@@ -1,6 +1,3 @@
-import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_PROVISIONING_STEP } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import { GuardedLink } from '@platform/components/shared/guarded-link';
 import {
@@ -39,6 +36,9 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
+import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_PROVISIONING_STEP } from '@shinefold/db';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import {

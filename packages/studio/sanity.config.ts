@@ -1,4 +1,4 @@
-import { buildStudioConfig } from '@blog/studio/studio-config';
+import { buildStudioConfig } from '@shinefold/studio/studio-config';
 
 import { requireEnv } from './sanity-env';
 

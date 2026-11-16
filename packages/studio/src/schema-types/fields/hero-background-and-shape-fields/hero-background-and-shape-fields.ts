@@ -2,9 +2,9 @@ import {
   BRAND_VARIANT,
   FULL_BRAND_VARIANT_LIST,
   HERO_VARIANT,
-} from '@blog/config/constants';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { variantField } from '@blog/studio/schema-types/fields/variant-field/variant-field';
+} from '@shinefold/config/constants';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { variantField } from '@shinefold/studio/schema-types/fields/variant-field/variant-field';
 
 export const heroBackgroundAndShapeFields = () => [
   brandVariantField({

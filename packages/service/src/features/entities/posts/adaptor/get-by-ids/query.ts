@@ -1,6 +1,6 @@
-import { q } from '@blog/service/sanity/query/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
-import { postCardFragment } from '@blog/service/shared/fragments/post/post';
+import { q } from '@shinefold/service/sanity/query/query';
+import { PUBLISHED_POST_FILTER } from '@shinefold/service/shared/expressions/post/published-post';
+import { postCardFragment } from '@shinefold/service/shared/fragments/post/post';
 
 export type TPostsByIdsQueryParams = {
   ids: string[];

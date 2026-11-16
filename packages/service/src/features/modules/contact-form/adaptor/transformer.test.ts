@@ -1,11 +1,11 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
-import { mockRawContactFormModule } from '@blog/service/testing/modules/fixtures';
+import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@shinefold/config';
+import { mockRawContactFormModule } from '@shinefold/service/testing/modules/fixtures';
 import {
   mockRawHeadingBlock,
   mockRawParagraphTextBlock,
   mockRawWideLayout,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toContactFormModule, type TRawContactFormModule } from './transformer';
 

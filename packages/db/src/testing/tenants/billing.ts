@@ -1,9 +1,9 @@
-import { PAID_SUBSCRIBER_BAND_CEILINGS } from '@blog/db/constants';
-import type { TStripeIds } from '@blog/db/queries/tenants/get-tenant-id-by-stripe-ids';
-import type { TTenantBilling } from '@blog/db/queries/tenants/tenant-billing';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
-import { createMockFaker } from '@blog/db/testing/mock-faker';
+import { PAID_SUBSCRIBER_BAND_CEILINGS } from '@shinefold/db/constants';
+import type { TStripeIds } from '@shinefold/db/queries/tenants/get-tenant-id-by-stripe-ids';
+import type { TTenantBilling } from '@shinefold/db/queries/tenants/tenant-billing';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
 
 const billingFaker = createMockFaker(6873);
 

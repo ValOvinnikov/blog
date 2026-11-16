@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_ESCAPED_SCRIPT_MARKUP,
   MOCK_ESCAPED_UNSAFE_MARKUP,
@@ -6,9 +7,8 @@ import {
   MOCK_TENANT_NAME,
   MOCK_UNSAFE_MARKUP,
   MOCK_URL,
-} from '@blog/email/testing/email-fixtures';
-import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/email/testing/email-fixtures';
+import { MOCK_TENANT_EMAIL_BRAND } from '@shinefold/email/testing/tenant-email-brand';
 
 import {
   buildContactNotificationEmail,

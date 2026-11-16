@@ -1,4 +1,4 @@
-# @blog/vitest-config
+# @shinefold/vitest-config
 
 > Shared Vitest preset.
 
@@ -13,7 +13,7 @@ Also exports `createVitestConfig(overrides)`, the shared Next.js app preset
 (SVGR, jsdom, the `next-intl` server-deps inline, and the node/jsdom project
 split — `node` on `threads`, `jsdom` on `vmThreads`) that `apps/web` and `apps/platform` call directly instead of
 `mergeConfig`-ing the base preset themselves, and `blogPackageAlias(pkg,
-import.meta.url)`, a one-line builder for a `@blog/<pkg>/*` -> `packages/<pkg>/src`
+import.meta.url)`, a one-line builder for a `@shinefold/<pkg>/*` -> `packages/<pkg>/src`
 resolve alias entry.
 
 ## Consumed by
@@ -24,9 +24,9 @@ configures Vitest directly rather than merging this preset.)
 
 ## Scripts
 
-| Script | Command                                  |
-| ------ | ---------------------------------------- |
-| `lint` | `pnpm --filter @blog/vitest-config lint` |
+| Script | Command                                       |
+| ------ | --------------------------------------------- |
+| `lint` | `pnpm --filter @shinefold/vitest-config lint` |
 
 ## Further reading
 

@@ -1,5 +1,8 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
-import type { TTenantSanityContext } from '@blog/service/sanity/client/client';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/client/client';
 
 export type TLocaleQueryParams = {
   locale: TLocaleIsoCode;

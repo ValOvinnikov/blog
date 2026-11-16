@@ -1,23 +1,23 @@
+import { faker } from '@faker-js/faker';
+import { ThemeProvider } from '@sanity/ui';
+import { buildTheme } from '@sanity/ui/theme';
 import {
   CAPABILITY,
   MODULE_PACK,
   type TCapability,
   type TModulePack,
-} from '@blog/config/constants';
-import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
-import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
-import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types/mark-requirement-off-types';
+} from '@shinefold/config/constants';
+import { migrationStateSchema } from '@shinefold/studio/schema-types/documents/system/migration-state/migration-state';
+import { entitlementGates } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
+import { markRequirementOffTypes } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types/mark-requirement-off-types';
 import {
   getRequirementOffMessage,
   type TEntitlementState,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
-import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
-import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
-import { isUndefined } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
-import { ThemeProvider } from '@sanity/ui';
-import { buildTheme } from '@sanity/ui/theme';
+} from '@shinefold/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { newsletterSchema } from '@shinefold/studio/schema-types/modules/newsletter/newsletter';
+import { pricingSchema } from '@shinefold/studio/schema-types/modules/pricing/pricing';
+import { EVERY_MODULE_PACK } from '@shinefold/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { createElement, type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { InputProps, ItemProps, TemplateItem } from 'sanity';

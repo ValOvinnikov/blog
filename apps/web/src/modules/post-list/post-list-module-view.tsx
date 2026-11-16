@@ -1,7 +1,7 @@
-import type { TPostListModule } from '@blog/service';
-import { CardGrid } from '@blog/ui/components/organisms/card-grid';
-import { Pagination } from '@blog/ui/components/organisms/pagination';
-import { hasLength } from '@blog/utils/primitives';
+import type { TPostListModule } from '@shinefold/service';
+import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
+import { Pagination } from '@shinefold/ui/components/organisms/pagination';
+import { hasLength } from '@shinefold/utils/primitives';
 import {
   type IMediaCardData,
   MediaCardItem,

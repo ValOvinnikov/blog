@@ -1,7 +1,5 @@
 'use client';
 
-import { ALERT_TYPE, FORM_STATUS, type TCapability } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
 import {
@@ -18,6 +16,8 @@ import {
   SHOWN_CAPABILITY_TOGGLES,
   type TSettingsFeaturesValues,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
+import { ALERT_TYPE, FORM_STATUS, type TCapability } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 

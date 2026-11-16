@@ -1,4 +1,4 @@
-import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
+import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
 
 import { nextSort } from './next-sort';
 

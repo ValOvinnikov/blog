@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   BILLING_CURRENCY,
   STRIPE_COUPON_DURATION,
   type TBillingCurrency,
-} from '@blog/db/constants';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/constants';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { z } from 'zod';
 
 export const PROMOTION_CODE_PATH = '/api/promotion-code';

@@ -6,17 +6,17 @@ import {
   SANITY_PROJECT_ROLE,
   SANITY_RESOURCE_TYPE,
   type TSanityResourceType,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
-import type { TFindingSummary } from '@blog/db/schema/findings';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { MOCK_IDLE_PROVISIONING_STEPS } from '@blog/db/testing/tenants/fixtures';
-import type { TSanityInvite } from '@blog/db/utils/sanity-management-client/sanity-project-access';
-import type { TSanityUser } from '@blog/db/utils/sanity-management-client/sanity-project-users';
+} from '@shinefold/db/constants';
+import type { TFindingSummary } from '@shinefold/db/schema/findings';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { MOCK_IDLE_PROVISIONING_STEPS } from '@shinefold/db/testing/tenants/fixtures';
+import type { TSanityInvite } from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
+import type { TSanityUser } from '@shinefold/db/utils/sanity-management-client/sanity-project-users';
 import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
 import { createMockFaker } from '@worker/testing/mock-faker';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';

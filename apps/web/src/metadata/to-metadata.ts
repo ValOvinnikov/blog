@@ -1,4 +1,4 @@
-import { type TSeoResolved, urlForSanityImage } from '@blog/service';
+import { type TSeoResolved, urlForSanityImage } from '@shinefold/service';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import type { Metadata } from 'next';
 

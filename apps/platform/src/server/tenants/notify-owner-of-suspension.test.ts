@@ -1,6 +1,3 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_STATUS } from '@blog/db/constants';
-import { sendEmail } from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import enMessages from '@platform/i18n/messages/en.json';
@@ -26,6 +23,9 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { sendEmail } from '@shinefold/email';
 
 import { notifyOwnerOfSuspension } from './notify-owner-of-suspension';
 
@@ -35,14 +35,14 @@ const { getTenantOwnerEmailMock } = vi.hoisted(() => ({
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: { getTenantOwnerEmail: getTenantOwnerEmailMock },
   },
 }));
 
-vi.mock('@blog/email');
+vi.mock('@shinefold/email');
 
 const MOCK_REPLY_TO_ADDRESS = faker.internet.email();
 const TENANT = mockTenant();

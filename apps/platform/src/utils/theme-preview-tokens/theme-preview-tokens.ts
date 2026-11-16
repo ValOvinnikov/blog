@@ -1,3 +1,4 @@
+import { FONT_OPTIONS } from '@platform/config/fonts';
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
@@ -24,8 +25,7 @@ import {
   type TNavLinkStyle,
   type TRadiusScale,
   type TThemeDeclarations,
-} from '@blog/config';
-import { FONT_OPTIONS } from '@platform/config/fonts';
+} from '@shinefold/config';
 import type { CSSProperties } from 'react';
 
 const HUE_GRADIENT_STEP = 20;

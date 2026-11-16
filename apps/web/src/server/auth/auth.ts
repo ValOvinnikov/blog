@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { buildAuthConfig } from '@blog/auth';
-import { AUTH_APP } from '@blog/config/constants';
+import { buildAuthConfig } from '@shinefold/auth';
+import { AUTH_APP } from '@shinefold/config/constants';
 import { logMagicLinkRefusal } from '@web/server/auth/log-magic-link-refusal';
 import { getRequestSiteOAuthCredentials } from '@web/server/auth/site-oauth-credentials/site-oauth-credentials';
 import { logEmailSendCountFailure } from '@web/server/email-usage/log-email-send-count-failure/log-email-send-count-failure';

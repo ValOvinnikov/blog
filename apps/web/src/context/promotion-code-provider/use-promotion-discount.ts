@@ -1,6 +1,6 @@
 'use client';
 
-import { HTTP_STATUS, type TMaybeUndefined } from '@blog/config';
+import { HTTP_STATUS, type TMaybeUndefined } from '@shinefold/config';
 import { PRICING_LOG, PRICING_SEARCH_PARAM } from '@web/constants/pricing';
 import { useClientSnapshot } from '@web/hooks/use-client-snapshot';
 import {

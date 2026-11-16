@@ -1,4 +1,3 @@
-import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockPendingProjectDomain } from '@platform/testing/domains/fixtures';
@@ -10,6 +9,7 @@ import {
   MOCK_CUSTOM_DOMAIN,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@shinefold/config';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -25,7 +25,7 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: {

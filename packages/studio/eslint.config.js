@@ -1,4 +1,4 @@
-import config from '@blog/eslint-config/studio';
+import config from '@shinefold/eslint-config/studio';
 
 export default [
   { ignores: ['dist/**', '.sanity/**', 'scripts/**', 'migrations/**/*.mjs'] },

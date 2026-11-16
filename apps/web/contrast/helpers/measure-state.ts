@@ -1,5 +1,5 @@
-import type { TMaybeNull } from '@blog/config';
 import type { CDPSession, Page } from '@playwright/test';
+import type { TMaybeNull } from '@shinefold/config';
 
 import { collectEdgeTargets, FOCUSABLE_SELECTOR } from './collect-edge-targets';
 import {

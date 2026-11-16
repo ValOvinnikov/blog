@@ -1,6 +1,6 @@
-import { service } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { service } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { mockTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -13,7 +13,7 @@ const TOPICS_FETCH_FAILED_EVENT = 'topics.fetch_failed';
 const MOCK_TOPICS = [mockTopicWithPostCount({ postCount: 3 })];
 const MOCK_ERROR = new Error(faker.lorem.sentence());
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     entities: {
       topics: { v1: { getTopics: vi.fn() } },

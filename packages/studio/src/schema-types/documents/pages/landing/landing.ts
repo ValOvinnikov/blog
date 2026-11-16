@@ -1,33 +1,33 @@
 import {
+  orderRankField,
+  orderRankOrdering,
+} from '@sanity/orderable-document-list';
+import {
   PAGE_LANDING_TYPE,
   SECTION_NAVIGATION_FIELD,
   SECTION_NAVIGATION_TITLE_FIELD,
   SHOW_SECTION_NAVIGATION_FIELD,
-} from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { landingTemplateSchema } from '@blog/studio/schema-types/documents/templates/landing/landing';
+} from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { landingTemplateSchema } from '@shinefold/studio/schema-types/documents/templates/landing/landing';
 import {
   LANGUAGE_FIELD,
   languageField,
-} from '@blog/studio/schema-types/fields/language-field/language-field';
-import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
-import { templateField } from '@blog/studio/schema-types/fields/template-field/template-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+} from '@shinefold/studio/schema-types/fields/language-field/language-field';
+import { slugField } from '@shinefold/studio/schema-types/fields/slug-field/slug-field';
+import { templateField } from '@shinefold/studio/schema-types/fields/template-field/template-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import {
   SectionNavigationField,
   ShowSectionNavigationField,
-} from '@blog/studio/schema-types/inputs/landing-section-navigation-field/landing-section-navigation-field';
-import { LandingSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/landing-slug-url-preview/landing-slug-url-preview-input';
-import { pageHeadingBlockField } from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block-field';
-import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
-import { languagePreview } from '@blog/studio/schema-types/preview/language-preview/language-preview';
-import { validateLandingParent } from '@blog/studio/schema-types/validation/validate-landing-parent/validate-landing-parent';
-import { validateLandingSlug } from '@blog/studio/schema-types/validation/validate-landing-slug/validate-landing-slug';
-import { validateLandingSlugUniqueAmongSiblings } from '@blog/studio/schema-types/validation/validate-landing-slug-unique-among-siblings/validate-landing-slug-unique-among-siblings';
-import { validateSettingMatchesDefaultLanguage } from '@blog/studio/schema-types/validation/validate-setting-matches-default-language/validate-setting-matches-default-language';
-import {
-  orderRankField,
-  orderRankOrdering,
-} from '@sanity/orderable-document-list';
+} from '@shinefold/studio/schema-types/inputs/landing-section-navigation-field/landing-section-navigation-field';
+import { LandingSlugUrlPreviewInput } from '@shinefold/studio/schema-types/inputs/landing-slug-url-preview/landing-slug-url-preview-input';
+import { pageHeadingBlockField } from '@shinefold/studio/schema-types/objects/page-heading-block/page-heading-block-field';
+import { seoField } from '@shinefold/studio/schema-types/objects/seo/seo-field';
+import { languagePreview } from '@shinefold/studio/schema-types/preview/language-preview/language-preview';
+import { validateLandingParent } from '@shinefold/studio/schema-types/validation/validate-landing-parent/validate-landing-parent';
+import { validateLandingSlug } from '@shinefold/studio/schema-types/validation/validate-landing-slug/validate-landing-slug';
+import { validateLandingSlugUniqueAmongSiblings } from '@shinefold/studio/schema-types/validation/validate-landing-slug-unique-among-siblings/validate-landing-slug-unique-among-siblings';
+import { validateSettingMatchesDefaultLanguage } from '@shinefold/studio/schema-types/validation/validate-setting-matches-default-language/validate-setting-matches-default-language';
 import { FileText } from 'lucide-react';
 import type { ComponentType } from 'react';
 import {

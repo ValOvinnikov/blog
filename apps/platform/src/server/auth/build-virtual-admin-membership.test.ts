@@ -1,7 +1,7 @@
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import { z } from 'zod';
 
 import {

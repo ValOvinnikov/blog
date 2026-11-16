@@ -1,5 +1,5 @@
-import { BRAND_VARIANT } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
+import { BRAND_VARIANT } from '@shinefold/config';
 
 // The swatch paints the site's own tokens, not `--platform-*` ones, so it shows the footer's real background.
 export const footerBackgroundGlyphVariants = tv({

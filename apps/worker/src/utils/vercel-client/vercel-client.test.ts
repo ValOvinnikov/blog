@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { HTTP_STATUS } from '@shinefold/config/constants';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import { MOCK_TENANT_DOMAIN } from '@worker/testing/tenant/fixtures';
 

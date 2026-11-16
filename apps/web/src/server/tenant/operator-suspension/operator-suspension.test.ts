@@ -1,4 +1,4 @@
-import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
+import { SUSPENSION_REASON, TENANT_STATUS } from '@shinefold/db/constants';
 import { mockTenant } from '@web/testing/shared/tenant/fixtures';
 
 import { isOperatorSuspended } from './operator-suspension';

@@ -1,7 +1,7 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { CONTRAST_STATUS, RELEASE_REFUSAL } from '@platform/constants/release';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ReleaseContrastCard } from './release-contrast-card';

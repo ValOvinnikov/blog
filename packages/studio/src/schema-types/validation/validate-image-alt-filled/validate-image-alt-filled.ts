@@ -1,4 +1,4 @@
-import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { validateDefaultLanguageFilled } from '@shinefold/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
 import type { ValidationContext } from 'sanity';
 
 type TImageParent = { asset?: unknown };

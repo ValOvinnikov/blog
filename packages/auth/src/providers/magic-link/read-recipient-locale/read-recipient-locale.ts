@@ -1,4 +1,7 @@
-import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@blog/config/constants';
+import {
+  LOCALE_BCP47_TAGS,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 
 /**
  * The recipient's language is the first segment of the return-to path inside

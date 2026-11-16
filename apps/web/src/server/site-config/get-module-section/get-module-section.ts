@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import type { TModuleSection } from '@web/components/shared/section';
 import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import type { TSectionStyleOverrides } from '@web/utils/gate-section-style-overrides';

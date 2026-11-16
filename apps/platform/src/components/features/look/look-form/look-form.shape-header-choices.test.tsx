@@ -1,11 +1,3 @@
-import {
-  CARD_STYLE,
-  HEADER_BAR_STYLE,
-  HEADER_CONTROL_STYLE,
-  HEADER_LAYOUT,
-  HEADER_SUBMENU_STYLE,
-  NAV_LINK_STYLE,
-} from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { screen, within } from '@platform/testing/custom-render';
@@ -22,6 +14,14 @@ import {
 import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { UNSAVED_CHANGES } from '@platform/testing/render-in-settings-form';
+import {
+  CARD_STYLE,
+  HEADER_BAR_STYLE,
+  HEADER_CONTROL_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
+  NAV_LINK_STYLE,
+} from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

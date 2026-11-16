@@ -4,11 +4,11 @@ import {
   type TDisplayMode,
   type THeadingBlock,
   type TMaybeUndefined,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   CardGrid,
   type TCardGridProps,
-} from '@blog/ui/components/organisms/card-grid';
+} from '@shinefold/ui/components/organisms/card-grid';
 import { CardCarousel } from '@web/components/shared/card-carousel';
 import {
   type IMediaCardData,

@@ -1,12 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  NEXT_NAVIGATION_ERROR,
-  RELEASE_CHANGE,
-  type TMaybeNull,
-} from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import {
@@ -26,6 +17,15 @@ import {
   MOCK_RELEASE_LAST_TAG,
   mockReleaseRun,
 } from '@platform/testing/releases/fixtures';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+  RELEASE_CHANGE,
+  type TMaybeNull,
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import type { Session } from 'next-auth';
 
 import { startReleaseAction } from './start-release-action';
@@ -73,7 +73,7 @@ vi.mock('./dispatch-release-workflow', () => ({
   dispatchReleaseWorkflow: dispatchReleaseWorkflowMock,
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { auditEvents: { insertAuditEvent: insertAuditEventMock } },
 }));
 

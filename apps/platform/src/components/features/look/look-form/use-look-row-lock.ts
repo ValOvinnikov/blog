@@ -1,7 +1,7 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TLookField } from '@blog/db/constants';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TLookField } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 
 import { useLookPresetName } from './use-look-preset-name';

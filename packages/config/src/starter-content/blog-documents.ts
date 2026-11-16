@@ -1,6 +1,6 @@
-import type { Blog_topic } from '@blog/config/sanity/generated/types';
+import type { Blog_topic } from '@shinefold/config/sanity/generated/types';
 
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 
 import { buildBaseDocuments } from './base-documents';
 import { buildBlogIndexPages } from './blog-index-pages';

@@ -1,7 +1,7 @@
-import { TENANT_CONFIG_REVALIDATE_SECONDS } from '@blog/config';
-import { queries } from '@blog/db';
-import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
-import { safeAsync } from '@blog/utils';
+import { TENANT_CONFIG_REVALIDATE_SECONDS } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toEffectiveLook } from '@shinefold/db/utils/effective-look/effective-look';
+import { safeAsync } from '@shinefold/utils';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { buildSiteConfigCacheTag } from '@web/utils/tenant-cache-tags';

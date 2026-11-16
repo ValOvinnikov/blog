@@ -10,7 +10,7 @@ import {
   RADIUS_DECLARATIONS,
   RADIUS_SCALE,
   type TCardStyle,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   MOCK_NO_SECTION_STYLE_OVERRIDES,
   MOCK_SECTION_LOOK,

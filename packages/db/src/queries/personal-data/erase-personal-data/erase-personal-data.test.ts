@@ -1,36 +1,36 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { isSignupBlocked } from '@blog/db/queries/blocked-signup-identities/is-signup-blocked';
-import { ownsFreeTenant } from '@blog/db/queries/tenants/owns-free-tenant';
+import { faker } from '@faker-js/faker';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import { isSignupBlocked } from '@shinefold/db/queries/blocked-signup-identities/is-signup-blocked';
+import { ownsFreeTenant } from '@shinefold/db/queries/tenants/owns-free-tenant';
 import {
   getUnsentStudioReinviteEmail,
   setUnsentStudioReinvite,
-} from '@blog/db/queries/tenants/unsent-studio-reinvite';
-import * as schema from '@blog/db/schema';
-import { MOCK_NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
+} from '@shinefold/db/queries/tenants/unsent-studio-reinvite';
+import * as schema from '@shinefold/db/schema';
+import { MOCK_NOT_AN_ADDRESS } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
 import {
   insertTestTenant,
   MOCK_INVITE_EMAIL,
   MOCK_SUBSCRIBER_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { testPersonalEmailIndex } from '@blog/db/testing/personal-data';
+} from '@shinefold/db/testing/fixtures';
+import { testPersonalEmailIndex } from '@shinefold/db/testing/personal-data';
 import {
   deleteTestPersonalDataRows,
   findTestReaderId,
   getTestReaderId,
   insertTestPersonalDataRows,
-} from '@blog/db/testing/personal-data-rows';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { readSelfServeIndex } from '@blog/db/testing/tenants/self-serve-fixtures';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/personal-data-rows';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { readSelfServeIndex } from '@shinefold/db/testing/tenants/self-serve-fixtures';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import {
   erasePersonalData,
   type TPersonalDataCounts,
 } from './erase-personal-data';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

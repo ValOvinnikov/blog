@@ -3,7 +3,7 @@ import {
   isComingSoonCapability,
   type TCapability,
   type TMaybeUndefined,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export type TSettingsFeaturesValues = {
   readerAccountsEnabled: boolean;

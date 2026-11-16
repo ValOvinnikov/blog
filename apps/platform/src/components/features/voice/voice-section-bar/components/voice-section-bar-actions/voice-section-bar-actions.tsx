@@ -1,7 +1,6 @@
 'use client';
 
 import { Button as BaseButton } from '@base-ui/react/button';
-import { ICONS, SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { IconSoloControl } from '@platform/components/shared/icon-solo-control';
 import { BUTTON_VARIANT } from '@platform/constants/button';
@@ -9,6 +8,7 @@ import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { VOICE_SECTION_ID } from '@platform/constants/voice';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
 import { VOICE_SECTIONS_IN_PAGE_ORDER } from '@platform/utils/voice-draft/voice-draft';
+import { ICONS, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { voiceSectionBarActionsVariants } from './voice-section-bar-actions-variants';

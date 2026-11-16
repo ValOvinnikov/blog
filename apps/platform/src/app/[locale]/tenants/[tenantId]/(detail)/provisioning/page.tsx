@@ -1,8 +1,8 @@
-import { queries } from '@blog/db';
 import { ProvisioningStatusView } from '@platform/components/features/tenants/provisioning-status-view';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
+import { queries } from '@shinefold/db';
 import type { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {

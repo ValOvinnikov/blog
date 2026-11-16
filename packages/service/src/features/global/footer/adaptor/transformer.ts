@@ -1,7 +1,10 @@
-import { FOOTER_FINE_PRINT_KIND, type TMaybeUndefined } from '@blog/config';
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
-import { toLinkDocuments } from '@blog/service/shared/transformers/link/to-link-documents';
-import { toSocialProfiles } from '@blog/service/shared/transformers/social-profile/to-social-profiles';
+import {
+  FOOTER_FINE_PRINT_KIND,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import { toLinkDocument } from '@shinefold/service/shared/transformers/link/to-link-document';
+import { toLinkDocuments } from '@shinefold/service/shared/transformers/link/to-link-documents';
+import { toSocialProfiles } from '@shinefold/service/shared/transformers/social-profile/to-social-profiles';
 import type { InferResultType } from 'groqd';
 
 import type { footerQuery } from './query';

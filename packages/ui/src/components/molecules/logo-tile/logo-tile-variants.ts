@@ -1,4 +1,4 @@
-import { INTERACTIVE_ITEM_CARD, tv } from '@blog/ui/lib/styling';
+import { INTERACTIVE_ITEM_CARD, tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const logoTileVariants = tv({

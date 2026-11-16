@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   DENSITY,
   FONT_CHOICE,
@@ -9,8 +10,7 @@ import {
   type TLocaleIsoCode,
   type TVoicePortableText,
   VOICE_FIELD_KIND,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -26,7 +26,7 @@ const { getSiteConfigMock } = vi.hoisted(() => ({
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },

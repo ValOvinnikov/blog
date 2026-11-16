@@ -1,6 +1,5 @@
 'use client';
 
-import { isOutcomeSuccess, SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
@@ -15,6 +14,7 @@ import {
   settleAction,
   type TUnreachedAction,
 } from '@platform/utils/settle-action/settle-action';
+import { isOutcomeSuccess, SIZE } from '@shinefold/config';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';

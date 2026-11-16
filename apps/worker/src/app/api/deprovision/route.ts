@@ -1,6 +1,6 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { getTenantById } from '@blog/db/queries/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { getTenantById } from '@shinefold/db/queries/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { DEPROVISIONING_START_FAILED_EVENT } from '@worker/constants/deprovisioning';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { logger } from '@worker/utils/logger/logger';

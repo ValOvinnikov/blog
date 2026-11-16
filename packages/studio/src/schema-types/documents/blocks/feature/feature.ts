@@ -1,10 +1,10 @@
-import { FEATURE_ICONS } from '@blog/config/constants';
-import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
-import { toTitleCase } from '@blog/utils/primitives';
+import { FEATURE_ICONS } from '@shinefold/config/constants';
+import { linkReferenceField } from '@shinefold/studio/schema-types/fields/link-reference-field/link-reference-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { localizedImageWithAltSchema } from '@shinefold/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { IdCard } from 'lucide-react';
 import {
   defineField,

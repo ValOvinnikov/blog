@@ -1,12 +1,12 @@
 import 'server-only';
 
-import type { TMaybeNull } from '@blog/config';
+import type { TMaybeNull } from '@shinefold/config';
 import {
   BLOCKED_IDENTITY_KIND,
   queries,
   type TBlockedIdentityKind,
-} from '@blog/db';
-import type { TBlockedIdentityListing } from '@blog/db/queries/blocked-signup-identities/list-blocked-identities';
+} from '@shinefold/db';
+import type { TBlockedIdentityListing } from '@shinefold/db/queries/blocked-signup-identities/list-blocked-identities';
 
 const HASH_PREVIEW_LENGTH = 12;
 

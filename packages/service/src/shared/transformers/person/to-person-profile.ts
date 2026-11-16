@@ -2,12 +2,12 @@ import type {
   ISanityImage,
   TMaybeUndefined,
   TPortableTextBlock,
-} from '@blog/config';
-import type { personDetailFragment } from '@blog/service/shared/fragments/person/person';
-import { toPersonCard } from '@blog/service/shared/transformers/person/to-person-card';
-import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
-import type { TSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
-import { toSocialProfiles } from '@blog/service/shared/transformers/social-profile/to-social-profiles';
+} from '@shinefold/config';
+import type { personDetailFragment } from '@shinefold/service/shared/fragments/person/person';
+import { toPersonCard } from '@shinefold/service/shared/transformers/person/to-person-card';
+import { toPortableText } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-mark-def';
+import type { TSocialProfile } from '@shinefold/service/shared/transformers/social-profile/to-social-profile';
+import { toSocialProfiles } from '@shinefold/service/shared/transformers/social-profile/to-social-profiles';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawPersonProfile = InferFragmentType<typeof personDetailFragment>;

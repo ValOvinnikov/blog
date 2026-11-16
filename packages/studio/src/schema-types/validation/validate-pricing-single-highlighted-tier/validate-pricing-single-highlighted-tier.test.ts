@@ -1,7 +1,7 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { validatePricingSingleHighlightedTier } from '@blog/studio/schema-types/validation/validate-pricing-single-highlighted-tier/validate-pricing-single-highlighted-tier';
-import { mockLocalizedValue } from '@blog/studio/testing/mock-documents';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { validatePricingSingleHighlightedTier } from '@shinefold/studio/schema-types/validation/validate-pricing-single-highlighted-tier/validate-pricing-single-highlighted-tier';
+import { mockLocalizedValue } from '@shinefold/studio/testing/mock-documents';
 
 faker.seed(6023);
 

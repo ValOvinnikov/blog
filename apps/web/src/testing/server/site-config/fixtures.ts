@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
@@ -21,9 +22,8 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
   SPINNER_STYLE,
-} from '@blog/config';
-import type { TSiteConfigResult } from '@blog/db/queries/site-config/get-site-config/get-site-config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import type { TSiteConfigResult } from '@shinefold/db/queries/site-config/get-site-config/get-site-config';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 

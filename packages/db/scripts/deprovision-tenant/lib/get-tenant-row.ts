@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { getDb } from '@shinefold/db/client';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
 export async function getTenantRow(tenantId: string): Promise<TTenant> {

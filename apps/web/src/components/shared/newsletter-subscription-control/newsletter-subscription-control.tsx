@@ -1,8 +1,8 @@
 'use client';
 
-import { ACTION_OUTCOME } from '@blog/config';
-import type { TValueOf } from '@blog/config/utils';
-import { Button } from '@blog/ui/components/atoms/button';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import type { TValueOf } from '@shinefold/config/utils';
+import { Button } from '@shinefold/ui/components/atoms/button';
 import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
 import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useToast } from '@web/context/toast-provider';

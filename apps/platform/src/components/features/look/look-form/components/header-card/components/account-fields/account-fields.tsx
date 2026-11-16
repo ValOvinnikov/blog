@@ -1,3 +1,8 @@
+import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
+import { useLookForm } from '@platform/components/features/look/look-form-provider';
+import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
@@ -5,12 +10,7 @@ import {
   type TAccountButtonStyle,
   type TAccountPanelStyle,
   type TAccountPhonePlacement,
-} from '@blog/config';
-import { LookField } from '@platform/components/features/look/look-form/components/look-field';
-import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
-import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
-import { useLookForm } from '@platform/components/features/look/look-form-provider';
-import { SegmentedControl } from '@platform/components/shared/segmented-control';
+} from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export const AccountFields = () => {

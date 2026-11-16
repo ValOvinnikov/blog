@@ -1,10 +1,10 @@
-import { DOMAIN_PATTERN } from '@blog/config/constants';
+import { DOMAIN_PATTERN } from '@shinefold/config/constants';
 import {
   isPersonalDataKey,
   isPersonalDataKeyring,
   PERSONAL_DATA_KEY_FORMAT,
   PERSONAL_DATA_KEYRING_FORMAT,
-} from '@blog/utils/encryption';
+} from '@shinefold/utils/encryption';
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 

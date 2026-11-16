@@ -1,4 +1,4 @@
-import type { TPortableTextBody } from '@blog/service';
+import type { TPortableTextBody } from '@shinefold/service';
 
 import {
   mockExpandableSectionBlock,

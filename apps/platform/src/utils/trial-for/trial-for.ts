@@ -1,7 +1,7 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export type TTrial = {
   plan: TTenantPlan;

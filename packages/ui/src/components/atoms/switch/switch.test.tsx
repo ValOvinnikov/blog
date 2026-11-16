@@ -1,4 +1,4 @@
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 

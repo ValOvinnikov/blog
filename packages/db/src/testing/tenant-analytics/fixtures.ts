@@ -1,6 +1,6 @@
-import { ANALYTICS_PROVIDER } from '@blog/config/constants';
-import type { TTenantAnalytics } from '@blog/db/queries/tenant-analytics/save-tenant-analytics';
-import { createMockFaker } from '@blog/db/testing/mock-faker';
+import { ANALYTICS_PROVIDER } from '@shinefold/config/constants';
+import type { TTenantAnalytics } from '@shinefold/db/queries/tenant-analytics/save-tenant-analytics';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
 
 const tenantAnalyticsFaker = createMockFaker(7150);
 

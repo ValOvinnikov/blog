@@ -1,11 +1,11 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
 import {
   tenantDomains,
   type TTenantDomain,
-} from '@blog/db/schema/tenant-domains';
-import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/db/schema/tenant-domains';
+import { isValidDomain } from '@shinefold/db/utils/is-valid-domain/is-valid-domain';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { eq } from 'drizzle-orm';
 
 // Idempotent for the exact same (tenantId, domain) pair, since `domain` is

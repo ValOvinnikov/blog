@@ -3,7 +3,7 @@ import {
   LOCALE_NATIVE_LABEL,
   routes,
   type TLocaleIsoCode,
-} from '@blog/config';
+} from '@shinefold/config';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 
 export type TLanguageEntry = {

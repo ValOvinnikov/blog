@@ -1,7 +1,7 @@
-import { HUE_MIN, PRESET_ID, RADIUS_SCALE } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { HUE_MIN, PRESET_ID, RADIUS_SCALE } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { toEffectiveLook } from '@shinefold/db/utils/effective-look/effective-look';
 
 import { listRefusedLookFields } from './refused-look-fields';
 

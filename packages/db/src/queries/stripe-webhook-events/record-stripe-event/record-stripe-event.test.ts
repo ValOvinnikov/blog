@@ -1,14 +1,14 @@
-import { STRIPE_EVENT_RECORD_OUTCOME } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { STRIPE_EVENT_RECORD_OUTCOME } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_OTHER_STRIPE_EVENT_ID,
   MOCK_STRIPE_EVENT_ID,
-} from '@blog/db/testing/tenants/billing';
+} from '@shinefold/db/testing/tenants/billing';
 
 import { recordStripeEvent } from './record-stripe-event';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

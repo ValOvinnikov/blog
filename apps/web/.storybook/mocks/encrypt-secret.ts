@@ -1,9 +1,9 @@
 /**
- * Storybook-only stand-in for `@blog/utils`'s encryption module, which
+ * Storybook-only stand-in for `@shinefold/utils`'s encryption module, which
  * imports `node:crypto` at module scope. Vite's browser-external stub for
  * that module throws the instant `createCipheriv`/`createDecipheriv`/
  * `randomBytes` are destructured off it, so merely importing the real file
- * — pulled in transitively via `@blog/utils`'s root barrel, which
+ * — pulled in transitively via `@shinefold/utils`'s root barrel, which
  * `apps/web/src/i18n/request.ts` imports for `deepMergePartial` — crashes
  * every story (`.storybook/main.ts`'s `resolveId` plugin redirects that one
  * importer to this module). No story calls either export.

@@ -27,12 +27,12 @@ export const listSources = () => {
     ...listConstFiles('packages/config/src/constants').map((file) => ({
       file,
       scope: 'config',
-      from: '@blog/config/constants',
+      from: '@shinefold/config/constants',
     })),
     ...listConstFiles('packages/db/src/constants').map((file) => ({
       file,
       scope: 'db',
-      from: '@blog/db/constants',
+      from: '@shinefold/db/constants',
     })),
     ...apps.flatMap((app) =>
       listConstFiles(`apps/${app}/src/constants`).map((file) => ({

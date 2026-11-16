@@ -1,15 +1,15 @@
-import type { TMaybeUndefined } from '@blog/config';
-import {
-  ELEVATE_TENANT_OWNER_OUTCOME,
-  OWNER_ACCESS_STALL_AFTER_MS,
-  TENANT_PROVISIONING_STEP,
-} from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import {
   OWNER_STUDIO_ACCESS,
   type TOwnerStudioAccess,
 } from '@platform/constants/owner-studio-access';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
+import type { TMaybeUndefined } from '@shinefold/config';
+import {
+  ELEVATE_TENANT_OWNER_OUTCOME,
+  OWNER_ACCESS_STALL_AFTER_MS,
+  TENANT_PROVISIONING_STEP,
+} from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 type TOwnerAccessTenant = Pick<
   TTenant,

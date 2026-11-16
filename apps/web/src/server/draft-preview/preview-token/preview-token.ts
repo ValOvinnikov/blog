@@ -1,8 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   type IPreviewTokenClaims,
   readPreviewTokenClaims,
-} from '@blog/utils/preview-token';
+} from '@shinefold/utils/preview-token';
 import { env } from '@web/utils/env/env';
 
 export const readPreviewLinkClaims = (

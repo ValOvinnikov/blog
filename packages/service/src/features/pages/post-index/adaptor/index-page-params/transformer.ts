@@ -1,4 +1,4 @@
-import { toTotalPages } from '@blog/utils';
+import { toTotalPages } from '@shinefold/utils';
 
 export type TRawIndexPageParams = {
   blogPosts: { total: number };

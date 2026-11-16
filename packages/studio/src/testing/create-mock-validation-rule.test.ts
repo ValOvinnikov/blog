@@ -1,11 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import { faker } from '@faker-js/faker';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   getCustomValidator,
   getCustomValidatorWithLevel,
   getRecordedBounds,
   getRecordedValidators,
-} from '@blog/studio/testing/create-mock-validation-rule';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/create-mock-validation-rule';
 import { defineField, defineType } from 'sanity';
 
 type TStringCustomFn = (value: TMaybeUndefined<string>) => string | true;

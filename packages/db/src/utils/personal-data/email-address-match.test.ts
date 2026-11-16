@@ -1,5 +1,5 @@
-import { MOCK_INVITE_EMAIL } from '@blog/db/testing/fixtures';
-import { taggedMixedCaseAddress } from '@blog/db/testing/personal-data-rows';
+import { MOCK_INVITE_EMAIL } from '@shinefold/db/testing/fixtures';
+import { taggedMixedCaseAddress } from '@shinefold/db/testing/personal-data-rows';
 
 import { withExactEmailAddress } from './email-address-match';
 import { encryptPersonalValue } from './personal-data';

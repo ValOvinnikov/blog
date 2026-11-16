@@ -1,15 +1,6 @@
 'use server';
 
 import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  type TActionResult,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { isUndefined } from '@blog/utils/primitives';
-import { toOutcome } from '@blog/utils/to-outcome';
-import {
   NEWSLETTER_PAUSE_LOG,
   NEWSLETTER_PAUSE_REFUSAL,
 } from '@platform/constants/newsletter-pause';
@@ -18,6 +9,15 @@ import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TActionResult,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { isUndefined } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
 const tenantIdSchema = z.uuid();

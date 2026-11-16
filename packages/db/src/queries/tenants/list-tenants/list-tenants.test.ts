@@ -1,19 +1,19 @@
+import { faker } from '@faker-js/faker';
 import {
   SORT_DIRECTION,
   TENANT_SORT_COLUMN,
   TENANT_PLAN,
-} from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_DEPROVISIONED_AT } from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_DEPROVISIONED_AT } from '@shinefold/db/testing/tenants/fixtures';
 
 import { listTenants } from './list-tenants';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(6020);
 

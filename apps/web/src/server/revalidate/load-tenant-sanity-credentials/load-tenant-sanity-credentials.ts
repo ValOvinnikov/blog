@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
-import type { TTenantSanityContext } from '@blog/service';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import type { TTenantSanityContext } from '@shinefold/service';
 import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { logger } from '@web/utils/logger/logger';
 

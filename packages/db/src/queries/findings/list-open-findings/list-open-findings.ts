@@ -1,9 +1,9 @@
-import { FINDING_SOURCE, FINDING_STATUS } from '@blog/config/constants';
-import type { TContrastResultBody, TMaybeNull } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { findingSummaryColumns } from '@blog/db/queries/findings/finding-summary-columns';
-import { findings, type TFindingSummary } from '@blog/db/schema/findings';
-import { tenants } from '@blog/db/schema/tenants';
+import { FINDING_SOURCE, FINDING_STATUS } from '@shinefold/config/constants';
+import type { TContrastResultBody, TMaybeNull } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { findingSummaryColumns } from '@shinefold/db/queries/findings/finding-summary-columns';
+import { findings, type TFindingSummary } from '@shinefold/db/schema/findings';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { desc, eq, sql } from 'drizzle-orm';
 
 export type TOpenFinding = TFindingSummary & {

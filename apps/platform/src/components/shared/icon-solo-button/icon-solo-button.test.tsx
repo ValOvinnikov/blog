@@ -1,7 +1,7 @@
-import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { ARIA_PRESSED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { ICONS } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { IconSoloButton } from './icon-solo-button';

@@ -1,8 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config';
 import {
   createStagingHandlers,
   type TStagedImage,
 } from '@platform/utils/staged-image/staged-image';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { type ChangeEvent, useState } from 'react';
 
 type TUseAssetFileChoiceArgs = {

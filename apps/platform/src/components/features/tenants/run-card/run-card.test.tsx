@@ -1,4 +1,3 @@
-import type { TProvisioningRun } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@platform/testing/custom-render';
 import {
@@ -7,6 +6,7 @@ import {
   MOCK_RUN_STARTED_AT,
   RUN_FINISHED_PENDING_TEXT,
 } from '@platform/testing/tenants/fixtures';
+import type { TProvisioningRun } from '@shinefold/db/schema/tenants';
 
 import { RunCard } from './run-card';
 

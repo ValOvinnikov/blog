@@ -1,4 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   HEADING_TEXT_PATH,
   MOCK_TEMPLATE_REFERENCE,
@@ -11,10 +12,9 @@ import {
   mockRawTopicIndexPage,
   mockTemplatedPageDocument,
   mockTemplateLayoutDocuments,
-} from '@blog/service/testing/pages/fixtures';
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqInLocale } from '@blog/service/testing/shared/groq';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/pages/fixtures';
+import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqInLocale } from '@shinefold/service/testing/shared/groq';
 
 import { topicIndexPageQuery } from './query';
 

@@ -1,14 +1,5 @@
 'use client';
 
-import {
-  isOutcomeInvalid,
-  isOutcomeRefused,
-  isOutcomeServerError,
-  isOutcomeSuccess,
-  type TMaybeNull,
-  type TMaybeUndefined,
-} from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
 import {
   CUSTOM_DOMAIN_CONNECT_REJECTIONS,
@@ -31,6 +22,15 @@ import {
   usePolledValue,
   type TPolledValueOptions,
 } from '@platform/utils/use-polled-value/use-polled-value';
+import {
+  isOutcomeInvalid,
+  isOutcomeRefused,
+  isOutcomeServerError,
+  isOutcomeSuccess,
+  type TMaybeNull,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';

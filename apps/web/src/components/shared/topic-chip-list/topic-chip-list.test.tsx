@@ -1,6 +1,6 @@
-import { routes, SITE_MESSAGES } from '@blog/config';
-import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { faker } from '@faker-js/faker';
+import { routes, SITE_MESSAGES } from '@shinefold/config';
+import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_SECOND_TOPIC,

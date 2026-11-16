@@ -1,4 +1,3 @@
-import { HTTP_STATUS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { CUSTOM_DOMAIN_TXT_TYPE } from '@platform/constants/custom-domain';
 import {
@@ -11,6 +10,7 @@ import { mockJsonResponse } from '@platform/testing/http/mock-json-response';
 import { requestedUrl } from '@platform/testing/http/requested-url';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_STATUS } from '@shinefold/config';
 
 import type { TDomainDnsRecord } from './project-domain';
 import { getProjectDomain } from './vercel-domains-api';

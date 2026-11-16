@@ -1,5 +1,5 @@
-import { service, type TBlogIndexPage } from '@blog/service';
-import type { TResult } from '@blog/utils';
+import { service, type TBlogIndexPage } from '@shinefold/service';
+import type { TResult } from '@shinefold/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { cache } from 'react';
 

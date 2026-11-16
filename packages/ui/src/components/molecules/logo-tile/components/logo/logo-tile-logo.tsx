@@ -1,5 +1,5 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { logoTileLogoVariants } from './logo-tile-logo-variants';

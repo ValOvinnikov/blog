@@ -1,12 +1,6 @@
 'use client';
 
 import { Field } from '@base-ui/react/field';
-import {
-  VOICE_FIELD_KIND,
-  VOICE_SURFACE,
-  type TVoiceFieldKind,
-} from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import { useVoiceFieldState } from '@platform/components/features/voice/voice-editor-provider';
 import { FormFieldControlProvider } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
@@ -18,6 +12,12 @@ import {
   isVoiceValueCustomised,
   type TVoiceField,
 } from '@platform/utils/voice-draft/voice-draft';
+import {
+  VOICE_FIELD_KIND,
+  VOICE_SURFACE,
+  type TVoiceFieldKind,
+} from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useRef, useState, type FocusEvent } from 'react';
 

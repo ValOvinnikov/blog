@@ -1,8 +1,3 @@
-import {
-  DEPROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
-import type { TTenantDeprovisioningState } from '@blog/db/schema/tenants';
 import { getTenantDeprovisioningStatusAction } from '@platform/server/provisioning/get-tenant-deprovisioning-status-action';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { act, renderHook } from '@platform/testing/custom-render';
@@ -22,6 +17,11 @@ import {
   MOCK_RUN_PLUS_2_MIN_AT,
   MOCK_RUN_PLUS_4_MIN_AT,
 } from '@platform/testing/tenants/fixtures';
+import {
+  DEPROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@shinefold/db/constants';
+import type { TTenantDeprovisioningState } from '@shinefold/db/schema/tenants';
 
 import {
   MAX_POLL_TICKS,

@@ -1,12 +1,12 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
-import { TENANT_STATUS, type TTenantStatus } from '@blog/db/constants';
 import {
   BILLING_GRACE,
   STRIPE_SUBSCRIPTION_STATUS,
   type TBillingGrace,
 } from '@platform/constants/billing';
 import type { TSubscribedPlan } from '@platform/server/billing/plan-from-price-keys';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
+import { TENANT_STATUS, type TTenantStatus } from '@shinefold/db/constants';
 
 export type TSubscriptionTenantState = TSubscribedPlan & {
   status: TTenantStatus;

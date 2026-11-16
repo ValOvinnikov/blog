@@ -1,9 +1,9 @@
-import { isUndefined } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import { UPGRADE_SEARCH_PARAM } from '@platform/constants/billing';
 import { MOCK_STRIPE_PROMOTION_CODE } from '@platform/testing/billing/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { SIGNUP_PROMO_COOKIE } from '@platform/utils/signup-promo-cookie/signup-promo-cookie';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { rememberSignupPromo } from './remember-signup-promo';

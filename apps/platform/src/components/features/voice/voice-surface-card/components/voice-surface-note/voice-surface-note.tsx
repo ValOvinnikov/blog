@@ -1,4 +1,4 @@
-import type { TVoiceSurface } from '@blog/config';
+import type { TVoiceSurface } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { voiceSurfaceNoteVariants } from './voice-surface-note-variants';

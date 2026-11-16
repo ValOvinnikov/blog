@@ -1,4 +1,4 @@
-import { isUndefined } from '@blog/utils/primitives';
+import { isUndefined } from '@shinefold/utils/primitives';
 import type { cookies } from 'next/headers';
 
 type TCookieStore = Awaited<ReturnType<typeof cookies>>;

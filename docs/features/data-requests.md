@@ -133,11 +133,11 @@ Nothing is configurable. Both personal-data keys must be set: without
 
 ## Dependencies
 
-- `@blog/db` (`findPersonalData`, `erasePersonalData`, `findUserByEmail`,
-  `getLinkedProviders`, `deleteAccount`), `@blog/utils`
+- `@shinefold/db` (`findPersonalData`, `erasePersonalData`, `findUserByEmail`,
+  `getLinkedProviders`, `deleteAccount`), `@shinefold/utils`
   (`normalizeEmailIdentity`, `personalDataIndex`, `decryptPersonalData`,
   `toCsv`),
-  `@blog/config` (`AUDIT_ACTION`, `AUDIT_TARGET_TYPE`).
+  `@shinefold/config` (`AUDIT_ACTION`, `AUDIT_TARGET_TYPE`).
 - Features: [tenant-access](./tenant-access.md),
   [audit-and-findings](./audit-and-findings.md),
   [newsletter](./newsletter.md), [contact-form](./contact-form.md).

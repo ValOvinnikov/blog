@@ -1,9 +1,9 @@
-import { IMAGE_LAYOUT } from '@blog/config/constants';
+import { IMAGE_LAYOUT } from '@shinefold/config/constants';
 import {
   imageAltField,
   imageHotspotOptions,
-} from '@blog/studio/schema-types/fields/image-alt-field/image-alt-field';
-import { toTitleCase } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/fields/image-alt-field/image-alt-field';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { defineField, defineType } from 'sanity';
 
 /**

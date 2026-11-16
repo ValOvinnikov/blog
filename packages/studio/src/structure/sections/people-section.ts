@@ -1,5 +1,5 @@
-import { personSchema } from '@blog/studio/schema-types/documents/person/person';
-import type { TStructureSection } from '@blog/studio/structure/build-section/build-section';
+import { personSchema } from '@shinefold/studio/schema-types/documents/person/person';
+import type { TStructureSection } from '@shinefold/studio/structure/build-section/build-section';
 import { Users } from 'lucide-react';
 
 export const peopleSection: TStructureSection = {

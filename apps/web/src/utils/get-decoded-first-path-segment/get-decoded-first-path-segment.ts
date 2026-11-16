@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { hasLength } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { hasLength } from '@shinefold/utils/primitives';
 
 export const getDecodedFirstPathSegment = (
   pathname: string,

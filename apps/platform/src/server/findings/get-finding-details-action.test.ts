@@ -1,8 +1,8 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { TENANT_PROVISIONING_STEP } from '@shinefold/db/constants';
 
 import { getFindingDetailsAction } from './get-finding-details-action';
 
@@ -17,7 +17,7 @@ vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
   requireTenantById: requireTenantByIdMock,
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: { findings: { getFindingDetails: getFindingDetailsMock } },
 }));

@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, HERO_VARIANT, SPACING_SCALE } from '@blog/config';
+import { BRAND_VARIANT, HERO_VARIANT, SPACING_SCALE } from '@shinefold/config';
 import { BANNER_SECTION_LAYOUT } from '@web/utils/banner-section-layout';
 
 import { resolveHeroLayout } from './resolve-hero-layout';

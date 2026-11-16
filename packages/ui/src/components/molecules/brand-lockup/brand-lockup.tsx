@@ -1,8 +1,8 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import {
   BrandMark,
   type TBrandMarkProps,
-} from '@blog/ui/components/atoms/brand-mark';
+} from '@shinefold/ui/components/atoms/brand-mark';
 
 import { brandLockupVariants } from './brand-lockup-variants';
 

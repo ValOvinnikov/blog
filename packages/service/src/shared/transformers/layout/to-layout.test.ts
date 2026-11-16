@@ -1,7 +1,7 @@
 import {
   mockRawHeroLayout,
   mockRawWideLayout,
-} from '@blog/service/testing/shared/fixtures';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toLayout } from './to-layout';
 

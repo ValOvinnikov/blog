@@ -1,4 +1,3 @@
-import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import en from '@platform/i18n/messages/en.json';
 import { sendTestEmailAction } from '@platform/server/email/send-test-email-action';
 import { screen } from '@platform/testing/custom-render';
@@ -13,6 +12,7 @@ import {
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
+import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@shinefold/config';
 import userEvent from '@testing-library/user-event';
 
 import { EmailPreviewPane } from './email-preview-pane';

@@ -1,5 +1,5 @@
-import { HEADER_BAR_STYLE, HEADER_LAYOUT } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
+import { HEADER_BAR_STYLE, HEADER_LAYOUT } from '@shinefold/config';
 
 export const sampleSiteHeaderVariants = tv({
   slots: {

@@ -1,12 +1,5 @@
 'use client';
 
-import { ACTION_OUTCOME, ALERT_TYPE, SIZE } from '@blog/config';
-import {
-  CORE_PROVISIONING_STEPS,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
-import { isUndefined } from '@blog/utils/primitives';
 import { RunStepsCard } from '@platform/components/features/tenants/run-steps-card';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
@@ -15,6 +8,13 @@ import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import type { TSiteSetup } from '@platform/server/provisioning/site-setup-for';
 import { useProvisioningPoll } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { useRefreshOnSettle } from '@platform/utils/use-refresh-on-settle/use-refresh-on-settle';
+import { ACTION_OUTCOME, ALERT_TYPE, SIZE } from '@shinefold/config';
+import {
+  CORE_PROVISIONING_STEPS,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@shinefold/db/constants';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 import { siteSetupCardVariants } from './site-setup-card-variants';

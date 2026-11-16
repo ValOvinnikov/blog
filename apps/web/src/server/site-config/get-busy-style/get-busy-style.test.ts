@@ -1,5 +1,5 @@
-import { BUSY_BUTTON_STYLE, SPINNER_STYLE } from '@blog/config';
-import { queries } from '@blog/db';
+import { BUSY_BUTTON_STYLE, SPINNER_STYLE } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { BUSY_STYLE_LOG } from '@web/constants/busy-style';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import { MOCK_BUSY_STYLE } from '@web/testing/shared/busy-style/fixtures';
@@ -13,7 +13,7 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant');
 vi.mock('@web/server/settings-features/get-tenant-plan/get-tenant-plan');
 
 vi.mock(
-  '@blog/db',
+  '@shinefold/db',
   () => import('@web/testing/server/site-config/site-config-db'),
 );
 

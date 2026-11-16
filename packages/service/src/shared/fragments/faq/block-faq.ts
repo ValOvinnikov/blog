@@ -1,6 +1,6 @@
-import type { Block_faq } from '@blog/config';
-import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
+import type { Block_faq } from '@shinefold/config';
+import { getLocalizedField } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
+import { getLocalizedPortableTextBlock } from '@shinefold/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
 import type { GroqBuilderSubquery, QueryConfig } from 'groqd';
 
 export function blockFaqFragment<TConfig extends QueryConfig>(

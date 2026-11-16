@@ -1,8 +1,8 @@
-import { queries } from '@blog/db';
-import { TENANT_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { getPlatformSanityContext } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import { queries } from '@shinefold/db';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { getPlatformSanityContext } from '@shinefold/service';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import {
   mockServableTenant,
@@ -22,8 +22,8 @@ faker.seed(9154);
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 vi.mock('@web/utils/is-production-environment');
-vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await import('@shinefold/db/constants')),
   queries: {
     tenants: {
       toTenantSanityCredentials: vi.fn(),
@@ -31,7 +31,7 @@ vi.mock('@blog/db', async () => ({
     },
   },
 }));
-vi.mock('@blog/service', () => ({ getPlatformSanityContext: vi.fn() }));
+vi.mock('@shinefold/service', () => ({ getPlatformSanityContext: vi.fn() }));
 
 const MOCK_PLATFORM_SANITY_CONTEXT = {
   projectId: faker.string.alphanumeric(8),

@@ -34,7 +34,7 @@ import type {
   Template_tagIndex,
   Template_topic,
   Template_topicIndex,
-} from '@blog/config/sanity/generated/types';
+} from '@shinefold/config/sanity/generated/types';
 
 type TSanitySystemField = '_createdAt' | '_updatedAt' | '_rev';
 

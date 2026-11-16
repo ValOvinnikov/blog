@@ -1,4 +1,4 @@
-import { isNull } from '@blog/utils/primitives';
+import { isNull } from '@shinefold/utils/primitives';
 
 // A realm-wide symbol, because onRequestError can load in a different bundle layer from the render, where a class or WeakSet would not match.
 const LOGGED = Symbol.for('@web/logged-error');

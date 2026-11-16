@@ -1,4 +1,3 @@
-import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
 import en from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -10,6 +9,7 @@ import {
   mockTenantSuspension,
 } from '@platform/testing/tenant-suspensions/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { SUSPENSION_REASON, TENANT_STATUS } from '@shinefold/db/constants';
 import userEvent from '@testing-library/user-event';
 
 import { OwnerSuspensionBanner } from './owner-suspension-banner';
@@ -18,7 +18,7 @@ const { getOpenTenantSuspensionMock } = vi.hoisted(() => ({
   getOpenTenantSuspensionMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     tenantSuspensions: { getOpenTenantSuspension: getOpenTenantSuspensionMock },

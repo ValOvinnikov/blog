@@ -1,5 +1,9 @@
-import type { IWithClassName, IWithDataTestId, TAsideKind } from '@blog/config';
-import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
+import type {
+  IWithClassName,
+  IWithDataTestId,
+  TAsideKind,
+} from '@shinefold/config';
+import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
 import type { ReactNode } from 'react';
 
 import { asideVariants } from './aside-variants';

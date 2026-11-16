@@ -1,11 +1,11 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import type { TPersonalDataMatches } from '@blog/db/queries/personal-data/find-personal-data';
 import {
   DATA_REQUEST_MATCH_KIND,
   type TDataRequestMatchKind,
 } from '@platform/constants/data-request';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TPersonalDataMatches } from '@shinefold/db/queries/personal-data/find-personal-data';
 
 export type TDataRequestMatch = {
   key: string;

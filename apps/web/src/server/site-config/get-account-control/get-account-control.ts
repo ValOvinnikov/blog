@@ -1,4 +1,4 @@
-import type { IAccountControl } from '@blog/config';
+import type { IAccountControl } from '@shinefold/config';
 import { ACCOUNT_CONTROL_LOG } from '@web/constants/account-control';
 import { getSiteConfigWithPreset } from '@web/server/site-config/get-site-config-with-preset/get-site-config-with-preset';
 

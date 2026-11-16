@@ -1,5 +1,5 @@
-import type { TMaybeUndefined, TPricePeriod } from '@blog/config';
-import type { TCtaButton } from '@blog/service';
+import type { TMaybeUndefined, TPricePeriod } from '@shinefold/config';
+import type { TCtaButton } from '@shinefold/service';
 import type { ILivePlanPrice } from '@web/utils/to-live-plan-price';
 
 import type { TPricingTabPeriod } from './pricing-tab-period';

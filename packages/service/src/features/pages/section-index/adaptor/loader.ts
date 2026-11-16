@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { isr } from '@blog/service/sanity/query/isr';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { isr } from '@shinefold/service/sanity/query/isr';
 import {
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query/query';
-import { buildLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+} from '@shinefold/service/sanity/query/query';
+import { buildLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
 
 import { sectionIndexPageQuery } from './query';
 import { toSectionIndexPage } from './transformer';

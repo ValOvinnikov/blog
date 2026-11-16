@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import type { TDb } from '@blog/db/client';
+import type { TDb } from '@shinefold/db/client';
 import { sql } from 'drizzle-orm';
 
 const migrationsDir = fileURLToPath(

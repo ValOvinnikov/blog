@@ -1,4 +1,4 @@
-# @blog/db
+# @shinefold/db
 
 > Typed relational data access for the engagement layer — Neon Postgres via Drizzle.
 
@@ -6,20 +6,20 @@ This package owns every table this blog stores outside Sanity: Auth.js
 sessions/accounts, comments, ratings, bookmarks, newsletter subscribers, and
 the multi-tenant registry (`tenants`, `tenant_domains`, `memberships`,
 `admins`, `site_config`). It is the Neon/Drizzle counterpart to
-`@blog/service`'s Sanity/GROQ role — same "typed queries in, view-model types
+`@shinefold/service`'s Sanity/GROQ role — same "typed queries in, view-model types
 out" contract, a different store, and the two never reference each other.
 
 ## Layer contract
 
-- **Depends on:** `@blog/config`, `@blog/utils`, plus the Drizzle/Neon SDKs
+- **Depends on:** `@shinefold/config`, `@shinefold/utils`, plus the Drizzle/Neon SDKs
   (`drizzle-orm`, `drizzle-kit`, `@neondatabase/serverless`). `@sanity/client`
   is a dependency too, but scoped to one directory (see below).
-- **Consumed by:** `apps/web`, `apps/platform`, and `@blog/auth` (which binds the
+- **Consumed by:** `apps/web`, `apps/platform`, and `@shinefold/auth` (which binds the
   Auth.js Drizzle adapter to the tables in `src/schema/auth.ts`).
-- **Never imports:** React, any Sanity SDK, or `@blog/service` — this package
+- **Never imports:** React, any Sanity SDK, or `@shinefold/service` — this package
   and `service` are siblings, not dependents; a feature needing both Sanity
   content and relational data joins them in `apps/web`, not inside either data
-  package. It also never imports `@blog/auth` — `auth` sits above `db` and
+  package. It also never imports `@shinefold/auth` — `auth` sits above `db` and
   reaches for its tables, never the reverse.
 
 ## Layout
@@ -47,20 +47,20 @@ out" contract, a different store, and the two never reference each other.
 
 ## Scripts
 
-| Script                           | Command                                                                            | What it does                                                                                                                                                                                             |
-| -------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type-check`                     | `pnpm --filter @blog/db type-check`                                                | `tsc --noEmit`.                                                                                                                                                                                          |
-| `lint`                           | `pnpm --filter @blog/db lint`                                                      | `eslint .`.                                                                                                                                                                                              |
-| `format`                         | `pnpm --filter @blog/db format`                                                    | `prettier --write .`.                                                                                                                                                                                    |
-| `test`                           | `pnpm --filter @blog/db test`                                                      | `vitest run --passWithNoTests`.                                                                                                                                                                          |
-| `test:watch`                     | `pnpm --filter @blog/db test:watch`                                                | `vitest` in watch mode.                                                                                                                                                                                  |
-| `db:generate`                    | `pnpm --filter @blog/db db:generate`                                               | `drizzle-kit generate` — diffs `src/schema/` against the last migration and writes a new timestamped SQL file plus snapshot under `migrations/`. Touches no database; this is the schema-change dry run. |
-| `db:migrate`                     | `pnpm --filter @blog/db db:migrate`                                                | `drizzle-kit migrate` — applies any un-applied migration file to the Neon branch pointed at by `DATABASE_URL_UNPOOLED`.                                                                                  |
-| `db:studio`                      | `pnpm --filter @blog/db db:studio`                                                 | `drizzle-kit studio` — local, read/write table browser against the same connection; inspection only.                                                                                                     |
-| `db:seed-tenant`                 | `pnpm --filter @blog/db db:seed-tenant -- --name=... ...`                          | Runs `scripts/seed-tenant.ts` — creates/reuses a `tenants` row (idempotency keyed on `--primary-domain`), its domain(s), and grants an existing user `OWNER` membership. Manual, human-run only.         |
-| `db:seed-admin`                  | `pnpm --filter @blog/db db:seed-admin -- --email=... --role=...`                   | Runs `scripts/seed-admin.ts` — grants an existing user a platform-admin `admins` row. Manual, human-run only.                                                                                            |
-| `db:deprovision-tenant`          | `pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id=... --confirm=<name>` | Runs `scripts/deprovision-tenant/run.ts` — reverses provisioning and archives the tenant row. Defaults to a dry run; invoked only by the `deprovision-tenant.yml` CI workflow.                           |
-| `db:recover-wedged-provisioning` | `pnpm --filter @blog/db db:recover-wedged-provisioning -- --dry-run=false`         | Runs `scripts/recover-wedged-provisioning.ts` — moves every tenant stuck at PROVISIONING with a FAILED step to FAILED. Defaults to a dry run that only lists them; manual, human-run only.               |
+| Script                           | Command                                                                                 | What it does                                                                                                                                                                                             |
+| -------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type-check`                     | `pnpm --filter @shinefold/db type-check`                                                | `tsc --noEmit`.                                                                                                                                                                                          |
+| `lint`                           | `pnpm --filter @shinefold/db lint`                                                      | `eslint .`.                                                                                                                                                                                              |
+| `format`                         | `pnpm --filter @shinefold/db format`                                                    | `prettier --write .`.                                                                                                                                                                                    |
+| `test`                           | `pnpm --filter @shinefold/db test`                                                      | `vitest run --passWithNoTests`.                                                                                                                                                                          |
+| `test:watch`                     | `pnpm --filter @shinefold/db test:watch`                                                | `vitest` in watch mode.                                                                                                                                                                                  |
+| `db:generate`                    | `pnpm --filter @shinefold/db db:generate`                                               | `drizzle-kit generate` — diffs `src/schema/` against the last migration and writes a new timestamped SQL file plus snapshot under `migrations/`. Touches no database; this is the schema-change dry run. |
+| `db:migrate`                     | `pnpm --filter @shinefold/db db:migrate`                                                | `drizzle-kit migrate` — applies any un-applied migration file to the Neon branch pointed at by `DATABASE_URL_UNPOOLED`.                                                                                  |
+| `db:studio`                      | `pnpm --filter @shinefold/db db:studio`                                                 | `drizzle-kit studio` — local, read/write table browser against the same connection; inspection only.                                                                                                     |
+| `db:seed-tenant`                 | `pnpm --filter @shinefold/db db:seed-tenant -- --name=... ...`                          | Runs `scripts/seed-tenant.ts` — creates/reuses a `tenants` row (idempotency keyed on `--primary-domain`), its domain(s), and grants an existing user `OWNER` membership. Manual, human-run only.         |
+| `db:seed-admin`                  | `pnpm --filter @shinefold/db db:seed-admin -- --email=... --role=...`                   | Runs `scripts/seed-admin.ts` — grants an existing user a platform-admin `admins` row. Manual, human-run only.                                                                                            |
+| `db:deprovision-tenant`          | `pnpm --filter @shinefold/db db:deprovision-tenant -- --tenant-id=... --confirm=<name>` | Runs `scripts/deprovision-tenant/run.ts` — reverses provisioning and archives the tenant row. Defaults to a dry run; invoked only by the `deprovision-tenant.yml` CI workflow.                           |
+| `db:recover-wedged-provisioning` | `pnpm --filter @shinefold/db db:recover-wedged-provisioning -- --dry-run=false`         | Runs `scripts/recover-wedged-provisioning.ts` — moves every tenant stuck at PROVISIONING with a FAILED step to FAILED. Defaults to a dry run that only lists them; manual, human-run only.               |
 
 The root-level `pnpm type-check`, `pnpm lint`, and `pnpm test` run every
 workspace, including this one, through Turborepo.
@@ -100,7 +100,7 @@ is mechanical:
    `migrations/meta/<idx>_snapshot.json` and `migrations/meta/_journal.json`
    wholesale — main's migration keeps the number.
 2. Delete our colliding `.sql` file and its snapshot.
-3. `pnpm --filter @blog/db db:generate` — ours regenerates under the next
+3. `pnpm --filter @shinefold/db db:generate` — ours regenerates under the next
    free index.
 4. Run `db:generate` again and confirm it reports no changes, which proves
    the snapshot chain is consistent.

@@ -1,5 +1,5 @@
-import type { TCapability } from '@blog/config';
-import { PLAN_REGISTRY } from '@blog/db';
+import type { TCapability } from '@shinefold/config';
+import { PLAN_REGISTRY } from '@shinefold/db';
 import {
   EFFECTIVE_FETCH_FAILED_EVENT,
   PLAN_FETCH_FAILED_EVENT,

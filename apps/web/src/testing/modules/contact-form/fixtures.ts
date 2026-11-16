@@ -1,6 +1,6 @@
-import { BRAND_VARIANT } from '@blog/config';
-import type { TContactFormModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT } from '@shinefold/config';
+import type { TContactFormModule } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 

@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { newsletterPostSends } from '@blog/db/schema/newsletter-post-sends';
+import { getDb } from '@shinefold/db/client';
+import { newsletterPostSends } from '@shinefold/db/schema/newsletter-post-sends';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export async function releaseNewsletterPostSend(

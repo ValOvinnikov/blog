@@ -1,8 +1,8 @@
+import { faker } from '@faker-js/faker';
 import {
   buildNestedRoutePrefix,
   buildSlugUrlPreviewPath,
-} from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-path';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/schema-types/inputs/slug-url-preview/slug-url-preview-path';
 
 faker.seed(4109);
 

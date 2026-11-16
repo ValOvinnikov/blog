@@ -1,5 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { okResult } from '@blog/utils';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import {
   MOCK_BLOCKED_DOMAIN,
@@ -7,6 +5,8 @@ import {
 } from '@platform/testing/blocked-signups/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { okResult } from '@shinefold/utils';
 
 import BlockedSignupsPage from './page';
 
@@ -24,7 +24,7 @@ vi.mock('@platform/server/signup-block/remove-blocked-identity-action', () => ({
   removeBlockedIdentityAction: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     blockedSignupIdentities: {

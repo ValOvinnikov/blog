@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { bookmarks } from '@blog/db/schema/bookmarks';
+import { getDb } from '@shinefold/db/client';
+import { bookmarks } from '@shinefold/db/schema/bookmarks';
 import { eq } from 'drizzle-orm';
 
 export async function countBookmarksForTenant(

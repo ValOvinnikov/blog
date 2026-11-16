@@ -1,6 +1,5 @@
 'use client';
 
-import { ALERT_TYPE, SIZE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import {
   AssetUploadField,
@@ -14,6 +13,7 @@ import {
   type TBrandAssetKind,
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+import { ALERT_TYPE, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { brandAssetFieldVariants } from './brand-asset-field-variants';

@@ -1,32 +1,32 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { createMembership } from '@blog/db/queries/memberships';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import { createMembership } from '@shinefold/db/queries/memberships';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestTenant,
   insertTestUser,
   MOCK_INVITE_EMAIL,
-} from '@blog/db/testing/fixtures';
+} from '@shinefold/db/testing/fixtures';
 import {
   deleteSeatRows,
   MOCK_INVITE_CONSUMED_AT,
   mockMembershipInvite,
-} from '@blog/db/testing/membership-invites/fixtures';
+} from '@shinefold/db/testing/membership-invites/fixtures';
 import {
   countLockedMemberships,
   insertTeam,
   mockMembership,
   MOCK_USER_ID,
   MOCK_MISSING_USER_ID,
-} from '@blog/db/testing/memberships/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/memberships/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
 import { consumeMembershipInvite } from './consume-membership-invite';
 
-vi.mock('@blog/db/client');
-vi.mock('@blog/db/queries/memberships', async (importOriginal) => {
+vi.mock('@shinefold/db/client');
+vi.mock('@shinefold/db/queries/memberships', async (importOriginal) => {
   const actual = await importOriginal<{
     createMembership: typeof createMembership;
   }>();

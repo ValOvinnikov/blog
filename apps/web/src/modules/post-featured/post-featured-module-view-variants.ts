@@ -1,4 +1,4 @@
-import { CARD_GAP, tv } from '@blog/ui/lib/styling';
+import { CARD_GAP, tv } from '@shinefold/ui/lib/styling';
 
 export const postFeaturedModuleViewVariants = tv({
   slots: {

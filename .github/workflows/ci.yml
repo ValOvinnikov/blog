@@ -76,10 +76,10 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      # `studio` is @blog/studio's turbo-affected set (itself, its workspace
+      # `studio` is @shinefold/studio's turbo-affected set (itself, its workspace
       # dependencies config and utils, and the lockfile) written out as paths,
       # so this job needs no install. It is wider than `packages/studio/**`
-      # because schemas and migrations import @blog/config: a constant changed
+      # because schemas and migrations import @shinefold/config: a constant changed
       # there alone can stale the generated types or break a migration.
       # `full` mirrors turbo.json's globalDependencies plus the root manifests:
       # any of them changing drops `--affected`, so turbo's own detection is
@@ -216,7 +216,7 @@ jobs:
 
       # A `'use client'` module that can reach an `import 'server-only'` module
       # fails `next build` under the `react-server` condition — and nothing
-      # else catches it, because every workspace aliases `@blog/<pkg>/*`
+      # else catches it, because every workspace aliases `@shinefold/<pkg>/*`
       # straight to that package's `src/`, so a deep import resolves whether or
       # not the package declares the subpath.
       - name: Client graph
@@ -315,7 +315,7 @@ jobs:
           restore-keys: |
             next-cache-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
 
-      # @blog/service validates its env at import time. CI has no Sanity env
+      # @shinefold/service validates its env at import time. CI has no Sanity env
       # vars and the build does not fetch, so validation is skipped here; it
       # still runs at deploy time on Vercel.
       - name: Build

@@ -1,7 +1,7 @@
-import type { PostTakeaways } from '@blog/config';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { getWriteClient } from '@blog/service/sanity/write-client/write-client';
-import { toDraftId, toPublishedId } from '@blog/utils/sanity-document-id';
+import type { PostTakeaways } from '@shinefold/config';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { getWriteClient } from '@shinefold/service/sanity/write-client/write-client';
+import { toDraftId, toPublishedId } from '@shinefold/utils/sanity-document-id';
 
 import type { TSaveSkimDraftInput } from './types';
 

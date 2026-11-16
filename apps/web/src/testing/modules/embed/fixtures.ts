@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   EMBED_ORIGIN,
   EMBED_PROVIDER,
   MEDIA_RATIO,
-} from '@blog/config';
-import type { TEmbed, TEmbedModule } from '@blog/service';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import type { TEmbed, TEmbedModule } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 

@@ -1,4 +1,4 @@
-import { HTTP_STATUS } from '@blog/config';
+import { HTTP_STATUS } from '@shinefold/config';
 import { PROXY_LOG } from '@web/constants/proxy';
 import { TENANT_ID_HEADER } from '@web/server/tenant/constants/constants';
 import { isOperatorSuspended } from '@web/server/tenant/operator-suspension/operator-suspension';

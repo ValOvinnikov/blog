@@ -1,10 +1,10 @@
-import { ALERT_TYPE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import type { TComparedCommit } from '@platform/server/github/compare-commits';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { shortSha } from '@platform/utils/short-sha/short-sha';
 import { tv } from '@platform/utils/tv/tv';
+import { ALERT_TYPE } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 
 const releaseCommitsVariants = tv({

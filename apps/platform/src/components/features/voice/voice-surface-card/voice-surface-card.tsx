@@ -1,10 +1,5 @@
 'use client';
 
-import {
-  VOICE_SURFACE,
-  type TVoiceFieldId,
-  type TVoiceSurface,
-} from '@blog/config';
 import { useVoiceEditor } from '@platform/components/features/voice/voice-editor-provider';
 import { VoiceField } from '@platform/components/features/voice/voice-field';
 import { VoiceListRow } from '@platform/components/features/voice/voice-list-row';
@@ -12,6 +7,11 @@ import { Accordion } from '@platform/components/shared/accordion';
 import { Card } from '@platform/components/shared/card';
 import { VOICE_CARD_ID } from '@platform/constants/voice';
 import { voiceFieldsOf } from '@platform/utils/voice-draft/voice-draft';
+import {
+  VOICE_SURFACE,
+  type TVoiceFieldId,
+  type TVoiceSurface,
+} from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 

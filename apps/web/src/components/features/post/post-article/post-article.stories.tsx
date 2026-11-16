@@ -1,5 +1,5 @@
-import { Prose } from '@blog/ui/components/atoms/prose';
-import { Article } from '@blog/ui/components/organisms/article';
+import { Prose } from '@shinefold/ui/components/atoms/prose';
+import { Article } from '@shinefold/ui/components/organisms/article';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ContentsRailLayout } from '@web/components/shared/contents-rail-layout';
 import {

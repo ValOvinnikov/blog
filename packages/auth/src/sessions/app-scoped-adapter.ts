@@ -1,6 +1,6 @@
-import { withEncryptedUsers } from '@blog/auth/users/encrypted-users';
-import type { TAuthApp } from '@blog/config/constants';
-import { sha256Hex } from '@blog/utils/hash';
+import { withEncryptedUsers } from '@shinefold/auth/users/encrypted-users';
+import type { TAuthApp } from '@shinefold/config/constants';
+import { sha256Hex } from '@shinefold/utils/hash';
 import type {
   Adapter,
   AdapterAccount,

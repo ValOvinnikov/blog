@@ -1,11 +1,5 @@
 'use client';
 
-import {
-  VOICE_FIELDS,
-  type TMaybeUndefined,
-  type TVoiceFieldId,
-} from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import {
   voiceDefaultText,
@@ -15,6 +9,12 @@ import {
   type TVoiceFieldErrors,
   type TVoiceLocaleDraft,
 } from '@platform/utils/voice-draft/voice-draft';
+import {
+  VOICE_FIELDS,
+  type TMaybeUndefined,
+  type TVoiceFieldId,
+} from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import { createContext, useContext, type ReactNode } from 'react';
 
 type TVoiceEditor = {

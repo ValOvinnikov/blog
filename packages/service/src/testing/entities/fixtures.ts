@@ -1,18 +1,18 @@
 import type {
   TFeedPost,
   TRawFeedPost,
-} from '@blog/service/features/entities/posts/adaptor/all-published/transformer';
-import type { toTags } from '@blog/service/features/entities/tags/adaptor/transformer';
-import type { toTopics } from '@blog/service/features/entities/topics/adaptor/transformer';
-import type { TRawTag } from '@blog/service/shared/transformers/tag/to-tag';
-import type { TRawTopic } from '@blog/service/shared/transformers/topic/to-topic';
+} from '@shinefold/service/features/entities/posts/adaptor/all-published/transformer';
+import type { toTags } from '@shinefold/service/features/entities/tags/adaptor/transformer';
+import type { toTopics } from '@shinefold/service/features/entities/topics/adaptor/transformer';
+import type { TRawTag } from '@shinefold/service/shared/transformers/tag/to-tag';
+import type { TRawTopic } from '@shinefold/service/shared/transformers/topic/to-topic';
 import {
   MOCK_POST_EXCERPT,
   MOCK_POST_PUBLISHED_AT,
   MOCK_POST_SLUG,
   MOCK_POST_TITLE,
   mockRawHeadingBlock,
-} from '@blog/service/testing/shared/fixtures';
+} from '@shinefold/service/testing/shared/fixtures';
 
 export const MOCK_AUTHOR_ID = 'author-1';
 export const MOCK_AUTHOR_NAME = 'Jane Doe';

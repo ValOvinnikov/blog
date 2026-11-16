@@ -1,5 +1,5 @@
-import type { TSellableTenantPlan } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TSellableTenantPlan } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 
 type TLinkedPricingTier = { platformPlan?: TSellableTenantPlan };
 

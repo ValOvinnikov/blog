@@ -1,6 +1,6 @@
 'use client';
 
-import type { TMaybeNull } from '@blog/config';
+import type { TMaybeNull } from '@shinefold/config';
 import { useRef } from 'react';
 
 import { useIsTruncated } from './use-is-truncated';

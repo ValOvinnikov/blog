@@ -1,4 +1,3 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
 import messages from '@platform/i18n/messages/en.json';
@@ -13,6 +12,7 @@ import {
   mockInboxLead,
 } from '@platform/testing/leads/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 
 import { LeadPageSource } from './lead-page-source';
 

@@ -1,7 +1,7 @@
 'use client';
 
-import { SIZE } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
+import { SIZE } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
 import { useConsentPreferences } from '@web/context/consent-preferences-provider';
 import { useTranslations } from 'next-intl';
 

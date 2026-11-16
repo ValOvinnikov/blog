@@ -1,9 +1,9 @@
 // Promotes each core-provisioned active tenant's owner to Sanity `administrator` once they have accepted their invite.
-import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
-import { listTenantsPendingOwnerElevation } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
-import { isUndefined } from '@blog/utils/primitives';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@shinefold/db/constants';
+import { listTenantsPendingOwnerElevation } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 

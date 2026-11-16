@@ -1,9 +1,9 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
 import {
   toPaginationParams,
   type TPaginationParam,
-} from '@blog/service/shared/transformers/pagination/to-pagination-params';
+} from '@shinefold/service/shared/transformers/pagination/to-pagination-params';
 
 import { getFirstPostListPageSizes } from './page-sizes';
 

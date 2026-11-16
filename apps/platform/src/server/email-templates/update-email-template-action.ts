@@ -1,18 +1,5 @@
 'use server';
 
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  LOCALE_ISO_CODES,
-  type TActionResult,
-  type TEmailTemplateType,
-  type TLocaleIsoCode,
-  type TOutcome,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import type { TEmailTemplateResult } from '@blog/db/queries/email-templates';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { EMAIL_TEMPLATES_LOG } from '@platform/constants/email-templates';
 import {
   SETTINGS_REFUSAL,
@@ -26,6 +13,19 @@ import {
 } from '@platform/utils/email-input-schemas/email-input-schemas';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  LOCALE_ISO_CODES,
+  type TActionResult,
+  type TEmailTemplateType,
+  type TLocaleIsoCode,
+  type TOutcome,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import type { TEmailTemplateResult } from '@shinefold/db/queries/email-templates';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
 export type TUpdateEmailTemplateInput = z.input<

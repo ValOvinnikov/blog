@@ -1,6 +1,6 @@
-import { HTTP_METHOD, type TMaybeUndefined } from '@blog/config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_METHOD, type TMaybeUndefined } from '@shinefold/config';
 
 import { readGitHubCredentials } from './read-github-credentials';
 

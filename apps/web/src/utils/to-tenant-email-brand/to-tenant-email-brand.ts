@@ -4,7 +4,7 @@ import {
   resolveTenantEmailBrand,
   type TPresetId,
   type TTenantEmailBrand,
-} from '@blog/config';
+} from '@shinefold/config';
 
 type TSiteConfigBrandRow = {
   preset: TPresetId;

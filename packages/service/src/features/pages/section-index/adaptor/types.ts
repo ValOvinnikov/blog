@@ -5,10 +5,10 @@ import type {
   THeadingBlock,
   TMaybeUndefined,
   TPageLandingType,
-} from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import type { TModule } from '@blog/service/shared/transformers/module/to-module';
-import type { TSeoResolved } from '@blog/service/shared/transformers/seo/resolve-seo';
+} from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import type { TModule } from '@shinefold/service/shared/transformers/module/to-module';
+import type { TSeoResolved } from '@shinefold/service/shared/transformers/seo/resolve-seo';
 
 export type TSectionIndexType =
   Page_privacyIndex['_type'] | Page_legalIndex['_type'];

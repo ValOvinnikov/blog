@@ -1,14 +1,14 @@
 import {
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
+import {
   FINDING_KIND,
   FINDING_SEVERITY,
   FINDING_SOURCE,
   FINDING_STATUS,
-} from '@blog/config/constants';
-import type { TOpenFinding } from '@blog/db/queries/findings';
-import {
-  MOCK_TENANT_NAME,
-  MOCK_TENANT_ID,
-} from '@platform/testing/tenants/fixtures';
+} from '@shinefold/config/constants';
+import type { TOpenFinding } from '@shinefold/db/queries/findings';
 
 export const MOCK_FINDING_LAST_SEEN_AT = new Date('2026-04-02T00:00:00.000Z');
 

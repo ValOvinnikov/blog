@@ -1,8 +1,8 @@
-import { CAPABILITY } from '@blog/config';
 import {
   mockAllOnSettingsFeaturesValues,
   mockSettingsFeaturesValues,
 } from '@platform/testing/settings-features/fixtures';
+import { CAPABILITY } from '@shinefold/config';
 
 import {
   clampToEntitlement,

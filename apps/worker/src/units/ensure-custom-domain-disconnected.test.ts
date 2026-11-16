@@ -1,4 +1,4 @@
-import { deleteVercelProjectDomains } from '@blog/db/utils/vercel-client/vercel-project-domains';
+import { deleteVercelProjectDomains } from '@shinefold/db/utils/vercel-client/vercel-project-domains';
 import { CUSTOM_DOMAIN_LOG } from '@worker/constants/custom-domain';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
@@ -15,7 +15,7 @@ import { getVercelEnv } from '@worker/utils/vercel-env/vercel-env';
 import { ensureCustomDomainDisconnected } from './ensure-custom-domain-disconnected';
 
 vi.mock('@worker/utils/disconnect-guard/disconnect-guard');
-vi.mock('@blog/db/utils/vercel-client/vercel-project-domains');
+vi.mock('@shinefold/db/utils/vercel-client/vercel-project-domains');
 vi.mock('@worker/utils/vercel-env/vercel-env');
 vi.mock('workflow');
 

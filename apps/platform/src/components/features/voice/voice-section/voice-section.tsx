@@ -1,6 +1,5 @@
 'use client';
 
-import type { TVoiceSurface } from '@blog/config';
 import { useVoiceEditor } from '@platform/components/features/voice/voice-editor-provider';
 import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
 import { Disclosure } from '@platform/components/shared/disclosure';
@@ -15,6 +14,7 @@ import {
   countVoiceSectionErrors,
   voiceSectionFields,
 } from '@platform/utils/voice-sections/voice-sections';
+import type { TVoiceSurface } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { VoiceSectionSummary } from './components/voice-section-summary';

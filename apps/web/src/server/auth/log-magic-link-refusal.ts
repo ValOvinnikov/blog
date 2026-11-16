@@ -1,4 +1,4 @@
-import type { IMagicLinkSendRefusal } from '@blog/config/types';
+import type { IMagicLinkSendRefusal } from '@shinefold/config/types';
 import { SIGN_IN_LOG } from '@web/constants/sign-in';
 import { logger } from '@web/utils/logger/logger';
 

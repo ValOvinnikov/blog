@@ -1,17 +1,17 @@
 import {
   renderEmailAction,
   type TEmailAction,
-} from '@blog/email/html/email-action/email-action';
+} from '@shinefold/email/html/email-action/email-action';
 import {
   detailsAsPlainText,
   renderEmailDetails,
   type TEmailDetail,
-} from '@blog/email/html/email-details/email-details';
-import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
-import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
-import { buildPlatformShell } from '@blog/email/html/platform-shell/platform-shell';
-import { buildPlainTextBody } from '@blog/email/plain-text/plain-text-body';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/email/html/email-details/email-details';
+import { escapeHtml } from '@shinefold/email/html/escape-html/escape-html';
+import { PLATFORM_EMAIL_BRAND } from '@shinefold/email/html/platform-email-brand/platform-email-brand';
+import { buildPlatformShell } from '@shinefold/email/html/platform-shell/platform-shell';
+import { buildPlainTextBody } from '@shinefold/email/plain-text/plain-text-body';
+import { hasLength } from '@shinefold/utils/primitives';
 
 export type TOwnerEmailInput = {
   brandName: string;

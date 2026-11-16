@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   CONTENT_ROUTE_REVALIDATE_SECONDS,
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
   routes,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildTopicMetadata } from '@web/metadata/topic-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';

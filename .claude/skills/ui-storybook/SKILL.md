@@ -1,19 +1,19 @@
 ---
 name: ui-storybook
 description: >-
-  How to write, run, and maintain Storybook stories in @blog/ui (packages/ui).
+  How to write, run, and maintain Storybook stories in @shinefold/ui (packages/ui).
   Use when adding stories for atoms, molecules, or organisms, or when
   configuring the Storybook instance in packages/ui. Complements
   ui-library-practices and testing-practices.
 ---
 
-# Storybook in `@blog/ui`
+# Storybook in `@shinefold/ui`
 
 Storybook 10 on `@storybook/react-vite`, port **6006**.
 
 ```
-pnpm --filter @blog/ui storybook        # dev server
-pnpm --filter @blog/ui storybook:build  # static build
+pnpm --filter @shinefold/ui storybook        # dev server
+pnpm --filter @shinefold/ui storybook:build  # static build
 ```
 
 - Controls, actions, interactions and viewport are core — no addon. The two
@@ -53,7 +53,7 @@ export const Ghost: TStory = { args: { variant: 'ghost' } };
 ```
 
 A component story's `title` is `'<Tier>/<ComponentName>'` — `Atoms`,
-`Molecules` or `Organisms` — with `tags: ['autodocs']`. `@blog/ui` has no
+`Molecules` or `Organisms` — with `tags: ['autodocs']`. `@shinefold/ui` has no
 Templates tier; page compositions are storied in `apps/web` (`web-storybook`).
 The one non-component story, `src/lib/design-tokens/design-tokens.stories.tsx`,
 is deliberately a top-level `'Design Tokens'` title with no tier and no
@@ -96,10 +96,10 @@ degrades to a free-text box. Pick `options` by what backs the prop:
 ### `tv()` variant props
 
 `tv()` exposes its config on `.variants` at runtime, so `objectKeys` (from
-`@blog/utils/primitives`) yields the real, current option list:
+`@shinefold/utils/primitives`) yields the real, current option list:
 
 ```tsx
-import { objectKeys } from '@blog/utils/primitives';
+import { objectKeys } from '@shinefold/utils/primitives';
 
 import { buttonVariants } from './button-variants';
 
@@ -227,7 +227,7 @@ whose open state can't be seen and exercised is broken.
 ## Theme and tokens
 
 `.storybook/preview.ts` imports `packages/ui/index.css` (the shared
-`@blog/tailwind-config/theme.css`), so the same token utilities components use
+`@shinefold/tailwind-config/theme.css`), so the same token utilities components use
 (`bg-surface`, `text-text`, …) work in stories with no setup. Dark mode is
 class-based: `@storybook/addon-themes`' `withThemeByClassName` toggles `.dark`
 on the preview `<html>` as `apps/web` does, and `.storybook/preview.css`
@@ -277,7 +277,7 @@ Usage notes here.
 
 ## Purity, tests and fixtures
 
-- Stories obey the component's layer contract — no `@blog/service`, Sanity
+- Stories obey the component's layer contract — no `@shinefold/service`, Sanity
   SDK, `next` or `fetch`. `configs/eslint/ui.js` fails a story the same as a
   component.
 - Storybook is for visual development and docs, not a test runner — behaviour
@@ -296,8 +296,8 @@ Usage notes here.
       `select` sourced per the Controls table, narrowed to what the type
       accepts — audited from the component's prop types, not the story's
       imports.
-- [ ] No `@blog/service`/Sanity/`next` imports and no live data.
-- [ ] `pnpm --filter @blog/ui type-check` passes — `packages/ui/tsconfig.json`
+- [ ] No `@shinefold/service`/Sanity/`next` imports and no live data.
+- [ ] `pnpm --filter @shinefold/ui type-check` passes — `packages/ui/tsconfig.json`
       includes `src` and `.storybook`, so no `storybook:build` is needed — and
       the story renders in the dev server, which catches the Vite runtime
       issues type-check can't.

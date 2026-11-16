@@ -1,6 +1,6 @@
-import { ALERT_TYPE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { formatDate } from '@platform/utils/format-date/format-date';
+import { ALERT_TYPE } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 
 export type TArchivedTenantNoticeProps = {

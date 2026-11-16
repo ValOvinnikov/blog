@@ -1,4 +1,7 @@
-import { isLocaleIsoCode, type TLocaleIsoCode } from '@blog/config/constants';
+import {
+  isLocaleIsoCode,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 
 export function normalizeLocaleCode(locale: string): TLocaleIsoCode {
   const code = locale.trim().toUpperCase();

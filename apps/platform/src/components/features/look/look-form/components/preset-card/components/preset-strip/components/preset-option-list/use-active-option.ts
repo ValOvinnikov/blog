@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import { KEY } from '@platform/constants/keyboard';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useState, type KeyboardEvent } from 'react';
 
 type TActiveOptionArgs = {

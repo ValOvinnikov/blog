@@ -1,12 +1,12 @@
+import { faker } from '@faker-js/faker';
 import {
   ACTION_OUTCOME,
   CAPABILITY,
   ERROR_CODE,
   TENANT_WRITE_REFUSAL,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { errorResult, okResult } from '@shinefold/utils';
 import { isReaderAccountFeatureEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
@@ -27,7 +27,7 @@ vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
 );
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     bookmarks: {
       isBookmarked: vi.fn(),

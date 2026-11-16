@@ -1,6 +1,6 @@
-import { SIZE, type TMaybeUndefined } from '@blog/config';
-import { BrandMark } from '@blog/ui/components/atoms/brand-mark';
 import { SAMPLE_PART } from '@platform/constants/sample-part';
+import { SIZE, type TMaybeUndefined } from '@shinefold/config';
+import { BrandMark } from '@shinefold/ui/components/atoms/brand-mark';
 
 import { sampleHeaderBrandVariants } from './sample-header-brand-variants';
 

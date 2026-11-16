@@ -10,7 +10,7 @@ import { getTagPage } from './get-tag-page';
 
 const { getTagPageMock } = vi.hoisted(() => ({ getTagPageMock: vi.fn() }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: { pages: { tag: { v1: { getTagPage: getTagPageMock } } } },
 }));
 

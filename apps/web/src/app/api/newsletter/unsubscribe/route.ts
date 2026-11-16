@@ -1,5 +1,5 @@
-import { NEWSLETTER_RESULT, SUBSCRIBER_OUTCOME } from '@blog/config';
-import { queries } from '@blog/db';
+import { NEWSLETTER_RESULT, SUBSCRIBER_OUTCOME } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import {
   redirectToNewsletterResult,
   redirectToNewsletterUnsubscribeConfirmation,

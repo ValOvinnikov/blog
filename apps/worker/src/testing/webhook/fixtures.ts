@@ -1,7 +1,7 @@
 import {
   REVALIDATE_WEBHOOK_PROJECTION,
   type TListedSanityWebhook,
-} from '@blog/db/utils/sanity-management-client/sanity-webhooks';
+} from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
 import { MOCK_REVALIDATE_WEBHOOK_URL } from '@worker/testing/provision-env/fake-provision-env';
 
 export const MOCK_WEBHOOK_ID = 'webhook-1';

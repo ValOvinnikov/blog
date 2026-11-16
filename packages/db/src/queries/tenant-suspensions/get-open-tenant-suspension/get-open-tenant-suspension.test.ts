@@ -1,16 +1,16 @@
-import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
-import * as schema from '@blog/db/schema';
+import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestAdmin,
   insertTestTenant,
   MOCK_OPERATOR_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { insertTestTenantSuspension } from '@blog/db/testing/tenant-suspensions/fixtures';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { insertTestTenantSuspension } from '@shinefold/db/testing/tenant-suspensions/fixtures';
 
 import { getOpenTenantSuspension } from './get-open-tenant-suspension';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

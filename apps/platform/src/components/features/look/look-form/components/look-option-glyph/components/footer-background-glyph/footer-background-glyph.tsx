@@ -1,5 +1,5 @@
-import type { TBrandVariant } from '@blog/config';
 import { buildAccentPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
+import type { TBrandVariant } from '@shinefold/config';
 import type { CSSProperties } from 'react';
 
 import { footerBackgroundGlyphVariants } from './footer-background-glyph-variants';

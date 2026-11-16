@@ -2,8 +2,8 @@ import {
   SEO_META_DESCRIPTION_MAX_LENGTH,
   SEO_META_TITLE_MAX_LENGTH,
   SEO_META_TITLE_MIN_LENGTH,
-} from '@blog/config/constants';
-import { openGraphSchema } from '@blog/studio/schema-types/objects/open-graph/open-graph';
+} from '@shinefold/config/constants';
+import { openGraphSchema } from '@shinefold/studio/schema-types/objects/open-graph/open-graph';
 import { defineField, defineType } from 'sanity';
 
 export const seoSchema = defineType({

@@ -1,10 +1,10 @@
-import { FORM_STATUS, NEWSLETTER_VARIANT } from '@blog/config';
-import type { TNewsletterSignupFormProps } from '@blog/ui/components/organisms/newsletter-signup/components/form/newsletter-signup-form';
-import type { TNewsletterSignupInputProps } from '@blog/ui/components/organisms/newsletter-signup/components/input/newsletter-signup-input';
-import type { TNewsletterSignupStatusProps } from '@blog/ui/components/organisms/newsletter-signup/components/status/newsletter-signup-status';
-import type { TNewsletterSignupSubmitProps } from '@blog/ui/components/organisms/newsletter-signup/components/submit/newsletter-signup-submit';
-import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { faker } from '@faker-js/faker';
+import { FORM_STATUS, NEWSLETTER_VARIANT } from '@shinefold/config';
+import type { TNewsletterSignupFormProps } from '@shinefold/ui/components/organisms/newsletter-signup/components/form/newsletter-signup-form';
+import type { TNewsletterSignupInputProps } from '@shinefold/ui/components/organisms/newsletter-signup/components/input/newsletter-signup-input';
+import type { TNewsletterSignupStatusProps } from '@shinefold/ui/components/organisms/newsletter-signup/components/status/newsletter-signup-status';
+import type { TNewsletterSignupSubmitProps } from '@shinefold/ui/components/organisms/newsletter-signup/components/submit/newsletter-signup-submit';
+import { NewsletterSignup } from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup';
 
 export const MOCK_NEWSLETTER_SUBMIT_LABEL = faker.lorem.word();
 

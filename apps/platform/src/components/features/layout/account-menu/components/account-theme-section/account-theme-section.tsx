@@ -1,10 +1,10 @@
 'use client';
 
-import { ICONS } from '@blog/config';
 import { MenuRadioGroup } from '@platform/components/shared/menu-radio-group';
 import type { TMenuRadioGroupSize } from '@platform/constants/menu-radio-group';
 import { THEME_PREFERENCE } from '@platform/constants/theme';
 import { useThemePreference } from '@platform/utils/use-theme-preference/use-theme-preference';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 type TAccountThemeSectionProps = {

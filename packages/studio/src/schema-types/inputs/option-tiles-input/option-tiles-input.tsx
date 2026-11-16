@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { isUndefined } from '@blog/utils/primitives';
 import { Card, Flex, Grid, Stack, Text } from '@sanity/ui';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { isUndefined } from '@shinefold/utils/primitives';
 import type { ComponentType, ReactNode } from 'react';
 import { set, type StringInputProps, unset } from 'sanity';
 

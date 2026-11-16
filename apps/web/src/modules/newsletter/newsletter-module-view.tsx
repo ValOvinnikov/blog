@@ -1,5 +1,5 @@
-import { NEWSLETTER_VARIANT } from '@blog/config';
-import type { TNewsletterModule } from '@blog/service';
+import { NEWSLETTER_VARIANT } from '@shinefold/config';
+import type { TNewsletterModule } from '@shinefold/service';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { NewsletterSubscribedGate } from '@web/components/shared/newsletter-subscribed-gate';
 import { Section } from '@web/components/shared/section';

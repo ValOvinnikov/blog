@@ -1,5 +1,3 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
@@ -18,6 +16,8 @@ import {
   setupLookForm,
   withLookTenant,
 } from '@platform/testing/look/look-form-setup';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

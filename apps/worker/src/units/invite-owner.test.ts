@@ -1,15 +1,18 @@
-import { TENANT_OWNER_EMAIL } from '@blog/db/constants';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
-import { getTenantById, setTenantOwnerAccess } from '@blog/db/queries/tenants';
+import { TENANT_OWNER_EMAIL } from '@shinefold/db/constants';
+import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
+import {
+  getTenantById,
+  setTenantOwnerAccess,
+} from '@shinefold/db/queries/tenants';
 import {
   createSanityProjectInvite,
   listSanityProjectInvites,
-} from '@blog/db/utils/sanity-management-client/sanity-project-access';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
 import {
   listSanityOrganizationUsers,
   listSanityProjectUsers,
-} from '@blog/db/utils/sanity-management-client/sanity-project-users';
-import { okResult } from '@blog/utils/result';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-users';
+import { okResult } from '@shinefold/utils/result';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
@@ -33,10 +36,10 @@ import { inviteOwner } from './invite-owner';
 const MOCK_INVITED_TENANT = mockProvisionedTenant();
 
 vi.mock('@worker/utils/owner-email/send-owner-email');
-vi.mock('@blog/db/queries/memberships');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/memberships');
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-project-access');
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-project-users');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('workflow');
 vi.mock('@worker/utils/tenant-management-token/tenant-management-token');

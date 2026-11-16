@@ -1,13 +1,13 @@
 'use client';
 
-import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
+import type { TOAuthProviderId } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
 import {
   FORM_STATUS,
   ICONS,
   type IWithClassName,
   type TIconName,
-} from '@blog/config';
-import { SignInPanel } from '@blog/ui/components/molecules/sign-in-panel';
+} from '@shinefold/config';
+import { SignInPanel } from '@shinefold/ui/components/molecules/sign-in-panel';
 import { useBusyStyle } from '@web/context/busy-style-provider';
 import type { TPopoverPanel } from '@web/hooks/use-popover';
 import { useTranslations } from 'next-intl';

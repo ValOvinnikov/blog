@@ -2,17 +2,20 @@ import {
   ERROR_CODE,
   type TErrorCode,
   TENANT_PLAN,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@blog/db/constants';
-import { users } from '@blog/db/schema/auth';
-import { memberships } from '@blog/db/schema/memberships';
-import { tenants } from '@blog/db/schema/tenants';
-import { normalizeSignupEmail } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
-import { requireEmailIndex } from '@blog/db/utils/personal-data/personal-data';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { accountEmailIndex, personalDataIndex } from '@blog/utils/encryption';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@shinefold/db/constants';
+import { users } from '@shinefold/db/schema/auth';
+import { memberships } from '@shinefold/db/schema/memberships';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { normalizeSignupEmail } from '@shinefold/db/utils/normalize-signup-identity/normalize-signup-identity';
+import { requireEmailIndex } from '@shinefold/db/utils/personal-data/personal-data';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import {
+  accountEmailIndex,
+  personalDataIndex,
+} from '@shinefold/utils/encryption';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { and, eq, exists, ne, or } from 'drizzle-orm';
 
 export async function ownsFreeTenant(

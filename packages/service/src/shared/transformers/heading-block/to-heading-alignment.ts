@@ -2,7 +2,7 @@ import {
   CONTENT_ALIGNMENT,
   type THeadingAlignment,
   type TMaybeNull,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export function toHeadingAlignment(
   raw: TMaybeNull<THeadingAlignment>,

@@ -1,4 +1,7 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 
 export const orderLocales = (
   defaultLocale: TLocaleIsoCode,

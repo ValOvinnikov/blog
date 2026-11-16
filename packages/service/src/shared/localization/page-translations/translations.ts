@@ -1,8 +1,8 @@
-import { q } from '@blog/service/sanity/query/query';
+import { q } from '@shinefold/service/sanity/query/query';
 import {
   PAGE_PATH_EXPRESSION,
   pagePathParser,
-} from '@blog/service/shared/expressions/landing-page/landing-page-path';
+} from '@shinefold/service/shared/expressions/landing-page/landing-page-path';
 
 export const translationsQuery = q.star
   .filterByType('translation.metadata')

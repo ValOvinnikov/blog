@@ -1,12 +1,12 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { MOCK_TAG_ID } from '@blog/service/testing/entities/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { MOCK_TAG_ID } from '@shinefold/service/testing/entities/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   evaluateRelatedPostsQuery,
   MOCK_DESIGN_NL_POST_ID,
   toIds,
-} from '@blog/service/testing/shared/translated-posts-dataset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { relatedByTagsQuery } from './by-tags.query';
 

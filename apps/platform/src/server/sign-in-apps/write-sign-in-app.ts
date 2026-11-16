@@ -1,7 +1,7 @@
 import 'server-only';
 
-import type { TOAuthProvider } from '@blog/config/constants';
-import { queries } from '@blog/db';
+import type { TOAuthProvider } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 
 type TWriteSignInAppInput = {
   provider: TOAuthProvider;

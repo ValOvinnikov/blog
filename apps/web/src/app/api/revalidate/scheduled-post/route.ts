@@ -1,4 +1,7 @@
-import { HTTP_STATUS, SANITY_WEBHOOK_OPERATION } from '@blog/config/constants';
+import {
+  HTTP_STATUS,
+  SANITY_WEBHOOK_OPERATION,
+} from '@shinefold/config/constants';
 import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { buildRevalidatedTags } from '@web/server/revalidate/build-revalidated-tags/build-revalidated-tags';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';

@@ -1,14 +1,14 @@
 import 'server-only';
 
-import { EMAIL_ACCOUNT, type TEmailAccount } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import type { TEmailTag } from '@blog/email/tags';
-import { SendEmailError } from '@blog/email/transport/send-email-error';
-import { env } from '@blog/email/utils/env/env';
-import { isUndefined } from '@blog/utils/primitives';
+import { EMAIL_ACCOUNT, type TEmailAccount } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import type { TEmailTag } from '@shinefold/email/tags';
+import { SendEmailError } from '@shinefold/email/transport/send-email-error';
+import { env } from '@shinefold/email/utils/env/env';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { Resend } from 'resend';
 
-import { isValidEmailAddress } from '@blog/email/validation';
+import { isValidEmailAddress } from '@shinefold/email/validation';
 
 export type TSendEmailInput = {
   account: TEmailAccount;

@@ -2,7 +2,7 @@ import {
   MOCK_BLOCKED_ADDRESS,
   MOCK_BLOCKED_ADDRESS_DOMAIN,
   MOCK_NOT_A_DOMAIN,
-} from '@blog/db/testing/blocked-signup-identities/fixtures';
+} from '@shinefold/db/testing/blocked-signup-identities/fixtures';
 
 import {
   normalizeSignupDomain,

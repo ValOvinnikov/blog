@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import { subscribers } from '@blog/db/schema/subscribers';
+import { getDb } from '@shinefold/db/client';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import { subscribers } from '@shinefold/db/schema/subscribers';
 import { and, count, eq } from 'drizzle-orm';
 
 export async function countActiveSubscribers(

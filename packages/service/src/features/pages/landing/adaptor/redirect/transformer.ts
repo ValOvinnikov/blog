@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { REDIRECT_STATUS } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { REDIRECT_STATUS } from '@shinefold/config/constants';
 import type { InferResultType } from 'groqd';
 
 import type { redirectsQuery } from './query';

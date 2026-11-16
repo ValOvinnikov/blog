@@ -1,23 +1,23 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import { archiveTenant } from '@blog/db/queries/tenants';
-import { createTenant } from '@blog/db/queries/tenants/create-tenant';
-import * as schema from '@blog/db/schema';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { archiveTenant } from '@shinefold/db/queries/tenants';
+import { createTenant } from '@shinefold/db/queries/tenants/create-tenant';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_INVALIDATE_CACHE_ENV,
   MOCK_SITE_CONFIG_REVALIDATE_SECRET,
   MOCK_WEB_APP_URL,
-} from '@blog/db/testing/invalidate-tenant-cache/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/invalidate-tenant-cache/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_MISSING_TENANT_ID,
   MOCK_TENANT_VALUES,
   unwrapOk,
-} from '@blog/db/testing/tenants/fixtures';
+} from '@shinefold/db/testing/tenants/fixtures';
 
 import { runInvalidateTenantCache } from './run';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const REVALIDATE_SITE_CONFIG_PATH = '/api/revalidate-site-config';
 

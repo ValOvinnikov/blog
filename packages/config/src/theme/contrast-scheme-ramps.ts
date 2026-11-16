@@ -1,4 +1,4 @@
-import { COLOR_SCHEME, type TColorScheme } from '@blog/config/constants';
+import { COLOR_SCHEME, type TColorScheme } from '@shinefold/config/constants';
 
 import { ACCENT_RAMP_DARK, ACCENT_RAMP_LIGHT } from './accent-ramps';
 import {

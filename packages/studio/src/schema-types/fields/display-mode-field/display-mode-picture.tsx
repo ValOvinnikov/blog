@@ -1,4 +1,4 @@
-import { DISPLAY_MODE, type TDisplayMode } from '@blog/config/constants';
+import { DISPLAY_MODE, type TDisplayMode } from '@shinefold/config/constants';
 import {
   FAINT,
   FRAME_CENTER_X,
@@ -7,7 +7,7 @@ import {
   FRAME_INSET,
   FRAME_WIDTH,
   PictureFrame,
-} from '@blog/studio/schema-types/inputs/option-tiles-input/picture-frame';
+} from '@shinefold/studio/schema-types/inputs/option-tiles-input/picture-frame';
 import type { ReactNode } from 'react';
 
 const GRID_CELL_WIDTH = (FRAME_WIDTH - FRAME_GAP) / 2;

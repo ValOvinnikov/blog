@@ -1,5 +1,5 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import {
   useCallback,
   useEffect,

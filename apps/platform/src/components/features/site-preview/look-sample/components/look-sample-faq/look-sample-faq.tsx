@@ -1,8 +1,8 @@
-import { Accordion } from '@blog/ui/components/organisms/accordion';
 import { LookSampleSection } from '@platform/components/features/site-preview/look-sample/components/look-sample-section/look-sample-section';
 import { SamplePart } from '@platform/components/features/site-preview/sample-part';
 import { LOOK_SAMPLE_FAQ_ITEM } from '@platform/constants/look-sample';
 import { SAMPLE_PART } from '@platform/constants/sample-part';
+import { Accordion } from '@shinefold/ui/components/organisms/accordion';
 import { useTranslations } from 'next-intl';
 
 export const LookSampleFaq = () => {

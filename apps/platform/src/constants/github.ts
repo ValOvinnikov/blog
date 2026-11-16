@@ -1,6 +1,9 @@
-import { ACTION_OUTCOME, TENANT_DELETE_OUTCOME } from '@blog/config/constants';
-import type { TValueOf } from '@blog/config/utils';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
+import {
+  ACTION_OUTCOME,
+  TENANT_DELETE_OUTCOME,
+} from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const GITHUB_FAILURE = {
   NOT_CONFIGURED: DOMAIN_AVAILABILITY.NOT_CONFIGURED,

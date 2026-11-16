@@ -1,8 +1,8 @@
-import type { AllSanitySchemaTypes, TModuleType } from '@blog/config';
+import type { AllSanitySchemaTypes, TModuleType } from '@shinefold/config';
 
 type TSanityType = Extract<AllSanitySchemaTypes, { _type: string }>['_type'];
 
-/** Every non-module document `_type` that a `@blog/service` loader's `isr(...)` tags depend on. */
+/** Every non-module document `_type` that a `@shinefold/service` loader's `isr(...)` tags depend on. */
 type TCachedDocumentType =
   | 'page_tag'
   | 'page_topic'

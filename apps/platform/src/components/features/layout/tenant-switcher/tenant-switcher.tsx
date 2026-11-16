@@ -1,7 +1,6 @@
 'use client';
 
 import { Menu } from '@base-ui/react/menu';
-import { ICONS } from '@blog/config';
 import { Avatar } from '@platform/components/shared/avatar';
 import { Icon } from '@platform/components/shared/icon';
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
@@ -13,6 +12,7 @@ import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
 import { Link } from '@platform/i18n/navigation';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { tenantSwitcherVariants } from './tenant-switcher-variants';

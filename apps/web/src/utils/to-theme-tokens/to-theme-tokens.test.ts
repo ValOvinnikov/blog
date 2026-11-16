@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   BUTTON_SHAPE,
   CARD_STYLE,
@@ -6,8 +7,7 @@ import {
   NAV_LINK_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 
 import { toThemeTokens } from './to-theme-tokens';
 

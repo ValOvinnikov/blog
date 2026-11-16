@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   CAPABILITY,
   LOCALE_ISO_CODES,
   portableTextToPlainText,
   SITE_MESSAGES_BY_LOCALE,
   type TLocaleIsoCode,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 import { useVoiceRich } from '@web/context/voice-rich-provider';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
@@ -32,7 +32,7 @@ vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   getSanityImageBaseUrl: () => 'https://cdn.sanity.io/images/p/d/',
 }));
 

@@ -8,7 +8,7 @@ import type {
   Template_tagIndex,
   Template_topic,
   Template_topicIndex,
-} from '@blog/config/sanity/generated/types';
+} from '@shinefold/config/sanity/generated/types';
 
 /**
  * The `_type` a reference union member points at, read off typegen's

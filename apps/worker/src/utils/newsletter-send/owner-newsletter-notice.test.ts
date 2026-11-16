@@ -1,14 +1,14 @@
-import { EMAIL_ACCOUNT, LOCALE_ISO_CODES } from '@blog/config/constants';
+import { EMAIL_ACCOUNT, LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
   NEWSLETTER_SKIP_REASON,
-} from '@blog/db/constants';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
+} from '@shinefold/db/constants';
+import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
 import {
   markNewsletterLimitNoticeSent,
   releaseNewsletterLimitNotice,
-} from '@blog/db/queries/newsletter-post-sends';
-import { sendEmail } from '@blog/email';
+} from '@shinefold/db/queries/newsletter-post-sends';
+import { sendEmail } from '@shinefold/email';
 import { NEWSLETTER_SEND_LOG } from '@worker/constants/newsletter-send';
 import { mockNewsletterLimits } from '@worker/testing/newsletter-send/fixtures';
 import { MOCK_RESEND_DOWN } from '@worker/testing/outage/fixtures';
@@ -20,9 +20,9 @@ import { logger } from '@worker/utils/logger/logger';
 
 import { sendOwnerNewsletterNotice } from './owner-newsletter-notice';
 
-vi.mock('@blog/db/queries/memberships');
-vi.mock('@blog/db/queries/newsletter-post-sends');
-vi.mock('@blog/email/transport/send-email');
+vi.mock('@shinefold/db/queries/memberships');
+vi.mock('@shinefold/db/queries/newsletter-post-sends');
+vi.mock('@shinefold/email/transport/send-email');
 vi.mock('@worker/utils/env/env');
 
 const { SENDING_PAUSED, SUBSCRIBER_BAND_NEAR } = NEWSLETTER_LIMIT_NOTICE_KIND;

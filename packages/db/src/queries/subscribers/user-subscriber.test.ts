@@ -1,4 +1,4 @@
-import * as schema from '@blog/db/schema';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestReader,
   insertTestSubscriber,
@@ -6,16 +6,16 @@ import {
   insertTestUser,
   MOCK_SUBSCRIBER_EMAIL,
   MOCK_SUBSCRIBER_TAGGED_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { MOCK_MISSING_USER_ID } from '@blog/db/testing/memberships/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/fixtures';
+import { MOCK_MISSING_USER_ID } from '@shinefold/db/testing/memberships/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import {
   findSubscriberByExactEmail,
   findUserSubscriber,
 } from './user-subscriber';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const MOCK_UNDECRYPTABLE_CIPHERTEXT = 'not-a-ciphertext';
 const STORED_EMAIL_CASES = [

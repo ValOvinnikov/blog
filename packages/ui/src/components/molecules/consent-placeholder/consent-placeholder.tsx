@@ -1,7 +1,11 @@
-import { SIZE, type IWithClassName, type IWithDataTestId } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
-import { MediaFrame } from '@blog/ui/components/atoms/media-frame';
-import type { TMediaFrameRatio } from '@blog/ui/components/atoms/media-frame/media-frame-variants';
+import {
+  SIZE,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { MediaFrame } from '@shinefold/ui/components/atoms/media-frame';
+import type { TMediaFrameRatio } from '@shinefold/ui/components/atoms/media-frame/media-frame-variants';
 import { useId } from 'react';
 
 import { consentPlaceholderVariants } from './consent-placeholder-variants';

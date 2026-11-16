@@ -1,4 +1,4 @@
-import { tv } from '@blog/ui/lib/styling';
+import { tv } from '@shinefold/ui/lib/styling';
 
 export const actionGroupVariants = tv({
   base: ['sm:min-w-32'],

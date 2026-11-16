@@ -1,12 +1,12 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { MOCK_TOPIC_ID } from '@blog/service/testing/entities/fixtures';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { MOCK_TOPIC_ID } from '@shinefold/service/testing/entities/fixtures';
 import {
   evaluateRelatedPostsQuery,
   MOCK_DESIGN_EN_POST_ID,
   MOCK_DESIGN_NL_POST_ID,
   MOCK_ONLY_EN_POST_ID,
   toIds,
-} from '@blog/service/testing/shared/translated-posts-dataset';
+} from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { relatedByTopicQuery } from './by-topic.query';
 

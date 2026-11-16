@@ -1,5 +1,5 @@
-import { TENANT_STATUS } from '@blog/db/constants';
-import { listTenants } from '@blog/db/queries/tenants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { listTenants } from '@shinefold/db/queries/tenants';
 import { REVALIDATE_WEBHOOK_LOG } from '@worker/constants/revalidate-webhook';
 import {
   MOCK_ENCRYPTED_WEBHOOK_SECRET,
@@ -9,7 +9,7 @@ import { runRevalidateWebhookStepForEach } from '@worker/utils/revalidate-webhoo
 
 import { syncRevalidateWebhooks } from './sync-revalidate-webhooks';
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock(
   '@worker/utils/revalidate-webhook-backfill/revalidate-webhook-backfill',
 );

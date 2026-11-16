@@ -26,7 +26,7 @@ const lintsTouchedFiles = process.env.BLOG_LINT_TOUCHED === '1';
 const touchedFilePlugins = {
   files: ['**/*.{ts,tsx}'],
   plugins: {
-    'blog-touched': {
+    'shinefold-touched': {
       rules: {
         'prefer-shared-constant': preferSharedConstantRule,
         'no-duplicate-string': noDuplicateStringRule,
@@ -41,10 +41,10 @@ const touchedFileRules = {
   files: ['**/*.{ts,tsx}'],
   ignores: ['migrations/**'],
   rules: {
-    'blog-touched/prefer-shared-constant': 'error',
-    'blog-touched/no-duplicate-string': ['error', { threshold: 2 }],
-    'blog-touched/no-failing-comment': 'error',
-    'blog-touched/prefer-utils-primitive': 'error',
+    'shinefold-touched/prefer-shared-constant': 'error',
+    'shinefold-touched/no-duplicate-string': ['error', { threshold: 2 }],
+    'shinefold-touched/no-failing-comment': 'error',
+    'shinefold-touched/prefer-utils-primitive': 'error',
   },
 };
 
@@ -57,8 +57,8 @@ const touchedTestFileRules = {
   files: ['**/*.test.{ts,tsx}'],
   plugins: { vitest },
   rules: {
-    'blog-test/no-nested-query': 'error',
-    'blog-test/prefer-before-each': 'error',
+    'shinefold-test/no-nested-query': 'error',
+    'shinefold-test/prefer-before-each': 'error',
     'vitest/valid-title': [
       'error',
       {
@@ -145,11 +145,11 @@ export default [
     // scripts, e2e specs) live in their own layer preset — `files` here
     // resolves relative to each consuming workspace, so a repo-root path
     // like `packages/insight/src/**` would never match from this shared file.
-    // Own namespace: registering a second rules object under `blog` throws
+    // Own namespace: registering a second rules object under `shinefold` throws
     // "Cannot redefine plugin".
     files: ['**/*.test.{ts,tsx}', 'src/testing/**/*.{ts,tsx}'],
     plugins: {
-      'blog-test': {
+      'shinefold-test': {
         rules: {
           'no-class-assertions': noClassAssertionsRule,
           'no-nested-query': noNestedQueryRule,
@@ -173,7 +173,7 @@ export default [
     },
     rules: {
       'no-console': 'off',
-      'blog-test/no-class-assertions': 'error',
+      'shinefold-test/no-class-assertions': 'error',
       'testing-library/no-container': 'error',
       'testing-library/no-node-access': 'error',
       'testing-library/prefer-screen-queries': 'error',

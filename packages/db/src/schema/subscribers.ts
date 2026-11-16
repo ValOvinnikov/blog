@@ -1,5 +1,8 @@
-import { SUBSCRIBER_STATUS, type TSubscriberStatus } from '@blog/db/constants';
-import { sha256Hex } from '@blog/utils/hash';
+import {
+  SUBSCRIBER_STATUS,
+  type TSubscriberStatus,
+} from '@shinefold/db/constants';
+import { sha256Hex } from '@shinefold/utils/hash';
 import {
   index,
   pgTable,

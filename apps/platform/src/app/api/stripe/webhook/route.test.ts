@@ -1,5 +1,3 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
-import { MOCK_STRIPE_EVENT_ID } from '@blog/db/testing/tenants/billing';
 import {
   BILLING_LOG,
   STRIPE_SIGNATURE_HEADER,
@@ -13,6 +11,8 @@ import { mockStripeEvent } from '@platform/testing/billing/stripe-subscription';
 import { mockedStripeEnv } from '@platform/testing/env/mocked-stripe-env';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
+import { MOCK_STRIPE_EVENT_ID } from '@shinefold/db/testing/tenants/billing';
 import Stripe from 'stripe';
 
 import { POST } from './route';

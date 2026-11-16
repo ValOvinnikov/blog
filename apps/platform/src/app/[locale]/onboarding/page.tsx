@@ -1,6 +1,3 @@
-import { isLocaleIsoCode, LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { OnboardingView } from '@platform/components/features/onboarding/onboarding-view';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import { getSessionEmail } from '@platform/server/auth/get-session-email';
@@ -8,6 +5,9 @@ import { requireOnboardingUser } from '@platform/server/onboarding/require-onboa
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { env } from '@platform/utils/env/env';
 import { toLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
+import { isLocaleIsoCode, LOCALE_ISO_CODES } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 

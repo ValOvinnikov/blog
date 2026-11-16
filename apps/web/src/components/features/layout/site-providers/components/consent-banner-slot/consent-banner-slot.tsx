@@ -1,7 +1,7 @@
 'use client';
 
-import { routes } from '@blog/config';
-import { ConsentBanner } from '@blog/ui/components/molecules/consent-banner';
+import { routes } from '@shinefold/config';
+import { ConsentBanner } from '@shinefold/ui/components/molecules/consent-banner';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { CONSENT_STATUS } from '@web/constants/consent';
 import { useConsentPreferences } from '@web/context/consent-preferences-provider';

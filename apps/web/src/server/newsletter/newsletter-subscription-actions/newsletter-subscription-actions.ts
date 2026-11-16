@@ -5,9 +5,9 @@ import {
   SUBSCRIBER_OUTCOME,
   type TActionResult,
   TENANT_WRITE_REFUSAL,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { auth } from '@web/server/auth/auth';
 import { deliverNewsletterConfirmation } from '@web/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send';

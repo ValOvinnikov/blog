@@ -1,13 +1,13 @@
-import { CTA_VARIANT } from '@blog/config';
-import { CtaModule } from '@blog/ui/components/organisms/cta-module';
-import { ctaModuleVariants } from '@blog/ui/components/organisms/cta-module/cta-module-variants';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { CTA_VARIANT } from '@shinefold/config';
+import { CtaModule } from '@shinefold/ui/components/organisms/cta-module';
+import { ctaModuleVariants } from '@shinefold/ui/components/organisms/cta-module/cta-module-variants';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import {
   MOCK_CTA_HEADING,
   MOCK_CTA_IMAGE_TEST_ID,
   mockCtaTestImage,
-} from '@blog/ui/testing/organisms/cta-module/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/organisms/cta-module/fixtures';
 
 import { CtaModuleLayout } from './cta-module-layout';
 

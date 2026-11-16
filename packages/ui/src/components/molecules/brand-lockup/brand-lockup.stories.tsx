@@ -1,4 +1,4 @@
-import { MOCK_SITE_NAME } from '@blog/ui/testing/fixtures';
+import { MOCK_SITE_NAME } from '@shinefold/ui/testing/fixtures';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { BrandLockup } from './brand-lockup';

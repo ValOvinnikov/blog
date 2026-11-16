@@ -1,13 +1,13 @@
-import { SITE_CONFIG_SAVED_AT } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_SITE_CONFIG_FIELDS } from '@blog/db/testing/site-config/fixtures';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
+import { SITE_CONFIG_SAVED_AT } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_SITE_CONFIG_FIELDS } from '@shinefold/db/testing/site-config/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { stampSiteConfigSavedAt } from './stamp-site-config-saved-at';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);

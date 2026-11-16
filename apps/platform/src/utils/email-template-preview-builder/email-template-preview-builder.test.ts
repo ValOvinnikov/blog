@@ -1,12 +1,12 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { MOCK_EMAIL_BODY } from '@platform/testing/email-draft';
+import { MOCK_TENANT_EMAIL_BRAND } from '@platform/testing/tenant-email-brand';
+import { EMAIL_TEMPLATE_TYPE } from '@shinefold/config';
 import {
   buildInviteMagicLinkEmail,
   buildMagicLinkEmail,
   buildNewsletterConfirmationEmail,
-} from '@blog/email/templates/tenant';
-import { faker } from '@faker-js/faker';
-import { MOCK_EMAIL_BODY } from '@platform/testing/email-draft';
-import { MOCK_TENANT_EMAIL_BRAND } from '@platform/testing/tenant-email-brand';
+} from '@shinefold/email/templates/tenant';
 
 import {
   buildEmailTemplatePreviewHtml,

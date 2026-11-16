@@ -1,5 +1,5 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { env } from '@blog/service/utils/env/env';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { env } from '@shinefold/service/utils/env/env';
 
 type TIsrOptions =
   { next: { revalidate: number; tags: string[] } } | { cache: 'no-store' };
@@ -17,7 +17,7 @@ type TIsrOptions =
  * specific affected path(s), falling back to a blanket
  * `revalidatePath('/', 'layout')` only when path derivation fails, and each
  * content route's own `export const revalidate`
- * (`CONTENT_ROUTE_REVALIDATE_SECONDS` from `@blog/config`) bounds how long
+ * (`CONTENT_ROUTE_REVALIDATE_SECONDS` from `@shinefold/config`) bounds how long
  * a missed or failed purge can stay visible regardless.
  *
  * `scopeProjectId` is required — every tag is prefixed `t:<projectId>:<tag>`,

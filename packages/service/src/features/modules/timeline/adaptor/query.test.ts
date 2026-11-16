@@ -1,23 +1,23 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   LOCALE_ISO_CODES,
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   MOCK_TIMELINE_MODULE_ID,
   mockRawTimelineItem,
   mockRawTimelineModule,
-} from '@blog/service/testing/modules/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/modules/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedParagraphText,
   mockLocalizedStrings,
   mockParagraphBlocks,
-} from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
 
 import { timelineModuleQuery } from './query';
 

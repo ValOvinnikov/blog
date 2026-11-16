@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   routes,
   type TLocaleIsoCode,
-} from '@blog/config';
-import type { TTranslationMap } from '@blog/service';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import type { TTranslationMap } from '@shinefold/service';
 
 import { toSwitchLanguageTarget } from './to-switch-language-target';
 

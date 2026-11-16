@@ -1,11 +1,11 @@
 import 'server-only';
 
-import { DAY_MS } from '@blog/db/constants';
-import { utcDay } from '@blog/utils/date';
 import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import { alertSelfServeLimit } from '@platform/server/create-site-gate/alert-self-serve-limit';
 import { createRateLimitStore } from '@platform/server/rate-limit/create-rate-limit-store';
 import { logger } from '@platform/utils/logger/logger';
+import { DAY_MS } from '@shinefold/db/constants';
+import { utcDay } from '@shinefold/utils/date';
 
 export const MAX_SITES_PER_IP_PER_DAY = 3;
 export const MAX_SELF_SERVE_SITES_PER_DAY = 50;

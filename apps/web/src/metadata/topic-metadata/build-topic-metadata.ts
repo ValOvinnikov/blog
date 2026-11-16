@@ -1,4 +1,4 @@
-import { routes } from '@blog/config';
+import { routes } from '@shinefold/config';
 import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getTopicPage } from '@web/server/topic/get-topic-page/get-topic-page';
 import { logger } from '@web/utils/logger/logger';

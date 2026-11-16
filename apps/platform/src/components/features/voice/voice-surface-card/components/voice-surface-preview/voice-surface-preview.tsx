@@ -1,19 +1,19 @@
 'use client';
 
-import {
-  SIZE,
-  VOICE_SURFACE,
-  type TMaybeUndefined,
-  type TVoiceFieldId,
-  type TVoiceSurface,
-} from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import { VoiceSpecimen } from '@platform/components/features/site-preview/voice-specimen';
 import { useVoiceEditor } from '@platform/components/features/voice/voice-editor-provider';
 import { useVoiceListSamples } from '@platform/components/features/voice/voice-list-samples-provider';
 import { VoiceSurfaceNote } from '@platform/components/features/voice/voice-surface-card/components/voice-surface-note';
 import { Button } from '@platform/components/shared/button';
 import { voiceFieldsOf } from '@platform/utils/voice-draft/voice-draft';
+import {
+  SIZE,
+  VOICE_SURFACE,
+  type TMaybeUndefined,
+  type TVoiceFieldId,
+  type TVoiceSurface,
+} from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 

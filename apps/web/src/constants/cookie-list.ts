@@ -1,7 +1,7 @@
-import { buildAppCookies } from '@blog/auth/sessions/app-cookies';
-import { CONSENT_CATEGORY, type TConsentCategory } from '@blog/config';
-import { AUTH_APP } from '@blog/config/constants';
-import type { TValueOf } from '@blog/config/utils';
+import { buildAppCookies } from '@shinefold/auth/sessions/app-cookies';
+import { CONSENT_CATEGORY, type TConsentCategory } from '@shinefold/config';
+import { AUTH_APP } from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
 import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
 import { THEME_STORAGE_KEY } from '@web/config/theme-script';
 import { CONSENT_COOKIE_NAME } from '@web/utils/consent-cookie';

@@ -1,6 +1,6 @@
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
+import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 import { SECTION_APPEARANCE_LOG } from '@web/constants/section-appearance';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
@@ -21,7 +21,7 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant');
 vi.mock('@web/server/site-config/get-effective-plan/get-effective-plan');
 
 vi.mock(
-  '@blog/db',
+  '@shinefold/db',
   () => import('@web/testing/server/site-config/site-config-db'),
 );
 

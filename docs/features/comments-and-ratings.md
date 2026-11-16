@@ -26,7 +26,7 @@ Signed-in readers will be able to leave threaded comments on a post and give it 
 
 ## Data
 
-- `CAPABILITY.COMMENTS` and `CAPABILITY.RATINGS` in `@blog/config`.
+- `CAPABILITY.COMMENTS` and `CAPABILITY.RATINGS` in `@shinefold/config`.
 - `settings_features.comments_enabled` and `ratings_enabled` — `NOT NULL`, default `false`. Both presets' `featureDefaults` leave them off.
 - No `comments` or `ratings` table exists. The decided shapes:
   - `comments` — `tenantId` (foreign key to `tenants`; every query scoped by it), `postId` as the Sanity `_id` string (a cross-store reference, not a foreign key), `userId`, plain-text `body`, `status` (pending, approved, spam), nullable `parentId` for threads, timestamps and a soft-delete flag.
@@ -48,7 +48,7 @@ Signed-in readers will be able to leave threaded comments on a post and give it 
 - One rating per user per post, enforced by the database, not the app.
 - The post page stays statically generated; only the island is dynamic.
 - Account export and deletion must cover both tables when they ship. A deleted reader's comments are tombstoned, not cascade-deleted, so a thread keeps its shape.
-- Both capabilities are on `COMING_SOON_CAPABILITIES` (`@blog/config`), the list both apps read, and on the platform's own `HIDDEN_CAPABILITIES`, which keeps their Features rows out; taking a capability off both is the deliberate step that ships it. The platform's Features save writes every `COMING_SOON_CAPABILITIES` entry off, and `apps/web` leaves listed capabilities out of `isReaderAccountEnabled`. A tenant with no `settings_features` row still falls back to its preset's defaults, so a `GROWTH` tenant resolves both capabilities on and a `FREE` tenant resolves `RATINGS` on; that is harmless only because no render site exists, so a comment or rating island must not ship while its capability is still on the list.
+- Both capabilities are on `COMING_SOON_CAPABILITIES` (`@shinefold/config`), the list both apps read, and on the platform's own `HIDDEN_CAPABILITIES`, which keeps their Features rows out; taking a capability off both is the deliberate step that ships it. The platform's Features save writes every `COMING_SOON_CAPABILITIES` entry off, and `apps/web` leaves listed capabilities out of `isReaderAccountEnabled`. A tenant with no `settings_features` row still falls back to its preset's defaults, so a `GROWTH` tenant resolves both capabilities on and a `FREE` tenant resolves `RATINGS` on; that is harmless only because no render site exists, so a comment or rating island must not ship while its capability is still on the list.
 - Comments and Ratings are nested under Reader accounts: once built, each applies only while `READER_ACCOUNTS` is on too (`isReaderAccountFeatureEnabled`). Neither decides whether a site offers sign-in.
 
 ## Dependencies

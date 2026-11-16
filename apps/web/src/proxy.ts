@@ -1,5 +1,5 @@
-import { HTTP_STATUS, type TMaybeUndefined } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
+import { HTTP_STATUS, type TMaybeUndefined } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { PROXY_LOG } from '@web/constants/proxy';
 import { SINGLE_LANGUAGE_ROUTING } from '@web/i18n/routing';
 import { applyPreviewResponseHeaders } from '@web/server/draft-preview/apply-preview-response-headers/apply-preview-response-headers';

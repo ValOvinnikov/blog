@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
 import type { SchemaDefinition } from '@portabletext/editor';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 const hasName = (
   entries: TMaybeUndefined<readonly { name: string }[]>,

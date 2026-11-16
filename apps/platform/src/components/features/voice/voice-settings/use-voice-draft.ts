@@ -1,15 +1,5 @@
 'use client';
 
-import {
-  ACTION_OUTCOME,
-  type TMaybeUndefined,
-  type TVoiceFieldId,
-} from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import {
-  hasArrayGotItems,
-  hasArrayGotMultipleItems,
-} from '@blog/utils/primitives';
 import { useSettingsForm } from '@platform/components/shared/settings-form-shell';
 import { useToast } from '@platform/context/toast-provider';
 import {
@@ -30,6 +20,16 @@ import {
 } from '@platform/utils/voice-draft/voice-draft';
 import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 import { toVoiceFieldMessages } from '@platform/utils/voice-field-errors/voice-field-errors';
+import {
+  ACTION_OUTCOME,
+  type TMaybeUndefined,
+  type TVoiceFieldId,
+} from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import {
+  hasArrayGotItems,
+  hasArrayGotMultipleItems,
+} from '@shinefold/utils/primitives';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';

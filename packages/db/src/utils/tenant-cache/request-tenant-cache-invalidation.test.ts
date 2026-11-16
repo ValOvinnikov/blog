@@ -1,11 +1,11 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config';
 import {
   emptyResponse,
   firstFetchCall,
   textResponse,
   useFetchFake,
-} from '@blog/db/testing/sanity-management-client/fetch-fake';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/sanity-management-client/fetch-fake';
 
 import { requestTenantCacheInvalidation } from './request-tenant-cache-invalidation';
 

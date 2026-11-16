@@ -1,10 +1,10 @@
-import { ASIDE_KIND } from '@blog/config/constants';
-import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
+import { ASIDE_KIND } from '@shinefold/config/constants';
+import { paragraphTextSchema } from '@shinefold/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import {
   toPlainText,
   type TPlainTextBlock,
-} from '@blog/studio/schema-types/portable-text/to-plain-text/to-plain-text';
-import { toTitleCase } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/portable-text/to-plain-text/to-plain-text';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { MessageSquareText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

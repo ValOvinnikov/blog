@@ -1,6 +1,6 @@
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
-import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 import { faker } from '@faker-js/faker';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
+import { mockTenant } from '@shinefold/db/testing/tenants/fixtures';
 
 import { recoverWedgedTenants } from './recover-wedged-provisioning';
 
@@ -12,7 +12,7 @@ const { listTenantsWedgedInProvisioningMock, setTenantProvisioningStatusMock } =
     setTenantProvisioningStatusMock: vi.fn(),
   }));
 
-vi.mock('@blog/db/queries/tenants', () => ({
+vi.mock('@shinefold/db/queries/tenants', () => ({
   listTenantsWedgedInProvisioning: listTenantsWedgedInProvisioningMock,
   setTenantProvisioningStatus: setTenantProvisioningStatusMock,
 }));

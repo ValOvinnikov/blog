@@ -1,14 +1,14 @@
-import { clearTenantProvisioningArtifacts } from '@blog/db/queries/tenants';
+import { faker } from '@faker-js/faker';
+import { clearTenantProvisioningArtifacts } from '@shinefold/db/queries/tenants';
 import {
   MOCK_DEPROVISION_DRY_RUN_ENV,
   MOCK_DEPROVISION_ENV,
-} from '@blog/db/testing/deprovision-tenant/fixtures';
-import { mockTenant } from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/deprovision-tenant/fixtures';
+import { mockTenant } from '@shinefold/db/testing/tenants/fixtures';
 
 import { clearTenantArtifacts } from './clear-artifacts';
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 
 faker.seed(5765);
 

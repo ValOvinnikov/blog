@@ -1,5 +1,5 @@
-import type { TElevateTenantOwnerOutcome } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TElevateTenantOwnerOutcome } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 import {
   isNotifiableOutcome,

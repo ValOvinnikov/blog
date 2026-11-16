@@ -1,7 +1,7 @@
-import { queries } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isPlatformTenant } from '@blog/db/utils/is-platform-tenant/is-platform-tenant';
 import { env } from '@platform/utils/env/env';
+import { queries } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isPlatformTenant } from '@shinefold/db/utils/is-platform-tenant/is-platform-tenant';
 
 export const resolveIsPlatformTenant = async (
   tenant: Pick<TTenant, 'id' | 'primaryDomain'>,

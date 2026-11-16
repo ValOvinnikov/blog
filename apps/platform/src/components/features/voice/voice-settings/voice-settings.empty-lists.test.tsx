@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
 import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
@@ -39,6 +37,8 @@ import {
   writeSettingsDraft,
 } from '@platform/utils/settings-draft-storage/settings-draft-storage';
 import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
+import { ACTION_OUTCOME, SITE_MESSAGES_BY_LOCALE } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { VoiceSettings } from './voice-settings';

@@ -1,7 +1,7 @@
 'use server';
 
-import { SUBSCRIBER_OUTCOME } from '@blog/config';
-import { queries } from '@blog/db';
+import { SUBSCRIBER_OUTCOME } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { auth } from '@web/server/auth/auth';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 

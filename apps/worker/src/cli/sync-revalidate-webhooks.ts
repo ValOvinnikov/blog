@@ -1,8 +1,8 @@
 import { pathToFileURL } from 'node:url';
 
-import { TENANT_STATUS } from '@blog/db/constants';
-import { listTenants } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { listTenants } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { REVALIDATE_WEBHOOK_LOG } from '@worker/constants/revalidate-webhook';
 import {
   reportRevalidateWebhookBackfill,

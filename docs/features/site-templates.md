@@ -31,14 +31,14 @@ No route of its own. The seeded documents are what the public site renders and w
 
 ## Data
 
-- **Sanity** — `@blog/config`'s `buildStarterDocuments({ siteType, siteName, locale, publishedAt })` builds the documents, each typed against the generated Sanity types. Copy comes from one catalogue per locale (`src/starter-content/copy/starter-copy.<locale>.json`, `en` the shape the others match). Slugs are localised with the copy (About is `about`, `over`, `a-propos`, `ueber` or `acerca-de`).
+- **Sanity** — `@shinefold/config`'s `buildStarterDocuments({ siteType, siteName, locale, publishedAt })` builds the documents, each typed against the generated Sanity types. Copy comes from one catalogue per locale (`src/starter-content/copy/starter-copy.<locale>.json`, `en` the shape the others match). Slugs are localised with the copy (About is `about`, `over`, `a-propos`, `ueber` or `acerca-de`).
 - **Ids** — the base documents keep their `provisioning.*` ids, a contract with tenants seeded before templates existed. Template documents use `starter.<type>.<doc>`. The topic and tag index pages and their lists reuse the ids the Studio migrations seed (`page_topicIndex`, `taxonomyList-topics`, `page_tagIndex`, `taxonomyList-tags`), so a later migration converges on the same documents instead of duplicating them.
 - **`tenants.site_type`** — which template to seed. Nothing writes it yet, so every tenant seeds Blank until signup records a type.
 - **`tenants.site_template_version`** — set to `STARTER_TEMPLATE_VERSION` (1) once the template is applied.
 - **`site_config`** — the type's preset (Blog, Portfolio and Personal `EDITORIAL`, Docs and Blank `CONSOLE`) with that preset's theme tokens, card style and header control style, inserted only when the tenant has no row.
 - **`settings_features`** — provisioning writes no row, so features follow the tenant's current preset defaults ([Plans and entitlements](plans-and-entitlements.md)).
 - **Currency** — Site Settings seeds `DEFAULT_SITE_CURRENCY` (USD); choosing it at signup is #5681.
-- **Migration ledger** — the seed transaction also creates the dataset's `migrationState` ledger, listing every id in `@blog/config`'s generated `STUDIO_MIGRATION_IDS` as applied, so the next cross-tenant run replays none of them on content that is already at the current schema.
+- **Migration ledger** — the seed transaction also creates the dataset's `migrationState` ledger, listing every id in `@shinefold/config`'s generated `STUDIO_MIGRATION_IDS` as applied, so the next cross-tenant run replays none of them on content that is already at the current schema.
 
 ## Constraints and invariants
 

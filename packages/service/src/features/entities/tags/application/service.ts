@@ -1,6 +1,6 @@
-import { getTags } from '@blog/service/features/entities/tags/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getTags } from '@shinefold/service/features/entities/tags/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createTagsService() {
   return {

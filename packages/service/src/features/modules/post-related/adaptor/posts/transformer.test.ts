@@ -1,5 +1,5 @@
-import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import { faker } from '@faker-js/faker';
+import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
 
 import {
   toRelatedPosts,

@@ -1,9 +1,9 @@
-import { HTTP_METHOD, type TMaybeUndefined } from '@blog/config';
+import { HTTP_METHOD, type TMaybeUndefined } from '@shinefold/config';
 import {
   VERCEL_API_BASE,
   VERCEL_API_TIMEOUT_MS,
   withTeamId,
-} from '@blog/db/utils/vercel-client/vercel-project-domains';
+} from '@shinefold/db/utils/vercel-client/vercel-project-domains';
 
 async function vercelRequest<T>(
   path: string,

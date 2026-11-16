@@ -1,11 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { RunCard } from '@platform/components/features/tenants/run-card';
+import { RunStatusBadge } from '@platform/components/features/tenants/run-status-badge';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
-import type { TProvisioningRun } from '@blog/db/schema/tenants';
-import { RunCard } from '@platform/components/features/tenants/run-card';
-import { RunStatusBadge } from '@platform/components/features/tenants/run-status-badge';
+} from '@shinefold/db/constants';
+import type { TProvisioningRun } from '@shinefold/db/schema/tenants';
 import type { ReactNode } from 'react';
 
 type TProvisioningRunCardProps = {

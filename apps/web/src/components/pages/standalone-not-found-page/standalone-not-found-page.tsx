@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@shinefold/config';
 import { NotFoundPage } from '@web/components/pages/not-found-page';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';

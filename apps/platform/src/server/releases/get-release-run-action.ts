@@ -1,7 +1,7 @@
 'use server';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 import { getReleaseRun, type TReleaseRun } from './get-release-run';
 import type { TReleaseResult } from './release-result';

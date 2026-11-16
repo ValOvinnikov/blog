@@ -1,15 +1,3 @@
-import {
-  type TMaybeNull,
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  ERROR_CODE,
-  LOCALE_ISO_CODES,
-  NEXT_NAVIGATION_ERROR,
-  RESERVED_SUBDOMAINS,
-} from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import {
@@ -39,6 +27,18 @@ import { MOCK_UNSUPPORTED_LOCALE } from '@platform/testing/tenants/unsupported-l
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import {
+  type TMaybeNull,
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  ERROR_CODE,
+  LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
+  RESERVED_SUBDOMAINS,
+} from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -96,7 +96,7 @@ vi.mock('@platform/server/provisioning/check-domain-availability', () => ({
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     users: { findUserByEmail: findUserByEmailMock },

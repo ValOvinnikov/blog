@@ -1,10 +1,13 @@
-import { PRICE_PERIOD } from '@blog/config';
-import { BILLING_CURRENCY, STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
+import { PRICE_PERIOD } from '@shinefold/config';
+import {
+  BILLING_CURRENCY,
+  STRIPE_PRICE_LOOKUP_KEY,
+} from '@shinefold/db/constants';
 import {
   MOCK_DOLLAR_AMOUNT,
   MOCK_EURO_AMOUNT,
   MOCK_STRIPE_PRODUCT_ID,
-} from '@blog/db/testing/stripe-catalogue/fixtures';
+} from '@shinefold/db/testing/stripe-catalogue/fixtures';
 import {
   mockPricingTier,
   MOCK_PRICING_LABELS,

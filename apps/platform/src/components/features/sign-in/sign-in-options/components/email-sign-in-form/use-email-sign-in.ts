@@ -1,20 +1,20 @@
 'use client';
 
 import {
-  ACTION_OUTCOME,
-  isOutcomeInvalid,
-  isOutcomeServerError,
-  isOutcomeSuccess,
-  type TMaybeUndefined,
-  type TReasonedFailure,
-} from '@blog/config';
-import {
   sendSignInLinkAction,
   type TSendSignInLinkInput,
   type TSendSignInLinkFieldError,
   type TSendSignInLinkRefusal,
 } from '@platform/server/auth/send-sign-in-link-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import {
+  ACTION_OUTCOME,
+  isOutcomeInvalid,
+  isOutcomeServerError,
+  isOutcomeSuccess,
+  type TMaybeUndefined,
+  type TReasonedFailure,
+} from '@shinefold/config';
 import { useState, useTransition } from 'react';
 
 export const useEmailSignIn = ({

@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { HTTP_STATUS } from '@shinefold/config/constants';
 import { readInternalPageRequest } from '@web/server/internal-pages/read-internal-page-request/read-internal-page-request';
 import {
   MOCK_INTERNAL_PAGE_ID,

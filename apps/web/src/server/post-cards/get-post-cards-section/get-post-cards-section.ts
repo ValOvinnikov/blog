@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TPostCard } from '@blog/service';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TPostCard } from '@shinefold/service';
 import type { IMediaCardData } from '@web/components/shared/media-card-item';
 import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import type { TSectionAppearance } from '@web/utils/build-section-scope-declarations';

@@ -1,16 +1,16 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { GRACE_EMAIL } from '@blog/db/constants';
-import { claimGraceEmail } from '@blog/db/queries/tenants/claim-grace-email';
-import { listTenantsDueForGraceEnd } from '@blog/db/queries/tenants/list-tenants-due-for-grace-end';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { daysBeforeNow } from '@blog/db/testing/tenants/grace';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { GRACE_EMAIL } from '@shinefold/db/constants';
+import { claimGraceEmail } from '@shinefold/db/queries/tenants/claim-grace-email';
+import { listTenantsDueForGraceEnd } from '@shinefold/db/queries/tenants/list-tenants-due-for-grace-end';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { daysBeforeNow } from '@shinefold/db/testing/tenants/grace';
 
 import { endDowngradeGrace } from './end-downgrade-grace';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock();

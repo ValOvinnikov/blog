@@ -1,5 +1,3 @@
-import { PRESET_ID, RADIUS_SCALE } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
@@ -24,6 +22,8 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { PRESET_ID, RADIUS_SCALE } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPageContent } from './look-page-content';
@@ -33,7 +33,7 @@ const { getSiteConfigMock, selectLiveLocalesMock } = vi.hoisted(() => ({
   selectLiveLocalesMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await (
     await import('@platform/testing/mock-db-constants')
   ).mockDbConstants()),

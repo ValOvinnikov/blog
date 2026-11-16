@@ -1,5 +1,5 @@
-import { DEPROVISIONING_STEP } from '@blog/db/constants';
-import { errorResult, okResult } from '@blog/utils/result';
+import { DEPROVISIONING_STEP } from '@shinefold/db/constants';
+import { errorResult, okResult } from '@shinefold/utils/result';
 import { MOCK_WORKFLOW_CRASH } from '@worker/testing/outage/fixtures';
 import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';

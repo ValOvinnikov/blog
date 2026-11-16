@@ -1,19 +1,19 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   LOCALE_ISO_CODES,
-} from '@blog/config/constants';
-import { MOCK_FEATURE_LIST_MODULE_ID } from '@blog/service/testing/modules/feature-list/fixtures';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/config/constants';
+import { MOCK_FEATURE_LIST_MODULE_ID } from '@shinefold/service/testing/modules/feature-list/fixtures';
+import { mockReference } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_IMAGE_ASSET_DOCUMENT,
   mockLocalizedHeadingBlock,
   mockLocalizedImage,
-} from '@blog/service/testing/shared/localized';
-import { MOCK_AUTHORED_MODULE_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
+import { MOCK_AUTHORED_MODULE_APPEARANCE } from '@shinefold/service/testing/shared/module-appearance';
 
 import { featureListModuleQuery } from './query';
 

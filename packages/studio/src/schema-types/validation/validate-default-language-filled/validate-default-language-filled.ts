@@ -1,4 +1,4 @@
-import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
 
 export const validateDefaultLanguageFilled =
   (message: string) =>

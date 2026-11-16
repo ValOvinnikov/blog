@@ -2,12 +2,12 @@ import {
   FOOTER_LAYOUT,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '@blog/ui/lib/react';
+} from '@shinefold/ui/lib/react';
 import { Fragment, type ElementType } from 'react';
 
 import { FooterAbout } from './components/about/footer-about';

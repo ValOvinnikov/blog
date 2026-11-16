@@ -1,7 +1,7 @@
 import {
   mockRawSanityImage,
   mockSanityImageView,
-} from '@blog/service/testing/shared/fixtures';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toSanityImage } from './to-sanity-image';
 

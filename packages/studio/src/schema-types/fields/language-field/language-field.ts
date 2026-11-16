@@ -1,4 +1,7 @@
-import { LOCALE_ISO_CODES, LOCALE_NATIVE_LABEL } from '@blog/config/constants';
+import {
+  LOCALE_ISO_CODES,
+  LOCALE_NATIVE_LABEL,
+} from '@shinefold/config/constants';
 import { defineField } from 'sanity';
 
 export const LANGUAGE_FIELD = 'language';

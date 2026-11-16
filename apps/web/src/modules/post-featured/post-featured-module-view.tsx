@@ -1,7 +1,7 @@
-import { DISPLAY_MODE } from '@blog/config';
-import type { TPostFeaturedModule } from '@blog/service';
-import { CardGrid } from '@blog/ui/components/organisms/card-grid';
-import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
+import { DISPLAY_MODE } from '@shinefold/config';
+import type { TPostFeaturedModule } from '@shinefold/service';
+import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
+import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { CardCarousel } from '@web/components/shared/card-carousel';
 import {
   type IMediaCardData,

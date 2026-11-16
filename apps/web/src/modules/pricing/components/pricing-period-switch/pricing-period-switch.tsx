@@ -1,7 +1,7 @@
 'use client';
 
-import { PRICE_PERIOD, type TContentAlignment } from '@blog/config';
-import { SegmentedControl } from '@blog/ui/components/atoms/segmented-control';
+import { PRICE_PERIOD, type TContentAlignment } from '@shinefold/config';
+import { SegmentedControl } from '@shinefold/ui/components/atoms/segmented-control';
 import type { TPricingTabPeriod } from '@web/utils/to-pricing-panels';
 import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';

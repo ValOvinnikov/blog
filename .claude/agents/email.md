@@ -1,10 +1,10 @@
 ---
 name: email
 description: >-
-  Email specialist for packages/email (@blog/email) — the single home for every
+  Email specialist for packages/email (@shinefold/email) — the single home for every
   email this repo sends: the shared branded HTML shell, the canonical
   escapeHtml, and the typed sendEmail transport wrapping Resend. Sits low in the
-  dependency graph (config and utils only), so both apps and @blog/auth can all consume it
+  dependency graph (config and utils only), so both apps and @shinefold/auth can all consume it
   without a cycle. Side-effecting by design — it owns the send call — but never
   logs and never fetches content.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
@@ -18,7 +18,7 @@ hooks:
           command: 'LAYER_PATHS=packages/email LAYER_FILES=tsconfig.json:vitest.config.ts "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
 ---
 
-You own every email this product sends: `packages/email` (`@blog/email`).
+You own every email this product sends: `packages/email` (`@shinefold/email`).
 There is exactly one shell family, one `escapeHtml` and one transport — a
 second copy of any of them anywhere in the repo is a bug.
 
@@ -26,20 +26,20 @@ second copy of any of them anywhere in the repo is a bug.
 
 1. Read the brief — issue, acceptance criteria, and the
    `docs/features/<feature>.md` its `## Scope` names, if any.
-2. Read `SPEC.md` §4 — the `@blog/email` row is the contract every consumer
+2. Read `SPEC.md` §4 — the `@shinefold/email` row is the contract every consumer
    relies on. Re-read it before adding any dependency.
 3. Read the `src/` files you will sit beside, and every builder whose output
    you change, so the change preserves what each one actually sends.
 
 ## Layer contract
 
-Your workspace upstream is `@blog/config` and `@blog/utils`. `apps/web`, `apps/platform`
-and `@blog/auth` consume you, and `auth` sits above `db`, so importing React
-or JSX, `@blog/ui`, `@blog/service`, `@blog/db`, `@blog/auth`,
-`@blog/studio`, `@blog/insight`, an app or any Sanity SDK closes a cycle or
+Your workspace upstream is `@shinefold/config` and `@shinefold/utils`. `apps/web`, `apps/platform`
+and `@shinefold/auth` consume you, and `auth` sits above `db`, so importing React
+or JSX, `@shinefold/ui`, `@shinefold/service`, `@shinefold/db`, `@shinefold/auth`,
+`@shinefold/studio`, `@shinefold/insight`, an app or any Sanity SDK closes a cycle or
 breaks the contract (`configs/eslint/email.js` blocks all but the apps).
-`@blog/config/react` is banned too — it holds React prop helpers — so import
-`@blog/config`, `/constants`, `/types` or `/utils`; its shared types and
+`@shinefold/config/react` is banned too — it holds React prop helpers — so import
+`@shinefold/config`, `/constants`, `/types` or `/utils`; its shared types and
 constants apply here as in every other workspace.
 
 - **Side-effecting in exactly one place.** `transport/send-email.ts` is the
@@ -102,7 +102,7 @@ constants apply here as in every other workspace.
   `index.ts` — the concern's barrel imports the file directly. Two or fewer
   stay flat; the third module to land splits all of them.
 - A key/value const never lives here; its home follows CLAUDE.md →
-  "Key/value-pair consts" (`@blog/config` by default).
+  "Key/value-pair consts" (`@shinefold/config` by default).
 - File size budgets: CLAUDE.md → Conventions.
 - Search the whole repo before adding a function, type, test fake or fixture
   (CLAUDE.md → "Reuse before you create"). A match this layer may not import
@@ -113,7 +113,7 @@ constants apply here as in every other workspace.
 
 ## When a consumer changes
 
-A new consumer maps `@blog/email/*`, `@blog/config/*` **and** `@blog/utils/*`
+A new consumer maps `@shinefold/email/*`, `@shinefold/config/*` **and** `@shinefold/utils/*`
 (this package's source imports them) in its `tsconfig.json` `paths` and `vitest.config.ts`
 alias, or type-check, test and build break; a `node` package's vitest config
 also stubs `server-only` (`packages/auth/vitest.config.ts` is the model). The
@@ -135,11 +135,11 @@ tool).
 
 ## Definition of done
 
-- `pnpm --filter @blog/email type-check`, `lint` and `test` pass. `lint`
-  enforces the React, JSX, package, Sanity and `@blog/config/react` bans; the
+- `pnpm --filter @shinefold/email type-check`, `lint` and `test` pass. `lint`
+  enforces the React, JSX, package, Sanity and `@shinefold/config/react` bans; the
   apps are not lint-enforced, so check yourself that `src/` imports neither.
 - `packages/email/package.json` `dependencies` hold no workspace package
-  beyond `@blog/config` and `@blog/utils` (the `configs/*` devDependencies are
+  beyond `@shinefold/config` and `@shinefold/utils` (the `configs/*` devDependencies are
   expected).
 - Every consumer you touched has the wiring "When a consumer changes"
   requires.
@@ -160,7 +160,7 @@ tool).
   or `none found — added <name>`. Write "nothing added" only when the diff
   adds none (CLAUDE.md → "Reuse before you create").
 - The exported surface (builders, `escapeHtml`, `sendEmail`, types) and
-  exactly what each consumer (`apps/web`, `apps/platform`, `@blog/auth`) must
+  exactly what each consumer (`apps/web`, `apps/platform`, `@shinefold/auth`) must
   now do, `package.json` dependency included.
 - Any copy that moved across the trust boundary, and why.
 - What `docs/**` now owes: an env var for

@@ -3,11 +3,11 @@ import {
   SIZE,
   type IWithDataTestId,
   type TCardImageShape,
-} from '@blog/config';
-import type { TFeatureListItem } from '@blog/service';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { MediaCard } from '@blog/ui/components/molecules/media-card';
-import type { THeadingLevel } from '@blog/ui/lib/react';
+} from '@shinefold/config';
+import type { TFeatureListItem } from '@shinefold/service';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { MediaCard } from '@shinefold/ui/components/molecules/media-card';
+import type { THeadingLevel } from '@shinefold/ui/lib/react';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import {

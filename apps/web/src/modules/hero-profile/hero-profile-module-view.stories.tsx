@@ -3,8 +3,8 @@ import {
   HERO_VARIANT,
   PORTABLE_TEXT_BLOCK_TYPE,
   SOCIAL_PLATFORMS,
-} from '@blog/config';
-import type { THeroProfileModule } from '@blog/service';
+} from '@shinefold/config';
+import type { THeroProfileModule } from '@shinefold/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';

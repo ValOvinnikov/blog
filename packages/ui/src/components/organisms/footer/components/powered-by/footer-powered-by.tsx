@@ -1,11 +1,11 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import {
   SHINEFOLD_LOGO,
   SHINEFOLD_LOGO_NAME,
   SHINEFOLD_LOGO_VARIANT,
-} from '@blog/utils/shinefold-logo';
+} from '@shinefold/utils/shinefold-logo';
 
 import { footerPoweredByVariants } from './footer-powered-by-variants';
 

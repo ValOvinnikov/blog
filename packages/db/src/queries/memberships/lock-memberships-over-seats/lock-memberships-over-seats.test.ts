@@ -1,19 +1,22 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
-import { countMembershipsOverSeats } from '@blog/db/queries/memberships/count-memberships-over-seats';
-import { getMembership } from '@blog/db/queries/memberships/get-membership';
-import { listMembershipsWithTenantsForUser } from '@blog/db/queries/memberships/list-memberships-with-tenants-for-user';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
-import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
-import { deleteSeatRows } from '@blog/db/testing/membership-invites/fixtures';
-import { mockMembership } from '@blog/db/testing/memberships/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { MEMBERSHIP_ROLE, type TMembershipRole } from '@shinefold/db/constants';
+import { countMembershipsOverSeats } from '@shinefold/db/queries/memberships/count-memberships-over-seats';
+import { getMembership } from '@shinefold/db/queries/memberships/get-membership';
+import { listMembershipsWithTenantsForUser } from '@shinefold/db/queries/memberships/list-memberships-with-tenants-for-user';
+import * as schema from '@shinefold/db/schema';
+import {
+  insertTestTenant,
+  insertTestUser,
+} from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
+import { deleteSeatRows } from '@shinefold/db/testing/membership-invites/fixtures';
+import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { lockMembershipsOverSeats } from './lock-memberships-over-seats';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(6875);
 

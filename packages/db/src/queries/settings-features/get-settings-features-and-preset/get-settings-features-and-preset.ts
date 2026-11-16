@@ -1,12 +1,12 @@
-import type { TPresetId } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
+import type { TPresetId } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
 import {
   settingsFeatures,
   type TSettingsFeatures,
-} from '@blog/db/schema/settings-features';
-import { siteConfig } from '@blog/db/schema/site-config';
-import { tenants } from '@blog/db/schema/tenants';
+} from '@shinefold/db/schema/settings-features';
+import { siteConfig } from '@shinefold/db/schema/site-config';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
 export type TSettingsFeatureToggles = Pick<

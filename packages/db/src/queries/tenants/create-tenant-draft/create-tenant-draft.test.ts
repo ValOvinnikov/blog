@@ -1,32 +1,35 @@
+import { faker } from '@faker-js/faker';
 import {
   ERROR_CODE,
   LOCALE_ISO_CODES,
   TENANT_PLAN,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   MEMBERSHIP_ROLE,
   TENANT_PROVISIONING_STATUS,
   TENANT_STATUS,
-} from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { insertTestUser, MOCK_OWNER_EMAIL } from '@blog/db/testing/fixtures';
+} from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import {
+  insertTestUser,
+  MOCK_OWNER_EMAIL,
+} from '@shinefold/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
-} from '@blog/db/testing/personal-data';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/personal-data';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_IDLE_PROVISIONING_STEPS,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_VALUES,
   unwrapOk,
-} from '@blog/db/testing/tenants/fixtures';
+} from '@shinefold/db/testing/tenants/fixtures';
 import {
   MOCK_SELF_SERVE_DOMAIN,
   MOCK_SELF_SERVE_PADDED_DOMAIN,
   MOCK_SELF_SERVE_SCHEME_DOMAIN,
-} from '@blog/db/testing/tenants/self-serve-fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/tenants/self-serve-fixtures';
 import { eq } from 'drizzle-orm';
 
 import {
@@ -34,7 +37,7 @@ import {
   type TCreateTenantDraftInput,
 } from './create-tenant-draft';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(6020);
 

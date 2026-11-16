@@ -21,7 +21,7 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
   SPINNER_STYLE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import { pgEnum } from 'drizzle-orm/pg-core';
 
 export const presetIdEnum = pgEnum('preset_id', PRESET_ID);

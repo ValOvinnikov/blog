@@ -1,4 +1,4 @@
-import { findings } from '@blog/db/schema/findings';
+import { findings } from '@shinefold/db/schema/findings';
 import { isNotNull } from 'drizzle-orm';
 
 export const findingSummaryColumns = {

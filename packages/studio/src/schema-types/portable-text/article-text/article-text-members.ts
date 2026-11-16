@@ -3,12 +3,12 @@ import {
   H2_AS_CONST,
   H3_AS_CONST,
   H4_AS_CONST,
-} from '@blog/config/constants';
-import { asideSchema } from '@blog/studio/schema-types/objects/aside/aside';
-import { bodyImageSchema } from '@blog/studio/schema-types/objects/body-image/body-image';
-import { cookieListSchema } from '@blog/studio/schema-types/objects/cookie-list/cookie-list';
-import { cookiePreferencesLinkSchema } from '@blog/studio/schema-types/objects/cookie-preferences-link/cookie-preferences-link';
-import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
+} from '@shinefold/config/constants';
+import { asideSchema } from '@shinefold/studio/schema-types/objects/aside/aside';
+import { bodyImageSchema } from '@shinefold/studio/schema-types/objects/body-image/body-image';
+import { cookieListSchema } from '@shinefold/studio/schema-types/objects/cookie-list/cookie-list';
+import { cookiePreferencesLinkSchema } from '@shinefold/studio/schema-types/objects/cookie-preferences-link/cookie-preferences-link';
+import { linkRefSchema } from '@shinefold/studio/schema-types/objects/link-ref/link-ref';
 import {
   boldDecorator,
   codeDecorator,
@@ -17,8 +17,8 @@ import {
   subscriptDecorator,
   superscriptDecorator,
   underlineDecorator,
-} from '@blog/studio/schema-types/portable-text/decorators/decorators';
-import { normalBlockStyle } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
+} from '@shinefold/studio/schema-types/portable-text/decorators/decorators';
+import { normalBlockStyle } from '@shinefold/studio/schema-types/portable-text/listed-text/listed-text';
 import {
   defineArrayMember,
   type BlockMarksDefinition,

@@ -1,4 +1,4 @@
-import { sanitizeLogMessage } from '@blog/insight';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';
 import { wakeOwnerAccess } from '@worker/utils/owner-access-run/owner-access-run';

@@ -2,8 +2,8 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import * as schema from '@blog/db/schema';
 import { PGlite } from '@electric-sql/pglite';
+import * as schema from '@shinefold/db/schema';
 import { drizzle } from 'drizzle-orm/pglite';
 import type { TestProject } from 'vitest/node';
 

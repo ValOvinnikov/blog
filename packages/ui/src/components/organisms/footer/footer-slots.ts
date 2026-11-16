@@ -1,5 +1,5 @@
-import { FOOTER_LAYOUT, type TFooterLayout } from '@blog/config';
-import { hasSlotContent } from '@blog/ui/lib/react';
+import { FOOTER_LAYOUT, type TFooterLayout } from '@shinefold/config';
+import { hasSlotContent } from '@shinefold/ui/lib/react';
 import { isValidElement, type PropsWithChildren, type ReactNode } from 'react';
 
 import { hasGroupItems } from './components/groups/has-group-items';

@@ -1,5 +1,3 @@
-import { VOICE_SURFACE, type TVoiceFieldId } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import {
   VOICE_CARD_ID,
@@ -9,6 +7,8 @@ import {
 } from '@platform/constants/voice';
 import { localeDraftOf } from '@platform/utils/voice-draft/voice-draft';
 import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
+import { VOICE_SURFACE, type TVoiceFieldId } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 
 import {
   countVoiceSectionCustomised,

@@ -2,9 +2,9 @@ import {
   PRESET_ID,
   TENANT_CONFIG_REVALIDATE_SECONDS,
   type TCapability,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { safeAsync } from '@blog/utils';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { safeAsync } from '@shinefold/utils';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { buildSettingsFeaturesCacheTag } from '@web/utils/tenant-cache-tags';
 import { toEffectiveSettingsFeatures } from '@web/utils/to-effective-settings-features';

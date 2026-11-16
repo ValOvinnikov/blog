@@ -1,26 +1,26 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CTA_ACTION_APPEARANCE,
   HERO_VARIANT,
   LOCALE_ISO_CODES,
   POST_SOURCE,
-} from '@blog/config/constants';
-import { MOCK_HERO_MODULE_ID } from '@blog/service/testing/pages/fixtures';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/config/constants';
+import { MOCK_HERO_MODULE_ID } from '@shinefold/service/testing/pages/fixtures';
+import { mockReference } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_IMAGE_ASSET_DOCUMENT,
   mockLocalizedImage,
   mockLocalizedStrings,
-} from '@blog/service/testing/shared/localized';
+} from '@shinefold/service/testing/shared/localized';
 import {
   MOCK_DESIGN_EN_POST_ID,
   MOCK_DESIGN_NL_POST_ID,
   MOCK_ONLY_EN_POST_ID,
   MOCK_PINNED_POST_DOCUMENTS,
   MOCK_SOLO_NL_POST_ID,
-} from '@blog/service/testing/shared/translated-posts-dataset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { heroBlogModuleQuery } from './query';
 

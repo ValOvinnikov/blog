@@ -12,7 +12,7 @@ export default meta;
 type TStory = StoryObj<typeof InlineCode>;
 
 export const Default: TStory = {
-  args: { children: 'pnpm --filter @blog/ui test' },
+  args: { children: 'pnpm --filter @shinefold/ui test' },
 };
 
 export const InSentence: TStory = {

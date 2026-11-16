@@ -1,15 +1,15 @@
 'use server';
 
-import {
-  ACTION_OUTCOME,
-  isOutcomeSuccess,
-  type TActionResult,
-} from '@blog/config';
-import { queries } from '@blog/db';
 import { OWNER_INVITE_RESEND_PATH } from '@platform/constants/owner-access';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { enqueueOwnerAccessRequest } from '@platform/server/owner-access/request-owner-access';
+import {
+  ACTION_OUTCOME,
+  isOutcomeSuccess,
+  type TActionResult,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 export type TResendChangedOwnerStudioInviteResult = TActionResult<
   typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,

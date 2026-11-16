@@ -1,14 +1,15 @@
+import { faker } from '@faker-js/faker';
 import {
   HTTP_METHOD,
   HTTP_STATUS,
   SANITY_WEBHOOK_OPERATION,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   firstFetchCall,
   jsonResponse,
   textResponse,
   useFetchFake,
-} from '@blog/db/testing/sanity-management-client/fetch-fake';
+} from '@shinefold/db/testing/sanity-management-client/fetch-fake';
 import {
   MOCK_SANITY_DATASET,
   MOCK_SANITY_ERROR_BODY,
@@ -17,8 +18,7 @@ import {
   MOCK_SANITY_WEBHOOK_ID,
   MOCK_SANITY_WEBHOOK_URL,
   mockSanityProjectInput,
-} from '@blog/db/testing/sanity-management-client/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/sanity-management-client/fixtures';
 
 import {
   createSanityWebhook,

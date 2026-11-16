@@ -2,7 +2,7 @@ import {
   LOCALE_ISO_CODES,
   SITE_MESSAGES,
   SITE_MESSAGES_BY_LOCALE,
-} from '@blog/config';
+} from '@shinefold/config';
 import { COOKIE_ID, COOKIE_LIST } from '@web/constants/cookie-list';
 import { renderElement, screen, within } from '@web/testing/custom-render';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';

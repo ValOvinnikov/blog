@@ -6,7 +6,7 @@ import { collectConsoleErrors } from './helpers/collect-console-errors';
  * This repo has no fixed seeded post slug to rely on across environments —
  * the dev dataset is author-managed and may be empty (docs/DEPLOY.md) — so
  * this test discovers a real post link from the `/blog` archive instead of
- * hardcoding one. `routes.post` (@blog/config) renders post links as
+ * hardcoding one. `routes.post` (@shinefold/config) renders post links as
  * `/blog/{slug}`; pagination links live under `/blog/page/{n}` and are
  * excluded from the match.
  */

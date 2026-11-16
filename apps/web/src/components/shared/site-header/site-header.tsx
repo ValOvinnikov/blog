@@ -1,7 +1,7 @@
-import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { ACCOUNT_PHONE_PLACEMENT, CAPABILITY } from '@blog/config';
-import { service } from '@blog/service';
-import { Header } from '@blog/ui/components/organisms/header';
+import { getEnabledOAuthProviderIds } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import { ACCOUNT_PHONE_PLACEMENT, CAPABILITY } from '@shinefold/config';
+import { service } from '@shinefold/service';
+import { Header } from '@shinefold/ui/components/organisms/header';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { SiteNavigation } from '@web/components/shared/site-navigation';

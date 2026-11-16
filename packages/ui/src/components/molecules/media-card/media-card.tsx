@@ -1,12 +1,12 @@
-import { type IWithClassName, type IWithDataTestId } from '@blog/config';
-import { Tag } from '@blog/ui/components/atoms/tag';
-import { CardMeta } from '@blog/ui/components/molecules/card-meta';
+import { type IWithClassName, type IWithDataTestId } from '@shinefold/config';
+import { Tag } from '@shinefold/ui/components/atoms/tag';
+import { CardMeta } from '@shinefold/ui/components/molecules/card-meta';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '@blog/ui/lib/react';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/ui/lib/react';
+import { hasLength } from '@shinefold/utils/primitives';
 import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { MediaCardFooter } from './components/footer/media-card-footer';

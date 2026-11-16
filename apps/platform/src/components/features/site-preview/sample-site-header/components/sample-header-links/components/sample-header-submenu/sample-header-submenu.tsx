@@ -1,8 +1,8 @@
-import type { THeaderSubmenuStyle } from '@blog/config';
 import {
   SAMPLE_SUBMENU_STYLE_ATTRIBUTE,
   SAMPLE_SUBMENU_TEST_ID,
 } from '@platform/constants/sample-header';
+import type { THeaderSubmenuStyle } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { sampleHeaderSubmenuVariants } from './sample-header-submenu-variants';

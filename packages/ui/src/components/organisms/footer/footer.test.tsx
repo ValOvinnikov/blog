@@ -1,8 +1,12 @@
-import { FOOTER_LAYOUT, type TFooterLayout } from '@blog/config';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { renderElement, screen, within } from '@blog/ui/testing/custom-render';
-import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { faker } from '@faker-js/faker';
+import { FOOTER_LAYOUT, type TFooterLayout } from '@shinefold/config';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import {
+  renderElement,
+  screen,
+  within,
+} from '@shinefold/ui/testing/custom-render';
+import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 
 import { Footer } from './footer';
 

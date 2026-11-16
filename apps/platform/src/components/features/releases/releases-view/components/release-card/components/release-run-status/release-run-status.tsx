@@ -1,4 +1,3 @@
-import { ALERT_TYPE, SIZE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -11,6 +10,7 @@ import {
 import type { TReleaseRun } from '@platform/server/releases/get-release-run';
 import { releaseRunStatusTone } from '@platform/utils/status-tone/status-tone';
 import { tv } from '@platform/utils/tv/tv';
+import { ALERT_TYPE, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 const releaseRunStatusVariants = tv({

@@ -1,4 +1,4 @@
-import type { TThemeTokens } from '@blog/config';
+import type { TThemeTokens } from '@shinefold/config';
 import { resolveFontVariableClassName } from '@web/config/fonts';
 import { buildThemeStyleBlock } from '@web/utils/build-theme-style-block';
 import type { ReactNode } from 'react';

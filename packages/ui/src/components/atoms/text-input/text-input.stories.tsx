@@ -1,7 +1,7 @@
-import { ICONS, SIZE } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { ButtonShapes } from '@blog/ui/testing/button-shapes';
-import { SurfaceBands } from '@blog/ui/testing/surface-bands';
+import { ICONS, SIZE } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
+import { SurfaceBands } from '@shinefold/ui/testing/surface-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 

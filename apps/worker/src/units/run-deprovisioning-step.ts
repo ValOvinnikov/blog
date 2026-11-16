@@ -1,9 +1,9 @@
 import {
   DEPROVISIONING_STEP,
   type TDeprovisioningStep,
-} from '@blog/db/constants';
-import { clearTenantProvisioningArtifacts } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/constants';
+import { clearTenantProvisioningArtifacts } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { archiveTenantRow } from '@worker/steps/deprovisioning/archive-tenant-row';
 import { archiveTenantSanityProject } from '@worker/steps/deprovisioning/archive-tenant-sanity-project';

@@ -1,5 +1,3 @@
-import { OAUTH_PROVIDER_IDS } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { ACTION_OUTCOME } from '@blog/config';
 import { sendSignInLinkAction } from '@platform/server/auth/send-sign-in-link-action';
 import { signInWithProviderAction } from '@platform/server/auth/sign-in-with-provider-action';
 import {
@@ -12,6 +10,8 @@ import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
 import { toLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { OAUTH_PROVIDER_IDS } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SignUpView } from './sign-up-view';

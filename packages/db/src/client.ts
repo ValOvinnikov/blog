@@ -2,8 +2,8 @@
 // db client reads DATABASE_URL and must stay server-only.
 import 'server-only';
 
-import { env } from '@blog/db/utils/env/env';
 import { neon } from '@neondatabase/serverless';
+import { env } from '@shinefold/db/utils/env/env';
 import { drizzle, type NeonHttpDatabase } from 'drizzle-orm/neon-http';
 import type { PgDatabase, PgQueryResultHKT } from 'drizzle-orm/pg-core';
 

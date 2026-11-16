@@ -25,14 +25,14 @@ const sanityRestrictedGroup = {
     'groqd/*',
   ],
   message:
-    'apps/web must not talk to Sanity directly — fetch through @blog/service.',
+    'apps/web must not talk to Sanity directly — fetch through @shinefold/service.',
 };
 
 const configuredTvPath = {
   name: 'tailwind-variants',
   importNames: ['tv', 'createTV'],
   message:
-    "Import tv from '@blog/ui/lib/styling' — the unconfigured tailwind-merge drops the repo's custom size and spacing tokens.",
+    "Import tv from '@shinefold/ui/lib/styling' — the unconfigured tailwind-merge drops the repo's custom size and spacing tokens.",
 };
 
 const webTestingRestrictedGroup = {
@@ -58,10 +58,10 @@ export default [
   {
     files: ['**/*.{ts,tsx}'],
     plugins: {
-      blog: { rules: { 'boolean-prop-prefix': booleanPropPrefixRule } },
+      shinefold: { rules: { 'boolean-prop-prefix': booleanPropPrefixRule } },
     },
     rules: {
-      'blog/boolean-prop-prefix': 'error',
+      'shinefold/boolean-prop-prefix': 'error',
       'func-style': ['error', 'expression', { allowArrowFunctions: true }],
       'no-restricted-imports': [
         'error',
@@ -98,7 +98,7 @@ export default [
     // check:revalidate-tags-sync reads REVALIDATE_TAGS' tags as literals, so a shared const would hide them from it.
     files: ['src/utils/revalidate-tags/revalidate-tags.ts'],
     rules: {
-      'blog-touched/no-duplicate-string': 'off',
+      'shinefold-touched/no-duplicate-string': 'off',
     },
   },
   {

@@ -1,8 +1,8 @@
-import { ICONS, SIZE } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { itActsAsAControlledTextbox } from '@blog/ui/testing/atoms/controlled-textbox';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { ICONS, SIZE } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { itActsAsAControlledTextbox } from '@shinefold/ui/testing/atoms/controlled-textbox';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 
 import { TextInput } from './text-input';
 

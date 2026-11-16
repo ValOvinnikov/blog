@@ -1,6 +1,6 @@
-import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@blog/config';
-import type { TNewsletterModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@shinefold/config';
+import type { TNewsletterModule } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 

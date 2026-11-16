@@ -1,17 +1,3 @@
-import {
-  ACCOUNT_BUTTON_STYLE,
-  ACCOUNT_PANEL_STYLE,
-  ACCOUNT_PHONE_PLACEMENT,
-  BRAND_VARIANT,
-  BUSY_BUTTON_STYLE,
-  COOKIE_SETTINGS_BUTTON,
-  FOOTER_LAYOUT,
-  FOOTER_SURFACE,
-  HEADER_BAR_STYLE,
-  HEADER_LAYOUT,
-  HEADER_SUBMENU_STYLE,
-  SPINNER_STYLE,
-} from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_PRESSED } from '@platform/testing/aria';
@@ -30,6 +16,20 @@ import {
   MOCK_LOGO_URL,
 } from '@platform/testing/site-config/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
+  BRAND_VARIANT,
+  BUSY_BUTTON_STYLE,
+  COOKIE_SETTINGS_BUTTON,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
+  HEADER_BAR_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
+  SPINNER_STYLE,
+} from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

@@ -1,6 +1,6 @@
-import { EMAIL_TYPE } from '@blog/config/constants';
-import type { IMagicLinkSendHandlers } from '@blog/config/types';
-import { queries } from '@blog/db';
+import { EMAIL_TYPE } from '@shinefold/config/constants';
+import type { IMagicLinkSendHandlers } from '@shinefold/config/types';
+import { queries } from '@shinefold/db';
 
 export async function recordSignInSendSafely(
   siteId: string,

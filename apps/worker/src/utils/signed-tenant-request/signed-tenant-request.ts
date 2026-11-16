@@ -1,13 +1,13 @@
-import { HTTP_STATUS, type THttpStatus } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getTenantById } from '@blog/db/queries/tenants';
+import { HTTP_STATUS, type THttpStatus } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getTenantById } from '@shinefold/db/queries/tenants';
 import {
   ENQUEUE_SIGNATURE_HEADER,
   ENQUEUE_TIMESTAMP_HEADER,
   isValidEnqueueSignature,
-} from '@blog/utils/enqueue-signature';
-import { isUndefined } from '@blog/utils/primitives';
-import { errorResult, okResult, type TResult } from '@blog/utils/result';
+} from '@shinefold/utils/enqueue-signature';
+import { isUndefined } from '@shinefold/utils/primitives';
+import { errorResult, okResult, type TResult } from '@shinefold/utils/result';
 import {
   ENQUEUE_ERROR,
   type TEnqueueError,

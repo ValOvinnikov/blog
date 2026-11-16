@@ -1,7 +1,5 @@
 import 'server-only';
 
-import type { TTenantPlan } from '@blog/config/constants';
-import { queries, STRIPE_EVENT_RECORD_OUTCOME } from '@blog/db';
 import { BILLING_LOG } from '@platform/constants/billing';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
 import { handleCatalogueEvent } from '@platform/server/billing/catalogue/handle-catalogue-event';
@@ -12,6 +10,8 @@ import { syncStripeSubscription } from '@platform/server/billing/sync-stripe-sub
 import { onTenantPlanChange } from '@platform/server/tenants/on-tenant-plan-change';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import type { TTenantPlan } from '@shinefold/config/constants';
+import { queries, STRIPE_EVENT_RECORD_OUTCOME } from '@shinefold/db';
 import { after } from 'next/server';
 import type Stripe from 'stripe';
 

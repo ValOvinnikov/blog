@@ -1,8 +1,8 @@
-import { getDb } from '@blog/db/client';
-import { LEAD_RETENTION_MONTHS } from '@blog/db/constants';
-import { isInBatch } from '@blog/db/queries/retention/retention-batch';
-import { monthsBefore } from '@blog/db/queries/retention/retention-cutoff';
-import { leads } from '@blog/db/schema/leads';
+import { getDb } from '@shinefold/db/client';
+import { LEAD_RETENTION_MONTHS } from '@shinefold/db/constants';
+import { isInBatch } from '@shinefold/db/queries/retention/retention-batch';
+import { monthsBefore } from '@shinefold/db/queries/retention/retention-cutoff';
+import { leads } from '@shinefold/db/schema/leads';
 import { lt } from 'drizzle-orm';
 
 export async function deleteLeadsPastRetention(

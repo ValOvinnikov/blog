@@ -1,4 +1,4 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import { createMockFaker } from '@web/testing/mock-faker';
 
 const siteCredentialsFaker = createMockFaker(6772);

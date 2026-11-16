@@ -2,7 +2,7 @@ import {
   MOCK_EMAIL_ADDRESS,
   MOCK_PLATFORM_BRAND_NAME,
   MOCK_TENANT_NAME,
-} from '@blog/email/testing/email-fixtures';
+} from '@shinefold/email/testing/email-fixtures';
 
 import { applyTenantSenderName } from './apply-tenant-sender-name';
 

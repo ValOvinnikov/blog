@@ -1,6 +1,3 @@
-import { OAUTH_PROVIDER, TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import en from '@platform/i18n/messages/en.json';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
@@ -24,11 +21,14 @@ import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { OAUTH_PROVIDER, TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SignInAppsPageContent } from './sign-in-apps-page-content';
 
-vi.mock('@blog/db', async () => {
+vi.mock('@shinefold/db', async () => {
   const { mockDbConstants } =
     await import('@platform/testing/mock-db-constants');
   const { mockSignInAppsDb } =

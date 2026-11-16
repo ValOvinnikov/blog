@@ -1,5 +1,3 @@
-import { CAPABILITY, type TPresetId } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
@@ -12,6 +10,8 @@ import {
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
+import { CAPABILITY, type TPresetId } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 import { FeaturesPageContent } from './features-page-content';
 
@@ -23,7 +23,7 @@ const { getSettingsFeaturesAndPresetMock } = vi.hoisted(() => ({
   >(async () => ({})),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     settingsFeatures: {

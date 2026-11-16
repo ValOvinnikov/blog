@@ -1,11 +1,11 @@
-import type { TLocaleIsoCode } from '@blog/config';
-import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import type { TEmailDraft } from '@platform/utils/email-draft/email-draft';
 import {
   countEmailDraftChanges,
   countLanguageChanges,
   countSharedChanges,
 } from '@platform/utils/email-draft-changes/email-draft-changes';
+import type { TLocaleIsoCode } from '@shinefold/config';
+import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 export const useEmailChangeCounts = (liveLocales: TLocaleIsoCode[]) => {

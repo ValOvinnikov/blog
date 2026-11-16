@@ -1,6 +1,6 @@
-import { ACTION_OUTCOME, routes, SITE_MESSAGES } from '@blog/config';
-import { OAUTH_PROVIDER } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { ACTION_OUTCOME, routes, SITE_MESSAGES } from '@shinefold/config';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';

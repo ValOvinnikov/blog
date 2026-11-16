@@ -1,8 +1,8 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { queries } from '@blog/db';
-import { TENANT_STATUS } from '@blog/db/constants';
-import { service, type TTranslationMap } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { service, type TTranslationMap } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { TRANSLATION_MAP_FETCH_FAILED_EVENT } from '@web/constants/translation-map';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
@@ -13,10 +13,10 @@ import { logger } from '@web/utils/logger/logger';
 
 import { getTenantTranslationMap } from './get-tenant-translation-map';
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenants: { toTenantSanityCredentials: vi.fn() } },
 }));
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     global: { translationMap: { v1: { getTranslationMap: vi.fn() } } },
   },

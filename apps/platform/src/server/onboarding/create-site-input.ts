@@ -1,11 +1,3 @@
-import {
-  type ACTION_OUTCOME,
-  HUE_MAX,
-  HUE_MIN,
-  LOCALE_ISO_CODES,
-  PRESET_ID,
-  type TActionResult,
-} from '@blog/config';
 import { SELF_SERVE_SITE_TYPE } from '@platform/constants/onboarding';
 import type {
   SIGN_UP_FIELD_ERROR,
@@ -15,6 +7,14 @@ import type {
   TENANT_FIELD_ERROR,
   TENANT_REFUSAL,
 } from '@platform/constants/tenant';
+import {
+  type ACTION_OUTCOME,
+  HUE_MAX,
+  HUE_MIN,
+  LOCALE_ISO_CODES,
+  PRESET_ID,
+  type TActionResult,
+} from '@shinefold/config';
 import { z } from 'zod';
 
 export const createSiteInputSchema = z.object({

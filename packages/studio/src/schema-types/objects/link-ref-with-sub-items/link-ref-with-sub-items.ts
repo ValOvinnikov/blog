@@ -1,10 +1,10 @@
-import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
+import { linkReferenceField } from '@shinefold/studio/schema-types/fields/link-reference-field/link-reference-field';
 import {
   linkReferencePreviewSelect,
   toLinkReferencePreviewTitle,
-} from '@blog/studio/schema-types/fields/link-reference-field/link-reference-preview';
-import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
-import { toToolbarIcon } from '@blog/studio/schema-types/portable-text/toolbar-icon/toolbar-icon';
+} from '@shinefold/studio/schema-types/fields/link-reference-field/link-reference-preview';
+import { linkRefSchema } from '@shinefold/studio/schema-types/objects/link-ref/link-ref';
+import { toToolbarIcon } from '@shinefold/studio/schema-types/portable-text/toolbar-icon/toolbar-icon';
 import { ListTree } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 

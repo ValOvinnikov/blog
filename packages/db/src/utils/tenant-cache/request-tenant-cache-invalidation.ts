@@ -1,4 +1,4 @@
-import { HTTP_METHOD } from '@blog/config';
+import { HTTP_METHOD } from '@shinefold/config';
 
 const REVALIDATE_SITE_CONFIG_PATH = '/api/revalidate-site-config';
 const TENANT_CACHE_INVALIDATION_TIMEOUT_MS = 30_000;

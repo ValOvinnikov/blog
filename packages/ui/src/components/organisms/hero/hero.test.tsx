@@ -1,21 +1,21 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   HERO_VARIANT,
   MEDIA_ORDER,
-} from '@blog/config';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
+} from '@shinefold/config';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import {
   customRender,
   renderElement,
   screen,
-} from '@blog/ui/testing/custom-render';
+} from '@shinefold/ui/testing/custom-render';
 import {
   MOCK_PERSON_NAME,
   MOCK_POST_EXCERPT,
   MOCK_POST_TITLE,
-} from '@blog/ui/testing/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/fixtures';
 
 import { Hero, type THeroProps } from './hero';
 

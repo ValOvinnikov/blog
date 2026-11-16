@@ -1,8 +1,8 @@
-import { isInsideSection } from '@blog/studio/schema-types/inputs/landing-section-navigation-field/is-inside-section';
-import { LANDING_PARENT_CHAIN_QUERY } from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
-import { mockLandingPage } from '@blog/studio/testing/mock-documents';
-import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
 import { faker } from '@faker-js/faker';
+import { isInsideSection } from '@shinefold/studio/schema-types/inputs/landing-section-navigation-field/is-inside-section';
+import { LANDING_PARENT_CHAIN_QUERY } from '@shinefold/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
+import { mockLandingPage } from '@shinefold/studio/testing/mock-documents';
+import { mockGroqFetch } from '@shinefold/studio/testing/mock-groq-fetch';
 import type { SanityDocument } from 'sanity';
 
 faker.seed(4104);

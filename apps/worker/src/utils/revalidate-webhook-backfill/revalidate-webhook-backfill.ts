@@ -1,7 +1,7 @@
-import type { TValueOf } from '@blog/config/utils';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
-import { hasLength } from '@blog/utils/primitives';
+import type { TValueOf } from '@shinefold/config/utils';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
+import { hasLength } from '@shinefold/utils/primitives';
 import {
   type REVALIDATE_WEBHOOK_LOG,
   REVALIDATE_WEBHOOK_CHANGE,

@@ -1,5 +1,3 @@
-import type * as oauthProviders from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import {
   MOCK_OFF_ORIGIN_PATH,
@@ -9,6 +7,8 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { ACCOUNT_NOT_LINKED_AUTH_ERROR } from '@platform/utils/sign-in-error/sign-in-error';
+import type * as oauthProviders from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@shinefold/config';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -17,7 +17,7 @@ import SignInPage from './page';
 vi.mock('@platform/server/auth/auth');
 
 vi.mock(
-  '@blog/auth/utils/oauth-providers/oauth-providers',
+  '@shinefold/auth/utils/oauth-providers/oauth-providers',
   async (importActual) => {
     const actual = await importActual<typeof oauthProviders>();
     return {

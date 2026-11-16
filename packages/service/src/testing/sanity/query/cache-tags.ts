@@ -1,4 +1,4 @@
-import { MOCK_TENANT_PROJECT_ID } from '@blog/service/testing/tenant';
+import { MOCK_TENANT_PROJECT_ID } from '@shinefold/service/testing/tenant';
 
 const TENANT_TAG_PREFIX = `t:${MOCK_TENANT_PROJECT_ID}:`;
 

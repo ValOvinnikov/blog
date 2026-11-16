@@ -3,7 +3,7 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 /**
  * Prism token → CSS custom property map, defined for both `:root` and
- * `.dark` in `apps/web/index.css`. Kept web-local (not `@blog/tailwind-config`)
+ * `.dark` in `apps/web/index.css`. Kept web-local (not `@shinefold/tailwind-config`)
  * since `react-syntax-highlighter` is a web-only dependency.
  */
 const CODE_FG = 'var(--code-fg)';

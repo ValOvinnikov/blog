@@ -1,9 +1,9 @@
-import type { SIZE, TMaybeUndefined } from '@blog/config';
 import {
   ASSET_UPLOAD_LAYOUT,
   ASSET_UPLOAD_THUMB_TEST_ID,
   type TAssetUploadLayout,
 } from '@platform/constants/asset-upload';
+import type { SIZE, TMaybeUndefined } from '@shinefold/config';
 import Image from 'next/image';
 
 import { assetUploadThumbVariants } from './asset-upload-thumb-variants';

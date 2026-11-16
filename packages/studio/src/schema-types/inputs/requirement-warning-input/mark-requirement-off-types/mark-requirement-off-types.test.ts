@@ -1,8 +1,8 @@
-import { CAPABILITY, MODULE_PACK } from '@blog/config/constants';
-import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types/mark-requirement-off-types';
-import { getRequirementOffSuffix } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
-import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { faker } from '@faker-js/faker';
+import { CAPABILITY, MODULE_PACK } from '@shinefold/config/constants';
+import { markRequirementOffTypes } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types/mark-requirement-off-types';
+import { getRequirementOffSuffix } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { EVERY_MODULE_PACK } from '@shinefold/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 
 faker.seed(4107);
 

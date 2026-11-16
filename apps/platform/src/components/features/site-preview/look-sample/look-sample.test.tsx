@@ -1,19 +1,3 @@
-import {
-  ACCOUNT_PANEL_STYLE,
-  ACCOUNT_PHONE_PLACEMENT,
-  BRAND_VARIANT,
-  BUSY_BUTTON_STYLE,
-  FOOTER_LAYOUT,
-  FOOTER_SURFACE,
-  HEADER_BAR_STYLE,
-  HEADER_LAYOUT,
-  HEADER_SUBMENU_STYLE,
-  LANGUAGE_SWITCHER_STYLE,
-  LOCALE_ISO_CODES,
-  SPINNER_STYLE,
-  type IBusyStyle,
-} from '@blog/config';
-import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { faker } from '@faker-js/faker';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
@@ -53,6 +37,22 @@ import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
+import {
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
+  BRAND_VARIANT,
+  BUSY_BUTTON_STYLE,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
+  HEADER_BAR_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
+  LANGUAGE_SWITCHER_STYLE,
+  LOCALE_ISO_CODES,
+  SPINNER_STYLE,
+  type IBusyStyle,
+} from '@shinefold/config';
+import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 import type { CSSProperties } from 'react';
 
 import { LookSample, type TLookSampleProps } from './look-sample';

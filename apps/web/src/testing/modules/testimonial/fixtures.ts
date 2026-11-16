@@ -1,5 +1,9 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
-import type { TTestimonialItem, TTestimonialModule } from '@blog/service';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  DISPLAY_MODE,
+} from '@shinefold/config';
+import type { TTestimonialItem, TTestimonialModule } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { MOCK_TEAM_MEMBER_NAME } from '@web/testing/modules/team/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';

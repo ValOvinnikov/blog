@@ -1,8 +1,11 @@
-import type { TPendingInviteTenant } from '@blog/auth/providers/magic-link/find-pending-invite-tenants/find-pending-invite-tenants';
-import { readRecipientLocale } from '@blog/auth/providers/magic-link/read-recipient-locale/read-recipient-locale';
-import type { TResolvedTenantEmailIdentity } from '@blog/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
-import type { TMaybeUndefined } from '@blog/config';
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
+import type { TPendingInviteTenant } from '@shinefold/auth/providers/magic-link/find-pending-invite-tenants/find-pending-invite-tenants';
+import { readRecipientLocale } from '@shinefold/auth/providers/magic-link/read-recipient-locale/read-recipient-locale';
+import type { TResolvedTenantEmailIdentity } from '@shinefold/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
+import type { TMaybeUndefined } from '@shinefold/config';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 
 export function resolveRecipientLocale(
   url: string,

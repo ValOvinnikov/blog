@@ -1,18 +1,18 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_TAGLINE_SEPARATORS,
   LOCALE_ISO_CODES,
   PORTABLE_TEXT_BLOCK_TYPE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   MOCK_MISSING_ID,
   mockReference,
-} from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqInLocale } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqInLocale } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedLinkDocument,
   mockLocalizedStrings,
-} from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
 
 import { navigationQuery } from './query';
 

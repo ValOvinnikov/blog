@@ -1,4 +1,3 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
@@ -8,6 +7,7 @@ import {
   customRenderInSettingsForm,
 } from '@platform/testing/render-in-settings-form';
 import type { TEmailCopyEdit } from '@platform/utils/email-draft/email-draft';
+import { EMAIL_TEMPLATE_TYPE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailTemplateEditor } from './email-template-editor';

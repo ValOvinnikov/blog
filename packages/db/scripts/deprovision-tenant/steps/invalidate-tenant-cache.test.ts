@@ -1,16 +1,16 @@
-import { TENANT_STATUS } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 import {
   MOCK_DEPROVISION_DRY_RUN_ENV,
   MOCK_DEPROVISION_ENV,
   MOCK_DEPROVISIONED_AT,
-} from '@blog/db/testing/deprovision-tenant/fixtures';
-import { mockTenant } from '@blog/db/testing/tenants/fixtures';
-import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/deprovision-tenant/fixtures';
+import { mockTenant } from '@shinefold/db/testing/tenants/fixtures';
+import { requestTenantCacheInvalidation } from '@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation';
 
 import { invalidateTenantCache } from './invalidate-tenant-cache';
 
-vi.mock('@blog/db/utils/tenant-cache/request-tenant-cache-invalidation');
+vi.mock('@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation');
 
 faker.seed(5765);
 

@@ -4,8 +4,8 @@ import {
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
+} from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 import type { ReactNode } from 'react';
 
 import { accordionTriggerVariants } from './accordion-trigger-variants';

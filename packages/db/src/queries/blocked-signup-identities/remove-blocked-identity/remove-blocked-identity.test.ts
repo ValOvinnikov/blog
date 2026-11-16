@@ -1,20 +1,20 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import { addBlockedIdentity } from '@blog/db/queries/blocked-signup-identities/add-blocked-identity';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
+import { addBlockedIdentity } from '@shinefold/db/queries/blocked-signup-identities/add-blocked-identity';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_BLOCK_REASON,
   MOCK_BLOCKED_DOMAIN,
-} from '@blog/db/testing/blocked-signup-identities/fixtures';
-import { insertTestAdmin } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/blocked-signup-identities/fixtures';
+import { insertTestAdmin } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { removeBlockedIdentity } from './remove-blocked-identity';
 
 faker.seed(602107);
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

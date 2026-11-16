@@ -1,12 +1,3 @@
-import { AUDIT_TARGET_TYPE } from '@blog/config';
-import { FINDING_STATUS } from '@blog/config/constants';
-import {
-  ADMIN_ROLE,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-  TENANT_STATUS,
-} from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
@@ -58,6 +49,15 @@ import {
   mockJoinedOwner,
 } from '@platform/testing/tenants/fixtures';
 import { STEP_POLL_INTERVAL_MS } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
+import { AUDIT_TARGET_TYPE } from '@shinefold/config';
+import { FINDING_STATUS } from '@shinefold/config/constants';
+import {
+  ADMIN_ROLE,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+  TENANT_STATUS,
+} from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantOverviewView } from './tenant-overview-view';
@@ -81,7 +81,7 @@ const {
   getNewsletterPausedAtMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: { getTenantOwnerMembership: getTenantOwnerMembershipMock },

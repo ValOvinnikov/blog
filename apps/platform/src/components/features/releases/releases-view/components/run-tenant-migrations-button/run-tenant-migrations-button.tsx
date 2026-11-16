@@ -1,13 +1,5 @@
 'use client';
 
-import {
-  type ACTION_OUTCOME,
-  isOutcomeRefused,
-  isOutcomeSuccess,
-  isOutcomeUnavailable,
-  SIZE,
-  type TOutcome,
-} from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
@@ -22,6 +14,14 @@ import {
   type TStartTenantMigrationsResult,
 } from '@platform/server/releases/start-tenant-migrations-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import {
+  type ACTION_OUTCOME,
+  isOutcomeRefused,
+  isOutcomeSuccess,
+  isOutcomeUnavailable,
+  SIZE,
+  type TOutcome,
+} from '@shinefold/config';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';

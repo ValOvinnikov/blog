@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { queries } from '@blog/db';
+import { queries } from '@shinefold/db';
 import type Stripe from 'stripe';
 
 import { CATALOGUE_PRICE_EXPAND } from './catalogue-expand';

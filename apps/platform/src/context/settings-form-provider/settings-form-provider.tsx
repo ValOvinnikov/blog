@@ -1,6 +1,6 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
 type TSettingsFormState = {

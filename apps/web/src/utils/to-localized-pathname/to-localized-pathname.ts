@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@shinefold/config';
 import { buildTenantRouting } from '@web/i18n/routing';
 import { createNavigation } from 'next-intl/navigation';
 

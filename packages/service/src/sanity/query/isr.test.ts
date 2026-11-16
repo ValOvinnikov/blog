@@ -1,9 +1,9 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
 import {
   MOCK_AUTHOR_CACHE_TAG,
   MOCK_POSTS_CACHE_TAG,
-} from '@blog/service/testing/sanity/query/cache-tags';
-import { MOCK_TENANT_PROJECT_ID } from '@blog/service/testing/tenant';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
+import { MOCK_TENANT_PROJECT_ID } from '@shinefold/service/testing/tenant';
 
 import { isr } from './isr';
 
@@ -15,7 +15,7 @@ const mockEnv = vi.hoisted(() => ({
   SANITY_LIVE_CONTENT: undefined as '1' | undefined,
 }));
 
-vi.mock('@blog/service/utils/env/env', () => ({ env: mockEnv }));
+vi.mock('@shinefold/service/utils/env/env', () => ({ env: mockEnv }));
 
 function taggedCache(tags: string[]) {
   return { next: { revalidate: SANITY_CONTENT_REVALIDATE_SECONDS, tags } };

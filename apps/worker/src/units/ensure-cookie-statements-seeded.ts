@@ -1,7 +1,7 @@
-import { buildStarterCookieStatement } from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { getTenantSanityWriteCredentials } from '@blog/db/queries/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
+import { buildStarterCookieStatement } from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { getTenantSanityWriteCredentials } from '@shinefold/db/queries/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { COOKIE_STATEMENT_LOG } from '@worker/constants/cookie-statement';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { SANITY_API_VERSION } from '@worker/constants/sanity-api';

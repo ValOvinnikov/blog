@@ -1,4 +1,4 @@
-import { tokensByCategory } from '@blog/ui/lib/design-tokens/token-registry';
+import { tokensByCategory } from '@shinefold/ui/lib/design-tokens/token-registry';
 
 import { tv } from './tv';
 

@@ -2,7 +2,7 @@ import type {
   IWithClassName,
   IWithDataTestId,
   TBrandVariant,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { AriaAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 
 import {

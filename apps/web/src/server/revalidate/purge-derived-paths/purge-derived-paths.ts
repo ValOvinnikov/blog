@@ -1,4 +1,4 @@
-import type { TResult } from '@blog/utils';
+import type { TResult } from '@shinefold/utils';
 import {
   REVALIDATE_LOG,
   WHOLE_SITE_PURGE_ARGS,

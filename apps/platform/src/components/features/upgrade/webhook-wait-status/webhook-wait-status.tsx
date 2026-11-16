@@ -1,10 +1,10 @@
 'use client';
 
-import { ALERT_TYPE, SIZE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Spinner } from '@platform/components/shared/spinner';
 import { SPINNER_TONE } from '@platform/constants/spinner';
+import { ALERT_TYPE, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 type TWebhookWaitCopy = { title: string; description: string };

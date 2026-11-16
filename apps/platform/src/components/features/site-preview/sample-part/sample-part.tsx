@@ -1,10 +1,10 @@
-import type { IWithChildren } from '@blog/config/react';
-import type { IWithClassName } from '@blog/config/types';
 import {
   SAMPLE_PART_ATTRIBUTE,
   SAMPLE_PART_ITEMS_ATTRIBUTE,
   type TSamplePart,
 } from '@platform/constants/sample-part';
+import type { IWithChildren } from '@shinefold/config/react';
+import type { IWithClassName } from '@shinefold/config/types';
 
 import { samplePartVariants } from './sample-part-variants';
 

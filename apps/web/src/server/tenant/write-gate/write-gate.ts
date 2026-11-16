@@ -1,7 +1,15 @@
-import { TENANT_WRITE_REFUSAL, type TTenantWriteRefusal } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isTenantWritable } from '@blog/db/utils/is-tenant-writable/is-tenant-writable';
-import { errorResult, isUndefined, okResult, type TResult } from '@blog/utils';
+import {
+  TENANT_WRITE_REFUSAL,
+  type TTenantWriteRefusal,
+} from '@shinefold/config';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isTenantWritable } from '@shinefold/db/utils/is-tenant-writable/is-tenant-writable';
+import {
+  errorResult,
+  isUndefined,
+  okResult,
+  type TResult,
+} from '@shinefold/utils';
 import { TENANT_WRITE_LOG } from '@web/constants/tenant-write';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';

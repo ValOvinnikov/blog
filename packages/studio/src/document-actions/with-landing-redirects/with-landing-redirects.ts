@@ -1,5 +1,5 @@
-import { applyLandingRedirects } from '@blog/studio/document-actions/apply-landing-redirects/apply-landing-redirects';
 import { useToast } from '@sanity/ui/toast';
+import { applyLandingRedirects } from '@shinefold/studio/document-actions/apply-landing-redirects/apply-landing-redirects';
 import { type DocumentActionComponent, useClient } from 'sanity';
 
 const REDIRECTS_API_VERSION = '2025-02-19';

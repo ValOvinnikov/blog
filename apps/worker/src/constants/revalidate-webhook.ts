@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const REVALIDATE_WEBHOOK_LOG = {
   ROTATION_TENANT_FAILED: 'webhook_secret_rotation.tenant_failed',

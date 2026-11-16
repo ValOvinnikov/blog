@@ -1,4 +1,4 @@
-import { listTenants } from '@blog/db/queries/tenants';
+import { listTenants } from '@shinefold/db/queries/tenants';
 import { REVALIDATE_WEBHOOK_LOG } from '@worker/constants/revalidate-webhook';
 import {
   MOCK_ENCRYPTED_WEBHOOK_SECRET,
@@ -8,7 +8,7 @@ import { runRevalidateWebhookStepForEach } from '@worker/utils/revalidate-webhoo
 
 import { rotateRevalidateWebhookSecrets } from './rotate-revalidate-webhook-secrets';
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock(
   '@worker/utils/revalidate-webhook-backfill/revalidate-webhook-backfill',
 );

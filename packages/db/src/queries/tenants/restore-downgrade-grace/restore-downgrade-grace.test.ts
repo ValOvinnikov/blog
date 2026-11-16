@@ -1,18 +1,18 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { endDowngradeGrace } from '@blog/db/queries/tenants/end-downgrade-grace';
-import { listTenantsDueForGraceEnd } from '@blog/db/queries/tenants/list-tenants-due-for-grace-end';
-import * as schema from '@blog/db/schema';
-import { tenants } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { daysBeforeNow } from '@blog/db/testing/tenants/grace';
-import { daysAfter } from '@blog/db/utils/day-offset/day-offset';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { endDowngradeGrace } from '@shinefold/db/queries/tenants/end-downgrade-grace';
+import { listTenantsDueForGraceEnd } from '@shinefold/db/queries/tenants/list-tenants-due-for-grace-end';
+import * as schema from '@shinefold/db/schema';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { daysBeforeNow } from '@shinefold/db/testing/tenants/grace';
+import { daysAfter } from '@shinefold/db/utils/day-offset/day-offset';
 import { eq } from 'drizzle-orm';
 
 import { restoreDowngradeGrace } from './restore-downgrade-grace';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock();

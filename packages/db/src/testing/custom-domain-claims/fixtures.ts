@@ -1,7 +1,7 @@
-import * as schema from '@blog/db/schema';
-import { firstRowOrThrow } from '@blog/db/testing/first-row-or-throw';
-import type { TTestDb } from '@blog/db/testing/fixtures';
-import { MOCK_SHARED_TENANT_DOMAIN } from '@blog/db/testing/tenant-domains/fixtures';
+import * as schema from '@shinefold/db/schema';
+import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
+import type { TTestDb } from '@shinefold/db/testing/fixtures';
+import { MOCK_SHARED_TENANT_DOMAIN } from '@shinefold/db/testing/tenant-domains/fixtures';
 
 export async function insertTestCustomDomainClaim(
   db: TTestDb,

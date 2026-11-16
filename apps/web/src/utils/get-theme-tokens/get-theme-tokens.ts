@@ -1,4 +1,4 @@
-import type { TThemeTokens } from '@blog/config';
+import type { TThemeTokens } from '@shinefold/config';
 import { THEME_TOKENS_LOG } from '@web/constants/theme-tokens';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { logger } from '@web/utils/logger/logger';

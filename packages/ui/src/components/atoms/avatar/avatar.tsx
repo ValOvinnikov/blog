@@ -1,5 +1,5 @@
-import type { IWithDataTestId } from '@blog/config';
-import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
+import type { IWithDataTestId } from '@shinefold/config';
+import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 
 import {
   avatarImageVariants,

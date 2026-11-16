@@ -1,7 +1,7 @@
 'use client';
 
-import { hasArrayGotItems, isUndefined } from '@blog/utils/primitives';
 import type { TInboxLeadsPage } from '@platform/server/leads/list-inbox-leads';
+import { hasArrayGotItems, isUndefined } from '@shinefold/utils/primitives';
 
 import { LeadReadingPane } from './components/lead-reading-pane';
 import { LeadsList } from './components/leads-list';

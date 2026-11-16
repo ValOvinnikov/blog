@@ -1,7 +1,7 @@
-import { getDb } from '@blog/db/client';
-import { STRIPE_TENANT_LOOKUP_OUTCOME } from '@blog/db/constants';
-import { tenants } from '@blog/db/schema/tenants';
-import { hasLength, isNull } from '@blog/utils/primitives';
+import { getDb } from '@shinefold/db/client';
+import { STRIPE_TENANT_LOOKUP_OUTCOME } from '@shinefold/db/constants';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { hasLength, isNull } from '@shinefold/utils/primitives';
 import { eq, or } from 'drizzle-orm';
 
 export type TStripeIds = {

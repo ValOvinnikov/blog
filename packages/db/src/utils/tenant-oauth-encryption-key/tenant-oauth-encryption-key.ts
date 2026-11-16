@@ -1,4 +1,4 @@
-import { env } from '@blog/db/utils/env/env';
+import { env } from '@shinefold/db/utils/env/env';
 
 export function requireTenantOAuthEncryptionKey(): string {
   const key = env.TENANT_OAUTH_ENCRYPTION_KEY;

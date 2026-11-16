@@ -1,10 +1,10 @@
-import { CONSENT_CATEGORY } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { CONSENT_CATEGORY } from '@shinefold/config';
 import {
   customRender,
   renderElement,
   screen,
-} from '@blog/ui/testing/custom-render';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 

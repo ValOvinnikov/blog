@@ -3,7 +3,7 @@ import {
   HTTP_STATUS,
   type THttpMethod,
   type THttpStatus,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export function jsonResponse(
   body: unknown,

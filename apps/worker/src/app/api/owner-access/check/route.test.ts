@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { getTenantById } from '@blog/db/queries/tenants';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { getTenantById } from '@shinefold/db/queries/tenants';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import {
   MOCK_ENQUEUE_SECRET,
@@ -22,7 +22,7 @@ const MOCK_CHECK_URL = `${MOCK_WORKER_ORIGIN}/api/owner-access/check`;
 
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/utils/owner-access-run/owner-access-run');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 
 function checkRequest(secret: string = MOCK_ENQUEUE_SECRET): Request {
   return mockSignedRequest(

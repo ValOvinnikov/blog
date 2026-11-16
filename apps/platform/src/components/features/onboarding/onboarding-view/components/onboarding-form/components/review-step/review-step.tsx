@@ -1,6 +1,5 @@
 'use client';
 
-import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { AccentSwatch } from '@platform/components/shared/accent-swatch';
 import { Button } from '@platform/components/shared/button';
 import { DetailList } from '@platform/components/shared/detail-list';
@@ -13,6 +12,7 @@ import {
 } from '@platform/constants/onboarding';
 import type { TCreateSiteInput } from '@platform/server/onboarding/create-site-input';
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
+import { SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

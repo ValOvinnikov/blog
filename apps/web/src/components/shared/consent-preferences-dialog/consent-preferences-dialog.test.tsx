@@ -1,4 +1,4 @@
-import { CONSENT_CATEGORY } from '@blog/config';
+import { CONSENT_CATEGORY } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ConsentBannerSlot } from '@web/components/features/layout/site-providers/components/consent-banner-slot/consent-banner-slot';
 import { CookieSettingsButton } from '@web/components/shared/cookie-settings-button';

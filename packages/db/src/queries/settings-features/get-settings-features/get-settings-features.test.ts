@@ -1,11 +1,11 @@
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { mockSettingsFeaturesToggles } from '@blog/db/testing/settings-features/fixtures';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { mockSettingsFeaturesToggles } from '@shinefold/db/testing/settings-features/fixtures';
 
 import { getSettingsFeatures } from './get-settings-features';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

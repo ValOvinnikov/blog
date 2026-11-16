@@ -3,7 +3,7 @@ import {
   FORM_STATUS,
   type TFormStatus,
   type TLocaleIsoCode,
-} from '@blog/config';
+} from '@shinefold/config';
 import { usePublicPathname } from '@web/hooks/use-public-pathname';
 import type {
   TContactMessageInput,

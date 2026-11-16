@@ -1,7 +1,7 @@
-import { SIZE } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
-import { ReducedMotion } from '@blog/ui/testing/reduced-motion';
-import { objectKeys } from '@blog/utils/primitives';
+import { SIZE } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { ReducedMotion } from '@shinefold/ui/testing/reduced-motion';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Spinner } from './spinner';

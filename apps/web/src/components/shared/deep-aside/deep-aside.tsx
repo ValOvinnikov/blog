@@ -1,7 +1,7 @@
 'use client';
 
-import type { TAsideKind } from '@blog/config';
-import { Aside } from '@blog/ui/components/molecules/aside';
+import type { TAsideKind } from '@shinefold/config';
+import { Aside } from '@shinefold/ui/components/molecules/aside';
 import { useHasDepthProvider } from '@web/context/depth-provider';
 import type { ReactNode } from 'react';
 

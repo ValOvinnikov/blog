@@ -1,7 +1,7 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
-import type { TResult } from '@blog/utils';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TResult } from '@shinefold/utils';
 import { useState, useTransition } from 'react';
 
 export type TConfirmDialogActionResult = TResult<void, TMaybeUndefined<string>>;

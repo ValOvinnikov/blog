@@ -1,16 +1,16 @@
 import type {
   AllSanitySchemaTypes,
   internalGroqTypeReferenceTo,
-} from '@blog/config';
-import { SANITY_PERSPECTIVE } from '@blog/config/constants';
+} from '@shinefold/config';
+import { SANITY_PERSPECTIVE } from '@shinefold/config/constants';
 import {
   getClient,
   type TTenantSanityContext,
-} from '@blog/service/sanity/client/client';
+} from '@shinefold/service/sanity/client/client';
 import {
   buildLocaleQueryParams,
   type TLocaleQueryParams,
-} from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+} from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
 import { createGroqBuilder, type IGroqBuilder, type QueryConfig } from 'groqd';
 
 export type { TTenantSanityContext };

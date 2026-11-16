@@ -1,10 +1,6 @@
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
-import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
-import { isOneOf } from '@blog/utils/primitives';
 import { BILLING_LOG } from '@platform/constants/billing';
 import {
   STRIPE_KEY_MODE,
@@ -22,6 +18,10 @@ import { getStripeClient } from '@platform/server/billing/stripe-client';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { stripeEnv } from '@platform/utils/stripe-env/stripe-env';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { STRIPE_PRICE_LOOKUP_KEY } from '@shinefold/db/constants';
+import { isOneOf } from '@shinefold/utils/primitives';
 import type Stripe from 'stripe';
 
 // Stripe's prices.list takes at most this many lookup keys per call.

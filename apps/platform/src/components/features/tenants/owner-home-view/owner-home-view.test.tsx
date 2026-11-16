@@ -1,4 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
@@ -21,6 +20,7 @@ import {
   mockJoinedOwner,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 import { OwnerHomeView, type TOwnerHomeViewProps } from './owner-home-view';
 

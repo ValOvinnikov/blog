@@ -1,10 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  NEXT_NAVIGATION_ERROR,
-  type TMaybeNull,
-} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -24,6 +17,13 @@ import {
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { brandAssetKindSchema } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { env } from '@platform/utils/env/env';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+  type TMaybeNull,
+} from '@shinefold/config';
 import type { Session } from 'next-auth';
 
 import { clearBrandAssetAction } from './clear-brand-asset-action';
@@ -46,7 +46,7 @@ vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@platform/server/site-config/site-config-or-defaults');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     siteConfig: { upsertSiteConfig: upsertSiteConfigMock },
     auditEvents: { insertAuditEvent: insertAuditEventMock },

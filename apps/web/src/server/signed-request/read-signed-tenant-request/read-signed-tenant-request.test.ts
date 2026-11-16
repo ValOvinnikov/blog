@@ -1,10 +1,10 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
 import {
   buildEnqueueHeaders,
   ENQUEUE_MAX_AGE_MS,
-} from '@blog/utils/enqueue-signature';
-import { isUndefined } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/utils/enqueue-signature';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { mockTenantSanityCredentials } from '@web/testing/server/tenant/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
@@ -20,7 +20,7 @@ const { getTenantSanityCredentialsMock } = vi.hoisted(() => ({
   getTenantSanityCredentialsMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: { getTenantSanityCredentials: getTenantSanityCredentialsMock },
   },

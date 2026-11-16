@@ -1,11 +1,11 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { REDIRECT_TYPE } from '@blog/studio/schema-types/documents/redirect/redirect-type';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { REDIRECT_TYPE } from '@shinefold/studio/schema-types/documents/redirect/redirect-type';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 import {
   fetchFailSafe,
   getDraftsClient,
-} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
-import { isString } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { isString } from '@shinefold/utils/primitives';
 import { getDraftId, getPublishedId, type ValidationContext } from 'sanity';
 
 type TOtherRedirect = {

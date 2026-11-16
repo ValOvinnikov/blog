@@ -1,24 +1,28 @@
-import { getPostRelatedModuleDocument } from '@blog/service/features/modules/post-related/adaptor/module/loader';
-import { toPostRelatedModuleDocument } from '@blog/service/features/modules/post-related/adaptor/module/transformer';
-import { getRelatedPosts } from '@blog/service/features/modules/post-related/adaptor/posts/loader';
-import { toPostCard } from '@blog/service/shared/transformers/post/to-post-card';
+import { faker } from '@faker-js/faker';
+import { getPostRelatedModuleDocument } from '@shinefold/service/features/modules/post-related/adaptor/module/loader';
+import { toPostRelatedModuleDocument } from '@shinefold/service/features/modules/post-related/adaptor/module/transformer';
+import { getRelatedPosts } from '@shinefold/service/features/modules/post-related/adaptor/posts/loader';
+import { toPostCard } from '@shinefold/service/shared/transformers/post/to-post-card';
 import {
   MOCK_POST_RELATED_MODULE_ID,
   mockRawPostRelatedModule,
-} from '@blog/service/testing/modules/post-related/fixtures';
-import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/modules/post-related/fixtures';
+import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_MISSING_ID,
   MOCK_POST_ID,
   mockValidationError,
-} from '@blog/service/testing/shared/fixtures';
-import { MOCK_TENANT } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { createPostRelatedModuleService } from './service';
 
-vi.mock('@blog/service/features/modules/post-related/adaptor/module/loader');
-vi.mock('@blog/service/features/modules/post-related/adaptor/posts/loader');
+vi.mock(
+  '@shinefold/service/features/modules/post-related/adaptor/module/loader',
+);
+vi.mock(
+  '@shinefold/service/features/modules/post-related/adaptor/posts/loader',
+);
 
 faker.seed(24);
 

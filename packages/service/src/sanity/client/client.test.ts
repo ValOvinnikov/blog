@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_PLATFORM_PROJECT_ID,
   MOCK_PREVIOUS_TOKEN,
@@ -6,8 +7,7 @@ import {
   MOCK_TENANT_PROJECT_ID,
   MOCK_TENANT_TOKEN,
   mockTenant,
-} from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/tenant';
 
 import { getClient, getPlatformSanityContext } from './client';
 
@@ -48,8 +48,11 @@ describe(getClient, () => {
   });
 
   it.each([
-    { path: '@blog/service/sanity/query/query', exportName: 'runQuery' },
-    { path: '@blog/service/sanity/image/image', exportName: 'urlForImage' },
+    { path: '@shinefold/service/sanity/query/query', exportName: 'runQuery' },
+    {
+      path: '@shinefold/service/sanity/image/image',
+      exportName: 'urlForImage',
+    },
   ])('lets $path import without a project id', async ({ path, exportName }) => {
     vi.stubEnv('NEXT_PUBLIC_SANITY_PROJECT_ID', undefined);
     vi.resetModules();

@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { LOOK_EDIT_PANEL_TEST_ID } from '@platform/constants/look-form';
 import messages from '@platform/i18n/messages/en.json';
 import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
@@ -36,6 +35,7 @@ import {
   MOCK_UPLOADED_LOGO_URL,
 } from '@platform/testing/site-config/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

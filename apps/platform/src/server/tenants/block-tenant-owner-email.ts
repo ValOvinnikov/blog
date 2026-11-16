@@ -1,16 +1,5 @@
 import 'server-only';
 
-import {
-  ACTION_OUTCOME,
-  type TMaybeUndefined,
-  type TOutcome,
-  type TReasonedFailure,
-} from '@blog/config';
-import { BLOCKED_IDENTITY_KIND, queries } from '@blog/db';
-import type { TAddBlockedIdentityOutcome } from '@blog/db/queries/blocked-signup-identities/add-blocked-identity';
-import type { TAdmin } from '@blog/db/schema/admins';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_REFUSAL, TENANT_LOG } from '@platform/constants/tenant';
 import {
   recordSignupBlockAdded,
@@ -18,6 +7,17 @@ import {
 } from '@platform/server/signup-block/add-signup-block';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  type TMaybeUndefined,
+  type TOutcome,
+  type TReasonedFailure,
+} from '@shinefold/config';
+import { BLOCKED_IDENTITY_KIND, queries } from '@shinefold/db';
+import type { TAddBlockedIdentityOutcome } from '@shinefold/db/queries/blocked-signup-identities/add-blocked-identity';
+import type { TAdmin } from '@shinefold/db/schema/admins';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 type TBlockTenantOwnerEmailFailure =
   | TOutcome<typeof ACTION_OUTCOME.SERVER_ERROR>

@@ -1,4 +1,3 @@
-import { SIZE } from '@blog/config';
 import { LogoHueField } from '@platform/components/features/look/logo-hue-field';
 import { logoHueFieldVariants } from '@platform/components/features/look/logo-hue-field/logo-hue-field-variants';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
@@ -12,6 +11,7 @@ import { HueSlider } from '@platform/components/shared/hue-slider';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
+import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TColourCardProps = {

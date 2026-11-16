@@ -1,11 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { isr } from '@blog/service/sanity/query/isr';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { isr } from '@shinefold/service/sanity/query/isr';
 import {
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query/query';
-import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
-import type { TSectionDocumentType } from '@blog/service/shared/types/page/section-document-type';
+} from '@shinefold/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@shinefold/service/shared/cache-tags/link/link-target-cache-tags';
+import type { TSectionDocumentType } from '@shinefold/service/shared/types/page/section-document-type';
 
 import { sectionDocumentPageQuery } from './query';
 import { toSectionDocumentDetail } from './transformer';

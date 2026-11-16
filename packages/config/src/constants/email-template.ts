@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const EMAIL_TEMPLATE_TYPE = {
   MAGIC_LINK: 'MAGIC_LINK',

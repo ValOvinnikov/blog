@@ -1,12 +1,12 @@
 import { format } from 'node:util';
 
-import type { SITE_MESSAGES, TMaybeUndefined } from '@blog/config';
+import type { SITE_MESSAGES, TMaybeUndefined } from '@shinefold/config';
 import {
   hasLength,
   isNull,
   isString,
   isUndefined,
-} from '@blog/utils/primitives';
+} from '@shinefold/utils/primitives';
 
 if (!isUndefined(globalThis.document)) {
   await import('@testing-library/jest-dom/vitest');
@@ -129,7 +129,7 @@ type TLooseCreateTranslator = (config: {
 // the config barrel and next-intl, not every test file.
 vi.mock('next-intl/server', async () => {
   const [{ LOCALE_ISO_CODES, SITE_MESSAGES }, nextIntl] = await Promise.all([
-    import('@blog/config'),
+    import('@shinefold/config'),
     import('next-intl'),
   ]);
   const createLooseTranslator =
@@ -167,7 +167,7 @@ vi.mock('next/font/local', () => ({
 // next-intl's `Link` reads `usePathname`/`useRouter` off `next/navigation`
 // even when a test never navigates.
 vi.mock('next/navigation', async () => {
-  const { NEXT_NAVIGATION_ERROR } = await import('@blog/config/constants');
+  const { NEXT_NAVIGATION_ERROR } = await import('@shinefold/config/constants');
   return {
     notFound: vi.fn(() => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);

@@ -1,5 +1,3 @@
-import { HTTP_STATUS } from '@blog/config';
-import { errorResult, okResult, type TResult } from '@blog/utils';
 import {
   GITHUB_FAILURE,
   GITHUB_RATE_LIMIT_EXHAUSTED,
@@ -9,6 +7,8 @@ import {
 } from '@platform/constants/github';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_STATUS } from '@shinefold/config';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 
 import { readGitHubCredentials } from './read-github-credentials';
 

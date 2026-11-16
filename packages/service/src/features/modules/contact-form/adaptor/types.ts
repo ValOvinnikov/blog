@@ -5,7 +5,7 @@ import type {
   TLayout,
   TMaybeUndefined,
   TPortableTextBlock,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export type TContactFormModule = {
   brandVariant: TBrandVariant;

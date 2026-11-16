@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   NEXT_NAVIGATION_ERROR,
   routes,
   SITE_MESSAGES,
   TAXONOMY_KIND,
-} from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { POST_LIST_LOG } from '@web/constants/post-list';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
@@ -33,7 +33,7 @@ const { getPostListMock } = vi.hoisted(() => ({
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       postList: { v1: { getPostList: getPostListMock } },

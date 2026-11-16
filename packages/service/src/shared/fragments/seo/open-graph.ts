@@ -1,5 +1,5 @@
-import { q } from '@blog/service/sanity/query/query';
-import { sanityImageOptionalFragment } from '@blog/service/shared/fragments/image/image';
+import { q } from '@shinefold/service/sanity/query/query';
+import { sanityImageOptionalFragment } from '@shinefold/service/shared/fragments/image/image';
 
 export const openGraphFragment = q
   .fragmentForType<'openGraph'>()

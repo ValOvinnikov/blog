@@ -1,16 +1,20 @@
-import { ERROR_CODE, HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import {
+  ERROR_CODE,
+  HTTP_METHOD,
+  HTTP_STATUS,
+} from '@shinefold/config/constants';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   beginTenantProvisioning,
   finishProvisioningRun,
   updateProvisioningStep,
-} from '@blog/db/queries/tenants';
-import { ENQUEUE_MAX_AGE_MS } from '@blog/utils/enqueue-signature';
-import { errorResult, okResult } from '@blog/utils/result';
+} from '@shinefold/db/queries/tenants';
+import { ENQUEUE_MAX_AGE_MS } from '@shinefold/utils/enqueue-signature';
+import { errorResult, okResult } from '@shinefold/utils/result';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
 import {
@@ -44,7 +48,7 @@ function signedRequest(
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/workflows/provision-tenant');
 vi.mock('workflow/api');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 
 function enqueueRequest(tenantId: string = MOCK_TENANT_ID): Request {
   return signedRequest(JSON.stringify({ tenantId }));

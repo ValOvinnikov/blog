@@ -3,7 +3,7 @@ import {
   type TLocaleIsoCode,
   type TSiteMessages,
   type TVoicePortableText,
-} from '@blog/config';
+} from '@shinefold/config';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 import {
   resolveVoiceRichFields,

@@ -1,7 +1,10 @@
-import { SUBSCRIBER_STATUS, type TSubscriberStatus } from '@blog/db/constants';
-import { StatusBadge } from '@blog/ui/components/atoms/status-badge';
-import { Panel } from '@blog/ui/components/molecules/panel';
-import { SettingRow } from '@blog/ui/components/molecules/setting-row';
+import {
+  SUBSCRIBER_STATUS,
+  type TSubscriberStatus,
+} from '@shinefold/db/constants';
+import { StatusBadge } from '@shinefold/ui/components/atoms/status-badge';
+import { Panel } from '@shinefold/ui/components/molecules/panel';
+import { SettingRow } from '@shinefold/ui/components/molecules/setting-row';
 import type { ReactNode } from 'react';
 
 import { newsletterSectionVariants } from './newsletter-section-variants';

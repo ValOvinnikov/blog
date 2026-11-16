@@ -1,6 +1,6 @@
-import { ACTION_OUTCOME, type TOutcome } from '@blog/config';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import type { TStartReleaseResult } from '@platform/server/releases/start-release-action';
+import { ACTION_OUTCOME, type TOutcome } from '@shinefold/config';
 
 const REFUSAL_KEYS = {
   [RELEASE_REFUSAL.RELEASE_RUNNING]: 'alreadyRunning',

@@ -1,6 +1,6 @@
-import { CAPABILITY, MODULE_PACK } from '@blog/config/constants';
-import { getMissingRequirement } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
-import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
+import { CAPABILITY, MODULE_PACK } from '@shinefold/config/constants';
+import { getMissingRequirement } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { EVERY_MODULE_PACK } from '@shinefold/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 
 const NEWSLETTER_MODULE_TYPE = 'module_newsletter';
 const CONTACT_FORM_MODULE_TYPE = 'module_contactForm';

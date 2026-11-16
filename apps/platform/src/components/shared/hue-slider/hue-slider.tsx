@@ -1,11 +1,11 @@
 'use client';
 
 import { Slider } from '@base-ui/react/slider';
-import { HUE_MAX, HUE_MIN } from '@blog/config';
 import {
   HUE_SLIDER_TRACK,
   type THueSliderTrack,
 } from '@platform/constants/hue-slider';
+import { HUE_MAX, HUE_MIN } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import type { AriaAttributes } from 'react';
 

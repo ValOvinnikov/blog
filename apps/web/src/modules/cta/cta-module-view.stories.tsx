@@ -3,7 +3,7 @@ import {
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
   SPACING_SCALE,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Section } from '@web/components/shared/section';
 import {

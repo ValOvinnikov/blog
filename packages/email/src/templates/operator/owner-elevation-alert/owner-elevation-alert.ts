@@ -1,5 +1,5 @@
-import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
-import { buildOperatorShell } from '@blog/email/html/operator-shell/operator-shell';
+import { escapeHtml } from '@shinefold/email/html/escape-html/escape-html';
+import { buildOperatorShell } from '@shinefold/email/html/operator-shell/operator-shell';
 
 const OUTCOME_COPY = {
   STALLED:

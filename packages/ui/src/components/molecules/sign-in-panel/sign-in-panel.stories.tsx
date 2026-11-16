@@ -4,11 +4,14 @@ import {
   ICONS,
   OAUTH_PROVIDER,
   TOAST_TYPE,
-} from '@blog/config';
-import { AccountTrigger } from '@blog/ui/components/molecules/account-trigger';
-import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
-import { Toast } from '@blog/ui/components/molecules/toast';
-import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
+} from '@shinefold/config';
+import { AccountTrigger } from '@shinefold/ui/components/molecules/account-trigger';
+import { PopoverMenu } from '@shinefold/ui/components/molecules/popover-menu';
+import { Toast } from '@shinefold/ui/components/molecules/toast';
+import {
+  BUSY_STYLES,
+  SPINNER_VARIANTS,
+} from '@shinefold/ui/testing/busy-styles';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { fn } from 'storybook/test';

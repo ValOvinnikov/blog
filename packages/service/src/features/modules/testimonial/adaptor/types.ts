@@ -7,10 +7,10 @@ import type {
   THeadingBlock,
   TMaybeUndefined,
   TPortableTextBlock,
-} from '@blog/config';
-import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
-import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
-import type { TModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
+} from '@shinefold/config';
+import type { TCtaButton } from '@shinefold/service/shared/transformers/cta/to-cta-button';
+import type { TWideLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
+import type { TModuleAppearance } from '@shinefold/service/shared/transformers/module/to-module-appearance';
 
 export type TTestimonialItem = {
   id: string;

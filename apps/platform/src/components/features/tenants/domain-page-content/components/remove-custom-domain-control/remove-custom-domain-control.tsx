@@ -1,13 +1,13 @@
 'use client';
 
-import { ACTION_OUTCOME, SIZE } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
 import { domainNameTag } from '@platform/components/features/tenants/domain-page-content/components/domain-name/domain-name';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { removeCustomDomainAction } from '@platform/server/custom-domain/remove-custom-domain-action';
 import { CUSTOM_DOMAIN_REFUSAL_KEYS } from '@platform/utils/custom-domain-keys/custom-domain-keys';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import { ACTION_OUTCOME, SIZE } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 

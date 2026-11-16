@@ -1,18 +1,19 @@
-import { LEGAL_PAGE_KIND, LOCALE_ISO_CODES } from '@blog/config/constants';
-import type { TRawCookieStatementPage } from '@blog/service/features/pages/cookie-statement/adaptor/transformer';
-import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
-import type { TRawLandingPage } from '@blog/service/features/pages/landing/adaptor/detail-page/transformer';
-import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
-import type { TRawBlogPage } from '@blog/service/features/pages/post-index/adaptor/index-page/transformer';
-import type { TRawSectionDocumentDetail } from '@blog/service/features/pages/section-document/adaptor/detail-page/transformer';
-import type { TRawSectionIndexPage } from '@blog/service/features/pages/section-index/adaptor/transformer';
-import type { TRawTagPage } from '@blog/service/features/pages/tag/adaptor/detail-page/transformer';
-import type { TRawTagIndexPage } from '@blog/service/features/pages/tag-index/adaptor/transformer';
-import type { TRawTopicPage } from '@blog/service/features/pages/topic/adaptor/detail-page/transformer';
-import type { TRawTopicIndexPage } from '@blog/service/features/pages/topic-index/adaptor/transformer';
-import type { TModule } from '@blog/service/shared/transformers/module/to-module';
-import type { TRawPersonCard } from '@blog/service/shared/transformers/person/to-person-card';
-import type { TRawPostCard } from '@blog/service/shared/transformers/post/to-post-card';
+import { faker } from '@faker-js/faker';
+import { LEGAL_PAGE_KIND, LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import type { TRawCookieStatementPage } from '@shinefold/service/features/pages/cookie-statement/adaptor/transformer';
+import type { TRawHomePage } from '@shinefold/service/features/pages/home/adaptor/transformer';
+import type { TRawLandingPage } from '@shinefold/service/features/pages/landing/adaptor/detail-page/transformer';
+import type { TRawPostDetail } from '@shinefold/service/features/pages/post/adaptor/detail-page/transformer';
+import type { TRawBlogPage } from '@shinefold/service/features/pages/post-index/adaptor/index-page/transformer';
+import type { TRawSectionDocumentDetail } from '@shinefold/service/features/pages/section-document/adaptor/detail-page/transformer';
+import type { TRawSectionIndexPage } from '@shinefold/service/features/pages/section-index/adaptor/transformer';
+import type { TRawTagPage } from '@shinefold/service/features/pages/tag/adaptor/detail-page/transformer';
+import type { TRawTagIndexPage } from '@shinefold/service/features/pages/tag-index/adaptor/transformer';
+import type { TRawTopicPage } from '@shinefold/service/features/pages/topic/adaptor/detail-page/transformer';
+import type { TRawTopicIndexPage } from '@shinefold/service/features/pages/topic-index/adaptor/transformer';
+import type { TModule } from '@shinefold/service/shared/transformers/module/to-module';
+import type { TRawPersonCard } from '@shinefold/service/shared/transformers/person/to-person-card';
+import type { TRawPostCard } from '@shinefold/service/shared/transformers/post/to-post-card';
 import {
   MOCK_AUTHOR_AVATAR_ALT,
   MOCK_AUTHOR_ID,
@@ -23,13 +24,13 @@ import {
   MOCK_TOPIC_TITLE,
   mockRawTag,
   mockRawTopic,
-} from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
 import {
   MOCK_CONTENT_MODULE_ID,
   MOCK_CTA_MODULE_ID,
   MOCK_POST_LIST_PAGE_SIZE,
   MOCK_TAXONOMY_LIST_MODULE_ID,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_POST_EXCERPT,
   MOCK_POST_ID,
@@ -40,10 +41,9 @@ import {
   mockRawSanityImage,
   mockRawSeo,
   mockReference,
-} from '@blog/service/testing/shared/fixtures';
-import { mockTranslationLink } from '@blog/service/testing/shared/localized';
-import { MOCK_ABOUT_SLUG } from '@blog/service/testing/shared/translated-pages-dataset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { mockTranslationLink } from '@shinefold/service/testing/shared/localized';
+import { MOCK_ABOUT_SLUG } from '@shinefold/service/testing/shared/translated-pages-dataset';
 
 export const MOCK_HOME_PAGE_ID = 'home-1';
 export const MOCK_LIST_MODULE_ID = 'list-1';

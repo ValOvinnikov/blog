@@ -1,7 +1,7 @@
 import {
   CONTENT_ALIGNMENT,
   type TContentAlignment,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   FRAME_CENTER_X,
   FRAME_INSET,
@@ -9,7 +9,7 @@ import {
   HEADING_HEIGHT,
   PictureFrame,
   TEXT_LINE_HEIGHT,
-} from '@blog/studio/schema-types/inputs/option-tiles-input/picture-frame';
+} from '@shinefold/studio/schema-types/inputs/option-tiles-input/picture-frame';
 
 const TEXT_ROWS = [
   { y: 6, width: 20, height: HEADING_HEIGHT },

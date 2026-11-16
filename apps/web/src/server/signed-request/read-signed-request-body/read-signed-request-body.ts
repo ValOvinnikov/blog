@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   ENQUEUE_SIGNATURE_HEADER,
   ENQUEUE_TIMESTAMP_HEADER,
   isValidEnqueueSignature,
-} from '@blog/utils/enqueue-signature';
+} from '@shinefold/utils/enqueue-signature';
 
 export const readSignedRequestBody = async (
   request: Request,

@@ -119,7 +119,7 @@ jobs:
         id: studio
         run: |
           set -uo pipefail
-          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" @blog/studio --fallback=HEAD^1; then
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" @shinefold/studio --fallback=HEAD^1; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -181,11 +181,11 @@ jobs:
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
-          # `@blog/studio...` is not optional padding: the fan-out reads each
+          # `@shinefold/studio...` is not optional padding: the fan-out reads each
           # tenant's ledger with `pnpm exec sanity documents query` and then
           # runs `node scripts/migrate.mjs` (which imports `@sanity/client`),
           # both with `packages/studio` as their cwd.
-          install-filter: '@blog/db... @blog/studio...'
+          install-filter: '@shinefold/db... @shinefold/studio...'
       - name: Check backup settings
         if: ${{ env.BACKUP_TENANT_EXPORTS == 'true' }}
         uses: ./.github/actions/encrypted-backup
@@ -213,9 +213,9 @@ jobs:
             mkdir -p "$TENANT_EXPORT_DIR"
           fi
           if [ -n "$TENANT_ID" ]; then
-            pnpm --filter @blog/db db:migrate-tenant-content -- --tenant-id="$TENANT_ID"
+            pnpm --filter @shinefold/db db:migrate-tenant-content -- --tenant-id="$TENANT_ID"
           else
-            pnpm --filter @blog/db db:migrate-tenant-content
+            pnpm --filter @shinefold/db db:migrate-tenant-content
           fi
       # Stored even when a tenant failed, so the exports taken before the
       # failure stay recoverable.

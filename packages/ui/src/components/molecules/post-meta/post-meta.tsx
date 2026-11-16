@@ -1,8 +1,12 @@
-import { type IWithClassName, type IWithDataTestId, SIZE } from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { MetaSeparator } from '@blog/ui/components/atoms/meta-separator';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
+import {
+  type IWithClassName,
+  type IWithDataTestId,
+  SIZE,
+} from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { MetaSeparator } from '@shinefold/ui/components/atoms/meta-separator';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { type ReactNode } from 'react';
 
 import { postMetaVariants } from './post-meta-variants';

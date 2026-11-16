@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { ACCOUNT_CONTROL_LOG } from '@web/constants/account-control';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
@@ -20,7 +20,7 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant');
 vi.mock('@web/server/settings-features/get-tenant-plan/get-tenant-plan');
 
 vi.mock(
-  '@blog/db',
+  '@shinefold/db',
   () => import('@web/testing/server/site-config/site-config-db'),
 );
 

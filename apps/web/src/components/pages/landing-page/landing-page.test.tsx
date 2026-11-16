@@ -1,9 +1,9 @@
-import { REDIRECT_STATUS, SITE_MESSAGES } from '@blog/config';
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { service, type TLandingPage } from '@blog/service';
-import { ARIA_CURRENT } from '@blog/ui/testing/aria';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { REDIRECT_STATUS, SITE_MESSAGES } from '@shinefold/config';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
+import { service, type TLandingPage } from '@shinefold/service';
+import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
+import { errorResult, okResult } from '@shinefold/utils';
 import { permanentRedirect } from '@web/i18n/navigation';
 import {
   customRenderServerAsync,
@@ -38,7 +38,7 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: { landing: { v1: { getPage: vi.fn(), getRedirect: vi.fn() } } },
     modules: { heroBlog: { v1: { getHeroBlog: vi.fn() } } },

@@ -1,8 +1,5 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
 import {
   BILLING_LOG,
   STRIPE_CUSTOMER_IDEMPOTENCY_PREFIX,
@@ -10,6 +7,9 @@ import {
   STRIPE_TENANT_METADATA_KEY,
 } from '@platform/constants/billing';
 import { logger } from '@platform/utils/logger/logger';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import Stripe from 'stripe';
 
 const isExistingCustomer = async (

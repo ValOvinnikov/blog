@@ -3,9 +3,9 @@ import type {
   IWithDataTestId,
   TContentAlignment,
   THeroVariant,
-} from '@blog/config';
-import { MediaFrame } from '@blog/ui/components/atoms/media-frame';
-import type { TMediaFrameRatio } from '@blog/ui/components/atoms/media-frame/media-frame-variants';
+} from '@shinefold/config';
+import { MediaFrame } from '@shinefold/ui/components/atoms/media-frame';
+import type { TMediaFrameRatio } from '@shinefold/ui/components/atoms/media-frame/media-frame-variants';
 import type { ReactNode } from 'react';
 
 import { heroMediaVariants } from './hero-media-variants';

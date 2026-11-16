@@ -1,9 +1,9 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { BILLING_LOG } from '@platform/constants/billing';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import type { TMaybeUndefined } from '@shinefold/config';
 import type Stripe from 'stripe';
 
 import {

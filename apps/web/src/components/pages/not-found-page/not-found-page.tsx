@@ -1,8 +1,8 @@
-import { ICONS, type TVoicePortableText } from '@blog/config';
-import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { Text } from '@blog/ui/components/atoms/text';
+import { ICONS, type TVoicePortableText } from '@shinefold/config';
+import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import { useTranslations } from 'next-intl';

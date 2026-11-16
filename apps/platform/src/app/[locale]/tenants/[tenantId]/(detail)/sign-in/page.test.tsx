@@ -1,9 +1,9 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockTenant, MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import TenantSignInAppsPage from './page';
 
@@ -16,7 +16,7 @@ const { getAdminByUserIdMock, getTenantByIdMock, listTenantOAuthClientsMock } =
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     admins: { getAdminByUserId: getAdminByUserIdMock },

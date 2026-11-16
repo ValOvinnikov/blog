@@ -1,8 +1,8 @@
-import { HTTP_METHOD } from '@blog/config/constants';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_METHOD } from '@shinefold/config/constants';
 
 const REVALIDATE_PATH = '/api/revalidate-site-config';
 const SITE_CONFIG_REVALIDATE_TIMEOUT_MS = 5000;

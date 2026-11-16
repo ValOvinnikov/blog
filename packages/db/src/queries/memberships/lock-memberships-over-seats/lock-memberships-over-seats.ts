@@ -1,9 +1,9 @@
-import { type TTenantPlan } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
-import { unlockedMembershipsOverSeats } from '@blog/db/queries/memberships/memberships-over-seats';
-import { isTenantOnPlan } from '@blog/db/queries/tenants/tenant-on-plan';
-import { memberships } from '@blog/db/schema/memberships';
+import { type TTenantPlan } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
+import { unlockedMembershipsOverSeats } from '@shinefold/db/queries/memberships/memberships-over-seats';
+import { isTenantOnPlan } from '@shinefold/db/queries/tenants/tenant-on-plan';
+import { memberships } from '@shinefold/db/schema/memberships';
 import { and, inArray } from 'drizzle-orm';
 
 // Locks nothing once the tenant has moved off `plan`, so a payment landing mid-sweep is never undone.

@@ -1,9 +1,9 @@
-import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
+import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@shinefold/config';
 import type {
   TTopic,
   TTopicDetailPage,
   TTopicWithPostCount,
-} from '@blog/service';
+} from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';

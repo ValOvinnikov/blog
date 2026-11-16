@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 
 import { buildBaseDocuments } from './base-documents';
 import type { TStarterCopy } from './copy/starter-copy';

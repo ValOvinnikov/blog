@@ -1,4 +1,4 @@
-import type { TMagicLinkRefusal } from '@blog/config/constants';
+import type { TMagicLinkRefusal } from '@shinefold/config/constants';
 
 import type { IEmailSendCountFailure } from './email-send-count-failure';
 

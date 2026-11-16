@@ -1,13 +1,16 @@
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
-import { TENANT_OWNER_EMAIL, type TTenantOwnerEmail } from '@blog/db/constants';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
+import {
+  TENANT_OWNER_EMAIL,
+  type TTenantOwnerEmail,
+} from '@shinefold/db/constants';
 import {
   claimTenantOwnerEmail,
   releaseTenantOwnerEmail,
-} from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { sendEmail } from '@blog/email';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { sendEmail } from '@shinefold/email';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import {
   OWNER_EMAIL_RELEASE_FAILED_EVENT,
   OWNER_EMAIL_SEND_FAILED_EVENT,

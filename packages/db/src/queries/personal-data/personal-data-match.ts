@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
-import { normalizeSignupEmail } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
-import { requireEmailIndex } from '@blog/db/utils/personal-data/personal-data';
-import { personalDataIndex } from '@blog/utils/encryption';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
+import { blockedSignupIdentities } from '@shinefold/db/schema/blocked-signup-identities';
+import { normalizeSignupEmail } from '@shinefold/db/utils/normalize-signup-identity/normalize-signup-identity';
+import { requireEmailIndex } from '@shinefold/db/utils/personal-data/personal-data';
+import { personalDataIndex } from '@shinefold/utils/encryption';
 import { and, eq, type SQL } from 'drizzle-orm';
 
 export function toPersonalEmailIndex(email: string): TMaybeUndefined<string> {

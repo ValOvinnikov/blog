@@ -1,6 +1,6 @@
 'use client';
 
-import { ConsentPreferences } from '@blog/ui/components/molecules/consent-preferences';
+import { ConsentPreferences } from '@shinefold/ui/components/molecules/consent-preferences';
 import { useConsentPreferences } from '@web/context/consent-preferences-provider';
 import { useConsentPreferencesForm } from '@web/hooks/use-consent-preferences-form';
 import { useTranslations } from 'next-intl';

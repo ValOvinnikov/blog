@@ -1,8 +1,8 @@
 'use client';
 
 import { Menu } from '@base-ui/react/menu';
-import type { IWithChildren } from '@blog/config/react';
 import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
+import type { IWithChildren } from '@shinefold/config/react';
 
 type TNestableMenuRootProps = IWithChildren & {
   onOpenChangeComplete?: (isOpen: boolean) => void;

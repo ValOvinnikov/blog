@@ -1,9 +1,9 @@
 import {
   serializePortableText,
   type TPortableTextContent,
-} from '@blog/email/portable-text';
-import { buildSignInEmailShell } from '@blog/email/templates/tenant/sign-in-email-shell/sign-in-email-shell';
-import type { TTenantEmailIdentity } from '@blog/email/templates/tenant/tenant-email-identity/tenant-email-identity';
+} from '@shinefold/email/portable-text';
+import { buildSignInEmailShell } from '@shinefold/email/templates/tenant/sign-in-email-shell/sign-in-email-shell';
+import type { TTenantEmailIdentity } from '@shinefold/email/templates/tenant/tenant-email-identity/tenant-email-identity';
 
 export type TMagicLinkEmailInput = {
   url: string;

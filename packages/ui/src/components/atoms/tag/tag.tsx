@@ -1,5 +1,5 @@
-import { SPAN_AS_CONST, type IWithDataTestId } from '@blog/config';
-import type { TPolymorphicProps } from '@blog/config/react';
+import { SPAN_AS_CONST, type IWithDataTestId } from '@shinefold/config';
+import type { TPolymorphicProps } from '@shinefold/config/react';
 import { type ElementType } from 'react';
 
 import { tagVariants, type TTagVariants } from './tag-variants';

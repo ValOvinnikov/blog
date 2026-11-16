@@ -2,13 +2,17 @@
 
 import { Radio } from '@base-ui/react/radio';
 import { RadioGroup } from '@base-ui/react/radio-group';
-import type { TControlLock, TMaybeNull, TNamedControlAria } from '@blog/config';
-import type { IWithClassName } from '@blog/config/types';
 import {
   SEGMENTED_RADIO_LAYOUT,
   type TSegmentedRadioLayout,
 } from '@platform/constants/segmented-control';
 import { useTrackScroll } from '@platform/utils/use-track-scroll/use-track-scroll';
+import type {
+  TControlLock,
+  TMaybeNull,
+  TNamedControlAria,
+} from '@shinefold/config';
+import type { IWithClassName } from '@shinefold/config/types';
 import { useId, type ReactNode } from 'react';
 
 import {

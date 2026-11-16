@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
@@ -22,9 +23,8 @@ import {
   RADIUS_SCALE,
   SPINNER_STYLE,
   TENANT_PLAN,
-} from '@blog/config/constants';
-import { MOCK_ACCENT_HUE } from '@blog/db/testing/site-config/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import { MOCK_ACCENT_HUE } from '@shinefold/db/testing/site-config/fixtures';
 
 import {
   isLookFieldEntitled,

@@ -1,4 +1,4 @@
-import { PricingCard } from '@blog/ui/components/molecules/pricing-card';
+import { PricingCard } from '@shinefold/ui/components/molecules/pricing-card';
 import { ActionGroup } from '@web/components/shared/action-group';
 import type { IPricingCardData } from '@web/utils/to-pricing-panels';
 

@@ -1,9 +1,9 @@
-import type { TModulePack } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
-import { MODULE_PACK_LABEL } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
-import { getModulePickerIcon } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
 import { Badge, Box, Card, Flex, Text } from '@sanity/ui';
 import { MenuItem } from '@sanity/ui/menu';
+import type { TModulePack } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { MODULE_PACK_LABEL } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { getModulePickerIcon } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
 import { createElement, useId } from 'react';
 import type { SchemaType } from 'sanity';
 

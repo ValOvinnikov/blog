@@ -1,4 +1,4 @@
-import type { TVoicePortableText } from '@blog/config';
+import type { TVoicePortableText } from '@shinefold/config';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
@@ -13,7 +13,7 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   SPINNER_STYLE,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   integer,
   jsonb,

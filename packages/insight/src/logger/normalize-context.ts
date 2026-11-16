@@ -1,5 +1,5 @@
-import type { TLogContext } from '@blog/insight/logger/logger';
-import { sanitizeLogMessage } from '@blog/insight/utils/sanitize-log-message';
+import type { TLogContext } from '@shinefold/insight/logger/logger';
+import { sanitizeLogMessage } from '@shinefold/insight/utils/sanitize-log-message';
 
 // Well under Vercel's few-KB line cut, which would otherwise split the JSON.
 const MAX_STACK_LENGTH = 4000;

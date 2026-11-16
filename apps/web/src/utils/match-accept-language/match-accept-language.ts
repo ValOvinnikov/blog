@@ -2,7 +2,7 @@ import {
   LOCALE_BCP47_TAGS,
   type TLocaleIsoCode,
   type TMaybeUndefined,
-} from '@blog/config';
+} from '@shinefold/config';
 
 type TWeightedLanguage = { primaryTag: string; quality: number };
 

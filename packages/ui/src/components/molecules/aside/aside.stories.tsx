@@ -1,5 +1,5 @@
-import { ASIDE_KIND } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { ASIDE_KIND } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Aside } from './aside';

@@ -1,15 +1,15 @@
-import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types/mark-requirement-off-types';
+import { Card, Stack, Text } from '@sanity/ui';
+import { markRequirementOffTypes } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types/mark-requirement-off-types';
 import {
   getMissingRequirement,
   getRequirementOffMessage,
   type TEntitlementState,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
-import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker';
-import { hasModuleMembers } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
-import { ModulePickerTypesContext } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-types-context';
-import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
-import { hasLength } from '@blog/utils/primitives';
-import { Card, Stack, Text } from '@sanity/ui';
+} from '@shinefold/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { createModulePicker } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker';
+import { hasModuleMembers } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
+import { ModulePickerTypesContext } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-types-context';
+import { EVERY_MODULE_PACK } from '@shinefold/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
+import { hasLength } from '@shinefold/utils/primitives';
 import { useMemo } from 'react';
 import {
   type InputProps,

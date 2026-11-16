@@ -1,5 +1,5 @@
-import { queries } from '@blog/db';
-import { okResult } from '@blog/utils';
+import { queries } from '@shinefold/db';
+import { okResult } from '@shinefold/utils';
 
 import { readDb, type TReleaseResult } from './release-result';
 

@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { queries } from '@blog/db';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
+import { queries } from '@shinefold/db';
 import type Stripe from 'stripe';
 
 import { syncCataloguePrice } from './sync-catalogue-price';

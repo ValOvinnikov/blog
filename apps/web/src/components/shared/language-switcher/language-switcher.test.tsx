@@ -5,8 +5,8 @@ import {
   LOCALE_NATIVE_LABEL,
   routes,
   type TLocaleIsoCode,
-} from '@blog/config';
-import { ARIA_CURRENT } from '@blog/ui/testing/aria';
+} from '@shinefold/config';
+import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
 import { customRender, screen, within } from '@web/testing/custom-render';

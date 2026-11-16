@@ -1,4 +1,4 @@
-import { mockRawTopicWithPostCount } from '@blog/service/testing/entities/fixtures';
+import { mockRawTopicWithPostCount } from '@shinefold/service/testing/entities/fixtures';
 
 import { topicsQuery } from './query';
 

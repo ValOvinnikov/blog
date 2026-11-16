@@ -1,8 +1,8 @@
-import type { TValueOf } from '@blog/config/utils';
 import {
   COPY_STATUS,
   COPY_STATUS_RESET_MS,
 } from '@platform/constants/clipboard';
+import type { TValueOf } from '@shinefold/config/utils';
 import { useEffect, useState } from 'react';
 
 export type TCopyStatus = TValueOf<typeof COPY_STATUS>;

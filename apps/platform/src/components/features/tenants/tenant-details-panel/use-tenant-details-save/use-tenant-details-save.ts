@@ -1,7 +1,5 @@
 'use client';
 
-import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
-import type { TValueOf } from '@blog/config/utils';
 import type {
   TTenantDetailsFieldErrors,
   TTenantDetailsValues,
@@ -14,6 +12,8 @@ import {
   type TUpdateTenantDetailsRefusal,
 } from '@platform/server/tenants/update-tenant-details-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import { ACTION_OUTCOME, type TMaybeUndefined } from '@shinefold/config';
+import type { TValueOf } from '@shinefold/config/utils';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';

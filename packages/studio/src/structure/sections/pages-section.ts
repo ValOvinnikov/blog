@@ -1,17 +1,17 @@
-import { cookieStatementPageSchema } from '@blog/studio/schema-types/documents/pages/cookie-statement/cookie-statement';
-import { homePageSchema } from '@blog/studio/schema-types/documents/pages/home/home';
-import { landingPageSchema } from '@blog/studio/schema-types/documents/pages/landing/landing';
-import { legalDocumentPageSchema } from '@blog/studio/schema-types/documents/pages/legal-document/legal-document';
-import { legalIndexPageSchema } from '@blog/studio/schema-types/documents/pages/legal-index/legal-index';
-import { postPageSchema } from '@blog/studio/schema-types/documents/pages/post/post';
-import { postIndexPageSchema } from '@blog/studio/schema-types/documents/pages/post-index/post-index';
-import { privacyDocumentPageSchema } from '@blog/studio/schema-types/documents/pages/privacy-document/privacy-document';
-import { privacyIndexPageSchema } from '@blog/studio/schema-types/documents/pages/privacy-index/privacy-index';
-import { tagPageSchema } from '@blog/studio/schema-types/documents/pages/tag/tag';
-import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index';
-import { topicPageSchema } from '@blog/studio/schema-types/documents/pages/topic/topic';
-import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index';
-import type { TStructureSection } from '@blog/studio/structure/build-section/build-section';
+import { cookieStatementPageSchema } from '@shinefold/studio/schema-types/documents/pages/cookie-statement/cookie-statement';
+import { homePageSchema } from '@shinefold/studio/schema-types/documents/pages/home/home';
+import { landingPageSchema } from '@shinefold/studio/schema-types/documents/pages/landing/landing';
+import { legalDocumentPageSchema } from '@shinefold/studio/schema-types/documents/pages/legal-document/legal-document';
+import { legalIndexPageSchema } from '@shinefold/studio/schema-types/documents/pages/legal-index/legal-index';
+import { postPageSchema } from '@shinefold/studio/schema-types/documents/pages/post/post';
+import { postIndexPageSchema } from '@shinefold/studio/schema-types/documents/pages/post-index/post-index';
+import { privacyDocumentPageSchema } from '@shinefold/studio/schema-types/documents/pages/privacy-document/privacy-document';
+import { privacyIndexPageSchema } from '@shinefold/studio/schema-types/documents/pages/privacy-index/privacy-index';
+import { tagPageSchema } from '@shinefold/studio/schema-types/documents/pages/tag/tag';
+import { tagIndexPageSchema } from '@shinefold/studio/schema-types/documents/pages/tag-index/tag-index';
+import { topicPageSchema } from '@shinefold/studio/schema-types/documents/pages/topic/topic';
+import { topicIndexPageSchema } from '@shinefold/studio/schema-types/documents/pages/topic-index/topic-index';
+import type { TStructureSection } from '@shinefold/studio/structure/build-section/build-section';
 import { Files } from 'lucide-react';
 
 export const pagesSection: TStructureSection = {

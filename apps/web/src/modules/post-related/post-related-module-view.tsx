@@ -1,4 +1,4 @@
-import type { TPostRelatedModule } from '@blog/service';
+import type { TPostRelatedModule } from '@shinefold/service';
 import {
   type IPostCardsSectionProps,
   PostCardsSection,

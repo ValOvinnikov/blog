@@ -1,5 +1,5 @@
-import { SIZE } from '@blog/config';
 import { Spinner } from '@platform/components/shared/spinner';
+import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { studioLoadingVariants } from './studio-loading-variants';

@@ -2,7 +2,7 @@ import type {
   TBillingCurrency,
   TStripeCouponDuration,
   TStripePriceLookupKey,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   doublePrecision,
   index,

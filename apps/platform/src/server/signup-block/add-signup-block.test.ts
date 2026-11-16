@@ -1,7 +1,3 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import { ERROR_CODE } from '@blog/config/constants';
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import { errorResult, okResult } from '@blog/utils';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
@@ -11,6 +7,10 @@ import {
   mockBlockedIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@shinefold/config';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import { addSignupBlock, recordSignupBlockAdded } from './add-signup-block';
 
@@ -23,7 +23,7 @@ vi.mock('@platform/server/audit/record-audit-event', () => ({
   recordAuditEvent: recordAuditEventMock,
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     blockedSignupIdentities: { addBlockedIdentity: addBlockedIdentityMock },

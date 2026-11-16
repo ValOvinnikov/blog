@@ -1,10 +1,10 @@
-import { ICONS, SIZE } from '@blog/config';
-import type { IWithClassName } from '@blog/config/types';
-import { isUndefined } from '@blog/utils/primitives';
 import { Icon } from '@platform/components/shared/icon';
 import { Spinner } from '@platform/components/shared/spinner';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { SPINNER_TONE } from '@platform/constants/spinner';
+import { ICONS, SIZE } from '@shinefold/config';
+import type { IWithClassName } from '@shinefold/config/types';
+import { isUndefined } from '@shinefold/utils/primitives';
 import type { AriaAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 
 import { buttonVariants, type TButtonVariants } from './button-variants';

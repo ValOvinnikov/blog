@@ -1,5 +1,9 @@
-import type { ACTION_OUTCOME, TActionResult, TOutcome } from '@blog/config';
 import type { TUploadRefusal } from '@platform/constants/upload';
+import type {
+  ACTION_OUTCOME,
+  TActionResult,
+  TOutcome,
+} from '@shinefold/config';
 
 export type TClearUploadResult = TActionResult<
   typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,

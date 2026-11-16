@@ -12,13 +12,13 @@ function isAllowlisted(filename) {
 
 // `.test.tsx`/`.stories.tsx` files spread test fixtures onto local mock
 // components (simulating a caller-supplied `Link`/router) — not part of
-// @blog/ui's public component surface, so they're out of this rule's scope.
+// @shinefold/ui's public component surface, so they're out of this rule's scope.
 function isTestOrStoryFile(filename) {
   return /\.(?:test|stories)\.tsx$/.test(filename);
 }
 
 /**
- * Bans `{...rest}`/`{...props}` spread onto a JSX element in `@blog/ui`
+ * Bans `{...rest}`/`{...props}` spread onto a JSX element in `@shinefold/ui`
  * component source. Polymorphic components that forward props to a
  * caller-chosen `as` element are the sole exception — listed explicitly
  * rather than inferred from `TPolymorphicProps`, since not every polymorphic
@@ -29,12 +29,12 @@ export const noPropSpreadRule = {
     type: 'problem',
     docs: {
       description:
-        '@blog/ui components declare closed prop types — never spread onto a JSX element.',
+        '@shinefold/ui components declare closed prop types — never spread onto a JSX element.',
     },
     schema: [],
     messages: {
       noSpread:
-        '@blog/ui components use closed prop types — enumerate props explicitly instead of spreading onto a JSX element.',
+        '@shinefold/ui components use closed prop types — enumerate props explicitly instead of spreading onto a JSX element.',
     },
   },
   create(context) {

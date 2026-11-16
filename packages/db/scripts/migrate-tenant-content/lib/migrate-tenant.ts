@@ -5,10 +5,10 @@ import {
   getTenantSanityWriteCredentials,
   recordTenantContentMigrationFailure,
   type TTenantSanityWriteCredentials,
-} from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isTenantWritable } from '@blog/db/utils/is-tenant-writable/is-tenant-writable';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isTenantWritable } from '@shinefold/db/utils/is-tenant-writable/is-tenant-writable';
+import { sanitizeLogMessage } from '@shinefold/insight';
 
 import { isTenantMigrationLedgerEmpty } from './read-tenant-migration-ledger';
 import {

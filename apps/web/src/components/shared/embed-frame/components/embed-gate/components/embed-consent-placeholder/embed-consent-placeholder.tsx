@@ -1,7 +1,11 @@
 'use client';
 
-import type { IWithClassName, TEmbedProvider, TMediaRatio } from '@blog/config';
-import { ConsentPlaceholder } from '@blog/ui/components/molecules/consent-placeholder';
+import type {
+  IWithClassName,
+  TEmbedProvider,
+  TMediaRatio,
+} from '@shinefold/config';
+import { ConsentPlaceholder } from '@shinefold/ui/components/molecules/consent-placeholder';
 import { EMBED_PROVIDER_NAME } from '@web/constants/embed';
 import { useConsentPreferences } from '@web/context/consent-preferences-provider';
 import { useTranslations } from 'next-intl';

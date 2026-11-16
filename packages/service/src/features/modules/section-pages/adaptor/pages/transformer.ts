@@ -1,5 +1,5 @@
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
+import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toSanityImage } from '@shinefold/service/shared/transformers/image/to-sanity-image';
 import type { InferResultType } from 'groqd';
 
 import type { sectionPagesQuery } from './query';

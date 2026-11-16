@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { SITE_MESSAGES } from '@shinefold/config';
 import userEvent from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
 import { MOCK_ERROR_WITH_DIGEST } from '@web/testing/shared/error/fixtures';

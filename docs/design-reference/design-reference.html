@@ -1349,7 +1349,8 @@
           foundations, full Home/Post page mocks in light and dark modes,
           optional image states, and a full atomic component catalogue with HTML
           previews. Page compositions (built in <code>apps/web</code>, not
-          <code>@blog/ui</code>) own page placement; <code>@blog/ui</code>
+          <code>@shinefold/ui</code>) own page placement;
+          <code>@shinefold/ui</code>
           components own only their internal styling.
         </p>
         <nav class="toc" aria-label="Reference sections">
@@ -2928,11 +2929,11 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
                   <code>apps/web</code> at
                   <code
                     >apps/web/src/components/shared/portable-text-renderer/code-block.tsx</code
-                  >, not as a <code>@blog/ui</code> molecule. It wraps
+                  >, not as a <code>@shinefold/ui</code> molecule. It wraps
                   <code>react-syntax-highlighter</code>, a third-party rendering
-                  dependency that <code>@blog/ui</code> must stay free of per
-                  this repo's layer contracts. The styling and behaviour shown
-                  here still apply; only the package location differs.</em
+                  dependency that <code>@shinefold/ui</code> must stay free of
+                  per this repo's layer contracts. The styling and behaviour
+                  shown here still apply; only the package location differs.</em
                 >
               </p>
             </div>
@@ -3325,11 +3326,11 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               <p>
                 Renders a list of pre-built share links (each via
                 <code>ShareLink</code>) plus a copy-link <code>Button</code>.
-                <code>@blog/ui</code> only renders the <code>links</code> it's
-                given — building the platform-specific share URLs (X, LinkedIn,
-                …) is <code>apps/web</code>'s job — and never touches
-                <code>window</code>/clipboard directly; copying is delegated
-                entirely to the <code>onCopy</code> callback.
+                <code>@shinefold/ui</code> only renders the
+                <code>links</code> it's given — building the platform-specific
+                share URLs (X, LinkedIn, …) is <code>apps/web</code>'s job — and
+                never touches <code>window</code>/clipboard directly; copying is
+                delegated entirely to the <code>onCopy</code> callback.
               </p>
               <p>
                 <code
@@ -4144,11 +4145,11 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
         <div class="sec-title">Page compositions · apps/web</div>
         <p class="cap">
           These are <code>apps/web</code> page compositions, not
-          <code>@blog/ui</code> components — <code>@blog/ui</code> stops at
-          organisms and never gains a template layer. Route-level placement
-          only: these compositions decide section order, reading width, and
-          optional media presence by arranging <code>@blog/ui</code> atoms,
-          molecules, and organisms.
+          <code>@shinefold/ui</code> components —
+          <code>@shinefold/ui</code> stops at organisms and never gains a
+          template layer. Route-level placement only: these compositions decide
+          section order, reading width, and optional media presence by arranging
+          <code>@shinefold/ui</code> atoms, molecules, and organisms.
         </p>
         <div class="component-list">
           <article class="component-row" id="homepagetemplate">
@@ -4159,8 +4160,8 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
                 Places header, HomeHero, LatestPosts, and footer. Owns
                 page-level padding and ordering. Lives in
                 <code>apps/web</code> — it composes
-                <code>@blog/ui</code> organisms, it is not part of
-                <code>@blog/ui</code>.
+                <code>@shinefold/ui</code> organisms, it is not part of
+                <code>@shinefold/ui</code>.
               </p>
               <p>
                 <code><HomePageTemplate /></code>
@@ -4405,8 +4406,8 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               <p>
                 Places header and article content inside a narrower reading
                 column. Owns route-level width. Lives in <code>apps/web</code> —
-                it composes <code>@blog/ui</code> organisms, it is not part of
-                <code>@blog/ui</code>.
+                it composes <code>@shinefold/ui</code> organisms, it is not part
+                of <code>@shinefold/ui</code>.
               </p>
               <p>
                 <code><PostPageTemplate /></code>
@@ -4598,9 +4599,9 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
       <section class="sec" id="next-map">
         <div class="sec-title">Next.js implementation map</div>
         <p class="cap">
-          Atoms, molecules, and organisms map to <code>@blog/ui</code>.
+          Atoms, molecules, and organisms map to <code>@shinefold/ui</code>.
           Templates / routes map to <code>apps/web</code> page compositions —
-          <code>@blog/ui</code> has no template layer.
+          <code>@shinefold/ui</code> has no template layer.
         </p>
         <div class="module-grid">
           <div class="module-card">

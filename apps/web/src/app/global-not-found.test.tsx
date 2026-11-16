@@ -1,5 +1,5 @@
-import { LOCALE_BCP47_TAGS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { LOCALE_BCP47_TAGS } from '@shinefold/config';
 import { StandaloneNotFoundPage } from '@web/components/pages/standalone-not-found-page';
 import { buildNotFoundMetadata } from '@web/metadata/not-found-metadata';
 

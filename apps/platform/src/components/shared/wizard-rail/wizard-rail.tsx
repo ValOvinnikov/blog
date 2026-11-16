@@ -1,7 +1,7 @@
-import type { IWithClassName } from '@blog/config/types';
 import { Card } from '@platform/components/shared/card';
 import { StepIndicator } from '@platform/components/shared/step-indicator';
 import { STEP_INDICATOR_STATE } from '@platform/constants/step-indicator';
+import type { IWithClassName } from '@shinefold/config/types';
 import type { ReactNode } from 'react';
 
 import { wizardRailVariants } from './wizard-rail-variants';

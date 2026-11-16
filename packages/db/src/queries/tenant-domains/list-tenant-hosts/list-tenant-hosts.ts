@@ -1,5 +1,5 @@
-import { listTenantDomains } from '@blog/db/queries/tenant-domains/list-tenant-domains';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { listTenantDomains } from '@shinefold/db/queries/tenant-domains/list-tenant-domains';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export async function listTenantHosts(
   tenant: Pick<TTenant, 'id' | 'primaryDomain'>,

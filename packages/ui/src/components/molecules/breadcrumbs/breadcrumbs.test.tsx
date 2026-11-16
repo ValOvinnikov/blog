@@ -1,8 +1,12 @@
-import { BREADCRUMBS_HOME_ICON_TEST_ID } from '@blog/ui/constants/breadcrumbs';
-import { ARIA_CURRENT } from '@blog/ui/testing/aria';
-import { customRender, screen, within } from '@blog/ui/testing/custom-render';
-import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
+import { BREADCRUMBS_HOME_ICON_TEST_ID } from '@shinefold/ui/constants/breadcrumbs';
+import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
+import {
+  customRender,
+  screen,
+  within,
+} from '@shinefold/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@shinefold/ui/testing/mock-link';
 
 import { Breadcrumbs } from './breadcrumbs';
 

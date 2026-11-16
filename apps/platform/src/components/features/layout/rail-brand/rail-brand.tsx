@@ -1,7 +1,7 @@
-import { SIZE } from '@blog/config';
-import type { IWithClassName } from '@blog/config/types';
 import { BrandLogo } from '@platform/components/shared/brand-logo';
 import { BrandMark } from '@platform/components/shared/brand-mark';
+import { SIZE } from '@shinefold/config';
+import type { IWithClassName } from '@shinefold/config/types';
 import { useTranslations } from 'next-intl';
 
 import { railBrandVariants } from './rail-brand-variants';

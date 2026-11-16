@@ -3,8 +3,8 @@ import {
   SITE_MESSAGES,
   SOCIAL_PLATFORM_LABEL,
   SOCIAL_PLATFORMS,
-} from '@blog/config';
-import type { THeroProfileModule } from '@blog/service';
+} from '@shinefold/config';
+import type { THeroProfileModule } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { MOCK_TEAM_MEMBER_NAME } from '@web/testing/modules/team/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';

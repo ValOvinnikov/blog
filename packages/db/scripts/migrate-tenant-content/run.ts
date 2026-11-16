@@ -1,8 +1,11 @@
 // `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
 // resolve to a no-op outside Next.js's own build.
 
-import { getTenantById, listActiveTenants } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  getTenantById,
+  listActiveTenants,
+} from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 import { readOptionalTenantId } from '../lib/cli-flags';
 import { runIfEntrypoint } from '../lib/run-if-entrypoint';

@@ -1,4 +1,4 @@
-import type { IWithClassName } from '@blog/config/types';
+import type { IWithClassName } from '@shinefold/config/types';
 import type { ElementType, ReactNode, Ref } from 'react';
 
 import { textVariants, type TTextVariants } from './text-variants';

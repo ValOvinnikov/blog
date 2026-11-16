@@ -3,9 +3,9 @@ import {
   SANITY_RESOURCE_TYPE,
   type TMaybeUndefined,
   type TSanityRobotRole,
-} from '@blog/config';
-import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
-import { sanityAccessRequest } from '@blog/db/utils/sanity-management-client/sanity-api-request';
+} from '@shinefold/config';
+import { SANITY_API_PATH } from '@shinefold/db/utils/sanity-management-client/sanity-api-paths';
+import { sanityAccessRequest } from '@shinefold/db/utils/sanity-management-client/sanity-api-request';
 
 export type TSanityRobotToken = { id: string; token: string };
 

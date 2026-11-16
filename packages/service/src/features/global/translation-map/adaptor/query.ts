@@ -1,9 +1,9 @@
-import { q } from '@blog/service/sanity/query/query';
+import { q } from '@shinefold/service/sanity/query/query';
 import {
   PAGE_PATH_EXPRESSION,
   pagePathParser,
-} from '@blog/service/shared/expressions/landing-page/landing-page-path';
-import { pageLanguagesQuery } from '@blog/service/shared/localization/page-languages/page-languages';
+} from '@shinefold/service/shared/expressions/landing-page/landing-page-path';
+import { pageLanguagesQuery } from '@shinefold/service/shared/localization/page-languages/page-languages';
 
 export const translationMapQuery = q.project((root) => ({
   groups: root.star.filterByType('translation.metadata').project((group) => ({

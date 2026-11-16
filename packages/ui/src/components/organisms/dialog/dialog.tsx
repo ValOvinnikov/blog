@@ -4,11 +4,11 @@ import {
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { IconButton } from '@blog/ui/components/atoms/icon-button';
-import type { THeadingLevel } from '@blog/ui/lib/react';
+} from '@shinefold/config';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
+import type { THeadingLevel } from '@shinefold/ui/lib/react';
 import { useRef, type ReactNode, type RefObject } from 'react';
 
 import { dialogVariants } from './dialog-variants';

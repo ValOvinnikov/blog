@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { emailConfig } from '@blog/db/schema/email-config';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { emailConfig } from '@shinefold/db/schema/email-config';
 import { eq } from 'drizzle-orm';
 
 export async function getNewsletterPausedAt(

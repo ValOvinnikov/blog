@@ -1,4 +1,3 @@
-import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { TAccount } from '@platform/components/features/layout/account-menu';
 import type {
@@ -11,6 +10,7 @@ import type {
 } from '@platform/components/features/layout/sidebar';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
+import { ICONS } from '@shinefold/config';
 
 type TNavLinkItem = Extract<TSidebarNavItem, { href: string }>;
 type TNavInertItem = Exclude<TSidebarNavItem, TNavLinkItem>;

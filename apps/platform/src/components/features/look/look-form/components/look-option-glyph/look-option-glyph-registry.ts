@@ -1,37 +1,3 @@
-import {
-  ACCOUNT_BUTTON_STYLE,
-  ACCOUNT_PANEL_STYLE,
-  ACCOUNT_PHONE_PLACEMENT,
-  BUSY_BUTTON_STYLE,
-  BUTTON_SHAPE,
-  COOKIE_SETTINGS_BUTTON,
-  DENSITY,
-  FOOTER_LAYOUT,
-  FOOTER_SURFACE,
-  HEADER_BAR_STYLE,
-  HEADER_CONTROL_SHAPE,
-  HEADER_CONTROL_STYLE,
-  HEADER_LAYOUT,
-  HEADER_SUBMENU_STYLE,
-  LANGUAGE_SWITCHER_STYLE,
-  RADIUS_SCALE,
-  type TAccountButtonStyle,
-  type TAccountPanelStyle,
-  type TAccountPhonePlacement,
-  type TBusyButtonStyle,
-  type TButtonShape,
-  type TCookieSettingsButton,
-  type TDensity,
-  type TFooterLayout,
-  type TFooterSurface,
-  type THeaderBarStyle,
-  type THeaderControlShape,
-  type THeaderControlStyle,
-  type THeaderLayout,
-  type THeaderSubmenuStyle,
-  type TLanguageSwitcherStyle,
-  type TRadiusScale,
-} from '@blog/config';
 import AccountButtonStyleCircle from '@platform/assets/look-glyphs/account-button-style-circle.svg';
 import AccountButtonStylePill from '@platform/assets/look-glyphs/account-button-style-pill.svg';
 import AccountPanelStyleCard from '@platform/assets/look-glyphs/account-panel-style-card.svg';
@@ -81,6 +47,40 @@ import RadiusScaleNone from '@platform/assets/look-glyphs/radius-scale-none.svg'
 import RadiusScaleSm from '@platform/assets/look-glyphs/radius-scale-sm.svg';
 import RadiusScaleXl from '@platform/assets/look-glyphs/radius-scale-xl.svg';
 import type { TGlyph } from '@platform/components/shared/icon';
+import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
+  BUSY_BUTTON_STYLE,
+  BUTTON_SHAPE,
+  COOKIE_SETTINGS_BUTTON,
+  DENSITY,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
+  HEADER_BAR_STYLE,
+  HEADER_CONTROL_SHAPE,
+  HEADER_CONTROL_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
+  LANGUAGE_SWITCHER_STYLE,
+  RADIUS_SCALE,
+  type TAccountButtonStyle,
+  type TAccountPanelStyle,
+  type TAccountPhonePlacement,
+  type TBusyButtonStyle,
+  type TButtonShape,
+  type TCookieSettingsButton,
+  type TDensity,
+  type TFooterLayout,
+  type TFooterSurface,
+  type THeaderBarStyle,
+  type THeaderControlShape,
+  type THeaderControlStyle,
+  type THeaderLayout,
+  type THeaderSubmenuStyle,
+  type TLanguageSwitcherStyle,
+  type TRadiusScale,
+} from '@shinefold/config';
 
 type TLookOptionGlyphValues = {
   radiusScale: TRadiusScale;

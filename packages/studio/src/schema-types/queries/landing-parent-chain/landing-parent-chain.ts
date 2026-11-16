@@ -1,6 +1,6 @@
-import { LANDING_PAGE_MAX_DEPTH } from '@blog/config/constants';
-import { SECTION_NAVIGATION_FIELD } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
+import { LANDING_PAGE_MAX_DEPTH } from '@shinefold/config/constants';
+import { SECTION_NAVIGATION_FIELD } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 
 export type TLandingParentChainNode = {
   _id: string;

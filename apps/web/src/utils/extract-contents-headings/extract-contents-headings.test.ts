@@ -1,5 +1,5 @@
-import type { TPortableTextBody } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import type { TPortableTextBody } from '@shinefold/service';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import {

@@ -1,6 +1,6 @@
-import { IMAGE_LAYOUT } from '@blog/config';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { IMAGE_LAYOUT } from '@shinefold/config';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 
 import { ImageWithCaption } from './image-with-caption';
 

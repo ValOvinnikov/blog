@@ -1,4 +1,4 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import { z } from 'zod';
 
 export const signInAppInputSchema = z.object({

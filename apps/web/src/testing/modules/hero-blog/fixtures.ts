@@ -1,5 +1,5 @@
-import { BRAND_VARIANT } from '@blog/config';
-import type { THeroBlogModule } from '@blog/service';
+import { BRAND_VARIANT } from '@shinefold/config';
+import type { THeroBlogModule } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeroPresentation } from '@web/testing/shared/hero-presentation/fixtures';
 

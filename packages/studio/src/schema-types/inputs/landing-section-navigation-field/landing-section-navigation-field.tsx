@@ -1,9 +1,9 @@
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { isInsideSection } from '@blog/studio/schema-types/inputs/landing-section-navigation-field/is-inside-section';
+import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { isInsideSection } from '@shinefold/studio/schema-types/inputs/landing-section-navigation-field/is-inside-section';
 import {
   LANDING_PARENT_CHAIN_QUERY,
   type TLandingParentChainNode,
-} from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
+} from '@shinefold/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
 import { useEffect, useState } from 'react';
 import {
   type BooleanFieldProps,

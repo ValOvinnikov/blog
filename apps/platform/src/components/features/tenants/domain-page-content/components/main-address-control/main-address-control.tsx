@@ -1,12 +1,5 @@
 'use client';
 
-import {
-  isOutcomeInvalid,
-  isOutcomeRefused,
-  isOutcomeSuccess,
-  SIZE,
-} from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
 import { domainNameTag } from '@platform/components/features/tenants/domain-page-content/components/domain-name/domain-name';
 import { MainAddressSignInAppsWarning } from '@platform/components/features/tenants/domain-page-content/components/main-address-sign-in-apps-warning/main-address-sign-in-apps-warning';
@@ -20,6 +13,13 @@ import { makeCustomDomainMainAddressAction } from '@platform/server/custom-domai
 import { makeSubdomainMainAddressAction } from '@platform/server/custom-domain/make-subdomain-main-address-action';
 import { CUSTOM_DOMAIN_REFUSAL_KEYS } from '@platform/utils/custom-domain-keys/custom-domain-keys';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import {
+  isOutcomeInvalid,
+  isOutcomeRefused,
+  isOutcomeSuccess,
+  SIZE,
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 

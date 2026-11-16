@@ -73,7 +73,7 @@ Every public page of a tenant's site is a Sanity page document of one of thirtee
 
 ## Constraints and invariants
 
-- The types and their routes are fixed in code. `routes` and `pageHref` in `@blog/config` are the only place a page type maps to a URL; `RESERVED_SLUGS` lists the segments a top-level Landing slug may not use. It does not match the routes exactly: it reserves `category`, `tag`, `author` and `page`, which are not top-level routes, and omits the fixed `/bookmarks` and `/account` routes, so a top-level Landing page with either slug is hidden behind them.
+- The types and their routes are fixed in code. `routes` and `pageHref` in `@shinefold/config` are the only place a page type maps to a URL; `RESERVED_SLUGS` lists the segments a top-level Landing slug may not use. It does not match the routes exactly: it reserves `category`, `tag`, `author` and `page`, which are not top-level routes, and omits the fixed `/bookmarks` and `/account` routes, so a top-level Landing page with either slug is hidden behind them.
 - Home, Post Index, Topic Index, Tag Index, Privacy Index, Legal Index and Cookie Statement allow one document per language (`validateOnePerLanguage`).
 - Slugged types (Post, Topic, Tag) require a slug unique within their type and language; Landing slugs are unique among siblings (see [landing-tree](./landing-tree.md)).
 - A page whose template differs from its default-language version's template gets a warning, not an error.

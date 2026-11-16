@@ -1,6 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import type { TTenantPickerItem } from '@platform/server/tenants/to-tenant-picker-items';
@@ -16,6 +13,9 @@ import {
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { fireEvent } from '@testing-library/react';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 

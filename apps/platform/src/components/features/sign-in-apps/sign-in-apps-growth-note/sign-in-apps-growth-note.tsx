@@ -1,5 +1,5 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
 import { GrowthNote } from '@platform/components/shared/growth-note';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 
 export const SignInAppsGrowthNote = () => {

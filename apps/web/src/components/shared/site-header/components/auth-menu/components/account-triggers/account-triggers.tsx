@@ -7,8 +7,8 @@ import {
   type IWithClassName,
   type TMaybeNull,
   type TMaybeUndefined,
-} from '@blog/config';
-import { AccountTrigger } from '@blog/ui/components/molecules/account-trigger';
+} from '@shinefold/config';
+import { AccountTrigger } from '@shinefold/ui/components/molecules/account-trigger';
 import type { IReaderAccountUser } from '@web/components/shared/reader-account-panel';
 import type { TUsePopoverResult } from '@web/hooks/use-popover';
 import { useTranslations } from 'next-intl';

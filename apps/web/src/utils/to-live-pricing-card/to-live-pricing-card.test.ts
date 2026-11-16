@@ -1,4 +1,8 @@
-import { BILLING_CURRENCY, STRIPE_COUPON_DURATION } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
+import {
+  BILLING_CURRENCY,
+  STRIPE_COUPON_DURATION,
+} from '@shinefold/db/constants';
 import {
   MOCK_DOLLAR_AMOUNT,
   MOCK_DURATION_IN_MONTHS,
@@ -6,8 +10,7 @@ import {
   MOCK_PERCENT_OFF,
   MOCK_PROMOTION_CODE,
   MOCK_STRIPE_PRODUCT_ID,
-} from '@blog/db/testing/stripe-catalogue/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/stripe-catalogue/fixtures';
 import { PRICING_SEARCH_PARAM } from '@web/constants/pricing';
 import { MOCK_CTA_PRIMARY_ACTION } from '@web/testing/modules/cta/fixtures';
 import {

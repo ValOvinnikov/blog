@@ -1,4 +1,3 @@
-import { PLAN_REGISTRY } from '@blog/db/constants';
 import { FeaturesSettings } from '@platform/components/features/capabilities/features-settings';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
@@ -6,6 +5,7 @@ import {
   clampToEntitlement,
   withComingSoonOff,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
+import { PLAN_REGISTRY } from '@shinefold/db/constants';
 
 export type TFeaturesPageContentProps = {
   tenant: TPlatformTenant;

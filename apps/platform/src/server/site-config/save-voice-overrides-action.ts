@@ -1,19 +1,5 @@
 'use server';
 
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  VOICE_FIELDS,
-  type TLocalizedActionResult,
-  type TVoiceFieldErrorReason,
-  type TVoiceFieldId,
-} from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { SITE_CONFIG_SAVED_AT } from '@blog/db/constants';
-import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -22,6 +8,20 @@ import { getSiteConfigOrDefaults } from '@platform/server/site-config/site-confi
 import { stampSavedAt } from '@platform/server/site-config/stamp-saved-at';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  VOICE_FIELDS,
+  type TLocalizedActionResult,
+  type TVoiceFieldErrorReason,
+  type TVoiceFieldId,
+} from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { SITE_CONFIG_SAVED_AT } from '@shinefold/db/constants';
+import type { TVoiceOverridesByLocaleInput } from '@shinefold/db/queries/site-config';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
 const voiceFieldIdSchema = z.enum(VOICE_FIELDS.map(({ id }) => id));

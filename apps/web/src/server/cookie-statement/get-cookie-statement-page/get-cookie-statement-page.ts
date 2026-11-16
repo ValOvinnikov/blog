@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { service, type TCookieStatementPage } from '@blog/service';
-import type { TResult } from '@blog/utils';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { service, type TCookieStatementPage } from '@shinefold/service';
+import type { TResult } from '@shinefold/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { cache } from 'react';
 

@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   CONTAINER_WIDTH,
   IMAGE_LAYOUT,
@@ -7,21 +8,20 @@ import {
   SPACING_SCALE,
   type ILink,
   type ISanityImage,
-} from '@blog/config';
-import type { postLinkFragment } from '@blog/service/shared/fragments/post/post-link';
-import type { TRawHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import type { TRawSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
+} from '@shinefold/config';
+import type { postLinkFragment } from '@shinefold/service/shared/fragments/post/post-link';
+import type { TRawHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import type { TRawSanityImage } from '@shinefold/service/shared/transformers/image/to-sanity-image';
 import type {
   TRawHeroLayout,
   TRawWideLayout,
-} from '@blog/service/shared/transformers/layout/to-layout';
-import type { TRawLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
-import type { TRawPersonProfile } from '@blog/service/shared/transformers/person/to-person-profile';
-import type { TRawPortableTextBody } from '@blog/service/shared/transformers/portable-text/to-portable-text-body';
-import type { TRawPortableTextMarkDef } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
-import type { TRawSeo } from '@blog/service/shared/transformers/seo/resolve-seo';
-import type { TRawSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/shared/transformers/layout/to-layout';
+import type { TRawLinkDocument } from '@shinefold/service/shared/transformers/link/to-link-document';
+import type { TRawPersonProfile } from '@shinefold/service/shared/transformers/person/to-person-profile';
+import type { TRawPortableTextBody } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-body';
+import type { TRawPortableTextMarkDef } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-mark-def';
+import type { TRawSeo } from '@shinefold/service/shared/transformers/seo/resolve-seo';
+import type { TRawSocialProfile } from '@shinefold/service/shared/transformers/social-profile/to-social-profile';
 import type { InferFragmentType } from 'groqd';
 
 type TRawPostLink = InferFragmentType<typeof postLinkFragment>;

@@ -1,4 +1,4 @@
-import { pageHref, type TMaybeUndefined } from '@blog/config';
+import { pageHref, type TMaybeUndefined } from '@shinefold/config';
 import type { InferResultType } from 'groqd';
 
 import type { sectionDocumentByKindQuery } from './query';

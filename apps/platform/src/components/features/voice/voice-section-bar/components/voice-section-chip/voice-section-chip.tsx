@@ -1,6 +1,5 @@
 'use client';
 
-import { ICONS } from '@blog/config';
 import { useVoiceEditor } from '@platform/components/features/voice/voice-editor-provider';
 import { Icon } from '@platform/components/shared/icon';
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
@@ -10,6 +9,7 @@ import {
   countVoiceSectionErrors,
   voiceSectionHref,
 } from '@platform/utils/voice-sections/voice-sections';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import type { Ref } from 'react';
 

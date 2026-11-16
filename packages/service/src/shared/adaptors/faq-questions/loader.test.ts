@@ -1,21 +1,21 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_FAQ_MODULE_ID,
   mockRawFaqModuleQuestions,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_BLOCK_FAQ_CACHE_TAG,
   MOCK_LINK_TARGET_CACHE_TAGS,
   MOCK_MODULES_FAQ_CACHE_TAG,
-} from '@blog/service/testing/sanity/query/cache-tags';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getFaqQuestions } from './loader';
 import { faqQuestionsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6020);
 

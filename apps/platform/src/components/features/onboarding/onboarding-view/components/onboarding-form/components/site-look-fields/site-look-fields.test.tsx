@@ -1,7 +1,7 @@
-import { PRESET_ID } from '@blog/config';
 import { ACCENT_SWATCH_TEST_ID } from '@platform/constants/accent-swatch';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { PRESET_ID } from '@shinefold/config';
 import userEvent from '@testing-library/user-event';
 
 import { SiteLookFields } from './site-look-fields';

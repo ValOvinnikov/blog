@@ -1,6 +1,6 @@
-import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { textVariants } from '@platform/components/shared/text/text-variants';
 import { useHasPoweredByMark } from '@platform/context/powered-by-mark-provider';
+import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 import { useTranslations } from 'next-intl';
 
 export const FooterPoweredByNote = () => {

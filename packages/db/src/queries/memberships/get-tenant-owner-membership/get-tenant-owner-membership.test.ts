@@ -1,27 +1,27 @@
-import type { TMaybeNull } from '@blog/config/types';
-import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
-import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
-import * as schema from '@blog/db/schema';
-import { GITHUB_PROVIDER } from '@blog/db/testing/account/fixtures';
+import { faker } from '@faker-js/faker';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { MEMBERSHIP_ROLE, type TMembershipRole } from '@shinefold/db/constants';
+import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
+import * as schema from '@shinefold/db/schema';
+import { GITHUB_PROVIDER } from '@shinefold/db/testing/account/fixtures';
 import {
   insertTestAccount,
   insertTestTenant,
   insertTestUser,
   MOCK_EMAIL_VERIFIED_AT,
   MOCK_OWNER_EMAIL,
-} from '@blog/db/testing/fixtures';
+} from '@shinefold/db/testing/fixtures';
 import {
   MOCK_INVITE_CONSUMED_AT,
   mockMembershipInvite,
-} from '@blog/db/testing/membership-invites/fixtures';
-import { mockMembership } from '@blog/db/testing/memberships/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { isNull } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/membership-invites/fixtures';
+import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { isNull } from '@shinefold/utils/primitives';
 
 import { getTenantOwnerMembership } from './get-tenant-owner-membership';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(5765);
 

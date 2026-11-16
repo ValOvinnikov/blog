@@ -1,12 +1,12 @@
-import { POST_SOURCE } from '@blog/config/constants';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
-import { mockDocument } from '@blog/studio/testing/mock-documents';
+import { faker } from '@faker-js/faker';
+import { POST_SOURCE } from '@shinefold/config/constants';
+import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
+import { validateNewestFeaturedHasCandidate } from '@shinefold/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
+import { mockDocument } from '@shinefold/studio/testing/mock-documents';
 import {
   mockFetchContext,
   mockGroqValidationContext,
-} from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/mock-validation-context';
 
 faker.seed(6031);
 

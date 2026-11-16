@@ -4,10 +4,10 @@ import type {
   TDisplayMode,
   TMaybeUndefined,
   THeadingBlock,
-} from '@blog/config';
-import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
-import type { TModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
-import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card';
+} from '@shinefold/config';
+import type { TWideLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
+import type { TModuleAppearance } from '@shinefold/service/shared/transformers/module/to-module-appearance';
+import type { TPostCard } from '@shinefold/service/shared/transformers/post/to-post-card';
 
 export type TPostLatestModule = TModuleAppearance & {
   brandVariant: TBrandVariant;

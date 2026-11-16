@@ -1,30 +1,30 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_ENGLISH_MODULE_HEADING,
   MOCK_NEWSLETTER_MODULE_ID,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   mockHeroSlotView,
   mockRawBlogPage,
   mockRawHeroRef,
-} from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_PAGE_POST_INDEX_CACHE_TAG,
   MOCK_TEMPLATE_POST_INDEX_CACHE_TAG,
-} from '@blog/service/testing/sanity/query/cache-tags';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   mockRawHeadingBlock,
   mockRawSeo,
-} from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getIndexPage } from './loader';
 import { blogPageQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6022);
 

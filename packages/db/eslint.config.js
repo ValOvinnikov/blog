@@ -1,3 +1,3 @@
-import config from '@blog/eslint-config/db';
+import config from '@shinefold/eslint-config/db';
 
 export default [...config];

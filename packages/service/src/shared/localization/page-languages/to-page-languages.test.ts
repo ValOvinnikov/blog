@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 
 import { toPageLanguages } from './to-page-languages';
 

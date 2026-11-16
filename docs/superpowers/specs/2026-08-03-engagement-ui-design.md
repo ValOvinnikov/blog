@@ -36,7 +36,7 @@ Five engagement issues were filed with acceptance criteria that describe **data
 shape, not UI** — each explicitly says it needs a design/brainstorm pass before
 implementation. This document is that pass. It resolves, for each feature:
 placement and composition on the page, interaction shape, the full set of
-states, responsive/theme behaviour, and the concrete `@blog/ui` component
+states, responsive/theme behaviour, and the concrete `@shinefold/ui` component
 boundaries with prop sketches. It also resolves the cross-cutting questions the
 issues left open (bookmarks-vs-likes, thread depth, moderation home, newsletter
 placement) as **logged decisions**, and specifies how the five features compose
@@ -51,7 +51,7 @@ feature as an epic + per-layer sub-issues.
 These are load-bearing — they change what the components can be, not just how
 they look.
 
-1. **`@blog/ui` stays pure.** Every component is prop-driven and
+1. **`@shinefold/ui` stays pure.** Every component is prop-driven and
    callback-based (`value`/`onChange`, `on*` handlers), owns **no** client
    state, and never ships `'use client'`. All state — Auth.js session, comment
    list, rating value, bookmark toggle, newsletter form status — lives in an
@@ -80,7 +80,7 @@ they look.
    comes from `configs/tailwind/theme.css` tokens (`--surface`, `--border`,
    `--accent`, `--text-muted`, `--spacing-section`, `rounded-sm`,
    `duration-base ease-console`) — no hardcoded values. Styling uses the `tv`
-   wrapper from `@blog/ui/lib/styling`, never `tailwind-variants` directly.
+   wrapper from `@shinefold/ui/lib/styling`, never `tailwind-variants` directly.
 
 ## Cross-cutting foundations (build once, used by many)
 
@@ -89,7 +89,7 @@ several, and are easy to miss if each issue is read in isolation.
 
 ### Form-input primitives (new — shared by #1040 and #1044)
 
-`@blog/ui` currently has **no text-input primitives** — there is no `Input` or
+`@shinefold/ui` currently has **no text-input primitives** — there is no `Input` or
 `Textarea` atom anywhere in the library (the atom set is avatar…theme-toggle,
 none of them a field). Both the comment form and the newsletter form need one.
 Rather than each feature inventing its own, the design introduces two pure,
@@ -135,10 +135,10 @@ body. This shell is not called out anywhere else in this document, but it is
 load-bearing for every feature reading `## X — visual treatment` below —
 without it, an implementation reads as generic Tailwind UI rather than this
 site's terminal/console voice (the same voice `PostCard`, `CommandLink`, and
-`SegmentedControl` already established elsewhere in `@blog/ui`).
+`SegmentedControl` already established elsewhere in `@shinefold/ui`).
 
 > **Decision D14 (foundational, added retroactively):** introduce a shared
-> `@blog/ui` "window chrome" compound component (title-bar + body slots, the
+> `@shinefold/ui` "window chrome" compound component (title-bar + body slots, the
 > `.win`/`.win__bar`/`.win__body`/`.tag` pattern in the mock) as shared
 > scaffolding for Features 1–5, the same way D0 introduced `TextInput`/
 > `Textarea`. Rationale: this cross-cutting gap is exactly why Feature 1's
@@ -155,7 +155,7 @@ The icon set (`packages/ui/src/assets/icons/`) has `github`, `share`, `copy`,
 etc., but is **missing**: a **`google`** glyph (auth provider button) and a
 **`bookmark`** glyph (bookmark toggle — outline only; the filled/active look is
 a CSS fill toggle on the same asset, not a second SVG). These are small
-`@blog/ui` asset additions and are called out per-feature below.
+`@shinefold/ui` asset additions and are called out per-feature below.
 
 ### Loading spinner (new — shared by every feature's async state)
 
@@ -165,7 +165,7 @@ account). Rather than each inventing a spinner, the design introduces one shared
 pure `Spinner` atom in the console idiom — a **braille-dot cycle**
 (`⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏`) rendered in `--font-mono`/`--accent`. It is **CSS-only** (the
 animation swaps `::before` content across keyframes), so it needs no `'use
-client'` and stays a valid `@blog/ui` atom. A11y: `role="status"` with the
+client'` and stays a valid `@shinefold/ui` atom. A11y: `role="status"` with the
 accessible name from a required `label` prop; the animated glyph is
 `aria-hidden`; `prefers-reduced-motion` freezes it on a stable glyph (no cycle).
 
@@ -211,7 +211,7 @@ primitive there. `/bookmarks` composes a **new** pure organism,
 **Decision (accepted): header popover.** Sign-in surfaces as a `PopoverMenu`
 from a header button, not a dedicated `/login` route and not a modal — it
 reuses an existing molecule, changes no route, and keeps the reader on the
-article (no engagement-context loss). A modal was rejected because `@blog/ui`
+article (no engagement-context loss). A modal was rejected because `@shinefold/ui`
 has no dialog primitive and three sign-in options don't justify building a
 focus-trapped one.
 
@@ -228,7 +228,7 @@ surface).
 **Placement & composition.** The control lives in the Header's **trailing
 actions cluster**, beside `ThemeToggleButton`, via `SiteNavigation`'s existing
 `actions` prop into `PrimaryNavigation` (`actions={<><ThemeToggleButton /><AuthMenu /></>}`).
-No new Header slot. Auth needs **no new `@blog/ui` composition** — it composes
+No new Header slot. Auth needs **no new `@shinefold/ui` composition** — it composes
 existing pure pieces plus the already-shipped `TextInput` atom (#1091):
 
 - _Logged-out:_ a `Button` ("Sign in") triggers a `PopoverMenu` with three
@@ -310,7 +310,7 @@ left offset that **collapses to one step on mobile**. Surfaces `--surface` /
 `--surface-2`; the pending badge uses `--accent-muted`. Dates arrive
 **pre-formatted** from `web`.
 
-**Component surface (`@blog/ui`, pure):**
+**Component surface (`@shinefold/ui`, pure):**
 
 ```ts
 // organisms/comments-section — labeled section wrapper (mirrors PostsSection)
@@ -396,7 +396,7 @@ inline retry; optimistic value rolls back on failure.
 **Responsive / theme.** Filled `--accent`, empty `--border`/`--text-subtle`;
 touch targets ≥44px on mobile; the whole block stays one row.
 
-**Component surface (`@blog/ui`, pure) — split display vs input:**
+**Component surface (`@shinefold/ui`, pure) — split display vs input:**
 
 ```ts
 // atoms/rating-summary — read-only aggregate, terminal-gauge glyphs
@@ -465,7 +465,7 @@ save a post to find it here."
 **Responsive / theme.** Icon target ≥44px on mobile; filled `--accent`,
 outline `--text-subtle`. Uses `aria-pressed` for toggle state.
 
-**Component surface (`@blog/ui`, pure):**
+**Component surface (`@shinefold/ui`, pure):**
 
 ```ts
 // atoms/bookmark-toggle
@@ -538,7 +538,7 @@ screens; `full` box constrains to `max-w-copy`. Tokens throughout;
 the `full` variant may use the `tinted` section treatment already in
 `PostsSection`.
 
-**Component surface (`@blog/ui`, pure):**
+**Component surface (`@shinefold/ui`, pure):**
 
 ```ts
 // organisms/newsletter-signup
@@ -644,7 +644,7 @@ contextually, rather than four different logged-out treatments.
 
 ---
 
-## Consolidated `@blog/ui` component list
+## Consolidated `@shinefold/ui` component list
 
 | Component                        | Kind     | New?    | Purity / a11y notes                                                                                                                 |
 | -------------------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -673,21 +673,21 @@ toggle, not a second asset). New `apps/web` islands: `AuthMenu`,
 
 ## Decision log
 
-| #   | Decision               | Chosen                                             | Rejected alternatives                    |
-| --- | ---------------------- | -------------------------------------------------- | ---------------------------------------- |
-| D0  | Form primitives        | Shared `TextInput` + `Textarea` atoms, built first | Per-feature one-off inputs               |
-| D1  | Sign-in affordance     | Header `PopoverMenu`                               | Dedicated `/login` route; modal dialog   |
-| D2  | Comment thread depth   | One reply level (`@author` beyond)                 | Full nesting + collapse; flat            |
-| D3  | Comment edit/delete    | Delete only (soft-delete tombstone)                | Edit + delete; neither                   |
-| D4  | Rating form            | 5 stars in console/terminal idiom                  | Numeric segmented; thumbs                |
-| D5  | Rating placement       | End of article, above comments                     | Header meta; header + end                |
-| D6  | #1043 scope            | **Bookmarks only**                                 | Likes only; both                         |
-| D7  | Newsletter placement   | Footer + CMS module + end-of-article               | Fewer surfaces                           |
-| D8  | Article-end newsletter | `compact` strip variant                            | `full` box; drop it                      |
-| D9  | Newsletter opt-in      | Double opt-in                                      | Single opt-in                            |
-| D10 | Moderation             | `/admin` queue now, auto pre-filter later          | Fully automatic only; Sanity Studio tool |
-| D13 | Sign-in methods        | GitHub + Google OAuth + email magic link           | More OAuth providers; email+password     |
-| D14 | Shared window chrome   | New `@blog/ui` compound, built once for all five   | Per-feature inline chrome (what shipped) |
+| #   | Decision               | Chosen                                                | Rejected alternatives                    |
+| --- | ---------------------- | ----------------------------------------------------- | ---------------------------------------- |
+| D0  | Form primitives        | Shared `TextInput` + `Textarea` atoms, built first    | Per-feature one-off inputs               |
+| D1  | Sign-in affordance     | Header `PopoverMenu`                                  | Dedicated `/login` route; modal dialog   |
+| D2  | Comment thread depth   | One reply level (`@author` beyond)                    | Full nesting + collapse; flat            |
+| D3  | Comment edit/delete    | Delete only (soft-delete tombstone)                   | Edit + delete; neither                   |
+| D4  | Rating form            | 5 stars in console/terminal idiom                     | Numeric segmented; thumbs                |
+| D5  | Rating placement       | End of article, above comments                        | Header meta; header + end                |
+| D6  | #1043 scope            | **Bookmarks only**                                    | Likes only; both                         |
+| D7  | Newsletter placement   | Footer + CMS module + end-of-article                  | Fewer surfaces                           |
+| D8  | Article-end newsletter | `compact` strip variant                               | `full` box; drop it                      |
+| D9  | Newsletter opt-in      | Double opt-in                                         | Single opt-in                            |
+| D10 | Moderation             | `/admin` queue now, auto pre-filter later             | Fully automatic only; Sanity Studio tool |
+| D13 | Sign-in methods        | GitHub + Google OAuth + email magic link              | More OAuth providers; email+password     |
+| D14 | Shared window chrome   | New `@shinefold/ui` compound, built once for all five | Per-feature inline chrome (what shipped) |
 
 ## Non-goals (recorded for the eventual builds)
 

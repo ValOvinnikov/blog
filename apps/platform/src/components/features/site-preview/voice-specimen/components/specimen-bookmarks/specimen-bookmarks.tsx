@@ -1,11 +1,11 @@
-import type { TVoiceFieldId, TVoicePortableText } from '@blog/config';
-import { headingVariants } from '@blog/ui/components/atoms/heading/heading-variants';
-import { Panel } from '@blog/ui/components/molecules/panel';
-import { panelHeaderVariants } from '@blog/ui/components/molecules/panel/components/header/panel-header-variants';
-import { panelVariants } from '@blog/ui/components/molecules/panel/panel-variants';
-import { BookmarksList } from '@blog/ui/components/organisms/bookmarks-list';
 import { VoiceKeyFrame } from '@platform/components/features/site-preview/voice-key-frame';
 import { VoiceRichText } from '@platform/components/features/site-preview/voice-rich-text';
+import type { TVoiceFieldId, TVoicePortableText } from '@shinefold/config';
+import { headingVariants } from '@shinefold/ui/components/atoms/heading/heading-variants';
+import { Panel } from '@shinefold/ui/components/molecules/panel';
+import { panelHeaderVariants } from '@shinefold/ui/components/molecules/panel/components/header/panel-header-variants';
+import { panelVariants } from '@shinefold/ui/components/molecules/panel/panel-variants';
+import { BookmarksList } from '@shinefold/ui/components/organisms/bookmarks-list';
 
 import { specimenBookmarksVariants } from './specimen-bookmarks-variants';
 

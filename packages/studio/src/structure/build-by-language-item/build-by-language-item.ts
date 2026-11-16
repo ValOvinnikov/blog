@@ -2,11 +2,11 @@ import {
   LOCALE_ISO_CODES,
   LOCALE_NATIVE_LABEL,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { isSingleLanguage } from '@blog/studio/structure/locales/is-single-language';
-import { templateIdFor } from '@blog/studio/structure/locales/template-id-for';
-import type { TPageItem } from '@blog/studio/structure/page-item/page-item';
+} from '@shinefold/config/constants';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
+import { isSingleLanguage } from '@shinefold/studio/structure/locales/is-single-language';
+import { templateIdFor } from '@shinefold/studio/structure/locales/template-id-for';
+import type { TPageItem } from '@shinefold/studio/structure/page-item/page-item';
 import type {
   ChildResolver,
   ListItemBuilder,

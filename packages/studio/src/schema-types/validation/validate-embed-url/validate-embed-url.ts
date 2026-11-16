@@ -1,4 +1,4 @@
-import { parseEmbedUrl, type TMaybeUndefined } from '@blog/config';
+import { parseEmbedUrl, type TMaybeUndefined } from '@shinefold/config';
 
 const toHost = (value: string) =>
   URL.canParse(value.trim()) ? new URL(value.trim()).hostname : undefined;

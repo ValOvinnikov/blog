@@ -1,5 +1,5 @@
-import type { TValueOf } from '@blog/config/utils';
-import type { TSiteConfig } from '@blog/db/schema/site-config';
+import type { TValueOf } from '@shinefold/config/utils';
+import type { TSiteConfig } from '@shinefold/db/schema/site-config';
 
 // Values are site_config column names, so they keep the schema's camelCase.
 export const LOOK_FIELD = {

@@ -1,14 +1,18 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT, MEDIA_ORDER } from '@blog/config';
-import { CtaModule } from '@blog/ui/components/organisms/cta-module';
-import { ctaModuleVariants } from '@blog/ui/components/organisms/cta-module/cta-module-variants';
-import { CardStyles } from '@blog/ui/testing/card-styles';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  MEDIA_ORDER,
+} from '@shinefold/config';
+import { CtaModule } from '@shinefold/ui/components/organisms/cta-module';
+import { ctaModuleVariants } from '@shinefold/ui/components/organisms/cta-module/cta-module-variants';
+import { CardStyles } from '@shinefold/ui/testing/card-styles';
 import {
   MOCK_CTA_PRIMARY_AND_INLINE_LINK,
   MOCK_CTA_PRIMARY_AND_SECONDARY,
   mockCtaImage,
   mockCtaSlots,
-} from '@blog/ui/testing/organisms/cta-module/fixtures';
-import { objectKeys } from '@blog/utils/primitives';
+} from '@shinefold/ui/testing/organisms/cta-module/fixtures';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const SPLIT_COPY = {

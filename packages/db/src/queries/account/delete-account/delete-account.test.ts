@@ -1,21 +1,25 @@
-import { AUDIT_ACTION, ERROR_CODE } from '@blog/config/constants';
-import { ADMIN_ROLE, GRANTED_VIA, MEMBERSHIP_ROLE } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { GITHUB_PROVIDER } from '@blog/db/testing/account/fixtures';
-import { insertTestAuditEvent } from '@blog/db/testing/audit-events/fixtures';
+import { faker } from '@faker-js/faker';
+import { AUDIT_ACTION, ERROR_CODE } from '@shinefold/config/constants';
+import {
+  ADMIN_ROLE,
+  GRANTED_VIA,
+  MEMBERSHIP_ROLE,
+} from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { GITHUB_PROVIDER } from '@shinefold/db/testing/account/fixtures';
+import { insertTestAuditEvent } from '@shinefold/db/testing/audit-events/fixtures';
 import {
   insertTestAccount,
   insertTestTenant,
   insertTestUser,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { errorResult, okResult } from '@shinefold/utils';
 import { eq } from 'drizzle-orm';
 
 import { deleteAccount } from './delete-account';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(602201);
 

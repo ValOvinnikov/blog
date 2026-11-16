@@ -1,4 +1,4 @@
-import { isLocaleIsoCode } from '@blog/config';
+import { isLocaleIsoCode } from '@shinefold/config';
 import { isValidTenantId } from '@web/utils/is-tenant-shaped-path-segment';
 
 export const toPublicPathname = (pathname: string): string => {

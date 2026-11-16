@@ -1,8 +1,8 @@
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import { listSuperadminEmails } from '@blog/db/queries/admins';
-import { sendEmail, type TSendEmailInput } from '@blog/email';
-import { sanitizeLogMessage } from '@blog/insight';
-import { hasLength } from '@blog/utils/primitives';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import { listSuperadminEmails } from '@shinefold/db/queries/admins';
+import { sendEmail, type TSendEmailInput } from '@shinefold/email';
+import { sanitizeLogMessage } from '@shinefold/insight';
+import { hasLength } from '@shinefold/utils/primitives';
 import { DEFAULT_OPERATOR_ALERT_FROM_ADDRESS } from '@worker/constants/operator-alert';
 import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';

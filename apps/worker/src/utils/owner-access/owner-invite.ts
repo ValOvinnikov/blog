@@ -1,13 +1,13 @@
-import { SANITY_PROJECT_ROLE } from '@blog/config';
-import { TENANT_OWNER_EMAIL } from '@blog/db/constants';
-import { setTenantOwnerAccess } from '@blog/db/queries/tenants';
+import { SANITY_PROJECT_ROLE } from '@shinefold/config';
+import { TENANT_OWNER_EMAIL } from '@shinefold/db/constants';
+import { setTenantOwnerAccess } from '@shinefold/db/queries/tenants';
 import {
   createSanityProjectInvite,
   deleteSanityProjectInvite,
   listSanityProjectInvites,
   type TSanityInvite,
-} from '@blog/db/utils/sanity-management-client/sanity-project-access';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import {
   OWNER_ACCESS_LOG,
   SANITY_PENDING_INVITE_STATUS,

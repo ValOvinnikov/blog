@@ -1,5 +1,5 @@
-import type { TMaybeNull } from '@blog/config/types';
-import { isNull } from '@blog/utils/primitives';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { isNull } from '@shinefold/utils/primitives';
 
 import {
   PRESET_ID,
@@ -7,7 +7,7 @@ import {
   type TLocaleIsoCode,
   type TPresetId,
   type TSiteType,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import { buildBaseDocuments } from './base-documents';
 import { buildBlogDocuments } from './blog-documents';

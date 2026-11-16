@@ -1,4 +1,3 @@
-import { ALERT_TYPE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { OwnerAccessActions } from '@platform/components/shared/owner-access-actions';
 import { PageHeader } from '@platform/components/shared/page-header';
@@ -6,6 +5,7 @@ import {
   OWNER_STUDIO_ACCESS,
   type TPendingOwnerStudioAccess,
 } from '@platform/constants/owner-studio-access';
+import { ALERT_TYPE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { ownerStudioAccessViewVariants } from './owner-studio-access-view-variants';

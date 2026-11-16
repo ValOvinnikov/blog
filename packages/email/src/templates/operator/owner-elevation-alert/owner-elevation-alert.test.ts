@@ -3,7 +3,7 @@ import {
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
   MOCK_UNSAFE_MARKUP,
-} from '@blog/email/testing/email-fixtures';
+} from '@shinefold/email/testing/email-fixtures';
 
 import {
   buildOwnerElevationAlertEmail,

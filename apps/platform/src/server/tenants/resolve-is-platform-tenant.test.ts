@@ -1,16 +1,16 @@
-import { queries } from '@blog/db';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import {
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ROOT_DOMAIN,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { queries } from '@shinefold/db';
 
 import { resolveIsPlatformTenant } from './resolve-is-platform-tenant';
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenantDomains: { listTenantHosts: vi.fn() } },
 }));
 

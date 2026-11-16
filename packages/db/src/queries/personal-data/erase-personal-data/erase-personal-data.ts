@@ -1,14 +1,14 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { deleteAccount } from '@blog/db/queries/account/delete-account';
-import { toPersonalEmailIndex } from '@blog/db/queries/personal-data/personal-data-match';
-import { eraseUnsentStudioReinvites } from '@blog/db/queries/personal-data/unsent-studio-reinvite-personal-data';
-import { findUserByEmail } from '@blog/db/queries/users/find-user-by-email';
-import { leads } from '@blog/db/schema/leads';
-import { membershipInvites } from '@blog/db/schema/membership-invites';
-import { subscribers } from '@blog/db/schema/subscribers';
-import { tenants } from '@blog/db/schema/tenants';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { deleteAccount } from '@shinefold/db/queries/account/delete-account';
+import { toPersonalEmailIndex } from '@shinefold/db/queries/personal-data/personal-data-match';
+import { eraseUnsentStudioReinvites } from '@shinefold/db/queries/personal-data/unsent-studio-reinvite-personal-data';
+import { findUserByEmail } from '@shinefold/db/queries/users/find-user-by-email';
+import { leads } from '@shinefold/db/schema/leads';
+import { membershipInvites } from '@shinefold/db/schema/membership-invites';
+import { subscribers } from '@shinefold/db/schema/subscribers';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { eq } from 'drizzle-orm';
 
 export type TPersonalDataCounts = {

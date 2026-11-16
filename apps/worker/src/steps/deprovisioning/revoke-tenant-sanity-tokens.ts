@@ -1,14 +1,14 @@
-import { getTenantSanityManagementCredentials } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { getTenantSanityManagementCredentials } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   missingManagementRobotIdMessage,
   robotsInRevocationOrder,
-} from '@blog/db/utils/sanity-management-client/sanity-robot-revocation';
+} from '@shinefold/db/utils/sanity-management-client/sanity-robot-revocation';
 import {
   deleteSanityRobotToken,
   listSanityRobotTokens,
-} from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { DEPROVISIONING_TOKEN_REVOKE_FAILED_EVENT } from '@worker/constants/deprovisioning';
 import { logger } from '@worker/utils/logger/logger';
 import { FatalError } from 'workflow';

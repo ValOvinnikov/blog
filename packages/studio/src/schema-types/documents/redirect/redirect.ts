@@ -1,19 +1,22 @@
-import { REDIRECT_STATUS, type TLocaleIsoCode } from '@blog/config/constants';
-import { REDIRECT_TYPE } from '@blog/studio/schema-types/documents/redirect/redirect-type';
-import { languageField } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { AutomaticRedirectNoticeInput } from '@blog/studio/schema-types/inputs/automatic-redirect-notice-input/automatic-redirect-notice-input';
-import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
-import { getDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
+import {
+  REDIRECT_STATUS,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import { REDIRECT_TYPE } from '@shinefold/studio/schema-types/documents/redirect/redirect-type';
+import { languageField } from '@shinefold/studio/schema-types/fields/language-field/language-field';
+import { AutomaticRedirectNoticeInput } from '@shinefold/studio/schema-types/inputs/automatic-redirect-notice-input/automatic-redirect-notice-input';
+import { LOCALE_LABEL } from '@shinefold/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { getDefaultLanguage } from '@shinefold/studio/schema-types/validation/default-language/default-language';
 import {
   validateRedirectDestination,
   validateRedirectSource,
-} from '@blog/studio/schema-types/validation/validate-redirect-chain/validate-redirect-chain';
+} from '@shinefold/studio/schema-types/validation/validate-redirect-chain/validate-redirect-chain';
 import {
   validateAutomaticRedirectUnchanged,
   validateRedirectDestinationPage,
   validateRedirectSourcePage,
-} from '@blog/studio/schema-types/validation/validate-redirect-page/validate-redirect-page';
-import { toTitleCase } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/validation/validate-redirect-page/validate-redirect-page';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { Signpost } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

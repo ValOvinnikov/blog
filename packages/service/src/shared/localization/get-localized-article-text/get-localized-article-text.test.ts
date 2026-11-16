@@ -1,31 +1,31 @@
+import { faker } from '@faker-js/faker';
 import type {
   TMaybeNull,
   InternationalizedArrayArticleText,
   Module_content,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   ASIDE_KIND,
   IMAGE_LAYOUT,
   LOCALE_ISO_CODES,
   PORTABLE_TEXT_BLOCK_TYPE,
-} from '@blog/config/constants';
-import { q } from '@blog/service/sanity/query/query';
-import type { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text/portable-text-body-item';
-import type { TLocalizedKey } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
-import { MOCK_CONTENT_MODULE_ID } from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/config/constants';
+import { q } from '@shinefold/service/sanity/query/query';
+import type { portableTextBodyItemFragment } from '@shinefold/service/shared/fragments/portable-text/portable-text-body-item';
+import type { TLocalizedKey } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
+import { MOCK_CONTENT_MODULE_ID } from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_BODY_IMAGE_KEY,
   mockRawBodyImageBlock,
-} from '@blog/service/testing/shared/fixtures';
-import { createLocalizedFieldResolver } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/shared/fixtures';
+import { createLocalizedFieldResolver } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_DUTCH_TEXT,
   MOCK_ENGLISH_TEXT,
   mockLocalizedEntry,
   mockParagraphBlocks,
-} from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
 import type { InferFragmentType } from 'groqd';
 
 import { getLocalizedArticleText } from './get-localized-article-text';

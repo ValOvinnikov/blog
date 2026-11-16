@@ -1,15 +1,15 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { stripeIdOf } from '@platform/server/billing/stripe-id';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   BILLING_CURRENCY,
   STRIPE_PRICE_LOOKUP_KEY,
   type TBillingCurrency,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import type {
   TSaveStripePriceInput,
   TStripePriceAmount,
-} from '@blog/db/queries/stripe-catalogue/save-stripe-price';
-import { isOneOf } from '@blog/utils/primitives';
-import { stripeIdOf } from '@platform/server/billing/stripe-id';
+} from '@shinefold/db/queries/stripe-catalogue/save-stripe-price';
+import { isOneOf } from '@shinefold/utils/primitives';
 import type Stripe from 'stripe';
 
 export const toBillingCurrency = (

@@ -1,9 +1,9 @@
 import 'server-only';
 
-import type { TOAuthProvider } from '@blog/config/constants';
-import { queries } from '@blog/db';
 import { OAUTH_PROVIDERS } from '@platform/constants/sign-in-apps';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import type { TOAuthProvider } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 
 export const listOwnSignInAppProviders = async ({
   id,

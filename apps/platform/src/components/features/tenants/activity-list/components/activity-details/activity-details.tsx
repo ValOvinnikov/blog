@@ -1,6 +1,6 @@
-import { LOCALE_BCP47_TAGS } from '@blog/config';
 import type { TActivityDetail } from '@platform/components/features/tenants/activity-list/to-activity-details';
 import { ACTIVITY_DETAIL } from '@platform/constants/activity';
+import { LOCALE_BCP47_TAGS } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { activityDetailsVariants } from './activity-details-variants';

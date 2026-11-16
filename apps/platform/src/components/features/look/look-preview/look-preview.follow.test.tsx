@@ -1,4 +1,3 @@
-import { RADIUS_DECLARATIONS, RADIUS_SCALE } from '@blog/config';
 import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
 import { LOOK_FOLLOW_TEST_ID } from '@platform/constants/look-follow';
 import { LOOK_ROW } from '@platform/constants/look-row';
@@ -17,6 +16,7 @@ import {
   renderPreview,
 } from '@platform/testing/look/look-preview-render';
 import { stubLgUpWindow } from '@platform/testing/match-media';
+import { RADIUS_DECLARATIONS, RADIUS_SCALE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPreview } from './look-preview';

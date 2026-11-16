@@ -1,4 +1,3 @@
-import { SIZE } from '@blog/config';
 import { TEXT_LINK_COLOUR_CLASSES } from '@platform/components/shared/text-link/text-link-variants';
 import {
   BUTTON_VARIANT,
@@ -10,6 +9,7 @@ import {
 } from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
+import { SIZE } from '@shinefold/config';
 import type { VariantProps } from 'tailwind-variants';
 
 const STYLED_VARIANTS: Exclude<

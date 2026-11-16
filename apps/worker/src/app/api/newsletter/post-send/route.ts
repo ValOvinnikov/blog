@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { sanitizeLogMessage } from '@blog/insight';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import {
   NEWSLETTER_POST_ID_MAX_LENGTH,

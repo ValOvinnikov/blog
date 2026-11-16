@@ -3,13 +3,13 @@ import {
   PRESET_REGISTRY,
   type TPresetId,
   type TTenantPlan,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   LOOK_FIELDS,
   PLAN_ENTITLEMENTS,
   type TLookField,
-} from '@blog/db/constants';
-import type { TSiteConfigResult } from '@blog/db/queries/site-config/get-site-config';
+} from '@shinefold/db/constants';
+import type { TSiteConfigResult } from '@shinefold/db/queries/site-config/get-site-config';
 
 export type TLook = Pick<TSiteConfigResult, TLookField>;
 

@@ -4,16 +4,16 @@ import {
   GRID_COLUMNS,
   LOCALE_ISO_CODES,
   RADIUS_SCALE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   MOCK_DUTCH_MODULE_HEADING,
   MOCK_ENGLISH_MODULE_HEADING,
   MOCK_MODULE_ID,
   MOCK_POST_LIST_PAGE_SIZE,
   mockModuleDocument,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawPostListModule } from '@blog/service/testing/modules/post-list/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawPostListModule } from '@shinefold/service/testing/modules/post-list/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 
 import { postListModuleQuery } from './query';
 

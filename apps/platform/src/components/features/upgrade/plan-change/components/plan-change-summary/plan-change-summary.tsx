@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { Text } from '@platform/components/shared/text';
 import {
   PLAN_CHANGE_TIMING,
@@ -7,6 +6,7 @@ import {
 import type { TPendingPlanChange } from '@platform/server/billing/load-subscription-plan';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { planChangeTiming } from '@platform/utils/plan-change-timing/plan-change-timing';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

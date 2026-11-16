@@ -15,7 +15,7 @@ const MOCK_PAGE_PATH = MOCK_PAGE_SEGMENTS.join('/');
 
 const { getPageMock } = vi.hoisted(() => ({ getPageMock: vi.fn() }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: { pages: { landing: { v1: { getPage: getPageMock } } } },
 }));
 

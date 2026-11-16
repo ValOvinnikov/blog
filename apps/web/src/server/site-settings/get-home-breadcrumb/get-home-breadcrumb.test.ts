@@ -1,4 +1,4 @@
-import { NEXT_NAVIGATION_ERROR, routes } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR, routes } from '@shinefold/config';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import {
   MOCK_REQUEST_CONTEXT,

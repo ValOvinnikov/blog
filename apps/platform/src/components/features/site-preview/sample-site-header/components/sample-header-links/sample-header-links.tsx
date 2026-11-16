@@ -1,8 +1,8 @@
-import { ICONS, SIZE, type THeaderSubmenuStyle } from '@blog/config';
-import type { IWithClassName } from '@blog/config/types';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { SampleHeaderSubmenu } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-links/components/sample-header-submenu/sample-header-submenu';
+import { ICONS, SIZE, type THeaderSubmenuStyle } from '@shinefold/config';
+import type { IWithClassName } from '@shinefold/config/types';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { useTranslations } from 'next-intl';
 
 import { sampleHeaderLinksVariants } from './sample-header-links-variants';

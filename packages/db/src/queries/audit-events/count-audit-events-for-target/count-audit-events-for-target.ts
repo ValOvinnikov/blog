@@ -1,6 +1,6 @@
-import type { TAuditTargetType } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { auditEvents } from '@blog/db/schema/audit-events';
+import type { TAuditTargetType } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { auditEvents } from '@shinefold/db/schema/audit-events';
 import { and, count, eq } from 'drizzle-orm';
 
 export async function countAuditEventsForTarget(

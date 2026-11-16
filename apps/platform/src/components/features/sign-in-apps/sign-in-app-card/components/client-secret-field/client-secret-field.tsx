@@ -1,6 +1,5 @@
 'use client';
 
-import { SIZE } from '@blog/config';
 import { RevealToggle } from '@platform/components/features/sign-in-apps/reveal-toggle';
 import type { TSignInAppFields } from '@platform/components/features/sign-in-apps/sign-in-app-card/use-sign-in-app-fields';
 import { Button } from '@platform/components/shared/button';
@@ -8,6 +7,7 @@ import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 

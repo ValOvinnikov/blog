@@ -1,6 +1,6 @@
-import { ICONS } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { ICON_SIZE } from '@platform/constants/icon';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { previewSiteAddressVariants } from './preview-site-address-variants';

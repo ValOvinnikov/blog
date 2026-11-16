@@ -170,7 +170,7 @@ describe('collectTagsFromSource', () => {
     const { tags, unresolved } = collectTagsFromSource(
       '/virtual/loader.ts',
       `
-        import { isr as buildCacheOptions } from '@blog/service/sanity/query/isr';
+        import { isr as buildCacheOptions } from '@shinefold/service/sanity/query/isr';
         buildCacheOptions('post', tenant.projectId);
       `,
     );

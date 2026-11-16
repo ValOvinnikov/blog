@@ -1,5 +1,5 @@
-import { REDIRECT_STATUS, type TMaybeUndefined } from '@blog/config';
-import type { TResult } from '@blog/utils';
+import { REDIRECT_STATUS, type TMaybeUndefined } from '@shinefold/config';
+import type { TResult } from '@shinefold/utils';
 import { permanentRedirect, redirect } from '@web/i18n/navigation';
 import { getLandingRedirect } from '@web/server/landing/get-landing-redirect/get-landing-redirect';
 import { getRequestContext } from '@web/server/request-context/request-context';

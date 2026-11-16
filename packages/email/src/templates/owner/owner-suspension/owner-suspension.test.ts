@@ -1,5 +1,5 @@
-import { buildOwnerEmail } from '@blog/email/templates/owner/owner-email/owner-email';
-import { MOCK_OWNER_EMAIL_INPUT } from '@blog/email/testing/owner-email';
+import { buildOwnerEmail } from '@shinefold/email/templates/owner/owner-email/owner-email';
+import { MOCK_OWNER_EMAIL_INPUT } from '@shinefold/email/testing/owner-email';
 
 import { buildOwnerSuspensionEmail } from './owner-suspension';
 

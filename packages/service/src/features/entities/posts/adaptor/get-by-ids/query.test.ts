@@ -1,14 +1,14 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { MOCK_MISSING_ID } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
+import { MOCK_MISSING_ID } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_DESIGN_EN_POST_ID,
   MOCK_DESIGN_NL_POST_ID,
   MOCK_SCHEDULED_NL_POST_ID,
   MOCK_TRANSLATED_POST_DOCUMENTS,
   toIds,
-} from '@blog/service/testing/shared/translated-posts-dataset';
+} from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { postsByIdsQuery } from './query';
 

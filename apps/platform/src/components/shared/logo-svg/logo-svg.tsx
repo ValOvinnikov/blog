@@ -1,5 +1,5 @@
-import type { IWithClassName } from '@blog/config/types';
-import type { IShinefoldLogo } from '@blog/utils/shinefold-logo';
+import type { IWithClassName } from '@shinefold/config/types';
+import type { IShinefoldLogo } from '@shinefold/utils/shinefold-logo';
 
 export type TLogoSvgProps = IWithClassName & {
   logo: IShinefoldLogo;

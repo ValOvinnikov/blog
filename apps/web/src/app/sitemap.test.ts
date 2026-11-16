@@ -1,14 +1,14 @@
+import { faker } from '@faker-js/faker';
 import {
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   routes,
   type TLocaleIsoCode,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { service, type TTranslationMap } from '@blog/service';
-import type * as TService from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { service, type TTranslationMap } from '@shinefold/service';
+import type * as TService from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { routing } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
@@ -127,11 +127,11 @@ vi.mock(
   }),
 );
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenants: { selectLiveLocales: vi.fn() } },
 }));
 
-vi.mock('@blog/service', async (importOriginal) => ({
+vi.mock('@shinefold/service', async (importOriginal) => ({
   service: {
     global: {
       translationMap: {

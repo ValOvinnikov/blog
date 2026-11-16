@@ -1,5 +1,5 @@
-import type { TDeprovisioningStep } from '@blog/db/constants';
-import { sanitizeLogMessage } from '@blog/insight';
+import type { TDeprovisioningStep } from '@shinefold/db/constants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { DEPROVISIONING_RUN_FAILED_EVENT } from '@worker/constants/deprovisioning';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import {

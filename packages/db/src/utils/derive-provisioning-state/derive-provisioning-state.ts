@@ -5,8 +5,8 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TProvisioningState,
   type TTenantProvisioningStatus,
-} from '@blog/db/constants';
-import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
+} from '@shinefold/db/constants';
+import type { TTenantProvisioningState } from '@shinefold/db/schema/tenants';
 
 // A dispatched workflow reports every step IDLE until its runner starts, so
 // the PROVISIONING column, not the steps map, is the only RUNNING signal then.

@@ -1,16 +1,5 @@
 'use server';
 
-import {
-  ACTION_OUTCOME,
-  type TActionResult,
-  type TOutcome,
-} from '@blog/config';
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
-import { applyTenantSenderName, sendEmail } from '@blog/email';
-import { isNull } from '@blog/utils/primitives';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { EMAIL_TEST_LOG } from '@platform/constants/email-test';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -25,6 +14,17 @@ import {
 import { buildEmailTemplatePreviewHtml } from '@platform/utils/email-template-preview-builder/email-template-preview-builder';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  type TActionResult,
+  type TOutcome,
+} from '@shinefold/config';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
+import { applyTenantSenderName, sendEmail } from '@shinefold/email';
+import { isNull } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 

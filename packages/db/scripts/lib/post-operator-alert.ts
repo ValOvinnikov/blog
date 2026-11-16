@@ -1,4 +1,7 @@
-import { HTTP_METHOD, type TOperatorAlertBody } from '@blog/config/constants';
+import {
+  HTTP_METHOD,
+  type TOperatorAlertBody,
+} from '@shinefold/config/constants';
 
 const OPERATOR_ALERT_PATH = '/api/internal/operator-alert';
 

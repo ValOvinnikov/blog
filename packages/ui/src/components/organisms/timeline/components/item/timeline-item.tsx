@@ -5,8 +5,11 @@ import {
   type IWithDataTestId,
   type TContentAlignment,
   type TTimelineOrientation,
-} from '@blog/config';
-import { mapCompoundSlots, type TCompoundChildren } from '@blog/ui/lib/react';
+} from '@shinefold/config';
+import {
+  mapCompoundSlots,
+  type TCompoundChildren,
+} from '@shinefold/ui/lib/react';
 import { Fragment } from 'react';
 
 import { TimelineBody } from '../body/timeline-body';

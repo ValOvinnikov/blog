@@ -1,15 +1,15 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import type { TNullablePatch } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { getTenantBilling } from '@blog/db/queries/tenants/get-tenant-billing';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import type { TNullablePatch } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { getTenantBilling } from '@shinefold/db/queries/tenants/get-tenant-billing';
 import {
   tenantBillingColumns,
   toTenantBilling,
   type TTenantBilling,
-} from '@blog/db/queries/tenants/tenant-billing';
-import { tenants } from '@blog/db/schema/tenants';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/queries/tenants/tenant-billing';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { eq } from 'drizzle-orm';
 
 export type TSetTenantBillingInput = TNullablePatch<TTenantBilling>;

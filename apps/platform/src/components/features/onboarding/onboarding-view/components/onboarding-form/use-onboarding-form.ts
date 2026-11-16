@@ -1,5 +1,14 @@
 'use client';
 
+import type { TSelfServeSiteType } from '@platform/constants/onboarding';
+import { createSiteAction } from '@platform/server/onboarding/create-site-action';
+import type {
+  TCreateSiteFieldError,
+  TCreateSiteInput,
+  TCreateSiteRefusal,
+  TCreateSiteResult,
+} from '@platform/server/onboarding/create-site-input';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import {
   type ACTION_OUTCOME,
   isOutcomeInvalid,
@@ -12,16 +21,7 @@ import {
   type TLocaleIsoCode,
   type TMaybeUndefined,
   type TPresetId,
-} from '@blog/config';
-import type { TSelfServeSiteType } from '@platform/constants/onboarding';
-import { createSiteAction } from '@platform/server/onboarding/create-site-action';
-import type {
-  TCreateSiteFieldError,
-  TCreateSiteInput,
-  TCreateSiteRefusal,
-  TCreateSiteResult,
-} from '@platform/server/onboarding/create-site-input';
-import { settleAction } from '@platform/utils/settle-action/settle-action';
+} from '@shinefold/config';
 import { useState, useTransition } from 'react';
 
 export type TOnboardingFieldErrors = TFieldErrors<

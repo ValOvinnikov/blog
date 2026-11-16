@@ -1,33 +1,33 @@
+import { faker } from '@faker-js/faker';
 import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   ERROR_CODE,
   WORKER_AUDIT_ACTOR_ID,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TDeprovisioningStep,
-} from '@blog/db/constants';
-import { insertAuditEvent } from '@blog/db/queries/audit-events';
-import { purgeTenantReaderData } from '@blog/db/queries/reader-data';
-import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
+} from '@shinefold/db/constants';
+import { insertAuditEvent } from '@shinefold/db/queries/audit-events';
+import { purgeTenantReaderData } from '@shinefold/db/queries/reader-data';
+import { listTenantHosts } from '@shinefold/db/queries/tenant-domains/list-tenant-hosts';
 import {
   archiveTenant,
   clearTenantProvisioningArtifacts,
   getTenantById,
   getTenantSanityManagementCredentials,
   updateDeprovisioningStep,
-} from '@blog/db/queries/tenants';
-import { archiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
+} from '@shinefold/db/queries/tenants';
+import { archiveSanityProject } from '@shinefold/db/utils/sanity-management-client/sanity-project-lifecycle';
 import {
   deleteSanityRobotToken,
   listSanityRobotTokens,
-} from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
-import { deleteVercelProjectDomains } from '@blog/db/utils/vercel-client/vercel-project-domains';
-import { errorResult, okResult } from '@blog/utils/result';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
+import { requestTenantCacheInvalidation } from '@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation';
+import { deleteVercelProjectDomains } from '@shinefold/db/utils/vercel-client/vercel-project-domains';
+import { errorResult, okResult } from '@shinefold/utils/result';
 import {
   DEPROVISIONING_AUDIT_VIA,
   DEPROVISIONING_STEP_FAILED_EVENT,
@@ -74,14 +74,16 @@ const MOCK_READER_DATA_COUNTS = {
   leads: 2,
 };
 
-vi.mock('@blog/db/queries/audit-events');
-vi.mock('@blog/db/queries/reader-data');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-project-lifecycle');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-robot-tokens');
-vi.mock('@blog/db/utils/tenant-cache/request-tenant-cache-invalidation');
-vi.mock('@blog/db/utils/vercel-client/vercel-project-domains');
-vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/db/queries/tenant-domains/list-tenant-hosts');
+vi.mock('@shinefold/db/queries/audit-events');
+vi.mock('@shinefold/db/queries/reader-data');
+vi.mock(
+  '@shinefold/db/utils/sanity-management-client/sanity-project-lifecycle',
+);
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-robot-tokens');
+vi.mock('@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation');
+vi.mock('@shinefold/db/utils/vercel-client/vercel-project-domains');
+vi.mock('@shinefold/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenant-domains/list-tenant-hosts');
 vi.mock(
   '@worker/utils/deprovision-env/deprovision-env',
   () => import('@worker/testing/deprovision-env/fake-deprovision-env'),

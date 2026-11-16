@@ -1,15 +1,4 @@
 import {
-  ERROR_CODE,
-  TENANT_PLAN,
-  type TTenantPlan,
-} from '@blog/config/constants';
-import {
-  STRIPE_PRICE_LOOKUP_KEY,
-  TENANT_PLAN_WRITE_OUTCOME,
-  TENANT_STATUS,
-} from '@blog/db/constants';
-import { MOCK_EMPTY_TENANT_BILLING } from '@blog/db/testing/tenants/billing';
-import {
   BILLING_LOG,
   STRIPE_SUBSCRIPTION_STATUS,
 } from '@platform/constants/billing';
@@ -26,6 +15,17 @@ import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscri
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ERROR_CODE,
+  TENANT_PLAN,
+  type TTenantPlan,
+} from '@shinefold/config/constants';
+import {
+  STRIPE_PRICE_LOOKUP_KEY,
+  TENANT_PLAN_WRITE_OUTCOME,
+  TENANT_STATUS,
+} from '@shinefold/db/constants';
+import { MOCK_EMPTY_TENANT_BILLING } from '@shinefold/db/testing/tenants/billing';
 import type Stripe from 'stripe';
 
 import { resolveStripeTenant } from './resolve-stripe-tenant';
@@ -45,7 +45,7 @@ const {
   retrieveSubscriptionMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     tenants: {

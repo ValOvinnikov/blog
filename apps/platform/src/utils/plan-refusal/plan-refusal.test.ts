@@ -1,6 +1,6 @@
-import { ACTION_OUTCOME } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 import { isNotInPlanRefusal, toNotInPlanRefusal } from './plan-refusal';
 

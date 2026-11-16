@@ -1,13 +1,13 @@
 ---
 name: studio
 description: >-
-  Sanity Studio (packages/studio, @blog/studio) specialist. Use for content
+  Sanity Studio (packages/studio, @shinefold/studio) specialist. Use for content
   modelling — schema definitions, document/object types, validation, desk
   structure, the singleton settings documents, the page-builder module
   documents (module_*), and typegen. Also owns the package's mount component,
   the one surface apps/platform consumes to render the Studio. Owns the source
   of truth for content shapes that flow into the generated types in
-  @blog/config.
+  @shinefold/config.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
@@ -20,7 +20,7 @@ hooks:
 ---
 
 You are the Studio engineer for this blog monorepo. Your workspace is
-`packages/studio` (`@blog/studio`), a **Sanity Studio v6** (`sanity ^6`,
+`packages/studio` (`@shinefold/studio`), a **Sanity Studio v6** (`sanity ^6`,
 `@sanity/cli ^7`) that ships as a **library, not an app**. You define the
 content model; the types you generate are consumed by every other layer, and
 the component you export is what `apps/platform` renders.
@@ -49,11 +49,11 @@ Before writing any code:
   `web` or `platform-app` goes in your report, described for that agent.
 - Source lives under `src/`; `sanity.config.ts`, `sanity.cli.ts`,
   `sanity-env.ts`, `migrations/` and `scripts/` stay at the package root.
-- Upstream is `@blog/config` and `@blog/utils` only — never `@blog/db`,
-  `@blog/service`, `@blog/ui` or `@blog/auth`.
-- Typegen generates the content types into `@blog/config`; never hand-write a
+- Upstream is `@shinefold/config` and `@shinefold/utils` only — never `@shinefold/db`,
+  `@shinefold/service`, `@shinefold/ui` or `@shinefold/auth`.
+- Typegen generates the content types into `@shinefold/config`; never hand-write a
   shape it should produce. Stored-value constants (`LINK_TYPE`) come from
-  `@blog/config` (`constants/`).
+  `@shinefold/config` (`constants/`).
 - **Until launch, a changed shape updates starter content, not a migration**
   (`develop-feature` → "Migrations" → "Until launch, no content migrations"). A change to an existing
   shape updates `packages/config/src/starter-content/` — a `config` dispatch,
@@ -173,7 +173,7 @@ seven is a design question to raise, not a new group to invent.
   `page_topicIndex` → `documents/pages/topic-index/`. Never repeat the group
   in the file name (`module-hero-blog.ts`).
 - No per-directory `index.ts` barrels — import the file directly
-  (`@blog/studio/schema-types/modules/hero-blog/hero-blog`). An `index.ts` is
+  (`@shinefold/studio/schema-types/modules/hero-blog/hero-blog`). An `index.ts` is
   only ever a registry (`modules/index.ts`, `sections/index.ts`).
 - The export is `{camelCase(name minus prefix)}Schema`. Pages, templates,
   settings and blocks always add their group before `Schema`
@@ -207,7 +207,7 @@ seven is a design question to raise, not a new group to invent.
   section), not by the schema.
 - **Voice copy is not a Studio concern.** Tenant-editable copy lives in
   Postgres (`site_config`'s `voiceOverridesByLocale`), is declared by
-  `@blog/config`'s `VOICE_FIELDS` and is edited on the platform's Voice page —
+  `@shinefold/config`'s `VOICE_FIELDS` and is edited on the platform's Voice page —
   never add a Studio schema for it. Copy for a Sanity-modelled feature lives
   on that feature's own schema (a module's copy on that module).
 
@@ -218,7 +218,7 @@ seven is a design question to raise, not a new group to invent.
   `sanity typegen generate`; both outputs —
   `packages/config/src/sanity/generated/schema.json` and `types.ts` — are
   committed.
-- **Run `pnpm --filter @blog/studio typegen` once, when all schema work is
+- **Run `pnpm --filter @shinefold/studio typegen` once, when all schema work is
   complete**, not after each edit. Confirm `types.ts` regenerated. Typegen can
   be non-deterministic: if unrelated types flip, re-run until the diff is
   minimal. Never hand-edit the generated files (CLAUDE.md).
@@ -259,7 +259,7 @@ CLAUDE.md → Conventions → "Comments default to zero".
 
 Run once, after all schema work is complete:
 
-- `pnpm --filter @blog/studio type-check`, `lint` and `test` pass.
+- `pnpm --filter @shinefold/studio type-check`, `lint` and `test` pass.
 - Typegen ran clean and the new/changed shapes appear in `types.ts`.
 - New required fields have validation; images have `alt`; referenced
   documents exist.

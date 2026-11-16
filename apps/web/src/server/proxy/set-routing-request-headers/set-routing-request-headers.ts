@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { PREVIEW_TOKEN_HEADER } from '@web/server/draft-preview/constants/constants';
 import { TENANT_ID_HEADER } from '@web/server/tenant/constants/constants';
 import type { NextRequest } from 'next/server';

@@ -1,8 +1,8 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
-import type { TLeadsCursor } from '@blog/db/queries/leads';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import type { TLeadsCursor } from '@shinefold/db/queries/leads';
 
 import { toInboxLead, type TInboxLead } from './to-inbox-lead';
 

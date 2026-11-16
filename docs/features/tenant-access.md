@@ -91,7 +91,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
   - Membership roles never gate anything: only OWNER is ever written, and nothing reads EDITOR or READER.
 - **Admins get a virtual OWNER membership.** Any `admins` row passes `requireTenantMembership` on any tenant through a virtual membership. Its id starts with `admin-virtual:`, so it can never pass as a foreign key. Call `isVirtualAdminMembership` before showing `membership.role`; the role chip shows the admin role instead.
 - **Invite consumption is atomic.** The claim stamps `consumedAt` only if it is still null. A failed membership insert resets it, and an existing membership is returned as-is.
-- **Invites are consumed best-effort, in the platform only.** `@blog/auth`'s `events.signIn` consumes invites on sign-in to the platform; signing in as a reader on a site leaves them pending. A failure is swallowed and retried on the next platform sign-in.
+- **Invites are consumed best-effort, in the platform only.** `@shinefold/auth`'s `events.signIn` consumes invites on sign-in to the platform; signing in as a reader on a site leaves them pending. A failure is swallowed and retried on the next platform sign-in.
 - **The blocklist is checked live.** Create site refuses a blocked address or domain with its neutral reply, even for a user who already holds a session, and enqueues nothing ([platform sign-in and onboarding](./platform-sign-in-and-onboarding.md)). Removing an entry restores sign-up at once. Blocking while suspending saves the block, then suspends. `neon-http` has no transactions, so a refused or failed suspension removes the block again, but only one this request created; an older entry stays. A failed removal is logged, and the operator still sees the suspension fail. `SIGNUP_BLOCK_ADDED` is recorded only once the suspension is saved. A failed block, or an owner with no email on record, leaves the tenant unsuspended.
 - **Platform access is not Studio access.** Studio rights come from the tenant's Sanity project ACL. The owner is invited as `viewer` and raised to `administrator` by owner elevation ([embedded studio](./embedded-studio.md)). The worker sends that invite and removes the `viewer` role with the tenant's own Sanity management token, so both survive rotation of the organisation token. Granting `administrator`, and removing it from a former owner, stay on the organisation token, because Sanity refuses a project-scoped token any change to an `administrator` role: after a rotation, the owner of a tenant created before it is promoted by hand in Sanity Manage. Owner discovery — listing the organisation's users while the owner is not yet a project member, the usual case before their first Studio sign-in — uses the organisation token. A replacement organisation token keeps that lookup working only if it can read the organisation's members ([tenant provisioning](./tenant-provisioning.md)).
 - **Site sign-in is separate.** A public site's readers sign in through the same `users` table, but `memberships` never gate anything in `apps/web` ([reader auth](./reader-auth.md)).
@@ -99,9 +99,9 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 ## Dependencies
 
 - **Layers:**
-  - `@blog/db` holds the tables and queries.
-  - `@blog/auth` consumes invites on sign-in and chooses the invite template.
-  - `@blog/email` renders the invite email.
+  - `@shinefold/db` holds the tables and queries.
+  - `@shinefold/auth` consumes invites on sign-in and chooses the invite template.
+  - `@shinefold/email` renders the invite email.
   - `apps/platform` owns the gates and the cookie.
 - **Features:** [platform sign-in and onboarding](./platform-sign-in-and-onboarding.md), [platform shell](./platform-shell.md), [tenant provisioning](./tenant-provisioning.md), [embedded studio](./embedded-studio.md), [email](./email.md), [multi-tenancy](./multi-tenancy.md).
 - **Env:** `AUTH_SECRET` (session and the owner-invite confirmation HMAC), `DATABASE_URL`.

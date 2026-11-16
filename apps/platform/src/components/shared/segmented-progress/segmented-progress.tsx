@@ -1,6 +1,6 @@
 import { Progress } from '@base-ui/react/progress';
-import type { IWithClassName } from '@blog/config/types';
 import { toStepProgressState } from '@platform/utils/step-progress-state/step-progress-state';
+import type { IWithClassName } from '@shinefold/config/types';
 
 import { segmentedProgressVariants } from './segmented-progress-variants';
 

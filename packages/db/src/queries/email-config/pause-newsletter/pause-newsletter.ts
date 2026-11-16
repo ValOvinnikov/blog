@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { emailConfig } from '@blog/db/schema/email-config';
+import { getDb } from '@shinefold/db/client';
+import { emailConfig } from '@shinefold/db/schema/email-config';
 import { sql } from 'drizzle-orm';
 
 export async function pauseNewsletter(tenantId: string): Promise<Date> {

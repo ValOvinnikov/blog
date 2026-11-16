@@ -1,13 +1,13 @@
-import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { MOCK_HERO_MODULE_ID } from '@blog/service/testing/pages/fixtures';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, HERO_VARIANT } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { MOCK_HERO_MODULE_ID } from '@shinefold/service/testing/pages/fixtures';
+import { mockReference } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
-} from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
 
 import { heroProfileModuleQuery } from './query';
 

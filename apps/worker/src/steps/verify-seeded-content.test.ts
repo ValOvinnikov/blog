@@ -1,8 +1,11 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
-import { getTenantSanityCredentials } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@shinefold/db/constants';
+import { getTenantSanityCredentials } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import {
   MOCK_PROVISION_ENV,
@@ -31,7 +34,7 @@ import {
 
 faker.seed(7008);
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 const { vercelToken, vercelTeamId, vercelWebProjectId } = MOCK_PROVISION_ENV;

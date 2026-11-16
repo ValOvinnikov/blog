@@ -1,5 +1,5 @@
-import { CONTENT_ALIGNMENT, TIMELINE_ORIENTATION } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import { CONTENT_ALIGNMENT, TIMELINE_ORIENTATION } from '@shinefold/config';
+import { tv } from '@shinefold/ui/lib/styling';
 
 export const timelineItemVariants = tv({
   slots: {

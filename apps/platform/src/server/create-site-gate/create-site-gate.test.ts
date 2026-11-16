@@ -1,6 +1,6 @@
-import { sendEmail } from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { sendEmail } from '@shinefold/email';
 
 import {
   MAX_SELF_SERVE_SITES_PER_DAY,
@@ -16,12 +16,12 @@ const { listSuperadminEmails } = vi.hoisted(() => ({
   listSuperadminEmails: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: { admins: { listSuperadminEmails } },
 }));
 
-vi.mock('@blog/email');
+vi.mock('@shinefold/email');
 
 const DAY_MS = 24 * 60 * 60_000;
 const MOCK_REFERENCE_DATE = new Date('2026-10-21T09:00:00Z');

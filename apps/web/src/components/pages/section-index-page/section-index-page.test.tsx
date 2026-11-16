@@ -1,8 +1,8 @@
-import { routes } from '@blog/config';
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { service } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { routes } from '@shinefold/config';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
+import { service } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { SECTION_INDEX_LOG } from '@web/constants/section-index';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { SectionPagesModule } from '@web/modules/section-pages/section-pages-module';
@@ -41,7 +41,7 @@ vi.mock('@web/modules/section-pages/section-pages-module', () => ({
   )),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: { sectionIndex: { v1: { getSectionIndexPage: vi.fn() } } },
   },

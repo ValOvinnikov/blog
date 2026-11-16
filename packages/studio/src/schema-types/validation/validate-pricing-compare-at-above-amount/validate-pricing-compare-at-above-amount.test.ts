@@ -1,5 +1,5 @@
-import { validatePricingCompareAtAboveAmount } from '@blog/studio/schema-types/validation/validate-pricing-compare-at-above-amount/validate-pricing-compare-at-above-amount';
 import { faker } from '@faker-js/faker';
+import { validatePricingCompareAtAboveAmount } from '@shinefold/studio/schema-types/validation/validate-pricing-compare-at-above-amount/validate-pricing-compare-at-above-amount';
 import type { ValidationContext } from 'sanity';
 
 faker.seed(6022);

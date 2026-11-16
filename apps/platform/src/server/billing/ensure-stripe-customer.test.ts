@@ -1,6 +1,3 @@
-import { ERROR_CODE } from '@blog/config';
-import { queries } from '@blog/db';
-import { errorResult, okResult } from '@blog/utils';
 import {
   BILLING_LOG,
   STRIPE_CUSTOMER_IDEMPOTENCY_PREFIX,
@@ -17,11 +14,14 @@ import {
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { ERROR_CODE } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { errorResult, okResult } from '@shinefold/utils';
 import Stripe from 'stripe';
 
 import { ensureStripeCustomer } from './ensure-stripe-customer';
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: { setTenantBilling: vi.fn(async () => okResult({})) },
   },

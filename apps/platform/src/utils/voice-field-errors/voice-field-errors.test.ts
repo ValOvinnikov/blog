@@ -1,9 +1,9 @@
+import { faker } from '@faker-js/faker';
 import {
   LOCALE_ISO_CODES,
   VOICE_FIELD_ERROR,
   VOICE_FIELDS,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 
 import { toVoiceFieldMessages } from './voice-field-errors';
 

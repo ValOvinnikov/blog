@@ -1,16 +1,5 @@
 import 'server-only';
 
-import {
-  ACTION_OUTCOME,
-  type TMaybeUndefined,
-  type TOutcome,
-  type TReasonedFailure,
-} from '@blog/config';
-import { queries, TENANT_STATUS, type TSuspensionStatus } from '@blog/db';
-import type { TAdmin } from '@blog/db/schema/admins';
-import type { TTenantSuspension } from '@blog/db/schema/tenant-suspensions';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_LOG, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
@@ -25,6 +14,17 @@ import {
 } from '@platform/server/tenants/tenant-suspension-case';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  type TMaybeUndefined,
+  type TOutcome,
+  type TReasonedFailure,
+} from '@shinefold/config';
+import { queries, TENANT_STATUS, type TSuspensionStatus } from '@shinefold/db';
+import type { TAdmin } from '@shinefold/db/schema/admins';
+import type { TTenantSuspension } from '@shinefold/db/schema/tenant-suspensions';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 export type TSuspensionWriteFailure =
   | TOutcome<typeof ACTION_OUTCOME.SERVER_ERROR>

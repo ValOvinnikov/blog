@@ -1,9 +1,12 @@
-import { resolveTenantEmailBrand, type TTenantEmailBrand } from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getEmailConfig } from '@blog/db/queries/email-config';
-import { getSiteConfig } from '@blog/db/queries/site-config';
-import { applyTenantSenderName, isValidEmailAddress } from '@blog/email';
+import {
+  resolveTenantEmailBrand,
+  type TTenantEmailBrand,
+} from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getEmailConfig } from '@shinefold/db/queries/email-config';
+import { getSiteConfig } from '@shinefold/db/queries/site-config';
+import { applyTenantSenderName, isValidEmailAddress } from '@shinefold/email';
 import { DEFAULT_NEWSLETTER_FROM_ADDRESS } from '@worker/constants/newsletter-send';
 import { loadTenant } from '@worker/units/run-reported-step';
 import { env } from '@worker/utils/env/env';

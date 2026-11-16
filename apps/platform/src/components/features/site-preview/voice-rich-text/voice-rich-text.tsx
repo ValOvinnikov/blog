@@ -2,7 +2,7 @@ import type {
   TVoicePortableText,
   TVoicePortableTextBlock,
   TVoicePortableTextSpan,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 import { voiceRichTextVariants } from './voice-rich-text-variants';

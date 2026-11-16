@@ -3,12 +3,12 @@ import { randomBytes } from 'node:crypto';
 import {
   getTenantRevalidateWebhookSecret,
   setTenantRevalidateWebhookSecret,
-} from '@blog/db/queries/tenants';
+} from '@shinefold/db/queries/tenants';
 import {
   type TListedSanityWebhook,
   updateSanityWebhookSecret,
-} from '@blog/db/utils/sanity-management-client/sanity-webhooks';
-import { HEX_ENCODING } from '@blog/utils/hash';
+} from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
+import { HEX_ENCODING } from '@shinefold/utils/hash';
 
 const WEBHOOK_SECRET_BYTES = 32;
 

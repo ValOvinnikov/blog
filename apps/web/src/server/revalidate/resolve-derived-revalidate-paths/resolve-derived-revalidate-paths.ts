@@ -1,6 +1,6 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import type { TTenantSanityContext } from '@blog/service';
-import { errorResult, type TResult } from '@blog/utils';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import type { TTenantSanityContext } from '@shinefold/service';
+import { errorResult, type TResult } from '@shinefold/utils';
 import {
   FETCH_FAILED_REASON,
   TENANT_UNRESOLVED_REASON,

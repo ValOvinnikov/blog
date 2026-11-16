@@ -1,14 +1,14 @@
-import { TERMS_VERSION } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
-import type { TUser } from '@blog/db/schema/auth';
-import { insertTestUser } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
+import { TERMS_VERSION } from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
+import type { TUser } from '@shinefold/db/schema/auth';
+import { insertTestUser } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
 import { recordTermsAcceptance } from './record-terms-acceptance';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(6022);
 

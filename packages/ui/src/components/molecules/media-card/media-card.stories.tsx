@@ -1,22 +1,22 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CARD_STYLE,
   ICONS,
   SIZE,
   type TBrandVariant,
-} from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
+} from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 import {
   BRAND_BAND_LABELS,
   BrandBand,
   focusLastLink,
-} from '@blog/ui/testing/brand-bands';
+} from '@shinefold/ui/testing/brand-bands';
 import {
   FilledAndPlainOnEachBand,
   InCardStyle,
-} from '@blog/ui/testing/card-styles';
-import { objectKeys } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/card-styles';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { MediaCard } from './media-card';

@@ -1,4 +1,4 @@
-import type { TMaybeNull } from '@blog/config';
+import type { TMaybeNull } from '@shinefold/config';
 import { type RefObject, useEffect, useState } from 'react';
 
 const isScrollable = (element: HTMLElement) =>

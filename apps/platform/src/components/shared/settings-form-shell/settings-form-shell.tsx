@@ -1,11 +1,11 @@
 'use client';
 
-import type { IWithChildren } from '@blog/config/react';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import type { TSettingsFormStack } from '@platform/constants/settings-form';
 import { SettingsFormProvider } from '@platform/context/settings-form-provider';
 import { formatLanguageChanges } from '@platform/utils/format-language-changes/format-language-changes';
 import type { TInvalidControls } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
+import type { IWithChildren } from '@shinefold/config/react';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

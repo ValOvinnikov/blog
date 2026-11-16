@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { tenantDetailsValuesOf } from '@platform/components/features/tenants/tenant-details-panel/tenant-details-values';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
@@ -13,6 +12,7 @@ import {
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent from '@testing-library/user-event';
 
 import { useTenantDetailsSave } from './use-tenant-details-save';

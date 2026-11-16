@@ -1,20 +1,20 @@
-import type { TPageLandingType } from '@blog/config';
-import { q } from '@blog/service/sanity/query/query';
+import type { TPageLandingType } from '@shinefold/config';
+import { q } from '@shinefold/service/sanity/query/query';
 import {
   LANDING_PAGE_PATH_EXPRESSION,
   pagePathParser,
-} from '@blog/service/shared/expressions/landing-page/landing-page-path';
+} from '@shinefold/service/shared/expressions/landing-page/landing-page-path';
 import {
   LANDING_PAGE_SECTION_CHAIN_EXPRESSION,
   landingPageSectionChainParser,
-} from '@blog/service/shared/expressions/landing-page/landing-page-section';
-import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
-import { moduleFragment } from '@blog/service/shared/fragments/module/module';
-import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
-import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
-import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
-import type { TPageQueryParams } from '@blog/service/shared/types/page/page-query-params';
+} from '@shinefold/service/shared/expressions/landing-page/landing-page-section';
+import { pageHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/page-heading-block';
+import { moduleFragment } from '@shinefold/service/shared/fragments/module/module';
+import { moduleContentAlignmentLeftCenterFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
+import { seoFragment } from '@shinefold/service/shared/fragments/seo/seo';
+import { translationsQuery } from '@shinefold/service/shared/localization/page-translations/translations';
+import type { TRawModule } from '@shinefold/service/shared/transformers/module/to-module';
+import type { TPageQueryParams } from '@shinefold/service/shared/types/page/page-query-params';
 
 export const landingPageQuery = q
   .parameters<TPageQueryParams & { path: string }>()

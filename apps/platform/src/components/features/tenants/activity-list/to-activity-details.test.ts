@@ -1,8 +1,8 @@
-import { AUDIT_ACTION } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { ACTIVITY_DETAIL } from '@platform/constants/activity';
 import { TENANT_DETAILS_FIELD } from '@platform/constants/tenant';
+import { AUDIT_ACTION } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 import { toActivityDetails } from './to-activity-details';
 

@@ -1,3 +1,6 @@
+import { faker } from '@faker-js/faker';
+import { FONT_OPTIONS } from '@platform/config/fonts';
+import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
@@ -17,10 +20,7 @@ import {
   NAV_LINK_STYLE,
   NAV_LINK_STYLE_DECLARATIONS,
   RADIUS_SCALE,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
-import { FONT_OPTIONS } from '@platform/config/fonts';
-import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+} from '@shinefold/config';
 
 import {
   accentHueGradient,

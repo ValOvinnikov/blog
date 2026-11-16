@@ -1,13 +1,13 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { MediaFrame } from '@blog/ui/components/atoms/media-frame';
-import { Text } from '@blog/ui/components/atoms/text';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { MediaFrame } from '@shinefold/ui/components/atoms/media-frame';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import {
   PostMeta,
   type TPostMetaProps,
-} from '@blog/ui/components/molecules/post-meta';
+} from '@shinefold/ui/components/molecules/post-meta';
 import { type ReactNode } from 'react';
 
 import { articleHeaderVariants } from './article-header-variants';

@@ -102,7 +102,10 @@ export type {
   TPostCardAuthor,
   TPostCardTopic,
 } from './shared/transformers/post/to-post-card';
-export type { IPortableTextLinkMark, TPortableTextLink } from '@blog/config';
+export type {
+  IPortableTextLinkMark,
+  TPortableTextLink,
+} from '@shinefold/config';
 export type { TPortableTextBody } from './shared/transformers/portable-text/to-portable-text-body';
 export type { TSeoResolved } from './shared/transformers/seo/resolve-seo';
 export type { TSocialProfile } from './shared/transformers/social-profile/to-social-profile';

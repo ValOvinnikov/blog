@@ -1,5 +1,5 @@
-import { BRAND_VARIANT } from '@blog/config';
-import type { TPostListModule } from '@blog/service';
+import { BRAND_VARIANT } from '@shinefold/config';
+import type { TPostListModule } from '@shinefold/service';
 import type { IMediaCardData } from '@web/components/shared/media-card-item';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 

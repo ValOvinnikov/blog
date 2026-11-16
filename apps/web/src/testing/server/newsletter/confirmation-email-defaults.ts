@@ -1,6 +1,6 @@
-import type { resolveTenantEmailBrand } from '@blog/config';
-import type { TEmailConfigResult } from '@blog/db/queries/email-config/get-email-config/get-email-config';
 import { faker } from '@faker-js/faker';
+import type { resolveTenantEmailBrand } from '@shinefold/config';
+import type { TEmailConfigResult } from '@shinefold/db/queries/email-config/get-email-config/get-email-config';
 
 import { confirmationEmailEdges } from './confirmation-email-edges';
 import { mockEmailConfig, mockEmailTemplate } from './fixtures';

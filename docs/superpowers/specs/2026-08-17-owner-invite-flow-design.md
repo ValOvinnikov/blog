@@ -105,16 +105,16 @@ New `db` queries: `createMembershipInvite`, `findPendingInviteByEmail`,
 
 ## Layer-contract impact
 
-- **`@blog/db`** — new `membershipInvites` table + migration; new queries
+- **`@shinefold/db`** — new `membershipInvites` table + migration; new queries
   above.
-- **`@blog/auth`** — new `events.signIn` hook (consumption logic); the
+- **`@shinefold/auth`** — new `events.signIn` hook (consumption logic); the
   magic-link provider's `sendVerificationRequest` gains the pending-invite
   lookup for invite-flavored copy. Both are legal — `auth → db` is an
   existing contract edge.
 - **`apps/platform`** — `create-tenant-action.ts`'s not-found branch; the
   Details-step wizard UI (soft confirmation instead of hard error); a status
   badge on `ProvisioningStatusView`.
-- **`@blog/config`, `@blog/service`, `@blog/ui`, `apps/web`, `apps/cms`** —
+- **`@shinefold/config`, `@shinefold/service`, `@shinefold/ui`, `apps/web`, `apps/cms`** —
   untouched. `membershipRoleEnum` already exists; no new const pairs needed.
 - Graph stays acyclic.
 

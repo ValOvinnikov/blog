@@ -1,8 +1,8 @@
 import {
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_WWW_TENANT_DOMAIN,
-} from '@blog/db/testing/tenant-domains/fixtures';
-import { MOCK_TENANT_DOMAIN } from '@blog/db/testing/tenants/fixtures';
+} from '@shinefold/db/testing/tenant-domains/fixtures';
+import { MOCK_TENANT_DOMAIN } from '@shinefold/db/testing/tenants/fixtures';
 
 import { isPlatformTenant } from './is-platform-tenant';
 

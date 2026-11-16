@@ -2,18 +2,18 @@ import {
   ERROR_CODE,
   type TErrorCode,
   type TTenantPlan,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@blog/db/constants';
-import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
-import { insertTenantWithDependents } from '@blog/db/queries/tenants/insert-tenant-with-dependents';
-import { membershipInvites } from '@blog/db/schema/membership-invites';
-import { memberships } from '@blog/db/schema/memberships';
-import { tenantDomains } from '@blog/db/schema/tenant-domains';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
-import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@shinefold/db/constants';
+import { inviteEmailColumns } from '@shinefold/db/queries/membership-invites/invite-email-columns';
+import { insertTenantWithDependents } from '@shinefold/db/queries/tenants/insert-tenant-with-dependents';
+import { membershipInvites } from '@shinefold/db/schema/membership-invites';
+import { memberships } from '@shinefold/db/schema/memberships';
+import { tenantDomains } from '@shinefold/db/schema/tenant-domains';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isValidDomain } from '@shinefold/db/utils/is-valid-domain/is-valid-domain';
+import { normalizeLocaleCode } from '@shinefold/db/utils/normalize-locale-code/normalize-locale-code';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 
 export type TDraftOwner =
   { type: 'user'; userId: string } | { type: 'invite'; email: string };

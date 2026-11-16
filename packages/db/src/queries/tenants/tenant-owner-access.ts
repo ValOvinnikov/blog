@@ -1,7 +1,10 @@
-import type { TSanityLoginProvider } from '@blog/config/constants';
-import type { TMaybeUndefined, TNullableRow } from '@blog/config/types';
-import type { TSanityProjectRole, TTenantOwnerEmail } from '@blog/db/constants';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import type { TSanityLoginProvider } from '@shinefold/config/constants';
+import type { TMaybeUndefined, TNullableRow } from '@shinefold/config/types';
+import type {
+  TSanityProjectRole,
+  TTenantOwnerEmail,
+} from '@shinefold/db/constants';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 
 export type TTenantOwnerAccess = {
   sanityInviteId: TMaybeUndefined<string>;

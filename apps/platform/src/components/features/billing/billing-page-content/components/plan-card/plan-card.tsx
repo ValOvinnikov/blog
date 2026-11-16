@@ -1,6 +1,3 @@
-import { SIZE, type TMaybeUndefined } from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
-import type { TTenantStatus } from '@blog/db/constants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { LinkButton } from '@platform/components/shared/link-button';
@@ -11,6 +8,9 @@ import { formatDate } from '@platform/utils/format-date/format-date';
 import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
+import { SIZE, type TMaybeUndefined } from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
+import type { TTenantStatus } from '@shinefold/db/constants';
 import { useLocale, useTranslations } from 'next-intl';
 
 export type TPlanCardProps = {

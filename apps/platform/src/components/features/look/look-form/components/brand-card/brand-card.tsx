@@ -1,4 +1,3 @@
-import { BRAND_NAME_MAX_LENGTH } from '@blog/db/constants';
 import { BrandAssetField } from '@platform/components/features/look/brand-asset-field';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
@@ -9,6 +8,7 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
+import { BRAND_NAME_MAX_LENGTH } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

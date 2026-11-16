@@ -1,6 +1,6 @@
-import { SANITY_WEBHOOK_OPERATION } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { service, type TTenantSanityContext } from '@blog/service';
+import { SANITY_WEBHOOK_OPERATION } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { service, type TTenantSanityContext } from '@shinefold/service';
 import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { enqueueWorkerRun } from '@web/server/revalidate/enqueue-worker-run/enqueue-worker-run';

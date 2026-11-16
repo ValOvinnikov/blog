@@ -1,5 +1,5 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { isPricingTierLinked } from '@blog/studio/schema-types/validation/is-pricing-tier-linked/is-pricing-tier-linked';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { isPricingTierLinked } from '@shinefold/studio/schema-types/validation/is-pricing-tier-linked/is-pricing-tier-linked';
 
 describe(isPricingTierLinked, () => {
   it.each([

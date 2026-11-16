@@ -1,6 +1,3 @@
-import { CAPABILITY } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { SAMPLE_HEADER_FULL_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
@@ -10,6 +7,9 @@ import {
   setupLookPageContent as setup,
 } from '@platform/testing/look/look-page-content-setup';
 import { mockReadyTenant } from '@platform/testing/tenants/fixtures';
+import { CAPABILITY } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 
 import { LookPageContent } from './look-page-content';
 
@@ -18,7 +18,7 @@ const { getSiteConfigMock, selectLiveLocalesMock } = vi.hoisted(() => ({
   selectLiveLocalesMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await (
     await import('@platform/testing/mock-db-constants')
   ).mockDbConstants()),

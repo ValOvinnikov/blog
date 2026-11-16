@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 
 import DE from './starter-copy.de.json';
 import STARTER_COPY from './starter-copy.en.json';

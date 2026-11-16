@@ -1,6 +1,5 @@
 'use client';
 
-import { ICONS, SIZE, type TMaybeUndefined } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
 import {
@@ -12,6 +11,7 @@ import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TEmailLogoKind } from '@platform/constants/email-logo';
 import { ICON_SIZE } from '@platform/constants/icon';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import { ICONS, SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { type ChangeEvent, useRef } from 'react';
 

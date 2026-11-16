@@ -2,8 +2,8 @@ import {
   IMAGE_LAYOUT,
   PORTABLE_TEXT_BLOCK_TYPE,
   type TPortableTextBlock,
-} from '@blog/config';
-import type { TPortableTextBody } from '@blog/service';
+} from '@shinefold/config';
+import type { TPortableTextBody } from '@shinefold/service';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 
 export const MOCK_PARAGRAPH_STYLE = 'normal';

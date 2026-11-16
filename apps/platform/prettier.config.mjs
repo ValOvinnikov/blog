@@ -1,4 +1,4 @@
-import basePrettierConfig from '@blog/prettier-config';
+import basePrettierConfig from '@shinefold/prettier-config';
 
 // prettier-plugin-tailwindcss is resolved from the repo root (root
 // package.json devDependency), not from here — Prettier loads plugin

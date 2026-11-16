@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   INACTIVITY_STAGE,
   INACTIVITY_STAGE_DAY,
@@ -6,9 +6,9 @@ import {
   SUSPENSION_REASON,
   TENANT_STATUS,
   type TInactivityStage,
-} from '@blog/db/constants';
-import { tenants } from '@blog/db/schema/tenants';
-import { daysBefore } from '@blog/db/utils/day-offset/day-offset';
+} from '@shinefold/db/constants';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { daysBefore } from '@shinefold/db/utils/day-offset/day-offset';
 import {
   and,
   eq,

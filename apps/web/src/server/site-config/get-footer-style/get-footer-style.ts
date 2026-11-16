@@ -1,4 +1,4 @@
-import type { IFooterStyle } from '@blog/config';
+import type { IFooterStyle } from '@shinefold/config';
 import { FOOTER_LOG } from '@web/constants/footer';
 import { getSiteConfigWithPreset } from '@web/server/site-config/get-site-config-with-preset/get-site-config-with-preset';
 

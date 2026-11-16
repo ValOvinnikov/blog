@@ -1,9 +1,9 @@
+import { faker } from '@faker-js/faker';
 import {
   mockRawSanityImage,
   mockRawSeo,
   mockSanityImageView,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { resolveSeo, type TRawSeo } from './resolve-seo';
 

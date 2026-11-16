@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   ASIDE_KIND,
   PORTABLE_TEXT_BLOCK_TYPE,
   SITE_MESSAGES,
   type TPortableTextBlock,
-} from '@blog/config';
-import type { TPortableTextBody } from '@blog/service';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import type { TPortableTextBody } from '@shinefold/service';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import {
   customRender,
