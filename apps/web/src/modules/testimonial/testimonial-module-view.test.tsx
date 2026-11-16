@@ -17,6 +17,7 @@ import {
   mockTestimonialItem,
 } from '@web/testing/modules/testimonial/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockItemsWithIds } from '@web/testing/shared/items/fixtures';
 import {
   MOCK_RADIUS_SCOPE_CASES,
   MOCK_SCOPED_RADIUS_TOKEN,
@@ -31,11 +32,6 @@ faker.seed(22);
 const MOCK_TITLE_ID = faker.string.uuid();
 const MOCK_DATA_TEST_ID = faker.string.uuid();
 const CAROUSEL_LABEL = `${MOCK_TESTIMONIAL_HEADING} carousel`;
-
-const mockItems = (count: number) =>
-  Array.from({ length: count }, () =>
-    mockTestimonialItem({ id: faker.string.uuid() }),
-  );
 
 const setup = customRender(TestimonialModuleView, {
   section: { brandVariant: BRAND_VARIANT.PRIMARY },
@@ -168,7 +164,10 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
       expected: 2,
     },
   ])('lays the grid out $title', ({ columns, itemCount, expected }) => {
-    setup({ columns, testimonials: mockItems(itemCount) });
+    setup({
+      columns,
+      testimonials: mockItemsWithIds(itemCount, mockTestimonialItem),
+    });
 
     const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-${expected}`);
 

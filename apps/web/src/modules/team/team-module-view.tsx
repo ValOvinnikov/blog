@@ -1,15 +1,13 @@
 import { CONTENT_ALIGNMENT, DISPLAY_MODE } from '@shinefold/config';
 import type { TTeamModule } from '@shinefold/service';
 import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
-import { hasLength } from '@shinefold/utils/primitives';
-import { ActionGroup } from '@web/components/shared/action-group';
-import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section, type TModuleSection } from '@web/components/shared/section';
+import { ModuleActions } from '@web/components/shared/module-actions';
+import { ModuleSection } from '@web/components/shared/module-section';
+import type { TModuleSection } from '@web/components/shared/section';
 import { TeamCarousel } from '@web/modules/team/components/team-carousel/team-carousel';
 import { TeamMemberCard } from '@web/modules/team/components/team-member-card/team-member-card';
 import { TeamSpotlight } from '@web/modules/team/components/team-spotlight/team-spotlight';
 import { isLoneLastInRow } from '@web/utils/is-lone-last-in-row';
-import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 import { toCardGridColumns } from '@web/utils/to-card-grid-columns';
 import { toTeamGridColumns } from '@web/utils/to-team-grid-columns';
 
@@ -17,63 +15,45 @@ import { teamModuleViewVariants } from './team-module-view-variants';
 
 export interface ITeamModuleViewProps extends Pick<
   TTeamModule,
-  | 'headingBlock'
-  | 'members'
-  | 'showBios'
-  | 'imageShape'
-  | 'displayMode'
-  | 'cardAlignment'
-  | 'ctaButtons'
-  | 'contentAlignment'
-  | 'columns'
+  'headingBlock' | 'members' | 'displayMode' | 'ctaButtons' | 'contentAlignment'
 > {
   section: TModuleSection;
-  titleId: string;
-  dataTestId: string;
+  card: Pick<TTeamModule, 'imageShape' | 'cardAlignment'>;
+  grid: Pick<TTeamModule, 'columns' | 'showBios'>;
+  id: string;
 }
 
 export const TeamModuleView = ({
   section,
   headingBlock,
   members,
-  showBios,
-  imageShape,
   displayMode,
-  cardAlignment,
   ctaButtons,
   contentAlignment,
-  columns: storedColumns,
-  titleId,
-  dataTestId,
+  card,
+  grid,
+  id,
 }: ITeamModuleViewProps) => {
-  const { brandVariant, layout, appearance } = section;
+  const { imageShape, cardAlignment } = card;
+  const titleId = `team-${id}`;
+  const dataTestId = `team-module-${id}`;
   const [spotlightMember] = members;
   const isSpotlight = members.length === 1;
   const cardAlign =
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
   const columns =
-    toCardGridColumns(storedColumns) ??
-    toTeamGridColumns(members.length, showBios);
+    toCardGridColumns(grid.columns) ??
+    toTeamGridColumns(members.length, grid.showBios);
   const lastIndex = members.length - 1;
   const isLoneInRowOfThree = isLoneLastInRow(members.length, 3);
-  const s = moduleGridActionsVariants({ align: contentAlignment });
   const v = teamModuleViewVariants({ columns });
 
   return (
-    <Section
-      brandVariant={brandVariant}
-      layout={layout}
-      appearance={appearance}
+    <ModuleSection
+      module={{ ...section, headingBlock, contentAlignment }}
       titleId={titleId}
       dataTestId={dataTestId}
     >
-      <ModuleHeading
-        headingBlock={headingBlock}
-        id={titleId}
-        level={2}
-        align={contentAlignment}
-        variant="section"
-      />
       {isSpotlight && spotlightMember ? (
         <TeamSpotlight
           member={spotlightMember}
@@ -86,7 +66,7 @@ export const TeamModuleView = ({
           imageShape={imageShape}
           align={cardAlign}
           title={headingBlock.heading}
-          tone={brandVariant}
+          tone={section.brandVariant}
           contentAlignment={contentAlignment}
         />
       ) : (
@@ -110,11 +90,7 @@ export const TeamModuleView = ({
           </CardGrid>
         </div>
       )}
-      {hasLength(ctaButtons) && (
-        <div className={s.actions()}>
-          <ActionGroup actions={ctaButtons} />
-        </div>
-      )}
-    </Section>
+      <ModuleActions actions={ctaButtons} align={contentAlignment} />
+    </ModuleSection>
   );
 };

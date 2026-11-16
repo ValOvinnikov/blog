@@ -21,12 +21,29 @@ export const TeamModule = async ({ id }: ITeamModuleProps) => {
 
   const { section, content } = await getModuleSection(tenantId, result.data);
 
+  const {
+    headingBlock,
+    members,
+    displayMode,
+    ctaButtons,
+    contentAlignment,
+    imageShape,
+    cardAlignment,
+    columns,
+    showBios,
+  } = content;
+
   return (
     <TeamModuleView
-      {...content}
       section={section}
-      titleId={`team-${id}`}
-      dataTestId={`team-module-${id}`}
+      headingBlock={headingBlock}
+      members={members}
+      displayMode={displayMode}
+      ctaButtons={ctaButtons}
+      contentAlignment={contentAlignment}
+      card={{ imageShape, cardAlignment }}
+      grid={{ columns, showBios }}
+      id={id}
     />
   );
 };
