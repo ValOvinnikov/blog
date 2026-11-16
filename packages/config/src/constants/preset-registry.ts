@@ -7,6 +7,7 @@ import { BUSY_BUTTON_STYLE, SPINNER_STYLE } from './busy-button';
 import { BUTTON_SHAPE } from './button-shape';
 import { CAPABILITY } from './capability';
 import { CARD_STYLE } from './card-style';
+import { DIVIDER_WIDTH } from './divider-width';
 import {
   COOKIE_SETTINGS_BUTTON,
   FOOTER_LAYOUT,
@@ -19,6 +20,8 @@ import {
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
 } from './header-layout';
+import { HEADING_CASE, HEADING_WEIGHT } from './heading-style';
+import { IMAGE_PROPORTION } from './image-proportion';
 import { BRAND_VARIANT } from './layout';
 import { NAV_LINK_STYLE } from './nav-link-style';
 import {
@@ -52,6 +55,10 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
     headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
     navLinkStyle: NAV_LINK_STYLE.PLAIN,
+    headingWeight: HEADING_WEIGHT.MEDIUM,
+    headingCase: HEADING_CASE.AS_WRITTEN,
+    imageProportion: IMAGE_PROPORTION.AS_DESIGNED,
+    dividerWidth: DIVIDER_WIDTH.HAIRLINE,
     footerLayout: FOOTER_LAYOUT.COLUMNS,
     footerBackground: BRAND_VARIANT.BRAND_PRIMARY,
     footerSurface: FOOTER_SURFACE.FULL_WIDTH,
@@ -88,6 +95,10 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
     headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
     navLinkStyle: NAV_LINK_STYLE.PLAIN,
+    headingWeight: HEADING_WEIGHT.MEDIUM,
+    headingCase: HEADING_CASE.AS_WRITTEN,
+    imageProportion: IMAGE_PROPORTION.AS_DESIGNED,
+    dividerWidth: DIVIDER_WIDTH.HAIRLINE,
     footerLayout: FOOTER_LAYOUT.COLUMNS,
     footerBackground: BRAND_VARIANT.BRAND_PRIMARY,
     footerSurface: FOOTER_SURFACE.FULL_WIDTH,

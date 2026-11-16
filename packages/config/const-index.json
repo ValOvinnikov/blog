@@ -742,6 +742,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-control-shape.ts"
+      },
+      {
+        "ref": "IMAGE_PROPORTION.SQUARE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/image-proportion.ts"
       }
     ],
     "ROUNDED": [
@@ -828,6 +834,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/card-image-shape.ts"
+      },
+      {
+        "ref": "IMAGE_PROPORTION.WIDE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/image-proportion.ts"
       },
       {
         "ref": "CONTAINER_WIDTH.WIDE",
@@ -1158,6 +1170,34 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/display-mode.ts"
+      }
+    ],
+    "HAIRLINE": [
+      {
+        "ref": "DIVIDER_WIDTH.HAIRLINE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/divider-width.ts"
+      }
+    ],
+    "BOLD": [
+      {
+        "ref": "DIVIDER_WIDTH.BOLD",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/divider-width.ts"
+      },
+      {
+        "ref": "HEADING_WEIGHT.BOLD",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/heading-style.ts"
+      },
+      {
+        "ref": "ICONS.BOLD",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
       }
     ],
     "MAGIC_LINK": [
@@ -1696,6 +1736,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
+      },
+      {
+        "ref": "IMAGE_PROPORTION.CLASSIC",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/image-proportion.ts"
       }
     ],
     "LINKS_BESIDE_BRAND": [
@@ -1760,6 +1806,46 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
+      }
+    ],
+    "REGULAR": [
+      {
+        "ref": "HEADING_WEIGHT.REGULAR",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/heading-style.ts"
+      }
+    ],
+    "MEDIUM": [
+      {
+        "ref": "HEADING_WEIGHT.MEDIUM",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/heading-style.ts"
+      }
+    ],
+    "SEMIBOLD": [
+      {
+        "ref": "HEADING_WEIGHT.SEMIBOLD",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/heading-style.ts"
+      }
+    ],
+    "AS_WRITTEN": [
+      {
+        "ref": "HEADING_CASE.AS_WRITTEN",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/heading-style.ts"
+      }
+    ],
+    "UPPERCASE": [
+      {
+        "ref": "HEADING_CASE.UPPERCASE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/heading-style.ts"
       }
     ],
     "GET": [
@@ -2398,14 +2484,6 @@
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
-    "BOLD": [
-      {
-        "ref": "ICONS.BOLD",
-        "scope": "config",
-        "from": "@shinefold/config/constants",
-        "file": "packages/config/src/constants/icon.ts"
-      }
-    ],
     "ITALIC": [
       {
         "ref": "ICONS.ITALIC",
@@ -2566,6 +2644,14 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/image-layout.ts"
+      }
+    ],
+    "AS_DESIGNED": [
+      {
+        "ref": "IMAGE_PROPORTION.AS_DESIGNED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/image-proportion.ts"
       }
     ],
     "EN": [

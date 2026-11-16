@@ -24,6 +24,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { timestampColumns } from './columns';
+import { siteConfigDetailColumns } from './site-config-detail-columns';
 import {
   accountButtonStyleEnum,
   accountPanelStyleEnum,
@@ -74,6 +75,7 @@ export const siteConfig = pgTable('site_config', {
     .notNull()
     .default(CARD_STYLE.ACCENT_BAR),
   ...siteConfigHeaderColumns,
+  ...siteConfigDetailColumns,
   accountButtonStyle: accountButtonStyleEnum('account_button_style')
     .notNull()
     .default(ACCOUNT_BUTTON_STYLE.PILL),

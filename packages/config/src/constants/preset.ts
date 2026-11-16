@@ -9,6 +9,7 @@ import type { TBusyButtonStyle, TSpinnerStyle } from './busy-button';
 import type { TButtonShape } from './button-shape';
 import type { TCapability } from './capability';
 import type { TCardStyle } from './card-style';
+import type { TDividerWidth } from './divider-width';
 import type {
   TCookieSettingsButton,
   TFooterLayout,
@@ -21,6 +22,8 @@ import type {
   THeaderLayout,
   THeaderSubmenuStyle,
 } from './header-layout';
+import type { THeadingCase, THeadingWeight } from './heading-style';
+import type { TImageProportion } from './image-proportion';
 import type { TBrandVariant } from './layout';
 import type { TNavLinkStyle } from './nav-link-style';
 import type { TThemeTokens } from './theme-tokens';
@@ -93,6 +96,10 @@ export type TPresetBundle = {
   headerSubmenuStyle: THeaderSubmenuStyle;
   headerBarStyle: THeaderBarStyle;
   navLinkStyle: TNavLinkStyle;
+  headingWeight: THeadingWeight;
+  headingCase: THeadingCase;
+  imageProportion: TImageProportion;
+  dividerWidth: TDividerWidth;
   footerLayout: TFooterLayout;
   footerBackground: TBrandVariant;
   footerSurface: TFooterSurface;

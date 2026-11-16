@@ -16,13 +16,17 @@ import {
   BUSY_BUTTON_STYLE,
   CARD_STYLE,
   DENSITY,
+  DIVIDER_WIDTH,
   FONT_CHOICE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
+  HEADING_CASE,
+  HEADING_WEIGHT,
   HUE_MAX,
+  IMAGE_PROPORTION,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   PRESET_ID,
@@ -130,6 +134,10 @@ const STYLE_FIELDS = [
   { field: 'footerBackground', value: BRAND_VARIANT.PRIMARY },
   { field: 'footerSurface', value: FOOTER_SURFACE.CARD },
   { field: 'cookieSettingsButton', value: COOKIE_SETTINGS_BUTTON.SHOWN },
+  { field: 'headingWeight', value: HEADING_WEIGHT.BOLD },
+  { field: 'headingCase', value: HEADING_CASE.UPPERCASE },
+  { field: 'imageProportion', value: IMAGE_PROPORTION.SQUARE },
+  { field: 'dividerWidth', value: DIVIDER_WIDTH.BOLD },
 ] as const;
 
 const NEW_CONFIG_DEFAULTS = [

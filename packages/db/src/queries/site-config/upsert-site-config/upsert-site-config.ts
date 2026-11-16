@@ -1,8 +1,5 @@
 import type { TVoiceFieldFailuresByLocale } from '@shinefold/config';
-import {
-  PRESET_REGISTRY,
-  type TLocaleIsoCode,
-} from '@shinefold/config/constants';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import { getDb } from '@shinefold/db/client';
 import {
@@ -14,6 +11,7 @@ import {
   type TVoiceOverridesByLocale,
 } from '@shinefold/db/schema/site-config';
 import { tenants } from '@shinefold/db/schema/tenants';
+import { presetSiteConfig } from '@shinefold/db/utils/preset-site-config/preset-site-config';
 import { okResult, type TResult } from '@shinefold/utils';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { eq, sql } from 'drizzle-orm';
@@ -74,37 +72,12 @@ export async function upsertSiteConfig(
 
   const { preset } = parsed;
   const optional = presentOptionalFields(parsed);
-  const presetBundle = PRESET_REGISTRY[preset];
-  const { accentHue, headingFont, bodyFont, radiusScale, density } =
-    presetBundle.themeTokens;
 
   const [row] = await db
     .insert(siteConfig)
     .values({
       tenantId,
-      accentHue,
-      headingFont,
-      bodyFont,
-      radiusScale,
-      density,
-      cardStyle: presetBundle.cardStyle,
-      headerControlStyle: presetBundle.headerControlStyle,
-      headerControlShape: presetBundle.headerControlShape,
-      accountButtonStyle: presetBundle.accountButtonStyle,
-      accountPanelStyle: presetBundle.accountPanelStyle,
-      accountPhonePlacement: presetBundle.accountPhonePlacement,
-      busyButtonStyle: presetBundle.busyButtonStyle,
-      spinnerStyle: presetBundle.spinnerStyle,
-      buttonShape: presetBundle.buttonShape,
-      headerLayout: presetBundle.headerLayout,
-      headerSubmenuStyle: presetBundle.headerSubmenuStyle,
-      headerBarStyle: presetBundle.headerBarStyle,
-      navLinkStyle: presetBundle.navLinkStyle,
-      footerLayout: presetBundle.footerLayout,
-      footerBackground: presetBundle.footerBackground,
-      footerSurface: presetBundle.footerSurface,
-      cookieSettingsButton: presetBundle.cookieSettingsButton,
-      preset,
+      ...presetSiteConfig(preset),
       ...optional,
       ...(voicePatch && { voiceOverridesByLocale: voicePatch }),
     })

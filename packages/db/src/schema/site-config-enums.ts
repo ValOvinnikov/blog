@@ -8,6 +8,7 @@ import {
   CARD_STYLE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
+  DIVIDER_WIDTH,
   FONT_CHOICE,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
@@ -16,6 +17,9 @@ import {
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
+  HEADING_CASE,
+  HEADING_WEIGHT,
+  IMAGE_PROPORTION,
   LANGUAGE_SWITCHER_STYLE,
   NAV_LINK_STYLE,
   PRESET_ID,
@@ -94,3 +98,11 @@ export const cookieSettingsButtonEnum = pgEnum(
   'cookie_settings_button',
   COOKIE_SETTINGS_BUTTON,
 );
+
+export const headingWeightEnum = pgEnum('heading_weight', HEADING_WEIGHT);
+
+export const headingCaseEnum = pgEnum('heading_case', HEADING_CASE);
+
+export const imageProportionEnum = pgEnum('image_proportion', IMAGE_PROPORTION);
+
+export const dividerWidthEnum = pgEnum('divider_width', DIVIDER_WIDTH);

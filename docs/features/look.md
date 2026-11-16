@@ -6,10 +6,17 @@ code:
   - packages/config/src/constants/preset.ts
   - packages/config/src/constants/card-style.ts
   - packages/config/src/constants/busy-button.ts
+  - packages/config/src/constants/heading-style.ts
+  - packages/config/src/constants/image-proportion.ts
+  - packages/config/src/constants/divider-width.ts
+  - packages/config/src/theme/heading-declarations.ts
+  - packages/config/src/theme/image-proportion-declarations.ts
+  - packages/config/src/theme/divider-declarations.ts
   - packages/db/src/schema/site-config.ts
   - packages/db/src/queries/site-config/**
   - packages/db/src/constants/look.ts
   - packages/db/src/utils/effective-look/**
+  - packages/db/src/utils/preset-site-config/**
   - apps/platform/src/app/*/dashboard/*/look/**
   - apps/platform/src/app/*/tenants/*/*/look/**
   - apps/platform/src/components/features/look/**
@@ -38,7 +45,7 @@ code:
   - apps/web/src/components/shared/theme-scope/**
   - apps/web/src/config/fonts.ts
   - apps/web/src/config/font-loaders/**
-epics: [4987, 4991, 4992, 4993, 4999, 4960, 6317]
+epics: [4987, 4991, 4992, 4993, 4999, 4960, 6317, 5067]
 ---
 
 # Look
@@ -59,7 +66,8 @@ The Look page is where a tenant owner styles their public site without touching 
 ## Data
 
 - `site_config` (Neon) — one row per tenant (unique `tenant_id`, cascade delete). Look columns: `preset` (`preset_id` pgEnum), `accent_hue` (int), `logo_hue` (int, nullable = follow the accent), `heading_font` and `body_font` (`font_choice`), `radius_scale` (`NONE`/`SM`/`MD`/`LG`/`XL`; `NONE` sets every radius role to zero, so cards, menus, panels, tables, images and Soft navigation links are square, while tags and every other control drawn with the Buttons shape follow that shape (form fields take `rounded-sm`, so they are square too), Rounded buttons and Rounded header controls keeping Small's corners through `atLeastSmall`), `density` (`DEFAULT`, labelled Comfortable, as in Studio, or `COMPACT`), `card_style` (`ACCENT_BAR` default, `OUTLINED`, `FILLED`, `RAISED`, `PLAIN`), `header_control_style` (`OUTLINED` default, `SOFT`, `PLAIN`; a new row takes the preset's, `OUTLINED` for both; `HEADER_CONTROL_STYLE_DECLARATIONS` maps each to `--header-control-border` / `--header-control-fill`), `header_control_shape` (`ROUND` default, `ROUNDED`, `SQUARE`; a new row takes the preset's, `ROUND` for both; `HEADER_CONTROL_SHAPE_DECLARATIONS` maps each to `--radius-header-control`, Rounded following Corners but never below Small; the Header card's Header buttons shape field edits it, and Use preset value resets it; on `FREE` and `STARTER` the public site renders the preset's Round), `language_switcher_style` (`MENU_CODE` default, `MENU_GLOBE`, `CODES`), `account_button_style` (`PILL` default, `CIRCLE`), `account_panel_style` (`CARD` default, `PROFILE`, `HUB`), `account_phone_placement` (`BAR` default, `MENU`), `busy_button_style` (`LABEL` default, `KEPT`, `EDGE`), `spinner_style` (`BRAILLE` default, `RING`, `DOTS`, `PULSE`; a new row takes the preset's, Braille for Console and Ring for Editorial), `button_shape` (`ROUNDED` default, `SQUARE`, `PILL`; a new row takes the preset's, Rounded for both; the Buttons card's Shape field edits it, and `--radius-button` carries it to the buttons and tags of the public site; form fields follow Corners instead), `header_layout` (`CLASSIC` default, `LINKS_BESIDE_BRAND`, `CENTRED_LINKS`, `TWO_ROWS`, `CENTRED_BRAND`, `MENU_BUTTON`), `header_submenu_style` (`DROPDOWN` default, `WIDE_PANEL`), `header_bar_style` (`FULL_WIDTH` default, `FLOATING`), `nav_link_style` (`PLAIN` default, `UNDERLINE`, `SOFT`, `PILL`; a new row takes the preset's, Plain for both; the Header card's Navigation links field edits it, and Use preset value resets it), `footer_layout` (`COLUMNS` default, `CENTRED`, `COMPACT`, `BIG_WORDMARK`), `footer_background` (`BRAND_PRIMARY` default, `PRIMARY`, `SECONDARY` — the `BRAND_VARIANT` skins), `footer_surface` (`FULL_WIDTH` default, `CARD`), `cookie_settings_button` (`HIDDEN` default — footer link only, `SHOWN` — link and floating button, `ONLY` — floating button only) — a new row takes the preset's, the defaults for both, and a preset change leaves them as they are; `brand_name` (text, nullable = the tenant name), `logo_asset_url`, `favicon_asset_url`. The same row holds Voice's `voice_overrides`.
-- `PRESET_REGISTRY` (`@shinefold/config`) — `CONSOLE`: hue 250, Space Grotesk / Newsreader, `MD`, `DEFAULT`, `ACCENT_BAR`. `EDITORIAL`: hue 28, Fraunces / Inter, `SM`, `COMPACT`, `OUTLINED`. Each preset also carries the capability `featureDefaults`.
+- `PRESET_REGISTRY` (`@shinefold/config`) — `CONSOLE`: hue 250, Space Grotesk / Newsreader, `MD`, `DEFAULT`, `ACCENT_BAR`. `EDITORIAL`: hue 28, Fraunces / Inter, `SM`, `COMPACT`, `OUTLINED`. Both presets carry today's `MEDIUM` heading weight, `AS_WRITTEN` heading case, `AS_DESIGNED` image proportion and `HAIRLINE` divider width. Each preset also carries the capability `featureDefaults`.
+- **Heading weight, heading case, image proportion and divider width** — four `site_config` columns, each a `NOT NULL` pgEnum defaulting to today's step: `heading_weight` (`HEADING_WEIGHT`: `REGULAR`, `MEDIUM`, `SEMIBOLD`, `BOLD`), `heading_case` (`HEADING_CASE`: `AS_WRITTEN`, `UPPERCASE`), `image_proportion` (`IMAGE_PROPORTION`: `AS_DESIGNED`, `WIDE`, `CLASSIC`, `SQUARE`) and `divider_width` (`DIVIDER_WIDTH`: `HAIRLINE`, `BOLD`). `getSiteConfig` returns them and `upsertSiteConfig` accepts them; they are Growth-only Look fields. Each step turns into CSS through its declaration table in `@shinefold/config/theme` — `HEADING_WEIGHT_DECLARATIONS` (`--font-weight-heading` 400/500/600/700), `HEADING_CASE_DECLARATIONS` (`--heading-case`, plus the hero, post, page and section titles' letter-spacing, which `UPPERCASE` opens to `0.02em`), `IMAGE_PROPORTION_DECLARATIONS` (`--aspect-card` and `--aspect-split`: `AS_DESIGNED` 16 / 9 and 4 / 3, `WIDE` both 16 / 9, `CLASSIC` both 4 / 3, `SQUARE` both 1 / 1) and `DIVIDER_WIDTH_DECLARATIONS` (`--divider-width` 1px / 2px). The default steps declare exactly what `configs/tailwind/theme.css` holds. Neither the public site nor the platform reads the four yet, and they have no per-section override.
 - Provisioning writes no row. With no row, the site renders the Console preset and the form opens on Console defaults.
 - Brand images live in Vercel Blob at `tenants/<id>/<logo|favicon>-<random suffix>.<ext>`, public. Every upload gets a unique name, so a same-type replacement never collides with the old file or its cached copy. A replaced or cleared image's old blob is deleted best-effort.
 - **Caching (web)** — `getSiteConfig` is `unstable_cache` per tenant, tag `site-config:<id>`, 3600s fallback (`TENANT_CONFIG_REVALIDATE_SECONDS`). `updateLookAction`, `uploadBrandAssetAction` and `clearBrandAssetAction` each POST `/api/revalidate-site-config` after their write, which expires the tenant's tags and purges that tenant's own pages ([rendering-and-caching](./rendering-and-caching.md)).
@@ -114,6 +122,8 @@ The Look page is where a tenant owner styles their public site without touching 
 
 - `packages/config/src/constants/preset.ts` — `PRESET_REGISTRY`, `FONT_CHOICE`, `RADIUS_SCALE`, `DENSITY`, `LANGUAGE_SWITCHER_STYLE`
 - `packages/db/src/schema/site-config.ts`
+- `packages/config/src/constants/heading-style.ts`, `image-proportion.ts`, `divider-width.ts` and `packages/config/src/theme/heading-declarations.ts`, `image-proportion-declarations.ts`, `divider-declarations.ts` — the four detail settings and their declaration tables
+- `packages/db/src/utils/preset-site-config/preset-site-config.ts` — a preset's `site_config` values, shared by the inserts and the effective Look
 - `apps/platform/src/components/features/look/look-page-content/look-page-content.tsx`
 - `apps/platform/src/components/features/look/look-form/look-form.tsx`, `use-look-form-state.ts`, `use-look-save.ts`
 - `apps/platform/src/components/features/look/look-jump-index/` and `apps/platform/src/utils/look-anchor/look-anchor.ts` — the jump index, its current-card rule and the card and group anchors
@@ -137,6 +147,7 @@ The Look page is where a tenant owner styles their public site without touching 
 - Platform: tests beside every Look component, both `look/page.test.tsx` routes, `apps/platform/src/server/site-config/*.test.ts`, `default-look-values.test.ts`, `look-form-values.test.ts`, `look-preset.test.ts`, `look-row-summaries.test.ts`, `fit-preset-chips.test.ts`, `preset-strip.test.tsx` (frame H's twelve presets as fixtures), `theme-preview-tokens.test.ts`, `brand-asset-limits.test.ts`, `apps/platform/src/config/fonts.test.ts`, `look-sample.test.tsx`, `use-look-follow.test.tsx`, `look-follow-status.test.tsx`, `look-form.follow.test.tsx`, `look-follow-target.test.ts`, `look-preview.test.tsx` (full screen included).
 - Web: `to-theme-tokens.test.ts`, `get-theme-tokens.test.ts`, `build-theme-style-block.test.ts`, `theme-scope.test.tsx`, `get-site-config.test.ts`, `get-language-switcher-style.test.ts`, `get-busy-style.test.ts`, `get-brand-logo-url.test.ts`, `icon.test.ts`, `brand-lockup-link.test.tsx`, `site-header.test.tsx`, `apps/web/src/config/fonts.test.ts`.
 - db: `packages/db/src/queries/site-config/**/*.test.ts`.
+- Config: `packages/config/src/theme/look-step-declarations.test.ts` — each preset's default heading, image and divider steps declare `theme.css`'s values.
 - Stories: `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`. The platform has no stories.
 
 ## Related

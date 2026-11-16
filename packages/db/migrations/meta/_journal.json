@@ -183,6 +183,13 @@
       "when": 1794594607490,
       "tag": "0025_stripe-catalogue",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1794822534977,
+      "tag": "0026_site-config-look-details",
+      "breakpoints": true
     }
   ]
 }
