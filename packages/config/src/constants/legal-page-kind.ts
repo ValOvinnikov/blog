@@ -1,6 +1,6 @@
-import { isOneOf } from '@blog/utils/primitives';
+import { isOneOf } from '@shinefold/utils/primitives';
 
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const LEGAL_PAGE_KIND = {
   PRIVACY_POLICY: 'PRIVACY_POLICY',

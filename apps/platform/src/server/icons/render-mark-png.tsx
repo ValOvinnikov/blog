@@ -1,10 +1,10 @@
 import 'server-only';
 
-import { isUndefined } from '@blog/utils/primitives';
+import { isUndefined } from '@shinefold/utils/primitives';
 import {
   SHINEFOLD_LOGO_VARIANT,
   shinefoldLogoSvg,
-} from '@blog/utils/shinefold-logo';
+} from '@shinefold/utils/shinefold-logo';
 import { ImageResponse } from 'next/og';
 
 export const renderMarkPng = (side: number, background?: string) => {

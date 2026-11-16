@@ -1,4 +1,4 @@
-import type { TFaqPageQuestion } from '@blog/service';
+import type { TFaqPageQuestion } from '@shinefold/service';
 
 export type TFaqPageSchema = {
   '@context': 'https://schema.org';

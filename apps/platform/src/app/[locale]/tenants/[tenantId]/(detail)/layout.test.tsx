@@ -32,7 +32,7 @@ vi.mock('next/headers', () => ({
   headers: vi.fn(async () => new Headers()),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     admins: { getAdminByUserId: getAdminByUserIdMock },

@@ -5,8 +5,8 @@ import {
   type TCtaActionAppearance,
   type TCtaActionVariant,
   type TMaybeUndefined,
-} from '@blog/config';
-import { LinkButton } from '@blog/ui/components/molecules/link-button';
+} from '@shinefold/config';
+import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
 import { SmartLink } from '@web/components/shared/smart-link';
 
 import {

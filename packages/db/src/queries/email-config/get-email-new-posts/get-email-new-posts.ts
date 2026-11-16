@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import { EMAIL_NEW_POSTS_DEFAULT } from '@blog/db/constants';
-import { emailConfig } from '@blog/db/schema/email-config';
+import { getDb } from '@shinefold/db/client';
+import { EMAIL_NEW_POSTS_DEFAULT } from '@shinefold/db/constants';
+import { emailConfig } from '@shinefold/db/schema/email-config';
 import { eq } from 'drizzle-orm';
 
 export async function getEmailNewPosts(tenantId: string): Promise<boolean> {

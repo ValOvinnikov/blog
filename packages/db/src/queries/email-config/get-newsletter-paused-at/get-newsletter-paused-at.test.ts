@@ -1,13 +1,13 @@
-import { pauseNewsletter } from '@blog/db/queries/email-config/pause-newsletter';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
+import { pauseNewsletter } from '@shinefold/db/queries/email-config/pause-newsletter';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { getNewsletterPausedAt } from './get-newsletter-paused-at';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);

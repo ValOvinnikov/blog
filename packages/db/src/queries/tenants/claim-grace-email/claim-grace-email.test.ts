@@ -1,14 +1,14 @@
-import { GRACE_EMAIL, type TGraceEmail } from '@blog/db/constants';
-import { listTenantsDueForGraceEmail } from '@blog/db/queries/tenants/list-tenants-due-for-grace-email';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { daysBeforeNow } from '@blog/db/testing/tenants/grace';
+import { GRACE_EMAIL, type TGraceEmail } from '@shinefold/db/constants';
+import { listTenantsDueForGraceEmail } from '@shinefold/db/queries/tenants/list-tenants-due-for-grace-email';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { daysBeforeNow } from '@shinefold/db/testing/tenants/grace';
 
 import { claimGraceEmail } from './claim-grace-email';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock();

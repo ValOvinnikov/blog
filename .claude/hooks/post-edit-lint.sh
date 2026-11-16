@@ -61,7 +61,7 @@ done
 cd "$workspace_dir" || exit 0
 
 # BLOG_LINT_TOUCHED switches on the rules that apply only to files being
-# changed (the blog-touched rules in configs/eslint/base.js).
+# changed (the shinefold-touched rules in configs/eslint/base.js).
 output=$(BLOG_LINT_TOUCHED=1 "$eslint" --no-warn-ignored "$file_path" 2>&1)
 status=$?
 

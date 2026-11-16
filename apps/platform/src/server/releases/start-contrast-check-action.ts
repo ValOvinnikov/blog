@@ -1,13 +1,6 @@
 'use server';
 
 import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  type TActionResult,
-} from '@blog/config';
-import { toOutcome } from '@blog/utils/to-outcome';
-import {
   CONTRAST_WORKFLOW_FILE,
   RELEASE_REFUSAL,
   RELEASE_LOG,
@@ -16,6 +9,13 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { getBranchHeadSha } from '@platform/server/github/get-branch-head-sha';
 import { isWorkflowRunActive } from '@platform/server/github/is-workflow-run-active';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TActionResult,
+} from '@shinefold/config';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { dispatchContrastWorkflow } from './dispatch-contrast-workflow';
 

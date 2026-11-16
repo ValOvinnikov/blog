@@ -1,5 +1,5 @@
-import type { TEmailAction } from '@blog/email/html/email-action/email-action';
-import { sanitizeHref } from '@blog/utils';
+import type { TEmailAction } from '@shinefold/email/html/email-action/email-action';
+import { sanitizeHref } from '@shinefold/utils';
 
 export const LIST_UNSUBSCRIBE_ONE_CLICK = 'List-Unsubscribe=One-Click';
 

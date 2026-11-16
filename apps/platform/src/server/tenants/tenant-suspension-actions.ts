@@ -1,21 +1,5 @@
 'use server';
 
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  isOutcomeSuccess,
-  type TAuditAction,
-  type TMaybeUndefined,
-} from '@blog/config';
-import {
-  SUSPENSION_CATEGORY,
-  TENANT_STATUS,
-  type TSuspensionStatus,
-} from '@blog/db';
-import type { TTenantSuspension } from '@blog/db/schema/tenant-suspensions';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { type TENANT_REFUSAL, TENANT_LOG } from '@platform/constants/tenant';
 import { SUSPENSION_DESCRIPTION_MAX_LENGTH } from '@platform/constants/tenant-suspension';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -27,6 +11,22 @@ import { notifyOwnerOfSuspension } from '@platform/server/tenants/notify-owner-o
 import { resolveSuspendableTenant } from '@platform/server/tenants/resolve-suspendable-tenant';
 import type { TSuspensionCase } from '@platform/server/tenants/tenant-suspension-case';
 import { applyTenantSuspension } from '@platform/server/tenants/tenant-suspension-writes';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  isOutcomeSuccess,
+  type TAuditAction,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import {
+  SUSPENSION_CATEGORY,
+  TENANT_STATUS,
+  type TSuspensionStatus,
+} from '@shinefold/db';
+import type { TTenantSuspension } from '@shinefold/db/schema/tenant-suspensions';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { after } from 'next/server';
 import { z } from 'zod';
 

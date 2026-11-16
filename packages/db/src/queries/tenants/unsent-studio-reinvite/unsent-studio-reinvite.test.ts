@@ -1,7 +1,10 @@
-import * as schema from '@blog/db/schema';
-import { insertTestTenant, MOCK_OWNER_EMAIL } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import * as schema from '@shinefold/db/schema';
+import {
+  insertTestTenant,
+  MOCK_OWNER_EMAIL,
+} from '@shinefold/db/testing/fixtures';
+import { usePersonalDataKeys } from '@shinefold/db/testing/personal-data';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
 import {
@@ -10,7 +13,7 @@ import {
   setUnsentStudioReinvite,
 } from './unsent-studio-reinvite';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 usePersonalDataKeys();

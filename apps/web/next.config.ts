@@ -1,6 +1,6 @@
 // The constants barrel pulls in aliased runtime imports Next's config transpiler cannot resolve, so import the one file.
-import { EMBED_ORIGINS } from '@blog/config/constants/embed';
-import { createNextConfig } from '@blog/next-config/preset';
+import { EMBED_ORIGINS } from '@shinefold/config/constants/embed';
+import { createNextConfig } from '@shinefold/next-config/preset';
 import { withBotId } from 'botid/next/config';
 
 import {
@@ -22,14 +22,14 @@ export default withBotId(
       globalNotFound: true,
     },
     transpilePackages: [
-      '@blog/ui',
-      '@blog/service',
-      '@blog/config',
-      '@blog/email',
-      '@blog/next-config',
+      '@shinefold/ui',
+      '@shinefold/service',
+      '@shinefold/config',
+      '@shinefold/email',
+      '@shinefold/next-config',
     ],
     images: {
-      // Next's static-image types declare `*.svg` as `any`, clashing with @blog/ui's typed SVGR declarations.
+      // Next's static-image types declare `*.svg` as `any`, clashing with @shinefold/ui's typed SVGR declarations.
       disableStaticImages: true,
       remotePatterns: [
         {

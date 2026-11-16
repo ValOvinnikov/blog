@@ -1,4 +1,4 @@
-import type { TNewsletterResult } from '@blog/config';
+import type { TNewsletterResult } from '@shinefold/config';
 
 type TNewsletterResultMessages = {
   namespace: 'newsletterConfirm' | 'newsletterUnsubscribe';

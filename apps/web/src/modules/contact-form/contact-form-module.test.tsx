@@ -1,6 +1,6 @@
-import { ACTION_OUTCOME, SITE_MESSAGES } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { ACTION_OUTCOME, SITE_MESSAGES } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
@@ -26,7 +26,7 @@ const { getContactFormMock } = vi.hoisted(() => ({
   getContactFormMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       contactForm: { v1: { getContactForm: getContactFormMock } },

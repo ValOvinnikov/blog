@@ -3,8 +3,8 @@ import type {
   TDensity,
   TGridColumns,
   TRadiusScale,
-} from '@blog/config';
-import type { moduleAppearanceFragment } from '@blog/service/shared/fragments/module/module-appearance';
+} from '@shinefold/config';
+import type { moduleAppearanceFragment } from '@shinefold/service/shared/fragments/module/module-appearance';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawModuleAppearance = InferFragmentType<

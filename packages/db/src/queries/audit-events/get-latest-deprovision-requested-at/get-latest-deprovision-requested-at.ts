@@ -1,6 +1,6 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { auditEvents } from '@blog/db/schema/audit-events';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { auditEvents } from '@shinefold/db/schema/audit-events';
 import { and, desc, eq } from 'drizzle-orm';
 
 // The most recent time a tenant's deprovisioning was requested, if ever.

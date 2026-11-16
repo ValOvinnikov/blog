@@ -1,4 +1,3 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import {
@@ -8,6 +7,7 @@ import {
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
 
 import { revalidateSiteConfig } from './revalidate-site-config';
 

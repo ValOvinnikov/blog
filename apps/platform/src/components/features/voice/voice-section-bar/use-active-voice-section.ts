@@ -1,7 +1,7 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import type { TVoiceSection } from '@platform/constants/voice';
 import { useLayoutMeasure } from '@platform/utils/use-layout-measure/use-layout-measure';
 import { findActiveVoiceSection } from '@platform/utils/voice-sections/voice-sections';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import { type RefObject, useEffect, useRef, useState } from 'react';
 
 import { stickyTopOf } from './sticky-top';

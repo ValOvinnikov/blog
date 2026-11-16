@@ -1,11 +1,11 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
 import {
   customDomainClaims,
   type TCustomDomainClaim,
-} from '@blog/db/schema/custom-domain-claims';
-import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/db/schema/custom-domain-claims';
+import { isValidDomain } from '@shinefold/db/utils/is-valid-domain/is-valid-domain';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 
 export async function insertCustomDomainClaim(
   tenantId: string,

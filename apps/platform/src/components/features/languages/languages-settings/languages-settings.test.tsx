@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
 import { updateTenantLanguagesAction } from '@platform/server/tenants/update-tenant-languages-action';
 import { ARIA_DISABLED } from '@platform/testing/aria';
@@ -11,6 +10,7 @@ import {
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LanguagesSettings } from './languages-settings';

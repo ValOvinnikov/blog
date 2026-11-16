@@ -1,5 +1,5 @@
-import { portableTextToPlainText } from '@blog/config';
-import type { TFaqModuleQuestions } from '@blog/service/shared/adaptors/faq-questions/types';
+import { portableTextToPlainText } from '@shinefold/config';
+import type { TFaqModuleQuestions } from '@shinefold/service/shared/adaptors/faq-questions/types';
 
 export type TFaqPageQuestion = {
   id: string;

@@ -1,5 +1,5 @@
-import { type IWithClassName, type IWithDataTestId } from '@blog/config';
-import { MetaSeparator } from '@blog/ui/components/atoms/meta-separator';
+import { type IWithClassName, type IWithDataTestId } from '@shinefold/config';
+import { MetaSeparator } from '@shinefold/ui/components/atoms/meta-separator';
 
 import { cardMetaVariants } from './card-meta-variants';
 

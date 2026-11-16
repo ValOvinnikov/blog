@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import type { queries } from '@blog/db';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import type { queries } from '@shinefold/db';
 import type { TContactMessageSource } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { MOCK_CONTACT_MESSAGE } from '@web/testing/modules/contact-form/fixtures';

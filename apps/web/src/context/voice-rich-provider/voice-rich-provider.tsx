@@ -1,6 +1,6 @@
 'use client';
 
-import type { TVoicePortableText } from '@blog/config';
+import type { TVoicePortableText } from '@shinefold/config';
 import type { TVoiceRichFieldId } from '@web/utils/resolve-voice-rich-fields';
 import { createContext, useContext, type ReactNode } from 'react';
 

@@ -1,4 +1,3 @@
-import { PRESET_ID, SIZE } from '@blog/config';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -12,6 +11,7 @@ import {
   LOOK_ANCHOR_CLASSES,
   toLookAnchorId,
 } from '@platform/utils/look-anchor/look-anchor';
+import { PRESET_ID, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

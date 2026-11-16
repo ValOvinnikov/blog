@@ -1,9 +1,9 @@
 import {
   BRAND_TAGLINE_SEPARATOR_CHARS,
   BRAND_TAGLINE_SEPARATORS,
-} from '@blog/config/constants';
-import { brandTaglineItemSchema } from '@blog/studio/schema-types/objects/brand-tagline-item/brand-tagline-item';
-import { toTitleCase } from '@blog/utils/primitives';
+} from '@shinefold/config/constants';
+import { brandTaglineItemSchema } from '@shinefold/studio/schema-types/objects/brand-tagline-item/brand-tagline-item';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export const brandTaglineSchema = defineType({

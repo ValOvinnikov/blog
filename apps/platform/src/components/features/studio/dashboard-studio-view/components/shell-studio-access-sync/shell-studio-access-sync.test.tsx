@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
 import {
   OWNER_STUDIO_ACCESS,
   type TOwnerStudioAccess,
@@ -6,6 +5,7 @@ import {
 import { ShellStudioAccessProvider } from '@platform/context/shell-studio-access-provider';
 import { renderWithIntl } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 import { ShellStudioAccessSync } from './shell-studio-access-sync';
 

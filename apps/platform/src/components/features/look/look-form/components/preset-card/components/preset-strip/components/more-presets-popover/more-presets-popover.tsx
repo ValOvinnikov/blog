@@ -1,7 +1,6 @@
 'use client';
 
 import { Popover } from '@base-ui/react/popover';
-import type { TMaybeNull } from '@blog/config';
 import { MorePresetsLabel } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/more-presets-label/more-presets-label';
 import { morePresetsButtonVariants } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/more-presets-label/more-presets-label-variants';
 import { PresetOptionList } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/preset-option-list/preset-option-list';
@@ -9,6 +8,7 @@ import type { TPresetOption } from '@platform/components/features/look/look-form
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
 import { KEY } from '@platform/constants/keyboard';
 import { PRESET_LIST_LAYOUT } from '@platform/constants/preset-list';
+import type { TMaybeNull } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import {
   useId,

@@ -1,5 +1,5 @@
-import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
-import { validateImageHasAsset } from '@blog/studio/schema-types/validation/validate-image-has-asset/validate-image-has-asset';
+import { linkReferenceField } from '@shinefold/studio/schema-types/fields/link-reference-field/link-reference-field';
+import { validateImageHasAsset } from '@shinefold/studio/schema-types/validation/validate-image-has-asset/validate-image-has-asset';
 import { Building2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

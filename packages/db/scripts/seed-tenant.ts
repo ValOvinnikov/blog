@@ -1,26 +1,26 @@
 // Seeds one tenant's registry rows and grants an existing user OWNER on it; manual, human-run only.
 // `db:seed-tenant` runs with `--conditions=react-server` so `getDb()`'s `server-only` import resolves outside Next.js.
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import {
   MEMBERSHIP_ROLE,
   TENANT_STATUS,
   type TTenantStatus,
-} from '@blog/db/constants';
-import { createMembership } from '@blog/db/queries/memberships';
+} from '@shinefold/db/constants';
+import { createMembership } from '@shinefold/db/queries/memberships';
 import {
   addTenantDomain,
   getTenantByDomain,
-} from '@blog/db/queries/tenant-domains';
+} from '@shinefold/db/queries/tenant-domains';
 import {
   createTenant,
   getTenantById,
   getTenantIdBySanityProjectId,
   setTenantSanityToken,
-} from '@blog/db/queries/tenants';
-import { findUserByEmail } from '@blog/db/queries/users';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
-import { isNull } from '@blog/utils/primitives';
+} from '@shinefold/db/queries/tenants';
+import { findUserByEmail } from '@shinefold/db/queries/users';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isValidDomain } from '@shinefold/db/utils/is-valid-domain/is-valid-domain';
+import { isNull } from '@shinefold/utils/primitives';
 
 import { runIfEntrypoint } from './lib/run-if-entrypoint';
 

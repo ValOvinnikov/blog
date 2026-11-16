@@ -1,6 +1,6 @@
-import { HTTP_STATUS, LOCALE_ISO_CODES } from '@blog/config/constants';
-import { getTenantById } from '@blog/db/queries/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
+import { HTTP_STATUS, LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { getTenantById } from '@shinefold/db/queries/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { COOKIE_STATEMENT_LOG } from '@worker/constants/cookie-statement';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { env } from '@worker/utils/env/env';

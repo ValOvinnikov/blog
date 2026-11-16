@@ -1,14 +1,14 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   MEMBERSHIP_INVITE_OUTCOME,
   type TMembershipRole,
-} from '@blog/db/constants';
-import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
+} from '@shinefold/db/constants';
+import { inviteEmailColumns } from '@shinefold/db/queries/membership-invites/invite-email-columns';
 import {
   membershipInvites,
   type TMembershipInvite,
-} from '@blog/db/schema/membership-invites';
-import { tenants } from '@blog/db/schema/tenants';
+} from '@shinefold/db/schema/membership-invites';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { and, eq, sql } from 'drizzle-orm';
 
 import { castTo, columnDefault } from './insert-select-columns';

@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import {
   buildPngBuffer,
@@ -9,6 +8,7 @@ import {
   MAX_EMAIL_LOGO_BYTES,
   maxEmailLogoKbLabel,
 } from '@platform/utils/email-logo-limits/email-logo-limits';
+import { ACTION_OUTCOME } from '@shinefold/config';
 
 import { validateEmailLogoUpload } from './validate-email-logo';
 

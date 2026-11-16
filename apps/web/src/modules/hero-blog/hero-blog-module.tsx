@@ -1,4 +1,4 @@
-import { service } from '@blog/service';
+import { service } from '@shinefold/service';
 import { HERO_BLOG_LOG } from '@web/constants/hero-blog';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';

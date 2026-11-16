@@ -1,7 +1,7 @@
-import { queries } from '@blog/db';
-import { PLAN_LOCALE_LIMIT } from '@blog/db/constants';
 import { LanguagesSettings } from '@platform/components/features/languages/languages-settings';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import { queries } from '@shinefold/db';
+import { PLAN_LOCALE_LIMIT } from '@shinefold/db/constants';
 
 export type TLanguagesPageContentProps = {
   tenant: TPlatformTenant;

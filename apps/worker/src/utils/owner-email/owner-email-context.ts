@@ -1,4 +1,4 @@
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { DEFAULT_OWNER_EMAIL_FROM_ADDRESS } from '@worker/constants/owner-email';
 import { env } from '@worker/utils/env/env';
 

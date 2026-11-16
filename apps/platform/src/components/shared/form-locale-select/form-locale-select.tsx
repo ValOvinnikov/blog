@@ -1,10 +1,10 @@
 'use client';
 
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
-import { toOptions } from '@blog/utils/primitives';
 import { FormField } from '@platform/components/shared/form-field';
 import { OptionSelect } from '@platform/components/shared/option-select';
 import type { TFieldAppearance } from '@platform/constants/field-appearance';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@shinefold/config';
+import { toOptions } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 export type TFormLocaleSelectProps = {

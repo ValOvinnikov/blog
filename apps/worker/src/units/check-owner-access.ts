@@ -1,8 +1,8 @@
 import {
   TENANT_OWNER_EMAIL,
   type TElevateTenantOwnerOutcome,
-} from '@blog/db/constants';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/constants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';

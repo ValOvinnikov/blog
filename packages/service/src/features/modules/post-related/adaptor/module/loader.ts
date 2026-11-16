@@ -1,8 +1,8 @@
-import { isr } from '@blog/service/sanity/query/isr';
+import { isr } from '@shinefold/service/sanity/query/isr';
 import {
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query/query';
+} from '@shinefold/service/sanity/query/query';
 
 import { postRelatedModuleQuery } from './query';
 import { toPostRelatedModuleDocument } from './transformer';

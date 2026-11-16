@@ -1,5 +1,5 @@
-import { TOAST_TYPE, type TToastType } from '@blog/config';
-import type { IToast } from '@blog/ui/components/molecules/toast';
+import { TOAST_TYPE, type TToastType } from '@shinefold/config';
+import type { IToast } from '@shinefold/ui/components/molecules/toast';
 
 /** Default auto-dismiss life per type, in ms — `undefined` = sticky. */
 const TOAST_DEFAULT_LIFE_MS: Partial<Record<TToastType, number>> = {

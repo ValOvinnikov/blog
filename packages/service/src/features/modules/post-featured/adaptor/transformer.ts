@@ -1,8 +1,8 @@
-import { POST_SOURCE } from '@blog/config';
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
-import { toModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
-import { toPostCard } from '@blog/service/shared/transformers/post/to-post-card';
+import { POST_SOURCE } from '@shinefold/config';
+import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
+import { toModuleAppearance } from '@shinefold/service/shared/transformers/module/to-module-appearance';
+import { toPostCard } from '@shinefold/service/shared/transformers/post/to-post-card';
 import type { InferResultType } from 'groqd';
 
 import type { postFeaturedModuleQuery } from './query';

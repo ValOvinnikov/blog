@@ -1,10 +1,10 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { admins } from '@blog/db/schema/admins';
-import { users } from '@blog/db/schema/auth';
-import { memberships } from '@blog/db/schema/memberships';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import { admins } from '@shinefold/db/schema/admins';
+import { users } from '@shinefold/db/schema/auth';
+import { memberships } from '@shinefold/db/schema/memberships';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { and, eq, exists, not } from 'drizzle-orm';
 
 // TODO: once comments exist, tombstone them ahead of this delete — a comment

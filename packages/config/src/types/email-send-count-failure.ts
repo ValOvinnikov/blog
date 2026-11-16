@@ -1,4 +1,4 @@
-import type { TEmailType } from '@blog/config/constants';
+import type { TEmailType } from '@shinefold/config/constants';
 
 export interface IEmailSendCountFailure {
   siteId: string;

@@ -1,4 +1,9 @@
-import { FONT_CHOICE, PRESET_ID, SIZE, type TPresetId } from '@blog/config';
+import {
+  FONT_CHOICE,
+  PRESET_ID,
+  SIZE,
+  type TPresetId,
+} from '@shinefold/config';
 
 import type { TPresetSwatch } from './components/preset-strip';
 

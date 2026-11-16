@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CARD_STYLE,
@@ -7,24 +8,23 @@ import {
   GRID_COLUMNS,
   LOCALE_ISO_CODES,
   RADIUS_SCALE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   MOCK_TESTIMONIAL_MODULE_ID,
   mockRawTestimonialModule,
-} from '@blog/service/testing/modules/testimonial/fixtures';
+} from '@shinefold/service/testing/modules/testimonial/fixtures';
 import {
   mockRawPortableTextMarkDef,
   mockReference,
-} from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_IMAGE_ASSET_DOCUMENT,
   mockLocalizedHeadingBlock,
   mockLocalizedImage,
   mockLocalizedListedText,
   mockLocalizedStrings,
-} from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
 
 import { testimonialModuleQuery } from './query';
 

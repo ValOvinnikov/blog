@@ -1,7 +1,7 @@
-import { PRICE_PERIOD, SITE_MESSAGES } from '@blog/config';
-import { MOCK_DOLLAR_AMOUNT } from '@blog/db/testing/stripe-catalogue/fixtures';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { PRICE_PERIOD, SITE_MESSAGES } from '@shinefold/config';
+import { MOCK_DOLLAR_AMOUNT } from '@shinefold/db/testing/stripe-catalogue/fixtures';
+import { errorResult, okResult } from '@shinefold/utils';
 import { PRICING_LOG } from '@web/constants/pricing';
 import { getPlanPrices } from '@web/server/pricing/get-plan-prices/get-plan-prices';
 import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
@@ -34,7 +34,7 @@ const { getPricingModuleMock } = vi.hoisted(() => ({
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: { pricing: { v1: { getPricingModule: getPricingModuleMock } } },
   },

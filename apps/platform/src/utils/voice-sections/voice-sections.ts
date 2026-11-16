@@ -1,12 +1,4 @@
 import {
-  VOICE_FIELDS,
-  VOICE_SURFACE,
-  type TMaybeUndefined,
-  type TVoiceFieldId,
-  type TVoiceSurface,
-} from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
-import {
   VOICE_CARD_ID,
   VOICE_COUNT_UNIT,
   VOICE_SECTION_ID,
@@ -22,6 +14,14 @@ import {
   type TVoiceFieldErrors,
   type TVoiceLocaleDraft,
 } from '@platform/utils/voice-draft/voice-draft';
+import {
+  VOICE_FIELDS,
+  VOICE_SURFACE,
+  type TMaybeUndefined,
+  type TVoiceFieldId,
+  type TVoiceSurface,
+} from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 export type TVoiceHashTarget = {
   section: TVoiceSection;

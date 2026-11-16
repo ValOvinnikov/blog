@@ -1,7 +1,7 @@
-import { HUE_MAX, HUE_MIN } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { MOCK_LOGO_URL } from '@platform/testing/site-config/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { HUE_MAX, HUE_MIN } from '@shinefold/config';
 
 import { toUpdateLookInput } from './to-update-look-input';
 

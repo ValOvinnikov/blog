@@ -1,5 +1,5 @@
-import { q } from '@blog/service/sanity/query/query';
-import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
+import { q } from '@shinefold/service/sanity/query/query';
+import { pageHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/page-heading-block';
 
 /**
  * Deliberately leaner than `postCardFragment` — an RSS entry only ever

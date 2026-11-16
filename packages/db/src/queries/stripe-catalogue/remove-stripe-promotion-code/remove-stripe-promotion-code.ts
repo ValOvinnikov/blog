@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { stripePromotionCodes } from '@blog/db/schema/stripe-catalogue';
+import { getDb } from '@shinefold/db/client';
+import { stripePromotionCodes } from '@shinefold/db/schema/stripe-catalogue';
 import { eq } from 'drizzle-orm';
 
 export async function removeStripePromotionCode(

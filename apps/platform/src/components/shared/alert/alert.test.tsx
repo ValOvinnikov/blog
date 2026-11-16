@@ -1,4 +1,3 @@
-import { ALERT_TYPE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { ICON_TEST_ID } from '@platform/constants/icon';
 import { ARIA_HIDDEN } from '@platform/testing/aria';
@@ -7,6 +6,7 @@ import {
   renderWithIntl,
   screen,
 } from '@platform/testing/custom-render';
+import { ALERT_TYPE } from '@shinefold/config';
 
 import { Alert } from './alert';
 

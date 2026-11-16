@@ -1,5 +1,5 @@
-import { VOICE_FIELD_KIND, VOICE_FIELDS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { VOICE_FIELD_KIND, VOICE_FIELDS } from '@shinefold/config';
 import { mockVoiceRichText } from '@web/testing/shared/voice/fixtures';
 import { wrapVoiceText } from '@web/utils/wrap-voice-text';
 

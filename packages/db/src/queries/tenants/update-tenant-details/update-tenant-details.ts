@@ -1,19 +1,19 @@
-import type { TMaybeUndefined, TOutcome, TTenantPlan } from '@blog/config';
-import { getDb } from '@blog/db/client';
+import type { TMaybeUndefined, TOutcome, TTenantPlan } from '@shinefold/config';
+import { getDb } from '@shinefold/db/client';
 import {
   PROVISIONING_STATE,
   TENANT_DETAILS_UPDATE_OUTCOME,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStep,
-} from '@blog/db/constants';
-import { tenantDomains } from '@blog/db/schema/tenant-domains';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { deriveProvisioningState } from '@blog/db/utils/derive-provisioning-state/derive-provisioning-state';
-import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
-import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
-import { isUndefined } from '@blog/utils/primitives';
-import { toOutcome } from '@blog/utils/to-outcome';
+} from '@shinefold/db/constants';
+import { tenantDomains } from '@shinefold/db/schema/tenant-domains';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
+import { deriveProvisioningState } from '@shinefold/db/utils/derive-provisioning-state/derive-provisioning-state';
+import { isValidDomain } from '@shinefold/db/utils/is-valid-domain/is-valid-domain';
+import { normalizeLocaleCode } from '@shinefold/db/utils/normalize-locale-code/normalize-locale-code';
+import { isUndefined } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { eq } from 'drizzle-orm';
 
 import {

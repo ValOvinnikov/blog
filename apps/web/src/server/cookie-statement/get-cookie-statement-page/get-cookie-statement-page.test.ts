@@ -11,7 +11,7 @@ const { getCookieStatementPageMock } = vi.hoisted(() => ({
   getCookieStatementPageMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: {
       cookieStatement: {

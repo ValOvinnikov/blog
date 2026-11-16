@@ -1,15 +1,15 @@
+import { faker } from '@faker-js/faker';
 import {
   ACTION_OUTCOME,
   ERROR_CODE,
   PRESET_ID,
   resolveTenantEmailBrand,
   SUBSCRIBER_OUTCOME,
-} from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import { errorResult, okResult } from '@blog/utils';
-import { FORWARDED_FOR_HEADER } from '@blog/utils/client-key';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { errorResult, okResult } from '@shinefold/utils';
+import { FORWARDED_FOR_HEADER } from '@shinefold/utils/client-key';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import { NEWSLETTER_LOG, NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
@@ -47,8 +47,8 @@ const {
 
 const { sendEmail: sendEmailMock } = confirmationEmailEdges;
 
-vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await import('@shinefold/db/constants')),
   queries: {
     ...(
       await import('@web/testing/server/newsletter/confirmation-email-edges')
@@ -61,7 +61,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock(import('@blog/email'), async (importOriginal) => ({
+vi.mock(import('@shinefold/email'), async (importOriginal) => ({
   ...(await importOriginal()),
   sendEmail: (
     await import('@web/testing/server/newsletter/confirmation-email-edges')

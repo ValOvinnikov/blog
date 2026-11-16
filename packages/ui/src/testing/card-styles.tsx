@@ -4,8 +4,8 @@ import {
   CARD_STYLE_DECLARATIONS,
   type IWithClassName,
   type TCardStyle,
-} from '@blog/config';
-import type { IWithChildren } from '@blog/config/react';
+} from '@shinefold/config';
+import type { IWithChildren } from '@shinefold/config/react';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { BrandBand } from './brand-bands';

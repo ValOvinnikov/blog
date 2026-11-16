@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { env } from '@platform/utils/env/env';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 import { parseGitHubRepo, type TGitHubRepo } from './parse-github-repo';
 

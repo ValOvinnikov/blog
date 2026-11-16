@@ -1,8 +1,8 @@
 'use client';
 
-import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { ICONS, SIZE, type TAccountPanelStyle } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
+import type { TOAuthProviderId } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import { ICONS, SIZE, type TAccountPanelStyle } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 import {
   ReaderAccountPanel,
   useReaderAccount,

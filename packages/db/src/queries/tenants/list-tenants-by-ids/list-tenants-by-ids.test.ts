@@ -1,13 +1,13 @@
-import { getDb } from '@blog/db/client';
-import * as schema from '@blog/db/schema';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import { getDb } from '@shinefold/db/client';
+import * as schema from '@shinefold/db/schema';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
 
 import { listTenantsByIds } from './list-tenants-by-ids';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

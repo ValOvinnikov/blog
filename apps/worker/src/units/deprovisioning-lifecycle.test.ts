@@ -1,10 +1,10 @@
-import { DEPROVISIONING_STEP } from '@blog/db/constants';
+import { DEPROVISIONING_STEP } from '@shinefold/db/constants';
 import {
   finishDeprovisioningRun,
   getTenantById,
   startDeprovisioningRun,
-} from '@blog/db/queries/tenants';
-import { errorResult, okResult } from '@blog/utils/result';
+} from '@shinefold/db/queries/tenants';
+import { errorResult, okResult } from '@shinefold/utils/result';
 import { DEPROVISIONING_RUN_FAILED_EVENT } from '@worker/constants/deprovisioning';
 import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import { MOCK_DB_DOWN } from '@worker/testing/outage/fixtures';
@@ -21,7 +21,7 @@ import {
 const MOCK_ARCHIVED_TENANT = mockTenant({ deprovisionedAt: MOCK_NOW });
 
 vi.mock('@worker/utils/operator-email/sanity-project-deletion-alert');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 
 describe(beginDeprovisioning, () => {
   beforeEach(() => {

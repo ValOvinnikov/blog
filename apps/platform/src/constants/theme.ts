@@ -1,5 +1,5 @@
-import { COLOR_SCHEME } from '@blog/config';
-import type { TValueOf } from '@blog/config/utils';
+import { COLOR_SCHEME } from '@shinefold/config';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const THEME_PREFERENCE = {
   LIGHT: 'LIGHT',

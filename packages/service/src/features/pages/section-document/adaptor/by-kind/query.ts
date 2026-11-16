@@ -1,6 +1,6 @@
-import { LEGAL_PAGE_KIND } from '@blog/config/constants';
-import { q } from '@blog/service/sanity/query/query';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+import { LEGAL_PAGE_KIND } from '@shinefold/config/constants';
+import { q } from '@shinefold/service/sanity/query/query';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
 import { z } from 'zod';
 
 import type { TSectionDocumentKind } from './types';

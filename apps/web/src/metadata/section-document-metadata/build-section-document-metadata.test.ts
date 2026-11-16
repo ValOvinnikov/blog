@@ -1,6 +1,6 @@
-import { LOCALE_ISO_CODES, routes } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { SECTION_DOCUMENT_LOG } from '@web/constants/section-document';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {

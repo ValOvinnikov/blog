@@ -2,8 +2,8 @@ import {
   TIMELINE_HORIZONTAL_ITEM_CAP,
   TIMELINE_ORIENTATION,
   type TTimelineOrientation,
-} from '@blog/config/constants';
-import { validateTimelineHorizontalItemCap } from '@blog/studio/schema-types/validation/validate-timeline-horizontal-item-cap/validate-timeline-horizontal-item-cap';
+} from '@shinefold/config/constants';
+import { validateTimelineHorizontalItemCap } from '@shinefold/studio/schema-types/validation/validate-timeline-horizontal-item-cap/validate-timeline-horizontal-item-cap';
 import type { ValidationContext } from 'sanity';
 
 const CAP_MESSAGE =

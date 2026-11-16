@@ -1,6 +1,5 @@
 'use client';
 
-import { SIZE } from '@blog/config';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { Spinner } from '@platform/components/shared/spinner';
 import {
@@ -9,6 +8,7 @@ import {
 } from '@platform/constants/tenant';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
 import { useTenantsListNavigation } from '@platform/utils/use-tenants-list-navigation/use-tenants-list-navigation';
+import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useOptimistic } from 'react';
 

@@ -1,12 +1,5 @@
 import 'server-only';
 
-import { EMAIL_ACCOUNT, type TTenantPlan } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import {
-  buildOwnerReceiptEmail,
-  PLATFORM_EMAIL_BRAND_NAME,
-  sendEmail,
-} from '@blog/email';
 import {
   BILLING_LOG,
   MILLISECONDS_PER_SECOND,
@@ -15,6 +8,13 @@ import { env } from '@platform/utils/env/env';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import { logger } from '@platform/utils/logger/logger';
+import { EMAIL_ACCOUNT, type TTenantPlan } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import {
+  buildOwnerReceiptEmail,
+  PLATFORM_EMAIL_BRAND_NAME,
+  sendEmail,
+} from '@shinefold/email';
 import { getTranslations } from 'next-intl/server';
 import type Stripe from 'stripe';
 

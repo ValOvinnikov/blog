@@ -2,11 +2,11 @@ import base from './base.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
 
 const noJsxMessage =
-  '@blog/db must not use JSX — it is the relational data layer and never imports React.';
+  '@shinefold/db must not use JSX — it is the relational data layer and never imports React.';
 const noReactImportMessage =
-  '@blog/db must not import React — it has no React at all, client or server.';
+  '@shinefold/db must not import React — it has no React at all, client or server.';
 const noUiImportMessage =
-  '@blog/db must not import @blog/ui — db has no presentation concerns.';
+  '@shinefold/db must not import @shinefold/ui — db has no presentation concerns.';
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
@@ -38,13 +38,13 @@ export default [
               message: noReactImportMessage,
             },
             {
-              group: ['@blog/ui', '@blog/ui/*'],
+              group: ['@shinefold/ui', '@shinefold/ui/*'],
               message: noUiImportMessage,
             },
             {
               group: [
-                '@blog/service',
-                '@blog/service/*',
+                '@shinefold/service',
+                '@shinefold/service/*',
                 'sanity',
                 'sanity/*',
                 'next-sanity',
@@ -54,17 +54,17 @@ export default [
                 'groqd/*',
               ],
               message:
-                '@blog/db must not import @blog/service or any Sanity SDK — db and service are sibling data layers that never reference each other; a feature needing both joins them in apps/web.',
+                '@shinefold/db must not import @shinefold/service or any Sanity SDK — db and service are sibling data layers that never reference each other; a feature needing both joins them in apps/web.',
             },
             {
-              group: ['@blog/insight', '@blog/insight/*'],
+              group: ['@shinefold/insight', '@shinefold/insight/*'],
               message:
-                '@blog/db must not import @blog/insight — db never logs; failures return to the caller and the app layer logs them. The one exception is the standalone deprovision-tenant/recheck-tenant-owners/validate-tenant-documents/migrate-tenant-content CLI scripts, which carve this out in their own override.',
+                '@shinefold/db must not import @shinefold/insight — db never logs; failures return to the caller and the app layer logs them. The one exception is the standalone deprovision-tenant/recheck-tenant-owners/validate-tenant-documents/migrate-tenant-content CLI scripts, which carve this out in their own override.',
             },
             {
-              group: ['@blog/auth', '@blog/auth/*'],
+              group: ['@shinefold/auth', '@shinefold/auth/*'],
               message:
-                "@blog/db must not import @blog/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
+                "@shinefold/db must not import @shinefold/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
             },
           ],
         },
@@ -85,13 +85,13 @@ export default [
               message: noReactImportMessage,
             },
             {
-              group: ['@blog/ui', '@blog/ui/*'],
+              group: ['@shinefold/ui', '@shinefold/ui/*'],
               message: noUiImportMessage,
             },
             {
               group: [
-                '@blog/service',
-                '@blog/service/*',
+                '@shinefold/service',
+                '@shinefold/service/*',
                 'sanity',
                 'sanity/*',
                 'next-sanity',
@@ -101,12 +101,12 @@ export default [
                 'groqd/*',
               ],
               message:
-                '@blog/db must not import @blog/service or any Sanity SDK — db and service are sibling data layers that never reference each other; a feature needing both joins them in apps/web.',
+                '@shinefold/db must not import @shinefold/service or any Sanity SDK — db and service are sibling data layers that never reference each other; a feature needing both joins them in apps/web.',
             },
             {
-              group: ['@blog/auth', '@blog/auth/*'],
+              group: ['@shinefold/auth', '@shinefold/auth/*'],
               message:
-                "@blog/db must not import @blog/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
+                "@shinefold/db must not import @shinefold/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
             },
           ],
         },
@@ -127,13 +127,13 @@ export default [
               message: noReactImportMessage,
             },
             {
-              group: ['@blog/ui', '@blog/ui/*'],
+              group: ['@shinefold/ui', '@shinefold/ui/*'],
               message: noUiImportMessage,
             },
             {
               group: [
-                '@blog/service',
-                '@blog/service/*',
+                '@shinefold/service',
+                '@shinefold/service/*',
                 'sanity',
                 'sanity/*',
                 'next-sanity',
@@ -143,12 +143,12 @@ export default [
                 'groqd/*',
               ],
               message:
-                '@blog/db must not import @blog/service or any Sanity SDK — db and service are sibling data layers that never reference each other; a feature needing both joins them in apps/web.',
+                '@shinefold/db must not import @shinefold/service or any Sanity SDK — db and service are sibling data layers that never reference each other; a feature needing both joins them in apps/web.',
             },
             {
-              group: ['@blog/auth', '@blog/auth/*'],
+              group: ['@shinefold/auth', '@shinefold/auth/*'],
               message:
-                "@blog/db must not import @blog/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
+                "@shinefold/db must not import @shinefold/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
             },
           ],
         },
@@ -171,13 +171,13 @@ export default [
               message: noReactImportMessage,
             },
             {
-              group: ['@blog/ui', '@blog/ui/*'],
+              group: ['@shinefold/ui', '@shinefold/ui/*'],
               message: noUiImportMessage,
             },
             {
               group: [
-                '@blog/service',
-                '@blog/service/*',
+                '@shinefold/service',
+                '@shinefold/service/*',
                 'sanity',
                 'sanity/*',
                 'next-sanity',
@@ -187,12 +187,12 @@ export default [
                 'groqd/*',
               ],
               message:
-                '@blog/db must not import @blog/service or any Sanity SDK — db and service are sibling data layers that never reference each other; a feature needing both joins them in apps/web.',
+                '@shinefold/db must not import @shinefold/service or any Sanity SDK — db and service are sibling data layers that never reference each other; a feature needing both joins them in apps/web.',
             },
             {
-              group: ['@blog/auth', '@blog/auth/*'],
+              group: ['@shinefold/auth', '@shinefold/auth/*'],
               message:
-                "@blog/db must not import @blog/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
+                "@shinefold/db must not import @shinefold/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
             },
           ],
         },
@@ -216,13 +216,13 @@ export default [
               message: noReactImportMessage,
             },
             {
-              group: ['@blog/ui', '@blog/ui/*'],
+              group: ['@shinefold/ui', '@shinefold/ui/*'],
               message: noUiImportMessage,
             },
             {
               group: [
-                '@blog/service',
-                '@blog/service/*',
+                '@shinefold/service',
+                '@shinefold/service/*',
                 'sanity',
                 'sanity/*',
                 'next-sanity',
@@ -232,12 +232,12 @@ export default [
                 'groqd/*',
               ],
               message:
-                '@blog/db must not import @blog/service or any Sanity SDK — db and service are sibling data layers that never reference each other; a feature needing both joins them in apps/web.',
+                '@shinefold/db must not import @shinefold/service or any Sanity SDK — db and service are sibling data layers that never reference each other; a feature needing both joins them in apps/web.',
             },
             {
-              group: ['@blog/auth', '@blog/auth/*'],
+              group: ['@shinefold/auth', '@shinefold/auth/*'],
               message:
-                "@blog/db must not import @blog/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
+                "@shinefold/db must not import @shinefold/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
             },
           ],
         },

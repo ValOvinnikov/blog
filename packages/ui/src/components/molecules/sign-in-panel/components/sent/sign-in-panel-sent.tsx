@@ -1,6 +1,6 @@
-import { ICONS, SIZE } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
-import { Icon } from '@blog/ui/components/atoms/icon';
+import { ICONS, SIZE } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 import type { ReactNode } from 'react';
 
 import { signInPanelSentVariants } from './sign-in-panel-sent-variants';

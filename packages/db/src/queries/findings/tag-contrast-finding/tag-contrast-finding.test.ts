@@ -1,18 +1,18 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { recordContrastResult } from '@blog/db/queries/findings/record-contrast-result';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { recordContrastResult } from '@shinefold/db/queries/findings/record-contrast-result';
+import * as schema from '@shinefold/db/schema';
 import {
   mockPassingContrastResult,
   mockReleaseTag,
-} from '@blog/db/testing/findings/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/findings/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { tagContrastFinding } from './tag-contrast-finding';
 
 faker.seed(6021004);
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

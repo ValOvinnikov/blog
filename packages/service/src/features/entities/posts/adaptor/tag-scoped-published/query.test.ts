@@ -1,14 +1,14 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   MOCK_TAG_ID,
   mockRawFeedPost,
-} from '@blog/service/testing/entities/fixtures';
-import { evaluateGroqSlugs } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/entities/fixtures';
+import { evaluateGroqSlugs } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_PUBLISHED_FEED_SLUGS,
   MOCK_TRANSLATED_POST_DOCUMENTS,
-} from '@blog/service/testing/shared/translated-posts-dataset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { tagScopedPublishedPostsQuery } from './query';
 

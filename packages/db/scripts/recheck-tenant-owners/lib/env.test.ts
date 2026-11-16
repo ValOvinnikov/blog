@@ -1,4 +1,4 @@
-import { MOCK_SANITY_MANAGEMENT_TOKEN } from '@blog/db/testing/recheck-tenant-owners/fixtures';
+import { MOCK_SANITY_MANAGEMENT_TOKEN } from '@shinefold/db/testing/recheck-tenant-owners/fixtures';
 
 import { loadRecheckEnv } from './env';
 

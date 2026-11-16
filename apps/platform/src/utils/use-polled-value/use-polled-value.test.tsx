@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { act, renderHook } from '@platform/testing/custom-render';
 import {
   changeDocumentVisibility,
@@ -6,6 +5,7 @@ import {
   DOCUMENT_VISIBLE,
 } from '@platform/testing/document-visibility';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 import { usePolledValue, type TPolledValueOptions } from './use-polled-value';
 

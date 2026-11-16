@@ -1,11 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  NEXT_NAVIGATION_ERROR,
-  type TMaybeNull,
-} from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { auth } from '@platform/server/auth/auth';
@@ -26,6 +18,14 @@ import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { MOCK_MIME_TYPE } from '@platform/testing/upload/fixtures';
 import { brandAssetKindSchema } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { env } from '@platform/utils/env/env';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+  type TMaybeNull,
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import type { Session } from 'next-auth';
 
 import { uploadBrandAssetAction } from './upload-brand-asset-action';
@@ -58,7 +58,7 @@ vi.mock('@platform/server/site-config/validate-brand-asset', () => ({
   validateBrandAssetUpload: validateBrandAssetUploadMock,
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     siteConfig: { upsertSiteConfig: upsertSiteConfigMock },
     auditEvents: { insertAuditEvent: insertAuditEventMock },

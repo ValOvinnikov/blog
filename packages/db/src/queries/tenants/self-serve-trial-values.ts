@@ -1,6 +1,6 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_STATUS, TRIAL_LENGTH_DAYS } from '@blog/db/constants';
-import { daysAfter } from '@blog/db/utils/day-offset/day-offset';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_STATUS, TRIAL_LENGTH_DAYS } from '@shinefold/db/constants';
+import { daysAfter } from '@shinefold/db/utils/day-offset/day-offset';
 
 export function selfServeTrialValues(createdAt: Date) {
   return {

@@ -1,13 +1,13 @@
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { localizedParagraphTextField } from '@blog/studio/schema-types/fields/localized-paragraph-text-field/localized-paragraph-text-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
-import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
-import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
+import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { localizedParagraphTextField } from '@shinefold/studio/schema-types/fields/localized-paragraph-text-field/localized-paragraph-text-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { layoutField } from '@shinefold/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
+import { validateDefaultLanguageFilled } from '@shinefold/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { validateLocalizedMaxLength } from '@shinefold/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { MessageSquare } from 'lucide-react';
 import { defineType } from 'sanity';
 

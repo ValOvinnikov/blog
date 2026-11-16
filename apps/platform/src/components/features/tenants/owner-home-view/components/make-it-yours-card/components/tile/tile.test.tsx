@@ -1,7 +1,7 @@
-import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ICONS } from '@shinefold/config';
 
 import { Tile } from './tile';
 

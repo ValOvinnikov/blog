@@ -1,4 +1,4 @@
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
+import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { logger } from '@web/utils/logger/logger';
 

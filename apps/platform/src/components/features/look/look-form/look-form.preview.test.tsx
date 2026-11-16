@@ -1,4 +1,3 @@
-import { BUSY_BUTTON_STYLE, SPINNER_STYLE } from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
@@ -22,6 +21,7 @@ import {
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import { BUSY_BUTTON_STYLE, SPINNER_STYLE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

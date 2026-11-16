@@ -1,5 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { okResult } from '@blog/utils';
 import {
   RELEASE_RUN_STATUS,
   RELEASE_WORKFLOW_FILE,
@@ -11,6 +9,8 @@ import {
   type TWorkflowRun,
 } from '@platform/server/github/get-latest-workflow-run';
 import { listFailedJobNames } from '@platform/server/github/list-failed-job-names';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { okResult } from '@shinefold/utils';
 
 import { toReleaseFailure, type TReleaseResult } from './release-result';
 

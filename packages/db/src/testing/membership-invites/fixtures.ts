@@ -1,11 +1,11 @@
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import type { TCreateMembershipInviteResult } from '@blog/db/queries/membership-invites/create-membership-invite';
-import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
-import * as schema from '@blog/db/schema';
-import type { TMembershipInvite } from '@blog/db/schema/membership-invites';
-import { firstRowOrThrow } from '@blog/db/testing/first-row-or-throw';
-import type { TTestDb } from '@blog/db/testing/fixtures';
 import { faker } from '@faker-js/faker';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import type { TCreateMembershipInviteResult } from '@shinefold/db/queries/membership-invites/create-membership-invite';
+import { inviteEmailColumns } from '@shinefold/db/queries/membership-invites/invite-email-columns';
+import * as schema from '@shinefold/db/schema';
+import type { TMembershipInvite } from '@shinefold/db/schema/membership-invites';
+import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
+import type { TTestDb } from '@shinefold/db/testing/fixtures';
 
 export const MOCK_INVITE_CONSUMED_AT = new Date('2026-08-12T00:00:00.000Z');
 

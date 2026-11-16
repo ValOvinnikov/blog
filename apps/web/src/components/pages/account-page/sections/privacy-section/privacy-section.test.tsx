@@ -1,4 +1,4 @@
-import { routes, SITE_MESSAGES } from '@blog/config';
+import { routes, SITE_MESSAGES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
 import { renderElement, screen } from '@web/testing/custom-render';

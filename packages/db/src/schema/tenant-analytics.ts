@@ -1,4 +1,4 @@
-import type { TAnalyticsProvider } from '@blog/config/constants';
+import type { TAnalyticsProvider } from '@shinefold/config/constants';
 import { pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 import { timestampColumns } from './columns';

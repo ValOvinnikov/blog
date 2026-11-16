@@ -1,13 +1,16 @@
-import { PRICE_PERIOD, SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { mockRawSiteSettings } from '@blog/service/testing/global/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
-import { mockTenant } from '@blog/service/testing/tenant';
+import {
+  PRICE_PERIOD,
+  SANITY_CONTENT_REVALIDATE_SECONDS,
+} from '@shinefold/config';
+import { mockRawSiteSettings } from '@shinefold/service/testing/global/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { mockCacheTag } from '@shinefold/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getSiteSettings } from './loader';
 import { siteSettingsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 const MOCK_CURRENCY = 'EUR';
 const MOCK_MONTH_WORDING = 'per month';

@@ -1,4 +1,4 @@
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
 
 import { getPostListPageSizes } from './loader';
 import { toFirstPostListPageSize } from './transformer';

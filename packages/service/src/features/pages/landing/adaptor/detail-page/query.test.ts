@@ -1,8 +1,9 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   MOCK_CONTENT_MODULE_ID,
   MOCK_CTA_MODULE_ID,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   HEADING_TEXT_PATH,
   MOCK_ABOUT_PAGE_TITLE,
@@ -10,13 +11,13 @@ import {
   mockRawContentRef,
   mockRawCtaRef,
   mockRawLandingPage,
-} from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/pages/fixtures';
 import {
   mockRawHeadingBlock,
   mockReference,
   mockSlug,
-} from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_ABOUT_EN_PAGE_ID,
   MOCK_ABOUT_NL_PAGE_ID,
@@ -24,8 +25,7 @@ import {
   MOCK_ABOUT_TRANSLATION_METADATA,
   MOCK_PRICING_NL_SLUG,
   MOCK_PRICING_SLUG,
-} from '@blog/service/testing/shared/translated-pages-dataset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/translated-pages-dataset';
 
 import { landingPageQuery } from './query';
 

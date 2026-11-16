@@ -1,11 +1,11 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockTenant } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getPaginationParamsWithPageSizes } from './pagination-params';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6018);
 

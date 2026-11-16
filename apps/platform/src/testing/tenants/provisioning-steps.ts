@@ -2,13 +2,13 @@ import {
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import type {
   TDeprovisioningStepState,
   TProvisioningStepState,
   TTenantDeprovisioningState,
   TTenantProvisioningState,
-} from '@blog/db/schema/tenants';
+} from '@shinefold/db/schema/tenants';
 
 export const mockIdleProvisioningSteps = (): TTenantProvisioningState => {
   const idle: TProvisioningStepState = {

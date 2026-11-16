@@ -2,10 +2,10 @@ import {
   CELL_ROW_END,
   EMAIL_WHITE,
   FONT_STACK,
-} from '@blog/email/html/email-metrics/email-metrics';
-import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
-import { sanitizeImageUrl } from '@blog/email/html/sanitize-image-url/sanitize-image-url';
-import { toInitial } from '@blog/utils/primitives';
+} from '@shinefold/email/html/email-metrics/email-metrics';
+import { escapeHtml } from '@shinefold/email/html/escape-html/escape-html';
+import { sanitizeImageUrl } from '@shinefold/email/html/sanitize-image-url/sanitize-image-url';
+import { toInitial } from '@shinefold/utils/primitives';
 
 export type TEmailLogoImage = {
   url: string;

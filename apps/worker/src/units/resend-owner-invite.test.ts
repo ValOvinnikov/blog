@@ -1,21 +1,24 @@
-import { SANITY_PROJECT_ROLE } from '@blog/config/constants';
-import { TENANT_OWNER_EMAIL } from '@blog/db/constants';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
-import { getTenantById, setTenantOwnerAccess } from '@blog/db/queries/tenants';
+import { faker } from '@faker-js/faker';
+import { SANITY_PROJECT_ROLE } from '@shinefold/config/constants';
+import { TENANT_OWNER_EMAIL } from '@shinefold/db/constants';
+import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
+import {
+  getTenantById,
+  setTenantOwnerAccess,
+} from '@shinefold/db/queries/tenants';
 import {
   createSanityProjectInvite,
   deleteSanityProjectInvite,
   listSanityProjectAcl,
   listSanityProjectInvites,
   revokeSanityProjectRole,
-} from '@blog/db/utils/sanity-management-client/sanity-project-access';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
 import {
   listSanityOrganizationUsers,
   listSanityProjectUsers,
   type TSanityUser,
-} from '@blog/db/utils/sanity-management-client/sanity-project-users';
-import { okResult } from '@blog/utils/result';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-users';
+import { okResult } from '@shinefold/utils/result';
 import {
   MOCK_INVITE_SENT_AT,
   MOCK_MIXED_CASE_OWNER_EMAIL,
@@ -59,10 +62,10 @@ function mockFormerOwner(): TSanityUser {
 }
 
 vi.mock('@worker/utils/owner-email/send-owner-email');
-vi.mock('@blog/db/queries/memberships');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/memberships');
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-project-access');
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-project-users');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 

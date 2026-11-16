@@ -1,10 +1,13 @@
-import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@blog/config/constants';
+import {
+  LOCALE_BCP47_TAGS,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 import {
   INACTIVITY_STAGE_DAY,
   type TInactivityStage,
-} from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { daysAfter } from '@blog/db/utils/day-offset/day-offset';
+} from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { daysAfter } from '@shinefold/db/utils/day-offset/day-offset';
 
 export function inactivityStageDate(
   { lastActivityAt }: TTenant,

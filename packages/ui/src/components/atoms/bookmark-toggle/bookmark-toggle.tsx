@@ -3,8 +3,8 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   SIZE,
-} from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
+} from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 
 import {
   bookmarkToggleVariants,

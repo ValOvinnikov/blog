@@ -1,5 +1,5 @@
-import { FEATURE_ICONS, ICONS, SIZE, type TIconName } from '@blog/config';
-import { objectKeys, toTitleCase } from '@blog/utils/primitives';
+import { FEATURE_ICONS, ICONS, SIZE, type TIconName } from '@shinefold/config';
+import { objectKeys, toTitleCase } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Icon } from './icon';

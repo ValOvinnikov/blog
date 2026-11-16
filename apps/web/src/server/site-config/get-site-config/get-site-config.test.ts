@@ -1,8 +1,8 @@
-import { PRESET_ID, TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { PRESET_ID, TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { toEffectiveLook } from '@shinefold/db/utils/effective-look/effective-look';
+import { errorResult, okResult } from '@shinefold/utils';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
@@ -22,12 +22,12 @@ faker.seed(6010);
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 vi.mock('@web/server/site-config/get-effective-plan/get-effective-plan');
 
-vi.mock('@blog/db/utils/effective-look/effective-look', () => ({
+vi.mock('@shinefold/db/utils/effective-look/effective-look', () => ({
   toEffectiveLook: vi.fn((look: unknown) => look),
 }));
 
 vi.mock(
-  '@blog/db',
+  '@shinefold/db',
   () => import('@web/testing/server/site-config/site-config-db'),
 );
 

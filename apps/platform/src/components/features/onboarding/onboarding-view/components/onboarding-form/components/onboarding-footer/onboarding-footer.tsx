@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
 import {
   AddressVerdict,
   type TAddressVerdict,
@@ -13,6 +12,7 @@ import {
   ONBOARDING_STEP,
   type TOnboardingStep,
 } from '@platform/constants/onboarding';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 import { onboardingFooterVariants } from './onboarding-footer-variants';
 

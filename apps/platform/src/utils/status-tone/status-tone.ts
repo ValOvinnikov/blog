@@ -1,13 +1,3 @@
-import {
-  FINDING_SEVERITY,
-  type TFindingSeverity,
-} from '@blog/config/constants';
-import {
-  TENANT_STATUS,
-  TENANT_PROVISIONING_STEP_STATUS,
-  type TTenantStatus,
-  type TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
 import type { TNavItemStatusTone } from '@platform/components/features/layout/nav-item-content';
 import type { TStatusBadgeProps } from '@platform/components/shared/status-badge';
 import { BADGE_TONE } from '@platform/constants/badge-tone';
@@ -26,6 +16,16 @@ import {
   type TReleaseRunStatus,
 } from '@platform/constants/release';
 import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
+import {
+  FINDING_SEVERITY,
+  type TFindingSeverity,
+} from '@shinefold/config/constants';
+import {
+  TENANT_STATUS,
+  TENANT_PROVISIONING_STEP_STATUS,
+  type TTenantStatus,
+  type TTenantProvisioningStepStatus,
+} from '@shinefold/db/constants';
 
 export type TBadgeTone = NonNullable<TStatusBadgeProps['tone']>;
 

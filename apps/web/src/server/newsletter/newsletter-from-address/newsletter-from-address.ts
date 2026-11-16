@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 // Resend's shared testing sender, the fallback until a verified sending domain is configured.
 export const DEFAULT_NEWSLETTER_FROM_ADDRESS =

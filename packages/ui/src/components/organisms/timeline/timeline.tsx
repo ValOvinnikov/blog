@@ -4,8 +4,11 @@ import type {
   TContentAlignment,
   TTimelineMarkerStyle,
   TTimelineOrientation,
-} from '@blog/config';
-import type { TCompoundChildren, TCompoundComponent } from '@blog/ui/lib/react';
+} from '@shinefold/config';
+import type {
+  TCompoundChildren,
+  TCompoundComponent,
+} from '@shinefold/ui/lib/react';
 import { Children, type CSSProperties, type ElementType } from 'react';
 
 import { TimelineBody } from './components/body/timeline-body';

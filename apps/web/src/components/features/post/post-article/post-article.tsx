@@ -1,7 +1,10 @@
-import { ASIDE_KIND, routes, type TAsideKind } from '@blog/config';
-import { type TImageTransformOptions, urlForSanityImage } from '@blog/service';
-import { Prose } from '@blog/ui/components/atoms/prose';
-import { Article } from '@blog/ui/components/organisms/article';
+import { ASIDE_KIND, routes, type TAsideKind } from '@shinefold/config';
+import {
+  type TImageTransformOptions,
+  urlForSanityImage,
+} from '@shinefold/service';
+import { Prose } from '@shinefold/ui/components/atoms/prose';
+import { Article } from '@shinefold/ui/components/organisms/article';
 import { BookmarkButtonGate } from '@web/components/features/post/bookmark-button-gate';
 import { ContentsRailLayout } from '@web/components/shared/contents-rail-layout';
 import {

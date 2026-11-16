@@ -1,7 +1,7 @@
-import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
-import { MOCK_RECHECK_ENV } from '@blog/db/testing/recheck-tenant-owners/fixtures';
-import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 import { faker } from '@faker-js/faker';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@shinefold/db/constants';
+import { MOCK_RECHECK_ENV } from '@shinefold/db/testing/recheck-tenant-owners/fixtures';
+import { mockTenant } from '@shinefold/db/testing/tenants/fixtures';
 
 import { hasSystemicFailures, runRecheck, type TRecheckSummary } from './run';
 
@@ -19,7 +19,7 @@ const {
   notifyOwnerElevationOutcomeMock: vi.fn(),
 }));
 
-vi.mock('@blog/db/queries/tenants', () => ({
+vi.mock('@shinefold/db/queries/tenants', () => ({
   listTenantsPendingOwnerElevation: listTenantsPendingOwnerElevationMock,
 }));
 vi.mock('./lib/report-owner-elevation-outcome', () => ({

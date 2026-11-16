@@ -1,6 +1,5 @@
 'use client';
 
-import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { DataRequestEraseDialog } from '@platform/components/features/data-requests/data-request-view/components/data-request-erase-dialog/data-request-erase-dialog';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -13,6 +12,7 @@ import {
 } from '@platform/constants/data-request';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { tv } from '@platform/utils/tv/tv';
+import { SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 

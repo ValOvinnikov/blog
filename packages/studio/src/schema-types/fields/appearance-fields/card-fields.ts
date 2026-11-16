@@ -5,14 +5,14 @@ import {
   GRID_COLUMNS,
   RADIUS_SCALE,
   RADIUS_SCALE_LABEL,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   CardStylePicture,
   ColumnsPicture,
   CornersPicture,
   DensityPicture,
-} from '@blog/studio/schema-types/fields/appearance-fields/appearance-pictures';
-import { tileField } from '@blog/studio/schema-types/fields/tile-field/tile-field';
+} from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-pictures';
+import { tileField } from '@shinefold/studio/schema-types/fields/tile-field/tile-field';
 import type { StringDefinition } from 'sanity';
 
 const SITE_DEFAULT = 'Site default';

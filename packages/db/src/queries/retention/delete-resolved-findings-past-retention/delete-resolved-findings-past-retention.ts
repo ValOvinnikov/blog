@@ -1,9 +1,9 @@
-import { FINDING_STATUS } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { RESOLVED_FINDING_RETENTION_DAYS } from '@blog/db/constants';
-import { isInBatch } from '@blog/db/queries/retention/retention-batch';
-import { findings } from '@blog/db/schema/findings';
-import { daysBefore } from '@blog/db/utils/day-offset/day-offset';
+import { FINDING_STATUS } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { RESOLVED_FINDING_RETENTION_DAYS } from '@shinefold/db/constants';
+import { isInBatch } from '@shinefold/db/queries/retention/retention-batch';
+import { findings } from '@shinefold/db/schema/findings';
+import { daysBefore } from '@shinefold/db/utils/day-offset/day-offset';
 import { and, eq, lt } from 'drizzle-orm';
 
 export async function deleteResolvedFindingsPastRetention(

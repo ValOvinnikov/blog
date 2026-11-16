@@ -1,5 +1,5 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';

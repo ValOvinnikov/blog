@@ -2,13 +2,13 @@ import {
   NEWSLETTER_VARIANT,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import { Panel } from '@blog/ui/components/molecules/panel';
+} from '@shinefold/config';
+import { Panel } from '@shinefold/ui/components/molecules/panel';
 import {
   newsletterSignupVariants,
   type TNewsletterSignupVariants,
-} from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+} from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import type { ReactNode } from 'react';
 
 export interface INewsletterSignupTrustCue {

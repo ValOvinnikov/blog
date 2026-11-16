@@ -1,6 +1,6 @@
-import { NEWSLETTER_VARIANT } from '@blog/config';
-import { makeNewsletterSignupForm } from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
 import { faker } from '@faker-js/faker';
+import { NEWSLETTER_VARIANT } from '@shinefold/config';
+import { makeNewsletterSignupForm } from '@shinefold/ui/testing/organisms/newsletter-signup/fixtures';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { NewsletterSignup } from './newsletter-signup';

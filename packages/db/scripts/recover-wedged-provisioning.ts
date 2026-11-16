@@ -1,9 +1,9 @@
 // Manual, human-run only: moves tenants wedged at PROVISIONING after a FAILED step to FAILED, so a normal Retry re-dispatches them.
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
 import {
   listTenantsWedgedInProvisioning,
   setTenantProvisioningStatus,
-} from '@blog/db/queries/tenants';
+} from '@shinefold/db/queries/tenants';
 
 import { parseDryRun } from './lib/cli-flags';
 import { runIfEntrypoint } from './lib/run-if-entrypoint';

@@ -1,8 +1,8 @@
-import { FORM_STATUS, ICONS, SIZE } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { TextInput } from '@blog/ui/components/atoms/text-input';
-import type { TNewsletterSignupFormState } from '@blog/ui/components/organisms/newsletter-signup/components/form/newsletter-signup-form-state';
-import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import { FORM_STATUS, ICONS, SIZE } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { TextInput } from '@shinefold/ui/components/atoms/text-input';
+import type { TNewsletterSignupFormState } from '@shinefold/ui/components/organisms/newsletter-signup/components/form/newsletter-signup-form-state';
+import { newsletterSignupVariants } from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
 
 export type TNewsletterSignupInputProps = {
   emailAriaLabel: string;

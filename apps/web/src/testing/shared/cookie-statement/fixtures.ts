@@ -1,5 +1,5 @@
-import { CONTENT_ALIGNMENT, LOCALE_ISO_CODES } from '@blog/config';
-import type { TCookieStatementPage } from '@blog/service';
+import { CONTENT_ALIGNMENT, LOCALE_ISO_CODES } from '@shinefold/config';
+import type { TCookieStatementPage } from '@shinefold/service';
 import { MOCK_CONTENTS_RAIL_BODY } from '@web/testing/shared/contents-rail/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 

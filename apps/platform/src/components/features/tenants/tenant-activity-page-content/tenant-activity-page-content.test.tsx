@@ -1,9 +1,3 @@
-import {
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { AUDIT_EVENTS_PAGE_SIZE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { mockAuditEvent } from '@platform/testing/audit-events/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
@@ -12,6 +6,12 @@ import {
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { AUDIT_EVENTS_PAGE_SIZE } from '@shinefold/db/constants';
 import { redirect } from 'next/navigation';
 
 import { TenantActivityPageContent } from './tenant-activity-page-content';
@@ -26,7 +26,7 @@ const { listAuditEventsForTargetMock, countAuditEventsForTargetMock } =
     countAuditEventsForTargetMock: vi.fn(),
   }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     auditEvents: {
       listAuditEventsForTarget: listAuditEventsForTargetMock,

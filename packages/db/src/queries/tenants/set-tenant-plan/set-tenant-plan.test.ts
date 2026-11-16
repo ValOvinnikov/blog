@@ -1,30 +1,30 @@
-import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import {
   MEMBERSHIP_ROLE,
   TENANT_PLAN_WRITE_OUTCOME,
   TENANT_STATUS,
-} from '@blog/db/constants';
-import { lockMembershipsOverSeats } from '@blog/db/queries/memberships/lock-memberships-over-seats';
-import * as schema from '@blog/db/schema';
-import { tenants } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
+} from '@shinefold/db/constants';
+import { lockMembershipsOverSeats } from '@shinefold/db/queries/memberships/lock-memberships-over-seats';
+import * as schema from '@shinefold/db/schema';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import {
   countLockedMemberships,
   insertTeam,
-} from '@blog/db/testing/memberships/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
-import { daysBeforeNow } from '@blog/db/testing/tenants/grace';
+} from '@shinefold/db/testing/memberships/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
+import { daysBeforeNow } from '@shinefold/db/testing/tenants/grace';
 import {
   MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
   readSelfServeIndex,
-} from '@blog/db/testing/tenants/self-serve-fixtures';
+} from '@shinefold/db/testing/tenants/self-serve-fixtures';
 import { eq } from 'drizzle-orm';
 
 import { setTenantPlan } from './set-tenant-plan';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock();

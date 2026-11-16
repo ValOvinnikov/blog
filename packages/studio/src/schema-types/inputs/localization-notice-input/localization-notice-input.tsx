@@ -1,17 +1,20 @@
-import { isLocaleIsoCode, type TLocaleIsoCode } from '@blog/config/constants';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { isLocalizedSchemaType } from '@blog/studio/schema-types/inputs/localization-notice-input/is-localized-schema-type';
+import { Card, Stack, Text } from '@sanity/ui';
+import {
+  isLocaleIsoCode,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
+import { isLocalizedSchemaType } from '@shinefold/studio/schema-types/inputs/localization-notice-input/is-localized-schema-type';
 import {
   collectMissingLocales,
   formatLocaleList,
   getMissingTranslations,
   LOCALE_LABEL,
-} from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
+} from '@shinefold/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import {
   formatUntranslatedTargetNotice,
   getUntranslatedTargetLocales,
-} from '@blog/studio/schema-types/inputs/localization-notice-input/untranslated-target';
-import { Card, Stack, Text } from '@sanity/ui';
+} from '@shinefold/studio/schema-types/inputs/localization-notice-input/untranslated-target';
 import { useEffect, useState } from 'react';
 import { type InputProps, useClient } from 'sanity';
 

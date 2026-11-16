@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const OPERATOR_ALERT_KIND = {
   OWNER_ELEVATION: 'OWNER_ELEVATION',

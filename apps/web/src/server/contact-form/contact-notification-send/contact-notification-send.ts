@@ -1,6 +1,6 @@
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { buildContactNotificationEmail, sendEmail } from '@blog/email';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { buildContactNotificationEmail, sendEmail } from '@shinefold/email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address/newsletter-from-address';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { env } from '@web/utils/env/env';

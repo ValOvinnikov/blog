@@ -1,4 +1,4 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 import { heroCtaVariants, type THeroCtaVariants } from './hero-cta-variants';

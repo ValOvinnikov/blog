@@ -1,6 +1,6 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { HTTP_STATUS } from '@blog/config/constants';
-import { resolveClientKey } from '@blog/utils/client-key';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { resolveClientKey } from '@shinefold/utils/client-key';
 import { CLIENT_LOG_LOG } from '@web/constants/client-log';
 import {
   clientLogSchema,

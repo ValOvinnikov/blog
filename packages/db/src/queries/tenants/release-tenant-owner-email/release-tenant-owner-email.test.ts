@@ -1,15 +1,15 @@
-import { TENANT_OWNER_EMAIL } from '@blog/db/constants';
-import { claimTenantOwnerEmail } from '@blog/db/queries/tenants/claim-tenant-owner-email';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
+import { TENANT_OWNER_EMAIL } from '@shinefold/db/constants';
+import { claimTenantOwnerEmail } from '@shinefold/db/queries/tenants/claim-tenant-owner-email';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
 import { releaseTenantOwnerEmail } from './release-tenant-owner-email';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(6020);
 

@@ -1,7 +1,7 @@
-import type { ArticleText } from '@blog/config';
-import { q } from '@blog/service/sanity/query/query';
-import { articleTextMemberProjections } from '@blog/service/shared/fragments/portable-text/article-text-member';
-import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
+import type { ArticleText } from '@shinefold/config';
+import { q } from '@shinefold/service/sanity/query/query';
+import { articleTextMemberProjections } from '@shinefold/service/shared/fragments/portable-text/article-text-member';
+import { textBlockFragment } from '@shinefold/service/shared/fragments/portable-text/text-block';
 
 export const portableTextBodyItemFragment = q
   .fragment<ArticleText[number]>()

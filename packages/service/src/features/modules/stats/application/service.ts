@@ -1,6 +1,6 @@
-import { getStatsModule } from '@blog/service/features/modules/stats/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getStatsModule } from '@shinefold/service/features/modules/stats/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createStatsModuleService() {
   return {

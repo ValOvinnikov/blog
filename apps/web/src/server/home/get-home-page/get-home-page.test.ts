@@ -5,7 +5,7 @@ import { getHomePage } from './get-home-page';
 
 const { getHomePageMock } = vi.hoisted(() => ({ getHomePageMock: vi.fn() }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: { pages: { home: { v1: { getHomePage: getHomePageMock } } } },
 }));
 

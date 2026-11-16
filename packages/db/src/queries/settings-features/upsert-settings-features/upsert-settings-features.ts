@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import { settingsFeatures } from '@blog/db/schema/settings-features';
-import { isUndefined } from '@blog/utils/primitives';
+import { getDb } from '@shinefold/db/client';
+import { settingsFeatures } from '@shinefold/db/schema/settings-features';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 import type { TSettingsFeaturesResult } from '../get-settings-features';
 

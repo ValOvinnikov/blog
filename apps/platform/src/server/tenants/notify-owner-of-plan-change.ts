@@ -1,17 +1,17 @@
 import 'server-only';
 
-import { EMAIL_ACCOUNT, type TTenantPlan } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import {
-  buildOwnerPlanChangeEmail,
-  PLATFORM_EMAIL_BRAND_NAME,
-  sendEmail,
-} from '@blog/email';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { EMAIL_ACCOUNT, type TTenantPlan } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import {
+  buildOwnerPlanChangeEmail,
+  PLATFORM_EMAIL_BRAND_NAME,
+  sendEmail,
+} from '@shinefold/email';
 import { getTranslations } from 'next-intl/server';
 
 const sendPlanChangeEmail = async (

@@ -1,12 +1,12 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { Select } from '@platform/components/shared/select';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { SUMMARY_JOINER } from '@platform/constants/summary';
 import type { TEmailPageItem } from '@platform/utils/email-draft/email-draft';
 import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
 import { fieldStatusTone } from '@platform/utils/status-tone/status-tone';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 import { itemSelectVariants } from './item-select-variants';
 

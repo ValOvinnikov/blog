@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   customRender,
   renderElement,
   screen,
-} from '@blog/ui/testing/custom-render';
-import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@shinefold/ui/testing/mock-link';
 
 import { LinkButton } from './link-button';
 

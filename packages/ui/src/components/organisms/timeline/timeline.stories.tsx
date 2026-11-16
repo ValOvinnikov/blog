@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   CONTENT_ALIGNMENT,
   TIMELINE_MARKER_STYLE,
@@ -5,9 +6,8 @@ import {
   type TContentAlignment,
   type TTimelineMarkerStyle,
   type TTimelineOrientation,
-} from '@blog/config';
-import { objectKeys } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 
 import { Timeline } from './timeline';

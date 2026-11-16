@@ -1,7 +1,7 @@
 import {
   COOKIE_SETTINGS_BUTTON,
   type TCookieSettingsButton,
-} from '@blog/config';
+} from '@shinefold/config';
 
 type TCookieSettingsControls = {
   hasCookieSettingsLink: boolean;

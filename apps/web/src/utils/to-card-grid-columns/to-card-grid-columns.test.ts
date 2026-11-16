@@ -1,4 +1,4 @@
-import { GRID_COLUMNS, type TGridColumns } from '@blog/config';
+import { GRID_COLUMNS, type TGridColumns } from '@shinefold/config';
 import { MOCK_STALE_OPTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { toCardGridColumns } from './to-card-grid-columns';

@@ -1,4 +1,3 @@
-import { COLOR_SCHEME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
 import { DATA_THEME, THEME_PREFERENCE } from '@platform/constants/theme';
@@ -18,6 +17,7 @@ import {
   resetThemePreference,
 } from '@platform/testing/theme-preference';
 import { THEME_PREFERENCE_COOKIE } from '@platform/utils/theme-preference-cookie/theme-preference-cookie';
+import { COLOR_SCHEME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { AccountMenu, type TAccountMenuProps } from './account-menu';

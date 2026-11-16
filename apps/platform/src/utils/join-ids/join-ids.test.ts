@@ -1,5 +1,5 @@
-import type { TNullable } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import type { TNullable } from '@shinefold/config';
 
 import { joinIds } from './join-ids';
 

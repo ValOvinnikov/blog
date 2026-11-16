@@ -1,7 +1,7 @@
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { firstRowOrThrow } from '@blog/db/testing/first-row-or-throw';
-import type { TTestDb } from '@blog/db/testing/fixtures';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
+import type { TTestDb } from '@shinefold/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 
 export const MOCK_CONFIRMATION_NOW = new Date('2026-10-23T09:00:00Z');

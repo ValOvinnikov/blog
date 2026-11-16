@@ -1,7 +1,7 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import { BILLING_INTERVAL } from '@platform/constants/billing';
 import { MOCK_BAND_CEILING } from '@platform/testing/billing/fixtures';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { STRIPE_PRICE_LOOKUP_KEY } from '@shinefold/db/constants';
 
 import {
   bandKeyFor,

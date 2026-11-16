@@ -1,4 +1,4 @@
-# @blog/next-config
+# @shinefold/next-config
 
 > Shared Next.js config preset.
 
@@ -18,9 +18,9 @@ when the deploy workflows set it. Each app passes only its own
 
 ## Scripts
 
-| Script | Command                                |
-| ------ | -------------------------------------- |
-| `lint` | `pnpm --filter @blog/next-config lint` |
+| Script | Command                                     |
+| ------ | ------------------------------------------- |
+| `lint` | `pnpm --filter @shinefold/next-config lint` |
 
 ## Further reading
 

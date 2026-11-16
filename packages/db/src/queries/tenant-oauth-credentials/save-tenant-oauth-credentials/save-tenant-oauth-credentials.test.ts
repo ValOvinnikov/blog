@@ -1,24 +1,24 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
-import { tenantOAuthCredentials } from '@blog/db/schema/tenant-oauth-credentials';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
+import { tenantOAuthCredentials } from '@shinefold/db/schema/tenant-oauth-credentials';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_OAUTH_CREDENTIALS,
   MOCK_REPLACEMENT_OAUTH_CREDENTIALS,
-} from '@blog/db/testing/tenant-oauth-credentials/fixtures';
+} from '@shinefold/db/testing/tenant-oauth-credentials/fixtures';
 import {
   MISSING_TENANT_OAUTH_KEY_ERROR,
   MOCK_TENANT_OAUTH_ENCRYPTION_KEY,
   useTenantOAuthEncryptionKey,
-} from '@blog/db/testing/tenant-oauth-encryption-key';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
-import { decryptSecret } from '@blog/utils';
-import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+} from '@shinefold/db/testing/tenant-oauth-encryption-key';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
+import { decryptSecret } from '@shinefold/utils';
+import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
 
 import { saveTenantOAuthCredentials } from './save-tenant-oauth-credentials';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useTenantOAuthEncryptionKey();

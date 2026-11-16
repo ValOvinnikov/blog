@@ -15,45 +15,45 @@ import {
   TAXONOMY_SORT,
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
-} from '@blog/config';
-import type { TRawContactFormModule } from '@blog/service/features/modules/contact-form/adaptor/transformer';
-import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
-import type { TRawCookieSettingsModule } from '@blog/service/features/modules/cookie-settings/adaptor/transformer';
-import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
-import type { TRawFaqModule } from '@blog/service/features/modules/faq/adaptor/transformer';
-import type { TRawFeatureHighlightsModule } from '@blog/service/features/modules/feature-highlights/adaptor/transformer';
-import type { TRawHeroBlogModule } from '@blog/service/features/modules/hero-blog/adaptor/transformer';
-import type { TRawHeroProfileModule } from '@blog/service/features/modules/hero-profile/adaptor/transformer';
-import type { TRawHeroStatementModule } from '@blog/service/features/modules/hero-statement/adaptor/transformer';
-import type { TRawLogoWallModule } from '@blog/service/features/modules/logo-wall/adaptor/transformer';
-import type { TRawNewsletterModule } from '@blog/service/features/modules/newsletter/adaptor/transformer';
-import type { TRawSectionPagesModule } from '@blog/service/features/modules/section-pages/adaptor/module/transformer';
-import type { TRawSectionPages } from '@blog/service/features/modules/section-pages/adaptor/pages/transformer';
-import type { TRawStatsModule } from '@blog/service/features/modules/stats/adaptor/transformer';
-import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
-import type { TRawTeamModule } from '@blog/service/features/modules/team/adaptor/transformer';
-import type { TRawTimelineModule } from '@blog/service/features/modules/timeline/adaptor/transformer';
-import type { TFaqModuleQuestions } from '@blog/service/shared/adaptors/faq-questions/types';
+} from '@shinefold/config';
+import type { TRawContactFormModule } from '@shinefold/service/features/modules/contact-form/adaptor/transformer';
+import type { TRawContentModule } from '@shinefold/service/features/modules/content/adaptor/transformer';
+import type { TRawCookieSettingsModule } from '@shinefold/service/features/modules/cookie-settings/adaptor/transformer';
+import type { TRawCtaModule } from '@shinefold/service/features/modules/cta/adaptor/transformer';
+import type { TRawFaqModule } from '@shinefold/service/features/modules/faq/adaptor/transformer';
+import type { TRawFeatureHighlightsModule } from '@shinefold/service/features/modules/feature-highlights/adaptor/transformer';
+import type { TRawHeroBlogModule } from '@shinefold/service/features/modules/hero-blog/adaptor/transformer';
+import type { TRawHeroProfileModule } from '@shinefold/service/features/modules/hero-profile/adaptor/transformer';
+import type { TRawHeroStatementModule } from '@shinefold/service/features/modules/hero-statement/adaptor/transformer';
+import type { TRawLogoWallModule } from '@shinefold/service/features/modules/logo-wall/adaptor/transformer';
+import type { TRawNewsletterModule } from '@shinefold/service/features/modules/newsletter/adaptor/transformer';
+import type { TRawSectionPagesModule } from '@shinefold/service/features/modules/section-pages/adaptor/module/transformer';
+import type { TRawSectionPages } from '@shinefold/service/features/modules/section-pages/adaptor/pages/transformer';
+import type { TRawStatsModule } from '@shinefold/service/features/modules/stats/adaptor/transformer';
+import type { TRawTaxonomyListModule } from '@shinefold/service/features/modules/taxonomy-list/adaptor/transformer';
+import type { TRawTeamModule } from '@shinefold/service/features/modules/team/adaptor/transformer';
+import type { TRawTimelineModule } from '@shinefold/service/features/modules/timeline/adaptor/transformer';
+import type { TFaqModuleQuestions } from '@shinefold/service/shared/adaptors/faq-questions/types';
 import type {
   TCtaButton,
   TRawCtaButton,
-} from '@blog/service/shared/transformers/cta/to-cta-button';
-import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
+} from '@shinefold/service/shared/transformers/cta/to-cta-button';
+import type { TFaqPageQuestion } from '@shinefold/service/shared/transformers/faq/resolve-faqs';
 import {
   MOCK_AUTHOR_ID,
   MOCK_TOPIC_DESCRIPTION,
   MOCK_TOPIC_ID,
   MOCK_TOPIC_SLUG,
   MOCK_TOPIC_TITLE,
-} from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
 import {
   mockLinkView,
   mockRawHeadingBlock,
   mockRawParagraphTextBlock,
   mockRawPortableTextMarkDef,
   mockRawSanityImage,
-} from '@blog/service/testing/shared/fixtures';
-import { mockLocalizedHeadingBlock } from '@blog/service/testing/shared/localized';
+} from '@shinefold/service/testing/shared/fixtures';
+import { mockLocalizedHeadingBlock } from '@shinefold/service/testing/shared/localized';
 
 export const MOCK_MODULE_ID = 'module-1';
 export const MOCK_HERO_EYEBROW = 'Field notes';

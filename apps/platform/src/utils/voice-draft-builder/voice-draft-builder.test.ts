@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
+import { voiceTextToPortableText } from '@platform/utils/voice-portable-text/voice-portable-text';
 import {
   SITE_MESSAGES_BY_LOCALE,
   type TVoiceFieldId,
   type TVoicePortableText,
-} from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { faker } from '@faker-js/faker';
-import { voiceTextToPortableText } from '@platform/utils/voice-portable-text/voice-portable-text';
+} from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 
 import { buildVoiceDraft } from './voice-draft-builder';
 

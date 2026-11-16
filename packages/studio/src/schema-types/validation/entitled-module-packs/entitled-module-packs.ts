@@ -1,4 +1,4 @@
-import { MODULE_PACK, type TModulePack } from '@blog/config/constants';
+import { MODULE_PACK, type TModulePack } from '@shinefold/config/constants';
 
 export const EVERY_MODULE_PACK: readonly TModulePack[] =
   Object.values(MODULE_PACK);

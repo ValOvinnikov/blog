@@ -1,6 +1,6 @@
-import { BRAND_VARIANT, MEDIA_ORDER } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, MEDIA_ORDER } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_FEATURE_HIGHLIGHT_ITEMS,
@@ -22,7 +22,7 @@ const { getFeatureHighlightsModuleMock } = vi.hoisted(() => ({
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       featureHighlights: {

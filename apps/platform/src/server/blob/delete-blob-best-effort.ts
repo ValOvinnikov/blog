@@ -1,9 +1,9 @@
 import 'server-only';
 
-import type { TLogContext } from '@blog/insight';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import type { TLogContext } from '@shinefold/insight';
 import { del } from '@vercel/blob';
 
 // A failed delete only orphans a blob; the caller's write has already landed, so it must not fail the action.

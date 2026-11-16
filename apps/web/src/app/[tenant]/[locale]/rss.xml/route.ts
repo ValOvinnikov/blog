@@ -1,5 +1,9 @@
-import { HTTP_STATUS, type ITenantLocalizedParams, routes } from '@blog/config';
-import { service } from '@blog/service';
+import {
+  HTTP_STATUS,
+  type ITenantLocalizedParams,
+  routes,
+} from '@shinefold/config';
+import { service } from '@shinefold/service';
 import { RSS_LOG } from '@web/constants/rss';
 import { getFeedContext } from '@web/server/feed/get-feed-context/get-feed-context';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';

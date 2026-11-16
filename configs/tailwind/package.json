@@ -1,5 +1,5 @@
 {
-  "name": "@blog/tailwind-config",
+  "name": "@shinefold/tailwind-config",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@blog/eslint-config": "workspace:*",
+    "@shinefold/eslint-config": "workspace:*",
     "eslint": "catalog:",
     "tailwindcss": "^4.3.3"
   }

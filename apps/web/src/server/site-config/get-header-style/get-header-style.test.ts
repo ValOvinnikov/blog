@@ -2,8 +2,8 @@ import {
   HEADER_BAR_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
-} from '@blog/config';
-import { queries } from '@blog/db';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { HEADER_STYLE_LOG } from '@web/constants/header-style';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -17,7 +17,7 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant');
 vi.mock('@web/server/settings-features/get-tenant-plan/get-tenant-plan');
 
 vi.mock(
-  '@blog/db',
+  '@shinefold/db',
   () => import('@web/testing/server/site-config/site-config-db'),
 );
 

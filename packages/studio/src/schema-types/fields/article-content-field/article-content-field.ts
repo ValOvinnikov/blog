@@ -1,4 +1,4 @@
-import { articleTextSchema } from '@blog/studio/schema-types/portable-text/article-text/article-text';
+import { articleTextSchema } from '@shinefold/studio/schema-types/portable-text/article-text/article-text';
 import { defineField } from 'sanity';
 
 export const articleContentField = (description: string) =>

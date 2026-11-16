@@ -1,10 +1,10 @@
-import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
-import { localizedListedTextField } from '@blog/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
-import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
-import { validateDefaultLanguageBlocksFilled } from '@blog/studio/schema-types/validation/validate-default-language-blocks-filled/validate-default-language-blocks-filled';
+import { linkReferenceField } from '@shinefold/studio/schema-types/fields/link-reference-field/link-reference-field';
+import { localizedListedTextField } from '@shinefold/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { localizedImageWithAltSchema } from '@shinefold/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
+import { validateDefaultLanguageBlocksFilled } from '@shinefold/studio/schema-types/validation/validate-default-language-blocks-filled/validate-default-language-blocks-filled';
 import { Quote } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

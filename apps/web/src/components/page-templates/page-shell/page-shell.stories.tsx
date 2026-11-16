@@ -1,4 +1,4 @@
-import { Breadcrumbs } from '@blog/ui/components/molecules/breadcrumbs';
+import { Breadcrumbs } from '@shinefold/ui/components/molecules/breadcrumbs';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { PageHeading } from '@web/components/shared/page-heading';

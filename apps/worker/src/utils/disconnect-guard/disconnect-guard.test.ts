@@ -1,4 +1,4 @@
-import { isDomainHeldByAnyTenant } from '@blog/db/queries/tenant-domains/is-domain-held-by-any-tenant';
+import { isDomainHeldByAnyTenant } from '@shinefold/db/queries/tenant-domains/is-domain-held-by-any-tenant';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import { MOCK_CUSTOM_DOMAIN } from '@worker/testing/tenant/fixtures';
@@ -8,7 +8,7 @@ import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { getDisconnectRefusal } from './disconnect-guard';
 
 vi.mock('@worker/utils/env/env');
-vi.mock('@blog/db/queries/tenant-domains/is-domain-held-by-any-tenant');
+vi.mock('@shinefold/db/queries/tenant-domains/is-domain-held-by-any-tenant');
 
 describe(getDisconnectRefusal, () => {
   beforeEach(() => {

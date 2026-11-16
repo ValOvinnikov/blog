@@ -1,4 +1,4 @@
-import type { TNavLinkStyle } from '@blog/config';
+import type { TNavLinkStyle } from '@shinefold/config';
 
 import { navLinkStyleGlyphVariants } from './nav-link-style-glyph-variants';
 

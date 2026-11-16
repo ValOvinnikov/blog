@@ -1,18 +1,21 @@
+import { faker } from '@faker-js/faker';
 import {
   CORE_DEPROVISIONING_STEPS,
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TDeprovisioningStep,
-} from '@blog/db/constants';
-import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/constants';
+import { listTenantHosts } from '@shinefold/db/queries/tenant-domains/list-tenant-hosts';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   MOCK_DEPROVISION_DRY_RUN_ENV,
   MOCK_DEPROVISION_ENV,
   MOCK_DEPROVISIONED_AT,
-} from '@blog/db/testing/deprovision-tenant/fixtures';
-import { MOCK_STEP_ERROR, mockTenant } from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/deprovision-tenant/fixtures';
+import {
+  MOCK_STEP_ERROR,
+  mockTenant,
+} from '@shinefold/db/testing/tenants/fixtures';
 import type { Mock } from 'vitest';
 
 import type { TDeprovisionEnv } from './lib/env';
@@ -39,7 +42,7 @@ vi.mock('./steps/purge-reader-data');
 vi.mock('./steps/invalidate-tenant-cache');
 vi.mock('./lib/report-deprovisioning-step-status');
 vi.mock('./lib/report-deprovisioning-run');
-vi.mock('@blog/db/queries/tenant-domains/list-tenant-hosts');
+vi.mock('@shinefold/db/queries/tenant-domains/list-tenant-hosts');
 
 faker.seed(5765);
 

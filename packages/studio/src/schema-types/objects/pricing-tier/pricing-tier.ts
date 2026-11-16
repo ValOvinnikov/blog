@@ -3,24 +3,24 @@ import {
   SELLABLE_TENANT_PLANS,
   type TPricePeriod,
   type TSellableTenantPlan,
-} from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { pricingFeatureSchema } from '@blog/studio/schema-types/objects/pricing-feature/pricing-feature';
+} from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { pricingFeatureSchema } from '@shinefold/studio/schema-types/objects/pricing-feature/pricing-feature';
 import {
   PRICING_PERIOD_TITLE,
   pricingPriceSchema,
-} from '@blog/studio/schema-types/objects/pricing-price/pricing-price';
-import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
-import { isPricingTierLinked } from '@blog/studio/schema-types/validation/is-pricing-tier-linked/is-pricing-tier-linked';
-import { getCanLinkPlatformPlans } from '@blog/studio/schema-types/validation/platform-plan-links/platform-plan-links';
-import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
-import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
-import { validatePricingPricePeriodsUnique } from '@blog/studio/schema-types/validation/validate-pricing-price-periods-unique/validate-pricing-price-periods-unique';
-import { validatePricingTierPlanIntervalRequired } from '@blog/studio/schema-types/validation/validate-pricing-tier-plan-interval-required/validate-pricing-tier-plan-interval-required';
-import { validatePricingTierPriceLabelRequired } from '@blog/studio/schema-types/validation/validate-pricing-tier-price-label-required/validate-pricing-tier-price-label-required';
-import { isUndefined, toTitleCase } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/objects/pricing-price/pricing-price';
+import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
+import { isPricingTierLinked } from '@shinefold/studio/schema-types/validation/is-pricing-tier-linked/is-pricing-tier-linked';
+import { getCanLinkPlatformPlans } from '@shinefold/studio/schema-types/validation/platform-plan-links/platform-plan-links';
+import { validateDefaultLanguageFilled } from '@shinefold/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { validateLocalizedMaxLength } from '@shinefold/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
+import { validatePricingPricePeriodsUnique } from '@shinefold/studio/schema-types/validation/validate-pricing-price-periods-unique/validate-pricing-price-periods-unique';
+import { validatePricingTierPlanIntervalRequired } from '@shinefold/studio/schema-types/validation/validate-pricing-tier-plan-interval-required/validate-pricing-tier-plan-interval-required';
+import { validatePricingTierPriceLabelRequired } from '@shinefold/studio/schema-types/validation/validate-pricing-tier-price-label-required/validate-pricing-tier-price-label-required';
+import { isUndefined, toTitleCase } from '@shinefold/utils/primitives';
 import { CreditCard } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 

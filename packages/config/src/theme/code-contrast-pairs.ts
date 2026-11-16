@@ -1,4 +1,4 @@
-import { CONTRAST_ROLE } from '@blog/config/constants';
+import { CONTRAST_ROLE } from '@shinefold/config/constants';
 
 import type { TContrastPair } from './contrast-pairs';
 import { CODE_SURFACES } from './contrast-surfaces';

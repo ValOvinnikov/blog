@@ -1,6 +1,6 @@
-import type { TLocaleIsoCode } from '@blog/config';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import { routing } from '@platform/i18n/routing';
+import type { TLocaleIsoCode } from '@shinefold/config';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import { useState } from 'react';
 
 type TTenantDetailsValues = {

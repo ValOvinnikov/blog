@@ -3,8 +3,8 @@ import {
   ICONS,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
+} from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 
 import { alertVariants, type TAlertVariants } from './alert-variants';
 

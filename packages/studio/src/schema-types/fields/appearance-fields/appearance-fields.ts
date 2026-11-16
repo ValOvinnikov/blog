@@ -1,4 +1,4 @@
-import { cardFields } from '@blog/studio/schema-types/fields/appearance-fields/card-fields';
+import { cardFields } from '@shinefold/studio/schema-types/fields/appearance-fields/card-fields';
 import type {
   FieldDefinition,
   FieldGroupDefinition,

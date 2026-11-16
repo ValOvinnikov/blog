@@ -1,4 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
@@ -10,6 +9,7 @@ import {
   DOCUMENT_VISIBLE,
 } from '@platform/testing/document-visibility';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import { useDomainStatusPoll } from './use-domain-status-poll';
 

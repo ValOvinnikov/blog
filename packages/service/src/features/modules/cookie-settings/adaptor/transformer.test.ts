@@ -1,9 +1,9 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT } from '@shinefold/config';
 import {
   MOCK_COOKIE_SETTINGS_HEADING,
   mockRawCookieSettingsModule,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawWideLayout } from '@blog/service/testing/shared/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawWideLayout } from '@shinefold/service/testing/shared/fixtures';
 
 import { toCookieSettingsModule } from './transformer';
 

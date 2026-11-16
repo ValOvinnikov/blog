@@ -1,8 +1,8 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { setPersistentCookie } from '@platform/utils/persistent-cookie/persistent-cookie';
 import { SIDEBAR_COLLAPSED_COOKIE } from '@platform/utils/sidebar-collapsed-cookie/sidebar-collapsed-cookie';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
 import { sidebarCollapseProviderVariants } from './sidebar-collapse-provider-variants';

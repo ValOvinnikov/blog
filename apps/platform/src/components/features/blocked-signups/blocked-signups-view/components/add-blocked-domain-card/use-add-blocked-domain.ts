@@ -1,15 +1,15 @@
 'use client';
 
-import {
-  isOutcomeInvalid,
-  isOutcomeSuccess,
-  type TMaybeUndefined,
-} from '@blog/config';
-import type { TValueOf } from '@blog/config/utils';
 import { SIGNUP_BLOCK_FIELD_ERROR } from '@platform/constants/signup-block';
 import { useToast } from '@platform/context/toast-provider';
 import { addBlockedDomainAction } from '@platform/server/signup-block/add-blocked-domain-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import {
+  isOutcomeInvalid,
+  isOutcomeSuccess,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import type { TValueOf } from '@shinefold/config/utils';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 

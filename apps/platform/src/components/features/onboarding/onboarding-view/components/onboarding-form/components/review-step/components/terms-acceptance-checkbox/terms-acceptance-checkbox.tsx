@@ -1,7 +1,7 @@
-import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { Checkbox } from '@platform/components/shared/checkbox';
 import { LegalPageLink } from '@platform/components/shared/legal-page-link';
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
+import { SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TTermsAcceptanceCheckboxProps = {

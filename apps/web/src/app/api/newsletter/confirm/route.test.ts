@@ -4,10 +4,10 @@ import {
   routes,
   SUBSCRIBER_OUTCOME,
   TENANT_WRITE_REFUSAL,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { errorResult, okResult } from '@blog/utils';
-import { toOutcome } from '@blog/utils/to-outcome';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { errorResult, okResult } from '@shinefold/utils';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { MOCK_CONFIRMATION_TOKEN } from '@web/testing/server/newsletter/fixtures';
@@ -21,7 +21,7 @@ import { logger } from '@web/utils/logger/logger';
 
 import { GET } from './route';
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { subscribers: { confirmSubscriber: vi.fn() } },
 }));
 

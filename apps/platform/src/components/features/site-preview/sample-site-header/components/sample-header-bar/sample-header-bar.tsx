@@ -1,3 +1,6 @@
+import { SampleHeaderBrand } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-brand/sample-header-brand';
+import { SampleAccountControl } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-account-control/sample-account-control';
+import { SAMPLE_HEADER_BAR_TEST_ID } from '@platform/constants/sample-header';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
@@ -5,13 +8,10 @@ import {
   SIZE,
   type IAccountControl,
   type TMaybeUndefined,
-} from '@blog/config';
-import type { IWithClassName } from '@blog/config/types';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { IconButton } from '@blog/ui/components/atoms/icon-button';
-import { SampleHeaderBrand } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-brand/sample-header-brand';
-import { SampleAccountControl } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-account-control/sample-account-control';
-import { SAMPLE_HEADER_BAR_TEST_ID } from '@platform/constants/sample-header';
+} from '@shinefold/config';
+import type { IWithClassName } from '@shinefold/config/types';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
 import { useTranslations } from 'next-intl';
 
 import { sampleHeaderBarVariants } from './sample-header-bar-variants';

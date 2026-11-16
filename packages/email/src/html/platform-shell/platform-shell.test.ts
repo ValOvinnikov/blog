@@ -1,7 +1,7 @@
 import {
   PLATFORM_EMAIL_BRAND,
   PLATFORM_EMAIL_FULL_LOGO,
-} from '@blog/email/html/platform-email-brand/platform-email-brand';
+} from '@shinefold/email/html/platform-email-brand/platform-email-brand';
 import {
   COPYRIGHT_ENTITY,
   DOCTYPE,
@@ -15,8 +15,8 @@ import {
   MOCK_PLATFORM_BRAND_NAME,
   MOCK_SCRIPT_MARKUP,
   MOCK_UNSAFE_MARKUP,
-} from '@blog/email/testing/email-fixtures';
-import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
+} from '@shinefold/email/testing/email-fixtures';
+import { MOCK_TENANT_EMAIL_BRAND } from '@shinefold/email/testing/tenant-email-brand';
 
 import { buildPlatformShell } from './platform-shell';
 

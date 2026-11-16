@@ -1,12 +1,12 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
 import {
   siteConfig,
   type TSiteConfig,
   type TVoiceOverrides,
-} from '@blog/db/schema/site-config';
-import { tenants } from '@blog/db/schema/tenants';
+} from '@shinefold/db/schema/site-config';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
 // Nullable columns are mapped to `undefined` so callers never reason about two "absent" representations.

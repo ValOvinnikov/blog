@@ -1,5 +1,5 @@
-import { CONSENT_CATEGORY } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { CONSENT_CATEGORY } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useConsent } from '@web/hooks/use-consent';
 import { renderElement, screen } from '@web/testing/custom-render';

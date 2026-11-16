@@ -1,6 +1,5 @@
 'use client';
 
-import { ACTION_OUTCOME } from '@blog/config';
 import {
   UPLOAD_OPERATION,
   UPLOAD_REFUSAL,
@@ -9,6 +8,7 @@ import {
 } from '@platform/constants/upload';
 import type { TUploadFailure } from '@platform/server/uploads/upload-error';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TUploadErrorState = {

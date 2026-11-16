@@ -1,6 +1,3 @@
-import { ACTION_OUTCOME, HTTP_STATUS } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { MEMBERSHIP_ROLE, STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import {
   BILLING_LOG,
   STRIPE_SUBSCRIPTION_STATUS,
@@ -26,6 +23,12 @@ import {
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { ACTION_OUTCOME, HTTP_STATUS } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import {
+  MEMBERSHIP_ROLE,
+  STRIPE_PRICE_LOOKUP_KEY,
+} from '@shinefold/db/constants';
 import Stripe from 'stripe';
 
 import { changePlanAction } from './change-plan-action';

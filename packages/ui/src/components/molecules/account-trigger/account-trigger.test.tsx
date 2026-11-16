@@ -1,6 +1,6 @@
-import { ACCOUNT_BUTTON_STYLE } from '@blog/config';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { ACCOUNT_BUTTON_STYLE } from '@shinefold/config';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 

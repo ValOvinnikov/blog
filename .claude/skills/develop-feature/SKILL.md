@@ -58,7 +58,7 @@ approvals, never bundled.
 - **Migration check** → "Migrations" below. Decide now; when the change is purely
   additive, say explicitly that no migration is needed.
 - **Voice check** → list every public-site string the work adds or rewords,
-  including the copy a new `@blog/ui` text prop will carry once `web` wires
+  including the copy a new `@shinefold/ui` text prop will carry once `web` wires
   it, each with a recommended classification ("Check for Voice candidates" below). This is the plan's **Copy** line.
 - **Manual-test check** → if the change alters what a page shows or how it
   behaves, the plan carries a manual-test issue (step 2).
@@ -439,7 +439,7 @@ state plainly:
   time").
 - **Constraints** — migrations, human gates, anything that cannot be split.
 - **Copy** — every visible string on the public site the work adds or rewords,
-  including the copy a new `@blog/ui` text prop will carry once `web` wires it,
+  including the copy a new `@shinefold/ui` text prop will carry once `web` wires it,
   each with a recommended classification, Voice or fixed, per "Check for Voice
   candidates" — or "none". The user's approval of the split settles them, and
   they go into the ticket body before dispatch.
@@ -714,7 +714,7 @@ observable behaviour changed.
     candidate however many fields already exist.
   - The cost of wiring a field (db, the platform page, its preview specimen)
     belongs in the recommendation, never in the decision.
-  - A feature that starts in `@blog/ui` lists its copy at the `ui` step. The
+  - A feature that starts in `@shinefold/ui` lists its copy at the `ui` step. The
     component's props already decide whether the copy can be a Voice field,
     such as one rich message versus a title, body and action.
   - A string a layer agent first reports mid-task under **Voice candidates**

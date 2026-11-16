@@ -1,6 +1,6 @@
-import { SANITY_PROJECT_ROLE } from '@blog/db/constants';
-import { listTenantsPendingOwnerElevation } from '@blog/db/queries/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
+import { SANITY_PROJECT_ROLE } from '@shinefold/db/constants';
+import { listTenantsPendingOwnerElevation } from '@shinefold/db/queries/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import {
   OWNER_ACCESS_LOG,
   OWNER_ACCESS_SWEEP_CHECKS,

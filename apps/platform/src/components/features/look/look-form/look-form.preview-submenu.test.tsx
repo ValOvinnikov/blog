@@ -1,4 +1,3 @@
-import { HEADER_SUBMENU_STYLE } from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import {
   SAMPLE_SUBMENU_STYLE_ATTRIBUTE,
@@ -8,6 +7,7 @@ import messages from '@platform/i18n/messages/en.json';
 import { screen, within } from '@platform/testing/custom-render';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import { HEADER_SUBMENU_STYLE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

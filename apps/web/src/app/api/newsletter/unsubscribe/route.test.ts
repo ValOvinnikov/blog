@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   HTTP_METHOD,
   HTTP_STATUS,
@@ -5,11 +6,10 @@ import {
   routes,
   type THttpMethod,
   SUBSCRIBER_OUTCOME,
-} from '@blog/config';
-import { queries, TENANT_STATUS } from '@blog/db';
-import type * as DbConstants from '@blog/db/constants';
-import { toOutcome } from '@blog/utils/to-outcome';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { queries, TENANT_STATUS } from '@shinefold/db';
+import type * as DbConstants from '@shinefold/db/constants';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { readNewsletterUnsubscribeSubscriberId } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
 import {
@@ -32,8 +32,8 @@ import { GET, POST } from './route';
 
 faker.seed(6009);
 
-vi.mock('@blog/db', async () => ({
-  ...(await vi.importActual<typeof DbConstants>('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await vi.importActual<typeof DbConstants>('@shinefold/db/constants')),
   queries: {
     subscribers: { unsubscribeByToken: vi.fn(), unsubscribeById: vi.fn() },
   },

@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-import { EMBED_PROVIDER, MEDIA_RATIO } from '@blog/config/constants';
+import { EMBED_PROVIDER, MEDIA_RATIO } from '@shinefold/config/constants';
 
 import { parseEmbedUrl } from './parse-embed-url';
 

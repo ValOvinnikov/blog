@@ -3,9 +3,9 @@ import {
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { IconButton } from '@blog/ui/components/atoms/icon-button';
+} from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
 
 import { backToTopVariants } from './back-to-top-variants';
 

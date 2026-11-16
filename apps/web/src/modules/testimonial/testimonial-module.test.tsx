@@ -1,4 +1,4 @@
-import { errorResult, okResult } from '@blog/utils';
+import { errorResult, okResult } from '@shinefold/utils';
 import { TESTIMONIAL_LOG } from '@web/constants/testimonial';
 import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
@@ -23,7 +23,7 @@ const { getTestimonialModuleMock } = vi.hoisted(() => ({
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       testimonial: { v1: { getTestimonialModule: getTestimonialModuleMock } },

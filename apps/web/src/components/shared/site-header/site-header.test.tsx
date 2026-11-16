@@ -1,12 +1,12 @@
+import { faker } from '@faker-js/faker';
 import {
   ACCOUNT_PHONE_PLACEMENT,
   LOCALE_ISO_CODES,
   SITE_MESSAGES,
-} from '@blog/config';
-import { OAUTH_PROVIDER } from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
-import { toInitial } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
+import { toInitial } from '@shinefold/utils/primitives';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NAVIGATION_LOG } from '@web/constants/navigation';
 import { SESSION_STATUS } from '@web/constants/session';
@@ -81,11 +81,11 @@ vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
 );
 
-vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
+vi.mock('@shinefold/auth/utils/oauth-providers/oauth-providers', () => ({
   getEnabledOAuthProviderIds: getEnabledOAuthProviderIdsMock,
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     global: { navigation: { v1: { getNavigation: getNavigationMock } } },
   },

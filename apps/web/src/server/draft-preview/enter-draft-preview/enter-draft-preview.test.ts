@@ -1,4 +1,4 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 

@@ -1,4 +1,4 @@
-import type { TLogContext } from '@blog/insight/logger/logger';
+import type { TLogContext } from '@shinefold/insight/logger/logger';
 
 export interface ILokiSinkOptions {
   url: string;

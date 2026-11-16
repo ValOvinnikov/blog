@@ -2,10 +2,10 @@ import {
   ERROR_CODE,
   FINDING_STATUS,
   type TErrorCode,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { findings, type TFinding } from '@blog/db/schema/findings';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { findings, type TFinding } from '@shinefold/db/schema/findings';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { and, eq } from 'drizzle-orm';
 
 // Marks one OPEN finding RESOLVED. A stale id, or one already RESOLVED, is a

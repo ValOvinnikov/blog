@@ -1,13 +1,13 @@
 import type {
   InternationalizedArrayListedText,
   InternationalizedArrayParagraphText,
-} from '@blog/config';
-import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
+} from '@shinefold/config';
+import { textBlockFragment } from '@shinefold/service/shared/fragments/portable-text/text-block';
 import type {
   TLanguageFilter,
   TLocaleQueryConfig,
   TLocalizedKey,
-} from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+} from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
 import type {
   GroqBuilder,
   GroqBuilderSubquery,

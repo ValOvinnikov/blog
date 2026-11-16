@@ -1,6 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockSlug } from '@blog/service/testing/shared/fixtures';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockSlug } from '@shinefold/service/testing/shared/fixtures';
 
 import { toLandingPageParams } from './transformer';
 

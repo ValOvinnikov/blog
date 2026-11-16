@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 import type { INavItem } from './primary-navigation';
 

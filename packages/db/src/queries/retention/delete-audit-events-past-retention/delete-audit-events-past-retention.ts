@@ -1,8 +1,8 @@
-import { getDb } from '@blog/db/client';
-import { AUDIT_EVENT_RETENTION_MONTHS } from '@blog/db/constants';
-import { isInBatch } from '@blog/db/queries/retention/retention-batch';
-import { monthsBefore } from '@blog/db/queries/retention/retention-cutoff';
-import { auditEvents } from '@blog/db/schema/audit-events';
+import { getDb } from '@shinefold/db/client';
+import { AUDIT_EVENT_RETENTION_MONTHS } from '@shinefold/db/constants';
+import { isInBatch } from '@shinefold/db/queries/retention/retention-batch';
+import { monthsBefore } from '@shinefold/db/queries/retention/retention-cutoff';
+import { auditEvents } from '@shinefold/db/schema/audit-events';
 import { lt } from 'drizzle-orm';
 
 export async function deleteAuditEventsPastRetention(

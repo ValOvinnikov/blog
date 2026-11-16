@@ -1,6 +1,6 @@
-import { SIZE } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
 import { faker } from '@faker-js/faker';
+import { SIZE } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 

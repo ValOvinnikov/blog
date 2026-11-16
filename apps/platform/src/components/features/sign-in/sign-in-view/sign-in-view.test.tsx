@@ -1,4 +1,3 @@
-import { OAUTH_PROVIDER_IDS } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { SIGN_IN_ERROR } from '@platform/constants/sign-in';
 import { signInWithProviderAction } from '@platform/server/auth/sign-in-with-provider-action';
 import {
@@ -8,6 +7,7 @@ import {
 } from '@platform/testing/auth/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { OAUTH_PROVIDER_IDS } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SignInView } from './sign-in-view';

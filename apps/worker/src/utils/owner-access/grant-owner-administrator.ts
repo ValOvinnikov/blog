@@ -2,26 +2,26 @@ import {
   SANITY_LOGIN_PROVIDER,
   SANITY_PROJECT_ROLE,
   type TSanityLoginProvider,
-} from '@blog/config/constants';
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
+} from '@shinefold/config/constants';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   SANITY_PROJECT_ROLE as STORED_SANITY_PROJECT_ROLE,
   type TElevateTenantOwnerOutcome,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   setTenantOwnerAccess,
   touchTenantActivity,
-} from '@blog/db/queries/tenants';
+} from '@shinefold/db/queries/tenants';
 import {
   grantSanityProjectRole,
   listSanityProjectAcl,
   revokeSanityProjectRole,
   type TSanityAclEntry,
-} from '@blog/db/utils/sanity-management-client/sanity-project-access';
-import type { TSanityUser } from '@blog/db/utils/sanity-management-client/sanity-project-users';
-import { sanityRoleChangeToken } from '@blog/db/utils/sanity-management-client/sanity-role-change-token';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
+import type { TSanityUser } from '@shinefold/db/utils/sanity-management-client/sanity-project-users';
+import { sanityRoleChangeToken } from '@shinefold/db/utils/sanity-management-client/sanity-role-change-token';
+import { hasLength } from '@shinefold/utils/primitives';
 import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
 

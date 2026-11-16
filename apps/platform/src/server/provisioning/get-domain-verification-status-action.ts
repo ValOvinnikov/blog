@@ -1,11 +1,11 @@
 'use server';
 
-import { queries } from '@blog/db';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
 import { requireAdmin } from '@platform/server/auth/require-admin';
+import { queries } from '@shinefold/db';
 
 import { getDomainVerificationStatus } from './get-domain-verification-status';
 

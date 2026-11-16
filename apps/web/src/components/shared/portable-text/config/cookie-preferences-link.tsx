@@ -1,7 +1,7 @@
 'use client';
 
-import type { IWithChildren } from '@blog/config/react';
-import { textLinkVariants } from '@blog/ui/components/atoms/text-link/text-link-variants';
+import type { IWithChildren } from '@shinefold/config/react';
+import { textLinkVariants } from '@shinefold/ui/components/atoms/text-link/text-link-variants';
 import { useConsentPreferences } from '@web/context/consent-preferences-provider';
 
 const { root } = textLinkVariants({ appearance: 'prose', hasHref: true });

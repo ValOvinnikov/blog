@@ -1,4 +1,5 @@
-import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
+import { faker } from '@faker-js/faker';
+import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@shinefold/email/templates/tenant/unsubscribe/unsubscribe';
 import {
   MOCK_ESCAPED_UNSAFE_MARKUP,
   MOCK_ESCAPED_UNSUBSCRIBE_URL,
@@ -7,9 +8,8 @@ import {
   MOCK_UNSAFE_MARKUP,
   MOCK_UNSUBSCRIBE_URL,
   MOCK_URL,
-} from '@blog/email/testing/email-fixtures';
-import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/email/testing/email-fixtures';
+import { MOCK_TENANT_EMAIL_BRAND } from '@shinefold/email/testing/tenant-email-brand';
 
 import { buildPostEmail, type TPostEmailInput } from './post-email';
 

@@ -1,12 +1,12 @@
 import {
   EMAIL_REPUTATION_LEVEL,
   EMAIL_REPUTATION_THRESHOLDS,
-} from '@blog/db/constants';
-import { pauseNewsletter } from '@blog/db/queries/email-config';
+} from '@shinefold/db/constants';
+import { pauseNewsletter } from '@shinefold/db/queries/email-config';
 import {
   getEmailReputation,
   type IEmailReputation,
-} from '@blog/db/queries/email-usage';
+} from '@shinefold/db/queries/email-usage';
 import { NEWSLETTER_SEND_PACE } from '@worker/constants/newsletter-send';
 import { MOCK_PLATFORM_APP_BASE_URL } from '@worker/testing/provision-env/fake-provision-env';
 import { MOCK_TENANT_ID, mockTenant } from '@worker/testing/tenant/fixtures';
@@ -15,8 +15,8 @@ import { sendOperatorEmail } from '@worker/utils/operator-email/send-operator-em
 
 import { readReputationPace } from './reputation-pace';
 
-vi.mock('@blog/db/queries/email-config');
-vi.mock('@blog/db/queries/email-usage');
+vi.mock('@shinefold/db/queries/email-config');
+vi.mock('@shinefold/db/queries/email-usage');
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/utils/operator-email/send-operator-email');
 

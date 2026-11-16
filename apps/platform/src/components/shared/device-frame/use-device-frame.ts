@@ -1,4 +1,3 @@
-import { isUndefined } from '@blog/utils/primitives';
 import {
   DEVICE_FRAME_FIT,
   DEVICE_FRAME_LIMIT,
@@ -16,6 +15,7 @@ import {
   type TDeviceFrameFit,
 } from '@platform/utils/device-frame-scale/device-frame-scale';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useEffect, useRef, useState, type Ref, type UIEvent } from 'react';
 
 import {

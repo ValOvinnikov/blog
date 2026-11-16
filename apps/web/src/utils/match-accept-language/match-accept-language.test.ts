@@ -1,4 +1,4 @@
-import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES } from '@shinefold/config';
 
 import { matchAcceptLanguage } from './match-accept-language';
 

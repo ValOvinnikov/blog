@@ -1,4 +1,4 @@
-import { routes } from '@blog/config';
+import { routes } from '@shinefold/config';
 import { toTenantScopedPath } from '@web/utils/to-tenant-scoped-path';
 
 export type TBuildPostPublishPathsInput = {

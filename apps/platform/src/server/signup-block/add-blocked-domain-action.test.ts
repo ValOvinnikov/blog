@@ -1,7 +1,3 @@
-import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ERROR_CODE } from '@blog/config/constants';
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import {
   SIGNUP_BLOCK_FIELD_ERROR,
@@ -15,6 +11,10 @@ import {
   mockBlockedIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 import { notFound } from 'next/navigation';
 
 import { addBlockedDomainAction } from './add-blocked-domain-action';

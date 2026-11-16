@@ -1,5 +1,9 @@
-import { LOCALE_ISO_CODES, routes, type TLocaleIsoCode } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
+import {
+  LOCALE_ISO_CODES,
+  routes,
+  type TLocaleIsoCode,
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { COOKIE_STATEMENT_LOG } from '@web/constants/cookie-statement';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {

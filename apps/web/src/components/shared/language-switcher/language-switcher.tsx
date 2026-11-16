@@ -4,7 +4,7 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   type TLanguageSwitcherStyle,
   type TLocaleIsoCode,
-} from '@blog/config';
+} from '@shinefold/config';
 import { usePublicPathname } from '@web/hooks/use-public-pathname';
 import { useTranslations } from 'next-intl';
 

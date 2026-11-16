@@ -1,12 +1,12 @@
 'use client';
 
-import { isOutcomeRefused, isOutcomeSuccess, SIZE } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { useTenantOverviewFocus } from '@platform/components/features/tenants/tenant-overview-focus-provider';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { clearNewsletterPauseAction } from '@platform/server/newsletter-pause/clear-newsletter-pause-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import { isOutcomeRefused, isOutcomeSuccess, SIZE } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 

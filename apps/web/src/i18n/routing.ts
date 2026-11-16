@@ -2,7 +2,7 @@ import {
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
-} from '@blog/config';
+} from '@shinefold/config';
 import { defineRouting } from 'next-intl/routing';
 
 const LOCALE_PREFIXES = {

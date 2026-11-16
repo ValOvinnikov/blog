@@ -1,7 +1,3 @@
-import { type IBusyStyle, SIZE, type TLocaleIsoCode } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { Text } from '@blog/ui/components/atoms/text';
 import { LookSampleCta } from '@platform/components/features/site-preview/look-sample/components/look-sample-cta/look-sample-cta';
 import { LookSampleFaq } from '@platform/components/features/site-preview/look-sample/components/look-sample-faq/look-sample-faq';
 import { LookSampleForm } from '@platform/components/features/site-preview/look-sample/components/look-sample-form/look-sample-form';
@@ -20,6 +16,10 @@ import { SAMPLE_PART } from '@platform/constants/sample-part';
 import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
+import { type IBusyStyle, SIZE, type TLocaleIsoCode } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import { useTranslations } from 'next-intl';
 
 import { lookSampleVariants } from './look-sample-variants';

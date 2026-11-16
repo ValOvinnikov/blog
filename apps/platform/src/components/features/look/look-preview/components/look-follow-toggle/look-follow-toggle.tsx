@@ -1,8 +1,8 @@
 'use client';
 
-import { ICONS } from '@blog/config';
 import type { TLookFollow } from '@platform/components/features/look/look-preview/use-look-follow';
 import { IconSoloToggle } from '@platform/components/shared/icon-solo-toggle';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TLookFollowToggleProps = {

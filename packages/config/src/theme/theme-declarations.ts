@@ -1,5 +1,5 @@
-import { oklchToHex } from '@blog/utils/color';
-import { isUndefined } from '@blog/utils/primitives';
+import { oklchToHex } from '@shinefold/utils/color';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 import {
   BUTTON_SHAPE,
@@ -8,7 +8,7 @@ import {
   type TButtonShape,
   type TDensity,
   type THeaderControlStyle,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import { BORDER_COLOR } from './border-tokens';
 import { atLeastSmall } from './radius-declarations';

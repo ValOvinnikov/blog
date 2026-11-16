@@ -1,6 +1,5 @@
 'use client';
 
-import { ICONS } from '@blog/config';
 import type { TIconToggleGroupProps } from '@platform/components/shared/icon-toggle-group';
 import { IconToolbar } from '@platform/components/shared/icon-toolbar';
 import { usePreviewModeGroup } from '@platform/components/shared/preview-mode-group';
@@ -10,6 +9,7 @@ import {
   type TPreviewDevice,
   type TPreviewMode,
 } from '@platform/constants/preview';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import type { PropsWithChildren } from 'react';
 

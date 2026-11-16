@@ -1,11 +1,11 @@
+import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import {
   ACTION_OUTCOME,
   isOutcomeRefused,
   type TActionOutcome,
   type TOutcome,
-} from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
-import { SETTINGS_REFUSAL } from '@platform/constants/settings';
+} from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
 
 export type TNotInPlanRefusal = {
   outcome: typeof ACTION_OUTCOME.REFUSED;

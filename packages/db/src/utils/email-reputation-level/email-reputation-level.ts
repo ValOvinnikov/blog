@@ -5,8 +5,8 @@ import {
   type TEmailReputationGateLevel,
   type TEmailReputationLevel,
   type TEmailReputationRateThresholds,
-} from '@blog/db/constants';
-import type { IEmailReputation } from '@blog/db/queries/email-usage/get-email-reputation/get-email-reputation';
+} from '@shinefold/db/constants';
+import type { IEmailReputation } from '@shinefold/db/queries/email-usage/get-email-reputation/get-email-reputation';
 
 const LEVELS_MOST_SEVERE_FIRST: readonly TEmailReputationGateLevel[] = [
   EMAIL_REPUTATION_LEVEL.STOP,

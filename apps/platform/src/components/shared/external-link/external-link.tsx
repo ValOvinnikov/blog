@@ -1,4 +1,4 @@
-import type { IWithClassName } from '@blog/config/types';
+import type { IWithClassName } from '@shinefold/config/types';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

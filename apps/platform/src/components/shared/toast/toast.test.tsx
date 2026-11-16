@@ -1,9 +1,9 @@
-import { TOAST_TYPE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { ICON_TEST_ID } from '@platform/constants/icon';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_HIDDEN } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { TOAST_TYPE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Toast } from './toast';

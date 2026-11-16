@@ -1,4 +1,4 @@
-import { routes, SITE_MESSAGES } from '@blog/config';
+import { routes, SITE_MESSAGES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, render, screen } from '@web/testing/custom-render';
 import { ARIA_LIVE_ASSERTIVE_SELECTOR } from '@web/testing/shared/aria/constants';

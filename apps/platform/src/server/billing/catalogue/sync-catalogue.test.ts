@@ -25,7 +25,9 @@ const { catalogueMocks } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@blog/db', () => ({ queries: { stripeCatalogue: catalogueMocks } }));
+vi.mock('@shinefold/db', () => ({
+  queries: { stripeCatalogue: catalogueMocks },
+}));
 
 describe('catalogue sync', () => {
   let stripe: Stripe;

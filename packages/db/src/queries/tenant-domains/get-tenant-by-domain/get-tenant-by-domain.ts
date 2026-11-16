@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import { tenantDomains } from '@blog/db/schema/tenant-domains';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { getDb } from '@shinefold/db/client';
+import { tenantDomains } from '@shinefold/db/schema/tenant-domains';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
 // Resolves via `tenant_domains`, the source of truth for "which domains

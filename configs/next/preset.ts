@@ -75,7 +75,7 @@ export function createNextConfig(overrides: TNextConfigOverrides): NextConfig {
     turbopack: {
       root: turbopackRoot,
       rules: {
-        // removeViewBox strips a viewBox equal to width/height (every icon here ships 24x24), which breaks @blog/ui's Icon CSS-based resizing — keep the rest of preset-default.
+        // removeViewBox strips a viewBox equal to width/height (every icon here ships 24x24), which breaks @shinefold/ui's Icon CSS-based resizing — keep the rest of preset-default.
         '*.svg': [
           {
             condition: { query: /^\?url$/ },

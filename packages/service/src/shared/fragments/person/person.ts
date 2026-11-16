@@ -1,10 +1,10 @@
-import { q } from '@blog/service/sanity/query/query';
-import { localizedImageWithAltOptionalFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
-import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
-import { socialProfileFragment } from '@blog/service/shared/fragments/social-profile/social-profile';
-import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+import { q } from '@shinefold/service/sanity/query/query';
+import { localizedImageWithAltOptionalFragment } from '@shinefold/service/shared/fragments/image/localized-image-with-alt';
+import { linkDocumentFragment } from '@shinefold/service/shared/fragments/link/link-document';
+import { socialProfileFragment } from '@shinefold/service/shared/fragments/social-profile/social-profile';
+import { getLocalizedField } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
+import { getLocalizedPortableTextBlock } from '@shinefold/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
 
 const localeQ = q.parameters<TLocaleQueryParams>();
 

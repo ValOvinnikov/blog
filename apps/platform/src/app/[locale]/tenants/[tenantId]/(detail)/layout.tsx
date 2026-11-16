@@ -1,4 +1,3 @@
-import { queries } from '@blog/db';
 import { PlatformShell } from '@platform/components/features/layout/platform-shell';
 import { TenantBreadcrumb } from '@platform/components/features/layout/tenant-breadcrumb';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
@@ -7,6 +6,7 @@ import {
   operatorNavSections,
   tenantNavSections,
 } from '@platform/utils/nav-sections/nav-sections';
+import { queries } from '@shinefold/db';
 import { getTranslations } from 'next-intl/server';
 
 type TProps = {

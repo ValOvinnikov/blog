@@ -1,4 +1,5 @@
-import type { TTenantEmailBrand } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import type { TTenantEmailBrand } from '@shinefold/config';
 import {
   COPYRIGHT_ENTITY,
   DOCTYPE,
@@ -17,14 +18,13 @@ import {
   MOCK_TENANT_NAME,
   MOCK_UNSAFE_MARKUP,
   PREHEADER_STYLE,
-} from '@blog/email/testing/email-fixtures';
-import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
+} from '@shinefold/email/testing/email-fixtures';
+import { MOCK_TENANT_EMAIL_BRAND } from '@shinefold/email/testing/tenant-email-brand';
 import {
   hexToOklch,
   renderedContrastRatio,
   WCAG_AA_CONTRAST_MIN,
-} from '@blog/utils/color';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/utils/color';
 
 import { buildTenantShell } from './tenant-shell';
 

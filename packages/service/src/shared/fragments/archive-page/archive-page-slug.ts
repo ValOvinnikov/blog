@@ -1,5 +1,5 @@
-import { q } from '@blog/service/sanity/query/query';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+import { q } from '@shinefold/service/sanity/query/query';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
 import { z } from 'zod';
 
 const slugParser = z.string().nullable();

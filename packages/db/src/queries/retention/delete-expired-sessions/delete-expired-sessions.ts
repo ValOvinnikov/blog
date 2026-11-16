@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import { isInBatch } from '@blog/db/queries/retention/retention-batch';
-import { sessions } from '@blog/db/schema/auth';
+import { getDb } from '@shinefold/db/client';
+import { isInBatch } from '@shinefold/db/queries/retention/retention-batch';
+import { sessions } from '@shinefold/db/schema/auth';
 import { lt } from 'drizzle-orm';
 
 export async function deleteExpiredSessions(

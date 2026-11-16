@@ -1,5 +1,5 @@
-import type { TSettingsFeaturesAndPreset } from '@blog/db/queries/settings-features';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
+import type { TSettingsFeaturesAndPreset } from '@shinefold/db/queries/settings-features';
 
 export const mockSettingsFeaturesValues = (
   overrides: Partial<TSettingsFeaturesValues> = {},

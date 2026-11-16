@@ -1,4 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_EXPANDED } from '@platform/testing/aria';
@@ -8,6 +7,7 @@ import {
   setupLookForm,
   withLookTenant,
 } from '@platform/testing/look/look-form-setup';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

@@ -1,5 +1,5 @@
-import { ACTION_OUTCOME, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { ACTION_OUTCOME, SITE_MESSAGES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';

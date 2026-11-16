@@ -1,11 +1,6 @@
 'use client';
 
 import {
-  ACTION_OUTCOME,
-  type TActionOutcome,
-  type TOutcome,
-} from '@blog/config';
-import {
   useSettingsForm,
   type TUseSettingsFormArgs,
 } from '@platform/components/shared/settings-form-shell';
@@ -25,6 +20,11 @@ import {
 import { toUpdateLookInput } from '@platform/utils/to-update-look-input/to-update-look-input';
 import { useAfterSave } from '@platform/utils/use-after-save/use-after-save';
 import type { TUploadErrorState } from '@platform/utils/use-upload-error-text/use-upload-error-text';
+import {
+  ACTION_OUTCOME,
+  type TActionOutcome,
+  type TOutcome,
+} from '@shinefold/config';
 import { useState } from 'react';
 
 type TUseLookSaveArgs = Omit<

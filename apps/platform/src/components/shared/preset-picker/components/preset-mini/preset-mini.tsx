@@ -1,4 +1,4 @@
-import type { TPresetId } from '@blog/config';
+import type { TPresetId } from '@shinefold/config';
 
 import { presetMiniVariants } from './preset-mini-variants';
 

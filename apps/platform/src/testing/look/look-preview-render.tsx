@@ -1,4 +1,3 @@
-import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@blog/config';
 import {
   LookFormProvider,
   type TLookFormContext,
@@ -19,6 +18,7 @@ import {
   type TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
 import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
+import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@shinefold/config';
 
 export type TRenderPreviewOptions = {
   values?: Partial<TLookFormValues>;

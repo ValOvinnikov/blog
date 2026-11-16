@@ -1,5 +1,5 @@
-import { HEADER_CONTROL } from '@blog/ui/lib/styling';
 import { tv } from '@platform/utils/tv/tv';
+import { HEADER_CONTROL } from '@shinefold/ui/lib/styling';
 
 export const sampleHeaderControlsVariants = tv({
   slots: {

@@ -1,4 +1,4 @@
-import { isSecretMatch } from '@blog/utils';
+import { isSecretMatch } from '@shinefold/utils';
 import { CRON_BEARER_PREFIX } from '@worker/constants/cron';
 
 export function hasCronSecret(request: Request, secret: string): boolean {

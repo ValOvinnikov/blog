@@ -1,6 +1,6 @@
-import { CTA_ACTION_VARIANT } from '@blog/config/constants';
-import { ctaButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
-import { toTitleCase } from '@blog/utils/primitives';
+import { CTA_ACTION_VARIANT } from '@shinefold/config/constants';
+import { ctaButtonSchema } from '@shinefold/studio/schema-types/objects/cta-button/cta-button';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { defineArrayMember, defineField } from 'sanity';
 
 type TCtaButtonItem = { variant?: string };

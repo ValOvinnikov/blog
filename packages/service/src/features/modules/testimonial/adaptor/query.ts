@@ -1,18 +1,21 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
+import {
+  q,
+  type TModuleQueryParams,
+} from '@shinefold/service/sanity/query/query';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
-} from '@blog/service/shared/expressions/module/display-mode';
-import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
-import { localizedImageWithAltOptionalFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
-import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
-import { moduleAppearanceFragment } from '@blog/service/shared/fragments/module/module-appearance';
-import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
+} from '@shinefold/service/shared/expressions/module/display-mode';
+import { ctaButtonsFragment } from '@shinefold/service/shared/fragments/cta/cta-buttons';
+import { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
+import { localizedImageWithAltOptionalFragment } from '@shinefold/service/shared/fragments/image/localized-image-with-alt';
+import { moduleWideLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { linkDocumentFragment } from '@shinefold/service/shared/fragments/link/link-document';
+import { moduleAppearanceFragment } from '@shinefold/service/shared/fragments/module/module-appearance';
+import { moduleContentAlignmentFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
+import { getLocalizedField } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
+import { getLocalizedPortableTextBlock } from '@shinefold/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
 import { z } from 'zod';
 
 const CARD_ALIGNMENT_EXPRESSION = `coalesce(cardAlignment, "${CONTENT_ALIGNMENT.LEFT}")`;

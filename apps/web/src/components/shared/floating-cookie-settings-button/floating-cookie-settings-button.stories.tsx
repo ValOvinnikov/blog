@@ -1,7 +1,7 @@
 import {
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
 import {

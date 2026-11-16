@@ -1,8 +1,5 @@
 'use client';
 
-import { type TEmailTemplateType } from '@blog/config';
-import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
-import { isNull } from '@blog/utils/primitives';
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
 import { Card } from '@platform/components/shared/card';
 import { FieldResetButton } from '@platform/components/shared/field-reset-button';
@@ -21,6 +18,9 @@ import { isBlankPortableTextValue } from '@platform/utils/is-blank-portable-text
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+import { type TEmailTemplateType } from '@shinefold/config';
+import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
+import { isNull } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 

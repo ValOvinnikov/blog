@@ -1,9 +1,12 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
-import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
-import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
+import {
+  q,
+  type TModuleQueryParams,
+} from '@shinefold/service/sanity/query/query';
+import { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
+import { moduleLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentLeftCenterFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
+import { getLocalizedField } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
+import { getLocalizedPortableTextBlock } from '@shinefold/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
 
 export const contactFormModuleQuery = q
   .parameters<TModuleQueryParams>()

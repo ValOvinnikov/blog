@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {

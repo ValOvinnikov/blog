@@ -1,7 +1,7 @@
-import { tenants } from '@blog/db/schema/tenants';
-import type { TTestDb } from '@blog/db/testing/fixtures';
-import { testPersonalEmailIndex } from '@blog/db/testing/personal-data';
 import { faker } from '@faker-js/faker';
+import { tenants } from '@shinefold/db/schema/tenants';
+import type { TTestDb } from '@shinefold/db/testing/fixtures';
+import { testPersonalEmailIndex } from '@shinefold/db/testing/personal-data';
 import { eq } from 'drizzle-orm';
 
 const EMAIL_DOMAIN = faker.internet.domainName();

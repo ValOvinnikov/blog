@@ -1,5 +1,9 @@
-import { SIZE, type IWithClassName, type IWithDataTestId } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
+import {
+  SIZE,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
 
 import { ConsentCategoryRow } from './components/category-row/consent-category-row';
 import { consentPreferencesVariants } from './consent-preferences-variants';

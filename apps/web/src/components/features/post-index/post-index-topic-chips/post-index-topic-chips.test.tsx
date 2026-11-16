@@ -1,7 +1,7 @@
-import { routes, SITE_MESSAGES } from '@blog/config';
-import { service } from '@blog/service';
-import { okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { routes, SITE_MESSAGES } from '@shinefold/config';
+import { service } from '@shinefold/service';
+import { okResult } from '@shinefold/utils';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { mockTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
@@ -12,7 +12,7 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', async (importOriginal) => {
+vi.mock('@shinefold/service', async (importOriginal) => {
   const actual = await importOriginal<object>();
   return {
     ...actual,

@@ -1,7 +1,7 @@
-import type { TFieldErrors } from '@blog/config';
-import { isValidEmailAddress } from '@blog/email/validation';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { hasLength } from '@blog/utils/primitives';
+import type { TFieldErrors } from '@shinefold/config';
+import { isValidEmailAddress } from '@shinefold/email/validation';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { hasLength } from '@shinefold/utils/primitives';
 import {
   FIELD_ERROR,
   type TFieldErrorReason,

@@ -1,6 +1,6 @@
-import type { TOAuthProvider } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { tenantOAuthCredentials } from '@blog/db/schema/tenant-oauth-credentials';
+import type { TOAuthProvider } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { tenantOAuthCredentials } from '@shinefold/db/schema/tenant-oauth-credentials';
 import { and, eq } from 'drizzle-orm';
 
 export async function confirmTenantOAuthCallbackDomain(

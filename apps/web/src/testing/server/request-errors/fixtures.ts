@@ -1,4 +1,4 @@
-import { HTTP_METHOD } from '@blog/config/constants';
+import { HTTP_METHOD } from '@shinefold/config/constants';
 import type { Instrumentation } from 'next';
 
 type TRequestErrorArgs = Parameters<Instrumentation.onRequestError>;

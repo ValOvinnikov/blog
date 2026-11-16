@@ -1,13 +1,16 @@
-import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config';
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
-import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
-import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { postLinkFragment } from '@blog/service/shared/fragments/post/post-link';
-import { tagWithPostCountFragment } from '@blog/service/shared/fragments/tag/tag';
-import { topicWithPostCountFragment } from '@blog/service/shared/fragments/topic/topic';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
-import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
+import { TAXONOMY_KIND, TAXONOMY_SORT } from '@shinefold/config';
+import {
+  q,
+  type TModuleQueryParams,
+} from '@shinefold/service/sanity/query/query';
+import { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
+import { moduleWideLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentLeftCenterFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
+import { postLinkFragment } from '@shinefold/service/shared/fragments/post/post-link';
+import { tagWithPostCountFragment } from '@shinefold/service/shared/fragments/tag/tag';
+import { topicWithPostCountFragment } from '@shinefold/service/shared/fragments/topic/topic';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
+import { publishedPostsInLocale } from '@shinefold/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 import { z } from 'zod';
 
 const LATEST_POSTS_LIMIT = 2;

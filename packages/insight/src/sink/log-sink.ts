@@ -1,10 +1,10 @@
-import type { TLogContext } from '@blog/insight/logger/logger';
+import type { TLogContext } from '@shinefold/insight/logger/logger';
 
 export type TLogSink = (line: TLogContext) => unknown;
 
 // Keyed on globalThis because Next.js bundles instrumentation.ts separately
 // from routes, so a module-level Set would not be shared between them.
-const SINKS_KEY = Symbol.for('@blog/insight/log-sinks');
+const SINKS_KEY = Symbol.for('@shinefold/insight/log-sinks');
 
 function getSinks(): Set<TLogSink> {
   const registry = globalThis as typeof globalThis & {

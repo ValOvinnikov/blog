@@ -1,14 +1,14 @@
-import { LOCALE_ISO_CODES, POST_SOURCE } from '@blog/config/constants';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { setLiveLanguages } from '@blog/studio/schema-types/validation/live-languages/live-languages';
-import { validatePinnedPostTranslated } from '@blog/studio/schema-types/validation/validate-pinned-post-translated/validate-pinned-post-translated';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES, POST_SOURCE } from '@shinefold/config/constants';
+import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
+import { setLiveLanguages } from '@shinefold/studio/schema-types/validation/live-languages/live-languages';
+import { validatePinnedPostTranslated } from '@shinefold/studio/schema-types/validation/validate-pinned-post-translated/validate-pinned-post-translated';
 import {
   mockReference,
   mockTranslationMetadata,
-} from '@blog/studio/testing/mock-documents';
-import { MOCK_FETCH_ERROR } from '@blog/studio/testing/mock-fetch-error';
-import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/mock-documents';
+import { MOCK_FETCH_ERROR } from '@shinefold/studio/testing/mock-fetch-error';
+import { mockGroqValidationContext } from '@shinefold/studio/testing/mock-validation-context';
 
 faker.seed(6022);
 

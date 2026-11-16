@@ -1,10 +1,10 @@
-import type { TLocaleIsoCode, TTenantPlan } from '@blog/config/constants';
-import type { TTenantStatus } from '@blog/db/constants';
+import type { TLocaleIsoCode, TTenantPlan } from '@shinefold/config/constants';
+import type { TTenantStatus } from '@shinefold/db/constants';
 import {
   planChangeFields,
   type TPlanChangeFields,
-} from '@blog/db/queries/tenants/plan-change-fields';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/queries/tenants/plan-change-fields';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 type TTenantDetailsFields = {
   name: string;

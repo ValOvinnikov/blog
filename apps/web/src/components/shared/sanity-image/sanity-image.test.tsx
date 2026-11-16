@@ -1,5 +1,5 @@
-import type { ISanityImage } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import type { ISanityImage } from '@shinefold/config';
 import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-provider';
 import {
   customRender,

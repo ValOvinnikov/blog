@@ -1,6 +1,6 @@
-import type { TPortableTextBlock } from '@blog/config';
-import type { TPortableTextBody } from '@blog/service';
-import { hasLength } from '@blog/utils/primitives';
+import type { TPortableTextBlock } from '@shinefold/config';
+import type { TPortableTextBody } from '@shinefold/service';
+import { hasLength } from '@shinefold/utils/primitives';
 
 export const MIN_H2_HEADINGS_FOR_RAIL = 3;
 

@@ -1,24 +1,24 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   LOCALE_ISO_CODES,
   PORTABLE_TEXT_BLOCK_TYPE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   MOCK_CONTENT_MODULE_ID,
   mockRawContentModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   mockRawBodyImageBlock,
   mockRawExternalLinkDocument,
-} from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_DUTCH_TEXT,
   MOCK_ENGLISH_TEXT,
   mockLocalizedValues,
   mockParagraphBlocks,
-} from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
 
 import { contentModuleQuery } from './query';
 

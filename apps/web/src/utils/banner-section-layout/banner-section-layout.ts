@@ -1,4 +1,4 @@
-import { SPACING_SCALE, type TLayout } from '@blog/config';
+import { SPACING_SCALE, type TLayout } from '@shinefold/config';
 
 export const BANNER_SECTION_LAYOUT: TLayout = {
   spacingTop: SPACING_SCALE.NONE,

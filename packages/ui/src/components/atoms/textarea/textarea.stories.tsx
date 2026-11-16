@@ -1,5 +1,5 @@
-import { ButtonShapes } from '@blog/ui/testing/button-shapes';
-import { SurfaceBands } from '@blog/ui/testing/surface-bands';
+import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
+import { SurfaceBands } from '@shinefold/ui/testing/surface-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 

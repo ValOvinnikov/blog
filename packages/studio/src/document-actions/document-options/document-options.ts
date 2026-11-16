@@ -1,12 +1,12 @@
 import {
   LOCALE_ISO_CODES,
   SANITY_DOCUMENT_ACTION,
-} from '@blog/config/constants';
-import { withLandingRedirects } from '@blog/studio/document-actions/with-landing-redirects/with-landing-redirects';
-import { PAGE_COOKIE_STATEMENT_TYPE } from '@blog/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
-import { templateIdFor } from '@blog/studio/structure/locales/template-id-for';
+} from '@shinefold/config/constants';
+import { withLandingRedirects } from '@shinefold/studio/document-actions/with-landing-redirects/with-landing-redirects';
+import { PAGE_COOKIE_STATEMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
+import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { migrationStateSchema } from '@shinefold/studio/schema-types/documents/system/migration-state/migration-state';
+import { templateIdFor } from '@shinefold/studio/structure/locales/template-id-for';
 import type { DocumentPluginOptions } from 'sanity';
 
 const COOKIE_STATEMENT_LOCKED_ACTIONS: readonly string[] = [

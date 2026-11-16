@@ -1,6 +1,6 @@
-import { TOAST_TYPE } from '@blog/config';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { TOAST_TYPE } from '@shinefold/config';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Toast, type IToast, type TToastProps } from './toast';

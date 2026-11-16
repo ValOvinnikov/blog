@@ -1,9 +1,9 @@
 'use client';
 
-import type { TMaybeUndefined, TReasonedFailure } from '@blog/config';
-import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import type { TTenantDetailsFieldError } from '@platform/server/tenants/tenant-field-error';
+import type { TMaybeUndefined, TReasonedFailure } from '@shinefold/config';
+import { TENANT_PROVISIONING_STEP } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 
 const FIELD_ERROR_KEYS = {

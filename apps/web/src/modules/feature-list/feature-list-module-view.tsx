@@ -1,7 +1,7 @@
-import { CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
-import type { TFeatureListModule } from '@blog/service';
-import { CardGrid } from '@blog/ui/components/organisms/card-grid';
-import { hasLength } from '@blog/utils/primitives';
+import { CONTENT_ALIGNMENT, DISPLAY_MODE } from '@shinefold/config';
+import type { TFeatureListModule } from '@shinefold/service';
+import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
+import { hasLength } from '@shinefold/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section, type TModuleSection } from '@web/components/shared/section';

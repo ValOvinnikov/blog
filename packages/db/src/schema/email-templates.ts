@@ -1,4 +1,4 @@
-import type { TEmailTemplateType } from '@blog/config/constants';
+import type { TEmailTemplateType } from '@shinefold/config/constants';
 import { jsonb, pgTable, primaryKey, text, uuid } from 'drizzle-orm/pg-core';
 
 import { timestampColumns } from './columns';
@@ -7,7 +7,7 @@ import { tenants } from './tenants';
 
 // A Portable Text block, typed loosely on purpose — this package never
 // interprets its contents (the email-HTML serializer that does lives in
-// `@blog/email`), it only stores and returns whatever shape was authored.
+// `@shinefold/email`), it only stores and returns whatever shape was authored.
 export type TEmailTemplateBlock = {
   _type: string;
   _key: string;

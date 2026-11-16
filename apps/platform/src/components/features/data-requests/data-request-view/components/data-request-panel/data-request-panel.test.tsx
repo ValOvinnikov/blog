@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   DATA_REQUEST_EXPORT_FILE_PREFIX,
@@ -20,6 +19,7 @@ import {
   mockPersonalDataReaderAccount,
 } from '@platform/testing/data-requests/fixtures';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DataRequestPanel } from './data-request-panel';

@@ -1,7 +1,7 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { ConsentPreferences } from '@blog/ui/components/molecules/consent-preferences';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { ConsentPreferences } from '@shinefold/ui/components/molecules/consent-preferences';
 import { useConsentPreferencesForm } from '@web/hooks/use-consent-preferences-form';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';

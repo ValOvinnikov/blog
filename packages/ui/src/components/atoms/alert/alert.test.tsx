@@ -1,6 +1,6 @@
-import { ALERT_TYPE } from '@blog/config';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { ALERT_TYPE } from '@shinefold/config';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 
 import { Alert } from './alert';
 

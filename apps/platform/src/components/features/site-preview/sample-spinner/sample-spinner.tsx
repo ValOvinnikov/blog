@@ -1,5 +1,5 @@
-import type { TSpinnerStyle } from '@blog/config';
-import { Spinner } from '@blog/ui/components/atoms/spinner';
+import type { TSpinnerStyle } from '@shinefold/config';
+import { Spinner } from '@shinefold/ui/components/atoms/spinner';
 
 export type TSampleSpinnerProps = {
   variant: TSpinnerStyle;

@@ -1,6 +1,6 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 

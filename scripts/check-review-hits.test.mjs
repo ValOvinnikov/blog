@@ -71,7 +71,7 @@ describe('findReviewHits', () => {
       hitsOf([
         added(
           COMPONENT_TEST,
-          '// eslint-disable-next-line blog-test/no-nested-query -- legacy',
+          '// eslint-disable-next-line shinefold-test/no-nested-query -- legacy',
         ),
       ]),
       [HIT.SUPPRESSION],
@@ -154,7 +154,7 @@ describe('valueLiteralsOf', () => {
       valueLiteralsOf(
         added(
           COMPONENT,
-          "import { Card } from '@blog/ui/card';",
+          "import { Card } from '@shinefold/ui/card';",
           "const kind = 'hero-profile';",
           "const type = 'button';",
           "const shape = 'PILL';",

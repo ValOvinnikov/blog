@@ -1,5 +1,5 @@
-import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
-import { createMockFaker } from '@blog/db/testing/mock-faker';
+import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
 
 const newsletterPostSendsFaker = createMockFaker(7158);
 

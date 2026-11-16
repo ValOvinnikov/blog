@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { cookies } from 'next/headers';
 
 type TRenamedCookie = {

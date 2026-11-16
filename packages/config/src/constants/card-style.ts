@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const CARD_STYLE = {
   ACCENT_BAR: 'ACCENT_BAR',

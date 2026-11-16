@@ -1,5 +1,5 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
 import {
   TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES,
   TENANT_PROVISIONING_RUN_STALE_AFTER_MINUTES,
@@ -7,26 +7,26 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStatus,
-} from '@blog/db/constants';
-import { setTenantProvisioningStatus } from '@blog/db/queries/tenants/set-tenant-provisioning-status';
-import * as schema from '@blog/db/schema';
+} from '@shinefold/db/constants';
+import { setTenantProvisioningStatus } from '@shinefold/db/queries/tenants/set-tenant-provisioning-status';
+import * as schema from '@shinefold/db/schema';
 import type {
   TTenant,
   TTenantProvisioningState,
-} from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_IDLE_PROVISIONING_STEPS,
   MOCK_MISSING_TENANT_ID,
   MOCK_STEP_ERROR,
-} from '@blog/db/testing/tenants/fixtures';
-import { errorResult, okResult } from '@blog/utils';
+} from '@shinefold/db/testing/tenants/fixtures';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import { beginTenantProvisioning } from './begin-tenant-provisioning';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock();

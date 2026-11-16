@@ -1,4 +1,4 @@
-import { BRAND_PILL, tv } from '@blog/ui/lib/styling';
+import { BRAND_PILL, tv } from '@shinefold/ui/lib/styling';
 
 export const pricingCardBadgeVariants = tv({
   base: [

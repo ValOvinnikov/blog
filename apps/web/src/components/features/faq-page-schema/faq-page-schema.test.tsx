@@ -1,5 +1,5 @@
-import type { TFaqPageQuestion } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import type { TFaqPageQuestion } from '@shinefold/service';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { customRender, screen } from '@web/testing/custom-render';
 import { MOCK_FAQ_PAGE_JSON_LD_FRAGMENT } from '@web/testing/shared/json-ld/fixtures';

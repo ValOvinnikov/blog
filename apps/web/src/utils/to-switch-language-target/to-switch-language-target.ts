@@ -1,5 +1,5 @@
-import { routes, type TLocaleIsoCode } from '@blog/config';
-import type { TTranslationMap } from '@blog/service';
+import { routes, type TLocaleIsoCode } from '@shinefold/config';
+import type { TTranslationMap } from '@shinefold/service';
 import { localeForPrefix } from '@web/i18n/routing';
 import { findListPage } from '@web/utils/find-list-page';
 import { findTranslatedPath } from '@web/utils/find-translated-path';

@@ -1,9 +1,9 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
 import {
   CARD_GUTTER_OFFSET,
   CARD_GUTTER_START,
   tv,
-} from '@blog/ui/lib/styling';
+} from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const carouselVariants = tv({

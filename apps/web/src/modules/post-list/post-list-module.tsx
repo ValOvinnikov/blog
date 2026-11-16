@@ -1,5 +1,5 @@
-import { routes, TAXONOMY_KIND, type TTaxonomyKind } from '@blog/config';
-import { service } from '@blog/service';
+import { routes, TAXONOMY_KIND, type TTaxonomyKind } from '@shinefold/config';
+import { service } from '@shinefold/service';
 import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import { POST_LIST_LOG } from '@web/constants/post-list';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';

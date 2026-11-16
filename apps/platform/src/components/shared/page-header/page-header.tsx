@@ -1,6 +1,6 @@
-import type { IWithClassName } from '@blog/config';
 import { Heading } from '@platform/components/shared/heading';
 import { Text } from '@platform/components/shared/text';
+import type { IWithClassName } from '@shinefold/config';
 import type { ReactNode, Ref } from 'react';
 
 import { pageHeaderVariants } from './page-header-variants';

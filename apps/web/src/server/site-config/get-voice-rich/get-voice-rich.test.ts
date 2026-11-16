@@ -1,6 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
@@ -20,7 +20,7 @@ vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock(
-  '@blog/db',
+  '@shinefold/db',
   () => import('@web/testing/server/site-config/site-config-db'),
 );
 

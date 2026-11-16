@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_PREVIOUS_TOKEN,
   MOCK_ROTATED_TOKEN,
   MOCK_TENANT_DATASET,
   MOCK_TENANT_PROJECT_ID,
-} from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/tenant';
 
 import { createProjectCache } from './project-cache';
 

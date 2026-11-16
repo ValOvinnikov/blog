@@ -1,10 +1,10 @@
 import {
   CONTENT_ALIGNMENT,
   type TContentAlignment,
-} from '@blog/config/constants';
-import { CardAlignmentPicture } from '@blog/studio/schema-types/fields/card-alignment-field/card-alignment-picture';
-import { tileField } from '@blog/studio/schema-types/fields/tile-field/tile-field';
-import { toTitleCase } from '@blog/utils/primitives';
+} from '@shinefold/config/constants';
+import { CardAlignmentPicture } from '@shinefold/studio/schema-types/fields/card-alignment-field/card-alignment-picture';
+import { tileField } from '@shinefold/studio/schema-types/fields/tile-field/tile-field';
+import { toTitleCase } from '@shinefold/utils/primitives';
 
 type TCardAlignmentFieldOptions = {
   initialValue: TContentAlignment;

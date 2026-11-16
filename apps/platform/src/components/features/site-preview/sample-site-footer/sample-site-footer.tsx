@@ -1,8 +1,3 @@
-import { ICONS, SIZE } from '@blog/config';
-import { BrandMark } from '@blog/ui/components/atoms/brand-mark';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { Footer } from '@blog/ui/components/organisms/footer';
 import { SamplePart } from '@platform/components/features/site-preview/sample-part';
 import type { TSampleSiteHeaderProps } from '@platform/components/features/site-preview/sample-site-header';
 import {
@@ -12,6 +7,11 @@ import {
 import { SAMPLE_PART } from '@platform/constants/sample-part';
 import { useHasPoweredByMark } from '@platform/context/powered-by-mark-provider';
 import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
+import { ICONS, SIZE } from '@shinefold/config';
+import { BrandMark } from '@shinefold/ui/components/atoms/brand-mark';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import { Footer } from '@shinefold/ui/components/organisms/footer';
 import { useTranslations } from 'next-intl';
 
 type TSampleSiteFooterProps = {

@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import type { TAdminRole, TGrantedVia } from '@blog/db/constants';
-import { admins, type TAdmin } from '@blog/db/schema/admins';
+import { getDb } from '@shinefold/db/client';
+import type { TAdminRole, TGrantedVia } from '@shinefold/db/constants';
+import { admins, type TAdmin } from '@shinefold/db/schema/admins';
 import { eq } from 'drizzle-orm';
 
 // Idempotent on `userId` (the table's unique constraint) rather than

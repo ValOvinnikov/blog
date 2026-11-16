@@ -2,8 +2,8 @@ import {
   routes,
   type TLocaleIsoCode,
   type TMaybeUndefined,
-} from '@blog/config';
-import type { TTranslationMap } from '@blog/service';
+} from '@shinefold/config';
+import type { TTranslationMap } from '@shinefold/service';
 
 type TListPage = {
   href: string;

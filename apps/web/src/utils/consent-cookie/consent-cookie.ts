@@ -2,7 +2,7 @@ import {
   CONSENT_CATEGORY,
   type TConsentCategory,
   type TMaybeUndefined,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export const CONSENT_COOKIE_NAME = 'consent';
 const CONSENT_COOKIE_VERSION = '1';

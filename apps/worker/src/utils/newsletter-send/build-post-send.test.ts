@@ -1,12 +1,12 @@
-import { resolveTenantEmailBrand } from '@blog/config';
+import { resolveTenantEmailBrand } from '@shinefold/config';
 import {
   EMAIL_ACCOUNT,
   LOCALE_ISO_CODES,
   PRESET_ID,
   PRESET_REGISTRY,
-} from '@blog/config/constants';
-import { SITE_EMAIL_TAG_NAME } from '@blog/email';
-import { verifyNewsletterUnsubscribeToken } from '@blog/utils/newsletter-unsubscribe-token';
+} from '@shinefold/config/constants';
+import { SITE_EMAIL_TAG_NAME } from '@shinefold/email';
+import { verifyNewsletterUnsubscribeToken } from '@shinefold/utils/newsletter-unsubscribe-token';
 import { RESEND_IDEMPOTENCY_KEY_MAX_LENGTH } from '@worker/constants/newsletter-send';
 import {
   MOCK_NEWSLETTER_FROM_ADDRESS,

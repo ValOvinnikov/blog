@@ -1,4 +1,4 @@
-import type { TPortableTextBlock, TVoicePortableText } from '@blog/config';
+import type { TPortableTextBlock, TVoicePortableText } from '@shinefold/config';
 
 /**
  * Adapts a Voice rich-text value for `PortableText` by wrapping each `link`

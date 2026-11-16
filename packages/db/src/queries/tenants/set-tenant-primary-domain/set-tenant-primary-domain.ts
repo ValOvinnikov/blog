@@ -2,11 +2,11 @@ import {
   ERROR_CODE,
   type TErrorCode,
   type TTenantPlan,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { tenantDomains } from '@blog/db/schema/tenant-domains';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { tenantDomains } from '@shinefold/db/schema/tenant-domains';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { and, eq, exists } from 'drizzle-orm';
 
 export async function setTenantPrimaryDomain(

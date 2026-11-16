@@ -1,5 +1,5 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import type { TTenantSanityContext } from '@blog/service';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import type { TTenantSanityContext } from '@shinefold/service';
 import { resolveReferencingModuleTags } from '@web/server/revalidate/resolve-referencing-module-tags/resolve-referencing-module-tags';
 
 export type TBuildRevalidatedTagsInput = {

@@ -1,9 +1,9 @@
-import { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config/constants';
 import {
   MOCK_EXTERNAL_URL,
   mockRawPortableTextMarkDef,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toPortableText } from './to-portable-text-mark-def';
 

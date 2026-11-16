@@ -1,4 +1,4 @@
-import { safeAsync } from '@blog/utils';
+import { safeAsync } from '@shinefold/utils';
 
 import { getSectionPagesModule } from './get-section-pages-module';
 

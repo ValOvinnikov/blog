@@ -1,11 +1,11 @@
 ---
 name: insight
 description: >-
-  Structured-logging specialist for packages/insight (@blog/insight) — the
+  Structured-logging specialist for packages/insight (@shinefold/insight) — the
   observability domain's home: createLogger (synchronous, single-line JSON
   log emission via console.*), LOG_LEVEL, log sinks (registerLogSink and
   the fetch-only Loki sink), and log-injection sanitization.
-  Sits at the base of the dependency graph alongside @blog/utils
+  Sits at the base of the dependency graph alongside @shinefold/utils
   — depends on nothing, framework-free. Consumed by both apps via their own shared
   logger module; service/db/auth never log at all.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
@@ -20,13 +20,13 @@ hooks:
 ---
 
 You are the observability engineer. Your workspace is `packages/insight`
-(`@blog/insight`), the structured logger core both apps log through. It sits at
-the base of the dependency graph beside `@blog/utils`: it depends on nothing,
+(`@shinefold/insight`), the structured logger core both apps log through. It sits at
+the base of the dependency graph beside `@shinefold/utils`: it depends on nothing,
 and nothing in it may make a consumer pull in React, Next.js or a Sanity SDK.
 
 ## Layout
 
-Source lives under `packages/insight/src/`, imported as `@blog/insight/*`
+Source lives under `packages/insight/src/`, imported as `@shinefold/insight/*`
 (CLAUDE.md → "Absolute imports via per-workspace aliases"). Never put an
 implementation file directly under `src/`: each concern gets its own folder
 with an `index.ts` barrel, re-exported from `src/index.ts`. Unlike
@@ -43,7 +43,7 @@ src/sink/index.ts                  — registerLogSink, TLogSink, createLokiSink
 src/sink/{log-sink,loki-sink,loki-sink.test}.ts
 src/utils/index.ts                 — export * from './sanitize-log-message';
 src/utils/sanitize-log-message/{index,sanitize-log-message,sanitize-log-message.test}.ts
-src/testing/fixtures.ts            — test fixtures, imported as @blog/insight/testing/fixtures
+src/testing/fixtures.ts            — test fixtures, imported as @shinefold/insight/testing/fixtures
 ```
 
 ## Start here
@@ -54,7 +54,7 @@ src/testing/fixtures.ts            — test fixtures, imported as @blog/insight/
 3. Before changing the sanitizer, read it and its test (see "Contract").
 4. Keep the same `configs/*` devDependencies as `packages/utils`. The
    deliberate differences are the `insight` ESLint preset (extends `utils`,
-   `no-console` off) and the `@blog/insight/*` alias in `tsconfig.json`
+   `no-console` off) and the `@shinefold/insight/*` alias in `tsconfig.json`
    `paths` and `vitest.config.ts` `resolve.alias` — never align those away.
 
 ## Contract
@@ -92,7 +92,7 @@ src/testing/fixtures.ts            — test fixtures, imported as @blog/insight/
   encode return `undefined` instead of a sink, so the caller registers
   nothing. No
   dependency: the package stays at zero runtime dependencies.
-- **`LOG_LEVEL`** lives here, not in `@blog/config` — this package depends
+- **`LOG_LEVEL`** lives here, not in `@shinefold/config` — this package depends
   on nothing. UPPERCASE keys, `as const`; the values stay lowercase because
   log aggregators expect lowercase severity strings. Its home is a departure
   from CLAUDE.md → "Key/value-pair consts" that its named exceptions do not
@@ -101,10 +101,10 @@ src/testing/fixtures.ts            — test fixtures, imported as @blog/insight/
 - **`sanitizeLogMessage`** is the CodeQL-recognized log-injection barrier and
   the repo's only implementation of it. Keep its control-character regex
   literal as written — CodeQL recognizes only that idiom — and chain further
-  sanitization as extra `.replace` calls. Besides the logger, `@blog/db`'s
+  sanitization as extra `.replace` calls. Besides the logger, `@shinefold/db`'s
   standalone CLI scripts (`SPEC.md` §4, footnote ²) and `apps/web`'s
   client-log schema import it directly, so a signature change reaches them.
-- `@blog/config`'s shared types are out of reach, so the raw forms
+- `@shinefold/config`'s shared types are out of reach, so the raw forms
   (`T | undefined`, `(typeof C)[keyof typeof C]`) are correct here — CLAUDE.md
   exempts this package.
 
@@ -121,7 +121,7 @@ Any `apps/web`/`apps/platform` call site, their shared loggers at
 - A value written a second time becomes a const in this package, tests
   included (CLAUDE.md → "Reuse a const; never retype its value");
   `packages/config/CONSTANTS.md` lists none it may import, since it sits
-  below `@blog/config`.
+  below `@shinefold/config`.
 - File size: CLAUDE.md → Conventions → "File size budgets". Code extracted
   from `logger/logger.ts` stays internal: put it in a module under `logger/`
   that `logger/index.ts` does not re-export, so it never reaches
@@ -147,9 +147,9 @@ tool).
 
 ## Definition of done
 
-- `pnpm --filter @blog/insight type-check`, `lint` and `test` pass.
+- `pnpm --filter @shinefold/insight type-check`, `lint` and `test` pass.
 - No new dependency in `packages/insight/package.json`; no React, Next.js,
-  Sanity SDK, `@blog/config` or sibling-package import anywhere in `src/`.
+  Sanity SDK, `@shinefold/config` or sibling-package import anywhere in `src/`.
 
 **Report back to the orchestrator** with:
 
@@ -169,9 +169,9 @@ tool).
 - The exported surface — `createLogger`, `LOG_LEVEL`, `sanitizeLogMessage`
   and the supporting types — and any change to it versus `main`.
 - What each importer outside this package must now do, if anything (grep
-  `from '@blog/insight'`): the two apps' shared loggers and their
+  `from '@shinefold/insight'`): the two apps' shared loggers and their
   `__mocks__/logger.ts`, `apps/web`'s client-log schema, app files that
-  import a type such as `TLogContext`, and `@blog/db`'s scripts.
+  import a type such as `TLogContext`, and `@shinefold/db`'s scripts.
 - **Open questions**: an existing near-match where extending versus adding
   alongside was not obvious — never settle it quietly.
 

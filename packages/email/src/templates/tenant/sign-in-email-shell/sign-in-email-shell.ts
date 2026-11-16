@@ -1,18 +1,18 @@
 import {
   renderEmailAction,
   type TEmailAction,
-} from '@blog/email/html/email-action/email-action';
+} from '@shinefold/email/html/email-action/email-action';
 import {
   buildNeutralShell,
   NEUTRAL_EMAIL_PALETTE,
-} from '@blog/email/html/neutral-shell/neutral-shell';
+} from '@shinefold/email/html/neutral-shell/neutral-shell';
 import {
   PLATFORM_EMAIL_BRAND,
   PLATFORM_EMAIL_BRAND_NAME,
-} from '@blog/email/html/platform-email-brand/platform-email-brand';
-import { buildPlatformShell } from '@blog/email/html/platform-shell/platform-shell';
-import { buildTenantShell } from '@blog/email/html/tenant-shell/tenant-shell';
-import type { TTenantEmailIdentity } from '@blog/email/templates/tenant/tenant-email-identity/tenant-email-identity';
+} from '@shinefold/email/html/platform-email-brand/platform-email-brand';
+import { buildPlatformShell } from '@shinefold/email/html/platform-shell/platform-shell';
+import { buildTenantShell } from '@shinefold/email/html/tenant-shell/tenant-shell';
+import type { TTenantEmailIdentity } from '@shinefold/email/templates/tenant/tenant-email-identity/tenant-email-identity';
 
 type TBuildSignInEmailShellInput = {
   title: string;

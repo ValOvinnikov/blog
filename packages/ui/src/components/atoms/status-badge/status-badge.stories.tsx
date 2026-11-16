@@ -1,4 +1,4 @@
-import { objectKeys } from '@blog/utils/primitives';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { StatusBadge } from './status-badge';

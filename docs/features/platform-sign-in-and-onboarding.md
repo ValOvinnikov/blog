@@ -72,7 +72,7 @@ site as a 14-day Growth trial, with no card.
   `/dashboard`, a user with no membership to `/onboarding`, a signed-out
   visitor to sign-in.
 - A signed-in user opening `/sign-in` is sent on to its `callbackUrl`.
-- Providers come from `@blog/auth`: GitHub and Google when their credentials
+- Providers come from `@shinefold/auth`: GitHub and Google when their credentials
   are set, and the email magic link always. `SignInOptions` lists Google
   first on both `/sign-in` and `/signup`: an owner who signs up with Google
   (or GitHub) accepts the Sanity editor invite with the same account in one
@@ -85,7 +85,7 @@ site as a 14-day Growth trial, with no card.
   provider buttons and email field (`SignInOptions` with `isSignUp`), then the
   note "By continuing, you agree to the Terms of Service and the Privacy
   Policy", linked at `https://<TENANT_ROOT_DOMAIN>/terms` and `/privacy`
-  (`routes.terms()` and `routes.privacy()` in `@blog/config`; the marketing
+  (`routes.terms()` and `routes.privacy()` in `@shinefold/config`; the marketing
   site serves them), or named as plain text without a root domain. No
   checkbox and no separate step: choosing a provider or sending a link runs
   `setSignupTermsCookie` first, which checks Vercel BotID at its free Basic
@@ -263,7 +263,7 @@ site as a 14-day Growth trial, with no card.
   `verification_tokens`) with the `database` session strategy. On sign-in,
   pending `membership_invites` for the exact email, found through its keyed
   index, become `memberships`.
-- `@blog/db`'s `createSelfServeTenant`
+- `@shinefold/db`'s `createSelfServeTenant`
   writes a GROWTH tenant in status TRIAL (`trial_ends_at` `TRIAL_LENGTH_DAYS`,
   14, after `created_at`; no Stripe customer or subscription; provisioning
   PENDING, `site_type`),
@@ -319,7 +319,7 @@ site as a 14-day Growth trial, with no card.
   its owner holds.
 - A new user's first platform sign-in records `users.termsAcceptedAt`
   and `termsVersion` when the request carries the `SIGNUP_TERMS_COOKIE_NAME`
-  cookie with the current `TERMS_VERSION` (both in `@blog/config`). Existing
+  cookie with the current `TERMS_VERSION` (both in `@shinefold/config`). Existing
   users are never stamped, and a recorded acceptance is never overwritten.
   Signing up from `/signup` sets that cookie; Create site records the
   acceptance it asks for again.
@@ -328,7 +328,7 @@ site as a 14-day Growth trial, with no card.
 
 - Operator access is decided by an `admins` row after sign-in, never by a
   separate sign-in. The first admin is granted by hand with
-  `pnpm --filter @blog/db db:seed-admin`.
+  `pnpm --filter @shinefold/db db:seed-admin`.
 - Self-serve starts every site as a Growth trial, one Free or trial site per
   user at a time. Wizard,
   card and email copy is fixed platform copy, not [Voice](./voice.md).
@@ -341,7 +341,7 @@ site as a 14-day Growth trial, with no card.
   lookup refuses too. Create site calls `admitCreateSite` before writing
   anything and answers every refusal with the same neutral "try again later"
   message, so the blocklist can't be probed.
-- `@blog/db`'s `normalizeSignupEmail` lower-cases an address and drops any
+- `@shinefold/db`'s `normalizeSignupEmail` lower-cases an address and drops any
   `+tag`, so `name+1@…` and `name+2@…` resolve to one person. The
   one-site-per-user lookup compares addresses in that form.
 
@@ -351,8 +351,8 @@ site as a 14-day Growth trial, with no card.
   `robots: { index: false, follow: false }`, so every page under it, public or
   session-gated, serves `noindex, nofollow`. There is no `robots.txt`, because
   a crawler must fetch a page to read its noindex.
-- `@blog/auth`'s `findMagicLinkSendRefusal` refuses a magic-link send to
-  an address or domain on `@blog/db`'s signup blocklist (`isSignupBlocked`),
+- `@shinefold/auth`'s `findMagicLinkSendRefusal` refuses a magic-link send to
+  an address or domain on `@shinefold/db`'s signup blocklist (`isSignupBlocked`),
   then past the per-IP and per-address hourly limits. The per-address count
   keys on `normalizeEmailIdentity`, so `+tag` variants share one budget. A
   refusal sends nothing. A block or a failed check never throws, so it shows
@@ -385,7 +385,7 @@ site as a 14-day Growth trial, with no card.
 
 ## Dependencies
 
-- `@blog/auth`, `@blog/db`, `@blog/email` (magic-link and invite mail).
+- `@shinefold/auth`, `@shinefold/db`, `@shinefold/email` (magic-link and invite mail).
 - Features: [reader-auth](./reader-auth.md),
   [tenant-access](./tenant-access.md),
   [tenant-provisioning](./tenant-provisioning.md),

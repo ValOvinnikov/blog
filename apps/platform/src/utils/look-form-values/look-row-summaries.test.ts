@@ -1,3 +1,10 @@
+import { LOOK_ROW } from '@platform/constants/look-row';
+import { makeEnTranslator } from '@platform/testing/en-translator';
+import {
+  MOCK_FAVICON_URL,
+  MOCK_LOGO_URL,
+} from '@platform/testing/site-config/fixtures';
+import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
   ACCOUNT_BUTTON_STYLE,
   BRAND_VARIANT,
@@ -17,14 +24,7 @@ import {
   NAV_LINK_STYLE,
   RADIUS_SCALE,
   SPINNER_STYLE,
-} from '@blog/config';
-import { LOOK_ROW } from '@platform/constants/look-row';
-import { makeEnTranslator } from '@platform/testing/en-translator';
-import {
-  MOCK_FAVICON_URL,
-  MOCK_LOGO_URL,
-} from '@platform/testing/site-config/fixtures';
-import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+} from '@shinefold/config';
 
 import { buildLookRowSummaries } from './look-row-summaries';
 

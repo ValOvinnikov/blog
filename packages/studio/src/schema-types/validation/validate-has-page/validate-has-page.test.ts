@@ -1,16 +1,16 @@
-import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
-import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
-import { validateHasPage } from '@blog/studio/schema-types/validation/validate-has-page/validate-has-page';
+import { faker } from '@faker-js/faker';
+import { PAGE_TAG_TYPE } from '@shinefold/studio/schema-types/documents/pages/tag/tag-type';
+import { PAGE_TOPIC_TYPE } from '@shinefold/studio/schema-types/documents/pages/topic/topic-type';
+import { validateHasPage } from '@shinefold/studio/schema-types/validation/validate-has-page/validate-has-page';
 import {
   mockDocument,
   mockReference,
-} from '@blog/studio/testing/mock-documents';
+} from '@shinefold/studio/testing/mock-documents';
 import {
   MOCK_TAXONOMY_REFERENCE_FIELD,
   mockFetchContext,
   mockGroqValidationContext,
-} from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/mock-validation-context';
 import { getDraftId } from 'sanity';
 
 faker.seed(6030);

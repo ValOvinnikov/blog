@@ -1,5 +1,5 @@
-import { PRICE_PERIOD } from '@blog/config';
-import type { TSiteSettings } from '@blog/service';
+import { PRICE_PERIOD } from '@shinefold/config';
+import type { TSiteSettings } from '@shinefold/service';
 
 export const MOCK_SITE_SETTINGS: TSiteSettings = {
   currency: 'GBP',

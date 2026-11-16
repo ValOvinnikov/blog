@@ -1,14 +1,14 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { MOCK_PAGE_POST_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
-import { mockTenant } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { MOCK_PAGE_POST_CACHE_TAG } from '@shinefold/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getPostParams } from './loader';
 import { postParamsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6017);
 

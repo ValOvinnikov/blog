@@ -1,10 +1,10 @@
 'use client';
 
-import type { TMaybeNull } from '@blog/config';
 import {
   CustomDomainFocusContext,
   type TCustomDomainFocus,
 } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
+import type { TMaybeNull } from '@shinefold/config';
 import {
   useCallback,
   useEffect,

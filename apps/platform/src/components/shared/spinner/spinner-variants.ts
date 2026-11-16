@@ -1,6 +1,6 @@
-import { SIZE } from '@blog/config';
 import { SPINNER_TONE } from '@platform/constants/spinner';
 import { tv } from '@platform/utils/tv/tv';
+import { SIZE } from '@shinefold/config';
 import type { VariantProps } from 'tailwind-variants';
 
 const HALF = [

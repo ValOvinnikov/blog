@@ -2,7 +2,7 @@ import {
   VOICE_FIELD_KIND,
   VOICE_FIELDS,
   type TVoicePortableText,
-} from '@blog/config';
+} from '@shinefold/config';
 import { wrapVoiceText } from '@web/utils/wrap-voice-text';
 
 type TVoiceField = (typeof VOICE_FIELDS)[number];

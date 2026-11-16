@@ -1,7 +1,7 @@
-import type { TTaxonomyListModule } from '@blog/service';
-import { TaxonomyCard } from '@blog/ui/components/molecules/taxonomy-card';
-import { CardGrid } from '@blog/ui/components/organisms/card-grid';
-import type { THeadingLevel } from '@blog/ui/lib/react';
+import type { TTaxonomyListModule } from '@shinefold/service';
+import { TaxonomyCard } from '@shinefold/ui/components/molecules/taxonomy-card';
+import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
+import type { THeadingLevel } from '@shinefold/ui/lib/react';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';

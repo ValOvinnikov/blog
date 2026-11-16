@@ -4,7 +4,7 @@ description: >-
   Use when adding or editing a story in apps/web — a module or page view, an
   async page, a client component — or changing apps/web's Storybook config.
   Covers what to story, aliasing server-only modules, fixtures and titles.
-  Pure @blog/ui stories follow ui-storybook.
+  Pure @shinefold/ui stories follow ui-storybook.
 ---
 
 # Storybook in `apps/web`
@@ -39,7 +39,7 @@ rules are the same here. This skill covers only what differs in `apps/web`.
 
 ## What to story
 
-`apps/web` stories are compositions that wire `@blog/ui` to real page
+`apps/web` stories are compositions that wire `@shinefold/ui` to real page
 structure. A pure design-system component is storied in `packages/ui`.
 
 | Kind                    | Story                                                            | Example                       |
@@ -71,7 +71,7 @@ the same prefix (`shared/portable-text/components/code-block/` →
 ## Story shape
 
 ```tsx
-import { ASIDE_KIND } from '@blog/config';
+import { ASIDE_KIND } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { DeepAside } from './deep-aside';
@@ -115,7 +115,7 @@ Storybook has no Sanity connection, no request context, and cannot evaluate a
 ### A — Story the view (default)
 
 The async component does the server-only work — request context,
-`@blog/service`, `auth()`, translations — and renders a pure view with the
+`@shinefold/service`, `auth()`, translations — and renders a pure view with the
 result: `src/modules/cta/cta-module.tsx` → `cta-module-view.tsx`,
 `src/components/pages/account-page/account-page.tsx` → `account-page-view.tsx`.
 Story the view, with args built from `@web/testing` builders. The view's prop
@@ -125,7 +125,7 @@ shape → `react-component-practices` § Props.
 
 When the storied component is itself async (`TopicIndexPage`), or pulls in a
 server-only or side-effecting module transitively (`newsletter-actions`, a
-`'use server'` module that pulls in `@blog/db`; `@web/server/auth/auth` via
+`'use server'` module that pulls in `@shinefold/db`; `@web/server/auth/auth` via
 the account-page sections; `@web/utils/report-client-error`, which fires a
 network request), alias that exact import specifier in `.storybook/main.ts`
 to a stand-in under `.storybook/mocks/`:

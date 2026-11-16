@@ -1,4 +1,4 @@
-import type { TPortableTextBody } from '@blog/service';
+import type { TPortableTextBody } from '@shinefold/service';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 import type { TContentsHeading } from '@web/utils/extract-contents-headings';
 

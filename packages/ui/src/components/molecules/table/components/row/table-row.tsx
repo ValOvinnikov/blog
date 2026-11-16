@@ -1,5 +1,5 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { TCompoundChildren } from '@blog/ui/lib/react';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import type { TCompoundChildren } from '@shinefold/ui/lib/react';
 import { Children, cloneElement, isValidElement } from 'react';
 
 import type { TableCell } from '../cell/table-cell';

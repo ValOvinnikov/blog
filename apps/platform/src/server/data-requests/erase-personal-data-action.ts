@@ -1,13 +1,13 @@
 'use server';
 
-import { ACTION_OUTCOME, AUDIT_ACTION } from '@blog/config';
-import { queries } from '@blog/db';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import {
   runDataRequest,
   type TDataRequestFailure,
   type TDataRequestInput,
 } from '@platform/server/data-requests/run-data-request';
+import { ACTION_OUTCOME, AUDIT_ACTION } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 export type TErasePersonalDataInput = TDataRequestInput & {
   includesReaderAccount: boolean;

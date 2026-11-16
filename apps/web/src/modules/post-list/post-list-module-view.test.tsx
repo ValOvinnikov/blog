@@ -1,5 +1,5 @@
-import { BRAND_VARIANT, routes } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, routes } from '@shinefold/config';
 import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {

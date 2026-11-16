@@ -2,7 +2,7 @@ import {
   STUDIO_MIGRATION_IDS,
   type MigrationState,
   type TStarterDocument,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export type TMigrationLedger = TStarterDocument<MigrationState, 'applied'>;
 

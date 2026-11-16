@@ -1,7 +1,5 @@
 'use client';
 
-import { isOutcomeRefused, isOutcomeSuccess } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import type { TSignInAppForm } from '@platform/components/features/sign-in-apps/sign-in-app-card/use-sign-in-app-form';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -9,6 +7,8 @@ import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { removeSignInAppAction } from '@platform/server/sign-in-apps/remove-sign-in-app-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import { isOutcomeRefused, isOutcomeSuccess } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { useTranslations } from 'next-intl';
 
 import { signInAppCardFooterVariants } from './sign-in-app-card-footer-variants';

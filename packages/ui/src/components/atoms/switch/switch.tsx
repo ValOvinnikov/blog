@@ -1,4 +1,4 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import type { AriaAttributes, ChangeEvent } from 'react';
 
 import { switchVariants } from './switch-variants';

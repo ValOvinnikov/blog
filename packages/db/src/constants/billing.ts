@@ -2,8 +2,8 @@ import {
   TENANT_PLAN,
   type TSellableTenantPlan,
   type TTenantPlan,
-} from '@blog/config/constants';
-import type { TValueOf } from '@blog/config/utils';
+} from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
 
 import { SUBSCRIBER_BAND_CEILINGS } from './tenant';
 

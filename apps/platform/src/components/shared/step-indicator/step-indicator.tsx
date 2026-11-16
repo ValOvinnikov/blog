@@ -1,10 +1,10 @@
-import { ICONS } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { ICON_SIZE } from '@platform/constants/icon';
 import {
   STEP_INDICATOR_STATE,
   type TStepIndicatorState,
 } from '@platform/constants/step-indicator';
+import { ICONS } from '@shinefold/config';
 
 import { stepIndicatorVariants } from './step-indicator-variants';
 

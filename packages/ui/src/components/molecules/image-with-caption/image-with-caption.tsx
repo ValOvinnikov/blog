@@ -1,6 +1,6 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { Caption } from '@blog/ui/components/atoms/caption';
-import { MediaFrame } from '@blog/ui/components/atoms/media-frame';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { Caption } from '@shinefold/ui/components/atoms/caption';
+import { MediaFrame } from '@shinefold/ui/components/atoms/media-frame';
 import type { ReactNode } from 'react';
 
 import {

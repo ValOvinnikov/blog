@@ -1,11 +1,11 @@
-import { BRAND_VARIANT, type TBrandVariant } from '@blog/config';
-import { CardGrid } from '@blog/ui/components/organisms/card-grid';
-import { HEADING_LEVELS } from '@blog/ui/lib/react';
+import { BRAND_VARIANT, type TBrandVariant } from '@shinefold/config';
+import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
+import { HEADING_LEVELS } from '@shinefold/ui/lib/react';
 import {
   BRAND_BAND_LABELS,
   BrandBand,
   focusLastLink,
-} from '@blog/ui/testing/brand-bands';
+} from '@shinefold/ui/testing/brand-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { TaxonomyCard } from './taxonomy-card';

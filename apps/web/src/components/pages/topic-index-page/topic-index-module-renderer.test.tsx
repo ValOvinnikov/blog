@@ -1,5 +1,5 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';

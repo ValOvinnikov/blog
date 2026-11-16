@@ -1,5 +1,3 @@
-import { COOKIE_SETTINGS_BUTTON } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
@@ -24,6 +22,8 @@ import {
   withLookTenant,
 } from '@platform/testing/look/look-form-setup';
 import { UPLOAD_LOGO } from '@platform/testing/site-config/fixtures';
+import { COOKIE_SETTINGS_BUTTON } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

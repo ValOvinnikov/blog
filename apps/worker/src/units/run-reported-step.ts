@@ -2,11 +2,11 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
-import { getTenantById } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
-import { errorResult, okResult, type TResult } from '@blog/utils/result';
+} from '@shinefold/db/constants';
+import { getTenantById } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
+import { errorResult, okResult, type TResult } from '@shinefold/utils/result';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';
 import { reportStep } from '@worker/utils/provisioning-report/provisioning-report';

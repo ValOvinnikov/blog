@@ -1,11 +1,11 @@
-import { getDb } from '@blog/db/client';
-import { readLeadContent } from '@blog/db/queries/leads/lead-content';
-import type { TSitePersonalData } from '@blog/db/queries/personal-data/site-personal-data-types';
-import { leads } from '@blog/db/schema/leads';
-import { membershipInvites } from '@blog/db/schema/membership-invites';
-import { subscribers } from '@blog/db/schema/subscribers';
-import { tenants } from '@blog/db/schema/tenants';
-import { decryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import { getDb } from '@shinefold/db/client';
+import { readLeadContent } from '@shinefold/db/queries/leads/lead-content';
+import type { TSitePersonalData } from '@shinefold/db/queries/personal-data/site-personal-data-types';
+import { leads } from '@shinefold/db/schema/leads';
+import { membershipInvites } from '@shinefold/db/schema/membership-invites';
+import { subscribers } from '@shinefold/db/schema/subscribers';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { decryptPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
 import { asc, eq } from 'drizzle-orm';
 
 const siteColumns = { tenantId: tenants.id, tenantName: tenants.name };

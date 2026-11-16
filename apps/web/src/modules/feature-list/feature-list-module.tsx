@@ -1,4 +1,4 @@
-import { service } from '@blog/service';
+import { service } from '@shinefold/service';
 import { FEATURE_LIST_LOG } from '@web/constants/feature-list';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getModuleSection } from '@web/server/site-config/get-module-section/get-module-section';

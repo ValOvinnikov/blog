@@ -53,15 +53,15 @@ importers:
 
   .:
     devDependencies:
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:configs/prettier
       '@commitlint/cli':
         specifier: ^21.2.3
         version: 21.2.3(@types/node@26.6.5)(conventional-commits-parser@7.1.2)(typescript@6.0.3)
       '@commitlint/config-conventional':
         specifier: ^21.2.3
         version: 21.2.3
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:configs/prettier
       eslint:
         specifier: 'catalog:'
         version: 10.12.0(jiti@2.7.0)(supports-color@10.2.2)
@@ -95,36 +95,36 @@ importers:
       '@base-ui/react':
         specifier: ^1.9.0
         version: 1.9.0(@date-fns/tz@1.5.0)(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@blog/auth':
-        specifier: workspace:*
-        version: link:../../packages/auth
-      '@blog/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@blog/db':
-        specifier: workspace:*
-        version: link:../../packages/db
-      '@blog/email':
-        specifier: workspace:*
-        version: link:../../packages/email
-      '@blog/insight':
-        specifier: workspace:*
-        version: link:../../packages/insight
-      '@blog/studio':
-        specifier: workspace:*
-        version: link:../../packages/studio
-      '@blog/tailwind-config':
-        specifier: workspace:*
-        version: link:../../configs/tailwind
-      '@blog/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@blog/utils':
-        specifier: workspace:*
-        version: link:../../packages/utils
       '@portabletext/editor':
         specifier: ^8.2.4
         version: 8.2.4(@types/react@19.3.0)(react@19.3.1)
+      '@shinefold/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
+      '@shinefold/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@shinefold/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@shinefold/email':
+        specifier: workspace:*
+        version: link:../../packages/email
+      '@shinefold/insight':
+        specifier: workspace:*
+        version: link:../../packages/insight
+      '@shinefold/studio':
+        specifier: workspace:*
+        version: link:../../packages/studio
+      '@shinefold/tailwind-config':
+        specifier: workspace:*
+        version: link:../../configs/tailwind
+      '@shinefold/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@shinefold/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@stripe/react-stripe-js':
         specifier: ^7.0.1
         version: 7.0.1(@stripe/stripe-js@10.2.1)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -189,24 +189,24 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
-      '@blog/eslint-config':
-        specifier: workspace:*
-        version: link:../../configs/eslint
-      '@blog/next-config':
-        specifier: workspace:*
-        version: link:../../configs/next
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:../../configs/prettier
-      '@blog/tsconfig':
-        specifier: workspace:*
-        version: link:../../configs/tsconfig
-      '@blog/vitest-config':
-        specifier: workspace:*
-        version: link:../../configs/vitest
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.6.0
+      '@shinefold/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@shinefold/next-config':
+        specifier: workspace:*
+        version: link:../../configs/next
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
+      '@shinefold/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
+      '@shinefold/vitest-config':
+        specifier: workspace:*
+        version: link:../../configs/vitest
       '@svgr/webpack':
         specifier: ^8.1.0
         version: 8.1.0(supports-color@10.2.2)(typescript@6.0.3)
@@ -258,39 +258,39 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.135.0
         version: 0.135.0(zod@4.6.7)
-      '@blog/auth':
-        specifier: workspace:*
-        version: link:../../packages/auth
-      '@blog/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@blog/db':
-        specifier: workspace:*
-        version: link:../../packages/db
-      '@blog/email':
-        specifier: workspace:*
-        version: link:../../packages/email
-      '@blog/insight':
-        specifier: workspace:*
-        version: link:../../packages/insight
-      '@blog/service':
-        specifier: workspace:*
-        version: link:../../packages/service
-      '@blog/tailwind-config':
-        specifier: workspace:*
-        version: link:../../configs/tailwind
-      '@blog/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@blog/utils':
-        specifier: workspace:*
-        version: link:../../packages/utils
       '@portabletext/react':
         specifier: ^8.0.1
         version: 8.0.1(react@19.3.1)
       '@sanity/webhook':
         specifier: ^4.0.4
         version: 4.0.4
+      '@shinefold/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
+      '@shinefold/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@shinefold/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@shinefold/email':
+        specifier: workspace:*
+        version: link:../../packages/email
+      '@shinefold/insight':
+        specifier: workspace:*
+        version: link:../../packages/insight
+      '@shinefold/service':
+        specifier: workspace:*
+        version: link:../../packages/service
+      '@shinefold/tailwind-config':
+        specifier: workspace:*
+        version: link:../../configs/tailwind
+      '@shinefold/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@shinefold/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@t3-oss/env-nextjs':
         specifier: ^0.13.11
         version: 0.13.11(typescript@6.0.3)(valibot@1.5.0(typescript@6.0.3))(zod@4.6.7)
@@ -340,27 +340,27 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
-      '@blog/eslint-config':
-        specifier: workspace:*
-        version: link:../../configs/eslint
-      '@blog/next-config':
-        specifier: workspace:*
-        version: link:../../configs/next
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:../../configs/prettier
-      '@blog/tsconfig':
-        specifier: workspace:*
-        version: link:../../configs/tsconfig
-      '@blog/vitest-config':
-        specifier: workspace:*
-        version: link:../../configs/vitest
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.6.0
       '@playwright/test':
         specifier: ^1.64.1
         version: 1.64.1
+      '@shinefold/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@shinefold/next-config':
+        specifier: workspace:*
+        version: link:../../configs/next
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
+      '@shinefold/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
+      '@shinefold/vitest-config':
+        specifier: workspace:*
+        version: link:../../configs/vitest
       '@storybook/addon-docs':
         specifier: ^10.6.6
         version: 10.6.6(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(storybook@10.6.6(@types/react@19.3.0)(prettier@3.9.10)(react@19.3.1))
@@ -421,24 +421,24 @@ importers:
 
   apps/worker:
     dependencies:
-      '@blog/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@blog/db':
-        specifier: workspace:*
-        version: link:../../packages/db
-      '@blog/email':
-        specifier: workspace:*
-        version: link:../../packages/email
-      '@blog/insight':
-        specifier: workspace:*
-        version: link:../../packages/insight
-      '@blog/utils':
-        specifier: workspace:*
-        version: link:../../packages/utils
       '@sanity/client':
         specifier: ^8.9.0
         version: 8.9.0(vitest@5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.23.15)(yaml@2.9.1)))
+      '@shinefold/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@shinefold/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@shinefold/email':
+        specifier: workspace:*
+        version: link:../../packages/email
+      '@shinefold/insight':
+        specifier: workspace:*
+        version: link:../../packages/insight
+      '@shinefold/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@t3-oss/env-nextjs':
         specifier: ^0.13.11
         version: 0.13.11(typescript@6.0.3)(valibot@1.5.0(typescript@6.0.3))(zod@4.6.7)
@@ -461,21 +461,21 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
-      '@blog/eslint-config':
-        specifier: workspace:*
-        version: link:../../configs/eslint
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:../../configs/prettier
-      '@blog/tsconfig':
-        specifier: workspace:*
-        version: link:../../configs/tsconfig
-      '@blog/vitest-config':
-        specifier: workspace:*
-        version: link:../../configs/vitest
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.6.0
+      '@shinefold/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
+      '@shinefold/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
+      '@shinefold/vitest-config':
+        specifier: workspace:*
+        version: link:../../configs/vitest
       '@types/node':
         specifier: ^26
         version: 26.6.5
@@ -553,7 +553,7 @@ importers:
         specifier: ^4.14.9
         version: 4.14.9(@swc/helpers@0.5.23)(@types/react@19.3.0)(next@16.4.2(@babel/core@7.29.7(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@playwright/test@1.64.1)(@types/node@26.6.5)(babel-plugin-macros@3.1.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
     devDependencies:
-      '@blog/eslint-config':
+      '@shinefold/eslint-config':
         specifier: workspace:*
         version: link:../eslint
       '@types/node':
@@ -571,7 +571,7 @@ importers:
 
   configs/tailwind:
     devDependencies:
-      '@blog/eslint-config':
+      '@shinefold/eslint-config':
         specifier: workspace:*
         version: link:../eslint
       eslint:
@@ -595,7 +595,7 @@ importers:
         specifier: 'catalog:'
         version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.23.15)(yaml@2.9.1))
     devDependencies:
-      '@blog/eslint-config':
+      '@shinefold/eslint-config':
         specifier: workspace:*
         version: link:../eslint
       eslint:
@@ -607,16 +607,16 @@ importers:
       '@auth/drizzle-adapter':
         specifier: ^1.11.3
         version: 1.11.3
-      '@blog/config':
+      '@shinefold/config':
         specifier: workspace:*
         version: link:../config
-      '@blog/db':
+      '@shinefold/db':
         specifier: workspace:*
         version: link:../db
-      '@blog/email':
+      '@shinefold/email':
         specifier: workspace:*
         version: link:../email
-      '@blog/utils':
+      '@shinefold/utils':
         specifier: workspace:*
         version: link:../utils
       '@t3-oss/env-core':
@@ -635,21 +635,21 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
-      '@blog/eslint-config':
-        specifier: workspace:*
-        version: link:../../configs/eslint
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:../../configs/prettier
-      '@blog/tsconfig':
-        specifier: workspace:*
-        version: link:../../configs/tsconfig
-      '@blog/vitest-config':
-        specifier: workspace:*
-        version: link:../../configs/vitest
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.6.0
+      '@shinefold/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
+      '@shinefold/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
+      '@shinefold/vitest-config':
+        specifier: workspace:*
+        version: link:../../configs/vitest
       '@types/node':
         specifier: ^26
         version: 26.6.5
@@ -668,28 +668,28 @@ importers:
 
   packages/config:
     dependencies:
-      '@blog/utils':
-        specifier: workspace:*
-        version: link:../utils
       '@portabletext/types':
         specifier: ^4.0.2
         version: 4.0.2
+      '@shinefold/utils':
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
-      '@blog/eslint-config':
-        specifier: workspace:*
-        version: link:../../configs/eslint
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:../../configs/prettier
-      '@blog/tsconfig':
-        specifier: workspace:*
-        version: link:../../configs/tsconfig
-      '@blog/vitest-config':
-        specifier: workspace:*
-        version: link:../../configs/vitest
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.6.0
+      '@shinefold/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
+      '@shinefold/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
+      '@shinefold/vitest-config':
+        specifier: workspace:*
+        version: link:../../configs/vitest
       '@types/node':
         specifier: ^26
         version: 26.6.5
@@ -711,18 +711,18 @@ importers:
 
   packages/db:
     dependencies:
-      '@blog/config':
-        specifier: workspace:*
-        version: link:../config
-      '@blog/insight':
-        specifier: workspace:*
-        version: link:../insight
-      '@blog/utils':
-        specifier: workspace:*
-        version: link:../utils
       '@neondatabase/serverless':
         specifier: ^1.2.0
         version: 1.2.0
+      '@shinefold/config':
+        specifier: workspace:*
+        version: link:../config
+      '@shinefold/insight':
+        specifier: workspace:*
+        version: link:../insight
+      '@shinefold/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@t3-oss/env-core':
         specifier: ^0.13.11
         version: 0.13.11(typescript@6.0.3)(valibot@1.5.0(typescript@6.0.3))(zod@4.6.7)
@@ -736,24 +736,24 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
-      '@blog/eslint-config':
-        specifier: workspace:*
-        version: link:../../configs/eslint
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:../../configs/prettier
-      '@blog/tsconfig':
-        specifier: workspace:*
-        version: link:../../configs/tsconfig
-      '@blog/vitest-config':
-        specifier: workspace:*
-        version: link:../../configs/vitest
       '@electric-sql/pglite':
         specifier: ^0.5.10
         version: 0.5.10
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.6.0
+      '@shinefold/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
+      '@shinefold/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
+      '@shinefold/vitest-config':
+        specifier: workspace:*
+        version: link:../../configs/vitest
       '@types/node':
         specifier: ^26
         version: 26.6.5
@@ -778,10 +778,10 @@ importers:
 
   packages/email:
     dependencies:
-      '@blog/config':
+      '@shinefold/config':
         specifier: workspace:*
         version: link:../config
-      '@blog/utils':
+      '@shinefold/utils':
         specifier: workspace:*
         version: link:../utils
       '@t3-oss/env-core':
@@ -797,21 +797,21 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
-      '@blog/eslint-config':
-        specifier: workspace:*
-        version: link:../../configs/eslint
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:../../configs/prettier
-      '@blog/tsconfig':
-        specifier: workspace:*
-        version: link:../../configs/tsconfig
-      '@blog/vitest-config':
-        specifier: workspace:*
-        version: link:../../configs/vitest
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.6.0
+      '@shinefold/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
+      '@shinefold/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
+      '@shinefold/vitest-config':
+        specifier: workspace:*
+        version: link:../../configs/vitest
       '@types/node':
         specifier: ^26
         version: 26.6.5
@@ -830,18 +830,18 @@ importers:
 
   packages/insight:
     devDependencies:
-      '@blog/eslint-config':
-        specifier: workspace:*
-        version: link:../../configs/eslint
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:../../configs/prettier
-      '@blog/tsconfig':
-        specifier: workspace:*
-        version: link:../../configs/tsconfig
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.6.0
+      '@shinefold/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
+      '@shinefold/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
       '@types/node':
         specifier: ^26
         version: 26.6.5
@@ -860,15 +860,15 @@ importers:
 
   packages/service:
     dependencies:
-      '@blog/config':
-        specifier: workspace:*
-        version: link:../config
-      '@blog/utils':
-        specifier: workspace:*
-        version: link:../utils
       '@sanity/image-url':
         specifier: ^2.1.1
         version: 2.1.1
+      '@shinefold/config':
+        specifier: workspace:*
+        version: link:../config
+      '@shinefold/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@t3-oss/env-core':
         specifier: ^0.13.11
         version: 0.13.11(typescript@6.0.3)(valibot@1.5.0(typescript@6.0.3))(zod@4.6.7)
@@ -885,21 +885,21 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
-      '@blog/eslint-config':
-        specifier: workspace:*
-        version: link:../../configs/eslint
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:../../configs/prettier
-      '@blog/tsconfig':
-        specifier: workspace:*
-        version: link:../../configs/tsconfig
-      '@blog/vitest-config':
-        specifier: workspace:*
-        version: link:../../configs/vitest
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.6.0
+      '@shinefold/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
+      '@shinefold/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
+      '@shinefold/vitest-config':
+        specifier: workspace:*
+        version: link:../../configs/vitest
       '@types/node':
         specifier: ^26
         version: 26.6.5
@@ -921,12 +921,6 @@ importers:
 
   packages/studio:
     dependencies:
-      '@blog/config':
-        specifier: workspace:*
-        version: link:../config
-      '@blog/utils':
-        specifier: workspace:*
-        version: link:../utils
       '@sanity/code-input':
         specifier: ^7.3.12
         version: 7.3.12(@babel/runtime@7.29.7)(@codemirror/autocomplete@6.20.3)(@codemirror/lint@6.9.7)(@codemirror/search@6.7.2)(@codemirror/theme-one-dark@6.1.3)(codemirror@6.0.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sanity@6.19.0(729ca40c114c74f62100136d1f6dd4ba))(styled-components@6.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))
@@ -945,6 +939,12 @@ importers:
       '@sanity/vision':
         specifier: ^6.19.0
         version: 6.19.0(@babel/runtime@7.29.7)(@codemirror/lint@6.9.7)(@codemirror/theme-one-dark@6.1.3)(codemirror@6.0.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sanity@6.19.0(729ca40c114c74f62100136d1f6dd4ba))(styled-components@6.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(vitest@5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.23.15)(yaml@2.9.1)))
+      '@shinefold/config':
+        specifier: workspace:*
+        version: link:../config
+      '@shinefold/utils':
+        specifier: workspace:*
+        version: link:../utils
       lucide-react:
         specifier: ^1.57.0
         version: 1.58.0(@types/react@19.3.0)(react@19.3.1)
@@ -967,18 +967,6 @@ importers:
         specifier: ^6.6.0
         version: 6.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     devDependencies:
-      '@blog/eslint-config':
-        specifier: workspace:*
-        version: link:../../configs/eslint
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:../../configs/prettier
-      '@blog/tsconfig':
-        specifier: workspace:*
-        version: link:../../configs/tsconfig
-      '@blog/vitest-config':
-        specifier: workspace:*
-        version: link:../../configs/vitest
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.6.0
@@ -991,6 +979,18 @@ importers:
       '@sanity/validation':
         specifier: ^6.19.0
         version: 6.19.0(@types/react@19.3.0)(typescript@6.0.3)(vitest@5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.23.15)(yaml@2.9.1)))
+      '@shinefold/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
+      '@shinefold/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
+      '@shinefold/vitest-config':
+        specifier: workspace:*
+        version: link:../../configs/vitest
       '@testing-library/react':
         specifier: ^16.3.3
         version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -1024,13 +1024,13 @@ importers:
       '@base-ui/react':
         specifier: ^1.9.0
         version: 1.9.0(@date-fns/tz@1.5.0)(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@blog/config':
+      '@shinefold/config':
         specifier: workspace:*
         version: link:../config
-      '@blog/tailwind-config':
+      '@shinefold/tailwind-config':
         specifier: workspace:*
         version: link:../../configs/tailwind
-      '@blog/utils':
+      '@shinefold/utils':
         specifier: workspace:*
         version: link:../utils
       embla-carousel-react:
@@ -1043,18 +1043,6 @@ importers:
         specifier: ^3.3.1
         version: 3.3.1(tailwind-merge@3.7.0)(tailwindcss@4.3.3)
     devDependencies:
-      '@blog/eslint-config':
-        specifier: workspace:*
-        version: link:../../configs/eslint
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:../../configs/prettier
-      '@blog/tsconfig':
-        specifier: workspace:*
-        version: link:../../configs/tsconfig
-      '@blog/vitest-config':
-        specifier: workspace:*
-        version: link:../../configs/vitest
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.6.0
@@ -1067,6 +1055,18 @@ importers:
       '@fontsource/space-grotesk':
         specifier: ^5.3.0
         version: 5.3.0
+      '@shinefold/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
+      '@shinefold/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
+      '@shinefold/vitest-config':
+        specifier: workspace:*
+        version: link:../../configs/vitest
       '@storybook/addon-docs':
         specifier: ^10.6.6
         version: 10.6.6(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(storybook@10.6.6(@types/react@19.3.0)(prettier@3.9.10)(react@19.3.1))
@@ -1131,18 +1131,18 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2
     devDependencies:
-      '@blog/eslint-config':
-        specifier: workspace:*
-        version: link:../../configs/eslint
-      '@blog/prettier-config':
-        specifier: workspace:*
-        version: link:../../configs/prettier
-      '@blog/tsconfig':
-        specifier: workspace:*
-        version: link:../../configs/tsconfig
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.6.0
+      '@shinefold/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@shinefold/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
+      '@shinefold/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
       '@types/culori':
         specifier: ^4.0.1
         version: 4.0.1

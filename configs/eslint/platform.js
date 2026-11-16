@@ -8,8 +8,8 @@ import { textInputTextareaAccessibleNameRule } from './text-input-textarea-acces
 
 const contentLayerRestrictedGroup = {
   group: [
-    '@blog/service',
-    '@blog/service/*',
+    '@shinefold/service',
+    '@shinefold/service/*',
     'sanity',
     'sanity/*',
     'next-sanity',
@@ -19,13 +19,13 @@ const contentLayerRestrictedGroup = {
     'groqd/*',
   ],
   message:
-    'apps/platform has no content-layer concern — it must not import @blog/service or any Sanity SDK; read relational data through @blog/db.',
+    'apps/platform has no content-layer concern — it must not import @shinefold/service or any Sanity SDK; read relational data through @shinefold/db.',
 };
 
 const uiRestrictedGroup = {
-  group: ['@blog/ui', '@blog/ui/*'],
+  group: ['@shinefold/ui', '@shinefold/ui/*'],
   message:
-    'apps/platform has dropped @blog/ui everywhere except site-preview/ (its samples render real blog UI for the tenant preview) — build platform UI from in-app Base UI-based primitives instead.',
+    'apps/platform has dropped @shinefold/ui everywhere except site-preview/ (its samples render real blog UI for the tenant preview) — build platform UI from in-app Base UI-based primitives instead.',
 };
 
 const platformTestingRestrictedGroup = {
@@ -51,7 +51,7 @@ export default [
   {
     files: ['**/*.{ts,tsx}'],
     plugins: {
-      blog: {
+      shinefold: {
         rules: {
           'boolean-prop-prefix': booleanPropPrefixRule,
           'text-input-textarea-accessible-name':
@@ -60,8 +60,8 @@ export default [
       },
     },
     rules: {
-      'blog/boolean-prop-prefix': 'error',
-      'blog/text-input-textarea-accessible-name': 'error',
+      'shinefold/boolean-prop-prefix': 'error',
+      'shinefold/text-input-textarea-accessible-name': 'error',
       'func-style': ['error', 'expression', { allowArrowFunctions: true }],
       'no-restricted-imports': [
         'error',
@@ -78,7 +78,7 @@ export default [
   },
   {
     // The one deliberate exception to the ban above: site-preview/ renders real
-    // @blog/ui so tenant previews match the public site.
+    // @shinefold/ui so tenant previews match the public site.
     files: [`${SITE_PREVIEW_DIR}/**/*.{ts,tsx}`],
     rules: {
       'no-restricted-imports': [
@@ -107,7 +107,7 @@ export default [
   },
   {
     // site-preview's own *.test.{ts,tsx}/*.stories.{ts,tsx} are both the
-    // @blog/ui exception above and test-only — most specific, so it must
+    // @shinefold/ui exception above and test-only — most specific, so it must
     // come last to win over both overrides for that intersection.
     files: [
       `${SITE_PREVIEW_DIR}/**/*.test.{ts,tsx}`,

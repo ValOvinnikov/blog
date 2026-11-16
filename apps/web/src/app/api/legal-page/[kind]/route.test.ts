@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   HTTP_STATUS,
   LEGAL_PAGE_KIND,
   LOCALE_ISO_CODES,
   routes,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 import { SECTION_DOCUMENT_LOG } from '@web/constants/section-document';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
@@ -22,7 +22,7 @@ const { getSectionDocumentByKindMock } = vi.hoisted(() => ({
   getSectionDocumentByKindMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: {
       sectionDocument: {

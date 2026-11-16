@@ -1,11 +1,11 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 import {
   NEXT_NAVIGATION_ERROR,
   SANITY_PERSPECTIVE,
-} from '@blog/config/constants';
-import { TENANT_PROVISIONING_STATUS } from '@blog/db';
-import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db';
+import { SUSPENSION_REASON, TENANT_STATUS } from '@shinefold/db/constants';
 import { REQUEST_CONTEXT_LOG } from '@web/constants/request-context';
 import { DRAFT_PREVIEW_MARKER } from '@web/server/draft-preview/constants/constants';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
@@ -43,8 +43,8 @@ const {
   mockEnv: {},
 }));
 
-vi.mock('@blog/db', async () => ({
-  ...(await vi.importActual('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await vi.importActual('@shinefold/db/constants')),
   queries: {
     tenants: {
       getTenantById: getTenantByIdMock,
@@ -53,7 +53,7 @@ vi.mock('@blog/db', async () => ({
     },
   },
 }));
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   getPlatformSanityContext: () => MOCK_PLATFORM_CONTEXT,
 }));
 vi.mock('@web/utils/env/env', () => ({ env: mockEnv }));

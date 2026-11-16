@@ -11,20 +11,20 @@ Sanity-fetching concerns.
 
 ## Layer contract
 
-- **Depends on:** `@blog/ui`, `@blog/db`, `@blog/auth`, `@blog/config`,
-  `@blog/utils`, `@blog/tailwind-config`, plus Base UI (`@base-ui/react`) for
+- **Depends on:** `@shinefold/ui`, `@shinefold/db`, `@shinefold/auth`, `@shinefold/config`,
+  `@shinefold/utils`, `@shinefold/tailwind-config`, plus Base UI (`@base-ui/react`) for
   interactive primitives, installed and styled directly in this app.
 - **Consumed by:** nothing — it is a deployable app, not a workspace
   dependency.
-- **Never imports:** `sanity`/`next-sanity`/`@sanity/*` or `@blog/service`.
-  All relational reads and writes go through `@blog/db`'s exported query and
+- **Never imports:** `sanity`/`next-sanity`/`@sanity/*` or `@shinefold/service`.
+  All relational reads and writes go through `@shinefold/db`'s exported query and
   mutation functions — no Drizzle, no Neon client, no SQL here. Nothing is
-  added to `@blog/ui` for this app; Base UI parts become reusable blocks in
+  added to `@shinefold/ui` for this app; Base UI parts become reusable blocks in
   `src/components/shared/` (see `platform-ui-practices`).
 
 Authorization is this app's own responsibility, layered on top of the shared
-session `@blog/auth` provides: a Platform route requires an `admins` row, a
-Tenant route requires a `memberships` row for the routed tenant. `@blog/auth`
+session `@shinefold/auth` provides: a Platform route requires an `admins` row, a
+Tenant route requires a `memberships` row for the routed tenant. `@shinefold/auth`
 supplies authentication only — it has no opinion on either.
 
 ## Layout
@@ -59,8 +59,8 @@ supplies authentication only — it has no opinion on either.
 
 This app owns its own presentational primitives under `src/components/shared/`
 (`Text`, `Card`, `Button`, `SegmentedControl`, …) rather than drawing them from
-`@blog/ui` — the one exception is `site-preview/`, which
-renders the tenant's real site and is allowed to import `@blog/ui` directly
+`@shinefold/ui` — the one exception is `site-preview/`, which
+renders the tenant's real site and is allowed to import `@shinefold/ui` directly
 for that reason.
 
 ## Scripts
@@ -83,7 +83,7 @@ workspace's equivalent script through Turborepo, this one included.
 - [`../../SPEC.md`](../../SPEC.md) — architecture, layer contracts, and the
   platform's place in the monorepo.
 - [`../../packages/ui/COMPONENTS.md`](../../packages/ui/COMPONENTS.md) —
-  every `@blog/ui` component, its props, and its compound slots.
+  every `@shinefold/ui` component, its props, and its compound slots.
 - [`../../docs/context/environment-variables.md`](../../docs/context/environment-variables.md) —
   the full env var reference, including every var this app reads.
 - [`../../docs/context/getting-started.md`](../../docs/context/getting-started.md) —

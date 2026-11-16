@@ -1,23 +1,23 @@
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { addBookmark } from '@blog/db/queries/bookmarks';
-import { createMembershipInvite } from '@blog/db/queries/membership-invites';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import { addBookmark } from '@shinefold/db/queries/bookmarks';
+import { createMembershipInvite } from '@shinefold/db/queries/membership-invites';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestLead,
   insertTestSubscriber,
   insertTestTenant,
   insertTestUser,
   MOCK_SUBSCRIBER_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import {
   countTenantReaderData,
   purgeTenantReaderData,
 } from './purge-tenant-reader-data';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

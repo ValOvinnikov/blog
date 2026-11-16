@@ -1,10 +1,10 @@
-import { CARD_IMAGE_SHAPE, type IWithDataTestId } from '@blog/config';
-import type { TTeamMember, TTeamModule } from '@blog/service';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { MediaFrame } from '@blog/ui/components/atoms/media-frame';
-import { Prose } from '@blog/ui/components/atoms/prose';
-import { Text } from '@blog/ui/components/atoms/text';
+import { CARD_IMAGE_SHAPE, type IWithDataTestId } from '@shinefold/config';
+import type { TTeamMember, TTeamModule } from '@shinefold/service';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { MediaFrame } from '@shinefold/ui/components/atoms/media-frame';
+import { Prose } from '@shinefold/ui/components/atoms/prose';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';

@@ -1,4 +1,4 @@
-import { toTitleCase } from '@blog/utils/primitives';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { defineField } from 'sanity';
 
 type TVariantFieldOptions<TValue extends string> = {

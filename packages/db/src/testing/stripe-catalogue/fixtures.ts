@@ -2,10 +2,10 @@ import {
   BILLING_CURRENCY,
   STRIPE_COUPON_DURATION,
   STRIPE_PRICE_LOOKUP_KEY,
-} from '@blog/db/constants';
-import type { TSaveStripePriceInput } from '@blog/db/queries/stripe-catalogue/save-stripe-price';
-import type { TSaveStripePromotionCodeInput } from '@blog/db/queries/stripe-catalogue/save-stripe-promotion-code';
-import { createMockFaker } from '@blog/db/testing/mock-faker';
+} from '@shinefold/db/constants';
+import type { TSaveStripePriceInput } from '@shinefold/db/queries/stripe-catalogue/save-stripe-price';
+import type { TSaveStripePromotionCodeInput } from '@shinefold/db/queries/stripe-catalogue/save-stripe-promotion-code';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
 
 const catalogueFaker = createMockFaker(6882);
 

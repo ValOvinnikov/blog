@@ -1,4 +1,4 @@
-import { CTA_ACTION_APPEARANCE } from '@blog/config';
+import { CTA_ACTION_APPEARANCE } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
   MOCK_CTA_PRIMARY_ACTION,

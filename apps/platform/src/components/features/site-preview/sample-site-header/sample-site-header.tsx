@@ -1,9 +1,3 @@
-import {
-  HEADER_LAYOUT,
-  HEADER_SUBMENU_STYLE,
-  type TLocaleIsoCode,
-  type TMaybeUndefined,
-} from '@blog/config';
 import { SampleHeaderBar } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-bar/sample-header-bar';
 import { SampleHeaderBrand } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-brand/sample-header-brand';
 import { SampleHeaderControls } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/sample-header-controls';
@@ -16,6 +10,12 @@ import {
 } from '@platform/constants/sample-header';
 import { SAMPLE_PART } from '@platform/constants/sample-part';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
+import {
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
+  type TLocaleIsoCode,
+  type TMaybeUndefined,
+} from '@shinefold/config';
 
 import { sampleSiteHeaderVariants } from './sample-site-header-variants';
 

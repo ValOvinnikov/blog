@@ -1,5 +1,9 @@
-import { SIZE, type IWithClassName, type IWithDataTestId } from '@blog/config';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
+import {
+  SIZE,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@shinefold/config';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import type { ReactNode } from 'react';
 
 import { mediaCardFooterVariants } from './media-card-footer-variants';

@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { SITE_MESSAGES } from '@shinefold/config';
 import type { UserEvent } from '@testing-library/user-event';
 import { screen } from '@web/testing/custom-render';
 

@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import { evaluate, parse } from 'groq-js';
 
 export async function evaluateGroqExpression(

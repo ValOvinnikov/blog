@@ -1,9 +1,9 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   leadContentColumns,
   type TLeadContent,
-} from '@blog/db/queries/leads/lead-content';
-import { leads, type TLead } from '@blog/db/schema/leads';
+} from '@shinefold/db/queries/leads/lead-content';
+import { leads, type TLead } from '@shinefold/db/schema/leads';
 
 export type TCreateLeadInput = Pick<TLead, 'tenantId' | 'sourcePath'> &
   TLeadContent &

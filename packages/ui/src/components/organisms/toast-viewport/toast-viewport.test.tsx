@@ -1,7 +1,7 @@
-import { TOAST_TYPE } from '@blog/config';
-import { Toast } from '@blog/ui/components/molecules/toast';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { TOAST_TYPE } from '@shinefold/config';
+import { Toast } from '@shinefold/ui/components/molecules/toast';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 
 import { ToastViewport } from './toast-viewport';
 

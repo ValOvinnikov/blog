@@ -1,15 +1,18 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
-import { MOCK_POST_ID } from '@blog/db/testing/bookmarks/fixtures';
-import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 import { faker } from '@faker-js/faker';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
+import { MOCK_POST_ID } from '@shinefold/db/testing/bookmarks/fixtures';
+import {
+  insertTestTenant,
+  insertTestUser,
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { addBookmark } from './add-bookmark';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(61011);
 

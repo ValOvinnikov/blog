@@ -1,4 +1,4 @@
-import { HTTP_STATUS } from '@blog/config';
+import { HTTP_STATUS } from '@shinefold/config';
 
 export const mockJsonResponse = (
   body: unknown,

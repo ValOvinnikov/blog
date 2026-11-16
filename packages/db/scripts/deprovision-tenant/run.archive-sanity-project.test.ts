@@ -1,7 +1,7 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
-import { MOCK_DEPROVISION_ENV } from '@blog/db/testing/deprovision-tenant/fixtures';
-import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 import { faker } from '@faker-js/faker';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
+import { MOCK_DEPROVISION_ENV } from '@shinefold/db/testing/deprovision-tenant/fixtures';
+import { mockTenant } from '@shinefold/db/testing/tenants/fixtures';
 
 import { runSteps } from './run';
 import { archiveTenantRow } from './steps/archive-tenant';

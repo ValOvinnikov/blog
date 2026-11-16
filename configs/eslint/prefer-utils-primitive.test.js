@@ -13,7 +13,7 @@ const GENERATED_SOURCE = '/repo/packages/config/src/sanity/generated/types.ts';
 
 const helperError = (helper) => ({
   messageId: 'preferUtilsPrimitive',
-  data: { helper, module: '@blog/utils/primitives' },
+  data: { helper, module: '@shinefold/utils/primitives' },
 });
 
 const invalid = (code, helper) => ({

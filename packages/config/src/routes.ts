@@ -2,7 +2,7 @@ import type {
   TMaybeNull,
   TMaybeUndefined,
   TNullable,
-} from '@blog/config/types';
+} from '@shinefold/config/types';
 
 import {
   COOKIE_STATEMENT_SLUG,
@@ -10,7 +10,7 @@ import {
   type TLegalPageKind,
   type TLocaleIsoCode,
   type TNewsletterResult,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 const toNewsletterLinkQuery = (token: string, locale?: TLocaleIsoCode) => {
   const tokenQuery = `token=${encodeURIComponent(token)}`;

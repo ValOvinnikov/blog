@@ -3,7 +3,7 @@ import type {
   TFindingSeverity,
   TFindingSource,
   TFindingStatus,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import { sql } from 'drizzle-orm';
 import {
   index,

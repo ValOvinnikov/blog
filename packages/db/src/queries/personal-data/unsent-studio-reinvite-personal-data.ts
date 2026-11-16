@@ -1,7 +1,7 @@
-import { getDb } from '@blog/db/client';
-import { tenants } from '@blog/db/schema/tenants';
-import { decryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
-import { normalizeEmailIdentity } from '@blog/utils/normalize-email-identity';
+import { getDb } from '@shinefold/db/client';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { decryptPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
+import { normalizeEmailIdentity } from '@shinefold/utils/normalize-email-identity';
 import { inArray, isNotNull } from 'drizzle-orm';
 
 export type TPersonalDataUnsentStudioReinvite = {

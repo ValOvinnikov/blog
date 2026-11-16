@@ -1,7 +1,7 @@
-import type { IAccountControl, TAccountButtonStyle } from '@blog/config';
-import { AccountPanel } from '@blog/ui/components/molecules/account-panel';
-import { AccountTrigger } from '@blog/ui/components/molecules/account-trigger';
-import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
+import type { IAccountControl, TAccountButtonStyle } from '@shinefold/config';
+import { AccountPanel } from '@shinefold/ui/components/molecules/account-panel';
+import { AccountTrigger } from '@shinefold/ui/components/molecules/account-trigger';
+import { PopoverMenu } from '@shinefold/ui/components/molecules/popover-menu';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

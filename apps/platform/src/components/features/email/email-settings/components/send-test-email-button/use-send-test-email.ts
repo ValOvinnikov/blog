@@ -1,11 +1,5 @@
 'use client';
 
-import {
-  ACTION_OUTCOME,
-  isOutcomeSuccess,
-  type TEmailTemplateType,
-} from '@blog/config';
-import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { useToast } from '@platform/context/toast-provider';
 import {
   sendTestEmailAction,
@@ -16,6 +10,12 @@ import {
   type TEmailSenderDraft,
 } from '@platform/utils/email-draft/email-draft';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import {
+  ACTION_OUTCOME,
+  isOutcomeSuccess,
+  type TEmailTemplateType,
+} from '@shinefold/config';
+import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 

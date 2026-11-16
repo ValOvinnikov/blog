@@ -1,5 +1,8 @@
-import { type TENANT_PLAN } from '@blog/config/constants';
-import { type INACTIVITY_STAGE, type TGraceEmail } from '@blog/db/constants';
+import { type TENANT_PLAN } from '@shinefold/config/constants';
+import {
+  type INACTIVITY_STAGE,
+  type TGraceEmail,
+} from '@shinefold/db/constants';
 
 type TOwnerEmailCopyInput = {
   siteName: string;

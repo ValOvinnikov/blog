@@ -4,8 +4,8 @@ import {
   CONSENT_CATEGORY,
   type TConsentCategory,
   type TMaybeUndefined,
-} from '@blog/config';
-import type { IConsentCategory } from '@blog/ui/components/molecules/consent-preferences';
+} from '@shinefold/config';
+import type { IConsentCategory } from '@shinefold/ui/components/molecules/consent-preferences';
 import { CONSENT_STATUS } from '@web/constants/consent';
 import { useConsentStore } from '@web/hooks/use-consent-store';
 import { OPTIONAL_CONSENT_CATEGORIES } from '@web/utils/consent-cookie';

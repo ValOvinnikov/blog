@@ -12,12 +12,12 @@ export default [
         {
           selector: 'JSXElement',
           message:
-            '@blog/auth must not use JSX — it exports Auth.js configuration only, never React components.',
+            '@shinefold/auth must not use JSX — it exports Auth.js configuration only, never React components.',
         },
         {
           selector: 'JSXFragment',
           message:
-            '@blog/auth must not use JSX — it exports Auth.js configuration only, never React components.',
+            '@shinefold/auth must not use JSX — it exports Auth.js configuration only, never React components.',
         },
       ],
       'no-restricted-imports': [
@@ -33,16 +33,16 @@ export default [
                 'react-dom/*',
                 'next-auth/react',
                 'next-auth/react/*',
-                '@blog/ui',
-                '@blog/ui/*',
+                '@shinefold/ui',
+                '@shinefold/ui/*',
               ],
               message:
-                '@blog/auth exports configuration only — React components/hooks (including next-auth/react) and @blog/ui belong to the consuming app.',
+                '@shinefold/auth exports configuration only — React components/hooks (including next-auth/react) and @shinefold/ui belong to the consuming app.',
             },
             {
               group: [
-                '@blog/service',
-                '@blog/service/*',
+                '@shinefold/service',
+                '@shinefold/service/*',
                 'sanity',
                 'sanity/*',
                 'next-sanity',
@@ -52,7 +52,7 @@ export default [
                 'groqd/*',
               ],
               message:
-                '@blog/auth must not import @blog/service or any Sanity SDK — auth is a sibling of db, never a Sanity consumer.',
+                '@shinefold/auth must not import @shinefold/service or any Sanity SDK — auth is a sibling of db, never a Sanity consumer.',
             },
           ],
         },

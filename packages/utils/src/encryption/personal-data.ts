@@ -1,7 +1,7 @@
 import {
   normalizeEmail,
   normalizeEmailIdentity,
-} from '@blog/utils/normalize-email-identity';
+} from '@shinefold/utils/normalize-email-identity';
 
 import { KEY_ENCODING } from './crypto-encoding';
 import { decryptSecret, encryptSecret } from './encrypt-secret';

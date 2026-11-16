@@ -1,4 +1,4 @@
-import { CARD_STYLE, type TCardStyle } from '@blog/config/constants';
+import { CARD_STYLE, type TCardStyle } from '@shinefold/config/constants';
 
 import { BORDER_COLOR } from './border-tokens';
 import { RADIUS_MD } from './radius-tokens';

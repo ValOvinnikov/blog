@@ -44,7 +44,7 @@ When something fails in a reader's browser, such as an error boundary rendering 
 
 ## Dependencies
 
-- Layers: `web` only; `@blog/insight` for `sanitizeLogMessage` and the logger core.
+- Layers: `web` only; `@shinefold/insight` for `sanitizeLogMessage` and the logger core.
 - Features: [errors-and-404](./errors-and-404.md), [bookmarks](./bookmarks.md).
 - Env vars: `KV_REST_API_URL`, `KV_REST_API_TOKEN` (shared rate-limit store).
 

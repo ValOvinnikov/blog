@@ -1,5 +1,5 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { GRACE_EMAIL } from '@blog/db/constants';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { GRACE_EMAIL } from '@shinefold/db/constants';
 import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 
 export const OWNER_GRACE_EMAIL_COPY_NL: TOwnerGraceEmailCopy = {

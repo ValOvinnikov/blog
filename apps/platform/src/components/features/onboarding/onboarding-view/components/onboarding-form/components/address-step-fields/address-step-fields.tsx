@@ -1,6 +1,5 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { SiteAddressField } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/address-step-fields/components/site-address-field';
 import { FormLocaleSelect } from '@platform/components/shared/form-locale-select';
 import { FIELD_APPEARANCE } from '@platform/constants/field-appearance';
@@ -8,6 +7,7 @@ import type {
   TCreateSiteFieldError,
   TCreateSiteInput,
 } from '@platform/server/onboarding/create-site-input';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TAddressStepFieldsProps = {

@@ -1,5 +1,5 @@
-import { BRAND_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { MOCK_TEAM_MEMBER_INITIALS } from '@web/testing/modules/team/fixtures';

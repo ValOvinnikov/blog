@@ -1,17 +1,17 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_SHARED_TENANT_DOMAIN,
-} from '@blog/db/testing/tenant-domains/fixtures';
-import { MOCK_TENANT_DOMAIN } from '@blog/db/testing/tenants/fixtures';
-import { errorResult } from '@blog/utils';
+} from '@shinefold/db/testing/tenant-domains/fixtures';
+import { MOCK_TENANT_DOMAIN } from '@shinefold/db/testing/tenants/fixtures';
+import { errorResult } from '@shinefold/utils';
 
 import { restoreCustomDomainClaim } from './restore-custom-domain-claim';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 const ORIGINAL_TOKEN = 'a'.repeat(64);

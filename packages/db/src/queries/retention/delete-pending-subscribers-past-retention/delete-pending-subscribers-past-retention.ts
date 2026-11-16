@@ -1,11 +1,11 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   PENDING_SUBSCRIBER_RETENTION_DAYS,
   SUBSCRIBER_STATUS,
-} from '@blog/db/constants';
-import { isInBatch } from '@blog/db/queries/retention/retention-batch';
-import { subscribers } from '@blog/db/schema/subscribers';
-import { daysBefore } from '@blog/db/utils/day-offset/day-offset';
+} from '@shinefold/db/constants';
+import { isInBatch } from '@shinefold/db/queries/retention/retention-batch';
+import { subscribers } from '@shinefold/db/schema/subscribers';
+import { daysBefore } from '@shinefold/db/utils/day-offset/day-offset';
 import { and, eq, isNull, lt, or } from 'drizzle-orm';
 
 export async function deletePendingSubscribersPastRetention(

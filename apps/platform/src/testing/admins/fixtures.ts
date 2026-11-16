@@ -1,5 +1,5 @@
-import { ADMIN_ROLE, GRANTED_VIA } from '@blog/db/constants';
-import type { TAdmin } from '@blog/db/schema/admins';
+import { ADMIN_ROLE, GRANTED_VIA } from '@shinefold/db/constants';
+import type { TAdmin } from '@shinefold/db/schema/admins';
 
 const ADMIN_GRANTED_AT = '2026-04-01T00:00:00.000Z';
 

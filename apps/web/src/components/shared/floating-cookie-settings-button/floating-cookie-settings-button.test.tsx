@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { SITE_MESSAGES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ConsentBannerSlot } from '@web/components/features/layout/site-providers/components/consent-banner-slot/consent-banner-slot';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';

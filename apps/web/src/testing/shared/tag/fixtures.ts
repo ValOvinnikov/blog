@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
-import type { TTagDetailPage } from '@blog/service';
+import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@shinefold/config';
+import type { TTagDetailPage } from '@shinefold/service';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 

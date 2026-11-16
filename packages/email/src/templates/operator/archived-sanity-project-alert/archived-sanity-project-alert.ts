@@ -1,8 +1,8 @@
-import { renderEmailAction } from '@blog/email/html/email-action/email-action';
-import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
-import { buildOperatorShell } from '@blog/email/html/operator-shell/operator-shell';
-import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
-import { buildPlainTextBody } from '@blog/email/plain-text/plain-text-body';
+import { renderEmailAction } from '@shinefold/email/html/email-action/email-action';
+import { escapeHtml } from '@shinefold/email/html/escape-html/escape-html';
+import { buildOperatorShell } from '@shinefold/email/html/operator-shell/operator-shell';
+import { PLATFORM_EMAIL_BRAND } from '@shinefold/email/html/platform-email-brand/platform-email-brand';
+import { buildPlainTextBody } from '@shinefold/email/plain-text/plain-text-body';
 
 export type TArchivedSanityProjectAlertInput = {
   tenantName: string;

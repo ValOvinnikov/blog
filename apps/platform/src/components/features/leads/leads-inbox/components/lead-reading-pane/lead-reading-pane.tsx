@@ -1,4 +1,3 @@
-import { SIZE, type TMaybeNull } from '@blog/config';
 import { BackLink } from '@platform/components/shared/back-link';
 import { Button } from '@platform/components/shared/button';
 import { buttonVariants } from '@platform/components/shared/button/button-variants';
@@ -9,6 +8,7 @@ import { BUTTON_VARIANT } from '@platform/constants/button';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
 import { formatDateTime } from '@platform/utils/format-date-time/format-date-time';
+import { SIZE, type TMaybeNull } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 import type { RefObject } from 'react';
 

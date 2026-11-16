@@ -1,4 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_CREATED_AT,
@@ -9,6 +8,7 @@ import {
   MOCK_TRIAL_ENDS_AT,
   mockTrialTenant,
 } from '@platform/testing/tenants/mock-tenant';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 import { toPlatformTenant } from './platform-tenant';
 

@@ -1,10 +1,10 @@
-import type { TLocaleIsoCode } from '@blog/config';
 import {
   EMAIL_SENDER_ITEM,
   EMAIL_TEMPLATE_TYPES,
   type TEmailDraft,
 } from '@platform/utils/email-draft/email-draft';
 import { resolveItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
+import type { TLocaleIsoCode } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 type TUseEmailItemsArgs = {

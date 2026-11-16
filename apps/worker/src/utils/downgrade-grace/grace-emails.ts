@@ -1,17 +1,17 @@
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
-import { GRACE_EMAIL, type TGraceEmail } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { graceEndDate } from '@blog/db/utils/grace-end-date/grace-end-date';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { GRACE_EMAIL, type TGraceEmail } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { graceEndDate } from '@shinefold/db/utils/grace-end-date/grace-end-date';
 import {
   hasGraceLocks,
   type TGraceLocks,
-} from '@blog/db/utils/grace-locks/grace-locks';
+} from '@shinefold/db/utils/grace-locks/grace-locks';
 import {
   buildOwnerDowngradeGraceEmail,
   PLATFORM_EMAIL_BRAND_NAME,
-} from '@blog/email';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/email';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { DOWNGRADE_GRACE_LOG } from '@worker/constants/downgrade-grace';
 import { OWNER_DASHBOARD_PATH } from '@worker/constants/owner-email';
 import { formatInactivityDate } from '@worker/utils/inactivity-sweep/inactivity-dates';

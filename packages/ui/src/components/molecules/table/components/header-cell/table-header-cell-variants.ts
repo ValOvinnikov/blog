@@ -1,5 +1,5 @@
-import { TABLE_CELL_BORDER } from '@blog/ui/components/molecules/table/table-cell-border';
-import { tv } from '@blog/ui/lib/styling';
+import { TABLE_CELL_BORDER } from '@shinefold/ui/components/molecules/table/table-cell-border';
+import { tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const tableHeaderCellVariants = tv({

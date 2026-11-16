@@ -1,5 +1,5 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { toInitial } from '@blog/utils/primitives';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { toInitial } from '@shinefold/utils/primitives';
 
 import {
   brandMarkImageVariants,

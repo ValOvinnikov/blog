@@ -3,9 +3,9 @@ import {
   SANITY_WEBHOOK_OPERATION,
   type TMaybeNull,
   type TMaybeUndefined,
-} from '@blog/config';
-import type { TTenantSanityContext } from '@blog/service';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/config';
+import type { TTenantSanityContext } from '@shinefold/service';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import {
   DOCUMENT_NOT_FOUND_REASON,
   type FETCH_FAILED_REASON,

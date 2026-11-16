@@ -1,10 +1,10 @@
-import { MOCK_MISSING_ID } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { MOCK_MISSING_ID } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_PUBLISHED_AT_FUTURE,
   MOCK_SCHEDULED_NL_POST_ID,
   MOCK_TRANSLATED_POST_DOCUMENTS,
-} from '@blog/service/testing/shared/translated-posts-dataset';
+} from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { postPublishedAtQuery } from './query';
 

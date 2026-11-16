@@ -1,11 +1,11 @@
-import type { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
-import type { TPortableTextBody } from '@blog/service';
-import { headingVariants } from '@blog/ui/components/atoms/heading/heading-variants';
-import { Accordion } from '@blog/ui/components/organisms/accordion';
 import {
   PortableText as PortableTextRoot,
   type PortableTextReactComponents,
 } from '@portabletext/react';
+import type { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
+import type { TPortableTextBody } from '@shinefold/service';
+import { headingVariants } from '@shinefold/ui/components/atoms/heading/heading-variants';
+import { Accordion } from '@shinefold/ui/components/organisms/accordion';
 
 import { expandableSectionVariants } from './expandable-section-variants';
 import { FULL_BLEED_DATA_ATTR } from './full-bleed';

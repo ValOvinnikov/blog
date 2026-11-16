@@ -1,13 +1,13 @@
 'use client';
 
-import { isOutcomeRefused, isOutcomeSuccess, SIZE } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { SIGNUP_BLOCK_REFUSAL } from '@platform/constants/signup-block';
 import type { TBlockedSignupEntry } from '@platform/server/signup-block/load-blocked-signup-entries';
 import { removeBlockedIdentityAction } from '@platform/server/signup-block/remove-blocked-identity-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import { isOutcomeRefused, isOutcomeSuccess, SIZE } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 

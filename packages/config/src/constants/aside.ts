@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const ASIDE_KIND = {
   WHY_NOT: 'WHY_NOT',

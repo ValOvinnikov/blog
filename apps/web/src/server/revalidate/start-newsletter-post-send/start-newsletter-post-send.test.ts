@@ -1,5 +1,5 @@
-import { SANITY_WEBHOOK_OPERATION } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { SANITY_WEBHOOK_OPERATION } from '@shinefold/config/constants';
 import {
   REVALIDATE_LOG,
   STARTER_DOCUMENT_ID_PREFIX,
@@ -29,7 +29,7 @@ const {
   releaseNewsletterPostSendMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: { getTenantById: getTenantByIdMock },
     emailConfig: { getEmailNewPosts: getEmailNewPostsMock },

@@ -1,4 +1,4 @@
-import { ASIDE_KIND, DEPTH } from '@blog/config';
+import { ASIDE_KIND, DEPTH } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
 import { DepthProvider } from '@web/context/depth-provider';

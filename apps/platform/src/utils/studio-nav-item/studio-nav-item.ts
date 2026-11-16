@@ -1,4 +1,3 @@
-import { ICONS } from '@blog/config';
 import type { TSidebarNavItem } from '@platform/components/features/layout/sidebar';
 import type { TRegisteredIconName } from '@platform/components/shared/icon';
 import {
@@ -8,6 +7,7 @@ import {
 } from '@platform/constants/owner-studio-access';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import { ownerStudioAccessTone } from '@platform/utils/status-tone/status-tone';
+import { ICONS } from '@shinefold/config';
 
 const STUDIO_ACCESS_LINE_ICON: Record<
   TPendingOwnerStudioAccess,

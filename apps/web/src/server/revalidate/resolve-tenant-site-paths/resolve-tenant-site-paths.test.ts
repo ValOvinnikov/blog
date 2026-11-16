@@ -1,5 +1,5 @@
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { errorResult, okResult } from '@shinefold/utils';
 import {
   FETCH_FAILED_REASON,
   TENANT_UNRESOLVED_REASON,

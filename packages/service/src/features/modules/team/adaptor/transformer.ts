@@ -1,7 +1,7 @@
-import { toCtaButtons } from '@blog/service/shared/transformers/cta/to-cta-buttons';
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
-import { toPersonProfile } from '@blog/service/shared/transformers/person/to-person-profile';
+import { toCtaButtons } from '@shinefold/service/shared/transformers/cta/to-cta-buttons';
+import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
+import { toPersonProfile } from '@shinefold/service/shared/transformers/person/to-person-profile';
 import type { InferResultType } from 'groqd';
 
 import type { teamModuleQuery } from './query';

@@ -1,16 +1,16 @@
+import { faker } from '@faker-js/faker';
 import {
   ASIDE_KIND,
   IMAGE_LAYOUT,
   PORTABLE_TEXT_BLOCK_TYPE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   MOCK_BODY_IMAGE_KEY,
   MOCK_EXTERNAL_URL,
   mockRawBodyImageBlock,
   mockRawPortableTextMarkDef,
   mockSanityImageView,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import {
   toPortableTextBody,

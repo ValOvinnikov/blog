@@ -1,7 +1,5 @@
 'use client';
 
-import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
-import type { TValueOf } from '@blog/config/utils';
 import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
 import { CUSTOM_DOMAIN_FIELD_ERROR } from '@platform/constants/custom-domain';
 import { useToast } from '@platform/context/toast-provider';
@@ -11,6 +9,8 @@ import {
   CUSTOM_DOMAIN_REFUSAL_KEYS,
 } from '@platform/utils/custom-domain-keys/custom-domain-keys';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import { ACTION_OUTCOME, type TMaybeUndefined } from '@shinefold/config';
+import type { TValueOf } from '@shinefold/config/utils';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';

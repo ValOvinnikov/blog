@@ -1,6 +1,6 @@
-import { MOCK_EMAIL } from '@blog/auth/testing/session-fixtures';
-import { ERROR_CODE, MAGIC_LINK_REFUSAL } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { MOCK_EMAIL } from '@shinefold/auth/testing/session-fixtures';
+import { ERROR_CODE, MAGIC_LINK_REFUSAL } from '@shinefold/config/constants';
 
 import { findMagicLinkSendRefusal } from './find-magic-link-send-refusal';
 
@@ -13,7 +13,7 @@ const { incrementMagicLinkSendCountMock, isSignupBlockedMock } = vi.hoisted(
   }),
 );
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     blockedSignupIdentities: { isSignupBlocked: isSignupBlockedMock },
     magicLinkSendCounters: {

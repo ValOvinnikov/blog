@@ -1,7 +1,7 @@
-import { BRAND_VARIANT } from '@blog/config';
-import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { mockRawModuleAppearance } from '@blog/service/testing/shared/module-appearance';
+import { BRAND_VARIANT } from '@shinefold/config';
+import type { TRawPostListModule } from '@shinefold/service/features/modules/post-list/adaptor/transformer';
+import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 export function mockRawPostListModule(
   overrides: Partial<TRawPostListModule> = {},

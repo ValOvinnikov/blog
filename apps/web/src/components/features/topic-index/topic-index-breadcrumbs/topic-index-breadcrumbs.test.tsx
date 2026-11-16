@@ -1,6 +1,6 @@
-import { routes } from '@blog/config';
-import { okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { routes } from '@shinefold/config';
+import { okResult } from '@shinefold/utils';
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
   testThrowsOnFetchFailure,

@@ -1,13 +1,13 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   membershipInvites,
   type TMembershipInvite,
-} from '@blog/db/schema/membership-invites';
+} from '@shinefold/db/schema/membership-invites';
 import {
   byEmailAddress,
   withExactEmailAddress,
-} from '@blog/db/utils/personal-data/email-address-match';
-import { normalizeEmail } from '@blog/utils/normalize-email-identity';
+} from '@shinefold/db/utils/personal-data/email-address-match';
+import { normalizeEmail } from '@shinefold/utils/normalize-email-identity';
 import { and, isNull } from 'drizzle-orm';
 
 export async function findPendingInviteByEmail(

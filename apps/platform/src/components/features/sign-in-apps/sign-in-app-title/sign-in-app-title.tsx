@@ -1,7 +1,7 @@
-import type { TOAuthProvider } from '@blog/config/constants';
 import { Icon } from '@platform/components/shared/icon';
 import { ICON_SIZE } from '@platform/constants/icon';
 import { OAUTH_PROVIDER_ICON } from '@platform/constants/sign-in-apps';
+import type { TOAuthProvider } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 
 import { signInAppTitleVariants } from './sign-in-app-title-variants';

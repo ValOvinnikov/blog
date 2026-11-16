@@ -1,7 +1,7 @@
-import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 
 import { buildVirtualAdminMembership } from './build-virtual-admin-membership';
 import { toPlatformViewer } from './platform-viewer';

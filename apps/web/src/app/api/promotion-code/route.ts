@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from '@blog/config';
-import { queries } from '@blog/db';
+import { HTTP_STATUS } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { CACHE_CONTROL } from '@web/constants/http';
 import { PRICING_LOG, PRICING_SEARCH_PARAM } from '@web/constants/pricing';
 import { logger } from '@web/utils/logger/logger';

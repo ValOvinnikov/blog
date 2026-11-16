@@ -38,7 +38,7 @@ What is decided, or follows from features already built:
 - Opening hours render per day.
 - The `LocalBusiness` JSON-LD must validate. It goes through the shared `JsonLd` component, which every structured-data block on the site already uses.
 - The map follows the embed module's rules: a provider from the embed module's supported set (which one is still undecided), iframe only, never loaded before the visitor allows External media, with `ConsentPlaceholder` standing in until then.
-- Day names and times are formatted in `apps/web`; `@blog/ui` takes them as strings.
+- Day names and times are formatted in `apps/web`; `@shinefold/ui` takes them as strings.
 
 ## Dependencies
 

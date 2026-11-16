@@ -1,5 +1,5 @@
-import { buildSlugUrlPreviewPath } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-path';
 import { Card, Stack, Text } from '@sanity/ui';
+import { buildSlugUrlPreviewPath } from '@shinefold/studio/schema-types/inputs/slug-url-preview/slug-url-preview-path';
 import type { SlugInputProps } from 'sanity';
 
 export const SlugUrlPreview = ({

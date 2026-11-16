@@ -1,4 +1,4 @@
-import { queries } from '@blog/db';
+import { queries } from '@shinefold/db';
 
 export type TSignInEventUser = {
   id?: string;

@@ -1,6 +1,5 @@
 'use client';
 
-import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -13,6 +12,7 @@ import {
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { contrastStatusTone } from '@platform/utils/status-tone/status-tone';
 import { tv } from '@platform/utils/tv/tv';
+import { SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 

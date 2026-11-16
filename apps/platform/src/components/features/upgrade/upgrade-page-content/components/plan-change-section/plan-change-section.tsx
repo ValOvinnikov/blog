@@ -1,10 +1,10 @@
-import { ALERT_TYPE, SIZE } from '@blog/config';
 import { PlanChange } from '@platform/components/features/upgrade/plan-change';
 import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { PLAN_CHANGE_REFUSAL } from '@platform/constants/plan-change';
 import { readTenantSubscriptionPlan } from '@platform/server/billing/read-tenant-subscription-plan';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ALERT_TYPE, SIZE } from '@shinefold/config';
 import { getTranslations } from 'next-intl/server';
 
 export type TPlanChangeSectionProps = {

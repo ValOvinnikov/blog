@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import { tenantAnalytics } from '@blog/db/schema/tenant-analytics';
-import { hasLength } from '@blog/utils/primitives';
+import { getDb } from '@shinefold/db/client';
+import { tenantAnalytics } from '@shinefold/db/schema/tenant-analytics';
+import { hasLength } from '@shinefold/utils/primitives';
 import { eq } from 'drizzle-orm';
 
 export async function clearTenantAnalytics(tenantId: string): Promise<boolean> {

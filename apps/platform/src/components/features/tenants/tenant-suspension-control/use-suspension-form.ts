@@ -1,6 +1,6 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import type { TSuspensionCategory } from '@blog/db/constants';
 import type { TSuspensionCase } from '@platform/server/tenants/tenant-suspension-actions';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import type { TSuspensionCategory } from '@shinefold/db/constants';
 import { useState } from 'react';
 
 export const useSuspensionForm = () => {

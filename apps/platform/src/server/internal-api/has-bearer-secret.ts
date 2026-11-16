@@ -1,4 +1,4 @@
-import { isSecretMatch } from '@blog/utils';
+import { isSecretMatch } from '@shinefold/utils';
 
 const BEARER_PREFIX = 'Bearer ';
 

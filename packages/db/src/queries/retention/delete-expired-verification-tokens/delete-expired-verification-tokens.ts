@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { verificationTokens } from '@blog/db/schema/auth';
+import { getDb } from '@shinefold/db/client';
+import { verificationTokens } from '@shinefold/db/schema/auth';
 import { inArray, lt, sql } from 'drizzle-orm';
 
 // Auth.js deletes a sign-in token when it is used, so only expired ones remain.

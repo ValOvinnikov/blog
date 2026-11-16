@@ -1,16 +1,16 @@
-import { STARTER_TEMPLATE_VERSION } from '@blog/config';
-import { ERROR_CODE, PRESET_ID, SITE_TYPE } from '@blog/config/constants';
+import { STARTER_TEMPLATE_VERSION } from '@shinefold/config';
+import { ERROR_CODE, PRESET_ID, SITE_TYPE } from '@shinefold/config/constants';
 import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
-import { insertSiteConfigIfMissing } from '@blog/db/queries/site-config';
+} from '@shinefold/db/constants';
+import { insertSiteConfigIfMissing } from '@shinefold/db/queries/site-config';
 import {
   getTenantById,
   setTenantSiteTemplateVersion,
   updateProvisioningStep,
-} from '@blog/db/queries/tenants';
-import { errorResult } from '@blog/utils/result';
+} from '@shinefold/db/queries/tenants';
+import { errorResult } from '@shinefold/utils/result';
 import { seedTenantContent } from '@worker/steps/seed-content';
 import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import { mockTenant, MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
@@ -19,10 +19,10 @@ import { FatalError } from 'workflow';
 
 import { applySiteTemplate } from './apply-site-template';
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('@worker/steps/seed-content');
-vi.mock('@blog/db/queries/site-config');
+vi.mock('@shinefold/db/queries/site-config');
 vi.mock('workflow');
 
 function reportedStatuses(): string[] {

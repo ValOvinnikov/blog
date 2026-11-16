@@ -1,5 +1,5 @@
-import { isUndefined } from '@blog/utils/primitives';
 import { LOOK_CARD, type TLookCard } from '@platform/constants/look-card';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 import { findTopmostLookCard, toLookAnchorId } from './look-anchor';
 

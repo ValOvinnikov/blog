@@ -1,5 +1,5 @@
-import { VOICE_SURFACE, type TVoiceSurface } from '@blog/config';
-import type { TValueOf } from '@blog/config/utils';
+import { VOICE_SURFACE, type TVoiceSurface } from '@shinefold/config';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const VOICE_SECTION = {
   ERROR_PAGES: 'ERROR_PAGES',

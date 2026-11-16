@@ -1,9 +1,5 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
-import { isUndefined } from '@blog/utils/primitives';
 import {
   GET_STARTED_STEP,
   type TGetStartedStep,
@@ -15,6 +11,10 @@ import {
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 export type TGetStarted = {
   tenantId: string;

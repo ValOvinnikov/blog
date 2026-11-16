@@ -1,16 +1,19 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
+import {
+  BILLING_INTERVAL,
+  type TBillingInterval,
+} from '@platform/constants/billing';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import {
   PAID_SUBSCRIBER_BAND_CEILINGS,
   PLAN_PRICE_LOOKUP_KEYS,
   type TIntervalPriceLookupKeys,
   type TPaidSubscriberBandCeiling,
-} from '@blog/db/constants';
-import { hasArrayGotMultipleItems, isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/constants';
 import {
-  BILLING_INTERVAL,
-  type TBillingInterval,
-} from '@platform/constants/billing';
+  hasArrayGotMultipleItems,
+  isUndefined,
+} from '@shinefold/utils/primitives';
 
 export type TSubscribedPlan = {
   plan: TTenantPlan;

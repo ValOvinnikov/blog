@@ -1,8 +1,8 @@
-import { SIGNUP_TERMS_COOKIE_NAME, TERMS_VERSION } from '@blog/config';
 import { SIGN_UP_LOG } from '@platform/constants/sign-up';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { toServerCookieOptions } from '@platform/utils/server-cookie-options/server-cookie-options';
+import { SIGNUP_TERMS_COOKIE_NAME, TERMS_VERSION } from '@shinefold/config';
 import { checkBotId } from 'botid/server';
 import { cookies } from 'next/headers';
 

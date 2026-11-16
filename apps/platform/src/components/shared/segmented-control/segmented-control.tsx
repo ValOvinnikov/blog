@@ -2,14 +2,14 @@
 
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
-import type { TControlAria, TControlLock } from '@blog/config';
-import type { IWithClassName } from '@blog/config/types';
 import { DecorativeGlyph } from '@platform/components/shared/decorative-glyph';
 import {
   SEGMENTED_LAYOUT,
   type TSegmentedLayout,
 } from '@platform/constants/segmented-control';
 import { singleSelectToggleGroupProps } from '@platform/utils/single-select-toggle-group/single-select-toggle-group';
+import type { TControlAria, TControlLock } from '@shinefold/config';
+import type { IWithClassName } from '@shinefold/config/types';
 import type { ReactNode } from 'react';
 
 import { SelectedDescription } from './components/selected-description/selected-description';

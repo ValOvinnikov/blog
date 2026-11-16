@@ -1,8 +1,8 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
-import { EMAIL_NEW_POSTS_DEFAULT } from '@blog/db/constants';
-import type { TEmailConfigResult } from '@blog/db/queries/email-config/get-email-config/get-email-config';
-import type { TEmailTemplateResult } from '@blog/db/queries/email-templates/get-email-template/get-email-template';
-import type { TSendEmailInput } from '@blog/email';
+import { EMAIL_TEMPLATE_TYPE } from '@shinefold/config';
+import { EMAIL_NEW_POSTS_DEFAULT } from '@shinefold/db/constants';
+import type { TEmailConfigResult } from '@shinefold/db/queries/email-config/get-email-config/get-email-config';
+import type { TEmailTemplateResult } from '@shinefold/db/queries/email-templates/get-email-template/get-email-template';
+import type { TSendEmailInput } from '@shinefold/email';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import type { Mock } from 'vitest';

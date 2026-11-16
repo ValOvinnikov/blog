@@ -1,9 +1,9 @@
 'use client';
 
-import { TOAST_TYPE, type TMaybeNull } from '@blog/config';
-import { Toast } from '@blog/ui/components/molecules/toast';
-import { ToastViewport } from '@blog/ui/components/organisms/toast-viewport';
-import { hasLength } from '@blog/utils/primitives';
+import { TOAST_TYPE, type TMaybeNull } from '@shinefold/config';
+import { Toast } from '@shinefold/ui/components/molecules/toast';
+import { ToastViewport } from '@shinefold/ui/components/organisms/toast-viewport';
+import { hasLength } from '@shinefold/utils/primitives';
 import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useTranslations } from 'next-intl';
 import {

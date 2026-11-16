@@ -1,4 +1,4 @@
-import { leads } from '@blog/db/schema/leads';
+import { leads } from '@shinefold/db/schema/leads';
 import { and, eq } from 'drizzle-orm';
 
 export type TLeadKey = {

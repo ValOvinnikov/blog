@@ -1,8 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import type { TPlanEntitlements } from '@blog/db/constants';
-import { countMembershipsOverSeats } from '@blog/db/queries/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isUndefined } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import type { TPlanEntitlements } from '@shinefold/db/constants';
+import { countMembershipsOverSeats } from '@shinefold/db/queries/memberships';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 export type TGraceLocks = {
   lockedMemberCount: number;

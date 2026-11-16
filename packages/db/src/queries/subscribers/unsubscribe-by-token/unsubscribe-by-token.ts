@@ -1,8 +1,8 @@
-import { type TOutcome, SUBSCRIBER_OUTCOME } from '@blog/config';
-import { getDb } from '@blog/db/client';
-import { subscribers } from '@blog/db/schema/subscribers';
-import { sha256Hex } from '@blog/utils/hash';
-import { toOutcome } from '@blog/utils/to-outcome';
+import { type TOutcome, SUBSCRIBER_OUTCOME } from '@shinefold/config';
+import { getDb } from '@shinefold/db/client';
+import { subscribers } from '@shinefold/db/schema/subscribers';
+import { sha256Hex } from '@shinefold/utils/hash';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
 export type TUnsubscribeByLinkResult = TOutcome<

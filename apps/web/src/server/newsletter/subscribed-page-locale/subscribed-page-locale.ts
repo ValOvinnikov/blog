@@ -1,5 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { isLocaleIsoCode, type TLocaleIsoCode } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config';
+import {
+  isLocaleIsoCode,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 import { getLocale } from 'next-intl/server';
 
 export const getSubscribedPageLocale = async (): Promise<

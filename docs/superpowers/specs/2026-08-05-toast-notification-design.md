@@ -35,7 +35,7 @@ specifies a single toast/notification system that:
 - Defines the complete **interaction model** (enqueue, stack, cap, coalesce,
   pause, dismiss, undo), **animation spec** (enter/exit/reflow/timer, exact
   tokens), **placement/responsive** behaviour, and **accessibility** contract.
-- Draws the **component boundaries**: a pure, prop-driven `@blog/ui`
+- Draws the **component boundaries**: a pure, prop-driven `@shinefold/ui`
   presentational layer and an `apps/web` client island that owns the queue and
   exposes an imperative `useToast()` API.
 
@@ -46,7 +46,7 @@ mental model precise enough to ticket as an epic + per-layer sub-issues.
 
 These are load-bearing — they change what the components can be.
 
-1. **`@blog/ui` stays pure.** The visual pieces (`Toast`, `ToastViewport`) are
+1. **`@shinefold/ui` stays pure.** The visual pieces (`Toast`, `ToastViewport`) are
    prop-driven and callback-based, own **no** client state, ship no
    `'use client'`. The queue, timers, and imperative API live in an `apps/web`
    client island (`ToastProvider` + `useToast`). Same split as
@@ -367,7 +367,7 @@ All motion uses `--ease-console` (`cubic-bezier(0.2,0,0,1)`) and the
 
 Same pure-`ui` / stateful-`web` split as the rest of the engagement layer.
 
-### `@blog/ui` — presentational (pure, no state, no `'use client'`)
+### `@shinefold/ui` — presentational (pure, no state, no `'use client'`)
 
 - **`Toast`** — renders one toast from props; emits callbacks, owns nothing.
 
@@ -412,7 +412,7 @@ Same pure-`ui` / stateful-`web` split as the rest of the engagement layer.
   (BookmarkButton, RatingInput, CommentForm, NewsletterForm, auth) call these;
   they never touch the viewport directly.
 
-- **Constants** live in `@blog/config` per repo convention (key === UPPERCASE
+- **Constants** live in `@shinefold/config` per repo convention (key === UPPERCASE
   value, `as const`):
 
   ```

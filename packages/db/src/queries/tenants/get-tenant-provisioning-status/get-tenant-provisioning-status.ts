@@ -1,9 +1,9 @@
-import { getDb } from '@blog/db/client';
-import type { TTenantProvisioningStatus } from '@blog/db/constants';
+import { getDb } from '@shinefold/db/client';
+import type { TTenantProvisioningStatus } from '@shinefold/db/constants';
 import {
   tenants,
   type TTenantProvisioningState,
-} from '@blog/db/schema/tenants';
+} from '@shinefold/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
 export type TTenantProvisioningStatusResult = {

@@ -1,6 +1,6 @@
-import { LEGAL_PAGE_KIND, routes } from '@blog/config';
 import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
 import { tenantSiteUrl } from '@platform/utils/routes/routes';
+import { LEGAL_PAGE_KIND, routes } from '@shinefold/config';
 
 import { toLegalPageUrls } from './legal-page-urls';
 

@@ -1,10 +1,10 @@
-import * as schema from '@blog/db/schema';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
+import * as schema from '@shinefold/db/schema';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { getEmailNewPosts } from './get-email-new-posts';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);

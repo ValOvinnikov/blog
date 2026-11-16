@@ -1,4 +1,3 @@
-import { STRIPE_COUPON_DURATION } from '@blog/db/constants';
 import { fromStripeTime } from '@platform/server/billing/stripe-time';
 import {
   MOCK_DOLLAR_AMOUNT,
@@ -15,6 +14,7 @@ import {
   MOCK_STRIPE_PROMOTION_CODE,
   MOCK_STRIPE_PROMOTION_CODE_ID,
 } from '@platform/testing/billing/fixtures';
+import { STRIPE_COUPON_DURATION } from '@shinefold/db/constants';
 
 import { toCataloguePromotionCode } from './to-catalogue-promotion-code';
 

@@ -1,10 +1,5 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { queries, TENANT_STATUS } from '@blog/db';
-import type { TAdmin } from '@blog/db/schema/admins';
-import type { TTenantSuspension } from '@blog/db/schema/tenant-suspensions';
-import { errorResult, okResult } from '@blog/utils';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { reopenTenantSuspensionCase } from '@platform/server/tenants/tenant-suspension-case';
 import {
@@ -12,6 +7,11 @@ import {
   failWrite,
   type TSuspensionWrite,
 } from '@platform/server/tenants/tenant-suspension-writes';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { queries, TENANT_STATUS } from '@shinefold/db';
+import type { TAdmin } from '@shinefold/db/schema/admins';
+import type { TTenantSuspension } from '@shinefold/db/schema/tenant-suspensions';
+import { errorResult, okResult } from '@shinefold/utils';
 
 export const liftTenantSuspension = async (
   admin: TAdmin,

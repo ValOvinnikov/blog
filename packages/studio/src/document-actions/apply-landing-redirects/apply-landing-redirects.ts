@@ -1,20 +1,20 @@
 import {
   LANDING_PAGE_MAX_DEPTH,
   REDIRECT_STATUS,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   planLandingRedirects,
   type TExistingRedirect,
   type TRedirectPlan,
-} from '@blog/studio/document-actions/plan-landing-redirects/plan-landing-redirects';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { REDIRECT_TYPE } from '@blog/studio/schema-types/documents/redirect/redirect-type';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
+} from '@shinefold/studio/document-actions/plan-landing-redirects/plan-landing-redirects';
+import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { REDIRECT_TYPE } from '@shinefold/studio/schema-types/documents/redirect/redirect-type';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 import {
   flattenLandingParentChain,
   LANDING_PARENT_CHAIN_PROJECTION,
   type TLandingParentChainNode,
-} from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
+} from '@shinefold/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
 import { getPublishedId, type SanityClient } from 'sanity';
 
 type TDescendant = { slug?: string | null; children?: TDescendant[] | null };

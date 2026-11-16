@@ -1,8 +1,8 @@
 import {
   TIMELINE_HORIZONTAL_ITEM_CAP,
   TIMELINE_ORIENTATION,
-} from '@blog/config/constants';
-import type { TTimelineDocument } from '@blog/studio/schema-types/modules/timeline/timeline-document';
+} from '@shinefold/config/constants';
+import type { TTimelineDocument } from '@shinefold/studio/schema-types/modules/timeline/timeline-document';
 import type { ValidationContext } from 'sanity';
 
 export const validateTimelineHorizontalItemCap = (

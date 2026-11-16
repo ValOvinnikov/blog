@@ -1,10 +1,10 @@
-import { RELEASE_CHANGE, type TReleaseChange } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import type { TReleaseChanges } from '@platform/server/releases/classify-release-changes';
 import type { TReleaseMigrationSummary } from '@platform/server/releases/summarise-release-migrations';
+import { RELEASE_CHANGE, type TReleaseChange } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TReleaseAreasCardProps = {

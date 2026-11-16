@@ -1,5 +1,5 @@
-import { FORWARDED_FOR_HEADER } from '@blog/utils/client-key';
 import { faker } from '@faker-js/faker';
+import { FORWARDED_FOR_HEADER } from '@shinefold/utils/client-key';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 

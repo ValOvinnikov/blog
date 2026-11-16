@@ -1,6 +1,6 @@
-import type { TPagePostType } from '@blog/config';
-import type { TModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import type { TPagePostType } from '@shinefold/config';
+import type { TModule } from '@shinefold/service';
 import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { customRender, screen } from '@web/testing/custom-render';

@@ -1,17 +1,20 @@
-import * as schema from '@blog/db/schema';
-import type { TMembershipInvite } from '@blog/db/schema/membership-invites';
-import { insertTestTenant, MOCK_INVITE_EMAIL } from '@blog/db/testing/fixtures';
+import { faker } from '@faker-js/faker';
+import * as schema from '@shinefold/db/schema';
+import type { TMembershipInvite } from '@shinefold/db/schema/membership-invites';
+import {
+  insertTestTenant,
+  MOCK_INVITE_EMAIL,
+} from '@shinefold/db/testing/fixtures';
 import {
   MOCK_INVITE_CONSUMED_AT,
   mockMembershipInvite,
-} from '@blog/db/testing/membership-invites/fixtures';
-import { taggedMixedCaseAddress } from '@blog/db/testing/personal-data-rows';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/membership-invites/fixtures';
+import { taggedMixedCaseAddress } from '@shinefold/db/testing/personal-data-rows';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { findPendingInviteByEmail } from './find-pending-invite-by-email';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(5765);
 

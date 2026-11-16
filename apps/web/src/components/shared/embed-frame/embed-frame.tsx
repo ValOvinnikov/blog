@@ -2,8 +2,8 @@ import {
   MEDIA_RATIO,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import type { TEmbed } from '@blog/service';
+} from '@shinefold/config';
+import type { TEmbed } from '@shinefold/service';
 
 import { EmbedGate } from './components/embed-gate/embed-gate';
 import { embedFrameVariants } from './embed-frame-variants';

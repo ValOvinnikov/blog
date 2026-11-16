@@ -1,6 +1,3 @@
-import { OAUTH_PROVIDER, TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
@@ -27,6 +24,9 @@ import {
   MOCK_TENANT_ROOT_DOMAIN,
 } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
+import { OAUTH_PROVIDER, TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import userEvent from '@testing-library/user-event';
 
 import { DomainPageContent } from './domain-page-content';
@@ -41,7 +41,7 @@ vi.mock('@platform/server/sign-in-apps/list-own-sign-in-app-providers', () => ({
   listOwnSignInAppProviders: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenantDomains: { listTenantDomains: vi.fn() },
     customDomainClaims: { getCustomDomainClaim: vi.fn() },

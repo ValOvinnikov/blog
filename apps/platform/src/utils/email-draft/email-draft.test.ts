@@ -1,8 +1,8 @@
-import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import {
   mockEmailDraft,
   MOCK_EMAIL_DRAFT_SUBJECT,
 } from '@platform/testing/email-draft';
+import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@shinefold/config';
 
 import { buildEmailDraft } from './email-draft';
 

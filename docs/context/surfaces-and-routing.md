@@ -8,7 +8,7 @@
 **Routing conventions** (decided 2026-07-14 — full rationale in
 `docs/archive/superpowers/specs/2026-07-14-blog-list-pagination-design.md`):
 
-- **One route-builder** — `routes` in `@blog/config` is the single source of
+- **One route-builder** — `routes` in `@shinefold/config` is the single source of
   URL truth (`routes.post(slug)`, `routes.blogIndex(page?)`, …). No inline
   path templates in `service` or `web`; the sitemap and JSON-LD consume it too.
 - **Pagination** — path-based, `/x/page/N` (static `page/` segment; singular).

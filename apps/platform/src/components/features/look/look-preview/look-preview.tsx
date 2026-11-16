@@ -1,7 +1,6 @@
 'use client';
 
 import { Dialog } from '@base-ui/react/dialog';
-import type { TLocaleIsoCode } from '@blog/config';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
 import { SampleCookieButton } from '@platform/components/features/site-preview/sample-cookie-button';
@@ -16,6 +15,7 @@ import { toSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-
 import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
+import type { TLocaleIsoCode } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 

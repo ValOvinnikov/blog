@@ -1,6 +1,6 @@
-import type { TControlAria } from '@blog/config';
 import { SettingRow } from '@platform/components/shared/setting-row';
 import { Switch } from '@platform/components/shared/switch';
+import type { TControlAria } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TLanguageToggleRowProps = {

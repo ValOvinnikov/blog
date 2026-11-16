@@ -1,6 +1,6 @@
-import { MODULE_PACK } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { mockReadyTenant } from '@platform/testing/tenants/fixtures';
+import { MODULE_PACK } from '@shinefold/config';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 const MOCK_SANITY_READ_TOKEN_ENCRYPTED = 'encrypted-read-token';
 

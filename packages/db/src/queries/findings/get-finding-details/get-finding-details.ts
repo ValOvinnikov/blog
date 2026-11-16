@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { findings, type TFinding } from '@blog/db/schema/findings';
+import { getDb } from '@shinefold/db/client';
+import { findings, type TFinding } from '@shinefold/db/schema/findings';
 import { and, eq } from 'drizzle-orm';
 
 export async function getFindingDetails(

@@ -1,6 +1,6 @@
-import { SUBSCRIBER_OUTCOME } from '@blog/config';
-import { queries } from '@blog/db';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
+import { SUBSCRIBER_OUTCOME } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
 import { ToastProvider } from '@web/context/toast-provider';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
@@ -18,7 +18,7 @@ vi.mock('@web/server/auth/auth');
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { subscribers: { getSubscriptionStatus: vi.fn() } },
 }));
 

@@ -1,4 +1,4 @@
-import { getTenantSanityCredentials } from '@blog/db/queries/tenants';
+import { getTenantSanityCredentials } from '@shinefold/db/queries/tenants';
 import { SCHEDULED_POST_STATE } from '@worker/constants/scheduled-post-purge';
 import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
 import { readPostPublishedAt } from '@worker/utils/scheduled-post-purge/read-post-published-at';

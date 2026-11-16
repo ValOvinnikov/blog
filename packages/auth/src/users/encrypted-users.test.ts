@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_EMAIL,
   MOCK_PROVIDER,
@@ -5,14 +6,13 @@ import {
   MOCK_SESSION_EXPIRES,
   MOCK_SESSION_TOKEN,
   MOCK_USER_ID,
-} from '@blog/auth/testing/session-fixtures';
-import { queries } from '@blog/db';
-import type { TUser } from '@blog/db/schema/auth';
+} from '@shinefold/auth/testing/session-fixtures';
+import { queries } from '@shinefold/db';
+import type { TUser } from '@shinefold/db/schema/auth';
 import {
   mockAccountEmailIndex,
   usePersonalDataKeys,
-} from '@blog/db/testing/personal-data';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/personal-data';
 import type { Adapter, AdapterUser } from 'next-auth/adapters';
 
 import { withEncryptedUsers } from './encrypted-users';
@@ -23,8 +23,8 @@ const { findUserByEmailMock } = vi.hoisted(() => ({
   findUserByEmailMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async (importActual) => {
-  const actual = await importActual<typeof import('@blog/db')>();
+vi.mock('@shinefold/db', async (importActual) => {
+  const actual = await importActual<typeof import('@shinefold/db')>();
   return {
     ...actual,
     queries: {

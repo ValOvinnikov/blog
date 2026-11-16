@@ -1,4 +1,4 @@
-import type { TEmbedProvider } from '@blog/config';
+import type { TEmbedProvider } from '@shinefold/config';
 
 export const EMBED_LOG = {
   MODULE_FETCH_FAILED: 'embed_module.fetch_failed',

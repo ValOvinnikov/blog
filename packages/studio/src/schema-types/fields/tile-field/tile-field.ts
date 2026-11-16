@@ -1,7 +1,7 @@
 import {
   createOptionTilesInput,
   type TOptionTile,
-} from '@blog/studio/schema-types/inputs/option-tiles-input/option-tiles-input';
+} from '@shinefold/studio/schema-types/inputs/option-tiles-input/option-tiles-input';
 import type { ComponentType } from 'react';
 import { defineField, type StringDefinition } from 'sanity';
 

@@ -1,9 +1,9 @@
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import { sendEmail } from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { logger } from '@platform/utils/logger/logger';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import { sendEmail } from '@shinefold/email';
 
 import { alertSelfServeLimit } from './alert-self-serve-limit';
 
@@ -15,12 +15,12 @@ const { listSuperadminEmails } = vi.hoisted(() => ({
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: { admins: { listSuperadminEmails } },
 }));
 
-vi.mock('@blog/email', async (importOriginal) => ({
+vi.mock('@shinefold/email', async (importOriginal) => ({
   ...(await importOriginal()),
   buildSelfServeLimitAlertEmail: () => MOCK_ALERT_EMAIL,
   sendEmail: vi.fn(),

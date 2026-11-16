@@ -1,6 +1,3 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { sendEmail } from '@blog/email';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import enMessages from '@platform/i18n/messages/en.json';
 import nlMessages from '@platform/i18n/messages/nl.json';
@@ -24,14 +21,17 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { sendEmail } from '@shinefold/email';
 
 import { notifyOwnerOfPlanChange } from './notify-owner-of-plan-change';
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', () => mockOwnerEmailDb());
+vi.mock('@shinefold/db', () => mockOwnerEmailDb());
 
-vi.mock('@blog/email');
+vi.mock('@shinefold/email');
 
 const sendEmailMock = vi.mocked(sendEmail);
 

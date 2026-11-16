@@ -1,8 +1,8 @@
-import { hasArrayGotItems } from '@blog/utils/primitives';
 import { RailBrand } from '@platform/components/features/layout/rail-brand';
 import { RailIntro } from '@platform/components/features/layout/rail-intro';
 import { SignedInAccount } from '@platform/components/features/layout/signed-in-account';
 import type { TTenantPickerItem } from '@platform/server/tenants/to-tenant-picker-items';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

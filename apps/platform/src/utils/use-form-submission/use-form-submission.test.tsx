@@ -1,6 +1,10 @@
-import { ACTION_OUTCOME, FORM_STATUS, type TActionOutcome } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { act, renderHook } from '@platform/testing/custom-render';
+import {
+  ACTION_OUTCOME,
+  FORM_STATUS,
+  type TActionOutcome,
+} from '@shinefold/config';
 
 import { useFormSubmission } from './use-form-submission';
 

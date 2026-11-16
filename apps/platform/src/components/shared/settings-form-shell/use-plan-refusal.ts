@@ -1,6 +1,5 @@
 'use client';
 
-import type { TActionOutcome, TMaybeUndefined, TOutcome } from '@blog/config';
 import { useTenantPlan } from '@platform/context/tenant-plan-provider';
 import {
   isNotInPlanRefusal,
@@ -8,6 +7,11 @@ import {
 } from '@platform/utils/plan-refusal/plan-refusal';
 import { restoreRefusedItems } from '@platform/utils/restore-refused-items/restore-refused-items';
 import type { TSettingsDraftField } from '@platform/utils/settings-draft-offer/settings-draft-offer';
+import type {
+  TActionOutcome,
+  TMaybeUndefined,
+  TOutcome,
+} from '@shinefold/config';
 import { useRouter } from 'next/navigation';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState, type Dispatch, type SetStateAction } from 'react';

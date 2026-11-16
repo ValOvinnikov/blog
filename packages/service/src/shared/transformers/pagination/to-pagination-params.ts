@@ -1,5 +1,5 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { toTotalPages } from '@blog/utils';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { toTotalPages } from '@shinefold/utils';
 
 export type TRawPaginationParamsPage = {
   slug: string;

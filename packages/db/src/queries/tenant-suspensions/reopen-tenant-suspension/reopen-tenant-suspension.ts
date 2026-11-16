@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { tenantSuspensions } from '@blog/db/schema/tenant-suspensions';
+import { getDb } from '@shinefold/db/client';
+import { tenantSuspensions } from '@shinefold/db/schema/tenant-suspensions';
 import { eq } from 'drizzle-orm';
 
 export async function reopenTenantSuspension(

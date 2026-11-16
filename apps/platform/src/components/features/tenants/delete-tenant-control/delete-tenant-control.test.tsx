@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouter } from '@platform/testing/mock-router';
@@ -9,6 +8,7 @@ import {
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DeleteTenantControl } from './delete-tenant-control';

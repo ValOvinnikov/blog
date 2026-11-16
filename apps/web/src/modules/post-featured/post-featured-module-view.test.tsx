@@ -1,5 +1,5 @@
-import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, DISPLAY_MODE } from '@shinefold/config';
 import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import { MOCK_POST_FEATURED_HEADING } from '@web/testing/modules/post-featured/fixtures';

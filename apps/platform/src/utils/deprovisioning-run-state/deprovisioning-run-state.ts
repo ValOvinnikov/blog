@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
-import type { TDeprovisioningRun } from '@blog/db/schema/tenants';
+} from '@shinefold/db/constants';
+import type { TDeprovisioningRun } from '@shinefold/db/schema/tenants';
 
 const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
   TENANT_PROVISIONING_STEP_STATUS.RUNNING,

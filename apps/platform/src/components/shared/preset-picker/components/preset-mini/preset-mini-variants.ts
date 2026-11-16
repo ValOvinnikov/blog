@@ -1,5 +1,5 @@
-import { PRESET_ID } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
+import { PRESET_ID } from '@shinefold/config';
 
 const BAR_SHAPE = 'h-[3px] rounded-platform-bar';
 

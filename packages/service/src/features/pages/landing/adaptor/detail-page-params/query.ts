@@ -1,9 +1,9 @@
-import { q } from '@blog/service/sanity/query/query';
+import { q } from '@shinefold/service/sanity/query/query';
 import {
   LANDING_PAGE_PATH_EXPRESSION,
   pagePathParser,
-} from '@blog/service/shared/expressions/landing-page/landing-page-path';
-import type { TPageQueryPageParams } from '@blog/service/shared/types/page/page-query-page-params';
+} from '@shinefold/service/shared/expressions/landing-page/landing-page-path';
+import type { TPageQueryPageParams } from '@shinefold/service/shared/types/page/page-query-page-params';
 
 export const landingPageParamsQuery = q
   .parameters<TPageQueryPageParams>()

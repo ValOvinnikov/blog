@@ -2,9 +2,9 @@ import {
   routes,
   type TLocaleIsoCode,
   type TMaybeUndefined,
-} from '@blog/config';
-import { service, type TTranslationMap } from '@blog/service';
-import { hasLength, isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/config';
+import { service, type TTranslationMap } from '@shinefold/service';
+import { hasLength, isUndefined } from '@shinefold/utils/primitives';
 import { findListPage } from '@web/utils/find-list-page';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 

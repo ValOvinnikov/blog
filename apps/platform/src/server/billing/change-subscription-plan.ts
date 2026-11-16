@@ -1,7 +1,5 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { PLAN_PRICE_LOOKUP_KEYS } from '@blog/db/constants';
 import {
   BILLING_LOG,
   STRIPE_PRORATION_BEHAVIOR,
@@ -15,6 +13,8 @@ import {
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { planChangeTiming } from '@platform/utils/plan-change-timing/plan-change-timing';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { PLAN_PRICE_LOOKUP_KEYS } from '@shinefold/db/constants';
 import type Stripe from 'stripe';
 
 import type { TSubscriptionPlan } from './load-subscription-plan';

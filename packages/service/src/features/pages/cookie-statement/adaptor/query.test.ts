@@ -1,12 +1,12 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockRawCookieStatementPage } from '@blog/service/testing/pages/fixtures';
+import { faker } from '@faker-js/faker';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockRawCookieStatementPage } from '@shinefold/service/testing/pages/fixtures';
 import {
   mockRawHeadingBlock,
   mockRawSeo,
-} from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 
 import { cookieStatementPageQuery } from './query';
 

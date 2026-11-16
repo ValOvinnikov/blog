@@ -1,4 +1,4 @@
-import type { TMaybeNull } from '@blog/config/types';
+import type { TMaybeNull } from '@shinefold/config/types';
 import { createContext } from 'react';
 import type { SchemaType } from 'sanity';
 

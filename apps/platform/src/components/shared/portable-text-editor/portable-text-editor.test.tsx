@@ -1,5 +1,3 @@
-import { SIZE, VOICE_PORTABLE_TEXT_SCHEMA } from '@blog/config';
-import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { faker } from '@faker-js/faker';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
@@ -11,6 +9,8 @@ import {
   mockTextBlock,
   NUMBER_LIST_ITEM,
 } from '@platform/testing/portable-text-editor/fixtures';
+import { SIZE, VOICE_PORTABLE_TEXT_SCHEMA } from '@shinefold/config';
+import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { PortableTextEditor } from './portable-text-editor';

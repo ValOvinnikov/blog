@@ -1,13 +1,5 @@
 'use client';
 
-import {
-  ALERT_TYPE,
-  isOutcomeRefused,
-  isOutcomeSuccess,
-  SIZE,
-  type TMaybeUndefined,
-} from '@blog/config';
-import { TENANT_PLAN, type TSellableTenantPlan } from '@blog/config/constants';
 import { PlanChoices } from '@platform/components/features/upgrade/plan-choices';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
@@ -18,6 +10,17 @@ import {
 } from '@platform/constants/billing';
 import { type TPlanChoice } from '@platform/constants/plan-change';
 import { createUpgradeCheckoutAction } from '@platform/server/billing/create-upgrade-checkout-action';
+import {
+  ALERT_TYPE,
+  isOutcomeRefused,
+  isOutcomeSuccess,
+  SIZE,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import {
+  TENANT_PLAN,
+  type TSellableTenantPlan,
+} from '@shinefold/config/constants';
 import {
   EmbeddedCheckout,
   EmbeddedCheckoutProvider,

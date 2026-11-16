@@ -1,6 +1,6 @@
-import { SIZE } from '@blog/config';
 import { ASSET_UPLOAD_LAYOUT } from '@platform/constants/asset-upload';
 import { tv } from '@platform/utils/tv/tv';
+import { SIZE } from '@shinefold/config';
 
 const BARE_BUTTON = 'h-8 py-0 text-platform-13 font-semibold';
 

@@ -1,7 +1,7 @@
-import type { TMaybeNull } from '@blog/config';
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import type { TMaybeNull } from '@shinefold/config';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 import {
   MOCK_TENANT_ID,
   MOCK_TENANT_SANITY_CONTEXT,
@@ -33,7 +33,7 @@ const {
   MOCK_SKIM_MODEL: 'claude-haiku-4-5',
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     editorial: {
       skim: {

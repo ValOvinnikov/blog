@@ -1,20 +1,20 @@
-import { CARD_STYLE, LOCALE_ISO_CODES } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
+import { CARD_STYLE, LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   DEFAULT_CONTROL_STYLES,
   MOCK_NOT_FOUND_HEADING,
   MOCK_SITE_CONFIG_FIELDS,
-} from '@blog/db/testing/site-config/fixtures';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/site-config/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { getSiteConfig } from './get-site-config';
 
 faker.seed(6022);
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const MOCK_EN_NOT_FOUND_HEADING = faker.lorem.words(3);
 const MOCK_LOOK_SAVED_AT = faker.date.past();

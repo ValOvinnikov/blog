@@ -2,9 +2,9 @@ import {
   TIMELINE_HORIZONTAL_ITEM_CAP,
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
-} from '@blog/config';
-import type { TTimelineModule } from '@blog/service';
-import { Timeline } from '@blog/ui/components/organisms/timeline';
+} from '@shinefold/config';
+import type { TTimelineModule } from '@shinefold/service';
+import { Timeline } from '@shinefold/ui/components/organisms/timeline';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { PortableText } from '@web/components/shared/portable-text';

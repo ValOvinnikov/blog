@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { TPersonalDataMatches } from '@blog/db/queries/personal-data/find-personal-data';
+import type { TPersonalDataMatches } from '@shinefold/db/queries/personal-data/find-personal-data';
 
 export type TPersonalDataMatchCounts = Record<
   keyof Omit<TPersonalDataMatches, 'emailIndex'> | 'bookmarks',

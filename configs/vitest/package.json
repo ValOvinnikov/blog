@@ -1,5 +1,5 @@
 {
-  "name": "@blog/vitest-config",
+  "name": "@shinefold/vitest-config",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -15,7 +15,7 @@
     "vitest": "catalog:"
   },
   "devDependencies": {
-    "@blog/eslint-config": "workspace:*",
+    "@shinefold/eslint-config": "workspace:*",
     "eslint": "catalog:"
   }
 }

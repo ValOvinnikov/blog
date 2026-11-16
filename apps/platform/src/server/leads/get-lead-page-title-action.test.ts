@@ -1,7 +1,7 @@
-import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import { fetchPageTitle } from './fetch-page-title';
 import { getLeadPageTitleAction } from './get-lead-page-title-action';

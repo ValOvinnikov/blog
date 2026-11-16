@@ -8,7 +8,7 @@
 
 ```
 web → ui, service, db, auth, config, utils
-platform → db, auth, config, utils, studio   (+ @blog/ui, scoped to site-preview/)
+platform → db, auth, config, utils, studio   (+ @shinefold/ui, scoped to site-preview/)
 service → config, utils   (no React, ever)
 db → config, utils        (no React, no Sanity SDK — sibling to service, not a dependent)
 ui → config               (no Sanity, no data fetching — stays publishable)
@@ -25,16 +25,16 @@ TypeScript (Just-in-Time pattern) and are transpiled by the web app via
 
 `platform` (`apps/platform`) never consumes `service` or Sanity — it owns its own
 presentational and interactive primitives, styled from its own token layer
-rather than `@blog/ui`. The one exception is
+rather than `@shinefold/ui`. The one exception is
 `apps/platform/src/components/features/site-preview/`,
 which renders the tenant's real site so the live theme preview doesn't
 drift from `apps/web`; an ESLint `no-restricted-imports` guard in
-`configs/eslint/platform.js` confines `@blog/ui` imports to that directory.
+`configs/eslint/platform.js` confines `@shinefold/ui` imports to that directory.
 
 ## Type flow
 
 ```
-Sanity schema (@blog/studio) ──typegen──► @blog/config ──► @blog/service ──► web ──props──► @blog/ui
+Sanity schema (@shinefold/studio) ──typegen──► @shinefold/config ──► @shinefold/service ──► web ──props──► @shinefold/ui
 ```
 
 One source of truth: a schema change surfaces as a TypeScript error anywhere a
@@ -42,7 +42,7 @@ consumer is out of date.
 
 ## SVG icon imports
 
-`@blog/ui` ships its icon set as raw SVGs under `packages/ui/src/assets/icons/`
+`@shinefold/ui` ships its icon set as raw SVGs under `packages/ui/src/assets/icons/`
 (the design-reference copy that seeded these has been removed — this is the
 sole source now). SVGR turns a bare `.svg` import into
 a typed React component; the `?url` suffix bypasses SVGR and resolves to the
@@ -51,9 +51,9 @@ configured:
 
 - **Next.js/Turbopack** (`configs/next/preset.ts`, the `createNextConfig`
   preset both apps' `next.config.ts` call) — `turbopack.rules` with
-  `@svgr/webpack`, split by a `condition.query` match on `?url`. `@blog/ui`
+  `@svgr/webpack`, split by a `condition.query` match on `?url`. `@shinefold/ui`
   ships from source (each app's `transpilePackages`), so Turbopack sees
-  these imports directly wherever `@blog/ui` is consumed.
+  these imports directly wherever `@shinefold/ui` is consumed.
 - **Storybook** (`packages/ui/.storybook/main.ts`, `apps/web/.storybook/main.ts`)
   and **Vitest** (`packages/ui/vitest.config.ts`, `apps/web/vitest.config.ts`)
   — both Vite-based, so `vite-plugin-svgr` (`include: '**/*.svg'`) handles the
@@ -61,11 +61,11 @@ configured:
   built-in asset-URL handling.
 
 Ambient module types (`declare module '*.svg'` / `'*.svg?url'`) live in
-`packages/ui/src/assets/icons/svg.d.ts`. `@blog/ui`'s own `tsconfig.json`
+`packages/ui/src/assets/icons/svg.d.ts`. `@shinefold/ui`'s own `tsconfig.json`
 picks them up via its `src` include; **`apps/web/tsconfig.json` also globs
-them in** (`../../packages/ui/src/**/*.d.ts`) — `@blog/ui` exports a wildcard
-subpath (`"./*": "./src/*"`), so web's `@blog/ui/*` alias resolves straight to
-`@blog/ui` source, and `tsc` type-checks that source (including any raw
+them in** (`../../packages/ui/src/**/*.d.ts`) — `@shinefold/ui` exports a wildcard
+subpath (`"./*": "./src/*"`), so web's `@shinefold/ui/*` alias resolves straight to
+`@shinefold/ui` source, and `tsc` type-checks that source (including any raw
 `.svg` import it makes) as part of web's own program. TypeScript never picks
 up a global ambient `.d.ts` transitively through import resolution — only via
 each program's own `include` — so both tsconfigs need the glob independently.
@@ -73,4 +73,4 @@ each program's own `include` — so both tsconfigs need the glob independently.
 (unused otherwise — all imagery is remote Sanity CDN URLs) so Next's own
 built-in `declare module '*.svg' { const content: any }` shim
 (`next/image-types/global.d.ts`) never lands in `next-env.d.ts` and conflicts
-with `@blog/ui`'s typed declaration for the same wildcard pattern.
+with `@shinefold/ui`'s typed declaration for the same wildcard pattern.

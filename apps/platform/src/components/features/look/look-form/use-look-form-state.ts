@@ -1,5 +1,3 @@
-import { isAccentHueAccessible, type TTenantPlan } from '@blog/config';
-import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { useToast } from '@platform/context/toast-provider';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
@@ -13,6 +11,8 @@ import {
   isBrandAssetKind,
   listLostStagedFiles,
 } from '@platform/utils/look-form-values/look-form-values';
+import { isAccentHueAccessible, type TTenantPlan } from '@shinefold/config';
+import { toEffectiveLook } from '@shinefold/db/utils/effective-look/effective-look';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 

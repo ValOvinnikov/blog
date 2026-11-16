@@ -1,9 +1,10 @@
-import { NEUTRAL_EMAIL_PALETTE } from '@blog/email/html/neutral-shell/neutral-shell';
+import { faker } from '@faker-js/faker';
+import { NEUTRAL_EMAIL_PALETTE } from '@shinefold/email/html/neutral-shell/neutral-shell';
 import {
   PLATFORM_EMAIL_BRAND,
   PLATFORM_EMAIL_BRAND_NAME,
   PLATFORM_EMAIL_FULL_LOGO,
-} from '@blog/email/html/platform-email-brand/platform-email-brand';
+} from '@shinefold/email/html/platform-email-brand/platform-email-brand';
 import {
   BRAND_HEADER_DIVIDER,
   COPYRIGHT_ENTITY,
@@ -20,13 +21,12 @@ import {
   MOCK_TENANT_NAME,
   MOCK_URL,
   OPERATOR_BRAND_NAME,
-} from '@blog/email/testing/email-fixtures';
+} from '@shinefold/email/testing/email-fixtures';
 import {
   mockLinkedPortableTextBody,
   mockPortableTextBody,
-} from '@blog/email/testing/portable-text-fixtures';
-import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/email/testing/portable-text-fixtures';
+import { MOCK_TENANT_EMAIL_BRAND } from '@shinefold/email/testing/tenant-email-brand';
 
 import { buildMagicLinkEmail } from './magic-link-email';
 

@@ -1,5 +1,5 @@
-import { hasLength } from '@blog/utils/primitives';
 import { Link } from '@platform/i18n/navigation';
+import { hasLength } from '@shinefold/utils/primitives';
 
 import { breadcrumbsVariants } from './breadcrumbs-variants';
 import { CrumbLabel } from './components/crumb-label';

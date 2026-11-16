@@ -1,13 +1,13 @@
-import { FORM_STATUS } from '@blog/config';
-import { renderElement, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { FORM_STATUS } from '@shinefold/config';
+import { renderElement, screen } from '@shinefold/ui/testing/custom-render';
 import {
   MOCK_NEWSLETTER_BUSY_LABEL,
   MOCK_NEWSLETTER_EMAIL_LABEL,
   MOCK_NEWSLETTER_SUBMIT_LABEL,
   MOCK_NEWSLETTER_SUCCESS_MESSAGE,
   makeNewsletterSignupForm,
-} from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/organisms/newsletter-signup/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 

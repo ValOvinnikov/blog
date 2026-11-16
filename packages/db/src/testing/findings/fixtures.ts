@@ -1,16 +1,16 @@
+import { faker } from '@faker-js/faker';
 import {
   CONTRAST_CHECK_OUTCOME,
   FINDING_KIND,
   FINDING_SEVERITY,
   FINDING_SOURCE,
-} from '@blog/config/constants';
-import type { TContrastResultBody } from '@blog/config/types';
+} from '@shinefold/config/constants';
+import type { TContrastResultBody } from '@shinefold/config/types';
 import {
   openFinding,
   type TOpenFindingInput,
-} from '@blog/db/queries/findings/open-finding';
-import type { TFinding } from '@blog/db/schema/findings';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/queries/findings/open-finding';
+import type { TFinding } from '@shinefold/db/schema/findings';
 
 export const MOCK_FINDING_NOW = new Date('2026-10-01T10:00:00Z');
 export const MOCK_FINDING_LATER_AT = new Date('2026-10-02T10:00:00Z');

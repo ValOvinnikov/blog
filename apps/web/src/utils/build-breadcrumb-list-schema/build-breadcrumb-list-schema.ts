@@ -1,4 +1,4 @@
-import type { IBreadcrumbItem } from '@blog/ui/components/molecules/breadcrumbs';
+import type { IBreadcrumbItem } from '@shinefold/ui/components/molecules/breadcrumbs';
 import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';

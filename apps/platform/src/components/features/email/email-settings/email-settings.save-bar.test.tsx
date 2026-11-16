@@ -1,8 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  EMAIL_TEMPLATE_TYPE,
-  LOCALE_ISO_CODES,
-} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';
 import { ARIA_SELECTED } from '@platform/testing/aria';
@@ -35,6 +30,11 @@ import {
   SAVE_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
+import {
+  ACTION_OUTCOME,
+  EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
+} from '@shinefold/config';
 import type { UserEvent } from '@testing-library/user-event';
 
 import { EmailSettings } from './email-settings';

@@ -1,7 +1,5 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { isOneOf } from '@blog/utils/primitives';
 import {
   BILLED_INVOICE_STATUSES,
   BILLING_INVOICE_LIMIT,
@@ -10,6 +8,8 @@ import {
   type TBilledInvoiceStatus,
 } from '@platform/constants/billing';
 import type { TStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { isOneOf } from '@shinefold/utils/primitives';
 import Stripe from 'stripe';
 
 import { fromStripeTime } from './stripe-time';

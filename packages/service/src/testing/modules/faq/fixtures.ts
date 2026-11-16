@@ -1,11 +1,11 @@
-import { BRAND_VARIANT } from '@blog/config';
-import type { TRawFaqModule } from '@blog/service/features/modules/faq/adaptor/transformer';
+import { BRAND_VARIANT } from '@shinefold/config';
+import type { TRawFaqModule } from '@shinefold/service/features/modules/faq/adaptor/transformer';
 import {
   MOCK_SECOND_FAQ_QUESTION_ID,
   mockRawFaqQuestionItem,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { mockRawModuleAppearance } from '@blog/service/testing/shared/module-appearance';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 export function mockRawFaqModule(
   overrides: Partial<TRawFaqModule> = {},

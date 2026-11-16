@@ -1,13 +1,13 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { isNull } from '@blog/utils/primitives';
-import {
-  isReleaseVersionGreater,
-  parseReleaseVersion,
-} from '@blog/utils/version';
 import { type TGitHubFailure, GITHUB_LOG } from '@platform/constants/github';
 import { RELEASE_FAILURE } from '@platform/constants/release';
 import { logger } from '@platform/utils/logger/logger';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { isNull } from '@shinefold/utils/primitives';
+import {
+  isReleaseVersionGreater,
+  parseReleaseVersion,
+} from '@shinefold/utils/version';
 import { z } from 'zod';
 
 import { fetchGitHubJson } from './fetch-github';

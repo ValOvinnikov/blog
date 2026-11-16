@@ -1,9 +1,9 @@
 'use client';
 
-import type { TControlAria, TControlLock, TMaybeNull } from '@blog/config';
 import type { TDecorativeGlyphProps } from '@platform/components/shared/decorative-glyph';
 import { Select } from '@platform/components/shared/select';
 import type { TSelectAppearance } from '@platform/constants/select-appearance';
+import type { TControlAria, TControlLock, TMaybeNull } from '@shinefold/config';
 
 type TOptionSelectOption<TValue extends string> = Pick<
   TDecorativeGlyphProps,

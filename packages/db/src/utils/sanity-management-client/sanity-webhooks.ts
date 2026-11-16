@@ -1,7 +1,7 @@
-import { HTTP_METHOD, SANITY_WEBHOOK_OPERATION } from '@blog/config';
-import type { TMaybeNull } from '@blog/config/types';
-import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
-import { sanityWebhooksRequest } from '@blog/db/utils/sanity-management-client/sanity-webhooks-request';
+import { HTTP_METHOD, SANITY_WEBHOOK_OPERATION } from '@shinefold/config';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { SANITY_API_PATH } from '@shinefold/db/utils/sanity-management-client/sanity-api-paths';
+import { sanityWebhooksRequest } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks-request';
 
 // `before()` is null on a create, so `previousSlug` is too.
 export const REVALIDATE_WEBHOOK_PROJECTION =

@@ -1,6 +1,3 @@
-import { RELEASE_CHANGE } from '@blog/config';
-import { queries } from '@blog/db';
-import { okResult } from '@blog/utils';
 import {
   CONTRAST_STATUS,
   CONTRAST_WORKFLOW_FILE,
@@ -8,6 +5,9 @@ import {
 } from '@platform/constants/release';
 import { compareCommits } from '@platform/server/github/compare-commits';
 import { isWorkflowRunActive } from '@platform/server/github/is-workflow-run-active';
+import { RELEASE_CHANGE } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { okResult } from '@shinefold/utils';
 
 import { classifyReleaseChanges } from './classify-release-changes';
 import {

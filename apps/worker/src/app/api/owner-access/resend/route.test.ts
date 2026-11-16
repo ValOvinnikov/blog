@@ -1,6 +1,6 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { getTenantById } from '@blog/db/queries/tenants';
 import { faker } from '@faker-js/faker';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { getTenantById } from '@shinefold/db/queries/tenants';
 import {
   MOCK_ENQUEUE_SECRET,
   MOCK_WORKER_ORIGIN,
@@ -27,7 +27,7 @@ const MOCK_RESEND_URL = `${MOCK_WORKER_ORIGIN}/api/owner-access/resend`;
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/units/resend-owner-invite');
 vi.mock('@worker/utils/owner-access-run/owner-access-run');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 
 function resendRequest(body: Record<string, string> = {}): Request {
   return mockSignedRequest(

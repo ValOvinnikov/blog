@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { SANITY_PERSPECTIVE } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { SANITY_PERSPECTIVE } from '@shinefold/config/constants';
 import {
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query/query';
-import { toPublishedId } from '@blog/utils/sanity-document-id';
+} from '@shinefold/service/sanity/query/query';
+import { toPublishedId } from '@shinefold/utils/sanity-document-id';
 
 import { draftPagePathQuery } from './query';
 import { toDraftPagePath } from './transformer';

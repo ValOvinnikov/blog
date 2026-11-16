@@ -1,8 +1,8 @@
 'use client';
 
-import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import type { IAccountControl } from '@blog/config';
-import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
+import type { TOAuthProviderId } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import type { IAccountControl } from '@shinefold/config';
+import { PopoverMenu } from '@shinefold/ui/components/molecules/popover-menu';
 import {
   ReaderAccountPanel,
   useReaderAccount,

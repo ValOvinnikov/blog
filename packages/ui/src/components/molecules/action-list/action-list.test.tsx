@@ -1,5 +1,5 @@
-import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 
 import { ActionList } from './action-list';
 

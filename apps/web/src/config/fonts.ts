@@ -1,4 +1,4 @@
-import { FONT_CHOICE, type TFontChoice } from '@blog/config';
+import { FONT_CHOICE, type TFontChoice } from '@shinefold/config';
 
 import { frauncesBody } from './font-loaders/fraunces-body-font';
 import { fraunces } from './font-loaders/fraunces-font';

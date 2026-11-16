@@ -1,13 +1,13 @@
-import { CONTENT_ALIGNMENT } from '@blog/config/constants';
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
-import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { logoItemSchema } from '@blog/studio/schema-types/objects/logo-item/logo-item';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
+import { CONTENT_ALIGNMENT } from '@shinefold/config/constants';
+import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { displayModeField } from '@shinefold/studio/schema-types/fields/display-mode-field/display-mode-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { layoutField } from '@shinefold/studio/schema-types/objects/layout/layout-field';
+import { logoItemSchema } from '@shinefold/studio/schema-types/objects/logo-item/logo-item';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Images } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 

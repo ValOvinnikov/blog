@@ -1,6 +1,10 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT, PRICE_PERIOD } from '@blog/config';
-import { BILLING_CURRENCY } from '@blog/db/constants';
-import { MOCK_EURO_AMOUNT } from '@blog/db/testing/stripe-catalogue/fixtures';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  PRICE_PERIOD,
+} from '@shinefold/config';
+import { BILLING_CURRENCY } from '@shinefold/db/constants';
+import { MOCK_EURO_AMOUNT } from '@shinefold/db/testing/stripe-catalogue/fixtures';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import {

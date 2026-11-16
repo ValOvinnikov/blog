@@ -1,8 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   fetchFailSafe,
   getDraftsClient,
-} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+} from '@shinefold/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
 const FAIL_SAFE_ASSUMES_REFERENCED = 1;

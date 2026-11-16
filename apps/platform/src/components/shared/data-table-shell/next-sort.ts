@@ -1,5 +1,5 @@
-import { SORT_DIRECTION } from '@blog/config';
-import type { TColumnSort } from '@blog/config/types';
+import { SORT_DIRECTION } from '@shinefold/config';
+import type { TColumnSort } from '@shinefold/config/types';
 
 export const nextSort = <TColumn>(
   current: TColumnSort<TColumn>,

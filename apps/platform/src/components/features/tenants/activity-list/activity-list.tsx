@@ -1,12 +1,3 @@
-import {
-  AUDIT_ACTION,
-  GITHUB_AUDIT_ACTOR_ID_PREFIX,
-  ICONS,
-  type TAuditAction,
-  WORKER_AUDIT_ACTOR_ID,
-} from '@blog/config';
-import type { TListedAuditEvent } from '@blog/db/queries/audit-events';
-import { hasArrayGotItems } from '@blog/utils/primitives';
 import { ActivityDetails } from '@platform/components/features/tenants/activity-list/components/activity-details/activity-details';
 import { toActivityDetails } from '@platform/components/features/tenants/activity-list/to-activity-details';
 import { CardList } from '@platform/components/shared/card-list';
@@ -15,6 +6,15 @@ import {
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
+import {
+  AUDIT_ACTION,
+  GITHUB_AUDIT_ACTOR_ID_PREFIX,
+  ICONS,
+  type TAuditAction,
+  WORKER_AUDIT_ACTOR_ID,
+} from '@shinefold/config';
+import type { TListedAuditEvent } from '@shinefold/db/queries/audit-events';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { activityListVariants } from './activity-list-variants';

@@ -1,5 +1,5 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';

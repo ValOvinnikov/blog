@@ -1,4 +1,4 @@
-import { DEPTH } from '@blog/config';
+import { DEPTH } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
 import { DepthProvider } from '@web/context/depth-provider';

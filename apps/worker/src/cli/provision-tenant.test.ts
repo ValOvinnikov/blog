@@ -1,13 +1,13 @@
-import { ERROR_CODE } from '@blog/config/constants';
+import { ERROR_CODE } from '@shinefold/config/constants';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   beginTenantProvisioning,
   setTenantProvisioningStatus,
-} from '@blog/db/queries/tenants';
-import { errorResult, okResult } from '@blog/utils/result';
+} from '@shinefold/db/queries/tenants';
+import { errorResult, okResult } from '@shinefold/utils/result';
 import { PROVISION_CLI_RESULT } from '@worker/constants/provisioning';
 import { MOCK_REGISTRY_UNREACHABLE } from '@worker/testing/outage/fixtures';
 import { mockTenant, MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
@@ -16,7 +16,7 @@ import { runProvisioningSequence } from '@worker/workflows/provisioning-sequence
 import { provisionTenantOnce } from './provision-tenant';
 
 vi.mock('@worker/workflows/provisioning-sequence');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 
 describe(provisionTenantOnce, () => {
   beforeEach(() => {

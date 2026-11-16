@@ -4,9 +4,9 @@ import {
   isLocaleIsoCode,
   type TLocaleIsoCode,
   type TMaybeNull,
-} from '@blog/config';
-import type { TListedLead } from '@blog/db/queries/leads';
-import { isNull } from '@blog/utils/primitives';
+} from '@shinefold/config';
+import type { TListedLead } from '@shinefold/db/queries/leads';
+import { isNull } from '@shinefold/utils/primitives';
 
 export type TInboxLead = Pick<
   TListedLead,

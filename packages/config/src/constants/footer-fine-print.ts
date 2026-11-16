@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const FOOTER_FINE_PRINT_KIND = {
   LINK: 'LINK',

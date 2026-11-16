@@ -1,4 +1,3 @@
-import { BILLING_CURRENCY, STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import {
   MOCK_DOLLAR_AMOUNT,
   MOCK_EURO_AMOUNT,
@@ -7,6 +6,10 @@ import {
   mockStripeCataloguePrice,
 } from '@platform/testing/billing/catalogue';
 import { MOCK_STRIPE_PRICE_ID } from '@platform/testing/billing/fixtures';
+import {
+  BILLING_CURRENCY,
+  STRIPE_PRICE_LOOKUP_KEY,
+} from '@shinefold/db/constants';
 
 import { toCataloguePrice } from './to-catalogue-price';
 

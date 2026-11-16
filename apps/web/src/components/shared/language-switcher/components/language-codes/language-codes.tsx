@@ -1,6 +1,6 @@
 'use client';
 
-import { TextLink } from '@blog/ui/components/atoms/text-link';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import type { TLanguageEntry } from '@web/components/shared/language-switcher/to-language-entries';
 
 import { languageCodesVariants } from './language-codes-variants';

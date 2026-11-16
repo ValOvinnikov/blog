@@ -1,6 +1,6 @@
-import { isString } from '@blog/utils/primitives';
 import type { TVoiceDraftValue } from '@platform/utils/voice-draft/voice-draft';
 import { isVoicePlainCopyOf } from '@platform/utils/voice-portable-text/voice-portable-text';
+import { isString } from '@shinefold/utils/primitives';
 
 export const withoutDefaultCopy = (
   value: TVoiceDraftValue,

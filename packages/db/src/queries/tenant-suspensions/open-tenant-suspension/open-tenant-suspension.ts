@@ -1,9 +1,9 @@
-import { getDb } from '@blog/db/client';
-import type { TSuspensionCategory } from '@blog/db/constants';
+import { getDb } from '@shinefold/db/client';
+import type { TSuspensionCategory } from '@shinefold/db/constants';
 import {
   tenantSuspensions,
   type TTenantSuspension,
-} from '@blog/db/schema/tenant-suspensions';
+} from '@shinefold/db/schema/tenant-suspensions';
 
 export type TOpenTenantSuspensionInput = {
   tenantId: string;

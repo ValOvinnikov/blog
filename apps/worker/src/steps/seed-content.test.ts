@@ -1,15 +1,15 @@
+import { faker } from '@faker-js/faker';
 import {
   buildStarterDocuments,
   SANITY_ROBOT_ROLE,
   STUDIO_MIGRATION_IDS,
   type TStarterSiteType,
-} from '@blog/config';
-import { SITE_TYPE } from '@blog/config/constants';
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
-import { setTenantSanityWriteTokenAndSeededAt } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { buildSanityTokenLabels } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { SITE_TYPE } from '@shinefold/config/constants';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
+import { setTenantSanityWriteTokenAndSeededAt } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { buildSanityTokenLabels } from '@shinefold/db/utils/sanity-management-client/sanity-token-labels';
 import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
 import {
   MOCK_DB_DOWN,
@@ -34,7 +34,7 @@ import { seedTenantContent, type TSeedContentDeps } from './seed-content';
 
 faker.seed(7007);
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 const MOCK_WRITE_TOKEN = faker.string.alphanumeric(32);

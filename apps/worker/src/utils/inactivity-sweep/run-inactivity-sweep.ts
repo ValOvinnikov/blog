@@ -1,9 +1,12 @@
-import { INACTIVITY_STAGE, type TInactivityStage } from '@blog/db/constants';
-import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
-import { listTenantsDueForInactivityStage } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isPlatformTenant } from '@blog/db/utils/is-platform-tenant/is-platform-tenant';
-import { sanitizeLogMessage } from '@blog/insight';
+import {
+  INACTIVITY_STAGE,
+  type TInactivityStage,
+} from '@shinefold/db/constants';
+import { listTenantHosts } from '@shinefold/db/queries/tenant-domains/list-tenant-hosts';
+import { listTenantsDueForInactivityStage } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isPlatformTenant } from '@shinefold/db/utils/is-platform-tenant/is-platform-tenant';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { logger } from '@worker/utils/logger/logger';
 

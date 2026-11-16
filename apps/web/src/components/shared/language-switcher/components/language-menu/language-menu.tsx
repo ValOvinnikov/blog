@@ -1,8 +1,8 @@
 'use client';
 
-import { ICONS, LANGUAGE_SWITCHER_STYLE, SIZE } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
+import { ICONS, LANGUAGE_SWITCHER_STYLE, SIZE } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { PopoverMenu } from '@shinefold/ui/components/molecules/popover-menu';
 import { headerControlVariants } from '@web/components/shared/header-control';
 import type { TLanguageEntry } from '@web/components/shared/language-switcher/to-language-entries';
 import { usePopover } from '@web/hooks/use-popover';

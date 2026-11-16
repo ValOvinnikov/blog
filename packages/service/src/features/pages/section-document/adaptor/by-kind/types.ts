@@ -1,4 +1,4 @@
-import type { LEGAL_PAGE_KIND, TLegalPageKind } from '@blog/config';
+import type { LEGAL_PAGE_KIND, TLegalPageKind } from '@shinefold/config';
 
 export type TSectionDocumentKind = Exclude<
   TLegalPageKind,

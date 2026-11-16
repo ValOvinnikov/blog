@@ -1,5 +1,5 @@
-import { SITE_TYPE } from '@blog/config';
-import type { TValueOf } from '@blog/config/utils';
+import { SITE_TYPE } from '@shinefold/config';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const SELF_SERVE_SITE_TYPE = {
   BLOG: SITE_TYPE.BLOG,

@@ -1,6 +1,9 @@
-import { SIZE, type TIconName } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { Spinner, type TSpinnerProps } from '@blog/ui/components/atoms/spinner';
+import { SIZE, type TIconName } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import {
+  Spinner,
+  type TSpinnerProps,
+} from '@shinefold/ui/components/atoms/spinner';
 
 import { signInPanelProviderVariants } from './sign-in-panel-provider-variants';
 

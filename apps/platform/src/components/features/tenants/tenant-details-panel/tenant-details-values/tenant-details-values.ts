@@ -1,7 +1,7 @@
-import type { TFieldErrors, TMaybeUndefined } from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
 import type { TTenantDetailsFieldError } from '@platform/server/tenants/tenant-field-error';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
+import type { TFieldErrors, TMaybeUndefined } from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
 
 export type TTenantDetailsValues = {
   name: string;

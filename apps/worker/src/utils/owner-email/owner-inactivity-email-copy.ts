@@ -1,5 +1,8 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
-import { INACTIVITY_STAGE } from '@blog/db/constants';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import { INACTIVITY_STAGE } from '@shinefold/db/constants';
 
 import type { TOwnerInactivityEmailCopy } from './owner-email-copy-types';
 

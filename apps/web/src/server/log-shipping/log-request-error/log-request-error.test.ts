@@ -1,5 +1,5 @@
-import { errorResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { errorResult } from '@shinefold/utils';
 import { REQUEST_LOG } from '@web/constants/request';
 import {
   MOCK_RENDER_ERROR_MESSAGE,

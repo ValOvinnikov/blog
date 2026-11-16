@@ -1,7 +1,7 @@
-import type { TImageLayout } from '@blog/config/constants/image-layout';
-import type { TSocialPlatform } from '@blog/config/constants/link';
-import type { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants/portable-text-block-type';
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TImageLayout } from '@shinefold/config/constants/image-layout';
+import type { TSocialPlatform } from '@shinefold/config/constants/link';
+import type { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config/constants/portable-text-block-type';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 
 export interface ISanityImageHotspot {
   x: number;

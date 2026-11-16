@@ -1,5 +1,5 @@
-import { DISPLAY_MODE } from '@blog/config';
-import type { TLogoWallModule } from '@blog/service';
+import { DISPLAY_MODE } from '@shinefold/config';
+import type { TLogoWallModule } from '@shinefold/service';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';

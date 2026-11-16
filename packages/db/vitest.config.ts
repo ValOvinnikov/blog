@@ -1,6 +1,8 @@
 import { fileURLToPath } from 'node:url';
 
-import preset, { RESET_FILE_STATE_SETUP } from '@blog/vitest-config/preset';
+import preset, {
+  RESET_FILE_STATE_SETUP,
+} from '@shinefold/vitest-config/preset';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 const src = fileURLToPath(new URL('./src', import.meta.url));
@@ -30,10 +32,10 @@ export default mergeConfig(
     },
     resolve: {
       alias: [
-        { find: /^@blog\/db\//, replacement: `${src}/` },
-        { find: /^@blog\/config\//, replacement: `${configSrc}/` },
-        { find: /^@blog\/insight\//, replacement: `${insightSrc}/` },
-        { find: /^@blog\/utils\//, replacement: `${utilsSrc}/` },
+        { find: /^@shinefold\/db\//, replacement: `${src}/` },
+        { find: /^@shinefold\/config\//, replacement: `${configSrc}/` },
+        { find: /^@shinefold\/insight\//, replacement: `${insightSrc}/` },
+        { find: /^@shinefold\/utils\//, replacement: `${utilsSrc}/` },
       ],
     },
   }),

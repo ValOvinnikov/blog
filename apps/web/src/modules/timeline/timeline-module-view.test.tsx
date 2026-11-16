@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   TIMELINE_HORIZONTAL_ITEM_CAP,
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_TIMELINE_HEADING,

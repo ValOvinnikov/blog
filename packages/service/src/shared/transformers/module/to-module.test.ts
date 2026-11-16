@@ -1,10 +1,10 @@
-import type { THeroModuleType } from '@blog/config';
+import type { THeroModuleType } from '@shinefold/config';
 import {
   mockCtaSlotView,
   mockHeroSlotView,
   mockRawCtaRef,
   mockRawHeroRef,
-} from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/pages/fixtures';
 
 import { toHeroSlot, toModule, type TRawModule } from './to-module';
 

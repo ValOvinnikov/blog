@@ -1,5 +1,9 @@
-import { CONTENT_ALIGNMENT, HERO_VARIANT, MEDIA_ORDER } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import {
+  CONTENT_ALIGNMENT,
+  HERO_VARIANT,
+  MEDIA_ORDER,
+} from '@shinefold/config';
+import { tv } from '@shinefold/ui/lib/styling';
 
 export const heroVariants = tv({
   slots: {

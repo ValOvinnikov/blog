@@ -2,16 +2,16 @@ import {
   A_AS_CONST,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
+} from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
   type THeadingLevel,
-} from '@blog/ui/lib/react';
+} from '@shinefold/ui/lib/react';
 import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { TaxonomyCardPosts } from './components/posts/taxonomy-card-posts';

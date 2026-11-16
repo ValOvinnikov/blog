@@ -1,13 +1,13 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { customDomainClaims } from '@blog/db/schema/custom-domain-claims';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { customDomainClaims } from '@shinefold/db/schema/custom-domain-claims';
 import {
   tenantDomains,
   TENANT_DOMAINS_DOMAIN_UNIQUE_NAME,
   type TTenantDomain,
-} from '@blog/db/schema/tenant-domains';
-import { uniqueViolationConstraint } from '@blog/db/utils/constraint-violation/constraint-violation';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/db/schema/tenant-domains';
+import { uniqueViolationConstraint } from '@shinefold/db/utils/constraint-violation/constraint-violation';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { and, eq, sql } from 'drizzle-orm';
 
 // One statement, because `neon-http` has no transactions: the claim's delete

@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 import { buildNotFoundMetadata } from '@web/metadata/not-found-metadata';
 import { getNotFoundContext } from '@web/server/request-context/request-context';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';

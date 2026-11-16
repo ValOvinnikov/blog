@@ -1,11 +1,14 @@
-import { CONTRAST_CHECK_OUTCOME, HTTP_STATUS } from '@blog/config/constants';
-import type { TContrastResultBody } from '@blog/config/types';
-import { queries } from '@blog/db';
 import { CONTRAST_RESULT_LOG } from '@platform/constants/contrast-result';
 import { hasBearerSecret } from '@platform/server/internal-api/has-bearer-secret';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  CONTRAST_CHECK_OUTCOME,
+  HTTP_STATUS,
+} from '@shinefold/config/constants';
+import type { TContrastResultBody } from '@shinefold/config/types';
+import { queries } from '@shinefold/db';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 

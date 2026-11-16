@@ -1,14 +1,17 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { POST_SOURCE, type TPostSource } from '@blog/config/constants';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { PUBLISHED_POST_CONDITION } from '@blog/studio/schema-types/filters/published-post';
-import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { POST_SOURCE, type TPostSource } from '@shinefold/config/constants';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
+import { PUBLISHED_POST_CONDITION } from '@shinefold/studio/schema-types/filters/published-post';
+import { LOCALE_LABEL } from '@shinefold/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import {
   fetchFailSafe,
   getDraftsClient,
-} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
-import { getLiveLanguages } from '@blog/studio/schema-types/validation/live-languages/live-languages';
-import { hasArrayGotMultipleItems, hasLength } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { getLiveLanguages } from '@shinefold/studio/schema-types/validation/live-languages/live-languages';
+import {
+  hasArrayGotMultipleItems,
+  hasLength,
+} from '@shinefold/utils/primitives';
 import { getPublishedId, type ValidationContext } from 'sanity';
 
 const POST_LANGUAGES_QUERY = `[*[_id == $id][0].${LANGUAGE_FIELD}] + *[_id in *[_type == "translation.metadata" && references($id)][0].translations[].value._ref && ${PUBLISHED_POST_CONDITION}].${LANGUAGE_FIELD}`;

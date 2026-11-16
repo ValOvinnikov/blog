@@ -1,5 +1,3 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { isOneOf } from '@blog/utils/primitives';
 import { DEVICE_FRAME_VIEWPORT_ATTRIBUTE } from '@platform/constants/device-frame';
 import {
   SAMPLE_PART,
@@ -7,6 +5,8 @@ import {
   SAMPLE_PART_ITEMS_ATTRIBUTE,
   type TSamplePart,
 } from '@platform/constants/sample-part';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { isOneOf } from '@shinefold/utils/primitives';
 import { useEffect, useState, type RefObject } from 'react';
 
 type TPartBox = {

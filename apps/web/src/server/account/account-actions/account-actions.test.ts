@@ -1,6 +1,6 @@
-import { ACTION_OUTCOME, ERROR_CODE } from '@blog/config';
-import { queries } from '@blog/db';
-import { errorResult, okResult } from '@blog/utils';
+import { ACTION_OUTCOME, ERROR_CODE } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { errorResult, okResult } from '@shinefold/utils';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { arrangeNoSessionOnce } from '@web/testing/shared/session/arrange-no-session-once';
 import { MOCK_USER_ID } from '@web/testing/shared/session/fixtures';
@@ -9,7 +9,7 @@ import { deleteAccountAction } from './account-actions';
 
 vi.mock('@web/server/auth/auth');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { account: { deleteAccount: vi.fn() } },
 }));
 

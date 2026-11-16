@@ -1,4 +1,4 @@
-import { PRESET_ID, type TPresetId } from '@blog/config/constants';
+import { PRESET_ID, type TPresetId } from '@shinefold/config/constants';
 
 export type TSiteThemeGlobals = {
   preset: TPresetId;

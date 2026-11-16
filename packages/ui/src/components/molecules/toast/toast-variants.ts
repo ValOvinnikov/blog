@@ -1,5 +1,5 @@
-import { TOAST_TYPE } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import { TOAST_TYPE } from '@shinefold/config';
+import { tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const toastVariants = tv({

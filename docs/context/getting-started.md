@@ -44,11 +44,11 @@ origins at [manage.sanity.io](https://manage.sanity.io).
 | `pnpm test:watch` | Vitest in watch mode                                |
 | `pnpm type-check` | `tsc --noEmit` across the graph                     |
 | `pnpm lint`       | ESLint across packages                              |
-| `pnpm typegen`    | Regenerate Sanity types into `@blog/config`         |
+| `pnpm typegen`    | Regenerate Sanity types into `@shinefold/config`    |
 | `pnpm format`     | Prettier write                                      |
 
 Scope to one workspace with `pnpm --filter <name>`, e.g.
-`pnpm --filter web dev` or `pnpm --filter @blog/ui test`.
+`pnpm --filter web dev` or `pnpm --filter @shinefold/ui test`.
 
 ## Dev ports
 

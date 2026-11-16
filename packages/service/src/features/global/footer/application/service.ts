@@ -1,6 +1,6 @@
-import { getFooter } from '@blog/service/features/global/footer/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getFooter } from '@shinefold/service/features/global/footer/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createFooterService() {
   return {

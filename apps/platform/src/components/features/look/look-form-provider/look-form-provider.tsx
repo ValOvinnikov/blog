@@ -1,8 +1,5 @@
 'use client';
 
-import type { TMaybeUndefined, TPresetId } from '@blog/config';
-import type { IWithChildren } from '@blog/config/react';
-import type { TLookField } from '@blog/db/constants';
 import type { TLookCard } from '@platform/constants/look-card';
 import type { TPreviewDevice } from '@platform/constants/preview';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
@@ -11,6 +8,9 @@ import type {
   TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
 import type { TPresetSeededField } from '@platform/utils/look-preset/look-preset';
+import type { TMaybeUndefined, TPresetId } from '@shinefold/config';
+import type { IWithChildren } from '@shinefold/config/react';
+import type { TLookField } from '@shinefold/db/constants';
 import { createContext, useContext } from 'react';
 
 export type TLookFormContext = {

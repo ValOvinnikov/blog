@@ -1,5 +1,5 @@
-import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
 import { MOCK_TENANT_SLUG } from '@platform/testing/tenants/fixtures';
+import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
 
 import {
   ARCHIVED_PARAM_ON,

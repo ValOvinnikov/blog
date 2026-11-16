@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT, GRID_COLUMNS } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  GRID_COLUMNS,
+} from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { TopicChipList } from '@web/components/shared/topic-chip-list';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';

@@ -22,7 +22,7 @@ on the public site or the platform yet).
 | [Plans and entitlements](plans-and-entitlements.md)                   | partial | config, db, studio, web, platform         | A tenant's `FREE` or `GROWTH` plan caps which capabilities, how many languages and which platform pages it gets.                                                 |
 | [Platform shell](platform-shell.md)                                   | built   | platform, db, auth, config                | The sidebar, topbar and content column every signed-in `apps/platform` page renders inside, in three gated trees.                                                |
 | [Platform sign-in and onboarding](platform-sign-in-and-onboarding.md) | built   | platform, auth, db, email, config, worker | How a person gets into `apps/platform` and into a workspace: one `/sign-in`, a `/signup` page, and `/onboarding`, which creates a site as a 14-day Growth trial. |
-| [Embedded Studio](embedded-studio.md)                                 | built   | studio, platform, db, config              | One Studio from `@blog/studio`, mounted in the platform per tenant and pointed at that tenant's Sanity project.                                                  |
+| [Embedded Studio](embedded-studio.md)                                 | built   | studio, platform, db, config              | One Studio from `@shinefold/studio`, mounted in the platform per tenant and pointed at that tenant's Sanity project.                                             |
 | [Audit events and findings](audit-and-findings.md)                    | partial | db, platform, config                      | An append-only log of who did what to a tenant, and open/resolved conditions an operator should act on.                                                          |
 | [Operator alerts](operator-alerts.md)                                 | built   | platform, email, db, config               | Emails SUPERADMINs when a background job finds a tenant needing a human, such as stuck Sanity access.                                                            |
 | [Data requests](data-requests.md)                                     | built   | db, platform, config                      | A SUPERADMIN finds, exports and erases what is still stored about a person, by email address.                                                                    |
@@ -95,12 +95,12 @@ on the public site or the platform yet).
 
 ## Delivery
 
-| Page                                              | Status  | Layers                                 | One-line purpose                                                                                         |
-| ------------------------------------------------- | ------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| [Rendering and caching](rendering-and-caching.md) | built   | service, web, config, platform, db     | Pages render on first request and are cached; a signed publish webhook expires the affected tags.        |
-| [SEO and feeds](seo-and-feeds.md)                 | built   | studio, service, web                   | Every page emits its authored metadata and `hreflang` alternates, with structured data and feeds.        |
-| [Email](email.md)                                 | partial | email, db, auth, web, platform, config | Every email is built and sent by `@blog/email`; tenant mail carries the tenant's look and editable copy. |
-| [Client error capture](client-error-capture.md)   | built   | web                                    | Browser-side failures are reported to the site's own endpoint and written to the server log.             |
+| Page                                              | Status  | Layers                                 | One-line purpose                                                                                              |
+| ------------------------------------------------- | ------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| [Rendering and caching](rendering-and-caching.md) | built   | service, web, config, platform, db     | Pages render on first request and are cached; a signed publish webhook expires the affected tags.             |
+| [SEO and feeds](seo-and-feeds.md)                 | built   | studio, service, web                   | Every page emits its authored metadata and `hreflang` alternates, with structured data and feeds.             |
+| [Email](email.md)                                 | partial | email, db, auth, web, platform, config | Every email is built and sent by `@shinefold/email`; tenant mail carries the tenant's look and editable copy. |
+| [Client error capture](client-error-capture.md)   | built   | web                                    | Browser-side failures are reported to the site's own endpoint and written to the server log.                  |
 
 ## Planned
 

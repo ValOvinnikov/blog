@@ -1,12 +1,12 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   getDefaultLanguage,
   setDefaultLanguage,
-} from '@blog/studio/schema-types/validation/default-language/default-language';
-import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
-import { mockLocalizedValue } from '@blog/studio/testing/mock-documents';
-import { MOCK_VALIDATION_MESSAGE } from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/schema-types/validation/default-language/default-language';
+import { validateDefaultLanguageFilled } from '@shinefold/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { mockLocalizedValue } from '@shinefold/studio/testing/mock-documents';
+import { MOCK_VALIDATION_MESSAGE } from '@shinefold/studio/testing/mock-validation-context';
 
 faker.seed(6026);
 

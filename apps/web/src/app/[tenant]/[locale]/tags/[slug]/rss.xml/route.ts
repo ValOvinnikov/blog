@@ -1,9 +1,9 @@
-import { type ITenantLocalizedParams, routes } from '@blog/config';
+import { type ITenantLocalizedParams, routes } from '@shinefold/config';
 import {
   service,
   type TFeedPost,
   type TTenantSanityContext,
-} from '@blog/service';
+} from '@shinefold/service';
 import { getFeedContext } from '@web/server/feed/get-feed-context/get-feed-context';
 import { buildRssFeed } from '@web/utils/build-rss-feed';
 import { logger } from '@web/utils/logger/logger';

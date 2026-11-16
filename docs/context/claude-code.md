@@ -19,31 +19,31 @@ contracts:
     constants live, and which one-line idioms never get a helper.
   - `studio` — Sanity schemas, content modelling, typegen, and the `StudioMount` component `apps/platform` renders.
   - `service` — Sanity client, GROQ, typed fetchers (no React).
-  - `db` — `packages/db` (`@blog/db`): Neon Postgres + Drizzle, the
+  - `db` — `packages/db` (`@shinefold/db`): Neon Postgres + Drizzle, the
     relational sibling to `service` (Auth.js users and sessions, tenants,
     memberships, admins, site config, subscribers, bookmarks, audit events,
     findings; comments and ratings are planned, with no tables yet); never
     React, never Sanity outside its provisioning CLI, consumed by the two
-    apps (`web`, `platform`) and by `@blog/auth`; owns the
+    apps (`web`, `platform`) and by `@shinefold/auth`; owns the
     `drizzle-kit generate`/`migrate`
     schema-migration workflow.
-  - `auth` — `packages/auth` (`@blog/auth`): the Auth.js configuration both
+  - `auth` — `packages/auth` (`@shinefold/auth`): the Auth.js configuration both
     apps pass to their own `NextAuth()` call (providers, the Drizzle adapter,
     session strategy, cookie options). A thin layer above `db`, which owns the
     adapter tables — and `db` must never import it. It exports configuration,
     never a constructed NextAuth instance, so each app keeps its own request
     context. Establishes identity only; authorization stays each app's call.
-  - `ui` — building the pure, publishable `@blog/ui` design system.
+  - `ui` — building the pure, publishable `@shinefold/ui` design system.
   - `web` — App Router routes, SEO, composition of `ui` + `service` + `db`.
   - `platform-app` — `apps/platform`, the platform, the operator and tenant app: a second Next.js
     app with its own deployment and domain, gated by the session `apps/web`
     already issues. A sibling to `web`, not a step after it — its upstreams are
-    `config`, `db` and `auth` (with `@blog/ui` confined to `site-preview/`), so
+    `config`, `db` and `auth` (with `@shinefold/ui` confined to `site-preview/`), so
     it never waits on `studio`/`service`, which it must not import. Interactive
     primitives come from Base UI installed in that app and styled from its own
     `platform-*` tokens; reusable blocks are built on them per
     `platform-ui-practices` and placed per `react-component-practices` →
-    "Where a component lives", and nothing is added to `@blog/ui` for it. Its
+    "Where a component lives", and nothing is added to `@shinefold/ui` for it. Its
     "Start here" names the
     three platform design documents — the product-design spec (intent), the
     interactive mock (approved information architecture and layout), and the
@@ -67,10 +67,10 @@ contracts:
     with fixed ids, a timeout on every external call, concurrency on
     `beginTenantProvisioning`'s row guard — because each is a failure that
     passes every test until a run is retried.
-  - `email` owns `packages/email` (`@blog/email`) — the single home for every
+  - `email` owns `packages/email` (`@shinefold/email`) — the single home for every
     email the product sends: the shared branded HTML shell, the canonical
     `escapeHtml`, and the typed `sendEmail` Resend transport. It sits low in
-    the graph (`@blog/config` and `@blog/utils` only) so both apps and `@blog/auth` can all
+    the graph (`@shinefold/config` and `@shinefold/utils` only) so both apps and `@shinefold/auth` can all
     consume it without a cycle, and it is side-effecting by
     design — it owns the send call — while never logging and never resolving
     tenants or fetching content itself. Its own agent exists because HTML email
@@ -100,7 +100,7 @@ contracts:
     `packages/ui/COMPONENTS.md`, and at `CLAUDE.md`'s **Reuse a const; never
     retype its value**: check the index before writing a literal, and turn a
     value written a second time into a const, tests included. `insight` sits
-    below `@blog/config`, so for it only the second half
+    below `@shinefold/config`, so for it only the second half
     applies. `explore` lists the index among its first stops;
     `testing-practices` and `code-review-practices` carry the test and review
     sides. Lint enforces it on touched files (the `BLOG_LINT_TOUCHED` rules
@@ -126,7 +126,7 @@ contracts:
     `expect(screen.…)` queries, which the skill bans. The ban covers
     interactions too (`user.click(screen.getByRole(…))`), and solo sessions
     kept shipping that half after the prose named it, so the touched-file
-    rule `blog-test/no-nested-query` now fails both (#6202);
+    rule `shinefold-test/no-nested-query` now fails both (#6202);
     `code-review-practices`' scan stays as a check for suppressions.
   - The same eleven, and `test-writer`, list a required **Reuse** item right
     after it: for each const, literal value, fixture, builder, fake or helper
@@ -414,8 +414,8 @@ file` are all denied alike) — an earlier version only handled the
     directory cannot be found" line out of the feedback. It sets
     `BLOG_LINT_TOUCHED=1`, which switches on the touched-file rules
     (`prefer-shared-constant`, `no-duplicate-string`,
-    `no-failing-comment`, `blog-test/no-nested-query`,
-    `blog-test/prefer-before-each`) that
+    `no-failing-comment`, `shinefold-test/no-nested-query`,
+    `shinefold-test/prefer-before-each`) that
     repo-wide
     `pnpm lint` leaves off; `.husky/pre-commit` sets it for lint-staged the
     same way. After ESLint it runs `scripts/check-file-size.mjs` on the file
@@ -661,7 +661,7 @@ file` are all denied alike) — an earlier version only handled the
   (each with a `create()` visitor). They sit alongside two `no-restricted-imports` helpers
   that are configuration rather than rules: `no-upstream-imports.js`, a
   flat-config preset blocking a base-of-the-graph package from importing
-  `@blog/service`/`@blog/ui`, and `no-vitest-globals-import.js`, a shared
+  `@shinefold/service`/`@shinefold/ui`, and `no-vitest-globals-import.js`, a shared
   `paths` entry banning redundant value imports of Vitest's globals, which
   every config declaring its own `no-restricted-imports` must spread in —
   flat config replaces a rule's options wholesale rather than merging them.
@@ -670,7 +670,7 @@ file` are all denied alike) — an earlier version only handled the
   surfaces their violations in the same turn as the edit, so a convention
   breach is corrected before it reaches review:
   - `no-prop-spread.js` — bans `{...rest}` spread onto a JSX element in
-    `@blog/ui`. Registered in `ui.js` only. `@blog/ui` prop types are closed
+    `@shinefold/ui`. Registered in `ui.js` only. `@shinefold/ui` prop types are closed
     and enumerated, so a spread promises a surface `tv()` never styles: the
     bug that motivated it was a `TextInput` accepting every native `<input>`
     attribute while visibly honouring almost none of them. The six
@@ -693,7 +693,7 @@ file` are all denied alike) — an earlier version only handled the
     (`invalid?: TTextInputVariants['invalid']`) is `boolean` at runtime but
     is not a `boolean` _annotation_, so the rule cannot see it — resolving
     that needs the type information this repo does not enable. Seven such
-    props exist in `@blog/ui`; renaming them is tracked in issue #1739.
+    props exist in `@shinefold/ui`; renaming them is tracked in issue #1739.
 
   Both carry `RuleTester` unit coverage (`*.test.js`, run by `configs/eslint`'s
   `node --test` script, which `pnpm test` picks up).
@@ -735,7 +735,7 @@ file` are all denied alike) — an earlier version only handled the
     copy — that directory holds pnpm's content-addressed `.pnpm` store, i.e.
     every external package;
   - each workspace `node_modules` is a tiny **copy of pnpm's symlink farm**
-    (`cp -RP`). pnpm's links are relative, so `@blog/*` resolve to the
+    (`cp -RP`). pnpm's links are relative, so `@shinefold/*` resolve to the
     _worktree's own source_ while external packages resolve through the root
     symlink into the primary checkout's store. A fresh worktree costs ~80 MB
     (source + farms) instead of ~1.2 GB, and removal is fast.
@@ -757,7 +757,7 @@ file` are all denied alike) — an earlier version only handled the
   - Why not the harness's `worktree.symlinkDirectories` setting: it can only
     symlink whole directories, which works for the root but would point the
     workspace-level `node_modules` at the primary checkout — and their
-    `@blog/*` links would then resolve to the _primary checkout's source_,
+    `@shinefold/*` links would then resolve to the _primary checkout's source_,
     silently building stale code. The `post-checkout` hook produces the
     farm copies the pnpm layout needs, covers manually created worktrees
     too, and keeps a single mechanism in charge.
@@ -858,13 +858,13 @@ file` are all denied alike) — an earlier version only handled the
     files, so it only fills the gaps).
 
 - **Skills** (`.claude/skills/`):
-  - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work. It also holds the orchestrator rules `CLAUDE.md` only points at — "Planning work — mandatory, not advisory", "Mid-task decisions", "Use the scoped agents" (dispatch order, background dispatch), "Migrations", "Check for Voice candidates", "Docs that ship with the change", "Skills by task" and "What `pnpm verify` runs" — so layer agents do not load them with every dispatch. The worktree and scratchpad removal procedure is the on-demand `worktree-cleanup.md` beside it, read only at §8. Its Voice check lists every new or reworded public-site string, including the copy a new `@blog/ui` text prop will carry, as the plan's **Copy** line. The user settles whether each one is tenant-editable. The `web` and `ui` agents report unclassified strings under **Voice candidates**, and the reviewer lists them (`develop-feature` "Check for Voice candidates"). Its plan also carries a **Manual test** line: a change to what a page shows or how it behaves files a manual-test issue with its tickets (§2 "Manual-test issue"), and a **Cost** line: every new cron, Workflow run, paid API call, Blob/KV use or hot-path query with its volume and free-allowance fit, or "none". Every ticket's `## Scope` names its `Feature doc:`, plus a `Cost:` line when it adds one of those.
+  - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work. It also holds the orchestrator rules `CLAUDE.md` only points at — "Planning work — mandatory, not advisory", "Mid-task decisions", "Use the scoped agents" (dispatch order, background dispatch), "Migrations", "Check for Voice candidates", "Docs that ship with the change", "Skills by task" and "What `pnpm verify` runs" — so layer agents do not load them with every dispatch. The worktree and scratchpad removal procedure is the on-demand `worktree-cleanup.md` beside it, read only at §8. Its Voice check lists every new or reworded public-site string, including the copy a new `@shinefold/ui` text prop will carry, as the plan's **Copy** line. The user settles whether each one is tenant-editable. The `web` and `ui` agents report unclassified strings under **Voice candidates**, and the reviewer lists them (`develop-feature` "Check for Voice candidates"). Its plan also carries a **Manual test** line: a change to what a page shows or how it behaves files a manual-test issue with its tickets (§2 "Manual-test issue"), and a **Cost** line: every new cron, Workflow run, paid API call, Blob/KV use or hot-path query with its volume and free-allowance fit, or "none". Every ticket's `## Scope` names its `Feature doc:`, plus a `Cost:` line when it adds one of those.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
   - `studio-schema-practices` — Sanity schema quality bar + content-migration workflow.
   - `react-component-practices` — the React rules shared by `ui`, `web` and `platform-app`: server-first, where a component lives (`shared/` only for one imported by two domains), the props contract with its ceiling (7 in `apps/platform`, 10 in `packages/ui` and `apps/web`) and the drop → group → slot → hook → context ladder (the `reviewer` blocks a touched component over it), derived state, provider hooks that throw outside their provider, styling files (a component's `tv()` in a sibling `*-variants.ts`, repeated styles kept in the workspace that renders them, a `lib/styling/` recipe only once a second `packages/ui` component imports it), sizes (a size derived from another element reads its token, an arbitrary value written twice becomes a token or const, a calculation names its terms), size and splitting, no unmeasured memo, accessible by construction.
   - `ui-library-practices` — building pure, prop-driven design-system components.
   - `platform-ui-practices` — the `apps/platform` design standard with its decided values (type scale, cards, fields, spacing, colour, states, phones, copy), reusable blocks built on Base UI, and a red-flags table; placement, props and size defer to `react-component-practices`. The reviewer checks platform diffs against it.
-  - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks, split a growing island at its state branches, a `@blog/ui` atom before raw markup, merge Portable Text component maps rather than spreading them).
+  - `web-component-practices` — building interactive `apps/web` components (compose `@shinefold/ui` via slots, client behaviour in ref-based hooks, split a growing island at its state branches, a `@shinefold/ui` atom before raw markup, merge Portable Text component maps rather than spreading them).
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.
   - `testing-practices` — Vitest + Testing Library conventions: render through each workspace's `testing/custom-render`, repeated arrangement in `beforeEach` or one named setup helper (mandatory and judged by shape — any statement or run that opens two or more cases with the same arguments, whatever it calls, with a run shared by some cases moved into a nested `describe`; one prop bag rendered three or more times is blocking), fake only the edges, a `vi.mock` factory moved to `__mocks__/` at its third copy and its defaults never restated, repeated fixtures as `testing/` builders, an exported fixture named `mock<Thing>` (builder) and every fixed fake value `MOCK_<THING>`, a test file's own consts included, with render and setup helpers exempt, made-up data from seeded `@faker-js/faker` where the workspace's `package.json` has it (and the user asked before it is added where it doesn't), never our own components faked, every asserted or acted-on element bound to a named `const` before its `expect` or `user.*` call (never a query nested inside another call, a `within(…)` scope included), exact expected values with no nested `expect.*` matcher (a touched test file converted whole for both), behaviour titles of 80 characters or fewer, a mandatory pruning pass over every touched test file (duplicates deleted, cases another unit owns moved to it, input/output repeats tabled, each removal reported with where its behaviour is still asserted), each workspace's Vitest pool (`threads` / `vmThreads`, and why `isolate: false` is only safe where files mock no modules), and act warnings — which fail the test in both apps — traced to their usual causes (a missing await, raw `element.focus()`, an async tree rendered without the awaited-`act` helper, a selector returning a fresh object), plus the settled edge cases: `@ts-expect-error -- reason` as an allowed directive, `container` only for an empty render, `act` only around a hook's `result.current` call or a file's one fake-timer advance helper, a query object `describe` cannot take named by its exact identifier with sub-behaviours as nested `describe`s, `user.keyboard` before `fireEvent`, a third thin-dispatcher exception for a Workflow orchestrator, `MOCK_` only for invented values, no real timers, and a cleanup ticket counting as touching the test files it names.
   - `seo-and-metadata` — per-route metadata, JSON-LD, sitemap/robots/RSS.
@@ -932,7 +932,7 @@ file` are all denied alike) — an earlier version only handled the
   - File size budgets → `CLAUDE.md` Conventions; feature docs (`docs/features/<feature>.md`), spec sync and design-doc retention → `develop-feature` "Docs that ship with the change".
   - Shared types, helpers and constants → `.claude/agents/config.md`.
     Since 2026-11-11 the guides name the code-convention pieces by their
-    owning guide: the shared types and `@blog/utils` primitives (with the
+    owning guide: the shared types and `@shinefold/utils` primitives (with the
     helpers deliberately not built) in `config.md`; the preset's reset
     flags, service's `query` mock, `useTestTenant` and
     `mockValidationContext` in `testing-practices`; the

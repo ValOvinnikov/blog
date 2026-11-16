@@ -1,5 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
 import { TenantPageHeader } from '@platform/components/features/tenants/tenant-page-header';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
@@ -12,6 +10,8 @@ import type { TGetStarted } from '@platform/server/onboarding/get-started-for';
 import type { TSiteSetup } from '@platform/server/provisioning/site-setup-for';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TTenantOwnerMembership } from '@shinefold/db/queries/memberships';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 

@@ -1,4 +1,4 @@
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_UNSUBSCRIBE_LABEL,

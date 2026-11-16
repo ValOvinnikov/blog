@@ -1,4 +1,4 @@
-import type { TTenantEmailBrand } from '@blog/config';
+import type { TTenantEmailBrand } from '@shinefold/config';
 
 export const MOCK_TENANT_EMAIL_BRAND: TTenantEmailBrand = {
   surface: '#ffffff',

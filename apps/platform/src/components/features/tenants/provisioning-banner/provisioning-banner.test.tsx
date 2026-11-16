@@ -1,10 +1,10 @@
+import { customRender, screen } from '@platform/testing/custom-render';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db';
-import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
-import { customRender, screen } from '@platform/testing/custom-render';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+} from '@shinefold/db';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@shinefold/db/constants';
 
 import {
   ProvisioningBanner,

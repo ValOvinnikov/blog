@@ -1,8 +1,16 @@
-import { ALERT_TYPE, FORM_STATUS, SIZE, type TFormStatus } from '@blog/config';
-import { Alert } from '@blog/ui/components/atoms/alert';
-import { Button, type TButtonProps } from '@blog/ui/components/atoms/button';
-import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
-import { TextInput } from '@blog/ui/components/atoms/text-input';
+import {
+  ALERT_TYPE,
+  FORM_STATUS,
+  SIZE,
+  type TFormStatus,
+} from '@shinefold/config';
+import { Alert } from '@shinefold/ui/components/atoms/alert';
+import {
+  Button,
+  type TButtonProps,
+} from '@shinefold/ui/components/atoms/button';
+import type { TSpinnerProps } from '@shinefold/ui/components/atoms/spinner';
+import { TextInput } from '@shinefold/ui/components/atoms/text-input';
 import { useId, type SubmitEvent } from 'react';
 
 import { signInPanelEmailFormVariants } from './sign-in-panel-email-form-variants';

@@ -1,5 +1,3 @@
-import { RELEASE_CHANGE } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import { CONTRAST_STATUS, RELEASE_FAILURE } from '@platform/constants/release';
 import { customRender, screen } from '@platform/testing/custom-render';
@@ -9,6 +7,8 @@ import {
   mockComparedCommit,
   mockReleaseCandidate,
 } from '@platform/testing/releases/fixtures';
+import { RELEASE_CHANGE } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ReleasesView } from './releases-view';

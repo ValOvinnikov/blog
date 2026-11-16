@@ -1,15 +1,5 @@
 'use server';
 
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  type TActionResult,
-  type TOutcome,
-  type TReasonedFailure,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import {
   TENANT_FIELD_ERROR,
@@ -36,6 +26,16 @@ import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TActionResult,
+  type TOutcome,
+  type TReasonedFailure,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { redirect } from 'next/navigation';
 
 export type TOwnerInviteConfirmation = { email: string; token: string };

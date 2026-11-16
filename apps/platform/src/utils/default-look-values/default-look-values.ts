@@ -1,3 +1,4 @@
+import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import {
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
@@ -25,8 +26,7 @@ import {
   type TPresetId,
   type TSpinnerStyle,
   type TRadiusScale,
-} from '@blog/config';
-import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+} from '@shinefold/config';
 
 export type TLookFormValues = {
   preset: TPresetId;

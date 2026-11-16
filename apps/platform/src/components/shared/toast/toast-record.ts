@@ -1,4 +1,4 @@
-import type { TToastType } from '@blog/config';
+import type { TToastType } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 interface IToastAction {

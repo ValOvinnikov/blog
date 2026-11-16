@@ -1,9 +1,9 @@
-import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import en from '@platform/i18n/messages/en.json';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockTenant, MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import VoicePage from './page';
 
@@ -16,7 +16,7 @@ const { getAdminByUserIdMock, getTenantByIdMock, getSiteConfigMock } =
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     admins: { getAdminByUserId: getAdminByUserIdMock },

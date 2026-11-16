@@ -1,9 +1,9 @@
-import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import type { TMembership } from '@blog/db/schema/memberships';
-import { firstRowOrThrow } from '@blog/db/testing/first-row-or-throw';
-import { insertTestUser, type TTestDb } from '@blog/db/testing/fixtures';
-import { createMockFaker } from '@blog/db/testing/mock-faker';
+import { MEMBERSHIP_ROLE, type TMembershipRole } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import type { TMembership } from '@shinefold/db/schema/memberships';
+import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
+import { insertTestUser, type TTestDb } from '@shinefold/db/testing/fixtures';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
 
 const membershipsFaker = createMockFaker(60221);
 

@@ -1,5 +1,5 @@
-import type { TMaybeNull } from '@blog/config';
 import { VOICE_BAR_HEIGHT_PROPERTY } from '@platform/constants/voice';
+import type { TMaybeNull } from '@shinefold/config';
 import { type RefObject, useLayoutEffect } from 'react';
 
 // A layout effect, so the first-load hash scroll in a parent's passive effect already reads the height.

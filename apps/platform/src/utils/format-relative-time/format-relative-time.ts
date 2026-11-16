@@ -1,5 +1,5 @@
-import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@blog/config';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
+import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@shinefold/config';
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;

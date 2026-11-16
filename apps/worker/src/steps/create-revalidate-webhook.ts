@@ -4,8 +4,8 @@ import {
   getTenantRevalidateWebhookSecret,
   setTenantRevalidateWebhookSecret,
   setTenantWebhookCreatedAt,
-} from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   createSanityWebhook,
   listSanityWebhooks,
@@ -13,9 +13,9 @@ import {
   type TListedSanityWebhook,
   updateSanityWebhookProjection,
   updateSanityWebhookSecret,
-} from '@blog/db/utils/sanity-management-client/sanity-webhooks';
-import { HEX_ENCODING } from '@blog/utils/hash';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
+import { HEX_ENCODING } from '@shinefold/utils/hash';
+import { hasLength } from '@shinefold/utils/primitives';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 

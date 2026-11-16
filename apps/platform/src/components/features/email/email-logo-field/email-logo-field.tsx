@@ -1,6 +1,5 @@
 'use client';
 
-import { SIZE } from '@blog/config';
 import {
   AssetUploadField,
   type TAssetUploadSpec,
@@ -12,6 +11,7 @@ import {
   quickClientEmailLogoCheck,
 } from '@platform/utils/email-logo-limits/email-logo-limits';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TEmailLogoFieldProps = {

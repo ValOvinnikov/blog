@@ -1,4 +1,4 @@
-# @blog/auth
+# @shinefold/auth
 
 > Shared Auth.js configuration for the two Next.js apps.
 
@@ -17,19 +17,19 @@ logic does not belong here.
 
 ## Layer contract
 
-- **Depends on:** `@blog/db` (the adapter tables — `users`, `accounts`,
+- **Depends on:** `@shinefold/db` (the adapter tables — `users`, `accounts`,
   `sessions`, `verificationTokens`), `next-auth`, `@auth/drizzle-adapter`
 - **Consumed by:** `apps/web`, `apps/platform` — each constructs its own
   `NextAuth()` instance from `buildAuthConfig(app)` so it keeps its own
   `auth`/`handlers` bound to its own runtime
-- **Never imports:** React components, `@blog/ui`, `@blog/service`, or a
-  Sanity SDK; and is never imported by `@blog/db` (the tables live in `db`,
+- **Never imports:** React components, `@shinefold/ui`, `@shinefold/service`, or a
+  Sanity SDK; and is never imported by `@shinefold/db` (the tables live in `db`,
   this package reaches for them, not the other way around)
 
 ## Layout
 
 - `src/config.ts` — `buildAuthConfig(app)`, which returns the `NextAuthConfig`:
-  the `DrizzleAdapter` bound to `@blog/db`'s adapter tables, the `database`
+  the `DrizzleAdapter` bound to `@shinefold/db`'s adapter tables, the `database`
   session strategy, and the `session` callback
 - `src/providers/magic-link/` — the hand-rolled Auth.js Email (magic-link)
   provider; delivery is injected via a `sendEmail` callback so this package
@@ -44,13 +44,13 @@ logic does not belong here.
 
 ## Scripts
 
-| Script       | Command                               |
-| ------------ | ------------------------------------- |
-| `lint`       | `pnpm --filter @blog/auth lint`       |
-| `type-check` | `pnpm --filter @blog/auth type-check` |
-| `format`     | `pnpm --filter @blog/auth format`     |
-| `test`       | `pnpm --filter @blog/auth test`       |
-| `test:watch` | `pnpm --filter @blog/auth test:watch` |
+| Script       | Command                                    |
+| ------------ | ------------------------------------------ |
+| `lint`       | `pnpm --filter @shinefold/auth lint`       |
+| `type-check` | `pnpm --filter @shinefold/auth type-check` |
+| `format`     | `pnpm --filter @shinefold/auth format`     |
+| `test`       | `pnpm --filter @shinefold/auth test`       |
+| `test:watch` | `pnpm --filter @shinefold/auth test:watch` |
 
 Root-level `pnpm type-check` / `pnpm lint` / `pnpm test` run every
 workspace, including this one, through Turborepo.

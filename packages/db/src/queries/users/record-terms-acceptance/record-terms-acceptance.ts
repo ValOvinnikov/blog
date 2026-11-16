@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { users } from '@blog/db/schema/auth';
+import { getDb } from '@shinefold/db/client';
+import { users } from '@shinefold/db/schema/auth';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export async function recordTermsAcceptance(

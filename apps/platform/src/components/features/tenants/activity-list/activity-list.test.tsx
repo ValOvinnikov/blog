@@ -1,8 +1,3 @@
-import {
-  AUDIT_ACTION,
-  GITHUB_AUDIT_ACTOR_ID_PREFIX,
-  WORKER_AUDIT_ACTOR_ID,
-} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { TENANT_DETAILS_FIELD } from '@platform/constants/tenant';
 import {
@@ -11,6 +6,11 @@ import {
   MOCK_AUDIT_EVENT_AT,
 } from '@platform/testing/audit-events/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
+import {
+  AUDIT_ACTION,
+  GITHUB_AUDIT_ACTOR_ID_PREFIX,
+  WORKER_AUDIT_ACTOR_ID,
+} from '@shinefold/config';
 
 import { ActivityList } from './activity-list';
 

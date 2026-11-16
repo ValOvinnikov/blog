@@ -1,4 +1,4 @@
-import type { IBusyStyle } from '@blog/config';
+import type { IBusyStyle } from '@shinefold/config';
 import { BUSY_STYLE_LOG } from '@web/constants/busy-style';
 import { getSiteConfigWithPreset } from '@web/server/site-config/get-site-config-with-preset/get-site-config-with-preset';
 

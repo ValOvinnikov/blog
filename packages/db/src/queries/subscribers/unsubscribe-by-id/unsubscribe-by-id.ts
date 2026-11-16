@@ -1,8 +1,8 @@
-import { SUBSCRIBER_OUTCOME } from '@blog/config';
-import { getDb } from '@blog/db/client';
-import type { TUnsubscribeByLinkResult } from '@blog/db/queries/subscribers/unsubscribe-by-token/unsubscribe-by-token';
-import { subscribers } from '@blog/db/schema/subscribers';
-import { toOutcome } from '@blog/utils/to-outcome';
+import { SUBSCRIBER_OUTCOME } from '@shinefold/config';
+import { getDb } from '@shinefold/db/client';
+import type { TUnsubscribeByLinkResult } from '@shinefold/db/queries/subscribers/unsubscribe-by-token/unsubscribe-by-token';
+import { subscribers } from '@shinefold/db/schema/subscribers';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
 export async function unsubscribeById(

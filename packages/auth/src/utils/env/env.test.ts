@@ -1,5 +1,5 @@
-import { MOCK_FROM_ADDRESS } from '@blog/auth/testing/magic-link-fixtures';
-import { MOCK_AUTH_SECRET } from '@blog/auth/testing/session-fixtures';
+import { MOCK_FROM_ADDRESS } from '@shinefold/auth/testing/magic-link-fixtures';
+import { MOCK_AUTH_SECRET } from '@shinefold/auth/testing/session-fixtures';
 
 const AUTH_SECRET_KEY = 'AUTH_SECRET';
 

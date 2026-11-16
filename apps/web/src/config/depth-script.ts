@@ -1,4 +1,4 @@
-import { DEPTH, type TDepth } from '@blog/config';
+import { DEPTH, type TDepth } from '@shinefold/config';
 
 /** `localStorage` key the reading-depth choice persists under — shared by `DepthProvider` and the bootstrap script below so there is exactly one literal. */
 export const DEPTH_STORAGE_KEY = 'reading-depth';

@@ -1,7 +1,7 @@
-import type { TSearchParam } from '@blog/config/types';
-import type { TValueOf } from '@blog/config/utils';
-import { isString } from '@blog/utils/primitives';
 import { UPGRADE_SEARCH_PARAM } from '@platform/constants/billing';
+import type { TSearchParam } from '@shinefold/config/types';
+import type { TValueOf } from '@shinefold/config/utils';
+import { isString } from '@shinefold/utils/primitives';
 
 export type TUpgradeSearchParams = Partial<
   Record<TValueOf<typeof UPGRADE_SEARCH_PARAM>, TSearchParam>

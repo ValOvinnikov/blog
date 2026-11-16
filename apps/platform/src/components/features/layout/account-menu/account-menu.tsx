@@ -1,7 +1,6 @@
 'use client';
 
 import { Menu } from '@base-ui/react/menu';
-import { ICONS, type TMaybeUndefined } from '@blog/config';
 import { useSidebarCollapse } from '@platform/components/features/layout/sidebar-collapse-provider';
 import { Avatar } from '@platform/components/shared/avatar';
 import { Icon } from '@platform/components/shared/icon';
@@ -16,6 +15,7 @@ import { AVATAR_VARIANT } from '@platform/constants/avatar';
 import { MENU_RADIO_GROUP_SIZE } from '@platform/constants/menu-radio-group';
 import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
 import { signOutAction } from '@platform/server/auth/sign-out-action';
+import { ICONS, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { startTransition, useRef } from 'react';
 

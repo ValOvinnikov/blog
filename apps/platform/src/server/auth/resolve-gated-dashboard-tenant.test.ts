@@ -1,4 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
 import { resolveTenantPageAccess } from '@platform/server/auth/resolve-tenant-page-access';
 import {
@@ -7,6 +6,7 @@ import {
 } from '@platform/testing/memberships/fixtures';
 import { mockReadyTenant } from '@platform/testing/tenants/fixtures';
 import { EVERY_PLAN_PAGE } from '@platform/utils/plan-page-access/plan-page-access';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import { resolveGatedDashboardTenant } from './resolve-gated-dashboard-tenant';
 

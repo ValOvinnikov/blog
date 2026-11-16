@@ -1,11 +1,11 @@
-import { getReferencingModuleIds } from '@blog/service/features/entities/modules/adaptor/loader';
-import { MOCK_DOCUMENT_ID } from '@blog/service/testing/entities/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
+import { getReferencingModuleIds } from '@shinefold/service/features/entities/modules/adaptor/loader';
+import { MOCK_DOCUMENT_ID } from '@shinefold/service/testing/entities/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { createModulesService } from './service';
 
-vi.mock('@blog/service/features/entities/modules/adaptor/loader', () => ({
+vi.mock('@shinefold/service/features/entities/modules/adaptor/loader', () => ({
   getReferencingModuleIds: vi.fn(),
 }));
 

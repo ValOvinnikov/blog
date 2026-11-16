@@ -1,10 +1,10 @@
-import { itActsAsAControlledTextbox } from '@blog/ui/testing/atoms/controlled-textbox';
+import { faker } from '@faker-js/faker';
+import { itActsAsAControlledTextbox } from '@shinefold/ui/testing/atoms/controlled-textbox';
 import {
   customRender,
   renderElement,
   screen,
-} from '@blog/ui/testing/custom-render';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
 

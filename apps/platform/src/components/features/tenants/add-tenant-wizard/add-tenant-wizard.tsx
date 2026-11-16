@@ -1,11 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { CORE_PROVISIONING_STEPS } from '@blog/db/constants';
 import { TenantDetailsForm } from '@platform/components/features/tenants/tenant-details-form';
 import { PageHeader } from '@platform/components/shared/page-header';
 import {
   WizardRail,
   type TWizardRailStep,
 } from '@platform/components/shared/wizard-rail';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { CORE_PROVISIONING_STEPS } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 
 import { addTenantWizardVariants } from './add-tenant-wizard-variants';

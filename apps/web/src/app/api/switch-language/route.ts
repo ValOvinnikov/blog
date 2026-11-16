@@ -1,6 +1,6 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { SINGLE_LANGUAGE_ROUTING } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { isPlatformFallbackAllowed } from '@web/server/tenant/resolve-tenant/resolve-tenant';

@@ -1,19 +1,19 @@
-import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, DISPLAY_MODE } from '@shinefold/config';
 import {
   mockCtaButtonView,
   mockRawCtaButton,
   mockRawLogoImage,
   mockRawLogoItem,
   mockRawLogoWallModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_IMAGE_ASSET_ID,
   mockLinkView,
   mockRawExternalLinkDocument,
   mockRawInternalLinkDocument,
   mockSanityImageView,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toLogoWallModule } from './transformer';
 

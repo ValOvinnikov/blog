@@ -1,6 +1,3 @@
-import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { queries } from '@blog/db';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { requireTenantOwnerOrAdmin } from '@platform/server/auth/require-tenant-owner-or-admin';
 import { startProvisioning } from '@platform/server/provisioning/start-provisioning';
@@ -11,6 +8,9 @@ import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 
 import { retryProvisioningStepAction } from './retry-provisioning-step-action';
 
@@ -18,7 +18,7 @@ vi.mock('@platform/server/auth/require-tenant-owner-or-admin');
 
 vi.mock('@platform/server/provisioning/start-provisioning');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenants: { getTenantById: vi.fn() } },
 }));
 

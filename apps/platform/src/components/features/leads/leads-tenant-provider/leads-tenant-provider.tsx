@@ -1,6 +1,6 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
 type TPageTitleCache = Map<string, Promise<TMaybeUndefined<string>>>;

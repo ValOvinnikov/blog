@@ -1,12 +1,12 @@
 'use client';
 
-import type { THeaderLayout, THeaderSubmenuStyle } from '@blog/config';
-import type { TNavigationItem } from '@blog/service';
+import type { THeaderLayout, THeaderSubmenuStyle } from '@shinefold/config';
+import type { TNavigationItem } from '@shinefold/service';
 import {
   type INavItem,
   PrimaryNavigation,
-} from '@blog/ui/components/molecules/primary-navigation';
-import { hasArrayGotItems, isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/ui/components/molecules/primary-navigation';
+import { hasArrayGotItems, isUndefined } from '@shinefold/utils/primitives';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { SESSION_STATUS } from '@web/constants/session';
 import { HeaderOverlayParent } from '@web/context/header-overlay-provider';

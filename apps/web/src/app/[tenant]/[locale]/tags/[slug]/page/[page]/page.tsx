@@ -1,4 +1,4 @@
-import { routes, type ITenantLocalizedParams } from '@blog/config';
+import { routes, type ITenantLocalizedParams } from '@shinefold/config';
 import { TagPage } from '@web/components/pages/tag-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildTagMetadata } from '@web/metadata/tag-metadata';

@@ -1,6 +1,5 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import {
   SITE_ADDRESS_CHECK_DELAY_MS,
   SITE_ADDRESS_STATUS,
@@ -8,6 +7,7 @@ import {
 } from '@platform/constants/onboarding';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
 import type { TTenantSlugError } from '@platform/server/tenants/check-tenant-slug';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useEffect, useState } from 'react';
 
 type TCheckedSlug = {

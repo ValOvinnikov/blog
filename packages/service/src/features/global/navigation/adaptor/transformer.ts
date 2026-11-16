@@ -1,7 +1,7 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { toBrandTagline } from '@blog/service/shared/transformers/brand-tagline/to-brand-tagline';
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
-import { toLinkDocuments } from '@blog/service/shared/transformers/link/to-link-documents';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { toBrandTagline } from '@shinefold/service/shared/transformers/brand-tagline/to-brand-tagline';
+import { toLinkDocument } from '@shinefold/service/shared/transformers/link/to-link-document';
+import { toLinkDocuments } from '@shinefold/service/shared/transformers/link/to-link-documents';
 import type { InferResultType } from 'groqd';
 
 import type { navigationQuery } from './query';

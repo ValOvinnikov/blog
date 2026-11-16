@@ -1,5 +1,5 @@
-import type { TPostTakeaways } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import type { TPostTakeaways } from '@shinefold/service';
 import { DepthProvider } from '@web/context/depth-provider';
 import {
   customRenderServerAsync,

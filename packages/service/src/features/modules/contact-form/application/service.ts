@@ -1,6 +1,6 @@
-import { getContactForm } from '@blog/service/features/modules/contact-form/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getContactForm } from '@shinefold/service/features/modules/contact-form/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createContactFormModuleService() {
   return {

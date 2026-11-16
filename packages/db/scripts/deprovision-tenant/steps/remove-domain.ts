@@ -1,6 +1,6 @@
-import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { deleteVercelProjectDomains } from '@blog/db/utils/vercel-client/vercel-project-domains';
+import { listTenantHosts } from '@shinefold/db/queries/tenant-domains/list-tenant-hosts';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { deleteVercelProjectDomains } from '@shinefold/db/utils/vercel-client/vercel-project-domains';
 
 import type { TDeprovisionEnv } from '../lib/env';
 

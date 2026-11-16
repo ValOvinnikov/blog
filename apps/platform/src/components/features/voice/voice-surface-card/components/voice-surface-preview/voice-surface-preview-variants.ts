@@ -1,5 +1,5 @@
-import { VOICE_SURFACE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
+import { VOICE_SURFACE } from '@shinefold/config';
 
 export const voiceSurfacePreviewVariants = tv({
   slots: {

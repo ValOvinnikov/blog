@@ -1,4 +1,3 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import type { TLookFollow } from '@platform/components/features/look/look-preview/use-look-follow';
 import type { TDeviceFrameHandle } from '@platform/components/shared/device-frame';
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
@@ -13,6 +12,7 @@ import {
   type TLookFollowTarget,
   toLookFollowTarget,
 } from '@platform/utils/look-follow-target/look-follow-target';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 import { createTranslator } from 'next-intl';
 
 const tFollow = createTranslator({

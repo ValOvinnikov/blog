@@ -1,14 +1,14 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { getDb } from '@blog/db/client';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { users } from '@blog/db/schema/auth';
-import { membershipInvites } from '@blog/db/schema/membership-invites';
-import { memberships } from '@blog/db/schema/memberships';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { getDb } from '@shinefold/db/client';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import { users } from '@shinefold/db/schema/auth';
+import { membershipInvites } from '@shinefold/db/schema/membership-invites';
+import { memberships } from '@shinefold/db/schema/memberships';
 import {
   decryptOptionalPersonalValue,
   decryptPersonalValue,
-} from '@blog/db/utils/personal-data/personal-data';
-import { userHasSignedIn } from '@blog/db/utils/user-has-signed-in/user-has-signed-in';
+} from '@shinefold/db/utils/personal-data/personal-data';
+import { userHasSignedIn } from '@shinefold/db/utils/user-has-signed-in/user-has-signed-in';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export type TTenantOwnerMembership =

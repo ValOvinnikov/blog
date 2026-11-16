@@ -1,5 +1,5 @@
-import { CONTENT_ALIGNMENT, LOCALE_ISO_CODES } from '@blog/config';
-import type { TSectionIndexPage } from '@blog/service';
+import { CONTENT_ALIGNMENT, LOCALE_ISO_CODES } from '@shinefold/config';
+import type { TSectionIndexPage } from '@shinefold/service';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 

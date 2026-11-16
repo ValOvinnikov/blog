@@ -1,15 +1,15 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
+import { EMAIL_TEMPLATE_TYPE } from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_LOGO_URL,
   MOCK_OTHER_LOGO_URL,
-} from '@blog/db/testing/email-templates/fixtures';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/email-templates/fixtures';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { listEmailTemplateLogoUrls } from './list-email-template-logo-urls';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const MOCK_NO_LOGO_URLS = Object.fromEntries(
   Object.values(EMAIL_TEMPLATE_TYPE).map((templateType) => [

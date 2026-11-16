@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { ONBOARDING_STEP } from '@platform/constants/onboarding';
 import { SIGN_UP_REFUSAL } from '@platform/constants/sign-up';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
@@ -18,6 +17,7 @@ import {
   STEPS,
   TRY_AGAIN_LATER,
 } from '@platform/testing/onboarding/onboarding-view';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { OnboardingView } from './onboarding-view';

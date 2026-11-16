@@ -1,10 +1,10 @@
-import { ICONS, SIZE } from '@blog/config';
 import {
   Icon,
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
 import type { TPortableTextEditorSize } from '@platform/components/shared/portable-text-editor/portable-text-editor-variants';
 import { ICON_SIZE } from '@platform/constants/icon';
+import { ICONS, SIZE } from '@shinefold/config';
 
 import { portableTextEditorToolbarGlyphVariants } from './portable-text-editor-toolbar-glyph-variants';
 

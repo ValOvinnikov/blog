@@ -1,5 +1,8 @@
-import { HEADER_CONTROL_STYLE, type THeaderControlStyle } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import {
+  HEADER_CONTROL_STYLE,
+  type THeaderControlStyle,
+} from '@shinefold/config';
 
 import { toDraftOffer } from './settings-draft-offer';
 

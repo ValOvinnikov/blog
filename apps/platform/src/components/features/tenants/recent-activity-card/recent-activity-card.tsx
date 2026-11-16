@@ -1,11 +1,11 @@
-import { SIZE } from '@blog/config';
-import type { TListedAuditEvent } from '@blog/db/queries/audit-events';
-import { hasArrayGotItems } from '@blog/utils/primitives';
 import { ActivityList } from '@platform/components/features/tenants/activity-list';
 import { Card } from '@platform/components/shared/card';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { Text } from '@platform/components/shared/text';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { SIZE } from '@shinefold/config';
+import type { TListedAuditEvent } from '@shinefold/db/queries/audit-events';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 export type TRecentActivityCardProps = {

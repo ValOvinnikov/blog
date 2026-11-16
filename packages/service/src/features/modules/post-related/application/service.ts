@@ -1,4 +1,4 @@
-import { safeAsync } from '@blog/utils';
+import { safeAsync } from '@shinefold/utils';
 
 import { getPostRelated } from './get-post-related';
 

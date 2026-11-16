@@ -1,10 +1,10 @@
-import { BUSY_BUTTON_STYLE } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { BUSY_BUTTON_STYLE } from '@shinefold/config';
 import {
   customRender,
   renderElement,
   screen,
-} from '@blog/ui/testing/custom-render';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { Button } from './button';

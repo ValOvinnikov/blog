@@ -1,5 +1,5 @@
-import { CARD_STYLE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
+import { CARD_STYLE } from '@shinefold/config';
 
 export const cardStyleGlyphVariants = tv({
   slots: {

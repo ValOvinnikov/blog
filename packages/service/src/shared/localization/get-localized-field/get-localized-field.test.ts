@@ -1,19 +1,19 @@
+import { faker } from '@faker-js/faker';
 import type {
   TMaybeNull,
   InternationalizedArrayReference,
   InternationalizedArrayString,
   Module_cta,
-} from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { q } from '@blog/service/sanity/query/query';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { q } from '@shinefold/service/sanity/query/query';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_DUTCH_TEXT,
   MOCK_ENGLISH_TEXT,
   mockLocalizedStrings,
-} from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
 
 import { getLocalizedField, type TLocalizedKey } from './get-localized-field';
 

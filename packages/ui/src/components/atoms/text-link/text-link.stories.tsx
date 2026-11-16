@@ -1,8 +1,8 @@
-import { ICONS, SIZE } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { focusLastLink } from '@blog/ui/testing/brand-bands';
-import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
+import { ICONS, SIZE } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { focusLastLink } from '@shinefold/ui/testing/brand-bands';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { AnchorHTMLAttributes } from 'react';
 

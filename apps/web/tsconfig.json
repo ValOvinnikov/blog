@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@blog/tsconfig/base.json",
+  "extends": "@shinefold/tsconfig/base.json",
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -9,14 +9,14 @@
     "types": ["vitest/globals"],
     "paths": {
       "@web/*": ["./src/*"],
-      "@blog/ui/*": ["../../packages/ui/src/*"],
-      "@blog/service/*": ["../../packages/service/src/*"],
-      "@blog/db/*": ["../../packages/db/src/*"],
-      "@blog/insight/*": ["../../packages/insight/src/*"],
-      "@blog/auth/*": ["../../packages/auth/src/*"],
-      "@blog/config/*": ["../../packages/config/src/*"],
-      "@blog/utils/*": ["../../packages/utils/src/*"],
-      "@blog/email/*": ["../../packages/email/src/*"]
+      "@shinefold/ui/*": ["../../packages/ui/src/*"],
+      "@shinefold/service/*": ["../../packages/service/src/*"],
+      "@shinefold/db/*": ["../../packages/db/src/*"],
+      "@shinefold/insight/*": ["../../packages/insight/src/*"],
+      "@shinefold/auth/*": ["../../packages/auth/src/*"],
+      "@shinefold/config/*": ["../../packages/config/src/*"],
+      "@shinefold/utils/*": ["../../packages/utils/src/*"],
+      "@shinefold/email/*": ["../../packages/email/src/*"]
     },
     "plugins": [
       {
@@ -37,8 +37,8 @@
     "index.css.d.ts",
     // TS only loads global ambient .d.ts files via a program's own include,
     // never transitively through import resolution — so any dependency's
-    // ambient declarations (e.g. @blog/ui's `*.svg`/`*.svg?url` types in
-    // src/assets/icons/svg.d.ts, @blog/auth's next-auth module augmentation)
+    // ambient declarations (e.g. @shinefold/ui's `*.svg`/`*.svg?url` types in
+    // src/assets/icons/svg.d.ts, @shinefold/auth's next-auth module augmentation)
     // must be listed here explicitly.
     "../../packages/ui/src/**/*.d.ts",
     "../../packages/auth/src/**/*.d.ts"

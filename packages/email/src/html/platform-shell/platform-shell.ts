@@ -1,8 +1,8 @@
-import { renderEmailShell } from '@blog/email/html/email-layout/email-layout';
+import { renderEmailShell } from '@shinefold/email/html/email-layout/email-layout';
 import {
   PLATFORM_EMAIL_BRAND,
   PLATFORM_EMAIL_FULL_LOGO,
-} from '@blog/email/html/platform-email-brand/platform-email-brand';
+} from '@shinefold/email/html/platform-email-brand/platform-email-brand';
 
 export type TBuildPlatformShellInput = {
   brandName: string;

@@ -7,10 +7,10 @@ import {
   type TActionResult,
   TENANT_WRITE_REFUSAL,
   type TOutcome,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { isValidEmailAddress } from '@blog/email/validation';
-import { toOutcome } from '@blog/utils/to-outcome';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { isValidEmailAddress } from '@shinefold/email/validation';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import {
   FIELD_ERROR,
   type TFieldErrorReason,

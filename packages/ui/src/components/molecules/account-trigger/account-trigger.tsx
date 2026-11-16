@@ -4,10 +4,10 @@ import {
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { IconButton } from '@blog/ui/components/atoms/icon-button';
+} from '@shinefold/config';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
 import type { MouseEventHandler, Ref } from 'react';
 
 import {

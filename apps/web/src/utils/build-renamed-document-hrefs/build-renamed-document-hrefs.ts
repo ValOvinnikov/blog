@@ -1,4 +1,4 @@
-import { pageHref, routes, type TMaybeUndefined } from '@blog/config';
+import { pageHref, routes, type TMaybeUndefined } from '@shinefold/config';
 import type { TTenantPageLists } from '@web/server/tenant/tenant-page-lists/tenant-page-lists';
 import { toLastPage } from '@web/utils/build-next-page-paths';
 

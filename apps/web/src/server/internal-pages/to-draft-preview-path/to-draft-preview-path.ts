@@ -1,5 +1,5 @@
-import type { TLocaleIsoCode } from '@blog/config';
-import type { TDraftPagePath } from '@blog/service';
+import type { TLocaleIsoCode } from '@shinefold/config';
+import type { TDraftPagePath } from '@shinefold/service';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 
 const PATH_SEPARATOR = '/';

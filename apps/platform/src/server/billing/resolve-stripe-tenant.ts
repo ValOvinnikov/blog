@@ -1,12 +1,12 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { queries, STRIPE_TENANT_LOOKUP_OUTCOME } from '@blog/db';
 import {
   BILLING_LOG,
   STRIPE_TENANT_METADATA_KEY,
 } from '@platform/constants/billing';
 import { logger } from '@platform/utils/logger/logger';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { queries, STRIPE_TENANT_LOOKUP_OUTCOME } from '@shinefold/db';
 import type Stripe from 'stripe';
 import { z } from 'zod';
 

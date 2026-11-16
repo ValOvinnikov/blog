@@ -1,6 +1,5 @@
 'use server';
 
-import { queries } from '@blog/db';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
@@ -9,6 +8,7 @@ import { requireTenantMembership } from '@platform/server/auth/require-tenant-me
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { env } from '@platform/utils/env/env';
 import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom-domain';
+import { queries } from '@shinefold/db';
 
 export const getCustomDomainStatusAction = async (
   tenantId: string,

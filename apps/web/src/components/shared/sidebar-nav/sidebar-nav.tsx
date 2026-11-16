@@ -1,7 +1,7 @@
 'use client';
 
-import { ICONS, type TMaybeUndefined } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
+import { ICONS, type TMaybeUndefined } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { usePopover } from '@web/hooks/use-popover';
 import { useId } from 'react';

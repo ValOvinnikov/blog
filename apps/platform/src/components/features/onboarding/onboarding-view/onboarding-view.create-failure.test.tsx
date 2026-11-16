@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { ONBOARDING_SCROLL_AREA_TEST_ID } from '@platform/constants/onboarding';
 import { SIGN_UP_REFUSAL } from '@platform/constants/sign-up';
 import { screen } from '@platform/testing/custom-render';
@@ -16,6 +15,7 @@ import {
   renderInTier,
   TRY_AGAIN_LATER,
 } from '@platform/testing/onboarding/onboarding-view';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { OnboardingView } from './onboarding-view';

@@ -1,4 +1,4 @@
-import { LOCALE_BCP47_TAGS } from '@blog/config';
+import { LOCALE_BCP47_TAGS } from '@shinefold/config';
 import { GlobalErrorPage } from '@web/components/pages/global-error-page';
 import { MOCK_ERROR_WITH_DIGEST } from '@web/testing/shared/error/fixtures';
 

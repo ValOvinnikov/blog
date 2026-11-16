@@ -1,14 +1,14 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_AUTHOR_ID,
   MOCK_AUTHOR_NAME,
-} from '@blog/service/testing/entities/fixtures';
-import { mockRawAuthor } from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
+import { mockRawAuthor } from '@shinefold/service/testing/pages/fixtures';
 import {
   mockLinkView,
   mockRawPersonBioBlock,
   mockRawSocialProfile,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toPersonProfile } from './to-person-profile';
 

@@ -1,4 +1,4 @@
-import { routes, type ITenantLocalizedParams } from '@blog/config';
+import { routes, type ITenantLocalizedParams } from '@shinefold/config';
 import { TopicPage } from '@web/components/pages/topic-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildTopicMetadata } from '@web/metadata/topic-metadata';

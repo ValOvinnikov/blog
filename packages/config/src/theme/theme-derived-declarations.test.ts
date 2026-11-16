@@ -1,4 +1,7 @@
-import { readCssBlock, readRepoFile } from '@blog/config/testing/theme-css';
+import {
+  readCssBlock,
+  readRepoFile,
+} from '@shinefold/config/testing/theme-css';
 
 import {
   DERIVED_RADIUS_DECLARATIONS,

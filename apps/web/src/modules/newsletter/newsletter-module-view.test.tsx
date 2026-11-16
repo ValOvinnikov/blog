@@ -1,5 +1,5 @@
-import { NEWSLETTER_VARIANT, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { NEWSLETTER_VARIANT, SITE_MESSAGES } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_NEWSLETTER_MODULE_ID,

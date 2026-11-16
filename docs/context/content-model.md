@@ -516,7 +516,7 @@ separator: BRAND_TAGLINE_SEPARATORS }`, replacing a plain string so the
   pages themselves.
 - Theme has no Studio schema. Tenant theme settings live in Postgres, in
   `site_config`, edited in the platform and resolved against
-  `PRESET_REGISTRY` in `@blog/config`. The Sanity theme singleton that
+  `PRESET_REGISTRY` in `@shinefold/config`. The Sanity theme singleton that
   once held them was deleted after the Postgres cutover left it with no read
   path.
 - Voice copy has no Studio schema. Tenant-overridable UI strings live in
@@ -588,7 +588,7 @@ has to reason about which case it is holding; `module_content` and
 its own, the second takes the referenced post's title — and
 alignment is not bundled here — it is a separate module-level
 `contentAlignment` field. Every `module_*` document gets its own
-standalone, **required** `brandVariant` field (`@blog/config`'s
+standalone, **required** `brandVariant` field (`@shinefold/config`'s
 `BRAND_VARIANT` const) via the shared `brandVariantField()` helper, placed
 immediately after `titleField` in each schema's `fields` array (see
 "Module documents" above).
@@ -599,7 +599,7 @@ immediately after `titleField` in each schema's `fields` array (see
   `rule.required()` on every field the frontend assumes; images get
   `hotspot: true` + required alt. Every schema definition is a **named
   export** (`{localName}Schema`) — never `export default defineType`.
-- Enum-ish stored values come from `@blog/config` constants — **both key and
+- Enum-ish stored values come from `@shinefold/config` constants — **both key and
   value UPPERCASE** (`LINK_TYPE.INTERNAL === 'INTERNAL'`,
   `CARD_IMAGE_SHAPE.SQUARE === 'SQUARE'`), `as const`; schema `options.list` and
   migrations use the same constant.
@@ -644,5 +644,5 @@ changing a schema does **not** change existing documents.
   dataset export backup and behind the `production` Environment's
   required-reviewer gate, same as `sanity deploy`. Both commands remain
   available to run manually (e.g.
-  `SANITY_STUDIO_DATASET=development pnpm --filter @blog/studio migrate:deploy`) for
+  `SANITY_STUDIO_DATASET=development pnpm --filter @shinefold/studio migrate:deploy`) for
   local rehearsal or backfilling a dataset outside the pipeline.

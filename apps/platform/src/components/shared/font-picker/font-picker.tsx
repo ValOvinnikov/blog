@@ -1,8 +1,8 @@
 'use client';
 
-import type { TControlAria, TFontChoice } from '@blog/config';
 import { Select } from '@platform/components/shared/select';
 import { FONT_OPTIONS } from '@platform/config/fonts';
+import type { TControlAria, TFontChoice } from '@shinefold/config';
 
 import { fontPickerVariants } from './font-picker-variants';
 

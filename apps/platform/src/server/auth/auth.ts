@@ -1,10 +1,10 @@
 import 'server-only';
 
-import { buildAuthConfig } from '@blog/auth';
-import { AUTH_APP } from '@blog/config/constants';
 import { logMagicLinkRefusal } from '@platform/server/auth/log-magic-link-refusal';
 import { withOwnerSignInActivity } from '@platform/server/auth/with-owner-sign-in-activity';
 import { adminRoutes, SIGN_IN_PATH } from '@platform/utils/routes/routes';
+import { buildAuthConfig } from '@shinefold/auth';
+import { AUTH_APP } from '@shinefold/config/constants';
 import NextAuth from 'next-auth';
 import { cache } from 'react';
 

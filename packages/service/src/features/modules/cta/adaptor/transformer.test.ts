@@ -1,17 +1,18 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
   LINK_TYPE,
   PORTABLE_TEXT_BLOCK_TYPE,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   mockCtaButtonView,
   mockRawContentBlock,
   mockRawContentMarkDef,
   mockRawCtaButton,
   mockRawCtaModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_LINK_LABEL,
   MOCK_POST_HREF,
@@ -20,8 +21,7 @@ import {
   mockRawSanityImage,
   mockRawWideLayout,
   mockSanityImageView,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toCtaModule } from './transformer';
 

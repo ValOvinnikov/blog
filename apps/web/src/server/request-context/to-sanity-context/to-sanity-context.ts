@@ -1,11 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { SANITY_PERSPECTIVE } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { SANITY_PERSPECTIVE } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   getPlatformSanityContext,
   type TTenantSanityContext,
-} from '@blog/service';
+} from '@shinefold/service';
 import { isPlatformFallbackAllowed } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { notFound } from 'next/navigation';
 

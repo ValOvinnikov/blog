@@ -1,24 +1,28 @@
-import { getSectionPagesModuleDocument } from '@blog/service/features/modules/section-pages/adaptor/module/loader';
-import { toSectionPagesModuleDocument } from '@blog/service/features/modules/section-pages/adaptor/module/transformer';
-import { getSectionPages } from '@blog/service/features/modules/section-pages/adaptor/pages/loader';
-import { toSectionPageCards } from '@blog/service/features/modules/section-pages/adaptor/pages/transformer';
+import { getSectionPagesModuleDocument } from '@shinefold/service/features/modules/section-pages/adaptor/module/loader';
+import { toSectionPagesModuleDocument } from '@shinefold/service/features/modules/section-pages/adaptor/module/transformer';
+import { getSectionPages } from '@shinefold/service/features/modules/section-pages/adaptor/pages/loader';
+import { toSectionPageCards } from '@shinefold/service/features/modules/section-pages/adaptor/pages/transformer';
 import {
   MOCK_SECTION_PAGES_MODULE_ID,
   MOCK_SECTION_PAGES_PARENT_ID,
   MOCK_SECTION_PAGES_PARENT_PATH,
   mockRawSectionPage,
   mockRawSectionPagesModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_MISSING_ID,
   mockValidationError,
-} from '@blog/service/testing/shared/fixtures';
-import { MOCK_TENANT } from '@blog/service/testing/tenant';
+} from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { createSectionPagesModuleService } from './service';
 
-vi.mock('@blog/service/features/modules/section-pages/adaptor/module/loader');
-vi.mock('@blog/service/features/modules/section-pages/adaptor/pages/loader');
+vi.mock(
+  '@shinefold/service/features/modules/section-pages/adaptor/module/loader',
+);
+vi.mock(
+  '@shinefold/service/features/modules/section-pages/adaptor/pages/loader',
+);
 
 const MOCK_MODULE_DOCUMENT = toSectionPagesModuleDocument(
   mockRawSectionPagesModule(),

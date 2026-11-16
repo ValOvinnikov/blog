@@ -1,20 +1,20 @@
-import { routes } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { routes } from '@shinefold/config';
 import {
   MOCK_TAG_SLUG,
   MOCK_TOPIC_SLUG,
-} from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
 import {
   MOCK_POST_HREF,
   MOCK_POST_SLUG,
   mockLinkView,
   mockRawExternalLinkDocument,
   mockRawInternalLinkDocument,
-} from '@blog/service/testing/shared/fixtures';
+} from '@shinefold/service/testing/shared/fixtures';
 import {
   MOCK_ABOUT_HREF,
   MOCK_ABOUT_SLUG,
-} from '@blog/service/testing/shared/translated-pages-dataset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/translated-pages-dataset';
 
 import { toLinkDocument } from './to-link-document';
 

@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   act,
   customRender,
   renderElement,
   screen,
-} from '@blog/ui/testing/custom-render';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Carousel } from './carousel';

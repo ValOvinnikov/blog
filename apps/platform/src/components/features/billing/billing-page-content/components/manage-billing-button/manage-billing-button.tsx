@@ -1,11 +1,11 @@
 'use client';
 
-import { isOutcomeRefused } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useToast } from '@platform/context/toast-provider';
 import { openBillingPortalAction } from '@platform/server/billing/open-billing-portal-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import { isOutcomeRefused } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 

@@ -1,9 +1,9 @@
-import { SIZE } from '@blog/config';
-import type { TContrastResultBody } from '@blog/config/types';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { SIZE } from '@shinefold/config';
+import type { TContrastResultBody } from '@shinefold/config/types';
 import { useTranslations } from 'next-intl';
 
 import { contrastFindingDetailsVariants } from './contrast-finding-details-variants';

@@ -1,4 +1,3 @@
-import { isUndefined } from '@blog/utils/primitives';
 import { useLeadsTenantId } from '@platform/components/features/leads/leads-tenant-provider';
 import type { TInboxLeadsPage } from '@platform/server/leads/list-inbox-leads';
 import {
@@ -6,6 +5,7 @@ import {
   type TLoadMoreLeadsResult,
 } from '@platform/server/leads/load-more-leads-action';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useState, useTransition } from 'react';
 
 export const useLeadsPages = (initialPage: TInboxLeadsPage) => {

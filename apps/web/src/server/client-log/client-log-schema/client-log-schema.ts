@@ -1,4 +1,4 @@
-import { sanitizeLogMessage } from '@blog/insight';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import {
   MAX_MESSAGE_LENGTH,
   MAX_STACK_LENGTH,

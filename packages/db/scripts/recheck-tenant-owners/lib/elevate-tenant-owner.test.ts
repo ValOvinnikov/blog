@@ -1,15 +1,15 @@
-import { SANITY_PROJECT_ROLE } from '@blog/config';
-import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
+import { SANITY_PROJECT_ROLE } from '@shinefold/config';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@shinefold/db/constants';
 import {
   MOCK_RECHECK_ENV,
   MOCK_SANITY_MANAGEMENT_TOKEN,
-} from '@blog/db/testing/recheck-tenant-owners/fixtures';
+} from '@shinefold/db/testing/recheck-tenant-owners/fixtures';
 import {
   MOCK_STEP_ERROR,
   MOCK_TENANT_MANAGEMENT_TOKEN,
   mockTenant,
-} from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/tenants/fixtures';
 
 import { elevateTenantOwner } from './elevate-tenant-owner';
 
@@ -26,7 +26,7 @@ const {
 }));
 
 vi.mock(
-  '@blog/db/queries/tenants/get-tenant-sanity-management-credentials',
+  '@shinefold/db/queries/tenants/get-tenant-sanity-management-credentials',
   () => ({
     getTenantSanityManagementCredentials:
       getTenantSanityManagementCredentialsMock,
@@ -34,7 +34,7 @@ vi.mock(
 );
 
 vi.mock(
-  '@blog/db/utils/sanity-management-client/sanity-project-access',
+  '@shinefold/db/utils/sanity-management-client/sanity-project-access',
   () => ({
     listSanityProjectAcl: listSanityProjectAclMock,
     grantSanityProjectRole: grantSanityProjectRoleMock,

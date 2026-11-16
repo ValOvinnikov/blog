@@ -1,4 +1,4 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT } from '@shinefold/config';
 import type { Decorator } from '@storybook/nextjs-vite';
 import { Section } from '@web/components/shared/section';
 

@@ -2,10 +2,10 @@ import {
   CARD_IMAGE_SHAPE,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import type { TTeamMember, TTeamModule } from '@blog/service';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { MediaCard } from '@blog/ui/components/molecules/media-card';
+} from '@shinefold/config';
+import type { TTeamMember, TTeamModule } from '@shinefold/service';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { MediaCard } from '@shinefold/ui/components/molecules/media-card';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';

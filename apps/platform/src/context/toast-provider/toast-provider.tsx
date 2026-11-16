@@ -1,7 +1,5 @@
 'use client';
 
-import { TOAST_TYPE } from '@blog/config';
-import { hasLength } from '@blog/utils/primitives';
 import type {
   IToastPayload,
   IToastRecord,
@@ -9,6 +7,8 @@ import type {
 import { ToastViewport } from '@platform/components/shared/toast-viewport';
 import { KEY } from '@platform/constants/keyboard';
 import { TOAST_TEST_ID } from '@platform/constants/toast';
+import { TOAST_TYPE } from '@shinefold/config';
+import { hasLength } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import {
   createContext,

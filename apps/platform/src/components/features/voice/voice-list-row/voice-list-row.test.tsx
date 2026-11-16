@@ -1,5 +1,3 @@
-import { VOICE_FIELDS } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { Accordion } from '@platform/components/shared/accordion';
 import {
@@ -8,6 +6,8 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { TAG_ROW, UNSAVED_MARK } from '@platform/testing/voice/fixtures';
+import { VOICE_FIELDS } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import type { ComponentProps } from 'react';
 
 import { VoiceListRow } from './voice-list-row';

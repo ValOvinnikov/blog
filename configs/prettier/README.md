@@ -1,4 +1,4 @@
-# @blog/prettier-config
+# @shinefold/prettier-config
 
 > Shared Prettier configuration.
 

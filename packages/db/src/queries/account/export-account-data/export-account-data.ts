@@ -1,8 +1,8 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { users } from '@blog/db/schema/auth';
-import { bookmarks } from '@blog/db/schema/bookmarks';
-import { decryptOptionalPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { users } from '@shinefold/db/schema/auth';
+import { bookmarks } from '@shinefold/db/schema/bookmarks';
+import { decryptOptionalPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
 import { and, desc, eq } from 'drizzle-orm';
 
 export type TAccountProfileExport = {

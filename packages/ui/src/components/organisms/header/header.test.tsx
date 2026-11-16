@@ -1,6 +1,6 @@
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { renderElement, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import { renderElement, screen } from '@shinefold/ui/testing/custom-render';
 
 import { Header } from './header';
 

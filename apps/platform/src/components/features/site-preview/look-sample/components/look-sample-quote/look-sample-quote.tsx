@@ -1,7 +1,7 @@
-import { BRAND_VARIANT } from '@blog/config';
-import { QuoteCard } from '@blog/ui/components/molecules/quote-card';
 import { SamplePart } from '@platform/components/features/site-preview/sample-part';
 import { SAMPLE_PART } from '@platform/constants/sample-part';
+import { BRAND_VARIANT } from '@shinefold/config';
+import { QuoteCard } from '@shinefold/ui/components/molecules/quote-card';
 import { useTranslations } from 'next-intl';
 
 export const LookSampleQuote = () => {

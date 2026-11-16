@@ -3,9 +3,9 @@ import type {
   Page_topic,
   Template_landing,
   Template_topic,
-} from '@blog/config/sanity/generated/types';
+} from '@shinefold/config/sanity/generated/types';
 
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 
 import type { TStarterCopy } from './copy/starter-copy';
 import type {

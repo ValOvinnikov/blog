@@ -79,7 +79,7 @@ initial design pass or by review afterward:
 tenant name, slug (Studio hostname only, per §1), domain, plan, and owner
 email — all client-side, fast. Submitting it is a Server Action that:
 
-1. Resolves the owner email to an existing registered user (`@blog/db` user
+1. Resolves the owner email to an existing registered user (`@shinefold/db` user
    lookup) — the operator picks an _existing_ user, no invite-email flow (a
    non-goal, matches the parent spec's admin-first framing).
 2. Inserts `tenants` (with `primaryDomain` from the form, a `PENDING`
@@ -125,7 +125,7 @@ the same workflow for the same tenant id resumes rather than repeats:
 4. **Persist the read token** — the `tenants`/`tenant_domains`/`memberships`
    rows already exist from the Server Action (step 1 above); this step
    encrypts and persists the minted Sanity read token (`packages/utils`'
-   `encryptSecret`, per epic 2a). No `@blog/auth` involvement — domain-to-
+   `encryptSecret`, per epic 2a). No `@shinefold/auth` involvement — domain-to-
    tenant resolution already works via the existing `tenant_domains` +
    `resolveTenantId` read path (epic 1), so there's nothing new to wire up
    here. Idempotency check: is `sanityReadTokenEncrypted` already set?
@@ -178,14 +178,14 @@ that failure class entirely — there's no network hop left to drop.
   platform's default locale at insert time — both columns always get a real
   value at insert, so their existing `NOT NULL` constraint is satisfied as-is.
 
-`@blog/config` gains `TENANT_PROVISIONING_STATUS` and
+`@shinefold/config` gains `TENANT_PROVISIONING_STATUS` and
 `TENANT_PROVISIONING_STEP` (the five step keys), both UPPERCASE const pairs
 per this repo's convention.
 
 ## Layer-contract impact
 
-- **`@blog/config`** — the two new const pairs above.
-- **`@blog/db`** — `tenants` schema changes: new nullable columns (additive,
+- **`@shinefold/config`** — the two new const pairs above.
+- **`@shinefold/db`** — `tenants` schema changes: new nullable columns (additive,
   no backfill) plus relaxing `sanityProjectId`/`sanityDataset` from `NOT NULL`
   to nullable (safe — no existing row loses data, see Data model); new
   queries (`createTenantDraft`, `updateProvisioningStep`,
@@ -200,10 +200,10 @@ per this repo's convention.
   `apps/platform` API route (revised post-launch; the route silently dropped
   updates on any network failure, see #2002). Not owned by any of the eight
   code layers; CI config, same bucket as this repo's other deploy workflows.
-- **`@blog/service`, `@blog/ui`, `apps/web`, `@blog/auth`** — untouched. No
+- **`@shinefold/service`, `@shinefold/ui`, `apps/web`, `@shinefold/auth`** — untouched. No
   new Sanity read paths beyond what epic 2a already built; the provisioning
   workflow talks to Sanity's _management_ API (Projects), not the read client
-  `@blog/service` owns.
+  `@shinefold/service` owns.
 - Graph stays acyclic.
 
 ## Error handling & testing

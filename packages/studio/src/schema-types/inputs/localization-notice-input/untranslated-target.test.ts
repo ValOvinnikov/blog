@@ -1,5 +1,8 @@
-import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES } from '@blog/config/constants';
-import { getUntranslatedTargetLocales } from '@blog/studio/schema-types/inputs/localization-notice-input/untranslated-target';
+import {
+  LOCALE_BCP47_TAGS,
+  LOCALE_ISO_CODES,
+} from '@shinefold/config/constants';
+import { getUntranslatedTargetLocales } from '@shinefold/studio/schema-types/inputs/localization-notice-input/untranslated-target';
 
 const { EN, NL, FR, DE } = LOCALE_ISO_CODES;
 

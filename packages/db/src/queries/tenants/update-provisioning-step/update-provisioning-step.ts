@@ -1,19 +1,19 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
 import {
   type TElevateTenantOwnerOutcome,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
   type TWorkerProvisioningStep,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   tenants,
   type TProvisioningStepState,
   type TTenant,
-} from '@blog/db/schema/tenants';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/schema/tenants';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { eq, sql } from 'drizzle-orm';
 
 export type TUpdateProvisioningStepInput = {

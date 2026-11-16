@@ -1,4 +1,4 @@
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import {
   pgEnum,
   pgTable,

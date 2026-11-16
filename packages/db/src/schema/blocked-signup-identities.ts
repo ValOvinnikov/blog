@@ -1,4 +1,4 @@
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
 import {
   pgEnum,
   pgTable,

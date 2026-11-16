@@ -1,4 +1,3 @@
-import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import { BILLING_LOG } from '@platform/constants/billing';
 import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures';
 import { mockStripePlanChangeClient } from '@platform/testing/billing/stripe-plan-change-client';
@@ -6,6 +5,7 @@ import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscri
 import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { STRIPE_PRICE_LOOKUP_KEY } from '@shinefold/db/constants';
 
 import { readTenantSubscriptionPlan } from './read-tenant-subscription-plan';
 import { getStripeClient } from './stripe-client';

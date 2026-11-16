@@ -1,7 +1,7 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { stripeEnv } from '@platform/utils/stripe-env/stripe-env';
+import type { TMaybeUndefined } from '@shinefold/config';
 import Stripe from 'stripe';
 
 let client: TMaybeUndefined<Stripe>;

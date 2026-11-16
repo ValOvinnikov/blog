@@ -1,10 +1,10 @@
-import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockLocaleRouterPush } from '@platform/testing/mock-locale-router';
 import {
   mockTenantsListQuery,
   MOCK_TENANT_SLUG,
 } from '@platform/testing/tenants/fixtures';
+import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ArchivedTenantsToggle } from './archived-tenants-toggle';

@@ -1,7 +1,7 @@
-import type { TMaybeNull } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
 import { mockTenant } from '@platform/testing/tenants/fixtures';
+import type { TMaybeNull } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 
 import { trialFor } from './trial-for';
 

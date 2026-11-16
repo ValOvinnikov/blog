@@ -1,23 +1,23 @@
-import { SUBSCRIBER_OUTCOME, ERROR_CODE } from '@blog/config/constants';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import { SUBSCRIBER_OUTCOME, ERROR_CODE } from '@shinefold/config/constants';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
   MOCK_SUBSCRIBER_TAGGED_EMAIL,
-} from '@blog/db/testing/fixtures';
+} from '@shinefold/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   mockAccountEmailIndex,
   testPersonalEmailIndex,
-} from '@blog/db/testing/personal-data';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { errorResult, okResult } from '@blog/utils';
+} from '@shinefold/db/testing/personal-data';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import { createPendingSubscriber } from './create-pending-subscriber';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

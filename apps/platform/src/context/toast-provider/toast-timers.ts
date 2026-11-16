@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 interface ITimerEntry {
   timeoutId: TMaybeUndefined<ReturnType<typeof setTimeout>>;

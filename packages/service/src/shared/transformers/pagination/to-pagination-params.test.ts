@@ -1,6 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { MOCK_TAG_SLUG } from '@blog/service/testing/entities/fixtures';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { MOCK_TAG_SLUG } from '@shinefold/service/testing/entities/fixtures';
 
 import { toPaginationParams } from './to-pagination-params';
 

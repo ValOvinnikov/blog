@@ -1,16 +1,16 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   MOCK_TOPIC_ID,
   MOCK_TOPIC_SLUG,
-} from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
 import {
   mockListModuleRefs,
   mockSlugPageDocument,
-} from '@blog/service/testing/pages/fixtures';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { MOCK_TRANSLATED_POST_DOCUMENTS } from '@blog/service/testing/shared/translated-posts-dataset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/pages/fixtures';
+import { mockReference } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { MOCK_TRANSLATED_POST_DOCUMENTS } from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { topicPaginationParamsQuery } from './query';
 

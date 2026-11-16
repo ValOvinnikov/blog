@@ -1,5 +1,5 @@
-import type { TLocaleIsoCode } from '@blog/config';
-import { queries } from '@blog/db';
+import type { TLocaleIsoCode } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 export const isLiveLocale = async (
   tenantId: string,

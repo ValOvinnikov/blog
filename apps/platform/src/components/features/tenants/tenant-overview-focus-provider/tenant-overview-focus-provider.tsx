@@ -1,7 +1,7 @@
 'use client';
 
-import type { TMaybeNull } from '@blog/config';
-import type { IWithChildren } from '@blog/config/react';
+import type { TMaybeNull } from '@shinefold/config';
+import type { IWithChildren } from '@shinefold/config/react';
 import { useCallback, useMemo, useRef } from 'react';
 
 import {

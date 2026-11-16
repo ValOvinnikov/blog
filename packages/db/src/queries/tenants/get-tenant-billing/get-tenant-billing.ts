@@ -1,11 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
 import {
   tenantBillingColumns,
   toTenantBilling,
   type TTenantBilling,
-} from '@blog/db/queries/tenants/tenant-billing';
-import { tenants } from '@blog/db/schema/tenants';
+} from '@shinefold/db/queries/tenants/tenant-billing';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
 export async function getTenantBilling(

@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const NEWSLETTER_POST_SEND_OUTCOME = {
   SENT: 'SENT',

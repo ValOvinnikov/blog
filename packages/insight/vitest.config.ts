@@ -10,6 +10,6 @@ export default defineConfig({
     globals: true,
   },
   resolve: {
-    alias: [{ find: /^@blog\/insight\//, replacement: `${src}/` }],
+    alias: [{ find: /^@shinefold\/insight\//, replacement: `${src}/` }],
   },
 });

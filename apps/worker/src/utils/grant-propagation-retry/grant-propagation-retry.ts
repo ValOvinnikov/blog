@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from '@blog/config';
 import { ClientError } from '@sanity/client';
+import { HTTP_STATUS } from '@shinefold/config';
 import type { TRetryWithBackoffOptions } from '@worker/utils/retry-with-backoff/retry-with-backoff';
 
 // Bounded to ride out a freshly-minted token's grant-propagation delay, not to mask a genuine misconfiguration.

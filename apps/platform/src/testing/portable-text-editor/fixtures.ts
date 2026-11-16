@@ -1,5 +1,5 @@
-import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { faker } from '@faker-js/faker';
+import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
 
 export const BULLET_LIST_ITEM = 'bullet';
 export const NUMBER_LIST_ITEM = 'number';

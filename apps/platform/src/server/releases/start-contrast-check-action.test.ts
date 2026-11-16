@@ -1,11 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  HTTP_STATUS,
-  NEXT_NAVIGATION_ERROR,
-  type TMaybeNull,
-} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { GITHUB_RUN_STATUS } from '@platform/constants/github';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
@@ -24,6 +16,14 @@ import {
   mockGitHubResponse,
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  HTTP_STATUS,
+  NEXT_NAVIGATION_ERROR,
+  type TMaybeNull,
+} from '@shinefold/config';
 import type { Session } from 'next-auth';
 
 import { startContrastCheckAction } from './start-contrast-check-action';
@@ -40,7 +40,7 @@ vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { auditEvents: { insertAuditEvent: insertAuditEventMock } },
 }));
 
