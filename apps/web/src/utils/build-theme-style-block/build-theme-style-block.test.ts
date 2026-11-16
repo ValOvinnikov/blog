@@ -11,10 +11,18 @@ import {
   CARD_STYLE_DECLARATIONS,
   DENSITY,
   DENSITY_DECLARATIONS,
+  DIVIDER_WIDTH,
+  DIVIDER_WIDTH_DECLARATIONS,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
+  HEADING_CASE,
+  HEADING_CASE_DECLARATIONS,
+  HEADING_WEIGHT,
+  HEADING_WEIGHT_DECLARATIONS,
+  IMAGE_PROPORTION,
+  IMAGE_PROPORTION_DECLARATIONS,
   NAV_LINK_STYLE,
   NAV_LINK_STYLE_DECLARATIONS,
   PRESET_ID,
@@ -85,6 +93,11 @@ const DARK_EXCLUDED_PREFIXES = [
   '--nav-link-',
   '--scrim-',
   '--on-image',
+  '--font-weight-heading',
+  '--heading-case',
+  '--text-',
+  '--aspect-',
+  '--divider-width',
 ];
 
 const splitModes = (css: string) => ({
@@ -121,6 +134,26 @@ const STYLE_AXES: {
     field: 'navLinkStyle',
     defaultValue: NAV_LINK_STYLE.PLAIN,
     declarations: NAV_LINK_STYLE_DECLARATIONS,
+  },
+  {
+    field: 'headingWeight',
+    defaultValue: HEADING_WEIGHT.MEDIUM,
+    declarations: HEADING_WEIGHT_DECLARATIONS,
+  },
+  {
+    field: 'headingCase',
+    defaultValue: HEADING_CASE.AS_WRITTEN,
+    declarations: HEADING_CASE_DECLARATIONS,
+  },
+  {
+    field: 'imageProportion',
+    defaultValue: IMAGE_PROPORTION.AS_DESIGNED,
+    declarations: IMAGE_PROPORTION_DECLARATIONS,
+  },
+  {
+    field: 'dividerWidth',
+    defaultValue: DIVIDER_WIDTH.HAIRLINE,
+    declarations: DIVIDER_WIDTH_DECLARATIONS,
   },
 ];
 
@@ -233,6 +266,21 @@ describe(buildThemeStyleBlock, () => {
       );
 
       expect(staticDeclarations.length).toBeGreaterThan(0);
+      expect(missing).toEqual([]);
+    });
+
+    it('reproduces the heading, image proportion and divider tokens', () => {
+      const staticDeclarations = declarationsMatching(
+        THEME_CSS,
+        'font-weight-heading|heading-case|aspect-(?:card|split)|divider-width|text-(?:hero|post-title|title-2xl|title-section)--letter-spacing',
+      );
+      const { root } = splitModes(buildThemeStyleBlock(CONSOLE_TOKENS));
+
+      const missing = staticDeclarations.filter(
+        (declaration) => !root.includes(declaration),
+      );
+
+      expect(staticDeclarations).toHaveLength(9);
       expect(missing).toEqual([]);
     });
   });

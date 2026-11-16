@@ -4,9 +4,13 @@ import {
   PRESET_REGISTRY,
   type TButtonShape,
   type TCardStyle,
+  type TDividerWidth,
   type TFontChoice,
   type THeaderControlShape,
   type THeaderControlStyle,
+  type THeadingCase,
+  type THeadingWeight,
+  type TImageProportion,
   type TNavLinkStyle,
   type TPresetId,
   type TRadiusScale,
@@ -27,6 +31,10 @@ type TThemeTokensRow = {
   headerControlShape: THeaderControlShape;
   buttonShape: TButtonShape;
   navLinkStyle: TNavLinkStyle;
+  headingWeight: THeadingWeight;
+  headingCase: THeadingCase;
+  imageProportion: TImageProportion;
+  dividerWidth: TDividerWidth;
 };
 
 export const toThemeTokens = (
@@ -40,6 +48,10 @@ export const toThemeTokens = (
     headerControlShape,
     buttonShape,
     navLinkStyle,
+    headingWeight,
+    headingCase,
+    imageProportion,
+    dividerWidth,
   } = PRESET_REGISTRY[preset];
 
   const requestedAccentHue = row?.accentHue ?? base.accentHue;
@@ -59,5 +71,9 @@ export const toThemeTokens = (
     headerControlShape: row?.headerControlShape ?? headerControlShape,
     buttonShape: row?.buttonShape ?? buttonShape,
     navLinkStyle: row?.navLinkStyle ?? navLinkStyle,
+    headingWeight: row?.headingWeight ?? headingWeight,
+    headingCase: row?.headingCase ?? headingCase,
+    imageProportion: row?.imageProportion ?? imageProportion,
+    dividerWidth: row?.dividerWidth ?? dividerWidth,
   };
 };
