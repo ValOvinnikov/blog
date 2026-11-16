@@ -1,17 +1,17 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_TENANT_VALUES } from '@blog/db/testing/tenants/fixtures';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_TENANT_VALUES } from '@shinefold/db/testing/tenants/fixtures';
 import {
   MOCK_SELF_SERVE_DOMAIN,
   MOCK_SELF_SERVE_PADDED_DOMAIN,
   MOCK_SELF_SERVE_SCHEME_DOMAIN,
-} from '@blog/db/testing/tenants/self-serve-fixtures';
+} from '@shinefold/db/testing/tenants/self-serve-fixtures';
 
 import { createTenant, type TCreateTenantInput } from './create-tenant';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

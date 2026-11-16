@@ -1,6 +1,6 @@
-import { routes } from '@blog/config';
-import type { TTopicsList } from '@blog/service';
-import { Tag } from '@blog/ui/components/atoms/tag';
+import { routes } from '@shinefold/config';
+import type { TTopicsList } from '@shinefold/service';
+import { Tag } from '@shinefold/ui/components/atoms/tag';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 

@@ -1,8 +1,8 @@
-import { isUndefined } from '@blog/utils/primitives';
 import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 import { useAccountDraftFields } from './use-account-draft-fields';

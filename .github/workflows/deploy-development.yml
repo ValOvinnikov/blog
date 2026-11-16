@@ -9,7 +9,7 @@ name: Deploy Development
 # `main` — but only the app(s) whose turbo graph the merge actually touched (see
 # the `changes` job), and ONLY after the `verify` gate (type-check/lint/test/build on the
 # merged commit) passes. The Studio is not deployed: it ships as the
-# `@blog/studio` package and is mounted by the platform, so `changes` tracks
+# `@shinefold/studio` package and is mounted by the platform, so `changes` tracks
 # it only to decide whether the Sanity content migration needs to run. Vercel's
 # native Git integration is disabled for every deployed project declaratively via
 # each app's own vercel.json `git.deploymentEnabled: false` (#445) so nothing
@@ -175,7 +175,7 @@ jobs:
           BASE_REF: ${{ steps.baseline.outputs.ref }}
         run: |
           set -uo pipefail
-          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" @blog/studio --fallback="$BASE_REF"; then
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" @shinefold/studio --fallback="$BASE_REF"; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -368,7 +368,7 @@ jobs:
   # migration" discipline as the content `migrate` job above, for the
   # separate relational store (`packages/db`, see .claude/agents/db.md's
   # "Migrations" section). `deploy-web`, `deploy-platform` and `deploy-worker` all
-  # depend on `@blog/db` (the Studio never touches Postgres), so this is gated
+  # depend on `@shinefold/db` (the Studio never touches Postgres), so this is gated
   # on web||platform||worker, not `studio`, and only those three need it below. No
   # artifact backup here — dev is the disposable staging line, same
   # stance as the content migrate job. `drizzle-kit migrate` is a no-op when nothing is
@@ -445,7 +445,7 @@ jobs:
         run: |
           set -euo pipefail
           : "${DATABASE_URL_UNPOOLED:?empty — set the DATABASE_URL_UNPOOLED secret on the development environment}"
-          pnpm --filter @blog/db db:migrate
+          pnpm --filter @shinefold/db db:migrate
 
   deploy-web:
     name: Stage dev web

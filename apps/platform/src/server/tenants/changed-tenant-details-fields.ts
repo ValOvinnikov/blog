@@ -1,11 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TUpdateTenantDetailsInput } from '@blog/db/queries/tenants/update-tenant-details/update-tenant-details';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isUndefined, objectKeys } from '@blog/utils/primitives';
 import {
   TENANT_DETAILS_FIELD,
   type TTenantDetailsField,
 } from '@platform/constants/tenant';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TUpdateTenantDetailsInput } from '@shinefold/db/queries/tenants/update-tenant-details/update-tenant-details';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isUndefined, objectKeys } from '@shinefold/utils/primitives';
 
 type TComparedDetails = Omit<TUpdateTenantDetailsInput, 'ownerEmail'>;
 

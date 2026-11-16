@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { HTTP_STATUS } from '@shinefold/config/constants';
 import { INTERNAL_PAGES_LOG } from '@web/constants/internal-pages';
 import {
   MOCK_INTERNAL_PAGE_ID,
@@ -26,7 +26,7 @@ vi.mock(
   '@web/server/internal-pages/read-internal-page-request/read-internal-page-request',
 );
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: { pagePath: { v1: { getDraftPagePath: getDraftPagePathMock } } },
   },

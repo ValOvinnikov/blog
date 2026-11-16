@@ -1,15 +1,18 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { MOCK_NO_BILLING } from '@blog/db/testing/tenants/billing';
-import { MOCK_NO_HOLD } from '@blog/db/testing/tenants/inactivity';
-import { MOCK_NO_OWNER_ACCESS } from '@blog/db/testing/tenants/owner-access';
 import { faker } from '@faker-js/faker';
 import {
   type TPlatformTenant,
   toPlatformTenant,
 } from '@platform/utils/platform-tenant/platform-tenant';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { MOCK_NO_BILLING } from '@shinefold/db/testing/tenants/billing';
+import { MOCK_NO_HOLD } from '@shinefold/db/testing/tenants/inactivity';
+import { MOCK_NO_OWNER_ACCESS } from '@shinefold/db/testing/tenants/owner-access';
 
 import {
   mockDoneProvisioningSteps,

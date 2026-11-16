@@ -1,7 +1,7 @@
-import { TAXONOMY_KIND } from '@blog/config/constants';
-import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index-type';
-import { taxonomyIndexPage } from '@blog/studio/schema-types/documents/pages/taxonomy-index/taxonomy-index-page';
-import { tagIndexTemplateSchema } from '@blog/studio/schema-types/documents/templates/tag-index/tag-index';
+import { TAXONOMY_KIND } from '@shinefold/config/constants';
+import { PAGE_TAG_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/tag-index/tag-index-type';
+import { taxonomyIndexPage } from '@shinefold/studio/schema-types/documents/pages/taxonomy-index/taxonomy-index-page';
+import { tagIndexTemplateSchema } from '@shinefold/studio/schema-types/documents/templates/tag-index/tag-index';
 import { Tag } from 'lucide-react';
 
 export const tagIndexPageSchema = taxonomyIndexPage({

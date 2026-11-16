@@ -1,5 +1,5 @@
-import { archiveTenant } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { archiveTenant } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 import type { TDeprovisionEnv } from '../lib/env';
 import { recordDeprovisionAuditEvent } from '../lib/record-deprovision-audit-event';

@@ -1,3 +1,3 @@
-import type { TRedirectStatus } from '@blog/config/constants';
+import type { TRedirectStatus } from '@shinefold/config/constants';
 
 export type TLandingRedirect = { destination: string; status: TRedirectStatus };

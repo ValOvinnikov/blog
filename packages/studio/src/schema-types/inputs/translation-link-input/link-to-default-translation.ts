@@ -1,6 +1,6 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import type { Mutation } from '@sanity/client';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 import { getDraftId, getPublishedId } from 'sanity';
 
 const METADATA_TYPE = 'translation.metadata';

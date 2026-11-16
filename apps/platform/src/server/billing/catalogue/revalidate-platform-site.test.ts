@@ -13,7 +13,7 @@ const { getTenantByDomainMock } = vi.hoisted(() => ({
   getTenantByDomainMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenantDomains: { getTenantByDomain: getTenantByDomainMock } },
 }));
 vi.mock('@platform/server/site-config/revalidate-site-config');

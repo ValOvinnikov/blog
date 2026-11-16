@@ -1,12 +1,12 @@
-import type { ISanityImage, TMaybeUndefined } from '@blog/config';
-import type { postCardFragment } from '@blog/service/shared/fragments/post/post';
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
+import type { ISanityImage, TMaybeUndefined } from '@shinefold/config';
+import type { postCardFragment } from '@shinefold/service/shared/fragments/post/post';
+import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toSanityImage } from '@shinefold/service/shared/transformers/image/to-sanity-image';
 import {
   toPersonCard,
   type TPersonCard,
-} from '@blog/service/shared/transformers/person/to-person-card';
-import { toReadingTimeMinutes } from '@blog/utils';
+} from '@shinefold/service/shared/transformers/person/to-person-card';
+import { toReadingTimeMinutes } from '@shinefold/utils';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawPostCard = InferFragmentType<typeof postCardFragment>;

@@ -1,5 +1,5 @@
-import { BRAND_VARIANT, PRICE_PERIOD } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, PRICE_PERIOD } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_ACTIONS,

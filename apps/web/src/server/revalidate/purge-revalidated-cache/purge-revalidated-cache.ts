@@ -1,4 +1,4 @@
-import { hasLength } from '@blog/utils/primitives';
+import { hasLength } from '@shinefold/utils/primitives';
 import { purgeDerivedPaths } from '@web/server/revalidate/purge-derived-paths/purge-derived-paths';
 import {
   resolveDerivedRevalidatePaths,

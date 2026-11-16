@@ -1,6 +1,6 @@
-import { HEADER_SUBMENU_STYLE } from '@blog/config';
-import { NAV_LINK } from '@blog/ui/lib/styling';
 import { tv } from '@platform/utils/tv/tv';
+import { HEADER_SUBMENU_STYLE } from '@shinefold/config';
+import { NAV_LINK } from '@shinefold/ui/lib/styling';
 
 export const sampleHeaderLinksVariants = tv({
   slots: {

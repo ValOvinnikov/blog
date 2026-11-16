@@ -1,4 +1,4 @@
-import { PRESET_ID, type TPresetId } from '@blog/config';
+import { PRESET_ID, type TPresetId } from '@shinefold/config';
 
 export const PRESET_LABEL_KEY = {
   [PRESET_ID.CONSOLE]: 'console',

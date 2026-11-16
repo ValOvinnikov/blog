@@ -7,13 +7,13 @@ import authConfig from './auth.js';
 
 const linter = new Linter();
 
-// `@blog/auth` sits above `@blog/db` (SPEC.md §4: auth's own upstreams
+// `@shinefold/auth` sits above `@shinefold/db` (SPEC.md §4: auth's own upstreams
 // include `db`) and binds the Drizzle adapter to db's tables — this is a
-// one-directional layering, not a mutual sibling ban, so importing `@blog/db`
-// from `@blog/auth` must stay unrestricted.
-test('auth.js does not restrict @blog/db imports', () => {
+// one-directional layering, not a mutual sibling ban, so importing `@shinefold/db`
+// from `@shinefold/auth` must stay unrestricted.
+test('auth.js does not restrict @shinefold/db imports', () => {
   const messages = linter.verify(
-    "export { schema } from '@blog/db';\n",
+    "export { schema } from '@shinefold/db';\n",
     authConfig,
     {
       filename: 'src/config.ts',
@@ -23,9 +23,9 @@ test('auth.js does not restrict @blog/db imports', () => {
   assert.deepEqual(messages, []);
 });
 
-test('auth.js still bans @blog/ui imports', () => {
+test('auth.js still bans @shinefold/ui imports', () => {
   const messages = linter.verify(
-    "export { Button } from '@blog/ui';\n",
+    "export { Button } from '@shinefold/ui';\n",
     authConfig,
     {
       filename: 'src/config.ts',

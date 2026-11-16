@@ -1,6 +1,6 @@
-import { PRICE_PERIOD, TENANT_PLAN } from '@blog/config/constants';
-import { validatePricingTierPlanIntervalRequired } from '@blog/studio/schema-types/validation/validate-pricing-tier-plan-interval-required/validate-pricing-tier-plan-interval-required';
-import { mockValidationContext } from '@blog/studio/testing/mock-validation-context';
+import { PRICE_PERIOD, TENANT_PLAN } from '@shinefold/config/constants';
+import { validatePricingTierPlanIntervalRequired } from '@shinefold/studio/schema-types/validation/validate-pricing-tier-plan-interval-required/validate-pricing-tier-plan-interval-required';
+import { mockValidationContext } from '@shinefold/studio/testing/mock-validation-context';
 
 const PLAN_INTERVAL_REQUIRED_MESSAGE =
   'Choose which of the plan’s prices the tier shows.';

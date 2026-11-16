@@ -1,5 +1,5 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
 import { ClientError } from '@sanity/client';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config';
 
 export const MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE =
   'transaction failed: Insufficient permissions; permission "create" required';

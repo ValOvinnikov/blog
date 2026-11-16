@@ -1,8 +1,8 @@
-import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import type { TButtonVariants } from '@platform/components/shared/button/button-variants';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { Text } from '@platform/components/shared/text';
+import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { paginationVariants } from './pagination-variants';

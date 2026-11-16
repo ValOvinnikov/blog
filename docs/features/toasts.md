@@ -17,7 +17,7 @@ epics: []
 
 ## What it does
 
-Short, non-blocking notices that confirm or report the outcome of an action: a saved bookmark (with Undo), a newsletter subscription, an account change on the public site; a saved Look, Voice, Email, Languages or Features form, or a provisioning update, in the platform. Each app has its own provider and the same queueing rules; the public site renders through `@blog/ui`, the platform through its own components.
+Short, non-blocking notices that confirm or report the outcome of an action: a saved bookmark (with Undo), a newsletter subscription, an account change on the public site; a saved Look, Voice, Email, Languages or Features form, or a provisioning update, in the platform. Each app has its own provider and the same queueing rules; the public site renders through `@shinefold/ui`, the platform through its own components.
 
 ## Surfaces and routes
 
@@ -45,7 +45,7 @@ Short, non-blocking notices that confirm or report the outcome of an action: a s
 - `toast.promise` shows a loading toast only if the promise is still pending after 400 ms, then settles it in place into success or error.
 - Hover or focus pauses a toast's timer; leaving resumes it with the remaining time. Escape dismisses the focused toast, otherwise the newest, in both apps. Acting on a toast's action dismisses it.
 - Errors announce as `role="alert"` (assertive); other types as `role="status"` (polite).
-- The two apps share no toast code: `apps/web` and `apps/platform` each own a store and provider, and only the public site uses the `@blog/ui` `Toast` and `ToastViewport`.
+- The two apps share no toast code: `apps/web` and `apps/platform` each own a store and provider, and only the public site uses the `@shinefold/ui` `Toast` and `ToastViewport`.
 
 ## Dependencies
 

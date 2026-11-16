@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config';
 import {
   useLeadPageTitleCache,
   useLeadsTenantId,
 } from '@platform/components/features/leads/leads-tenant-provider';
 import { getLeadPageTitleAction } from '@platform/server/leads/get-lead-page-title-action';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useEffect, useState } from 'react';
 
 type TResolvedTitle = { key: string; title: TMaybeUndefined<string> };

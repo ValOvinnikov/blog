@@ -1,26 +1,26 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   LOCALE_ISO_CODES,
   TAXONOMY_KIND,
   TAXONOMY_SORT,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   MOCK_DUTCH_MODULE_HEADING,
   MOCK_ENGLISH_MODULE_HEADING,
   MOCK_MODULE_ID,
   mockModuleDocument,
   mockRawTaxonomyListModule,
-} from '@blog/service/testing/modules/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
+} from '@shinefold/service/testing/modules/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { mockLocalizedStrings } from '@shinefold/service/testing/shared/localized';
 import {
   MOCK_DESIGN_EN_POST_ID,
   MOCK_DESIGN_NL_POST_ID,
   MOCK_ONLY_EN_POST_ID,
   MOCK_TRANSLATED_POST_DOCUMENTS,
   toIds,
-} from '@blog/service/testing/shared/translated-posts-dataset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { taxonomyListModuleQuery } from './query';
 

@@ -1,8 +1,8 @@
-import type { TControlAria, TMaybeUndefined } from '@blog/config';
-import type { TLookField } from '@blog/db/constants';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
+import type { TControlAria, TMaybeUndefined } from '@shinefold/config';
+import type { TLookField } from '@shinefold/db/constants';
 import { useId } from 'react';
 
 export const useLookFieldLock = (field: TLookField) => {

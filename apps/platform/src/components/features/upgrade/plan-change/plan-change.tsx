@@ -1,6 +1,5 @@
 'use client';
 
-import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
 import { PlanChoices } from '@platform/components/features/upgrade/plan-choices';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
@@ -12,6 +11,7 @@ import type { TPendingPlanChange } from '@platform/server/billing/load-subscript
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { isSamePlanChoice } from '@platform/utils/plan-change-timing/plan-change-timing';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ALERT_TYPE, type TMaybeUndefined } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 import { type ReactNode, useState } from 'react';
 

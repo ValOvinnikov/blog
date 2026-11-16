@@ -1,6 +1,6 @@
-import { WRITABLE_TENANT_STATUSES } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isOneOf } from '@blog/utils/primitives';
+import { WRITABLE_TENANT_STATUSES } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isOneOf } from '@shinefold/utils/primitives';
 
 export function isTenantWritable({
   status,

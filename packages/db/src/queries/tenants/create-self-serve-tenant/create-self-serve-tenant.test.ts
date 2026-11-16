@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
@@ -6,26 +7,26 @@ import {
   PRESET_ID,
   SITE_TYPE,
   TENANT_PLAN,
-} from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
+} from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   DAY_MS,
   MEMBERSHIP_ROLE,
   TENANT_PROVISIONING_STATUS,
   TENANT_STATUS,
   TRIAL_LENGTH_DAYS,
-} from '@blog/db/constants';
-import type { insertAuditEvent } from '@blog/db/queries/audit-events/insert-audit-event';
-import type { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
-import type { ownsFreeTenant } from '@blog/db/queries/tenants/owns-free-tenant';
-import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data';
-import * as schema from '@blog/db/schema';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { MOCK_NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
-import { insertTestUser } from '@blog/db/testing/fixtures';
-import { testPersonalEmailIndex } from '@blog/db/testing/personal-data';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { unwrapOk } from '@blog/db/testing/tenants/fixtures';
+} from '@shinefold/db/constants';
+import type { insertAuditEvent } from '@shinefold/db/queries/audit-events/insert-audit-event';
+import type { getTenantByDomain } from '@shinefold/db/queries/tenant-domains/get-tenant-by-domain';
+import type { ownsFreeTenant } from '@shinefold/db/queries/tenants/owns-free-tenant';
+import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data';
+import * as schema from '@shinefold/db/schema';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { MOCK_NOT_AN_ADDRESS } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
+import { insertTestUser } from '@shinefold/db/testing/fixtures';
+import { testPersonalEmailIndex } from '@shinefold/db/testing/personal-data';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { unwrapOk } from '@shinefold/db/testing/tenants/fixtures';
 import {
   MOCK_SELF_SERVE_DOMAIN,
   MOCK_SELF_SERVE_MISSING_USER_ID,
@@ -39,10 +40,9 @@ import {
   MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL,
   MOCK_SELF_SERVE_PADDED_DOMAIN,
   MOCK_SELF_SERVE_SCHEME_DOMAIN,
-} from '@blog/db/testing/tenants/self-serve-fixtures';
-import { patchTestTenant } from '@blog/db/testing/test-tenant';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/tenants/self-serve-fixtures';
+import { patchTestTenant } from '@shinefold/db/testing/test-tenant';
+import { errorResult, okResult } from '@shinefold/utils';
 import { eq } from 'drizzle-orm';
 
 import {
@@ -61,13 +61,14 @@ const {
   ownsFreeTenantMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
-  OWNS_FREE_TENANT_MODULE: '@blog/db/queries/tenants/owns-free-tenant',
+  OWNS_FREE_TENANT_MODULE: '@shinefold/db/queries/tenants/owns-free-tenant',
   GET_TENANT_BY_DOMAIN_MODULE:
-    '@blog/db/queries/tenant-domains/get-tenant-by-domain',
-  INSERT_AUDIT_EVENT_MODULE: '@blog/db/queries/audit-events/insert-audit-event',
+    '@shinefold/db/queries/tenant-domains/get-tenant-by-domain',
+  INSERT_AUDIT_EVENT_MODULE:
+    '@shinefold/db/queries/audit-events/insert-audit-event',
 }));
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 vi.mock(OWNS_FREE_TENANT_MODULE, () => ({
   ownsFreeTenant: ownsFreeTenantMock,

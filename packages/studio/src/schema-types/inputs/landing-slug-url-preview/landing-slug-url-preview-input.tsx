@@ -1,13 +1,13 @@
-import { SlugUrlPreview } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
+import { SlugUrlPreview } from '@shinefold/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
 import {
   buildNestedRoutePrefix,
   buildSlugUrlPreviewPath,
-} from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-path';
+} from '@shinefold/studio/schema-types/inputs/slug-url-preview/slug-url-preview-path';
 import {
   flattenLandingParentChain,
   LANDING_PARENT_CHAIN_QUERY,
   type TLandingParentChainNode,
-} from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
+} from '@shinefold/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
 import { useEffect, useState } from 'react';
 import {
   type Reference,

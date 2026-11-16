@@ -5,21 +5,21 @@ import {
   FINDING_SOURCE,
   FINDING_STATUS,
   type TFindingSeverity,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   listFindingsForTenant,
   openFinding,
   resolveFinding,
-} from '@blog/db/queries/findings';
+} from '@shinefold/db/queries/findings';
 import {
   getTenantById,
   getTenantSanityCredentials,
   listActiveTenants,
-} from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isTenantWritable } from '@blog/db/utils/is-tenant-writable/is-tenant-writable';
-import { sanitizeLogMessage } from '@blog/insight';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isTenantWritable } from '@shinefold/db/utils/is-tenant-writable/is-tenant-writable';
+import { sanitizeLogMessage } from '@shinefold/insight';
+import { hasLength } from '@shinefold/utils/primitives';
 
 import { readOptionalTenantId } from '../lib/cli-flags';
 import { runIfEntrypoint } from '../lib/run-if-entrypoint';

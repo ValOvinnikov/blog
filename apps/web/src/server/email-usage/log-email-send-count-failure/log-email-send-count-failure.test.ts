@@ -1,4 +1,4 @@
-import { EMAIL_TYPE } from '@blog/config/constants';
+import { EMAIL_TYPE } from '@shinefold/config/constants';
 import { EMAIL_USAGE_LOG } from '@web/constants/email-usage';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';

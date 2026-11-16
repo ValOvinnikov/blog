@@ -1,13 +1,13 @@
-import { SANITY_ROBOT_ROLE } from '@blog/config';
+import { SANITY_ROBOT_ROLE } from '@shinefold/config';
 import {
   getTenantSanityManagementCredentials,
   setTenantSanityManagementToken,
-} from '@blog/db/queries/tenants';
+} from '@shinefold/db/queries/tenants';
 import {
   createSanityRobotToken,
   deleteSanityRobotToken,
-} from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { buildSanityTokenLabels } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
+} from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
+import { buildSanityTokenLabels } from '@shinefold/db/utils/sanity-management-client/sanity-token-labels';
 import { FatalError } from 'workflow';
 
 export async function requireTenantManagementToken(

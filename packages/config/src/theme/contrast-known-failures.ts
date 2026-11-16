@@ -1,4 +1,7 @@
-import { COLOR_SCHEME, HEADER_CONTROL_STYLE } from '@blog/config/constants';
+import {
+  COLOR_SCHEME,
+  HEADER_CONTROL_STYLE,
+} from '@shinefold/config/constants';
 
 import type { TContrastFailure } from './contrast-check';
 

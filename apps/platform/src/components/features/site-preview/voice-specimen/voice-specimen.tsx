@@ -1,13 +1,3 @@
-import {
-  SITE_MESSAGES_BY_LOCALE,
-  SIZE,
-  VOICE_SURFACE,
-  type TVoiceFieldId,
-  type TVoiceSurface,
-} from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { Button } from '@blog/ui/components/atoms/button';
-import { LinkButton } from '@blog/ui/components/molecules/link-button';
 import { SiteThemeFrame } from '@platform/components/features/site-preview/site-theme-frame';
 import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import {
@@ -16,6 +6,16 @@ import {
   type TVoiceField,
   type TVoiceLocaleDraft,
 } from '@platform/utils/voice-draft/voice-draft';
+import {
+  SITE_MESSAGES_BY_LOCALE,
+  SIZE,
+  VOICE_SURFACE,
+  type TVoiceFieldId,
+  type TVoiceSurface,
+} from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
 import type { ReactNode } from 'react';
 
 import { SpecimenBookmarks } from './components/specimen-bookmarks/specimen-bookmarks';

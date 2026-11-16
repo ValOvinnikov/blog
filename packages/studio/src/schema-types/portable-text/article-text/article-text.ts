@@ -1,11 +1,11 @@
-import { expandableSectionSchema } from '@blog/studio/schema-types/objects/expandable-section/expandable-section';
-import { tableSchema } from '@blog/studio/schema-types/objects/table/table';
-import { withTablePlugin } from '@blog/studio/schema-types/objects/table/table-plugin';
+import { expandableSectionSchema } from '@shinefold/studio/schema-types/objects/expandable-section/expandable-section';
+import { tableSchema } from '@shinefold/studio/schema-types/objects/table/table';
+import { withTablePlugin } from '@shinefold/studio/schema-types/objects/table/table-plugin';
 import {
   articleTextEmbeds,
   articleTextMarks,
   articleTextStyles,
-} from '@blog/studio/schema-types/portable-text/article-text/article-text-members';
+} from '@shinefold/studio/schema-types/portable-text/article-text/article-text-members';
 import { defineArrayMember, defineType } from 'sanity';
 
 export const articleTextSchema = defineType({

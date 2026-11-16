@@ -2,11 +2,11 @@
 
 import { Radio } from '@base-ui/react/radio';
 import { RadioGroup } from '@base-ui/react/radio-group';
-import { ICONS, SIZE } from '@blog/config';
 import { PresetSwatch } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/preset-swatch/preset-swatch';
 import type { TPresetOption } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/preset-option';
 import { Icon } from '@platform/components/shared/icon';
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
+import { ICONS, SIZE } from '@shinefold/config';
 import { Fragment, useId } from 'react';
 
 import { presetChipsVariants } from './preset-chips-variants';

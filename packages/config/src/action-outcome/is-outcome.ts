@@ -1,6 +1,9 @@
-import type { TOutcome } from '@blog/config/types';
+import type { TOutcome } from '@shinefold/config/types';
 
-import { ACTION_OUTCOME, type TActionOutcome } from '@blog/config/constants';
+import {
+  ACTION_OUTCOME,
+  type TActionOutcome,
+} from '@shinefold/config/constants';
 
 type TCanBe<
   TResult extends TOutcome<string>,

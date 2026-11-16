@@ -1,12 +1,3 @@
-import {
-  type TMaybeNull,
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { PLAN_REGISTRY } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { SETTINGS_FEATURES_LOG } from '@platform/constants/settings-features';
@@ -30,6 +21,15 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { CAPABILITY_TOGGLES } from '@platform/utils/settings-features-fields/settings-features-fields';
+import {
+  type TMaybeNull,
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { PLAN_REGISTRY } from '@shinefold/db/constants';
 import type { Session } from 'next-auth';
 
 import {
@@ -60,7 +60,7 @@ vi.mock(
   () => ({ getSettingsFeaturesOrDefaults: getSettingsFeaturesOrDefaultsMock }),
 );
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     settingsFeatures: { upsertSettingsFeatures: upsertSettingsFeaturesMock },

@@ -1,12 +1,12 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
-} from '@blog/config';
-import type { TTimelineModule } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import type { TTimelineModule } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_TIMELINE_HEADING,
@@ -24,7 +24,7 @@ const { getTimelineModuleMock } = vi.hoisted(() => ({
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       timeline: { v1: { getTimelineModule: getTimelineModuleMock } },

@@ -9,7 +9,7 @@ import { getPostIndexPage } from './get-post-index-page';
 
 const { getIndexPageMock } = vi.hoisted(() => ({ getIndexPageMock: vi.fn() }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: { pages: { blog: { v1: { getIndexPage: getIndexPageMock } } } },
 }));
 

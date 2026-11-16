@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { SESSION_STATUS } from '@web/constants/session';
 import { isReaderSubscribedToNewsletter } from '@web/server/newsletter/reader-subscription-status/reader-subscription-status';

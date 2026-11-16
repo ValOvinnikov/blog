@@ -1,10 +1,13 @@
 import {
   CONTENT_ALIGNMENT,
   type TContentAlignment,
-} from '@blog/config/constants';
-import { AlignmentPicture } from '@blog/studio/schema-types/fields/alignment-fields/alignment-picture';
-import { tileField } from '@blog/studio/schema-types/fields/tile-field/tile-field';
-import { hasArrayGotMultipleItems, toTitleCase } from '@blog/utils/primitives';
+} from '@shinefold/config/constants';
+import { AlignmentPicture } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-picture';
+import { tileField } from '@shinefold/studio/schema-types/fields/tile-field/tile-field';
+import {
+  hasArrayGotMultipleItems,
+  toTitleCase,
+} from '@shinefold/utils/primitives';
 import type { ComponentType } from 'react';
 import type { StringDefinition } from 'sanity';
 

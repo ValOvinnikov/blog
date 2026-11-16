@@ -1,5 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
@@ -11,6 +9,8 @@ import {
   MOCK_TENANT_NAME,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 
 import { toTenantPickerItems } from './to-tenant-picker-items';
 

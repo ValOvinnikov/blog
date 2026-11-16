@@ -1,6 +1,6 @@
 import { createHmac } from 'node:crypto';
 
-import { SHA256_ALGORITHM } from '@blog/utils/hash';
+import { SHA256_ALGORITHM } from '@shinefold/utils/hash';
 
 import { KEY_ENCODING, PAYLOAD_ENCODING } from './crypto-encoding';
 

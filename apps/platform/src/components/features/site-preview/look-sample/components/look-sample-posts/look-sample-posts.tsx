@@ -1,8 +1,8 @@
-import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import { LookSamplePostImage } from '@platform/components/features/site-preview/look-sample/components/look-sample-posts/components/look-sample-post-image/look-sample-post-image';
 import { LookSampleSection } from '@platform/components/features/site-preview/look-sample/components/look-sample-section/look-sample-section';
 import { SamplePart } from '@platform/components/features/site-preview/sample-part';
 import { SAMPLE_PART } from '@platform/constants/sample-part';
+import { MediaCard } from '@shinefold/ui/components/molecules/media-card';
 import { useTranslations } from 'next-intl';
 
 import { lookSamplePostsVariants } from './look-sample-posts-variants';

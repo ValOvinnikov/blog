@@ -1,11 +1,11 @@
 'use client';
 
-import { ICONS } from '@blog/config';
 import { useSidebarCollapse } from '@platform/components/features/layout/sidebar-collapse-provider';
 import { Icon } from '@platform/components/shared/icon';
 import { Tooltip } from '@platform/components/shared/tooltip';
 import { ICON_SIZE } from '@platform/constants/icon';
 import { SIDEBAR_ID } from '@platform/constants/sidebar';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { sidebarCollapseToggleVariants } from './sidebar-collapse-toggle-variants';

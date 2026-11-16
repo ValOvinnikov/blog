@@ -1,6 +1,6 @@
-import { HERO_VARIANT } from '@blog/config/constants';
-import { spacingAndDividerFields } from '@blog/studio/schema-types/fields/spacing-and-divider-fields/spacing-and-divider-fields';
-import { isVariantDocument } from '@blog/studio/schema-types/fields/variant-field/variant-predicate';
+import { HERO_VARIANT } from '@shinefold/config/constants';
+import { spacingAndDividerFields } from '@shinefold/studio/schema-types/fields/spacing-and-divider-fields/spacing-and-divider-fields';
+import { isVariantDocument } from '@shinefold/studio/schema-types/fields/variant-field/variant-predicate';
 import { SlidersHorizontal } from 'lucide-react';
 import { defineType } from 'sanity';
 

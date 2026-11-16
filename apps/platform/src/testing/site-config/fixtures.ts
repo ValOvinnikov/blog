@@ -1,3 +1,6 @@
+import { faker } from '@faker-js/faker';
+import type { TSiteConfigThemeAndAssets } from '@platform/server/site-config/site-config-or-defaults';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
@@ -21,11 +24,8 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
   SPINNER_STYLE,
-} from '@blog/config';
-import type { TSiteConfigResult } from '@blog/db/queries/site-config';
-import { faker } from '@faker-js/faker';
-import type { TSiteConfigThemeAndAssets } from '@platform/server/site-config/site-config-or-defaults';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+} from '@shinefold/config';
+import type { TSiteConfigResult } from '@shinefold/db/queries/site-config';
 
 export const MOCK_LOGO_URL =
   'https://example.blob.vercel-storage.com/brand-logo.png';

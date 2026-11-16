@@ -1,6 +1,6 @@
-import { renderEmailShell } from '@blog/email/html/email-layout/email-layout';
-import { EMAIL_WHITE } from '@blog/email/html/email-metrics/email-metrics';
-import { oklchToHex } from '@blog/utils/color';
+import { renderEmailShell } from '@shinefold/email/html/email-layout/email-layout';
+import { EMAIL_WHITE } from '@shinefold/email/html/email-metrics/email-metrics';
+import { oklchToHex } from '@shinefold/utils/color';
 
 export const NEUTRAL_EMAIL_PALETTE = {
   surface: EMAIL_WHITE,

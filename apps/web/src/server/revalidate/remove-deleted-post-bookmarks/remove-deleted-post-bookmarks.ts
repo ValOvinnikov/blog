@@ -1,5 +1,5 @@
-import { SANITY_WEBHOOK_OPERATION } from '@blog/config/constants';
-import { queries } from '@blog/db';
+import { SANITY_WEBHOOK_OPERATION } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import type { TPostWebhookEvent } from '@web/server/revalidate/post-webhook-event/post-webhook-event';

@@ -1,7 +1,7 @@
-import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
-import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/module/transformer';
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { mockRawModuleAppearance } from '@blog/service/testing/shared/module-appearance';
+import { BRAND_VARIANT, DISPLAY_MODE } from '@shinefold/config';
+import type { TRawPostRelatedModule } from '@shinefold/service/features/modules/post-related/adaptor/module/transformer';
+import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 export const MOCK_POST_RELATED_MODULE_ID = 'post-related-1';
 

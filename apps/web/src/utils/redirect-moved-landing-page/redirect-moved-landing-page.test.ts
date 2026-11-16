@@ -1,8 +1,8 @@
-import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config';
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { service } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@shinefold/config';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
+import { service } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { permanentRedirect, redirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -16,7 +16,7 @@ import { redirectMovedLandingPage } from './redirect-moved-landing-page';
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: { pages: { landing: { v1: { getRedirect: vi.fn() } } } },
 }));
 

@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import {
@@ -7,6 +5,8 @@ import {
   mockPersonalDataMatches,
 } from '@platform/testing/data-requests/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { okResult } from '@shinefold/utils';
 import { notFound } from 'next/navigation';
 
 import { lookUpPersonalDataAction } from './look-up-personal-data-action';
@@ -21,7 +21,7 @@ const { findPersonalDataMock } = vi.hoisted(() => ({
 vi.mock('@platform/server/auth/require-super-admin');
 vi.mock('@platform/server/audit/record-audit-event');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: { personalData: { findPersonalData: findPersonalDataMock } },
 }));

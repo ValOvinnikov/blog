@@ -1,5 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_ABOUT_EN_PAGE_ID,
   MOCK_ABOUT_NL_PAGE_ID,
@@ -15,8 +16,7 @@ import {
   MOCK_TEAM_SLUG,
   mockLandingPageDocument,
   mockTranslationMetadata,
-} from '@blog/service/testing/shared/translated-pages-dataset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/translated-pages-dataset';
 
 import { translationMapQuery } from './query';
 import {

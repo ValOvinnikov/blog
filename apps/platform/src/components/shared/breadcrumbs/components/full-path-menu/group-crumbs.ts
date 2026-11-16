@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
 import type { TBreadcrumbItem } from '@platform/components/shared/breadcrumbs/breadcrumbs';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 export type TCrumbLink = Required<Pick<TBreadcrumbItem, 'label' | 'href'>>;
 

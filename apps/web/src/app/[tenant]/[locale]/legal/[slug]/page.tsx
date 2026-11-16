@@ -1,4 +1,4 @@
-import type { ITenantLocalizedParams } from '@blog/config';
+import type { ITenantLocalizedParams } from '@shinefold/config';
 import { SectionDocumentPage } from '@web/components/pages/section-document-page';
 import { buildSectionDocumentMetadata } from '@web/metadata/section-document-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';

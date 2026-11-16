@@ -1,18 +1,18 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_SECTION_PAGES_PARENT_ID,
   MOCK_SECTION_PAGES_PARENT_PATH,
   mockRawSectionPage,
-} from '@blog/service/testing/modules/fixtures';
-import { MOCK_PAGE_LANDING_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
-import { MOCK_TENANT } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/modules/fixtures';
+import { MOCK_PAGE_LANDING_CACHE_TAG } from '@shinefold/service/testing/sanity/query/cache-tags';
+import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getSectionPages } from './loader';
 import { sectionPagesQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(31);
 

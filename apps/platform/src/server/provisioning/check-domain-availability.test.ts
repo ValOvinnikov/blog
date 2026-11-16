@@ -1,4 +1,3 @@
-import { HTTP_STATUS, type TMaybeNull } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   DOMAIN_AVAILABILITY,
@@ -9,6 +8,7 @@ import { mockJsonResponse } from '@platform/testing/http/mock-json-response';
 import { requestedUrl } from '@platform/testing/http/requested-url';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_STATUS, type TMaybeNull } from '@shinefold/config';
 
 import { checkDomainAvailability } from './check-domain-availability';
 

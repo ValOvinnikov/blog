@@ -1,7 +1,7 @@
-import { DOMAIN_PATTERN, isLocaleIsoCode } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { toTenantFieldErrors } from '@platform/server/tenants/tenant-field-error';
+import { DOMAIN_PATTERN, isLocaleIsoCode } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import { z } from 'zod';
 
 export const updateTenantDetailsInputSchema = z.object({

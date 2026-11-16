@@ -1,11 +1,11 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { FormField } from '@platform/components/shared/form-field';
 import {
   SegmentedControl,
   type TSegmentedControlProps,
 } from '@platform/components/shared/segmented-control';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useId } from 'react';
 
 import { lockableSegmentedFieldVariants } from './lockable-segmented-field-variants';

@@ -1,8 +1,8 @@
-import { SIZE } from '@blog/config';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { SELECTED_COMPACT_FILL_CLASSES } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
+import { SIZE } from '@shinefold/config';
 
 export const portableTextEditorToggleButtonVariants = tv({
   slots: {

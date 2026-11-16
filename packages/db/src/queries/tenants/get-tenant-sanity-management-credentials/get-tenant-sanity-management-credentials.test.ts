@@ -1,24 +1,24 @@
-import { setTenantSanityManagementToken } from '@blog/db/queries/tenants/set-tenant-sanity-management-token';
-import { setTenantSanityWriteToken } from '@blog/db/queries/tenants/set-tenant-sanity-write-token';
-import * as schema from '@blog/db/schema';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { setTenantSanityManagementToken } from '@shinefold/db/queries/tenants/set-tenant-sanity-management-token';
+import { setTenantSanityWriteToken } from '@shinefold/db/queries/tenants/set-tenant-sanity-write-token';
+import * as schema from '@shinefold/db/schema';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
   useTenantTokenEncryptionKey,
-} from '@blog/db/testing/tenant-token-encryption-key';
+} from '@shinefold/db/testing/tenant-token-encryption-key';
 import {
   MOCK_MISSING_TENANT_ID,
   MOCK_TENANT_MANAGEMENT_ROBOT_ID,
   MOCK_TENANT_MANAGEMENT_TOKEN,
   MOCK_TENANT_VALUES,
   MOCK_TENANT_WRITE_TOKEN,
-} from '@blog/db/testing/tenants/fixtures';
+} from '@shinefold/db/testing/tenants/fixtures';
 
 import { getTenantSanityManagementCredentials } from './get-tenant-sanity-management-credentials';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useTenantTokenEncryptionKey();

@@ -21,15 +21,15 @@ and `platform-app.md` (`apps/platform`). Component tests follow
   Component — a page composition, a web `*-module.tsx`, a layout shell such
   as the site header, a platform section (`platform-ui-practices` → "Data
   loading") — which hands typed props to a view that only renders.
-- A `'use client'` component never calls a `@blog/service` loader, a
-  `@blog/db` query or `fetch()` (a type or constant import is fine). Data it
+- A `'use client'` component never calls a `@shinefold/service` loader, a
+  `@shinefold/db` query or `fetch()` (a type or constant import is fine). Data it
   loads on demand comes through a Server Action (`platform-ui-practices` →
   "Data loading"). No component reads `process.env`.
-- `'use client'` never in `@blog/ui` (it stays pure and prop-driven). Two
+- `'use client'` never in `@shinefold/ui` (it stays pure and prop-driven). Two
   components there, `Carousel` and `Dialog`, are nonetheless client-only —
   they own client hooks (`useEmblaCarousel`, Base UI's dialog) — and carry no
   directive: the consumer declares the boundary, the way `sanity-image`'s
-  `SanityImage` works. The one package that may carry it is `@blog/studio`,
+  `SanityImage` works. The one package that may carry it is `@shinefold/studio`,
   whose mount component is irreducibly client-side; that exception is scoped
   to that component and does not license the directive anywhere else in
   `packages/*`. In `apps/web` it IS the right
@@ -82,13 +82,13 @@ A domain is a module, a feature, a page, or a layout or app route.
   (`{caption && …}` ⇒ `caption?: string`). A default lives in the
   destructure (`{ size = SIZE.MD }`), never in a `??` deep in the body.
 - A closed set of values is typed from its source — `TValueOf<typeof C>` of a
-  `@blog/config` const, or the `tv()` variants type
+  `@shinefold/config` const, or the `tv()` variants type
   (`variant?: TTextLinkVariants['variant']`) — never a hand-written union.
 - Props forwarded unchanged through two or more layers, or hand-bundled into
   a local object, become one object prop typed from their source. A view
   receives its view-model whole (`<CtaModuleView module={data} />`), never
   `{...result.data}` spread in and re-destructured.
-- Copy in `@blog/ui` stays one flat `…Label` prop per string; no step of the
+- Copy in `@shinefold/ui` stays one flat `…Label` prop per string; no step of the
   ladder below drops or bundles it.
 
 ### The ceiling
@@ -99,7 +99,7 @@ A domain is a module, a feature, a page, or a layout or app route.
   extending a service view-model or a mixin such as `IWithClassName` or
   `IWithDataTestId`.
 - Exempt, and only these: the native-attribute primitives `Button`,
-  `IconButton`, `TextInput` and `TextLink` in `@blog/ui`, and `Button` and
+  `IconButton`, `TextInput` and `TextLink` in `@shinefold/ui`, and `Button` and
   `TextInput` in `apps/platform`.
 - A component at the ceiling takes no new prop until it is restructured — in
   the same PR or one before it.
@@ -262,10 +262,10 @@ Apply as written:
 - **Client bundle** — `bundle-dynamic-imports`, `bundle-defer-third-party`,
   `bundle-barrel-imports`. A component folder's `index.ts` re-exporting its
   one component is not a barrel in that rule's sense: import the component
-  through the folder (`@blog/ui/components/atoms/button`), never
+  through the folder (`@shinefold/ui/components/atoms/button`), never
   `<name>/<name>.tsx`. A `-variants.ts` (which that `index.ts` leaves out)
   and a child folder with no barrel are imported by path. The
-  `@blog/ui/lib/styling` entry is the required way to import `tv` and its
+  `@shinefold/ui/lib/styling` entry is the required way to import `tv` and its
   recipes, and is exempt. Any other barrel re-exporting many modules can pull
   `server-only` code into the client graph.
 - **Re-renders that are really design** — `rerender-derived-state-no-effect`,
@@ -311,7 +311,7 @@ Overridden here:
   A component offers the first as its own prop beside `isDisabled`, never by
   changing what `isDisabled` means: `isLocked` on the platform's `Switch`,
   `SegmentedControl` and `Select`, `isAriaDisabled` on its `Button`, and
-  `isFocusableWhenDisabled` on `@blog/ui`'s `IconButton`. A busy `Button` is
+  `isFocusableWhenDisabled` on `@shinefold/ui`'s `IconButton`. A busy `Button` is
   `aria-disabled`, never `disabled`, so focus stays on it while it works.
   VoiceOver reads an `aria-disabled` control as dimmed, followed by its
   description.

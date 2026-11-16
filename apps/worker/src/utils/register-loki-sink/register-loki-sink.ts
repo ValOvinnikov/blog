@@ -1,4 +1,4 @@
-import { createLokiSink, registerLogSink } from '@blog/insight';
+import { createLokiSink, registerLogSink } from '@shinefold/insight';
 import { waitUntil } from '@vercel/functions';
 import { env } from '@worker/utils/env/env';
 

@@ -1,13 +1,13 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
+import { env } from '@platform/utils/env/env';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import {
   findGraceLocks,
   type TGraceLocks,
-} from '@blog/db/utils/grace-locks/grace-locks';
-import { env } from '@platform/utils/env/env';
-import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+} from '@shinefold/db/utils/grace-locks/grace-locks';
 
 export const loadGraceLocks = async (
   tenant: Pick<TPlatformTenant, 'id' | 'primaryDomain' | 'entitlements'>,

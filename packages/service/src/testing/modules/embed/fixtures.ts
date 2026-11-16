@@ -1,7 +1,7 @@
-import { BRAND_VARIANT } from '@blog/config';
-import type { TRawEmbedModule } from '@blog/service/features/modules/embed/adaptor/transformer';
-import { createMockFaker } from '@blog/service/testing/mock-faker';
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import { BRAND_VARIANT } from '@shinefold/config';
+import type { TRawEmbedModule } from '@shinefold/service/features/modules/embed/adaptor/transformer';
+import { createMockFaker } from '@shinefold/service/testing/mock-faker';
+import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
 
 const mockFaker = createMockFaker(3772);
 

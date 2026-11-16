@@ -1,7 +1,11 @@
-import { ARIA_CURRENT } from '@blog/ui/testing/aria';
-import { customRender, screen, within } from '@blog/ui/testing/custom-render';
-import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
+import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
+import {
+  customRender,
+  screen,
+  within,
+} from '@shinefold/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@shinefold/ui/testing/mock-link';
 
 import { Pagination } from './pagination';
 

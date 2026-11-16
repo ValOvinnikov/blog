@@ -1,6 +1,6 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import type { THeadingLevel } from '@blog/ui/lib/react';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import type { THeadingLevel } from '@shinefold/ui/lib/react';
 import type { ReactNode } from 'react';
 
 import { mediaCardTitleVariants } from './media-card-title-variants';

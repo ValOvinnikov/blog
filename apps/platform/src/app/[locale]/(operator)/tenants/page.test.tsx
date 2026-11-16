@@ -1,6 +1,3 @@
-import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import { isEmailAccountConfigured } from '@blog/email';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
@@ -11,6 +8,9 @@ import {
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { DEFAULT_TENANTS_SORT } from '@platform/utils/tenants-list-query/tenants-list-query';
+import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import { isEmailAccountConfigured } from '@shinefold/email';
 
 import TenantsPage from './page';
 
@@ -20,12 +20,12 @@ const { listTenantsMock } = vi.hoisted(() => ({
   listTenantsMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: { tenants: { listTenants: listTenantsMock } },
 }));
 
-vi.mock('@blog/email', async (importOriginal) => ({
+vi.mock('@shinefold/email', async (importOriginal) => ({
   ...(await importOriginal()),
   isEmailAccountConfigured: vi.fn(),
 }));

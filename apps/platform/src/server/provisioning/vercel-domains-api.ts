@@ -1,9 +1,9 @@
-import { DOMAIN_PATTERN } from '@blog/config';
-import { HTTP_STATUS } from '@blog/config/constants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { DOMAIN_PATTERN } from '@shinefold/config';
+import { HTTP_STATUS } from '@shinefold/config/constants';
 
 import { projectDomain, type TProjectDomain } from './project-domain';
 import { fetchVercel, readVercelCredentials } from './vercel-client';

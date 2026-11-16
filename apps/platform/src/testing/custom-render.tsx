@@ -1,7 +1,7 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { ToastProvider } from '@platform/context/toast-provider';
 import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provider';
 import messages from '@platform/i18n/messages/en.json';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 import {
   act,
   render as rtlRender,

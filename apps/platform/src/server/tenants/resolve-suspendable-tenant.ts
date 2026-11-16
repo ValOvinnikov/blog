@@ -1,15 +1,15 @@
+import { TENANT_LOG, TENANT_REFUSAL } from '@platform/constants/tenant';
+import { getPlatformTenant } from '@platform/server/tenants/get-platform-tenant';
+import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
+import { logger } from '@platform/utils/logger/logger';
 import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   type TOutcome,
   type TReasonedFailure,
-} from '@blog/config';
-import { TENANT_STATUS, type TSuspensionStatus } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { TENANT_LOG, TENANT_REFUSAL } from '@platform/constants/tenant';
-import { getPlatformTenant } from '@platform/server/tenants/get-platform-tenant';
-import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
-import { logger } from '@platform/utils/logger/logger';
+} from '@shinefold/config';
+import { TENANT_STATUS, type TSuspensionStatus } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 type TSuspendableTenantRefusal =
   | typeof TENANT_REFUSAL.NOT_FOUND

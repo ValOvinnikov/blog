@@ -1,10 +1,13 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
-import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
-import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleAppearanceFragment } from '@blog/service/shared/fragments/module/module-appearance';
-import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import {
+  q,
+  type TModuleQueryParams,
+} from '@shinefold/service/sanity/query/query';
+import { ctaButtonsFragment } from '@shinefold/service/shared/fragments/cta/cta-buttons';
+import { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
+import { moduleWideLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { moduleAppearanceFragment } from '@shinefold/service/shared/fragments/module/module-appearance';
+import { moduleContentAlignmentLeftCenterFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
+import { getLocalizedField } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
 
 export const pricingModuleQuery = q
   .parameters<TModuleQueryParams>()

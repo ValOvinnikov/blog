@@ -1,4 +1,3 @@
-import { PRESET_ID } from '@blog/config';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import { ARIA_VALUENOW } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
@@ -19,6 +18,7 @@ import {
   setup,
   SITE_TYPES,
 } from '@platform/testing/onboarding/onboarding-view';
+import { PRESET_ID } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { OnboardingView } from './onboarding-view';

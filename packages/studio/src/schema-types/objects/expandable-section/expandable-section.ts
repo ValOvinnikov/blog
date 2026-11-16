@@ -1,5 +1,5 @@
-import { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
-import { expandableSectionTextSchema } from '@blog/studio/schema-types/portable-text/expandable-section-text/expandable-section-text';
+import { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config/constants';
+import { expandableSectionTextSchema } from '@shinefold/studio/schema-types/portable-text/expandable-section-text/expandable-section-text';
 import { ListCollapse } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

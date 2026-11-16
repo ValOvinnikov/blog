@@ -8,7 +8,7 @@ This file follows the same structure as the provided reference instruction file,
 
 Read `shared-foundations-and-rules.md` first.
 
-Required Tailwind utilities come from `configs/tailwind/theme.css`, consumed through `@blog/tailwind-config/theme.css`.
+Required Tailwind utilities come from `configs/tailwind/theme.css`, consumed through `@shinefold/tailwind-config/theme.css`.
 
 Important implementation rules:
 
@@ -29,7 +29,7 @@ packages/ui/src/components/organisms/
 apps/web/src/app/[locale]/page.tsx
 ```
 
-Do not add Home templates to `@blog/ui`. The localized Next.js route owns page
+Do not add Home templates to `@shinefold/ui`. The localized Next.js route owns page
 composition.
 
 Responsive baseline:
@@ -739,14 +739,14 @@ export function PostCard({ href, title, description, meta }: PostCardProps) {
 ```
 
 > **Decision record (2026-07-21, issue #624, epic #612):** the reference
-> `PostCard` above is text-only — no thumbnail. The actual `@blog/ui`
+> `PostCard` above is text-only — no thumbnail. The actual `@shinefold/ui`
 > `PostCard` (`packages/ui/src/components/molecules/post-card/`) is a compound
 > component that includes a `PostCard.Media` slot for an optional
 > thumbnail. This is intentional, not drift to reconcile: it matches
 > issue #74's acceptance criteria, which predates and supersedes this
 > design reference's text-only mock for `PostCard`. Do not "fix" `PostCard`
 > back to thumbnail-less to match this reference — the reference is stale
-> on this point; `@blog/ui`'s compound `Media` slot is the source of truth.
+> on this point; `@shinefold/ui`'s compound `Media` slot is the source of truth.
 
 ---
 

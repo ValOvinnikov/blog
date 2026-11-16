@@ -1,14 +1,14 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
 import {
   TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES,
   TENANT_PROVISIONING_RUN_STALE_AFTER_MINUTES,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStatus,
-} from '@blog/db/constants';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/db/constants';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { and, eq, isNull, ne, or, sql } from 'drizzle-orm';
 
 export type TBeginTenantProvisioningResult = {

@@ -1,5 +1,5 @@
-import { pageHref, routes } from '@blog/config';
-import type { TSectionIndexType } from '@blog/service';
+import { pageHref, routes } from '@shinefold/config';
+import type { TSectionIndexType } from '@shinefold/service';
 import { FaqPageSchema } from '@web/components/features/faq-page-schema';
 import { PageShell } from '@web/components/page-templates/page-shell';
 import { LandingModuleRenderer } from '@web/components/pages/landing-page/landing-module-renderer';

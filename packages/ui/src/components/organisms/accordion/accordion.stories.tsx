@@ -1,8 +1,8 @@
+import { faker } from '@faker-js/faker';
 import {
   CardStyles,
   FilledAndPlainOnEachBand,
-} from '@blog/ui/testing/card-styles';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/card-styles';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { within } from 'storybook/test';
 

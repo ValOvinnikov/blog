@@ -1,5 +1,5 @@
-import { HERO_VARIANT, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { HERO_VARIANT, SITE_MESSAGES } from '@shinefold/config';
 import {
   customRender,
   isInaccessible,

@@ -2,7 +2,6 @@
 
 import { Button } from '@base-ui/react/button';
 import { Toolbar } from '@base-ui/react/toolbar';
-import type { IWithClassName } from '@blog/config/types';
 import {
   Icon,
   type TRegisteredIconName,
@@ -13,6 +12,7 @@ import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
+import type { IWithClassName } from '@shinefold/config/types';
 import type { ReactElement } from 'react';
 
 const iconSoloControlVariants = tv({

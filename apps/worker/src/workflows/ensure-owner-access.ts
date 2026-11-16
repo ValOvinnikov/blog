@@ -1,8 +1,8 @@
-import type { TMaybeNull } from '@blog/config/types';
+import type { TMaybeNull } from '@shinefold/config/types';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   type TElevateTenantOwnerOutcome,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   OWNER_ACCESS_POLL_INTERVAL_MS,
   OWNER_ACCESS_RUN_CHECKS,

@@ -1,4 +1,3 @@
-import type { IWithChildren } from '@blog/config/react';
 import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { Accordion } from '@platform/components/shared/accordion';
@@ -6,6 +5,7 @@ import { Text } from '@platform/components/shared/text';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import type { TLookRow } from '@platform/constants/look-row';
 import { toLookAnchorId } from '@platform/utils/look-anchor/look-anchor';
+import type { IWithChildren } from '@shinefold/config/react';
 import { useTranslations } from 'next-intl';
 import { useId, type ReactNode } from 'react';
 

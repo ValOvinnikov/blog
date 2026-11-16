@@ -1,5 +1,5 @@
-import { TOAST_TYPE, type TToastType } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { TOAST_TYPE, type TToastType } from '@shinefold/config';
 
 import type { IToastPayload } from './toast-record';
 import { createToastStore } from './toast-store';

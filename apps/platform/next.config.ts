@@ -1,5 +1,5 @@
-import { createNextConfig } from '@blog/next-config/preset';
 import { buildContentSecurityPolicy } from '@platform/utils/content-security-policy/content-security-policy';
+import { createNextConfig } from '@shinefold/next-config/preset';
 import { withBotId } from 'botid/next/config';
 
 const isDev = process.env.NODE_ENV !== 'production';
@@ -16,7 +16,7 @@ export default withBotId(
         bodySizeLimit: '6mb',
       },
     },
-    transpilePackages: ['@blog/ui'],
+    transpilePackages: ['@shinefold/ui'],
     // Turbopack cannot bundle jsdom, and Next externalises it only under its own name, not this alias.
     serverExternalPackages: ['jsdom-commonjs'],
     images: {

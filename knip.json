@@ -81,9 +81,9 @@
       // (no hoisting) still requires it as a real apps/web devDependency so
       // Turbopack can resolve it.
       //
-      // @blog/db dropped from this list (#1107): the Auth.js config
+      // @shinefold/db dropped from this list (#1107): the Auth.js config
       // (`src/server/auth/auth.ts`) is now the first real
-      // `import ... from '@blog/db'` in apps/web.
+      // `import ... from '@shinefold/db'` in apps/web.
       "ignoreDependencies": ["@svgr/webpack"]
     },
     ".": {

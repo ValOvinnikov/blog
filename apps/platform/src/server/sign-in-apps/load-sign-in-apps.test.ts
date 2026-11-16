@@ -1,6 +1,3 @@
-import { OAUTH_PROVIDER, TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { SIGN_IN_APPS_MODE } from '@platform/constants/sign-in-apps';
 import {
   MOCK_CLIENT_ID,
@@ -13,10 +10,13 @@ import {
   MOCK_CUSTOM_DOMAIN,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { OAUTH_PROVIDER, TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 import { loadSignInApps } from './load-sign-in-apps';
 
-vi.mock('@blog/db', async () => {
+vi.mock('@shinefold/db', async () => {
   const { mockSignInAppsDb } =
     await import('@platform/testing/sign-in-apps/fixtures');
   return mockSignInAppsDb();

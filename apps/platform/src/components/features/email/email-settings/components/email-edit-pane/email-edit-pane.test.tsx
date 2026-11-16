@@ -1,4 +1,3 @@
-import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
@@ -8,6 +7,7 @@ import {
 } from '@platform/testing/email-draft';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
+import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailEditPane } from './email-edit-pane';

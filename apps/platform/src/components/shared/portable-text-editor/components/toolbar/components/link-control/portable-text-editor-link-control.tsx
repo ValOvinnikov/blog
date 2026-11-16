@@ -2,9 +2,9 @@
 
 import { Field } from '@base-ui/react/field';
 import { Form } from '@base-ui/react/form';
-import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useState, type FormEvent } from 'react';
 

@@ -1,6 +1,5 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import {
   tenantDetailsValuesOf,
   type TTenantDetailsValues,
@@ -10,6 +9,7 @@ import {
   ALL_FIELD_KEYS,
   type TTenantFieldKey,
 } from '@platform/utils/tenant-field-locks/tenant-field-locks';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useState } from 'react';
 
 export const useTenantDetailsValues = (

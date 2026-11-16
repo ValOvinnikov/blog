@@ -1,6 +1,6 @@
 'use client';
 
-import type { TConsentCategory, TMaybeUndefined } from '@blog/config';
+import type { TConsentCategory, TMaybeUndefined } from '@shinefold/config';
 import { CONSENT_STATUS, type TConsentStatus } from '@web/constants/consent';
 import {
   CONSENT_COOKIE_NAME,

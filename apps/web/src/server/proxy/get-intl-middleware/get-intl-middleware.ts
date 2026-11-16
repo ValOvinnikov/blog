@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config';
+import type { TLocaleIsoCode } from '@shinefold/config';
 import { buildTenantRouting } from '@web/i18n/routing';
 import createMiddleware from 'next-intl/middleware';
 

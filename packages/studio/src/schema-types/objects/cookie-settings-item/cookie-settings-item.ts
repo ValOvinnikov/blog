@@ -1,4 +1,4 @@
-import { markerField } from '@blog/studio/schema-types/fields/marker-field/marker-field';
+import { markerField } from '@shinefold/studio/schema-types/fields/marker-field/marker-field';
 import { Cookie } from 'lucide-react';
 import { defineType } from 'sanity';
 

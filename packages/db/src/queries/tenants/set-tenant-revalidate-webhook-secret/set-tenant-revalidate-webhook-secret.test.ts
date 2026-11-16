@@ -1,19 +1,19 @@
-import * as schema from '@blog/db/schema';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import * as schema from '@shinefold/db/schema';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
   useTenantTokenEncryptionKey,
-} from '@blog/db/testing/tenant-token-encryption-key';
-import { MOCK_REVALIDATE_WEBHOOK_SECRET } from '@blog/db/testing/tenants/fixtures';
-import { decryptSecret } from '@blog/utils';
-import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+} from '@shinefold/db/testing/tenant-token-encryption-key';
+import { MOCK_REVALIDATE_WEBHOOK_SECRET } from '@shinefold/db/testing/tenants/fixtures';
+import { decryptSecret } from '@shinefold/utils';
+import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
 import { eq } from 'drizzle-orm';
 
 import { setTenantRevalidateWebhookSecret } from './set-tenant-revalidate-webhook-secret';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

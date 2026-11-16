@@ -1,16 +1,21 @@
-import { SANITY_PROJECT_ARCHIVE_OUTCOME } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { SANITY_PROJECT_ARCHIVE_OUTCOME } from '@shinefold/config';
 import {
   MOCK_DEPROVISION_DRY_RUN_ENV,
   MOCK_DEPROVISION_ENV,
-} from '@blog/db/testing/deprovision-tenant/fixtures';
-import { MOCK_STEP_ERROR, mockTenant } from '@blog/db/testing/tenants/fixtures';
-import { archiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
-import { toOutcome } from '@blog/utils/to-outcome';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/deprovision-tenant/fixtures';
+import {
+  MOCK_STEP_ERROR,
+  mockTenant,
+} from '@shinefold/db/testing/tenants/fixtures';
+import { archiveSanityProject } from '@shinefold/db/utils/sanity-management-client/sanity-project-lifecycle';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { archiveTenantSanityProject } from './archive-sanity-project';
 
-vi.mock('@blog/db/utils/sanity-management-client/sanity-project-lifecycle');
+vi.mock(
+  '@shinefold/db/utils/sanity-management-client/sanity-project-lifecycle',
+);
 
 faker.seed(5765);
 

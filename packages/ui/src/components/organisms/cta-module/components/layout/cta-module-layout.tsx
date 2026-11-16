@@ -1,11 +1,14 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { CtaModuleSlotParts } from '@blog/ui/components/organisms/cta-module/cta-module-slot-parts';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { CtaModuleSlotParts } from '@shinefold/ui/components/organisms/cta-module/cta-module-slot-parts';
 import type {
   TCtaModuleBannerStyles,
   TCtaModuleStyles,
-} from '@blog/ui/components/organisms/cta-module/cta-module-variants';
-import { mapCompoundSlots, type TCompoundChildren } from '@blog/ui/lib/react';
+} from '@shinefold/ui/components/organisms/cta-module/cta-module-variants';
+import {
+  mapCompoundSlots,
+  type TCompoundChildren,
+} from '@shinefold/ui/lib/react';
 import { cloneElement, Fragment } from 'react';
 
 export type TCtaModuleLayoutProps = IWithClassName &

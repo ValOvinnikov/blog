@@ -1,5 +1,5 @@
-import type { TMaybeNull } from '@blog/config';
 import type { TStoredSettingsDraft } from '@platform/utils/settings-draft-storage/settings-draft-storage';
+import type { TMaybeNull } from '@shinefold/config';
 
 export type TSettingsDraftField<TValues> = {
   id: string;

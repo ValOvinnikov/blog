@@ -1,7 +1,10 @@
-import type { TPricingModule } from '@blog/service';
-import { Text } from '@blog/ui/components/atoms/text';
-import { PricingCardGrid } from '@blog/ui/components/organisms/pricing-card-grid';
-import { hasArrayGotMultipleItems, hasLength } from '@blog/utils/primitives';
+import type { TPricingModule } from '@shinefold/service';
+import { Text } from '@shinefold/ui/components/atoms/text';
+import { PricingCardGrid } from '@shinefold/ui/components/organisms/pricing-card-grid';
+import {
+  hasArrayGotMultipleItems,
+  hasLength,
+} from '@shinefold/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section, type TModuleSection } from '@web/components/shared/section';

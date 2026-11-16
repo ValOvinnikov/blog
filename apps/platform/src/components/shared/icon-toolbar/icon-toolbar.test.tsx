@@ -1,4 +1,3 @@
-import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { IconSoloButton } from '@platform/components/shared/icon-solo-button';
 import { IconSoloToggle } from '@platform/components/shared/icon-solo-toggle';
@@ -6,6 +5,7 @@ import { ARIA_PRESSED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockIconToggleOption } from '@platform/testing/icon-toggle-group/fixtures';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
+import { ICONS } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { IconToolbar } from './icon-toolbar';

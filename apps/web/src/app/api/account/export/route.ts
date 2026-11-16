@@ -1,4 +1,4 @@
-import { queries } from '@blog/db';
+import { queries } from '@shinefold/db';
 import { auth } from '@web/server/auth/auth';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { logger } from '@web/utils/logger/logger';

@@ -1,9 +1,5 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { TENANT_STATUS, type TSuspensionStatus } from '@blog/db/constants';
-import type { TOpenTenantSuspension } from '@blog/db/queries/tenant-suspensions';
-import { errorResult } from '@blog/utils';
 import { BlockOwnerFields } from '@platform/components/features/tenants/tenant-suspension-control/components/block-owner-fields/block-owner-fields';
 import { SuspensionCaseDetails } from '@platform/components/features/tenants/tenant-suspension-control/components/suspension-case-details/suspension-case-details';
 import { SuspensionCaseFields } from '@platform/components/features/tenants/tenant-suspension-control/components/suspension-case-fields/suspension-case-fields';
@@ -18,6 +14,10 @@ import {
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { cardBodyStackClasses } from '@platform/utils/card-body-stack-classes/card-body-stack-classes';
 import { useTenantLifecycleAction } from '@platform/utils/use-tenant-lifecycle-action/use-tenant-lifecycle-action';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { TENANT_STATUS, type TSuspensionStatus } from '@shinefold/db/constants';
+import type { TOpenTenantSuspension } from '@shinefold/db/queries/tenant-suspensions';
+import { errorResult } from '@shinefold/utils';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 

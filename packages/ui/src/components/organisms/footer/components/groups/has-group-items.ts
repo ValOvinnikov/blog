@@ -1,4 +1,4 @@
-import { hasSlotContent } from '@blog/ui/lib/react';
+import { hasSlotContent } from '@shinefold/ui/lib/react';
 import {
   Children,
   isValidElement,

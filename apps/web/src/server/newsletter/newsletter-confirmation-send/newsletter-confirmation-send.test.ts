@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   EMAIL_TYPE,
   LOCALE_ISO_CODES,
@@ -5,14 +6,13 @@ import {
   resolveTenantEmailBrand,
   routes,
   type TLocaleIsoCode,
-} from '@blog/config';
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
+} from '@shinefold/config';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import {
   buildSiteEmailTag,
   escapeHtml,
   LIST_UNSUBSCRIBE_ONE_CLICK,
-} from '@blog/email';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/email';
 import { EMAIL_USAGE_LOG } from '@web/constants/email-usage';
 import { mintNewsletterUnsubscribeToken } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
 import { setConfirmationEmailDefaults } from '@web/testing/server/newsletter/confirmation-email-defaults';
@@ -44,14 +44,14 @@ const {
   recordEmailSend: recordEmailSendMock,
 } = confirmationEmailEdges;
 
-vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await import('@shinefold/db/constants')),
   queries: (
     await import('@web/testing/server/newsletter/confirmation-email-edges')
   ).confirmationEmailQueries(),
 }));
 
-vi.mock(import('@blog/email'), async (importOriginal) => ({
+vi.mock(import('@shinefold/email'), async (importOriginal) => ({
   ...(await importOriginal()),
   sendEmail: (
     await import('@web/testing/server/newsletter/confirmation-email-edges')

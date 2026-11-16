@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 import { monthlySendAllowance } from './monthly-send-allowance';
 

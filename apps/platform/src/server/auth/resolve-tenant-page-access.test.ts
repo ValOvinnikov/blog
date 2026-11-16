@@ -1,10 +1,3 @@
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import {
-  ADMIN_ROLE,
-  MEMBERSHIP_ROLE,
-  type TMembershipRole,
-} from '@blog/db/constants';
 import {
   mockMembership,
   mockOperatorViewer,
@@ -14,10 +7,17 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import {
+  ADMIN_ROLE,
+  MEMBERSHIP_ROLE,
+  type TMembershipRole,
+} from '@shinefold/db/constants';
 
 import { resolveTenantPageAccess } from './resolve-tenant-page-access';
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { leads: { countLeadsForTenant: vi.fn() } },
 }));
 

@@ -1,4 +1,4 @@
-import { CONSENT_CATEGORY, type TConsentCategory } from '@blog/config';
+import { CONSENT_CATEGORY, type TConsentCategory } from '@shinefold/config';
 import {
   CONSENT_COOKIE_NAME,
   decodeConsent,

@@ -1,8 +1,8 @@
 'use client';
 
-import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

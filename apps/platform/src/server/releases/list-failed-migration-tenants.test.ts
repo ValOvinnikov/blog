@@ -1,7 +1,7 @@
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { RELEASE_FAILURE } from '@platform/constants/release';
 import { mockTenant } from '@platform/testing/tenants/fixtures';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import { listFailedMigrationTenants } from './list-failed-migration-tenants';
 
@@ -11,7 +11,7 @@ const { listActiveTenantsMock } = vi.hoisted(() => ({
   listActiveTenantsMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenants: { listActiveTenants: listActiveTenantsMock } },
 }));
 

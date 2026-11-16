@@ -1,11 +1,11 @@
-import { ICONS } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_EXPANDED, ARIA_HASPOPUP } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ICONS } from '@shinefold/config';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { PlatformShell } from './platform-shell';

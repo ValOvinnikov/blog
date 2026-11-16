@@ -1,4 +1,3 @@
-import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import { BILLING_LOG } from '@platform/constants/billing';
 import { STRIPE_KEY_MODE } from '@platform/constants/stripe-key-mode';
 import { revalidatePlatformSite } from '@platform/server/billing/catalogue/revalidate-platform-site';
@@ -16,6 +15,7 @@ import {
 } from '@platform/testing/billing/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { stripeEnv } from '@platform/utils/stripe-env/stripe-env';
+import { STRIPE_PRICE_LOOKUP_KEY } from '@shinefold/db/constants';
 import type Stripe from 'stripe';
 
 import {
@@ -31,7 +31,9 @@ const { catalogueMocks } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@blog/db', () => ({ queries: { stripeCatalogue: catalogueMocks } }));
+vi.mock('@shinefold/db', () => ({
+  queries: { stripeCatalogue: catalogueMocks },
+}));
 
 vi.mock('@platform/server/billing/catalogue/sync-catalogue-price', () => ({
   saveOrRemoveCataloguePrice: vi.fn(),

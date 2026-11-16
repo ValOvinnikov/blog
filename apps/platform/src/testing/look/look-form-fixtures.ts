@@ -1,10 +1,10 @@
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   defaultLookFormValues,
   type TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
+import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
 
 const { lookForm: LOOK_FORM } = messages;
 const tLogoHue = makeEnTranslator('logoHueField');

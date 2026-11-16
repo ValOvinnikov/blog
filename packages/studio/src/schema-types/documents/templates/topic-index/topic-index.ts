@@ -1,5 +1,5 @@
-import { TAXONOMY_KIND } from '@blog/config/constants';
-import { taxonomyIndexTemplate } from '@blog/studio/schema-types/documents/templates/taxonomy-index/taxonomy-index-template';
+import { TAXONOMY_KIND } from '@shinefold/config/constants';
+import { taxonomyIndexTemplate } from '@shinefold/studio/schema-types/documents/templates/taxonomy-index/taxonomy-index-template';
 import { Tags } from 'lucide-react';
 
 export const topicIndexTemplateSchema = taxonomyIndexTemplate({

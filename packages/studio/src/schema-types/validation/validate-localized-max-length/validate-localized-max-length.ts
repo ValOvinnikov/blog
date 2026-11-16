@@ -1,4 +1,4 @@
-import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
+import { localizedStringValues } from '@shinefold/studio/schema-types/validation/localized-string-values/localized-string-values';
 
 export const validateLocalizedMaxLength =
   (maxLength: number, message: string) =>

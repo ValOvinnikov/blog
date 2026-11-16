@@ -27,27 +27,27 @@ insight → nothing (base of graph)           utils → nothing (base of graph)
 graph is acyclic
 ```
 
-- `@blog/ui` is pure and prop-driven — never imports `service`/`sanity`/`fetch`.
-- `@blog/service` is the only request-path package importing the Sanity SDKs;
-  never imports React. (`@blog/studio` is the Studio and schema owner;
-  `@blog/db`'s provisioning exception and `apps/worker` are below.)
-- `@blog/db` is the only package importing the Neon/Drizzle SDKs — Postgres
+- `@shinefold/ui` is pure and prop-driven — never imports `service`/`sanity`/`fetch`.
+- `@shinefold/service` is the only request-path package importing the Sanity SDKs;
+  never imports React. (`@shinefold/studio` is the Studio and schema owner;
+  `@shinefold/db`'s provisioning exception and `apps/worker` are below.)
+- `@shinefold/db` is the only package importing the Neon/Drizzle SDKs — Postgres
   data: Auth.js users and sessions, tenants and their domains, memberships and
   invites, admins, site config, feature toggles, owner analytics ids, email
   config and templates, subscribers, bookmarks, contact-form leads, magic-link send counters, email
   send and delivery-outcome counts, newsletter post-send claims, Stripe
-  billing state, handled Stripe webhook event ids and the Stripe price and promotion-code catalogue, audit events and findings (comments are planned; no table exists yet). It never imports React or `@blog/service`
+  billing state, handled Stripe webhook event ids and the Stripe price and promotion-code catalogue, audit events and findings (comments are planned; no table exists yet). It never imports React or `@shinefold/service`
   (siblings, not dependents — `.claude/agents/db.md`), and is **imported only
-  by the three apps (`web`, `platform`, `worker`) and `@blog/auth`**, which
+  by the three apps (`web`, `platform`, `worker`) and `@shinefold/auth`**, which
   binds the Auth.js adapter to its tables. It imports no Sanity SDK, and its `src/` never imports
-  `@blog/insight` — logging is the apps' job. One scoped exception, in
+  `@shinefold/insight` — logging is the apps' job. One scoped exception, in
   standalone CLI tools outside the request path (`SPEC.md` §4): four tools —
   `deprovision-tenant/`, `recheck-tenant-owners/`,
   `validate-tenant-documents/` and `migrate-tenant-content/` — import
   `sanitizeLogMessage` directly rather than keep a drifted copy.
 - `apps/web` is the only place `ui` and `service` (and `db`) meet (Server
   Components fetch, pass typed props to `ui`).
-- `@blog/auth` holds the Auth.js configuration both apps pass to their own
+- `@shinefold/auth` holds the Auth.js configuration both apps pass to their own
   `NextAuth()` call — providers, the Drizzle adapter, session strategy, cookie
   options. It sits above `db` (which owns the adapter tables) and **`db` must
   never import it**. One shared builder, never a shared session: two
@@ -56,27 +56,27 @@ graph is acyclic
   app's session as no session. See `.claude/agents/auth.md`.
 - `apps/platform` is a separate Next.js app (its own deployment and domain) for
   the platform, the operator and tenant app — it consumes `db`, `auth`, `config`, `utils`,
-  `insight`, `email` and `@blog/studio`, and **never Sanity or `@blog/service` directly**: it
-  reaches the Studio only through `@blog/studio`'s mount component, and ESLint
+  `insight`, `email` and `@shinefold/studio`, and **never Sanity or `@shinefold/service` directly**: it
+  reaches the Studio only through `@shinefold/studio`'s mount component, and ESLint
   `no-restricted-imports` bans `sanity`, `next-sanity`, `@sanity/*`, `groqd`
-  and `@blog/service` there. It owns its presentational primitives (Text, Card,
+  and `@shinefold/service` there. It owns its presentational primitives (Text, Card,
   Icon, Button, …) as well as its interactive ones, built on Base UI and styled
-  in-app; nothing is added to `@blog/ui` for it. The one exception is
+  in-app; nothing is added to `@shinefold/ui` for it. The one exception is
   `apps/platform/src/components/features/site-preview/`, which renders the
-  tenant's real site with `@blog/ui` so the live theme preview cannot drift
-  from `apps/web` — an ESLint guard confines `@blog/ui` imports under
+  tenant's real site with `@shinefold/ui` so the live theme preview cannot drift
+  from `apps/web` — an ESLint guard confines `@shinefold/ui` imports under
   `apps/platform` to that directory. See `.claude/agents/platform-app.md`.
 - `apps/worker` is a third, non-public app (its own Vercel project) that runs
   tenant provisioning as Vercel Workflow durable runs, enqueued by
   `apps/platform` with a shared secret. It consumes `db`, `config`, `utils`,
-  `insight`, `email` and `@sanity/client` — a third importer of `@blog/db`
+  `insight`, `email` and `@sanity/client` — a third importer of `@shinefold/db`
   and, off the request path, of a Sanity SDK — and **nothing imports it**. It
-  never imports React, `@blog/ui`, `@blog/service`, `@blog/auth` or
-  `@blog/studio`, and it alone holds the provisioning secrets
+  never imports React, `@shinefold/ui`, `@shinefold/service`, `@shinefold/auth` or
+  `@shinefold/studio`, and it alone holds the provisioning secrets
   (`SANITY_MANAGEMENT_TOKEN`, `TENANT_TOKEN_ENCRYPTION_KEY`, the registry
   `DATABASE_URL`, `SANITY_REVALIDATE_SECRET`, `VERCEL_TOKEN`). See
   `.claude/agents/worker.md`.
-- `@blog/studio` (`packages/studio`) is the Sanity Studio: schema types (the
+- `@shinefold/studio` (`packages/studio`) is the Sanity Studio: schema types (the
   source of truth for every content shape), desk structure, content migrations,
   and a `StudioMount` component that takes plain strings (`projectId`,
   `dataset`, `basePath`, `title`), builds the Studio config **internally**, and
@@ -86,7 +86,7 @@ graph is acyclic
   Component calling the builder drags the Sanity SDK into the RSC graph, where
   `swr`, `sanity`'s CSS and `sanity-plugin-media` break under the
   `react-server` condition. See `.claude/agents/studio.md`.
-- `@blog/insight` (`packages/insight`) holds the structured logger core —
+- `@shinefold/insight` (`packages/insight`) holds the structured logger core —
   `createLogger`, `LOG_LEVEL`, and `sanitizeLogMessage`, its sole canonical
   implementation. It depends on nothing. The logger may ship its `error` and
   `warn` lines to sinks registered at runtime (`registerLogSink`; the
@@ -95,19 +95,19 @@ graph is acyclic
   expose one shared logger at `src/utils/logger/logger.ts` carrying their own
   `service` value, and import that rather than calling `createLogger` per
   module. `service`, `db` and `auth` never log — failures reach the caller and
-  the app layer logs them once, with request context (the `@blog/db` CLI tools
+  the app layer logs them once, with request context (the `@shinefold/db` CLI tools
   above are the one exception). See `.claude/agents/insight.md`.
-- `@blog/email` (`packages/email`) is the single home for every email the
+- `@shinefold/email` (`packages/email`) is the single home for every email the
   product sends — the shared branded HTML shell, the canonical `escapeHtml`,
   and the typed `sendEmail` Resend transport. Upstream is `config` and `utils`, so
-  both apps **and** `@blog/auth` consume it without a cycle; it never imports
-  `@blog/config/react`. It owns the send call
+  both apps **and** `@shinefold/auth` consume it without a cycle; it never imports
+  `@shinefold/config/react`. It owns the send call
   but **never logs**, and never resolves tenants or fetches content: callers
-  pass it resolved copy and URLs, the way `@blog/ui` takes props, which keeps it
+  pass it resolved copy and URLs, the way `@shinefold/ui` takes props, which keeps it
   usable from an Auth.js callback with no request context. Operator-alert copy
   stays hardcoded and must never become tenant-editable. See
   `.claude/agents/email.md`.
-- Content shapes come from the generated Sanity types in `@blog/config`
+- Content shapes come from the generated Sanity types in `@shinefold/config`
   (`packages/config/src/sanity/generated/types.ts`, produced by typegen) —
   never hand-redeclared.
 
@@ -139,7 +139,7 @@ the search is the gate: every implementing agent reports it in a required
 helper the diff adds, where it looked (`packages/config/const-index.json`,
 `packages/utils/src/`, the workspace's `src/testing/` and `__mocks__/`, the
 nearest sibling) and what it found. A missing or empty Reuse item is a
-blocking review finding. `@blog/utils` holds the shared small helpers, so
+blocking review finding. `@shinefold/utils` holds the shared small helpers, so
 before writing a comparison, type check, emptiness test or small transform,
 look there first.
 
@@ -186,7 +186,7 @@ Read them against this file's Conventions, the layer's own skill, and the
 ticket itself. Then sort what you find:
 
 - **Mechanical drift in a file the diff already touches is fixed in the same
-  change** — a comment that fails the comment test, a type `@blog/config`
+  change** — a comment that fails the comment test, a type `@shinefold/config`
   already exports, a dead import or export, a pattern a later convention
   replaced, a test file not yet pruned (`testing-practices` → "When you
   touch a test file"). This is the steady-state rule comments already follow,
@@ -245,11 +245,11 @@ except the Gate 0 `board-keeper` dispatch and the board write after
 - `react-component-practices` when writing or changing any React component in
   `packages/ui`, `apps/web` or `apps/platform` — the shared rules the layer
   skills below build on.
-- `ui-library-practices` when touching `packages/ui`; its § "The `@blog/ui`
+- `ui-library-practices` when touching `packages/ui`; its § "The `@shinefold/ui`
   component index" (`packages/ui/COMPONENTS.md`, generated) is checked before
   deciding a feature needs a new UI component.
 - `web-component-practices` when building or editing an interactive component in
-  `apps/web` (popover/menu/disclosure/clipboard/focus) or composing `@blog/ui`
+  `apps/web` (popover/menu/disclosure/clipboard/focus) or composing `@shinefold/ui`
   with client state.
 - `platform-ui-practices` when building or changing any UI in `apps/platform`
   — the platform design standard, reusable blocks on Base UI, and the red flags to
@@ -342,36 +342,36 @@ except the Gate 0 `board-keeper` dispatch and the board write after
   (`sanity.config.ts`, `sanity.cli.ts`, `next.config.ts`, `vitest.config.ts`,
   etc.) stay at the package root.
 - **Absolute imports via per-workspace aliases.** Internal imports use the
-  workspace's **own name** as the alias — `@blog/{pkg}/*` for packages
-  (`@blog/config`, `@blog/service`, `@blog/ui`), `@{app}/*` for apps (`@web/*`,
+  workspace's **own name** as the alias — `@shinefold/{pkg}/*` for packages
+  (`@shinefold/config`, `@shinefold/service`, `@shinefold/ui`), `@{app}/*` for apps (`@web/*`,
   `@platform/*`). Same-directory `./` stays relative; **never**
   parent-traversal `../`, and **never** a shared `#/`/`@/` (a shared prefix
   hijacks a dependency's identically-named alias across packages, and breaks
   the Turbopack build / cross-package type-check). Each workspace's
   `tsconfig.json` `paths` **and** `vitest.config.ts` alias declare its own
-  alias **plus each dependency's** alias (e.g. `web` maps `@web`, `@blog/ui`,
-  `@blog/service`, `@blog/config`). **When a workspace starts consuming a new
+  alias **plus each dependency's** alias (e.g. `web` maps `@web`, `@shinefold/ui`,
+  `@shinefold/service`, `@shinefold/config`). **When a workspace starts consuming a new
   package, add that dependency's alias to the consumer's `tsconfig` +
   `vitest`** — otherwise type-check/test/build fail. Unique per-workspace
   prefixes resolve cleanly in tsc (`Bundler`), Next/Turbopack, Sanity's esbuild
   extract, and vitest.
 - TypeScript `strict`; no `any`. Server Components by default.
-- **Use `@blog/config`'s shared types; never spell one out by hand.** Write
+- **Use `@shinefold/config`'s shared types; never spell one out by hand.** Write
   `TMaybeUndefined<T>`, never `T | undefined`; `TMaybeNull<T>`, never
   `T | null`; `TNullable<T>`, never `T | null | undefined` — in a prop, a
   return type, a `useState` or a `createContext` alike. Derive a const's union
-  with `TValueOf<typeof C>` (`@blog/config/utils`), never
+  with `TValueOf<typeof C>` (`@shinefold/config/utils`), never
   `(typeof C)[keyof typeof C]`. The same goes for `IWithClassName`,
   `IWithDataTestId`, `ILocalizedParams`, `ITenantLocalizedParams` and
-  `IWithChildren` (from `@blog/config/react`). Before
+  `IWithChildren` (from `@shinefold/config/react`). Before
   writing a type, check `packages/config/src/types/` for one that already says
   it, and add a missing one there rather than locally. Exempt are the
-  generated Sanity types and the workspaces below `@blog/config` in the graph,
-  which cannot import it: `@blog/utils` and `@blog/insight`. The
+  generated Sanity types and the workspaces below `@shinefold/config` in the graph,
+  which cannot import it: `@shinefold/utils` and `@shinefold/insight`. The
   raw forms already in the repo are converted file by file as each file is
   touched, the same steady-state rule as comments. Where helpers and shared
   constants live: `.claude/agents/config.md`.
-- **Read an action result through its outcome guards.** `@blog/config`'s
+- **Read an action result through its outcome guards.** `@shinefold/config`'s
   `isOutcomeSuccess(result)`, `isOutcomeInvalid(result)`,
   `isOutcomeServerError(result)`, `isOutcomeRefused(result)` and
   `isOutcomeUnavailable(result)` take the whole result and narrow it — never
@@ -397,7 +397,7 @@ except the Gate 0 `board-keeper` dispatch and the board write after
   workspace.** React layers export _values_ — a component is a const holding a
   function — so they use **arrow-function consts**
   (`func-style: ['error', 'expression', { allowArrowFunctions: true }]`).
-  `@blog/service`, `@blog/db` and `@blog/email` export _operations_, where
+  `@shinefold/service`, `@shinefold/db` and `@shinefold/email` export _operations_, where
   `export function getPostBySlug()` is the ordinary Node/TypeScript idiom, so
   they keep **declarations**. Wired in `configs/eslint/`: `web.js`,
   `platform.js` and `studio.js` (arrow); `service.js`, `db.js` and `email.js`
@@ -406,7 +406,7 @@ except the Gate 0 `board-keeper` dispatch and the board write after
   carve-out: `.claude/agents/web.md` / `platform-app.md` § "Function style".
 - **Key/value-pair consts are always both UPPERCASE** (key === uppercase
   value; a `<DOMAIN>_LOG` const's values are its event names, "No bare
-  `console.*`" below), `as const`, and live in `@blog/config` (`constants/`). e.g.
+  `console.*`" below), `as const`, and live in `@shinefold/config` (`constants/`). e.g.
   `export const LINK_TYPE = { INTERNAL: 'INTERNAL', EXTERNAL: 'EXTERNAL' } as const;`
   The uppercase value is the stored/serialized value, so schema `options.list`
   and migrations use it too; derive unions with `TValueOf<typeof C>`. Shape
@@ -430,21 +430,21 @@ except the Gate 0 `board-keeper` dispatch and the board write after
     app and by no package lives in that app's `src/constants/`, one domain per
     file, imported through the app's alias (`@platform/constants/preview` — the
     preview mode and width only its preview frames read). The day a second
-    workspace needs one, it moves to `@blog/config` in the change that adds
+    workspace needs one, it moves to `@shinefold/config` in the change that adds
     that reader.
   - **A storage layer's own vocabulary lives with that layer** — a const whose
     values that layer persists, read _only_ by that layer and the app on top of
-    it; "only one app happens to use it today" is not enough. `@blog/db` owns
+    it; "only one app happens to use it today" is not enough. `@shinefold/db` owns
     `TENANT_STATUS`, `MEMBERSHIP_ROLE`, `ADMIN_ROLE`, `GRANTED_VIA` and
     `TENANT_PROVISIONING_*` on that basis.
 
   **Reach is the test — not how the column is typed.** Those five are stored
   as a `pgEnum`, plain `text().$type<>()` and a `jsonb` map alike.
   `PRESET_ID` / `FONT_CHOICE` / `RADIUS_SCALE` / `DENSITY` back `pgEnum`
-  columns in `site-config.ts` yet stay in `@blog/config`, because both apps
+  columns in `site-config.ts` yet stay in `@shinefold/config`, because both apps
   read all four and `packages/studio` reads `PRESET_ID`; `TENANT_PLAN` backs
   `tenants.plan` and lives there because `packages/studio` reads it.
-  **`AUDIT_ACTION` / `AUDIT_TARGET_TYPE` deliberately stay in `@blog/config`**
+  **`AUDIT_ACTION` / `AUDIT_TARGET_TYPE` deliberately stay in `@shinefold/config`**
   although only `db` and `apps/platform` read them: auditing is cross-cutting,
   its vocabulary grows as surfaces become auditable, and `audit_events` stores
   both as plain text so a new action needs no schema change — don't relocate
@@ -456,7 +456,7 @@ except the Gate 0 `board-keeper` dispatch and the board write after
 
 - **Reuse a const; never retype its value.** Check
   `packages/config/CONSTANTS.md` — the generated index of every key/value
-  const in `@blog/config`, `@blog/db` and each app's `src/constants/` —
+  const in `@shinefold/config`, `@shinefold/db` and each app's `src/constants/` —
   before writing a string or number literal, and import the const it names
   (`HTTP_STATUS.NOT_FOUND`, never `404`). **A value written a second time
   becomes a const** in the change that writes it, homed by the placement
@@ -482,9 +482,9 @@ except the Gate 0 `board-keeper` dispatch and the board write after
   `pnpm verify`) — so an untouched file keeps its backlog. After adding or changing a const, run
   `pnpm gen:const-index`; `pnpm gen:const-index:check` guards drift.
 
-- `'use client'` never in `@blog/ui`; in `apps/web` and `apps/platform` it goes
+- `'use client'` never in `@shinefold/ui`; in `apps/web` and `apps/platform` it goes
   on the smallest leaf that needs the client. Exceptions (`Carousel`,
-  `Dialog`, `@blog/studio`'s mount): `react-component-practices` § "Server
+  `Dialog`, `@shinefold/studio`'s mount): `react-component-practices` § "Server
   first, client at the leaf".
 - **Destructure a value into local bindings once, right after the point that
   settles its shape — then use those bindings, not repeated inline access.**
@@ -496,10 +496,10 @@ except the Gate 0 `board-keeper` dispatch and the board write after
   fetched result right after the guard
   (`const { title, posts, currentPage, totalPages } = result.data;`).
 - **No bare `console.*` — log through the app's shared logger** (see the
-  `@blog/insight` contract above; dropping it loses the `service` field that
+  `@shinefold/insight` contract above; dropping it loses the `service` field that
   separates the two apps' lines). `no-console` is declared in
   `configs/eslint/base.js`, which exempts tests; each other exemption — the
-  logger itself, `@blog/db`'s `scripts/**` and `drizzle.config.ts`,
+  logger itself, `@shinefold/db`'s `scripts/**` and `drizzle.config.ts`,
   `apps/web`'s `e2e/**`, places where stdout _is_ the interface — lives in that
   workspace's preset, because flat-config `files` globs resolve per consuming
   workspace. Event names are static, lowercase and dot-namespaced; dynamic

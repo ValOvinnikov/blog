@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 // Namespaced by origin layer (`DB_`) so a log line stays readable without a
 // second field identifying where the failure came from.

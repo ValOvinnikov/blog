@@ -1,5 +1,5 @@
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { errorResult, okResult } from '@shinefold/utils';
 import { POST_FEATURED_LOG } from '@web/constants/post-featured';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -31,7 +31,7 @@ const { getPostFeaturedMock } = vi.hoisted(() => ({
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       postFeatured: { v1: { getPostFeatured: getPostFeaturedMock } },

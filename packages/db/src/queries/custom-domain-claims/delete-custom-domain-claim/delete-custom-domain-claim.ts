@@ -1,8 +1,8 @@
-import { type TTenantPlan } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { isTenantOnPlan } from '@blog/db/queries/tenants/tenant-on-plan';
-import { customDomainClaims } from '@blog/db/schema/custom-domain-claims';
-import { hasLength } from '@blog/utils/primitives';
+import { type TTenantPlan } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { isTenantOnPlan } from '@shinefold/db/queries/tenants/tenant-on-plan';
+import { customDomainClaims } from '@shinefold/db/schema/custom-domain-claims';
+import { hasLength } from '@shinefold/utils/primitives';
 import { and, eq } from 'drizzle-orm';
 
 export async function deleteCustomDomainClaim(

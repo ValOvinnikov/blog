@@ -6,10 +6,10 @@ import {
   type TActionResult,
   type TLocaleIsoCode,
   type TMaybeUndefined,
-} from '@blog/config';
-import { queries, type schema } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { toOutcome } from '@blog/utils/to-outcome';
+} from '@shinefold/config';
+import { queries, type schema } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import type { TFieldErrorReason } from '@web/constants/field-error';
 import { sendContactNotification } from '@web/server/contact-form/contact-notification-send/contact-notification-send';
 import { createPublicWriteGuard } from '@web/server/rate-limit/public-write-guard/public-write-guard';

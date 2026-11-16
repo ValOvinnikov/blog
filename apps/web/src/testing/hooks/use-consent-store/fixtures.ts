@@ -1,4 +1,4 @@
-import { CONSENT_CATEGORY } from '@blog/config';
+import { CONSENT_CATEGORY } from '@shinefold/config';
 import { CONSENT_COOKIE_NAME } from '@web/utils/consent-cookie';
 
 const COOKIE_PATH_ATTRIBUTE = 'Path=/';

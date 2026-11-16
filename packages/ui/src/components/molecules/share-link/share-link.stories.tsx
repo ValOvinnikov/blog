@@ -1,6 +1,6 @@
-import { ICONS, SIZE } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
 import { faker } from '@faker-js/faker';
+import { ICONS, SIZE } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { ShareLink } from './share-link';

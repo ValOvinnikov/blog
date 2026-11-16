@@ -2,13 +2,6 @@
 
 import { Radio } from '@base-ui/react/radio';
 import { RadioGroup } from '@base-ui/react/radio-group';
-import {
-  FONT_CHOICE,
-  ICONS,
-  PRESET_ID,
-  type TNamedControlAria,
-  type TPresetId,
-} from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
@@ -16,6 +9,13 @@ import {
   PRESET_PICKER_LAYOUT,
   type TPresetPickerLayout,
 } from '@platform/constants/preset-picker';
+import {
+  FONT_CHOICE,
+  ICONS,
+  PRESET_ID,
+  type TNamedControlAria,
+  type TPresetId,
+} from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

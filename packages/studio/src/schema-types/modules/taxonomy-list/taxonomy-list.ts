@@ -1,12 +1,12 @@
-import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config/constants';
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { showToggleField } from '@blog/studio/schema-types/fields/show-toggle-field/show-toggle-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
-import { toTitleCase } from '@blog/utils/primitives';
+import { TAXONOMY_KIND, TAXONOMY_SORT } from '@shinefold/config/constants';
+import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { showToggleField } from '@shinefold/studio/schema-types/fields/show-toggle-field/show-toggle-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { wideLayoutField } from '@shinefold/studio/schema-types/objects/wide-layout/wide-layout-field';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { LayoutGrid } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

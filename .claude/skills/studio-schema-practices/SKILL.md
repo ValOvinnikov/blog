@@ -38,12 +38,12 @@ schema-only and never exported from the package.
 
 A value **stored in a document** or **matched in code** — `options.list`
 values, mode discriminators, values written by `initialValue` or a migration —
-comes from one UPPERCASE key/value const in `@blog/config` `constants/`
+comes from one UPPERCASE key/value const in `@shinefold/config` `constants/`
 (CLAUDE.md → Conventions), as `LINK_TYPE` does for `link`'s `linkType`. The
 test: if renaming the value would touch more than one file, it should have been
 a constant.
 
-- **`_type` names are not `@blog/config` constants.** Inside the Studio,
+- **`_type` names are not `@shinefold/config` constants.** Inside the Studio,
   reference the schema's `.name` (`to: [{ type: linkSchema.name }]` in
   `objects/link-ref/link-ref.ts`), never a string, so a rename is
   compiler-checked. Where importing the schema would close an import cycle,
@@ -166,14 +166,14 @@ helpers a second migration needs: `migrations/README.md`.
 - **One source of truth for moved fields** — a `const … as const` list from
   which the legacy type, the builder and the `unset()` list all derive.
   Parallel hand-kept lists are how fields get orphaned.
-- **Stored values come from the same `@blog/config` constants the schema
+- **Stored values come from the same `@shinefold/config` constants the schema
   uses**; `_type` names are the literal or a local const.
 - **Never import a Studio schema module (`src/schema-types`), or anything that
   reaches bare `sanity` or React** — `sanity/migrate` is fine. Every
   migration's `index.ts` is loaded to build `sanity migrations list`, so one
   such import breaks every migration while type-check and vitest stay green.
   Redeclare a schema-module constant locally (the test imports the real one,
-  so drift fails), and run `pnpm --filter @blog/studio migrate:list` before
+  so drift fails), and run `pnpm --filter @shinefold/studio migrate:list` before
   committing.
 - **Every migration ships a co-located `*.test.ts`**: the transform on a
   representative fixture, and a re-run on migrated input proving it a no-op

@@ -1,4 +1,4 @@
-import type { TMaybeUndefined, TParsedEmbed } from '@blog/config/types';
+import type { TMaybeUndefined, TParsedEmbed } from '@shinefold/config/types';
 
 export type TEmbedParser = (
   host: string,

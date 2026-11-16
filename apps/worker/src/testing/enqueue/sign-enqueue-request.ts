@@ -1,5 +1,5 @@
-import { HTTP_METHOD } from '@blog/config/constants';
-import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
+import { HTTP_METHOD } from '@shinefold/config/constants';
+import { buildEnqueueHeaders } from '@shinefold/utils/enqueue-signature';
 
 export function mockSignedRequest(
   url: string,

@@ -4,11 +4,11 @@ import type {
   THeadingBlock,
   TMaybeUndefined,
   TPortableTextBlock,
-} from '@blog/config';
-import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
-import type { THeroPresentation } from '@blog/service/shared/transformers/hero/to-hero-presentation';
-import type { THeroLayout } from '@blog/service/shared/transformers/layout/to-layout';
-import type { TSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
+} from '@shinefold/config';
+import type { TCtaButton } from '@shinefold/service/shared/transformers/cta/to-cta-button';
+import type { THeroPresentation } from '@shinefold/service/shared/transformers/hero/to-hero-presentation';
+import type { THeroLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
+import type { TSocialProfile } from '@shinefold/service/shared/transformers/social-profile/to-social-profile';
 
 export type THeroProfileModule = {
   brandVariant: TBrandVariant;

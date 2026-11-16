@@ -1,5 +1,5 @@
-import { LOCALE_OPEN_GRAPH_TAGS } from '@blog/config';
-import type { TSeoResolved } from '@blog/service';
+import { LOCALE_OPEN_GRAPH_TAGS } from '@shinefold/config';
+import type { TSeoResolved } from '@shinefold/service';
 import { routing } from '@web/i18n/routing';
 import { toMetadata, type TToMetadataOptions } from '@web/metadata/to-metadata';
 import { getRequestContext } from '@web/server/request-context/request-context';

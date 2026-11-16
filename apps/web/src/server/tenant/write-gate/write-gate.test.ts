@@ -1,8 +1,8 @@
-import { TENANT_WRITE_REFUSAL, type TMaybeUndefined } from '@blog/config';
-import { TENANT_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { TENANT_WRITE_REFUSAL, type TMaybeUndefined } from '@shinefold/config';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { errorResult, okResult } from '@shinefold/utils';
 import { TENANT_WRITE_LOG } from '@web/constants/tenant-write';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
@@ -23,8 +23,8 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await import('@shinefold/db/constants')),
 }));
 
 const MOCK_SITE = faker.lorem.slug();

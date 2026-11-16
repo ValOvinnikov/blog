@@ -1,10 +1,10 @@
-import { ICONS } from '@blog/config';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { ICON_SIZE } from '@platform/constants/icon';
 import { PREVIEW_DEVICE } from '@platform/constants/preview';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { previewDeviceNoteVariants } from './preview-device-note-variants';

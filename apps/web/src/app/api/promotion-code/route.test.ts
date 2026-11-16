@@ -1,10 +1,10 @@
-import { HTTP_STATUS } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { HTTP_STATUS } from '@shinefold/config/constants';
 import {
   MOCK_PERCENT_OFF,
   MOCK_PROMOTION_CODE,
-} from '@blog/db/testing/stripe-catalogue/fixtures';
-import { isUndefined } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/stripe-catalogue/fixtures';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { CACHE_CONTROL } from '@web/constants/http';
 import { PRICING_LOG, PRICING_SEARCH_PARAM } from '@web/constants/pricing';
 import { mockPromotionDiscount } from '@web/testing/modules/pricing/live-price-fixtures';
@@ -19,7 +19,7 @@ const { getActiveStripePromotionCodeMock } = vi.hoisted(() => ({
   getActiveStripePromotionCodeMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     stripeCatalogue: {
       getActiveStripePromotionCode: getActiveStripePromotionCodeMock,

@@ -1,14 +1,14 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import type { TEmailDeliveryOutcome } from '@blog/db/constants';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import type { TEmailDeliveryOutcome } from '@shinefold/db/constants';
 import {
   emailDeliveryEvents,
   emailDeliveryOutcomeCounts,
-} from '@blog/db/schema/email-usage';
-import { foreignKeyViolationConstraint } from '@blog/db/utils/constraint-violation/constraint-violation';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { utcDay } from '@blog/utils/date';
-import { hasLength, isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/schema/email-usage';
+import { foreignKeyViolationConstraint } from '@shinefold/db/utils/constraint-violation/constraint-violation';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { utcDay } from '@shinefold/utils/date';
+import { hasLength, isUndefined } from '@shinefold/utils/primitives';
 import { sql } from 'drizzle-orm';
 
 // One statement, because `neon-http` has no transactions: the event id and the count are stored together or not at all.

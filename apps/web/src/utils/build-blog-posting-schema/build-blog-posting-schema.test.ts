@@ -1,10 +1,10 @@
-import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES, routes } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES, routes } from '@shinefold/config';
 import {
   type TPostDetail,
   type TSanityProjectRef,
   urlForSanityImage,
-} from '@blog/service';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service';
 import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
 
 import { buildBlogPostingSchema } from './build-blog-posting-schema';

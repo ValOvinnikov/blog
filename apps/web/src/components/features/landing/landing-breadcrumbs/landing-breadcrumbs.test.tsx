@@ -1,5 +1,5 @@
-import { routes } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { routes } from '@shinefold/config';
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
   mockLandingSectionNavigation,

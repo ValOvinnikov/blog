@@ -1,9 +1,9 @@
-import { NEWSLETTER_VARIANT } from '@blog/config';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { NEWSLETTER_VARIANT } from '@shinefold/config';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import {
   MOCK_NEWSLETTER_EMAIL_LABEL,
   makeNewsletterSignupForm,
-} from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
+} from '@shinefold/ui/testing/organisms/newsletter-signup/fixtures';
 
 import { NewsletterSignupCompact } from './newsletter-signup-compact';
 

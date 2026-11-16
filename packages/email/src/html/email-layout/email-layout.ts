@@ -1,15 +1,15 @@
 import {
   renderEmailHeader,
   type TEmailHeaderLogo,
-} from '@blog/email/html/email-header/email-header';
+} from '@shinefold/email/html/email-header/email-header';
 import {
   CELL_ROW_END,
   FONT_STACK,
   SHELL_PADDING_PX,
   SHELL_WIDTH_PX,
-} from '@blog/email/html/email-metrics/email-metrics';
-import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/email/html/email-metrics/email-metrics';
+import { escapeHtml } from '@shinefold/email/html/escape-html/escape-html';
+import { hasLength } from '@shinefold/utils/primitives';
 
 type TEmailPalette = {
   surface: string;

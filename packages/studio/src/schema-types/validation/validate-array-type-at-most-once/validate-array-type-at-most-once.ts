@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { isUndefined } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 type TArrayMember = { _type?: unknown };
 

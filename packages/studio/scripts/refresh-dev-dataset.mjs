@@ -5,7 +5,7 @@
  * projects, not just separate datasets in one project; see docs/DEPLOY.md).
  * `sanity dataset copy` is same-project only and doesn't apply here.
  *
- *   pnpm --filter @blog/studio dataset:refresh-dev
+ *   pnpm --filter @shinefold/studio dataset:refresh-dev
  *
  * Manual, human-gated — run this ONLY after confirming that release's
  * production migrations have already finished (never in parallel with or

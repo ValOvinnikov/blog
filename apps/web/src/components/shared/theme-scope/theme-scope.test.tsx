@@ -1,5 +1,5 @@
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import { buildThemeStyleBlock } from '@web/utils/build-theme-style-block';
 

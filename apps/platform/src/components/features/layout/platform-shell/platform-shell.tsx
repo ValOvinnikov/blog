@@ -1,11 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TAdminRole, TMembershipRole } from '@blog/db/constants';
 import { AccountMenu } from '@platform/components/features/layout/account-menu';
 import {
   Sidebar,
   type TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
 import { Topbar } from '@platform/components/features/layout/topbar';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TAdminRole, TMembershipRole } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

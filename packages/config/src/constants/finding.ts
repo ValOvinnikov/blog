@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const FINDING_SOURCE = {
   DOCUMENT_VALIDATION: 'DOCUMENT_VALIDATION',

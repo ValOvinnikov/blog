@@ -1,19 +1,19 @@
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { MOCK_CORRUPT_PERSONAL_VALUE } from '@blog/db/testing/personal-data';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_ACTIVE_SUBSCRIBER } from '@blog/db/testing/subscribers/fixtures';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/fixtures';
+import { MOCK_CORRUPT_PERSONAL_VALUE } from '@shinefold/db/testing/personal-data';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_ACTIVE_SUBSCRIBER } from '@shinefold/db/testing/subscribers/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { eq } from 'drizzle-orm';
 
 import { listActiveSubscribers } from './list-active-subscribers';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(7159);
 

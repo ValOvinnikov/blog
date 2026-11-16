@@ -1,12 +1,12 @@
 import { Field } from '@base-ui/react/field';
 import { Fieldset } from '@base-ui/react/fieldset';
-import type { IWithChildren } from '@blog/config/react';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { FieldLabel } from '@platform/components/shared/field-label';
 import { GrowthBadge } from '@platform/components/shared/growth-badge';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { isBrandAssetKind } from '@platform/utils/look-form-values/look-form-values';
+import type { IWithChildren } from '@shinefold/config/react';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

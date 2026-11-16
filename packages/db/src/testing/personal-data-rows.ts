@@ -1,15 +1,18 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { BLOCKED_IDENTITY_KIND, MEMBERSHIP_ROLE } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { MOCK_BLOCK_REASON } from '@blog/db/testing/blocked-signup-identities/fixtures';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import {
+  BLOCKED_IDENTITY_KIND,
+  MEMBERSHIP_ROLE,
+} from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { MOCK_BLOCK_REASON } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
 import {
   insertTestLead,
   insertTestReader,
   type TTestDb,
-} from '@blog/db/testing/fixtures';
-import { mockAccountEmailIndex } from '@blog/db/testing/personal-data';
-import { uniqueEmailColumns } from '@blog/db/utils/personal-data/personal-data';
+} from '@shinefold/db/testing/fixtures';
+import { mockAccountEmailIndex } from '@shinefold/db/testing/personal-data';
+import { uniqueEmailColumns } from '@shinefold/db/utils/personal-data/personal-data';
 import { eq } from 'drizzle-orm';
 
 export const MOCK_PERSONAL_DATA_LEAD_NAME = 'Grace Hopper';

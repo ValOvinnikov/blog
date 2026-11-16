@@ -1,3 +1,5 @@
+import { VOICE_SECTION, type TVoiceSection } from '@platform/constants/voice';
+import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 import {
   portableTextToPlainText,
   SITE_MESSAGES_BY_LOCALE,
@@ -8,12 +10,10 @@ import {
   type TVoicePortableText,
   type TMaybeUndefined,
   type TVoiceSurface,
-} from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
-import { isNull, isString, isUndefined } from '@blog/utils/primitives';
-import { VOICE_SECTION, type TVoiceSection } from '@platform/constants/voice';
-import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
+} from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import type { TVoiceOverridesByLocaleInput } from '@shinefold/db/queries/site-config';
+import { isNull, isString, isUndefined } from '@shinefold/utils/primitives';
 
 export type TVoiceField = (typeof VOICE_FIELDS)[number];
 

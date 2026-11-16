@@ -1,4 +1,4 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
 
 import { toHeadingAlignment } from './to-heading-alignment';
 

@@ -23,10 +23,10 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
   SPINNER_STYLE,
-} from '@blog/config/constants';
-import { BRAND_NAME_MAX_LENGTH, LOOK_FIELD } from '@blog/db/constants';
-import type { siteConfig } from '@blog/db/schema/site-config';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/config/constants';
+import { BRAND_NAME_MAX_LENGTH, LOOK_FIELD } from '@shinefold/db/constants';
+import type { siteConfig } from '@shinefold/db/schema/site-config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { z } from 'zod';
 
 import type { TVoiceOverridesByLocaleInput } from './parse-voice-overrides';

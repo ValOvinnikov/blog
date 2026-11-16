@@ -1,4 +1,3 @@
-import { BRAND_NAME_MAX_LENGTH } from '@blog/db/constants';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
@@ -16,6 +15,7 @@ import {
 import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
+import { BRAND_NAME_MAX_LENGTH } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

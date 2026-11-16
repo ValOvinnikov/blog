@@ -2,8 +2,8 @@ import {
   CONTENT_ALIGNMENT,
   LEGAL_PAGE_KIND,
   LOCALE_ISO_CODES,
-} from '@blog/config';
-import type { TSectionDocumentDetail } from '@blog/service';
+} from '@shinefold/config';
+import type { TSectionDocumentDetail } from '@shinefold/service';
 import { MOCK_CONTENTS_RAIL_BODY } from '@web/testing/shared/contents-rail/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 

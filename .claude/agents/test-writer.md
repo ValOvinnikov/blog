@@ -100,7 +100,7 @@ summary:
   you are applying.
 - What each layer tests → "What to test".
 - Rendering, `beforeEach`/`setup()` → "Rendering and arrangement". The
-  `blog-test/prefer-before-each` lint rule reports a repeated opening in a
+  `shinefold-test/prefer-before-each` lint rule reports a repeated opening in a
   file you edit; fix it, never disable it.
 - Queries, `userEvent`, async → "Writing a component test".
 - Fakes and `__mocks__/` → "What to fake".
@@ -146,7 +146,7 @@ Inputs and expectations use the const `packages/config/CONSTANTS.md` names
 (`toBe(HTTP_STATUS.NOT_FOUND)`, never `404`), and a value a test file writes a
 second time becomes a const at the top of that file (testing-practices →
 "Where tests live"). A value several files share is a `testing/` builder, which you write, or an
-`@blog/config` const, which is product code: report it like an extraction
+`@shinefold/config` const, which is product code: report it like an extraction
 above.
 
 ## Definition of done

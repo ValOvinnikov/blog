@@ -1,6 +1,6 @@
-import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { OAUTH_PROVIDER } from '@blog/config/constants';
-import { hasLength } from '@blog/utils/primitives';
+import type { TOAuthProviderId } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
+import { hasLength } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 import { EmailSignInForm } from './components/email-sign-in-form';

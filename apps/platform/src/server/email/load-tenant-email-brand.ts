@@ -1,13 +1,13 @@
 import 'server-only';
 
+import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
 import {
   resolveTenantEmailBrand,
   type TMaybeUndefined,
   type TTenantEmailBrand,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import type { TSiteConfigResult } from '@blog/db/queries/site-config';
-import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import type { TSiteConfigResult } from '@shinefold/db/queries/site-config';
 
 export const toTenantEmailBrand = (
   siteConfig: TMaybeUndefined<TSiteConfigResult>,

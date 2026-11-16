@@ -1,6 +1,6 @@
-import { SIZE } from '@blog/config';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { tv } from '@platform/utils/tv/tv';
+import { SIZE } from '@shinefold/config';
 
 export const signedInAccountVariants = tv({
   slots: {

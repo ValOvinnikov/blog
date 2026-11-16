@@ -1,9 +1,9 @@
-import { type TTenantPlan } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { MEMBERSHIP_ROLE, PLAN_ENTITLEMENTS } from '@blog/db/constants';
-import { unlockedMembershipsCount } from '@blog/db/queries/membership-invites/create-membership-invite/seat-limit';
-import { isTenantOnPlan } from '@blog/db/queries/tenants/tenant-on-plan';
-import { membershipInvites } from '@blog/db/schema/membership-invites';
+import { type TTenantPlan } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { MEMBERSHIP_ROLE, PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
+import { unlockedMembershipsCount } from '@shinefold/db/queries/membership-invites/create-membership-invite/seat-limit';
+import { isTenantOnPlan } from '@shinefold/db/queries/tenants/tenant-on-plan';
+import { membershipInvites } from '@shinefold/db/schema/membership-invites';
 import { and, eq, gt, inArray, isNull, ne, sql } from 'drizzle-orm';
 
 export async function stopPendingInvitesOverSeats(

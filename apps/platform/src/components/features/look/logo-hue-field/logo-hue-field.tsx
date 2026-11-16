@@ -1,11 +1,11 @@
 'use client';
 
-import { SIZE, type TMaybeUndefined } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import { accentSwatchVariants } from '@platform/components/shared/accent-swatch/accent-swatch-variants';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { Switch } from '@platform/components/shared/switch';
 import { buildLogoPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
+import { SIZE, type TMaybeUndefined } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useId, type AriaAttributes } from 'react';
 

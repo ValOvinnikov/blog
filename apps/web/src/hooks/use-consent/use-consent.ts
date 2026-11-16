@@ -1,6 +1,6 @@
 'use client';
 
-import { CONSENT_CATEGORY, type TConsentCategory } from '@blog/config';
+import { CONSENT_CATEGORY, type TConsentCategory } from '@shinefold/config';
 import { CONSENT_STATUS, type TConsentStatus } from '@web/constants/consent';
 import { useConsentStore } from '@web/hooks/use-consent-store';
 

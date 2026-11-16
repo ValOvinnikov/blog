@@ -1,6 +1,6 @@
-import type { TLocaleIsoCode } from '@blog/config';
-import { queries } from '@blog/db';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+import type { TLocaleIsoCode } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { routing } from '@web/i18n/routing';
 
 export const resolveTenantLiveLocales = async (

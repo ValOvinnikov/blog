@@ -1,5 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TCustomDomainClaim } from '@blog/db/schema/custom-domain-claims';
 import { ConnectCustomDomainForm } from '@platform/components/features/tenants/domain-page-content/components/connect-custom-domain-form/connect-custom-domain-form';
 import { CustomDomainActions } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-actions/custom-domain-actions';
 import { CustomDomainClaimCard } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-claim-card/custom-domain-claim-card';
@@ -11,6 +9,8 @@ import { DomainVerificationCardSkeleton } from '@platform/components/features/te
 import type { TProjectDomain } from '@platform/server/provisioning/project-domain';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TCustomDomainClaim } from '@shinefold/db/schema/custom-domain-claims';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 

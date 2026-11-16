@@ -1,5 +1,5 @@
-import type { TSocialProfile } from '@blog/service';
-import type { TTextLinkVariants } from '@blog/ui/components/atoms/text-link/text-link-variants';
+import type { TSocialProfile } from '@shinefold/service';
+import type { TTextLinkVariants } from '@shinefold/ui/components/atoms/text-link/text-link-variants';
 import { useTranslations } from 'next-intl';
 
 import { SocialLink } from './social-link';

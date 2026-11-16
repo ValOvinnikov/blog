@@ -1,5 +1,5 @@
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 import { accordionItemVariants } from './accordion-item-variants';

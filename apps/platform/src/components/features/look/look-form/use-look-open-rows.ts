@@ -1,4 +1,3 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import type { TLookJumpIndexProps } from '@platform/components/features/look/look-jump-index';
 import type { TAccordionActions } from '@platform/components/shared/accordion';
 import { LOOK_CARD, type TLookCard } from '@platform/constants/look-card';
@@ -9,6 +8,7 @@ import {
   nextOpenRows,
   revealOpenRow,
 } from '@platform/utils/look-open-rows/look-open-rows';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import { useRef, useState, type RefCallback } from 'react';
 
 type TLookRowActions = TAccordionActions<TLookRow>;

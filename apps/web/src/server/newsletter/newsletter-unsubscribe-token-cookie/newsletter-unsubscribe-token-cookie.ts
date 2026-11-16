@@ -1,4 +1,4 @@
-import { routes, type TMaybeUndefined } from '@blog/config';
+import { routes, type TMaybeUndefined } from '@shinefold/config';
 import { NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME } from '@web/utils/newsletter-unsubscribe-token-cookie-name';
 import { cookies } from 'next/headers';
 

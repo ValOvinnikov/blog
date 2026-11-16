@@ -1,7 +1,7 @@
 'use client';
 
-import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TVoiceListSamples } from '@platform/components/features/site-preview/voice-specimen';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import { createContext, useContext, type ReactNode } from 'react';
 
 type TVoiceListSamplesByLocale = Partial<

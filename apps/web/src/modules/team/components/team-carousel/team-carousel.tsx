@@ -1,8 +1,8 @@
 'use client';
 
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { TTeamMember, TTeamModule } from '@blog/service';
-import type { ICarouselProps } from '@blog/ui/components/organisms/carousel';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import type { TTeamMember, TTeamModule } from '@shinefold/service';
+import type { ICarouselProps } from '@shinefold/ui/components/organisms/carousel';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
 import { TeamMemberCard } from '@web/modules/team/components/team-member-card/team-member-card';
 

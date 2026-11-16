@@ -1,15 +1,15 @@
-import type { TOutcome } from '@blog/config';
-import { getDb } from '@blog/db/client';
+import type { TOutcome } from '@shinefold/config';
+import { getDb } from '@shinefold/db/client';
 import {
   TENANT_DETAILS_UPDATE_OUTCOME,
   type TTenantStatus,
-} from '@blog/db/constants';
-import { unlockMembershipsWithinPlan } from '@blog/db/queries/memberships/memberships-over-seats';
-import { isFreeOwnerViolation } from '@blog/db/queries/tenants/is-free-owner-violation';
-import { memberships } from '@blog/db/schema/memberships';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { hasLength } from '@blog/utils/primitives';
-import { toOutcome } from '@blog/utils/to-outcome';
+} from '@shinefold/db/constants';
+import { unlockMembershipsWithinPlan } from '@shinefold/db/queries/memberships/memberships-over-seats';
+import { isFreeOwnerViolation } from '@shinefold/db/queries/tenants/is-free-owner-violation';
+import { memberships } from '@shinefold/db/schema/memberships';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
+import { hasLength } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { eq, getTableColumns, inArray, sql } from 'drizzle-orm';
 
 import {

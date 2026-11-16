@@ -1,8 +1,8 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { tenantOAuthCredentials } from '@blog/db/schema/tenant-oauth-credentials';
-import { requireTenantOAuthEncryptionKey } from '@blog/db/utils/tenant-oauth-encryption-key/tenant-oauth-encryption-key';
-import { encryptSecret } from '@blog/utils';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { tenantOAuthCredentials } from '@shinefold/db/schema/tenant-oauth-credentials';
+import { requireTenantOAuthEncryptionKey } from '@shinefold/db/utils/tenant-oauth-encryption-key/tenant-oauth-encryption-key';
+import { encryptSecret } from '@shinefold/utils';
 import { z } from 'zod';
 
 export const saveTenantOAuthCredentialsInputSchema = z.object({

@@ -1,8 +1,8 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { RunContrastCheckButton } from './run-contrast-check-button';

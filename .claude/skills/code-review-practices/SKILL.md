@@ -32,7 +32,7 @@ committed `.env*`, an `eslint-disable` without a `-- reason` or a bare
 `@ts-ignore`/`@ts-expect-error`/`@ts-nocheck`, a log event name typed at the
 call instead of read from its `<DOMAIN>_LOG` const, and an `it` title over 80
 characters. Any comment in a touched test file is `check:touched-lint`'s
-(`blog-touched/no-failing-comment`). Both are in `pnpm verify` and pre-push,
+(`shinefold-touched/no-failing-comment`). Both are in `pnpm verify` and pre-push,
 so the implementing session has already seen them pass; any hit is blocking.
 
 **Then `pnpm check:review-hits`** — the checks that need a reader, over the
@@ -71,9 +71,9 @@ Also scan by eye for commented-out code, which no pattern catches reliably.
 Map each changed file to its workspace and read its imports against `CLAUDE.md`
 → "Layer contracts"; every breach is blocking. The recurring misses:
 
-- `@blog/ui` imports no `service`, Sanity SDK or `fetch` — props in, markup out.
-- `apps/web` fetches in Server Components through `@blog/service` and passes
-  typed props to `@blog/ui`; no GROQ or raw Sanity client in `web`.
+- `@shinefold/ui` imports no `service`, Sanity SDK or `fetch` — props in, markup out.
+- `apps/web` fetches in Server Components through `@shinefold/service` and passes
+  typed props to `@shinefold/ui`; no GROQ or raw Sanity client in `web`.
 - Links in `apps/web` go through `SmartLink`, never `next/link` or
   `@web/i18n/navigation`'s `Link` at a call site. No lint rule enforces it
   (→ `.claude/agents/web.md`).
@@ -83,16 +83,16 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
 - No `any`; `unknown` is narrowed; `strict` and `noUncheckedIndexedAccess`
   (`configs/tsconfig/base.json`) honoured.
 - Content shapes come from `packages/config/src/sanity/generated/types.ts`,
-  never hand-redeclared. `@blog/ui` defines its own prop types and imports no
+  never hand-redeclared. `@shinefold/ui` defines its own prop types and imports no
   service view-model.
 - A schema change commits its `pnpm typegen` output and updates `service`. An
   existing-shape change carries a migration or rules one out explicitly; a
   `packages/db/src/schema` change carries its `db:generate` migration
   (→ `develop-feature` "Migrations": "Check for migrations", "Check for `db` (Neon/Drizzle)
   migrations too").
-- No hand-written form of a type `@blog/config` exports, outside
-  `@blog/utils`, `@blog/insight`, `@blog/email` and the generated Sanity types
-  (→ `CLAUDE.md` "Use `@blog/config`'s shared types" for the list). Blocking
+- No hand-written form of a type `@shinefold/config` exports, outside
+  `@shinefold/utils`, `@shinefold/insight`, `@shinefold/email` and the generated Sanity types
+  (→ `CLAUDE.md` "Use `@shinefold/config`'s shared types" for the list). Blocking
   on added lines; elsewhere in a touched file see §7 "Drift left in a touched
   file". Helper and constant placement, and the one-line idioms that never get
   a helper: `.claude/agents/config.md`.
@@ -101,7 +101,7 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   and 404s — and a `.notNull()` on an optional field that should fall back
   (→ `.claude/agents/service.md`).
 - Studio schema and migration diffs hold the `studio-schema-practices` bar:
-  stored values and `_type`s as `@blog/config` constants; repeated field
+  stored values and `_type`s as `@shinefold/config` constants; repeated field
   patterns in a helper; validation parity across a restructure, or the dropped
   constraint named in the PR; every migration with a target-state idempotency
   guard on each document-type branch, one source for moved-field lists, and a
@@ -129,7 +129,7 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
 ## 5. Styling & structure
 
 - Token utilities from the shared preset, never raw hex; dark mode intact. New
-  `@blog/ui` classes are reachable by the apps' `@source` glob
+  `@shinefold/ui` classes are reachable by the apps' `@source` glob
   (`apps/web/index.css`, `apps/platform/index.css`).
 - No class strings inline in JSX in any React workspace — classes go through a
   module-scope `tv()`; no standalone `clsx` or `tailwind-merge`. Exception:
@@ -168,7 +168,7 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
 
 ## 6. Tests & stories
 
-- A new or changed `@blog/ui` component has a story (`ui-storybook`) and a
+- A new or changed `@shinefold/ui` component has a story (`ui-storybook`) and a
   co-located behaviour test; a styling-only change gets the story and
   `no-tests-needed`, never a test. A new or changed `service` function has a
   co-located `*.test.ts`.
@@ -226,7 +226,7 @@ line from this checklist.
   rather than re-running the suite. `build` is CI-only.
 - **Drift left in a touched file (blocking).** Read every touched file in
   full, not only its hunks. Mechanical drift anywhere in it — a comment that
-  fails the comment test, a hand-written type `@blog/config` exports, a dead
+  fails the comment test, a hand-written type `@shinefold/config` exports, a dead
   import or export, a pattern a later convention replaced — is a finding
   (→ `CLAUDE.md` "Examine before you change"). Drift in untouched files is
   not. Check the implementing agent's **Examined** section exists and that
@@ -264,7 +264,7 @@ line from this checklist.
 - **Voice candidates (listed, not blocking).** Under a "Voice candidates"
   heading, list every key the diff adds or rewords in
   `packages/config/src/voice/site-messages.*.json` with the list it landed on
-  (`VOICE_FIELDS` or `VOICE_FIXED_KEYS`), and every new `@blog/ui` prop that
+  (`VOICE_FIELDS` or `VOICE_FIXED_KEYS`), and every new `@shinefold/ui` prop that
   renders visible text. The orchestrator checks each against the ticket's
   classification (`develop-feature` "Check for Voice candidates").
 

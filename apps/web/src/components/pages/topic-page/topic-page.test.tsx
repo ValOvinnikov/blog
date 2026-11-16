@@ -1,8 +1,8 @@
-import { SITE_MESSAGES } from '@blog/config';
-import { service, type TTopicDetailPage } from '@blog/service';
-import { ARIA_CURRENT } from '@blog/ui/testing/aria';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { SITE_MESSAGES } from '@shinefold/config';
+import { service, type TTopicDetailPage } from '@shinefold/service';
+import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
+import { errorResult, okResult } from '@shinefold/utils';
 import {
   customRenderServerAsync,
   screen,
@@ -37,7 +37,7 @@ vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: { topic: { v1: { getTopicPage: vi.fn() } } },
     entities: { topics: { v1: { getTopics: vi.fn() } } },

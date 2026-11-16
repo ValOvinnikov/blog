@@ -1,4 +1,3 @@
-import type { TVoicePortableText } from '@blog/config';
 import { screen } from '@platform/testing/custom-render';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
 import { SUPPORTING_TEXT_FIELD } from '@platform/testing/voice/fixtures';
@@ -6,6 +5,7 @@ import {
   VoiceFieldInEditor,
   fieldById,
 } from '@platform/testing/voice/voice-field-in-editor';
+import type { TVoicePortableText } from '@shinefold/config';
 import userEvent from '@testing-library/user-event';
 import { useEffect } from 'react';
 

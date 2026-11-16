@@ -1,13 +1,13 @@
-import type { TAnchorElementType } from '@blog/config/react';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { PrimaryNavigationPanelGroup } from '@blog/ui/components/molecules/primary-navigation/components/panel-group/primary-navigation-panel-group';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import { PrimaryNavigationPanelGroup } from '@shinefold/ui/components/molecules/primary-navigation/components/panel-group/primary-navigation-panel-group';
 import {
   PrimaryNavigationSubmenu,
   type TPrimaryNavigationSubmenuProps,
-} from '@blog/ui/components/molecules/primary-navigation/components/submenu/primary-navigation-submenu';
-import type { INavItem } from '@blog/ui/components/molecules/primary-navigation/primary-navigation';
-import { NAV_LINK } from '@blog/ui/lib/styling';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+} from '@shinefold/ui/components/molecules/primary-navigation/components/submenu/primary-navigation-submenu';
+import type { INavItem } from '@shinefold/ui/components/molecules/primary-navigation/primary-navigation';
+import { NAV_LINK } from '@shinefold/ui/lib/styling';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 
 export type TPrimaryNavigationItemProps = {
   item: INavItem;

@@ -1,9 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
-import {
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
@@ -16,6 +10,12 @@ import {
   mockClientTenant,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SiteSetupCard } from './site-setup-card';

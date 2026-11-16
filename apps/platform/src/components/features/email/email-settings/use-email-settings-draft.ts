@@ -1,6 +1,6 @@
-import type { TLocaleIsoCode } from '@blog/config';
 import { useToast } from '@platform/context/toast-provider';
 import type { TEmailDraft } from '@platform/utils/email-draft/email-draft';
+import type { TLocaleIsoCode } from '@shinefold/config';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';

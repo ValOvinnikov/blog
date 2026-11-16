@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { BILLING_INTERVAL } from '@platform/constants/billing';
 import {
   PLAN_CHANGE_TIMING,
   type TPlanChoice,
 } from '@platform/constants/plan-change';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 
 // Key order is the rank; a shorter period waits for renewal even when the plan moves up.
 const PLAN_ORDER: string[] = Object.keys(PLAN_ENTITLEMENTS);

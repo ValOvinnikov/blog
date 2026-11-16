@@ -1,9 +1,9 @@
-import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
 import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { REQUESTED_PATH_HEADER } from '@platform/utils/requested-path/requested-path';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@shinefold/config';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';

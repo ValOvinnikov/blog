@@ -1,5 +1,5 @@
-import type { ILink } from '@blog/config';
-import type { TLogoItem } from '@blog/service';
+import type { ILink } from '@shinefold/config';
+import type { TLogoItem } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 

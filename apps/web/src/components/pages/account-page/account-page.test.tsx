@@ -1,8 +1,8 @@
-import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { routes, SUBSCRIBER_OUTCOME } from '@blog/config';
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
+import { getEnabledOAuthProviderIds } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import { routes, SUBSCRIBER_OUTCOME } from '@shinefold/config';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
 import { getHostSiteOAuthCredentials } from '@web/server/auth/site-oauth-credentials/site-oauth-credentials';
@@ -23,7 +23,7 @@ vi.mock('@web/server/auth/auth');
 
 vi.mock('@web/server/auth/site-oauth-credentials/site-oauth-credentials');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     account: { getLinkedProviders: vi.fn() },
     subscribers: { getSubscriptionStatus: vi.fn() },
@@ -34,7 +34,7 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
+vi.mock('@shinefold/auth/utils/oauth-providers/oauth-providers', () => ({
   getEnabledOAuthProviderIds: vi.fn(() => []),
 }));
 

@@ -1,8 +1,8 @@
-import { queries } from '@blog/db';
+import { queries } from '@shinefold/db';
 import {
   getPlatformSanityContext,
   type TTenantSanityContext,
-} from '@blog/service';
+} from '@shinefold/service';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { isPlatformFallbackAllowed } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { isTenantActive } from '@web/server/tenant/write-gate/write-gate';

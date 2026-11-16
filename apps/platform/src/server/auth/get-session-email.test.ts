@@ -1,9 +1,9 @@
-import type { TMaybeNull } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import {
   MOCK_SIGN_IN_EMAIL,
   MOCK_SIGN_IN_USER_ID,
 } from '@platform/testing/auth/fixtures';
+import type { TMaybeNull } from '@shinefold/config';
 import type { Session } from 'next-auth';
 
 import { getSessionEmail } from './get-session-email';

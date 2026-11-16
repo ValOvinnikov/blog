@@ -1,5 +1,5 @@
-import { BRAND_VARIANT } from '@blog/config';
-import type { TCookieSettingsModule } from '@blog/service';
+import { BRAND_VARIANT } from '@shinefold/config';
+import type { TCookieSettingsModule } from '@shinefold/service';
 
 export const mockCookieSettingsModule = (
   overrides: Partial<TCookieSettingsModule> = {},

@@ -1,8 +1,3 @@
-import {
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { TENANT_FIELD_LOCK_KIND } from '@platform/constants/tenant';
 import {
@@ -13,6 +8,11 @@ import {
   mockJoinedOwner,
   mockMapDomainFailedProvisioningSteps,
 } from '@platform/testing/tenants/fixtures';
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@shinefold/db/constants';
 
 import {
   computeTenantFieldLocks,

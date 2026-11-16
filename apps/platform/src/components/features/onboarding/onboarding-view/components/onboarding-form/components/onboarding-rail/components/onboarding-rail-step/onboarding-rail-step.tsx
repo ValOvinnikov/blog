@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { StepIndicator } from '@platform/components/shared/step-indicator';
 import { STEP_INDICATOR_STATE } from '@platform/constants/step-indicator';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import {

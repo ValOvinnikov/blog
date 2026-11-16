@@ -1,9 +1,9 @@
-import type { TSignInEventUser } from '@blog/auth/events/consume-pending-invites-on-sign-in';
+import type { TSignInEventUser } from '@shinefold/auth/events/consume-pending-invites-on-sign-in';
 import {
   SIGNUP_TERMS_COOKIE_NAME,
   TERMS_VERSION,
-} from '@blog/config/constants';
-import { queries } from '@blog/db';
+} from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 import { cookies } from 'next/headers';
 
 export async function recordSignupTermsOnSignIn({

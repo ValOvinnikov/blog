@@ -1,9 +1,9 @@
-import { hasArrayGotItems } from '@blog/utils/primitives';
 import { PreviewFrameHeading } from '@platform/components/shared/preview-frame/components/heading/preview-frame-heading';
 import { PreviewFrameStage } from '@platform/components/shared/preview-frame/components/stage/preview-frame-stage';
 import { PreviewFrameStatus } from '@platform/components/shared/preview-frame/components/status/preview-frame-status';
 import { PreviewFrameToolbar } from '@platform/components/shared/preview-frame/components/toolbar/preview-frame-toolbar';
 import { mapCompoundSlots, type TCompoundComponent } from '@platform/lib/react';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import {
   Fragment,
   type ElementType,

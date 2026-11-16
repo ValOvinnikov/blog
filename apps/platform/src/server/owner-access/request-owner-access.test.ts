@@ -1,11 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  HTTP_STATUS,
-  NEXT_NAVIGATION_ERROR,
-  type TMaybeNull,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { OWNER_ACCESS_LOG } from '@platform/constants/owner-access';
 import { WORKER_LOG } from '@platform/constants/worker';
@@ -19,6 +11,14 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  HTTP_STATUS,
+  NEXT_NAVIGATION_ERROR,
+  type TMaybeNull,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 import type { Session } from 'next-auth';
 
 import { checkOwnerAccessAction } from './check-owner-access-action';
@@ -32,7 +32,7 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', async () => {
+vi.mock('@shinefold/db', async () => {
   const { mockDbConstants } =
     await import('@platform/testing/mock-db-constants');
 

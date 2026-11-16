@@ -1,10 +1,10 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
 import {
   ENQUEUE_SIGNATURE_HEADER,
   ENQUEUE_TIMESTAMP_HEADER,
   isValidEnqueueSignature,
-} from '@blog/utils/enqueue-signature';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/utils/enqueue-signature';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';

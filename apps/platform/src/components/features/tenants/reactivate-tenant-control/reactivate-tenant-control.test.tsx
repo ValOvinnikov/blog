@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -9,6 +8,7 @@ import {
   MOCK_TENANT_NAME,
   REACTIVATE_TENANT_LABEL,
 } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ReactivateTenantControl } from './reactivate-tenant-control';

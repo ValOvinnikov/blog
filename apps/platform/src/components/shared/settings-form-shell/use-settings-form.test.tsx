@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME, FORM_STATUS, type TActionOutcome } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import {
   act,
@@ -8,6 +6,12 @@ import {
 } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { toNotInPlanRefusal } from '@platform/utils/plan-refusal/plan-refusal';
+import {
+  ACTION_OUTCOME,
+  FORM_STATUS,
+  type TActionOutcome,
+} from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import type { Mock } from 'vitest';
 
 import {

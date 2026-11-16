@@ -1,5 +1,5 @@
-import { DEPTH, LOCALE_BCP47_TAGS, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { DEPTH, LOCALE_BCP47_TAGS, SITE_MESSAGES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
 import {

@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
+import type { TLocaleIsoCode, TMaybeUndefined } from '@shinefold/config';
 import { REMEMBERED_COOKIE_OPTIONS } from '@web/utils/remembered-cookie-options';
 
 export const LANGUAGE_COOKIE_NAME = 'NEXT_LOCALE';

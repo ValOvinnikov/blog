@@ -1,13 +1,13 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   tenants,
   type TProvisioningStepState,
   type TTenant,
-} from '@blog/db/schema/tenants';
+} from '@shinefold/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
 function isFailedStepState(value: unknown): value is TProvisioningStepState {

@@ -1,6 +1,6 @@
 /**
  * `no-restricted-imports` "paths" entry banning value imports of Vitest's
- * globals (`describe`, `it`, `expect`, `vi`, ...) — `@blog/vitest-config`'s
+ * globals (`describe`, `it`, `expect`, `vi`, ...) — `@shinefold/vitest-config`'s
  * shared preset sets `test.globals: true`, so these are real globals and
  * importing them from `'vitest'` is redundant. `import type {...}` stays
  * allowed — only named value imports matching `importNames` are flagged.

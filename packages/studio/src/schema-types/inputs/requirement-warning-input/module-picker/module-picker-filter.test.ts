@@ -1,14 +1,14 @@
+import { faker } from '@faker-js/faker';
 import {
   ALL_ITEMS_TAB,
   filterModulePickerTypes,
   getModulePickerIcon,
   hasModuleMembers,
   isModulePickerSearchShown,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
-import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
-import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
-import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
+import { ctaSchema } from '@shinefold/studio/schema-types/modules/cta/cta';
+import { faqSchema } from '@shinefold/studio/schema-types/modules/faq/faq';
+import { pricingSchema } from '@shinefold/studio/schema-types/modules/pricing/pricing';
 import type { ComponentType } from 'react';
 import type { SchemaType } from 'sanity';
 

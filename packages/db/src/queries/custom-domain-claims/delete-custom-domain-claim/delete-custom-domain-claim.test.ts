@@ -1,13 +1,13 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
-import { insertTestCustomDomainClaim } from '@blog/db/testing/custom-domain-claims/fixtures';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_TENANT_DOMAIN } from '@blog/db/testing/tenants/fixtures';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
+import { insertTestCustomDomainClaim } from '@shinefold/db/testing/custom-domain-claims/fixtures';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_TENANT_DOMAIN } from '@shinefold/db/testing/tenants/fixtures';
 
 import { deleteCustomDomainClaim } from './delete-custom-domain-claim';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

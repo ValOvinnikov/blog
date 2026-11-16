@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { SIGN_UP_FIELD_ERROR } from '@platform/constants/sign-up';
 import { screen } from '@platform/testing/custom-render';
 import { reachReview } from '@platform/testing/onboarding/address-step';
@@ -12,6 +11,7 @@ import {
   STEPS,
   TERMS_NOT_ACCEPTED,
 } from '@platform/testing/onboarding/onboarding-view';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { OnboardingView } from './onboarding-view';

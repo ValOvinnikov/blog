@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
 import { NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';

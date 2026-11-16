@@ -1,5 +1,5 @@
-import { CONTAINER_WIDTH, type IWithDataTestId } from '@blog/config';
-import type { TEmbedModule } from '@blog/service';
+import { CONTAINER_WIDTH, type IWithDataTestId } from '@shinefold/config';
+import type { TEmbedModule } from '@shinefold/service';
 import { EmbedFrame } from '@web/components/shared/embed-frame';
 import { ModuleActions } from '@web/components/shared/module-actions';
 import { ModuleSection } from '@web/components/shared/module-section';

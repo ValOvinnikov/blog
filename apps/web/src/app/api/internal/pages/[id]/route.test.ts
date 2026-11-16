@@ -1,5 +1,5 @@
-import { HTTP_STATUS, LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { HTTP_STATUS, LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import { INTERNAL_PAGES_LOG } from '@web/constants/internal-pages';
 import { readInternalPageRequest } from '@web/server/internal-pages/read-internal-page-request/read-internal-page-request';
 import {
@@ -24,7 +24,7 @@ vi.mock(
   '@web/server/internal-pages/read-internal-page-request/read-internal-page-request',
 );
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: { pages: { pageTitle: { v1: { getPageTitle: getPageTitleMock } } } },
 }));
 

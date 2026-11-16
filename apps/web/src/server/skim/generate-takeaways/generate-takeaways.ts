@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
-import type { ArticleText } from '@blog/config';
+import type { ArticleText } from '@shinefold/config';
 import { z } from 'zod';
 
 /** Model id for both the Anthropic call and the `skim.model` value persisted via `saveSkimDraft` — one source of truth, per `cms-schema-practices`' "no repeated literals". */

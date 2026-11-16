@@ -1,5 +1,5 @@
-import { IMAGE_LAYOUT } from '@blog/config';
-import { objectKeys } from '@blog/utils/primitives';
+import { IMAGE_LAYOUT } from '@shinefold/config';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { ImageWithCaption } from './image-with-caption';

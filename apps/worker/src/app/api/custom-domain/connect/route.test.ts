@@ -1,7 +1,7 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { HTTP_STATUS } from '@blog/config/constants';
-import { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
-import { getTenantById } from '@blog/db/queries/tenants';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { getTenantByDomain } from '@shinefold/db/queries/tenant-domains/get-tenant-by-domain';
+import { getTenantById } from '@shinefold/db/queries/tenants';
 import { CUSTOM_DOMAIN_LOG } from '@worker/constants/custom-domain';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import {
@@ -31,8 +31,8 @@ const MOCK_OTHER_TENANT_ID = 'b1c2d3e4-0000-4000-8000-000000000000';
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/workflows/connect-custom-domain');
 vi.mock('workflow/api');
-vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/db/queries/tenant-domains/get-tenant-by-domain');
+vi.mock('@shinefold/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenant-domains/get-tenant-by-domain');
 
 function connectRequest(
   body: Record<string, TMaybeUndefined<string>> = {

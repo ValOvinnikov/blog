@@ -1,4 +1,4 @@
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { Settings } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

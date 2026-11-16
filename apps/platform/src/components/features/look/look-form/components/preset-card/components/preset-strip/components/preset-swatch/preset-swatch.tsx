@@ -1,6 +1,6 @@
-import type { SIZE } from '@blog/config';
 import type { TPresetSwatch } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/preset-option';
 import { FONT_OPTIONS } from '@platform/config/fonts';
+import type { SIZE } from '@shinefold/config';
 
 import { presetSwatchVariants } from './preset-swatch-variants';
 

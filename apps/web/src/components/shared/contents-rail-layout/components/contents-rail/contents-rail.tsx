@@ -1,6 +1,6 @@
 'use client';
 
-import type { IWithClassName } from '@blog/config';
+import type { IWithClassName } from '@shinefold/config';
 import {
   SidebarNav,
   type TSidebarNavItem,

@@ -1,9 +1,9 @@
 'use client';
 
-import { ICONS } from '@blog/config';
 import { IconSoloButton } from '@platform/components/shared/icon-solo-button';
 import { COPY_STATUS } from '@platform/constants/clipboard';
 import { useCopyToClipboard } from '@platform/utils/use-copy-to-clipboard/use-copy-to-clipboard';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { copyButtonVariants } from './copy-button-variants';

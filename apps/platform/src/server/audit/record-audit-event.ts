@@ -1,10 +1,10 @@
 import 'server-only';
 
-import type { TAuditAction, TAuditTargetType } from '@blog/config';
-import { queries } from '@blog/db';
 import { auth } from '@platform/server/auth/auth';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import type { TAuditAction, TAuditTargetType } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 export type TRecordAuditEventInput = {
   logEvent: string;

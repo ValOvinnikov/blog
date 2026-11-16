@@ -1,7 +1,7 @@
-import { MOCK_DOCUMENT_ID } from '@blog/service/testing/entities/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockTenant } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
+import { MOCK_DOCUMENT_ID } from '@shinefold/service/testing/entities/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getReferencingModuleIds } from './loader';
 import {
@@ -9,7 +9,7 @@ import {
   referencingModuleIdsQuery,
 } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6101);
 

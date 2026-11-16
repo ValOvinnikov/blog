@@ -1,11 +1,11 @@
-import { ICONS, SIZE } from '@blog/config';
-import type { IWithClassName } from '@blog/config/types';
-import { isUndefined } from '@blog/utils/primitives';
 import { buttonVariants } from '@platform/components/shared/button/button-variants';
 import { Icon } from '@platform/components/shared/icon';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { Link } from '@platform/i18n/navigation';
+import { ICONS, SIZE } from '@shinefold/config';
+import type { IWithClassName } from '@shinefold/config/types';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 import { backLinkVariants } from './back-link-variants';
 

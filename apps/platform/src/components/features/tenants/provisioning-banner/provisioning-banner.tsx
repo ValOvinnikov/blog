@@ -1,19 +1,19 @@
 'use client';
 
-import { ALERT_TYPE, SIZE } from '@blog/config';
-import {
-  CORE_PROVISIONING_STEPS,
-  ELEVATE_TENANT_OWNER_OUTCOME,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP_STATUS,
-  type TElevateTenantOwnerOutcome,
-} from '@blog/db/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { findFailedStep } from '@platform/utils/run-steps/run-steps';
 import type { TUseProvisioningPollResult } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
+import { ALERT_TYPE, SIZE } from '@shinefold/config';
+import {
+  CORE_PROVISIONING_STEPS,
+  ELEVATE_TENANT_OWNER_OUTCOME,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP_STATUS,
+  type TElevateTenantOwnerOutcome,
+} from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 
 import { provisioningBannerVariants } from './provisioning-banner-variants';

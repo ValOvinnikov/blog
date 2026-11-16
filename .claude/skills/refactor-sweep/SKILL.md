@@ -68,7 +68,7 @@ sweep: it returns the same findings.
    prompt naming the absolute path of the checkout (`.claude/agents/explore.md`),
    the layer's directories (`packages/<x>/src`, `apps/<x>/src`, or whatever
    the agent file's scope names), the tool output from step 3 and the
-   covered list from step 2. It may read `@blog/utils`/`@blog/config` exports
+   covered list from step 2. It may read `@shinefold/utils`/`@shinefold/config` exports
    as reference, never another layer's implementation. It does not repeat
    what the tools found; it looks for what they cannot, with `file:line`
    evidence, not prose:
@@ -81,7 +81,7 @@ sweep: it returns the same findings.
      thresholds `testing-practices` sets.
    - **Code worth simplifying**, even when it appears once: deep nesting, a
      function doing several unrelated things, hand-rolled logic an existing
-     `@blog/utils`/`@blog/config` helper already covers, a component over
+     `@shinefold/utils`/`@shinefold/config` helper already covers, a component over
      its prop ceiling (`react-component-practices` § Props), a shape harder
      to follow than the problem.
    - **Drift** — a file still on a pattern the agent file, or the rest of
@@ -96,7 +96,7 @@ sweep: it returns the same findings.
      `tv()` still in a `.tsx` (`react-component-practices` § Styling
      files), a single-domain component in `shared/`
      (`react-component-practices` § Where a component lives), file size
-     alone (CLAUDE.md → "File size budgets"), a raw type form `@blog/config`
+     alone (CLAUDE.md → "File size budgets"), a raw type form `@shinefold/config`
      already names (`.claude/agents/config.md` → "Types"), a feature with no
      `docs/features/` page (`develop-feature` → "Docs that ship with the change").
 

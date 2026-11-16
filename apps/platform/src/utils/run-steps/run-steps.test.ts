@@ -1,5 +1,5 @@
-import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { TENANT_PROVISIONING_STEP_STATUS } from '@shinefold/db/constants';
 
 import { findFailedStep, stepStatusesFor, stepUpdatedAtFor } from './run-steps';
 

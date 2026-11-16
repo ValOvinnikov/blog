@@ -1,7 +1,7 @@
 import {
   listedTextMarks,
   listedTextStyles,
-} from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
+} from '@shinefold/studio/schema-types/portable-text/listed-text/listed-text';
 import { defineArrayMember, defineType } from 'sanity';
 
 export const paragraphTextSchema = defineType({

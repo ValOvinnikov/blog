@@ -1,4 +1,3 @@
-import { COLOR_SCHEME } from '@blog/config';
 import {
   DATA_THEME,
   STUDIO_SCHEME,
@@ -11,6 +10,7 @@ import {
 } from '@platform/testing/theme-preference';
 import { storeThemePreference } from '@platform/utils/theme-preference/theme-preference';
 import { THEME_PREFERENCE_COOKIE } from '@platform/utils/theme-preference-cookie/theme-preference-cookie';
+import { COLOR_SCHEME } from '@shinefold/config';
 
 import { useStudioScheme } from './use-studio-scheme';
 

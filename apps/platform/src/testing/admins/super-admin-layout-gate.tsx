@@ -1,7 +1,7 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 import type { ReactNode } from 'react';
 import type { Mock } from 'vitest';
 
@@ -9,7 +9,7 @@ const GATED_CONTENT = 'gated content';
 
 type TGatedLayout = (props: { children: ReactNode }) => Promise<ReactNode>;
 
-// The calling file mocks `@platform/server/auth/auth` and `@blog/db`'s `getAdminByUserId`.
+// The calling file mocks `@platform/server/auth/auth` and `@shinefold/db`'s `getAdminByUserId`.
 export const itGatesToSuperAdmins = (
   Layout: TGatedLayout,
   getAdminByUserIdMock: Mock,

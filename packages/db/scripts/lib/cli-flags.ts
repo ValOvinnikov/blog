@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 
 const TENANT_ID_FLAG = '--tenant-id=';
 const DRY_RUN_FLAG = '--dry-run=';

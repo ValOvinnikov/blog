@@ -1,8 +1,8 @@
-import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@blog/config';
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { service } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@shinefold/config';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
+import { service } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   customRenderServerAsync,
@@ -32,7 +32,7 @@ vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: { blog: { v1: { getIndexPage: vi.fn() } } },
     entities: { topics: { v1: { getTopics: vi.fn() } } },

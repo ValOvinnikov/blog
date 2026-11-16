@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const SITE_CONFIG_SAVED_AT = {
   LOOK: 'LOOK',

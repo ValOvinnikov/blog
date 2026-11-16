@@ -1,5 +1,5 @@
-import { isUndefined } from '@blog/utils/primitives';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useRef, type FocusEvent } from 'react';
 
 type TSubmenuPreviewState = {

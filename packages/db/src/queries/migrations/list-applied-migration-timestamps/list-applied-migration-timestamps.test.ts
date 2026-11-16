@@ -1,10 +1,10 @@
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { sql } from 'drizzle-orm';
 
 import { listAppliedMigrationTimestamps } from './list-applied-migration-timestamps';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(6022);
 

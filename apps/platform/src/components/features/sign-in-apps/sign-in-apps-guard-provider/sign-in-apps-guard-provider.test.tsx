@@ -1,4 +1,3 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
 import { SignInAppCard } from '@platform/components/features/sign-in-apps/sign-in-app-card';
 import { GuardedLink } from '@platform/components/shared/guarded-link';
 import { useRouter as useGuardRouter } from '@platform/i18n/base-navigation';
@@ -16,6 +15,7 @@ import {
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import userEvent from '@testing-library/user-event';
 
 import { SignInAppsGuardProvider } from './sign-in-apps-guard-provider';

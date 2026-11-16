@@ -1,7 +1,8 @@
-import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockRawCtaModule } from '@blog/service/testing/modules/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, CTA_VARIANT } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockRawCtaModule } from '@shinefold/service/testing/modules/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_DUTCH_TEXT,
   MOCK_ENGLISH_TEXT,
@@ -11,8 +12,7 @@ import {
   mockLocalizedListedText,
   mockLocalizedStrings,
   mockLocalizedValues,
-} from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
 
 import { ctaModuleQuery } from './query';
 

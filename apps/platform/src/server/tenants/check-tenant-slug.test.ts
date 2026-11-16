@@ -1,15 +1,15 @@
-import { RESERVED_SUBDOMAINS } from '@blog/config';
-import { queries } from '@blog/db';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import {
   MOCK_TENANT_ROOT_DOMAIN,
   MOCK_TENANT_SLUG,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { RESERVED_SUBDOMAINS } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 import { checkTenantSlug } from './check-tenant-slug';
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenantDomains: { getTenantByDomain: vi.fn() } },
 }));
 

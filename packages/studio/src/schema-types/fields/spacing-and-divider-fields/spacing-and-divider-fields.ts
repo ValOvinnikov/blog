@@ -1,5 +1,5 @@
-import { SPACING_SCALE } from '@blog/config/constants';
-import { EnabledStateBooleanInput } from '@blog/studio/schema-types/inputs/enabled-state-boolean-input';
+import { SPACING_SCALE } from '@shinefold/config/constants';
+import { EnabledStateBooleanInput } from '@shinefold/studio/schema-types/inputs/enabled-state-boolean-input';
 import { type ConditionalProperty, defineField } from 'sanity';
 
 const spacingOptions = [

@@ -1,16 +1,6 @@
 'use server';
 
 import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  ERROR_CODE,
-  isLocaleIsoCode,
-  type TActionResult,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
-import {
   SETTINGS_REFUSAL,
   type TSettingsRefusal,
 } from '@platform/constants/settings';
@@ -25,6 +15,16 @@ import {
   toNotInPlanRefusal,
   type TNotInPlanRefusal,
 } from '@platform/utils/plan-refusal/plan-refusal';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  ERROR_CODE,
+  isLocaleIsoCode,
+  type TActionResult,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
 const updateTenantLanguagesInputSchema = z.array(

@@ -1,5 +1,9 @@
-import { BRAND_VARIANT, MEDIA_ORDER, type TMediaOrder } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import {
+  BRAND_VARIANT,
+  MEDIA_ORDER,
+  type TMediaOrder,
+} from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_FEATURE_HIGHLIGHTS_HEADING,

@@ -11,7 +11,7 @@ const { getSectionIndexPageMock } = vi.hoisted(() => ({
   getSectionIndexPageMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: {
       sectionIndex: { v1: { getSectionIndexPage: getSectionIndexPageMock } },

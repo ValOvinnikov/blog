@@ -1,6 +1,6 @@
-import { getIndexPage } from '@blog/service/features/pages/topic-index/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getIndexPage } from '@shinefold/service/features/pages/topic-index/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createTopicIndexService() {
   return {

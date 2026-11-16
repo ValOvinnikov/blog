@@ -45,7 +45,7 @@ the email in the platform's own look, and sends it.
 
 ## Data
 
-- Wire contract (`TOperatorAlertBody` in `@blog/config`), discriminated on
+- Wire contract (`TOperatorAlertBody` in `@shinefold/config`), discriminated on
   `kind`:
   - `OWNER_ELEVATION`: `tenantId` and `outcome` (`STALLED` or
     `AMBIGUOUS_MEMBERSHIP`).
@@ -65,7 +65,7 @@ the email in the platform's own look, and sends it.
 
 - Nothing is configurable in the UI. Recipients are whoever holds a SUPERADMIN
   `admins` row.
-- Copy is hardcoded English in `@blog/email`'s operator templates and must
+- Copy is hardcoded English in `@shinefold/email`'s operator templates and must
   never become tenant-editable.
 
 ## Constraints and invariants
@@ -110,9 +110,9 @@ the email in the platform's own look, and sends it.
 
 ## Dependencies
 
-- `@blog/email` (`sendEmail` over Resend, the operator templates),
-  `@blog/db` (tenant lookup, superadmin emails, `ELEVATE_TENANT_OWNER_OUTCOME`),
-  `@blog/utils` (`isSecretMatch`), `@blog/config`.
+- `@shinefold/email` (`sendEmail` over Resend, the operator templates),
+  `@shinefold/db` (tenant lookup, superadmin emails, `ELEVATE_TENANT_OWNER_OUTCOME`),
+  `@shinefold/utils` (`isSecretMatch`), `@shinefold/config`.
 - Features: [tenant-provisioning](./tenant-provisioning.md),
   [audit-and-findings](./audit-and-findings.md), [email](./email.md),
   [tenant-access](./tenant-access.md).

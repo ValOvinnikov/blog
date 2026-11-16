@@ -1,7 +1,7 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { UPLOAD_OPERATION, UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { MOCK_STAGED_LOGO_BLOB_URL } from '@platform/testing/site-config/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
 
 import {
   createStagingHandlers,

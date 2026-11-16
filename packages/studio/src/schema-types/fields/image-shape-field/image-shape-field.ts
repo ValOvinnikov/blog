@@ -1,7 +1,7 @@
-import type { TCardImageShape } from '@blog/config/constants';
-import { ImageShapePicture } from '@blog/studio/schema-types/fields/image-shape-field/image-shape-picture';
-import { tileField } from '@blog/studio/schema-types/fields/tile-field/tile-field';
-import { toTitleCase } from '@blog/utils/primitives';
+import type { TCardImageShape } from '@shinefold/config/constants';
+import { ImageShapePicture } from '@shinefold/studio/schema-types/fields/image-shape-field/image-shape-picture';
+import { tileField } from '@shinefold/studio/schema-types/fields/tile-field/tile-field';
+import { toTitleCase } from '@shinefold/utils/primitives';
 
 type TImageShapeFieldOptions = {
   values: readonly TCardImageShape[];

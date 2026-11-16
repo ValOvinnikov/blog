@@ -1,8 +1,8 @@
-import { ALERT_TYPE } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { Alert } from '@platform/components/shared/alert';
 import { CopyButton } from '@platform/components/shared/copy-button';
 import { loadOperatorSuspension } from '@platform/server/tenants/load-operator-suspension';
+import { ALERT_TYPE } from '@shinefold/config';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { getTranslations } from 'next-intl/server';
 
 export type TOwnerSuspensionBannerProps = {

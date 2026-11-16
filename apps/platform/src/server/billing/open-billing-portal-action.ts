@@ -1,13 +1,6 @@
 'use server';
 
 import {
-  ACTION_OUTCOME,
-  type TActionResult,
-  type TMaybeUndefined,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
-import {
   BILLING_LOG,
   BILLING_REFUSAL,
   type TBillingRefusal,
@@ -19,6 +12,13 @@ import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import {
+  ACTION_OUTCOME,
+  type TActionResult,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 

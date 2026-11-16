@@ -1,9 +1,9 @@
-import type { TEmailAction } from '@blog/email/html/email-action/email-action';
+import type { TEmailAction } from '@shinefold/email/html/email-action/email-action';
 import {
   buildOwnerEmail,
   type TOwnerEmail,
   type TOwnerEmailInput,
-} from '@blog/email/templates/owner/owner-email/owner-email';
+} from '@shinefold/email/templates/owner/owner-email/owner-email';
 
 export type TOwnerSuspensionEmailInput = TOwnerEmailInput & {
   action: TEmailAction;

@@ -1,10 +1,10 @@
-import { ALERT_TYPE, SIZE } from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
-import type { TGraceLocks } from '@blog/db/utils/grace-locks/grace-locks';
 import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ALERT_TYPE, SIZE } from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
+import type { TGraceLocks } from '@shinefold/db/utils/grace-locks/grace-locks';
 import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

@@ -1,9 +1,9 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { queries, SUSPENSION_REASON, TENANT_STATUS } from '@blog/db';
-import type { TOpenTenantSuspension } from '@blog/db/queries/tenant-suspensions';
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { queries, SUSPENSION_REASON, TENANT_STATUS } from '@shinefold/db';
+import type { TOpenTenantSuspension } from '@shinefold/db/queries/tenant-suspensions';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export const loadOperatorSuspension = async ({
   id,

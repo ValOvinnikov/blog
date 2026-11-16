@@ -1,4 +1,4 @@
-import type { ITenantLocalizedParams } from '@blog/config';
+import type { ITenantLocalizedParams } from '@shinefold/config';
 import { AccountPage } from '@web/components/pages/account-page';
 import { buildAccountMetadata } from '@web/metadata/account-metadata';
 import { auth } from '@web/server/auth/auth';

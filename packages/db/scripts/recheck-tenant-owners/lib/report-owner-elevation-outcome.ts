@@ -2,8 +2,8 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TElevateTenantOwnerOutcome,
-} from '@blog/db/constants';
-import { updateProvisioningStep } from '@blog/db/queries/tenants';
+} from '@shinefold/db/constants';
+import { updateProvisioningStep } from '@shinefold/db/queries/tenants';
 
 /**
  * Persists one `elevateTenantOwner` check's outcome to the tenant's

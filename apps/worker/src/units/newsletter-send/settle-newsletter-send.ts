@@ -1,9 +1,9 @@
-import { EMAIL_TYPE } from '@blog/config/constants';
-import { recordEmailSend } from '@blog/db/queries/email-usage';
+import { EMAIL_TYPE } from '@shinefold/config/constants';
+import { recordEmailSend } from '@shinefold/db/queries/email-usage';
 import {
   markNewsletterPostSent,
   releaseNewsletterPostSend,
-} from '@blog/db/queries/newsletter-post-sends';
+} from '@shinefold/db/queries/newsletter-post-sends';
 import {
   NEWSLETTER_SEND_LOG,
   NEWSLETTER_UNIT_MAX_RETRIES,

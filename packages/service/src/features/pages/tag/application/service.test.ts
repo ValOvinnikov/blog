@@ -1,26 +1,26 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { getFaqQuestions } from '@blog/service/shared/adaptors/faq-questions/loader';
-import { MOCK_TAG_SLUG } from '@blog/service/testing/entities/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { getFaqQuestions } from '@shinefold/service/shared/adaptors/faq-questions/loader';
+import { MOCK_TAG_SLUG } from '@shinefold/service/testing/entities/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   mockFaqView,
   mockRawFaqModuleQuestions,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_HERO_MODULE_ID,
   mockListModulePageSize,
   mockListModuleRefs,
   mockRawTagPage,
-} from '@blog/service/testing/pages/fixtures';
-import { MOCK_MISSING_ID } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/pages/fixtures';
+import { MOCK_MISSING_ID } from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { createTagService } from './service';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
-vi.mock('@blog/service/shared/adaptors/faq-questions/loader');
+vi.mock('@shinefold/service/shared/adaptors/faq-questions/loader');
 
 faker.seed(601506);
 

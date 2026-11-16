@@ -1,34 +1,34 @@
-# `@blog/db` Email Separation — Implementation Plan
+# `@shinefold/db` Email Separation — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Remove outbound email from `@blog/db` entirely — its CLI scripts report an event to `apps/platform` over HTTP, and the platform app decides who to tell and renders the mail.
+**Goal:** Remove outbound email from `@shinefold/db` entirely — its CLI scripts report an event to `apps/platform` over HTTP, and the platform app decides who to tell and renders the mail.
 
-**Architecture:** A new `POST /api/internal/operator-alert` route on `apps/platform`, authenticated by a Bearer shared secret compared in constant time, mirroring `apps/web`'s existing `/api/revalidate-site-config`. The two `notify-operators.ts` modules in `@blog/db`'s scripts stop constructing Resend clients and HTML, and instead POST a small typed event. Recipient resolution moves to the platform app, so the scripts no longer query superadmins or escape anything. `packages/email` gains its first real consumers.
+**Architecture:** A new `POST /api/internal/operator-alert` route on `apps/platform`, authenticated by a Bearer shared secret compared in constant time, mirroring `apps/web`'s existing `/api/revalidate-site-config`. The two `notify-operators.ts` modules in `@shinefold/db`'s scripts stop constructing Resend clients and HTML, and instead POST a small typed event. Recipient resolution moves to the platform app, so the scripts no longer query superadmins or escape anything. `packages/email` gains its first real consumers.
 
-**Tech Stack:** Next.js 16 App Router route handler, `node:crypto` `timingSafeEqual`, Drizzle/Neon via `@blog/db`, Resend via `@blog/email`, Vitest.
+**Tech Stack:** Next.js 16 App Router route handler, `node:crypto` `timingSafeEqual`, Drizzle/Neon via `@shinefold/db`, Resend via `@shinefold/email`, Vitest.
 
 **Spec:** [`../specs/2026-09-03-tenant-email-design.md`](../specs/2026-09-03-tenant-email-design.md) §6
 
 ## Global Constraints
 
-- `@blog/db` must end this plan with **no** `resend` dependency and **no** `@blog/email` dependency in `packages/db/package.json`.
-- `@blog/email` may import **only** `@blog/utils`. It must not import `@blog/config`, so the alert-kind vocabulary never enters it — the package exports one builder per alert type and the caller chooses.
-- `@blog/db`, `@blog/service`, `@blog/auth` and `@blog/email` **never log**. `packages/db/scripts/**` is the exception (`configs/eslint/db.js`) and keeps its existing `console.*` calls.
+- `@shinefold/db` must end this plan with **no** `resend` dependency and **no** `@shinefold/email` dependency in `packages/db/package.json`.
+- `@shinefold/email` may import **only** `@shinefold/utils`. It must not import `@shinefold/config`, so the alert-kind vocabulary never enters it — the package exports one builder per alert type and the caller chooses.
+- `@shinefold/db`, `@shinefold/service`, `@shinefold/auth` and `@shinefold/email` **never log**. `packages/db/scripts/**` is the exception (`configs/eslint/db.js`) and keeps its existing `console.*` calls.
 - The two notify functions **must never throw** — a notification failure must not fail the sweep it reports on. This contract is already documented on both and must survive.
 - Conventional commits, lower-case scope. Run `pnpm type-check && pnpm lint && pnpm test && pnpm knip` from the repo root before the final commit.
 - Any new env var must be declared in `turbo.json` (strict env mode strips undeclared vars) and pass `pnpm check:turbo-env-sync`.
 
 ---
 
-### Task 1: Move `isSecretMatch` into `@blog/utils`
+### Task 1: Move `isSecretMatch` into `@shinefold/utils`
 
 **This primitive is already duplicated — that is the reason for the task, not a risk it avoids.** Both apps carry their own byte-for-byte copy:
 
 - `apps/web/src/utils/is-secret-match/` (with an `index.ts` barrel), consumed by `apps/web/src/app/api/revalidate-site-config/route.ts` and `apps/web/src/app/api/generate-skim/route.ts`
 - `apps/platform/src/utils/is-secret-match/` (no barrel), consumed by `apps/platform/src/server/tenants/owner-invite-token.ts`
 
-Each has its own test file. `@blog/utils` is framework-free and already consumed by both apps, so one copy there replaces both. Deleting only the web copy would leave the duplication standing.
+Each has its own test file. `@shinefold/utils` is framework-free and already consumed by both apps, so one copy there replaces both. Deleting only the web copy would leave the duplication standing.
 
 **Files:**
 
@@ -39,15 +39,15 @@ Each has its own test file. `@blog/utils` is framework-free and already consumed
 - Delete: `apps/web/src/utils/is-secret-match/` (whole directory, including its test)
 - Delete: `apps/platform/src/utils/is-secret-match/` (whole directory, including its test)
 - Modify: all three importers listed above
-- Modify: `apps/platform/package.json` — **add `"@blog/utils": "workspace:*"`**, then run `pnpm install`
+- Modify: `apps/platform/package.json` — **add `"@shinefold/utils": "workspace:*"`**, then run `pnpm install`
 
-**`apps/platform` does not currently depend on `@blog/utils`, and the alias alone will not save you.** Its `tsconfig.json` and `vitest.config.ts` already declare the `@blog/utils/*` wildcard, so the alias looks present — but `isSecretMatch` is consumed as a **bare** root import (`import { isSecretMatch } from '@blog/utils'`, matching every other consumer in the repo — `packages/utils/package.json`'s `exports` map does declare several subpaths such as `./async` and `./color`, but none for `is-secret-match`, and this task adds none). A bare specifier does not match a wildcard-only `paths` entry, so it resolves through `node_modules` — which requires the `package.json` dependency. `@blog/insight` in this same app is the working precedent: wildcard-only alias, bare import, and it works precisely _because_ it is declared in `package.json`.
+**`apps/platform` does not currently depend on `@shinefold/utils`, and the alias alone will not save you.** Its `tsconfig.json` and `vitest.config.ts` already declare the `@shinefold/utils/*` wildcard, so the alias looks present — but `isSecretMatch` is consumed as a **bare** root import (`import { isSecretMatch } from '@shinefold/utils'`, matching every other consumer in the repo — `packages/utils/package.json`'s `exports` map does declare several subpaths such as `./async` and `./color`, but none for `is-secret-match`, and this task adds none). A bare specifier does not match a wildcard-only `paths` entry, so it resolves through `node_modules` — which requires the `package.json` dependency. `@shinefold/insight` in this same app is the working precedent: wildcard-only alias, bare import, and it works precisely _because_ it is declared in `package.json`.
 
-Skip this and `apps/platform` fails with "Cannot find module '@blog/utils'" at type-check, test and build.
+Skip this and `apps/platform` fails with "Cannot find module '@shinefold/utils'" at type-check, test and build.
 
 **Interfaces:**
 
-- Produces: `isSecretMatch(provided: string | null, expected: string): boolean`, exported from `@blog/utils`.
+- Produces: `isSecretMatch(provided: string | null, expected: string): boolean`, exported from `@shinefold/utils`.
 
 - [ ] **Step 1: Find every consumer**
 
@@ -111,7 +111,7 @@ describe('isSecretMatch', () => {
 
 - [ ] **Step 4: Run the new test**
 
-Run: `pnpm --filter @blog/utils test`
+Run: `pnpm --filter @shinefold/utils test`
 Expected: PASS.
 
 - [ ] **Step 5: Update consumers and delete the old copy**
@@ -119,10 +119,10 @@ Expected: PASS.
 Add the `apps/platform` dependency and install:
 
 ```bash
-pnpm --filter platform add @blog/utils@workspace:*
+pnpm --filter platform add @shinefold/utils@workspace:*
 ```
 
-Point all three importers at `@blog/utils`, then delete **both** copies:
+Point all three importers at `@shinefold/utils`, then delete **both** copies:
 
 ```bash
 rm -rf apps/web/src/utils/is-secret-match
@@ -134,7 +134,7 @@ rm -rf apps/platform/src/utils/is-secret-match
 Run: `grep -rn "utils/is-secret-match" apps packages --include="*.ts" --exclude-dir=node_modules`
 Expected: no output.
 
-Run: `pnpm --filter @blog/utils type-check && pnpm --filter @blog/utils test`
+Run: `pnpm --filter @shinefold/utils type-check && pnpm --filter @shinefold/utils test`
 Run: `pnpm --filter web type-check && pnpm --filter web test`
 Run: `pnpm --filter platform type-check && pnpm --filter platform test`
 Expected: all PASS.
@@ -150,9 +150,9 @@ git commit -m "refactor(utils): hoist isSecretMatch out of both apps"
 
 ---
 
-### Task 2: Operator-alert templates in `@blog/email`
+### Task 2: Operator-alert templates in `@shinefold/email`
 
-Two alert emails exist today as inline HTML inside `@blog/db`'s scripts. They move into `@blog/email` as builders. Copy is preserved **exactly** — this task changes where the HTML is built, not what it says.
+Two alert emails exist today as inline HTML inside `@shinefold/db`'s scripts. They move into `@shinefold/email` as builders. Copy is preserved **exactly** — this task changes where the HTML is built, not what it says.
 
 **Files:**
 
@@ -190,7 +190,7 @@ Two alert emails exist today as inline HTML inside `@blog/db`'s scripts. They mo
   };
   ```
 
-Note `outcome` is a literal union and `isCritical` a boolean rather than a `TFindingSeverity` — `@blog/email` cannot import `@blog/config`, so the caller narrows.
+Note `outcome` is a literal union and `isCritical` a boolean rather than a `TFindingSeverity` — `@shinefold/email` cannot import `@shinefold/config`, so the caller narrows.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -246,7 +246,7 @@ Write the matching file for `buildDocumentValidationAlertEmail`, asserting: the 
 
 - [ ] **Step 2: Run to verify they fail**
 
-Run: `pnpm --filter @blog/email test`
+Run: `pnpm --filter @shinefold/email test`
 Expected: FAIL — modules not found.
 
 - [ ] **Step 3: Implement both builders**
@@ -254,8 +254,8 @@ Expected: FAIL — modules not found.
 Lift the copy strings verbatim from `packages/db/scripts/recheck-tenant-owners/lib/notify-operators.ts` (its `OUTCOME_COPY` map) and `packages/db/scripts/validate-tenant-documents/lib/notify-operators.ts` (its `severityCopy` ternary). Wrap the body in `buildEmailShell` with `brandName` set to the platform's own name and a `previewText` summarising the alert.
 
 ```ts
-import { buildEmailShell } from '@blog/email/html/email-shell';
-import { escapeHtml } from '@blog/email/html/escape-html';
+import { buildEmailShell } from '@shinefold/email/html/email-shell';
+import { escapeHtml } from '@shinefold/email/html/escape-html';
 
 const OUTCOME_COPY = {
   STALLED:
@@ -289,11 +289,11 @@ export function buildOwnerElevationAlertEmail({
 }
 ```
 
-Note the specifiers point at the **modules**, not at `@blog/email/html`. There is no `src/html/index.ts` barrel, and `packages/email/package.json`'s `exports` map declares only `"."` — so `@blog/email/html` does not resolve. Intra-package imports go through the own-name alias `@blog/email/*` → `./src/*`, never a relative parent path.
+Note the specifiers point at the **modules**, not at `@shinefold/email/html`. There is no `src/html/index.ts` barrel, and `packages/email/package.json`'s `exports` map declares only `"."` — so `@shinefold/email/html` does not resolve. Intra-package imports go through the own-name alias `@shinefold/email/*` → `./src/*`, never a relative parent path.
 
 - [ ] **Step 4: Run tests**
 
-Run: `pnpm --filter @blog/email test`
+Run: `pnpm --filter @shinefold/email test`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -317,8 +317,8 @@ git commit -m "feat(email): add the two operator-alert templates"
 
 **Interfaces:**
 
-- Consumes: `isSecretMatch` (Task 1), both builders (Task 2), `listSuperadminEmails` from `@blog/db/queries/admins`, `sendEmail` from `@blog/email`.
-- Produces: the wire contract, in `@blog/config` because **both** `@blog/db` (which sends it) and `apps/platform` (which receives it) must see it, and `db` cannot import an app. Per `CLAUDE.md`'s reach test, two layers across a boundary puts it in `config`; it is not a storage-layer vocabulary.
+- Consumes: `isSecretMatch` (Task 1), both builders (Task 2), `listSuperadminEmails` from `@shinefold/db/queries/admins`, `sendEmail` from `@shinefold/email`.
+- Produces: the wire contract, in `@shinefold/config` because **both** `@shinefold/db` (which sends it) and `apps/platform` (which receives it) must see it, and `db` cannot import an app. Per `CLAUDE.md`'s reach test, two layers across a boundary puts it in `config`; it is not a storage-layer vocabulary.
 
   ```ts
   export const OPERATOR_ALERT_KIND = {
@@ -477,7 +477,7 @@ git commit -m "feat(platform): add the internal operator-alert endpoint"
 
 **Interfaces:**
 
-- Consumes: `TOperatorAlertBody` and `OPERATOR_ALERT_KIND` from `@blog/config/constants` (Task 3). `@blog/db` already depends on `@blog/config`, so no dependency changes.
+- Consumes: `TOperatorAlertBody` and `OPERATOR_ALERT_KIND` from `@shinefold/config/constants` (Task 3). `@shinefold/db` already depends on `@shinefold/config`, so no dependency changes.
 - Produces: `postOperatorAlert(body: TOperatorAlertBody): Promise<void>` — reads `PLATFORM_APP_BASE_URL` and `OPERATOR_ALERT_SECRET`, POSTs, **never throws**.
 
 Note `packages/db/scripts/lib/` is a new directory — every existing script keeps its own private `lib/`, and this is the first module shared across two of them. Confirm `packages/db`'s tsconfig/vitest alias resolves it before writing the test.
@@ -533,18 +533,18 @@ Add: when either env var is unset it skips, logs once, and does not call `fetch`
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `pnpm --filter @blog/db test -- post-operator-alert`
+Run: `pnpm --filter @shinefold/db test -- post-operator-alert`
 Expected: FAIL.
 
 - [ ] **Step 3: Implement the poster, then rewrite `notify-operators.ts`**
 
-`notifyOperatorsOfOwnerElevationOutcome` keeps its exported name and its never-throws contract, but its `TNotifyOperatorsParams` loses `resendApiKey` and its body becomes a `postOperatorAlert` call. Delete this file's local `escapeHtml`, its `Resend` import, its `DEFAULT_FROM_ADDRESS`, its `OUTCOME_COPY` (now in `@blog/email`), and its `listSuperadminEmails` call — recipient resolution is the platform's job now. Keep `isNotifiableOutcome` and `TNotifiableOutcome` exactly as they are; the caller depends on them.
+`notifyOperatorsOfOwnerElevationOutcome` keeps its exported name and its never-throws contract, but its `TNotifyOperatorsParams` loses `resendApiKey` and its body becomes a `postOperatorAlert` call. Delete this file's local `escapeHtml`, its `Resend` import, its `DEFAULT_FROM_ADDRESS`, its `OUTCOME_COPY` (now in `@shinefold/email`), and its `listSuperadminEmails` call — recipient resolution is the platform's job now. Keep `isNotifiableOutcome` and `TNotifiableOutcome` exactly as they are; the caller depends on them.
 
 Then follow `resendApiKey` all the way up and delete it at every level, not just at this boundary: `notify-owner-elevation-outcome.ts`'s own `resendApiKey` param field goes too, and so does the threading in **both** of its callers (`provision-tenant/run.ts` and `recheck-tenant-owners/run.ts`). Type errors will surface most of this, but the env-reading that supplies the value will not error on its own — remove that as well.
 
 - [ ] **Step 4: Run tests**
 
-Run: `pnpm --filter @blog/db test`
+Run: `pnpm --filter @shinefold/db test`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -573,18 +573,18 @@ git commit -m "refactor(db): post owner-elevation alerts to the platform"
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `pnpm --filter @blog/db test -- validate-tenant-documents`
+Run: `pnpm --filter @shinefold/db test -- validate-tenant-documents`
 Expected: FAIL.
 
 - [ ] **Step 3: Implement**
 
-Delete the local `escapeHtml`, the `Resend` import, `DEFAULT_FROM_ADDRESS`, the `severityCopy` ternary and the `listSuperadminEmails` call. Narrow `severity` to the boolean at this boundary, since `@blog/email` cannot see `TFindingSeverity`.
+Delete the local `escapeHtml`, the `Resend` import, `DEFAULT_FROM_ADDRESS`, the `severityCopy` ternary and the `listSuperadminEmails` call. Narrow `severity` to the boolean at this boundary, since `@shinefold/email` cannot see `TFindingSeverity`.
 
 Update the call site in `validate-tenant-documents/run.ts` to stop passing `resendApiKey`.
 
 - [ ] **Step 4: Run tests**
 
-Run: `pnpm --filter @blog/db test`
+Run: `pnpm --filter @shinefold/db test`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -600,12 +600,12 @@ git commit -m "refactor(db): post document-validation alerts to the platform"
 
 **Files:**
 
-- Modify: `packages/db/package.json` (remove `resend` and `@blog/email`)
-- Modify: `knip.json` (remove the now-obsolete `@blog/email` ignore for `packages/db`)
+- Modify: `packages/db/package.json` (remove `resend` and `@shinefold/email`)
+- Modify: `knip.json` (remove the now-obsolete `@shinefold/email` ignore for `packages/db`)
 - Do **not** modify `turbo.json`. Neither variable belongs in its build `env`
   allowlist on account of this task: `packages/db`'s scripts are `tsx` entry
-  points invoked directly (`pnpm --filter @blog/db <script>`), never through
-  `turbo run`, and `@blog/db` has no `build` task at all, so turbo's strict-env
+  points invoked directly (`pnpm --filter @shinefold/db <script>`), never through
+  `turbo run`, and `@shinefold/db` has no `build` task at all, so turbo's strict-env
   stripping never applies to them. `check-turbo-env-sync.mjs` only asserts that
   vars declared via `createEnv()` in an app's own `env.ts` appear in the
   allowlist, and neither variable is declared that way here.
@@ -620,7 +620,7 @@ git commit -m "refactor(db): post document-validation alerts to the platform"
 - [ ] **Step 1: Remove the dependencies**
 
 ```bash
-pnpm --filter @blog/db remove resend @blog/email
+pnpm --filter @shinefold/db remove resend @shinefold/email
 ```
 
 - [ ] **Step 2: Prove no Resend reference survives in `db`**
@@ -637,7 +637,7 @@ In both workflows, remove `RESEND_API_KEY` from the step env and add `PLATFORM_A
 
 - [ ] **Step 4: Update the prose that names `db` as an email sender**
 
-`SPEC.md` §4's `@blog/email` row and `.claude/agents/email.md` both justify the package's "upstream is `utils` only" position by naming `@blog/db`'s CLI scripts as consumers. That is no longer true. Correct both to cite `@blog/auth` (which still consumes the package and sits above `db`) as the binding constraint. Also update `CLAUDE.md`'s carve-out list, which names these scripts as `@blog/insight` importers — that part stays true, so change only the email claim.
+`SPEC.md` §4's `@shinefold/email` row and `.claude/agents/email.md` both justify the package's "upstream is `utils` only" position by naming `@shinefold/db`'s CLI scripts as consumers. That is no longer true. Correct both to cite `@shinefold/auth` (which still consumes the package and sits above `db`) as the binding constraint. Also update `CLAUDE.md`'s carve-out list, which names these scripts as `@shinefold/insight` importers — that part stays true, so change only the email claim.
 
 **Four files carry this claim, not three.** `docs/context/claude-code.md`'s `email` agent description repeats it verbatim, and `CLAUDE.md`'s own docs-sync rule requires that file to be updated in the same PR as any `.claude/agents/*` change. It is easy to miss because the other three sit together in the layer-contract prose while this one sits in the agent roster.
 
@@ -664,4 +664,4 @@ git commit -m "chore(db): drop resend now that alerts route through the platform
 
 `OPERATOR_ALERT_SECRET` must be set on **both** `apps/platform`'s Vercel project and the GitHub Environment the two workflows run under, with the same value, before the first post-deploy sweep. Until it is, `postOperatorAlert` skips and logs — alerts are silently lost rather than erroring, which matches today's behaviour when `RESEND_API_KEY` is unset. That configuration is human-gated console work; it is not part of this plan.
 
-**Accepted risk, recorded in the spec:** these alerts fire when provisioning breaks, and they now depend on the platform app being up. If that coupling ever bites, the fix is a fallback transport inside `postOperatorAlert` — not returning email to `@blog/db`.
+**Accepted risk, recorded in the spec:** these alerts fire when provisioning breaks, and they now depend on the platform app being up. If that coupling ever bites, the fix is a fallback transport inside `postOperatorAlert` — not returning email to `@shinefold/db`.

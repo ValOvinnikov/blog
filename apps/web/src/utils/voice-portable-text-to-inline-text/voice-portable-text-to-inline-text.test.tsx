@@ -1,5 +1,5 @@
-import type { TVoicePortableText } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import type { TVoicePortableText } from '@shinefold/config';
 import { PortableText } from '@web/components/shared/portable-text';
 import { customRender, screen } from '@web/testing/custom-render';
 

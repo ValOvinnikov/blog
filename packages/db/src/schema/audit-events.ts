@@ -1,4 +1,7 @@
-import type { TAuditAction, TAuditTargetType } from '@blog/config/constants';
+import type {
+  TAuditAction,
+  TAuditTargetType,
+} from '@shinefold/config/constants';
 import {
   index,
   jsonb,
@@ -12,7 +15,7 @@ import { CREATED_AT_COLUMN } from './columns';
 
 // `action`/`targetType` are plain `text`, not `pgEnum` — a new audited
 // action or target type never forces a migration this way — but stay bound
-// to `@blog/config`'s closed unions via `.$type<>()`. `targetId` has no
+// to `@shinefold/config`'s closed unions via `.$type<>()`. `targetId` has no
 // Postgres FK: rows span several target tables (tenants, domains, site
 // config, ...), so no single FK target applies to every row.
 export const auditEvents = pgTable(

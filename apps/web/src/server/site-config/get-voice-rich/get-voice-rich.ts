@@ -1,4 +1,4 @@
-import type { TVoicePortableText } from '@blog/config';
+import type { TVoicePortableText } from '@shinefold/config';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';

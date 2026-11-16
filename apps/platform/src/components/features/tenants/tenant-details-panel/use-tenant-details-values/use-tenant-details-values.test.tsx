@@ -1,4 +1,3 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { act, renderHook } from '@platform/testing/custom-render';
 import {
@@ -9,6 +8,7 @@ import {
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 
 import { useTenantDetailsValues } from './use-tenant-details-values';
 

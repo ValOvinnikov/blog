@@ -120,4 +120,4 @@ jobs:
         run: |
           set -euo pipefail
           : "${DATABASE_URL_UNPOOLED:?empty — set the DATABASE_URL_UNPOOLED secret on the production environment}"
-          pnpm --filter @blog/db db:migrate
+          pnpm --filter @shinefold/db db:migrate

@@ -1,4 +1,4 @@
-import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { linkSchema } from '@shinefold/studio/schema-types/documents/link/link';
 import { defineField, type ReferenceRule } from 'sanity';
 
 type TLinkReferenceFieldOptions = {

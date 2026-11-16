@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const NEWSLETTER_SEND_LOG = {
   START_FAILED: 'newsletter_send.start_failed',

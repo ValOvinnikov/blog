@@ -1,6 +1,6 @@
-import { getFaqModule } from '@blog/service/features/modules/faq/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getFaqModule } from '@shinefold/service/features/modules/faq/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createFaqModuleService() {
   return {

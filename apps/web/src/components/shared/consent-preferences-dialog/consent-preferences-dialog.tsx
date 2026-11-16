@@ -1,6 +1,6 @@
 'use client';
 
-import { Dialog } from '@blog/ui/components/organisms/dialog';
+import { Dialog } from '@shinefold/ui/components/organisms/dialog';
 import { useConsentPreferences } from '@web/context/consent-preferences-provider';
 import { useTranslations } from 'next-intl';
 

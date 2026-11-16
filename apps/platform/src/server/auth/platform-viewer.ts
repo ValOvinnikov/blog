@@ -1,10 +1,10 @@
 import 'server-only';
 
-import type { TNullable } from '@blog/config/types';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import type { TAdmin } from '@blog/db/schema/admins';
-import type { TMembership } from '@blog/db/schema/memberships';
-import { isUndefined } from '@blog/utils/primitives';
+import type { TNullable } from '@shinefold/config/types';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import type { TAdmin } from '@shinefold/db/schema/admins';
+import type { TMembership } from '@shinefold/db/schema/memberships';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 import { isVirtualAdminMembership } from './build-virtual-admin-membership';
 import { isSuperAdmin } from './is-super-admin';

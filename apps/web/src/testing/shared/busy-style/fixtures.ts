@@ -2,7 +2,7 @@ import {
   BUSY_BUTTON_STYLE,
   type IBusyStyle,
   SPINNER_STYLE,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export const MOCK_BUSY_STYLE: IBusyStyle = {
   busyStyle: BUSY_BUTTON_STYLE.LABEL,

@@ -1,12 +1,12 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { INACTIVITY_STAGE } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { INACTIVITY_STAGE } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   buildInactivityWarningAlertEmail,
   buildOwnerDeletionNoticeEmail,
   buildOwnerInactivityWarningEmail,
   PLATFORM_EMAIL_BRAND_NAME,
-} from '@blog/email';
+} from '@shinefold/email';
 import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { OWNER_DASHBOARD_PATH } from '@worker/constants/owner-email';
 import { sendOperatorEmail } from '@worker/utils/operator-email/send-operator-email';

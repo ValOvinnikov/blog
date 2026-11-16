@@ -1,9 +1,9 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_TAGLINE_SEPARATORS,
   type TBrandTaglineSeparator,
   type TMaybeNull,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 
 import { toBrandTagline } from './to-brand-tagline';
 

@@ -1,15 +1,6 @@
 'use server';
 
 import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  type TActionResult,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { hasLength } from '@blog/utils/primitives';
-import { toOutcome } from '@blog/utils/to-outcome';
-import {
   SIGN_IN_APP_FIELD_ERROR,
   SIGN_IN_APP_LOG,
   SIGN_IN_APP_REFUSAL,
@@ -20,6 +11,15 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TActionResult,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { hasLength } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { requireSignInAppOwner } from './require-sign-in-app-owner';
 import {

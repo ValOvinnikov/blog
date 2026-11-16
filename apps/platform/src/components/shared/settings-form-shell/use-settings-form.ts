@@ -1,17 +1,17 @@
 'use client';
 
-import {
-  FORM_STATUS,
-  type TActionOutcome,
-  type TMaybeUndefined,
-  type TOutcome,
-} from '@blog/config';
 import type { TLanguageChangeCount } from '@platform/utils/format-language-changes/format-language-changes';
 import {
   revealFirstInvalidControl,
   type TInvalidControls,
 } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
+import {
+  FORM_STATUS,
+  type TActionOutcome,
+  type TMaybeUndefined,
+  type TOutcome,
+} from '@shinefold/config';
 import { useId, useState } from 'react';
 
 import type { TSettingsForm } from './settings-form-types';

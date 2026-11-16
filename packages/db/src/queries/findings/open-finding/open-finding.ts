@@ -3,14 +3,14 @@ import {
   FINDING_STATUS,
   type TErrorCode,
   type TFindingSeverity,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
 import {
   buildDedupeKey,
   type TDedupeKeyParts,
-} from '@blog/db/queries/findings/build-dedupe-key';
-import { findings, type TFinding } from '@blog/db/schema/findings';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/db/queries/findings/build-dedupe-key';
+import { findings, type TFinding } from '@shinefold/db/schema/findings';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { and, eq, sql } from 'drizzle-orm';
 
 export type TOpenFindingInput = TDedupeKeyParts & {

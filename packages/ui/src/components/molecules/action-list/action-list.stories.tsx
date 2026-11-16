@@ -1,5 +1,5 @@
-import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { faker } from '@faker-js/faker';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { ActionList } from './action-list';

@@ -1,4 +1,4 @@
-import { RADIUS_SCALE, type TRadiusScale } from '@blog/config/constants';
+import { RADIUS_SCALE, type TRadiusScale } from '@shinefold/config/constants';
 
 import { RADIUS_NONE } from './radius-tokens';
 import type { TThemeDeclarations } from './theme-declarations';

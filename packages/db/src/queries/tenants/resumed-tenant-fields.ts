@@ -1,7 +1,10 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import { tenantPlanEnum, tenantStatusEnum } from '@blog/db/schema/tenant-enums';
-import { tenants } from '@blog/db/schema/tenants';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import {
+  tenantPlanEnum,
+  tenantStatusEnum,
+} from '@shinefold/db/schema/tenant-enums';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { type SQL, sql } from 'drizzle-orm';
 
 const isUnpaidTrial = sql`(${tenants.trialEndsAt} is not null and ${tenants.stripeSubscriptionId} is null)`;

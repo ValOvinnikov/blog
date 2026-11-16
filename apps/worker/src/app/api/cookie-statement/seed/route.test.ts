@@ -2,8 +2,8 @@ import {
   HTTP_METHOD,
   HTTP_STATUS,
   LOCALE_ISO_CODES,
-} from '@blog/config/constants';
-import { getTenantById } from '@blog/db/queries/tenants';
+} from '@shinefold/config/constants';
+import { getTenantById } from '@shinefold/db/queries/tenants';
 import { COOKIE_STATEMENT_LOG } from '@worker/constants/cookie-statement';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import {
@@ -32,7 +32,7 @@ const MOCK_LOCALES = [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.FR];
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/workflows/seed-cookie-statements');
 vi.mock('workflow/api');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 
 function seedRequest(
   body: Record<string, unknown> = {

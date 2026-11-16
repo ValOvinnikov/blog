@@ -1,7 +1,7 @@
 'use client';
 
-import type { TLocaleIsoCode } from '@blog/config/constants';
 import { SegmentedRadioGroup } from '@platform/components/shared/segmented-control';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 
 export type TLanguagePickerProps = {

@@ -1,9 +1,12 @@
-import type { TMaybeNull } from '@blog/config/types';
-import { MOCK_USER_EMAIL, MOCK_USER_NAME } from '@blog/db/testing/fixtures';
+import type { TMaybeNull } from '@shinefold/config/types';
+import {
+  MOCK_USER_EMAIL,
+  MOCK_USER_NAME,
+} from '@shinefold/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
-} from '@blog/db/testing/personal-data';
+} from '@shinefold/db/testing/personal-data';
 
 import {
   readUserPersonalData,

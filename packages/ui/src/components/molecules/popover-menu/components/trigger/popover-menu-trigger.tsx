@@ -1,6 +1,6 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { IconButton } from '@blog/ui/components/atoms/icon-button';
-import type { TIconButtonVariants } from '@blog/ui/components/atoms/icon-button/icon-button-variants';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
+import type { TIconButtonVariants } from '@shinefold/ui/components/atoms/icon-button/icon-button-variants';
 import type { MouseEventHandler, ReactNode, Ref } from 'react';
 
 export type TPopoverMenuTriggerProps = IWithClassName &

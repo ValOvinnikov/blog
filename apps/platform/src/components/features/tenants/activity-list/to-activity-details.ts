@@ -1,26 +1,26 @@
+import { ACTIVITY_DETAIL } from '@platform/constants/activity';
+import {
+  TENANT_DETAILS_FIELD,
+  type TTenantDetailsField,
+} from '@platform/constants/tenant';
 import {
   AUDIT_ACTION,
   LOCALE_ISO_CODES,
   type TAuditAction,
   type TLocaleIsoCode,
   type TMaybeNull,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   OAUTH_PROVIDER,
   type TOAuthProvider,
   TENANT_PLAN,
   type TTenantPlan,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   SUSPENSION_CATEGORY,
   type TSuspensionCategory,
-} from '@blog/db/constants';
-import { hasArrayGotItems, hasLength } from '@blog/utils/primitives';
-import { ACTIVITY_DETAIL } from '@platform/constants/activity';
-import {
-  TENANT_DETAILS_FIELD,
-  type TTenantDetailsField,
-} from '@platform/constants/tenant';
+} from '@shinefold/db/constants';
+import { hasArrayGotItems, hasLength } from '@shinefold/utils/primitives';
 import { z } from 'zod';
 
 const D = ACTIVITY_DETAIL;

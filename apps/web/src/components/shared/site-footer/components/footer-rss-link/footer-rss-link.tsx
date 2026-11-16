@@ -1,6 +1,6 @@
-import { ICONS, routes, SIZE } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
+import { ICONS, routes, SIZE } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { SmartLink } from '@web/components/shared/smart-link';
 
 type TFooterRssLinkProps = {

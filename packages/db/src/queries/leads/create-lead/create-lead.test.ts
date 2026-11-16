@@ -1,21 +1,21 @@
-import { LOCALE_BCP47_TAGS } from '@blog/config';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { LOCALE_BCP47_TAGS } from '@shinefold/config';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestTenant,
   MOCK_LEAD_EMAIL,
   MOCK_LEAD_MESSAGE,
   MOCK_LEAD_NAME,
-} from '@blog/db/testing/fixtures';
+} from '@shinefold/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
-} from '@blog/db/testing/personal-data';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/personal-data';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { createLead } from './create-lead';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

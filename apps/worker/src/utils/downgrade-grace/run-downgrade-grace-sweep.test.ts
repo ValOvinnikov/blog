@@ -1,13 +1,13 @@
-import { ERROR_CODE, TENANT_PLAN } from '@blog/config/constants';
-import { GRACE_EMAIL, type TGraceEmail } from '@blog/db/constants';
-import { deleteCustomDomainClaim } from '@blog/db/queries/custom-domain-claims';
-import { stopPendingInvitesOverSeats } from '@blog/db/queries/membership-invites';
+import { ERROR_CODE, TENANT_PLAN } from '@shinefold/config/constants';
+import { GRACE_EMAIL, type TGraceEmail } from '@shinefold/db/constants';
+import { deleteCustomDomainClaim } from '@shinefold/db/queries/custom-domain-claims';
+import { stopPendingInvitesOverSeats } from '@shinefold/db/queries/membership-invites';
 import {
   countMembershipsOverSeats,
   getTenantOwnerEmail,
   lockMembershipsOverSeats,
-} from '@blog/db/queries/memberships';
-import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
+} from '@shinefold/db/queries/memberships';
+import { listTenantHosts } from '@shinefold/db/queries/tenant-domains/list-tenant-hosts';
 import {
   claimGraceEmail,
   endDowngradeGrace,
@@ -17,12 +17,15 @@ import {
   listTenantsWithEndedTrial,
   restoreDowngradeGrace,
   setTenantPrimaryDomain,
-} from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { daysAfter, daysBefore } from '@blog/db/utils/day-offset/day-offset';
-import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
-import { sendEmail } from '@blog/email';
-import { errorResult, okResult } from '@blog/utils';
+} from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import {
+  daysAfter,
+  daysBefore,
+} from '@shinefold/db/utils/day-offset/day-offset';
+import { requestTenantCacheInvalidation } from '@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation';
+import { sendEmail } from '@shinefold/email';
+import { errorResult, okResult } from '@shinefold/utils';
 import {
   DOWNGRADE_GRACE_LOG,
   DOWNGRADE_GRACE_STEP,
@@ -61,13 +64,13 @@ const MOCK_NOTHING_DONE = {
   [GRACE_EMAIL.ENDING]: 0,
 };
 
-vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/db/queries/memberships');
-vi.mock('@blog/db/queries/membership-invites');
-vi.mock('@blog/db/queries/custom-domain-claims');
-vi.mock('@blog/db/queries/tenant-domains/list-tenant-hosts');
-vi.mock('@blog/db/utils/tenant-cache/request-tenant-cache-invalidation');
-vi.mock('@blog/email/transport/send-email');
+vi.mock('@shinefold/db/queries/tenants');
+vi.mock('@shinefold/db/queries/memberships');
+vi.mock('@shinefold/db/queries/membership-invites');
+vi.mock('@shinefold/db/queries/custom-domain-claims');
+vi.mock('@shinefold/db/queries/tenant-domains/list-tenant-hosts');
+vi.mock('@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation');
+vi.mock('@shinefold/email/transport/send-email');
 
 function inGraceFor(days: number, overrides: Partial<TTenant> = {}): TTenant {
   return mockTenant({

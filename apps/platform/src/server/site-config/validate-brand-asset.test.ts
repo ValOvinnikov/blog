@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
@@ -13,6 +12,7 @@ import {
   MAX_UPLOAD_BYTES,
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { logger } from '@platform/utils/logger/logger';
+import { ACTION_OUTCOME } from '@shinefold/config';
 
 import { sanitizeSvgMarkup } from './sanitize-svg-markup';
 import { validateBrandAssetUpload } from './validate-brand-asset';

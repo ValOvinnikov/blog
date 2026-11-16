@@ -1,5 +1,5 @@
-import { TIMELINE_MARKER_STYLE } from '@blog/config';
-import { BRAND_PILL, tv } from '@blog/ui/lib/styling';
+import { TIMELINE_MARKER_STYLE } from '@shinefold/config';
+import { BRAND_PILL, tv } from '@shinefold/ui/lib/styling';
 
 export const timelineMarkerVariants = tv({
   base: [BRAND_PILL, 'h-8'],

@@ -1,10 +1,10 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import {
   SIGN_UP_FIELD_ERROR,
   SIGN_UP_REFUSAL,
 } from '@platform/constants/sign-up';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import type { TCreateSiteFieldError } from '@platform/server/onboarding/create-site-input';
+import { ACTION_OUTCOME } from '@shinefold/config';
 
 import type { TOnboardingFormFailure } from './use-onboarding-form';
 

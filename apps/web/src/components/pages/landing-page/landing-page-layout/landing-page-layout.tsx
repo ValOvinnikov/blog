@@ -1,4 +1,4 @@
-import type { TLandingSectionNavigation } from '@blog/service';
+import type { TLandingSectionNavigation } from '@shinefold/service';
 import { SectionNavigation } from '@web/components/features/landing/section-navigation';
 import type { ReactNode } from 'react';
 

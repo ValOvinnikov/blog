@@ -1,8 +1,8 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   tenants,
   type TTenantDeprovisioningState,
-} from '@blog/db/schema/tenants';
+} from '@shinefold/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
 export type TTenantDeprovisioningStatusResult = {

@@ -1,6 +1,6 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { OrderableDocumentList } from '@sanity/orderable-document-list';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 import { ListOrdered } from 'lucide-react';
 import { getDraftId, type SchemaTypeDefinition } from 'sanity';
 import type {

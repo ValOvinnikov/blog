@@ -1,6 +1,6 @@
-import { HERO_VARIANT, MEDIA_ORDER } from '@blog/config/constants';
-import { mediaOrderField } from '@blog/studio/schema-types/fields/media-order-field/media-order-field';
-import { isNotVariant } from '@blog/studio/schema-types/fields/variant-field/variant-predicate';
+import { HERO_VARIANT, MEDIA_ORDER } from '@shinefold/config/constants';
+import { mediaOrderField } from '@shinefold/studio/schema-types/fields/media-order-field/media-order-field';
+import { isNotVariant } from '@shinefold/studio/schema-types/fields/variant-field/variant-predicate';
 
 export const heroMediaOrderSplitField = () =>
   mediaOrderField({

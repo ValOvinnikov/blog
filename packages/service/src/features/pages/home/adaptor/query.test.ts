@@ -1,13 +1,13 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   HEADING_TEXT_PATH,
   MOCK_HERO_MODULE_ID,
   MOCK_POST_LATEST_MODULE_ID,
   mockRawHomePage,
-} from '@blog/service/testing/pages/fixtures';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/pages/fixtures';
+import { mockReference } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 
 import { homePageQuery } from './query';
 

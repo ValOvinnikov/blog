@@ -1,29 +1,29 @@
+import { faker } from '@faker-js/faker';
 import {
   ADMIN_ROLE,
   BLOCKED_IDENTITY_KIND,
   GRANTED_VIA,
-} from '@blog/db/constants';
-import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
-import * as schema from '@blog/db/schema';
+} from '@shinefold/db/constants';
+import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_BLOCK_REASON,
   MOCK_BLOCKED_ADDRESS_DOMAIN,
   MOCK_BLOCKED_DOMAIN,
-} from '@blog/db/testing/blocked-signup-identities/fixtures';
+} from '@shinefold/db/testing/blocked-signup-identities/fixtures';
 import {
   MOCK_OPERATOR_EMAIL,
   insertTestAdmin,
   insertTestUser,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import {
   listBlockedIdentities,
   type TBlockedIdentityListing,
 } from './list-blocked-identities';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(602108);
 

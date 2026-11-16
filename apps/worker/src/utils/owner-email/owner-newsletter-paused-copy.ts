@@ -1,5 +1,8 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
-import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@blog/db/constants';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@shinefold/db/constants';
 import type { TOwnerNewsletterText } from '@worker/utils/owner-email/owner-newsletter-copy-input';
 
 type TOwnerNewsletterPausedCopy = {

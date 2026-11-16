@@ -1,4 +1,4 @@
-import { landingLayoutTemplate } from '@blog/studio/schema-types/documents/templates/landing/landing-layout-template';
+import { landingLayoutTemplate } from '@shinefold/studio/schema-types/documents/templates/landing/landing-layout-template';
 import { ShieldCheck } from 'lucide-react';
 
 export const privacyIndexTemplateSchema = landingLayoutTemplate({

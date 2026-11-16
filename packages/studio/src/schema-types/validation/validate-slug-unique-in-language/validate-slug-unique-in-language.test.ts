@@ -1,10 +1,10 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { validateSlugUniqueInLanguage } from '@blog/studio/schema-types/validation/validate-slug-unique-in-language/validate-slug-unique-in-language';
-import { mockLandingPage } from '@blog/studio/testing/mock-documents';
-import { MOCK_FETCH_ERROR } from '@blog/studio/testing/mock-fetch-error';
-import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { validateSlugUniqueInLanguage } from '@shinefold/studio/schema-types/validation/validate-slug-unique-in-language/validate-slug-unique-in-language';
+import { mockLandingPage } from '@shinefold/studio/testing/mock-documents';
+import { MOCK_FETCH_ERROR } from '@shinefold/studio/testing/mock-fetch-error';
+import { mockGroqValidationContext } from '@shinefold/studio/testing/mock-validation-context';
 import {
   getDraftId,
   type SanityDocument,

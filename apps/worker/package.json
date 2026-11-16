@@ -17,12 +17,12 @@
     "rotate-webhook-secrets": "tsx --conditions=react-server src/cli/rotate-revalidate-webhook-secrets.ts"
   },
   "dependencies": {
-    "@blog/config": "workspace:*",
-    "@blog/db": "workspace:*",
-    "@blog/email": "workspace:*",
-    "@blog/insight": "workspace:*",
-    "@blog/utils": "workspace:*",
     "@sanity/client": "^8.9.0",
+    "@shinefold/config": "workspace:*",
+    "@shinefold/db": "workspace:*",
+    "@shinefold/email": "workspace:*",
+    "@shinefold/insight": "workspace:*",
+    "@shinefold/utils": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.11",
     "@vercel/functions": "^3.10.1",
     "next": "^16.4.1",
@@ -32,11 +32,11 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@blog/eslint-config": "workspace:*",
-    "@blog/prettier-config": "workspace:*",
-    "@blog/tsconfig": "workspace:*",
-    "@blog/vitest-config": "workspace:*",
     "@faker-js/faker": "catalog:",
+    "@shinefold/eslint-config": "workspace:*",
+    "@shinefold/prettier-config": "workspace:*",
+    "@shinefold/tsconfig": "workspace:*",
+    "@shinefold/vitest-config": "workspace:*",
     "@types/node": "^26",
     "eslint": "catalog:",
     "prettier": "catalog:",

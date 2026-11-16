@@ -1,4 +1,4 @@
-import { routes } from '@blog/config';
+import { routes } from '@shinefold/config';
 import type {
   IBookmarkedPost,
   IBookmarksPageViewProps,

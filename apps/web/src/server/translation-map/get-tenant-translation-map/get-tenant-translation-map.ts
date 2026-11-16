@@ -1,7 +1,7 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { service, type TTranslationMap } from '@blog/service';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { service, type TTranslationMap } from '@shinefold/service';
 import { TRANSLATION_MAP_FETCH_FAILED_EVENT } from '@web/constants/translation-map';
 import { logger } from '@web/utils/logger/logger';
 

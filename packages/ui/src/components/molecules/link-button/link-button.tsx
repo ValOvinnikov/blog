@@ -1,6 +1,6 @@
-import { A_AS_CONST, type IWithDataTestId } from '@blog/config';
-import type { TPolymorphicProps } from '@blog/config/react';
-import { buttonVariants } from '@blog/ui/components/atoms/button/button-variants';
+import { A_AS_CONST, type IWithDataTestId } from '@shinefold/config';
+import type { TPolymorphicProps } from '@shinefold/config/react';
+import { buttonVariants } from '@shinefold/ui/components/atoms/button/button-variants';
 import type { ElementType } from 'react';
 import type { VariantProps } from 'tailwind-variants';
 

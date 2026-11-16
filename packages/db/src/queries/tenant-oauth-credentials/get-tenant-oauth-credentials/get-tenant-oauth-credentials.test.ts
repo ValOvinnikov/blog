@@ -1,17 +1,17 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
-import { saveTenantOAuthCredentials } from '@blog/db/queries/tenant-oauth-credentials/save-tenant-oauth-credentials';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
+import { saveTenantOAuthCredentials } from '@shinefold/db/queries/tenant-oauth-credentials/save-tenant-oauth-credentials';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_OAUTH_CREDENTIALS,
   MOCK_REPLACEMENT_OAUTH_CREDENTIALS,
-} from '@blog/db/testing/tenant-oauth-credentials/fixtures';
-import { useTenantOAuthEncryptionKey } from '@blog/db/testing/tenant-oauth-encryption-key';
+} from '@shinefold/db/testing/tenant-oauth-credentials/fixtures';
+import { useTenantOAuthEncryptionKey } from '@shinefold/db/testing/tenant-oauth-encryption-key';
 
 import { getTenantOAuthCredentials } from './get-tenant-oauth-credentials';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useTenantOAuthEncryptionKey();

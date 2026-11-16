@@ -1,5 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
@@ -11,6 +9,8 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 
 import { requireTenantManager } from './require-tenant-manager';
 

@@ -1,8 +1,8 @@
 import { pathToFileURL } from 'node:url';
 
-import { listTenants } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
+import { listTenants } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
 import { logger } from '@worker/utils/logger/logger';
 import { getProvisionEnv } from '@worker/utils/provision-env/provision-env';

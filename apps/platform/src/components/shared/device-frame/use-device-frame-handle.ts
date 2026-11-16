@@ -1,6 +1,6 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import type { TValueOf } from '@blog/config/utils';
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import type { TValueOf } from '@shinefold/config/utils';
 import { useImperativeHandle, type Ref, type RefObject } from 'react';
 
 type TDeviceFrameScrollTarget =

@@ -1,11 +1,11 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
-import { EMAIL_NEW_POSTS_DEFAULT } from '@blog/db/constants';
-import type { TEmailConfigResult } from '@blog/db/queries/email-config';
-import type { TEmailTemplateResult } from '@blog/db/queries/email-templates';
-import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { faker } from '@faker-js/faker';
 import { MOCK_EMAIL_BODY } from '@platform/testing/email-draft';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { EMAIL_TEMPLATE_TYPE } from '@shinefold/config';
+import { EMAIL_NEW_POSTS_DEFAULT } from '@shinefold/db/constants';
+import type { TEmailConfigResult } from '@shinefold/db/queries/email-config';
+import type { TEmailTemplateResult } from '@shinefold/db/queries/email-templates';
+import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
 
 export const MOCK_CONTACT_RECIPIENT = 'contact-inbox@acme.example';
 export const MOCK_EMAIL_LOGO_URL =

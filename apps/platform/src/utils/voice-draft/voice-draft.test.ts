@@ -1,11 +1,3 @@
-import {
-  SITE_MESSAGES_BY_LOCALE,
-  VOICE_FIELDS,
-  VOICE_SURFACE,
-  type TVoiceFieldId,
-  type TVoicePortableText,
-} from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import de from '@platform/i18n/messages/de.json';
 import en from '@platform/i18n/messages/en.json';
@@ -13,6 +5,14 @@ import es from '@platform/i18n/messages/es.json';
 import fr from '@platform/i18n/messages/fr.json';
 import nl from '@platform/i18n/messages/nl.json';
 import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
+import {
+  SITE_MESSAGES_BY_LOCALE,
+  VOICE_FIELDS,
+  VOICE_SURFACE,
+  type TVoiceFieldId,
+  type TVoicePortableText,
+} from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 
 import {
   countLanguageVoiceChanges,

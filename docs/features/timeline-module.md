@@ -30,7 +30,7 @@ An editor walks a reader through a process or a history: a step-by-step how-it-w
 
 - **`module_timeline`** — `title`, `brandVariant`, `headingBlock`, `markerStyle` (`NUMBERED` or `LABELLED`, initial Numbered), `items[]` (`timelineItem`), `orientation` (`VERTICAL` or `HORIZONTAL`, initial Vertical), `ctaButtons`, `contentAlignment` (Left or Center), `itemAlignment` (Left or Center, initial Left), `layout` (spacing, container width, dividers).
 - **`timelineItem`** (object) — `marker` (per-language one line; hidden when the module is Numbered), `heading` (per-language one line; required in the default language), `body` (per-language short rich text).
-- `TIMELINE_MARKER_STYLE`, `TIMELINE_ORIENTATION` and `TIMELINE_HORIZONTAL_ITEM_CAP` (5) live in `@blog/config`, read by Studio validation, the `ui` organism and the web view.
+- `TIMELINE_MARKER_STYLE`, `TIMELINE_ORIENTATION` and `TIMELINE_HORIZONTAL_ITEM_CAP` (5) live in `@shinefold/config`, read by Studio validation, the `ui` organism and the web view.
 - **Service** — `getTimelineModule` returns `TTimelineModule`. The transformer drops every item's `marker` when the module is Numbered, so a stale label never renders.
 - **Caching** — tagged `modules:timeline`, `module:<id>`, `link`, `homePage` and `page_landing` ([rendering-and-caching](./rendering-and-caching.md)).
 

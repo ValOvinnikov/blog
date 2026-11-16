@@ -1,6 +1,3 @@
-import { ALERT_TYPE } from '@blog/config';
-import { SELLABLE_TENANT_PLANS } from '@blog/config/constants';
-import { isOneOf } from '@blog/utils/primitives';
 import { UpgradeCheckout } from '@platform/components/features/upgrade/upgrade-checkout';
 import { UpgradeConfirming } from '@platform/components/features/upgrade/upgrade-confirming';
 import { PlanChangeSection } from '@platform/components/features/upgrade/upgrade-page-content/components/plan-change-section/plan-change-section';
@@ -15,6 +12,9 @@ import {
 import { logger } from '@platform/utils/logger/logger';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { stripeEnv } from '@platform/utils/stripe-env/stripe-env';
+import { ALERT_TYPE } from '@shinefold/config';
+import { SELLABLE_TENANT_PLANS } from '@shinefold/config/constants';
+import { isOneOf } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 export type TUpgradeBodyProps = {

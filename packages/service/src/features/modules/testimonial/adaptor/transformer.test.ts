@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CARD_STYLE,
@@ -7,15 +8,15 @@ import {
   GRID_COLUMNS,
   PORTABLE_TEXT_BLOCK_TYPE,
   RADIUS_SCALE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   mockCtaButtonView,
   mockRawCtaButton,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   mockRawTestimonialItem,
   mockRawTestimonialModule,
-} from '@blog/service/testing/modules/testimonial/fixtures';
+} from '@shinefold/service/testing/modules/testimonial/fixtures';
 import {
   MOCK_EXTERNAL_URL,
   mockLinkView,
@@ -23,8 +24,8 @@ import {
   mockRawInternalLinkDocument,
   mockRawPortableTextMarkDef,
   mockRawSanityImage,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_UNSET_MODULE_APPEARANCE } from '@shinefold/service/testing/shared/module-appearance';
 
 import { toTestimonialModule } from './transformer';
 
@@ -86,12 +87,7 @@ describe(toTestimonialModule, () => {
   it('leaves every appearance override undefined when unset', () => {
     const module = toTestimonialModule(mockRawTestimonialModule());
 
-    expect(module).toMatchObject({
-      cardStyle: undefined,
-      radiusScale: undefined,
-      density: undefined,
-      columns: undefined,
-    });
+    expect(module).toMatchObject(MOCK_UNSET_MODULE_APPEARANCE);
   });
 
   it('maps the authored appearance overrides straight through', () => {

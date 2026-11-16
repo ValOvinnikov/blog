@@ -1,8 +1,5 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import type { TOAuthProvider } from '@blog/config/constants';
-import { queries } from '@blog/db';
 import {
   OAUTH_PROVIDERS,
   SIGN_IN_APPS_MODE,
@@ -11,6 +8,9 @@ import {
 import { maskClientId } from '@platform/utils/mask-client-id/mask-client-id';
 import { oauthCallbackUrl } from '@platform/utils/oauth-callback-url/oauth-callback-url';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TOAuthProvider } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 
 export type TSignInAppView = {
   provider: TOAuthProvider;

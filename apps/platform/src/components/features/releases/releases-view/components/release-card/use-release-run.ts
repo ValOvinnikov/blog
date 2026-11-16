@@ -1,11 +1,11 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import type { TReleaseRun } from '@platform/server/releases/get-release-run';
 import { getReleaseRunAction } from '@platform/server/releases/get-release-run-action';
 import type { TReleaseResult } from '@platform/server/releases/release-result';
 import { isReleaseRunActive } from '@platform/utils/release-state/release-state';
 import { useDocumentVisible } from '@platform/utils/use-document-visible/use-document-visible';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 

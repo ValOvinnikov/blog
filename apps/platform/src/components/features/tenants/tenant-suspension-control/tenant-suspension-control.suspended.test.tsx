@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
-import { TENANT_STATUS } from '@blog/db/constants';
 import en from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -11,6 +9,8 @@ import {
   mockTenantSuspension,
 } from '@platform/testing/tenant-suspensions/fixtures';
 import { mockClientTenant } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantSuspensionControl } from './tenant-suspension-control';

@@ -1,9 +1,9 @@
-import { getDb } from '@blog/db/client';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
-import { membershipInvites } from '@blog/db/schema/membership-invites';
-import { memberships } from '@blog/db/schema/memberships';
-import { tenants } from '@blog/db/schema/tenants';
-import { hasLength } from '@blog/utils/primitives';
+import { getDb } from '@shinefold/db/client';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
+import { membershipInvites } from '@shinefold/db/schema/membership-invites';
+import { memberships } from '@shinefold/db/schema/memberships';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { hasLength } from '@shinefold/utils/primitives';
 import { and, eq, isNull, type SQL, sql, type SQLWrapper } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 

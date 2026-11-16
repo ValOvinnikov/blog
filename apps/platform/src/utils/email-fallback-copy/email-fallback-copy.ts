@@ -1,10 +1,10 @@
-import type { TEmailTemplateType, TLocaleIsoCode } from '@blog/config';
-import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants/email-template-defaults';
 import type {
   TEmailDraft,
   TEmailFallbackCopy,
 } from '@platform/utils/email-draft/email-draft';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+import type { TEmailTemplateType, TLocaleIsoCode } from '@shinefold/config';
+import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@shinefold/db/constants/email-template-defaults';
 
 type TEmailPreviewCopy = TEmailFallbackCopy & {
   logo: TStagedImage;

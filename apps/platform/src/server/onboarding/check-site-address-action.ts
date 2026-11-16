@@ -1,11 +1,11 @@
 'use server';
 
-import type { TMaybeUndefined } from '@blog/config';
 import {
   checkTenantSlug,
   type TTenantSlugError,
 } from '@platform/server/tenants/check-tenant-slug';
 import { env } from '@platform/utils/env/env';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { z } from 'zod';
 
 import { requireOnboardingUser } from './require-onboarding-user';

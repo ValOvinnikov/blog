@@ -1,8 +1,8 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { buildContrastDedupeKey } from '@blog/db/queries/findings/contrast-dedupe-key';
-import { findings, type TFinding } from '@blog/db/schema/findings';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { buildContrastDedupeKey } from '@shinefold/db/queries/findings/contrast-dedupe-key';
+import { findings, type TFinding } from '@shinefold/db/schema/findings';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { eq, sql } from 'drizzle-orm';
 
 export async function tagContrastFinding(

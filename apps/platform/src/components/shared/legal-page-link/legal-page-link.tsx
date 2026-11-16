@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { ExternalLink } from '@platform/components/shared/external-link';
 import { textLinkVariants } from '@platform/components/shared/text-link/text-link-variants';
+import type { TMaybeUndefined } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 export type TLegalPageLinkProps = {

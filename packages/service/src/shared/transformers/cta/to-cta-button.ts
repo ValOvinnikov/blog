@@ -3,12 +3,12 @@ import type {
   TCtaActionAppearance,
   TCtaActionVariant,
   TMaybeUndefined,
-} from '@blog/config';
+} from '@shinefold/config';
 import type {
   ctaButtonFragment,
   ctaSecondaryButtonFragment,
-} from '@blog/service/shared/fragments/cta/cta-button';
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
+} from '@shinefold/service/shared/fragments/cta/cta-button';
+import { toLinkDocument } from '@shinefold/service/shared/transformers/link/to-link-document';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawCtaButton = InferFragmentType<typeof ctaButtonFragment>;

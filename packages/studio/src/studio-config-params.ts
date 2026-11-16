@@ -3,7 +3,7 @@ import type {
   TLocaleIsoCode,
   TModulePack,
   TSanityLoginProvider,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 type TStudioEntitlements = {
   modulePacks?: readonly TModulePack[];

@@ -4,10 +4,10 @@ import {
   type IBodyImageBlock,
   type TMaybeUndefined,
   type TPortableTextBlock,
-} from '@blog/config';
-import type { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text/portable-text-body-item';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
-import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
+} from '@shinefold/config';
+import type { portableTextBodyItemFragment } from '@shinefold/service/shared/fragments/portable-text/portable-text-body-item';
+import { toSanityImage } from '@shinefold/service/shared/transformers/image/to-sanity-image';
+import { toPortableText } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import type { InferFragmentType } from 'groqd';
 
 type TRawBodyItem = InferFragmentType<typeof portableTextBodyItemFragment>;

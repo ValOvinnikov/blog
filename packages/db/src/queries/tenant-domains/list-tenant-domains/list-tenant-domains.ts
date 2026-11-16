@@ -1,8 +1,8 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   tenantDomains,
   type TTenantDomain,
-} from '@blog/db/schema/tenant-domains';
+} from '@shinefold/db/schema/tenant-domains';
 import { eq } from 'drizzle-orm';
 
 export async function listTenantDomains(

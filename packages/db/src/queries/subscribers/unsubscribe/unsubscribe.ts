@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import { findUserSubscriber } from '@blog/db/queries/subscribers/user-subscriber';
-import { subscribers } from '@blog/db/schema/subscribers';
+import { getDb } from '@shinefold/db/client';
+import { findUserSubscriber } from '@shinefold/db/queries/subscribers/user-subscriber';
+import { subscribers } from '@shinefold/db/schema/subscribers';
 import { eq } from 'drizzle-orm';
 
 // `subscribers.status` has no `unsubscribed` value, so unsubscribing deletes

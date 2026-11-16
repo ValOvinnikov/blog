@@ -1,15 +1,15 @@
-import type { TMaybeNull } from '@blog/config/types';
+import type { TMaybeNull } from '@shinefold/config/types';
 import {
   accountEmailIndex,
   decryptPersonalData,
   parsePersonalDataKeyring,
   personalDataIndex,
-} from '@blog/utils/encryption';
+} from '@shinefold/utils/encryption';
 import {
   MOCK_OTHER_ENCRYPTION_KEY,
   MOCK_ENCRYPTION_KEY,
-} from '@blog/utils/encryption/encryption-fixtures';
-import { isNull } from '@blog/utils/primitives';
+} from '@shinefold/utils/encryption/encryption-fixtures';
+import { isNull } from '@shinefold/utils/primitives';
 
 const TEST_KEYRING = `v1:${MOCK_ENCRYPTION_KEY}`;
 

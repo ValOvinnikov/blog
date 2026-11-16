@@ -5,13 +5,13 @@
 // red `Build` job on an already-open PR.
 //
 // The gap this closes is that `exports` maps are not a resolution boundary in
-// this repo. Every workspace aliases `@blog/<pkg>/*` straight to
+// this repo. Every workspace aliases `@shinefold/<pkg>/*` straight to
 // `packages/<pkg>/src/*` via tsconfig `paths`, so a deep import resolves
 // whether or not the package declares it — and `type-check`, `lint`, `test` and
 // `knip` all stay green either way.
 //
 // Nothing here is specific to one package: the taint marker is `server-only`
-// itself, so `@blog/db`, `@blog/auth`, `@blog/service` and `@blog/email` are all
+// itself, so `@shinefold/db`, `@shinefold/auth`, `@shinefold/service` and `@shinefold/email` are all
 // covered, as is any future package that mixes a server-only transport with
 // client-safe helpers.
 //
@@ -22,7 +22,7 @@
 //     reference. Almost every Server Action reaches the database, so walking
 //     through them flags nearly all of them.
 //   - Type-only imports are erased before the bundler sees them, so
-//     `import type { TUser } from '@blog/db'` is not a client-graph edge.
+//     `import type { TUser } from '@shinefold/db'` is not a client-graph edge.
 //
 // Aliases are read from each workspace's own tsconfig `paths` rather than
 // hardcoded, so the guard follows the same resolution the failure class abuses.
@@ -41,7 +41,7 @@ const CLIENT_DIRECTIVE = 'use client';
 const SERVER_DIRECTIVE = 'use server';
 
 // Every `'use client'` module in the repo is an entrypoint, not just the two
-// apps': `@blog/studio`'s mount component carries the directive too, and a
+// apps': `@shinefold/studio`'s mount component carries the directive too, and a
 // package's client module can reach server-only code exactly as easily.
 const SOURCE_ROOT_PARENTS = ['apps', 'packages'];
 
@@ -49,7 +49,7 @@ const RESOLVABLE_EXTENSIONS = ['.ts', '.tsx'];
 
 const parsedModules = new Map();
 
-// Widely-shared modules (`@blog/config`, `@blog/ui`) sit in most entrypoints'
+// Widely-shared modules (`@shinefold/config`, `@shinefold/ui`) sit in most entrypoints'
 // graphs, so parsing per entrypoint re-reads the same files ~79 times. Keyed by
 // absolute path and never invalidated: rewriting a file at a path already read
 // in this process yields the stale AST, which tests must avoid by giving each
@@ -175,10 +175,10 @@ export const extractRuntimeSpecifiers = (sf) => {
   return specifiers;
 };
 
-// `@web/*` → `apps/web/src/*`, `@blog/db/*` → `packages/db/src/*`, … read from
+// `@web/*` → `apps/web/src/*`, `@shinefold/db/*` → `packages/db/src/*`, … read from
 // the tsconfig `paths` that actually drive resolution. Targets are resolved
 // against the declaring tsconfig's own directory, so a package's self-alias
-// (`"@blog/email/*": ["./src/*"]`) lands in the right place.
+// (`"@shinefold/email/*": ["./src/*"]`) lands in the right place.
 export const listWorkspaces = (root = repoRoot) =>
   SOURCE_ROOT_PARENTS.flatMap((parent) => {
     const parentDir = join(root, parent);
@@ -249,11 +249,11 @@ const tryFile = (base) => {
   return null;
 };
 
-// A bare `@blog/<pkg>` has no tsconfig alias — it resolves through the
+// A bare `@shinefold/<pkg>` has no tsconfig alias — it resolves through the
 // package's own `exports["."]`, which is the barrel that dragged server-only
 // code into the client graph in the first place.
 const resolvePackageRoot = (specifier, root) => {
-  const match = /^@blog\/([a-z0-9-]+)$/.exec(specifier);
+  const match = /^@shinefold\/([a-z0-9-]+)$/.exec(specifier);
   if (match === null) {
     return null;
   }

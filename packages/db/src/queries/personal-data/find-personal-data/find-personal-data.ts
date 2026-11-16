@@ -3,27 +3,27 @@ import {
   type TAuditAction,
   type TAuditTargetType,
   type TErrorCode,
-} from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
+} from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
 import {
   isBlockedAddress,
   toPersonalEmailIndex,
-} from '@blog/db/queries/personal-data/personal-data-match';
+} from '@shinefold/db/queries/personal-data/personal-data-match';
 import {
   findReaderAccountPersonalData,
   type TPersonalDataReaderAccount,
-} from '@blog/db/queries/personal-data/reader-account-personal-data';
-import { findSitePersonalData } from '@blog/db/queries/personal-data/site-personal-data';
-import type { TSitePersonalData } from '@blog/db/queries/personal-data/site-personal-data-types';
+} from '@shinefold/db/queries/personal-data/reader-account-personal-data';
+import { findSitePersonalData } from '@shinefold/db/queries/personal-data/site-personal-data';
+import type { TSitePersonalData } from '@shinefold/db/queries/personal-data/site-personal-data-types';
 import {
   findUnsentStudioReinvites,
   type TPersonalDataUnsentStudioReinvite,
-} from '@blog/db/queries/personal-data/unsent-studio-reinvite-personal-data';
-import { findUserByEmail } from '@blog/db/queries/users/find-user-by-email';
-import { auditEvents } from '@blog/db/schema/audit-events';
-import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/db/queries/personal-data/unsent-studio-reinvite-personal-data';
+import { findUserByEmail } from '@shinefold/db/queries/users/find-user-by-email';
+import { auditEvents } from '@shinefold/db/schema/audit-events';
+import { blockedSignupIdentities } from '@shinefold/db/schema/blocked-signup-identities';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { desc, eq } from 'drizzle-orm';
 
 export type TPersonalDataBlock = {

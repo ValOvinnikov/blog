@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const BLOCKED_IDENTITY_KIND = {
   ADDRESS: 'ADDRESS',

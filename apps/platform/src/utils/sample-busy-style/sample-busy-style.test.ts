@@ -1,4 +1,4 @@
-import { BUSY_BUTTON_STYLE, SPINNER_STYLE } from '@blog/config';
+import { BUSY_BUTTON_STYLE, SPINNER_STYLE } from '@shinefold/config';
 
 import { toSampleBusyStyle } from './sample-busy-style';
 

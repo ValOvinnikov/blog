@@ -1,4 +1,4 @@
-import { toPostCard } from '@blog/service/shared/transformers/post/to-post-card';
+import { toPostCard } from '@shinefold/service/shared/transformers/post/to-post-card';
 import type { InferResultType } from 'groqd';
 
 import type { postsByIdsQuery } from './query';

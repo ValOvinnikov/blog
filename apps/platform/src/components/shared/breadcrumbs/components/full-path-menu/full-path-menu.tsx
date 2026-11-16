@@ -1,11 +1,11 @@
 'use client';
 
 import { Menu } from '@base-ui/react/menu';
-import type { TMaybeNull } from '@blog/config';
-import { hasLength } from '@blog/utils/primitives';
 import type { TBreadcrumbItem } from '@platform/components/shared/breadcrumbs/breadcrumbs';
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
 import { Link } from '@platform/i18n/navigation';
+import type { TMaybeNull } from '@shinefold/config';
+import { hasLength } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 

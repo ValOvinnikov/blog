@@ -1,6 +1,5 @@
 'use client';
 
-import { isUndefined } from '@blog/utils/primitives';
 import { Heading } from '@platform/components/shared/heading';
 import { previewFrameVariants } from '@platform/components/shared/preview-frame/preview-frame-variants';
 import {
@@ -12,6 +11,7 @@ import {
 } from '@platform/constants/preview';
 import { toScalePercent } from '@platform/utils/device-frame-scale/device-frame-scale';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useRef, type ReactNode } from 'react';
 

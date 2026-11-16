@@ -1,5 +1,5 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
-import { HEADING_LEVELS } from '@blog/ui/lib/react';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
+import { HEADING_LEVELS } from '@shinefold/ui/lib/react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_POST_LIST_HEADING } from '@web/testing/modules/post-list/fixtures';
 import {

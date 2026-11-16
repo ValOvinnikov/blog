@@ -1,13 +1,13 @@
-import { getDb } from '@blog/db/client';
-import type { TAccountProfileExport } from '@blog/db/queries/account/export-account-data';
+import { getDb } from '@shinefold/db/client';
+import type { TAccountProfileExport } from '@shinefold/db/queries/account/export-account-data';
 import {
   getLinkedProviders,
   type TLinkedProviders,
-} from '@blog/db/queries/account/get-linked-providers';
-import { readUserPersonalData } from '@blog/db/queries/users/user-personal-data';
-import { sessions, type TUser } from '@blog/db/schema/auth';
-import { bookmarks } from '@blog/db/schema/bookmarks';
-import { tenants } from '@blog/db/schema/tenants';
+} from '@shinefold/db/queries/account/get-linked-providers';
+import { readUserPersonalData } from '@shinefold/db/queries/users/user-personal-data';
+import { sessions, type TUser } from '@shinefold/db/schema/auth';
+import { bookmarks } from '@shinefold/db/schema/bookmarks';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { and, asc, count, eq, gt } from 'drizzle-orm';
 
 type TPersonalDataBookmark = {

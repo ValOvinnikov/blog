@@ -1,6 +1,6 @@
-import type { TMaybeJsonDates, TMaybeNull } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isNull } from '@blog/utils/primitives';
+import type { TMaybeJsonDates, TMaybeNull } from '@shinefold/config';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isNull } from '@shinefold/utils/primitives';
 
 const toDate = (value: Date | string): Date => new Date(value);
 

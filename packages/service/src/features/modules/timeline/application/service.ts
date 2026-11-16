@@ -1,6 +1,6 @@
-import { getTimelineModule } from '@blog/service/features/modules/timeline/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getTimelineModule } from '@shinefold/service/features/modules/timeline/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createTimelineModuleService() {
   return {

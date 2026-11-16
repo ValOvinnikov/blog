@@ -1,49 +1,49 @@
+import { faker } from '@faker-js/faker';
 import {
   HTTP_METHOD,
   HTTP_STATUS,
   TENANT_DELETE_OUTCOME,
   TENANT_DELETE_SANITY_PROJECT_OUTCOME,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   DENSITY,
   FONT_CHOICE,
   PRESET_ID,
   RADIUS_SCALE,
-} from '@blog/config/constants';
-import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/config/constants';
+import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import {
   insertTestSubscriber,
   insertTestTenant,
   insertTestUser,
   MOCK_SUBSCRIBER_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   emptyResponse,
   firstFetchCall,
   jsonResponse,
   textResponse,
   useFetchFake,
-} from '@blog/db/testing/sanity-management-client/fetch-fake';
+} from '@shinefold/db/testing/sanity-management-client/fetch-fake';
 import {
   MOCK_SANITY_EXPECTED_URL,
   MOCK_SANITY_ORGANIZATION_ID,
   MOCK_SANITY_PROJECT_ID,
   MOCK_SANITY_TOKEN,
-} from '@blog/db/testing/sanity-management-client/fixtures';
+} from '@shinefold/db/testing/sanity-management-client/fixtures';
 import {
   MOCK_DEPROVISIONED_AT,
   MOCK_MISSING_TENANT_ID,
   MOCK_TENANT_DOMAIN,
-} from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { deleteTenant } from './delete-tenant';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(6020);
 

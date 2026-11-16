@@ -1,8 +1,8 @@
-import { getPageSlugs } from '@blog/service/features/pages/landing/adaptor/detail-page-params/loader';
-import { getRedirect } from '@blog/service/features/pages/landing/adaptor/redirect/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import type { TPageQueryPageParams } from '@blog/service/shared/types/page/page-query-page-params';
-import { safeAsync } from '@blog/utils';
+import { getPageSlugs } from '@shinefold/service/features/pages/landing/adaptor/detail-page-params/loader';
+import { getRedirect } from '@shinefold/service/features/pages/landing/adaptor/redirect/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import type { TPageQueryPageParams } from '@shinefold/service/shared/types/page/page-query-page-params';
+import { safeAsync } from '@shinefold/utils';
 
 import { getPage } from './get-page';
 

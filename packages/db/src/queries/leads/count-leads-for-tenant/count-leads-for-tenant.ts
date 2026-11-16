@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { leads } from '@blog/db/schema/leads';
+import { getDb } from '@shinefold/db/client';
+import { leads } from '@shinefold/db/schema/leads';
 import { count, eq } from 'drizzle-orm';
 
 export async function countLeadsForTenant(tenantId: string): Promise<number> {

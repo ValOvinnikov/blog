@@ -1,5 +1,5 @@
 {
-  "name": "@blog/service",
+  "name": "@shinefold/service",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -14,9 +14,9 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@blog/config": "workspace:*",
-    "@blog/utils": "workspace:*",
     "@sanity/image-url": "^2.1.1",
+    "@shinefold/config": "workspace:*",
+    "@shinefold/utils": "workspace:*",
     "@t3-oss/env-core": "^0.13.11",
     "groqd": "^1.7.1",
     "next-sanity": "^13.3.4",
@@ -24,11 +24,11 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@blog/eslint-config": "workspace:*",
-    "@blog/prettier-config": "workspace:*",
-    "@blog/tsconfig": "workspace:*",
-    "@blog/vitest-config": "workspace:*",
     "@faker-js/faker": "catalog:",
+    "@shinefold/eslint-config": "workspace:*",
+    "@shinefold/prettier-config": "workspace:*",
+    "@shinefold/tsconfig": "workspace:*",
+    "@shinefold/vitest-config": "workspace:*",
     "@types/node": "^26",
     "eslint": "catalog:",
     "groq-js": "^2.0.0",

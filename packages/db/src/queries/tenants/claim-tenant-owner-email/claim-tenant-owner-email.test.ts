@@ -1,16 +1,16 @@
-import { TENANT_OWNER_EMAIL } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
-import { isNull } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
+import { TENANT_OWNER_EMAIL } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
+import { isNull } from '@shinefold/utils/primitives';
 import { eq } from 'drizzle-orm';
 
 import { claimTenantOwnerEmail } from './claim-tenant-owner-email';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(6020);
 

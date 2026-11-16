@@ -1,12 +1,12 @@
 import {
   toAllPublishedPosts,
   type TFeedPost,
-} from '@blog/service/features/entities/posts/adaptor/all-published/transformer';
-import { isr } from '@blog/service/sanity/query/isr';
+} from '@shinefold/service/features/entities/posts/adaptor/all-published/transformer';
+import { isr } from '@shinefold/service/sanity/query/isr';
 import {
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query/query';
+} from '@shinefold/service/sanity/query/query';
 
 import { tagScopedPublishedPostsQuery } from './query';
 

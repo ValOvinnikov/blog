@@ -1,6 +1,6 @@
-import { CAPABILITY } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { CAPABILITY } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
@@ -20,7 +20,7 @@ const { getNewsletterMock } = vi.hoisted(() => ({
   getNewsletterMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       newsletter: { v1: { getNewsletter: getNewsletterMock } },

@@ -6,12 +6,12 @@ import {
   MEDIA_ORDER,
   SIZE,
   SPACING_SCALE,
-} from '@blog/config';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { ShareLink } from '@blog/ui/components/molecules/share-link';
-import { objectKeys } from '@blog/utils/primitives';
+} from '@shinefold/config';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import { ShareLink } from '@shinefold/ui/components/molecules/share-link';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Hero } from './hero';

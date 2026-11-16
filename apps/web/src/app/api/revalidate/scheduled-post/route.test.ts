@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   HTTP_METHOD,
   HTTP_STATUS,
   SANITY_WEBHOOK_OPERATION,
-} from '@blog/config/constants';
-import { okResult } from '@blog/utils';
-import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import { okResult } from '@shinefold/utils';
+import { buildEnqueueHeaders } from '@shinefold/utils/enqueue-signature';
 import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import type * as DeriveRevalidatePathsModule from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
@@ -33,7 +33,7 @@ const {
   envMock: {} as { SANITY_REVALIDATE_SECRET?: string },
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: { getTenantSanityCredentials: getTenantSanityCredentialsMock },
   },

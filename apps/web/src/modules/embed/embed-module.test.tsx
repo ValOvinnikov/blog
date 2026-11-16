@@ -1,4 +1,4 @@
-import { errorResult, okResult } from '@blog/utils';
+import { errorResult, okResult } from '@shinefold/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_EMBED_MODULE_ID,
@@ -15,7 +15,7 @@ const { getEmbedModuleMock } = vi.hoisted(() => ({
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       embed: { v1: { getEmbedModule: getEmbedModuleMock } },

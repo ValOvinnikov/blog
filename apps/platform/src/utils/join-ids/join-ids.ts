@@ -1,4 +1,4 @@
-import type { TMaybeUndefined, TNullable } from '@blog/config';
+import type { TMaybeUndefined, TNullable } from '@shinefold/config';
 
 export const joinIds = (
   ...ids: TNullable<string | false>[]

@@ -1,7 +1,7 @@
 import {
   MOCK_ESCAPED_SCRIPT_MARKUP,
   MOCK_SCRIPT_MARKUP,
-} from '@blog/email/testing/email-fixtures';
+} from '@shinefold/email/testing/email-fixtures';
 
 import { escapeHtml } from './escape-html';
 

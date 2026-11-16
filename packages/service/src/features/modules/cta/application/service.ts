@@ -1,6 +1,6 @@
-import { getCta } from '@blog/service/features/modules/cta/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getCta } from '@shinefold/service/features/modules/cta/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createCtaModuleService() {
   return {

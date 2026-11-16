@@ -1,24 +1,24 @@
+import { faker } from '@faker-js/faker';
 import {
   ASIDE_KIND,
   LOCALE_ISO_CODES,
   PORTABLE_TEXT_BLOCK_TYPE,
-} from '@blog/config/constants';
-import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
-import { mockRawTopic } from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/config/constants';
+import type { TRawPostDetail } from '@shinefold/service/features/pages/post/adaptor/detail-page/transformer';
+import { mockRawTopic } from '@shinefold/service/testing/entities/fixtures';
 import {
   mockRawAuthor,
   mockRawPostDetail,
   mockSlugPageDocument,
-} from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_POST_TITLE,
   mockRawBodyImageBlock,
   mockRawExternalLinkDocument,
   mockRawHeadingBlock,
-} from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { mockTranslationLink } from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { mockTranslationLink } from '@shinefold/service/testing/shared/localized';
 
 import { postPageQuery } from './query';
 

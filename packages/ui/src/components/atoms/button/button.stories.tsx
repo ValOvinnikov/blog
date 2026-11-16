@@ -1,8 +1,11 @@
-import { SIZE } from '@blog/config';
-import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
-import { ButtonShapes } from '@blog/ui/testing/button-shapes';
-import { ReducedMotion } from '@blog/ui/testing/reduced-motion';
-import { objectKeys } from '@blog/utils/primitives';
+import { SIZE } from '@shinefold/config';
+import {
+  BUSY_STYLES,
+  SPINNER_VARIANTS,
+} from '@shinefold/ui/testing/busy-styles';
+import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
+import { ReducedMotion } from '@shinefold/ui/testing/reduced-motion';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { within } from 'storybook/test';
 

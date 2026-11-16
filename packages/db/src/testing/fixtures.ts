@@ -1,21 +1,25 @@
-import { LOCALE_ISO_CODES, TENANT_PLAN } from '@blog/config/constants';
-import { ADMIN_ROLE, GRANTED_VIA, TENANT_STATUS } from '@blog/db/constants';
+import type { PGlite } from '@electric-sql/pglite';
+import { LOCALE_ISO_CODES, TENANT_PLAN } from '@shinefold/config/constants';
+import {
+  ADMIN_ROLE,
+  GRANTED_VIA,
+  TENANT_STATUS,
+} from '@shinefold/db/constants';
 import {
   leadContentColumns,
   type TLeadContent,
-} from '@blog/db/queries/leads/lead-content';
-import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
-import * as schema from '@blog/db/schema';
-import type { TAdmin } from '@blog/db/schema/admins';
-import type { TUser } from '@blog/db/schema/auth';
-import type { TLead } from '@blog/db/schema/leads';
-import type { TSubscriber } from '@blog/db/schema/subscribers';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { firstRowOrThrow } from '@blog/db/testing/first-row-or-throw';
-import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
-import { createMockFaker } from '@blog/db/testing/mock-faker';
-import { uniqueEmailColumns } from '@blog/db/utils/personal-data/personal-data';
-import type { PGlite } from '@electric-sql/pglite';
+} from '@shinefold/db/queries/leads/lead-content';
+import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
+import * as schema from '@shinefold/db/schema';
+import type { TAdmin } from '@shinefold/db/schema/admins';
+import type { TUser } from '@shinefold/db/schema/auth';
+import type { TLead } from '@shinefold/db/schema/leads';
+import type { TSubscriber } from '@shinefold/db/schema/subscribers';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
+import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
+import { uniqueEmailColumns } from '@shinefold/db/utils/personal-data/personal-data';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 export type TTestDb = PgliteDatabase<typeof schema> & { $client: PGlite };

@@ -1,7 +1,5 @@
 'use client';
 
-import { SIZE, TENANT_SORT_COLUMN, type TTenantSortColumn } from '@blog/config';
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import { Avatar } from '@platform/components/shared/avatar';
 import {
   DataTableShell,
@@ -17,6 +15,12 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
 import { useTenantsListNavigation } from '@platform/utils/use-tenants-list-navigation/use-tenants-list-navigation';
+import {
+  SIZE,
+  TENANT_SORT_COLUMN,
+  type TTenantSortColumn,
+} from '@shinefold/config';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
 import { useLocale, useTranslations } from 'next-intl';
 import { useOptimistic, type ReactNode } from 'react';
 

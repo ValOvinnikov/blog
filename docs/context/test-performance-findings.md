@@ -103,12 +103,12 @@ whole suite gains only 10–17%: those files finish within the first ~95s, and
 the rest of the run is import and collection of the other 193 files.
 
 **`--no-isolate` failed** with `getDb()` returning `undefined`. Each query
-test mocked `@blog/db/client` with its own `vi.hoisted` `getDbMock`, so with
+test mocked `@shinefold/db/client` with its own `vi.hoisted` `getDbMock`, so with
 isolation off a query module imported by an earlier file in the same worker
 kept that file's (now reset) mock.
 
 **Adopted:** every db test now takes the shared `src/__mocks__/client.ts`
-through a bare `vi.mock('@blog/db/client')`, and `useQueryTestDb()` points its
+through a bare `vi.mock('@shinefold/db/client')`, and `useQueryTestDb()` points its
 `getDb` at the worker's PGlite instance. `vitest.config.ts` sets
 `unstubEnvs: true`.
 
@@ -177,7 +177,7 @@ every test passing.
 
 - **Setup files load more than node tests need.** Each app's
   `src/vitest-setup.ts` runs for both projects and eagerly loads jest-dom
-  (~204 modules), next-intl's client build and the `@blog/config` barrel.
+  (~204 modules), next-intl's client build and the `@shinefold/config` barrel.
   None of the 298 node-project files uses a jest-dom matcher.
 - **faker's root entry** loads every locale: 86 files / 2.39 MB, against 3
   files / 0.42 MB for `@faker-js/faker/locale/en`. The root `faker` export is
@@ -263,7 +263,7 @@ needed a product change. Also found:
   same `vi.mock` reason. Their import time came from the tests themselves:
   `importOriginal` spreads of the db tenants barrel (since removed with
   `fake-tenants-queries.ts`), the real `workflow` package loaded through
-  `importOriginal`, and `config.test.ts` importing the whole `@blog/db` barrel
+  `importOriginal`, and `config.test.ts` importing the whole `@shinefold/db` barrel
   up to 4 times.
 - **`isolate: false` candidates** (no or few module mocks, unmeasured):
   `packages/utils` and `packages/email`.
@@ -283,7 +283,7 @@ decision comes first:
 - **Trim `apps/worker` and `packages/auth` test imports** — about 48s of suite
   time between them, measured before `fake-tenants-queries.ts` was removed.
   Replace the real `workflow` package in tests with a light shim that re-exports its error classes, turn db automocks into
-  factories, and mock `@blog/db` in auth's `config.test.ts`. Measure with
+  factories, and mock `@shinefold/db` in auth's `config.test.ts`. Measure with
   `--experimental.importDurations.print` first.
 - **`isolate: false` for `packages/utils` and `packages/email`** — none or
   almost none of their files mock modules. Validate each with a normal run and a

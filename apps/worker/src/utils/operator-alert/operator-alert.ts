@@ -1,5 +1,8 @@
-import { HTTP_METHOD, type TOperatorAlertBody } from '@blog/config/constants';
-import { sanitizeLogMessage } from '@blog/insight';
+import {
+  HTTP_METHOD,
+  type TOperatorAlertBody,
+} from '@shinefold/config/constants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import {
   OPERATOR_ALERT_PATH,
   OPERATOR_ALERT_TIMEOUT_MS,

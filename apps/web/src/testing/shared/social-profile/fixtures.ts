@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   SOCIAL_PLATFORM_LABEL,
   SOCIAL_PLATFORMS,
   type TSocialPlatform,
-} from '@blog/config';
-import type { TSocialProfile } from '@blog/service';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import type { TSocialProfile } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 
 const mockFaker = createMockFaker(61065);

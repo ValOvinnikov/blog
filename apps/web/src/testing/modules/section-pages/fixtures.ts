@@ -1,5 +1,5 @@
-import { BRAND_VARIANT } from '@blog/config';
-import type { TSectionPageCard, TSectionPagesModule } from '@blog/service';
+import { BRAND_VARIANT } from '@shinefold/config';
+import type { TSectionPageCard, TSectionPagesModule } from '@shinefold/service';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 export const MOCK_SECTION_PAGE_TITLE = 'FAQ';

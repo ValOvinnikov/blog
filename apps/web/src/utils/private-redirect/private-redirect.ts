@@ -1,4 +1,4 @@
-import type { THttpStatus } from '@blog/config';
+import type { THttpStatus } from '@shinefold/config';
 import { CACHE_CONTROL } from '@web/constants/http';
 import { NextResponse } from 'next/server';
 

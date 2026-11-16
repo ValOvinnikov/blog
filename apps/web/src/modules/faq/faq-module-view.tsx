@@ -1,6 +1,6 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { TFaqModule } from '@blog/service';
-import { Accordion } from '@blog/ui/components/organisms/accordion';
+import type { IWithDataTestId } from '@shinefold/config';
+import type { TFaqModule } from '@shinefold/service';
+import { Accordion } from '@shinefold/ui/components/organisms/accordion';
 import { ModuleActions } from '@web/components/shared/module-actions';
 import { ModuleSection } from '@web/components/shared/module-section';
 import { PortableText } from '@web/components/shared/portable-text';

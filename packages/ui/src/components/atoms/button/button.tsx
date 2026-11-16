@@ -2,8 +2,11 @@ import {
   BUSY_BUTTON_STYLE,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import { Spinner, type TSpinnerProps } from '@blog/ui/components/atoms/spinner';
+} from '@shinefold/config';
+import {
+  Spinner,
+  type TSpinnerProps,
+} from '@shinefold/ui/components/atoms/spinner';
 import type { AriaAttributes, MouseEventHandler, ReactNode } from 'react';
 
 import {

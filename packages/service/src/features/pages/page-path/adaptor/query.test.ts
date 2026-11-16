@@ -1,17 +1,17 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   MOCK_MISSING_ID,
   MOCK_POST_ID,
   MOCK_POST_SLUG,
-} from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_ABOUT_NL_PAGE_ID,
   MOCK_ABOUT_NL_SLUG,
   MOCK_TEAM_NL_PAGE_ID,
   MOCK_TEAM_SLUG,
   mockLandingPageDocument,
-} from '@blog/service/testing/shared/translated-pages-dataset';
+} from '@shinefold/service/testing/shared/translated-pages-dataset';
 
 import { draftPagePathQuery } from './query';
 

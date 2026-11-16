@@ -1,4 +1,4 @@
-import { RESERVED_SLUGS } from '@blog/config/constants';
+import { RESERVED_SLUGS } from '@shinefold/config/constants';
 import type { SlugValue, ValidationContext } from 'sanity';
 
 export const LANDING_SLUG_SLASH_ERROR =

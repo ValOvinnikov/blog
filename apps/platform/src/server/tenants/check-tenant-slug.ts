@@ -1,10 +1,10 @@
+import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import {
   DOMAIN_LABEL_PATTERN,
   RESERVED_SUBDOMAINS,
   type TMaybeUndefined,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 export type TTenantSlugError =
   | typeof TENANT_FIELD_ERROR.SLUG_INVALID

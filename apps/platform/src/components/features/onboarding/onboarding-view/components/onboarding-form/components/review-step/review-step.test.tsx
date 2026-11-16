@@ -1,4 +1,3 @@
-import { LOCALE_ISO_CODES, PRESET_ID, SITE_TYPE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { ONBOARDING_STEP } from '@platform/constants/onboarding';
 import messages from '@platform/i18n/messages/en.json';
@@ -8,6 +7,7 @@ import {
   MOCK_SITE_NAME,
   MOCK_TENANT_DOMAIN,
 } from '@platform/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES, PRESET_ID, SITE_TYPE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 

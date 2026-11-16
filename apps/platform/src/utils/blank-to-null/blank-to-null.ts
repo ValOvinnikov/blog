@@ -1,4 +1,4 @@
-import type { TMaybeNull } from '@blog/config';
+import type { TMaybeNull } from '@shinefold/config';
 
 export const blankToNull = (value: string): TMaybeNull<string> => {
   const trimmed = value.trim();

@@ -1,4 +1,3 @@
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import messages from '@platform/i18n/messages/en.json';
 import {
   MOCK_BLOCK_AUTHOR_EMAIL,
@@ -10,6 +9,7 @@ import {
 } from '@platform/testing/blocked-signups/fixtures';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
 
 import { BlockedSignupsView } from './blocked-signups-view';
 

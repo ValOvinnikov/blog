@@ -1,5 +1,5 @@
-import { BILLING_CURRENCY } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { BILLING_CURRENCY } from '@shinefold/db/constants';
 import { COUNTRY_CODE } from '@web/constants/country';
 import { CURRENCY_COOKIE_NAME } from '@web/utils/currency-cookie';
 import { NextRequest, NextResponse } from 'next/server';

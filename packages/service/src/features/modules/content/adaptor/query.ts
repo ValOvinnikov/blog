@@ -1,6 +1,9 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
-import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { getLocalizedArticleText } from '@blog/service/shared/localization/get-localized-article-text/get-localized-article-text';
+import {
+  q,
+  type TModuleQueryParams,
+} from '@shinefold/service/sanity/query/query';
+import { moduleLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { getLocalizedArticleText } from '@shinefold/service/shared/localization/get-localized-article-text/get-localized-article-text';
 
 export const contentModuleQuery = q
   .parameters<TModuleQueryParams>()

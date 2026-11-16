@@ -1,4 +1,4 @@
-import type { TVoicePortableText } from '@blog/config';
+import type { TVoicePortableText } from '@shinefold/config';
 
 /** Wraps a catalog string as the single-paragraph Portable Text shape a RICH voice field falls back to when no override is stored. */
 export const wrapVoiceText = (text: string): TVoicePortableText => [

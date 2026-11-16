@@ -1,20 +1,20 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
-import { insertAuditEvent } from '@blog/db/queries/audit-events';
-import { archiveTenant } from '@blog/db/queries/tenants';
+import { faker } from '@faker-js/faker';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@shinefold/config/constants';
+import { insertAuditEvent } from '@shinefold/db/queries/audit-events';
+import { archiveTenant } from '@shinefold/db/queries/tenants';
 import {
   MOCK_DEPROVISION_AUDIT_ACTOR,
   MOCK_DEPROVISION_AUDIT_DETAILS,
   MOCK_DEPROVISION_DRY_RUN_ENV,
   MOCK_DEPROVISION_ENV,
   MOCK_DEPROVISIONED_AT,
-} from '@blog/db/testing/deprovision-tenant/fixtures';
-import { mockTenant } from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/deprovision-tenant/fixtures';
+import { mockTenant } from '@shinefold/db/testing/tenants/fixtures';
 
 import { archiveTenantRow } from './archive-tenant';
 
-vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/db/queries/audit-events');
+vi.mock('@shinefold/db/queries/tenants');
+vi.mock('@shinefold/db/queries/audit-events');
 
 faker.seed(5765);
 

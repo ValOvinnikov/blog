@@ -1,14 +1,14 @@
 import 'server-only';
 
-import { ACTION_OUTCOME, ERROR_CODE } from '@blog/config';
-import { queries } from '@blog/db';
-import type { TCreateSelfServeTenantInput } from '@blog/db/queries/tenants';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { ONBOARDING_LOG } from '@platform/constants/onboarding';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { ACTION_OUTCOME, ERROR_CODE } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import type { TCreateSelfServeTenantInput } from '@shinefold/db/queries/tenants';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import type { TCreateSiteResult } from './create-site-input';
 

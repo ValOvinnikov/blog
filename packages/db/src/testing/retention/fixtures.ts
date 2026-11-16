@@ -1,4 +1,4 @@
-import { DAY_MS } from '@blog/db/constants';
+import { DAY_MS } from '@shinefold/db/constants';
 
 export const MOCK_RETENTION_NOW = new Date('2026-06-15T12:00:00.000Z');
 

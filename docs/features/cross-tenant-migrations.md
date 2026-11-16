@@ -18,7 +18,7 @@ epics: [4840]
 
 ## What it does
 
-One `@blog/studio` schema serves many Sanity projects: the platform's own console project, and one project per tenant. When a schema change alters an existing shape, a content migration rewrites the documents to match. This feature runs those migrations against every tenant's dataset, not only the console's. Each run records what it applied in that dataset's ledger, so the run is safe to repeat and resumes where it stopped. A tenant created later catches up on the next run. Editors and owners never see any of this.
+One `@shinefold/studio` schema serves many Sanity projects: the platform's own console project, and one project per tenant. When a schema change alters an existing shape, a content migration rewrites the documents to match. This feature runs those migrations against every tenant's dataset, not only the console's. Each run records what it applied in that dataset's ledger, so the run is safe to repeat and resumes where it stopped. A tenant created later catches up on the next run. Editors and owners never see any of this.
 
 **No migrations exist until launch.** Launch replaces production, and every tenant is created from starter content, so `packages/studio/migrations/` holds no migration folders and `STUDIO_MIGRATION_IDS` is empty. A change to an existing content shape updates the starter content instead. The tooling below stays, for migrations written after launch.
 
@@ -33,7 +33,7 @@ One `@blog/studio` schema serves many Sanity projects: the platform's own consol
 - **Releases.** `release.yml`, dispatched from the platform's Releases page, migrates the production database, then the console project and every active tenant, before it tags and deploys. A failed tenant migration stops the release before the tag, so the previous web keeps serving.
 - **Console project.** `migrate-production-content.yml` runs `migrate:deploy --yes` for `release.yml`, and for `deploy-production.yml` on a hand-pushed `vX.Y.Z` tag. `deploy-development.yml` runs it too, but that workflow's `push` trigger is commented out, so it only runs when dispatched by hand.
 - **Tenant projects.** `migrate-tenant-content.yml` has three triggers:
-  - **`push` to `main`:** runs against the `development` Environment, for all tenants. It runs only when `turbo-ignore` reports that `@blog/studio` or `web` is affected.
+  - **`push` to `main`:** runs against the `development` Environment, for all tenants. It runs only when `turbo-ignore` reports that `@shinefold/studio` or `web` is affected.
   - **`workflow_dispatch`:** defaults to `production` and takes an optional `tenantId`.
   - **`workflow_call`:** takes an optional `tenantId` (blank migrates every tenant), `environment` and `ref`. `release.yml` calls it for every tenant.
 - **CI check.** The `Migrations` job in `ci.yml` loads every migration (`sanity migrations list`). When a read token is configured, it also dry-runs them against the console dataset only.
@@ -44,7 +44,7 @@ One `@blog/studio` schema serves many Sanity projects: the platform's own consol
   - It has a declared schema type so validation and typegen see it, but editors can't touch it: document actions are disabled, and it is left out of the desk and the new-document menu.
   - Each dataset keeps its own ledger, so development and production track separately, and so does every tenant.
   - A freshly provisioned tenant's ledger is written by the seed step ([Site templates](site-templates.md)), every migration marked applied.
-- **Migration id list.** `STUDIO_MIGRATION_IDS` in `@blog/config` is generated from the folders in `packages/studio/migrations/`, in run order, by `pnpm gen:migration-ids`. `apps/worker` reads it, since it cannot import `@blog/studio`.
+- **Migration id list.** `STUDIO_MIGRATION_IDS` in `@shinefold/config` is generated from the folders in `packages/studio/migrations/`, in run order, by `pnpm gen:migration-ids`. `apps/worker` reads it, since it cannot import `@shinefold/studio`.
 - **Tenant selection.** `listActiveTenants` returns tenants whose `status` is writable (ACTIVE, TRIAL or PAST_DUE) with a null `deprovisionedAt`. A single-tenant run uses `getTenantById`.
 - **Credentials.** `getTenantSanityWriteCredentials` decrypts the tenant's own `sanityWriteTokenEncrypted` for each run. A tenant with no write token, or one whose status is not writable (ACTIVE, TRIAL or PAST_DUE), is counted as skipped.
 - **Failure record.** `tenants.content_migration_failed_at` holds when the tenant's last content migration failed. A failed deploy, export or ledger read sets it with `recordTenantContentMigrationFailure`. The tenant's next successful deploy or backfill, in a full or single-tenant run, clears it with `clearTenantContentMigrationFailure`. A skipped tenant, or one outside the run, keeps its value. If writing the record fails, the run still counts the original failure and exits 1.
@@ -72,12 +72,12 @@ One `@blog/studio` schema serves many Sanity projects: the platform's own consol
 - **A failing migration deploy for one tenant never stops the sweep, but a failure to read or decrypt a tenant's credentials does.** Tenants run one after another; each deploy is wrapped in its own error handling, while the credentials read runs before it and aborts the run. Otherwise the job exits 1 only when a deploy errors, or when a requested `tenantId` is not found.
 - **Concurrency.** Runs are serialised per environment and tenant scope, without cancelling an earlier run, and time out after 45 minutes.
 - **A production run exports each tenant first.** With `TENANT_EXPORT_DIR` set, which the workflow does for production only, each tenant's dataset is exported just before its migration, and a failed export counts as that tenant's error without migrating it. The exports upload as one artifact, kept 30 days. The daily tenant backups (#5095) replace this.
-- **Code limits on migrations.** A migration never imports a Studio schema module, bare `sanity` or React; `sanity/migrate` is fine. A shared migration helper depends only on `@blog/config`, `@blog/utils`, `sanity/migrate` and Node built-ins. One bad import stops every migration from loading at once.
+- **Code limits on migrations.** A migration never imports a Studio schema module, bare `sanity` or React; `sanity/migrate` is fine. A shared migration helper depends only on `@shinefold/config`, `@shinefold/utils`, `sanity/migrate` and Node built-ins. One bad import stops every migration from loading at once.
 - **A separate read-only check.** `validate-tenant-documents` runs the same per-tenant fan-out, read-only, recording drift as findings ([tenant provisioning](./tenant-provisioning.md), [audit and findings](./audit-and-findings.md)).
 
 ## Dependencies
 
-- **Layers:** `@blog/studio` owns the schema, the migrations and `migrate.mjs`. `@blog/db` owns the fan-out script, the tenant registry and the encrypted tokens; this is its scoped `sanitizeLogMessage` exception.
+- **Layers:** `@shinefold/studio` owns the schema, the migrations and `migrate.mjs`. `@shinefold/db` owns the fan-out script, the tenant registry and the encrypted tokens; this is its scoped `sanitizeLogMessage` exception.
 - **Features:** [multi-tenancy](./multi-tenancy.md), [tenant provisioning](./tenant-provisioning.md) (which seeds the starter content and mints the write token), [studio authoring](./studio-authoring.md).
 
 ## Entry points

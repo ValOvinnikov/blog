@@ -2,7 +2,7 @@ import {
   BRAND_VARIANT,
   FULL_BRAND_VARIANT_LIST,
   type TBrandVariant,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import { defineField, type StringDefinition } from 'sanity';
 
 const brandVariantOptions = [

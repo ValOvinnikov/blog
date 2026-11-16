@@ -1,4 +1,3 @@
-import { RELEASE_CHANGE } from '@blog/config';
 import {
   CONTRAST_STATUS,
   RELEASE_RUN_STATUS,
@@ -11,6 +10,7 @@ import {
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
+import { RELEASE_CHANGE } from '@shinefold/config';
 
 const RELEASE_AT = '2026-04-02T10:00:00.000Z';
 

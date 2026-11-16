@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import {
   CUSTOM_DOMAIN_FIELD_ERROR,
   CUSTOM_DOMAIN_REFUSAL,
@@ -11,6 +10,7 @@ import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ConnectCustomDomainForm } from './connect-custom-domain-form';

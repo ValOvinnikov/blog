@@ -4,7 +4,7 @@ import {
   type TCapability,
   type TMaybeUndefined,
   type TPresetId,
-} from '@blog/config';
+} from '@shinefold/config';
 
 type TSettingsFeaturesRow = {
   readerAccountsEnabled: boolean;

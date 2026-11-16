@@ -1,8 +1,8 @@
-import { SANITY_ROBOT_ROLE } from '@blog/config';
-import { setTenantSanityToken } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { createSanityRobotToken } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { buildSanityTokenLabels } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
+import { SANITY_ROBOT_ROLE } from '@shinefold/config';
+import { setTenantSanityToken } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { createSanityRobotToken } from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
+import { buildSanityTokenLabels } from '@shinefold/db/utils/sanity-management-client/sanity-token-labels';
 import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 
 export type TPersistSanityTokenDeps = {

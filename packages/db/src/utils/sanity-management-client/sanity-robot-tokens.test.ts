@@ -1,23 +1,23 @@
+import { faker } from '@faker-js/faker';
 import {
   HTTP_METHOD,
   HTTP_STATUS,
   SANITY_RESOURCE_TYPE,
   SANITY_ROBOT_ROLE,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   emptyResponse,
   firstFetchCall,
   jsonResponse,
   useFetchFake,
-} from '@blog/db/testing/sanity-management-client/fetch-fake';
+} from '@shinefold/db/testing/sanity-management-client/fetch-fake';
 import {
   MOCK_SANITY_EXPECTED_URL,
   MOCK_SANITY_MINTED_TOKEN,
   MOCK_SANITY_PROJECT_ID,
   MOCK_SANITY_ROBOT_ID,
   mockSanityProjectInput,
-} from '@blog/db/testing/sanity-management-client/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/sanity-management-client/fixtures';
 
 import {
   createSanityRobotToken,

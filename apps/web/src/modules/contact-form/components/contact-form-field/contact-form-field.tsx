@@ -1,4 +1,4 @@
-import type { IWithClassName, TMaybeUndefined } from '@blog/config';
+import type { IWithClassName, TMaybeUndefined } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 import { contactFormFieldVariants } from './contact-form-field-variants';

@@ -1,13 +1,16 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { renderedContrastRatio, type TOklchColor } from '@blog/utils/color';
-import { isUndefined } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import {
+  renderedContrastRatio,
+  type TOklchColor,
+} from '@shinefold/utils/color';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 import type {
   TCardStyle,
   TColorScheme,
   THeaderControlStyle,
   TNavLinkStyle,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import { CARD_STYLE_DECLARATIONS } from './card-style-declarations';
 import type { TThemeToken } from './contrast-pairs';

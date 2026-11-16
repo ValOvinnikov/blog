@@ -1,4 +1,4 @@
-import type { TVoicePortableText } from '@blog/config';
+import type { TVoicePortableText } from '@shinefold/config';
 
 const PLACEHOLDER = /\{(\w+)\}/g;
 

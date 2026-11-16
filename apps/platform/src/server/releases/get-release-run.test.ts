@@ -1,4 +1,3 @@
-import { HTTP_STATUS, type TMaybeNull } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   GITHUB_FAILURE,
@@ -15,6 +14,7 @@ import {
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 import { mockReleaseRun } from '@platform/testing/releases/fixtures';
+import { HTTP_STATUS, type TMaybeNull } from '@shinefold/config';
 
 import { getReleaseRun } from './get-release-run';
 

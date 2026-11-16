@@ -1,13 +1,13 @@
 import { join } from 'node:path';
 
-import { TENANT_STATUS } from '@blog/db/constants';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { mockTenantSanityCredentials } from '@blog/db/testing/tenant-sanity-credentials/fixtures';
+import { faker } from '@faker-js/faker';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { mockTenantSanityCredentials } from '@shinefold/db/testing/tenant-sanity-credentials/fixtures';
 import {
   MOCK_MISSING_TENANT_ID,
   mockTenant,
-} from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/tenants/fixtures';
 
 import type { TMigrateSummary } from './lib/migrate-tenant';
 import {
@@ -36,7 +36,7 @@ const {
   exportTenantDatasetMock: vi.fn(),
 }));
 
-vi.mock('@blog/db/queries/tenants', () => ({
+vi.mock('@shinefold/db/queries/tenants', () => ({
   listActiveTenants: listActiveTenantsMock,
   getTenantById: getTenantByIdMock,
   getTenantSanityWriteCredentials: getTenantSanityWriteCredentialsMock,

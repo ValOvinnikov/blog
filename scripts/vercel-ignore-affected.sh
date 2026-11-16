@@ -18,7 +18,7 @@
 # commit touches, so affected mode rebuilt it on ~41% of all pushes while the
 # stories themselves had not moved. Naming the real inputs cuts that to the
 # commits that can actually change the output. The trade is a Storybook that
-# lags a component edit until a story, @blog/ui, or the Tailwind preset moves —
+# lags a component edit until a story, @shinefold/ui, or the Tailwind preset moves —
 # acceptable for a browsable reference that is run locally during development.
 #
 # Both modes fall back to a real git-computed base when Vercel doesn't supply

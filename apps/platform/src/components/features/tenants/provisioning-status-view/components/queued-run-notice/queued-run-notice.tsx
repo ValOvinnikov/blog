@@ -1,6 +1,6 @@
-import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Text } from '@platform/components/shared/text';
+import { ALERT_TYPE, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 

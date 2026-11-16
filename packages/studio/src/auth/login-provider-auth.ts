@@ -1,7 +1,7 @@
 import {
   SANITY_LOGIN_PROVIDER,
   type TSanityLoginProvider,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import type { AuthConfig, AuthProvider } from 'sanity';
 
 const SANITY_PROVIDER_NAME: Record<TSanityLoginProvider, string> = {

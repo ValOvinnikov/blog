@@ -1,8 +1,8 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import type { TOwnerStudioAccess } from '@platform/constants/owner-studio-access';
 import { useShellStudioAccess } from '@platform/context/shell-studio-access-provider';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 

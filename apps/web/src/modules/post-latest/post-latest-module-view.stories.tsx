@@ -3,7 +3,7 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
   GRID_COLUMNS,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';

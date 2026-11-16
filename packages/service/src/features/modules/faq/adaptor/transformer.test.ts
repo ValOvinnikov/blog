@@ -1,13 +1,13 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
-import { mockRawFaqModule } from '@blog/service/testing/modules/faq/fixtures';
+import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@shinefold/config';
+import { mockRawFaqModule } from '@shinefold/service/testing/modules/faq/fixtures';
 import {
   mockCtaButtonView,
   mockRawContentBlock,
   mockRawCtaButton,
   mockRawFaqQuestionItem,
-} from '@blog/service/testing/modules/fixtures';
-import { MOCK_AUTHORED_CARD_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/modules/fixtures';
+import { MOCK_AUTHORED_CARD_APPEARANCE } from '@shinefold/service/testing/shared/module-appearance';
 
 import { toFaqModule } from './transformer';
 

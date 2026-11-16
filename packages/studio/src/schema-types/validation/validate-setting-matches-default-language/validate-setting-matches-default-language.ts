@@ -1,5 +1,5 @@
-import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
-import { fetchDefaultLanguagePageField } from '@blog/studio/schema-types/validation/default-language-page-field/default-language-page-field';
+import { LOCALE_LABEL } from '@shinefold/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { fetchDefaultLanguagePageField } from '@shinefold/studio/schema-types/validation/default-language-page-field/default-language-page-field';
 import type { ValidationContext } from 'sanity';
 
 type TSetting = {

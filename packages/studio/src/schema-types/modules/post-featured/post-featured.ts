@@ -1,22 +1,22 @@
-import { POST_SOURCE, type TPostSource } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { POST_SOURCE, type TPostSource } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
+import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
 import {
   appearanceFieldGroups,
   appearanceFields,
   appearanceFieldsets,
-} from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
-import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { publishedPostFilter } from '@blog/studio/schema-types/filters/published-post';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
-import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
-import { hasLength, toTitleCase } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { displayModeField } from '@shinefold/studio/schema-types/fields/display-mode-field/display-mode-field';
+import { showImagesField } from '@shinefold/studio/schema-types/fields/show-images-field/show-images-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { publishedPostFilter } from '@shinefold/studio/schema-types/filters/published-post';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { wideLayoutField } from '@shinefold/studio/schema-types/objects/wide-layout/wide-layout-field';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
+import { validateNewestFeaturedHasCandidate } from '@shinefold/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
+import { hasLength, toTitleCase } from '@shinefold/utils/primitives';
 import { Pin } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 

@@ -1,14 +1,14 @@
-import { createLokiSink, registerLogSink } from '@blog/insight';
 import { faker } from '@faker-js/faker';
 import { MOCK_LOKI_ENV } from '@platform/testing/env/fixtures';
 import { env } from '@platform/utils/env/env';
+import { createLokiSink, registerLogSink } from '@shinefold/insight';
 import { waitUntil } from '@vercel/functions';
 
 import { registerLokiSink } from './register-loki-sink';
 
 faker.seed(6102);
 
-vi.mock('@blog/insight', () => ({
+vi.mock('@shinefold/insight', () => ({
   createLokiSink: vi.fn(),
   registerLogSink: vi.fn(),
 }));

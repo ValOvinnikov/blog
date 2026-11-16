@@ -1,4 +1,4 @@
-import { SHINEFOLD_LOGO_COLOR } from '@blog/utils/shinefold-logo';
+import { SHINEFOLD_LOGO_COLOR } from '@shinefold/utils/shinefold-logo';
 
 import { renderMarkPng } from './render-mark-png';
 

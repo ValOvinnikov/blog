@@ -7,9 +7,9 @@ import dbConfig from './db.js';
 
 const linter = new Linter();
 
-test('db.js bans @blog/auth imports', () => {
+test('db.js bans @shinefold/auth imports', () => {
   const messages = linter.verify(
-    "export { auth } from '@blog/auth';\n",
+    "export { auth } from '@shinefold/auth';\n",
     dbConfig,
     {
       filename: 'src/index.ts',
@@ -18,24 +18,30 @@ test('db.js bans @blog/auth imports', () => {
 
   assert.equal(messages.length, 1);
   assert.equal(messages[0].ruleId, 'no-restricted-imports');
-  assert.match(messages[0].message, /@blog\/db must not import @blog\/auth/);
+  assert.match(
+    messages[0].message,
+    /@shinefold\/db must not import @shinefold\/auth/,
+  );
 });
 
-test('db.js still bans @blog/service imports (existing sibling ban unaffected)', () => {
+test('db.js still bans @shinefold/service imports (existing sibling ban unaffected)', () => {
   const messages = linter.verify(
-    "export { getPostBySlug } from '@blog/service';\n",
+    "export { getPostBySlug } from '@shinefold/service';\n",
     dbConfig,
     { filename: 'src/index.ts' },
   );
 
   assert.equal(messages.length, 1);
   assert.equal(messages[0].ruleId, 'no-restricted-imports');
-  assert.match(messages[0].message, /@blog\/db must not import @blog\/service/);
+  assert.match(
+    messages[0].message,
+    /@shinefold\/db must not import @shinefold\/service/,
+  );
 });
 
 test('db.js does not restrict unrelated package imports', () => {
   const messages = linter.verify(
-    "export { TValueOf } from '@blog/config';\n",
+    "export { TValueOf } from '@shinefold/config';\n",
     dbConfig,
     {
       filename: 'src/index.ts',

@@ -1,5 +1,3 @@
-import { ALERT_TYPE, type TSanityLoginProvider } from '@blog/config';
-import { queries } from '@blog/db';
 import { PlatformStudioMount } from '@platform/components/features/studio/platform-studio-mount';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
@@ -7,6 +5,8 @@ import { PageHeader } from '@platform/components/shared/page-header';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import { ALERT_TYPE, type TSanityLoginProvider } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { getTranslations } from 'next-intl/server';
 
 import { studioMountViewVariants } from './studio-mount-view-variants';

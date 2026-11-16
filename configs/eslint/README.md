@@ -1,4 +1,4 @@
-# @blog/eslint-config
+# @shinefold/eslint-config
 
 > Shared ESLint flat-config presets, one subpath per workspace layer.
 
@@ -8,19 +8,19 @@
   rules, `import-x`, Prettier compatibility, and `check-file`'s
   kebab-case filename enforcement.
 - `no-upstream-imports.js` — the `no-restricted-imports` rule that enforces
-  the dependency graph (e.g. blocking `@blog/config`/`@blog/utils` from
-  importing `@blog/service`/`@blog/ui`). It's generic and unscoped by file
+  the dependency graph (e.g. blocking `@shinefold/config`/`@shinefold/utils` from
+  importing `@shinefold/service`/`@shinefold/ui`). It's generic and unscoped by file
   path, so it only covers bans that apply everywhere it's spread in. The
-  `@blog/db` → `@blog/auth` layering (db must never import auth; auth
+  `@shinefold/db` → `@shinefold/auth` layering (db must never import auth; auth
   legitimately imports db, so it's one-directional, not mutual) is
   package-specific and lives directly in `db.js` instead — with
   `db.test.js` covering the ban and `auth.test.js` covering that the
   reverse import stays unrestricted.
 - `no-prop-spread.js` — bans `{...rest}`/`{...props}` spread onto a JSX
-  element in `@blog/ui` component source, with an explicit file allowlist
+  element in `@shinefold/ui` component source, with an explicit file allowlist
   for polymorphic components that forward props to a caller-chosen `as`
   element. `.test.tsx`/`.stories.tsx` files are out of scope — they spread
-  fixtures onto local mock components, not `@blog/ui`'s own surface.
+  fixtures onto local mock components, not `@shinefold/ui`'s own surface.
   Registered only in `ui.js`. Co-located `no-prop-spread.test.js`
   (`RuleTester`, run via `node --test`).
 - `boolean-prop-prefix.js` — requires boolean-typed members of `T*Props`/
@@ -37,8 +37,8 @@
 - `no-class-assertions.js` — bans asserting a DOM class in a test:
   `toHaveClass`/`.not.toHaveClass`, `toHaveAttribute('class', …)`,
   `getAttribute('class')`, and reads of `.className`/`.classList`. Registered
-  in `base.js` under its own `blog-test` plugin namespace (not `blog` —
-  `ui.js`/`web.js`/`platform.js` already register `blog` over the broader
+  in `base.js` under its own `shinefold-test` plugin namespace (not `shinefold` —
+  `ui.js`/`web.js`/`platform.js` already register `shinefold` over the broader
   `**/*.{ts,tsx}`, and ESLint's flat-config plugin merge throws
   `Cannot redefine plugin` when two matching config objects register the same
   plugin key with a different rules object), scoped to `**/*.test.{ts,tsx}`
@@ -66,8 +66,8 @@
   a number equal to one only as a `status:` value, a comparison operand, a
   `case` test or the expected value of `expect(x.status).toBe(…)`. The
   message names the const and where to import it from. Only consts the file's
-  workspace may import count: `@blog/config`'s outside `utils`/`insight`/
-  `email`, `@blog/db`'s in `db`, `auth` and the three apps, and an app's own
+  workspace may import count: `@shinefold/config`'s outside `utils`/`insight`/
+  `email`, `@shinefold/db`'s in `db`, `auth` and the three apps, and an app's own
   in that app. Exempt: import and `vi.mock` paths, directives, property keys,
   HTML attribute names passed to `getAttribute`/`toHaveAttribute` and their
   siblings, the method name passed to `spyOn`,
@@ -88,7 +88,7 @@
   Co-located `no-duplicate-string.test.js`.
 
 - `prefer-utils-primitive.js` — flags a raw check that
-  `@blog/utils/primitives` already wraps: `x === undefined` / `!==`
+  `@shinefold/utils/primitives` already wraps: `x === undefined` / `!==`
   (`isUndefined`), `x === null` / `!==` (`isNull`), `typeof x === 'string'` /
   `!==` (`isString`), and `x.length === 0` / `!== 0` / `> 0` (`hasLength`,
   which takes any value with a length, because the rule has no type
@@ -115,7 +115,7 @@
   one earns its place is the reviewer's call. Co-located
   `no-failing-comment.test.js`.
 
-  All four are registered in `base.js` under the `blog-touched` namespace, at
+  All four are registered in `base.js` under the `shinefold-touched` namespace, at
   threshold 2 for `no-duplicate-string`, and only when `BLOG_LINT_TOUCHED=1` —
   set by `.claude/hooks/post-edit-lint.sh`, `.husky/pre-commit` (lint-staged) and
   `pnpm check:touched-lint`. Repo-wide `pnpm lint` never sets it, so a file
@@ -130,7 +130,7 @@
   `within(…).*By*`, an awaited `findBy*` included) passed directly to
   `expect(…)`, `user.<method>(…)`, `userEvent.<method>(…)`, `fireEvent(…)` or
   `fireEvent.<method>(…)`; a query bound to a const first passes. Registered
-  in the `blog-test` plugin in `base.js` but enabled only in the
+  in the `shinefold-test` plugin in `base.js` but enabled only in the
   `BLOG_LINT_TOUCHED=1` test-file block, so untouched files keep their
   backlog. Co-located `no-nested-query.test.js`. Per `testing-practices` →
   "Name the element, then use the name". Known gap: a query nested deeper
@@ -140,7 +140,7 @@
   statement opening two or more `it`/`test` cases directly inside one
   `describe` or at file level, (b) `userEvent.setup()` inside a case, and
   (c) three or more `render`/`renderElement`/`renderWithIntl` calls in one
-  file with identical arguments. Registered in the `blog-test` plugin and
+  file with identical arguments. Registered in the `shinefold-test` plugin and
   enabled only in the `BLOG_LINT_TOUCHED=1` test-file block. Co-located
   `prefer-before-each.test.js`. Per `testing-practices` → "Repeated
   arrangement goes in beforeEach". It does not catch: a longer run of
@@ -151,7 +151,7 @@
   `userEvent.setup()` in a helper called from a case.
 
 - `eslint-plugin-testing-library` — registered in `base.js`'s
-  `**/*.test.{ts,tsx}` override alongside `blog-test/no-class-assertions`,
+  `**/*.test.{ts,tsx}` override alongside `shinefold-test/no-class-assertions`,
   with exactly three rules as `error` (no `recommended` preset):
   `testing-library/no-container` bans `container.querySelector`/
   `container.querySelectorAll` in favor of a `screen` query;
@@ -183,7 +183,7 @@
   `no-node-access` also reports only in a file that imports an official
   `@testing-library/*` module or the `testing-library/utils-module`, so that
   setting is `testing/custom-render` — the plugin matches it as an import
-  suffix, which covers `@blog/ui/`, `@web/` and `@platform/testing/custom-render`
+  suffix, which covers `@shinefold/ui/`, `@web/` and `@platform/testing/custom-render`
   at once. Without it the rule is silent in every test importing `screen`
   from a wrapper. The setting also turns off aggressive module detection for
   the other two rules, which is harmless here because every test imports

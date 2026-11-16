@@ -1,10 +1,10 @@
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockTenant } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getFirstPostListPageSizes } from './page-sizes';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6017);
 

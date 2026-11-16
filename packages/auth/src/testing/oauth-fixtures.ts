@@ -1,5 +1,5 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 
 export const MOCK_GITHUB_ID = faker.string.alphanumeric(20);
 export const MOCK_GITHUB_SECRET = faker.string.alphanumeric(40);

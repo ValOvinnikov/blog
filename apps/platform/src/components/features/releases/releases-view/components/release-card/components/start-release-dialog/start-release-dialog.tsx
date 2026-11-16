@@ -1,15 +1,5 @@
 'use client';
 
-import {
-  ALERT_TYPE,
-  isOutcomeInvalid,
-  isOutcomeSuccess,
-  SIZE,
-  type TFieldErrors,
-  type TMaybeUndefined,
-} from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
-import { hasArrayGotItems } from '@blog/utils/primitives';
 import { Alert } from '@platform/components/shared/alert';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { FormField } from '@platform/components/shared/form-field';
@@ -22,6 +12,16 @@ import type { TReleaseFieldError } from '@platform/constants/release';
 import { startReleaseAction } from '@platform/server/releases/start-release-action';
 import type { TReleaseMigrationSummary } from '@platform/server/releases/summarise-release-migrations';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import {
+  ALERT_TYPE,
+  isOutcomeInvalid,
+  isOutcomeSuccess,
+  SIZE,
+  type TFieldErrors,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 

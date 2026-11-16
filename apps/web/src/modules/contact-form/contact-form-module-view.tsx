@@ -1,4 +1,4 @@
-import type { TContactFormModule } from '@blog/service';
+import type { TContactFormModule } from '@shinefold/service';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { PortableText } from '@web/components/shared/portable-text';
 import { Section } from '@web/components/shared/section';

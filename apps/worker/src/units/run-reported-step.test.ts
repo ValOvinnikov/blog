@@ -1,11 +1,11 @@
-import { ERROR_CODE } from '@blog/config/constants';
+import { ERROR_CODE } from '@shinefold/config/constants';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
-import { updateProvisioningStep } from '@blog/db/queries/tenants';
-import { errorResult } from '@blog/utils/result';
+} from '@shinefold/db/constants';
+import { updateProvisioningStep } from '@shinefold/db/queries/tenants';
+import { errorResult } from '@shinefold/utils/result';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
@@ -18,7 +18,7 @@ const STEP = TENANT_PROVISIONING_STEP.CREATE_WEBHOOK;
 const MOCK_SANITY_TIMED_OUT = 'sanity timed out';
 const MOCK_STILL_DOWN = 'still down';
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('workflow');
 
 function reportedStatuses(): string[] {

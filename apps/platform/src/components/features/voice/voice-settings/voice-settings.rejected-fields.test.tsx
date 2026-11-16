@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
 import { screen, within } from '@platform/testing/custom-render';
@@ -24,6 +22,8 @@ import {
   setupVoiceSettings,
   voiceCard,
 } from '@platform/testing/voice/voice-settings-setup';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { VoiceSettings } from './voice-settings';

@@ -103,7 +103,7 @@ jobs:
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
-          install-filter: '@blog/db...'
+          install-filter: '@shinefold/db...'
       - name: Run deprovisioning steps
         # `inputs.*` are attacker-influenceable (any repo collaborator who
         # can trigger workflow_dispatch controls them) — never interpolate a
@@ -118,4 +118,4 @@ jobs:
           TENANT_ID: ${{ inputs.tenantId }}
           CONFIRM: ${{ inputs.confirm }}
           DRY_RUN: ${{ inputs.dryRun }}
-        run: pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id="$TENANT_ID" --confirm="$CONFIRM" --dry-run="$DRY_RUN"
+        run: pnpm --filter @shinefold/db db:deprovision-tenant -- --tenant-id="$TENANT_ID" --confirm="$CONFIRM" --dry-run="$DRY_RUN"

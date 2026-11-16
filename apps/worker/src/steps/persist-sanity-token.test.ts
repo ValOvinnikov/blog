@@ -1,9 +1,9 @@
-import { SANITY_ROBOT_ROLE } from '@blog/config';
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
-import { setTenantSanityToken } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { buildSanityTokenLabels } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { faker } from '@faker-js/faker';
+import { SANITY_ROBOT_ROLE } from '@shinefold/config';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
+import { setTenantSanityToken } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { buildSanityTokenLabels } from '@shinefold/db/utils/sanity-management-client/sanity-token-labels';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_SANITY_PROJECT_ID,
@@ -24,7 +24,7 @@ faker.seed(7006);
 const MOCK_PERSISTED_TOKEN = faker.string.alphanumeric(32);
 const MOCK_ROBOT_ID = faker.string.uuid();
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {

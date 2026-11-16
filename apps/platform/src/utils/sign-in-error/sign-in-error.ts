@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { SIGN_IN_ERROR, type TSignInError } from '@platform/constants/sign-in';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 export const ACCOUNT_NOT_LINKED_AUTH_ERROR = 'OAuthAccountNotLinked';
 

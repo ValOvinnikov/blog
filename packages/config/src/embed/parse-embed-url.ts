@@ -1,11 +1,11 @@
-import type { TMaybeUndefined, TParsedEmbed } from '@blog/config/types';
-import { hasLength } from '@blog/utils/primitives';
+import type { TMaybeUndefined, TParsedEmbed } from '@shinefold/config/types';
+import { hasLength } from '@shinefold/utils/primitives';
 
 import {
   EMBED_ORIGIN,
   EMBED_PROVIDER,
   MEDIA_RATIO,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import type { TEmbedParser } from './embed-parser';
 import { parseYoutubeEmbed } from './youtube-embed';

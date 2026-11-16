@@ -1,29 +1,29 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockRawFaqModule } from '@blog/service/testing/modules/faq/fixtures';
+import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { mockRawFaqModule } from '@shinefold/service/testing/modules/faq/fixtures';
 import {
   MOCK_FAQ_MODULE_ID,
   MOCK_FAQ_QUESTION_ID,
   MOCK_SECOND_FAQ_QUESTION_ID,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_BLOCK_FAQ_CACHE_TAG,
   MOCK_LINK_TARGET_CACHE_TAGS,
   MOCK_MODULES_FAQ_CACHE_TAG,
   mockCacheTag,
-} from '@blog/service/testing/sanity/query/cache-tags';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockRawHeadingBlock,
   mockValidationError,
-} from '@blog/service/testing/shared/fixtures';
-import { MOCK_TENANT } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getFaqModule } from './loader';
 import { faqModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6);
 

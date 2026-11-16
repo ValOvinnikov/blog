@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { getTenantOwnerMembership } from '@blog/db/queries/memberships/get-tenant-owner-membership';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { getTenantOwnerMembership } from '@shinefold/db/queries/memberships/get-tenant-owner-membership';
 
 export async function getTenantOwnerEmail(
   tenantId: string,

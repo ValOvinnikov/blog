@@ -1,4 +1,8 @@
-import { HTTP_METHOD, HTTP_STATUS, type TMaybeUndefined } from '@blog/config';
+import {
+  HTTP_METHOD,
+  HTTP_STATUS,
+  type TMaybeUndefined,
+} from '@shinefold/config';
 
 const QUERY_START = '?';
 

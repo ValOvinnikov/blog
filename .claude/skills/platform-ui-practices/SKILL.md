@@ -286,7 +286,7 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
 
 - Colours come only from the `platform-*` tokens in `styles/platform-theme.css`: no
   hex, no raw palette colour, no site token outside `site-preview/`.
-  The Shinefold logo's colours (`@blog/utils/shinefold-logo`) and the preset
+  The Shinefold logo's colours (`@shinefold/utils/shinefold-logo`) and the preset
   swatches are artwork and exempt.
 - The palette is near-black and yellow. In Light, `brand`/`brand-ink` are
   near-black and yellow highlights (`brand-weak`, `brand-line`,
@@ -502,7 +502,7 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
   awaits it, as low as the slow part goes, so the rest of the page — and
   `PageHeader` — renders first.
   - Here a `*PageContent` component, or a Suspense-wrapped async section under
-    `src/components/features/`, may load its own data through `@blog/db` or
+    `src/components/features/`, may load its own data through `@shinefold/db` or
     `src/server/`. Never a `'use client'` component or a `shared/` primitive.
   - To stream into a client component, pass it the server-rendered element as a
     `ReactNode` slot.
@@ -525,7 +525,7 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
   - A gate may run first. Work keyed only by route params starts alongside the
     gate, with bad input guarded so the gate's redirect still wins.
   - When one lookup only feeds another query (memberships, then tenants),
-    replace both with one join in `@blog/db`.
+    replace both with one join in `@shinefold/db`.
 - **One read per request.** Anything that more than one layout, page or
   component reads during a request goes through a `cache()`-wrapped function:
   `getSession`, `requireAdmin`, `requireTenantById`, `resolveDashboardTenant`,
@@ -540,7 +540,7 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 - **Select only what renders.** A list query never pulls a jsonb blob that is
   shown only on demand. When a consumer uses only part of a query, narrow or
   replace that query; don't add a near-duplicate beside it.
-- **Send client components only the fields they render.** Map a `@blog/db` row
+- **Send client components only the fields they render.** Map a `@shinefold/db` row
   to a client-safe shape on the server before it reaches a `'use client'`
   component. A `Pick<>` type removes nothing at runtime. Never send token
   ciphertext or any other secret. Never pass a plain function, only a Server

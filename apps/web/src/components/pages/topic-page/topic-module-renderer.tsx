@@ -3,8 +3,8 @@ import type {
   TMaybeUndefined,
   TPageTopicType,
   TContentAlignmentOf,
-} from '@blog/config';
-import type { TModule } from '@blog/service';
+} from '@shinefold/config';
+import type { TModule } from '@shinefold/service';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';

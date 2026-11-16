@@ -1,24 +1,24 @@
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
   NEWSLETTER_SKIP_REASON,
   type TNewsletterLimitNoticeKind,
   type TNewsletterSkipReason,
-} from '@blog/db/constants';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
+} from '@shinefold/db/constants';
+import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
 import {
   markNewsletterLimitNoticeSent,
   releaseNewsletterLimitNotice,
-} from '@blog/db/queries/newsletter-post-sends';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/queries/newsletter-post-sends';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   buildOwnerNewsletterLimitNearEmail,
   buildOwnerNewsletterPausedEmail,
   PLATFORM_EMAIL_BRAND_NAME,
   sendEmail,
-} from '@blog/email';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/email';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import {
   NEWSLETTER_LIMIT_NEAR_RATIO,
   NEWSLETTER_SEND_LOG,

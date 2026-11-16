@@ -1,8 +1,8 @@
 'use client';
 
-import type { IWithChildren } from '@blog/config/react';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import type { TProjectDomain } from '@platform/server/provisioning/project-domain';
+import type { IWithChildren } from '@shinefold/config/react';
 import { use } from 'react';
 
 export type TVerifiedDomainGateProps = IWithChildren & {

@@ -1,8 +1,8 @@
-import type { TMaybeNull } from '@blog/config';
+import type { TMaybeNull } from '@shinefold/config';
 import {
   signNewsletterUnsubscribeToken,
   verifyNewsletterUnsubscribeToken,
-} from '@blog/utils/newsletter-unsubscribe-token';
+} from '@shinefold/utils/newsletter-unsubscribe-token';
 import { env } from '@web/utils/env/env';
 
 export const mintNewsletterUnsubscribeToken = (

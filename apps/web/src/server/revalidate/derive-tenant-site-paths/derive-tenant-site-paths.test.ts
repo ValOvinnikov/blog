@@ -1,6 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { FETCH_FAILED_REASON, REVALIDATE_LOG } from '@web/constants/revalidate';
 import { resolveTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import {

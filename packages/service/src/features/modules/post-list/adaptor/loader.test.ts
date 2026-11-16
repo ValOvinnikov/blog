@@ -1,12 +1,13 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { MOCK_TAG_ID } from '@blog/service/testing/entities/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { MOCK_TAG_ID } from '@shinefold/service/testing/entities/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_POST_LIST_PAGE_SIZE,
   MOCK_RECENT_POSTS_HEADING,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawPostListModule } from '@blog/service/testing/modules/post-list/fixtures';
-import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawPostListModule } from '@shinefold/service/testing/modules/post-list/fixtures';
+import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_AUTHOR_CACHE_TAG,
   MOCK_LINK_TARGET_CACHE_TAGS,
@@ -15,20 +16,19 @@ import {
   MOCK_TAG_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
   mockCacheTag,
-} from '@blog/service/testing/sanity/query/cache-tags';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockRawHeadingBlock,
   mockValidationError,
-} from '@blog/service/testing/shared/fixtures';
-import { MOCK_TENANT } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getPostList } from './loader';
 import { postListModulePaginatedPostsQuery } from './posts.query';
 import { postListModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6014);
 

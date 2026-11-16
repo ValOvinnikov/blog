@@ -1,6 +1,10 @@
-import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR, routes } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import {
+  LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
+  routes,
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
@@ -26,11 +30,11 @@ const { authMock, listBookmarksMock, getPostsByIdsMock } = vi.hoisted(() => ({
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { bookmarks: { listBookmarks: listBookmarksMock } },
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     entities: {
       posts: { v1: { getPostsByIds: getPostsByIdsMock } },

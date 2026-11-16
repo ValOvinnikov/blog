@@ -1,12 +1,12 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import type { TValueOf } from '@blog/config/utils';
-import { queries, type TSuspensionCategory } from '@blog/db';
-import type { TTenantSuspension } from '@blog/db/schema/tenant-suspensions';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TValueOf } from '@shinefold/config/utils';
+import { queries, type TSuspensionCategory } from '@shinefold/db';
+import type { TTenantSuspension } from '@shinefold/db/schema/tenant-suspensions';
 
 export type TSuspensionCase = {
   category: TSuspensionCategory;

@@ -1,5 +1,5 @@
-import type { TEmailType } from '@blog/config/constants';
-import { queries } from '@blog/db';
+import type { TEmailType } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 import { logEmailSendCountFailure } from '@web/server/email-usage/log-email-send-count-failure/log-email-send-count-failure';
 
 export const recordEmailSendSafely = async (

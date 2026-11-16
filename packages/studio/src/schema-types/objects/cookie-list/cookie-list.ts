@@ -1,5 +1,5 @@
-import { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
-import { markerField } from '@blog/studio/schema-types/fields/marker-field/marker-field';
+import { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config/constants';
+import { markerField } from '@shinefold/studio/schema-types/fields/marker-field/marker-field';
 import { Cookie } from 'lucide-react';
 import { defineType } from 'sanity';
 

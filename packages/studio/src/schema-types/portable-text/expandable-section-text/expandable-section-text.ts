@@ -2,7 +2,7 @@ import {
   articleTextEmbeds,
   articleTextMarks,
   expandableSectionTextStyles,
-} from '@blog/studio/schema-types/portable-text/article-text/article-text-members';
+} from '@shinefold/studio/schema-types/portable-text/article-text/article-text-members';
 import { defineArrayMember, defineType } from 'sanity';
 
 export const expandableSectionTextSchema = defineType({

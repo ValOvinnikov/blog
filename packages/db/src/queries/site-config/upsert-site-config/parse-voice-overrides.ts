@@ -4,17 +4,17 @@ import {
   type TVoiceFieldErrorReason,
   type TVoiceFieldFailuresByLocale,
   type TVoiceFieldId,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   isLocaleIsoCode,
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import type {
   TVoiceOverrides,
   TVoiceOverridesByLocale,
-} from '@blog/db/schema/site-config';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/db/schema/site-config';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 
 import { validateVoiceFieldValue } from './validate-voice-field';
 

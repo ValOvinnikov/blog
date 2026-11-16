@@ -1,14 +1,14 @@
 import { defineConfig } from 'drizzle-kit';
 
 // drizzle-kit's CLI (`db:generate`/`db:migrate`/`db:studio`) runs standalone
-// via `pnpm --filter @blog/db db:*`, outside of Next.js's own env loading —
+// via `pnpm --filter @shinefold/db db:*`, outside of Next.js's own env loading —
 // so it expects DATABASE_URL_UNPOOLED to already be in the process
 // environment. Locally that means sourcing it from apps/web/.env.local (the
 // single local source of these Neon connection strings) before running a
 // script, from the repo root, e.g.:
 //
 //   set -a && source apps/web/.env.local && set +a
-//   pnpm --filter @blog/db db:generate
+//   pnpm --filter @shinefold/db db:generate
 //
 // This is a build-tool config file, not application code, so reading
 // `process.env` directly here is the same exception next.config.ts /

@@ -1,4 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import {
@@ -16,6 +15,7 @@ import {
   LEGACY_ACTIVE_TENANT_COOKIE,
 } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 

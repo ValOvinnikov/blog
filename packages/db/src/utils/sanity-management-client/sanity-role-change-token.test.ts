@@ -1,8 +1,8 @@
-import { SANITY_PROJECT_ROLE } from '@blog/config';
+import { SANITY_PROJECT_ROLE } from '@shinefold/config';
 import {
   MOCK_SANITY_MINTED_TOKEN,
   MOCK_SANITY_TOKEN,
-} from '@blog/db/testing/sanity-management-client/fixtures';
+} from '@shinefold/db/testing/sanity-management-client/fixtures';
 
 import { sanityRoleChangeToken } from './sanity-role-change-token';
 

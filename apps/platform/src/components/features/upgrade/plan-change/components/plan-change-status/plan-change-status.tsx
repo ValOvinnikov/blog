@@ -1,7 +1,7 @@
-import { ALERT_TYPE } from '@blog/config';
 import type { TPlanChangeProgress } from '@platform/components/features/upgrade/plan-change/use-plan-change';
 import { WebhookWaitStatus } from '@platform/components/features/upgrade/webhook-wait-status';
 import { Alert } from '@platform/components/shared/alert';
+import { ALERT_TYPE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

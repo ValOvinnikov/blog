@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
   NEWSLETTER_SKIP_REASON,
   type TNewsletterLimitNoticeKind,
   type TNewsletterSkipReason,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import { NEWSLETTER_LIMIT_NEAR_RATIO } from '@worker/constants/newsletter-send';
 
 export type TNewsletterLimits = {

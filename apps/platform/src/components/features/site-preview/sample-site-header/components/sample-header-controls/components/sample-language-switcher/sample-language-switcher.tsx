@@ -6,10 +6,10 @@ import {
   SIZE,
   type TLanguageSwitcherStyle,
   type TLocaleIsoCode,
-} from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
+} from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import { PopoverMenu } from '@shinefold/ui/components/molecules/popover-menu';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

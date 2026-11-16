@@ -1,9 +1,3 @@
-import {
-  SITE_MESSAGES_BY_LOCALE,
-  VOICE_FIELDS,
-  VOICE_SURFACE,
-} from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import de from '@platform/i18n/messages/de.json';
 import {
@@ -26,6 +20,12 @@ import {
 } from '@platform/testing/voice/sections';
 import { RESET } from '@platform/testing/voice/voice-settings-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import {
+  SITE_MESSAGES_BY_LOCALE,
+  VOICE_FIELDS,
+  VOICE_SURFACE,
+} from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { VoicePageContent } from './voice-page-content';
@@ -41,7 +41,7 @@ const { getSiteConfigMock, selectLiveLocalesMock } = vi.hoisted(() => ({
   selectLiveLocalesMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     siteConfig: { getSiteConfig: getSiteConfigMock },

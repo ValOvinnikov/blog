@@ -2,8 +2,8 @@ import type {
   IWithDataTestId,
   TContentAlignment,
   TMaybeUndefined,
-} from '@blog/config';
-import type { IWithChildren } from '@blog/config/react';
+} from '@shinefold/config';
+import type { IWithChildren } from '@shinefold/config/react';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import type { IModuleHeadingProps } from '@web/components/shared/module-heading/module-heading';
 import { Section } from '@web/components/shared/section';

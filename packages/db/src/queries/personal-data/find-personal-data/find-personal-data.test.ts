@@ -1,24 +1,25 @@
+import { faker } from '@faker-js/faker';
 import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   ERROR_CODE,
-} from '@blog/config/constants';
-import { DAY_MS, MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { setUnsentStudioReinvite } from '@blog/db/queries/tenants/unsent-studio-reinvite';
-import * as schema from '@blog/db/schema';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { GITHUB_PROVIDER } from '@blog/db/testing/account/fixtures';
+} from '@shinefold/config/constants';
+import { DAY_MS, MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import { setUnsentStudioReinvite } from '@shinefold/db/queries/tenants/unsent-studio-reinvite';
+import * as schema from '@shinefold/db/schema';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { GITHUB_PROVIDER } from '@shinefold/db/testing/account/fixtures';
 import {
   MOCK_BLOCK_REASON,
   MOCK_NOT_AN_ADDRESS,
-} from '@blog/db/testing/blocked-signup-identities/fixtures';
+} from '@shinefold/db/testing/blocked-signup-identities/fixtures';
 import {
   insertTestAccount,
   insertTestTenant,
   MOCK_INVITE_EMAIL,
   MOCK_SUBSCRIBER_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { testPersonalEmailIndex } from '@blog/db/testing/personal-data';
+} from '@shinefold/db/testing/fixtures';
+import { testPersonalEmailIndex } from '@shinefold/db/testing/personal-data';
 import {
   deleteTestPersonalDataRows,
   getTestReaderId,
@@ -26,18 +27,17 @@ import {
   MOCK_PERSONAL_DATA_LEAD_MESSAGE,
   MOCK_PERSONAL_DATA_LEAD_NAME,
   taggedMixedCaseAddress,
-} from '@blog/db/testing/personal-data-rows';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { unwrapOk } from '@blog/db/testing/tenants/fixtures';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/personal-data-rows';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { unwrapOk } from '@shinefold/db/testing/tenants/fixtures';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import {
   findPersonalData,
   type TPersonalDataMatches,
 } from './find-personal-data';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

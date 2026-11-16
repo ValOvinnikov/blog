@@ -1,11 +1,11 @@
-import { AUDIT_ACTION } from '@blog/config/constants';
+import { AUDIT_ACTION } from '@shinefold/config/constants';
 import {
   TENANT_PROVISIONING_STATUS,
   type TTenantProvisioningStep,
-} from '@blog/db/constants';
-import { setTenantProvisioningStatus } from '@blog/db/queries/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
-import type { TResult } from '@blog/utils/result';
+} from '@shinefold/db/constants';
+import { setTenantProvisioningStatus } from '@shinefold/db/queries/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
+import type { TResult } from '@shinefold/utils/result';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';
 import {

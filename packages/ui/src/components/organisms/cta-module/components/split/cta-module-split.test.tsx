@@ -1,8 +1,8 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
 import {
   describeCtaModuleLayout,
   mockCtaLayoutProps,
-} from '@blog/ui/testing/organisms/cta-module/layout-cases';
+} from '@shinefold/ui/testing/organisms/cta-module/layout-cases';
 
 import { CtaModuleSplit } from './cta-module-split';
 

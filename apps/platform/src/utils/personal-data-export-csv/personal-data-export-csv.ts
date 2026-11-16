@@ -1,7 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TPersonalDataReaderAccount } from '@blog/db/queries/personal-data/reader-account-personal-data';
-import { toCsv, type TCsvCell } from '@blog/utils/csv';
-import { isNull, isString } from '@blog/utils/primitives';
 import {
   DATA_REQUEST_MATCH_KIND,
   type TDataRequestMatchKind,
@@ -10,6 +6,10 @@ import type {
   TPersonalDataExport,
   TPersonalDataExportHeader,
 } from '@platform/server/data-requests/export-personal-data-action';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TPersonalDataReaderAccount } from '@shinefold/db/queries/personal-data/reader-account-personal-data';
+import { toCsv, type TCsvCell } from '@shinefold/utils/csv';
+import { isNull, isString } from '@shinefold/utils/primitives';
 
 type TExportRecord = {
   kind: TDataRequestMatchKind;

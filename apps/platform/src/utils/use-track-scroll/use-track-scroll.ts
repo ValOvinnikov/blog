@@ -1,4 +1,4 @@
-import type { TMaybeNull } from '@blog/config';
+import type { TMaybeNull } from '@shinefold/config';
 import { useEffect, useRef, useState } from 'react';
 
 type TTrackOverflow = { hasMoreStart: boolean; hasMoreEnd: boolean };

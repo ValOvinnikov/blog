@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, GRID_COLUMNS } from '@blog/config';
+import { BRAND_VARIANT, GRID_COLUMNS } from '@shinefold/config';
 import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import {
   MOCK_SECTION_LOOK,

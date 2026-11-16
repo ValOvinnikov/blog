@@ -1,4 +1,4 @@
-import { DOMAIN_PATTERN } from '@blog/config/constants';
+import { DOMAIN_PATTERN } from '@shinefold/config/constants';
 import { tenantRequestBodySchema } from '@worker/utils/signed-tenant-request/signed-tenant-request';
 import { z } from 'zod';
 

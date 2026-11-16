@@ -1,13 +1,13 @@
-import type { TEmailAction } from '@blog/email/html/email-action/email-action';
-import type { TEmailDetail } from '@blog/email/html/email-details/email-details';
-import type { TOwnerEmailInput } from '@blog/email/templates/owner/owner-email/owner-email';
+import type { TEmailAction } from '@shinefold/email/html/email-action/email-action';
+import type { TEmailDetail } from '@shinefold/email/html/email-details/email-details';
+import type { TOwnerEmailInput } from '@shinefold/email/templates/owner/owner-email/owner-email';
 import {
   MOCK_EMAIL_ACTION,
   MOCK_EMAIL_SUBJECT,
   MOCK_PLATFORM_BRAND_NAME,
   MOCK_UNSAFE_MARKUP,
-} from '@blog/email/testing/email-fixtures';
-import { createMockFaker } from '@blog/email/testing/mock-faker';
+} from '@shinefold/email/testing/email-fixtures';
+import { createMockFaker } from '@shinefold/email/testing/mock-faker';
 
 const ownerEmailFaker = createMockFaker(6876);
 

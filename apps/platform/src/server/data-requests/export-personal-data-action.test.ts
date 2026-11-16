@@ -1,9 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { okResult } from '@blog/utils';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
@@ -14,6 +8,12 @@ import {
   mockPersonalDataMatches,
 } from '@platform/testing/data-requests/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { okResult } from '@shinefold/utils';
 import { notFound } from 'next/navigation';
 
 import { exportPersonalDataAction } from './export-personal-data-action';
@@ -25,7 +25,7 @@ const { findPersonalDataMock } = vi.hoisted(() => ({
 vi.mock('@platform/server/auth/require-super-admin');
 vi.mock('@platform/server/audit/record-audit-event');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: { personalData: { findPersonalData: findPersonalDataMock } },
 }));

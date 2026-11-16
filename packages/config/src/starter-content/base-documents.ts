@@ -6,10 +6,10 @@ import type {
   Settings_site,
   Template_home,
   Template_postIndex,
-} from '@blog/config/sanity/generated/types';
-import { SITE_MESSAGES_BY_LOCALE } from '@blog/config/voice';
+} from '@shinefold/config/sanity/generated/types';
+import { SITE_MESSAGES_BY_LOCALE } from '@shinefold/config/voice';
 
-import { PRICE_PERIOD, type TLocaleIsoCode } from '@blog/config/constants';
+import { PRICE_PERIOD, type TLocaleIsoCode } from '@shinefold/config/constants';
 
 import type { TStarterCopy } from './copy/starter-copy';
 import { buildLegalPages } from './legal-pages';

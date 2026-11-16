@@ -1,10 +1,10 @@
 'use client';
 
-import { ICONS, SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
+import { ICONS, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { useSendTestEmail, type TTestEmail } from './use-send-test-email';

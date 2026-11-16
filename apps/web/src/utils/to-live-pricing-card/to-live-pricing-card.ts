@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   STRIPE_COUPON_DURATION,
   type TBillingCurrency,
-} from '@blog/db/constants';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/constants';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { PRICING_SEARCH_PARAM } from '@web/constants/pricing';
 import { formatPriceAmount } from '@web/utils/format-price-amount';
 import {

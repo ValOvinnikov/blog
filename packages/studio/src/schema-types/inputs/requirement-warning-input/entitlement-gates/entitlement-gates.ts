@@ -1,9 +1,9 @@
 import {
   getMissingModulePack,
   type TEntitlementState,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
-import { createRequirementWarningInput } from '@blog/studio/schema-types/inputs/requirement-warning-input/requirement-warning/requirement-warning-input';
-import { createRequirementWarningItem } from '@blog/studio/schema-types/inputs/requirement-warning-input/requirement-warning/requirement-warning-item';
+} from '@shinefold/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { createRequirementWarningInput } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/requirement-warning/requirement-warning-input';
+import { createRequirementWarningItem } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/requirement-warning/requirement-warning-item';
 import { definePlugin } from 'sanity';
 
 export const entitlementGates = definePlugin<TEntitlementState>(

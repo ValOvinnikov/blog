@@ -2,9 +2,12 @@ import type {
   Module_sectionPages,
   Page_landing,
   Template_landing,
-} from '@blog/config/sanity/generated/types';
+} from '@shinefold/config/sanity/generated/types';
 
-import { BRAND_VARIANT, type TLocaleIsoCode } from '@blog/config/constants';
+import {
+  BRAND_VARIANT,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 
 import type {
   TStarterDocument,

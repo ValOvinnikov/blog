@@ -1,7 +1,6 @@
 'use client';
 
 import { Form } from '@base-ui/react/form';
-import { ACTION_OUTCOME, ALERT_TYPE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
@@ -9,6 +8,7 @@ import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TSendSignInLinkRefusal } from '@platform/server/auth/send-sign-in-link-action';
 import { tv } from '@platform/utils/tv/tv';
 import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
+import { ACTION_OUTCOME, ALERT_TYPE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import type { FormEvent } from 'react';
 

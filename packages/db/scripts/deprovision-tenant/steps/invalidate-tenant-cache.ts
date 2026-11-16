@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { requestTenantCacheInvalidation } from '@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation';
 
 export type TInvalidateTenantCacheEnv = {
   dryRun: boolean;

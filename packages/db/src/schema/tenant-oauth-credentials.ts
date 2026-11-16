@@ -1,4 +1,4 @@
-import type { TOAuthProvider } from '@blog/config/constants';
+import type { TOAuthProvider } from '@shinefold/config/constants';
 import { pgTable, primaryKey, text, uuid } from 'drizzle-orm/pg-core';
 
 import { timestampColumns } from './columns';

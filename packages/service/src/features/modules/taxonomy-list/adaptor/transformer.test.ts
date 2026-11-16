@@ -1,9 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   TAXONOMY_KIND,
   TAXONOMY_SORT,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   MOCK_TAG_ID,
   MOCK_TAG_TITLE,
@@ -11,19 +12,18 @@ import {
   MOCK_TOPIC_ID,
   MOCK_TOPIC_SLUG,
   MOCK_TOPIC_TITLE,
-} from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
 import {
   mockRawTaxonomyEntry,
   mockRawTaxonomyListModule,
-} from '@blog/service/testing/modules/fixtures';
-import { MOCK_TOPIC_INDEX_HEADING } from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
+import { MOCK_TOPIC_INDEX_HEADING } from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_POST_ID,
   mockRawHeadingBlock,
   mockRawPostLink,
   mockRawWideLayout,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toTaxonomyListModule } from './transformer';
 

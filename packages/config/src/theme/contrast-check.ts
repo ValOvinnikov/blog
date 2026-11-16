@@ -1,4 +1,4 @@
-import { hasLength } from '@blog/utils/primitives';
+import { hasLength } from '@shinefold/utils/primitives';
 
 import {
   COLOR_SCHEME,
@@ -9,7 +9,7 @@ import {
   type TColorScheme,
   type THeaderControlStyle,
   type TNavLinkStyle,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import {
   CONTRAST_PAIRS,

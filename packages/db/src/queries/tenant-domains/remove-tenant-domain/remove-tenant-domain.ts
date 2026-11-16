@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import { tenants } from '@blog/db/schema';
-import { tenantDomains } from '@blog/db/schema/tenant-domains';
+import { getDb } from '@shinefold/db/client';
+import { tenants } from '@shinefold/db/schema';
+import { tenantDomains } from '@shinefold/db/schema/tenant-domains';
 import { and, eq, notExists } from 'drizzle-orm';
 
 export async function removeTenantDomain(

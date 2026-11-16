@@ -1,21 +1,21 @@
 import {
   EMAIL_DELIVERY_OUTCOME,
   EMAIL_REPUTATION_WINDOW_DAYS,
-} from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+} from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestEmailDeliveryOutcomeCount,
   MOCK_TODAY,
-} from '@blog/db/testing/email-usage/fixtures';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
-import { utcDayDaysBefore } from '@blog/utils/date';
+} from '@shinefold/db/testing/email-usage/fixtures';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
+import { utcDayDaysBefore } from '@shinefold/utils/date';
 
 import { getEmailReputation } from './get-email-reputation';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const MOCK_OLDEST_DAY_IN_WINDOW = utcDayDaysBefore(
   MOCK_NOW,

@@ -19,12 +19,12 @@ for (const specifier of [
   '@base-ui/react',
   '@testing-library/react',
   '@floating-ui/react/utils',
-  '@blog/config/react',
-  '@blog/config/react/index',
-  '@blog/ui',
-  '@blog/db',
-  '@blog/auth',
-  '@blog/insight',
+  '@shinefold/config/react',
+  '@shinefold/config/react/index',
+  '@shinefold/ui',
+  '@shinefold/db',
+  '@shinefold/auth',
+  '@shinefold/insight',
   'sanity',
 ]) {
   test(`email.js bans ${specifier} imports`, () => {
@@ -37,11 +37,11 @@ for (const specifier of [
 }
 
 for (const specifier of [
-  '@blog/config',
-  '@blog/config/constants',
-  '@blog/config/types',
-  '@blog/config/utils',
-  '@blog/utils/primitives',
+  '@shinefold/config',
+  '@shinefold/config/constants',
+  '@shinefold/config/types',
+  '@shinefold/config/utils',
+  '@shinefold/utils/primitives',
 ]) {
   test(`email.js allows ${specifier} imports`, () => {
     assert.deepEqual(lint(`export * from '${specifier}';\n`), []);

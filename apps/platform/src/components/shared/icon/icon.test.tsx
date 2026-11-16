@@ -1,8 +1,8 @@
-import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { ICON_TEST_ID } from '@platform/constants/icon';
 import { ARIA_HIDDEN } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { ICONS } from '@shinefold/config';
 
 import { Icon } from './icon';
 

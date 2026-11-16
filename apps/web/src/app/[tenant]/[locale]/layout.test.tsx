@@ -4,7 +4,7 @@ import {
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   RADIUS_SCALE,
-} from '@blog/config';
+} from '@shinefold/config';
 import { SiteProviders } from '@web/components/features/layout/site-providers';
 import { SiteAnalytics } from '@web/components/shared/site-analytics';
 import { SiteFooter } from '@web/components/shared/site-footer';

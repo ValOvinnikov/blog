@@ -1,5 +1,5 @@
-import { DEPTH } from '@blog/config';
-import { ButtonShapes } from '@blog/ui/testing/button-shapes';
+import { DEPTH } from '@shinefold/config';
+import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 

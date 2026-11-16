@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@shinefold/config';
 
 import { formatShortDateTime } from './format-short-date-time';
 

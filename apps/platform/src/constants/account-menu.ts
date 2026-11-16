@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const ACCOUNT_MENU_PLACEMENT = {
   FOOT: 'FOOT',

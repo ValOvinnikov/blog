@@ -1,5 +1,5 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
-import { MAGIC_LINK_PROVIDER_ID } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
+import { MAGIC_LINK_PROVIDER_ID } from '@shinefold/auth/providers/magic-link/magic-link-provider/magic-link-provider';
 import {
   MOCK_GITHUB_ID,
   MOCK_GITHUB_SECRET,
@@ -8,17 +8,17 @@ import {
   MOCK_REDIRECT_PROXY_URL,
   MOCK_SITE_GITHUB_CREDENTIALS,
   MOCK_SITE_GITHUB_ID,
-} from '@blog/auth/testing/oauth-fixtures';
+} from '@shinefold/auth/testing/oauth-fixtures';
 import {
   MOCK_AUTH_SECRET,
   MOCK_EMAIL,
   MOCK_SESSION_EXPIRES,
   MOCK_SESSION_TOKEN,
   MOCK_USER_ID,
-} from '@blog/auth/testing/session-fixtures';
-import { AUTH_APP, OAUTH_PROVIDER } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { schema } from '@blog/db';
+} from '@shinefold/auth/testing/session-fixtures';
+import { AUTH_APP, OAUTH_PROVIDER } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { schema } from '@shinefold/db';
 import type { DefaultSession, NextAuthConfig } from 'next-auth';
 
 import { buildAuthConfig } from './config';
@@ -37,11 +37,11 @@ const { consumePendingInvitesOnSignInMock, recordSignupTermsOnSignInMock } =
     recordSignupTermsOnSignInMock: vi.fn(),
   }));
 
-vi.mock('@blog/auth/events/consume-pending-invites-on-sign-in', () => ({
+vi.mock('@shinefold/auth/events/consume-pending-invites-on-sign-in', () => ({
   consumePendingInvitesOnSignIn: consumePendingInvitesOnSignInMock,
 }));
 
-vi.mock('@blog/auth/events/record-signup-terms-on-sign-in', () => ({
+vi.mock('@shinefold/auth/events/record-signup-terms-on-sign-in', () => ({
   recordSignupTermsOnSignIn: recordSignupTermsOnSignInMock,
 }));
 
@@ -120,7 +120,7 @@ describe(buildAuthConfig, () => {
     },
   );
 
-  it("binds the Drizzle adapter to @blog/db's Auth.js tables", () => {
+  it("binds the Drizzle adapter to @shinefold/db's Auth.js tables", () => {
     buildAuthConfig(AUTH_APP.SITE, MAGIC_LINK_HANDLERS);
 
     const [, tables] = vi.mocked(DrizzleAdapter).mock.calls[0] ?? [];

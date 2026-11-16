@@ -1,4 +1,3 @@
-import { mockContrastResult } from '@blog/db/testing/findings/fixtures';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -7,6 +6,7 @@ import {
   MOCK_SHORT_COMMIT_SHA,
 } from '@platform/testing/findings/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { mockContrastResult } from '@shinefold/db/testing/findings/fixtures';
 
 import { ContrastFindingDetails } from './contrast-finding-details';
 

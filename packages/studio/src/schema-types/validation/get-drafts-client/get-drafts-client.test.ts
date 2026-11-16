@@ -1,9 +1,9 @@
+import { faker } from '@faker-js/faker';
 import {
   fetchFailSafe,
   getDraftsClient,
-} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
-import { mockFetchContext } from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { mockFetchContext } from '@shinefold/studio/testing/mock-validation-context';
 import type { ValidationContext } from 'sanity';
 
 faker.seed(6029);

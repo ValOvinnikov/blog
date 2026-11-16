@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
@@ -7,15 +8,15 @@ import {
   LINK_TYPE,
   MEDIA_ORDER,
   routes,
-} from '@blog/config';
-import { MOCK_TOPIC_TITLE } from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/config';
+import { MOCK_TOPIC_TITLE } from '@shinefold/service/testing/entities/fixtures';
 import {
   MOCK_HERO_EYEBROW,
   MOCK_HERO_IMAGE_ALT,
   mockRawCtaButton,
   mockRawHeroBlogModule,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_POST_EXCERPT,
   MOCK_POST_HREF,
@@ -25,8 +26,7 @@ import {
   mockRawInternalLinkDocument,
   mockRawSanityImage,
   mockSanityImageView,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toHeroBlogModule, type TRawHeroBlogModule } from './transformer';
 

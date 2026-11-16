@@ -1,4 +1,4 @@
-import { CAPABILITY, type ITenantLocalizedParams } from '@blog/config';
+import { CAPABILITY, type ITenantLocalizedParams } from '@shinefold/config';
 import { BookmarksPage } from '@web/components/pages/bookmarks-page';
 import { buildBookmarksMetadata } from '@web/metadata/bookmarks-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';

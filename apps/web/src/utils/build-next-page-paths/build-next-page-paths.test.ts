@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES, routes } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
 
 import {
   buildNextBlogIndexPage,

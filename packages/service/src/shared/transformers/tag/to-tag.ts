@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { tagFragment } from '@blog/service/shared/fragments/tag/tag';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { tagFragment } from '@shinefold/service/shared/fragments/tag/tag';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawTag = InferFragmentType<typeof tagFragment>;

@@ -1,5 +1,5 @@
-import type { TPersonalDataCounts } from '@blog/db/queries/personal-data/erase-personal-data';
 import type { TPersonalDataMatchCounts } from '@platform/server/data-requests/count-personal-data-matches';
+import type { TPersonalDataCounts } from '@shinefold/db/queries/personal-data/erase-personal-data';
 
 export const MOCK_ONE_OF_EACH_COUNT = {
   subscribers: 1,

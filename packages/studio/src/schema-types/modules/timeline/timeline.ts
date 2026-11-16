@@ -2,17 +2,17 @@ import {
   CONTENT_ALIGNMENT,
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
-} from '@blog/config/constants';
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { timelineItemSchema } from '@blog/studio/schema-types/objects/timeline-item/timeline-item';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
-import { validateTimelineHorizontalItemCap } from '@blog/studio/schema-types/validation/validate-timeline-horizontal-item-cap/validate-timeline-horizontal-item-cap';
-import { toTitleCase } from '@blog/utils/primitives';
+} from '@shinefold/config/constants';
+import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { layoutField } from '@shinefold/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { timelineItemSchema } from '@shinefold/studio/schema-types/objects/timeline-item/timeline-item';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
+import { validateTimelineHorizontalItemCap } from '@shinefold/studio/schema-types/validation/validate-timeline-horizontal-item-cap/validate-timeline-horizontal-item-cap';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { Milestone } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 

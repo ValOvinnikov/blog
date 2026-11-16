@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useId } from 'react';
 
 type TDescribedOption = {

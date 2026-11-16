@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES, routes } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { toTenantScopedPath } from '@web/utils/to-tenant-scoped-path';
 

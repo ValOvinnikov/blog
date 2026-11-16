@@ -27,7 +27,7 @@ test('extractConsts reads exported as-const objects and their literal members', 
 
 test('buildOutputs maps each value to every const that holds it', () => {
   const sources = [
-    { file: 'a.ts', scope: 'config', from: '@blog/config/constants' },
+    { file: 'a.ts', scope: 'config', from: '@shinefold/config/constants' },
     { file: 'b.ts', scope: 'app:web', from: '@web/constants/b' },
   ];
   const texts = {
@@ -53,7 +53,7 @@ test('buildOutputs maps each value to every const that holds it', () => {
 
 test('buildOutputs leaves out a file with no indexable const', () => {
   const { catalog } = buildOutputs(
-    [{ file: 'c.ts', scope: 'config', from: '@blog/config/constants' }],
+    [{ file: 'c.ts', scope: 'config', from: '@shinefold/config/constants' }],
     () => 'export const SECONDS = 60;',
   );
   assert.doesNotMatch(catalog, /c\.ts/);

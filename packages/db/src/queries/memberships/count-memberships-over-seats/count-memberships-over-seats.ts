@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { unlockedMembershipsOverSeats } from '@blog/db/queries/memberships/memberships-over-seats';
+import { getDb } from '@shinefold/db/client';
+import { unlockedMembershipsOverSeats } from '@shinefold/db/queries/memberships/memberships-over-seats';
 
 export async function countMembershipsOverSeats(
   tenantId: string,

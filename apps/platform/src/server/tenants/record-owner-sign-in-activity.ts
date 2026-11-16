@@ -1,11 +1,11 @@
 import 'server-only';
 
-import { queries } from '@blog/db';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { toPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { queries } from '@shinefold/db';
 
 const touchAndWakeTenant = async (tenantId: string, at: Date) => {
   try {

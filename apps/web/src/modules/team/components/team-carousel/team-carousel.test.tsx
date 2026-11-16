@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, CARD_IMAGE_SHAPE } from '@blog/config';
+import { BRAND_VARIANT, CARD_IMAGE_SHAPE } from '@shinefold/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_TEAM_HEADING,

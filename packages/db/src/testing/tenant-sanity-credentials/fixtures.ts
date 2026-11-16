@@ -1,7 +1,10 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
-import type { TTenantSanityCredentials } from '@blog/db/queries/tenants/get-tenant-sanity-credentials';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@shinefold/db/constants';
+import type { TTenantSanityCredentials } from '@shinefold/db/queries/tenants/get-tenant-sanity-credentials';
 
 export function mockTenantSanityCredentials(
   overrides: Partial<TTenantSanityCredentials> = {},

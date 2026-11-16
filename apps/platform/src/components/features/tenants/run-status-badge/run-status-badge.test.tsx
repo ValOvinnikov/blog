@@ -1,5 +1,5 @@
-import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { TENANT_PROVISIONING_STEP_STATUS } from '@shinefold/db/constants';
 
 import { RunStatusBadge } from './run-status-badge';
 

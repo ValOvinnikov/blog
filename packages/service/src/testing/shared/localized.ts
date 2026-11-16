@@ -1,7 +1,7 @@
-import { LINK_TYPE } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { faker } from '@faker-js/faker';
+import { LINK_TYPE } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockReference } from '@shinefold/service/testing/shared/fixtures';
 
 type TLocalizedText = Partial<Record<string, string>>;
 

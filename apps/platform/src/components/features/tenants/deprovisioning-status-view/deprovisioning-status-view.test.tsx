@@ -1,7 +1,3 @@
-import {
-  DEPROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import {
@@ -17,6 +13,10 @@ import {
   STEP_POLL_INTERVAL_MS,
   useDeprovisioningPoll,
 } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
+import {
+  DEPROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DeprovisioningStatusView } from './deprovisioning-status-view';

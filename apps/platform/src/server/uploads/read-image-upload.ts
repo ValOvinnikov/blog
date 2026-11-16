@@ -1,10 +1,10 @@
 import 'server-only';
 
-import { ACTION_OUTCOME } from '@blog/config';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { errorResult, okResult, type TResult } from '@blog/utils';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import type { TUploadFailure } from '@platform/server/uploads/upload-error';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { imageSize } from 'image-size';
 
 export type TImageFormat = { contentType: string; extension: string };

@@ -1,4 +1,4 @@
-import { sha256Hex } from '@blog/utils/hash';
+import { sha256Hex } from '@shinefold/utils/hash';
 
 import { mintConfirmationToken } from './subscriber-tokens';
 

@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
 import messages from '@platform/i18n/messages/en.json';
@@ -20,6 +19,7 @@ import {
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LeadsInbox } from './leads-inbox';

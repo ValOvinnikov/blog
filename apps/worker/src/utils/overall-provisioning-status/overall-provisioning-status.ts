@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -6,7 +6,7 @@ import {
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 
 // Any FAILED step settles the run FAILED, or `beginTenantProvisioning`'s guard would stay shut forever.
 export function overallStatusFor(

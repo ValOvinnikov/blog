@@ -1,7 +1,7 @@
-import { RELEASE_CHANGE } from '@blog/config';
-import { okResult } from '@blog/utils';
 import type { TContrastStatus } from '@platform/constants/release';
 import type { TComparedCommit } from '@platform/server/github/compare-commits';
+import { RELEASE_CHANGE } from '@shinefold/config';
+import { okResult } from '@shinefold/utils';
 
 import type { TReleaseChanges } from './classify-release-changes';
 import { getCandidateComparison } from './get-candidate-comparison';

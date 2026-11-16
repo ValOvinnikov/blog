@@ -1,10 +1,10 @@
 /**
  * @vitest-environment jsdom
  */
-import type { TMaybeUndefined } from '@blog/config';
-import { KEY_ENCODING } from '@blog/utils/encryption';
-import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 import { faker } from '@faker-js/faker';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { KEY_ENCODING } from '@shinefold/utils/encryption';
+import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
 
 faker.seed(111);
 

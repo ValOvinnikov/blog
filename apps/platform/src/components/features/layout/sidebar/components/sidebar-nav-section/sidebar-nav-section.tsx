@@ -1,9 +1,9 @@
-import { hasArrayGotItems } from '@blog/utils/primitives';
 import {
   SidebarNavItem,
   type TSidebarNavItem,
 } from '@platform/components/features/layout/sidebar/components/sidebar-nav-item';
 import { sidebarVariants } from '@platform/components/features/layout/sidebar/sidebar-variants';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 
 export type TSidebarNavSection = {
   label: string;

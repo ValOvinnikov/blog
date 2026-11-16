@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { CUSTOM_DOMAIN_REFUSAL } from '@platform/constants/custom-domain';
 import en from '@platform/i18n/messages/en.json';
 import { removeCustomDomainAction } from '@platform/server/custom-domain/remove-custom-domain-action';
@@ -8,6 +7,7 @@ import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { RemoveCustomDomainControl } from './remove-custom-domain-control';

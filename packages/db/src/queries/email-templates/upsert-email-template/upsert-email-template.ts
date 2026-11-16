@@ -2,18 +2,18 @@ import {
   SUBJECT_MAX,
   type TEmailTemplateType,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
 import {
   getEmailTemplate,
   type TEmailTemplateResult,
-} from '@blog/db/queries/email-templates/get-email-template';
+} from '@shinefold/db/queries/email-templates/get-email-template';
 import {
   emailTemplates,
   type TEmailTemplateBlock,
-} from '@blog/db/schema/email-templates';
-import { tenants } from '@blog/db/schema/tenants';
-import { hasLength, isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/schema/email-templates';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { hasLength, isUndefined } from '@shinefold/utils/primitives';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 

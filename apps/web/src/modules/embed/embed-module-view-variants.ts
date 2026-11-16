@@ -1,5 +1,5 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
+import { tv } from '@shinefold/ui/lib/styling';
 
 export const embedModuleViewVariants = tv({
   variants: {

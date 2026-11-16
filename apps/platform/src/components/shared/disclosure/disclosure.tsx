@@ -1,12 +1,12 @@
 'use client';
 
 import { Collapsible } from '@base-ui/react/collapsible';
-import { ICONS } from '@blog/config';
 import {
   HEADING_TAGS,
   type THeadingLevel,
 } from '@platform/components/shared/heading';
 import { Icon } from '@platform/components/shared/icon';
+import { ICONS } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 import {

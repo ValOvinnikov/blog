@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_EMAIL,
   MOCK_PROVIDER,
@@ -5,12 +6,11 @@ import {
   MOCK_SESSION_EXPIRES,
   MOCK_SESSION_TOKEN,
   MOCK_USER_ID,
-} from '@blog/auth/testing/session-fixtures';
-import { AUTH_APP, type TAuthApp } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
-import { sha256Hex } from '@blog/utils/hash';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/auth/testing/session-fixtures';
+import { AUTH_APP, type TAuthApp } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { usePersonalDataKeys } from '@shinefold/db/testing/personal-data';
+import { sha256Hex } from '@shinefold/utils/hash';
 import type { Adapter, AdapterAccount } from 'next-auth/adapters';
 
 import { scopeAdapterToApp } from './app-scoped-adapter';

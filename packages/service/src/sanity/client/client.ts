@@ -4,12 +4,12 @@ import {
   SANITY_PERSPECTIVE,
   type TLocaleIsoCode,
   type TSanityPerspective,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   createProjectCache,
   type TSanityProjectRef,
-} from '@blog/service/sanity/project-cache/project-cache';
-import { env } from '@blog/service/utils/env/env';
+} from '@shinefold/service/sanity/project-cache/project-cache';
+import { env } from '@shinefold/service/utils/env/env';
 import { createClient } from 'next-sanity';
 
 type TSanityClient = ReturnType<typeof createClient>;

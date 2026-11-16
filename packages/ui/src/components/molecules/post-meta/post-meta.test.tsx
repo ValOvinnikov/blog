@@ -1,11 +1,11 @@
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import {
   MOCK_FORMATTED_DATE,
   MOCK_PERSON_NAME,
   MOCK_PUBLISHED_AT,
-} from '@blog/ui/testing/fixtures';
-import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/fixtures';
+import { MOCK_LINK_TEST_ID, MockLink } from '@shinefold/ui/testing/mock-link';
 
 import { PostMeta } from './post-meta';
 

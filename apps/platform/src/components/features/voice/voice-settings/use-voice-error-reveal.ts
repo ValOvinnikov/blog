@@ -1,7 +1,5 @@
 'use client';
 
-import type { TMaybeUndefined, TVoiceFieldId } from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TVoiceSection } from '@platform/constants/voice';
 import type { TInvalidControls } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
 import {
@@ -10,6 +8,8 @@ import {
   type TVoiceFieldError,
 } from '@platform/utils/voice-draft/voice-draft';
 import { voiceSectionOfField } from '@platform/utils/voice-sections/voice-sections';
+import type { TMaybeUndefined, TVoiceFieldId } from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import { useState } from 'react';
 
 type TUseVoiceErrorRevealArgs = {

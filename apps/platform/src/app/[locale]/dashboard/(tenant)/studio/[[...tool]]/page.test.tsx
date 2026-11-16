@@ -1,9 +1,3 @@
-import {
-  NEXT_NAVIGATION_ERROR,
-  SANITY_LOGIN_PROVIDER,
-  type TMaybeNull,
-} from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
 import { auth } from '@platform/server/auth/auth';
@@ -24,6 +18,12 @@ import {
 } from '@platform/testing/tenants/studio-ready-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { studioEnteredCookie } from '@platform/utils/studio-entered-cookie/studio-entered-cookie';
+import {
+  NEXT_NAVIGATION_ERROR,
+  SANITY_LOGIN_PROVIDER,
+  type TMaybeNull,
+} from '@shinefold/config';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -49,7 +49,7 @@ vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 
 vi.mock('@platform/server/studio-entry/resolve-has-entered-studio');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: {
@@ -62,7 +62,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@blog/studio', () => ({
+vi.mock('@shinefold/studio', () => ({
   StudioMount: (props: unknown) => {
     studioMountMock(props);
     return <div data-testid={STUDIO_MOUNT_TEST_ID} />;

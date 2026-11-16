@@ -1,4 +1,3 @@
-import { SITE_TYPE } from '@blog/config';
 import { reachReview } from '@platform/testing/onboarding/address-step';
 import {
   acceptAndCreate,
@@ -11,6 +10,7 @@ import {
   setup,
   SITE_TYPES,
 } from '@platform/testing/onboarding/onboarding-view';
+import { SITE_TYPE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { OnboardingView } from './onboarding-view';

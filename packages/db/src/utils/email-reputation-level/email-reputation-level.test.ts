@@ -2,7 +2,7 @@ import {
   EMAIL_REPUTATION_LEVEL,
   EMAIL_REPUTATION_MIN_RESOLVED_COUNT,
   EMAIL_REPUTATION_THRESHOLDS,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 
 import { emailReputationLevel } from './email-reputation-level';
 

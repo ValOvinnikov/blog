@@ -1,9 +1,9 @@
-import type { TPortableTextBody } from '@blog/service';
 import {
   mergeComponents,
   PortableText as PortableTextRoot,
   type PortableTextComponents,
 } from '@portabletext/react';
+import type { TPortableTextBody } from '@shinefold/service';
 
 import { baseComponents } from './config';
 

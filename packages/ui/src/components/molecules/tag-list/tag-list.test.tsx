@@ -1,7 +1,7 @@
-import { customRender, screen } from '@blog/ui/testing/custom-render';
-import { MOCK_TAG } from '@blog/ui/testing/fixtures';
-import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
+import { MOCK_TAG } from '@shinefold/ui/testing/fixtures';
+import { MOCK_LINK_TEST_ID, MockLink } from '@shinefold/ui/testing/mock-link';
 
 import { TagList } from './tag-list';
 

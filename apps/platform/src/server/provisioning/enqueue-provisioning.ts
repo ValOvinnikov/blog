@@ -1,10 +1,10 @@
-import { HTTP_METHOD, type TMaybeNull } from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
 import { WORKER_LOG } from '@platform/constants/worker';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_METHOD, type TMaybeNull } from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { buildEnqueueHeaders } from '@shinefold/utils/enqueue-signature';
 
 const PROVISION_PATH = '/api/provision';
 // Twice the platform's other outbound calls: the worker admits the row and starts the run before it answers.

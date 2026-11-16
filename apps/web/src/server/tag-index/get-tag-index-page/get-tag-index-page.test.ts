@@ -9,7 +9,7 @@ import { getTagIndexPage } from './get-tag-index-page';
 
 const { getIndexPageMock } = vi.hoisted(() => ({ getIndexPageMock: vi.fn() }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: { pages: { tagIndex: { v1: { getIndexPage: getIndexPageMock } } } },
 }));
 

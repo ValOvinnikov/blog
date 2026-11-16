@@ -1,6 +1,5 @@
 import 'server-only';
 
-import type { TMembership } from '@blog/db/schema/memberships';
 import { readRenamedCookie } from '@platform/server/renamed-cookie/read-renamed-cookie';
 import {
   ACTIVE_TENANT_COOKIE,
@@ -8,6 +7,7 @@ import {
 } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TMembership } from '@shinefold/db/schema/memberships';
 import { notFound, redirect } from 'next/navigation';
 import { cache } from 'react';
 

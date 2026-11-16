@@ -1,9 +1,9 @@
-import { getNewsletterPostSend } from '@blog/db/queries/newsletter-post-sends';
+import { getNewsletterPostSend } from '@shinefold/db/queries/newsletter-post-sends';
 import {
   getTenantById,
   getTenantSanityCredentials,
-} from '@blog/db/queries/tenants';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/queries/tenants';
+import { isUndefined } from '@shinefold/utils/primitives';
 import {
   NEWSLETTER_POST_STATE,
   NEWSLETTER_UNIT_MAX_RETRIES,

@@ -1,7 +1,7 @@
-import { CAPABILITY } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { mockAllOnSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { CAPABILITY } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 import { getEnabledCapabilities } from './get-enabled-capabilities';
 

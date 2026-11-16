@@ -1,8 +1,8 @@
-import { HERO_VARIANT } from '@blog/config';
-import type { THeroProfileModule } from '@blog/service';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { Hero } from '@blog/ui/components/organisms/hero';
-import { hasLength } from '@blog/utils/primitives';
+import { HERO_VARIANT } from '@shinefold/config';
+import type { THeroProfileModule } from '@shinefold/service';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { Hero } from '@shinefold/ui/components/organisms/hero';
+import { hasLength } from '@shinefold/utils/primitives';
 import { HeroModuleShell } from '@web/components/shared/hero-module-shell';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';

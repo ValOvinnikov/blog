@@ -1,5 +1,5 @@
-import { SIZE } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import { SIZE } from '@shinefold/config';
+import { tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const iconVariants = tv({

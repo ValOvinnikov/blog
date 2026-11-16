@@ -1,11 +1,11 @@
+import messages from '@platform/i18n/messages/en.json';
+import { renderHookWithIntl } from '@platform/testing/custom-render';
+import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
   BUTTON_SHAPE,
   HEADER_CONTROL_SHAPE,
   NAV_LINK_STYLE,
-} from '@blog/config';
-import messages from '@platform/i18n/messages/en.json';
-import { renderHookWithIntl } from '@platform/testing/custom-render';
-import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+} from '@shinefold/config';
 
 import { useLookDraftFields } from './use-look-draft-fields';
 

@@ -1,7 +1,7 @@
 import {
   finishDeprovisioningRun,
   startDeprovisioningRun,
-} from '@blog/db/queries/tenants';
+} from '@shinefold/db/queries/tenants';
 
 export type TReportDeprovisioningRunStartInput = {
   tenantId: string;

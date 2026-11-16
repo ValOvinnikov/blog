@@ -1,8 +1,5 @@
 'use client';
 
-import { FORM_STATUS } from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { VoiceEditorProvider } from '@platform/components/features/voice/voice-editor-provider';
 import { VoiceSection } from '@platform/components/features/voice/voice-section';
 import { VoiceSectionBar } from '@platform/components/features/voice/voice-section-bar';
@@ -21,6 +18,9 @@ import {
   VOICE_SECTIONS_IN_PAGE_ORDER,
   type TVoiceDraft,
 } from '@platform/utils/voice-draft/voice-draft';
+import { FORM_STATUS } from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 import { VoiceNoteRow } from './components/voice-note-row/voice-note-row';

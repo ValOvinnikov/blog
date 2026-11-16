@@ -1,5 +1,5 @@
-import { validateArrayTypeAtMostOnce } from '@blog/studio/schema-types/validation/validate-array-type-at-most-once/validate-array-type-at-most-once';
 import { faker } from '@faker-js/faker';
+import { validateArrayTypeAtMostOnce } from '@shinefold/studio/schema-types/validation/validate-array-type-at-most-once/validate-array-type-at-most-once';
 
 faker.seed(5086);
 

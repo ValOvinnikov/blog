@@ -1,4 +1,4 @@
-import { safeAsync } from '@blog/utils';
+import { safeAsync } from '@shinefold/utils';
 
 import { getHomePage } from './get-home-page';
 

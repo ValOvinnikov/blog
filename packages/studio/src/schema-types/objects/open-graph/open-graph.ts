@@ -1,8 +1,8 @@
 import {
   SEO_OG_DESCRIPTION_MAX_LENGTH,
   SEO_OG_TITLE_MAX_LENGTH,
-} from '@blog/config/constants';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+} from '@shinefold/config/constants';
+import { imageWithAltSchema } from '@shinefold/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { defineField, defineType } from 'sanity';
 
 export const openGraphSchema = defineType({

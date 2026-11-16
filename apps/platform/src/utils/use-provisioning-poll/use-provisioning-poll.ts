@@ -1,17 +1,5 @@
 'use client';
 
-import {
-  type ACTION_OUTCOME,
-  isOutcomeRefused,
-  isOutcomeSuccess,
-  type TMaybeNull,
-  type TMaybeUndefined,
-} from '@blog/config';
-import {
-  TENANT_PROVISIONING_STATUS,
-  type TTenantProvisioningStatus,
-} from '@blog/db/constants';
-import type { TTenantProvisioningStatusResult } from '@blog/db/queries/tenants/get-tenant-provisioning-status';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import {
@@ -25,6 +13,18 @@ import {
 } from '@platform/utils/provisioning-view-state/provisioning-view-state';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { usePolledValue } from '@platform/utils/use-polled-value/use-polled-value';
+import {
+  type ACTION_OUTCOME,
+  isOutcomeRefused,
+  isOutcomeSuccess,
+  type TMaybeNull,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import {
+  TENANT_PROVISIONING_STATUS,
+  type TTenantProvisioningStatus,
+} from '@shinefold/db/constants';
+import type { TTenantProvisioningStatusResult } from '@shinefold/db/queries/tenants/get-tenant-provisioning-status';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 

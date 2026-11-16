@@ -6,7 +6,7 @@ import {
   RADIUS_DECLARATIONS,
   RADIUS_SCALE,
   type TMaybeUndefined,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { ISectionProps } from '@web/components/shared/section';
 import type { TSectionAppearance } from '@web/utils/build-section-scope-declarations';
 import type { TSectionStyleOverrides } from '@web/utils/gate-section-style-overrides';

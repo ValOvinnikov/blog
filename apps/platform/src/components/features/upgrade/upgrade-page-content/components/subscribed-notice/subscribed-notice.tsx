@@ -1,8 +1,8 @@
-import { ALERT_TYPE, SIZE } from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ALERT_TYPE, SIZE } from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 
 export type TSubscribedNoticeProps = {

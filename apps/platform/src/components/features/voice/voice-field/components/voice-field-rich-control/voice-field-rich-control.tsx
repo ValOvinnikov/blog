@@ -1,12 +1,5 @@
 'use client';
 
-import {
-  SIZE,
-  VOICE_PORTABLE_TEXT_SCHEMA,
-  type TMaybeUndefined,
-  type TVoiceFieldId,
-  type TVoicePortableText,
-} from '@blog/config';
 import { useVoiceFieldState } from '@platform/components/features/voice/voice-editor-provider';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
@@ -16,6 +9,13 @@ import {
   toVoiceRichDraft,
   voiceTextToPortableText,
 } from '@platform/utils/voice-portable-text/voice-portable-text';
+import {
+  SIZE,
+  VOICE_PORTABLE_TEXT_SCHEMA,
+  type TMaybeUndefined,
+  type TVoiceFieldId,
+  type TVoicePortableText,
+} from '@shinefold/config';
 
 export type TVoiceFieldRichControlProps = {
   fieldId: TVoiceFieldId;

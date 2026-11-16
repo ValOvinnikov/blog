@@ -1,6 +1,6 @@
-import { ICONS } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
+import { ICONS } from '@shinefold/config';
 
 import { checkMarkVariants } from './check-mark-variants';
 

@@ -1,8 +1,8 @@
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { tenants } from '@blog/db/schema/tenants';
-import { hasLength } from '@blog/utils/primitives';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { hasLength } from '@shinefold/utils/primitives';
 import { and, eq, isNull } from 'drizzle-orm';
 
 type TRestoredGrace = {

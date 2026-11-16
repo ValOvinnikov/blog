@@ -2,15 +2,15 @@ import {
   PORTABLE_TEXT_BLOCK_TYPE,
   type TMaybeUndefined,
   type TPortableTextBlock,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   toArticleTextMember,
   type TArticleTextMember,
   type TRawArticleTextMember,
   type TRawExpandableSectionBlock,
   type TRawTableBlock,
-} from '@blog/service/shared/transformers/portable-text/to-article-text-member';
-import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
+} from '@shinefold/service/shared/transformers/portable-text/to-article-text-member';
+import { toPortableText } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-mark-def';
 
 export type TRawPortableTextBody = Array<
   TRawArticleTextMember | TRawExpandableSectionBlock | TRawTableBlock

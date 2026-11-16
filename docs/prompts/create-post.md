@@ -305,7 +305,7 @@ UUID, not a slug-style ID. Before writing any `_ref` to an existing
 author/topic/tag, resolve its real `_id` with:
 
 ```bash
-pnpm --filter @blog/studio exec sanity documents query \
+pnpm --filter @shinefold/studio exec sanity documents query \
   '*[_type in ["person","blog_topic","blog_tag"]]{_id,_type,title,name,"slug":slug.current}' \
   --dataset <dataset>
 ```
@@ -320,7 +320,7 @@ One JSON document **per line** (the post, plus any NEW author/topic/tag and
 their archive pages), importable with:
 
 ```bash
-pnpm --filter @blog/studio exec sanity datasets import posts.ndjson --dataset <dataset>
+pnpm --filter @shinefold/studio exec sanity datasets import posts.ndjson --dataset <dataset>
 ```
 
 Note `datasets` (plural) — the CLI also accepts the dataset as a positional

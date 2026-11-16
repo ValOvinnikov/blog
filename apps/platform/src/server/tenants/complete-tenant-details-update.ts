@@ -1,20 +1,5 @@
 import 'server-only';
 
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  isOutcomeSuccess,
-  type TMaybeUndefined,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import type { TENANT_DETAILS_UPDATE_OUTCOME } from '@blog/db/constants';
-import type {
-  TUpdateTenantDetailsInput,
-  TUpdateTenantDetailsResult,
-} from '@blog/db/queries/tenants/update-tenant-details/update-tenant-details';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isUndefined } from '@blog/utils/primitives';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import type { TOwnerAccessRequestResult } from '@platform/server/owner-access/request-owner-access';
@@ -22,6 +7,21 @@ import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-si
 import { changedTenantDetailsFields } from '@platform/server/tenants/changed-tenant-details-fields';
 import { onTenantPlanChange } from '@platform/server/tenants/on-tenant-plan-change';
 import { reinviteChangedOwner } from '@platform/server/tenants/reinvite-changed-owner';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  isOutcomeSuccess,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import type { TENANT_DETAILS_UPDATE_OUTCOME } from '@shinefold/db/constants';
+import type {
+  TUpdateTenantDetailsInput,
+  TUpdateTenantDetailsResult,
+} from '@shinefold/db/queries/tenants/update-tenant-details/update-tenant-details';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { after } from 'next/server';
 
 type TTenantDetailsUpdate = Extract<

@@ -1,6 +1,6 @@
-import { PRICE_PERIOD } from '@blog/config';
-import type { TStripePrice } from '@blog/db/queries/stripe-catalogue/list-stripe-prices';
-import { service, type TPricingTier } from '@blog/service';
+import { PRICE_PERIOD } from '@shinefold/config';
+import type { TStripePrice } from '@shinefold/db/queries/stripe-catalogue/list-stripe-prices';
+import { service, type TPricingTier } from '@shinefold/service';
 import { PRICING_LOG } from '@web/constants/pricing';
 import { getPlanPrices } from '@web/server/pricing/get-plan-prices/get-plan-prices';
 import { getRequestContext } from '@web/server/request-context/request-context';

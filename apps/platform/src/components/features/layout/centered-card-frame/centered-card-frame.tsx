@@ -1,6 +1,6 @@
-import { SIZE } from '@blog/config';
 import { BrandLogo } from '@platform/components/shared/brand-logo';
 import { Card } from '@platform/components/shared/card';
+import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

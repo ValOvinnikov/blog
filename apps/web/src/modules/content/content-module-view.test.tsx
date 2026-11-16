@@ -1,4 +1,4 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { MOCK_CONTENT_MODULE_ID } from '@web/testing/modules/content/fixtures';
 

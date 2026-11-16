@@ -3,7 +3,7 @@
 import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import { useEffect, useState } from 'react';
 
 // Long enough to read a step's Running state before the next change replaces it.

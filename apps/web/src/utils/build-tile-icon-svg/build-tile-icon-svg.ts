@@ -6,7 +6,7 @@ import {
   oklchStopToHex,
   type TMaybeUndefined,
   type TOklchStop,
-} from '@blog/config';
+} from '@shinefold/config';
 
 type TTileStops = { light: TOklchStop; dark: TOklchStop };
 

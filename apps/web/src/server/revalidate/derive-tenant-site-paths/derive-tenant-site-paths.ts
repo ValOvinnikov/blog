@@ -1,5 +1,5 @@
-import type { TTenantSanityContext } from '@blog/service';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+import type { TTenantSanityContext } from '@shinefold/service';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { FETCH_FAILED_REASON, REVALIDATE_LOG } from '@web/constants/revalidate';
 import { resolveTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import {

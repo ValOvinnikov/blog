@@ -1,5 +1,9 @@
-import { LEGAL_PAGE_KIND, routes, type TMaybeUndefined } from '@blog/config';
 import { tenantSiteUrl } from '@platform/utils/routes/routes';
+import {
+  LEGAL_PAGE_KIND,
+  routes,
+  type TMaybeUndefined,
+} from '@shinefold/config';
 
 export type TLegalPageUrls = {
   terms: string;

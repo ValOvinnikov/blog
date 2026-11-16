@@ -1,13 +1,13 @@
 import 'server-only';
 
-import { HTTP_STATUS } from '@blog/config';
-import { queries } from '@blog/db';
 import {
   CUSTOM_DOMAIN_LOG,
   CUSTOM_DOMAIN_PATH,
 } from '@platform/constants/custom-domain';
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_STATUS } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 export const enqueueCustomDomainDisconnectOrRestore = async (
   tenantId: string,

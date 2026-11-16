@@ -1,7 +1,11 @@
-import { type IWithClassName, type IWithDataTestId, SIZE } from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { LinkButton } from '@blog/ui/components/molecules/link-button';
-import type { IWithIcon } from '@blog/ui/lib/react';
+import {
+  type IWithClassName,
+  type IWithDataTestId,
+  SIZE,
+} from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
+import type { IWithIcon } from '@shinefold/ui/lib/react';
 import type { ElementType } from 'react';
 
 export interface IShareLinkItem extends IWithIcon {

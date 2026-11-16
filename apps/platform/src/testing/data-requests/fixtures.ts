@@ -1,12 +1,12 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import { MEMBERSHIP_ROLE, SUBSCRIBER_STATUS } from '@blog/db/constants';
-import type { TPersonalDataMatches } from '@blog/db/queries/personal-data/find-personal-data';
-import type { TPersonalDataReaderAccount } from '@blog/db/queries/personal-data/reader-account-personal-data';
 import { faker } from '@faker-js/faker';
 import { DATA_REQUEST_MATCH_KIND } from '@platform/constants/data-request';
 import type { TPersonalDataExport } from '@platform/server/data-requests/export-personal-data-action';
 import type { TDataRequestMatch } from '@platform/server/data-requests/to-data-request-matches';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@shinefold/config';
+import { MEMBERSHIP_ROLE, SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import type { TPersonalDataMatches } from '@shinefold/db/queries/personal-data/find-personal-data';
+import type { TPersonalDataReaderAccount } from '@shinefold/db/queries/personal-data/reader-account-personal-data';
 
 export const MOCK_DATA_REQUEST_EMAIL = faker.internet.email().toLowerCase();
 export const MOCK_DATA_REQUEST_EMAIL_INDEX = faker.string.alphanumeric(43);

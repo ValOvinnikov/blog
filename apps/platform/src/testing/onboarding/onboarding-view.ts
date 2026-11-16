@@ -1,9 +1,3 @@
-import {
-  LOCALE_ISO_CODES,
-  PRESET_ID,
-  PRESET_REGISTRY,
-  SITE_TYPE,
-} from '@blog/config';
 import { OnboardingView } from '@platform/components/features/onboarding/onboarding-view/onboarding-view';
 import {
   ONBOARDING_STEP,
@@ -27,6 +21,12 @@ import {
   MOCK_TENANT_SLUG,
 } from '@platform/testing/tenants/fixtures';
 import { toLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
+import {
+  LOCALE_ISO_CODES,
+  PRESET_ID,
+  PRESET_REGISTRY,
+  SITE_TYPE,
+} from '@shinefold/config';
 import type { UserEvent } from '@testing-library/user-event';
 
 export const createSiteMock = vi.mocked(createSiteAction);

@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TResult } from '@blog/utils';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TResult } from '@shinefold/utils';
 import { markErrorLogged } from '@web/utils/logged-error';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';

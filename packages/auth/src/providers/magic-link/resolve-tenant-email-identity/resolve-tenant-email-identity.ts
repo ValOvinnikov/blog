@@ -1,6 +1,9 @@
-import { resolveTenantEmailBrand, type TTenantEmailBrand } from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { queries } from '@blog/db';
+import {
+  resolveTenantEmailBrand,
+  type TTenantEmailBrand,
+} from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 
 export type TResolvedTenantEmailIdentity = {
   brand: TTenantEmailBrand;

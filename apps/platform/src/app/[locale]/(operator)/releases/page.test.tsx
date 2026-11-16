@@ -1,4 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   GITHUB_RUN_CONCLUSION,
@@ -18,6 +17,7 @@ import {
 } from '@platform/testing/github/github-fetch';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_LAST_RELEASE_TAG } from '@platform/testing/releases/contrast-due-github';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import ReleasesPage from './page';
 
@@ -29,7 +29,7 @@ vi.mock('@platform/utils/env/env');
 
 vi.mock('@platform/server/auth/require-super-admin');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     findings: {

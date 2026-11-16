@@ -1,7 +1,7 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { PLAN_LOCALE_LIMIT } from '@blog/db/constants';
-import { getTenantLocales } from '@blog/db/queries/tenants/get-tenant-locales';
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { PLAN_LOCALE_LIMIT } from '@shinefold/db/constants';
+import { getTenantLocales } from '@shinefold/db/queries/tenants/get-tenant-locales';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export function selectLiveLocales({
   locale,

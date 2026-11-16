@@ -1,4 +1,4 @@
-import { Heading } from '@blog/ui/components/atoms/heading';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
 
 import { contactFormSuccessVariants } from './contact-form-success-variants';
 

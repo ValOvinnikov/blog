@@ -1,4 +1,4 @@
-import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
+import { requestTenantCacheInvalidation } from '@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation';
 
 type TSiteCacheEnv = {
   webAppBaseUrl: string;

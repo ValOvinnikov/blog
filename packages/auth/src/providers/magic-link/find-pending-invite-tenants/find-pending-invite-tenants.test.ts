@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_OTHER_INVITE_ID,
   MOCK_OTHER_TENANT_ID,
@@ -5,10 +6,9 @@ import {
   MOCK_TENANT_NAME,
   mockPendingInvite,
   mockTenant,
-} from '@blog/auth/testing/magic-link-fixtures';
-import { MOCK_EMAIL } from '@blog/auth/testing/session-fixtures';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/auth/testing/magic-link-fixtures';
+import { MOCK_EMAIL } from '@shinefold/auth/testing/session-fixtures';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 
 import { findPendingInviteTenants } from './find-pending-invite-tenants';
 
@@ -23,7 +23,7 @@ const { findPendingInviteByEmailMock, listTenantsByIdsMock } = vi.hoisted(
   }),
 );
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     membershipInvites: {
       findPendingInviteByEmail: findPendingInviteByEmailMock,

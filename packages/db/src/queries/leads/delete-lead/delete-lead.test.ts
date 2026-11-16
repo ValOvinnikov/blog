@@ -1,11 +1,14 @@
-import * as schema from '@blog/db/schema';
-import { insertTestLead, insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
+import * as schema from '@shinefold/db/schema';
+import {
+  insertTestLead,
+  insertTestTenant,
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { deleteLead } from './delete-lead';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

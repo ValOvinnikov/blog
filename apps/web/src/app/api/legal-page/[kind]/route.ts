@@ -1,5 +1,9 @@
-import { HTTP_STATUS, isLegalPageKind, LEGAL_PAGE_KIND } from '@blog/config';
-import { service } from '@blog/service';
+import {
+  HTTP_STATUS,
+  isLegalPageKind,
+  LEGAL_PAGE_KIND,
+} from '@shinefold/config';
+import { service } from '@shinefold/service';
 import { SECTION_DOCUMENT_LOG } from '@web/constants/section-document';
 import { SINGLE_LANGUAGE_ROUTING } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';

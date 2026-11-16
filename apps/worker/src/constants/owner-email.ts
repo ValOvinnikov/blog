@@ -1,4 +1,4 @@
-import { PLATFORM_EMAIL_BRAND_NAME } from '@blog/email';
+import { PLATFORM_EMAIL_BRAND_NAME } from '@shinefold/email';
 
 export const OWNER_INVITE_NUDGE_AFTER_MS = 24 * 60 * 60_000;
 export const OWNER_DASHBOARD_PATH = '/dashboard';

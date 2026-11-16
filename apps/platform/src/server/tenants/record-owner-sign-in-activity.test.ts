@@ -1,7 +1,3 @@
-import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -12,10 +8,14 @@ import {
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { queries } from '@shinefold/db';
+import { MEMBERSHIP_ROLE, type TMembershipRole } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { okResult } from '@shinefold/utils';
 
 import { recordOwnerSignInActivity } from './record-owner-sign-in-activity';
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     memberships: { listMembershipsWithTenantsForUser: vi.fn() },
     tenants: {

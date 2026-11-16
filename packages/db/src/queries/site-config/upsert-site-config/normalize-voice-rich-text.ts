@@ -6,8 +6,13 @@ import {
   type TVoicePortableTextBlock,
   type TVoicePortableTextLink,
   type TVoicePortableTextSpan,
-} from '@blog/config';
-import { errorResult, okResult, sanitizeHref, type TResult } from '@blog/utils';
+} from '@shinefold/config';
+import {
+  errorResult,
+  okResult,
+  sanitizeHref,
+  type TResult,
+} from '@shinefold/utils';
 
 const ALLOWED_DECORATORS: Set<string> = new Set(
   VOICE_PORTABLE_TEXT_SCHEMA.decorators.map((decorator) => decorator.name),

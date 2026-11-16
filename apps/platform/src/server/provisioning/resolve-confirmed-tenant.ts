@@ -1,17 +1,17 @@
 import {
-  ACTION_OUTCOME,
-  type TFieldErrors,
-  type TMaybeUndefined,
-  type TOutcome,
-  type TReasonedFailure,
-} from '@blog/config';
-import {
   TENANT_FIELD_ERROR,
   TENANT_REFUSAL,
   type TTenantRefusal,
 } from '@platform/constants/tenant';
 import { getPlatformTenant } from '@platform/server/tenants/get-platform-tenant';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import {
+  ACTION_OUTCOME,
+  type TFieldErrors,
+  type TMaybeUndefined,
+  type TOutcome,
+  type TReasonedFailure,
+} from '@shinefold/config';
 import { z } from 'zod';
 
 export const confirmTenantInputSchema = z.object({

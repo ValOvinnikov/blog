@@ -1,13 +1,13 @@
 'use client';
 
 import { Form } from '@base-ui/react/form';
-import type { TMaybeUndefined } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { tv } from '@platform/utils/tv/tv';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import type { FormEvent } from 'react';
 

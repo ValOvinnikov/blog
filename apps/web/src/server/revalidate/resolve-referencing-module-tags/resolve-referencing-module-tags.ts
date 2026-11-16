@@ -1,4 +1,4 @@
-import { service, type TTenantSanityContext } from '@blog/service';
+import { service, type TTenantSanityContext } from '@shinefold/service';
 import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { logger } from '@web/utils/logger/logger';
 

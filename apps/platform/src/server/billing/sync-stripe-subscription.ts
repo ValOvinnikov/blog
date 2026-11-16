@@ -1,13 +1,5 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
-import {
-  queries,
-  TENANT_PLAN_WRITE_OUTCOME,
-  WRITABLE_TENANT_STATUSES,
-} from '@blog/db';
-import { isOneOf, isString } from '@blog/utils/primitives';
 import {
   BILLING_LOG,
   STRIPE_LIVE_SUBSCRIPTION_STATUSES,
@@ -18,6 +10,14 @@ import { resolveStripeTenant } from '@platform/server/billing/resolve-stripe-ten
 import { stripeIdOf } from '@platform/server/billing/stripe-id';
 import { tenantStateFromSubscription } from '@platform/server/billing/tenant-state-from-subscription';
 import { logger } from '@platform/utils/logger/logger';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
+import {
+  queries,
+  TENANT_PLAN_WRITE_OUTCOME,
+  WRITABLE_TENANT_STATUSES,
+} from '@shinefold/db';
+import { isOneOf, isString } from '@shinefold/utils/primitives';
 import type Stripe from 'stripe';
 
 export type TSyncedSubscription = {

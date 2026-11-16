@@ -1,10 +1,10 @@
-import { testControlActions } from '@blog/ui/testing/control-actions-contract';
+import { faker } from '@faker-js/faker';
+import { testControlActions } from '@shinefold/ui/testing/control-actions-contract';
 import {
   customRender,
   renderElement,
   screen,
-} from '@blog/ui/testing/custom-render';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 

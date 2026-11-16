@@ -1,7 +1,7 @@
-import { HTTP_STATUS } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
-import { toInitial } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
+import { HTTP_STATUS } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
+import { toInitial } from '@shinefold/utils/primitives';
 import { CACHE_CONTROL } from '@web/constants/http';
 import { ICON_LOG } from '@web/constants/icon';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';

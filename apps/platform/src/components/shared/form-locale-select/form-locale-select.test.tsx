@@ -1,7 +1,7 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { FormLocaleSelect } from './form-locale-select';

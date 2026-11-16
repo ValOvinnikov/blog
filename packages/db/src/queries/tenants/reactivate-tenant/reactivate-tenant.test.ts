@@ -1,38 +1,38 @@
-import { ERROR_CODE, TENANT_PLAN } from '@blog/config/constants';
+import { ERROR_CODE, TENANT_PLAN } from '@shinefold/config/constants';
 import {
   INACTIVITY_STAGE,
   SUSPENSION_REASON,
   TENANT_PROVISIONING_STATUS,
   TENANT_STATUS,
-} from '@blog/db/constants';
-import { listTenantsDueForInactivityStage } from '@blog/db/queries/tenants/list-tenants-due-for-inactivity-stage';
-import { wakeTenantFromInactivity } from '@blog/db/queries/tenants/wake-tenant-from-inactivity';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { testPersonalEmailIndex } from '@blog/db/testing/personal-data';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/constants';
+import { listTenantsDueForInactivityStage } from '@shinefold/db/queries/tenants/list-tenants-due-for-inactivity-stage';
+import { wakeTenantFromInactivity } from '@shinefold/db/queries/tenants/wake-tenant-from-inactivity';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { testPersonalEmailIndex } from '@shinefold/db/testing/personal-data';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_DEPROVISIONED_AT,
   MOCK_IDLE_DEPROVISIONING_STEPS,
   MOCK_MISSING_TENANT_ID,
-} from '@blog/db/testing/tenants/fixtures';
+} from '@shinefold/db/testing/tenants/fixtures';
 import {
   daysAfterLastActivity,
   MOCK_LAST_ACTIVITY_AT,
-} from '@blog/db/testing/tenants/inactivity';
+} from '@shinefold/db/testing/tenants/inactivity';
 import {
   MOCK_RESUME_CASES,
   pickResumedFields,
-} from '@blog/db/testing/tenants/resume';
-import { MOCK_SELF_SERVE_OWNER_EMAIL } from '@blog/db/testing/tenants/self-serve-fixtures';
-import { patchTestTenant } from '@blog/db/testing/test-tenant';
-import { errorResult } from '@blog/utils';
+} from '@shinefold/db/testing/tenants/resume';
+import { MOCK_SELF_SERVE_OWNER_EMAIL } from '@shinefold/db/testing/tenants/self-serve-fixtures';
+import { patchTestTenant } from '@shinefold/db/testing/test-tenant';
+import { errorResult } from '@shinefold/utils';
 import { eq } from 'drizzle-orm';
 
 import { reactivateTenant } from './reactivate-tenant';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock();

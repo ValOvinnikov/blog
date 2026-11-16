@@ -1,5 +1,5 @@
-import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockNewsletterModule } from '@web/testing/modules/newsletter/fixtures';
 import { SessionProvider } from 'next-auth/react';

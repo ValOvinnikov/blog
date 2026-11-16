@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_FRENCH_PATH,
   MOCK_READER_EMAIL,
   MOCK_TOKEN,
-} from '@blog/auth/testing/magic-link-fixtures';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/auth/testing/magic-link-fixtures';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 
 import { readRecipientLocale } from './read-recipient-locale';
 

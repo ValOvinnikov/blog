@@ -1,7 +1,7 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import type { BUTTON_VARIANT } from '@platform/constants/button';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { createContext, useContext } from 'react';
 
 import type { useConfirmDialog } from './use-confirm-dialog';

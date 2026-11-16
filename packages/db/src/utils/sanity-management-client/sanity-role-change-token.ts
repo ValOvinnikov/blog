@@ -1,4 +1,4 @@
-import { SANITY_PROJECT_ROLE } from '@blog/config';
+import { SANITY_PROJECT_ROLE } from '@shinefold/config';
 
 // Sanity refuses a project-scoped token any change to an `administrator` role.
 export function sanityRoleChangeToken(input: {

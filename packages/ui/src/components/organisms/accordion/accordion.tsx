@@ -1,6 +1,6 @@
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { type TCompoundComponent } from '@blog/ui/lib/react';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { type TCompoundComponent } from '@shinefold/ui/lib/react';
 import type { ElementType, ReactNode } from 'react';
 
 import { accordionVariants } from './accordion-variants';

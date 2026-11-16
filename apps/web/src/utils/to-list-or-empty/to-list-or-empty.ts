@@ -1,5 +1,5 @@
-import type { TValueOf } from '@blog/config';
-import type { TResult } from '@blog/utils';
+import type { TValueOf } from '@shinefold/config';
+import type { TResult } from '@shinefold/utils';
 import type { SITEMAP_LOG } from '@web/constants/sitemap';
 import { logger } from '@web/utils/logger/logger';
 

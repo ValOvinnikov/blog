@@ -1,4 +1,4 @@
-import { Button } from '@blog/ui/components/atoms/button';
+import { Button } from '@shinefold/ui/components/atoms/button';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { MessagePage } from './message-page';

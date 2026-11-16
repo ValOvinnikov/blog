@@ -1,14 +1,3 @@
-import {
-  type TMaybeNull,
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  ERROR_CODE,
-  LOCALE_ISO_CODES,
-} from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { TENANT_LOG } from '@platform/constants/tenant';
@@ -31,6 +20,17 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { MOCK_UNSUPPORTED_LOCALE } from '@platform/testing/tenants/unsupported-locale';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  type TMaybeNull,
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  ERROR_CODE,
+  LOCALE_ISO_CODES,
+} from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { errorResult, okResult } from '@shinefold/utils';
 import type { Session } from 'next-auth';
 
 import { updateTenantLanguagesAction } from './update-tenant-languages-action';
@@ -43,7 +43,7 @@ vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@platform/server/cookie-statement/enqueue-cookie-statement-seed');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: { setTenantAdditionalLocales: vi.fn() },
     auditEvents: { insertAuditEvent: vi.fn() },

@@ -4,7 +4,7 @@ import {
   mockFaqView,
   mockRawFaqModuleQuestions,
   mockRawFaqQuestionItem,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 
 import { resolveFaqs } from './resolve-faqs';
 

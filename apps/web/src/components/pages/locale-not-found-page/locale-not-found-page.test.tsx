@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { SITE_MESSAGES } from '@shinefold/config';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { renderElement, screen } from '@web/testing/custom-render';
 import {

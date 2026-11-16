@@ -1,15 +1,18 @@
-import { POST_SOURCE } from '@blog/config';
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
-import { FEATURED_POST_FILTER } from '@blog/service/shared/expressions/post/featured-post';
-import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
-import { localizedImageWithAltOptionalFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
-import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { postCardFragment } from '@blog/service/shared/fragments/post/post';
-import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
-import { pinnedPostInLocale } from '@blog/service/shared/localization/pinned-post-in-locale/pinned-post-in-locale';
-import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
+import { POST_SOURCE } from '@shinefold/config';
+import {
+  q,
+  type TModuleQueryParams,
+} from '@shinefold/service/sanity/query/query';
+import { FEATURED_POST_FILTER } from '@shinefold/service/shared/expressions/post/featured-post';
+import { ctaSecondaryButtonFragment } from '@shinefold/service/shared/fragments/cta/cta-button';
+import { localizedImageWithAltOptionalFragment } from '@shinefold/service/shared/fragments/image/localized-image-with-alt';
+import { moduleHeroLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
+import { postCardFragment } from '@shinefold/service/shared/fragments/post/post';
+import { getLocalizedField } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
+import { pinnedPostInLocale } from '@shinefold/service/shared/localization/pinned-post-in-locale/pinned-post-in-locale';
+import { publishedPostsInLocale } from '@shinefold/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 
 const newestFeaturedPostQuery = publishedPostsInLocale(
   q.parameters<TLocaleQueryParams>().star,

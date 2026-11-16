@@ -1,6 +1,6 @@
-import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES, routes } from '@blog/config';
-import type { IBreadcrumbItem } from '@blog/ui/components/molecules/breadcrumbs';
 import { faker } from '@faker-js/faker';
+import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES, routes } from '@shinefold/config';
+import type { IBreadcrumbItem } from '@shinefold/ui/components/molecules/breadcrumbs';
 import { mockRequestContextOnce } from '@web/testing/server/request-context/mock-request-context-once';
 import { MOCK_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
 

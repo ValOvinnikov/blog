@@ -1,5 +1,5 @@
-import { routes, type TMaybeUndefined } from '@blog/config';
-import type { TResult } from '@blog/utils';
+import { routes, type TMaybeUndefined } from '@shinefold/config';
+import type { TResult } from '@shinefold/utils';
 import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { redirect } from 'next/navigation';

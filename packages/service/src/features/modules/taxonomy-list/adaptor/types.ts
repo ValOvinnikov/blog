@@ -4,8 +4,8 @@ import type {
   TMaybeUndefined,
   THeadingBlock,
   TTaxonomyKind,
-} from '@blog/config';
-import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
+} from '@shinefold/config';
+import type { TWideLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 
 export type TPostLink = {
   id: string;

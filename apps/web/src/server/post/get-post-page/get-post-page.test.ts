@@ -14,7 +14,7 @@ const MOCK_POST_SLUG = faker.lorem.slug();
 
 const { getPostMock } = vi.hoisted(() => ({ getPostMock: vi.fn() }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: { pages: { post: { v1: { getPost: getPostMock } } } },
 }));
 

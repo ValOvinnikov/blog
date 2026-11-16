@@ -43,7 +43,7 @@ const preset = defineConfig({
 export default preset;
 
 export const blogPackageAlias = (pkg: string, importMetaUrl: string) => ({
-  find: new RegExp(`^@blog/${pkg}/`),
+  find: new RegExp(`^@shinefold/${pkg}/`),
   replacement: `${fileURLToPath(new URL(`../../packages/${pkg}/src`, importMetaUrl))}/`,
 });
 
@@ -76,7 +76,7 @@ export function createVitestConfig(overrides: TNextAppVitestOverrides) {
       resolve: {
         alias: overrides.resolve.alias,
       },
-      // @blog/ui ships raw .svg imports from source, so both apps' tests need the same SVGR handling as its own Vitest config.
+      // @shinefold/ui ships raw .svg imports from source, so both apps' tests need the same SVGR handling as its own Vitest config.
       plugins: [
         svgr({
           include: '**/*.svg',

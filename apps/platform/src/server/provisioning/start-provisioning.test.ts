@@ -1,9 +1,9 @@
-import { ACTION_OUTCOME, HTTP_STATUS } from '@blog/config';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { enqueueProvisioning } from '@platform/server/provisioning/enqueue-provisioning';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { ACTION_OUTCOME, HTTP_STATUS } from '@shinefold/config';
 
 import { startProvisioning } from './start-provisioning';
 

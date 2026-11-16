@@ -1,7 +1,7 @@
-import { ACCOUNT_PANEL_STYLE } from '@blog/config';
-import { ARIA_CURRENT, ARIA_CURRENT_PAGE } from '@blog/ui/testing/aria';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { ACCOUNT_PANEL_STYLE } from '@shinefold/config';
+import { ARIA_CURRENT, ARIA_CURRENT_PAGE } from '@shinefold/ui/testing/aria';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 

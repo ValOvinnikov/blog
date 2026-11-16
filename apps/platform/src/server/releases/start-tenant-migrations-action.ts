@@ -1,20 +1,20 @@
 'use server';
 
 import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  type TActionResult,
-  type TMaybeUndefined,
-} from '@blog/config';
-import { toOutcome } from '@blog/utils/to-outcome';
-import {
   MIGRATION_ENVIRONMENT,
   RELEASE_LOG,
   RELEASE_REFUSAL,
 } from '@platform/constants/release';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TActionResult,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
 import { dispatchTenantMigrationWorkflow } from './dispatch-tenant-migration-workflow';

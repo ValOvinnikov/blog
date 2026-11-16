@@ -1,8 +1,6 @@
 'use client';
 
 import { Menu } from '@base-ui/react/menu';
-import { ICONS, type TMaybeNull } from '@blog/config';
-import { hasArrayGotItems } from '@blog/utils/primitives';
 import { NavItemContent } from '@platform/components/features/layout/nav-item-content';
 import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
 import { sidebarVariants } from '@platform/components/features/layout/sidebar/sidebar-variants';
@@ -12,6 +10,8 @@ import { Tooltip } from '@platform/components/shared/tooltip';
 import { NestedMenuProvider } from '@platform/context/nested-menu-provider';
 import { Link, usePathname } from '@platform/i18n/navigation';
 import { isCurrentNavHref } from '@platform/utils/nav-sections/is-current-nav-href';
+import { ICONS, type TMaybeNull } from '@shinefold/config';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import type { ReactNode, RefObject } from 'react';
 

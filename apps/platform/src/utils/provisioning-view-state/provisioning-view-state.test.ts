@@ -1,11 +1,4 @@
 import {
-  ELEVATE_TENANT_OWNER_OUTCOME,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
-import type { TProvisioningRun } from '@blog/db/schema/tenants';
-import {
   MOCK_RUN_PLUS_1_MIN_AT,
   MOCK_RUN_PLUS_2_MIN_AT,
   MOCK_RUN_PLUS_4_MIN_AT,
@@ -14,6 +7,13 @@ import {
   mockIdleProvisioningSteps,
   mockMapDomainFailedProvisioningSteps,
 } from '@platform/testing/tenants/fixtures';
+import {
+  ELEVATE_TENANT_OWNER_OUTCOME,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@shinefold/db/constants';
+import type { TProvisioningRun } from '@shinefold/db/schema/tenants';
 
 import { provisioningViewState } from './provisioning-view-state';
 

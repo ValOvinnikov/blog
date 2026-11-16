@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import type { TStripeCouponDuration } from '@blog/db/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import type { TStripeCouponDuration } from '@shinefold/db/constants';
 import {
   stripePromotionCodes,
   type TAmountOffByCurrency,
-} from '@blog/db/schema/stripe-catalogue';
+} from '@shinefold/db/schema/stripe-catalogue';
 import { and, eq, ne, sql } from 'drizzle-orm';
 
 export type TSaveStripePromotionCodeInput = {

@@ -15,12 +15,12 @@ export default [
         {
           selector: 'JSXElement',
           message:
-            '@blog/service must not use JSX — it is the data layer and never imports React.',
+            '@shinefold/service must not use JSX — it is the data layer and never imports React.',
         },
         {
           selector: 'JSXFragment',
           message:
-            '@blog/service must not use JSX — it is the data layer and never imports React.',
+            '@shinefold/service must not use JSX — it is the data layer and never imports React.',
         },
       ],
       'no-restricted-imports': [
@@ -31,12 +31,12 @@ export default [
             {
               group: ['react', 'react/*', 'react-dom', 'react-dom/*'],
               message:
-                '@blog/service must not import React — it is the only package that talks to Sanity and never touches React.',
+                '@shinefold/service must not import React — it is the only package that talks to Sanity and never touches React.',
             },
             {
-              group: ['@blog/ui', '@blog/ui/*'],
+              group: ['@shinefold/ui', '@shinefold/ui/*'],
               message:
-                '@blog/service must not import @blog/ui — service has no presentation concerns.',
+                '@shinefold/service must not import @shinefold/ui — service has no presentation concerns.',
             },
           ],
         },

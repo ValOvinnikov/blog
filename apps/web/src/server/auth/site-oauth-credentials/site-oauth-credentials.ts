@@ -1,9 +1,9 @@
 import 'server-only';
 
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
-import type { TTenantOAuthCredentialsByProvider } from '@blog/db/queries/tenant-oauth-credentials/get-tenant-oauth-credentials/get-tenant-oauth-credentials';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
+import type { TTenantOAuthCredentialsByProvider } from '@shinefold/db/queries/tenant-oauth-credentials/get-tenant-oauth-credentials/get-tenant-oauth-credentials';
 import { AUTH_ACTION } from '@web/constants/session';
 import { SIGN_IN_LOG } from '@web/constants/sign-in';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';

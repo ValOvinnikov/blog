@@ -1,10 +1,10 @@
 'use client';
 
-import { SIZE } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TInvalidControls } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
+import { SIZE } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { type Ref, useRef } from 'react';
 

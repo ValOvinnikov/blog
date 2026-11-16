@@ -1,4 +1,4 @@
-import { queries } from '@blog/db';
+import { queries } from '@shinefold/db';
 import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { logger } from '@web/utils/logger/logger';
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { Form } from '@base-ui/react/form';
-import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
 import { OnboardingFooter } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-footer';
 import { OnboardingPreview } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-preview';
 import { OnboardingRail } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-rail';
@@ -9,6 +8,7 @@ import { OnboardingStepFields } from '@platform/components/features/onboarding/o
 import { OnboardingStepHeader } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-step-header';
 import { ONBOARDING_SCROLL_AREA_TEST_ID } from '@platform/constants/onboarding';
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
+import type { TLocaleIsoCode, TMaybeUndefined } from '@shinefold/config';
 
 import { onboardingFormVariants } from './onboarding-form-variants';
 import { useOnboardingPreviewOptions } from './use-onboarding-preview-options';

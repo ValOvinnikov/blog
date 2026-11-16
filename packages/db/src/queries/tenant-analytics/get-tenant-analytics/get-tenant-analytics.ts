@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
-import type { TTenantAnalytics } from '@blog/db/queries/tenant-analytics/save-tenant-analytics';
-import { tenantAnalytics } from '@blog/db/schema/tenant-analytics';
-import { tenants } from '@blog/db/schema/tenants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
+import type { TTenantAnalytics } from '@shinefold/db/queries/tenant-analytics/save-tenant-analytics';
+import { tenantAnalytics } from '@shinefold/db/schema/tenant-analytics';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
 /** The analytics tool a site loads: nothing when the tenant's plan excludes it, whatever is stored. */

@@ -1,18 +1,18 @@
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
 import {
   getTenantRevalidateWebhookSecret,
   setTenantRevalidateWebhookSecret,
   setTenantWebhookCreatedAt,
-} from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   createSanityWebhook,
   listSanityWebhooks,
   type TListedSanityWebhook,
   updateSanityWebhookProjection,
   updateSanityWebhookSecret,
-} from '@blog/db/utils/sanity-management-client/sanity-webhooks';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
 import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
@@ -41,8 +41,8 @@ import {
 
 faker.seed(7003);
 
-vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-webhooks');
+vi.mock('@shinefold/db/queries/tenants');
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-webhooks');
 vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 const MOCK_STORED_TENANT_SECRET = faker.string.alphanumeric(32);

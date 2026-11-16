@@ -1,8 +1,12 @@
-import { ERROR_CODE, HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
-import { EMAIL_DELIVERY_OUTCOME } from '@blog/db/constants';
-import { SITE_EMAIL_TAG_NAME } from '@blog/email';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import {
+  ERROR_CODE,
+  HTTP_METHOD,
+  HTTP_STATUS,
+} from '@shinefold/config/constants';
+import { EMAIL_DELIVERY_OUTCOME } from '@shinefold/db/constants';
+import { SITE_EMAIL_TAG_NAME } from '@shinefold/email';
+import { errorResult, okResult } from '@shinefold/utils';
 import {
   EMAIL_USAGE_LOG,
   RESEND_DELIVERY_EVENT_TYPE,
@@ -20,7 +24,7 @@ const { recordEmailDeliveryOutcomeMock, envMock } = vi.hoisted(() => ({
   envMock: {} as { RESEND_WEBHOOK_SECRET?: string },
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     emailUsage: { recordEmailDeliveryOutcome: recordEmailDeliveryOutcomeMock },
   },

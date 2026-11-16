@@ -1,5 +1,3 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import {
@@ -13,6 +11,8 @@ import {
 } from '@platform/testing/loggable-error/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { logger } from '@platform/utils/logger/logger';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import { admitCreateSite } from './admit-create-site';
 import { MAX_SITES_PER_IP_PER_DAY } from './create-site-gate';
@@ -23,7 +23,7 @@ const { isSignupBlockedMock } = vi.hoisted(() => ({
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     blockedSignupIdentities: { isSignupBlocked: isSignupBlockedMock },

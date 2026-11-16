@@ -1,10 +1,10 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
 
 export type TSiteSetup = {
   tenant: ReturnType<typeof toClientTenant>;

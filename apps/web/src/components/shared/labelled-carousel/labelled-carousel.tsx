@@ -4,11 +4,11 @@ import type {
   IWithClassName,
   IWithDataTestId,
   TBrandVariant,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   Carousel,
   type ICarouselProps,
-} from '@blog/ui/components/organisms/carousel';
+} from '@shinefold/ui/components/organisms/carousel';
 import { useTranslations } from 'next-intl';
 import type { Key, ReactNode } from 'react';
 

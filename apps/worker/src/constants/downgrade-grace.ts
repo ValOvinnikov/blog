@@ -1,4 +1,4 @@
-import { GRACE_EMAIL } from '@blog/db/constants';
+import { GRACE_EMAIL } from '@shinefold/db/constants';
 
 export const DOWNGRADE_GRACE_LOG = {
   FAILED: 'downgrade_grace.failed',

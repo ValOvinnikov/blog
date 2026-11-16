@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { FatalError } from 'workflow';
 
 function requireValue(name: string, value: TMaybeUndefined<string>): string {

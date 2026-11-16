@@ -1,7 +1,7 @@
-import { CAPABILITY, FOOTER_FINE_PRINT_KIND } from '@blog/config';
-import { service } from '@blog/service';
-import { Footer } from '@blog/ui/components/organisms/footer';
-import { hasArrayGotItems, isString } from '@blog/utils/primitives';
+import { CAPABILITY, FOOTER_FINE_PRINT_KIND } from '@shinefold/config';
+import { service } from '@shinefold/service';
+import { Footer } from '@shinefold/ui/components/organisms/footer';
+import { hasArrayGotItems, isString } from '@shinefold/utils/primitives';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { CookieSettingsButton } from '@web/components/shared/cookie-settings-button';
 import { FloatingCookieSettingsButton } from '@web/components/shared/floating-cookie-settings-button';

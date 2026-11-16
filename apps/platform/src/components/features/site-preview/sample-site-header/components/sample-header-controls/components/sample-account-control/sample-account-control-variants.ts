@@ -1,5 +1,5 @@
-import { ACCOUNT_BUTTON_STYLE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
+import { ACCOUNT_BUTTON_STYLE } from '@shinefold/config';
 
 export const sampleAccountControlVariants = tv({
   slots: {

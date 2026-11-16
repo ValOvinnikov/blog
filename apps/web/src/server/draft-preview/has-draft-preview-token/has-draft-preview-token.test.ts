@@ -1,5 +1,5 @@
-import { signPreviewToken } from '@blog/utils/preview-token';
 import { faker } from '@faker-js/faker';
+import { signPreviewToken } from '@shinefold/utils/preview-token';
 import { PREVIEW_TOKEN_HEADER } from '@web/server/draft-preview/constants/constants';
 import { env } from '@web/utils/env/env';
 

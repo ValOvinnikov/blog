@@ -1,19 +1,19 @@
-import { SUBSCRIBER_OUTCOME } from '@blog/config';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { SUBSCRIBER_OUTCOME } from '@shinefold/config';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestReader,
   insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { toOutcome } from '@blog/utils/to-outcome';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { resendConfirmation } from './resend-confirmation';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(1);
 

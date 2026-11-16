@@ -1,5 +1,5 @@
-import type { TNullable } from '@blog/config';
-import { isNull, isString, isUndefined } from '@blog/utils/primitives';
+import type { TNullable } from '@shinefold/config';
+import { isNull, isString, isUndefined } from '@shinefold/utils/primitives';
 
 export interface IRevalidateWebhookBody {
   _type: string;

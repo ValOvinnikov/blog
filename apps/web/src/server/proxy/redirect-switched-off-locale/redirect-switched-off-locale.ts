@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
+import type { TLocaleIsoCode, TMaybeUndefined } from '@shinefold/config';
 import { localeForPrefix } from '@web/i18n/routing';
 import { NextResponse, type NextRequest } from 'next/server';
 

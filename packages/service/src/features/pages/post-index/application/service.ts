@@ -1,6 +1,6 @@
-import { getIndexPage } from '@blog/service/features/pages/post-index/adaptor/index-page/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getIndexPage } from '@shinefold/service/features/pages/post-index/adaptor/index-page/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 import { getIndexPageParams } from './get-index-page-params';
 

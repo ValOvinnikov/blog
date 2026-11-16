@@ -1,8 +1,8 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { ARIA_CURRENT, ARIA_CURRENT_PAGE } from '@blog/ui/testing/aria';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
-import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { ARIA_CURRENT, ARIA_CURRENT_PAGE } from '@shinefold/ui/testing/aria';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@shinefold/ui/testing/mock-link';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TextLink, type TTextLinkProps } from './text-link';

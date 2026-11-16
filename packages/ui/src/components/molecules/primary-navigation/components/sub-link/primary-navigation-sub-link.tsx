@@ -1,11 +1,11 @@
-import { ICONS, SIZE } from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { Icon } from '@blog/ui/components/atoms/icon';
+import { ICONS, SIZE } from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 import {
   TextLink,
   type TTextLinkProps,
-} from '@blog/ui/components/atoms/text-link';
-import type { INavItem } from '@blog/ui/components/molecules/primary-navigation/primary-navigation';
+} from '@shinefold/ui/components/atoms/text-link';
+import type { INavItem } from '@shinefold/ui/components/molecules/primary-navigation/primary-navigation';
 
 export type TPrimaryNavigationSubLinkProps = {
   item: INavItem;

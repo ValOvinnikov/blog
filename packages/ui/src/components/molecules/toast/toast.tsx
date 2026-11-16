@@ -6,11 +6,14 @@ import {
   type IWithDataTestId,
   type TIconName,
   type TToastType,
-} from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { IconButton } from '@blog/ui/components/atoms/icon-button';
-import { Spinner, type TSpinnerProps } from '@blog/ui/components/atoms/spinner';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
+import {
+  Spinner,
+  type TSpinnerProps,
+} from '@shinefold/ui/components/atoms/spinner';
+import { isUndefined } from '@shinefold/utils/primitives';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { toastVariants, type TToastVariants } from './toast-variants';

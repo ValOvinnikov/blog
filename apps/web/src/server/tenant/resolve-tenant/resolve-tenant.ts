@@ -4,9 +4,13 @@ import {
   type TMaybeJsonDates,
   type TMaybeNull,
   type TMaybeUndefined,
-} from '@blog/config';
-import { queries, TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/config';
+import {
+  queries,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { reviveCachedTenant } from '@web/server/tenant/revive-cached-tenant/revive-cached-tenant';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { TENANT_BY_HOST_CACHE_TAG } from '@web/utils/tenant-cache-tags';

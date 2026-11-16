@@ -1,5 +1,5 @@
-import { CORE_DEPROVISIONING_STEPS } from '@blog/db/constants';
-import { errorResult, okResult } from '@blog/utils/result';
+import { CORE_DEPROVISIONING_STEPS } from '@shinefold/db/constants';
+import { errorResult, okResult } from '@shinefold/utils/result';
 import { UNKNOWN_RUN_ERROR } from '@worker/constants/provisioning';
 import {
   beginDeprovisioning,

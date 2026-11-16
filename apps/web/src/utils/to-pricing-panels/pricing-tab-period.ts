@@ -1,5 +1,5 @@
-import { PRICE_PERIOD, type TPricePeriod } from '@blog/config';
-import type { TPricingTier } from '@blog/service';
+import { PRICE_PERIOD, type TPricePeriod } from '@shinefold/config';
+import type { TPricingTier } from '@shinefold/service';
 
 export const PRICING_TAB_PERIODS = [
   PRICE_PERIOD.MONTH,

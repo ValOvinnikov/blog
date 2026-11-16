@@ -1,8 +1,8 @@
 /**
  * @vitest-environment jsdom
  */
-import { HTTP_METHOD } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { HTTP_METHOD } from '@shinefold/config';
 import {
   MAX_MESSAGE_LENGTH,
   MAX_STACK_LENGTH,

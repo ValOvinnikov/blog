@@ -1,4 +1,4 @@
-import type { ITenantLocalizedParams } from '@blog/config';
+import type { ITenantLocalizedParams } from '@shinefold/config';
 import { TagIndexPage } from '@web/components/pages/tag-index-page';
 import { buildTagIndexMetadata } from '@web/metadata/tag-index-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';

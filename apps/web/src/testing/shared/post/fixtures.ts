@@ -1,4 +1,4 @@
-import type { TPostCard, TPostCardTopic } from '@blog/service';
+import type { TPostCard, TPostCardTopic } from '@shinefold/service';
 import { mockPostCardAuthor } from '@web/testing/shared/author/fixtures';
 
 export const MOCK_EN_POST_SLUG = 'localized-post';

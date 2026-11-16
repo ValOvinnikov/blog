@@ -2,8 +2,8 @@ import {
   CONTENT_ALIGNMENT,
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
-} from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+} from '@shinefold/config';
+import { tv } from '@shinefold/ui/lib/styling';
 
 export const timelineVariants = tv({
   slots: {

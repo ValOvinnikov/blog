@@ -1,6 +1,7 @@
-import type { TTenantEmailBrand } from '@blog/config';
-import type { TPortableTextContent } from '@blog/email/portable-text';
-import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
+import { faker } from '@faker-js/faker';
+import type { TTenantEmailBrand } from '@shinefold/config';
+import type { TPortableTextContent } from '@shinefold/email/portable-text';
+import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@shinefold/email/templates/tenant/unsubscribe/unsubscribe';
 import {
   MOCK_ESCAPED_UNSUBSCRIBE_URL,
   MOCK_LOGO_URL,
@@ -9,10 +10,9 @@ import {
   MOCK_UNSAFE_MARKUP,
   MOCK_UNSUBSCRIBE_URL,
   MOCK_URL,
-} from '@blog/email/testing/email-fixtures';
-import { mockPortableTextBody } from '@blog/email/testing/portable-text-fixtures';
-import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/email/testing/email-fixtures';
+import { mockPortableTextBody } from '@shinefold/email/testing/portable-text-fixtures';
+import { MOCK_TENANT_EMAIL_BRAND } from '@shinefold/email/testing/tenant-email-brand';
 
 import { buildNewsletterConfirmationEmail } from './newsletter-confirmation';
 

@@ -1,4 +1,4 @@
-import { tv } from '@blog/ui/lib/styling';
+import { tv } from '@shinefold/ui/lib/styling';
 
 import { FULL_BLEED_TABLE } from './full-bleed';
 

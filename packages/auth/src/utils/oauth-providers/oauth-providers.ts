@@ -1,10 +1,13 @@
 import 'server-only';
 
-import { oauthEnv } from '@blog/auth/utils/oauth-env/oauth-env';
-import type { TMaybeUndefined, TOAuthCredentials } from '@blog/config';
-import { OAUTH_PROVIDER, type TOAuthProvider } from '@blog/config/constants';
-import type { TTenantOAuthCredentialsByProvider } from '@blog/db/queries/tenant-oauth-credentials/get-tenant-oauth-credentials/get-tenant-oauth-credentials';
-import { isUndefined } from '@blog/utils/primitives';
+import { oauthEnv } from '@shinefold/auth/utils/oauth-env/oauth-env';
+import type { TMaybeUndefined, TOAuthCredentials } from '@shinefold/config';
+import {
+  OAUTH_PROVIDER,
+  type TOAuthProvider,
+} from '@shinefold/config/constants';
+import type { TTenantOAuthCredentialsByProvider } from '@shinefold/db/queries/tenant-oauth-credentials/get-tenant-oauth-credentials/get-tenant-oauth-credentials';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 export type TOAuthProviderId = TOAuthProvider;
 

@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { KEY_ENCODING } from '@blog/utils/encryption';
 import { faker } from '@faker-js/faker';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { KEY_ENCODING } from '@shinefold/utils/encryption';
 import { env } from '@web/utils/env/env';
 
 import {

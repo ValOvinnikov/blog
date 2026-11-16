@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
 import type { TLanguageChangeCount } from '@platform/utils/format-language-changes/format-language-changes';
 import type { TInvalidControls } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 import type { TSettingsFormDraft } from './use-settings-draft';
 

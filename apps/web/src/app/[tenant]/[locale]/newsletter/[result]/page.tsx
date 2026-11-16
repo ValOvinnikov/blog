@@ -1,4 +1,4 @@
-import type { ITenantLocalizedParams } from '@blog/config';
+import type { ITenantLocalizedParams } from '@shinefold/config';
 import { NewsletterResultPage } from '@web/components/pages/newsletter-result-page';
 import { buildNewsletterResultMetadata } from '@web/metadata/newsletter-result-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';

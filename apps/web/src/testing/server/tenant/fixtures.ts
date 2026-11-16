@@ -1,8 +1,11 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
-import type { TTenantSanityCredentials } from '@blog/db/queries/tenants/get-tenant-sanity-credentials/get-tenant-sanity-credentials';
-import type { TTenantSanityWriteCredentials } from '@blog/db/queries/tenants/get-tenant-sanity-write-credentials/get-tenant-sanity-write-credentials';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@shinefold/db/constants';
+import type { TTenantSanityCredentials } from '@shinefold/db/queries/tenants/get-tenant-sanity-credentials/get-tenant-sanity-credentials';
+import type { TTenantSanityWriteCredentials } from '@shinefold/db/queries/tenants/get-tenant-sanity-write-credentials/get-tenant-sanity-write-credentials';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { createMockFaker } from '@web/testing/mock-faker';
 import {
   MOCK_TENANT_SANITY_CONTEXT,

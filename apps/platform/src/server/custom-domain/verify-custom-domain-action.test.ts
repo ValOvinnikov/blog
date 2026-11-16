@@ -1,17 +1,4 @@
 import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  ERROR_CODE,
-  HTTP_STATUS,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { errorResult, okResult } from '@blog/utils';
-import {
   CUSTOM_DOMAIN_FIELD_ERROR,
   CUSTOM_DOMAIN_LOG,
   CUSTOM_DOMAIN_PATH,
@@ -37,6 +24,19 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { customDomainTxtName } from '@platform/utils/custom-domain-txt-name/custom-domain-txt-name';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  ERROR_CODE,
+  HTTP_STATUS,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { errorResult, okResult } from '@shinefold/utils';
 import { notFound } from 'next/navigation';
 
 import { lookupTxtRecords } from './lookup-txt-records';
@@ -50,7 +50,7 @@ vi.mock('./lookup-txt-records');
 
 vi.mock('@platform/server/provisioning/enqueue-provisioning');
 
-vi.mock('@blog/db', async () => {
+vi.mock('@shinefold/db', async () => {
   const { mockCustomDomainDb } =
     await import('@platform/testing/custom-domain/fixtures');
   return mockCustomDomainDb();

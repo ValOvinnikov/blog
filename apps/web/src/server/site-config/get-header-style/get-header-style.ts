@@ -1,4 +1,4 @@
-import type { IHeaderStyle } from '@blog/config';
+import type { IHeaderStyle } from '@shinefold/config';
 import { HEADER_STYLE_LOG } from '@web/constants/header-style';
 import { getSiteConfigWithPreset } from '@web/server/site-config/get-site-config-with-preset/get-site-config-with-preset';
 

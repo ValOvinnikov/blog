@@ -1,10 +1,10 @@
-import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
+import { linkRefSchema } from '@shinefold/studio/schema-types/objects/link-ref/link-ref';
 import {
   boldDecorator,
   italicDecorator,
   subscriptDecorator,
   superscriptDecorator,
-} from '@blog/studio/schema-types/portable-text/decorators/decorators';
+} from '@shinefold/studio/schema-types/portable-text/decorators/decorators';
 import {
   defineArrayMember,
   defineType,

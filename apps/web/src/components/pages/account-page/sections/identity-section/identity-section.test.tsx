@@ -1,5 +1,5 @@
-import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
+import { queries } from '@shinefold/db';
 import { ToastProvider } from '@web/context/toast-provider';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
@@ -10,7 +10,7 @@ import { IdentitySection } from './identity-section';
 
 vi.mock('@web/server/auth/auth');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { account: { getLinkedProviders: vi.fn() } },
 }));
 

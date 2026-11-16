@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { createLokiSink, registerLogSink } from '@blog/insight';
 import { env } from '@platform/utils/env/env';
+import { createLokiSink, registerLogSink } from '@shinefold/insight';
 import { waitUntil } from '@vercel/functions';
 
 const isHttpUrl = (value: string): boolean => {

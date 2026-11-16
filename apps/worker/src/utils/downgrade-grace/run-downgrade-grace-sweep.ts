@@ -1,14 +1,14 @@
-import type { TValueOf } from '@blog/config/utils';
-import { GRACE_EMAIL, type TGraceEmail } from '@blog/db/constants';
-import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
+import type { TValueOf } from '@shinefold/config/utils';
+import { GRACE_EMAIL, type TGraceEmail } from '@shinefold/db/constants';
+import { listTenantHosts } from '@shinefold/db/queries/tenant-domains/list-tenant-hosts';
 import {
   listTenantsDueForGraceEmail,
   listTenantsDueForGraceEnd,
   listTenantsWithEndedTrial,
-} from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isPlatformTenant } from '@blog/db/utils/is-platform-tenant/is-platform-tenant';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isPlatformTenant } from '@shinefold/db/utils/is-platform-tenant/is-platform-tenant';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import {
   DOWNGRADE_GRACE_LOG,
   DOWNGRADE_GRACE_STEP,

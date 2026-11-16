@@ -2,14 +2,14 @@ import {
   BRAND_VARIANT,
   IMAGE_LAYOUT,
   PORTABLE_TEXT_BLOCK_TYPE,
-} from '@blog/config';
-import { mockRawContentModule } from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/config';
+import { mockRawContentModule } from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_BODY_IMAGE_KEY,
   mockRawBodyImageBlock,
   mockRawWideLayout,
   mockSanityImageView,
-} from '@blog/service/testing/shared/fixtures';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toContentModule } from './transformer';
 

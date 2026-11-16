@@ -1,8 +1,8 @@
 'use client';
 
-import { ACTION_OUTCOME, routes } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
-import { TextInput } from '@blog/ui/components/atoms/text-input';
+import { ACTION_OUTCOME, routes } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { TextInput } from '@shinefold/ui/components/atoms/text-input';
 import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useToast } from '@web/context/toast-provider';
 import { deleteAccountAction } from '@web/server/account/account-actions/account-actions';

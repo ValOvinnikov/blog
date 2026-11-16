@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { magicLinkSendCounters } from '@blog/db/schema/magic-link-send-counters';
+import { getDb } from '@shinefold/db/client';
+import { magicLinkSendCounters } from '@shinefold/db/schema/magic-link-send-counters';
 import { sql } from 'drizzle-orm';
 
 export async function incrementMagicLinkSendCount(

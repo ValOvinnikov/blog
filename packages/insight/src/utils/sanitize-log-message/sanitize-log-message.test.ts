@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_ERROR_MESSAGE,
   MOCK_LINE_SEPARATOR,
   MOCK_PARAGRAPH_SEPARATOR,
   MOCK_SEPARATORS,
-} from '@blog/insight/testing/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/insight/testing/fixtures';
 
 import { sanitizeLogMessage } from './sanitize-log-message';
 

@@ -1,6 +1,6 @@
-import { SIZE } from '@blog/config';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import { Button } from '@blog/ui/components/atoms/button';
+import { SIZE } from '@shinefold/config';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import { Button } from '@shinefold/ui/components/atoms/button';
 import type { INewsletterSectionViewProps } from '@web/components/pages/account-page/sections/newsletter-section/newsletter-section-view';
 import { createMockFaker } from '@web/testing/mock-faker';
 

@@ -1,7 +1,7 @@
-import { NAV_LINK_STYLE } from '@blog/config';
 import { NavLinkStyleGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { SEGMENTED_LAYOUT } from '@platform/constants/segmented-control';
+import { NAV_LINK_STYLE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export const NavLinkStyleField = () => {

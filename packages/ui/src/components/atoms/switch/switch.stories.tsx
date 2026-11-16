@@ -1,4 +1,4 @@
-import { SurfaceBands } from '@blog/ui/testing/surface-bands';
+import { SurfaceBands } from '@shinefold/ui/testing/surface-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 

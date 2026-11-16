@@ -1,5 +1,5 @@
-import type { TTenant } from '@blog/db/schema/tenants';
-import { buildArchivedSanityProjectAlertEmail } from '@blog/email';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { buildArchivedSanityProjectAlertEmail } from '@shinefold/email';
 import {
   DEPROVISIONING_ALERT_NO_RECIPIENTS_EVENT,
   DEPROVISIONING_ALERT_SEND_FAILED_EVENT,

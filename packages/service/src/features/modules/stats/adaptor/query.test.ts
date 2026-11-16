@@ -1,15 +1,15 @@
-import { BRAND_VARIANT, LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   MOCK_STATS_MODULE_ID,
   mockRawStatItem,
   mockRawStatsModule,
-} from '@blog/service/testing/modules/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/modules/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
-} from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
 
 import { statsModuleQuery } from './query';
 

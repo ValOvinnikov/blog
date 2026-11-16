@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
-import { normalizeEmailIdentity } from '@blog/utils/normalize-email-identity';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { isValidDomain } from '@shinefold/db/utils/is-valid-domain/is-valid-domain';
+import { normalizeEmailIdentity } from '@shinefold/utils/normalize-email-identity';
 
 export type TSignupEmail = {
   address: string;

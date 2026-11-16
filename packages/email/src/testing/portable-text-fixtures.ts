@@ -1,4 +1,4 @@
-import type { TPortableTextNode } from '@blog/email/portable-text';
+import type { TPortableTextNode } from '@shinefold/email/portable-text';
 
 const LINK_KEY = 'linked-link';
 
