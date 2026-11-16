@@ -19,7 +19,11 @@ export const LookSamplePosts = () => {
     <LookSampleSection heading={t('latestPostsHeading')}>
       <div className={cards()}>
         <SamplePart part={SAMPLE_PART.POST_CARD}>
-          <MediaCard isInteractive={true} excerpt={t('firstCardExcerpt')}>
+          <MediaCard
+            isLead={true}
+            isInteractive={true}
+            excerpt={t('firstCardExcerpt')}
+          >
             <MediaCard.Media>
               <LookSamplePostImage />
             </MediaCard.Media>

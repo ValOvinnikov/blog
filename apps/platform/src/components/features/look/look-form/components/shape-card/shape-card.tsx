@@ -4,7 +4,12 @@ import { LookPresetChoiceField } from '@platform/components/features/look/look-f
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
-import { DENSITY, RADIUS_SCALE } from '@shinefold/config';
+import {
+  DENSITY,
+  DIVIDER_WIDTH,
+  IMAGE_PROPORTION,
+  RADIUS_SCALE,
+} from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TShapeCardProps = {
@@ -27,6 +32,18 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
     t(`densityOptionLabel.${option}`),
   );
 
+  const imageProportionOptions = Object.values(IMAGE_PROPORTION).map(
+    (proportion) => ({
+      value: proportion,
+      label: t(`imageProportionOptionLabel.${proportion}`),
+    }),
+  );
+
+  const dividerWidthOptions = Object.values(DIVIDER_WIDTH).map((width) => ({
+    value: width,
+    label: t(`dividerWidthOptionLabel.${width}`),
+  }));
+
   return (
     <LookCard
       summary={summary}
@@ -47,6 +64,20 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
         label={t('densityLabel')}
         hint={t('densityDescription')}
         options={densityOptions}
+      />
+
+      <LookPresetChoiceField
+        field="imageProportion"
+        label={t('imageProportionLabel')}
+        hint={t('imageProportionDescription')}
+        options={imageProportionOptions}
+      />
+
+      <LookPresetChoiceField
+        field="dividerWidth"
+        label={t('dividerWidthLabel')}
+        hint={t('dividerWidthDescription')}
+        options={dividerWidthOptions}
       />
     </LookCard>
   );

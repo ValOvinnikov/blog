@@ -225,6 +225,12 @@ describe(`<${LookSample.name}/>`, () => {
       });
     });
 
+    it('shows one section divider for the divider weight to draw on', () => {
+      const divider = screen.getByRole('separator');
+
+      expect(divider).toBeInTheDocument();
+    });
+
     it('asks two questions under Questions, answering the first', () => {
       const questions = within(screen.getByRole('region', { name: QUESTIONS }));
       const firstQuestion = questions.getByRole('button', {

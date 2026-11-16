@@ -26,6 +26,10 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
     headerControlShape,
     buttonShape,
     navLinkStyle,
+    headingWeight,
+    headingCase,
+    imageProportion,
+    dividerWidth,
   } = lookFormValuesOrDefaults(config);
   const listSamplesByLocale = Object.fromEntries(
     await Promise.all(
@@ -58,6 +62,10 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
           headerControlShape,
           buttonShape,
           navLinkStyle,
+          headingWeight,
+          headingCase,
+          imageProportion,
+          dividerWidth,
         }}
         savedAt={config?.updatedAt}
         archivedAt={tenant.archivedAt}

@@ -724,8 +724,8 @@
     "viewTabsAriaLabel": "Look-weergave",
     "jumpIndexAriaLabel": "Look-onderdelen",
     "growthAddsColour": "Een eigen tint voor het logo",
-    "growthAddsType": "Lettertypen voor koppen en lopende tekst",
-    "growthAddsShape": "Hoeken en ruimte",
+    "growthAddsType": "Lettertypen, dikte en hoofdletters van koppen",
+    "growthAddsShape": "Hoeken, ruimte, beeldverhoudingen en scheidingslijnen",
     "growthAddsCards": "Kaartstijl",
     "growthAddsButtons": "Bezig-status en spinner",
     "growthAddsHeader": "Indeling, submenu’s, balk, headerknoppen en accountknoppen",
@@ -776,6 +776,34 @@
       "DEFAULT": "Comfortabel",
       "COMPACT": "Compact"
     },
+    "headingWeightLabel": "Dikte van koppen",
+    "headingWeightDescription": "Hoe zwaar elke kop op je site eruitziet.",
+    "headingWeightOptionLabel": {
+      "REGULAR": "Normaal",
+      "MEDIUM": "Medium",
+      "SEMIBOLD": "Halfvet",
+      "BOLD": "Vet"
+    },
+    "headingCaseLabel": "Hoofdletters in koppen",
+    "headingCaseDescription": "Pagina- en sectietitels. Kaarttitels en koppen in berichten blijven zoals je ze schreef, zodat langere tekst goed leesbaar blijft.",
+    "headingCaseOptionLabel": {
+      "AS_WRITTEN": "Zoals geschreven",
+      "UPPERCASE": "Hoofdletters"
+    },
+    "imageProportionLabel": "Beeldverhoudingen",
+    "imageProportionDescription": "Verandert afbeeldingen met de vorm Breed en afbeeldingen zonder vormkeuze. Vierkante en ronde afbeeldingen houden hun vorm.",
+    "imageProportionOptionLabel": {
+      "AS_DESIGNED": "Zoals ontworpen",
+      "WIDE": "Breed",
+      "CLASSIC": "Klassiek",
+      "SQUARE": "Vierkant"
+    },
+    "dividerWidthLabel": "Sectiescheidingen",
+    "dividerWidthDescription": "Hoe dik de lijn is tussen secties die een scheiding tonen.",
+    "dividerWidthOptionLabel": {
+      "HAIRLINE": "Haarlijn",
+      "BOLD": "Dik"
+    },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Accentbalk",
       "OUTLINED": "Omlijnd",
@@ -820,7 +848,7 @@
     "languageSwitcherSingleLanguage": "Voeg eerst een andere taal toe bij Talen om een stijl te kiezen.",
     "languageSwitcherFreeDescription": "Je abonnement publiceert één taal. Upgrade om talen toe te voegen en een stijl voor de taalkeuze te kiezen.",
     "lockLineGrowthFields": "Velden met Growth houden de waarde van de voorinstelling {preset}.",
-    "lockLineTypeFonts": "Met dit abonnement houdt Lettertype de lettertypen van de voorinstelling {preset}. Een andere voorinstelling kiezen verandert ze.",
+    "lockLineTypeFonts": "Met dit abonnement houdt Lettertype de lettertypen en kopstijl van de voorinstelling {preset}. Een andere voorinstelling kiezen verandert ze.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Wereldbol",

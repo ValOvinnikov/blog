@@ -1,5 +1,6 @@
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
@@ -7,6 +8,7 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { FontPicker } from '@platform/components/shared/font-picker';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
+import { HEADING_CASE, HEADING_WEIGHT } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TTypeCardProps = {
@@ -28,6 +30,14 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
 
   const headingFontLabel = t('headingFontLabel');
   const bodyFontLabel = t('bodyFontLabel');
+  const headingWeightOptions = Object.values(HEADING_WEIGHT).map((weight) => ({
+    value: weight,
+    label: t(`headingWeightOptionLabel.${weight}`),
+  }));
+  const headingCaseOptions = Object.values(HEADING_CASE).map((headingCase) => ({
+    value: headingCase,
+    label: t(`headingCaseOptionLabel.${headingCase}`),
+  }));
 
   return (
     <LookCard
@@ -68,6 +78,20 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
         />
         <PresetValueButton field="bodyFont" fieldLabel={bodyFontLabel} />
       </LookField>
+
+      <LookPresetChoiceField
+        field="headingWeight"
+        label={t('headingWeightLabel')}
+        hint={t('headingWeightDescription')}
+        options={headingWeightOptions}
+      />
+
+      <LookPresetChoiceField
+        field="headingCase"
+        label={t('headingCaseLabel')}
+        hint={t('headingCaseDescription')}
+        options={headingCaseOptions}
+      />
     </LookCard>
   );
 };

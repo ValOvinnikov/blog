@@ -51,7 +51,8 @@ export const LookSample = ({
 }: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
-  const { root, main, hero, title, lead, actionsRow } = lookSampleVariants();
+  const { root, main, hero, title, lead, actionsRow, divider } =
+    lookSampleVariants();
 
   return (
     <SiteThemeFrame
@@ -93,6 +94,7 @@ export const LookSample = ({
           </div>
         </div>
         <LookSamplePosts />
+        <hr className={divider()} />
         <LookSampleFaq />
         <LookSampleForm />
         <LookSampleQuote />
