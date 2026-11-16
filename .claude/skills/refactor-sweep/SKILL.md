@@ -1,8 +1,8 @@
 ---
 name: refactor-sweep
 description: >-
-  Use when running an on-demand refactor audit over one workspace in this
-  blog monorepo — surfacing duplication, over-complex code worth
+  Use when running an on-demand refactor audit over one workspace in the
+  Shinefold monorepo — surfacing duplication, over-complex code worth
   simplifying, comment-policy violations, dead code, and drifted
   conventions as verified findings the user approves before any is filed as
   an issue. Triggers on "run a refactor sweep" or "audit <layer> for cleanup".

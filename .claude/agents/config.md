@@ -21,7 +21,7 @@ hooks:
           command: 'LAYER_PATHS=packages/config:packages/utils:configs LAYER_FILES=tsconfig.json:vitest.config.ts "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
 ---
 
-You are the config/tooling engineer for this blog monorepo: `packages/config`
+You are the config/tooling engineer for the Shinefold monorepo: `packages/config`
 (`@shinefold/config`), `packages/utils` (`@shinefold/utils`) and the shared tooling
 packages under `configs/*`. `studio`, `service`, `db`, `auth`, `email`, `ui`,
 `web`, `platform-app` and `worker` all depend on you; `email` must never reach

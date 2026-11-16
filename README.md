@@ -11,10 +11,10 @@
 
 [![CI](https://github.com/ValOvinnikov/blog/actions/workflows/ci.yml/badge.svg)](https://github.com/ValOvinnikov/blog/actions/workflows/ci.yml)
 
-A CMS-driven blog built as a **Turborepo + pnpm monorepo** with strict
-separation of concerns: a headless Sanity Studio for authoring, a Next.js
-frontend for reading, a portable design system, and a typed data layer — with
-end-to-end TypeScript type safety from schema to screen.
+Shinefold is a CMS-driven publishing platform built as a **Turborepo + pnpm
+monorepo** with strict separation of concerns: a headless Sanity Studio for
+authoring, a Next.js frontend for reading, a portable design system, and a typed
+data layer — with end-to-end TypeScript type safety from schema to screen.
 
 ## Docs map
 

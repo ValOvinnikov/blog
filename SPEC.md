@@ -1,4 +1,4 @@
-# Blog — Product & Architecture Spec
+# Shinefold — Product & Architecture Spec
 
 > **The single durable reference for this project.** Any PR that changes
 > architecture, contracts, env vars, or the content model must update this file
@@ -20,10 +20,10 @@
 
 ## 1. Product summary
 
-A headless-CMS blog: editors author long-form articles in a Sanity Studio;
-readers browse a fast, statically-rendered Next.js site. Content is fully typed
-end-to-end — a schema change in the CMS surfaces as a TypeScript error in the
-frontend if a consumer is out of date.
+Shinefold is a headless-CMS platform: editors author long-form articles in a
+Sanity Studio; readers browse a fast, statically-rendered Next.js site. Content
+is fully typed end-to-end — a schema change in the CMS surfaces as a TypeScript
+error in the frontend if a consumer is out of date.
 
 **It is a multi-tenant platform.** One `apps/web` deployment serves every
 tenant, each with its own Sanity project under one organisation, and the

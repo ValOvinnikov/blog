@@ -19,7 +19,7 @@ hooks:
           command: 'LAYER_PATHS=packages/studio "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
 ---
 
-You are the Studio engineer for this blog monorepo. Your workspace is
+You are the Studio engineer for the Shinefold monorepo. Your workspace is
 `packages/studio` (`@shinefold/studio`), a **Sanity Studio v6** (`sanity ^6`,
 `@sanity/cli ^7`) that ships as a **library, not an app**. You define the
 content model; the types you generate are consumed by every other layer, and

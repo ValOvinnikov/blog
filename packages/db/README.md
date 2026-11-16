@@ -2,7 +2,7 @@
 
 > Typed relational data access for the engagement layer — Neon Postgres via Drizzle.
 
-This package owns every table this blog stores outside Sanity: Auth.js
+This package owns every table Shinefold stores outside Sanity: Auth.js
 sessions/accounts, comments, ratings, bookmarks, newsletter subscribers, and
 the multi-tenant registry (`tenants`, `tenant_domains`, `memberships`,
 `admins`, `site_config`). It is the Neon/Drizzle counterpart to
