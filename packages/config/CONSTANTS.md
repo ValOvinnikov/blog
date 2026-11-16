@@ -86,6 +86,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **DISPLAY_MODE**: `GRID`, `CAROUSEL`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/divider-width.ts`
+
+- **DIVIDER_WIDTH**: `HAIRLINE`, `BOLD`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/email-account.ts`
 
 - **EMAIL_ACCOUNT**: `PLATFORM`, `TENANT`
@@ -145,6 +149,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **HEADER_SUBMENU_STYLE**: `DROPDOWN`, `WIDE_PANEL`
 - **HEADER_BAR_STYLE**: `FULL_WIDTH`, `FLOATING`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/heading-style.ts`
+
+- **HEADING_WEIGHT**: `REGULAR`, `MEDIUM`, `SEMIBOLD`, `BOLD`
+- **HEADING_CASE**: `AS_WRITTEN`, `UPPERCASE`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/http-methods.ts`
 
 - **HTTP_METHOD**: `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`
@@ -160,6 +169,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@shinefold/config/constants` — `packages/config/src/constants/image-layout.ts`
 
 - **IMAGE_LAYOUT**: `INLINE`, `FULL_BLEED`, `FLOAT_LEFT`, `FLOAT_RIGHT`
+
+### `@shinefold/config/constants` — `packages/config/src/constants/image-proportion.ts`
+
+- **IMAGE_PROPORTION**: `AS_DESIGNED`, `WIDE`, `CLASSIC`, `SQUARE`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/language.ts`
 

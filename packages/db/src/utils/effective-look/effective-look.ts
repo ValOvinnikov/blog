@@ -1,6 +1,5 @@
 import {
   LANGUAGE_SWITCHER_STYLE,
-  PRESET_REGISTRY,
   type TPresetId,
   type TTenantPlan,
 } from '@shinefold/config/constants';
@@ -10,59 +9,17 @@ import {
   type TLookField,
 } from '@shinefold/db/constants';
 import type { TSiteConfigResult } from '@shinefold/db/queries/site-config/get-site-config';
+import { presetSiteConfig } from '@shinefold/db/utils/preset-site-config/preset-site-config';
 
 export type TLook = Pick<TSiteConfigResult, TLookField>;
 
 type TLookInput = Partial<TLook> & Pick<TLook, 'preset'>;
 
 function presetLook(preset: TPresetId): TLook {
-  const {
-    themeTokens: { accentHue, headingFont, bodyFont, radiusScale, density },
-    cardStyle,
-    headerControlStyle,
-    headerControlShape,
-    accountButtonStyle,
-    accountPanelStyle,
-    accountPhonePlacement,
-    busyButtonStyle,
-    spinnerStyle,
-    buttonShape,
-    headerLayout,
-    headerSubmenuStyle,
-    headerBarStyle,
-    navLinkStyle,
-    footerLayout,
-    footerBackground,
-    footerSurface,
-    cookieSettingsButton,
-  } = PRESET_REGISTRY[preset];
-
   return {
-    preset,
-    accentHue,
+    ...presetSiteConfig(preset),
     logoHue: undefined,
-    headingFont,
-    bodyFont,
-    radiusScale,
-    density,
     languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
-    cardStyle,
-    headerControlStyle,
-    headerControlShape,
-    accountButtonStyle,
-    accountPanelStyle,
-    accountPhonePlacement,
-    busyButtonStyle,
-    spinnerStyle,
-    buttonShape,
-    headerLayout,
-    headerSubmenuStyle,
-    headerBarStyle,
-    navLinkStyle,
-    footerLayout,
-    footerBackground,
-    footerSurface,
-    cookieSettingsButton,
     brandName: undefined,
     logoAssetUrl: undefined,
     faviconAssetUrl: undefined,

@@ -16,13 +16,17 @@ import {
   BUSY_BUTTON_STYLE,
   CARD_STYLE,
   DENSITY,
+  DIVIDER_WIDTH,
   FONT_CHOICE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
+  HEADING_CASE,
+  HEADING_WEIGHT,
   HUE_MAX,
+  IMAGE_PROPORTION,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   PRESET_ID,
@@ -130,6 +134,10 @@ const STYLE_FIELDS = [
   { field: 'footerBackground', value: BRAND_VARIANT.PRIMARY },
   { field: 'footerSurface', value: FOOTER_SURFACE.CARD },
   { field: 'cookieSettingsButton', value: COOKIE_SETTINGS_BUTTON.SHOWN },
+  { field: 'headingWeight', value: HEADING_WEIGHT.BOLD },
+  { field: 'headingCase', value: HEADING_CASE.UPPERCASE },
+  { field: 'imageProportion', value: IMAGE_PROPORTION.SQUARE },
+  { field: 'dividerWidth', value: DIVIDER_WIDTH.BOLD },
 ] as const;
 
 const NEW_CONFIG_DEFAULTS = [
@@ -215,6 +223,33 @@ const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
     { brandName: 'x'.repeat(BRAND_NAME_MAX_LENGTH + 1) },
   ],
   ['a blank brand name', { brandName: ' ' }],
+  [
+    'an unknown heading weight',
+    {
+      headingWeight:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headingWeight'],
+    },
+  ],
+  [
+    'an unknown heading case',
+    {
+      headingCase: MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headingCase'],
+    },
+  ],
+  [
+    'an unknown image proportion',
+    {
+      imageProportion:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['imageProportion'],
+    },
+  ],
+  [
+    'an unknown divider width',
+    {
+      dividerWidth:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['dividerWidth'],
+    },
+  ],
   [
     'an unknown spinner style',
     {
