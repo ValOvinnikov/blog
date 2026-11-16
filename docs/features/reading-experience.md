@@ -42,7 +42,7 @@ A post page offers the reader three depths: **30s** (a short list of takeaways),
 - `TPostDetail.readingTimeMinutes` comes from a GROQ word count over the top-level `block`s of `content` (`WORD_COUNT_EXPRESSION`, split on spaces) and `toReadingTimeMinutes` (200 words a minute, rounded up, at least 1). Asides, code and images are not counted.
 - The contents outline is derived on the server from the body (`extractContentsHeadings`); nothing is stored.
 - The reader's chosen depth lives only in the browser: `localStorage` key `reading-depth` (`DEPTH_STORAGE_KEY`), one value for the whole site.
-- Cache: everything rides the post read (`getPostPage` → `service.pages.post.v1.getPost`), tagged with the post and the types it references and revalidated by the publish webhook, with the route's 21600s backstop. Switching depth never fetches. See ./rendering-and-caching.md.
+- Cache: everything rides the post read (`getPostPage` → `service.pages.post.v1.getPost`), tagged with the post and the types it references and revalidated by the publish webhook, with the route's 86400s backstop. Switching depth never fetches. See ./rendering-and-caching.md.
 
 ## Configuration
 

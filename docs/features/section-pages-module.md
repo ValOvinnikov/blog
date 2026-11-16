@@ -26,7 +26,7 @@ Section Pages turns a landing page into a hub for the pages nested under it. Pla
 - **`module_sectionPages`** — `title`, `brandVariant`, optional `headingBlock` (the only module whose heading is optional), `contentAlignment` (Left/Center), `layout` (`wideLayout`). There is no list of pages to author: the children are derived.
 - **Children** — `page_landing` documents whose `parent` is the current page and whose `language` is the request language, ordered by `orderRank`. Each card reads the child's `slug`, its `headingBlock` heading (title) and supporting text (summary), and `seo.openGraph.ogImage` (image).
 - **Context** — the landing renderer passes `landingPage { id, path }`; the module uses `id` to find children and `path` to build their links.
-- **Caching** — the module query is tagged `modules:sectionPages` + `module:<id>`; the children query `page_landing`, so publishing any landing page refreshes every Section Pages grid. Fallback revalidate 3600s.
+- **Caching** — the module query is tagged `modules:sectionPages` + `module:<id>`; the children query `page_landing`, so publishing any landing page refreshes every Section Pages grid. Fallback revalidate 86400s (`SANITY_CONTENT_REVALIDATE_SECONDS`).
 
 ## Configuration
 

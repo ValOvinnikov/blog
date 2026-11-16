@@ -1809,7 +1809,7 @@ empty page. (Theme's own fallback to the `CONSOLE` preset is a separate
 thing: copy has no preset layer to fall back to.) Same per-request tenant
 resolution as theme, above.
 
-`get-site-config.ts`'s cache carries a 3600s
+`get-site-config.ts`'s cache carries a 24-hour (86400s)
 (`TENANT_CONFIG_REVALIDATE_SECONDS`, `@shinefold/config`) fallback window as its
 safety net, but `apps/platform`'s Look/Voice/Features save
 actions (`update-look-action.ts`/`save-voice-overrides-action.ts`/
@@ -1830,7 +1830,7 @@ two apps' own deployments — not a Sanity webhook, so it doesn't reuse
 `@sanity/webhook`'s HMAC verification. Calling it is best-effort from the
 platform side: a failure (missing config, network error, non-2xx) is logged and
 swallowed, never thrown, since the save itself has already succeeded and the
-3600s window still covers it. That best-effort stance belongs to the platform
+24-hour window still covers it. That best-effort stance belongs to the platform
 caller, not to the route: deprovisioning's final step (`deprovision-tenant.yml`
 and the worker's deprovisioning run, through `@shinefold/db`'s
 `requestTenantCacheInvalidation`) is a second caller, POSTing the same `{ tenantId }` body to purge an archived tenant's
@@ -2483,13 +2483,14 @@ cards carries them for the same reason: `personCardFragment` derefs the
 author's `profilePage` link.
 
 That purge is best-effort, and the backstop behind it is a time-based
-expiry declared per content route: `export const revalidate = 21600` (6 hours)
-on each of the eleven `[tenant]/[locale]` content routes, excluding
-`account`/`bookmarks`, which stay `force-dynamic`. It governs the Full Route
-Cache, distinct from the 3600s Data Cache TTL `isr()` sets on fetches, and
-exists so a purge that never happens self-heals within a bounded window rather
-than leaving a page wrong indefinitely — a correctness floor, not a freshness
-target. Next requires the value to be a literal and rejects it on a shared
+expiry declared per content route: `export const revalidate = 86400` (24 hours)
+on each `[tenant]/[locale]` content route, excluding `account`/`bookmarks`,
+which stay `force-dynamic`. It governs the Full Route Cache, and exists so a
+purge that never happens self-heals within a bounded window rather than
+leaving a page wrong indefinitely — a correctness floor, not a freshness
+target. A page caches only as long as the shortest window it reads, and the
+Sanity fetches (`isr()`) and the tenant-config `unstable_cache` reads each
+lower it to their own, so all three windows are held at 86400s. Next requires the value to be a literal and rejects it on a shared
 layout that has a `force-dynamic` child, both as hard build errors, so each
 route declares its own, kept in step with `@shinefold/config`'s
 `CONTENT_ROUTE_REVALIDATE_SECONDS` by test rather than by import.

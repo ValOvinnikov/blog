@@ -139,10 +139,10 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
 
   **The purge is best-effort; the route-level `revalidate` is the correctness
   backstop behind it.** Every content route under `[tenant]/[locale]` declares
-  `export const revalidate = 21600` (6 hours) — the eleven content routes, not
+  `export const revalidate = 86400` (24 hours) — every content route, not
   `account`/`bookmarks`, which stay `force-dynamic` and must never be cached
   across users. This governs the **Full Route Cache** and is a different
-  mechanism from the 3600s **Data Cache** TTL that `isr()` sets on fetches;
+  mechanism from the 86400s **Data Cache** TTL that `isr()` sets on fetches;
   same unit, different cache, and the two should not be conflated. Its purpose
   is that a purge which never happens — a derivation bug, a project on the old webhook projection, a
   failed request — self-heals within a bounded window instead of leaving a
@@ -197,7 +197,7 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
 
   It calls the endpoint best-effort
   (`@platform/server/site-config/revalidate-site-config`) — a failed call is
-  logged, never thrown, and the site-config cache's own 3600s
+  logged, never thrown, and the site-config cache's own 24-hour
   (`TENANT_CONFIG_REVALIDATE_SECONDS`, `@shinefold/config`) window remains the
   fallback either way. `deprovision-tenant.yml`'s `invalidate-tenant-cache`
   step is a second caller, POSTing the same `{ tenantId }` once a tenant has
