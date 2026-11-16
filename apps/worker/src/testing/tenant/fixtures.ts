@@ -20,6 +20,7 @@ export const MOCK_SANITY_READ_TOKEN = 'sk-read';
 export const MOCK_TENANT_MANAGEMENT_TOKEN = 'sk-tenant-management';
 export const MOCK_TENANT_MANAGEMENT_ROBOT_ID = 'robot-tenant-management';
 export const MOCK_ENCRYPTED_TOKEN = 'encrypted-read-token';
+export const MOCK_ENCRYPTED_WEBHOOK_SECRET = mockFaker.string.alphanumeric(32);
 export const MOCK_SANITY_CREDENTIALS = {} as TTenantSanityCredentials;
 
 export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
@@ -67,6 +68,16 @@ export function mockProvisionedTenant(
   return mockTenant({
     sanityProjectId: MOCK_SANITY_PROJECT_ID,
     sanityDataset: MOCK_SANITY_DATASET,
+    ...overrides,
+  });
+}
+
+export function mockTenantWithWebhook(
+  overrides: Partial<TTenant> = {},
+): TTenant {
+  return mockProvisionedTenant({
+    id: mockFaker.string.uuid(),
+    webhookCreatedAt: new Date(0),
     ...overrides,
   });
 }

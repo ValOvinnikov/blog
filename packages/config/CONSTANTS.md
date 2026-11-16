@@ -1059,6 +1059,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **RETENTION_KIND**: `PENDING_SUBSCRIBERS`, `LEADS`, `SESSIONS`, `VERIFICATION_TOKENS`, `AUDIT_EVENTS`, `RESOLVED_FINDINGS`
 - **RETENTION_LOG**: `DELETED`=`"retention.deleted"`, `CLEANUP_FAILED`=`"retention.cleanup_failed"`, `DEADLINE_REACHED`=`"retention.deadline_reached"`
 
+### `@worker/constants/revalidate-webhook` — `apps/worker/src/constants/revalidate-webhook.ts`
+
+- **REVALIDATE_WEBHOOK_LOG**: `ROTATION_TENANT_FAILED`=`"webhook_secret_rotation.tenant_failed"`, `ROTATION_FINISHED`=`"webhook_secret_rotation.finished"`, `ROTATION_FAILED`=`"webhook_secret_rotation.failed"`, `SYNC_TENANT_FAILED`=`"revalidate_webhook_sync.tenant_failed"`, `SYNC_FINISHED`=`"revalidate_webhook_sync.finished"`, `SYNC_FAILED`=`"revalidate_webhook_sync.failed"`
+- **REVALIDATE_WEBHOOK_CHANGE**: `UPDATED`, `UNCHANGED`
+
 ### `@worker/constants/scheduled-post-purge` — `apps/worker/src/constants/scheduled-post-purge.ts`
 
 - **SCHEDULED_POST_PURGE_LOG**: `START_FAILED`=`"scheduled_post_purge.start_failed"`, `RUN_FAILED`=`"scheduled_post_purge.run_failed"`
