@@ -6,13 +6,9 @@ import type {
 import type { IWithChildren } from '@shinefold/config/react';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import type { IModuleHeadingProps } from '@web/components/shared/module-heading/module-heading';
-import { Section } from '@web/components/shared/section';
-import type { ISectionProps } from '@web/components/shared/section/section';
+import { Section, type TModuleSection } from '@web/components/shared/section';
 
-type TModuleSectionModule = Pick<
-  ISectionProps,
-  'brandVariant' | 'layout' | 'appearance'
-> &
+type TModuleSectionModule = TModuleSection &
   Pick<IModuleHeadingProps, 'headingBlock'> & {
     contentAlignment: TMaybeUndefined<TContentAlignment>;
   };

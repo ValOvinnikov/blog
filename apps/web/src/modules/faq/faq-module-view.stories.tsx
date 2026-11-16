@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import {
   MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK,
+  MOCK_FAQ_HEADING,
   mockFaqQuestion,
 } from '@web/testing/modules/faq/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -31,8 +32,8 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   args: {
-    section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
-    headingBlock: mockHeadingBlock({ heading: 'Frequently asked questions' }),
+    section: { brandVariant: BRAND_VARIANT.PRIMARY },
+    headingBlock: mockHeadingBlock({ heading: MOCK_FAQ_HEADING }),
     questions,
     ctaButtons: [],
     contentAlignment: undefined,
