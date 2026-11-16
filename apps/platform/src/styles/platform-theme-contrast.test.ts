@@ -135,7 +135,12 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Input border on card', TOKEN.CONTROL_LINE, TOKEN.SURFACE, BOUNDARY],
   ['Input border on page', TOKEN.CONTROL_LINE, TOKEN.BG, BOUNDARY],
   ['Switch off track on card', TOKEN.CONTROL_LINE, TOKEN.SURFACE, BOUNDARY],
-  ['Switch on thumb on track', TOKEN.SWITCH_THUMB_ON, TOKEN.SELECTED, BOUNDARY],
+  [
+    'Switch on thumb on track',
+    TOKEN.SWITCH_THUMB_ON,
+    TOKEN.SELECTED_TINT,
+    BOUNDARY,
+  ],
   [
     'Focused field border against resting border',
     TOKEN.BRAND_INK,
@@ -194,7 +199,7 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Chip count on chip', TOKEN.MUTED, TOKEN.SURFACE, TEXT],
   ['Text on hovered row', TOKEN.TEXT, TOKEN.SURFACE_2, TEXT],
   ['Chip border on page', TOKEN.CONTROL_LINE, TOKEN.BG, BOUNDARY],
-  ['Label on selected chip', TOKEN.ON_SELECTED, TOKEN.SELECTED, TEXT],
+  ['Tick on selected mark', TOKEN.ON_SELECTED, TOKEN.SELECTED, TEXT],
   ['Follow mark tag label', TOKEN.FOLLOW_MARK_INK, TOKEN.FOLLOW_MARK, TEXT],
   [
     'Follow mark edge on its outline',
@@ -214,12 +219,6 @@ const SHARED_PAIRS: readonly TPair[] = [
     TOKEN.SPINNER_ON_BRAND_LINE,
     TOKEN.BRAND,
     BOUNDARY,
-  ],
-  [
-    "Focus ring on a checked item's gap",
-    TOKEN.FOCUS_RING,
-    TOKEN.ON_SELECTED,
-    FOCUS,
   ],
   ['Hovered primary border on page', TOKEN.BRAND_HOVER, TOKEN.BG, BOUNDARY],
   ['Error pill on active chip', TOKEN.BAD, TOKEN.SURFACE, TEXT],

@@ -4,21 +4,26 @@ export const SELECTED_CHOICE_CLASSES = [
 ];
 
 export const SELECTED_COMPACT_FILL_CLASSES =
-  'border-platform-selected-edge bg-platform-selected text-platform-on-selected';
+  'border-platform-selected-edge bg-platform-selected-tint text-platform-text';
 
 export const SELECTED_COMPACT_CHOICE_CLASSES = [
   'border-[1.5px]',
   SELECTED_COMPACT_FILL_CLASSES,
 ];
 
+export const SELECTED_MARK_FILL_CLASSES =
+  'border-platform-selected-edge bg-platform-selected text-platform-on-selected';
+
 export const UNSELECTED_CHOICE_CLASSES = ['m-[0.5px] border'];
 
 export const SELECTED_TICK_CLASSES =
   'flex size-4 items-center justify-center rounded-full bg-platform-selected text-platform-on-selected';
 
-// The edge is a pseudo-element so it paints above the row's inset focus ring.
+// A pseudo-element, so it paints above the row's inset focus ring.
+export const SELECTED_STRIPE_CLASSES =
+  'before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:w-platform-bar before:rounded-l-[inherit] before:bg-platform-selected-line';
+
 export const SELECTED_ROW_CLASSES = [
   'relative bg-platform-selected-tint',
-  'before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:w-platform-bar before:rounded-l-[inherit] before:bg-platform-selected-line',
-  'after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:border after:border-platform-selected-edge',
+  SELECTED_STRIPE_CLASSES,
 ];

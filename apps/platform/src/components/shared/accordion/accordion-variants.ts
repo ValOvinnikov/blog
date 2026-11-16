@@ -4,7 +4,7 @@ import {
   focusRingClasses,
   insetFocusRingClasses,
 } from '@platform/utils/focus-ring-classes/focus-ring-classes';
-import { SELECTED_ROW_CLASSES } from '@platform/utils/selected-choice-classes/selected-choice-classes';
+import { SELECTED_STRIPE_CLASSES } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { COLOUR_TRANSITION_CLASSES } from '@platform/utils/transition-classes/transition-classes';
 import { tv } from '@platform/utils/tv/tv';
 
@@ -16,7 +16,6 @@ export const accordionVariants = tv({
     trigger: [
       'group/accordion-trigger flex w-full cursor-pointer items-center text-left',
       COLOUR_TRANSITION_CLASSES,
-      'hover:bg-platform-surface-2',
     ],
     chevron: [
       'shrink-0 text-platform-muted',
@@ -50,6 +49,7 @@ export const accordionVariants = tv({
         item: ['border-t border-platform-line-2'],
         trigger: [
           'min-h-11 gap-3 rounded-platform-control px-2.5 py-3',
+          'hover:bg-platform-surface-2',
           'max-md:min-h-[52px] max-md:gap-2.5 max-md:rounded-none max-md:px-1 max-md:py-2',
           focusRingClasses(FOCUS_RING_GROUND.SURFACE),
         ],
@@ -60,6 +60,7 @@ export const accordionVariants = tv({
         item: ['relative border-t border-platform-line-2'],
         trigger: [
           'min-h-[52px] gap-3 px-4 font-normal focus-visible:rounded-platform-control max-lg:min-h-14',
+          'hover:bg-platform-hover-tint',
           insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE),
         ],
         panelContent: [
@@ -100,11 +101,10 @@ export const accordionVariants = tv({
       variant: ACCORDION_VARIANT.ROW,
       isOpen: true,
       class: {
-        item: ['bg-platform-surface'],
+        item: ['bg-platform-surface', SELECTED_STRIPE_CLASSES],
         trigger: [
-          ...SELECTED_ROW_CLASSES,
-          'hover:bg-platform-selected-tint max-lg:min-h-12',
-          insetFocusRingClasses(FOCUS_RING_GROUND.SELECTED_TINT),
+          'bg-platform-surface-head hover:bg-platform-surface-head max-lg:min-h-12',
+          insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE_HEAD),
         ],
       },
     },

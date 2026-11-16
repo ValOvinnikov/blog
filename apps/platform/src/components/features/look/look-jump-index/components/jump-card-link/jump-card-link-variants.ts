@@ -43,7 +43,8 @@ export const jumpCardLinkVariants = tv({
       isCurrent: true,
       class: {
         link: [
-          'text-platform-text shadow-[inset_0_-2px_0_var(--platform-selected-line)]',
+          'relative text-platform-text',
+          'after:pointer-events-none after:absolute after:inset-x-2.5 after:bottom-0 after:h-0.5 after:bg-platform-selected-line',
         ],
       },
     },

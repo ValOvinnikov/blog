@@ -6950,14 +6950,6 @@
         "file": "apps/platform/src/constants/focus-ring.ts"
       }
     ],
-    "ON_SELECTED": [
-      {
-        "ref": "FOCUS_RING_GROUND.ON_SELECTED",
-        "scope": "app:platform",
-        "from": "@platform/constants/focus-ring",
-        "file": "apps/platform/src/constants/focus-ring.ts"
-      }
-    ],
     "HOVER_TINT": [
       {
         "ref": "FOCUS_RING_GROUND.HOVER_TINT",

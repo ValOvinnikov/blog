@@ -27,7 +27,7 @@ export const leadRowVariants = tv({
         row: [
           ...SELECTED_ROW_CLASSES,
           'border-l-transparent hover:bg-platform-selected-tint',
-          'before:-left-platform-bar after:-left-platform-bar',
+          'before:-left-platform-bar',
           insetFocusRingClasses(FOCUS_RING_GROUND.SELECTED_TINT),
         ],
       },
