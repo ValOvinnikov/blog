@@ -1,15 +1,15 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import type { TNullablePatch } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { getTenantOwnerAccess } from '@blog/db/queries/tenants/get-tenant-owner-access';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import type { TNullablePatch } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { getTenantOwnerAccess } from '@shinefold/db/queries/tenants/get-tenant-owner-access';
 import {
   tenantOwnerAccessColumns,
   toTenantOwnerAccess,
   type TTenantOwnerAccess,
-} from '@blog/db/queries/tenants/tenant-owner-access';
-import { tenants } from '@blog/db/schema/tenants';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/queries/tenants/tenant-owner-access';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { eq } from 'drizzle-orm';
 
 export type TSetTenantOwnerAccessInput = TNullablePatch<TTenantOwnerAccess>;

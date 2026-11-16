@@ -7,9 +7,9 @@ import {
   type TVoiceFieldFailure,
   type TMaybeUndefined,
   type TVoicePortableText,
-} from '@blog/config';
-import type { TVoiceOverrideValue } from '@blog/db/schema/site-config';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/config';
+import type { TVoiceOverrideValue } from '@shinefold/db/schema/site-config';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 
 import { normalizeRichValue } from './normalize-voice-rich-text';
 

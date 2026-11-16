@@ -1,12 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { ERROR_CODE } from '@blog/config/constants';
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import {
   SIGNUP_BLOCK_LOG,
@@ -21,6 +12,15 @@ import {
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 import { notFound } from 'next/navigation';
 
 import { removeBlockedIdentityAction } from './remove-blocked-identity-action';
@@ -41,7 +41,7 @@ vi.mock('@platform/server/audit/record-audit-event', () => ({
   recordAuditEvent: recordAuditEventMock,
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     blockedSignupIdentities: {

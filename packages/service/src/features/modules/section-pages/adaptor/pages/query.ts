@@ -1,7 +1,7 @@
-import { q } from '@blog/service/sanity/query/query';
-import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
-import { sanityImageOptionalFragment } from '@blog/service/shared/fragments/image/image';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+import { q } from '@shinefold/service/sanity/query/query';
+import { pageHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/page-heading-block';
+import { sanityImageOptionalFragment } from '@shinefold/service/shared/fragments/image/image';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
 
 export type TSectionPagesQueryParams = {
   parentId: string;

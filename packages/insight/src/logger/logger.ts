@@ -1,9 +1,9 @@
-import { normalizeContext } from '@blog/insight/logger/normalize-context';
-import { dispatchToSinks } from '@blog/insight/sink/log-sink';
+import { normalizeContext } from '@shinefold/insight/logger/normalize-context';
+import { dispatchToSinks } from '@shinefold/insight/sink/log-sink';
 
 /**
- * Local to `@blog/insight` rather than `@blog/config`: this package sits at
- * the base of the dependency graph alongside `@blog/config`, so importing
+ * Local to `@shinefold/insight` rather than `@shinefold/config`: this package sits at
+ * the base of the dependency graph alongside `@shinefold/config`, so importing
  * config's constants here would add a dependency where none is needed.
  * Values stay lowercase (breaking the repo's usual UPPERCASE-value
  * convention) because log aggregators expect lowercase severity strings.

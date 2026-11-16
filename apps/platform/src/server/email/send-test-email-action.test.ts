@@ -1,10 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  EMAIL_TEMPLATE_TYPE,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { sendEmail } from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { EMAIL_TEST_LOG } from '@platform/constants/email-test';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -21,13 +14,20 @@ import { makeEnTranslator } from '@platform/testing/en-translator';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  EMAIL_TEMPLATE_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { sendEmail } from '@shinefold/email';
 
 import {
   sendTestEmailAction,
   type TSendTestEmailInput,
 } from './send-test-email-action';
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     emailConfig: { getEmailConfig: vi.fn() },
     emailTemplates: { getEmailTemplate: vi.fn() },
@@ -35,7 +35,7 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('@blog/email');
+vi.mock('@shinefold/email');
 
 vi.mock('@platform/server/auth/require-tenant-membership');
 vi.mock('@platform/server/auth/auth');

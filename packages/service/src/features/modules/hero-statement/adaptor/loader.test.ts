@@ -1,22 +1,22 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockRawHeroStatementModule } from '@blog/service/testing/modules/fixtures';
+import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { mockRawHeroStatementModule } from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,
-} from '@blog/service/testing/sanity/query/cache-tags';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockRawHeadingBlock,
   mockValidationError,
-} from '@blog/service/testing/shared/fixtures';
-import { MOCK_TENANT } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getHeroStatement } from './loader';
 import { heroStatementModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6);
 

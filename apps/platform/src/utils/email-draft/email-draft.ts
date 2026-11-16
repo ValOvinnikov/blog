@@ -1,14 +1,14 @@
+import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
+import { blankToNull } from '@platform/utils/blank-to-null/blank-to-null';
+import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import {
   EMAIL_TEMPLATE_TYPE,
   type TEmailTemplateType,
   type TLocaleIsoCode,
-} from '@blog/config';
-import type { TAuthoredEmailTemplateCopy } from '@blog/db/queries/email-templates';
-import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
-import { isUndefined, mapKeysToRecord } from '@blog/utils/primitives';
-import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
-import { blankToNull } from '@platform/utils/blank-to-null/blank-to-null';
-import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+} from '@shinefold/config';
+import type { TAuthoredEmailTemplateCopy } from '@shinefold/db/queries/email-templates';
+import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
+import { isUndefined, mapKeysToRecord } from '@shinefold/utils/primitives';
 
 export const EMAIL_SENDER_ITEM = EMAIL_LOGO_KIND.SENDER;
 

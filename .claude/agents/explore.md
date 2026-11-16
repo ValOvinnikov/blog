@@ -45,15 +45,15 @@ apps/
   platform   Next.js operator/tenant app: own deploy, mounts Studio   (platform-app)
   worker     Tenant provisioning runs: non-public, Vercel Workflow    (worker)
 packages/
-  studio     Sanity Studio library: schema, desk, migrations          (@blog/studio)
-  config     Constants, shared types, generated Sanity types, routes  (@blog/config)
-  service    Data access: Sanity client, groqd queries, transformers  (@blog/service)
-  db         Relational data: Neon Postgres via Drizzle               (@blog/db)
-  auth       Shared Auth.js config for both apps                      (@blog/auth)
-  ui         Pure components by atomic tier, atoms→organisms          (@blog/ui)
-  insight    Structured logger core                                   (@blog/insight)
-  email      Email shell, escapeHtml, Resend transport                (@blog/email)
-  utils      Framework-free helpers                                   (@blog/utils)
+  studio     Sanity Studio library: schema, desk, migrations          (@shinefold/studio)
+  config     Constants, shared types, generated Sanity types, routes  (@shinefold/config)
+  service    Data access: Sanity client, groqd queries, transformers  (@shinefold/service)
+  db         Relational data: Neon Postgres via Drizzle               (@shinefold/db)
+  auth       Shared Auth.js config for both apps                      (@shinefold/auth)
+  ui         Pure components by atomic tier, atoms→organisms          (@shinefold/ui)
+  insight    Structured logger core                                   (@shinefold/insight)
+  email      Email shell, escapeHtml, Resend transport                (@shinefold/email)
+  utils      Framework-free helpers                                   (@shinefold/utils)
 configs/     eslint, next, prettier, tailwind, tsconfig, vitest presets
 docs/        README.md (index), context/ (one file per topic), features/ (per feature), ROADMAP.md, DEPLOY.md
 SPEC.md      architecture core — layer contracts, data flow, cross-cutting rules
@@ -67,11 +67,11 @@ SPEC.md      architecture core — layer contracts, data flow, cross-cutting rul
 - `packages/config/src/sanity/generated/types.ts` — every content shape (grep
   it; see below).
 - `packages/service/src/index.ts` — the whole data-access surface.
-- `packages/ui/COMPONENTS.md` — generated index of every `@blog/ui` component
+- `packages/ui/COMPONENTS.md` — generated index of every `@shinefold/ui` component
   (purpose, props, compound slots). Answer "is there already a component that
   does X" here before grepping `packages/ui/src/components/`.
 - `packages/config/CONSTANTS.md` — generated index of every key/value const
-  (`@blog/config`, `@blog/db`, each app's `src/constants/`). Answer "is there
+  (`@shinefold/config`, `@shinefold/db`, each app's `src/constants/`). Answer "is there
   already a const for X" here.
 - `apps/web/src/app/` — routes: public pages under `[tenant]/[locale]/`;
   `api/`, `sitemap.ts`, `robots.ts` at the root.

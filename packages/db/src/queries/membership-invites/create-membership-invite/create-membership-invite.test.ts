@@ -1,37 +1,37 @@
-import { TENANT_PLAN } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import {
   MEMBERSHIP_INVITE_OUTCOME,
   MEMBERSHIP_ROLE,
   PLAN_ENTITLEMENTS,
-} from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import type { TMembershipInvite } from '@blog/db/schema/membership-invites';
+} from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import type { TMembershipInvite } from '@shinefold/db/schema/membership-invites';
 import {
   insertTestTenant,
   insertTestUser,
   MOCK_INVITE_EMAIL,
-} from '@blog/db/testing/fixtures';
+} from '@shinefold/db/testing/fixtures';
 import {
   deleteSeatRows,
   inviteOf,
   MOCK_INVITE_CONSUMED_AT,
   mockMembershipInvite,
-} from '@blog/db/testing/membership-invites/fixtures';
-import { mockMembership } from '@blog/db/testing/memberships/fixtures';
+} from '@shinefold/db/testing/membership-invites/fixtures';
+import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
 import {
   decryptTestPersonalValue,
   mockAccountEmailIndex,
   testPersonalEmailIndex,
-} from '@blog/db/testing/personal-data';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
-import { patchTestTenant } from '@blog/db/testing/test-tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/personal-data';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
+import { patchTestTenant } from '@shinefold/db/testing/test-tenant';
 import { eq } from 'drizzle-orm';
 
 import { createMembershipInvite } from './create-membership-invite';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(6022);
 

@@ -1,12 +1,12 @@
+import { faker } from '@faker-js/faker';
 import {
   LOCALE_ISO_CODES,
   PRICE_PERIOD,
   TENANT_PLAN,
-} from '@blog/config/constants';
-import { validatePricingTierPriceLabelRequired } from '@blog/studio/schema-types/validation/validate-pricing-tier-price-label-required/validate-pricing-tier-price-label-required';
-import { mockLocalizedValue } from '@blog/studio/testing/mock-documents';
-import { mockValidationContext } from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import { validatePricingTierPriceLabelRequired } from '@shinefold/studio/schema-types/validation/validate-pricing-tier-price-label-required/validate-pricing-tier-price-label-required';
+import { mockLocalizedValue } from '@shinefold/studio/testing/mock-documents';
+import { mockValidationContext } from '@shinefold/studio/testing/mock-validation-context';
 
 faker.seed(6024);
 

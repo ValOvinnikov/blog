@@ -1,6 +1,5 @@
 'use client';
 
-import type { TAdminRole } from '@blog/db/constants';
 import {
   Breadcrumbs,
   type TBreadcrumbItem,
@@ -11,6 +10,7 @@ import {
   operatorNavSections,
 } from '@platform/utils/nav-sections/nav-sections';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TAdminRole } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 
 export type TOperatorBreadcrumbProps = {

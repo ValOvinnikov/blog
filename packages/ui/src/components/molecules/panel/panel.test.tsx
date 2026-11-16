@@ -1,5 +1,5 @@
-import { renderElement, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { renderElement, screen } from '@shinefold/ui/testing/custom-render';
 
 import { Panel } from './panel';
 

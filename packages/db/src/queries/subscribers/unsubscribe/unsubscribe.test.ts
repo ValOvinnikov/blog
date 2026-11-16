@@ -1,16 +1,16 @@
-import * as schema from '@blog/db/schema';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestReader,
   insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
   MOCK_SUBSCRIBER_TAGGED_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { unsubscribe } from './unsubscribe';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

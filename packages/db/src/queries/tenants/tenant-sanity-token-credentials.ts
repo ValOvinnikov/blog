@@ -1,11 +1,11 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
 import type {
   TTenantProvisioningStatus,
   TTenantStatus,
-} from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { requireTenantTokenEncryptionKey } from '@blog/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
-import { decryptSecret } from '@blog/utils';
+} from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { requireTenantTokenEncryptionKey } from '@shinefold/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
+import { decryptSecret } from '@shinefold/utils';
 
 export type TTenantSanityTokenCredentials = {
   projectId: string;

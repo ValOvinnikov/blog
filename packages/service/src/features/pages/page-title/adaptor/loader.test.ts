@@ -1,5 +1,5 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_HOME_PAGE_CACHE_TAG,
   MOCK_PAGE_COOKIE_STATEMENT_CACHE_TAG,
@@ -8,13 +8,13 @@ import {
   MOCK_PAGE_LEGAL_INDEX_CACHE_TAG,
   MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
   MOCK_PAGE_PRIVACY_INDEX_CACHE_TAG,
-} from '@blog/service/testing/sanity/query/cache-tags';
-import { mockTenant } from '@blog/service/testing/tenant';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getPageTitle } from './loader';
 import { pageTitleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 const tenant = mockTenant();
 const MOCK_PAGE_ID = 'landing-pricing';

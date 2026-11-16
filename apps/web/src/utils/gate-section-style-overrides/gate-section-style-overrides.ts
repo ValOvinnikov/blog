@@ -1,7 +1,7 @@
-import type { TTenantPlan } from '@blog/config/constants';
-import { LOOK_FIELD, type TLookField } from '@blog/db/constants';
-import { isLookFieldEntitled } from '@blog/db/utils/effective-look/effective-look';
-import type { TModuleAppearance } from '@blog/service';
+import type { TTenantPlan } from '@shinefold/config/constants';
+import { LOOK_FIELD, type TLookField } from '@shinefold/db/constants';
+import { isLookFieldEntitled } from '@shinefold/db/utils/effective-look/effective-look';
+import type { TModuleAppearance } from '@shinefold/service';
 
 export type TSectionStyleOverrides = Pick<
   TModuleAppearance,

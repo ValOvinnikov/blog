@@ -1,5 +1,5 @@
 {
-  "name": "@blog/email",
+  "name": "@shinefold/email",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -17,19 +17,19 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@blog/config": "workspace:*",
-    "@blog/utils": "workspace:*",
+    "@shinefold/config": "workspace:*",
+    "@shinefold/utils": "workspace:*",
     "@t3-oss/env-core": "^0.13.11",
     "resend": "^6.33.0",
     "server-only": "^0.0.1",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@blog/eslint-config": "workspace:*",
-    "@blog/prettier-config": "workspace:*",
-    "@blog/tsconfig": "workspace:*",
-    "@blog/vitest-config": "workspace:*",
     "@faker-js/faker": "catalog:",
+    "@shinefold/eslint-config": "workspace:*",
+    "@shinefold/prettier-config": "workspace:*",
+    "@shinefold/tsconfig": "workspace:*",
+    "@shinefold/vitest-config": "workspace:*",
     "@types/node": "^26",
     "eslint": "catalog:",
     "prettier": "catalog:",

@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { bookmarks, type TBookmark } from '@blog/db/schema/bookmarks';
+import { getDb } from '@shinefold/db/client';
+import { bookmarks, type TBookmark } from '@shinefold/db/schema/bookmarks';
 import { and, desc, eq } from 'drizzle-orm';
 
 // Lists a user's saved posts within a tenant, most recently bookmarked first

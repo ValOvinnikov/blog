@@ -4,19 +4,19 @@
       {
         "ref": "ACCOUNT_BUTTON_STYLE.PILL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
       },
       {
         "ref": "BUTTON_SHAPE.PILL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/button-shape.ts"
       },
       {
         "ref": "NAV_LINK_STYLE.PILL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/nav-link-style.ts"
       }
     ],
@@ -24,13 +24,13 @@
       {
         "ref": "ACCOUNT_BUTTON_STYLE.CIRCLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
       },
       {
         "ref": "CARD_IMAGE_SHAPE.CIRCLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/card-image-shape.ts"
       }
     ],
@@ -38,13 +38,13 @@
       {
         "ref": "ACCOUNT_PANEL_STYLE.CARD",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
       },
       {
         "ref": "FOOTER_SURFACE.CARD",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/footer-layout.ts"
       }
     ],
@@ -52,7 +52,7 @@
       {
         "ref": "ACCOUNT_PANEL_STYLE.PROFILE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
       }
     ],
@@ -60,7 +60,7 @@
       {
         "ref": "ACCOUNT_PANEL_STYLE.HUB",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
       }
     ],
@@ -68,7 +68,7 @@
       {
         "ref": "ACCOUNT_PHONE_PLACEMENT.BAR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
       }
     ],
@@ -76,13 +76,13 @@
       {
         "ref": "ACCOUNT_PHONE_PLACEMENT.MENU",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
       },
       {
         "ref": "ICONS.MENU",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
@@ -96,25 +96,25 @@
       {
         "ref": "ACTION_OUTCOME.SUCCESS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/action-outcome.ts"
       },
       {
         "ref": "ALERT_TYPE.SUCCESS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/alert.ts"
       },
       {
         "ref": "FORM_STATUS.SUCCESS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/form-status.ts"
       },
       {
         "ref": "TOAST_TYPE.SUCCESS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/toast.ts"
       }
     ],
@@ -122,7 +122,7 @@
       {
         "ref": "ACTION_OUTCOME.INVALID",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/action-outcome.ts"
       },
       {
@@ -136,13 +136,13 @@
       {
         "ref": "ACTION_OUTCOME.BLOCKED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/action-outcome.ts"
       },
       {
         "ref": "MAGIC_LINK_REFUSAL.BLOCKED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/magic-link-refusal.ts"
       }
     ],
@@ -150,7 +150,7 @@
       {
         "ref": "ACTION_OUTCOME.RATE_LIMITED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/action-outcome.ts"
       }
     ],
@@ -158,7 +158,7 @@
       {
         "ref": "ACTION_OUTCOME.UNAVAILABLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/action-outcome.ts"
       },
       {
@@ -184,7 +184,7 @@
       {
         "ref": "ACTION_OUTCOME.REFUSED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/action-outcome.ts"
       }
     ],
@@ -192,7 +192,7 @@
       {
         "ref": "ACTION_OUTCOME.SERVER_ERROR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/action-outcome.ts"
       },
       {
@@ -206,25 +206,25 @@
       {
         "ref": "ALERT_TYPE.WARNING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/alert.ts"
       },
       {
         "ref": "FINDING_SEVERITY.WARNING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       },
       {
         "ref": "ICONS.WARNING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "TOAST_TYPE.WARNING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/toast.ts"
       }
     ],
@@ -232,19 +232,19 @@
       {
         "ref": "ALERT_TYPE.ERROR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/alert.ts"
       },
       {
         "ref": "FORM_STATUS.ERROR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/form-status.ts"
       },
       {
         "ref": "TOAST_TYPE.ERROR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/toast.ts"
       },
       {
@@ -264,25 +264,25 @@
       {
         "ref": "ALERT_TYPE.INFO",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/alert.ts"
       },
       {
         "ref": "FINDING_SEVERITY.INFO",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       },
       {
         "ref": "ICONS.INFO",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "TOAST_TYPE.INFO",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/toast.ts"
       }
     ],
@@ -290,7 +290,7 @@
       {
         "ref": "ANALYTICS_PROVIDER.GOOGLE_ANALYTICS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/analytics-provider.ts"
       }
     ],
@@ -298,7 +298,7 @@
       {
         "ref": "ANALYTICS_PROVIDER.PLAUSIBLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/analytics-provider.ts"
       }
     ],
@@ -306,7 +306,7 @@
       {
         "ref": "ASIDE_KIND.WHY_NOT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/aside.ts"
       }
     ],
@@ -314,7 +314,7 @@
       {
         "ref": "ASIDE_KIND.DIGRESSION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/aside.ts"
       }
     ],
@@ -322,7 +322,7 @@
       {
         "ref": "ASIDE_KIND.CONTEXT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/aside.ts"
       }
     ],
@@ -330,13 +330,13 @@
       {
         "ref": "AUDIT_TARGET_TYPE.TENANT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       },
       {
         "ref": "EMAIL_ACCOUNT.TENANT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/email-account.ts"
       }
     ],
@@ -344,7 +344,7 @@
       {
         "ref": "AUDIT_TARGET_TYPE.SITE_CONFIG",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -352,7 +352,7 @@
       {
         "ref": "AUDIT_TARGET_TYPE.SETTINGS_FEATURES",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -360,7 +360,7 @@
       {
         "ref": "AUDIT_TARGET_TYPE.RELEASE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -368,7 +368,7 @@
       {
         "ref": "AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -376,7 +376,7 @@
       {
         "ref": "AUDIT_TARGET_TYPE.PERSONAL_DATA",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -384,19 +384,19 @@
       {
         "ref": "AUDIT_ACTION.CREATED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       },
       {
         "ref": "TENANT_SORT_COLUMN.CREATED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/tenant-sort.ts"
       },
       {
         "ref": "MEMBERSHIP_INVITE_OUTCOME.CREATED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
@@ -404,7 +404,7 @@
       {
         "ref": "AUDIT_ACTION.DEPROVISION_REQUESTED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -412,7 +412,7 @@
       {
         "ref": "AUDIT_ACTION.DEPROVISIONED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -420,7 +420,7 @@
       {
         "ref": "AUDIT_ACTION.REACTIVATED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -428,7 +428,7 @@
       {
         "ref": "AUDIT_ACTION.SUSPENSION_APPLIED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -436,7 +436,7 @@
       {
         "ref": "AUDIT_ACTION.SUSPENSION_LIFTED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -444,7 +444,7 @@
       {
         "ref": "AUDIT_ACTION.PROVISIONED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -452,7 +452,7 @@
       {
         "ref": "AUDIT_ACTION.PROVISIONING_FAILED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -460,7 +460,7 @@
       {
         "ref": "AUDIT_ACTION.SETTINGS_UPDATED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -468,25 +468,25 @@
       {
         "ref": "AUDIT_ACTION.DELETED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       },
       {
         "ref": "SANITY_PROJECT_DELETE_OUTCOME.DELETED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
         "ref": "TENANT_DELETE_SANITY_PROJECT_OUTCOME.DELETED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
         "ref": "TENANT_DELETE_OUTCOME.DELETED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -494,7 +494,7 @@
       {
         "ref": "AUDIT_ACTION.READER_DATA_PURGED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -502,7 +502,7 @@
       {
         "ref": "AUDIT_ACTION.RELEASE_STARTED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -510,7 +510,7 @@
       {
         "ref": "AUDIT_ACTION.RELEASE_OVERRIDE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -518,7 +518,7 @@
       {
         "ref": "AUDIT_ACTION.CONTRAST_CHECK_STARTED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -526,7 +526,7 @@
       {
         "ref": "AUDIT_ACTION.TENANT_MIGRATIONS_STARTED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -534,7 +534,7 @@
       {
         "ref": "AUDIT_ACTION.SIGNUP_BLOCK_ADDED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -542,7 +542,7 @@
       {
         "ref": "AUDIT_ACTION.SIGNUP_BLOCK_REMOVED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -550,7 +550,7 @@
       {
         "ref": "AUDIT_ACTION.PERSONAL_DATA_LOOKED_UP",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -558,7 +558,7 @@
       {
         "ref": "AUDIT_ACTION.PERSONAL_DATA_EXPORTED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -566,7 +566,7 @@
       {
         "ref": "AUDIT_ACTION.PERSONAL_DATA_ERASED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -574,7 +574,7 @@
       {
         "ref": "AUDIT_ACTION.OAUTH_APP_SAVED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -582,7 +582,7 @@
       {
         "ref": "AUDIT_ACTION.OAUTH_APP_REPLACED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -590,7 +590,7 @@
       {
         "ref": "AUDIT_ACTION.OAUTH_APP_REMOVED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -598,7 +598,7 @@
       {
         "ref": "AUDIT_ACTION.NEWSLETTER_PAUSE_CLEARED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
@@ -606,7 +606,7 @@
       {
         "ref": "AUTH_APP.SITE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/auth-app.ts"
       },
       {
@@ -626,13 +626,13 @@
       {
         "ref": "AUTH_APP.PLATFORM",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/auth-app.ts"
       },
       {
         "ref": "EMAIL_ACCOUNT.PLATFORM",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/email-account.ts"
       }
     ],
@@ -640,7 +640,7 @@
       {
         "ref": "BRAND_TAGLINE_SEPARATORS.DOT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/brand-tagline.ts"
       }
     ],
@@ -648,7 +648,7 @@
       {
         "ref": "BRAND_TAGLINE_SEPARATORS.PIPE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/brand-tagline.ts"
       }
     ],
@@ -656,7 +656,7 @@
       {
         "ref": "BRAND_TAGLINE_SEPARATORS.BULLET",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/brand-tagline.ts"
       }
     ],
@@ -664,7 +664,7 @@
       {
         "ref": "BRAND_TAGLINE_SEPARATORS.SLASH",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/brand-tagline.ts"
       }
     ],
@@ -672,7 +672,7 @@
       {
         "ref": "BUSY_BUTTON_STYLE.LABEL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/busy-button.ts"
       }
     ],
@@ -680,7 +680,7 @@
       {
         "ref": "BUSY_BUTTON_STYLE.KEPT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/busy-button.ts"
       }
     ],
@@ -688,7 +688,7 @@
       {
         "ref": "BUSY_BUTTON_STYLE.EDGE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/busy-button.ts"
       }
     ],
@@ -696,7 +696,7 @@
       {
         "ref": "SPINNER_STYLE.BRAILLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/busy-button.ts"
       }
     ],
@@ -704,7 +704,7 @@
       {
         "ref": "SPINNER_STYLE.RING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/busy-button.ts"
       }
     ],
@@ -712,7 +712,7 @@
       {
         "ref": "SPINNER_STYLE.DOTS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/busy-button.ts"
       }
     ],
@@ -720,7 +720,7 @@
       {
         "ref": "SPINNER_STYLE.PULSE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/busy-button.ts"
       }
     ],
@@ -728,19 +728,19 @@
       {
         "ref": "BUTTON_SHAPE.SQUARE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/button-shape.ts"
       },
       {
         "ref": "CARD_IMAGE_SHAPE.SQUARE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/card-image-shape.ts"
       },
       {
         "ref": "HEADER_CONTROL_SHAPE.SQUARE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-control-shape.ts"
       }
     ],
@@ -748,13 +748,13 @@
       {
         "ref": "BUTTON_SHAPE.ROUNDED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/button-shape.ts"
       },
       {
         "ref": "HEADER_CONTROL_SHAPE.ROUNDED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-control-shape.ts"
       }
     ],
@@ -762,7 +762,7 @@
       {
         "ref": "CAPABILITY.READER_ACCOUNTS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
       }
     ],
@@ -770,7 +770,7 @@
       {
         "ref": "CAPABILITY.COMMENTS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
       }
     ],
@@ -778,7 +778,7 @@
       {
         "ref": "CAPABILITY.RATINGS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
       }
     ],
@@ -786,7 +786,7 @@
       {
         "ref": "CAPABILITY.BOOKMARKS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
       }
     ],
@@ -794,7 +794,7 @@
       {
         "ref": "CAPABILITY.NEWSLETTER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
       }
     ],
@@ -802,7 +802,7 @@
       {
         "ref": "CAPABILITY.ANALYTICS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
       }
     ],
@@ -810,7 +810,7 @@
       {
         "ref": "CAPABILITY.CONSENT_BANNER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
       }
     ],
@@ -818,7 +818,7 @@
       {
         "ref": "CAPABILITY.CONTACT_FORM",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
       }
     ],
@@ -826,13 +826,13 @@
       {
         "ref": "CARD_IMAGE_SHAPE.WIDE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/card-image-shape.ts"
       },
       {
         "ref": "CONTAINER_WIDTH.WIDE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       },
       {
@@ -846,7 +846,7 @@
       {
         "ref": "CARD_IMAGE_SHAPE.ICON",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/card-image-shape.ts"
       }
     ],
@@ -854,7 +854,7 @@
       {
         "ref": "CARD_STYLE.ACCENT_BAR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/card-style.ts"
       }
     ],
@@ -862,13 +862,13 @@
       {
         "ref": "CARD_STYLE.OUTLINED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/card-style.ts"
       },
       {
         "ref": "HEADER_CONTROL_STYLE.OUTLINED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-control-style.ts"
       }
     ],
@@ -876,7 +876,7 @@
       {
         "ref": "CARD_STYLE.FILLED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/card-style.ts"
       }
     ],
@@ -884,7 +884,7 @@
       {
         "ref": "CARD_STYLE.RAISED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/card-style.ts"
       }
     ],
@@ -892,19 +892,19 @@
       {
         "ref": "CARD_STYLE.PLAIN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/card-style.ts"
       },
       {
         "ref": "HEADER_CONTROL_STYLE.PLAIN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-control-style.ts"
       },
       {
         "ref": "NAV_LINK_STYLE.PLAIN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/nav-link-style.ts"
       }
     ],
@@ -912,7 +912,7 @@
       {
         "ref": "CONSENT_CATEGORY.NECESSARY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/consent-category.ts"
       }
     ],
@@ -920,7 +920,7 @@
       {
         "ref": "CONSENT_CATEGORY.EXTERNAL_MEDIA",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/consent-category.ts"
       }
     ],
@@ -928,7 +928,7 @@
       {
         "ref": "COLOR_SCHEME.LIGHT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/contrast.ts"
       },
       {
@@ -948,7 +948,7 @@
       {
         "ref": "COLOR_SCHEME.DARK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/contrast.ts"
       },
       {
@@ -968,7 +968,7 @@
       {
         "ref": "CONTRAST_ROLE.TEXT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/contrast.ts"
       },
       {
@@ -982,7 +982,7 @@
       {
         "ref": "CONTRAST_ROLE.LARGE_TEXT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/contrast.ts"
       }
     ],
@@ -990,7 +990,7 @@
       {
         "ref": "CONTRAST_ROLE.UI_BOUNDARY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/contrast.ts"
       }
     ],
@@ -998,7 +998,7 @@
       {
         "ref": "CONTRAST_ROLE.FOCUS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/contrast.ts"
       }
     ],
@@ -1006,7 +1006,7 @@
       {
         "ref": "CONTRAST_ROLE.DECORATIVE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/contrast.ts"
       }
     ],
@@ -1014,13 +1014,13 @@
       {
         "ref": "CTA_VARIANT.BANNER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/cta.ts"
       },
       {
         "ref": "HERO_VARIANT.BANNER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module.ts"
       }
     ],
@@ -1028,13 +1028,13 @@
       {
         "ref": "CTA_VARIANT.SPLIT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/cta.ts"
       },
       {
         "ref": "HERO_VARIANT.SPLIT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module.ts"
       }
     ],
@@ -1042,7 +1042,7 @@
       {
         "ref": "CTA_VARIANT.CALLOUT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/cta.ts"
       }
     ],
@@ -1050,7 +1050,7 @@
       {
         "ref": "CTA_ACTION_APPEARANCE.CONTAINED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/cta.ts"
       }
     ],
@@ -1058,13 +1058,13 @@
       {
         "ref": "CTA_ACTION_APPEARANCE.INLINE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/cta.ts"
       },
       {
         "ref": "IMAGE_LAYOUT.INLINE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/image-layout.ts"
       }
     ],
@@ -1072,13 +1072,13 @@
       {
         "ref": "CTA_ACTION_VARIANT.PRIMARY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/cta.ts"
       },
       {
         "ref": "BRAND_VARIANT.PRIMARY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       },
       {
@@ -1092,13 +1092,13 @@
       {
         "ref": "CTA_ACTION_VARIANT.SECONDARY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/cta.ts"
       },
       {
         "ref": "BRAND_VARIANT.SECONDARY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       },
       {
@@ -1112,7 +1112,7 @@
       {
         "ref": "DEPTH.SKIM",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/depth.ts"
       }
     ],
@@ -1120,7 +1120,7 @@
       {
         "ref": "DEPTH.READ",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/depth.ts"
       }
     ],
@@ -1128,7 +1128,7 @@
       {
         "ref": "DEPTH.DEEP",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/depth.ts"
       }
     ],
@@ -1136,13 +1136,13 @@
       {
         "ref": "DISPLAY_MODE.GRID",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/display-mode.ts"
       },
       {
         "ref": "ICONS.GRID",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
@@ -1156,7 +1156,7 @@
       {
         "ref": "DISPLAY_MODE.CAROUSEL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/display-mode.ts"
       }
     ],
@@ -1164,7 +1164,7 @@
       {
         "ref": "EMAIL_TEMPLATE_TYPE.MAGIC_LINK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/email-template.ts"
       }
     ],
@@ -1172,7 +1172,7 @@
       {
         "ref": "EMAIL_TEMPLATE_TYPE.TENANT_INVITE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/email-template.ts"
       }
     ],
@@ -1180,13 +1180,13 @@
       {
         "ref": "EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/email-template.ts"
       },
       {
         "ref": "EMAIL_TYPE.NEWSLETTER_CONFIRMATION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/email-type.ts"
       }
     ],
@@ -1194,7 +1194,7 @@
       {
         "ref": "EMAIL_TYPE.SIGN_IN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/email-type.ts"
       }
     ],
@@ -1202,7 +1202,7 @@
       {
         "ref": "EMAIL_TYPE.NEWSLETTER_ISSUE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/email-type.ts"
       }
     ],
@@ -1210,19 +1210,19 @@
       {
         "ref": "EMBED_PROVIDER.YOUTUBE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/embed.ts"
       },
       {
         "ref": "ICONS.YOUTUBE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "SOCIAL_PLATFORMS.YOUTUBE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/link.ts"
       }
     ],
@@ -1230,7 +1230,7 @@
       {
         "ref": "EMBED_PROVIDER.VIMEO",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/embed.ts"
       }
     ],
@@ -1238,7 +1238,7 @@
       {
         "ref": "EMBED_PROVIDER.LOOM",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/embed.ts"
       }
     ],
@@ -1246,7 +1246,7 @@
       {
         "ref": "EMBED_PROVIDER.CAL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/embed.ts"
       }
     ],
@@ -1254,7 +1254,7 @@
       {
         "ref": "EMBED_PROVIDER.GOOGLE_MAPS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/embed.ts"
       }
     ],
@@ -1262,7 +1262,7 @@
       {
         "ref": "ERROR_CODE.DB_NOT_FOUND",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
       }
     ],
@@ -1270,7 +1270,7 @@
       {
         "ref": "ERROR_CODE.DB_DUPLICATE_DOMAIN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
       }
     ],
@@ -1278,7 +1278,7 @@
       {
         "ref": "ERROR_CODE.DB_LAST_LINKED_METHOD",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
       }
     ],
@@ -1286,7 +1286,7 @@
       {
         "ref": "ERROR_CODE.DB_HOLDS_PLATFORM_ROLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
       }
     ],
@@ -1294,7 +1294,7 @@
       {
         "ref": "ERROR_CODE.DB_ALREADY_PROVISIONING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
       }
     ],
@@ -1302,7 +1302,7 @@
       {
         "ref": "ERROR_CODE.DB_INVALID_DOMAIN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
       }
     ],
@@ -1310,7 +1310,7 @@
       {
         "ref": "ERROR_CODE.DB_INVALID_EMAIL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
       }
     ],
@@ -1318,7 +1318,7 @@
       {
         "ref": "ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
       }
     ],
@@ -1326,7 +1326,7 @@
       {
         "ref": "ERROR_CODE.DB_DEFAULT_LOCALE_REPEATED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
       }
     ],
@@ -1334,7 +1334,7 @@
       {
         "ref": "ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
       }
     ],
@@ -1342,7 +1342,7 @@
       {
         "ref": "ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
       }
     ],
@@ -1350,13 +1350,13 @@
       {
         "ref": "FINDING_SOURCE.DOCUMENT_VALIDATION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       },
       {
         "ref": "OPERATOR_ALERT_KIND.DOCUMENT_VALIDATION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/operator-alert.ts"
       }
     ],
@@ -1364,7 +1364,7 @@
       {
         "ref": "FINDING_SOURCE.TENANT_PROVISIONING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1372,7 +1372,7 @@
       {
         "ref": "FINDING_SOURCE.RECHECK_TENANT_OWNERS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1380,7 +1380,7 @@
       {
         "ref": "FINDING_SOURCE.DOMAIN_VERIFICATION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1388,7 +1388,7 @@
       {
         "ref": "FINDING_SOURCE.SITE_CONFIG_REVALIDATION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1396,7 +1396,7 @@
       {
         "ref": "FINDING_SOURCE.CONTRAST_CHECK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1404,7 +1404,7 @@
       {
         "ref": "FINDING_KIND.SCHEMA_VALIDATION_ERROR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1412,7 +1412,7 @@
       {
         "ref": "FINDING_KIND.PROVISIONING_STEP_FAILED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1420,7 +1420,7 @@
       {
         "ref": "FINDING_KIND.OWNER_CHECK_STALLED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1428,7 +1428,7 @@
       {
         "ref": "FINDING_KIND.OWNER_CHECK_AMBIGUOUS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1436,7 +1436,7 @@
       {
         "ref": "FINDING_KIND.DOMAIN_NOT_ADDED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1444,7 +1444,7 @@
       {
         "ref": "FINDING_KIND.REVALIDATION_FAILED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1452,7 +1452,7 @@
       {
         "ref": "FINDING_KIND.CONTRAST_REGRESSION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1460,7 +1460,7 @@
       {
         "ref": "FINDING_KIND.OWNER_ACCESS_CHECK_FAILED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1468,7 +1468,7 @@
       {
         "ref": "FINDING_SEVERITY.CRITICAL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1476,7 +1476,7 @@
       {
         "ref": "FINDING_STATUS.OPEN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1484,7 +1484,7 @@
       {
         "ref": "FINDING_STATUS.RESOLVED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
@@ -1492,13 +1492,13 @@
       {
         "ref": "FOOTER_FINE_PRINT_KIND.LINK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/footer-fine-print.ts"
       },
       {
         "ref": "ICONS.LINK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
@@ -1512,7 +1512,7 @@
       {
         "ref": "FOOTER_FINE_PRINT_KIND.COOKIE_SETTINGS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/footer-fine-print.ts"
       }
     ],
@@ -1520,7 +1520,7 @@
       {
         "ref": "FOOTER_LAYOUT.COLUMNS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/footer-layout.ts"
       }
     ],
@@ -1528,7 +1528,7 @@
       {
         "ref": "FOOTER_LAYOUT.CENTRED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/footer-layout.ts"
       }
     ],
@@ -1536,19 +1536,19 @@
       {
         "ref": "FOOTER_LAYOUT.COMPACT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/footer-layout.ts"
       },
       {
         "ref": "NEWSLETTER_VARIANT.COMPACT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module.ts"
       },
       {
         "ref": "DENSITY.COMPACT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       },
       {
@@ -1562,7 +1562,7 @@
       {
         "ref": "FOOTER_LAYOUT.BIG_WORDMARK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/footer-layout.ts"
       }
     ],
@@ -1570,13 +1570,13 @@
       {
         "ref": "FOOTER_SURFACE.FULL_WIDTH",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/footer-layout.ts"
       },
       {
         "ref": "HEADER_BAR_STYLE.FULL_WIDTH",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
       }
     ],
@@ -1584,7 +1584,7 @@
       {
         "ref": "COOKIE_SETTINGS_BUTTON.HIDDEN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/footer-layout.ts"
       }
     ],
@@ -1592,7 +1592,7 @@
       {
         "ref": "COOKIE_SETTINGS_BUTTON.SHOWN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/footer-layout.ts"
       }
     ],
@@ -1600,7 +1600,7 @@
       {
         "ref": "COOKIE_SETTINGS_BUTTON.ONLY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/footer-layout.ts"
       }
     ],
@@ -1608,13 +1608,13 @@
       {
         "ref": "FORM_STATUS.IDLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/form-status.ts"
       },
       {
         "ref": "TENANT_PROVISIONING_STEP_STATUS.IDLE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       },
       {
@@ -1640,7 +1640,7 @@
       {
         "ref": "FORM_STATUS.SUBMITTING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/form-status.ts"
       }
     ],
@@ -1648,7 +1648,7 @@
       {
         "ref": "GRID_COLUMNS.TWO",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/grid-columns.ts"
       }
     ],
@@ -1656,7 +1656,7 @@
       {
         "ref": "GRID_COLUMNS.THREE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/grid-columns.ts"
       }
     ],
@@ -1664,7 +1664,7 @@
       {
         "ref": "GRID_COLUMNS.FOUR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/grid-columns.ts"
       }
     ],
@@ -1672,7 +1672,7 @@
       {
         "ref": "HEADER_CONTROL_SHAPE.ROUND",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-control-shape.ts"
       }
     ],
@@ -1680,13 +1680,13 @@
       {
         "ref": "HEADER_CONTROL_STYLE.SOFT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-control-style.ts"
       },
       {
         "ref": "NAV_LINK_STYLE.SOFT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/nav-link-style.ts"
       }
     ],
@@ -1694,7 +1694,7 @@
       {
         "ref": "HEADER_LAYOUT.CLASSIC",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
       }
     ],
@@ -1702,7 +1702,7 @@
       {
         "ref": "HEADER_LAYOUT.LINKS_BESIDE_BRAND",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
       }
     ],
@@ -1710,7 +1710,7 @@
       {
         "ref": "HEADER_LAYOUT.CENTRED_LINKS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
       }
     ],
@@ -1718,7 +1718,7 @@
       {
         "ref": "HEADER_LAYOUT.TWO_ROWS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
       }
     ],
@@ -1726,7 +1726,7 @@
       {
         "ref": "HEADER_LAYOUT.CENTRED_BRAND",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
       }
     ],
@@ -1734,7 +1734,7 @@
       {
         "ref": "HEADER_LAYOUT.MENU_BUTTON",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
       }
     ],
@@ -1742,7 +1742,7 @@
       {
         "ref": "HEADER_SUBMENU_STYLE.DROPDOWN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
       }
     ],
@@ -1750,7 +1750,7 @@
       {
         "ref": "HEADER_SUBMENU_STYLE.WIDE_PANEL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
       }
     ],
@@ -1758,7 +1758,7 @@
       {
         "ref": "HEADER_BAR_STYLE.FLOATING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
       }
     ],
@@ -1766,7 +1766,7 @@
       {
         "ref": "HTTP_METHOD.GET",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-methods.ts"
       }
     ],
@@ -1774,7 +1774,7 @@
       {
         "ref": "HTTP_METHOD.HEAD",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-methods.ts"
       }
     ],
@@ -1782,7 +1782,7 @@
       {
         "ref": "HTTP_METHOD.POST",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-methods.ts"
       }
     ],
@@ -1790,7 +1790,7 @@
       {
         "ref": "HTTP_METHOD.PUT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-methods.ts"
       }
     ],
@@ -1798,7 +1798,7 @@
       {
         "ref": "HTTP_METHOD.PATCH",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-methods.ts"
       }
     ],
@@ -1806,7 +1806,7 @@
       {
         "ref": "HTTP_METHOD.DELETE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-methods.ts"
       }
     ],
@@ -1814,7 +1814,7 @@
       {
         "ref": "ICONS.SUN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -1822,7 +1822,7 @@
       {
         "ref": "ICONS.MOON",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -1830,7 +1830,7 @@
       {
         "ref": "ICONS.HOUSE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -1838,7 +1838,7 @@
       {
         "ref": "ICONS.SHARE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -1846,7 +1846,7 @@
       {
         "ref": "ICONS.COPY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -1854,7 +1854,7 @@
       {
         "ref": "ICONS.CHECK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -1862,7 +1862,7 @@
       {
         "ref": "ICONS.CHECK_SHEET",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -1870,7 +1870,7 @@
       {
         "ref": "ICONS.EXTERNAL_LINK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -1878,7 +1878,7 @@
       {
         "ref": "ICONS.MENU_ROWS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -1886,7 +1886,7 @@
       {
         "ref": "ICONS.CLOSE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -1894,13 +1894,13 @@
       {
         "ref": "ICONS.X",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "SOCIAL_PLATFORMS.X",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/link.ts"
       }
     ],
@@ -1908,19 +1908,19 @@
       {
         "ref": "ICONS.GITHUB",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "SOCIAL_PLATFORMS.GITHUB",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/link.ts"
       },
       {
         "ref": "SANITY_LOGIN_PROVIDER.GITHUB",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -1928,13 +1928,13 @@
       {
         "ref": "ICONS.LINKEDIN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "SOCIAL_PLATFORMS.LINKEDIN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/link.ts"
       }
     ],
@@ -1942,13 +1942,13 @@
       {
         "ref": "ICONS.FACEBOOK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "SOCIAL_PLATFORMS.FACEBOOK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/link.ts"
       }
     ],
@@ -1956,13 +1956,13 @@
       {
         "ref": "ICONS.INSTAGRAM",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "SOCIAL_PLATFORMS.INSTAGRAM",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/link.ts"
       }
     ],
@@ -1970,13 +1970,13 @@
       {
         "ref": "ICONS.MASTODON",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "SOCIAL_PLATFORMS.MASTODON",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/link.ts"
       }
     ],
@@ -1984,13 +1984,13 @@
       {
         "ref": "ICONS.BLUESKY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "SOCIAL_PLATFORMS.BLUESKY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/link.ts"
       }
     ],
@@ -1998,13 +1998,13 @@
       {
         "ref": "ICONS.THREADS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "SOCIAL_PLATFORMS.THREADS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/link.ts"
       }
     ],
@@ -2012,13 +2012,13 @@
       {
         "ref": "ICONS.RSS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "SOCIAL_PLATFORMS.RSS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/link.ts"
       }
     ],
@@ -2026,7 +2026,7 @@
       {
         "ref": "ICONS.ARROW_UP",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2034,13 +2034,13 @@
       {
         "ref": "ICONS.GOOGLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
         "ref": "SANITY_LOGIN_PROVIDER.GOOGLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -2048,7 +2048,7 @@
       {
         "ref": "ICONS.BOOKMARK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
@@ -2062,7 +2062,7 @@
       {
         "ref": "ICONS.SPINNER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2070,7 +2070,7 @@
       {
         "ref": "ICONS.SETTINGS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2078,7 +2078,7 @@
       {
         "ref": "ICONS.POWER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2086,7 +2086,7 @@
       {
         "ref": "ICONS.MAIL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2094,7 +2094,7 @@
       {
         "ref": "ICONS.CHEVRON_RIGHT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2102,7 +2102,7 @@
       {
         "ref": "ICONS.CHEVRON_LEFT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2110,7 +2110,7 @@
       {
         "ref": "ICONS.CHEVRON_DOWN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2118,7 +2118,7 @@
       {
         "ref": "ICONS.CHEVRON_UP",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2126,7 +2126,7 @@
       {
         "ref": "ICONS.SELECT_CHEVRON",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2134,7 +2134,7 @@
       {
         "ref": "ICONS.ARROW",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2142,7 +2142,7 @@
       {
         "ref": "ICONS.SHIELD_CHECK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2150,7 +2150,7 @@
       {
         "ref": "ICONS.PLUS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2158,7 +2158,7 @@
       {
         "ref": "ICONS.PALETTE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
@@ -2172,7 +2172,7 @@
       {
         "ref": "ICONS.QUOTE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2180,7 +2180,7 @@
       {
         "ref": "ICONS.GLOBE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2188,7 +2188,7 @@
       {
         "ref": "ICONS.STUDIO",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2196,7 +2196,7 @@
       {
         "ref": "ICONS.COMMENT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2204,7 +2204,7 @@
       {
         "ref": "ICONS.USER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2212,7 +2212,7 @@
       {
         "ref": "ICONS.USERS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2220,7 +2220,7 @@
       {
         "ref": "ICONS.CODE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2228,7 +2228,7 @@
       {
         "ref": "ICONS.LAYERS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2236,7 +2236,7 @@
       {
         "ref": "ICONS.ZAP",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2244,7 +2244,7 @@
       {
         "ref": "ICONS.SEARCH",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2252,7 +2252,7 @@
       {
         "ref": "ICONS.CHART",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2260,7 +2260,7 @@
       {
         "ref": "ICONS.CLOCK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2268,7 +2268,7 @@
       {
         "ref": "ICONS.WRENCH",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2276,7 +2276,7 @@
       {
         "ref": "ICONS.ROCKET",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2284,7 +2284,7 @@
       {
         "ref": "ICONS.BOOK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2292,7 +2292,7 @@
       {
         "ref": "ICONS.PEN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2300,7 +2300,7 @@
       {
         "ref": "ICONS.STAR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2308,7 +2308,7 @@
       {
         "ref": "ICONS.LOCK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2316,7 +2316,7 @@
       {
         "ref": "ICONS.CLOUD",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2324,7 +2324,7 @@
       {
         "ref": "ICONS.CPU",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2332,7 +2332,7 @@
       {
         "ref": "ICONS.TARGET",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2340,7 +2340,7 @@
       {
         "ref": "ICONS.HEART",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2348,7 +2348,7 @@
       {
         "ref": "ICONS.CAMERA",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2356,7 +2356,7 @@
       {
         "ref": "ICONS.LIGHTBULB",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2364,7 +2364,7 @@
       {
         "ref": "ICONS.MAP_PIN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2372,7 +2372,7 @@
       {
         "ref": "ICONS.PHONE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
@@ -2386,7 +2386,7 @@
       {
         "ref": "ICONS.TRENDING_UP",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2394,7 +2394,7 @@
       {
         "ref": "ICONS.SMILE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2402,7 +2402,7 @@
       {
         "ref": "ICONS.BOLD",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2410,7 +2410,7 @@
       {
         "ref": "ICONS.ITALIC",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2418,7 +2418,7 @@
       {
         "ref": "ICONS.SEND",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
@@ -2432,7 +2432,7 @@
       {
         "ref": "ICONS.COOKIE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2440,7 +2440,7 @@
       {
         "ref": "ICONS.UNFOLD",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2448,7 +2448,7 @@
       {
         "ref": "ICONS.TICK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2456,7 +2456,7 @@
       {
         "ref": "ICONS.SIDEBAR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2464,7 +2464,7 @@
       {
         "ref": "ICONS.MONITOR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2472,7 +2472,7 @@
       {
         "ref": "ICONS.TABLET",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
@@ -2486,7 +2486,7 @@
       {
         "ref": "ICONS.USER_CHECK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2494,7 +2494,7 @@
       {
         "ref": "ICONS.CROSSHAIR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2502,7 +2502,7 @@
       {
         "ref": "ICONS.MAXIMIZE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2510,7 +2510,7 @@
       {
         "ref": "ICONS.PAUSE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2518,7 +2518,7 @@
       {
         "ref": "ICONS.UPLOAD",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       },
       {
@@ -2532,7 +2532,7 @@
       {
         "ref": "ICONS.EYE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2540,7 +2540,7 @@
       {
         "ref": "ICONS.EYE_OFF",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
@@ -2548,7 +2548,7 @@
       {
         "ref": "IMAGE_LAYOUT.FULL_BLEED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/image-layout.ts"
       }
     ],
@@ -2556,7 +2556,7 @@
       {
         "ref": "IMAGE_LAYOUT.FLOAT_LEFT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/image-layout.ts"
       }
     ],
@@ -2564,7 +2564,7 @@
       {
         "ref": "IMAGE_LAYOUT.FLOAT_RIGHT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/image-layout.ts"
       }
     ],
@@ -2572,7 +2572,7 @@
       {
         "ref": "LOCALE_ISO_CODES.EN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/language.ts"
       }
     ],
@@ -2580,7 +2580,7 @@
       {
         "ref": "LOCALE_ISO_CODES.NL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/language.ts"
       },
       {
@@ -2594,7 +2594,7 @@
       {
         "ref": "LOCALE_ISO_CODES.FR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/language.ts"
       },
       {
@@ -2608,7 +2608,7 @@
       {
         "ref": "LOCALE_ISO_CODES.DE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/language.ts"
       },
       {
@@ -2622,7 +2622,7 @@
       {
         "ref": "LOCALE_ISO_CODES.ES",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/language.ts"
       },
       {
@@ -2636,7 +2636,7 @@
       {
         "ref": "BRAND_VARIANT.BRAND_PRIMARY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       }
     ],
@@ -2644,13 +2644,13 @@
       {
         "ref": "SPACING_SCALE.NONE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       },
       {
         "ref": "RADIUS_SCALE.NONE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       },
       {
@@ -2664,19 +2664,19 @@
       {
         "ref": "SPACING_SCALE.SM",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       },
       {
         "ref": "RADIUS_SCALE.SM",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       },
       {
         "ref": "SIZE.SM",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/size.ts"
       },
       {
@@ -2696,19 +2696,19 @@
       {
         "ref": "SPACING_SCALE.MD",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       },
       {
         "ref": "RADIUS_SCALE.MD",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       },
       {
         "ref": "SIZE.MD",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/size.ts"
       },
       {
@@ -2722,19 +2722,19 @@
       {
         "ref": "SPACING_SCALE.LG",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       },
       {
         "ref": "RADIUS_SCALE.LG",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       },
       {
         "ref": "SIZE.LG",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/size.ts"
       },
       {
@@ -2748,19 +2748,19 @@
       {
         "ref": "SPACING_SCALE.XL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       },
       {
         "ref": "RADIUS_SCALE.XL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       },
       {
         "ref": "SIZE.XL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/size.ts"
       },
       {
@@ -2774,7 +2774,7 @@
       {
         "ref": "CONTAINER_WIDTH.NARROW",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       }
     ],
@@ -2782,13 +2782,13 @@
       {
         "ref": "CONTAINER_WIDTH.FULL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       },
       {
         "ref": "NEWSLETTER_VARIANT.FULL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module.ts"
       }
     ],
@@ -2796,7 +2796,7 @@
       {
         "ref": "CONTENT_ALIGNMENT.LEFT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       }
     ],
@@ -2804,7 +2804,7 @@
       {
         "ref": "CONTENT_ALIGNMENT.CENTER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       }
     ],
@@ -2812,7 +2812,7 @@
       {
         "ref": "CONTENT_ALIGNMENT.RIGHT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       }
     ],
@@ -2820,7 +2820,7 @@
       {
         "ref": "MEDIA_ORDER.LAST",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       }
     ],
@@ -2828,7 +2828,7 @@
       {
         "ref": "MEDIA_ORDER.FIRST",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
       },
       {
@@ -2842,7 +2842,7 @@
       {
         "ref": "LEGAL_PAGE_KIND.PRIVACY_POLICY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/legal-page-kind.ts"
       }
     ],
@@ -2850,7 +2850,7 @@
       {
         "ref": "LEGAL_PAGE_KIND.TERMS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/legal-page-kind.ts"
       }
     ],
@@ -2858,7 +2858,7 @@
       {
         "ref": "LEGAL_PAGE_KIND.IMPRINT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/legal-page-kind.ts"
       }
     ],
@@ -2866,7 +2866,7 @@
       {
         "ref": "LEGAL_PAGE_KIND.COOKIE_STATEMENT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/legal-page-kind.ts"
       }
     ],
@@ -2874,13 +2874,13 @@
       {
         "ref": "LEGAL_PAGE_KIND.OTHER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/legal-page-kind.ts"
       },
       {
         "ref": "SUSPENSION_CATEGORY.OTHER",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-suspension.ts"
       }
     ],
@@ -2888,7 +2888,7 @@
       {
         "ref": "LINK_TYPE.INTERNAL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/link.ts"
       }
     ],
@@ -2896,7 +2896,7 @@
       {
         "ref": "LINK_TYPE.EXTERNAL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/link.ts"
       }
     ],
@@ -2904,7 +2904,7 @@
       {
         "ref": "MAGIC_LINK_REFUSAL.NETWORK_LIMIT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/magic-link-refusal.ts"
       }
     ],
@@ -2912,7 +2912,7 @@
       {
         "ref": "MAGIC_LINK_REFUSAL.ADDRESS_LIMIT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/magic-link-refusal.ts"
       }
     ],
@@ -2920,7 +2920,7 @@
       {
         "ref": "MAGIC_LINK_REFUSAL.CHECK_FAILED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/magic-link-refusal.ts"
       }
     ],
@@ -2928,7 +2928,7 @@
       {
         "ref": "MAGIC_LINK_SIGN_IN_CODE.SEND_LIMITED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/magic-link-refusal.ts"
       }
     ],
@@ -2936,7 +2936,7 @@
       {
         "ref": "MEDIA_RATIO.VIDEO",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/media-ratio.ts"
       }
     ],
@@ -2944,7 +2944,7 @@
       {
         "ref": "MEDIA_RATIO.VERTICAL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/media-ratio.ts"
       }
     ],
@@ -2952,7 +2952,7 @@
       {
         "ref": "MEDIA_RATIO.CLASSIC",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/media-ratio.ts"
       }
     ],
@@ -2960,7 +2960,7 @@
       {
         "ref": "MEDIA_RATIO.PORTRAIT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/media-ratio.ts"
       }
     ],
@@ -2968,7 +2968,7 @@
       {
         "ref": "MODULE_PACK.CORE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module-pack.ts"
       }
     ],
@@ -2976,13 +2976,13 @@
       {
         "ref": "MODULE_PACK.STARTER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module-pack.ts"
       },
       {
         "ref": "TENANT_PLAN.STARTER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/tenant-plan.ts"
       }
     ],
@@ -2990,13 +2990,13 @@
       {
         "ref": "MODULE_PACK.GROWTH",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module-pack.ts"
       },
       {
         "ref": "TENANT_PLAN.GROWTH",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/tenant-plan.ts"
       }
     ],
@@ -3004,7 +3004,7 @@
       {
         "ref": "HERO_VARIANT.STACKED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module.ts"
       }
     ],
@@ -3012,7 +3012,7 @@
       {
         "ref": "POST_SOURCE.PINNED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module.ts"
       }
     ],
@@ -3020,7 +3020,7 @@
       {
         "ref": "POST_SOURCE.NEWEST_FEATURED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module.ts"
       }
     ],
@@ -3028,7 +3028,7 @@
       {
         "ref": "NAV_LINK_STYLE.UNDERLINE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/nav-link-style.ts"
       },
       {
@@ -3042,13 +3042,13 @@
       {
         "ref": "NEWSLETTER_REPUTATION_ALERT_LEVEL.WARN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/newsletter-reputation.ts"
       },
       {
         "ref": "EMAIL_REPUTATION_LEVEL.WARN",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
       }
     ],
@@ -3056,13 +3056,13 @@
       {
         "ref": "NEWSLETTER_REPUTATION_ALERT_LEVEL.SLOW",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/newsletter-reputation.ts"
       },
       {
         "ref": "EMAIL_REPUTATION_LEVEL.SLOW",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
       },
       {
@@ -3076,13 +3076,13 @@
       {
         "ref": "NEWSLETTER_REPUTATION_ALERT_LEVEL.STOP",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/newsletter-reputation.ts"
       },
       {
         "ref": "EMAIL_REPUTATION_LEVEL.STOP",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
       }
     ],
@@ -3090,7 +3090,7 @@
       {
         "ref": "NEWSLETTER_RESULT.CONFIRMED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/newsletter-result.ts"
       }
     ],
@@ -3098,7 +3098,7 @@
       {
         "ref": "NEWSLETTER_RESULT.CONFIRM_INVALID",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/newsletter-result.ts"
       }
     ],
@@ -3106,7 +3106,7 @@
       {
         "ref": "NEWSLETTER_RESULT.CONFIRM_UNAVAILABLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/newsletter-result.ts"
       }
     ],
@@ -3114,7 +3114,7 @@
       {
         "ref": "NEWSLETTER_RESULT.CONFIRM_FAILED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/newsletter-result.ts"
       }
     ],
@@ -3122,7 +3122,7 @@
       {
         "ref": "NEWSLETTER_RESULT.UNSUBSCRIBED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/newsletter-result.ts"
       }
     ],
@@ -3130,7 +3130,7 @@
       {
         "ref": "NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/newsletter-result.ts"
       }
     ],
@@ -3138,7 +3138,7 @@
       {
         "ref": "NEWSLETTER_RESULT.UNSUBSCRIBE_FAILED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/newsletter-result.ts"
       }
     ],
@@ -3146,7 +3146,7 @@
       {
         "ref": "NEXT_DYNAMIC_ERROR.DYNAMIC_SERVER_USAGE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/next-dynamic-error.ts"
       }
     ],
@@ -3154,7 +3154,7 @@
       {
         "ref": "NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/next-navigation-error.ts"
       }
     ],
@@ -3162,7 +3162,7 @@
       {
         "ref": "NEXT_NAVIGATION_ERROR.NEXT_REDIRECT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/next-navigation-error.ts"
       }
     ],
@@ -3170,7 +3170,7 @@
       {
         "ref": "OAUTH_PROVIDER.GITHUB",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/oauth-provider.ts"
       }
     ],
@@ -3178,7 +3178,7 @@
       {
         "ref": "OAUTH_PROVIDER.GOOGLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/oauth-provider.ts"
       }
     ],
@@ -3186,13 +3186,13 @@
       {
         "ref": "OPERATOR_ALERT_KIND.OWNER_ELEVATION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/operator-alert.ts"
       },
       {
         "ref": "TENANT_PROVISIONING_STEP.OWNER_ELEVATION",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -3200,7 +3200,7 @@
       {
         "ref": "PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/portable-text-block-type.ts"
       }
     ],
@@ -3208,7 +3208,7 @@
       {
         "ref": "PORTABLE_TEXT_BLOCK_TYPE.ASIDE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/portable-text-block-type.ts"
       }
     ],
@@ -3216,7 +3216,7 @@
       {
         "ref": "PORTABLE_TEXT_BLOCK_TYPE.LINK_REF",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/portable-text-block-type.ts"
       }
     ],
@@ -3224,7 +3224,7 @@
       {
         "ref": "PORTABLE_TEXT_BLOCK_TYPE.COOKIE_PREFERENCES_LINK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/portable-text-block-type.ts"
       }
     ],
@@ -3232,7 +3232,7 @@
       {
         "ref": "PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/portable-text-block-type.ts"
       }
     ],
@@ -3240,7 +3240,7 @@
       {
         "ref": "PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/portable-text-block-type.ts"
       }
     ],
@@ -3248,7 +3248,7 @@
       {
         "ref": "PORTABLE_TEXT_BLOCK_TYPE.TABLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/portable-text-block-type.ts"
       }
     ],
@@ -3256,7 +3256,7 @@
       {
         "ref": "PRESET_ID.CONSOLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       }
     ],
@@ -3264,7 +3264,7 @@
       {
         "ref": "PRESET_ID.EDITORIAL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       }
     ],
@@ -3272,7 +3272,7 @@
       {
         "ref": "FONT_CHOICE.SPACE_GROTESK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       }
     ],
@@ -3280,7 +3280,7 @@
       {
         "ref": "FONT_CHOICE.NEWSREADER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       }
     ],
@@ -3288,7 +3288,7 @@
       {
         "ref": "FONT_CHOICE.JETBRAINS_MONO",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       }
     ],
@@ -3296,7 +3296,7 @@
       {
         "ref": "FONT_CHOICE.FRAUNCES",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       }
     ],
@@ -3304,7 +3304,7 @@
       {
         "ref": "FONT_CHOICE.INTER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       }
     ],
@@ -3312,7 +3312,7 @@
       {
         "ref": "DENSITY.DEFAULT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       },
       {
@@ -3326,7 +3326,7 @@
       {
         "ref": "LANGUAGE_SWITCHER_STYLE.MENU_CODE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       }
     ],
@@ -3334,7 +3334,7 @@
       {
         "ref": "LANGUAGE_SWITCHER_STYLE.MENU_GLOBE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       }
     ],
@@ -3342,7 +3342,7 @@
       {
         "ref": "LANGUAGE_SWITCHER_STYLE.CODES",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/preset.ts"
       }
     ],
@@ -3350,7 +3350,7 @@
       {
         "ref": "PRICE_PERIOD.ONE_TIME",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/price-period.ts"
       }
     ],
@@ -3358,7 +3358,7 @@
       {
         "ref": "PRICE_PERIOD.HOUR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/price-period.ts"
       }
     ],
@@ -3366,7 +3366,7 @@
       {
         "ref": "PRICE_PERIOD.SESSION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/price-period.ts"
       },
       {
@@ -3380,7 +3380,7 @@
       {
         "ref": "PRICE_PERIOD.MONTH",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/price-period.ts"
       }
     ],
@@ -3388,7 +3388,7 @@
       {
         "ref": "PRICE_PERIOD.YEAR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/price-period.ts"
       }
     ],
@@ -3396,7 +3396,7 @@
       {
         "ref": "REDIRECT_STATUS.PERMANENT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/redirect.ts"
       }
     ],
@@ -3404,7 +3404,7 @@
       {
         "ref": "REDIRECT_STATUS.TEMPORARY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/redirect.ts"
       }
     ],
@@ -3412,7 +3412,7 @@
       {
         "ref": "RELEASE_CHANGE.RENDERING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/release.ts"
       }
     ],
@@ -3420,7 +3420,7 @@
       {
         "ref": "RELEASE_CHANGE.DB_MIGRATION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/release.ts"
       }
     ],
@@ -3428,7 +3428,7 @@
       {
         "ref": "RELEASE_CHANGE.SANITY_MIGRATION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/release.ts"
       }
     ],
@@ -3436,7 +3436,7 @@
       {
         "ref": "RELEASE_CHANGE.ENV",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/release.ts"
       }
     ],
@@ -3444,7 +3444,7 @@
       {
         "ref": "CONTRAST_CHECK_OUTCOME.PASS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/release.ts"
       }
     ],
@@ -3452,7 +3452,7 @@
       {
         "ref": "CONTRAST_CHECK_OUTCOME.FAIL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/release.ts"
       }
     ],
@@ -3460,7 +3460,7 @@
       {
         "ref": "SANITY_DOCUMENT_ACTION.PUBLISH",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-document-action.ts"
       }
     ],
@@ -3468,7 +3468,7 @@
       {
         "ref": "SANITY_DOCUMENT_ACTION.DISCARD_CHANGES",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-document-action.ts"
       }
     ],
@@ -3476,7 +3476,7 @@
       {
         "ref": "SANITY_DOCUMENT_ACTION.UNPUBLISH",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-document-action.ts"
       }
     ],
@@ -3484,7 +3484,7 @@
       {
         "ref": "SANITY_DOCUMENT_ACTION.DUPLICATE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-document-action.ts"
       }
     ],
@@ -3492,13 +3492,13 @@
       {
         "ref": "SANITY_DOCUMENT_ACTION.DELETE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-document-action.ts"
       },
       {
         "ref": "SANITY_WEBHOOK_OPERATION.DELETE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-webhook-operation.ts"
       }
     ],
@@ -3506,7 +3506,7 @@
       {
         "ref": "SANITY_PERSPECTIVE.PUBLISHED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-perspective.ts"
       }
     ],
@@ -3514,7 +3514,7 @@
       {
         "ref": "SANITY_PERSPECTIVE.DRAFTS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-perspective.ts"
       }
     ],
@@ -3522,31 +3522,31 @@
       {
         "ref": "SANITY_PROJECT_DELETE_OUTCOME.ALREADY_GONE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
         "ref": "SANITY_PROJECT_ARCHIVE_OUTCOME.ALREADY_GONE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
         "ref": "SANITY_PROJECT_UNARCHIVE_OUTCOME.ALREADY_GONE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
         "ref": "SANITY_PROJECT_TOGGLE_RESULT.ALREADY_GONE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
         "ref": "TENANT_DELETE_SANITY_PROJECT_OUTCOME.ALREADY_GONE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3554,7 +3554,7 @@
       {
         "ref": "SANITY_PROJECT_DELETE_OUTCOME.BLOCKED_BY_BILLING_PERMISSION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3562,13 +3562,13 @@
       {
         "ref": "SANITY_PROJECT_ARCHIVE_OUTCOME.ARCHIVED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
         "ref": "TENANT_STATUS.ARCHIVED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       },
       {
@@ -3588,7 +3588,7 @@
       {
         "ref": "SANITY_PROJECT_ARCHIVE_OUTCOME.ALREADY_ARCHIVED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3596,7 +3596,7 @@
       {
         "ref": "SANITY_PROJECT_UNARCHIVE_OUTCOME.UNARCHIVED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3604,7 +3604,7 @@
       {
         "ref": "SANITY_PROJECT_UNARCHIVE_OUTCOME.ALREADY_ACTIVE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3612,7 +3612,7 @@
       {
         "ref": "SANITY_PROJECT_TOGGLE_RESULT.CHANGED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3620,7 +3620,7 @@
       {
         "ref": "SANITY_PROJECT_TOGGLE_RESULT.ALREADY_IN_STATE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3628,7 +3628,7 @@
       {
         "ref": "SANITY_PROJECT_ROLE.ADMINISTRATOR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3636,7 +3636,7 @@
       {
         "ref": "SANITY_PROJECT_ROLE.EDITOR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3644,7 +3644,7 @@
       {
         "ref": "SANITY_PROJECT_ROLE.VIEWER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3652,7 +3652,7 @@
       {
         "ref": "SANITY_RESOURCE_TYPE.PROJECT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3660,7 +3660,7 @@
       {
         "ref": "SANITY_RESOURCE_TYPE.ORGANIZATION",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3668,7 +3668,7 @@
       {
         "ref": "SANITY_LOGIN_PROVIDER.SANITY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3676,7 +3676,7 @@
       {
         "ref": "SANITY_ROBOT_ROLE.DEVELOPER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3684,7 +3684,7 @@
       {
         "ref": "SANITY_API_SURFACE.MANAGEMENT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3692,7 +3692,7 @@
       {
         "ref": "SANITY_API_SURFACE.ACCESS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3700,7 +3700,7 @@
       {
         "ref": "SANITY_API_SURFACE.WEBHOOKS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3708,7 +3708,7 @@
       {
         "ref": "TENANT_DELETE_SANITY_PROJECT_OUTCOME.LEFT_ARCHIVED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3716,7 +3716,7 @@
       {
         "ref": "TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3724,7 +3724,7 @@
       {
         "ref": "TENANT_DELETE_SANITY_PROJECT_OUTCOME.SKIPPED_NO_TOKEN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
@@ -3732,7 +3732,7 @@
       {
         "ref": "TENANT_DELETE_OUTCOME.NOT_ARCHIVED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
@@ -3746,19 +3746,19 @@
       {
         "ref": "TENANT_DELETE_OUTCOME.NOT_FOUND",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
         "ref": "STRIPE_TENANT_LOOKUP_OUTCOME.NOT_FOUND",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       },
       {
         "ref": "TENANT_PLAN_WRITE_OUTCOME.NOT_FOUND",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       },
       {
@@ -3796,7 +3796,7 @@
       {
         "ref": "SANITY_WEBHOOK_OPERATION.CREATE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-webhook-operation.ts"
       }
     ],
@@ -3804,13 +3804,13 @@
       {
         "ref": "SANITY_WEBHOOK_OPERATION.UPDATE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-webhook-operation.ts"
       },
       {
         "ref": "ROW_LOCK.UPDATE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/row-lock.ts"
       }
     ],
@@ -3818,7 +3818,7 @@
       {
         "ref": "SITE_TYPE.BLOG",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/site-type.ts"
       }
     ],
@@ -3826,7 +3826,7 @@
       {
         "ref": "SITE_TYPE.PORTFOLIO",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/site-type.ts"
       }
     ],
@@ -3834,7 +3834,7 @@
       {
         "ref": "SITE_TYPE.PERSONAL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/site-type.ts"
       }
     ],
@@ -3842,7 +3842,7 @@
       {
         "ref": "SITE_TYPE.DOCS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/site-type.ts"
       }
     ],
@@ -3850,7 +3850,7 @@
       {
         "ref": "SITE_TYPE.BLANK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/site-type.ts"
       }
     ],
@@ -3858,7 +3858,7 @@
       {
         "ref": "SITE_TYPE.BUSINESS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/site-type.ts"
       }
     ],
@@ -3866,7 +3866,7 @@
       {
         "ref": "SITE_TYPE.PRODUCT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/site-type.ts"
       }
     ],
@@ -3874,7 +3874,7 @@
       {
         "ref": "SIZE.XS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/size.ts"
       },
       {
@@ -3888,7 +3888,7 @@
       {
         "ref": "SIZE.XXL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/size.ts"
       },
       {
@@ -3902,7 +3902,7 @@
       {
         "ref": "SORT_DIRECTION.ASCENDING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sort.ts"
       }
     ],
@@ -3910,7 +3910,7 @@
       {
         "ref": "SORT_DIRECTION.DESCENDING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sort.ts"
       }
     ],
@@ -3918,13 +3918,13 @@
       {
         "ref": "SUBSCRIBER_OUTCOME.ALREADY_PENDING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/subscriber-outcome.ts"
       },
       {
         "ref": "MEMBERSHIP_INVITE_OUTCOME.ALREADY_PENDING",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
@@ -3932,7 +3932,7 @@
       {
         "ref": "SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/subscriber-outcome.ts"
       }
     ],
@@ -3940,19 +3940,19 @@
       {
         "ref": "SUBSCRIBER_OUTCOME.PENDING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/subscriber-outcome.ts"
       },
       {
         "ref": "SUBSCRIBER_STATUS.PENDING",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/subscriber.ts"
       },
       {
         "ref": "TENANT_PROVISIONING_STATUS.PENDING",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       },
       {
@@ -3966,7 +3966,7 @@
       {
         "ref": "SUBSCRIBER_OUTCOME.NOT_PENDING",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/subscriber-outcome.ts"
       }
     ],
@@ -3974,7 +3974,7 @@
       {
         "ref": "SUBSCRIBER_OUTCOME.NOT_SUBSCRIBED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/subscriber-outcome.ts"
       },
       {
@@ -3988,7 +3988,7 @@
       {
         "ref": "TAXONOMY_KIND.TOPICS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/taxonomy.ts"
       }
     ],
@@ -3996,7 +3996,7 @@
       {
         "ref": "TAXONOMY_KIND.TAGS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/taxonomy.ts"
       }
     ],
@@ -4004,7 +4004,7 @@
       {
         "ref": "TAXONOMY_SORT.ALPHABETICAL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/taxonomy.ts"
       }
     ],
@@ -4012,7 +4012,7 @@
       {
         "ref": "TAXONOMY_SORT.MOST_POSTS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/taxonomy.ts"
       }
     ],
@@ -4020,7 +4020,7 @@
       {
         "ref": "TENANT_PLAN.FREE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/tenant-plan.ts"
       },
       {
@@ -4034,7 +4034,7 @@
       {
         "ref": "TENANT_SORT_COLUMN.NAME",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/tenant-sort.ts"
       },
       {
@@ -4048,7 +4048,7 @@
       {
         "ref": "TENANT_SORT_COLUMN.PLAN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/tenant-sort.ts"
       },
       {
@@ -4068,7 +4068,7 @@
       {
         "ref": "TENANT_SORT_COLUMN.STATUS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/tenant-sort.ts"
       }
     ],
@@ -4076,7 +4076,7 @@
       {
         "ref": "TENANT_WRITE_REFUSAL.UNRESOLVED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/tenant-write-refusal.ts"
       }
     ],
@@ -4084,7 +4084,7 @@
       {
         "ref": "TENANT_WRITE_REFUSAL.INACTIVE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/tenant-write-refusal.ts"
       }
     ],
@@ -4092,7 +4092,7 @@
       {
         "ref": "TIMELINE_MARKER_STYLE.NUMBERED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/timeline.ts"
       }
     ],
@@ -4100,7 +4100,7 @@
       {
         "ref": "TIMELINE_MARKER_STYLE.LABELLED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/timeline.ts"
       }
     ],
@@ -4108,7 +4108,7 @@
       {
         "ref": "TIMELINE_ORIENTATION.VERTICAL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/timeline.ts"
       },
       {
@@ -4122,7 +4122,7 @@
       {
         "ref": "TIMELINE_ORIENTATION.HORIZONTAL",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/timeline.ts"
       },
       {
@@ -4136,7 +4136,7 @@
       {
         "ref": "ADMIN_ROLE.SUPERADMIN",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/admin.ts"
       }
     ],
@@ -4144,7 +4144,7 @@
       {
         "ref": "ADMIN_ROLE.ADMIN",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/admin.ts"
       }
     ],
@@ -4152,7 +4152,7 @@
       {
         "ref": "ADMIN_ROLE.MODERATOR",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/admin.ts"
       }
     ],
@@ -4160,7 +4160,7 @@
       {
         "ref": "GRANTED_VIA.BREAK_GLASS",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/admin.ts"
       }
     ],
@@ -4168,7 +4168,7 @@
       {
         "ref": "GRANTED_VIA.PROMOTION",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/admin.ts"
       }
     ],
@@ -4176,7 +4176,7 @@
       {
         "ref": "BILLING_CURRENCY.USD",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4184,7 +4184,7 @@
       {
         "ref": "BILLING_CURRENCY.EUR",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4192,7 +4192,7 @@
       {
         "ref": "BILLING_CURRENCY.GBP",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4200,7 +4200,7 @@
       {
         "ref": "STRIPE_COUPON_DURATION.ONCE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4208,7 +4208,7 @@
       {
         "ref": "STRIPE_COUPON_DURATION.REPEATING",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4216,7 +4216,7 @@
       {
         "ref": "STRIPE_COUPON_DURATION.FOREVER",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4224,7 +4224,7 @@
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4232,7 +4232,7 @@
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.STARTER_YEARLY",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4240,7 +4240,7 @@
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4248,7 +4248,7 @@
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4256,7 +4256,7 @@
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4264,7 +4264,7 @@
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_5000",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4272,7 +4272,7 @@
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_10000",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4280,7 +4280,7 @@
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_25000",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4288,7 +4288,7 @@
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500_YEARLY",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4296,7 +4296,7 @@
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_5000_YEARLY",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4304,7 +4304,7 @@
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_10000_YEARLY",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4312,7 +4312,7 @@
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_25000_YEARLY",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4320,7 +4320,7 @@
       {
         "ref": "STRIPE_EVENT_RECORD_OUTCOME.RECORDED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       },
       {
@@ -4334,7 +4334,7 @@
       {
         "ref": "STRIPE_EVENT_RECORD_OUTCOME.ALREADY_HANDLED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4342,7 +4342,7 @@
       {
         "ref": "STRIPE_TENANT_LOOKUP_OUTCOME.FOUND",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4350,7 +4350,7 @@
       {
         "ref": "STRIPE_TENANT_LOOKUP_OUTCOME.CONFLICT",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4358,7 +4358,7 @@
       {
         "ref": "TENANT_PLAN_WRITE_OUTCOME.WRITTEN",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4366,7 +4366,7 @@
       {
         "ref": "TENANT_PLAN_WRITE_OUTCOME.NOT_WRITABLE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
@@ -4374,7 +4374,7 @@
       {
         "ref": "BLOCKED_IDENTITY_KIND.ADDRESS",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/blocked-signup-identity.ts"
       },
       {
@@ -4388,7 +4388,7 @@
       {
         "ref": "BLOCKED_IDENTITY_KIND.DOMAIN",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/blocked-signup-identity.ts"
       }
     ],
@@ -4396,7 +4396,7 @@
       {
         "ref": "GRACE_EMAIL.STARTED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/downgrade-grace.ts"
       }
     ],
@@ -4404,7 +4404,7 @@
       {
         "ref": "GRACE_EMAIL.HALFWAY",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/downgrade-grace.ts"
       }
     ],
@@ -4412,7 +4412,7 @@
       {
         "ref": "GRACE_EMAIL.ENDING",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/downgrade-grace.ts"
       }
     ],
@@ -4420,7 +4420,7 @@
       {
         "ref": "EMAIL_DELIVERY_OUTCOME.DELIVERED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
       }
     ],
@@ -4428,7 +4428,7 @@
       {
         "ref": "EMAIL_DELIVERY_OUTCOME.BOUNCED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
       }
     ],
@@ -4436,7 +4436,7 @@
       {
         "ref": "EMAIL_DELIVERY_OUTCOME.COMPLAINED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
       }
     ],
@@ -4444,7 +4444,7 @@
       {
         "ref": "EMAIL_REPUTATION_LEVEL.OK",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
       }
     ],
@@ -4452,7 +4452,7 @@
       {
         "ref": "MEMBERSHIP_ROLE.OWNER",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
@@ -4460,13 +4460,13 @@
       {
         "ref": "MEMBERSHIP_ROLE.EDITOR",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/membership.ts"
       },
       {
         "ref": "SANITY_PROJECT_ROLE.EDITOR",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-owner-access.ts"
       }
     ],
@@ -4474,7 +4474,7 @@
       {
         "ref": "MEMBERSHIP_ROLE.READER",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
@@ -4482,7 +4482,7 @@
       {
         "ref": "MEMBERSHIP_INVITE_OUTCOME.ALREADY_CONSUMED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
@@ -4490,7 +4490,7 @@
       {
         "ref": "MEMBERSHIP_INVITE_OUTCOME.SEAT_LIMIT",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
@@ -4498,7 +4498,7 @@
       {
         "ref": "NEWSLETTER_POST_SEND_OUTCOME.SENT",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/newsletter.ts"
       },
       {
@@ -4512,7 +4512,7 @@
       {
         "ref": "NEWSLETTER_POST_SEND_OUTCOME.SKIPPED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/newsletter.ts"
       },
       {
@@ -4526,7 +4526,7 @@
       {
         "ref": "NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/newsletter.ts"
       }
     ],
@@ -4534,7 +4534,7 @@
       {
         "ref": "NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/newsletter.ts"
       }
     ],
@@ -4542,7 +4542,7 @@
       {
         "ref": "NEWSLETTER_SKIP_REASON.REPUTATION_STOP",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/newsletter.ts"
       }
     ],
@@ -4550,7 +4550,7 @@
       {
         "ref": "NEWSLETTER_SKIP_REASON.SITE_PAUSED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/newsletter.ts"
       }
     ],
@@ -4558,7 +4558,7 @@
       {
         "ref": "NEWSLETTER_LIMIT_NOTICE_KIND.SUBSCRIBER_BAND_NEAR",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/newsletter.ts"
       }
     ],
@@ -4566,7 +4566,7 @@
       {
         "ref": "NEWSLETTER_LIMIT_NOTICE_KIND.MONTHLY_ALLOWANCE_NEAR",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/newsletter.ts"
       }
     ],
@@ -4574,7 +4574,7 @@
       {
         "ref": "NEWSLETTER_LIMIT_NOTICE_KIND.SENDING_PAUSED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/newsletter.ts"
       }
     ],
@@ -4582,7 +4582,7 @@
       {
         "ref": "SITE_CONFIG_SAVED_AT.LOOK",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/site-config-saved-at.ts"
       },
       {
@@ -4608,7 +4608,7 @@
       {
         "ref": "SITE_CONFIG_SAVED_AT.VOICE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/site-config-saved-at.ts"
       },
       {
@@ -4628,13 +4628,13 @@
       {
         "ref": "SUBSCRIBER_STATUS.ACTIVE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/subscriber.ts"
       },
       {
         "ref": "TENANT_STATUS.ACTIVE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       },
       {
@@ -4654,7 +4654,7 @@
       {
         "ref": "DEPROVISIONING_STEP.REMOVE_DOMAIN",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-deprovisioning.ts"
       }
     ],
@@ -4662,7 +4662,7 @@
       {
         "ref": "DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-deprovisioning.ts"
       }
     ],
@@ -4670,7 +4670,7 @@
       {
         "ref": "DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-deprovisioning.ts"
       }
     ],
@@ -4678,7 +4678,7 @@
       {
         "ref": "DEPROVISIONING_STEP.CLEAR_ARTIFACTS",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-deprovisioning.ts"
       }
     ],
@@ -4686,7 +4686,7 @@
       {
         "ref": "DEPROVISIONING_STEP.ARCHIVE_TENANT",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-deprovisioning.ts"
       }
     ],
@@ -4694,7 +4694,7 @@
       {
         "ref": "DEPROVISIONING_STEP.PURGE_READER_DATA",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-deprovisioning.ts"
       }
     ],
@@ -4702,7 +4702,7 @@
       {
         "ref": "DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-deprovisioning.ts"
       }
     ],
@@ -4710,7 +4710,7 @@
       {
         "ref": "INACTIVITY_STAGE.SUSPENSION_WARNING",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-inactivity.ts"
       }
     ],
@@ -4718,7 +4718,7 @@
       {
         "ref": "INACTIVITY_STAGE.SUSPENSION",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-inactivity.ts"
       }
     ],
@@ -4726,7 +4726,7 @@
       {
         "ref": "INACTIVITY_STAGE.DELETION_NOTICE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-inactivity.ts"
       }
     ],
@@ -4734,7 +4734,7 @@
       {
         "ref": "INACTIVITY_STAGE.DEPROVISIONING",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-inactivity.ts"
       }
     ],
@@ -4742,7 +4742,7 @@
       {
         "ref": "SUSPENSION_REASON.INACTIVITY",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-inactivity.ts"
       }
     ],
@@ -4750,7 +4750,7 @@
       {
         "ref": "SUSPENSION_REASON.OPERATOR",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-inactivity.ts"
       },
       {
@@ -4764,7 +4764,7 @@
       {
         "ref": "SANITY_PROJECT_ROLE.VIEWER",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-owner-access.ts"
       }
     ],
@@ -4772,7 +4772,7 @@
       {
         "ref": "SANITY_PROJECT_ROLE.ADMINISTRATOR",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-owner-access.ts"
       }
     ],
@@ -4780,7 +4780,7 @@
       {
         "ref": "TENANT_OWNER_EMAIL.INVITE_HEADS_UP",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-owner-access.ts"
       }
     ],
@@ -4788,7 +4788,7 @@
       {
         "ref": "TENANT_OWNER_EMAIL.INVITE_NUDGE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-owner-access.ts"
       }
     ],
@@ -4796,7 +4796,7 @@
       {
         "ref": "TENANT_OWNER_EMAIL.SITE_READY",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-owner-access.ts"
       }
     ],
@@ -4804,7 +4804,7 @@
       {
         "ref": "TENANT_PROVISIONING_STATUS.PROVISIONING",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4812,7 +4812,7 @@
       {
         "ref": "TENANT_PROVISIONING_STATUS.READY",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       },
       {
@@ -4832,13 +4832,13 @@
       {
         "ref": "TENANT_PROVISIONING_STATUS.FAILED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       },
       {
         "ref": "TENANT_PROVISIONING_STEP_STATUS.FAILED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       },
       {
@@ -4876,7 +4876,7 @@
       {
         "ref": "TENANT_PROVISIONING_STEP.SANITY_PROJECT",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4884,7 +4884,7 @@
       {
         "ref": "TENANT_PROVISIONING_STEP.SEED_CONTENT",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4892,7 +4892,7 @@
       {
         "ref": "TENANT_PROVISIONING_STEP.PERSIST_TOKEN",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4900,7 +4900,7 @@
       {
         "ref": "TENANT_PROVISIONING_STEP.MAP_DOMAIN",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4908,7 +4908,7 @@
       {
         "ref": "TENANT_PROVISIONING_STEP.CREATE_WEBHOOK",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4916,7 +4916,7 @@
       {
         "ref": "TENANT_PROVISIONING_STEP.VERIFY_CONTENT",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4924,7 +4924,7 @@
       {
         "ref": "WORKER_PROVISIONING_STEP.ENSURE_INFRASTRUCTURE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4932,7 +4932,7 @@
       {
         "ref": "WORKER_PROVISIONING_STEP.INVITE_OWNER",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4940,7 +4940,7 @@
       {
         "ref": "WORKER_PROVISIONING_STEP.APPLY_SITE_TEMPLATE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4948,7 +4948,7 @@
       {
         "ref": "WORKER_PROVISIONING_STEP.VERIFY_TENANT",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4956,7 +4956,7 @@
       {
         "ref": "WORKER_PROVISIONING_STEP.ENSURE_OWNER_ACCESS",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4964,7 +4964,7 @@
       {
         "ref": "WORKER_PROVISIONING_STEP.VALIDATE_DOCUMENTS",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -4972,7 +4972,7 @@
       {
         "ref": "TENANT_PROVISIONING_STEP_STATUS.RUNNING",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       },
       {
@@ -5004,7 +5004,7 @@
       {
         "ref": "TENANT_PROVISIONING_STEP_STATUS.DONE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       },
       {
@@ -5018,7 +5018,7 @@
       {
         "ref": "PROVISIONING_STATE.SUCCEEDED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       },
       {
@@ -5044,7 +5044,7 @@
       {
         "ref": "ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -5052,7 +5052,7 @@
       {
         "ref": "ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -5060,7 +5060,7 @@
       {
         "ref": "ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -5068,7 +5068,7 @@
       {
         "ref": "ELEVATE_TENANT_OWNER_OUTCOME.STALLED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       },
       {
@@ -5082,7 +5082,7 @@
       {
         "ref": "ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
@@ -5090,7 +5090,7 @@
       {
         "ref": "SUSPENSION_CATEGORY.ABUSE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-suspension.ts"
       }
     ],
@@ -5098,7 +5098,7 @@
       {
         "ref": "SUSPENSION_CATEGORY.ILLEGAL_CONTENT",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-suspension.ts"
       }
     ],
@@ -5106,7 +5106,7 @@
       {
         "ref": "SUSPENSION_CATEGORY.TERMS_VIOLATION",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-suspension.ts"
       }
     ],
@@ -5114,7 +5114,7 @@
       {
         "ref": "TENANT_STATUS.SUSPENDED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
@@ -5122,7 +5122,7 @@
       {
         "ref": "TENANT_STATUS.TRIAL",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
@@ -5130,7 +5130,7 @@
       {
         "ref": "TENANT_STATUS.PAST_DUE",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
@@ -5138,7 +5138,7 @@
       {
         "ref": "TENANT_DETAILS_UPDATE_OUTCOME.UPDATED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
@@ -5146,7 +5146,7 @@
       {
         "ref": "TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_TAKEN",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       },
       {
@@ -5160,7 +5160,7 @@
       {
         "ref": "TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_LOCKED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       },
       {
@@ -5174,7 +5174,7 @@
       {
         "ref": "TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_INVALID",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       },
       {
@@ -5188,7 +5188,7 @@
       {
         "ref": "TENANT_DETAILS_UPDATE_OUTCOME.PROVISIONING_STARTED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       },
       {
@@ -5202,7 +5202,7 @@
       {
         "ref": "TENANT_DETAILS_UPDATE_OUTCOME.OWNER_ALREADY_JOINED",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       },
       {
@@ -5216,7 +5216,7 @@
       {
         "ref": "TENANT_DETAILS_UPDATE_OUTCOME.OWNER_EMAIL_TAKEN",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       },
       {
@@ -5230,7 +5230,7 @@
       {
         "ref": "TENANT_DETAILS_UPDATE_OUTCOME.OWNS_FREE_TENANT",
         "scope": "db",
-        "from": "@blog/db/constants",
+        "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
@@ -11624,7 +11624,7 @@
       {
         "ref": "HTTP_STATUS.OK",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11632,7 +11632,7 @@
       {
         "ref": "HTTP_STATUS.CREATED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11640,7 +11640,7 @@
       {
         "ref": "HTTP_STATUS.ACCEPTED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11648,7 +11648,7 @@
       {
         "ref": "HTTP_STATUS.NO_CONTENT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11664,7 +11664,7 @@
       {
         "ref": "HTTP_STATUS.MOVED_PERMANENTLY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11672,7 +11672,7 @@
       {
         "ref": "HTTP_STATUS.SEE_OTHER",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11680,7 +11680,7 @@
       {
         "ref": "HTTP_STATUS.TEMPORARY_REDIRECT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11696,7 +11696,7 @@
       {
         "ref": "HTTP_STATUS.BAD_REQUEST",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       },
       {
@@ -11710,7 +11710,7 @@
       {
         "ref": "HTTP_STATUS.UNAUTHORIZED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11718,7 +11718,7 @@
       {
         "ref": "HTTP_STATUS.PAYMENT_REQUIRED",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11726,7 +11726,7 @@
       {
         "ref": "HTTP_STATUS.FORBIDDEN",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11734,7 +11734,7 @@
       {
         "ref": "HTTP_STATUS.NOT_FOUND",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11742,7 +11742,7 @@
       {
         "ref": "HTTP_STATUS.REQUEST_TIMEOUT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11750,7 +11750,7 @@
       {
         "ref": "HTTP_STATUS.CONFLICT",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11758,7 +11758,7 @@
       {
         "ref": "HTTP_STATUS.TOO_EARLY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11766,7 +11766,7 @@
       {
         "ref": "HTTP_STATUS.TOO_MANY_REQUESTS",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11782,7 +11782,7 @@
       {
         "ref": "HTTP_STATUS.INTERNAL_SERVER_ERROR",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11790,7 +11790,7 @@
       {
         "ref": "HTTP_STATUS.BAD_GATEWAY",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
@@ -11798,7 +11798,7 @@
       {
         "ref": "HTTP_STATUS.SERVICE_UNAVAILABLE",
         "scope": "config",
-        "from": "@blog/config/constants",
+        "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],

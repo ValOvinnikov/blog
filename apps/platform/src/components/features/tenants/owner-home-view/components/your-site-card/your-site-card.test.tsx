@@ -1,11 +1,11 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { customRender, screen } from '@platform/testing/custom-render';
 import {
   mockTenant,
   MOCK_CUSTOM_DOMAIN,
   MOCK_SITE_NAME,
 } from '@platform/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 import { YourSiteCard } from './your-site-card';
 

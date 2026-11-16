@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { SIGNUP_BLOCK_REFUSAL } from '@platform/constants/signup-block';
 import messages from '@platform/i18n/messages/en.json';
 import { removeBlockedIdentityAction } from '@platform/server/signup-block/remove-blocked-identity-action';
@@ -10,6 +9,7 @@ import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { RemoveBlockedIdentityControl } from './remove-blocked-identity-control';

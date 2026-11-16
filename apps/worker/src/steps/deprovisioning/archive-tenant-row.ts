@@ -1,6 +1,6 @@
-import { AUDIT_ACTION } from '@blog/config/constants';
-import { archiveTenant } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { AUDIT_ACTION } from '@shinefold/config/constants';
+import { archiveTenant } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { recordDeprovisioningAuditEvent } from '@worker/utils/deprovisioning-report/deprovisioning-report';
 
 export async function archiveTenantRow(

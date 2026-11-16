@@ -1,6 +1,3 @@
-import { routes, type TVoiceFieldId, type VOICE_SURFACE } from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { isUndefined } from '@blog/utils/primitives';
 import { Accordion } from '@platform/components/shared/accordion';
 import { FieldStatus } from '@platform/components/shared/field-status';
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
@@ -11,6 +8,13 @@ import {
   type TVoiceDraftValue,
   type TVoiceField,
 } from '@platform/utils/voice-draft/voice-draft';
+import {
+  routes,
+  type TVoiceFieldId,
+  type VOICE_SURFACE,
+} from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useId, type ReactNode } from 'react';
 

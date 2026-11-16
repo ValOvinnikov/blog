@@ -1,5 +1,3 @@
-import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
-import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants/email-template-defaults';
 import { faker } from '@faker-js/faker';
 import { mockEmailDraft, MOCK_EMAIL_BODY } from '@platform/testing/email-draft';
 import {
@@ -7,6 +5,8 @@ import {
   withCopy,
   withLogo,
 } from '@platform/utils/email-draft/email-draft';
+import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@shinefold/config';
+import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@shinefold/db/constants/email-template-defaults';
 
 import {
   resolveEmailPreview,

@@ -1,8 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { LOOK_CARD, type TLookCard } from '@platform/constants/look-card';
 import type { TLookGroup } from '@platform/constants/look-group';
 import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
 import { LOOK_CARDS } from '@platform/utils/look-open-rows/look-open-rows';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 export type TLookAnchor = TLookCard | TLookGroup;
 

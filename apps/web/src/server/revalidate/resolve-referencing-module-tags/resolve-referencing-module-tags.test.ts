@@ -1,5 +1,5 @@
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { errorResult, okResult } from '@shinefold/utils';
 import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
@@ -16,7 +16,7 @@ const { getReferencingModuleIdsMock } = vi.hoisted(() => ({
   getReferencingModuleIdsMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     entities: {
       modules: { v1: { getReferencingModuleIds: getReferencingModuleIdsMock } },

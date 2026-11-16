@@ -1,7 +1,7 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { blockedSignupIdentities } from '@shinefold/db/schema/blocked-signup-identities';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { eq } from 'drizzle-orm';
 
 export async function removeBlockedIdentity(

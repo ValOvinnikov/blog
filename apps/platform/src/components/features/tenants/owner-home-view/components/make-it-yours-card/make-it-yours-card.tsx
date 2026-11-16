@@ -1,6 +1,6 @@
-import { ICONS } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { Tile } from './components/tile/tile';

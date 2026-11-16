@@ -1,8 +1,11 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { queries } from '@blog/db';
-import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { mockServableTenant } from '@web/testing/server/tenant/fixtures';
 import {
   MOCK_OTHER_TENANT_ID,
@@ -26,8 +29,8 @@ vi.mock(
   'next/cache',
   () => import('@web/testing/server/next-cache/passthrough-next-cache'),
 );
-vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await import('@shinefold/db/constants')),
   queries: {
     tenantDomains: { getTenantByDomain: vi.fn() },
     tenants: {

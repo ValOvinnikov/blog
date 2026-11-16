@@ -1,11 +1,11 @@
-import { KEY_ENCODING } from '@blog/utils/encryption';
-import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
-import { isUndefined } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import {
   MOCK_WEB_APP_URL,
   MOCK_REVALIDATE_SECRET,
 } from '@platform/testing/env/fixtures';
+import { KEY_ENCODING } from '@shinefold/utils/encryption';
+import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 faker.seed(1);
 

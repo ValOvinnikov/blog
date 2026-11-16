@@ -1,5 +1,5 @@
-import type { TOAuthCredentials } from '@blog/config';
-import { createMockFaker } from '@blog/db/testing/mock-faker';
+import type { TOAuthCredentials } from '@shinefold/config';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
 
 const oauthCredentialsFaker = createMockFaker(61004);
 

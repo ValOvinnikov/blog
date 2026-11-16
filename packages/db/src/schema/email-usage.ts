@@ -1,8 +1,8 @@
-import { EMAIL_TYPE, type TEmailType } from '@blog/config/constants';
+import { EMAIL_TYPE, type TEmailType } from '@shinefold/config/constants';
 import {
   EMAIL_DELIVERY_OUTCOME,
   type TEmailDeliveryOutcome,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   date,
   integer,

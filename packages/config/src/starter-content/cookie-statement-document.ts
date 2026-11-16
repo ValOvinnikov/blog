@@ -1,12 +1,12 @@
 import type {
   ArticleText,
   Page_cookieStatement,
-} from '@blog/config/sanity/generated/types';
+} from '@shinefold/config/sanity/generated/types';
 
 import {
   PORTABLE_TEXT_BLOCK_TYPE,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocument } from './starter-document';

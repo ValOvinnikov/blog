@@ -1,12 +1,12 @@
-import type { TMaybeUndefined } from '@blog/config';
-import {
-  isReleaseVersionGreater,
-  parseReleaseVersion,
-} from '@blog/utils/version';
 import {
   RELEASE_FIELD_ERROR,
   type TReleaseFieldError,
 } from '@platform/constants/release';
+import type { TMaybeUndefined } from '@shinefold/config';
+import {
+  isReleaseVersionGreater,
+  parseReleaseVersion,
+} from '@shinefold/utils/version';
 
 export const releaseVersionError = (
   version: string,

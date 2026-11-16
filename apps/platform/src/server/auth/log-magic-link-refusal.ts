@@ -1,6 +1,6 @@
-import type { IMagicLinkSendRefusal } from '@blog/config/types';
 import { SIGN_IN_LOG } from '@platform/constants/sign-in';
 import { logger } from '@platform/utils/logger/logger';
+import type { IMagicLinkSendRefusal } from '@shinefold/config/types';
 
 export const logMagicLinkRefusal = ({
   reason,

@@ -1,4 +1,3 @@
-import { registerLogSink } from '@blog/insight';
 import { REQUEST_LOG } from '@platform/constants/request';
 import { MOCK_LOKI_ENV } from '@platform/testing/env/fixtures';
 import {
@@ -9,12 +8,13 @@ import {
 } from '@platform/testing/request-errors/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
+import { registerLogSink } from '@shinefold/insight';
 import { waitUntil } from '@vercel/functions';
 
 import { onRequestError, register } from './instrumentation';
 
 vi.mock('@vercel/functions', () => ({ waitUntil: vi.fn() }));
-vi.mock('@blog/insight', () => ({
+vi.mock('@shinefold/insight', () => ({
   createLokiSink: vi.fn(() => vi.fn()),
   registerLogSink: vi.fn(),
 }));

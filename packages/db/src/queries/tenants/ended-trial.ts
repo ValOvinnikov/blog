@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { TENANT_STATUS } from '@blog/db/constants';
-import { tenants } from '@blog/db/schema/tenants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { and, eq, isNull, lte, type SQL } from 'drizzle-orm';
 
 export function hasEndedUnpaidTrial(now: Date): TMaybeUndefined<SQL> {

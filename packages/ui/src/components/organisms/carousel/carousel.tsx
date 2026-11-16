@@ -6,9 +6,9 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   type TBrandVariant,
-} from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { IconButton } from '@blog/ui/components/atoms/icon-button';
+} from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
 import type { Key, ReactNode } from 'react';
 
 import { carouselVariants, type TCarouselVariants } from './carousel-variants';

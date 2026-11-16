@@ -2,8 +2,8 @@ import {
   SOCIAL_PLATFORMS,
   SOCIAL_PLATFORM_LABEL,
   type TSocialPlatform,
-} from '@blog/config/constants';
-import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
+} from '@shinefold/config/constants';
+import { linkReferenceField } from '@shinefold/studio/schema-types/fields/link-reference-field/link-reference-field';
 import { Share2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

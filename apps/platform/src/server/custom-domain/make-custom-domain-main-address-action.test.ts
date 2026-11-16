@@ -1,15 +1,4 @@
 import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  ERROR_CODE,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import {
   CUSTOM_DOMAIN_LOG,
   CUSTOM_DOMAIN_REFUSAL,
 } from '@platform/constants/custom-domain';
@@ -36,6 +25,17 @@ import {
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  ERROR_CODE,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { notFound } from 'next/navigation';
 
 import { makeCustomDomainMainAddressAction } from './make-custom-domain-main-address-action';
@@ -52,7 +52,7 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
   getProjectDomain: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => {
+vi.mock('@shinefold/db', async () => {
   const { mockCustomDomainDb } =
     await import('@platform/testing/custom-domain/fixtures');
   return mockCustomDomainDb();

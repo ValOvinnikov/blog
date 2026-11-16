@@ -1,5 +1,5 @@
-import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
-import { sanitizeHref } from '@blog/utils';
+import { escapeHtml } from '@shinefold/email/html/escape-html/escape-html';
+import { sanitizeHref } from '@shinefold/utils';
 
 import type {
   TEmailBlock,

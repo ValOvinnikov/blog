@@ -1,29 +1,29 @@
-import { ERROR_CODE } from '@blog/config/constants';
+import { ERROR_CODE } from '@shinefold/config/constants';
 import {
   SUSPENSION_REASON,
   TENANT_STATUS,
   type TTenantStatus,
-} from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { tenants } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_DEPROVISIONED_AT,
   MOCK_MISSING_TENANT_ID,
   unwrapOk,
-} from '@blog/db/testing/tenants/fixtures';
-import { MOCK_LAST_ACTIVITY_AT } from '@blog/db/testing/tenants/inactivity';
+} from '@shinefold/db/testing/tenants/fixtures';
+import { MOCK_LAST_ACTIVITY_AT } from '@shinefold/db/testing/tenants/inactivity';
 import {
   MOCK_RESUME_CASES,
   pickResumedFields,
-} from '@blog/db/testing/tenants/resume';
+} from '@shinefold/db/testing/tenants/resume';
 import { eq } from 'drizzle-orm';
 
 import { setTenantSuspension } from './set-tenant-suspension';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock();

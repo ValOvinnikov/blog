@@ -1,5 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
@@ -8,6 +6,8 @@ import { useGitHubFetch } from '@platform/testing/github/github-fetch';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { respondWithDueContrastCheck } from '@platform/testing/releases/contrast-due-github';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 
 import OperatorLayout from './layout';
 
@@ -25,7 +25,7 @@ vi.mock('@platform/utils/env/env');
 
 vi.mock('@platform/i18n/navigation');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     admins: { getAdminByUserId: getAdminByUserIdMock },

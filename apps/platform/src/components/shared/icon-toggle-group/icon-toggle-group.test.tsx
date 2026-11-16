@@ -1,4 +1,3 @@
-import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   customRender,
@@ -7,6 +6,7 @@ import {
 } from '@platform/testing/custom-render';
 import { mockIconToggleOption } from '@platform/testing/icon-toggle-group/fixtures';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
+import { ICONS } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
 

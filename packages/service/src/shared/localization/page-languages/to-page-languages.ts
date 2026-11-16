@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import type { InferResultType } from 'groqd';
 
 import type { pageLanguagesQuery } from './page-languages';

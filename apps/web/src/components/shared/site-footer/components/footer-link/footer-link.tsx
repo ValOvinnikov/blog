@@ -1,5 +1,5 @@
-import type { ILink } from '@blog/config';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
+import type { ILink } from '@shinefold/config';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { SmartLink } from '@web/components/shared/smart-link';
 
 export const FooterLink = ({

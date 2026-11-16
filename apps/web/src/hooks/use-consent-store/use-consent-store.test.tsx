@@ -1,4 +1,4 @@
-import { CONSENT_CATEGORY } from '@blog/config';
+import { CONSENT_CATEGORY } from '@shinefold/config';
 import { CONSENT_STATUS } from '@web/constants/consent';
 import { act, renderHook } from '@web/testing/custom-render';
 import {

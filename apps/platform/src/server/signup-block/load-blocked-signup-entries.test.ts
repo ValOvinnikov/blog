@@ -1,6 +1,3 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import { errorResult, okResult } from '@blog/utils';
 import {
   MOCK_BLOCK_AUTHOR_EMAIL,
   MOCK_BLOCKED_ADDRESS_HASH,
@@ -8,6 +5,9 @@ import {
   mockBlockedIdentityListing,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import { loadBlockedSignupEntries } from './load-blocked-signup-entries';
 
@@ -15,7 +15,7 @@ const { listBlockedIdentitiesMock } = vi.hoisted(() => ({
   listBlockedIdentitiesMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     blockedSignupIdentities: {

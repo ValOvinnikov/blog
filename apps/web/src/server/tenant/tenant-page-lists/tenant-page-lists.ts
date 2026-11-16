@@ -1,6 +1,6 @@
-import type { TLocaleIsoCode } from '@blog/config';
-import { service, type TTenantSanityContext } from '@blog/service';
-import type { TResult } from '@blog/utils';
+import type { TLocaleIsoCode } from '@shinefold/config';
+import { service, type TTenantSanityContext } from '@shinefold/service';
+import type { TResult } from '@shinefold/utils';
 import type { TTranslatedPage } from '@web/utils/to-translated-sitemap-entry';
 
 type TPaginatedPageParam = TTranslatedPage & { page: string };

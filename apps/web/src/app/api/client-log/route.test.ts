@@ -1,6 +1,6 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
-import { FORWARDED_FOR_HEADER } from '@blog/utils/client-key';
 import { faker } from '@faker-js/faker';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
+import { FORWARDED_FOR_HEADER } from '@shinefold/utils/client-key';
 import { CLIENT_LOG_LOG } from '@web/constants/client-log';
 import type * as TRateLimiterModule from '@web/server/rate-limit/rate-limiter/rate-limiter';
 import { logger } from '@web/utils/logger/logger';

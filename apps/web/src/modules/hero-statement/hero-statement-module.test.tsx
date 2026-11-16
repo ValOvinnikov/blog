@@ -1,4 +1,4 @@
-import { errorResult, okResult } from '@blog/utils';
+import { errorResult, okResult } from '@shinefold/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
@@ -16,7 +16,7 @@ const { getHeroStatementMock } = vi.hoisted(() => ({
   getHeroStatementMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       heroStatement: { v1: { getHeroStatement: getHeroStatementMock } },

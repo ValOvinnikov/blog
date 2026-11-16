@@ -1,5 +1,5 @@
-import { routes, TAXONOMY_KIND } from '@blog/config';
-import { service } from '@blog/service';
+import { routes, TAXONOMY_KIND } from '@shinefold/config';
+import { service } from '@shinefold/service';
 import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import { TAXONOMY_LIST_LOG } from '@web/constants/taxonomy-list';
 import { getRequestContext } from '@web/server/request-context/request-context';

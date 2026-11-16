@@ -3,8 +3,8 @@ import {
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
   HERO_VARIANT,
-} from '@blog/config';
-import type { THeroBlogModule } from '@blog/service';
+} from '@shinefold/config';
+import type { THeroBlogModule } from '@shinefold/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';

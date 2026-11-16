@@ -2,7 +2,7 @@ import {
   service,
   type TTenantSanityContext,
   type TTopicsList,
-} from '@blog/service';
+} from '@shinefold/service';
 import { logger } from '@web/utils/logger/logger';
 
 /**

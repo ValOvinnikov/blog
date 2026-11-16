@@ -1,6 +1,6 @@
-import { type IWithClassName, SIZE } from '@blog/config';
 import { ACCENT_SWATCH_TEST_ID } from '@platform/constants/accent-swatch';
 import { buildAccentPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
+import { type IWithClassName, SIZE } from '@shinefold/config';
 
 import { accentSwatchVariants } from './accent-swatch-variants';
 

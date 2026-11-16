@@ -1,4 +1,4 @@
-import type { TSanityProjectRef } from '@blog/service/sanity/project-cache/project-cache';
+import type { TSanityProjectRef } from '@shinefold/service/sanity/project-cache/project-cache';
 
 /** The `sanity-image` package's `baseUrl` prop, an alternative to separate `projectId`/`dataset` props. */
 export function getSanityImageBaseUrl(project: TSanityProjectRef): string {

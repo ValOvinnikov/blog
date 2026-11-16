@@ -1,10 +1,10 @@
-import { HTTP_STATUS } from '@blog/config';
 import { CUSTOM_DOMAIN_TXT_TYPE } from '@platform/constants/custom-domain';
 import { DNS_RCODE, DNS_TYPE } from '@platform/constants/dns';
 import { MOCK_CLAIM_TOKEN } from '@platform/testing/custom-domain/fixtures';
 import { mockJsonResponse } from '@platform/testing/http/mock-json-response';
 import { MOCK_CUSTOM_DOMAIN } from '@platform/testing/tenants/fixtures';
 import { customDomainTxtName } from '@platform/utils/custom-domain-txt-name/custom-domain-txt-name';
+import { HTTP_STATUS } from '@shinefold/config';
 
 import { lookupTxtRecords } from './lookup-txt-records';
 

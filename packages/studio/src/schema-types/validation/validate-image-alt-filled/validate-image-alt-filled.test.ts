@@ -1,14 +1,14 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { validateImageAltFilled } from '@blog/studio/schema-types/validation/validate-image-alt-filled/validate-image-alt-filled';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { validateImageAltFilled } from '@shinefold/studio/schema-types/validation/validate-image-alt-filled/validate-image-alt-filled';
 import {
   mockLocalizedValue,
   mockReference,
-} from '@blog/studio/testing/mock-documents';
+} from '@shinefold/studio/testing/mock-documents';
 import {
   MOCK_VALIDATION_MESSAGE,
   mockValidationContext,
-} from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/mock-validation-context';
 
 faker.seed(6020);
 

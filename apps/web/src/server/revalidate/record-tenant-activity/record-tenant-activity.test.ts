@@ -1,6 +1,6 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
@@ -12,7 +12,7 @@ const { touchTenantActivityMock } = vi.hoisted(() => ({
   touchTenantActivityMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenants: { touchTenantActivity: touchTenantActivityMock } },
 }));
 

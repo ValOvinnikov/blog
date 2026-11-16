@@ -5,7 +5,7 @@ import {
   type TMaybeNull,
   type TMaybeUndefined,
   type TMediaOrder,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export type TRawHeroPresentationFields = {
   variant: THeroVariant;

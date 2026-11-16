@@ -1,8 +1,8 @@
-import { ICONS } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { Link } from '@platform/i18n/navigation';
 import type { TTenantPickerItem } from '@platform/server/tenants/to-tenant-picker-items';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { tenantPickerRowVariants } from './tenant-picker-row-variants';

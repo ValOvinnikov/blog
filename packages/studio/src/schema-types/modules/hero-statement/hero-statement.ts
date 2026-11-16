@@ -1,17 +1,17 @@
-import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
-import { heroBackgroundAndShapeFields } from '@blog/studio/schema-types/fields/hero-background-and-shape-fields/hero-background-and-shape-fields';
-import { heroContentPositionFields } from '@blog/studio/schema-types/fields/hero-content-position-fields/hero-content-position-fields';
-import { heroImageField } from '@blog/studio/schema-types/fields/hero-image-field/hero-image-field';
+import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { heroBackgroundAndShapeFields } from '@shinefold/studio/schema-types/fields/hero-background-and-shape-fields/hero-background-and-shape-fields';
+import { heroContentPositionFields } from '@shinefold/studio/schema-types/fields/hero-content-position-fields/hero-content-position-fields';
+import { heroImageField } from '@shinefold/studio/schema-types/fields/hero-image-field/hero-image-field';
 import {
   heroMediaOrderSplitField,
   heroMediaOrderStackedField,
-} from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
-import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+} from '@shinefold/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { heroFieldsets } from '@shinefold/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
+import { heroLayoutField } from '@shinefold/studio/schema-types/objects/hero-layout/hero-layout-field';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
 import { Quote } from 'lucide-react';
 import { defineType } from 'sanity';
 

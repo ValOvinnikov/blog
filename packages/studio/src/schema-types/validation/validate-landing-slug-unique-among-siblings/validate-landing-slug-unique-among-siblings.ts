@@ -1,9 +1,9 @@
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 import {
   fetchFailSafe,
   getDraftsClient,
-} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
-import { isString } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { isString } from '@shinefold/utils/primitives';
 import { getPublishedId, type SlugValidationContext } from 'sanity';
 
 const FAIL_SAFE_ASSUMES_UNIQUE = true;

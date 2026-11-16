@@ -1,9 +1,9 @@
-import { isr } from '@blog/service/sanity/query/isr';
+import { isr } from '@shinefold/service/sanity/query/isr';
 import {
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query/query';
-import { buildLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+} from '@shinefold/service/sanity/query/query';
+import { buildLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
 
 import { translationMapQuery } from './query';
 import { toTranslationMap } from './transformer';

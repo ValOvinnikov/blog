@@ -1,8 +1,8 @@
-import { TENANT_STATUS } from '@blog/db/constants';
-import { graceEndDate } from '@blog/db/utils/grace-end-date/grace-end-date';
-import { hasGraceLocks } from '@blog/db/utils/grace-locks/grace-locks';
 import { loadGraceLocks } from '@platform/server/billing/load-grace-locks';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { graceEndDate } from '@shinefold/db/utils/grace-end-date/grace-end-date';
+import { hasGraceLocks } from '@shinefold/db/utils/grace-locks/grace-locks';
 
 import { GraceNotice } from './components/grace-notice/grace-notice';
 import { PastDueNotice } from './components/past-due-notice/past-due-notice';

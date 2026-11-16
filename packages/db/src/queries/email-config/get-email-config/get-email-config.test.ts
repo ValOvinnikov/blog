@@ -1,11 +1,11 @@
-import * as schema from '@blog/db/schema';
-import { MOCK_EMAIL_CONFIG } from '@blog/db/testing/email-config/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
+import * as schema from '@shinefold/db/schema';
+import { MOCK_EMAIL_CONFIG } from '@shinefold/db/testing/email-config/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { getEmailConfig } from './get-email-config';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);

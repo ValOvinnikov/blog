@@ -1,12 +1,12 @@
+import { faker } from '@faker-js/faker';
 import {
   ERROR_CODE,
   PRESET_ID,
   PRESET_REGISTRY,
   resolveTenantEmailBrand,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { errorResult, okResult } from '@shinefold/utils';
 import { TENANT_EMAIL_IDENTITY_LOG } from '@web/constants/tenant-email-identity';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
@@ -24,7 +24,7 @@ vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
 
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenants: { getTenantById: vi.fn() } },
 }));
 

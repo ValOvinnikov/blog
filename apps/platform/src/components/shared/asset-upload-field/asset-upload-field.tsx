@@ -1,6 +1,5 @@
 'use client';
 
-import type { SIZE, TMaybeUndefined } from '@blog/config';
 import {
   ASSET_UPLOAD_LAYOUT,
   type TAssetUploadLayout,
@@ -9,6 +8,7 @@ import type { TEmailLogoKind } from '@platform/constants/email-logo';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+import type { SIZE, TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

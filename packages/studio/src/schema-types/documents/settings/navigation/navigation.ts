@@ -1,8 +1,8 @@
-import { languageSwitcherField } from '@blog/studio/schema-types/fields/language-switcher-field/language-switcher-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { brandTaglineSchema } from '@blog/studio/schema-types/objects/brand-tagline/brand-tagline';
-import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
-import { linkRefWithSubItemsSchema } from '@blog/studio/schema-types/objects/link-ref-with-sub-items/link-ref-with-sub-items';
+import { languageSwitcherField } from '@shinefold/studio/schema-types/fields/language-switcher-field/language-switcher-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { brandTaglineSchema } from '@shinefold/studio/schema-types/objects/brand-tagline/brand-tagline';
+import { linkRefSchema } from '@shinefold/studio/schema-types/objects/link-ref/link-ref';
+import { linkRefWithSubItemsSchema } from '@shinefold/studio/schema-types/objects/link-ref-with-sub-items/link-ref-with-sub-items';
 import { Menu } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 

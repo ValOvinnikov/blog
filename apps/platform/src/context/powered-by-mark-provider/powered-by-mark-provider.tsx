@@ -1,6 +1,6 @@
 'use client';
 
-import type { IWithChildren } from '@blog/config/react';
+import type { IWithChildren } from '@shinefold/config/react';
 import { createContext, useContext } from 'react';
 
 const PoweredByMarkContext = createContext(false);

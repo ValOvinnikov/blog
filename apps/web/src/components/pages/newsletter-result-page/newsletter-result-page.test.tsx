@@ -1,4 +1,4 @@
-import { NEWSLETTER_RESULT, routes, SITE_MESSAGES } from '@blog/config';
+import { NEWSLETTER_RESULT, routes, SITE_MESSAGES } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { NewsletterResultPage } from './newsletter-result-page';

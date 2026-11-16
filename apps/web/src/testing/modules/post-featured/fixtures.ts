@@ -1,5 +1,5 @@
-import { DISPLAY_MODE } from '@blog/config';
-import type { TPostFeaturedModule } from '@blog/service';
+import { DISPLAY_MODE } from '@shinefold/config';
+import type { TPostFeaturedModule } from '@shinefold/service';
 import { mockPostModuleBase } from '@web/testing/modules/post-list/fixtures';
 
 export const MOCK_POST_FEATURED_HEADING = 'Editor picks';

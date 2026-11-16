@@ -1,6 +1,6 @@
-import { routes } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
-import { LinkButton } from '@blog/ui/components/molecules/link-button';
+import { routes } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
 import { MessagePage } from '@web/components/page-templates/message-page';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { getRequestContext } from '@web/server/request-context/request-context';

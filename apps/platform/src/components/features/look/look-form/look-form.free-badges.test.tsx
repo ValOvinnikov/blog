@@ -1,4 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_DISABLED } from '@platform/testing/aria';
@@ -21,6 +20,7 @@ import {
   withLookTenant,
 } from '@platform/testing/look/look-form-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

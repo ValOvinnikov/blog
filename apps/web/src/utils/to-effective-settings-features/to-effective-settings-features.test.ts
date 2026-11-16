@@ -1,4 +1,4 @@
-import { CAPABILITY, PRESET_ID, PRESET_REGISTRY } from '@blog/config';
+import { CAPABILITY, PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
 
 import { toEffectiveSettingsFeatures } from './to-effective-settings-features';
 

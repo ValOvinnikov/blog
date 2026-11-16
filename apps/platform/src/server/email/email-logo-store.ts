@@ -1,8 +1,8 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
 import type { TEmailLogoTarget } from '@platform/utils/email-logo-target/email-logo-target';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 export const getEmailLogoUrl = async (
   tenantId: string,

@@ -1,5 +1,5 @@
-import { SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { SITE_MESSAGES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { EMBED_PROVIDER_NAME } from '@web/constants/embed';
 import { useConsentStore } from '@web/hooks/use-consent-store';

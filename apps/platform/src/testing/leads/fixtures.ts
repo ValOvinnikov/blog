@@ -1,6 +1,6 @@
-import type { TListedLead } from '@blog/db/queries/leads';
 import { faker } from '@faker-js/faker';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
+import type { TListedLead } from '@shinefold/db/queries/leads';
 
 export const MOCK_LEAD_ID = faker.string.uuid();
 export const MOCK_LEAD_NAME = faker.person.fullName();

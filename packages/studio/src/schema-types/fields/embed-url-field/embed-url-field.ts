@@ -1,4 +1,4 @@
-import { validateEmbedUrl } from '@blog/studio/schema-types/validation/validate-embed-url/validate-embed-url';
+import { validateEmbedUrl } from '@shinefold/studio/schema-types/validation/validate-embed-url/validate-embed-url';
 import { defineField } from 'sanity';
 
 export const embedUrlField = () =>

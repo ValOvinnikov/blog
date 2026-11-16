@@ -1,4 +1,4 @@
-import { TAXONOMY_KIND } from '@blog/config';
+import { TAXONOMY_KIND } from '@shinefold/config';
 import { FaqPageSchema } from '@web/components/features/faq-page-schema';
 import { TopicBreadcrumbs } from '@web/components/features/topic/topic-breadcrumbs';
 import { TopicChips } from '@web/components/features/topic/topic-chips';

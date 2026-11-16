@@ -1,4 +1,4 @@
-import { isNull, isString, isUndefined } from '@blog/utils/primitives';
+import { isNull, isString, isUndefined } from '@shinefold/utils/primitives';
 
 export type TCsvCell = string | number | boolean | null | undefined;
 

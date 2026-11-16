@@ -1,11 +1,11 @@
 import type {
   TEmailTemplateType,
   TLocaleIsoCode,
-} from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
-import type { TEmailTemplateResult } from '@blog/db/queries/email-templates';
-import { isValidEmailAddress } from '@blog/email/validation';
+} from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@shinefold/db/constants';
+import type { TEmailTemplateResult } from '@shinefold/db/queries/email-templates';
+import { isValidEmailAddress } from '@shinefold/email/validation';
 
 export type TResolvedMagicLinkEmailSettings = {
   subject: string;

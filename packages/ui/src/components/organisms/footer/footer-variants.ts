@@ -1,5 +1,9 @@
-import { BRAND_VARIANT, FOOTER_LAYOUT, FOOTER_SURFACE } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import {
+  BRAND_VARIANT,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
+} from '@shinefold/config';
+import { tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const footerVariants = tv({

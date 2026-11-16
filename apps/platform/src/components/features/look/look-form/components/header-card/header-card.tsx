@@ -1,10 +1,3 @@
-import {
-  HEADER_BAR_STYLE,
-  HEADER_LAYOUT,
-  HEADER_SUBMENU_STYLE,
-  type THeaderBarStyle,
-  type THeaderSubmenuStyle,
-} from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
@@ -16,6 +9,13 @@ import { SegmentedControl } from '@platform/components/shared/segmented-control'
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
+import {
+  HEADER_BAR_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
+  type THeaderBarStyle,
+  type THeaderSubmenuStyle,
+} from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { AccountFields } from './components/account-fields/account-fields';

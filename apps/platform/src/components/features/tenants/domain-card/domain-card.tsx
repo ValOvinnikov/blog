@@ -1,5 +1,3 @@
-import { SIZE } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { LinkButton } from '@platform/components/shared/link-button';
@@ -10,6 +8,8 @@ import {
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
 import { domainVerificationTone } from '@platform/utils/status-tone/status-tone';
+import { SIZE } from '@shinefold/config';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { useTranslations } from 'next-intl';
 
 export type TDomainCardProps = {

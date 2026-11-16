@@ -1,10 +1,10 @@
-import { BUSY_BUTTON_STYLE, SIZE } from '@blog/config';
+import { BUSY_BUTTON_STYLE, SIZE } from '@shinefold/config';
 import {
   FOCUS_RING,
   LINK_UNDERLINE,
   TRANSITION_COLORS,
   tv,
-} from '@blog/ui/lib/styling';
+} from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const buttonVariants = tv({

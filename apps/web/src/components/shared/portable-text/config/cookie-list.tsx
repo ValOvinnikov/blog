@@ -1,6 +1,6 @@
-import { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
-import { InlineCode } from '@blog/ui/components/atoms/inline-code';
-import { Table } from '@blog/ui/components/molecules/table';
+import { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
+import { InlineCode } from '@shinefold/ui/components/atoms/inline-code';
+import { Table } from '@shinefold/ui/components/molecules/table';
 import { COOKIE_LIST } from '@web/constants/cookie-list';
 import { useTranslations } from 'next-intl';
 

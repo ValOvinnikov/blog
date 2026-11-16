@@ -202,10 +202,10 @@ values are stored as plain `text`, so none of them needs a db migration:
 
 - `CONTRAST_RESULT_SECRET` (platform env) — the ingest route's shared
   secret; see `docs/context/environment-variables.md`.
-- `RELEASE_WATCHED_PATHS` (`@blog/config`) maps each `RELEASE_CHANGE`
+- `RELEASE_WATCHED_PATHS` (`@shinefold/config`) maps each `RELEASE_CHANGE`
   (`RENDERING`, `DB_MIGRATION`, `SANITY_MIGRATION`, `ENV`) to the path
   prefixes that count as that kind of change.
-- `TContrastResultBody` (`@blog/config`) is the body the contrast workflow
+- `TContrastResultBody` (`@shinefold/config`) is the body the contrast workflow
   posts and the ingest route validates: `sha`, `outcome` (`PASS` or `FAIL`),
   `failureCount`, `runUrl` and an optional `tag`.
 
@@ -252,7 +252,7 @@ values are stored as plain `text`, so none of them needs a db migration:
 
 ## Entry points
 
-- `parseReleaseVersion` and `isReleaseVersionGreater` (`@blog/utils/version`).
+- `parseReleaseVersion` and `isReleaseVersionGreater` (`@shinefold/utils/version`).
 - `getReleaseCandidate` and `isContrastDue`, both built on
   `getCandidateComparison` (`apps/platform/src/server/releases/`).
 - `startContrastCheckAction`, `startReleaseAction`, `getReleaseRun`,

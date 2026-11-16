@@ -1,4 +1,4 @@
-import type { TPostRelatedModule } from '@blog/service';
+import type { TPostRelatedModule } from '@shinefold/service';
 import { mockPostModuleBase } from '@web/testing/modules/post-list/fixtures';
 
 const MOCK_POST_RELATED_HEADING = 'Related reading';

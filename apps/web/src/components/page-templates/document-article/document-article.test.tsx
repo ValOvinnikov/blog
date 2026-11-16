@@ -1,5 +1,5 @@
-import { CONTENT_ALIGNMENT, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { CONTENT_ALIGNMENT, SITE_MESSAGES } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { MOCK_CONTENTS_RAIL_BODY } from '@web/testing/shared/contents-rail/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';

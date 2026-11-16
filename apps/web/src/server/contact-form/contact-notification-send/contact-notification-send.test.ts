@@ -1,8 +1,8 @@
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { sendEmail } from '@blog/email';
-import type * as TEmail from '@blog/email';
 import { faker } from '@faker-js/faker';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { sendEmail } from '@shinefold/email';
+import type * as TEmail from '@shinefold/email';
 import { mockLeadInput } from '@web/testing/server/contact-form/fixtures';
 import { firstSentEmail } from '@web/testing/server/newsletter/fixtures';
 import {
@@ -25,7 +25,7 @@ vi.mock(
   () => import('@web/testing/server/next-cache/passthrough-next-cache'),
 );
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     emailConfig: { getContactRecipient: vi.fn(), getEmailConfig: vi.fn() },
     tenants: { getTenantById: vi.fn() },
@@ -33,7 +33,7 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('@blog/email', async (importOriginal) => ({
+vi.mock('@shinefold/email', async (importOriginal) => ({
   ...(await importOriginal<typeof TEmail>()),
   sendEmail: vi.fn(),
 }));

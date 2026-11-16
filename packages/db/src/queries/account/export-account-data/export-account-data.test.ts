@@ -1,17 +1,17 @@
-import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestTenant,
   insertTestUser,
   MOCK_USER_EMAIL,
   MOCK_USER_NAME,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { exportAccountData } from './export-account-data';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(602202);
 

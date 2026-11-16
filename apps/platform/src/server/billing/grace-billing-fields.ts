@@ -1,6 +1,6 @@
-import type { TSetTenantBillingInput } from '@blog/db/queries/tenants/set-tenant-billing/set-tenant-billing';
-import type { TTenantBilling } from '@blog/db/queries/tenants/tenant-billing';
 import { BILLING_GRACE, type TBillingGrace } from '@platform/constants/billing';
+import type { TSetTenantBillingInput } from '@shinefold/db/queries/tenants/set-tenant-billing/set-tenant-billing';
+import type { TTenantBilling } from '@shinefold/db/queries/tenants/tenant-billing';
 
 type TGraceBillingFields = Pick<
   TSetTenantBillingInput,

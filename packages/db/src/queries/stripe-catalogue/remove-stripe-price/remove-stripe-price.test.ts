@@ -1,17 +1,17 @@
-import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
-import { listStripePrices } from '@blog/db/queries/stripe-catalogue/list-stripe-prices';
-import { saveStripePrice } from '@blog/db/queries/stripe-catalogue/save-stripe-price';
-import * as schema from '@blog/db/schema';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { STRIPE_PRICE_LOOKUP_KEY } from '@shinefold/db/constants';
+import { listStripePrices } from '@shinefold/db/queries/stripe-catalogue/list-stripe-prices';
+import { saveStripePrice } from '@shinefold/db/queries/stripe-catalogue/save-stripe-price';
+import * as schema from '@shinefold/db/schema';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_OTHER_STRIPE_PRICE_ID,
   MOCK_STRIPE_PRICE_ID,
   mockSaveStripePriceInput,
-} from '@blog/db/testing/stripe-catalogue/fixtures';
+} from '@shinefold/db/testing/stripe-catalogue/fixtures';
 
 import { removeStripePrice } from './remove-stripe-price';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

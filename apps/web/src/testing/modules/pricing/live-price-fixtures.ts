@@ -1,17 +1,17 @@
-import { PRICE_PERIOD } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
+import { PRICE_PERIOD } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import {
   BILLING_CURRENCY,
   STRIPE_COUPON_DURATION,
   STRIPE_PRICE_LOOKUP_KEY,
-} from '@blog/db/constants';
-import type { TStripePrice } from '@blog/db/queries/stripe-catalogue/list-stripe-prices';
+} from '@shinefold/db/constants';
+import type { TStripePrice } from '@shinefold/db/queries/stripe-catalogue/list-stripe-prices';
 import {
   MOCK_DOLLAR_AMOUNT,
   MOCK_EURO_AMOUNT,
   MOCK_PROMOTION_CODE,
   MOCK_STRIPE_PRODUCT_ID,
-} from '@blog/db/testing/stripe-catalogue/fixtures';
+} from '@shinefold/db/testing/stripe-catalogue/fixtures';
 import {
   mockPricingTier,
   MOCK_PRICING_LABELS,

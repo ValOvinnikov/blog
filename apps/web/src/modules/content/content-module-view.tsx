@@ -1,6 +1,6 @@
-import type { TContentModule } from '@blog/service';
-import { Prose } from '@blog/ui/components/atoms/prose';
-import { ContentModule as ContentModuleUi } from '@blog/ui/components/organisms/content-module';
+import type { TContentModule } from '@shinefold/service';
+import { Prose } from '@shinefold/ui/components/atoms/prose';
+import { ContentModule as ContentModuleUi } from '@shinefold/ui/components/organisms/content-module';
 import { PortableText } from '@web/components/shared/portable-text';
 import { Section } from '@web/components/shared/section';
 

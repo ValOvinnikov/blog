@@ -1,9 +1,9 @@
-import type { TFindingSummary } from '@blog/db/schema/findings';
 import { Card } from '@platform/components/shared/card';
 import { CardList } from '@platform/components/shared/card-list';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { findingSeverityTone } from '@platform/utils/status-tone/status-tone';
+import type { TFindingSummary } from '@shinefold/db/schema/findings';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { FindingDetails } from './components/finding-details/finding-details';

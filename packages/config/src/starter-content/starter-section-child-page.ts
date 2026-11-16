@@ -1,9 +1,9 @@
 import type {
   Page_landing,
   Template_landing,
-} from '@blog/config/sanity/generated/types';
+} from '@shinefold/config/sanity/generated/types';
 
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 
 import type {
   TStarterDocument,

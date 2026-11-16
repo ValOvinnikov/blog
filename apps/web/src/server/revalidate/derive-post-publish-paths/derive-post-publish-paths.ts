@@ -1,5 +1,5 @@
-import { service, type TTenantSanityContext } from '@blog/service';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+import { service, type TTenantSanityContext } from '@shinefold/service';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import {
   DOCUMENT_NOT_FOUND_REASON,
   FETCH_FAILED_REASON,

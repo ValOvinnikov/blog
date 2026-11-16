@@ -1,14 +1,14 @@
-import { AUDIT_ACTION } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
-import { insertTestAuditEvent } from '@blog/db/testing/audit-events/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
+import { AUDIT_ACTION } from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
+import { insertTestAuditEvent } from '@shinefold/db/testing/audit-events/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { getLatestDeprovisionRequestedAt } from './get-latest-deprovision-requested-at';
 
 faker.seed(602102);
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

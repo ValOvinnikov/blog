@@ -2,15 +2,15 @@ import {
   SORT_DIRECTION,
   TENANT_SORT_COLUMN,
   type TTenantSortColumn,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import type {
   TColumnSort,
   TMaybeNull,
   TMaybeUndefined,
-} from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { tenantDomains } from '@blog/db/schema/tenant-domains';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { tenantDomains } from '@shinefold/db/schema/tenant-domains';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import {
   and,
   asc,

@@ -1,6 +1,6 @@
-import { SIZE } from '@blog/config';
-import { HEADING_LEVELS } from '@blog/ui/lib/react';
-import { objectKeys } from '@blog/utils/primitives';
+import { SIZE } from '@shinefold/config';
+import { HEADING_LEVELS } from '@shinefold/ui/lib/react';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Heading } from './heading';

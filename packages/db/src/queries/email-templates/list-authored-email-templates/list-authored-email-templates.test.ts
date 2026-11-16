@@ -1,16 +1,19 @@
-import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
+import {
+  EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
+} from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_ENGLISH_SUBJECT,
   MOCK_FRENCH_SUBJECT,
   MOCK_SECOND_SUBJECT,
-} from '@blog/db/testing/email-templates/fixtures';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/email-templates/fixtures';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { listAuthoredEmailTemplates } from './list-authored-email-templates';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

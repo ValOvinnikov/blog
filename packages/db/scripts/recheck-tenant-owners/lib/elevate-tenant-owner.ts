@@ -1,16 +1,16 @@
-import { SANITY_PROJECT_ROLE } from '@blog/config';
+import { SANITY_PROJECT_ROLE } from '@shinefold/config';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   type TElevateTenantOwnerOutcome,
-} from '@blog/db/constants';
-import { getTenantSanityManagementCredentials } from '@blog/db/queries/tenants/get-tenant-sanity-management-credentials';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/constants';
+import { getTenantSanityManagementCredentials } from '@shinefold/db/queries/tenants/get-tenant-sanity-management-credentials';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   grantSanityProjectRole,
   listSanityProjectAcl,
-} from '@blog/db/utils/sanity-management-client/sanity-project-access';
-import { sanityRoleChangeToken } from '@blog/db/utils/sanity-management-client/sanity-role-change-token';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
+import { sanityRoleChangeToken } from '@shinefold/db/utils/sanity-management-client/sanity-role-change-token';
+import { sanitizeLogMessage } from '@shinefold/insight';
 
 import type { TRecheckEnv } from './env';
 

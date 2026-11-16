@@ -1,13 +1,13 @@
-import { CONTAINER_WIDTH } from '@blog/config/constants';
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { embedObjectSchema } from '@blog/studio/schema-types/objects/embed/embed';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
-import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { CONTAINER_WIDTH } from '@shinefold/config/constants';
+import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { embedObjectSchema } from '@shinefold/studio/schema-types/objects/embed/embed';
+import { layoutField } from '@shinefold/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
+import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
 import { SquarePlay } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

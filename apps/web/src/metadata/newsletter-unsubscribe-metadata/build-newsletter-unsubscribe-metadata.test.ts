@@ -1,4 +1,4 @@
-import { SITE_MESSAGES_BY_LOCALE } from '@blog/config';
+import { SITE_MESSAGES_BY_LOCALE } from '@shinefold/config';
 import { NOINDEX_ROBOTS } from '@web/testing/metadata/to-metadata/fixtures';
 
 import { buildNewsletterUnsubscribeMetadata } from './build-newsletter-unsubscribe-metadata';

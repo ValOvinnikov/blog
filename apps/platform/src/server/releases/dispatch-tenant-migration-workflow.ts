@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config';
 import {
   RELEASE_LOG,
   TENANT_MIGRATION_WORKFLOW_FILE,
   type TMigrationEnvironment,
 } from '@platform/constants/release';
 import { dispatchGitHubWorkflow } from '@platform/server/github/dispatch-github-workflow';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 type TDispatchTenantMigrationWorkflowInput = {
   environment: TMigrationEnvironment;

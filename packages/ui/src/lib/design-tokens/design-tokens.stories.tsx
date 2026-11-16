@@ -1,4 +1,4 @@
-import { hasLength } from '@blog/utils/primitives';
+import { hasLength } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ReactElement } from 'react';
 

@@ -1,21 +1,21 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { INACTIVITY_STAGE_DAY, TENANT_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { INACTIVITY_STAGE_DAY, TENANT_STATUS } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_MISSING_TENANT_ID,
   unwrapOk,
-} from '@blog/db/testing/tenants/fixtures';
+} from '@shinefold/db/testing/tenants/fixtures';
 import {
   daysAfterLastActivity,
   MOCK_LAST_ACTIVITY_AT,
-} from '@blog/db/testing/tenants/inactivity';
+} from '@shinefold/db/testing/tenants/inactivity';
 
 import { touchTenantActivity } from './touch-tenant-activity';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock();

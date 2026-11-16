@@ -1,7 +1,3 @@
-import {
-  DEPROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { ARIA_DISABLED } from '@platform/testing/aria';
 import { act, customRender, screen } from '@platform/testing/custom-render';
@@ -14,6 +10,10 @@ import {
   PLATFORM_TENANT_NOTICE_TEXT,
 } from '@platform/testing/tenants/fixtures';
 import { STEP_POLL_INTERVAL_MS } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
+import {
+  DEPROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@shinefold/db/constants';
 
 import { TenantDangerPageContent } from './tenant-danger-page-content';
 

@@ -1,8 +1,8 @@
-import { SIZE } from '@blog/config';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { HAS_DISABLED_DESCENDANT_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
+import { SIZE } from '@shinefold/config';
 import type { VariantProps } from 'tailwind-variants';
 
 export const checkboxVariants = tv({

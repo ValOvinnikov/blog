@@ -1,6 +1,6 @@
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { Text } from '@blog/ui/components/atoms/text';
-import { tv } from '@blog/ui/lib/styling';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { Text } from '@shinefold/ui/components/atoms/text';
+import { tv } from '@shinefold/ui/lib/styling';
 import type { ReactNode } from 'react';
 
 const s = tv({

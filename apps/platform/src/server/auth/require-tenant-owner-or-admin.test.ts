@@ -1,12 +1,12 @@
-import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
-import { queries } from '@blog/db';
-import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -15,7 +15,7 @@ import { requireTenantOwnerOrAdmin } from './require-tenant-owner-or-admin';
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@blog/db', async () => {
+vi.mock('@shinefold/db', async () => {
   const { mockDbConstants } =
     await import('@platform/testing/mock-db-constants');
 

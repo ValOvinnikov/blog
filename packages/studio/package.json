@@ -1,5 +1,5 @@
 {
-  "name": "@blog/studio",
+  "name": "@shinefold/studio",
   "private": true,
   "type": "module",
   "engines": {
@@ -28,14 +28,14 @@
     "dataset:refresh-dev": "node scripts/refresh-dev-dataset.mjs"
   },
   "dependencies": {
-    "@blog/config": "workspace:*",
-    "@blog/utils": "workspace:*",
     "@sanity/code-input": "^7.3.12",
     "@sanity/document-internationalization": "^6.2.42",
     "@sanity/language-filter": "^5.0.22",
     "@sanity/orderable-document-list": "^2.0.28",
     "@sanity/ui": "^4.4.9",
     "@sanity/vision": "^6.19.0",
+    "@shinefold/config": "workspace:*",
+    "@shinefold/utils": "workspace:*",
     "lucide-react": "^1.57.0",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -45,14 +45,14 @@
     "styled-components": "^6.6.0"
   },
   "devDependencies": {
-    "@blog/eslint-config": "workspace:*",
-    "@blog/prettier-config": "workspace:*",
-    "@blog/tsconfig": "workspace:*",
-    "@blog/vitest-config": "workspace:*",
     "@faker-js/faker": "catalog:",
     "@sanity/cli": "^7.7.1",
     "@sanity/client": "^8.9.0",
     "@sanity/validation": "^6.19.0",
+    "@shinefold/eslint-config": "workspace:*",
+    "@shinefold/prettier-config": "workspace:*",
+    "@shinefold/tsconfig": "workspace:*",
+    "@shinefold/vitest-config": "workspace:*",
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -1,7 +1,7 @@
-import { SIGNUP_TERMS_COOKIE_NAME, TERMS_VERSION } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { SIGN_UP_LOG } from '@platform/constants/sign-up';
 import { logger } from '@platform/utils/logger/logger';
+import { SIGNUP_TERMS_COOKIE_NAME, TERMS_VERSION } from '@shinefold/config';
 import { checkBotId } from 'botid/server';
 
 import { setSignupTermsCookie } from './set-signup-terms-cookie';

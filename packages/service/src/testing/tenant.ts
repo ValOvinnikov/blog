@@ -1,4 +1,4 @@
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
 
 export const MOCK_TENANT_PROJECT_ID = 'tenant-a';
 export const MOCK_TENANT_DATASET = 'production';

@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   mockFaqView,
   mockRawFaqModuleQuestions,
-} from '@blog/service/testing/modules/fixtures';
-import { mockCtaSlotView } from '@blog/service/testing/pages/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockCtaSlotView } from '@shinefold/service/testing/pages/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getFaqQuestions } from './loader';
 import { getPageFaqs } from './page-faqs';

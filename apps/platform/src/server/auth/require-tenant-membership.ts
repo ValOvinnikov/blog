@@ -1,11 +1,11 @@
 import 'server-only';
 
-import { queries } from '@blog/db';
-import type { TMembership } from '@blog/db/schema/memberships';
 import {
   type TPlatformTenant,
   toPlatformTenant,
 } from '@platform/utils/platform-tenant/platform-tenant';
+import { queries } from '@shinefold/db';
+import type { TMembership } from '@shinefold/db/schema/memberships';
 import { notFound } from 'next/navigation';
 
 import { buildVirtualAdminMembership } from './build-virtual-admin-membership';

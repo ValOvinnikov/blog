@@ -1,4 +1,3 @@
-import { SIZE } from '@blog/config';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -6,6 +5,7 @@ import { BUTTON_VARIANT } from '@platform/constants/button';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { tenantSiteUrl } from '@platform/utils/routes/routes';
 import { domainVerificationTone } from '@platform/utils/status-tone/status-tone';
+import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TConnectedDomainDetailsProps = {

@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import type { TMembership } from '@blog/db/schema/memberships';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import type { TMembership } from '@shinefold/db/schema/memberships';
 
 const VIRTUAL_ADMIN_MEMBERSHIP_ID_PREFIX = 'admin-virtual:';
 

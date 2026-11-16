@@ -1,14 +1,14 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
 import { insertAuditEvent } from './insert-audit-event';
 
 faker.seed(602103);
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

@@ -1,21 +1,21 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_SECTION_PAGES_HEADING,
   MOCK_SECTION_PAGES_MODULE_ID,
   mockRawSectionPagesModule,
-} from '@blog/service/testing/modules/fixtures';
-import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockCacheTag } from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockValidationError,
-} from '@blog/service/testing/shared/fixtures';
-import { MOCK_TENANT } from '@blog/service/testing/tenant';
+} from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getSectionPagesModuleDocument } from './loader';
 import { sectionPagesModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 describe(getSectionPagesModuleDocument, () => {
   beforeEach(() => {

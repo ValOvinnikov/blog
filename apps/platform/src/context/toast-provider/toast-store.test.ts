@@ -1,6 +1,6 @@
-import { TOAST_TYPE, type TToastType } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { IToastPayload } from '@platform/components/shared/toast';
+import { TOAST_TYPE, type TToastType } from '@shinefold/config';
 
 import { createToastStore } from './toast-store';
 

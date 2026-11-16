@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import { FOOTER_LOG } from '@web/constants/footer';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
 import { env } from '@web/utils/env/env';

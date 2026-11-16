@@ -1,4 +1,8 @@
-import { registerLogSink, type TLogSink } from '@blog/insight/sink/log-sink';
+import { faker } from '@faker-js/faker';
+import {
+  registerLogSink,
+  type TLogSink,
+} from '@shinefold/insight/sink/log-sink';
 import {
   MOCK_ERROR_MESSAGE,
   MOCK_EVENT,
@@ -6,8 +10,7 @@ import {
   MOCK_PARAGRAPH_SEPARATOR,
   MOCK_SEPARATORS,
   MOCK_SERVICE,
-} from '@blog/insight/testing/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/insight/testing/fixtures';
 
 import { createLogger, LOG_LEVEL } from './logger';
 

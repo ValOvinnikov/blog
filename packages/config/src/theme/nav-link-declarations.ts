@@ -1,4 +1,7 @@
-import { NAV_LINK_STYLE, type TNavLinkStyle } from '@blog/config/constants';
+import {
+  NAV_LINK_STYLE,
+  type TNavLinkStyle,
+} from '@shinefold/config/constants';
 
 import { RADIUS_MD, RADIUS_PILL } from './radius-tokens';
 import type { TThemeDeclarations } from './theme-declarations';

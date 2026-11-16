@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TSiteConfigResult } from '@blog/db/queries/site-config';
 import {
   defaultLookFormValues,
   type TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TSiteConfigResult } from '@shinefold/db/queries/site-config';
 
 export const toLookFormValues = (
   siteConfig: TSiteConfigResult,

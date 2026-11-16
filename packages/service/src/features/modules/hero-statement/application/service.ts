@@ -1,6 +1,6 @@
-import { getHeroStatement } from '@blog/service/features/modules/hero-statement/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getHeroStatement } from '@shinefold/service/features/modules/hero-statement/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createHeroStatementModuleService() {
   return {

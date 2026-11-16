@@ -1,5 +1,5 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { MediaFrame } from '@blog/ui/components/atoms/media-frame';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { MediaFrame } from '@shinefold/ui/components/atoms/media-frame';
 import type { ReactNode } from 'react';
 
 export type TCtaModuleMediaProps = IWithClassName &

@@ -1,19 +1,19 @@
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_CONFIRMATION_NOW,
   readTestSubscriber,
-} from '@blog/db/testing/subscribers/fixtures';
+} from '@shinefold/db/testing/subscribers/fixtures';
 
 import { claimConfirmationSend } from './claim-confirmation-send';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const COOLDOWN_MS = 15 * 60_000;
 

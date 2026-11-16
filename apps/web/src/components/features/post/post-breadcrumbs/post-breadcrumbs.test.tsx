@@ -1,6 +1,6 @@
-import { routes, SITE_MESSAGES } from '@blog/config';
-import { okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { routes, SITE_MESSAGES } from '@shinefold/config';
+import { okResult } from '@shinefold/utils';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
 import {

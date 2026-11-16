@@ -1,5 +1,5 @@
-import { buttonVariants } from '@blog/ui/components/atoms/button/button-variants';
-import { objectKeys } from '@blog/utils/primitives';
+import { buttonVariants } from '@shinefold/ui/components/atoms/button/button-variants';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { LinkButton } from './link-button';

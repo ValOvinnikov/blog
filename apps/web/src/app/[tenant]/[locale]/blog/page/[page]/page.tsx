@@ -1,4 +1,4 @@
-import { routes, type ITenantLocalizedParams } from '@blog/config';
+import { routes, type ITenantLocalizedParams } from '@shinefold/config';
 import { PostIndexPage } from '@web/components/pages/post-index-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildPostIndexMetadata } from '@web/metadata/post-index-metadata';

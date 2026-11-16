@@ -1,8 +1,8 @@
+import { faker } from '@faker-js/faker';
 import {
   mockLinkView,
   mockRawExternalLinkDocument,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toLinkDocuments } from './to-link-documents';
 

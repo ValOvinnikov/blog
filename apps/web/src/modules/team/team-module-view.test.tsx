@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_CTA_ACTIONS,

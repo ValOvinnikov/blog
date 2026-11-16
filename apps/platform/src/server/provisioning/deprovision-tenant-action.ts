@@ -1,15 +1,6 @@
 'use server';
 
 import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  HTTP_STATUS,
-  isOutcomeSuccess,
-} from '@blog/config';
-import { isNull } from '@blog/utils/primitives';
-import { toOutcome } from '@blog/utils/to-outcome';
-import {
   DEPROVISION_PATH,
   PROVISIONING_LOG,
 } from '@platform/constants/provisioning';
@@ -22,6 +13,15 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  HTTP_STATUS,
+  isOutcomeSuccess,
+} from '@shinefold/config';
+import { isNull } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import type { z } from 'zod';
 
 import { enqueueWorkerRequest } from './enqueue-provisioning';

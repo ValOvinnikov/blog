@@ -1,4 +1,4 @@
-# @blog/ui
+# @shinefold/ui
 
 > The design system: pure, prop-driven React components shared by both apps.
 
@@ -10,11 +10,11 @@ could be published to npm without edits.
 
 ## Layer contract
 
-- **Depends on:** `@blog/config` (shared types and constants), `@blog/utils`,
-  `@blog/tailwind-config` (design tokens, consumed via `theme.css`), and
+- **Depends on:** `@shinefold/config` (shared types and constants), `@shinefold/utils`,
+  `@shinefold/tailwind-config` (design tokens, consumed via `theme.css`), and
   `tailwind-variants` for styling.
 - **Consumed by:** `apps/web` and `apps/platform`.
-- **Never imports:** `@blog/service`, `sanity`, `next-sanity`, `next/*`, or
+- **Never imports:** `@shinefold/service`, `sanity`, `next-sanity`, `next/*`, or
   anything that fetches data. `'use client'` never appears in this package —
   components stay server-component-safe by default and accept
   `children`/`as`/slot props so the consuming app owns framework specifics.
@@ -25,7 +25,7 @@ could be published to npm without edits.
 - `src/molecules/` — components composed from atoms.
 - `src/organisms/` — larger sections composed from molecules and atoms.
 - `src/lib/` — internal helpers: `design-tokens` (parses and registers the
-  design tokens from `@blog/tailwind-config`'s `theme.css`), `react` (compound
+  design tokens from `@shinefold/tailwind-config`'s `theme.css`), `react` (compound
   component and heading-tag helpers), `styling` (the shared `tv()` wrapper).
 - `src/assets/icons/` — SVG source assets.
 - `src/testing/` — shared test utilities (a custom Testing Library render).
@@ -35,15 +35,15 @@ Every component is re-exported from `src/index.ts` (and per-layer barrels
 
 ## Scripts
 
-| Script            | Command                                  |
-| ----------------- | ---------------------------------------- |
-| `lint`            | `pnpm --filter @blog/ui lint`            |
-| `type-check`      | `pnpm --filter @blog/ui type-check`      |
-| `format`          | `pnpm --filter @blog/ui format`          |
-| `test`            | `pnpm --filter @blog/ui test`            |
-| `test:watch`      | `pnpm --filter @blog/ui test:watch`      |
-| `storybook`       | `pnpm --filter @blog/ui storybook`       |
-| `storybook:build` | `pnpm --filter @blog/ui storybook:build` |
+| Script            | Command                                       |
+| ----------------- | --------------------------------------------- |
+| `lint`            | `pnpm --filter @shinefold/ui lint`            |
+| `type-check`      | `pnpm --filter @shinefold/ui type-check`      |
+| `format`          | `pnpm --filter @shinefold/ui format`          |
+| `test`            | `pnpm --filter @shinefold/ui test`            |
+| `test:watch`      | `pnpm --filter @shinefold/ui test:watch`      |
+| `storybook`       | `pnpm --filter @shinefold/ui storybook`       |
+| `storybook:build` | `pnpm --filter @shinefold/ui storybook:build` |
 
 The root-level `pnpm type-check`, `pnpm lint`, and `pnpm test` run every
 workspace, including this one, through Turborepo.

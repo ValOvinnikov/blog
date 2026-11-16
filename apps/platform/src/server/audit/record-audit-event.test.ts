@@ -1,10 +1,14 @@
-import { type TMaybeNull, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
 import { MOCK_OPERATOR_ID } from '@platform/testing/admins/operator';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  type TMaybeNull,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+} from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import type { Session } from 'next-auth';
 
 import { recordAuditEvent } from './record-audit-event';
@@ -17,7 +21,7 @@ const { insertAuditEventMock } = vi.hoisted(() => ({
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { auditEvents: { insertAuditEvent: insertAuditEventMock } },
 }));
 

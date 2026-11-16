@@ -1,8 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
-import {
-  hasArrayGotItems,
-  hasArrayGotMultipleItems,
-} from '@blog/utils/primitives';
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
 import type { TLookCard } from '@platform/constants/look-card';
 import { LOOK_FOLLOW_TARGET } from '@platform/constants/look-follow';
@@ -12,6 +7,11 @@ import {
   SITE_PARTS_ROWS,
   type STYLE_ROWS,
 } from '@platform/utils/look-open-rows/look-open-rows';
+import type { TMaybeUndefined } from '@shinefold/config';
+import {
+  hasArrayGotItems,
+  hasArrayGotMultipleItems,
+} from '@shinefold/utils/primitives';
 
 type TSitePartsRow = (typeof SITE_PARTS_ROWS)[number];
 type TStyleRow = (typeof STYLE_ROWS)[number];

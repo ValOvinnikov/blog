@@ -1,4 +1,4 @@
-import { SITE_MESSAGES_BY_LOCALE } from '@blog/config';
+import { SITE_MESSAGES_BY_LOCALE } from '@shinefold/config';
 import { peekVoiceTenant } from '@web/server/request-context/request-context';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 import { hasLocale } from 'next-intl';

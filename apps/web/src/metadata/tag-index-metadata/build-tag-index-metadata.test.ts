@@ -1,6 +1,10 @@
-import { LOCALE_ISO_CODES, routes, type TLocaleIsoCode } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import {
+  LOCALE_ISO_CODES,
+  routes,
+  type TLocaleIsoCode,
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { NL_TAGS_INDEX_PATH } from '@web/testing/metadata/index-paths/fixtures';
 import {

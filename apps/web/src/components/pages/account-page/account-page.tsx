@@ -1,5 +1,5 @@
-import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { routes } from '@blog/config';
+import { getEnabledOAuthProviderIds } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import { routes } from '@shinefold/config';
 import { auth } from '@web/server/auth/auth';
 import { getHostSiteOAuthCredentials } from '@web/server/auth/site-oauth-credentials/site-oauth-credentials';
 import { getRequestContext } from '@web/server/request-context/request-context';

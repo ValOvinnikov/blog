@@ -1,12 +1,12 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_DESIGN_EN_POST_ID,
   MOCK_DESIGN_NL_POST_ID,
   MOCK_ONLY_EN_POST_ID,
   MOCK_TRANSLATED_POST_DOCUMENTS,
   toIds,
-} from '@blog/service/testing/shared/translated-posts-dataset';
+} from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { postLatestModulePostsQuery } from './posts.query';
 

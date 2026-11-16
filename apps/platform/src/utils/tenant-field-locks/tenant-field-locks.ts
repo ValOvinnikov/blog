@@ -1,15 +1,15 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
+import { TENANT_FIELD_LOCK_KIND } from '@platform/constants/tenant';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import {
   PROVISIONING_STATE,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
-} from '@blog/db/constants';
-import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
-import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
-import { deriveProvisioningState } from '@blog/db/utils/derive-provisioning-state/derive-provisioning-state';
-import { TENANT_FIELD_LOCK_KIND } from '@platform/constants/tenant';
+} from '@shinefold/db/constants';
+import type { TTenantOwnerMembership } from '@shinefold/db/queries/memberships';
+import type { TTenantProvisioningState } from '@shinefold/db/schema/tenants';
+import { deriveProvisioningState } from '@shinefold/db/utils/derive-provisioning-state/derive-provisioning-state';
 
 export const ALL_FIELD_KEYS = [
   'name',

@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { admins, type TAdmin } from '@blog/db/schema/admins';
+import { getDb } from '@shinefold/db/client';
+import { admins, type TAdmin } from '@shinefold/db/schema/admins';
 import { eq } from 'drizzle-orm';
 
 export async function getAdminByUserId(

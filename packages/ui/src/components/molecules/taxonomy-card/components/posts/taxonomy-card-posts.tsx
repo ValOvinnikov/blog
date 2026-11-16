@@ -1,7 +1,7 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 
 import { taxonomyCardPostsVariants } from './taxonomy-card-posts-variants';
 

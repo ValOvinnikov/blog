@@ -1,11 +1,14 @@
-import * as schema from '@blog/db/schema';
-import { MOCK_USER_EMAIL, insertTestReader } from '@blog/db/testing/fixtures';
-import { taggedMixedCaseAddress } from '@blog/db/testing/personal-data-rows';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import * as schema from '@shinefold/db/schema';
+import {
+  MOCK_USER_EMAIL,
+  insertTestReader,
+} from '@shinefold/db/testing/fixtures';
+import { taggedMixedCaseAddress } from '@shinefold/db/testing/personal-data-rows';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { findUserByEmail } from './find-user-by-email';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

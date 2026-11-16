@@ -1,2 +1,2 @@
-/* @blog/ui style entry — shared Tailwind config, without app-only @source directives. */
-@import '@blog/tailwind-config/theme.css';
+/* @shinefold/ui style entry — shared Tailwind config, without app-only @source directives. */
+@import '@shinefold/tailwind-config/theme.css';

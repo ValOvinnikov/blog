@@ -1,7 +1,7 @@
-import { BRAND_VARIANT, PRICE_PERIOD } from '@blog/config';
-import type { TRawPricingModule } from '@blog/service/features/modules/pricing/adaptor/transformer';
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { mockRawModuleAppearance } from '@blog/service/testing/shared/module-appearance';
+import { BRAND_VARIANT, PRICE_PERIOD } from '@shinefold/config';
+import type { TRawPricingModule } from '@shinefold/service/features/modules/pricing/adaptor/transformer';
+import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 export const MOCK_PRICING_MODULE_ID = 'pricing-1';
 export const MOCK_UNLIMITED_POSTS_FEATURE = 'Unlimited posts';

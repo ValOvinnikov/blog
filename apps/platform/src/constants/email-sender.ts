@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const EMAIL_SENDER_FIELD_ERROR = {
   SENDER_NAME_INVALID: 'SENDER_NAME_INVALID',

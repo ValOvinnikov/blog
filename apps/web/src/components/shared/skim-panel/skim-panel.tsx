@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TPostTakeaways } from '@blog/service';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TPostTakeaways } from '@shinefold/service';
 import { SwitchToReadButton } from '@web/components/shared/switch-to-read-button';
 import { getTranslations } from 'next-intl/server';
 

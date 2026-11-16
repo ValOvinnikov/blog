@@ -1,10 +1,10 @@
 'use client';
 
-import { ALERT_TYPE, SIZE } from '@blog/config';
 import { useResendStudioInvite } from '@platform/components/features/tenants/tenant-details-panel/use-resend-studio-invite';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { ALERT_TYPE, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 

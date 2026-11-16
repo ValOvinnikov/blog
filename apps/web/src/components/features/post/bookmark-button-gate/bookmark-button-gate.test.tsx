@@ -1,5 +1,5 @@
-import { CAPABILITY, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { CAPABILITY, SITE_MESSAGES } from '@shinefold/config';
 import { SESSION_STATUS } from '@web/constants/session';
 import { ToastProvider } from '@web/context/toast-provider';
 import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';

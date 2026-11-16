@@ -1,9 +1,3 @@
-import {
-  CARD_STYLE,
-  COOKIE_SETTINGS_BUTTON,
-  DENSITY,
-  RADIUS_SCALE,
-} from '@blog/config';
 import { DEVICE_FRAME_TEST_ID } from '@platform/constants/device-frame';
 import { LOOK_FULLSCREEN as LOOK_FULLSCREEN_LIMIT } from '@platform/constants/look-fullscreen';
 import { LOOK_ROW } from '@platform/constants/look-row';
@@ -36,6 +30,12 @@ import {
   stubLgUpWindow,
 } from '@platform/testing/match-media';
 import { MOCK_TENANT_DOMAIN } from '@platform/testing/tenants/fixtures';
+import {
+  CARD_STYLE,
+  COOKIE_SETTINGS_BUTTON,
+  DENSITY,
+  RADIUS_SCALE,
+} from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPreview } from './look-preview';

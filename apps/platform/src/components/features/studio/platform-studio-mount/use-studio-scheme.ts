@@ -1,7 +1,7 @@
-import type { TStudioMountProps } from '@blog/studio';
 import { STUDIO_SCHEME } from '@platform/constants/theme';
 import { themePreferenceFor } from '@platform/utils/theme-preference/theme-preference';
 import { useThemePreference } from '@platform/utils/use-theme-preference/use-theme-preference';
+import type { TStudioMountProps } from '@shinefold/studio';
 
 export type TStudioSchemeProps = Required<
   Pick<TStudioMountProps, 'scheme' | 'onSchemeChange'>

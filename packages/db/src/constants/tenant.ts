@@ -5,8 +5,8 @@ import {
   type TCapability,
   type TModulePack,
   type TTenantPlan,
-} from '@blog/config/constants';
-import type { TValueOf } from '@blog/config/utils';
+} from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
 
 import { LOOK_FIELD, LOOK_FIELDS, type TLookField } from './look';
 

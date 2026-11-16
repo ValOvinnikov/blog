@@ -1,10 +1,10 @@
-import { LOCALE_ISO_CODES, TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import type { TTenantSanityCredentials } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { MOCK_NO_BILLING } from '@blog/db/testing/tenants/billing';
-import { MOCK_NO_HOLD } from '@blog/db/testing/tenants/inactivity';
-import { MOCK_NO_OWNER_ACCESS } from '@blog/db/testing/tenants/owner-access';
+import { LOCALE_ISO_CODES, TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import type { TTenantSanityCredentials } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { MOCK_NO_BILLING } from '@shinefold/db/testing/tenants/billing';
+import { MOCK_NO_HOLD } from '@shinefold/db/testing/tenants/inactivity';
+import { MOCK_NO_OWNER_ACCESS } from '@shinefold/db/testing/tenants/owner-access';
 import { createMockFaker } from '@worker/testing/mock-faker';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 

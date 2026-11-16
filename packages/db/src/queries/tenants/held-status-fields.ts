@@ -1,5 +1,5 @@
-import { TENANT_STATUS } from '@blog/db/constants';
-import { tenants } from '@blog/db/schema/tenants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { inArray, sql } from 'drizzle-orm';
 
 const isAlreadyHeld = inArray(tenants.status, [

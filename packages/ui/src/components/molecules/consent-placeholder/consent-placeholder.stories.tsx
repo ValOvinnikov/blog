@@ -1,5 +1,5 @@
-import { mediaFrameVariants } from '@blog/ui/components/atoms/media-frame/media-frame-variants';
-import { objectKeys } from '@blog/utils/primitives';
+import { mediaFrameVariants } from '@shinefold/ui/components/atoms/media-frame/media-frame-variants';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { ConsentPlaceholder } from './consent-placeholder';

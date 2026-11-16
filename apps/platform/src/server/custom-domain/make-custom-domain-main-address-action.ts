@@ -1,8 +1,5 @@
 'use server';
 
-import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
 import {
   CUSTOM_DOMAIN_LOG,
   CUSTOM_DOMAIN_REFUSAL,
@@ -15,6 +12,9 @@ import { env } from '@platform/utils/env/env';
 import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom-domain';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { ACTION_OUTCOME, type TActionResult } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import {
   customDomainInputSchema,

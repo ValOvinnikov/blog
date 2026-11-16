@@ -1,6 +1,5 @@
 'use client';
 
-import { ICONS, type TVoiceSurface } from '@blog/config';
 import { useVoiceEditor } from '@platform/components/features/voice/voice-editor-provider';
 import { FieldStatus } from '@platform/components/shared/field-status';
 import { Icon } from '@platform/components/shared/icon';
@@ -15,6 +14,7 @@ import {
   voiceCardHref,
   voiceSurfaceUnit,
 } from '@platform/utils/voice-sections/voice-sections';
+import { ICONS, type TVoiceSurface } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { voiceSectionSummaryVariants } from './voice-section-summary-variants';

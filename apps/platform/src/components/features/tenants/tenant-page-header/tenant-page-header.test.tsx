@@ -1,5 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
   mockTenant,
@@ -7,6 +5,8 @@ import {
   MOCK_CUSTOM_DOMAIN_URL,
   MOCK_SITE_NAME,
 } from '@platform/testing/tenants/fixtures';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 
 import { TenantPageHeader } from './tenant-page-header';
 

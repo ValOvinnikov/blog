@@ -1,10 +1,10 @@
 'use client';
 
-import { ACTION_OUTCOME, ICONS, SIZE, type TNullable } from '@blog/config';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { Button } from '@blog/ui/components/atoms/button';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { TextInput } from '@blog/ui/components/atoms/text-input';
+import { ACTION_OUTCOME, ICONS, SIZE, type TNullable } from '@shinefold/config';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { TextInput } from '@shinefold/ui/components/atoms/text-input';
 import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useToast } from '@web/context/toast-provider';
 import { updateDisplayNameAction } from '@web/server/account/identity-actions/identity-actions';

@@ -1,6 +1,6 @@
-import type { TRawFooter } from '@blog/service/features/global/footer/adaptor/transformer';
-import type { TRawNavigation } from '@blog/service/features/global/navigation/adaptor/transformer';
-import type { TRawSiteSettings } from '@blog/service/features/global/site-settings/adaptor/transformer';
+import type { TRawFooter } from '@shinefold/service/features/global/footer/adaptor/transformer';
+import type { TRawNavigation } from '@shinefold/service/features/global/navigation/adaptor/transformer';
+import type { TRawSiteSettings } from '@shinefold/service/features/global/site-settings/adaptor/transformer';
 
 export function mockRawSiteSettings(
   overrides: Partial<TRawSiteSettings> = {},

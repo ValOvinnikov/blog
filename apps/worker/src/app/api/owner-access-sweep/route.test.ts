@@ -1,4 +1,4 @@
-import { HTTP_STATUS } from '@blog/config/constants';
+import { HTTP_STATUS } from '@shinefold/config/constants';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { MOCK_CRON_SECRET, cronRequest } from '@worker/testing/cron/fixtures';

@@ -1,9 +1,9 @@
-import type { TMaybeNull } from '@blog/config';
-import { isString } from '@blog/utils/primitives';
 import {
   isVoiceValueCustomised,
   type TVoiceDraftValue,
 } from '@platform/utils/voice-draft/voice-draft';
+import type { TMaybeNull } from '@shinefold/config';
+import { isString } from '@shinefold/utils/primitives';
 import { useState } from 'react';
 
 type TUseVoiceTextControlParams = {

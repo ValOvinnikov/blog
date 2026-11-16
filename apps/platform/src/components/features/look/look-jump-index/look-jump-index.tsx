@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
@@ -13,6 +12,7 @@ import { scrollToLookAnchor } from '@platform/utils/look-anchor/look-anchor';
 import { LOOK_CARDS } from '@platform/utils/look-open-rows/look-open-rows';
 import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
 import { useTrackScroll } from '@platform/utils/use-track-scroll/use-track-scroll';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 

@@ -1,16 +1,16 @@
-import { ERROR_CODE } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { ERROR_CODE } from '@shinefold/config/constants';
 import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   getTenantById,
   reactivateTenant,
   updateProvisioningStep,
-} from '@blog/db/queries/tenants';
-import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
-import { errorResult, okResult } from '@blog/utils/result';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/queries/tenants';
+import { unarchiveSanityProject } from '@shinefold/db/utils/sanity-management-client/sanity-project-lifecycle';
+import { errorResult, okResult } from '@shinefold/utils/result';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
 import { createTenantSanityProject } from '@worker/steps/create-sanity-project';
@@ -35,9 +35,9 @@ faker.seed(7009);
 
 const MOCK_EXISTING_PROJECT_ID = faker.string.alphanumeric(8);
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock(
-  '@blog/db/utils/sanity-management-client/sanity-project-lifecycle',
+  '@shinefold/db/utils/sanity-management-client/sanity-project-lifecycle',
   () => ({ unarchiveSanityProject: vi.fn() }),
 );
 vi.mock('@worker/utils/provision-env/provision-env');

@@ -1,6 +1,6 @@
-import { FEATURE_ICONS, ICONS } from '@blog/config';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { FEATURE_ICONS, ICONS } from '@shinefold/config';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 
 import { Icon } from './icon';
 

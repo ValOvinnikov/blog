@@ -1,7 +1,8 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
+import { PAGE_TOPIC_TYPE } from '@shinefold/studio/schema-types/documents/pages/topic/topic-type';
 import {
   AUTOMATIC_REDIRECT_EDITED_WARNING,
   REDIRECT_DESTINATION_UNPUBLISHED_ERROR,
@@ -9,15 +10,14 @@ import {
   validateAutomaticRedirectUnchanged,
   validateRedirectDestinationPage,
   validateRedirectSourcePage,
-} from '@blog/studio/schema-types/validation/validate-redirect-page/validate-redirect-page';
+} from '@shinefold/studio/schema-types/validation/validate-redirect-page/validate-redirect-page';
 import {
   MOCK_REDIRECT_SOURCE,
   mockPage,
   mockRedirect,
-} from '@blog/studio/testing/mock-documents';
-import { MOCK_FETCH_ERROR } from '@blog/studio/testing/mock-fetch-error';
-import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/mock-documents';
+import { MOCK_FETCH_ERROR } from '@shinefold/studio/testing/mock-fetch-error';
+import { mockGroqValidationContext } from '@shinefold/studio/testing/mock-validation-context';
 import { getDraftId } from 'sanity';
 
 faker.seed(6017);

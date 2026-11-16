@@ -1,5 +1,5 @@
-import { CAPABILITY, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
-import { getSanityImageBaseUrl } from '@blog/service';
+import { CAPABILITY, SITE_MESSAGES_BY_LOCALE } from '@shinefold/config';
+import { getSanityImageBaseUrl } from '@shinefold/service';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
 import { BusyStyleProvider } from '@web/context/busy-style-provider';
 import { ConsentPreferencesProvider } from '@web/context/consent-preferences-provider';

@@ -1,5 +1,5 @@
-import { CAPABILITY } from '@blog/config';
-import { service } from '@blog/service';
+import { CAPABILITY } from '@shinefold/config';
+import { service } from '@shinefold/service';
 import { CONTACT_FORM_LOG } from '@web/constants/contact-form';
 import { routing } from '@web/i18n/routing';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';

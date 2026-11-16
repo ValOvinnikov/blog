@@ -1,5 +1,3 @@
-import { SIZE, type TMaybeUndefined } from '@blog/config';
-import { hasArrayGotItems } from '@blog/utils/primitives';
 import type { TLeadsLoading } from '@platform/components/features/leads/leads-inbox/use-leads-pages';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -7,6 +5,8 @@ import { Spinner } from '@platform/components/shared/spinner';
 import { Text } from '@platform/components/shared/text';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
+import { SIZE, type TMaybeUndefined } from '@shinefold/config';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import type { Ref } from 'react';
 

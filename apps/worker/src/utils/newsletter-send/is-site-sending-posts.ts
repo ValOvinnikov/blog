@@ -1,9 +1,12 @@
-import { CAPABILITY } from '@blog/config/constants';
-import { PLAN_REGISTRY, WRITABLE_TENANT_STATUSES } from '@blog/db/constants';
-import { getEmailNewPosts } from '@blog/db/queries/email-config';
-import { getSettingsFeatures } from '@blog/db/queries/settings-features';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isOneOf } from '@blog/utils/primitives';
+import { CAPABILITY } from '@shinefold/config/constants';
+import {
+  PLAN_REGISTRY,
+  WRITABLE_TENANT_STATUSES,
+} from '@shinefold/db/constants';
+import { getEmailNewPosts } from '@shinefold/db/queries/email-config';
+import { getSettingsFeatures } from '@shinefold/db/queries/settings-features';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isOneOf } from '@shinefold/utils/primitives';
 
 export async function isSiteSendingPosts(tenant: TTenant): Promise<boolean> {
   const { id, status, plan } = tenant;

@@ -1,5 +1,5 @@
-import { ALERT_TYPE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
+import { ALERT_TYPE } from '@shinefold/config';
 import type { VariantProps } from 'tailwind-variants';
 
 export const alertVariants = tv({

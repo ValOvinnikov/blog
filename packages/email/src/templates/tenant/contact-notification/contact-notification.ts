@@ -1,8 +1,8 @@
-import type { TTenantEmailBrand } from '@blog/config';
-import { renderEmailAction } from '@blog/email/html/email-action/email-action';
-import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
-import { buildTenantShell } from '@blog/email/html/tenant-shell/tenant-shell';
-import { sanitizeHref } from '@blog/utils';
+import type { TTenantEmailBrand } from '@shinefold/config';
+import { renderEmailAction } from '@shinefold/email/html/email-action/email-action';
+import { escapeHtml } from '@shinefold/email/html/escape-html/escape-html';
+import { buildTenantShell } from '@shinefold/email/html/tenant-shell/tenant-shell';
+import { sanitizeHref } from '@shinefold/utils';
 
 export type TContactNotificationEmailInput = {
   siteName: string;

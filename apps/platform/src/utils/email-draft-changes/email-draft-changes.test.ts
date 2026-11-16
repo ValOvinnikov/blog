@@ -1,4 +1,3 @@
-import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   mockEmailDraft,
@@ -11,6 +10,7 @@ import {
   withLogo,
   type TEmailDraft,
 } from '@platform/utils/email-draft/email-draft';
+import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@shinefold/config';
 
 import {
   countEmailDraftChanges,

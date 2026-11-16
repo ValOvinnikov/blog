@@ -1,5 +1,5 @@
-import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
-import { errorResult, okResult } from '@blog/utils/result';
+import { TENANT_PROVISIONING_STEP } from '@shinefold/db/constants';
+import { errorResult, okResult } from '@shinefold/utils/result';
 import {
   MOCK_REGISTRY_UNREACHABLE,
   MOCK_WORKFLOW_CRASH,

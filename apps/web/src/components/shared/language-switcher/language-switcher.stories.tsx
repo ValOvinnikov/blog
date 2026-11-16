@@ -1,5 +1,5 @@
-import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@blog/config';
-import { HeaderControlShapes } from '@blog/ui/testing/header-control-shapes';
+import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@shinefold/config';
+import { HeaderControlShapes } from '@shinefold/ui/testing/header-control-shapes';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { userEvent, within } from 'storybook/test';
 

@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import {
   CUSTOM_DOMAIN_REFUSAL,
   CUSTOM_DOMAIN_TXT_TYPE,
@@ -35,6 +33,8 @@ import {
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { customDomainTxtName } from '@platform/utils/custom-domain-txt-name/custom-domain-txt-name';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import {

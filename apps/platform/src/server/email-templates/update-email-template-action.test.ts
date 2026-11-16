@@ -1,12 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  EMAIL_TEMPLATE_TYPE,
-  LOCALE_ISO_CODES,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import { EMAIL_TEMPLATES_LOG } from '@platform/constants/email-templates';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
@@ -23,13 +14,22 @@ import {
 } from '@platform/testing/email/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 import {
   updateEmailTemplateAction,
   type TUpdateEmailTemplateInput,
 } from './update-email-template-action';
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     emailTemplates: { upsertEmailTemplate: vi.fn() },
     auditEvents: { insertAuditEvent: vi.fn() },

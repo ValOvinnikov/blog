@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME, isAccentHueAccessible } from '@blog/config';
-import type * as BlogConfig from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
@@ -23,11 +21,13 @@ import {
   MOCK_STAGED_LOGO_BLOB_URL,
   REPLACE_LOGO,
 } from '@platform/testing/site-config/fixtures';
+import type * as BlogConfig from '@shinefold/config';
+import { ACTION_OUTCOME, isAccentHueAccessible } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { useLookOpenRows } from './use-look-open-rows';
 
-vi.mock('@blog/config', async (importOriginal) => ({
+vi.mock('@shinefold/config', async (importOriginal) => ({
   ...(await importOriginal<typeof BlogConfig>()),
   isAccentHueAccessible: vi.fn(() => true),
 }));

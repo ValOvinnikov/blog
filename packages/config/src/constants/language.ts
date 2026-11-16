@@ -1,6 +1,6 @@
-import { isOneOf } from '@blog/utils/primitives';
+import { isOneOf } from '@shinefold/utils/primitives';
 
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const LOCALE_ISO_CODES = {
   EN: 'EN',

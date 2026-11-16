@@ -1,6 +1,6 @@
-import { indexPage } from '@blog/studio/schema-types/documents/pages/index-page/index-page';
-import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
-import { postIndexTemplateSchema } from '@blog/studio/schema-types/documents/templates/post-index/post-index';
+import { indexPage } from '@shinefold/studio/schema-types/documents/pages/index-page/index-page';
+import { PAGE_POST_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/post-index/post-index-type';
+import { postIndexTemplateSchema } from '@shinefold/studio/schema-types/documents/templates/post-index/post-index';
 import { Newspaper } from 'lucide-react';
 
 export const postIndexPageSchema = indexPage({

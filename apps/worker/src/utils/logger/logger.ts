@@ -1,3 +1,3 @@
-import { createLogger } from '@blog/insight';
+import { createLogger } from '@shinefold/insight';
 
 export const logger = createLogger({ service: 'worker' });

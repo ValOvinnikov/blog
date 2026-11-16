@@ -1,6 +1,5 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { FormField } from '@platform/components/shared/form-field';
 import { Text } from '@platform/components/shared/text';
 import { TextInput } from '@platform/components/shared/text-input';
@@ -9,6 +8,7 @@ import {
   type TFieldAppearance,
 } from '@platform/constants/field-appearance';
 import { tv } from '@platform/utils/tv/tv';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

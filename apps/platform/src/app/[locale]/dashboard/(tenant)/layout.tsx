@@ -1,5 +1,3 @@
-import { queries } from '@blog/db';
-import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { BillingStatusNotice } from '@platform/components/features/billing/billing-status-notice';
 import { DashboardBreadcrumb } from '@platform/components/features/layout/dashboard-breadcrumb';
 import { PlatformShell } from '@platform/components/features/layout/platform-shell';
@@ -16,6 +14,8 @@ import { loadPlatformShellChrome } from '@platform/server/layout/load-platform-s
 import { dashboardNavSections } from '@platform/utils/dashboard-nav-sections/dashboard-nav-sections';
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
 import { toTenantSwitcherItems } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
+import { queries } from '@shinefold/db';
+import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { Suspense } from 'react';
 
 type TProps = {

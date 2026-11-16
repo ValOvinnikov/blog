@@ -1,12 +1,12 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { hasLength } from '@blog/utils/primitives';
 import { auth } from '@platform/server/auth/auth';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
 import { toRequestedPath } from '@platform/utils/requested-path/requested-path';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { toServerCookieOptions } from '@platform/utils/server-cookie-options/server-cookie-options';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { hasLength } from '@shinefold/utils/primitives';
 import { NextResponse } from 'next/server';
 
 const ACTIVE_TENANT_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;

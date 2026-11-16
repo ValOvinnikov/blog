@@ -1,23 +1,23 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   DAY_MS,
   INACTIVITY_STAGE,
   SUSPENSION_REASON,
   TENANT_STATUS,
   type TInactivityStage,
-} from '@blog/db/constants';
-import { listSuperadminEmails } from '@blog/db/queries/admins';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
-import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
+} from '@shinefold/db/constants';
+import { listSuperadminEmails } from '@shinefold/db/queries/admins';
+import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
+import { listTenantHosts } from '@shinefold/db/queries/tenant-domains/list-tenant-hosts';
 import {
   listTenantsDueForInactivityStage,
   stampTenantInactivityStage,
   startDeprovisioningRun,
-} from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
-import { sendEmail } from '@blog/email';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { requestTenantCacheInvalidation } from '@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation';
+import { sendEmail } from '@shinefold/email';
 import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import { mockInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
@@ -52,12 +52,12 @@ const MOCK_NO_STAGE_ADVANCED = {
   [INACTIVITY_STAGE.DEPROVISIONING]: 0,
 };
 
-vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/db/queries/admins');
-vi.mock('@blog/db/queries/memberships');
-vi.mock('@blog/db/queries/tenant-domains/list-tenant-hosts');
-vi.mock('@blog/db/utils/tenant-cache/request-tenant-cache-invalidation');
-vi.mock('@blog/email/transport/send-email');
+vi.mock('@shinefold/db/queries/tenants');
+vi.mock('@shinefold/db/queries/admins');
+vi.mock('@shinefold/db/queries/memberships');
+vi.mock('@shinefold/db/queries/tenant-domains/list-tenant-hosts');
+vi.mock('@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation');
+vi.mock('@shinefold/email/transport/send-email');
 vi.mock('@worker/workflows/deprovision-tenant');
 vi.mock('workflow/api');
 

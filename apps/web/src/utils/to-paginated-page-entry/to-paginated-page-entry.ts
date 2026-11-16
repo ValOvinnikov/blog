@@ -1,4 +1,4 @@
-import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@blog/config';
+import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@shinefold/config';
 import { toLocalizedSitemapUrl } from '@web/utils/to-translated-sitemap-entry';
 import type { MetadataRoute } from 'next';
 

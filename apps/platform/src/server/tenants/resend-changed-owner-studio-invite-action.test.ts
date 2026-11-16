@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { OWNER_INVITE_RESEND_PATH } from '@platform/constants/owner-access';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { requireAdmin } from '@platform/server/auth/require-admin';
@@ -10,6 +9,7 @@ import {
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import { resendChangedOwnerStudioInviteAction } from './resend-changed-owner-studio-invite-action';
 
@@ -29,7 +29,7 @@ vi.mock('@platform/server/owner-access/request-owner-access', () => ({
   enqueueOwnerAccessRequest: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     tenants: {

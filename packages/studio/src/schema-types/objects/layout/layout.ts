@@ -1,5 +1,5 @@
-import { containerWidthField } from '@blog/studio/schema-types/fields/container-width-field/container-width-field';
-import { spacingAndDividerFields } from '@blog/studio/schema-types/fields/spacing-and-divider-fields/spacing-and-divider-fields';
+import { containerWidthField } from '@shinefold/studio/schema-types/fields/container-width-field/container-width-field';
+import { spacingAndDividerFields } from '@shinefold/studio/schema-types/fields/spacing-and-divider-fields/spacing-and-divider-fields';
 import { SlidersHorizontal } from 'lucide-react';
 import { defineType } from 'sanity';
 

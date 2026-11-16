@@ -1,9 +1,9 @@
-import { COOKIE_STATEMENT_SLUG } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { COOKIE_STATEMENT_SLUG } from '@shinefold/config/constants';
 import {
   LEGAL_DOCUMENT_COOKIE_STATEMENT_SLUG_ERROR,
   validateLegalDocumentSlug,
-} from '@blog/studio/schema-types/validation/validate-legal-document-slug/validate-legal-document-slug';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/schema-types/validation/validate-legal-document-slug/validate-legal-document-slug';
 import type { SlugValue } from 'sanity';
 
 faker.seed(6506);

@@ -1,5 +1,5 @@
-import { NAV_LINK_STYLE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
+import { NAV_LINK_STYLE } from '@shinefold/config';
 
 export const navLinkStyleGlyphVariants = tv({
   base: [

@@ -1,5 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { queries } from '@blog/db';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import {
@@ -8,13 +6,15 @@ import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 import { getDomainVerificationStatus } from './get-domain-verification-status';
 import { getDomainVerificationStatusAction } from './get-domain-verification-status-action';
 
 vi.mock('@platform/server/auth/require-admin');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenants: { getTenantById: vi.fn() } },
 }));
 

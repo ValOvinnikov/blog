@@ -1,9 +1,9 @@
-import { getDb } from '@blog/db/client';
-import { ADMIN_ROLE } from '@blog/db/constants';
-import { admins } from '@blog/db/schema/admins';
-import { users } from '@blog/db/schema/auth';
-import { decryptOptionalPersonalValue } from '@blog/db/utils/personal-data/personal-data';
-import { isNull } from '@blog/utils/primitives';
+import { getDb } from '@shinefold/db/client';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
+import { admins } from '@shinefold/db/schema/admins';
+import { users } from '@shinefold/db/schema/auth';
+import { decryptOptionalPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
+import { isNull } from '@shinefold/utils/primitives';
 import { eq } from 'drizzle-orm';
 
 export async function listSuperadminEmails(): Promise<string[]> {

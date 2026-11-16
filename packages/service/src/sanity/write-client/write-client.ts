@@ -5,9 +5,9 @@ import {
   hasToken,
   type TTenantSanityContext,
   type TTokenScopedClient,
-} from '@blog/service/sanity/client/client';
-import { createProjectCache } from '@blog/service/sanity/project-cache/project-cache';
-import { env } from '@blog/service/utils/env/env';
+} from '@shinefold/service/sanity/client/client';
+import { createProjectCache } from '@shinefold/service/sanity/project-cache/project-cache';
+import { env } from '@shinefold/service/utils/env/env';
 import { createClient } from 'next-sanity';
 
 import { InvalidTenantSanityContextError } from './invalid-tenant-sanity-context-error';

@@ -1,6 +1,6 @@
-import { getPostRelatedModuleDocument } from '@blog/service/features/modules/post-related/adaptor/module/loader';
-import { getRelatedPosts } from '@blog/service/features/modules/post-related/adaptor/posts/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
+import { getPostRelatedModuleDocument } from '@shinefold/service/features/modules/post-related/adaptor/module/loader';
+import { getRelatedPosts } from '@shinefold/service/features/modules/post-related/adaptor/posts/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
 
 import type { TPostRelatedModule } from './types';
 

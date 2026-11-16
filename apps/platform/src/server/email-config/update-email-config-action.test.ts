@@ -1,12 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { EMAIL_CONFIG_LOG } from '@platform/constants/email-config';
 import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';
@@ -25,13 +16,22 @@ import {
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { MEMBERSHIP_ROLE, type TMembershipRole } from '@shinefold/db/constants';
 
 import {
   updateEmailConfigAction,
   type TUpdateEmailConfigInput,
 } from './update-email-config-action';
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     emailConfig: { upsertEmailConfig: vi.fn() },
     auditEvents: { insertAuditEvent: vi.fn() },

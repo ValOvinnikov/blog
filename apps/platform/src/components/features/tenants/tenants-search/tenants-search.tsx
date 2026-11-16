@@ -1,12 +1,12 @@
 'use client';
 
-import { ICONS, SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { FormField } from '@platform/components/shared/form-field';
 import { Icon } from '@platform/components/shared/icon';
 import { TextInput } from '@platform/components/shared/text-input';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
+import { ICONS, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useRef, type FormEvent } from 'react';
 

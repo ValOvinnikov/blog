@@ -1,4 +1,3 @@
-import { ALERT_TYPE } from '@blog/config';
 import { SignInAppCard } from '@platform/components/features/sign-in-apps/sign-in-app-card';
 import { SignInAppReadOnlyCard } from '@platform/components/features/sign-in-apps/sign-in-app-read-only-card';
 import { SignInAppsFreeCard } from '@platform/components/features/sign-in-apps/sign-in-apps-free-card';
@@ -13,6 +12,7 @@ import {
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { loadSignInApps } from '@platform/server/sign-in-apps/load-sign-in-apps';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import { ALERT_TYPE } from '@shinefold/config';
 import { getTranslations } from 'next-intl/server';
 
 import { signInAppsPageContentVariants } from './sign-in-apps-page-content-variants';

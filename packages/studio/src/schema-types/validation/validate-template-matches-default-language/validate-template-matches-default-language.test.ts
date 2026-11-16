@@ -1,13 +1,13 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
-import { validateTemplateMatchesDefaultLanguage } from '@blog/studio/schema-types/validation/validate-template-matches-default-language/validate-template-matches-default-language';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { LOCALE_LABEL } from '@shinefold/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { validateTemplateMatchesDefaultLanguage } from '@shinefold/studio/schema-types/validation/validate-template-matches-default-language/validate-template-matches-default-language';
 import {
   mockLandingPage,
   mockReference,
   mockTranslationMetadata,
-} from '@blog/studio/testing/mock-documents';
-import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/mock-documents';
+import { mockGroqValidationContext } from '@shinefold/studio/testing/mock-validation-context';
 import { getDraftId, type SanityDocument } from 'sanity';
 
 faker.seed(6034);

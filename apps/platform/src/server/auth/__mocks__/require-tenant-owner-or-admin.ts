@@ -1,4 +1,4 @@
-import type { TAdmin } from '@blog/db/schema/admins';
+import type { TAdmin } from '@shinefold/db/schema/admins';
 
 export const requireTenantOwnerOrAdmin = vi.fn<
   (

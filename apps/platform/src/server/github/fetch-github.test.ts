@@ -1,5 +1,3 @@
-import { HTTP_STATUS } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import {
   GITHUB_FAILURE,
@@ -12,6 +10,8 @@ import {
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_STATUS } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { z } from 'zod';
 
 import { fetchGitHub, fetchGitHubJson, recoverNotFound } from './fetch-github';

@@ -1,6 +1,6 @@
-import { getSiteSettings } from '@blog/service/features/global/site-settings/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getSiteSettings } from '@shinefold/service/features/global/site-settings/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createSiteSettingsService() {
   return {

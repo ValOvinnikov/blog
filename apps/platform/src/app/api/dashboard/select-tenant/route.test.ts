@@ -1,5 +1,3 @@
-import { HTTP_STATUS, type TMaybeNull } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
@@ -13,6 +11,8 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { HTTP_STATUS, type TMaybeNull } from '@shinefold/config';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 import type { Session } from 'next-auth';
 
 import { GET } from './route';
@@ -28,7 +28,7 @@ const { getMembershipMock, getAdminByUserIdMock, listTenantsByIdsMock } =
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: { getMembership: getMembershipMock },

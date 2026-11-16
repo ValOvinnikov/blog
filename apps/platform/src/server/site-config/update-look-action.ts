@@ -1,16 +1,5 @@
 'use server';
 
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  type TActionResult,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { SITE_CONFIG_SAVED_AT } from '@blog/db/constants';
-import { pickEntitledLook } from '@blog/db/utils/effective-look/effective-look';
-import { hasArrayGotItems } from '@blog/utils/primitives';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -29,6 +18,17 @@ import {
 } from '@platform/utils/plan-refusal/plan-refusal';
 import { listRefusedLookFields } from '@platform/utils/refused-look-fields/refused-look-fields';
 import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TActionResult,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { SITE_CONFIG_SAVED_AT } from '@shinefold/db/constants';
+import { pickEntitledLook } from '@shinefold/db/utils/effective-look/effective-look';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 export type TUpdateLookResult =
   | TActionResult<typeof ACTION_OUTCOME.SERVER_ERROR, keyof TUpdateLookInput>

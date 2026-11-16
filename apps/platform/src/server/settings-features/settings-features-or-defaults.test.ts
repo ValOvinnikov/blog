@@ -1,7 +1,7 @@
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
 import { mockSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { featureDefaultsToValues } from '@platform/utils/settings-features-fields/settings-features-fields';
+import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
 
 import { getSettingsFeaturesOrDefaults } from './settings-features-or-defaults';
 
@@ -9,7 +9,7 @@ const { getSettingsFeaturesAndPresetMock } = vi.hoisted(() => ({
   getSettingsFeaturesAndPresetMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     settingsFeatures: {
       getSettingsFeaturesAndPreset: getSettingsFeaturesAndPresetMock,

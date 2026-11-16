@@ -1,4 +1,4 @@
-import { createMockFaker } from '@blog/db/testing/mock-faker';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
 
 const sanityManagementClientFaker = createMockFaker(7741);
 

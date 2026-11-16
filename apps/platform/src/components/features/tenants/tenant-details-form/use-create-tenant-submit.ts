@@ -1,19 +1,19 @@
 'use client';
 
 import {
-  isOutcomeInvalid,
-  isOutcomeRefused,
-  isOutcomeServerError,
-  type TFieldErrors,
-  type TMaybeNull,
-} from '@blog/config';
-import {
   createTenantAction,
   type TOwnerInviteConfirmation,
 } from '@platform/server/tenants/create-tenant-action';
 import type { TCreateTenantInput } from '@platform/server/tenants/create-tenant-input';
 import type { TTenantDetailsFieldError } from '@platform/server/tenants/tenant-field-error';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import {
+  isOutcomeInvalid,
+  isOutcomeRefused,
+  isOutcomeServerError,
+  type TFieldErrors,
+  type TMaybeNull,
+} from '@shinefold/config';
 import { useState, useTransition } from 'react';
 
 type TCreateTenantValues = Omit<TCreateTenantInput, 'confirmOwnerInviteToken'>;

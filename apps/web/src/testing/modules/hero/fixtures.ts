@@ -1,4 +1,4 @@
-import type { ISanityImage } from '@blog/config';
+import type { ISanityImage } from '@shinefold/config';
 
 export const mockSanityImage = (
   overrides: Partial<ISanityImage> = {},

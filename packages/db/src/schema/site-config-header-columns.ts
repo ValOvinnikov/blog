@@ -5,7 +5,7 @@ import {
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
   NAV_LINK_STYLE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import {
   headerBarStyleEnum,

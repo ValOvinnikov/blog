@@ -1,4 +1,3 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import {
   DEVICE_FRAME_LIMIT,
   DEVICE_FRAME_VIEWPORT_ATTRIBUTE,
@@ -9,6 +8,7 @@ import type { TPreviewDevice } from '@platform/constants/preview';
 import { SAVE_BAR_HEIGHT_PROPERTY } from '@platform/constants/settings-form';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
 import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import { useEffect, useRef, useState } from 'react';
 
 const VIEWPORT_SELECTOR = `[${DEVICE_FRAME_VIEWPORT_ATTRIBUTE}]`;

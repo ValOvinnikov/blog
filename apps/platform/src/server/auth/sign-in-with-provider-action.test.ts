@@ -1,9 +1,9 @@
-import type * as oauthProviders from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { OAUTH_PROVIDER_IDS } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { signIn } from '@platform/server/auth/auth';
 import { setSignupTermsCookie } from '@platform/server/auth/set-signup-terms-cookie';
 import { MOCK_OFF_ORIGIN_URL } from '@platform/testing/auth/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { OAUTH_PROVIDER_IDS } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import type * as oauthProviders from '@shinefold/auth/utils/oauth-providers/oauth-providers';
 
 import { signInWithProviderAction } from './sign-in-with-provider-action';
 
@@ -14,7 +14,7 @@ vi.mock('@platform/server/auth/set-signup-terms-cookie', () => ({
 }));
 
 vi.mock(
-  '@blog/auth/utils/oauth-providers/oauth-providers',
+  '@shinefold/auth/utils/oauth-providers/oauth-providers',
   async (importActual) => {
     const actual = await importActual<typeof oauthProviders>();
     return {

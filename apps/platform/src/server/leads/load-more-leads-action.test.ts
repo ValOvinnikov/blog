@@ -1,10 +1,10 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { LEAD_LOG } from '@platform/constants/lead';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { mockLead } from '@platform/testing/leads/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import { loadMoreLeadsAction } from './load-more-leads-action';
 
@@ -16,7 +16,7 @@ const { listLeadsByCursorMock } = vi.hoisted(() => ({
 
 vi.mock('@platform/server/auth/require-tenant-membership');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { leads: { listLeadsByCursor: listLeadsByCursorMock } },
 }));
 

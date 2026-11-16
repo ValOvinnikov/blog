@@ -1,5 +1,5 @@
-import type { TBrandVariant } from '@blog/config/constants';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
+import type { TBrandVariant } from '@shinefold/config/constants';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 
 export const limitPreview = {
   select: {

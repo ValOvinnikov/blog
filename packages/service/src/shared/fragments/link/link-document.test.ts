@@ -1,20 +1,20 @@
-import { LINK_TYPE } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { q } from '@blog/service/sanity/query/query';
+import { faker } from '@faker-js/faker';
+import { LINK_TYPE } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { q } from '@shinefold/service/sanity/query/query';
 import {
   MOCK_LINK_LABEL,
   mockReference,
-} from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
+} from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { mockLocalizedStrings } from '@shinefold/service/testing/shared/localized';
 import {
   MOCK_ABOUT_EN_PAGE_ID,
   MOCK_ABOUT_NL_PAGE_ID,
   MOCK_ABOUT_NL_SLUG,
   MOCK_ABOUT_SLUG,
   MOCK_ABOUT_TRANSLATION_METADATA,
-} from '@blog/service/testing/shared/translated-pages-dataset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/translated-pages-dataset';
 
 import { linkDocumentFragment } from './link-document';
 

@@ -3,15 +3,15 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   SIZE,
-} from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { IconButton } from '@blog/ui/components/atoms/icon-button';
+} from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '@blog/ui/lib/react';
+} from '@shinefold/ui/lib/react';
 import { type ElementType, Fragment } from 'react';
 
 import { PrimaryNavigationActions } from './components/actions/primary-navigation-actions';

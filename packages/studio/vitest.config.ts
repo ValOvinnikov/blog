@@ -1,6 +1,8 @@
 import { fileURLToPath } from 'node:url';
 
-import preset, { RESET_FILE_STATE_SETUP } from '@blog/vitest-config/preset';
+import preset, {
+  RESET_FILE_STATE_SETUP,
+} from '@shinefold/vitest-config/preset';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 // Split into two projects because schema tests (src/**) always import
@@ -24,11 +26,11 @@ export default mergeConfig(
     resolve: {
       alias: [
         {
-          find: /^@blog\/studio\//,
+          find: /^@shinefold\/studio\//,
           replacement: `${fileURLToPath(new URL('./src', import.meta.url))}/`,
         },
         {
-          find: /^@blog\/config\//,
+          find: /^@shinefold\/config\//,
           replacement: `${fileURLToPath(new URL('../../packages/config/src', import.meta.url))}/`,
         },
       ],

@@ -10,12 +10,12 @@ import type {
  * prop. `C` is the element/component type; `OwnProps` are the component's own
  * props — they win over, and are stripped from, the inherited element props.
  *
- * Not re-exported from the package root (`@blog/config`) so the framework-
- * agnostic barrel stays React-free and `@blog/service` never pulls in React
+ * Not re-exported from the package root (`@shinefold/config`) so the framework-
+ * agnostic barrel stays React-free and `@shinefold/service` never pulls in React
  * types. Import from the subpath instead:
  *
  * ```ts
- * import type { TPolymorphicProps } from '@blog/config/react';
+ * import type { TPolymorphicProps } from '@shinefold/config/react';
  * ```
  */
 export type TPolymorphicProps<
@@ -33,7 +33,7 @@ export type TPolymorphicProps<
  * allows any intrinsic element to structurally match an object type that only
  * adds properties, so it would silently accept `div`, `span`, etc.
  *
- * Use this whenever a `@blog/ui` component renders an anchor — never hardcode
+ * Use this whenever a `@shinefold/ui` component renders an anchor — never hardcode
  * a bare `<a>`. Default the prop to `'a'` so the library stays framework-free,
  * and let `apps/web` pass its router's `Link` for client-side navigation.
  */

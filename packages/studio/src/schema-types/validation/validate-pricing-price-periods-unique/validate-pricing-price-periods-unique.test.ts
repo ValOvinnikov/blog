@@ -1,5 +1,5 @@
-import { PRICE_PERIOD } from '@blog/config/constants';
-import { validatePricingPricePeriodsUnique } from '@blog/studio/schema-types/validation/validate-pricing-price-periods-unique/validate-pricing-price-periods-unique';
+import { PRICE_PERIOD } from '@shinefold/config/constants';
+import { validatePricingPricePeriodsUnique } from '@shinefold/studio/schema-types/validation/validate-pricing-price-periods-unique/validate-pricing-price-periods-unique';
 
 const PERIOD_DUPLICATE_MESSAGE =
   'Each price period can only be used once per tier.';

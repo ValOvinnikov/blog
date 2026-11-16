@@ -1,13 +1,13 @@
-import { ADMIN_ROLE, GRANTED_VIA } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { insertTestUser } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
+import { ADMIN_ROLE, GRANTED_VIA } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { insertTestUser } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
 import { createAdmin } from './create-admin';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(602205);
 

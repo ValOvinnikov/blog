@@ -1,13 +1,13 @@
-import type { IWithClassName } from '@blog/config/types';
-import {
-  TENANT_PROVISIONING_STEP_STATUS,
-  type TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
 import { StepIndicator } from '@platform/components/shared/step-indicator';
 import {
   STEP_INDICATOR_STATE,
   type TStepIndicatorState,
 } from '@platform/constants/step-indicator';
+import type { IWithClassName } from '@shinefold/config/types';
+import {
+  TENANT_PROVISIONING_STEP_STATUS,
+  type TTenantProvisioningStepStatus,
+} from '@shinefold/db/constants';
 import type { ReactNode } from 'react';
 
 import { stepListVariants } from './step-list-variants';

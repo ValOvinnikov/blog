@@ -1,16 +1,16 @@
-import { mockRun } from '@blog/service/testing/mock-run-query';
+import { faker } from '@faker-js/faker';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_MISSING_ID,
   MOCK_POST_ID,
   mockValidationError,
-} from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getPublishedPostBody } from './loader';
 import { publishedPostBodyQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6015101);
 

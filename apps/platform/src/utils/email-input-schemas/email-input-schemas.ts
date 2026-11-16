@@ -3,9 +3,9 @@ import {
   FOOTER_ADDRESS_MAX,
   SENDER_NAME_MAX,
   SUBJECT_MAX,
-} from '@blog/config';
-import { sanitizeHref } from '@blog/email/html';
-import { isNull, isString } from '@blog/utils/primitives';
+} from '@shinefold/config';
+import { sanitizeHref } from '@shinefold/email/html';
+import { isNull, isString } from '@shinefold/utils/primitives';
 import { z } from 'zod';
 
 // Each lets a display name pose as, or split off, a second address in the From header.
@@ -24,7 +24,7 @@ type TLooseMarkDef = { _type?: unknown; href?: unknown };
 type TLooseBlock = { markDefs?: unknown };
 
 // A Server Action is callable whatever the client renders, so every `link`
-// href is re-checked against the allowlist `@blog/email` renders with.
+// href is re-checked against the allowlist `@shinefold/email` renders with.
 const hasOnlySafeLinkHrefs = (
   body: z.infer<typeof portableTextBlockSchema>[] | null,
 ): boolean => {

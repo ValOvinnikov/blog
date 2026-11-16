@@ -1,4 +1,3 @@
-import { FONT_CHOICE, SIZE } from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -8,6 +7,7 @@ import {
   resizeObservedElements,
   stubResizeObserver,
 } from '@platform/testing/resize-observer';
+import { FONT_CHOICE, SIZE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useId, useState } from 'react';
 import type { Mock } from 'vitest';

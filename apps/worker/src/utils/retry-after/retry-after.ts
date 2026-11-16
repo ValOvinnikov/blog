@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   RETRY_AFTER_HEADER,
   RETRY_AFTER_SECOND_MS,

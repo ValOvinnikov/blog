@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   CARD_STYLE,
   DENSITY,
@@ -5,17 +6,17 @@ import {
   LOCALE_ISO_CODES,
   POST_SOURCE,
   RADIUS_SCALE,
-} from '@blog/config/constants';
-import { MOCK_TOPIC_ID } from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/config/constants';
+import { MOCK_TOPIC_ID } from '@shinefold/service/testing/entities/fixtures';
 import {
   MOCK_DUTCH_MODULE_HEADING,
   MOCK_ENGLISH_MODULE_HEADING,
   mockModuleDocument,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawPostFeaturedModule } from '@blog/service/testing/modules/post-featured/fixtures';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawPostFeaturedModule } from '@shinefold/service/testing/modules/post-featured/fixtures';
+import { mockReference } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { mockLocalizedStrings } from '@shinefold/service/testing/shared/localized';
 import {
   MOCK_DESIGN_EN_POST_ID,
   MOCK_DESIGN_NL_POST_ID,
@@ -25,8 +26,7 @@ import {
   MOCK_SCHEDULED_NL_POST_ID,
   MOCK_SOLO_NL_POST_ID,
   toIds,
-} from '@blog/service/testing/shared/translated-posts-dataset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { postFeaturedModuleQuery } from './query';
 

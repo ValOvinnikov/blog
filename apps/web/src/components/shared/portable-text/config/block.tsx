@@ -1,6 +1,6 @@
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { QuoteBlock } from '@blog/ui/components/atoms/quote-block';
 import type { PortableTextReactComponents } from '@portabletext/react';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { QuoteBlock } from '@shinefold/ui/components/atoms/quote-block';
 
 import { portableTextVariants } from '../portable-text-variants';
 

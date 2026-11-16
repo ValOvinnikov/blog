@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { SITE_MESSAGES } from '@shinefold/config';
 import { useConsentPreferences } from '@web/context/consent-preferences-provider';
 
 export const PREFERENCES_OPEN_TEXT = 'Preferences open';

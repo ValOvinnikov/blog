@@ -1,16 +1,16 @@
-import type { ArticleText } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import type { ArticleText } from '@shinefold/config';
 import {
   LOCALE_ISO_CODES,
   PORTABLE_TEXT_BLOCK_TYPE,
-} from '@blog/config/constants';
-import { q } from '@blog/service/sanity/query/query';
+} from '@shinefold/config/constants';
+import { q } from '@shinefold/service/sanity/query/query';
 import {
   MOCK_LINK_LABEL,
   mockReference,
-} from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { mockLocalizedLinkDocument } from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { mockLocalizedLinkDocument } from '@shinefold/service/testing/shared/localized';
 
 import { portableTextBodyItemFragment } from './portable-text-body-item';
 

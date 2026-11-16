@@ -1,4 +1,4 @@
-import type { IWithChildren } from '@blog/config/react';
+import type { IWithChildren } from '@shinefold/config/react';
 import type { SVGProps } from 'react';
 
 const WIDTH = 40;

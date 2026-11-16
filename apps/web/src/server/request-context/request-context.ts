@@ -1,7 +1,7 @@
-import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
-import type { TTenantSanityContext } from '@blog/service';
+import type { TLocaleIsoCode, TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import type { TTenantSanityContext } from '@shinefold/service';
 import { REQUEST_CONTEXT_LOG } from '@web/constants/request-context';
 import { routing } from '@web/i18n/routing';
 import { hasDraftPreviewToken } from '@web/server/draft-preview/has-draft-preview-token/has-draft-preview-token';

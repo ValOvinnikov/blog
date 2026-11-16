@@ -1,9 +1,13 @@
-import { ACTION_OUTCOME, HTTP_STATUS, type TActionResult } from '@blog/config';
-import { isNull } from '@blog/utils/primitives';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  HTTP_STATUS,
+  type TActionResult,
+} from '@shinefold/config';
+import { isNull } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { enqueueProvisioning } from './enqueue-provisioning';
 

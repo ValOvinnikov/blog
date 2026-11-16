@@ -1,5 +1,5 @@
-import { EMBED_ORIGINS } from '@blog/config';
-import { buildFramingHeaders } from '@blog/next-config/security-headers';
+import { EMBED_ORIGINS } from '@shinefold/config';
+import { buildFramingHeaders } from '@shinefold/next-config/security-headers';
 import {
   buildContentSecurityPolicy,
   FRAME_ANCESTORS_NONE,

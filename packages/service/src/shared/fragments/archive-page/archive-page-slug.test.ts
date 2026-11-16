@@ -1,15 +1,15 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { q } from '@blog/service/sanity/query/query';
-import { tagFragment } from '@blog/service/shared/fragments/tag/tag';
-import { topicFragment } from '@blog/service/shared/fragments/topic/topic';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { q } from '@shinefold/service/sanity/query/query';
+import { tagFragment } from '@shinefold/service/shared/fragments/tag/tag';
+import { topicFragment } from '@shinefold/service/shared/fragments/topic/topic';
 import {
   MOCK_TAG_SLUG,
   MOCK_TOPIC_SLUG,
-} from '@blog/service/testing/entities/fixtures';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/entities/fixtures';
+import { mockReference } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { mockLocalizedStrings } from '@shinefold/service/testing/shared/localized';
 
 faker.seed(6019);
 

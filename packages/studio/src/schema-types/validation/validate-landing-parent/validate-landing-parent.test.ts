@@ -1,17 +1,17 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   LANDING_PARENT_CYCLE_ERROR,
   LANDING_PARENT_DEPTH_ERROR,
   LANDING_PARENT_LANGUAGE_ERROR,
   validateLandingParent,
-} from '@blog/studio/schema-types/validation/validate-landing-parent/validate-landing-parent';
+} from '@shinefold/studio/schema-types/validation/validate-landing-parent/validate-landing-parent';
 import {
   mockLandingPage,
   mockReference,
-} from '@blog/studio/testing/mock-documents';
-import { MOCK_FETCH_ERROR } from '@blog/studio/testing/mock-fetch-error';
-import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/mock-documents';
+import { MOCK_FETCH_ERROR } from '@shinefold/studio/testing/mock-fetch-error';
+import { mockGroqValidationContext } from '@shinefold/studio/testing/mock-validation-context';
 import { getDraftId } from 'sanity';
 
 faker.seed(6020);

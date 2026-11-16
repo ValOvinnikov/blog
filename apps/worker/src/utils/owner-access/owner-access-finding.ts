@@ -3,16 +3,16 @@ import {
   FINDING_SEVERITY,
   FINDING_SOURCE,
   FINDING_STATUS,
-} from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
+} from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   getFindingDetails,
   listFindingsForTenant,
   openFinding,
   resolveFinding,
-} from '@blog/db/queries/findings';
-import type { TFindingSummary } from '@blog/db/schema/findings';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/queries/findings';
+import type { TFindingSummary } from '@shinefold/db/schema/findings';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   OWNER_ACCESS_FINDING_AFTER_MS,
   OWNER_ACCESS_FINDING_IDENTIFIER,

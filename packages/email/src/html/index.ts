@@ -10,7 +10,7 @@ export {
   type TBuildOperatorShellInput,
 } from './operator-shell/operator-shell';
 export { PLATFORM_EMAIL_BRAND_NAME } from './platform-email-brand/platform-email-brand';
-export { sanitizeHref } from '@blog/utils';
+export { sanitizeHref } from '@shinefold/utils';
 export {
   buildTenantShell,
   type TBuildTenantShellInput,

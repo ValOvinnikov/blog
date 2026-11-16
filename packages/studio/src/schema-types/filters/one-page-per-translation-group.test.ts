@@ -1,12 +1,12 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { onePagePerTranslationGroupFilter } from '@blog/studio/schema-types/filters/one-page-per-translation-group';
-import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { onePagePerTranslationGroupFilter } from '@shinefold/studio/schema-types/filters/one-page-per-translation-group';
+import { setDefaultLanguage } from '@shinefold/studio/schema-types/validation/default-language/default-language';
 import {
   mockLandingPage,
   mockTranslationMetadata,
-} from '@blog/studio/testing/mock-documents';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/mock-documents';
 import { evaluate, parse } from 'groq-js';
 import { getDraftId } from 'sanity';
 

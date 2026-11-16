@@ -1,5 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import {
   STRIPE_SUBSCRIPTION_STATUS,
   BILLING_INTERVAL,
@@ -22,6 +20,8 @@ import {
   mockStripeSubscription,
   type TMockStripeSubscription,
 } from '@platform/testing/billing/stripe-subscription';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { STRIPE_PRICE_LOOKUP_KEY } from '@shinefold/db/constants';
 
 import { loadSubscriptionPlan } from './load-subscription-plan';
 import { fromStripeTime } from './stripe-time';

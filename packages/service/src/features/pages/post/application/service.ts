@@ -1,8 +1,8 @@
-import { getPost } from '@blog/service/features/pages/post/adaptor/detail-page/loader';
-import { getPostParams } from '@blog/service/features/pages/post/adaptor/detail-page-params/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import type { TPageQueryPageParams } from '@blog/service/shared/types/page/page-query-page-params';
-import { safeAsync } from '@blog/utils';
+import { getPost } from '@shinefold/service/features/pages/post/adaptor/detail-page/loader';
+import { getPostParams } from '@shinefold/service/features/pages/post/adaptor/detail-page-params/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import type { TPageQueryPageParams } from '@shinefold/service/shared/types/page/page-query-page-params';
+import { safeAsync } from '@shinefold/utils';
 
 export function createPostService() {
   return {

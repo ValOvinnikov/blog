@@ -1,11 +1,15 @@
-import { HTTP_METHOD, HTTP_STATUS, SANITY_PROJECT_ROLE } from '@blog/config';
+import {
+  HTTP_METHOD,
+  HTTP_STATUS,
+  SANITY_PROJECT_ROLE,
+} from '@shinefold/config';
 import {
   emptyResponse,
   firstFetchCall,
   jsonResponse,
   textResponse,
   useFetchFake,
-} from '@blog/db/testing/sanity-management-client/fetch-fake';
+} from '@shinefold/db/testing/sanity-management-client/fetch-fake';
 import {
   MOCK_SANITY_ERROR_BODY,
   MOCK_SANITY_EXPECTED_URL,
@@ -13,7 +17,7 @@ import {
   MOCK_SANITY_INVITE_ID,
   MOCK_SANITY_PROJECT_USER_ID,
   mockSanityProjectInput,
-} from '@blog/db/testing/sanity-management-client/fixtures';
+} from '@shinefold/db/testing/sanity-management-client/fixtures';
 
 import {
   createSanityProjectInvite,

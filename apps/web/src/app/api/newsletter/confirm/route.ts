@@ -2,8 +2,8 @@ import {
   SUBSCRIBER_OUTCOME,
   NEWSLETTER_RESULT,
   TENANT_WRITE_REFUSAL,
-} from '@blog/config';
-import { queries } from '@blog/db';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { redirectToNewsletterResult } from '@web/server/newsletter/newsletter-result-redirect/newsletter-result-redirect';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';

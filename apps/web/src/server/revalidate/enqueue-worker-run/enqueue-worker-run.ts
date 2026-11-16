@@ -1,5 +1,5 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
-import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
+import { buildEnqueueHeaders } from '@shinefold/utils/enqueue-signature';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 

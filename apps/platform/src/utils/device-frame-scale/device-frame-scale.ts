@@ -1,5 +1,3 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import {
   DEVICE_FRAME_FIT,
   DEVICE_FRAME_LIMIT,
@@ -12,6 +10,8 @@ import {
   PREVIEW_DEVICE_WIDTH,
   type TPreviewDevice,
 } from '@platform/constants/preview';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 export type TDeviceFrameFit = {
   mode: TDeviceFrameFitMode;

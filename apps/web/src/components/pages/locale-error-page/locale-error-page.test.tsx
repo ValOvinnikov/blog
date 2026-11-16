@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@blog/config';
+import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import {

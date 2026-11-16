@@ -1,8 +1,8 @@
 'use client';
 
-import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import type { TMaybeNull } from '@blog/config';
-import { Heading } from '@blog/ui/components/atoms/heading';
+import type { TOAuthProviderId } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import type { TMaybeNull } from '@shinefold/config';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { accountPageVariants } from '@web/components/pages/account-page/account-page-variants';
 import { ReaderSignInPanel } from '@web/components/shared/reader-sign-in-panel';
 import { useId, useRef } from 'react';

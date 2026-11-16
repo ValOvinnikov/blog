@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { HTTP_STATUS } from '@shinefold/config/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_TENANT_HOST,
@@ -22,7 +22,7 @@ vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
   resolveTenantId: resolveTenantIdMock,
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { account: { exportAccountData: exportAccountDataMock } },
 }));
 

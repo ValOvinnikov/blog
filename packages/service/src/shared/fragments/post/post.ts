@@ -1,21 +1,21 @@
-import type { TPagePostType } from '@blog/config';
-import { q } from '@blog/service/sanity/query/query';
+import type { TPagePostType } from '@shinefold/config';
+import { q } from '@shinefold/service/sanity/query/query';
 import {
   WORD_COUNT_EXPRESSION,
   wordCountParser,
-} from '@blog/service/shared/expressions/post/word-count';
-import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
-import { sanityImageOptionalFragment } from '@blog/service/shared/fragments/image/image';
-import { moduleFragment } from '@blog/service/shared/fragments/module/module';
+} from '@shinefold/service/shared/expressions/post/word-count';
+import { pageHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/page-heading-block';
+import { sanityImageOptionalFragment } from '@shinefold/service/shared/fragments/image/image';
+import { moduleFragment } from '@shinefold/service/shared/fragments/module/module';
 import {
   personCardFragment,
   personDetailFragment,
-} from '@blog/service/shared/fragments/person/person';
-import { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text/portable-text-body-item';
-import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
-import { tagFragment } from '@blog/service/shared/fragments/tag/tag';
-import { topicFragment } from '@blog/service/shared/fragments/topic/topic';
-import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
+} from '@shinefold/service/shared/fragments/person/person';
+import { portableTextBodyItemFragment } from '@shinefold/service/shared/fragments/portable-text/portable-text-body-item';
+import { seoFragment } from '@shinefold/service/shared/fragments/seo/seo';
+import { tagFragment } from '@shinefold/service/shared/fragments/tag/tag';
+import { topicFragment } from '@shinefold/service/shared/fragments/topic/topic';
+import type { TRawModule } from '@shinefold/service/shared/transformers/module/to-module';
 
 const postTakeawaysFragment = q
   .fragmentForType<'postTakeaways'>()

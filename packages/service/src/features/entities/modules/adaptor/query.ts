@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query/query';
+import { q } from '@shinefold/service/sanity/query/query';
 import { z } from 'zod';
 
 // `match` tokenizes on `_`, so `_type match "module_*"` would also accept a type like `blog_module`.

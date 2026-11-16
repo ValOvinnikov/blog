@@ -5,8 +5,8 @@ import {
   deleteLeadsPastRetention,
   deletePendingSubscribersPastRetention,
   deleteResolvedFindingsPastRetention,
-} from '@blog/db/queries/retention';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/queries/retention';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import {
   RETENTION_DELETE_BATCH_SIZE,
   RETENTION_KIND,

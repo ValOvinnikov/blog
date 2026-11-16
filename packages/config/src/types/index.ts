@@ -1,4 +1,7 @@
-import type { TLocaleIsoCode, TSortDirection } from '@blog/config/constants';
+import type {
+  TLocaleIsoCode,
+  TSortDirection,
+} from '@shinefold/config/constants';
 
 export * from './action-result';
 export * from './contrast-result';

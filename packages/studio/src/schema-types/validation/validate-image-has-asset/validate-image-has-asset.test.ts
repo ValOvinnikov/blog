@@ -1,8 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { validateImageHasAsset } from '@blog/studio/schema-types/validation/validate-image-has-asset/validate-image-has-asset';
-import { mockReference } from '@blog/studio/testing/mock-documents';
-import { MOCK_VALIDATION_MESSAGE } from '@blog/studio/testing/mock-validation-context';
 import { faker } from '@faker-js/faker';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { validateImageHasAsset } from '@shinefold/studio/schema-types/validation/validate-image-has-asset/validate-image-has-asset';
+import { mockReference } from '@shinefold/studio/testing/mock-documents';
+import { MOCK_VALIDATION_MESSAGE } from '@shinefold/studio/testing/mock-validation-context';
 
 faker.seed(6019);
 

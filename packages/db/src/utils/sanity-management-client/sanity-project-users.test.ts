@@ -1,11 +1,16 @@
-import { HTTP_METHOD, HTTP_STATUS, SANITY_PROJECT_ROLE } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import {
+  HTTP_METHOD,
+  HTTP_STATUS,
+  SANITY_PROJECT_ROLE,
+} from '@shinefold/config';
 import {
   firstFetchCall,
   jsonResponse,
   nthFetchCall,
   textResponse,
   useFetchFake,
-} from '@blog/db/testing/sanity-management-client/fetch-fake';
+} from '@shinefold/db/testing/sanity-management-client/fetch-fake';
 import {
   MOCK_SANITY_ERROR_BODY,
   MOCK_SANITY_EXPECTED_URL,
@@ -15,8 +20,7 @@ import {
   MOCK_SANITY_TOKEN,
   MOCK_SANITY_USER_ID,
   mockSanityProjectInput,
-} from '@blog/db/testing/sanity-management-client/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/sanity-management-client/fixtures';
 
 import {
   assignSanityProjectUserRole,

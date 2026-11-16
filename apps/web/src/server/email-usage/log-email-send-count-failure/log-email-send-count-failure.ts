@@ -1,4 +1,4 @@
-import type { IEmailSendCountFailure } from '@blog/config/types';
+import type { IEmailSendCountFailure } from '@shinefold/config/types';
 import { EMAIL_USAGE_LOG } from '@web/constants/email-usage';
 import { logger } from '@web/utils/logger/logger';
 

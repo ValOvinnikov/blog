@@ -1,4 +1,4 @@
-import type { TTimelineItem } from '@blog/service';
+import type { TTimelineItem } from '@shinefold/service';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 export const mockTimelineItem = (

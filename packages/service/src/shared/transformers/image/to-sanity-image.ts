@@ -4,8 +4,8 @@ import type {
   ISanityImageDimensions,
   ISanityImageHotspot,
   TMaybeUndefined,
-} from '@blog/config';
-import type { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+} from '@shinefold/config';
+import type { sanityImageFragment } from '@shinefold/service/shared/fragments/image/image';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawSanityImage = InferFragmentType<typeof sanityImageFragment>;

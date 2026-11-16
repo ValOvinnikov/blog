@@ -1,15 +1,15 @@
-import { TIMELINE_MARKER_STYLE } from '@blog/config/constants';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { localizedParagraphTextField } from '@blog/studio/schema-types/fields/localized-paragraph-text-field/localized-paragraph-text-field';
-import type { TTimelineDocument } from '@blog/studio/schema-types/modules/timeline/timeline-document';
+import { TIMELINE_MARKER_STYLE } from '@shinefold/config/constants';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { localizedParagraphTextField } from '@shinefold/studio/schema-types/fields/localized-paragraph-text-field/localized-paragraph-text-field';
+import type { TTimelineDocument } from '@shinefold/studio/schema-types/modules/timeline/timeline-document';
 import {
   toPlainText,
   type TPlainTextBlock,
-} from '@blog/studio/schema-types/portable-text/to-plain-text/to-plain-text';
-import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
-import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
-import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
-import { validateTimelineMarkerRequired } from '@blog/studio/schema-types/validation/validate-timeline-marker-required/validate-timeline-marker-required';
+} from '@shinefold/studio/schema-types/portable-text/to-plain-text/to-plain-text';
+import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
+import { validateDefaultLanguageFilled } from '@shinefold/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { validateLocalizedMaxLength } from '@shinefold/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
+import { validateTimelineMarkerRequired } from '@shinefold/studio/schema-types/validation/validate-timeline-marker-required/validate-timeline-marker-required';
 import { CircleDot } from 'lucide-react';
 import { defineType } from 'sanity';
 

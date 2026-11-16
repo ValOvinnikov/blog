@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { GRACE_EMAIL, INACTIVITY_STAGE } from '@blog/db/constants';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { GRACE_EMAIL, INACTIVITY_STAGE } from '@shinefold/db/constants';
 import {
   DOWNGRADE_GRACE_LOG,
   DOWNGRADE_GRACE_STEP,

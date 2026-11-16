@@ -24,7 +24,7 @@ const { removeStripePriceMock } = vi.hoisted(() => ({
   removeStripePriceMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { stripeCatalogue: { removeStripePrice: removeStripePriceMock } },
 }));
 vi.mock('./sync-catalogue-price');

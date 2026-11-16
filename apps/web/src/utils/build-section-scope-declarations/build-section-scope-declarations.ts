@@ -9,8 +9,8 @@ import {
   type TCardStyle,
   type TMaybeUndefined,
   type TThemeDeclarations,
-} from '@blog/config';
-import { isOneOf } from '@blog/utils/primitives';
+} from '@shinefold/config';
+import { isOneOf } from '@shinefold/utils/primitives';
 import type { TSectionStyleOverrides } from '@web/utils/gate-section-style-overrides';
 
 export type TSectionAppearance = {

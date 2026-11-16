@@ -1,12 +1,12 @@
-import { languageSwitcherField } from '@blog/studio/schema-types/fields/language-switcher-field/language-switcher-field';
-import { localizedMultilineTextField } from '@blog/studio/schema-types/fields/localized-multiline-text-field/localized-multiline-text-field';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { cookieSettingsItemSchema } from '@blog/studio/schema-types/objects/cookie-settings-item/cookie-settings-item';
-import { footerLinkGroupSchema } from '@blog/studio/schema-types/objects/footer-link-group/footer-link-group';
-import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
-import { socialProfileSchema } from '@blog/studio/schema-types/objects/social-profile/social-profile';
-import { validateArrayTypeAtMostOnce } from '@blog/studio/schema-types/validation/validate-array-type-at-most-once/validate-array-type-at-most-once';
+import { languageSwitcherField } from '@shinefold/studio/schema-types/fields/language-switcher-field/language-switcher-field';
+import { localizedMultilineTextField } from '@shinefold/studio/schema-types/fields/localized-multiline-text-field/localized-multiline-text-field';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { cookieSettingsItemSchema } from '@shinefold/studio/schema-types/objects/cookie-settings-item/cookie-settings-item';
+import { footerLinkGroupSchema } from '@shinefold/studio/schema-types/objects/footer-link-group/footer-link-group';
+import { linkRefSchema } from '@shinefold/studio/schema-types/objects/link-ref/link-ref';
+import { socialProfileSchema } from '@shinefold/studio/schema-types/objects/social-profile/social-profile';
+import { validateArrayTypeAtMostOnce } from '@shinefold/studio/schema-types/validation/validate-array-type-at-most-once/validate-array-type-at-most-once';
 import { PanelBottom } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 

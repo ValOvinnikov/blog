@@ -1,5 +1,5 @@
-import { SANITY_WEBHOOK_OPERATION } from '@blog/config/constants';
-import { queries } from '@blog/db';
+import { SANITY_WEBHOOK_OPERATION } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 import {
   REVALIDATE_LOG,
   STARTER_DOCUMENT_ID_PREFIX,

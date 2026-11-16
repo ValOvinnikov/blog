@@ -1,5 +1,5 @@
-import type { TFeedPost } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import type { TFeedPost } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 
 const mockFaker = createMockFaker(61055);

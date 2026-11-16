@@ -1,9 +1,3 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
-import {
-  ENQUEUE_SIGNATURE_HEADER,
-  ENQUEUE_TIMESTAMP_HEADER,
-  isValidEnqueueSignature,
-} from '@blog/utils/enqueue-signature';
 import { faker } from '@faker-js/faker';
 import { CUSTOM_DOMAIN_PATH } from '@platform/constants/custom-domain';
 import { WORKER_LOG } from '@platform/constants/worker';
@@ -13,6 +7,12 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config';
+import {
+  ENQUEUE_SIGNATURE_HEADER,
+  ENQUEUE_TIMESTAMP_HEADER,
+  isValidEnqueueSignature,
+} from '@shinefold/utils/enqueue-signature';
 
 import {
   enqueueProvisioning,

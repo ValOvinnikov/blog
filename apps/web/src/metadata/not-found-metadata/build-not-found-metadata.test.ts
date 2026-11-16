@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES, SITE_MESSAGES_BY_LOCALE } from '@shinefold/config';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 

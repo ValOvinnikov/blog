@@ -1,6 +1,6 @@
-import { FONT_STACK } from '@blog/email/html/email-metrics/email-metrics';
-import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
-import { sanitizeHref } from '@blog/utils';
+import { FONT_STACK } from '@shinefold/email/html/email-metrics/email-metrics';
+import { escapeHtml } from '@shinefold/email/html/escape-html/escape-html';
+import { sanitizeHref } from '@shinefold/utils';
 
 export type TEmailAction = {
   label: string;

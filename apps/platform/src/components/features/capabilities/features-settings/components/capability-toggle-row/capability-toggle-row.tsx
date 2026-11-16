@@ -1,9 +1,9 @@
-import { isUndefined } from '@blog/utils/primitives';
 import { SettingRow } from '@platform/components/shared/setting-row';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Switch } from '@platform/components/shared/switch';
 import { lowestPlanWithCapability } from '@platform/utils/lowest-plan-with-capability/lowest-plan-with-capability';
 import type { TCapabilityToggle } from '@platform/utils/settings-features-fields/settings-features-fields';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 export type TCapabilityToggleRowProps = {

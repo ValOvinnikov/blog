@@ -1,12 +1,12 @@
 'use client';
 
-import { ICONS } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { COPY_STATUS } from '@platform/constants/clipboard';
 import { ICON_SIZE } from '@platform/constants/icon';
 import { useCopyToClipboard } from '@platform/utils/use-copy-to-clipboard/use-copy-to-clipboard';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import type { Ref } from 'react';
 

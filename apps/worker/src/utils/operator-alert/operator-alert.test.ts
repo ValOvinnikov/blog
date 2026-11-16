@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   HTTP_METHOD,
   HTTP_STATUS,
   OPERATOR_ALERT_KIND,
-} from '@blog/config/constants';
-import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@shinefold/db/constants';
 import { MOCK_QUEUE_DOWN } from '@worker/testing/outage/fixtures';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';

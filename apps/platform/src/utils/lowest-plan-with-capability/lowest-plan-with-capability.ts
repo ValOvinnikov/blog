@@ -1,6 +1,6 @@
-import type { TCapability } from '@blog/config';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
-import { PLAN_REGISTRY } from '@blog/db/constants';
+import type { TCapability } from '@shinefold/config';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
+import { PLAN_REGISTRY } from '@shinefold/db/constants';
 
 // TENANT_PLAN lists the plans cheapest first, and GROWTH holds every capability.
 export const lowestPlanWithCapability = (

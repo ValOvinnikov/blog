@@ -1,9 +1,9 @@
 'use client';
 
 import { Toggle } from '@base-ui/react/toggle';
-import { ICONS } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { ICON_SIZE } from '@platform/constants/icon';
+import { ICONS } from '@shinefold/config';
 
 import { revealToggleVariants } from './reveal-toggle-variants';
 

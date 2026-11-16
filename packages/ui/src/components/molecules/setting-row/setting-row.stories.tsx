@@ -1,7 +1,7 @@
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { Button } from '@blog/ui/components/atoms/button';
-import { TextInput } from '@blog/ui/components/atoms/text-input';
-import { Panel } from '@blog/ui/components/molecules/panel';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { TextInput } from '@shinefold/ui/components/atoms/text-input';
+import { Panel } from '@shinefold/ui/components/molecules/panel';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 

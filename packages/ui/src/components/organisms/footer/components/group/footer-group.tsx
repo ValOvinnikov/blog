@@ -1,12 +1,12 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { FooterGroupItem } from '@blog/ui/components/organisms/footer/components/group-item/footer-group-item';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import type { FooterGroupItem } from '@shinefold/ui/components/organisms/footer/components/group-item/footer-group-item';
 import {
   hasSlotContent,
   headingTags,
   type TCompoundChildren,
   type THeadingLevel,
-} from '@blog/ui/lib/react';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+} from '@shinefold/ui/lib/react';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { Children } from 'react';
 
 import { footerGroupVariants } from './footer-group-variants';

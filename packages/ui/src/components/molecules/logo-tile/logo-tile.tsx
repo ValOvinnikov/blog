@@ -1,10 +1,10 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '@blog/ui/lib/react';
+} from '@shinefold/ui/lib/react';
 import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { LogoTileDarkLogo } from './components/dark-logo/logo-tile-dark-logo';

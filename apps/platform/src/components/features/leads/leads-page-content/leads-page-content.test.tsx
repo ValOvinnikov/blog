@@ -1,4 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import {
@@ -11,6 +10,7 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 import { LeadsPageContent } from './leads-page-content';
 
@@ -20,7 +20,7 @@ const { listLeadsByCursorMock } = vi.hoisted(() => ({
   listLeadsByCursorMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { leads: { listLeadsByCursor: listLeadsByCursorMock } },
 }));
 

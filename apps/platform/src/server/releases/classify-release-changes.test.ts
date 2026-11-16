@@ -1,5 +1,5 @@
-import { RELEASE_CHANGE } from '@blog/config';
 import { mockChangedFile } from '@platform/testing/github/fixtures';
+import { RELEASE_CHANGE } from '@shinefold/config';
 
 import { classifyReleaseChanges } from './classify-release-changes';
 

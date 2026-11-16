@@ -1,8 +1,8 @@
-import { ICONS, SIZE } from '@blog/config';
 import { PresetSwatch } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/preset-swatch/preset-swatch';
 import type { TPresetOption } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/preset-option';
 import { Icon } from '@platform/components/shared/icon';
 import { ICON_SIZE } from '@platform/constants/icon';
+import { ICONS, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { presetSheetSummaryVariants } from './preset-sheet-summary-variants';

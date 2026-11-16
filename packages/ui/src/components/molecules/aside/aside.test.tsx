@@ -1,6 +1,6 @@
-import { ASIDE_KIND } from '@blog/config';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { ASIDE_KIND } from '@shinefold/config';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 
 import { Aside } from './aside';
 

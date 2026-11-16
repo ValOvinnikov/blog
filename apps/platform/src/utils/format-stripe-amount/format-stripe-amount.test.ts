@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { MOCK_AMOUNT_PAID } from '@platform/testing/billing/fixtures';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 
 import { formatStripeAmount } from './format-stripe-amount';
 

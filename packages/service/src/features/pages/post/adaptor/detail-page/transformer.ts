@@ -1,14 +1,17 @@
-import { PORTABLE_TEXT_BLOCK_TYPE, type TMaybeUndefined } from '@blog/config';
-import { toPageTranslations } from '@blog/service/shared/localization/page-translations/to-page-translations';
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
-import { toModule } from '@blog/service/shared/transformers/module/to-module';
-import { toPersonProfile } from '@blog/service/shared/transformers/person/to-person-profile';
-import { toPortableTextBody } from '@blog/service/shared/transformers/portable-text/to-portable-text-body';
-import { resolveSeo } from '@blog/service/shared/transformers/seo/resolve-seo';
-import { toTag } from '@blog/service/shared/transformers/tag/to-tag';
-import { toTopic } from '@blog/service/shared/transformers/topic/to-topic';
-import { toReadingTimeMinutes } from '@blog/utils';
+import {
+  PORTABLE_TEXT_BLOCK_TYPE,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import { toPageTranslations } from '@shinefold/service/shared/localization/page-translations/to-page-translations';
+import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toSanityImage } from '@shinefold/service/shared/transformers/image/to-sanity-image';
+import { toModule } from '@shinefold/service/shared/transformers/module/to-module';
+import { toPersonProfile } from '@shinefold/service/shared/transformers/person/to-person-profile';
+import { toPortableTextBody } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-body';
+import { resolveSeo } from '@shinefold/service/shared/transformers/seo/resolve-seo';
+import { toTag } from '@shinefold/service/shared/transformers/tag/to-tag';
+import { toTopic } from '@shinefold/service/shared/transformers/topic/to-topic';
+import { toReadingTimeMinutes } from '@shinefold/utils';
 import type { InferResultType } from 'groqd';
 
 import type { postPageQuery } from './query';

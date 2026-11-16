@@ -1,4 +1,4 @@
-import { EnabledStateBooleanInput } from '@blog/studio/schema-types/inputs/enabled-state-boolean-input';
+import { EnabledStateBooleanInput } from '@shinefold/studio/schema-types/inputs/enabled-state-boolean-input';
 import { defineField } from 'sanity';
 
 type TShowToggleFieldOptions = {

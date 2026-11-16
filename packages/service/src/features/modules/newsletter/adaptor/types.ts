@@ -5,7 +5,7 @@ import type {
   TLayout,
   TMaybeUndefined,
   TNewsletterVariant,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export type TNewsletterModule = {
   brandVariant: TBrandVariant;

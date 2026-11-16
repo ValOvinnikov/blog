@@ -1,10 +1,10 @@
-import { isr } from '@blog/service/sanity/query/isr';
+import { isr } from '@shinefold/service/sanity/query/isr';
 import {
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query/query';
-import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@shinefold/service/shared/cache-tags/link/link-target-cache-tags';
+import { hasLength } from '@shinefold/utils/primitives';
 
 import { postsByIdsQuery } from './query';
 import { toPostsByIds } from './transformer';

@@ -1,5 +1,5 @@
-import type { TMaybeNull } from '@blog/config';
 import { useLayoutMeasure } from '@platform/utils/use-layout-measure/use-layout-measure';
+import type { TMaybeNull } from '@shinefold/config';
 import { type RefObject, useRef, useState } from 'react';
 
 import { stickyTopOf } from './sticky-top';

@@ -1,7 +1,7 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
-import type { TTenantOAuthClient } from '@blog/db/queries/tenant-oauth-credentials';
 import type { TSignInAppView } from '@platform/server/sign-in-apps/load-sign-in-apps';
 import { MOCK_TENANT_URL } from '@platform/testing/tenants/fixtures';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
+import type { TTenantOAuthClient } from '@shinefold/db/queries/tenant-oauth-credentials';
 
 export const MOCK_CLIENT_ID = '1234567890-abcdefghij.apps.example.com';
 export const MOCK_MASKED_CLIENT_ID = '123456••••••••';

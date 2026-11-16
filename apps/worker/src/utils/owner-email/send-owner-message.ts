@@ -1,6 +1,6 @@
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import { sendEmail, type TOwnerEmail } from '@blog/email';
-import { sanitizeLogMessage } from '@blog/insight';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import { sendEmail, type TOwnerEmail } from '@shinefold/email';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { logger } from '@worker/utils/logger/logger';
 
 import { ownerEmailFromAddress } from './owner-email-context';

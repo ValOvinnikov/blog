@@ -1,4 +1,3 @@
-import { FINDING_STATUS, HTTP_STATUS, RELEASE_CHANGE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   GITHUB_FAILURE,
@@ -26,6 +25,7 @@ import {
 } from '@platform/testing/github/github-fetch';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_RELEASE_LAST_TAG } from '@platform/testing/releases/fixtures';
+import { FINDING_STATUS, HTTP_STATUS, RELEASE_CHANGE } from '@shinefold/config';
 
 import { getReleaseCandidate } from './get-release-candidate';
 
@@ -45,7 +45,7 @@ const {
   listAppliedMigrationTimestampsMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     findings: {

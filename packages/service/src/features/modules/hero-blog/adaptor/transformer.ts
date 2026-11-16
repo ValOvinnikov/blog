@@ -3,16 +3,16 @@ import {
   routes,
   type ISanityImage,
   type TMaybeUndefined,
-} from '@blog/config';
-import { toCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
-import { toHeroPresentation } from '@blog/service/shared/transformers/hero/to-hero-presentation';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
+} from '@shinefold/config';
+import { toCtaButton } from '@shinefold/service/shared/transformers/cta/to-cta-button';
+import { toHeroPresentation } from '@shinefold/service/shared/transformers/hero/to-hero-presentation';
+import { toSanityImage } from '@shinefold/service/shared/transformers/image/to-sanity-image';
+import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 import {
   toPostCard,
   type TPostCard,
-} from '@blog/service/shared/transformers/post/to-post-card';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/service/shared/transformers/post/to-post-card';
+import { isUndefined } from '@shinefold/utils/primitives';
 import type { InferResultType } from 'groqd';
 
 import type { heroBlogModuleQuery } from './query';

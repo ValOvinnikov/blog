@@ -1,7 +1,7 @@
 import {
   MOCK_EMAIL_ADDRESS,
   MOCK_INVALID_EMAIL_ADDRESS,
-} from '@blog/email/testing/email-fixtures';
+} from '@shinefold/email/testing/email-fixtures';
 
 import { isValidEmailAddress } from './is-valid-email-address';
 

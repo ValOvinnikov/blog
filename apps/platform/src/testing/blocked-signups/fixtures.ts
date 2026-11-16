@@ -1,7 +1,7 @@
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import type { TBlockedIdentityListing } from '@blog/db/queries/blocked-signup-identities/list-blocked-identities';
-import type { TBlockedSignupIdentity } from '@blog/db/schema/blocked-signup-identities';
 import type { TBlockedSignupEntry } from '@platform/server/signup-block/load-blocked-signup-entries';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
+import type { TBlockedIdentityListing } from '@shinefold/db/queries/blocked-signup-identities/list-blocked-identities';
+import type { TBlockedSignupIdentity } from '@shinefold/db/schema/blocked-signup-identities';
 
 export const MOCK_BLOCKED_DOMAIN = 'blocklist-spam.example';
 export const MOCK_BLOCKED_ADDRESS_HASH = 'f00dface0123456789abcdef01234567';

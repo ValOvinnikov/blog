@@ -1,6 +1,3 @@
-import { AUDIT_TARGET_TYPE, FINDING_STATUS } from '@blog/config';
-import { queries, TENANT_STATUS } from '@blog/db';
-import { isNull, isUndefined } from '@blog/utils/primitives';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
 import { LiveDomainCard } from '@platform/components/features/tenants/live-domain-card';
@@ -22,6 +19,9 @@ import { env } from '@platform/utils/env/env';
 import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { AUDIT_TARGET_TYPE, FINDING_STATUS } from '@shinefold/config';
+import { queries, TENANT_STATUS } from '@shinefold/db';
+import { isNull, isUndefined } from '@shinefold/utils/primitives';
 import { Suspense } from 'react';
 
 import { TenantProvisioningSection } from './components/tenant-provisioning-section/tenant-provisioning-section';

@@ -1,7 +1,5 @@
 import 'server-only';
 
-import { ACTION_OUTCOME } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import {
   readImageUpload,
@@ -13,6 +11,8 @@ import {
   MAX_EMAIL_LOGO_BYTES,
   maxEmailLogoKbLabel,
 } from '@platform/utils/email-logo-limits/email-logo-limits';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 
 const IMAGE_FORMAT_BY_DETECTED_TYPE: Record<string, TImageFormat> = {
   png: { contentType: 'image/png', extension: 'png' },

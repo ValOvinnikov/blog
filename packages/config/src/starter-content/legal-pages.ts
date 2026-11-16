@@ -4,12 +4,12 @@ import type {
   Page_privacyIndex,
   Template_legalIndex,
   Template_privacyIndex,
-} from '@blog/config/sanity/generated/types';
+} from '@shinefold/config/sanity/generated/types';
 
 import {
   PORTABLE_TEXT_BLOCK_TYPE,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import {
   buildCookieStatementDocument,

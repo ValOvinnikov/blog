@@ -1,8 +1,8 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockRawTagWithPostCount } from '@blog/service/testing/entities/fixtures';
-import { evaluateGroqIds } from '@blog/service/testing/shared/groq';
-import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockRawTagWithPostCount } from '@shinefold/service/testing/entities/fixtures';
+import { evaluateGroqIds } from '@shinefold/service/testing/shared/groq';
+import { mockLocalizedStrings } from '@shinefold/service/testing/shared/localized';
 
 import { tagsQuery } from './query';
 

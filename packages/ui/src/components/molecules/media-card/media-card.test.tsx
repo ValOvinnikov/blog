@@ -1,10 +1,10 @@
-import { renderElement, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { renderElement, screen } from '@shinefold/ui/testing/custom-render';
 import {
   MOCK_FORMATTED_DATE,
   MOCK_PERSON_NAME,
   MOCK_PUBLISHED_AT,
-} from '@blog/ui/testing/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/fixtures';
 
 import { MediaCard } from './media-card';
 

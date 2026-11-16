@@ -1,11 +1,11 @@
 import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
   NEWSLETTER_SKIP_REASON,
-} from '@blog/db/constants';
-import { getNewsletterPausedAt } from '@blog/db/queries/email-config';
-import { markNewsletterPostSkipped } from '@blog/db/queries/newsletter-post-sends';
-import { getTenantById } from '@blog/db/queries/tenants';
-import { isEmailAccountConfigured } from '@blog/email';
+} from '@shinefold/db/constants';
+import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config';
+import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends';
+import { getTenantById } from '@shinefold/db/queries/tenants';
+import { isEmailAccountConfigured } from '@shinefold/email';
 import {
   NEWSLETTER_SEND_GATE,
   NEWSLETTER_SEND_LOG,
@@ -25,10 +25,10 @@ import { readReputationPace } from '@worker/utils/newsletter-send/reputation-pac
 
 import { gateNewsletterSend } from './gate-newsletter-send';
 
-vi.mock('@blog/db/queries/email-config');
-vi.mock('@blog/db/queries/newsletter-post-sends');
-vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/email/transport/send-email');
+vi.mock('@shinefold/db/queries/email-config');
+vi.mock('@shinefold/db/queries/newsletter-post-sends');
+vi.mock('@shinefold/db/queries/tenants');
+vi.mock('@shinefold/email/transport/send-email');
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/utils/newsletter-send/read-newsletter-limits');
 vi.mock('@worker/utils/newsletter-send/owner-newsletter-notice');

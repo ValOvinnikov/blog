@@ -1,4 +1,4 @@
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export const resolveIsPlatformTenant = vi.fn<
   (tenant: Pick<TTenant, 'id' | 'primaryDomain'>) => Promise<boolean>

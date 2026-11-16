@@ -1,10 +1,10 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import type { TTaxonomyKind } from '@blog/config/constants';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import type { TTaxonomyKind } from '@shinefold/config/constants';
 import {
   fetchFailSafe,
   getDraftsClient,
-} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { hasLength } from '@shinefold/utils/primitives';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string; _key?: string };

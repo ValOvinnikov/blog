@@ -1,5 +1,5 @@
-import type { IWithClassName, TThemeDeclarations } from '@blog/config';
-import { objectKeys } from '@blog/utils/primitives';
+import type { IWithClassName, TThemeDeclarations } from '@shinefold/config';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { CSSProperties, ReactNode } from 'react';
 
 type TStyleVariantsProps<TStyle extends string> = IWithClassName & {

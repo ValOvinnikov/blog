@@ -1,11 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  HTTP_STATUS,
-  NEXT_NAVIGATION_ERROR,
-  type TMaybeNull,
-} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   MIGRATION_ENVIRONMENT,
@@ -24,6 +16,14 @@ import {
 } from '@platform/testing/github/github-fetch';
 import { MOCK_MIGRATION_FAILED_AT } from '@platform/testing/releases/fixtures';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  HTTP_STATUS,
+  NEXT_NAVIGATION_ERROR,
+  type TMaybeNull,
+} from '@shinefold/config';
 import type { Session } from 'next-auth';
 
 import { startTenantMigrationsAction } from './start-tenant-migrations-action';
@@ -41,7 +41,7 @@ vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     auditEvents: { insertAuditEvent: insertAuditEventMock },
     tenants: { listActiveTenants: listActiveTenantsMock },

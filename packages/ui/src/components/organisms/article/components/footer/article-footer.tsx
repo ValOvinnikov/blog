@@ -1,7 +1,7 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { TagList } from '@blog/ui/components/molecules/tag-list';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { TagList } from '@shinefold/ui/components/molecules/tag-list';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 
 import { articleFooterVariants } from './article-footer-variants';
 

@@ -1,12 +1,12 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
-import type { TGetTenantByIdOptions } from '@blog/db/queries/tenants/get-tenant-by-id/get-tenant-by-id';
 import {
   type TPlatformTenant,
   toPlatformTenant,
 } from '@platform/utils/platform-tenant/platform-tenant';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import type { TGetTenantByIdOptions } from '@shinefold/db/queries/tenants/get-tenant-by-id/get-tenant-by-id';
 
 export const getPlatformTenant = async (
   tenantId: string,

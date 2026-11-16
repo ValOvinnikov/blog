@@ -1,4 +1,8 @@
-import { LOCALE_ISO_CODES, LOCALE_OPEN_GRAPH_TAGS, routes } from '@blog/config';
+import {
+  LOCALE_ISO_CODES,
+  LOCALE_OPEN_GRAPH_TAGS,
+  routes,
+} from '@shinefold/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   DE_PATH_PREFIX,

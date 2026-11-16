@@ -1,6 +1,6 @@
 import path from 'path';
 
-import preset from '@blog/vitest-config/preset';
+import preset from '@shinefold/vitest-config/preset';
 import svgr from 'vite-plugin-svgr';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
@@ -37,15 +37,15 @@ export default mergeConfig(
     resolve: {
       alias: [
         {
-          find: /^@blog\/ui\/(.+)/,
+          find: /^@shinefold\/ui\/(.+)/,
           replacement: `${path.resolve(__dirname, 'src')}/$1`,
         },
         {
-          find: /^@blog\/config\/(.+)/,
+          find: /^@shinefold\/config\/(.+)/,
           replacement: `${path.resolve(__dirname, '../config/src')}/$1`,
         },
         {
-          find: /^@blog\/utils\/(.+)/,
+          find: /^@shinefold\/utils\/(.+)/,
           replacement: `${path.resolve(__dirname, '../utils/src')}/$1`,
         },
       ],

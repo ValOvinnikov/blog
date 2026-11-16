@@ -1,4 +1,4 @@
-import { tv } from '@blog/ui/lib/styling';
+import { tv } from '@shinefold/ui/lib/styling';
 
 // 30rem: below it a 320px popover no longer fits between the bar's account button and the left gutter.
 const SHEET_ON_PHONE = [

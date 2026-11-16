@@ -1,11 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { POST_SOURCE } from '@blog/config/constants';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { PUBLISHED_POST_CONDITION } from '@blog/studio/schema-types/filters/published-post';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { POST_SOURCE } from '@shinefold/config/constants';
+import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
+import { PUBLISHED_POST_CONDITION } from '@shinefold/studio/schema-types/filters/published-post';
 import {
   fetchFailSafe,
   getDraftsClient,
-} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+} from '@shinefold/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import type { ValidationContext } from 'sanity';
 
 const FAIL_SAFE_ASSUMES_CANDIDATE = 1;

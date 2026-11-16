@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME, CAPABILITY } from '@blog/config';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import messages from '@platform/i18n/messages/en.json';
 import {
   updateFeaturesAction,
@@ -27,6 +25,8 @@ import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME, CAPABILITY } from '@shinefold/config';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { FeaturesSettings } from './features-settings';

@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
 import {
   customDomainClaims,
   type TCustomDomainClaim,
-} from '@blog/db/schema/custom-domain-claims';
+} from '@shinefold/db/schema/custom-domain-claims';
 import { eq } from 'drizzle-orm';
 
 export async function getCustomDomainClaim(

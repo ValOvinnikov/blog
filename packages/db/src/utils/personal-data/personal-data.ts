@@ -1,5 +1,5 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
-import { env } from '@blog/db/utils/env/env';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
+import { env } from '@shinefold/db/utils/env/env';
 import {
   accountEmailIndex,
   decryptPersonalData,
@@ -7,8 +7,8 @@ import {
   parsePersonalDataKeyring,
   personalDataIndex,
   type IPersonalDataKeyring,
-} from '@blog/utils/encryption';
-import { isNull } from '@blog/utils/primitives';
+} from '@shinefold/utils/encryption';
+import { isNull } from '@shinefold/utils/primitives';
 
 function requireEncryptionKeyring(): IPersonalDataKeyring {
   const raw = env.PERSONAL_DATA_ENCRYPTION_KEY;

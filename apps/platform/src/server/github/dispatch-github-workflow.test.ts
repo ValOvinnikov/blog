@@ -1,8 +1,12 @@
-import { HTTP_METHOD, HTTP_STATUS, type TMaybeUndefined } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { useGitHubFetch } from '@platform/testing/github/github-fetch';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  HTTP_METHOD,
+  HTTP_STATUS,
+  type TMaybeUndefined,
+} from '@shinefold/config';
 
 import { dispatchGitHubWorkflow } from './dispatch-github-workflow';
 

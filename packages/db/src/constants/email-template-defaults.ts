@@ -3,8 +3,8 @@ import {
   LOCALE_ISO_CODES,
   type TEmailTemplateType,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
-import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
+} from '@shinefold/config/constants';
+import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
 
 export type TEmailTemplateDefaultCopy = {
   subject: string;
@@ -49,7 +49,7 @@ function copySet(
 
 // Deliberately generic: no tenant name, host or link — the actionable element
 // (sign-in button, invite-accept button, unsubscribe link) is rendered by
-// `@blog/email`'s templates, never inside this authored copy.
+// `@shinefold/email`'s templates, never inside this authored copy.
 export const EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE: Record<
   TLocaleIsoCode,
   TEmailTemplateDefaultCopySet

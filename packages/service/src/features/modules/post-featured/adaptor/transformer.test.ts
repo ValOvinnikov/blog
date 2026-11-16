@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CARD_STYLE,
@@ -6,14 +7,13 @@ import {
   DISPLAY_MODE,
   POST_SOURCE,
   RADIUS_SCALE,
-} from '@blog/config/constants';
-import { mockRawPostFeaturedModule } from '@blog/service/testing/modules/post-featured/fixtures';
-import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/config/constants';
+import { mockRawPostFeaturedModule } from '@shinefold/service/testing/modules/post-featured/fixtures';
+import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
 import {
   mockRawHeadingBlock,
   mockRawWideLayout,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toPostFeaturedModule } from './transformer';
 

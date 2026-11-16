@@ -1,6 +1,5 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import {
   ONBOARDING_STEP,
   SITE_ADDRESS_STATUS,
@@ -12,6 +11,7 @@ import type {
   TCreateSiteFieldError,
   TCreateSiteInput,
 } from '@platform/server/onboarding/create-site-input';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useEffect, useRef, useState } from 'react';
 
 import type { TOnboardingFieldErrors } from './use-onboarding-form';

@@ -1,11 +1,11 @@
-import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
+import { escapeHtml } from '@shinefold/email/html/escape-html/escape-html';
 import {
   serializePortableText,
   type TPortableTextContent,
-} from '@blog/email/portable-text';
-import type { TMagicLinkEmailContent } from '@blog/email/templates/tenant/magic-link-email/magic-link-email';
-import { buildSignInEmailShell } from '@blog/email/templates/tenant/sign-in-email-shell/sign-in-email-shell';
-import type { TTenantEmailIdentity } from '@blog/email/templates/tenant/tenant-email-identity/tenant-email-identity';
+} from '@shinefold/email/portable-text';
+import type { TMagicLinkEmailContent } from '@shinefold/email/templates/tenant/magic-link-email/magic-link-email';
+import { buildSignInEmailShell } from '@shinefold/email/templates/tenant/sign-in-email-shell/sign-in-email-shell';
+import type { TTenantEmailIdentity } from '@shinefold/email/templates/tenant/tenant-email-identity/tenant-email-identity';
 
 export type TMagicLinkInviteEmailInput = {
   url: string;

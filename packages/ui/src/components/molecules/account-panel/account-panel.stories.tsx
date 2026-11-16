@@ -1,8 +1,8 @@
-import { ACCOUNT_BUTTON_STYLE, ACCOUNT_PANEL_STYLE } from '@blog/config';
-import { AccountTrigger } from '@blog/ui/components/molecules/account-trigger';
-import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
-import { CardStyles } from '@blog/ui/testing/card-styles';
-import { objectKeys } from '@blog/utils/primitives';
+import { ACCOUNT_BUTTON_STYLE, ACCOUNT_PANEL_STYLE } from '@shinefold/config';
+import { AccountTrigger } from '@shinefold/ui/components/molecules/account-trigger';
+import { PopoverMenu } from '@shinefold/ui/components/molecules/popover-menu';
+import { CardStyles } from '@shinefold/ui/testing/card-styles';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { fn, within } from 'storybook/test';

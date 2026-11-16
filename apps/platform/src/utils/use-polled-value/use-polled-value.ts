@@ -1,8 +1,8 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import { useDocumentVisible } from '@platform/utils/use-document-visible/use-document-visible';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import {
   type Dispatch,
   type SetStateAction,

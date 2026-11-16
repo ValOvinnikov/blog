@@ -1,5 +1,8 @@
-import { CONTAINER_WIDTH, type TContainerWidth } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils/primitives';
+import {
+  CONTAINER_WIDTH,
+  type TContainerWidth,
+} from '@shinefold/config/constants';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { type ConditionalProperty, defineField } from 'sanity';
 
 type TContainerWidthFieldOptions = {

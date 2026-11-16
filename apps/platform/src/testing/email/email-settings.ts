@@ -1,9 +1,3 @@
-import {
-  EMAIL_TEMPLATE_TYPE,
-  LOCALE_ISO_CODES,
-  type TEmailTemplateType,
-  type TLocaleIsoCode,
-} from '@blog/config';
 import { EmailSettings } from '@platform/components/features/email/email-settings/email-settings';
 import en from '@platform/i18n/messages/en.json';
 import { uploadEmailLogoAction } from '@platform/server/email/upload-email-logo-action';
@@ -32,6 +26,12 @@ import {
   EMAIL_SENDER_ITEM,
   type TEmailPageItem,
 } from '@platform/utils/email-draft/email-draft';
+import {
+  EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
+  type TEmailTemplateType,
+  type TLocaleIsoCode,
+} from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 const { EN, FR } = LOCALE_ISO_CODES;

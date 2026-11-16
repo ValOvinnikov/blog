@@ -1,16 +1,16 @@
 import 'server-only';
 
-import {
-  COLOR_SCHEME,
-  type TColorScheme,
-  type TMaybeUndefined,
-} from '@blog/config';
 import { THEME_PREFERENCE } from '@platform/constants/theme';
 import { readRenamedCookie } from '@platform/server/renamed-cookie/read-renamed-cookie';
 import {
   LEGACY_THEME_PREFERENCE_COOKIE,
   THEME_PREFERENCE_COOKIE,
 } from '@platform/utils/theme-preference-cookie/theme-preference-cookie';
+import {
+  COLOR_SCHEME,
+  type TColorScheme,
+  type TMaybeUndefined,
+} from '@shinefold/config';
 
 export const resolveThemeColorScheme = async (): Promise<
   TMaybeUndefined<TColorScheme>

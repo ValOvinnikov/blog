@@ -1,5 +1,5 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 import { AUTH_ACTION } from '@web/constants/session';
 import { SIGN_IN_LOG } from '@web/constants/sign-in';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
@@ -24,7 +24,7 @@ const { headersMock } = vi.hoisted(() => ({ headersMock: vi.fn() }));
 
 vi.mock('next/headers', () => ({ headers: headersMock }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenantOAuthCredentials: { getTenantOAuthCredentials: vi.fn() },
   },

@@ -1,16 +1,19 @@
-import { addBookmark } from '@blog/db/queries/bookmarks/add-bookmark/add-bookmark';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { addBookmark } from '@shinefold/db/queries/bookmarks/add-bookmark/add-bookmark';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_OTHER_POST_ID,
   MOCK_POST_ID,
-} from '@blog/db/testing/bookmarks/fixtures';
-import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/bookmarks/fixtures';
+import {
+  insertTestTenant,
+  insertTestUser,
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { listBookmarks } from './list-bookmarks';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(61012);
 

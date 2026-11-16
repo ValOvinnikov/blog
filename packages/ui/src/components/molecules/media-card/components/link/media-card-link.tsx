@@ -1,6 +1,6 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import type { ReactNode } from 'react';
 
 export type TMediaCardLinkProps = IWithClassName &

@@ -1,10 +1,10 @@
 import {
   EMAIL_TEMPLATE_TYPE,
   type TEmailTemplateType,
-} from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { emailTemplateLogos } from '@blog/db/schema/email-templates';
+} from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { emailTemplateLogos } from '@shinefold/db/schema/email-templates';
 import { eq } from 'drizzle-orm';
 
 export type TEmailTemplateLogoUrls = Record<

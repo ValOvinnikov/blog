@@ -4,9 +4,9 @@ import type {
   IWithClassName,
   IWithDataTestId,
   TBrandVariant,
-} from '@blog/config';
-import type { TTestimonialItem } from '@blog/service';
-import type { ICarouselProps } from '@blog/ui/components/organisms/carousel';
+} from '@shinefold/config';
+import type { TTestimonialItem } from '@shinefold/service';
+import type { ICarouselProps } from '@shinefold/ui/components/organisms/carousel';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
 import { TestimonialCard } from '@web/modules/testimonial/components/testimonial-card/testimonial-card';
 

@@ -6,8 +6,8 @@ import {
   MOCK_SITE_GITHUB_CREDENTIALS,
   MOCK_SITE_GITHUB_ID,
   MOCK_SITE_GITHUB_SECRET,
-} from '@blog/auth/testing/oauth-fixtures';
-import { OAUTH_PROVIDER } from '@blog/config/constants';
+} from '@shinefold/auth/testing/oauth-fixtures';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 
 import {
   getEnabledOAuthProviderIds,

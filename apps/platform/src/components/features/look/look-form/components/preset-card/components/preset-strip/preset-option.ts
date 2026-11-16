@@ -1,4 +1,4 @@
-import type { SIZE, TFontChoice } from '@blog/config';
+import type { SIZE, TFontChoice } from '@shinefold/config';
 
 export type TPresetSwatch = {
   glyph: string;

@@ -3,7 +3,7 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   type TTimelineMarkerStyle,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 import { timelineMarkerVariants } from './timeline-marker-variants';

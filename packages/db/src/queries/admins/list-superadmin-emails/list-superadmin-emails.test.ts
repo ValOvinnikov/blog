@@ -1,13 +1,17 @@
-import { ADMIN_ROLE, GRANTED_VIA, type TAdminRole } from '@blog/db/constants';
-import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
-import * as schema from '@blog/db/schema';
-import { insertTestUser } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
+import {
+  ADMIN_ROLE,
+  GRANTED_VIA,
+  type TAdminRole,
+} from '@shinefold/db/constants';
+import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
+import * as schema from '@shinefold/db/schema';
+import { insertTestUser } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { listSuperadminEmails } from './list-superadmin-emails';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(5765);
 

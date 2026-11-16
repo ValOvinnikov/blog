@@ -1,7 +1,8 @@
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { buildSiteEmailTag } from '@blog/email/tags';
-import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
+import { faker } from '@faker-js/faker';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { buildSiteEmailTag } from '@shinefold/email/tags';
+import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@shinefold/email/templates/tenant/unsubscribe/unsubscribe';
 import {
   MOCK_BODY_HTML,
   MOCK_EMAIL_ADDRESS,
@@ -11,8 +12,7 @@ import {
   MOCK_RESEND_TENANT_API_KEY,
   MOCK_TENANT_ID,
   MOCK_URL,
-} from '@blog/email/testing/email-fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/email/testing/email-fixtures';
 
 import {
   isEmailAccountConfigured,

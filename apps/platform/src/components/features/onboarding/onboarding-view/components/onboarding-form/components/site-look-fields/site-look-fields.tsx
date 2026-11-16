@@ -1,11 +1,11 @@
 'use client';
 
-import type { TPresetId } from '@blog/config';
 import { AccentSwatch } from '@platform/components/shared/accent-swatch';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { PresetPicker } from '@platform/components/shared/preset-picker';
 import { HUE_SLIDER_TRACK } from '@platform/constants/hue-slider';
 import { PRESET_PICKER_LAYOUT } from '@platform/constants/preset-picker';
+import type { TPresetId } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

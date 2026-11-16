@@ -19,9 +19,9 @@ import {
   NAV_LINK_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
-} from '@blog/config/constants';
-import type { TUpdateSiteConfigInput } from '@blog/db/queries/site-config/upsert-site-config';
-import { createMockFaker } from '@blog/db/testing/mock-faker';
+} from '@shinefold/config/constants';
+import type { TUpdateSiteConfigInput } from '@shinefold/db/queries/site-config/upsert-site-config';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
 
 const siteConfigFaker = createMockFaker(60222);
 

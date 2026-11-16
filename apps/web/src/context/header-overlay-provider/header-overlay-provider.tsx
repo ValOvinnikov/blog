@@ -1,6 +1,6 @@
 'use client';
 
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import {
   createContext,
   type ReactNode,

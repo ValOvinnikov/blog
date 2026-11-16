@@ -1,14 +1,14 @@
-import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { MOCK_NEXT_MONTH } from '@blog/db/testing/newsletter-post-sends/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
+import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { MOCK_NEXT_MONTH } from '@shinefold/db/testing/newsletter-post-sends/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { markNewsletterLimitNoticeSent } from './mark-newsletter-limit-notice-sent';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const { SENDING_PAUSED, MONTHLY_ALLOWANCE_NEAR } = NEWSLETTER_LIMIT_NOTICE_KIND;
 

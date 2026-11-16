@@ -1,6 +1,6 @@
-import { ACTION_OUTCOME, type TOutcome } from '@blog/config';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { markPageOutOfDate } from '@platform/utils/page-out-of-date/page-out-of-date';
+import { ACTION_OUTCOME, type TOutcome } from '@shinefold/config';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import {
   unstable_isUnrecognizedActionError,
   unstable_rethrow,

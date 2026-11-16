@@ -5,10 +5,10 @@ import {
   type TBrandVariant,
   type TLayout,
   type TMaybeUndefined,
-} from '@blog/config';
-import type { TCtaButton, THeroPresentation } from '@blog/service';
-import { Hero, type THeroProps } from '@blog/ui/components/organisms/hero';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/config';
+import type { TCtaButton, THeroPresentation } from '@shinefold/service';
+import { Hero, type THeroProps } from '@shinefold/ui/components/organisms/hero';
+import { hasLength } from '@shinefold/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';

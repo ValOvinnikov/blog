@@ -1,4 +1,4 @@
-import { sanitizeLogMessage } from '@blog/insight';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import type { NEWSLETTER_SEND_LOG } from '@worker/constants/newsletter-send';
 import type { SCHEDULED_POST_PURGE_LOG } from '@worker/constants/scheduled-post-purge';
 import { logger } from '@worker/utils/logger/logger';

@@ -1,6 +1,6 @@
-import { ACCOUNT_BUTTON_STYLE } from '@blog/config';
-import { HeaderControlShapes } from '@blog/ui/testing/header-control-shapes';
-import { objectKeys } from '@blog/utils/primitives';
+import { ACCOUNT_BUTTON_STYLE } from '@shinefold/config';
+import { HeaderControlShapes } from '@shinefold/ui/testing/header-control-shapes';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 

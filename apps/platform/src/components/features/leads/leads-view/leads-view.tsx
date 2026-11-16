@@ -1,8 +1,8 @@
-import { ALERT_TYPE } from '@blog/config';
 import { LeadsInbox } from '@platform/components/features/leads/leads-inbox';
 import { Alert } from '@platform/components/shared/alert';
 import { PageHeader } from '@platform/components/shared/page-header';
 import type { TInboxLeadsPage } from '@platform/server/leads/list-inbox-leads';
+import { ALERT_TYPE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { leadsViewVariants } from './leads-view-variants';

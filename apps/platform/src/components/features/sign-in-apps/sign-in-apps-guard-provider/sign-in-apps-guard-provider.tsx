@@ -1,7 +1,7 @@
 'use client';
 
-import type { TOAuthProvider } from '@blog/config/constants';
 import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
+import type { TOAuthProvider } from '@shinefold/config/constants';
 import {
   createContext,
   use,

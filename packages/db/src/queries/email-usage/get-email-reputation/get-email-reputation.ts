@@ -1,11 +1,11 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   EMAIL_DELIVERY_OUTCOME,
   EMAIL_REPUTATION_WINDOW_DAYS,
   type TEmailDeliveryOutcome,
-} from '@blog/db/constants';
-import { emailDeliveryOutcomeCounts } from '@blog/db/schema/email-usage';
-import { utcDayDaysBefore } from '@blog/utils/date';
+} from '@shinefold/db/constants';
+import { emailDeliveryOutcomeCounts } from '@shinefold/db/schema/email-usage';
+import { utcDayDaysBefore } from '@shinefold/utils/date';
 import { and, eq, gte, sql } from 'drizzle-orm';
 
 export interface IEmailReputation {

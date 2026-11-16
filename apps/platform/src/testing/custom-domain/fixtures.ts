@@ -1,5 +1,3 @@
-import type { TCustomDomainClaim } from '@blog/db/schema/custom-domain-claims';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
 import type { TTenantMembershipContext } from '@platform/server/auth/require-tenant-membership';
 import { mockMembershipContext } from '@platform/testing/memberships/fixtures';
@@ -9,6 +7,8 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import type { TCustomDomainClaim } from '@shinefold/db/schema/custom-domain-claims';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export const mockCustomDomainDb = () => ({
   queries: {

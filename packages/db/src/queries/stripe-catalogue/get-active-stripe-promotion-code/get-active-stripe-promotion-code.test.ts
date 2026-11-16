@@ -1,15 +1,15 @@
-import { saveStripePromotionCode } from '@blog/db/queries/stripe-catalogue/save-stripe-promotion-code';
-import * as schema from '@blog/db/schema';
-import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { saveStripePromotionCode } from '@shinefold/db/queries/stripe-catalogue/save-stripe-promotion-code';
+import * as schema from '@shinefold/db/schema';
+import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_PROMOTION_CODE,
   mockSaveStripePromotionCodeInput,
-} from '@blog/db/testing/stripe-catalogue/fixtures';
+} from '@shinefold/db/testing/stripe-catalogue/fixtures';
 
 import { getActiveStripePromotionCode } from './get-active-stripe-promotion-code';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

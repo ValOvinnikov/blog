@@ -1,5 +1,5 @@
-import { BRAND_VARIANT } from '@blog/config/constants';
 import { expect, test } from '@playwright/test';
+import { BRAND_VARIANT } from '@shinefold/config/constants';
 
 import {
   flattenCase,

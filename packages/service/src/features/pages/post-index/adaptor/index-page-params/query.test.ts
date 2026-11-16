@@ -1,10 +1,10 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   mockIndexPageDocument,
   mockListModuleRefs,
-} from '@blog/service/testing/pages/fixtures';
-import { evaluateGroqInLocale } from '@blog/service/testing/shared/groq';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/pages/fixtures';
+import { evaluateGroqInLocale } from '@shinefold/service/testing/shared/groq';
 
 import { indexPageParamsQuery } from './query';
 

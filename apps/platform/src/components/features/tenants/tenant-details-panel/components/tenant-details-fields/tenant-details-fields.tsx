@@ -1,7 +1,5 @@
 'use client';
 
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { toOptions } from '@blog/utils/primitives';
 import { LockableSegmentedField } from '@platform/components/features/tenants/tenant-details-panel/components/lockable-segmented-field';
 import type {
   TTenantDetailsFieldErrors,
@@ -12,6 +10,8 @@ import { TextInput } from '@platform/components/shared/text-input';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { usePlanOptions } from '@platform/utils/use-plan-options/use-plan-options';
 import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { toOptions } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 import { tenantDetailsFieldsVariants } from './tenant-details-fields-variants';

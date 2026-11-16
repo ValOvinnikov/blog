@@ -1,17 +1,5 @@
 'use client';
 
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import {
-  CORE_DEPROVISIONING_STEPS,
-  TENANT_PROVISIONING_STEP_STATUS,
-  type TDeprovisioningStep,
-  type TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
-import type { TTenantDeprovisioningStatusResult } from '@blog/db/queries/tenants/get-tenant-deprovisioning-status';
-import type {
-  TDeprovisioningRun,
-  TTenantDeprovisioningState,
-} from '@blog/db/schema/tenants';
 import { getTenantDeprovisioningStatusAction } from '@platform/server/provisioning/get-tenant-deprovisioning-status-action';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
@@ -28,6 +16,18 @@ import {
   stepUpdatedAtFor,
 } from '@platform/utils/run-steps/run-steps';
 import { usePolledValue } from '@platform/utils/use-polled-value/use-polled-value';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import {
+  CORE_DEPROVISIONING_STEPS,
+  TENANT_PROVISIONING_STEP_STATUS,
+  type TDeprovisioningStep,
+  type TTenantProvisioningStepStatus,
+} from '@shinefold/db/constants';
+import type { TTenantDeprovisioningStatusResult } from '@shinefold/db/queries/tenants/get-tenant-deprovisioning-status';
+import type {
+  TDeprovisioningRun,
+  TTenantDeprovisioningState,
+} from '@shinefold/db/schema/tenants';
 import { useRouter } from 'next/navigation';
 
 export const STEP_POLL_INTERVAL_MS = 4000;

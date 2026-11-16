@@ -1,4 +1,3 @@
-import { ICONS } from '@blog/config';
 import { ArchivedTenantsToggle } from '@platform/components/features/tenants/archived-tenants-toggle';
 import { EmailAlertsBanner } from '@platform/components/features/tenants/email-alerts-banner';
 import { TenantsSearch } from '@platform/components/features/tenants/tenants-search';
@@ -12,6 +11,7 @@ import { ICON_SIZE } from '@platform/constants/icon';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { tenantsViewVariants } from './tenants-view-variants';

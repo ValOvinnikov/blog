@@ -1,4 +1,4 @@
-export type { TSectionDocumentType } from '@blog/service/shared/types/page/section-document-type';
+export type { TSectionDocumentType } from '@shinefold/service/shared/types/page/section-document-type';
 export type {
   TSectionDocumentKind,
   TSectionDocumentLink,

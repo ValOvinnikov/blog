@@ -1,11 +1,16 @@
-import { HEADER_LAYOUT, ICONS, SIZE, type TLocaleIsoCode } from '@blog/config';
-import type { IWithClassName } from '@blog/config/types';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { IconButton } from '@blog/ui/components/atoms/icon-button';
-import { ThemeToggle } from '@blog/ui/components/atoms/theme-toggle';
 import { SampleAccountControl } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-account-control/sample-account-control';
 import { SampleLanguageSwitcher } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-language-switcher/sample-language-switcher';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
+import {
+  HEADER_LAYOUT,
+  ICONS,
+  SIZE,
+  type TLocaleIsoCode,
+} from '@shinefold/config';
+import type { IWithClassName } from '@shinefold/config/types';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
+import { ThemeToggle } from '@shinefold/ui/components/atoms/theme-toggle';
 import { useTranslations } from 'next-intl';
 
 import { sampleHeaderControlsVariants } from './sample-header-controls-variants';

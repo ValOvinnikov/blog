@@ -1,6 +1,6 @@
-import { CAPABILITY, type TCapability } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import type * as DbConstants from '@blog/db/constants';
+import { CAPABILITY, type TCapability } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import type * as DbConstants from '@shinefold/db/constants';
 
 import { planPageAccess, type TPlanPage } from './plan-page-access';
 
@@ -12,7 +12,7 @@ const { entitlements } = vi.hoisted(() => ({
   entitlements: {} as Record<string, { seats: number }>,
 }));
 
-vi.mock('@blog/db/constants', async (importOriginal) => ({
+vi.mock('@shinefold/db/constants', async (importOriginal) => ({
   ...(await importOriginal<typeof DbConstants>()),
   PLAN_REGISTRY: registry,
   PLAN_ENTITLEMENTS: entitlements,

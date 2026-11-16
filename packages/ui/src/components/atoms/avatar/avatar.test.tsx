@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   customRender,
   fireEvent,
   screen,
-} from '@blog/ui/testing/custom-render';
-import { MOCK_PERSON_NAME } from '@blog/ui/testing/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/custom-render';
+import { MOCK_PERSON_NAME } from '@shinefold/ui/testing/fixtures';
 
 import { Avatar } from './avatar';
 

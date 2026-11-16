@@ -1,6 +1,6 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useEffect, useRef, useState } from 'react';
 
 // `decode()` settles even when the image failed before hydration, which a React `onError` would miss.

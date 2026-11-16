@@ -1,15 +1,18 @@
+import { faker } from '@faker-js/faker';
 import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   WORKER_AUDIT_ACTOR_ID,
-} from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
-import type { TAuditEvent } from '@blog/db/schema/audit-events';
-import { insertTestAuditEvent } from '@blog/db/testing/audit-events/fixtures';
-import { MOCK_OPERATOR_EMAIL, insertTestUser } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
+import type { TAuditEvent } from '@shinefold/db/schema/audit-events';
+import { insertTestAuditEvent } from '@shinefold/db/testing/audit-events/fixtures';
+import {
+  MOCK_OPERATOR_EMAIL,
+  insertTestUser,
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { encryptPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
 
 import {
   listAuditEventsForTarget,
@@ -18,7 +21,7 @@ import {
 
 faker.seed(602104);
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

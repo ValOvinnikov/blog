@@ -1,5 +1,5 @@
-import { q } from '@blog/service/sanity/query/query';
-import type { TPageQueryPageParams } from '@blog/service/shared/types/page/page-query-page-params';
+import { q } from '@shinefold/service/sanity/query/query';
+import type { TPageQueryPageParams } from '@shinefold/service/shared/types/page/page-query-page-params';
 
 export const tagParamsQuery = q
   .parameters<TPageQueryPageParams>()

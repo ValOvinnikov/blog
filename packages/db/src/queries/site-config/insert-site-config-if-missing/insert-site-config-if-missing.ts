@@ -1,6 +1,6 @@
-import { PRESET_REGISTRY, type TPresetId } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { siteConfig } from '@blog/db/schema/site-config';
+import { PRESET_REGISTRY, type TPresetId } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { siteConfig } from '@shinefold/db/schema/site-config';
 
 export async function insertSiteConfigIfMissing(
   tenantId: string,

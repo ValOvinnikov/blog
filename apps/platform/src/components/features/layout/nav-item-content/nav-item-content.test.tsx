@@ -1,8 +1,8 @@
-import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { ICON_TEST_ID } from '@platform/constants/icon';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockNavBadge, mockNavStatus } from '@platform/testing/layout/fixtures';
+import { ICONS } from '@shinefold/config';
 
 import { NavItemContent } from './nav-item-content';
 

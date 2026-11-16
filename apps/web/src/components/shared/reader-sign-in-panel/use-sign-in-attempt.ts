@@ -1,13 +1,13 @@
 'use client';
 
-import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
+import type { TOAuthProviderId } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
 import {
   FORM_STATUS,
   MAGIC_LINK_SIGN_IN_CODE,
   type TFormStatus,
   type TMaybeUndefined,
-} from '@blog/config';
-import { isValidEmailAddress } from '@blog/email/validation';
+} from '@shinefold/config';
+import { isValidEmailAddress } from '@shinefold/email/validation';
 import { signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 

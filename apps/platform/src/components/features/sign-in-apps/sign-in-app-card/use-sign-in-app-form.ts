@@ -1,16 +1,16 @@
 'use client';
 
+import { useSignInAppGuard } from '@platform/components/features/sign-in-apps/sign-in-apps-guard-provider';
+import type { TSignInAppView } from '@platform/server/sign-in-apps/load-sign-in-apps';
+import { saveSignInAppAction } from '@platform/server/sign-in-apps/save-sign-in-app-action';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import {
   isOutcomeInvalid,
   isOutcomeRefused,
   isOutcomeSuccess,
   type TMaybeUndefined,
-} from '@blog/config';
-import { hasLength } from '@blog/utils/primitives';
-import { useSignInAppGuard } from '@platform/components/features/sign-in-apps/sign-in-apps-guard-provider';
-import type { TSignInAppView } from '@platform/server/sign-in-apps/load-sign-in-apps';
-import { saveSignInAppAction } from '@platform/server/sign-in-apps/save-sign-in-app-action';
-import { settleAction } from '@platform/utils/settle-action/settle-action';
+} from '@shinefold/config';
+import { hasLength } from '@shinefold/utils/primitives';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';

@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { isr } from '@blog/service/sanity/query/isr';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { isr } from '@shinefold/service/sanity/query/isr';
 import {
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query/query';
+} from '@shinefold/service/sanity/query/query';
 
 import { redirectsQuery } from './query';
 import { toLandingRedirect } from './transformer';

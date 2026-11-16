@@ -1,15 +1,15 @@
 # Content migrations
 
-This directory holds Sanity content migrations for the `@blog/studio` Studio. A
+This directory holds Sanity content migrations for the `@shinefold/studio` Studio. A
 migration transforms **existing documents** in a dataset so they match a new
 schema shape — it does the opposite job of typegen, which only regenerates
 **TypeScript types** from the schema.
 
-|             | Schema change (`typegen`)                       | Content migration                                        |
-| ----------- | ----------------------------------------------- | -------------------------------------------------------- |
-| Operates on | `src/schema-types/**`                           | Documents in a dataset                                   |
-| Output      | `packages/config/src/sanity/generated/types.ts` | Mutated documents (or a dry-run diff)                    |
-| Command     | `pnpm --filter @blog/studio typegen`            | `pnpm --filter @blog/studio migrate:dry` / `migrate:run` |
+|             | Schema change (`typegen`)                       | Content migration                                             |
+| ----------- | ----------------------------------------------- | ------------------------------------------------------------- |
+| Operates on | `src/schema-types/**`                           | Documents in a dataset                                        |
+| Output      | `packages/config/src/sanity/generated/types.ts` | Mutated documents (or a dry-run diff)                         |
+| Command     | `pnpm --filter @shinefold/studio typegen`       | `pnpm --filter @shinefold/studio migrate:dry` / `migrate:run` |
 
 **Both are needed for a field rename or restructure.** Changing a field in the
 schema does not touch documents already in the dataset — old data is silently
@@ -48,7 +48,7 @@ another migration folder. A migration still owns the transform and test that
 are specific to it; only the genuinely repeated piece moves.
 
 **The one rule `lib/` must never break: a file under `lib/` may depend on
-nothing beyond `@blog/config`, `@blog/utils`, `sanity/migrate` and Node
+nothing beyond `@shinefold/config`, `@shinefold/utils`, `sanity/migrate` and Node
 built-ins — never `src/schema-types` or anything that pulls in `sanity`
 (the full package) or React.** Every migration's `index.ts` is loaded to
 build the list `sanity migrations list`/`migrate:run` show, so a `lib/`
@@ -58,7 +58,7 @@ the import.
 
 ## Workflow
 
-1. **Scaffold + track.** `pnpm --filter @blog/studio migrate:new "<name>"` slugifies
+1. **Scaffold + track.** `pnpm --filter @shinefold/studio migrate:new "<name>"` slugifies
    `<name>`, prepends the current UTC timestamp, creates
    `<timestamp>-<slug>/index.ts` from a template, and records it as the
    _current_ migration (in the gitignored `migrations/.current`), so the
@@ -77,14 +77,14 @@ the import.
 3. **Back up the dataset before any destructive run** (see Guardrails below):
 
    ```sh
-   pnpm --filter @blog/studio dataset:export -- migrations/backups/production-<date>.tar.gz
+   pnpm --filter @shinefold/studio dataset:export -- migrations/backups/production-<date>.tar.gz
    ```
 
 4. **Dry-run first.** Uses the tracked migration (no id needed); dry-run never
    touches the dataset:
 
    ```sh
-   pnpm --filter @blog/studio migrate:dry
+   pnpm --filter @shinefold/studio migrate:dry
    ```
 
    Inspect the printed diff carefully — check the exact documents and fields
@@ -94,18 +94,18 @@ the import.
    backup exists:
 
    ```sh
-   pnpm --filter @blog/studio migrate:run          # prompts for confirmation
+   pnpm --filter @shinefold/studio migrate:run          # prompts for confirmation
    ```
 
    This passes `--no-dry-run` and will mutate the dataset. In a
    **non-interactive/deploy** context add `--yes` (or set `CI=true`) to skip the
-   prompt: `pnpm --filter @blog/studio migrate:run --yes`. Pass an explicit `<slug>` to
+   prompt: `pnpm --filter @shinefold/studio migrate:run --yes`. Pass an explicit `<slug>` to
    any of these to override the tracked migration.
 
 6. **Regenerate types if the schema also changed:**
 
    ```sh
-   pnpm --filter @blog/studio typegen
+   pnpm --filter @shinefold/studio typegen
    ```
 
 ## Deploying multiple pending migrations (`migrate:deploy`)
@@ -130,8 +130,8 @@ document actions are disabled and it's excluded from the desk structure and
 the new-document menu.
 
 ```sh
-pnpm --filter @blog/studio migrate:deploy          # prompts for confirmation, then:
-pnpm --filter @blog/studio migrate:deploy --yes    # non-interactive (or CI=true)
+pnpm --filter @shinefold/studio migrate:deploy          # prompts for confirmation, then:
+pnpm --filter @shinefold/studio migrate:deploy --yes    # non-interactive (or CI=true)
 ```
 
 Algorithm: read the ledger for the resolved dataset → compute
@@ -147,8 +147,8 @@ ledger existed (or before you started tracking a dataset), record them as
 applied **without re-running them**:
 
 ```sh
-pnpm --filter @blog/studio migrate:backfill          # prompts for confirmation
-pnpm --filter @blog/studio migrate:backfill --yes    # non-interactive (or CI=true)
+pnpm --filter @shinefold/studio migrate:backfill          # prompts for confirmation
+pnpm --filter @shinefold/studio migrate:backfill --yes    # non-interactive (or CI=true)
 ```
 
 This marks every currently-pending folder migration as applied in one
@@ -191,7 +191,7 @@ and `development` track applied migrations independently.
 
 ## Commands reference
 
-Run from the repo root via `pnpm --filter @blog/studio <script>`. `migrate:*` and
+Run from the repo root via `pnpm --filter @shinefold/studio <script>`. `migrate:*` and
 `dataset:export` are backed by `scripts/migrate.mjs`, which resolves the target
 migration (explicit name → tracked `.current` → newest) and the target dataset.
 
@@ -200,21 +200,21 @@ migration (explicit name → tracked `.current` → newest) and the target datas
 agree. Target another dataset by exporting it:
 
 ```sh
-SANITY_STUDIO_DATASET=development pnpm --filter @blog/studio migrate:dry
+SANITY_STUDIO_DATASET=development pnpm --filter @shinefold/studio migrate:dry
 ```
 
 The resolved dataset is printed before every dry-run / run / export.
 
 ```sh
-pnpm --filter @blog/studio migrate:list            # list all migrations
-pnpm --filter @blog/studio migrate:new "<name>"    # scaffold (timestamped id) or reuse + track
-pnpm --filter @blog/studio migrate:track [id]      # track an existing one (default: newest)
-pnpm --filter @blog/studio migrate:current         # print the tracked migration
-pnpm --filter @blog/studio migrate:dry [id]        # dry-run the tracked/named migration
-pnpm --filter @blog/studio migrate:run [id]        # apply it (prompts; --yes to skip)
-pnpm --filter @blog/studio migrate:deploy          # run every un-applied migration (ledger); no-op if none pending
-pnpm --filter @blog/studio migrate:backfill        # record all pending migrations as applied, without running them
-pnpm --filter @blog/studio dataset:export [dest]   # backup (default dest: backups/<dataset>-<ts>.tar.gz)
+pnpm --filter @shinefold/studio migrate:list            # list all migrations
+pnpm --filter @shinefold/studio migrate:new "<name>"    # scaffold (timestamped id) or reuse + track
+pnpm --filter @shinefold/studio migrate:track [id]      # track an existing one (default: newest)
+pnpm --filter @shinefold/studio migrate:current         # print the tracked migration
+pnpm --filter @shinefold/studio migrate:dry [id]        # dry-run the tracked/named migration
+pnpm --filter @shinefold/studio migrate:run [id]        # apply it (prompts; --yes to skip)
+pnpm --filter @shinefold/studio migrate:deploy          # run every un-applied migration (ledger); no-op if none pending
+pnpm --filter @shinefold/studio migrate:backfill        # record all pending migrations as applied, without running them
+pnpm --filter @shinefold/studio dataset:export [dest]   # backup (default dest: backups/<dataset>-<ts>.tar.gz)
 ```
 
 For CI/deploy, `migrate:run --yes` (or `CI=true`) runs non-interactively — same
@@ -224,7 +224,7 @@ through to the underlying `sanity migrations run`.
 
 ## Refreshing `development` from `production` (not a migration)
 
-`pnpm --filter @blog/studio dataset:refresh-dev` (`scripts/refresh-dev-dataset.mjs`) is
+`pnpm --filter @shinefold/studio dataset:refresh-dev` (`scripts/refresh-dev-dataset.mjs`) is
 a **different** tool from everything above — it doesn't transform documents in
 place, it wholesale **replaces** the `development` dataset with a fresh
 `--no-drafts` (published-only) export of `production`, including assets. Dev

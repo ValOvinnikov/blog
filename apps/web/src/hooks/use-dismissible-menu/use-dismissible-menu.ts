@@ -1,6 +1,6 @@
 'use client';
 
-import type { TMaybeNull } from '@blog/config';
+import type { TMaybeNull } from '@shinefold/config';
 import { useOverlayOpenState } from '@web/hooks/use-overlay-open-state';
 import { useCallback, useEffect } from 'react';
 

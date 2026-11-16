@@ -1,5 +1,5 @@
-import { ACCOUNT_BUTTON_STYLE } from '@blog/config';
-import { HEADER_CONTROL, tv } from '@blog/ui/lib/styling';
+import { ACCOUNT_BUTTON_STYLE } from '@shinefold/config';
+import { HEADER_CONTROL, tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const accountTriggerVariants = tv({

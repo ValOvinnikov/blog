@@ -1,5 +1,5 @@
-import { queries } from '@blog/db';
-import { service } from '@blog/service';
+import { queries } from '@shinefold/db';
+import { service } from '@shinefold/service';
 import { SITEMAP_LOG } from '@web/constants/sitemap';
 import { routing } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';

@@ -1,4 +1,4 @@
-import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
+import { textSizedIcon } from '@shinefold/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 
 import { contactFormSchema } from './contact-form/contact-form';
 import { contentSchema } from './content/content';

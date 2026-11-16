@@ -3,8 +3,8 @@ import type {
   TDensity,
   TGridColumns,
   TRadiusScale,
-} from '@blog/config';
-import { q } from '@blog/service/sanity/query/query';
+} from '@shinefold/config';
+import { q } from '@shinefold/service/sanity/query/query';
 
 export const moduleAppearanceFragment = q
   .fragment<{

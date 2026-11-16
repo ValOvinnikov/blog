@@ -1,3 +1,3 @@
-import basePrettierConfig from '@blog/prettier-config';
+import basePrettierConfig from '@shinefold/prettier-config';
 
 export default { ...basePrettierConfig };

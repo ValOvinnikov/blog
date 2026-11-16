@@ -1,19 +1,19 @@
+import { faker } from '@faker-js/faker';
 import {
   FINDING_KIND,
   FINDING_SOURCE,
   FINDING_STATUS,
-} from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
+} from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_FINDING_LATER_AT,
   MOCK_FINDING_LATEST_AT,
   MOCK_FINDING_NOW,
   mockOpenFindingInput,
   openTestFinding,
-} from '@blog/db/testing/findings/fixtures';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/findings/fixtures';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { resolveFinding } from '../resolve-finding';
 
@@ -21,7 +21,7 @@ import { listFindingsForTenant } from './list-findings-for-tenant';
 
 faker.seed(6021005);
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

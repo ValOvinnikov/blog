@@ -1,9 +1,9 @@
 import {
   decryptPersonalValue,
   requireEmailIndex,
-} from '@blog/db/utils/personal-data/personal-data';
-import { personalDataIndex } from '@blog/utils/encryption';
-import { normalizeEmail } from '@blog/utils/normalize-email-identity';
+} from '@shinefold/db/utils/personal-data/personal-data';
+import { personalDataIndex } from '@shinefold/utils/encryption';
+import { normalizeEmail } from '@shinefold/utils/normalize-email-identity';
 import { eq, type SQL } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 

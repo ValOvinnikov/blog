@@ -1,19 +1,19 @@
-import { ERROR_CODE, SANITY_LOGIN_PROVIDER } from '@blog/config/constants';
-import { SANITY_PROJECT_ROLE } from '@blog/db/constants';
-import { getTenantOwnerAccess } from '@blog/db/queries/tenants/get-tenant-owner-access';
-import type { TTenantOwnerAccess } from '@blog/db/queries/tenants/tenant-owner-access';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import { ERROR_CODE, SANITY_LOGIN_PROVIDER } from '@shinefold/config/constants';
+import { SANITY_PROJECT_ROLE } from '@shinefold/db/constants';
+import { getTenantOwnerAccess } from '@shinefold/db/queries/tenants/get-tenant-owner-access';
+import type { TTenantOwnerAccess } from '@shinefold/db/queries/tenants/tenant-owner-access';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
 import {
   mockTenantOwnerAccess,
   toTenantOwnerAccessColumns,
-} from '@blog/db/testing/tenants/owner-access';
+} from '@shinefold/db/testing/tenants/owner-access';
 
 import { setTenantOwnerAccess } from './set-tenant-owner-access';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

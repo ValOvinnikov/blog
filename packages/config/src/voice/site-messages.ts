@@ -1,4 +1,4 @@
-import type { LOCALE_ISO_CODES } from '@blog/config/constants';
+import type { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 
 import DE from './site-messages.de.json';
 import SITE_MESSAGES from './site-messages.en.json';

@@ -1,6 +1,6 @@
-import { q } from '@blog/service/sanity/query/query';
-import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+import { q } from '@shinefold/service/sanity/query/query';
+import { getLocalizedField } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
 
 export const moduleHeadingBlockFragment = q
   .parameters<TLocaleQueryParams>()

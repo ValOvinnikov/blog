@@ -1,10 +1,10 @@
-import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
 import { routing } from '@platform/i18n/routing';
 import {
   MOCK_TENANT_ID,
   MOCK_TENANT_SLUG,
 } from '@platform/testing/tenants/fixtures';
 import { DEFAULT_TENANTS_SORT } from '@platform/utils/tenants-list-query/tenants-list-query';
+import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
 
 import { adminRoutes, STUDIO_SEGMENT } from './routes';
 

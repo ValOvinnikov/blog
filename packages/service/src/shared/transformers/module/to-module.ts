@@ -3,7 +3,7 @@ import {
   type THeroModuleType,
   type TMaybeUndefined,
   type TModuleType,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export type TRawModule<T extends TModuleType = TModuleType> = {
   _id: string;

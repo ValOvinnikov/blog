@@ -1,6 +1,6 @@
-import type { TNullable } from '@blog/config/types';
-import { isLocalizedSchemaType } from '@blog/studio/schema-types/inputs/localization-notice-input/is-localized-schema-type';
 import { faker } from '@faker-js/faker';
+import type { TNullable } from '@shinefold/config/types';
+import { isLocalizedSchemaType } from '@shinefold/studio/schema-types/inputs/localization-notice-input/is-localized-schema-type';
 import type { SchemaType } from 'sanity';
 
 faker.seed(4101);

@@ -1,9 +1,9 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { UPGRADE_POLL } from '@platform/constants/billing';
 import { useRouter } from '@platform/i18n/navigation';
 import { usePolledValue } from '@platform/utils/use-polled-value/use-polled-value';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useState } from 'react';
 
 export const useWebhookWait = <TValue>(

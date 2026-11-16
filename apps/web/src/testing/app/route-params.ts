@@ -1,4 +1,7 @@
-import { LOCALE_ISO_CODES, type ITenantLocalizedParams } from '@blog/config';
+import {
+  LOCALE_ISO_CODES,
+  type ITenantLocalizedParams,
+} from '@shinefold/config';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 export const mockRouteParams = <TExtra extends object = object>(

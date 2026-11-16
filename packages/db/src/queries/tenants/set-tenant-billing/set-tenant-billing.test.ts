@@ -1,16 +1,16 @@
-import { ERROR_CODE, TENANT_PLAN } from '@blog/config/constants';
-import { getTenantBilling } from '@blog/db/queries/tenants/get-tenant-billing';
-import type { TTenantBilling } from '@blog/db/queries/tenants/tenant-billing';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { mockTenantBilling } from '@blog/db/testing/tenants/billing';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import { ERROR_CODE, TENANT_PLAN } from '@shinefold/config/constants';
+import { getTenantBilling } from '@shinefold/db/queries/tenants/get-tenant-billing';
+import type { TTenantBilling } from '@shinefold/db/queries/tenants/tenant-billing';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { mockTenantBilling } from '@shinefold/db/testing/tenants/billing';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { setTenantBilling } from './set-tenant-billing';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

@@ -1,10 +1,13 @@
-import { FORM_STATUS } from '@blog/config';
-import type { TNewsletterSignupFormState } from '@blog/ui/components/organisms/newsletter-signup/components/form/newsletter-signup-form-state';
-import { NewsletterSignupInput } from '@blog/ui/components/organisms/newsletter-signup/components/input/newsletter-signup-input';
-import { NewsletterSignupStatus } from '@blog/ui/components/organisms/newsletter-signup/components/status/newsletter-signup-status';
-import { NewsletterSignupSubmit } from '@blog/ui/components/organisms/newsletter-signup/components/submit/newsletter-signup-submit';
-import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
-import { mapCompoundSlots, type TCompoundChildren } from '@blog/ui/lib/react';
+import { FORM_STATUS } from '@shinefold/config';
+import type { TNewsletterSignupFormState } from '@shinefold/ui/components/organisms/newsletter-signup/components/form/newsletter-signup-form-state';
+import { NewsletterSignupInput } from '@shinefold/ui/components/organisms/newsletter-signup/components/input/newsletter-signup-input';
+import { NewsletterSignupStatus } from '@shinefold/ui/components/organisms/newsletter-signup/components/status/newsletter-signup-status';
+import { NewsletterSignupSubmit } from '@shinefold/ui/components/organisms/newsletter-signup/components/submit/newsletter-signup-submit';
+import { newsletterSignupVariants } from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import {
+  mapCompoundSlots,
+  type TCompoundChildren,
+} from '@shinefold/ui/lib/react';
 import {
   cloneElement,
   Fragment,

@@ -4,7 +4,7 @@ import {
   MOCK_TOPIC_SLUG,
   MOCK_TOPIC_TITLE,
   mockRawTopic,
-} from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
 
 import { toTopic } from './to-topic';
 

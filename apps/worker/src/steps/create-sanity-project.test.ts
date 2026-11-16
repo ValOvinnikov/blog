@@ -1,20 +1,20 @@
-import { HTTP_STATUS, SANITY_PROJECT_ROLE } from '@blog/config';
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
-import { setTenantSanityProject } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { faker } from '@faker-js/faker';
+import { HTTP_STATUS, SANITY_PROJECT_ROLE } from '@shinefold/config';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
+import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
+import { setTenantSanityProject } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   createSanityProjectInvite,
   listSanityProjectInvites,
-} from '@blog/db/utils/sanity-management-client/sanity-project-access';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
 import {
   addSanityCorsOrigin,
   createSanityDataset,
   createSanityProject,
   listSanityCorsOrigins,
   listSanityDatasets,
-} from '@blog/db/utils/sanity-management-client/sanity-project-setup';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-setup';
 import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
@@ -35,10 +35,10 @@ import { createTenantSanityProject } from './create-sanity-project';
 
 faker.seed(7004);
 
-vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/db/queries/memberships');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-project-setup');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
+vi.mock('@shinefold/db/queries/tenants');
+vi.mock('@shinefold/db/queries/memberships');
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-project-setup');
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-project-access');
 vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 const MOCK_CREATED_PROJECT_ID = faker.string.alphanumeric(8);

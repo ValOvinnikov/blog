@@ -1,7 +1,5 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { type TTenantPlan } from '@blog/config/constants';
 import {
   BILLING_LOG,
   STRIPE_TENANT_METADATA_KEY,
@@ -9,6 +7,8 @@ import {
 } from '@platform/constants/billing';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { type TTenantPlan } from '@shinefold/config/constants';
 import type Stripe from 'stripe';
 
 import {

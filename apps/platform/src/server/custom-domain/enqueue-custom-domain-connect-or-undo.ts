@@ -1,7 +1,5 @@
 import 'server-only';
 
-import { HTTP_STATUS, type TMaybeNull } from '@blog/config';
-import { queries } from '@blog/db';
 import {
   CUSTOM_DOMAIN_LOG,
   CUSTOM_DOMAIN_PATH,
@@ -10,6 +8,8 @@ import {
 } from '@platform/constants/custom-domain';
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_STATUS, type TMaybeNull } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 export type TConnectAttempt =
   | { isAccepted: true }

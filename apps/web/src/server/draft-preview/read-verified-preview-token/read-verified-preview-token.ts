@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { PREVIEW_TOKEN_QUERY_PARAM } from '@web/server/draft-preview/constants/constants';
 import { readPreviewLinkClaims } from '@web/server/draft-preview/preview-token/preview-token';
 import type { NextRequest } from 'next/server';

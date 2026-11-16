@@ -1,11 +1,11 @@
-import { LANDING_PAGE_MAX_DEPTH } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LANDING_PAGE_MAX_DEPTH } from '@shinefold/config/constants';
 import {
   flattenLandingParentChain,
   LANDING_PARENT_CHAIN_PROJECTION,
-} from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
-import { mockLandingPage } from '@blog/studio/testing/mock-documents';
-import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
+import { mockLandingPage } from '@shinefold/studio/testing/mock-documents';
+import { mockGroqFetch } from '@shinefold/studio/testing/mock-groq-fetch';
 
 faker.seed(4113);
 

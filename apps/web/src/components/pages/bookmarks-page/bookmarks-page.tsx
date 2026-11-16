@@ -1,6 +1,6 @@
-import { routes } from '@blog/config';
-import { queries } from '@blog/db';
-import { service } from '@blog/service';
+import { routes } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { service } from '@shinefold/service';
 import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import { routing } from '@web/i18n/routing';
 import { auth } from '@web/server/auth/auth';

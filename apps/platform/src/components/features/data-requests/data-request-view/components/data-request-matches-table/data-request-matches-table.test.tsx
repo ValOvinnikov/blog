@@ -1,4 +1,3 @@
-import { SORT_DIRECTION } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import {
   DATA_REQUEST_MATCH_KIND,
@@ -8,6 +7,7 @@ import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockDataRequestMatch } from '@platform/testing/data-requests/fixtures';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { SORT_DIRECTION } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DataRequestMatchesTable } from './data-request-matches-table';

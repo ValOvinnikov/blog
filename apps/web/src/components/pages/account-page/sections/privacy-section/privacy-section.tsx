@@ -1,7 +1,7 @@
-import { routes } from '@blog/config';
-import { LinkButton } from '@blog/ui/components/molecules/link-button';
-import { Panel } from '@blog/ui/components/molecules/panel';
-import { SettingRow } from '@blog/ui/components/molecules/setting-row';
+import { routes } from '@shinefold/config';
+import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
+import { Panel } from '@shinefold/ui/components/molecules/panel';
+import { SettingRow } from '@shinefold/ui/components/molecules/setting-row';
 import { DeleteAccountControl } from '@web/components/shared/delete-account-control';
 import { SmartLink } from '@web/components/shared/smart-link';
 

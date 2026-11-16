@@ -1,7 +1,7 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { useToast } from '@platform/context/toast-provider';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useEffect, useRef } from 'react';
 
 export const useSaveErrorToast = (

@@ -1,11 +1,11 @@
-import { NEWSLETTER_REPUTATION_ALERT_LEVEL } from '@blog/config/constants';
+import { NEWSLETTER_REPUTATION_ALERT_LEVEL } from '@shinefold/config/constants';
 import {
   MOCK_ESCAPED_UNSAFE_MARKUP,
   MOCK_SIGN_IN_URL,
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
   MOCK_UNSAFE_MARKUP,
-} from '@blog/email/testing/email-fixtures';
+} from '@shinefold/email/testing/email-fixtures';
 
 import { buildNewsletterReputationAlertEmail } from './newsletter-reputation-alert';
 

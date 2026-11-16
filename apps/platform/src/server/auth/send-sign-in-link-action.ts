@@ -1,15 +1,15 @@
 'use server';
 
-import { MAGIC_LINK_PROVIDER_ID } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
-import { MagicLinkSendLimitedError } from '@blog/auth/providers/magic-link/magic-link-send-limited-error/magic-link-send-limited-error';
-import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { SIGN_IN_LOG } from '@platform/constants/sign-in';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { toTenantFieldErrors } from '@platform/server/tenants/tenant-field-error';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { toSafeCallbackPath } from '@platform/utils/safe-callback-path/safe-callback-path';
+import { MAGIC_LINK_PROVIDER_ID } from '@shinefold/auth/providers/magic-link/magic-link-provider/magic-link-provider';
+import { MagicLinkSendLimitedError } from '@shinefold/auth/providers/magic-link/magic-link-send-limited-error/magic-link-send-limited-error';
+import { ACTION_OUTCOME, type TActionResult } from '@shinefold/config';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
 import { signIn } from './auth';

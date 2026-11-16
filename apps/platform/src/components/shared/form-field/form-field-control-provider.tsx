@@ -1,7 +1,7 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import type { TFieldAppearance } from '@platform/constants/field-appearance';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
 type TFormFieldControlContext = {

@@ -1,34 +1,34 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { TAXONOMY_KIND } from '@blog/config/constants';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { TAXONOMY_KIND } from '@shinefold/config/constants';
 import {
   MOCK_TOPIC_DESCRIPTION,
   MOCK_TOPIC_ID,
   MOCK_TOPIC_SLUG,
   MOCK_TOPIC_TITLE,
-} from '@blog/service/testing/entities/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+} from '@shinefold/service/testing/entities/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_TAXONOMY_LIST_MODULE_ID,
   mockRawTaxonomyEntry,
   mockRawTaxonomyListModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_MODULES_TAXONOMY_LIST_CACHE_TAG,
   MOCK_POSTS_CACHE_TAG,
   MOCK_TAGS_CACHE_TAG,
   MOCK_TOPICS_CACHE_TAG,
   mockCacheTag,
-} from '@blog/service/testing/sanity/query/cache-tags';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockValidationError,
-} from '@blog/service/testing/shared/fixtures';
-import { MOCK_TENANT } from '@blog/service/testing/tenant';
+} from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getTaxonomyList } from './loader';
 import { taxonomyListModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 describe(getTaxonomyList, () => {
   beforeEach(() => {

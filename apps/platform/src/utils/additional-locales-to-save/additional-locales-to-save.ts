@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@shinefold/config';
 
 const SUPPORTED_LOCALES = Object.values(LOCALE_ISO_CODES);
 

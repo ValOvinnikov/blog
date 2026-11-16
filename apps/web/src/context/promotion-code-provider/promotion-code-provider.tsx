@@ -1,7 +1,7 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
-import type { IWithChildren } from '@blog/config/react';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { IWithChildren } from '@shinefold/config/react';
 import type { TPromotionDiscount } from '@web/utils/promotion-discount';
 import { createContext, useContext } from 'react';
 

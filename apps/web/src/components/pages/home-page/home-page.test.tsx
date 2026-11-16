@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   CONTENT_ALIGNMENT,
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
   routes,
-} from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { CtaModule } from '@web/modules/cta/cta-module';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -39,7 +39,7 @@ const { getHomePageMock } = vi.hoisted(() => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: {
       home: { v1: { getHomePage: getHomePageMock } },

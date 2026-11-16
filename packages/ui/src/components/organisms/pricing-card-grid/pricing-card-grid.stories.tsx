@@ -1,7 +1,7 @@
-import { Button } from '@blog/ui/components/atoms/button';
-import { LinkButton } from '@blog/ui/components/molecules/link-button';
-import { PricingCard } from '@blog/ui/components/molecules/pricing-card';
-import { objectKeys } from '@blog/utils/primitives';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
+import { PricingCard } from '@shinefold/ui/components/molecules/pricing-card';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { PricingCardGrid } from './pricing-card-grid';

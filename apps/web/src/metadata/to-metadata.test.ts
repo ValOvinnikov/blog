@@ -1,5 +1,5 @@
-import { routes } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { routes } from '@shinefold/config';
 import { mockMetadataSeo } from '@web/testing/metadata/to-metadata/fixtures';
 import { MOCK_EN_POST_SLUG } from '@web/testing/shared/post/fixtures';
 import { MOCK_OG_IMAGE_URL } from '@web/testing/shared/seo/og-image-fixtures';

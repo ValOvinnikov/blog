@@ -1,14 +1,17 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
+import {
+  q,
+  type TModuleQueryParams,
+} from '@shinefold/service/sanity/query/query';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
-} from '@blog/service/shared/expressions/module/display-mode';
-import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
-import { sanityImageAssetFragment } from '@blog/service/shared/fragments/image/image';
-import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
-import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+} from '@shinefold/service/shared/expressions/module/display-mode';
+import { ctaButtonsFragment } from '@shinefold/service/shared/fragments/cta/cta-buttons';
+import { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
+import { sanityImageAssetFragment } from '@shinefold/service/shared/fragments/image/image';
+import { moduleLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { linkDocumentFragment } from '@shinefold/service/shared/fragments/link/link-document';
+import { moduleContentAlignmentLeftCenterFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
 
 export const logoWallModuleQuery = q
   .parameters<TModuleQueryParams>()

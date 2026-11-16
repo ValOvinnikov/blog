@@ -1,8 +1,8 @@
 import 'server-only';
 
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import { sendEmail, type TSendEmailInput } from '@blog/email';
 import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import { sendEmail, type TSendEmailInput } from '@shinefold/email';
 
 type TOperatorAlertEmail = Pick<TSendEmailInput, 'subject' | 'html'>;
 

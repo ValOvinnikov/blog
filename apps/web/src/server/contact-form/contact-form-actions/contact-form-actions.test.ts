@@ -1,10 +1,10 @@
-import { ACTION_OUTCOME, CAPABILITY } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { sendEmail } from '@blog/email';
-import type * as TEmail from '@blog/email';
-import { FORWARDED_FOR_HEADER } from '@blog/utils/client-key';
 import { faker } from '@faker-js/faker';
+import { ACTION_OUTCOME, CAPABILITY } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { sendEmail } from '@shinefold/email';
+import type * as TEmail from '@shinefold/email';
+import { FORWARDED_FOR_HEADER } from '@shinefold/utils/client-key';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { isTenantActive } from '@web/server/tenant/write-gate/write-gate';
@@ -50,8 +50,8 @@ vi.mock(
   () => import('@web/testing/server/next-cache/passthrough-next-cache'),
 );
 
-vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await import('@shinefold/db/constants')),
   queries: {
     leads: { createLead: vi.fn() },
     tenants: { getTenantById: vi.fn() },
@@ -61,7 +61,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@blog/email', async (importOriginal) => ({
+vi.mock('@shinefold/email', async (importOriginal) => ({
   ...(await importOriginal<typeof TEmail>()),
   sendEmail: vi.fn(),
 }));

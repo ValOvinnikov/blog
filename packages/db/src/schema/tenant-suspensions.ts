@@ -2,7 +2,7 @@ import {
   SUSPENSION_REFERENCE_DIGITS,
   SUSPENSION_REFERENCE_PREFIX,
   type TSuspensionCategory,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import { isNull, sql } from 'drizzle-orm';
 import {
   pgSequence,

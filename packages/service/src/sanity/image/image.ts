@@ -1,13 +1,13 @@
-import type { ISanityImage } from '@blog/config';
-import {
-  createProjectCache,
-  type TSanityProjectRef,
-} from '@blog/service/sanity/project-cache/project-cache';
 import {
   createImageUrlBuilder,
   type FitMode,
   type SanityImageSource,
 } from '@sanity/image-url';
+import type { ISanityImage } from '@shinefold/config';
+import {
+  createProjectCache,
+  type TSanityProjectRef,
+} from '@shinefold/service/sanity/project-cache/project-cache';
 
 const getCachedImageUrlBuilder =
   createProjectCache<ReturnType<typeof createImageUrlBuilder>>();

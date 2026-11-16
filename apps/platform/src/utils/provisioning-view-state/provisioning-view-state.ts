@@ -1,17 +1,3 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import {
-  CORE_PROVISIONING_STEPS,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-  type TElevateTenantOwnerOutcome,
-  type TTenantProvisioningStatus,
-  type TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
-import type {
-  TProvisioningRun,
-  TTenantProvisioningState,
-} from '@blog/db/schema/tenants';
 import {
   classifyProvisioningError,
   type TProvisioningErrorKind,
@@ -21,6 +7,20 @@ import {
   stepStatusesFor,
   stepUpdatedAtFor,
 } from '@platform/utils/run-steps/run-steps';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import {
+  CORE_PROVISIONING_STEPS,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+  type TElevateTenantOwnerOutcome,
+  type TTenantProvisioningStatus,
+  type TTenantProvisioningStepStatus,
+} from '@shinefold/db/constants';
+import type {
+  TProvisioningRun,
+  TTenantProvisioningState,
+} from '@shinefold/db/schema/tenants';
 
 const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
   TENANT_PROVISIONING_STEP_STATUS.FAILED,

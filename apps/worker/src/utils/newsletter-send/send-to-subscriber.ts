@@ -1,7 +1,7 @@
-import type { IActiveSubscriber } from '@blog/db/queries/subscribers';
-import { isRetryableSendError, sendEmail } from '@blog/email';
-import { sanitizeLogMessage } from '@blog/insight';
-import { hasLength } from '@blog/utils/primitives';
+import type { IActiveSubscriber } from '@shinefold/db/queries/subscribers';
+import { isRetryableSendError, sendEmail } from '@shinefold/email';
+import { sanitizeLogMessage } from '@shinefold/insight';
+import { hasLength } from '@shinefold/utils/primitives';
 import {
   NEWSLETTER_SEND_LOG,
   NEWSLETTER_SUBSCRIBER_SEND,

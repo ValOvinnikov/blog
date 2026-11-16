@@ -1,13 +1,13 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_DB_ERROR_MESSAGE,
   MOCK_SITE_CONFIG,
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
   mockTenant,
-} from '@blog/auth/testing/magic-link-fixtures';
-import { resolveTenantEmailBrand } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/auth/testing/magic-link-fixtures';
+import { resolveTenantEmailBrand } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 
 import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';
 
@@ -20,11 +20,11 @@ const { getTenantByDomainMock, getSiteConfigMock } = vi.hoisted(() => ({
   getSiteConfigMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   queries: {
     tenantDomains: { getTenantByDomain: getTenantByDomainMock },
     tenants: await vi.importActual(
-      '@blog/db/queries/tenants/get-tenant-live-locales',
+      '@shinefold/db/queries/tenants/get-tenant-live-locales',
     ),
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },

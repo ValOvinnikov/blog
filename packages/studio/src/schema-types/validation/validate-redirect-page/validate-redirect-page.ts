@@ -1,6 +1,6 @@
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { findPublishedPageAtPath } from '@blog/studio/schema-types/queries/published-page-at-path/published-page-at-path';
-import { getPublishedClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
+import { findPublishedPageAtPath } from '@shinefold/studio/schema-types/queries/published-page-at-path/published-page-at-path';
+import { getPublishedClient } from '@shinefold/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import { getPublishedId, type ValidationContext } from 'sanity';
 
 export const REDIRECT_DESTINATION_UNPUBLISHED_ERROR =

@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';

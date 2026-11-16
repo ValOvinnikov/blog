@@ -1,8 +1,8 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
 import { MOCK_NEXT_PAYMENT } from '@platform/testing/billing/overview';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 
 import { PlanCard } from './plan-card';
 

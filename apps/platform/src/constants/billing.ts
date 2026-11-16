@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const BILLING_LOG = {
   WEBHOOK_SECRET_MISSING: 'billing.webhook_secret_missing',

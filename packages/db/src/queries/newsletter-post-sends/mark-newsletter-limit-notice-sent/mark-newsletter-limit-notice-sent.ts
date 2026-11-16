@@ -1,8 +1,8 @@
-import { getDb } from '@blog/db/client';
-import type { TNewsletterLimitNoticeKind } from '@blog/db/constants';
-import { newsletterLimitNotices } from '@blog/db/schema/newsletter-post-sends';
-import { utcMonthStartDay } from '@blog/utils/date';
-import { hasLength } from '@blog/utils/primitives';
+import { getDb } from '@shinefold/db/client';
+import type { TNewsletterLimitNoticeKind } from '@shinefold/db/constants';
+import { newsletterLimitNotices } from '@shinefold/db/schema/newsletter-post-sends';
+import { utcMonthStartDay } from '@shinefold/utils/date';
+import { hasLength } from '@shinefold/utils/primitives';
 
 export async function markNewsletterLimitNoticeSent(
   tenantId: string,

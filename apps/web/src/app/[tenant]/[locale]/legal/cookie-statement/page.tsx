@@ -1,4 +1,4 @@
-import type { ITenantLocalizedParams } from '@blog/config';
+import type { ITenantLocalizedParams } from '@shinefold/config';
 import { CookieStatementPage } from '@web/components/pages/cookie-statement-page';
 import { buildCookieStatementMetadata } from '@web/metadata/cookie-statement-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';

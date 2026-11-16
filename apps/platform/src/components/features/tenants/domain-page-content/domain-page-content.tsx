@@ -1,4 +1,3 @@
-import { queries } from '@blog/db';
 import { CustomDomainCard } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-card/custom-domain-card';
 import { MainAddressSignInAppsProvider } from '@platform/components/features/tenants/domain-page-content/components/main-address-sign-in-apps-provider/main-address-sign-in-apps-provider';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
@@ -12,6 +11,7 @@ import { findSubdomain } from '@platform/utils/find-subdomain/find-subdomain';
 import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import { isPlatformAddress } from '@platform/utils/is-platform-address/is-platform-address';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import { queries } from '@shinefold/db';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 

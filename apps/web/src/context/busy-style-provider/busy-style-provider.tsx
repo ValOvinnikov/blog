@@ -1,6 +1,6 @@
 'use client';
 
-import type { IBusyStyle, TMaybeUndefined } from '@blog/config';
+import type { IBusyStyle, TMaybeUndefined } from '@shinefold/config';
 import { createContext, useContext, type ReactNode } from 'react';
 
 const BusyStyleContext = createContext<TMaybeUndefined<IBusyStyle>>(undefined);

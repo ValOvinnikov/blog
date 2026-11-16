@@ -1,14 +1,6 @@
 'use server';
 
 import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  RELEASE_CHANGE,
-  type TActionResult,
-} from '@blog/config';
-import { toOutcome } from '@blog/utils/to-outcome';
-import {
   IS_PRODUCTION_RELEASE_ENABLED,
   RELEASE_FIELD_ERROR,
   RELEASE_OVERRIDE_REASON_MAX_LENGTH,
@@ -22,6 +14,14 @@ import {
   isReleaseOverrideRequired,
   isReleaseRunActive,
 } from '@platform/utils/release-state/release-state';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  RELEASE_CHANGE,
+  type TActionResult,
+} from '@shinefold/config';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
 import { dispatchReleaseWorkflow } from './dispatch-release-workflow';

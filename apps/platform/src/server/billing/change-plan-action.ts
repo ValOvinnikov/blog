@@ -1,12 +1,5 @@
 'use server';
 
-import {
-  ACTION_OUTCOME,
-  HTTP_STATUS,
-  type TActionResult,
-  type TOutcome,
-} from '@blog/config';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { BILLING_LOG } from '@platform/constants/billing';
 import {
   PLAN_CHANGE_REFUSAL,
@@ -17,6 +10,13 @@ import {
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  HTTP_STATUS,
+  type TActionResult,
+  type TOutcome,
+} from '@shinefold/config';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import Stripe from 'stripe';
 
 import { changeSubscriptionPlan } from './change-subscription-plan';

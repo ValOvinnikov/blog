@@ -1,6 +1,6 @@
-import { getModulePack } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { isNull, isUndefined } from '@blog/utils/primitives';
+import { getModulePack } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { isNull, isUndefined } from '@shinefold/utils/primitives';
 import type { ComponentType } from 'react';
 import {
   type InsertMenuOptions,

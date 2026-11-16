@@ -1,4 +1,4 @@
-import { DAY_MS } from '@blog/db/constants';
+import { DAY_MS } from '@shinefold/db/constants';
 
 export const WORKFLOW_RUN_STATUS = {
   PENDING: 'pending',

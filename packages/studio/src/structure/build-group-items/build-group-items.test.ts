@@ -1,9 +1,9 @@
+import { faker } from '@faker-js/faker';
 import {
   asStructureBuilder,
   mockStructureBuilder,
-} from '@blog/studio/testing/structure/mock-structure-builder';
-import { mockStructureSchema } from '@blog/studio/testing/structure/mock-structure-schema';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/structure/mock-structure-builder';
+import { mockStructureSchema } from '@shinefold/studio/testing/structure/mock-structure-schema';
 
 import { buildGroupedListItems } from './build-group-items';
 

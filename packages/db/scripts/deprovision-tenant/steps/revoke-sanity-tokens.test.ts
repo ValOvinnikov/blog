@@ -1,16 +1,16 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_DEPROVISION_DRY_RUN_ENV,
   MOCK_DEPROVISION_ENV,
-} from '@blog/db/testing/deprovision-tenant/fixtures';
-import { MOCK_SANITY_PROJECT_ID } from '@blog/db/testing/sanity-management-client/fixtures';
+} from '@shinefold/db/testing/deprovision-tenant/fixtures';
+import { MOCK_SANITY_PROJECT_ID } from '@shinefold/db/testing/sanity-management-client/fixtures';
 import {
   MOCK_STEP_ERROR,
   MOCK_TENANT_MANAGEMENT_ROBOT_ID,
   MOCK_TENANT_MANAGEMENT_TOKEN,
   mockTenant,
-} from '@blog/db/testing/tenants/fixtures';
-import { missingManagementRobotIdMessage } from '@blog/db/utils/sanity-management-client/sanity-robot-revocation';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/tenants/fixtures';
+import { missingManagementRobotIdMessage } from '@shinefold/db/utils/sanity-management-client/sanity-robot-revocation';
 
 import {
   revokeTenantSanityTokens,

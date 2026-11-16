@@ -1,8 +1,8 @@
-import { DISPLAY_MODE } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { DisplayModePicture } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-picture';
-import { tileField } from '@blog/studio/schema-types/fields/tile-field/tile-field';
-import { toTitleCase } from '@blog/utils/primitives';
+import { DISPLAY_MODE } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { DisplayModePicture } from '@shinefold/studio/schema-types/fields/display-mode-field/display-mode-picture';
+import { tileField } from '@shinefold/studio/schema-types/fields/tile-field/tile-field';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import type { ConditionalPropertyCallback, StringDefinition } from 'sanity';
 
 export const isCarouselMode: ConditionalPropertyCallback = ({ parent }) =>

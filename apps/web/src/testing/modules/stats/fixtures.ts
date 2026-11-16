@@ -1,5 +1,5 @@
-import { BRAND_VARIANT } from '@blog/config';
-import type { TStatItem, TStatsModule } from '@blog/service';
+import { BRAND_VARIANT } from '@shinefold/config';
+import type { TStatItem, TStatsModule } from '@shinefold/service';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 export const mockStatItem = (

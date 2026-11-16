@@ -1,4 +1,3 @@
-import { FINDING_STATUS, HTTP_STATUS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   MOCK_GITHUB_CONTRAST_RUNS_PATH,
@@ -13,6 +12,7 @@ import {
 } from '@platform/testing/github/github-fetch';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_RELEASE_LAST_TAG } from '@platform/testing/releases/fixtures';
+import { FINDING_STATUS, HTTP_STATUS } from '@shinefold/config';
 
 import { isContrastDue } from './is-contrast-due';
 
@@ -27,7 +27,7 @@ const { getContrastFindingMock, getLatestPassingContrastShaMock } = vi.hoisted(
   }),
 );
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     findings: {

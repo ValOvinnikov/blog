@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { deviceFrameVariants } from '@platform/components/shared/device-frame/device-frame-variants';
 import {
   DEVICE_FRAME_SIZE,
   DEVICE_FRAME_TEST_ID,
 } from '@platform/constants/device-frame';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 export type TDeviceFrameBrowserBarProps = {
   host: TMaybeUndefined<string>;

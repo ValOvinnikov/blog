@@ -1,4 +1,4 @@
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { env } from '@web/utils/env/env';
 import { cache } from 'react';

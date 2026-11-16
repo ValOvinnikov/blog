@@ -5,15 +5,15 @@ import {
   GRID_COLUMNS,
   LOCALE_ISO_CODES,
   RADIUS_SCALE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   MOCK_DUTCH_MODULE_HEADING,
   MOCK_ENGLISH_MODULE_HEADING,
   MOCK_MODULE_ID,
   mockModuleDocument,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawPostLatestModule } from '@blog/service/testing/modules/post-latest/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawPostLatestModule } from '@shinefold/service/testing/modules/post-latest/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 
 import { postLatestModuleQuery } from './query';
 

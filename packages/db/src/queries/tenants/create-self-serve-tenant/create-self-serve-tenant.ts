@@ -5,31 +5,31 @@ import {
   type TErrorCode,
   type TPresetId,
   type TSiteType,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { insertAuditEvent } from '@blog/db/queries/audit-events/insert-audit-event';
-import { upsertSettingsFeatures } from '@blog/db/queries/settings-features/upsert-settings-features';
-import { insertSiteConfigIfMissing } from '@blog/db/queries/site-config/insert-site-config-if-missing';
-import { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
-import { insertTenantWithDependents } from '@blog/db/queries/tenants/insert-tenant-with-dependents';
-import { ownsFreeTenant } from '@blog/db/queries/tenants/owns-free-tenant';
-import { selfServeTrialValues } from '@blog/db/queries/tenants/self-serve-trial-values';
-import { memberships } from '@blog/db/schema/memberships';
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import { insertAuditEvent } from '@shinefold/db/queries/audit-events/insert-audit-event';
+import { upsertSettingsFeatures } from '@shinefold/db/queries/settings-features/upsert-settings-features';
+import { insertSiteConfigIfMissing } from '@shinefold/db/queries/site-config/insert-site-config-if-missing';
+import { getTenantByDomain } from '@shinefold/db/queries/tenant-domains/get-tenant-by-domain';
+import { insertTenantWithDependents } from '@shinefold/db/queries/tenants/insert-tenant-with-dependents';
+import { ownsFreeTenant } from '@shinefold/db/queries/tenants/owns-free-tenant';
+import { selfServeTrialValues } from '@shinefold/db/queries/tenants/self-serve-trial-values';
+import { memberships } from '@shinefold/db/schema/memberships';
 import {
   TENANT_DOMAINS_DOMAIN_UNIQUE_NAME,
   tenantDomains,
-} from '@blog/db/schema/tenant-domains';
-import { SELF_SERVE_FREE_OWNER_INDEX_NAME } from '@blog/db/schema/tenant-self-serve-owner-index';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { uniqueViolationConstraint } from '@blog/db/utils/constraint-violation/constraint-violation';
-import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
-import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
-import { normalizeSignupEmail } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
-import { requireEmailIndex } from '@blog/db/utils/personal-data/personal-data';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { personalDataIndex } from '@blog/utils/encryption';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/schema/tenant-domains';
+import { SELF_SERVE_FREE_OWNER_INDEX_NAME } from '@shinefold/db/schema/tenant-self-serve-owner-index';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { uniqueViolationConstraint } from '@shinefold/db/utils/constraint-violation/constraint-violation';
+import { isValidDomain } from '@shinefold/db/utils/is-valid-domain/is-valid-domain';
+import { normalizeLocaleCode } from '@shinefold/db/utils/normalize-locale-code/normalize-locale-code';
+import { normalizeSignupEmail } from '@shinefold/db/utils/normalize-signup-identity/normalize-signup-identity';
+import { requireEmailIndex } from '@shinefold/db/utils/personal-data/personal-data';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { personalDataIndex } from '@shinefold/utils/encryption';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 const REFUSAL_BY_CONSTRAINT: Partial<Record<string, TErrorCode>> = {
   [SELF_SERVE_FREE_OWNER_INDEX_NAME]: ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT,

@@ -1,30 +1,30 @@
+import { faker } from '@faker-js/faker';
 import {
   LOCALE_ISO_CODES,
   LOCALE_NATIVE_LABEL,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
+} from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { PAGE_HOME_TYPE } from '@shinefold/studio/schema-types/documents/pages/home/home-type';
+import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
 import {
   mockHomePage,
   mockLandingPage,
   mockPage,
-} from '@blog/studio/testing/mock-documents';
+} from '@shinefold/studio/testing/mock-documents';
 import {
   asStructureBuilder,
   matchingIds,
   mockStructureBuilder,
   type TMockStructureBuilder,
-} from '@blog/studio/testing/structure/mock-structure-builder';
+} from '@shinefold/studio/testing/structure/mock-structure-builder';
 import {
   callArgs,
   type TMockStructureNode,
-} from '@blog/studio/testing/structure/mock-structure-node';
-import { mockStructureSchema } from '@blog/studio/testing/structure/mock-structure-schema';
-import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/structure/mock-structure-node';
+import { mockStructureSchema } from '@shinefold/studio/testing/structure/mock-structure-schema';
+import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { House } from 'lucide-react';
 import { getDraftId } from 'sanity';
 

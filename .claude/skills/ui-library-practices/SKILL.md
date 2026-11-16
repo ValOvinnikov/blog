@@ -1,13 +1,13 @@
 ---
 name: ui-library-practices
 description: >-
-  Best practices for building components in the @blog/ui design system
+  Best practices for building components in the @shinefold/ui design system
   (packages/ui). Use when creating or editing an atom, molecule or organism,
   deciding a component API, styling with tv() and Tailwind tokens, or keeping
   the library pure and publishable. Apply whenever touching packages/ui.
 ---
 
-# UI library practices (`@blog/ui`)
+# UI library practices (`@shinefold/ui`)
 
 A **pure, prop-driven, Atomic Design** component library, portable enough to
 publish to npm with zero edits. It builds on `react-component-practices`
@@ -19,10 +19,10 @@ load on demand: `polymorphic-and-as.md` (Level-2 `as`, anchor rules) and
 ## Purity rules (non-negotiable)
 
 - **No data fetching.** Components take plain typed props; they never call
-  `@blog/service` or `fetch`, or import `sanity`/`next-sanity`.
+  `@shinefold/service` or `fetch`, or import `sanity`/`next-sanity`.
 - **No app coupling.** No `next/*` imports. Framework specifics arrive through
   `as`/`linkAs`, `children` or a slot; default to plain elements.
-- Shapes come from `@blog/config`. No business logic.
+- Shapes come from `@shinefold/config`. No business logic.
 - **No `'use client'`** (`react-component-practices` → "Server first, client at the leaf", which names the agreed
   client-only components). A component that calls a client-only hook — state,
   a ref, an effect, a third-party hook such as `useEmblaCarousel` — is
@@ -40,7 +40,7 @@ load on demand: `polymorphic-and-as.md` (Level-2 `as`, anchor rules) and
 - `organisms/` — page sections (`Header`, `Footer`, `Hero`, `Carousel`,
   `Dialog`, `Pagination`).
 - **No template layer.** Page composition (layout shells, Portable Text
-  rendering) belongs in `apps/web`; `@blog/ui` stops at organisms.
+  rendering) belongs in `apps/web`; `@shinefold/ui` stops at organisms.
 - Each layer composes only the layers below it.
 
 ## File and folder structure
@@ -64,11 +64,11 @@ src/components/molecules/media-card/
 - **One component per file.** A part not exported from `index.ts` lives in
   `components/<child>/<parent>-<child>.tsx`, never inline in the parent.
 - **No group barrels.** There is no `src/index.ts` and no per-layer `index.ts`;
-  consumers deep-import `@blog/ui/components/<layer>/<name>` (served by
+  consumers deep-import `@shinefold/ui/components/<layer>/<name>` (served by
   `package.json`'s `"./*"` export). Cross-folder imports inside the package
-  use the `@blog/ui/*` alias (declared in `tsconfig.json`, `vitest.config.ts`
-  and `.storybook/main.ts`), e.g. `@blog/ui/components/atoms/heading`,
-  `@blog/ui/lib/react`; same-folder imports stay relative.
+  use the `@shinefold/ui/*` alias (declared in `tsconfig.json`, `vitest.config.ts`
+  and `.storybook/main.ts`), e.g. `@shinefold/ui/components/atoms/heading`,
+  `@shinefold/ui/lib/react`; same-folder imports stay relative.
 - Size budgets: CLAUDE.md → Conventions. What to extract, and where:
   `react-component-practices` § Size and splitting.
 
@@ -155,20 +155,20 @@ src/components/molecules/media-card/
   either end; `TextInput`, `Button` and `BookmarkToggle` offer only native
   `disabled` today.
 
-## Using `@blog/config`
+## Using `@shinefold/config`
 
 - **`SIZE` keys every size variant** — computed keys in `tv()` maps,
   `defaultVariants` and lookups, never `'sm'`/`'md'` literals:
   ```ts
-  import { SIZE } from '@blog/config';
+  import { SIZE } from '@shinefold/config';
   // inside tv({ … })
   size: { [SIZE.SM]: 'px-3 py-1.5 text-sm', [SIZE.MD]: 'px-4 py-2 text-copy' },
   defaultVariants: { size: SIZE.MD },
   ```
 - Shared types (`IWithClassName`, `IWithDataTestId`, `TMaybeUndefined`, …):
-  CLAUDE.md → "Use `@blog/config`'s shared types". The React ones —
-  `TPolymorphicProps`, `TAnchorElementType` — come from `@blog/config/react`.
-- **Heading tags come from `headingTags`** (`@blog/ui/lib/react`, keyed by
+  CLAUDE.md → "Use `@shinefold/config`'s shared types". The React ones —
+  `TPolymorphicProps`, `TAnchorElementType` — come from `@shinefold/config/react`.
+- **Heading tags come from `headingTags`** (`@shinefold/ui/lib/react`, keyed by
   `THeadingLevel`) — never ``Tag = `h${level}` `` and never a local map.
 
 ## Props
@@ -220,9 +220,9 @@ ceiling, its exemptions and the drop → group → slot → hook → context lad
   export type TPostMetaProps = … & { share?: { url: string; isCopied: boolean; onCopy: () => void; … } };
   ```
 - **Shape data props to the view-model you're fed.** Name a data prop's
-  fields after the `@blog/service` view-model passed to it, so
-  `x={viewModel.x}` type-checks with no reshape. `@blog/ui` still never
-  imports `@blog/service`; structural typing bridges it.
+  fields after the `@shinefold/service` view-model passed to it, so
+  `x={viewModel.x}` type-checks with no reshape. `@shinefold/ui` still never
+  imports `@shinefold/service`; structural typing bridges it.
 - **Every exported component and slot carries a one-sentence JSDoc — required
   here, unlike the repo default.** It is the library's public API and feeds
   `COMPONENTS.md`, whose `pnpm gen:ui-index:check` coverage guard fails on a
@@ -246,7 +246,7 @@ Pick the **minimum** level:
   element-specific prop inference.
 - **Level 2 — fully polymorphic.** Accepts _any_ element and exposes _that_
   element's props (`href` only when `as="a"`). Use the shared
-  `TPolymorphicProps<C, OwnProps>` from `@blog/config/react` — never
+  `TPolymorphicProps<C, OwnProps>` from `@shinefold/config/react` — never
   re-derive it.
 - **Every anchor a component builds itself takes a `linkAs`/`as` prop**
   (default `'a'`, typed `TAnchorElementType`) — never a hardcoded `<a>`,
@@ -272,7 +272,7 @@ Use when a component owns **more than one** framework-coupled seam (a link and
 an image, or a family of swappable children); a single `as` swaps one seam.
 Compound splits into named slots (`Header.Brand`/`Header.Nav`, `MediaCard`,
 `Panel`). The repo uses **context-free children introspection**
-(`mapCompoundSlots` from `@blog/ui/lib/react`), **not** React Context, which
+(`mapCompoundSlots` from `@shinefold/ui/lib/react`), **not** React Context, which
 needs a client boundary this package can't have. A component that only ever
 swaps **one** element uses `as`, not compound.
 
@@ -284,10 +284,10 @@ Primitives API, folder layout, the `Header` example and the slot/media rules →
 - **Where a `tv()` lives:** `react-component-practices` § Styling files.
 - **No Tailwind classes inline in JSX, on any element** — root or inner
   (placeholder spans, icon wrappers). Every class goes through the `tv()`.
-- **Import `tv` from `@blog/ui/lib/styling`**, never from `tailwind-variants`
+- **Import `tv` from `@shinefold/ui/lib/styling`**, never from `tailwind-variants`
   — the wrapper registers this project's tokens with `tailwind-merge`. Pass
   `className` as `class: className` in the call; never wrap it in `cn()`.
-- **Build from the shared recipes in `@blog/ui/lib/styling`; never retype
+- **Build from the shared recipes in `@shinefold/ui/lib/styling`; never retype
   their classes.** `FOCUS_RING` is the focus indicator and
   `TRANSITION_COLORS` the colour transition (`interaction.ts`);
   `ALIGN_JUSTIFY` maps each `CONTENT_ALIGNMENT` value to its `justify-*`
@@ -348,7 +348,7 @@ Primitives API, folder layout, the `Header` example and the slot/media rules →
 ## Icons
 
 - **Every icon is `<Icon name={ICONS.X} />`**
-  (`@blog/ui/components/atoms/icon`; `ICONS`/`TIconName` from `@blog/config`),
+  (`@shinefold/ui/components/atoms/icon`; `ICONS`/`TIconName` from `@shinefold/config`),
   which maps the name to a bespoke local SVG through `icon-registry.ts`. No
   `lucide-react`, no ad-hoc inline SVG.
 - Size it with the `size` variant (`size={SIZE.SM}`). It is `aria-hidden`
@@ -359,14 +359,14 @@ Primitives API, folder layout, the `Header` example and the slot/media rules →
 
 - Tests: `testing-practices` — nothing test-specific lives here. Stories:
   `ui-storybook`.
-- While iterating: `pnpm --filter @blog/ui type-check` and
-  `pnpm --filter @blog/ui test`. Before finishing: `pnpm verify` from the
+- While iterating: `pnpm --filter @shinefold/ui type-check` and
+  `pnpm --filter @shinefold/ui test`. Before finishing: `pnpm verify` from the
   root, which also runs lint and `gen:ui-index:check`. The post-edit hook
   formats every file you write.
 
 ## Checklist before finishing
 
-- [ ] No `@blog/service`/`sanity`/`fetch` or `next/*` import; no
+- [ ] No `@shinefold/service`/`sanity`/`fetch` or `next/*` import; no
       `'use client'`; no client-only hook (state, ref, effect, third-party)
       unless the component is an agreed client-only one — `useId` is fine
       (Purity).
@@ -377,7 +377,7 @@ Primitives API, folder layout, the `Header` example and the slot/media rules →
       every slot.
 - [ ] Every class comes from a `tv()` in a `-variants.ts` (its own, or a
       shared one per `react-component-practices` § Styling files), with `tv`
-      from `@blog/ui/lib/styling`; none inline; slot values arrays, grouped
+      from `@shinefold/ui/lib/styling`; none inline; slot values arrays, grouped
       by concern; `class: className`, no `cn()`; tokens only.
 - [ ] Interactive or foreign content via a `ReactNode` slot; data props accept
       the view-model as is.
@@ -390,9 +390,9 @@ Primitives API, folder layout, the `Header` example and the slot/media rules →
       type — never the variants.
 - [ ] Stories alongside (`ui-storybook`); `pnpm verify` green.
 
-## The `@blog/ui` component index
+## The `@shinefold/ui` component index
 
-`packages/ui/COMPONENTS.md` is a generated index of every `@blog/ui` component
+`packages/ui/COMPONENTS.md` is a generated index of every `@shinefold/ui` component
 — its purpose, props, and compound slots (`Header.Brand`, `PostCard.Media`, …)
 — produced by `scripts/gen-ui-index.mjs`. **Consult it before deciding a feature
 needs a new UI component:** it's the cheapest way to spot one to reuse or

@@ -1,11 +1,11 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
 import {
   STRIPE_PRORATION_BEHAVIOR,
   STRIPE_RECURRING_INTERVAL,
   type TBillingInterval,
 } from '@platform/constants/billing';
+import type { TMaybeUndefined } from '@shinefold/config';
 import Stripe from 'stripe';
 
 import type { TSubscriptionPlan } from './load-subscription-plan';

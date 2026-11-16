@@ -1,16 +1,16 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config/constants';
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
-import { mockSlug } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { mockTenant } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@shinefold/config/constants';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { mockCacheTag } from '@shinefold/service/testing/sanity/query/cache-tags';
+import { mockSlug } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getRedirect } from './loader';
 import { redirectsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6015107);
 

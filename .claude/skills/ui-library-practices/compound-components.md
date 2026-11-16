@@ -1,11 +1,11 @@
-# Compound components (`@blog/ui`)
+# Compound components (`@shinefold/ui`)
 
 Reference for `ui-library-practices` § Compound components, which says when to
 pick compound over `as` and why the mechanism is context-free. This file holds
 the mechanics. Besides several swappable seams, compound also fits a component
 that owns text the consumer must wrap in its own markup.
 
-## The primitives — `@blog/ui/lib/react`
+## The primitives — `@shinefold/ui/lib/react`
 
 Defined in `packages/ui/src/lib/react/compound.tsx`. Import them; never
 re-derive the mechanism per component.

@@ -1,10 +1,10 @@
-import { SIZE } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import { Button } from '@platform/components/shared/button';
 import { FirstInvalidFieldLink } from '@platform/components/shared/settings-form-shell/components/save-bar/components/first-invalid-field-link/first-invalid-field-link';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TInvalidControls } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
+import { SIZE } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { type Ref, useId } from 'react';
 

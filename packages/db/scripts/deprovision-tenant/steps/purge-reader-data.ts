@@ -2,8 +2,8 @@ import {
   countTenantReaderData,
   purgeTenantReaderData as purgeReaderDataRows,
   type TTenantReaderDataCounts,
-} from '@blog/db/queries/reader-data';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/queries/reader-data';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 import type { TDeprovisionEnv } from '../lib/env';
 import { recordReaderDataPurgeAuditEvent } from '../lib/record-reader-data-purge-audit-event';

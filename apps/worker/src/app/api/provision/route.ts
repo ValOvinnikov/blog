@@ -1,6 +1,6 @@
-import { ERROR_CODE, HTTP_STATUS } from '@blog/config/constants';
-import { beginTenantProvisioning } from '@blog/db/queries/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
+import { ERROR_CODE, HTTP_STATUS } from '@shinefold/config/constants';
+import { beginTenantProvisioning } from '@shinefold/db/queries/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { PROVISIONING_BEGIN_FAILED_EVENT } from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';

@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
 import type { TDeviceFrameHandle } from '@platform/components/shared/device-frame';
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
 import { LOOK_FOLLOW_TARGET } from '@platform/constants/look-follow';
@@ -10,6 +9,7 @@ import {
   type TLookFollowTarget,
 } from '@platform/utils/look-follow-target/look-follow-target';
 import { useMotionScrollBehavior } from '@platform/utils/use-motion-scroll-behavior/use-motion-scroll-behavior';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useEffect, useRef, useState } from 'react';
 
 import { followScroll, type TLookFollowSettled } from './follow-scroll';

@@ -1,6 +1,6 @@
-import type { TMaybeNull } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import { KEY } from '@platform/constants/keyboard';
+import type { TMaybeNull } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useRef, type KeyboardEvent } from 'react';
 
 type TOptionNode = TMaybeNull<HTMLButtonElement>;

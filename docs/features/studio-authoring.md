@@ -33,13 +33,13 @@ epics: [4035, 2803, 3252, 1036, 4970, 2918]
 
 ## What it does
 
-This is how content is modelled and edited in the Sanity Studio: the desk an editor navigates, the shared field kit every schema type is built from, the previews that label documents in lists, and the validation that blocks a publish. One schema in `@blog/studio` serves every tenant; the Studio is mounted per tenant by ./embedded-studio.md. The schema is also the source of every content type the rest of the monorepo reads, through generated types in `@blog/config`.
+This is how content is modelled and edited in the Sanity Studio: the desk an editor navigates, the shared field kit every schema type is built from, the previews that label documents in lists, and the validation that blocks a publish. One schema in `@shinefold/studio` serves every tenant; the Studio is mounted per tenant by ./embedded-studio.md. The schema is also the source of every content type the rest of the monorepo reads, through generated types in `@shinefold/config`.
 
 ## Surfaces and routes
 
 - **Desk ("Content"):** People (opens the Person list directly); Modules (Heroes, then one group per module kind: Explainers, Proof, Conversion, Posts); Blocks (Cards: feature and testimonial; FAQs; Links); Taxonomy (Topic, Tag); Pages (Home; Landing as a page tree; Blog: post index, posts, topic index, topics, tag index, tags); Templates (one per page type except posts); a divider; Settings (Navigation and Footer singletons, Redirects, then Site Settings).
 - **Other tools:** Vision (GROQ), Media (`sanity-plugin-media`, the asset source for every image and file field).
-- **Where it runs:** `/dashboard/studio` and `/tenants/{id}/studio` in the platform, or standalone with `pnpm --filter @blog/studio dev`.
+- **Where it runs:** `/dashboard/studio` and `/tenants/{id}/studio` in the platform, or standalone with `pnpm --filter @shinefold/studio dev`.
 
 ## Data
 
@@ -53,7 +53,7 @@ This is how content is modelled and edited in the Sanity Studio: the desk an edi
 - Editors (the tenant project's Sanity members) edit content; what they may do is decided by Sanity roles, not the platform.
 - The desk's language lists follow the tenant's live languages (./languages.md). A module type whose capability is off stays in the desk and insert menus with a warning (./plans-and-entitlements.md).
 - Look and Voice do not reach the Studio. Its UI is Sanity's own, in English.
-- Changing the desk, a field or a validation rule is a code change in `@blog/studio`, shipped to every tenant at once.
+- Changing the desk, a field or a validation rule is a code change in `@shinefold/studio`, shipped to every tenant at once.
 
 ## Constraints and invariants
 
@@ -61,7 +61,7 @@ This is how content is modelled and edited in the Sanity Studio: the desk an edi
 - Every type and editor-visible field carries a `description` written for an editor: what to put there and when, never the widget's mechanics, an enum identifier, or a restatement of a validation limit.
 - Every document type and desk entry has an icon and a `preview` with a meaningful title (`buildSections` enforces the title and icon); object types often have neither. `prepare` inputs are typed. Shared helpers: `languagePreview` (title plus the language's label) and `moduleSubtitle` (brand variant and details joined with " · ").
 - A shape repeated across schemas is a factory: `titleField` (internal, required), `slugField` (sourced from `title`, max 96, optional preview input and uniqueness check), `imageAltField` with `imageHotspotOptions`, `imageWithAlt`, and the localized fields (`localizedOneLineTextField`, `localizedMultilineTextField`, and the Portable Text ones in ./rich-text.md) backed by `internationalizedArray*` types.
-- Stored option values come from UPPERCASE constants in `@blog/config`; `_type` names are referenced through the schema's `.name` (or its `*-type.ts` const where an import would cycle). An `options.list` states its `layout`, except `containerWidthField`, which leaves the default.
+- Stored option values come from UPPERCASE constants in `@shinefold/config`; `_type` names are referenced through the schema's `.name` (or its `*-type.ts` const where an import would cycle). An `options.list` states its `layout`, except `containerWidthField`, which leaves the default.
 - A new field on an existing type gets no `required()` unless a backfill migration ships with it; a change to an existing shape needs a content migration (./cross-tenant-migrations.md).
 - A cross-document validator reads through `getDraftsClient` and `fetchDraftsFailSafe`, which resolves a failed fetch to a fallback rather than blocking publish; the redirect validators use the published-perspective `getPublishedClient` with their own fallback on a failed fetch. `validateImageHasAsset` checks the asset reference itself, since `required()` on an image passes with only alt text or crop data; `validateImageAltFilled` requires alt only once an asset exists; `validateLocalizedMaxLength` applies a limit to every language.
 - An option field that picks a look is a `tileField`: `createOptionTilesInput` shows each option as a picture tile (a keyboard-reachable radio named by its title), with an optional empty tile for "Site default"-style fields that may stay unset. Display mode, card alignment, image shape, card style, corners, density and columns use it; the stored values are the same as a plain option list's.
@@ -71,7 +71,7 @@ This is how content is modelled and edited in the Sanity Studio: the desk an edi
 
 ## Dependencies
 
-- Layers: `@blog/studio` (upstream `@blog/config`, `@blog/utils`); it feeds `@blog/config`'s generated types, which `@blog/service` and `apps/web` consume. Plugins: structure, vision, code input, media, document internationalization, internationalized arrays; `@sanity/orderable-document-list` renders the page tree.
+- Layers: `@shinefold/studio` (upstream `@shinefold/config`, `@shinefold/utils`); it feeds `@shinefold/config`'s generated types, which `@shinefold/service` and `apps/web` consume. Plugins: structure, vision, code input, media, document internationalization, internationalized arrays; `@sanity/orderable-document-list` renders the page tree.
 - Features: ./embedded-studio.md, ./languages.md, ./module-system.md, ./page-types.md, ./landing-tree.md, ./links.md, ./rich-text.md, ./navigation.md, ./footer-and-legal-pages.md, ./people.md, ./topics-and-tags.md, ./cross-tenant-migrations.md, ./plans-and-entitlements.md.
 - Env: `SANITY_STUDIO_PROJECT_ID` and `SANITY_STUDIO_DATASET` for the CLI (dev, typegen, migrations); none when mounted.
 
@@ -90,7 +90,7 @@ This is how content is modelled and edited in the Sanity Studio: the desk an edi
 - `packages/studio/src/structure/build-section/build-section.test.ts`, `structure/module-kinds/module-kinds.test.ts`, `structure/page-tree/page-tree.test.ts`.
 - `packages/studio/src/schema-types/preview/**/*.test.ts`, `inputs/slug-url-preview/slug-url-preview-path.test.ts`, `validation/**/*.test.ts`.
 - `packages/studio/src/testing/*.test.ts`; `studio-config.test.ts` for plugin and template wiring.
-- No Storybook in `@blog/studio`.
+- No Storybook in `@shinefold/studio`.
 
 ## Related
 

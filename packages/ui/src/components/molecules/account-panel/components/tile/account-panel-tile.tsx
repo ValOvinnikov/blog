@@ -1,7 +1,7 @@
-import { SIZE, type TIconName } from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
+import { SIZE, type TIconName } from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { PopoverMenu } from '@shinefold/ui/components/molecules/popover-menu';
 import { useId } from 'react';
 
 import { accountPanelTileVariants } from './account-panel-tile-variants';

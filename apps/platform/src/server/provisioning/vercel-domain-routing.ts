@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config';
 import {
   DOMAIN_VERIFICATION_STATUS,
   ROUTING_RECORD_TYPE,
 } from '@platform/constants/domain';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { logger } from '@platform/utils/logger/logger';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 import {
   projectDomain,

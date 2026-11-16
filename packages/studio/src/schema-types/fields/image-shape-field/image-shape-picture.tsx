@@ -1,4 +1,7 @@
-import { CARD_IMAGE_SHAPE, type TCardImageShape } from '@blog/config/constants';
+import {
+  CARD_IMAGE_SHAPE,
+  type TCardImageShape,
+} from '@shinefold/config/constants';
 import {
   FAINT,
   FRAME_CENTER_X,
@@ -6,7 +9,7 @@ import {
   FRAME_WIDTH,
   PictureFrame,
   TEXT_LINE_HEIGHT,
-} from '@blog/studio/schema-types/inputs/option-tiles-input/picture-frame';
+} from '@shinefold/studio/schema-types/inputs/option-tiles-input/picture-frame';
 import type { ReactNode } from 'react';
 
 const IMAGE_SIZE = 12;

@@ -1,11 +1,11 @@
-import type { TMaybeNull } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import type { TGraceEmail } from '@blog/db/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import type { TGraceEmail } from '@shinefold/db/constants';
 import {
   GRACE_EMAIL_STAMP,
   graceEmailDue,
-} from '@blog/db/queries/tenants/grace-due';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/queries/tenants/grace-due';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import { and, eq } from 'drizzle-orm';
 
 // Returns the tenant only to the one caller that stamped the email.

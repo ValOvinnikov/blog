@@ -1,13 +1,13 @@
-import * as schema from '@blog/db/schema';
-import { MOCK_EMAIL_CONFIG } from '@blog/db/testing/email-config/fixtures';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 import { faker } from '@faker-js/faker';
+import * as schema from '@shinefold/db/schema';
+import { MOCK_EMAIL_CONFIG } from '@shinefold/db/testing/email-config/fixtures';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
 
 import { upsertEmailConfig } from './upsert-email-config';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(61013);
 

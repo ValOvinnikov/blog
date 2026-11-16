@@ -1,10 +1,10 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT } from '@shinefold/config';
 import {
   FOCUS_RING,
   HEADER_CONTROL,
   TRANSITION_COLORS,
   tv,
-} from '@blog/ui/lib/styling';
+} from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const iconButtonVariants = tv({

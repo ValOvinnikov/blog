@@ -1,13 +1,13 @@
 import 'server-only';
 
+import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { getPlatformTenant } from '@platform/server/tenants/get-platform-tenant';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import {
   ACTION_OUTCOME,
   type TOutcome,
   type TReasonedFailure,
-} from '@blog/config';
-import { TENANT_REFUSAL } from '@platform/constants/tenant';
-import { getPlatformTenant } from '@platform/server/tenants/get-platform-tenant';
-import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+} from '@shinefold/config';
 
 export type TResolveLiveTenantResult =
   | { outcome: typeof ACTION_OUTCOME.SUCCESS; tenant: TPlatformTenant }

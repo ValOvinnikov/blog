@@ -1,4 +1,4 @@
-import type { TMaybeNull } from '@blog/config';
+import type { TMaybeNull } from '@shinefold/config';
 import { type FocusEvent, useRef } from 'react';
 
 const findControl = (control: TMaybeNull<HTMLElement>) => {

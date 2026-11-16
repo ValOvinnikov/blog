@@ -1,25 +1,25 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
 import {
   BRAND_TAGLINE_SEPARATORS,
   PORTABLE_TEXT_BLOCK_TYPE,
-} from '@blog/config/constants';
-import { mockRawNavigation } from '@blog/service/testing/global/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+} from '@shinefold/config/constants';
+import { mockRawNavigation } from '@shinefold/service/testing/global/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,
-} from '@blog/service/testing/sanity/query/cache-tags';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   mockLinkView,
   mockRawExternalLinkDocument,
-} from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getNavigation } from './loader';
 import { navigationQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6015106);
 

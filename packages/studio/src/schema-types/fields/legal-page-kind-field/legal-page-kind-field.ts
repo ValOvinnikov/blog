@@ -1,9 +1,9 @@
-import type { TLegalPageKind } from '@blog/config/constants';
+import type { TLegalPageKind } from '@shinefold/config/constants';
 import {
   LEGAL_PAGE_KIND_FIELD,
   validateUniqueLegalPageKind,
-} from '@blog/studio/schema-types/validation/validate-unique-legal-page-kind/validate-unique-legal-page-kind';
-import { toTitleCase } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/validation/validate-unique-legal-page-kind/validate-unique-legal-page-kind';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { defineField } from 'sanity';
 
 export const legalPageKindField = (kinds: readonly TLegalPageKind[]) =>

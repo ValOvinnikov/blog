@@ -1,9 +1,9 @@
-import { getAllPublishedPosts } from '@blog/service/features/entities/posts/adaptor/all-published/loader';
-import { getPostsByIds } from '@blog/service/features/entities/posts/adaptor/get-by-ids/loader';
-import { getPostPublishedAt } from '@blog/service/features/entities/posts/adaptor/get-published-at/loader';
-import { getPublishedPostsByTag } from '@blog/service/features/entities/posts/adaptor/tag-scoped-published/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getAllPublishedPosts } from '@shinefold/service/features/entities/posts/adaptor/all-published/loader';
+import { getPostsByIds } from '@shinefold/service/features/entities/posts/adaptor/get-by-ids/loader';
+import { getPostPublishedAt } from '@shinefold/service/features/entities/posts/adaptor/get-published-at/loader';
+import { getPublishedPostsByTag } from '@shinefold/service/features/entities/posts/adaptor/tag-scoped-published/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createPostsService() {
   return {

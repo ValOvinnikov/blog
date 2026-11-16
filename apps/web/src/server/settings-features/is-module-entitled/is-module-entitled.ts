@@ -2,8 +2,8 @@ import {
   isModuleTypeEntitled,
   MODULE_PACK,
   type TModulePack,
-} from '@blog/config';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
+} from '@shinefold/config';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';

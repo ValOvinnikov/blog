@@ -1,9 +1,9 @@
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { localizedArticleTextField } from '@blog/studio/schema-types/fields/localized-article-text-field/localized-article-text-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
-import { validateDefaultLanguageBlocksFilled } from '@blog/studio/schema-types/validation/validate-default-language-blocks-filled/validate-default-language-blocks-filled';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { localizedArticleTextField } from '@shinefold/studio/schema-types/fields/localized-article-text-field/localized-article-text-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { layoutField } from '@shinefold/studio/schema-types/objects/layout/layout-field';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
+import { validateDefaultLanguageBlocksFilled } from '@shinefold/studio/schema-types/validation/validate-default-language-blocks-filled/validate-default-language-blocks-filled';
 import { FileText } from 'lucide-react';
 import { defineType } from 'sanity';
 

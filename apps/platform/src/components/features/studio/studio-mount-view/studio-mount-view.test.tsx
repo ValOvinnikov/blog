@@ -1,10 +1,3 @@
-import {
-  CAPABILITY,
-  LOCALE_ISO_CODES,
-  SANITY_LOGIN_PROVIDER,
-} from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
@@ -17,6 +10,13 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { MOCK_FREE_STUDIO_ENTITLEMENTS } from '@platform/testing/tenants/studio-ready-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import {
+  CAPABILITY,
+  LOCALE_ISO_CODES,
+  SANITY_LOGIN_PROVIDER,
+} from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 
 import { StudioMountView } from './studio-mount-view';
 
@@ -34,7 +34,7 @@ const { studioMountMock, getEnabledCapabilitiesMock, selectLiveLocalesMock } =
     studioMountMock: vi.fn(),
   }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: { selectLiveLocales: selectLiveLocalesMock },
   },
@@ -46,7 +46,7 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities', () => ({
 
 vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 
-vi.mock('@blog/studio', () => ({
+vi.mock('@shinefold/studio', () => ({
   StudioMount: (props: unknown) => {
     studioMountMock(props);
     return <div data-testid={STUDIO_MOUNT} />;

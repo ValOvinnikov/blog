@@ -50,7 +50,7 @@ An editor introduces a founder, a team, staff or contributors by picking existin
 
 ## Dependencies
 
-- Layers: `studio`, `service`, `web` (with `@blog/ui` `MediaCard`, `MediaFrame`, `Avatar`, `CardGrid`, `Carousel`).
+- Layers: `studio`, `service`, `web` (with `@shinefold/ui` `MediaCard`, `MediaFrame`, `Avatar`, `CardGrid`, `Carousel`).
 - Features: [people](./people.md) (the members' content), [module-system](./module-system.md), [links](./links.md) (profile pages, actions), [rich-text](./rich-text.md) (bios), [languages](./languages.md), [page-types](./page-types.md), [rendering-and-caching](./rendering-and-caching.md).
 - No env vars of its own.
 

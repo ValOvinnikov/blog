@@ -1,6 +1,6 @@
-import { ICONS } from '@blog/config';
 import type { TIconToggleGroupProps } from '@platform/components/shared/icon-toggle-group';
 import { PREVIEW_MODE, type TPreviewMode } from '@platform/constants/preview';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export const usePreviewModeGroup = (

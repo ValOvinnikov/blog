@@ -1,6 +1,6 @@
-import { Button } from '@blog/ui/components/atoms/button';
-import { CtaModule } from '@blog/ui/components/organisms/cta-module';
 import { faker } from '@faker-js/faker';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { CtaModule } from '@shinefold/ui/components/organisms/cta-module';
 import type { ReactNode } from 'react';
 
 export const mockCtaImage = (seed: string) => (

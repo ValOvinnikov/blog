@@ -1,6 +1,6 @@
-import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { Text } from '@platform/components/shared/text';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+import { SIZE, type TMaybeUndefined } from '@shinefold/config';
 
 import { assetUploadDetailsVariants } from './asset-upload-details-variants';
 

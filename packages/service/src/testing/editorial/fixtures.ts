@@ -1,5 +1,5 @@
-import type { TSaveSkimDraftInput } from '@blog/service/features/editorial/skim/adaptor/save-skim-draft/types';
-import { MOCK_POST_ID } from '@blog/service/testing/shared/fixtures';
+import type { TSaveSkimDraftInput } from '@shinefold/service/features/editorial/skim/adaptor/save-skim-draft/types';
+import { MOCK_POST_ID } from '@shinefold/service/testing/shared/fixtures';
 
 export const MOCK_SKIM_MODEL = 'claude-haiku-4-5';
 export const MOCK_SKIM_TAKEAWAYS = ['One', 'Two', 'Three'];

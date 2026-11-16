@@ -1,6 +1,5 @@
 'use client';
 
-import { SIZE } from '@blog/config';
 import { Checkbox } from '@platform/components/shared/checkbox';
 import {
   ConfirmDialog,
@@ -8,6 +7,7 @@ import {
 } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 

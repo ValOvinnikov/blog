@@ -1,6 +1,6 @@
-import { q } from '@blog/service/sanity/query/query';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
-import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
+import { q } from '@shinefold/service/sanity/query/query';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
+import { publishedPostsInLocale } from '@shinefold/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 
 export const indexPageParamsQuery = q
   .parameters<TLocaleQueryParams>()

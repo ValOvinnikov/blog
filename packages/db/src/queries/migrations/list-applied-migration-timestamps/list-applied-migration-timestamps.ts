@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { CREATED_AT_COLUMN } from '@blog/db/schema/columns';
+import { getDb } from '@shinefold/db/client';
+import { CREATED_AT_COLUMN } from '@shinefold/db/schema/columns';
 import { bigint, pgSchema, serial, text } from 'drizzle-orm/pg-core';
 
 // drizzle-kit migrate's own journal table; kept out of src/schema so db:generate never manages it.

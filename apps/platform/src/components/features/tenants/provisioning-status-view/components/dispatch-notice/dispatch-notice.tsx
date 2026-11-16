@@ -1,7 +1,7 @@
-import { ACTION_OUTCOME, ALERT_TYPE, type TAlertType } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import type { TDispatchNoticeKind } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
+import { ACTION_OUTCOME, ALERT_TYPE, type TAlertType } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 const NOTICE_MESSAGES = {

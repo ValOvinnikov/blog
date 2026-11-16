@@ -1,6 +1,6 @@
-import { type IWithDataTestId } from '@blog/config';
-import { MediaCard } from '@blog/ui/components/molecules/media-card';
-import type { THeadingLevel } from '@blog/ui/lib/react';
+import { type IWithDataTestId } from '@shinefold/config';
+import { MediaCard } from '@shinefold/ui/components/molecules/media-card';
+import type { THeadingLevel } from '@shinefold/ui/lib/react';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import type { ReactNode } from 'react';

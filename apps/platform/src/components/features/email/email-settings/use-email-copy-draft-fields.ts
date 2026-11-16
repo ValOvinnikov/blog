@@ -1,8 +1,11 @@
-import { portableTextToPlainText, type TLocaleIsoCode } from '@blog/config';
 import {
   EMAIL_TEMPLATE_TYPES,
   type TEmailDraft,
 } from '@platform/utils/email-draft/email-draft';
+import {
+  portableTextToPlainText,
+  type TLocaleIsoCode,
+} from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export const useEmailCopyDraftFields = (liveLocales: TLocaleIsoCode[]) => {

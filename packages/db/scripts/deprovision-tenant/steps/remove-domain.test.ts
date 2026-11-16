@@ -1,20 +1,20 @@
-import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
+import { faker } from '@faker-js/faker';
+import { listTenantHosts } from '@shinefold/db/queries/tenant-domains/list-tenant-hosts';
 import {
   MOCK_DEPROVISION_DRY_RUN_ENV,
   MOCK_DEPROVISION_ENV,
-} from '@blog/db/testing/deprovision-tenant/fixtures';
-import { MOCK_WWW_TENANT_DOMAIN } from '@blog/db/testing/tenant-domains/fixtures';
+} from '@shinefold/db/testing/deprovision-tenant/fixtures';
+import { MOCK_WWW_TENANT_DOMAIN } from '@shinefold/db/testing/tenant-domains/fixtures';
 import {
   MOCK_TENANT_DOMAIN,
   mockTenant,
-} from '@blog/db/testing/tenants/fixtures';
-import { deleteVercelProjectDomains } from '@blog/db/utils/vercel-client/vercel-project-domains';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/tenants/fixtures';
+import { deleteVercelProjectDomains } from '@shinefold/db/utils/vercel-client/vercel-project-domains';
 
 import { removeTenantDomain } from './remove-domain';
 
-vi.mock('@blog/db/utils/vercel-client/vercel-project-domains');
-vi.mock('@blog/db/queries/tenant-domains/list-tenant-hosts');
+vi.mock('@shinefold/db/utils/vercel-client/vercel-project-domains');
+vi.mock('@shinefold/db/queries/tenant-domains/list-tenant-hosts');
 
 faker.seed(5765);
 

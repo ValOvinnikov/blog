@@ -1,4 +1,5 @@
-import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
+import { faker } from '@faker-js/faker';
+import { PLATFORM_EMAIL_BRAND } from '@shinefold/email/html/platform-email-brand/platform-email-brand';
 import {
   COPYRIGHT_ENTITY,
   MOCK_ATTRIBUTE_BREAKOUT,
@@ -10,12 +11,11 @@ import {
   MOCK_PLATFORM_BRAND_NAME,
   MOCK_UNSAFE_MARKUP,
   MOCK_URL,
-} from '@blog/email/testing/email-fixtures';
+} from '@shinefold/email/testing/email-fixtures';
 import {
   MOCK_EMAIL_DETAILS,
   MOCK_OWNER_EMAIL_INPUT,
-} from '@blog/email/testing/owner-email';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/email/testing/owner-email';
 
 import { buildOwnerEmail } from './owner-email';
 

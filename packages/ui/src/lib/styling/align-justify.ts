@@ -1,4 +1,4 @@
-import { CONTENT_ALIGNMENT, type TContentAlignment } from '@blog/config';
+import { CONTENT_ALIGNMENT, type TContentAlignment } from '@shinefold/config';
 
 export const ALIGN_JUSTIFY = {
   [CONTENT_ALIGNMENT.LEFT]: 'justify-start',

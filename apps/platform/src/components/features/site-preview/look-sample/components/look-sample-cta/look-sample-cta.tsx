@@ -1,8 +1,8 @@
-import { BRAND_VARIANT, SIZE } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
-import { CtaModule } from '@blog/ui/components/organisms/cta-module';
 import { SamplePart } from '@platform/components/features/site-preview/sample-part';
 import { SAMPLE_PART } from '@platform/constants/sample-part';
+import { BRAND_VARIANT, SIZE } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { CtaModule } from '@shinefold/ui/components/organisms/cta-module';
 import { useTranslations } from 'next-intl';
 
 export const LookSampleCta = () => {

@@ -1,7 +1,7 @@
 import type {
   TTimelineMarkerStyle,
   TTimelineOrientation,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 export type TTimelineDocument = {
   markerStyle?: TTimelineMarkerStyle;

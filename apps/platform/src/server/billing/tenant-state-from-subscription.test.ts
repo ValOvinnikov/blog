@@ -1,5 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
 import {
   BILLING_GRACE,
   STRIPE_SUBSCRIPTION_STATUS,
@@ -8,6 +6,8 @@ import {
   MOCK_BAND_CEILING,
   MOCK_INCOMPLETE_SUBSCRIPTION_STATUS,
 } from '@platform/testing/billing/fixtures';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 
 import type { TSubscribedPlan } from './plan-from-price-keys';
 import { tenantStateFromSubscription } from './tenant-state-from-subscription';

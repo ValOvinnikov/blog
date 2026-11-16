@@ -1,10 +1,3 @@
-import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
-import {
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db';
-import type { TProvisioningRun } from '@blog/db/schema/tenants';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
@@ -38,6 +31,13 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { STEP_POLL_INTERVAL_MS } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { STEP_REVEAL_DWELL_MS } from '@platform/utils/use-staged-step-statuses/use-staged-step-statuses';
+import { ACTION_OUTCOME, type TMaybeUndefined } from '@shinefold/config';
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@shinefold/db';
+import type { TProvisioningRun } from '@shinefold/db/schema/tenants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ProvisioningStatusView } from './provisioning-status-view';

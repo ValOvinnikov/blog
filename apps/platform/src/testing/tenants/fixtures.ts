@@ -1,5 +1,3 @@
-import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
 import {
   toClientTenant,
@@ -9,6 +7,8 @@ import {
   DEFAULT_TENANTS_SORT,
   type TTenantsListQuery,
 } from '@platform/utils/tenants-list-query/tenants-list-query';
+import type { TTenantOwnerMembership } from '@shinefold/db/queries/memberships';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 import { mockReadyTenant, mockTenant } from './mock-tenant';
 import { MOCK_TENANT_DOMAIN, MOCK_TENANT_NAME } from './tenant-identity';

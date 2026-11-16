@@ -1,4 +1,3 @@
-import { HTTP_STATUS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
@@ -12,6 +11,7 @@ import {
   mockGitHubResponse,
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
+import { HTTP_STATUS } from '@shinefold/config';
 
 import { compareCommits } from './compare-commits';
 

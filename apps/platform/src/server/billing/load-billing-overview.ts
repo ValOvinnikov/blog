@@ -1,7 +1,5 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import type { TTenantBilling } from '@blog/db/queries/tenants/tenant-billing';
 import {
   BILLING_LOG,
   BILLING_OVERVIEW_STATE,
@@ -15,6 +13,8 @@ import {
 import { getStripeClient } from '@platform/server/billing/stripe-client';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TTenantBilling } from '@shinefold/db/queries/tenants/tenant-billing';
 import type Stripe from 'stripe';
 
 export type TBillingOverview =

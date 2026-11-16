@@ -4,15 +4,15 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
   GRID_COLUMNS,
-} from '@blog/config/constants';
-import { MOCK_RECENT_POSTS_HEADING } from '@blog/service/testing/modules/fixtures';
-import { mockRawPostLatestModule } from '@blog/service/testing/modules/post-latest/fixtures';
-import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/config/constants';
+import { MOCK_RECENT_POSTS_HEADING } from '@shinefold/service/testing/modules/fixtures';
+import { mockRawPostLatestModule } from '@shinefold/service/testing/modules/post-latest/fixtures';
+import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_POST_ID,
   mockRawHeadingBlock,
   mockRawWideLayout,
-} from '@blog/service/testing/shared/fixtures';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import {
   toPostLatestModule,

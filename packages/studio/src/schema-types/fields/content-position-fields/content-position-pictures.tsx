@@ -1,8 +1,8 @@
 import {
   CONTENT_ALIGNMENT,
   type TContentAlignment,
-} from '@blog/config/constants';
-import { alignedRowX } from '@blog/studio/schema-types/fields/alignment-fields/alignment-picture';
+} from '@shinefold/config/constants';
+import { alignedRowX } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-picture';
 import {
   FAINT,
   FRAME_GAP,
@@ -13,7 +13,7 @@ import {
   HEADING_HEIGHT,
   PictureFrame,
   TEXT_LINE_HEIGHT,
-} from '@blog/studio/schema-types/inputs/option-tiles-input/picture-frame';
+} from '@shinefold/studio/schema-types/inputs/option-tiles-input/picture-frame';
 
 const COLUMN_WIDTH = (FRAME_WIDTH - FRAME_GAP) / 2;
 const BANNER_PADDING = 4;

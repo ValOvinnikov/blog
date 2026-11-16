@@ -1,8 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
-import { requireEmailIndex } from '@blog/db/utils/personal-data/personal-data';
-import { personalDataIndex } from '@blog/utils/encryption';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import {
+  subscribers,
+  type TSubscriber,
+} from '@shinefold/db/schema/subscribers';
+import { requireEmailIndex } from '@shinefold/db/utils/personal-data/personal-data';
+import { personalDataIndex } from '@shinefold/utils/encryption';
 import { and, eq } from 'drizzle-orm';
 
 export async function getSubscriberByEmailIndex(

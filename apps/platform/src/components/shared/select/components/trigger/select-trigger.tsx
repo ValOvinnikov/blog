@@ -1,5 +1,4 @@
 import { Select as BaseSelect } from '@base-ui/react/select';
-import { ICONS, type TControlAria } from '@blog/config';
 import { DecorativeGlyph } from '@platform/components/shared/decorative-glyph';
 import { Icon } from '@platform/components/shared/icon';
 import { selectVariants } from '@platform/components/shared/select/select-variants';
@@ -7,6 +6,7 @@ import {
   SELECT_APPEARANCE,
   type TSelectAppearance,
 } from '@platform/constants/select-appearance';
+import { ICONS, type TControlAria } from '@shinefold/config';
 import { useId, type ReactNode } from 'react';
 
 export type TSelectTriggerProps = {

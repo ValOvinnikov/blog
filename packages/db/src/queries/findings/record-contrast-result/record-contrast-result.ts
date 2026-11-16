@@ -4,11 +4,11 @@ import {
   FINDING_SEVERITY,
   FINDING_SOURCE,
   FINDING_STATUS,
-} from '@blog/config/constants';
-import type { TContrastResultBody } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { buildContrastDedupeKey } from '@blog/db/queries/findings/contrast-dedupe-key';
-import { findings, type TFinding } from '@blog/db/schema/findings';
+} from '@shinefold/config/constants';
+import type { TContrastResultBody } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { buildContrastDedupeKey } from '@shinefold/db/queries/findings/contrast-dedupe-key';
+import { findings, type TFinding } from '@shinefold/db/schema/findings';
 import { and, eq, ne, sql } from 'drizzle-orm';
 
 const SUPERSEDED_BY_KEY = 'supersededBy';

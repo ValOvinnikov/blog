@@ -1,15 +1,3 @@
-import {
-  ELEVATE_TENANT_OWNER_OUTCOME,
-  MEMBERSHIP_ROLE,
-  OWNER_ACCESS_STALL_AFTER_MS,
-  SANITY_PROJECT_ROLE,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
-import type {
-  TTenant,
-  TTenantProvisioningState,
-} from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
@@ -23,6 +11,18 @@ import {
   mockIdleProvisioningSteps,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import {
+  ELEVATE_TENANT_OWNER_OUTCOME,
+  MEMBERSHIP_ROLE,
+  OWNER_ACCESS_STALL_AFTER_MS,
+  SANITY_PROJECT_ROLE,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@shinefold/db/constants';
+import type {
+  TTenant,
+  TTenantProvisioningState,
+} from '@shinefold/db/schema/tenants';
 
 import { ownerStudioAccessFor } from './owner-studio-access';
 

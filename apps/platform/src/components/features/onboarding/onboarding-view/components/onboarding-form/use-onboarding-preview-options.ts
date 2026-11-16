@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
 import {
   PREVIEW_DEVICE,
   type TPreviewDevice,
 } from '@platform/constants/preview';
 import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useState } from 'react';
 
 export type TOnboardingPreviewOptions = ReturnType<

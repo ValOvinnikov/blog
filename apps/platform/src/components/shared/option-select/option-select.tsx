@@ -1,9 +1,10 @@
 'use client';
 
-import type { TControlAria, TControlLock, TMaybeNull } from '@blog/config';
 import type { TDecorativeGlyphProps } from '@platform/components/shared/decorative-glyph';
 import { Select } from '@platform/components/shared/select';
 import type { TSelectAppearance } from '@platform/constants/select-appearance';
+import type { TControlAria, TControlLock, TMaybeNull } from '@shinefold/config';
+import type { ReactNode } from 'react';
 
 type TOptionSelectOption<TValue extends string> = Pick<
   TDecorativeGlyphProps,
@@ -11,6 +12,7 @@ type TOptionSelectOption<TValue extends string> = Pick<
 > & {
   value: TValue;
   label: string;
+  triggerGlyph?: ReactNode;
 };
 
 export type TOptionSelectProps<TValue extends string> = {
@@ -46,7 +48,7 @@ export const OptionSelect = <TValue extends string>({
         aria={aria}
         isLocked={isLocked}
         appearance={appearance}
-        glyph={selected?.glyph}
+        glyph={selected?.triggerGlyph ?? selected?.glyph}
       >
         {selected?.label ?? placeholder}
       </Select.Trigger>

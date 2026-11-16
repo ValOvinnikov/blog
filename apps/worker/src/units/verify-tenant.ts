@@ -1,4 +1,4 @@
-import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
+import { TENANT_PROVISIONING_STEP } from '@shinefold/db/constants';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { verifyTenantSeededContent } from '@worker/steps/verify-seeded-content';
 import { getProvisionEnv } from '@worker/utils/provision-env/provision-env';

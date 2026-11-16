@@ -2,11 +2,11 @@ import {
   SIZE,
   SOCIAL_PLATFORM_ICON,
   SOCIAL_PLATFORM_LABEL,
-} from '@blog/config';
-import type { TSocialProfile } from '@blog/service';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import type { TTextLinkVariants } from '@blog/ui/components/atoms/text-link/text-link-variants';
+} from '@shinefold/config';
+import type { TSocialProfile } from '@shinefold/service';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import type { TTextLinkVariants } from '@shinefold/ui/components/atoms/text-link/text-link-variants';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 

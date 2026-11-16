@@ -1,10 +1,14 @@
-import type { TContainerWidth, TLayout, TMaybeUndefined } from '@blog/config';
+import type {
+  TContainerWidth,
+  TLayout,
+  TMaybeUndefined,
+} from '@shinefold/config';
 import type {
   ctaLayoutFragment,
   heroLayoutFragment,
   layoutFragment,
   wideLayoutFragment,
-} from '@blog/service/shared/fragments/layout/layout';
+} from '@shinefold/service/shared/fragments/layout/layout';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawLayout = InferFragmentType<typeof layoutFragment>;

@@ -1,7 +1,7 @@
 'use client';
 
-import type { TMaybeNull } from '@blog/config';
-import { noop } from '@blog/utils/primitives';
+import type { TMaybeNull } from '@shinefold/config';
+import { noop } from '@shinefold/utils/primitives';
 import { createContext, useContext } from 'react';
 
 export type TTenantOverviewFocus = {

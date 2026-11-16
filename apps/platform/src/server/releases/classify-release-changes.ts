@@ -1,9 +1,9 @@
+import type { TChangedFile } from '@platform/server/github/compare-commits';
 import {
   RELEASE_CHANGE,
   RELEASE_WATCHED_PATHS,
   type TReleaseChange,
-} from '@blog/config';
-import type { TChangedFile } from '@platform/server/github/compare-commits';
+} from '@shinefold/config';
 
 export type TReleaseChanges = Record<TReleaseChange, boolean>;
 

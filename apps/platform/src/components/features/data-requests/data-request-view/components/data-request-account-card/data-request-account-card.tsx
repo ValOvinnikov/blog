@@ -1,7 +1,7 @@
-import type { TPersonalDataReaderAccount } from '@blog/db/queries/personal-data/reader-account-personal-data';
-import { objectKeys } from '@blog/utils/primitives';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
+import type { TPersonalDataReaderAccount } from '@shinefold/db/queries/personal-data/reader-account-personal-data';
+import { objectKeys } from '@shinefold/utils/primitives';
 import { useFormatter, useTranslations } from 'next-intl';
 
 export type TDataRequestAccountCardProps = {

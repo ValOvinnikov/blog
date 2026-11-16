@@ -1,13 +1,13 @@
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
-import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
+import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
+import { PAGE_TAG_TYPE } from '@shinefold/studio/schema-types/documents/pages/tag/tag-type';
+import { PAGE_TOPIC_TYPE } from '@shinefold/studio/schema-types/documents/pages/topic/topic-type';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 import {
   flattenLandingParentChain,
   LANDING_PARENT_CHAIN_PROJECTION,
   type TLandingParentChainNode,
-} from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
+} from '@shinefold/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
 import type { SanityClient } from 'sanity';
 
 export type TPublishedPage = { title?: string | null };

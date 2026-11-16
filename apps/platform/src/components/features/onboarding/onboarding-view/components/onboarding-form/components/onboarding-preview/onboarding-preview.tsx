@@ -1,11 +1,5 @@
 'use client';
 
-import {
-  CAPABILITY,
-  PRESET_REGISTRY,
-  type TLocaleIsoCode,
-  type TPresetId,
-} from '@blog/config';
 import type { TOnboardingPreviewOptions } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-onboarding-preview-options';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
 import { SampleCookieButton } from '@platform/components/features/site-preview/sample-cookie-button';
@@ -22,6 +16,12 @@ import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
 import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
+import {
+  CAPABILITY,
+  PRESET_REGISTRY,
+  type TLocaleIsoCode,
+  type TPresetId,
+} from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 

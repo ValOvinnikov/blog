@@ -1,6 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { getDb } from '@blog/db/client';
-import { emailConfig, type TEmailConfig } from '@blog/db/schema/email-config';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { getDb } from '@shinefold/db/client';
+import {
+  emailConfig,
+  type TEmailConfig,
+} from '@shinefold/db/schema/email-config';
 import { eq } from 'drizzle-orm';
 
 export type TEmailConfigResult = Omit<

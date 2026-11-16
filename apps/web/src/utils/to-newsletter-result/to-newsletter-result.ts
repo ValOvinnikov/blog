@@ -3,7 +3,7 @@ import {
   NEWSLETTER_RESULT_SLUGS,
   type TMaybeUndefined,
   type TNewsletterResult,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export const toNewsletterResult = (
   slug: string,

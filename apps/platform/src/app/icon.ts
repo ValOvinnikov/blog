@@ -1,7 +1,7 @@
 import {
   SHINEFOLD_LOGO_VARIANT,
   shinefoldLogoSvg,
-} from '@blog/utils/shinefold-logo';
+} from '@shinefold/utils/shinefold-logo';
 
 export const contentType = 'image/svg+xml';
 

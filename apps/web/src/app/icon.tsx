@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { toInitial } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { toInitial } from '@shinefold/utils/primitives';
 import { CACHE_CONTROL } from '@web/constants/http';
 import { ICON_LOG } from '@web/constants/icon';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';

@@ -1,6 +1,3 @@
-import { DOMAIN_PATTERN, type TMaybeNull } from '@blog/config';
-import { HTTP_STATUS } from '@blog/config/constants';
-import { isUndefined } from '@blog/utils/primitives';
 import {
   DOMAIN_AVAILABILITY,
   type TDomainAvailability,
@@ -8,6 +5,9 @@ import {
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { DOMAIN_PATTERN, type TMaybeNull } from '@shinefold/config';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { getDomain } from 'tldts';
 
 import { fetchVercel, readVercelCredentials } from './vercel-client';

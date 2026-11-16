@@ -1,8 +1,8 @@
 import { createHmac } from 'node:crypto';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { isSecretMatch } from '@blog/utils';
 import { env } from '@platform/utils/env/env';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { isSecretMatch } from '@shinefold/utils';
 
 const OWNER_INVITE_TOKEN_MESSAGE_PREFIX = 'owner-invite:';
 

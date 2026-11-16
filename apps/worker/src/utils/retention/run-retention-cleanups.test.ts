@@ -5,7 +5,7 @@ import {
   deleteLeadsPastRetention,
   deletePendingSubscribersPastRetention,
   deleteResolvedFindingsPastRetention,
-} from '@blog/db/queries/retention';
+} from '@shinefold/db/queries/retention';
 import {
   RETENTION_DELETE_BATCH_SIZE,
   RETENTION_KIND,
@@ -18,7 +18,7 @@ import { logger } from '@worker/utils/logger/logger';
 
 import { runRetentionCleanups } from './run-retention-cleanups';
 
-vi.mock('@blog/db/queries/retention');
+vi.mock('@shinefold/db/queries/retention');
 
 const ALL_CLEANUPS = [
   deletePendingSubscribersPastRetention,

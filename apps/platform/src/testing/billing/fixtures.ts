@@ -1,10 +1,10 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { type TPaidSubscriberBandCeiling } from '@blog/db/constants';
-import { mockStripeIds } from '@blog/db/testing/tenants/billing';
 import { STRIPE_INVOICE_STATUS } from '@platform/constants/billing';
 import { toStripeTime } from '@platform/testing/billing/stripe-time';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { type TPaidSubscriberBandCeiling } from '@shinefold/db/constants';
+import { mockStripeIds } from '@shinefold/db/testing/tenants/billing';
 import type Stripe from 'stripe';
 
 const billingFaker = createMockFaker(6876);

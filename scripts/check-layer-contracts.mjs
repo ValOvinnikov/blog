@@ -1,4 +1,4 @@
-// Fails when a workspace's `@blog/*` runtime dependencies in its package.json
+// Fails when a workspace's `@shinefold/*` runtime dependencies in its package.json
 // disagree with the `Imports` column of SPEC.md §4's layer table, or when the
 // CLAUDE.md layer-contract diagram disagrees with that table. A dependency the
 // table lists inside a `(+ … scoped)` note is a documented scoped exception:
@@ -17,7 +17,7 @@ const CLAUDE_FILE = join(repoRoot, 'CLAUDE.md');
 const WORKSPACE_DIRS = ['apps', 'packages'];
 const SPEC_SECTION_HEADING = '## 4. ';
 const CLAUDE_SECTION_HEADING = '## Layer contracts';
-const SCOPE = '@blog/';
+const SCOPE = '@shinefold/';
 
 export const readWorkspaces = (root = repoRoot) =>
   WORKSPACE_DIRS.flatMap((dir) =>
@@ -169,7 +169,7 @@ const main = () => {
         'Layer-contract docs disagree with the real dependency graph:',
         ...problems.map((problem) => `  ${problem}`),
         '',
-        "Fix the SPEC.md §4 table's Imports column and the CLAUDE.md diagram to match each package.json's @blog/* dependencies.",
+        "Fix the SPEC.md §4 table's Imports column and the CLAUDE.md diagram to match each package.json's @shinefold/* dependencies.",
       ].join('\n'),
     );
     process.exit(1);

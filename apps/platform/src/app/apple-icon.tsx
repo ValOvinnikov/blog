@@ -1,5 +1,5 @@
-import { SHINEFOLD_LOGO_COLOR } from '@blog/utils/shinefold-logo';
 import { renderMarkPng } from '@platform/server/icons/render-mark-png';
+import { SHINEFOLD_LOGO_COLOR } from '@shinefold/utils/shinefold-logo';
 
 const APPLE_ICON_SIDE = 180;
 

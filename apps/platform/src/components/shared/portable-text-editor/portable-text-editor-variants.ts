@@ -1,4 +1,3 @@
-import { SIZE } from '@blog/config';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { DISABLED_READONLY_SURFACE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import {
@@ -8,6 +7,7 @@ import {
 } from '@platform/utils/field-surface-classes/field-surface-classes';
 import { INVALID_SURFACE_CLASSES } from '@platform/utils/invalid-state-classes/invalid-state-classes';
 import { tv } from '@platform/utils/tv/tv';
+import { SIZE } from '@shinefold/config';
 import type { VariantProps } from 'tailwind-variants';
 
 export const portableTextEditorVariants = tv({

@@ -1,11 +1,14 @@
-import { BRAND_VARIANT } from '@blog/config';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { CardGrid } from '@blog/ui/components/organisms/card-grid';
-import { Carousel } from '@blog/ui/components/organisms/carousel';
-import { BRAND_BAND_LABELS, BrandBand } from '@blog/ui/testing/brand-bands';
-import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT } from '@shinefold/config';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
+import { Carousel } from '@shinefold/ui/components/organisms/carousel';
+import {
+  BRAND_BAND_LABELS,
+  BrandBand,
+} from '@shinefold/ui/testing/brand-bands';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { quoteCardNameVariants } from './components/name/quote-card-name-variants';

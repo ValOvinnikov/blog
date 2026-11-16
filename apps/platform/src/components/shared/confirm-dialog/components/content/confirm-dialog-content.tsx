@@ -1,5 +1,4 @@
 import { AlertDialog } from '@base-ui/react/alert-dialog';
-import { ALERT_TYPE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { AlertDialogShell } from '@platform/components/shared/alert-dialog-shell';
 import { Button } from '@platform/components/shared/button';
@@ -7,6 +6,7 @@ import { useConfirmDialogContext } from '@platform/components/shared/confirm-dia
 import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { ALERT_TYPE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

@@ -7,7 +7,7 @@ import {
   type TDensity,
   type TGridColumns,
   type TRadiusScale,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   FAINT,
   FRAME_HEIGHT,
@@ -17,7 +17,7 @@ import {
   FrameRect,
   PictureFrame,
   TEXT_LINE_HEIGHT,
-} from '@blog/studio/schema-types/inputs/option-tiles-input/picture-frame';
+} from '@shinefold/studio/schema-types/inputs/option-tiles-input/picture-frame';
 import type { ReactNode } from 'react';
 
 const CORNER_RADIUS: Record<TRadiusScale, number> = {

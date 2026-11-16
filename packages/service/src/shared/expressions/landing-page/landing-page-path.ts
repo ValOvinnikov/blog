@@ -1,4 +1,4 @@
-import { LANDING_PAGE_MAX_DEPTH } from '@blog/config/constants';
+import { LANDING_PAGE_MAX_DEPTH } from '@shinefold/config/constants';
 import { z } from 'zod';
 
 function ancestor(hops: number): string {

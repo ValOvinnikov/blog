@@ -1,8 +1,8 @@
 import {
   SEO_META_TITLE_MAX_LENGTH,
   SEO_META_TITLE_MIN_LENGTH,
-} from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/config';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export function assertHomeMetaTitleLength(
   tenantId: TTenant['id'],

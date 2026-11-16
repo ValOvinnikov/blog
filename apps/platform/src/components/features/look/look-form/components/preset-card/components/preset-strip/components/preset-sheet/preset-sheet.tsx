@@ -1,13 +1,13 @@
 'use client';
 
 import { Drawer } from '@base-ui/react/drawer';
-import { ICONS } from '@blog/config';
 import { PresetOptionList } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/preset-option-list/preset-option-list';
 import type { TPresetOption } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/preset-option';
 import { IconSoloButton } from '@platform/components/shared/icon-solo-button';
 import { DIALOG_BACKDROP_TONE } from '@platform/constants/dialog-backdrop';
 import { PRESET_LIST_LAYOUT } from '@platform/constants/preset-list';
 import { dialogBackdropVariants } from '@platform/utils/dialog-backdrop-variants/dialog-backdrop-variants';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId, useRef, useState } from 'react';
 

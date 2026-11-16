@@ -1,9 +1,10 @@
-import { ERROR_CODE } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { ERROR_CODE } from '@shinefold/config/constants';
 import {
   BLOCKED_IDENTITY_KIND,
   type TBlockedIdentityKind,
-} from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+} from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_BLOCK_REASON,
   MOCK_BLOCKED_ADDRESS,
@@ -14,17 +15,16 @@ import {
   MOCK_BLOCKED_DOMAIN,
   MOCK_NOT_A_DOMAIN,
   MOCK_NOT_AN_ADDRESS,
-} from '@blog/db/testing/blocked-signup-identities/fixtures';
-import { insertTestAdmin } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/blocked-signup-identities/fixtures';
+import { insertTestAdmin } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
 
 import { addBlockedIdentity } from './add-blocked-identity';
 
 faker.seed(602105);
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const MOCK_OTHER_REASON = faker.lorem.sentence();
 

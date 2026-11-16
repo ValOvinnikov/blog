@@ -1,17 +1,17 @@
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import {
   MOCK_OTHER_POST_ID,
   MOCK_POST_ID,
-} from '@blog/db/testing/newsletter-post-sends/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
-import { isNull } from '@blog/utils/primitives';
+} from '@shinefold/db/testing/newsletter-post-sends/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
+import { isNull } from '@shinefold/utils/primitives';
 
 import { claimNewsletterPostSend } from './claim-newsletter-post-send';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);

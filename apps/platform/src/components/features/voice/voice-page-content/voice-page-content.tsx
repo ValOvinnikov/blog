@@ -1,10 +1,10 @@
-import { queries } from '@blog/db';
 import type { TVoiceListSamples } from '@platform/components/features/site-preview/voice-specimen';
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
 import { VoiceSettings } from '@platform/components/features/voice/voice-settings';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
 import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
+import { queries } from '@shinefold/db';
 import { getTranslations } from 'next-intl/server';
 
 export type TVoicePageContentProps = {

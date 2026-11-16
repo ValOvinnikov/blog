@@ -17,7 +17,7 @@ const { listOpenFindingsMock } = vi.hoisted(() => ({
   listOpenFindingsMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     findings: { listOpenFindings: listOpenFindingsMock },

@@ -1,23 +1,23 @@
-import { LOCALE_ISO_CODES, TENANT_PLAN } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES, TENANT_PLAN } from '@shinefold/config/constants';
 import {
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import type {
   TTenant,
   TTenantDeprovisioningState,
   TTenantProvisioningState,
-} from '@blog/db/schema/tenants';
-import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
-import { createMockFaker } from '@blog/db/testing/mock-faker';
-import { MOCK_NO_BILLING } from '@blog/db/testing/tenants/billing';
-import { MOCK_NO_HOLD } from '@blog/db/testing/tenants/inactivity';
-import { MOCK_NO_OWNER_ACCESS } from '@blog/db/testing/tenants/owner-access';
-import type { TResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/schema/tenants';
+import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
+import { MOCK_NO_BILLING } from '@shinefold/db/testing/tenants/billing';
+import { MOCK_NO_HOLD } from '@shinefold/db/testing/tenants/inactivity';
+import { MOCK_NO_OWNER_ACCESS } from '@shinefold/db/testing/tenants/owner-access';
+import type { TResult } from '@shinefold/utils';
 
 const tenantsFaker = createMockFaker(60224);
 

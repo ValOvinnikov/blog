@@ -1,10 +1,10 @@
-import type { TEmailLogoImage } from '@blog/email/html/email-header/email-header';
-import { EMAIL_WHITE } from '@blog/email/html/email-metrics/email-metrics';
-import { oklchToHex } from '@blog/utils/color';
+import type { TEmailLogoImage } from '@shinefold/email/html/email-header/email-header';
+import { EMAIL_WHITE } from '@shinefold/email/html/email-metrics/email-metrics';
+import { oklchToHex } from '@shinefold/utils/color';
 import {
   SHINEFOLD_LOGO_COLOR,
   SHINEFOLD_LOGO_NAME,
-} from '@blog/utils/shinefold-logo';
+} from '@shinefold/utils/shinefold-logo';
 
 // Email clients can't read CSS custom properties, so the neutrals mirror
 // `configs/tailwind/theme.css`'s light-mode `:root` OKLCH values as static hex.

@@ -1,4 +1,4 @@
-import type { TFaqPageQuestion } from '@blog/service';
+import type { TFaqPageQuestion } from '@shinefold/service';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { buildFaqPageSchema } from '@web/utils/build-faq-page-schema';
 

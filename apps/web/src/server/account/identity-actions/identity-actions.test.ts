@@ -1,7 +1,7 @@
-import { ACTION_OUTCOME } from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import {
   DISPLAY_NAME_UPDATE_FAILED_EVENT,
   PROVIDER_UNLINK_FAILED_EVENT,
@@ -21,7 +21,7 @@ import {
 
 vi.mock('@web/server/auth/auth');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     account: { unlinkProvider: vi.fn(), updateDisplayName: vi.fn() },
   },

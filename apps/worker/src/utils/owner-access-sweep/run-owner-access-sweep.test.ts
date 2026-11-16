@@ -1,5 +1,5 @@
-import { SANITY_PROJECT_ROLE } from '@blog/db/constants';
-import { listTenantsPendingOwnerElevation } from '@blog/db/queries/tenants';
+import { SANITY_PROJECT_ROLE } from '@shinefold/db/constants';
+import { listTenantsPendingOwnerElevation } from '@shinefold/db/queries/tenants';
 import {
   OWNER_ACCESS_LOG,
   OWNER_ACCESS_SWEEP_CHECKS,
@@ -16,7 +16,7 @@ import { runOwnerAccessSweep } from './run-owner-access-sweep';
 
 const MOCK_OTHER_TENANT_ID = 'tenant-other';
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/owner-access-run/owner-access-run');
 
 describe(runOwnerAccessSweep, () => {

@@ -1,5 +1,5 @@
-import type { TTenantEmailBrand } from '@blog/config';
-import { renderEmailShell } from '@blog/email/html/email-layout/email-layout';
+import type { TTenantEmailBrand } from '@shinefold/config';
+import { renderEmailShell } from '@shinefold/email/html/email-layout/email-layout';
 
 export type TBuildTenantShellInput = {
   brand: TTenantEmailBrand;

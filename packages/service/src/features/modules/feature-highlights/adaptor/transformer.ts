@@ -1,9 +1,9 @@
-import { toCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
-import { toCtaButtons } from '@blog/service/shared/transformers/cta/to-cta-buttons';
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
-import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
+import { toCtaButton } from '@shinefold/service/shared/transformers/cta/to-cta-button';
+import { toCtaButtons } from '@shinefold/service/shared/transformers/cta/to-cta-buttons';
+import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toSanityImage } from '@shinefold/service/shared/transformers/image/to-sanity-image';
+import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
+import { toPortableText } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import type { InferResultType } from 'groqd';
 
 import type { featureHighlightsModuleQuery } from './query';

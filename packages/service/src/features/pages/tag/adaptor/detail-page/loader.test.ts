@@ -1,10 +1,11 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
 import {
   MOCK_TAG_ID,
   MOCK_TAG_SLUG,
   MOCK_TAG_TITLE,
-} from '@blog/service/testing/entities/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+} from '@shinefold/service/testing/entities/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_CURATED_SUPPORTING_TEXT,
   MOCK_TAG_PAGE_DESCRIPTION,
@@ -12,24 +13,23 @@ import {
   mockRawCtaRef,
   mockRawHeroRef,
   mockRawTagPage,
-} from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_PAGE_TAG_CACHE_TAG,
   MOCK_TAG_CACHE_TAG,
   MOCK_TEMPLATE_TAG_CACHE_TAG,
-} from '@blog/service/testing/sanity/query/cache-tags';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockRawHeadingBlock,
   mockRawSeo,
-} from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getTagPageDocument } from './loader';
 import { tagPageQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(601501);
 

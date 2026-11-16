@@ -1,5 +1,5 @@
-import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
-import type { THeroStatementModule } from '@blog/service';
+import { BRAND_VARIANT, HERO_VARIANT } from '@shinefold/config';
+import type { THeroStatementModule } from '@shinefold/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';

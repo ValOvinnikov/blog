@@ -1,5 +1,5 @@
-import { HEADER_BAR_STYLE, HEADER_LAYOUT } from '@blog/config';
-import { HEADER_ANCHOR, tv } from '@blog/ui/lib/styling';
+import { HEADER_BAR_STYLE, HEADER_LAYOUT } from '@shinefold/config';
+import { HEADER_ANCHOR, tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const headerVariants = tv({

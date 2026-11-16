@@ -1,6 +1,3 @@
-import { MAGIC_LINK_PROVIDER_ID } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
-import { MagicLinkSendLimitedError } from '@blog/auth/providers/magic-link/magic-link-send-limited-error/magic-link-send-limited-error';
-import { ACTION_OUTCOME } from '@blog/config';
 import { SIGN_IN_LOG } from '@platform/constants/sign-in';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { signIn } from '@platform/server/auth/auth';
@@ -12,6 +9,9 @@ import {
 import { MOCK_NOT_AN_EMAIL } from '@platform/testing/data-requests/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { MAGIC_LINK_PROVIDER_ID } from '@shinefold/auth/providers/magic-link/magic-link-provider/magic-link-provider';
+import { MagicLinkSendLimitedError } from '@shinefold/auth/providers/magic-link/magic-link-send-limited-error/magic-link-send-limited-error';
+import { ACTION_OUTCOME } from '@shinefold/config';
 
 import { sendSignInLinkAction } from './send-sign-in-link-action';
 

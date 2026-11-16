@@ -1,4 +1,4 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import { getRssSelfLink } from '@web/testing/shared/rss/get-rss-self-link';
 
 const XML_CONTENT_TYPE = 'application/xml';

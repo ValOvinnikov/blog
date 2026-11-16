@@ -1,7 +1,7 @@
-import { HTTP_STATUS, type TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
-import { isSecretMatch } from '@blog/utils';
-import { hasLength, isNull, isString } from '@blog/utils/primitives';
+import { HTTP_STATUS, type TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { isSecretMatch } from '@shinefold/utils';
+import { hasLength, isNull, isString } from '@shinefold/utils/primitives';
 import { REVALIDATE_SITE_CONFIG_LOG } from '@web/constants/revalidate-site-config';
 import { purgeDerivedPaths } from '@web/server/revalidate/purge-derived-paths/purge-derived-paths';
 import { resolveTenantSitePaths } from '@web/server/revalidate/resolve-tenant-site-paths/resolve-tenant-site-paths';

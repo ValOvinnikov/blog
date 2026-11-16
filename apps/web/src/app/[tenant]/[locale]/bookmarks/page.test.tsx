@@ -1,4 +1,4 @@
-import { CAPABILITY, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { CAPABILITY, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { isReaderAccountFeatureEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { mockRouteParams } from '@web/testing/app/route-params';
 import { customRenderAsync, screen } from '@web/testing/custom-render';

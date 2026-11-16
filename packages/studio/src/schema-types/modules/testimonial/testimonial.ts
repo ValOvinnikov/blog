@@ -1,22 +1,22 @@
-import { CONTENT_ALIGNMENT } from '@blog/config/constants';
-import { blockTestimonialSchema } from '@blog/studio/schema-types/documents/blocks/testimonial/testimonial';
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { CONTENT_ALIGNMENT } from '@shinefold/config/constants';
+import { blockTestimonialSchema } from '@shinefold/studio/schema-types/documents/blocks/testimonial/testimonial';
+import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
 import {
   appearanceFieldGroups,
   appearanceFields,
   appearanceFieldsets,
-} from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { cardAlignmentField } from '@blog/studio/schema-types/fields/card-alignment-field/card-alignment-field';
-import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+} from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { cardAlignmentField } from '@shinefold/studio/schema-types/fields/card-alignment-field/card-alignment-field';
+import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import {
   displayModeField,
   isCarouselMode,
-} from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
+} from '@shinefold/studio/schema-types/fields/display-mode-field/display-mode-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { wideLayoutField } from '@shinefold/studio/schema-types/objects/wide-layout/wide-layout-field';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { MessageSquareQuote } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 

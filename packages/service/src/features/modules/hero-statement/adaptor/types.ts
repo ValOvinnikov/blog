@@ -3,10 +3,10 @@ import type {
   TBrandVariant,
   THeadingBlock,
   TMaybeUndefined,
-} from '@blog/config';
-import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
-import type { THeroPresentation } from '@blog/service/shared/transformers/hero/to-hero-presentation';
-import type { THeroLayout } from '@blog/service/shared/transformers/layout/to-layout';
+} from '@shinefold/config';
+import type { TCtaButton } from '@shinefold/service/shared/transformers/cta/to-cta-button';
+import type { THeroPresentation } from '@shinefold/service/shared/transformers/hero/to-hero-presentation';
+import type { THeroLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 
 export type THeroStatementModule = {
   brandVariant: TBrandVariant;

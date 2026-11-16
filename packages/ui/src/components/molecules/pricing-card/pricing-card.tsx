@@ -1,10 +1,10 @@
-import { type IWithClassName, type IWithDataTestId } from '@blog/config';
+import { type IWithClassName, type IWithDataTestId } from '@shinefold/config';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '@blog/ui/lib/react';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+} from '@shinefold/ui/lib/react';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { Fragment, type ElementType } from 'react';
 
 import { PricingCardActions } from './components/actions/pricing-card-actions';

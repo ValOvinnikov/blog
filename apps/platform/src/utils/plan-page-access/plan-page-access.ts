@@ -1,10 +1,10 @@
-import { CAPABILITY } from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
+import { CAPABILITY } from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
 import {
   PLAN_ENTITLEMENTS,
   PLAN_LOCALE_LIMIT,
   PLAN_REGISTRY,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 
 export type TPlanPageAccess = {
   languages: boolean;

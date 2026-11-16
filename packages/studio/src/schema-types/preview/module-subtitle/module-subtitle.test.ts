@@ -1,7 +1,7 @@
-import { BRAND_VARIANT } from '@blog/config/constants';
-import { brandVariantTitle } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT } from '@shinefold/config/constants';
+import { brandVariantTitle } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 
 faker.seed(4111);
 

@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 // Lowercase because the values are `data-part` markup and the selectors that find it.
 export const SAMPLE_PART = {

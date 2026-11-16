@@ -1,10 +1,10 @@
-import type { TEmailAction } from '@blog/email/html/email-action/email-action';
-import type { TEmailDetail } from '@blog/email/html/email-details/email-details';
+import type { TEmailAction } from '@shinefold/email/html/email-action/email-action';
+import type { TEmailDetail } from '@shinefold/email/html/email-details/email-details';
 import {
   buildOwnerEmail,
   type TOwnerEmail,
   type TOwnerEmailInput,
-} from '@blog/email/templates/owner/owner-email/owner-email';
+} from '@shinefold/email/templates/owner/owner-email/owner-email';
 
 export type TOwnerReceiptEmailInput = TOwnerEmailInput & {
   details: TEmailDetail[];

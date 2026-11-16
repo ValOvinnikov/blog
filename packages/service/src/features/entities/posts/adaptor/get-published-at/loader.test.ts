@@ -1,12 +1,12 @@
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { MOCK_POST_ID } from '@blog/service/testing/shared/fixtures';
-import { MOCK_PUBLISHED_AT_FUTURE } from '@blog/service/testing/shared/translated-posts-dataset';
-import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { MOCK_POST_ID } from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_PUBLISHED_AT_FUTURE } from '@shinefold/service/testing/shared/translated-posts-dataset';
+import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getPostPublishedAt } from './loader';
 import { postPublishedAtQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 describe(getPostPublishedAt, () => {
   beforeEach(() => {

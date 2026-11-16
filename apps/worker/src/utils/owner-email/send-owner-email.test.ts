@@ -1,10 +1,10 @@
-import { EMAIL_ACCOUNT, LOCALE_ISO_CODES } from '@blog/config/constants';
-import { DAY_MS, TENANT_OWNER_EMAIL } from '@blog/db/constants';
+import { EMAIL_ACCOUNT, LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { DAY_MS, TENANT_OWNER_EMAIL } from '@shinefold/db/constants';
 import {
   claimTenantOwnerEmail,
   releaseTenantOwnerEmail,
-} from '@blog/db/queries/tenants';
-import { sendEmail } from '@blog/email';
+} from '@shinefold/db/queries/tenants';
+import { sendEmail } from '@shinefold/email';
 import {
   DEFAULT_OWNER_EMAIL_FROM_ADDRESS,
   OWNER_EMAIL_RELEASE_FAILED_EVENT,
@@ -35,8 +35,8 @@ const MOCK_TWO_DAYS_AGO = new Date(MOCK_NOW.getTime() - 2 * DAY_MS);
 const MOCK_AN_HOUR_AGO = new Date(MOCK_NOW.getTime() - DAY_MS / 24);
 const { platformAppBaseUrl } = MOCK_PROVISION_ENV;
 
-vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/email/transport/send-email');
+vi.mock('@shinefold/db/queries/tenants');
+vi.mock('@shinefold/email/transport/send-email');
 
 function makeTarget(
   overrides: Parameters<typeof mockProvisionedTenant>[0] = {},

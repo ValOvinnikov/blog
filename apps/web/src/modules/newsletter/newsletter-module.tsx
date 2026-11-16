@@ -1,5 +1,5 @@
-import { CAPABILITY } from '@blog/config';
-import { service } from '@blog/service';
+import { CAPABILITY } from '@shinefold/config';
+import { service } from '@shinefold/service';
 import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';

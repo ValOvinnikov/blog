@@ -1,14 +1,5 @@
 'use server';
 
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  type TActionResult,
-} from '@blog/config';
-import { PLAN_REGISTRY, queries } from '@blog/db';
-import { hasArrayGotItems } from '@blog/utils/primitives';
-import { toOutcome } from '@blog/utils/to-outcome';
 import type { TSettingsRefusal } from '@platform/constants/settings';
 import { SETTINGS_FEATURES_LOG } from '@platform/constants/settings-features';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -27,6 +18,15 @@ import {
   listSwitchedOnOutOfPlan,
   withComingSoonOff,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TActionResult,
+} from '@shinefold/config';
+import { PLAN_REGISTRY, queries } from '@shinefold/db';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
 const updateFeaturesInputSchema = z.object({

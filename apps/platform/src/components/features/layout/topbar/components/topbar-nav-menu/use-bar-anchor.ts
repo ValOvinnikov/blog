@@ -1,4 +1,4 @@
-import type { TMaybeNull } from '@blog/config';
+import type { TMaybeNull } from '@shinefold/config';
 import { useMemo, useRef, type RefObject } from 'react';
 
 /** Spans the trigger's width and the bar's height, so a popup placed below it clears the whole bar. */

@@ -1,6 +1,5 @@
 'use client';
 
-import { toOptions } from '@blog/utils/primitives';
 import { useFieldErrorText } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-field-error-text';
 import type { TOnboardingFieldErrors } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-onboarding-form';
 import { FormField } from '@platform/components/shared/form-field';
@@ -12,6 +11,7 @@ import {
   type TSelfServeSiteType,
 } from '@platform/constants/onboarding';
 import type { TCreateSiteInput } from '@platform/server/onboarding/create-site-input';
+import { toOptions } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 export type TSiteDetailsFieldsProps = {

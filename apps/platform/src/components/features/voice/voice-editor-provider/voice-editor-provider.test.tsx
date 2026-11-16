@@ -1,5 +1,3 @@
-import { SITE_MESSAGES_BY_LOCALE } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { act, renderHook } from '@platform/testing/custom-render';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
@@ -8,6 +6,8 @@ import {
   withVoiceValue,
 } from '@platform/utils/voice-draft/voice-draft';
 import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
+import { SITE_MESSAGES_BY_LOCALE } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import type { ReactNode } from 'react';
 
 import {

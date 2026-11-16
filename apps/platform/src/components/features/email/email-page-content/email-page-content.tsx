@@ -1,10 +1,10 @@
-import { queries } from '@blog/db';
 import { EmailSettings } from '@platform/components/features/email/email-settings';
 import { canEditContactRecipient } from '@platform/server/auth/can-edit-contact-recipient';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { toTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
 import { buildEmailDraft } from '@platform/utils/email-draft/email-draft';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import { queries } from '@shinefold/db';
 
 export type TEmailPageContentProps = {
   tenant: TPlatformTenant;

@@ -1,15 +1,5 @@
 'use server';
 
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  type TActionResult,
-  type TFieldErrors,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { isUndefined } from '@blog/utils/primitives';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { EMAIL_CONFIG_LOG } from '@platform/constants/email-config';
 import {
   EMAIL_SENDER_FIELD_ERROR,
@@ -24,6 +14,16 @@ import {
 } from '@platform/utils/email-input-schemas/email-input-schemas';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TActionResult,
+  type TFieldErrors,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { isUndefined } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import type { z } from 'zod';
 
 export type TUpdateEmailConfigInput = z.input<typeof emailSenderInputSchema>;

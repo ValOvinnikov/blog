@@ -1,4 +1,4 @@
-import { SPACING_SCALE, type TSpacingScale } from '@blog/config';
+import { SPACING_SCALE, type TSpacingScale } from '@shinefold/config';
 
 export const BAND_SPACING_TOP = {
   [SPACING_SCALE.NONE]: 'pt-0',

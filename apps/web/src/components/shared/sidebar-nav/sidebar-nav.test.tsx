@@ -1,4 +1,4 @@
-import { ARIA_CURRENT } from '@blog/ui/testing/aria';
+import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, fireEvent, screen } from '@web/testing/custom-render';
 import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';

@@ -1,4 +1,4 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { PageHeading } from './page-heading';

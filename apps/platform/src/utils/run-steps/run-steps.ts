@@ -1,8 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 
 type TRunStepState = {
   status: TTenantProvisioningStepStatus;

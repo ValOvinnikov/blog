@@ -1,11 +1,11 @@
-import { OPERATOR_ALERT_KIND } from '@blog/config/constants';
-import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
+import { OPERATOR_ALERT_KIND } from '@shinefold/config/constants';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@shinefold/db/constants';
 import {
   MOCK_OPERATOR_ALERT_SECRET,
   MOCK_PLATFORM_APP_BASE_URL,
-} from '@blog/db/testing/operator-alert/fixtures';
-import { mockTenant } from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/operator-alert/fixtures';
+import { mockTenant } from '@shinefold/db/testing/tenants/fixtures';
 
 import {
   isNotifiableOutcome,

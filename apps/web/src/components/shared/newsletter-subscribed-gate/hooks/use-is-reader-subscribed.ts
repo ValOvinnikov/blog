@@ -1,6 +1,6 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { SESSION_STATUS } from '@web/constants/session';
 import { isReaderSubscribedToNewsletter } from '@web/server/newsletter/reader-subscription-status/reader-subscription-status';

@@ -1,7 +1,7 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { Tag } from '@blog/ui/components/atoms/tag';
-import { hasLength, isString } from '@blog/utils/primitives';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { Tag } from '@shinefold/ui/components/atoms/tag';
+import { hasLength, isString } from '@shinefold/utils/primitives';
 
 import { tagListVariants } from './tag-list-variants';
 

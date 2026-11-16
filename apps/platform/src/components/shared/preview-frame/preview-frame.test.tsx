@@ -1,4 +1,3 @@
-import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   PREVIEW_DEVICE,
@@ -19,6 +18,7 @@ import {
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { stubResizeObserver } from '@platform/testing/resize-observer';
 import { TOOLTIP_HOVER_TIMEOUT } from '@platform/testing/tooltip';
+import { ICONS } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { PreviewFrame } from './preview-frame';

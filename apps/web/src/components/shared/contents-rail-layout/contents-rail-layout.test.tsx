@@ -1,5 +1,5 @@
-import { SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { SITE_MESSAGES } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { MOCK_CONTENTS_RAIL_BODY } from '@web/testing/shared/contents-rail/fixtures';
 import { stubFakeIntersectionObserver } from '@web/testing/shared/intersection-observer/fake-intersection-observer';

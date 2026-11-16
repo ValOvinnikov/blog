@@ -1,7 +1,7 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 
 import { requireSuperAdmin } from './require-super-admin';
 

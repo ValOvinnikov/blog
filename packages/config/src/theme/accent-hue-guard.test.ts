@@ -1,10 +1,10 @@
-import { renderedContrastRatio } from '@blog/utils/color';
+import { renderedContrastRatio } from '@shinefold/utils/color';
 
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
+import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config/constants';
 
 import { isAccentHueAccessible } from './accent-hue-guard';
 
-vi.mock(import('@blog/utils/color'), async (importOriginal) => {
+vi.mock(import('@shinefold/utils/color'), async (importOriginal) => {
   const actual = await importOriginal();
 
   return {

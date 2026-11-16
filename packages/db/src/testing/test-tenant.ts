@@ -1,5 +1,5 @@
-import * as schema from '@blog/db/schema';
-import type { TTenant } from '@blog/db/schema/tenants';
+import * as schema from '@shinefold/db/schema';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
 import { insertTestTenant, type TTestDb } from './fixtures';

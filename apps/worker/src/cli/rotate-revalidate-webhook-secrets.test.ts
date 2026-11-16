@@ -1,5 +1,5 @@
-import { listTenants } from '@blog/db/queries/tenants';
 import { faker } from '@faker-js/faker';
+import { listTenants } from '@shinefold/db/queries/tenants';
 import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
 import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
@@ -7,7 +7,7 @@ import { mockTenant } from '@worker/testing/tenant/fixtures';
 
 import { rotateRevalidateWebhookSecrets } from './rotate-revalidate-webhook-secrets';
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('@worker/steps/create-revalidate-webhook');
 

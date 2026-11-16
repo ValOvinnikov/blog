@@ -1,6 +1,12 @@
-import type { TAuditAction, TAuditTargetType } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { auditEvents, type TAuditEvent } from '@blog/db/schema/audit-events';
+import type {
+  TAuditAction,
+  TAuditTargetType,
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import {
+  auditEvents,
+  type TAuditEvent,
+} from '@shinefold/db/schema/audit-events';
 
 export type TInsertAuditEventInput = {
   actorId: string;

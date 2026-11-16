@@ -1,4 +1,4 @@
-# @blog/studio
+# @shinefold/studio
 
 > Sanity Studio (v6) — the content model, desk structure, and a mount
 > component that renders the Studio inside `apps/platform`.
@@ -6,7 +6,7 @@
 This package defines every content shape (documents, pages, singletons,
 reusable modules, and shared objects) as Sanity schemas. It does not import
 or re-export those shapes directly — it generates them via Sanity typegen
-into `@blog/config`, which is how every other layer consumes the content
+into `@shinefold/config`, which is how every other layer consumes the content
 model.
 
 It exports two things: the schema/desk structure (consumed by typegen, and
@@ -16,15 +16,15 @@ Studio from one deployment.
 
 ## Layer contract
 
-- **Depends on:** `@blog/config`, `@blog/utils`
+- **Depends on:** `@shinefold/config`, `@shinefold/utils`
 - **Consumed by:** `apps/platform` (via the exported `StudioMount`
   component); every other layer only ever consumes the generated types this
   package produces in `packages/config/src/sanity/generated/`, not the
   package itself
-- **Never imports:** `@blog/service`, `@blog/ui`, `@blog/db`, `@blog/auth`,
+- **Never imports:** `@shinefold/service`, `@shinefold/ui`, `@shinefold/db`, `@shinefold/auth`,
   or any app
 - **The one package permitted a `'use client'` directive.** Every other rule
-  in this repo bans it outright (`@blog/ui` must stay pure and
+  in this repo bans it outright (`@shinefold/ui` must stay pure and
   server-agnostic). `src/studio-mount.tsx` is the sole exception: Sanity
   Studio only runs client-side, and a Server Component calling the config
   builder and passing the built object out pulls the Sanity SDK into
@@ -73,7 +73,7 @@ Studio from one deployment.
 ## Using the mount component
 
 ```tsx
-import { StudioMount } from '@blog/studio';
+import { StudioMount } from '@shinefold/studio';
 
 export default function StudioPage() {
   return (
@@ -124,7 +124,7 @@ package's checks alongside every other workspace's, via Turborepo.
 
 ## Typegen
 
-`pnpm --filter @blog/studio typegen` extracts the schema and regenerates
+`pnpm --filter @shinefold/studio typegen` extracts the schema and regenerates
 `packages/config/src/sanity/generated/schema.json` and `types.ts`. Those
 generated files are committed and are the single source of truth for content
 shapes everywhere downstream — never hand-edit them and never hand-redeclare

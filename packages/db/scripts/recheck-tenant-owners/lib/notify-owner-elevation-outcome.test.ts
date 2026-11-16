@@ -1,6 +1,6 @@
-import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
-import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 import { faker } from '@faker-js/faker';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@shinefold/db/constants';
+import { mockTenant } from '@shinefold/db/testing/tenants/fixtures';
 
 import type * as NotifyOperators from './notify-operators';
 import { notifyOwnerElevationOutcome } from './notify-owner-elevation-outcome';

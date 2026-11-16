@@ -2,8 +2,8 @@
 
 > The Next.js App Router site that renders the blog for readers.
 
-This is the only app in the monorepo that fetches from `@blog/service` and
-renders through `@blog/ui` in the same place — Server Components pull typed
+This is the only app in the monorepo that fetches from `@shinefold/service` and
+renders through `@shinefold/ui` in the same place — Server Components pull typed
 data from the service facade and pass plain props into design-system
 components. It also owns everything framework-coupled that doesn't belong in
 a pure package: routing, locale handling, metadata/SEO, feeds, and the
@@ -11,11 +11,11 @@ Server Actions behind account/bookmark/newsletter features.
 
 ## Layer contract
 
-- **Depends on:** `@blog/ui`, `@blog/service`, `@blog/db`, `@blog/auth`,
-  `@blog/config`, `@blog/utils`, `@blog/tailwind-config`
+- **Depends on:** `@shinefold/ui`, `@shinefold/service`, `@shinefold/db`, `@shinefold/auth`,
+  `@shinefold/config`, `@shinefold/utils`, `@shinefold/tailwind-config`
 - **Consumed by:** nothing (deployable app, not a workspace dependency)
 - **Never imports:** the Sanity SDKs or GROQ directly (that's
-  `@blog/service`'s job), and never wraps/re-forwards a `@blog/ui`
+  `@shinefold/service`'s job), and never wraps/re-forwards a `@shinefold/ui`
   component's props — it composes compound slots instead
 
 Within the app itself: Server Components by default; `'use client'` is added
@@ -80,7 +80,7 @@ workspace, including this one, through Turborepo.
 
 - [`../../SPEC.md`](../../SPEC.md) — architecture and route inventory
 - [`../../packages/ui/COMPONENTS.md`](../../packages/ui/COMPONENTS.md) —
-  generated index of every `@blog/ui` component (props, compound slots)
+  generated index of every `@shinefold/ui` component (props, compound slots)
 - [`../../docs/context/surfaces-and-routing.md`](../../docs/context/surfaces-and-routing.md)
 - [`../../docs/context/rendering-caching-i18n.md`](../../docs/context/rendering-caching-i18n.md)
 - [`../../docs/context/seo-accessibility.md`](../../docs/context/seo-accessibility.md)

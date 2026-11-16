@@ -13,7 +13,7 @@ vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
   requireTenantById: requireTenantByIdMock,
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     auditEvents: {

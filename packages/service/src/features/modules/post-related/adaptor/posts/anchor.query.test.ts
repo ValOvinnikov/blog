@@ -1,13 +1,13 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_TAG_ID,
   MOCK_TOPIC_ID,
-} from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
 import {
   MOCK_POST_ID,
   mockReference,
-} from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 
 import { relatedPostAnchorQuery } from './anchor.query';
 

@@ -1,10 +1,10 @@
 'use client';
 
-import { DEPTH, type TDepth } from '@blog/config';
+import { DEPTH, type TDepth } from '@shinefold/config';
 import {
   SegmentedControl,
   type ISegmentedControlOption,
-} from '@blog/ui/components/atoms/segmented-control';
+} from '@shinefold/ui/components/atoms/segmented-control';
 import { useDepth } from '@web/context/depth-provider';
 import { useTranslations } from 'next-intl';
 

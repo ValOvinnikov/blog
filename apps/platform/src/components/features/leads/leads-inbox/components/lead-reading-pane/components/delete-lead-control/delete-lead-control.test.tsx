@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
 import { LEAD_REFUSAL } from '@platform/constants/lead';
@@ -12,6 +11,7 @@ import {
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { MOCK_LEAD_ID, MOCK_LEAD_NAME } from '@platform/testing/leads/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DeleteLeadControl } from './delete-lead-control';

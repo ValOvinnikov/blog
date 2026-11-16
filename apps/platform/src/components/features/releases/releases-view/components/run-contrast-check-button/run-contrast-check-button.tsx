@@ -1,11 +1,5 @@
 'use client';
 
-import {
-  isOutcomeRefused,
-  isOutcomeSuccess,
-  isOutcomeUnavailable,
-  SIZE,
-} from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
@@ -13,6 +7,12 @@ import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { useToast } from '@platform/context/toast-provider';
 import { startContrastCheckAction } from '@platform/server/releases/start-contrast-check-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import {
+  isOutcomeRefused,
+  isOutcomeSuccess,
+  isOutcomeUnavailable,
+  SIZE,
+} from '@shinefold/config';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';

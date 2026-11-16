@@ -2,15 +2,15 @@ import {
   HERO_VARIANT,
   type ISanityImage,
   type TMaybeUndefined,
-} from '@blog/config';
-import { toCtaButtons } from '@blog/service/shared/transformers/cta/to-cta-buttons';
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import { toHeroPresentation } from '@blog/service/shared/transformers/hero/to-hero-presentation';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
-import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
-import type { TSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
-import { toSocialProfiles } from '@blog/service/shared/transformers/social-profile/to-social-profiles';
+} from '@shinefold/config';
+import { toCtaButtons } from '@shinefold/service/shared/transformers/cta/to-cta-buttons';
+import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toHeroPresentation } from '@shinefold/service/shared/transformers/hero/to-hero-presentation';
+import { toSanityImage } from '@shinefold/service/shared/transformers/image/to-sanity-image';
+import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
+import { toPortableText } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-mark-def';
+import type { TSocialProfile } from '@shinefold/service/shared/transformers/social-profile/to-social-profile';
+import { toSocialProfiles } from '@shinefold/service/shared/transformers/social-profile/to-social-profiles';
 import type { InferResultType } from 'groqd';
 
 import type { heroProfileModuleQuery } from './query';

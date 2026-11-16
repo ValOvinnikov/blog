@@ -1,9 +1,9 @@
-import { ICONS } from '@blog/config';
 import type { TIconToggleGroupProps } from '@platform/components/shared/icon-toggle-group';
 import {
   PREVIEW_READER_STATE,
   type TPreviewReaderState,
 } from '@platform/constants/preview';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 

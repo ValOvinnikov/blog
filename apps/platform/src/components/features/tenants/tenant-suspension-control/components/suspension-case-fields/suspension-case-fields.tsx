@@ -1,14 +1,14 @@
 'use client';
 
-import type { TMaybeNull } from '@blog/config';
-import {
-  SUSPENSION_CATEGORY,
-  type TSuspensionCategory,
-} from '@blog/db/constants';
 import { FormField } from '@platform/components/shared/form-field';
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { Textarea } from '@platform/components/shared/textarea';
 import { tv } from '@platform/utils/tv/tv';
+import type { TMaybeNull } from '@shinefold/config';
+import {
+  SUSPENSION_CATEGORY,
+  type TSuspensionCategory,
+} from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 
 const suspensionCaseFieldsVariants = tv({

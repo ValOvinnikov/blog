@@ -1,4 +1,4 @@
-import type { TPostDetail } from '@blog/service';
+import type { TPostDetail } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';

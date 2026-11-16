@@ -1,6 +1,6 @@
-import { FOOTER_FINE_PRINT_KIND, type ILink } from '@blog/config';
-import type { TFooter } from '@blog/service';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+import { FOOTER_FINE_PRINT_KIND, type ILink } from '@shinefold/config';
+import type { TFooter } from '@shinefold/service';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 
 type TFooterFinePrintItem = TFooter['finePrint'][number];
 

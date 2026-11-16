@@ -1,6 +1,6 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { ClientError } from '@sanity/client';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config';
 import {
   MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE,
   MOCK_MALFORMED_DOCUMENT_MESSAGE,

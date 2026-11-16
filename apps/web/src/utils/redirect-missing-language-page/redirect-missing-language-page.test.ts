@@ -1,5 +1,9 @@
-import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR, routes } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
+import {
+  LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
+  routes,
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';

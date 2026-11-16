@@ -1,13 +1,13 @@
-import { saveTenantAnalytics } from '@blog/db/queries/tenant-analytics/save-tenant-analytics';
-import { tenantAnalytics } from '@blog/db/schema/tenant-analytics';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_GOOGLE_ANALYTICS } from '@blog/db/testing/tenant-analytics/fixtures';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
+import { saveTenantAnalytics } from '@shinefold/db/queries/tenant-analytics/save-tenant-analytics';
+import { tenantAnalytics } from '@shinefold/db/schema/tenant-analytics';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_GOOGLE_ANALYTICS } from '@shinefold/db/testing/tenant-analytics/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { clearTenantAnalytics } from './clear-tenant-analytics';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);

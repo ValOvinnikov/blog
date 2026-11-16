@@ -1,4 +1,4 @@
-import { CARD_IMAGE_SHAPE } from '@blog/config';
+import { CARD_IMAGE_SHAPE } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {

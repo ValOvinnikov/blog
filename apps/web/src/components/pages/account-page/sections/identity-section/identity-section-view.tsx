@@ -1,6 +1,6 @@
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { Panel } from '@blog/ui/components/molecules/panel';
-import { SettingRow } from '@blog/ui/components/molecules/setting-row';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { Panel } from '@shinefold/ui/components/molecules/panel';
+import { SettingRow } from '@shinefold/ui/components/molecules/setting-row';
 import type { ReactNode } from 'react';
 
 import { identitySectionVariants } from './identity-section-variants';
@@ -28,7 +28,7 @@ export interface IIdentitySectionViewProps {
 
 /**
  * Each row and the display-name control arrive already resolved by the wrapper — this component has no knowledge
- * of the session, `@blog/db`, or translations.
+ * of the session, `@shinefold/db`, or translations.
  */
 export const IdentitySectionView = ({
   heading,

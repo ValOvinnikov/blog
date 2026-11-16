@@ -1,7 +1,7 @@
 'use client';
 
-import { TENANT_PLAN } from '@blog/config/constants';
-import { toOptions } from '@blog/utils/primitives';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { toOptions } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 export const usePlanOptions = () => {

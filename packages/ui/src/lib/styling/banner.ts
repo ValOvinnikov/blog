@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT, SPACING_SCALE } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  SPACING_SCALE,
+} from '@shinefold/config';
 
 import { BAND_SPACING_BOTTOM, BAND_SPACING_TOP } from './band-spacing';
 import { BANNER_LAYOUT, BANNER_POSITION } from './banner-layout';

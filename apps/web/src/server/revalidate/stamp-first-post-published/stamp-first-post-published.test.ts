@@ -1,5 +1,5 @@
-import { SANITY_WEBHOOK_OPERATION } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { SANITY_WEBHOOK_OPERATION } from '@shinefold/config/constants';
 import {
   REVALIDATE_LOG,
   STARTER_DOCUMENT_ID_PREFIX,
@@ -15,7 +15,7 @@ const { stampTenantFirstPostPublishedMock } = vi.hoisted(() => ({
   stampTenantFirstPostPublishedMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: {
       stampTenantFirstPostPublished: stampTenantFirstPostPublishedMock,

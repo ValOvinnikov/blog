@@ -1,14 +1,14 @@
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_EMPTY_TENANT_BILLING,
   mockTenantBilling,
-} from '@blog/db/testing/tenants/billing';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
+} from '@shinefold/db/testing/tenants/billing';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { getTenantBilling } from './get-tenant-billing';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

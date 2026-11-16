@@ -1,10 +1,10 @@
-import { mapKeysToRecord, objectKeys } from '@blog/utils/primitives';
+import { mapKeysToRecord, objectKeys } from '@shinefold/utils/primitives';
 
 import {
   CARD_STYLE,
   HEADER_CONTROL_STYLE,
   NAV_LINK_STYLE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import { CARD_STYLE_DECLARATIONS } from './card-style-declarations';
 import type { TThemeToken } from './contrast-pairs';

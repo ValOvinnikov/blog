@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { routing } from '@web/i18n/routing';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
@@ -10,7 +10,7 @@ const { getTenantLiveLocalesMock } = vi.hoisted(() => ({
   getTenantLiveLocalesMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenants: { getTenantLiveLocales: getTenantLiveLocalesMock } },
 }));
 

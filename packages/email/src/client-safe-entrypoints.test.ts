@@ -39,8 +39,12 @@ function toModulePath(specifier: string, fromFile: string): string | null {
   if (specifier.startsWith('.')) {
     return resolve(dirname(fromFile), specifier);
   }
-  if (specifier.startsWith('@blog/email/')) {
-    return resolve(PACKAGE_ROOT, 'src', specifier.slice('@blog/email/'.length));
+  if (specifier.startsWith('@shinefold/email/')) {
+    return resolve(
+      PACKAGE_ROOT,
+      'src',
+      specifier.slice('@shinefold/email/'.length),
+    );
   }
   return null;
 }

@@ -1,4 +1,4 @@
-import { HTTP_STATUS } from '@blog/config/constants';
+import { HTTP_STATUS } from '@shinefold/config/constants';
 
 export const SCHEDULED_POST_PURGE_LOG = {
   START_FAILED: 'scheduled_post_purge.start_failed',

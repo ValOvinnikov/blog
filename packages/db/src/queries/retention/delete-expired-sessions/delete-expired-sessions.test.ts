@@ -1,17 +1,17 @@
-import * as schema from '@blog/db/schema';
-import { insertTestUser } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
+import * as schema from '@shinefold/db/schema';
+import { insertTestUser } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   justPast,
   justWithin,
   MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
-} from '@blog/db/testing/retention/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/retention/fixtures';
 
 import { deleteExpiredSessions } from './delete-expired-sessions';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

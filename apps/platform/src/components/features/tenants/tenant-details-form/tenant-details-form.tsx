@@ -1,7 +1,5 @@
 'use client';
 
-import { ALERT_TYPE, SIZE, type TMaybeUndefined } from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -15,6 +13,8 @@ import { TextInput } from '@platform/components/shared/text-input';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { usePlanOptions } from '@platform/utils/use-plan-options/use-plan-options';
 import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
+import { ALERT_TYPE, SIZE, type TMaybeUndefined } from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 
 import { tenantDetailsFormVariants } from './tenant-details-form-variants';

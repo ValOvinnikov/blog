@@ -1,8 +1,3 @@
-import {
-  SITE_MESSAGES_BY_LOCALE,
-  VOICE_FIELD_KIND,
-  VOICE_SURFACE,
-} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
@@ -21,6 +16,11 @@ import {
   VoiceFieldInEditor,
   fieldById,
 } from '@platform/testing/voice/voice-field-in-editor';
+import {
+  SITE_MESSAGES_BY_LOCALE,
+  VOICE_FIELD_KIND,
+  VOICE_SURFACE,
+} from '@shinefold/config';
 import userEvent from '@testing-library/user-event';
 
 import { VoiceField } from './voice-field';

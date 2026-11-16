@@ -1,6 +1,6 @@
-import { PRICE_PERIOD, type TPricePeriod } from '@blog/config/constants';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { PRICING_PERIOD_TITLE } from '@blog/studio/schema-types/objects/pricing-price/pricing-price';
+import { PRICE_PERIOD, type TPricePeriod } from '@shinefold/config/constants';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { PRICING_PERIOD_TITLE } from '@shinefold/studio/schema-types/objects/pricing-price/pricing-price';
 import { defineField } from 'sanity';
 
 const PRICE_PERIOD_WORDING_DESCRIPTION: Record<TPricePeriod, string> = {

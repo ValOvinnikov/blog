@@ -1,9 +1,9 @@
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 
 import { OperatorBreadcrumb } from './operator-breadcrumb';
 

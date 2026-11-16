@@ -1,6 +1,10 @@
-import { LOCALE_ISO_CODES, routes, type TLocaleIsoCode } from '@blog/config';
-import type { TSectionIndexType } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
+import {
+  LOCALE_ISO_CODES,
+  routes,
+  type TLocaleIsoCode,
+} from '@shinefold/config';
+import type { TSectionIndexType } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { SECTION_INDEX_LOG } from '@web/constants/section-index';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {

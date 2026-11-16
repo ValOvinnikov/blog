@@ -1,5 +1,5 @@
-import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, DISPLAY_MODE } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,

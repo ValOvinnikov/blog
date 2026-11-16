@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import type * as releaseConstants from '@platform/constants/release';
@@ -13,6 +11,8 @@ import {
   mockReleaseRun,
   MOCK_RELEASE_RUN_URL,
 } from '@platform/testing/releases/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ReleaseCard } from './release-card';

@@ -4,8 +4,8 @@ import {
   type ILink,
   type TMaybeUndefined,
   type TNullable,
-} from '@blog/config';
-import type { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
+} from '@shinefold/config';
+import type { linkDocumentFragment } from '@shinefold/service/shared/fragments/link/link-document';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawLinkDocument = InferFragmentType<typeof linkDocumentFragment>;

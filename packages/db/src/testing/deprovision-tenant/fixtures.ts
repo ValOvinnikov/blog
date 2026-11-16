@@ -1,6 +1,6 @@
-import { GITHUB_AUDIT_ACTOR_ID_PREFIX } from '@blog/config/constants';
-import { DEPROVISIONING_WORKFLOW_AUDIT_VIA } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { GITHUB_AUDIT_ACTOR_ID_PREFIX } from '@shinefold/config/constants';
+import { DEPROVISIONING_WORKFLOW_AUDIT_VIA } from '@shinefold/db/constants';
 
 export const MOCK_DEPROVISION_ENV = {
   sanityManagementToken: faker.string.alphanumeric(24),

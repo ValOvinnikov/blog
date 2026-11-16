@@ -4,12 +4,12 @@ import {
   HEADER_CONTROL_STYLE_DECLARATIONS,
   ICONS,
   SIZE,
-} from '@blog/config';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { ButtonShapes } from '@blog/ui/testing/button-shapes';
-import { HeaderControlShapes } from '@blog/ui/testing/header-control-shapes';
-import { objectKeys } from '@blog/utils/primitives';
+} from '@shinefold/config';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
+import { HeaderControlShapes } from '@shinefold/ui/testing/header-control-shapes';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 import { within } from 'storybook/test';
