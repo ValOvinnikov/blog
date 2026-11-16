@@ -41,8 +41,12 @@ export const sectionVariants = tv({
       [CONTAINER_WIDTH.WIDE]: { inner: ['max-w-wide'] },
       [CONTAINER_WIDTH.FULL]: { inner: ['max-w-page'] },
     },
-    dividerTop: { true: { root: ['border-t border-divider'] } },
-    dividerBottom: { true: { root: ['border-b border-divider'] } },
+    dividerTop: {
+      true: { root: ['border-t-[length:var(--divider-width)] border-divider'] },
+    },
+    dividerBottom: {
+      true: { root: ['border-b-[length:var(--divider-width)] border-divider'] },
+    },
   },
   defaultVariants: {
     spacingTop: SPACING_SCALE.MD,
