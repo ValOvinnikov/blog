@@ -18,6 +18,7 @@ import {
   mockFeatureListItem,
 } from '@web/testing/modules/feature-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockItemsWithIds } from '@web/testing/shared/items/fixtures';
 import {
   MOCK_RADIUS_SCOPE_CASES,
   MOCK_SCOPED_RADIUS_TOKEN,
@@ -33,11 +34,6 @@ const MOCK_MODULE_ID = faker.string.uuid();
 const MOCK_TITLE_ID = `feature-list-${MOCK_MODULE_ID}`;
 const MOCK_DATA_TEST_ID = `feature-list-module-${MOCK_MODULE_ID}`;
 const CAROUSEL_LABEL = `${MOCK_FEATURE_LIST_HEADING} carousel`;
-
-const mockItems = (count: number) =>
-  Array.from({ length: count }, () =>
-    mockFeatureListItem({ id: faker.string.uuid() }),
-  );
 
 const setup = customRender(FeatureListModuleView, {
   section: { brandVariant: BRAND_VARIANT.PRIMARY },
@@ -154,7 +150,7 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
       expected: 3,
     },
   ])('lays the grid out $title', ({ columns, itemCount, expected }) => {
-    setup({ columns, items: mockItems(itemCount) });
+    setup({ columns, items: mockItemsWithIds(itemCount, mockFeatureListItem) });
 
     const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-${expected}`);
 

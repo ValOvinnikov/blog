@@ -3,6 +3,7 @@ import {
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
+  GRID_COLUMNS,
   SOCIAL_PLATFORMS,
 } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
@@ -13,6 +14,7 @@ import { mockTeamMember } from '@web/testing/modules/team/fixtures';
 import { mockLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { TeamModuleView } from './team-module-view';
 
@@ -70,21 +72,32 @@ const socialLinks = [
   },
 ];
 
+const CIRCLE_LEFT_CARD = {
+  imageShape: CARD_IMAGE_SHAPE.CIRCLE,
+  cardAlignment: CONTENT_ALIGNMENT.LEFT,
+} as const;
+
+const CIRCLE_CENTRE_CARD = {
+  imageShape: CARD_IMAGE_SHAPE.CIRCLE,
+  cardAlignment: CONTENT_ALIGNMENT.CENTER,
+} as const;
+
+const SQUARE_LEFT_CARD = {
+  imageShape: CARD_IMAGE_SHAPE.SQUARE,
+  cardAlignment: CONTENT_ALIGNMENT.LEFT,
+} as const;
+
+const AUTO_GRID = { columns: undefined, showBios: false };
+
+const AUTO_GRID_WITH_BIOS = { columns: undefined, showBios: true };
+
 const meta = {
   title: 'Modules/TeamModule',
   component: TeamModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    },
     contentAlignment: {
-      control: 'select',
-      options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-    },
-    cardAlignment: {
       control: 'select',
       options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
     },
@@ -92,25 +105,17 @@ const meta = {
       control: 'select',
       options: Object.values(DISPLAY_MODE),
     },
-    imageShape: {
-      control: 'select',
-      options: [CARD_IMAGE_SHAPE.CIRCLE, CARD_IMAGE_SHAPE.SQUARE],
-    },
   },
   args: {
-    brandVariant: BRAND_VARIANT.PRIMARY,
+    section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     headingBlock: mockHeadingBlock({ heading: 'Meet the team' }),
     members,
-    showBios: false,
-    showSocialLinks: false,
-    imageShape: CARD_IMAGE_SHAPE.CIRCLE,
+    grid: AUTO_GRID,
+    card: CIRCLE_LEFT_CARD,
     displayMode: DISPLAY_MODE.GRID,
-    cardAlignment: CONTENT_ALIGNMENT.LEFT,
     ctaButtons: [],
     contentAlignment: undefined,
-    layout: undefined,
-    titleId: 'team-title',
-    dataTestId: 'team-module-team-1',
+    id: 'team-1',
   },
 } satisfies Meta<typeof TeamModuleView>;
 
@@ -130,7 +135,7 @@ export const WithPhotos: TStory = {
 
 export const SquareShape: TStory = {
   args: {
-    imageShape: CARD_IMAGE_SHAPE.SQUARE,
+    card: SQUARE_LEFT_CARD,
     members: members.map((member) => ({
       ...member,
       image: mockSanityImage(),
@@ -140,20 +145,19 @@ export const SquareShape: TStory = {
 
 export const SquareShapeInitials: TStory = {
   args: {
-    imageShape: CARD_IMAGE_SHAPE.SQUARE,
+    card: SQUARE_LEFT_CARD,
   },
 };
 
 export const WithBios: TStory = {
   args: {
-    showBios: true,
+    grid: AUTO_GRID_WITH_BIOS,
     members: members.map((member) => ({ ...member, bio })),
   },
 };
 
 export const WithSocialLinks: TStory = {
   args: {
-    showSocialLinks: true,
     members: members.map((member) => ({ ...member, socialLinks })),
   },
 };
@@ -175,7 +179,7 @@ export const CarouselTwoMembersCentre: TStory = {
     displayMode: DISPLAY_MODE.CAROUSEL,
     members: members.slice(0, 2),
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    cardAlignment: CONTENT_ALIGNMENT.CENTER,
+    card: CIRCLE_CENTRE_CARD,
   },
 };
 
@@ -194,7 +198,7 @@ export const WithActions: TStory = {
 export const CenterAligned: TStory = {
   args: {
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    cardAlignment: CONTENT_ALIGNMENT.CENTER,
+    card: CIRCLE_CENTRE_CARD,
   },
 };
 
@@ -206,7 +210,7 @@ export const SixMembers: TStory = {
 
 export const SevenMembersWithBios: TStory = {
   args: {
-    showBios: true,
+    grid: AUTO_GRID_WITH_BIOS,
     members: [...members, ...moreMembers.slice(0, 4)].map((member) => ({
       ...member,
       bio,
@@ -222,8 +226,7 @@ export const NineMembers: TStory = {
 
 export const Spotlight: TStory = {
   args: {
-    showBios: true,
-    showSocialLinks: true,
+    grid: AUTO_GRID_WITH_BIOS,
     members: [
       {
         ...members[2]!,
@@ -237,7 +240,7 @@ export const Spotlight: TStory = {
 
 export const SpotlightSquareInitials: TStory = {
   args: {
-    imageShape: CARD_IMAGE_SHAPE.SQUARE,
+    card: SQUARE_LEFT_CARD,
     displayMode: DISPLAY_MODE.CAROUSEL,
     members: [mockTeamMember()],
   },
@@ -245,8 +248,7 @@ export const SpotlightSquareInitials: TStory = {
 
 export const SocialLinksAlignedAcrossRow: TStory = {
   args: {
-    showBios: true,
-    showSocialLinks: true,
+    grid: AUTO_GRID_WITH_BIOS,
     members: [
       { ...members[0]!, bio, socialLinks },
       {
@@ -266,8 +268,8 @@ export const TabletThreePerRow: TStory = {
 
 export const SquarePhotosWithBios: TStory = {
   args: {
-    showBios: true,
-    imageShape: CARD_IMAGE_SHAPE.SQUARE,
+    grid: AUTO_GRID_WITH_BIOS,
+    card: SQUARE_LEFT_CARD,
     members: [...members, ...moreMembers.slice(0, 2)].map((member) => ({
       ...member,
       image: mockSanityImage(),
@@ -290,7 +292,7 @@ export const SquarePhotosCentreAligned: TStory = {
   args: {
     ...SquarePhotosWithBios.args,
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    cardAlignment: CONTENT_ALIGNMENT.CENTER,
+    card: { ...SQUARE_LEFT_CARD, cardAlignment: CONTENT_ALIGNMENT.CENTER },
   },
 };
 
@@ -334,4 +336,41 @@ export const TabletCarouselThreePerView: TStory = {
 export const DesktopCarouselThreePerView: TStory = {
   globals: { viewport: 'desktop' },
   args: { ...SixMembers.args, displayMode: DISPLAY_MODE.CAROUSEL },
+};
+
+export const SquarePhotosOutlinedOnBrandTint: TStory = {
+  args: {
+    ...SquareShape.args,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const CirclePhotosOutlinedOnBrandTint: TStory = {
+  args: {
+    ...WithPhotos.args,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const CarouselOutlinedOnBrandTint: TStory = {
+  args: {
+    ...SquareShape.args,
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const SpotlightSquareOutlinedOnBrandTint: TStory = {
+  args: {
+    ...Spotlight.args,
+    card: SQUARE_LEFT_CARD,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const TwoColumnsSixMembers: TStory = {
+  args: {
+    ...SixMembers.args,
+    grid: { columns: GRID_COLUMNS.TWO, showBios: false },
+  },
 };

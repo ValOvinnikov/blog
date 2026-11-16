@@ -3,6 +3,7 @@ import { BRAND_VARIANT, DISPLAY_MODE, GRID_COLUMNS } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockItemsWithIds } from '@web/testing/shared/items/fixtures';
 
 import { PostRelatedModuleView } from './post-related-module-view';
 
@@ -12,15 +13,10 @@ faker.seed(6011);
 
 const MOCK_DATA_TEST_ID = faker.lorem.slug();
 
-const mockItems = (count: number) =>
-  Array.from({ length: count }, () =>
-    mockPostListItem({ id: faker.string.uuid() }),
-  );
-
 const setup = customRender(PostRelatedModuleView, {
   section: { brandVariant: BRAND_VARIANT.PRIMARY },
   headingBlock: mockHeadingBlock(),
-  items: mockItems(2),
+  items: mockItemsWithIds(2, mockPostListItem),
   contentAlignment: undefined,
   titleId: faker.lorem.slug(),
   dataTestId: MOCK_DATA_TEST_ID,
@@ -29,7 +25,10 @@ const setup = customRender(PostRelatedModuleView, {
 
 describe(`<${PostRelatedModuleView.name}/>`, () => {
   it('lays the grid out in the stored column count over the post count', () => {
-    setup({ columns: GRID_COLUMNS.FOUR, items: mockItems(2) });
+    setup({
+      columns: GRID_COLUMNS.FOUR,
+      items: mockItemsWithIds(2, mockPostListItem),
+    });
 
     const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-4`);
 
@@ -37,7 +36,7 @@ describe(`<${PostRelatedModuleView.name}/>`, () => {
   });
 
   it('falls back to columns that fit the post count on Auto', () => {
-    setup({ columns: undefined, items: mockItems(5) });
+    setup({ columns: undefined, items: mockItemsWithIds(5, mockPostListItem) });
 
     const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-3`);
 

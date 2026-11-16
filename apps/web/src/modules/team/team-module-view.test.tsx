@@ -4,6 +4,7 @@ import {
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
+  GRID_COLUMNS,
 } from '@shinefold/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
@@ -17,6 +18,11 @@ import {
   mockTeamMember,
 } from '@web/testing/modules/team/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockItemsWithIds } from '@web/testing/shared/items/fixtures';
+import {
+  MOCK_RADIUS_SCOPE_CASES,
+  MOCK_SCOPED_RADIUS_TOKEN,
+} from '@web/testing/shared/section-appearance/fixtures';
 
 import { TeamModuleView } from './team-module-view';
 
@@ -24,24 +30,24 @@ vi.mock('@web/i18n/navigation');
 
 faker.seed(11);
 
-const MOCK_TITLE_ID = faker.string.uuid();
-const MOCK_DATA_TEST_ID = faker.string.uuid();
+const MOCK_MODULE_ID = faker.string.uuid();
+const MOCK_DATA_TEST_ID = `team-module-${MOCK_MODULE_ID}`;
 const CAROUSEL_LABEL = `${MOCK_TEAM_HEADING} carousel`;
+const MOCK_GRID_TEST_ID = new RegExp(`^${MOCK_DATA_TEST_ID}-grid`);
 
 const setup = customRender(TeamModuleView, {
-  brandVariant: BRAND_VARIANT.PRIMARY,
+  section: { brandVariant: BRAND_VARIANT.PRIMARY },
   headingBlock: mockHeadingBlock({ heading: MOCK_TEAM_HEADING }),
   members: MOCK_TEAM_MEMBERS,
-  showBios: false,
-  showSocialLinks: false,
-  ctaButtons: [],
-  imageShape: CARD_IMAGE_SHAPE.SQUARE,
   displayMode: DISPLAY_MODE.GRID,
+  ctaButtons: [],
   contentAlignment: undefined,
-  cardAlignment: CONTENT_ALIGNMENT.LEFT,
-  layout: undefined,
-  titleId: MOCK_TITLE_ID,
-  dataTestId: MOCK_DATA_TEST_ID,
+  card: {
+    imageShape: CARD_IMAGE_SHAPE.SQUARE,
+    cardAlignment: CONTENT_ALIGNMENT.LEFT,
+  },
+  grid: { columns: undefined, showBios: false },
+  id: MOCK_MODULE_ID,
 });
 
 describe(`<${TeamModuleView.name}/>`, () => {
@@ -133,7 +139,7 @@ describe(`<${TeamModuleView.name}/>`, () => {
         const carousel = screen.queryByRole('region', {
           name: CAROUSEL_LABEL,
         });
-        const grid = screen.queryByTestId(`${MOCK_DATA_TEST_ID}-grid`);
+        const grid = screen.queryByTestId(MOCK_GRID_TEST_ID);
 
         expect(carousel).not.toBeInTheDocument();
         expect(grid).not.toBeInTheDocument();
@@ -159,5 +165,65 @@ describe(`<${TeamModuleView.name}/>`, () => {
       'href',
       MOCK_CTA_SECONDARY_ACTION.link.href,
     );
+  });
+
+  it.each(MOCK_RADIUS_SCOPE_CASES)(
+    'scopes the radius token to its section $title an override',
+    ({ section, scoped }) => {
+      setup({ section });
+
+      const region = screen.getByRole('region', { name: MOCK_TEAM_HEADING });
+
+      expect(region.style.getPropertyValue(MOCK_SCOPED_RADIUS_TOKEN)).toBe(
+        scoped,
+      );
+    },
+  );
+
+  it.each([
+    {
+      title: 'in the stored column count over the member count',
+      columns: GRID_COLUMNS.TWO,
+      showBios: false,
+      memberCount: 3,
+      expected: 2,
+    },
+    {
+      title: 'in a stored column count past three with bios shown',
+      columns: GRID_COLUMNS.FOUR,
+      showBios: true,
+      memberCount: 4,
+      expected: 4,
+    },
+    {
+      title: 'in at most three columns on Auto with bios shown',
+      columns: undefined,
+      showBios: true,
+      memberCount: 4,
+      expected: 3,
+    },
+  ])(
+    'lays the grid out $title',
+    ({ columns, showBios, memberCount, expected }) => {
+      setup({
+        grid: { columns, showBios },
+        members: mockItemsWithIds(memberCount, mockTeamMember),
+      });
+
+      const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-${expected}`);
+
+      expect(grid).toBeVisible();
+    },
+  );
+
+  it('ignores a stored column count in carousel mode', () => {
+    setup({
+      displayMode: DISPLAY_MODE.CAROUSEL,
+      grid: { columns: GRID_COLUMNS.TWO, showBios: false },
+    });
+
+    const grid = screen.queryByTestId(MOCK_GRID_TEST_ID);
+
+    expect(grid).not.toBeInTheDocument();
   });
 });

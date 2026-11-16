@@ -1,5 +1,12 @@
-import type { TTeamMember } from '@shinefold/service';
+import {
+  BRAND_VARIANT,
+  CARD_IMAGE_SHAPE,
+  CONTENT_ALIGNMENT,
+  DISPLAY_MODE,
+} from '@shinefold/config';
+import type { TTeamMember, TTeamModule } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 const mockFaker = createMockFaker(61043);
 
@@ -30,3 +37,20 @@ export const MOCK_TEAM_MEMBERS: TTeamMember[] = [
 export const MOCK_TEAM_MEMBER_PROFILE_URL = '/team/jordan-reyes';
 
 export const MOCK_TEAM_MEMBER_BIO = 'Builds resilient distributed systems.';
+
+export const mockTeamModule = (
+  overrides: Partial<TTeamModule> = {},
+): TTeamModule => ({
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  headingBlock: mockHeadingBlock({ heading: MOCK_TEAM_HEADING }),
+  members: MOCK_TEAM_MEMBERS,
+  showBios: false,
+  showSocialLinks: false,
+  imageShape: CARD_IMAGE_SHAPE.CIRCLE,
+  displayMode: DISPLAY_MODE.GRID,
+  cardAlignment: CONTENT_ALIGNMENT.LEFT,
+  ctaButtons: [],
+  contentAlignment: undefined,
+  layout: undefined,
+  ...overrides,
+});

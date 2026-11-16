@@ -1004,6 +1004,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **TAXONOMY_LIST_LOG**: `MODULE_FETCH_FAILED`=`"taxonomy_list_module.fetch_failed"`
 
+### `@web/constants/team` — `apps/web/src/constants/team.ts`
+
+- **TEAM_LOG**: `MODULE_FETCH_FAILED`=`"team_module.fetch_failed"`
+
 ### `@web/constants/tenant-email-identity` — `apps/web/src/constants/tenant-email-identity.ts`
 
 - **TENANT_EMAIL_IDENTITY_LOG**: `TENANT_ROW_NOT_FOUND`=`"tenant_email_identity.tenant_row_not_found"`
