@@ -1,8 +1,10 @@
 import { TENANT_STATUS } from '@blog/db/constants';
 import { listTenants } from '@blog/db/queries/tenants';
 import { REVALIDATE_WEBHOOK_LOG } from '@worker/constants/revalidate-webhook';
-import { mockTenantWithWebhook } from '@worker/testing/tenant/fixtures';
-import { MOCK_ENCRYPTED_WEBHOOK_SECRET } from '@worker/testing/webhook/fixtures';
+import {
+  MOCK_ENCRYPTED_WEBHOOK_SECRET,
+  mockTenantWithWebhook,
+} from '@worker/testing/tenant/fixtures';
 import { runRevalidateWebhookStepForEach } from '@worker/utils/revalidate-webhook-backfill/revalidate-webhook-backfill';
 
 import { syncRevalidateWebhooks } from './sync-revalidate-webhooks';

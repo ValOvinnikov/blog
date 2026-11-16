@@ -22,6 +22,7 @@ import {
 } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_ENCRYPTED_TOKEN,
+  MOCK_ENCRYPTED_WEBHOOK_SECRET,
   MOCK_SANITY_DATASET,
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
@@ -30,7 +31,6 @@ import {
 } from '@worker/testing/tenant/fixtures';
 import {
   MOCK_CURRENT_WEBHOOK,
-  MOCK_ENCRYPTED_WEBHOOK_SECRET,
   MOCK_OTHER_WEBHOOK,
   MOCK_STALE_PROJECTION_WEBHOOK,
   MOCK_WEBHOOK_ID,

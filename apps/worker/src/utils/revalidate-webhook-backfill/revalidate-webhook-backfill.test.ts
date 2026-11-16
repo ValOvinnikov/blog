@@ -5,7 +5,7 @@ import {
 } from '@worker/constants/revalidate-webhook';
 import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
-import { mockTenant } from '@worker/testing/tenant/fixtures';
+import { mockTenantWithWebhook } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 
 import {
@@ -23,14 +23,10 @@ const EVENTS = {
   failed: REVALIDATE_WEBHOOK_LOG.SYNC_FAILED,
 };
 
-function tenantWithId() {
-  return mockTenant({ id: faker.string.uuid() });
-}
-
 describe(runRevalidateWebhookStepForEach, () => {
   it('sorts each tenant by whether the step changed its hook', async () => {
-    const stale = tenantWithId();
-    const current = tenantWithId();
+    const stale = mockTenantWithWebhook();
+    const current = mockTenantWithWebhook();
     vi.mocked(createTenantRevalidateWebhook).mockImplementation(
       async (tenant) =>
         tenant.id === stale.id
@@ -51,8 +47,8 @@ describe(runRevalidateWebhookStepForEach, () => {
   });
 
   it('logs a failed tenant under the given event and carries on', async () => {
-    const failing = tenantWithId();
-    const healthy = tenantWithId();
+    const failing = mockTenantWithWebhook();
+    const healthy = mockTenantWithWebhook();
     vi.mocked(createTenantRevalidateWebhook).mockImplementation(
       async (tenant) => {
         if (tenant.id === failing.id) throw new Error(MOCK_SANITY_OUTAGE);
