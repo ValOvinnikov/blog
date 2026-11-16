@@ -26,4 +26,5 @@ export const SELECTED_STRIPE_CLASSES =
 export const SELECTED_ROW_CLASSES = [
   'relative bg-platform-selected-tint',
   SELECTED_STRIPE_CLASSES,
+  'after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:border after:border-platform-selected-edge',
 ];

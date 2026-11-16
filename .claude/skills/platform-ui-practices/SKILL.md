@@ -315,19 +315,22 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
 text-platform-text` and a `selected-edge` border or inset ring
   (`SELECTED_COMPACT_FILL_CLASSES`, `SELECTED_COMPACT_CHOICE_CLASSES` for a
   bordered chip); a tile takes `SELECTED_CHOICE_CLASSES`; a selected row takes
-  `SELECTED_ROW_CLASSES` (the tint with a full-height `selected-line` stripe,
-  no frame). Only small marks keep the strong `bg-platform-selected`: a tick
-  (`SELECTED_TICK_CLASSES`), a checked checkbox and a radio dot
-  (`SELECTED_MARK_FILL_CLASSES`). An open accordion row is not selected: its
-  title row takes the card header's `surface-head` and the item carries the
-  stripe (`SELECTED_STRIPE_CLASSES`) down the title and the open panel. Yellow
-  on white is 1.61:1, so in Light every yellow mark carries its 3:1 on a
-  near-black part: the `selected-edge` (transparent in Dark, where yellow
-  passes alone), a tile's hairline, a switch's thumb (yellow in Dark, so it
-  shows on the dark tint). Three yellow marks stay below 3:1 in Light, and a
+  `SELECTED_ROW_CLASSES` (the tint, a full-height `selected-line` stripe and
+  a 1px `selected-edge` frame). Only small marks keep the strong
+  `bg-platform-selected`: a tick (`SELECTED_TICK_CLASSES`), a radio dot
+  (`SELECTED_MARK_FILL_CLASSES`) and a checked checkbox, whose own
+  `data-[checked]:` classes use the same tokens. An open accordion row is not
+  selected: its title row takes the card header's `surface-head`, with no
+  frame, and the item carries the stripe (`SELECTED_STRIPE_CLASSES`) down the
+  title and the open panel. Neither tint reaches 3:1 on its ground, so every
+  picked control carries its 3:1 on the `selected-edge`: near-black in Light
+  (yellow on white is 1.61:1) and amber `#ffc233` in Dark (the dark tint on
+  the card is about 1.6:1). A tile adds its hairline, and a switch its thumb
+  (yellow in Dark, so it shows on the dark tint). Three yellow marks stay below 3:1 in Light, and a
   bold near-black label carries their state: the sidebar's current-row bar
   (with its raised plate), and the straight 2px underline under the current
-  underline tab and desktop jump index entry, inside the link's padding.
+  underline tab and desktop jump index entry (the jump index's a straight
+  bar inside the link's padding).
   Every selected item also announces itself as pressed, checked, selected
   or current.
 - **Hover is one rule per kind of control.** A primary button darkens to

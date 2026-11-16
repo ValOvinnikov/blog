@@ -35,7 +35,10 @@ export const jumpCardLinkVariants = tv({
       isPhone: true,
       isCurrent: true,
       class: {
-        link: [SELECTED_COMPACT_FILL_CLASSES],
+        link: [
+          SELECTED_COMPACT_FILL_CLASSES,
+          insetFocusRingClasses(FOCUS_RING_GROUND.SELECTED_TINT),
+        ],
       },
     },
     {

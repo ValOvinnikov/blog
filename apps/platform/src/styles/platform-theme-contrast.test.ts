@@ -289,15 +289,14 @@ const selectionMarkPairs = (mark: string): TPair[] =>
     BOUNDARY,
   ]);
 
+const PICKED_EDGE_PAIRS: readonly TPair[] = [
+  ...selectionMarkPairs(TOKEN.SELECTED_EDGE),
+  ['Picked edge on tint', TOKEN.SELECTED_EDGE, TOKEN.SELECTED_TINT, BOUNDARY],
+];
+
 const LIGHT_PAIRS: readonly TPair[] = [
   ...SHARED_PAIRS,
-  ...selectionMarkPairs(TOKEN.SELECTED_EDGE),
-  [
-    'Selected row edge on tint',
-    TOKEN.SELECTED_EDGE,
-    TOKEN.SELECTED_TINT,
-    BOUNDARY,
-  ],
+  ...PICKED_EDGE_PAIRS,
   ['Tile hairline on card', TOKEN.SELECTED_EDGE, TOKEN.SURFACE, BOUNDARY],
   ['Focus edge around the ring', TOKEN.FOCUS_EDGE, TOKEN.FOCUS_RING, FOCUS],
   ...focusMarkPairs(TOKEN.FOCUS_EDGE),
@@ -306,6 +305,7 @@ const LIGHT_PAIRS: readonly TPair[] = [
 const DARK_PAIRS: readonly TPair[] = [
   ...SHARED_PAIRS,
   ...selectionMarkPairs(TOKEN.SELECTED),
+  ...PICKED_EDGE_PAIRS,
   [
     'Selected row bar on tint',
     TOKEN.SELECTED_LINE,
