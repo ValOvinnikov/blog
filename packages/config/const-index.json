@@ -10852,6 +10852,14 @@
         "file": "apps/web/src/constants/taxonomy-list.ts"
       }
     ],
+    "team_module.fetch_failed": [
+      {
+        "ref": "TEAM_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/team",
+        "file": "apps/web/src/constants/team.ts"
+      }
+    ],
     "tenant_email_identity.tenant_row_not_found": [
       {
         "ref": "TENANT_EMAIL_IDENTITY_LOG.TENANT_ROW_NOT_FOUND",

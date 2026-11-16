@@ -1,19 +1,19 @@
 import { faker } from '@faker-js/faker';
-import {
-  BRAND_VARIANT,
-  CARD_IMAGE_SHAPE,
-  CONTENT_ALIGNMENT,
-  DISPLAY_MODE,
-} from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
+import { TEAM_LOG } from '@web/constants/team';
+import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
-  MOCK_TEAM_HEADING,
   MOCK_TEAM_MEMBERS,
+  mockTeamModule,
 } from '@web/testing/modules/team/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_SECTION_STYLE_OVERRIDE_CASES } from '@web/testing/shared/section-appearance/fixtures';
+import {
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { TeamModule } from './team-module';
 
@@ -33,23 +33,13 @@ vi.mock('@shinefold/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
+vi.mock(
+  '@web/server/site-config/get-section-appearance/get-section-appearance',
+);
+
 faker.seed(12);
 
 const MOCK_MODULE_ID = faker.string.uuid();
-
-const MOCK_TEAM_MODULE = {
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: mockHeadingBlock({ heading: MOCK_TEAM_HEADING }),
-  ctaButtons: [],
-  imageShape: CARD_IMAGE_SHAPE.CIRCLE,
-  displayMode: DISPLAY_MODE.GRID,
-  contentAlignment: undefined,
-  cardAlignment: CONTENT_ALIGNMENT.LEFT,
-  showBios: false,
-  showSocialLinks: false,
-  layout: undefined,
-  members: MOCK_TEAM_MEMBERS,
-};
 
 const setup = customRenderAsync(TeamModule, {
   id: MOCK_MODULE_ID,
@@ -57,13 +47,11 @@ const setup = customRenderAsync(TeamModule, {
 
 describe(`<${TeamModule.name}/>`, () => {
   beforeEach(() => {
-    getTeamModuleMock.mockReset();
+    getTeamModuleMock.mockResolvedValue(okResult(mockTeamModule()));
   });
 
   describe('when the module resolves', () => {
     beforeEach(async () => {
-      getTeamModuleMock.mockResolvedValue(okResult(MOCK_TEAM_MODULE));
-
       await setup();
     });
 
@@ -81,11 +69,29 @@ describe(`<${TeamModule.name}/>`, () => {
     });
   });
 
-  it('renders nothing when the fetch fails', async () => {
+  it.each(MOCK_SECTION_STYLE_OVERRIDE_CASES)(
+    'scopes the section to $title',
+    async ({ overrides }) => {
+      getTeamModuleMock.mockResolvedValue(okResult(mockTeamModule(overrides)));
+
+      await setup();
+
+      expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
+        MOCK_REQUEST_CONTEXT.tenantId,
+        overrides,
+      );
+    },
+  );
+
+  it('logs and renders nothing when the fetch fails', async () => {
     getTeamModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      TEAM_LOG.MODULE_FETCH_FAILED,
+      { id: MOCK_MODULE_ID, error: MOCK_ERROR },
+    );
   });
 });

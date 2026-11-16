@@ -3,6 +3,7 @@ import {
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
+  GRID_COLUMNS,
   SOCIAL_PLATFORMS,
 } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
@@ -13,6 +14,7 @@ import { mockTeamMember } from '@web/testing/modules/team/fixtures';
 import { mockLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { TeamModuleView } from './team-module-view';
 
@@ -76,10 +78,6 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    },
     contentAlignment: {
       control: 'select',
       options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
@@ -96,19 +94,22 @@ const meta = {
       control: 'select',
       options: [CARD_IMAGE_SHAPE.CIRCLE, CARD_IMAGE_SHAPE.SQUARE],
     },
+    columns: {
+      control: 'select',
+      options: [undefined, ...Object.values(GRID_COLUMNS)],
+    },
   },
   args: {
-    brandVariant: BRAND_VARIANT.PRIMARY,
+    section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     headingBlock: mockHeadingBlock({ heading: 'Meet the team' }),
     members,
     showBios: false,
-    showSocialLinks: false,
     imageShape: CARD_IMAGE_SHAPE.CIRCLE,
     displayMode: DISPLAY_MODE.GRID,
     cardAlignment: CONTENT_ALIGNMENT.LEFT,
     ctaButtons: [],
     contentAlignment: undefined,
-    layout: undefined,
+    columns: undefined,
     titleId: 'team-title',
     dataTestId: 'team-module-team-1',
   },
@@ -153,7 +154,6 @@ export const WithBios: TStory = {
 
 export const WithSocialLinks: TStory = {
   args: {
-    showSocialLinks: true,
     members: members.map((member) => ({ ...member, socialLinks })),
   },
 };
@@ -223,7 +223,6 @@ export const NineMembers: TStory = {
 export const Spotlight: TStory = {
   args: {
     showBios: true,
-    showSocialLinks: true,
     members: [
       {
         ...members[2]!,
@@ -246,7 +245,6 @@ export const SpotlightSquareInitials: TStory = {
 export const SocialLinksAlignedAcrossRow: TStory = {
   args: {
     showBios: true,
-    showSocialLinks: true,
     members: [
       { ...members[0]!, bio, socialLinks },
       {
@@ -334,4 +332,38 @@ export const TabletCarouselThreePerView: TStory = {
 export const DesktopCarouselThreePerView: TStory = {
   globals: { viewport: 'desktop' },
   args: { ...SixMembers.args, displayMode: DISPLAY_MODE.CAROUSEL },
+};
+
+export const SquarePhotosOutlinedOnBrandTint: TStory = {
+  args: {
+    ...SquareShape.args,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const CirclePhotosOutlinedOnBrandTint: TStory = {
+  args: {
+    ...WithPhotos.args,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const CarouselOutlinedOnBrandTint: TStory = {
+  args: {
+    ...SquareShape.args,
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const SpotlightSquareOutlinedOnBrandTint: TStory = {
+  args: {
+    ...Spotlight.args,
+    imageShape: CARD_IMAGE_SHAPE.SQUARE,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const TwoColumnsSixMembers: TStory = {
+  args: { ...SixMembers.args, columns: GRID_COLUMNS.TWO },
 };

@@ -1,25 +1,39 @@
 import { CONTENT_ALIGNMENT, DISPLAY_MODE } from '@shinefold/config';
 import type { TTeamModule } from '@shinefold/service';
 import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
+import { hasLength } from '@shinefold/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section } from '@web/components/shared/section';
+import { Section, type TModuleSection } from '@web/components/shared/section';
 import { TeamCarousel } from '@web/modules/team/components/team-carousel/team-carousel';
 import { TeamMemberCard } from '@web/modules/team/components/team-member-card/team-member-card';
 import { TeamSpotlight } from '@web/modules/team/components/team-spotlight/team-spotlight';
 import { isLoneLastInRow } from '@web/utils/is-lone-last-in-row';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
+import { toCardGridColumns } from '@web/utils/to-card-grid-columns';
 import { toTeamGridColumns } from '@web/utils/to-team-grid-columns';
 
 import { teamModuleViewVariants } from './team-module-view-variants';
 
-export interface ITeamModuleViewProps extends TTeamModule {
+export interface ITeamModuleViewProps extends Pick<
+  TTeamModule,
+  | 'headingBlock'
+  | 'members'
+  | 'showBios'
+  | 'imageShape'
+  | 'displayMode'
+  | 'cardAlignment'
+  | 'ctaButtons'
+  | 'contentAlignment'
+  | 'columns'
+> {
+  section: TModuleSection;
   titleId: string;
   dataTestId: string;
 }
 
 export const TeamModuleView = ({
-  brandVariant,
+  section,
   headingBlock,
   members,
   showBios,
@@ -28,15 +42,18 @@ export const TeamModuleView = ({
   cardAlignment,
   ctaButtons,
   contentAlignment,
-  layout,
+  columns: storedColumns,
   titleId,
   dataTestId,
 }: ITeamModuleViewProps) => {
+  const { brandVariant, layout, appearance } = section;
   const [spotlightMember] = members;
   const isSpotlight = members.length === 1;
   const cardAlign =
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
-  const columns = toTeamGridColumns(members.length, showBios);
+  const columns =
+    toCardGridColumns(storedColumns) ??
+    toTeamGridColumns(members.length, showBios);
   const lastIndex = members.length - 1;
   const isLoneInRowOfThree = isLoneLastInRow(members.length, 3);
   const s = moduleGridActionsVariants({ align: contentAlignment });
@@ -46,6 +63,7 @@ export const TeamModuleView = ({
     <Section
       brandVariant={brandVariant}
       layout={layout}
+      appearance={appearance}
       titleId={titleId}
       dataTestId={dataTestId}
     >
@@ -76,7 +94,7 @@ export const TeamModuleView = ({
           <CardGrid
             columns={1}
             className={v.grid()}
-            dataTestId={`${dataTestId}-grid`}
+            dataTestId={`${dataTestId}-grid-${columns}`}
           >
             {members.map((member, index) => (
               <TeamMemberCard
@@ -92,7 +110,7 @@ export const TeamModuleView = ({
           </CardGrid>
         </div>
       )}
-      {ctaButtons.length > 0 && (
+      {hasLength(ctaButtons) && (
         <div className={s.actions()}>
           <ActionGroup actions={ctaButtons} />
         </div>
