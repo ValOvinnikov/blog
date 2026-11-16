@@ -1,5 +1,5 @@
 {
-  "name": "blog",
+  "name": "shinefold",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.21.0",
@@ -17,7 +17,7 @@
     "verify": "pnpm check:file-size && pnpm check:revalidate-tags-sync && pnpm check:turbo-env-sync && pnpm check:layer-contracts && pnpm check:migration-index && pnpm gen:ui-index:check && pnpm gen:const-index:check && pnpm gen:migration-ids:check && pnpm check:diff-hygiene && pnpm check:touched-lint && pnpm check:client-graph && pnpm type-check && pnpm lint && pnpm knip && pnpm test && pnpm check:test-budget",
     "storybook:build": "turbo run storybook:build",
     "typegen": "turbo run typegen",
-    "db:studio": "set -a && source apps/web/.env.local && set +a && pnpm --filter @blog/db db:studio",
+    "db:studio": "set -a && source apps/web/.env.local && set +a && pnpm --filter @shinefold/db db:studio",
     "gen:ui-index": "node scripts/gen-ui-index.mjs",
     "gen:ui-index:check": "node scripts/gen-ui-index.mjs --verify",
     "gen:ui-index:test": "node --test scripts/gen-ui-index.test.mjs",
@@ -66,9 +66,9 @@
     ]
   },
   "devDependencies": {
-    "@blog/prettier-config": "workspace:*",
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
+    "@shinefold/prettier-config": "workspace:*",
     "eslint": "catalog:",
     "husky": "^9.1.7",
     "jscpd": "4.3.0",

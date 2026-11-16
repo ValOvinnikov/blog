@@ -1,5 +1,3 @@
-import { MEMBERSHIP_ROLE, type TAdminRole } from '@blog/db/constants';
-import type { TMembership } from '@blog/db/schema/memberships';
 import {
   type TPlatformViewer,
   toPlatformViewer,
@@ -9,6 +7,8 @@ import type { TTenantMembershipContext } from '@platform/server/auth/require-ten
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import { MEMBERSHIP_ROLE, type TAdminRole } from '@shinefold/db/constants';
+import type { TMembership } from '@shinefold/db/schema/memberships';
 
 export const mockMembership = (
   overrides: Partial<TMembership> = {},

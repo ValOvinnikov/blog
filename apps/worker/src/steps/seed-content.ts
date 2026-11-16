@@ -1,18 +1,18 @@
+import { createClient } from '@sanity/client';
 import {
   buildStarterDocuments,
   SANITY_ROBOT_ROLE,
   type TMaybeNull,
   type TStarterDocumentUnion,
   type TStarterSiteType,
-} from '@blog/config';
-import { setTenantSanityWriteTokenAndSeededAt } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/config';
+import { setTenantSanityWriteTokenAndSeededAt } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   createSanityRobotToken,
   deleteSanityRobotToken,
-} from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { buildSanityTokenLabels } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
-import { createClient } from '@sanity/client';
+} from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
+import { buildSanityTokenLabels } from '@shinefold/db/utils/sanity-management-client/sanity-token-labels';
 import { SANITY_API_VERSION } from '@worker/constants/sanity-api';
 import { grantPropagationRetryOptions } from '@worker/utils/grant-propagation-retry/grant-propagation-retry';
 import {

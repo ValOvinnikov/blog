@@ -1,23 +1,23 @@
-import { SUBSCRIBER_OUTCOME } from '@blog/config';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { SUBSCRIBER_OUTCOME } from '@shinefold/config';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_CONFIRMATION_NOW,
   readTestSubscriber,
-} from '@blog/db/testing/subscribers/fixtures';
-import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
-import { toOutcome } from '@blog/utils/to-outcome';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/subscribers/fixtures';
+import { mintConfirmationToken } from '@shinefold/db/utils/subscriber-tokens/subscriber-tokens';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { confirmSubscriber } from './confirm-subscriber';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(5802);
 

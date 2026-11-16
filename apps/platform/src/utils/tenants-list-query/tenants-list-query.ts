@@ -1,6 +1,6 @@
-import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
-import type { TMaybeUndefined, TSearchParam } from '@blog/config/types';
-import type { TTenantSort } from '@blog/db/queries/tenants/list-tenants';
+import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
+import type { TMaybeUndefined, TSearchParam } from '@shinefold/config/types';
+import type { TTenantSort } from '@shinefold/db/queries/tenants/list-tenants';
 import { z } from 'zod';
 
 export type TTenantsListQuery = {

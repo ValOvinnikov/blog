@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { VOICE_CARDS_TEST_ID } from '@platform/constants/voice';
 import en from '@platform/i18n/messages/en.json';
@@ -29,6 +27,8 @@ import {
   setupBilingualVoiceSettings,
   setupVoiceSettings,
 } from '@platform/testing/voice/voice-settings-setup';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { VoiceSettings } from './voice-settings';

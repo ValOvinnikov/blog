@@ -1,30 +1,30 @@
+import { faker } from '@faker-js/faker';
 import {
   SANITY_CONTENT_REVALIDATE_SECONDS,
   type TMaybeNull,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   FOOTER_FINE_PRINT_KIND,
   PORTABLE_TEXT_BLOCK_TYPE,
   SOCIAL_PLATFORMS,
-} from '@blog/config/constants';
-import { mockRawFooter } from '@blog/service/testing/global/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+} from '@shinefold/config/constants';
+import { mockRawFooter } from '@shinefold/service/testing/global/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,
-} from '@blog/service/testing/sanity/query/cache-tags';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   mockLinkView,
   mockRawExternalLinkDocument,
-} from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { isNull } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
+import { isNull } from '@shinefold/utils/primitives';
 
 import { getFooter } from './loader';
 import { footerQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6015107);
 

@@ -1,5 +1,5 @@
-import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
 import { faker } from '@faker-js/faker';
+import { assertSatisfiesRequiredFields } from '@shinefold/studio/testing/assert-satisfies-required-fields';
 import { defineField, defineType } from 'sanity';
 
 faker.seed(6017);

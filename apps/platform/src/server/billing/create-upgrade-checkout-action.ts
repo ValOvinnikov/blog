@@ -1,12 +1,6 @@
 'use server';
 
 import {
-  ACTION_OUTCOME,
-  type TActionResult,
-  type TOutcome,
-} from '@blog/config';
-import { toOutcome } from '@blog/utils/to-outcome';
-import {
   BILLING_LOG,
   STRIPE_CHECKOUT_SESSION_ID_TEMPLATE,
   type TUpgradeRefusal,
@@ -20,6 +14,12 @@ import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import {
+  ACTION_OUTCOME,
+  type TActionResult,
+  type TOutcome,
+} from '@shinefold/config';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { createPlanCheckoutSession } from './create-plan-checkout-session';
 import { ensureStripeCustomer } from './ensure-stripe-customer';

@@ -1,4 +1,4 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithDataTestId } from '@shinefold/config';
 
 import { popoverMenuSeparatorVariants } from './popover-menu-separator-variants';
 

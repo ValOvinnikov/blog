@@ -1,5 +1,5 @@
-import type { TPagePostType } from '@blog/config';
-import type { TModule } from '@blog/service';
+import type { TPagePostType } from '@shinefold/config';
+import type { TModule } from '@shinefold/service';
 import { CtaModule } from '@web/modules/cta/cta-module';
 import {
   renderModules,

@@ -1,4 +1,4 @@
-import { NEWSLETTER_RESULT, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
+import { NEWSLETTER_RESULT, SITE_MESSAGES_BY_LOCALE } from '@shinefold/config';
 import { NOINDEX_ROBOTS } from '@web/testing/metadata/to-metadata/fixtures';
 
 import { buildNewsletterResultMetadata } from './build-newsletter-result-metadata';

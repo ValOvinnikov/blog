@@ -3,7 +3,7 @@ import {
   MENU_ROW,
   TRANSITION_COLORS,
   tv,
-} from '@blog/ui/lib/styling';
+} from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const popoverMenuItemVariants = tv({

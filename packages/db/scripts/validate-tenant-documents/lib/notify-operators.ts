@@ -2,8 +2,8 @@ import {
   FINDING_SEVERITY,
   OPERATOR_ALERT_KIND,
   type TFindingSeverity,
-} from '@blog/config/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/config/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 import { postOperatorAlert } from '../../lib/post-operator-alert';
 

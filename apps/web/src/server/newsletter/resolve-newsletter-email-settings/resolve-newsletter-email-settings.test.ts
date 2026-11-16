@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   EMAIL_TEMPLATE_TYPE,
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
   type TMaybeUndefined,
-} from '@blog/config';
-import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@shinefold/db/constants';
 import {
   mockEmailConfig,
   mockEmailTemplate,
@@ -21,8 +21,8 @@ const { getEmailConfigMock, getEmailTemplateMock } = vi.hoisted(() => ({
   getEmailTemplateMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await import('@shinefold/db/constants')),
   queries: {
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },

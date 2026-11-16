@@ -11,10 +11,10 @@
 
 [![CI](https://github.com/ValOvinnikov/blog/actions/workflows/ci.yml/badge.svg)](https://github.com/ValOvinnikov/blog/actions/workflows/ci.yml)
 
-A CMS-driven blog built as a **Turborepo + pnpm monorepo** with strict
-separation of concerns: a headless Sanity Studio for authoring, a Next.js
-frontend for reading, a portable design system, and a typed data layer — with
-end-to-end TypeScript type safety from schema to screen.
+Shinefold is a CMS-driven publishing platform built as a **Turborepo + pnpm
+monorepo** with strict separation of concerns: a headless Sanity Studio for
+authoring, a Next.js frontend for reading, a portable design system, and a typed
+data layer — with end-to-end TypeScript type safety from schema to screen.
 
 ## Docs map
 
@@ -51,13 +51,13 @@ This README covers what the project is and where things live. Everything else
 apps/
   web        Next.js frontend: routes, SEO, composition             (web)
 packages/
-  studio     Sanity Studio: schemas, editorial UI, typegen source   (@blog/studio)
-  service    Data access: Sanity client, groqd queries, transformers (@blog/service)
-  ui         Atomic Design component library (pure, prop-driven)     (@blog/ui)
-  config     Constants, generated Sanity types, shared TS types      (@blog/config)
-  utils      Framework-free helpers (async, primitives)              (@blog/utils)
+  studio     Sanity Studio: schemas, editorial UI, typegen source   (@shinefold/studio)
+  service    Data access: Sanity client, groqd queries, transformers (@shinefold/service)
+  ui         Atomic Design component library (pure, prop-driven)     (@shinefold/ui)
+  config     Constants, generated Sanity types, shared TS types      (@shinefold/config)
+  utils      Framework-free helpers (async, primitives)              (@shinefold/utils)
 configs/
-  eslint / prettier / tailwind / tsconfig / vitest presets           (@blog/*-config)
+  eslint / prettier / tailwind / tsconfig / vitest presets           (@shinefold/*-config)
 ```
 
 Layer contracts (who may import whom) are enforced and documented in

@@ -1,4 +1,3 @@
-import { STRIPE_TENANT_LOOKUP_OUTCOME } from '@blog/db/constants';
 import { BILLING_LOG } from '@platform/constants/billing';
 import {
   MOCK_STRIPE_CUSTOMER_ID,
@@ -12,6 +11,7 @@ import {
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { STRIPE_TENANT_LOOKUP_OUTCOME } from '@shinefold/db/constants';
 
 import { resolveStripeTenant } from './resolve-stripe-tenant';
 
@@ -20,7 +20,7 @@ const { getTenantIdByStripeIdsMock, getTenantByIdMock } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     tenants: {

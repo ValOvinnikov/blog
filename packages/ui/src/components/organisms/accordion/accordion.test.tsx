@@ -1,5 +1,5 @@
-import { renderElement, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { renderElement, screen } from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Accordion } from './accordion';

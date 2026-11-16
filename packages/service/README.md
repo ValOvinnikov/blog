@@ -1,4 +1,4 @@
-# @blog/service
+# @shinefold/service
 
 > The data layer that turns raw Sanity content into typed, React-free view models.
 
@@ -11,14 +11,14 @@ function and never sees GROQ or a `SanityDocument`.
 
 ## Layer contract
 
-- **Depends on:** `@blog/config` (generated Sanity types, constants),
-  `@blog/utils`.
+- **Depends on:** `@shinefold/config` (generated Sanity types, constants),
+  `@shinefold/utils`.
 - **Consumed by:** `apps/web` only.
-- **Never imports:** React, or anything from `@blog/ui`. This is the only
+- **Never imports:** React, or anything from `@shinefold/ui`. This is the only
   package in the monorepo that imports the Sanity SDKs (`next-sanity`,
   `@sanity/image-url`, `groqd`) — no other package may. It is a **sibling to
-  `@blog/db`**, not a dependent: the two never import each other. Content
-  shapes come from the generated types in `@blog/config`
+  `@shinefold/db`**, not a dependent: the two never import each other. Content
+  shapes come from the generated types in `@shinefold/config`
   (`packages/config/src/sanity/generated/types.ts`) and are never
   hand-redeclared here.
 
@@ -53,13 +53,13 @@ function and never sees GROQ or a `SanityDocument`.
 
 ## Scripts
 
-| Script       | Command                                  |
-| ------------ | ---------------------------------------- |
-| `lint`       | `pnpm --filter @blog/service lint`       |
-| `type-check` | `pnpm --filter @blog/service type-check` |
-| `format`     | `pnpm --filter @blog/service format`     |
-| `test`       | `pnpm --filter @blog/service test`       |
-| `test:watch` | `pnpm --filter @blog/service test:watch` |
+| Script       | Command                                       |
+| ------------ | --------------------------------------------- |
+| `lint`       | `pnpm --filter @shinefold/service lint`       |
+| `type-check` | `pnpm --filter @shinefold/service type-check` |
+| `format`     | `pnpm --filter @shinefold/service format`     |
+| `test`       | `pnpm --filter @shinefold/service test`       |
+| `test:watch` | `pnpm --filter @shinefold/service test:watch` |
 
 The root `pnpm type-check` / `pnpm lint` / `pnpm test` run every workspace,
 including this one, through Turborepo.

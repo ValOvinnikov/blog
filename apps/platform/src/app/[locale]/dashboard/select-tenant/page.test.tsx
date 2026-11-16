@@ -1,4 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
@@ -9,6 +8,7 @@ import {
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { redirect } from 'next/navigation';
 
 import SelectTenantPage from './page';
@@ -19,7 +19,7 @@ const { listMembershipsWithTenantsForUserMock } = vi.hoisted(() => ({
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: {

@@ -1,10 +1,10 @@
-import type { TOutcome } from '@blog/config';
-import type { TOAuthProvider } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { ROW_LOCK } from '@blog/db/constants';
-import { accounts, users } from '@blog/db/schema/auth';
-import { hasLength } from '@blog/utils/primitives';
-import { toOutcome } from '@blog/utils/to-outcome';
+import type { TOutcome } from '@shinefold/config';
+import type { TOAuthProvider } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { ROW_LOCK } from '@shinefold/db/constants';
+import { accounts, users } from '@shinefold/db/schema/auth';
+import { hasLength } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { and, eq, sql } from 'drizzle-orm';
 
 // The magic-link method has no `accounts` row to delete, so it is not a

@@ -1,4 +1,4 @@
-import type { TEmbedProvider, TMediaRatio } from '@blog/config/constants';
+import type { TEmbedProvider, TMediaRatio } from '@shinefold/config/constants';
 
 export type TParsedEmbed = {
   provider: TEmbedProvider;

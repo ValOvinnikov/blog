@@ -1,12 +1,12 @@
-import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
-import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
-import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
-import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
-import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
-import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
+import { contentSchema } from '@shinefold/studio/schema-types/modules/content/content';
+import { ctaSchema } from '@shinefold/studio/schema-types/modules/cta/cta';
+import { faqSchema } from '@shinefold/studio/schema-types/modules/faq/faq';
+import { heroBlogSchema } from '@shinefold/studio/schema-types/modules/hero-blog/hero-blog';
+import { heroStatementSchema } from '@shinefold/studio/schema-types/modules/hero-statement/hero-statement';
+import { newsletterSchema } from '@shinefold/studio/schema-types/modules/newsletter/newsletter';
+import { postLatestSchema } from '@shinefold/studio/schema-types/modules/post-latest/post-latest';
+import { postListSchema } from '@shinefold/studio/schema-types/modules/post-list/post-list';
+import { statsSchema } from '@shinefold/studio/schema-types/modules/stats/stats';
 
 import {
   moduleInsertMenuGroups,

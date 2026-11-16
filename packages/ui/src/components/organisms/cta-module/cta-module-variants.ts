@@ -3,8 +3,8 @@ import {
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
   MEDIA_ORDER,
-} from '@blog/config';
-import { type bannerVariants, tv } from '@blog/ui/lib/styling';
+} from '@shinefold/config';
+import { type bannerVariants, tv } from '@shinefold/ui/lib/styling';
 
 const CARD = [
   'mx-auto w-full max-w-4xl',

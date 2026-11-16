@@ -1,13 +1,13 @@
-import {
-  PORTABLE_TEXT_BLOCK_TYPE,
-  type IPortableTextLinkMark,
-} from '@blog/config';
-import { InlineCode } from '@blog/ui/components/atoms/inline-code';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
 import type {
   PortableTextMarkComponentProps,
   PortableTextReactComponents,
 } from '@portabletext/react';
+import {
+  PORTABLE_TEXT_BLOCK_TYPE,
+  type IPortableTextLinkMark,
+} from '@shinefold/config';
+import { InlineCode } from '@shinefold/ui/components/atoms/inline-code';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { SmartLink } from '@web/components/shared/smart-link';
 
 import { CookiePreferencesLink } from './cookie-preferences-link';

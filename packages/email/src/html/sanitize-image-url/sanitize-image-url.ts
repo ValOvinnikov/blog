@@ -1,4 +1,4 @@
-import { sanitizeHref } from '@blog/utils';
+import { sanitizeHref } from '@shinefold/utils';
 
 export function sanitizeImageUrl(imageUrl: string): string | null {
   const sanitized = sanitizeHref(imageUrl);

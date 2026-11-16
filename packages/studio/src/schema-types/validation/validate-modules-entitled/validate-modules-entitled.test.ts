@@ -1,11 +1,11 @@
-import { MODULE_PACK } from '@blog/config/constants';
-import { getModulePackOffMessage } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { faker } from '@faker-js/faker';
+import { MODULE_PACK } from '@shinefold/config/constants';
+import { getModulePackOffMessage } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import {
   EVERY_MODULE_PACK,
   setEntitledModulePacks,
-} from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
-import { validateModulesEntitled } from '@blog/studio/schema-types/validation/validate-modules-entitled/validate-modules-entitled';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
+import { validateModulesEntitled } from '@shinefold/studio/schema-types/validation/validate-modules-entitled/validate-modules-entitled';
 
 faker.seed(5048);
 

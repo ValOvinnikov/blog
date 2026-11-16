@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   SITE_MESSAGES_BY_LOCALE,
-} from '@blog/config';
-import type { TSeoResolved } from '@blog/service';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import type { TSeoResolved } from '@shinefold/service';
 import type { TRequestContext } from '@web/server/request-context/request-context';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import { MOCK_OG_IMAGE } from '@web/testing/shared/seo/og-image-fixtures';

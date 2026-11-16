@@ -3,22 +3,22 @@ import {
   SUSPENSION_REASON,
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
-} from '@blog/db/constants';
-import { startDeprovisioningRun } from '@blog/db/queries/tenants/start-deprovisioning-run';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_IDLE_DEPROVISIONING_STEPS } from '@blog/db/testing/tenants/fixtures';
-import { MOCK_LAST_ACTIVITY_AT } from '@blog/db/testing/tenants/inactivity';
+} from '@shinefold/db/constants';
+import { startDeprovisioningRun } from '@shinefold/db/queries/tenants/start-deprovisioning-run';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_IDLE_DEPROVISIONING_STEPS } from '@shinefold/db/testing/tenants/fixtures';
+import { MOCK_LAST_ACTIVITY_AT } from '@shinefold/db/testing/tenants/inactivity';
 import {
   MOCK_RESUME_CASES,
   pickResumedFields,
-} from '@blog/db/testing/tenants/resume';
+} from '@shinefold/db/testing/tenants/resume';
 
 import { wakeTenantFromInactivity } from './wake-tenant-from-inactivity';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock();

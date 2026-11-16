@@ -1,7 +1,7 @@
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   type TElevateTenantOwnerOutcome,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   OWNER_ACCESS_HOOK_TOKEN_PREFIX,
   OWNER_ACCESS_POLL_INTERVAL_MS,

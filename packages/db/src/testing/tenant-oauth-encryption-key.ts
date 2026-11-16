@@ -1,4 +1,4 @@
-import { MOCK_OTHER_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { MOCK_OTHER_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
 
 export const MOCK_TENANT_OAUTH_ENCRYPTION_KEY = MOCK_OTHER_ENCRYPTION_KEY;
 

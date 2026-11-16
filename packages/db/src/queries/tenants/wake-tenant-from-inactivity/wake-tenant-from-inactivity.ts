@@ -1,8 +1,8 @@
-import type { TMaybeNull } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
-import { resumedTenantFields } from '@blog/db/queries/tenants/resumed-tenant-fields';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { SUSPENSION_REASON, TENANT_STATUS } from '@shinefold/db/constants';
+import { resumedTenantFields } from '@shinefold/db/queries/tenants/resumed-tenant-fields';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 
 const hasNoDeprovisioningRecorded = sql`coalesce(${tenants.deprovisioningSteps}, '{}'::jsonb) = '{}'::jsonb`;

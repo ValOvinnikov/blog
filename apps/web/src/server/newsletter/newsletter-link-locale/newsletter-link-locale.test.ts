@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { mockNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -9,7 +9,7 @@ import { resolveNewsletterLinkLocale } from './newsletter-link-locale';
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: {
       selectLiveLocales: ({

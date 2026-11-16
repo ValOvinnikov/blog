@@ -1,17 +1,21 @@
 import 'server-only';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE, type TErrorCode } from '@blog/config';
+import { SIGNUP_BLOCK_LOG } from '@platform/constants/signup-block';
+import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TErrorCode,
+} from '@shinefold/config';
 import {
   BLOCKED_IDENTITY_KIND,
   queries,
   type TBlockedIdentityKind,
-} from '@blog/db';
-import type { TAddBlockedIdentityOutcome } from '@blog/db/queries/blocked-signup-identities/add-blocked-identity';
-import type { TAdmin } from '@blog/db/schema/admins';
-import type { TBlockedSignupIdentity } from '@blog/db/schema/blocked-signup-identities';
-import type { TResult } from '@blog/utils';
-import { SIGNUP_BLOCK_LOG } from '@platform/constants/signup-block';
-import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
+} from '@shinefold/db';
+import type { TAddBlockedIdentityOutcome } from '@shinefold/db/queries/blocked-signup-identities/add-blocked-identity';
+import type { TAdmin } from '@shinefold/db/schema/admins';
+import type { TBlockedSignupIdentity } from '@shinefold/db/schema/blocked-signup-identities';
+import type { TResult } from '@shinefold/utils';
 
 export type TAddSignupBlockInput = {
   kind: TBlockedIdentityKind;

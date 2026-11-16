@@ -1,14 +1,14 @@
-import { mockRun } from '@blog/service/testing/mock-run-query';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_HERO_MODULE_ID,
   MOCK_LIST_MODULE_ID,
   mockListModulePageSize,
-} from '@blog/service/testing/pages/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+} from '@shinefold/service/testing/pages/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { createBlogService } from './service';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 const tenant = mockTenant();
 

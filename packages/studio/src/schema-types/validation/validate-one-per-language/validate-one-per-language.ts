@@ -1,13 +1,13 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { isLocaleIsoCode } from '@blog/config/constants';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
-import { getDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { isLocaleIsoCode } from '@shinefold/config/constants';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
+import { LOCALE_LABEL } from '@shinefold/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { getDefaultLanguage } from '@shinefold/studio/schema-types/validation/default-language/default-language';
 import {
   fetchFailSafe,
   getDraftsClient,
-} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
-import { isString } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { isString } from '@shinefold/utils/primitives';
 import {
   getPublishedId,
   type SanityDocument,

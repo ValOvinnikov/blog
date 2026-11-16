@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   EMPTY_REDIRECT_PLAN,
   planLandingRedirects,
   type TLandingMove,
-} from '@blog/studio/document-actions/plan-landing-redirects/plan-landing-redirects';
-import { mockUniqueSlugs } from '@blog/studio/testing/mock-unique-slugs';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/document-actions/plan-landing-redirects/plan-landing-redirects';
+import { mockUniqueSlugs } from '@shinefold/studio/testing/mock-unique-slugs';
 
 faker.seed(6017);
 

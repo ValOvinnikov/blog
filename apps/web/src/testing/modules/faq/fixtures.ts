@@ -1,5 +1,5 @@
-import { BRAND_VARIANT, PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
-import type { TFaqModule, TFaqQuestion } from '@blog/service';
+import { BRAND_VARIANT, PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
+import type { TFaqModule, TFaqQuestion } from '@shinefold/service';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   mockPortableTextBlock,
@@ -53,11 +53,13 @@ export const MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK: TFaqQuestion['answer'] = [
   ),
 ];
 
+export const MOCK_FAQ_HEADING = 'Frequently asked questions';
+
 export const mockFaqModule = (
   overrides: Partial<TFaqModule> = {},
 ): TFaqModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: mockHeadingBlock({ heading: 'Frequently asked questions' }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_FAQ_HEADING }),
   questions: [],
   ctaButtons: [],
   contentAlignment: undefined,

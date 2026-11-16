@@ -1,20 +1,20 @@
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_CONFIRMATION_NOW,
   readTestSubscriber,
-} from '@blog/db/testing/subscribers/fixtures';
-import { sha256Hex } from '@blog/utils/hash';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/subscribers/fixtures';
+import { sha256Hex } from '@shinefold/utils/hash';
 
 import { commitConfirmationToken } from './commit-confirmation-token';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(5801);
 

@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
-import { OAUTH_PROVIDER } from '@blog/config/constants';
 import en from '@platform/i18n/messages/en.json';
 import { confirmSignInCallbackAction } from '@platform/server/sign-in-apps/confirm-sign-in-callback-action';
 import { removeSignInAppAction } from '@platform/server/sign-in-apps/remove-sign-in-app-action';
@@ -18,6 +16,8 @@ import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SignInAppCard } from './sign-in-app-card';

@@ -4,8 +4,11 @@ import {
   MOCK_OTHER_INVITE_ID,
   MOCK_OTHER_TENANT_ID,
   mockPendingInvite,
-} from '@blog/auth/testing/magic-link-fixtures';
-import { MOCK_EMAIL, MOCK_USER_ID } from '@blog/auth/testing/session-fixtures';
+} from '@shinefold/auth/testing/magic-link-fixtures';
+import {
+  MOCK_EMAIL,
+  MOCK_USER_ID,
+} from '@shinefold/auth/testing/session-fixtures';
 
 import { consumePendingInvitesOnSignIn } from './consume-pending-invites-on-sign-in';
 
@@ -15,7 +18,7 @@ const { findPendingInviteByEmailMock, consumeMembershipInviteMock } =
     consumeMembershipInviteMock: vi.fn(),
   }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     membershipInvites: {
       findPendingInviteByEmail: findPendingInviteByEmailMock,

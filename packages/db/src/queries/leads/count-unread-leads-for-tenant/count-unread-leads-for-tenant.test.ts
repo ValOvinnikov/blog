@@ -1,14 +1,14 @@
-import * as schema from '@blog/db/schema';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestLead,
   insertTestTenant,
   MOCK_LEAD_READ_AT,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { countUnreadLeadsForTenant } from './count-unread-leads-for-tenant';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

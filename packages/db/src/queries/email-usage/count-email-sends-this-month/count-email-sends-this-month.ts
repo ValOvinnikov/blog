@@ -1,7 +1,7 @@
-import type { TEmailType } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { emailSendCounts } from '@blog/db/schema/email-usage';
-import { utcMonthStartDay } from '@blog/utils/date';
+import type { TEmailType } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { emailSendCounts } from '@shinefold/db/schema/email-usage';
+import { utcMonthStartDay } from '@shinefold/utils/date';
 import { and, eq, gte, sql } from 'drizzle-orm';
 
 export async function countEmailSendsThisMonth(

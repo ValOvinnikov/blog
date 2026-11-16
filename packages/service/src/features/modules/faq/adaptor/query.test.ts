@@ -1,15 +1,15 @@
-import { BRAND_VARIANT, LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockRawFaqModule } from '@blog/service/testing/modules/faq/fixtures';
-import { MOCK_FAQ_MODULE_ID } from '@blog/service/testing/modules/fixtures';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockRawFaqModule } from '@shinefold/service/testing/modules/faq/fixtures';
+import { MOCK_FAQ_MODULE_ID } from '@shinefold/service/testing/modules/fixtures';
+import { mockReference } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedListedText,
   mockLocalizedStrings,
-} from '@blog/service/testing/shared/localized';
-import { MOCK_AUTHORED_CARD_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
+import { MOCK_AUTHORED_CARD_APPEARANCE } from '@shinefold/service/testing/shared/module-appearance';
 
 import { faqModuleQuery } from './query';
 

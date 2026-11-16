@@ -1,9 +1,9 @@
-import { BRAND_VARIANT, PRICE_PERIOD } from '@blog/config';
+import { BRAND_VARIANT, PRICE_PERIOD } from '@shinefold/config';
 import type {
   TPricingModule,
   TPricingPrice,
   TPricingTier,
-} from '@blog/service';
+} from '@shinefold/service';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import type {
   IPricingCardData,

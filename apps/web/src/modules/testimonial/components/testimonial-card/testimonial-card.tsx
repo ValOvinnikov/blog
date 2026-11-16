@@ -3,10 +3,10 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   type TBrandVariant,
-} from '@blog/config';
-import type { TTestimonialItem } from '@blog/service';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { QuoteCard } from '@blog/ui/components/molecules/quote-card';
+} from '@shinefold/config';
+import type { TTestimonialItem } from '@shinefold/service';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { QuoteCard } from '@shinefold/ui/components/molecules/quote-card';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';

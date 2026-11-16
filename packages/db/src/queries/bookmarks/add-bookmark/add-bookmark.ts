@@ -1,7 +1,7 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { bookmarks, type TBookmark } from '@blog/db/schema/bookmarks';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { bookmarks, type TBookmark } from '@shinefold/db/schema/bookmarks';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { and, eq } from 'drizzle-orm';
 
 // Adds a bookmark for (tenantId, userId, postId). Idempotent: if the tuple

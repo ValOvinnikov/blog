@@ -1,17 +1,17 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import { listTenantsWithEndedTrial } from '@blog/db/queries/tenants/list-tenants-with-ended-trial';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { mockStripeIds } from '@blog/db/testing/tenants/billing';
-import { daysBeforeNow } from '@blog/db/testing/tenants/grace';
-import { MOCK_SELF_SERVE_OWNER_EMAIL_INDEX } from '@blog/db/testing/tenants/self-serve-fixtures';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { listTenantsWithEndedTrial } from '@shinefold/db/queries/tenants/list-tenants-with-ended-trial';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { mockStripeIds } from '@shinefold/db/testing/tenants/billing';
+import { daysBeforeNow } from '@shinefold/db/testing/tenants/grace';
+import { MOCK_SELF_SERVE_OWNER_EMAIL_INDEX } from '@shinefold/db/testing/tenants/self-serve-fixtures';
 
 import { endTenantTrial } from './end-tenant-trial';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock();

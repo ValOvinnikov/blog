@@ -1,11 +1,13 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import {
   MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK,
-  mockFaqModule,
+  MOCK_FAQ_HEADING,
   mockFaqQuestion,
 } from '@web/testing/modules/faq/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { FaqModuleView } from './faq-module-view';
 
@@ -30,7 +32,11 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   args: {
-    module: mockFaqModule({ questions }),
+    section: { brandVariant: BRAND_VARIANT.PRIMARY },
+    headingBlock: mockHeadingBlock({ heading: MOCK_FAQ_HEADING }),
+    questions,
+    ctaButtons: [],
+    contentAlignment: undefined,
     titleId: 'faq-title',
     dataTestId: 'faq-module-faq-1',
   },
@@ -42,35 +48,30 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const CenterAligned: TStory = {
-  args: {
-    module: mockFaqModule({
-      questions,
-      contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    }),
-  },
+  args: { contentAlignment: CONTENT_ALIGNMENT.CENTER },
 };
 
 export const WithActions: TStory = {
-  args: { module: mockFaqModule({ questions, ctaButtons: MOCK_CTA_ACTIONS }) },
+  args: { ctaButtons: MOCK_CTA_ACTIONS },
 };
 
 export const Secondary: TStory = {
-  args: {
-    module: mockFaqModule({ questions, brandVariant: BRAND_VARIANT.SECONDARY }),
-  },
+  args: { section: { brandVariant: BRAND_VARIANT.SECONDARY } },
 };
 
 export const WithRichAnswer: TStory = {
   args: {
-    module: mockFaqModule({
-      questions: [
-        mockFaqQuestion({
-          id: 'faq-1',
-          question: 'What does the free trial include?',
-          answer: MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK,
-        }),
-        ...questions.slice(1),
-      ],
-    }),
+    questions: [
+      mockFaqQuestion({
+        id: 'faq-1',
+        question: 'What does the free trial include?',
+        answer: MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK,
+      }),
+      ...questions.slice(1),
+    ],
   },
+};
+
+export const OutlinedOnBrandTint: TStory = {
+  args: { section: MOCK_OUTLINED_BRAND_TINT_SECTION },
 };

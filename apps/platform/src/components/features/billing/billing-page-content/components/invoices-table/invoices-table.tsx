@@ -1,4 +1,3 @@
-import { SIZE } from '@blog/config';
 import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -7,6 +6,7 @@ import type { TBillingInvoice } from '@platform/server/billing/fetch-stripe-bill
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import { invoiceStatusTone } from '@platform/utils/invoice-status-tone/invoice-status-tone';
+import { SIZE } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { invoicesTableVariants } from './invoices-table-variants';

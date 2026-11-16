@@ -2,7 +2,7 @@
 name: testing-practices
 description: >-
   How to write and run tests in this monorepo with Vitest + Testing Library.
-  Use when adding or updating unit tests for @blog/ui components, @blog/service
+  Use when adding or updating unit tests for @shinefold/ui components, @shinefold/service
   query mappers, or web routes, configuring vitest, or deciding what to test.
   Apply whenever adding a *.test.ts(x) file or wiring test config.
 ---
@@ -102,7 +102,7 @@ not to test", and treats "nothing to add" as a complete outcome.
   touched test files too.
   Using a const is not asserting it: `expect(HTTP_STATUS.NOT_FOUND).toBe(404)`
   still falls under "What not to test".
-  `@blog/insight`'s own tests are exempt from the `<DOMAIN>_LOG` rule: the
+  `@shinefold/insight`'s own tests are exempt from the `<DOMAIN>_LOG` rule: the
   event names they hand the logger are arbitrary inputs, held in `MOCK_`
   consts.
 - **Run:** `pnpm test`, `pnpm --filter <pkg> test`, `pnpm test:watch`. Run
@@ -111,7 +111,7 @@ not to test", and treats "nothing to add" as a complete outcome.
 
 ## Per-package setup
 
-The shared preset is `@blog/vitest-config/preset` (`configs/vitest/preset.ts`):
+The shared preset is `@shinefold/vitest-config/preset` (`configs/vitest/preset.ts`):
 globals, `src/**/*.{test,spec}.{ts,tsx}`, and `mockReset`, `restoreMocks`,
 `unstubGlobals` and `unstubEnvs` for every workspace — so a test never writes
 its own `vi.restoreAllMocks()`, `vi.unstubAllGlobals()`, `vi.unstubAllEnvs()`
@@ -140,7 +140,7 @@ or a `mockReset()` that only returns a fake to its default.
   Its worker restores one PGlite and truncates every table before each file.
 - **Every other package** runs in `node`.
 - **`packages/studio`** and **`packages/db`** run with `isolate: false` and
-  the shared `RESET_FILE_STATE_SETUP` (`@blog/vitest-config/preset`), which
+  the shared `RESET_FILE_STATE_SETUP` (`@shinefold/vitest-config/preset`), which
   calls `vi.resetModules()` and, after each file, unstubs envs and globals,
   restores spies and real timers — the config's unstub/restore flags only run
   before each test, so the last test's stubs would otherwise reach the next
@@ -159,9 +159,9 @@ or a `mockReset()` that only returns a fake to its default.
 
 ## What to test
 
-- **`@blog/ui`** — behaviour and contract through roles, text and
+- **`@shinefold/ui`** — behaviour and contract through roles, text and
   `userEvent` ("Writing a component test"); never markup, never a class.
-- **`@blog/service`** — pure logic: GROQ result → domain mapping,
+- **`@shinefold/service`** — pure logic: GROQ result → domain mapping,
   `urlForImage` output, error/empty handling, with the query runner faked.
   No `revalidate` timing tests.
 - **`apps/web`, `apps/platform`** — pages and components with only the edges
@@ -270,11 +270,11 @@ or a `mockReset()` that only returns a fake to its default.
   `customRender(Component, defaultProps)` returns `setup(overrides?)`, with
   props inferred (`NoInfer`) — no type argument.
 
-  | wrapper                           | exports                                                                         | providers                                                           |
-  | --------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-  | `@blog/ui/testing/custom-render`  | `customRender`, `renderElement`                                                 | passthrough — `@blog/ui` is prop-driven                             |
-  | `@web/testing/custom-render`      | `customRender`, `customRenderAsync`, `customRenderServerAsync`, `renderElement` | the `[tenant]/[locale]/layout.tsx` stack (`@web/testing/providers`) |
-  | `@platform/testing/custom-render` | `customRender`, `customRenderAsync`, `renderWithIntl`, `renderHookWithIntl`     | `NextIntlClientProvider`, `ToastProvider`, `UnsavedChangesProvider` |
+  | wrapper                               | exports                                                                         | providers                                                           |
+  | ------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+  | `@shinefold/ui/testing/custom-render` | `customRender`, `renderElement`                                                 | passthrough — `@shinefold/ui` is prop-driven                        |
+  | `@web/testing/custom-render`          | `customRender`, `customRenderAsync`, `customRenderServerAsync`, `renderElement` | the `[tenant]/[locale]/layout.tsx` stack (`@web/testing/providers`) |
+  | `@platform/testing/custom-render`     | `customRender`, `customRenderAsync`, `renderWithIntl`, `renderHookWithIntl`     | `NextIntlClientProvider`, `ToastProvider`, `UnsavedChangesProvider` |
 
   Bind `setup` once per file at module level:
   - **Sync component** → `customRender(Component, {…})`.
@@ -331,7 +331,7 @@ or a `mockReset()` that only returns a fake to its default.
   of two or more `it`s in one `describe`, whatever it calls; a run of act or
   assert statements written out twice; and the same `render(<X …/>)` prop bag
   three or more times in one file. That the existing file already repeats it
-  is no exemption in a file the diff touches. `blog-test/prefer-before-each`
+  is no exemption in a file the diff touches. `shinefold-test/prefer-before-each`
   reports the first statement repeated, `userEvent.setup()` inside a case and
   the repeated `render` in any test file you edit; the longer run and the
   repeated act or assert run are still the reviewer's to catch.
@@ -379,7 +379,7 @@ or a `mockReset()` that only returns a fake to its default.
 
 ## Writing a component test
 
-The shape of every `@blog/ui`, `apps/web` and `apps/platform` component test.
+The shape of every `@shinefold/ui`, `apps/web` and `apps/platform` component test.
 It proves what the user sees and does through the accessibility tree, and
 never reads state, props, handlers or markup shape.
 
@@ -577,11 +577,11 @@ describe(`<${SubscribeForm.name}/>`, () => {
 ## What to fake
 
 **Fake the edges of the app, never our own code.** An edge reaches outside
-the process or the request: `@blog/service`, `@blog/db` (its `client` inside
+the process or the request: `@shinefold/service`, `@shinefold/db` (its `client` inside
 `packages/db`), the Sanity query runner, tenant and auth resolution, `env`,
 the logger, each app's `i18n/navigation`, Server Action modules (the
 `'use server'` files under `src/server/`), `next/cache`, `next/navigation`,
-`next-auth` and `next-auth/react`. Our components, `@blog/ui`, our helpers
+`next-auth` and `next-auth/react`. Our components, `@shinefold/ui`, our helpers
 and our context providers render for real. This holds in both apps.
 
 - `SmartLink` is ours: fake `@web/i18n/navigation` under it, never
@@ -594,7 +594,7 @@ and our context providers render for real. This holds in both apps.
   `IntersectionObserver` and `@vercel/functions`' `waitUntil`), and every app fakes its shared logger there with
   its `__mocks__` copy; never mock those again. A test asserting a log line
   reads `vi.mocked(logger)`.
-- **Never `vi.mock` an `@web/*`, `@platform/*` or `@blog/ui` component to test
+- **Never `vi.mock` an `@web/*`, `@platform/*` or `@shinefold/ui` component to test
   its parent.** Render the real child. One that will not render in jsdom gets
   the missing browser API stubbed once in the workspace's setup file, not the
   child faked per file.
@@ -622,18 +622,18 @@ tenant)`) is fine: that call is the contract with the outside.
   as a `vi.fn()` with a sensible default.
   - **A `vi.mock` factory byte-identical in three or more files becomes a
     `__mocks__/` file** in the change that would write the third copy; until
-    then an inline factory is fine. db's `@blog/db/client` already has one
+    then an inline factory is fine. db's `@shinefold/db/client` already has one
     (`src/__mocks__/client.ts`, which `useQueryTestDb()` points at the
     worker's PGlite instance), and a db test that needs a tenant row calls
-    `useTestTenant(db)` (`@blog/db/testing/test-tenant`), which inserts it
+    `useTestTenant(db)` (`@shinefold/db/testing/test-tenant`), which inserts it
     before each test and deletes it after — never a hand-written
-    `insertTestTenant` and cleanup pair. Service's `@blog/service/sanity/query/query`
+    `insertTestTenant` and cleanup pair. Service's `@shinefold/service/sanity/query/query`
     has `src/sanity/query/__mocks__/query.ts` — a partial mock, because every
     loader needs the real `q` builder, so it spreads `vi.importActual(…)` and
     replaces only `runQuery`; `mockRun`
-    (`@blog/service/testing/mock-run-query`) is the typed handle.
+    (`@shinefold/service/testing/mock-run-query`) is the typed handle.
   - **A Studio validator's context comes from `mockValidationContext`**
-    (`@blog/studio/testing/mock-validation-context`), built from the fields
+    (`@shinefold/studio/testing/mock-validation-context`), built from the fields
     the validator reads; `mockGroqValidationContext` adds a fake GROQ client.
     Never cast a hand-built object to `ValidationContext`.
   - **Never restate a `__mocks__` default in `beforeEach`** —
@@ -697,7 +697,7 @@ tenant)`) is fine: that call is the contract with the outside.
   line in `*.test.ts(x)` is blocking in review.
 - **No snapshots, no implementation details, no network calls.**
 - **Never mock our own components** ("What to fake"). A test that only
-  passes by faking a sibling `@blog/ui` component usually means the web
+  passes by faking a sibling `@shinefold/ui` component usually means the web
   component wraps the pure one instead of filling its slot — fix the
   structure (`web-component-practices`) and test the real tree.
 

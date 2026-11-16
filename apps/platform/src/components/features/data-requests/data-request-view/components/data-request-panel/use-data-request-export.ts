@@ -1,6 +1,5 @@
 'use client';
 
-import { isOutcomeSuccess, type TMaybeUndefined } from '@blog/config';
 import {
   DATA_REQUEST_EXPORT_FILE_PREFIX,
   DATA_REQUEST_EXPORT_FORMAT,
@@ -14,6 +13,7 @@ import {
 import { downloadFile } from '@platform/utils/download-file/download-file';
 import { toPersonalDataExportCsv } from '@platform/utils/personal-data-export-csv/personal-data-export-csv';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import { isOutcomeSuccess, type TMaybeUndefined } from '@shinefold/config';
 import { useState, useTransition } from 'react';
 
 const JSON_INDENT = 2;

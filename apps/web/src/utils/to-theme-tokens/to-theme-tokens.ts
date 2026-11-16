@@ -12,7 +12,7 @@ import {
   type TRadiusScale,
   type TDensity,
   type TThemeTokens,
-} from '@blog/config';
+} from '@shinefold/config';
 
 type TThemeTokensRow = {
   preset: TPresetId;

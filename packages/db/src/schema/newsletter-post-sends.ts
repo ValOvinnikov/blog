@@ -5,7 +5,7 @@ import {
   type TNewsletterLimitNoticeKind,
   type TNewsletterPostSendOutcome,
   type TNewsletterSkipReason,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   date,
   pgTable,

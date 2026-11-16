@@ -1,9 +1,9 @@
-import { TENANT_PROVISIONING_STEP } from '@blog/db';
 import { TENANT_FIELD_LOCK_KIND } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
 import { renderHookWithIntl } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import type { TTenantFieldLockReason } from '@platform/utils/tenant-field-locks/tenant-field-locks';
+import { TENANT_PROVISIONING_STEP } from '@shinefold/db';
 
 import { useLockReasonText } from './use-lock-reason-text';
 

@@ -1,14 +1,14 @@
-import {
-  isOutcomeSuccess,
-  type TMaybeNull,
-  type TMaybeUndefined,
-} from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import { useLeadsTenantId } from '@platform/components/features/leads/leads-tenant-provider';
 import { useToast } from '@platform/context/toast-provider';
 import { setLeadReadAction } from '@platform/server/leads/set-lead-read-action';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import {
+  isOutcomeSuccess,
+  type TMaybeNull,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';

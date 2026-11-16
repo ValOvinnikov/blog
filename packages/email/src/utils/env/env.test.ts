@@ -1,7 +1,7 @@
 import {
   MOCK_RESEND_PLATFORM_API_KEY,
   MOCK_RESEND_TENANT_API_KEY,
-} from '@blog/email/testing/email-fixtures';
+} from '@shinefold/email/testing/email-fixtures';
 
 type TEnv = (typeof import('./env'))['env'];
 

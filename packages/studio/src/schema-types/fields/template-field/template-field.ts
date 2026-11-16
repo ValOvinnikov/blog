@@ -1,4 +1,4 @@
-import { validateTemplateMatchesDefaultLanguage } from '@blog/studio/schema-types/validation/validate-template-matches-default-language/validate-template-matches-default-language';
+import { validateTemplateMatchesDefaultLanguage } from '@shinefold/studio/schema-types/validation/validate-template-matches-default-language/validate-template-matches-default-language';
 import { defineField } from 'sanity';
 
 export const templateField = ({ type }: { type: string }) =>

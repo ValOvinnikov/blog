@@ -1,9 +1,5 @@
 'use client';
 
-import type { TLocaleIsoCode } from '@blog/config';
-import { LOOK_FIELD } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { hasArrayGotMultipleItems, isUndefined } from '@blog/utils/primitives';
 import { LookEditCards } from '@platform/components/features/look/look-form/components/look-edit-cards';
 import { LookFormProvider } from '@platform/components/features/look/look-form-provider';
 import { LookJumpIndex } from '@platform/components/features/look/look-jump-index';
@@ -22,6 +18,13 @@ import {
   STYLE_ROWS,
 } from '@platform/utils/look-open-rows/look-open-rows';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
+import type { TLocaleIsoCode } from '@shinefold/config';
+import { LOOK_FIELD } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import {
+  hasArrayGotMultipleItems,
+  isUndefined,
+} from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 

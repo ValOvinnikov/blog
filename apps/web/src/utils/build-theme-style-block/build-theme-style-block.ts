@@ -19,7 +19,7 @@ import {
   RADIUS_DECLARATIONS,
   type TThemeDeclarations,
   type TThemeTokens,
-} from '@blog/config';
+} from '@shinefold/config';
 
 const formatDeclarations = (declarations: TThemeDeclarations): string => {
   return Object.entries(declarations)

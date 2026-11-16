@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
@@ -6,10 +7,9 @@ import {
   MAGIC_LINK_SIGN_IN_CODE,
   routes,
   SITE_MESSAGES,
-} from '@blog/config';
-import { OAUTH_PROVIDER } from '@blog/config/constants';
-import { ARIA_CURRENT, ARIA_CURRENT_PAGE } from '@blog/ui/testing/aria';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
+import { ARIA_CURRENT, ARIA_CURRENT_PAGE } from '@shinefold/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { SESSION_STATUS } from '@web/constants/session';
 import { usePathname } from '@web/i18n/navigation';

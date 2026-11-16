@@ -1,13 +1,16 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   DOWNGRADE_GRACE_DAYS,
   GRACE_EMAIL,
   GRACE_EMAIL_DAY,
   GRACE_EMAIL_DUE_UNTIL_DAY,
   type TGraceEmail,
-} from '@blog/db/constants';
-import { tenants } from '@blog/db/schema/tenants';
-import { daysBefore, utcDayStart } from '@blog/db/utils/day-offset/day-offset';
+} from '@shinefold/db/constants';
+import { tenants } from '@shinefold/db/schema/tenants';
+import {
+  daysBefore,
+  utcDayStart,
+} from '@shinefold/db/utils/day-offset/day-offset';
 import { and, gte, isNull, lt, type SQL } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 

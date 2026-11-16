@@ -1,11 +1,11 @@
-import { ICONS } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { ICONS } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import {
   MOCK_NEWSLETTER_EMAIL_LABEL,
   makeNewsletterSignupForm,
-} from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/organisms/newsletter-signup/fixtures';
 
 import { NewsletterSignupFull } from './newsletter-signup-full';
 

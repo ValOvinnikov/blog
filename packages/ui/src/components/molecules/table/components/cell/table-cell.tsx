@@ -1,5 +1,5 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { IWithChildren } from '@blog/config/react';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import type { IWithChildren } from '@shinefold/config/react';
 
 import { tableCellVariants } from './table-cell-variants';
 

@@ -1,5 +1,9 @@
-import { renderElement, screen, within } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import {
+  renderElement,
+  screen,
+  within,
+} from '@shinefold/ui/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 

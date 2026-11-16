@@ -1,5 +1,5 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { Heading } from '@blog/ui/components/atoms/heading';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
 import type { ReactNode } from 'react';
 
 export type TTimelineHeadingProps = IWithClassName &

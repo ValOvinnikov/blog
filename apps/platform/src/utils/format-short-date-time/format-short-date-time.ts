@@ -1,4 +1,4 @@
-import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@blog/config';
+import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@shinefold/config';
 
 const DAY_MS = 86_400_000;
 const TIME_ZONE = 'UTC';

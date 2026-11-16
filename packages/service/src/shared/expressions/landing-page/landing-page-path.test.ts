@@ -1,7 +1,7 @@
-import type { TMaybeNull } from '@blog/config';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { faker } from '@faker-js/faker';
+import type { TMaybeNull } from '@shinefold/config';
+import { mockReference } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 
 import {
   LANDING_PAGE_PATH_EXPRESSION,

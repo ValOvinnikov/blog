@@ -1,5 +1,3 @@
-import { isAccentHueAccessible } from '@blog/config';
-import type * as BlogConfig from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
@@ -26,11 +24,13 @@ import {
   ARCHIVED_NOTICE_DESCRIPTION,
   ONE_FIELD_NEEDS_ATTENTION,
 } from '@platform/testing/render-in-settings-form';
+import type * as BlogConfig from '@shinefold/config';
+import { isAccentHueAccessible } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
 
-vi.mock('@blog/config', async (importOriginal) => ({
+vi.mock('@shinefold/config', async (importOriginal) => ({
   ...(await importOriginal<typeof BlogConfig>()),
   isAccentHueAccessible: vi.fn(() => true),
 }));

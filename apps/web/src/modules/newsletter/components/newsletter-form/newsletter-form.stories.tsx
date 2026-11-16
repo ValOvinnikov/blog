@@ -1,5 +1,5 @@
-import { CONTENT_ALIGNMENT, NEWSLETTER_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { CONTENT_ALIGNMENT, NEWSLETTER_VARIANT } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { userEvent, within } from 'storybook/test';
 

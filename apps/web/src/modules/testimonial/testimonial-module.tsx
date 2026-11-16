@@ -1,4 +1,4 @@
-import { service } from '@blog/service';
+import { service } from '@shinefold/service';
 import { TESTIMONIAL_LOG } from '@web/constants/testimonial';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getModuleSection } from '@web/server/site-config/get-module-section/get-module-section';

@@ -2,7 +2,7 @@ import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 
 import { overallStatusFor } from './overall-provisioning-status';
 

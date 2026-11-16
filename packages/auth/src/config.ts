@@ -1,27 +1,27 @@
 import 'server-only';
 
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
-import { consumePendingInvitesOnSignIn } from '@blog/auth/events/consume-pending-invites-on-sign-in';
-import { recordSignupTermsOnSignIn } from '@blog/auth/events/record-signup-terms-on-sign-in';
-import { buildMagicLinkProvider } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
-import { buildAppCookies } from '@blog/auth/sessions/app-cookies';
-import { scopeAdapterToApp } from '@blog/auth/sessions/app-scoped-adapter';
-import { env } from '@blog/auth/utils/env/env';
+import { consumePendingInvitesOnSignIn } from '@shinefold/auth/events/consume-pending-invites-on-sign-in';
+import { recordSignupTermsOnSignIn } from '@shinefold/auth/events/record-signup-terms-on-sign-in';
+import { buildMagicLinkProvider } from '@shinefold/auth/providers/magic-link/magic-link-provider/magic-link-provider';
+import { buildAppCookies } from '@shinefold/auth/sessions/app-cookies';
+import { scopeAdapterToApp } from '@shinefold/auth/sessions/app-scoped-adapter';
+import { env } from '@shinefold/auth/utils/env/env';
 import {
   getOAuthProviderCredentials,
   OAUTH_PROVIDER_IDS,
   type TOAuthProviderId,
-} from '@blog/auth/utils/oauth-providers/oauth-providers';
-import type { TOAuthCredentials } from '@blog/config';
+} from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import type { TOAuthCredentials } from '@shinefold/config';
 import {
   AUTH_APP,
   OAUTH_PROVIDER,
   type TAuthApp,
-} from '@blog/config/constants';
-import type { IMagicLinkSendHandlers } from '@blog/config/types';
-import { getDb, schema } from '@blog/db';
-import type { TTenantOAuthCredentialsByProvider } from '@blog/db/queries/tenant-oauth-credentials/get-tenant-oauth-credentials/get-tenant-oauth-credentials';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/config/constants';
+import type { IMagicLinkSendHandlers } from '@shinefold/config/types';
+import { getDb, schema } from '@shinefold/db';
+import type { TTenantOAuthCredentialsByProvider } from '@shinefold/db/queries/tenant-oauth-credentials/get-tenant-oauth-credentials/get-tenant-oauth-credentials';
+import { isUndefined } from '@shinefold/utils/primitives';
 import type { NextAuthConfig } from 'next-auth';
 import type { Provider } from 'next-auth/providers';
 import GitHub from 'next-auth/providers/github';

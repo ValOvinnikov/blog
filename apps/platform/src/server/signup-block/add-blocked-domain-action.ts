@@ -1,9 +1,5 @@
 'use server';
 
-import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
-import { ERROR_CODE } from '@blog/config/constants';
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import { toOutcome } from '@blog/utils/to-outcome';
 import {
   SIGNUP_BLOCK_FIELD_ERROR,
   type TSignupBlockFieldError,
@@ -15,6 +11,10 @@ import { signupBlockReasonSchema } from '@platform/server/signup-block/signup-bl
 import { toTenantFieldErrors } from '@platform/server/tenants/tenant-field-error';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { ACTION_OUTCOME, type TActionResult } from '@shinefold/config';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
 const addBlockedDomainInputSchema = z.object({

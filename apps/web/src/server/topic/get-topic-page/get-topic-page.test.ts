@@ -14,7 +14,7 @@ const MOCK_TOPIC_SLUG = faker.lorem.slug();
 
 const { getTopicPageMock } = vi.hoisted(() => ({ getTopicPageMock: vi.fn() }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: { pages: { topic: { v1: { getTopicPage: getTopicPageMock } } } },
 }));
 

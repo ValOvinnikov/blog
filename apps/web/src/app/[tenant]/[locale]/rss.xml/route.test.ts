@@ -1,15 +1,15 @@
 /**
  * @vitest-environment jsdom
  */
+import { faker } from '@faker-js/faker';
 import {
   HTTP_STATUS,
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   routes,
   SITE_MESSAGES,
-} from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { RSS_LOG } from '@web/constants/rss';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -43,7 +43,7 @@ const {
   getHostTenantSanityContextMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     entities: {
       posts: { v1: { getAllPublishedPosts: getAllPublishedPostsMock } },

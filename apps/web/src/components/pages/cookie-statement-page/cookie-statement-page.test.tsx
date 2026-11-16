@@ -1,6 +1,6 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { service } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
+import { service } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { COOKIE_STATEMENT_LOG } from '@web/constants/cookie-statement';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { mockCookieStatementPage } from '@web/testing/shared/cookie-statement/fixtures';
@@ -16,7 +16,7 @@ import { CookieStatementPage } from './cookie-statement-page';
 vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: { cookieStatement: { v1: { getCookieStatementPage: vi.fn() } } },
   },

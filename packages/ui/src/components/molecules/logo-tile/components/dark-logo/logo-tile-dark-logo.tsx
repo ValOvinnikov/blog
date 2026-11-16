@@ -1,7 +1,7 @@
 import {
   LogoTileLogo,
   type TLogoTileLogoProps,
-} from '@blog/ui/components/molecules/logo-tile/components/logo/logo-tile-logo';
+} from '@shinefold/ui/components/molecules/logo-tile/components/logo/logo-tile-logo';
 
 import { logoTileDarkLogoVariants } from './logo-tile-dark-logo-variants';
 

@@ -2,20 +2,20 @@ import type {
   TMaybeNull,
   InternationalizedArrayListedText,
   Module_cta,
-} from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { q } from '@blog/service/sanity/query/query';
-import type { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
-import type { TLocalizedKey } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
-import { MOCK_CTA_MODULE_ID } from '@blog/service/testing/modules/fixtures';
-import { createLocalizedFieldResolver } from '@blog/service/testing/shared/groq';
+} from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { q } from '@shinefold/service/sanity/query/query';
+import type { textBlockFragment } from '@shinefold/service/shared/fragments/portable-text/text-block';
+import type { TLocalizedKey } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
+import { MOCK_CTA_MODULE_ID } from '@shinefold/service/testing/modules/fixtures';
+import { createLocalizedFieldResolver } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_DUTCH_TEXT,
   MOCK_ENGLISH_TEXT,
   mockLocalizedEntry,
   mockParagraphBlocks,
-} from '@blog/service/testing/shared/localized';
+} from '@shinefold/service/testing/shared/localized';
 import type { InferFragmentType } from 'groqd';
 
 import { getLocalizedPortableTextBlock } from './get-localized-portable-text-block';

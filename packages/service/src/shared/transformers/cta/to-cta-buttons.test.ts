@@ -1,9 +1,9 @@
-import { CTA_ACTION_VARIANT } from '@blog/config';
+import { CTA_ACTION_VARIANT } from '@shinefold/config';
 import {
   mockCtaButtonView,
   mockRawCtaButton,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawInternalLinkDocument } from '@blog/service/testing/shared/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawInternalLinkDocument } from '@shinefold/service/testing/shared/fixtures';
 
 import { toCtaButtons } from './to-cta-buttons';
 

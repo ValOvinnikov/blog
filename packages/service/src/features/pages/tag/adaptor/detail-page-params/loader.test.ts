@@ -1,17 +1,17 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { MOCK_TAG_SLUG } from '@blog/service/testing/entities/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockSlugPageDocument } from '@blog/service/testing/pages/fixtures';
-import { MOCK_PAGE_TAG_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { mockTenant } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { MOCK_TAG_SLUG } from '@shinefold/service/testing/entities/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { mockSlugPageDocument } from '@shinefold/service/testing/pages/fixtures';
+import { MOCK_PAGE_TAG_CACHE_TAG } from '@shinefold/service/testing/sanity/query/cache-tags';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getTagParams } from './loader';
 import { tagParamsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(601504);
 

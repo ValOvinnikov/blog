@@ -1,9 +1,9 @@
-import { SANITY_LOGIN_PROVIDER } from '@blog/config/constants';
-import { SANITY_PROJECT_ROLE } from '@blog/db/constants';
-import type { TTenantOwnerAccess } from '@blog/db/queries/tenants/tenant-owner-access';
-import type * as schema from '@blog/db/schema';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
+import { SANITY_LOGIN_PROVIDER } from '@shinefold/config/constants';
+import { SANITY_PROJECT_ROLE } from '@shinefold/db/constants';
+import type { TTenantOwnerAccess } from '@shinefold/db/queries/tenants/tenant-owner-access';
+import type * as schema from '@shinefold/db/schema';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export const MOCK_NO_OWNER_ACCESS = {
   ownerSanityInviteId: null,

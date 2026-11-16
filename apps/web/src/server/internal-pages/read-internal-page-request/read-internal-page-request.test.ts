@@ -1,5 +1,5 @@
-import { HTTP_METHOD } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { HTTP_METHOD } from '@shinefold/config/constants';
 import { INTERNAL_PAGES_LOG } from '@web/constants/internal-pages';
 import { readSignedTenantRequest } from '@web/server/signed-request/read-signed-tenant-request/read-signed-tenant-request';
 import { z } from 'zod';

@@ -1,7 +1,7 @@
 import {
   MOCK_SECTION_PAGES_HEADING,
   mockRawSectionPagesModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 
 import { toSectionPagesModuleDocument } from './transformer';
 

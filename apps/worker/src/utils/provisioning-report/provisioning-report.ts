@@ -2,20 +2,20 @@ import {
   AUDIT_TARGET_TYPE,
   type TAuditAction,
   WORKER_AUDIT_ACTOR_ID,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
-import { insertAuditEvent } from '@blog/db/queries/audit-events';
+} from '@shinefold/db/constants';
+import { insertAuditEvent } from '@shinefold/db/queries/audit-events';
 import {
   finishProvisioningRun,
   startProvisioningRun,
   updateProvisioningStep,
-} from '@blog/db/queries/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/queries/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { PROVISIONING_AUDIT_VIA } from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';
 import { overallStatusFor } from '@worker/utils/overall-provisioning-status/overall-provisioning-status';

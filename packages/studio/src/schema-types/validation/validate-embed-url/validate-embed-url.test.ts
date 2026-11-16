@@ -1,5 +1,5 @@
-import { validateEmbedUrl } from '@blog/studio/schema-types/validation/validate-embed-url/validate-embed-url';
 import { faker } from '@faker-js/faker';
+import { validateEmbedUrl } from '@shinefold/studio/schema-types/validation/validate-embed-url/validate-embed-url';
 
 faker.seed(3771);
 

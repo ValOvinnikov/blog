@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
@@ -5,15 +6,14 @@ import {
   routes,
   SITE_MESSAGES_BY_LOCALE,
   type TLocaleIsoCode,
-} from '@blog/config';
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
-import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
-import type { TTranslationMap } from '@blog/service';
+} from '@shinefold/config';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
+import { SUSPENSION_REASON, TENANT_STATUS } from '@shinefold/db/constants';
+import type { TTranslationMap } from '@shinefold/service';
 import {
   type IPreviewTokenClaims,
   signPreviewToken,
-} from '@blog/utils/preview-token';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/utils/preview-token';
 import { CACHE_CONTROL, ROBOTS_DIRECTIVE } from '@web/constants/http';
 import { PROXY_LOG } from '@web/constants/proxy';
 import {

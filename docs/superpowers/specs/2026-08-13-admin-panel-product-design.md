@@ -116,9 +116,9 @@ equal-weight with Basic):
 **Live preview, two tiers, both real:**
 
 1. **Inline/instant** — small live samples next to the controls themselves
-   (the swatch, a couple of actual `@blog/ui` primitives like `BrandMark` or
+   (the swatch, a couple of actual `@shinefold/ui` primitives like `BrandMark` or
    a button) driven directly by in-progress form state via CSS custom
-   properties. This works _because_ `@blog/ui` is pure and prop/token-driven
+   properties. This works _because_ `@shinefold/ui` is pure and prop/token-driven
    with zero Sanity dependency — the same components the real site renders
    can render live on this page, fed unsaved values. No save, no reload.
 2. **Full-page** — a reserved panel/route showing an iframe of the actual
@@ -160,7 +160,7 @@ DNS verification, not a subscriber-facing feature.
 
 Newsletter subscriber list: search, status (active/pending/unsubscribed),
 manual unsubscribe, export. Straightforward table/list UI, no live-preview
-concerns. Data source: `@blog/db`'s existing `subscribers` table.
+concerns. Data source: `@shinefold/db`'s existing `subscribers` table.
 
 ### Comments (not this milestone — design the shape now)
 
@@ -184,7 +184,7 @@ confirmation step, probably a type-to-confirm like the account page's
 existing delete-account flow (`apps/web`'s `accountPage.privacy` section) for
 consistency with an established pattern in this codebase.
 
-## Component library — Base UI for behavior, `@blog/ui` for appearance
+## Component library — Base UI for behavior, `@shinefold/ui` for appearance
 
 **Decision (2026-08-13): adopt Base UI (`@base-ui/react`, v1.6.0+) in
 `apps/platform`.** It is the successor to Radix rather than a competitor — built
@@ -196,7 +196,7 @@ almost entirely forms; Radix has no equivalent.
 
 **Where it lives: entirely in `apps/platform`.** Install Base UI there and style
 its parts with Tailwind directly. There is no shell layer, no wrapper
-components, and nothing added to `@blog/ui` for this.
+components, and nothing added to `@shinefold/ui` for this.
 
 ```tsx
 <Switch.Root className="h-6 w-11 rounded-full bg-secondary data-[checked]:bg-brand-primary-solid …">
@@ -204,7 +204,7 @@ components, and nothing added to `@blog/ui` for this.
 </Switch.Root>
 ```
 
-**An earlier revision of this doc prescribed pure visual shells in `@blog/ui`,
+**An earlier revision of this doc prescribed pure visual shells in `@shinefold/ui`,
 wired via Base UI's `render` prop. That was wrong and is withdrawn** (the
 shells were built, reviewed, and closed unmerged — PR #1443, issues
 #1435–#1438).
@@ -220,14 +220,14 @@ instead.
 **Superseded 2026-10-08 (owner decision):** reusable blocks are built on Base
 UI inside `apps/platform/src/components/shared/`, and pages compose them; a
 pattern another domain's page needs becomes a block. Nothing goes into
-`@blog/ui` for this app. `.claude/skills/platform-ui-practices/SKILL.md` →
+`@shinefold/ui` for this app. `.claude/skills/platform-ui-practices/SKILL.md` →
 "Reusable blocks" is the rule.
 
-**What `@blog/ui` keeps giving you here** is the token vocabulary — the same
+**What `@shinefold/ui` keeps giving you here** is the token vocabulary — the same
 Tailwind theme tokens (`brand-primary-solid`, `border`, `duration-base`, …)
 that its components use are what the admin panel styles Base UI with. One
 design language, without a component layer in between. The Look tab's live
-preview still renders real `@blog/ui` primitives fed unsaved form state; that
+preview still renders real `@shinefold/ui` primitives fed unsaved form state; that
 was always independent of where the _controls_ live.
 
 **Explicitly rejected: shadcn/ui.** It is copy-pasted components carrying their
@@ -236,7 +236,7 @@ with its own tokens and `*-variants.ts` convention. Adopting it would mean
 maintaining two design languages. (Noted because it is the reflexive
 recommendation, and a `vercel:shadcn` skill is available in this environment.)
 
-**Already covered by `@blog/ui` — do not rebuild:** `SegmentedControl` (preset
+**Already covered by `@shinefold/ui` — do not rebuild:** `SegmentedControl` (preset
 / radius / density pickers), `TextInput`/`Textarea` (the 20 voice fields),
 `Button`/`IconButton`, `PopoverMenu`, `SettingRow`, `StatusBadge` (tenant
 status/plan), `ActionList`, `Alert`, `Spinner`, `Toast`. Consult

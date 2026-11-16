@@ -1,19 +1,19 @@
 import {
+  PortableText as PortableTextRoot,
+  type PortableTextReactComponents,
+} from '@portabletext/react';
+import {
   ASIDE_KIND,
   IMAGE_LAYOUT,
   PORTABLE_TEXT_BLOCK_TYPE,
   type Code,
   type IBodyImageBlock,
   type TAsideKind,
-} from '@blog/config';
-import type { TPortableTextBody } from '@blog/service';
-import { ImageWithCaption } from '@blog/ui/components/molecules/image-with-caption';
-import { Table } from '@blog/ui/components/molecules/table';
-import { hasLength } from '@blog/utils/primitives';
-import {
-  PortableText as PortableTextRoot,
-  type PortableTextReactComponents,
-} from '@portabletext/react';
+} from '@shinefold/config';
+import type { TPortableTextBody } from '@shinefold/service';
+import { ImageWithCaption } from '@shinefold/ui/components/molecules/image-with-caption';
+import { Table } from '@shinefold/ui/components/molecules/table';
+import { hasLength } from '@shinefold/utils/primitives';
 import { DeepAside } from '@web/components/shared/deep-aside';
 import { CodeBlock } from '@web/components/shared/portable-text/components/code-block';
 import { portableTextVariants } from '@web/components/shared/portable-text/portable-text-variants';

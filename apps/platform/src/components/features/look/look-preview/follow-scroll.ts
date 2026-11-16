@@ -1,5 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TValueOf } from '@blog/config/utils';
 import type { TDeviceFrameHandle } from '@platform/components/shared/device-frame';
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
 import {
@@ -12,6 +10,8 @@ import {
   PREVIEW_DEVICE_HEIGHT,
   type TPreviewDevice,
 } from '@platform/constants/preview';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TValueOf } from '@shinefold/config/utils';
 
 type TScrollTarget = TValueOf<typeof DEVICE_FRAME_SCROLL_TARGET>;
 

@@ -1,10 +1,10 @@
-import type { TOAuthCredentials } from '@blog/config';
-import type { TOAuthProvider } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { tenantOAuthCredentials } from '@blog/db/schema/tenant-oauth-credentials';
-import { requireTenantOAuthEncryptionKey } from '@blog/db/utils/tenant-oauth-encryption-key/tenant-oauth-encryption-key';
-import { decryptSecret } from '@blog/utils';
-import { hasLength } from '@blog/utils/primitives';
+import type { TOAuthCredentials } from '@shinefold/config';
+import type { TOAuthProvider } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { tenantOAuthCredentials } from '@shinefold/db/schema/tenant-oauth-credentials';
+import { requireTenantOAuthEncryptionKey } from '@shinefold/db/utils/tenant-oauth-encryption-key/tenant-oauth-encryption-key';
+import { decryptSecret } from '@shinefold/utils';
+import { hasLength } from '@shinefold/utils/primitives';
 import { eq } from 'drizzle-orm';
 
 export type TTenantOAuthCredentialsByProvider = Partial<

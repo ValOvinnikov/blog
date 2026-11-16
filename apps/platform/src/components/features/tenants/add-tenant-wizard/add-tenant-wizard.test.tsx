@@ -1,6 +1,6 @@
-import { CORE_PROVISIONING_STEPS } from '@blog/db/constants';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
+import { CORE_PROVISIONING_STEPS } from '@shinefold/db/constants';
 
 import { AddTenantWizard } from './add-tenant-wizard';
 

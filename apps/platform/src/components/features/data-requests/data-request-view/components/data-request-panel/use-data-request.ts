@@ -1,12 +1,5 @@
 'use client';
 
-import {
-  isOutcomeInvalid,
-  isOutcomeSuccess,
-  type TMaybeUndefined,
-  type TReasonedFailure,
-} from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import type { TConfirmDialogActionResult } from '@platform/components/shared/confirm-dialog';
 import type { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { useToast } from '@platform/context/toast-provider';
@@ -16,6 +9,13 @@ import {
   type TLookUpPersonalDataResult,
 } from '@platform/server/data-requests/look-up-personal-data-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import {
+  isOutcomeInvalid,
+  isOutcomeSuccess,
+  type TMaybeUndefined,
+  type TReasonedFailure,
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { useRef, useState, useTransition } from 'react';
 
 type TEmailError = TReasonedFailure<typeof TENANT_FIELD_ERROR.EMAIL_INVALID>;

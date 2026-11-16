@@ -1,10 +1,10 @@
-import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { localizedParagraphTextField } from '@blog/studio/schema-types/fields/localized-paragraph-text-field/localized-paragraph-text-field';
-import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
-import { socialProfileSchema } from '@blog/studio/schema-types/objects/social-profile/social-profile';
-import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
-import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
+import { linkReferenceField } from '@shinefold/studio/schema-types/fields/link-reference-field/link-reference-field';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { localizedParagraphTextField } from '@shinefold/studio/schema-types/fields/localized-paragraph-text-field/localized-paragraph-text-field';
+import { localizedImageWithAltSchema } from '@shinefold/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { socialProfileSchema } from '@shinefold/studio/schema-types/objects/social-profile/social-profile';
+import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
+import { validateLocalizedMaxLength } from '@shinefold/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { UserRound } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 

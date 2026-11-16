@@ -1,11 +1,3 @@
-import {
-  BRAND_VARIANT,
-  FOOTER_LAYOUT,
-  FOOTER_SURFACE,
-  type TBrandVariant,
-  type TFooterLayout,
-  type TFooterSurface,
-} from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import {
@@ -18,6 +10,14 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
+import {
+  BRAND_VARIANT,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
+  type TBrandVariant,
+  type TFooterLayout,
+  type TFooterSurface,
+} from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { CookieSettingsButtonField } from './components/cookie-settings-button-field/cookie-settings-button-field';

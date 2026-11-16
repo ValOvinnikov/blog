@@ -5,11 +5,11 @@ import {
   type TOutcome,
   type TTenantDeleteOutcome,
   type TTenantDeleteSanityProjectOutcome,
-} from '@blog/config';
-import { getDb } from '@blog/db/client';
-import { tenants } from '@blog/db/schema/tenants';
-import { deleteSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
-import { toOutcome } from '@blog/utils/to-outcome';
+} from '@shinefold/config';
+import { getDb } from '@shinefold/db/client';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { deleteSanityProject } from '@shinefold/db/utils/sanity-management-client/sanity-project-lifecycle';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { eq } from 'drizzle-orm';
 
 type TDeleted = typeof TENANT_DELETE_OUTCOME.DELETED;

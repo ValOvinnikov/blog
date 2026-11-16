@@ -1,4 +1,4 @@
-import { routes } from '@blog/config';
+import { routes } from '@shinefold/config';
 import { COOKIE_STATEMENT_LOG } from '@web/constants/cookie-statement';
 import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getCookieStatementPage } from '@web/server/cookie-statement/get-cookie-statement-page/get-cookie-statement-page';

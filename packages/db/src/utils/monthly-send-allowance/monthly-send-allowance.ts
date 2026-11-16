@@ -1,8 +1,8 @@
-import type { TTenantPlan } from '@blog/config/constants';
+import type { TTenantPlan } from '@shinefold/config/constants';
 import {
   PLAN_MONTHLY_SENDS_PER_SUBSCRIBER,
   SUBSCRIBER_BAND_CEILINGS,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 
 function subscriberBandCeiling(activeSubscriberCount: number): number {
   return (

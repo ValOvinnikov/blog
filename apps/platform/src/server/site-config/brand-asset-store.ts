@@ -1,9 +1,9 @@
 import 'server-only';
 
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
 import { getSiteConfigOrDefaults } from '@platform/server/site-config/site-config-or-defaults';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 const assetColumn = (kind: TBrandAssetKind) =>
   kind === 'logo' ? 'logoAssetUrl' : 'faviconAssetUrl';

@@ -3,7 +3,7 @@ import type {
   THeadingBlock,
   TLayout,
   TMaybeUndefined,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export type TCookieSettingsModule = {
   brandVariant: TBrandVariant;

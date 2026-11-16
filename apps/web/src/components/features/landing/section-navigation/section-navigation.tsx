@@ -1,5 +1,5 @@
-import { routes } from '@blog/config';
-import type { TLandingSectionNavigation } from '@blog/service';
+import { routes } from '@shinefold/config';
+import type { TLandingSectionNavigation } from '@shinefold/service';
 import {
   SidebarNav,
   type TSidebarNavItem,

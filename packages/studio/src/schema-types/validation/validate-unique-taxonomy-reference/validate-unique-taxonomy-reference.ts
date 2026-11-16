@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 import {
   fetchFailSafe,
   getDraftsClient,
-} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
-import { isString } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { isString } from '@shinefold/utils/primitives';
 import type { ValidationContext } from 'sanity';
 
 type TReferenceValue = TMaybeUndefined<{ _ref?: string }>;

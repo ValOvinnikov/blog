@@ -1,4 +1,4 @@
-import type { TNewsletterResult } from '@blog/config';
+import type { TNewsletterResult } from '@shinefold/config';
 import { NEWSLETTER_RESULT_MESSAGES } from '@web/utils/newsletter-result-messages';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';

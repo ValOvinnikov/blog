@@ -1,4 +1,3 @@
-import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
 import { TENANTS_SEARCH_DEBOUNCE_MS } from '@platform/constants/tenant';
 import {
   act,
@@ -11,6 +10,7 @@ import {
   mockTenantsListQuery,
   MOCK_TENANT_SLUG,
 } from '@platform/testing/tenants/fixtures';
+import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 

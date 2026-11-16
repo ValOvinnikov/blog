@@ -1,8 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query/query';
+} from '@shinefold/service/sanity/query/query';
 
 import { postPublishedAtQuery } from './query';
 
@@ -17,5 +17,7 @@ export async function getPostPublishedAt(
     cache: 'no-store',
   });
 
-  return raw?.publishedAt ?? undefined;
+  if (!raw) return undefined;
+
+  return raw.publishedAt;
 }

@@ -1,4 +1,4 @@
-import { MOCK_DATABASE_URL } from '@blog/db/testing/env/fixtures';
+import { MOCK_DATABASE_URL } from '@shinefold/db/testing/env/fixtures';
 
 describe('db client module loading', () => {
   beforeEach(() => {

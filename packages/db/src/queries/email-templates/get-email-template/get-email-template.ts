@@ -2,16 +2,16 @@ import {
   LOCALE_ISO_CODES,
   type TEmailTemplateType,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@shinefold/db/constants';
 import {
   emailTemplateLogos,
   emailTemplates,
   type TEmailTemplateBlock,
   type TEmailTemplateRow,
-} from '@blog/db/schema/email-templates';
-import { tenants } from '@blog/db/schema/tenants';
+} from '@shinefold/db/schema/email-templates';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { and, eq } from 'drizzle-orm';
 
 export type TEmailTemplateResult = {

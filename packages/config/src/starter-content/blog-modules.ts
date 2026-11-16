@@ -2,7 +2,7 @@ import type {
   Module_heroBlog,
   Module_postLatest,
   Module_taxonomyList,
-} from '@blog/config/sanity/generated/types';
+} from '@shinefold/config/sanity/generated/types';
 
 import {
   BRAND_VARIANT,
@@ -12,7 +12,7 @@ import {
   TAXONOMY_KIND,
   TAXONOMY_SORT,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion, TStarterModule } from './starter-document';

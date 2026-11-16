@@ -1,5 +1,5 @@
-import { SIZE, SOCIAL_PLATFORM_ICON } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
+import { SIZE, SOCIAL_PLATFORM_ICON } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { buildShareLinks } from '@web/utils/build-share-links';
 import { userEvent, within } from 'storybook/test';

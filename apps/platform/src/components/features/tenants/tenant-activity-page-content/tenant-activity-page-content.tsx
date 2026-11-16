@@ -1,12 +1,12 @@
-import { AUDIT_TARGET_TYPE } from '@blog/config';
-import { queries } from '@blog/db';
-import { AUDIT_EVENTS_PAGE_SIZE } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { TenantActivityView } from '@platform/components/features/tenants/tenant-activity-view';
 import { Pagination } from '@platform/components/shared/pagination';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { resolveTotalPages } from '@platform/utils/pagination/pagination';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { AUDIT_TARGET_TYPE } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { AUDIT_EVENTS_PAGE_SIZE } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export type TTenantActivityPageContentProps = {
   tenant: TTenant;

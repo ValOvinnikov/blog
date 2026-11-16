@@ -2,8 +2,8 @@ import type {
   FOOTER_FINE_PRINT_KIND,
   ILink,
   TMaybeUndefined,
-} from '@blog/config';
-import type { TSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
+} from '@shinefold/config';
+import type { TSocialProfile } from '@shinefold/service/shared/transformers/social-profile/to-social-profile';
 
 export type TFooterLinkGroup = {
   heading: TMaybeUndefined<string>;

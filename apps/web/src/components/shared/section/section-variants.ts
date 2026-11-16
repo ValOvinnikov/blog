@@ -1,9 +1,13 @@
-import { BRAND_VARIANT, CONTAINER_WIDTH, SPACING_SCALE } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTAINER_WIDTH,
+  SPACING_SCALE,
+} from '@shinefold/config';
 import {
   BAND_SPACING_BOTTOM,
   BAND_SPACING_TOP,
   tv,
-} from '@blog/ui/lib/styling';
+} from '@shinefold/ui/lib/styling';
 
 export const sectionVariants = tv({
   slots: {
@@ -37,8 +41,12 @@ export const sectionVariants = tv({
       [CONTAINER_WIDTH.WIDE]: { inner: ['max-w-wide'] },
       [CONTAINER_WIDTH.FULL]: { inner: ['max-w-page'] },
     },
-    dividerTop: { true: { root: ['border-t border-divider'] } },
-    dividerBottom: { true: { root: ['border-b border-divider'] } },
+    dividerTop: {
+      true: { root: ['border-t-[length:var(--divider-width)] border-divider'] },
+    },
+    dividerBottom: {
+      true: { root: ['border-b-[length:var(--divider-width)] border-divider'] },
+    },
   },
   defaultVariants: {
     spacingTop: SPACING_SCALE.MD,

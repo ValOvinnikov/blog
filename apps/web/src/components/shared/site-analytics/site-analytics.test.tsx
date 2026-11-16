@@ -1,4 +1,4 @@
-import { CAPABILITY } from '@blog/config';
+import { CAPABILITY } from '@shinefold/config';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 

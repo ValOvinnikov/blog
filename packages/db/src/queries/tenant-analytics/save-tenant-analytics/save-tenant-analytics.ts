@@ -2,9 +2,9 @@ import {
   ANALYTICS_PROVIDER,
   DOMAIN_PATTERN,
   GOOGLE_ANALYTICS_ID_PATTERN,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { tenantAnalytics } from '@blog/db/schema/tenant-analytics';
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { tenantAnalytics } from '@shinefold/db/schema/tenant-analytics';
 import { z } from 'zod';
 
 export const saveTenantAnalyticsInputSchema = z.discriminatedUnion('provider', [

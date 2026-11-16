@@ -1,6 +1,3 @@
-import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import { ERROR_CODE } from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -13,6 +10,13 @@ import {
   MOCK_NOT_AN_EMAIL,
 } from '@platform/testing/data-requests/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+} from '@shinefold/config';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import { countPersonalDataMatches } from './count-personal-data-matches';
 import { runDataRequest } from './run-data-request';

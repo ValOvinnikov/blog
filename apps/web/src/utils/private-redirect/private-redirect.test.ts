@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { HTTP_STATUS } from '@shinefold/config';
 
 import { privateRedirect } from './private-redirect';
 

@@ -1,8 +1,8 @@
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
-import { TENANT_STATUS, type TTenantStatus } from '@blog/db/constants';
-import { tenantPlanEnum } from '@blog/db/schema/tenant-enums';
-import { tenants } from '@blog/db/schema/tenants';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { TENANT_STATUS, type TTenantStatus } from '@shinefold/db/constants';
+import { tenantPlanEnum } from '@shinefold/db/schema/tenant-enums';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { or, type SQL, sql } from 'drizzle-orm';
 
 export type TPlanChangeFields = {

@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CARD_IMAGE_SHAPE,
@@ -5,21 +6,20 @@ import {
   DISPLAY_MODE,
   ICONS,
   LINK_TYPE,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   mockRawFeatureListItem,
   mockRawFeatureListModule,
-} from '@blog/service/testing/modules/feature-list/fixtures';
+} from '@shinefold/service/testing/modules/feature-list/fixtures';
 import {
   mockCtaButtonView,
   mockRawCtaButton,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   mockLinkView,
   mockRawSanityImage,
-} from '@blog/service/testing/shared/fixtures';
-import { MOCK_AUTHORED_MODULE_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_AUTHORED_MODULE_APPEARANCE } from '@shinefold/service/testing/shared/module-appearance';
 
 import { toFeatureListModule } from './transformer';
 

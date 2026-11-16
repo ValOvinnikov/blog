@@ -1,4 +1,4 @@
-import { POPOVER_SURFACE, tv } from '@blog/ui/lib/styling';
+import { POPOVER_SURFACE, tv } from '@shinefold/ui/lib/styling';
 
 export const popoverMenuPanelVariants = tv({
   base: [POPOVER_SURFACE],

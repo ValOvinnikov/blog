@@ -1,11 +1,11 @@
-import { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
-import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
+import { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config/constants';
+import { linkRefSchema } from '@shinefold/studio/schema-types/objects/link-ref/link-ref';
 import {
   boldDecorator,
   italicDecorator,
-} from '@blog/studio/schema-types/portable-text/decorators/decorators';
-import { normalBlockStyle } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
-import { validateTableColumnCount } from '@blog/studio/schema-types/validation/validate-table-column-count/validate-table-column-count';
+} from '@shinefold/studio/schema-types/portable-text/decorators/decorators';
+import { normalBlockStyle } from '@shinefold/studio/schema-types/portable-text/listed-text/listed-text';
+import { validateTableColumnCount } from '@shinefold/studio/schema-types/validation/validate-table-column-count/validate-table-column-count';
 import { Table } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 

@@ -1,6 +1,6 @@
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import { listSuperadminEmails } from '@blog/db/queries/admins';
-import { sendEmail } from '@blog/email';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import { listSuperadminEmails } from '@shinefold/db/queries/admins';
+import { sendEmail } from '@shinefold/email';
 import {
   DEPROVISIONING_ALERT_NO_RECIPIENTS_EVENT,
   DEPROVISIONING_ALERT_SEND_FAILED_EVENT,
@@ -22,8 +22,8 @@ import { alertOperatorsToDeleteSanityProject } from './sanity-project-deletion-a
 const MOCK_ARCHIVED_TENANT = mockProvisionedTenant();
 
 vi.mock('@worker/utils/env/env');
-vi.mock('@blog/db/queries/admins');
-vi.mock('@blog/email/transport/send-email');
+vi.mock('@shinefold/db/queries/admins');
+vi.mock('@shinefold/email/transport/send-email');
 
 function sentTo(): string[] {
   return vi.mocked(sendEmail).mock.calls.map(([input]) => input.to);

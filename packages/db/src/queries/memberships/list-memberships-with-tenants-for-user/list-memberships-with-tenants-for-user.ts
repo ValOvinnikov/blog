@@ -1,6 +1,9 @@
-import { getDb } from '@blog/db/client';
-import { memberships, type TMembership } from '@blog/db/schema/memberships';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { getDb } from '@shinefold/db/client';
+import {
+  memberships,
+  type TMembership,
+} from '@shinefold/db/schema/memberships';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export type TMembershipWithTenant = {

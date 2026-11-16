@@ -1,12 +1,12 @@
-import { RESERVED_SLUGS } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { RESERVED_SLUGS } from '@shinefold/config/constants';
 import {
   LANDING_SLUG_SLASH_ERROR,
   landingSlugReservedError,
   validateLandingSlug,
-} from '@blog/studio/schema-types/validation/validate-landing-slug/validate-landing-slug';
-import { mockLandingPage } from '@blog/studio/testing/mock-documents';
-import { mockValidationContext } from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/schema-types/validation/validate-landing-slug/validate-landing-slug';
+import { mockLandingPage } from '@shinefold/studio/testing/mock-documents';
+import { mockValidationContext } from '@shinefold/studio/testing/mock-validation-context';
 import type { SlugValue } from 'sanity';
 
 faker.seed(6028);

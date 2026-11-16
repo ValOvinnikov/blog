@@ -1,5 +1,5 @@
-import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
+import { queries } from '@shinefold/db';
 import { mockServableTenant } from '@web/testing/server/tenant/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 
@@ -12,8 +12,8 @@ vi.mock(
   'next/cache',
   () => import('@web/testing/server/next-cache/memoizing-next-cache'),
 );
-vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await import('@shinefold/db/constants')),
   queries: {
     tenantDomains: { getTenantByDomain: vi.fn() },
     tenants: { listTenants: vi.fn(), selectLiveLocales: vi.fn() },

@@ -1,6 +1,3 @@
-import { ICONS, type TMaybeUndefined } from '@blog/config';
-import type { TAdminRole } from '@blog/db/constants';
-import { isUndefined } from '@blog/utils/primitives';
 import type {
   TSidebarNavItem,
   TSidebarNavSection,
@@ -15,6 +12,9 @@ import {
 } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { studioNavItem } from '@platform/utils/studio-nav-item/studio-nav-item';
+import { ICONS, type TMaybeUndefined } from '@shinefold/config';
+import type { TAdminRole } from '@shinefold/db/constants';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 import { isCurrentNavHref } from './is-current-nav-href';
 

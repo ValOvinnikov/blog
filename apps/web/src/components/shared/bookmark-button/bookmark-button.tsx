@@ -1,7 +1,7 @@
 'use client';
 
-import { ACTION_OUTCOME, type IWithClassName } from '@blog/config';
-import { BookmarkToggle } from '@blog/ui/components/atoms/bookmark-toggle';
+import { ACTION_OUTCOME, type IWithClassName } from '@shinefold/config';
+import { BookmarkToggle } from '@shinefold/ui/components/atoms/bookmark-toggle';
 import { BOOKMARK_LOG } from '@web/constants/bookmark';
 import { SESSION_STATUS } from '@web/constants/session';
 import {

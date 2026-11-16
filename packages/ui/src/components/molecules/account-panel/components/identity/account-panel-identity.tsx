@@ -2,8 +2,8 @@ import {
   ACCOUNT_PANEL_STYLE,
   SIZE,
   type TAccountPanelStyle,
-} from '@blog/config';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
+} from '@shinefold/config';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 
 import { accountPanelIdentityVariants } from './account-panel-identity-variants';
 

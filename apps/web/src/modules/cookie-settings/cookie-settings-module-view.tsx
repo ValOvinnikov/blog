@@ -1,4 +1,4 @@
-import type { TBrandVariant, THeadingBlock, TLayout } from '@blog/config';
+import type { TBrandVariant, THeadingBlock, TLayout } from '@shinefold/config';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 

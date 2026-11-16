@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import { users } from '@blog/db/schema/auth';
-import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import { getDb } from '@shinefold/db/client';
+import { users } from '@shinefold/db/schema/auth';
+import { encryptPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
 import { eq } from 'drizzle-orm';
 
 // Performs no authorization check: pass the signed-in session's own user id, never a client-supplied one.

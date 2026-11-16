@@ -1,6 +1,6 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
-import { TAXONOMY_KIND } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
+import { TAXONOMY_KIND } from '@shinefold/config/constants';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';

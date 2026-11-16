@@ -2,10 +2,10 @@ import type {
   TContentAlignment,
   THeadingBlock,
   TMaybeUndefined,
-} from '@blog/config';
-import type { TPortableTextBody } from '@blog/service';
-import { Prose } from '@blog/ui/components/atoms/prose';
-import { Article } from '@blog/ui/components/organisms/article';
+} from '@shinefold/config';
+import type { TPortableTextBody } from '@shinefold/service';
+import { Prose } from '@shinefold/ui/components/atoms/prose';
+import { Article } from '@shinefold/ui/components/organisms/article';
 import { ContentsRailLayout } from '@web/components/shared/contents-rail-layout';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { PortableText } from '@web/components/shared/portable-text';

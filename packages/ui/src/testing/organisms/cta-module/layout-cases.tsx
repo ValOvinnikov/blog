@@ -1,11 +1,11 @@
-import { BRAND_VARIANT } from '@blog/config';
-import { CtaModule } from '@blog/ui/components/organisms/cta-module';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { BRAND_VARIANT } from '@shinefold/config';
+import { CtaModule } from '@shinefold/ui/components/organisms/cta-module';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import {
   MOCK_CTA_HEADING,
   MOCK_CTA_IMAGE_TEST_ID,
   mockCtaTestImage,
-} from '@blog/ui/testing/organisms/cta-module/fixtures';
+} from '@shinefold/ui/testing/organisms/cta-module/fixtures';
 import type { ComponentType } from 'react';
 
 export const mockCtaLayoutProps = () => ({

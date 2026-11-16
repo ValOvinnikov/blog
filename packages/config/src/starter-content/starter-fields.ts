@@ -1,6 +1,6 @@
-import type { ArticleText } from '@blog/config/sanity/generated/types';
+import type { ArticleText } from '@shinefold/config/sanity/generated/types';
 
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 
 export function seo(metaTitle: string, metaDescription: string) {
   return {

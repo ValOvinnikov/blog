@@ -1,6 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { memberships, type TMembership } from '@blog/db/schema/memberships';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import {
+  memberships,
+  type TMembership,
+} from '@shinefold/db/schema/memberships';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export async function getMembership(

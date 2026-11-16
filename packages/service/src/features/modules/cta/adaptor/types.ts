@@ -8,8 +8,8 @@ import type {
   TMaybeUndefined,
   TMediaOrder,
   TPortableTextBlock,
-} from '@blog/config';
-import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+} from '@shinefold/config';
+import type { TCtaButton } from '@shinefold/service/shared/transformers/cta/to-cta-button';
 
 export type TCtaModule = {
   variant: TCtaVariant;

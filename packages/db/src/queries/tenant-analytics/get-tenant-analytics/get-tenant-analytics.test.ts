@@ -1,13 +1,16 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { saveTenantAnalytics } from '@blog/db/queries/tenant-analytics/save-tenant-analytics';
-import { tenantAnalytics } from '@blog/db/schema/tenant-analytics';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_GOOGLE_ANALYTICS } from '@blog/db/testing/tenant-analytics/fixtures';
-import { patchTestTenant, useTestTenant } from '@blog/db/testing/test-tenant';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { saveTenantAnalytics } from '@shinefold/db/queries/tenant-analytics/save-tenant-analytics';
+import { tenantAnalytics } from '@shinefold/db/schema/tenant-analytics';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_GOOGLE_ANALYTICS } from '@shinefold/db/testing/tenant-analytics/fixtures';
+import {
+  patchTestTenant,
+  useTestTenant,
+} from '@shinefold/db/testing/test-tenant';
 
 import { getTenantAnalytics } from './get-tenant-analytics';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db, { plan: TENANT_PLAN.STARTER });

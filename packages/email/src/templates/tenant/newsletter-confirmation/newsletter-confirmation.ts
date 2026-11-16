@@ -1,14 +1,14 @@
-import type { TTenantEmailBrand } from '@blog/config';
-import { renderEmailAction } from '@blog/email/html/email-action/email-action';
-import { buildTenantShell } from '@blog/email/html/tenant-shell/tenant-shell';
+import type { TTenantEmailBrand } from '@shinefold/config';
+import { renderEmailAction } from '@shinefold/email/html/email-action/email-action';
+import { buildTenantShell } from '@shinefold/email/html/tenant-shell/tenant-shell';
 import {
   serializePortableText,
   type TPortableTextContent,
-} from '@blog/email/portable-text';
+} from '@shinefold/email/portable-text';
 import {
   buildListUnsubscribeHeaders,
   buildUnsubscribeAction,
-} from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
+} from '@shinefold/email/templates/tenant/unsubscribe/unsubscribe';
 
 export type TNewsletterConfirmationEmailInput = {
   subject: string;

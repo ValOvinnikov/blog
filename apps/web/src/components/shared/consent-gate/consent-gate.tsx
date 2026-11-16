@@ -1,7 +1,7 @@
 'use client';
 
-import type { TConsentCategory } from '@blog/config';
-import type { IWithChildren } from '@blog/config/react';
+import type { TConsentCategory } from '@shinefold/config';
+import type { IWithChildren } from '@shinefold/config/react';
 import { CONSENT_STATUS } from '@web/constants/consent';
 import { useConsent } from '@web/hooks/use-consent';
 import type { ReactNode } from 'react';

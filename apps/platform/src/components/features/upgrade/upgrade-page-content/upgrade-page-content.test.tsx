@@ -1,5 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { BILLING_LOG } from '@platform/constants/billing';
 import messages from '@platform/i18n/messages/en.json';
 import {
@@ -18,6 +16,8 @@ import {
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 
 import { UpgradePageContent } from './upgrade-page-content';
 

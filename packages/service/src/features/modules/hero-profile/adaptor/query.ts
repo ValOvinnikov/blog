@@ -1,11 +1,14 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
-import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
-import { localizedImageWithAltOptionalFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
-import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { personDetailFragment } from '@blog/service/shared/fragments/person/person';
-import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import {
+  q,
+  type TModuleQueryParams,
+} from '@shinefold/service/sanity/query/query';
+import { ctaButtonsFragment } from '@shinefold/service/shared/fragments/cta/cta-buttons';
+import { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
+import { localizedImageWithAltOptionalFragment } from '@shinefold/service/shared/fragments/image/localized-image-with-alt';
+import { moduleHeroLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
+import { personDetailFragment } from '@shinefold/service/shared/fragments/person/person';
+import { getLocalizedField } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
 import { z } from 'zod';
 
 export const heroProfileModuleQuery = q

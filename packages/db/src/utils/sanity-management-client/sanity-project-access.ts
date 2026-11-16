@@ -2,14 +2,14 @@ import {
   HTTP_METHOD,
   HTTP_STATUS,
   type TSanityProjectRole,
-} from '@blog/config';
-import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
+} from '@shinefold/config';
+import { SANITY_API_PATH } from '@shinefold/db/utils/sanity-management-client/sanity-api-paths';
 import {
   sanityAccessRequest,
   sanityAccessResponse,
   sanityManagementRequest,
   sanityManagementResponse,
-} from '@blog/db/utils/sanity-management-client/sanity-api-request';
+} from '@shinefold/db/utils/sanity-management-client/sanity-api-request';
 
 export type TSanityInvite = {
   id?: string;

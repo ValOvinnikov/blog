@@ -1,8 +1,5 @@
 'use server';
 
-import { ACTION_OUTCOME, TERMS_VERSION } from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { ONBOARDING_LOG } from '@platform/constants/onboarding';
 import {
   SIGN_UP_FIELD_ERROR,
@@ -18,6 +15,9 @@ import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ACTION_OUTCOME, TERMS_VERSION } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 

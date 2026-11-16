@@ -1,35 +1,35 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
 import {
   MOCK_TOPIC_DESCRIPTION,
   MOCK_TOPIC_ID,
   MOCK_TOPIC_SLUG,
   MOCK_TOPIC_TITLE,
-} from '@blog/service/testing/entities/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+} from '@shinefold/service/testing/entities/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_CURATED_SUPPORTING_TEXT,
   mockHeroSlotView,
   mockRawCtaRef,
   mockRawHeroRef,
   mockRawTopicPage,
-} from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_PAGE_TOPIC_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
   MOCK_TEMPLATE_TOPIC_CACHE_TAG,
-} from '@blog/service/testing/sanity/query/cache-tags';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockRawHeadingBlock,
   mockRawSeo,
-} from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getTopicPageDocument } from './loader';
 import { topicPageQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(601601);
 

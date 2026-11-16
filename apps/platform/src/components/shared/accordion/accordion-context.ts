@@ -1,9 +1,9 @@
-import type { TMaybeNull } from '@blog/config';
-import { noop } from '@blog/utils/primitives';
 import {
   ACCORDION_VARIANT,
   type TAccordionVariant,
 } from '@platform/constants/accordion';
+import type { TMaybeNull } from '@shinefold/config';
+import { noop } from '@shinefold/utils/primitives';
 import { createContext, useContext } from 'react';
 
 type TAccordionContext = {

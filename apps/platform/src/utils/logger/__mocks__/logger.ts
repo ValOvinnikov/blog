@@ -1,4 +1,4 @@
-import type { ILogger } from '@blog/insight';
+import type { ILogger } from '@shinefold/insight';
 
 export const logger = {
   error: vi.fn(),

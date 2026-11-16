@@ -1,4 +1,5 @@
-import type { TTenantSanityContext } from '@blog/service/sanity/client/client';
+import { faker } from '@faker-js/faker';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/client/client';
 import {
   MOCK_PLATFORM_PROJECT_ID,
   MOCK_PREVIOUS_TOKEN,
@@ -7,8 +8,7 @@ import {
   MOCK_TENANT_PROJECT_ID,
   MOCK_TENANT_TOKEN,
   mockTenant,
-} from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/tenant';
 
 import type { InvalidTenantSanityContextError } from './invalid-tenant-sanity-context-error';
 import { getPlatformSanityWriteContext, getWriteClient } from './write-client';

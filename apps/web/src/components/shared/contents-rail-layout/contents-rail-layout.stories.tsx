@@ -1,4 +1,4 @@
-import { Prose } from '@blog/ui/components/atoms/prose';
+import { Prose } from '@shinefold/ui/components/atoms/prose';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { PortableText } from '@web/components/shared/portable-text';
 import { MOCK_CONTENTS_RAIL_BODY } from '@web/testing/shared/contents-rail/fixtures';

@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_DB_ERROR_MESSAGE,
   MOCK_POSTAL_ADDRESS,
@@ -9,18 +10,17 @@ import {
   MOCK_TENANT_LOGO_URL,
   mockEmailConfig,
   mockEmailTemplate,
-} from '@blog/auth/testing/magic-link-fixtures';
+} from '@shinefold/auth/testing/magic-link-fixtures';
 import {
   EMAIL_TEMPLATE_TYPE,
   LOCALE_ISO_CODES,
   type TEmailTemplateType,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   EMAIL_TEMPLATE_DEFAULT_COPY,
   EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
-} from '@blog/db/constants';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/constants';
 
 import { resolveMagicLinkEmailSettings } from './resolve-magic-link-email-settings';
 
@@ -43,7 +43,7 @@ const { getEmailConfigMock, getEmailTemplateMock } = vi.hoisted(() => ({
   getEmailTemplateMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },

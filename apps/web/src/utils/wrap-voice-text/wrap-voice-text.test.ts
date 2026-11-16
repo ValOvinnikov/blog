@@ -1,5 +1,5 @@
-import { portableTextToPlainText } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { portableTextToPlainText } from '@shinefold/config';
 
 import { wrapVoiceText } from './wrap-voice-text';
 

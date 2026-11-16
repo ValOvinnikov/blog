@@ -1,4 +1,4 @@
-import { PRESET_REGISTRY, type TPresetId } from '@blog/config/constants';
+import { PRESET_REGISTRY, type TPresetId } from '@shinefold/config/constants';
 
 import { isAccentHueAccessible } from './accent-hue-guard';
 import { ACCENT_RAMP_LIGHT } from './accent-ramps';

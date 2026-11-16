@@ -1,4 +1,4 @@
-import { isUndefined } from '@blog/utils/primitives';
+import { isUndefined } from '@shinefold/utils/primitives';
 import {
   RETRY_AFTER_HEADER,
   RETRY_AFTER_SECOND_MS,

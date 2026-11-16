@@ -1,16 +1,6 @@
 'use server';
 
 import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  ERROR_CODE,
-  type TActionResult,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { isUndefined } from '@blog/utils/primitives';
-import { toOutcome } from '@blog/utils/to-outcome';
-import {
   CUSTOM_DOMAIN_FIELD_ERROR,
   CUSTOM_DOMAIN_LOG,
   CUSTOM_DOMAIN_REFUSAL,
@@ -25,6 +15,16 @@ import { restoreClaimAfterRejection } from '@platform/server/custom-domain/resto
 import { customDomainTxtName } from '@platform/utils/custom-domain-txt-name/custom-domain-txt-name';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  ERROR_CODE,
+  type TActionResult,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { isUndefined } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 export type TVerifyCustomDomainResult = TActionResult<
   typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,

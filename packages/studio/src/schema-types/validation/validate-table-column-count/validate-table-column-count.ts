@@ -1,5 +1,5 @@
-import type { Table, TMaybeUndefined } from '@blog/config';
-import { TABLE_COLUMN_WARNING_THRESHOLD } from '@blog/config/constants';
+import type { Table, TMaybeUndefined } from '@shinefold/config';
+import { TABLE_COLUMN_WARNING_THRESHOLD } from '@shinefold/config/constants';
 
 export const validateTableColumnCount = (
   table: TMaybeUndefined<Table>,

@@ -1,4 +1,4 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
 
 export const BANNER_LAYOUT = [
   'isolate grid content-center justify-center overflow-hidden rounded-none',

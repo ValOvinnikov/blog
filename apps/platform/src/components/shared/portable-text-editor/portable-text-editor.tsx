@@ -1,8 +1,5 @@
 'use client';
 
-import { SIZE } from '@blog/config';
-import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
-import { hasArrayGotItems } from '@blog/utils/primitives';
 import {
   CONTROL_MODE,
   type TControlMode,
@@ -18,6 +15,9 @@ import {
   type SchemaDefinition,
 } from '@portabletext/editor';
 import { EventListenerPlugin, NodePlugin } from '@portabletext/editor/plugins';
+import { SIZE } from '@shinefold/config';
+import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 
 import { PortableTextEditorLinkAnnotation } from './components/link-annotation/portable-text-editor-link-annotation';
 import { PortableTextEditorTextBlock } from './components/text-block/portable-text-editor-text-block';

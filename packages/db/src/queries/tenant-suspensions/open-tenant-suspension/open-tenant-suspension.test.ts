@@ -1,18 +1,21 @@
-import { SUSPENSION_CATEGORY } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { insertTestAdmin, insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { SUSPENSION_CATEGORY } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import {
+  insertTestAdmin,
+  insertTestTenant,
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   insertTestTenantSuspension,
   MOCK_SUSPENSION_DESCRIPTION,
   MOCK_SUSPENSION_REFERENCE_PATTERN,
   toReferenceNumber,
-} from '@blog/db/testing/tenant-suspensions/fixtures';
+} from '@shinefold/db/testing/tenant-suspensions/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { openTenantSuspension } from './open-tenant-suspension';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

@@ -1,8 +1,8 @@
 import 'server-only';
 
-import { queries } from '@blog/db';
 import { CUSTOM_DOMAIN_LOG } from '@platform/constants/custom-domain';
 import { logger } from '@platform/utils/logger/logger';
+import { queries } from '@shinefold/db';
 
 export const restoreClaimAfterRejection = async (
   tenantId: string,

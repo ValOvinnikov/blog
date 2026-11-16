@@ -1,12 +1,12 @@
+import { faker } from '@faker-js/faker';
+import { SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
   HTTP_METHOD,
   HTTP_STATUS,
   SANITY_WEBHOOK_OPERATION,
-} from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
-import { isUndefined } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
-import { SIGNATURE_HEADER_NAME } from '@sanity/webhook';
+} from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
+import { isUndefined } from '@shinefold/utils/primitives';
 import {
   FETCH_FAILED_REASON,
   REVALIDATE_LOG,
@@ -76,7 +76,7 @@ vi.mock('next/cache', () => ({
 
 vi.mock('@web/utils/env/env', () => ({ env: envMock }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: {
       getTenantById: getTenantByIdMock,

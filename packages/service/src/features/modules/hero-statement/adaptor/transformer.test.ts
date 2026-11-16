@@ -1,22 +1,22 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   HERO_VARIANT,
   MEDIA_ORDER,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   MOCK_HERO_EYEBROW,
   MOCK_HERO_IMAGE_ALT,
   mockCtaButtonView,
   mockRawCtaButton,
   mockRawHeroStatementModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   mockRawHeadingBlock,
   mockRawHeroLayout,
   mockRawSanityImage,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toHeroStatementModule } from './transformer';
 

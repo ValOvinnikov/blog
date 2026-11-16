@@ -1,10 +1,10 @@
 import 'server-only';
 
-import { queries } from '@blog/db';
 import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import { takeCreateSiteSlot } from '@platform/server/create-site-gate/create-site-gate';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { queries } from '@shinefold/db';
 
 type TAdmitCreateSiteInput = {
   clientKey: string;

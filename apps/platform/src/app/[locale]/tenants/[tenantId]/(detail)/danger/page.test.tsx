@@ -1,5 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import messages from '@platform/i18n/messages/en.json';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
@@ -14,6 +12,8 @@ import {
   mockIdleDeprovisioningSteps,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 
 import TenantDangerPage from './page';
 
@@ -35,7 +35,7 @@ vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
   requireTenantById: requireTenantByIdMock,
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     auditEvents: {

@@ -1,8 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { buildContrastDedupeKey } from '@blog/db/queries/findings/contrast-dedupe-key';
-import { contrastHasPassed } from '@blog/db/queries/findings/contrast-has-passed';
-import { findings, type TFinding } from '@blog/db/schema/findings';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { buildContrastDedupeKey } from '@shinefold/db/queries/findings/contrast-dedupe-key';
+import { contrastHasPassed } from '@shinefold/db/queries/findings/contrast-has-passed';
+import { findings, type TFinding } from '@shinefold/db/schema/findings';
 import { eq, getTableColumns } from 'drizzle-orm';
 
 export type TContrastFinding = TFinding & { hasPassed: boolean };

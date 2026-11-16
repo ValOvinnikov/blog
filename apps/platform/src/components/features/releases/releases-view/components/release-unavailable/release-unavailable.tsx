@@ -1,8 +1,8 @@
-import { ALERT_TYPE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import { RELEASE_FAILURE } from '@platform/constants/release';
 import type { TReleaseCandidateFailureReason } from '@platform/server/releases/release-result';
+import { ALERT_TYPE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { RetryButton } from './components/retry-button/retry-button';

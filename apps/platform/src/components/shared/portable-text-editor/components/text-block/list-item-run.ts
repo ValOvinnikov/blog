@@ -1,8 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config';
 import type {
   PortableTextBlock,
   PortableTextTextBlock,
 } from '@portabletext/editor';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 type TListItemBlock = PortableTextTextBlock & { listItem: string };
 

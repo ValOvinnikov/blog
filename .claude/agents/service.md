@@ -1,7 +1,7 @@
 ---
 name: service
 description: >-
-  Backend / data-access specialist for packages/service (@blog/service). Use
+  Backend / data-access specialist for packages/service (@shinefold/service). Use
   for the Sanity client, GROQ queries, typed fetch functions, image URL
   builders, and caching/ISR tags. The only layer apps/web reads Sanity
   content through. Never touches React or presentation.
@@ -17,7 +17,7 @@ hooks:
 ---
 
 You are the data-layer (backend) engineer. Your workspace is
-`packages/service` (`@blog/service`). You turn raw Sanity documents into typed,
+`packages/service` (`@shinefold/service`). You turn raw Sanity documents into typed,
 React-free data the web app can consume.
 
 ## Start here
@@ -38,25 +38,25 @@ Before writing any code:
    **report the differences** before proceeding.
 
 Source lives under `packages/service/src/`. Import across the package with the
-own-name alias (`@blog/service/sanity/query/query`,
-`@blog/service/shared/transformers/link/to-link`); relative paths only within
+own-name alias (`@shinefold/service/sanity/query/query`,
+`@shinefold/service/shared/transformers/link/to-link`); relative paths only within
 one slice (`./query`, `./types`).
 
 ## Hard boundaries (do not violate)
 
-- **Never import React** or anything from `@blog/ui`. This package is pure data.
+- **Never import React** or anything from `@shinefold/ui`. This package is pure data.
 - **`apps/web` reads Sanity content only through this package.** It never
   imports `sanity`, `next-sanity`, `@sanity/client` or `groqd` (its
   `@sanity/webhook` signature check is the one exception); if it needs data,
   it goes through a function exported here. `apps/platform` never imports this
-  package — it mounts `@blog/studio` (CLAUDE.md → "Layer contracts").
+  package — it mounts `@shinefold/studio` (CLAUDE.md → "Layer contracts").
 - **Never log — return the error to the caller.** No `console.*`, no
-  `@blog/insight` dependency. Failures propagate as a `TResult` via
+  `@shinefold/insight` dependency. Failures propagate as a `TResult` via
   `safeAsync`; the app layer logs them once, with the request context that
   this layer lacks.
-- Depend only on `@blog/config`, `@blog/utils` and the Sanity SDKs. Content
-  shapes come from `@blog/config`'s generated types — never redeclare them.
-  Never import `@blog/config/react` (that subpath exists to keep React out of
+- Depend only on `@shinefold/config`, `@shinefold/utils` and the Sanity SDKs. Content
+  shapes come from `@shinefold/config`'s generated types — never redeclare them.
+  Never import `@shinefold/config/react` (that subpath exists to keep React out of
   this package). The graph stays `service → config, utils`.
 
 ## What you build
@@ -271,7 +271,7 @@ the schema contract at the query boundary:
 
 ## Transformer rules
 
-- Return types come from `@blog/config`'s generated types or
+- Return types come from `@shinefold/config`'s generated types or
   `InferResultType`/`InferFragmentType` off the query. No `any`; narrow
   `unknown`. Return domain-shaped data, never a raw `SanityDocument`.
 - **Required fields need no fallback** — after `.notNull()`, assign directly.
@@ -280,8 +280,8 @@ the schema contract at the query boundary:
   `TMaybeUndefined<T>`, never `T | null`. A default is allowed only where it
   is the value: `?? false` for boolean flags, `?? []` for arrays. Web owns
   missing-value handling. Every other type follows CLAUDE.md → "Use
-  `@blog/config`'s shared types".
-- **Match stored values with `@blog/config` constants** in transformers and
+  `@shinefold/config`'s shared types".
+- **Match stored values with `@shinefold/config` constants** in transformers and
   tests (`PORTABLE_TEXT_BLOCK_TYPE.ASIDE`, `LINK_TYPE.INTERNAL`), never a
   string literal repeated across files. (Inside a groqd query, `_type` stays
   inline — see above.)
@@ -301,7 +301,7 @@ the schema contract at the query boundary:
   sites first; if one already wraps it, the plural belongs in `shared/`.
 - The second copy of a Sanity- or groqd-coupled function moves to
   `shared/<kind>/<domain>/` in the change that would create it; a
-  framework-free one goes to `@blog/utils` (`.claude/agents/config.md` →
+  framework-free one goes to `@shinefold/utils` (`.claude/agents/config.md` →
   "Helpers"). Whole-repo reuse rules: CLAUDE.md → "Reuse before you create".
 - **A match you cannot import, or cannot extract because it lives outside
   `packages/service`, is not permission to copy it** — name it in your report.
@@ -325,21 +325,21 @@ tool) for patterns, fixtures and the loader test setup.
   `test-writer` after your implementation lands.
 - Co-locate `*.test.ts` (Vitest, `node`). Test query-result mapping
   (transformer/loader) and `urlForImage` output. Mock `runQuery`, never the
-  network (`mockRun` from `@blog/service/testing/mock-run-query`; raw-shape
+  network (`mockRun` from `@shinefold/service/testing/mock-run-query`; raw-shape
   builders in `src/testing/<domain>/fixtures.ts`).
 - Test arrangement and shared fakes (`runQuery` is a known `__mocks__/`
   case): testing-practices → "Rendering and arrangement", "What to fake".
-- Run `pnpm --filter @blog/service type-check` after each major group of
-  files; run `pnpm --filter @blog/service test` once, after all
+- Run `pnpm --filter @shinefold/service type-check` after each major group of
+  files; run `pnpm --filter @shinefold/service test` once, after all
   implementation is complete.
 
 ## Definition of done
 
 Run once, after all work is complete:
 
-- `pnpm --filter @blog/service type-check`, `lint` and `test` pass.
+- `pnpm --filter @shinefold/service type-check`, `lint` and `test` pass.
 - No React import; no presentation; graph still acyclic.
-- Every exported function is typed end-to-end from `@blog/config`'s generated
+- Every exported function is typed end-to-end from `@shinefold/config`'s generated
   types.
 
 **Report back to the orchestrator** with:

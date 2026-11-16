@@ -43,12 +43,12 @@ An editor backs up a claim with a band of figures — signups, uptime, ratings. 
 - Content alignment allows Left and Center (the field's default list); it aligns the heading, every figure, the footnote and the actions.
 - The figures render as one `<dl>`: each item is a `<dt>` label followed by a `<dd>` value and an optional `<dd>` description. CSS `order` shows the value first, so screen readers hear the label before the number.
 - The list is a wrapping flex row (`@container`) whose value size steps up with the container (`text-2xl` → `text-4xl`); values never wrap and use tabular figures.
-- The module has no `@blog/ui` organism of its own; the view composes `Text`, `Section`, `ModuleHeading` and `ActionGroup` directly.
+- The module has no `@shinefold/ui` organism of its own; the view composes `Text`, `Section`, `ModuleHeading` and `ActionGroup` directly.
 - A failed fetch logs `stats_module.fetch_failed` and renders nothing.
 
 ## Dependencies
 
-- Layers: `studio`, `service`, `web` (with `@blog/ui` atoms).
+- Layers: `studio`, `service`, `web` (with `@shinefold/ui` atoms).
 - Features: [module-system](./module-system.md), [languages](./languages.md) (per-language fields), [links](./links.md) (actions), [page-types](./page-types.md), [rendering-and-caching](./rendering-and-caching.md).
 - No env vars of its own.
 

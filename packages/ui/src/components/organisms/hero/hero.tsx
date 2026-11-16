@@ -9,16 +9,16 @@ import {
   type THeroVariant,
   type TMediaOrder,
   type TSpacingScale,
-} from '@blog/config';
-import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { Text } from '@blog/ui/components/atoms/text';
+} from '@shinefold/config';
+import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '@blog/ui/lib/react';
-import { bannerVariants } from '@blog/ui/lib/styling';
+} from '@shinefold/ui/lib/react';
+import { bannerVariants } from '@shinefold/ui/lib/styling';
 import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { HeroAvatar } from './components/avatar/hero-avatar';

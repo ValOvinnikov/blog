@@ -1,10 +1,10 @@
 import { execFileSync } from 'node:child_process';
 
+import { faker } from '@faker-js/faker';
 import {
   MOCK_TENANT_MIGRATE_CLI_ENV,
   MOCK_TENANT_MIGRATE_PARAMS,
-} from '@blog/db/testing/migrate-tenant-content/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/migrate-tenant-content/fixtures';
 
 import {
   exportTenantDataset,

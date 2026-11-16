@@ -1,13 +1,13 @@
-import { buildStarterDocuments } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { validateDocument, type ValidationClient } from '@sanity/validation';
+import { buildStarterDocuments } from '@shinefold/config';
 import {
   LOCALE_ISO_CODES,
   SITE_TYPE,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
-import { siteSettingsSchema } from '@blog/studio/schema-types/documents/settings/site-settings/site-settings';
-import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
-import { faker } from '@faker-js/faker';
-import { validateDocument, type ValidationClient } from '@sanity/validation';
+} from '@shinefold/config/constants';
+import { siteSettingsSchema } from '@shinefold/studio/schema-types/documents/settings/site-settings/site-settings';
+import { mockGroqFetch } from '@shinefold/studio/testing/mock-groq-fetch';
 import { prepareConfig, type SanityDocument, type Schema } from 'sanity';
 
 import { buildStudioConfig } from './studio-config';

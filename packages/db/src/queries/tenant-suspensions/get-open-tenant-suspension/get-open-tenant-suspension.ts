@@ -1,12 +1,12 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { getDb } from '@blog/db/client';
-import { admins } from '@blog/db/schema/admins';
-import { users } from '@blog/db/schema/auth';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { getDb } from '@shinefold/db/client';
+import { admins } from '@shinefold/db/schema/admins';
+import { users } from '@shinefold/db/schema/auth';
 import {
   tenantSuspensions,
   type TTenantSuspension,
-} from '@blog/db/schema/tenant-suspensions';
-import { decryptOptionalPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+} from '@shinefold/db/schema/tenant-suspensions';
+import { decryptOptionalPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export type TOpenTenantSuspension = TTenantSuspension & {

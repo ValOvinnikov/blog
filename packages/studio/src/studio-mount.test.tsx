@@ -1,16 +1,16 @@
 /**
  * @vitest-environment jsdom
  */
+import { faker } from '@faker-js/faker';
 import {
   CAPABILITY,
   LOCALE_ISO_CODES,
   MODULE_PACK,
   SANITY_LOGIN_PROVIDER,
-} from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
-import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { entitlementGates } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
+import { EVERY_MODULE_PACK } from '@shinefold/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { render } from '@testing-library/react';
 import type { ComponentProps } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';

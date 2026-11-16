@@ -1,13 +1,13 @@
-import { PRESET_ID } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { mockSettingsFeaturesToggles } from '@blog/db/testing/settings-features/fixtures';
-import { MOCK_SITE_CONFIG_FIELDS } from '@blog/db/testing/site-config/fixtures';
+import { PRESET_ID } from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { mockSettingsFeaturesToggles } from '@shinefold/db/testing/settings-features/fixtures';
+import { MOCK_SITE_CONFIG_FIELDS } from '@shinefold/db/testing/site-config/fixtures';
 
 import { getSettingsFeaturesAndPreset } from './get-settings-features-and-preset';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const NOTHING_SAVED = {
   features: undefined,

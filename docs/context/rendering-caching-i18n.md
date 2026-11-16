@@ -88,7 +88,7 @@
   Purging **resolved** paths does work — `revalidatePath('/<tenantId>/<locale>/
 blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   route now purges a published `page_post` (#2666):
-  `@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths` queries `@blog/service` for
+  `@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths` queries `@shinefold/service` for
   the post's own slug, every archive's current pagination extent
   (`getIndexPageParams`), and **every** tag/topic page of the tenant
   (`getTagParams`/`getTopicParams` for the page-1 slugs, `getTagPaginationParams`/
@@ -158,11 +158,11 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   `[tenant]/[locale]/layout.tsx`, because a layout-level `revalidate` fails the
   build outright once a child route sets `dynamic = 'force-dynamic'`. Each
   route therefore declares the literal itself, kept equal to
-  `CONTENT_ROUTE_REVALIDATE_SECONDS` (`@blog/config`) by a per-route test; that
+  `CONTENT_ROUTE_REVALIDATE_SECONDS` (`@shinefold/config`) by a per-route test; that
   constant is a drift detector for the eleven copies rather than something the
   routes import.
 
-  The same route also cleans up orphaned `bookmarks` rows (`@blog/db`) when the
+  The same route also cleans up orphaned `bookmarks` rows (`@shinefold/db`) when the
   webhook's `sanity-operation` header reads `delete` for a `page_post` —
   unpublish fires the same trigger as true deletion, so one check covers
   both. Detection is header-only, never a re-query against Sanity: a
@@ -198,7 +198,7 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   It calls the endpoint best-effort
   (`@platform/server/site-config/revalidate-site-config`) — a failed call is
   logged, never thrown, and the site-config cache's own 3600s
-  (`TENANT_CONFIG_REVALIDATE_SECONDS`, `@blog/config`) window remains the
+  (`TENANT_CONFIG_REVALIDATE_SECONDS`, `@shinefold/config`) window remains the
   fallback either way. `deprovision-tenant.yml`'s `invalidate-tenant-cache`
   step is a second caller, POSTing the same `{ tenantId }` once a tenant has
   been archived, and it takes the opposite stance deliberately — it throws on
@@ -229,7 +229,7 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
 - **i18n:** all content routes under `src/app/[tenant]/[locale]/`; next-intl
   with `localePrefix: 'as-needed'` (no prefix for the tenant's default
   language, a prefix for the others). Locales come from `LOCALE_ISO_CODES` in
-  `@blog/config`; content localization is described in `SPEC.md` §9
+  `@shinefold/config`; content localization is described in `SPEC.md` §9
   Localization. Never hardcode a
   locale; `setRequestLocale(locale)` at the top of every layout/page. All
   in-app links go through the single `SmartLink`

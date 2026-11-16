@@ -13,7 +13,7 @@ about twenty such reads:
 
 | Surface                         | Reads                                                                                                                                                                                                                                 |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@blog/db`                      | `isLookFieldEntitled` / `toEffectiveLook` / `pickEntitledLook` (`utils/effective-look/`), `selectLiveLocales` / `getTenantLiveLocales`, `setTenantAdditionalLocales`                                                                  |
+| `@shinefold/db`                 | `isLookFieldEntitled` / `toEffectiveLook` / `pickEntitledLook` (`utils/effective-look/`), `selectLiveLocales` / `getTenantLiveLocales`, `setTenantAdditionalLocales`                                                                  |
 | `apps/platform` — server        | `planPageAccess` (nav, `renderTenantScopedPage`, `resolveTenantPageAccess`, `canEditContactRecipient`), `updateFeaturesAction`, `getEnabledCapabilities`, `updateLookAction` + `listRefusedLookFields`, `updateTenantLanguagesAction` |
 | `apps/platform` — render/client | `FeaturesPageContent`, `LanguagesPageContent`, `LeadsPageContent`, `StudioMountView` (module packs into `StudioMount`), `LookPageContent`, `useLookFormState` (client, via `TenantPlanProvider`)                                      |
 | `apps/web`                      | `getTenantPlan` (cached, tag `tenant-plan:<id>`) → `isCapabilityEnabled`, `isModuleEntitled` / `ModuleGate`, `getSiteConfig` (Look); live locales through `getTenantLiveLocales`                                                      |
@@ -26,7 +26,7 @@ recommendation is the second.
 
 ### 1. Resolution — one resolved record, not one more check
 
-Add `TTenantEntitlements` to `@blog/db` — the same shape every gate already
+Add `TTenantEntitlements` to `@shinefold/db` — the same shape every gate already
 needs, resolved for one tenant:
 
 - `capabilities: TCapability[]`
@@ -44,7 +44,7 @@ NULL OR expires_at > now)`.
 
 Every gate then reads the resolved record, never `PLAN_*[plan]`:
 
-- the `@blog/db` helpers above take `TTenantEntitlements` instead of a plan;
+- the `@shinefold/db` helpers above take `TTenantEntitlements` instead of a plan;
   `getTenantLiveLocales` and `setTenantAdditionalLocales` read the grants
   themselves, since they already load the tenant;
 - `apps/platform` resolves once per request in the tenant layouts and passes the
@@ -57,7 +57,7 @@ Every gate then reads the resolved record, never `PLAN_*[plan]`:
 
 This is the epic's own rule — "no gate names a plan" — taken one step further:
 no gate names a plan _record_ either. Because both apps call the same resolver
-from `@blog/db`, they cannot drift.
+from `@shinefold/db`, they cannot drift.
 
 The owner's toggle still applies on top: a grant raises the **ceiling**, it
 never switches a capability on. `isCapabilityEnabled` stays
@@ -84,7 +84,7 @@ admin-applied, per-tenant, closable record):
 A partial unique index on `(tenant_id, kind, key) WHERE revoked_at IS NULL`
 allows one open grant per entitlement. `kind`/`key` are `text().$type<>()`, not
 a `pgEnum`, so a new grantable kind needs no migration. `ENTITLEMENT_KIND` lives
-in `@blog/db` (its own vocabulary, read only by `db` and the two apps on top of
+in `@shinefold/db` (its own vocabulary, read only by `db` and the two apps on top of
 it). Every grant and revoke writes an `audit_events` row: new
 `AUDIT_ACTION.ENTITLEMENT_GRANTED` / `ENTITLEMENT_REVOKED`, target
 `AUDIT_TARGET_TYPE.TENANT`, details `{ kind, key, value, expiresAt, note }`.
@@ -136,7 +136,7 @@ A grant is independent of the plan:
   confirmation dialog (Base UI) naming the item and the tenant, with an optional
   expiry date and note; Confirm writes the grant, the audit row and calls the
   site revalidation route (as plan changes do), then `router.refresh()`.
-- **Module packs** cannot be granted from inside Studio — `@blog/studio` has no
+- **Module packs** cannot be granted from inside Studio — `@shinefold/studio` has no
   database, and must not. They are granted from a **Grants** card on the tenant
   details panel, which also lists every open grant (item, granted by, when,
   expiry, note) with a Revoke action behind its own confirmation.

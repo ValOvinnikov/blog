@@ -1,4 +1,4 @@
-import { ARIA_CURRENT } from '@blog/ui/testing/aria';
+import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { SESSION_STATUS } from '@web/constants/session';
 import { usePathname } from '@web/i18n/navigation';

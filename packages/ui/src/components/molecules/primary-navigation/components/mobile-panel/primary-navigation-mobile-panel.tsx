@@ -1,6 +1,6 @@
-import type { TAnchorElementType } from '@blog/config/react';
-import { PrimaryNavigationItem } from '@blog/ui/components/molecules/primary-navigation/components/item/primary-navigation-item';
-import type { INavItem } from '@blog/ui/components/molecules/primary-navigation/primary-navigation';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { PrimaryNavigationItem } from '@shinefold/ui/components/molecules/primary-navigation/components/item/primary-navigation-item';
+import type { INavItem } from '@shinefold/ui/components/molecules/primary-navigation/primary-navigation';
 import { type ReactNode, useId } from 'react';
 
 import {

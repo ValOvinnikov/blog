@@ -1,5 +1,5 @@
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { errorResult, okResult } from '@shinefold/utils';
 import { HERO_BLOG_LOG } from '@web/constants/hero-blog';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -22,7 +22,7 @@ const { getHeroBlogMock } = vi.hoisted(() => ({
   getHeroBlogMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       heroBlog: { v1: { getHeroBlog: getHeroBlogMock } },

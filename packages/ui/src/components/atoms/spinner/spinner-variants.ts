@@ -1,5 +1,5 @@
-import { SIZE, SPINNER_STYLE } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import { SIZE, SPINNER_STYLE } from '@shinefold/config';
+import { tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const spinnerVariants = tv({

@@ -1,4 +1,4 @@
-import { HEADER_SUBMENU_STYLE } from '@blog/config';
+import { HEADER_SUBMENU_STYLE } from '@shinefold/config';
 import {
   BELOW_HEADER,
   FOCUS_RING,
@@ -7,7 +7,7 @@ import {
   NAV_LINK_CURRENT,
   TRANSITION_COLORS,
   tv,
-} from '@blog/ui/lib/styling';
+} from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const primaryNavigationSubmenuVariants = tv({

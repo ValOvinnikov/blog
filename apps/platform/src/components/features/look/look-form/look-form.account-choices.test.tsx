@@ -1,14 +1,14 @@
-import {
-  ACCOUNT_BUTTON_STYLE,
-  ACCOUNT_PANEL_STYLE,
-  ACCOUNT_PHONE_PLACEMENT,
-} from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { screen, within } from '@platform/testing/custom-render';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
 import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
+} from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

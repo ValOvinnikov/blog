@@ -1,3 +1,3 @@
-import config from '@blog/eslint-config/email';
+import config from '@shinefold/eslint-config/email';
 
 export default [...config];

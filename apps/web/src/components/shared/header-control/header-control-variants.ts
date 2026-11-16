@@ -1,4 +1,4 @@
-import { HEADER_CONTROL, tv } from '@blog/ui/lib/styling';
+import { HEADER_CONTROL, tv } from '@shinefold/ui/lib/styling';
 
 export const headerControlVariants = tv({
   base: [

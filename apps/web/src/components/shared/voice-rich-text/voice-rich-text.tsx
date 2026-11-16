@@ -1,5 +1,5 @@
-import type { TVoicePortableText } from '@blog/config';
 import type { PortableTextComponents } from '@portabletext/react';
+import type { TVoicePortableText } from '@shinefold/config';
 import { PortableText } from '@web/components/shared/portable-text';
 import { voicePortableTextToInlineText } from '@web/utils/voice-portable-text-to-inline-text';
 

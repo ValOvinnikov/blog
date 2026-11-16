@@ -1,6 +1,6 @@
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
-import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
+import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
+import { toPortableText } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import type { InferResultType } from 'groqd';
 
 import type { contactFormModuleQuery } from './query';

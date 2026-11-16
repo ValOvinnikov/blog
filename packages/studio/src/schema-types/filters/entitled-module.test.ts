@@ -1,11 +1,11 @@
-import { MODULE_PACK } from '@blog/config/constants';
-import { entitledModuleFilter } from '@blog/studio/schema-types/filters/entitled-module';
+import { faker } from '@faker-js/faker';
+import { MODULE_PACK } from '@shinefold/config/constants';
+import { entitledModuleFilter } from '@shinefold/studio/schema-types/filters/entitled-module';
 import {
   EVERY_MODULE_PACK,
   setEntitledModulePacks,
-} from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
-import { mockDocument } from '@blog/studio/testing/mock-documents';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
+import { mockDocument } from '@shinefold/studio/testing/mock-documents';
 import { evaluate, parse } from 'groq-js';
 
 faker.seed(5048);

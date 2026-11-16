@@ -1,7 +1,7 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { REDIRECT_TYPE } from '@blog/studio/schema-types/documents/redirect/redirect-type';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { PAGE_HOME_TYPE } from '@shinefold/studio/schema-types/documents/pages/home/home-type';
+import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { REDIRECT_TYPE } from '@shinefold/studio/schema-types/documents/redirect/redirect-type';
 import type { Reference, SanityDocument } from 'sanity';
 
 export const MOCK_REDIRECT_SOURCE = '/old';

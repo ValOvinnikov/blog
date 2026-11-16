@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { queries } from '@blog/db';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { queries } from '@shinefold/db';
 
 import { getSession } from './auth';
 

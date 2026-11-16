@@ -1,5 +1,3 @@
-import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
-import { MOCK_STRIPE_EVENT_ID } from '@blog/db/testing/tenants/billing';
 import {
   STRIPE_SUBSCRIPTION_STATUS,
   STRIPE_TENANT_METADATA_KEY,
@@ -16,6 +14,8 @@ import {
   MOCK_PLAN_ITEM_ID,
   mockPrice,
 } from '@platform/testing/billing/plan-subscription';
+import { STRIPE_PRICE_LOOKUP_KEY } from '@shinefold/db/constants';
+import { MOCK_STRIPE_EVENT_ID } from '@shinefold/db/testing/tenants/billing';
 import type Stripe from 'stripe';
 
 const SUBSCRIPTION_ITEM_IDS = [MOCK_PLAN_ITEM_ID, MOCK_BAND_ITEM_ID];

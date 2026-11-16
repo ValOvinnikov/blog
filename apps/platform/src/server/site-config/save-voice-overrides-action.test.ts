@@ -1,13 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  type TMaybeNull,
-  VOICE_FIELD_ERROR,
-} from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { SITE_CONFIG_SAVED_AT } from '@blog/db/constants';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { auth } from '@platform/server/auth/auth';
@@ -24,6 +14,16 @@ import {
 } from '@platform/testing/site-config/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TMaybeNull,
+  VOICE_FIELD_ERROR,
+} from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { SITE_CONFIG_SAVED_AT } from '@shinefold/db/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 import type { Session } from 'next-auth';
 
 import { saveVoiceOverridesAction } from './save-voice-overrides-action';
@@ -48,7 +48,7 @@ vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@platform/server/site-config/site-config-or-defaults');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     siteConfig: {
       upsertSiteConfig: upsertSiteConfigMock,

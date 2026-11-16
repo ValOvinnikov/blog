@@ -1,6 +1,6 @@
-import { getNavigation } from '@blog/service/features/global/navigation/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getNavigation } from '@shinefold/service/features/global/navigation/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createNavigationService() {
   return {

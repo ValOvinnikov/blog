@@ -1,5 +1,5 @@
-import { sanitizeHref } from '@blog/email/html';
 import type { AnnotationRenderProps } from '@portabletext/editor';
+import { sanitizeHref } from '@shinefold/email/html';
 
 import { portableTextEditorLinkAnnotationVariants } from './portable-text-editor-link-annotation-variants';
 

@@ -5,9 +5,9 @@ import type {
   TLayout,
   TMaybeUndefined,
   TPortableTextBlock,
-} from '@blog/config';
-import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
-import type { TModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
+} from '@shinefold/config';
+import type { TCtaButton } from '@shinefold/service/shared/transformers/cta/to-cta-button';
+import type { TModuleAppearance } from '@shinefold/service/shared/transformers/module/to-module-appearance';
 
 export type TFaqQuestion = {
   id: string;

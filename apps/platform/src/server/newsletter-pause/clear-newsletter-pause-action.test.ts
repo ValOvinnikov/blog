@@ -1,9 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   NEWSLETTER_PAUSE_LOG,
@@ -19,6 +13,12 @@ import {
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
 import { notFound } from 'next/navigation';
 
 import { clearNewsletterPauseAction } from './clear-newsletter-pause-action';
@@ -45,7 +45,7 @@ vi.mock('@platform/server/audit/record-audit-event', () => ({
   recordAuditEvent: recordAuditEventMock,
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     emailConfig: { clearNewsletterPause: clearNewsletterPauseMock },

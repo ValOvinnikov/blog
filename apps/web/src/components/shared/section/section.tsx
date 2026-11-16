@@ -1,4 +1,8 @@
-import type { IWithDataTestId, TBrandVariant, TLayout } from '@blog/config';
+import type {
+  IWithDataTestId,
+  TBrandVariant,
+  TLayout,
+} from '@shinefold/config';
 import {
   buildSectionScopeDeclarations,
   type TSectionAppearance,

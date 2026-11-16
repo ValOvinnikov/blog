@@ -1,10 +1,10 @@
-import { LOCALE_ISO_CODES, TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import type { TTenantSanityCredentials } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { MOCK_NO_BILLING } from '@blog/db/testing/tenants/billing';
-import { MOCK_NO_HOLD } from '@blog/db/testing/tenants/inactivity';
-import { MOCK_NO_OWNER_ACCESS } from '@blog/db/testing/tenants/owner-access';
+import { LOCALE_ISO_CODES, TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import type { TTenantSanityCredentials } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { MOCK_NO_BILLING } from '@shinefold/db/testing/tenants/billing';
+import { MOCK_NO_HOLD } from '@shinefold/db/testing/tenants/inactivity';
+import { MOCK_NO_OWNER_ACCESS } from '@shinefold/db/testing/tenants/owner-access';
 import { createMockFaker } from '@worker/testing/mock-faker';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 
@@ -20,6 +20,7 @@ export const MOCK_SANITY_READ_TOKEN = 'sk-read';
 export const MOCK_TENANT_MANAGEMENT_TOKEN = 'sk-tenant-management';
 export const MOCK_TENANT_MANAGEMENT_ROBOT_ID = 'robot-tenant-management';
 export const MOCK_ENCRYPTED_TOKEN = 'encrypted-read-token';
+export const MOCK_ENCRYPTED_WEBHOOK_SECRET = mockFaker.string.alphanumeric(32);
 export const MOCK_SANITY_CREDENTIALS = {} as TTenantSanityCredentials;
 
 export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
@@ -67,6 +68,16 @@ export function mockProvisionedTenant(
   return mockTenant({
     sanityProjectId: MOCK_SANITY_PROJECT_ID,
     sanityDataset: MOCK_SANITY_DATASET,
+    ...overrides,
+  });
+}
+
+export function mockTenantWithWebhook(
+  overrides: Partial<TTenant> = {},
+): TTenant {
+  return mockProvisionedTenant({
+    id: mockFaker.string.uuid(),
+    webhookCreatedAt: new Date(0),
     ...overrides,
   });
 }

@@ -9,7 +9,7 @@
 
 **Goal:** Give `apps/platform` its own design system — admin-owned primitives on
 Base UI plus an admin-specific token layer matching the design reference exactly
-— replacing all 16 `@blog/ui` components across 68 sites, save one deliberate
+— replacing all 16 `@shinefold/ui` components across 68 sites, save one deliberate
 exception: the Look preview's simulated-site sample, which must keep rendering
 the _tenant's_ components or the preview stops telling the truth.
 
@@ -17,7 +17,7 @@ the _tenant's_ components or the preview stops telling the truth.
 the site's shared theme wholesale, which is why it looks like the public site),
 its own icon registry over 13 copied SVGs, and its own `src/components/shared/*`
 primitives. Migration is bottom-up — tokens, then icons, then primitives, then
-call sites — so the app compiles at every commit. The `@blog/ui` dependency is
+call sites — so the app compiles at every commit. The `@shinefold/ui` dependency is
 removed last, once nothing imports it.
 
 **Tech Stack:** Next.js 16 App Router, Tailwind v4, Base UI (`@base-ui/react`,
@@ -29,7 +29,7 @@ already a dependency), `tailwind-variants`, Vitest + Testing Library, SVGR.
 — the authority on every value in Global Constraints below.
 
 **Companion plan:** the route/page work (spec §1–§7) is a separate plan and
-depends on this one. Building those surfaces against `@blog/ui` and migrating
+depends on this one. Building those surfaces against `@shinefold/ui` and migrating
 afterwards would build each of them twice.
 
 ## Global Constraints
@@ -56,7 +56,7 @@ afterwards would build each of them twice.
 - **Prefix every admin token `--admin-*`.** They coexist with the tenant preview's
   site tokens in the same document; an unprefixed `--surface` would collide.
 - **No new workspace package.** Icons are copied into `apps/platform/src/assets/icons`.
-- **Never add anything to `@blog/ui` for admin.** That rule predates this plan
+- **Never add anything to `@shinefold/ui` for admin.** That rule predates this plan
   (`CLAUDE.md`) and this plan is its enforcement.
 - **`func-style`:** admin is an arrow-function-const workspace. Components are
   `export const X = (props) => …`, never `export function`.
@@ -71,7 +71,7 @@ afterwards would build each of them twice.
   18px body padding, 14px/18px header padding, hairline `--admin-line-2`
   divider. Every card renders through the `Card` primitive after this plan; no
   page re-declares a surface.
-- **No site tokens survive under `apps/platform/src`**, and **no `@blog/ui` imports**
+- **No site tokens survive under `apps/platform/src`**, and **no `@shinefold/ui` imports**
   — outside one allowlisted directory. There are ~165 site-token references today
   (`border-border` x36, `text-text` x27, `bg-surface` x27, ...). The finishing
   checks both exclude
@@ -79,9 +79,9 @@ afterwards would build each of them twice.
   and must otherwise return nothing.
 - **`preview-sample/` is the single allowlisted directory.** It renders the
   tenant's site as it will actually look — `Panel`, `BrandMark`, `Heading`,
-  `Text` and `Button` from `@blog/ui`. Copying those into admin would produce a second copy
+  `Text` and `Button` from `@shinefold/ui`. Copying those into admin would produce a second copy
   that drifts from the real site, so the preview would eventually lie. Nothing
-  else under `apps/platform` may import `@blog/ui`, and a path-scoped guard enforces
+  else under `apps/platform` may import `@shinefold/ui`, and a path-scoped guard enforces
   it — an unenforced exception is how the current 68 sites accumulated.
 - **Every commit must leave `pnpm type-check`, `pnpm lint`, `pnpm test` green.**
   Migration is bottom-up specifically so this holds.
@@ -90,29 +90,29 @@ afterwards would build each of them twice.
 
 **Created in `apps/platform`:**
 
-| Path                                                        | Responsibility                                                                                                     |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `src/styles/admin-theme.css`                                | The `--admin-*` token layer + `@theme inline` mappings. The one place a token value is written.                    |
-| `src/assets/icons/*.svg`                                    | 13 copied glyphs. Static assets, no logic.                                                                         |
-| `src/components/shared/icon/`                               | `Icon` + `ICON_REGISTRY` over the 13 glyphs.                                                                       |
-| `src/components/shared/text/`                               | `Text` — body/muted/supporting/hint variants.                                                                      |
-| `src/components/shared/heading/`                            | `Heading` — levels 1–4, size variants.                                                                             |
-| `src/components/shared/button/`                             | `Button` — primary/secondary/ghost/danger, sizes.                                                                  |
-| `src/components/shared/link-button/`                        | `LinkButton` — polymorphic `as`, shares Button's variants.                                                         |
-| `src/components/shared/status-badge/`                       | `StatusBadge` — rounded pill + tone dot. The component that motivated this work.                                   |
-| `src/components/shared/text-input/`                         | `TextInput`, controlled.                                                                                           |
-| `src/components/shared/textarea/`                           | `Textarea`, controlled. Replaces the `@blog/ui` atom being deleted.                                                |
-| `src/components/shared/segmented-control/`                  | `SegmentedControl` on Base UI `Toggle Group`.                                                                      |
-| `src/components/shared/alert/`                              | `Alert` — info/warning/error/success.                                                                              |
-| `src/components/shared/spinner/`                            | `Spinner`.                                                                                                         |
-| `src/components/shared/avatar/`                             | `Avatar` — initials.                                                                                               |
-| `src/components/shared/eyebrow/`                            | `Eyebrow`.                                                                                                         |
-| `src/components/shared/setting-row/`                        | `SettingRow` — label/description/control row.                                                                      |
-| `src/components/shared/brand-mark/`                         | `BrandMark` — admin's own sidebar logo.                                                                            |
-| `src/components/shared/card/`                               | `Card` with `Card.Header`/`Card.Body`/`Card.Footer`. Replaces 17 hand-rolled surfaces.                             |
-| `src/components/shared/page-header/`                        | `PageHeader` — title, description, badges, actions slot.                                                           |
-| `src/components/shared/disclosure/`                         | `Disclosure` — the "Advanced" `<details>` pattern, re-implemented per page today.                                  |
-| `src/components/features/look/look-preview/preview-sample/` | The simulated tenant site, extracted from `look-preview.tsx`. **The only directory allowed to import `@blog/ui`.** |
+| Path                                                        | Responsibility                                                                                                          |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `src/styles/admin-theme.css`                                | The `--admin-*` token layer + `@theme inline` mappings. The one place a token value is written.                         |
+| `src/assets/icons/*.svg`                                    | 13 copied glyphs. Static assets, no logic.                                                                              |
+| `src/components/shared/icon/`                               | `Icon` + `ICON_REGISTRY` over the 13 glyphs.                                                                            |
+| `src/components/shared/text/`                               | `Text` — body/muted/supporting/hint variants.                                                                           |
+| `src/components/shared/heading/`                            | `Heading` — levels 1–4, size variants.                                                                                  |
+| `src/components/shared/button/`                             | `Button` — primary/secondary/ghost/danger, sizes.                                                                       |
+| `src/components/shared/link-button/`                        | `LinkButton` — polymorphic `as`, shares Button's variants.                                                              |
+| `src/components/shared/status-badge/`                       | `StatusBadge` — rounded pill + tone dot. The component that motivated this work.                                        |
+| `src/components/shared/text-input/`                         | `TextInput`, controlled.                                                                                                |
+| `src/components/shared/textarea/`                           | `Textarea`, controlled. Replaces the `@shinefold/ui` atom being deleted.                                                |
+| `src/components/shared/segmented-control/`                  | `SegmentedControl` on Base UI `Toggle Group`.                                                                           |
+| `src/components/shared/alert/`                              | `Alert` — info/warning/error/success.                                                                                   |
+| `src/components/shared/spinner/`                            | `Spinner`.                                                                                                              |
+| `src/components/shared/avatar/`                             | `Avatar` — initials.                                                                                                    |
+| `src/components/shared/eyebrow/`                            | `Eyebrow`.                                                                                                              |
+| `src/components/shared/setting-row/`                        | `SettingRow` — label/description/control row.                                                                           |
+| `src/components/shared/brand-mark/`                         | `BrandMark` — admin's own sidebar logo.                                                                                 |
+| `src/components/shared/card/`                               | `Card` with `Card.Header`/`Card.Body`/`Card.Footer`. Replaces 17 hand-rolled surfaces.                                  |
+| `src/components/shared/page-header/`                        | `PageHeader` — title, description, badges, actions slot.                                                                |
+| `src/components/shared/disclosure/`                         | `Disclosure` — the "Advanced" `<details>` pattern, re-implemented per page today.                                       |
+| `src/components/features/look/look-preview/preview-sample/` | The simulated tenant site, extracted from `look-preview.tsx`. **The only directory allowed to import `@shinefold/ui`.** |
 
 These join the six primitives `src/components/shared/*` already holds
 (`confirm-dialog`, `font-picker`, `form-field`, `form-text-input`,
@@ -124,14 +124,14 @@ existing ones are already imported today.
 
 **Modified:**
 
-| Path                                    | Change                                                                      |
-| --------------------------------------- | --------------------------------------------------------------------------- |
-| `apps/platform/index.css`               | Import `admin-theme.css`; drop the `@source` scan of `packages/ui`.         |
-| `apps/platform/next.config.ts`          | Repoint SVGR at `src/assets/icons`; drop `transpilePackages: ['@blog/ui']`. |
-| `apps/platform/vitest.config.ts`        | Drop the `@blog/ui` alias.                                                  |
-| `apps/platform/tsconfig.json`           | Drop the `@blog/ui/*` path mapping.                                         |
-| `apps/platform/package.json`            | Drop the `@blog/ui` dependency.                                             |
-| 68 call sites under `apps/platform/src` | Repoint imports.                                                            |
+| Path                                    | Change                                                                           |
+| --------------------------------------- | -------------------------------------------------------------------------------- |
+| `apps/platform/index.css`               | Import `admin-theme.css`; drop the `@source` scan of `packages/ui`.              |
+| `apps/platform/next.config.ts`          | Repoint SVGR at `src/assets/icons`; drop `transpilePackages: ['@shinefold/ui']`. |
+| `apps/platform/vitest.config.ts`        | Drop the `@shinefold/ui` alias.                                                  |
+| `apps/platform/tsconfig.json`           | Drop the `@shinefold/ui/*` path mapping.                                         |
+| `apps/platform/package.json`            | Drop the `@shinefold/ui` dependency.                                             |
+| 68 call sites under `apps/platform/src` | Repoint imports.                                                                 |
 
 **Deleted:**
 
@@ -232,11 +232,11 @@ Constraints — this file is the only place they appear.
 - [ ] **Step 2: Wire it in**
 
 `apps/platform/index.css` — keep the shared theme import for now (primitives still
-come from `@blog/ui` until Task 3+; removing it early breaks the build). The
+come from `@shinefold/ui` until Task 3+; removing it early breaks the build). The
 `@source` scan of `packages/ui` is dropped in Task 11, not here.
 
 ```css
-@import '@blog/tailwind-config/theme.css';
+@import '@shinefold/tailwind-config/theme.css';
 @import './src/styles/admin-theme.css';
 
 /* Tell Tailwind to scan ui package source for class names */
@@ -245,7 +245,7 @@ come from `@blog/ui` until Task 3+; removing it early breaks the build). The
 
 - [ ] **Step 3: Verify the tenant preview is untouched**
 
-Run: `pnpm --filter @blog/admin test look-preview`
+Run: `pnpm --filter @shinefold/admin test look-preview`
 Expected: PASS. The preview renders the _tenant's_ site tokens via
 `build-theme-style-block`; if this reds, an admin token has collided with a site
 token and the prefix is wrong.
@@ -274,8 +274,8 @@ git commit -m "feat(admin): add admin-owned Tailwind token layer"
 
 **Interfaces:**
 
-- Consumes: `ICONS`, `TIconName` from `@blog/config` (unchanged — admin keeps
-  `@blog/config`).
+- Consumes: `ICONS`, `TIconName` from `@shinefold/config` (unchanged — admin keeps
+  `@shinefold/config`).
 - Produces: `<Icon name={ICONS.GRID} size="sm" ariaLabel?="…" />`. Decorative by
   default: with no `ariaLabel` it renders `aria-hidden="true"`.
 
@@ -296,7 +296,7 @@ ls apps/platform/src/assets/icons | wc -l   # expect 13
 
 ```tsx
 import { render, screen } from '@platform/testing/custom-render';
-import { ICONS } from '@blog/config';
+import { ICONS } from '@shinefold/config';
 
 import { Icon } from './icon';
 
@@ -339,16 +339,16 @@ describe(Icon, () => {
 
 - [ ] **Step 3: Run it to confirm it fails**
 
-Run: `pnpm --filter @blog/admin test icon`
+Run: `pnpm --filter @shinefold/admin test icon`
 Expected: FAIL — `Cannot find module './icon'`.
 
 - [ ] **Step 4: Implement the registry and component**
 
-`icon-registry.ts` maps only the 13 names admin uses. Unlike `@blog/ui`'s
+`icon-registry.ts` maps only the 13 names admin uses. Unlike `@shinefold/ui`'s
 registry it carries no `?url` exports — admin has no consumer for raw URLs.
 
 ```ts
-import { ICONS, type TIconName } from '@blog/config';
+import { ICONS, type TIconName } from '@shinefold/config';
 import type { FC, SVGProps } from 'react';
 
 import ChevronRight from '@platform/assets/icons/chevron-right.svg';
@@ -387,7 +387,7 @@ export const ICON_REGISTRY: Partial<Record<TIconName, TGlyph>> = {
 `icon.tsx`:
 
 ```tsx
-import type { TIconName } from '@blog/config';
+import type { TIconName } from '@shinefold/config';
 
 import { ICON_REGISTRY } from './icon-registry';
 import { iconVariants, type TIconVariants } from './icon-variants';
@@ -419,13 +419,13 @@ export const Icon = ({ name, size, ariaLabel, className }: TIconProps) => {
 
 - [ ] **Step 5: Repoint SVGR**
 
-In `apps/platform/next.config.ts`, the SVGR rule currently targets `@blog/ui`'s
+In `apps/platform/next.config.ts`, the SVGR rule currently targets `@shinefold/ui`'s
 asset directory. Point it at `apps/platform/src/assets/icons` **in addition** for
-now — `@blog/ui`'s registry is still loaded until Task 11.
+now — `@shinefold/ui`'s registry is still loaded until Task 11.
 
 - [ ] **Step 6: Run the tests**
 
-Run: `pnpm --filter @blog/admin test icon`
+Run: `pnpm --filter @shinefold/admin test icon`
 Expected: PASS, 3 tests.
 
 - [ ] **Step 7: Commit**
@@ -450,7 +450,7 @@ visual difference is provable early.
 
 - Consumes: Task 1's tokens.
 - Produces: `<StatusBadge tone="ok" | "warn" | "bad" | "neutral" | "plan">{children}</StatusBadge>`.
-  Note `bad` and `plan` are new tones `@blog/ui`'s badge never had — admin needs
+  Note `bad` and `plan` are new tones `@shinefold/ui`'s badge never had — admin needs
   a failure tone and a plan chip.
 
 - [ ] **Step 1: Write the failing test**
@@ -488,13 +488,13 @@ describe(StatusBadge, () => {
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `pnpm --filter @blog/admin test status-badge`
+Run: `pnpm --filter @shinefold/admin test status-badge`
 Expected: FAIL — module not found.
 
 - [ ] **Step 3: Implement**
 
 `status-badge-variants.ts` — rounded pill, sentence case, Inter. Deliberately
-none of `@blog/ui`'s `font-mono uppercase tracking-label rounded-sm`:
+none of `@shinefold/ui`'s `font-mono uppercase tracking-label rounded-sm`:
 
 ```ts
 import { tv } from 'tailwind-variants';
@@ -559,7 +559,7 @@ export const StatusBadge = ({
 
 - [ ] **Step 4: Run the tests**
 
-Run: `pnpm --filter @blog/admin test status-badge`
+Run: `pnpm --filter @shinefold/admin test status-badge`
 Expected: PASS, 3 tests.
 
 - [ ] **Step 5: Commit**
@@ -577,14 +577,14 @@ Each follows Task 3's exact shape — failing test, run it, implement with
 `tailwind-variants` over Task 1's tokens, run, commit. Build them in this order
 so each only depends on what already exists:
 
-| Task  | Component(s)                        | Notes specific to this one                                                                                                                                                                                           |
-| ----- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **4** | `Text`, `Heading`, `Eyebrow`        | `Text` variants: `body`/`muted`/`supporting`/`hint`. `Heading` takes `level` 1–4 and a separate `size` — level is semantics, size is appearance, and they must stay independent.                                     |
-| **5** | `Button`, `LinkButton`              | Variants `primary`/`secondary`/`ghost`/`danger`, sizes `sm`/`md`. `LinkButton` is polymorphic via `as` (used with next-intl's `Link`) and shares Button's variant file — do not duplicate the class lists.           |
-| **6** | `TextInput`, `Textarea`             | Controlled: `value` + `onChange(value: string)`, not a raw event. Both need a `isDisabled` state styled to match the mock's locked-field treatment (`bg-admin-line-2`, `text-admin-faint`).                          |
-| **7** | `SegmentedControl`                  | Base UI `Toggle Group`. Generic over the option value type: `SegmentedControl<TTenantPlan>`. Keep the existing `ariaLabel` prop contract — call sites already pass it.                                               |
-| **8** | `Alert`, `Spinner`                  | `Alert` tones map to `ALERT_TYPE` from `@blog/config`. `Spinner` keeps `label` + `hasLabel` — the add-tenant overlay asserts on `getByRole('status', { name: 'Creating…' })`.                                        |
-| **9** | `Avatar`, `SettingRow`, `BrandMark` | `Avatar` renders initials from a `name`. `BrandMark` is admin's own sidebar mark — it does **not** need `@blog/ui`'s uploaded-image branch or `--logo-*` tokens, which exist for tenant branding on the public site. |
+| Task  | Component(s)                        | Notes specific to this one                                                                                                                                                                                                |
+| ----- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **4** | `Text`, `Heading`, `Eyebrow`        | `Text` variants: `body`/`muted`/`supporting`/`hint`. `Heading` takes `level` 1–4 and a separate `size` — level is semantics, size is appearance, and they must stay independent.                                          |
+| **5** | `Button`, `LinkButton`              | Variants `primary`/`secondary`/`ghost`/`danger`, sizes `sm`/`md`. `LinkButton` is polymorphic via `as` (used with next-intl's `Link`) and shares Button's variant file — do not duplicate the class lists.                |
+| **6** | `TextInput`, `Textarea`             | Controlled: `value` + `onChange(value: string)`, not a raw event. Both need a `isDisabled` state styled to match the mock's locked-field treatment (`bg-admin-line-2`, `text-admin-faint`).                               |
+| **7** | `SegmentedControl`                  | Base UI `Toggle Group`. Generic over the option value type: `SegmentedControl<TTenantPlan>`. Keep the existing `ariaLabel` prop contract — call sites already pass it.                                                    |
+| **8** | `Alert`, `Spinner`                  | `Alert` tones map to `ALERT_TYPE` from `@shinefold/config`. `Spinner` keeps `label` + `hasLabel` — the add-tenant overlay asserts on `getByRole('status', { name: 'Creating…' })`.                                        |
+| **9** | `Avatar`, `SettingRow`, `BrandMark` | `Avatar` renders initials from a `name`. `BrandMark` is admin's own sidebar mark — it does **not** need `@shinefold/ui`'s uploaded-image branch or `--logo-*` tokens, which exist for tenant branding on the public site. |
 
 - [ ] **Step 1 (per task): Write the failing test, run it, implement, run, commit**
 
@@ -593,7 +593,7 @@ its variant, and honours its disabled/empty state where it has one.
 
 - [ ] **Step 2 (per task): Verify the suite is still green**
 
-Run: `pnpm --filter @blog/admin test`
+Run: `pnpm --filter @shinefold/admin test`
 Expected: PASS. Nothing consumes these yet, so no existing test may change.
 
 ---
@@ -658,7 +658,7 @@ describe(Card, () => {
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `pnpm --filter @blog/admin test card`
+Run: `pnpm --filter @shinefold/admin test card`
 Expected: FAIL — cannot find module `./card`.
 
 - [ ] **Step 3: Implement Card**
@@ -689,11 +689,11 @@ export const cardVariants = tv({
 ```
 
 `card.tsx` uses this repo's compound-slot pattern (`Card.Header`, not a `header`
-prop), matching how `@blog/ui` organisms compose so it reads as familiar.
+prop), matching how `@shinefold/ui` organisms compose so it reads as familiar.
 
 - [ ] **Step 4: Run the Card tests**
 
-Run: `pnpm --filter @blog/admin test card`
+Run: `pnpm --filter @shinefold/admin test card`
 Expected: PASS, 3 tests.
 
 - [ ] **Step 5: Repeat the cycle for PageHeader and Disclosure**
@@ -720,7 +720,7 @@ Tasks 11–18 each take one admin surface and bring it fully onto admin's own
 design system. **Every one of them runs this identical checklist.** It is the
 definition of "the design is implemented correctly" for that surface:
 
-1. **Imports.** No `@blog/ui` import remains in the surface's files.
+1. **Imports.** No `@shinefold/ui` import remains in the surface's files.
 2. **Tokens.** No site token (`bg-surface`, `text-text*`, `border-border*`,
    `ring-brand-primary`, `bg-primary`, `border-brand-primary`) remains. Only
    `*-admin-*` utilities.
@@ -736,7 +736,7 @@ definition of "the design is implemented correctly" for that surface:
    weight and focus ring. Differences are bugs in the surface, not acceptable
    drift.
 7. **Tests.** The surface's existing tests pass unchanged. If a test asserted on
-   a `@blog/ui` class name, rewrite that assertion against behaviour or role —
+   a `@shinefold/ui` class name, rewrite that assertion against behaviour or role —
    never delete it.
 8. **Commit** as `refactor(admin): bring <surface> onto admin's design system`.
 
@@ -817,11 +817,11 @@ The largest surface, and the one carrying the highest-risk component.
 
 - [ ] Run all 8 checklist items above.
 - [ ] **Extra step: verify the preview survived.**
-      Run: `pnpm --filter @blog/admin test look-preview` — Expected: PASS.
+      Run: `pnpm --filter @shinefold/admin test look-preview` — Expected: PASS.
       Then load the page and confirm the preview still renders both light and dark
       tenant ramps, and that `chromeOn` still produces the terminal frame.
 - [ ] **Extra step: confirm the exception is exactly one directory.**
-      Run: `grep -rln "@blog/ui" apps/platform/src/components/features/look`
+      Run: `grep -rln "@shinefold/ui" apps/platform/src/components/features/look`
       Expected: only paths under `look-preview/preview-sample/`.
 
 ---
@@ -837,7 +837,7 @@ The largest surface, and the one carrying the highest-risk component.
   `rounded-lg` in the same file. Both become `Card`.
 - The advanced section becomes `Disclosure`.
 - `voice-field` renders a `Textarea` — repoint it at Task 6's admin primitive.
-  This is the **last consumer of `@blog/ui`'s `Textarea` anywhere in the repo**,
+  This is the **last consumer of `@shinefold/ui`'s `Textarea` anywhere in the repo**,
   so finishing this task is what makes Task 19's deletion safe.
 - Each field is an **override**: empty means "inherit from the preset's voice
   pack". The inherited value must stay visible as a placeholder, and clearing a
@@ -855,7 +855,7 @@ The largest surface, and the one carrying the highest-risk component.
 **Surface specifics:**
 
 - Uses `SettingRow` (Task 9's admin version). The label/description/control
-  rhythm must match the reference, not `@blog/ui`'s account-page spacing.
+  rhythm must match the reference, not `@shinefold/ui`'s account-page spacing.
 - Capability rows disabled by plan entitlement get the same locked treatment as a
   locked tenant-details field: `bg-admin-line-2`, `text-admin-faint`, reason text
   beside them. Consistency between "locked by plan" and "locked by provisioning"
@@ -898,7 +898,7 @@ The largest surface, and the one carrying the highest-risk component.
 
 - [ ] Run all 8 checklist items above.
 - [ ] **Extra step: verify the lock matrix is unchanged.**
-      Run: `pnpm --filter @blog/admin test tenant-details-panel tenant-field-locks`
+      Run: `pnpm --filter @shinefold/admin test tenant-details-panel tenant-field-locks`
       Expected: PASS, with no test edits.
 
 ---
@@ -922,7 +922,7 @@ The largest surface, and the one carrying the highest-risk component.
 `src/components/features/tenants/tenant-overview/` — the `/t/{slug}` landing
 stub. The companion plan **deletes** it along with the whole slug tree, so
 restyling it is wasted work. If you reach it and the companion plan has not run
-yet, leave it exactly as it is; it will still be importing `@blog/ui`, and Task
+yet, leave it exactly as it is; it will still be importing `@shinefold/ui`, and Task
 19 Step 1's grep will flag it. That flag is expected, and it is the signal that
 the two plans have to land in order — not a reason to restyle the file.
 
@@ -947,7 +947,7 @@ the two plans have to land in order — not a reason to restyle the file.
 - [ ] **Step 1: Confirm the only remaining reach is the allowlisted directory**
 
 ```bash
-grep -rln "@blog/ui" apps/platform/src | grep -v "look-preview/preview-sample/"
+grep -rln "@shinefold/ui" apps/platform/src | grep -v "look-preview/preview-sample/"
 grep -rnE "(text|bg|border|ring)-(text|surface|border|primary|brand)" apps/platform/src | grep -v "look-preview/preview-sample/"
 ```
 
@@ -961,7 +961,7 @@ The dependency **stays** — `preview-sample/` imports it, so `package.json`, th
 import all remain. Removing them is not the goal; confining the reach is.
 
 An unenforced exception is exactly how 68 import sites accumulated, so add an
-ESLint rule in `configs/eslint/` restricting `@blog/ui` imports under
+ESLint rule in `configs/eslint/` restricting `@shinefold/ui` imports under
 `apps/platform` to `look-preview/preview-sample/` — `no-restricted-imports` with a
 `files` override for the allowlisted path. Remember `files` globs resolve against
 the consuming workspace, not the repo root; verify with `eslint --print-config`
@@ -972,8 +972,8 @@ next reader does not "clean it up".
 
 - [ ] **Step 3: Verify the boundary holds**
 
-Run: `pnpm type-check && pnpm lint && pnpm --filter @blog/admin test`
-Expected: PASS. Then prove the guard bites: add a throwaway `@blog/ui` import to
+Run: `pnpm type-check && pnpm lint && pnpm --filter @shinefold/admin test`
+Expected: PASS. Then prove the guard bites: add a throwaway `@shinefold/ui` import to
 an admin file outside `preview-sample/`, re-run `pnpm lint`, confirm it errors,
 and remove it. A guard nobody has seen fail is not known to work.
 
@@ -987,7 +987,7 @@ pnpm gen:ui-index
 
 The grep must print nothing before you delete.
 
-Run: `pnpm gen:ui-index:check && pnpm --filter @blog/ui test`
+Run: `pnpm gen:ui-index:check && pnpm --filter @shinefold/ui test`
 Expected: PASS, and `COMPONENTS.md` no longer lists Textarea.
 
 **Do not delete anything else.** `StatusBadge`, `SegmentedControl`, `SettingRow`,
@@ -1024,7 +1024,7 @@ one field treatment and one badge shape throughout.
 
 ```bash
 git add -A
-git commit -m "refactor(admin): drop the @blog/ui dependency entirely"
+git commit -m "refactor(admin): drop the @shinefold/ui dependency entirely"
 ```
 
 ---
@@ -1063,7 +1063,7 @@ Task 10 and referenced by those names throughout Tasks 11–18.
 
 1. Task 1's token prefix is load-bearing — the tenant preview renders site tokens
    in the same document. Verified at Task 1 Step 3, Task 13, and Task 19 Step 1.
-2. `preview-sample/` is the one directory exempt from BOTH the no-`@blog/ui` and
+2. `preview-sample/` is the one directory exempt from BOTH the no-`@shinefold/ui` and
    no-site-tokens rules, because it reproduces the tenant's site rather than
    admin's own chrome. Tasks 13 and 19 both call it out. A mechanical sweep that
    ignores it breaks the live preview; an exception left unenforced re-grows into

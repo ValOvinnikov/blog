@@ -1,14 +1,14 @@
 'use client';
 
+import type { TEmailDraft } from '@platform/utils/email-draft/email-draft';
+import { resolveEmailPreview } from '@platform/utils/email-fallback-copy/email-fallback-copy';
+import { buildEmailTemplatePreviewHtml } from '@platform/utils/email-template-preview-builder/email-template-preview-builder';
 import type {
   TEmailTemplateType,
   TLocaleIsoCode,
   TTenantEmailBrand,
-} from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
-import type { TEmailDraft } from '@platform/utils/email-draft/email-draft';
-import { resolveEmailPreview } from '@platform/utils/email-fallback-copy/email-fallback-copy';
-import { buildEmailTemplatePreviewHtml } from '@platform/utils/email-template-preview-builder/email-template-preview-builder';
+} from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 type TUseEmailPreviewArgs = {
   draft: TEmailDraft;

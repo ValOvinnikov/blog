@@ -1,6 +1,6 @@
-import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { okResult } from '@blog/utils/result';
+import { TENANT_PROVISIONING_STEP } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { okResult } from '@shinefold/utils/result';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
 import { mapTenantDomain } from '@worker/steps/map-domain';
@@ -37,7 +37,9 @@ export async function ensureInfrastructure(
     },
     {
       step: TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
-      run: () => createTenantRevalidateWebhook(tenant, env),
+      run: async () => {
+        await createTenantRevalidateWebhook(tenant, env);
+      },
     },
     {
       step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,

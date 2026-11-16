@@ -1,6 +1,6 @@
 # Deploy & release runbook
 
-How this blog deploys, and the one-time setup that makes the pipeline live.
+How Shinefold deploys, and the one-time setup that makes the pipeline live.
 
 - **Local dev + every `main` merge** → **development** environment
   (`development` dataset).
@@ -11,7 +11,7 @@ On a `main` merge, the Next.js **web app** and the **platform** each deploy
 only when the merge touches their turbo graph (`turbo-ignore`; a manual
 `workflow_dispatch` run deploys both). A production tag has no such gate and
 always deploys both. The Studio is not a deploy target — it ships as the
-`@blog/studio` package and is mounted by the platform; change detection
+`@shinefold/studio` package and is mounted by the platform; change detection
 still tracks it, but only to decide whether the Sanity content-migration job
 needs to run.
 Architecture rationale lives in `SPEC.md` §13 and
@@ -107,7 +107,7 @@ project-scoped, so mint them **inside** the matching project):
         privilege, scoped to migrations only.)
 
 > No `ci-deploy` / Deploy-Studio token anymore — the Studio is not deployed at
-> all: it ships as the `@blog/studio` package and is mounted by the
+> all: it ships as the `@shinefold/studio` package and is mounted by the
 > platform, so nothing needs Sanity's own deploy permission. If a project still
 > has an old `ci-deploy` token from before this change, it can be revoked.
 
@@ -139,7 +139,7 @@ take different values.
 
 Three projects per environment — a web project, a platform project and a
 worker project. The
-Studio is no longer a deploy target of its own: it ships as the `@blog/studio`
+Studio is no longer a deploy target of its own: it ships as the `@shinefold/studio`
 package and is mounted by the platform, so it has no project, no hostname
 and no deploy job.
 
@@ -245,7 +245,7 @@ the platform tenant.
 and `deploy-production.yml` both run `vercel pull --environment=production`
 before `vercel build`, so a var scoped only to Preview/Development is never
 pulled, and — for a required key like `DATABASE_URL` — the app fails at its
-eager `@blog/db` validation rather than silently degrading; same reasoning as
+eager `@shinefold/db` validation rather than silently degrading; same reasoning as
 the Preview-scope note below) — same six keys per project; each project
 points at its **own** Sanity project, so the id / dataset / URL / tokens all
 differ:
@@ -271,7 +271,7 @@ differ:
 > a setup detail. (The two Storybook projects do preview-deploy, but they hold
 > no database or token config at all.)
 
-`@blog/db` (Neon Postgres, engagement layer — comments/ratings/auth/bookmarks/
+`@shinefold/db` (Neon Postgres, engagement layer — comments/ratings/auth/bookmarks/
 subscribers, `SPEC.md` §4/§8) needs two connection strings, same Production
 scope as the five keys above:
 
@@ -282,7 +282,7 @@ scope as the five keys above:
 | `TENANT_TOKEN_ENCRYPTION_KEY` | `<DEV_TENANT_TOKEN_KEY>`      | `<PRD_TENANT_TOKEN_KEY>`      |
 
 > `DATABASE_URL` (the pooled Neon HTTP driver, `drizzle-orm/neon-http`) is
-> what the deployed app reads at runtime via `@blog/db`'s validated env entry
+> what the deployed app reads at runtime via `@shinefold/db`'s validated env entry
 > point. `DATABASE_URL_UNPOOLED` (direct connection) is what `drizzle-kit`
 > needs for `db:generate`/`db:migrate`/`db:studio` — `db:generate` never runs
 > in CI (it's a local, human-review step), but `db:migrate` now runs
@@ -317,7 +317,7 @@ Production scope like the rest:
 > that tenant's emails, and never the address.
 
 > `TENANT_TOKEN_ENCRYPTION_KEY` decrypts `tenants.sanityReadTokenEncrypted`
-> (`@blog/utils`'s `encryptSecret`/`decryptSecret`, AES-256-GCM) — a 32-byte
+> (`@shinefold/utils`'s `encryptSecret`/`decryptSecret`, AES-256-GCM) — a 32-byte
 > key, base64-encoded. Generate one per environment with
 > `openssl rand -base64 32`; **dev and prod must use different keys.**
 > Rotating this key means re-encrypting every tenant's stored token, so treat
@@ -378,7 +378,7 @@ Neon gives each branch two connection strings from **Connection details**: a
 **direct/unpooled** one. They are not interchangeable:
 
 - `DATABASE_URL` (pooled) is what the deployed app reads at runtime via
-  `@blog/db`'s `drizzle-orm/neon-http` client — a serverless function opens
+  `@shinefold/db`'s `drizzle-orm/neon-http` client — a serverless function opens
   many short-lived connections, and only the pooler tolerates that load.
 - `DATABASE_URL_UNPOOLED` (direct) is what `drizzle-kit`
   (`db:generate`/`db:migrate`/`db:studio`) and `pg_dump` need — a migration or
@@ -412,7 +412,7 @@ Provisioning notes for recreating this from scratch:
       against the branch you think you're targeting and checking its row
       counts/timestamps, not by trusting the secret's name.
 - [ ] Create the schema on a fresh, empty branch with
-      `pnpm --filter @blog/db db:migrate` (with `DATABASE_URL_UNPOOLED`
+      `pnpm --filter @shinefold/db db:migrate` (with `DATABASE_URL_UNPOOLED`
       sourced into the shell first). The history starts at
       `packages/db/migrations/0000_baseline.sql`, which creates every table;
       later migrations apply on top. A database that still records the old
@@ -431,7 +431,7 @@ Provisioning notes for recreating this from scratch:
 
 **Platform** (`platform-dev` / `platform-prod`, Production scope). The panel runs its
 **own** Node process, so it needs
-its own copy of every variable it reads: `@blog/auth` declares the auth set
+its own copy of every variable it reads: `@shinefold/auth` declares the auth set
 with `runtimeEnv: process.env` and neither app declares them itself any more
 (#1457), so extracting the shared package moved where these are _declared_,
 not where they are _needed_. It never touches Sanity, so none of the
@@ -470,8 +470,8 @@ not fully functional until they are set:
 
 | Key                                | Purpose                                                                             |
 | ---------------------------------- | ----------------------------------------------------------------------------------- |
-| `AUTH_GITHUB_ID` / `_SECRET`       | GitHub sign-in (`@blog/auth`)                                                       |
-| `AUTH_GOOGLE_ID` / `_SECRET`       | Google sign-in (`@blog/auth`)                                                       |
+| `AUTH_GITHUB_ID` / `_SECRET`       | GitHub sign-in (`@shinefold/auth`)                                                  |
+| `AUTH_GOOGLE_ID` / `_SECRET`       | Google sign-in (`@shinefold/auth`)                                                  |
 | `MAGIC_LINK_FROM_ADDRESS`          | magic-link sender, on a Resend-verified domain (see the web note)                   |
 | `RESEND_PLATFORM_API_KEY`          | the platform Resend account's key: sign-in, invites, alerts, owner emails           |
 | `BLOB_READ_WRITE_TOKEN`            | Look tab's logo/favicon uploads (`@vercel/blob`)                                    |
@@ -676,7 +676,7 @@ dispatch can point it at `development`.
       the owner-elevation sweep to grant the owner `administrator`.
 - [ ] Secret `TENANT_TOKEN_ENCRYPTION_KEY` — the **same** value already set as
       the Vercel env var of the same name on that environment's `apps/web`
-      project (see the `@blog/db` env vars table above): `web-dev`'s on
+      project (see the `@shinefold/db` env vars table above): `web-dev`'s on
       `development`, `web-prod`'s on `production`. `setTenantSanityToken`
       throws without it, and `deprovision-tenant.yml` and
       `recheck-tenant-owners.yml` need it to decrypt each tenant's management
@@ -820,7 +820,7 @@ never be touching production); prod fails when its resolved host
 **differs from** `PRODUCTION_DB_HOST` (a release must always touch
 production, and only production). Set the Variable correctly before either
 job first runs with a real `DATABASE_URL_UNPOOLED`, or every deploy touching
-`@blog/db` — dev on merge, prod on tag — will fail at this step.
+`@shinefold/db` — dev on merge, prod on tag — will fail at this step.
 
 **Repo level — release backup encryption**
 
@@ -949,15 +949,15 @@ Local dev points at the **dev** project (`<DEV_PROJECT_ID>`):
 - [ ] `apps/web/.env.local` also carries `DATABASE_URL=<DEV_DATABASE_URL>` and
       `DATABASE_URL_UNPOOLED=<DEV_DATABASE_URL_UNPOOLED>` (the `development`
       Neon branch's pooled/unpooled connection strings) — the single local
-      source `@blog/db`'s `drizzle.config.ts` and runtime client both expect.
+      source `@shinefold/db`'s `drizzle.config.ts` and runtime client both expect.
       `packages/db`'s own CLI (`db:generate`/`db:migrate`/`db:studio`) runs
-      standalone via `pnpm --filter @blog/db db:*`, outside Next's own env
+      standalone via `pnpm --filter @shinefold/db db:*`, outside Next's own env
       loading, so source these into the shell first:
       `set -a && source apps/web/.env.local && set +a`.
 
 ### 8. Observability — Loki, alerts & uptime · Grafana Cloud + Vercel
 
-Every server log line is the `@blog/insight` logger's single-line JSON —
+Every server log line is the `@shinefold/insight` logger's single-line JSON —
 `service` (`web` or `platform`), `level`, `event`, `ts`, then the call's
 context fields. On its own, Vercel keeps those lines in each project's Runtime
 Logs, with a short history and nobody watching. This step has each app push its
@@ -1084,11 +1084,11 @@ filterable:
 disabled on both deployed projects, so this is the **only** path onto dev —
 nothing deploys before checks pass):
 
-1. **`changes` gate** runs `turbo-ignore` per target (`@blog/studio`, `web`,
+1. **`changes` gate** runs `turbo-ignore` per target (`@shinefold/studio`, `web`,
    `platform`) — a downstream job only runs when the merge affects its
    target's turbo graph (a no-op merge skips everything, including `verify`;
    a manual `workflow_dispatch` bypasses the gate on every job, so all of them
-   run). `@blog/studio` gates the Sanity `migrate` job rather than a deploy —
+   run). `@shinefold/studio` gates the Sanity `migrate` job rather than a deploy —
    the Studio ships as a package and is not deployed on its own. "Affects" is
    measured from the last commit this workflow **completed successfully
    against**, not from `HEAD^1`, so a merge whose run was cancelled by the next
@@ -1112,9 +1112,9 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    rather than skipping the step (#2734). **No approval gate on dev** (unlike
    prod) — dev auto-migrates.
 4. **`migrate-db`** (`environment: development`) — the same idea as `migrate`
-   above, for the separate `@blog/db` (Drizzle/Neon) relational store: applies
+   above, for the separate `@shinefold/db` (Drizzle/Neon) relational store: applies
    any un-applied schema migrations to the **development** Neon branch via
-   `pnpm --filter @blog/db db:migrate` (`drizzle-kit migrate`, a no-op when
+   `pnpm --filter @shinefold/db db:migrate` (`drizzle-kit migrate`, a no-op when
    none are pending). Gated on `web`, `platform` or `worker` (the Studio never
    touches Postgres, so a studio-only change doesn't trigger it);
    `deploy-web`, `deploy-platform` and `deploy-worker` `need` it. No artifact backup here,
@@ -1133,12 +1133,12 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
 stage`: `deploy --prebuilt --prod --skip-domain → request`; see "A deploy
    goes live only after every app starts" below).
 6. **`deploy-platform`** → `platform-dev` via the Vercel CLI, same mechanism.
-   `needs: [changes, verify, migrate-db]` — it depends on `@blog/db` (it
+   `needs: [changes, verify, migrate-db]` — it depends on `@shinefold/db` (it
    writes `site_config`), so it is at least as exposed to schema drift as the
    public site is, but not on `migrate`, since it never reads Sanity.
 7. **`deploy-worker`** → `worker-dev` via the Vercel CLI, same mechanism, when
    the `worker` turbo graph changed. `needs: [changes, verify, migrate-db]` —
-   it writes the tenant registry through `@blog/db`, and reaches Sanity only
+   it writes the tenant registry through `@shinefold/db`, and reaches Sanity only
    through the Management API and `@sanity/client`, never the dev dataset's
    content migrations.
 8. **`promote`** (Promote dev apps) → once every stage job this run deployed
@@ -1238,10 +1238,10 @@ There are **no PR preview deployments** — deploys happen only on merge to
    `deploy-web`'s `needs` and the release would ship new code against
    un-migrated content — with the dataset backup skipped too.
 3. **`migrate-db`** (`environment: production`, `needs: full-gate`) — the same
-   idea as `migrate` above, for the separate `@blog/db` (Drizzle/Neon)
+   idea as `migrate` above, for the separate `@shinefold/db` (Drizzle/Neon)
    relational store: `pg_dump`s the production Neon branch and stores it,
    encrypted, as `release/<tag>/attempt-<n>/db-prod.dump.age` **before** any mutation, then runs
-   `pnpm --filter @blog/db db:migrate` (`drizzle-kit migrate`) to apply only
+   `pnpm --filter @shinefold/db db:migrate` (`drizzle-kit migrate`) to apply only
    the un-applied schema migrations (tracked in drizzle-kit's own journal
    under `packages/db/migrations/meta`, idempotent). Reuses the **same**
    `production` Environment required-reviewer gate as every other prod job —
@@ -1359,15 +1359,15 @@ commit or redeploy a prior Vercel build.
 
 ---
 
-## Storybook — hosted `@blog/ui` design system (optional, not a deploy environment)
+## Storybook — hosted `@shinefold/ui` design system (optional, not a deploy environment)
 
 Unlike everything above, this is **not** part of the dev/prod pipeline — no
 Sanity project, no dataset, no CI-gated migration. It's a single Vercel
-project hosting `@blog/ui`'s Storybook build for visual PR review, and it
+project hosting `@shinefold/ui`'s Storybook build for visual PR review, and it
 deliberately uses Vercel's Git integration with PR previews **enabled** —
 the opposite of `web-dev`/`web-prod`/`platform-dev`/`platform-prod`, whose Git
 integration is disabled in favor of a CI-gated deploy. That's intentional:
-`@blog/ui` is pure and prop-driven (no `service`/Sanity import), so there's
+`@shinefold/ui` is pure and prop-driven (no `service`/Sanity import), so there's
 no content or credentials a pre-merge preview could leak — and the entire
 point of hosting Storybook is letting a reviewer see a component change
 _before_ it merges, which a post-merge-only deploy would defeat. See
@@ -1390,14 +1390,14 @@ integration stays **on** are human-gated console steps:
       deployment only — previews keep Vercel's own auto-generated URLs); add
       the DNS record it shows you at whatever registrar/DNS host manages
       `{your_hosting}`.
-- [ ] No env vars, no CORS, no tokens — `@blog/ui` never imports `service` or
+- [ ] No env vars, no CORS, no tokens — `@shinefold/ui` never imports `service` or
       touches Sanity, so nothing here needs the Sanity/Vercel credential
       dance the rest of this doc walks through.
 
 ### `apps/web`'s own Storybook (second, separate hosted project)
 
 Same idea, mirrored for `apps/web`'s own stories (#1573) — a broken story
-there needs the same pre-merge visual signal as `@blog/ui`, and the hosted
+there needs the same pre-merge visual signal as `@shinefold/ui`, and the hosted
 `packages/ui` project above only ever builds `packages/ui`'s Storybook (its
 Root Directory scopes it there), so nothing else covers `apps/web`'s.
 

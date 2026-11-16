@@ -1,6 +1,6 @@
-import { SUBSCRIBER_OUTCOME } from '@blog/config';
-import { queries } from '@blog/db';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
+import { SUBSCRIBER_OUTCOME } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
 import { NewsletterSubscriptionControl } from '@web/components/shared/newsletter-subscription-control';
 import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
 import { auth } from '@web/server/auth/auth';

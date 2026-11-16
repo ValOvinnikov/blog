@@ -1,4 +1,4 @@
-import { isUndefined } from '@blog/utils/primitives';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 type TSingleSelectOptions = {
   isLocked?: boolean;

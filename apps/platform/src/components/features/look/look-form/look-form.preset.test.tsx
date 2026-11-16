@@ -1,4 +1,3 @@
-import { HEADER_CONTROL_STYLE, RADIUS_SCALE } from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
@@ -21,6 +20,7 @@ import {
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { HEADER_CONTROL_STYLE, RADIUS_SCALE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

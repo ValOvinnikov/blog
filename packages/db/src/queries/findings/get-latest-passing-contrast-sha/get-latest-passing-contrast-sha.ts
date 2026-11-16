@@ -1,8 +1,8 @@
-import { FINDING_KIND, FINDING_SOURCE } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { contrastHasPassed } from '@blog/db/queries/findings/contrast-has-passed';
-import { findings } from '@blog/db/schema/findings';
+import { FINDING_KIND, FINDING_SOURCE } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { contrastHasPassed } from '@shinefold/db/queries/findings/contrast-has-passed';
+import { findings } from '@shinefold/db/schema/findings';
 import { and, desc, eq, sql } from 'drizzle-orm';
 
 export async function getLatestPassingContrastSha(): Promise<

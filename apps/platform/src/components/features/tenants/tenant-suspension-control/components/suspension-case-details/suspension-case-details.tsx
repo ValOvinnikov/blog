@@ -1,6 +1,6 @@
-import type { TOpenTenantSuspension } from '@blog/db/queries/tenant-suspensions';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { formatDate } from '@platform/utils/format-date/format-date';
+import type { TOpenTenantSuspension } from '@shinefold/db/queries/tenant-suspensions';
 import { useLocale, useTranslations } from 'next-intl';
 
 export type TSuspensionCaseDetailsProps = {

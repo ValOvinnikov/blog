@@ -2,13 +2,13 @@ import {
   ERROR_CODE,
   type TErrorCode,
   type TTenantPlan,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { type TTenantStatus } from '@blog/db/constants';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
-import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { type TTenantStatus } from '@shinefold/db/constants';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
+import { isValidDomain } from '@shinefold/db/utils/is-valid-domain/is-valid-domain';
+import { normalizeLocaleCode } from '@shinefold/db/utils/normalize-locale-code/normalize-locale-code';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 
 export type TCreateTenantInput = {
   name: string;

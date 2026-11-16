@@ -2,8 +2,8 @@ import {
   TOAST_TYPE,
   type TMaybeUndefined,
   type TToastType,
-} from '@blog/config';
-import { isString, isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/config';
+import { isString, isUndefined } from '@shinefold/utils/primitives';
 
 import {
   toPayloadFields,

@@ -1,6 +1,6 @@
-import type { IWithClassName } from '@blog/config/types';
-import { SHINEFOLD_LOGO } from '@blog/utils/shinefold-logo';
 import { LogoSvg } from '@platform/components/shared/logo-svg';
+import type { IWithClassName } from '@shinefold/config/types';
+import { SHINEFOLD_LOGO } from '@shinefold/utils/shinefold-logo';
 
 import {
   brandMarkVariants,

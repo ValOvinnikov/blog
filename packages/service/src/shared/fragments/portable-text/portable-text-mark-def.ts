@@ -1,6 +1,6 @@
-import type { CookiePreferencesLink, LinkRef } from '@blog/config';
-import { q } from '@blog/service/sanity/query/query';
-import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
+import type { CookiePreferencesLink, LinkRef } from '@shinefold/config';
+import { q } from '@shinefold/service/sanity/query/query';
+import { linkDocumentFragment } from '@shinefold/service/shared/fragments/link/link-document';
 
 export const portableTextMarkDefFragment = q
   .fragment<{ _key: string } & (LinkRef | CookiePreferencesLink)>()

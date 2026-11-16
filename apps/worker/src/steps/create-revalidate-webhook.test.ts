@@ -1,18 +1,19 @@
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
 import {
   getTenantRevalidateWebhookSecret,
   setTenantRevalidateWebhookSecret,
   setTenantWebhookCreatedAt,
-} from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   createSanityWebhook,
   listSanityWebhooks,
   type TListedSanityWebhook,
   updateSanityWebhookProjection,
   updateSanityWebhookSecret,
-} from '@blog/db/utils/sanity-management-client/sanity-webhooks';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
+import { REVALIDATE_WEBHOOK_CHANGE } from '@worker/constants/revalidate-webhook';
 import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
@@ -21,6 +22,7 @@ import {
 } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_ENCRYPTED_TOKEN,
+  MOCK_ENCRYPTED_WEBHOOK_SECRET,
   MOCK_SANITY_DATASET,
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
@@ -41,12 +43,11 @@ import {
 
 faker.seed(7003);
 
-vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-webhooks');
+vi.mock('@shinefold/db/queries/tenants');
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-webhooks');
 vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 const MOCK_STORED_TENANT_SECRET = faker.string.alphanumeric(32);
-const MOCK_ENCRYPTED_SECRET = faker.string.alphanumeric(32);
 const MOCK_OTHER_TENANT_ID = faker.string.uuid();
 const MOCK_OTHER_PROJECT_ID = faker.string.alphanumeric(8);
 const MOCK_SECOND_WEBHOOK_ID = faker.string.uuid();
@@ -168,7 +169,9 @@ describe(createTenantRevalidateWebhook, () => {
       });
 
       await createTenantRevalidateWebhook(
-        baseTenant({ revalidateWebhookSecretEncrypted: MOCK_ENCRYPTED_SECRET }),
+        baseTenant({
+          revalidateWebhookSecretEncrypted: MOCK_ENCRYPTED_WEBHOOK_SECRET,
+        }),
         MOCK_PROVISION_ENV,
       );
 
@@ -196,11 +199,12 @@ describe(createTenantRevalidateWebhook, () => {
     async ({ before }) => {
       givenHooksUntilCreated(before);
 
-      await createTenantRevalidateWebhook(
+      const change = await createTenantRevalidateWebhook(
         baseTenant({ webhookCreatedAt: MOCK_NOW }),
         MOCK_PROVISION_ENV,
       );
 
+      expect(change).toBe(REVALIDATE_WEBHOOK_CHANGE.UPDATED);
       expect(createSanityWebhook).toHaveBeenCalledTimes(1);
     },
   );
@@ -216,7 +220,7 @@ describe(createTenantRevalidateWebhook, () => {
 
   describe('when the hook exists and its secret is stored', () => {
     const rotatedTenant = {
-      revalidateWebhookSecretEncrypted: MOCK_ENCRYPTED_SECRET,
+      revalidateWebhookSecretEncrypted: MOCK_ENCRYPTED_WEBHOOK_SECRET,
     };
 
     beforeEach(() => {
@@ -224,11 +228,12 @@ describe(createTenantRevalidateWebhook, () => {
     });
 
     it('changes nothing once the marker is set', async () => {
-      await createTenantRevalidateWebhook(
+      const change = await createTenantRevalidateWebhook(
         baseTenant({ ...rotatedTenant, webhookCreatedAt: MOCK_NOW }),
         MOCK_PROVISION_ENV,
       );
 
+      expect(change).toBe(REVALIDATE_WEBHOOK_CHANGE.UNCHANGED);
       expect(createSanityWebhook).not.toHaveBeenCalled();
       expect(updateSanityWebhookSecret).not.toHaveBeenCalled();
       expect(updateSanityWebhookProjection).not.toHaveBeenCalled();
@@ -259,9 +264,9 @@ describe(createTenantRevalidateWebhook, () => {
     });
 
     it('updates that hook in place and creates no second one', async () => {
-      await createTenantRevalidateWebhook(
+      const change = await createTenantRevalidateWebhook(
         baseTenant({
-          revalidateWebhookSecretEncrypted: MOCK_ENCRYPTED_SECRET,
+          revalidateWebhookSecretEncrypted: MOCK_ENCRYPTED_WEBHOOK_SECRET,
           webhookCreatedAt: MOCK_NOW,
         }),
         MOCK_PROVISION_ENV,
@@ -276,6 +281,7 @@ describe(createTenantRevalidateWebhook, () => {
           },
         ],
       ]);
+      expect(change).toBe(REVALIDATE_WEBHOOK_CHANGE.UPDATED);
       expect(createSanityWebhook).not.toHaveBeenCalled();
       expect(updateSanityWebhookSecret).not.toHaveBeenCalled();
       expect(setTenantRevalidateWebhookSecret).not.toHaveBeenCalled();
@@ -299,11 +305,12 @@ describe(createTenantRevalidateWebhook, () => {
       MOCK_OTHER_WEBHOOK,
     ]);
 
-    await createTenantRevalidateWebhook(
+    const change = await createTenantRevalidateWebhook(
       baseTenant({ webhookCreatedAt: MOCK_NOW }),
       MOCK_PROVISION_ENV,
     );
 
+    expect(change).toBe(REVALIDATE_WEBHOOK_CHANGE.UPDATED);
     const updates = vi
       .mocked(updateSanityWebhookSecret)
       .mock.calls.map(([input]) => input);

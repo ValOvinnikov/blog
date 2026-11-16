@@ -1,14 +1,6 @@
 'use server';
 
 import {
-  ACTION_OUTCOME,
-  isOutcomeSuccess,
-  type TActionResult,
-  type TOutcome,
-} from '@blog/config';
-import { queries, TENANT_DETAILS_UPDATE_OUTCOME } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
-import {
   TENANT_FIELD_ERROR,
   TENANT_REFUSAL,
   TENANT_LOG,
@@ -29,6 +21,14 @@ import { env } from '@platform/utils/env/env';
 import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  isOutcomeSuccess,
+  type TActionResult,
+  type TOutcome,
+} from '@shinefold/config';
+import { queries, TENANT_DETAILS_UPDATE_OUTCOME } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 export type TUpdateTenantDetailsRefusal =
   | typeof TENANT_REFUSAL.NOT_FOUND

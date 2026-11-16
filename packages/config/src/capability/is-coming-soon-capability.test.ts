@@ -1,4 +1,7 @@
-import { CAPABILITY, COMING_SOON_CAPABILITIES } from '@blog/config/constants';
+import {
+  CAPABILITY,
+  COMING_SOON_CAPABILITIES,
+} from '@shinefold/config/constants';
 
 import { isComingSoonCapability } from './is-coming-soon-capability';
 

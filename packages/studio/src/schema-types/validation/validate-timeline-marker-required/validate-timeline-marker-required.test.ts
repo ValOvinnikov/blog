@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   LOCALE_ISO_CODES,
   TIMELINE_MARKER_STYLE,
   type TTimelineMarkerStyle,
-} from '@blog/config/constants';
-import { validateTimelineMarkerRequired } from '@blog/studio/schema-types/validation/validate-timeline-marker-required/validate-timeline-marker-required';
-import { mockLocalizedValue } from '@blog/studio/testing/mock-documents';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import { validateTimelineMarkerRequired } from '@shinefold/studio/schema-types/validation/validate-timeline-marker-required/validate-timeline-marker-required';
+import { mockLocalizedValue } from '@shinefold/studio/testing/mock-documents';
 import type { ValidationContext } from 'sanity';
 
 faker.seed(6025);

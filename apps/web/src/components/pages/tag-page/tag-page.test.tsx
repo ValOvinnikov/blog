@@ -1,7 +1,7 @@
-import { SITE_MESSAGES } from '@blog/config';
-import { service, type TTagDetailPage } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { SITE_MESSAGES } from '@shinefold/config';
+import { service, type TTagDetailPage } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import {
   customRenderServerAsync,
   screen,
@@ -33,7 +33,7 @@ vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: { tag: { v1: { getTagPage: vi.fn() } } },
     modules: {

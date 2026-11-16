@@ -1,4 +1,3 @@
-import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@platform/testing/custom-render';
 import {
@@ -6,6 +5,7 @@ import {
   mockValidationResult,
 } from '@platform/testing/features/tenants/findings-card/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { TENANT_PROVISIONING_STEP } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { FindingDetails } from './finding-details';

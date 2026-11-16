@@ -1,7 +1,10 @@
-import { FOOTER_ADDRESS_MAX, SENDER_NAME_MAX } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { emailConfig } from '@blog/db/schema/email-config';
-import { isUndefined } from '@blog/utils/primitives';
+import {
+  FOOTER_ADDRESS_MAX,
+  SENDER_NAME_MAX,
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { emailConfig } from '@shinefold/db/schema/email-config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { z } from 'zod';
 
 import {

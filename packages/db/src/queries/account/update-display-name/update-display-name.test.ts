@@ -1,14 +1,14 @@
-import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
-import * as schema from '@blog/db/schema';
-import { insertTestUser } from '@blog/db/testing/fixtures';
-import { decryptTestPersonalValue } from '@blog/db/testing/personal-data';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
+import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
+import * as schema from '@shinefold/db/schema';
+import { insertTestUser } from '@shinefold/db/testing/fixtures';
+import { decryptTestPersonalValue } from '@shinefold/db/testing/personal-data';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
 import { updateDisplayName } from './update-display-name';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(602204);
 

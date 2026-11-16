@@ -1,7 +1,10 @@
-import { CAPABILITY, SANITY_WEBHOOK_OPERATION } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { queries } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  CAPABILITY,
+  SANITY_WEBHOOK_OPERATION,
+} from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { queries } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   REVALIDATE_LOG,
   STARTER_DOCUMENT_ID_PREFIX,

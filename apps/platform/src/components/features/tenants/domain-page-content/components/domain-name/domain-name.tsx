@@ -1,5 +1,5 @@
-import type { IWithChildren } from '@blog/config/react';
 import { tv } from '@platform/utils/tv/tv';
+import type { IWithChildren } from '@shinefold/config/react';
 import type { ReactNode } from 'react';
 
 const domainNameVariants = tv({

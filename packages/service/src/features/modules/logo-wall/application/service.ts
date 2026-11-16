@@ -1,6 +1,6 @@
-import { getLogoWallModule } from '@blog/service/features/modules/logo-wall/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getLogoWallModule } from '@shinefold/service/features/modules/logo-wall/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createLogoWallModuleService() {
   return {

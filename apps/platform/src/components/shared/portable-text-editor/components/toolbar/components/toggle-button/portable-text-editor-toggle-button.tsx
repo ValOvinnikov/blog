@@ -1,11 +1,11 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { Toolbar } from '@base-ui/react/toolbar';
-import { SIZE } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import type { TRegisteredIconName } from '@platform/components/shared/icon';
 import { PortableTextEditorToolbarGlyph } from '@platform/components/shared/portable-text-editor/components/toolbar/components/glyph/portable-text-editor-toolbar-glyph';
 import type { TPortableTextEditorSize } from '@platform/components/shared/portable-text-editor/portable-text-editor-variants';
 import { Tooltip } from '@platform/components/shared/tooltip';
+import { SIZE } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 import { portableTextEditorToggleButtonVariants } from './portable-text-editor-toggle-button-variants';
 

@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { LEAD_LOG, LEAD_REFUSAL } from '@platform/constants/lead';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -13,6 +11,8 @@ import {
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 
 import { deleteLeadAction } from './delete-lead-action';
 
@@ -22,7 +22,7 @@ const { deleteLeadMock } = vi.hoisted(() => ({ deleteLeadMock: vi.fn() }));
 
 vi.mock('@platform/server/auth/require-tenant-membership');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { leads: { deleteLead: deleteLeadMock } },
 }));
 

@@ -1,8 +1,8 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_TENANT_DATASET,
   MOCK_TENANT_PROJECT_ID,
-} from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/tenant';
 
 import { getSanityImageBaseUrl } from './image-base-url';
 

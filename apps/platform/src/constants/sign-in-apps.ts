@@ -1,7 +1,10 @@
-import { ICONS } from '@blog/config';
-import { OAUTH_PROVIDER, type TOAuthProvider } from '@blog/config/constants';
-import type { TValueOf } from '@blog/config/utils';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { ICONS } from '@shinefold/config';
+import {
+  OAUTH_PROVIDER,
+  type TOAuthProvider,
+} from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const SIGN_IN_APP_FIELD_ERROR = {
   REQUIRED: 'REQUIRED',

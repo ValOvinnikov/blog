@@ -1,4 +1,5 @@
-import { MagicLinkSendLimitedError } from '@blog/auth/providers/magic-link/magic-link-send-limited-error/magic-link-send-limited-error';
+import { faker } from '@faker-js/faker';
+import { MagicLinkSendLimitedError } from '@shinefold/auth/providers/magic-link/magic-link-send-limited-error/magic-link-send-limited-error';
 import {
   MOCK_COMMA_NAME,
   MOCK_DB_ERROR_MESSAGE,
@@ -20,8 +21,8 @@ import {
   mockEmailTemplate,
   mockPendingInvite,
   mockTenant,
-} from '@blog/auth/testing/magic-link-fixtures';
-import { resolveTenantEmailBrand } from '@blog/config';
+} from '@shinefold/auth/testing/magic-link-fixtures';
+import { resolveTenantEmailBrand } from '@shinefold/config';
 import {
   AUTH_APP,
   EMAIL_ACCOUNT,
@@ -31,18 +32,17 @@ import {
   LOCALE_ISO_CODES,
   MAGIC_LINK_REFUSAL,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   EMAIL_TEMPLATE_DEFAULT_COPY,
   EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   buildSiteEmailTag,
   escapeHtml,
   PLATFORM_EMAIL_BRAND_NAME,
   type TSendEmailInput,
-} from '@blog/email';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/email';
 
 import {
   buildMagicLinkProvider,
@@ -141,22 +141,25 @@ const {
 }));
 
 vi.mock(
-  '@blog/auth/providers/magic-link/find-magic-link-send-refusal/find-magic-link-send-refusal',
+  '@shinefold/auth/providers/magic-link/find-magic-link-send-refusal/find-magic-link-send-refusal',
   () => ({ findMagicLinkSendRefusal: findMagicLinkSendRefusalMock }),
 );
 
-vi.mock('@blog/auth/utils/with-minimum-duration/with-minimum-duration', () => ({
-  withMinimumDuration: withMinimumDurationMock,
-}));
+vi.mock(
+  '@shinefold/auth/utils/with-minimum-duration/with-minimum-duration',
+  () => ({
+    withMinimumDuration: withMinimumDurationMock,
+  }),
+);
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   queries: {
     membershipInvites: {
       findPendingInviteByEmail: findPendingInviteByEmailMock,
     },
     tenants: {
       ...(await vi.importActual(
-        '@blog/db/queries/tenants/get-tenant-live-locales',
+        '@shinefold/db/queries/tenants/get-tenant-live-locales',
       )),
       listTenantsByIds: listTenantsByIdsMock,
     },
@@ -168,7 +171,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock(import('@blog/email'), async (importOriginal) => ({
+vi.mock(import('@shinefold/email'), async (importOriginal) => ({
   ...(await importOriginal()),
   sendEmail: sendEmailMock,
 }));

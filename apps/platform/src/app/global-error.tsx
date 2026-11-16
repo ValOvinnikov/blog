@@ -2,13 +2,13 @@
 
 import '../../index.css';
 
-import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES } from '@blog/config';
-import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { DeadEndView } from '@platform/components/features/layout/dead-end-view';
 import { Button } from '@platform/components/shared/button';
 import { inter } from '@platform/config/font-loaders/inter-font';
 import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES } from '@shinefold/config';
+import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 import { NextIntlClientProvider } from 'next-intl';
 
 const globalErrorCopy = {

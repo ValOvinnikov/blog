@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import { subscribers } from '@blog/db/schema/subscribers';
-import { decryptPersonalValueOrUndefined } from '@blog/db/utils/personal-data/personal-data';
-import { isUndefined } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import { subscribers } from '@shinefold/db/schema/subscribers';
+import { decryptPersonalValueOrUndefined } from '@shinefold/db/utils/personal-data/personal-data';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { and, asc, eq, gt } from 'drizzle-orm';
 
 export interface IActiveSubscriber {

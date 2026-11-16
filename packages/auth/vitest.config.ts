@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 
-import preset from '@blog/vitest-config/preset';
+import preset from '@shinefold/vitest-config/preset';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 const src = fileURLToPath(new URL('./src', import.meta.url));
@@ -19,7 +19,7 @@ export default mergeConfig(
         // env.ts validates at import time; SKIP_ENV_VALIDATION lets tests
         // import config/env modules without real Auth.js credentials set.
         SKIP_ENV_VALIDATION: 'true',
-        // `buildAuthConfig` constructs `@blog/db`'s adapter eagerly (its
+        // `buildAuthConfig` constructs `@shinefold/db`'s adapter eagerly (its
         // `getDb()` call, not the network connection), which needs a
         // syntactically valid connection string even under
         // SKIP_ENV_VALIDATION — the Neon driver parses this itself.
@@ -28,11 +28,11 @@ export default mergeConfig(
     },
     resolve: {
       alias: [
-        { find: /^@blog\/auth\//, replacement: `${src}/` },
-        { find: /^@blog\/db\//, replacement: `${dbSrc}/` },
-        { find: /^@blog\/config\//, replacement: `${configSrc}/` },
-        { find: /^@blog\/email\//, replacement: `${emailSrc}/` },
-        { find: /^@blog\/utils\//, replacement: `${utilsSrc}/` },
+        { find: /^@shinefold\/auth\//, replacement: `${src}/` },
+        { find: /^@shinefold\/db\//, replacement: `${dbSrc}/` },
+        { find: /^@shinefold\/config\//, replacement: `${configSrc}/` },
+        { find: /^@shinefold\/email\//, replacement: `${emailSrc}/` },
+        { find: /^@shinefold\/utils\//, replacement: `${utilsSrc}/` },
       ],
     },
   }),

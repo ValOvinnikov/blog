@@ -1,6 +1,7 @@
-import { service } from '@blog/service';
+import { service } from '@shinefold/service';
 import { FAQ_LOG } from '@web/constants/faq';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getModuleSection } from '@web/server/site-config/get-module-section/get-module-section';
 import { logger } from '@web/utils/logger/logger';
 
 import { FaqModuleView } from './faq-module-view';
@@ -10,7 +11,7 @@ export interface IFaqModuleProps {
 }
 
 export const FaqModule = async ({ id }: IFaqModuleProps) => {
-  const { sanityContext } = await getRequestContext();
+  const { sanityContext, tenantId } = await getRequestContext();
   const result = await service.modules.faq.v1.getFaqModule(id, sanityContext);
 
   if (!result.ok) {
@@ -18,9 +19,12 @@ export const FaqModule = async ({ id }: IFaqModuleProps) => {
     return null;
   }
 
+  const { section, content } = await getModuleSection(tenantId, result.data);
+
   return (
     <FaqModuleView
-      module={result.data}
+      {...content}
+      section={section}
       titleId={`faq-${id}`}
       dataTestId={`faq-module-${id}`}
     />

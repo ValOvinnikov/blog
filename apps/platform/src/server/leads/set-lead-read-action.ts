@@ -1,8 +1,5 @@
 'use server';
 
-import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
 import {
   LEAD_LOG,
   LEAD_REFUSAL,
@@ -11,6 +8,9 @@ import {
 import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { ACTION_OUTCOME, type TActionResult } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
 const setLeadReadInputSchema = z.object({

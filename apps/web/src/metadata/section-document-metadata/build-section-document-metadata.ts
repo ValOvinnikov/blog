@@ -1,5 +1,5 @@
-import { routes } from '@blog/config';
-import type { TSectionDocumentType } from '@blog/service';
+import { routes } from '@shinefold/config';
+import type { TSectionDocumentType } from '@shinefold/service';
 import { SECTION_DOCUMENT_LOG } from '@web/constants/section-document';
 import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getSectionDocumentPage } from '@web/server/section-document/get-section-document-page/get-section-document-page';

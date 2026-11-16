@@ -1,11 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  EMAIL_TEMPLATE_TYPE,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import {
@@ -23,11 +15,19 @@ import {
 } from '@platform/testing/email/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  EMAIL_TEMPLATE_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { del } from '@vercel/blob';
 
 import { clearEmailLogoAction } from './clear-email-logo-action';
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     emailConfig: { getEmailConfig: vi.fn(), upsertEmailConfig: vi.fn() },
     emailTemplates: {

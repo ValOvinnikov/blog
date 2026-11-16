@@ -1,4 +1,3 @@
-import { HTTP_STATUS } from '@blog/config/constants';
 import {
   BILLING_LOG,
   STRIPE_SIGNATURE_HEADER,
@@ -8,6 +7,7 @@ import { getStripeClient } from '@platform/server/billing/stripe-client';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { stripeEnv } from '@platform/utils/stripe-env/stripe-env';
+import { HTTP_STATUS } from '@shinefold/config/constants';
 import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 

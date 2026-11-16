@@ -3,20 +3,20 @@ import {
   INACTIVITY_STAGE_DAY,
   SUSPENSION_REASON,
   TENANT_STATUS,
-} from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   daysAfterLastActivity,
   MOCK_LAST_ACTIVITY_AT,
-} from '@blog/db/testing/tenants/inactivity';
+} from '@shinefold/db/testing/tenants/inactivity';
 
 import { stampTenantInactivityStage } from './stamp-tenant-inactivity-stage';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock();

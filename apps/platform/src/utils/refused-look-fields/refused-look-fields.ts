@@ -1,9 +1,9 @@
-import type { TTenantPlan } from '@blog/config/constants';
+import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import type { TTenantPlan } from '@shinefold/config/constants';
 import {
   isLookFieldEntitled,
   toEffectiveLook,
-} from '@blog/db/utils/effective-look/effective-look';
-import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+} from '@shinefold/db/utils/effective-look/effective-look';
 
 export type TLookChoices = Omit<TLookFormValues, 'logo' | 'favicon'>;
 

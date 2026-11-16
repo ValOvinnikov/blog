@@ -1,12 +1,12 @@
-import { getPost } from '@blog/service/features/pages/post/adaptor/detail-page/loader';
-import type { TPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/types';
-import { MOCK_MISSING_ID } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
+import { getPost } from '@shinefold/service/features/pages/post/adaptor/detail-page/loader';
+import type { TPostDetail } from '@shinefold/service/features/pages/post/adaptor/detail-page/types';
+import { MOCK_MISSING_ID } from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { createPostService } from './service';
 
-vi.mock('@blog/service/features/pages/post/adaptor/detail-page/loader');
+vi.mock('@shinefold/service/features/pages/post/adaptor/detail-page/loader');
 
 faker.seed(6019);
 

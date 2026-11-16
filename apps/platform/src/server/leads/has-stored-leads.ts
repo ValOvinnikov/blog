@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { queries } from '@blog/db';
+import { queries } from '@shinefold/db';
 import { cache } from 'react';
 
 export const hasStoredLeads = cache(

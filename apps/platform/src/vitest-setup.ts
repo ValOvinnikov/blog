@@ -1,12 +1,12 @@
 import { format } from 'node:util';
 
+import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import {
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
   type TMaybeUndefined,
-} from '@blog/config';
-import { hasLength, isString } from '@blog/utils/primitives';
-import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
+} from '@shinefold/config';
+import { hasLength, isString } from '@shinefold/utils/primitives';
 import { createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
@@ -52,7 +52,7 @@ vi.mock('next-intl/server', () => ({
 // createNavigation reads permanentRedirect at import, so it must exist.
 vi.mock('next/navigation', async () => {
   const { createRouterStub } = await import('@platform/testing/router-stub');
-  const { NEXT_NAVIGATION_ERROR } = await import('@blog/config');
+  const { NEXT_NAVIGATION_ERROR } = await import('@shinefold/config');
 
   return {
     redirect: vi.fn(() => {

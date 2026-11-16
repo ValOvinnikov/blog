@@ -1,3 +1,3 @@
-import config from '@blog/eslint-config/web';
+import config from '@shinefold/eslint-config/web';
 
 export default [{ ignores: ['next-env.d.ts'] }, ...config];

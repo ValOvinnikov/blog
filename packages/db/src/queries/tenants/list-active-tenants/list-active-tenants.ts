@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import { WRITABLE_TENANT_STATUSES } from '@blog/db/constants';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { getDb } from '@shinefold/db/client';
+import { WRITABLE_TENANT_STATUSES } from '@shinefold/db/constants';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import { and, inArray, isNull } from 'drizzle-orm';
 
 export async function listActiveTenants(): Promise<TTenant[]> {

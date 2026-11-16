@@ -1,7 +1,7 @@
-import { routes } from '@blog/config';
-import type { TSectionPagesModule } from '@blog/service';
-import { MediaCard } from '@blog/ui/components/molecules/media-card';
-import { CardGrid } from '@blog/ui/components/organisms/card-grid';
+import { routes } from '@shinefold/config';
+import type { TSectionPagesModule } from '@shinefold/service';
+import { MediaCard } from '@shinefold/ui/components/molecules/media-card';
+import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';

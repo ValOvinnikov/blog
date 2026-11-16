@@ -1,5 +1,5 @@
-import type { TTaxonomyKind } from '@blog/config';
-import type { TModule } from '@blog/service';
+import type { TTaxonomyKind } from '@shinefold/config';
+import type { TModule } from '@shinefold/service';
 import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
 import { ModuleGate } from '@web/modules/module-gate/module-gate';
 import { isModuleEntitled } from '@web/server/settings-features/is-module-entitled/is-module-entitled';

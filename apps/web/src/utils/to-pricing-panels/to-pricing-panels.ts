@@ -1,7 +1,7 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TStripePrice } from '@blog/db/queries/stripe-catalogue/list-stripe-prices';
-import type { TPricingPrice, TPricingTier } from '@blog/service';
-import { isUndefined } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TStripePrice } from '@shinefold/db/queries/stripe-catalogue/list-stripe-prices';
+import type { TPricingPrice, TPricingTier } from '@shinefold/service';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { formatPriceAmount } from '@web/utils/format-price-amount';
 import { toLivePlanPrice } from '@web/utils/to-live-plan-price';
 

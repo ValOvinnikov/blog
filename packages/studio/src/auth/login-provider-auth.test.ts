@@ -1,8 +1,8 @@
+import { faker } from '@faker-js/faker';
 import {
   SANITY_LOGIN_PROVIDER,
   type TSanityLoginProvider,
-} from '@blog/config/constants';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
 import type { AuthProvider } from 'sanity';
 
 import { buildLoginProviderAuth } from './login-provider-auth';

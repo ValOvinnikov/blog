@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const SIGN_IN_ERROR = {
   ACCOUNT_NOT_LINKED: 'ACCOUNT_NOT_LINKED',

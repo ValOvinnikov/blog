@@ -1,7 +1,7 @@
-import { testControlActions } from '@blog/ui/testing/control-actions-contract';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
-import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
+import { testControlActions } from '@shinefold/ui/testing/control-actions-contract';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@shinefold/ui/testing/mock-link';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 

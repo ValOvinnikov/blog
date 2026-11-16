@@ -1,16 +1,3 @@
-import {
-  type TMaybeNull,
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  LOCALE_ISO_CODES,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import {
-  TENANT_DETAILS_UPDATE_OUTCOME,
-  TENANT_PROVISIONING_STEP,
-} from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { OWNER_INVITE_RESEND_PATH } from '@platform/constants/owner-access';
 import {
@@ -46,6 +33,19 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { MOCK_UNSUPPORTED_LOCALE } from '@platform/testing/tenants/unsupported-locale';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  type TMaybeNull,
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import {
+  TENANT_DETAILS_UPDATE_OUTCOME,
+  TENANT_PROVISIONING_STEP,
+} from '@shinefold/db/constants';
 import type { Session } from 'next-auth';
 
 import { updateTenantDetailsAction } from './update-tenant-details-action';
@@ -95,7 +95,7 @@ vi.mock('next/server', () => ({
   after: (task: () => unknown) => task(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     tenants: {

@@ -1,10 +1,10 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { isr } from '@blog/service/sanity/query/isr';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { isr } from '@shinefold/service/sanity/query/isr';
 import {
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query/query';
-import type { TPageQueryPageParams } from '@blog/service/shared/types/page/page-query-page-params';
+} from '@shinefold/service/sanity/query/query';
+import type { TPageQueryPageParams } from '@shinefold/service/shared/types/page/page-query-page-params';
 
 import { tagParamsQuery } from './query';
 

@@ -1,6 +1,6 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { isUndefined } from '@blog/utils/primitives';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { EMAIL_USAGE_LOG } from '@web/constants/email-usage';
 import {
   isDeliveryOutcomeEvent,

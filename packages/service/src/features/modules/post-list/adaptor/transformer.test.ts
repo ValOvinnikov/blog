@@ -3,15 +3,15 @@ import {
   CARD_STYLE,
   CONTENT_ALIGNMENT,
   GRID_COLUMNS,
-} from '@blog/config/constants';
-import { MOCK_RECENT_POSTS_HEADING } from '@blog/service/testing/modules/fixtures';
-import { mockRawPostListModule } from '@blog/service/testing/modules/post-list/fixtures';
-import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/config/constants';
+import { MOCK_RECENT_POSTS_HEADING } from '@shinefold/service/testing/modules/fixtures';
+import { mockRawPostListModule } from '@shinefold/service/testing/modules/post-list/fixtures';
+import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_POST_ID,
   mockRawHeadingBlock,
   mockRawWideLayout,
-} from '@blog/service/testing/shared/fixtures';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toPostListModule, type TRawPostListModulePosts } from './transformer';
 

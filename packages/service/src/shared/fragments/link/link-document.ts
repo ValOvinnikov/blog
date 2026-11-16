@@ -1,8 +1,8 @@
-import { q } from '@blog/service/sanity/query/query';
-import { PAGE_PATH_EXPRESSION } from '@blog/service/shared/expressions/landing-page/landing-page-path';
-import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
-import { translatedReference } from '@blog/service/shared/localization/translated-reference/translated-reference';
+import { q } from '@shinefold/service/sanity/query/query';
+import { PAGE_PATH_EXPRESSION } from '@shinefold/service/shared/expressions/landing-page/landing-page-path';
+import { getLocalizedField } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
+import { translatedReference } from '@shinefold/service/shared/localization/translated-reference/translated-reference';
 
 const localeQ = q.parameters<TLocaleQueryParams>();
 

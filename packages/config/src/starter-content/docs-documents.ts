@@ -1,10 +1,10 @@
-import type { Module_heroStatement } from '@blog/config/sanity/generated/types';
+import type { Module_heroStatement } from '@shinefold/config/sanity/generated/types';
 
 import {
   BRAND_VARIANT,
   HERO_VARIANT,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import { buildBaseDocuments } from './base-documents';
 import type { TStarterCopy } from './copy/starter-copy';

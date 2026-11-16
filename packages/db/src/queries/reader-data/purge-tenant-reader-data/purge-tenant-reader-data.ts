@@ -1,19 +1,19 @@
 import {
   countBookmarksForTenant,
   deleteBookmarksForTenant,
-} from '@blog/db/queries/bookmarks';
+} from '@shinefold/db/queries/bookmarks';
 import {
   countLeadsForTenant,
   deleteLeadsForTenant,
-} from '@blog/db/queries/leads';
+} from '@shinefold/db/queries/leads';
 import {
   countMembershipInvitesForTenant,
   deleteMembershipInvitesForTenant,
-} from '@blog/db/queries/membership-invites';
+} from '@shinefold/db/queries/membership-invites';
 import {
   countSubscribersForTenant,
   deleteSubscribersForTenant,
-} from '@blog/db/queries/subscribers';
+} from '@shinefold/db/queries/subscribers';
 
 export type TTenantReaderDataCounts = {
   subscribers: number;

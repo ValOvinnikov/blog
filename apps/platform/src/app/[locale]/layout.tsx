@@ -1,6 +1,5 @@
 import '../../../index.css';
 
-import { LOCALE_BCP47_TAGS } from '@blog/config';
 import { OutOfDatePageDialog } from '@platform/components/features/layout/out-of-date-page-dialog';
 import { inter } from '@platform/config/font-loaders/inter-font';
 import { jetbrainsMono } from '@platform/config/font-loaders/jetbrains-mono-font';
@@ -10,6 +9,7 @@ import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provid
 import { routing } from '@platform/i18n/routing';
 import { resolveThemeColorScheme } from '@platform/server/layout/resolve-theme-color-scheme';
 import { rootPageMetadata } from '@platform/server/page-metadata/page-metadata';
+import { LOCALE_BCP47_TAGS } from '@shinefold/config';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';

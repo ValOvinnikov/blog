@@ -1,10 +1,10 @@
 'use client';
 
-import { routes } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { Text } from '@blog/ui/components/atoms/text';
-import { LinkButton } from '@blog/ui/components/molecules/link-button';
+import { routes } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { Text } from '@shinefold/ui/components/atoms/text';
+import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
 import { errorPageLayoutVariants } from '@web/components/shared/error-page-layout';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { VoiceRichText } from '@web/components/shared/voice-rich-text';

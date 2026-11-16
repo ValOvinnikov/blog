@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { AddressStepFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/address-step-fields';
 import { ReviewStep } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/review-step';
 import { SiteDetailsFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/site-details-fields';
@@ -6,6 +5,7 @@ import { SiteLookFields } from '@platform/components/features/onboarding/onboard
 import type { useOnboardingWizard } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-onboarding-wizard';
 import { ONBOARDING_STEP } from '@platform/constants/onboarding';
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 export type TOnboardingStepFieldsProps = Pick<
   ReturnType<typeof useOnboardingWizard>,

@@ -1,8 +1,8 @@
 import {
   MOCK_ESCAPED_UNSAFE_MARKUP,
   MOCK_UNSAFE_MARKUP,
-} from '@blog/email/testing/email-fixtures';
-import { MOCK_EMAIL_DETAILS } from '@blog/email/testing/owner-email';
+} from '@shinefold/email/testing/email-fixtures';
+import { MOCK_EMAIL_DETAILS } from '@shinefold/email/testing/owner-email';
 
 import { detailsAsPlainText, renderEmailDetails } from './email-details';
 

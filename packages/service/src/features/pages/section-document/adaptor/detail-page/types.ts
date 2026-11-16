@@ -3,11 +3,11 @@ import type {
   THeadingBlock,
   TLegalPageKind,
   TMaybeUndefined,
-} from '@blog/config';
-import type { TPageTranslation } from '@blog/service/shared/localization/page-translations/to-page-translations';
-import type { TPortableTextBody } from '@blog/service/shared/transformers/portable-text/to-portable-text-body';
-import type { TSeoResolved } from '@blog/service/shared/transformers/seo/resolve-seo';
-import type { TSectionDocumentType } from '@blog/service/shared/types/page/section-document-type';
+} from '@shinefold/config';
+import type { TPageTranslation } from '@shinefold/service/shared/localization/page-translations/to-page-translations';
+import type { TPortableTextBody } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-body';
+import type { TSeoResolved } from '@shinefold/service/shared/transformers/seo/resolve-seo';
+import type { TSectionDocumentType } from '@shinefold/service/shared/types/page/section-document-type';
 
 export type TSectionDocumentDetail = {
   id: string;

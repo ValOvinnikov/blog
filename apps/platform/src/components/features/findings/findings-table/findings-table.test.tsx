@@ -1,5 +1,3 @@
-import { FINDING_KIND, FINDING_SOURCE } from '@blog/config/constants';
-import { mockContrastResult } from '@blog/db/testing/findings/fixtures';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
@@ -15,6 +13,8 @@ import {
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { FINDING_KIND, FINDING_SOURCE } from '@shinefold/config/constants';
+import { mockContrastResult } from '@shinefold/db/testing/findings/fixtures';
 
 import { FindingsTable } from './findings-table';
 

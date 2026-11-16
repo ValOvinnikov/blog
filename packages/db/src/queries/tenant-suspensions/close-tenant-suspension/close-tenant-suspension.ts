@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { getDb } from '@blog/db/client';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { getDb } from '@shinefold/db/client';
 import {
   tenantSuspensions,
   type TTenantSuspension,
-} from '@blog/db/schema/tenant-suspensions';
+} from '@shinefold/db/schema/tenant-suspensions';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export async function closeTenantSuspension(

@@ -1,5 +1,5 @@
-import { SIZE, SOCIAL_PLATFORM_ICON } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
+import { SIZE, SOCIAL_PLATFORM_ICON } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { PostShare } from '@web/components/shared/post-share';
 import { buildShareLinks } from '@web/utils/build-share-links';
 

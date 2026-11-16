@@ -1,11 +1,11 @@
 'use client';
 
-import { ALERT_TYPE } from '@blog/config';
 import { useVerifyCustomDomain } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-claim-actions/use-verify-custom-domain';
 import { RemoveCustomDomainControl } from '@platform/components/features/tenants/domain-page-content/components/remove-custom-domain-control/remove-custom-domain-control';
 import { VerifyCustomDomainButton } from '@platform/components/features/tenants/domain-page-content/components/verify-custom-domain-button/verify-custom-domain-button';
 import { Alert } from '@platform/components/shared/alert';
 import { CUSTOM_DOMAIN_REFUSAL_KEYS } from '@platform/utils/custom-domain-keys/custom-domain-keys';
+import { ALERT_TYPE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { customDomainClaimActionsVariants } from './custom-domain-claim-actions-variants';

@@ -1,6 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import {
   DOCUMENT_NOT_FOUND_REASON,
   FETCH_FAILED_REASON,
@@ -41,7 +41,7 @@ vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales', () => ({
   resolveTenantLiveLocales: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     entities: {
       posts: {

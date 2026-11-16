@@ -1,8 +1,8 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   settingsFeatures,
   type TSettingsFeatures,
-} from '@blog/db/schema/settings-features';
+} from '@shinefold/db/schema/settings-features';
 import { eq } from 'drizzle-orm';
 
 export type TSettingsFeaturesResult = TSettingsFeatures;

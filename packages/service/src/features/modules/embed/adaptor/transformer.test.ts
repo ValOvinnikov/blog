@@ -1,12 +1,16 @@
-import { CONTENT_ALIGNMENT, EMBED_PROVIDER, MEDIA_RATIO } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import {
+  CONTENT_ALIGNMENT,
+  EMBED_PROVIDER,
+  MEDIA_RATIO,
+} from '@shinefold/config';
 import {
   MOCK_EMBED_TITLE,
   MOCK_UNPARSABLE_EMBED_URL,
   MOCK_VIMEO_ID,
   mockRawEmbed,
   mockRawEmbedModule,
-} from '@blog/service/testing/modules/embed/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/modules/embed/fixtures';
 
 import { toEmbedModule } from './transformer';
 

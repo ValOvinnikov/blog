@@ -51,7 +51,7 @@ const config: StorybookConfig = {
     config.resolve.alias = [
       ...(Array.isArray(config.resolve.alias) ? config.resolve.alias : []),
       {
-        find: /^@blog\/ui\/(.+)/,
+        find: /^@shinefold\/ui\/(.+)/,
         replacement: `${srcDir}/$1`,
       },
     ];

@@ -1,5 +1,5 @@
-import { MOCK_NOW } from '@blog/email/testing/email-fixtures';
 import { faker } from '@faker-js/faker';
+import { MOCK_NOW } from '@shinefold/email/testing/email-fixtures';
 
 import { buildSelfServeLimitAlertEmail } from './self-serve-limit-alert';
 

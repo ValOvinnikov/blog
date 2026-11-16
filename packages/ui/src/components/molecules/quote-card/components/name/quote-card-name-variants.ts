@@ -1,5 +1,5 @@
-import { BRAND_VARIANT } from '@blog/config';
-import { LINK_UNDERLINE, tv } from '@blog/ui/lib/styling';
+import { BRAND_VARIANT } from '@shinefold/config';
+import { LINK_UNDERLINE, tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const quoteCardNameVariants = tv({

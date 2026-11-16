@@ -1,6 +1,6 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { service } from '@blog/service';
-import { isUndefined } from '@blog/utils/primitives';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { service } from '@shinefold/service';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { INTERNAL_PAGES_LOG } from '@web/constants/internal-pages';
 import { isLiveLocale } from '@web/server/internal-pages/is-live-locale/is-live-locale';
 import {

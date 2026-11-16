@@ -1,10 +1,14 @@
-import { BRAND_VARIANT } from '@blog/config';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { QUOTE_CARD_CAPTION_TEST_ID } from '@blog/ui/constants/quote-card';
-import { customRender, screen, within } from '@blog/ui/testing/custom-render';
-import { MOCK_PERSON_NAME } from '@blog/ui/testing/fixtures';
-import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT } from '@shinefold/config';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { QUOTE_CARD_CAPTION_TEST_ID } from '@shinefold/ui/constants/quote-card';
+import {
+  customRender,
+  screen,
+  within,
+} from '@shinefold/ui/testing/custom-render';
+import { MOCK_PERSON_NAME } from '@shinefold/ui/testing/fixtures';
+import { MOCK_LINK_TEST_ID, MockLink } from '@shinefold/ui/testing/mock-link';
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
 
 import { QuoteCard } from './quote-card';

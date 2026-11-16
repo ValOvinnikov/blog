@@ -1,5 +1,5 @@
-import type { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
-import { q } from '@blog/service/sanity/query/query';
+import type { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
+import { q } from '@shinefold/service/sanity/query/query';
 
 export const sanityImageAssetFragment = q
   .fragmentForType<'sanity.imageAsset'>()

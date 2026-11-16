@@ -1,4 +1,4 @@
-import { AUTH_APP, type TAuthApp } from '@blog/config/constants';
+import { AUTH_APP, type TAuthApp } from '@shinefold/config/constants';
 import type { NextAuthConfig } from 'next-auth';
 
 type TAppCookies = Record<

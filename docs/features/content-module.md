@@ -41,7 +41,7 @@ A section of written content placed between a page's other modules: headings, pa
 - `body` is projected `.notNull()`: a document with no body in either the request or the default language fails the query, so the module renders nothing and `content_module.fetch_failed` is logged; the page still renders.
 - No `headingBlock`, no `contentAlignment` and no `ctaButtons`: the body supplies its own headings and links. Because there is no module heading, the `Section` landmark gets no `aria-labelledby`.
 - Body text is left-aligned in a column capped at the text measure (`ContentModule`'s body slot) and centred in the container; each block is also capped at the measure, except a `bodyImage` laid out `FULL_BLEED`, which skips the per-block cap but still stays within the measure-wide column. Blocks are spaced `mt-6` apart.
-- Rendering goes through the shared `PortableText` component inside `@blog/ui`'s `Prose`, so headings, links, images, code blocks and asides look the same as in a post body.
+- Rendering goes through the shared `PortableText` component inside `@shinefold/ui`'s `Prose`, so headings, links, images, code blocks and asides look the same as in a post body.
 - Posts deliberately do not allow `module_content`, so a post never has two places for its article prose.
 
 ## Dependencies

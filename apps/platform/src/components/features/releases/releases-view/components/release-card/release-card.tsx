@@ -1,6 +1,5 @@
 'use client';
 
-import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
 import { Text } from '@platform/components/shared/text';
@@ -12,6 +11,7 @@ import { useToast } from '@platform/context/toast-provider';
 import type { TReleaseRun } from '@platform/server/releases/get-release-run';
 import type { TReleaseResult } from '@platform/server/releases/release-result';
 import type { TReleaseMigrationSummary } from '@platform/server/releases/summarise-release-migrations';
+import { ALERT_TYPE, type TMaybeUndefined } from '@shinefold/config';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 

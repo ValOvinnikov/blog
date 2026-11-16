@@ -3,7 +3,7 @@ import {
   MOCK_TAG_SLUG,
   MOCK_TAG_TITLE,
   mockRawTag,
-} from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
 
 import { toTag } from './to-tag';
 

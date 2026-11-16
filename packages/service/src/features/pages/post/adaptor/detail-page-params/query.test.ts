@@ -1,6 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 
 import { postParamsQuery } from './query';
 

@@ -1,8 +1,8 @@
-import { errorResult, okResult } from '@blog/utils';
 import { RELEASE_FAILURE } from '@platform/constants/release';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockFailedMigrationTenant } from '@platform/testing/releases/fixtures';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import { TenantMigrationsCard } from './tenant-migrations-card';
 

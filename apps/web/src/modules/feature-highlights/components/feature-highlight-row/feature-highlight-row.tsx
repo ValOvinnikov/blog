@@ -1,8 +1,8 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { TFeatureHighlightItem } from '@blog/service';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { MediaFrame } from '@blog/ui/components/atoms/media-frame';
-import { Prose } from '@blog/ui/components/atoms/prose';
+import type { IWithDataTestId } from '@shinefold/config';
+import type { TFeatureHighlightItem } from '@shinefold/service';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { MediaFrame } from '@shinefold/ui/components/atoms/media-frame';
+import { Prose } from '@shinefold/ui/components/atoms/prose';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';

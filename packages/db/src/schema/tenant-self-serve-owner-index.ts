@@ -1,4 +1,4 @@
-import { TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 import { sql } from 'drizzle-orm';
 import { type AnyPgColumn, uniqueIndex } from 'drizzle-orm/pg-core';
 

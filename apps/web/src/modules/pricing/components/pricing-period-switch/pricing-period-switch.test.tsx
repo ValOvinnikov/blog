@@ -1,5 +1,5 @@
-import { PRICE_PERIOD, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { PRICE_PERIOD, SITE_MESSAGES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
 

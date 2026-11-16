@@ -1,5 +1,5 @@
-import { uniqueEmailColumns } from '@blog/db/utils/personal-data/personal-data';
-import { normalizeEmail } from '@blog/utils/normalize-email-identity';
+import { uniqueEmailColumns } from '@shinefold/db/utils/personal-data/personal-data';
+import { normalizeEmail } from '@shinefold/utils/normalize-email-identity';
 
 export function inviteEmailColumns(
   email: string,

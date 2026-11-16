@@ -1,7 +1,3 @@
-import {
-  COOKIE_SETTINGS_BUTTON,
-  type TCookieSettingsButton,
-} from '@blog/config';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
@@ -9,6 +5,10 @@ import { SegmentedControl } from '@platform/components/shared/segmented-control'
 import { textVariants } from '@platform/components/shared/text/text-variants';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
+import {
+  COOKIE_SETTINGS_BUTTON,
+  type TCookieSettingsButton,
+} from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

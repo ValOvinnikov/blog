@@ -1,11 +1,11 @@
 import { Menu } from '@base-ui/react/menu';
-import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   renderWithIntl,
   screen,
   waitFor,
 } from '@platform/testing/custom-render';
+import { ICONS } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { MenuRadioGroup, type TMenuRadioGroupProps } from './menu-radio-group';

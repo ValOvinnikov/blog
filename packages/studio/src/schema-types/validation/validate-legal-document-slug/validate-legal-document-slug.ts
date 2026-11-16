@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { COOKIE_STATEMENT_SLUG } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { COOKIE_STATEMENT_SLUG } from '@shinefold/config/constants';
 import type { SlugValue } from 'sanity';
 
 export const LEGAL_DOCUMENT_COOKIE_STATEMENT_SLUG_ERROR = `"${COOKIE_STATEMENT_SLUG}" is the cookie statement's own address and can't be used by another legal page.`;

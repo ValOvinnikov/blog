@@ -1,6 +1,6 @@
-import { routes } from '@blog/config';
-import { toInitial } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
+import { routes } from '@shinefold/config';
+import { toInitial } from '@shinefold/utils/primitives';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 
 import { BrandLockupLink } from './brand-lockup-link';

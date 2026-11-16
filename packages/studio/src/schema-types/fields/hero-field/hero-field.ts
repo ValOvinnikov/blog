@@ -1,4 +1,4 @@
-import { sortModulesByKind } from '@blog/studio/structure/module-kinds/module-kinds';
+import { sortModulesByKind } from '@shinefold/studio/structure/module-kinds/module-kinds';
 import { defineField } from 'sanity';
 
 export const heroField = ({ allow }: { allow: string[] }) =>

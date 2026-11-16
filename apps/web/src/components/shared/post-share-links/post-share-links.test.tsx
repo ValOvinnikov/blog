@@ -1,5 +1,5 @@
-import { SOCIAL_PLATFORMS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { SOCIAL_PLATFORMS } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, within } from '@web/testing/custom-render';
 

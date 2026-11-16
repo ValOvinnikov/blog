@@ -1,4 +1,4 @@
-import { service } from '@blog/service';
+import { service } from '@shinefold/service';
 import { CONSENT_LOG } from '@web/constants/consent';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { getRequestContext } from '@web/server/request-context/request-context';

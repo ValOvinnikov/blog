@@ -1,11 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { ERROR_CODE } from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
@@ -15,6 +7,14 @@ import {
   MOCK_DATA_REQUEST_EMAIL_INDEX,
 } from '@platform/testing/data-requests/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 import { notFound } from 'next/navigation';
 
 import { erasePersonalDataAction } from './erase-personal-data-action';
@@ -26,7 +26,7 @@ const { erasePersonalDataMock } = vi.hoisted(() => ({
 vi.mock('@platform/server/auth/require-super-admin');
 vi.mock('@platform/server/audit/record-audit-event');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: { personalData: { erasePersonalData: erasePersonalDataMock } },
 }));

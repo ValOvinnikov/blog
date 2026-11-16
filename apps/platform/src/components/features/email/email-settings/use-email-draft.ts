@@ -1,12 +1,6 @@
 'use client';
 
 import {
-  ACTION_OUTCOME,
-  type TActionOutcome,
-  type TLocaleIsoCode,
-  type TOutcome,
-} from '@blog/config';
-import {
   useSettingsForm,
   type TUseSettingsFormArgs,
 } from '@platform/components/shared/settings-form-shell';
@@ -33,6 +27,12 @@ import {
 } from '@platform/utils/email-draft-changes/email-draft-changes';
 import type { TEmailLogoTarget } from '@platform/utils/email-logo-target/email-logo-target';
 import { persistStagedImage } from '@platform/utils/staged-image/staged-image';
+import {
+  ACTION_OUTCOME,
+  type TActionOutcome,
+  type TLocaleIsoCode,
+  type TOutcome,
+} from '@shinefold/config';
 import { useState } from 'react';
 
 type TUseEmailDraftArgs = Omit<

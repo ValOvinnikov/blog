@@ -1,4 +1,4 @@
-import type { TCardStyle } from '@blog/config';
+import type { TCardStyle } from '@shinefold/config';
 
 import { cardStyleGlyphVariants } from './card-style-glyph-variants';
 

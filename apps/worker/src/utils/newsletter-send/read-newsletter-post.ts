@@ -1,6 +1,6 @@
-import type { Page_post } from '@blog/config';
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
-import type { TTenantSanityCredentials } from '@blog/db/queries/tenants';
+import type { Page_post } from '@shinefold/config';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
+import type { TTenantSanityCredentials } from '@shinefold/db/queries/tenants';
 import { createPublishedTenantClient } from '@worker/utils/tenant-content/published-tenant-client';
 
 type TRawNewsletterPost = Pick<

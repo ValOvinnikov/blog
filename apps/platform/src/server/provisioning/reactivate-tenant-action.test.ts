@@ -1,10 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { queries } from '@blog/db';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
@@ -19,6 +12,13 @@ import {
   MOCK_TENANT_NAME,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import type { Session } from 'next-auth';
 
 import { reactivateTenantAction } from './reactivate-tenant-action';
@@ -29,7 +29,7 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/provisioning/start-provisioning');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: { getTenantById: vi.fn() },
     auditEvents: { insertAuditEvent: vi.fn() },

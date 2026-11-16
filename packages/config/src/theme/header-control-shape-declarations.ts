@@ -1,7 +1,7 @@
 import {
   HEADER_CONTROL_SHAPE,
   type THeaderControlShape,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import { atLeastSmall } from './radius-declarations';
 import { RADIUS_NONE, RADIUS_PILL } from './radius-tokens';

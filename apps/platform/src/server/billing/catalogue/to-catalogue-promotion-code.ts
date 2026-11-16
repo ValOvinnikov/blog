@@ -1,12 +1,12 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
+import { fromStripeTime } from '@platform/server/billing/stripe-time';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import {
   STRIPE_COUPON_DURATION,
   type TStripeCouponDuration,
-} from '@blog/db/constants';
-import type { TSaveStripePromotionCodeInput } from '@blog/db/queries/stripe-catalogue/save-stripe-promotion-code';
-import type { TAmountOffByCurrency } from '@blog/db/schema/stripe-catalogue';
-import { hasLength, isNull, isString } from '@blog/utils/primitives';
-import { fromStripeTime } from '@platform/server/billing/stripe-time';
+} from '@shinefold/db/constants';
+import type { TSaveStripePromotionCodeInput } from '@shinefold/db/queries/stripe-catalogue/save-stripe-promotion-code';
+import type { TAmountOffByCurrency } from '@shinefold/db/schema/stripe-catalogue';
+import { hasLength, isNull, isString } from '@shinefold/utils/primitives';
 import type Stripe from 'stripe';
 
 import { toBillingCurrency } from './to-catalogue-price';

@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config';
+import type { TLocaleIsoCode } from '@shinefold/config';
 
 type TLiveLanguagePagesParams<TPage extends { language: TLocaleIsoCode }> = {
   pages: readonly TPage[];

@@ -1,4 +1,3 @@
-import { MAGIC_LINK_REFUSAL } from '@blog/config/constants';
 import { SIGN_IN_LOG } from '@platform/constants/sign-in';
 import { MOCK_SIGN_IN_EMAIL } from '@platform/testing/auth/fixtures';
 import { MOCK_BLOCKED_ADDRESS_HASH } from '@platform/testing/blocked-signups/fixtures';
@@ -8,6 +7,7 @@ import {
   mockQueryError,
 } from '@platform/testing/loggable-error/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { MAGIC_LINK_REFUSAL } from '@shinefold/config/constants';
 
 import { logMagicLinkRefusal } from './log-magic-link-refusal';
 

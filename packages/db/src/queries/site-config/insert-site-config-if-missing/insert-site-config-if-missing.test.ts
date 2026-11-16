@@ -1,16 +1,16 @@
-import { HUE_MAX, HUE_MIN, PRESET_ID } from '@blog/config/constants';
-import { getSiteConfig } from '@blog/db/queries/site-config/get-site-config';
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
+import { HUE_MAX, HUE_MIN, PRESET_ID } from '@shinefold/config/constants';
+import { getSiteConfig } from '@shinefold/db/queries/site-config/get-site-config';
+import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
 import { insertSiteConfigIfMissing } from './insert-site-config-if-missing';
 
 faker.seed(6022);
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const MOCK_CUSTOM_ACCENT_HUE = faker.number.int({
   min: HUE_MIN + 1,

@@ -4,7 +4,7 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
   SOCIAL_PLATFORMS,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { LandingPageLayout } from '@web/components/pages/landing-page/landing-page-layout';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';

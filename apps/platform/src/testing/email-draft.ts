@@ -1,11 +1,11 @@
-import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
-import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { faker } from '@faker-js/faker';
 import {
   buildEmailDraft,
   type TEmailDraft,
   type TEmailSenderDraft,
 } from '@platform/utils/email-draft/email-draft';
+import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@shinefold/config';
+import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
 
 const { EN, FR } = LOCALE_ISO_CODES;
 

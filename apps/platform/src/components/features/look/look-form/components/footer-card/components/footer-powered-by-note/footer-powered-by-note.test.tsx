@@ -1,7 +1,7 @@
-import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 
 import { FooterPoweredByNote } from './footer-powered-by-note';
 

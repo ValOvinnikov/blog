@@ -1,5 +1,5 @@
-import { createLokiSink, LOG_LEVEL, registerLogSink } from '@blog/insight';
 import { faker } from '@faker-js/faker';
+import { createLokiSink, LOG_LEVEL, registerLogSink } from '@shinefold/insight';
 import { waitUntil } from '@vercel/functions';
 import { env } from '@worker/utils/env/__mocks__/env';
 
@@ -7,7 +7,7 @@ import { registerLokiSink } from './register-loki-sink';
 
 faker.seed(7015);
 
-vi.mock(import('@blog/insight'), async (importOriginal) => ({
+vi.mock(import('@shinefold/insight'), async (importOriginal) => ({
   ...(await importOriginal()),
   createLokiSink: vi.fn(),
   registerLogSink: vi.fn(),

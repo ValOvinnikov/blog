@@ -1,15 +1,15 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config/types';
-import { queries } from '@blog/db';
-import type { TAdmin } from '@blog/db/schema/admins';
-import type { TMembership } from '@blog/db/schema/memberships';
-import { hasLength } from '@blog/utils/primitives';
 import {
   type TPlatformTenant,
   toPlatformTenant,
 } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { queries } from '@shinefold/db';
+import type { TAdmin } from '@shinefold/db/schema/admins';
+import type { TMembership } from '@shinefold/db/schema/memberships';
+import { hasLength } from '@shinefold/utils/primitives';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
 

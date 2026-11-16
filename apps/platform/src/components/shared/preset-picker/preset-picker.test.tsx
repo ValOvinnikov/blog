@@ -1,7 +1,7 @@
-import { PRESET_ID, type TPresetId } from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
+import { PRESET_ID, type TPresetId } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 

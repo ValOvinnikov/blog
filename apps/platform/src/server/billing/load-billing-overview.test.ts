@@ -1,4 +1,3 @@
-import { MOCK_EMPTY_TENANT_BILLING } from '@blog/db/testing/tenants/billing';
 import { faker } from '@faker-js/faker';
 import {
   BILLING_LOG,
@@ -21,6 +20,7 @@ import {
 } from '@platform/testing/billing/overview';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { MOCK_EMPTY_TENANT_BILLING } from '@shinefold/db/testing/tenants/billing';
 
 import { loadBillingOverview } from './load-billing-overview';
 

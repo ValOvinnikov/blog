@@ -1,18 +1,18 @@
-import { AUDIT_EVENT_RETENTION_MONTHS } from '@blog/db/constants';
-import { monthsBefore } from '@blog/db/queries/retention/retention-cutoff';
-import * as schema from '@blog/db/schema';
-import { insertTestAuditEvent } from '@blog/db/testing/audit-events/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { AUDIT_EVENT_RETENTION_MONTHS } from '@shinefold/db/constants';
+import { monthsBefore } from '@shinefold/db/queries/retention/retention-cutoff';
+import * as schema from '@shinefold/db/schema';
+import { insertTestAuditEvent } from '@shinefold/db/testing/audit-events/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   justPast,
   justWithin,
   MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
-} from '@blog/db/testing/retention/fixtures';
+} from '@shinefold/db/testing/retention/fixtures';
 
 import { deleteAuditEventsPastRetention } from './delete-audit-events-past-retention';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

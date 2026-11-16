@@ -3,11 +3,11 @@ import {
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { BREADCRUMBS_HOME_ICON_TEST_ID } from '@blog/ui/constants/breadcrumbs';
+} from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import { BREADCRUMBS_HOME_ICON_TEST_ID } from '@shinefold/ui/constants/breadcrumbs';
 
 import { breadcrumbsVariants } from './breadcrumbs-variants';
 

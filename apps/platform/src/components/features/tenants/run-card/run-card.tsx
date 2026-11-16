@@ -1,5 +1,3 @@
-import { SIZE } from '@blog/config';
-import type { TProvisioningRun } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
@@ -9,6 +7,8 @@ import { Text } from '@platform/components/shared/text';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { formatDateTime } from '@platform/utils/format-date-time/format-date-time';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
+import { SIZE } from '@shinefold/config';
+import type { TProvisioningRun } from '@shinefold/db/schema/tenants';
 import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

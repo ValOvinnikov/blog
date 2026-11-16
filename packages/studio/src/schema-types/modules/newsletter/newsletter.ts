@@ -1,14 +1,14 @@
-import { NEWSLETTER_VARIANT } from '@blog/config/constants';
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { localizedMultilineTextField } from '@blog/studio/schema-types/fields/localized-multiline-text-field/localized-multiline-text-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { variantField } from '@blog/studio/schema-types/fields/variant-field/variant-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { newsletterTrustCueSchema } from '@blog/studio/schema-types/objects/newsletter-trust-cue/newsletter-trust-cue';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
-import { toTitleCase } from '@blog/utils/primitives';
+import { NEWSLETTER_VARIANT } from '@shinefold/config/constants';
+import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { localizedMultilineTextField } from '@shinefold/studio/schema-types/fields/localized-multiline-text-field/localized-multiline-text-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { variantField } from '@shinefold/studio/schema-types/fields/variant-field/variant-field';
+import { layoutField } from '@shinefold/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { newsletterTrustCueSchema } from '@shinefold/studio/schema-types/objects/newsletter-trust-cue/newsletter-trust-cue';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { Mail } from 'lucide-react';
 import {
   defineArrayMember,

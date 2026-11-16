@@ -1,11 +1,11 @@
-import { pageHref } from '@blog/config';
+import { pageHref } from '@shinefold/config';
 import {
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
   type TCtaActionVariant,
-} from '@blog/config/constants';
-import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
-import { toTitleCase } from '@blog/utils/primitives';
+} from '@shinefold/config/constants';
+import { linkReferenceField } from '@shinefold/studio/schema-types/fields/link-reference-field/link-reference-field';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { MousePointerClick } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

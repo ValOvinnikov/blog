@@ -1,4 +1,4 @@
-import { ADMIN_ROLE } from '@blog/db/constants';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 
 import { isSuperAdmin } from './is-super-admin';
 

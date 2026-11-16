@@ -1,6 +1,6 @@
-import type { TMaybeNull } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { newsletterPostSends } from '@blog/db/schema/newsletter-post-sends';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { newsletterPostSends } from '@shinefold/db/schema/newsletter-post-sends';
 
 export interface INewsletterPostSendClaim {
   claimedAt: Date;

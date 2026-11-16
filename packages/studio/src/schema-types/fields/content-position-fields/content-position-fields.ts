@@ -1,10 +1,10 @@
-import { CONTENT_ALIGNMENT } from '@blog/config/constants';
-import { alignmentField } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { CONTENT_ALIGNMENT } from '@shinefold/config/constants';
+import { alignmentField } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
 import {
   ContentPositionBannerPicture,
   ContentPositionSplitPicture,
-} from '@blog/studio/schema-types/fields/content-position-fields/content-position-pictures';
-import { isNotVariant } from '@blog/studio/schema-types/fields/variant-field/variant-predicate';
+} from '@shinefold/studio/schema-types/fields/content-position-fields/content-position-pictures';
+import { isNotVariant } from '@shinefold/studio/schema-types/fields/variant-field/variant-predicate';
 
 const CONTENT_POSITION_TITLE = 'Content Position';
 

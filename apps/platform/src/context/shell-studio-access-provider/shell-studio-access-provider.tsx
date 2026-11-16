@@ -1,7 +1,7 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import type { TOwnerStudioAccess } from '@platform/constants/owner-studio-access';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { createContext, useContext, type ReactNode } from 'react';
 
 const ShellStudioAccessContext =

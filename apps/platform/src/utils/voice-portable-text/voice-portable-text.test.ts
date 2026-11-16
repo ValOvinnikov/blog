@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
+import { voiceDefaultText } from '@platform/utils/voice-draft/voice-draft';
 import {
   VOICE_FIELDS,
   type TVoiceFieldId,
   type TVoicePortableText,
-} from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { faker } from '@faker-js/faker';
-import { voiceDefaultText } from '@platform/utils/voice-draft/voice-draft';
+} from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 
 import {
   isVoicePlainCopyOf,

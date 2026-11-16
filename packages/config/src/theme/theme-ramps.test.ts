@@ -1,6 +1,9 @@
-import { readCssBlock, readRepoFile } from '@blog/config/testing/theme-css';
+import {
+  readCssBlock,
+  readRepoFile,
+} from '@shinefold/config/testing/theme-css';
 
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
+import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config/constants';
 
 import { ACCENT_RAMP_DARK, ACCENT_RAMP_LIGHT } from './accent-ramps';
 import {

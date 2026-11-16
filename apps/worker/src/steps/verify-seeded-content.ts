@@ -1,12 +1,12 @@
-import type { TMaybeNull } from '@blog/config';
-import { getTenantSanityCredentials } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { createClient } from '@sanity/client';
+import type { TMaybeNull } from '@shinefold/config';
+import { getTenantSanityCredentials } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   listSanityWebhooks,
   type TSanityWebhook,
-} from '@blog/db/utils/sanity-management-client/sanity-webhooks';
-import { hasLength } from '@blog/utils/primitives';
-import { createClient } from '@sanity/client';
+} from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
+import { hasLength } from '@shinefold/utils/primitives';
 import { SANITY_API_VERSION } from '@worker/constants/sanity-api';
 import { errorMessage } from '@worker/utils/error-message/error-message';
 import { grantPropagationRetryOptions } from '@worker/utils/grant-propagation-retry/grant-propagation-retry';

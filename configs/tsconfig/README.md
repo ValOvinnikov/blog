@@ -1,4 +1,4 @@
-# @blog/tsconfig
+# @shinefold/tsconfig
 
 > Shared base `tsconfig.json` `compilerOptions`.
 
@@ -6,7 +6,7 @@
 
 `base.json` — `strict`, `noUncheckedIndexedAccess`, `target`/`module`/
 `moduleResolution`, and the other repo-wide compiler options. Each
-consumer's own `tsconfig.json` extends it (`"extends": "@blog/tsconfig/base.json"`)
+consumer's own `tsconfig.json` extends it (`"extends": "@shinefold/tsconfig/base.json"`)
 and adds only its own `paths`.
 
 ## Consumed by

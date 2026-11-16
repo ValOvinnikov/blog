@@ -1,10 +1,10 @@
-import type { InternationalizedArrayArticleText } from '@blog/config';
-import { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text/portable-text-body-item';
+import type { InternationalizedArrayArticleText } from '@shinefold/config';
+import { portableTextBodyItemFragment } from '@shinefold/service/shared/fragments/portable-text/portable-text-body-item';
 import type {
   TLanguageFilter,
   TLocaleQueryConfig,
   TLocalizedKey,
-} from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+} from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
 import type {
   GroqBuilder,
   GroqBuilderSubquery,

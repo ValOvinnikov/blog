@@ -1,5 +1,9 @@
-import { renderElement, screen, waitFor } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import {
+  renderElement,
+  screen,
+  waitFor,
+} from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useRef, useState } from 'react';
 

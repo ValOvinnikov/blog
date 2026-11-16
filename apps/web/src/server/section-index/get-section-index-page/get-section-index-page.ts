@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   service,
   type TSectionIndexPage,
   type TSectionIndexType,
-} from '@blog/service';
-import type { TResult } from '@blog/utils';
+} from '@shinefold/service';
+import type { TResult } from '@shinefold/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { cache } from 'react';
 

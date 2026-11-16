@@ -1,7 +1,7 @@
-import { TOAST_TYPE } from '@blog/config';
-import { spinnerVariants } from '@blog/ui/components/atoms/spinner/spinner-variants';
-import { ButtonShapes } from '@blog/ui/testing/button-shapes';
-import { objectKeys } from '@blog/utils/primitives';
+import { TOAST_TYPE } from '@shinefold/config';
+import { spinnerVariants } from '@shinefold/ui/components/atoms/spinner/spinner-variants';
+import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Toast, type IToast } from './toast';

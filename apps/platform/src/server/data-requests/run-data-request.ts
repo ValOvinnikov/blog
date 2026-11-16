@@ -1,5 +1,10 @@
 import 'server-only';
 
+import { DATA_REQUEST_LOG } from '@platform/constants/data-request';
+import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
+import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
+import { logger } from '@platform/utils/logger/logger';
 import {
   ACTION_OUTCOME,
   AUDIT_TARGET_TYPE,
@@ -7,15 +12,10 @@ import {
   type TAuditAction,
   type TErrorCode,
   type TOutcome,
-} from '@blog/config';
-import { ERROR_CODE } from '@blog/config/constants';
-import { errorResult, type TResult } from '@blog/utils';
-import { toOutcome } from '@blog/utils/to-outcome';
-import { DATA_REQUEST_LOG } from '@platform/constants/data-request';
-import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
-import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
-import { logger } from '@platform/utils/logger/logger';
+} from '@shinefold/config';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { errorResult, type TResult } from '@shinefold/utils';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
 const dataRequestInputSchema = z.object({

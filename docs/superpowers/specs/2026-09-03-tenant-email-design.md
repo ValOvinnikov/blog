@@ -2,16 +2,16 @@
 
 **Status:** Design pass, approved in brainstorming 2026-09-03. Supersedes the
 per-consumer migration scope of epic #2605's sub-issues #2607–#2611, which were
-written against the assumption that `@blog/email`'s shell was correct as
+written against the assumption that `@shinefold/email`'s shell was correct as
 scaffolded. It is not — see §1. Where tenant configuration lives
-(`site_config` in `@blog/db`) is described in `SPEC.md` §6.
+(`site_config` in `@shinefold/db`) is described in `SPEC.md` §6.
 
 **Date:** 2026-09-03
 
 **Scope:** Make every email this product sends carry the right identity — the
 tenant's for tenant-facing mail, the platform's for operator mail — and let a
 tenant author the subject and body of their own transactional email. Also
-removes email-sending from `@blog/db` entirely.
+removes email-sending from `@shinefold/db` entirely.
 
 Out of scope: tenant-authored operator alerts (deliberately impossible, §1),
 localisation of email copy beyond what the existing voice ladder provides,
@@ -19,7 +19,7 @@ marketing/campaign email, and any change to `sendEmail`'s Resend transport.
 
 ## Why this exists
 
-PR #2619 created `@blog/email` as the single home for email and migrated
+PR #2619 created `@shinefold/email` as the single home for email and migrated
 nothing. Reviewing what it built against the multi-tenant product surfaced two
 problems that the scaffold cannot grow into, and one boundary that was drawn in
 the wrong place.
@@ -38,18 +38,18 @@ callers onto that signature would encode it three more times.
 
 **No tenant email copy exists, anywhere.** All copy is hardcoded in the
 builders (`buildNewsletterConfirmationEmail`, `buildMagicLinkEmail`,
-`buildInviteMagicLinkEmail`) and inline in `@blog/db`'s scripts. The
+`buildInviteMagicLinkEmail`) and inline in `@shinefold/db`'s scripts. The
 `voiceOverrides` `jsonb` column on `site_config` is present but unused, and is
 not a fit for this: it is a voice ladder for site copy, not a per-template
 subject and body.
 
-**`@blog/db` sends email.** `packages/db/package.json:37` depends on `resend`,
+**`@shinefold/db` sends email.** `packages/db/package.json:37` depends on `resend`,
 and `scripts/validate-tenant-documents/lib/notify-operators.ts` plus
 `scripts/recheck-tenant-owners/lib/notify-operators.ts` each construct a
 `Resend` client (at `:68` and `:84` respectively) and carry their own private
 `escapeHtml` (at `:18` and `:19`). A relational
 data-access layer should not own an outbound email transport, and #2619 was
-about to formalise that by adding `@blog/email` to `db`'s dependencies rather
+about to formalise that by adding `@shinefold/email` to `db`'s dependencies rather
 than removing the capability.
 
 ## §1 — Separation is a type error, not a folder convention
@@ -99,7 +99,7 @@ this at render time by injecting a `<style>` block
 injected at `apps/web/src/app/layout.tsx:59-63`).
 
 Email cannot use CSS custom properties, so `resolveTenantEmailBrand` runs the
-same recipes through `oklchToHex` (already a `@blog/utils` export, already used
+same recipes through `oklchToHex` (already a `@shinefold/utils` export, already used
 by the current `brand-tokens.ts`) and returns literal hex. Email always renders
 the **light** palette — inbox dark-mode handling is out of scope and is not
 reliably controllable across clients.
@@ -107,7 +107,7 @@ reliably controllable across clients.
 **The one structural change this forces.** The WCAG AA contrast guard lives at
 `apps/web/src/utils/to-theme-tokens/to-theme-tokens.ts:29-67`, inside the web
 app. A tenant hue that fails contrast on the site fails it in an inbox too, and
-duplicating the guard would let the two drift. It moves down to `@blog/config`
+duplicating the guard would let the two drift. It moves down to `@shinefold/config`
 alongside `PRESET_REGISTRY`, and `apps/web` imports it from there.
 
 This is the only part of this design that touches an existing rendering path,
@@ -213,8 +213,8 @@ alternative considered and rejected was a `{{token}}` the tenant must remember
 to keep: a tenant who deletes the token from their sign-in email locks every one
 of their users out, and discovers it only via support.
 
-**`@blog/email` gains a Portable-Text-to-email-HTML serializer.** It cannot
-reuse `@blog/ui`'s renderer, which is React and emits web CSS. The email
+**`@shinefold/email` gains a Portable-Text-to-email-HTML serializer.** It cannot
+reuse `@shinefold/ui`'s renderer, which is React and emits web CSS. The email
 serializer is pure, framework-free, emits inlined styles and table layout, and
 routes every text node through the canonical `escapeHtml`. Its supported block
 set is deliberately small — paragraph, heading, emphasis, link, list — and
@@ -242,10 +242,10 @@ read path from §4:
 Seeding is the primary path; the merge is the safety net. Neither alone is
 sufficient.
 
-## §6 — `@blog/db` stops sending email
+## §6 — `@shinefold/db` stops sending email
 
-`@blog/db` loses `resend`, both private `escapeHtml` copies, and its
-`@blog/email` dependency. Its scripts instead POST to a new endpoint on
+`@shinefold/db` loses `resend`, both private `escapeHtml` copies, and its
+`@shinefold/email` dependency. Its scripts instead POST to a new endpoint on
 `apps/platform`, which owns the send.
 
 **The security design is precedent-matched, not invented.**
@@ -282,7 +282,7 @@ The magic-link senders were believed to have no tenant context. They do.
 `packages/auth/src/providers/magic-link/magic-link-provider.ts:29-36` already
 extracts `const { host } = new URL(url)` and already performs a database lookup
 inside `sendVerificationRequest` — `findPendingInviteTenants(identifier)` —
-because `packages/auth/package.json:21` depends on `@blog/db`.
+because `packages/auth/package.json:21` depends on `@shinefold/db`.
 
 So tenant resolution is `getTenantByDomain(host)`, the same lookup
 `apps/web/src/server/tenant/resolve-tenant/resolve-tenant.ts`'s `resolveTenant` performs against the
@@ -308,8 +308,8 @@ package's layer position and its ESLint preset all stand; what changes is the
 shell's shape and the addition of everything above.
 
 One consequence worth recording: with `db` no longer a consumer (§6),
-`@blog/email`'s "upstream is `utils` only" constraint is no longer forced by
-`db`. It remains correct — `@blog/auth` still consumes the package and sits
+`@shinefold/email`'s "upstream is `utils` only" constraint is no longer forced by
+`db`. It remains correct — `@shinefold/auth` still consumes the package and sits
 above `db` — but the justification written into `SPEC.md` §4 and
 `.claude/agents/email.md` names `db` and must be updated to match reality.
 
@@ -322,7 +322,7 @@ In dependency order:
    and `platform-app` consume the guard, and nothing else can start until it
    has a settled home.
 
-   The template-type const belongs in `@blog/config` rather than `@blog/db`
+   The template-type const belongs in `@shinefold/config` rather than `@shinefold/db`
    despite `db` persisting it as the copy map's key. `CLAUDE.md`'s test is
    reach, not storage: `email` names the templates, `platform-app` renders a
    form per type, and `db` keys rows by them. Three layers is the same shape as

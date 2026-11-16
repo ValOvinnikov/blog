@@ -1,6 +1,6 @@
-import { q } from '@blog/service/sanity/query/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
-import type { TPageQueryPageParams } from '@blog/service/shared/types/page/page-query-page-params';
+import { q } from '@shinefold/service/sanity/query/query';
+import { PUBLISHED_POST_FILTER } from '@shinefold/service/shared/expressions/post/published-post';
+import type { TPageQueryPageParams } from '@shinefold/service/shared/types/page/page-query-page-params';
 
 export const postParamsQuery = q
   .parameters<TPageQueryPageParams>()

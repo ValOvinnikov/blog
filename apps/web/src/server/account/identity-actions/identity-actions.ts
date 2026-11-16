@@ -1,8 +1,8 @@
 'use server';
 
-import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
+import { ACTION_OUTCOME, type TActionResult } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import {
   DISPLAY_NAME_UPDATE_FAILED_EVENT,
   PROVIDER_UNLINK_FAILED_EVENT,

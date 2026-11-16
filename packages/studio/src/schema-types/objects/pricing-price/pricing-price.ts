@@ -1,5 +1,5 @@
-import { PRICE_PERIOD, type TPricePeriod } from '@blog/config/constants';
-import { validatePricingCompareAtAboveAmount } from '@blog/studio/schema-types/validation/validate-pricing-compare-at-above-amount/validate-pricing-compare-at-above-amount';
+import { PRICE_PERIOD, type TPricePeriod } from '@shinefold/config/constants';
+import { validatePricingCompareAtAboveAmount } from '@shinefold/studio/schema-types/validation/validate-pricing-compare-at-above-amount/validate-pricing-compare-at-above-amount';
 import { Banknote } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

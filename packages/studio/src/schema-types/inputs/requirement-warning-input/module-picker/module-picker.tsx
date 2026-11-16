@@ -1,10 +1,10 @@
-import type { TMaybeNull } from '@blog/config/types';
-import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
-import type { TEntitlementState } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
-import { ModulePickerMenu } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-menu';
-import { ModulePickerTypesContext } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-types-context';
 import { Button, Grid, useClickOutsideEvent } from '@sanity/ui';
 import { Popover } from '@sanity/ui/popover';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { textSizedIcon } from '@shinefold/studio/schema-types/icons/text-sized-icon/text-sized-icon';
+import type { TEntitlementState } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { ModulePickerMenu } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-menu';
+import { ModulePickerTypesContext } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-types-context';
 import { Plus } from 'lucide-react';
 import { useContext, useRef, useState } from 'react';
 import {

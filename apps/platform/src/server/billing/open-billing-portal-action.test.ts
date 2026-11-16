@@ -1,7 +1,3 @@
-import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { queries } from '@blog/db';
-import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { MOCK_EMPTY_TENANT_BILLING } from '@blog/db/testing/tenants/billing';
 import { faker } from '@faker-js/faker';
 import { BILLING_LOG, BILLING_REFUSAL } from '@platform/constants/billing';
 import { getStripeClient } from '@platform/server/billing/stripe-client';
@@ -18,6 +14,10 @@ import { MOCK_PLATFORM_APP_BASE_URL } from '@platform/testing/owner-email/fixtur
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import { MOCK_EMPTY_TENANT_BILLING } from '@shinefold/db/testing/tenants/billing';
 import { redirect } from 'next/navigation';
 import type Stripe from 'stripe';
 
@@ -28,7 +28,7 @@ vi.mock('@platform/server/auth/require-session-user-id', () => ({
   requireSessionUserId: vi.fn(async () => MOCK_SIGN_IN_USER_ID),
 }));
 vi.mock('@platform/server/billing/stripe-client');
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: { getTenantBilling: vi.fn() },
     admins: { getAdminByUserId: vi.fn() },

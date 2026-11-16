@@ -1,7 +1,7 @@
-import { ALERT_TYPE, FORM_STATUS } from '@blog/config';
-import { Alert } from '@blog/ui/components/atoms/alert';
-import type { TNewsletterSignupFormState } from '@blog/ui/components/organisms/newsletter-signup/components/form/newsletter-signup-form-state';
-import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import { ALERT_TYPE, FORM_STATUS } from '@shinefold/config';
+import { Alert } from '@shinefold/ui/components/atoms/alert';
+import type { TNewsletterSignupFormState } from '@shinefold/ui/components/organisms/newsletter-signup/components/form/newsletter-signup-form-state';
+import { newsletterSignupVariants } from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
 
 export type TNewsletterSignupStatusProps = {
   successMessage: string;

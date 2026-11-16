@@ -1,9 +1,9 @@
-import { SUBSCRIBER_OUTCOME, type TOutcome } from '@blog/config';
-import { getDb } from '@blog/db/client';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import { subscribers } from '@blog/db/schema/subscribers';
-import { sha256Hex } from '@blog/utils/hash';
-import { toOutcome } from '@blog/utils/to-outcome';
+import { SUBSCRIBER_OUTCOME, type TOutcome } from '@shinefold/config';
+import { getDb } from '@shinefold/db/client';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import { subscribers } from '@shinefold/db/schema/subscribers';
+import { sha256Hex } from '@shinefold/utils/hash';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
 export type TConfirmSubscriberResult = TOutcome<

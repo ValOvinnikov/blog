@@ -1,4 +1,3 @@
-import { SITE_MESSAGES_BY_LOCALE, VOICE_SURFACE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
 import { ARIA_CONTROLS, ARIA_EXPANDED } from '@platform/testing/aria';
@@ -40,6 +39,7 @@ import {
   setupVoiceSettingsWithSectionsOpen,
 } from '@platform/testing/voice/voice-settings-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { SITE_MESSAGES_BY_LOCALE, VOICE_SURFACE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { VoiceSettings } from './voice-settings';

@@ -1,9 +1,9 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { buildByLanguageItem } from '@blog/studio/structure/build-by-language-item/build-by-language-item';
-import { buildOnePerLanguageItem } from '@blog/studio/structure/build-one-per-language-item/build-one-per-language-item';
-import { createPageTreeResolver } from '@blog/studio/structure/page-tree/page-tree';
-import { hasLength, isUndefined } from '@blog/utils/primitives';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { buildByLanguageItem } from '@shinefold/studio/structure/build-by-language-item/build-by-language-item';
+import { buildOnePerLanguageItem } from '@shinefold/studio/structure/build-one-per-language-item/build-one-per-language-item';
+import { createPageTreeResolver } from '@shinefold/studio/structure/page-tree/page-tree';
+import { hasLength, isUndefined } from '@shinefold/utils/primitives';
 import type { SchemaTypeDefinition } from 'sanity';
 import type { ListItemBuilder, StructureBuilder } from 'sanity/structure';
 

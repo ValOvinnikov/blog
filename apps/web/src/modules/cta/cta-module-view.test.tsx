@@ -1,4 +1,4 @@
-import { CTA_VARIANT } from '@blog/config';
+import { CTA_VARIANT } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_ACTIONS,

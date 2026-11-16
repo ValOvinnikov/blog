@@ -1,20 +1,20 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   DISPLAY_MODE,
   LOCALE_ISO_CODES,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   mockRawLogoItem,
   mockRawLogoWallModule,
-} from '@blog/service/testing/modules/fixtures';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockReference } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_IMAGE_ASSET_DOCUMENT,
   MOCK_IMAGE_ASSET_DOCUMENT_ID,
   mockLocalizedHeadingBlock,
-} from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
 
 import { logoWallModuleQuery } from './query';
 

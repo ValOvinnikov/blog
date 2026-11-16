@@ -1,9 +1,9 @@
-import type { Table } from '@blog/config';
+import type { Table } from '@shinefold/config';
 import {
   PORTABLE_TEXT_BLOCK_TYPE,
   TABLE_COLUMN_WARNING_THRESHOLD,
-} from '@blog/config/constants';
-import { validateTableColumnCount } from '@blog/studio/schema-types/validation/validate-table-column-count/validate-table-column-count';
+} from '@shinefold/config/constants';
+import { validateTableColumnCount } from '@shinefold/studio/schema-types/validation/validate-table-column-count/validate-table-column-count';
 
 const WARNS = expect.any(String);
 

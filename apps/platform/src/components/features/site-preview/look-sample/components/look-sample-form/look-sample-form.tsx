@@ -1,9 +1,9 @@
-import { SIZE } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
-import { TextInput } from '@blog/ui/components/atoms/text-input';
-import { noop } from '@blog/utils/primitives';
 import { SamplePart } from '@platform/components/features/site-preview/sample-part';
 import { SAMPLE_PART } from '@platform/constants/sample-part';
+import { SIZE } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { TextInput } from '@shinefold/ui/components/atoms/text-input';
+import { noop } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

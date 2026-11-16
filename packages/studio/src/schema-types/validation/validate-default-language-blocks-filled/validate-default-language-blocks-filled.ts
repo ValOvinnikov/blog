@@ -1,4 +1,4 @@
-import { getDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
+import { getDefaultLanguage } from '@shinefold/studio/schema-types/validation/default-language/default-language';
 
 type TLocalizedEntry = { language?: unknown; value?: unknown } | null;
 

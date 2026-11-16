@@ -24,8 +24,8 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
   SPINNER_STYLE,
-} from '@blog/config';
-import { BRAND_NAME_MAX_LENGTH } from '@blog/db/constants';
+} from '@shinefold/config';
+import { BRAND_NAME_MAX_LENGTH } from '@shinefold/db/constants';
 import { z } from 'zod';
 
 const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);

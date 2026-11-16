@@ -1,6 +1,6 @@
-import { CAPABILITY, type TCapability } from '@blog/config';
-import type { TSettingsFeatures } from '@blog/db/schema/settings-features';
 import { faker } from '@faker-js/faker';
+import { CAPABILITY, type TCapability } from '@shinefold/config';
+import type { TSettingsFeatures } from '@shinefold/db/schema/settings-features';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 

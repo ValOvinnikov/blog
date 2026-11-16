@@ -1,5 +1,5 @@
-import { IMAGE_LAYOUT } from '@blog/config';
-import { FULL_BLEED, MEDIA_MAX_WIDTH, tv } from '@blog/ui/lib/styling';
+import { IMAGE_LAYOUT } from '@shinefold/config';
+import { FULL_BLEED, MEDIA_MAX_WIDTH, tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const imageWithCaptionVariants = tv({

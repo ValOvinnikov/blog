@@ -1,4 +1,4 @@
-import { brandVariantTitle } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { brandVariantTitle } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 
 export const moduleSubtitle = (
   brandVariant: unknown,

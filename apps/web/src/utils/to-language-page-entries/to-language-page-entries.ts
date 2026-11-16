@@ -1,4 +1,4 @@
-import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@blog/config';
+import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@shinefold/config';
 import { toLanguageAlternates } from '@web/utils/to-language-alternates';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import { toAbsoluteAlternates } from '@web/utils/to-translated-sitemap-entry';

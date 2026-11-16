@@ -68,7 +68,7 @@ export const formatReport = (collisions, baseRef = BASE_REF) =>
     '',
     `Two migrations cannot share an index. ${baseRef} got there first, so this branch's ` +
       `migration has to be regenerated under the next free index — merge ${baseRef}, delete ` +
-      'the colliding .sql and its snapshot, and re-run `pnpm --filter @blog/db db:generate`. ' +
+      'the colliding .sql and its snapshot, and re-run `pnpm --filter @shinefold/db db:generate`. ' +
       `Full procedure: "${RENUMBER_SECTION}" in ${RENUMBER_DOC}.`,
   ].join('\n');
 

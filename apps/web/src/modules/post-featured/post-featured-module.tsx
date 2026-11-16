@@ -1,5 +1,5 @@
-import { service, type TPostCard } from '@blog/service';
-import { hasLength } from '@blog/utils/primitives';
+import { service, type TPostCard } from '@shinefold/service';
+import { hasLength } from '@shinefold/utils/primitives';
 import { POST_FEATURED_LOG } from '@web/constants/post-featured';
 import { getPostCardsSection } from '@web/server/post-cards/get-post-cards-section/get-post-cards-section';
 import { getRequestContext } from '@web/server/request-context/request-context';

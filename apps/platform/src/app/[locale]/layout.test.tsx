@@ -1,13 +1,13 @@
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
+import { resolveThemeColorScheme } from '@platform/server/layout/resolve-theme-color-scheme';
+import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import {
   COLOR_SCHEME,
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
-import messages from '@platform/i18n/messages/en.json';
-import { resolveThemeColorScheme } from '@platform/server/layout/resolve-theme-color-scheme';
-import { customRenderAsync, screen } from '@platform/testing/custom-render';
+} from '@shinefold/config';
 import { setRequestLocale } from 'next-intl/server';
 import type { ReactElement } from 'react';
 

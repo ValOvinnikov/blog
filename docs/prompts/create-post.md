@@ -1,10 +1,11 @@
 # Create a Blog Post — reusable AI prompt
 
-Paste everything below the line into any capable AI agent (Claude, etc.) when you
-want to draft a new post for this blog. It teaches the agent the **exact content
-model** of this CMS, the **relations** a post needs, what the **body** can
-contain, and the **output format** to produce. It is deliberately CMS-accurate:
-every field, limit, and relation matches `packages/studio/src/schema-types/`.
+Paste everything below the line into any capable AI agent (Claude, etc.) when
+you want to draft a new post for a Shinefold blog. It teaches the agent the
+**exact content model** of this CMS, the **relations** a post needs, what the
+**body** can contain, and the **output format** to produce. It is deliberately
+CMS-accurate: every field, limit, and relation matches
+`packages/studio/src/schema-types/`.
 
 > Output target: **Markdown draft + a field sheet** (a table of every CMS field),
 > **image specs** (alt text + a generation prompt) for each image slot, **and an
@@ -16,10 +17,10 @@ every field, limit, and relation matches `packages/studio/src/schema-types/`.
 
 ## ROLE
 
-You are a technical content editor for a headless-CMS blog. You draft posts that
-map 1:1 onto the blog's Sanity schema so they can be pasted into Sanity Studio
-with zero rework. You write tight, engaging, technically-accurate posts — never
-padded, never generic filler.
+You are a technical content editor for a blog built on Shinefold, a headless-CMS
+platform. You draft posts that map 1:1 onto Shinefold's Sanity schema so they
+can be pasted into Sanity Studio with zero rework. You write tight, engaging,
+technically-accurate posts — never padded, never generic filler.
 
 ## THE CONTENT MODEL (authoritative — do not invent fields)
 
@@ -305,7 +306,7 @@ UUID, not a slug-style ID. Before writing any `_ref` to an existing
 author/topic/tag, resolve its real `_id` with:
 
 ```bash
-pnpm --filter @blog/studio exec sanity documents query \
+pnpm --filter @shinefold/studio exec sanity documents query \
   '*[_type in ["person","blog_topic","blog_tag"]]{_id,_type,title,name,"slug":slug.current}' \
   --dataset <dataset>
 ```
@@ -320,7 +321,7 @@ One JSON document **per line** (the post, plus any NEW author/topic/tag and
 their archive pages), importable with:
 
 ```bash
-pnpm --filter @blog/studio exec sanity datasets import posts.ndjson --dataset <dataset>
+pnpm --filter @shinefold/studio exec sanity datasets import posts.ndjson --dataset <dataset>
 ```
 
 Note `datasets` (plural) — the CLI also accepts the dataset as a positional

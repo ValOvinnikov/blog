@@ -1,14 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@blog/tsconfig/base.json",
+  "extends": "@shinefold/tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true,
     // Declare ambient globals explicitly so type resolution does not depend on
     // pnpm's hoisting layout: "node" for node:crypto, "vitest/globals" for the
-    // `globals: true` test config — matches @blog/utils and @blog/db.
+    // `globals: true` test config — matches @shinefold/utils and @shinefold/db.
     "types": ["node", "vitest/globals"],
     "paths": {
-      "@blog/insight/*": ["./src/*"]
+      "@shinefold/insight/*": ["./src/*"]
     }
   },
   "include": ["src"]

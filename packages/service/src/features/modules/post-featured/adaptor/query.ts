@@ -1,22 +1,25 @@
-import { POST_SOURCE } from '@blog/config';
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
+import { POST_SOURCE } from '@shinefold/config';
+import {
+  q,
+  type TModuleQueryParams,
+} from '@shinefold/service/sanity/query/query';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
-} from '@blog/service/shared/expressions/module/display-mode';
+} from '@shinefold/service/shared/expressions/module/display-mode';
 import {
   SHOW_IMAGES_EXPRESSION,
   showImagesParser,
-} from '@blog/service/shared/expressions/module/show-images';
-import { FEATURED_POST_FILTER } from '@blog/service/shared/expressions/post/featured-post';
-import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
-import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleAppearanceFragment } from '@blog/service/shared/fragments/module/module-appearance';
-import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { postCardFragment } from '@blog/service/shared/fragments/post/post';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
-import { pinnedPostInLocale } from '@blog/service/shared/localization/pinned-post-in-locale/pinned-post-in-locale';
-import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
+} from '@shinefold/service/shared/expressions/module/show-images';
+import { FEATURED_POST_FILTER } from '@shinefold/service/shared/expressions/post/featured-post';
+import { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
+import { moduleWideLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { moduleAppearanceFragment } from '@shinefold/service/shared/fragments/module/module-appearance';
+import { moduleContentAlignmentLeftCenterFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
+import { postCardFragment } from '@shinefold/service/shared/fragments/post/post';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
+import { pinnedPostInLocale } from '@shinefold/service/shared/localization/pinned-post-in-locale/pinned-post-in-locale';
+import { publishedPostsInLocale } from '@shinefold/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 
 const newestFeaturedPostsQuery = publishedPostsInLocale(
   q.parameters<TLocaleQueryParams>().star,

@@ -1,5 +1,5 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { Text } from '@blog/ui/components/atoms/text';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import type { ReactNode } from 'react';
 
 export type TPricingCardDescriptionProps = IWithClassName &

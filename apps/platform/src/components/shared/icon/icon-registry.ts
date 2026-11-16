@@ -1,4 +1,3 @@
-import { ICONS, type TIconName } from '@blog/config';
 import ArrowUp from '@platform/assets/icons/arrow-up.svg';
 import Arrow from '@platform/assets/icons/arrow.svg';
 import Bold from '@platform/assets/icons/bold.svg';
@@ -57,6 +56,7 @@ import Users from '@platform/assets/icons/users.svg';
 import Warning from '@platform/assets/icons/warning.svg';
 import X from '@platform/assets/icons/x.svg';
 import Zap from '@platform/assets/icons/zap.svg';
+import { ICONS, type TIconName } from '@shinefold/config';
 import type { FC, SVGProps } from 'react';
 
 export type TGlyph = FC<SVGProps<SVGSVGElement>>;
@@ -73,7 +73,7 @@ export const ICON_REGISTRY = {
   [ICONS.CHEVRON_RIGHT]: ChevronRight,
   [ICONS.CHEVRON_UP]: ChevronUp,
   [ICONS.CLOCK]: Clock,
-  // The error notice's circled cross, the same key @blog/ui's Alert uses for ERROR.
+  // The error notice's circled cross, the same key @shinefold/ui's Alert uses for ERROR.
   [ICONS.CLOSE]: ErrorCircle,
   [ICONS.COMMENT]: Comment,
   [ICONS.COPY]: Copy,

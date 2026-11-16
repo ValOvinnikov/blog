@@ -1,7 +1,7 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { errorResult, okResult } from '@shinefold/utils';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import {
   MOCK_DYNAMIC_SERVER_USAGE_ERROR,
@@ -19,7 +19,7 @@ faker.seed(6010);
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: {
       getTenantById: vi.fn(),

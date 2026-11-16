@@ -1,8 +1,3 @@
-import {
-  ADMIN_ROLE,
-  MEMBERSHIP_ROLE,
-  TENANT_PROVISIONING_STATUS,
-} from '@blog/db/constants';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
@@ -15,6 +10,11 @@ import {
   mockReadyTenant,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import {
+  ADMIN_ROLE,
+  MEMBERSHIP_ROLE,
+  TENANT_PROVISIONING_STATUS,
+} from '@shinefold/db/constants';
 
 import { siteSetupFor } from './site-setup-for';
 

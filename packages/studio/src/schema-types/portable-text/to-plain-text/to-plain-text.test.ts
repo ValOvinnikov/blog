@@ -1,5 +1,5 @@
-import { toPlainText } from '@blog/studio/schema-types/portable-text/to-plain-text/to-plain-text';
 import { faker } from '@faker-js/faker';
+import { toPlainText } from '@shinefold/studio/schema-types/portable-text/to-plain-text/to-plain-text';
 
 faker.seed(4114);
 

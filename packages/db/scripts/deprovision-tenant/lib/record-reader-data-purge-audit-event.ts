@@ -2,11 +2,11 @@ import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   GITHUB_AUDIT_ACTOR_ID_PREFIX,
-} from '@blog/config/constants';
-import { DEPROVISIONING_WORKFLOW_AUDIT_VIA } from '@blog/db/constants';
-import { insertAuditEvent } from '@blog/db/queries/audit-events';
-import type { TTenantReaderDataCounts } from '@blog/db/queries/reader-data';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/config/constants';
+import { DEPROVISIONING_WORKFLOW_AUDIT_VIA } from '@shinefold/db/constants';
+import { insertAuditEvent } from '@shinefold/db/queries/audit-events';
+import type { TTenantReaderDataCounts } from '@shinefold/db/queries/reader-data';
+import { sanitizeLogMessage } from '@shinefold/insight';
 
 import type { TDeprovisionEnv } from './env';
 

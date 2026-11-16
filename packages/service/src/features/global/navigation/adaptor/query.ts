@@ -1,8 +1,8 @@
-import { q } from '@blog/service/sanity/query/query';
-import { brandTaglineFragment } from '@blog/service/shared/fragments/brand-tagline/brand-tagline';
-import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
-import { linkRefFragment } from '@blog/service/shared/fragments/link/link-ref';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+import { q } from '@shinefold/service/sanity/query/query';
+import { brandTaglineFragment } from '@shinefold/service/shared/fragments/brand-tagline/brand-tagline';
+import { linkDocumentFragment } from '@shinefold/service/shared/fragments/link/link-document';
+import { linkRefFragment } from '@shinefold/service/shared/fragments/link/link-ref';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
 
 export const navigationQuery = q
   .parameters<TLocaleQueryParams>()

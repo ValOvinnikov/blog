@@ -1,4 +1,8 @@
-import { FIELD_CONTROL, FIELD_CONTROL_INVALID, tv } from '@blog/ui/lib/styling';
+import {
+  FIELD_CONTROL,
+  FIELD_CONTROL_INVALID,
+  tv,
+} from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const textInputVariants = tv({

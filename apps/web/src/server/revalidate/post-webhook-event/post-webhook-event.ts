@@ -1,4 +1,4 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 
 export type TPostWebhookEvent = {
   operation: TMaybeNull<string>;

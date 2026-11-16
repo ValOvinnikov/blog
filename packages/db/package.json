@@ -1,5 +1,5 @@
 {
-  "name": "@blog/db",
+  "name": "@shinefold/db",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -25,22 +25,22 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@blog/config": "workspace:*",
-    "@blog/insight": "workspace:*",
-    "@blog/utils": "workspace:*",
     "@neondatabase/serverless": "^1.2.0",
+    "@shinefold/config": "workspace:*",
+    "@shinefold/insight": "workspace:*",
+    "@shinefold/utils": "workspace:*",
     "@t3-oss/env-core": "^0.13.11",
     "drizzle-orm": "^0.45.4",
     "server-only": "^0.0.1",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@blog/eslint-config": "workspace:*",
-    "@blog/prettier-config": "workspace:*",
-    "@blog/tsconfig": "workspace:*",
-    "@blog/vitest-config": "workspace:*",
     "@electric-sql/pglite": "^0.5.10",
     "@faker-js/faker": "catalog:",
+    "@shinefold/eslint-config": "workspace:*",
+    "@shinefold/prettier-config": "workspace:*",
+    "@shinefold/tsconfig": "workspace:*",
+    "@shinefold/vitest-config": "workspace:*",
     "@types/node": "^26",
     "drizzle-kit": "^0.31.11",
     "eslint": "catalog:",

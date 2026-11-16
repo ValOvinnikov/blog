@@ -1,48 +1,51 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
-import { buildLoginProviderAuth } from '@blog/studio/auth/login-provider-auth';
-import { documentOptions } from '@blog/studio/document-actions/document-options/document-options';
-import { schemaTypes } from '@blog/studio/schema-types';
-import { PAGE_COOKIE_STATEMENT_TYPE } from '@blog/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
-import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { PAGE_LEGAL_DOCUMENT_TYPE } from '@blog/studio/schema-types/documents/pages/legal-document/legal-document-type';
-import { PAGE_LEGAL_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/legal-index/legal-index-type';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
-import { PAGE_PRIVACY_DOCUMENT_TYPE } from '@blog/studio/schema-types/documents/pages/privacy-document/privacy-document-type';
-import { PAGE_PRIVACY_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/privacy-index/privacy-index-type';
-import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
-import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index-type';
-import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
-import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { createLanguageSwitcherField } from '@blog/studio/schema-types/inputs/language-switcher-field/language-switcher-field';
-import {
-  createLocalizationNoticeInput,
-  type TLocalizationNoticeOptions,
-} from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
-import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
-import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
-import { createSingleLanguageInput } from '@blog/studio/schema-types/inputs/single-language-input/single-language-input';
-import {
-  createTranslationLinkInput,
-  type TTranslationLinkOptions,
-} from '@blog/studio/schema-types/inputs/translation-link-input/translation-link-input';
-import { articleTextSchema } from '@blog/studio/schema-types/portable-text/article-text/article-text';
-import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
-import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
-import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
-import {
-  EVERY_MODULE_PACK,
-  setEntitledModulePacks,
-} from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
-import { setLiveLanguages } from '@blog/studio/schema-types/validation/live-languages/live-languages';
-import { setCanLinkPlatformPlans } from '@blog/studio/schema-types/validation/platform-plan-links/platform-plan-links';
-import { isSingleLanguage } from '@blog/studio/structure/locales/is-single-language';
-import { orderLocales } from '@blog/studio/structure/locales/order-locales';
 import { codeInput } from '@sanity/code-input';
 import { documentInternationalization } from '@sanity/document-internationalization';
 import { visionTool } from '@sanity/vision';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import { buildLoginProviderAuth } from '@shinefold/studio/auth/login-provider-auth';
+import { documentOptions } from '@shinefold/studio/document-actions/document-options/document-options';
+import { schemaTypes } from '@shinefold/studio/schema-types';
+import { PAGE_COOKIE_STATEMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
+import { PAGE_HOME_TYPE } from '@shinefold/studio/schema-types/documents/pages/home/home-type';
+import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { PAGE_LEGAL_DOCUMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/legal-document/legal-document-type';
+import { PAGE_LEGAL_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/legal-index/legal-index-type';
+import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
+import { PAGE_POST_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/post-index/post-index-type';
+import { PAGE_PRIVACY_DOCUMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/privacy-document/privacy-document-type';
+import { PAGE_PRIVACY_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/privacy-index/privacy-index-type';
+import { PAGE_TAG_TYPE } from '@shinefold/studio/schema-types/documents/pages/tag/tag-type';
+import { PAGE_TAG_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/tag-index/tag-index-type';
+import { PAGE_TOPIC_TYPE } from '@shinefold/studio/schema-types/documents/pages/topic/topic-type';
+import { PAGE_TOPIC_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/topic-index/topic-index-type';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
+import { createLanguageSwitcherField } from '@shinefold/studio/schema-types/inputs/language-switcher-field/language-switcher-field';
+import {
+  createLocalizationNoticeInput,
+  type TLocalizationNoticeOptions,
+} from '@shinefold/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
+import { LOCALE_LABEL } from '@shinefold/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { entitlementGates } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
+import { createSingleLanguageInput } from '@shinefold/studio/schema-types/inputs/single-language-input/single-language-input';
+import {
+  createTranslationLinkInput,
+  type TTranslationLinkOptions,
+} from '@shinefold/studio/schema-types/inputs/translation-link-input/translation-link-input';
+import { articleTextSchema } from '@shinefold/studio/schema-types/portable-text/article-text/article-text';
+import { listedTextSchema } from '@shinefold/studio/schema-types/portable-text/listed-text/listed-text';
+import { paragraphTextSchema } from '@shinefold/studio/schema-types/portable-text/paragraph-text/paragraph-text';
+import { setDefaultLanguage } from '@shinefold/studio/schema-types/validation/default-language/default-language';
+import {
+  EVERY_MODULE_PACK,
+  setEntitledModulePacks,
+} from '@shinefold/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
+import { setLiveLanguages } from '@shinefold/studio/schema-types/validation/live-languages/live-languages';
+import { setCanLinkPlatformPlans } from '@shinefold/studio/schema-types/validation/platform-plan-links/platform-plan-links';
+import { isSingleLanguage } from '@shinefold/studio/structure/locales/is-single-language';
+import { orderLocales } from '@shinefold/studio/structure/locales/order-locales';
 import { defineConfig, defineField, definePlugin } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { internationalizedArray } from 'sanity-plugin-internationalized-array';

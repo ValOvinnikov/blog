@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { isString } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { isString } from '@shinefold/utils/primitives';
 
 type TLoggableError = {
   errorName: string;

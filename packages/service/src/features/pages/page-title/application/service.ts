@@ -1,5 +1,5 @@
-import { getPageTitle } from '@blog/service/features/pages/page-title/adaptor/loader';
-import { safeAsync } from '@blog/utils';
+import { getPageTitle } from '@shinefold/service/features/pages/page-title/adaptor/loader';
+import { safeAsync } from '@shinefold/utils';
 
 export function createPageTitleService() {
   return {

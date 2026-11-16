@@ -1,6 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { STRIPE_EVENT_RECORD_OUTCOME } from '@blog/db/constants';
-import { MOCK_STRIPE_EVENT_ID } from '@blog/db/testing/tenants/billing';
 import { BILLING_LOG } from '@platform/constants/billing';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -17,6 +14,9 @@ import { mockStripeEvent } from '@platform/testing/billing/stripe-subscription';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { STRIPE_EVENT_RECORD_OUTCOME } from '@shinefold/db/constants';
+import { MOCK_STRIPE_EVENT_ID } from '@shinefold/db/testing/tenants/billing';
 import { after } from 'next/server';
 import type Stripe from 'stripe';
 
@@ -31,7 +31,7 @@ const { recordStripeEventMock, afterWork } = vi.hoisted(() => ({
   afterWork: [] as Promise<void>[],
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     stripeWebhookEvents: { recordStripeEvent: recordStripeEventMock },

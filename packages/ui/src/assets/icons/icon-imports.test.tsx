@@ -1,4 +1,4 @@
-import { renderElement, screen } from '@blog/ui/testing/custom-render';
+import { renderElement, screen } from '@shinefold/ui/testing/custom-render';
 
 import SunIcon from './sun.svg';
 import sunIconUrl from './sun.svg?url';

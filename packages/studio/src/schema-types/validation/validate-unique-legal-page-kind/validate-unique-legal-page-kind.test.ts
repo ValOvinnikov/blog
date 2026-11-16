@@ -1,18 +1,18 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { LEGAL_PAGE_KIND, LOCALE_ISO_CODES } from '@blog/config/constants';
-import { PAGE_LEGAL_DOCUMENT_TYPE } from '@blog/studio/schema-types/documents/pages/legal-document/legal-document-type';
-import { PAGE_PRIVACY_DOCUMENT_TYPE } from '@blog/studio/schema-types/documents/pages/privacy-document/privacy-document-type';
+import { faker } from '@faker-js/faker';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { LEGAL_PAGE_KIND, LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { PAGE_LEGAL_DOCUMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/legal-document/legal-document-type';
+import { PAGE_PRIVACY_DOCUMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/privacy-document/privacy-document-type';
 import {
   LEGAL_PAGE_KIND_FIELD,
   validateUniqueLegalPageKind,
-} from '@blog/studio/schema-types/validation/validate-unique-legal-page-kind/validate-unique-legal-page-kind';
-import { mockDocument } from '@blog/studio/testing/mock-documents';
-import { MOCK_FETCH_ERROR } from '@blog/studio/testing/mock-fetch-error';
+} from '@shinefold/studio/schema-types/validation/validate-unique-legal-page-kind/validate-unique-legal-page-kind';
+import { mockDocument } from '@shinefold/studio/testing/mock-documents';
+import { MOCK_FETCH_ERROR } from '@shinefold/studio/testing/mock-fetch-error';
 import {
   mockFetchContext,
   mockGroqValidationContext,
-} from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/mock-validation-context';
 import { getDraftId } from 'sanity';
 
 faker.seed(6506);

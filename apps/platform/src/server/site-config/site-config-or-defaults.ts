@@ -1,14 +1,14 @@
 import 'server-only';
 
+import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
 import type {
   TDensity,
   TFontChoice,
   TMaybeUndefined,
   TPresetId,
   TRadiusScale,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 export type TSiteConfigThemeAndAssets = {
   preset: TPresetId;

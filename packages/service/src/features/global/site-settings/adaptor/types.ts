@@ -2,7 +2,7 @@ import type {
   Settings_site,
   TMaybeUndefined,
   TPricePeriod,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export type TSiteSettings = {
   currency: NonNullable<Settings_site['currency']>;

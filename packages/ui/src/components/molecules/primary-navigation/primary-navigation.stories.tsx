@@ -1,9 +1,9 @@
+import { faker } from '@faker-js/faker';
 import {
   HEADER_SUBMENU_STYLE,
   NAV_LINK_STYLE_DECLARATIONS,
-} from '@blog/config';
-import { StyleVariants } from '@blog/ui/testing/style-variants';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { StyleVariants } from '@shinefold/ui/testing/style-variants';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 

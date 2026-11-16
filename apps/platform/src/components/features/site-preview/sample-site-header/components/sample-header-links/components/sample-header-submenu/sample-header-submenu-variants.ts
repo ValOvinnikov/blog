@@ -1,5 +1,5 @@
-import { HEADER_SUBMENU_STYLE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
+import { HEADER_SUBMENU_STYLE } from '@shinefold/config';
 
 export const sampleHeaderSubmenuVariants = tv({
   slots: {

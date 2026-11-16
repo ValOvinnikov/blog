@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   ACTION_OUTCOME,
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   LOCALE_ISO_CODES,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import type { TSubmitContactMessage } from '@web/modules/contact-form/hooks/use-contact-form/use-contact-form';
 import { mockContactFormModule } from '@web/testing/modules/contact-form/fixtures';

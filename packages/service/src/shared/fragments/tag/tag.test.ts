@@ -1,9 +1,9 @@
-import { q } from '@blog/service/sanity/query/query';
+import { q } from '@shinefold/service/sanity/query/query';
 import {
   MOCK_TAG_ID,
   MOCK_TAG_SLUG,
   MOCK_TAG_TITLE,
-} from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
 
 import { tagFragment } from './tag';
 

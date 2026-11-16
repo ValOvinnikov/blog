@@ -1,8 +1,5 @@
 import 'server-only';
 
-import { ACTION_OUTCOME } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import {
@@ -18,6 +15,9 @@ import {
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { imageSize } from 'image-size';
 
 import { sanitizeSvgMarkup } from './sanitize-svg-markup';

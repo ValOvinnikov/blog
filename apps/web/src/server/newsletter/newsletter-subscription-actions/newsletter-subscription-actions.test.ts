@@ -1,13 +1,13 @@
+import { faker } from '@faker-js/faker';
 import {
   ACTION_OUTCOME,
   PRESET_ID,
   resolveTenantEmailBrand,
   routes,
   SUBSCRIBER_OUTCOME,
-} from '@blog/config';
-import { TENANT_STATUS } from '@blog/db/constants';
-import { toOutcome } from '@blog/utils/to-outcome';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { setConfirmationEmailDefaults } from '@web/testing/server/newsletter/confirmation-email-defaults';
@@ -51,8 +51,8 @@ const {
 
 vi.mock('@web/server/auth/auth');
 
-vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await import('@shinefold/db/constants')),
   queries: (
     await import('@web/testing/server/newsletter/confirmation-email-edges')
   ).confirmationEmailQueries({
@@ -61,7 +61,7 @@ vi.mock('@blog/db', async () => ({
   }),
 }));
 
-vi.mock(import('@blog/email'), async (importOriginal) => ({
+vi.mock(import('@shinefold/email'), async (importOriginal) => ({
   ...(await importOriginal()),
   sendEmail: (
     await import('@web/testing/server/newsletter/confirmation-email-edges')

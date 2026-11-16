@@ -6,8 +6,8 @@ import {
   MOCK_SCRIPT_MARKUP,
   MOCK_TAB_SPLIT_JAVASCRIPT_URL,
   MOCK_URL,
-} from '@blog/email/testing/email-fixtures';
-import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
+} from '@shinefold/email/testing/email-fixtures';
+import { MOCK_TENANT_EMAIL_BRAND } from '@shinefold/email/testing/tenant-email-brand';
 
 import { renderEmailAction } from './email-action';
 

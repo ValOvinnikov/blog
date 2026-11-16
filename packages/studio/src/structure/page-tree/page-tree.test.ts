@@ -1,17 +1,20 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { mockLandingPage } from '@blog/studio/testing/mock-documents';
+import { faker } from '@faker-js/faker';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { mockLandingPage } from '@shinefold/studio/testing/mock-documents';
 import {
   asStructureBuilder,
   matchingIds,
   MOCK_PERSPECTIVE,
   mockStructureBuilder,
-} from '@blog/studio/testing/structure/mock-structure-builder';
+} from '@shinefold/studio/testing/structure/mock-structure-builder';
 import {
   callArgs,
   type TMockStructureNode,
-} from '@blog/studio/testing/structure/mock-structure-node';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/structure/mock-structure-node';
 import { FileText } from 'lucide-react';
 import { getDraftId } from 'sanity';
 

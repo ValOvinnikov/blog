@@ -1,6 +1,6 @@
-import type { AllSanitySchemaTypes } from '@blog/config/sanity/generated/types';
+import type { AllSanitySchemaTypes } from '@shinefold/config/sanity/generated/types';
 
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export type TModuleType = Extract<
   AllSanitySchemaTypes,

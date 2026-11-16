@@ -1,5 +1,3 @@
-import { VOICE_FIELD_ERROR, type TVoicePortableText } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
 import {
   VoiceSettings,
@@ -17,6 +15,8 @@ import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
 import { openVoiceSections } from '@platform/testing/voice/sections';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
+import { VOICE_FIELD_ERROR, type TVoicePortableText } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import type { UserEvent } from '@testing-library/user-event';
 
 const { EN, DE } = LOCALE_ISO_CODES;

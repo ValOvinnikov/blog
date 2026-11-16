@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 
 import { formatRelativeTime } from './format-relative-time';
 

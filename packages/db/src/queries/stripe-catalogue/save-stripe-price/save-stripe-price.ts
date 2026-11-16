@@ -1,10 +1,10 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import type {
   TBillingCurrency,
   TStripePriceLookupKey,
-} from '@blog/db/constants';
-import { stripePrices } from '@blog/db/schema/stripe-catalogue';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/db/constants';
+import { stripePrices } from '@shinefold/db/schema/stripe-catalogue';
+import { hasLength } from '@shinefold/utils/primitives';
 import { and, eq, notInArray, sql } from 'drizzle-orm';
 
 export type TStripePriceAmount = {

@@ -1,12 +1,12 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
-import { normalizeSignupEmail } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
-import { requireEmailIndex } from '@blog/db/utils/personal-data/personal-data';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { personalDataIndex } from '@blog/utils/encryption';
-import { isUndefined } from '@blog/utils/primitives';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
+import { blockedSignupIdentities } from '@shinefold/db/schema/blocked-signup-identities';
+import { normalizeSignupEmail } from '@shinefold/db/utils/normalize-signup-identity/normalize-signup-identity';
+import { requireEmailIndex } from '@shinefold/db/utils/personal-data/personal-data';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { personalDataIndex } from '@shinefold/utils/encryption';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { and, eq, or } from 'drizzle-orm';
 
 export async function isSignupBlocked(

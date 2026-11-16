@@ -1,6 +1,9 @@
-import { getDb } from '@blog/db/client';
-import type { TMembershipRole } from '@blog/db/constants';
-import { memberships, type TMembership } from '@blog/db/schema/memberships';
+import { getDb } from '@shinefold/db/client';
+import type { TMembershipRole } from '@shinefold/db/constants';
+import {
+  memberships,
+  type TMembership,
+} from '@shinefold/db/schema/memberships';
 import { and, eq } from 'drizzle-orm';
 
 // Idempotent on the (userId, tenantId) pair (the table's unique

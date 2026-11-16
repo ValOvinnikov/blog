@@ -1,13 +1,13 @@
 import { readFile } from 'node:fs/promises';
 
-import * as schema from '@blog/db/schema';
-import type { TTestDb } from '@blog/db/testing/fixtures';
 import { PGlite } from '@electric-sql/pglite';
+import * as schema from '@shinefold/db/schema';
+import type { TTestDb } from '@shinefold/db/testing/fixtures';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/pglite';
 import { inject } from 'vitest';
 
-const WORKER_TEST_DB = Symbol.for('@blog/db/worker-test-db');
+const WORKER_TEST_DB = Symbol.for('@shinefold/db/worker-test-db');
 
 type TWorkerGlobal = typeof globalThis & {
   [WORKER_TEST_DB]?: Promise<TTestDb>;

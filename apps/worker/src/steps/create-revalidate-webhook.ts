@@ -1,41 +1,29 @@
-import { randomBytes } from 'node:crypto';
-
-import {
-  getTenantRevalidateWebhookSecret,
-  setTenantRevalidateWebhookSecret,
-  setTenantWebhookCreatedAt,
-} from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { setTenantWebhookCreatedAt } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   createSanityWebhook,
   listSanityWebhooks,
   REVALIDATE_WEBHOOK_PROJECTION,
   type TListedSanityWebhook,
   updateSanityWebhookProjection,
-  updateSanityWebhookSecret,
-} from '@blog/db/utils/sanity-management-client/sanity-webhooks';
-import { HEX_ENCODING } from '@blog/utils/hash';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
+import { hasLength } from '@shinefold/utils/primitives';
+import {
+  REVALIDATE_WEBHOOK_CHANGE,
+  type TRevalidateWebhookChange,
+} from '@worker/constants/revalidate-webhook';
+import {
+  rotateWebhookSecret,
+  storedOrNewSecret,
+  type TTenantWebhookTarget,
+} from '@worker/steps/revalidate-webhook-secret';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 
 const WEBHOOK_NAME = 'web-revalidate (provisioned)';
-const WEBHOOK_SECRET_BYTES = 32;
-
-type TTenantWebhookTarget = {
-  tenantId: string;
-  token: string;
-  projectId: string;
-  dataset: string;
-  url: string;
-};
 
 export function revalidateWebhookUrl(webAppBaseUrl: string): string {
   return `${webAppBaseUrl}/api/revalidate`;
-}
-
-function generateWebhookSecret(): string {
-  return randomBytes(WEBHOOK_SECRET_BYTES).toString(HEX_ENCODING);
 }
 
 async function webhooksTargeting(
@@ -44,19 +32,6 @@ async function webhooksTargeting(
   const { token, projectId, url } = target;
   const webhooks = await listSanityWebhooks({ token, projectId });
   return webhooks.filter((webhook) => webhook.url === url);
-}
-
-// Stored before the hook exists, so a retry after a failed create signs with the same secret.
-async function storedOrNewSecret(
-  target: TTenantWebhookTarget,
-): Promise<string> {
-  const { tenantId, projectId } = target;
-  const stored = await getTenantRevalidateWebhookSecret(projectId);
-  if (stored?.tenantId === tenantId && stored.secret) return stored.secret;
-
-  const secret = generateWebhookSecret();
-  await setTenantRevalidateWebhookSecret(tenantId, secret);
-  return secret;
 }
 
 async function createWebhook(target: TTenantWebhookTarget): Promise<void> {
@@ -77,28 +52,18 @@ async function createWebhook(target: TTenantWebhookTarget): Promise<void> {
   }
 }
 
-// Stored only after every hook carries it: a failed update leaves the tenant due for another rotation.
-async function rotateWebhookSecret(
-  target: TTenantWebhookTarget,
-  webhooks: TListedSanityWebhook[],
-): Promise<void> {
-  const { tenantId, token, projectId } = target;
-  const secret = generateWebhookSecret();
-  for (const { id: webhookId } of webhooks) {
-    await updateSanityWebhookSecret({ token, projectId, webhookId, secret });
-  }
-  await setTenantRevalidateWebhookSecret(tenantId, secret);
-}
-
 async function updateStaleProjections(
   target: TTenantWebhookTarget,
   webhooks: TListedSanityWebhook[],
-): Promise<void> {
+): Promise<boolean> {
   const { token, projectId } = target;
-  for (const { id: webhookId, projection } of webhooks) {
-    if (projection === REVALIDATE_WEBHOOK_PROJECTION) continue;
+  const stale = webhooks.filter(
+    ({ projection }) => projection !== REVALIDATE_WEBHOOK_PROJECTION,
+  );
+  for (const { id: webhookId } of stale) {
     await updateSanityWebhookProjection({ token, projectId, webhookId });
   }
+  return hasLength(stale);
 }
 
 // Decides from the project's live hooks, never from `webhookCreatedAt`: a
@@ -106,8 +71,14 @@ async function updateStaleProjections(
 export async function createTenantRevalidateWebhook(
   tenant: TTenant,
   env: TProvisionEnv,
-): Promise<void> {
-  const { id: tenantId, sanityProjectId, sanityDataset } = tenant;
+): Promise<TRevalidateWebhookChange> {
+  const {
+    id: tenantId,
+    sanityProjectId,
+    sanityDataset,
+    revalidateWebhookSecretEncrypted,
+    webhookCreatedAt,
+  } = tenant;
   if (!sanityProjectId || !sanityDataset) {
     throw new Error(
       `createTenantRevalidateWebhook: tenant "${tenantId}" has no Sanity project yet — run the "Create Sanity project" step first.`,
@@ -123,16 +94,22 @@ export async function createTenantRevalidateWebhook(
   };
 
   const existing = await webhooksTargeting(target);
+  const isMissing = !hasLength(existing);
+  const isUnrotated = !isMissing && !revalidateWebhookSecretEncrypted;
 
-  if (!hasLength(existing)) {
+  if (isMissing) {
     await createWebhook(target);
-  } else if (!tenant.revalidateWebhookSecretEncrypted) {
+  } else if (isUnrotated) {
     await rotateWebhookSecret(target, existing);
   }
 
-  await updateStaleProjections(target, existing);
+  const hasUpdatedProjection = await updateStaleProjections(target, existing);
 
-  if (!hasLength(existing) || !tenant.webhookCreatedAt) {
+  if (isMissing || !webhookCreatedAt) {
     await setTenantWebhookCreatedAt(tenantId, new Date());
   }
+
+  return isMissing || isUnrotated || hasUpdatedProjection
+    ? REVALIDATE_WEBHOOK_CHANGE.UPDATED
+    : REVALIDATE_WEBHOOK_CHANGE.UNCHANGED;
 }

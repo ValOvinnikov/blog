@@ -1,13 +1,16 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { users } from '@blog/db/schema/auth';
-import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { users } from '@shinefold/db/schema/auth';
+import {
+  subscribers,
+  type TSubscriber,
+} from '@shinefold/db/schema/subscribers';
 import {
   byEmailAddress,
   withExactEmailAddress,
-} from '@blog/db/utils/personal-data/email-address-match';
-import { decryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
-import { normalizeEmail } from '@blog/utils/normalize-email-identity';
+} from '@shinefold/db/utils/personal-data/email-address-match';
+import { decryptPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
+import { normalizeEmail } from '@shinefold/utils/normalize-email-identity';
 import { and, eq } from 'drizzle-orm';
 
 export type TUserSubscriber = Pick<TSubscriber, 'id' | 'status'> & {

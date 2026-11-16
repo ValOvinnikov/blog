@@ -1,5 +1,5 @@
-import { HERO_VARIANT } from '@blog/config';
-import type { THeroPresentation } from '@blog/service';
+import { HERO_VARIANT } from '@shinefold/config';
+import type { THeroPresentation } from '@shinefold/service';
 
 export const mockHeroPresentation = (
   overrides: Partial<THeroPresentation> = {},

@@ -1,8 +1,5 @@
 'use server';
 
-import { ACTION_OUTCOME, ERROR_CODE, type TActionResult } from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
 import {
   CUSTOM_DOMAIN_FIELD_ERROR,
   CUSTOM_DOMAIN_LOG,
@@ -16,6 +13,13 @@ import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domai
 import { isReservedDomain } from '@platform/utils/is-reserved-domain/is-reserved-domain';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  ERROR_CODE,
+  type TActionResult,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import {
   customDomainInputSchema,

@@ -1,11 +1,11 @@
-import type { ISanityImage } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import type { SanityImageSource } from '@sanity/image-url';
+import type { ISanityImage } from '@shinefold/config';
 import {
   MOCK_IMAGE_ALT,
   MOCK_IMAGE_ASSET_ID,
-} from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
-import type { SanityImageSource } from '@sanity/image-url';
+} from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { urlForImage, urlForSanityImage } from './image';
 

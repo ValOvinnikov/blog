@@ -2,7 +2,7 @@ import {
   toSocialProfile,
   type TRawSocialProfile,
   type TSocialProfile,
-} from '@blog/service/shared/transformers/social-profile/to-social-profile';
+} from '@shinefold/service/shared/transformers/social-profile/to-social-profile';
 
 export function toSocialProfiles(
   raw: TRawSocialProfile[] | null | undefined,

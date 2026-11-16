@@ -5,8 +5,8 @@ import {
   MODULE_PACK,
   type TCapability,
   type TModulePack,
-} from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
+} from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
 
 export type TRequirement =
   { capability: TCapability } | { modulePack: TModulePack };

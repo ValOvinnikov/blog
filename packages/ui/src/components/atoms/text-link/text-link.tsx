@@ -2,8 +2,8 @@ import {
   A_AS_CONST,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
+} from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
 import type { ReactNode } from 'react';
 
 import { type TTextLinkVariants, textLinkVariants } from './text-link-variants';

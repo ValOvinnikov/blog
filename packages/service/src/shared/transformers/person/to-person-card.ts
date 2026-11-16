@@ -1,7 +1,7 @@
-import type { ISanityImage, TMaybeUndefined } from '@blog/config';
-import type { personCardFragment } from '@blog/service/shared/fragments/person/person';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
+import type { ISanityImage, TMaybeUndefined } from '@shinefold/config';
+import type { personCardFragment } from '@shinefold/service/shared/fragments/person/person';
+import { toSanityImage } from '@shinefold/service/shared/transformers/image/to-sanity-image';
+import { toLinkDocument } from '@shinefold/service/shared/transformers/link/to-link-document';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawPersonCard = InferFragmentType<typeof personCardFragment>;

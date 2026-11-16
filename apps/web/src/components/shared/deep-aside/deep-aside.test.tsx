@@ -1,4 +1,4 @@
-import { ASIDE_KIND } from '@blog/config';
+import { ASIDE_KIND } from '@shinefold/config';
 import { DepthProvider } from '@web/context/depth-provider';
 import {
   customRender,

@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import type { TTenantDomain } from '@blog/db/schema/tenant-domains';
 import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import type { TTenantDomain } from '@shinefold/db/schema/tenant-domains';
 
 export const findCustomDomain = (
   tenantDomains: Pick<TTenantDomain, 'domain'>[],

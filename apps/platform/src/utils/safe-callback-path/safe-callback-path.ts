@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 // Parsed the way a browser parses a Location header, so `//host`, `/\host` and tab-split variants resolve off this origin.
 const PARSE_ORIGIN = 'https://platform.invalid';

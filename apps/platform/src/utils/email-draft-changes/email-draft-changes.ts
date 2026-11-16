@@ -1,4 +1,3 @@
-import type { TLocaleIsoCode } from '@blog/config';
 import {
   EMAIL_SENDER_ITEM,
   EMAIL_TEMPLATE_TYPES,
@@ -10,6 +9,7 @@ import {
 } from '@platform/utils/email-draft/email-draft';
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 import { isSameStagedImage } from '@platform/utils/staged-image/staged-image';
+import type { TLocaleIsoCode } from '@shinefold/config';
 
 export type TEmailItemStatus = 'default' | 'customised' | 'unsaved';
 

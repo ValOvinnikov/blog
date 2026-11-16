@@ -1,15 +1,15 @@
-import { findMagicLinkSendRefusal } from '@blog/auth/providers/magic-link/find-magic-link-send-refusal/find-magic-link-send-refusal';
-import { MagicLinkSendLimitedError } from '@blog/auth/providers/magic-link/magic-link-send-limited-error/magic-link-send-limited-error';
-import { resolveMagicLinkFromAddress } from '@blog/auth/providers/magic-link/resolve-magic-link-from-address/resolve-magic-link-from-address';
-import { sendMagicLinkEmail } from '@blog/auth/providers/magic-link/send-magic-link-email/send-magic-link-email';
-import { env } from '@blog/auth/utils/env/env';
-import { withMinimumDuration } from '@blog/auth/utils/with-minimum-duration/with-minimum-duration';
+import { findMagicLinkSendRefusal } from '@shinefold/auth/providers/magic-link/find-magic-link-send-refusal/find-magic-link-send-refusal';
+import { MagicLinkSendLimitedError } from '@shinefold/auth/providers/magic-link/magic-link-send-limited-error/magic-link-send-limited-error';
+import { resolveMagicLinkFromAddress } from '@shinefold/auth/providers/magic-link/resolve-magic-link-from-address/resolve-magic-link-from-address';
+import { sendMagicLinkEmail } from '@shinefold/auth/providers/magic-link/send-magic-link-email/send-magic-link-email';
+import { env } from '@shinefold/auth/utils/env/env';
+import { withMinimumDuration } from '@shinefold/auth/utils/with-minimum-duration/with-minimum-duration';
 import {
   MAGIC_LINK_REFUSAL,
   type TAuthApp,
   type TMagicLinkRefusal,
-} from '@blog/config/constants';
-import type { IMagicLinkSendHandlers } from '@blog/config/types';
+} from '@shinefold/config/constants';
+import type { IMagicLinkSendHandlers } from '@shinefold/config/types';
 import type { EmailConfig } from 'next-auth/providers/email';
 
 // Above a typical lookup-and-Resend round trip, so a refused send is not measurably faster than a real one.

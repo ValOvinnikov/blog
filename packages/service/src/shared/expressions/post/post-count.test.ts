@@ -1,7 +1,7 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { MOCK_TOPIC_ID } from '@blog/service/testing/entities/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { MOCK_TRANSLATED_POST_DOCUMENTS } from '@blog/service/testing/shared/translated-posts-dataset';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { MOCK_TOPIC_ID } from '@shinefold/service/testing/entities/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { MOCK_TRANSLATED_POST_DOCUMENTS } from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { POST_COUNT_EXPRESSION, postCountParser } from './post-count';
 

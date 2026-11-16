@@ -1,10 +1,10 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 import {
   MOCK_TENANT_VALUES,
   mockTenant,
-} from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/tenants/fixtures';
 
 import { resolveOrCreateTenant } from './seed-tenant';
 
@@ -23,11 +23,11 @@ const {
   getTenantByIdMock: vi.fn(),
 }));
 
-vi.mock('@blog/db/queries/tenant-domains', () => ({
+vi.mock('@shinefold/db/queries/tenant-domains', () => ({
   getTenantByDomain: getTenantByDomainMock,
   addTenantDomain: vi.fn(),
 }));
-vi.mock('@blog/db/queries/tenants', () => ({
+vi.mock('@shinefold/db/queries/tenants', () => ({
   createTenant: createTenantMock,
   getTenantById: getTenantByIdMock,
   getTenantIdBySanityProjectId: getTenantIdBySanityProjectIdMock,

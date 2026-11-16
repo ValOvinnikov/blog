@@ -1,7 +1,3 @@
-import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockLocaleRouterPush } from '@platform/testing/mock-locale-router';
 import {
@@ -16,6 +12,13 @@ import {
   MOCK_TENANT_ID,
   MOCK_TENANT_SLUG,
 } from '@platform/testing/tenants/fixtures';
+import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantsTable } from './tenants-table';

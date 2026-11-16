@@ -1,6 +1,6 @@
-import { LOG_LEVEL } from '@blog/insight/logger/logger';
-import { MOCK_EVENT, MOCK_SERVICE } from '@blog/insight/testing/fixtures';
 import { faker } from '@faker-js/faker';
+import { LOG_LEVEL } from '@shinefold/insight/logger/logger';
+import { MOCK_EVENT, MOCK_SERVICE } from '@shinefold/insight/testing/fixtures';
 
 import { createLokiSink } from './loki-sink';
 

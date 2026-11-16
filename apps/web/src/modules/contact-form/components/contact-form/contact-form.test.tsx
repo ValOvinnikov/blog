@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   ACTION_OUTCOME,
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   SITE_MESSAGES,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import { usePathname } from '@web/i18n/navigation';

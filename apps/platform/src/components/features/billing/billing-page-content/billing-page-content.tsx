@@ -1,9 +1,9 @@
-import { queries } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { BillingOverview } from '@platform/components/features/billing/billing-page-content/components/billing-overview/billing-overview';
 import { BillingOverviewSkeleton } from '@platform/components/features/billing/billing-page-content/components/billing-overview-skeleton/billing-overview-skeleton';
 import { ManageBillingButton } from '@platform/components/features/billing/billing-page-content/components/manage-billing-button/manage-billing-button';
 import { PageHeader } from '@platform/components/shared/page-header';
+import { queries } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 

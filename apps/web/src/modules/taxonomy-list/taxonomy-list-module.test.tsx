@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   LOCALE_ISO_CODES,
@@ -5,10 +6,9 @@ import {
   SITE_MESSAGES,
   TAXONOMY_KIND,
   type TTaxonomyKind,
-} from '@blog/config';
-import type { TTaxonomyEntry, TTaxonomyListModule } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import type { TTaxonomyEntry, TTaxonomyListModule } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { TAXONOMY_LIST_LOG } from '@web/constants/taxonomy-list';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
@@ -37,7 +37,7 @@ const { getTaxonomyListMock } = vi.hoisted(() => ({
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       taxonomyList: { v1: { getTaxonomyList: getTaxonomyListMock } },

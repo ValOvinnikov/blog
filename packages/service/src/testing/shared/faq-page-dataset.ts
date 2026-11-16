@@ -1,9 +1,9 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockReference } from '@shinefold/service/testing/shared/fixtures';
 import {
   mockLocalizedListedText,
   mockLocalizedStrings,
-} from '@blog/service/testing/shared/localized';
+} from '@shinefold/service/testing/shared/localized';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 

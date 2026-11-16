@@ -1,7 +1,7 @@
-import type { TMaybeNull } from '@blog/config';
 import type { TDeviceFrameHandle } from '@platform/components/shared/device-frame';
 import { KEY } from '@platform/constants/keyboard';
 import { LOOK_FULLSCREEN } from '@platform/constants/look-fullscreen';
+import type { TMaybeNull } from '@shinefold/config';
 import { useRef, type KeyboardEvent } from 'react';
 
 const { SCROLL_STEP } = LOOK_FULLSCREEN;

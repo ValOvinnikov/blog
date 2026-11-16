@@ -1,7 +1,7 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import {
   createContext,
   useContext,

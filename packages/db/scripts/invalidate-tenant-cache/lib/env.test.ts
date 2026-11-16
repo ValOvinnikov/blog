@@ -1,7 +1,7 @@
 import {
   MOCK_SITE_CONFIG_REVALIDATE_SECRET,
   MOCK_WEB_APP_URL,
-} from '@blog/db/testing/invalidate-tenant-cache/fixtures';
+} from '@shinefold/db/testing/invalidate-tenant-cache/fixtures';
 
 import { loadInvalidateCacheEnv } from './env';
 

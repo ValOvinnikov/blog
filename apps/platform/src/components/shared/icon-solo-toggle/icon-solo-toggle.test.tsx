@@ -1,6 +1,6 @@
-import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { ICONS } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { IconSoloToggle } from './icon-solo-toggle';

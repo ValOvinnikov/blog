@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import type { TSiteConfigSavedAt } from '@blog/db/constants';
-import { siteConfig, type TSiteConfig } from '@blog/db/schema/site-config';
+import { getDb } from '@shinefold/db/client';
+import type { TSiteConfigSavedAt } from '@shinefold/db/constants';
+import { siteConfig, type TSiteConfig } from '@shinefold/db/schema/site-config';
 import { eq } from 'drizzle-orm';
 
 const SAVED_AT_COLUMN = {

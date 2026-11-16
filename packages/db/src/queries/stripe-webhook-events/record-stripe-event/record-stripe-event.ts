@@ -1,9 +1,9 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   STRIPE_EVENT_RECORD_OUTCOME,
   type TStripeEventRecordOutcome,
-} from '@blog/db/constants';
-import { stripeWebhookEvents } from '@blog/db/schema/stripe-webhook-events';
+} from '@shinefold/db/constants';
+import { stripeWebhookEvents } from '@shinefold/db/schema/stripe-webhook-events';
 
 export async function recordStripeEvent(
   eventId: string,

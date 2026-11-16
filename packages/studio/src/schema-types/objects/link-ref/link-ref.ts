@@ -1,10 +1,10 @@
-import { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
-import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
+import { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config/constants';
+import { linkReferenceField } from '@shinefold/studio/schema-types/fields/link-reference-field/link-reference-field';
 import {
   linkReferencePreviewSelect,
   toLinkReferencePreviewTitle,
-} from '@blog/studio/schema-types/fields/link-reference-field/link-reference-preview';
-import { toToolbarIcon } from '@blog/studio/schema-types/portable-text/toolbar-icon/toolbar-icon';
+} from '@shinefold/studio/schema-types/fields/link-reference-field/link-reference-preview';
+import { toToolbarIcon } from '@shinefold/studio/schema-types/portable-text/toolbar-icon/toolbar-icon';
 import { Link2 } from 'lucide-react';
 import { defineType } from 'sanity';
 

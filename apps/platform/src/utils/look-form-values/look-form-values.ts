@@ -1,4 +1,3 @@
-import { isUndefined } from '@blog/utils/primitives';
 import { LOOK_CARD, type TLookCard } from '@platform/constants/look-card';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import {
@@ -7,6 +6,7 @@ import {
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { isSameStagedImage } from '@platform/utils/staged-image/staged-image';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 export const CARD_FIELDS = {
   [LOOK_CARD.PRESET]: ['preset'],

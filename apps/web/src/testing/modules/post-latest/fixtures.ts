@@ -1,5 +1,5 @@
-import { DISPLAY_MODE } from '@blog/config';
-import type { TPostLatestModule } from '@blog/service';
+import { DISPLAY_MODE } from '@shinefold/config';
+import type { TPostLatestModule } from '@shinefold/service';
 import { mockPostModuleBase } from '@web/testing/modules/post-list/fixtures';
 
 export const mockPostLatestModuleData = (

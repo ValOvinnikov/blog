@@ -1,6 +1,9 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
-import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
-import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import {
+  q,
+  type TModuleQueryParams,
+} from '@shinefold/service/sanity/query/query';
+import { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
+import { moduleLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
 
 export const cookieSettingsModuleQuery = q
   .parameters<TModuleQueryParams>()

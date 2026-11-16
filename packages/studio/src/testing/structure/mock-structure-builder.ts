@@ -1,5 +1,5 @@
-import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
-import { mockStructureNode } from '@blog/studio/testing/structure/mock-structure-node';
+import { mockGroqFetch } from '@shinefold/studio/testing/mock-groq-fetch';
+import { mockStructureNode } from '@shinefold/studio/testing/structure/mock-structure-node';
 import type { StructureBuilder } from 'sanity/structure';
 
 export const MOCK_PERSPECTIVE = 'drafts';

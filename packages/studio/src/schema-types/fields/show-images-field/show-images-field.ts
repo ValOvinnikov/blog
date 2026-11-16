@@ -1,4 +1,4 @@
-import { showToggleField } from '@blog/studio/schema-types/fields/show-toggle-field/show-toggle-field';
+import { showToggleField } from '@shinefold/studio/schema-types/fields/show-toggle-field/show-toggle-field';
 
 export const showImagesField = ({ subject }: { subject: string }) =>
   showToggleField({

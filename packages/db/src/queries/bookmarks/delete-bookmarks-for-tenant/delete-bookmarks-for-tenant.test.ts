@@ -1,17 +1,20 @@
-import * as schema from '@blog/db/schema';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_OTHER_POST_ID,
   MOCK_POST_ID,
-} from '@blog/db/testing/bookmarks/fixtures';
-import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/bookmarks/fixtures';
+import {
+  insertTestTenant,
+  insertTestUser,
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
 import { addBookmark } from '../add-bookmark';
 
 import { deleteBookmarksForTenant } from './delete-bookmarks-for-tenant';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

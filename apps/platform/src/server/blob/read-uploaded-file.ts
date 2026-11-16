@@ -1,10 +1,10 @@
 import 'server-only';
 
-import { ACTION_OUTCOME } from '@blog/config';
-import { errorResult, okResult, type TResult } from '@blog/utils';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import type { TUploadFailure } from '@platform/server/uploads/upload-error';
 import { env } from '@platform/utils/env/env';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 
 type TReadUploadedFileResult = TResult<
   { file: File; token: string },

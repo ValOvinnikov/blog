@@ -1,7 +1,7 @@
-import type { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
-import { q } from '@blog/service/sanity/query/query';
-import { bodyImageFragment } from '@blog/service/shared/fragments/image/image';
-import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
+import type { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
+import { q } from '@shinefold/service/sanity/query/query';
+import { bodyImageFragment } from '@shinefold/service/shared/fragments/image/image';
+import { textBlockFragment } from '@shinefold/service/shared/fragments/portable-text/text-block';
 
 const bodyImageBlockFragment = q
   .fragmentForType<typeof PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE>()

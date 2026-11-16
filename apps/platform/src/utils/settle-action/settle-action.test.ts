@@ -1,6 +1,6 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import { UnrecognizedActionError } from 'next/dist/client/components/unrecognized-action-error';
 import { notFound, redirect } from 'next/navigation';
 

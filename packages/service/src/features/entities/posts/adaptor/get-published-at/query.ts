@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query/query';
+import { q } from '@shinefold/service/sanity/query/query';
 
 export type TPostPublishedAtQueryParams = {
   id: string;
@@ -11,5 +11,6 @@ export const postPublishedAtQuery = q
   .filterBy('_id == $id')
   .slice(0)
   .project((sub) => ({
-    publishedAt: sub.field('publishedAt'),
-  }));
+    publishedAt: sub.field('publishedAt').notNull(),
+  }))
+  .nullable(true);

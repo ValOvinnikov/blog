@@ -1,13 +1,13 @@
 'use client';
 
 import { Collapsible } from '@base-ui/react/collapsible';
-import { ALERT_TYPE, ICONS, SIZE } from '@blog/config';
 import { buttonVariants } from '@platform/components/shared/button/button-variants';
 import { GrowthBadge } from '@platform/components/shared/growth-badge';
 import { Icon, STATUS_ICON } from '@platform/components/shared/icon';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { ICON_SIZE } from '@platform/constants/icon';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ALERT_TYPE, ICONS, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 

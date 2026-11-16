@@ -1,14 +1,15 @@
+import { faker } from '@faker-js/faker';
 import {
   FINDING_KIND,
   FINDING_SEVERITY,
   FINDING_SOURCE,
   FINDING_STATUS,
-} from '@blog/config/constants';
-import type { TContrastResultBody } from '@blog/config/types';
-import { buildContrastDedupeKey } from '@blog/db/queries/findings/contrast-dedupe-key';
-import { getContrastFinding } from '@blog/db/queries/findings/get-contrast-finding';
-import { listOpenFindings } from '@blog/db/queries/findings/list-open-findings';
-import * as schema from '@blog/db/schema';
+} from '@shinefold/config/constants';
+import type { TContrastResultBody } from '@shinefold/config/types';
+import { buildContrastDedupeKey } from '@shinefold/db/queries/findings/contrast-dedupe-key';
+import { getContrastFinding } from '@shinefold/db/queries/findings/get-contrast-finding';
+import { listOpenFindings } from '@shinefold/db/queries/findings/list-open-findings';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_FINDING_LATER_AT,
   MOCK_FINDING_NOW,
@@ -17,15 +18,14 @@ import {
   mockPassingContrastResult,
   mockReleaseTag,
   openTestFinding,
-} from '@blog/db/testing/findings/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/findings/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { recordContrastResult } from './record-contrast-result';
 
 faker.seed(6021008);
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

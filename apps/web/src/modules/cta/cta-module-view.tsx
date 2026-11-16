@@ -1,7 +1,7 @@
-import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config';
-import type { TCtaModule } from '@blog/service';
-import { CtaModule as CtaModuleUi } from '@blog/ui/components/organisms/cta-module';
-import { hasLength } from '@blog/utils/primitives';
+import { BRAND_VARIANT, CTA_VARIANT } from '@shinefold/config';
+import type { TCtaModule } from '@shinefold/service';
+import { CtaModule as CtaModuleUi } from '@shinefold/ui/components/organisms/cta-module';
+import { hasLength } from '@shinefold/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';

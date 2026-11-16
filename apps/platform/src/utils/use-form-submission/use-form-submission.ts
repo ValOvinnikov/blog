@@ -1,13 +1,13 @@
 'use client';
 
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import {
   FORM_STATUS,
   isOutcomeSuccess,
   type TActionOutcome,
   type TFormStatus,
   type TOutcome,
-} from '@blog/config';
-import { settleAction } from '@platform/utils/settle-action/settle-action';
+} from '@shinefold/config';
 import {
   useState,
   useTransition,

@@ -1,4 +1,4 @@
-import { isNull } from '@blog/utils/primitives';
+import { isNull } from '@shinefold/utils/primitives';
 
 const RETRYABLE_STATUS_FLOOR = 500;
 const TOO_MANY_REQUESTS = 429;

@@ -1,7 +1,7 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { LANGUAGE_SWITCHER_FIELD_NAME } from '@blog/studio/schema-types/fields/language-switcher-field/language-switcher-field';
-import { createLanguageSwitcherField } from '@blog/studio/schema-types/inputs/language-switcher-field/language-switcher-field';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { LANGUAGE_SWITCHER_FIELD_NAME } from '@shinefold/studio/schema-types/fields/language-switcher-field/language-switcher-field';
+import { createLanguageSwitcherField } from '@shinefold/studio/schema-types/inputs/language-switcher-field/language-switcher-field';
 import type { FieldProps } from 'sanity';
 
 faker.seed(4105);

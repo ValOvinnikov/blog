@@ -1,9 +1,9 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '@blog/ui/lib/react';
+} from '@shinefold/ui/lib/react';
 import { Fragment, type ElementType } from 'react';
 
 import { PopoverMenuItem } from './components/item/popover-menu-item';

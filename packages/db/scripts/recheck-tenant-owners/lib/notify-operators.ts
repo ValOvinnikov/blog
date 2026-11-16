@@ -1,9 +1,9 @@
-import { OPERATOR_ALERT_KIND } from '@blog/config/constants';
+import { OPERATOR_ALERT_KIND } from '@shinefold/config/constants';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   type TElevateTenantOwnerOutcome,
-} from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 import { postOperatorAlert } from '../../lib/post-operator-alert';
 

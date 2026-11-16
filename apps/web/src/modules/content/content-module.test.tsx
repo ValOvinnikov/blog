@@ -1,7 +1,7 @@
-import { BRAND_VARIANT, PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
-import type { TPortableTextBody } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
+import type { TPortableTextBody } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { MOCK_CONTENT_MODULE_ID } from '@web/testing/modules/content/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -17,7 +17,7 @@ const { getContentMock } = vi.hoisted(() => ({
   getContentMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       content: { v1: { getContent: getContentMock } },

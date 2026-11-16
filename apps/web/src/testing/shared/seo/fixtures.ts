@@ -1,4 +1,4 @@
-import type { TSeoResolved } from '@blog/service';
+import type { TSeoResolved } from '@shinefold/service';
 
 export const mockSeo = (
   overrides: Partial<TSeoResolved> = {},

@@ -1,9 +1,9 @@
+import { faker } from '@faker-js/faker';
 import {
   RADIUS_DECLARATIONS,
   RADIUS_SCALE,
   type TRadiusScale,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 

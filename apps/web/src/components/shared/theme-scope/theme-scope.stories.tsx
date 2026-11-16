@@ -5,12 +5,12 @@ import {
   PRESET_REGISTRY,
   RADIUS_SCALE,
   type TThemeTokens,
-} from '@blog/config';
-import { BrandMark } from '@blog/ui/components/atoms/brand-mark';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { ThemeToggle } from '@blog/ui/components/atoms/theme-toggle';
-import { MediaCard } from '@blog/ui/components/molecules/media-card';
-import { Header } from '@blog/ui/components/organisms/header';
+} from '@shinefold/config';
+import { BrandMark } from '@shinefold/ui/components/atoms/brand-mark';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import { ThemeToggle } from '@shinefold/ui/components/atoms/theme-toggle';
+import { MediaCard } from '@shinefold/ui/components/molecules/media-card';
+import { Header } from '@shinefold/ui/components/organisms/header';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { resolveFontVariableClassName } from '@web/config/fonts';
 import { buildThemeStyleBlock } from '@web/utils/build-theme-style-block';

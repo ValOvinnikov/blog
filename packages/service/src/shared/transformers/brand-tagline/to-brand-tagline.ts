@@ -2,8 +2,8 @@ import {
   BRAND_TAGLINE_SEPARATOR_CHARS,
   type TMaybeUndefined,
   type TNullable,
-} from '@blog/config';
-import type { brandTaglineFragment } from '@blog/service/shared/fragments/brand-tagline/brand-tagline';
+} from '@shinefold/config';
+import type { brandTaglineFragment } from '@shinefold/service/shared/fragments/brand-tagline/brand-tagline';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawBrandTagline = InferFragmentType<typeof brandTaglineFragment>;

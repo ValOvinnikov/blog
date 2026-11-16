@@ -1,5 +1,5 @@
-import { BRAND_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT } from '@shinefold/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_FIRST_TOPIC_POST_TITLE,

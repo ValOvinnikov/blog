@@ -1,11 +1,11 @@
+import { dataTableShellVariants } from '@platform/components/shared/data-table-shell/data-table-shell-variants';
+import { Icon } from '@platform/components/shared/icon';
 import {
   ICONS,
   SORT_DIRECTION,
   type TMaybeUndefined,
   type TSortDirection,
-} from '@blog/config';
-import { dataTableShellVariants } from '@platform/components/shared/data-table-shell/data-table-shell-variants';
-import { Icon } from '@platform/components/shared/icon';
+} from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 export type TDataTableShellColumnSort = {

@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { membershipInvites } from '@blog/db/schema/membership-invites';
+import { getDb } from '@shinefold/db/client';
+import { membershipInvites } from '@shinefold/db/schema/membership-invites';
 import { eq } from 'drizzle-orm';
 
 export async function countMembershipInvitesForTenant(

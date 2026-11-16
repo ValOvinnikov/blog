@@ -27,7 +27,7 @@ const {
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: {

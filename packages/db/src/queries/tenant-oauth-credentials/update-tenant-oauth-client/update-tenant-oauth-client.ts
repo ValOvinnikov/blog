@@ -1,7 +1,7 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { tenantOAuthCredentials } from '@blog/db/schema/tenant-oauth-credentials';
-import { hasLength } from '@blog/utils/primitives';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { tenantOAuthCredentials } from '@shinefold/db/schema/tenant-oauth-credentials';
+import { hasLength } from '@shinefold/utils/primitives';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 

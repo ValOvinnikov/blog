@@ -1,9 +1,9 @@
 'use client';
 
-import { ALERT_TYPE } from '@blog/config';
-import { hasLength } from '@blog/utils/primitives';
 import { useMainAddressSignInApps } from '@platform/components/features/tenants/domain-page-content/components/main-address-sign-in-apps-provider/main-address-sign-in-apps-provider';
 import { Alert } from '@platform/components/shared/alert';
+import { ALERT_TYPE } from '@shinefold/config';
+import { hasLength } from '@shinefold/utils/primitives';
 import { useFormatter, useTranslations } from 'next-intl';
 
 export const MainAddressSignInAppsWarning = () => {

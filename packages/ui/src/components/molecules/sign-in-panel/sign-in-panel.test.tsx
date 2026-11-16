@@ -1,6 +1,6 @@
-import { FORM_STATUS, ICONS } from '@blog/config';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import { FORM_STATUS, ICONS } from '@shinefold/config';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { SignInPanel } from './sign-in-panel';

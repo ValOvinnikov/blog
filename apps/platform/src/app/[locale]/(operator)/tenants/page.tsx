@@ -1,6 +1,3 @@
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { isEmailAccountConfigured } from '@blog/email';
 import { TenantsView } from '@platform/components/features/tenants/tenants-view';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
@@ -9,6 +6,9 @@ import {
   parseTenantsListQuery,
   type TTenantsListSearchParams,
 } from '@platform/utils/tenants-list-query/tenants-list-query';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { isEmailAccountConfigured } from '@shinefold/email';
 import type { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {

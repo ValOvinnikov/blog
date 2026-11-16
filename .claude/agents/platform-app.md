@@ -5,7 +5,7 @@ description: >-
   platform, deployed separately from the public site. Use for its App Router routes,
   Server Actions, the session gate built from the shared Auth.js config
   (requireAdmin / membership checks), and its Base UI + Tailwind form surfaces.
-  Reads and writes relational data through @blog/db only; never touches Sanity,
+  Reads and writes relational data through @shinefold/db only; never touches Sanity,
   and never edits apps/web.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
@@ -58,22 +58,22 @@ Before writing code:
 4. Before building a component, list `src/components/shared/` and the
    domain's `src/components/features/<domain>/`. The primitives (`Button`,
    `Card`, `FormField`, `SettingRow`, `Alert`, `Text`, `Heading`, …) exist —
-   never rebuild one, and never reach for `@blog/ui`'s.
+   never rebuild one, and never reach for `@shinefold/ui`'s.
 5. Verify that any `db` or `config` change your work depends on has actually
    landed before coding against it.
 
 ## Hard boundaries (do not violate)
 
-- **Dependencies:** `@blog/db`, `@blog/auth`, `@blog/config`, `@blog/utils`,
-  `@blog/insight`, `@blog/email`, and `@blog/studio` through `StudioMount`
-  only. `@blog/ui` is confined by an ESLint guard to
+- **Dependencies:** `@shinefold/db`, `@shinefold/auth`, `@shinefold/config`, `@shinefold/utils`,
+  `@shinefold/insight`, `@shinefold/email`, and `@shinefold/studio` through `StudioMount`
+  only. `@shinefold/ui` is confined by an ESLint guard to
   `components/features/site-preview/`, which renders the tenant's real site for
   live-preview fidelity; an import anywhere else fails lint. A new workspace
   dependency needs its alias in `tsconfig.json` `paths` and `vitest.config.ts`
   — the `config` agent's wiring, so report it.
 - **Never import Sanity** (`sanity`, `next-sanity`, `@sanity/*`, `groqd`) or
-  `@blog/service`. Needing one is a signal to stop and report.
-- **All relational reads and writes go through `@blog/db`'s exported
+  `@shinefold/service`. Needing one is a signal to stop and report.
+- **All relational reads and writes go through `@shinefold/db`'s exported
   functions** — no Drizzle, no Neon client, no SQL here. A missing query is a
   `db` request you report.
 - **Never edit outside `apps/platform`.** Implement your side and report the
@@ -97,7 +97,7 @@ failure answers:
 
 Reason codes are UPPERCASE key/value consts in `src/constants/`, one domain
 per file (`TENANT_FIELD_ERROR`, `TENANT_REFUSAL`, `UPLOAD_REFUSAL`, …); they
-move to `@blog/config` only when a second workspace reads one. The client maps
+move to `@shinefold/config` only when a second workspace reads one. The client maps
 each code to its existing catalogue key with a `satisfies Record<…>` map, so
 the catalogues do not change.
 
@@ -194,7 +194,7 @@ Tailwind in this app: `tabs`, `slider`, `switch`, `select`, `radio-group`,
 `Field`/`Fieldset`/`Form` primitives a form-heavy app leans on.
 
 - **Compose pages from blocks built on Base UI** (`platform-ui-practices` →
-  "Reusable blocks"). Never add anything to `@blog/ui` for this app.
+  "Reusable blocks"). Never add anything to `@shinefold/ui` for this app.
 - **A control uses its Base UI part when one exists,** directly or through the
   shared primitive built on it (`FormField`, `Disclosure`, `Button`). A
   labelled input is a `Field` (Label, Description, Error) around `Input` or
@@ -214,7 +214,7 @@ Tailwind in this app: `tabs`, `slider`, `switch`, `select`, `radio-group`,
 
 ## Auth and access
 
-Both sections sit behind an Auth.js session built from `@blog/auth`'s shared
+Both sections sit behind an Auth.js session built from `@shinefold/auth`'s shared
 builder, `buildAuthConfig(AUTH_APP.PLATFORM)`, passed to this app's own
 `NextAuth()`. One shared builder, never a shared session: this app's cookies
 carry their own names and a session `apps/web` issued reads as signed out, so
@@ -265,7 +265,7 @@ be answerable from that table alone.
 - An event written after _requesting_ an out-of-repo workflow attests the
   request, not the outcome — say so in the PR.
 - Use the existing `AUDIT_ACTION` / `AUDIT_TARGET_TYPE` members in
-  `@blog/config`. If none fits, ask the orchestrator rather than adding one: an
+  `@shinefold/config`. If none fits, ask the orchestrator rather than adding one: an
   action with no producer is dead vocabulary that Knip cannot see, since its
   unused-export check is whole-binding.
 
@@ -302,7 +302,7 @@ page builder and no SEO surface to justify them.
   authorization and validates its input with Zod — it is a public HTTP
   endpoint, and the form that called it proves nothing.
 - **Helpers coupled to this app** live in `src/utils/<name>/<name>.ts` with a
-  co-located test and no barrel; a framework-free one belongs in `@blog/utils`
+  co-located test and no barrel; a framework-free one belongs in `@shinefold/utils`
   — report it (`.claude/agents/config.md` → "Helpers").
 - **Size and hooks:** the budgets are CLAUDE.md → "File size budgets"; what to
   extract, where it goes, and where a hook lives are
@@ -318,7 +318,7 @@ A component with several exported parts follows
   defines the `<X>Parts` map and composes `Object.assign(<X>Root, <X>Parts)`;
   no part's JSX or props type lives there.
 - **Slot matching is never hand-rolled.** Use `mapCompoundSlots` from
-  `@platform/lib/react` — this app's counterpart of `@blog/ui`'s, which it may
+  `@platform/lib/react` — this app's counterpart of `@shinefold/ui`'s, which it may
   not import. The root renders the `unmatched` children it returns in keyed
   `Fragment`s.
 - Use the helper when the root places each named part in a fixed position or
@@ -337,14 +337,14 @@ that section; the rule is the same in both apps. Here the override silences
 `func-style` in `**/page.tsx`, `**/layout.tsx`, `**/route.ts` and
 `src/proxy.ts`; a non-reserved helper in those files is still an arrow. Server
 Actions convert normally — `export const action = async () => {}` satisfies
-`'use server'`. `@blog/db` and `@blog/service` keep declarations; never carry
+`'use server'`. `@shinefold/db` and `@shinefold/service` keep declarations; never carry
 this rule across.
 
 ## Tailwind
 
 - Platform chrome is styled from this app's own token layer,
   `src/styles/platform-theme.css` (`bg-platform-surface`, `text-platform-13`,
-  `rounded-platform`). `index.css` also imports `@blog/tailwind-config/theme.css`,
+  `rounded-platform`). `index.css` also imports `@shinefold/tailwind-config/theme.css`,
   but only for `site-preview/`; a site token, a hex or a raw palette colour
   anywhere else is wrong (`platform-ui-practices` → "Colour and contrast").
 - **No class strings inline in JSX** — classes live in a module-scope `tv()`
@@ -397,7 +397,7 @@ wrong ones.
 
 ## Voice settings
 
-The Voice page edits the site copy registered in `@blog/config`'s
+The Voice page edits the site copy registered in `@shinefold/config`'s
 `VOICE_FIELDS`.
 
 - It renders straight from the registry (`src/utils/voice-draft/voice-draft.ts`)
@@ -406,7 +406,7 @@ The Voice page edits the site copy registered in `@blog/config`'s
 - Each surface's specimen in `site-preview/voice-specimen/` places every field
   through a `Record<TVoiceFieldId, …>` map, so an unplaced field fails
   type-check. Wrap a field's specimen text in `VoiceKeyFrame` for the focus
-  outline; never widen a `@blog/ui` prop for it.
+  outline; never widen a `@shinefold/ui` prop for it.
 - Rich values render through `site-preview/voice-rich-text/`, which handles
   exactly `VOICE_PORTABLE_TEXT_SCHEMA`'s marks; never import `apps/web`'s
   Portable Text renderer.
@@ -438,7 +438,7 @@ arrangement, fakes and queries. On top of it:
 - **A bugfix's regression test is yours, written first**
   (`superpowers:test-driven-development`); new-feature coverage comes from
   `test-writer` after your implementation lands.
-- Mock `@blog/db` functions; assert that fetched data renders and that a
+- Mock `@shinefold/db` functions; assert that fetched data renders and that a
   submission calls the action with the values the user entered.
 - **A mutation that records an audit event gets a test that it is _not_
   recorded when the mutation fails**, beside the happy path.
@@ -482,8 +482,8 @@ turn.
   or `none found — added <name>`. Write "nothing added" only when the diff
   adds none (CLAUDE.md → "Reuse before you create").
 - Routes and Server Actions created or changed.
-- The `@blog/db` functions you consumed, and any you needed that don't exist.
-- Any `@blog/ui` component composed in `site-preview/`, and any gap you worked
+- The `@shinefold/db` functions you consumed, and any you needed that don't exist.
+- Any `@shinefold/ui` component composed in `site-preview/`, and any gap you worked
   around.
 - Alias or config wiring the `config` agent still owes.
 - Behaviour the feature's `docs/features/<feature>.md` page must now state —

@@ -52,7 +52,7 @@ test('a reasoned no-node-access disable still suppresses a chained walk', () => 
 
 const REPEATED_OPENING =
   "it('a', () => { vi.useFakeTimers(); });\nit('b', () => { vi.useFakeTimers(); });\n";
-const BEFORE_EACH_RULE = 'blog-test/prefer-before-each';
+const BEFORE_EACH_RULE = 'shinefold-test/prefer-before-each';
 
 test('cases opening with the same statement fail lint on a touched file', () => {
   assert.ok(ruleIdsFor(REPEATED_OPENING).includes(BEFORE_EACH_RULE));

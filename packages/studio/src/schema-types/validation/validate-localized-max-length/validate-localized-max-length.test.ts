@@ -1,8 +1,8 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
-import { mockLocalizedValue } from '@blog/studio/testing/mock-documents';
-import { MOCK_VALIDATION_MESSAGE } from '@blog/studio/testing/mock-validation-context';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { validateLocalizedMaxLength } from '@shinefold/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
+import { mockLocalizedValue } from '@shinefold/studio/testing/mock-documents';
+import { MOCK_VALIDATION_MESSAGE } from '@shinefold/studio/testing/mock-validation-context';
 
 faker.seed(6021);
 

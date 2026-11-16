@@ -1,6 +1,6 @@
-import type { TTenant } from '@blog/db/schema/tenants';
 import { DomainCard } from '@platform/components/features/tenants/domain-card';
 import type { TDomainVerificationStatus } from '@platform/constants/domain';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { use } from 'react';
 
 export type TStreamedDomainCardProps = {

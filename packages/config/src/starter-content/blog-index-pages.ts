@@ -4,14 +4,14 @@ import type {
   Page_topicIndex,
   Template_tagIndex,
   Template_topicIndex,
-} from '@blog/config/sanity/generated/types';
+} from '@shinefold/config/sanity/generated/types';
 
 import {
   BRAND_VARIANT,
   TAXONOMY_KIND,
   type TLocaleIsoCode,
   type TTaxonomyKind,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import type { TStarterCopy } from './copy/starter-copy';
 import type {

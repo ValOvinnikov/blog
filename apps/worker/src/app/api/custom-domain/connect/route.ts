@@ -1,7 +1,7 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
-import { getTenantById } from '@blog/db/queries/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { getTenantByDomain } from '@shinefold/db/queries/tenant-domains/get-tenant-by-domain';
+import { getTenantById } from '@shinefold/db/queries/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { CUSTOM_DOMAIN_LOG } from '@worker/constants/custom-domain';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { customDomainRequestBodySchema } from '@worker/utils/custom-domain-request/custom-domain-request';

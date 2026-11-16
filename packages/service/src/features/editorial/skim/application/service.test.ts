@@ -1,17 +1,21 @@
-import { getPublishedPostBody } from '@blog/service/features/editorial/skim/adaptor/get-post-body/loader';
-import { saveSkimDraft } from '@blog/service/features/editorial/skim/adaptor/save-skim-draft/loader';
-import { mockSkimDraftInput } from '@blog/service/testing/editorial/fixtures';
+import { faker } from '@faker-js/faker';
+import { getPublishedPostBody } from '@shinefold/service/features/editorial/skim/adaptor/get-post-body/loader';
+import { saveSkimDraft } from '@shinefold/service/features/editorial/skim/adaptor/save-skim-draft/loader';
+import { mockSkimDraftInput } from '@shinefold/service/testing/editorial/fixtures';
 import {
   MOCK_MISSING_ID,
   MOCK_POST_ID,
-} from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { createSkimService } from './service';
 
-vi.mock('@blog/service/features/editorial/skim/adaptor/get-post-body/loader');
-vi.mock('@blog/service/features/editorial/skim/adaptor/save-skim-draft/loader');
+vi.mock(
+  '@shinefold/service/features/editorial/skim/adaptor/get-post-body/loader',
+);
+vi.mock(
+  '@shinefold/service/features/editorial/skim/adaptor/save-skim-draft/loader',
+);
 
 faker.seed(6015103);
 

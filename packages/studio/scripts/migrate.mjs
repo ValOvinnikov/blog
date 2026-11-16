@@ -4,27 +4,27 @@
  * run / export against a chosen dataset without retyping ids. Also usable
  * non-interactively from a deployment pipeline.
  *
- *   pnpm --filter @blog/studio migrate:new <name>       # scaffold a new, timestamped
+ *   pnpm --filter @shinefold/studio migrate:new <name>       # scaffold a new, timestamped
  *                                              # migration (or reuse a matching
  *                                              # existing one), track it
- *   pnpm --filter @blog/studio migrate:track [name]     # set current (defaults to newest)
- *   pnpm --filter @blog/studio migrate:current          # print the current migration
- *   pnpm --filter @blog/studio migrate:dry [name]       # dry-run (read-only) current-or-name
- *   pnpm --filter @blog/studio migrate:run [name] [--yes]
+ *   pnpm --filter @shinefold/studio migrate:track [name]     # set current (defaults to newest)
+ *   pnpm --filter @shinefold/studio migrate:current          # print the current migration
+ *   pnpm --filter @shinefold/studio migrate:dry [name]       # dry-run (read-only) current-or-name
+ *   pnpm --filter @shinefold/studio migrate:run [name] [--yes]
  *                                              # apply (--no-dry-run) current-or-name;
  *                                              # --yes (or CI=true) skips the prompt
- *   pnpm --filter @blog/studio migrate:deploy [--yes]   # run every UN-APPLIED migration, in
+ *   pnpm --filter @shinefold/studio migrate:deploy [--yes]   # run every UN-APPLIED migration, in
  *                                              # order (dry-run -> run -> record in the
  *                                              # per-dataset `migrationState` ledger);
  *                                              # a second run is a no-op
- *   pnpm --filter @blog/studio migrate:backfill [--yes] # record every current folder migration
+ *   pnpm --filter @shinefold/studio migrate:backfill [--yes] # record every current folder migration
  *                                              # as applied WITHOUT running it (one-time,
  *                                              # per dataset — see migrations/README.md)
- *   pnpm --filter @blog/studio dataset:export [dest]    # export the dataset to a tarball
+ *   pnpm --filter @shinefold/studio dataset:export [dest]    # export the dataset to a tarball
  *
  * Dataset: read from `SANITY_STUDIO_DATASET` (falls back to `production`), so you
  * can target e.g. a `development` dataset with
- * `SANITY_STUDIO_DATASET=development pnpm --filter @blog/studio migrate:dry`. The resolved
+ * `SANITY_STUDIO_DATASET=development pnpm --filter @shinefold/studio migrate:dry`. The resolved
  * dataset is printed before every command.
  *
  * Target resolution: explicit [name] → tracked id in `migrations/.current` →

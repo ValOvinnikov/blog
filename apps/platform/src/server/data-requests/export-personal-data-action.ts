@@ -1,8 +1,5 @@
 'use server';
 
-import { ACTION_OUTCOME, AUDIT_ACTION } from '@blog/config';
-import { queries } from '@blog/db';
-import type { TPersonalDataMatches } from '@blog/db/queries/personal-data/find-personal-data';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { countPersonalDataMatches } from '@platform/server/data-requests/count-personal-data-matches';
 import {
@@ -10,6 +7,9 @@ import {
   type TDataRequestFailure,
   type TDataRequestInput,
 } from '@platform/server/data-requests/run-data-request';
+import { ACTION_OUTCOME, AUDIT_ACTION } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import type { TPersonalDataMatches } from '@shinefold/db/queries/personal-data/find-personal-data';
 
 export type TPersonalDataExportHeader = {
   generatedAt: string;

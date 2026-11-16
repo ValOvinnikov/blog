@@ -1,5 +1,5 @@
-import { SITE_MESSAGES_BY_LOCALE } from '@blog/config/voice';
 import { faker } from '@faker-js/faker';
+import { SITE_MESSAGES_BY_LOCALE } from '@shinefold/config/voice';
 
 import {
   LOCALE_ISO_CODES,
@@ -11,7 +11,7 @@ import {
   SEO_OG_DESCRIPTION_MAX_LENGTH,
   SEO_OG_TITLE_MAX_LENGTH,
   SITE_TYPE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
 import {

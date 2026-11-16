@@ -1,7 +1,7 @@
-import type { TFindingStatus } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { findingSummaryColumns } from '@blog/db/queries/findings/finding-summary-columns';
-import { findings, type TFindingSummary } from '@blog/db/schema/findings';
+import type { TFindingStatus } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { findingSummaryColumns } from '@shinefold/db/queries/findings/finding-summary-columns';
+import { findings, type TFindingSummary } from '@shinefold/db/schema/findings';
 import { and, desc, eq } from 'drizzle-orm';
 
 export async function listFindingsForTenant(

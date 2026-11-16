@@ -1,7 +1,5 @@
 'use client';
 
-import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { ICONS } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import {
   Icon,
@@ -10,6 +8,8 @@ import {
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { signInWithProviderAction } from '@platform/server/auth/sign-in-with-provider-action';
 import { tv } from '@platform/utils/tv/tv';
+import type { TOAuthProviderId } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 

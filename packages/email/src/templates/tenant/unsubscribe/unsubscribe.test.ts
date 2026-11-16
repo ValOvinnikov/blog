@@ -1,7 +1,7 @@
 import {
   MOCK_JAVASCRIPT_URL,
   MOCK_UNSUBSCRIBE_URL,
-} from '@blog/email/testing/email-fixtures';
+} from '@shinefold/email/testing/email-fixtures';
 
 import {
   buildListUnsubscribeHeaders,

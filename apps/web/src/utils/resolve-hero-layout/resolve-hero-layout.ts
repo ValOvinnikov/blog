@@ -6,7 +6,7 @@ import {
   type TLayout,
   type TMaybeUndefined,
   type TSpacingScale,
-} from '@blog/config';
+} from '@shinefold/config';
 import { BANNER_SECTION_LAYOUT } from '@web/utils/banner-section-layout';
 
 interface IResolveHeroLayoutInput {

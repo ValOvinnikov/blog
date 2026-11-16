@@ -1,5 +1,5 @@
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { faker } from '@faker-js/faker';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 
 import { postListPageSizeQuery } from './query';
 import { toFirstPostListPageSize } from './transformer';

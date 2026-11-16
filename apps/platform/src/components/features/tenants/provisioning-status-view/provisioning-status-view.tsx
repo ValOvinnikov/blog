@@ -1,10 +1,5 @@
 'use client';
 
-import { SIZE, type TMaybeUndefined } from '@blog/config';
-import {
-  CORE_PROVISIONING_STEPS,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
 import { RunErrorCard } from '@platform/components/features/tenants/run-error-card';
 import { RunStepsCard } from '@platform/components/features/tenants/run-steps-card';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
@@ -19,6 +14,11 @@ import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useProvisioningPoll } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
 import { useStagedStepStatuses } from '@platform/utils/use-staged-step-statuses/use-staged-step-statuses';
+import { SIZE, type TMaybeUndefined } from '@shinefold/config';
+import {
+  CORE_PROVISIONING_STEPS,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

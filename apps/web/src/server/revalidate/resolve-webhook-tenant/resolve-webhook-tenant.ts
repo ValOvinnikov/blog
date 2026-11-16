@@ -1,6 +1,6 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { HTTP_STATUS } from '@blog/config/constants';
-import { queries } from '@blog/db';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 import {
   REVALIDATE_LOG,
   TENANT_LOOKUP_FAILED_MESSAGE,

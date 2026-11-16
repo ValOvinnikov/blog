@@ -1,7 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { STRIPE_PRICE_LOOKUP_KEY, TENANT_STATUS } from '@blog/db/constants';
-import { okResult } from '@blog/utils';
 import {
   BILLING_INTERVAL,
   BILLING_LOG,
@@ -31,6 +27,13 @@ import {
 import { MOCK_TRIAL_ENDS_AT } from '@platform/testing/tenants/mock-tenant';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import {
+  STRIPE_PRICE_LOOKUP_KEY,
+  TENANT_STATUS,
+} from '@shinefold/db/constants';
+import { okResult } from '@shinefold/utils';
 
 import { createUpgradeCheckoutAction } from './create-upgrade-checkout-action';
 import { getStripeClient } from './stripe-client';
@@ -42,7 +45,7 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: { setTenantBilling: vi.fn(async () => okResult({})) },
   },

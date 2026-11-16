@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   CONTENT_ALIGNMENT,
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
   type TTimelineMarkerStyle,
-} from '@blog/config';
-import { renderElement, screen } from '@blog/ui/testing/custom-render';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { renderElement, screen } from '@shinefold/ui/testing/custom-render';
 
 import { Timeline, type TTimelineProps } from './timeline';
 

@@ -1,7 +1,7 @@
-import { ACTION_OUTCOME } from '@blog/config';
-import { OAUTH_PROVIDER } from '@blog/config/constants';
-import type { TValueOf } from '@blog/config/utils';
 import { faker } from '@faker-js/faker';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { AuthMenu } from '@web/components/shared/site-header/components/auth-menu/auth-menu';
 import { BOOKMARK_LOG } from '@web/constants/bookmark';

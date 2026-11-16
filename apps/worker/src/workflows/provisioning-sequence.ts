@@ -1,4 +1,4 @@
-import { errorResult, okResult } from '@blog/utils/result';
+import { errorResult, okResult } from '@shinefold/utils/result';
 import { UNKNOWN_RUN_ERROR } from '@worker/constants/provisioning';
 import { applySiteTemplate } from '@worker/units/apply-site-template';
 import { ensureInfrastructure } from '@worker/units/ensure-infrastructure';

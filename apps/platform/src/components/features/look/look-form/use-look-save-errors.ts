@@ -1,8 +1,8 @@
-import { FORM_STATUS, type TFormStatus } from '@blog/config';
 import {
   useUploadErrorText,
   type TUploadErrorState,
 } from '@platform/utils/use-upload-error-text/use-upload-error-text';
+import { FORM_STATUS, type TFormStatus } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 type TUseLookSaveErrorsArgs = {

@@ -1,6 +1,6 @@
-import { HEADER_LAYOUT } from '@blog/config';
-import { PANEL_LINK } from '@blog/ui/components/molecules/primary-navigation/primary-navigation-variants';
-import { tv } from '@blog/ui/lib/styling';
+import { HEADER_LAYOUT } from '@shinefold/config';
+import { PANEL_LINK } from '@shinefold/ui/components/molecules/primary-navigation/primary-navigation-variants';
+import { tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const primaryNavigationMobilePanelVariants = tv({

@@ -1,4 +1,3 @@
-import { CARD_STYLE, ICONS, type TCardStyle } from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { CardStyleGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
@@ -12,6 +11,7 @@ import { ICON_SIZE } from '@platform/constants/icon';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { SEGMENTED_RADIO_LAYOUT } from '@platform/constants/segmented-control';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
+import { CARD_STYLE, ICONS, type TCardStyle } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { cardsCardVariants } from './cards-card-variants';

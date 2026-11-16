@@ -1,18 +1,21 @@
-import type { TVoiceFieldFailuresByLocale } from '@blog/config';
-import { PRESET_REGISTRY, type TLocaleIsoCode } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
+import type { TVoiceFieldFailuresByLocale } from '@shinefold/config';
+import {
+  PRESET_REGISTRY,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
 import {
   toSiteConfigResult,
   type TSiteConfigResult,
-} from '@blog/db/queries/site-config/get-site-config';
+} from '@shinefold/db/queries/site-config/get-site-config';
 import {
   siteConfig,
   type TVoiceOverridesByLocale,
-} from '@blog/db/schema/site-config';
-import { tenants } from '@blog/db/schema/tenants';
-import { okResult, type TResult } from '@blog/utils';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/schema/site-config';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { okResult, type TResult } from '@shinefold/utils';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { eq, sql } from 'drizzle-orm';
 
 import {

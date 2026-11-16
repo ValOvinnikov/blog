@@ -1,5 +1,5 @@
-import { CTA_ACTION_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { CTA_ACTION_VARIANT } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,

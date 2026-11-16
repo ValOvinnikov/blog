@@ -1,7 +1,7 @@
-import { LOCALE_BCP47_TAGS } from '@blog/config';
-import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { LOCALE_BCP47_TAGS } from '@shinefold/config';
+import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import GlobalError from './global-error';

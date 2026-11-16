@@ -1,8 +1,8 @@
-import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
-import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
-import type { TStructureSection } from '@blog/studio/structure/build-section/build-section';
-import { moduleKinds } from '@blog/studio/structure/module-kinds/module-kinds';
+import { heroBlogSchema } from '@shinefold/studio/schema-types/modules/hero-blog/hero-blog';
+import { heroProfileSchema } from '@shinefold/studio/schema-types/modules/hero-profile/hero-profile';
+import { heroStatementSchema } from '@shinefold/studio/schema-types/modules/hero-statement/hero-statement';
+import type { TStructureSection } from '@shinefold/studio/structure/build-section/build-section';
+import { moduleKinds } from '@shinefold/studio/structure/module-kinds/module-kinds';
 import { Blocks } from 'lucide-react';
 
 export const modulesSection: TStructureSection = {

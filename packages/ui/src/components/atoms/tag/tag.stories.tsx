@@ -1,5 +1,5 @@
-import { ButtonShapes } from '@blog/ui/testing/button-shapes';
-import { objectKeys } from '@blog/utils/primitives';
+import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Tag } from './tag';

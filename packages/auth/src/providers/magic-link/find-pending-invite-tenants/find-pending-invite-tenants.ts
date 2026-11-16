@@ -1,5 +1,5 @@
-import { queries } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { queries } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export type TPendingInviteTenant = Pick<TTenant, 'name' | 'locale'>;
 

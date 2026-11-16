@@ -1,6 +1,6 @@
-import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ARIA_CURRENT } from '@blog/ui/testing/aria';
-import { errorResult, okResult } from '@blog/utils';
+import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
+import { errorResult, okResult } from '@shinefold/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import {
   getRequestContext,

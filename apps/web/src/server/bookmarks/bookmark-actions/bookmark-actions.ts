@@ -5,9 +5,9 @@ import {
   CAPABILITY,
   TENANT_WRITE_REFUSAL,
   type TActionResult,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { BOOKMARK_LOG } from '@web/constants/bookmark';
 import { auth } from '@web/server/auth/auth';
 import { isReaderAccountFeatureEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';

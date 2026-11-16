@@ -13,7 +13,7 @@
 #        the content-addressed `.pnpm` store, i.e. all external packages.
 #      - each workspace `node_modules` -> tiny copy of pnpm's symlink farm
 #        (`cp -RP`, links copied as links). pnpm's links are relative, so
-#        `@blog/*` resolve to THIS worktree's source while external deps
+#        `@shinefold/*` resolve to THIS worktree's source while external deps
 #        resolve through the root symlink into the primary checkout's store.
 #    Running `pnpm install`/`add` inside such a worktree would write through
 #    the symlink and mutate the primary checkout — guarded by the pnpm

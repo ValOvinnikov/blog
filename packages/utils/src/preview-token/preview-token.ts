@@ -1,9 +1,9 @@
 import { createHmac } from 'node:crypto';
 
-import { isSecretMatch } from '@blog/utils';
-import { PAYLOAD_ENCODING } from '@blog/utils/encryption';
-import { SHA256_ALGORITHM } from '@blog/utils/hash';
-import { hasLength, isString } from '@blog/utils/primitives';
+import { isSecretMatch } from '@shinefold/utils';
+import { PAYLOAD_ENCODING } from '@shinefold/utils/encryption';
+import { SHA256_ALGORITHM } from '@shinefold/utils/hash';
+import { hasLength, isString } from '@shinefold/utils/primitives';
 
 export interface IPreviewTokenClaims {
   tenantId: string;

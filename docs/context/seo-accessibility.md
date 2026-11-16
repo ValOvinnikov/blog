@@ -42,7 +42,7 @@
   conventions, [`surfaces-and-routing.md`](./surfaces-and-routing.md)).
 - JSON-LD `Article`/`BlogPosting` on post pages (#94).
 - **Breadcrumbs & structured data (#835):** every content route renders a
-  `Breadcrumbs` trail (`@blog/ui` molecule) as page chrome, wrapped in a
+  `Breadcrumbs` trail (`@shinefold/ui` molecule) as page chrome, wrapped in a
   web-level `BreadcrumbBar` (#903) rendered as a true DOM sibling of
   `<main>` — immediately after `<Header>`, before `<main>`, never nested
   inside it. `BreadcrumbBar`'s outer band spans the full viewport width

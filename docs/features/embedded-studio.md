@@ -22,7 +22,7 @@ epics: [4840, 4956, 4959, 4035, 1036]
 
 ## What it does
 
-One Sanity Studio, built from the shared `@blog/studio` package, serves every
+One Sanity Studio, built from the shared `@shinefold/studio` package, serves every
 tenant. The platform mounts it inside its own shell at a tenant-scoped route
 and points it at that tenant's own Sanity project and dataset. Owners edit
 their site's content there and operators can open any tenant's. The Studio is
@@ -56,7 +56,7 @@ module types whose capability is off for the tenant carry a warning.
   item's one tooltip, to the right of the row, replacing the rail's name
   tooltip. The line follows the current state without a reload (see
   [platform-shell](./platform-shell.md)). Operators never see it.
-- Outside the platform, `pnpm --filter @blog/studio dev` runs the same config
+- Outside the platform, `pnpm --filter @shinefold/studio dev` runs the same config
   standalone through the Sanity CLI (`sanity.config.ts`, title "Blog").
 
 ## Data
@@ -116,7 +116,7 @@ module types whose capability is off for the tenant carry a warning.
   `liveLocales`, `loginProvider`, `scheme`, plus the `onSchemeChange` and
   `onSignedIn` callbacks) and calls
   `buildStudioConfig` itself. It is the only `'use client'` file in
-  `@blog/studio`. Nothing exports a built config: calling the builder in a
+  `@shinefold/studio`. Nothing exports a built config: calling the builder in a
   Server Component pulls the Sanity SDK into the RSC graph, where `swr`,
   Sanity's bundled CSS and `sanity-plugin-media` break.
 - With `loginProvider` (a `SANITY_LOGIN_PROVIDER` value) set, the login
@@ -148,7 +148,7 @@ module types whose capability is off for the tenant carry a warning.
   column backs it. Since the sidebar stopped showing Ready, no surface reads
   it.
 - `apps/platform` reaches Sanity only through `StudioMount`. ESLint bans
-  `sanity`, `next-sanity`, `@sanity/*`, `groqd` and `@blog/service` there.
+  `sanity`, `next-sanity`, `@sanity/*`, `groqd` and `@shinefold/service` there.
 - **The Studio renders only in the browser.** `PlatformStudioMount` loads
   `StudioMount` with `next/dynamic` and `ssr: false`, because Sanity Studio
   cannot render on the server: a full page load would otherwise show Sanity's
@@ -196,10 +196,10 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
 
 ## Dependencies
 
-- `@blog/studio` (schema, structure, plugins: structure, vision, code input,
+- `@shinefold/studio` (schema, structure, plugins: structure, vision, code input,
   media, document internationalization, internationalized arrays).
-- `@blog/db` for the tenant row, live locales and `PLAN_REGISTRY`;
-  `@blog/config` for `TCapability` and `LOCALE_ISO_CODES`.
+- `@shinefold/db` for the tenant row, live locales and `PLAN_REGISTRY`;
+  `@shinefold/config` for `TCapability` and `LOCALE_ISO_CODES`.
 - Features: [studio-authoring](./studio-authoring.md) (schema and desk
   structure), [platform-shell](./platform-shell.md),
   [tenant-provisioning](./tenant-provisioning.md),

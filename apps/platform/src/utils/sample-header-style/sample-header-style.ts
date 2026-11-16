@@ -1,9 +1,9 @@
+import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import type {
   IAccountControl,
   IHeaderStyle,
   TLanguageSwitcherStyle,
-} from '@blog/config';
-import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+} from '@shinefold/config';
 
 export type TSampleHeaderStyle = IHeaderStyle & {
   languageSwitcherStyle: TLanguageSwitcherStyle;

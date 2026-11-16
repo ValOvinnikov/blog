@@ -1,4 +1,3 @@
-import { ALERT_TYPE, RELEASE_CHANGE, type TMaybeUndefined } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
@@ -8,6 +7,11 @@ import type { TFailedMigrationTenant } from '@platform/server/releases/list-fail
 import type { TReleaseResult } from '@platform/server/releases/release-result';
 import { isReleaseOverrideRequired } from '@platform/utils/release-state/release-state';
 import { tv } from '@platform/utils/tv/tv';
+import {
+  ALERT_TYPE,
+  RELEASE_CHANGE,
+  type TMaybeUndefined,
+} from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { ReleaseAreasCard } from './components/release-areas-card/release-areas-card';

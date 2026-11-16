@@ -1,20 +1,20 @@
-import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestTenant,
   insertTestUser,
   MOCK_OWNER_EMAIL,
-} from '@blog/db/testing/fixtures';
+} from '@shinefold/db/testing/fixtures';
 import {
   mockMembership,
   MOCK_USER_ID,
-} from '@blog/db/testing/memberships/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/memberships/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { getTenantOwnerEmail } from './get-tenant-owner-email';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(6022);
 

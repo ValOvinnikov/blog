@@ -1,3 +1,9 @@
+import { faker } from '@faker-js/faker';
+import {
+  MOCK_LOGO_URL,
+  MOCK_STAGED_LOGO_BLOB_URL,
+} from '@platform/testing/site-config/fixtures';
+import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
@@ -21,13 +27,7 @@ import {
   PRESET_REGISTRY,
   RADIUS_SCALE,
   SPINNER_STYLE,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
-import {
-  MOCK_LOGO_URL,
-  MOCK_STAGED_LOGO_BLOB_URL,
-} from '@platform/testing/site-config/fixtures';
-import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+} from '@shinefold/config';
 
 import {
   applyPresetDefaults,

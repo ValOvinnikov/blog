@@ -1,4 +1,4 @@
-import type { IWithChildren } from '@blog/config/react';
+import type { IWithChildren } from '@shinefold/config/react';
 
 import { lookSubheadingVariants } from './look-subheading-variants';
 

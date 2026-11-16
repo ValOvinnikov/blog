@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { SITE_MESSAGES } from '@shinefold/config';
 import type { TSidebarNavItem } from '@web/components/shared/sidebar-nav';
 
 export const MOCK_SIDEBAR_NAV_LABEL = SITE_MESSAGES.sectionNavigation.label;

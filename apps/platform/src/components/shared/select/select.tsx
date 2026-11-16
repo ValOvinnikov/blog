@@ -1,12 +1,12 @@
 'use client';
 
 import { Select as BaseSelect } from '@base-ui/react/select';
-import type { TMaybeNull } from '@blog/config';
 import { SelectItem } from '@platform/components/shared/select/components/item/select-item';
 import { SelectItemText } from '@platform/components/shared/select/components/item-text/select-item-text';
 import { SelectPopup } from '@platform/components/shared/select/components/popup/select-popup';
 import { SelectTrigger } from '@platform/components/shared/select/components/trigger/select-trigger';
 import type { TCompoundComponent } from '@platform/lib/react';
+import type { TMaybeNull } from '@shinefold/config';
 import type { ElementType, ReactNode } from 'react';
 
 const SelectParts = {

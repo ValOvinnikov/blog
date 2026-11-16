@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import en from '@platform/i18n/messages/en.json';
@@ -14,6 +12,8 @@ import {
   MOCK_TENANT_SLUG,
   OWNER_EMAIL_LABEL,
 } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantDetailsForm } from './tenant-details-form';

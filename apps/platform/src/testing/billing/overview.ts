@@ -1,5 +1,3 @@
-import type { TTenantBilling } from '@blog/db/queries/tenants/tenant-billing';
-import { MOCK_EMPTY_TENANT_BILLING } from '@blog/db/testing/tenants/billing';
 import type { TBillingNextPayment } from '@platform/server/billing/fetch-stripe-billing';
 import {
   MOCK_AMOUNT_PAID,
@@ -8,6 +6,8 @@ import {
   MOCK_STRIPE_SUBSCRIPTION_ID,
 } from '@platform/testing/billing/fixtures';
 import type { TStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
+import type { TTenantBilling } from '@shinefold/db/queries/tenants/tenant-billing';
+import { MOCK_EMPTY_TENANT_BILLING } from '@shinefold/db/testing/tenants/billing';
 
 export const MOCK_DRAFT_INVOICE_STATUS = 'draft';
 

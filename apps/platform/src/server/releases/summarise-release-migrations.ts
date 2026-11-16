@@ -1,7 +1,7 @@
-import { queries } from '@blog/db';
-import { okResult } from '@blog/utils';
 import type { TChangedFile } from '@platform/server/github/compare-commits';
 import { getDbMigrationJournal } from '@platform/server/github/get-db-migration-journal';
+import { queries } from '@shinefold/db';
+import { okResult } from '@shinefold/utils';
 
 import {
   countAddedContentMigrations,

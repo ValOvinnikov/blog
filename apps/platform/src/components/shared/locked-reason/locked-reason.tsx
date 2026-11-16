@@ -1,12 +1,12 @@
 import { Field } from '@base-ui/react/field';
-import { ICONS } from '@blog/config';
-import type { IWithClassName } from '@blog/config/types';
 import {
   Icon,
   type TIconProps,
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
 import { ICON_SIZE } from '@platform/constants/icon';
+import { ICONS } from '@shinefold/config';
+import type { IWithClassName } from '@shinefold/config/types';
 
 import { lockedReasonVariants } from './locked-reason-variants';
 

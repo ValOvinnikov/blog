@@ -4,7 +4,7 @@ import {
   isNull,
   isString,
   isUndefined,
-} from '@blog/utils/primitives';
+} from '@shinefold/utils/primitives';
 
 type TLooseNode = Record<string, unknown>;
 

@@ -4,8 +4,8 @@ import type {
   IWithClassName,
   IWithDataTestId,
   TBrandVariant,
-} from '@blog/config';
-import type { ICarouselProps } from '@blog/ui/components/organisms/carousel';
+} from '@shinefold/config';
+import type { ICarouselProps } from '@shinefold/ui/components/organisms/carousel';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
 import {
   type IMediaCardData,

@@ -1,6 +1,6 @@
-import { CONTENT_ALIGNMENT, LOCALE_ISO_CODES } from '@blog/config';
-import type { TBlogIndexPage } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import { CONTENT_ALIGNMENT, LOCALE_ISO_CODES } from '@shinefold/config';
+import type { TBlogIndexPage } from '@shinefold/service';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 

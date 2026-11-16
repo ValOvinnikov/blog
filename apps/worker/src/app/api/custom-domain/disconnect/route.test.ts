@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { HTTP_STATUS } from '@blog/config/constants';
-import { getTenantById } from '@blog/db/queries/tenants';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { getTenantById } from '@shinefold/db/queries/tenants';
 import { CUSTOM_DOMAIN_LOG } from '@worker/constants/custom-domain';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import {
@@ -29,7 +29,7 @@ const MOCK_DISCONNECT_URL = `${MOCK_WORKER_ORIGIN}/api/custom-domain/disconnect`
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/workflows/disconnect-custom-domain');
 vi.mock('workflow/api');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/disconnect-guard/disconnect-guard');
 
 function disconnectRequest(

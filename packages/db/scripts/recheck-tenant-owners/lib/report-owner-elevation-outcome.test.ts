@@ -1,9 +1,9 @@
+import { faker } from '@faker-js/faker';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/constants';
 
 import { reportOwnerElevationOutcome } from './report-owner-elevation-outcome';
 
@@ -13,7 +13,7 @@ const { updateProvisioningStepMock } = vi.hoisted(() => ({
   updateProvisioningStepMock: vi.fn(),
 }));
 
-vi.mock('@blog/db/queries/tenants', () => ({
+vi.mock('@shinefold/db/queries/tenants', () => ({
   updateProvisioningStep: updateProvisioningStepMock,
 }));
 

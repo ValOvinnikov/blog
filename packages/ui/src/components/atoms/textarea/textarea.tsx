@@ -1,4 +1,4 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import { type AriaAttributes, type ChangeEvent } from 'react';
 
 import { textareaVariants, type TTextareaVariants } from './textarea-variants';

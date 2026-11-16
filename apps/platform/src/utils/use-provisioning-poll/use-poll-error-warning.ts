@@ -1,7 +1,7 @@
 'use client';
 
-import type { TMaybeNull } from '@blog/config';
 import { useToast } from '@platform/context/toast-provider';
+import type { TMaybeNull } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 

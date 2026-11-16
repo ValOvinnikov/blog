@@ -1,17 +1,17 @@
-import { CONTENT_ALIGNMENT } from '@blog/config/constants';
-import { faqBlockSchema } from '@blog/studio/schema-types/documents/blocks/faq/faq';
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { CONTENT_ALIGNMENT } from '@shinefold/config/constants';
+import { faqBlockSchema } from '@shinefold/studio/schema-types/documents/blocks/faq/faq';
+import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
 import {
   appearanceFieldGroups,
   appearanceFields,
   appearanceFieldsets,
-} from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
+} from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { layoutField } from '@shinefold/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { MessageCircleQuestion } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 

@@ -1,21 +1,21 @@
-import { setTenantRevalidateWebhookSecret } from '@blog/db/queries/tenants/set-tenant-revalidate-webhook-secret';
-import * as schema from '@blog/db/schema';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_SANITY_PROJECT_ID } from '@blog/db/testing/sanity-management-client/fixtures';
+import { setTenantRevalidateWebhookSecret } from '@shinefold/db/queries/tenants/set-tenant-revalidate-webhook-secret';
+import * as schema from '@shinefold/db/schema';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_SANITY_PROJECT_ID } from '@shinefold/db/testing/sanity-management-client/fixtures';
 import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
   useTenantTokenEncryptionKey,
-} from '@blog/db/testing/tenant-token-encryption-key';
+} from '@shinefold/db/testing/tenant-token-encryption-key';
 import {
   MOCK_REVALIDATE_WEBHOOK_SECRET,
   MOCK_UNKNOWN_SANITY_PROJECT_ID,
-} from '@blog/db/testing/tenants/fixtures';
+} from '@shinefold/db/testing/tenants/fixtures';
 
 import { getTenantRevalidateWebhookSecret } from './get-tenant-revalidate-webhook-secret';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

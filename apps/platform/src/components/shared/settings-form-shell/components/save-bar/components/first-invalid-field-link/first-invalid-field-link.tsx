@@ -1,8 +1,8 @@
-import type { IWithClassName } from '@blog/config/types';
 import {
   revealFirstInvalidControl,
   type TInvalidControls,
 } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
+import type { IWithClassName } from '@shinefold/config/types';
 import { useTranslations } from 'next-intl';
 import type { MouseEvent } from 'react';
 

@@ -1,4 +1,4 @@
-import { MOCK_FROM_ADDRESS } from '@blog/auth/testing/magic-link-fixtures';
+import { MOCK_FROM_ADDRESS } from '@shinefold/auth/testing/magic-link-fixtures';
 
 import { resolveMagicLinkFromAddress } from './resolve-magic-link-from-address';
 

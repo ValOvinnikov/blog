@@ -1,13 +1,13 @@
-import type { TMaybeNull, TNullable } from '@blog/config/types';
-import type { TUser } from '@blog/db/schema/auth';
+import type { TMaybeNull, TNullable } from '@shinefold/config/types';
+import type { TUser } from '@shinefold/db/schema/auth';
 import {
   decryptOptionalPersonalValue,
   decryptPersonalValue,
   emailColumns,
   encryptPersonalValue,
-} from '@blog/db/utils/personal-data/personal-data';
-import { accountEmailIndex } from '@blog/utils/encryption';
-import { isNull, isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/utils/personal-data/personal-data';
+import { accountEmailIndex } from '@shinefold/utils/encryption';
+import { isNull, isUndefined } from '@shinefold/utils/primitives';
 
 type TUserPersonalColumns = Pick<
   TUser,

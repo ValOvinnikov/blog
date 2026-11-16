@@ -1,11 +1,11 @@
 import 'server-only';
 
-import { queries } from '@blog/db';
-import type { TAdmin } from '@blog/db/schema/admins';
 import {
   type TPlatformTenant,
   toPlatformTenant,
 } from '@platform/utils/platform-tenant/platform-tenant';
+import { queries } from '@shinefold/db';
+import type { TAdmin } from '@shinefold/db/schema/admins';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
 

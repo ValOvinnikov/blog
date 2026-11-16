@@ -1,12 +1,15 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { PLAN_ENTITLEMENTS, type TPlanEntitlements } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import {
   planPageAccess,
   type TPlanPageAccess,
 } from '@platform/utils/plan-page-access/plan-page-access';
 import { tenantSiteUrl } from '@platform/utils/routes/routes';
 import { type TTrial, trialFor } from '@platform/utils/trial-for/trial-for';
+import type { TMaybeUndefined } from '@shinefold/config';
+import {
+  PLAN_ENTITLEMENTS,
+  type TPlanEntitlements,
+} from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export type TPlatformTenant = TTenant & {
   trial: TMaybeUndefined<TTrial>;

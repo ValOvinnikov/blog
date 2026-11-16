@@ -1,7 +1,7 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { getHomePageDocument } from '@blog/service/features/pages/home/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { getPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { getHomePageDocument } from '@shinefold/service/features/pages/home/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { getPageFaqs } from '@shinefold/service/shared/adaptors/faq-questions/page-faqs';
 
 import type { THomePage } from './types';
 

@@ -1,6 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import messages from '@platform/i18n/messages/en.json';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
@@ -12,6 +9,9 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 
 import DashboardLeadsPage from './page';
 
@@ -31,7 +31,7 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/leads/delete-lead-action');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: {

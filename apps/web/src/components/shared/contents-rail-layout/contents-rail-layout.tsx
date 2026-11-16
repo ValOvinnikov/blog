@@ -1,6 +1,6 @@
-import type { IWithChildren } from '@blog/config/react';
-import type { TPortableTextBody } from '@blog/service';
-import { hasLength } from '@blog/utils/primitives';
+import type { IWithChildren } from '@shinefold/config/react';
+import type { TPortableTextBody } from '@shinefold/service';
+import { hasLength } from '@shinefold/utils/primitives';
 import { extractContentsHeadings } from '@web/utils/extract-contents-headings';
 import type { ReactNode } from 'react';
 

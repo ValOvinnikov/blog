@@ -1,8 +1,8 @@
-import { ALERT_TYPE } from '@blog/config';
-import type { IWithClassName } from '@blog/config/types';
 import { ONBOARDING_FAILURE_KEYS } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/onboarding-error-keys';
 import type { TOnboardingFormFailure } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-onboarding-form';
 import { Alert } from '@platform/components/shared/alert';
+import { ALERT_TYPE } from '@shinefold/config';
+import type { IWithClassName } from '@shinefold/config/types';
 import { useTranslations } from 'next-intl';
 
 export type TOnboardingFailureAlertProps = IWithClassName & {

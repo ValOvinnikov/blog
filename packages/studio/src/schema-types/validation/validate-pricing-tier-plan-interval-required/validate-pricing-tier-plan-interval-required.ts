@@ -1,4 +1,4 @@
-import { isPricingTierLinked } from '@blog/studio/schema-types/validation/is-pricing-tier-linked/is-pricing-tier-linked';
+import { isPricingTierLinked } from '@shinefold/studio/schema-types/validation/is-pricing-tier-linked/is-pricing-tier-linked';
 import type { ValidationContext } from 'sanity';
 
 const PLAN_INTERVAL_REQUIRED_MESSAGE =

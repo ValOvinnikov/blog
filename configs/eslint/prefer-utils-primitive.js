@@ -1,4 +1,4 @@
-const PRIMITIVES_MODULE = '@blog/utils/primitives';
+const PRIMITIVES_MODULE = '@shinefold/utils/primitives';
 const EXEMPT_WORKSPACES = new Set(['packages/utils', 'packages/insight']);
 const STRICT_EQUALITY = new Set(['===', '!==']);
 const EMPTINESS_OPERATORS = new Set(['===', '!==', '>']);
@@ -92,7 +92,7 @@ export const preferUtilsPrimitiveRule = {
     type: 'suggestion',
     docs: {
       description:
-        'Use the @blog/utils/primitives helper instead of the raw comparison it wraps.',
+        'Use the @shinefold/utils/primitives helper instead of the raw comparison it wraps.',
     },
     schema: [],
     messages: {

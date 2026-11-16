@@ -1,5 +1,5 @@
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { faker } from '@faker-js/faker';
+import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
 
 import { toHeadingBlock } from './to-heading-block';
 

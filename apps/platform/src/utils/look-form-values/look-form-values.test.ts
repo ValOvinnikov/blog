@@ -1,10 +1,10 @@
-import { RADIUS_SCALE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   MOCK_LOGO_URL,
   MOCK_STAGED_LOGO_BLOB_URL,
 } from '@platform/testing/site-config/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { RADIUS_SCALE } from '@shinefold/config';
 
 import {
   countChanges,

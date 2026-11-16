@@ -1,11 +1,11 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   collectMissingLocales,
   getMissingLocales,
   getMissingTranslations,
-} from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
-import { mockLocalizedValue } from '@blog/studio/testing/mock-documents';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { mockLocalizedValue } from '@shinefold/studio/testing/mock-documents';
 
 faker.seed(4102);
 

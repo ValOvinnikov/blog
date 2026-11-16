@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { TAdmin } from '@blog/db/schema/admins';
+import type { TAdmin } from '@shinefold/db/schema/admins';
 import { notFound } from 'next/navigation';
 
 import { isSuperAdmin } from './is-super-admin';

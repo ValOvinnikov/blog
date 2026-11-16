@@ -1,5 +1,5 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { toPageLanguages } from '@blog/service/shared/localization/page-languages/to-page-languages';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { toPageLanguages } from '@shinefold/service/shared/localization/page-languages/to-page-languages';
 import type { InferResultType } from 'groqd';
 
 import type { translationMapQuery } from './query';

@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import {
   blogPackageAlias,
   createVitestConfig,
-} from '@blog/vitest-config/preset';
+} from '@shinefold/vitest-config/preset';
 
 export default createVitestConfig({
   resolve: {

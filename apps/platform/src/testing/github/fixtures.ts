@@ -1,4 +1,3 @@
-import type { TValueOf } from '@blog/config/utils';
 import { faker } from '@faker-js/faker';
 import { GITHUB_FILE_STATUS } from '@platform/constants/github';
 import {
@@ -6,6 +5,7 @@ import {
   TENANT_MIGRATION_WORKFLOW_FILE,
 } from '@platform/constants/release';
 import type { TChangedFile } from '@platform/server/github/compare-commits';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const MOCK_GITHUB_RELEASE_TAGS_PATH = '/git/matching-refs/tags/v';
 export const MOCK_GITHUB_MAIN_BRANCH_PATH = '/branches/main';

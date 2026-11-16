@@ -1,13 +1,13 @@
-import { SANITY_ROBOT_ROLE } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { SANITY_ROBOT_ROLE } from '@shinefold/config';
 import {
   getTenantSanityManagementCredentials,
   setTenantSanityManagementToken,
-} from '@blog/db/queries/tenants';
+} from '@shinefold/db/queries/tenants';
 import {
   createSanityRobotToken,
   deleteSanityRobotToken,
-} from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_SANITY_PROJECT_ID,
@@ -24,8 +24,8 @@ import {
 
 faker.seed(7041);
 
-vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-robot-tokens');
+vi.mock('@shinefold/db/queries/tenants');
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-robot-tokens');
 
 const MOCK_MINTED_TOKEN = faker.string.alphanumeric(32);
 const MOCK_MINTED_ROBOT_ID = faker.string.uuid();

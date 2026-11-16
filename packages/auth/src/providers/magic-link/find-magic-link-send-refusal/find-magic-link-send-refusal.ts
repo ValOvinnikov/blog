@@ -1,13 +1,13 @@
-import { MAGIC_LINK_REFUSAL } from '@blog/config/constants';
+import { MAGIC_LINK_REFUSAL } from '@shinefold/config/constants';
 import type {
   IMagicLinkSendRefusal,
   TMaybeUndefined,
-} from '@blog/config/types';
-import { queries } from '@blog/db';
-import { resolveClientKey } from '@blog/utils/client-key';
-import { sha256Hex } from '@blog/utils/hash';
-import { normalizeEmailIdentity } from '@blog/utils/normalize-email-identity';
-import { isString } from '@blog/utils/primitives';
+} from '@shinefold/config/types';
+import { queries } from '@shinefold/db';
+import { resolveClientKey } from '@shinefold/utils/client-key';
+import { sha256Hex } from '@shinefold/utils/hash';
+import { normalizeEmailIdentity } from '@shinefold/utils/normalize-email-identity';
+import { isString } from '@shinefold/utils/primitives';
 
 const SEND_LIMIT_WINDOW_MS = 60 * 60_000;
 const MAX_SENDS_PER_EMAIL = 10;

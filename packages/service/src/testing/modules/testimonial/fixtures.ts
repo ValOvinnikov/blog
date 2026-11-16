@@ -1,11 +1,15 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
-import type { TRawTestimonialModule } from '@blog/service/features/modules/testimonial/adaptor/transformer';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  DISPLAY_MODE,
+} from '@shinefold/config';
+import type { TRawTestimonialModule } from '@shinefold/service/features/modules/testimonial/adaptor/transformer';
 import {
   MOCK_PERSON_NAME,
   mockRawContentBlock,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { mockRawModuleAppearance } from '@blog/service/testing/shared/module-appearance';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 type TRawTestimonialItem = TRawTestimonialModule['testimonials'][number];
 

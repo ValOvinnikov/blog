@@ -1,10 +1,13 @@
-import { TENANT_OWNER_EMAIL, type TTenantOwnerEmail } from '@blog/db/constants';
+import {
+  TENANT_OWNER_EMAIL,
+  type TTenantOwnerEmail,
+} from '@shinefold/db/constants';
 import {
   buildOwnerInviteHeadsUpEmail,
   buildOwnerInviteNudgeEmail,
   buildOwnerSiteReadyEmail,
   PLATFORM_EMAIL_BRAND_NAME,
-} from '@blog/email';
+} from '@shinefold/email';
 import {
   OWNER_DASHBOARD_PATH,
   OWNER_STUDIO_PATH,

@@ -1,14 +1,14 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   NEWSLETTER_VARIANT,
-} from '@blog/config/constants';
-import { mockRawNewsletterModule } from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/config/constants';
+import { mockRawNewsletterModule } from '@shinefold/service/testing/modules/fixtures';
 import {
   mockRawHeadingBlock,
   mockRawWideLayout,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toNewsletterModule } from './transformer';
 

@@ -1,4 +1,3 @@
-import { SIZE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   ASSET_UPLOAD_LAYOUT,
@@ -20,6 +19,7 @@ import {
   ACCEPTED_IMAGE_MIME_TYPES,
   brandAssetKindSchema,
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import { SIZE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { AssetUploadField, type TAssetUploadSpec } from './asset-upload-field';

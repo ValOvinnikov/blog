@@ -1,6 +1,6 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { FooterGroup } from '@blog/ui/components/organisms/footer/components/group/footer-group';
-import type { TCompoundChildren } from '@blog/ui/lib/react';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import type { FooterGroup } from '@shinefold/ui/components/organisms/footer/components/group/footer-group';
+import type { TCompoundChildren } from '@shinefold/ui/lib/react';
 
 import { footerGroupsVariants } from './footer-groups-variants';
 import { hasGroupItems } from './has-group-items';

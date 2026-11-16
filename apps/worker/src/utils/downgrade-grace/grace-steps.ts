@@ -2,14 +2,14 @@ import {
   GRACE_EMAIL,
   PLAN_ENTITLEMENTS,
   type TGraceEmail,
-} from '@blog/db/constants';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
-import { claimGraceEmail, endTenantTrial } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/constants';
+import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
+import { claimGraceEmail, endTenantTrial } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   findGraceLocks,
   hasGraceLocks,
-} from '@blog/db/utils/grace-locks/grace-locks';
+} from '@shinefold/db/utils/grace-locks/grace-locks';
 import { DOWNGRADE_GRACE_LOG } from '@worker/constants/downgrade-grace';
 import type { TInactivitySweepContext } from '@worker/utils/inactivity-sweep/inactivity-stages';
 import { logger } from '@worker/utils/logger/logger';

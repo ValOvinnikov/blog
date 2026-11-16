@@ -1,4 +1,4 @@
-import type { TSuspensionReason } from '@blog/db/constants';
+import type { TSuspensionReason } from '@shinefold/db/constants';
 import { text, timestamp } from 'drizzle-orm/pg-core';
 
 export const tenantInactivityColumns = {

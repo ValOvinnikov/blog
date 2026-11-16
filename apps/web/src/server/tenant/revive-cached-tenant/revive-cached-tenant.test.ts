@@ -1,5 +1,5 @@
-import type { TMaybeJsonDates } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TMaybeJsonDates } from '@shinefold/config';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { mockServableTenant } from '@web/testing/server/tenant/fixtures';
 
 import { reviveCachedTenant } from './revive-cached-tenant';

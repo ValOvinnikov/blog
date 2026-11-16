@@ -1,6 +1,6 @@
-import { SANITY_WEBHOOK_OPERATION } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { SANITY_WEBHOOK_OPERATION } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import {
   DOCUMENT_NOT_FOUND_REASON,
   FETCH_FAILED_REASON,

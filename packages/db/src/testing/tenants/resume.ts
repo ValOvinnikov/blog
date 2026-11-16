@@ -1,10 +1,10 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
-import { createMockFaker } from '@blog/db/testing/mock-faker';
-import { mockStripeIds } from '@blog/db/testing/tenants/billing';
-import { MOCK_SELF_SERVE_OWNER_EMAIL_INDEX } from '@blog/db/testing/tenants/self-serve-fixtures';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
+import { mockStripeIds } from '@shinefold/db/testing/tenants/billing';
+import { MOCK_SELF_SERVE_OWNER_EMAIL_INDEX } from '@shinefold/db/testing/tenants/self-serve-fixtures';
 
 type TResumedFields = Pick<
   TTenant,

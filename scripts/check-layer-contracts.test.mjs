@@ -15,14 +15,14 @@ const SPEC_FIXTURE = `
 
 | Layer          | Imports                                                     | Exposes |
 | -------------- | ----------------------------------------------------------- | ------- |
-| \`@blog/config\` | \`utils\`, \`@portabletext/types\` (types only)                 | x       |
-| \`@blog/utils\`  | \`culori\` (OKLCH color math)                                 | x       |
-| \`@blog/db\`     | \`config\`, \`utils\`, Drizzle (+ \`@blog/insight\`'s \`fn\`, scoped¹) | x       |
-| \`@blog/insight\` | —                                                          | x       |
+| \`@shinefold/config\` | \`utils\`, \`@portabletext/types\` (types only)                 | x       |
+| \`@shinefold/utils\`  | \`culori\` (OKLCH color math)                                 | x       |
+| \`@shinefold/db\`     | \`config\`, \`utils\`, Drizzle (+ \`@shinefold/insight\`'s \`fn\`, scoped¹) | x       |
+| \`@shinefold/insight\` | —                                                          | x       |
 | \`web\` (app)    | \`db\`, \`config\`, utils                                       | x       |
 
 ## 5. Next
-| \`@blog/utils\` | \`config\` | x |
+| \`@shinefold/utils\` | \`config\` | x |
 `;
 
 const CLAUDE_FIXTURE = `
@@ -42,7 +42,7 @@ const workspace = (name, deps) => ({
   name,
   pkg: {
     dependencies: Object.fromEntries(
-      deps.map((dep) => [`@blog/${dep}`, 'workspace:*']),
+      deps.map((dep) => [`@shinefold/${dep}`, 'workspace:*']),
     ),
   },
 });
@@ -67,11 +67,11 @@ describe('blogDependencies', () => {
     assert.deepEqual(
       blogDependencies({
         dependencies: {
-          '@blog/utils': 'workspace:*',
-          '@blog/tailwind-config': 'workspace:*',
+          '@shinefold/utils': 'workspace:*',
+          '@shinefold/tailwind-config': 'workspace:*',
           react: '19.0.0',
         },
-        devDependencies: { '@blog/config': 'workspace:*' },
+        devDependencies: { '@shinefold/config': 'workspace:*' },
       }),
       ['utils'],
     );

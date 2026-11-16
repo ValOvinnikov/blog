@@ -4,10 +4,10 @@ import {
   FOOTER_SURFACE,
   ICONS,
   SIZE,
-} from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { objectKeys } from '@blog/utils/primitives';
+} from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Footer, type TFooterProps } from './footer';

@@ -1,4 +1,4 @@
-import { ButtonShapes } from '@blog/ui/testing/button-shapes';
+import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { BookmarkToggle } from './bookmark-toggle';

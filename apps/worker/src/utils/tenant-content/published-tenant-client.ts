@@ -1,5 +1,5 @@
-import { SANITY_PERSPECTIVE } from '@blog/config/constants';
-import type { TTenantSanityCredentials } from '@blog/db/queries/tenants';
+import { SANITY_PERSPECTIVE } from '@shinefold/config/constants';
+import type { TTenantSanityCredentials } from '@shinefold/db/queries/tenants';
 import { SANITY_API_VERSION } from '@worker/constants/sanity-api';
 import { createClientWithTimeout } from '@worker/utils/step-deps/step-deps';
 

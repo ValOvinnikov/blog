@@ -3,7 +3,7 @@ import {
   type TLocaleIsoCode,
   VOICE_FIELDS,
   type TVoicePortableText,
-} from '@blog/config';
+} from '@shinefold/config';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { logger } from '@web/utils/logger/logger';

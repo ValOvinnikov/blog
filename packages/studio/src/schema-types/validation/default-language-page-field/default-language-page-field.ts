@@ -1,12 +1,15 @@
-import type { TMaybeNull } from '@blog/config';
-import { isLocaleIsoCode, type TLocaleIsoCode } from '@blog/config/constants';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { getDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
+import type { TMaybeNull } from '@shinefold/config';
+import {
+  isLocaleIsoCode,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
+import { getDefaultLanguage } from '@shinefold/studio/schema-types/validation/default-language/default-language';
 import {
   fetchFailSafe,
   getDraftsClient,
-} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
-import { isString } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { isString } from '@shinefold/utils/primitives';
 import { getPublishedId, type ValidationContext } from 'sanity';
 
 type TDefaultLanguagePageField<T> = {
