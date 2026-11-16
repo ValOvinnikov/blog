@@ -490,8 +490,8 @@ save still settles as the form's generic server error.
   `selected` and `selected-line` are #ffc233 in every theme, `on-selected`
   is #12141a / #0f1115, `selected-tint` is #ffe08a / #4a3b10, and
   `selected-edge` is #12141a in Light and #ffc233 in Dark, because neither
-  tint reaches 3:1 on its ground (yellow on white is 1.61:1, the dark tint on
-  the card about 1.6:1), so the edge carries a picked control's 3:1.
+  tint reaches 3:1 on its ground (the light tint on white is 1.29:1, the dark
+  tint on the card about 1.6:1), so the edge carries a picked control's 3:1.
   Compact controls (segmented options at every width, preview toolbar
   toggles, the Follow solo, rich-text toolbar toggles,
   segmented view tabs, the language picker and other segmented radio
@@ -539,8 +539,9 @@ save still settles as the form's generic server error.
   that is off darkens its track to `control-line-hover`; a text link's
   `highlight` stroke thickens from 2px to 3px; the asset upload drop area
   takes the tint and a `brand-ink` dashed border. A select keeps the
-  field rule (a `brand-ink` border, no tint). Table, list, accordion,
-  tenant picker, menu and sidebar rows keep their grey hover, and a
+  field rule (a `brand-ink` border, no tint). Table, list, list-accordion,
+  tenant picker, menu and sidebar rows keep their grey hover (a folded
+  row-accordion row takes `hover-tint`), and a
   selected, pressed, checked, current or open control does not change on
   hover. Disabled and `aria-disabled` controls take no hover.
 - Focus is one gapped ring on every control, built by

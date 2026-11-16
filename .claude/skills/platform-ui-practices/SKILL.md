@@ -324,12 +324,12 @@ text-platform-text` and a `selected-edge` border or inset ring
   frame, and the item carries the stripe (`SELECTED_STRIPE_CLASSES`) down the
   title and the open panel. Neither tint reaches 3:1 on its ground, so every
   picked control carries its 3:1 on the `selected-edge`: near-black in Light
-  (yellow on white is 1.61:1) and amber `#ffc233` in Dark (the dark tint on
+  (the light tint on white is 1.29:1) and amber `#ffc233` in Dark (the dark tint on
   the card is about 1.6:1). A tile adds its hairline, and a switch its thumb
   (yellow in Dark, so it shows on the dark tint). Three yellow marks stay below 3:1 in Light, and a
   bold near-black label carries their state: the sidebar's current-row bar
-  (with its raised plate), and the straight 2px underline under the current
-  underline tab and desktop jump index entry (the jump index's a straight
+  (with its raised plate), and the 2px underline under the current
+  underline tab and desktop jump index entry (on the jump index, a straight
   bar inside the link's padding).
   Every selected item also announces itself as pressed, checked, selected
   or current.
