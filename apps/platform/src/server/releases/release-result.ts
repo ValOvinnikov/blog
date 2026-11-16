@@ -1,5 +1,3 @@
-import type { TValueOf } from '@blog/config/utils';
-import { errorResult, okResult, type TResult } from '@blog/utils';
 import {
   GITHUB_FAILURE,
   type TGitHubFailure,
@@ -7,6 +5,8 @@ import {
 import { RELEASE_FAILURE, RELEASE_LOG } from '@platform/constants/release';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import type { TValueOf } from '@shinefold/config/utils';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 
 export type TReleaseCandidateFailureReason =
   | Exclude<TGitHubFailure, typeof GITHUB_FAILURE.NOT_FOUND>

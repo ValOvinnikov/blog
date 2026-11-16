@@ -1,5 +1,5 @@
-import type { TValueOf } from '@blog/config/utils';
 import { FIELD_APPEARANCE } from '@platform/constants/field-appearance';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const SELECT_APPEARANCE = {
   ...FIELD_APPEARANCE,

@@ -1,5 +1,3 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import {
   LookForm,
   type TLookFormTenant,
@@ -13,6 +11,8 @@ import {
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 const MOCK_LOOK_TENANT: TLookFormTenant = {
   id: MOCK_TENANT_ID,

@@ -1,6 +1,3 @@
-import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { OAUTH_PROVIDER } from '@blog/config/constants';
-import { queries } from '@blog/db';
 import {
   SIGN_IN_APP_LOG,
   SIGN_IN_APP_REFUSAL,
@@ -13,12 +10,15 @@ import {
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 import { notFound } from 'next/navigation';
 
 import { confirmSignInCallbackAction } from './confirm-sign-in-callback-action';
 
 vi.mock('@platform/server/auth/require-tenant-membership');
-vi.mock('@blog/db', async () => {
+vi.mock('@shinefold/db', async () => {
   const { mockSignInAppsDb } =
     await import('@platform/testing/sign-in-apps/fixtures');
   return mockSignInAppsDb();

@@ -1,6 +1,6 @@
-import { getFeatureHighlightsModule } from '@blog/service/features/modules/feature-highlights/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getFeatureHighlightsModule } from '@shinefold/service/features/modules/feature-highlights/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createFeatureHighlightsModuleService() {
   return {

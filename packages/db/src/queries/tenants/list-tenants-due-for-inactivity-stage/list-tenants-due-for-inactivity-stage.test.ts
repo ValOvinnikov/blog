@@ -5,21 +5,21 @@ import {
   TENANT_STATUS,
   type TInactivityStage,
   type TStampedInactivityStage,
-} from '@blog/db/constants';
-import { stampTenantInactivityStage } from '@blog/db/queries/tenants/stamp-tenant-inactivity-stage';
-import { startDeprovisioningRun } from '@blog/db/queries/tenants/start-deprovisioning-run';
-import * as schema from '@blog/db/schema';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/constants';
+import { stampTenantInactivityStage } from '@shinefold/db/queries/tenants/stamp-tenant-inactivity-stage';
+import { startDeprovisioningRun } from '@shinefold/db/queries/tenants/start-deprovisioning-run';
+import * as schema from '@shinefold/db/schema';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   daysAfterLastActivity,
   MOCK_LAST_ACTIVITY_AT,
-} from '@blog/db/testing/tenants/inactivity';
+} from '@shinefold/db/testing/tenants/inactivity';
 
 import { listTenantsDueForInactivityStage } from './list-tenants-due-for-inactivity-stage';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

@@ -2,13 +2,13 @@ import { randomUUID } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 
-import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
 import {
   beginTenantProvisioning,
   setTenantProvisioningStatus,
-} from '@blog/db/queries/tenants';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/queries/tenants';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import {
   PROVISION_CLI_RESULT,
   type TProvisionCliResult,

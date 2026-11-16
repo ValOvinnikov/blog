@@ -1,6 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { MOCK_ABOUT_SLUG } from '@blog/service/testing/shared/translated-pages-dataset';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { MOCK_ABOUT_SLUG } from '@shinefold/service/testing/shared/translated-pages-dataset';
 
 import { toPageTranslations } from './to-page-translations';
 

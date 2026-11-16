@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, type TBrandVariant } from '@blog/config';
+import { BRAND_VARIANT, type TBrandVariant } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 const BAND_CLASS: Record<TBrandVariant, string> = {

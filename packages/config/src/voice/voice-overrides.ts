@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config/constants/language';
+import type { TLocaleIsoCode } from '@shinefold/config/constants/language';
 
 import type { TVoiceFieldId } from './voice-fields';
 import type { TVoicePortableText } from './voice-portable-text';

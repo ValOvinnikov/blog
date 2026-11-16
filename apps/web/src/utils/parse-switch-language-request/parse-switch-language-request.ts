@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
+import type { TLocaleIsoCode, TMaybeUndefined } from '@shinefold/config';
 
 type TSwitchLanguageRequest = { to: TLocaleIsoCode; from: string };
 

@@ -1,5 +1,5 @@
-import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@shinefold/config';
 import { buildSectionDocumentMetadata } from '@web/metadata/section-document-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';
 import { mockRouteParams } from '@web/testing/app/route-params';

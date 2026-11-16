@@ -1,5 +1,5 @@
-import { ALERT_TYPE } from '@blog/config';
 import { Icon, STATUS_ICON } from '@platform/components/shared/icon';
+import { ALERT_TYPE } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 import { alertVariants, type TAlertVariants } from './alert-variants';

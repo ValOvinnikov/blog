@@ -1,9 +1,9 @@
+import { faker } from '@faker-js/faker';
 import {
   HTTP_STATUS,
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 import { CACHE_CONTROL } from '@web/constants/http';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { mockTenant } from '@web/testing/shared/tenant/fixtures';
@@ -24,7 +24,7 @@ const {
   getTenantTranslationMapMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenants: { selectLiveLocales: selectLiveLocalesMock } },
 }));
 vi.mock('@web/server/tenant/request-tenant/request-tenant');

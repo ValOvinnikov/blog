@@ -1,11 +1,11 @@
-import type { IWithClassName } from '@blog/config/types';
+import { LogoSvg } from '@platform/components/shared/logo-svg';
+import type { IWithClassName } from '@shinefold/config/types';
 import {
   type IShinefoldLogo,
   SHINEFOLD_LOGO,
   SHINEFOLD_LOGO_COLOR,
   SHINEFOLD_LOGO_CURRENT_COLOR,
-} from '@blog/utils/shinefold-logo';
-import { LogoSvg } from '@platform/components/shared/logo-svg';
+} from '@shinefold/utils/shinefold-logo';
 
 import {
   brandLogoVariants,

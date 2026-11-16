@@ -1,4 +1,4 @@
-import { urlForSanityImage } from '@blog/service';
+import { urlForSanityImage } from '@shinefold/service';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 

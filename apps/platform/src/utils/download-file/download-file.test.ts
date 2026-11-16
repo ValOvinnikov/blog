@@ -1,7 +1,7 @@
 import { type Blob, resolveObjectURL } from 'node:buffer';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 import { downloadFile } from './download-file';
 

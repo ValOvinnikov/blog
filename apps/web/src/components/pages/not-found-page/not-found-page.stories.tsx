@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { SITE_MESSAGES } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 

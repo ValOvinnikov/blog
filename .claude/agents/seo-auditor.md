@@ -71,7 +71,7 @@ Then walk the diff:
    re-deriving an SEO field in `web`, and any extra `siteSettings` fetch
    "just for metadata".
 2. **Canonicals.** The `href` handed to the helper is a locale-less `routes`
-   path from `@blog/config`; the helper localizes it and adds the language
+   path from `@shinefold/config`; the helper localizes it and adds the language
    alternates, so flag a hand-built locale prefix. Paginated listings
    self-canonicalize per page (`routes.blogIndex(page)`,
    `routes.tag(slug, page)`), never collapsing to page 1. Only the home
@@ -90,7 +90,7 @@ Then walk the diff:
    production only and never disallows `/`, and the `rss.xml/route.ts`
    handlers (site and per-tag) stay consistent if posts change.
 6. **No Sanity client in `web`.** Every Sanity-sourced SEO input — metadata,
-   JSON-LD fields, feed data — comes through `@blog/service`, never a Sanity
+   JSON-LD fields, feed data — comes through `@shinefold/service`, never a Sanity
    client in `apps/web`.
 
 ## Re-review mode

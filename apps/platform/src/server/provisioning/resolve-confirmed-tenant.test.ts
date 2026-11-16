@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
-import { queries } from '@blog/db';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import {
   MOCK_OTHER_TENANT_ID,
@@ -7,10 +5,12 @@ import {
   MOCK_TENANT_NAME,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 import { resolveConfirmedTenant } from './resolve-confirmed-tenant';
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenants: { getTenantById: vi.fn() } },
 }));
 

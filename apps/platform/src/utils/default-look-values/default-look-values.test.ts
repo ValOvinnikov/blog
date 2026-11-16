@@ -2,7 +2,7 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
-} from '@blog/config';
+} from '@shinefold/config';
 
 import { defaultLookFormValues } from './default-look-values';
 

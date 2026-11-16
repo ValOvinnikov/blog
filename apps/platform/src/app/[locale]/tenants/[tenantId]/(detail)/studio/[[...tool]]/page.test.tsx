@@ -1,4 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -12,6 +11,7 @@ import {
   mockStudioReadyTenant,
 } from '@platform/testing/tenants/studio-ready-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import TenantStudioPage from './page';
 
@@ -33,7 +33,7 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 
 vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     admins: { getAdminByUserId: getAdminByUserIdMock },
@@ -44,7 +44,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@blog/studio', () => ({
+vi.mock('@shinefold/studio', () => ({
   StudioMount: (props: unknown) => {
     studioMountMock(props);
     return <div data-testid={STUDIO_MOUNT_TEST_ID} />;

@@ -1,9 +1,9 @@
+import { faker } from '@faker-js/faker';
 import {
   PRESET_ID,
   PRESET_REGISTRY,
   resolveTenantEmailBrand,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 
 import { toTenantEmailBrand } from './to-tenant-email-brand';
 

@@ -1,5 +1,5 @@
-import { BRAND_VARIANT, DISPLAY_MODE, GRID_COLUMNS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, DISPLAY_MODE, GRID_COLUMNS } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';

@@ -1,4 +1,3 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { ACCENT_SWATCH_TEST_ID } from '@platform/constants/accent-swatch';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
@@ -15,6 +14,7 @@ import {
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { MOCK_STAGED_LOGO_BLOB_URL } from '@platform/testing/site-config/fixtures';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

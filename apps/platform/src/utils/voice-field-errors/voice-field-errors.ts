@@ -1,10 +1,10 @@
+import type { TVoiceFieldErrorsByLocale } from '@platform/utils/voice-draft/voice-draft';
 import {
   LOCALE_ISO_CODES,
   VOICE_FIELDS,
   type TVoiceFieldFailure,
   type TVoiceFieldFailuresByLocale,
-} from '@blog/config';
-import type { TVoiceFieldErrorsByLocale } from '@platform/utils/voice-draft/voice-draft';
+} from '@shinefold/config';
 
 export const toVoiceFieldMessages = (
   failuresByLocale: TVoiceFieldFailuresByLocale,

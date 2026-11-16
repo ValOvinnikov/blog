@@ -1,7 +1,7 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import DataRequestsPage from './page';
 

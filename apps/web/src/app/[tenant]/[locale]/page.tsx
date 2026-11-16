@@ -1,4 +1,4 @@
-import type { ITenantLocalizedParams } from '@blog/config';
+import type { ITenantLocalizedParams } from '@shinefold/config';
 import { HomePage } from '@web/components/pages/home-page';
 import { buildHomePageMetadata } from '@web/metadata/home-page-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';

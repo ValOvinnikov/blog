@@ -1,4 +1,4 @@
-import { HEADING_REQUIRED_MESSAGE } from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block';
+import { HEADING_REQUIRED_MESSAGE } from '@shinefold/studio/schema-types/objects/page-heading-block/page-heading-block';
 import { defineField } from 'sanity';
 
 import { moduleHeadingBlockSchema } from './module-heading-block';

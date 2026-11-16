@@ -1,8 +1,8 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { pickNextOptionByKeyboard } from '@platform/testing/pick-next-option-by-keyboard';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
+import { EMAIL_TEMPLATE_TYPE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ItemSelect } from './item-select';

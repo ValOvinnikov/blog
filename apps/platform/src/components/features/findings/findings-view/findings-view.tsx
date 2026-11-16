@@ -1,6 +1,6 @@
-import type { TOpenFinding } from '@blog/db/queries/findings';
 import { FindingsTable } from '@platform/components/features/findings/findings-table';
 import { PageHeader } from '@platform/components/shared/page-header';
+import type { TOpenFinding } from '@shinefold/db/queries/findings';
 import { useTranslations } from 'next-intl';
 
 import { findingsViewVariants } from './findings-view-variants';

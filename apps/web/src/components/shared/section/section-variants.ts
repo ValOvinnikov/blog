@@ -1,9 +1,13 @@
-import { BRAND_VARIANT, CONTAINER_WIDTH, SPACING_SCALE } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTAINER_WIDTH,
+  SPACING_SCALE,
+} from '@shinefold/config';
 import {
   BAND_SPACING_BOTTOM,
   BAND_SPACING_TOP,
   tv,
-} from '@blog/ui/lib/styling';
+} from '@shinefold/ui/lib/styling';
 
 export const sectionVariants = tv({
   slots: {

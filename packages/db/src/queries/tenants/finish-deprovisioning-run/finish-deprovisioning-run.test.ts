@@ -1,14 +1,14 @@
-import { ERROR_CODE } from '@blog/config/constants';
+import { ERROR_CODE } from '@shinefold/config/constants';
 import {
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
-import { startDeprovisioningRun } from '@blog/db/queries/tenants/start-deprovisioning-run';
-import * as schema from '@blog/db/schema';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/constants';
+import { startDeprovisioningRun } from '@shinefold/db/queries/tenants/start-deprovisioning-run';
+import * as schema from '@shinefold/db/schema';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_IDLE_DEPROVISIONING_STEPS,
   MOCK_MISSING_TENANT_ID,
@@ -17,11 +17,11 @@ import {
   MOCK_STEP_ERROR,
   MOCK_WORKFLOW_RUN_URL,
   unwrapOk,
-} from '@blog/db/testing/tenants/fixtures';
+} from '@shinefold/db/testing/tenants/fixtures';
 
 import { finishDeprovisioningRun } from './finish-deprovisioning-run';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock(new Date(MOCK_RUN_AT));

@@ -1,5 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
@@ -9,13 +7,15 @@ import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { redirect } from 'next/navigation';
 
 import { requireTenantById } from './require-tenant-by-id';
 
 vi.mock('@platform/server/auth/require-admin');
 
-vi.mock('@blog/db', async () => {
+vi.mock('@shinefold/db', async () => {
   const { mockDbConstants } =
     await import('@platform/testing/mock-db-constants');
 

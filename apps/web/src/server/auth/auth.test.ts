@@ -1,4 +1,4 @@
-import { buildAuthConfig } from '@blog/auth';
+import { buildAuthConfig } from '@shinefold/auth';
 import { getRequestSiteOAuthCredentials } from '@web/server/auth/site-oauth-credentials/site-oauth-credentials';
 import { clearNewsletterSubscribedCookieSafely } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
 import { MOCK_SITE_OAUTH_CREDENTIALS } from '@web/testing/server/auth/site-oauth-credentials-fixtures';
@@ -8,7 +8,7 @@ import NextAuth, { type NextAuthConfig } from 'next-auth';
 
 vi.mock('next-auth', () => ({ default: vi.fn(() => ({ handlers: {} })) }));
 
-vi.mock('@blog/auth', () => ({ buildAuthConfig: vi.fn(() => ({})) }));
+vi.mock('@shinefold/auth', () => ({ buildAuthConfig: vi.fn(() => ({})) }));
 
 vi.mock(
   '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie',

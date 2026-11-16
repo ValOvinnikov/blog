@@ -1,6 +1,3 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_PROVISIONING_STEP } from '@blog/db';
 import { tenantDetailsValuesOf } from '@platform/components/features/tenants/tenant-details-panel/tenant-details-values';
 import {
   TENANT_FIELD_ERROR,
@@ -17,6 +14,9 @@ import {
   OWNER_EMAIL_LABEL,
   PRIMARY_DOMAIN_LABEL,
 } from '@platform/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_PROVISIONING_STEP } from '@shinefold/db';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import {

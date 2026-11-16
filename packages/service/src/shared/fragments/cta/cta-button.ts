@@ -1,5 +1,5 @@
-import { q } from '@blog/service/sanity/query/query';
-import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
+import { q } from '@shinefold/service/sanity/query/query';
+import { linkDocumentFragment } from '@shinefold/service/shared/fragments/link/link-document';
 
 export const ctaButtonFragment = q
   .fragmentForType<'ctaButton'>()

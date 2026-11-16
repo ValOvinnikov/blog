@@ -1,4 +1,4 @@
-import { routes } from '@blog/config';
+import { routes } from '@shinefold/config';
 import { NL_PATH_PREFIX } from '@web/testing/metadata/to-metadata/fixtures';
 
 export const NL_TOPICS_INDEX_PATH = `${NL_PATH_PREFIX}${routes.topics()}`;

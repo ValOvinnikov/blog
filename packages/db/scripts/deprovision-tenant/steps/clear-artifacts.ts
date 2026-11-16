@@ -1,5 +1,5 @@
-import { clearTenantProvisioningArtifacts } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { clearTenantProvisioningArtifacts } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 import type { TDeprovisionEnv } from '../lib/env';
 

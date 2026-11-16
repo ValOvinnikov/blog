@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { HTTP_METHOD } from '@blog/config/constants';
-import { isString } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { HTTP_METHOD } from '@shinefold/config/constants';
+import { isString } from '@shinefold/utils/primitives';
 import {
   MAX_MESSAGE_LENGTH,
   MAX_STACK_LENGTH,

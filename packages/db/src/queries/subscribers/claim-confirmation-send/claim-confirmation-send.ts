@@ -1,8 +1,8 @@
-import type { TMaybeNull } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import { subscribers } from '@blog/db/schema/subscribers';
-import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import { subscribers } from '@shinefold/db/schema/subscribers';
+import { mintConfirmationToken } from '@shinefold/db/utils/subscriber-tokens/subscriber-tokens';
 import { and, eq, isNull, lt, or } from 'drizzle-orm';
 
 export interface IConfirmationSendClaim {

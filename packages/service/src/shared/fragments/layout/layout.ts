@@ -1,5 +1,10 @@
-import type { CtaLayout, HeroLayout, Layout, WideLayout } from '@blog/config';
-import { q } from '@blog/service/sanity/query/query';
+import type {
+  CtaLayout,
+  HeroLayout,
+  Layout,
+  WideLayout,
+} from '@shinefold/config';
+import { q } from '@shinefold/service/sanity/query/query';
 
 export const layoutFragment = q.fragmentForType<'layout'>().project((sub) => ({
   spacingTop: sub.field('spacingTop').nullable(true),

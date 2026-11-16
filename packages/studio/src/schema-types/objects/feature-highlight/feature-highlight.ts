@@ -1,11 +1,11 @@
-import { localizedListedTextField } from '@blog/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
-import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
-import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
-import { validateDefaultLanguageBlocksFilled } from '@blog/studio/schema-types/validation/validate-default-language-blocks-filled/validate-default-language-blocks-filled';
-import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
-import { validateImageHasAsset } from '@blog/studio/schema-types/validation/validate-image-has-asset/validate-image-has-asset';
+import { localizedListedTextField } from '@shinefold/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { ctaSecondaryButtonSchema } from '@shinefold/studio/schema-types/objects/cta-button/cta-button';
+import { localizedImageWithAltSchema } from '@shinefold/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
+import { validateDefaultLanguageBlocksFilled } from '@shinefold/studio/schema-types/validation/validate-default-language-blocks-filled/validate-default-language-blocks-filled';
+import { validateDefaultLanguageFilled } from '@shinefold/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { validateImageHasAsset } from '@shinefold/studio/schema-types/validation/validate-image-has-asset/validate-image-has-asset';
 import { Columns2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

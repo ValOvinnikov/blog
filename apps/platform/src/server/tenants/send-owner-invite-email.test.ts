@@ -1,4 +1,3 @@
-import { MAGIC_LINK_PROVIDER_ID } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { signIn } from '@platform/server/auth/auth';
 import {
@@ -17,6 +16,7 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { MAGIC_LINK_PROVIDER_ID } from '@shinefold/auth/providers/magic-link/magic-link-provider/magic-link-provider';
 
 import { sendOwnerInviteEmail } from './send-owner-invite-email';
 

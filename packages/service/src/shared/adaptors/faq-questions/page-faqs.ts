@@ -1,9 +1,9 @@
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
 import {
   resolveFaqs,
   type TFaqPageQuestion,
-} from '@blog/service/shared/transformers/faq/resolve-faqs';
-import type { TModule } from '@blog/service/shared/transformers/module/to-module';
+} from '@shinefold/service/shared/transformers/faq/resolve-faqs';
+import type { TModule } from '@shinefold/service/shared/transformers/module/to-module';
 
 import { getFaqQuestions } from './loader';
 

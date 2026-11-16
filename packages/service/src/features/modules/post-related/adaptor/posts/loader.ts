@@ -1,11 +1,11 @@
-import { isr } from '@blog/service/sanity/query/isr';
+import { isr } from '@shinefold/service/sanity/query/isr';
 import {
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query/query';
-import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
-import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@shinefold/service/shared/cache-tags/link/link-target-cache-tags';
+import type { TPostCard } from '@shinefold/service/shared/transformers/post/to-post-card';
+import { hasLength } from '@shinefold/utils/primitives';
 
 import { relatedPostAnchorQuery } from './anchor.query';
 import { relatedByTagsQuery } from './by-tags.query';

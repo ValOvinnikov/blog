@@ -3,7 +3,7 @@ import {
   MOCK_GITHUB_SECRET,
   MOCK_GOOGLE_ID,
   MOCK_GOOGLE_SECRET,
-} from '@blog/auth/testing/oauth-fixtures';
+} from '@shinefold/auth/testing/oauth-fixtures';
 
 async function importOAuthEnv(): Promise<typeof import('./oauth-env')> {
   vi.resetModules();

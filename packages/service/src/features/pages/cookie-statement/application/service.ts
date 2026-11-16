@@ -1,6 +1,6 @@
-import { getCookieStatementPage } from '@blog/service/features/pages/cookie-statement/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getCookieStatementPage } from '@shinefold/service/features/pages/cookie-statement/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createCookieStatementService() {
   return {

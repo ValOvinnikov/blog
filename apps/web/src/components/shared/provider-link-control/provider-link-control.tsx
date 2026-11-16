@@ -1,7 +1,7 @@
 'use client';
 
-import { ACTION_OUTCOME, routes } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
+import { ACTION_OUTCOME, routes } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
 import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useToast } from '@web/context/toast-provider';
 import {

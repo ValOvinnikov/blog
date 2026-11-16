@@ -1,4 +1,4 @@
-import { oklchToHex } from '@blog/utils/color';
+import { oklchToHex } from '@shinefold/utils/color';
 
 export const FONT_STACK =
   "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";

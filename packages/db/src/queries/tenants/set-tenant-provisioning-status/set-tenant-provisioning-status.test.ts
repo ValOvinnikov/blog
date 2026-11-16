@@ -1,16 +1,16 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { setTenantProvisioningStatus } from './set-tenant-provisioning-status';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 useFrozenClock();

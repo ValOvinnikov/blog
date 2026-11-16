@@ -1,27 +1,27 @@
 import {
   findPendingInviteTenants,
   type TPendingInviteTenant,
-} from '@blog/auth/providers/magic-link/find-pending-invite-tenants/find-pending-invite-tenants';
-import { recordSignInSendSafely } from '@blog/auth/providers/magic-link/record-sign-in-send-safely/record-sign-in-send-safely';
-import { resolveMagicLinkEmailSettings } from '@blog/auth/providers/magic-link/resolve-magic-link-email-settings/resolve-magic-link-email-settings';
-import { resolveRecipientLocale } from '@blog/auth/providers/magic-link/resolve-recipient-locale/resolve-recipient-locale';
-import { resolveTenantEmailIdentity } from '@blog/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
+} from '@shinefold/auth/providers/magic-link/find-pending-invite-tenants/find-pending-invite-tenants';
+import { recordSignInSendSafely } from '@shinefold/auth/providers/magic-link/record-sign-in-send-safely/record-sign-in-send-safely';
+import { resolveMagicLinkEmailSettings } from '@shinefold/auth/providers/magic-link/resolve-magic-link-email-settings/resolve-magic-link-email-settings';
+import { resolveRecipientLocale } from '@shinefold/auth/providers/magic-link/resolve-recipient-locale/resolve-recipient-locale';
+import { resolveTenantEmailIdentity } from '@shinefold/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
 import {
   AUTH_APP,
   EMAIL_ACCOUNT,
   EMAIL_TEMPLATE_TYPE,
   type TAuthApp,
-} from '@blog/config/constants';
-import type { IMagicLinkSendHandlers } from '@blog/config/types';
-import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
+} from '@shinefold/config/constants';
+import type { IMagicLinkSendHandlers } from '@shinefold/config/types';
+import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@shinefold/db/constants';
 import {
   applyTenantSenderName,
   buildInviteMagicLinkEmail,
   buildMagicLinkEmail,
   buildSiteEmailTag,
   sendEmail,
-} from '@blog/email';
-import { hasLength } from '@blog/utils/primitives';
+} from '@shinefold/email';
+import { hasLength } from '@shinefold/utils/primitives';
 
 type TMagicLinkEmailRequest = {
   app: TAuthApp;

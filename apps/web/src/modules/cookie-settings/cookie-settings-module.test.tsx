@@ -1,5 +1,5 @@
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { errorResult, okResult } from '@shinefold/utils';
 import { CONSENT_LOG } from '@web/constants/consent';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockCookieSettingsModule } from '@web/testing/modules/cookie-settings/fixtures';
@@ -14,7 +14,7 @@ const { getCookieSettingsMock } = vi.hoisted(() => ({
   getCookieSettingsMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       cookieSettings: { v1: { getCookieSettings: getCookieSettingsMock } },

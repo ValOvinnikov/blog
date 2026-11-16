@@ -1,8 +1,8 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import { LOOK_CARD, type TLookCard } from '@platform/constants/look-card';
 import type { TLookRow } from '@platform/constants/look-row';
 import { findTopmostLookCard } from '@platform/utils/look-anchor/look-anchor';
 import { useLayoutMeasure } from '@platform/utils/use-layout-measure/use-layout-measure';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import { useState, type RefObject } from 'react';
 
 type TUseCurrentLookCardOptions = {

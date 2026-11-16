@@ -1,10 +1,10 @@
 'use server';
 
+import { toSafeCallbackPath } from '@platform/utils/safe-callback-path/safe-callback-path';
 import {
   getEnabledOAuthProviderIds,
   type TOAuthProviderId,
-} from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { toSafeCallbackPath } from '@platform/utils/safe-callback-path/safe-callback-path';
+} from '@shinefold/auth/utils/oauth-providers/oauth-providers';
 import { z } from 'zod';
 
 import { signIn } from './auth';

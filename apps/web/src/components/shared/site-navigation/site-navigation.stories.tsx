@@ -5,8 +5,8 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   type TMaybeNull,
-} from '@blog/config';
-import { OAUTH_PROVIDER } from '@blog/config/constants';
+} from '@shinefold/config';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { AuthMenu } from '@web/components/shared/site-header/components/auth-menu/auth-menu';

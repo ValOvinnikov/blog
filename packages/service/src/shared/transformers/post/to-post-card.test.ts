@@ -1,4 +1,5 @@
-import { routes } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { routes } from '@shinefold/config';
 import {
   MOCK_AUTHOR_AVATAR_ALT,
   MOCK_AUTHOR_ID,
@@ -6,8 +7,8 @@ import {
   MOCK_TOPIC_ID,
   MOCK_TOPIC_SLUG,
   MOCK_TOPIC_TITLE,
-} from '@blog/service/testing/entities/fixtures';
-import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
+import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_POST_EXCERPT,
   MOCK_POST_ID,
@@ -17,8 +18,7 @@ import {
   mockRawHeadingBlock,
   mockRawInternalLinkDocument,
   mockSanityImageView,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toPostCard } from './to-post-card';
 

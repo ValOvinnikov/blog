@@ -1,5 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
 import en from '@platform/i18n/messages/en.json';
 import {
   customRenderAsync,
@@ -17,6 +15,8 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 
 import { BillingStatusNotice } from './billing-status-notice';
 
@@ -29,12 +29,12 @@ const { countMembershipsOverSeatsMock, listTenantHostsMock } = vi.hoisted(
   }),
 );
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: { tenantDomains: { listTenantHosts: listTenantHostsMock } },
 }));
 
-vi.mock('@blog/db/queries/memberships', () => ({
+vi.mock('@shinefold/db/queries/memberships', () => ({
   countMembershipsOverSeats: countMembershipsOverSeatsMock,
 }));
 const envMock: Partial<Record<keyof typeof env, string>> = env;

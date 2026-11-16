@@ -1,5 +1,5 @@
-import { CAPABILITY } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
+import { CAPABILITY } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 import { lowestPlanWithCapability } from './lowest-plan-with-capability';
 

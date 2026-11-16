@@ -92,7 +92,7 @@ platform-wide Findings page. Tenant owners see neither.
   `kind`, `severity`, `status`, `dedupeKey`, `details` jsonb, `firstSeenAt`,
   `lastSeenAt`, `resolvedAt`. A partial unique index allows one OPEN row per
   `dedupeKey`.
-- Vocabularies in `@blog/config`: `AUDIT_ACTION`, `AUDIT_TARGET_TYPE`,
+- Vocabularies in `@shinefold/config`: `AUDIT_ACTION`, `AUDIT_TARGET_TYPE`,
   `FINDING_SOURCE`, `FINDING_KIND`, `FINDING_SEVERITY`, `FINDING_STATUS`. All
   are stored as plain `text`, so adding a value needs no migration.
 - Writers today:
@@ -165,7 +165,7 @@ Nothing is configurable. Only admins (any role) see either record.
   systems records request then outcome: `CREATED` before
   `PROVISIONED`/`PROVISIONING_FAILED`, `DEPROVISION_REQUESTED` before
   `DEPROVISIONED`.
-- `AUDIT_ACTION` and `AUDIT_TARGET_TYPE` stay in `@blog/config` even though
+- `AUDIT_ACTION` and `AUDIT_TARGET_TYPE` stay in `@shinefold/config` even though
   only `db` and the platform read them.
 - `openFinding` builds the dedupe key from source, kind, tenant (or
   `global`) and a caller identifier. An existing OPEN finding is refreshed in
@@ -204,7 +204,7 @@ Nothing is configurable. Only admins (any role) see either record.
 
 ## Dependencies
 
-- `@blog/db`, `@blog/config`; `@blog/insight` (`sanitizeLogMessage`) in the
+- `@shinefold/db`, `@shinefold/config`; `@shinefold/insight` (`sanitizeLogMessage`) in the
   CLI scripts; the platform logger.
 - Features: [tenant-provisioning](./tenant-provisioning.md),
   [operator-alerts](./operator-alerts.md),

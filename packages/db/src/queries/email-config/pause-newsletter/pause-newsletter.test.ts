@@ -1,13 +1,13 @@
-import { DAY_MS } from '@blog/db/constants';
-import { getNewsletterPausedAt } from '@blog/db/queries/email-config/get-newsletter-paused-at';
-import * as schema from '@blog/db/schema';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
+import { DAY_MS } from '@shinefold/db/constants';
+import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config/get-newsletter-paused-at';
+import * as schema from '@shinefold/db/schema';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { pauseNewsletter } from './pause-newsletter';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const MOCK_LATER = new Date(MOCK_NOW.getTime() + DAY_MS);
 

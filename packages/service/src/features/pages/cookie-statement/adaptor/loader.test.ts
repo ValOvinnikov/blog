@@ -1,25 +1,25 @@
+import { faker } from '@faker-js/faker';
 import {
   CONTENT_ALIGNMENT,
   SANITY_CONTENT_REVALIDATE_SECONDS,
-} from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockRawCookieStatementPage } from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { mockRawCookieStatementPage } from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_LINK_TARGET_CACHE_TAGS,
   MOCK_TOPIC_CACHE_TAG,
-} from '@blog/service/testing/sanity/query/cache-tags';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   mockRawHeadingBlock,
   mockRawSeo,
-} from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getCookieStatementPage } from './loader';
 import { cookieStatementPageQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(65140);
 

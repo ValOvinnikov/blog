@@ -1,9 +1,9 @@
-import type { TListedAuditEvent } from '@blog/db/queries/audit-events';
 import { ActivityList } from '@platform/components/features/tenants/activity-list';
 import { BackLink } from '@platform/components/shared/back-link';
 import { Card } from '@platform/components/shared/card';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { PageStack } from '@platform/components/shared/page-stack';
+import type { TListedAuditEvent } from '@shinefold/db/queries/audit-events';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

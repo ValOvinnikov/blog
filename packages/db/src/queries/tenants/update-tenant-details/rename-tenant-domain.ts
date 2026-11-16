@@ -1,6 +1,6 @@
-import { getDb } from '@blog/db/client';
-import { tenantDomains } from '@blog/db/schema/tenant-domains';
-import { hasLength } from '@blog/utils/primitives';
+import { getDb } from '@shinefold/db/client';
+import { tenantDomains } from '@shinefold/db/schema/tenant-domains';
+import { hasLength } from '@shinefold/utils/primitives';
 import { and, eq } from 'drizzle-orm';
 
 export async function renameTenantDomain(

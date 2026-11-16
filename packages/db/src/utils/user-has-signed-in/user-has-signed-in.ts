@@ -1,4 +1,4 @@
-import { accounts, users } from '@blog/db/schema/auth';
+import { accounts, users } from '@shinefold/db/schema/auth';
 import { sql, type SQL } from 'drizzle-orm';
 
 // A magic-link sign-in sets `emailVerified`; an OAuth sign-in leaves it null but links an account.

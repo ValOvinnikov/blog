@@ -7,9 +7,9 @@ description: >-
   (ensureInfrastructure, inviteOwner, applySiteTemplate, verifyTenant,
   ensureOwnerAccess), their calls to Sanity's Management
   API and @sanity/client, and the provisioning secrets no other app holds.
-  Reads and writes relational data through @blog/db only; imported by
-  nothing, and never imports React, @blog/ui, @blog/service, @blog/auth or
-  @blog/studio.
+  Reads and writes relational data through @shinefold/db only; imported by
+  nothing, and never imports React, @shinefold/ui, @shinefold/service, @shinefold/auth or
+  @shinefold/studio.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
@@ -55,12 +55,12 @@ default to zero".
 
 ## Hard boundaries (do not violate)
 
-- **Dependencies:** `@blog/db`, `@blog/config`, `@blog/utils`,
-  `@blog/insight`, `@blog/email`, and `@sanity/client`. A new workspace
+- **Dependencies:** `@shinefold/db`, `@shinefold/config`, `@shinefold/utils`,
+  `@shinefold/insight`, `@shinefold/email`, and `@sanity/client`. A new workspace
   dependency needs its alias in `tsconfig.json` `paths` and
   `vitest.config.ts` — the `config` agent's wiring, so report it.
-- **Never import** React, `@blog/ui`, `@blog/service`, `@blog/auth` or
-  `@blog/studio`. Needing one is a signal to stop and report.
+- **Never import** React, `@shinefold/ui`, `@shinefold/service`, `@shinefold/auth` or
+  `@shinefold/studio`. Needing one is a signal to stop and report.
 - **Nothing imports `apps/worker`.** The platform reaches it only through
   its signed endpoints — `POST /api/provision`, `POST /api/deprovision`,
   `POST /api/owner-access/*`, `POST /api/custom-domain/*` and
@@ -68,7 +68,7 @@ default to zero".
   — every one authenticated by the shared enqueue secret. The other routes
   are Vercel Cron's `GET /api/inactivity-sweep` and
   `GET /api/owner-access-sweep`, authenticated by `CRON_SECRET`.
-- **All relational reads and writes go through `@blog/db`'s exported
+- **All relational reads and writes go through `@shinefold/db`'s exported
   functions** — no Drizzle, no Neon client, no SQL here. A missing query is a
   `db` request you report.
 - **Never edit outside `apps/worker`.** Implement your side and report the
@@ -83,7 +83,7 @@ default to zero".
   `applySiteTemplate(siteType, plan, locale)`, `verifyTenant`,
   `ensureOwnerAccess`. A unit never reaches into another's state.
 - **Deprovisioning** (`deprovisionTenant`) runs `runDeprovisioningStep` once
-  per `DEPROVISIONING_STEP`, in the CLI's order, reusing `@blog/db`'s shared
+  per `DEPROVISIONING_STEP`, in the CLI's order, reusing `@shinefold/db`'s shared
   pieces (`purgeTenantReaderData`, `deleteVercelProjectDomain`,
   `requestTenantCacheInvalidation`, `archiveSanityProject`) rather than
   copying the CLI's steps; a change to what deprovisioning does lands in both.
@@ -129,19 +129,19 @@ default to zero".
   module, and no bare `console.*` (`SPEC.md` §17). Event names come from the
   domain's `<DOMAIN>_LOG` const in `src/constants/<domain>.ts`, never a
   literal at the call (CLAUDE.md → "No bare `console.*`").
-- `@blog/db` and `@blog/email` never log — their failures reach you, and you
+- `@shinefold/db` and `@shinefold/email` never log — their failures reach you, and you
   log them once, with the tenant id and unit name as context. Log the gap
   between what the run reports and what happened; a result that already says
   everything needs no line.
 - An operator alert (a STALLED owner, a failed unit after its retries) goes
-  through `@blog/email`'s operator shell with hardcoded copy — never
+  through `@shinefold/email`'s operator shell with hardcoded copy — never
   tenant-editable.
 
 ## Function style
 
 The worker exports operations, not React values, so it uses **declarations**
-(`export async function ensureInfrastructure()`), like `@blog/service`,
-`@blog/db` and `@blog/email` (CLAUDE.md → "Function style").
+(`export async function ensureInfrastructure()`), like `@shinefold/service`,
+`@shinefold/db` and `@shinefold/email` (CLAUDE.md → "Function style").
 
 ## Testing
 
@@ -151,7 +151,7 @@ Read `.claude/skills/testing-practices/SKILL.md`.
   (`superpowers:test-driven-development`); new-feature coverage comes from
   `test-writer` afterwards.
 - Co-located `*.test.ts`, Vitest `node` environment. Fake the network at the
-  `fetch` and `@sanity/client` boundary and `@blog/db` at its exported
+  `fetch` and `@sanity/client` boundary and `@shinefold/db` at its exported
   functions; never call a real Sanity, Vercel or Neon endpoint from a test.
 - Cover each unit's idempotency: a second run against what the first created
   creates nothing and reports success.
@@ -170,7 +170,7 @@ Read `.claude/skills/testing-practices/SKILL.md`.
 ## Definition of done
 
 - `pnpm --filter worker type-check`, `lint` and `test` pass.
-- No React, `@blog/ui`, `@blog/service`, `@blog/auth` or `@blog/studio`
+- No React, `@shinefold/ui`, `@shinefold/service`, `@shinefold/auth` or `@shinefold/studio`
   import anywhere under `apps/worker`, and no import of `@worker/*` outside
   it.
 
@@ -190,7 +190,7 @@ Read `.claude/skills/testing-practices/SKILL.md`.
   or `none found — added <name>`. Write "nothing added" only when the diff
   adds none (CLAUDE.md → "Reuse before you create").
 - Each unit you added or changed, and what it creates or reads in Sanity,
-  Vercel and `@blog/db`.
+  Vercel and `@shinefold/db`.
 - What another layer must now do: a `db` query, a `platform-app` enqueue
   change, an env var for `docs/context/environment-variables.md`, a behaviour
   change for `docs/features/public-front-door.md`.

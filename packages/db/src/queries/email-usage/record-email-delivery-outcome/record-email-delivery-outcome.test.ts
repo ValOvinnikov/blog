@@ -1,21 +1,21 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { EMAIL_DELIVERY_OUTCOME } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { EMAIL_DELIVERY_OUTCOME } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_DELIVERY_EVENT_IDS,
   MOCK_TODAY,
   readEmailDeliveryOutcomeCounts,
-} from '@blog/db/testing/email-usage/fixtures';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/email-usage/fixtures';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import { recordEmailDeliveryOutcome } from './record-email-delivery-outcome';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(7161);
 

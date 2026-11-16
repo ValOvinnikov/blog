@@ -1,5 +1,5 @@
-import { GRID_COLUMNS } from '@blog/config';
-import type { TPostLatestModule } from '@blog/service';
+import { GRID_COLUMNS } from '@shinefold/config';
+import type { TPostLatestModule } from '@shinefold/service';
 import {
   type IPostCardsSectionProps,
   PostCardsSection,

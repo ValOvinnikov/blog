@@ -1,5 +1,5 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import type { TElementSize } from '@platform/utils/device-frame-scale/device-frame-scale';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import { useEffect, useState, type RefObject } from 'react';
 
 export const useElementSize = (

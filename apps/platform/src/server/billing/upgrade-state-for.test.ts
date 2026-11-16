@@ -1,5 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@blog/db/constants';
 import { UPGRADE_STATE } from '@platform/constants/billing';
 import { PLAN_CHANGE_REFUSAL } from '@platform/constants/plan-change';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
@@ -15,6 +13,8 @@ import {
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { mockTrialTenant } from '@platform/testing/tenants/mock-tenant';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@shinefold/db/constants';
 
 import { planChangeRefusalFor, upgradeStateFor } from './upgrade-state-for';
 

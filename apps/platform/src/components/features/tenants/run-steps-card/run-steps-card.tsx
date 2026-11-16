@@ -1,4 +1,3 @@
-import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import { Disclosure } from '@platform/components/shared/disclosure';
 import type { THeadingLevel } from '@platform/components/shared/heading';
 import { headingVariants } from '@platform/components/shared/heading/heading-variants';
@@ -9,6 +8,7 @@ import {
 } from '@platform/components/shared/step-list';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
 import { useCollapseOnDone } from '@platform/utils/use-collapse-on-done/use-collapse-on-done';
+import { TENANT_PROVISIONING_STEP_STATUS } from '@shinefold/db/constants';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { runStepsCardVariants } from './run-steps-card-variants';

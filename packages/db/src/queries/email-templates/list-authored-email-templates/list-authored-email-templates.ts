@@ -1,8 +1,8 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   emailTemplates,
   type TEmailTemplateRow,
-} from '@blog/db/schema/email-templates';
+} from '@shinefold/db/schema/email-templates';
 import { eq } from 'drizzle-orm';
 
 export type TAuthoredEmailTemplateCopy = Pick<

@@ -1,8 +1,8 @@
-import type { Page_postReference } from '@blog/config';
-import type { TSchemaConfig } from '@blog/service/sanity/query/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
-import { postCardFragment } from '@blog/service/shared/fragments/post/post';
-import type { TLocaleQueryConfig } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import type { Page_postReference } from '@shinefold/config';
+import type { TSchemaConfig } from '@shinefold/service/sanity/query/query';
+import { PUBLISHED_POST_FILTER } from '@shinefold/service/shared/expressions/post/published-post';
+import { postCardFragment } from '@shinefold/service/shared/fragments/post/post';
+import type { TLocaleQueryConfig } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
 import type {
   GroqBuilder,
   GroqBuilderSubquery,

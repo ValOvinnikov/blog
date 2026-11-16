@@ -1,10 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   SANITY_PROJECT_ARCHIVE_OUTCOME,
   SANITY_PROJECT_DELETE_OUTCOME,
   SANITY_PROJECT_UNARCHIVE_OUTCOME,
   HTTP_METHOD,
   HTTP_STATUS,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   emptyResponse,
   firstFetchCall,
@@ -12,15 +13,14 @@ import {
   nthFetchCall,
   textResponse,
   useFetchFake,
-} from '@blog/db/testing/sanity-management-client/fetch-fake';
+} from '@shinefold/db/testing/sanity-management-client/fetch-fake';
 import {
   MOCK_SANITY_EXPECTED_URL,
   MOCK_SANITY_ORGANIZATION_ID,
   MOCK_SANITY_PROJECT_ID,
   mockSanityProjectInput,
-} from '@blog/db/testing/sanity-management-client/fixtures';
-import { toOutcome } from '@blog/utils/to-outcome';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/sanity-management-client/fixtures';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import {
   archiveSanityProject,

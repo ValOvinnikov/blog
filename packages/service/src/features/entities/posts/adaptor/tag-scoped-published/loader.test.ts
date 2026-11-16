@@ -1,17 +1,17 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
 import {
   MOCK_TAG_ID,
   mockFeedPostViews,
   mockRawFeedPosts,
-} from '@blog/service/testing/entities/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { MOCK_POSTS_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
-import { mockTenant } from '@blog/service/testing/tenant';
+} from '@shinefold/service/testing/entities/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { MOCK_POSTS_CACHE_TAG } from '@shinefold/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getPublishedPostsByTag } from './loader';
 import { tagScopedPublishedPostsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 const tenant = mockTenant();
 

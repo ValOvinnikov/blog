@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   LOCALE_ISO_CODES,
   SANITY_PERSPECTIVE,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
-import { MOCK_ABOUT_SLUG } from '@blog/service/testing/shared/translated-pages-dataset';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import { MOCK_ABOUT_SLUG } from '@shinefold/service/testing/shared/translated-pages-dataset';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 import type { IGroqBuilder } from 'groqd';
 
 import { q, runQuery, type TSlugQueryParams } from './query';
@@ -25,7 +25,7 @@ const { mockFetch, getClientMock } = vi.hoisted(() => {
   return { mockFetch, getClientMock };
 });
 
-vi.mock('@blog/service/sanity/client/client', () => ({
+vi.mock('@shinefold/service/sanity/client/client', () => ({
   getClient: getClientMock,
 }));
 

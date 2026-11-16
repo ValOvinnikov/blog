@@ -1,4 +1,4 @@
-import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
+import { mockGroqFetch } from '@shinefold/studio/testing/mock-groq-fetch';
 import type { Path, ValidationContext } from 'sanity';
 
 type TMockValidationContextFields = {

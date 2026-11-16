@@ -1,12 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  NEXT_NAVIGATION_ERROR,
-  TENANT_DELETE_OUTCOME,
-  TENANT_DELETE_SANITY_PROJECT_OUTCOME,
-} from '@blog/config';
-import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import {
   TENANT_FIELD_ERROR,
@@ -26,6 +17,15 @@ import {
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+  TENANT_DELETE_OUTCOME,
+  TENANT_DELETE_SANITY_PROJECT_OUTCOME,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import type { Session } from 'next-auth';
 
 import { deleteTenantAction } from './delete-tenant-action';
@@ -34,7 +34,7 @@ vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: { getTenantById: vi.fn(), deleteTenant: vi.fn() },
     auditEvents: { insertAuditEvent: vi.fn() },

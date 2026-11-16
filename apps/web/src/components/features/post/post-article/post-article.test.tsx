@@ -1,12 +1,12 @@
-import { routes, SITE_MESSAGES } from '@blog/config';
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { routes, SITE_MESSAGES } from '@shinefold/config';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
 import {
   service,
   type TPortableTextBody,
   urlForSanityImage,
-} from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { SESSION_STATUS } from '@web/constants/session';
 import { ToastProvider } from '@web/context/toast-provider';
 import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
@@ -40,7 +40,7 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', async (importOriginal) => {
+vi.mock('@shinefold/service', async (importOriginal) => {
   const actual = await importOriginal<object>();
   return {
     ...actual,

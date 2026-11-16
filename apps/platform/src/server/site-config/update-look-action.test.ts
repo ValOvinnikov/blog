@@ -1,3 +1,23 @@
+import { faker } from '@faker-js/faker';
+import { SETTINGS_REFUSAL } from '@platform/constants/settings';
+import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
+import { auth } from '@platform/server/auth/auth';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import {
+  MOCK_OPERATOR_EMAIL,
+  MOCK_OPERATOR_ID,
+} from '@platform/testing/admins/operator';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
+import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
+import {
+  MOCK_TENANT_ID,
+  mockReadyTenant,
+} from '@platform/testing/tenants/fixtures';
+import { logger } from '@platform/utils/logger/logger';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
@@ -29,33 +49,13 @@ import {
   RADIUS_SCALE,
   SPINNER_STYLE,
   type TMaybeNull,
-} from '@blog/config';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
+} from '@shinefold/config';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import {
   BRAND_NAME_MAX_LENGTH,
   SITE_CONFIG_SAVED_AT,
-} from '@blog/db/constants';
-import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
-import { faker } from '@faker-js/faker';
-import { SETTINGS_REFUSAL } from '@platform/constants/settings';
-import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
-import { auth } from '@platform/server/auth/auth';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
-import {
-  MOCK_OPERATOR_EMAIL,
-  MOCK_OPERATOR_ID,
-} from '@platform/testing/admins/operator';
-import {
-  mockMembership,
-  mockMembershipContext,
-} from '@platform/testing/memberships/fixtures';
-import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
-import {
-  MOCK_TENANT_ID,
-  mockReadyTenant,
-} from '@platform/testing/tenants/fixtures';
-import { logger } from '@platform/utils/logger/logger';
+} from '@shinefold/db/constants';
+import { toEffectiveLook } from '@shinefold/db/utils/effective-look/effective-look';
 import type { Session } from 'next-auth';
 
 import { updateLookAction } from './update-look-action';
@@ -75,7 +75,7 @@ const {
   insertAuditEventMock: vi.fn(),
 }));
 
-vi.mock('@blog/config', async (importOriginal) => ({
+vi.mock('@shinefold/config', async (importOriginal) => ({
   ...(await importOriginal()),
   isAccentHueAccessible: vi.fn(),
 }));
@@ -86,7 +86,7 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     siteConfig: {
       getSiteConfig: getSiteConfigMock,

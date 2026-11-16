@@ -1,8 +1,8 @@
-import { TOAST_TYPE, type TToastType } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { Icon, STATUS_ICON } from '@platform/components/shared/icon';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { ICON_SIZE } from '@platform/constants/icon';
+import { TOAST_TYPE, type TToastType } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import type { IToastRecord } from './toast-record';

@@ -1,4 +1,4 @@
-import { STUDIO_MIGRATION_IDS } from '@blog/config';
+import { STUDIO_MIGRATION_IDS } from '@shinefold/config';
 import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 
 import { buildAppliedMigrationLedger } from './migration-ledger';

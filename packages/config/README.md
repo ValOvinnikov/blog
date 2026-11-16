@@ -1,12 +1,12 @@
-# @blog/config
+# @shinefold/config
 
 > Shared constants, URL builders, and generated Sanity types — near the base of the dependency graph.
 
-Every other workspace in this monorepo depends on `@blog/config`. Its only
-workspace upstream is `@blog/utils`, for the OKLCH maths behind the shared
-contrast guard — imported by the `@blog/utils/color` subpath, never the root
+Every other workspace in this monorepo depends on `@shinefold/config`. Its only
+workspace upstream is `@shinefold/utils`, for the OKLCH maths behind the shared
+contrast guard — imported by the `@shinefold/utils/color` subpath, never the root
 barrel, which re-exports `node:crypto`-importing modules into every
-consumer's graph, `@blog/ui` among them. It centralizes the values and
+consumer's graph, `@shinefold/ui` among them. It centralizes the values and
 shapes that must stay identical across layers: UPPERCASE key/value constants
 (also referenced by CMS schema `options.list` and migrations), the single
 URL-construction source of truth (`routes`), shared TS types, and the Sanity
@@ -15,11 +15,11 @@ hand-redeclaring them.
 
 ## Layer contract
 
-- **Depends on:** `@blog/utils`, via the `@blog/utils/color` subpath only
+- **Depends on:** `@shinefold/utils`, via the `@shinefold/utils/color` subpath only
   (never the root barrel, which re-exports `node:crypto`-importing modules) —
   used for the OKLCH maths behind the shared contrast guard.
-- **Consumed by:** `@blog/service`, `@blog/db`, `@blog/ui`, `@blog/studio`, `apps/web`, `apps/platform`.
-- **Never imports:** `@blog/service`, `@blog/ui`, or any app — enforced by
+- **Consumed by:** `@shinefold/service`, `@shinefold/db`, `@shinefold/ui`, `@shinefold/studio`, `apps/web`, `apps/platform`.
+- **Never imports:** `@shinefold/service`, `@shinefold/ui`, or any app — enforced by
   `configs/eslint/no-upstream-imports.js` in this package's own
   `eslint.config.js`.
 
@@ -35,10 +35,10 @@ hand-redeclaring them.
 - `client/objects.ts` — shared plain-object helpers.
 - `utils.ts` — small standalone type helpers (e.g. `TValueOf<Obj>`).
 - `react/polymorphic.ts` — the `TPolymorphicProps<C, OwnProps>` generic,
-  exposed only via the `@blog/config/react` subpath so non-React consumers
-  (like `@blog/service`) stay React-free.
+  exposed only via the `@shinefold/config/react` subpath so non-React consumers
+  (like `@shinefold/service`) stay React-free.
 - `sanity/generated/` — `schema.json` and `types.ts`, produced by
-  `pnpm --filter @blog/studio typegen`. Never hand-edited — the next typegen run
+  `pnpm --filter @shinefold/studio typegen`. Never hand-edited — the next typegen run
   reverts a manual edit, and CI's typegen drift guard catches it.
 
 Three `package.json` `exports` subpaths: `.` (the `src/index.ts` barrel —
@@ -48,13 +48,13 @@ constants, `routes`, generated Sanity types, shared types, `client/objects`,
 
 ## Scripts
 
-| Script       | Command                                 |
-| ------------ | --------------------------------------- |
-| `lint`       | `pnpm --filter @blog/config lint`       |
-| `type-check` | `pnpm --filter @blog/config type-check` |
-| `format`     | `pnpm --filter @blog/config format`     |
-| `test`       | `pnpm --filter @blog/config test`       |
-| `test:watch` | `pnpm --filter @blog/config test:watch` |
+| Script       | Command                                      |
+| ------------ | -------------------------------------------- |
+| `lint`       | `pnpm --filter @shinefold/config lint`       |
+| `type-check` | `pnpm --filter @shinefold/config type-check` |
+| `format`     | `pnpm --filter @shinefold/config format`     |
+| `test`       | `pnpm --filter @shinefold/config test`       |
+| `test:watch` | `pnpm --filter @shinefold/config test:watch` |
 
 Root-level `pnpm type-check` / `pnpm lint` / `pnpm test` run every
 workspace's equivalent script through Turborepo, this one included.

@@ -1,5 +1,5 @@
-import { SIZE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
+import { SIZE } from '@shinefold/config';
 import type { VariantProps } from 'tailwind-variants';
 
 export const brandLogoVariants = tv({

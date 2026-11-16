@@ -1,23 +1,23 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { MOCK_TOPIC_ID } from '@blog/service/testing/entities/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import { MOCK_TOPIC_ID } from '@shinefold/service/testing/entities/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_AUTHOR_CACHE_TAG,
   MOCK_LINK_TARGET_CACHE_TAGS,
   MOCK_POSTS_CACHE_TAG,
   MOCK_TAG_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
-} from '@blog/service/testing/sanity/query/cache-tags';
-import { MOCK_POST_ID } from '@blog/service/testing/shared/fixtures';
-import { MOCK_TENANT } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
+import { MOCK_POST_ID } from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { relatedPostAnchorQuery } from './anchor.query';
 import { relatedByTagsQuery } from './by-tags.query';
 import { getRelatedPosts } from './loader';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(11);
 

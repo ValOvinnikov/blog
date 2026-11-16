@@ -1,12 +1,12 @@
 'use client';
 
-import { VOICE_FIELDS } from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
 import {
   localeDraftOf,
   voiceValueAsText,
   type TVoiceDraft,
 } from '@platform/utils/voice-draft/voice-draft';
+import { VOICE_FIELDS } from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 
 export const useVoiceDraftFields = (liveLocales: TLocaleIsoCode[]) => {

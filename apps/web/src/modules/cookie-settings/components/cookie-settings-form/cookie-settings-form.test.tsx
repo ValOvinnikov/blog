@@ -1,4 +1,4 @@
-import { CONSENT_CATEGORY } from '@blog/config';
+import { CONSENT_CATEGORY } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
 import { renderElement, screen, within } from '@web/testing/custom-render';

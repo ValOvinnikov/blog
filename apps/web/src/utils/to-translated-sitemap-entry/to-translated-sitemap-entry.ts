@@ -1,5 +1,5 @@
-import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@blog/config';
-import { service, type TTranslationMap } from '@blog/service';
+import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@shinefold/config';
+import { service, type TTranslationMap } from '@shinefold/service';
 import { toLanguageAlternates } from '@web/utils/to-language-alternates';
 import { toLiveLanguagePages } from '@web/utils/to-live-language-pages';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';

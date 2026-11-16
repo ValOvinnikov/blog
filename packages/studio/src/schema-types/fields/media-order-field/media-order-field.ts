@@ -1,5 +1,5 @@
-import { MEDIA_ORDER, type TMediaOrder } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils/primitives';
+import { MEDIA_ORDER, type TMediaOrder } from '@shinefold/config/constants';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { defineField, type StringDefinition } from 'sanity';
 
 const mediaOrderCopy = {

@@ -1,4 +1,4 @@
-import type { IWithClassName } from '@blog/config/types';
+import type { IWithClassName } from '@shinefold/config/types';
 import type { ReactNode } from 'react';
 
 export type TDecorativeGlyphProps = IWithClassName & {

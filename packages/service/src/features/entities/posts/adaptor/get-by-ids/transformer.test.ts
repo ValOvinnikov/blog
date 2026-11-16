@@ -1,11 +1,11 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   MOCK_FIRST_POST_TITLE,
   MOCK_SECOND_POST_TITLE,
-} from '@blog/service/testing/entities/fixtures';
-import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/entities/fixtures';
+import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
+import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
 
 import { toPostsByIds } from './transformer';
 

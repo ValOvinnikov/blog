@@ -4,8 +4,8 @@ import {
   CTA_ACTION_VARIANT,
   CTA_VARIANT,
   type TPortableTextBlock,
-} from '@blog/config';
-import type { TCtaButton, TCtaModule } from '@blog/service';
+} from '@shinefold/config';
+import type { TCtaButton, TCtaModule } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {

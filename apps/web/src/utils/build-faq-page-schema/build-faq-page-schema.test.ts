@@ -1,5 +1,5 @@
-import type { TFaqPageQuestion } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import type { TFaqPageQuestion } from '@shinefold/service';
 
 import { buildFaqPageSchema } from './build-faq-page-schema';
 

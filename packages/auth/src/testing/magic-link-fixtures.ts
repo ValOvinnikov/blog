@@ -1,15 +1,15 @@
+import { faker } from '@faker-js/faker';
 import {
   EMAIL_TEMPLATE_TYPE,
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   PRESET_ID,
   TENANT_PLAN,
-} from '@blog/config/constants';
-import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
-import type { TEmailConfigResult } from '@blog/db/queries/email-config/get-email-config/get-email-config';
-import type { TEmailTemplateResult } from '@blog/db/queries/email-templates/get-email-template/get-email-template';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@shinefold/db/constants';
+import type { TEmailConfigResult } from '@shinefold/db/queries/email-config/get-email-config/get-email-config';
+import type { TEmailTemplateResult } from '@shinefold/db/queries/email-templates/get-email-template/get-email-template';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export const MOCK_TENANT_ID = faker.string.uuid();
 export const MOCK_OTHER_TENANT_ID = faker.string.uuid();

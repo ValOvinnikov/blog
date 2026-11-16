@@ -1,36 +1,36 @@
-import { getAllPublishedPosts } from '@blog/service/features/entities/posts/adaptor/all-published/loader';
-import { getPostsByIds } from '@blog/service/features/entities/posts/adaptor/get-by-ids/loader';
-import { getPostPublishedAt } from '@blog/service/features/entities/posts/adaptor/get-published-at/loader';
-import { getPublishedPostsByTag } from '@blog/service/features/entities/posts/adaptor/tag-scoped-published/loader';
-import { MOCK_TAG_ID } from '@blog/service/testing/entities/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
+import { getAllPublishedPosts } from '@shinefold/service/features/entities/posts/adaptor/all-published/loader';
+import { getPostsByIds } from '@shinefold/service/features/entities/posts/adaptor/get-by-ids/loader';
+import { getPostPublishedAt } from '@shinefold/service/features/entities/posts/adaptor/get-published-at/loader';
+import { getPublishedPostsByTag } from '@shinefold/service/features/entities/posts/adaptor/tag-scoped-published/loader';
+import { MOCK_TAG_ID } from '@shinefold/service/testing/entities/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { createPostsService } from './service';
 
 vi.mock(
-  '@blog/service/features/entities/posts/adaptor/get-by-ids/loader',
+  '@shinefold/service/features/entities/posts/adaptor/get-by-ids/loader',
   () => ({
     getPostsByIds: vi.fn(),
   }),
 );
 
 vi.mock(
-  '@blog/service/features/entities/posts/adaptor/get-published-at/loader',
+  '@shinefold/service/features/entities/posts/adaptor/get-published-at/loader',
   () => ({
     getPostPublishedAt: vi.fn(),
   }),
 );
 
 vi.mock(
-  '@blog/service/features/entities/posts/adaptor/all-published/loader',
+  '@shinefold/service/features/entities/posts/adaptor/all-published/loader',
   () => ({
     getAllPublishedPosts: vi.fn(),
   }),
 );
 
 vi.mock(
-  '@blog/service/features/entities/posts/adaptor/tag-scoped-published/loader',
+  '@shinefold/service/features/entities/posts/adaptor/tag-scoped-published/loader',
   () => ({
     getPublishedPostsByTag: vi.fn(),
   }),

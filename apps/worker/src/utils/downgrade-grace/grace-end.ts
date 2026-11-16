@@ -1,15 +1,15 @@
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
-import { deleteCustomDomainClaim } from '@blog/db/queries/custom-domain-claims';
-import { stopPendingInvitesOverSeats } from '@blog/db/queries/membership-invites';
-import { lockMembershipsOverSeats } from '@blog/db/queries/memberships';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
+import { deleteCustomDomainClaim } from '@shinefold/db/queries/custom-domain-claims';
+import { stopPendingInvitesOverSeats } from '@shinefold/db/queries/membership-invites';
+import { lockMembershipsOverSeats } from '@shinefold/db/queries/memberships';
 import {
   endDowngradeGrace,
   restoreDowngradeGrace,
   setTenantPrimaryDomain,
-} from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { findSubdomain } from '@blog/db/utils/grace-locks/grace-locks';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { findSubdomain } from '@shinefold/db/utils/grace-locks/grace-locks';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { DOWNGRADE_GRACE_LOG } from '@worker/constants/downgrade-grace';
 import { logger } from '@worker/utils/logger/logger';
 import { invalidateSiteCache } from '@worker/utils/site-cache/invalidate-site-cache';

@@ -1,4 +1,4 @@
-import type { queries } from '@blog/db';
+import type { queries } from '@shinefold/db';
 import { createMockFaker } from '@web/testing/mock-faker';
 
 const mockFaker = createMockFaker(61059);

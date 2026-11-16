@@ -1,5 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import type { TMembershipRole, TSubscriberStatus } from '@blog/db/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import type {
+  TMembershipRole,
+  TSubscriberStatus,
+} from '@shinefold/db/constants';
 
 type TPersonalDataSite = {
   tenantId: string;

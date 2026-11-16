@@ -1,11 +1,11 @@
-import { BRAND_VARIANT } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT } from '@shinefold/config/constants';
 import {
   mockCtaButtonView,
   mockRawCtaButton,
   mockRawStatItem,
   mockRawStatsModule,
-} from '@blog/service/testing/modules/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/modules/fixtures';
 
 import { toStatsModule } from './transformer';
 

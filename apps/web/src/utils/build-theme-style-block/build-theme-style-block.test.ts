@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
+import { faker } from '@faker-js/faker';
 import {
   type TThemeDeclarations,
   type TThemeTokens,
@@ -19,8 +20,7 @@ import {
   PRESET_ID,
   PRESET_REGISTRY,
   RADIUS_SCALE,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 
 import { buildThemeStyleBlock } from './build-theme-style-block';
 
@@ -44,7 +44,9 @@ const CONSOLE_TOKENS: TThemeTokens = {
 };
 
 const THEME_CSS = readFileSync(
-  createRequire(import.meta.url).resolve('@blog/tailwind-config/theme.css'),
+  createRequire(import.meta.url).resolve(
+    '@shinefold/tailwind-config/theme.css',
+  ),
   'utf8',
 );
 const THEME_ROOT_BLOCK = THEME_CSS.slice(

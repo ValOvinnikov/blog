@@ -3,11 +3,11 @@ import {
   DENSITY,
   GRID_COLUMNS,
   RADIUS_SCALE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   MOCK_UNSET_MODULE_APPEARANCE,
   mockRawModuleAppearance,
-} from '@blog/service/testing/shared/module-appearance';
+} from '@shinefold/service/testing/shared/module-appearance';
 
 import { toModuleAppearance } from './to-module-appearance';
 

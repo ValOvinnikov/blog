@@ -27,8 +27,8 @@ A link is authored once, as a `link` document — a label per language and exact
 ## Data
 
 - **`link` document:** `title` (Studio-only), `label` (`internationalizedArrayString`), `linkType` (`INTERNAL` or `EXTERNAL` from `LINK_TYPE`, initial `INTERNAL`), `internalReference` (a reference to one of `LINK_PAGE_TYPES`: `page_home`, `page_landing`, `page_post`, `page_postIndex`, `page_topic`, `page_topicIndex`, `page_tag`, `page_tagIndex`), `url` (`internationalizedArrayString`), `openInNewTab` (initial `false`, shown for external links only).
-- **Domain shape:** `ILink` (`@blog/config`) — `label`, `href`, `target`, `platform`.
-- **Resolution** (`linkDocumentFragment` → `toLinkDocument`): `label` and `url` take the request language, else the default language. An internal reference follows `translation.metadata` to the target's translation in the request language, else in the default language, else the referenced page itself; `pageHref(type, slug)` (`@blog/config` `routes.ts`) turns it into a path, with a landing page's nested path built by `PAGE_PATH_EXPRESSION`. `target` is `_blank` only for an external link with `openInNewTab`. This path never sets `platform`.
+- **Domain shape:** `ILink` (`@shinefold/config`) — `label`, `href`, `target`, `platform`.
+- **Resolution** (`linkDocumentFragment` → `toLinkDocument`): `label` and `url` take the request language, else the default language. An internal reference follows `translation.metadata` to the target's translation in the request language, else in the default language, else the referenced page itself; `pageHref(type, slug)` (`@shinefold/config` `routes.ts`) turns it into a path, with a landing page's nested path built by `PAGE_PATH_EXPRESSION`. `target` is `_blank` only for an external link with `openInNewTab`. This path never sets `platform`.
 - **Cache:** every loader that projects link documents lists `link` and the page types in its `isr(...)` tags; the publish webhook maps `link` → `link`, and also purges the `module:<id>` tag of any module that references a changed document directly or through a `link` document.
 
 ## Configuration

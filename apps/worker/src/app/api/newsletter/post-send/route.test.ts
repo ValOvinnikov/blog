@@ -1,5 +1,5 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
-import { getTenantById } from '@blog/db/queries/tenants';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
+import { getTenantById } from '@shinefold/db/queries/tenants';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import {
   NEWSLETTER_POST_ID_MAX_LENGTH,
@@ -38,7 +38,7 @@ const MOCK_BODY = {
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/workflows/send-newsletter-post');
 vi.mock('workflow/api');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 
 function postSendRequest(
   body: Record<string, unknown> = MOCK_BODY,

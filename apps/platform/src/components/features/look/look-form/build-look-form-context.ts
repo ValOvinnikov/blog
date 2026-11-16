@@ -1,7 +1,3 @@
-import { isAccentHueAccessible, type TPresetId } from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
-import { LOOK_FIELDS, type TLookField } from '@blog/db/constants';
-import { isLookFieldEntitled } from '@blog/db/utils/effective-look/effective-look';
 import type { TLookFormContext } from '@platform/components/features/look/look-form-provider';
 import type { TLookCard } from '@platform/constants/look-card';
 import { isBrandNameTooLong } from '@platform/utils/brand-name/brand-name';
@@ -17,6 +13,10 @@ import {
   switchPreset,
   withPresetValue,
 } from '@platform/utils/look-preset/look-preset';
+import { isAccentHueAccessible, type TPresetId } from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
+import { LOOK_FIELDS, type TLookField } from '@shinefold/db/constants';
+import { isLookFieldEntitled } from '@shinefold/db/utils/effective-look/effective-look';
 import type { Dispatch, SetStateAction } from 'react';
 
 type TBuildLookFormContextArgs = Pick<

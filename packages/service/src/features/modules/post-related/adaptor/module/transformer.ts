@@ -1,6 +1,6 @@
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
-import { toModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
+import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
+import { toModuleAppearance } from '@shinefold/service/shared/transformers/module/to-module-appearance';
 import type { InferResultType } from 'groqd';
 
 import type { postRelatedModuleQuery } from './query';

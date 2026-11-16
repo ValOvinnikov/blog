@@ -1,11 +1,14 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   EMAIL_TEMPLATE_TYPE,
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
-import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE, queries } from '@blog/db';
-import { isValidEmailAddress, type TPortableTextContent } from '@blog/email';
+} from '@shinefold/config/constants';
+import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE, queries } from '@shinefold/db';
+import {
+  isValidEmailAddress,
+  type TPortableTextContent,
+} from '@shinefold/email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address/newsletter-from-address';
 import { logger } from '@web/utils/logger/logger';
 

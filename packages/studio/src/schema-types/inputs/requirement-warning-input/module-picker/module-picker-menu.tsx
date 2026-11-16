@@ -1,15 +1,15 @@
-import type { TModulePack } from '@blog/config/constants';
-import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
-import { getMissingModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { Box, Card, Flex, Tab, TabList, Text, TextInput } from '@sanity/ui';
+import { Menu } from '@sanity/ui/menu';
+import type { TModulePack } from '@shinefold/config/constants';
+import { textSizedIcon } from '@shinefold/studio/schema-types/icons/text-sized-icon/text-sized-icon';
+import { getMissingModulePack } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import {
   ALL_ITEMS_TAB,
   filterModulePickerTypes,
   isModulePickerSearchShown,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
-import { ModulePickerRow } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-row';
-import { hasArrayGotItems, hasLength } from '@blog/utils/primitives';
-import { Box, Card, Flex, Tab, TabList, Text, TextInput } from '@sanity/ui';
-import { Menu } from '@sanity/ui/menu';
+} from '@shinefold/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
+import { ModulePickerRow } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-row';
+import { hasArrayGotItems, hasLength } from '@shinefold/utils/primitives';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
 import {

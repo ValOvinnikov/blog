@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { resolveFaqs } from '@blog/service/shared/transformers/faq/resolve-faqs';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { resolveFaqs } from '@shinefold/service/shared/transformers/faq/resolve-faqs';
 import {
   MOCK_FAQ_MODULE_A_ID,
   MOCK_FAQ_MODULE_B_ID,
@@ -10,9 +10,9 @@ import {
   MOCK_UNTRANSLATED_ANSWER,
   MOCK_UNTRANSLATED_QUESTION,
   MOCK_UNTRANSLATED_QUESTION_ID,
-} from '@blog/service/testing/shared/faq-page-dataset';
-import { MOCK_MISSING_ID } from '@blog/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/shared/faq-page-dataset';
+import { MOCK_MISSING_ID } from '@shinefold/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 
 import { faqQuestionsQuery } from './query';
 import { toFaqModuleQuestions } from './transformer';

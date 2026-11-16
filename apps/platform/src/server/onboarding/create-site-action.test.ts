@@ -1,15 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  ERROR_CODE,
-  HUE_MAX,
-  HUE_MIN,
-  LOCALE_ISO_CODES,
-  NEXT_NAVIGATION_ERROR,
-  PRESET_ID,
-  SITE_TYPE,
-  TERMS_VERSION,
-} from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { ONBOARDING_LOG } from '@platform/constants/onboarding';
 import {
@@ -40,6 +28,18 @@ import {
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import {
+  ACTION_OUTCOME,
+  ERROR_CODE,
+  HUE_MAX,
+  HUE_MIN,
+  LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
+  PRESET_ID,
+  SITE_TYPE,
+  TERMS_VERSION,
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -77,7 +77,7 @@ vi.mock('@platform/server/provisioning/start-provisioning', () => ({
   startProvisioning: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     tenants: {

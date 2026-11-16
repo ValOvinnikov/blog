@@ -3,9 +3,9 @@ import type {
   TContentAlignmentOf,
   TMaybeUndefined,
   THeadingBlock,
-} from '@blog/config';
-import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
-import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
+} from '@shinefold/config';
+import type { TCtaButton } from '@shinefold/service/shared/transformers/cta/to-cta-button';
+import type { TWideLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 
 export type TStatItem = {
   id: string;

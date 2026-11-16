@@ -1,13 +1,13 @@
-import type { TAuditAction } from '@blog/config/constants';
+import type { TAuditAction } from '@shinefold/config/constants';
 import type {
   TDeprovisioningStep,
   TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   finishDeprovisioningRun,
   startDeprovisioningRun,
   updateDeprovisioningStep,
-} from '@blog/db/queries/tenants';
+} from '@shinefold/db/queries/tenants';
 import {
   DEPROVISIONING_AUDIT_VIA,
   DEPROVISIONING_STEP_FAILED_EVENT,

@@ -1,4 +1,4 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 
 import type { TTestDb } from './fixtures';
 import { getWorkerTestDb, truncateAllTables } from './worker-test-db';

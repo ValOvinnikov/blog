@@ -1,4 +1,4 @@
-import { ADMIN_ROLE, GRANTED_VIA } from '@blog/db/constants';
+import { ADMIN_ROLE, GRANTED_VIA } from '@shinefold/db/constants';
 import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { users } from './auth';

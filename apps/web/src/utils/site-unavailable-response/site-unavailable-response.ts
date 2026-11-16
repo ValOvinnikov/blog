@@ -3,7 +3,7 @@ import {
   LOCALE_BCP47_TAGS,
   SITE_MESSAGES_BY_LOCALE,
   type TLocaleIsoCode,
-} from '@blog/config';
+} from '@shinefold/config';
 import { CACHE_CONTROL, ROBOTS_DIRECTIVE } from '@web/constants/http';
 import { escapeXml } from '@web/utils/escape-xml';
 import { NextResponse } from 'next/server';

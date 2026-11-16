@@ -1,5 +1,3 @@
-import { VOICE_FIELDS, type TVoiceFieldId } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { VoiceEditorProvider } from '@platform/components/features/voice/voice-editor-provider';
 import { VoiceField } from '@platform/components/features/voice/voice-field';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
@@ -10,6 +8,8 @@ import {
   type TVoiceFieldErrors,
 } from '@platform/utils/voice-draft/voice-draft';
 import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
+import { VOICE_FIELDS, type TVoiceFieldId } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import { useState, type ComponentProps } from 'react';
 
 const { EN } = LOCALE_ISO_CODES;

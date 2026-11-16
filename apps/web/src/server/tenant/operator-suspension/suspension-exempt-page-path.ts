@@ -1,4 +1,4 @@
-import { NEWSLETTER_RESULT, routes } from '@blog/config';
+import { NEWSLETTER_RESULT, routes } from '@shinefold/config';
 import { localeForPrefix } from '@web/i18n/routing';
 
 const SUSPENSION_EXEMPT_PAGE_PATHS = new Set<string>([

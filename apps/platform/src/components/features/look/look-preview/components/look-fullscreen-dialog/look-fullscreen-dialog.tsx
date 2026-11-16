@@ -1,7 +1,6 @@
 'use client';
 
 import { Dialog } from '@base-ui/react/dialog';
-import { ICONS, type TMaybeNull } from '@blog/config';
 import { DeviceFrame } from '@platform/components/shared/device-frame';
 import { IconSoloControl } from '@platform/components/shared/icon-solo-control';
 import { previewFrameVariants } from '@platform/components/shared/preview-frame/preview-frame-variants';
@@ -14,6 +13,7 @@ import {
 } from '@platform/constants/preview';
 import { toScalePercent } from '@platform/utils/device-frame-scale/device-frame-scale';
 import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
+import { ICONS, type TMaybeNull } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import {
   useRef,

@@ -1,6 +1,6 @@
-import { HTTP_METHOD } from '@blog/config';
-import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
-import { sanityManagementRequest } from '@blog/db/utils/sanity-management-client/sanity-api-request';
+import { HTTP_METHOD } from '@shinefold/config';
+import { SANITY_API_PATH } from '@shinefold/db/utils/sanity-management-client/sanity-api-paths';
+import { sanityManagementRequest } from '@shinefold/db/utils/sanity-management-client/sanity-api-request';
 
 export type TSanityProject = { id: string };
 

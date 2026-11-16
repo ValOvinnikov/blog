@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query/query';
+import { q } from '@shinefold/service/sanity/query/query';
 
 import { openGraphFragment } from './open-graph';
 

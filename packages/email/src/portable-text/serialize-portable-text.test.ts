@@ -5,7 +5,7 @@ import {
   MOCK_SCRIPT_MARKUP,
   MOCK_TAB_SPLIT_JAVASCRIPT_URL,
   MOCK_URL,
-} from '@blog/email/testing/email-fixtures';
+} from '@shinefold/email/testing/email-fixtures';
 
 import { serializePortableText } from './serialize-portable-text';
 import type { TPortableTextNode } from './types';

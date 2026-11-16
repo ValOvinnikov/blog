@@ -1,6 +1,6 @@
-import { SUSPENSION_CATEGORY } from '@blog/db/constants';
-import type { TOpenTenantSuspension } from '@blog/db/queries/tenant-suspensions';
 import { faker } from '@faker-js/faker';
+import { SUSPENSION_CATEGORY } from '@shinefold/db/constants';
+import type { TOpenTenantSuspension } from '@shinefold/db/queries/tenant-suspensions';
 
 export const MOCK_SUSPENSION_REFERENCE = 'SUS-000042';
 export const MOCK_SUSPENSION_DESCRIPTION = faker.lorem.sentence();

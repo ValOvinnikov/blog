@@ -1,5 +1,5 @@
-import { deleteVercelProjectDomains } from '@blog/db/utils/vercel-client/vercel-project-domains';
-import { sanitizeLogMessage } from '@blog/insight';
+import { deleteVercelProjectDomains } from '@shinefold/db/utils/vercel-client/vercel-project-domains';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { CUSTOM_DOMAIN_LOG } from '@worker/constants/custom-domain';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { getDisconnectRefusal } from '@worker/utils/disconnect-guard/disconnect-guard';

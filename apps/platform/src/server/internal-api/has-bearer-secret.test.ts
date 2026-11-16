@@ -1,6 +1,6 @@
-import { HTTP_METHOD } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { MOCK_BEARER_SECRET } from '@platform/testing/internal-api/fixtures';
+import { HTTP_METHOD } from '@shinefold/config/constants';
 
 import { hasBearerSecret } from './has-bearer-secret';
 

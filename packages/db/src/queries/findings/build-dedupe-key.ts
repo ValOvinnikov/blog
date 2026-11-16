@@ -1,4 +1,4 @@
-import type { TFindingKind, TFindingSource } from '@blog/config/constants';
+import type { TFindingKind, TFindingSource } from '@shinefold/config/constants';
 
 export type TDedupeKeyParts = {
   tenantId?: string;

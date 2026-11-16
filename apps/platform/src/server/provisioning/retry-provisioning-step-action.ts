@@ -1,14 +1,14 @@
 'use server';
 
-import {
-  type ACTION_OUTCOME,
-  isOutcomeSuccess,
-  type TActionResult,
-} from '@blog/config';
 import type { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { requireTenantOwnerOrAdmin } from '@platform/server/auth/require-tenant-owner-or-admin';
 import { resolveLiveTenant } from '@platform/server/tenants/resolve-live-tenant';
+import {
+  type ACTION_OUTCOME,
+  isOutcomeSuccess,
+  type TActionResult,
+} from '@shinefold/config';
 
 import {
   startProvisioning,

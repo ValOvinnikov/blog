@@ -1,6 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 
 import {
   clearSettingsDraft,

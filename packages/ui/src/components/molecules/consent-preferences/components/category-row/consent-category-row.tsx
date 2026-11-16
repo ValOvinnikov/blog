@@ -1,5 +1,5 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { Switch } from '@blog/ui/components/atoms/switch';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { Switch } from '@shinefold/ui/components/atoms/switch';
 import { useId } from 'react';
 
 import { consentCategoryRowVariants } from './consent-category-row-variants';

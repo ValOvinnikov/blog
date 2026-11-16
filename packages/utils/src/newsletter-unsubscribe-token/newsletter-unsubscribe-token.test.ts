@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-import { KEY_ENCODING } from '@blog/utils/encryption';
+import { KEY_ENCODING } from '@shinefold/utils/encryption';
 
 import {
   signNewsletterUnsubscribeToken,

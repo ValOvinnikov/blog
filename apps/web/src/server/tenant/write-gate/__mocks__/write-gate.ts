@@ -1,4 +1,4 @@
-import { okResult } from '@blog/utils';
+import { okResult } from '@shinefold/utils';
 import type * as TModule from '@web/server/tenant/write-gate/write-gate';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 

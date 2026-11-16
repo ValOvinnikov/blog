@@ -1,9 +1,5 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { SELLABLE_TENANT_PLANS } from '@blog/config/constants';
-import { isTenantWritable } from '@blog/db/utils/is-tenant-writable/is-tenant-writable';
-import { isOneOf } from '@blog/utils/primitives';
 import { type TUpgradeState, UPGRADE_STATE } from '@platform/constants/billing';
 import {
   PLAN_CHANGE_REFUSAL,
@@ -11,6 +7,10 @@ import {
 } from '@platform/constants/plan-change';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { SELLABLE_TENANT_PLANS } from '@shinefold/config/constants';
+import { isTenantWritable } from '@shinefold/db/utils/is-tenant-writable/is-tenant-writable';
+import { isOneOf } from '@shinefold/utils/primitives';
 
 type TUpgradeTenant = Pick<
   TPlatformTenant,

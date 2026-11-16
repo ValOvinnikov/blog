@@ -4,22 +4,22 @@ import {
   CTA_VARIANT,
   FULL_BRAND_VARIANT_LIST,
   MEDIA_ORDER,
-} from '@blog/config/constants';
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { contentPositionFields } from '@blog/studio/schema-types/fields/content-position-fields/content-position-fields';
-import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
-import { localizedListedTextField } from '@blog/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { mediaOrderField } from '@blog/studio/schema-types/fields/media-order-field/media-order-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { variantField } from '@blog/studio/schema-types/fields/variant-field/variant-field';
-import { isNotVariant } from '@blog/studio/schema-types/fields/variant-field/variant-predicate';
-import { ctaLayoutField } from '@blog/studio/schema-types/objects/cta-layout/cta-layout-field';
-import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
-import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
+} from '@shinefold/config/constants';
+import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { contentPositionFields } from '@shinefold/studio/schema-types/fields/content-position-fields/content-position-fields';
+import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { localizedListedTextField } from '@shinefold/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { mediaOrderField } from '@shinefold/studio/schema-types/fields/media-order-field/media-order-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { variantField } from '@shinefold/studio/schema-types/fields/variant-field/variant-field';
+import { isNotVariant } from '@shinefold/studio/schema-types/fields/variant-field/variant-predicate';
+import { ctaLayoutField } from '@shinefold/studio/schema-types/objects/cta-layout/cta-layout-field';
+import { localizedImageWithAltSchema } from '@shinefold/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
+import { validateLocalizedMaxLength } from '@shinefold/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { Megaphone } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

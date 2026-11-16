@@ -1,7 +1,7 @@
 import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
   NEWSLETTER_SKIP_REASON,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import { mockNewsletterLimits } from '@worker/testing/newsletter-send/fixtures';
 
 import {

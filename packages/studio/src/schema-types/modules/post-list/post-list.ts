@@ -1,15 +1,15 @@
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
 import {
   appearanceFieldGroups,
   appearanceFields,
   appearanceFieldsets,
-} from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
-import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
+} from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { showImagesField } from '@shinefold/studio/schema-types/fields/show-images-field/show-images-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { wideLayoutField } from '@shinefold/studio/schema-types/objects/wide-layout/wide-layout-field';
+import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { List } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

@@ -1,25 +1,25 @@
+import { faker } from '@faker-js/faker';
 import {
   FINDING_KIND,
   FINDING_SEVERITY,
   FINDING_SOURCE,
   FINDING_STATUS,
-} from '@blog/config/constants';
-import { RESOLVED_FINDING_RETENTION_DAYS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import { firstRowOrThrow } from '@blog/db/testing/first-row-or-throw';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/config/constants';
+import { RESOLVED_FINDING_RETENTION_DAYS } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   justPast,
   justWithin,
   MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
-} from '@blog/db/testing/retention/fixtures';
-import { daysBefore } from '@blog/db/utils/day-offset/day-offset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/retention/fixtures';
+import { daysBefore } from '@shinefold/db/utils/day-offset/day-offset';
 
 import { deleteResolvedFindingsPastRetention } from './delete-resolved-findings-past-retention';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

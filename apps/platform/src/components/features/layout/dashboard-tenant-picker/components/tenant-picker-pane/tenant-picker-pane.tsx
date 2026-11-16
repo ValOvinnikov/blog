@@ -1,11 +1,11 @@
 'use client';
 
-import { hasArrayGotItems } from '@blog/utils/primitives';
 import { TenantPickerRow } from '@platform/components/features/layout/dashboard-tenant-picker/components/tenant-picker-row';
 import { Card } from '@platform/components/shared/card';
 import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
 import type { TTenantPickerItem } from '@platform/server/tenants/to-tenant-picker-items';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useId, useRef, useState } from 'react';
 

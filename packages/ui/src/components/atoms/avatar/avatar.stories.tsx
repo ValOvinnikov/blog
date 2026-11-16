@@ -1,5 +1,5 @@
-import { SIZE } from '@blog/config';
-import { objectKeys } from '@blog/utils/primitives';
+import { SIZE } from '@shinefold/config';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Avatar } from './avatar';

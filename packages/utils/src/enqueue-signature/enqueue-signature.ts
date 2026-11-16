@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
-import { HEX_ENCODING, SHA256_ALGORITHM } from '@blog/utils/hash';
+import { HEX_ENCODING, SHA256_ALGORITHM } from '@shinefold/utils/hash';
 
 export const ENQUEUE_SIGNATURE_HEADER = 'x-worker-signature';
 export const ENQUEUE_TIMESTAMP_HEADER = 'x-worker-timestamp';

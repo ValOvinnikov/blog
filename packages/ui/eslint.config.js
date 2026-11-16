@@ -1,3 +1,3 @@
-import config from '@blog/eslint-config/ui';
+import config from '@shinefold/eslint-config/ui';
 
 export default [...config];

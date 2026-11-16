@@ -1,11 +1,11 @@
+import { isBlankPortableTextValue } from '@platform/utils/is-blank-portable-text-value/is-blank-portable-text-value';
 import {
   portableTextToPlainText,
   type TMaybeNull,
   type TVoiceFieldId,
   type TVoicePortableText,
-} from '@blog/config';
-import { hasLength } from '@blog/utils/primitives';
-import { isBlankPortableTextValue } from '@platform/utils/is-blank-portable-text-value/is-blank-portable-text-value';
+} from '@shinefold/config';
+import { hasLength } from '@shinefold/utils/primitives';
 
 export const voiceTextToPortableText = (
   id: TVoiceFieldId,

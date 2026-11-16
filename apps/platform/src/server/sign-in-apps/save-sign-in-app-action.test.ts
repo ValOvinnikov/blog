@@ -1,14 +1,4 @@
 import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { OAUTH_PROVIDER, TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-import {
   SIGN_IN_APP_FIELD_ERROR,
   SIGN_IN_APP_LOG,
   SIGN_IN_APP_REFUSAL,
@@ -35,6 +25,16 @@ import {
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { OAUTH_PROVIDER, TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { notFound } from 'next/navigation';
 
 import { saveSignInAppAction } from './save-sign-in-app-action';
@@ -42,7 +42,7 @@ import { saveSignInAppAction } from './save-sign-in-app-action';
 vi.mock('@platform/server/auth/require-tenant-membership');
 vi.mock('@platform/server/audit/record-audit-event');
 vi.mock('@platform/server/site-config/revalidate-site-config');
-vi.mock('@blog/db', async () => {
+vi.mock('@shinefold/db', async () => {
   const { mockSignInAppsDb } =
     await import('@platform/testing/sign-in-apps/fixtures');
   return mockSignInAppsDb();

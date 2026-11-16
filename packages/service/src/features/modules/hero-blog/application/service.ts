@@ -1,6 +1,6 @@
-import { getHeroBlog } from '@blog/service/features/modules/hero-blog/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getHeroBlog } from '@shinefold/service/features/modules/hero-blog/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createHeroBlogModuleService() {
   return {

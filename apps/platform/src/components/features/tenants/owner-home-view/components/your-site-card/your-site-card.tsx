@@ -1,10 +1,10 @@
-import { ICONS } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { Icon } from '@platform/components/shared/icon';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
+import { ICONS } from '@shinefold/config';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { useTranslations } from 'next-intl';
 
 import { BandCell } from './components/band-cell/band-cell';

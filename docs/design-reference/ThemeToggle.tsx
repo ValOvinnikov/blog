@@ -23,7 +23,7 @@ function readTheme(): Theme {
  * (`"light"` | `"dark"`); an absent value means "follow the system preference".
  *
  * Pure and portable: it touches only `document` / `localStorage` and has no
- * `service`, `sanity`, or data-fetching imports, so `@blog/ui` stays extractable.
+ * `service`, `sanity`, or data-fetching imports, so `@shinefold/ui` stays extractable.
  *
  * @example
  * <ThemeToggle className="ml-2" />

@@ -1,4 +1,4 @@
-import { DOMAIN_PATTERN } from '@blog/config';
+import { DOMAIN_PATTERN } from '@shinefold/config';
 import { z } from 'zod';
 
 export const customDomainInputSchema = z.object({

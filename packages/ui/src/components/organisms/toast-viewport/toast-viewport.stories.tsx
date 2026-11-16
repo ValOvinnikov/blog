@@ -1,5 +1,5 @@
-import { TOAST_TYPE } from '@blog/config';
-import { Toast, type IToast } from '@blog/ui/components/molecules/toast';
+import { TOAST_TYPE } from '@shinefold/config';
+import { Toast, type IToast } from '@shinefold/ui/components/molecules/toast';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { ToastViewport } from './toast-viewport';

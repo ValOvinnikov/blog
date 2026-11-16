@@ -1,7 +1,7 @@
-import type { TMaybeNull } from '@blog/config/types';
-import { isNull } from '@blog/utils/primitives';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { isNull } from '@shinefold/utils/primitives';
 
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 import type { TModuleType } from './module';
 

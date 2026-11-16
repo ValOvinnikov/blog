@@ -1,8 +1,8 @@
 import 'server-only';
 
-import { HTTP_STATUS } from '@blog/config';
 import { CUSTOM_DOMAIN_TXT_TYPE } from '@platform/constants/custom-domain';
 import { DNS_RCODE, DNS_TYPE } from '@platform/constants/dns';
+import { HTTP_STATUS } from '@shinefold/config';
 import { z } from 'zod';
 
 const DOH_ENDPOINT = 'https://cloudflare-dns.com/dns-query';

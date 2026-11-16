@@ -1,11 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  HTTP_STATUS,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import {
   DEPROVISION_PATH,
@@ -30,6 +22,14 @@ import {
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  HTTP_STATUS,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import type { Session } from 'next-auth';
 
 import { deprovisionTenantAction } from './deprovision-tenant-action';
@@ -41,7 +41,7 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: { getTenantById: vi.fn() },
     auditEvents: { insertAuditEvent: vi.fn() },

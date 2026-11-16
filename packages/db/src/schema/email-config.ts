@@ -1,4 +1,4 @@
-import { EMAIL_NEW_POSTS_DEFAULT } from '@blog/db/constants';
+import { EMAIL_NEW_POSTS_DEFAULT } from '@shinefold/db/constants';
 import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { timestampColumns } from './columns';

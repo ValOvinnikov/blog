@@ -1,6 +1,6 @@
 'use client';
 
-import { DEPTH, type TDepth } from '@blog/config';
+import { DEPTH, type TDepth } from '@shinefold/config';
 import {
   buildDepthBootstrapScript,
   DEPTH_STORAGE_KEY,

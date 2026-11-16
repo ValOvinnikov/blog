@@ -1,22 +1,22 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   setTenantOwnerAccess,
   type TSetTenantOwnerAccessInput,
-} from '@blog/db/queries/tenants';
+} from '@shinefold/db/queries/tenants';
 import {
   deleteSanityProjectInvite,
   listSanityProjectAcl,
   listSanityProjectInvites,
   revokeSanityProjectRole,
   type TSanityInvite,
-} from '@blog/db/utils/sanity-management-client/sanity-project-access';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
 import {
   listSanityProjectUsers,
   type TSanityUser,
-} from '@blog/db/utils/sanity-management-client/sanity-project-users';
-import { sanityRoleChangeToken } from '@blog/db/utils/sanity-management-client/sanity-role-change-token';
-import { normalizeEmail } from '@blog/utils/normalize-email-identity';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-users';
+import { sanityRoleChangeToken } from '@shinefold/db/utils/sanity-management-client/sanity-role-change-token';
+import { normalizeEmail } from '@shinefold/utils/normalize-email-identity';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
 
 import { findProjectAclEntry } from './find-project-acl-entry';

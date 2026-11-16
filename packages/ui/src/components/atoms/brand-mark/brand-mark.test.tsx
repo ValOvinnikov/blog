@@ -1,6 +1,9 @@
-import { customRender, screen } from '@blog/ui/testing/custom-render';
-import { MOCK_SITE_INITIAL, MOCK_SITE_NAME } from '@blog/ui/testing/fixtures';
 import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
+import {
+  MOCK_SITE_INITIAL,
+  MOCK_SITE_NAME,
+} from '@shinefold/ui/testing/fixtures';
 
 import { BrandMark } from './brand-mark';
 

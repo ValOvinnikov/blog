@@ -1,12 +1,12 @@
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
   NEWSLETTER_SKIP_REASON,
   type TNewsletterSkipReason,
-} from '@blog/db/constants';
-import { getNewsletterPausedAt } from '@blog/db/queries/email-config';
-import { markNewsletterPostSkipped } from '@blog/db/queries/newsletter-post-sends';
-import { isEmailAccountConfigured } from '@blog/email';
+} from '@shinefold/db/constants';
+import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config';
+import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends';
+import { isEmailAccountConfigured } from '@shinefold/email';
 import {
   NEWSLETTER_SEND_GATE,
   NEWSLETTER_SEND_LOG,

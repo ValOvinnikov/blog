@@ -1,12 +1,12 @@
-import { TAXONOMY_KIND } from '@blog/config/constants';
-import { validateTaxonomyListReferencesMatchKind } from '@blog/studio/schema-types/validation/validate-taxonomy-list-matches-kind/validate-taxonomy-list-matches-kind';
-import { mockDocument } from '@blog/studio/testing/mock-documents';
-import { MOCK_FETCH_ERROR } from '@blog/studio/testing/mock-fetch-error';
+import { faker } from '@faker-js/faker';
+import { TAXONOMY_KIND } from '@shinefold/config/constants';
+import { validateTaxonomyListReferencesMatchKind } from '@shinefold/studio/schema-types/validation/validate-taxonomy-list-matches-kind/validate-taxonomy-list-matches-kind';
+import { mockDocument } from '@shinefold/studio/testing/mock-documents';
+import { MOCK_FETCH_ERROR } from '@shinefold/studio/testing/mock-fetch-error';
 import {
   mockFetchContext,
   type TMockFetchContext,
-} from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/mock-validation-context';
 
 faker.seed(6021);
 

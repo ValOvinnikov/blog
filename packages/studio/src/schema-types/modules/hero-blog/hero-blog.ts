@@ -2,26 +2,26 @@ import {
   CTA_ACTION_APPEARANCE,
   POST_SOURCE,
   type TPostSource,
-} from '@blog/config/constants';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { heroBackgroundAndShapeFields } from '@blog/studio/schema-types/fields/hero-background-and-shape-fields/hero-background-and-shape-fields';
-import { heroContentPositionFields } from '@blog/studio/schema-types/fields/hero-content-position-fields/hero-content-position-fields';
+} from '@shinefold/config/constants';
+import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
+import { heroBackgroundAndShapeFields } from '@shinefold/studio/schema-types/fields/hero-background-and-shape-fields/hero-background-and-shape-fields';
+import { heroContentPositionFields } from '@shinefold/studio/schema-types/fields/hero-content-position-fields/hero-content-position-fields';
 import {
   heroMediaOrderSplitField,
   heroMediaOrderStackedField,
-} from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { publishedPostFilter } from '@blog/studio/schema-types/filters/published-post';
-import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
-import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
-import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
-import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
-import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
-import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
-import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
-import { validatePinnedPostTranslated } from '@blog/studio/schema-types/validation/validate-pinned-post-translated/validate-pinned-post-translated';
-import { toTitleCase } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { publishedPostFilter } from '@shinefold/studio/schema-types/filters/published-post';
+import { heroFieldsets } from '@shinefold/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
+import { ctaSecondaryButtonSchema } from '@shinefold/studio/schema-types/objects/cta-button/cta-button';
+import { heroLayoutField } from '@shinefold/studio/schema-types/objects/hero-layout/hero-layout-field';
+import { localizedImageWithAltSchema } from '@shinefold/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { validateDefaultLanguageFilled } from '@shinefold/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { validateLocalizedMaxLength } from '@shinefold/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
+import { validateNewestFeaturedHasCandidate } from '@shinefold/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
+import { validatePinnedPostTranslated } from '@shinefold/studio/schema-types/validation/validate-pinned-post-translated/validate-pinned-post-translated';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import { Star } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

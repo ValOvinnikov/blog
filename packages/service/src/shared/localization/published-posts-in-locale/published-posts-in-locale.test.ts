@@ -1,14 +1,14 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { q } from '@blog/service/sanity/query/query';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
-import { evaluateGroqIds } from '@blog/service/testing/shared/groq';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { q } from '@shinefold/service/sanity/query/query';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
+import { evaluateGroqIds } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_DESIGN_EN_POST_ID,
   MOCK_DESIGN_NL_POST_ID,
   MOCK_NOTES_EN_POST_ID,
   MOCK_ONLY_EN_POST_ID,
   MOCK_TRANSLATED_POST_DOCUMENTS,
-} from '@blog/service/testing/shared/translated-posts-dataset';
+} from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { publishedPostsInLocale } from './published-posts-in-locale';
 

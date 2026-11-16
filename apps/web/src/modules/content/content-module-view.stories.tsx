@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, CONTAINER_WIDTH, SPACING_SCALE } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTAINER_WIDTH,
+  SPACING_SCALE,
+} from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
   MOCK_FULL_BLEED_IMAGE_DEMO,

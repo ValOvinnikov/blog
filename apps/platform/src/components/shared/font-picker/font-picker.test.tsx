@@ -1,9 +1,9 @@
-import { FONT_CHOICE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { pickNextOptionByKeyboard } from '@platform/testing/pick-next-option-by-keyboard';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
+import { FONT_CHOICE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { FontPicker } from './font-picker';

@@ -45,8 +45,8 @@ for arg in "$@"; do
 	esac
 done
 [ -n "$base" ] || exit 1
-# Stands in for `turbo query affected --packages @blog/ui --exit-code`:
-# exit 1 (affected) when the diff touches @blog/ui or a package it depends
+# Stands in for `turbo query affected --packages @shinefold/ui --exit-code`:
+# exit 1 (affected) when the diff touches @shinefold/ui or a package it depends
 # on, exit 0 (not affected) otherwise. Modelling the config -> ui graph edge
 # matters — turbo genuinely reports ui as affected by any packages/config
 # change, which is precisely why the type-only skip has to be its own rule
@@ -126,7 +126,7 @@ expect() {
 		cd "$repo" && \
 			VERCEL_GIT_REPO_OWNER=test-owner \
 			VERCEL_GIT_REPO_SLUG=test-repo \
-			sh "$script" "@blog/ui" "$@" >/dev/null 2>&1
+			sh "$script" "@shinefold/ui" "$@" >/dev/null 2>&1
 	)
 	got=$?
 	if [ "$got" != "$want" ]; then

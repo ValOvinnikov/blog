@@ -5,7 +5,7 @@ import type {
   TTenantProvisioningStep,
   TTenantProvisioningStepStatus,
   TWorkerProvisioningStep,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   integer,
   jsonb,

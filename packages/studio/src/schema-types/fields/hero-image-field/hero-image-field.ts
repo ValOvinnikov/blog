@@ -1,5 +1,5 @@
-import { HERO_VARIANT } from '@blog/config/constants';
-import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { HERO_VARIANT } from '@shinefold/config/constants';
+import { localizedImageWithAltSchema } from '@shinefold/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
 import { defineField } from 'sanity';
 
 type THeroImageFieldParent = { variant?: string };

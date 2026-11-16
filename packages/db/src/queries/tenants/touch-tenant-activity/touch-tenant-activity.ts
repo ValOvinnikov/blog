@@ -1,8 +1,8 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { TENANT_STATUS } from '@blog/db/constants';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { and, eq, isNull, ne, sql } from 'drizzle-orm';
 
 export async function touchTenantActivity(

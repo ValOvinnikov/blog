@@ -4,7 +4,7 @@ import {
   PRESET_ID,
   PRESET_REGISTRY,
   type TPresetId,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { Decorator, Preview } from '@storybook/nextjs-vite';
 import { resolveFontVariableClassName } from '@web/config/fonts';
 import { buildThemeStyleBlock } from '@web/utils/build-theme-style-block';

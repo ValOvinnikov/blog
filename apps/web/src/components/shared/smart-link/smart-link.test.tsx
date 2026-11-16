@@ -1,5 +1,5 @@
-import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES, routes } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES, routes } from '@shinefold/config';
 import {
   customRender,
   renderElement,

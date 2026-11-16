@@ -2,8 +2,8 @@ import {
   isLocaleIsoCode,
   type TLocaleIsoCode,
   type TMaybeNull,
-} from '@blog/config';
-import { queries } from '@blog/db';
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { routing } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { logger } from '@web/utils/logger/logger';

@@ -1,4 +1,4 @@
-import type { TPostCard } from '@blog/service';
+import type { TPostCard } from '@shinefold/service';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import type { ReactNode } from 'react';
 

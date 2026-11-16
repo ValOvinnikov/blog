@@ -1,5 +1,5 @@
-import type { TTenantEmailBrand } from '@blog/config';
-import { queries } from '@blog/db';
+import type { TTenantEmailBrand } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { TENANT_EMAIL_IDENTITY_LOG } from '@web/constants/tenant-email-identity';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';

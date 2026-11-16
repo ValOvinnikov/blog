@@ -1,12 +1,12 @@
 import 'server-only';
 
-import { PRESET_REGISTRY, type TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
   featureDefaultsToValues,
   type TSettingsFeaturesValues,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
+import { PRESET_REGISTRY, type TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 
 type TSettingsFeaturesOrDefaults = {
   values: TSettingsFeaturesValues;

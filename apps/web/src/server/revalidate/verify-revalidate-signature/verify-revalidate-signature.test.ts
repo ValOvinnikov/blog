@@ -1,7 +1,7 @@
-import type { TMaybeNull } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { encodeSignatureHeader } from '@sanity/webhook';
+import type { TMaybeNull } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import {
   REVALIDATE_SIGNATURE_MAX_AGE_MS,
   SIGNATURE_REFUSED_REASON,
@@ -20,7 +20,7 @@ const { getTenantRevalidateWebhookSecretMock } = vi.hoisted(() => ({
   getTenantRevalidateWebhookSecretMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: {
       getTenantRevalidateWebhookSecret: getTenantRevalidateWebhookSecretMock,

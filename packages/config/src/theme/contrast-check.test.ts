@@ -5,7 +5,7 @@ import {
   NAV_LINK_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import { findContrastFailures } from './contrast-check';
 import { KNOWN_CONTRAST_FAILURES } from './contrast-known-failures';

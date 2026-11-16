@@ -1,5 +1,5 @@
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { getDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
+import { getDefaultLanguage } from '@shinefold/studio/schema-types/validation/default-language/default-language';
 import type { ReferenceFilterSearchOptions } from 'sanity';
 
 const publishedId = (id: string) => `string::split(${id}, "drafts.")[-1]`;

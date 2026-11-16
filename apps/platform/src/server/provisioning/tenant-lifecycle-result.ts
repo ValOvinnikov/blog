@@ -1,5 +1,5 @@
-import type { ACTION_OUTCOME, TActionResult } from '@blog/config';
 import type { TENANT_REFUSAL } from '@platform/constants/tenant';
+import type { ACTION_OUTCOME, TActionResult } from '@shinefold/config';
 
 import type {
   TConfirmTenantField,

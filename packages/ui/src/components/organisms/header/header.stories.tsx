@@ -3,15 +3,15 @@ import {
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
   type THeaderSubmenuStyle,
-} from '@blog/config';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { ThemeToggle } from '@blog/ui/components/atoms/theme-toggle';
-import { BrandLockup } from '@blog/ui/components/molecules/brand-lockup';
+} from '@shinefold/config';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import { ThemeToggle } from '@shinefold/ui/components/atoms/theme-toggle';
+import { BrandLockup } from '@shinefold/ui/components/molecules/brand-lockup';
 import {
   type INavItem,
   PrimaryNavigation,
-} from '@blog/ui/components/molecules/primary-navigation';
-import { objectKeys } from '@blog/utils/primitives';
+} from '@shinefold/ui/components/molecules/primary-navigation';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { userEvent, within } from 'storybook/test';

@@ -1,4 +1,3 @@
-import { ADMIN_ROLE } from '@blog/db/constants';
 import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
 import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
 import {
@@ -17,6 +16,7 @@ import {
 import { dashboardNavSections } from '@platform/utils/dashboard-nav-sections/dashboard-nav-sections';
 import { EVERY_PLAN_PAGE } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes, STUDIO_SEGMENT } from '@platform/utils/routes/routes';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 
 import {
   navLabelForPathname,

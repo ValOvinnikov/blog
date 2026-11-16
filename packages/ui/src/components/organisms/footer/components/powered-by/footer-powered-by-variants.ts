@@ -1,4 +1,4 @@
-import { TRANSITION_COLORS, tv } from '@blog/ui/lib/styling';
+import { TRANSITION_COLORS, tv } from '@shinefold/ui/lib/styling';
 
 export const footerPoweredByVariants = tv({
   slots: {

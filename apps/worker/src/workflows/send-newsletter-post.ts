@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   NEWSLETTER_POST_STATE,
   NEWSLETTER_SEND_GATE,

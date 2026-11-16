@@ -1,6 +1,6 @@
-import { getSectionPagesModuleDocument } from '@blog/service/features/modules/section-pages/adaptor/module/loader';
-import { getSectionPages } from '@blog/service/features/modules/section-pages/adaptor/pages/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
+import { getSectionPagesModuleDocument } from '@shinefold/service/features/modules/section-pages/adaptor/module/loader';
+import { getSectionPages } from '@shinefold/service/features/modules/section-pages/adaptor/pages/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
 
 import type { TSectionPagesModule } from './types';
 

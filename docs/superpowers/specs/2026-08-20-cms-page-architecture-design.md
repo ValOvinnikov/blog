@@ -193,7 +193,7 @@ epics are not planned against them:
   related-posts type-checked fine and would have failed at runtime.
 
 No Postgres involvement — "category" was not a stored value, a `pgEnum`, or a
-column anywhere in `@blog/db`, so no DB migration was needed. `@blog/db` was
+column anywhere in `@shinefold/db`, so no DB migration was needed. `@shinefold/db` was
 touched in one place: `scripts/provision-tenant/steps/starter-content.ts`.
 
 Two stored, category-named values were deliberately left behind and tracked in
@@ -314,7 +314,7 @@ Migration).
   paginated archive.
 - **`module_taxonomyList`** — a new module document listing taxonomy entries as
   cards. Source inferred by slot.
-- **A taxonomy card + card grid in `@blog/ui`** — `/topics` currently hand-rolls
+- **A taxonomy card + card grid in `@shinefold/ui`** — `/topics` currently hand-rolls
   its own list markup because `BlogPageTemplate`'s `posts` slot is built for
   post grids. Check `packages/ui/COMPONENTS.md` for something extendable before
   adding new components.
@@ -421,7 +421,7 @@ today.
 
 ### `RESERVED_SLUGS` must be updated
 
-`@blog/config`'s `RESERVED_SLUGS` guards `page_landing` slugs against colliding
+`@shinefold/config`'s `RESERVED_SLUGS` guards `page_landing` slugs against colliding
 with real routes. It is currently
 `blog, category, tag, author, api, page, topics`.
 
@@ -521,7 +521,7 @@ plumbing it added (`isPaginated`, the pagination-href helper's unreachable
 branches, the page-type label map) is deleted there.
 
 **E3 — `module_taxonomyList` and the taxonomy card UI.** New module document
-plus the `@blog/ui` card and grid that `/topics` currently hand-rolls. Check
+plus the `@shinefold/ui` card and grid that `/topics` currently hand-rolls. Check
 `packages/ui/COMPONENTS.md` for something extendable first. Sub-issues: cms +
 web **combined** (constraint 2) → service (taxonomy entries with post counts) →
 ui (card, grid, stories). Ships before the two index-page epics that consume it.
@@ -632,7 +632,7 @@ time after E1 (E11 more naturally after E4). (E10 was dropped; it was a leaf,
 so nothing re-orders.) E5/E6 and E7/E8 are each an index-and-children pair and
 are best reviewed together in sequence, though either merges green alone.
 
-`@blog/db`'s `starter-content.ts` is a sibling sub-issue in every epic that
+`@shinefold/db`'s `starter-content.ts` is a sibling sub-issue in every epic that
 changes Sanity fixtures — E1, E6, E8, and E11.
 
 ## Board actions

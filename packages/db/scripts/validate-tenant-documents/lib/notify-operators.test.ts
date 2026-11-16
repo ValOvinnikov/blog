@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   FINDING_SEVERITY,
   HTTP_STATUS,
   OPERATOR_ALERT_KIND,
-} from '@blog/config/constants';
-import { mockTenant } from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import { mockTenant } from '@shinefold/db/testing/tenants/fixtures';
 
 import { notifyOperatorsOfDocumentValidationFailure } from './notify-operators';
 

@@ -7,165 +7,165 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## config
 
-### `@blog/config/constants` — `packages/config/src/constants/account-control.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/account-control.ts`
 
 - **ACCOUNT_BUTTON_STYLE**: `PILL`, `CIRCLE`
 - **ACCOUNT_PANEL_STYLE**: `CARD`, `PROFILE`, `HUB`
 - **ACCOUNT_PHONE_PLACEMENT**: `BAR`, `MENU`
 
-### `@blog/config/constants` — `packages/config/src/constants/action-outcome.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/action-outcome.ts`
 
 - **ACTION_OUTCOME**: `SUCCESS`, `INVALID`, `BLOCKED`, `RATE_LIMITED`, `UNAVAILABLE`, `REFUSED`, `SERVER_ERROR`
 
-### `@blog/config/constants` — `packages/config/src/constants/alert.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/alert.ts`
 
 - **ALERT_TYPE**: `SUCCESS`, `WARNING`, `ERROR`, `INFO`
 
-### `@blog/config/constants` — `packages/config/src/constants/analytics-provider.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/analytics-provider.ts`
 
 - **ANALYTICS_PROVIDER**: `GOOGLE_ANALYTICS`, `PLAUSIBLE`
 
-### `@blog/config/constants` — `packages/config/src/constants/aside.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/aside.ts`
 
 - **ASIDE_KIND**: `WHY_NOT`, `DIGRESSION`, `CONTEXT`
 
-### `@blog/config/constants` — `packages/config/src/constants/audit.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/audit.ts`
 
 - **AUDIT_TARGET_TYPE**: `TENANT`, `SITE_CONFIG`, `SETTINGS_FEATURES`, `RELEASE`, `BLOCKED_SIGNUP_IDENTITY`, `PERSONAL_DATA`
 - **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`, `OAUTH_APP_SAVED`, `OAUTH_APP_REPLACED`, `OAUTH_APP_REMOVED`, `NEWSLETTER_PAUSE_CLEARED`
 
-### `@blog/config/constants` — `packages/config/src/constants/auth-app.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/auth-app.ts`
 
 - **AUTH_APP**: `SITE`, `PLATFORM`
 
-### `@blog/config/constants` — `packages/config/src/constants/brand-tagline.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/brand-tagline.ts`
 
 - **BRAND_TAGLINE_SEPARATORS**: `DOT`, `PIPE`, `BULLET`, `SLASH`
 
-### `@blog/config/constants` — `packages/config/src/constants/busy-button.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/busy-button.ts`
 
 - **BUSY_BUTTON_STYLE**: `LABEL`, `KEPT`, `EDGE`
 - **SPINNER_STYLE**: `BRAILLE`, `RING`, `DOTS`, `PULSE`
 
-### `@blog/config/constants` — `packages/config/src/constants/button-shape.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/button-shape.ts`
 
 - **BUTTON_SHAPE**: `SQUARE`, `ROUNDED`, `PILL`
 
-### `@blog/config/constants` — `packages/config/src/constants/capability.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/capability.ts`
 
 - **CAPABILITY**: `READER_ACCOUNTS`, `COMMENTS`, `RATINGS`, `BOOKMARKS`, `NEWSLETTER`, `ANALYTICS`, `CONSENT_BANNER`, `CONTACT_FORM`
 
-### `@blog/config/constants` — `packages/config/src/constants/card-image-shape.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/card-image-shape.ts`
 
 - **CARD_IMAGE_SHAPE**: `WIDE`, `SQUARE`, `CIRCLE`, `ICON`
 
-### `@blog/config/constants` — `packages/config/src/constants/card-style.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/card-style.ts`
 
 - **CARD_STYLE**: `ACCENT_BAR`, `OUTLINED`, `FILLED`, `RAISED`, `PLAIN`
 
-### `@blog/config/constants` — `packages/config/src/constants/consent-category.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/consent-category.ts`
 
 - **CONSENT_CATEGORY**: `NECESSARY`, `EXTERNAL_MEDIA`
 
-### `@blog/config/constants` — `packages/config/src/constants/contrast.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/contrast.ts`
 
 - **COLOR_SCHEME**: `LIGHT`, `DARK`
 - **CONTRAST_ROLE**: `TEXT`, `LARGE_TEXT`, `UI_BOUNDARY`, `FOCUS`, `DECORATIVE`
 
-### `@blog/config/constants` — `packages/config/src/constants/cta.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/cta.ts`
 
 - **CTA_VARIANT**: `BANNER`, `SPLIT`, `CALLOUT`
 - **CTA_ACTION_APPEARANCE**: `CONTAINED`, `INLINE`
 - **CTA_ACTION_VARIANT**: `PRIMARY`, `SECONDARY`
 
-### `@blog/config/constants` — `packages/config/src/constants/depth.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/depth.ts`
 
 - **DEPTH**: `SKIM`, `READ`, `DEEP`
 
-### `@blog/config/constants` — `packages/config/src/constants/display-mode.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/display-mode.ts`
 
 - **DISPLAY_MODE**: `GRID`, `CAROUSEL`
 
-### `@blog/config/constants` — `packages/config/src/constants/email-account.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/email-account.ts`
 
 - **EMAIL_ACCOUNT**: `PLATFORM`, `TENANT`
 
-### `@blog/config/constants` — `packages/config/src/constants/email-template.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/email-template.ts`
 
 - **EMAIL_TEMPLATE_TYPE**: `MAGIC_LINK`, `TENANT_INVITE`, `NEWSLETTER_CONFIRMATION`
 
-### `@blog/config/constants` — `packages/config/src/constants/email-type.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/email-type.ts`
 
 - **EMAIL_TYPE**: `SIGN_IN`, `NEWSLETTER_CONFIRMATION`, `NEWSLETTER_ISSUE`
 
-### `@blog/config/constants` — `packages/config/src/constants/embed.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/embed.ts`
 
 - **EMBED_PROVIDER**: `YOUTUBE`, `VIMEO`, `LOOM`, `CAL`, `GOOGLE_MAPS`
 
-### `@blog/config/constants` — `packages/config/src/constants/error.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/error.ts`
 
 - **ERROR_CODE**: `DB_NOT_FOUND`, `DB_DUPLICATE_DOMAIN`, `DB_LAST_LINKED_METHOD`, `DB_HOLDS_PLATFORM_ROLE`, `DB_ALREADY_PROVISIONING`, `DB_INVALID_DOMAIN`, `DB_INVALID_EMAIL`, `DB_LOCALE_LIMIT_EXCEEDED`, `DB_DEFAULT_LOCALE_REPEATED`, `DB_ALREADY_OWNS_FREE_TENANT`, `DB_DOMAIN_CLAIM_EXISTS`
 
-### `@blog/config/constants` — `packages/config/src/constants/finding.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/finding.ts`
 
 - **FINDING_SOURCE**: `DOCUMENT_VALIDATION`, `TENANT_PROVISIONING`, `RECHECK_TENANT_OWNERS`, `DOMAIN_VERIFICATION`, `SITE_CONFIG_REVALIDATION`, `CONTRAST_CHECK`
 - **FINDING_KIND**: `SCHEMA_VALIDATION_ERROR`, `PROVISIONING_STEP_FAILED`, `OWNER_CHECK_STALLED`, `OWNER_CHECK_AMBIGUOUS`, `DOMAIN_NOT_ADDED`, `REVALIDATION_FAILED`, `CONTRAST_REGRESSION`, `OWNER_ACCESS_CHECK_FAILED`
 - **FINDING_SEVERITY**: `INFO`, `WARNING`, `CRITICAL`
 - **FINDING_STATUS**: `OPEN`, `RESOLVED`
 
-### `@blog/config/constants` — `packages/config/src/constants/footer-fine-print.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/footer-fine-print.ts`
 
 - **FOOTER_FINE_PRINT_KIND**: `LINK`, `COOKIE_SETTINGS`
 
-### `@blog/config/constants` — `packages/config/src/constants/footer-layout.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/footer-layout.ts`
 
 - **FOOTER_LAYOUT**: `COLUMNS`, `CENTRED`, `COMPACT`, `BIG_WORDMARK`
 - **FOOTER_SURFACE**: `FULL_WIDTH`, `CARD`
 - **COOKIE_SETTINGS_BUTTON**: `HIDDEN`, `SHOWN`, `ONLY`
 
-### `@blog/config/constants` — `packages/config/src/constants/form-status.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/form-status.ts`
 
 - **FORM_STATUS**: `IDLE`, `SUBMITTING`, `SUCCESS`, `ERROR`
 
-### `@blog/config/constants` — `packages/config/src/constants/grid-columns.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/grid-columns.ts`
 
 - **GRID_COLUMNS**: `TWO`, `THREE`, `FOUR`
 
-### `@blog/config/constants` — `packages/config/src/constants/header-control-shape.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/header-control-shape.ts`
 
 - **HEADER_CONTROL_SHAPE**: `ROUND`, `ROUNDED`, `SQUARE`
 
-### `@blog/config/constants` — `packages/config/src/constants/header-control-style.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/header-control-style.ts`
 
 - **HEADER_CONTROL_STYLE**: `OUTLINED`, `SOFT`, `PLAIN`
 
-### `@blog/config/constants` — `packages/config/src/constants/header-layout.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/header-layout.ts`
 
 - **HEADER_LAYOUT**: `CLASSIC`, `LINKS_BESIDE_BRAND`, `CENTRED_LINKS`, `TWO_ROWS`, `CENTRED_BRAND`, `MENU_BUTTON`
 - **HEADER_SUBMENU_STYLE**: `DROPDOWN`, `WIDE_PANEL`
 - **HEADER_BAR_STYLE**: `FULL_WIDTH`, `FLOATING`
 
-### `@blog/config/constants` — `packages/config/src/constants/http-methods.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/http-methods.ts`
 
 - **HTTP_METHOD**: `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`
 
-### `@blog/config/constants` — `packages/config/src/constants/http-statuses.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/http-statuses.ts`
 
 - **HTTP_STATUS**: `OK`=`200`, `CREATED`=`201`, `ACCEPTED`=`202`, `NO_CONTENT`=`204`, `MOVED_PERMANENTLY`=`301`, `SEE_OTHER`=`303`, `TEMPORARY_REDIRECT`=`307`, `BAD_REQUEST`=`400`, `UNAUTHORIZED`=`401`, `PAYMENT_REQUIRED`=`402`, `FORBIDDEN`=`403`, `NOT_FOUND`=`404`, `REQUEST_TIMEOUT`=`408`, `CONFLICT`=`409`, `TOO_EARLY`=`425`, `TOO_MANY_REQUESTS`=`429`, `INTERNAL_SERVER_ERROR`=`500`, `BAD_GATEWAY`=`502`, `SERVICE_UNAVAILABLE`=`503`
 
-### `@blog/config/constants` — `packages/config/src/constants/icon.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/icon.ts`
 
 - **ICONS**: `SUN`, `MOON`, `HOUSE`, `SHARE`, `COPY`, `CHECK`, `CHECK_SHEET`, `EXTERNAL_LINK`, `MENU`, `MENU_ROWS`, `CLOSE`, `X`, `GITHUB`, `LINKEDIN`, `FACEBOOK`, `YOUTUBE`, `INSTAGRAM`, `MASTODON`, `BLUESKY`, `THREADS`, `RSS`, `ARROW_UP`, `GOOGLE`, `BOOKMARK`, `SPINNER`, `WARNING`, `INFO`, `SETTINGS`, `POWER`, `MAIL`, `CHEVRON_RIGHT`, `CHEVRON_LEFT`, `CHEVRON_DOWN`, `CHEVRON_UP`, `SELECT_CHEVRON`, `ARROW`, `SHIELD_CHECK`, `GRID`, `PLUS`, `PALETTE`, `QUOTE`, `GLOBE`, `STUDIO`, `COMMENT`, `USER`, `USERS`, `CODE`, `LAYERS`, `ZAP`, `SEARCH`, `CHART`, `CLOCK`, `WRENCH`, `ROCKET`, `BOOK`, `PEN`, `STAR`, `LOCK`, `CLOUD`, `CPU`, `TARGET`, `HEART`, `CAMERA`, `LIGHTBULB`, `MAP_PIN`, `PHONE`, `TRENDING_UP`, `SMILE`, `BOLD`, `ITALIC`, `LINK`, `SEND`, `COOKIE`, `UNFOLD`, `TICK`, `SIDEBAR`, `MONITOR`, `TABLET`, `USER_CHECK`, `CROSSHAIR`, `MAXIMIZE`, `PAUSE`, `UPLOAD`, `EYE`, `EYE_OFF`
 
-### `@blog/config/constants` — `packages/config/src/constants/image-layout.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/image-layout.ts`
 
 - **IMAGE_LAYOUT**: `INLINE`, `FULL_BLEED`, `FLOAT_LEFT`, `FLOAT_RIGHT`
 
-### `@blog/config/constants` — `packages/config/src/constants/language.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/language.ts`
 
 - **LOCALE_ISO_CODES**: `EN`, `NL`, `FR`, `DE`, `ES`
 
-### `@blog/config/constants` — `packages/config/src/constants/layout.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/layout.ts`
 
 - **BRAND_VARIANT**: `PRIMARY`, `SECONDARY`, `BRAND_PRIMARY`
 - **SPACING_SCALE**: `NONE`, `SM`, `MD`, `LG`, `XL`
@@ -173,67 +173,67 @@ Every key/value const an agent should reuse before writing a literal. The
 - **CONTENT_ALIGNMENT**: `LEFT`, `CENTER`, `RIGHT`
 - **MEDIA_ORDER**: `LAST`, `FIRST`
 
-### `@blog/config/constants` — `packages/config/src/constants/legal-page-kind.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/legal-page-kind.ts`
 
 - **LEGAL_PAGE_KIND**: `PRIVACY_POLICY`, `TERMS`, `IMPRINT`, `COOKIE_STATEMENT`, `OTHER`
 
-### `@blog/config/constants` — `packages/config/src/constants/link.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/link.ts`
 
 - **LINK_TYPE**: `INTERNAL`, `EXTERNAL`
 - **SOCIAL_PLATFORMS**: `X`, `GITHUB`, `LINKEDIN`, `YOUTUBE`, `INSTAGRAM`, `MASTODON`, `BLUESKY`, `FACEBOOK`, `THREADS`, `RSS`
 
-### `@blog/config/constants` — `packages/config/src/constants/magic-link-refusal.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/magic-link-refusal.ts`
 
 - **MAGIC_LINK_REFUSAL**: `BLOCKED`, `NETWORK_LIMIT`, `ADDRESS_LIMIT`, `CHECK_FAILED`
 - **MAGIC_LINK_SIGN_IN_CODE**: `SEND_LIMITED`
 
-### `@blog/config/constants` — `packages/config/src/constants/media-ratio.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/media-ratio.ts`
 
 - **MEDIA_RATIO**: `VIDEO`=`"video"`, `VERTICAL`=`"vertical"`, `CLASSIC`=`"classic"`, `PORTRAIT`=`"portrait"`
 
-### `@blog/config/constants` — `packages/config/src/constants/module-pack.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/module-pack.ts`
 
 - **MODULE_PACK**: `CORE`, `STARTER`, `GROWTH`
 
-### `@blog/config/constants` — `packages/config/src/constants/module.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/module.ts`
 
 - **HERO_VARIANT**: `SPLIT`, `STACKED`, `BANNER`
 - **NEWSLETTER_VARIANT**: `FULL`, `COMPACT`
 - **POST_SOURCE**: `PINNED`, `NEWEST_FEATURED`
 
-### `@blog/config/constants` — `packages/config/src/constants/nav-link-style.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/nav-link-style.ts`
 
 - **NAV_LINK_STYLE**: `PLAIN`, `UNDERLINE`, `SOFT`, `PILL`
 
-### `@blog/config/constants` — `packages/config/src/constants/newsletter-reputation.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/newsletter-reputation.ts`
 
 - **NEWSLETTER_REPUTATION_ALERT_LEVEL**: `WARN`, `SLOW`, `STOP`
 
-### `@blog/config/constants` — `packages/config/src/constants/newsletter-result.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/newsletter-result.ts`
 
 - **NEWSLETTER_RESULT**: `CONFIRMED`, `CONFIRM_INVALID`, `CONFIRM_UNAVAILABLE`, `CONFIRM_FAILED`, `UNSUBSCRIBED`, `UNSUBSCRIBE_INVALID`, `UNSUBSCRIBE_FAILED`
 
-### `@blog/config/constants` — `packages/config/src/constants/next-dynamic-error.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/next-dynamic-error.ts`
 
 - **NEXT_DYNAMIC_ERROR**: `DYNAMIC_SERVER_USAGE`
 
-### `@blog/config/constants` — `packages/config/src/constants/next-navigation-error.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/next-navigation-error.ts`
 
 - **NEXT_NAVIGATION_ERROR**: `NEXT_NOT_FOUND`, `NEXT_REDIRECT`
 
-### `@blog/config/constants` — `packages/config/src/constants/oauth-provider.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/oauth-provider.ts`
 
 - **OAUTH_PROVIDER**: `GITHUB`=`"github"`, `GOOGLE`=`"google"`
 
-### `@blog/config/constants` — `packages/config/src/constants/operator-alert.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/operator-alert.ts`
 
 - **OPERATOR_ALERT_KIND**: `OWNER_ELEVATION`, `DOCUMENT_VALIDATION`
 
-### `@blog/config/constants` — `packages/config/src/constants/portable-text-block-type.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/portable-text-block-type.ts`
 
 - **PORTABLE_TEXT_BLOCK_TYPE**: `BODY_IMAGE`=`"bodyImage"`, `ASIDE`=`"aside"`, `LINK_REF`=`"linkRef"`, `COOKIE_PREFERENCES_LINK`=`"cookiePreferencesLink"`, `COOKIE_LIST`=`"cookieList"`, `EXPANDABLE_SECTION`=`"expandableSection"`, `TABLE`=`"table"`
 
-### `@blog/config/constants` — `packages/config/src/constants/preset.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/preset.ts`
 
 - **PRESET_ID**: `CONSOLE`, `EDITORIAL`
 - **FONT_CHOICE**: `SPACE_GROTESK`, `NEWSREADER`, `JETBRAINS_MONO`, `FRAUNCES`, `INTER`
@@ -241,28 +241,28 @@ Every key/value const an agent should reuse before writing a literal. The
 - **DENSITY**: `DEFAULT`, `COMPACT`
 - **LANGUAGE_SWITCHER_STYLE**: `MENU_CODE`, `MENU_GLOBE`, `CODES`
 
-### `@blog/config/constants` — `packages/config/src/constants/price-period.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/price-period.ts`
 
 - **PRICE_PERIOD**: `ONE_TIME`, `HOUR`, `SESSION`, `MONTH`, `YEAR`
 
-### `@blog/config/constants` — `packages/config/src/constants/redirect.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/redirect.ts`
 
 - **REDIRECT_STATUS**: `PERMANENT`, `TEMPORARY`
 
-### `@blog/config/constants` — `packages/config/src/constants/release.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/release.ts`
 
 - **RELEASE_CHANGE**: `RENDERING`, `DB_MIGRATION`, `SANITY_MIGRATION`, `ENV`
 - **CONTRAST_CHECK_OUTCOME**: `PASS`, `FAIL`
 
-### `@blog/config/constants` — `packages/config/src/constants/sanity-document-action.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/sanity-document-action.ts`
 
 - **SANITY_DOCUMENT_ACTION**: `PUBLISH`=`"publish"`, `DISCARD_CHANGES`=`"discardChanges"`, `UNPUBLISH`=`"unpublish"`, `DUPLICATE`=`"duplicate"`, `DELETE`=`"delete"`
 
-### `@blog/config/constants` — `packages/config/src/constants/sanity-perspective.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/sanity-perspective.ts`
 
 - **SANITY_PERSPECTIVE**: `PUBLISHED`=`"published"`, `DRAFTS`=`"drafts"`
 
-### `@blog/config/constants` — `packages/config/src/constants/sanity-project.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/sanity-project.ts`
 
 - **SANITY_PROJECT_DELETE_OUTCOME**: `DELETED`, `ALREADY_GONE`, `BLOCKED_BY_BILLING_PERMISSION`
 - **SANITY_PROJECT_ARCHIVE_OUTCOME**: `ARCHIVED`, `ALREADY_ARCHIVED`, `ALREADY_GONE`
@@ -276,60 +276,60 @@ Every key/value const an agent should reuse before writing a literal. The
 - **TENANT_DELETE_SANITY_PROJECT_OUTCOME**: `DELETED`, `ALREADY_GONE`, `LEFT_ARCHIVED`, `NO_PROJECT`, `SKIPPED_NO_TOKEN`
 - **TENANT_DELETE_OUTCOME**: `DELETED`, `NOT_ARCHIVED`, `NOT_FOUND`
 
-### `@blog/config/constants` — `packages/config/src/constants/sanity-webhook-operation.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/sanity-webhook-operation.ts`
 
 - **SANITY_WEBHOOK_OPERATION**: `CREATE`=`"create"`, `UPDATE`=`"update"`, `DELETE`=`"delete"`
 
-### `@blog/config/constants` — `packages/config/src/constants/site-type.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/site-type.ts`
 
 - **SITE_TYPE**: `BLOG`, `PORTFOLIO`, `PERSONAL`, `DOCS`, `BLANK`, `BUSINESS`, `PRODUCT`
 
-### `@blog/config/constants` — `packages/config/src/constants/size.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/size.ts`
 
 - **SIZE**: `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`
 
-### `@blog/config/constants` — `packages/config/src/constants/sort.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/sort.ts`
 
 - **SORT_DIRECTION**: `ASCENDING`=`"ascending"`, `DESCENDING`=`"descending"`
 
-### `@blog/config/constants` — `packages/config/src/constants/subscriber-outcome.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/subscriber-outcome.ts`
 
 - **SUBSCRIBER_OUTCOME**: `ALREADY_PENDING`, `ALREADY_CONFIRMED`, `PENDING`, `NOT_PENDING`, `NOT_SUBSCRIBED`
 
-### `@blog/config/constants` — `packages/config/src/constants/taxonomy.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/taxonomy.ts`
 
 - **TAXONOMY_KIND**: `TOPICS`, `TAGS`
 - **TAXONOMY_SORT**: `ALPHABETICAL`, `MOST_POSTS`
 
-### `@blog/config/constants` — `packages/config/src/constants/tenant-plan.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/tenant-plan.ts`
 
 - **TENANT_PLAN**: `FREE`, `STARTER`, `GROWTH`
 
-### `@blog/config/constants` — `packages/config/src/constants/tenant-sort.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/tenant-sort.ts`
 
 - **TENANT_SORT_COLUMN**: `NAME`, `PLAN`, `STATUS`, `CREATED`
 
-### `@blog/config/constants` — `packages/config/src/constants/tenant-write-refusal.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/tenant-write-refusal.ts`
 
 - **TENANT_WRITE_REFUSAL**: `UNRESOLVED`, `INACTIVE`
 
-### `@blog/config/constants` — `packages/config/src/constants/timeline.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/timeline.ts`
 
 - **TIMELINE_MARKER_STYLE**: `NUMBERED`, `LABELLED`
 - **TIMELINE_ORIENTATION**: `VERTICAL`, `HORIZONTAL`
 
-### `@blog/config/constants` — `packages/config/src/constants/toast.ts`
+### `@shinefold/config/constants` — `packages/config/src/constants/toast.ts`
 
 - **TOAST_TYPE**: `SUCCESS`, `INFO`, `WARNING`, `ERROR`
 
 ## db
 
-### `@blog/db/constants` — `packages/db/src/constants/admin.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/admin.ts`
 
 - **ADMIN_ROLE**: `SUPERADMIN`, `ADMIN`, `MODERATOR`
 - **GRANTED_VIA**: `BREAK_GLASS`, `PROMOTION`
 
-### `@blog/db/constants` — `packages/db/src/constants/billing.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/billing.ts`
 
 - **BILLING_CURRENCY**: `USD`, `EUR`, `GBP`
 - **STRIPE_COUPON_DURATION**: `ONCE`, `REPEATING`, `FOREVER`
@@ -338,57 +338,57 @@ Every key/value const an agent should reuse before writing a literal. The
 - **STRIPE_TENANT_LOOKUP_OUTCOME**: `FOUND`, `NOT_FOUND`, `CONFLICT`
 - **TENANT_PLAN_WRITE_OUTCOME**: `WRITTEN`, `NOT_WRITABLE`, `NOT_FOUND`
 
-### `@blog/db/constants` — `packages/db/src/constants/blocked-signup-identity.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/blocked-signup-identity.ts`
 
 - **BLOCKED_IDENTITY_KIND**: `ADDRESS`, `DOMAIN`
 
-### `@blog/db/constants` — `packages/db/src/constants/downgrade-grace.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/downgrade-grace.ts`
 
 - **GRACE_EMAIL**: `STARTED`, `HALFWAY`, `ENDING`
 
-### `@blog/db/constants` — `packages/db/src/constants/email-usage.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/email-usage.ts`
 
 - **EMAIL_DELIVERY_OUTCOME**: `DELIVERED`, `BOUNCED`, `COMPLAINED`
 - **EMAIL_REPUTATION_LEVEL**: `OK`, `WARN`, `SLOW`, `STOP`
 
-### `@blog/db/constants` — `packages/db/src/constants/membership.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/membership.ts`
 
 - **MEMBERSHIP_ROLE**: `OWNER`, `EDITOR`, `READER`
 - **MEMBERSHIP_INVITE_OUTCOME**: `CREATED`, `ALREADY_PENDING`, `ALREADY_CONSUMED`, `SEAT_LIMIT`
 
-### `@blog/db/constants` — `packages/db/src/constants/newsletter.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/newsletter.ts`
 
 - **NEWSLETTER_POST_SEND_OUTCOME**: `SENT`, `SKIPPED`
 - **NEWSLETTER_SKIP_REASON**: `OVER_SUBSCRIBER_BAND`, `OVER_MONTHLY_ALLOWANCE`, `REPUTATION_STOP`, `SITE_PAUSED`
 - **NEWSLETTER_LIMIT_NOTICE_KIND**: `SUBSCRIBER_BAND_NEAR`, `MONTHLY_ALLOWANCE_NEAR`, `SENDING_PAUSED`
 
-### `@blog/db/constants` — `packages/db/src/constants/row-lock.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/row-lock.ts`
 
 - **ROW_LOCK**: `UPDATE`=`"update"`
 
-### `@blog/db/constants` — `packages/db/src/constants/site-config-saved-at.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/site-config-saved-at.ts`
 
 - **SITE_CONFIG_SAVED_AT**: `LOOK`, `VOICE`
 
-### `@blog/db/constants` — `packages/db/src/constants/subscriber.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/subscriber.ts`
 
 - **SUBSCRIBER_STATUS**: `PENDING`, `ACTIVE`
 
-### `@blog/db/constants` — `packages/db/src/constants/tenant-deprovisioning.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/tenant-deprovisioning.ts`
 
 - **DEPROVISIONING_STEP**: `REMOVE_DOMAIN`, `REVOKE_SANITY_TOKENS`, `ARCHIVE_SANITY_PROJECT`, `CLEAR_ARTIFACTS`, `ARCHIVE_TENANT`, `PURGE_READER_DATA`, `INVALIDATE_TENANT_CACHE`
 
-### `@blog/db/constants` — `packages/db/src/constants/tenant-inactivity.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/tenant-inactivity.ts`
 
 - **INACTIVITY_STAGE**: `SUSPENSION_WARNING`, `SUSPENSION`, `DELETION_NOTICE`, `DEPROVISIONING`
 - **SUSPENSION_REASON**: `INACTIVITY`, `OPERATOR`
 
-### `@blog/db/constants` — `packages/db/src/constants/tenant-owner-access.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/tenant-owner-access.ts`
 
 - **SANITY_PROJECT_ROLE**: `VIEWER`, `EDITOR`, `ADMINISTRATOR`
 - **TENANT_OWNER_EMAIL**: `INVITE_HEADS_UP`, `INVITE_NUDGE`, `SITE_READY`
 
-### `@blog/db/constants` — `packages/db/src/constants/tenant-provisioning.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/tenant-provisioning.ts`
 
 - **TENANT_PROVISIONING_STATUS**: `PENDING`, `PROVISIONING`, `READY`, `FAILED`
 - **TENANT_PROVISIONING_STEP**: `SANITY_PROJECT`, `SEED_CONTENT`, `PERSIST_TOKEN`, `MAP_DOMAIN`, `CREATE_WEBHOOK`, `VERIFY_CONTENT`, `OWNER_ELEVATION`
@@ -397,11 +397,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **PROVISIONING_STATE**: `SUCCEEDED`
 - **ELEVATE_TENANT_OWNER_OUTCOME**: `ELEVATED`, `ALREADY_ADMINISTRATOR`, `PENDING_ACCEPTANCE`, `STALLED`, `AMBIGUOUS_MEMBERSHIP`
 
-### `@blog/db/constants` — `packages/db/src/constants/tenant-suspension.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/tenant-suspension.ts`
 
 - **SUSPENSION_CATEGORY**: `ABUSE`, `ILLEGAL_CONTENT`, `TERMS_VIOLATION`, `OTHER`
 
-### `@blog/db/constants` — `packages/db/src/constants/tenant.ts`
+### `@shinefold/db/constants` — `packages/db/src/constants/tenant.ts`
 
 - **TENANT_STATUS**: `ACTIVE`, `SUSPENDED`, `ARCHIVED`, `TRIAL`, `PAST_DUE`
 - **TENANT_DETAILS_UPDATE_OUTCOME**: `UPDATED`, `DOMAIN_TAKEN`, `DOMAIN_LOCKED`, `DOMAIN_INVALID`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_EMAIL_TAKEN`, `OWNS_FREE_TENANT`

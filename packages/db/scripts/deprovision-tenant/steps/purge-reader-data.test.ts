@@ -1,9 +1,10 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
-import { insertAuditEvent } from '@blog/db/queries/audit-events';
+import { faker } from '@faker-js/faker';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@shinefold/config/constants';
+import { insertAuditEvent } from '@shinefold/db/queries/audit-events';
 import {
   countTenantReaderData,
   purgeTenantReaderData as purgeReaderDataRows,
-} from '@blog/db/queries/reader-data';
+} from '@shinefold/db/queries/reader-data';
 import {
   MOCK_DEPROVISION_AUDIT_ACTOR,
   MOCK_DEPROVISION_AUDIT_DETAILS,
@@ -11,14 +12,13 @@ import {
   MOCK_DEPROVISION_ENV,
   MOCK_DEPROVISIONED_AT,
   MOCK_PURGED_READER_DATA_COUNTS,
-} from '@blog/db/testing/deprovision-tenant/fixtures';
-import { mockTenant } from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/deprovision-tenant/fixtures';
+import { mockTenant } from '@shinefold/db/testing/tenants/fixtures';
 
 import { purgeTenantReaderData } from './purge-reader-data';
 
-vi.mock('@blog/db/queries/reader-data');
-vi.mock('@blog/db/queries/audit-events');
+vi.mock('@shinefold/db/queries/reader-data');
+vi.mock('@shinefold/db/queries/audit-events');
 
 faker.seed(5765);
 

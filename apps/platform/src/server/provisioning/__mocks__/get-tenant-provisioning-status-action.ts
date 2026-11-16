@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TTenantProvisioningStatusResult } from '@blog/db/queries/tenants/get-tenant-provisioning-status';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TTenantProvisioningStatusResult } from '@shinefold/db/queries/tenants/get-tenant-provisioning-status';
 
 export const getTenantProvisioningStatusAction = vi.fn<
   (

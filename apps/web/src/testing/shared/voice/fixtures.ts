@@ -1,4 +1,4 @@
-import type { TVoicePortableText } from '@blog/config';
+import type { TVoicePortableText } from '@shinefold/config';
 import { MOCK_PARAGRAPH_STYLE } from '@web/testing/shared/portable-text/fixtures';
 
 const BLOCK_KEY = 'b1';

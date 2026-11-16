@@ -1,7 +1,7 @@
-import { BRAND_VARIANT, DISPLAY_MODE, POST_SOURCE } from '@blog/config';
-import type { TRawPostFeaturedModule } from '@blog/service/features/modules/post-featured/adaptor/transformer';
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { mockRawModuleAppearance } from '@blog/service/testing/shared/module-appearance';
+import { BRAND_VARIANT, DISPLAY_MODE, POST_SOURCE } from '@shinefold/config';
+import type { TRawPostFeaturedModule } from '@shinefold/service/features/modules/post-featured/adaptor/transformer';
+import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 export function mockRawPostFeaturedModule(
   overrides: Partial<TRawPostFeaturedModule> = {},

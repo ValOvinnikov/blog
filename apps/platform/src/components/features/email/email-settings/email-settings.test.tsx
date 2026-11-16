@@ -1,4 +1,3 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import en from '@platform/i18n/messages/en.json';
 import { ARIA_SELECTED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
@@ -36,6 +35,7 @@ import {
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
+import { EMAIL_TEMPLATE_TYPE } from '@shinefold/config';
 import type { UserEvent } from '@testing-library/user-event';
 
 import { EmailSettings } from './email-settings';

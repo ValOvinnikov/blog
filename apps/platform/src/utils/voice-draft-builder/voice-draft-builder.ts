@@ -1,12 +1,3 @@
-import {
-  portableTextToPlainText,
-  VOICE_FIELD_KIND,
-  VOICE_FIELDS,
-  type TMaybeUndefined,
-  type TVoicePortableText,
-} from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { hasLength, isString } from '@blog/utils/primitives';
 import { withoutDefaultCopy } from '@platform/utils/voice-default-copy/voice-default-copy';
 import {
   voiceDefaultText,
@@ -16,6 +7,15 @@ import {
   type TVoiceLocaleDraft,
 } from '@platform/utils/voice-draft/voice-draft';
 import { voiceTextToPortableText } from '@platform/utils/voice-portable-text/voice-portable-text';
+import {
+  portableTextToPlainText,
+  VOICE_FIELD_KIND,
+  VOICE_FIELDS,
+  type TMaybeUndefined,
+  type TVoicePortableText,
+} from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { hasLength, isString } from '@shinefold/utils/primitives';
 
 type TStoredVoiceOverrides = Partial<
   Record<TLocaleIsoCode, Partial<Record<string, unknown>>>

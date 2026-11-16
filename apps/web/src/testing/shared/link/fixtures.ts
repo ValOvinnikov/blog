@@ -1,4 +1,4 @@
-import { routes, type ILink } from '@blog/config';
+import { routes, type ILink } from '@shinefold/config';
 import { createMockFaker } from '@web/testing/mock-faker';
 
 const mockFaker = createMockFaker(61057);

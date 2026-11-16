@@ -1,7 +1,5 @@
 'use server';
 
-import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -21,6 +19,12 @@ import {
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+} from '@shinefold/config';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { put } from '@vercel/blob';
 
 // `kind` is re-validated although the client only sends one of two literals: a Server Action is a public endpoint.

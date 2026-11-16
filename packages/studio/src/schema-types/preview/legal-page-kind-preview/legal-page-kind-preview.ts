@@ -1,8 +1,11 @@
-import type { TLegalPageKind, TLocaleIsoCode } from '@blog/config/constants';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
-import { LEGAL_PAGE_KIND_FIELD } from '@blog/studio/schema-types/validation/validate-unique-legal-page-kind/validate-unique-legal-page-kind';
-import { toTitleCase } from '@blog/utils/primitives';
+import type {
+  TLegalPageKind,
+  TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
+import { LOCALE_LABEL } from '@shinefold/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { LEGAL_PAGE_KIND_FIELD } from '@shinefold/studio/schema-types/validation/validate-unique-legal-page-kind/validate-unique-legal-page-kind';
+import { toTitleCase } from '@shinefold/utils/primitives';
 
 export const legalPageKindPreview = {
   select: {

@@ -1,5 +1,11 @@
-import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config/constants';
-import type { TLandingPage, TLandingSectionNavigation } from '@blog/service';
+import {
+  LOCALE_ISO_CODES,
+  CONTENT_ALIGNMENT,
+} from '@shinefold/config/constants';
+import type {
+  TLandingPage,
+  TLandingSectionNavigation,
+} from '@shinefold/service';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 

@@ -2,11 +2,11 @@ import {
   NEWSLETTER_VARIANT,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   newsletterSignupVariants,
   type TNewsletterSignupVariants,
-} from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+} from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
 import type { ReactNode } from 'react';
 
 export type TNewsletterSignupCompactProps = IWithClassName &

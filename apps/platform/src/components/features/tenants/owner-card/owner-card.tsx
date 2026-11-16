@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { formatDate } from '@platform/utils/format-date/format-date';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import type { TTenantOwnerMembership } from '@shinefold/db/queries/memberships';
 import { useLocale, useTranslations } from 'next-intl';
 
 export type TOwnerCardProps = {

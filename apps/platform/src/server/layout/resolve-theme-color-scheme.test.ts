@@ -1,7 +1,7 @@
-import { COLOR_SCHEME } from '@blog/config';
 import { THEME_PREFERENCE } from '@platform/constants/theme';
 import { mockCookies } from '@platform/testing/mock-cookies';
 import { THEME_PREFERENCE_COOKIE } from '@platform/utils/theme-preference-cookie/theme-preference-cookie';
+import { COLOR_SCHEME } from '@shinefold/config';
 
 import { resolveThemeColorScheme } from './resolve-theme-color-scheme';
 

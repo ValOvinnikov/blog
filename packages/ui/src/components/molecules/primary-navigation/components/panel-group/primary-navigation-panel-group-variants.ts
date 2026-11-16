@@ -1,5 +1,5 @@
-import { PANEL_LINK } from '@blog/ui/components/molecules/primary-navigation/primary-navigation-variants';
-import { tv } from '@blog/ui/lib/styling';
+import { PANEL_LINK } from '@shinefold/ui/components/molecules/primary-navigation/primary-navigation-variants';
+import { tv } from '@shinefold/ui/lib/styling';
 
 export const primaryNavigationPanelGroupVariants = tv({
   slots: {

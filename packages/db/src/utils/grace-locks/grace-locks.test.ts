@@ -1,8 +1,8 @@
-import { countMembershipsOverSeats } from '@blog/db/queries/memberships';
+import { countMembershipsOverSeats } from '@shinefold/db/queries/memberships';
 
 import { findGraceLocks, findSubdomain, hasGraceLocks } from './grace-locks';
 
-vi.mock('@blog/db/queries/memberships', () => ({
+vi.mock('@shinefold/db/queries/memberships', () => ({
   countMembershipsOverSeats: vi.fn(),
 }));
 

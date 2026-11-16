@@ -1,5 +1,8 @@
-import { WRITABLE_TENANT_STATUSES, TENANT_STATUS } from '@blog/db/constants';
-import { MOCK_DEPROVISIONED_AT } from '@blog/db/testing/tenants/fixtures';
+import {
+  WRITABLE_TENANT_STATUSES,
+  TENANT_STATUS,
+} from '@shinefold/db/constants';
+import { MOCK_DEPROVISIONED_AT } from '@shinefold/db/testing/tenants/fixtures';
 
 import { isTenantWritable } from './is-tenant-writable';
 

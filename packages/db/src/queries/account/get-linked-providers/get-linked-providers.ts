@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { accounts, users } from '@blog/db/schema/auth';
+import { getDb } from '@shinefold/db/client';
+import { accounts, users } from '@shinefold/db/schema/auth';
 import { eq } from 'drizzle-orm';
 
 // The `/account` hub's "connected accounts" section needs the linked

@@ -1,5 +1,5 @@
-import { getDb } from '@blog/db/client';
-import { subscribers } from '@blog/db/schema/subscribers';
+import { getDb } from '@shinefold/db/client';
+import { subscribers } from '@shinefold/db/schema/subscribers';
 import { eq } from 'drizzle-orm';
 
 export async function countSubscribersForTenant(

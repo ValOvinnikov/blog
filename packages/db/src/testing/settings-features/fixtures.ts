@@ -1,4 +1,4 @@
-import type * as schema from '@blog/db/schema';
+import type * as schema from '@shinefold/db/schema';
 
 export function mockSettingsFeaturesToggles(
   overrides: Partial<typeof schema.settingsFeatures.$inferInsert> = {},

@@ -1,5 +1,10 @@
-import { CARD_STYLE, DENSITY, GRID_COLUMNS, RADIUS_SCALE } from '@blog/config';
-import type { TRawModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
+import {
+  CARD_STYLE,
+  DENSITY,
+  GRID_COLUMNS,
+  RADIUS_SCALE,
+} from '@shinefold/config';
+import type { TRawModuleAppearance } from '@shinefold/service/shared/transformers/module/to-module-appearance';
 
 export function mockRawModuleAppearance(
   overrides: Partial<TRawModuleAppearance> = {},

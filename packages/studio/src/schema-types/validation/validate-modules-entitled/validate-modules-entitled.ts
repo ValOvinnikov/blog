@@ -1,13 +1,13 @@
 import {
   getMissingModulePack,
   getModulePackOffMessage,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
-import { getEntitledModulePacks } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
+} from '@shinefold/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { getEntitledModulePacks } from '@shinefold/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import {
   modulePath,
   type TModuleReference,
-} from '@blog/studio/schema-types/validation/module-path/module-path';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/validation/module-path/module-path';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 
 export const validateModulesEntitled = (modules: unknown) => {
   const entitledModulePacks = getEntitledModulePacks();

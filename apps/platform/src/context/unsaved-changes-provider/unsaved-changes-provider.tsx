@@ -1,11 +1,11 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { useRouter } from '@platform/i18n/base-navigation';
 import {
   formatLanguageChanges,
   type TLanguageChangeCount,
 } from '@platform/utils/format-language-changes/format-language-changes';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import {
   createContext,

@@ -1,6 +1,6 @@
-import { getReferencingModuleIds } from '@blog/service/features/entities/modules/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getReferencingModuleIds } from '@shinefold/service/features/entities/modules/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createModulesService() {
   return {

@@ -2,7 +2,7 @@ import {
   GRID_COLUMNS,
   type TGridColumns,
   type TMaybeUndefined,
-} from '@blog/config';
+} from '@shinefold/config';
 
 const CARD_GRID_COLUMN_COUNT: Record<TGridColumns, 2 | 3 | 4> = {
   [GRID_COLUMNS.TWO]: 2,

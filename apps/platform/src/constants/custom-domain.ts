@@ -1,5 +1,5 @@
-import type { TValueOf } from '@blog/config/utils';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const CUSTOM_DOMAIN_FIELD_ERROR = {
   DOMAIN_INVALID: TENANT_FIELD_ERROR.DOMAIN_INVALID,

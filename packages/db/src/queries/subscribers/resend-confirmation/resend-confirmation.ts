@@ -1,8 +1,8 @@
-import { SUBSCRIBER_OUTCOME, type TOutcome } from '@blog/config';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import { findUserSubscriber } from '@blog/db/queries/subscribers/user-subscriber';
-import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
-import { toOutcome } from '@blog/utils/to-outcome';
+import { SUBSCRIBER_OUTCOME, type TOutcome } from '@shinefold/config';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import { findUserSubscriber } from '@shinefold/db/queries/subscribers/user-subscriber';
+import { mintConfirmationToken } from '@shinefold/db/utils/subscriber-tokens/subscriber-tokens';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 export type TResendConfirmationResult =
   | (TOutcome<typeof SUBSCRIBER_OUTCOME.PENDING> & {

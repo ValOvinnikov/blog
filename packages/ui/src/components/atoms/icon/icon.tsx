@@ -1,4 +1,8 @@
-import type { IWithClassName, IWithDataTestId, TIconName } from '@blog/config';
+import type {
+  IWithClassName,
+  IWithDataTestId,
+  TIconName,
+} from '@shinefold/config';
 import type { AriaAttributes } from 'react';
 
 import { ICON_REGISTRY } from './icon-registry';

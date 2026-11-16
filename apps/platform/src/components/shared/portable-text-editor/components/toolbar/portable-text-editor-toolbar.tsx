@@ -1,10 +1,10 @@
 'use client';
 
 import { Toolbar } from '@base-ui/react/toolbar';
-import { ICONS, SIZE } from '@blog/config';
 import type { TPortableTextEditorSize } from '@platform/components/shared/portable-text-editor/portable-text-editor-variants';
 import { Tooltip } from '@platform/components/shared/tooltip';
 import type { SchemaDefinition } from '@portabletext/editor';
+import { ICONS, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 

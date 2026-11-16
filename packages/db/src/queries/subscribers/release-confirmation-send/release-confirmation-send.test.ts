@@ -1,15 +1,15 @@
-import * as schema from '@blog/db/schema';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { readTestSubscriber } from '@blog/db/testing/subscribers/fixtures';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { readTestSubscriber } from '@shinefold/db/testing/subscribers/fixtures';
 
 import { releaseConfirmationSend } from './release-confirmation-send';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const MOCK_CLAIMED_AT = new Date('2026-10-15T10:00:00.000Z');
 const MOCK_NEWER_CLAIMED_AT = new Date('2026-10-15T10:20:00.000Z');

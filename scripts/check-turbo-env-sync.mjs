@@ -7,9 +7,9 @@
 //
 // Which env.ts files feed which app's declared-vars set is based on each
 // app's actual package.json dependencies, not a guess: `apps/web` depends on
-// `@blog/service` (Sanity), `@blog/db` and `@blog/auth` (Postgres/session);
-// `apps/platform` depends on `@blog/db` and `@blog/auth` but never
-// `@blog/service` (it never talks to Sanity). See APPS below.
+// `@shinefold/service` (Sanity), `@shinefold/db` and `@shinefold/auth` (Postgres/session);
+// `apps/platform` depends on `@shinefold/db` and `@shinefold/auth` but never
+// `@shinefold/service` (it never talks to Sanity). See APPS below.
 //
 // A var legitimately read only inside a runtime request/Server Action code
 // path — one `next build`'s "collecting page data" phase never evaluates —

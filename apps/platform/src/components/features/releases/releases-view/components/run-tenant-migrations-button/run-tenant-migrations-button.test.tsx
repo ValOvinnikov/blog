@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import {
   MIGRATION_ENVIRONMENT,
   RELEASE_REFUSAL,
@@ -9,6 +8,7 @@ import {
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { RunTenantMigrationsButton } from './run-tenant-migrations-button';

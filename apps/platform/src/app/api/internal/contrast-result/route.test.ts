@@ -1,14 +1,14 @@
-import {
-  CONTRAST_CHECK_OUTCOME,
-  HTTP_METHOD,
-  HTTP_STATUS,
-} from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { CONTRAST_RESULT_LOG } from '@platform/constants/contrast-result';
 import { MOCK_BEARER_SECRET } from '@platform/testing/internal-api/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  CONTRAST_CHECK_OUTCOME,
+  HTTP_METHOD,
+  HTTP_STATUS,
+} from '@shinefold/config/constants';
 
 import { POST } from './route';
 
@@ -20,7 +20,7 @@ const { recordContrastResultMock } = vi.hoisted(() => ({
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     findings: { recordContrastResult: recordContrastResultMock },

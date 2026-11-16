@@ -1,7 +1,7 @@
-import { buildStarterCookieStatement } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import { getTenantSanityWriteCredentials } from '@blog/db/queries/tenants';
+import { buildStarterCookieStatement } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { getTenantSanityWriteCredentials } from '@shinefold/db/queries/tenants';
 import { COOKIE_STATEMENT_LOG } from '@worker/constants/cookie-statement';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
@@ -16,7 +16,7 @@ import { createClientWithTimeout } from '@worker/utils/step-deps/step-deps';
 
 import { ensureCookieStatementsSeeded } from './ensure-cookie-statements-seeded';
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/step-deps/step-deps');
 vi.mock('workflow');
 

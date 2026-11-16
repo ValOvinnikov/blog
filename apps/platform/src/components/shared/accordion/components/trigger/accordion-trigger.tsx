@@ -1,5 +1,4 @@
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
-import { ICONS } from '@blog/config';
 import { useAccordionItem } from '@platform/components/shared/accordion/accordion-context';
 import { accordionVariants } from '@platform/components/shared/accordion/accordion-variants';
 import { AccordionRowLabel } from '@platform/components/shared/accordion/components/row-label/accordion-row-label';
@@ -10,6 +9,7 @@ import {
 import { Icon } from '@platform/components/shared/icon';
 import { ACCORDION_VARIANT } from '@platform/constants/accordion';
 import { ICON_SIZE } from '@platform/constants/icon';
+import { ICONS } from '@shinefold/config';
 import type { AriaAttributes, ReactNode } from 'react';
 
 export type TAccordionTriggerProps = {

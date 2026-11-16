@@ -5,7 +5,7 @@ import {
   DISPLAY_MODE,
   GRID_COLUMNS,
   ICONS,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockFeatureListItem } from '@web/testing/modules/feature-list/fixtures';

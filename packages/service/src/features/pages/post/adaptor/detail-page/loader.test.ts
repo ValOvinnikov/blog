@@ -1,43 +1,46 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { IMAGE_LAYOUT, PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import {
+  IMAGE_LAYOUT,
+  PORTABLE_TEXT_BLOCK_TYPE,
+} from '@shinefold/config/constants';
 import {
   MOCK_SKIM_MODEL,
   MOCK_SKIM_TAKEAWAYS,
-} from '@blog/service/testing/editorial/fixtures';
+} from '@shinefold/service/testing/editorial/fixtures';
 import {
   MOCK_TAG_ID,
   MOCK_TAG_SLUG,
   MOCK_TAG_TITLE,
   mockRawTag,
-} from '@blog/service/testing/entities/fixtures';
-import { mockRun } from '@blog/service/testing/mock-run-query';
-import { MOCK_NEWSLETTER_MODULE_ID } from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { MOCK_NEWSLETTER_MODULE_ID } from '@shinefold/service/testing/modules/fixtures';
 import {
   mockRawAuthor,
   mockRawPostDetail,
-} from '@blog/service/testing/pages/fixtures';
+} from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_AUTHOR_CACHE_TAG,
   MOCK_LINK_TARGET_CACHE_TAGS,
   MOCK_PAGE_POST_CACHE_TAG,
   MOCK_TAG_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
-} from '@blog/service/testing/sanity/query/cache-tags';
+} from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_POST_SLUG,
   mockRawBodyImageBlock,
   mockRawHeadingBlock,
   mockRawSeo,
   mockSanityImageView,
-} from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { getPost } from './loader';
 import { postPageQuery } from './query';
 import type { TRawPostDetail } from './transformer';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
 faker.seed(6015);
 

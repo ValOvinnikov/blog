@@ -1,5 +1,5 @@
-import { queries } from '@blog/db';
-import type { TUser } from '@blog/db/schema/auth';
+import { queries } from '@shinefold/db';
+import type { TUser } from '@shinefold/db/schema/auth';
 import type { Adapter, AdapterUser } from 'next-auth/adapters';
 
 type TStoredUser = Omit<AdapterUser, 'email'> & {

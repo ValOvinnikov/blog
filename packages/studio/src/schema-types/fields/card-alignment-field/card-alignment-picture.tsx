@@ -1,11 +1,11 @@
-import type { TContentAlignment } from '@blog/config/constants';
-import { alignedRowX } from '@blog/studio/schema-types/fields/alignment-fields/alignment-picture';
+import type { TContentAlignment } from '@shinefold/config/constants';
+import { alignedRowX } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-picture';
 import {
   FAINT,
   FrameRect,
   PictureFrame,
   TEXT_LINE_HEIGHT,
-} from '@blog/studio/schema-types/inputs/option-tiles-input/picture-frame';
+} from '@shinefold/studio/schema-types/inputs/option-tiles-input/picture-frame';
 
 const PADDING = 4;
 

@@ -1,5 +1,5 @@
-import { BRAND_VARIANT, PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
-import type { TFaqModule, TFaqQuestion } from '@blog/service';
+import { BRAND_VARIANT, PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
+import type { TFaqModule, TFaqQuestion } from '@shinefold/service';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   mockPortableTextBlock,

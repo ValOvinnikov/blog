@@ -3,13 +3,13 @@ import {
   type ILink,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { Button } from '@blog/ui/components/atoms/button';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { Text } from '@blog/ui/components/atoms/text';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import type { THeadingLevel } from '@blog/ui/lib/react';
+} from '@shinefold/config';
+import type { TAnchorElementType } from '@shinefold/config/react';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { Text } from '@shinefold/ui/components/atoms/text';
+import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import type { THeadingLevel } from '@shinefold/ui/lib/react';
 
 import { consentBannerVariants } from './consent-banner-variants';
 

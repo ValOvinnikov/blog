@@ -1,9 +1,9 @@
-import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
-import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { notFound, redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -11,7 +11,7 @@ import { requireAdmin } from './require-admin';
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@blog/db', async () => {
+vi.mock('@shinefold/db', async () => {
   const { mockDbConstants } =
     await import('@platform/testing/mock-db-constants');
 

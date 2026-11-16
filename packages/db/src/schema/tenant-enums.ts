@@ -2,8 +2,8 @@ import {
   LOCALE_ISO_CODES,
   SITE_TYPE,
   TENANT_PLAN,
-} from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
+} from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 import { pgEnum } from 'drizzle-orm/pg-core';
 
 export const tenantPlanEnum = pgEnum('tenant_plan', TENANT_PLAN);

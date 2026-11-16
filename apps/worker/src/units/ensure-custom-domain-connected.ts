@@ -1,5 +1,5 @@
-import { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
-import { sanitizeLogMessage } from '@blog/insight';
+import { getTenantByDomain } from '@shinefold/db/queries/tenant-domains/get-tenant-by-domain';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { CUSTOM_DOMAIN_LOG } from '@worker/constants/custom-domain';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { mapTenantDomain } from '@worker/steps/map-domain';

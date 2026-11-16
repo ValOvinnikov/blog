@@ -1,4 +1,4 @@
-import { AUTH_APP, type TAuthApp } from '@blog/config/constants';
+import { AUTH_APP, type TAuthApp } from '@shinefold/config/constants';
 import {
   integer,
   pgTable,
@@ -15,7 +15,7 @@ export const users = pgTable(
     id: text('id')
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    // Kept null by @blog/auth's withEncryptedUsers.
+    // Kept null by @shinefold/auth's withEncryptedUsers.
     name: text('name'),
     email: text('email').unique(),
     nameEncrypted: text('nameEncrypted'),

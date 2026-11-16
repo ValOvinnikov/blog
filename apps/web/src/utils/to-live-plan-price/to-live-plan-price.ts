@@ -2,15 +2,15 @@ import {
   PRICE_PERIOD,
   type TMaybeUndefined,
   type TPricePeriod,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   BILLING_CURRENCY,
   PLAN_PRICE_LOOKUP_KEYS,
   type TBillingCurrency,
-} from '@blog/db/constants';
-import type { TStripePrice } from '@blog/db/queries/stripe-catalogue/list-stripe-prices';
-import type { TPricingTier } from '@blog/service';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/constants';
+import type { TStripePrice } from '@shinefold/db/queries/stripe-catalogue/list-stripe-prices';
+import type { TPricingTier } from '@shinefold/service';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { isBillingCurrency } from '@web/utils/is-billing-currency';
 
 interface IPlanPriceAmount {

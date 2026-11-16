@@ -1,6 +1,6 @@
 'use client';
 
-import type { TMaybeNull, TNullable } from '@blog/config';
+import type { TMaybeNull, TNullable } from '@shinefold/config';
 import {
   createContext,
   useContext,

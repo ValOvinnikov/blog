@@ -1,4 +1,7 @@
-import { BUTTON_SHAPE_DECLARATIONS, type TButtonShape } from '@blog/config';
+import {
+  BUTTON_SHAPE_DECLARATIONS,
+  type TButtonShape,
+} from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 import { StyleVariants } from './style-variants';

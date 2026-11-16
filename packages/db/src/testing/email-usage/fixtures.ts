@@ -1,9 +1,9 @@
-import type { TEmailType } from '@blog/config/constants';
-import type { TEmailDeliveryOutcome } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import type { TTestDb } from '@blog/db/testing/fixtures';
-import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
-import { utcDay, utcDayDaysBefore } from '@blog/utils/date';
+import type { TEmailType } from '@shinefold/config/constants';
+import type { TEmailDeliveryOutcome } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import type { TTestDb } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
+import { utcDay, utcDayDaysBefore } from '@shinefold/utils/date';
 
 export const MOCK_TODAY = utcDay(MOCK_NOW);
 export const MOCK_LAST_MONTH_DAY = utcDayDaysBefore(MOCK_NOW, 31);

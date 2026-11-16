@@ -4,14 +4,14 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   type TBrandVariant,
-} from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { QUOTE_CARD_CAPTION_TEST_ID } from '@blog/ui/constants/quote-card';
+} from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { QUOTE_CARD_CAPTION_TEST_ID } from '@shinefold/ui/constants/quote-card';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '@blog/ui/lib/react';
+} from '@shinefold/ui/lib/react';
 import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { QuoteCardAvatar } from './components/avatar/quote-card-avatar';

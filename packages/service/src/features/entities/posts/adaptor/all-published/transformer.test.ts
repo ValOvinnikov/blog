@@ -2,12 +2,12 @@ import {
   mockFeedPostViews,
   mockRawFeedPost,
   mockRawFeedPosts,
-} from '@blog/service/testing/entities/fixtures';
+} from '@shinefold/service/testing/entities/fixtures';
 import {
   MOCK_POST_TITLE,
   mockRawHeadingBlock,
-} from '@blog/service/testing/shared/fixtures';
-import { MOCK_HERO_IMAGE_FIELD } from '@blog/service/testing/shared/translated-posts-dataset';
+} from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_HERO_IMAGE_FIELD } from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { toAllPublishedPosts } from './transformer';
 

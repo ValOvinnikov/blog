@@ -1,17 +1,17 @@
-import { entitledModuleFilter } from '@blog/studio/schema-types/filters/entitled-module';
-import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { entitledModuleFilter } from '@shinefold/studio/schema-types/filters/entitled-module';
+import { ctaSchema } from '@shinefold/studio/schema-types/modules/cta/cta';
+import { newsletterSchema } from '@shinefold/studio/schema-types/modules/newsletter/newsletter';
 import {
   modulePath,
   type TModuleReference,
-} from '@blog/studio/schema-types/validation/module-path/module-path';
-import { validateModulesEntitled } from '@blog/studio/schema-types/validation/validate-modules-entitled/validate-modules-entitled';
+} from '@shinefold/studio/schema-types/validation/module-path/module-path';
+import { validateModulesEntitled } from '@shinefold/studio/schema-types/validation/validate-modules-entitled/validate-modules-entitled';
 import {
   getModuleTitle,
   moduleInsertMenuGroups,
   sortModulesByKind,
-} from '@blog/studio/structure/module-kinds/module-kinds';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+} from '@shinefold/studio/structure/module-kinds/module-kinds';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { defineArrayMember, defineField } from 'sanity';
 
 const ONCE_ERROR = 'Only one module of this type is allowed per page.';

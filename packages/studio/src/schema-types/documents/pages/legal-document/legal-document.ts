@@ -1,8 +1,8 @@
-import { routes } from '@blog/config';
-import { LEGAL_DOCUMENT_KINDS } from '@blog/config/constants';
-import { PAGE_LEGAL_DOCUMENT_TYPE } from '@blog/studio/schema-types/documents/pages/legal-document/legal-document-type';
-import { sectionDocumentSchema } from '@blog/studio/schema-types/documents/pages/section-document/section-document';
-import { validateLegalDocumentSlug } from '@blog/studio/schema-types/validation/validate-legal-document-slug/validate-legal-document-slug';
+import { routes } from '@shinefold/config';
+import { LEGAL_DOCUMENT_KINDS } from '@shinefold/config/constants';
+import { PAGE_LEGAL_DOCUMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/legal-document/legal-document-type';
+import { sectionDocumentSchema } from '@shinefold/studio/schema-types/documents/pages/section-document/section-document';
+import { validateLegalDocumentSlug } from '@shinefold/studio/schema-types/validation/validate-legal-document-slug/validate-legal-document-slug';
 import { Scale } from 'lucide-react';
 
 export const legalDocumentPageSchema = sectionDocumentSchema({

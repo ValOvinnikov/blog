@@ -1,4 +1,4 @@
-import { okResult } from '@blog/utils';
+import { okResult } from '@shinefold/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';

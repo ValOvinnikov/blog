@@ -1,5 +1,5 @@
-import { MAGIC_LINK_REFUSAL } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { MAGIC_LINK_REFUSAL } from '@shinefold/config/constants';
 import { SIGN_IN_LOG } from '@web/constants/sign-in';
 import { logger } from '@web/utils/logger/logger';
 

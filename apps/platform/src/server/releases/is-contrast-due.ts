@@ -1,5 +1,5 @@
-import { RELEASE_CHANGE } from '@blog/config';
 import { CONTRAST_STATUS } from '@platform/constants/release';
+import { RELEASE_CHANGE } from '@shinefold/config';
 
 import { getCandidateComparison } from './get-candidate-comparison';
 import { resolveContrastStatus } from './resolve-contrast-status';

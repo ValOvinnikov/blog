@@ -1,4 +1,4 @@
-import { errorResult, okResult, type TResult } from '@blog/utils/result';
+import { errorResult, okResult, type TResult } from '@shinefold/utils/result';
 
 export function safeAsync<A extends unknown[], T>(
   fn: (...args: A) => Promise<T>,

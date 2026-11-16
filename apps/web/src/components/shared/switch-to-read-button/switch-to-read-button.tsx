@@ -1,7 +1,7 @@
 'use client';
 
-import { DEPTH } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
+import { DEPTH } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
 import { useDepth } from '@web/context/depth-provider';
 
 export interface ISwitchToReadButtonProps {

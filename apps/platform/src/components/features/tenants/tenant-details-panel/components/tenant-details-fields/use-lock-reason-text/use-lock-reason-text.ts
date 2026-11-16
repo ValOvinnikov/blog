@@ -1,8 +1,8 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
 import { TENANT_FIELD_LOCK_KIND } from '@platform/constants/tenant';
 import type { TTenantFieldLockReason } from '@platform/utils/tenant-field-locks/tenant-field-locks';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export const useLockReasonText = () => {

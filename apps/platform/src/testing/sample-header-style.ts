@@ -1,3 +1,4 @@
+import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
@@ -6,8 +7,7 @@ import {
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
   LANGUAGE_SWITCHER_STYLE,
-} from '@blog/config';
-import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
+} from '@shinefold/config';
 
 export const MOCK_SAMPLE_HEADER_STYLE: TSampleHeaderStyle = {
   layout: HEADER_LAYOUT.CLASSIC,

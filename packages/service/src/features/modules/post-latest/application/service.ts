@@ -1,6 +1,6 @@
-import { getPostLatest } from '@blog/service/features/modules/post-latest/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getPostLatest } from '@shinefold/service/features/modules/post-latest/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createPostLatestModuleService() {
   return {

@@ -45,11 +45,11 @@ an inline OG/Twitter object. Model a new one on `build-post-metadata.ts`.
 
 - **Never re-derive SEO in web** — no `seo?.metaTitle ?? title` chains, no
   `siteSettings` fetch "just for metadata". SEO image URLs come only from
-  `@blog/service`'s `urlForSanityImage` — `toMetadata` for `seo.ogImage`,
+  `@shinefold/service`'s `urlForSanityImage` — `toMetadata` for `seo.ogImage`,
   `buildBlogPostingSchema` for the post hero; never hand-build one.
 - **Error path:** a failed loader logs and returns `{}`; a missing document
   returns `{}`. Never hand-roll fallback metadata — the page 404s anyway.
-- **`href` is a locale-less `routes` path** from `@blog/config`.
+- **`href` is a locale-less `routes` path** from `@shinefold/config`.
   `toLocalizedPageMetadata` localizes the canonical and `og:url` and adds
   hreflang and `og:locale:alternate` for live translations — never prefix a
   locale yourself.

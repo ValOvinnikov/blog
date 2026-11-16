@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { getEmailConfig } from '@blog/db/queries/email-config/get-email-config';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships/get-tenant-owner-email';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { getEmailConfig } from '@shinefold/db/queries/email-config/get-email-config';
+import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships/get-tenant-owner-email';
 
 export async function getContactRecipient(
   tenantId: string,

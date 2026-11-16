@@ -1,5 +1,3 @@
-import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
 import { CenteredCardFrame } from '@platform/components/features/layout/centered-card-frame';
 import { SignInOptions } from '@platform/components/features/sign-in/sign-in-options';
 import { Alert } from '@platform/components/shared/alert';
@@ -8,6 +6,8 @@ import { Text } from '@platform/components/shared/text';
 import { TextLink } from '@platform/components/shared/text-link';
 import { SIGN_IN_ERROR, type TSignInError } from '@platform/constants/sign-in';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TOAuthProviderId } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
+import { ALERT_TYPE, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { signInViewVariants } from './sign-in-view-variants';

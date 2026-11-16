@@ -1,11 +1,5 @@
 'use client';
 
-import {
-  ALERT_TYPE,
-  LOCALE_ISO_CODES,
-  type TLocaleIsoCode,
-  FORM_STATUS,
-} from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
 import {
@@ -19,6 +13,12 @@ import {
   type TUpdateTenantLanguagesResult,
 } from '@platform/server/tenants/update-tenant-languages-action';
 import { additionalLocalesToSave } from '@platform/utils/additional-locales-to-save/additional-locales-to-save';
+import {
+  ALERT_TYPE,
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+  FORM_STATUS,
+} from '@shinefold/config';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';

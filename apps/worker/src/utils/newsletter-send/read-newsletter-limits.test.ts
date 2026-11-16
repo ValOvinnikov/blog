@@ -1,16 +1,16 @@
-import { EMAIL_TYPE, TENANT_PLAN } from '@blog/config/constants';
+import { EMAIL_TYPE, TENANT_PLAN } from '@shinefold/config/constants';
 import {
   PLAN_MONTHLY_SENDS_PER_SUBSCRIBER,
   SUBSCRIBER_BAND_CEILINGS,
-} from '@blog/db/constants';
-import { countEmailSendsThisMonth } from '@blog/db/queries/email-usage';
-import { countActiveSubscribers } from '@blog/db/queries/subscribers';
+} from '@shinefold/db/constants';
+import { countEmailSendsThisMonth } from '@shinefold/db/queries/email-usage';
+import { countActiveSubscribers } from '@shinefold/db/queries/subscribers';
 import { MOCK_TENANT_ID, mockTenant } from '@worker/testing/tenant/fixtures';
 
 import { readNewsletterLimits } from './read-newsletter-limits';
 
-vi.mock('@blog/db/queries/email-usage');
-vi.mock('@blog/db/queries/subscribers');
+vi.mock('@shinefold/db/queries/email-usage');
+vi.mock('@shinefold/db/queries/subscribers');
 
 const [INCLUDED_BAND, PAID_BAND] = SUBSCRIBER_BAND_CEILINGS;
 const MOCK_ACTIVE_COUNT = 700;

@@ -11,10 +11,10 @@ import {
   type TNewsletterVariant,
   FORM_STATUS,
   isOutcomeSuccess,
-} from '@blog/config';
-import { isValidEmailAddress } from '@blog/email/validation';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup';
+} from '@shinefold/config';
+import { isValidEmailAddress } from '@shinefold/email/validation';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { NewsletterSignup } from '@shinefold/ui/components/organisms/newsletter-signup';
 import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
 import { useBusyStyle } from '@web/context/busy-style-provider';
 import {

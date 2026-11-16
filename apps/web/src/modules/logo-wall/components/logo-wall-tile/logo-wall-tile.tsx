@@ -1,7 +1,7 @@
-import type { ISanityImage, TMaybeUndefined } from '@blog/config';
-import type { TLogoItem } from '@blog/service';
-import { LogoTile } from '@blog/ui/components/molecules/logo-tile';
-import { isUndefined } from '@blog/utils/primitives';
+import type { ISanityImage, TMaybeUndefined } from '@shinefold/config';
+import type { TLogoItem } from '@shinefold/service';
+import { LogoTile } from '@shinefold/ui/components/molecules/logo-tile';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 

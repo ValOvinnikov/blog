@@ -1,5 +1,5 @@
-import { isSecretMatch } from '@blog/utils';
-import { keyedHmac } from '@blog/utils/encryption';
+import { isSecretMatch } from '@shinefold/utils';
+import { keyedHmac } from '@shinefold/utils/encryption';
 
 const TOKEN_SEPARATOR = '~';
 

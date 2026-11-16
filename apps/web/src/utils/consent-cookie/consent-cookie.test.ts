@@ -1,5 +1,5 @@
-import { CONSENT_CATEGORY } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { CONSENT_CATEGORY } from '@shinefold/config';
 
 import {
   CONSENT_COOKIE_NAME,

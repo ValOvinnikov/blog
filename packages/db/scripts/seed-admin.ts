@@ -6,7 +6,7 @@
  * it by hand, once, against the target Neon branch:
  *
  *   set -a && source apps/web/.env.local && set +a
- *   pnpm --filter @blog/db db:seed-admin -- \
+ *   pnpm --filter @shinefold/db db:seed-admin -- \
  *     --email=you@example.com \
  *     --role=SUPERADMIN|ADMIN|MODERATOR
  *
@@ -23,9 +23,13 @@
  * build (the condition Next.js itself sets), so this plain-Node script can
  * reuse the real query functions instead of duplicating their SQL.
  */
-import { ADMIN_ROLE, GRANTED_VIA, type TAdminRole } from '@blog/db/constants';
-import { createAdmin, getAdminByUserId } from '@blog/db/queries/admins';
-import { findUserByEmail } from '@blog/db/queries/users';
+import {
+  ADMIN_ROLE,
+  GRANTED_VIA,
+  type TAdminRole,
+} from '@shinefold/db/constants';
+import { createAdmin, getAdminByUserId } from '@shinefold/db/queries/admins';
+import { findUserByEmail } from '@shinefold/db/queries/users';
 
 type TParsedArgs = {
   email: string;

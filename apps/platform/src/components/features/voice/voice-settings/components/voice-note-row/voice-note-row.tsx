@@ -1,8 +1,8 @@
-import { ALERT_TYPE } from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { PreviewModeGroup } from '@platform/components/shared/preview-mode-group';
 import type { TPreviewMode } from '@platform/constants/preview';
+import { ALERT_TYPE } from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 
 import { voiceNoteRowVariants } from './voice-note-row-variants';

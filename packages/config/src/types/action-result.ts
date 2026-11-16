@@ -1,6 +1,9 @@
-import type { TPartialByLocale } from '@blog/config/types';
+import type { TPartialByLocale } from '@shinefold/config/types';
 
-import type { ACTION_OUTCOME, TActionRefusal } from '@blog/config/constants';
+import type {
+  ACTION_OUTCOME,
+  TActionRefusal,
+} from '@shinefold/config/constants';
 
 export type TReasonValues = Record<string, string | number>;
 

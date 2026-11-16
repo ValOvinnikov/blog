@@ -6,12 +6,12 @@ import {
   type TBrandVariant,
   type TContentAlignment,
   type TSpacingScale,
-} from '@blog/config';
-import { CtaModuleLayout } from '@blog/ui/components/organisms/cta-module/components/layout/cta-module-layout';
-import type { CtaModuleSlotParts } from '@blog/ui/components/organisms/cta-module/cta-module-slot-parts';
-import { ctaModuleVariants } from '@blog/ui/components/organisms/cta-module/cta-module-variants';
-import type { TCompoundChildren } from '@blog/ui/lib/react';
-import { bannerVariants } from '@blog/ui/lib/styling';
+} from '@shinefold/config';
+import { CtaModuleLayout } from '@shinefold/ui/components/organisms/cta-module/components/layout/cta-module-layout';
+import type { CtaModuleSlotParts } from '@shinefold/ui/components/organisms/cta-module/cta-module-slot-parts';
+import { ctaModuleVariants } from '@shinefold/ui/components/organisms/cta-module/cta-module-variants';
+import type { TCompoundChildren } from '@shinefold/ui/lib/react';
+import { bannerVariants } from '@shinefold/ui/lib/styling';
 
 export type TCtaModuleBannerProps = IWithClassName &
   IWithDataTestId & {

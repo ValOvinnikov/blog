@@ -1,4 +1,4 @@
-import { KEY_ENCODING } from '@blog/utils/encryption';
+import { KEY_ENCODING } from '@shinefold/utils/encryption';
 
 export const confirmationEmailEnv = {
   NEWSLETTER_FROM_ADDRESS: undefined,

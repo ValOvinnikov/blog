@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import type { DOMPurify, ElementHook, NodeHook } from 'dompurify';
 
 const URI_BEARING_ATTRIBUTES = ['href', 'xlink:href', 'src'];

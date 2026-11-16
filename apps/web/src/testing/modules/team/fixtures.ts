@@ -1,4 +1,4 @@
-import type { TTeamMember } from '@blog/service';
+import type { TTeamMember } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 
 const mockFaker = createMockFaker(61043);

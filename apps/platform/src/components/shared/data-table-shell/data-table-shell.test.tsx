@@ -1,6 +1,6 @@
-import { SORT_DIRECTION } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { SORT_DIRECTION } from '@shinefold/config/constants';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps, ReactNode } from 'react';
 

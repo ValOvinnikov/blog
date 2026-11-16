@@ -1,4 +1,4 @@
-import { LANDING_PAGE_MAX_DEPTH } from '@blog/config/constants';
+import { LANDING_PAGE_MAX_DEPTH } from '@shinefold/config/constants';
 import { z } from 'zod';
 
 import { LANDING_PAGE_PATH_EXPRESSION } from './landing-page-path';

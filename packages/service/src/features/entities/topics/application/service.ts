@@ -1,6 +1,6 @@
-import { getTopics } from '@blog/service/features/entities/topics/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import { safeAsync } from '@blog/utils';
+import { getTopics } from '@shinefold/service/features/entities/topics/adaptor/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import { safeAsync } from '@shinefold/utils';
 
 export function createTopicsService() {
   return {

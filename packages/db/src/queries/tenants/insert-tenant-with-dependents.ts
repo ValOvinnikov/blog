@@ -1,16 +1,16 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStep,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   tenants,
   type TProvisioningStepState,
   type TTenant,
   type TTenantProvisioningState,
-} from '@blog/db/schema/tenants';
+} from '@shinefold/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
 type TTenantDraftValues = Omit<

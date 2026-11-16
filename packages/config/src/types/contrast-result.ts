@@ -1,4 +1,4 @@
-import type { TContrastCheckOutcome } from '@blog/config/constants';
+import type { TContrastCheckOutcome } from '@shinefold/config/constants';
 
 export type TContrastResultBody = {
   sha: string;

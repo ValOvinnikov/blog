@@ -1,4 +1,4 @@
-import type { TSectionDocumentType } from '@blog/service';
+import type { TSectionDocumentType } from '@shinefold/service';
 import { DocumentArticle } from '@web/components/page-templates/document-article';
 import { SECTION_DOCUMENT_LOG } from '@web/constants/section-document';
 import { getSectionDocumentPage } from '@web/server/section-document/get-section-document-page/get-section-document-page';

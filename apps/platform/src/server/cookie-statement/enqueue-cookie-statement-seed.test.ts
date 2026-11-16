@@ -1,4 +1,3 @@
-import { HTTP_STATUS, LOCALE_ISO_CODES } from '@blog/config';
 import {
   COOKIE_STATEMENT_LOG,
   COOKIE_STATEMENT_PATH,
@@ -6,6 +5,7 @@ import {
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { HTTP_STATUS, LOCALE_ISO_CODES } from '@shinefold/config';
 
 import { enqueueCookieStatementSeed } from './enqueue-cookie-statement-seed';
 

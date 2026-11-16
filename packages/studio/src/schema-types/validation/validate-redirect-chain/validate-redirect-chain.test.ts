@@ -1,18 +1,18 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
   REDIRECT_DUPLICATE_SOURCE_ERROR,
   REDIRECT_INCOMING_CHAIN_ERROR,
   REDIRECT_OUTGOING_CHAIN_ERROR,
   validateRedirectDestination,
   validateRedirectSource,
-} from '@blog/studio/schema-types/validation/validate-redirect-chain/validate-redirect-chain';
+} from '@shinefold/studio/schema-types/validation/validate-redirect-chain/validate-redirect-chain';
 import {
   MOCK_REDIRECT_SOURCE,
   mockRedirect,
-} from '@blog/studio/testing/mock-documents';
-import { MOCK_FETCH_ERROR } from '@blog/studio/testing/mock-fetch-error';
-import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/mock-documents';
+import { MOCK_FETCH_ERROR } from '@shinefold/studio/testing/mock-fetch-error';
+import { mockGroqValidationContext } from '@shinefold/studio/testing/mock-validation-context';
 import { getDraftId, type SanityDocument } from 'sanity';
 
 faker.seed(6018);

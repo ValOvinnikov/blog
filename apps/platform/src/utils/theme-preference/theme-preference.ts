@@ -1,4 +1,3 @@
-import { COLOR_SCHEME, type TMaybeUndefined } from '@blog/config';
 import {
   DATA_THEME,
   THEME_PREFERENCE,
@@ -6,6 +5,7 @@ import {
 } from '@platform/constants/theme';
 import { setPersistentCookie } from '@platform/utils/persistent-cookie/persistent-cookie';
 import { THEME_PREFERENCE_COOKIE } from '@platform/utils/theme-preference-cookie/theme-preference-cookie';
+import { COLOR_SCHEME, type TMaybeUndefined } from '@shinefold/config';
 
 export const themePreferenceFor = (
   scheme: TMaybeUndefined<string>,

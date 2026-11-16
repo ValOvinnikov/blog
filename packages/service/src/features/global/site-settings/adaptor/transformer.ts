@@ -1,4 +1,4 @@
-import { PRICE_PERIOD } from '@blog/config';
+import { PRICE_PERIOD } from '@shinefold/config';
 import type { InferResultType } from 'groqd';
 
 import type { siteSettingsQuery } from './query';

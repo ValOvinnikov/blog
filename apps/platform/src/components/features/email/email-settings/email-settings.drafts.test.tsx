@@ -1,4 +1,3 @@
-import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { screen, within } from '@platform/testing/custom-render';
 import {
@@ -33,6 +32,7 @@ import {
   settingsDraftStorageKey,
   writeSettingsDraft,
 } from '@platform/utils/settings-draft-storage/settings-draft-storage';
+import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@shinefold/config';
 import type { UserEvent } from '@testing-library/user-event';
 
 import { EmailSettings } from './email-settings';

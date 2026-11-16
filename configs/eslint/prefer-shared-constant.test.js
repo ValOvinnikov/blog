@@ -6,7 +6,7 @@ import { createPreferSharedConstantRule } from './prefer-shared-constant.js';
 const configEntry = (ref, file = 'packages/config/src/constants/x.ts') => ({
   ref,
   scope: 'config',
-  from: '@blog/config/constants',
+  from: '@shinefold/config/constants',
   file,
 });
 
@@ -23,7 +23,7 @@ const index = {
       {
         ref: 'TENANT_STATUS.ACTIVE',
         scope: 'db',
-        from: '@blog/db/constants',
+        from: '@shinefold/db/constants',
         file: 'packages/db/src/constants/tenant.ts',
       },
     ],
@@ -61,14 +61,14 @@ const NOT_FOUND = {
   messageId: 'preferSharedConstant',
   data: {
     value: '404',
-    consts: 'HTTP_STATUS.NOT_FOUND (@blog/config/constants)',
+    consts: 'HTTP_STATUS.NOT_FOUND (@shinefold/config/constants)',
   },
 };
 const BUTTON = {
   messageId: 'preferSharedConstant',
   data: {
     value: "'button'",
-    consts: 'PART.BUTTON (@blog/config/constants)',
+    consts: 'PART.BUTTON (@shinefold/config/constants)',
   },
 };
 const typescript = { parser: tseslint.parser };
@@ -76,7 +76,7 @@ const INTERNAL = {
   messageId: 'preferSharedConstant',
   data: {
     value: "'INTERNAL'",
-    consts: 'LINK_TYPE.INTERNAL (@blog/config/constants)',
+    consts: 'LINK_TYPE.INTERNAL (@shinefold/config/constants)',
   },
 };
 
@@ -215,7 +215,7 @@ ruleTester.run('prefer-shared-constant', rule, {
           messageId: 'preferSharedConstant',
           data: {
             value: "'ACTIVE'",
-            consts: 'TENANT_STATUS.ACTIVE (@blog/db/constants)',
+            consts: 'TENANT_STATUS.ACTIVE (@shinefold/db/constants)',
           },
         },
       ],

@@ -1,7 +1,7 @@
-import { STRIPE_COUPON_DURATION } from '@blog/db/constants';
-import { getActiveStripePromotionCode } from '@blog/db/queries/stripe-catalogue/get-active-stripe-promotion-code';
-import * as schema from '@blog/db/schema';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { STRIPE_COUPON_DURATION } from '@shinefold/db/constants';
+import { getActiveStripePromotionCode } from '@shinefold/db/queries/stripe-catalogue/get-active-stripe-promotion-code';
+import * as schema from '@shinefold/db/schema';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_DURATION_IN_MONTHS,
   MOCK_OTHER_PROMOTION_CODE_ID,
@@ -9,11 +9,11 @@ import {
   MOCK_PROMOTION_CODE,
   MOCK_STRIPE_PRODUCT_ID,
   mockSaveStripePromotionCodeInput,
-} from '@blog/db/testing/stripe-catalogue/fixtures';
+} from '@shinefold/db/testing/stripe-catalogue/fixtures';
 
 import { saveStripePromotionCode } from './save-stripe-promotion-code';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

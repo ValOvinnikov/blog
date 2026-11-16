@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CARD_STYLE,
@@ -5,10 +6,9 @@ import {
   DISPLAY_MODE,
   GRID_COLUMNS,
   RADIUS_SCALE,
-} from '@blog/config/constants';
-import { mockRawPostRelatedModule } from '@blog/service/testing/modules/post-related/fixtures';
-import { MOCK_UNSET_MODULE_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config/constants';
+import { mockRawPostRelatedModule } from '@shinefold/service/testing/modules/post-related/fixtures';
+import { MOCK_UNSET_MODULE_APPEARANCE } from '@shinefold/service/testing/shared/module-appearance';
 
 import { toPostRelatedModuleDocument } from './transformer';
 

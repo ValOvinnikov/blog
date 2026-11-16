@@ -1,5 +1,5 @@
-import type { ArticleText } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import type { ArticleText } from '@shinefold/config';
 
 import { generateTakeaways, SKIM_GENERATION_MODEL } from './generate-takeaways';
 

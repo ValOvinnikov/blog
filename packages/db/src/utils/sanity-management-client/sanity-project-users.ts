@@ -1,7 +1,7 @@
-import { HTTP_METHOD, type TSanityProjectRole } from '@blog/config';
-import type { TMaybeNull } from '@blog/config/types';
-import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
-import { sanityAccessRequest } from '@blog/db/utils/sanity-management-client/sanity-api-request';
+import { HTTP_METHOD, type TSanityProjectRole } from '@shinefold/config';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { SANITY_API_PATH } from '@shinefold/db/utils/sanity-management-client/sanity-api-paths';
+import { sanityAccessRequest } from '@shinefold/db/utils/sanity-management-client/sanity-api-request';
 
 export type TSanityUser = {
   sanityUserId: string;

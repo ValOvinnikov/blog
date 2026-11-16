@@ -1,6 +1,6 @@
-import type { TMaybeUndefined, TNullableRow } from '@blog/config/types';
-import type { TPaidSubscriberBandCeiling } from '@blog/db/constants';
-import { tenants } from '@blog/db/schema/tenants';
+import type { TMaybeUndefined, TNullableRow } from '@shinefold/config/types';
+import type { TPaidSubscriberBandCeiling } from '@shinefold/db/constants';
+import { tenants } from '@shinefold/db/schema/tenants';
 
 export type TTenantBilling = {
   stripeCustomerId: TMaybeUndefined<string>;

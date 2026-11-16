@@ -1,4 +1,4 @@
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   TENANT_ID_HEADER,
   UNRESOLVED_TENANT_PLACEHOLDER,

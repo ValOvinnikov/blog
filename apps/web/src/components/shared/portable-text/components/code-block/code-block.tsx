@@ -12,8 +12,8 @@ export interface ICodeBlockProps {
 }
 
 /**
- * Not a `@blog/ui` component: it wraps the third-party
- * `react-syntax-highlighter`, which `@blog/ui` must stay free of per the
+ * Not a `@shinefold/ui` component: it wraps the third-party
+ * `react-syntax-highlighter`, which `@shinefold/ui` must stay free of per the
  * layer contract.
  */
 export const CodeBlock = ({

@@ -1,7 +1,7 @@
-import { CAPABILITY, type TCapability } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
+import { CAPABILITY, type TCapability } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 import { mockSettingsFeaturesRowEnabling } from '@web/testing/server/settings-features/fixtures';
 import {
   MOCK_TENANT_ID,
@@ -19,8 +19,8 @@ faker.seed(6010);
 vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-vi.mock('@blog/db', async () => ({
-  ...(await vi.importActual('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await vi.importActual('@shinefold/db/constants')),
   queries: {
     tenants: { getTenantById: vi.fn() },
     settingsFeatures: { getSettingsFeatures: vi.fn() },

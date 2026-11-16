@@ -1,6 +1,6 @@
-import type { TFieldErrors } from '@blog/config';
 import type { TTenantFieldErrorReason } from '@platform/constants/tenant';
 import type { TConfirmTenantFieldError } from '@platform/server/provisioning/resolve-confirmed-tenant';
+import type { TFieldErrors } from '@shinefold/config';
 import type { z } from 'zod';
 
 export type TTenantDetailsFieldError = Exclude<

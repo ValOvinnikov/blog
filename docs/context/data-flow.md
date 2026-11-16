@@ -10,18 +10,18 @@ Sanity Studio (packages/studio)
       ▼
 packages/config/src/sanity/generated/{schema.json,types.ts}   (committed)
       ▼
-@blog/service
+@shinefold/service
   ├─ service.pages.<page>   ──thin query──►  { title, hero?, modules[]: TModule, seo }
   └─ service.modules.<type> ──runQuery + groqd, keyed by module id──►  typed module view-model
       ▼
 apps/web
   ├─ page.tsx           fetches service.pages.<page>, checks result.ok
   ├─ ModuleRenderer      maps each TModule → MODULE_MAP[type]({ id, locale })
-  └─ per-module component  fetches service.modules.<type>, maps view-model ──plain typed props──►  @blog/ui organism
+  └─ per-module component  fetches service.modules.<type>, maps view-model ──plain typed props──►  @shinefold/ui organism
 ```
 
 - Typegen config lives in `packages/studio/sanity.cli.ts`; the script is
-  `pnpm --filter @blog/studio typegen`. **Commit the generated files.**
+  `pnpm --filter @shinefold/studio typegen`. **Commit the generated files.**
 - Typegen output can be non-deterministic across runs — if the diff churns,
   re-run until minimal before committing.
 - **Typegen is tenant-agnostic** — one schema (`packages/studio`), one
@@ -40,7 +40,7 @@ apps/web
   `enterRequestContext(params)` with the `[tenant]` segment
   `apps/web/src/proxy.ts` wrote into the path, and readers call
   `getRequestContext()`, whose `sanityContext` carries that tenant's read
-  credentials — decrypted fresh from `@blog/db` per request, never cached
+  credentials — decrypted fresh from `@shinefold/db` per request, never cached
   across requests — with the route's locale applied. Every page, module,
   loader and metadata builder takes it from there, so a single request only
   ever touches one tenant's content. With no tenant resolved it is the
@@ -55,7 +55,7 @@ apps/web
   The service layer restores the contract at the query boundary: explicit
   `sub.field()` projections, `.notNull()` (always last in the chain) for
   schema-required fields, `T | undefined` (never `| null`) in view-models —
-  spelled `TMaybeUndefined<T>` (the `@blog/config` alias) for a value that may
+  spelled `TMaybeUndefined<T>` (the `@shinefold/config` alias) for a value that may
   be absent, distinct from property optionality (`field?:`) — and **no faked
   defaults**: absence handling belongs to `apps/web`.
 - Service loaders return `Promise<TViewModel>` and throw on missing data, so
@@ -113,7 +113,7 @@ apps/web
   tenant's two durable Sanity credentials (a `viewer`-scoped read token
   and this `editor`-scoped write token) — how they're minted, persisted
   encrypted, and read back — are documented once, in `SPEC.md`'s two-token
-  credential footnote under the `@blog/db` layer contract; this doc doesn't
+  credential footnote under the `@shinefold/db` layer contract; this doc doesn't
   duplicate that. Writes are always scoped to a document's **draft**
   (`drafts.<id>`), never the published document, and are triggered by an
   explicit pipeline action — concretely, that same route (webhook-driven,
@@ -124,7 +124,7 @@ apps/web
 - **Web renders modules generically.** `apps/web/src/modules/module-map.ts`
   registers `MODULE_MAP: Record<Exclude<TModuleType, TSlotModuleType>,
 (props) => ReactNode>` — typed exhaustively over `TModuleType`
-  (`@blog/config`) minus the slot-rendered types, so omitting any other
+  (`@shinefold/config`) minus the slot-rendered types, so omitting any other
   module type from the map is a compile error. `TSlotModuleType` names every
   module reached **only** through a dedicated slot and never through a page's
   `modules[]` array, so none of them can ever reach `ModuleRenderer`: that is
@@ -153,7 +153,7 @@ Partial<Record<TSanityType, …>>` — every module type needs a purge-tag entry
   the page. Each per-module component
   (`apps/web/src/modules/<type>/<type>-module.tsx`) is an async Server
   Component that calls its `service.modules.<type>` fetcher, checks
-  `result.ok`, and maps the view-model onto the matching pure `@blog/ui`
+  `result.ok`, and maps the view-model onto the matching pure `@shinefold/ui`
   organism — this is the only place that module's service and ui meet.
 
   A page's `hero` reference is dispatched by its own pair,
@@ -166,6 +166,6 @@ Partial<Record<TSanityType, …>>` — every module type needs a purge-tag entry
   `page_landing`, `page_postIndex`, `page_topic` and `page_tag` each have an
   optional one that replaces the page's default header and owns its `<h1>`.
   The slot stays two-step — the page query projects `_id` and `_type`, and
-  the hero's own loader fetches it by id — and `@blog/service`'s
+  the hero's own loader fetches it by id — and `@shinefold/service`'s
   `toHeroSlot()` rejects a non-hero `_type` as a data error rather than
   letting it render blank.

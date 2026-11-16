@@ -1,4 +1,4 @@
-import { LOCALE_BCP47_TAGS } from '@blog/config';
+import { LOCALE_BCP47_TAGS } from '@shinefold/config';
 import { routing } from '@web/i18n/routing';
 import type { MetadataRoute } from 'next';
 

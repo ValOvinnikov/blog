@@ -7,7 +7,7 @@ import type {
   ISanityImageCrop,
   ISanityImageHotspot,
   TMaybeUndefined,
-} from '@blog/config';
+} from '@shinefold/config';
 import { useSanityImageBaseUrl } from '@web/context/sanity-image-base-url-provider';
 import { SanityImage as SanityImageBase } from 'sanity-image';
 

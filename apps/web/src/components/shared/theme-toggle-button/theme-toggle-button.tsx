@@ -1,6 +1,6 @@
 'use client';
 
-import { ThemeToggle } from '@blog/ui/components/atoms/theme-toggle';
+import { ThemeToggle } from '@shinefold/ui/components/atoms/theme-toggle';
 import { headerControlVariants } from '@web/components/shared/header-control';
 import { THEME_STORAGE_KEY } from '@web/config/theme-script';
 import { useEffect, useState } from 'react';

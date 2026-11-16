@@ -191,5 +191,5 @@ packages/ui/src/components/organisms/
 apps/web/src/app/[locale]/page.tsx
 ```
 
-Do not add a template layer to `@blog/ui`; page-level composition belongs in
+Do not add a template layer to `@shinefold/ui`; page-level composition belongs in
 `apps/web`.

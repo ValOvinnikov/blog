@@ -1,10 +1,10 @@
+import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
   COOKIE_SETTINGS_BUTTON,
   type TBrandVariant,
   type TFooterLayout,
   type TFooterSurface,
-} from '@blog/config';
-import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+} from '@shinefold/config';
 
 export type TSampleFooterStyle = {
   layout: TFooterLayout;

@@ -1,7 +1,12 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
-import { errorResult, isUndefined, okResult, type TResult } from '@blog/utils';
 import { decodeSignatureHeader, isValidSignature } from '@sanity/webhook';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import {
+  errorResult,
+  isUndefined,
+  okResult,
+  type TResult,
+} from '@shinefold/utils';
 import {
   REVALIDATE_SIGNATURE_MAX_AGE_MS,
   SIGNATURE_REFUSED_REASON,

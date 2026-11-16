@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 
 import { isWebAnalyticsEnabled } from './is-web-analytics-enabled';
 

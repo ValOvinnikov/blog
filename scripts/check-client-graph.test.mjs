@@ -169,7 +169,7 @@ const createFixtureRepo = () => {
       "compilerOptions": {
         "paths": {
           "@app/*": ["./src/*"],
-          "@blog/mail/*": ["../../packages/mail/src/*"]
+          "@shinefold/mail/*": ["../../packages/mail/src/*"]
         }
       }
     }`,
@@ -178,7 +178,7 @@ const createFixtureRepo = () => {
   write(
     'packages/mail/package.json',
     JSON.stringify({
-      name: '@blog/mail',
+      name: '@shinefold/mail',
       exports: { '.': './src/index.ts', './html': './src/html/index.ts' },
     }),
   );
@@ -209,7 +209,10 @@ describe('buildAliasMap', () => {
   });
 
   it('resolves a target relative to the tsconfig that declares it', () => {
-    assert.equal(aliases.get('@blog/mail'), join(root, 'packages/mail/src'));
+    assert.equal(
+      aliases.get('@shinefold/mail'),
+      join(root, 'packages/mail/src'),
+    );
   });
 });
 
@@ -226,7 +229,7 @@ describe('resolveSpecifier', () => {
   });
 
   it('resolves an aliased deep import the package never declared', () => {
-    const resolved = resolve('@blog/mail/transport/send');
+    const resolved = resolve('@shinefold/mail/transport/send');
     assert.equal(resolved.kind, 'internal');
     assert.equal(
       resolved.file,
@@ -235,7 +238,7 @@ describe('resolveSpecifier', () => {
   });
 
   it('resolves a bare package specifier through its exports barrel', () => {
-    const resolved = resolve('@blog/mail');
+    const resolved = resolve('@shinefold/mail');
     assert.equal(resolved.kind, 'internal');
     assert.equal(resolved.file, join(root, 'packages/mail/src/index.ts'));
   });
@@ -254,7 +257,7 @@ describe('findLeaksFrom', () => {
   it('reports the chain when a client module deep-imports an undeclared server-only path', () => {
     const entry = write(
       'apps/app/src/deep.tsx',
-      "'use client';\nimport { send } from '@blog/mail/transport/send';\nexport const C = () => send();\n",
+      "'use client';\nimport { send } from '@shinefold/mail/transport/send';\nexport const C = () => send();\n",
     );
     const leaks = leaksFrom(entry);
     assert.equal(leaks.length, 1);
@@ -267,7 +270,7 @@ describe('findLeaksFrom', () => {
   it('reports the chain when a client module imports the barrel', () => {
     const entry = write(
       'apps/app/src/barrel.tsx',
-      "'use client';\nimport { send } from '@blog/mail';\nexport const C = () => send();\n",
+      "'use client';\nimport { send } from '@shinefold/mail';\nexport const C = () => send();\n",
     );
     const leaks = leaksFrom(entry);
     assert.equal(leaks.length, 1);
@@ -282,7 +285,7 @@ describe('findLeaksFrom', () => {
     write('apps/app/src/mid/index.ts', "export * from '../leafy';\n");
     write(
       'apps/app/src/leafy.ts',
-      "import { send } from '@blog/mail/transport/send';\nexport const go = () => send();\n",
+      "import { send } from '@shinefold/mail/transport/send';\nexport const go = () => send();\n",
     );
     const entry = write(
       'apps/app/src/nested.tsx',
@@ -294,7 +297,7 @@ describe('findLeaksFrom', () => {
   it('accepts a client module importing the client-safe entrypoint', () => {
     const entry = write(
       'apps/app/src/safe.tsx',
-      "'use client';\nimport { shell } from '@blog/mail/html';\nexport const C = () => shell();\n",
+      "'use client';\nimport { shell } from '@shinefold/mail/html';\nexport const C = () => shell();\n",
     );
     assert.deepEqual(leaksFrom(entry), []);
   });
@@ -302,7 +305,7 @@ describe('findLeaksFrom', () => {
   it('stops at a "use server" module, which Next replaces with a network reference', () => {
     write(
       'apps/app/src/actions.ts',
-      "'use server';\nimport { send } from '@blog/mail';\nexport const act = async () => send();\n",
+      "'use server';\nimport { send } from '@shinefold/mail';\nexport const act = async () => send();\n",
     );
     const entry = write(
       'apps/app/src/with-action.tsx',
@@ -314,7 +317,7 @@ describe('findLeaksFrom', () => {
   it('accepts a type-only import of a server-only module', () => {
     const entry = write(
       'apps/app/src/typed.tsx',
-      "'use client';\nimport type { Send } from '@blog/mail';\nexport const C = (_: Send) => null;\n",
+      "'use client';\nimport type { Send } from '@shinefold/mail';\nexport const C = (_: Send) => null;\n",
     );
     assert.deepEqual(leaksFrom(entry), []);
   });

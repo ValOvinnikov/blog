@@ -1,10 +1,10 @@
-import { queries } from '@blog/db';
 import { TenantDangerPageContent } from '@platform/components/features/tenants/tenant-danger-page-content';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
+import { queries } from '@shinefold/db';
 import type { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {

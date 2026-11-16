@@ -1,11 +1,5 @@
 'use client';
 
-import {
-  isOutcomeRefused,
-  isOutcomeSuccess,
-  type TMaybeUndefined,
-} from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
 import { useWebhookWait } from '@platform/components/features/upgrade/webhook-wait-status';
 import {
   PLAN_CHANGE_TIMING,
@@ -15,6 +9,12 @@ import {
 import { useRouter } from '@platform/i18n/navigation';
 import { changePlanAction } from '@platform/server/billing/change-plan-action';
 import { getTenantPlanAction } from '@platform/server/billing/get-tenant-plan-action';
+import {
+  isOutcomeRefused,
+  isOutcomeSuccess,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
 import { useState, useTransition } from 'react';
 
 export const usePlanChange = (tenantId: string, currentPlan: TTenantPlan) => {

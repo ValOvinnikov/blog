@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { isUndefined } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 export const UNIQUE_VIOLATION_CODE = '23505';
 export const FOREIGN_KEY_VIOLATION_CODE = '23503';

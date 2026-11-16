@@ -1,4 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
 import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { LOOK_ROW } from '@platform/constants/look-row';
@@ -16,6 +15,7 @@ import {
   withLookTenant,
 } from '@platform/testing/look/look-form-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

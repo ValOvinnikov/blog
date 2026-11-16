@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   EMAIL_DELIVERY_OUTCOME,
   type TEmailDeliveryOutcome,
-} from '@blog/db/constants';
-import { SITE_EMAIL_TAG_NAME } from '@blog/email';
+} from '@shinefold/db/constants';
+import { SITE_EMAIL_TAG_NAME } from '@shinefold/email';
 import { RESEND_DELIVERY_EVENT_TYPE } from '@web/constants/email-usage';
 import { z } from 'zod';
 

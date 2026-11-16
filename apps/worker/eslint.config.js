@@ -1,4 +1,4 @@
-import config from '@blog/eslint-config/worker';
+import config from '@shinefold/eslint-config/worker';
 
 export default [
   { ignores: ['next-env.d.ts', 'src/app/.well-known/**'] },

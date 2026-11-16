@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { getTenantById } from '@blog/db/queries/tenants';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { getTenantById } from '@shinefold/db/queries/tenants';
 import { DEPROVISIONING_START_FAILED_EVENT } from '@worker/constants/deprovisioning';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import {
@@ -23,7 +23,7 @@ const MOCK_DEPROVISION_URL = `${MOCK_WORKER_ORIGIN}/api/deprovision`;
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/workflows/deprovision-tenant');
 vi.mock('workflow/api');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 
 function deprovisionRequest(secret: string = MOCK_ENQUEUE_SECRET): Request {
   return mockSignedRequest(

@@ -1,4 +1,4 @@
-import { MENU_ROW, tv } from '@blog/ui/lib/styling';
+import { MENU_ROW, tv } from '@shinefold/ui/lib/styling';
 
 export const accountMenuGroupVariants = tv({
   slots: {

@@ -1,4 +1,5 @@
-import { LOCALE_ISO_CODES, TENANT_PLAN } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES, TENANT_PLAN } from '@shinefold/config/constants';
 import {
   MEMBERSHIP_ROLE,
   TENANT_DETAILS_UPDATE_OUTCOME,
@@ -7,55 +8,54 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
   type TTenantProvisioningStatus,
-} from '@blog/db/constants';
-import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
-import { lockMembershipsOverSeats } from '@blog/db/queries/memberships/lock-memberships-over-seats';
+} from '@shinefold/db/constants';
+import { inviteEmailColumns } from '@shinefold/db/queries/membership-invites/invite-email-columns';
+import { lockMembershipsOverSeats } from '@shinefold/db/queries/memberships/lock-memberships-over-seats';
 import {
   getUnsentStudioReinviteEmail,
   setUnsentStudioReinvite,
-} from '@blog/db/queries/tenants/unsent-studio-reinvite';
-import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
-import * as schema from '@blog/db/schema';
-import { type users, verificationTokens } from '@blog/db/schema/auth';
-import { membershipInvites } from '@blog/db/schema/membership-invites';
-import { memberships } from '@blog/db/schema/memberships';
-import { tenantDomains } from '@blog/db/schema/tenant-domains';
+} from '@shinefold/db/queries/tenants/unsent-studio-reinvite';
+import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
+import * as schema from '@shinefold/db/schema';
+import { type users, verificationTokens } from '@shinefold/db/schema/auth';
+import { membershipInvites } from '@shinefold/db/schema/membership-invites';
+import { memberships } from '@shinefold/db/schema/memberships';
+import { tenantDomains } from '@shinefold/db/schema/tenant-domains';
 import {
   tenants,
   type TTenant,
   type TTenantProvisioningState,
-} from '@blog/db/schema/tenants';
-import { GITHUB_PROVIDER } from '@blog/db/testing/account/fixtures';
+} from '@shinefold/db/schema/tenants';
+import { GITHUB_PROVIDER } from '@shinefold/db/testing/account/fixtures';
 import {
   MOCK_EMAIL_VERIFIED_AT,
   MOCK_OWNER_EMAIL,
   insertTestAccount,
   insertTestTenant,
   insertTestUser,
-} from '@blog/db/testing/fixtures';
+} from '@shinefold/db/testing/fixtures';
 import {
   countLockedMemberships,
   insertTeam,
-} from '@blog/db/testing/memberships/fixtures';
+} from '@shinefold/db/testing/memberships/fixtures';
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
-} from '@blog/db/testing/personal-data';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_SANITY_PROJECT_ID } from '@blog/db/testing/sanity-management-client/fixtures';
+} from '@shinefold/db/testing/personal-data';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_SANITY_PROJECT_ID } from '@shinefold/db/testing/sanity-management-client/fixtures';
 import {
   MOCK_IDLE_PROVISIONING_STEPS,
   MOCK_MISSING_TENANT_ID,
   MOCK_TENANT_DOMAIN,
-} from '@blog/db/testing/tenants/fixtures';
+} from '@shinefold/db/testing/tenants/fixtures';
 import {
   MOCK_SELF_SERVE_DOMAIN,
   MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
   MOCK_SELF_SERVE_PADDED_DOMAIN,
   MOCK_SELF_SERVE_SCHEME_DOMAIN,
-} from '@blog/db/testing/tenants/self-serve-fixtures';
-import { patchTestTenant } from '@blog/db/testing/test-tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/tenants/self-serve-fixtures';
+import { patchTestTenant } from '@shinefold/db/testing/test-tenant';
 import { and, eq } from 'drizzle-orm';
 
 import {
@@ -64,7 +64,7 @@ import {
   type TUpdateTenantDetailsResult,
 } from './update-tenant-details';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(6020);
 

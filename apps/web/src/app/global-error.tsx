@@ -2,7 +2,7 @@
 
 import '../../index.css';
 
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 import { GlobalErrorPage } from '@web/components/pages/global-error-page';
 
 /**

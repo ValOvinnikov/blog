@@ -1,9 +1,12 @@
-import type { TAuditTargetType } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { auditEvents, type TAuditEvent } from '@blog/db/schema/audit-events';
-import { users } from '@blog/db/schema/auth';
-import { decryptOptionalPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import type { TAuditTargetType } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import {
+  auditEvents,
+  type TAuditEvent,
+} from '@shinefold/db/schema/audit-events';
+import { users } from '@shinefold/db/schema/auth';
+import { decryptOptionalPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
 import { and, desc, eq } from 'drizzle-orm';
 
 export type TListAuditEventsForTargetOptions = {

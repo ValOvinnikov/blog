@@ -1,5 +1,5 @@
-import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
+import { queries } from '@shinefold/db';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
@@ -11,7 +11,7 @@ faker.seed(6010);
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock(
-  '@blog/db',
+  '@shinefold/db',
   () => import('@web/testing/server/site-config/site-config-db'),
 );
 

@@ -1,6 +1,6 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import { isLocalizedSchemaType } from '@blog/studio/schema-types/inputs/localization-notice-input/is-localized-schema-type';
-import { isSingleLanguage } from '@blog/studio/structure/locales/is-single-language';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import { isLocalizedSchemaType } from '@shinefold/studio/schema-types/inputs/localization-notice-input/is-localized-schema-type';
+import { isSingleLanguage } from '@shinefold/studio/structure/locales/is-single-language';
 import {
   ArrayOfObjectsInputMember,
   type ArrayOfObjectsItemMember,

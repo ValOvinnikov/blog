@@ -1,5 +1,5 @@
-import type { TTenant } from '@blog/db/schema/tenants';
-import { archiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { archiveSanityProject } from '@shinefold/db/utils/sanity-management-client/sanity-project-lifecycle';
 
 import type { TDeprovisionEnv } from '../lib/env';
 

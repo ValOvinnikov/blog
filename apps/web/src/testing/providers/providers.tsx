@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
+import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@shinefold/config';
 import { BusyStyleProvider } from '@web/context/busy-style-provider';
 import { ConsentPreferencesProvider } from '@web/context/consent-preferences-provider';
 import { HeaderOverlayProvider } from '@web/context/header-overlay-provider';

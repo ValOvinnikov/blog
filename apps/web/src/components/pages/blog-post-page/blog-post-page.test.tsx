@@ -1,8 +1,8 @@
-import { SITE_MESSAGES } from '@blog/config';
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { service } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { SITE_MESSAGES } from '@shinefold/config';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
+import { service } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import {
   customRenderServerAsync,
@@ -31,7 +31,7 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
-vi.mock('@blog/service', async (importOriginal) => {
+vi.mock('@shinefold/service', async (importOriginal) => {
   const actual = await importOriginal<object>();
   return {
     ...actual,

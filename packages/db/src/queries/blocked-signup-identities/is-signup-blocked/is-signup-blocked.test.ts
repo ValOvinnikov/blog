@@ -1,7 +1,8 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import { addBlockedIdentity } from '@blog/db/queries/blocked-signup-identities/add-blocked-identity';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { ERROR_CODE } from '@shinefold/config/constants';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
+import { addBlockedIdentity } from '@shinefold/db/queries/blocked-signup-identities/add-blocked-identity';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_BLOCK_REASON,
   MOCK_BLOCKED_ADDRESS,
@@ -12,11 +13,10 @@ import {
   MOCK_BLOCKED_DOMAIN,
   MOCK_NOT_AN_ADDRESS,
   MOCK_SAME_DOMAIN_OTHER_ADDRESS,
-} from '@blog/db/testing/blocked-signup-identities/fixtures';
-import { insertTestAdmin } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/blocked-signup-identities/fixtures';
+import { insertTestAdmin } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
 
 import { isSignupBlocked } from './is-signup-blocked';
 
@@ -28,7 +28,7 @@ const MOCK_UNRELATED_ADDRESS = faker.internet.email({
 const BLOCKED = { ok: true, data: true };
 const NOT_BLOCKED = { ok: true, data: false };
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

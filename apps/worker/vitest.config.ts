@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 
-import preset, { blogPackageAlias } from '@blog/vitest-config/preset';
+import preset, { blogPackageAlias } from '@shinefold/vitest-config/preset';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 export default mergeConfig(

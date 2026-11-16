@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { MOCK_DEPROVISION_ENV } from '@blog/db/testing/deprovision-tenant/fixtures';
 import { faker } from '@faker-js/faker';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { MOCK_DEPROVISION_ENV } from '@shinefold/db/testing/deprovision-tenant/fixtures';
 
 import { loadDeprovisionEnv } from './env';
 

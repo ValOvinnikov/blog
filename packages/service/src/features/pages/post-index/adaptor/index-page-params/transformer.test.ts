@@ -1,4 +1,4 @@
-import { MOCK_POST_LIST_PAGE_SIZE } from '@blog/service/testing/modules/fixtures';
+import { MOCK_POST_LIST_PAGE_SIZE } from '@shinefold/service/testing/modules/fixtures';
 
 import { toIndexPageParams } from './transformer';
 

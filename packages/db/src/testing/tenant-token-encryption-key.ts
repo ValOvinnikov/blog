@@ -1,4 +1,4 @@
-import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
 
 export function useTenantTokenEncryptionKey(): void {
   beforeEach(() => {

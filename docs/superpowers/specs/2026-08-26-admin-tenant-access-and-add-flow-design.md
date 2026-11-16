@@ -207,7 +207,7 @@ that it starts provisioning — the URL is the only signal.
 The provisioning poll's `pollErrorWarning` renders as an inline `Alert`, so
 each failed tick pushes the page down and each recovery pulls it back.
 
-**Do not build a toast system.** `@blog/ui` already ships `Toast` and
+**Do not build a toast system.** `@shinefold/ui` already ships `Toast` and
 `ToastViewport`, and `apps/web` has a working provider at
 `src/context/toast-provider`. Port that provider into `apps/platform` and mount
 the viewport in `AdminShell`.
@@ -286,8 +286,8 @@ owner uses daily.
 ## §8 — `apps/platform` owns its own design system
 
 `CLAUDE.md` already says admin's **interactive** primitives come from Base UI,
-styled in-app, and that nothing is added to `@blog/ui` for it. In practice admin
-imports 16 `@blog/ui` components across 68 sites, and they carry the public
+styled in-app, and that nothing is added to `@shinefold/ui` for it. In practice admin
+imports 16 `@shinefold/ui` components across 68 sites, and they carry the public
 site's design language rather than an operator tool's.
 
 `StatusBadge` is the worked example:
@@ -303,7 +303,7 @@ panel, where a status pill should be a quiet, rounded, sentence-case chip with a
 tone dot.
 
 **Decision: `apps/platform` owns every primitive it renders**, built in-app on Base
-UI plus its own theme, and stops importing `@blog/ui` for its own chrome.
+UI plus its own theme, and stops importing `@shinefold/ui` for its own chrome.
 
 **With one deliberate exception, and it is not a compromise.** The Look tab's
 live preview renders _the tenant's site as it will actually look_ — including
@@ -311,7 +311,7 @@ live preview renders _the tenant's site as it will actually look_ — including
 in #2846; the preview renders `Panel` today). That is the site's
 component by definition. Copying it into admin would create a second copy that
 silently drifts from the real thing, and a preview that lies is worse than no
-preview. So the preview's simulated-site content keeps importing `@blog/ui`.
+preview. So the preview's simulated-site content keeps importing `@shinefold/ui`.
 
 The layer contract is therefore **unchanged** — `admin → ui, db, auth, config,
 utils` — but `ui`'s reach shrinks from 68 import sites across the whole app to a
@@ -331,22 +331,22 @@ exception can be enforced:
 
 So the sample is extracted to
 `apps/platform/src/components/features/look/look-preview/preview-sample/`, and
-**that directory is the only place under `apps/platform` where a `@blog/ui` import
+**that directory is the only place under `apps/platform` where a `@shinefold/ui` import
 is allowed.** A path-scoped guard enforces it, so the exception cannot quietly
 widen back into the app — which is exactly how the current 68 sites accumulated.
 
 ### What separation actually costs
 
-- **13 icons.** `Icon` resolves 35 SVGs from `@blog/ui/assets/icons` via SVGR.
-  The _names_ (`ICONS`) already live in `@blog/config`, which admin keeps. Admin
+- **13 icons.** `Icon` resolves 35 SVGs from `@shinefold/ui/assets/icons` via SVGR.
+  The _names_ (`ICONS`) already live in `@shinefold/config`, which admin keeps. Admin
   copies only the 13 glyphs it uses — `CHEVRON_RIGHT`, `COMMENT`, `GLOBE`,
   `GRID`, `MAIL`, `MENU`, `MENU_ROWS`, `PALETTE`, `PLUS`, `QUOTE`, `SETTINGS`,
   `USERS`, `WARNING` — into `apps/platform/src/assets/icons` with its own registry.
   No new workspace package. Admin's `vitest.config.ts` and `next.config.ts`
-  already carry the SVGR plumbing (they had to, to consume `@blog/ui` source),
+  already carry the SVGR plumbing (they had to, to consume `@shinefold/ui` source),
   so that wiring is repointed rather than written.
 - **Its own theme.** `apps/platform/index.css` is four lines: import
-  `@blog/tailwind-config/theme.css` and `@source`-scan `packages/ui`. That
+  `@shinefold/tailwind-config/theme.css` and `@source`-scan `packages/ui`. That
   shared theme declares itself "the only source of Tailwind theme tokens and
   global base styling," with a narrow carve-out for workspace-specific tokens.
   Admin needs a **broader** exception: its own token layer, so the mock's
@@ -355,13 +355,13 @@ widen back into the app — which is exactly how the current 68 sites accumulate
   `configs/tailwind/theme.css`'s own header and in `SPEC.md`.
 - **One component dies.** `Textarea` has exactly one consumer in the entire
   repo — admin's `voice-field`. It becomes dead code the moment admin stops
-  importing it, and is **deleted from `@blog/ui`** (with `pnpm gen:ui-index`
+  importing it, and is **deleted from `@shinefold/ui`** (with `pnpm gen:ui-index`
   re-run to drop its `COMPONENTS.md` entry).
-- **The `@blog/ui` dependency stays in `package.json`.** It cannot be removed
+- **The `@shinefold/ui` dependency stays in `package.json`.** It cannot be removed
   while the preview sample imports it, and neither can the `tsconfig` path, the
   vitest alias, `transpilePackages`, or the shared-theme import the preview's
   own tokens need. The measure of success is not a removed dependency; it is
-  `@blog/ui` reaching exactly one directory instead of the whole app.
+  `@shinefold/ui` reaching exactly one directory instead of the whole app.
 
 ### What does _not_ get deleted
 
@@ -387,9 +387,9 @@ add-tenant, provisioning, danger zone, Look, Voice, Features, owner dashboard,
 and the entirely unstyled `/unauthorized` — not only the pages this design
 introduces.
 
-### `@blog/ui` is reverted to a web-only design system
+### `@shinefold/ui` is reverted to a web-only design system
 
-Separation runs both ways. `@blog/ui` has accumulated API that exists **only**
+Separation runs both ways. `@shinefold/ui` has accumulated API that exists **only**
 because admin consumes it, and once admin stops, that API is dead weight in a
 library whose sole remaining audience is `apps/web`. Audited against git history
 and current call sites:
@@ -429,7 +429,7 @@ caught by present usage.
 ### Sequencing consequence
 
 This lands **before** the route and page work, not after. Building the new
-overview, provisioning, danger and owner pages against `@blog/ui` and then
+overview, provisioning, danger and owner pages against `@shinefold/ui` and then
 migrating them would build every surface twice.
 
 ## Delivery
@@ -478,12 +478,12 @@ redesign — it can ship ahead of the route work if wanted.
   a super admin is never labelled OWNER.
 - **The sidebar tenant switcher is dropped from the platform tree** (it was
   non-functional there) and kept, unchanged, in the owner tree.
-- **`apps/platform` owns every primitive it renders** (§8), with `@blog/ui`
+- **`apps/platform` owns every primitive it renders** (§8), with `@shinefold/ui`
   confined to the Look preview's simulated-site sample — the tenant's own
   appearance, where a copy would drift from the real site and make the preview
   lie. The dependency stays; its reach shrinks from 68 sites to one directory. It copies the 13 icons it uses rather than adding a shared package,
   gains its own Tailwind token layer, and `Textarea` — dead once admin stops
-  importing it — is deleted from `@blog/ui`. This lands before the route work,
+  importing it — is deleted from `@shinefold/ui`. This lands before the route work,
   or every surface gets built twice.
 
 ## Open questions

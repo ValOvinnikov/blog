@@ -1,4 +1,4 @@
-# @blog/utils
+# @shinefold/utils
 
 > Framework-free, dependency-free pure helper functions.
 
@@ -11,7 +11,7 @@ logic it needs without inheriting framework baggage.
 ## Layer contract
 
 - **Depends on:** `culori` only (no workspace dependencies).
-- **Consumed by:** `@blog/ui`, `@blog/service`, `@blog/db`, `@blog/studio`, `apps/web`, `apps/platform`.
+- **Consumed by:** `@shinefold/ui`, `@shinefold/service`, `@shinefold/db`, `@shinefold/studio`, `apps/web`, `apps/platform`.
 - **Never imports:** React, Next.js, Sanity, or any sibling workspace.
 
 ## Layout
@@ -28,19 +28,19 @@ logic it needs without inheriting framework baggage.
 - `result/` — `TResult<T, E>` and its builders `okResult` / `errorResult`.
 
 Each directory re-exports through its own `index.ts` and gets its own
-`package.json` `exports` subpath (`@blog/utils/async`, `@blog/utils/color`,
+`package.json` `exports` subpath (`@shinefold/utils/async`, `@shinefold/utils/color`,
 …) alongside the root barrel (`.`, `src/index.ts`) that re-exports all of
 them.
 
 ## Scripts
 
-| Script       | Command                                |
-| ------------ | -------------------------------------- |
-| `lint`       | `pnpm --filter @blog/utils lint`       |
-| `type-check` | `pnpm --filter @blog/utils type-check` |
-| `format`     | `pnpm --filter @blog/utils format`     |
-| `test`       | `pnpm --filter @blog/utils test`       |
-| `test:watch` | `pnpm --filter @blog/utils test:watch` |
+| Script       | Command                                     |
+| ------------ | ------------------------------------------- |
+| `lint`       | `pnpm --filter @shinefold/utils lint`       |
+| `type-check` | `pnpm --filter @shinefold/utils type-check` |
+| `format`     | `pnpm --filter @shinefold/utils format`     |
+| `test`       | `pnpm --filter @shinefold/utils test`       |
+| `test:watch` | `pnpm --filter @shinefold/utils test:watch` |
 
 Root-level `pnpm type-check` / `pnpm lint` / `pnpm test` run every
 workspace's equivalent script through Turborepo, this one included.

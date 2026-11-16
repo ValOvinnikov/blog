@@ -1,8 +1,8 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockTenant } from '@platform/testing/tenants/fixtures';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 import { renderTenantScopedPage } from './render-tenant-scoped-page';
 

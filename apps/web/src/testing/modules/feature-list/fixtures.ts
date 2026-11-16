@@ -4,8 +4,8 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
   ICONS,
-} from '@blog/config';
-import type { TFeatureListItem, TFeatureListModule } from '@blog/service';
+} from '@shinefold/config';
+import type { TFeatureListItem, TFeatureListModule } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 

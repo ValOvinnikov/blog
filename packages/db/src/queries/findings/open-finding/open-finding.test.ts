@@ -1,31 +1,31 @@
+import { faker } from '@faker-js/faker';
 import {
   ERROR_CODE,
   FINDING_KIND,
   FINDING_SEVERITY,
   FINDING_SOURCE,
   FINDING_STATUS,
-} from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { buildDedupeKey } from '@blog/db/queries/findings/build-dedupe-key';
-import type { TOpenFindingInput } from '@blog/db/queries/findings/open-finding';
-import { resolveFinding } from '@blog/db/queries/findings/resolve-finding';
-import * as schema from '@blog/db/schema';
-import type { TFinding } from '@blog/db/schema/findings';
+} from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { buildDedupeKey } from '@shinefold/db/queries/findings/build-dedupe-key';
+import type { TOpenFindingInput } from '@shinefold/db/queries/findings/open-finding';
+import { resolveFinding } from '@shinefold/db/queries/findings/resolve-finding';
+import * as schema from '@shinefold/db/schema';
+import type { TFinding } from '@shinefold/db/schema/findings';
 import {
   MOCK_FINDING_LATER_AT,
   MOCK_FINDING_NOW,
   mockOpenFindingInput,
-} from '@blog/db/testing/findings/fixtures';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/findings/fixtures';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
 import { openFinding } from './open-finding';
 
 faker.seed(6021009);
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

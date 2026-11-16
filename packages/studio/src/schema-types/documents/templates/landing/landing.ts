@@ -1,4 +1,4 @@
-import { landingLayoutTemplate } from '@blog/studio/schema-types/documents/templates/landing/landing-layout-template';
+import { landingLayoutTemplate } from '@shinefold/studio/schema-types/documents/templates/landing/landing-layout-template';
 import { FileText } from 'lucide-react';
 
 export const landingTemplateSchema = landingLayoutTemplate({

@@ -1,6 +1,6 @@
 # Action-outcome guards — conversion backlog
 
-Read an action result through `@blog/config`'s outcome guards, never a raw
+Read an action result through `@shinefold/config`'s outcome guards, never a raw
 `result.outcome === ACTION_OUTCOME.<X>` comparison. Each guard takes the whole
 result and narrows it, so `isOutcomeInvalid(result) && result.fieldErrors`
 type-checks:

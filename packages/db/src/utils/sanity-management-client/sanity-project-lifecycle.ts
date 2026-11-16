@@ -11,14 +11,14 @@ import {
   type TSanityProjectUnarchiveOutcome,
   HTTP_METHOD,
   HTTP_STATUS,
-} from '@blog/config';
-import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
+} from '@shinefold/config';
+import { SANITY_API_PATH } from '@shinefold/db/utils/sanity-management-client/sanity-api-paths';
 import {
   sanityApiError,
   sanityManagementRequest,
   sanityManagementResponse,
-} from '@blog/db/utils/sanity-management-client/sanity-api-request';
-import { toOutcome } from '@blog/utils/to-outcome';
+} from '@shinefold/db/utils/sanity-management-client/sanity-api-request';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 const BILLING_PERMISSION_TEXT = 'billing permission';
 

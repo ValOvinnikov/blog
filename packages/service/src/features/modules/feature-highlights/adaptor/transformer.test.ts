@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   mockRawCtaButton,
   mockRawFeatureHighlightItem,
   mockRawFeatureHighlightsModule,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawInternalLinkDocument } from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawInternalLinkDocument } from '@shinefold/service/testing/shared/fixtures';
 
 import { toFeatureHighlightsModule } from './transformer';
 

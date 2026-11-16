@@ -1,9 +1,9 @@
-import { EMAIL_TYPE } from '@blog/config/constants';
-import { SUBSCRIBER_BAND_CEILINGS } from '@blog/db/constants';
-import { countEmailSendsThisMonth } from '@blog/db/queries/email-usage';
-import { countActiveSubscribers } from '@blog/db/queries/subscribers';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { monthlySendAllowance } from '@blog/db/utils/monthly-send-allowance/monthly-send-allowance';
+import { EMAIL_TYPE } from '@shinefold/config/constants';
+import { SUBSCRIBER_BAND_CEILINGS } from '@shinefold/db/constants';
+import { countEmailSendsThisMonth } from '@shinefold/db/queries/email-usage';
+import { countActiveSubscribers } from '@shinefold/db/queries/subscribers';
+import type { TTenant } from '@shinefold/db/schema/tenants';
+import { monthlySendAllowance } from '@shinefold/db/utils/monthly-send-allowance/monthly-send-allowance';
 import type { TNewsletterLimits } from '@worker/utils/newsletter-send/newsletter-limits';
 
 export async function readNewsletterLimits({

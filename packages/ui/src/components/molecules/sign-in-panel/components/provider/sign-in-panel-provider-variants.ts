@@ -1,4 +1,4 @@
-import { FOCUS_RING, TRANSITION_COLORS, tv } from '@blog/ui/lib/styling';
+import { FOCUS_RING, TRANSITION_COLORS, tv } from '@shinefold/ui/lib/styling';
 
 export const signInPanelProviderVariants = tv({
   slots: {

@@ -1,5 +1,5 @@
-import type { THeadingBlock, TMaybeUndefined } from '@blog/config';
-import type { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
+import type { THeadingBlock, TMaybeUndefined } from '@shinefold/config';
+import type { pageHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/page-heading-block';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawHeadingBlock = InferFragmentType<

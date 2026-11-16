@@ -1,13 +1,13 @@
 import { setTimeout as sleep } from 'node:timers/promises';
 
-import { getTenantSanityCredentials } from '@blog/db/queries/tenants';
-import { SANITY_API_TIMEOUT_MS } from '@blog/db/utils/sanity-management-client/sanity-api-request';
+import { createClient } from '@sanity/client';
+import { getTenantSanityCredentials } from '@shinefold/db/queries/tenants';
+import { SANITY_API_TIMEOUT_MS } from '@shinefold/db/utils/sanity-management-client/sanity-api-request';
 import {
   createSanityRobotToken,
   deleteSanityRobotToken,
-} from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { listSanityWebhooks } from '@blog/db/utils/sanity-management-client/sanity-webhooks';
-import { createClient } from '@sanity/client';
+} from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
+import { listSanityWebhooks } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
 import { type TSeedContentDeps } from '@worker/steps/seed-content';
 import { type TVerifyTenantSeededContentDeps } from '@worker/steps/verify-seeded-content';
 import { listVercelProjectDomains } from '@worker/utils/vercel-client/vercel-client';

@@ -1,19 +1,19 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   LOCALE_ISO_CODES,
   NEWSLETTER_VARIANT,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   MOCK_NEWSLETTER_MODULE_ID,
   mockRawNewsletterModule,
-} from '@blog/service/testing/modules/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+} from '@shinefold/service/testing/modules/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
   mockLocalizedValues,
-} from '@blog/service/testing/shared/localized';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/localized';
 
 import { newsletterModuleQuery } from './query';
 

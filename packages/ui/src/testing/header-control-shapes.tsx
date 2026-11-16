@@ -1,7 +1,7 @@
 import {
   HEADER_CONTROL_SHAPE_DECLARATIONS,
   type THeaderControlShape,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 import { StyleVariants } from './style-variants';

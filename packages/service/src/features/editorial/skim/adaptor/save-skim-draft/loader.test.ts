@@ -1,16 +1,16 @@
-import { getWriteClient } from '@blog/service/sanity/write-client/write-client';
+import { faker } from '@faker-js/faker';
+import { getWriteClient } from '@shinefold/service/sanity/write-client/write-client';
 import {
   MOCK_SKIM_MODEL,
   MOCK_SKIM_TAKEAWAYS,
   mockSkimDraftInput,
-} from '@blog/service/testing/editorial/fixtures';
-import { MOCK_POST_ID } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/editorial/fixtures';
+import { MOCK_POST_ID } from '@shinefold/service/testing/shared/fixtures';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { saveSkimDraft } from './loader';
 
-vi.mock('@blog/service/sanity/write-client/write-client', () => ({
+vi.mock('@shinefold/service/sanity/write-client/write-client', () => ({
   getWriteClient: vi.fn(),
 }));
 

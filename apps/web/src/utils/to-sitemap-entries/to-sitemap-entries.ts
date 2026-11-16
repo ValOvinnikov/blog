@@ -1,4 +1,4 @@
-import { routes, type TLocaleIsoCode } from '@blog/config';
+import { routes, type TLocaleIsoCode } from '@shinefold/config';
 import type { TTenantPageLists } from '@web/server/tenant/tenant-page-lists/tenant-page-lists';
 import { toLanguagePageEntries } from '@web/utils/to-language-page-entries';
 import { toPaginatedPageEntry } from '@web/utils/to-paginated-page-entry';

@@ -1,7 +1,7 @@
-import { LEGAL_PAGE_KIND, LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockSlugPageDocument } from '@blog/service/testing/pages/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { faker } from '@faker-js/faker';
+import { LEGAL_PAGE_KIND, LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockSlugPageDocument } from '@shinefold/service/testing/pages/fixtures';
+import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 
 import { sectionDocumentByKindQuery } from './query';
 

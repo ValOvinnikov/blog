@@ -1,8 +1,8 @@
 'use client';
 
-import type { TStudioMountProps } from '@blog/studio';
 import { setPersistentCookie } from '@platform/utils/persistent-cookie/persistent-cookie';
 import { studioEnteredCookie } from '@platform/utils/studio-entered-cookie/studio-entered-cookie';
+import type { TStudioMountProps } from '@shinefold/studio';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
@@ -11,7 +11,7 @@ import { type TStudioSchemeProps, useStudioScheme } from './use-studio-scheme';
 
 // Sanity Studio cannot render on the server: its error boundary would fill the server HTML until hydration.
 const StudioMount = dynamic(
-  () => import('@blog/studio').then(({ StudioMount }) => StudioMount),
+  () => import('@shinefold/studio').then(({ StudioMount }) => StudioMount),
   { ssr: false, loading: StudioLoading },
 );
 

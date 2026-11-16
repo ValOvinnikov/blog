@@ -1,4 +1,4 @@
-import { ALIGN_JUSTIFY, tv } from '@blog/ui/lib/styling';
+import { ALIGN_JUSTIFY, tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const heroSocialVariants = tv({

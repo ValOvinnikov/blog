@@ -1,12 +1,12 @@
 import 'server-only';
 
-import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
 import { ONBOARDING_LOG } from '@platform/constants/onboarding';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { checkTenantSlug } from '@platform/server/tenants/check-tenant-slug';
 import { logger } from '@platform/utils/logger/logger';
+import { ACTION_OUTCOME, type TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import type { TCreateSiteResult } from './create-site-input';
 

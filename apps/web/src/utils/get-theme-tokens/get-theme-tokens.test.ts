@@ -1,6 +1,6 @@
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { THEME_TOKENS_LOG } from '@web/constants/theme-tokens';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';

@@ -1,7 +1,5 @@
 'use client';
 
-import { SORT_DIRECTION } from '@blog/config/constants';
-import type { TColumnSort } from '@blog/config/types';
 import { nextSort } from '@platform/components/shared/data-table-shell';
 import {
   DATA_REQUEST_KIND_FILTER,
@@ -13,6 +11,8 @@ import {
 } from '@platform/constants/data-request';
 import type { TDataRequestMatch } from '@platform/server/data-requests/to-data-request-matches';
 import { countPages } from '@platform/utils/pagination/pagination';
+import { SORT_DIRECTION } from '@shinefold/config/constants';
+import type { TColumnSort } from '@shinefold/config/types';
 import { useLocale } from 'next-intl';
 import { useState } from 'react';
 

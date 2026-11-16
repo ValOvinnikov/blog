@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
-import { errorResult, okResult, type TResult } from '@blog/utils';
 import {
   UPLOAD_OPERATION,
   type TUploadOperation,
@@ -9,6 +7,8 @@ import type {
   TUploadFailure,
   TUploadResult,
 } from '@platform/server/uploads/upload-error';
+import { ACTION_OUTCOME, type TMaybeUndefined } from '@shinefold/config';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 
 export type TStagedImage = { url: TMaybeUndefined<string>; file?: File };
 

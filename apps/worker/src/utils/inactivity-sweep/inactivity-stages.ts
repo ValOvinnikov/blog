@@ -1,12 +1,12 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   INACTIVITY_STAGE,
   type TInactivityStage,
   type TStampedInactivityStage,
-} from '@blog/db/constants';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
-import { stampTenantInactivityStage } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/constants';
+import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
+import { stampTenantInactivityStage } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { reportDeprovisioningRunStart } from '@worker/utils/deprovisioning-report/deprovisioning-report';
 import { logger } from '@worker/utils/logger/logger';

@@ -1,11 +1,3 @@
-import {
-  BUSY_BUTTON_STYLE,
-  BUTTON_SHAPE,
-  ICONS,
-  SPINNER_STYLE,
-  type TBusyButtonStyle,
-} from '@blog/config';
-import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
@@ -23,6 +15,14 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import { SEGMENTED_LAYOUT } from '@platform/constants/segmented-control';
 import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
+import {
+  BUSY_BUTTON_STYLE,
+  BUTTON_SHAPE,
+  ICONS,
+  SPINNER_STYLE,
+  type TBusyButtonStyle,
+} from '@shinefold/config';
+import { toOptions } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 export type TButtonsCardProps = {

@@ -102,7 +102,7 @@ const LINE_HITS = [
     applies: (file) =>
       TEST_FILE.test(file) && !RENDERER_OR_ROUTE_TEST.test(file),
     matches: (text) =>
-      /^\s*vi\.mock\(.(@web\/(components|modules)|@platform\/components|@blog\/ui)/.test(
+      /^\s*vi\.mock\(.(@web\/(components|modules)|@platform\/components|@shinefold\/ui)/.test(
         text,
       ),
   },

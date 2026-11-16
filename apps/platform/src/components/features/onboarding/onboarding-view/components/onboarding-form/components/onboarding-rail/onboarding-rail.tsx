@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { RailBrand } from '@platform/components/features/layout/rail-brand';
 import { RailIntro } from '@platform/components/features/layout/rail-intro';
 import { SignedInAccount } from '@platform/components/features/layout/signed-in-account';
 import { SegmentedProgress } from '@platform/components/shared/segmented-progress';
 import type { TOnboardingStep } from '@platform/constants/onboarding';
 import { toStepProgressState } from '@platform/utils/step-progress-state/step-progress-state';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { OnboardingRailStep } from './components/onboarding-rail-step/onboarding-rail-step';

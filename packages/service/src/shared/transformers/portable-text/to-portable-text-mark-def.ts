@@ -2,9 +2,9 @@ import {
   PORTABLE_TEXT_BLOCK_TYPE,
   type TPortableTextBlock,
   type TPortableTextMark,
-} from '@blog/config';
-import type { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text/portable-text-mark-def';
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
+} from '@shinefold/config';
+import type { portableTextMarkDefFragment } from '@shinefold/service/shared/fragments/portable-text/portable-text-mark-def';
+import { toLinkDocument } from '@shinefold/service/shared/transformers/link/to-link-document';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawPortableTextMarkDef = InferFragmentType<

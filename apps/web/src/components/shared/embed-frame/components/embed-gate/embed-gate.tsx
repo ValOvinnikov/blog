@@ -5,9 +5,9 @@ import {
   EMBED_PROVIDER,
   type TEmbedProvider,
   type TMaybeNull,
-} from '@blog/config';
-import type { TEmbed } from '@blog/service';
-import { MediaFrame } from '@blog/ui/components/atoms/media-frame';
+} from '@shinefold/config';
+import type { TEmbed } from '@shinefold/service';
+import { MediaFrame } from '@shinefold/ui/components/atoms/media-frame';
 import { ConsentGate } from '@web/components/shared/consent-gate';
 import { useConsent } from '@web/hooks/use-consent';
 import { useRef } from 'react';

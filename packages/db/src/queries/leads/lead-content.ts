@@ -1,10 +1,10 @@
-import type { TLead } from '@blog/db/schema/leads';
+import type { TLead } from '@shinefold/db/schema/leads';
 import {
   decryptPersonalValue,
   emailColumns,
   encryptPersonalValue,
-} from '@blog/db/utils/personal-data/personal-data';
-import { personalDataIndex } from '@blog/utils/encryption';
+} from '@shinefold/db/utils/personal-data/personal-data';
+import { personalDataIndex } from '@shinefold/utils/encryption';
 
 export type TLeadContent = {
   name: string;

@@ -1,6 +1,6 @@
-import { SANITY_WEBHOOK_OPERATION } from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { SANITY_WEBHOOK_OPERATION } from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { enqueueWorkerRun } from '@web/server/revalidate/enqueue-worker-run/enqueue-worker-run';
@@ -17,7 +17,7 @@ const { getPostPublishedAtMock } = vi.hoisted(() => ({
   getPostPublishedAtMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     entities: { posts: { v1: { getPostPublishedAt: getPostPublishedAtMock } } },
   },
@@ -27,7 +27,7 @@ vi.mock('@web/server/revalidate/enqueue-worker-run/enqueue-worker-run', () => ({
   enqueueWorkerRun: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({ queries: {} }));
+vi.mock('@shinefold/db', () => ({ queries: {} }));
 
 faker.seed(7384);
 

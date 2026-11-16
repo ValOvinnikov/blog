@@ -4,8 +4,8 @@ import {
   routes,
   type IWithClassName,
   type TAccountPanelStyle,
-} from '@blog/config';
-import { AccountPanel } from '@blog/ui/components/molecules/account-panel';
+} from '@shinefold/config';
+import { AccountPanel } from '@shinefold/ui/components/molecules/account-panel';
 import { SmartLink } from '@web/components/shared/smart-link';
 import type { TPopoverPanel } from '@web/hooks/use-popover';
 import { usePublicPathname } from '@web/hooks/use-public-pathname';

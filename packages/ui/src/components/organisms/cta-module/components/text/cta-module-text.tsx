@@ -1,5 +1,5 @@
-import type { IWithClassName } from '@blog/config';
-import { Prose } from '@blog/ui/components/atoms/prose';
+import type { IWithClassName } from '@shinefold/config';
+import { Prose } from '@shinefold/ui/components/atoms/prose';
 import type { ReactNode } from 'react';
 
 export type TCtaModuleTextProps = IWithClassName & {

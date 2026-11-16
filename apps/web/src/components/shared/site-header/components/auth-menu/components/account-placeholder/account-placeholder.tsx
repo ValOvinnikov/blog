@@ -1,4 +1,4 @@
-import type { IAccountControl } from '@blog/config';
+import type { IAccountControl } from '@shinefold/config';
 import { authMenuVariants } from '@web/components/shared/site-header/components/auth-menu/auth-menu-variants';
 import { AccountTriggers } from '@web/components/shared/site-header/components/auth-menu/components/account-triggers/account-triggers';
 import { useTranslations } from 'next-intl';

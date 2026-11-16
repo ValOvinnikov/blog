@@ -1,9 +1,9 @@
 import type {
   InternationalizedArrayString,
   InternationalizedArrayText,
-} from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+} from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
 import type { GroqBuilder, GroqBuilderSubquery, QueryConfig } from 'groqd';
 
 export type TLanguageFilter =

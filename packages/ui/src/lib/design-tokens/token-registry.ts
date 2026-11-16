@@ -1,4 +1,4 @@
-import themeCss from '@blog/tailwind-config/theme.css?raw';
+import themeCss from '@shinefold/tailwind-config/theme.css?raw';
 
 import {
   parseThemeTokens,

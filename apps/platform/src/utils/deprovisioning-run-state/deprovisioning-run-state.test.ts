@@ -1,9 +1,9 @@
-import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import {
   MOCK_RUN_PLUS_1_MIN_AT,
   MOCK_RUN_PLUS_2_MIN_AT,
   MOCK_RUN_STARTED_AT,
 } from '@platform/testing/tenants/fixtures';
+import { TENANT_PROVISIONING_STEP_STATUS } from '@shinefold/db/constants';
 
 import {
   deprovisioningOverallStatus,

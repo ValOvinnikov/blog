@@ -1,4 +1,4 @@
-import { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
+import { getTenantByDomain } from '@shinefold/db/queries/tenant-domains/get-tenant-by-domain';
 import { CUSTOM_DOMAIN_LOG } from '@worker/constants/custom-domain';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { mapTenantDomain } from '@worker/steps/map-domain';
@@ -15,7 +15,7 @@ import { getVercelEnv } from '@worker/utils/vercel-env/vercel-env';
 
 import { ensureCustomDomainConnected } from './ensure-custom-domain-connected';
 
-vi.mock('@blog/db/queries/tenant-domains/get-tenant-by-domain');
+vi.mock('@shinefold/db/queries/tenant-domains/get-tenant-by-domain');
 vi.mock('@worker/steps/map-domain');
 vi.mock('@worker/utils/vercel-env/vercel-env');
 vi.mock('workflow');

@@ -1,9 +1,9 @@
-import { NEWSLETTER_SKIP_REASON } from '@blog/db/constants';
-import { getNewsletterPausedAt } from '@blog/db/queries/email-config';
-import { markNewsletterPostSkipped } from '@blog/db/queries/newsletter-post-sends';
-import { listActiveSubscribers } from '@blog/db/queries/subscribers';
-import { getTenantById } from '@blog/db/queries/tenants';
-import { SendEmailError, sendEmail } from '@blog/email';
+import { NEWSLETTER_SKIP_REASON } from '@shinefold/db/constants';
+import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config';
+import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends';
+import { listActiveSubscribers } from '@shinefold/db/queries/subscribers';
+import { getTenantById } from '@shinefold/db/queries/tenants';
+import { SendEmailError, sendEmail } from '@shinefold/email';
 import {
   NEWSLETTER_SEND_LOG,
   NEWSLETTER_SEND_PACE,
@@ -33,11 +33,11 @@ import {
 } from './send-newsletter-page';
 
 vi.mock('node:timers/promises');
-vi.mock('@blog/db/queries/email-config');
-vi.mock('@blog/db/queries/newsletter-post-sends');
-vi.mock('@blog/db/queries/subscribers');
-vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/email/transport/send-email');
+vi.mock('@shinefold/db/queries/email-config');
+vi.mock('@shinefold/db/queries/newsletter-post-sends');
+vi.mock('@shinefold/db/queries/subscribers');
+vi.mock('@shinefold/db/queries/tenants');
+vi.mock('@shinefold/email/transport/send-email');
 vi.mock('@worker/utils/newsletter-send/build-post-send');
 vi.mock('@worker/utils/newsletter-send/newsletter-send-context');
 vi.mock('@worker/utils/newsletter-send/is-site-sending-posts');

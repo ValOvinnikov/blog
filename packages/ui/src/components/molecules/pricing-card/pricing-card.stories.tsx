@@ -1,6 +1,6 @@
-import { Button } from '@blog/ui/components/atoms/button';
-import { LinkButton } from '@blog/ui/components/molecules/link-button';
-import { CardStyles } from '@blog/ui/testing/card-styles';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
+import { CardStyles } from '@shinefold/ui/testing/card-styles';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { PricingCard } from './pricing-card';

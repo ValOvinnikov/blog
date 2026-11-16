@@ -1,5 +1,5 @@
-import { service } from '@blog/service';
-import { hasLength } from '@blog/utils/primitives';
+import { service } from '@shinefold/service';
+import { hasLength } from '@shinefold/utils/primitives';
 import { POST_RELATED_LOG } from '@web/constants/post-related';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { getPostCardsSection } from '@web/server/post-cards/get-post-cards-section/get-post-cards-section';

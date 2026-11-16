@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 
 function requireEnv(name: string): string {
   const value = process.env[name];

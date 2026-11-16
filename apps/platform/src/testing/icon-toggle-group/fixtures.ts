@@ -1,6 +1,6 @@
-import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { TIconToggleGroupProps } from '@platform/components/shared/icon-toggle-group';
+import { ICONS } from '@shinefold/config';
 
 type TMockIconToggleOption = TIconToggleGroupProps<string>['options'][number];
 

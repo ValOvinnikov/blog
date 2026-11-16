@@ -1,9 +1,9 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
 import {
   ENQUEUE_SIGNATURE_HEADER,
   ENQUEUE_TIMESTAMP_HEADER,
   isValidEnqueueSignature,
-} from '@blog/utils/enqueue-signature';
+} from '@shinefold/utils/enqueue-signature';
 import {
   RETRY_AFTER_HEADER,
   RETRY_AFTER_SECOND_MS,

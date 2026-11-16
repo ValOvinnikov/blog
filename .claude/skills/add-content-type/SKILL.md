@@ -3,7 +3,7 @@ name: add-content-type
 description: >-
   Use when a change spans more than one workspace — above all adding or
   extending a Sanity document, module or object whose shape has to reach
-  @blog/config typegen, @blog/service, @blog/ui and apps/web.
+  @shinefold/config typegen, @shinefold/service, @shinefold/ui and apps/web.
 ---
 
 # Add a content type (end-to-end)
@@ -14,7 +14,7 @@ says what each step hands the next. The lifecycle around it is
 `develop-feature`; data flow is `SPEC.md` §5, the content model §6.
 
 ```
-studio (schema) ──typegen──► @blog/config ──► @blog/service ──► apps/web ──props──► @blog/ui
+studio (schema) ──typegen──► @shinefold/config ──► @shinefold/service ──► apps/web ──props──► @shinefold/ui
 ```
 
 - Never reverse an arrow. Build order is `studio → service → ui → web`,
@@ -50,7 +50,7 @@ studio (schema) ──typegen──► @blog/config ──► @blog/service ─�
   (schema), the orchestrator's `pnpm typegen`, a `config` dispatch (the
   `page-module.test.ts` assertion, when one is owed), a `web` dispatch (the
   `REVALIDATE_TAGS` key), and only then `verify-runner`.
-- When the schema is done, `pnpm --filter @blog/studio typegen` once, re-run
+- When the schema is done, `pnpm --filter @shinefold/studio typegen` once, re-run
   until the diff is minimal, and commit
   `packages/config/src/sanity/generated/` with it.
 
@@ -78,7 +78,7 @@ studio (schema) ──typegen──► @blog/config ──► @blog/service ─�
   (`@web/components/shared/portable-text`), never here.
 - `react-component-practices`, then `ui-library-practices`. The folder's
   `index.ts` exports the component and its props type; consumers import
-  `@blog/ui/components/<level>/<name>` (no root barrel). Every new or changed
+  `@shinefold/ui/components/<level>/<name>` (no root barrel). Every new or changed
   component gets a story (`ui-storybook`).
 
 ## 4. Composition — `apps/web` · `web`
@@ -90,8 +90,8 @@ studio (schema) ──typegen──► @blog/config ──► @blog/service ─�
   `renderHeroModule`. A routed document: a route under
   `src/app/[tenant]/[locale]/`. → `.claude/agents/web.md`.
 - The Server Component calls `service.<domain>.<name>.v1.*`, checks
-  `ok && data`, passes plain props to `@blog/ui`. No GROQ, no Sanity client.
-- `dataTestId` on each `@blog/ui` component an E2E test targets: stable
+  `ok && data`, passes plain props to `@shinefold/ui`. No GROQ, no Sanity client.
+- `dataTestId` on each `@shinefold/ui` component an E2E test targets: stable
   kebab-case scoped to the page or section (`post-article-header`).
 - A new route: `generateMetadata`, plus `sitemap.ts` and RSS when publicly
   listed → `seo-and-metadata`.

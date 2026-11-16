@@ -1,18 +1,18 @@
 ---
 name: web-component-practices
-description: Use when building or editing an interactive component in apps/web — popover, dropdown, menu, disclosure, tabs, toggle, clipboard, focus trap, outside-click/Escape handling — or composing a pure @blog/ui component with client state. Apply the moment you add 'use client' + useState/useEffect + document.addEventListener/getElementById/querySelector to a component.
+description: Use when building or editing an interactive component in apps/web — popover, dropdown, menu, disclosure, tabs, toggle, clipboard, focus trap, outside-click/Escape handling — or composing a pure @shinefold/ui component with client state. Apply the moment you add 'use client' + useState/useEffect + document.addEventListener/getElementById/querySelector to a component.
 ---
 
 # Web component practices (apps/web)
 
-`apps/web` is where pure `@blog/ui` meets client interactivity. These rules
+`apps/web` is where pure `@shinefold/ui` meets client interactivity. These rules
 keep that boundary clean. They sit on top of `react-component-practices`
 (server first, `useId`, props, state, styling files, placement, size), which
 they do not repeat.
 
 ## Rule 1 — slot in, never wrap
 
-A pure `@blog/ui` component that shows an interactive element exposes a
+A pure `@shinefold/ui` component that shows an interactive element exposes a
 `ReactNode` slot. Build the widget as a `'use client'` leaf in `apps/web` and
 pass it **into** the slot — never wrap the pure component and re-forward its
 props.
@@ -28,8 +28,8 @@ props.
 
 **Self-check:** a component that takes another component's data props
 (`author`, `publishedAt`) _plus_ a bag of interactive state, or whose test
-only passes with a faked `@blog/ui` component, wrapped where it should have
-slotted in (`testing-practices` → "What to fake"). The `@blog/ui` side of
+only passes with a faked `@shinefold/ui` component, wrapped where it should have
+slotted in (`testing-practices` → "What to fake"). The `@shinefold/ui` side of
 this rule is `ui-library-practices` → "Component conventions".
 
 ## Rule 2 — client behaviour in ref-based hooks
@@ -96,9 +96,9 @@ render them.
 Below the budget, don't split a component that has one render path and
 straightforward state.
 
-## Rule 4 — reach for a `@blog/ui` atom before a raw HTML element
+## Rule 4 — reach for a `@shinefold/ui` atom before a raw HTML element
 
-If `@blog/ui` ships an atom for the element — `Button`, `IconButton`,
+If `@shinefold/ui` ships an atom for the element — `Button`, `IconButton`,
 `TextInput`, `Avatar` — use it, even for a small disabled or loading control.
 Bare markup in `apps/web` is the exception: a framework-coupled wrapper
 (`SmartLink`, `SanityImage`) or a capability the atom's prop type genuinely
@@ -144,7 +144,7 @@ overrides the code mark").
 
 - Props, including passing a view-model whole (`author={post.author}`):
   `react-component-practices` → "Props". When a view-model field won't
-  type-check against a `@blog/ui` prop, rename the prop
+  type-check against a `@shinefold/ui` prop, rename the prop
   (`ui-library-practices` → "Shape data props to the view-model you're fed").
 - Which file holds the `tv()`, including after a split:
   `react-component-practices` → "Styling files"; class grouping:

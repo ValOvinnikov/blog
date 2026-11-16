@@ -1,4 +1,4 @@
-import { NEWSLETTER_RESULT } from '@blog/config';
+import { NEWSLETTER_RESULT } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { NewsletterResultPage } from './newsletter-result-page';

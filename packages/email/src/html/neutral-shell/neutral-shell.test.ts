@@ -1,4 +1,5 @@
-import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
+import { faker } from '@faker-js/faker';
+import { PLATFORM_EMAIL_BRAND } from '@shinefold/email/html/platform-email-brand/platform-email-brand';
 import {
   BRAND_HEADER_DIVIDER,
   COPYRIGHT_ENTITY,
@@ -10,8 +11,7 @@ import {
   MOCK_STRUCTURAL_HTML,
   OPERATOR_BRAND_NAME,
   PREHEADER_STYLE,
-} from '@blog/email/testing/email-fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/email/testing/email-fixtures';
 
 import { buildNeutralShell } from './neutral-shell';
 

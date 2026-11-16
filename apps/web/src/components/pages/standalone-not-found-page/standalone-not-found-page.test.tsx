@@ -1,9 +1,9 @@
+import { faker } from '@faker-js/faker';
 import {
   LOCALE_ISO_CODES,
   SITE_MESSAGES_BY_LOCALE,
   type TSiteMessages,
-} from '@blog/config';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import {

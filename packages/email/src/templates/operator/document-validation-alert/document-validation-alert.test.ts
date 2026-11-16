@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_ESCAPED_UNSAFE_MARKUP,
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
   MOCK_UNSAFE_MARKUP,
-} from '@blog/email/testing/email-fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/email/testing/email-fixtures';
 
 import { buildDocumentValidationAlertEmail } from './document-validation-alert';
 

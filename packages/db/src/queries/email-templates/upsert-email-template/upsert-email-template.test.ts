@@ -1,10 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   EMAIL_TEMPLATE_TYPE,
   LOCALE_ISO_CODES,
   SUBJECT_MAX,
-} from '@blog/config/constants';
-import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+} from '@shinefold/config/constants';
+import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   MOCK_CUSTOM_SUBJECT,
   MOCK_ENGLISH_SUBJECT,
@@ -12,15 +13,14 @@ import {
   MOCK_GERMAN_SUBJECT,
   MOCK_LOGO_URL,
   MOCK_SECOND_SUBJECT,
-} from '@blog/db/testing/email-templates/fixtures';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/email-templates/fixtures';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
 
 import { upsertEmailTemplate } from './upsert-email-template';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(61014);
 

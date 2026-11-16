@@ -1,11 +1,11 @@
 'use client';
 
-import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
 import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
 import {
   ONBOARDING_STEP,
   SITE_ADDRESS_STATUS,
 } from '@platform/constants/onboarding';
+import type { TLocaleIsoCode, TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import type { FormEvent } from 'react';
 

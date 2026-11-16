@@ -1,10 +1,10 @@
-import type { IWithChildren } from '@blog/config/react';
 import type { TLookRowsGroup } from '@platform/components/features/look/look-form/use-look-open-rows';
 import { Accordion } from '@platform/components/shared/accordion';
 import { ACCORDION_VARIANT } from '@platform/constants/accordion';
 import type { TLookGroup } from '@platform/constants/look-group';
 import type { TLookRow } from '@platform/constants/look-row';
 import { toLookAnchorId } from '@platform/utils/look-anchor/look-anchor';
+import type { IWithChildren } from '@shinefold/config/react';
 import { useId } from 'react';
 
 import { lookGroupVariants } from './look-group-variants';

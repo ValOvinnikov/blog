@@ -1,6 +1,6 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { SESSION_STATUS } from '@web/constants/session';
 import { toSessionUsername } from '@web/utils/to-session-username';
 import { useSession } from 'next-auth/react';

@@ -1,11 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { getDb } from '@blog/db/client';
-import { LEADS_PAGE_SIZE } from '@blog/db/constants/lead';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { getDb } from '@shinefold/db/client';
+import { LEADS_PAGE_SIZE } from '@shinefold/db/constants/lead';
 import {
   readLeadContent,
   type TLeadContent,
-} from '@blog/db/queries/leads/lead-content';
-import { leads, type TLead } from '@blog/db/schema/leads';
+} from '@shinefold/db/queries/leads/lead-content';
+import { leads, type TLead } from '@shinefold/db/schema/leads';
 import { and, desc, eq, sql } from 'drizzle-orm';
 
 export type TLeadsCursor = {

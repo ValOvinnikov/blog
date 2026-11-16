@@ -1,4 +1,4 @@
-import type { TTenantSanityCredentials } from '@blog/db/queries/tenants/get-tenant-sanity-credentials/get-tenant-sanity-credentials';
+import type { TTenantSanityCredentials } from '@shinefold/db/queries/tenants/get-tenant-sanity-credentials/get-tenant-sanity-credentials';
 import { readInternalPageRequest } from '@web/server/internal-pages/read-internal-page-request/read-internal-page-request';
 import type { NextResponse } from 'next/server';
 import type { z } from 'zod';

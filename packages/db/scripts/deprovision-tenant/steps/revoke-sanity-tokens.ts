@@ -1,16 +1,16 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getTenantSanityManagementCredentials } from '@blog/db/queries/tenants/get-tenant-sanity-management-credentials';
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getTenantSanityManagementCredentials } from '@shinefold/db/queries/tenants/get-tenant-sanity-management-credentials';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   missingManagementRobotIdMessage,
   robotsInRevocationOrder,
-} from '@blog/db/utils/sanity-management-client/sanity-robot-revocation';
+} from '@shinefold/db/utils/sanity-management-client/sanity-robot-revocation';
 import {
   deleteSanityRobotToken,
   listSanityRobotTokens,
   type TSanityRobotTokenSummary,
-} from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
+import { sanitizeLogMessage } from '@shinefold/insight';
 
 import type { TDeprovisionEnv } from '../lib/env';
 

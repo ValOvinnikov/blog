@@ -1,7 +1,7 @@
-import { q } from '@blog/service/sanity/query/query';
-import { sanityImageAssetFragment } from '@blog/service/shared/fragments/image/image';
-import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+import { q } from '@shinefold/service/sanity/query/query';
+import { sanityImageAssetFragment } from '@shinefold/service/shared/fragments/image/image';
+import { getLocalizedField } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
 
 export const localizedImageWithAltFragment = q
   .parameters<TLocaleQueryParams>()

@@ -1,5 +1,5 @@
-import { SITE_MESSAGES } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
+import { SITE_MESSAGES } from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
@@ -19,7 +19,7 @@ const { getHeroProfileMock } = vi.hoisted(() => ({
   getHeroProfileMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       heroProfile: { v1: { getHeroProfile: getHeroProfileMock } },

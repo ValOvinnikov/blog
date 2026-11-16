@@ -3,12 +3,12 @@ import {
   routes,
   type TLocaleBcp47Tag,
   type TLocaleIsoCode,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   type TPostDetail,
   type TSanityProjectRef,
   urlForSanityImage,
-} from '@blog/service';
+} from '@shinefold/service';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 
 export type TBlogPostingSchema = {

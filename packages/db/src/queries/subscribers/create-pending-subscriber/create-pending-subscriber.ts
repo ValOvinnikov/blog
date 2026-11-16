@@ -2,15 +2,15 @@ import {
   SUBSCRIBER_OUTCOME,
   ERROR_CODE,
   type TErrorCode,
-} from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import { findSubscriberByExactEmail } from '@blog/db/queries/subscribers/user-subscriber';
-import { subscribers } from '@blog/db/schema/subscribers';
-import { uniqueEmailColumns } from '@blog/db/utils/personal-data/personal-data';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { normalizeEmail } from '@blog/utils/normalize-email-identity';
+} from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import { findSubscriberByExactEmail } from '@shinefold/db/queries/subscribers/user-subscriber';
+import { subscribers } from '@shinefold/db/schema/subscribers';
+import { uniqueEmailColumns } from '@shinefold/db/utils/personal-data/personal-data';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { normalizeEmail } from '@shinefold/utils/normalize-email-identity';
 
 export type TPendingSubscriber = {
   id: string;

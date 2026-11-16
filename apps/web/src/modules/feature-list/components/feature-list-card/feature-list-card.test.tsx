@@ -1,5 +1,5 @@
-import { CARD_IMAGE_SHAPE, ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { CARD_IMAGE_SHAPE, ICONS } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';

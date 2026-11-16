@@ -1,11 +1,11 @@
-import { routes } from '@blog/config';
-import { EMAIL_ACCOUNT } from '@blog/config/constants';
+import { routes } from '@shinefold/config';
+import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import {
   buildPostEmail,
   buildSiteEmailTag,
   type TSendEmailInput,
-} from '@blog/email';
-import { signNewsletterUnsubscribeToken } from '@blog/utils/newsletter-unsubscribe-token';
+} from '@shinefold/email';
+import { signNewsletterUnsubscribeToken } from '@shinefold/utils/newsletter-unsubscribe-token';
 import { RESEND_IDEMPOTENCY_KEY_MAX_LENGTH } from '@worker/constants/newsletter-send';
 import type { TNewsletterSendContext } from '@worker/utils/newsletter-send/newsletter-send-context';
 import type { TNewsletterPost } from '@worker/utils/newsletter-send/read-newsletter-post';

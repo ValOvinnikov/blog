@@ -1,8 +1,8 @@
-import { LINK_TYPE } from '@blog/config/constants';
-import { LINK_PAGE_TYPES } from '@blog/studio/schema-types/documents/link/link-page-types';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { onePagePerTranslationGroupFilter } from '@blog/studio/schema-types/filters/one-page-per-translation-group';
-import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
+import { LINK_TYPE } from '@shinefold/config/constants';
+import { LINK_PAGE_TYPES } from '@shinefold/studio/schema-types/documents/link/link-page-types';
+import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { onePagePerTranslationGroupFilter } from '@shinefold/studio/schema-types/filters/one-page-per-translation-group';
+import { localizedStringValues } from '@shinefold/studio/schema-types/validation/localized-string-values/localized-string-values';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

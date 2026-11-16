@@ -1,5 +1,5 @@
-import type { IWithChildren } from '@blog/config/react';
 import { LookSubheading } from '@platform/components/features/look/look-form/components/look-subheading';
+import type { IWithChildren } from '@shinefold/config/react';
 import { useId } from 'react';
 
 import { lookSubsectionVariants } from './look-subsection-variants';

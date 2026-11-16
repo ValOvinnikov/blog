@@ -1,11 +1,14 @@
-import { MOCK_USER_EMAIL } from '@blog/db/testing/fixtures';
+import { MOCK_USER_EMAIL } from '@shinefold/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   MOCK_CORRUPT_PERSONAL_VALUE,
   mockAccountEmailIndex,
   testPersonalEmailIndex,
-} from '@blog/db/testing/personal-data';
-import { accountEmailIndex, personalDataIndex } from '@blog/utils/encryption';
+} from '@shinefold/db/testing/personal-data';
+import {
+  accountEmailIndex,
+  personalDataIndex,
+} from '@shinefold/utils/encryption';
 
 import {
   decryptOptionalPersonalValue,

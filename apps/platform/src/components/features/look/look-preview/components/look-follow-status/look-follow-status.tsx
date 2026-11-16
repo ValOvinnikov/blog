@@ -1,6 +1,5 @@
 'use client';
 
-import { ICONS, SIZE, type TMaybeUndefined } from '@blog/config';
 import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
 import type { TLookFollow } from '@platform/components/features/look/look-preview/use-look-follow';
 import { Button } from '@platform/components/shared/button';
@@ -14,6 +13,7 @@ import {
   type TPreviewDevice,
 } from '@platform/constants/preview';
 import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
+import { ICONS, SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { LookFollowSentence } from './components/look-follow-sentence';

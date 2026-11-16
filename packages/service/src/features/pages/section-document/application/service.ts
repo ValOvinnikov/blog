@@ -1,11 +1,11 @@
-import { getSectionDocumentByKind } from '@blog/service/features/pages/section-document/adaptor/by-kind/loader';
-import type { TSectionDocumentKind } from '@blog/service/features/pages/section-document/adaptor/by-kind/types';
-import { getSectionDocument } from '@blog/service/features/pages/section-document/adaptor/detail-page/loader';
-import { getSectionDocumentParams } from '@blog/service/features/pages/section-document/adaptor/detail-page-params/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
-import type { TPageQueryPageParams } from '@blog/service/shared/types/page/page-query-page-params';
-import type { TSectionDocumentType } from '@blog/service/shared/types/page/section-document-type';
-import { safeAsync } from '@blog/utils';
+import { getSectionDocumentByKind } from '@shinefold/service/features/pages/section-document/adaptor/by-kind/loader';
+import type { TSectionDocumentKind } from '@shinefold/service/features/pages/section-document/adaptor/by-kind/types';
+import { getSectionDocument } from '@shinefold/service/features/pages/section-document/adaptor/detail-page/loader';
+import { getSectionDocumentParams } from '@shinefold/service/features/pages/section-document/adaptor/detail-page-params/loader';
+import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
+import type { TPageQueryPageParams } from '@shinefold/service/shared/types/page/page-query-page-params';
+import type { TSectionDocumentType } from '@shinefold/service/shared/types/page/section-document-type';
+import { safeAsync } from '@shinefold/utils';
 
 export function createSectionDocumentService() {
   return {

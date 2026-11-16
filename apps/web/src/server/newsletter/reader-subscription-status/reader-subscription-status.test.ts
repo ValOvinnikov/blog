@@ -1,7 +1,7 @@
-import { SUBSCRIBER_OUTCOME } from '@blog/config';
-import { queries } from '@blog/db';
-import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import { toOutcome } from '@blog/utils/to-outcome';
+import { SUBSCRIBER_OUTCOME } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { arrangeNoSessionOnce } from '@web/testing/shared/session/arrange-no-session-once';
 import { MOCK_USER_ID } from '@web/testing/shared/session/fixtures';
@@ -13,8 +13,8 @@ vi.mock('@web/server/auth/auth');
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+vi.mock('@shinefold/db', async () => ({
+  ...(await import('@shinefold/db/constants')),
   queries: { subscribers: { getSubscriptionStatus: vi.fn() } },
 }));
 

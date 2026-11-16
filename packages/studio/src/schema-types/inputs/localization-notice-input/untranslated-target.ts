@@ -1,5 +1,8 @@
-import { isLocaleIsoCode, type TLocaleIsoCode } from '@blog/config/constants';
-import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import {
+  isLocaleIsoCode,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import { LOCALE_LABEL } from '@shinefold/studio/schema-types/inputs/localization-notice-input/missing-locales';
 
 export const getUntranslatedTargetLocales = (
   translatedLanguages: readonly unknown[],

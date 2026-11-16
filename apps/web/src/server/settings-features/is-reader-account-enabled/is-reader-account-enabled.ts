@@ -1,4 +1,4 @@
-import { CAPABILITY, type TCapability } from '@blog/config';
+import { CAPABILITY, type TCapability } from '@shinefold/config';
 import {
   isCapabilityEnabled,
   isCapabilityEnabledForTenant,

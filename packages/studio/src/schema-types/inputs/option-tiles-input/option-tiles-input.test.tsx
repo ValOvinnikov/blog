@@ -1,10 +1,10 @@
 /**
  * @vitest-environment jsdom
  */
-import { createOptionTilesInput } from '@blog/studio/schema-types/inputs/option-tiles-input/option-tiles-input';
 import { faker } from '@faker-js/faker';
 import { ThemeProvider } from '@sanity/ui';
 import { buildTheme } from '@sanity/ui/theme';
+import { createOptionTilesInput } from '@shinefold/studio/schema-types/inputs/option-tiles-input/option-tiles-input';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef, type RefObject } from 'react';
 import { set, type StringInputProps, unset } from 'sanity';

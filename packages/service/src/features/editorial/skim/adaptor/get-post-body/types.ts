@@ -1,3 +1,3 @@
-import type { ArticleText } from '@blog/config';
+import type { ArticleText } from '@shinefold/config';
 
 export type TPostBody = ArticleText;

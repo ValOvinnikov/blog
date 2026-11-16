@@ -4,7 +4,7 @@ description: >-
   Read-only accessibility auditor for the full diff (origin/main...HEAD + working
   tree) restricted to packages/ui, apps/web, and apps/platform files. Use after
   implementation is complete, alongside `reviewer`, for any diff that
-  touches @blog/ui components or apps/web / apps/platform presentation — checks the repo's
+  touches @shinefold/ui components or apps/web / apps/platform presentation — checks the repo's
   a11y rules (ariaLabel prop convention, no in-component date formatting,
   real heading tags, polymorphic linkAs, alt text, focus-visible, icon
   labelling) that today live only in skill prose. Read-only: reports
@@ -42,7 +42,7 @@ stop — an empty scope is not `NEEDS FIXES`, and never invent findings
 elsewhere.
 
 `apps/platform` is internal, which lowers the traffic, not the standard: the
-checklist applies there too, except the clauses that are `@blog/ui`
+checklist applies there too, except the clauses that are `@shinefold/ui`
 contracts — the `ariaLabel` prop (rule 1), date formatting (rule 2) and
 `linkAs` (rule 4). A platform page may format its own date and links with
 `@platform/i18n/navigation`'s `Link`. Its interactive primitives come from
@@ -85,25 +85,25 @@ disagree.
   → "Copy".
 
 1. **No hardcoded accessible names.** `aria-label`, landmark names and button
-   labels are never a literal in JSX. In `@blog/ui` they are props —
+   labels are never a literal in JSX. In `@shinefold/ui` they are props —
    `ariaLabel` mapped to `aria-label`. In `apps/web` and `apps/platform` they
    come from a catalogue key (`aria-label={t('ariaLabel')}`). A component
    whose name is its own visible text plus props it already receives composes
    it in one `sr-only` span instead of taking an `ariaLabel` override (WCAG
    2.5.3; `apps/web`'s `LanguageCodes` is the precedent).
-2. **No date formatting in `@blog/ui`.** It takes `publishedAt` (ISO 8601) and
+2. **No date formatting in `@shinefold/ui`.** It takes `publishedAt` (ISO 8601) and
    `formattedDate` (pre-formatted in the app) and renders `<time dateTime>`
    only when both are present; `Intl.DateTimeFormat`/locale logic stays in
    the app.
 3. **Title slots are real headings at the caller's level**, never a `<div>`
    — in `packages/ui` through its `Heading` atom, in `apps/platform` through
    the app's own `Heading` (`apps/platform/src/components/shared/heading`),
-   never `@blog/ui`'s. When a diff adds, removes or re-levels a heading,
+   never `@shinefold/ui`'s. When a diff adds, removes or re-levels a heading,
    check the **composed page's** outline, not only the diff's own nesting:
    follow the import chain up to the page/layout and confirm the level fits
    (an `<h3>` under an `<h1>` with no `<h2>` skips a level). Per-diff nesting
    checks are how a page once shipped `h1 → h3` through several reviews.
-4. **Every anchor a `@blog/ui` component builds takes a polymorphic
+4. **Every anchor a `@shinefold/ui` component builds takes a polymorphic
    `linkAs`/`as` prop**, never a bare `<a>` — including one built to hand into
    another component's slot.
 5. **Images have `alt`**; a decorative one has an explicit `alt=""`, never an

@@ -1,10 +1,10 @@
-import type { TVoiceFieldId, TVoicePortableText } from '@blog/config';
-import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
-import { headingVariants } from '@blog/ui/components/atoms/heading/heading-variants';
-import { Text } from '@blog/ui/components/atoms/text';
-import { isString } from '@blog/utils/primitives';
 import { VoiceKeyFrame } from '@platform/components/features/site-preview/voice-key-frame';
 import { VoiceRichText } from '@platform/components/features/site-preview/voice-rich-text';
+import type { TVoiceFieldId, TVoicePortableText } from '@shinefold/config';
+import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
+import { headingVariants } from '@shinefold/ui/components/atoms/heading/heading-variants';
+import { Text } from '@shinefold/ui/components/atoms/text';
+import { isString } from '@shinefold/utils/primitives';
 import type { ReactNode } from 'react';
 
 import { specimenPageVariants } from './specimen-page-variants';

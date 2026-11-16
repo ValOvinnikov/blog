@@ -1,4 +1,4 @@
-# Polymorphic `as` — Level 2 and anchor rules (`@blog/ui`)
+# Polymorphic `as` — Level 2 and anchor rules (`@shinefold/ui`)
 
 Reference for `ui-library-practices` § Polymorphism, which picks the level
 (Level 1 union by default). Read this when a component needs element-specific
@@ -18,7 +18,7 @@ closed like any other atom.
 
 For a wrapper that accepts **any** element and exposes _that_ element's props
 (`href` only when `as="a"`, `disabled` only when `as="button"`), import
-`TPolymorphicProps` from `@blog/config/react`
+`TPolymorphicProps` from `@shinefold/config/react`
 (`packages/config/src/react/polymorphic.ts`) — never re-derive it. `Tag`
 (`atoms/tag`) is the minimal consumer; `LinkButton` and `PopoverMenu.Item`
 follow the same shape:
@@ -28,8 +28,8 @@ import {
   SPAN_AS_CONST,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import type { TPolymorphicProps } from '@blog/config/react';
+} from '@shinefold/config';
+import type { TPolymorphicProps } from '@shinefold/config/react';
 import type { ElementType } from 'react';
 
 import { tagVariants, type TTagVariants } from './tag-variants';
@@ -78,7 +78,7 @@ Why each piece matters:
 
 - **`C extends ElementType = typeof A_AS_CONST`** — `C` is inferred from `as`;
   the default (`A_AS_CONST`, `SPAN_AS_CONST` or `BUTTON_AS_CONST` from
-  `@blog/config`) makes a bare `<Tag />` a `<span>`. The `extends`
+  `@shinefold/config`) makes a bare `<Tag />` a `<span>`. The `extends`
   constraint also lets the generic arrow parse in `.tsx`, so no `<C,>`.
 - **`as ?? SPAN_AS_CONST`** needs no `as ElementType` cast; don't add one.
 - **`ComponentPropsWithoutRef<C>`** (inside the generic) is the inference
@@ -89,8 +89,8 @@ Why each piece matters:
   component that genuinely needs a ref builds a local variant on
   `ComponentPropsWithRef<C>` instead of reusing `TPolymorphicProps`; React 19's
   ref-as-prop forwards it through `...rest` with no `forwardRef`.
-- **`@blog/config/react`, never the root barrel** — the root is consumed by
-  `@blog/service`, which must not see React types. Never re-export the React
+- **`@shinefold/config/react`, never the root barrel** — the root is consumed by
+  `@shinefold/service`, which must not see React types. Never re-export the React
   types from the root.
 
 ## Every anchor a component renders — never a hardcoded `<a>`
@@ -98,7 +98,7 @@ Why each piece matters:
 The rule (SKILL.md § Polymorphism) covers anchors that aren't the component's
 root too: `Pagination`'s page links, `BookmarksList`'s per-row link, and a link
 an organism builds to hand into another component's slot. Each takes a
-`linkAs` prop typed `TAnchorElementType` (`@blog/config/react` — never
+`linkAs` prop typed `TAnchorElementType` (`@shinefold/config/react` — never
 redeclare the union), defaulting to `'a'`. "It only wraps a slot's children"
 is not an exemption.
 

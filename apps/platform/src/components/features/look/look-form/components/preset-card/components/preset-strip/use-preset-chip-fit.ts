@@ -1,10 +1,10 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import {
   fitPresetChips,
   type TPresetChipMeasure,
 } from '@platform/utils/fit-preset-chips/fit-preset-chips';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useLayoutEffect, useState, type RefObject } from 'react';
 
 import type { TPresetOption } from './preset-option';

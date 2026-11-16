@@ -1,5 +1,5 @@
-import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
+import type { TLocaleIsoCode, TMaybeUndefined } from '@shinefold/config';
 
 import { OnboardingForm } from './components/onboarding-form';
 

@@ -1,6 +1,6 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import type { TCreateUpgradeCheckoutResult } from '@platform/server/billing/create-upgrade-checkout-action';
 import { MOCK_CHECKOUT_CLIENT_SECRET } from '@platform/testing/billing/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
 
 export const createUpgradeCheckoutAction = vi.fn(
   async (): Promise<TCreateUpgradeCheckoutResult> => ({

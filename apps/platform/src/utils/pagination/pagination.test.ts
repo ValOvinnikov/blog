@@ -1,4 +1,4 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { redirect } from 'next/navigation';
 
 import { countPages, parsePage, resolveTotalPages } from './pagination';

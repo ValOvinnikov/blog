@@ -1,4 +1,3 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { SETTINGS_FORM_STACK } from '@platform/constants/settings-form';
 import { TOAST_TEST_ID } from '@platform/constants/toast';
@@ -22,6 +21,7 @@ import {
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
 

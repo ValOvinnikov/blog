@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getUsersByEmailIndex } from '@blog/db/queries/users/get-users-by-email-index/get-users-by-email-index';
-import type { TUser } from '@blog/db/schema/auth';
-import { decryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
-import { normalizeEmail } from '@blog/utils/normalize-email-identity';
-import { isNull } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getUsersByEmailIndex } from '@shinefold/db/queries/users/get-users-by-email-index/get-users-by-email-index';
+import type { TUser } from '@shinefold/db/schema/auth';
+import { decryptPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
+import { normalizeEmail } from '@shinefold/utils/normalize-email-identity';
+import { isNull } from '@shinefold/utils/primitives';
 
 export async function findUserByEmail(
   email: string,

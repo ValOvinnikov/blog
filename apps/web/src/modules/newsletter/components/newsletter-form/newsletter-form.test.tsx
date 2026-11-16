@@ -1,5 +1,5 @@
-import { ACTION_OUTCOME, NEWSLETTER_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { ACTION_OUTCOME, NEWSLETTER_VARIANT } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
 import type { TSubscribeResult } from '@web/server/newsletter/newsletter-actions/newsletter-actions';

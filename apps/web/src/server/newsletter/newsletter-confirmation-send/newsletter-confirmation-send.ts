@@ -1,11 +1,11 @@
-import { routes } from '@blog/config';
-import { EMAIL_ACCOUNT, EMAIL_TYPE } from '@blog/config/constants';
-import { queries } from '@blog/db';
+import { routes } from '@shinefold/config';
+import { EMAIL_ACCOUNT, EMAIL_TYPE } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
 import {
   buildNewsletterConfirmationEmail,
   buildSiteEmailTag,
   sendEmail,
-} from '@blog/email';
+} from '@shinefold/email';
 import { recordEmailSendSafely } from '@web/server/email-usage/record-email-send-safely/record-email-send-safely';
 import { mintNewsletterUnsubscribeToken } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
 import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings/resolve-newsletter-email-settings';

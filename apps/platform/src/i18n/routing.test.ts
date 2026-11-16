@@ -1,6 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 import { NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 

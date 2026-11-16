@@ -1,6 +1,5 @@
 'use client';
 
-import { ICONS, SIZE, type TMaybeUndefined } from '@blog/config';
 import { useFieldErrorText } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-field-error-text';
 import { Icon } from '@platform/components/shared/icon';
 import { Spinner } from '@platform/components/shared/spinner';
@@ -10,6 +9,7 @@ import {
 } from '@platform/constants/onboarding';
 import type { TCreateSiteFieldError } from '@platform/server/onboarding/create-site-input';
 import { tv } from '@platform/utils/tv/tv';
+import { ICONS, SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 const addressVerdictVariants = tv({

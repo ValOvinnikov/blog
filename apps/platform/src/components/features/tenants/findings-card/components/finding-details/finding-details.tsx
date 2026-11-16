@@ -1,10 +1,10 @@
 'use client';
 
-import type { TFinding } from '@blog/db/schema/findings';
-import { isUndefined } from '@blog/utils/primitives';
 import { Disclosure } from '@platform/components/shared/disclosure';
 import { Spinner } from '@platform/components/shared/spinner';
 import { getFindingDetailsAction } from '@platform/server/findings/get-finding-details-action';
+import type { TFinding } from '@shinefold/db/schema/findings';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 

@@ -1,15 +1,15 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
 import {
   SUSPENSION_REASON,
   TENANT_STATUS,
   WRITABLE_TENANT_STATUSES,
   type TSuspensionStatus,
-} from '@blog/db/constants';
-import { heldStatusFields } from '@blog/db/queries/tenants/held-status-fields';
-import { resumedTenantFields } from '@blog/db/queries/tenants/resumed-tenant-fields';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/db/constants';
+import { heldStatusFields } from '@shinefold/db/queries/tenants/held-status-fields';
+import { resumedTenantFields } from '@shinefold/db/queries/tenants/resumed-tenant-fields';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { and, eq, inArray, isNull } from 'drizzle-orm';
 
 const isSuspended = eq(tenants.status, TENANT_STATUS.SUSPENDED);

@@ -1,19 +1,19 @@
-import { getFaqQuestions } from '@blog/service/shared/adaptors/faq-questions/loader';
-import { mockRun } from '@blog/service/testing/mock-run-query';
+import { faker } from '@faker-js/faker';
+import { getFaqQuestions } from '@shinefold/service/shared/adaptors/faq-questions/loader';
+import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   mockFaqView,
   mockRawFaqModuleQuestions,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawLandingPage } from '@blog/service/testing/pages/fixtures';
-import { MOCK_ABOUT_SLUG } from '@blog/service/testing/shared/translated-pages-dataset';
-import { mockTenant } from '@blog/service/testing/tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawLandingPage } from '@shinefold/service/testing/pages/fixtures';
+import { MOCK_ABOUT_SLUG } from '@shinefold/service/testing/shared/translated-pages-dataset';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { createLandingPageService } from './service';
 
-vi.mock('@blog/service/sanity/query/query');
+vi.mock('@shinefold/service/sanity/query/query');
 
-vi.mock('@blog/service/shared/adaptors/faq-questions/loader');
+vi.mock('@shinefold/service/shared/adaptors/faq-questions/loader');
 
 faker.seed(6015104);
 

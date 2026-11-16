@@ -4,7 +4,7 @@ import {
   LEGAL_PAGE_KIND,
   LOCALE_ISO_CODES,
   NEWSLETTER_RESULT,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import { pageHref, routes } from './routes';
 

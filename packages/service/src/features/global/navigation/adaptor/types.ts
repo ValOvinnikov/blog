@@ -1,4 +1,4 @@
-import type { ILink, TMaybeUndefined } from '@blog/config';
+import type { ILink, TMaybeUndefined } from '@shinefold/config';
 
 export type TNavigationItem = ILink & {
   subItems?: ILink[];

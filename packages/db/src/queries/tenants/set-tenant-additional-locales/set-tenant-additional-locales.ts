@@ -2,12 +2,12 @@ import {
   ERROR_CODE,
   type TErrorCode,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { PLAN_LOCALE_LIMIT } from '@blog/db/constants';
-import { getTenantLocales } from '@blog/db/queries/tenants/get-tenant-locales';
-import { tenants } from '@blog/db/schema/tenants';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { PLAN_LOCALE_LIMIT } from '@shinefold/db/constants';
+import { getTenantLocales } from '@shinefold/db/queries/tenants/get-tenant-locales';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { eq } from 'drizzle-orm';
 
 // Past the plan limit only already-stored locales are kept, so a downgraded

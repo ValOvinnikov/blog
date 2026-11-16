@@ -1,4 +1,4 @@
-import { NEXT_DYNAMIC_ERROR } from '@blog/config';
+import { NEXT_DYNAMIC_ERROR } from '@shinefold/config';
 import { createMockFaker } from '@web/testing/mock-faker';
 
 const mockFaker = createMockFaker(61054);

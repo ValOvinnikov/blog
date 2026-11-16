@@ -1,5 +1,5 @@
-import { CONTENT_ALIGNMENT } from '@blog/config/constants';
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { CONTENT_ALIGNMENT } from '@shinefold/config/constants';
+import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { defineField } from 'sanity';
 
 import {

@@ -1,7 +1,7 @@
-import { SUBSCRIBER_OUTCOME, type TOutcome } from '@blog/config';
-import type { TSubscriberStatus } from '@blog/db/constants';
-import { findUserSubscriber } from '@blog/db/queries/subscribers/user-subscriber';
-import { toOutcome } from '@blog/utils/to-outcome';
+import { SUBSCRIBER_OUTCOME, type TOutcome } from '@shinefold/config';
+import type { TSubscriberStatus } from '@shinefold/db/constants';
+import { findUserSubscriber } from '@shinefold/db/queries/subscribers/user-subscriber';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 
 export type TSubscriptionStatusResult = TOutcome<
   TSubscriberStatus | typeof SUBSCRIBER_OUTCOME.NOT_SUBSCRIBED

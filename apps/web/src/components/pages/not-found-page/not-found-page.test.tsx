@@ -1,4 +1,4 @@
-import { routes, SITE_MESSAGES } from '@blog/config';
+import { routes, SITE_MESSAGES } from '@shinefold/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_VOICE_BOLD_TEXT,

@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { errorResult, type TResult } from '@blog/utils';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { errorResult, type TResult } from '@shinefold/utils';
 import {
   FETCH_FAILED_REASON,
   TENANT_UNRESOLVED_REASON,

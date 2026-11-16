@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 
 import { additionalLocalesToSave } from './additional-locales-to-save';
 

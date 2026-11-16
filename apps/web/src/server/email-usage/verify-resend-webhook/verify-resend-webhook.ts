@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { RESEND_WEBHOOK_HEADER } from '@web/constants/email-usage';
 import { Webhook } from 'standardwebhooks';
 

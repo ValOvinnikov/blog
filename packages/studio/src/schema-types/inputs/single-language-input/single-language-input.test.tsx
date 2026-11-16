@@ -1,5 +1,8 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
-import { createSingleLanguageInput } from '@blog/studio/schema-types/inputs/single-language-input/single-language-input';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import { createSingleLanguageInput } from '@shinefold/studio/schema-types/inputs/single-language-input/single-language-input';
 import { ArrayOfObjectsInputMember, type InputProps } from 'sanity';
 
 const { EN, NL } = LOCALE_ISO_CODES;

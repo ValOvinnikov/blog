@@ -1,10 +1,11 @@
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { updateDisplayName } from '@blog/db/queries/account/update-display-name';
-import { createLead } from '@blog/db/queries/leads/create-lead';
-import { createMembershipInvite } from '@blog/db/queries/membership-invites/create-membership-invite';
-import { createPendingSubscriber } from '@blog/db/queries/subscribers/create-pending-subscriber';
-import { applyOwnerEmailChange } from '@blog/db/queries/tenants/update-tenant-details/owner-email-change';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import { updateDisplayName } from '@shinefold/db/queries/account/update-display-name';
+import { createLead } from '@shinefold/db/queries/leads/create-lead';
+import { createMembershipInvite } from '@shinefold/db/queries/membership-invites/create-membership-invite';
+import { createPendingSubscriber } from '@shinefold/db/queries/subscribers/create-pending-subscriber';
+import { applyOwnerEmailChange } from '@shinefold/db/queries/tenants/update-tenant-details/owner-email-change';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestReader,
   insertTestTenant,
@@ -16,13 +17,12 @@ import {
   MOCK_SUBSCRIBER_EMAIL,
   MOCK_USER_EMAIL,
   MOCK_USER_NAME,
-} from '@blog/db/testing/fixtures';
-import { inviteOf } from '@blog/db/testing/membership-invites/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/fixtures';
+import { inviteOf } from '@shinefold/db/testing/membership-invites/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { sql } from 'drizzle-orm';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 faker.seed(5666);
 

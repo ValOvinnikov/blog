@@ -1,13 +1,13 @@
 'use client';
 
-import { ALERT_TYPE, isOutcomeSuccess, SIZE } from '@blog/config';
-import type { TOAuthProvider } from '@blog/config/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useToast } from '@platform/context/toast-provider';
 import { confirmSignInCallbackAction } from '@platform/server/sign-in-apps/confirm-sign-in-callback-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import { ALERT_TYPE, isOutcomeSuccess, SIZE } from '@shinefold/config';
+import type { TOAuthProvider } from '@shinefold/config/constants';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';

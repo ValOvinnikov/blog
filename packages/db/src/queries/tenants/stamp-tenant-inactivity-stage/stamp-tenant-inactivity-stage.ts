@@ -1,14 +1,14 @@
-import type { TMaybeNull } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
 import {
   INACTIVITY_STAGE,
   SUSPENSION_REASON,
   TENANT_STATUS,
   type TStampedInactivityStage,
-} from '@blog/db/constants';
-import { heldStatusFields } from '@blog/db/queries/tenants/held-status-fields';
-import { inactivityStageDue } from '@blog/db/queries/tenants/inactivity-stage-due';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/constants';
+import { heldStatusFields } from '@shinefold/db/queries/tenants/held-status-fields';
+import { inactivityStageDue } from '@shinefold/db/queries/tenants/inactivity-stage-due';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import { and, eq } from 'drizzle-orm';
 import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
 

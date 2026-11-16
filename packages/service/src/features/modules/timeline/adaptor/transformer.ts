@@ -1,8 +1,11 @@
-import { TIMELINE_MARKER_STYLE, type TTimelineMarkerStyle } from '@blog/config';
-import { toCtaButtons } from '@blog/service/shared/transformers/cta/to-cta-buttons';
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
-import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
+import {
+  TIMELINE_MARKER_STYLE,
+  type TTimelineMarkerStyle,
+} from '@shinefold/config';
+import { toCtaButtons } from '@shinefold/service/shared/transformers/cta/to-cta-buttons';
+import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
+import { toPortableText } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import type { InferResultType } from 'groqd';
 
 import type { timelineModuleQuery } from './query';

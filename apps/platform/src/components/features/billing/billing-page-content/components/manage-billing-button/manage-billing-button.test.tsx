@@ -1,7 +1,7 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { BILLING_REFUSAL } from '@platform/constants/billing';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent from '@testing-library/user-event';
 
 import { ManageBillingButton } from './manage-billing-button';

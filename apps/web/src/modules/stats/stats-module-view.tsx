@@ -1,6 +1,6 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { TStatsModule } from '@blog/service';
-import { Text } from '@blog/ui/components/atoms/text';
+import type { IWithDataTestId } from '@shinefold/config';
+import type { TStatsModule } from '@shinefold/service';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import { ModuleActions } from '@web/components/shared/module-actions';
 import { ModuleSection } from '@web/components/shared/module-section';
 

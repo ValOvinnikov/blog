@@ -1,6 +1,6 @@
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { findPublishedPageAtPath } from '@blog/studio/schema-types/queries/published-page-at-path/published-page-at-path';
 import { Card, Stack, Text } from '@sanity/ui';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
+import { findPublishedPageAtPath } from '@shinefold/studio/schema-types/queries/published-page-at-path/published-page-at-path';
 import { useEffect, useState } from 'react';
 import { type ObjectInputProps, useClient } from 'sanity';
 

@@ -2,13 +2,13 @@ import {
   EMAIL_TEMPLATE_TYPE,
   type TEmailTemplateType,
   type TTenantEmailBrand,
-} from '@blog/config';
-import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
+} from '@shinefold/config';
+import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
 import {
   buildInviteMagicLinkEmail,
   buildMagicLinkEmail,
   buildNewsletterConfirmationEmail,
-} from '@blog/email/templates/tenant';
+} from '@shinefold/email/templates/tenant';
 
 export type TEmailTemplatePreviewInput = {
   subject: string;

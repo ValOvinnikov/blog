@@ -1,8 +1,8 @@
-import { TOAST_TYPE, type TToastType } from '@blog/config';
 import type {
   IToastPayload,
   IToastRecord,
 } from '@platform/components/shared/toast';
+import { TOAST_TYPE, type TToastType } from '@shinefold/config';
 
 import { createToastTimers } from './toast-timers';
 

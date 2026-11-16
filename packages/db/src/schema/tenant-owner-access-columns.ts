@@ -1,5 +1,5 @@
-import type { TSanityLoginProvider } from '@blog/config/constants';
-import type { TSanityProjectRole } from '@blog/db/constants';
+import type { TSanityLoginProvider } from '@shinefold/config/constants';
+import type { TSanityProjectRole } from '@shinefold/db/constants';
 import { text, timestamp } from 'drizzle-orm/pg-core';
 
 export const tenantOwnerAccessColumns = {

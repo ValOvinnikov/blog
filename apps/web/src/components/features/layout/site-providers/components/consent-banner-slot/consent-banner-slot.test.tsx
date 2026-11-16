@@ -1,4 +1,4 @@
-import { CONSENT_CATEGORY, routes } from '@blog/config';
+import { CONSENT_CATEGORY, routes } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import {
   customRender,

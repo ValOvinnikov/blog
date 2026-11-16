@@ -1,5 +1,5 @@
-import { PRESET_REGISTRY, type TPresetId } from '@blog/config';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { PRESET_REGISTRY, type TPresetId } from '@shinefold/config';
 
 export type TPresetSeededField =
   | 'accentHue'

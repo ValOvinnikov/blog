@@ -1,4 +1,4 @@
-import { BILLING_CURRENCY } from '@blog/db/constants';
+import { BILLING_CURRENCY } from '@shinefold/db/constants';
 import { MOCK_UNLISTED_CURRENCY } from '@web/testing/modules/pricing/live-price-fixtures';
 
 import { isBillingCurrency } from './is-billing-currency';

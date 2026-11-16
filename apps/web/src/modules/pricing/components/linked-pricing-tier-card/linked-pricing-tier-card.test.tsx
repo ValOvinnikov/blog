@@ -1,12 +1,12 @@
-import { HTTP_STATUS, SITE_MESSAGES } from '@blog/config';
-import { BILLING_CURRENCY } from '@blog/db/constants';
+import { HTTP_STATUS, SITE_MESSAGES } from '@shinefold/config';
+import { BILLING_CURRENCY } from '@shinefold/db/constants';
 import {
   MOCK_DOLLAR_AMOUNT,
   MOCK_EURO_AMOUNT,
   MOCK_PERCENT_OFF,
   MOCK_PROMOTION_CODE,
-} from '@blog/db/testing/stripe-catalogue/fixtures';
-import { isUndefined } from '@blog/utils/primitives';
+} from '@shinefold/db/testing/stripe-catalogue/fixtures';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { PRICING_LOG, PRICING_SEARCH_PARAM } from '@web/constants/pricing';
 import { PromotionCodeProvider } from '@web/context/promotion-code-provider';
 import { customRender, screen } from '@web/testing/custom-render';

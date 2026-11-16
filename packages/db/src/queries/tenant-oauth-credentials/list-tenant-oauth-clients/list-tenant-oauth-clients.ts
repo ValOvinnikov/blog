@@ -1,8 +1,8 @@
-import { getDb } from '@blog/db/client';
+import { getDb } from '@shinefold/db/client';
 import {
   tenantOAuthCredentials,
   type TTenantOAuthCredentials,
-} from '@blog/db/schema/tenant-oauth-credentials';
+} from '@shinefold/db/schema/tenant-oauth-credentials';
 import { asc, eq } from 'drizzle-orm';
 
 export type TTenantOAuthClient = Pick<

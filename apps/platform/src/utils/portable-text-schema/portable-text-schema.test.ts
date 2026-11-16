@@ -1,5 +1,5 @@
-import { serializePortableText } from '@blog/email';
 import { faker } from '@faker-js/faker';
+import { serializePortableText } from '@shinefold/email';
 
 import { EMAIL_PORTABLE_TEXT_SCHEMA } from './portable-text-schema';
 

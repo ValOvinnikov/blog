@@ -1,6 +1,6 @@
-import { routes } from '@blog/config';
-import type { TPostCard } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import { routes } from '@shinefold/config';
+import type { TPostCard } from '@shinefold/service';
 import {
   mockPostCard,
   mockPostCardTopic,

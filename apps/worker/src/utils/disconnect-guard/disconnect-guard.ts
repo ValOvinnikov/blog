@@ -1,5 +1,5 @@
-import type { TMaybeNull } from '@blog/config';
-import { isDomainHeldByAnyTenant } from '@blog/db/queries/tenant-domains/is-domain-held-by-any-tenant';
+import type { TMaybeNull } from '@shinefold/config';
+import { isDomainHeldByAnyTenant } from '@shinefold/db/queries/tenant-domains/is-domain-held-by-any-tenant';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { env } from '@worker/utils/env/env';
 import { requireValues } from '@worker/utils/require-values/require-values';

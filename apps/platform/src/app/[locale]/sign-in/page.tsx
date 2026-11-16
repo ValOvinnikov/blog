@@ -1,9 +1,9 @@
-import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { SignInView } from '@platform/components/features/sign-in/sign-in-view';
 import { getSession } from '@platform/server/auth/auth';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { toSafeCallbackPath } from '@platform/utils/safe-callback-path/safe-callback-path';
 import { toSignInError } from '@platform/utils/sign-in-error/sign-in-error';
+import { getEnabledOAuthProviderIds } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 

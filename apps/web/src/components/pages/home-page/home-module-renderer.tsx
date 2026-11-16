@@ -4,8 +4,8 @@ import type {
   TMaybeUndefined,
   TPageHomeType,
   TContentAlignmentOf,
-} from '@blog/config';
-import type { TModule } from '@blog/service';
+} from '@shinefold/config';
+import type { TModule } from '@shinefold/service';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { ContactFormModule } from '@web/modules/contact-form/contact-form-module';
 import { ContentModule } from '@web/modules/content/content-module';

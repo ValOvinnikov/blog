@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME, EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
 import {
@@ -14,6 +13,7 @@ import {
 } from '@platform/testing/email-draft';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { ACTION_OUTCOME, EMAIL_TEMPLATE_TYPE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SendTestEmailButton } from './send-test-email-button';

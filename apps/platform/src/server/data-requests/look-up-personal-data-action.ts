@@ -1,12 +1,5 @@
 'use server';
 
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  type TMaybeUndefined,
-} from '@blog/config';
-import { queries } from '@blog/db';
-import type { TPersonalDataReaderAccount } from '@blog/db/queries/personal-data/reader-account-personal-data';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { countPersonalDataMatches } from '@platform/server/data-requests/count-personal-data-matches';
 import {
@@ -18,6 +11,13 @@ import {
   toDataRequestMatches,
   type TDataRequestMatch,
 } from '@platform/server/data-requests/to-data-request-matches';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import type { TPersonalDataReaderAccount } from '@shinefold/db/queries/personal-data/reader-account-personal-data';
 
 export type TLookUpPersonalDataResult =
   | {

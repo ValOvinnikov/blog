@@ -1,13 +1,5 @@
 'use client';
 
-import {
-  EMAIL_TEMPLATE_TYPE,
-  FORM_STATUS,
-  type TEmailTemplateType,
-  type TLocaleIsoCode,
-  type TTenantEmailBrand,
-} from '@blog/config';
-import { hasArrayGotMultipleItems, hasLength } from '@blog/utils/primitives';
 import { EmailEditPane } from '@platform/components/features/email/email-settings/components/email-edit-pane';
 import { EmailPreviewPane } from '@platform/components/features/email/email-settings/components/email-preview-pane';
 import { ItemSelect } from '@platform/components/features/email/email-settings/components/item-select';
@@ -21,6 +13,17 @@ import {
 } from '@platform/utils/email-draft/email-draft';
 import { countCustomisedTemplates } from '@platform/utils/email-draft-changes/email-draft-changes';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import {
+  EMAIL_TEMPLATE_TYPE,
+  FORM_STATUS,
+  type TEmailTemplateType,
+  type TLocaleIsoCode,
+  type TTenantEmailBrand,
+} from '@shinefold/config';
+import {
+  hasArrayGotMultipleItems,
+  hasLength,
+} from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 

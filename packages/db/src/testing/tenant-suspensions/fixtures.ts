@@ -1,9 +1,9 @@
-import { SUSPENSION_CATEGORY } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
-import type { TTenantSuspension } from '@blog/db/schema/tenant-suspensions';
-import { firstRowOrThrow } from '@blog/db/testing/first-row-or-throw';
-import type { TTestDb } from '@blog/db/testing/fixtures';
-import { createMockFaker } from '@blog/db/testing/mock-faker';
+import { SUSPENSION_CATEGORY } from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
+import type { TTenantSuspension } from '@shinefold/db/schema/tenant-suspensions';
+import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
+import type { TTestDb } from '@shinefold/db/testing/fixtures';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
 
 const suspensionsFaker = createMockFaker(659001);
 

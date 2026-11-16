@@ -1,3 +1,3 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 
 export type TLandingPageParam = { slug: string; language: TLocaleIsoCode };

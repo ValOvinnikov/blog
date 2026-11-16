@@ -1,10 +1,10 @@
-import { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
 import {
   defaultComponents,
   mergeComponents,
   type PortableTextComponents,
   type PortableTextTypeComponent,
 } from '@portabletext/react';
+import { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
 
 import { blockComponents } from './block';
 import { CookieList } from './cookie-list';

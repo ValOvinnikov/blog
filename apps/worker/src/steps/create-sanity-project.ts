@@ -1,19 +1,19 @@
-import { type TMaybeUndefined, SANITY_PROJECT_ROLE } from '@blog/config';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
-import { setTenantSanityProject } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { type TMaybeUndefined, SANITY_PROJECT_ROLE } from '@shinefold/config';
+import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
+import { setTenantSanityProject } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   createSanityProjectInvite,
   listSanityProjectInvites,
-} from '@blog/db/utils/sanity-management-client/sanity-project-access';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
 import {
   addSanityCorsOrigin,
   createSanityDataset,
   createSanityProject,
   listSanityCorsOrigins,
   listSanityDatasets,
-} from '@blog/db/utils/sanity-management-client/sanity-project-setup';
-import { sanitizeLogMessage } from '@blog/insight';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-setup';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { logger } from '@worker/utils/logger/logger';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import { ensureTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';

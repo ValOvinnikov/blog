@@ -1,10 +1,10 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockRawFeedPost } from '@blog/service/testing/entities/fixtures';
-import { evaluateGroqSlugs } from '@blog/service/testing/shared/groq';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockRawFeedPost } from '@shinefold/service/testing/entities/fixtures';
+import { evaluateGroqSlugs } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_PUBLISHED_FEED_SLUGS,
   MOCK_TRANSLATED_POST_DOCUMENTS,
-} from '@blog/service/testing/shared/translated-posts-dataset';
+} from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { allPublishedPostsQuery } from './query';
 

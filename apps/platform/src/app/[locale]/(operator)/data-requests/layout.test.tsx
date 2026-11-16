@@ -9,7 +9,7 @@ const { getAdminByUserIdMock } = vi.hoisted(() => ({
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: { admins: { getAdminByUserId: getAdminByUserIdMock } },
 }));

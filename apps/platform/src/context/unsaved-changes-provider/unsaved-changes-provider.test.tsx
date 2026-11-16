@@ -1,4 +1,3 @@
-import type { TMaybeNull } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { GuardedLink } from '@platform/components/shared/guarded-link';
 import { useRouter } from '@platform/i18n/base-navigation';
@@ -9,6 +8,7 @@ import {
   waitFor,
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import type { TMaybeNull } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import {

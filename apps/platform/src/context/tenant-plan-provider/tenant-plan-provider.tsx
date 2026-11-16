@@ -1,8 +1,8 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
-import type { IWithChildren } from '@blog/config/react';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
+import type { IWithChildren } from '@shinefold/config/react';
 import { createContext, useContext } from 'react';
 
 const TenantPlanContext =

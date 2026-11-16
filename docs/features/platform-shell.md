@@ -200,7 +200,7 @@ save still settles as the form's generic server error.
 ## Data
 
 - Neon: `admins` (role), `memberships` and `tenants`, read through
-  `@blog/db` queries; nothing is written except the cookies below.
+  `@shinefold/db` queries; nothing is written except the cookies below.
 - Cookies: `platform-active-tenant` (httpOnly, 30 days, set only by the
   select-tenant route), `platform-sidebar-collapsed` (client-written, one
   year; read server-side for the first render), `platform-theme` (the
@@ -309,7 +309,7 @@ save still settles as the form's generic server error.
   is the S box, served by `app/icon.ts` (SVG), `app/apple-icon.tsx` (180px
   PNG on yellow), `/favicon.ico` (16, 32 and 48px, for browsers that skip the
   SVG) and listed in `app/manifest.ts`, all drawn from
-  `@blog/utils/shinefold-logo`; the proxy leaves `/icon` and `/apple-icon`
+  `@shinefold/utils/shinefold-logo`; the proxy leaves `/icon` and `/apple-icon`
   unrewritten. The collapse toggle is the topbar's first item from
   `md` (below `md` that slot holds the phone Menu button and the toggle never
   renders): a 36×36 `control-line` box on `surface` with the unrotated 16px
@@ -595,7 +595,7 @@ save still settles as the form's generic server error.
   a page is a link item. Focus lands on the first link; Escape returns it to
   the "…".
 - `apps/platform` owns its own primitives on Base UI and never imports
-  `@blog/ui` outside `components/features/site-preview/`.
+  `@shinefold/ui` outside `components/features/site-preview/`.
 - A busy platform `Button` stays at full colour and keeps focus: it is
   `aria-disabled` and `aria-busy`, never `disabled`, and ignores clicks and
   form submission until it settles. It shows the spinner beside its busy
@@ -618,14 +618,14 @@ save still settles as the form's generic server error.
 
 ## Dependencies
 
-- `@blog/db` (`queries.admins`, `queries.memberships`, `queries.tenants`,
-  `PLAN_REGISTRY`), `@blog/auth` through `server/auth/auth.ts`, `@blog/config`
+- `@shinefold/db` (`queries.admins`, `queries.memberships`, `queries.tenants`,
+  `PLAN_REGISTRY`), `@shinefold/auth` through `server/auth/auth.ts`, `@shinefold/config`
   (`ICONS`, `LOCALE_ISO_CODES`).
 - Features: [platform-sign-in-and-onboarding](./platform-sign-in-and-onboarding.md),
   [tenant-access](./tenant-access.md), [embedded-studio](./embedded-studio.md),
   [plans-and-entitlements](./plans-and-entitlements.md),
   [audit-and-findings](./audit-and-findings.md).
-- Env: `AUTH_SECRET` (via `@blog/auth`), `DATABASE_URL` (via `@blog/db`).
+- Env: `AUTH_SECRET` (via `@shinefold/auth`), `DATABASE_URL` (via `@shinefold/db`).
 
 ## Entry points
 

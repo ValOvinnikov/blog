@@ -1,11 +1,11 @@
-import { BRAND_VARIANT, type TBrandVariant } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, type TBrandVariant } from '@shinefold/config';
 import {
   BRAND_BAND_LABELS,
   BrandBand,
   focusLastLink,
-} from '@blog/ui/testing/brand-bands';
-import { objectKeys } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/brand-bands';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
 

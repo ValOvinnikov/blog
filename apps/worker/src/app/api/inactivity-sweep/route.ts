@@ -1,6 +1,6 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
-import { sanitizeLogMessage } from '@blog/insight';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { sanitizeLogMessage } from '@shinefold/insight';
 import { DOWNGRADE_GRACE_LOG } from '@worker/constants/downgrade-grace';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';

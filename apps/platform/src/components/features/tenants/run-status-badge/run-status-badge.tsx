@@ -1,6 +1,6 @@
-import type { TTenantProvisioningStepStatus } from '@blog/db/constants';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { provisioningStepTone } from '@platform/utils/status-tone/status-tone';
+import type { TTenantProvisioningStepStatus } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 
 import { runStatusBadgeVariants } from './run-status-badge-variants';

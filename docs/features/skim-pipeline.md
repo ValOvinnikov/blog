@@ -45,11 +45,11 @@ When a post is published, an endpoint on the public site can ask Claude for 3–
 - **Tenant comes from the `Host` header** (`getHostTenantSanityContext` / `getHostTenantSanityWriteContext`), because `/api/*` skips the proxy's tenant rewrite. A webhook must therefore call the tenant's own host. Outside production a host with no tenant falls back to the only tenant if exactly one servable tenant exists, otherwise to the platform project, writing with `SANITY_API_WRITE_TOKEN`.
 - **Generation:** `generateTakeaways` sends the body's text blocks only (code, images and asides are skipped) to `claude-haiku-4-5` (`SKIM_GENERATION_MODEL`) at temperature 0, `max_tokens` 1024, with a zod output format of 3–7 strings of at most 160 characters. No parsed output throws. The same constant is stored as `model`.
 - **Rendering threshold:** the service treats fewer than 3 takeaways as none, matching the schema's `min(3)`.
-- The write client uses the `raw` perspective and `useCdn: false`, and refuses a tenant context missing project, dataset or token (`InvalidTenantSanityContextError`). It is the only Sanity write path in `@blog/service` (`service.editorial.*`) and is never used for page reads.
+- The write client uses the `raw` perspective and `useCdn: false`, and refuses a tenant context missing project, dataset or token (`InvalidTenantSanityContextError`). It is the only Sanity write path in `@shinefold/service` (`service.editorial.*`) and is never used for page reads.
 
 ## Dependencies
 
-- Layers: `apps/web` (route, Anthropic call, tenant resolution), `@blog/service` (`service.editorial.skim.v1`, write client), `@blog/db` (tenant credentials), `@blog/studio` (`postTakeaways`), `@blog/config` (generated `PostTakeaways`, `ArticleText`). SDK: `@anthropic-ai/sdk`.
+- Layers: `apps/web` (route, Anthropic call, tenant resolution), `@shinefold/service` (`service.editorial.skim.v1`, write client), `@shinefold/db` (tenant credentials), `@shinefold/studio` (`postTakeaways`), `@shinefold/config` (generated `PostTakeaways`, `ArticleText`). SDK: `@anthropic-ai/sdk`.
 - Features: ./reading-experience.md (renders the result), ./posts.md, ./rich-text.md (body shape), ./multi-tenancy.md (host resolution), ./tenant-provisioning.md (which registers only the revalidation webhook), ./rendering-and-caching.md.
 - Env (web): `ANTHROPIC_API_KEY`, `SANITY_GENERATE_SECRET`, `TENANT_TOKEN_ENCRYPTION_KEY`; `SANITY_API_WRITE_TOKEN` for the non-production platform fallback. All declared in `turbo.json`.
 

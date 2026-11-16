@@ -1,8 +1,8 @@
 import { randomBytes } from 'node:crypto';
 
-import type { TErrorCode } from '@blog/config/constants';
-import type { TCustomDomainClaim } from '@blog/db/schema/custom-domain-claims';
-import type { TResult } from '@blog/utils';
+import type { TErrorCode } from '@shinefold/config/constants';
+import type { TCustomDomainClaim } from '@shinefold/db/schema/custom-domain-claims';
+import type { TResult } from '@shinefold/utils';
 
 import { insertCustomDomainClaim } from '../insert-custom-domain-claim';
 

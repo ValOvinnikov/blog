@@ -1,5 +1,5 @@
-import { routes } from '@blog/config';
-import type { TPostCardTopic } from '@blog/service';
+import { routes } from '@shinefold/config';
+import type { TPostCardTopic } from '@shinefold/service';
 import type { IMediaCardData } from '@web/components/shared/media-card-item';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';

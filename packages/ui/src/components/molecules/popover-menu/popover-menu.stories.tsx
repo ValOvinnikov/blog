@@ -1,6 +1,6 @@
-import { ICONS, SIZE } from '@blog/config';
-import { Avatar } from '@blog/ui/components/atoms/avatar';
-import { Icon } from '@blog/ui/components/atoms/icon';
+import { ICONS, SIZE } from '@shinefold/config';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 

@@ -1,5 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { BILLING_CURRENCY, type TBillingCurrency } from '@blog/db/constants';
+import type { TMaybeUndefined } from '@shinefold/config';
+import {
+  BILLING_CURRENCY,
+  type TBillingCurrency,
+} from '@shinefold/db/constants';
 import { COUNTRY_CODE } from '@web/constants/country';
 import { CURRENCY_COOKIE_NAME } from '@web/utils/currency-cookie';
 import { REMEMBERED_COOKIE_OPTIONS } from '@web/utils/remembered-cookie-options';

@@ -1,4 +1,4 @@
-import { type TOptionalNameLocalizedFieldOptions } from '@blog/studio/schema-types/fields/localized-field-options/localized-field-options';
+import { type TOptionalNameLocalizedFieldOptions } from '@shinefold/studio/schema-types/fields/localized-field-options/localized-field-options';
 import { defineField } from 'sanity';
 
 export const localizedArticleTextField = (

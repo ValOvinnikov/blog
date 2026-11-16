@@ -1,7 +1,7 @@
-import { q } from '@blog/service/sanity/query/query';
-import { postCardFragment } from '@blog/service/shared/fragments/post/post';
-import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
-import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
+import { q } from '@shinefold/service/sanity/query/query';
+import { postCardFragment } from '@shinefold/service/shared/fragments/post/post';
+import type { TLocaleQueryParams } from '@shinefold/service/shared/localization/locale-query-params/locale-query-params';
+import { publishedPostsInLocale } from '@shinefold/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 
 import { RELATED_POSTS_TAG_CANDIDATE_LIMIT } from './constants';
 

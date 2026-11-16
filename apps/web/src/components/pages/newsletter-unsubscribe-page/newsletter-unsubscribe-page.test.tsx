@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@blog/config';
+import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@shinefold/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';

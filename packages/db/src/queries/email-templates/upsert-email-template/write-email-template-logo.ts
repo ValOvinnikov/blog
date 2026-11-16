@@ -1,8 +1,8 @@
-import type { TEmailTemplateType } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { emailTemplateLogos } from '@blog/db/schema/email-templates';
-import { isNull } from '@blog/utils/primitives';
+import type { TEmailTemplateType } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { emailTemplateLogos } from '@shinefold/db/schema/email-templates';
+import { isNull } from '@shinefold/utils/primitives';
 import { and, eq } from 'drizzle-orm';
 
 export async function writeEmailTemplateLogo(

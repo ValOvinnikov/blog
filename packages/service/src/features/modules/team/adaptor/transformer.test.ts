@@ -1,24 +1,24 @@
+import { faker } from '@faker-js/faker';
 import {
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
   SOCIAL_PLATFORMS,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   mockRawTeamMember,
   mockRawTeamModule,
-} from '@blog/service/testing/modules/team/fixtures';
+} from '@shinefold/service/testing/modules/team/fixtures';
 import {
   MOCK_BIO_BLOCK_KEY,
   mockRawExternalLinkDocument,
   mockRawPersonBioBlock,
   mockRawSocialProfile,
-} from '@blog/service/testing/shared/fixtures';
+} from '@shinefold/service/testing/shared/fixtures';
 import {
   MOCK_AUTHORED_MODULE_APPEARANCE,
   MOCK_UNSET_MODULE_APPEARANCE,
-} from '@blog/service/testing/shared/module-appearance';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/module-appearance';
 
 import { toTeamModule } from './transformer';
 

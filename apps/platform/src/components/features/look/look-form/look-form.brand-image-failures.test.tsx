@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
@@ -32,6 +31,7 @@ import {
   MOCK_STAGED_LOGO_BLOB_URL,
   REPLACE_LOGO,
 } from '@platform/testing/site-config/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';

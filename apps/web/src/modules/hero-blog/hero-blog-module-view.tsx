@@ -1,4 +1,4 @@
-import type { THeroBlogModule } from '@blog/service';
+import type { THeroBlogModule } from '@shinefold/service';
 import { HeroModuleShell } from '@web/components/shared/hero-module-shell';
 
 export interface IHeroBlogModuleViewProps {

@@ -1,7 +1,7 @@
 'use client';
 
 import { Switch as BaseSwitch } from '@base-ui/react/switch';
-import type { TNamedControlAria } from '@blog/config';
+import type { TNamedControlAria } from '@shinefold/config';
 
 import { switchVariants } from './switch-variants';
 

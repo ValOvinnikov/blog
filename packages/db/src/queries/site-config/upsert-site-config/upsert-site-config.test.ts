@@ -1,4 +1,5 @@
-import type * as BlogConfig from '@blog/config';
+import { faker } from '@faker-js/faker';
+import type * as BlogConfig from '@shinefold/config';
 import {
   BRAND_VARIANT,
   COOKIE_SETTINGS_BUTTON,
@@ -7,7 +8,7 @@ import {
   type TVoiceFieldFailuresByLocale,
   VOICE_FIELDS,
   VOICE_FIELD_ERROR,
-} from '@blog/config';
+} from '@shinefold/config';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
@@ -27,20 +28,19 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
   SPINNER_STYLE,
-} from '@blog/config/constants';
-import { BRAND_NAME_MAX_LENGTH } from '@blog/db/constants';
-import type { TSiteConfigResult } from '@blog/db/queries/site-config/get-site-config';
-import * as schema from '@blog/db/schema';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/config/constants';
+import { BRAND_NAME_MAX_LENGTH } from '@shinefold/db/constants';
+import type { TSiteConfigResult } from '@shinefold/db/queries/site-config/get-site-config';
+import * as schema from '@shinefold/db/schema';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   DEFAULT_CONTROL_STYLES,
   MOCK_ACCENT_HUE,
   MOCK_NOT_FOUND_HEADING,
   MOCK_SITE_CONFIG_FIELDS,
-} from '@blog/db/testing/site-config/fixtures';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/site-config/fixtures';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import {
   upsertSiteConfig,
@@ -57,9 +57,9 @@ const { SYNTHETIC_MULTILINE_FIELD_ID, SYNTHETIC_MULTILINE_FIELD_MAX } =
     SYNTHETIC_MULTILINE_FIELD_MAX: 300,
   }));
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
-vi.mock('@blog/config', async (importOriginal) => {
+vi.mock('@shinefold/config', async (importOriginal) => {
   const actual = await importOriginal<typeof BlogConfig>();
   return {
     ...actual,

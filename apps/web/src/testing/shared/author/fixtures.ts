@@ -1,4 +1,4 @@
-import type { TPostCardAuthor } from '@blog/service';
+import type { TPostCardAuthor } from '@shinefold/service';
 
 export const mockPostCardAuthor = (
   overrides: Partial<TPostCardAuthor> = {},

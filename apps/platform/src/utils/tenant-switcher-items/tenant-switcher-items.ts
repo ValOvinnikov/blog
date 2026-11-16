@@ -1,5 +1,5 @@
-import type { TTenant } from '@blog/db/schema/tenants';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export type TTenantSwitcherItem = Pick<
   TTenant,

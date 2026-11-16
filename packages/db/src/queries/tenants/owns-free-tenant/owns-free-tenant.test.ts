@@ -1,29 +1,32 @@
-import { ERROR_CODE, TENANT_PLAN } from '@blog/config/constants';
+import { ERROR_CODE, TENANT_PLAN } from '@shinefold/config/constants';
 import {
   MEMBERSHIP_ROLE,
   TENANT_STATUS,
   type TMembershipRole,
-} from '@blog/db/constants';
-import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
-import * as schema from '@blog/db/schema';
-import { MOCK_NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
-import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
+} from '@shinefold/db/constants';
+import { inviteEmailColumns } from '@shinefold/db/queries/membership-invites/invite-email-columns';
+import * as schema from '@shinefold/db/schema';
+import { MOCK_NOT_AN_ADDRESS } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
+import {
+  insertTestTenant,
+  insertTestUser,
+} from '@shinefold/db/testing/fixtures';
 import {
   mockAccountEmailIndex,
   testPersonalEmailIndex,
-} from '@blog/db/testing/personal-data';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/personal-data';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_SELF_SERVE_OTHER_EMAIL,
   MOCK_SELF_SERVE_OWNER_EMAIL,
   MOCK_SELF_SERVE_OWNER_SHOUTED_EMAIL,
   MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL,
-} from '@blog/db/testing/tenants/self-serve-fixtures';
-import { errorResult, okResult } from '@blog/utils';
+} from '@shinefold/db/testing/tenants/self-serve-fixtures';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import { ownsFreeTenant } from './owns-free-tenant';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

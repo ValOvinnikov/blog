@@ -1,6 +1,6 @@
-import { SIZE } from '@blog/config';
-import { MOCK_SITE_NAME } from '@blog/ui/testing/fixtures';
-import { objectKeys } from '@blog/utils/primitives';
+import { SIZE } from '@shinefold/config';
+import { MOCK_SITE_NAME } from '@shinefold/ui/testing/fixtures';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { BrandMark } from './brand-mark';

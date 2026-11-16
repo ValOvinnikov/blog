@@ -1,7 +1,3 @@
-import {
-  MEMBERSHIP_ROLE,
-  TENANT_PROVISIONING_STATUS,
-} from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { GET_STARTED_STEP } from '@platform/constants/get-started';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
@@ -19,6 +15,10 @@ import {
   MOCK_TENANT_URL,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import {
+  MEMBERSHIP_ROLE,
+  TENANT_PROVISIONING_STATUS,
+} from '@shinefold/db/constants';
 
 import { getStartedFor } from './get-started-for';
 
@@ -28,7 +28,7 @@ const { getSiteConfigMock } = vi.hoisted(() => ({
   getSiteConfigMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { siteConfig: { getSiteConfig: getSiteConfigMock } },
 }));
 

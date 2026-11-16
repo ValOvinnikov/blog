@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
 import type {
   TNewsletterPostSendOutcome,
   TNewsletterSkipReason,
-} from '@blog/db/constants';
-import { newsletterPostSends } from '@blog/db/schema/newsletter-post-sends';
+} from '@shinefold/db/constants';
+import { newsletterPostSends } from '@shinefold/db/schema/newsletter-post-sends';
 import { and, eq } from 'drizzle-orm';
 
 export interface INewsletterPostSend {

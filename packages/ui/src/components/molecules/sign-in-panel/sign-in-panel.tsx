@@ -2,10 +2,10 @@ import {
   FORM_STATUS,
   type IWithClassName,
   type IWithDataTestId,
-} from '@blog/config';
-import type { TButtonProps } from '@blog/ui/components/atoms/button';
-import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+} from '@shinefold/config';
+import type { TButtonProps } from '@shinefold/ui/components/atoms/button';
+import type { TSpinnerProps } from '@shinefold/ui/components/atoms/spinner';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useId, type ReactNode, type Ref } from 'react';
 
 import {

@@ -3,7 +3,7 @@
 import {
   BrandLockup,
   type TBrandLockupProps,
-} from '@blog/ui/components/molecules/brand-lockup';
+} from '@shinefold/ui/components/molecules/brand-lockup';
 import { useImageLoadFailure } from '@web/hooks/use-image-load-failure';
 
 export const FallbackBrandLockup = ({ src, ...props }: TBrandLockupProps) => {

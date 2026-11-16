@@ -1,4 +1,4 @@
-import { okResult } from '@blog/utils';
+import { okResult } from '@shinefold/utils';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -9,7 +9,7 @@ const { getSiteSettingsMock } = vi.hoisted(() => ({
   getSiteSettingsMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     global: { siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } } },
   },

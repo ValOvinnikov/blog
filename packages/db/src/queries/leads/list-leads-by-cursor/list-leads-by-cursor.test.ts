@@ -1,19 +1,19 @@
-import { LEADS_PAGE_SIZE } from '@blog/db/constants/lead';
-import * as schema from '@blog/db/schema';
+import { faker } from '@faker-js/faker';
+import { LEADS_PAGE_SIZE } from '@shinefold/db/constants/lead';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestLead,
   insertTestTenant,
   MOCK_LEAD_EMAIL,
   MOCK_LEAD_MESSAGE,
   MOCK_LEAD_NAME,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { eq, sql } from 'drizzle-orm';
 
 import { listLeadsByCursor } from './list-leads-by-cursor';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

@@ -1,18 +1,18 @@
-import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import {
   TENANT_STATUS,
   NEWSLETTER_POST_SEND_OUTCOME,
-} from '@blog/db/constants';
-import { getEmailNewPosts } from '@blog/db/queries/email-config';
-import { getNewsletterPostSend } from '@blog/db/queries/newsletter-post-sends';
+} from '@shinefold/db/constants';
+import { getEmailNewPosts } from '@shinefold/db/queries/email-config';
+import { getNewsletterPostSend } from '@shinefold/db/queries/newsletter-post-sends';
 import {
   getSettingsFeatures,
   type TSettingsFeaturesResult,
-} from '@blog/db/queries/settings-features';
+} from '@shinefold/db/queries/settings-features';
 import {
   getTenantById,
   getTenantSanityCredentials,
-} from '@blog/db/queries/tenants';
+} from '@shinefold/db/queries/tenants';
 import { NEWSLETTER_POST_STATE } from '@worker/constants/newsletter-send';
 import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
 import { MOCK_ONE_HOUR_MS } from '@worker/testing/clock/frozen-clock';
@@ -30,10 +30,10 @@ import { readNewsletterPost } from '@worker/utils/newsletter-send/read-newslette
 
 import { checkNewsletterPost } from './check-newsletter-post';
 
-vi.mock('@blog/db/queries/email-config');
-vi.mock('@blog/db/queries/newsletter-post-sends');
-vi.mock('@blog/db/queries/settings-features');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/email-config');
+vi.mock('@shinefold/db/queries/newsletter-post-sends');
+vi.mock('@shinefold/db/queries/settings-features');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/newsletter-send/read-newsletter-post');
 
 const MOCK_NOW = new Date('2031-05-15T12:00:00Z');

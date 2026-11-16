@@ -1,10 +1,10 @@
 import 'server-only';
 
-import { isOneOf } from '@blog/utils/primitives';
 import {
   STRIPE_CHECKOUT_SESSION_STATUS,
   STRIPE_LIVE_SUBSCRIPTION_STATUSES,
 } from '@platform/constants/billing';
+import { isOneOf } from '@shinefold/utils/primitives';
 import type Stripe from 'stripe';
 
 const STRIPE_LIST_LIMIT = 100;

@@ -1,8 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { tenants } from '@blog/db/schema/tenants';
-import { requireTenantTokenEncryptionKey } from '@blog/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
-import { decryptSecret } from '@blog/utils';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { requireTenantTokenEncryptionKey } from '@shinefold/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
+import { decryptSecret } from '@shinefold/utils';
 import { eq } from 'drizzle-orm';
 
 export type TTenantRevalidateWebhookSecret = {

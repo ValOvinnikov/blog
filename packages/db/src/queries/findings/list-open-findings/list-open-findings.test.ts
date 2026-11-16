@@ -1,26 +1,26 @@
+import { faker } from '@faker-js/faker';
 import {
   FINDING_KIND,
   FINDING_SEVERITY,
   FINDING_SOURCE,
-} from '@blog/config/constants';
-import { recordContrastResult } from '@blog/db/queries/findings/record-contrast-result';
-import { resolveFinding } from '@blog/db/queries/findings/resolve-finding';
-import * as schema from '@blog/db/schema';
+} from '@shinefold/config/constants';
+import { recordContrastResult } from '@shinefold/db/queries/findings/record-contrast-result';
+import { resolveFinding } from '@shinefold/db/queries/findings/resolve-finding';
+import * as schema from '@shinefold/db/schema';
 import {
   mockContrastResult,
   mockOpenFindingInput,
   mockReleaseTag,
   openTestFinding,
-} from '@blog/db/testing/findings/fixtures';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/findings/fixtures';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { listOpenFindings } from './list-open-findings';
 
 faker.seed(6021006);
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

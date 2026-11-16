@@ -1,6 +1,6 @@
-import { CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
-import type { TTeamModule } from '@blog/service';
-import { CardGrid } from '@blog/ui/components/organisms/card-grid';
+import { CONTENT_ALIGNMENT, DISPLAY_MODE } from '@shinefold/config';
+import type { TTeamModule } from '@shinefold/service';
+import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';

@@ -1,13 +1,13 @@
-import { ERROR_CODE } from '@blog/config/constants';
+import { ERROR_CODE } from '@shinefold/config/constants';
 import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   getTenantById,
   updateProvisioningStep,
-} from '@blog/db/queries/tenants';
-import { errorResult } from '@blog/utils/result';
+} from '@shinefold/db/queries/tenants';
+import { errorResult } from '@shinefold/utils/result';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { verifyTenantSeededContent } from '@worker/steps/verify-seeded-content';
 import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
@@ -16,7 +16,7 @@ import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
 
 import { verifyTenant } from './verify-tenant';
 
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('@worker/steps/verify-seeded-content');
 vi.mock('workflow');

@@ -1,13 +1,13 @@
 'use client';
 
+import { EmailPreview } from '@platform/components/features/email/email-preview';
+import { SendTestEmailButton } from '@platform/components/features/email/email-settings/components/send-test-email-button';
+import type { TEmailDraft } from '@platform/utils/email-draft/email-draft';
 import type {
   TEmailTemplateType,
   TLocaleIsoCode,
   TTenantEmailBrand,
-} from '@blog/config';
-import { EmailPreview } from '@platform/components/features/email/email-preview';
-import { SendTestEmailButton } from '@platform/components/features/email/email-settings/components/send-test-email-button';
-import type { TEmailDraft } from '@platform/utils/email-draft/email-draft';
+} from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { useEmailPreview } from './use-email-preview';

@@ -3,7 +3,7 @@ import {
   CONTENT_ALIGNMENT,
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockTimelineItem } from '@web/testing/modules/timeline/fixtures';

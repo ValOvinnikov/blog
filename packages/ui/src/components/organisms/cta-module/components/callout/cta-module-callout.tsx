@@ -5,11 +5,11 @@ import {
   type IWithDataTestId,
   type TBrandVariant,
   type TContentAlignment,
-} from '@blog/config';
-import { CtaModuleLayout } from '@blog/ui/components/organisms/cta-module/components/layout/cta-module-layout';
-import type { CtaModuleSlotParts } from '@blog/ui/components/organisms/cta-module/cta-module-slot-parts';
-import { ctaModuleVariants } from '@blog/ui/components/organisms/cta-module/cta-module-variants';
-import type { TCompoundChildren } from '@blog/ui/lib/react';
+} from '@shinefold/config';
+import { CtaModuleLayout } from '@shinefold/ui/components/organisms/cta-module/components/layout/cta-module-layout';
+import type { CtaModuleSlotParts } from '@shinefold/ui/components/organisms/cta-module/cta-module-slot-parts';
+import { ctaModuleVariants } from '@shinefold/ui/components/organisms/cta-module/cta-module-variants';
+import type { TCompoundChildren } from '@shinefold/ui/lib/react';
 
 export type TCtaModuleCalloutProps = IWithClassName &
   IWithDataTestId & {

@@ -1,4 +1,4 @@
-import { siteConfig } from '@blog/db/schema/site-config';
+import { siteConfig } from '@shinefold/db/schema/site-config';
 import { getTableColumns } from 'drizzle-orm';
 
 import { LOOK_FIELDS } from './look';

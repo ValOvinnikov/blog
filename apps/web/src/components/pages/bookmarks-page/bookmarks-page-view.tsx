@@ -1,9 +1,9 @@
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { Panel } from '@blog/ui/components/molecules/panel';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { Panel } from '@shinefold/ui/components/molecules/panel';
 import {
   BookmarksList,
   type IBookmarkRow,
-} from '@blog/ui/components/organisms/bookmarks-list';
+} from '@shinefold/ui/components/organisms/bookmarks-list';
 import NextLink from 'next/link';
 import type { ReactNode } from 'react';
 

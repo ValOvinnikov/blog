@@ -1,9 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@platform/lib/react';
+import type { TMaybeUndefined } from '@shinefold/config';
 import {
   cloneElement,
   type ElementType,

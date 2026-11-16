@@ -1,5 +1,3 @@
-import { SITE_MESSAGES_BY_LOCALE, VOICE_SURFACE } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import de from '@platform/i18n/messages/de.json';
 import en from '@platform/i18n/messages/en.json';
@@ -10,6 +8,8 @@ import {
 } from '@platform/testing/site-preview-theme';
 import { withVoiceValue } from '@platform/utils/voice-draft/voice-draft';
 import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
+import { SITE_MESSAGES_BY_LOCALE, VOICE_SURFACE } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 
 import { VoiceSpecimen } from './voice-specimen';
 

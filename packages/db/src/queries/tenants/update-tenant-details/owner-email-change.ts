@@ -1,19 +1,19 @@
-import type { TMaybeUndefined, TOutcome } from '@blog/config';
-import { getDb } from '@blog/db/client';
+import type { TMaybeUndefined, TOutcome } from '@shinefold/config';
+import { getDb } from '@shinefold/db/client';
 import {
   MEMBERSHIP_ROLE,
   TENANT_DETAILS_UPDATE_OUTCOME,
-} from '@blog/db/constants';
-import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
-import { getTenantOwnerMembership } from '@blog/db/queries/memberships';
-import { users, verificationTokens } from '@blog/db/schema/auth';
-import { membershipInvites } from '@blog/db/schema/membership-invites';
-import { memberships } from '@blog/db/schema/memberships';
-import { requireEmailIndex } from '@blog/db/utils/personal-data/personal-data';
-import { userHasSignedIn } from '@blog/db/utils/user-has-signed-in/user-has-signed-in';
-import { accountEmailIndex } from '@blog/utils/encryption';
-import { normalizeEmail } from '@blog/utils/normalize-email-identity';
-import { toOutcome } from '@blog/utils/to-outcome';
+} from '@shinefold/db/constants';
+import { inviteEmailColumns } from '@shinefold/db/queries/membership-invites/invite-email-columns';
+import { getTenantOwnerMembership } from '@shinefold/db/queries/memberships';
+import { users, verificationTokens } from '@shinefold/db/schema/auth';
+import { membershipInvites } from '@shinefold/db/schema/membership-invites';
+import { memberships } from '@shinefold/db/schema/memberships';
+import { requireEmailIndex } from '@shinefold/db/utils/personal-data/personal-data';
+import { userHasSignedIn } from '@shinefold/db/utils/user-has-signed-in/user-has-signed-in';
+import { accountEmailIndex } from '@shinefold/utils/encryption';
+import { normalizeEmail } from '@shinefold/utils/normalize-email-identity';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 
 const OUTCOME = TENANT_DETAILS_UPDATE_OUTCOME;

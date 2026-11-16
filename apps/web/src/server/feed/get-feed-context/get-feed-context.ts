@@ -1,5 +1,9 @@
-import { LOCALE_BCP47_TAGS, routes, type TMaybeUndefined } from '@blog/config';
-import type { TFeedPost, TTenantSanityContext } from '@blog/service';
+import {
+  LOCALE_BCP47_TAGS,
+  routes,
+  type TMaybeUndefined,
+} from '@shinefold/config';
+import type { TFeedPost, TTenantSanityContext } from '@shinefold/service';
 import { routing } from '@web/i18n/routing';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';

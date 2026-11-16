@@ -1,4 +1,4 @@
-import { FONT_CHOICE } from '@blog/config';
+import { FONT_CHOICE } from '@shinefold/config';
 
 import { resolveFontVariableClassName } from './fonts';
 

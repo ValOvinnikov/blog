@@ -1,4 +1,4 @@
-import { HTTP_METHOD, type TMaybeUndefined } from '@blog/config';
+import { HTTP_METHOD, type TMaybeUndefined } from '@shinefold/config';
 import { localeForPrefix } from '@web/i18n/routing';
 import type { TTenantRouting } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { getTenantTranslationMap } from '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map';

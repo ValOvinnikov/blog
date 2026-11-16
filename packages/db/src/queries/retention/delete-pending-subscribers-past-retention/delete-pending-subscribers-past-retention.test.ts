@@ -1,25 +1,25 @@
+import { faker } from '@faker-js/faker';
 import {
   PENDING_SUBSCRIBER_RETENTION_DAYS,
   SUBSCRIBER_STATUS,
-} from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+} from '@shinefold/db/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestSubscriber,
   insertTestTenant,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   justPast,
   justWithin,
   MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
-} from '@blog/db/testing/retention/fixtures';
-import { daysBefore } from '@blog/db/utils/day-offset/day-offset';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/retention/fixtures';
+import { daysBefore } from '@shinefold/db/utils/day-offset/day-offset';
 
 import { deletePendingSubscribersPastRetention } from './delete-pending-subscribers-past-retention';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

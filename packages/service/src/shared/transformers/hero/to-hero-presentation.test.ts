@@ -1,4 +1,8 @@
-import { CONTENT_ALIGNMENT, HERO_VARIANT, MEDIA_ORDER } from '@blog/config';
+import {
+  CONTENT_ALIGNMENT,
+  HERO_VARIANT,
+  MEDIA_ORDER,
+} from '@shinefold/config';
 
 import {
   toHeroPresentation,

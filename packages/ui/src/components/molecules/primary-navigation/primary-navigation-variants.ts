@@ -1,5 +1,5 @@
-import { HEADER_LAYOUT } from '@blog/config';
-import { MENU_ROW, tv } from '@blog/ui/lib/styling';
+import { HEADER_LAYOUT } from '@shinefold/config';
+import { MENU_ROW, tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const PANEL_LINK = [

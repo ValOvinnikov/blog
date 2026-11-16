@@ -1,8 +1,8 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_SIGN_IN_URL,
   MOCK_UNSAFE_URL,
-} from '@blog/email/testing/email-fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/email/testing/email-fixtures';
 
 import { buildPlainTextBody } from './plain-text-body';
 

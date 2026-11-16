@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CARD_STYLE,
@@ -6,11 +7,11 @@ import {
   PRICE_PERIOD,
   RADIUS_SCALE,
   TENANT_PLAN,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   mockCtaButtonView,
   mockRawCtaButton,
-} from '@blog/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_PRICING_FEATURE_KEY,
   MOCK_PRICING_FOOTNOTE,
@@ -25,8 +26,7 @@ import {
   mockRawPricingModule,
   mockRawPricingPrice,
   mockRawPricingTier,
-} from '@blog/service/testing/modules/pricing/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/modules/pricing/fixtures';
 
 import { toPricingModule } from './transformer';
 

@@ -1,4 +1,4 @@
-import { buildOperatorShell } from '@blog/email/html/operator-shell/operator-shell';
+import { buildOperatorShell } from '@shinefold/email/html/operator-shell/operator-shell';
 
 export type TSelfServeLimitAlertInput = {
   day: string;

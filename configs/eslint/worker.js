@@ -37,17 +37,17 @@ export default [
             },
             {
               group: [
-                '@blog/ui',
-                '@blog/ui/*',
-                '@blog/service',
-                '@blog/service/*',
-                '@blog/auth',
-                '@blog/auth/*',
-                '@blog/studio',
-                '@blog/studio/*',
+                '@shinefold/ui',
+                '@shinefold/ui/*',
+                '@shinefold/service',
+                '@shinefold/service/*',
+                '@shinefold/auth',
+                '@shinefold/auth/*',
+                '@shinefold/studio',
+                '@shinefold/studio/*',
               ],
               message:
-                'apps/worker must not import @blog/ui, @blog/service, @blog/auth or @blog/studio — it consumes db, config, utils, insight, email and @sanity/client only.',
+                'apps/worker must not import @shinefold/ui, @shinefold/service, @shinefold/auth or @shinefold/studio — it consumes db, config, utils, insight, email and @sanity/client only.',
             },
             {
               group: [

@@ -1,5 +1,5 @@
-import type { TContentAlignment, TMaybeUndefined } from '@blog/config';
-import { hasLength } from '@blog/utils/primitives';
+import type { TContentAlignment, TMaybeUndefined } from '@shinefold/config';
+import { hasLength } from '@shinefold/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import type { IActionGroupProps } from '@web/components/shared/action-group/action-group';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';

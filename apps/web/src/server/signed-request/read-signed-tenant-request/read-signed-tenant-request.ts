@@ -1,8 +1,8 @@
-import type { TMaybeUndefined } from '@blog/config';
-import { HTTP_STATUS, type THttpStatus } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import type { TTenantSanityCredentials } from '@blog/db/queries/tenants/get-tenant-sanity-credentials/get-tenant-sanity-credentials';
-import { isUndefined } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@shinefold/config';
+import { HTTP_STATUS, type THttpStatus } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import type { TTenantSanityCredentials } from '@shinefold/db/queries/tenants/get-tenant-sanity-credentials/get-tenant-sanity-credentials';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { readSignedRequestBody } from '@web/server/signed-request/read-signed-request-body/read-signed-request-body';
 import { respondEmpty } from '@web/utils/empty-response/empty-response';
 import { logger } from '@web/utils/logger/logger';

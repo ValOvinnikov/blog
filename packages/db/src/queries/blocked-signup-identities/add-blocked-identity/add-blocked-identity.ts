@@ -1,20 +1,20 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
 import {
   BLOCKED_IDENTITY_KIND,
   type TBlockedIdentityKind,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   blockedSignupIdentities,
   type TBlockedSignupIdentity,
-} from '@blog/db/schema/blocked-signup-identities';
+} from '@shinefold/db/schema/blocked-signup-identities';
 import {
   normalizeSignupDomain,
   normalizeSignupEmail,
-} from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
-import { requireEmailIndex } from '@blog/db/utils/personal-data/personal-data';
-import { errorResult, okResult, type TResult } from '@blog/utils';
-import { personalDataIndex } from '@blog/utils/encryption';
+} from '@shinefold/db/utils/normalize-signup-identity/normalize-signup-identity';
+import { requireEmailIndex } from '@shinefold/db/utils/personal-data/personal-data';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
+import { personalDataIndex } from '@shinefold/utils/encryption';
 import { and, eq } from 'drizzle-orm';
 
 export type TAddBlockedIdentityInput = {

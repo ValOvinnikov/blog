@@ -1,7 +1,7 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import { and, eq } from 'drizzle-orm';
 
 // Returns the tenant only to the one caller that ended a grace still running on Free.

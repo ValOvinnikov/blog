@@ -1,7 +1,7 @@
-import { localizedMultilineTextField } from '@blog/studio/schema-types/fields/localized-multiline-text-field/localized-multiline-text-field';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { HEADING_REQUIRED_MESSAGE } from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block';
-import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { localizedMultilineTextField } from '@shinefold/studio/schema-types/fields/localized-multiline-text-field/localized-multiline-text-field';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { HEADING_REQUIRED_MESSAGE } from '@shinefold/studio/schema-types/objects/page-heading-block/page-heading-block';
+import { validateDefaultLanguageFilled } from '@shinefold/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
 import { defineType } from 'sanity';
 
 export const moduleHeadingBlockSchema = defineType({

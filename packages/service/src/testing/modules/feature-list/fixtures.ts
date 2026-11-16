@@ -4,11 +4,11 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
   ICONS,
-} from '@blog/config';
-import type { TRawFeatureListModule } from '@blog/service/features/modules/feature-list/adaptor/transformer';
-import { MOCK_SHIP_FASTER_HEADING } from '@blog/service/testing/modules/fixtures';
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { mockRawModuleAppearance } from '@blog/service/testing/shared/module-appearance';
+} from '@shinefold/config';
+import type { TRawFeatureListModule } from '@shinefold/service/features/modules/feature-list/adaptor/transformer';
+import { MOCK_SHIP_FASTER_HEADING } from '@shinefold/service/testing/modules/fixtures';
+import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 export const MOCK_FEATURE_LIST_MODULE_ID = 'feature-list-1';
 

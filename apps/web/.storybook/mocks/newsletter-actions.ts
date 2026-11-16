@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import type { TSubscribeResult } from '@web/server/newsletter/newsletter-actions/newsletter-actions';
 
 /** Answers `SERVER_ERROR` for an address containing `fail`, `SUCCESS` otherwise. */

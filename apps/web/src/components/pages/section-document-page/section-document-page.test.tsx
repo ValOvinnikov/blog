@@ -1,7 +1,7 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { service } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
+import { service } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { SECTION_DOCUMENT_LOG } from '@web/constants/section-document';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -19,7 +19,7 @@ faker.seed(6522);
 vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: { sectionDocument: { v1: { getSectionDocument: vi.fn() } } },
   },

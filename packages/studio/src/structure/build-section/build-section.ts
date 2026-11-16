@@ -1,11 +1,14 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   buildGroupedListItems,
   type TDividerBuilder,
   type TStructureGroup,
   type TStructureGroupItem,
-} from '@blog/studio/structure/build-group-items/build-group-items';
+} from '@shinefold/studio/structure/build-group-items/build-group-items';
 import type { ComponentType } from 'react';
 import type { ListItemBuilder, StructureBuilder } from 'sanity/structure';
 

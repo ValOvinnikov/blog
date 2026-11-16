@@ -1,6 +1,5 @@
 'use client';
 
-import type { TLocaleIsoCode } from '@blog/config';
 import {
   EmailSenderEditor,
   type TEmailSenderEditorProps,
@@ -16,6 +15,7 @@ import {
   type TEmailSenderDraft,
 } from '@platform/utils/email-draft/email-draft';
 import { resolveFallbackCopy } from '@platform/utils/email-fallback-copy/email-fallback-copy';
+import type { TLocaleIsoCode } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 type TEmailEditPaneProps = {

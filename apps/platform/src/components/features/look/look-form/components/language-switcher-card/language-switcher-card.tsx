@@ -1,8 +1,3 @@
-import {
-  LANGUAGE_SWITCHER_STYLE,
-  type TLanguageSwitcherStyle,
-} from '@blog/config';
-import { LOOK_FIELD } from '@blog/db/constants';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
@@ -13,6 +8,11 @@ import { SegmentedControl } from '@platform/components/shared/segmented-control'
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { SEGMENTED_LAYOUT } from '@platform/constants/segmented-control';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
+import {
+  LANGUAGE_SWITCHER_STYLE,
+  type TLanguageSwitcherStyle,
+} from '@shinefold/config';
+import { LOOK_FIELD } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 
 import { languageSwitcherCardVariants } from './language-switcher-card-variants';

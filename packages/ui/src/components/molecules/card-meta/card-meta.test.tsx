@@ -1,13 +1,13 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_TAGLINE_SEPARATOR_CHARS,
   BRAND_TAGLINE_SEPARATORS,
-} from '@blog/config';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+} from '@shinefold/config';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import {
   MOCK_FORMATTED_DATE,
   MOCK_PUBLISHED_AT,
-} from '@blog/ui/testing/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/ui/testing/fixtures';
 
 import { CardMeta } from './card-meta';
 

@@ -1,5 +1,5 @@
-import { NEWSLETTER_RESULT, NEWSLETTER_RESULT_SLUGS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { NEWSLETTER_RESULT, NEWSLETTER_RESULT_SLUGS } from '@shinefold/config';
 
 import { toNewsletterResult } from './to-newsletter-result';
 

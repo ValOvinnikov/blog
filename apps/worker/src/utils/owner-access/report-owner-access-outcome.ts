@@ -1,14 +1,14 @@
-import { OPERATOR_ALERT_KIND } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
+import { OPERATOR_ALERT_KIND } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   OWNER_ACCESS_STALL_AFTER_MS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TElevateTenantOwnerOutcome,
-} from '@blog/db/constants';
-import { updateProvisioningStep } from '@blog/db/queries/tenants';
-import type { TTenant } from '@blog/db/schema/tenants';
+} from '@shinefold/db/constants';
+import { updateProvisioningStep } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
 import { postOperatorAlert } from '@worker/utils/operator-alert/operator-alert';

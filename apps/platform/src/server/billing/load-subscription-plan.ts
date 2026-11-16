@@ -1,12 +1,12 @@
 import 'server-only';
 
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { SELLABLE_TENANT_PLANS } from '@blog/config/constants';
-import type { TPaidSubscriberBandCeiling } from '@blog/db/constants';
-import { isOneOf, isString } from '@blog/utils/primitives';
 import { STRIPE_SUBSCRIPTION_STATUS } from '@platform/constants/billing';
 import { type TPlanChoice } from '@platform/constants/plan-change';
 import { isSamePlanChoice } from '@platform/utils/plan-change-timing/plan-change-timing';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { SELLABLE_TENANT_PLANS } from '@shinefold/config/constants';
+import type { TPaidSubscriberBandCeiling } from '@shinefold/db/constants';
+import { isOneOf, isString } from '@shinefold/utils/primitives';
 import type Stripe from 'stripe';
 
 import { planFromPriceKeys, pricesFromKeys } from './plan-from-price-keys';

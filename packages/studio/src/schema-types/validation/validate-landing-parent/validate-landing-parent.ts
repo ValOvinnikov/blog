@@ -1,16 +1,16 @@
-import type { TMaybeNull, TMaybeUndefined, TNullable } from '@blog/config';
-import { LANDING_PAGE_MAX_DEPTH } from '@blog/config/constants';
-import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
+import type { TMaybeNull, TMaybeUndefined, TNullable } from '@shinefold/config';
+import { LANDING_PAGE_MAX_DEPTH } from '@shinefold/config/constants';
+import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 import {
   flattenLandingParentChain,
   LANDING_PARENT_CHAIN_PROJECTION,
   type TLandingParentChainNode,
-} from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
+} from '@shinefold/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
 import {
   fetchFailSafe,
   getDraftsClient,
-} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
-import { hasLength, isString } from '@blog/utils/primitives';
+} from '@shinefold/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { hasLength, isString } from '@shinefold/utils/primitives';
 import { getPublishedId, type Reference, type ValidationContext } from 'sanity';
 
 type TDescendant = { _id: string; children?: TMaybeNull<TDescendant[]> };

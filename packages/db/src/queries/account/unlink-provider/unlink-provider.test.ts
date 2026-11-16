@@ -1,20 +1,20 @@
-import * as schema from '@blog/db/schema';
+import * as schema from '@shinefold/db/schema';
 import {
   GITHUB_PROVIDER,
   GOOGLE_PROVIDER,
-} from '@blog/db/testing/account/fixtures';
+} from '@shinefold/db/testing/account/fixtures';
 import {
   insertTestAccount,
   insertTestUser,
   MOCK_EMAIL_VERIFIED_AT,
-} from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { toOutcome } from '@blog/utils/to-outcome';
+} from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
 
 import { unlinkProvider } from './unlink-provider';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const UNLINKED = toOutcome('unlinked');
 const LAST_METHOD = toOutcome('last-method');

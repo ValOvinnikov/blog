@@ -1,6 +1,5 @@
 'use client';
 
-import type { TMaybeUndefined, TVoiceSurface } from '@blog/config';
 import {
   VOICE_CARD_ID,
   VOICE_SECTION_ID,
@@ -14,6 +13,7 @@ import {
   voiceSectionHref,
   voiceSectionOf,
 } from '@platform/utils/voice-sections/voice-sections';
+import type { TMaybeUndefined, TVoiceSurface } from '@shinefold/config';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { flushSync } from 'react-dom';
 

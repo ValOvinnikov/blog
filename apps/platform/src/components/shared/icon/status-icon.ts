@@ -1,4 +1,4 @@
-import { ALERT_TYPE, ICONS, type TAlertType } from '@blog/config';
+import { ALERT_TYPE, ICONS, type TAlertType } from '@shinefold/config';
 
 import type { TRegisteredIconName } from './icon-registry';
 

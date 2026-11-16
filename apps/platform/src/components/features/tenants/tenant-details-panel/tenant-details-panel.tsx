@@ -1,8 +1,5 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
-import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
-import { hasArrayGotItems } from '@blog/utils/primitives';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { BUTTON_VARIANT } from '@platform/constants/button';
@@ -13,6 +10,9 @@ import {
   lockAllFields,
   type TTenantFieldLocks,
 } from '@platform/utils/tenant-field-locks/tenant-field-locks';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TTenantOwnerMembership } from '@shinefold/db/queries/memberships';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useId, useTransition } from 'react';
 

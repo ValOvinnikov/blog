@@ -1,4 +1,7 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 
 import { OWNER_DASHBOARD_ACTION_LABEL } from './owner-dashboard-action-label';
 import type { TOwnerEmailCopy } from './owner-email-copy-types';

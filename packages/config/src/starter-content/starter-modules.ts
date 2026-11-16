@@ -5,14 +5,14 @@ import type {
   Module_heroProfile,
   Module_postList,
   Person,
-} from '@blog/config/sanity/generated/types';
+} from '@shinefold/config/sanity/generated/types';
 
 import {
   BRAND_VARIANT,
   CTA_VARIANT,
   HERO_VARIANT,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import type { TStarterDocument, TStarterModule } from './starter-document';
 import {

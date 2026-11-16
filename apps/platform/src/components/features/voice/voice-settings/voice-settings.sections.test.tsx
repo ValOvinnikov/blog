@@ -1,5 +1,3 @@
-import { ACTION_OUTCOME, VOICE_SURFACE } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
 import {
@@ -39,6 +37,8 @@ import {
   voiceCard,
 } from '@platform/testing/voice/voice-settings-setup';
 import { voiceCardHref } from '@platform/utils/voice-sections/voice-sections';
+import { ACTION_OUTCOME, VOICE_SURFACE } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { VoiceSettings } from './voice-settings';

@@ -1,9 +1,3 @@
-import {
-  ACTION_OUTCOME,
-  EMAIL_TEMPLATE_TYPE,
-  LOCALE_ISO_CODES,
-} from '@blog/config';
-import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants/email-template-defaults';
 import en from '@platform/i18n/messages/en.json';
 import { sendTestEmailAction } from '@platform/server/email/send-test-email-action';
 import { MOCK_ADMIN_EMAIL } from '@platform/testing/admins/fixtures';
@@ -33,6 +27,12 @@ import { MOCK_EMAIL_DRAFT_SUBJECT } from '@platform/testing/email-draft';
 import type { mockRouterRefresh } from '@platform/testing/mock-router';
 import { SAVE_CHANGES } from '@platform/testing/render-in-settings-form';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  ACTION_OUTCOME,
+  EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
+} from '@shinefold/config';
+import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@shinefold/db/constants/email-template-defaults';
 import type { UserEvent } from '@testing-library/user-event';
 
 import { EmailSettings } from './email-settings';

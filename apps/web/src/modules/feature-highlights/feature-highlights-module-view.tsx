@@ -1,5 +1,5 @@
-import { MEDIA_ORDER } from '@blog/config';
-import type { TFeatureHighlightsModule } from '@blog/service';
+import { MEDIA_ORDER } from '@shinefold/config';
+import type { TFeatureHighlightsModule } from '@shinefold/service';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';

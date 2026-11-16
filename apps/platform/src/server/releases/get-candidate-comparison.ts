@@ -1,4 +1,3 @@
-import { errorResult, okResult } from '@blog/utils';
 import { RELEASE_FAILURE } from '@platform/constants/release';
 import {
   compareCommits,
@@ -6,6 +5,7 @@ import {
 } from '@platform/server/github/compare-commits';
 import { getBranchHeadSha } from '@platform/server/github/get-branch-head-sha';
 import { getLatestReleaseTag } from '@platform/server/github/get-latest-release-tag';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import {
   classifyReleaseChanges,

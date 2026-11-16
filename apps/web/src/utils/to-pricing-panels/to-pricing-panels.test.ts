@@ -1,6 +1,6 @@
-import { PRICE_PERIOD } from '@blog/config';
-import { BILLING_CURRENCY } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { PRICE_PERIOD } from '@shinefold/config';
+import { BILLING_CURRENCY } from '@shinefold/db/constants';
 import {
   mockPricingPrice,
   mockPricingTier,

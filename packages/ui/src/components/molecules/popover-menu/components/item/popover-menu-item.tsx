@@ -1,5 +1,5 @@
-import { BUTTON_AS_CONST, type IWithDataTestId } from '@blog/config';
-import type { TPolymorphicProps } from '@blog/config/react';
+import { BUTTON_AS_CONST, type IWithDataTestId } from '@shinefold/config';
+import type { TPolymorphicProps } from '@shinefold/config/react';
 import type { ElementType, ReactNode } from 'react';
 
 import {

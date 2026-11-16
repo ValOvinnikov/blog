@@ -1,14 +1,14 @@
-import { SANITY_PROJECT_ROLE } from '@blog/config';
-import type { TMaybeUndefined } from '@blog/config/types';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { SANITY_PROJECT_ROLE } from '@shinefold/config';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   assignSanityProjectUserRole,
   listSanityOrganizationUsers,
   listSanityProjectUsers,
   type TSanityUser,
-} from '@blog/db/utils/sanity-management-client/sanity-project-users';
-import { normalizeEmail } from '@blog/utils/normalize-email-identity';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-users';
+import { normalizeEmail } from '@shinefold/utils/normalize-email-identity';
 import { loadTenant } from '@worker/units/run-reported-step';
 import {
   getProvisionEnv,

@@ -1,7 +1,7 @@
-import { HEADER_CONTROL_SHAPE } from '@blog/config';
 import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { SEGMENTED_LAYOUT } from '@platform/constants/segmented-control';
+import { HEADER_CONTROL_SHAPE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export const HeaderControlShapeField = () => {

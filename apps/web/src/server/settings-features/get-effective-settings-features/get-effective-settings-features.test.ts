@@ -1,8 +1,8 @@
-import { CAPABILITY, PRESET_REGISTRY } from '@blog/config';
-import { PRESET_ID } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { CAPABILITY, PRESET_REGISTRY } from '@shinefold/config';
+import { PRESET_ID } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { errorResult, okResult } from '@shinefold/utils';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { mockSettingsFeaturesRow } from '@web/testing/server/settings-features/fixtures';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
@@ -21,7 +21,7 @@ faker.seed(6010);
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: {
     settingsFeatures: { getSettingsFeatures: vi.fn() },
     siteConfig: { getSiteConfig: vi.fn() },

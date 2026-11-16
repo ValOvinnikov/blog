@@ -1,4 +1,4 @@
-import { LANGUAGE_SWITCHER_STYLE } from '@blog/config';
+import { LANGUAGE_SWITCHER_STYLE } from '@shinefold/config';
 import type * as TModule from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 
 export const getLanguageSwitcherStyle = vi.fn<

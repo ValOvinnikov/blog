@@ -1,5 +1,5 @@
-import type { TEmailAction } from '@blog/email/html/email-action/email-action';
-import { sanitizeHref } from '@blog/utils';
+import type { TEmailAction } from '@shinefold/email/html/email-action/email-action';
+import { sanitizeHref } from '@shinefold/utils';
 
 export function buildPlainTextBody(
   paragraphs: string[],

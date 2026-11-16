@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   BRAND_VARIANT,
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
-} from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_TEAM_HEADING,
@@ -23,7 +23,7 @@ const { getTeamModuleMock } = vi.hoisted(() => ({
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
       team: { v1: { getTeamModule: getTeamModuleMock } },

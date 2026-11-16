@@ -1,5 +1,5 @@
-import { pageHref, routes } from '@blog/config';
-import type { TSectionIndexType } from '@blog/service';
+import { pageHref, routes } from '@shinefold/config';
+import type { TSectionIndexType } from '@shinefold/service';
 import { SECTION_INDEX_LOG } from '@web/constants/section-index';
 import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getSectionIndexPage } from '@web/server/section-index/get-section-index-page/get-section-index-page';

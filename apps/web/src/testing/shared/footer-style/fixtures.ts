@@ -4,7 +4,7 @@ import {
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
   type IFooterStyle,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export const MOCK_FOOTER_STYLE: IFooterStyle = {
   layout: FOOTER_LAYOUT.COLUMNS,

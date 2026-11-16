@@ -1,4 +1,3 @@
-import { BILLING_CURRENCY, STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import {
   MOCK_STRIPE_CURRENCY,
   MOCK_STRIPE_PRICE_ID,
@@ -6,6 +5,10 @@ import {
   MOCK_STRIPE_PROMOTION_CODE_ID,
 } from '@platform/testing/billing/fixtures';
 import { createMockFaker } from '@platform/testing/mock-faker';
+import {
+  BILLING_CURRENCY,
+  STRIPE_PRICE_LOOKUP_KEY,
+} from '@shinefold/db/constants';
 import type Stripe from 'stripe';
 
 const catalogueFaker = createMockFaker(6882);

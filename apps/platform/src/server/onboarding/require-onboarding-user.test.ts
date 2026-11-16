@@ -1,4 +1,3 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { requireSessionUserId } from '@platform/server/auth/require-session-user-id';
 import { resolveUserHomeHref } from '@platform/server/auth/resolve-home-href';
 import {
@@ -6,6 +5,7 @@ import {
   MOCK_SIGN_IN_USER_ID,
 } from '@platform/testing/auth/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { redirect } from 'next/navigation';
 
 import { requireOnboardingUser } from './require-onboarding-user';

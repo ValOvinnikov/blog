@@ -1,10 +1,10 @@
-import { ICONS } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
 import type { THeadingLevel } from '@platform/components/shared/heading';
 import { Icon } from '@platform/components/shared/icon';
 import { Text } from '@platform/components/shared/text';
 import { ICON_SIZE } from '@platform/constants/icon';
+import { ICONS } from '@shinefold/config';
 
 import { runErrorCardVariants } from './run-error-card-variants';
 

@@ -1,5 +1,8 @@
-import { HEADER_CONTROL, HEADER_CONTROL_FRAME } from '@blog/ui/lib/styling';
 import { tv } from '@platform/utils/tv/tv';
+import {
+  HEADER_CONTROL,
+  HEADER_CONTROL_FRAME,
+} from '@shinefold/ui/lib/styling';
 
 export const sampleLanguageSwitcherVariants = tv({
   slots: {

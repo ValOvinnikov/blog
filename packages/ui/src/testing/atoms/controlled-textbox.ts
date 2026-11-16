@@ -1,6 +1,6 @@
-import type { TTextareaProps } from '@blog/ui/components/atoms/textarea/textarea';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import type { TTextareaProps } from '@shinefold/ui/components/atoms/textarea/textarea';
+import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { ComponentType } from 'react';
 

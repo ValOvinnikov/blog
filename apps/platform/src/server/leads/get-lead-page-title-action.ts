@@ -1,7 +1,7 @@
 'use server';
 
-import { LOCALE_ISO_CODES, type TMaybeUndefined } from '@blog/config';
 import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
+import { LOCALE_ISO_CODES, type TMaybeUndefined } from '@shinefold/config';
 import { z } from 'zod';
 
 import { fetchPageTitle } from './fetch-page-title';

@@ -1,13 +1,13 @@
+import { faker } from '@faker-js/faker';
 import {
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   mockRawTimelineItem,
   mockRawTimelineModule,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawParagraphTextBlock } from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawParagraphTextBlock } from '@shinefold/service/testing/shared/fixtures';
 
 import { toTimelineModule, type TRawTimelineModule } from './transformer';
 

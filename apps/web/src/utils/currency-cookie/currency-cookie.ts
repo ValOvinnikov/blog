@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TBillingCurrency } from '@blog/db/constants';
+import type { TMaybeUndefined } from '@shinefold/config';
+import type { TBillingCurrency } from '@shinefold/db/constants';
 import { isBillingCurrency } from '@web/utils/is-billing-currency';
 import { readCookie } from '@web/utils/read-cookie';
 

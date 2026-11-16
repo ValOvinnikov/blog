@@ -1,4 +1,4 @@
-import type { ITenantLocalizedParams } from '@blog/config';
+import type { ITenantLocalizedParams } from '@shinefold/config';
 import { NewsletterUnsubscribePage } from '@web/components/pages/newsletter-unsubscribe-page';
 import { buildNewsletterUnsubscribeMetadata } from '@web/metadata/newsletter-unsubscribe-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';

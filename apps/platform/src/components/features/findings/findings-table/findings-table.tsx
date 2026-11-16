@@ -1,5 +1,3 @@
-import { SIZE } from '@blog/config';
-import type { TOpenFinding } from '@blog/db/queries/findings';
 import { ContrastFindingDetails } from '@platform/components/features/findings/contrast-finding-details';
 import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import { LinkButton } from '@platform/components/shared/link-button';
@@ -8,6 +6,8 @@ import { BUTTON_VARIANT } from '@platform/constants/button';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { findingSeverityTone } from '@platform/utils/status-tone/status-tone';
+import { SIZE } from '@shinefold/config';
+import type { TOpenFinding } from '@shinefold/db/queries/findings';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { findingsTableVariants } from './findings-table-variants';

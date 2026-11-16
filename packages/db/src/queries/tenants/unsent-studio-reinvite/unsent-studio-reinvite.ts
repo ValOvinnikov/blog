@@ -1,10 +1,10 @@
-import type { TMaybeNull } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import { tenants } from '@blog/db/schema/tenants';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { getDb } from '@shinefold/db/client';
+import { tenants } from '@shinefold/db/schema/tenants';
 import {
   decryptOptionalPersonalValue,
   encryptPersonalValue,
-} from '@blog/db/utils/personal-data/personal-data';
+} from '@shinefold/db/utils/personal-data/personal-data';
 import { eq } from 'drizzle-orm';
 
 export async function setUnsentStudioReinvite(

@@ -1,13 +1,13 @@
-import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config/constants';
-import { applyLandingRedirects } from '@blog/studio/document-actions/apply-landing-redirects/apply-landing-redirects';
-import { REDIRECT_TYPE } from '@blog/studio/schema-types/documents/redirect/redirect-type';
+import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@shinefold/config/constants';
+import { applyLandingRedirects } from '@shinefold/studio/document-actions/apply-landing-redirects/apply-landing-redirects';
+import { REDIRECT_TYPE } from '@shinefold/studio/schema-types/documents/redirect/redirect-type';
 import {
   mockLandingPage,
   mockRedirect,
-} from '@blog/studio/testing/mock-documents';
-import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
-import { mockUniqueSlugs } from '@blog/studio/testing/mock-unique-slugs';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/testing/mock-documents';
+import { mockGroqFetch } from '@shinefold/studio/testing/mock-groq-fetch';
+import { mockUniqueSlugs } from '@shinefold/studio/testing/mock-unique-slugs';
 import { getDraftId, type SanityClient, type SanityDocument } from 'sanity';
 
 const { EN, NL } = LOCALE_ISO_CODES;

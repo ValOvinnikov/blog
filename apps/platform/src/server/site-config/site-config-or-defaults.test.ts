@@ -1,10 +1,15 @@
-import { DENSITY, FONT_CHOICE, PRESET_ID, RADIUS_SCALE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   MOCK_LOGO_URL,
   MOCK_THEME_FIELDS,
 } from '@platform/testing/site-config/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  DENSITY,
+  FONT_CHOICE,
+  PRESET_ID,
+  RADIUS_SCALE,
+} from '@shinefold/config';
 
 import { getSiteConfigOrDefaults } from './site-config-or-defaults';
 
@@ -14,7 +19,7 @@ const { getSiteConfigMock } = vi.hoisted(() => ({
   getSiteConfigMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { siteConfig: { getSiteConfig: getSiteConfigMock } },
 }));
 

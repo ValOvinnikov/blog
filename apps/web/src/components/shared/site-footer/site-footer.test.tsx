@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   COOKIE_SETTINGS_BUTTON,
   FOOTER_FINE_PRINT_KIND,
@@ -7,11 +8,10 @@ import {
   routes,
   SITE_MESSAGES,
   type ILink,
-} from '@blog/config';
-import type { TFooter } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
-import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import type { TFooter } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
+import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 import { FOOTER_LOG } from '@web/constants/footer';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
@@ -66,7 +66,7 @@ vi.mock(
   '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
 );
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: { global: { footer: { v1: { getFooter: getFooterMock } } } },
 }));
 

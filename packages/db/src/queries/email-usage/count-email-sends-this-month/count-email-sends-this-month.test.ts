@@ -1,18 +1,18 @@
-import { EMAIL_TYPE } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
+import { EMAIL_TYPE } from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
 import {
   insertTestEmailSendCount,
   MOCK_LAST_MONTH_DAY,
   MOCK_TODAY,
-} from '@blog/db/testing/email-usage/fixtures';
-import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { useTestTenant } from '@blog/db/testing/test-tenant';
-import { utcMonthStartDay } from '@blog/utils/date';
+} from '@shinefold/db/testing/email-usage/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
+import { utcMonthStartDay } from '@shinefold/utils/date';
 
 import { countEmailSendsThisMonth } from './count-email-sends-this-month';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);

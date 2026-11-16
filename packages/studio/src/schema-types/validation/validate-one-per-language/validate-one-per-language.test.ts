@@ -1,10 +1,13 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
-import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
-import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
-import { validateOnePerLanguage } from '@blog/studio/schema-types/validation/validate-one-per-language/validate-one-per-language';
-import { mockHomePage } from '@blog/studio/testing/mock-documents';
-import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
 import { faker } from '@faker-js/faker';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
+import { LOCALE_LABEL } from '@shinefold/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { setDefaultLanguage } from '@shinefold/studio/schema-types/validation/default-language/default-language';
+import { validateOnePerLanguage } from '@shinefold/studio/schema-types/validation/validate-one-per-language/validate-one-per-language';
+import { mockHomePage } from '@shinefold/studio/testing/mock-documents';
+import { mockGroqValidationContext } from '@shinefold/studio/testing/mock-validation-context';
 import {
   getDraftId,
   type SanityDocument,

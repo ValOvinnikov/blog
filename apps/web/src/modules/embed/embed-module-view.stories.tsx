@@ -5,7 +5,7 @@ import {
   EMBED_ORIGIN,
   EMBED_PROVIDER,
   MEDIA_RATIO,
-} from '@blog/config';
+} from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';

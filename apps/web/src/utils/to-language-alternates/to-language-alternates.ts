@@ -1,4 +1,4 @@
-import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@blog/config';
+import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@shinefold/config';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 
 export type TLanguagePage = { language: TLocaleIsoCode; href: string };

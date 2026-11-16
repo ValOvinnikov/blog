@@ -1,4 +1,4 @@
-import { DAY_MS } from '@blog/db/constants';
+import { DAY_MS } from '@shinefold/db/constants';
 
 export function daysBefore(date: Date, days: number): Date {
   return new Date(date.getTime() - days * DAY_MS);

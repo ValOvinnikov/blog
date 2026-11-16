@@ -1,4 +1,4 @@
-import type { TVoiceFieldId } from '@blog/config';
+import type { TVoiceFieldId } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 import { voiceKeyFrameVariants } from './voice-key-frame-variants';

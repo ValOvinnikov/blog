@@ -1,12 +1,12 @@
-import { CAPABILITY } from '@blog/config';
-import { queries } from '@blog/db';
-import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { LookForm } from '@platform/components/features/look/look-form';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
+import { CAPABILITY } from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toEffectiveLook } from '@shinefold/db/utils/effective-look/effective-look';
 
 export type TLookPageContentProps = {
   tenant: TPlatformTenant;

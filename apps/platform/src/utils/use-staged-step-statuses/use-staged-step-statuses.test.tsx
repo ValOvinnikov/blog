@@ -1,8 +1,8 @@
+import { act, renderHook } from '@platform/testing/custom-render';
 import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
-import { act, renderHook } from '@platform/testing/custom-render';
+} from '@shinefold/db/constants';
 
 import {
   STEP_REVEAL_DWELL_MS,

@@ -1,18 +1,18 @@
+import { faker } from '@faker-js/faker';
 import {
   FINDING_KIND,
   FINDING_SEVERITY,
   FINDING_SOURCE,
   FINDING_STATUS,
-} from '@blog/config/constants';
-import type { TValueOf } from '@blog/config/utils';
-import { TENANT_STATUS } from '@blog/db/constants';
-import { mockTenantSanityCredentials } from '@blog/db/testing/tenant-sanity-credentials/fixtures';
+} from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { mockTenantSanityCredentials } from '@shinefold/db/testing/tenant-sanity-credentials/fixtures';
 import {
   MOCK_MISSING_TENANT_ID,
   mockTenant,
-} from '@blog/db/testing/tenants/fixtures';
-import { mockSanityValidationResult } from '@blog/db/testing/validate-tenant-documents/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/tenants/fixtures';
+import { mockSanityValidationResult } from '@shinefold/db/testing/validate-tenant-documents/fixtures';
 
 import {
   DOCUMENT_VALIDATION_IDENTIFIER,
@@ -42,12 +42,12 @@ const {
   notifyMock: vi.fn(),
 }));
 
-vi.mock('@blog/db/queries/tenants', () => ({
+vi.mock('@shinefold/db/queries/tenants', () => ({
   listActiveTenants: listActiveTenantsMock,
   getTenantById: getTenantByIdMock,
   getTenantSanityCredentials: getTenantSanityCredentialsMock,
 }));
-vi.mock('@blog/db/queries/findings', () => ({
+vi.mock('@shinefold/db/queries/findings', () => ({
   listFindingsForTenant: listFindingsForTenantMock,
   openFinding: openFindingMock,
   resolveFinding: resolveFindingMock,

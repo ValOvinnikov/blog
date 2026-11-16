@@ -1,14 +1,17 @@
+import { faker } from '@faker-js/faker';
 import {
   CONTENT_ALIGNMENT,
   FORM_STATUS,
   NEWSLETTER_VARIANT,
-} from '@blog/config';
-import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
-import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
-import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
-import { makeNewsletterSignupForm } from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
-import { objectKeys } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { NewsletterSignup } from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup';
+import { newsletterSignupVariants } from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import {
+  BUSY_STYLES,
+  SPINNER_VARIANTS,
+} from '@shinefold/ui/testing/busy-styles';
+import { makeNewsletterSignupForm } from '@shinefold/ui/testing/organisms/newsletter-signup/fixtures';
+import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 faker.seed(123);

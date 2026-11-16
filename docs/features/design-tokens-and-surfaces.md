@@ -22,11 +22,11 @@ epics: [4987, 4990, 4991, 4994, 4996, 4997, 4858, 5459, 5067]
 
 ## What it does
 
-The public site and `@blog/ui` draw every colour, size, radius, spacing step, shadow and duration from one token layer, `configs/tailwind/theme.css`, through Tailwind utilities. A tenant's Look overrides a fixed subset of those tokens at runtime; everything else is the same on every site. Coloured bands and cards set a few inherited properties, so focus-ring offsets, dividers and item-card frames match the surface they sit on without any component prop.
+The public site and `@shinefold/ui` draw every colour, size, radius, spacing step, shadow and duration from one token layer, `configs/tailwind/theme.css`, through Tailwind utilities. A tenant's Look overrides a fixed subset of those tokens at runtime; everything else is the same on every site. Coloured bands and cards set a few inherited properties, so focus-ring offsets, dividers and item-card frames match the surface they sit on without any component prop.
 
 ## Surfaces and routes
 
-- No route. Every public page and every `@blog/ui` component consumes the tokens.
+- No route. Every public page and every `@shinefold/ui` component consumes the tokens.
 - `packages/ui`'s Storybook has a design-tokens story that parses `theme.css` (`token-registry.ts`, the `@role` comments) and renders colour, type, radius, spacing, layout, motion and hook tables.
 - Editors reach surfaces only through a module's `brandVariant` field in Studio (`PRIMARY`, `SECONDARY`, `BRAND_PRIMARY`), which picks the band `Section` paints.
 - `apps/platform` keeps its own `--platform-*` token layer (`apps/platform/src/styles/platform-theme.css`). It imports `theme.css` for the Tailwind base and for the site preview components.
@@ -46,8 +46,8 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - **`@theme inline`** — semantic colour utilities (`bg-surface`, `text-text-muted`, `border-divider`, `ring-offset-ambient`, `bg-brand-primary-solid`, status `success`/`warn`/`error`/`info` and their `-muted` tints, `on-image`), `shadow-card`, `shadow-float`, and the font stacks. Each emits `var(--…)` rather than a literal.
 - **`@theme`** — radius steps plus role radii (`--radius-card` → `--radius-md`, `--radius-media` → `--radius-lg`, `--radius-item` → `--item-radius`); the role hooks (below); containers; layout spacing (`gutter`, `section`, `page-y`, `site-x/y`, `card-x/y`, `card-gap`, and the `band` step with its `sm`–`xl` ladder); the type scale (`title-*`, `prose-*`, `card-*`, `meta`, `label`, `code`, …); tracking; easing.
 - **`:root`, with `.dark` overrides** — page neutrals (`primary`, `primary-subtle`, `secondary`, `surface`, `surface-2`), borders (`border`, `border-strong`, `border-emphasis`), ink (`text`, `text-muted`), the brand ramp, `ring`, status colours, logo steps, shadows, durations, the on-image and scrim tokens, the seven `--item-*` card-style properties, the two header-control properties (`--header-control-border` → `--border-strong`, `--header-control-fill` → `--surface`, with no `.dark` copy), the navigation-link properties at their Plain values (`--nav-link-fill` and `--nav-link-outline: transparent`, `--nav-link-decoration: none`, `--nav-link-padding-x`/`-y: 0px`; `--nav-link-radius` is left unset so `rounded-nav-link` falls back to the nearest `--radius-sm`), and `--ambient`/`--divider`/`--field-boundary`.
-- **`@blog/config` theme tables** (`accent-ramps.ts`, `radius-declarations.ts`, `theme-declarations.ts`) — `ACCENT_RAMP_LIGHT/DARK` (with `--brand-primary-wash`, the lighter-in-light, darker-in-dark tint a Filled card takes on a Brand tint band), `LOGO_RAMP_LIGHT/DARK` (with `--logo-tile`, the fill of the initial tile a site with no logo shows — a dark tile in light, a pale one in dark — and `--logo-tile-contrast`, its letter, held to 4.5:1 by the contrast guard) and `IMAGE_SCRIM_RAMP` as OKLCH stops with fixed lightness and chroma, plus `RADIUS_DECLARATIONS`, `DENSITY_DECLARATIONS` and `CARD_STYLE_DECLARATIONS`. `formatOklchRamp` fills in the tenant's hue.
-- **Colour maths** — `@blog/utils/color`: `renderedContrastRatio` (culori, OKLCH in, the worse of gamut mapping and clipping into sRGB), `oklchToHex`, `WCAG_AA_CONTRAST_MIN` (4.5).
+- **`@shinefold/config` theme tables** (`accent-ramps.ts`, `radius-declarations.ts`, `theme-declarations.ts`) — `ACCENT_RAMP_LIGHT/DARK` (with `--brand-primary-wash`, the lighter-in-light, darker-in-dark tint a Filled card takes on a Brand tint band), `LOGO_RAMP_LIGHT/DARK` (with `--logo-tile`, the fill of the initial tile a site with no logo shows — a dark tile in light, a pale one in dark — and `--logo-tile-contrast`, its letter, held to 4.5:1 by the contrast guard) and `IMAGE_SCRIM_RAMP` as OKLCH stops with fixed lightness and chroma, plus `RADIUS_DECLARATIONS`, `DENSITY_DECLARATIONS` and `CARD_STYLE_DECLARATIONS`. `formatOklchRamp` fills in the tenant's hue.
+- **Colour maths** — `@shinefold/utils/color`: `renderedContrastRatio` (culori, OKLCH in, the worse of gamut mapping and clipping into sRGB), `oklchToHex`, `WCAG_AA_CONTRAST_MIN` (4.5).
 
 ## Configuration
 
@@ -114,7 +114,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - `packages/utils/src/color/oklch.test.ts`
 - `apps/web/src/utils/build-theme-style-block/build-theme-style-block.test.ts` (Console parity with `theme.css`)
 - `packages/ui/src/lib/design-tokens/parse-theme-tokens.test.ts`, `token-registry.test.ts`
-- Stories: `packages/ui/src/lib/design-tokens/design-tokens.stories.tsx`, `apps/web/src/components/shared/section/section.stories.tsx`, `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`, the `OnBands` stories of `TextInput` and `Switch`, the descenders-and-wrapping stories of `TextLink`, `Button` and `QuoteCard` (`packages/ui/src/testing/surface-bands.tsx`), and every `@blog/ui` component's stories across the bands.
+- Stories: `packages/ui/src/lib/design-tokens/design-tokens.stories.tsx`, `apps/web/src/components/shared/section/section.stories.tsx`, `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`, the `OnBands` stories of `TextInput` and `Switch`, the descenders-and-wrapping stories of `TextLink`, `Button` and `QuoteCard` (`packages/ui/src/testing/surface-bands.tsx`), and every `@shinefold/ui` component's stories across the bands.
 
 ## Related
 

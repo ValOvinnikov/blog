@@ -1,5 +1,5 @@
-import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
-import { createMockFaker } from '@blog/db/testing/mock-faker';
+import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
+import { createMockFaker } from '@shinefold/db/testing/mock-faker';
 
 const emailTemplatesFaker = createMockFaker(61003);
 

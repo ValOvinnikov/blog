@@ -1,8 +1,12 @@
 'use server';
 
-import { ACTION_OUTCOME, ERROR_CODE, type TActionResult } from '@blog/config';
-import { queries } from '@blog/db';
-import { toOutcome } from '@blog/utils/to-outcome';
+import {
+  ACTION_OUTCOME,
+  ERROR_CODE,
+  type TActionResult,
+} from '@shinefold/config';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { auth } from '@web/server/auth/auth';
 import { logger } from '@web/utils/logger/logger';
 

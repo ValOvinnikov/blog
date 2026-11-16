@@ -1,15 +1,15 @@
-import { LOCALE_ISO_CODES, TENANT_PLAN } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
-import { tenants } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
-import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
-import { patchTestTenant } from '@blog/db/testing/test-tenant';
+import { LOCALE_ISO_CODES, TENANT_PLAN } from '@shinefold/config/constants';
+import * as schema from '@shinefold/db/schema';
+import { tenants } from '@shinefold/db/schema/tenants';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
+import { patchTestTenant } from '@shinefold/db/testing/test-tenant';
 import { eq } from 'drizzle-orm';
 
 import { getTenantLiveLocales } from './get-tenant-live-locales';
 
-vi.mock('@blog/db/client');
+vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 

@@ -1,10 +1,10 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { TENANT_STATUS } from '@blog/db/constants';
-import { isFreeOwnerViolation } from '@blog/db/queries/tenants/is-free-owner-violation';
-import { resumedTenantFields } from '@blog/db/queries/tenants/resumed-tenant-fields';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { TENANT_STATUS } from '@shinefold/db/constants';
+import { isFreeOwnerViolation } from '@shinefold/db/queries/tenants/is-free-owner-violation';
+import { resumedTenantFields } from '@shinefold/db/queries/tenants/resumed-tenant-fields';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
+import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { eq, type SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 

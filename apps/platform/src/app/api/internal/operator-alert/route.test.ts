@@ -1,15 +1,3 @@
-import {
-  EMAIL_ACCOUNT,
-  HTTP_METHOD,
-  HTTP_STATUS,
-  OPERATOR_ALERT_KIND,
-} from '@blog/config/constants';
-import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
-import {
-  buildDocumentValidationAlertEmail,
-  buildOwnerElevationAlertEmail,
-  sendEmail,
-} from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { OPERATOR_ALERT_LOG } from '@platform/constants/operator-alert';
 import { MOCK_BEARER_SECRET } from '@platform/testing/internal-api/fixtures';
@@ -20,6 +8,18 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  EMAIL_ACCOUNT,
+  HTTP_METHOD,
+  HTTP_STATUS,
+  OPERATOR_ALERT_KIND,
+} from '@shinefold/config/constants';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@shinefold/db/constants';
+import {
+  buildDocumentValidationAlertEmail,
+  buildOwnerElevationAlertEmail,
+  sendEmail,
+} from '@shinefold/email';
 
 import { POST } from './route';
 
@@ -32,7 +32,7 @@ const { getTenantByIdMock, listSuperadminEmailsMock } = vi.hoisted(() => ({
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     tenants: { getTenantById: getTenantByIdMock },
@@ -40,7 +40,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@blog/email');
+vi.mock('@shinefold/email');
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 const sendEmailMock = vi.mocked(sendEmail);

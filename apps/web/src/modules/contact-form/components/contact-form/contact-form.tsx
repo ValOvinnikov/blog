@@ -1,10 +1,10 @@
 'use client';
 
-import { ACTION_OUTCOME, ALERT_TYPE, FORM_STATUS } from '@blog/config';
-import { Alert } from '@blog/ui/components/atoms/alert';
-import { Button } from '@blog/ui/components/atoms/button';
-import { TextInput } from '@blog/ui/components/atoms/text-input';
-import { Textarea } from '@blog/ui/components/atoms/textarea';
+import { ACTION_OUTCOME, ALERT_TYPE, FORM_STATUS } from '@shinefold/config';
+import { Alert } from '@shinefold/ui/components/atoms/alert';
+import { Button } from '@shinefold/ui/components/atoms/button';
+import { TextInput } from '@shinefold/ui/components/atoms/text-input';
+import { Textarea } from '@shinefold/ui/components/atoms/textarea';
 import { useBusyStyle } from '@web/context/busy-style-provider';
 import { ContactFormField } from '@web/modules/contact-form/components/contact-form-field/contact-form-field';
 import { ContactFormSuccess } from '@web/modules/contact-form/components/contact-form-success/contact-form-success';

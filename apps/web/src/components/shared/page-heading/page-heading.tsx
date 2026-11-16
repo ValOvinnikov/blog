@@ -1,5 +1,5 @@
-import type { TContentAlignment, THeadingBlock } from '@blog/config';
-import { Heading } from '@blog/ui/components/atoms/heading';
+import type { TContentAlignment, THeadingBlock } from '@shinefold/config';
+import { Heading } from '@shinefold/ui/components/atoms/heading';
 
 import { pageHeadingVariants } from './page-heading-variants';
 

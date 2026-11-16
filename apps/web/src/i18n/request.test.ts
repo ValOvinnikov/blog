@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   LOCALE_ISO_CODES,
   SITE_MESSAGES_BY_LOCALE,
   VOICE_FIELDS,
-} from '@blog/config';
-import { okResult } from '@blog/utils';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/config';
+import { okResult } from '@shinefold/utils';
 import { peekVoiceTenant } from '@web/server/request-context/request-context';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';

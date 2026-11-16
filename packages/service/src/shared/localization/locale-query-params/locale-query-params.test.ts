@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { buildLocaleQueryParams } from './locale-query-params';
 

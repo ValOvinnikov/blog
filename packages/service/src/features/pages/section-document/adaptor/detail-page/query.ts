@@ -1,11 +1,11 @@
-import { q } from '@blog/service/sanity/query/query';
-import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
-import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text/portable-text-body-item';
-import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
-import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
-import type { TPageQueryParams } from '@blog/service/shared/types/page/page-query-params';
-import type { TSectionDocumentType } from '@blog/service/shared/types/page/section-document-type';
+import { q } from '@shinefold/service/sanity/query/query';
+import { pageHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/page-heading-block';
+import { moduleContentAlignmentLeftCenterFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
+import { portableTextBodyItemFragment } from '@shinefold/service/shared/fragments/portable-text/portable-text-body-item';
+import { seoFragment } from '@shinefold/service/shared/fragments/seo/seo';
+import { translationsQuery } from '@shinefold/service/shared/localization/page-translations/translations';
+import type { TPageQueryParams } from '@shinefold/service/shared/types/page/page-query-params';
+import type { TSectionDocumentType } from '@shinefold/service/shared/types/page/section-document-type';
 
 export const sectionDocumentPageQuery = q
   .parameters<TPageQueryParams & { type: TSectionDocumentType }>()

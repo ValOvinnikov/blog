@@ -1,10 +1,10 @@
-import { q } from '@blog/service/sanity/query/query';
+import { q } from '@shinefold/service/sanity/query/query';
 import {
   MOCK_POST_ID,
   MOCK_POST_SLUG,
   MOCK_POST_TITLE,
-} from '@blog/service/testing/shared/fixtures';
-import { MOCK_WORD_COUNT_FIELD } from '@blog/service/testing/shared/translated-posts-dataset';
+} from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_WORD_COUNT_FIELD } from '@shinefold/service/testing/shared/translated-posts-dataset';
 
 import { postLinkFragment } from './post-link';
 

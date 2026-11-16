@@ -1,4 +1,4 @@
-import { CAPABILITY } from '@blog/config';
+import { CAPABILITY } from '@shinefold/config';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';

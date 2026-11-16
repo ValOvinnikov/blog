@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import { useEffect, useRef } from 'react';
 
 export const useDebouncedCallback = <TArgs extends unknown[]>(

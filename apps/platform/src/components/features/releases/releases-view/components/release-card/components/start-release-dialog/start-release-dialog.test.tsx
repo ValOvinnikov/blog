@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   RELEASE_FIELD_ERROR,
@@ -9,6 +8,7 @@ import {
   MOCK_LAST_TAG,
   mockReleaseCandidate,
 } from '@platform/testing/releases/fixtures';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { StartReleaseDialog } from './start-release-dialog';

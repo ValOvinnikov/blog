@@ -1,10 +1,13 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
-import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { blockFaqFragment } from '@blog/service/shared/fragments/faq/block-faq';
-import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
-import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleAppearanceFragment } from '@blog/service/shared/fragments/module/module-appearance';
-import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import {
+  q,
+  type TModuleQueryParams,
+} from '@shinefold/service/sanity/query/query';
+import { ctaButtonsFragment } from '@shinefold/service/shared/fragments/cta/cta-buttons';
+import { blockFaqFragment } from '@shinefold/service/shared/fragments/faq/block-faq';
+import { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
+import { moduleLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { moduleAppearanceFragment } from '@shinefold/service/shared/fragments/module/module-appearance';
+import { moduleContentAlignmentLeftCenterFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
 
 export const faqModuleQuery = q
   .parameters<TModuleQueryParams>()

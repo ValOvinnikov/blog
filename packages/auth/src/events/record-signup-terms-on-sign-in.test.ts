@@ -1,9 +1,12 @@
-import { MOCK_DB_ERROR_MESSAGE } from '@blog/auth/testing/magic-link-fixtures';
-import { MOCK_EMAIL, MOCK_USER_ID } from '@blog/auth/testing/session-fixtures';
+import { MOCK_DB_ERROR_MESSAGE } from '@shinefold/auth/testing/magic-link-fixtures';
+import {
+  MOCK_EMAIL,
+  MOCK_USER_ID,
+} from '@shinefold/auth/testing/session-fixtures';
 import {
   SIGNUP_TERMS_COOKIE_NAME,
   TERMS_VERSION,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import { recordSignupTermsOnSignIn } from './record-signup-terms-on-sign-in';
 
@@ -14,7 +17,7 @@ const { cookiesMock, recordTermsAcceptanceMock } = vi.hoisted(() => ({
 
 vi.mock('next/headers', () => ({ cookies: cookiesMock }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { users: { recordTermsAcceptance: recordTermsAcceptanceMock } },
 }));
 

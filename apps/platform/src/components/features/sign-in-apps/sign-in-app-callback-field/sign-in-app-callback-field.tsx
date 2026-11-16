@@ -1,10 +1,10 @@
 'use client';
 
-import type { TOAuthProvider } from '@blog/config/constants';
 import { CopyCallbackButton } from '@platform/components/features/sign-in-apps/copy-callback-button';
 import { ExternalLink } from '@platform/components/shared/external-link';
 import { FormField } from '@platform/components/shared/form-field';
 import { OAUTH_PROVIDER_CONSOLE_URL } from '@platform/constants/sign-in-apps';
+import type { TOAuthProvider } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 import type { Ref } from 'react';
 

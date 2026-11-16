@@ -1,7 +1,3 @@
-import { TENANT_PLAN } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
-import { countMembershipsOverSeats } from '@blog/db/queries/memberships';
 import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_DOMAIN,
@@ -10,16 +6,20 @@ import {
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
+import { countMembershipsOverSeats } from '@shinefold/db/queries/memberships';
 
 import { loadGraceLocks } from './load-grace-locks';
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', () => ({
+vi.mock('@shinefold/db', () => ({
   queries: { tenantDomains: { listTenantHosts: vi.fn() } },
 }));
 
-vi.mock('@blog/db/queries/memberships', () => ({
+vi.mock('@shinefold/db/queries/memberships', () => ({
   countMembershipsOverSeats: vi.fn(),
 }));
 

@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   CAPABILITY,
   LOCALE_ISO_CODES,
@@ -5,24 +6,23 @@ import {
   SANITY_DOCUMENT_ACTION,
   SANITY_LOGIN_PROVIDER,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
-import { PAGE_COOKIE_STATEMENT_TYPE } from '@blog/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
-import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
-import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
-import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index-type';
-import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
-import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
-import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
-import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
+} from '@shinefold/config/constants';
+import { PAGE_COOKIE_STATEMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
+import { PAGE_HOME_TYPE } from '@shinefold/studio/schema-types/documents/pages/home/home-type';
+import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
+import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
+import { PAGE_POST_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/post-index/post-index-type';
+import { PAGE_TAG_TYPE } from '@shinefold/studio/schema-types/documents/pages/tag/tag-type';
+import { PAGE_TAG_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/tag-index/tag-index-type';
+import { PAGE_TOPIC_TYPE } from '@shinefold/studio/schema-types/documents/pages/topic/topic-type';
+import { PAGE_TOPIC_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/topic-index/topic-index-type';
+import { migrationStateSchema } from '@shinefold/studio/schema-types/documents/system/migration-state/migration-state';
+import { entitlementGates } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
 import {
   EVERY_MODULE_PACK,
   getEntitledModulePacks,
-} from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
-import { getCanLinkPlatformPlans } from '@blog/studio/schema-types/validation/platform-plan-links/platform-plan-links';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
+import { getCanLinkPlatformPlans } from '@shinefold/studio/schema-types/validation/platform-plan-links/platform-plan-links';
 import {
   type DocumentActionComponent,
   type DocumentActionsContext,

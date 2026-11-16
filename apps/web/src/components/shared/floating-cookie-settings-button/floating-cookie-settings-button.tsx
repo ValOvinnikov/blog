@@ -1,9 +1,9 @@
 'use client';
 
-import { ICONS, SIZE } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { IconButton } from '@blog/ui/components/atoms/icon-button';
-import { tv } from '@blog/ui/lib/styling';
+import { ICONS, SIZE } from '@shinefold/config';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
+import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
+import { tv } from '@shinefold/ui/lib/styling';
 import { CONSENT_STATUS } from '@web/constants/consent';
 import { useConsentPreferences } from '@web/context/consent-preferences-provider';
 import { useHeaderOverlay } from '@web/context/header-overlay-provider';

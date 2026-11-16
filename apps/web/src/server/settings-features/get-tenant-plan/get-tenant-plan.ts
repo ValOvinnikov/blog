@@ -1,10 +1,10 @@
 import {
   TENANT_CONFIG_REVALIDATE_SECONDS,
   type TMaybeUndefined,
-} from '@blog/config';
-import type { TTenantPlan } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { safeAsync } from '@blog/utils';
+} from '@shinefold/config';
+import type { TTenantPlan } from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { safeAsync } from '@shinefold/utils';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { buildTenantPlanCacheTag } from '@web/utils/tenant-cache-tags';
 import { unstable_cache } from 'next/cache';

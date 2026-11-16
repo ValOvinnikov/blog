@@ -2,8 +2,8 @@ import {
   getPlatformSanityWriteContext,
   service,
   type TTenantSanityContext,
-} from '@blog/service';
-import { isSecretMatch } from '@blog/utils';
+} from '@shinefold/service';
+import { isSecretMatch } from '@shinefold/utils';
 import {
   generateTakeaways,
   SKIM_GENERATION_MODEL,

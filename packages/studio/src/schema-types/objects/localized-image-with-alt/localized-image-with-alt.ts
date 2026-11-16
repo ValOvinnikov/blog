@@ -1,6 +1,6 @@
-import { imageHotspotOptions } from '@blog/studio/schema-types/fields/image-alt-field/image-alt-field';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { validateImageAltFilled } from '@blog/studio/schema-types/validation/validate-image-alt-filled/validate-image-alt-filled';
+import { imageHotspotOptions } from '@shinefold/studio/schema-types/fields/image-alt-field/image-alt-field';
+import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { validateImageAltFilled } from '@shinefold/studio/schema-types/validation/validate-image-alt-filled/validate-image-alt-filled';
 import { defineType } from 'sanity';
 
 export const localizedImageWithAltSchema = defineType({

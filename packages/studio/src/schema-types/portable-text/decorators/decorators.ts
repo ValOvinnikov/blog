@@ -1,4 +1,4 @@
-import { toToolbarIcon } from '@blog/studio/schema-types/portable-text/toolbar-icon/toolbar-icon';
+import { toToolbarIcon } from '@shinefold/studio/schema-types/portable-text/toolbar-icon/toolbar-icon';
 import {
   Bold,
   Code,

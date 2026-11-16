@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 
-import { CONTRAST_ROLE, CONTRAST_ROLE_MIN } from '@blog/config';
-import { hexToOklch, renderedContrastRatio } from '@blog/utils/color';
+import { CONTRAST_ROLE, CONTRAST_ROLE_MIN } from '@shinefold/config';
+import { hexToOklch, renderedContrastRatio } from '@shinefold/utils/color';
 
 const TEXT = CONTRAST_ROLE_MIN[CONTRAST_ROLE.TEXT];
 const BOUNDARY = CONTRAST_ROLE_MIN[CONTRAST_ROLE.UI_BOUNDARY];

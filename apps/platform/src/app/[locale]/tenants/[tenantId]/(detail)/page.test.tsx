@@ -40,7 +40,7 @@ vi.mock('@platform/server/tenants/tenant-suspension-actions', () => ({
   liftTenantSuspensionAction: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => ({
+vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: { getTenantOwnerMembership: getTenantOwnerMembershipMock },

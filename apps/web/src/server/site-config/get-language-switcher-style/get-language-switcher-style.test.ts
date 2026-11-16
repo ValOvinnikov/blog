@@ -1,6 +1,6 @@
-import { LANGUAGE_SWITCHER_STYLE } from '@blog/config';
-import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
+import { LANGUAGE_SWITCHER_STYLE } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
@@ -13,7 +13,7 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant');
 vi.mock('@web/server/settings-features/get-tenant-plan/get-tenant-plan');
 
 vi.mock(
-  '@blog/db',
+  '@shinefold/db',
   () => import('@web/testing/server/site-config/site-config-db'),
 );
 

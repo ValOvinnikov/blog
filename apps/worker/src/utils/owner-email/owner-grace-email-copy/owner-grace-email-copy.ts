@@ -1,4 +1,7 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
+import {
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 
 import { OWNER_GRACE_EMAIL_COPY_DE } from './de';

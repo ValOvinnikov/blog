@@ -1,19 +1,19 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
-import { insertAuditEvent } from '@blog/db/queries/audit-events';
+import { faker } from '@faker-js/faker';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@shinefold/config/constants';
+import { insertAuditEvent } from '@shinefold/db/queries/audit-events';
 import {
   MOCK_DEPROVISION_AUDIT_ACTOR,
   MOCK_DEPROVISION_AUDIT_DETAILS,
   MOCK_DEPROVISION_ENV,
   MOCK_PURGED_READER_DATA_COUNTS,
-} from '@blog/db/testing/deprovision-tenant/fixtures';
-import { MOCK_STEP_ERROR } from '@blog/db/testing/tenants/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/db/testing/deprovision-tenant/fixtures';
+import { MOCK_STEP_ERROR } from '@shinefold/db/testing/tenants/fixtures';
 
 import type { TDeprovisionEnv } from './env';
 import { recordDeprovisionAuditEvent } from './record-deprovision-audit-event';
 import { recordReaderDataPurgeAuditEvent } from './record-reader-data-purge-audit-event';
 
-vi.mock('@blog/db/queries/audit-events');
+vi.mock('@shinefold/db/queries/audit-events');
 
 faker.seed(5765);
 

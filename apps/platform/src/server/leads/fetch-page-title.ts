@@ -1,16 +1,16 @@
 import 'server-only';
 
+import { LEAD_LOG } from '@platform/constants/lead';
+import { env } from '@platform/utils/env/env';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
+import { logger } from '@platform/utils/logger/logger';
 import {
   HTTP_METHOD,
   HTTP_STATUS,
   type TLocaleIsoCode,
   type TMaybeUndefined,
-} from '@blog/config';
-import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
-import { LEAD_LOG } from '@platform/constants/lead';
-import { env } from '@platform/utils/env/env';
-import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
-import { logger } from '@platform/utils/logger/logger';
+} from '@shinefold/config';
+import { buildEnqueueHeaders } from '@shinefold/utils/enqueue-signature';
 import { z } from 'zod';
 
 const PAGE_TITLE_TIMEOUT_MS = 5000;

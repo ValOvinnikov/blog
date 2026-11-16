@@ -1,15 +1,15 @@
 'use client';
 
-import {
-  ALERT_TYPE,
-  LOCALE_BCP47_TAGS,
-  type TLocaleIsoCode,
-} from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Disclosure } from '@platform/components/shared/disclosure';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TDraftDifference } from '@platform/utils/settings-draft-offer/settings-draft-offer';
+import {
+  ALERT_TYPE,
+  LOCALE_BCP47_TAGS,
+  type TLocaleIsoCode,
+} from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 

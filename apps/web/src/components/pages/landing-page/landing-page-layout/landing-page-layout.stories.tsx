@@ -1,4 +1,4 @@
-import { HERO_VARIANT, type THeroVariant } from '@blog/config';
+import { HERO_VARIANT, type THeroVariant } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { HeroBlogModuleView } from '@web/modules/hero-blog/hero-blog-module-view';

@@ -1,4 +1,4 @@
-import { routes } from '@blog/config';
+import { routes } from '@shinefold/config';
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
   testBreadcrumbsJsonLdSchema,

@@ -3,11 +3,11 @@ import {
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
-} from '@blog/config';
-import type { TRawTeamModule } from '@blog/service/features/modules/team/adaptor/transformer';
-import { MOCK_PERSON_NAME } from '@blog/service/testing/modules/fixtures';
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { mockRawModuleAppearance } from '@blog/service/testing/shared/module-appearance';
+} from '@shinefold/config';
+import type { TRawTeamModule } from '@shinefold/service/features/modules/team/adaptor/transformer';
+import { MOCK_PERSON_NAME } from '@shinefold/service/testing/modules/fixtures';
+import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 type TRawTeamMember = TRawTeamModule['members'][number];
 

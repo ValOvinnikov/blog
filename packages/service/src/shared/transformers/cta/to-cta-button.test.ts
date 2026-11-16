@@ -1,8 +1,8 @@
 import {
   mockCtaButtonView,
   mockRawCtaButton,
-} from '@blog/service/testing/modules/fixtures';
-import { mockRawInternalLinkDocument } from '@blog/service/testing/shared/fixtures';
+} from '@shinefold/service/testing/modules/fixtures';
+import { mockRawInternalLinkDocument } from '@shinefold/service/testing/shared/fixtures';
 
 import { toCtaButton } from './to-cta-button';
 

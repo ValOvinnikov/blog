@@ -1,10 +1,10 @@
-import { SOCIAL_PLATFORMS } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { SOCIAL_PLATFORMS } from '@shinefold/config';
 import {
   mockLinkView,
   mockRawExternalLinkDocument,
   mockRawSocialProfile,
-} from '@blog/service/testing/shared/fixtures';
-import { faker } from '@faker-js/faker';
+} from '@shinefold/service/testing/shared/fixtures';
 
 import { toSocialProfiles } from './to-social-profiles';
 

@@ -1,7 +1,7 @@
-import { LOCALE_ISO_CODES, routes } from '@blog/config';
-import { type TTagDetailPage } from '@blog/service';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
+import { type TTagDetailPage } from '@shinefold/service';
+import { errorResult, okResult } from '@shinefold/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   MOCK_DUTCH_REQUEST_CONTEXT,

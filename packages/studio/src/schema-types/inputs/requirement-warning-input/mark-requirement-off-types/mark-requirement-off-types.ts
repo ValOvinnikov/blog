@@ -1,10 +1,10 @@
-import type { TMaybeNull } from '@blog/config/types';
-import { LockIcon } from '@blog/studio/schema-types/icons/lock-icon/lock-icon';
+import type { TMaybeNull } from '@shinefold/config/types';
+import { LockIcon } from '@shinefold/studio/schema-types/icons/lock-icon/lock-icon';
 import {
   getMissingRequirement,
   getRequirementOffSuffix,
   type TEntitlementState,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+} from '@shinefold/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 
 type TNamedType = { name: string; title?: string };
 

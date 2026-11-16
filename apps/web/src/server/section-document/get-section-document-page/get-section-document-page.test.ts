@@ -17,7 +17,7 @@ const { getSectionDocumentMock } = vi.hoisted(() => ({
   getSectionDocumentMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
+vi.mock('@shinefold/service', () => ({
   service: {
     pages: {
       sectionDocument: { v1: { getSectionDocument: getSectionDocumentMock } },

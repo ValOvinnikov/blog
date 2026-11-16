@@ -1,4 +1,4 @@
-import { NEWSLETTER_RESULT, routes } from '@blog/config';
+import { NEWSLETTER_RESULT, routes } from '@shinefold/config';
 import type { TTenantPageLists } from '@web/server/tenant/tenant-page-lists/tenant-page-lists';
 import {
   buildNextBlogIndexPage,

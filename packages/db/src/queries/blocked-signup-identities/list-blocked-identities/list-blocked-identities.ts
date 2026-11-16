@@ -1,14 +1,14 @@
-import type { TMaybeNull } from '@blog/config';
-import type { TErrorCode } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
-import { admins } from '@blog/db/schema/admins';
-import { users } from '@blog/db/schema/auth';
+import type { TMaybeNull } from '@shinefold/config';
+import type { TErrorCode } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { admins } from '@shinefold/db/schema/admins';
+import { users } from '@shinefold/db/schema/auth';
 import {
   blockedSignupIdentities,
   type TBlockedSignupIdentity,
-} from '@blog/db/schema/blocked-signup-identities';
-import { decryptOptionalPersonalValue } from '@blog/db/utils/personal-data/personal-data';
-import { okResult, type TResult } from '@blog/utils';
+} from '@shinefold/db/schema/blocked-signup-identities';
+import { decryptOptionalPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
+import { okResult, type TResult } from '@shinefold/utils';
 import { desc, eq } from 'drizzle-orm';
 
 export type TBlockedIdentityListing = TBlockedSignupIdentity & {

@@ -3,7 +3,7 @@ import {
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
   type IHeaderStyle,
-} from '@blog/config';
+} from '@shinefold/config';
 
 export const MOCK_HEADER_STYLE: IHeaderStyle = {
   layout: HEADER_LAYOUT.CLASSIC,

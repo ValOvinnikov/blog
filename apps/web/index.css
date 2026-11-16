@@ -1,4 +1,4 @@
-@import '@blog/tailwind-config/theme.css';
+@import '@shinefold/tailwind-config/theme.css';
 
 /* Tell Tailwind to scan ui package source for class names */
 @source '../../packages/ui/src/**/*.{ts,tsx}';
@@ -6,7 +6,7 @@
 /*
  * Syntax-highlighting token colors for the Portable Text code block
  * (`src/components/shared/portable-text/components/code-block/code-block-syntax-theme.ts`).
- * Kept web-local rather than in `@blog/tailwind-config/theme.css` since
+ * Kept web-local rather than in `@shinefold/tailwind-config/theme.css` since
  * `react-syntax-highlighter` is a web-only dependency with no consumer
  * outside `apps/web` (#862). The code block's own background reuses the
  * existing `--surface-2` token (already documented as the "nested / code"
@@ -24,7 +24,7 @@
      (not just `--text`/`--text-muted`'s override), because `.dark` isn't
      guaranteed to sit on the same element as `:root` here — per
      `@custom-variant dark (&:where(.dark, .dark *));` in
-     `@blog/tailwind-config/theme.css`, `.dark` can be toggled on an
+     `@shinefold/tailwind-config/theme.css`, `.dark` can be toggled on an
      ancestor element instead (this PR's own `code-block.stories.tsx` `Dark`
      story does exactly that, nesting `.dark` on a wrapper `<div>` around
      the code block). When `.dark` lands on an ancestor, an element inside

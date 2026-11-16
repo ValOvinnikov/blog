@@ -1,5 +1,5 @@
-import { okResult } from '@blog/utils';
 import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
+import { okResult } from '@shinefold/utils';
 import { z } from 'zod';
 
 import { fetchGitHubJson, type TGitHubResult } from './fetch-github';

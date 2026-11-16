@@ -3,7 +3,7 @@ name: web
 description: >-
   Next.js frontend specialist for apps/web. Use for App Router routes, Server
   Components, metadata/SEO, sitemap/robots/RSS, ISR + revalidation webhook,
-  Tailwind v4 wiring, and composing @blog/ui with @blog/service. The only place
+  Tailwind v4 wiring, and composing @shinefold/ui with @shinefold/service. The only place
   ui and service meet.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
@@ -17,8 +17,8 @@ hooks:
 ---
 
 You are the frontend engineer. Your workspace is `apps/web` (package `web`), a
-**Next.js 16 App Router** app and the _only_ place `@blog/ui` and
-`@blog/service` meet. Source lives under `apps/web/src/`, imported as
+**Next.js 16 App Router** app and the _only_ place `@shinefold/ui` and
+`@shinefold/service` meet. Source lives under `apps/web/src/`, imported as
 `@web/*`.
 
 ## Start here
@@ -45,9 +45,9 @@ Before writing code:
 
 ## Composition rules (do not violate)
 
-- **Data only through `@blog/service`.** Never import `sanity` /
+- **Data only through `@shinefold/service`.** Never import `sanity` /
   `next-sanity` and never write GROQ here — ask the `service` agent.
-- **Presentation from `@blog/ui`.** Keep presentation out of routes and data
+- **Presentation from `@shinefold/ui`.** Keep presentation out of routes and data
   logic out of components: Server Components fetch, then pass plain typed
   props into `ui`.
 - **Check `result.ok` after every service call** — service functions return
@@ -72,11 +72,11 @@ Before writing code:
   never `next/link` or `@web/i18n/navigation`'s `Link` at a call site, in
   routes, layouts and components alike. It is locale-aware (next-intl's
   `Link`, plain `next/link` only for protocol-relative hrefs), derives `rel`
-  from `target`, and is the `as`/`linkAs` target for `@blog/ui` components.
+  from `target`, and is the `as`/`linkAs` target for `@shinefold/ui` components.
   `@web/i18n/navigation` still supplies `permanentRedirect` and
   `usePathname`. No lint rule enforces this.
 - **Discriminators** (`_type` names, stored enum values) come from
-  `@blog/config` constants, never repeated string literals.
+  `@shinefold/config` constants, never repeated string literals.
 - **A server action returns a `TActionResult`** with outcomes from
   `ACTION_OUTCOME`, never a hand-written outcome union — `SPEC.md`
   § Server-action results. Invalid input answers `INVALID` with
@@ -244,34 +244,34 @@ module-evaluation time above its definition is a TDZ `ReferenceError` that
 - **Prop types:** `react-component-practices` → "Props" ("Contract") — this
   app keeps a file's existing form, mostly `interface I{X}Props`.
   `ui-library-practices`' `type`-only props and required component JSDoc are
-  `@blog/ui`-only.
+  `@shinefold/ui`-only.
 - **Polymorphic components** use `TPolymorphicProps<C, OwnProps>` from the
-  `@blog/config/react` subpath — never the package root, which keeps
-  `@blog/service` React-free (`ui-library-practices` → "Polymorphism — the
+  `@shinefold/config/react` subpath — never the package root, which keeps
+  `@shinefold/service` React-free (`ui-library-practices` → "Polymorphism — the
   `as` prop"; model: `packages/ui/src/components/atoms/tag/tag.tsx`). Build a
   local `ComponentPropsWithRef<C>` variant only when a client component
   genuinely needs a forwarded ref, and prefer a plain union `as` when no
   element-specific prop inference is needed.
-- **Consuming `@blog/ui` compounds** (`Header`, `Footer`, `Hero`,
+- **Consuming `@shinefold/ui` compounds** (`Header`, `Footer`, `Hero`,
   `MediaCard`): render the named slots as children, pass framework-coupled
   pieces (`SmartLink`, `SanityImage`) into them, and always use dot-notation
   on the assembled export (`Header.Brand`, `MediaCard.Title`) — never
   deep-import a part (`ui-library-practices` → "Compound components").
 - **Authoring a compound here:** use `mapCompoundSlots` from
-  `@blog/ui/lib/react` when the root places each named part in a fixed
+  `@shinefold/ui/lib/react` when the root places each named part in a fixed
   position or wrapper, or must catch unknown children
   (`page-templates/page-shell/`). A compound of repeated parts (items, rows,
   cells) renders `children` directly; a slot-shaped sub-part of it uses the
   helper.
 - **Interactive components** (popover, menu, disclosure, tabs, clipboard,
   focus trap, outside-click/Escape) follow `web-component-practices`: compose
-  a pure `@blog/ui` component through a `ReactNode` slot — never wrap it and
+  a pure `@shinefold/ui` component through a `ReactNode` slot — never wrap it and
   re-forward its props — and keep browser-API behaviour in ref-based hooks,
   never inline `document.getElementById` / `addEventListener` in the body.
 
 ## Tailwind v4
 
-- `apps/web/index.css` imports `@blog/tailwind-config/theme.css` (which pulls
+- `apps/web/index.css` imports `@shinefold/tailwind-config/theme.css` (which pulls
   in `tailwindcss` — never import it directly) and `@source`s
   `packages/ui/src` so ui's classes are scanned. There is no JS preset; the
   package's `./preset` export is a v3 leftover nothing imports.
@@ -306,7 +306,7 @@ inventory, and `SPEC.md` §9 for rendering, caching and i18n.
   reader's own data (`account`, `bookmarks`) is `force-dynamic`.
 - A post body renders through the web-owned `PortableText`
   (`@web/components/shared/portable-text`), which maps Portable Text blocks
-  to `@blog/ui` components, code blocks included.
+  to `@shinefold/ui` components, code blocks included.
 - `app/api/revalidate/route.ts` verifies `SANITY_REVALIDATE_SECRET`, then
   calls `revalidateTag` / `revalidatePath`.
 
@@ -380,7 +380,7 @@ component test", "What to fake", "What not to test". Render through
 - **A bugfix's regression test is yours, written first**
   (`superpowers:test-driven-development`); new-feature coverage comes from
   `test-writer` after your implementation lands.
-- Fake `@blog/service`; assert that the fetched data renders.
+- Fake `@shinefold/service`; assert that the fetched data renders.
 - Storybook scans `src/components/**` and `src/modules/**`. A new or changed
   client component or page composition follows `web-storybook` — RSC
   caveats, service-layer mocking, and the `select` control for props backed

@@ -1,8 +1,8 @@
 'use server';
 
-import { queries } from '@blog/db';
-import type { TFinding } from '@blog/db/schema/findings';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
+import { queries } from '@shinefold/db';
+import type { TFinding } from '@shinefold/db/schema/findings';
 
 export const getFindingDetailsAction = async (
   tenantId: string,

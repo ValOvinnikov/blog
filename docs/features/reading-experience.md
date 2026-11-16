@@ -53,7 +53,7 @@ A post page offers the reader three depths: **30s** (a short list of takeaways),
 
 ## Constraints and invariants
 
-- `DEPTH` is `SKIM`, `READ`, `DEEP` (`@blog/config`). Toggle order is 30s, Read, Deep; `READ` is always offered when the control renders.
+- `DEPTH` is `SKIM`, `READ`, `DEEP` (`@shinefold/config`). Toggle order is 30s, Read, Deep; `READ` is always offered when the control renders.
 - All three depths ship in the same server-rendered HTML. Visibility is CSS only, keyed off `data-depth` on the provider's wrapper through the named group `group/depth`: SKIM hides the article body and footer and shows `SkimPanel`; DEEP shows `DeepAside`. The article header stays at every depth. Crawlers and the canonical URL see the Read article.
 - A stored depth is clamped to what the current post supports (`allowedDepths`), both in the inline pre-hydration script and in the provider's mount effect, so a reader is never stranded on a depth the post cannot show. The effect re-runs when `hasSkim`/`hasDeep` change on client navigation.
 - The inline script stamps `data-depth` before paint so a returning 30s/Deep reader sees no flash of Read. It renders only on the hydrating render (`useSyncExternalStore` snapshot pair), never on a client-only mount. `localStorage` failures fall back to Read.
@@ -66,7 +66,7 @@ A post page offers the reader three depths: **30s** (a short list of takeaways),
 
 ## Dependencies
 
-- Layers: `@blog/config` (`DEPTH`, `ASIDE_KIND`), `@blog/utils` (`toReadingTimeMinutes`), `@blog/service` (post detail projection), `@blog/ui` (`SegmentedControl`, `Aside`, `BackToTop`, `Article`, `Button`), `apps/web`.
+- Layers: `@shinefold/config` (`DEPTH`, `ASIDE_KIND`), `@shinefold/utils` (`toReadingTimeMinutes`), `@shinefold/service` (post detail projection), `@shinefold/ui` (`SegmentedControl`, `Aside`, `BackToTop`, `Article`, `Button`), `apps/web`.
 - Features: ./posts.md (the post page and its data), ./rich-text.md (asides and heading anchors), ./skim-pipeline.md (drafts the takeaways), ./post-modules.md (card reading time), ./rendering-and-caching.md, ./look.md, ./voice.md.
 - Env: none.
 

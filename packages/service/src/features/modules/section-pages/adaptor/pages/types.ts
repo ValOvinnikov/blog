@@ -1,4 +1,4 @@
-import type { ISanityImage, TMaybeUndefined } from '@blog/config';
+import type { ISanityImage, TMaybeUndefined } from '@shinefold/config';
 
 export type TSectionPageCard = {
   id: string;

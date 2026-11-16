@@ -1,20 +1,20 @@
-import {
-  OPERATOR_ALERT_KIND,
-  type TOperatorAlertBody,
-  HTTP_STATUS,
-} from '@blog/config/constants';
-import { ELEVATE_TENANT_OWNER_OUTCOME, queries } from '@blog/db';
-import {
-  buildDocumentValidationAlertEmail,
-  buildOwnerElevationAlertEmail,
-} from '@blog/email';
-import { hasArrayGotItems } from '@blog/utils/primitives';
 import { OPERATOR_ALERT_LOG } from '@platform/constants/operator-alert';
 import { sendOperatorAlertEmail } from '@platform/server/email/send-operator-alert-email';
 import { hasBearerSecret } from '@platform/server/internal-api/has-bearer-secret';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  OPERATOR_ALERT_KIND,
+  type TOperatorAlertBody,
+  HTTP_STATUS,
+} from '@shinefold/config/constants';
+import { ELEVATE_TENANT_OWNER_OUTCOME, queries } from '@shinefold/db';
+import {
+  buildDocumentValidationAlertEmail,
+  buildOwnerElevationAlertEmail,
+} from '@shinefold/email';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -38,7 +38,7 @@ const operatorAlertBodySchema = z.discriminatedUnion('kind', [
 ]) satisfies z.ZodType<TOperatorAlertBody>;
 
 /**
- * Inbound, machine-callable alert endpoint — `@blog/db`'s CLI scripts report
+ * Inbound, machine-callable alert endpoint — `@shinefold/db`'s CLI scripts report
  * facts here over a Bearer shared secret, and this app resolves recipients,
  * renders copy, and sends.
  */

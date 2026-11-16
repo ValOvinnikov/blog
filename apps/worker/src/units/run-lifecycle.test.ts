@@ -1,15 +1,15 @@
-import { AUDIT_ACTION, ERROR_CODE } from '@blog/config/constants';
+import { AUDIT_ACTION, ERROR_CODE } from '@shinefold/config/constants';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
-} from '@blog/db/constants';
-import { insertAuditEvent } from '@blog/db/queries/audit-events';
+} from '@shinefold/db/constants';
+import { insertAuditEvent } from '@shinefold/db/queries/audit-events';
 import {
   finishProvisioningRun,
   setTenantProvisioningStatus,
   startProvisioningRun,
-} from '@blog/db/queries/tenants';
-import { errorResult, okResult } from '@blog/utils/result';
+} from '@shinefold/db/queries/tenants';
+import { errorResult, okResult } from '@shinefold/utils/result';
 import { PROVISIONING_AUDIT_VIA } from '@worker/constants/provisioning';
 import {
   MOCK_DB_DOWN,
@@ -20,8 +20,8 @@ import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 
 import { beginRun, finishRun } from './run-lifecycle';
 
-vi.mock('@blog/db/queries/audit-events');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/audit-events');
+vi.mock('@shinefold/db/queries/tenants');
 
 function recordedActions(): string[] {
   return vi.mocked(insertAuditEvent).mock.calls.map(([event]) => event.action);

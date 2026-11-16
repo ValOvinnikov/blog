@@ -56,9 +56,9 @@ that #1285 already shipped.
   an optional `headingBlock` (`headingBlockField()` — `heading` +
   `supportingText`, with a `requireHeading` override), and a module-level
   `contentAlignment` (`defineAlignmentFields()`). `apps/web`'s `Section`
-  component (`apps/web/src/components/shared/section`) — **not** `@blog/ui` —
+  component (`apps/web/src/components/shared/section`) — **not** `@shinefold/ui` —
   renders the band, spacing, dividers and the `<section>` landmark; the
-  `@blog/ui` organism is bare content inside it. Full contract: `SPEC.md` §6.
+  `@shinefold/ui` organism is bare content inside it. Full contract: `SPEC.md` §6.
 - **Theme-as-content** (shipped, now Postgres-backed via `site_config`) —
   accent/fonts/radius/density are tenant-authored and injected as CSS
   variables; new modules need no theme-specific work, they're already
@@ -74,17 +74,17 @@ that #1285 already shipped.
   feature lives on that feature's `settings_*` singleton (the newsletter's
   form strings on `settings_newsletter` are the precedent); per-instance
   content lives on the module document.
-- **`@blog/db` (Neon + Drizzle)** — the engagement persistence layer. The
+- **`@shinefold/db` (Neon + Drizzle)** — the engagement persistence layer. The
   contact form module adds a `leads` table here, sibling to `subscribers`.
   `service` stays Sanity-only; `db` is the sibling layer `web` consumes.
   Every tenant-scoped write goes through `apps/web`'s `isTenantActive()`
   predicate (`apps/web/src/server/tenant/`) — a SUSPENDED/ARCHIVED tenant's
   site stays readable while nothing new lands against it.
-- **`@blog/email`** — the single home for every email the product sends
+- **`@shinefold/email`** — the single home for every email the product sends
   (`sendEmail`, the branded shell, `escapeHtml`). The contact form's
   notification email goes through it; callers pass resolved copy and URLs.
-- **Capability gating** — `@blog/config`'s `CAPABILITY` keys, the tenant's
-  `settings_features` toggles and `@blog/db`'s `PLAN_REGISTRY` entitlement
+- **Capability gating** — `@shinefold/config`'s `CAPABILITY` keys, the tenant's
+  `settings_features` toggles and `@shinefold/db`'s `PLAN_REGISTRY` entitlement
   gate every write-path feature (`module_newsletter` is omitted at render
   when `NEWSLETTER` is off). The contact form is the next capability in that
   list.
@@ -92,7 +92,7 @@ that #1285 already shipped.
   project; `apps/web` routes live under `app/[tenant]/[locale]/`, and every
   engagement table carries `tenantId`. The `leads` table this doc adds
   follows that shape; the tenancy mechanics themselves belong to
-  `SPEC.md` §4 ("Tenant scoping in `@blog/db`").
+  `SPEC.md` §4 ("Tenant scoping in `@shinefold/db`").
 - **CMS page architecture** — every public page is a CMS document with a
   required slot ([`2026-08-20-cms-page-architecture-design.md`](./2026-08-20-cms-page-architecture-design.md)).
   Its two settled patterns shape the portfolio strand below: a per-entity
@@ -146,7 +146,7 @@ end rather than renumbering):
 - `module_stats` — metric figures ("40% faster", "3M users").
 - `module_faq` — **built** ([#2786](https://github.com/ValOvinnikov/blog/issues/2786));
   `SPEC.md` §6 describes what shipped. The disclosure is `Accordion` in
-  `@blog/ui` on Base UI and carries no `'use client'`, so a Server Component
+  `@shinefold/ui` on Base UI and carries no `'use client'`, so a Server Component
   renders it directly — superseding this catalogue's earlier "lives in a `web`
   client leaf" note.
 - `module_embed` — video / oEmbed (YouTube, Loom, CodePen).
@@ -157,7 +157,7 @@ end rather than renumbering):
 
 **Per module, the same steps** (dependency order `studio → service → ui →
 web` — **no config-const step**, since a module's `_type` is derived from its
-schema, not declared in `@blog/config`): add the `packages/studio` `module_*`
+schema, not declared in `@shinefold/config`): add the `packages/studio` `module_*`
 document schema (`titleField()` + `brandVariantField()` + the module's own
 display fields + `headingBlockField()`/`defineAlignmentFields()` where the
 module has a heading + `layoutField()`) and add it to the relevant pages'
@@ -165,7 +165,7 @@ module has a heading + `layoutField()`) and add it to the relevant pages'
 the new `_type`; add `service.modules.<type>.v1` (query + transformer +
 view-model + cache tags — plus a `REVALIDATE_TAGS` entry in `apps/web`, which
 every module type requires regardless of how it renders); compose the
-section in `apps/web` from existing `@blog/ui` primitives (a new atom or
+section in `apps/web` from existing `@shinefold/ui` primitives (a new atom or
 molecule only where one is genuinely missing — never a per-module "section
 organism"); register the web component in `MODULE_MAP`, wrapped in
 `apps/web`'s `Section`. Reusable pieces a module references (a feature card,
@@ -204,7 +204,7 @@ A hero is any module whose schema `name:` starts with `module_hero`. Nothing
 is registered by hand:
 
 ```ts
-// @blog/config — constants/module.ts
+// @shinefold/config — constants/module.ts
 type THeroModuleType = Extract<TModuleType, `module_hero${string}`>;
 type TSlotModuleType =
   THeroModuleType | 'module_postList' | 'module_taxonomyList';
@@ -218,7 +218,7 @@ kind drops out of the union the day its schema is deleted.
 `TSlotModuleType` names every module that renders _only_ through a page's
 dedicated slot, never `modules[]`, so `MODULE_MAP` is typed
 `Record<Exclude<TModuleType, TSlotModuleType>, …>` instead of listing three
-string literals. Both types live in `@blog/config` because studio, service
+string literals. Both types live in `@shinefold/config` because studio, service
 and web all read them. `module_taxonomyList` is a member until Phase 1.5
 makes it render both ways, at which point it leaves the union and takes its
 `MODULE_MAP` entry (see "The placeable taxonomy list" below).
@@ -279,7 +279,7 @@ set, exactly as `page_home.title` does today.
 Every hero kind is _content fields first, shared tail last_. The tail is
 emitted by one studio helper so an editor who has configured one hero already
 knows the next, and so the web view for every kind maps the same props onto
-the same `@blog/ui` organism:
+the same `@shinefold/ui` organism:
 
 | Field                   | Type                                     | Notes                                                                                |
 | ----------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------ |
@@ -300,7 +300,7 @@ they collapse, while Stacked is a single column at every width, so its field
 is the layout itself. A Sanity field's description and option list are fixed
 per named type, so one field cannot say both — the same constraint that makes
 `contentPositionSplit`/`contentPositionBanner` two fields. Both collapse to a
-single `mediaOrder` value in the service view model, so the `@blog/ui`
+single `mediaOrder` value in the service view model, so the `@shinefold/ui`
 organism still takes one prop. Banner emits neither: its image is the
 background, not a sibling block. Reordering is visual only — the DOM keeps the
 copy before the media at every width, so the `<h1>` stays first for assistive
@@ -316,7 +316,7 @@ text for Statement; name, role, bio, avatar and social links for Profile) are
 that kind's own design decision, made in its own section.
 
 Two constants back this tail, and they land in different phases because
-`@blog/config` has no `knip` exemption — an exported const with no importer
+`@shinefold/config` has no `knip` exemption — an exported const with no importer
 fails that gate:
 
 - `MEDIA_ORDER = { LAST, FIRST }` lands in **Phase 0**, because it is a
@@ -333,7 +333,7 @@ fails that gate:
 Phase 0 — a helper with no caller fails `knip`, and the legacy hero is not
 retrofitted because it is being retired.
 
-### The `@blog/ui` organism
+### The `@shinefold/ui` organism
 
 One `Hero` organism serves every kind. It gains the props `CtaModule`
 already has for the same fields — `variant`, `tone`, `contentPosition`,
@@ -353,7 +353,7 @@ TModuleType> = { id: string; type: T }` — and the page view models narrow the
 slot: `THomePage.hero: TModule<THeroModuleType>`, and the generic, blog,
 topic and tag page view models gain `hero?: TModule<THeroModuleType>`. The
 page queries already project `_id` and `_type` for a slot; a `toHeroSlot()` transformer applies an `isHeroModuleType()`
-guard from `@blog/config` (a `startsWith('module_hero')` check typed as a
+guard from `@shinefold/config` (a `startsWith('module_hero')` check typed as a
 predicate) and a slot that fails it is a data error the loader returns
 through its existing failure path, never a silently blank page. Each hero
 kind keeps its own loader (`getHero(id)` today, `getHeroBlog(id)` next), so
@@ -383,7 +383,7 @@ Legacy hero documents keep working until #2813 deletes the schema.
 - **config** — `THeroModuleType`, `TSlotModuleType`, `isHeroModuleType()`,
   and `MEDIA_ORDER` (renaming `CTA_MOBILE_MEDIA_ORDER` and its consumers).
   **Not `HERO_VARIANT`:** nothing consumes it until `defineHeroFields()`
-  lands, and `@blog/config` has no `knip` exemption, so an export with no
+  lands, and `@shinefold/config` has no `knip` exemption, so an export with no
   importer fails that gate. It ships with the helper, in `module_heroBlog`.
 - **studio** — `HERO_SCHEMA_TYPES` + its registry test; `page_home.hero`
   references the list; `page_landing`, `page_blog`, `page_topic` and
@@ -554,7 +554,7 @@ An authored label is trusted as already descriptive and gets no suffix.
 `contentPosition` and `mediaOrder` each collapse their two variant-scoped
 Studio fields into one value, so the organism takes one prop per concept.
 
-### `@blog/ui`
+### `@shinefold/ui`
 
 No new organism. `Hero` gains the props the shared tail implies — `variant`,
 `tone`, `contentPosition`, `contentAlignment`, `mediaOrder` — and keeps its
@@ -565,7 +565,7 @@ later hero kind rather than just this one.
 
 ### Constants
 
-- New in `@blog/config`: `HERO_POST_SOURCE = { PINNED, NEWEST_FEATURED }` and
+- New in `@shinefold/config`: `HERO_POST_SOURCE = { PINNED, NEWEST_FEATURED }` and
   `HERO_IMAGE_SOURCE = { POST, CUSTOM, NONE }`.
 - **The legacy hero's field-mode const does not shrink in this epic.** The
   legacy hero still
@@ -774,7 +774,7 @@ an action can name — `page_landing`, `page_blog`, `page_post`, `topic` — so
 a renamed slug invalidates the hero that links to it. `REVALIDATE_TAGS`
 gains `module_heroStatement: ['modules:heroStatement']`.
 
-### `@blog/ui`
+### `@shinefold/ui`
 
 No new organism. The one change is the Banner finish above: `tone`, the
 shared scrim constants, the on-image copy colours, the stories. Everything
@@ -931,7 +931,7 @@ description.
 
 **Image shape is one field on the module, not per card,** so the grid stays
 even. `CARD_IMAGE_SHAPE = { WIDE, SQUARE, CIRCLE, ICON }` lands in
-`@blog/config` and is shared with the post modules' own shape control
+`@shinefold/config` and is shared with the post modules' own shape control
 (#3245, which takes `WIDE` and `SQUARE` only). Icon draws from a curated
 **`FEATURE_ICONS`** subset of `ICONS` — about 24 pictograms for services
 and skills — rendered through the `Icon` atom in `currentColor`, so it
@@ -941,13 +941,13 @@ card's uploaded `imageWithAlt`. **No SVG upload for icons** (decided
 cannot follow the theme, and a services grid of eight editor-sourced files
 never matches in weight.
 
-**Icons exist on two surfaces, from one key list.** `@blog/ui`'s icons are
-hand-kept SVG assets, and the Studio cannot import `@blog/ui`. So the web
+**Icons exist on two surfaces, from one key list.** `@shinefold/ui`'s icons are
+hand-kept SVG assets, and the Studio cannot import `@shinefold/ui`. So the web
 gets 24 new assets in `packages/ui/src/assets/icons/` registered in
 `ICON_REGISTRY`, and the Studio gets a visual picker drawing the same glyphs
 from `lucide-react`, which it already depends on for schema icons. Taking
 the ui assets from lucide, glyph for glyph, is what keeps the two identical;
-the `FEATURE_ICONS` key list in `@blog/config` keeps them in step. The
+the `FEATURE_ICONS` key list in `@shinefold/config` keeps them in step. The
 picker is its own ticket after the schema (#3252), so the schema ships
 with a plain dropdown first.
 
@@ -1036,7 +1036,7 @@ Items keep authored order; `link` goes through `toLinkDocument()` and is
 dereference), plus the `link` + page-type set the statement hero's loader
 carries. `REVALIDATE_TAGS` gains `module_featureList: ['modules:featureList']`.
 
-### `@blog/ui`
+### `@shinefold/ui`
 
 No new component. Three additive changes:
 
@@ -1078,7 +1078,7 @@ beside the other modules; the Blocks section as above.
 
 ### Migration
 
-None — two new document types, two new consts, additive `@blog/ui` variants,
+None — two new document types, two new consts, additive `@shinefold/ui` variants,
 a desk regrouping.
 
 ### Per-layer scope and PRs
@@ -1250,7 +1250,7 @@ item and drops the link — and `ctaButtons` through `toCtaButton()`.
 `link` and the page types a link can target, as `getHeroStatement` lists
 them. `REVALIDATE_TAGS.module_testimonial = ['modules:testimonial']`.
 
-### `@blog/ui`
+### `@shinefold/ui`
 
 > **Superseded** — the spotlight `QuoteCard` caps at `38ch`, not ~52ch. See `SPEC.md` §6.
 
@@ -1385,7 +1385,7 @@ wants to render, the card says what the post has, and the web layer combines
 them. Stripping data to express a presentation choice would also break the
 related-reading surface, which has no flag.
 
-### `@blog/ui`
+### `@shinefold/ui`
 
 `PostsSection` gains `hasImages?: boolean`. `IPostCardData` gains
 `image?: ReactNode`. When `hasImages` is set, **every** card renders
@@ -1611,7 +1611,7 @@ the transformer and `entries` comes out already ordered and cut.
 
 ### Constants and the slot-type union
 
-- New in `@blog/config`: `TAXONOMY_SORT = { ALPHABETICAL, MOST_POSTS }`.
+- New in `@shinefold/config`: `TAXONOMY_SORT = { ALPHABETICAL, MOST_POSTS }`.
   `TAXONOMY_KIND` already exists.
 - **`module_taxonomyList` leaves `TSlotModuleType`.** That union names the
   modules that render _only_ through a page slot, and it is what
@@ -1621,7 +1621,7 @@ the transformer and `entries` comes out already ordered and cut.
   the web entry cannot merge separately. `TSlotModuleType` becomes
   `THeroModuleType | 'module_postList'`.
 
-### `@blog/ui`
+### `@shinefold/ui`
 
 None. The taxonomy list has no organism: the web view composes `PostGrid`
 and `TaxonomyCard` directly, and the ticket's "PostsSection-adjacent
@@ -1737,7 +1737,7 @@ empty array under `PINNED` is an error rather than a silent mode switch.
 **The constant is `POST_SOURCE`.** `HERO_POST_SOURCE` shipped with
 `module_heroBlog` and has the exact two values this module needs; a
 non-hero module importing a `HERO_`-prefixed constant reads wrong for as
-long as it exists. It is renamed in `@blog/config` with its four consumers
+long as it exists. It is renamed in `@shinefold/config` with its four consumers
 (the hero schema and its test, the hero query, the starter-content
 script) updated in the same small PR, before the module's own PR.
 
@@ -1810,7 +1810,7 @@ Structurally `TPostLatestModule`. That is deliberate: the web view, the
 card mapping and the carousel display mode (1.4) treat the two as the same
 thing with a different first card.
 
-### `@blog/ui` — a `PostsSection` layout, not a new organism
+### `@shinefold/ui` — a `PostsSection` layout, not a new organism
 
 The spotlight is `PostsSection` with a different first card. Everything
 else the section owns — the heading and its accessible fallback, the
@@ -1916,7 +1916,7 @@ choosing a different module. `displayMode` (`GRID` | `CAROUSEL`) is a
 per-instance presentation field on the two teaser modules,
 `module_postLatest` and `module_postFeatured`; the data scope stays what
 the module already is. `module_postList` paginates and never gets it. The
-row is one `@blog/ui` organism that **owns Embla** — the pre-hydration
+row is one `@shinefold/ui` organism that **owns Embla** — the pre-hydration
 scroll-snap track, the hook, the buttons, the disabled flags and the
 scroll-position handoff are all inside it — rendered through a thin
 `'use client'` wrapper in `apps/web`, the `SanityImage` shape. **Neither
@@ -1969,9 +1969,9 @@ type, defaulted in the query, never faked in the transformer. Nothing else
 in the service changes: the carousel is the same posts in a different
 layout, and `limit` already caps them.
 
-### `@blog/ui` — `Carousel` owns Embla
+### `@shinefold/ui` — `Carousel` owns Embla
 
-**`Carousel` is a new organism, generic, and the first in `@blog/ui` to
+**`Carousel` is a new organism, generic, and the first in `@shinefold/ui` to
 carry a hook.** It renders a `role="region"` root, a viewport `<div>`
 bound to `useEmblaCarousel`, a `<ul>` track with one `<li>` per item, and
 the two previous/next `IconButton`s centred under the track. The caller
@@ -2116,11 +2116,11 @@ renders once through `renderItem`, keyed by `getItemKey`.
 
 **`PostsCarousel` is the `'use client'` wrapper**, under
 `apps/web/src/components/shared/posts-carousel/`, the `SanityImage` shape:
-the directive, `import { Carousel } from '@blog/ui/components/organisms/carousel'`, and
+the directive, `import { Carousel } from '@shinefold/ui/components/organisms/carousel'`, and
 nothing Embla-shaped of its own. **The wrapper is per item type by
 construction**: a function cannot cross the server→client boundary, so
 the Server Component views pass plain data and the wrapper is where
-`renderItem` is born. Its jobs: the client boundary (`@blog/ui` is in
+`renderItem` is born. Its jobs: the client boundary (`@shinefold/ui` is in
 `transpilePackages`, so the organism's hook bundles under this file's
 directive; `PostCardItem` renders on the client from here, and its
 `IPostCardData` is strings plus a pre-rendered `image?: ReactNode`, all
@@ -2325,7 +2325,7 @@ type TTaxonomyListModule = {
 };
 ```
 
-### `@blog/ui` — a slot on `TaxonomyCard`
+### `@shinefold/ui` — a slot on `TaxonomyCard`
 
 **`TaxonomyCard` gains a `TaxonomyCard.Posts` compound slot** — its first,
 resolved with `mapCompoundSlots` the way `PostCard`'s are. The card's own
@@ -2430,19 +2430,19 @@ module — wherever the two overlap.
 
 **Composition (mostly reuse):**
 
-- **db** — a new `leads` table in `@blog/db` (`tenantId`, name, email,
+- **db** — a new `leads` table in `@shinefold/db` (`tenantId`, name, email,
   message, sourcePage, createdAt; sibling to `subscribers`). New table →
   `db:generate` schema migration, dev-free / prod-gated per `SPEC.md` §8.
 - **config** — a new `CAPABILITY` key so the tenant can switch the form off
   and the plan can entitle it; `settings_features` gains the matching
-  column (a `@blog/db` schema migration) and `PLAN_REGISTRY` the matching
+  column (a `@shinefold/db` schema migration) and `PLAN_REGISTRY` the matching
   entry.
 - **ui** — a `ContactForm` organism built on the existing `TextInput` /
   `Textarea` atoms, states bound to the status tokens (`--ok/--warn/
 --danger`).
-- **web** — a client-island form + server action writing via `@blog/db`
+- **web** — a client-island form + server action writing via `@shinefold/db`
   behind `isTenantActive()`, plus a notification email through
-  `@blog/email`'s `sendEmail`. Spam mitigation (honeypot / rate-limiting)
+  `@shinefold/email`'s `sendEmail`. Spam mitigation (honeypot / rate-limiting)
   applied here. Rendered through `MODULE_MAP` and omitted silently when the
   capability is off, exactly like `module_newsletter`.
 - **studio** — the `module_contactForm` document (heading, intro, which
@@ -2451,9 +2451,9 @@ module — wherever the two overlap.
   success/error/consent strings — per the copy-placement rule above. Voice
   owns none of it.
 
-**Dependencies:** all landed — `@blog/db` (#984), the `TextInput`/`Textarea`
+**Dependencies:** all landed — `@shinefold/db` (#984), the `TextInput`/`Textarea`
 atoms (#1091), the status tokens (#1093), Auth.js (#1107) and the
-`@blog/email` transport (2026-09-03). Nothing gates a start.
+`@shinefold/email` transport (2026-09-03). Nothing gates a start.
 
 **Open decisions (settle in the ticket before dispatch):**
 
@@ -2544,7 +2544,7 @@ ui      →  new module organisms + ContactForm (all pure, token-only)
 web     →  MODULE_MAP entries, slot renderers, /work routes, server action behind isTenantActive()
 ```
 
-`@blog/ui` never imports `service`/`db`/`sanity`; `web` is the only meeting
+`@shinefold/ui` never imports `service`/`db`/`sanity`; `web` is the only meeting
 point; the graph stays acyclic.
 
 ## Decision log
@@ -2627,7 +2627,7 @@ point; the graph stays acyclic.
 - **Grid vs. carousel is one `displayMode` field on the two teaser modules,
   and the carousel is a pure scroll-snap track that Embla takes over after
   hydration** — `coalesce(displayMode, "GRID")` keeps every existing
-  document a grid with no migration; `Carousel` in `@blog/ui` owns the
+  document a grid with no migration; `Carousel` in `@shinefold/ui` owns the
   markup, the slide widths and an `isEnhanced` switch, a
   `PostsSection.Carousel` slot keeps the card mapping in one place, and the
   `apps/web` `PostsCarousel` leaf owns Embla (`align: 'start'`, one slide
@@ -2657,7 +2657,7 @@ point; the graph stays acyclic.
   `page_tag`/`page_tagIndex`. Live documents and references exist, so it is
   the expand → repoint → contract recipe with two migrations, unlike #2904.
   Tracked in #2961 (2026-09-08).
-- **The carousel organism owns Embla, and `@blog/ui` gains its one
+- **The carousel organism owns Embla, and `@shinefold/ui` gains its one
   hook-bearing component** — `Carousel` carries `useEmblaCarousel`, the
   buttons, the disabled flags and the scroll-position handoff, with no
   `'use client'` of its own; a thin `apps/web` wrapper (the `SanityImage`
@@ -2730,7 +2730,7 @@ point; the graph stays acyclic.
   Square / Circle / Icon, one field on the module) and `cardAlignment`
   beside the heading's `contentAlignment`, derives columns from the count (no
   field), draws Icon-shape glyphs from a curated `FEATURE_ICONS` set (no SVG
-  upload) rendered on the web from `@blog/ui` assets and in the Studio from
+  upload) rendered on the web from `@shinefold/ui` assets and in the Studio from
   `lucide-react` through a visual picker that ships after the schema; the
   Blocks section holds Feature Cards and the moved Links, and the `block_`
   prefix names the family; ui alone, then studio + service + web as one PR
@@ -2769,7 +2769,7 @@ point; the graph stays acyclic.
   express.
 - Multi-tenant tenancy mechanics — the `leads` table's `tenantId` and every
   other tenancy concern belongs to
-  `SPEC.md` §4 ("Tenant scoping in `@blog/db`"), not this doc.
+  `SPEC.md` §4 ("Tenant scoping in `@shinefold/db`"), not this doc.
 
 ## How this is ticketed
 
@@ -2853,7 +2853,7 @@ catalogue has enough shipped history to matter).
   `slideSize`; the state moves into an internal `useCarousel` hook; the
   web wrapper becomes the per-consumer `PostsCarousel`.
 - **2026-09-10** — re-cut "The carousel display mode" (#2785): Embla
-  moves from a web leaf into the `@blog/ui` organism (hook, buttons,
+  moves from a web leaf into the `@shinefold/ui` organism (hook, buttons,
   flags, handoff internal; `Carousel.Controls`, `viewportRef` and
   `isEnhanced` are no longer props), `slideSize` added for the gallery,
   the web side becomes a `'use client'` wrapper plus a branch in
@@ -2907,11 +2907,11 @@ catalogue has enough shipped history to matter).
   per page, the shared `defineHeroFields()` tail, the generalised
   blank-heading validator and Phase 0's per-layer scope.
 - **2026-09-06** — brought back in line with what shipped between
-  2026-08-23 and today: the `cms` layer is `packages/studio` (`@blog/studio`);
+  2026-08-23 and today: the `cms` layer is `packages/studio` (`@shinefold/studio`);
   the "appearance object" shipped as `brandVariant`/`layout`/
   `sectionHeader`/`contentAlignment` helpers rendered by `apps/web`'s
   `Section`; `MODULE_MAP` excludes three slot types, not one; the M5
-  dependencies all landed and the email transport is `@blog/email` (#1107
+  dependencies all landed and the email transport is `@shinefold/email` (#1107
   was the Auth.js issue, not a Resend helper); tenant writes go through
   `isTenantActive()`; write-path modules are capability-gated; #1907's desk
   regroup shipped; the page-architecture programme settled `page_project`

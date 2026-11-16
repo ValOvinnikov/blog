@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT, MEDIA_ORDER } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  MEDIA_ORDER,
+} from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';

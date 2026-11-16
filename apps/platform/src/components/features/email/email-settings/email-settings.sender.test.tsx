@@ -1,4 +1,3 @@
-import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';
 import en from '@platform/i18n/messages/en.json';
@@ -27,6 +26,7 @@ import { mockEmailSender } from '@platform/testing/email-draft';
 import { SAVE_CHANGES } from '@platform/testing/render-in-settings-form';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
+import { ACTION_OUTCOME } from '@shinefold/config';
 import type { UserEvent } from '@testing-library/user-event';
 
 import { EmailSettings } from './email-settings';

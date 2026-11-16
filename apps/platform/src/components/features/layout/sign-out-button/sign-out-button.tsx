@@ -1,10 +1,10 @@
 'use client';
 
-import type { IWithClassName } from '@blog/config/types';
 import { Button } from '@platform/components/shared/button';
 import type { TButtonVariants } from '@platform/components/shared/button/button-variants';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { signOutAction } from '@platform/server/auth/sign-out-action';
+import type { IWithClassName } from '@shinefold/config/types';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 

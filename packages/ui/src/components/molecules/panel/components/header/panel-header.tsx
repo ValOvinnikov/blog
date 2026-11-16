@@ -1,5 +1,5 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import { headingTags, type THeadingLevel } from '@blog/ui/lib/react';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import { headingTags, type THeadingLevel } from '@shinefold/ui/lib/react';
 import type { ReactNode } from 'react';
 
 import { panelHeaderVariants } from './panel-header-variants';

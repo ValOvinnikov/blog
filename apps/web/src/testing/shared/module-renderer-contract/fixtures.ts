@@ -1,5 +1,5 @@
-import type { TModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import type { TModule } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 
 const mockFaker = createMockFaker(61052);

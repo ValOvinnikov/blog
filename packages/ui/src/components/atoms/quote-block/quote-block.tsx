@@ -1,4 +1,4 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 import { quoteBlockVariants } from './quote-block-variants';

@@ -1,17 +1,17 @@
 /**
  * @vitest-environment jsdom
  */
-import { MODULE_PACK } from '@blog/config/constants';
-import { MODULE_PACK_LABEL } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
-import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker';
-import { ModulePickerTypesContext } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-types-context';
-import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
-import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
-import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
-import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { faker } from '@faker-js/faker';
 import { ThemeProvider } from '@sanity/ui';
 import { buildTheme } from '@sanity/ui/theme';
+import { MODULE_PACK } from '@shinefold/config/constants';
+import { MODULE_PACK_LABEL } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { createModulePicker } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker';
+import { ModulePickerTypesContext } from '@shinefold/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-types-context';
+import { ctaSchema } from '@shinefold/studio/schema-types/modules/cta/cta';
+import { faqSchema } from '@shinefold/studio/schema-types/modules/faq/faq';
+import { pricingSchema } from '@shinefold/studio/schema-types/modules/pricing/pricing';
+import { EVERY_MODULE_PACK } from '@shinefold/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { ComponentProps } from 'react';
 import type { SchemaType } from 'sanity';

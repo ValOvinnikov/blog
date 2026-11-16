@@ -1,8 +1,8 @@
 import type {
   TDeprovisioningStep,
   TTenantProvisioningStepStatus,
-} from '@blog/db/constants';
-import { updateDeprovisioningStep } from '@blog/db/queries/tenants';
+} from '@shinefold/db/constants';
+import { updateDeprovisioningStep } from '@shinefold/db/queries/tenants';
 
 export type TReportDeprovisioningStepStatusInput = {
   tenantId: string;

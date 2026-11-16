@@ -1,4 +1,4 @@
-import type { Link } from '@blog/config/sanity/generated/types';
+import type { Link } from '@shinefold/config/sanity/generated/types';
 
 import {
   CTA_ACTION_APPEARANCE,
@@ -6,7 +6,7 @@ import {
   LINK_TYPE,
   PORTABLE_TEXT_BLOCK_TYPE,
   type TLocaleIsoCode,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 
 import type { TStarterDocument } from './starter-document';
 import { localizedString, reference } from './starter-fields';

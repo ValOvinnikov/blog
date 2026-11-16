@@ -1,7 +1,7 @@
 'use server';
 
-import type { TTenantPlan } from '@blog/config/constants';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import type { TTenantPlan } from '@shinefold/config/constants';
 
 export const getTenantPlanAction = async (
   tenantId: string,

@@ -1,10 +1,10 @@
-import { ICONS } from '@blog/config';
 import {
   buttonVariants,
   type TButtonVariants,
 } from '@platform/components/shared/button/button-variants';
 import { ExternalLink } from '@platform/components/shared/external-link';
 import { Icon } from '@platform/components/shared/icon';
+import { ICONS } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 export type TExternalLinkButtonProps = {

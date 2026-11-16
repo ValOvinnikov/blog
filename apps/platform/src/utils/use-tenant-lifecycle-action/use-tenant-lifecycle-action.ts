@@ -1,7 +1,5 @@
 'use client';
 
-import { ACTION_OUTCOME, isOutcomeSuccess, type TOutcome } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import type { TConfirmTenantFieldError } from '@platform/server/provisioning/resolve-confirmed-tenant';
 import type {
@@ -9,6 +7,12 @@ import type {
   TTenantLifecycleResult,
 } from '@platform/server/provisioning/tenant-lifecycle-result';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import {
+  ACTION_OUTCOME,
+  isOutcomeSuccess,
+  type TOutcome,
+} from '@shinefold/config';
+import { errorResult, okResult } from '@shinefold/utils';
 import { useTranslations } from 'next-intl';
 
 const FIELD_ERROR_KEYS = {

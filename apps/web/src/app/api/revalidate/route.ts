@@ -1,6 +1,6 @@
-import { HTTP_STATUS } from '@blog/config/constants';
-import { hasLength } from '@blog/utils/primitives';
 import { SIGNATURE_HEADER_NAME } from '@sanity/webhook';
+import { HTTP_STATUS } from '@shinefold/config/constants';
+import { hasLength } from '@shinefold/utils/primitives';
 import {
   REVALIDATE_LOG,
   TENANT_LOOKUP_FAILED_MESSAGE,

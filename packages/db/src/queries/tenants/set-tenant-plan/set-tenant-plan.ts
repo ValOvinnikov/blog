@@ -1,14 +1,14 @@
-import type { TTenantPlan } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
+import type { TTenantPlan } from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
 import {
   ROW_LOCK,
   TENANT_PLAN_WRITE_OUTCOME,
   type TTenantStatus,
   WRITABLE_TENANT_STATUSES,
-} from '@blog/db/constants';
-import { unlockMembershipsWithinPlan } from '@blog/db/queries/memberships/memberships-over-seats';
-import { planChangeFields } from '@blog/db/queries/tenants/plan-change-fields';
-import { tenants } from '@blog/db/schema/tenants';
+} from '@shinefold/db/constants';
+import { unlockMembershipsWithinPlan } from '@shinefold/db/queries/memberships/memberships-over-seats';
+import { planChangeFields } from '@shinefold/db/queries/tenants/plan-change-fields';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { and, eq, inArray } from 'drizzle-orm';
 
 export type TTenantPlanAndStatus = {

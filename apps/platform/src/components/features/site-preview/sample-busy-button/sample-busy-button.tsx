@@ -1,5 +1,3 @@
-import { type IBusyStyle, SIZE } from '@blog/config';
-import { Button } from '@blog/ui/components/atoms/button';
 import { SamplePart } from '@platform/components/features/site-preview/sample-part';
 import {
   SAMPLE_BUSY_BUTTON_TEST_ID,
@@ -7,6 +5,8 @@ import {
   SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
 } from '@platform/constants/sample-busy';
 import { SAMPLE_PART } from '@platform/constants/sample-part';
+import { type IBusyStyle, SIZE } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
 import { useTranslations } from 'next-intl';
 
 export type TSampleBusyButtonProps = {

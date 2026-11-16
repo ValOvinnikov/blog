@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import type { TValueOf } from '@shinefold/config/utils';
 
 export const SIGNUP_BLOCK_FIELD_ERROR = {
   BLOCK_DOMAIN_INVALID: 'BLOCK_DOMAIN_INVALID',

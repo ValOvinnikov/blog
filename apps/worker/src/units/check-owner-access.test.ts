@@ -8,27 +8,27 @@ import {
   SANITY_LOGIN_PROVIDER,
   SANITY_PROJECT_ROLE,
   SANITY_RESOURCE_TYPE,
-} from '@blog/config/constants';
+} from '@shinefold/config/constants';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   SANITY_PROJECT_ROLE as STORED_SANITY_PROJECT_ROLE,
   TENANT_OWNER_EMAIL,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
+} from '@shinefold/db/constants';
 import {
   getFindingDetails,
   listFindingsForTenant,
   openFinding,
   resolveFinding,
-} from '@blog/db/queries/findings';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
+} from '@shinefold/db/queries/findings';
+import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
 import {
   getTenantById,
   setTenantOwnerAccess,
   touchTenantActivity,
   updateProvisioningStep,
-} from '@blog/db/queries/tenants';
+} from '@shinefold/db/queries/tenants';
 import {
   createSanityProjectInvite,
   deleteSanityProjectInvite,
@@ -36,13 +36,13 @@ import {
   listSanityProjectAcl,
   listSanityProjectInvites,
   revokeSanityProjectRole,
-} from '@blog/db/utils/sanity-management-client/sanity-project-access';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
 import {
   assignSanityProjectUserRole,
   listSanityOrganizationUsers,
   listSanityProjectUsers,
-} from '@blog/db/utils/sanity-management-client/sanity-project-users';
-import { errorResult, okResult } from '@blog/utils/result';
+} from '@shinefold/db/utils/sanity-management-client/sanity-project-users';
+import { errorResult, okResult } from '@shinefold/utils/result';
 import {
   OWNER_ACCESS_FINDING_AFTER_MS,
   OWNER_ACCESS_FINDING_IDENTIFIER,
@@ -94,11 +94,11 @@ const MOCK_WAITING_TENANT = mockProvisionedTenant({
 
 vi.mock('@worker/utils/operator-alert/operator-alert');
 vi.mock('@worker/utils/owner-email/send-owner-email');
-vi.mock('@blog/db/queries/findings');
-vi.mock('@blog/db/queries/memberships');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
-vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
-vi.mock('@blog/db/queries/tenants');
+vi.mock('@shinefold/db/queries/findings');
+vi.mock('@shinefold/db/queries/memberships');
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-project-access');
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-project-users');
+vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('workflow');
 vi.mock('@worker/utils/tenant-management-token/tenant-management-token');

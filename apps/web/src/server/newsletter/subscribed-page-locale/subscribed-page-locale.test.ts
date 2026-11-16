@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { LOCALE_ISO_CODES } from '@shinefold/config';
 import { getLocale } from 'next-intl/server';
 
 import { getSubscribedPageLocale } from './subscribed-page-locale';
