@@ -1,6 +1,6 @@
 # Deploy & release runbook
 
-How this blog deploys, and the one-time setup that makes the pipeline live.
+How Shinefold deploys, and the one-time setup that makes the pipeline live.
 
 - **Local dev + every `main` merge** → **development** environment
   (`development` dataset).

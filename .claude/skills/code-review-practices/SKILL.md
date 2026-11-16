@@ -1,7 +1,7 @@
 ---
 name: code-review-practices
 description: >-
-  Project-specific code-review checklist for this blog monorepo. Use before
+  Project-specific code-review checklist for the Shinefold monorepo. Use before
   opening a PR or when reviewing a diff — to verify layer boundaries, type
   safety, the Sanity→types→service→ui→web data flow, SEO, accessibility, and
   test coverage. Apply when reviewing or self-reviewing changes in this repo.

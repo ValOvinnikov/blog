@@ -9,8 +9,9 @@ current behaviour; when it disagrees with `SPEC.md`, the spec wins.
 
 ## What this is
 
-A Turborepo + pnpm monorepo for a headless-CMS blog. Sanity Studio (v6) authors
-content; a Next.js 16 App Router site renders it; types flow end-to-end.
+A Turborepo + pnpm monorepo for Shinefold, a multi-tenant headless-CMS platform
+on which a blog is one site type. Sanity Studio (v6) authors content; a Next.js
+16 App Router site renders it; types flow end-to-end.
 
 ## Layer contracts (do not violate)
 
