@@ -17,5 +17,7 @@ export async function getPostPublishedAt(
     cache: 'no-store',
   });
 
-  return raw?.publishedAt ?? undefined;
+  if (!raw) return undefined;
+
+  return raw.publishedAt;
 }
