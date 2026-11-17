@@ -763,6 +763,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **STRIPE_KEY_MODE**: `TEST`=`"test"`, `LIVE`=`"live"`
 
+### `@platform/constants/stripe-schedule` — `apps/platform/src/constants/stripe-schedule.ts`
+
+- **STRIPE_BILLING_CYCLE_ANCHOR**: `PHASE_START`=`"phase_start"`
+- **STRIPE_SCHEDULE_END_BEHAVIOR**: `RELEASE`=`"release"`
+
 ### `@platform/constants/tenant` — `apps/platform/src/constants/tenant.ts`
 
 - **TENANT_FIELD_ERROR**: `CONFIRM_REQUIRED`, `NAME_MISMATCH`, `NAME_REQUIRED`, `DOMAIN_INVALID`, `DOMAIN_TAKEN`, `DOMAIN_ATTACHED_ELSEWHERE`, `DOMAIN_LOCKED`, `DOMAIN_CUSTOM_MAIN`, `SLUG_REQUIRED`, `SLUG_INVALID`, `SLUG_RESERVED`, `SLUG_TAKEN`, `EMAIL_INVALID`, `LOCALE_UNSUPPORTED`, `PLAN_UNSUPPORTED`, `OWNER_EMAIL_TAKEN`
