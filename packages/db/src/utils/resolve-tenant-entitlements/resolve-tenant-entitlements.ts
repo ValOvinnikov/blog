@@ -30,7 +30,7 @@ export type TResolvableGrant = Pick<
 const CAPABILITIES = Object.values(CAPABILITY);
 const MODULE_PACKS = Object.values(MODULE_PACK);
 
-export function isEntitlementGrantActive(
+function isEntitlementGrantActive(
   { revokedAt, expiresAt }: Pick<TResolvableGrant, 'expiresAt' | 'revokedAt'>,
   now: Date,
 ): boolean {
