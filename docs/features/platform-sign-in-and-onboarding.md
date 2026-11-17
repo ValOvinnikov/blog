@@ -14,6 +14,7 @@ code:
   - apps/platform/src/constants/onboarding.ts
   - apps/platform/src/server/auth/set-signup-terms-cookie*
   - apps/platform/src/utils/legal-page-urls/**
+  - apps/platform/src/server/legal-pages/**
   - apps/platform/src/instrumentation-client.ts
   - apps/platform/src/components/features/sign-in/**
   - apps/platform/src/server/auth/send-sign-in-link-action*
@@ -84,9 +85,17 @@ site as a 14-day Growth trial, with no card.
 - `/signup`: the same card, titled "Create an account", with the same
   provider buttons and email field (`SignInOptions` with `isSignUp`), then the
   note "By continuing, you agree to the Terms of Service and the Privacy
-  Policy", linked by `toLegalPageUrls` at the marketing site's by-kind
-  redirect, `<MARKETING_SITE_URL>/api/legal-page/TERMS` and
-  `/PRIVACY_POLICY` (`routes.legalPageByKind()` in `@shinefold/config`). With
+  Policy", each opening in a new tab so the form keeps its state.
+  `toLegalPageUrls` builds the marketing site's by-kind redirect,
+  `<MARKETING_SITE_URL>/api/legal-page/TERMS` and `/PRIVACY_POLICY`
+  (`routes.legalPageByKind()` in `@shinefold/config`), and
+  `resolveLegalPageUrls` fetches each with `redirect: 'manual'` on the server
+  and links the page its `Location` names (`/legal/terms`), so no `/api/…`
+  address shows in the browser. The resolved address is cached for 10 minutes
+  per platform instance, so a slug change in the marketing Studio reaches the
+  links within that window. A failed lookup (network error, non-redirect
+  answer, missing `Location`, or one off the marketing site's origin) is not
+  cached and keeps the `/api/legal-page/…` link, which still redirects. With
   `MARKETING_SITE_URL` unset they fall back to the `TENANT_ROOT_DOMAIN` apex,
   `https://<TENANT_ROOT_DOMAIN>/api/legal-page/…`; with neither set they are
   named as plain text. Onboarding's review-step terms checkbox links the same
@@ -432,6 +441,7 @@ site as a 14-day Growth trial, with no card.
   `sign-in-with-provider-action.test.ts`, `sign-in/page.test.tsx`,
   `sign-in-error/page.test.tsx`, `signup/page.test.tsx`,
   `set-signup-terms-cookie.test.ts`, `legal-page-urls.test.ts`,
+  `resolve-legal-page-urls.test.ts`,
   `create-site-action.test.ts`, `check-site-address-action.test.ts`,
   `require-onboarding-user.test.ts`, the `onboarding-view*.test.tsx` files,
   `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,
