@@ -28,7 +28,8 @@
     "signUpTitle": "Create an account",
     "onboarding": "Create your site",
     "billing": "Billing · Admin",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "help": "Help"
   },
   "signInPage": {
     "heading": "Sign in",
@@ -188,6 +189,7 @@
   },
   "account": {
     "signOut": "Sign out",
+    "signingOut": "Signing out…",
     "signedInAs": "Signed in as {email}",
     "menuLabel": "Account",
     "triggerCollapsedLabel": "Account: {name}, {email}",
@@ -244,7 +246,9 @@
     "blockedSignups": "Blocked sign-ups",
     "dataRequests": "Data requests",
     "badgeUnreadLeads": "{count} new",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Support",
+    "help": "Help"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -507,7 +511,10 @@
       "OAUTH_APP_SAVED": "Sign-in app saved",
       "OAUTH_APP_REPLACED": "Sign-in app replaced",
       "OAUTH_APP_REMOVED": "Sign-in app removed",
-      "NEWSLETTER_PAUSE_CLEARED": "Newsletter pause cleared"
+      "NEWSLETTER_PAUSE_CLEARED": "Newsletter pause cleared",
+      "MEMBER_INVITED": "Team member invited",
+      "MEMBER_REMOVED": "Team member removed",
+      "MEMBER_INVITE_CANCELLED": "Team invite cancelled"
     },
     "detail": {
       "field": {
@@ -527,6 +534,7 @@
       "SUSPENSION_REASON": "Reason: {category}",
       "SUSPENSION_REFERENCE": "Reference: {reference}",
       "PLAN": "Plan: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Plan: {from} → {to}",
       "SIGN_IN_PROVIDER": "Sign-in provider: {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Client secret replaced"
     }
@@ -1579,9 +1587,11 @@
       "provisioningStarted": "This tenant's provisioning has already started; its details can no longer be edited.",
       "ownerAlreadyJoined": "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
       "ownerHasFreeTenant": "This owner already has a Free site. Archive it or keep this site on its current plan.",
+      "planFollowsSubscription": "This site has a live subscription, so its plan follows Stripe. Change it on the owner's Billing page or in the Stripe dashboard.",
       "saveFailed": "Couldn't save tenant details — try again."
     },
-    "fieldLockedReasonCustomMainDomain": "Locked — the main address is your own domain. Switch back to the subdomain on the Domain page to edit."
+    "fieldLockedReasonCustomMainDomain": "Locked — the main address is your own domain. Switch back to the subdomain on the Domain page to edit.",
+    "fieldLockedReasonSubscribed": "Locked — this site has a live subscription, so its plan follows Stripe. Change it on the owner's Billing page or in the Stripe dashboard."
   },
   "tenantFieldErrors": {
     "nameRequired": "Enter a tenant name.",
@@ -1699,6 +1709,8 @@
     "suspendFailed": "Couldn't suspend the tenant — try again.",
     "liftSuspensionFailed": "Couldn't reactivate the tenant — try again.",
     "ownerEmailUnknown": "This tenant's owner has no email address on record yet, so it can't be blocked.",
+    "subscriptionCancelFailed": "The site's Stripe subscription couldn't be cancelled, so it wasn't archived. Try again, or cancel it in Stripe first.",
+    "subscriptionLive": "Stripe still bills this site. Cancel its subscription before deleting it.",
     "invalidInput": "Check the details and try again."
   },
   "featuresSettings": {
@@ -1728,9 +1740,32 @@
       "RATINGS": "Let readers rate posts.",
       "BOOKMARKS": "Let readers save posts to read later.",
       "NEWSLETTER": "Show the newsletter signup form on the site.",
-      "ANALYTICS": "Enable on-site analytics tracking.",
+      "ANALYTICS": "Connect your own Google Analytics or Plausible. Leave the ID empty to load no analytics tool.",
       "CONSENT_BANNER": "Show visitors a cookie-consent banner before non-essential cookies or scripts load.",
       "CONTACT_FORM": "Show the contact form on the site."
+    },
+    "analyticsProviderLabel": "Analytics tool",
+    "analyticsProviderOption": {
+      "GOOGLE_ANALYTICS": "Google Analytics",
+      "PLAUSIBLE": "Plausible"
+    },
+    "analyticsIdDraftLabel": "Analytics ID",
+    "analyticsIdEmpty": "None",
+    "analyticsIdLabel": {
+      "GOOGLE_ANALYTICS": "Measurement ID",
+      "PLAUSIBLE": "Site domain"
+    },
+    "analyticsIdHint": {
+      "GOOGLE_ANALYTICS": "Find it in Google Analytics under Admin, Data streams.",
+      "PLAUSIBLE": "The domain your site is registered under in Plausible."
+    },
+    "analyticsIdPlaceholder": {
+      "GOOGLE_ANALYTICS": "G-A1B2C3D4E5",
+      "PLAUSIBLE": "example.com"
+    },
+    "analyticsIdInvalid": {
+      "GOOGLE_ANALYTICS": "Enter a measurement ID: G- followed by capital letters and numbers, like G-A1B2C3D4E5.",
+      "PLAUSIBLE": "Enter a domain on its own, without https:// or a path, like example.com."
     }
   },
   "languagePicker": {
@@ -2246,6 +2281,7 @@
     "nextPaymentLabel": "Next payment",
     "nextPayment": "{amount} on <time>{date}</time>",
     "noNextPayment": "None scheduled",
+    "planEnds": "Your plan ends on <time>{date}</time>.",
     "noPayments": "Your site has no payments yet.",
     "invoicesTitle": "Invoices",
     "invoicesEmpty": "No invoices yet.",
@@ -2295,6 +2331,7 @@
     "currentPlan": "Your site is on {plan}, paid {interval, select, YEARLY {yearly} other {monthly}}.",
     "pendingChange": "Your site moves to {plan}, paid {interval, select, YEARLY {yearly} other {monthly}}, on <time>{date}</time>.",
     "changeNow": "The change starts today. You pay the difference for the rest of the current period now.",
+    "changeNowNewPeriod": "The change starts today, and a new {interval, select, YEARLY {yearly} other {monthly}} period starts with it. You pay for the new period now, less the unused time on your current one.",
     "changeAtRenewal": "The change starts on <time>{date}</time>, when the current period ends. Nothing changes until then.",
     "keepCurrentDescription": "Your site stays on {plan}, and the change planned for <time>{date}</time> is cancelled.",
     "changeUnchanged": "This is your current plan. Choose another plan or billing period to change it.",
@@ -2309,7 +2346,30 @@
     "billingLink": "Billing",
     "NOT_SUBSCRIBED": "Your site has no paid plan to change yet. Choose one at checkout.",
     "NOT_ACTIVE": "Your subscription needs attention before its plan can change. Open Billing to settle it.",
+    "planEnds": "Your plan ends on <time>{date}</time>, so it can't change. To keep it, undo the cancellation from Billing.",
     "UNCHANGED": "Your site is already on this plan.",
     "CARD_DECLINED": "Your card was declined, so nothing changed. Update it in Billing and try again."
+  },
+  "helpView": {
+    "title": "Help",
+    "description": "Send a message to our support team. We include your site, plan and this account with it, so you don't need to.",
+    "helpCentre": "Help centre",
+    "unavailableTitle": "The Help form is unavailable",
+    "unavailableDescription": "Messages can't be sent from here right now. Please try again later."
+  },
+  "helpForm": {
+    "title": "Contact support",
+    "responseTime": "We usually reply within two working days.",
+    "subjectLabel": "Subject",
+    "messageLabel": "Message",
+    "messageHint": "Say what you were trying to do and what happened instead.",
+    "required": "Fill this in.",
+    "tooLong": "Keep this under {limit} characters.",
+    "send": "Send message",
+    "sending": "Sending…",
+    "sent": "Message sent. We've emailed you a copy.",
+    "rateLimited": "You've sent several messages in a short time. Please try again later.",
+    "unavailable": "The Help form is unavailable right now. Please try again later.",
+    "sendFailed": "Couldn't send your message — try again."
   }
 }

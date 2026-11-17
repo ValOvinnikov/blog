@@ -32,6 +32,7 @@ vi.mock('@shinefold/db', async () => ({
     settingsFeatures: {
       getSettingsFeaturesAndPreset: getSettingsFeaturesAndPresetMock,
     },
+    tenantAnalytics: { getStoredTenantAnalytics: vi.fn() },
   },
 }));
 

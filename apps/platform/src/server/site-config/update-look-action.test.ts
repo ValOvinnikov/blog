@@ -9,8 +9,10 @@ import {
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
 import {
+  mockEditorMembershipContext,
   mockMembership,
   mockMembershipContext,
+  mockOperatorMembershipContext,
 } from '@platform/testing/memberships/fixtures';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
@@ -399,6 +401,29 @@ describe(updateLookAction, () => {
         errorName: auditError.name,
       },
     );
+  });
+
+  it('refuses an editor and writes nothing', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockEditorMembershipContext(mockReadyTenant({ id: MOCK_TENANT_ID })),
+    );
+
+    await expect(updateLookAction(MOCK_TENANT_ID, VALID_INPUT)).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
+    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
+  });
+
+  it('saves for an operator', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockOperatorMembershipContext(
+        mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
+      ),
+    );
+
+    await expect(
+      updateLookAction(MOCK_TENANT_ID, VALID_INPUT),
+    ).resolves.toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it.each([

@@ -14,6 +14,8 @@ export const MOCK_PERIOD_END = toStripeTime(planChangeFaker.date.soon());
 export const MOCK_RENEWS_AT = new Date(
   MOCK_PERIOD_END * MILLISECONDS_PER_SECOND,
 );
+export const MOCK_CANCEL_AT = toStripeTime(planChangeFaker.date.soon());
+export const MOCK_ENDS_AT = new Date(MOCK_CANCEL_AT * MILLISECONDS_PER_SECOND);
 
 export const priceIdFor = (lookupKey: string) => `price_${lookupKey}`;
 

@@ -72,10 +72,12 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   reload or shared link keeps them; `listTenants`' own default order stays by
   name, which the dashboard tenant picker relies on.
 - **Operator tenant view**: `/tenants/{id}` and its Look, Voice, Features,
-  Languages, Domain, Email, Studio, Provisioning and Danger zone pages. The
-  sidebar shows the Platform section plus the tenant's own sections.
+  Languages, Domain, Email, Studio, Provisioning, Danger zone and Help pages.
+  The sidebar shows the Platform section plus the tenant's own sections, ending
+  with Support.
 - **Owner dashboard**: `/dashboard` and its Look, Voice, Features,
-  Languages, Domain, Email and Studio pages. `/dashboard/select-tenant` is a
+  Languages, Domain, Email, Studio and Help pages. The sidebar ends with a
+  Support section holding Help on every plan (see [support](./support.md)). `/dashboard/select-tenant` is a
   picker for a user with several workspaces: rows sorted by name, each with
   its domain and "role · plan" (role hidden for a SUPERADMIN's virtual
   membership), archived workspaces in their own read-only group, and a
@@ -95,7 +97,9 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   in two equal columns from `md` and stack below; from `md` to below `lg`
   their detail lists stack label over value, following the window width.
 - `GET /api/dashboard/select-tenant?tenantId=` sets the active-workspace
-  cookie and redirects to `/dashboard`.
+  cookie and redirects to `/dashboard`. The Workspace switcher reaches it with
+  a plain link, so choosing a site loads its dashboard as a new document; a
+  client navigation would keep the previous site's dashboard layout.
 - Every other path 404s through a catch-all. `not-found.tsx` renders
   `DeadEndView` with a home link from `resolveHomeHref` (sign-in, `/tenants`
   for an admin, `/dashboard` otherwise); `error.tsx` offers only Retry.
@@ -343,7 +347,8 @@ save still settles as the form's generic server error.
   to the trigger's. It heads with the name, the email and the role line
   ("{role} · {scope}"), none focusable, then — in the expanded and the rail
   menu — a Theme section, then the Sign out item, which takes focus on open
-  from the sidebar.
+  from the sidebar. Choosing Sign out keeps the menu open: the item turns into
+  a small spinner and "Signing out…", `aria-disabled`, until the redirect.
   The Theme section is the shared `MenuRadioGroup`
   (`components/shared/menu-radio-group/`) at its desktop size: a "Theme"
   group of Light (sun), Dark (moon) and System (monitor) `menuitemradio`
@@ -439,9 +444,10 @@ save still settles as the form's generic server error.
   border, `rounded-platform` on every corner, 4px padding, `text` colour and
   `shadow-platform-lg`. Its `positioner` slot puts every shell popup — the
   phone Menu, the full-path menu, the account menu, the Workspace dropdown,
-  `Select` and More presets — on one layer, `z-30`: above the sticky
-  `ViewTabs` (`z-21`) and `LookJumpIndex` (`z-20`), below dialogs (`z-40`)
-  and toasts and tooltips (`z-50`). The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
+  `Select` and More presets — on one layer, `z-45`: above the sticky
+  `ViewTabs` (`z-21`), `LookJumpIndex` (`z-20`) and dialogs (`z-40`), so a
+  `Select` inside a dialog (the Suspend dialog's category) opens over it, and
+  below toasts and tooltips (`z-50`). The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
   288px wide. It is anchored to the Menu button's left edge and the top bar's
   full height (`use-bar-anchor.ts`), so it opens 5px below the bar and grows
   with its content until it stops 12px above the viewport's bottom (Base UI's

@@ -42,6 +42,7 @@ export type TActivityDetail =
   | { kind: typeof D.SUSPENSION_REASON; category: TSuspensionCategory }
   | { kind: typeof D.SUSPENSION_REFERENCE; reference: string }
   | { kind: typeof D.PLAN; plan: TTenantPlan }
+  | { kind: typeof D.PLAN_CHANGED; from: TTenantPlan; to: TTenantPlan }
   | { kind: typeof D.SIGN_IN_PROVIDER; provider: TOAuthProvider };
 
 const optional = <T extends z.ZodType>(schema: T) =>
@@ -58,6 +59,9 @@ const activityDetailsSchema = z.object({
   category: optional(z.enum(SUSPENSION_CATEGORY)),
   reference: optional(z.string()),
   plan: optional(z.enum(TENANT_PLAN)),
+  planChanged: optional(
+    z.object({ from: z.enum(TENANT_PLAN), to: z.enum(TENANT_PLAN) }),
+  ),
   provider: optional(z.enum(OAUTH_PROVIDER)),
   isSecretReplaced: optional(z.boolean()),
 });
@@ -77,14 +81,19 @@ export const toActivityDetails = (
     category,
     reference,
     plan,
+    planChanged,
     provider,
     isSecretReplaced,
   } = activityDetailsSchema.parse(details ?? {});
+  const otherChangedFields = planChanged
+    ? changedFields?.filter((field) => field !== TENANT_DETAILS_FIELD.PLAN)
+    : changedFields;
   const candidates: Array<TActivityDetail | false | undefined> = [
-    hasArrayGotItems(changedFields) && {
+    hasArrayGotItems(otherChangedFields) && {
       kind: D.CHANGED_FIELDS,
-      fields: changedFields,
+      fields: otherChangedFields,
     },
+    planChanged && { kind: D.PLAN_CHANGED, ...planChanged },
     studioReinviteRequested === true && { kind: D.STUDIO_INVITE_SENT },
     studioReinviteUnsent === true && { kind: D.STUDIO_INVITE_UNSENT },
     mainAddressChanged && {

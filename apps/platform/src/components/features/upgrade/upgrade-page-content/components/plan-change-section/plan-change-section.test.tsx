@@ -7,6 +7,7 @@ import {
   MOCK_STRIPE_SUBSCRIPTION_ID,
 } from '@platform/testing/billing/fixtures';
 import {
+  MOCK_ENDS_AT,
   MOCK_PLAN_ITEM_ID,
   MOCK_RENEWS_AT,
 } from '@platform/testing/billing/plan-subscription';
@@ -40,6 +41,7 @@ const MOCK_SUBSCRIPTION: TSubscriptionPlan = {
   },
   isChangeable: true,
   renewsAt: MOCK_RENEWS_AT,
+  endsAt: undefined,
   scheduleId: undefined,
   pending: undefined,
   planItemId: MOCK_PLAN_ITEM_ID,
@@ -81,6 +83,22 @@ describe(`<${PlanChangeSection.name}/>`, () => {
 
     expect(note).toHaveTextContent(upgradePage.NOT_ACTIVE);
     expect(billing).toHaveAttribute('href', adminRoutes.dashboardBilling());
+  });
+
+  it('says when a cancelled plan ends and offers no change', async () => {
+    withSubscription({ isChangeable: false, endsAt: MOCK_ENDS_AT });
+
+    await setup();
+    const note = screen.getByRole('note');
+    const change = screen.queryByRole('button', {
+      name: upgradePage.changeSubmit,
+    });
+
+    expect(note).toHaveTextContent(
+      /^Your plan ends on .+, so it can't change\./,
+    );
+    expect(note).not.toHaveTextContent(upgradePage.NOT_ACTIVE);
+    expect(change).not.toBeInTheDocument();
   });
 
   it('says the plan could not be loaded', async () => {

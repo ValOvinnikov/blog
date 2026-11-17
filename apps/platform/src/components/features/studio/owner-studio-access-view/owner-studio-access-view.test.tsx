@@ -1,9 +1,9 @@
-import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { ACTION_OUTCOME } from '@shinefold/config';
+import { STUDIO_ACCESS } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { OwnerStudioAccessView } from './owner-studio-access-view';
@@ -25,7 +25,7 @@ vi.mock('@platform/server/owner-access/resend-owner-invite-action', () => ({
 
 const setup = customRender(OwnerStudioAccessView, {
   tenantId: MOCK_TENANT_ID,
-  studioAccess: OWNER_STUDIO_ACCESS.INVITE_SENT,
+  studioAccess: STUDIO_ACCESS.INVITE_SENT,
 });
 
 const RESEND_INVITE = 'Resend invite';
@@ -47,9 +47,9 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
   });
 
   it.each([
-    [OWNER_STUDIO_ACCESS.INVITE_SENT, 'Accept your Studio invite'],
-    [OWNER_STUDIO_ACCESS.ACTIVATING, 'Setting up your Studio access'],
-    [OWNER_STUDIO_ACCESS.STALLED, "Your Studio invite hasn't been accepted"],
+    [STUDIO_ACCESS.INVITE_SENT, 'Accept your Studio invite'],
+    [STUDIO_ACCESS.ACTIVATING, 'Setting up your Studio access'],
+    [STUDIO_ACCESS.STALLED, "Your Studio invite hasn't been accepted"],
   ] as const)('explains the %s state', (studioAccess, title) => {
     setup({ studioAccess });
 
@@ -64,9 +64,9 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
   });
 
   it.each([
-    [OWNER_STUDIO_ACCESS.INVITE_SENT, [CHECK_NOW, RESEND_INVITE]],
-    [OWNER_STUDIO_ACCESS.ACTIVATING, [CHECK_NOW]],
-    [OWNER_STUDIO_ACCESS.STALLED, [RESEND_INVITE, CHECK_NOW]],
+    [STUDIO_ACCESS.INVITE_SENT, [CHECK_NOW, RESEND_INVITE]],
+    [STUDIO_ACCESS.ACTIVATING, [CHECK_NOW]],
+    [STUDIO_ACCESS.STALLED, [RESEND_INVITE, CHECK_NOW]],
   ] as const)('orders the %s actions', (studioAccess, actionNames) => {
     setup({ studioAccess });
 

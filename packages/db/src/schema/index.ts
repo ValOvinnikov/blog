@@ -19,6 +19,7 @@ export * from './site-config-enums';
 export * from './stripe-catalogue';
 export * from './stripe-webhook-events';
 export * from './subscribers';
+export * from './takeaway-generation-counts';
 export * from './tenant-analytics';
 export * from './tenant-domains';
 export * from './tenant-enums';

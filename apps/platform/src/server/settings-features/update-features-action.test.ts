@@ -9,8 +9,10 @@ import {
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
 import {
+  mockEditorMembershipContext,
   mockMembership,
   mockMembershipContext,
+  mockOperatorMembershipContext,
 } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
@@ -136,6 +138,29 @@ describe(updateFeaturesAction, () => {
       VALID_INPUT,
     );
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+  });
+
+  it('refuses an editor and writes nothing', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockEditorMembershipContext(mockTenant({ id: MOCK_TENANT_ID })),
+    );
+
+    await expect(
+      updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
+  });
+
+  it('saves for an operator', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockOperatorMembershipContext(
+        mockTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
+      ),
+    );
+
+    await expect(
+      updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT),
+    ).resolves.toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   describe('once saved', () => {

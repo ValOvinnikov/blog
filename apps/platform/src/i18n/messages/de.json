@@ -28,7 +28,8 @@
     "signUpTitle": "Konto erstellen",
     "onboarding": "Website erstellen",
     "billing": "Abrechnung · Admin",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "help": "Hilfe"
   },
   "signInPage": {
     "heading": "Anmelden",
@@ -188,6 +189,7 @@
   },
   "account": {
     "signOut": "Abmelden",
+    "signingOut": "Wird abgemeldet…",
     "signedInAs": "Angemeldet als {email}",
     "menuLabel": "Konto",
     "triggerCollapsedLabel": "Konto: {name}, {email}",
@@ -244,7 +246,9 @@
     "blockedSignups": "Gesperrte Registrierungen",
     "dataRequests": "Datenanfragen",
     "badgeUnreadLeads": "{count} neu",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Support",
+    "help": "Hilfe"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -507,7 +511,10 @@
       "OAUTH_APP_SAVED": "Anmelde-App gespeichert",
       "OAUTH_APP_REPLACED": "Anmelde-App ersetzt",
       "OAUTH_APP_REMOVED": "Anmelde-App entfernt",
-      "NEWSLETTER_PAUSE_CLEARED": "Newsletter-Pause aufgehoben"
+      "NEWSLETTER_PAUSE_CLEARED": "Newsletter-Pause aufgehoben",
+      "MEMBER_INVITED": "Teammitglied eingeladen",
+      "MEMBER_REMOVED": "Teammitglied entfernt",
+      "MEMBER_INVITE_CANCELLED": "Team-Einladung storniert"
     },
     "detail": {
       "field": {
@@ -527,6 +534,7 @@
       "SUSPENSION_REASON": "Grund: {category}",
       "SUSPENSION_REFERENCE": "Referenz: {reference}",
       "PLAN": "Tarif: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Tarif: {from} → {to}",
       "SIGN_IN_PROVIDER": "Anmeldeanbieter: {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Client-Geheimnis ersetzt"
     }
@@ -1579,9 +1587,11 @@
       "provisioningStarted": "Die Bereitstellung dieses Mandanten hat bereits begonnen; seine Details können nicht mehr bearbeitet werden.",
       "ownerAlreadyJoined": "Der Inhaber dieses Mandanten hat sich bereits angemeldet, daher kann seine E-Mail-Adresse hier nicht mehr korrigiert werden — dies würde stattdessen die Inhaberschaft übertragen.",
       "ownerHasFreeTenant": "Dieser Inhaber hat bereits eine kostenlose Website. Archivieren Sie sie oder belassen Sie diese Website in ihrem aktuellen Tarif.",
+      "planFollowsSubscription": "Diese Website hat ein aktives Abonnement, daher folgt ihr Tarif Stripe. Ändern Sie ihn auf der Abrechnungsseite des Inhabers oder im Stripe-Dashboard.",
       "saveFailed": "Die Mandantendaten konnten nicht gespeichert werden — bitte erneut versuchen."
     },
-    "fieldLockedReasonCustomMainDomain": "Gesperrt — die Hauptadresse ist die eigene Domain. Wechsle zum Bearbeiten auf der Domain-Seite zurück zur Subdomain."
+    "fieldLockedReasonCustomMainDomain": "Gesperrt — die Hauptadresse ist die eigene Domain. Wechsle zum Bearbeiten auf der Domain-Seite zurück zur Subdomain.",
+    "fieldLockedReasonSubscribed": "Gesperrt — diese Website hat ein aktives Abonnement, daher folgt ihr Tarif Stripe. Ändern Sie ihn auf der Abrechnungsseite des Inhabers oder im Stripe-Dashboard."
   },
   "tenantFieldErrors": {
     "nameRequired": "Geben Sie einen Mandantennamen ein.",
@@ -1699,6 +1709,8 @@
     "suspendFailed": "Der Mandant konnte nicht gesperrt werden — bitte erneut versuchen.",
     "liftSuspensionFailed": "Der Mandant konnte nicht reaktiviert werden — bitte erneut versuchen.",
     "ownerEmailUnknown": "Für den Inhaber dieses Mandanten ist noch keine E-Mail-Adresse hinterlegt, daher kann sie nicht gesperrt werden.",
+    "subscriptionCancelFailed": "Das Stripe-Abo der Website konnte nicht gekündigt werden, deshalb wurde sie nicht archiviert. Versuche es erneut oder kündige es zuerst in Stripe.",
+    "subscriptionLive": "Stripe rechnet diese Website noch ab. Kündige ihr Abo, bevor du sie löschst.",
     "invalidInput": "Prüfen Sie die Angaben und versuchen Sie es erneut."
   },
   "featuresSettings": {
@@ -1728,9 +1740,32 @@
       "RATINGS": "Leser können Beiträge bewerten.",
       "BOOKMARKS": "Leser können Beiträge für später merken.",
       "NEWSLETTER": "Das Newsletter-Anmeldeformular auf der Website anzeigen.",
-      "ANALYTICS": "Analyse-Tracking auf der Website aktivieren.",
+      "ANALYTICS": "Verbinde dein eigenes Google Analytics oder Plausible. Lass die ID leer, um kein Analysetool zu laden.",
       "CONSENT_BANNER": "Besuchern ein Cookie-Einwilligungsbanner anzeigen, bevor nicht notwendige Cookies oder Skripte geladen werden.",
       "CONTACT_FORM": "Das Kontaktformular auf der Website anzeigen."
+    },
+    "analyticsProviderLabel": "Analysetool",
+    "analyticsProviderOption": {
+      "GOOGLE_ANALYTICS": "Google Analytics",
+      "PLAUSIBLE": "Plausible"
+    },
+    "analyticsIdDraftLabel": "Analyse-ID",
+    "analyticsIdEmpty": "Keine",
+    "analyticsIdLabel": {
+      "GOOGLE_ANALYTICS": "Mess-ID",
+      "PLAUSIBLE": "Website-Domain"
+    },
+    "analyticsIdHint": {
+      "GOOGLE_ANALYTICS": "Du findest sie in Google Analytics unter Verwaltung, Datenstreams.",
+      "PLAUSIBLE": "Die Domain, unter der deine Website in Plausible eingetragen ist."
+    },
+    "analyticsIdPlaceholder": {
+      "GOOGLE_ANALYTICS": "G-A1B2C3D4E5",
+      "PLAUSIBLE": "example.com"
+    },
+    "analyticsIdInvalid": {
+      "GOOGLE_ANALYTICS": "Gib eine Mess-ID ein: G- gefolgt von Großbuchstaben und Ziffern, zum Beispiel G-A1B2C3D4E5.",
+      "PLAUSIBLE": "Gib nur eine Domain ein, ohne https:// oder Pfad, zum Beispiel example.com."
     }
   },
   "languagePicker": {
@@ -2246,6 +2281,7 @@
     "nextPaymentLabel": "Nächste Zahlung",
     "nextPayment": "{amount} am <time>{date}</time>",
     "noNextPayment": "Keine geplant",
+    "planEnds": "Ihr Tarif endet am <time>{date}</time>.",
     "noPayments": "Für Ihre Website gibt es noch keine Zahlungen.",
     "invoicesTitle": "Rechnungen",
     "invoicesEmpty": "Noch keine Rechnungen.",
@@ -2295,6 +2331,7 @@
     "currentPlan": "Deine Website nutzt {plan}, {interval, select, YEARLY {jährlich} other {monatlich}} bezahlt.",
     "pendingChange": "Deine Website wechselt am <time>{date}</time> zu {plan}, {interval, select, YEARLY {jährlich} other {monatlich}} bezahlt.",
     "changeNow": "Die Änderung gilt ab heute. Du zahlst jetzt die Differenz für den Rest des laufenden Zeitraums.",
+    "changeNowNewPeriod": "Die Änderung gilt ab heute, und ein neuer {interval, select, YEARLY {jährlicher} other {monatlicher}} Zeitraum beginnt damit. Du zahlst jetzt für den neuen Zeitraum, abzüglich der ungenutzten Zeit deines aktuellen.",
     "changeAtRenewal": "Die Änderung gilt ab dem <time>{date}</time>, wenn der laufende Zeitraum endet. Bis dahin ändert sich nichts.",
     "keepCurrentDescription": "Deine Website bleibt bei {plan}, und die für den <time>{date}</time> geplante Änderung wird storniert.",
     "changeUnchanged": "Das ist dein aktueller Tarif. Wähle einen anderen Tarif oder Abrechnungszeitraum, um ihn zu ändern.",
@@ -2309,7 +2346,30 @@
     "billingLink": "Abrechnung",
     "NOT_SUBSCRIBED": "Deine Website hat noch keinen bezahlten Tarif, der geändert werden kann. Wähle einen an der Kasse.",
     "NOT_ACTIVE": "Dein Abonnement braucht deine Aufmerksamkeit, bevor sich der Tarif ändern kann. Öffne die Abrechnung, um das zu klären.",
+    "planEnds": "Dein Tarif endet am <time>{date}</time> und kann sich deshalb nicht mehr ändern. Um ihn zu behalten, nimm die Kündigung in der Abrechnung zurück.",
     "UNCHANGED": "Deine Website nutzt diesen Tarif bereits.",
     "CARD_DECLINED": "Deine Karte wurde abgelehnt, daher hat sich nichts geändert. Aktualisiere sie in der Abrechnung und versuch es erneut."
+  },
+  "helpView": {
+    "title": "Hilfe",
+    "description": "Schreib unserem Support-Team. Wir schicken deine Website, deinen Tarif und dieses Konto automatisch mit.",
+    "helpCentre": "Hilfe-Center",
+    "unavailableTitle": "Das Hilfe-Formular ist nicht verfügbar",
+    "unavailableDescription": "Nachrichten können gerade nicht von hier gesendet werden. Bitte versuch es später noch einmal."
+  },
+  "helpForm": {
+    "title": "Support kontaktieren",
+    "responseTime": "Wir antworten in der Regel innerhalb von zwei Werktagen.",
+    "subjectLabel": "Betreff",
+    "messageLabel": "Nachricht",
+    "messageHint": "Beschreib, was du tun wolltest und was stattdessen passiert ist.",
+    "required": "Bitte ausfüllen.",
+    "tooLong": "Bitte weniger als {limit} Zeichen.",
+    "send": "Nachricht senden",
+    "sending": "Wird gesendet…",
+    "sent": "Nachricht gesendet. Wir haben dir eine Kopie gemailt.",
+    "rateLimited": "Du hast in kurzer Zeit mehrere Nachrichten gesendet. Bitte versuch es später noch einmal.",
+    "unavailable": "Das Hilfe-Formular ist gerade nicht verfügbar. Bitte versuch es später noch einmal.",
+    "sendFailed": "Deine Nachricht konnte nicht gesendet werden – versuch es noch einmal."
   }
 }

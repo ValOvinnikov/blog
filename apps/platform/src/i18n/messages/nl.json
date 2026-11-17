@@ -28,7 +28,8 @@
     "signUpTitle": "Account aanmaken",
     "onboarding": "Je site maken",
     "billing": "Facturering · Admin",
-    "upgrade": "Upgraden"
+    "upgrade": "Upgraden",
+    "help": "Help"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -188,6 +189,7 @@
   },
   "account": {
     "signOut": "Uitloggen",
+    "signingOut": "Bezig met uitloggen…",
     "signedInAs": "Ingelogd als {email}",
     "menuLabel": "Account",
     "triggerCollapsedLabel": "Account: {name}, {email}",
@@ -244,7 +246,9 @@
     "blockedSignups": "Geblokkeerde aanmeldingen",
     "dataRequests": "Gegevensverzoeken",
     "badgeUnreadLeads": "{count} nieuw",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Ondersteuning",
+    "help": "Help"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -507,7 +511,10 @@
       "OAUTH_APP_SAVED": "Inlog-app opgeslagen",
       "OAUTH_APP_REPLACED": "Inlog-app vervangen",
       "OAUTH_APP_REMOVED": "Inlog-app verwijderd",
-      "NEWSLETTER_PAUSE_CLEARED": "Nieuwsbriefpauze opgeheven"
+      "NEWSLETTER_PAUSE_CLEARED": "Nieuwsbriefpauze opgeheven",
+      "MEMBER_INVITED": "Teamlid uitgenodigd",
+      "MEMBER_REMOVED": "Teamlid verwijderd",
+      "MEMBER_INVITE_CANCELLED": "Teamuitnodiging geannuleerd"
     },
     "detail": {
       "field": {
@@ -527,6 +534,7 @@
       "SUSPENSION_REASON": "Reden: {category}",
       "SUSPENSION_REFERENCE": "Referentie: {reference}",
       "PLAN": "Abonnement: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Abonnement: {from} → {to}",
       "SIGN_IN_PROVIDER": "Aanmeldprovider: {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Clientgeheim vervangen"
     }
@@ -1579,9 +1587,11 @@
       "provisioningStarted": "De inrichting van deze tenant is al gestart; de gegevens kunnen niet meer worden bewerkt.",
       "ownerAlreadyJoined": "De eigenaar van deze tenant heeft al ingelogd, dus het e-mailadres kan hier niet meer worden gecorrigeerd — dat zou in plaats daarvan het eigendom overdragen.",
       "ownerHasFreeTenant": "Deze eigenaar heeft al een gratis site. Archiveer die of laat deze site op het huidige abonnement.",
+      "planFollowsSubscription": "Deze site heeft een actief abonnement, dus het abonnement volgt Stripe. Wijzig het op de Facturatie-pagina van de eigenaar of in het Stripe-dashboard.",
       "saveFailed": "De tenantgegevens konden niet worden opgeslagen — probeer het opnieuw."
     },
-    "fieldLockedReasonCustomMainDomain": "Vergrendeld — het hoofdadres is het eigen domein. Ga op de Domein-pagina terug naar het subdomein om te bewerken."
+    "fieldLockedReasonCustomMainDomain": "Vergrendeld — het hoofdadres is het eigen domein. Ga op de Domein-pagina terug naar het subdomein om te bewerken.",
+    "fieldLockedReasonSubscribed": "Vergrendeld — deze site heeft een actief abonnement, dus het abonnement volgt Stripe. Wijzig het op de Facturatie-pagina van de eigenaar of in het Stripe-dashboard."
   },
   "tenantFieldErrors": {
     "nameRequired": "Vul een tenantnaam in.",
@@ -1699,6 +1709,8 @@
     "suspendFailed": "Kon de tenant niet opschorten — probeer het opnieuw.",
     "liftSuspensionFailed": "Kon de tenant niet opnieuw activeren — probeer het opnieuw.",
     "ownerEmailUnknown": "De eigenaar van deze tenant heeft nog geen e-mailadres vastgelegd, dus het kan niet worden geblokkeerd.",
+    "subscriptionCancelFailed": "Het Stripe-abonnement van de site kon niet worden opgezegd, dus de site is niet gearchiveerd. Probeer het opnieuw of zeg het eerst op in Stripe.",
+    "subscriptionLive": "Stripe factureert deze site nog. Zeg het abonnement op voordat je de site verwijdert.",
     "invalidInput": "Controleer de gegevens en probeer het opnieuw."
   },
   "featuresSettings": {
@@ -1728,9 +1740,32 @@
       "RATINGS": "Laat lezers berichten beoordelen.",
       "BOOKMARKS": "Laat lezers berichten bewaren om later te lezen.",
       "NEWSLETTER": "Toon het aanmeldformulier voor de nieuwsbrief op de site.",
-      "ANALYTICS": "Schakel analysetracking op de site in.",
+      "ANALYTICS": "Koppel je eigen Google Analytics of Plausible. Laat de ID leeg om geen analysetool te laden.",
       "CONSENT_BANNER": "Toon bezoekers een cookiemelding voordat niet-essentiële cookies of scripts worden geladen.",
       "CONTACT_FORM": "Toon het contactformulier op de site."
+    },
+    "analyticsProviderLabel": "Analysetool",
+    "analyticsProviderOption": {
+      "GOOGLE_ANALYTICS": "Google Analytics",
+      "PLAUSIBLE": "Plausible"
+    },
+    "analyticsIdDraftLabel": "Analyse-ID",
+    "analyticsIdEmpty": "Geen",
+    "analyticsIdLabel": {
+      "GOOGLE_ANALYTICS": "Metings-ID",
+      "PLAUSIBLE": "Sitedomein"
+    },
+    "analyticsIdHint": {
+      "GOOGLE_ANALYTICS": "Je vindt hem in Google Analytics onder Beheer, Gegevensstreams.",
+      "PLAUSIBLE": "Het domein waaronder je site in Plausible staat."
+    },
+    "analyticsIdPlaceholder": {
+      "GOOGLE_ANALYTICS": "G-A1B2C3D4E5",
+      "PLAUSIBLE": "example.com"
+    },
+    "analyticsIdInvalid": {
+      "GOOGLE_ANALYTICS": "Voer een metings-ID in: G- gevolgd door hoofdletters en cijfers, zoals G-A1B2C3D4E5.",
+      "PLAUSIBLE": "Voer alleen een domein in, zonder https:// of pad, zoals example.com."
     }
   },
   "languagePicker": {
@@ -2246,6 +2281,7 @@
     "nextPaymentLabel": "Volgende betaling",
     "nextPayment": "{amount} op <time>{date}</time>",
     "noNextPayment": "Geen gepland",
+    "planEnds": "Je abonnement eindigt op <time>{date}</time>.",
     "noPayments": "Je site heeft nog geen betalingen.",
     "invoicesTitle": "Facturen",
     "invoicesEmpty": "Nog geen facturen.",
@@ -2295,6 +2331,7 @@
     "currentPlan": "Je site zit op {plan}, {interval, select, YEARLY {per jaar} other {per maand}} betaald.",
     "pendingChange": "Je site gaat op <time>{date}</time> over naar {plan}, {interval, select, YEARLY {per jaar} other {per maand}} betaald.",
     "changeNow": "De wijziging gaat vandaag in. Je betaalt nu het verschil voor de rest van de huidige periode.",
+    "changeNowNewPeriod": "De wijziging gaat vandaag in, en daarmee begint een nieuwe {interval, select, YEARLY {jaarlijkse} other {maandelijkse}} periode. Je betaalt nu voor de nieuwe periode, min de ongebruikte tijd van je huidige.",
     "changeAtRenewal": "De wijziging gaat in op <time>{date}</time>, als de huidige periode afloopt. Tot dan verandert er niets.",
     "keepCurrentDescription": "Je site blijft op {plan} en de wijziging die voor <time>{date}</time> gepland stond, wordt geannuleerd.",
     "changeUnchanged": "Dit is je huidige abonnement. Kies een ander abonnement of een andere betaalperiode om het te wijzigen.",
@@ -2309,7 +2346,30 @@
     "billingLink": "Facturering",
     "NOT_SUBSCRIBED": "Je site heeft nog geen betaald abonnement om te wijzigen. Kies er een bij het afrekenen.",
     "NOT_ACTIVE": "Je abonnement vraagt eerst je aandacht voordat het kan wijzigen. Open Facturering om het op te lossen.",
+    "planEnds": "Je abonnement eindigt op <time>{date}</time>, dus het kan niet meer wijzigen. Wil je het houden, maak de opzegging dan ongedaan via Facturering.",
     "UNCHANGED": "Je site zit al op dit abonnement.",
     "CARD_DECLINED": "Je kaart is geweigerd, dus er is niets gewijzigd. Werk hem bij in Facturering en probeer het opnieuw."
+  },
+  "helpView": {
+    "title": "Help",
+    "description": "Stuur een bericht naar ons supportteam. We sturen je site, je abonnement en dit account automatisch mee.",
+    "helpCentre": "Helpcentrum",
+    "unavailableTitle": "Het helpformulier is niet beschikbaar",
+    "unavailableDescription": "Berichten kunnen hier nu niet worden verstuurd. Probeer het later opnieuw."
+  },
+  "helpForm": {
+    "title": "Contact met support",
+    "responseTime": "We antwoorden meestal binnen twee werkdagen.",
+    "subjectLabel": "Onderwerp",
+    "messageLabel": "Bericht",
+    "messageHint": "Vertel wat je probeerde te doen en wat er in plaats daarvan gebeurde.",
+    "required": "Vul dit in.",
+    "tooLong": "Gebruik minder dan {limit} tekens.",
+    "send": "Bericht versturen",
+    "sending": "Versturen…",
+    "sent": "Bericht verstuurd. We hebben je een kopie gemaild.",
+    "rateLimited": "Je hebt in korte tijd meerdere berichten verstuurd. Probeer het later opnieuw.",
+    "unavailable": "Het helpformulier is nu niet beschikbaar. Probeer het later opnieuw.",
+    "sendFailed": "Je bericht kon niet worden verstuurd — probeer het opnieuw."
   }
 }

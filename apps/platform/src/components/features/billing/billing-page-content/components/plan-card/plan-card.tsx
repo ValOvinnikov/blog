@@ -4,8 +4,8 @@ import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import type { TBillingNextPayment } from '@platform/server/billing/fetch-stripe-billing';
-import { formatDate } from '@platform/utils/format-date/format-date';
 import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
+import { richDate } from '@platform/utils/rich-date/rich-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { SIZE, type TMaybeUndefined } from '@shinefold/config';
@@ -19,6 +19,7 @@ export type TPlanCardProps = {
   hasPayments: boolean;
   isSubscribed: boolean;
   nextPayment?: TBillingNextPayment;
+  endsAt?: Date;
 };
 
 export const PlanCard = ({
@@ -27,6 +28,7 @@ export const PlanCard = ({
   hasPayments,
   isSubscribed,
   nextPayment,
+  endsAt,
 }: TPlanCardProps) => {
   const t = useTranslations('billingPage');
   const tPlan = useTranslations('planNames');
@@ -37,10 +39,7 @@ export const PlanCard = ({
     payment
       ? t.rich('nextPayment', {
           amount: formatStripeAmount(payment.amount, locale),
-          date: formatDate(payment.dueAt, locale),
-          time: (chunks) => (
-            <time dateTime={payment.dueAt.toISOString()}>{chunks}</time>
-          ),
+          ...richDate(payment.dueAt, locale),
         })
       : t('noNextPayment');
 
@@ -58,19 +57,22 @@ export const PlanCard = ({
       <Card.Body>
         <DetailList>
           <DetailList.Row label={t('planLabel')}>{tPlan(plan)}</DetailList.Row>
-          {hasPayments && (
+          {hasPayments && !endsAt && (
             <DetailList.Row label={t('nextPaymentLabel')}>
               {nextPaymentText(nextPayment)}
             </DetailList.Row>
           )}
         </DetailList>
+        {endsAt && <Text>{t.rich('planEnds', richDate(endsAt, locale))}</Text>}
         {!hasPayments && <Text>{t('noPayments')}</Text>}
       </Card.Body>
-      <Card.Footer>
-        <LinkButton href={adminRoutes.dashboardUpgrade()} size={SIZE.SM}>
-          {isSubscribed ? t('changePlan') : t('upgrade')}
-        </LinkButton>
-      </Card.Footer>
+      {!endsAt && (
+        <Card.Footer>
+          <LinkButton href={adminRoutes.dashboardUpgrade()} size={SIZE.SM}>
+            {isSubscribed ? t('changePlan') : t('upgrade')}
+          </LinkButton>
+        </Card.Footer>
+      )}
     </Card>
   );
 };

@@ -3,7 +3,7 @@
 import type { TSettingsRefusal } from '@platform/constants/settings';
 import { SETTINGS_FEATURES_LOG } from '@platform/constants/settings-features';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -50,13 +50,7 @@ export type TUpdateFeaturesResult =
     >
   | TNotInPlanRefusal;
 
-/**
- * A "Coming soon" capability is always written off. Switching on a toggle
- * outside `PLAN_REGISTRY[tenant.plan]` that is stored off rejects the whole
- * save; otherwise an out-of-plan toggle keeps its stored value, so a
- * downgrade loses nothing. A toggle whose parent is off can be switched
- * off but not on, so switching the parent back on restores what was kept.
- */
+/** Writes "Coming soon" capabilities off, keeps out-of-plan toggles at their stored value but refuses switching one on, and lets a toggle under an off parent be switched off, never on. */
 export const updateFeaturesAction = async (
   tenantId: string,
   input: TUpdateFeaturesInput,
@@ -66,7 +60,7 @@ export const updateFeaturesAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
   const values = withComingSoonOff(parsed.data);
 
   const entitled = PLAN_REGISTRY[tenant.plan];

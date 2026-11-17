@@ -5,7 +5,7 @@ import {
 } from '@platform/constants/billing';
 import {
   listBillingInvoices,
-  previewNextPayment,
+  previewRenewal,
   type TBillingInvoice,
 } from '@platform/server/billing/fetch-stripe-billing';
 import { getStripeClient } from '@platform/server/billing/stripe-client';
@@ -27,7 +27,7 @@ import { loadBillingOverview } from './load-billing-overview';
 vi.mock('@platform/server/billing/stripe-client');
 vi.mock('@platform/server/billing/fetch-stripe-billing', () => ({
   listBillingInvoices: vi.fn(),
-  previewNextPayment: vi.fn(),
+  previewRenewal: vi.fn(),
 }));
 
 faker.seed(6878);
@@ -37,7 +37,9 @@ const MOCK_STRIPE_FAILURE = new Error(faker.lorem.sentence());
 
 const getStripeClientMock = vi.mocked(getStripeClient);
 const listBillingInvoicesMock = vi.mocked(listBillingInvoices);
-const previewNextPaymentMock = vi.mocked(previewNextPayment);
+const previewRenewalMock = vi.mocked(previewRenewal);
+const MOCK_RENEWAL = { nextPayment: MOCK_NEXT_PAYMENT, endsAt: undefined };
+const NO_RENEWAL = { nextPayment: undefined, endsAt: undefined };
 
 const loadPaying = () =>
   loadBillingOverview(MOCK_TENANT_ID, MOCK_PAYING_TENANT_BILLING);
@@ -46,7 +48,7 @@ describe(loadBillingOverview, () => {
   beforeEach(() => {
     getStripeClientMock.mockReturnValue(MOCK_STRIPE_CLIENT);
     listBillingInvoicesMock.mockResolvedValue(MOCK_INVOICES);
-    previewNextPaymentMock.mockResolvedValue(MOCK_NEXT_PAYMENT);
+    previewRenewalMock.mockResolvedValue(MOCK_RENEWAL);
   });
 
   it('reads nothing from billing for a site with no billing account', async () => {
@@ -66,14 +68,14 @@ describe(loadBillingOverview, () => {
       MOCK_STRIPE_CLIENT,
       MOCK_STRIPE_CUSTOMER_ID,
     );
-    expect(previewNextPaymentMock).toHaveBeenCalledWith(
+    expect(previewRenewalMock).toHaveBeenCalledWith(
       MOCK_STRIPE_CLIENT,
       MOCK_STRIPE_CUSTOMER_ID,
       MOCK_STRIPE_SUBSCRIPTION_ID,
     );
     expect(overview).toEqual({
       state: BILLING_OVERVIEW_STATE.LOADED,
-      nextPayment: MOCK_NEXT_PAYMENT,
+      renewal: MOCK_RENEWAL,
       invoices: MOCK_INVOICES,
     });
   });
@@ -84,22 +86,22 @@ describe(loadBillingOverview, () => {
       stripeSubscriptionId: undefined,
     });
 
-    expect(previewNextPaymentMock).not.toHaveBeenCalled();
+    expect(previewRenewalMock).not.toHaveBeenCalled();
     expect(overview).toEqual({
       state: BILLING_OVERVIEW_STATE.LOADED,
-      nextPayment: undefined,
+      renewal: NO_RENEWAL,
       invoices: MOCK_INVOICES,
     });
   });
 
   it('keeps the invoices and logs when the next payment cannot be read', async () => {
-    previewNextPaymentMock.mockRejectedValue(MOCK_STRIPE_FAILURE);
+    previewRenewalMock.mockRejectedValue(MOCK_STRIPE_FAILURE);
 
     const overview = await loadPaying();
 
     expect(overview).toEqual({
       state: BILLING_OVERVIEW_STATE.LOADED,
-      nextPayment: undefined,
+      renewal: NO_RENEWAL,
       invoices: MOCK_INVOICES,
     });
     expect(logger.error).toHaveBeenCalledWith(

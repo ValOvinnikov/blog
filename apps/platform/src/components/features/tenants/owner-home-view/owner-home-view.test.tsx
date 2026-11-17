@@ -3,7 +3,6 @@ import {
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
 import { GET_STARTED_STEP } from '@platform/constants/get-started';
-import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import messages from '@platform/i18n/messages/en.json';
 import {
   customRenderAsync,
@@ -20,7 +19,7 @@ import {
   mockJoinedOwner,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { TENANT_PLAN } from '@shinefold/config/constants';
+import { STUDIO_ACCESS, TENANT_PLAN } from '@shinefold/config/constants';
 
 import { OwnerHomeView, type TOwnerHomeViewProps } from './owner-home-view';
 
@@ -145,7 +144,7 @@ describe(`<${OwnerHomeView.name}/>`, () => {
           [GET_STARTED_STEP.EDITOR_INVITE]: true,
           [GET_STARTED_STEP.FIRST_POST]: false,
         },
-        studioAccess: OWNER_STUDIO_ACCESS.READY,
+        studioAccess: STUDIO_ACCESS.READY,
       },
     });
 

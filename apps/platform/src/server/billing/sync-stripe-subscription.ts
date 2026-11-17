@@ -6,8 +6,10 @@ import {
 } from '@platform/constants/billing';
 import { graceBillingFields } from '@platform/server/billing/grace-billing-fields';
 import { planFromPriceKeys } from '@platform/server/billing/plan-from-price-keys';
+import { releaseSchedule } from '@platform/server/billing/release-schedule';
 import { resolveStripeTenant } from '@platform/server/billing/resolve-stripe-tenant';
 import { stripeIdOf } from '@platform/server/billing/stripe-id';
+import { subscriptionEndsAt } from '@platform/server/billing/subscription-ends-at';
 import { tenantStateFromSubscription } from '@platform/server/billing/tenant-state-from-subscription';
 import { logger } from '@platform/utils/logger/logger';
 import type { TMaybeUndefined } from '@shinefold/config';
@@ -78,6 +80,10 @@ export const syncStripeSubscription = async (
       storedSubscriptionId: billing.stripeSubscriptionId,
     });
     return undefined;
+  }
+
+  if (subscription.schedule && subscriptionEndsAt(subscription)) {
+    await releaseSchedule(stripe, stripeIdOf(subscription.schedule));
   }
 
   const state = tenantStateFromSubscription(

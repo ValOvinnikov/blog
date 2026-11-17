@@ -35,7 +35,7 @@ graph is acyclic
 - `@shinefold/db` is the only package importing the Neon/Drizzle SDKs — Postgres
   data: Auth.js users and sessions, tenants and their domains, memberships and
   invites, admins, site config, feature toggles, owner analytics ids, email
-  config and templates, subscribers, bookmarks, contact-form leads, magic-link send counters, email
+  config and templates, subscribers, bookmarks, contact-form leads, magic-link send counters, AI takeaway generation counts, email
   send and delivery-outcome counts, newsletter post-send claims, Stripe
   billing state, handled Stripe webhook event ids and the Stripe price and promotion-code catalogue, audit events and findings (comments are planned; no table exists yet). It never imports React or `@shinefold/service`
   (siblings, not dependents — `.claude/agents/db.md`), and is **imported only

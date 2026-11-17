@@ -2,19 +2,22 @@ import { BillingOverview } from '@platform/components/features/billing/billing-p
 import { BillingOverviewSkeleton } from '@platform/components/features/billing/billing-page-content/components/billing-overview-skeleton/billing-overview-skeleton';
 import { ManageBillingButton } from '@platform/components/features/billing/billing-page-content/components/manage-billing-button/manage-billing-button';
 import { PageHeader } from '@platform/components/shared/page-header';
+import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { queries } from '@shinefold/db';
-import type { TTenant } from '@shinefold/db/schema/tenants';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 
 import { billingPageContentVariants } from './billing-page-content-variants';
 
 export type TBillingPageContentProps = {
-  tenant: TTenant;
+  tenant: TPlatformTenant;
+  viewer: TPlatformViewer;
 };
 
 export const BillingPageContent = async ({
   tenant,
+  viewer,
 }: TBillingPageContentProps) => {
   const { id, plan, status } = tenant;
   const [t, billing] = await Promise.all([
@@ -29,7 +32,7 @@ export const BillingPageContent = async ({
         title={t('title')}
         description={t('description')}
         actions={
-          billing?.stripeCustomerId ? (
+          viewer.isOwner && billing?.stripeCustomerId ? (
             <ManageBillingButton tenantId={id} />
           ) : undefined
         }

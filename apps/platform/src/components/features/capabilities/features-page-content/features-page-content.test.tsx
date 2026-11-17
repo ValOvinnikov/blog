@@ -10,18 +10,28 @@ import {
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
-import { CAPABILITY, type TPresetId } from '@shinefold/config';
-import { TENANT_PLAN } from '@shinefold/config/constants';
+import {
+  CAPABILITY,
+  type TMaybeUndefined,
+  type TPresetId,
+} from '@shinefold/config';
+import { ANALYTICS_PROVIDER, TENANT_PLAN } from '@shinefold/config/constants';
+import type { TTenantAnalytics } from '@shinefold/db/queries/tenant-analytics';
+import { MOCK_GOOGLE_ANALYTICS } from '@shinefold/db/testing/tenant-analytics/fixtures';
 
 import { FeaturesPageContent } from './features-page-content';
 
-const { getSettingsFeaturesAndPresetMock } = vi.hoisted(() => ({
-  getSettingsFeaturesAndPresetMock: vi.fn<
-    (
-      tenantId: string,
-    ) => Promise<{ features?: TSettingsFeaturesValues; preset?: TPresetId }>
-  >(async () => ({})),
-}));
+const { getSettingsFeaturesAndPresetMock, getStoredTenantAnalyticsMock } =
+  vi.hoisted(() => ({
+    getSettingsFeaturesAndPresetMock: vi.fn<
+      (
+        tenantId: string,
+      ) => Promise<{ features?: TSettingsFeaturesValues; preset?: TPresetId }>
+    >(async () => ({})),
+    getStoredTenantAnalyticsMock: vi.fn<
+      (tenantId: string) => Promise<TMaybeUndefined<TTenantAnalytics>>
+    >(async () => undefined),
+  }));
 
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
@@ -29,12 +39,17 @@ vi.mock('@shinefold/db', async () => ({
     settingsFeatures: {
       getSettingsFeaturesAndPreset: getSettingsFeaturesAndPresetMock,
     },
+    tenantAnalytics: {
+      getStoredTenantAnalytics: getStoredTenantAnalyticsMock,
+    },
   },
 }));
 
 vi.mock('@platform/server/auth/auth');
 
-const { toggleLabel } = messages.featuresSettings;
+const { toggleLabel, analyticsIdLabel } = messages.featuresSettings;
+const MEASUREMENT_ID_LABEL =
+  analyticsIdLabel[ANALYTICS_PROVIDER.GOOGLE_ANALYTICS];
 
 const setup = customRenderAsync(FeaturesPageContent, {
   tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }),
@@ -43,7 +58,7 @@ const setup = customRenderAsync(FeaturesPageContent, {
 describe(`<${FeaturesPageContent.name}/>`, () => {
   it("shows the tenant's saved feature toggles", async () => {
     getSettingsFeaturesAndPresetMock.mockResolvedValueOnce({
-      features: mockSettingsFeaturesValues({ analyticsEnabled: true }),
+      features: mockSettingsFeaturesValues({ contactFormEnabled: true }),
     });
 
     await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.GROWTH }) });
@@ -51,28 +66,24 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     const bookmarksSwitch = screen.getByRole('switch', {
       name: toggleLabel[CAPABILITY.BOOKMARKS],
     });
-    const analyticsSwitch = screen.getByRole('switch', {
-      name: toggleLabel[CAPABILITY.ANALYTICS],
+    const contactFormSwitch = screen.getByRole('switch', {
+      name: toggleLabel[CAPABILITY.CONTACT_FORM],
     });
 
     expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
     );
     expect(bookmarksSwitch).not.toBeChecked();
-    expect(analyticsSwitch).toBeChecked();
+    expect(contactFormSwitch).toBeChecked();
   });
 
   it('enables the Growth-only toggles on the Growth plan', async () => {
     await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.GROWTH }) });
 
-    const analyticsSwitch = screen.getByRole('switch', {
-      name: toggleLabel[CAPABILITY.ANALYTICS],
-    });
     const readerAccountsSwitch = screen.getByRole('switch', {
       name: toggleLabel[CAPABILITY.READER_ACCOUNTS],
     });
 
-    expect(analyticsSwitch).toBeEnabled();
     expect(readerAccountsSwitch).toBeEnabled();
   });
 
@@ -80,8 +91,8 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     it('locks the Growth-only toggles', async () => {
       await setup();
 
-      const analyticsSwitch = screen.getByRole('switch', {
-        name: toggleLabel[CAPABILITY.ANALYTICS],
+      const readerAccountsSwitch = screen.getByRole('switch', {
+        name: toggleLabel[CAPABILITY.READER_ACCOUNTS],
       });
       const bookmarksSwitch = screen.getByRole('switch', {
         name: toggleLabel[CAPABILITY.BOOKMARKS],
@@ -90,25 +101,46 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
         name: toggleLabel[CAPABILITY.CONSENT_BANNER],
       });
 
-      expect(analyticsSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(readerAccountsSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(consentSwitch).toBeEnabled();
     });
 
     it('unchecks a Growth-only toggle left on by a plan downgrade', async () => {
       getSettingsFeaturesAndPresetMock.mockResolvedValueOnce({
-        features: mockSettingsFeaturesValues({ analyticsEnabled: true }),
+        features: mockSettingsFeaturesValues({ bookmarksEnabled: true }),
       });
 
       await setup();
 
-      const analyticsSwitch = screen.getByRole('switch', {
-        name: toggleLabel[CAPABILITY.ANALYTICS],
+      const bookmarksSwitch = screen.getByRole('switch', {
+        name: toggleLabel[CAPABILITY.BOOKMARKS],
       });
 
-      expect(analyticsSwitch).not.toBeChecked();
-      expect(analyticsSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(bookmarksSwitch).not.toBeChecked();
+      expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
     });
+
+    it('shows the analytics id kept from a paid plan, read-only', async () => {
+      getStoredTenantAnalyticsMock.mockResolvedValueOnce(MOCK_GOOGLE_ANALYTICS);
+
+      await setup();
+
+      const field = screen.getByRole('textbox', { name: MEASUREMENT_ID_LABEL });
+
+      expect(getStoredTenantAnalyticsMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      expect(field).toHaveValue(MOCK_GOOGLE_ANALYTICS.analyticsId);
+      expect(field).toHaveAttribute('readonly');
+    });
+  });
+
+  it('lets a Starter owner edit the analytics id', async () => {
+    await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.STARTER }) });
+
+    const field = screen.getByRole('textbox', { name: MEASUREMENT_ID_LABEL });
+
+    expect(field).toHaveValue('');
+    expect(field).not.toHaveAttribute('readonly');
   });
 
   it('shows the archived notice and offers no Save for an archived tenant', async () => {

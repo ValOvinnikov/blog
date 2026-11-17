@@ -31,8 +31,8 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/audit.ts`
 
-- **AUDIT_TARGET_TYPE**: `TENANT`, `SITE_CONFIG`, `SETTINGS_FEATURES`, `RELEASE`, `BLOCKED_SIGNUP_IDENTITY`, `PERSONAL_DATA`
-- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`, `OAUTH_APP_SAVED`, `OAUTH_APP_REPLACED`, `OAUTH_APP_REMOVED`, `NEWSLETTER_PAUSE_CLEARED`
+- **AUDIT_TARGET_TYPE**: `TENANT`, `SITE_CONFIG`, `SETTINGS_FEATURES`, `RELEASE`, `BLOCKED_SIGNUP_IDENTITY`, `PERSONAL_DATA`, `TEAM_MEMBER`
+- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`, `OAUTH_APP_SAVED`, `OAUTH_APP_REPLACED`, `OAUTH_APP_REMOVED`, `NEWSLETTER_PAUSE_CLEARED`, `MEMBER_INVITED`, `MEMBER_REMOVED`, `MEMBER_INVITE_CANCELLED`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/auth-app.ts`
 
@@ -160,7 +160,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/http-statuses.ts`
 
-- **HTTP_STATUS**: `OK`=`200`, `CREATED`=`201`, `ACCEPTED`=`202`, `NO_CONTENT`=`204`, `MOVED_PERMANENTLY`=`301`, `SEE_OTHER`=`303`, `TEMPORARY_REDIRECT`=`307`, `BAD_REQUEST`=`400`, `UNAUTHORIZED`=`401`, `PAYMENT_REQUIRED`=`402`, `FORBIDDEN`=`403`, `NOT_FOUND`=`404`, `REQUEST_TIMEOUT`=`408`, `CONFLICT`=`409`, `TOO_EARLY`=`425`, `TOO_MANY_REQUESTS`=`429`, `INTERNAL_SERVER_ERROR`=`500`, `BAD_GATEWAY`=`502`, `SERVICE_UNAVAILABLE`=`503`
+- **HTTP_STATUS**: `OK`=`200`, `CREATED`=`201`, `ACCEPTED`=`202`, `NO_CONTENT`=`204`, `MOVED_PERMANENTLY`=`301`, `SEE_OTHER`=`303`, `TEMPORARY_REDIRECT`=`307`, `BAD_REQUEST`=`400`, `UNAUTHORIZED`=`401`, `PAYMENT_REQUIRED`=`402`, `FORBIDDEN`=`403`, `NOT_FOUND`=`404`, `REQUEST_TIMEOUT`=`408`, `CONFLICT`=`409`, `UNPROCESSABLE_ENTITY`=`422`, `TOO_EARLY`=`425`, `TOO_MANY_REQUESTS`=`429`, `INTERNAL_SERVER_ERROR`=`500`, `BAD_GATEWAY`=`502`, `SERVICE_UNAVAILABLE`=`503`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/icon.ts`
 
@@ -305,6 +305,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SORT_DIRECTION**: `ASCENDING`=`"ascending"`, `DESCENDING`=`"descending"`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/studio-access.ts`
+
+- **STUDIO_ACCESS**: `INVITE_SENT`, `ACTIVATING`, `READY`, `STALLED`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/subscriber-outcome.ts`
 
 - **SUBSCRIBER_OUTCOME**: `ALREADY_PENDING`, `ALREADY_CONFIRMED`, `PENDING`, `NOT_PENDING`, `NOT_SUBSCRIBED`
@@ -368,6 +372,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **MEMBERSHIP_ROLE**: `OWNER`, `EDITOR`, `READER`
 - **MEMBERSHIP_INVITE_OUTCOME**: `CREATED`, `ALREADY_PENDING`, `ALREADY_CONSUMED`, `SEAT_LIMIT`
+- **MEMBERSHIP_REMOVAL_OUTCOME**: `REMOVED`, `NOT_FOUND`, `LAST_OWNER`, `SELF`
 
 ### `@shinefold/db/constants` — `packages/db/src/constants/newsletter.ts`
 
@@ -431,7 +436,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/activity` — `apps/platform/src/constants/activity.ts`
 
-- **ACTIVITY_DETAIL**: `CHANGED_FIELDS`, `STUDIO_INVITE_SENT`, `STUDIO_INVITE_UNSENT`, `MAIN_ADDRESS_CHANGED`, `CUSTOM_DOMAIN_REQUESTED`, `CUSTOM_DOMAIN_REMOVED`, `ADDITIONAL_LANGUAGES`, `SUSPENSION_REASON`, `SUSPENSION_REFERENCE`, `PLAN`, `SIGN_IN_PROVIDER`, `CLIENT_SECRET_REPLACED`
+- **ACTIVITY_DETAIL**: `CHANGED_FIELDS`, `STUDIO_INVITE_SENT`, `STUDIO_INVITE_UNSENT`, `MAIN_ADDRESS_CHANGED`, `CUSTOM_DOMAIN_REQUESTED`, `CUSTOM_DOMAIN_REMOVED`, `ADDITIONAL_LANGUAGES`, `SUSPENSION_REASON`, `SUSPENSION_REFERENCE`, `PLAN`, `PLAN_CHANGED`, `SIGN_IN_PROVIDER`, `CLIENT_SECRET_REPLACED`
 
 ### `@platform/constants/asset-upload` — `apps/platform/src/constants/asset-upload.ts`
 
@@ -650,10 +655,6 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **OWNER_ACCESS_LOG**: `REQUEST_FAILED`=`"owner_access.request_failed"`
 
-### `@platform/constants/owner-studio-access` — `apps/platform/src/constants/owner-studio-access.ts`
-
-- **OWNER_STUDIO_ACCESS**: `INVITE_SENT`, `ACTIVATING`, `READY`, `STALLED`
-
 ### `@platform/constants/plan-change` — `apps/platform/src/constants/plan-change.ts`
 
 - **PLAN_CHANGE_TIMING**: `NOW`, `AT_RENEWAL`, `CANCEL_PENDING`
@@ -709,7 +710,8 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/settings-features` — `apps/platform/src/constants/settings-features.ts`
 
-- **SETTINGS_FEATURES_LOG**: `PLAN_ENTITLEMENT_REJECTED`=`"settings_features.plan_entitlement_rejected"`, `UPDATE_AUDIT_FAILED`=`"settings_features.update_audit_failed"`, `UPDATE_FAILED`=`"settings_features.update_failed"`
+- **SETTINGS_FEATURES_LOG**: `PLAN_ENTITLEMENT_REJECTED`=`"settings_features.plan_entitlement_rejected"`, `UPDATE_AUDIT_FAILED`=`"settings_features.update_audit_failed"`, `UPDATE_FAILED`=`"settings_features.update_failed"`, `ANALYTICS_UPDATE_AUDIT_FAILED`=`"settings_features.analytics_update_audit_failed"`, `ANALYTICS_UPDATE_FAILED`=`"settings_features.analytics_update_failed"`
+- **ANALYTICS_FIELD_ERROR**: `ID_INVALID`
 
 ### `@platform/constants/settings-form` — `apps/platform/src/constants/settings-form.ts`
 
@@ -763,12 +765,28 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **STRIPE_KEY_MODE**: `TEST`=`"test"`, `LIVE`=`"live"`
 
+### `@platform/constants/stripe-schedule` — `apps/platform/src/constants/stripe-schedule.ts`
+
+- **STRIPE_BILLING_CYCLE_ANCHOR**: `PHASE_START`=`"phase_start"`
+- **STRIPE_SCHEDULE_END_BEHAVIOR**: `RELEASE`=`"release"`
+
+### `@platform/constants/subscription-lifecycle` — `apps/platform/src/constants/subscription-lifecycle.ts`
+
+- **SUBSCRIPTION_LIFECYCLE_LOG**: `COLLECTION_FAILED`=`"billing.subscription_collection_failed"`, `CANCEL_FAILED`=`"billing.subscription_cancel_failed"`, `LIVE_CHECK_FAILED`=`"billing.live_subscription_check_failed"`
+- **STRIPE_PAUSE_BEHAVIOR**: `VOID`=`"void"`
+
+### `@platform/constants/support` — `apps/platform/src/constants/support.ts`
+
+- **SUPPORT_FIELD_ERROR**: `REQUIRED`, `TOO_LONG`
+- **SUPPORT_LIMIT**: `SUBJECT_MAX_LENGTH`=`150`, `MESSAGE_MAX_LENGTH`=`5000`, `ORIGIN_PATH_MAX_LENGTH`=`500`, `MESSAGES_PER_WINDOW`=`5`
+- **SUPPORT_LOG**: `ADDRESS_MISSING`=`"support.address_missing"`, `SEND_FAILED`=`"support.send_failed"`, `COPY_FAILED`=`"support.copy_failed"`
+
 ### `@platform/constants/tenant` — `apps/platform/src/constants/tenant.ts`
 
 - **TENANT_FIELD_ERROR**: `CONFIRM_REQUIRED`, `NAME_MISMATCH`, `NAME_REQUIRED`, `DOMAIN_INVALID`, `DOMAIN_TAKEN`, `DOMAIN_ATTACHED_ELSEWHERE`, `DOMAIN_LOCKED`, `DOMAIN_CUSTOM_MAIN`, `SLUG_REQUIRED`, `SLUG_INVALID`, `SLUG_RESERVED`, `SLUG_TAKEN`, `EMAIL_INVALID`, `LOCALE_UNSUPPORTED`, `PLAN_UNSUPPORTED`, `OWNER_EMAIL_TAKEN`
-- **TENANT_REFUSAL**: `NOT_FOUND`, `ARCHIVED`, `ALREADY_DEPROVISIONED`, `NOT_DEPROVISIONED`, `ALREADY_IN_PROGRESS`, `NOT_ARCHIVED`, `NOT_SUSPENDED`, `PLATFORM_TENANT`, `LOCALE_IS_ADDITIONAL`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_HAS_FREE_TENANT`, `OWNER_INVITE_UNCONFIRMED`, `OWNER_EMAIL_UNKNOWN`, `STUDIO_NOT_PROVISIONED`
+- **TENANT_REFUSAL**: `NOT_FOUND`, `ARCHIVED`, `ALREADY_DEPROVISIONED`, `NOT_DEPROVISIONED`, `ALREADY_IN_PROGRESS`, `NOT_ARCHIVED`, `NOT_SUSPENDED`, `PLATFORM_TENANT`, `LOCALE_IS_ADDITIONAL`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_HAS_FREE_TENANT`, `PLAN_FOLLOWS_SUBSCRIPTION`, `OWNER_INVITE_UNCONFIRMED`, `OWNER_EMAIL_UNKNOWN`, `STUDIO_NOT_PROVISIONED`, `SUBSCRIPTION_CANCEL_FAILED`, `SUBSCRIPTION_LIVE`
 - **TENANT_DETAILS_FIELD**: `NAME`, `PRIMARY_DOMAIN`, `PLAN`, `LOCALE`, `OWNER_EMAIL`
-- **TENANT_FIELD_LOCK_KIND**: `STEP`, `RUNNING`, `SUCCEEDED`, `ARCHIVED`, `CUSTOM_MAIN_DOMAIN`
+- **TENANT_FIELD_LOCK_KIND**: `STEP`, `RUNNING`, `SUCCEEDED`, `ARCHIVED`, `CUSTOM_MAIN_DOMAIN`, `SUBSCRIBED`
 - **TENANT_LOG**: `CREATE_AUDIT_FAILED`=`"tenants.create_audit_failed"`, `CREATE_DRAFT_FAILED`=`"tenants.create_draft_failed"`, `DELETE_AUDIT_FAILED`=`"tenants.delete_audit_failed"`, `DELETE_FAILED`=`"tenants.delete_failed"`, `DOMAIN_AVAILABILITY_APEX_UNDETERMINED`=`"tenants.domain_availability_apex_undetermined"`, `DOMAIN_AVAILABILITY_CHECK_ERROR`=`"tenants.domain_availability_check_error"`, `DOMAIN_AVAILABILITY_CHECK_FAILED`=`"tenants.domain_availability_check_failed"`, `DOMAIN_AVAILABILITY_CHECK_PAGINATION_EXHAUSTED`=`"tenants.domain_availability_check_pagination_exhausted"`, `DOMAIN_AVAILABILITY_INVALID_DOMAIN`=`"tenants.domain_availability_invalid_domain"`, `OWNER_INVITE_EMAIL_FAILED`=`"tenants.owner_invite_email_failed"`, `PLAN_CHANGE_EMAIL_FAILED`=`"tenants.plan_change_email_failed"`, `PLAN_CHANGE_EMAIL_OWNER_MISSING`=`"tenants.plan_change_email_owner_missing"`, `PLAN_CHANGE_EMAIL_UNCONFIGURED`=`"tenants.plan_change_email_unconfigured"`, `PLATFORM_TENANT_REFUSED`=`"tenants.platform_tenant_refused"`, `ROOT_DOMAIN_MISSING`=`"tenants.root_domain_missing"`, `SIGN_IN_ACTIVITY_FAILED`=`"tenant.sign_in_activity_failed"`, `SIGN_IN_OWNER_LOOKUP_FAILED`=`"tenant.sign_in_owner_lookup_failed"`, `SUSPENSION_AUDIT_FAILED`=`"tenant.suspension_audit_failed"`, `SUSPENSION_BLOCK_FAILED`=`"tenant.suspension_block_failed"`, `SUSPENSION_BLOCK_UNDO_FAILED`=`"tenant.suspension_block_undo_failed"`, `SUSPENSION_CASE_DISCARD_FAILED`=`"tenant.suspension_case_discard_failed"`, `SUSPENSION_CASE_REOPEN_FAILED`=`"tenant.suspension_case_reopen_failed"`, `SUSPENSION_EMAIL_FAILED`=`"tenant.suspension_email_failed"`, `SUSPENSION_EMAIL_OWNER_MISSING`=`"tenant.suspension_email_owner_missing"`, `SUSPENSION_EMAIL_REPLY_TO_MISSING`=`"tenant.suspension_email_reply_to_missing"`, `SUSPENSION_EMAIL_UNCONFIGURED`=`"tenant.suspension_email_unconfigured"`, `SUSPENSION_SAVE_FAILED`=`"tenant.suspension_save_failed"`, `UPDATE_DETAILS_AUDIT_FAILED`=`"tenants.update_details_audit_failed"`, `UPDATE_DETAILS_FAILED`=`"tenants.update_details_failed"`, `UPDATE_LANGUAGES_AUDIT_FAILED`=`"tenants.update_languages_audit_failed"`, `UPDATE_LANGUAGES_FAILED`=`"tenants.update_languages_failed"`, `UPDATE_LANGUAGES_REJECTED`=`"tenants.update_languages_rejected"`
 - **TENANT_VISIBILITY**: `ACTIVE`, `ALL`
 
@@ -866,6 +884,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/footer` — `apps/web/src/constants/footer.ts`
 
 - **FOOTER_LOG**: `CONTENT_FETCH_FAILED`=`"footer.layout_fetch_failed"`, `SITE_CONFIG_FETCH_FAILED`=`"footer.site_config_fetch_failed"`, `POWERED_BY_UNCONFIGURED`=`"footer.powered_by_unconfigured"`
+
+### `@web/constants/generate-skim` — `apps/web/src/constants/generate-skim.ts`
+
+- **GENERATE_SKIM_LOG**: `CONFIG_MISSING`=`"generate_skim.config_missing"`, `HOST_UNRESOLVABLE`=`"generate_skim.host_unresolvable"`, `WRITE_TENANT_UNRESOLVABLE`=`"generate_skim.write_tenant_unresolvable"`, `TENANT_WRITE_CREDENTIALS_MISSING`=`"generate_skim.tenant_write_credentials_missing"`, `TENANT_NOT_ACTIVE`=`"generate_skim.tenant_not_active"`, `ALLOWANCE_USED`=`"generate_skim.allowance_used"`, `CLAIM_FAILED`=`"generate_skim.claim_failed"`, `CLAIM_RELEASE_FAILED`=`"generate_skim.claim_release_failed"`, `POST_BODY_FETCH_FAILED`=`"generate_skim.post_body_fetch_failed"`, `GENERATION_FAILED`=`"generate_skim.generation_failed"`, `WRITE_CLIENT_UNCONFIGURED`=`"generate_skim.write_client_unconfigured"`, `DRAFT_SAVE_FAILED`=`"generate_skim.draft_save_failed"`
 
 ### `@web/constants/header-style` — `apps/web/src/constants/header-style.ts`
 

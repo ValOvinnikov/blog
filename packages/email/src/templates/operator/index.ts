@@ -22,3 +22,7 @@ export {
   buildNewsletterReputationAlertEmail,
   type TNewsletterReputationAlertInput,
 } from './newsletter-reputation-alert/newsletter-reputation-alert';
+export {
+  buildSupportRequestEmail,
+  type TSupportRequestEmailInput,
+} from './support-request/support-request';
