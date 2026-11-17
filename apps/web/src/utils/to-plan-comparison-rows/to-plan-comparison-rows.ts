@@ -1,5 +1,7 @@
 import {
   CAPABILITY,
+  getModuleCapability,
+  isModuleTypeEntitled,
   MODULE_PACK_BY_TYPE,
   TENANT_PLAN,
   type TCapability,
@@ -32,13 +34,21 @@ export interface IPlanComparisonRow {
 
 export const PLAN_COMPARISON_PLANS = Object.values(TENANT_PLAN);
 
-const MODULE_TYPE_PACKS = Object.values(MODULE_PACK_BY_TYPE);
+const MODULE_TYPES = Object.keys(MODULE_PACK_BY_TYPE);
 
 const hasCapabilities = (
   plan: TTenantPlan,
   ...capabilities: TCapability[]
 ): boolean =>
   capabilities.every((capability) => PLAN_REGISTRY[plan].includes(capability));
+
+const isModuleTypeOnPlan = (type: string, plan: TTenantPlan): boolean => {
+  const capability = getModuleCapability(type);
+  return (
+    isModuleTypeEntitled(type, PLAN_ENTITLEMENTS[plan].modulePacks) &&
+    (!capability || hasCapabilities(plan, capability))
+  );
+};
 
 const PLAN_COMPARISON_READERS: Record<
   TPlanComparisonRow,
@@ -55,9 +65,7 @@ const PLAN_COMPARISON_READERS: Record<
     total: LOOK_FIELDS.length,
   }),
   [PLAN_COMPARISON_ROW.SECTION_TYPES]: (plan) =>
-    MODULE_TYPE_PACKS.filter((pack) =>
-      PLAN_ENTITLEMENTS[plan].modulePacks.includes(pack),
-    ).length,
+    MODULE_TYPES.filter((type) => isModuleTypeOnPlan(type, plan)).length,
   [PLAN_COMPARISON_ROW.OWN_ANALYTICS]: (plan) =>
     PLAN_ENTITLEMENTS[plan].hasOwnAnalytics,
   [PLAN_COMPARISON_ROW.OWN_SIGN_IN_APPS]: (plan) =>
