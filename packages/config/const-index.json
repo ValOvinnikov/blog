@@ -6008,6 +6008,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_LOCK_KIND.SUBSCRIBED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
     "NOT_OWNER": [
@@ -8917,6 +8923,14 @@
     "OWNER_HAS_FREE_TENANT": [
       {
         "ref": "TENANT_REFUSAL.OWNER_HAS_FREE_TENANT",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "PLAN_FOLLOWS_SUBSCRIPTION": [
+      {
+        "ref": "TENANT_REFUSAL.PLAN_FOLLOWS_SUBSCRIPTION",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"
