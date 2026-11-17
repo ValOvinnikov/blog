@@ -72,6 +72,10 @@ export const segmentedRadioGroupVariants = tv({
       true: {},
       false: {},
     },
+    isPlanLocked: {
+      true: {},
+      false: {},
+    },
     isWide: {
       true: { option: ['min-w-37.5'] },
     },
@@ -130,10 +134,23 @@ export const segmentedRadioGroupVariants = tv({
         ],
       },
     },
+    {
+      layout: SEGMENTED_RADIO_LAYOUT.TILES,
+      isPlanLocked: true,
+      isSelected: true,
+      class: { option: ['text-platform-muted'] },
+    },
+    {
+      layout: SEGMENTED_RADIO_LAYOUT.TILES,
+      isPlanLocked: true,
+      isSelected: false,
+      class: { option: ['text-platform-faint'] },
+    },
   ],
   defaultVariants: {
     layout: SEGMENTED_RADIO_LAYOUT.TRACK,
     isSelected: false,
     isLocked: false,
+    isPlanLocked: false,
   },
 });

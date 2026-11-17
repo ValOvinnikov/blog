@@ -56,6 +56,7 @@ export const SegmentedControl = <TValue extends string>({
     glyph: glyphSlot,
   } = segmentedControlVariants({
     isLocked: isLocked || isDisabled,
+    isPlanLocked: isLocked,
     hasGlyphs,
     layout,
   });

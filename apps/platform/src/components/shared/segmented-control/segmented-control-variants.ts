@@ -59,9 +59,16 @@ export const segmentedControlVariants = tv({
         ],
       },
     },
+    isPlanLocked: {
+      true: {
+        option: ['text-platform-faint data-[pressed]:text-platform-muted'],
+      },
+      false: {},
+    },
   },
   defaultVariants: {
     isLocked: false,
+    isPlanLocked: false,
     hasGlyphs: false,
     layout: SEGMENTED_LAYOUT.FIT,
   },

@@ -116,6 +116,12 @@ from `useSettingsFormState()`:
   the Tab order as `aria-disabled`; `isDisabled` is for a state with nothing
   to explain (→ `react-component-practices` § Accessible by construction).
   A `Button` blocked for a reason takes `isAriaDisabled`.
+- A choice control locked by the plan (segmented control, tile group,
+  select) greys its text as well as its ground: the picked option or closed
+  value in `text-platform-muted`, the rest and a select's chevron in
+  `text-platform-faint`. An archived site's disabled controls keep their own
+  faded treatment, so the plan lock is its own variant (`isPlanLocked`), never
+  folded into the disabled one.
 - `lockReason` is `undefined` or the translated reason the switch can't be
   used, set for every cause other than saving or archiving (not on the plan, the
   plan's limit reached, another setting off), each with its own key: no row is

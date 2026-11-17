@@ -1,6 +1,5 @@
 'use client';
 
-import { Radio } from '@base-ui/react/radio';
 import { RadioGroup } from '@base-ui/react/radio-group';
 import {
   SEGMENTED_RADIO_LAYOUT,
@@ -13,28 +12,19 @@ import type {
   TNamedControlAria,
 } from '@shinefold/config';
 import type { IWithClassName } from '@shinefold/config/types';
-import { useId, type ReactNode } from 'react';
+import { useId } from 'react';
 
 import {
-  OptionBody,
-  optionBodyIds,
-} from './components/option-body/option-body';
+  SegmentedRadioOption,
+  type TSegmentedRadioOption,
+} from './components/segmented-radio-option/segmented-radio-option';
 import { SelectedDescription } from './components/selected-description/selected-description';
-import { TileCheck } from './components/tile-check/tile-check';
 import {
   SEGMENTED_FADE_WIDTH_PX,
   segmentedRadioGroupVariants,
 } from './segmented-radio-group-variants';
 import { useLockedArrowFocus } from './use-locked-arrow-focus';
 import { useSelectedDescription } from './use-selected-description';
-
-type TSegmentedRadioOption<TValue extends string> = {
-  value: TValue;
-  label: string;
-  description?: string;
-  glyph?: ReactNode;
-  isWide?: boolean;
-};
 
 type TSegmentedRadioGroupProps<TValue extends string> = IWithClassName & {
   options: TSegmentedRadioOption<TValue>[];
@@ -57,7 +47,8 @@ export const SegmentedRadioGroup = <TValue extends string>({
   const idPrefix = useId();
   const { label: ariaLabel, labelledBy, describedBy } = aria;
   const isTiles = layout === SEGMENTED_RADIO_LAYOUT.TILES;
-  const isLocked = Boolean(lock.isLocked || lock.isDisabled);
+  const { isLocked: isPlanLocked = false, isDisabled = false } = lock;
+  const isLocked = isPlanLocked || isDisabled;
   const selectedIndex = options.findIndex(
     ({ value: optionValue }) => optionValue === value,
   );
@@ -94,58 +85,18 @@ export const SegmentedRadioGroup = <TValue extends string>({
         onKeyDown={onKeyDown}
         className={track()}
       >
-        {options.map(
-          (
-            {
-              value: optionValue,
-              label,
-              description: optionDescription,
-              glyph,
-              isWide,
-            },
-            index,
-          ) => {
-            const ids = optionBodyIds(idPrefix, optionValue);
-            const hasInlineDescription = Boolean(optionDescription) && !isTiles;
-            const slots = segmentedRadioGroupVariants({
-              layout,
-              isLocked,
-              isWide,
-              isSelected: optionValue === value,
-            });
-
-            return (
-              <Radio.Root
-                key={optionValue}
-                ref={setRef(index)}
-                value={optionValue}
-                nativeButton={true}
-                render={<button type="button" />}
-                aria-labelledby={ids.labelId}
-                aria-describedby={
-                  hasInlineDescription ? ids.descriptionId : undefined
-                }
-                aria-disabled={isLocked || undefined}
-                className={slots.option()}
-              >
-                <OptionBody
-                  ids={ids}
-                  label={label}
-                  description={
-                    hasInlineDescription ? optionDescription : undefined
-                  }
-                  glyph={glyph}
-                  classNames={{
-                    label: slots.optionLabel(),
-                    description: slots.optionDescription(),
-                    glyph: slots.glyph(),
-                  }}
-                />
-                {isTiles && <TileCheck className={slots.check()} />}
-              </Radio.Root>
-            );
-          },
-        )}
+        {options.map((option, index) => (
+          <SegmentedRadioOption
+            key={option.value}
+            ref={setRef(index)}
+            option={option}
+            idPrefix={idPrefix}
+            layout={layout}
+            isSelected={option.value === value}
+            isLocked={isLocked}
+            isPlanLocked={isPlanLocked}
+          />
+        ))}
       </RadioGroup>
       {hasMoreStart ? (
         <span aria-hidden="true" className={fade({ class: fadeStart() })} />
