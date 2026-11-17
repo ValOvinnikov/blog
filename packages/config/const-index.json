@@ -8378,6 +8378,30 @@
         "file": "apps/platform/src/constants/settings-features.ts"
       }
     ],
+    "settings_features.analytics_update_audit_failed": [
+      {
+        "ref": "SETTINGS_FEATURES_LOG.ANALYTICS_UPDATE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-features",
+        "file": "apps/platform/src/constants/settings-features.ts"
+      }
+    ],
+    "settings_features.analytics_update_failed": [
+      {
+        "ref": "SETTINGS_FEATURES_LOG.ANALYTICS_UPDATE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-features",
+        "file": "apps/platform/src/constants/settings-features.ts"
+      }
+    ],
+    "ID_INVALID": [
+      {
+        "ref": "ANALYTICS_FIELD_ERROR.ID_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-features",
+        "file": "apps/platform/src/constants/settings-features.ts"
+      }
+    ],
     "NOT_IN_PLAN": [
       {
         "ref": "SETTINGS_REFUSAL.NOT_IN_PLAN",

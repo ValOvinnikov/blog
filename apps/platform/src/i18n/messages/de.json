@@ -1740,9 +1740,32 @@
       "RATINGS": "Leser können Beiträge bewerten.",
       "BOOKMARKS": "Leser können Beiträge für später merken.",
       "NEWSLETTER": "Das Newsletter-Anmeldeformular auf der Website anzeigen.",
-      "ANALYTICS": "Analyse-Tracking auf der Website aktivieren.",
+      "ANALYTICS": "Verbinde dein eigenes Google Analytics oder Plausible. Lass die ID leer, um kein Analysetool zu laden.",
       "CONSENT_BANNER": "Besuchern ein Cookie-Einwilligungsbanner anzeigen, bevor nicht notwendige Cookies oder Skripte geladen werden.",
       "CONTACT_FORM": "Das Kontaktformular auf der Website anzeigen."
+    },
+    "analyticsProviderLabel": "Analysetool",
+    "analyticsProviderOption": {
+      "GOOGLE_ANALYTICS": "Google Analytics",
+      "PLAUSIBLE": "Plausible"
+    },
+    "analyticsIdDraftLabel": "Analyse-ID",
+    "analyticsIdEmpty": "Keine",
+    "analyticsIdLabel": {
+      "GOOGLE_ANALYTICS": "Mess-ID",
+      "PLAUSIBLE": "Website-Domain"
+    },
+    "analyticsIdHint": {
+      "GOOGLE_ANALYTICS": "Du findest sie in Google Analytics unter Verwaltung, Datenstreams.",
+      "PLAUSIBLE": "Die Domain, unter der deine Website in Plausible eingetragen ist."
+    },
+    "analyticsIdPlaceholder": {
+      "GOOGLE_ANALYTICS": "G-A1B2C3D4E5",
+      "PLAUSIBLE": "example.com"
+    },
+    "analyticsIdInvalid": {
+      "GOOGLE_ANALYTICS": "Gib eine Mess-ID ein: G- gefolgt von Großbuchstaben und Ziffern, zum Beispiel G-A1B2C3D4E5.",
+      "PLAUSIBLE": "Gib nur eine Domain ein, ohne https:// oder Pfad, zum Beispiel example.com."
     }
   },
   "languagePicker": {

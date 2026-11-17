@@ -1,7 +1,7 @@
 ---
 title: Consent and analytics
 status: partial
-layers: [config, db, studio, service, ui, web]
+layers: [config, db, studio, service, ui, web, platform-app]
 code:
   - packages/config/src/constants/consent-category.ts
   - packages/config/src/constants/analytics-provider.ts
@@ -22,6 +22,9 @@ code:
   - apps/web/src/modules/cookie-settings/**
   - apps/web/src/components/shared/site-analytics/**
   - apps/web/src/utils/is-web-analytics-enabled/**
+  - apps/platform/src/server/settings-features/update-analytics-action.ts
+  - apps/platform/src/utils/analytics-draft/**
+  - apps/platform/src/components/features/capabilities/**
 epics: [3774, 3726, 5037, 5029]
 ---
 
@@ -49,11 +52,11 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - `useConsentStore` also reports a `saveRevision` that every `save` advances, even one that rewrites the same choice; `save` returns the new revision.
 - `useConsentStore` turns the cookie into `UNKNOWN` (server and first render), `UNANSWERED` (missing or invalid cookie) or `ANSWERED`; `useConsent(category)` answers `GRANTED` or `DENIED` per category and exposes `grant()`.
 - Sanity `module_cookieSettings`: `brandVariant`, optional `headingBlock`, `layout`. The capability flags come from `settings_features`, cached per tenant like every other capability.
-- `tenant_analytics` (Neon): at most one row per tenant holding the owner's own analytics tool, `provider` (`ANALYTICS_PROVIDER` in `@shinefold/config`: `GOOGLE_ANALYTICS` or `PLAUSIBLE`) and `analytics_id` (a measurement id or a site domain); no row means none. `saveTenantAnalytics` stores or replaces it and `clearTenantAnalytics` removes it. The save is the only write path and checks the id per provider, because the site puts it into a script tag: Google Analytics must match `GOOGLE_ANALYTICS_ID_PATTERN` (`G-` then uppercase letters and digits), Plausible must be a bare domain (`DOMAIN_PATTERN`, lowercased); anything else throws. `getTenantAnalytics` owns the plan gate, reading `tenants.plan` itself: it returns the row only when the plan's `hasOwnAnalytics` allows (`STARTER`, `GROWTH`); on `FREE` it returns nothing and the row is kept. A caller never re-gates it on `getEffectivePlan`; when the read fails it throws and loads nothing. It hides a kept id after a downgrade, so a platform form showing that id needs an ungated read of its own. Nothing on the platform or the site reads or writes it yet.
+- `tenant_analytics` (Neon): at most one row per tenant holding the owner's own analytics tool, `provider` (`ANALYTICS_PROVIDER` in `@shinefold/config`: `GOOGLE_ANALYTICS` or `PLAUSIBLE`) and `analytics_id` (a measurement id or a site domain); no row means none. `saveTenantAnalytics` stores or replaces it and `clearTenantAnalytics` removes it. The save is the only write path and checks the id per provider, because the site puts it into a script tag: Google Analytics must match `GOOGLE_ANALYTICS_ID_PATTERN` (`G-` then uppercase letters and digits), Plausible must be a bare domain (`DOMAIN_PATTERN`, lowercased); anything else throws. `getTenantAnalytics` owns the plan gate, reading `tenants.plan` itself: it returns the row only when the plan's `hasOwnAnalytics` allows (`STARTER`, `GROWTH`); on `FREE` it returns nothing and the row is kept. A caller never re-gates it on `getEffectivePlan`; when the read fails it throws and loads nothing. `getStoredTenantAnalytics` is the ungated read for the platform's Features form, so an owner on `FREE` still sees the kept id behind the lock. The site does not read it yet.
 
 ## Configuration
 
-- **Owner or operator (platform Features)** — `CONSENT_BANNER` (in every plan) and `ANALYTICS` (`GROWTH` only). Both preset defaults are off.
+- **Owner or operator (platform Features)** — `CONSENT_BANNER` (in every plan, preset default off), and the Analytics row: a choice of Google Analytics or Plausible and the measurement id or site domain, on `STARTER` and `GROWTH`. On `FREE` the row is locked with a Starter badge and shows a kept id read-only. `updateAnalyticsAction` saves it with the rest of the page: a blank id clears it, setting one on a plan without `hasOwnAnalytics` is refused as not in the plan (clearing is not), and an id `saveTenantAnalyticsInputSchema` rejects returns `ANALYTICS_FIELD_ERROR.ID_INVALID`, which the form words with an example of the chosen provider's format. A save revalidates the site config and records a `SETTINGS_UPDATED` audit event. The stored `ANALYTICS` toggle is no longer shown; it keeps its stored value and still gates Vercel Web Analytics until the site loads the owner's tool.
 - **Operator (env)** — `WEB_ANALYTICS_ENABLED=true` is required as well; analytics loads only when the env flag and the capability both allow it.
 - **Voice** — none; banner, dialog, module, footer-link and embed-placeholder copy are fixed keys (`consent.*`). The placeholder's allow label and scope note are `consent.placeholder.allowLabel` and `consent.placeholder.scopeNote`; its settings action reuses `consent.footerSettingsLabel`.
 - **Look** — the banner, dialog and placeholder are `@shinefold/ui` molecules and follow the site's Look. Look › Footer › Cookie settings (Footer link default · Floating button · Both, every plan; stored as `COOKIE_SETTINGS_BUTTON` `HIDDEN` · `ONLY` · `SHOWN`) picks which controls reopen the dialog, read through `getFooterStyle`; `resolveCookieSettingsControls` turns the choice and the capability into the footer link and the floating button.
@@ -81,7 +84,9 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 ## Entry points
 
 - `apps/web/src/utils/consent-cookie/consent-cookie.ts` — `encodeConsent`, `decodeConsent`
-- `packages/db/src/queries/tenant-analytics/` — `getTenantAnalytics`, `saveTenantAnalytics`, `clearTenantAnalytics`
+- `packages/db/src/queries/tenant-analytics/` — `getTenantAnalytics`, `getStoredTenantAnalytics`, `saveTenantAnalytics`, `clearTenantAnalytics`
+- `apps/platform/src/server/settings-features/update-analytics-action.ts`
+- `apps/platform/src/components/features/capabilities/features-settings/components/analytics-setting-row/analytics-setting-row.tsx`
 - `apps/web/src/hooks/use-consent-store/use-consent-store.ts`
 - `apps/web/src/hooks/use-consent/use-consent.ts`
 - `apps/web/src/components/shared/consent-gate/consent-gate.tsx`
@@ -100,6 +105,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 
 - `apps/web/src/utils/consent-cookie/consent-cookie.test.ts`, `use-consent.test.tsx`, `use-consent-store.test.tsx`, `consent-gate.test.tsx`, `consent-preferences-provider.test.tsx`, `consent-banner-slot.test.tsx`, `consent-preferences-dialog.test.tsx`, `cookie-settings-form.test.tsx`, `cookie-settings-module.test.tsx`, `cookie-settings-button.test.tsx`, `floating-cookie-settings-button.test.tsx`, `site-analytics.test.tsx`, `is-web-analytics-enabled.test.ts`.
 - `packages/db/src/queries/tenant-analytics/**/*.test.ts`.
+- `apps/platform/src/server/settings-features/update-analytics-action.test.ts`, `features-settings.test.tsx`, `features-page-content.test.tsx`.
 - `packages/ui/src/components/molecules/consent-*/**/*.test.tsx`.
 - Stories: `consent-banner.stories.tsx`, `consent-preferences.stories.tsx`, `consent-placeholder.stories.tsx` (ui); `cookie-settings-module-view.stories.tsx` (web).
 
@@ -112,4 +118,5 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - #5029 — the cookie-settings dialog title is dialog-size again (#5046 manual test).
 - #6505 — the banner's cookie-statement link, the cookie list and the cookie-preferences link.
 - #7150 — a tenant stores its analytics provider and id (epic #7149).
+- #7151 — the owner enters their analytics id in place of the Analytics switch (epic #7149).
 - #6743 — owners choose the footer link, the floating button or both; with the banner off neither shows.
