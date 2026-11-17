@@ -3,7 +3,7 @@ import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email
 
 export const OWNER_GRACE_EMAIL_COPY_ES: TOwnerGraceEmailCopy = {
   upgradeAnyTime:
-    'Puede mejorar su plan en cualquier momento para volver a activarlas.',
+    'No se ha eliminado nada. Puede mejorar su plan en cualquier momento para volver a activar sus funciones.',
   keepAsTheyAre: (date) =>
     `Mejore su plan antes del ${date} para mantenerlo todo como está.`,
   memberLock: ({ count, date }) =>

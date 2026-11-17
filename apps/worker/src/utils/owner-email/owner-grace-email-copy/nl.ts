@@ -2,7 +2,8 @@ import { GRACE_EMAIL } from '@shinefold/db/constants';
 import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 
 export const OWNER_GRACE_EMAIL_COPY_NL: TOwnerGraceEmailCopy = {
-  upgradeAnyTime: 'Je kunt op elk moment upgraden om ze weer aan te zetten.',
+  upgradeAnyTime:
+    'Er is niets verwijderd. Je kunt op elk moment upgraden om de functies van je abonnement weer aan te zetten.',
   keepAsTheyAre: (date) =>
     `Upgrade vóór ${date} om alles te houden zoals het is.`,
   memberLock: ({ count, date }) =>
