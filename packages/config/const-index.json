@@ -770,6 +770,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.READER_ACCOUNTS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
       }
     ],
     "COMMENTS": [
@@ -826,6 +832,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.CONTACT_FORM",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
       }
     ],
     "WIDE": [
@@ -6320,6 +6332,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.CUSTOM_DOMAIN",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
       }
     ],
     "SUBDOMAIN": [
@@ -10389,6 +10407,70 @@
     "pricing_module.promotion_code_fetch_failed": [
       {
         "ref": "PRICING_LOG.PROMOTION_CODE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "LANGUAGES": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.LANGUAGES",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "SEATS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.SEATS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "NO_POWERED_BY_MARK": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.NO_POWERED_BY_MARK",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "LOOK_SETTINGS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.LOOK_SETTINGS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "SECTION_TYPES": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.SECTION_TYPES",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "OWN_ANALYTICS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.OWN_ANALYTICS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "OWN_SIGN_IN_APPS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.OWN_SIGN_IN_APPS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "NEWSLETTER_SUBSCRIBERS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.NEWSLETTER_SUBSCRIBERS",
         "scope": "app:web",
         "from": "@web/constants/pricing",
         "file": "apps/web/src/constants/pricing.ts"

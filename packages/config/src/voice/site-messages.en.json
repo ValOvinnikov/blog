@@ -310,6 +310,32 @@
     "promo": {
       "once": "on your first payment",
       "repeating": "for {months, plural, one {# month} other {# months}}"
+    },
+    "compare": {
+      "heading": "Compare plans",
+      "feature": "Feature",
+      "included": "Included",
+      "notIncluded": "Not included",
+      "all": "All",
+      "share": "{count} of {total}",
+      "plans": {
+        "FREE": "Free",
+        "STARTER": "Starter",
+        "GROWTH": "Growth"
+      },
+      "rows": {
+        "LANGUAGES": "Languages",
+        "SEATS": "Team members",
+        "CUSTOM_DOMAIN": "Your own domain",
+        "NO_POWERED_BY_MARK": "No “Powered by” mark",
+        "LOOK_SETTINGS": "Look settings",
+        "SECTION_TYPES": "Page section types",
+        "OWN_ANALYTICS": "Your own analytics tool",
+        "OWN_SIGN_IN_APPS": "Your own sign-in apps",
+        "CONTACT_FORM": "Contact form",
+        "READER_ACCOUNTS": "Reader accounts and bookmarks",
+        "NEWSLETTER_SUBSCRIBERS": "Newsletter subscribers included"
+      }
     }
   },
   "consent": {
