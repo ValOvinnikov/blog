@@ -10264,6 +10264,14 @@
         "file": "apps/web/src/constants/email-usage.ts"
       }
     ],
+    "email_usage.webhook_event_untagged": [
+      {
+        "ref": "EMAIL_USAGE_LOG.WEBHOOK_EVENT_UNTAGGED",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
     "email_usage.webhook_site_unknown": [
       {
         "ref": "EMAIL_USAGE_LOG.WEBHOOK_SITE_UNKNOWN",

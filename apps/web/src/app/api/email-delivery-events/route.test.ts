@@ -5,7 +5,12 @@ import {
   HTTP_STATUS,
 } from '@shinefold/config/constants';
 import { EMAIL_DELIVERY_OUTCOME } from '@shinefold/db/constants';
-import { SITE_EMAIL_TAG_NAME } from '@shinefold/email';
+import {
+  buildOwnerNoticeEmailTag,
+  buildPlatformEmailTag,
+  SITE_EMAIL_TAG_NAME,
+  type TEmailTag,
+} from '@shinefold/email';
 import { errorResult, okResult } from '@shinefold/utils';
 import {
   EMAIL_USAGE_LOG,
@@ -134,12 +139,33 @@ describe(POST, () => {
     },
   );
 
-  it('acknowledges an untagged event without recording or logging it', async () => {
-    const response = await POST(signedRequest(eventBody(undefined, {})));
+  it.each<[string, TEmailTag]>([
+    ['platform', buildPlatformEmailTag()],
+    ['owner-notice', buildOwnerNoticeEmailTag()],
+  ])(
+    'acknowledges a %s event without recording or logging it',
+    async (_case, { name, value }) => {
+      const response = await POST(
+        signedRequest(eventBody(undefined, { [name]: value })),
+      );
+
+      expect(response.status).toBe(HTTP_STATUS.OK);
+      expect(recordEmailDeliveryOutcomeMock).not.toHaveBeenCalled();
+      expect(logger.warn).not.toHaveBeenCalled();
+    },
+  );
+
+  it('acknowledges an untagged event, warning once', async () => {
+    const response = await POST(
+      signedRequest(eventBody(RESEND_DELIVERY_EVENT_TYPE.BOUNCED, {})),
+    );
 
     expect(response.status).toBe(HTTP_STATUS.OK);
     expect(recordEmailDeliveryOutcomeMock).not.toHaveBeenCalled();
-    expect(logger.warn).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
+      EMAIL_USAGE_LOG.WEBHOOK_EVENT_UNTAGGED,
+      { eventId: MOCK_EVENT_ID, outcome: EMAIL_DELIVERY_OUTCOME.BOUNCED },
+    );
   });
 
   it('acknowledges an event whose site tag is not a site id, warning once', async () => {

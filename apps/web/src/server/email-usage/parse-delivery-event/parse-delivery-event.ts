@@ -3,7 +3,12 @@ import {
   EMAIL_DELIVERY_OUTCOME,
   type TEmailDeliveryOutcome,
 } from '@shinefold/db/constants';
-import { SITE_EMAIL_TAG_NAME } from '@shinefold/email';
+import {
+  OWNER_NOTICE_EMAIL_TAG_NAME,
+  PLATFORM_EMAIL_TAG_NAME,
+  SITE_EMAIL_TAG_NAME,
+} from '@shinefold/email';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { RESEND_DELIVERY_EVENT_TYPE } from '@web/constants/email-usage';
 import { z } from 'zod';
 
@@ -23,9 +28,15 @@ const deliveryEventSchema = deliveryEventTypeSchema.extend({
   }),
 });
 
+const UNCOUNTED_EMAIL_TAG_NAMES = [
+  PLATFORM_EMAIL_TAG_NAME,
+  OWNER_NOTICE_EMAIL_TAG_NAME,
+];
+
 export interface IDeliveryEvent {
   outcome: TEmailDeliveryOutcome;
   siteTag: TMaybeUndefined<string>;
+  isUncountedMail: boolean;
 }
 
 export const isDeliveryOutcomeEvent = (payload: unknown): boolean =>
@@ -42,6 +53,9 @@ export const parseDeliveryEvent = (
   return {
     outcome: OUTCOME_BY_EVENT_TYPE[type],
     siteTag: data.tags?.[SITE_EMAIL_TAG_NAME],
+    isUncountedMail: UNCOUNTED_EMAIL_TAG_NAMES.some(
+      (name) => !isUndefined(data.tags?.[name]),
+    ),
   };
 };
 
