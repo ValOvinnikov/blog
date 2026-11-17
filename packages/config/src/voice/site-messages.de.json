@@ -310,6 +310,33 @@
     "promo": {
       "once": "auf deine erste Zahlung",
       "repeating": "für {months, plural, one {# Monat} other {# Monate}}"
+    },
+    "compare": {
+      "heading": "Pläne vergleichen",
+      "feature": "Funktion",
+      "included": "Enthalten",
+      "notIncluded": "Nicht enthalten",
+      "all": "Alle",
+      "share": "{count} von {total}",
+      "plans": {
+        "FREE": "Free",
+        "STARTER": "Starter",
+        "GROWTH": "Growth"
+      },
+      "rows": {
+        "LANGUAGES": "Sprachen",
+        "SEATS": "Teammitglieder",
+        "CUSTOM_DOMAIN": "Eigene Domain",
+        "NO_POWERED_BY_MARK": "Kein „Powered by“-Hinweis",
+        "LOOK_SETTINGS": "Look-Einstellungen",
+        "SECTION_TYPES": "Arten von Seitenabschnitten",
+        "OWN_ANALYTICS": "Eigenes Analyse-Tool",
+        "OWN_SIGN_IN_APPS": "Eigene Anmelde-Apps",
+        "CONTACT_FORM": "Kontaktformular",
+        "READER_ACCOUNTS": "Leserkonten und Lesezeichen",
+        "NEWSLETTER_SUBSCRIBERS": "Enthaltene Newsletter-Abonnenten",
+        "TAKEAWAYS_PER_MONTH": "KI-Kernaussagen pro Monat"
+      }
     }
   },
   "consent": {

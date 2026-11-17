@@ -111,6 +111,7 @@ const meta = {
     footnote: undefined,
     ctaButtons: [],
     contentAlignment: undefined,
+    hasPlanComparison: false,
     titleId: 'pricing-title',
     dataTestId: 'pricing-module-pricing-1',
   },
@@ -204,6 +205,7 @@ export const ThreeTiersPhone: TStory = {
 
 export const LinkedPlanLivePrice: TStory = {
   args: {
+    hasPlanComparison: true,
     panels: panelsFor([
       tiers[0]!,
       mockLinkedPricingTier(PRICE_PERIOD.MONTH, {
@@ -215,4 +217,9 @@ export const LinkedPlanLivePrice: TStory = {
       }),
     ]),
   },
+};
+
+export const LinkedPlanComparisonPhone: TStory = {
+  ...LinkedPlanLivePrice,
+  globals: { viewport: 'mobile' },
 };

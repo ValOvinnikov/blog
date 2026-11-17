@@ -310,6 +310,33 @@
     "promo": {
       "once": "en tu primer pago",
       "repeating": "durante {months, plural, one {# mes} other {# meses}}"
+    },
+    "compare": {
+      "heading": "Compara los planes",
+      "feature": "Función",
+      "included": "Incluido",
+      "notIncluded": "No incluido",
+      "all": "Todos",
+      "share": "{count} de {total}",
+      "plans": {
+        "FREE": "Free",
+        "STARTER": "Starter",
+        "GROWTH": "Growth"
+      },
+      "rows": {
+        "LANGUAGES": "Idiomas",
+        "SEATS": "Miembros del equipo",
+        "CUSTOM_DOMAIN": "Tu propio dominio",
+        "NO_POWERED_BY_MARK": "Sin la marca «Powered by»",
+        "LOOK_SETTINGS": "Ajustes de Look",
+        "SECTION_TYPES": "Tipos de sección de página",
+        "OWN_ANALYTICS": "Tu propia herramienta de analítica",
+        "OWN_SIGN_IN_APPS": "Tus propias apps de inicio de sesión",
+        "CONTACT_FORM": "Formulario de contacto",
+        "READER_ACCOUNTS": "Cuentas de lectores y marcadores",
+        "NEWSLETTER_SUBSCRIBERS": "Suscriptores del boletín incluidos",
+        "TAKEAWAYS_PER_MONTH": "Resúmenes con IA al mes"
+      }
     }
   },
   "consent": {

@@ -1,5 +1,6 @@
 import {
   CAPABILITY,
+  getModuleCapability,
   getModulePack,
   isModuleTypeEntitled,
   MODULE_PACK,
@@ -14,11 +15,6 @@ export type TRequirement =
 export type TEntitlementState = {
   enabledCapabilities?: readonly TCapability[];
   entitledModulePacks: readonly TModulePack[];
-};
-
-const CAPABILITY_BY_TYPE: Readonly<Record<string, TCapability>> = {
-  module_newsletter: CAPABILITY.NEWSLETTER,
-  module_contactForm: CAPABILITY.CONTACT_FORM,
 };
 
 const CAPABILITY_LABEL: Readonly<Record<TCapability, string>> = {
@@ -53,7 +49,7 @@ const getMissingCapability = (
   typeName: string,
   enabledCapabilities: TEntitlementState['enabledCapabilities'],
 ): TMaybeNull<TCapability> => {
-  const required = CAPABILITY_BY_TYPE[typeName];
+  const required = getModuleCapability(typeName);
 
   if (!required || !enabledCapabilities) {
     return null;

@@ -956,6 +956,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **PRICING_LOG**: `MODULE_FETCH_FAILED`=`"pricing_module.fetch_failed"`, `SITE_SETTINGS_FAILED`=`"pricing_module.site_settings_failed"`, `PLAN_PRICES_FETCH_FAILED`=`"pricing_module.plan_prices_fetch_failed"`, `PROMOTION_CODE_LOOKUP_FAILED`=`"pricing_module.promotion_code_lookup_failed"`, `PROMOTION_CODE_FETCH_FAILED`=`"pricing_module.promotion_code_fetch_failed"`
 - **PRICING_SEARCH_PARAM**: `PROMO`=`"promo"`
+- **PLAN_COMPARISON_ROW**: `LANGUAGES`, `SEATS`, `CUSTOM_DOMAIN`, `NO_POWERED_BY_MARK`, `LOOK_SETTINGS`, `SECTION_TYPES`, `OWN_ANALYTICS`, `OWN_SIGN_IN_APPS`, `CONTACT_FORM`, `READER_ACCOUNTS`, `NEWSLETTER_SUBSCRIBERS`, `TAKEAWAYS_PER_MONTH`
 
 ### `@web/constants/proxy` — `apps/web/src/constants/proxy.ts`
 

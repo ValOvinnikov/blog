@@ -310,6 +310,33 @@
     "promo": {
       "once": "op je eerste betaling",
       "repeating": "gedurende {months, plural, one {# maand} other {# maanden}}"
+    },
+    "compare": {
+      "heading": "Abonnementen vergelijken",
+      "feature": "Functie",
+      "included": "Inbegrepen",
+      "notIncluded": "Niet inbegrepen",
+      "all": "Alle",
+      "share": "{count} van {total}",
+      "plans": {
+        "FREE": "Free",
+        "STARTER": "Starter",
+        "GROWTH": "Growth"
+      },
+      "rows": {
+        "LANGUAGES": "Talen",
+        "SEATS": "Teamleden",
+        "CUSTOM_DOMAIN": "Je eigen domein",
+        "NO_POWERED_BY_MARK": "Geen ‘Powered by’-vermelding",
+        "LOOK_SETTINGS": "Look-instellingen",
+        "SECTION_TYPES": "Soorten paginasecties",
+        "OWN_ANALYTICS": "Je eigen analysetool",
+        "OWN_SIGN_IN_APPS": "Je eigen inlogapps",
+        "CONTACT_FORM": "Contactformulier",
+        "READER_ACCOUNTS": "Lezersaccounts en bladwijzers",
+        "NEWSLETTER_SUBSCRIBERS": "Inbegrepen nieuwsbriefabonnees",
+        "TAKEAWAYS_PER_MONTH": "AI-kernpunten per maand"
+      }
     }
   },
   "consent": {

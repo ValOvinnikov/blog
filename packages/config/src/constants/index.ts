@@ -56,6 +56,7 @@ export * from './newsletter-result';
 export * from './oauth-provider';
 export * from './operator-alert';
 export * from './path';
+export * from './plan-comparison';
 export * from './portable-text-block-type';
 export * from './preset';
 export * from './preset-registry';
