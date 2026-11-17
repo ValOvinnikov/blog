@@ -4,6 +4,7 @@ import { getMemberStudioAccess } from '@shinefold/db/queries/memberships/get-mem
 import type { TMemberStudioAccess } from '@shinefold/db/queries/memberships/member-studio-access';
 import * as schema from '@shinefold/db/schema';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
 import { insertTestMember } from '@shinefold/db/testing/memberships/fixtures';
 import {
   mockMemberStudioAccess,
@@ -114,6 +115,20 @@ describe(setMemberStudioAccess, () => {
       const stored = await getMemberStudioAccess(tenant().id, id);
       expect(stored?.access).toEqual(access);
     });
+  });
+
+  it('records against a locked member', async () => {
+    const { id } = await insertTestMember(
+      db(),
+      tenant().id,
+      faker.internet.email(),
+      { lockedAt: MOCK_NOW },
+    );
+    const access = mockMemberStudioAccess();
+
+    await expect(
+      setMemberStudioAccess(tenant().id, id, access),
+    ).resolves.toEqual({ ok: true, data: access });
   });
 
   it('reports DB_NOT_FOUND for an id that is not a UUID', async () => {
