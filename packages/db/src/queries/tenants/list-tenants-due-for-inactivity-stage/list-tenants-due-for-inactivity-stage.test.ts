@@ -1,6 +1,11 @@
 import {
+  SELLABLE_TENANT_PLANS,
+  TENANT_PLAN,
+} from '@shinefold/config/constants';
+import {
   INACTIVITY_STAGE,
   INACTIVITY_STAGE_DAY,
+  SUSPENSION_REASON,
   WRITABLE_TENANT_STATUSES,
   TENANT_STATUS,
   type TInactivityStage,
@@ -12,6 +17,7 @@ import * as schema from '@shinefold/db/schema';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { mockStripeIds } from '@shinefold/db/testing/tenants/billing';
 import {
   daysAfterLastActivity,
   MOCK_LAST_ACTIVITY_AT,
@@ -32,6 +38,35 @@ const MOCK_DAY_22 = daysAfterLastActivity(
 const MOCK_DAY_30 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.SUSPENSION);
 const MOCK_DAY_50 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.DELETION_NOTICE);
 const MOCK_DAY_60 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.DEPROVISIONING);
+
+const MOCK_STAGE_DAY: Record<TInactivityStage, Date> = {
+  [INACTIVITY_STAGE.SUSPENSION_WARNING]: MOCK_DAY_23,
+  [INACTIVITY_STAGE.SUSPENSION]: MOCK_DAY_30,
+  [INACTIVITY_STAGE.DELETION_NOTICE]: MOCK_DAY_50,
+  [INACTIVITY_STAGE.DEPROVISIONING]: MOCK_DAY_60,
+};
+
+const MOCK_SUSPENDED_FOR_INACTIVITY = {
+  status: TENANT_STATUS.SUSPENDED,
+  suspensionReason: SUSPENSION_REASON.INACTIVITY,
+  inactivityWarnedAt: MOCK_DAY_23,
+  suspendedAt: MOCK_DAY_30,
+};
+
+const MOCK_STAGE_STATE: Record<
+  TInactivityStage,
+  Partial<typeof schema.tenants.$inferInsert>
+> = {
+  [INACTIVITY_STAGE.SUSPENSION_WARNING]: {},
+  [INACTIVITY_STAGE.SUSPENSION]: { inactivityWarnedAt: MOCK_DAY_23 },
+  [INACTIVITY_STAGE.DELETION_NOTICE]: MOCK_SUSPENDED_FOR_INACTIVITY,
+  [INACTIVITY_STAGE.DEPROVISIONING]: {
+    ...MOCK_SUSPENDED_FOR_INACTIVITY,
+    deletionNotifiedAt: MOCK_DAY_50,
+  },
+};
+
+const MOCK_STAGES = Object.values(INACTIVITY_STAGE);
 
 const MOCK_STAMPED_STAGES: [TStampedInactivityStage, Date][] = [
   [INACTIVITY_STAGE.SUSPENSION_WARNING, MOCK_DAY_23],
@@ -112,7 +147,59 @@ describe(listTenantsDueForInactivityStage, () => {
     },
   );
 
-  it.each(Object.values(INACTIVITY_STAGE))(
+  it.each(
+    SELLABLE_TENANT_PLANS.flatMap((plan) =>
+      MOCK_STAGES.map((stage) => [plan, stage] as const),
+    ),
+  )(
+    'never returns a subscribed %s tenant at the %s stage',
+    async (plan, stage) => {
+      await insertTestTenant(db(), {
+        plan,
+        stripeSubscriptionId: mockStripeIds().stripeSubscriptionId,
+        lastActivityAt: MOCK_LAST_ACTIVITY_AT,
+        ...MOCK_STAGE_STATE[stage],
+      });
+
+      const due = await dueIds(stage, MOCK_STAGE_DAY[stage]);
+
+      expect(due).toEqual([]);
+    },
+  );
+
+  it.each(MOCK_STAGES)(
+    'returns a trial tenant with no subscription at the %s stage',
+    async (stage) => {
+      const tenant = await insertTestTenant(db(), {
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.TRIAL,
+        lastActivityAt: MOCK_LAST_ACTIVITY_AT,
+        ...MOCK_STAGE_STATE[stage],
+      });
+
+      const due = await dueIds(stage, MOCK_STAGE_DAY[stage]);
+
+      expect(due).toEqual([tenant.id]);
+    },
+  );
+
+  it.each(MOCK_STAGES)(
+    'returns a Free tenant whose subscription was cancelled at the %s stage',
+    async (stage) => {
+      const tenant = await insertTestTenant(db(), {
+        plan: TENANT_PLAN.FREE,
+        stripeSubscriptionId: mockStripeIds().stripeSubscriptionId,
+        lastActivityAt: MOCK_LAST_ACTIVITY_AT,
+        ...MOCK_STAGE_STATE[stage],
+      });
+
+      const due = await dueIds(stage, MOCK_STAGE_DAY[stage]);
+
+      expect(due).toEqual([tenant.id]);
+    },
+  );
+
+  it.each(MOCK_STAGES)(
     'never returns an archived tenant at the %s stage',
     async (stage) => {
       await insertTestTenant(db(), {
