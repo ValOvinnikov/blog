@@ -22,7 +22,10 @@ export default async function SignUpPage() {
   return (
     <SignUpView
       providerIds={getEnabledOAuthProviderIds()}
-      legalPageUrls={toLegalPageUrls(env.TENANT_ROOT_DOMAIN)}
+      legalPageUrls={toLegalPageUrls({
+        marketingSiteUrl: env.MARKETING_SITE_URL,
+        rootDomain: env.TENANT_ROOT_DOMAIN,
+      })}
     />
   );
 }

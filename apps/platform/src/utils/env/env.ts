@@ -41,6 +41,8 @@ export const env = createEnv({
       .regex(DOMAIN_PATTERN)
       .optional(),
     // @env-optional
+    MARKETING_SITE_URL: z.string().url().optional(),
+    // @env-optional
     VERCEL_API_TOKEN: z.string().min(1).optional(),
     // The one shared `apps/web` project every tenant's custom domain is added to.
     // @env-required: development, production
@@ -95,6 +97,7 @@ export const env = createEnv({
     WORKER_ENQUEUE_URL: process.env.WORKER_ENQUEUE_URL,
     WORKER_ENQUEUE_SECRET: process.env.WORKER_ENQUEUE_SECRET,
     TENANT_ROOT_DOMAIN: process.env.TENANT_ROOT_DOMAIN,
+    MARKETING_SITE_URL: process.env.MARKETING_SITE_URL,
     VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,
     VERCEL_PROJECT_ID_WEB: process.env.VERCEL_PROJECT_ID_WEB,
     VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,

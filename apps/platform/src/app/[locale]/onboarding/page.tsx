@@ -28,7 +28,10 @@ export default async function OnboardingPage() {
     >
       <OnboardingView
         rootDomain={env.TENANT_ROOT_DOMAIN}
-        legalPageUrls={toLegalPageUrls(env.TENANT_ROOT_DOMAIN)}
+        legalPageUrls={toLegalPageUrls({
+          marketingSiteUrl: env.MARKETING_SITE_URL,
+          rootDomain: env.TENANT_ROOT_DOMAIN,
+        })}
         initialLocale={isLocaleIsoCode(locale) ? locale : LOCALE_ISO_CODES.EN}
         accountEmail={accountEmail}
       />

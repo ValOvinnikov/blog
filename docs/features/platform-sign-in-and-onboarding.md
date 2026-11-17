@@ -84,9 +84,13 @@ site as a 14-day Growth trial, with no card.
 - `/signup`: the same card, titled "Create an account", with the same
   provider buttons and email field (`SignInOptions` with `isSignUp`), then the
   note "By continuing, you agree to the Terms of Service and the Privacy
-  Policy", linked at `https://<TENANT_ROOT_DOMAIN>/terms` and `/privacy`
-  (`routes.terms()` and `routes.privacy()` in `@shinefold/config`; the marketing
-  site serves them), or named as plain text without a root domain. No
+  Policy", linked by `toLegalPageUrls` at the marketing site's by-kind
+  redirect, `<MARKETING_SITE_URL>/api/legal-page/TERMS` and
+  `/PRIVACY_POLICY` (`routes.legalPageByKind()` in `@shinefold/config`). With
+  `MARKETING_SITE_URL` unset they fall back to the `TENANT_ROOT_DOMAIN` apex,
+  `https://<TENANT_ROOT_DOMAIN>/api/legal-page/…`; with neither set they are
+  named as plain text. Onboarding's review-step terms checkbox links the same
+  two URLs. No
   checkbox and no separate step: choosing a provider or sending a link runs
   `setSignupTermsCookie` first, which checks Vercel BotID at its free Basic
   level and sets the `SIGNUP_TERMS_COOKIE_NAME` cookie to `TERMS_VERSION` for
@@ -400,7 +404,8 @@ site as a 14-day Growth trial, with no card.
 - Env: `AUTH_SECRET`, `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`,
   `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `RESEND_PLATFORM_API_KEY`,
   `MAGIC_LINK_FROM_ADDRESS`, `KV_REST_API_URL`/`KV_REST_API_TOKEN` (the
-  Create site gate's counts), `OPERATOR_ALERT_FROM_ADDRESS`.
+  Create site gate's counts), `OPERATOR_ALERT_FROM_ADDRESS`,
+  `MARKETING_SITE_URL` and `TENANT_ROOT_DOMAIN` (the legal links).
 
 ## Entry points
 
