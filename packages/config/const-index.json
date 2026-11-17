@@ -8742,6 +8742,22 @@
         "file": "apps/platform/src/constants/stripe-key-mode.ts"
       }
     ],
+    "phase_start": [
+      {
+        "ref": "STRIPE_BILLING_CYCLE_ANCHOR.PHASE_START",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-schedule",
+        "file": "apps/platform/src/constants/stripe-schedule.ts"
+      }
+    ],
+    "release": [
+      {
+        "ref": "STRIPE_SCHEDULE_END_BEHAVIOR.RELEASE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-schedule",
+        "file": "apps/platform/src/constants/stripe-schedule.ts"
+      }
+    ],
     "CONFIRM_REQUIRED": [
       {
         "ref": "TENANT_FIELD_ERROR.CONFIRM_REQUIRED",
