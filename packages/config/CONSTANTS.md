@@ -31,8 +31,8 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/audit.ts`
 
-- **AUDIT_TARGET_TYPE**: `TENANT`, `SITE_CONFIG`, `SETTINGS_FEATURES`, `RELEASE`, `BLOCKED_SIGNUP_IDENTITY`, `PERSONAL_DATA`
-- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`, `OAUTH_APP_SAVED`, `OAUTH_APP_REPLACED`, `OAUTH_APP_REMOVED`, `NEWSLETTER_PAUSE_CLEARED`
+- **AUDIT_TARGET_TYPE**: `TENANT`, `SITE_CONFIG`, `SETTINGS_FEATURES`, `RELEASE`, `BLOCKED_SIGNUP_IDENTITY`, `PERSONAL_DATA`, `TEAM_MEMBER`
+- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`, `OAUTH_APP_SAVED`, `OAUTH_APP_REPLACED`, `OAUTH_APP_REMOVED`, `NEWSLETTER_PAUSE_CLEARED`, `MEMBER_INVITED`, `MEMBER_REMOVED`, `MEMBER_INVITE_CANCELLED`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/auth-app.ts`
 
@@ -305,6 +305,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SORT_DIRECTION**: `ASCENDING`=`"ascending"`, `DESCENDING`=`"descending"`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/studio-access.ts`
+
+- **STUDIO_ACCESS**: `INVITE_SENT`, `ACTIVATING`, `READY`, `STALLED`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/subscriber-outcome.ts`
 
 - **SUBSCRIBER_OUTCOME**: `ALREADY_PENDING`, `ALREADY_CONFIRMED`, `PENDING`, `NOT_PENDING`, `NOT_SUBSCRIBED`
@@ -368,6 +372,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **MEMBERSHIP_ROLE**: `OWNER`, `EDITOR`, `READER`
 - **MEMBERSHIP_INVITE_OUTCOME**: `CREATED`, `ALREADY_PENDING`, `ALREADY_CONSUMED`, `SEAT_LIMIT`
+- **MEMBERSHIP_REMOVAL_OUTCOME**: `REMOVED`, `NOT_FOUND`, `LAST_OWNER`, `SELF`
 
 ### `@shinefold/db/constants` — `packages/db/src/constants/newsletter.ts`
 
@@ -654,10 +659,6 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **OWNER_ACCESS_LOG**: `REQUEST_FAILED`=`"owner_access.request_failed"`
 
-### `@platform/constants/owner-studio-access` — `apps/platform/src/constants/owner-studio-access.ts`
-
-- **OWNER_STUDIO_ACCESS**: `INVITE_SENT`, `ACTIVATING`, `READY`, `STALLED`
-
 ### `@platform/constants/plan-change` — `apps/platform/src/constants/plan-change.ts`
 
 - **PLAN_CHANGE_TIMING**: `NOW`, `AT_RENEWAL`, `CANCEL_PENDING`
@@ -713,7 +714,8 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/settings-features` — `apps/platform/src/constants/settings-features.ts`
 
-- **SETTINGS_FEATURES_LOG**: `PLAN_ENTITLEMENT_REJECTED`=`"settings_features.plan_entitlement_rejected"`, `UPDATE_AUDIT_FAILED`=`"settings_features.update_audit_failed"`, `UPDATE_FAILED`=`"settings_features.update_failed"`
+- **SETTINGS_FEATURES_LOG**: `PLAN_ENTITLEMENT_REJECTED`=`"settings_features.plan_entitlement_rejected"`, `UPDATE_AUDIT_FAILED`=`"settings_features.update_audit_failed"`, `UPDATE_FAILED`=`"settings_features.update_failed"`, `ANALYTICS_UPDATE_AUDIT_FAILED`=`"settings_features.analytics_update_audit_failed"`, `ANALYTICS_UPDATE_FAILED`=`"settings_features.analytics_update_failed"`
+- **ANALYTICS_FIELD_ERROR**: `ID_INVALID`
 
 ### `@platform/constants/settings-form` — `apps/platform/src/constants/settings-form.ts`
 

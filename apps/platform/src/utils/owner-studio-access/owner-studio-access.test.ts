@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
@@ -11,6 +10,7 @@ import {
   mockIdleProvisioningSteps,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { STUDIO_ACCESS } from '@shinefold/config/constants';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   MEMBERSHIP_ROLE,
@@ -66,23 +66,19 @@ describe(ownerStudioAccessFor, () => {
   it('is INVITE_SENT while the invite waits for the owner', () => {
     expect(
       ownerStudioAccessFor(invitedTenant(), owner, MOCK_BEFORE_STALL),
-    ).toBe(OWNER_STUDIO_ACCESS.INVITE_SENT);
+    ).toBe(STUDIO_ACCESS.INVITE_SENT);
   });
 
   it('is STALLED once the owner check reports a stall', () => {
     const tenant = invitedTenant({ provisioningSteps: stalledSteps });
 
-    expect(ownerStudioAccessFor(tenant, owner)).toBe(
-      OWNER_STUDIO_ACCESS.STALLED,
-    );
+    expect(ownerStudioAccessFor(tenant, owner)).toBe(STUDIO_ACCESS.STALLED);
   });
 
   it('is ACTIVATING once the Sanity user is known but acceptance is not recorded', () => {
     const tenant = invitedTenant({ ownerSanityUserId: MOCK_SANITY_USER_ID });
 
-    expect(ownerStudioAccessFor(tenant, owner)).toBe(
-      OWNER_STUDIO_ACCESS.ACTIVATING,
-    );
+    expect(ownerStudioAccessFor(tenant, owner)).toBe(STUDIO_ACCESS.ACTIVATING);
   });
 
   it('is READY once the owner is recorded as an administrator', () => {
@@ -92,7 +88,7 @@ describe(ownerStudioAccessFor, () => {
       provisioningSteps: stalledSteps,
     });
 
-    expect(ownerStudioAccessFor(tenant, owner)).toBe(OWNER_STUDIO_ACCESS.READY);
+    expect(ownerStudioAccessFor(tenant, owner)).toBe(STUDIO_ACCESS.READY);
   });
 
   it.each([SANITY_PROJECT_ROLE.VIEWER, null])(
@@ -100,9 +96,7 @@ describe(ownerStudioAccessFor, () => {
     (ownerSanityRole) => {
       const tenant = invitedTenant({ ...joined, ownerSanityRole });
 
-      expect(ownerStudioAccessFor(tenant, owner)).toBe(
-        OWNER_STUDIO_ACCESS.READY,
-      );
+      expect(ownerStudioAccessFor(tenant, owner)).toBe(STUDIO_ACCESS.READY);
     },
   );
 
@@ -118,10 +112,10 @@ describe(ownerStudioAccessFor, () => {
       const tenant = invitedTenant({ provisioningSteps });
 
       expect(ownerStudioAccessFor(tenant, owner, MOCK_AT_STALL)).toBe(
-        OWNER_STUDIO_ACCESS.STALLED,
+        STUDIO_ACCESS.STALLED,
       );
       expect(ownerStudioAccessFor(tenant, owner, MOCK_BEFORE_STALL)).toBe(
-        OWNER_STUDIO_ACCESS.INVITE_SENT,
+        STUDIO_ACCESS.INVITE_SENT,
       );
     },
   );
@@ -134,7 +128,7 @@ describe(ownerStudioAccessFor, () => {
     });
 
     expect(ownerStudioAccessFor(tenant, owner, MOCK_AT_STALL)).toBe(
-      OWNER_STUDIO_ACCESS.INVITE_SENT,
+      STUDIO_ACCESS.INVITE_SENT,
     );
   });
 

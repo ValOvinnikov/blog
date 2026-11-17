@@ -7,7 +7,7 @@ import {
 } from '@platform/constants/email-sender';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { canEditContactRecipient } from '@platform/server/auth/can-edit-contact-recipient';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import {
   emailSenderInputSchema,
   SENDER_NAME_INVALID,
@@ -63,7 +63,7 @@ export const updateEmailConfigAction = async (
     };
   }
 
-  const { tenant, viewer } = await requireTenantMembership(tenantId);
+  const { tenant, viewer } = await requireTenantManager(tenantId);
   const data = canEditContactRecipient(tenant, viewer)
     ? parsed.data
     : { ...parsed.data, contactRecipient: undefined };

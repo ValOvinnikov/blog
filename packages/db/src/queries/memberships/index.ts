@@ -4,4 +4,6 @@ export * from './get-membership';
 export * from './get-tenant-owner-email';
 export * from './get-tenant-owner-membership';
 export * from './list-memberships-with-tenants-for-user';
+export * from './list-tenant-members';
 export * from './lock-memberships-over-seats';
+export * from './remove-membership';

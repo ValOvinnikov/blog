@@ -1,6 +1,6 @@
-import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { STUDIO_ACCESS } from '@shinefold/config/constants';
 
 import { studioNavItem } from './studio-nav-item';
 
@@ -9,9 +9,9 @@ const t = makeEnTranslator('navSections');
 const studioHref = adminRoutes.dashboardStudio();
 
 const PENDING_ACCESSES = [
-  OWNER_STUDIO_ACCESS.INVITE_SENT,
-  OWNER_STUDIO_ACCESS.ACTIVATING,
-  OWNER_STUDIO_ACCESS.STALLED,
+  STUDIO_ACCESS.INVITE_SENT,
+  STUDIO_ACCESS.ACTIVATING,
+  STUDIO_ACCESS.STALLED,
 ];
 
 describe(studioNavItem, () => {
@@ -35,7 +35,7 @@ describe(studioNavItem, () => {
     expect(new Set(icons).size).toBe(PENDING_ACCESSES.length);
   });
 
-  it.each([OWNER_STUDIO_ACCESS.READY, undefined])(
+  it.each([STUDIO_ACCESS.READY, undefined])(
     'carries no line when the access is %s',
     (access) => {
       const { status } = studioNavItem(t, studioHref, access);
@@ -44,7 +44,7 @@ describe(studioNavItem, () => {
     },
   );
 
-  it.each(Object.values(OWNER_STUDIO_ACCESS))(
+  it.each(Object.values(STUDIO_ACCESS))(
     'never badges the %s state',
     (access) => {
       const { badge } = studioNavItem(t, studioHref, access);

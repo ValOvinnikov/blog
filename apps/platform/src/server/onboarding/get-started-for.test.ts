@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import { GET_STARTED_STEP } from '@platform/constants/get-started';
-import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
@@ -15,6 +14,7 @@ import {
   MOCK_TENANT_URL,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { STUDIO_ACCESS } from '@shinefold/config/constants';
 import {
   MEMBERSHIP_ROLE,
   TENANT_PROVISIONING_STATUS,
@@ -58,7 +58,7 @@ describe(getStartedFor, () => {
         [GET_STARTED_STEP.EDITOR_INVITE]: false,
         [GET_STARTED_STEP.FIRST_POST]: false,
       },
-      studioAccess: OWNER_STUDIO_ACCESS.INVITE_SENT,
+      studioAccess: STUDIO_ACCESS.INVITE_SENT,
     });
   });
 
@@ -72,14 +72,14 @@ describe(getStartedFor, () => {
     const getStarted = await getStartedFor(tenant, owner);
 
     expect(getStarted?.doneSteps[GET_STARTED_STEP.EDITOR_INVITE]).toBe(true);
-    expect(getStarted?.studioAccess).toBe(OWNER_STUDIO_ACCESS.READY);
+    expect(getStarted?.studioAccess).toBe(STUDIO_ACCESS.READY);
   });
 
   it('treats an owner the worker never invited as having the editor already', async () => {
     const getStarted = await getStartedFor(mockReadyTenant(), owner);
 
     expect(getStarted?.doneSteps[GET_STARTED_STEP.EDITOR_INVITE]).toBe(true);
-    expect(getStarted?.studioAccess).toBe(OWNER_STUDIO_ACCESS.READY);
+    expect(getStarted?.studioAccess).toBe(STUDIO_ACCESS.READY);
   });
 
   it('marks the first post done once one has been published', async () => {

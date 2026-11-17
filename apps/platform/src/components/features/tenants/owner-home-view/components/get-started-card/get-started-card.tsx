@@ -7,9 +7,9 @@ import {
   GET_STARTED_STEP,
   type TGetStartedStep,
 } from '@platform/constants/get-started';
-import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import type { TGetStarted } from '@platform/server/onboarding/get-started-for';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { STUDIO_ACCESS } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -36,7 +36,7 @@ export const GetStartedCard = ({ getStarted }: TGetStartedCardProps) => {
     getStarted;
   const t = useTranslations('getStartedCard');
   const { body, list } = getStartedCardVariants();
-  const isEditorReady = studioAccess === OWNER_STUDIO_ACCESS.READY;
+  const isEditorReady = studioAccess === STUDIO_ACCESS.READY;
   const isInviteDone = doneSteps[GET_STARTED_STEP.EDITOR_INVITE];
   const firstPostDescriptionKey = isEditorReady
     ? 'firstPostReady'
