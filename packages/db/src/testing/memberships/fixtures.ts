@@ -1,4 +1,5 @@
 import { MEMBERSHIP_ROLE, type TMembershipRole } from '@shinefold/db/constants';
+import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@shinefold/db/schema';
 import type { TMembership } from '@shinefold/db/schema/memberships';
 import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
@@ -45,4 +46,17 @@ export async function insertTeam(
 export async function countLockedMemberships(db: TTestDb): Promise<number> {
   const rows = await db.select().from(schema.memberships);
   return rows.filter(({ lockedAt }) => lockedAt).length;
+}
+
+export async function insertTestMember(
+  db: TTestDb,
+  tenantId: string,
+  email: string,
+  overrides: Partial<typeof schema.memberships.$inferInsert> = {},
+): Promise<TMembership> {
+  const { id: userId } = await insertTestUser(db, {
+    id: membershipsFaker.string.uuid(),
+    ...userPersonalColumns({ email }),
+  });
+  return mockMembership(db, { userId, tenantId, ...overrides });
 }

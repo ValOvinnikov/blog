@@ -29,6 +29,7 @@
     "onboarding": "Créer votre site",
     "billing": "Facturation · Administration",
     "upgrade": "Changer d'offre",
+    "help": "Aide",
     "draftPreview": "Aperçu du brouillon"
   },
   "signInPage": {
@@ -189,6 +190,7 @@
   },
   "account": {
     "signOut": "Se déconnecter",
+    "signingOut": "Déconnexion…",
     "signedInAs": "Connecté en tant que {email}",
     "menuLabel": "Compte",
     "triggerCollapsedLabel": "Compte : {name}, {email}",
@@ -245,7 +247,9 @@
     "blockedSignups": "Inscriptions bloquées",
     "dataRequests": "Demandes de données",
     "badgeUnreadLeads": "{count, plural, one {# nouveau} other {# nouveaux}}",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Assistance",
+    "help": "Aide"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -508,7 +512,10 @@
       "OAUTH_APP_SAVED": "Application de connexion enregistrée",
       "OAUTH_APP_REPLACED": "Application de connexion remplacée",
       "OAUTH_APP_REMOVED": "Application de connexion supprimée",
-      "NEWSLETTER_PAUSE_CLEARED": "Pause de la newsletter levée"
+      "NEWSLETTER_PAUSE_CLEARED": "Pause de la newsletter levée",
+      "MEMBER_INVITED": "Membre de l’équipe invité",
+      "MEMBER_REMOVED": "Membre de l’équipe retiré",
+      "MEMBER_INVITE_CANCELLED": "Invitation à l’équipe annulée"
     },
     "detail": {
       "field": {
@@ -528,6 +535,7 @@
       "SUSPENSION_REASON": "Motif : {category}",
       "SUSPENSION_REFERENCE": "Référence : {reference}",
       "PLAN": "Formule : {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Formule : {from} → {to}",
       "SIGN_IN_PROVIDER": "Fournisseur de connexion : {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Secret client remplacé"
     }
@@ -1580,9 +1588,11 @@
       "provisioningStarted": "Le provisionnement de ce locataire a déjà commencé ; ses détails ne peuvent plus être modifiés.",
       "ownerAlreadyJoined": "Le propriétaire de ce locataire s'est déjà connecté : son e-mail ne peut plus être corrigé ici — cela transférerait la propriété.",
       "ownerHasFreeTenant": "Ce propriétaire a déjà un site gratuit. Archivez-le ou laissez ce site sur son offre actuelle.",
+      "planFollowsSubscription": "Ce site a un abonnement actif, son offre suit donc Stripe. Modifiez-la depuis la page Facturation du propriétaire ou dans le tableau de bord Stripe.",
       "saveFailed": "Impossible d'enregistrer les informations du locataire — veuillez réessayer."
     },
-    "fieldLockedReasonCustomMainDomain": "Verrouillé — l'adresse principale est le domaine propre du site. Pour la modifier, revenez au sous-domaine depuis la page Domaine."
+    "fieldLockedReasonCustomMainDomain": "Verrouillé — l'adresse principale est le domaine propre du site. Pour la modifier, revenez au sous-domaine depuis la page Domaine.",
+    "fieldLockedReasonSubscribed": "Verrouillé — ce site a un abonnement actif, son offre suit donc Stripe. Modifiez-la depuis la page Facturation du propriétaire ou dans le tableau de bord Stripe."
   },
   "tenantFieldErrors": {
     "nameRequired": "Saisissez un nom de locataire.",
@@ -1700,6 +1710,8 @@
     "suspendFailed": "Impossible de suspendre le locataire — réessayez.",
     "liftSuspensionFailed": "Impossible de réactiver le locataire — réessayez.",
     "ownerEmailUnknown": "Le propriétaire de ce locataire n’a pas encore d’adresse e-mail enregistrée : elle ne peut donc pas être bloquée.",
+    "subscriptionCancelFailed": "L'abonnement Stripe du site n'a pas pu être résilié, il n'a donc pas été archivé. Réessayez, ou résiliez-le d'abord dans Stripe.",
+    "subscriptionLive": "Stripe facture encore ce site. Résiliez son abonnement avant de le supprimer.",
     "invalidInput": "Vérifiez les informations et réessayez."
   },
   "featuresSettings": {
@@ -1729,9 +1741,32 @@
       "RATINGS": "Permettre aux lecteurs de noter les articles.",
       "BOOKMARKS": "Permettre aux lecteurs d'enregistrer des articles pour plus tard.",
       "NEWSLETTER": "Afficher le formulaire d'inscription à la newsletter sur le site.",
-      "ANALYTICS": "Activer le suivi statistique sur le site.",
+      "ANALYTICS": "Connectez votre propre Google Analytics ou Plausible. Laissez l’ID vide pour ne charger aucun outil d’analyse.",
       "CONSENT_BANNER": "Afficher aux visiteurs une bannière de consentement aux cookies avant le chargement des cookies ou scripts non essentiels.",
       "CONTACT_FORM": "Afficher le formulaire de contact sur le site."
+    },
+    "analyticsProviderLabel": "Outil d’analyse",
+    "analyticsProviderOption": {
+      "GOOGLE_ANALYTICS": "Google Analytics",
+      "PLAUSIBLE": "Plausible"
+    },
+    "analyticsIdDraftLabel": "ID d’analyse",
+    "analyticsIdEmpty": "Aucun",
+    "analyticsIdLabel": {
+      "GOOGLE_ANALYTICS": "ID de mesure",
+      "PLAUSIBLE": "Domaine du site"
+    },
+    "analyticsIdHint": {
+      "GOOGLE_ANALYTICS": "Vous le trouverez dans Google Analytics sous Administration, Flux de données.",
+      "PLAUSIBLE": "Le domaine sous lequel votre site est enregistré dans Plausible."
+    },
+    "analyticsIdPlaceholder": {
+      "GOOGLE_ANALYTICS": "G-A1B2C3D4E5",
+      "PLAUSIBLE": "example.com"
+    },
+    "analyticsIdInvalid": {
+      "GOOGLE_ANALYTICS": "Saisissez un ID de mesure : G- suivi de majuscules et de chiffres, par exemple G-A1B2C3D4E5.",
+      "PLAUSIBLE": "Saisissez un domaine seul, sans https:// ni chemin, par exemple example.com."
     }
   },
   "languagePicker": {
@@ -2247,6 +2282,7 @@
     "nextPaymentLabel": "Prochain paiement",
     "nextPayment": "{amount} le <time>{date}</time>",
     "noNextPayment": "Aucun prévu",
+    "planEnds": "Votre formule prend fin le <time>{date}</time>.",
     "noPayments": "Votre site n'a encore aucun paiement.",
     "invoicesTitle": "Factures",
     "invoicesEmpty": "Aucune facture pour l'instant.",
@@ -2296,6 +2332,7 @@
     "currentPlan": "Votre site est sur {plan}, payé {interval, select, YEARLY {à l'année} other {au mois}}.",
     "pendingChange": "Votre site passe à {plan}, payé {interval, select, YEARLY {à l'année} other {au mois}}, le <time>{date}</time>.",
     "changeNow": "Le changement commence aujourd'hui. Vous payez maintenant la différence pour le reste de la période en cours.",
+    "changeNowNewPeriod": "Le changement commence aujourd'hui, avec une nouvelle période {interval, select, YEARLY {annuelle} other {mensuelle}}. Vous payez maintenant la nouvelle période, moins le temps non utilisé de la période en cours.",
     "changeAtRenewal": "Le changement commence le <time>{date}</time>, à la fin de la période en cours. Rien ne change d'ici là.",
     "keepCurrentDescription": "Votre site reste sur {plan}, et le changement prévu le <time>{date}</time> est annulé.",
     "changeUnchanged": "C'est votre formule actuelle. Choisissez une autre formule ou période de facturation pour la changer.",
@@ -2310,8 +2347,31 @@
     "billingLink": "Facturation",
     "NOT_SUBSCRIBED": "Votre site n'a pas encore de formule payante à changer. Choisissez-en une au paiement.",
     "NOT_ACTIVE": "Votre abonnement demande votre attention avant de pouvoir changer de formule. Ouvrez Facturation pour le régler.",
+    "planEnds": "Votre formule prend fin le <time>{date}</time> et ne peut donc plus changer. Pour la garder, annulez la résiliation depuis Facturation.",
     "UNCHANGED": "Votre site est déjà sur cette formule.",
     "CARD_DECLINED": "Votre carte a été refusée, donc rien n'a changé. Mettez-la à jour dans Facturation et réessayez."
+  },
+  "helpView": {
+    "title": "Aide",
+    "description": "Envoyez un message à notre équipe d'assistance. Nous y joignons votre site, votre offre et ce compte, pour que vous n'ayez pas à le faire.",
+    "helpCentre": "Centre d'aide",
+    "unavailableTitle": "Le formulaire d'aide n'est pas disponible",
+    "unavailableDescription": "Impossible d'envoyer des messages d'ici pour le moment. Réessayez plus tard."
+  },
+  "helpForm": {
+    "title": "Contacter l'assistance",
+    "responseTime": "Nous répondons généralement sous deux jours ouvrés.",
+    "subjectLabel": "Objet",
+    "messageLabel": "Message",
+    "messageHint": "Dites ce que vous essayiez de faire et ce qui s'est passé à la place.",
+    "required": "Remplissez ce champ.",
+    "tooLong": "Restez sous {limit} caractères.",
+    "send": "Envoyer le message",
+    "sending": "Envoi…",
+    "sent": "Message envoyé. Nous vous en avons envoyé une copie par e-mail.",
+    "rateLimited": "Vous avez envoyé plusieurs messages en peu de temps. Réessayez plus tard.",
+    "unavailable": "Le formulaire d'aide n'est pas disponible pour le moment. Réessayez plus tard.",
+    "sendFailed": "Impossible d'envoyer votre message — réessayez."
   },
   "draftPreview": {
     "title": "Aperçu du brouillon",

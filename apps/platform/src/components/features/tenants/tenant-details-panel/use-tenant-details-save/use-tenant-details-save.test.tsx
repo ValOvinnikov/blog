@@ -92,6 +92,13 @@ const FORM_ERROR_CASES = [
     message: errors.ownerHasFreeTenant,
   },
   {
+    result: {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.PLAN_FOLLOWS_SUBSCRIPTION,
+    },
+    message: errors.planFollowsSubscription,
+  },
+  {
     result: { outcome: ACTION_OUTCOME.SERVER_ERROR },
     message: errors.saveFailed,
   },
@@ -152,9 +159,11 @@ describe(useTenantDetailsSave, () => {
       const isSaved = await saveWith(result);
       const unsentToast = await screen.findByText(alertSavedStudioInviteUnsent);
 
+      const savedToast = screen.queryByText(alertSuccess);
+
       expect(isSaved).toBe(true);
       expect(unsentToast).toBeVisible();
-      expect(screen.queryByText(alertSuccess)).not.toBeInTheDocument();
+      expect(savedToast).not.toBeInTheDocument();
       expect(refreshMock).toHaveBeenCalled();
     });
 
@@ -167,32 +176,48 @@ describe(useTenantDetailsSave, () => {
       const { result } = renderSave();
       await saveWith(result);
 
-      await user.click(
-        await screen.findByRole('button', { name: resendStudioInvite }),
-      );
+      const resendButton = await screen.findByRole('button', {
+        name: resendStudioInvite,
+      });
+
+      await user.click(resendButton);
+      const resendToast = await screen.findByText(message);
 
       expect(resendStudioInviteActionMock).toHaveBeenCalledExactlyOnceWith(
         MOCK_TENANT_ID,
       );
-      expect(await screen.findByText(message)).toBeVisible();
+      expect(resendToast).toBeVisible();
     });
   });
 
-  it('returns the field errors of an invalid save, without a toast or refresh', async () => {
-    updateTenantDetailsActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: DOMAIN_TAKEN_ERRORS,
+  describe('when the save is invalid', () => {
+    let result: ReturnType<typeof renderSave>['result'];
+    let isSaved: boolean;
+
+    beforeEach(async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: DOMAIN_TAKEN_ERRORS,
+      });
+      ({ result } = renderSave());
+      isSaved = await saveWith(result);
     });
-    const { result } = renderSave();
 
-    const isSaved = await saveWith(result);
-    const savedToast = screen.queryByText(alertSuccess);
+    it('returns its field errors, without a toast or refresh', () => {
+      const savedToast = screen.queryByText(alertSuccess);
 
-    expect(isSaved).toBe(false);
-    expect(result.current.fieldErrors).toEqual(DOMAIN_TAKEN_ERRORS);
-    expect(result.current.formError).toBeUndefined();
-    expect(savedToast).not.toBeInTheDocument();
-    expect(refreshMock).not.toHaveBeenCalled();
+      expect(isSaved).toBe(false);
+      expect(result.current.fieldErrors).toEqual(DOMAIN_TAKEN_ERRORS);
+      expect(result.current.formError).toBeUndefined();
+      expect(savedToast).not.toBeInTheDocument();
+      expect(refreshMock).not.toHaveBeenCalled();
+    });
+
+    it('clears the previous errors', () => {
+      act(() => result.current.clearErrors());
+
+      expect(result.current.fieldErrors).toEqual({});
+    });
   });
 
   it.each(FORM_ERROR_CASES)(
@@ -208,17 +233,4 @@ describe(useTenantDetailsSave, () => {
       expect(refreshMock).not.toHaveBeenCalled();
     },
   );
-
-  it('clears the previous errors', async () => {
-    updateTenantDetailsActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: DOMAIN_TAKEN_ERRORS,
-    });
-    const { result } = renderSave();
-    await saveWith(result);
-
-    act(() => result.current.clearErrors());
-
-    expect(result.current.fieldErrors).toEqual({});
-  });
 });

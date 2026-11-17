@@ -1,4 +1,3 @@
-import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import {
   ALWAYS_AVAILABLE_KEYS,
   CONFIGURATION_KEYS,
@@ -14,6 +13,7 @@ import {
   type TPlanPageAccess,
 } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { STUDIO_ACCESS } from '@shinefold/config/constants';
 
 import { dashboardNavSections } from './dashboard-nav-sections';
 
@@ -25,11 +25,11 @@ describe(dashboardNavSections, () => {
     const [, content] = dashboardNavSections(
       t,
       EVERY_PLAN_PAGE,
-      OWNER_STUDIO_ACCESS.STALLED,
+      STUDIO_ACCESS.STALLED,
     );
 
     expect(content!.items[0]?.status?.text).toBe(
-      t(`studioAccessLine.${OWNER_STUDIO_ACCESS.STALLED}`),
+      t(`studioAccessLine.${STUDIO_ACCESS.STALLED}`),
     );
   });
 

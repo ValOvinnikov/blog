@@ -190,6 +190,20 @@
       "when": 1794822534977,
       "tag": "0026_site-config-look-details",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1794909855060,
+      "tag": "0027_takeaway-generation-counts",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1794922671023,
+      "tag": "0028_greedy_rocket_raccoon",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,4 @@
 import { GET_STARTED_STEP } from '@platform/constants/get-started';
-import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import type { TGetStarted } from '@platform/server/onboarding/get-started-for';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
@@ -8,6 +7,7 @@ import {
   MOCK_TENANT_URL,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { STUDIO_ACCESS } from '@shinefold/config/constants';
 
 import { GetStartedCard } from './get-started-card';
 
@@ -31,7 +31,7 @@ const MOCK_GET_STARTED: TGetStarted = {
   siteAddress: MOCK_TENANT_DOMAIN,
   siteUrl: MOCK_TENANT_URL,
   doneSteps: MOCK_NONE_DONE,
-  studioAccess: OWNER_STUDIO_ACCESS.INVITE_SENT,
+  studioAccess: STUDIO_ACCESS.INVITE_SENT,
 };
 
 const renderCard = customRender(GetStartedCard, {
@@ -101,8 +101,8 @@ describe(`<${GetStartedCard.name}/>`, () => {
   });
 
   it.each([
-    [OWNER_STUDIO_ACCESS.ACTIVATING, 'Setting up…'],
-    [OWNER_STUDIO_ACCESS.STALLED, 'Needs attention'],
+    [STUDIO_ACCESS.ACTIVATING, 'Setting up…'],
+    [STUDIO_ACCESS.STALLED, 'Needs attention'],
   ])('shows the %s invite state', (studioAccess, pillText) => {
     setup({ studioAccess });
 
@@ -116,7 +116,7 @@ describe(`<${GetStartedCard.name}/>`, () => {
   it('says the Studio is being set up once the invite is accepted', () => {
     setup({
       doneSteps: { ...MOCK_NONE_DONE, [GET_STARTED_STEP.EDITOR_INVITE]: true },
-      studioAccess: OWNER_STUDIO_ACCESS.ACTIVATING,
+      studioAccess: STUDIO_ACCESS.ACTIVATING,
     });
 
     const activating = screen.getByText(
@@ -131,7 +131,7 @@ describe(`<${GetStartedCard.name}/>`, () => {
   it('opens the Studio once the editor is ready', () => {
     setup({
       doneSteps: { ...MOCK_NONE_DONE, [GET_STARTED_STEP.EDITOR_INVITE]: true },
-      studioAccess: OWNER_STUDIO_ACCESS.READY,
+      studioAccess: STUDIO_ACCESS.READY,
     });
 
     const openStudio = screen.getByRole('link', OPEN_STUDIO);
@@ -149,7 +149,7 @@ describe(`<${GetStartedCard.name}/>`, () => {
         [GET_STARTED_STEP.VOICE]: true,
         [GET_STARTED_STEP.EDITOR_INVITE]: true,
       },
-      studioAccess: OWNER_STUDIO_ACCESS.READY,
+      studioAccess: STUDIO_ACCESS.READY,
     });
 
     const count = screen.getByText('3 of 4 done');

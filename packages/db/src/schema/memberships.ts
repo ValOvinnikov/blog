@@ -1,3 +1,4 @@
+import type { TSanityLoginProvider } from '@shinefold/config/constants';
 import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import {
   pgEnum,
@@ -29,6 +30,15 @@ export const memberships = pgTable(
       .notNull()
       .defaultNow(),
     lockedAt: timestamp('locked_at', { mode: 'date' }),
+    sanityInviteId: text('sanity_invite_id'),
+    sanityInviteSentAt: timestamp('sanity_invite_sent_at', { mode: 'date' }),
+    sanityInviteAcceptedAt: timestamp('sanity_invite_accepted_at', {
+      mode: 'date',
+    }),
+    sanityUserId: text('sanity_user_id'),
+    sanityLoginProvider: text(
+      'sanity_login_provider',
+    ).$type<TSanityLoginProvider>(),
   },
   (membership) => [unique().on(membership.userId, membership.tenantId)],
 );

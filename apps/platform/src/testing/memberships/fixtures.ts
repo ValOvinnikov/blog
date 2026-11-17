@@ -1,3 +1,4 @@
+import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import {
   type TPlatformViewer,
   toPlatformViewer,
@@ -19,6 +20,11 @@ export const mockMembership = (
   role: MEMBERSHIP_ROLE.OWNER,
   createdAt: new Date('2026-10-01T00:00:00.000Z'),
   lockedAt: null,
+  sanityInviteId: null,
+  sanityInviteSentAt: null,
+  sanityInviteAcceptedAt: null,
+  sanityUserId: null,
+  sanityLoginProvider: null,
   ...overrides,
 });
 
@@ -39,3 +45,19 @@ export const mockMembershipContext = (
   membership,
   viewer: mockViewer({ membership }),
 });
+
+export const mockEditorMembershipContext = (
+  tenant: TPlatformTenant,
+): TTenantMembershipContext =>
+  mockMembershipContext(
+    tenant,
+    mockMembership({ tenantId: tenant.id, role: MEMBERSHIP_ROLE.EDITOR }),
+  );
+
+export const mockOperatorMembershipContext = (
+  tenant: TPlatformTenant,
+): TTenantMembershipContext =>
+  mockMembershipContext(
+    tenant,
+    buildVirtualAdminMembership(mockAdmin().userId, tenant.id),
+  );

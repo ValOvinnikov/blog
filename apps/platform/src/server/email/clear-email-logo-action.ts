@@ -2,7 +2,7 @@
 
 import { EMAIL_LOGO_LOG } from '@platform/constants/email-logo';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { deleteBlobBestEffort } from '@platform/server/blob/delete-blob-best-effort';
 import { UNRECOGNIZED_UPLOAD_TARGET_RESULT } from '@platform/server/blob/unrecognized-upload-target';
 import {
@@ -27,7 +27,7 @@ export const clearEmailLogoAction = async (
   tenantId: string,
   target: TEmailLogoTarget,
 ): Promise<TClearUploadResult> => {
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
 
   const parsedTarget = emailLogoTargetSchema.safeParse(target);
   if (!parsedTarget.success) return UNRECOGNIZED_UPLOAD_TARGET_RESULT;

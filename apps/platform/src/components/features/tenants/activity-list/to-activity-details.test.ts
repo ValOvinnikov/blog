@@ -57,6 +57,25 @@ describe(toActivityDetails, () => {
     ]);
   });
 
+  it('describes an operator plan change in place of the changed plan field', () => {
+    const details = toActivityDetails(AUDIT_ACTION.SETTINGS_UPDATED, {
+      changedFields: [TENANT_DETAILS_FIELD.NAME, TENANT_DETAILS_FIELD.PLAN],
+      planChanged: { from: TENANT_PLAN.GROWTH, to: TENANT_PLAN.STARTER },
+    });
+
+    expect(details).toEqual([
+      {
+        kind: ACTIVITY_DETAIL.CHANGED_FIELDS,
+        fields: [TENANT_DETAILS_FIELD.NAME],
+      },
+      {
+        kind: ACTIVITY_DETAIL.PLAN_CHANGED,
+        from: TENANT_PLAN.GROWTH,
+        to: TENANT_PLAN.STARTER,
+      },
+    ]);
+  });
+
   it('skips unknown keys and values of the wrong shape', () => {
     const details = toActivityDetails(AUDIT_ACTION.SETTINGS_UPDATED, {
       [faker.lorem.word()]: faker.lorem.word(),

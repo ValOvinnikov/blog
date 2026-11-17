@@ -6,10 +6,6 @@ import {
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
 import {
-  OWNER_STUDIO_ACCESS,
-  type TPendingOwnerStudioAccess,
-} from '@platform/constants/owner-studio-access';
-import {
   CONTRAST_STATUS,
   RELEASE_RUN_STATUS,
   type TContrastStatus,
@@ -17,6 +13,8 @@ import {
 } from '@platform/constants/release';
 import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
 import {
+  STUDIO_ACCESS,
+  type TPendingStudioAccess,
   FINDING_SEVERITY,
   type TFindingSeverity,
 } from '@shinefold/config/constants';
@@ -71,13 +69,10 @@ const RELEASE_RUN_STATUS_TONE: Record<TReleaseRunStatus, TBadgeTone> = {
   [RELEASE_RUN_STATUS.FAILED]: BADGE_TONE.BAD,
 };
 
-const OWNER_STUDIO_ACCESS_TONE: Record<
-  TPendingOwnerStudioAccess,
-  TNavItemStatusTone
-> = {
-  [OWNER_STUDIO_ACCESS.INVITE_SENT]: BADGE_TONE.WARN,
-  [OWNER_STUDIO_ACCESS.ACTIVATING]: BADGE_TONE.BRAND,
-  [OWNER_STUDIO_ACCESS.STALLED]: BADGE_TONE.BAD,
+const STUDIO_ACCESS_TONE: Record<TPendingStudioAccess, TNavItemStatusTone> = {
+  [STUDIO_ACCESS.INVITE_SENT]: BADGE_TONE.WARN,
+  [STUDIO_ACCESS.ACTIVATING]: BADGE_TONE.BRAND,
+  [STUDIO_ACCESS.STALLED]: BADGE_TONE.BAD,
 };
 
 const FINDING_SEVERITY_TONE: Record<TFindingSeverity, TBadgeTone> = {
@@ -130,5 +125,5 @@ export const contrastStatusTone = (status: TContrastStatus) =>
 export const releaseRunStatusTone = (status: TReleaseRunStatus) =>
   RELEASE_RUN_STATUS_TONE[status];
 
-export const ownerStudioAccessTone = (access: TPendingOwnerStudioAccess) =>
-  OWNER_STUDIO_ACCESS_TONE[access];
+export const ownerStudioAccessTone = (access: TPendingStudioAccess) =>
+  STUDIO_ACCESS_TONE[access];

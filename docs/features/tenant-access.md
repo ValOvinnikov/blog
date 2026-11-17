@@ -11,6 +11,7 @@ code:
   - packages/db/src/queries/memberships/**
   - packages/db/src/queries/membership-invites/**
   - packages/db/src/queries/admins/**
+  - packages/db/src/utils/studio-access/**
   - packages/db/scripts/seed-admin.ts
   - packages/auth/src/events/**
   - packages/auth/src/providers/magic-link/find-pending-invite-tenants/**
@@ -58,11 +59,18 @@ The platform decides who may run which tenant. Platform operators hold an `admin
   - `grantedVia`: BREAK_GLASS or PROMOTION;
   - `grantedBy` and `grantedAt`.
     It has no `tenantId`.
-- **`memberships`:** unique on `(userId, tenantId)`. `role` is OWNER, EDITOR or READER.
+- **`memberships`:** unique on `(userId, tenantId)`. `role` is OWNER, EDITOR or READER. Each membership also carries its own Studio access record, mirroring the owner's on `tenants`: the Sanity invite id, when that invite was sent and accepted, the Sanity user id and the login provider. Nothing writes these yet.
 - **`membership_invites`:** the address is stored only encrypted, with a keyed index that drops `+tag`s so a data request reaches every variant, and `email_exact_index`, which keeps them. Unique on `(tenantId, email_exact_index)`, with `role` and `consumedAt`; an invite written before that column existed has none and is not covered by the rule. At sign-in, `findPendingInviteByEmail` looks invites up by the `+tag`-blind index and keeps only the ones whose decrypted email is the exact requested address, ignoring case. Changing a pending owner's email is refused when another invite on the tenant holds the new address's exact index.
+- **Team reads and writes.**
+  - `listTenantMembers` returns only that tenant's members, owners first, each with the decrypted email, role, whether they have signed in, when they joined and their Studio access state. The state is derived the way the owner's is (Invite sent, Activating, Ready, Stalled after `OWNER_ACCESS_STALL_AFTER_MS`), by the shared `studioAccessOf`, and is absent until a Studio invite has been sent.
+  - `listPendingMembershipInvites` returns only that tenant's unconsumed invites, with the decrypted email, role and invite date.
+  - `removeMembership` refuses to remove the acting user (`SELF`) and the tenant's last owner (`LAST_OWNER`), and changes nothing when it refuses. A removal also deletes that person's consumed invite on the tenant in the same statement, so the same address can be invited again. An id that is not a UUID, such as an operator's virtual membership, is not found; `cancelMembershipInvite` returns false for one. Concurrent removals of two different owners are not serialised: each sees the other still present.
+  - `cancelMembershipInvite` deletes one pending invite of that tenant. It never cancels a pending OWNER invite, which is the site's only owner until it is accepted and moves with the owner email instead.
+  - Changing a role has no query yet.
 - **Personal data reads.** `getTenantOwnerMembership` returns the OWNER's user email and whether they have signed in, else the pending OWNER invite's email. The SUPERADMIN alert recipients and the blocklist's "added by" are user emails too. Every one of these reads the encrypted column and decrypts it. Create site finds an existing owner with `findUserByEmail`, the same exact-address index lookup sign-in uses.
 - **Cascades:** `admins` and `memberships` cascade on user delete. Memberships and invites cascade on tenant delete. An invite has no user until it is consumed.
 - **`blocked_signup_identities`:** unique on `(kind, value)`. An ADDRESS entry stores only the keyed personal-data index (`PERSONAL_DATA_INDEX_KEY`) of the normalised address (lower-cased, `+tag` dropped), never the address. A DOMAIN entry stores the lower-cased domain. Each entry records `reason`, `createdByAdminId` and `createdAt`. Adds and removes are audited as `SIGNUP_BLOCK_ADDED` / `SIGNUP_BLOCK_REMOVED` against `BLOCKED_SIGNUP_IDENTITY`; re-adding an entry already on the list keeps its reason and author and records no second `SIGNUP_BLOCK_ADDED`. An address entry's audit row carries its kind and reason, never the address or hash. "Added by" on the list page is the email of the admin in `createdByAdminId`, read in the same query as the entries, and "Unknown" once that admin is gone.
+- **Audit.** Inviting, removing and cancelling are recorded as `MEMBER_INVITED`, `MEMBER_REMOVED` and `MEMBER_INVITE_CANCELLED` against `TEAM_MEMBER`. An email address is never written to these events' details.
 - **Caching:** none. Every gate reads Neon per request, and `cache()` deduplicates the reads within one request.
 
 ## Configuration
@@ -81,14 +89,14 @@ The platform decides who may run which tenant. Platform operators hold an `admin
   - `requireTenantById` guards `/tenants/{id}`.
   - `listSessionTenants` and `resolveDashboardTenant` guard `/dashboard`.
 - **Server Actions call a gate themselves.**
-  - Tenant-scoped actions (Look, Voice, Features, Languages, Email, brand assets) call `requireTenantMembership`. That gate excludes archived tenants.
+  - Every tenant-scoped settings save (Look, Voice, Features, Languages, Email settings, templates, logo and test send, brand assets) calls `requireTenantManager`: the tenant's own OWNER or an operator. An editor keeps the Studio and cannot save any of them. Reads and the custom-domain status poll still call `requireTenantMembership`. Both gates exclude archived tenants.
   - Creating a tenant and editing its details need `requireAdmin`.
   - Deprovision, reactivate, delete, the deprovisioning status poll and the blocklist add and remove actions need `requireSuperAdmin`.
   - The provisioning status poll needs the tenant's own OWNER or any admin; retry, Check now and Resend invite need the tenant's own OWNER or a SUPERADMIN (`requireTenantOwnerOrAdmin`).
 - **Roles differ in three places only.**
   - Admin roles gate identically, except that SUPERADMIN alone passes `requireSuperAdmin` and alone sees every tenant under `/dashboard`.
   - Only SUPERADMINs receive operator alerts.
-  - Membership roles never gate anything: only OWNER is ever written, and nothing reads EDITOR or READER.
+  - Membership roles gate the settings saves: OWNER passes `requireTenantManager`, EDITOR and READER do not.
 - **Admins get a virtual OWNER membership.** Any `admins` row passes `requireTenantMembership` on any tenant through a virtual membership. Its id starts with `admin-virtual:`, so it can never pass as a foreign key. Call `isVirtualAdminMembership` before showing `membership.role`; the role chip shows the admin role instead.
 - **Invite consumption is atomic.** The claim stamps `consumedAt` only if it is still null. A failed membership insert resets it, and an existing membership is returned as-is.
 - **Invites are consumed best-effort, in the platform only.** `@shinefold/auth`'s `events.signIn` consumes invites on sign-in to the platform; signing in as a reader on a site leaves them pending. A failure is swallowed and retried on the next platform sign-in.
@@ -125,7 +133,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 - The `dashboard/select-tenant` page test and `tenant-switcher.test.tsx`.
 - `packages/auth/src/events/consume-pending-invites-on-sign-in.test.ts`.
 - `apps/platform/src/server/signup-block/*.test.ts`, `admit-create-site.test.ts`, the `blocked-signups` layout and page tests, `blocked-signups-view.test.tsx` and `tenant-suspension-control.test.tsx`.
-- `packages/db/src/queries/{memberships,membership-invites,admins}/**` tests (PGlite).
+- `packages/db/src/queries/{memberships,membership-invites,admins}/**` tests (PGlite), and `packages/db/src/utils/studio-access/studio-access.test.ts`.
 - No Storybook.
 
 ## Related

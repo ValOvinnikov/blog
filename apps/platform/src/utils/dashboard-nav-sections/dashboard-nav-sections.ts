@@ -1,5 +1,4 @@
 import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
-import type { TOwnerStudioAccess } from '@platform/constants/owner-studio-access';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import {
   configurationNavItems,
@@ -9,11 +8,12 @@ import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { studioNavItem } from '@platform/utils/studio-nav-item/studio-nav-item';
 import { ICONS } from '@shinefold/config';
+import type { TStudioAccess } from '@shinefold/config/constants';
 
 export const dashboardNavSections = (
   t: TLooseTranslator,
   access: TPlanPageAccess,
-  studioAccess?: TOwnerStudioAccess,
+  studioAccess?: TStudioAccess,
   unreadLeadsCount = 0,
 ): TSidebarNavSection[] => {
   const hrefs: TTenantNavHrefs = {

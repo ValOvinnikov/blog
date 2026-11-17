@@ -1,7 +1,9 @@
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { formatDate } from '@platform/utils/format-date/format-date';
+import { richDate } from '@platform/utils/rich-date/rich-date';
 import type { TMaybeUndefined } from '@shinefold/config';
 import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import type { TTenantOwnerMembership } from '@shinefold/db/queries/memberships';
@@ -31,7 +33,7 @@ export const OwnerCard = ({
             isMono={true}
             action={
               !ownerEmail && (
-                <StatusBadge tone="warn">
+                <StatusBadge tone={BADGE_TONE.WARN}>
                   {t('ownerInvitedPendingBadge')}
                 </StatusBadge>
               )
@@ -40,7 +42,7 @@ export const OwnerCard = ({
             {ownerEmail ?? '—'}
           </DetailList.Row>
           <DetailList.Row label={t('roleLabel')}>
-            <StatusBadge tone="neutral">
+            <StatusBadge tone={BADGE_TONE.NEUTRAL}>
               {tRole(MEMBERSHIP_ROLE.OWNER)}
             </StatusBadge>
           </DetailList.Row>
@@ -53,12 +55,7 @@ export const OwnerCard = ({
           )}
           {owner?.hasSignedIn === false && (
             <DetailList.Row label={t('invitedLabel')}>
-              {t.rich('ownerNotSignedInYet', {
-                date: formatDate(owner.invitedAt, locale),
-                time: (chunks) => (
-                  <time dateTime={owner.invitedAt.toISOString()}>{chunks}</time>
-                ),
-              })}
+              {t.rich('ownerNotSignedInYet', richDate(owner.invitedAt, locale))}
             </DetailList.Row>
           )}
         </DetailList>

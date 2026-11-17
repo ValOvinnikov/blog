@@ -2,7 +2,7 @@
 
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { getSiteConfigOrDefaults } from '@platform/server/site-config/site-config-or-defaults';
 import { stampSavedAt } from '@platform/server/site-config/stamp-saved-at';
@@ -46,7 +46,7 @@ export const saveVoiceOverridesAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrorsByLocale: {} };
   }
 
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
 
   try {
     const { preset } = await getSiteConfigOrDefaults(tenant.id);

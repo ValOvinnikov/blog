@@ -66,6 +66,7 @@ export const adminRoutes = {
   tenantStudio: (tenantId: string) => `/tenants/${tenantId}/${STUDIO_SEGMENT}`,
   tenantDraftPreview: (tenantId: string, documentId: string) =>
     `/tenants/${tenantId}/${DRAFT_PREVIEW_SEGMENT}/${encodeURIComponent(documentId)}`,
+  tenantHelp: (tenantId: string) => `/tenants/${tenantId}/help`,
   dashboard: () => '/dashboard',
   dashboardDomain: () => '/dashboard/domain',
   dashboardSignIn: () => '/dashboard/sign-in',
@@ -80,6 +81,7 @@ export const adminRoutes = {
   dashboardStudio: () => `/dashboard/${STUDIO_SEGMENT}`,
   dashboardDraftPreview: (documentId: string) =>
     `/dashboard/${DRAFT_PREVIEW_SEGMENT}/${encodeURIComponent(documentId)}`,
+  dashboardHelp: () => '/dashboard/help',
   dashboardSelectTenant: () => '/dashboard/select-tenant',
   dashboardSelectTenantHref: (tenantId: string) =>
     `/api/dashboard/select-tenant?tenantId=${tenantId}`,

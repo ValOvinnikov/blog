@@ -267,6 +267,7 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
 - `apps/platform/src/components/features/studio/dashboard-studio-view/dashboard-studio-view.tsx`
 - `apps/platform/src/components/features/studio/owner-studio-access-view/owner-studio-access-view.tsx`
 - `apps/platform/src/utils/owner-studio-access/owner-studio-access.ts`
+- `packages/db/src/utils/studio-access/studio-access.ts`
 - `apps/platform/src/server/owner-access/{check-owner-access,resend-owner-invite}-action.ts`
 - `apps/platform/src/app/[locale]/dashboard/(tenant)/studio/[[...tool]]/page.tsx`
 - `apps/platform/src/app/[locale]/tenants/[tenantId]/(detail)/studio/[[...tool]]/page.tsx`

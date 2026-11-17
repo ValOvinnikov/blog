@@ -14,13 +14,13 @@ import {
 import { AVATAR_VARIANT } from '@platform/constants/avatar';
 import { MENU_RADIO_GROUP_SIZE } from '@platform/constants/menu-radio-group';
 import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
-import { signOutAction } from '@platform/server/auth/sign-out-action';
 import { ICONS, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
-import { startTransition, useRef } from 'react';
+import { useRef } from 'react';
 
 import { accountMenuVariants } from './account-menu-variants';
 import { AccountThemeSection } from './components/account-theme-section';
+import { SignOutItem } from './components/sign-out-item';
 
 export type TAccount = {
   name: TMaybeUndefined<string>;
@@ -68,9 +68,8 @@ export const AccountMenu = ({ account }: TAccountMenuProps) => {
     headerName,
     headerEmail,
     headerRole,
-    signOutIcon,
   } = accountMenuVariants({ placement });
-  const { positioner, popup: surfacePopup, item } = menuSurfaceVariants();
+  const { positioner, popup: surfacePopup } = menuSurfaceVariants();
 
   const railProps =
     placement === ACCOUNT_MENU_PLACEMENT.RAIL
@@ -87,10 +86,6 @@ export const AccountMenu = ({ account }: TAccountMenuProps) => {
     if (isOpen && !isNested) {
       signOutRef.current?.focus();
     }
-  };
-
-  const handleSignOut = () => {
-    startTransition(() => signOutAction());
   };
 
   return (
@@ -134,14 +129,7 @@ export const AccountMenu = ({ account }: TAccountMenuProps) => {
                   : MENU_RADIO_GROUP_SIZE.DESKTOP
               }
             />
-            <Menu.Item
-              ref={signOutRef}
-              className={item()}
-              onClick={handleSignOut}
-            >
-              <Icon name={ICONS.POWER} className={signOutIcon()} />
-              {t('signOut')}
-            </Menu.Item>
+            <SignOutItem ref={signOutRef} />
           </Menu.Popup>
         </Menu.Positioner>
       </Menu.Portal>

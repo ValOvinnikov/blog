@@ -1,29 +1,24 @@
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { screen, within } from '@platform/testing/custom-render';
-import {
-  HEADER_LAYOUT_LABEL,
-  OUTLINED,
-} from '@platform/testing/look/look-form-fixtures';
+import { within } from '@platform/testing/custom-render';
+import { HEADER_LAYOUT_LABEL } from '@platform/testing/look/look-form-fixtures';
 import {
   chooseOption,
   chooseSegment,
   lookRowTrigger,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
-import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
+import {
+  saveAndExpectLook,
+  saveChosenStyle,
+} from '@platform/testing/look/look-form-save';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { UNSAVED_CHANGES } from '@platform/testing/render-in-settings-form';
 import {
-  CARD_STYLE,
-  DIVIDER_WIDTH,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
-  HEADING_CASE,
-  HEADING_WEIGHT,
-  IMAGE_PROPORTION,
   NAV_LINK_STYLE,
 } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -75,51 +70,9 @@ describe(`<${LookForm.name}/>`, () => {
         option: LOOK_FORM.navLinkStyleOptionLabel.SOFT,
         saved: { navLinkStyle: NAV_LINK_STYLE.SOFT },
       },
-      {
-        row: LOOK_ROW.TYPE,
-        group: LOOK_FORM.headingWeightLabel,
-        option: LOOK_FORM.headingWeightOptionLabel.BOLD,
-        saved: { headingWeight: HEADING_WEIGHT.BOLD },
-      },
-      {
-        row: LOOK_ROW.TYPE,
-        group: LOOK_FORM.headingCaseLabel,
-        option: LOOK_FORM.headingCaseOptionLabel.UPPERCASE,
-        saved: { headingCase: HEADING_CASE.UPPERCASE },
-      },
-      {
-        row: LOOK_ROW.SHAPE,
-        group: LOOK_FORM.imageProportionLabel,
-        option: LOOK_FORM.imageProportionOptionLabel.SQUARE,
-        saved: { imageProportion: IMAGE_PROPORTION.SQUARE },
-      },
-      {
-        row: LOOK_ROW.SHAPE,
-        group: LOOK_FORM.dividerWidthLabel,
-        option: LOOK_FORM.dividerWidthOptionLabel.BOLD,
-        saved: { dividerWidth: DIVIDER_WIDTH.BOLD },
-      },
-    ])(
-      'saves the chosen $group style',
-      async ({ row, group, option, saved }) => {
-        await openLookRow(user, row);
-        const [styleGroup] = screen.getAllByRole('group', { name: group });
-        const optionButton = within(styleGroup!).getByRole('button', {
-          name: option,
-        });
-        await user.click(optionButton);
-
-        await saveAndExpectLook(user, saved);
-      },
+    ])('saves the chosen $group style', (style) =>
+      saveChosenStyle(user, style),
     );
-
-    it('saves the chosen Card style tile', async () => {
-      await openLookRow(user, LOOK_ROW.CARDS);
-      const outlinedTile = screen.getByRole('radio', { name: OUTLINED });
-      await user.click(outlinedTile);
-
-      await saveAndExpectLook(user, { cardStyle: CARD_STYLE.OUTLINED });
-    });
 
     it.each([
       {
