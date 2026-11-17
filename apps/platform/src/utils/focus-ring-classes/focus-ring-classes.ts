@@ -20,8 +20,6 @@ const FOCUS_RING_GROUND_CLASSES: Record<TFocusRingGround, string> = {
     '[--platform-focus-ground:var(--platform-popover)]',
   [FOCUS_RING_GROUND.POPOVER_HOVER]:
     '[--platform-focus-ground:var(--platform-popover-hover)]',
-  [FOCUS_RING_GROUND.ON_SELECTED]:
-    '[--platform-focus-ground:var(--platform-on-selected)]',
   [FOCUS_RING_GROUND.HOVER_TINT]:
     '[--platform-focus-ground:var(--platform-hover-tint)]',
   [FOCUS_RING_GROUND.THEME_TRACK]:
@@ -34,8 +32,8 @@ const CHECKED_FOCUS_RING_GROUND_CLASSES: Record<
   TCheckedFocusRingGround,
   string
 > = {
-  [FOCUS_RING_GROUND.ON_SELECTED]:
-    'data-[checked]:[--platform-focus-ground:var(--platform-on-selected)]',
+  [FOCUS_RING_GROUND.SELECTED_TINT]:
+    'data-[checked]:[--platform-focus-ground:var(--platform-selected-tint)]',
 };
 
 // Forced colours drop box-shadows; the theme's `:focus-visible` outline covers only the default trigger.

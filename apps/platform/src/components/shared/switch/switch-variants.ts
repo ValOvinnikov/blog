@@ -34,7 +34,7 @@ export const switchVariants = tv({
       false: {
         root: ['cursor-pointer'],
         track: [
-          'cursor-pointer data-[checked]:bg-platform-selected',
+          'cursor-pointer data-[checked]:bg-platform-selected-tint',
           'data-[checked]:inset-ring data-[checked]:inset-ring-platform-selected-edge',
           'not-data-[disabled]:not-data-[checked]:hover:bg-platform-control-line-hover',
         ],

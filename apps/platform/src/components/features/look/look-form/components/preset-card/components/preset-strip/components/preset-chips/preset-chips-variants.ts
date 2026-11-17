@@ -23,7 +23,7 @@ export const presetChipsVariants = tv({
     selected: {
       true: {
         chip: SELECTED_COMPACT_CHOICE_CLASSES,
-        tick: ['text-platform-on-selected'],
+        tick: ['text-platform-text'],
       },
       false: {
         chip: [

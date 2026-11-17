@@ -20,7 +20,6 @@ export const segmentedRadioGroupVariants = tv({
     optionLabel: [],
     optionDescription: [
       'block text-platform-12 leading-4 font-normal text-platform-muted md:leading-3.75',
-      'in-data-[checked]:text-platform-on-selected',
     ],
     glyph: ['flex shrink-0'],
     check: [],
@@ -42,7 +41,7 @@ export const segmentedRadioGroupVariants = tv({
         option: [
           'flex min-h-11 min-w-30 shrink-0 cursor-pointer flex-col items-start justify-center',
           'rounded-platform-control px-3 py-1.5 text-left md:min-h-0',
-          'data-[checked]:bg-platform-selected data-[checked]:text-platform-on-selected',
+          'data-[checked]:bg-platform-selected-tint data-[checked]:text-platform-text',
           'data-[checked]:inset-ring data-[checked]:inset-ring-platform-selected-edge',
           focusRingClasses(FOCUS_RING_GROUND.THEME_TRACK),
         ],
