@@ -80,7 +80,15 @@ export {
   type TTenantEmailIdentity,
 } from './templates/tenant';
 export { applyTenantSenderName } from './sender-name';
-export { buildSiteEmailTag, SITE_EMAIL_TAG_NAME, type TEmailTag } from './tags';
+export {
+  buildOwnerNoticeEmailTag,
+  buildPlatformEmailTag,
+  buildSiteEmailTag,
+  OWNER_NOTICE_EMAIL_TAG_NAME,
+  PLATFORM_EMAIL_TAG_NAME,
+  SITE_EMAIL_TAG_NAME,
+  type TEmailTag,
+} from './tags';
 export {
   isEmailAccountConfigured,
   sendEmail,

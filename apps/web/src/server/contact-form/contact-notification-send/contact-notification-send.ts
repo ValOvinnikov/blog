@@ -1,6 +1,10 @@
 import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
-import { buildContactNotificationEmail, sendEmail } from '@shinefold/email';
+import {
+  buildContactNotificationEmail,
+  buildOwnerNoticeEmailTag,
+  sendEmail,
+} from '@shinefold/email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address/newsletter-from-address';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { env } from '@web/utils/env/env';
@@ -55,5 +59,6 @@ export const sendContactNotification = async ({
     subject,
     html,
     replyTo: email,
+    tags: [buildOwnerNoticeEmailTag()],
   });
 };

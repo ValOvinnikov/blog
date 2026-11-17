@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
-import { sendEmail } from '@shinefold/email';
+import { buildOwnerNoticeEmailTag, sendEmail } from '@shinefold/email';
 import type * as TEmail from '@shinefold/email';
 import { mockLeadInput } from '@web/testing/server/contact-form/fixtures';
 import { firstSentEmail } from '@web/testing/server/newsletter/fixtures';
@@ -73,6 +73,12 @@ describe(sendContactNotification, () => {
       expect(from).toBe(MOCK_FROM_ADDRESS);
       expect(replyTo).toBe(MOCK_LEAD.email);
       expect(subject).toContain(MOCK_LEAD.name);
+    });
+
+    it('tags the email as an owner notice, never as site mail', () => {
+      expect(firstSentEmail(vi.mocked(sendEmail)).tags).toEqual([
+        buildOwnerNoticeEmailTag(),
+      ]);
     });
 
     it('links the page the message came from and the leads list', () => {
