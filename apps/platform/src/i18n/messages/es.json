@@ -1706,6 +1706,8 @@
     "suspendFailed": "No se pudo suspender el cliente — inténtalo de nuevo.",
     "liftSuspensionFailed": "No se pudo reactivar el cliente — inténtalo de nuevo.",
     "ownerEmailUnknown": "El propietario de este cliente aún no tiene un correo electrónico registrado, así que no se puede bloquear.",
+    "subscriptionCancelFailed": "No se pudo cancelar la suscripción de Stripe del sitio, así que no se ha archivado. Inténtalo de nuevo o cancélala primero en Stripe.",
+    "subscriptionLive": "Stripe todavía cobra este sitio. Cancela su suscripción antes de eliminarlo.",
     "invalidInput": "Revise los datos e inténtelo de nuevo."
   },
   "featuresSettings": {
