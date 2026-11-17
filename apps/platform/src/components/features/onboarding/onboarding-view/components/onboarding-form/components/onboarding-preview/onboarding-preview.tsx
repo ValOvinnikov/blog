@@ -100,8 +100,8 @@ export const OnboardingPreview = ({
             mode: DEVICE_FRAME_FIT.STAGE,
             availableHeight: isFull ? stageSize?.height : undefined,
           }}
-          isDark={isDark}
-          onScaleChange={setScale}
+          chrome={{ isDark }}
+          listeners={{ onScaleChange: setScale }}
         >
           <LookSample
             brand={{

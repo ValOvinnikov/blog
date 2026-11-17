@@ -221,6 +221,10 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   device widths (`PREVIEW_DEVICE`), Reload, and a link to the published page
   in a new tab. Reload refreshes the route, which signs a new token and so
   reloads the frame with the latest saved draft.
+- The frame sits in the shared `DeviceFrame` (`DEVICE_FRAME_FIT.PAGE`, as on
+  the Look page), so the site renders at the true device width scaled to fit.
+  It passes `isInteractive`, which drops `DeviceFrame`'s `inert` so the framed
+  draft scrolls and clicks; every other `DeviceFrame` stays inert.
 - Refusals replace the frame with a message that says why: a document with no
   public path (404), a draft in a language the site does not serve (409, "switch
   this language on"), a suspended or archived tenant, and a preview the

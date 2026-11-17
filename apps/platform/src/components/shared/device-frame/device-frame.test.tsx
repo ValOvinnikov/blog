@@ -34,8 +34,7 @@ const MOCK_VIEWPORT_HEIGHT = 300;
 
 const setup = customRender(DeviceFrame, {
   device: PREVIEW_DEVICE.DESKTOP,
-  host: MOCK_HOST,
-  isDark: false,
+  chrome: { host: MOCK_HOST, isDark: false },
   children: <p>{MOCK_CONTENT}</p>,
 });
 
@@ -73,16 +72,28 @@ describe(`<${DeviceFrame.name}/>`, () => {
     },
   );
 
-  it('drops the role and name of the frame in the full-screen fit', () => {
-    setup({ fit: { mode: DEVICE_FRAME_FIT.FULLSCREEN } });
+  describe('in the full-screen fit', () => {
+    beforeEach(() => {
+      setup({ fit: { mode: DEVICE_FRAME_FIT.FULLSCREEN } });
+    });
 
-    const frame = screen.queryByRole('img');
+    it('drops the role and name of the frame', () => {
+      const frame = screen.queryByRole('img');
 
-    expect(frame).not.toBeInTheDocument();
+      expect(frame).not.toBeInTheDocument();
+    });
+
+    it('shows a horizontal scrollbar while the frame pans', () => {
+      const scrollbar = screen.getByTestId(
+        DEVICE_FRAME_TEST_ID.HORIZONTAL_SCROLLBAR,
+      );
+
+      expect(scrollbar).toBeInTheDocument();
+    });
   });
 
   it('shows the dots alone when the caller leaves the host out', () => {
-    setup({ host: undefined });
+    setup({ chrome: { isDark: false } });
 
     const bar = screen.getByTestId(DEVICE_FRAME_TEST_ID.BROWSER_BAR);
 
@@ -106,9 +117,25 @@ describe(`<${DeviceFrame.name}/>`, () => {
   it('reports the scale once the stage is measured', () => {
     const onScaleChange = vi.fn();
 
-    setup({ onScaleChange });
+    setup({ listeners: { onScaleChange } });
 
     expect(onScaleChange).toHaveBeenLastCalledWith(0.4406);
+  });
+
+  it('keeps the sample out of reach of clicks, focus and scrolling', () => {
+    setup();
+
+    const content = screen.getByTestId(DEVICE_FRAME_TEST_ID.CONTENT);
+
+    expect(content).toHaveAttribute('inert');
+  });
+
+  it('lets an interactive frame be clicked and scrolled', () => {
+    setup({ isInteractive: true });
+
+    const content = screen.getByTestId(DEVICE_FRAME_TEST_ID.CONTENT);
+
+    expect(content).not.toHaveAttribute('inert');
   });
 
   it('shows no scrollbar when the sample fits', () => {
@@ -121,16 +148,6 @@ describe(`<${DeviceFrame.name}/>`, () => {
     );
 
     expect(scrollbar).not.toBeInTheDocument();
-  });
-
-  it('shows a horizontal scrollbar while the full-screen frame pans', () => {
-    setup({ fit: { mode: DEVICE_FRAME_FIT.FULLSCREEN } });
-
-    const scrollbar = screen.getByTestId(
-      DEVICE_FRAME_TEST_ID.HORIZONTAL_SCROLLBAR,
-    );
-
-    expect(scrollbar).toBeInTheDocument();
   });
 
   it('renders the overlay slot beside the scrolling sample', () => {
@@ -214,30 +231,30 @@ describe(`<${DeviceFrame.name}/>`, () => {
 
   describe('hand scroll', () => {
     const scroller = () => screen.getByTestId(DEVICE_FRAME_TEST_ID.SCROLLER);
+    const onHandScroll = vi.fn();
 
-    it('reports a wheel that moves the frame', () => {
-      const onHandScroll = vi.fn();
-      setup({ onHandScroll });
-
-      fireEvent.wheel(scroller());
-      fireEvent.scroll(scroller());
-
-      expect(onHandScroll).toHaveBeenCalledOnce();
+    beforeEach(() => {
+      onHandScroll.mockReset();
+      setup({ listeners: { onHandScroll } });
     });
 
-    it('ignores a wheel that leaves the frame where it is', () => {
-      const onHandScroll = vi.fn();
-      setup({ onHandScroll });
+    describe('after a wheel', () => {
+      beforeEach(() => {
+        fireEvent.wheel(scroller());
+      });
 
-      fireEvent.wheel(scroller());
+      it('reports the scroll it sets off', () => {
+        fireEvent.scroll(scroller());
 
-      expect(onHandScroll).not.toHaveBeenCalled();
+        expect(onHandScroll).toHaveBeenCalledOnce();
+      });
+
+      it('reports nothing while the frame stays where it is', () => {
+        expect(onHandScroll).not.toHaveBeenCalled();
+      });
     });
 
     it('ignores a scroll no hand started', () => {
-      const onHandScroll = vi.fn();
-      setup({ onHandScroll });
-
       fireEvent.scroll(scroller());
 
       expect(onHandScroll).not.toHaveBeenCalled();

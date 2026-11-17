@@ -65,6 +65,7 @@ export const LookPreview = ({
     scale,
     isShown,
   });
+  const { onHandScroll } = follow;
   const theme = buildSitePreviewTheme(values, isDark);
   const footer = toSampleFooterStyle(values, hasCookieBanner);
 
@@ -128,11 +129,9 @@ export const LookPreview = ({
           <DeviceFrame
             ref={frameRef}
             device={previewDevice}
-            host={siteHost}
+            chrome={{ host: siteHost, isDark }}
             fit={{ mode: DEVICE_FRAME_FIT.PAGE, availableHeight }}
-            isDark={isDark}
-            onScaleChange={setScale}
-            onHandScroll={follow.onHandScroll}
+            listeners={{ onScaleChange: setScale, onHandScroll }}
           >
             {sample}
             {follow.isFollowing && follow.outline && (

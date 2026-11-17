@@ -1,14 +1,16 @@
 'use client';
 
 import { Button } from '@platform/components/shared/button';
+import { DeviceFrame } from '@platform/components/shared/device-frame';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { IconToolbar } from '@platform/components/shared/icon-toolbar';
 import { usePreviewDeviceGroup } from '@platform/components/shared/preview-device-group';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { DEVICE_FRAME_FIT } from '@platform/constants/device-frame';
 import {
   PREVIEW_DEVICE,
-  PREVIEW_DEVICE_WIDTH,
+  PREVIEW_DEVICE_HEIGHT,
   type TPreviewDevice,
 } from '@platform/constants/preview';
 import { SIZE } from '@shinefold/config';
@@ -17,6 +19,8 @@ import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 
 import { draftPreviewFrameVariants } from './draft-preview-frame-variants';
+
+const PAGE_FIT = { mode: DEVICE_FRAME_FIT.PAGE };
 
 export type TDraftPreviewFrameProps = {
   frameUrl: string;
@@ -33,6 +37,7 @@ export const DraftPreviewFrame = ({
   const [isReloading, startReload] = useTransition();
   const deviceGroup = usePreviewDeviceGroup(device, setDevice);
   const { frame } = draftPreviewFrameVariants();
+  const { host } = new URL(publishedUrl);
 
   const handleReload = () => {
     startReload(() => router.refresh());
@@ -62,13 +67,22 @@ export const DraftPreviewFrame = ({
         </IconToolbar>
       }
     >
-      <iframe
-        key={frameUrl}
-        title={t('frameTitle')}
-        src={frameUrl}
-        className={frame()}
-        style={{ width: PREVIEW_DEVICE_WIDTH[device] }}
-      />
+      <PreviewFrame.Stage>
+        <DeviceFrame
+          device={device}
+          chrome={{ host, isDark: false }}
+          fit={PAGE_FIT}
+          isInteractive={true}
+        >
+          <iframe
+            key={frameUrl}
+            title={t('frameTitle')}
+            src={frameUrl}
+            className={frame()}
+            style={{ height: PREVIEW_DEVICE_HEIGHT[device] }}
+          />
+        </DeviceFrame>
+      </PreviewFrame.Stage>
     </PreviewFrame>
   );
 };

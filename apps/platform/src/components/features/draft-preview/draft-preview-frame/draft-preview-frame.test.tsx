@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { DEVICE_FRAME_TEST_ID } from '@platform/constants/device-frame';
 import {
   PREVIEW_DEVICE,
   PREVIEW_DEVICE_WIDTH,
@@ -6,6 +7,7 @@ import {
 import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { stubResizeObserver } from '@platform/testing/resize-observer';
 import { MOCK_TENANT_URL } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -23,25 +25,46 @@ const setup = customRender(DraftPreviewFrame, {
   publishedUrl: MOCK_PUBLISHED_URL,
 });
 
+const MOCK_STAGE_WIDTH = 564;
+const MOCK_STAGE_HEIGHT = 300;
+
 const frame = () => screen.getByTitle(t('frameTitle'));
+const deviceContent = () => screen.getByTestId(DEVICE_FRAME_TEST_ID.CONTENT);
 
 describe(`<${DraftPreviewFrame.name}/>`, () => {
   let user: UserEvent;
   let refresh: ReturnType<typeof mockRouterRefresh>;
+  let restoreResizeObserver: () => void;
 
   beforeEach(() => {
+    restoreResizeObserver = stubResizeObserver(() => ({
+      width: MOCK_STAGE_WIDTH,
+      height: MOCK_STAGE_HEIGHT,
+    }));
     user = userEvent.setup();
     refresh = mockRouterRefresh();
     setup();
   });
 
-  it("frames the tenant's site at the signed address, desktop-wide", () => {
+  afterEach(() => {
+    restoreResizeObserver();
+  });
+
+  it("frames the tenant's site at the signed address, at the true desktop width", () => {
     const iframe = frame();
+    const content = deviceContent();
 
     expect(iframe).toHaveAttribute('src', MOCK_FRAME_URL);
-    expect(iframe).toHaveStyle({
+    expect(content).toContainElement(iframe);
+    expect(content).toHaveStyle({
       width: `${PREVIEW_DEVICE_WIDTH[PREVIEW_DEVICE.DESKTOP]}px`,
     });
+  });
+
+  it('lets the framed draft be scrolled and clicked', () => {
+    const content = deviceContent();
+
+    expect(content).not.toHaveAttribute('inert');
   });
 
   it('resizes the frame to the chosen device width', async () => {
@@ -49,7 +72,7 @@ describe(`<${DraftPreviewFrame.name}/>`, () => {
 
     await user.click(phone);
 
-    expect(frame()).toHaveStyle({
+    expect(deviceContent()).toHaveStyle({
       width: `${PREVIEW_DEVICE_WIDTH[PREVIEW_DEVICE.PHONE]}px`,
     });
   });
