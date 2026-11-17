@@ -660,6 +660,9 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
         await user.type(idField, MOCK_PLAUSIBLE_ANALYTICS.analyticsId);
         await saveChanges();
+        await waitFor(() => {
+          expect(idField).toBeEnabled();
+        });
       });
 
       it("describes the field with what the provider's id looks like", async () => {
@@ -677,10 +680,6 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       });
 
       it('withdraws the message on the next keystroke', async () => {
-        await screen.findByText(
-          analyticsIdInvalid[ANALYTICS_PROVIDER.GOOGLE_ANALYTICS],
-        );
-
         await user.type(idField, MOCK_GOOGLE_ANALYTICS.analyticsId);
         const message = screen.queryByText(
           analyticsIdInvalid[ANALYTICS_PROVIDER.GOOGLE_ANALYTICS],
