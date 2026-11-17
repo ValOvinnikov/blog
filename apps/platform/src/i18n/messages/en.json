@@ -188,6 +188,7 @@
   },
   "account": {
     "signOut": "Sign out",
+    "signingOut": "Signing out…",
     "signedInAs": "Signed in as {email}",
     "menuLabel": "Account",
     "triggerCollapsedLabel": "Account: {name}, {email}",
@@ -527,6 +528,7 @@
       "SUSPENSION_REASON": "Reason: {category}",
       "SUSPENSION_REFERENCE": "Reference: {reference}",
       "PLAN": "Plan: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Plan: {from} → {to}",
       "SIGN_IN_PROVIDER": "Sign-in provider: {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Client secret replaced"
     }
@@ -2297,6 +2299,7 @@
     "currentPlan": "Your site is on {plan}, paid {interval, select, YEARLY {yearly} other {monthly}}.",
     "pendingChange": "Your site moves to {plan}, paid {interval, select, YEARLY {yearly} other {monthly}}, on <time>{date}</time>.",
     "changeNow": "The change starts today. You pay the difference for the rest of the current period now.",
+    "changeNowNewPeriod": "The change starts today, and a new {interval, select, YEARLY {yearly} other {monthly}} period starts with it. You pay for the new period now, less the unused time on your current one.",
     "changeAtRenewal": "The change starts on <time>{date}</time>, when the current period ends. Nothing changes until then.",
     "keepCurrentDescription": "Your site stays on {plan}, and the change planned for <time>{date}</time> is cancelled.",
     "changeUnchanged": "This is your current plan. Choose another plan or billing period to change it.",

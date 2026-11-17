@@ -188,6 +188,7 @@
   },
   "account": {
     "signOut": "Cerrar sesión",
+    "signingOut": "Cerrando sesión…",
     "signedInAs": "Sesión iniciada como {email}",
     "menuLabel": "Cuenta",
     "triggerCollapsedLabel": "Cuenta: {name}, {email}",
@@ -527,6 +528,7 @@
       "SUSPENSION_REASON": "Motivo: {category}",
       "SUSPENSION_REFERENCE": "Referencia: {reference}",
       "PLAN": "Plan: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Plan: {from} → {to}",
       "SIGN_IN_PROVIDER": "Proveedor de inicio de sesión: {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Secreto de cliente sustituido"
     }
@@ -2297,6 +2299,7 @@
     "currentPlan": "Tu sitio está en {plan}, con pago {interval, select, YEARLY {anual} other {mensual}}.",
     "pendingChange": "Tu sitio pasa a {plan}, con pago {interval, select, YEARLY {anual} other {mensual}}, el <time>{date}</time>.",
     "changeNow": "El cambio empieza hoy. Pagas ahora la diferencia por el resto del periodo actual.",
+    "changeNowNewPeriod": "El cambio empieza hoy y con él empieza un nuevo periodo {interval, select, YEARLY {anual} other {mensual}}. Pagas ahora el nuevo periodo, menos el tiempo sin usar del actual.",
     "changeAtRenewal": "El cambio empieza el <time>{date}</time>, cuando termina el periodo actual. Hasta entonces no cambia nada.",
     "keepCurrentDescription": "Tu sitio se queda en {plan} y se cancela el cambio previsto para el <time>{date}</time>.",
     "changeUnchanged": "Este es tu plan actual. Elige otro plan u otro periodo de facturación para cambiarlo.",

@@ -3,7 +3,11 @@ import { SidebarCollapseProvider } from '@platform/components/features/layout/si
 import { DATA_THEME, THEME_PREFERENCE } from '@platform/constants/theme';
 import messages from '@platform/i18n/messages/en.json';
 import { signOutAction } from '@platform/server/auth/sign-out-action';
-import { ARIA_EXPANDED, ARIA_HASPOPUP } from '@platform/testing/aria';
+import {
+  ARIA_DISABLED,
+  ARIA_EXPANDED,
+  ARIA_HASPOPUP,
+} from '@platform/testing/aria';
 import {
   renderWithIntl,
   screen,
@@ -128,6 +132,17 @@ describe(`<${AccountMenu.name}/>`, () => {
 
         expect(signOutAction).toHaveBeenCalledOnce();
       });
+
+      it('keeps the menu open and shows it is signing out until the redirect', async () => {
+        vi.mocked(signOutAction).mockReturnValueOnce(new Promise(() => {}));
+
+        await user.click(signOutItem);
+
+        const pendingItem = await within(menu).findByRole('menuitem', {
+          name: messages.account.signingOut,
+        });
+        expect(pendingItem).toHaveAttribute(ARIA_DISABLED, 'true');
+      });
     });
   });
 
@@ -202,24 +217,47 @@ describe(`<${AccountMenu.name}/>`, () => {
 
     afterEach(resetThemePreference);
 
-    it('labels the group Theme, describes it by the hint and checks System with no stored choice', async () => {
-      const menu = await openSidebarMenu();
+    describe('opened from the sidebar', () => {
+      let menu: HTMLElement;
 
-      const group = within(menu).getByRole('group', {
-        name: messages.account.themeLabel,
+      beforeEach(async () => {
+        menu = await openSidebarMenu();
       });
-      const items = within(group).getAllByRole(MENU_ITEM_RADIO);
-      const systemItem = getThemeItem(menu, messages.account.themeSystem);
 
-      expect(group).toHaveAccessibleDescription(
-        messages.account.themeSystemHint,
-      );
-      expect(items.map((item) => item.textContent)).toEqual([
-        messages.account.themeLight,
-        messages.account.themeDark,
-        messages.account.themeSystem,
-      ]);
-      expect(systemItem).toBeChecked();
+      it('labels and describes the group and checks System by default', () => {
+        const group = within(menu).getByRole('group', {
+          name: messages.account.themeLabel,
+        });
+        const items = within(group).getAllByRole(MENU_ITEM_RADIO);
+        const systemItem = getThemeItem(menu, messages.account.themeSystem);
+
+        expect(group).toHaveAccessibleDescription(
+          messages.account.themeSystemHint,
+        );
+        expect(items.map((item) => item.textContent)).toEqual([
+          messages.account.themeLight,
+          messages.account.themeDark,
+          messages.account.themeSystem,
+        ]);
+        expect(systemItem).toBeChecked();
+      });
+
+      it('applies and stores a chosen theme, moves the check and keeps the menu open', async () => {
+        const darkItem = getThemeItem(menu, messages.account.themeDark);
+        await user.click(darkItem);
+        const systemItem = getThemeItem(menu, messages.account.themeSystem);
+
+        expect(document.documentElement).toHaveAttribute(
+          DATA_THEME_ATTRIBUTE,
+          DATA_THEME[COLOR_SCHEME.DARK],
+        );
+        expect(document.cookie).toBe(
+          `${THEME_PREFERENCE_COOKIE}=${THEME_PREFERENCE.DARK}`,
+        );
+        expect(darkItem).toBeChecked();
+        expect(systemItem).not.toBeChecked();
+        expect(menu).toBeVisible();
+      });
     });
 
     it('checks the stored choice', async () => {
@@ -229,25 +267,6 @@ describe(`<${AccountMenu.name}/>`, () => {
       const lightItem = getThemeItem(menu, messages.account.themeLight);
 
       expect(lightItem).toBeChecked();
-    });
-
-    it('applies and stores a chosen theme, moves the check and keeps the menu open', async () => {
-      const menu = await openSidebarMenu();
-
-      const darkItem = getThemeItem(menu, messages.account.themeDark);
-      await user.click(darkItem);
-      const systemItem = getThemeItem(menu, messages.account.themeSystem);
-
-      expect(document.documentElement).toHaveAttribute(
-        DATA_THEME_ATTRIBUTE,
-        DATA_THEME[COLOR_SCHEME.DARK],
-      );
-      expect(document.cookie).toBe(
-        `${THEME_PREFERENCE_COOKIE}=${THEME_PREFERENCE.DARK}`,
-      );
-      expect(darkItem).toBeChecked();
-      expect(systemItem).not.toBeChecked();
-      expect(menu).toBeVisible();
     });
 
     it('hands the theme back to the device setting when System is chosen', async () => {

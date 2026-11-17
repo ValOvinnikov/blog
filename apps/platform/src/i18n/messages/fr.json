@@ -188,6 +188,7 @@
   },
   "account": {
     "signOut": "Se déconnecter",
+    "signingOut": "Déconnexion…",
     "signedInAs": "Connecté en tant que {email}",
     "menuLabel": "Compte",
     "triggerCollapsedLabel": "Compte : {name}, {email}",
@@ -527,6 +528,7 @@
       "SUSPENSION_REASON": "Motif : {category}",
       "SUSPENSION_REFERENCE": "Référence : {reference}",
       "PLAN": "Formule : {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Formule : {from} → {to}",
       "SIGN_IN_PROVIDER": "Fournisseur de connexion : {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Secret client remplacé"
     }
@@ -2297,6 +2299,7 @@
     "currentPlan": "Votre site est sur {plan}, payé {interval, select, YEARLY {à l'année} other {au mois}}.",
     "pendingChange": "Votre site passe à {plan}, payé {interval, select, YEARLY {à l'année} other {au mois}}, le <time>{date}</time>.",
     "changeNow": "Le changement commence aujourd'hui. Vous payez maintenant la différence pour le reste de la période en cours.",
+    "changeNowNewPeriod": "Le changement commence aujourd'hui, avec une nouvelle période {interval, select, YEARLY {annuelle} other {mensuelle}}. Vous payez maintenant la nouvelle période, moins le temps non utilisé de la période en cours.",
     "changeAtRenewal": "Le changement commence le <time>{date}</time>, à la fin de la période en cours. Rien ne change d'ici là.",
     "keepCurrentDescription": "Votre site reste sur {plan}, et le changement prévu le <time>{date}</time> est annulé.",
     "changeUnchanged": "C'est votre formule actuelle. Choisissez une autre formule ou période de facturation pour la changer.",
