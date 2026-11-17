@@ -4066,6 +4066,22 @@
         "file": "apps/platform/src/constants/icon.ts"
       }
     ],
+    "MATCH": [
+      {
+        "ref": "SKIN_MODE.MATCH",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/skin.ts"
+      }
+    ],
+    "INVERSE": [
+      {
+        "ref": "SKIN_MODE.INVERSE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/skin.ts"
+      }
+    ],
     "ascending": [
       {
         "ref": "SORT_DIRECTION.ASCENDING",

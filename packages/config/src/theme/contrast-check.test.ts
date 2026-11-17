@@ -45,7 +45,7 @@ describe(measureContrast, () => {
 
   it('resolves the item accent colour from the card style', () => {
     expect(
-      measureContrast('--item-accent-color', '--surface', {
+      measureContrast('--item-accent-brand-share', '--surface', {
         ...MOCK_LIGHT_ACCENT_BAR,
         cardStyle: CARD_STYLE.OUTLINED,
       }),

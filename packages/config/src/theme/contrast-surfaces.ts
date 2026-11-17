@@ -8,6 +8,8 @@ export const BRAND_PRIMARY_MUTED =
 export const ERROR_MUTED = '--error-muted' satisfies TThemeToken;
 export const TEXT = '--text' satisfies TThemeToken;
 export const BRAND_PRIMARY = '--brand-primary' satisfies TThemeToken;
+export const ITEM_ACCENT_BRAND_SHARE =
+  '--item-accent-brand-share' satisfies TThemeToken;
 
 export const BANDS = [
   '--primary',

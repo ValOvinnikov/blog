@@ -58,8 +58,10 @@ constants, `routes`, generated Sanity types, shared types, `client/objects`,
 | `test:watch` | `pnpm --filter @shinefold/config test:watch` |
 
 `gen:skins` writes `formatSkinCss()`'s output to `configs/tailwind/skins.css`,
-which `theme.css` imports. Run it after any palette change:
-`skin-css.test.ts` fails `pnpm test` while the checked-in file differs.
+which `theme.css` imports, and `formatStorybookSkinCss()`'s to
+`configs/tailwind/skins-storybook.css`, which only the Storybook previews
+import. Run it after any palette or skin change: `skin-css.test.ts` fails
+`pnpm test` while either checked-in file differs.
 
 Root-level `pnpm type-check` / `pnpm lint` / `pnpm test` run every
 workspace's equivalent script through Turborepo, this one included.

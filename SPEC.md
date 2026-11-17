@@ -3127,20 +3127,26 @@ the values site-wide on the Look page (`site_config.card_style`), and
 `buildThemeStyleBlock` declares them under `:root` from `@shinefold/config`'s
 `CARD_STYLE_DECLARATIONS`:
 
-| Property                 | `ACCENT_BAR` (default) | `OUTLINED`         | `FILLED`               | `RAISED`             | `PLAIN`         |
-| ------------------------ | ---------------------- | ------------------ | ---------------------- | -------------------- | --------------- |
-| `--item-radius`          | `var(--radius-md)`     | `var(--radius-md)` | same                   | same                 | same            |
-| `--item-border-width`    | `0px`                  | `1px`              | `0px`                  | `1px`                | `0px`           |
-| `--item-accent-width`    | `2px`                  | `1px`              | `0px`                  | `1px`                | `0px`           |
-| `--item-accent-color`    | `var(--brand-primary)` | `var(--border)`    | `var(--border)`        | `var(--border)`      | `var(--border)` |
-| `--item-shadow`          | `none`                 | `none`             | `none`                 | `var(--shadow-card)` | `none`          |
-| `--item-fill-mix`        | `0%`                   | `0%`               | `100%`                 | `0%`                 | `0%`            |
-| `--item-clear-mix`       | `0%`                   | `0%`               | `0%`                   | `0%`                 | `100%`          |
-| `--item-card-hover-mix`  | `0%`                   | `0%`               | `100%`                 | `0%`                 | `0%`            |
-| `--item-card-hover-edge` | `transparent`          | `transparent`      | `var(--border-strong)` | `transparent`        | `transparent`   |
-| `--item-divider-width`   | `0px`                  | `0px`              | `0px`                  | `0px`                | `1px`           |
-| `--item-stack-gap`       | `0.75rem`              | `0.75rem`          | `0.75rem`              | `0.75rem`            | `0px`           |
-| `--item-stack-radius`    | `var(--radius-md)`     | `var(--radius-md)` | same                   | same                 | `0px`           |
+| Property                    | `ACCENT_BAR` (default) | `OUTLINED`         | `FILLED`               | `RAISED`             | `PLAIN`       |
+| --------------------------- | ---------------------- | ------------------ | ---------------------- | -------------------- | ------------- |
+| `--item-radius`             | `var(--radius-md)`     | `var(--radius-md)` | same                   | same                 | same          |
+| `--item-border-width`       | `0px`                  | `1px`              | `0px`                  | `1px`                | `0px`         |
+| `--item-accent-width`       | `2px`                  | `1px`              | `0px`                  | `1px`                | `0px`         |
+| `--item-accent-brand-share` | `100%`                 | `0%`               | `0%`                   | `0%`                 | `0%`          |
+| `--item-shadow`             | `none`                 | `none`             | `none`                 | `var(--shadow-card)` | `none`        |
+| `--item-fill-mix`           | `0%`                   | `0%`               | `100%`                 | `0%`                 | `0%`          |
+| `--item-clear-mix`          | `0%`                   | `0%`               | `0%`                   | `0%`                 | `100%`        |
+| `--item-card-hover-mix`     | `0%`                   | `0%`               | `100%`                 | `0%`                 | `0%`          |
+| `--item-card-hover-edge`    | `transparent`          | `transparent`      | `var(--border-strong)` | `transparent`        | `transparent` |
+| `--item-divider-width`      | `0px`                  | `0px`              | `0px`                  | `0px`                | `1px`         |
+| `--item-stack-gap`          | `0.75rem`              | `0.75rem`          | `0.75rem`              | `0.75rem`            | `0px`         |
+| `--item-stack-radius`       | `var(--radius-md)`     | `var(--radius-md)` | same                   | same                 | `0px`         |
+
+The accent edge is a switch, not a colour: `item-card` paints it
+`color-mix(in oklch, var(--brand-primary) var(--item-accent-brand-share), var(--border))`,
+so the colour resolves at the card from the roles of the skin it sits in,
+while the card style set on the nearest ancestor — the tenant's `:root`, or a
+nested scope such as a per-module block — decides which of the two it shows.
 
 The fill is `--surface` mixed toward `--item-fill` by `--item-fill-mix`. A
 band owns `--item-fill`, the tint a filled card takes on it, and

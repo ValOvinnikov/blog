@@ -25,7 +25,7 @@ export const pricingCardVariants = tv({
       true: {
         root: [
           'border-brand-primary',
-          '[--item-border-width:1px] [--item-accent-color:var(--brand-primary)] [--item-shadow:var(--shadow-card)]',
+          '[--item-border-width:1px] [--item-accent-brand-share:100%] [--item-shadow:var(--shadow-card)]',
         ],
       },
       false: {},

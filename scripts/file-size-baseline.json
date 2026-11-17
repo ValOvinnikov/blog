@@ -35,7 +35,7 @@
   "apps/worker/src/utils/owner-access/revoke-former-owner-access.ts": 136,
   "apps/worker/src/utils/owner-email/owner-email-copy.ts": 153,
   "packages/config/src/constants/icon.ts": 125,
-  "packages/config/src/theme/contrast-pairs.ts": 143,
+  "packages/config/src/theme/contrast-pairs.ts": 131,
   "packages/config/src/voice/voice-fixed-keys.ts": 213,
   "packages/db/scripts/deprovision-tenant/run.ts": 224,
   "packages/db/scripts/seed-tenant.ts": 176,
