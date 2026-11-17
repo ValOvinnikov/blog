@@ -1581,9 +1581,11 @@
       "provisioningStarted": "Die Bereitstellung dieses Mandanten hat bereits begonnen; seine Details können nicht mehr bearbeitet werden.",
       "ownerAlreadyJoined": "Der Inhaber dieses Mandanten hat sich bereits angemeldet, daher kann seine E-Mail-Adresse hier nicht mehr korrigiert werden — dies würde stattdessen die Inhaberschaft übertragen.",
       "ownerHasFreeTenant": "Dieser Inhaber hat bereits eine kostenlose Website. Archivieren Sie sie oder belassen Sie diese Website in ihrem aktuellen Tarif.",
+      "planFollowsSubscription": "Diese Website hat ein aktives Abonnement, daher folgt ihr Tarif Stripe. Ändern Sie ihn auf der Abrechnungsseite des Inhabers oder im Stripe-Dashboard.",
       "saveFailed": "Die Mandantendaten konnten nicht gespeichert werden — bitte erneut versuchen."
     },
-    "fieldLockedReasonCustomMainDomain": "Gesperrt — die Hauptadresse ist die eigene Domain. Wechsle zum Bearbeiten auf der Domain-Seite zurück zur Subdomain."
+    "fieldLockedReasonCustomMainDomain": "Gesperrt — die Hauptadresse ist die eigene Domain. Wechsle zum Bearbeiten auf der Domain-Seite zurück zur Subdomain.",
+    "fieldLockedReasonSubscribed": "Gesperrt — diese Website hat ein aktives Abonnement, daher folgt ihr Tarif Stripe. Ändern Sie ihn auf der Abrechnungsseite des Inhabers oder im Stripe-Dashboard."
   },
   "tenantFieldErrors": {
     "nameRequired": "Geben Sie einen Mandantennamen ein.",

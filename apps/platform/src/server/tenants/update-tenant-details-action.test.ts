@@ -16,6 +16,7 @@ import {
   MOCK_OPERATOR_ID,
   MOCK_OPERATOR_EMAIL,
 } from '@platform/testing/admins/operator';
+import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
@@ -240,6 +241,56 @@ describe(updateTenantDetailsAction, () => {
         input,
       );
     });
+  });
+
+  describe('while the site has a live subscription', () => {
+    beforeEach(() => {
+      getTenantByIdMock.mockResolvedValue(
+        mockTenant({
+          plan: TENANT_PLAN.GROWTH,
+          stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
+        }),
+      );
+    });
+
+    it('refuses a plan change without saving anything', async () => {
+      const result = await updateTenantDetailsAction(
+        MOCK_TENANT_ID,
+        validInput,
+      );
+
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.PLAN_FOLLOWS_SUBSCRIPTION,
+      });
+      expect(updateTenantDetailsMock).not.toHaveBeenCalled();
+      expect(notifyOwnerOfPlanChangeMock).not.toHaveBeenCalled();
+    });
+
+    it('still saves other fields while the plan is unchanged', async () => {
+      const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
+        ...validInput,
+        plan: TENANT_PLAN.GROWTH,
+      });
+
+      expect(result).toMatchObject({ outcome: ACTION_OUTCOME.SUCCESS });
+    });
+  });
+
+  it('saves a plan change once a cancelled subscription moved the site to Free', async () => {
+    getTenantByIdMock.mockResolvedValue(
+      mockTenant({
+        plan: TENANT_PLAN.FREE,
+        stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
+      }),
+    );
+
+    const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
+      ...validInput,
+      plan: TENANT_PLAN.GROWTH,
+    });
+
+    expect(result).toMatchObject({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('returns field errors for an invalid domain', async () => {
