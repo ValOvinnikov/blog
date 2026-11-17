@@ -1579,9 +1579,11 @@
       "provisioningStarted": "El aprovisionamiento de este cliente ya ha comenzado; sus detalles ya no se pueden editar.",
       "ownerAlreadyJoined": "El propietario de este cliente ya ha iniciado sesión, por lo que su correo ya no se puede corregir aquí: eso transferiría la propiedad.",
       "ownerHasFreeTenant": "Este propietario ya tiene un sitio gratuito. Archívelo o mantenga este sitio en su plan actual.",
+      "planFollowsSubscription": "Este sitio tiene una suscripción activa, así que su plan sigue a Stripe. Cámbielo en la página de Facturación del propietario o en el panel de Stripe.",
       "saveFailed": "No se pudieron guardar los datos del cliente. Vuelva a intentarlo."
     },
-    "fieldLockedReasonCustomMainDomain": "Bloqueado — la dirección principal es su propio dominio. Para editarla, vuelve al subdominio en la página Dominio."
+    "fieldLockedReasonCustomMainDomain": "Bloqueado — la dirección principal es su propio dominio. Para editarla, vuelve al subdominio en la página Dominio.",
+    "fieldLockedReasonSubscribed": "Bloqueado — este sitio tiene una suscripción activa, así que su plan sigue a Stripe. Cámbielo en la página de Facturación del propietario o en el panel de Stripe."
   },
   "tenantFieldErrors": {
     "nameRequired": "Introduzca un nombre de cliente.",
