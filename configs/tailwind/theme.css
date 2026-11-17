@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './skins.css';
 
 /*
  * @shinefold/tailwind-config — shared Tailwind v4 theme entry.

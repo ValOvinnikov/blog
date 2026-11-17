@@ -1,8 +1,8 @@
 import { PRESET_REGISTRY, type TPresetId } from '@shinefold/config/constants';
 
 import { isAccentHueAccessible } from './accent-hue-guard';
-import { ACCENT_RAMP_LIGHT } from './accent-ramps';
-import { LOGO_RAMP_LIGHT, oklchStopToHex } from './theme-declarations';
+import { ACCENT_RAMP_LIGHT, LOGO_RAMP_LIGHT } from './accent-ramps';
+import { oklchStopToHex } from './theme-declarations';
 import { NEUTRAL_RAMP_LIGHT } from './theme-ramps';
 
 export type TResolveTenantEmailBrandInput = {

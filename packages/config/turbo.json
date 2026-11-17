@@ -3,7 +3,11 @@
   "extends": ["//"],
   "tasks": {
     "test": {
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/apps/web/index.css"]
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/apps/web/index.css",
+        "$TURBO_ROOT$/configs/tailwind/skins.css"
+      ]
     }
   }
 }

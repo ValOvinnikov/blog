@@ -4,8 +4,11 @@ status: built
 layers: [config, ui, web, platform]
 code:
   - configs/tailwind/theme.css
+  - configs/tailwind/skins.css
   - configs/tailwind/preset.ts
   - packages/config/src/theme/theme-declarations*.ts
+  - packages/config/src/theme/palette-ramps*.ts
+  - packages/config/src/theme/skin-css*.ts
   - packages/config/src/theme/accent-hue-guard*.ts
   - packages/utils/src/color/**
   - packages/ui/src/lib/styling/item-card.ts
@@ -15,7 +18,7 @@ code:
   - packages/ui/index.css
   - apps/web/index.css
   - apps/platform/src/styles/platform-theme.css
-epics: [4987, 4990, 4991, 4994, 4996, 4997, 4858, 5459, 5067]
+epics: [4987, 4990, 4991, 4994, 4996, 4997, 4858, 5459, 5067, 5016]
 ---
 
 # Design tokens and surfaces
@@ -46,7 +49,8 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - **`@theme inline`** — semantic colour utilities (`bg-surface`, `text-text-muted`, `border-divider`, `ring-offset-ambient`, `bg-brand-primary-solid`, status `success`/`warn`/`error`/`info` and their `-muted` tints, `on-image`), `shadow-card`, `shadow-float`, and the font stacks. Each emits `var(--…)` rather than a literal.
 - **`@theme`** — radius steps plus role radii (`--radius-card` → `--radius-md`, `--radius-media` → `--radius-lg`, `--radius-item` → `--item-radius`); the role hooks (below); containers; layout spacing (`gutter`, `section`, `page-y`, `site-x/y`, `card-x/y`, `card-gap`, and the `band` step with its `sm`–`xl` ladder); the type scale (`title-*`, `prose-*`, `card-*`, `meta`, `label`, `code`, …); tracking; easing.
 - **`:root`, with `.dark` overrides** — page neutrals (`primary`, `primary-subtle`, `secondary`, `surface`, `surface-2`), borders (`border`, `border-strong`, `border-emphasis`), ink (`text`, `text-muted`), the brand ramp, `ring`, status colours, logo steps, shadows, durations, the on-image and scrim tokens, the seven `--item-*` card-style properties, the two header-control properties (`--header-control-border` → `--border-strong`, `--header-control-fill` → `--surface`, with no `.dark` copy), the navigation-link properties at their Plain values (`--nav-link-fill` and `--nav-link-outline: transparent`, `--nav-link-decoration: none`, `--nav-link-padding-x`/`-y: 0px`; `--nav-link-radius` is left unset so `rounded-nav-link` falls back to the nearest `--radius-sm`), and `--ambient`/`--divider`/`--field-boundary`.
-- **`@shinefold/config` theme tables** (`accent-ramps.ts`, `radius-declarations.ts`, `theme-declarations.ts`) — `ACCENT_RAMP_LIGHT/DARK` (with `--brand-primary-wash`, the lighter-in-light, darker-in-dark tint a Filled card takes on a Brand tint band), `LOGO_RAMP_LIGHT/DARK` (with `--logo-tile`, the fill of the initial tile a site with no logo shows — a dark tile in light, a pale one in dark — and `--logo-tile-contrast`, its letter, held to 4.5:1 by the contrast guard) and `IMAGE_SCRIM_RAMP` as OKLCH stops with fixed lightness and chroma, plus `RADIUS_DECLARATIONS`, `DENSITY_DECLARATIONS` and `CARD_STYLE_DECLARATIONS`. `formatOklchRamp` fills in the tenant's hue.
+- **Palette tier** (`palette-ramps.ts`) — every opaque colour a role holds, as named stops: `NEUTRAL_PALETTE` (hue 250, or achromatic), `BRAND_PALETTE` (no hue of its own, so it takes the tenant's) and `STATUS_PALETTE` (success, warn and error at their own hues). A stop is named `--palette-<family>-<l × 1000>-<c × 1000>`. The role ramps point at stops rather than restating values, and a role that needs translucency (the scrims, `--on-image-muted`) adds its alpha to a stop. `formatPaletteDeclarations(hue)` returns the palette's declarations at a hue. `formatSkinCss()` renders them at Console's hue on `:root`, `pnpm --filter @shinefold/config gen:skins` writes that to `configs/tailwind/skins.css`, and `theme.css` imports it; `skin-css.test.ts` fails while the checked-in file differs. No role reads a palette stop yet.
+- **`@shinefold/config` theme tables** (`accent-ramps.ts`, `theme-ramps.ts`, `radius-declarations.ts`, `theme-declarations.ts`) — `ACCENT_RAMP_LIGHT/DARK` (with `--brand-primary-wash`, the lighter-in-light, darker-in-dark tint a Filled card takes on a Brand tint band), `LOGO_RAMP_LIGHT/DARK` (with `--logo-tile`, the fill of the initial tile a site with no logo shows — a dark tile in light, a pale one in dark — and `--logo-tile-contrast`, its letter, held to 4.5:1 by the contrast guard) and `IMAGE_SCRIM_RAMP` as OKLCH stops with fixed lightness and chroma, plus `RADIUS_DECLARATIONS`, `DENSITY_DECLARATIONS` and `CARD_STYLE_DECLARATIONS`. `formatOklchRamp` fills in the tenant's hue.
 - **Colour maths** — `@shinefold/utils/color`: `renderedContrastRatio` (culori, OKLCH in, the worse of gamut mapping and clipping into sRGB), `oklchToHex`, `WCAG_AA_CONTRAST_MIN` (4.5).
 
 ## Configuration
@@ -110,7 +114,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 
 ## Tests and stories
 
-- `packages/config/src/theme/theme-declarations.test.ts`, `accent-hue-guard.test.ts`
+- `packages/config/src/theme/theme-declarations.test.ts`, `accent-hue-guard.test.ts`, `palette-ramps.test.ts` (every role value is a stop; brand stops take the hue), `skin-css.test.ts` (the `skins.css` drift gate)
 - `packages/utils/src/color/oklch.test.ts`
 - `apps/web/src/utils/build-theme-style-block/build-theme-style-block.test.ts` (Console parity with `theme.css`)
 - `packages/ui/src/lib/design-tokens/parse-theme-tokens.test.ts`, `token-registry.test.ts`

@@ -1,55 +1,65 @@
+import { NEUTRAL_PALETTE, STATUS_PALETTE } from './palette-ramps';
 import type { TOklchRamp } from './theme-declarations';
 
 export const NEUTRAL_RAMP_LIGHT = {
-  '--primary': { l: 0.99, c: 0.002, h: 250 },
-  '--primary-subtle': { l: 0.965, c: 0.003, h: 250 },
-  '--secondary': { l: 0.91, c: 0.004, h: 250 },
-  '--surface': { l: 1, c: 0, h: 0 },
-  '--surface-2': { l: 0.975, c: 0.003, h: 250 },
-  '--border': { l: 0.9, c: 0.004, h: 250 },
-  '--border-strong': { l: 0.8, c: 0.006, h: 250 },
-  '--border-emphasis': { l: 0.62, c: 0.006, h: 250 },
-  '--field-boundary-tinted': { l: 0.58, c: 0.006, h: 250 },
-  '--text': { l: 0.2, c: 0.01, h: 250 },
-  '--text-muted': { l: 0.46, c: 0.01, h: 250 },
+  '--primary': NEUTRAL_PALETTE['--palette-neutral-990-2'],
+  '--primary-subtle': NEUTRAL_PALETTE['--palette-neutral-965-3'],
+  '--secondary': NEUTRAL_PALETTE['--palette-neutral-910-4'],
+  '--surface': NEUTRAL_PALETTE['--palette-neutral-1000-0'],
+  '--surface-2': NEUTRAL_PALETTE['--palette-neutral-975-3'],
+  '--border': NEUTRAL_PALETTE['--palette-neutral-900-4'],
+  '--border-strong': NEUTRAL_PALETTE['--palette-neutral-800-6'],
+  '--border-emphasis': NEUTRAL_PALETTE['--palette-neutral-620-6'],
+  '--field-boundary-tinted': NEUTRAL_PALETTE['--palette-neutral-580-6'],
+  '--text': NEUTRAL_PALETTE['--palette-neutral-200-10'],
+  '--text-muted': NEUTRAL_PALETTE['--palette-neutral-460-10'],
 } as const satisfies TOklchRamp;
 
 export const NEUTRAL_RAMP_DARK = {
-  '--primary': { l: 0.17, c: 0.006, h: 250 },
-  '--primary-subtle': { l: 0.2, c: 0.006, h: 250 },
-  '--secondary': { l: 0.24, c: 0.007, h: 250 },
-  '--surface': { l: 0.21, c: 0.007, h: 250 },
-  '--surface-2': { l: 0.24, c: 0.008, h: 250 },
-  '--border': { l: 0.3, c: 0.008, h: 250 },
-  '--border-strong': { l: 0.42, c: 0.01, h: 250 },
-  '--border-emphasis': { l: 0.55, c: 0.01, h: 250 },
-  '--field-boundary-tinted': { l: 0.59, c: 0.01, h: 250 },
-  '--text': { l: 0.95, c: 0.004, h: 250 },
-  '--text-muted': { l: 0.72, c: 0.008, h: 250 },
+  '--primary': NEUTRAL_PALETTE['--palette-neutral-170-6'],
+  '--primary-subtle': NEUTRAL_PALETTE['--palette-neutral-200-6'],
+  '--secondary': NEUTRAL_PALETTE['--palette-neutral-240-7'],
+  '--surface': NEUTRAL_PALETTE['--palette-neutral-210-7'],
+  '--surface-2': NEUTRAL_PALETTE['--palette-neutral-240-8'],
+  '--border': NEUTRAL_PALETTE['--palette-neutral-300-8'],
+  '--border-strong': NEUTRAL_PALETTE['--palette-neutral-420-10'],
+  '--border-emphasis': NEUTRAL_PALETTE['--palette-neutral-550-10'],
+  '--field-boundary-tinted': NEUTRAL_PALETTE['--palette-neutral-590-10'],
+  '--text': NEUTRAL_PALETTE['--palette-neutral-950-4'],
+  '--text-muted': NEUTRAL_PALETTE['--palette-neutral-720-8'],
 } as const satisfies TOklchRamp;
 
 export const STATUS_RAMP_LIGHT = {
-  '--success': { l: 0.49, c: 0.15, h: 150 },
-  '--warn': { l: 0.52, c: 0.15, h: 75 },
-  '--error': { l: 0.53, c: 0.2, h: 25 },
-  '--success-muted': { l: 0.95, c: 0.03, h: 150 },
-  '--warn-muted': { l: 0.95, c: 0.03, h: 75 },
-  '--error-muted': { l: 0.95, c: 0.03, h: 25 },
+  '--success': STATUS_PALETTE['--palette-success-490-150'],
+  '--warn': STATUS_PALETTE['--palette-warn-520-150'],
+  '--error': STATUS_PALETTE['--palette-error-530-200'],
+  '--success-muted': STATUS_PALETTE['--palette-success-950-30'],
+  '--warn-muted': STATUS_PALETTE['--palette-warn-950-30'],
+  '--error-muted': STATUS_PALETTE['--palette-error-950-30'],
 } as const satisfies TOklchRamp;
 
 export const STATUS_RAMP_DARK = {
-  '--success': { l: 0.72, c: 0.16, h: 150 },
-  '--warn': { l: 0.8, c: 0.15, h: 80 },
-  '--error': { l: 0.7, c: 0.17, h: 25 },
-  '--success-muted': { l: 0.3, c: 0.05, h: 150 },
-  '--warn-muted': { l: 0.3, c: 0.05, h: 80 },
-  '--error-muted': { l: 0.3, c: 0.05, h: 25 },
+  '--success': STATUS_PALETTE['--palette-success-720-160'],
+  '--warn': STATUS_PALETTE['--palette-warn-800-150'],
+  '--error': STATUS_PALETTE['--palette-error-700-170'],
+  '--success-muted': STATUS_PALETTE['--palette-success-300-50'],
+  '--warn-muted': STATUS_PALETTE['--palette-warn-300-50'],
+  '--error-muted': STATUS_PALETTE['--palette-error-300-50'],
 } as const satisfies TOklchRamp;
 
 export const NEUTRAL_SCRIM_RAMP = {
-  '--scrim-neutral-strong': { l: 0.18, c: 0.01, h: 250, alpha: 0.9 },
-  '--scrim-neutral-mid': { l: 0.26, c: 0.015, h: 250, alpha: 0.68 },
-  '--scrim-neutral-weak': { l: 0.32, c: 0.02, h: 250, alpha: 0.4 },
+  '--scrim-neutral-strong': {
+    ...NEUTRAL_PALETTE['--palette-neutral-180-10'],
+    alpha: 0.9,
+  },
+  '--scrim-neutral-mid': {
+    ...NEUTRAL_PALETTE['--palette-neutral-260-15'],
+    alpha: 0.68,
+  },
+  '--scrim-neutral-weak': {
+    ...NEUTRAL_PALETTE['--palette-neutral-320-20'],
+    alpha: 0.4,
+  },
 } as const satisfies TOklchRamp;
 
 export const CODE_SYNTAX_RAMP_LIGHT = {

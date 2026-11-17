@@ -43,6 +43,7 @@
       ]
     },
     "packages/config": {
+      "entry": ["scripts/*.ts!"],
       "project": ["**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!", "!src/testing/**!"]
     },
     "packages/service": {
