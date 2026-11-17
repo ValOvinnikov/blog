@@ -25,6 +25,7 @@ export type TPlanChangeProps = {
   current: TPlanChoice;
   renewsAt: Date;
   pending: TMaybeUndefined<TPendingPlanChange>;
+  publishableKey?: string;
 };
 
 export const PlanChange = ({
@@ -32,6 +33,7 @@ export const PlanChange = ({
   current,
   renewsAt,
   pending,
+  publishableKey,
 }: TPlanChangeProps) => {
   const t = useTranslations('upgradePage');
   const tPlan = useTranslations('planNames');
@@ -40,6 +42,7 @@ export const PlanChange = ({
   const { submit, isPending, ...progress } = usePlanChange(
     tenantId,
     current.plan,
+    publishableKey,
   );
   const { body } = planChangeVariants();
   const isCurrent = isSamePlanChoice(choice, current);

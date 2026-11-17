@@ -5,6 +5,7 @@ import { PLAN_CHANGE_REFUSAL } from '@platform/constants/plan-change';
 import { readTenantSubscriptionPlan } from '@platform/server/billing/read-tenant-subscription-plan';
 import { richDate } from '@platform/utils/rich-date/rich-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { stripeEnv } from '@platform/utils/stripe-env/stripe-env';
 import { ALERT_TYPE, SIZE } from '@shinefold/config';
 import { getLocale, getTranslations } from 'next-intl/server';
 
@@ -58,6 +59,7 @@ export const PlanChangeSection = async ({
       current={{ plan, interval }}
       renewsAt={renewsAt}
       pending={pending}
+      publishableKey={stripeEnv.STRIPE_PUBLISHABLE_KEY}
     />
   );
 };

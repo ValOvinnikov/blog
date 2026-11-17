@@ -2349,7 +2349,8 @@
     "NOT_ACTIVE": "Votre abonnement demande votre attention avant de pouvoir changer de formule. Ouvrez Facturation pour le régler.",
     "planEnds": "Votre formule prend fin le <time>{date}</time> et ne peut donc plus changer. Pour la garder, annulez la résiliation depuis Facturation.",
     "UNCHANGED": "Votre site est déjà sur cette formule.",
-    "CARD_DECLINED": "Votre carte a été refusée, donc rien n'a changé. Mettez-la à jour dans Facturation et réessayez."
+    "CARD_DECLINED": "Votre carte a été refusée, donc rien n'a changé. Mettez-la à jour dans Facturation et réessayez.",
+    "PAYMENT_NOT_CONFIRMED": "La confirmation auprès de votre banque n'a pas abouti, donc votre formule n'a pas changé. Réessayez quand vous êtes prêt."
   },
   "helpView": {
     "title": "Aide",

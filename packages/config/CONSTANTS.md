@@ -452,7 +452,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/billing` — `apps/platform/src/constants/billing.ts`
 
-- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`, `CHECKOUT_UNCONFIGURED`=`"billing.checkout_unconfigured"`, `CHECKOUT_PRICE_MISSING`=`"billing.checkout_price_missing"`, `CHECKOUT_FAILED`=`"billing.checkout_failed"`, `CHECKOUT_CUSTOMER_REPLACED`=`"billing.checkout_customer_replaced"`, `CHECKOUT_PROMO_REFUSED`=`"billing.checkout_promo_refused"`, `STRIPE_UNCONFIGURED`=`"billing.stripe_unconfigured"`, `OVERVIEW_FAILED`=`"billing.overview_failed"`, `NEXT_PAYMENT_FAILED`=`"billing.next_payment_failed"`, `PORTAL_FAILED`=`"billing.portal_failed"`, `PLAN_CHANGE_FAILED`=`"billing.plan_change_failed"`, `PLAN_CHANGE_PRICE_MISSING`=`"billing.plan_change_price_missing"`, `PLAN_CHANGE_LOAD_FAILED`=`"billing.plan_change_load_failed"`, `PLAN_CHANGE_RELEASE_FAILED`=`"billing.plan_change_release_failed"`, `CATALOGUE_SYNCED`=`"billing.catalogue_synced"`, `CATALOGUE_SYNC_FAILED`=`"billing.catalogue_sync_failed"`, `CATALOGUE_SYNC_MODE_INVALID`=`"billing.catalogue_sync_mode_invalid"`, `CATALOGUE_SYNC_MODE_MISMATCH`=`"billing.catalogue_sync_mode_mismatch"`, `CATALOGUE_REVALIDATE_SKIPPED`=`"billing.catalogue_revalidate_skipped"`, `CATALOGUE_REVALIDATE_FAILED`=`"billing.catalogue_revalidate_failed"`, `CATALOGUE_PLATFORM_TENANT_MISSING`=`"billing.catalogue_platform_tenant_missing"`
+- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`, `CHECKOUT_UNCONFIGURED`=`"billing.checkout_unconfigured"`, `CHECKOUT_PRICE_MISSING`=`"billing.checkout_price_missing"`, `CHECKOUT_FAILED`=`"billing.checkout_failed"`, `CHECKOUT_CUSTOMER_REPLACED`=`"billing.checkout_customer_replaced"`, `CHECKOUT_PROMO_REFUSED`=`"billing.checkout_promo_refused"`, `STRIPE_UNCONFIGURED`=`"billing.stripe_unconfigured"`, `OVERVIEW_FAILED`=`"billing.overview_failed"`, `NEXT_PAYMENT_FAILED`=`"billing.next_payment_failed"`, `PORTAL_FAILED`=`"billing.portal_failed"`, `PLAN_CHANGE_FAILED`=`"billing.plan_change_failed"`, `PLAN_CHANGE_PRICE_MISSING`=`"billing.plan_change_price_missing"`, `PLAN_CHANGE_LOAD_FAILED`=`"billing.plan_change_load_failed"`, `PLAN_CHANGE_RELEASE_FAILED`=`"billing.plan_change_release_failed"`, `PLAN_CHANGE_PAYMENT_UNKNOWN`=`"billing.plan_change_payment_unknown"`, `CATALOGUE_SYNCED`=`"billing.catalogue_synced"`, `CATALOGUE_SYNC_FAILED`=`"billing.catalogue_sync_failed"`, `CATALOGUE_SYNC_MODE_INVALID`=`"billing.catalogue_sync_mode_invalid"`, `CATALOGUE_SYNC_MODE_MISMATCH`=`"billing.catalogue_sync_mode_mismatch"`, `CATALOGUE_REVALIDATE_SKIPPED`=`"billing.catalogue_revalidate_skipped"`, `CATALOGUE_REVALIDATE_FAILED`=`"billing.catalogue_revalidate_failed"`, `CATALOGUE_PLATFORM_TENANT_MISSING`=`"billing.catalogue_platform_tenant_missing"`
 - **STRIPE_SUBSCRIPTION_STATUS**: `ACTIVE`=`"active"`, `TRIALING`=`"trialing"`, `PAST_DUE`=`"past_due"`, `CANCELED`=`"canceled"`, `UNPAID`=`"unpaid"`
 - **STRIPE_RECURRING_INTERVAL**: `MONTHLY`=`"month"`, `YEARLY`=`"year"`
 - **STRIPE_PRORATION_BEHAVIOR**: `NONE`=`"none"`, `ALWAYS_INVOICE`=`"always_invoice"`
@@ -667,7 +667,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/plan-change` — `apps/platform/src/constants/plan-change.ts`
 
 - **PLAN_CHANGE_TIMING**: `NOW`, `AT_RENEWAL`, `CANCEL_PENDING`
-- **PLAN_CHANGE_REFUSAL**: `NOT_SUBSCRIBED`, `NOT_ACTIVE`, `UNCHANGED`, `CARD_DECLINED`
+- **PLAN_CHANGE_REFUSAL**: `NOT_SUBSCRIBED`, `NOT_ACTIVE`, `UNCHANGED`, `CARD_DECLINED`, `PAYMENT_NOT_CONFIRMED`
 
 ### `@platform/constants/preset-list` — `apps/platform/src/constants/preset-list.ts`
 
@@ -773,6 +773,13 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/stripe-key-mode` — `apps/platform/src/constants/stripe-key-mode.ts`
 
 - **STRIPE_KEY_MODE**: `TEST`=`"test"`, `LIVE`=`"live"`
+
+### `@platform/constants/stripe-payment` — `apps/platform/src/constants/stripe-payment.ts`
+
+- **STRIPE_PAYMENT_BEHAVIOR**: `PENDING_IF_INCOMPLETE`=`"pending_if_incomplete"`
+- **STRIPE_PAYMENT_INTENT_STATUS**: `REQUIRES_ACTION`=`"requires_action"`, `REQUIRES_PAYMENT_METHOD`=`"requires_payment_method"`, `PROCESSING`=`"processing"`
+- **STRIPE_JS_ERROR_TYPE**: `CARD_ERROR`=`"card_error"`
+- **STRIPE_JS_ERROR_CODE**: `AUTHENTICATION_FAILURE`=`"payment_intent_authentication_failure"`
 
 ### `@platform/constants/stripe-schedule` — `apps/platform/src/constants/stripe-schedule.ts`
 

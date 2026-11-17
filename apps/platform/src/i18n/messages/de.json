@@ -2349,7 +2349,8 @@
     "NOT_ACTIVE": "Dein Abonnement braucht deine Aufmerksamkeit, bevor sich der Tarif ändern kann. Öffne die Abrechnung, um das zu klären.",
     "planEnds": "Dein Tarif endet am <time>{date}</time> und kann sich deshalb nicht mehr ändern. Um ihn zu behalten, nimm die Kündigung in der Abrechnung zurück.",
     "UNCHANGED": "Deine Website nutzt diesen Tarif bereits.",
-    "CARD_DECLINED": "Deine Karte wurde abgelehnt, daher hat sich nichts geändert. Aktualisiere sie in der Abrechnung und versuch es erneut."
+    "CARD_DECLINED": "Deine Karte wurde abgelehnt, daher hat sich nichts geändert. Aktualisiere sie in der Abrechnung und versuch es erneut.",
+    "PAYMENT_NOT_CONFIRMED": "Die Bestätigung bei deiner Bank wurde nicht abgeschlossen, daher hat sich dein Tarif nicht geändert. Versuch es erneut, wenn du so weit bist."
   },
   "helpView": {
     "title": "Hilfe",

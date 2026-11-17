@@ -3,6 +3,7 @@
 import { BILLING_LOG } from '@platform/constants/billing';
 import {
   PLAN_CHANGE_REFUSAL,
+  PLAN_CHANGE_TIMING,
   type TPlanChangeRefusal,
   type TPlanChangeTiming,
   type TPlanChoice,
@@ -16,6 +17,7 @@ import {
   type TActionResult,
   type TOutcome,
 } from '@shinefold/config';
+import { isString } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import Stripe from 'stripe';
 
@@ -25,7 +27,11 @@ import { planChoiceSchema } from './upgrade-checkout-input';
 import { planChangeRefusalFor } from './upgrade-state-for';
 
 export type TChangePlanResult =
-  | { outcome: typeof ACTION_OUTCOME.SUCCESS; timing: TPlanChangeTiming }
+  | {
+      outcome: typeof ACTION_OUTCOME.SUCCESS;
+      timing: TPlanChangeTiming;
+      clientSecret?: string;
+    }
   | Exclude<
       TActionResult<
         typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
@@ -78,7 +84,19 @@ export const changePlanAction = async (
       tenantId,
     );
     if (!result) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
-    if (result === PLAN_CHANGE_REFUSAL.UNCHANGED) return refused(result);
+    if (!isString(result)) {
+      return {
+        outcome: ACTION_OUTCOME.SUCCESS,
+        timing: PLAN_CHANGE_TIMING.NOW,
+        clientSecret: result.clientSecret,
+      };
+    }
+    if (
+      result === PLAN_CHANGE_REFUSAL.UNCHANGED ||
+      result === PLAN_CHANGE_REFUSAL.CARD_DECLINED
+    ) {
+      return refused(result);
+    }
     return { outcome: ACTION_OUTCOME.SUCCESS, timing: result };
   } catch (error) {
     if (isPaymentFailure(error)) {

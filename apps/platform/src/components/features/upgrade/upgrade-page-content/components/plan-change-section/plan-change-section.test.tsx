@@ -25,6 +25,8 @@ vi.mock('@platform/server/billing/change-plan-action');
 
 vi.mock('@platform/server/billing/get-tenant-plan-action');
 
+vi.mock('@platform/utils/stripe-env/stripe-env');
+
 vi.mock('@platform/server/billing/read-tenant-subscription-plan', () => ({
   readTenantSubscriptionPlan: vi.fn(),
 }));

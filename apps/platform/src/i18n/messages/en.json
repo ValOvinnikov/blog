@@ -2349,7 +2349,8 @@
     "NOT_ACTIVE": "Your subscription needs attention before its plan can change. Open Billing to settle it.",
     "planEnds": "Your plan ends on <time>{date}</time>, so it can't change. To keep it, undo the cancellation from Billing.",
     "UNCHANGED": "Your site is already on this plan.",
-    "CARD_DECLINED": "Your card was declined, so nothing changed. Update it in Billing and try again."
+    "CARD_DECLINED": "Your card was declined, so nothing changed. Update it in Billing and try again.",
+    "PAYMENT_NOT_CONFIRMED": "Your bank's confirmation wasn't completed, so your plan hasn't changed. Try again when you're ready."
   },
   "helpView": {
     "title": "Help",
