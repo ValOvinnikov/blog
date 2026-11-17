@@ -28,7 +28,8 @@
     "signUpTitle": "Crear una cuenta",
     "onboarding": "Crear tu sitio",
     "billing": "Facturación · Administración",
-    "upgrade": "Mejorar plan"
+    "upgrade": "Mejorar plan",
+    "help": "Ayuda"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -188,6 +189,7 @@
   },
   "account": {
     "signOut": "Cerrar sesión",
+    "signingOut": "Cerrando sesión…",
     "signedInAs": "Sesión iniciada como {email}",
     "menuLabel": "Cuenta",
     "triggerCollapsedLabel": "Cuenta: {name}, {email}",
@@ -244,7 +246,9 @@
     "blockedSignups": "Registros bloqueados",
     "dataRequests": "Solicitudes de datos",
     "badgeUnreadLeads": "{count, plural, one {# nuevo} other {# nuevos}}",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Soporte",
+    "help": "Ayuda"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -527,6 +531,7 @@
       "SUSPENSION_REASON": "Motivo: {category}",
       "SUSPENSION_REFERENCE": "Referencia: {reference}",
       "PLAN": "Plan: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Plan: {from} → {to}",
       "SIGN_IN_PROVIDER": "Proveedor de inicio de sesión: {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Secreto de cliente sustituido"
     }
@@ -1579,9 +1584,11 @@
       "provisioningStarted": "El aprovisionamiento de este cliente ya ha comenzado; sus detalles ya no se pueden editar.",
       "ownerAlreadyJoined": "El propietario de este cliente ya ha iniciado sesión, por lo que su correo ya no se puede corregir aquí: eso transferiría la propiedad.",
       "ownerHasFreeTenant": "Este propietario ya tiene un sitio gratuito. Archívelo o mantenga este sitio en su plan actual.",
+      "planFollowsSubscription": "Este sitio tiene una suscripción activa, así que su plan sigue a Stripe. Cámbielo en la página de Facturación del propietario o en el panel de Stripe.",
       "saveFailed": "No se pudieron guardar los datos del cliente. Vuelva a intentarlo."
     },
-    "fieldLockedReasonCustomMainDomain": "Bloqueado — la dirección principal es su propio dominio. Para editarla, vuelve al subdominio en la página Dominio."
+    "fieldLockedReasonCustomMainDomain": "Bloqueado — la dirección principal es su propio dominio. Para editarla, vuelve al subdominio en la página Dominio.",
+    "fieldLockedReasonSubscribed": "Bloqueado — este sitio tiene una suscripción activa, así que su plan sigue a Stripe. Cámbielo en la página de Facturación del propietario o en el panel de Stripe."
   },
   "tenantFieldErrors": {
     "nameRequired": "Introduzca un nombre de cliente.",
@@ -2296,6 +2303,7 @@
     "currentPlan": "Tu sitio está en {plan}, con pago {interval, select, YEARLY {anual} other {mensual}}.",
     "pendingChange": "Tu sitio pasa a {plan}, con pago {interval, select, YEARLY {anual} other {mensual}}, el <time>{date}</time>.",
     "changeNow": "El cambio empieza hoy. Pagas ahora la diferencia por el resto del periodo actual.",
+    "changeNowNewPeriod": "El cambio empieza hoy y con él empieza un nuevo periodo {interval, select, YEARLY {anual} other {mensual}}. Pagas ahora el nuevo periodo, menos el tiempo sin usar del actual.",
     "changeAtRenewal": "El cambio empieza el <time>{date}</time>, cuando termina el periodo actual. Hasta entonces no cambia nada.",
     "keepCurrentDescription": "Tu sitio se queda en {plan} y se cancela el cambio previsto para el <time>{date}</time>.",
     "changeUnchanged": "Este es tu plan actual. Elige otro plan u otro periodo de facturación para cambiarlo.",
@@ -2313,5 +2321,27 @@
     "planEnds": "Tu plan termina el <time>{date}</time>, así que no puede cambiar. Para conservarlo, anula la cancelación desde Facturación.",
     "UNCHANGED": "Tu sitio ya está en este plan.",
     "CARD_DECLINED": "Tu tarjeta ha sido rechazada, así que no ha cambiado nada. Actualízala en Facturación e inténtalo de nuevo."
+  },
+  "helpView": {
+    "title": "Ayuda",
+    "description": "Envía un mensaje a nuestro equipo de soporte. Incluimos tu sitio, tu plan y esta cuenta, para que no tengas que hacerlo tú.",
+    "helpCentre": "Centro de ayuda",
+    "unavailableTitle": "El formulario de ayuda no está disponible",
+    "unavailableDescription": "Ahora mismo no se pueden enviar mensajes desde aquí. Vuelve a intentarlo más tarde."
+  },
+  "helpForm": {
+    "title": "Contactar con soporte",
+    "responseTime": "Solemos responder en un plazo de dos días laborables.",
+    "subjectLabel": "Asunto",
+    "messageLabel": "Mensaje",
+    "messageHint": "Cuenta qué intentabas hacer y qué pasó en su lugar.",
+    "required": "Rellena este campo.",
+    "tooLong": "Usa menos de {limit} caracteres.",
+    "send": "Enviar mensaje",
+    "sending": "Enviando…",
+    "sent": "Mensaje enviado. Te hemos enviado una copia por correo.",
+    "rateLimited": "Has enviado varios mensajes en poco tiempo. Vuelve a intentarlo más tarde.",
+    "unavailable": "El formulario de ayuda no está disponible ahora mismo. Vuelve a intentarlo más tarde.",
+    "sendFailed": "No se pudo enviar tu mensaje. Inténtalo de nuevo."
   }
 }

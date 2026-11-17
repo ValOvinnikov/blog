@@ -5,7 +5,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const alertVariants = tv({
   slots: {
     root: ['flex w-full rounded-platform border'],
-    icon: ['mt-0.5 self-start'],
+    icon: [],
     text: [],
     title: ['block text-platform-13-5 font-semibold'],
     description: [],
@@ -41,6 +41,7 @@ export const alertVariants = tv({
       },
       true: {
         root: ['gap-2.5 px-3.5 py-2.5'],
+        icon: ['mt-0.5 self-start'],
         text: ['min-w-0 flex-1'],
         description: [
           'text-platform-13 leading-platform-19 text-platform-text',

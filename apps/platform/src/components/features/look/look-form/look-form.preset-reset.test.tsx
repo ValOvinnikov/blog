@@ -1,6 +1,8 @@
 import { LOOK_ROW } from '@platform/constants/look-row';
+import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
-import { screen } from '@platform/testing/custom-render';
+import { ARIA_PRESSED } from '@platform/testing/aria';
+import { screen, within } from '@platform/testing/custom-render';
 import {
   COMPACT,
   DEFAULT_ACCENT_HUE,
@@ -13,6 +15,7 @@ import { openLookRow } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { UNSAVED_CHANGES } from '@platform/testing/render-in-settings-form';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { HEADER_CONTROL_STYLE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -22,6 +25,8 @@ vi.mock('@platform/server/site-config/update-look-action');
 vi.mock('@platform/server/site-config/upload-brand-asset-action');
 
 vi.mock('@platform/server/site-config/clear-brand-asset-action');
+
+const { lookForm: LOOK_FORM } = messages;
 
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
@@ -80,5 +85,28 @@ describe(`<${LookForm.name}/>`, () => {
       const savedReadout = screen.getByText(hueValue(MOCK_SAVED_ACCENT_HUE));
       expect(savedReadout).toBeVisible();
     });
+  });
+
+  it('resets the header buttons style with the rest of the preset', async () => {
+    setupLookForm({
+      initialValues: {
+        ...defaultLookFormValues(),
+        headerControlStyle: HEADER_CONTROL_STYLE.PLAIN,
+      },
+    });
+
+    const resetToPresetButton = screen.getByRole('button', {
+      name: RESET_TO_PRESET,
+    });
+    await user.click(resetToPresetButton);
+    await openLookRow(user, LOOK_ROW.HEADER);
+
+    const headerButtons = screen.getByRole('group', {
+      name: `${LOOK_FORM.headerControlStyleLabel} ${LOOK_FORM.fieldUnsavedLabel}`,
+    });
+    const outlinedButton = within(headerButtons).getByRole('button', {
+      name: LOOK_FORM.headerControlStyleOptionLabel.OUTLINED,
+    });
+    expect(outlinedButton).toHaveAttribute(ARIA_PRESSED, 'true');
   });
 });

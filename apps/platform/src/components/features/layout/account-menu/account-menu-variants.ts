@@ -34,7 +34,6 @@ export const accountMenuVariants = tv({
     ],
     headerEmail: ['text-platform-12 wrap-anywhere text-platform-muted'],
     headerRole: ['mt-1 text-platform-12 text-platform-muted'],
-    signOutIcon: ['text-platform-muted'],
   },
   variants: {
     placement: {

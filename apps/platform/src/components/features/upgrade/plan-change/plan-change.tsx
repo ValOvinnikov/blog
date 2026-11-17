@@ -17,6 +17,7 @@ import { useState } from 'react';
 
 import { PlanChangeStatus } from './components/plan-change-status/plan-change-status';
 import { PlanChangeSummary } from './components/plan-change-summary/plan-change-summary';
+import { planChangeVariants } from './plan-change-variants';
 import { usePlanChange } from './use-plan-change';
 
 export type TPlanChangeProps = {
@@ -40,6 +41,7 @@ export const PlanChange = ({
     tenantId,
     current.plan,
   );
+  const { body } = planChangeVariants();
   const isCurrent = isSamePlanChoice(choice, current);
   const choiceText = ({ plan, interval }: TPlanChoice) => ({
     plan: tPlan(plan),
@@ -53,7 +55,7 @@ export const PlanChange = ({
         supportingText={t('currentPlan', choiceText(current))}
         actions={<PlanChoices choice={choice} onChange={setChoice} />}
       />
-      <Card.Body>
+      <Card.Body className={body()}>
         {pending && (
           <Alert
             type={ALERT_TYPE.INFO}

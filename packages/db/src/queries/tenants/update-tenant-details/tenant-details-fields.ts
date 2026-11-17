@@ -1,10 +1,17 @@
-import type { TLocaleIsoCode, TTenantPlan } from '@shinefold/config/constants';
-import type { TTenantStatus } from '@shinefold/db/constants';
 import {
+  TENANT_PLAN,
+  type TLocaleIsoCode,
+  type TTenantPlan,
+} from '@shinefold/config/constants';
+import { TENANT_STATUS, type TTenantStatus } from '@shinefold/db/constants';
+import {
+  isOnTrial,
   planChangeFields,
   type TPlanChangeFields,
 } from '@shinefold/db/queries/tenants/plan-change-fields';
-import type { TTenant } from '@shinefold/db/schema/tenants';
+import { tenantStatusEnum } from '@shinefold/db/schema/tenant-enums';
+import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
+import { type SQL, sql } from 'drizzle-orm';
 
 type TTenantDetailsFields = {
   name: string;
@@ -39,16 +46,26 @@ export function changesProvisionedTenantDetails(
   );
 }
 
+const statusType = sql.raw(tenantStatusEnum.enumName);
+
+const trialEndedOnFreeStatus = sql`case when ${isOnTrial} then ${TENANT_STATUS.ACTIVE}::${statusType} else ${tenants.status} end`;
+
 export function tenantDetailsWrite(
   details: TTenantDetailsFields,
   status: TTenantStatus,
   clearsUnsentReinvite: boolean,
   now: Date,
 ): TTenantDetailsFields &
-  TPlanChangeFields & { unsentReinviteFormerOwnerEmailEncrypted?: null } {
+  TPlanChangeFields & {
+    status?: SQL;
+    unsentReinviteFormerOwnerEmailEncrypted?: null;
+  } {
   return {
     ...details,
     ...planChangeFields(details.plan, status, now),
+    ...(details.plan === TENANT_PLAN.FREE && {
+      status: trialEndedOnFreeStatus,
+    }),
     ...(clearsUnsentReinvite && {
       unsentReinviteFormerOwnerEmailEncrypted: null,
     }),
@@ -60,6 +77,7 @@ export function restorableTenantFields(
 ): TTenantDetailsFields &
   Pick<
     TTenant,
+    | 'status'
     | 'unsentReinviteFormerOwnerEmailEncrypted'
     | 'selfServeOwnerEmailIndex'
     | 'downgradeGraceStartedAt'
@@ -70,6 +88,7 @@ export function restorableTenantFields(
   > {
   return {
     ...tenantDetailsFields(original),
+    status: original.status,
     unsentReinviteFormerOwnerEmailEncrypted:
       original.unsentReinviteFormerOwnerEmailEncrypted,
     selfServeOwnerEmailIndex: original.selfServeOwnerEmailIndex,

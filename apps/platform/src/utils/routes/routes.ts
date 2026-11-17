@@ -63,6 +63,7 @@ export const adminRoutes = {
       ? `/tenants/${tenantId}/activity?page=${page}`
       : `/tenants/${tenantId}/activity`,
   tenantStudio: (tenantId: string) => `/tenants/${tenantId}/${STUDIO_SEGMENT}`,
+  tenantHelp: (tenantId: string) => `/tenants/${tenantId}/help`,
   dashboard: () => '/dashboard',
   dashboardDomain: () => '/dashboard/domain',
   dashboardSignIn: () => '/dashboard/sign-in',
@@ -75,6 +76,7 @@ export const adminRoutes = {
   dashboardUpgrade: () => '/dashboard/upgrade',
   dashboardBilling: () => '/dashboard/billing',
   dashboardStudio: () => `/dashboard/${STUDIO_SEGMENT}`,
+  dashboardHelp: () => '/dashboard/help',
   dashboardSelectTenant: () => '/dashboard/select-tenant',
   dashboardSelectTenantHref: (tenantId: string) =>
     `/api/dashboard/select-tenant?tenantId=${tenantId}`,

@@ -95,6 +95,15 @@ describe(`<${PlanChange.name}/>`, () => {
       expect(submit).toBeEnabled();
     });
 
+    it('says a move to yearly starts a new yearly period today', async () => {
+      await choose(user, upgradePage.YEARLY);
+      const summary = screen.getByText(
+        t('changeNowNewPeriod', { interval: BILLING_INTERVAL.YEARLY }),
+      );
+
+      expect(summary).toBeVisible();
+    });
+
     it('moves up now and waits for the webhook before refreshing', async () => {
       vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
 

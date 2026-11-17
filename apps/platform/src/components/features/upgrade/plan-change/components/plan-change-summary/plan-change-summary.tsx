@@ -27,7 +27,15 @@ export const PlanChangeSummary = ({
   const locale = useLocale();
   const timing = planChangeTiming(current, choice);
 
-  if (timing === PLAN_CHANGE_TIMING.NOW) return <Text>{t('changeNow')}</Text>;
+  if (timing === PLAN_CHANGE_TIMING.NOW) {
+    return (
+      <Text>
+        {choice.interval === current.interval
+          ? t('changeNow')
+          : t('changeNowNewPeriod', { interval: choice.interval })}
+      </Text>
+    );
+  }
   if (timing === PLAN_CHANGE_TIMING.AT_RENEWAL) {
     return <Text>{t.rich('changeAtRenewal', richDate(renewsAt, locale))}</Text>;
   }
