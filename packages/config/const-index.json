@@ -5868,6 +5868,14 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "billing.plan_change_payment_unknown": [
+      {
+        "ref": "BILLING_LOG.PLAN_CHANGE_PAYMENT_UNKNOWN",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "billing.catalogue_synced": [
       {
         "ref": "BILLING_LOG.CATALOGUE_SYNCED",
@@ -7948,6 +7956,14 @@
         "file": "apps/platform/src/constants/plan-change.ts"
       }
     ],
+    "PAYMENT_NOT_CONFIRMED": [
+      {
+        "ref": "PLAN_CHANGE_REFUSAL.PAYMENT_NOT_CONFIRMED",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
     "ROWS": [
       {
         "ref": "PRESET_LIST_LAYOUT.ROWS",
@@ -8954,6 +8970,62 @@
         "scope": "app:platform",
         "from": "@platform/constants/stripe-key-mode",
         "file": "apps/platform/src/constants/stripe-key-mode.ts"
+      }
+    ],
+    "pending_if_incomplete": [
+      {
+        "ref": "STRIPE_PAYMENT_BEHAVIOR.PENDING_IF_INCOMPLETE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "requires_action": [
+      {
+        "ref": "STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_ACTION",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "requires_payment_method": [
+      {
+        "ref": "STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_PAYMENT_METHOD",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "processing": [
+      {
+        "ref": "STRIPE_PAYMENT_INTENT_STATUS.PROCESSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "succeeded": [
+      {
+        "ref": "STRIPE_PAYMENT_INTENT_STATUS.SUCCEEDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "card_error": [
+      {
+        "ref": "STRIPE_JS_ERROR_TYPE.CARD_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "payment_intent_authentication_failure": [
+      {
+        "ref": "STRIPE_JS_ERROR_CODE.AUTHENTICATION_FAILURE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
       }
     ],
     "phase_start": [

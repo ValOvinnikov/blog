@@ -25,6 +25,7 @@ export const BILLING_LOG = {
   PLAN_CHANGE_PRICE_MISSING: 'billing.plan_change_price_missing',
   PLAN_CHANGE_LOAD_FAILED: 'billing.plan_change_load_failed',
   PLAN_CHANGE_RELEASE_FAILED: 'billing.plan_change_release_failed',
+  PLAN_CHANGE_PAYMENT_UNKNOWN: 'billing.plan_change_payment_unknown',
   CATALOGUE_SYNCED: 'billing.catalogue_synced',
   CATALOGUE_SYNC_FAILED: 'billing.catalogue_sync_failed',
   CATALOGUE_SYNC_MODE_INVALID: 'billing.catalogue_sync_mode_invalid',

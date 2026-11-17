@@ -9,6 +9,7 @@ import {
 import { useRouter } from '@platform/i18n/navigation';
 import { changePlanAction } from '@platform/server/billing/change-plan-action';
 import { getTenantPlanAction } from '@platform/server/billing/get-tenant-plan-action';
+import { confirmPlanPayment } from '@platform/utils/confirm-plan-payment/confirm-plan-payment';
 import {
   isOutcomeRefused,
   isOutcomeSuccess,
@@ -17,7 +18,11 @@ import {
 import type { TTenantPlan } from '@shinefold/config/constants';
 import { useState, useTransition } from 'react';
 
-export const usePlanChange = (tenantId: string, currentPlan: TTenantPlan) => {
+export const usePlanChange = (
+  tenantId: string,
+  currentPlan: TTenantPlan,
+  publishableKey: TMaybeUndefined<string>,
+) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [refusal, setRefusal] = useState<TMaybeUndefined<TPlanChangeRefusal>>();
@@ -38,10 +43,15 @@ export const usePlanChange = (tenantId: string, currentPlan: TTenantPlan) => {
     setHasFailed(false);
     startTransition(async () => {
       const result = await changePlanAction(tenantId, choice);
-      if (isOutcomeRefused(result)) setRefusal(result.reason);
-      else if (!isOutcomeSuccess(result)) setHasFailed(true);
+      if (isOutcomeRefused(result)) return setRefusal(result.reason);
+      if (!isOutcomeSuccess(result)) return setHasFailed(true);
+      const { timing, clientSecret } = result;
+      const paymentRefusal =
+        clientSecret &&
+        (await confirmPlanPayment(publishableKey, clientSecret));
+      if (paymentRefusal) setRefusal(paymentRefusal);
       else if (
-        result.timing === PLAN_CHANGE_TIMING.NOW &&
+        timing === PLAN_CHANGE_TIMING.NOW &&
         choice.plan !== currentPlan
       ) {
         setAwaitedPlan(choice.plan);

@@ -8,8 +8,12 @@ import {
   PLAN_CHANGE_TIMING,
   type TPlanChoice,
 } from '@platform/constants/plan-change';
+import { STRIPE_PAYMENT_INTENT_STATUS } from '@platform/constants/stripe-payment';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures';
+import {
+  MOCK_PAYMENT_CLIENT_SECRET,
+  MOCK_STRIPE_SUBSCRIPTION_ID,
+} from '@platform/testing/billing/fixtures';
 import { MOCK_GROWTH_MONTHLY_CHOICE } from '@platform/testing/billing/plan-choices';
 import { mockStripePlanChangeClient } from '@platform/testing/billing/stripe-plan-change-client';
 import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
@@ -137,6 +141,36 @@ describe(changePlanAction, () => {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {},
     });
+  });
+
+  it("hands back the payment's client secret when the bank asks for a step", async () => {
+    client.holdForPayment(STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_ACTION);
+
+    const result = await changePlanAction(
+      MOCK_TENANT_ID,
+      MOCK_GROWTH_MONTHLY_CHOICE,
+    );
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      timing: PLAN_CHANGE_TIMING.NOW,
+      clientSecret: MOCK_PAYMENT_CLIENT_SECRET,
+    });
+  });
+
+  it('says the card was declined when the payment needs another card', async () => {
+    client.holdForPayment(STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_PAYMENT_METHOD);
+
+    const result = await changePlanAction(
+      MOCK_TENANT_ID,
+      MOCK_GROWTH_MONTHLY_CHOICE,
+    );
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: PLAN_CHANGE_REFUSAL.CARD_DECLINED,
+    });
+    expect(vi.mocked(logger).error).not.toHaveBeenCalled();
   });
 
   it.each([

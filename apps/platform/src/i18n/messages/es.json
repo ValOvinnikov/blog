@@ -2349,7 +2349,8 @@
     "NOT_ACTIVE": "Tu suscripción necesita atención antes de poder cambiar de plan. Abre Facturación para resolverlo.",
     "planEnds": "Tu plan termina el <time>{date}</time>, así que no puede cambiar. Para conservarlo, anula la cancelación desde Facturación.",
     "UNCHANGED": "Tu sitio ya está en este plan.",
-    "CARD_DECLINED": "Tu tarjeta ha sido rechazada, así que no ha cambiado nada. Actualízala en Facturación e inténtalo de nuevo."
+    "CARD_DECLINED": "Tu tarjeta ha sido rechazada, así que no ha cambiado nada. Actualízala en Facturación e inténtalo de nuevo.",
+    "PAYMENT_NOT_CONFIRMED": "La confirmación con tu banco no se completó, así que tu plan no ha cambiado. Inténtalo de nuevo cuando quieras."
   },
   "helpView": {
     "title": "Ayuda",
