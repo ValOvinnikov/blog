@@ -33,6 +33,10 @@ const PLATFORM_STRIPE_ENV_FILE = join(
   repoRoot,
   'apps/platform/src/utils/stripe-env/stripe-env.ts',
 );
+const PLATFORM_SUPPORT_ENV_FILE = join(
+  repoRoot,
+  'apps/platform/src/utils/support-env/support-env.ts',
+);
 const WORKER_ENV_FILE = join(repoRoot, 'apps/worker/src/utils/env/env.ts');
 const SERVICE_ENV_FILE = join(
   repoRoot,
@@ -127,6 +131,7 @@ export const APPS = [
     files: [
       PLATFORM_ENV_FILE,
       PLATFORM_STRIPE_ENV_FILE,
+      PLATFORM_SUPPORT_ENV_FILE,
       DB_ENV_FILE,
       AUTH_ENV_FILE,
     ],

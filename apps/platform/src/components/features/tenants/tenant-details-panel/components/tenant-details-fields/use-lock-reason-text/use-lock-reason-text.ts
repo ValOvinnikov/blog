@@ -24,6 +24,8 @@ export const useLockReasonText = () => {
         return t('fieldLockedReasonSucceeded');
       case TENANT_FIELD_LOCK_KIND.CUSTOM_MAIN_DOMAIN:
         return t('fieldLockedReasonCustomMainDomain');
+      case TENANT_FIELD_LOCK_KIND.SUBSCRIBED:
+        return t('fieldLockedReasonSubscribed');
       case TENANT_FIELD_LOCK_KIND.ARCHIVED:
         return t('fieldLockedReasonArchived');
       case TENANT_FIELD_LOCK_KIND.RUNNING:

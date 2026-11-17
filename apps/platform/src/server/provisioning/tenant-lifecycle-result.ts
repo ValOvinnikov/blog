@@ -15,7 +15,9 @@ export type TTenantLifecycleRefusal =
   | typeof TENANT_REFUSAL.NOT_ARCHIVED
   | typeof TENANT_REFUSAL.NOT_SUSPENDED
   | typeof TENANT_REFUSAL.PLATFORM_TENANT
-  | typeof TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN;
+  | typeof TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN
+  | typeof TENANT_REFUSAL.SUBSCRIPTION_CANCEL_FAILED
+  | typeof TENANT_REFUSAL.SUBSCRIPTION_LIVE;
 
 export type TTenantLifecycleResult<
   TRefusalReason extends TTenantLifecycleRefusal,

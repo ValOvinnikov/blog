@@ -7,15 +7,18 @@ import {
 } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { hasLiveStripeSubscription } from '@platform/server/billing/has-live-stripe-subscription';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  isOutcomeSuccess,
   TENANT_DELETE_OUTCOME,
 } from '@shinefold/config';
 import { queries } from '@shinefold/db';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import type { z } from 'zod';
 
@@ -28,7 +31,9 @@ import type { TTenantLifecycleResult } from './tenant-lifecycle-result';
 export type TDeleteTenantInput = z.input<typeof confirmTenantInputSchema>;
 
 export type TDeleteTenantResult = TTenantLifecycleResult<
-  typeof TENANT_REFUSAL.NOT_FOUND | typeof TENANT_REFUSAL.NOT_ARCHIVED
+  | typeof TENANT_REFUSAL.NOT_FOUND
+  | typeof TENANT_REFUSAL.NOT_ARCHIVED
+  | typeof TENANT_REFUSAL.SUBSCRIPTION_LIVE
 >;
 
 /**
@@ -50,10 +55,19 @@ export const deleteTenantAction = async (
   }
 
   const resolved = await resolveConfirmedTenant(tenantId, parsed.data.confirm);
-  if (resolved.outcome !== ACTION_OUTCOME.SUCCESS) {
+  if (!isOutcomeSuccess(resolved)) {
     return resolved;
   }
   const { tenant } = resolved;
+
+  const isBilled = await hasLiveStripeSubscription(tenant);
+  if (isUndefined(isBilled)) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+  if (isBilled) {
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.SUBSCRIPTION_LIVE,
+    };
+  }
 
   let result;
   try {

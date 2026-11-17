@@ -5444,6 +5444,14 @@
         "file": "apps/platform/src/constants/activity.ts"
       }
     ],
+    "PLAN_CHANGED": [
+      {
+        "ref": "ACTIVITY_DETAIL.PLAN_CHANGED",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
     "SIGN_IN_PROVIDER": [
       {
         "ref": "ACTIVITY_DETAIL.SIGN_IN_PROVIDER",
@@ -5910,6 +5918,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "STRIPE_PAUSE_BEHAVIOR.VOID",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscription-lifecycle",
+        "file": "apps/platform/src/constants/subscription-lifecycle.ts"
       }
     ],
     "invoice_upcoming_none": [
@@ -6022,6 +6036,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_LOCK_KIND.SUBSCRIBED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
     "NOT_OWNER": [
@@ -8338,6 +8358,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/sign-in-apps",
         "file": "apps/platform/src/constants/sign-in-apps.ts"
+      },
+      {
+        "ref": "SUPPORT_FIELD_ERROR.REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "NO_SAVED_APP": [
@@ -8762,6 +8788,78 @@
         "file": "apps/platform/src/constants/stripe-key-mode.ts"
       }
     ],
+    "phase_start": [
+      {
+        "ref": "STRIPE_BILLING_CYCLE_ANCHOR.PHASE_START",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-schedule",
+        "file": "apps/platform/src/constants/stripe-schedule.ts"
+      }
+    ],
+    "release": [
+      {
+        "ref": "STRIPE_SCHEDULE_END_BEHAVIOR.RELEASE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-schedule",
+        "file": "apps/platform/src/constants/stripe-schedule.ts"
+      }
+    ],
+    "billing.subscription_collection_failed": [
+      {
+        "ref": "SUBSCRIPTION_LIFECYCLE_LOG.COLLECTION_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscription-lifecycle",
+        "file": "apps/platform/src/constants/subscription-lifecycle.ts"
+      }
+    ],
+    "billing.subscription_cancel_failed": [
+      {
+        "ref": "SUBSCRIPTION_LIFECYCLE_LOG.CANCEL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscription-lifecycle",
+        "file": "apps/platform/src/constants/subscription-lifecycle.ts"
+      }
+    ],
+    "billing.live_subscription_check_failed": [
+      {
+        "ref": "SUBSCRIPTION_LIFECYCLE_LOG.LIVE_CHECK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscription-lifecycle",
+        "file": "apps/platform/src/constants/subscription-lifecycle.ts"
+      }
+    ],
+    "TOO_LONG": [
+      {
+        "ref": "SUPPORT_FIELD_ERROR.TOO_LONG",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
+      }
+    ],
+    "support.address_missing": [
+      {
+        "ref": "SUPPORT_LOG.ADDRESS_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
+      }
+    ],
+    "support.send_failed": [
+      {
+        "ref": "SUPPORT_LOG.SEND_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
+      }
+    ],
+    "support.copy_failed": [
+      {
+        "ref": "SUPPORT_LOG.COPY_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
+      }
+    ],
     "CONFIRM_REQUIRED": [
       {
         "ref": "TENANT_FIELD_ERROR.CONFIRM_REQUIRED",
@@ -8926,6 +9024,14 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
+    "PLAN_FOLLOWS_SUBSCRIPTION": [
+      {
+        "ref": "TENANT_REFUSAL.PLAN_FOLLOWS_SUBSCRIPTION",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "OWNER_INVITE_UNCONFIRMED": [
       {
         "ref": "TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED",
@@ -8945,6 +9051,22 @@
     "STUDIO_NOT_PROVISIONED": [
       {
         "ref": "TENANT_REFUSAL.STUDIO_NOT_PROVISIONED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "SUBSCRIPTION_CANCEL_FAILED": [
+      {
+        "ref": "TENANT_REFUSAL.SUBSCRIPTION_CANCEL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "SUBSCRIPTION_LIVE": [
+      {
+        "ref": "TENANT_REFUSAL.SUBSCRIPTION_LIVE",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"
@@ -10044,6 +10166,102 @@
         "scope": "app:web",
         "from": "@web/constants/footer",
         "file": "apps/web/src/constants/footer.ts"
+      }
+    ],
+    "generate_skim.config_missing": [
+      {
+        "ref": "GENERATE_SKIM_LOG.CONFIG_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.host_unresolvable": [
+      {
+        "ref": "GENERATE_SKIM_LOG.HOST_UNRESOLVABLE",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.write_tenant_unresolvable": [
+      {
+        "ref": "GENERATE_SKIM_LOG.WRITE_TENANT_UNRESOLVABLE",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.tenant_write_credentials_missing": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TENANT_WRITE_CREDENTIALS_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.tenant_not_active": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TENANT_NOT_ACTIVE",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.allowance_used": [
+      {
+        "ref": "GENERATE_SKIM_LOG.ALLOWANCE_USED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.claim_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.CLAIM_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.claim_release_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.CLAIM_RELEASE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.post_body_fetch_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.POST_BODY_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.generation_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GENERATION_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.write_client_unconfigured": [
+      {
+        "ref": "GENERATE_SKIM_LOG.WRITE_CLIENT_UNCONFIGURED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.draft_save_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.DRAFT_SAVE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
       }
     ],
     "header_style.site_config_fetch_failed": [
@@ -11676,6 +11894,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/dns",
         "file": "apps/platform/src/constants/dns.ts"
+      },
+      {
+        "ref": "SUPPORT_LIMIT.MESSAGES_PER_WINDOW",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "6": [
@@ -11776,6 +12000,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/device-frame",
         "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "150": [
+      {
+        "ref": "SUPPORT_LIMIT.SUBJECT_MAX_LENGTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "200": [
@@ -11912,6 +12144,14 @@
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
+    "422": [
+      {
+        "ref": "HTTP_STATUS.UNPROCESSABLE_ENTITY",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
     "425": [
       {
         "ref": "HTTP_STATUS.TOO_EARLY",
@@ -11942,6 +12182,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
+      },
+      {
+        "ref": "SUPPORT_LIMIT.ORIGIN_PATH_MAX_LENGTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "502": [
@@ -11990,6 +12236,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "5000": [
+      {
+        "ref": "SUPPORT_LIMIT.MESSAGE_MAX_LENGTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "10000": [

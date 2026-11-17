@@ -1,5 +1,5 @@
 {
-  "id": "919b6272-5c51-4e67-a9ab-714aeb410efa",
+  "id": "680c8c10-595e-4f31-846e-f2053a5cae6a",
   "prevId": "d131797c-f50e-44e8-8d32-742d2f13e6f1",
   "version": "7",
   "dialect": "postgresql",
@@ -1000,43 +1000,6 @@
         "email_send_counts_tenant_id_day_email_type_pk": {
           "name": "email_send_counts_tenant_id_day_email_type_pk",
           "columns": ["tenant_id", "day", "email_type"]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.platform_email_send_counts": {
-      "name": "platform_email_send_counts",
-      "schema": "",
-      "columns": {
-        "day": {
-          "name": "day",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email_type": {
-          "name": "email_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "count": {
-          "name": "count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "platform_email_send_counts_day_email_type_pk": {
-          "name": "platform_email_send_counts_day_email_type_pk",
-          "columns": ["day", "email_type"]
         }
       },
       "uniqueConstraints": {},
@@ -2339,6 +2302,53 @@
           "columns": ["tenant_id", "email_exact_index"]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.takeaway_generation_counts": {
+      "name": "takeaway_generation_counts",
+      "schema": "",
+      "columns": {
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "month": {
+          "name": "month",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "count": {
+          "name": "count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "takeaway_generation_counts_tenant_id_tenants_id_fk": {
+          "name": "takeaway_generation_counts_tenant_id_tenants_id_fk",
+          "tableFrom": "takeaway_generation_counts",
+          "tableTo": "tenants",
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "takeaway_generation_counts_tenant_id_month_pk": {
+          "name": "takeaway_generation_counts_tenant_id_month_pk",
+          "columns": ["tenant_id", "month"]
+        }
+      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

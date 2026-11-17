@@ -12,3 +12,6 @@ export const mockQueryError = (...leaks: string[]): Error => {
   error.name = MOCK_QUERY_ERROR_NAME;
   return error;
 };
+
+export const MOCK_STRIPE_REQUEST_ID = 'req_mock0001';
+export const MOCK_RESEND_ERROR_CODE = 'validation_error';

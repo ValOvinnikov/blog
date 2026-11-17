@@ -9,6 +9,10 @@ import {
   PLAN_CHANGE_TIMING,
   type TPlanChoice,
 } from '@platform/constants/plan-change';
+import {
+  STRIPE_BILLING_CYCLE_ANCHOR,
+  STRIPE_SCHEDULE_END_BEHAVIOR,
+} from '@platform/constants/stripe-schedule';
 import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures';
 import {
   MOCK_GROWTH_MONTHLY_CHOICE,
@@ -152,7 +156,7 @@ describe(changeSubscriptionPlan, () => {
       from_subscription: MOCK_STRIPE_SUBSCRIPTION_ID,
     });
     expect(updateSchedule).toHaveBeenCalledExactlyOnceWith(MOCK_SCHEDULE_ID, {
-      end_behavior: 'release',
+      end_behavior: STRIPE_SCHEDULE_END_BEHAVIOR.RELEASE,
       proration_behavior: STRIPE_PRORATION_BEHAVIOR.NONE,
       phases: [
         {
@@ -171,12 +175,42 @@ describe(changeSubscriptionPlan, () => {
             interval: STRIPE_RECURRING_INTERVAL.MONTHLY,
             interval_count: 1,
           },
+          billing_cycle_anchor: STRIPE_BILLING_CYCLE_ANCHOR.PHASE_START,
           proration_behavior: STRIPE_PRORATION_BEHAVIOR.NONE,
           discounts: [],
           automatic_tax: { enabled: true },
         },
       ],
     });
+  });
+
+  it('bills a move down to a longer period from the day its phase starts', async () => {
+    const { updateSchedule } = await change(
+      { lookupKeys: [GROWTH_MONTHLY] },
+      { ...MOCK_STARTER_MONTHLY_CHOICE, interval: BILLING_INTERVAL.YEARLY },
+    );
+
+    expect(updateSchedule).toHaveBeenCalledExactlyOnceWith(
+      MOCK_SCHEDULE_ID,
+      expect.objectContaining({
+        phases: [
+          expect.anything(),
+          expect.objectContaining({
+            items: [
+              {
+                price: priceIdFor(STRIPE_PRICE_LOOKUP_KEY.STARTER_YEARLY),
+                quantity: 1,
+              },
+            ],
+            duration: {
+              interval: STRIPE_RECURRING_INTERVAL.YEARLY,
+              interval_count: 1,
+            },
+            billing_cycle_anchor: STRIPE_BILLING_CYCLE_ANCHOR.PHASE_START,
+          }),
+        ],
+      }),
+    );
   });
 
   it('moves yearly to monthly at renewal', async () => {

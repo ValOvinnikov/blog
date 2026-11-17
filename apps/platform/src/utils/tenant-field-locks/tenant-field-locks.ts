@@ -10,30 +10,34 @@ import {
 import type { TTenantOwnerMembership } from '@shinefold/db/queries/memberships';
 import type { TTenantProvisioningState } from '@shinefold/db/schema/tenants';
 import { deriveProvisioningState } from '@shinefold/db/utils/derive-provisioning-state/derive-provisioning-state';
+import { objectKeys } from '@shinefold/utils/primitives';
 
-export const ALL_FIELD_KEYS = [
-  'name',
-  'primaryDomain',
-  'plan',
-  'locale',
-  'ownerEmail',
-] as const;
+const IS_EDITABLE_AFTER_PROVISIONING = {
+  name: false,
+  primaryDomain: false,
+  plan: true,
+  locale: false,
+  ownerEmail: false,
+} as const;
 
-export type TTenantFieldKey = (typeof ALL_FIELD_KEYS)[number];
+export type TTenantFieldKey = keyof typeof IS_EDITABLE_AFTER_PROVISIONING;
+
+export const ALL_FIELD_KEYS: readonly TTenantFieldKey[] = objectKeys(
+  IS_EDITABLE_AFTER_PROVISIONING,
+);
 
 export type TTenantFieldLockReason =
   | { kind: typeof TENANT_FIELD_LOCK_KIND.STEP; step: TTenantProvisioningStep }
   | { kind: typeof TENANT_FIELD_LOCK_KIND.RUNNING }
   | { kind: typeof TENANT_FIELD_LOCK_KIND.SUCCEEDED }
   | { kind: typeof TENANT_FIELD_LOCK_KIND.CUSTOM_MAIN_DOMAIN }
+  | { kind: typeof TENANT_FIELD_LOCK_KIND.SUBSCRIBED }
   // Never returned by computeTenantFieldLocks; TenantDetailsPanel overlays it.
   | { kind: typeof TENANT_FIELD_LOCK_KIND.ARCHIVED };
 
 export type TTenantFieldLocks = Partial<
   Record<TTenantFieldKey, TTenantFieldLockReason>
 >;
-
-const EDITABLE_AFTER_PROVISIONING: readonly TTenantFieldKey[] = ['plan'];
 
 const lockFields = (
   keys: readonly TTenantFieldKey[],
@@ -81,7 +85,7 @@ const computeProvisioningFieldLocks = (
     const isOwnerEmailEditable = owner?.hasSignedIn === false;
     const lockedKeys = ALL_FIELD_KEYS.filter(
       (key) =>
-        !EDITABLE_AFTER_PROVISIONING.includes(key) &&
+        !IS_EDITABLE_AFTER_PROVISIONING[key] &&
         !(key === 'ownerEmail' && isOwnerEmailEditable),
     );
     return lockFields(lockedKeys, { kind: TENANT_FIELD_LOCK_KIND.SUCCEEDED });
@@ -90,18 +94,24 @@ const computeProvisioningFieldLocks = (
   return lockAllFields({ kind: TENANT_FIELD_LOCK_KIND.RUNNING });
 };
 
+export type TTenantFieldLockFlags = {
+  isPrimaryCustom: boolean;
+  isSubscribed: boolean;
+};
+
 export const computeTenantFieldLocks = (
   steps: TMaybeNull<TTenantProvisioningState>,
   provisioningStatus: TMaybeNull<TTenantProvisioningStatus>,
   owner: TMaybeUndefined<TTenantOwnerMembership>,
-  isPrimaryCustom: boolean,
+  { isPrimaryCustom, isSubscribed }: TTenantFieldLockFlags,
 ): TTenantFieldLocks => {
   const locks = computeProvisioningFieldLocks(steps, provisioningStatus, owner);
 
-  return isPrimaryCustom
-    ? {
-        ...locks,
-        primaryDomain: { kind: TENANT_FIELD_LOCK_KIND.CUSTOM_MAIN_DOMAIN },
-      }
-    : locks;
+  return {
+    ...locks,
+    ...(isPrimaryCustom && {
+      primaryDomain: { kind: TENANT_FIELD_LOCK_KIND.CUSTOM_MAIN_DOMAIN },
+    }),
+    ...(isSubscribed && { plan: { kind: TENANT_FIELD_LOCK_KIND.SUBSCRIBED } }),
+  };
 };

@@ -10,6 +10,7 @@ import {
   completeTenantDetailsUpdate,
   type TTenantDetailsSaved,
 } from '@platform/server/tenants/complete-tenant-details-update';
+import { refuseTenantDetailsChange } from '@platform/server/tenants/refuse-tenant-details-change';
 import { resolveLiveTenant } from '@platform/server/tenants/resolve-live-tenant';
 import type { TTenantDetailsFieldError } from '@platform/server/tenants/tenant-field-error';
 import {
@@ -17,8 +18,6 @@ import {
   type TUpdateTenantDetailsActionInput,
   updateTenantDetailsInputSchema,
 } from '@platform/server/tenants/update-tenant-details-input';
-import { env } from '@platform/utils/env/env';
-import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {
@@ -36,7 +35,8 @@ export type TUpdateTenantDetailsRefusal =
   | typeof TENANT_REFUSAL.LOCALE_IS_ADDITIONAL
   | typeof TENANT_REFUSAL.PROVISIONING_STARTED
   | typeof TENANT_REFUSAL.OWNER_ALREADY_JOINED
-  | typeof TENANT_REFUSAL.OWNER_HAS_FREE_TENANT;
+  | typeof TENANT_REFUSAL.OWNER_HAS_FREE_TENANT
+  | typeof TENANT_REFUSAL.PLAN_FOLLOWS_SUBSCRIPTION;
 
 type TUpdateTenantDetailsFailure = Exclude<
   TActionResult<
@@ -68,26 +68,8 @@ export const updateTenantDetailsAction = async (
   const resolved = await resolveLiveTenant(tenantId);
   if (!isOutcomeSuccess(resolved)) return resolved;
   const { tenant } = resolved;
-  if (
-    parsed.data.primaryDomain !== tenant.primaryDomain &&
-    isCustomDomain(tenant.primaryDomain, env.TENANT_ROOT_DOMAIN)
-  ) {
-    return {
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: {
-        primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_CUSTOM_MAIN },
-      },
-    };
-  }
-  if (
-    parsed.data.locale !== tenant.locale &&
-    tenant.additionalLocales.includes(parsed.data.locale)
-  ) {
-    return {
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.LOCALE_IS_ADDITIONAL,
-    };
-  }
+  const refusal = refuseTenantDetailsChange(parsed.data, tenant);
+  if (refusal) return refusal;
 
   try {
     const result = await queries.tenants.updateTenantDetails(

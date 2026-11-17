@@ -17,12 +17,25 @@ import {
 import {
   computeTenantFieldLocks,
   lockAllFields,
+  type TTenantFieldLockFlags,
   type TTenantFieldLockReason,
 } from './tenant-field-locks';
 
 faker.seed(6006);
 
 const MOCK_ERROR = faker.lorem.sentence();
+const NO_FLAGS: TTenantFieldLockFlags = {
+  isPrimaryCustom: false,
+  isSubscribed: false,
+};
+const BEFORE_AND_AFTER_PROVISIONING = [
+  ['provisioning has not started', null, null],
+  [
+    'provisioning has finished',
+    mockDoneProvisioningSteps(),
+    TENANT_PROVISIONING_STATUS.READY,
+  ],
+] as const;
 const RUNNING: TTenantFieldLockReason = {
   kind: TENANT_FIELD_LOCK_KIND.RUNNING,
 };
@@ -57,7 +70,7 @@ describe(computeTenantFieldLocks, () => {
       hasSteps ? mockIdleProvisioningSteps() : null,
       hasSteps ? TENANT_PROVISIONING_STATUS.PENDING : null,
       undefined,
-      false,
+      NO_FLAGS,
     );
 
     expect(locks).toEqual({});
@@ -68,7 +81,7 @@ describe(computeTenantFieldLocks, () => {
       mockMapDomainFailedProvisioningSteps(MOCK_ERROR),
       TENANT_PROVISIONING_STATUS.FAILED,
       undefined,
-      false,
+      NO_FLAGS,
     );
 
     expect(locks).toEqual({});
@@ -87,7 +100,7 @@ describe(computeTenantFieldLocks, () => {
       steps,
       TENANT_PROVISIONING_STATUS.FAILED,
       undefined,
-      false,
+      NO_FLAGS,
     );
 
     expect(locks).toEqual({
@@ -114,7 +127,7 @@ describe(computeTenantFieldLocks, () => {
       steps,
       status,
       mockInvitedOwner(),
-      false,
+      NO_FLAGS,
     );
 
     expect(locks).toEqual(everyFieldLockedBy(RUNNING));
@@ -125,7 +138,7 @@ describe(computeTenantFieldLocks, () => {
       mockDoneProvisioningSteps(),
       TENANT_PROVISIONING_STATUS.READY,
       mockJoinedOwner(),
-      false,
+      NO_FLAGS,
     );
 
     expect(locks).toEqual(everyFieldButPlanLockedBy(SUCCEEDED));
@@ -136,7 +149,7 @@ describe(computeTenantFieldLocks, () => {
       mockDoneProvisioningSteps(),
       TENANT_PROVISIONING_STATUS.READY,
       mockInvitedOwner(),
-      false,
+      NO_FLAGS,
     );
 
     expect(locks).toEqual({
@@ -146,26 +159,29 @@ describe(computeTenantFieldLocks, () => {
     });
   });
 
-  it.each([
-    ['provisioning has not started', null, null],
-    [
-      'provisioning has finished',
-      mockDoneProvisioningSteps(),
-      TENANT_PROVISIONING_STATUS.READY,
-    ],
-  ])(
+  it.each(BEFORE_AND_AFTER_PROVISIONING)(
     'locks primaryDomain for a custom main address when %s',
     (_, steps, status) => {
-      const locks = computeTenantFieldLocks(
-        steps,
-        status,
-        mockInvitedOwner(),
-        true,
-      );
+      const locks = computeTenantFieldLocks(steps, status, mockInvitedOwner(), {
+        ...NO_FLAGS,
+        isPrimaryCustom: true,
+      });
 
       expect(locks.primaryDomain).toEqual({
         kind: TENANT_FIELD_LOCK_KIND.CUSTOM_MAIN_DOMAIN,
       });
+    },
+  );
+
+  it.each(BEFORE_AND_AFTER_PROVISIONING)(
+    'locks the plan for a live subscription when %s',
+    (_, steps, status) => {
+      const locks = computeTenantFieldLocks(steps, status, mockJoinedOwner(), {
+        ...NO_FLAGS,
+        isSubscribed: true,
+      });
+
+      expect(locks.plan).toEqual({ kind: TENANT_FIELD_LOCK_KIND.SUBSCRIBED });
     },
   );
 
@@ -180,7 +196,7 @@ describe(computeTenantFieldLocks, () => {
       },
       TENANT_PROVISIONING_STATUS.READY,
       undefined,
-      false,
+      NO_FLAGS,
     );
 
     expect(locks).toEqual(everyFieldButPlanLockedBy(SUCCEEDED));

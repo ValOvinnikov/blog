@@ -10,6 +10,7 @@ import {
 } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { cancelLiveSubscription } from '@platform/server/billing/tenant-subscription-lifecycle';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import {
   MOCK_OPERATOR_EMAIL,
@@ -50,6 +51,10 @@ vi.mock('@shinefold/db', () => ({
 
 vi.mock('@platform/server/provisioning/enqueue-provisioning');
 
+vi.mock('@platform/server/billing/tenant-subscription-lifecycle', () => ({
+  cancelLiveSubscription: vi.fn(),
+}));
+
 faker.seed(5997);
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
@@ -74,6 +79,22 @@ describe(deprovisionTenantAction, () => {
     enqueueMock.mockResolvedValue(HTTP_STATUS.ACCEPTED);
     insertAuditEventMock.mockReset();
     resolveIsPlatformTenantMock.mockReset().mockResolvedValue(false);
+    vi.mocked(cancelLiveSubscription).mockReset().mockResolvedValue(true);
+  });
+
+  it('refuses the archive, enqueuing and auditing nothing, when the cancel fails', async () => {
+    vi.mocked(cancelLiveSubscription).mockResolvedValueOnce(false);
+
+    const result = await deprovisionTenantAction(MOCK_TENANT_ID, {
+      confirm: MOCK_TENANT_NAME,
+    });
+
+    expect(result).toStrictEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.SUBSCRIPTION_CANCEL_FAILED,
+    });
+    expect(enqueueMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('stops before any tenant work when the super-admin gate rejects', async () => {
@@ -138,15 +159,21 @@ describe(deprovisionTenantAction, () => {
     );
   });
 
-  it('starts the worker run when confirm matches the name', async () => {
+  it('cancels the subscription, then starts the worker run, when confirm matches', async () => {
     const result = await deprovisionTenantAction(MOCK_TENANT_ID, {
       confirm: MOCK_TENANT_NAME,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(cancelLiveSubscription).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MOCK_TENANT_ID }),
+    );
     expect(enqueueMock).toHaveBeenCalledWith(DEPROVISION_PATH, {
       tenantId: MOCK_TENANT_ID,
     });
+    expect(
+      vi.mocked(cancelLiveSubscription).mock.invocationCallOrder[0],
+    ).toBeLessThan(enqueueMock.mock.invocationCallOrder[0] ?? 0);
   });
 
   it('records a DEPROVISION_REQUESTED audit event once the worker accepts', async () => {
