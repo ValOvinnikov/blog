@@ -233,6 +233,11 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   `frame-src`, and every page keeps `frame-ancestors 'none'`. The site itself
   allows framing only for a valid token, by the platform's origin
   ([rendering-and-caching](./rendering-and-caching.md)).
+- The preview CSP comes from `next.config` `headers()`, so it applies only to a
+  full page load: a client-side navigation into a preview route keeps the
+  Stripe-only `frame-src` and the frame is blocked. Anything that opens the
+  preview (the Studio's preview action included) uses a full navigation, never
+  `Link` or `router.push`.
 
 ## Dependencies
 

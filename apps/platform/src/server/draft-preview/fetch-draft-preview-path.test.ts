@@ -139,4 +139,17 @@ describe(fetchDraftPreviewPath, () => {
       { hasWebAppUrl: true, hasSecret: false },
     );
   });
+
+  it.each(['..', '.', 'a/b', '-leading-dash'])(
+    'refuses %j without asking the website',
+    async (documentId) => {
+      const result = await fetchDraftPreviewPath(MOCK_TENANT_ID, documentId);
+
+      expect(result).toEqual({
+        isResolved: false,
+        refusal: DRAFT_PREVIEW_REFUSAL.NOT_FOUND,
+      });
+      expect(fetchMock).not.toHaveBeenCalled();
+    },
+  );
 });

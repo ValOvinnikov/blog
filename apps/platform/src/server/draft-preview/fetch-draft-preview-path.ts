@@ -16,6 +16,12 @@ import { z } from 'zod';
 
 const draftPathResponseSchema = z.object({ path: z.string().startsWith('/') });
 
+// Sanity's id alphabet; refusing `.` and `..` keeps `new URL` from resolving them into another route.
+const documentIdSchema = z
+  .string()
+  .max(128)
+  .regex(/^[A-Za-z0-9][A-Za-z0-9_.-]*$/);
+
 export type TDraftPreviewPath =
   | { isResolved: true; path: string }
   | { isResolved: false; refusal: TDraftPreviewRefusal };
@@ -29,6 +35,10 @@ export const fetchDraftPreviewPath = async (
   tenantId: string,
   documentId: string,
 ): Promise<TDraftPreviewPath> => {
+  if (!documentIdSchema.safeParse(documentId).success) {
+    return refuse(DRAFT_PREVIEW_REFUSAL.NOT_FOUND);
+  }
+
   try {
     const result = await postToInternalPagesRoute(
       internalPagesRoutes.path(documentId),

@@ -106,7 +106,9 @@ describe(resolveDraftPreview, () => {
 
     expect(preview).toMatchObject({
       isReady: true,
-      publishedUrl: `${MOCK_CUSTOM_DOMAIN_URL}${MOCK_DRAFT_PATH}`,
+      frameUrl: expect.stringMatching(
+        new RegExp(`^${MOCK_CUSTOM_DOMAIN_URL}${MOCK_DRAFT_PATH}\\?`),
+      ),
     });
   });
 
