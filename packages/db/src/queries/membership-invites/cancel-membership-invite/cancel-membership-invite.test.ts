@@ -62,4 +62,10 @@ describe(cancelMembershipInvite, () => {
 
     await expect(cancelMembershipInvite(tenantId, id)).resolves.toBe(false);
   });
+
+  it('cancels nothing for an id that is not a UUID', async () => {
+    await expect(
+      cancelMembershipInvite(tenantId, `admin-virtual:${tenantId}`),
+    ).resolves.toBe(false);
+  });
 });

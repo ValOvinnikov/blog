@@ -1,3 +1,4 @@
+import type { TMaybeNull } from '@shinefold/config/types';
 import { getDb } from '@shinefold/db/client';
 import {
   MEMBERSHIP_REMOVAL_OUTCOME,
@@ -8,8 +9,10 @@ import { inviteEmailColumns } from '@shinefold/db/queries/membership-invites/inv
 import { users } from '@shinefold/db/schema/auth';
 import { membershipInvites } from '@shinefold/db/schema/membership-invites';
 import { memberships } from '@shinefold/db/schema/memberships';
+import { isUuid } from '@shinefold/db/utils/is-uuid/is-uuid';
 import { decryptOptionalPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
-import { and, eq, exists, isNotNull, ne, or } from 'drizzle-orm';
+import { hasLength } from '@shinefold/utils/primitives';
+import { and, eq, exists, isNotNull, ne, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 
 function keepsAnotherOwner() {
@@ -32,22 +35,44 @@ function keepsAnotherOwner() {
   );
 }
 
-async function clearConsumedInvite(
+// One statement, because `neon-http` has no transactions: the membership and
+// its consumed invite go together, so a failure never leaves the address
+// stuck as already invited.
+async function deleteMembershipAndConsumedInvite(
   tenantId: string,
-  email: string,
-): Promise<void> {
-  await getDb()
-    .delete(membershipInvites)
-    .where(
-      and(
-        eq(membershipInvites.tenantId, tenantId),
-        eq(
-          membershipInvites.emailExactIndex,
-          inviteEmailColumns(email).emailExactIndex,
+  membershipId: string,
+  email: TMaybeNull<string>,
+): Promise<boolean> {
+  const db = getDb();
+  const removed = db.$with('removed_membership').as(
+    db
+      .delete(memberships)
+      .where(and(eq(memberships.id, membershipId), keepsAnotherOwner()))
+      .returning({ id: memberships.id }),
+  );
+  const clearedInvite = db.$with('cleared_invite').as(
+    db
+      .delete(membershipInvites)
+      .where(
+        and(
+          eq(membershipInvites.tenantId, tenantId),
+          eq(
+            membershipInvites.emailExactIndex,
+            email ? inviteEmailColumns(email).emailExactIndex : sql`null`,
+          ),
+          isNotNull(membershipInvites.consumedAt),
+          exists(db.select({ id: removed.id }).from(removed)),
         ),
-        isNotNull(membershipInvites.consumedAt),
-      ),
-    );
+      )
+      .returning({ id: membershipInvites.id }),
+  );
+
+  const rows = await db
+    .with(removed, clearedInvite)
+    .select({ id: removed.id })
+    .from(removed);
+
+  return hasLength(rows);
 }
 
 export async function removeMembership(
@@ -55,9 +80,9 @@ export async function removeMembership(
   membershipId: string,
   actingUserId: string,
 ): Promise<TMembershipRemovalOutcome> {
-  const db = getDb();
+  if (!isUuid(membershipId)) return MEMBERSHIP_REMOVAL_OUTCOME.NOT_FOUND;
 
-  const [member] = await db
+  const [member] = await getDb()
     .select({
       userId: memberships.userId,
       role: memberships.role,
@@ -74,19 +99,15 @@ export async function removeMembership(
   const { userId, role, emailEncrypted } = member;
   if (userId === actingUserId) return MEMBERSHIP_REMOVAL_OUTCOME.SELF;
 
-  const [removed] = await db
-    .delete(memberships)
-    .where(and(eq(memberships.id, membershipId), keepsAnotherOwner()))
-    .returning({ id: memberships.id });
+  const removed = await deleteMembershipAndConsumedInvite(
+    tenantId,
+    membershipId,
+    decryptOptionalPersonalValue(emailEncrypted),
+  );
 
-  if (!removed) {
-    return role === MEMBERSHIP_ROLE.OWNER
-      ? MEMBERSHIP_REMOVAL_OUTCOME.LAST_OWNER
-      : MEMBERSHIP_REMOVAL_OUTCOME.NOT_FOUND;
-  }
+  if (removed) return MEMBERSHIP_REMOVAL_OUTCOME.REMOVED;
 
-  const email = decryptOptionalPersonalValue(emailEncrypted);
-  if (email) await clearConsumedInvite(tenantId, email);
-
-  return MEMBERSHIP_REMOVAL_OUTCOME.REMOVED;
+  return role === MEMBERSHIP_ROLE.OWNER
+    ? MEMBERSHIP_REMOVAL_OUTCOME.LAST_OWNER
+    : MEMBERSHIP_REMOVAL_OUTCOME.NOT_FOUND;
 }

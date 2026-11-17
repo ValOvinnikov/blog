@@ -19,6 +19,8 @@ import {
 import {
   deleteSeatRows,
   inviteOf,
+  MOCK_INVITE_CONSUMED_AT,
+  mockMembershipInvite,
 } from '@shinefold/db/testing/membership-invites/fixtures';
 import { insertTestMember } from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
@@ -89,6 +91,26 @@ describe(removeMembership, () => {
     await expect(db().select().from(schema.memberships)).resolves.toEqual([
       owner,
     ]);
+  });
+
+  it('keeps the consumed invite when the removal is refused', async () => {
+    await mockMembershipInvite(db(), tenantId, {
+      email: MOCK_OWNER_EMAIL,
+      consumedAt: MOCK_INVITE_CONSUMED_AT,
+    });
+
+    await expect(
+      removeMembership(tenantId, owner.id, faker.string.uuid()),
+    ).resolves.toBe(MEMBERSHIP_REMOVAL_OUTCOME.LAST_OWNER);
+    await expect(
+      db().select().from(schema.membershipInvites),
+    ).resolves.toHaveLength(1);
+  });
+
+  it('finds no member for an id that is not a UUID', async () => {
+    await expect(
+      removeMembership(tenantId, `admin-virtual:${tenantId}`, owner.userId),
+    ).resolves.toBe(MEMBERSHIP_REMOVAL_OUTCOME.NOT_FOUND);
   });
 
   describe('with a second owner', () => {
