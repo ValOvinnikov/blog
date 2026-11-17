@@ -1,63 +1,67 @@
-import { NEUTRAL_PALETTE, STATUS_PALETTE } from './palette-ramps';
+import {
+  ACHROMATIC_PALETTE,
+  NEUTRAL_PALETTE,
+  STATUS_PALETTE,
+} from './palette-ramps';
 import type { TOklchRamp } from './theme-declarations';
 
 export const NEUTRAL_RAMP_LIGHT = {
-  '--primary': NEUTRAL_PALETTE['--palette-neutral-990-2'],
-  '--primary-subtle': NEUTRAL_PALETTE['--palette-neutral-965-3'],
-  '--secondary': NEUTRAL_PALETTE['--palette-neutral-910-4'],
-  '--surface': NEUTRAL_PALETTE['--palette-neutral-1000-0'],
-  '--surface-2': NEUTRAL_PALETTE['--palette-neutral-975-3'],
-  '--border': NEUTRAL_PALETTE['--palette-neutral-900-4'],
-  '--border-strong': NEUTRAL_PALETTE['--palette-neutral-800-6'],
-  '--border-emphasis': NEUTRAL_PALETTE['--palette-neutral-620-6'],
-  '--field-boundary-tinted': NEUTRAL_PALETTE['--palette-neutral-580-6'],
-  '--text': NEUTRAL_PALETTE['--palette-neutral-200-10'],
-  '--text-muted': NEUTRAL_PALETTE['--palette-neutral-460-10'],
+  '--primary': NEUTRAL_PALETTE['--palette-neutral-100'],
+  '--primary-subtle': NEUTRAL_PALETTE['--palette-neutral-300'],
+  '--secondary': NEUTRAL_PALETTE['--palette-neutral-500'],
+  '--surface': ACHROMATIC_PALETTE['--palette-achromatic-100'],
+  '--surface-2': NEUTRAL_PALETTE['--palette-neutral-200'],
+  '--border': NEUTRAL_PALETTE['--palette-neutral-600'],
+  '--border-strong': NEUTRAL_PALETTE['--palette-neutral-700'],
+  '--border-emphasis': NEUTRAL_PALETTE['--palette-neutral-900'],
+  '--field-boundary-tinted': NEUTRAL_PALETTE['--palette-neutral-1100'],
+  '--text': NEUTRAL_PALETTE['--palette-neutral-2200'],
+  '--text-muted': NEUTRAL_PALETTE['--palette-neutral-1300'],
 } as const satisfies TOklchRamp;
 
 export const NEUTRAL_RAMP_DARK = {
-  '--primary': NEUTRAL_PALETTE['--palette-neutral-170-6'],
-  '--primary-subtle': NEUTRAL_PALETTE['--palette-neutral-200-6'],
-  '--secondary': NEUTRAL_PALETTE['--palette-neutral-240-7'],
-  '--surface': NEUTRAL_PALETTE['--palette-neutral-210-7'],
-  '--surface-2': NEUTRAL_PALETTE['--palette-neutral-240-8'],
-  '--border': NEUTRAL_PALETTE['--palette-neutral-300-8'],
-  '--border-strong': NEUTRAL_PALETTE['--palette-neutral-420-10'],
-  '--border-emphasis': NEUTRAL_PALETTE['--palette-neutral-550-10'],
-  '--field-boundary-tinted': NEUTRAL_PALETTE['--palette-neutral-590-10'],
-  '--text': NEUTRAL_PALETTE['--palette-neutral-950-4'],
-  '--text-muted': NEUTRAL_PALETTE['--palette-neutral-720-8'],
+  '--primary': NEUTRAL_PALETTE['--palette-neutral-2600'],
+  '--primary-subtle': NEUTRAL_PALETTE['--palette-neutral-2100'],
+  '--secondary': NEUTRAL_PALETTE['--palette-neutral-1800'],
+  '--surface': NEUTRAL_PALETTE['--palette-neutral-2000'],
+  '--surface-2': NEUTRAL_PALETTE['--palette-neutral-1900'],
+  '--border': NEUTRAL_PALETTE['--palette-neutral-1600'],
+  '--border-strong': NEUTRAL_PALETTE['--palette-neutral-1400'],
+  '--border-emphasis': NEUTRAL_PALETTE['--palette-neutral-1200'],
+  '--field-boundary-tinted': NEUTRAL_PALETTE['--palette-neutral-1000'],
+  '--text': NEUTRAL_PALETTE['--palette-neutral-400'],
+  '--text-muted': NEUTRAL_PALETTE['--palette-neutral-800'],
 } as const satisfies TOklchRamp;
 
 export const STATUS_RAMP_LIGHT = {
-  '--success': STATUS_PALETTE['--palette-success-490-150'],
-  '--warn': STATUS_PALETTE['--palette-warn-520-150'],
-  '--error': STATUS_PALETTE['--palette-error-530-200'],
-  '--success-muted': STATUS_PALETTE['--palette-success-950-30'],
-  '--warn-muted': STATUS_PALETTE['--palette-warn-950-30'],
-  '--error-muted': STATUS_PALETTE['--palette-error-950-30'],
+  '--success': STATUS_PALETTE['--palette-success-300'],
+  '--warn': STATUS_PALETTE['--palette-warn-200'],
+  '--error': STATUS_PALETTE['--palette-error-300'],
+  '--success-muted': STATUS_PALETTE['--palette-success-100'],
+  '--warn-muted': STATUS_PALETTE['--palette-warn-100'],
+  '--error-muted': STATUS_PALETTE['--palette-error-100'],
 } as const satisfies TOklchRamp;
 
 export const STATUS_RAMP_DARK = {
-  '--success': STATUS_PALETTE['--palette-success-720-160'],
-  '--warn': STATUS_PALETTE['--palette-warn-800-150'],
-  '--error': STATUS_PALETTE['--palette-error-700-170'],
-  '--success-muted': STATUS_PALETTE['--palette-success-300-50'],
-  '--warn-muted': STATUS_PALETTE['--palette-warn-300-50'],
-  '--error-muted': STATUS_PALETTE['--palette-error-300-50'],
+  '--success': STATUS_PALETTE['--palette-success-200'],
+  '--warn': STATUS_PALETTE['--palette-warn-yellow-100'],
+  '--error': STATUS_PALETTE['--palette-error-200'],
+  '--success-muted': STATUS_PALETTE['--palette-success-400'],
+  '--warn-muted': STATUS_PALETTE['--palette-warn-yellow-200'],
+  '--error-muted': STATUS_PALETTE['--palette-error-400'],
 } as const satisfies TOklchRamp;
 
 export const NEUTRAL_SCRIM_RAMP = {
   '--scrim-neutral-strong': {
-    ...NEUTRAL_PALETTE['--palette-neutral-180-10'],
+    ...NEUTRAL_PALETTE['--palette-neutral-2500'],
     alpha: 0.9,
   },
   '--scrim-neutral-mid': {
-    ...NEUTRAL_PALETTE['--palette-neutral-260-15'],
+    ...NEUTRAL_PALETTE['--palette-neutral-1700'],
     alpha: 0.68,
   },
   '--scrim-neutral-weak': {
-    ...NEUTRAL_PALETTE['--palette-neutral-320-20'],
+    ...NEUTRAL_PALETTE['--palette-neutral-1500'],
     alpha: 0.4,
   },
 } as const satisfies TOklchRamp;

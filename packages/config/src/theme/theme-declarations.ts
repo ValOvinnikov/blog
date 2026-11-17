@@ -11,7 +11,6 @@ import {
 } from '@shinefold/config/constants';
 
 import { BORDER_COLOR } from './border-tokens';
-import { PALETTE } from './palette-ramps';
 import { atLeastSmall } from './radius-declarations';
 import { RADIUS_NONE, RADIUS_PILL } from './radius-tokens';
 
@@ -104,7 +103,3 @@ export const formatOklchRamp = <TRamp extends TOklchRamp>(
     ]),
   ) as Record<keyof TRamp, string>;
 };
-
-export const formatPaletteDeclarations = (
-  hue: number,
-): Record<keyof typeof PALETTE, string> => formatOklchRamp(PALETTE, hue);

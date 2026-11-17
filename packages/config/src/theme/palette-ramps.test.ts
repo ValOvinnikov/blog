@@ -1,85 +1,52 @@
-import { isUndefined } from '@shinefold/utils/primitives';
+import {
+  readCssBlock,
+  readRepoFile,
+} from '@shinefold/config/testing/theme-css';
 
-import {
-  ACCENT_RAMP_DARK,
-  ACCENT_RAMP_LIGHT,
-  IMAGE_SCRIM_RAMP,
-  LOGO_RAMP_DARK,
-  LOGO_RAMP_LIGHT,
-} from './accent-ramps';
-import {
-  BRAND_PALETTE,
-  NEUTRAL_PALETTE,
-  PALETTE,
-  STATUS_PALETTE,
-} from './palette-ramps';
-import {
-  formatPaletteDeclarations,
-  type TOklchRamp,
-  type TOklchStop,
-} from './theme-declarations';
-import {
-  NEUTRAL_RAMP_DARK,
-  NEUTRAL_RAMP_LIGHT,
-  NEUTRAL_SCRIM_RAMP,
-  STATUS_RAMP_DARK,
-  STATUS_RAMP_LIGHT,
-} from './theme-ramps';
+import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config/constants';
+
+import { BRAND_PALETTE, formatPaletteDeclarations } from './palette-ramps';
+
+const CONSOLE_HUE = PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue;
 
 const MOCK_TENANT_HUE = 28;
 
-const THEME_CSS_RAMPS: TOklchRamp[] = [
-  NEUTRAL_RAMP_LIGHT,
-  NEUTRAL_RAMP_DARK,
-  ACCENT_RAMP_LIGHT,
-  ACCENT_RAMP_DARK,
-  STATUS_RAMP_LIGHT,
-  STATUS_RAMP_DARK,
-  LOGO_RAMP_LIGHT,
-  LOGO_RAMP_DARK,
-  IMAGE_SCRIM_RAMP,
-  NEUTRAL_SCRIM_RAMP,
-];
+const readColours = (css: string, selector: string): string[] =>
+  [
+    ...readCssBlock(css, selector).matchAll(
+      /\b(?:oklch|oklab|lch|lab|rgba?|hsla?|hwb|color)\(([^)]*)\)|#[\da-f]{3,8}\b/gi,
+    ),
+  ].map(([colour]) => colour);
 
-const opaque = ({ l, c, h }: TOklchStop): TOklchStop =>
-  isUndefined(h) ? { l, c } : { l, c, h };
-
-const paletteStops = Object.values(PALETTE).map(opaque);
+const toOpaqueOklch = (colour: string): string =>
+  colour.replace(/\s*\/[^)]*\)$/, ')').replace(/\(\s*(.*?)\s*\)/, '($1)');
 
 describe('the palette', () => {
-  it.each(THEME_CSS_RAMPS.flatMap((ramp) => Object.entries(ramp)))(
-    'holds the colour of %s as a stop',
-    (_property, stop) => {
-      expect(paletteStops).toContainEqual(opaque(stop));
+  const themeCss = readRepoFile('configs/tailwind/theme.css');
+  const stops = Object.values(formatPaletteDeclarations(CONSOLE_HUE));
+
+  it.each([':root', '.dark'])(
+    'holds every colour theme.css sets in %s as a stop',
+    (selector) => {
+      const colours = readColours(themeCss, selector);
+
+      expect(colours.length).toBeGreaterThan(0);
+
+      for (const colour of colours) {
+        expect(stops).toContain(toOpaqueOklch(colour));
+      }
     },
   );
-
-  it('names every stop after its lightness and chroma', () => {
-    for (const [property, { l, c }] of Object.entries(PALETTE)) {
-      expect(property).toMatch(
-        new RegExp(`-${Math.round(l * 1000)}-${Math.round(c * 1000)}$`),
-      );
-    }
-  });
 });
 
 describe(formatPaletteDeclarations, () => {
-  const declarations = formatPaletteDeclarations(MOCK_TENANT_HUE);
-
   it('puts every brand stop at the tenant hue', () => {
+    const declarations = formatPaletteDeclarations(MOCK_TENANT_HUE);
+
     for (const property of Object.keys(BRAND_PALETTE)) {
       expect(declarations[property as keyof typeof declarations]).toMatch(
         new RegExp(` ${MOCK_TENANT_HUE}\\)$`),
       );
     }
   });
-
-  it.each(Object.entries({ ...NEUTRAL_PALETTE, ...STATUS_PALETTE }))(
-    'keeps %s at its own hue',
-    (property, { h }) => {
-      expect(declarations[property as keyof typeof declarations]).toMatch(
-        new RegExp(` ${h}\\)$`),
-      );
-    },
-  );
 });

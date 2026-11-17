@@ -1,6 +1,6 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config/constants';
 
-import { formatPaletteDeclarations } from './theme-declarations';
+import { formatPaletteDeclarations } from './palette-ramps';
 
 export const SKIN_CSS_REPO_PATH = 'configs/tailwind/skins.css';
 

@@ -58,7 +58,7 @@ constants, `routes`, generated Sanity types, shared types, `client/objects`,
 | `test:watch` | `pnpm --filter @shinefold/config test:watch` |
 
 `gen:skins` writes `formatSkinCss()`'s output to `configs/tailwind/skins.css`,
-which `theme.css` imports. Run it after any palette or ramp change:
+which `theme.css` imports. Run it after any palette change:
 `skin-css.test.ts` fails `pnpm test` while the checked-in file differs.
 
 Root-level `pnpm type-check` / `pnpm lint` / `pnpm test` run every
