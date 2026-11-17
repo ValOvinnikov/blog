@@ -53,7 +53,11 @@ export const routes = {
     `/api/switch-language?${new URLSearchParams({ to, from }).toString()}`,
   rssFeed: () => '/rss.xml',
   tagRssFeed: (slug: string) => `${routes.tag(slug)}/rss.xml`,
+  pricingComparison: () => '/pricing#compare',
 } as const;
+
+export const pricingPageUrl = (platformMainAddress: string) =>
+  `https://${platformMainAddress}${routes.pricingComparison()}`;
 
 const PAGE_HREF_BUILDERS = {
   page_home: () => routes.home(),

@@ -5,6 +5,10 @@ import {
   STRIPE_RECURRING_INTERVAL,
   type TBillingInterval,
 } from '@platform/constants/billing';
+import {
+  STRIPE_BILLING_CYCLE_ANCHOR,
+  STRIPE_SCHEDULE_END_BEHAVIOR,
+} from '@platform/constants/stripe-schedule';
 import type { TMaybeUndefined } from '@shinefold/config';
 import Stripe from 'stripe';
 
@@ -59,6 +63,7 @@ const nextPhaseParams = (
     interval: STRIPE_RECURRING_INTERVAL[interval],
     interval_count: 1,
   },
+  billing_cycle_anchor: STRIPE_BILLING_CYCLE_ANCHOR.PHASE_START,
   proration_behavior: STRIPE_PRORATION_BEHAVIOR.NONE,
 });
 
@@ -106,7 +111,7 @@ export const scheduleChangeAtRenewal = async (
   }
   try {
     await stripe.subscriptionSchedules.update(id, {
-      end_behavior: 'release',
+      end_behavior: STRIPE_SCHEDULE_END_BEHAVIOR.RELEASE,
       proration_behavior: STRIPE_PRORATION_BEHAVIOR.NONE,
       phases: [
         currentPhaseParams(current),

@@ -1582,9 +1582,11 @@
       "provisioningStarted": "This tenant's provisioning has already started; its details can no longer be edited.",
       "ownerAlreadyJoined": "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
       "ownerHasFreeTenant": "This owner already has a Free site. Archive it or keep this site on its current plan.",
+      "planFollowsSubscription": "This site has a live subscription, so its plan follows Stripe. Change it on the owner's Billing page or in the Stripe dashboard.",
       "saveFailed": "Couldn't save tenant details — try again."
     },
-    "fieldLockedReasonCustomMainDomain": "Locked — the main address is your own domain. Switch back to the subdomain on the Domain page to edit."
+    "fieldLockedReasonCustomMainDomain": "Locked — the main address is your own domain. Switch back to the subdomain on the Domain page to edit.",
+    "fieldLockedReasonSubscribed": "Locked — this site has a live subscription, so its plan follows Stripe. Change it on the owner's Billing page or in the Stripe dashboard."
   },
   "tenantFieldErrors": {
     "nameRequired": "Enter a tenant name.",

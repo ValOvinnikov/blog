@@ -6,7 +6,7 @@ import {
   NEWSLETTER_RESULT,
 } from '@shinefold/config/constants';
 
-import { pageHref, routes } from './routes';
+import { pageHref, pricingPageUrl, routes } from './routes';
 
 faker.seed(6028);
 
@@ -19,6 +19,8 @@ const NEWSLETTER_UNSUBSCRIBE_PATH = '/api/newsletter/unsubscribe';
 const COOKIE_STATEMENT_PATH = '/legal/cookie-statement';
 const PRIVACY_INDEX_PATH = '/privacy';
 const LEGAL_INDEX_PATH = '/legal';
+const PRICING_COMPARISON_PATH = '/pricing#compare';
+const MOCK_MAIN_ADDRESS = faker.internet.domainName();
 
 describe('routes', () => {
   it.each([
@@ -36,6 +38,7 @@ describe('routes', () => {
       routes.legalPageByKind(LEGAL_PAGE_KIND.TERMS),
       '/api/legal-page/TERMS',
     ],
+    ['pricing comparison', routes.pricingComparison(), PRICING_COMPARISON_PATH],
   ])('builds the %s path', (_route, path, expected) => {
     expect(path).toBe(expected);
   });
@@ -125,6 +128,14 @@ describe('routes', () => {
   it('carries the language on the unsubscribe submit path', () => {
     expect(routes.newsletterUnsubscribeSubmit(LOCALE_ISO_CODES.FR)).toBe(
       `${NEWSLETTER_UNSUBSCRIBE_PATH}?lang=${LOCALE_ISO_CODES.FR}`,
+    );
+  });
+});
+
+describe(pricingPageUrl, () => {
+  it('builds the pricing comparison address on the given main address', () => {
+    expect(pricingPageUrl(MOCK_MAIN_ADDRESS)).toBe(
+      `https://${MOCK_MAIN_ADDRESS}${PRICING_COMPARISON_PATH}`,
     );
   });
 });
