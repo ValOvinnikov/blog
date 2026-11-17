@@ -6,7 +6,7 @@ import {
   type TAnalyticsFieldErrorReason,
 } from '@platform/constants/settings-features';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { blankToNull } from '@platform/utils/blank-to-null/blank-to-null';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -62,7 +62,7 @@ export const updateAnalyticsAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
   const { analyticsProvider, analyticsId } = parsed.data;
   const isClearing = isNull(blankToNull(analyticsId));
 

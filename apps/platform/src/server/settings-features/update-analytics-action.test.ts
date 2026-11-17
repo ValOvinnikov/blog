@@ -12,8 +12,10 @@ import {
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
 import {
+  mockEditorMembershipContext,
   mockMembership,
   mockMembershipContext,
+  mockOperatorMembershipContext,
 } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
@@ -23,6 +25,7 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
 } from '@shinefold/config';
 import {
   ANALYTICS_PROVIDER,
@@ -226,6 +229,32 @@ describe(updateAnalyticsAction, () => {
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
       expect(clearTenantAnalyticsMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     });
+  });
+
+  it('refuses an editor and writes nothing', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockEditorMembershipContext(
+        mockTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
+      ),
+    );
+
+    await expect(
+      updateAnalyticsAction(MOCK_TENANT_ID, GOOGLE_ANALYTICS_INPUT),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    expect(saveTenantAnalyticsMock).not.toHaveBeenCalled();
+    expect(clearTenantAnalyticsMock).not.toHaveBeenCalled();
+  });
+
+  it('saves for an operator', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockOperatorMembershipContext(
+        mockTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
+      ),
+    );
+
+    await expect(
+      updateAnalyticsAction(MOCK_TENANT_ID, GOOGLE_ANALYTICS_INPUT),
+    ).resolves.toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('rejects an unknown provider before reaching the tenant gate', async () => {
