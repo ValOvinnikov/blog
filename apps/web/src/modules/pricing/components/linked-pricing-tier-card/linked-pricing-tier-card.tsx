@@ -8,7 +8,6 @@ import { toLivePricingCard } from '@web/utils/to-live-pricing-card';
 import type { IPricingCardData } from '@web/utils/to-pricing-panels';
 import { useLocale, useTranslations } from 'next-intl';
 
-// Holds the price line's height until the visitor's currency is known, so the card does not jump.
 const PRICE_PLACEHOLDER = '\u00a0';
 
 export interface ILinkedPricingTierCardProps {

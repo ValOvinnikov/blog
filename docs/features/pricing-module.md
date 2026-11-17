@@ -93,7 +93,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 - `apps/web/src/modules/pricing/components/pricing-tier-card/pricing-tier-card.tsx`, `components/pricing-period-switch/pricing-period-switch.tsx`
 - `apps/web/src/utils/to-pricing-panels/to-pricing-panels.ts`, `apps/web/src/utils/format-price-amount/format-price-amount.ts`
 - `apps/web/src/modules/pricing/components/linked-pricing-tier-card/linked-pricing-tier-card.tsx`, `apps/web/src/utils/to-live-pricing-card/to-live-pricing-card.ts`
-- `apps/web/src/app/api/promotion-code/route.ts`, `apps/web/src/server/proxy/remember-visitor-currency/remember-visitor-currency.ts`
+- `apps/web/src/app/api/promotion-code/route.ts`, `apps/web/src/app/api/visitor-currency/route.ts`, `apps/web/src/hooks/use-visitor-currency/use-visitor-currency.ts`
 
 ## Tests and stories
 

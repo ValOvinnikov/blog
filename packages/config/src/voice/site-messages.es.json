@@ -360,10 +360,6 @@
         "purpose": "Recuerda el idioma que elegiste para este sitio.",
         "duration": "1 año"
       },
-      "CURRENCY": {
-        "purpose": "Recuerda en qué moneda mostrar los precios, según el país desde el que visitas el sitio.",
-        "duration": "1 año"
-      },
       "SESSION": {
         "purpose": "Mantiene tu sesión iniciada.",
         "duration": "Hasta que termine tu sesión"

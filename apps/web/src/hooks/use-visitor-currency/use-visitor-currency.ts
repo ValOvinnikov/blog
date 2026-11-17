@@ -34,7 +34,6 @@ const requestVisitorCurrency = (): TVisitorCurrencyRequest => {
   return visitorCurrencyRequest;
 };
 
-/** `undefined` until the visitor's currency is known, then that currency or `defaultCurrency` when it has none or the lookup fails. */
 export const useVisitorCurrency = (
   defaultCurrency: TBillingCurrency,
 ): TMaybeUndefined<TBillingCurrency> => {
