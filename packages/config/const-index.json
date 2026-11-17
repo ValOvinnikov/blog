@@ -174,6 +174,12 @@
         "file": "apps/platform/src/constants/billing.ts"
       },
       {
+        "ref": "DRAFT_PREVIEW_REFUSAL.UNAVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      },
+      {
         "ref": "SITE_ADDRESS_STATUS.UNAVAILABLE",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -3658,6 +3664,12 @@
         "file": "packages/db/src/constants/tenant.ts"
       },
       {
+        "ref": "DRAFT_PREVIEW_REFUSAL.ARCHIVED",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      },
+      {
         "ref": "TENANT_REFUSAL.ARCHIVED",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
@@ -3846,6 +3858,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
+      },
+      {
+        "ref": "DRAFT_PREVIEW_REFUSAL.NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
       },
       {
         "ref": "LEAD_REFUSAL.NOT_FOUND",
@@ -5202,6 +5220,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "DRAFT_PREVIEW_REFUSAL.SUSPENDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
       }
     ],
     "TRIAL": [
@@ -6766,6 +6790,46 @@
         "scope": "app:platform",
         "from": "@platform/constants/domain",
         "file": "apps/platform/src/constants/domain.ts"
+      }
+    ],
+    "LANGUAGE_OFF": [
+      {
+        "ref": "DRAFT_PREVIEW_REFUSAL.LANGUAGE_OFF",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
+    "draft_preview.secret_missing": [
+      {
+        "ref": "DRAFT_PREVIEW_LOG.SECRET_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
+    "draft_preview.path_skipped": [
+      {
+        "ref": "DRAFT_PREVIEW_LOG.PATH_SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
+    "draft_preview.path_failed": [
+      {
+        "ref": "DRAFT_PREVIEW_LOG.PATH_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
+    "draft_preview.path_error": [
+      {
+        "ref": "DRAFT_PREVIEW_LOG.PATH_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
       }
     ],
     "email_config.update_audit_failed": [

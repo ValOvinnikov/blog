@@ -28,7 +28,8 @@
     "signUpTitle": "Account aanmaken",
     "onboarding": "Je site maken",
     "billing": "Facturering · Admin",
-    "upgrade": "Upgraden"
+    "upgrade": "Upgraden",
+    "draftPreview": "Conceptvoorbeeld"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -2311,5 +2312,23 @@
     "NOT_ACTIVE": "Je abonnement vraagt eerst je aandacht voordat het kan wijzigen. Open Facturering om het op te lossen.",
     "UNCHANGED": "Je site zit al op dit abonnement.",
     "CARD_DECLINED": "Je kaart is geweigerd, dus er is niets gewijzigd. Werk hem bij in Facturering en probeer het opnieuw."
+  },
+  "draftPreview": {
+    "title": "Conceptvoorbeeld",
+    "draftNotice": "Dit is het laatst opgeslagen concept, niet de gepubliceerde pagina. Alleen leden van deze site kunnen dit voorbeeld openen.",
+    "siteLabel": "Site",
+    "pathLabel": "Pagina",
+    "frameRegionLabel": "Conceptvoorbeeld",
+    "frameTitle": "Concept van deze pagina op je site",
+    "toolbarAriaLabel": "Voorbeeldopties",
+    "reload": "Opnieuw laden",
+    "reloading": "Opnieuw laden…",
+    "openPublished": "Gepubliceerde pagina openen",
+    "refusedTitle": "Dit concept heeft geen voorbeeld",
+    "refusalNotFound": "Deze pagina heeft geen adres op je site. Alleen berichten en landingspagina's hebben een voorbeeld, en een landingspagina heeft al haar bovenliggende pagina's nodig.",
+    "refusalLanguageOff": "Deze pagina is in een taal die je site niet aanbiedt. Zet deze taal aan om het voorbeeld te zien.",
+    "refusalSuspended": "Deze site is opgeschort, dus de concepten hebben geen voorbeeld.",
+    "refusalArchived": "Deze site is gearchiveerd, dus de concepten hebben geen voorbeeld.",
+    "refusalUnavailable": "Het platform kon dit voorbeeld niet voorbereiden. Het probleem is gelogd voor het platformteam."
   }
 }

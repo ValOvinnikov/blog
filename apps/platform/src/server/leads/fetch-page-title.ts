@@ -1,19 +1,18 @@
 import 'server-only';
 
 import { LEAD_LOG } from '@platform/constants/lead';
-import { env } from '@platform/utils/env/env';
+import {
+  internalPagesRoutes,
+  postToInternalPagesRoute,
+} from '@platform/server/internal-pages/post-to-internal-pages-route';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {
-  HTTP_METHOD,
   HTTP_STATUS,
   type TLocaleIsoCode,
   type TMaybeUndefined,
 } from '@shinefold/config';
-import { buildEnqueueHeaders } from '@shinefold/utils/enqueue-signature';
 import { z } from 'zod';
-
-const PAGE_TITLE_TIMEOUT_MS = 5000;
 
 const pageTitleResponseSchema = z.object({ title: z.string().min(1) });
 
@@ -28,33 +27,19 @@ export const fetchPageTitle = async ({
   documentId,
   locale,
 }: TFetchPageTitleInput): Promise<TMaybeUndefined<string>> => {
-  const { WEB_APP_URL: webAppUrl, INTERNAL_PAGES_SECRET: secret } = env;
-
-  if (!webAppUrl || !secret) {
-    logger.error(LEAD_LOG.PAGE_TITLE_SKIPPED, {
-      hasWebAppUrl: Boolean(webAppUrl),
-      hasSecret: Boolean(secret),
-    });
-    return undefined;
-  }
-
-  const url = new URL(
-    `/api/internal/pages/${encodeURIComponent(documentId)}`,
-    webAppUrl,
-  );
-  const rawBody = JSON.stringify({ tenantId, locale });
-
   try {
-    const response = await fetch(url, {
-      method: HTTP_METHOD.POST,
-      headers: {
-        'Content-Type': 'application/json',
-        ...buildEnqueueHeaders({ secret, path: url.pathname, rawBody }),
-      },
-      body: rawBody,
-      signal: AbortSignal.timeout(PAGE_TITLE_TIMEOUT_MS),
-    });
+    const result = await postToInternalPagesRoute(
+      internalPagesRoutes.title(documentId),
+      { tenantId, locale },
+    );
 
+    if (!result.isConfigured) {
+      const { hasWebAppUrl, hasSecret } = result;
+      logger.error(LEAD_LOG.PAGE_TITLE_SKIPPED, { hasWebAppUrl, hasSecret });
+      return undefined;
+    }
+
+    const { response } = result;
     if (response.status === HTTP_STATUS.NOT_FOUND) return undefined;
     if (!response.ok) {
       logger.error(LEAD_LOG.PAGE_TITLE_FAILED, {

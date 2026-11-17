@@ -2261,7 +2261,13 @@ or landing page through the `drafts` perspective (a never-published draft
 included, its id given bare or as `drafts.<id>`) and answers its
 percent-encoded public path, with the locale prefix the site serves, for the
 platform to frame exactly as returned; a draft in a language the tenant has
-not switched on answers 409. Detail: `docs/features/rendering-and-caching.md`.
+not switched on answers 409. The platform's preview page
+(`/dashboard/preview/{documentId}`, `/tenants/{id}/preview/{documentId}`)
+asks for that path on every load, signs a five-minute token behind its own
+membership gate, and frames the tenant's main address with it; only those two
+routes may frame other sites (`frame-src https:`). Detail:
+`docs/features/rendering-and-caching.md` and
+`docs/features/embedded-studio.md`.
 
 ### Localization
 

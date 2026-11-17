@@ -28,7 +28,8 @@
     "signUpTitle": "Crear una cuenta",
     "onboarding": "Crear tu sitio",
     "billing": "Facturación · Administración",
-    "upgrade": "Mejorar plan"
+    "upgrade": "Mejorar plan",
+    "draftPreview": "Vista previa del borrador"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -2311,5 +2312,23 @@
     "NOT_ACTIVE": "Tu suscripción necesita atención antes de poder cambiar de plan. Abre Facturación para resolverlo.",
     "UNCHANGED": "Tu sitio ya está en este plan.",
     "CARD_DECLINED": "Tu tarjeta ha sido rechazada, así que no ha cambiado nada. Actualízala en Facturación e inténtalo de nuevo."
+  },
+  "draftPreview": {
+    "title": "Vista previa del borrador",
+    "draftNotice": "Este es el último borrador guardado, no la página publicada. Solo los miembros de este sitio pueden abrir esta vista previa.",
+    "siteLabel": "Sitio",
+    "pathLabel": "Página",
+    "frameRegionLabel": "Vista previa del borrador",
+    "frameTitle": "Borrador de esta página en tu sitio",
+    "toolbarAriaLabel": "Opciones de vista previa",
+    "reload": "Recargar",
+    "reloading": "Recargando…",
+    "openPublished": "Abrir la página publicada",
+    "refusedTitle": "No se puede previsualizar este borrador",
+    "refusalNotFound": "Esta página no tiene dirección en tu sitio. Solo se pueden previsualizar entradas y páginas de destino, y una página de destino necesita todas sus páginas superiores.",
+    "refusalLanguageOff": "Esta página está en un idioma que tu sitio no ofrece. Activa este idioma para previsualizarla.",
+    "refusalSuspended": "Este sitio está suspendido, así que sus borradores no se pueden previsualizar.",
+    "refusalArchived": "Este sitio está archivado, así que sus borradores no se pueden previsualizar.",
+    "refusalUnavailable": "La plataforma no pudo preparar esta vista previa. El problema se ha registrado para el equipo de la plataforma."
   }
 }

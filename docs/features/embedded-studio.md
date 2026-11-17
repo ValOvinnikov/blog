@@ -15,6 +15,9 @@ code:
   - apps/platform/src/utils/content-security-policy/**
   - apps/platform/src/utils/studio-entered-cookie/**
   - apps/platform/src/server/studio-entry/**
+  - apps/platform/src/components/features/draft-preview/**
+  - apps/platform/src/app/**/preview/**
+  - apps/platform/src/server/draft-preview/**
 epics: [4840, 4956, 4959, 4035, 1036]
 ---
 
@@ -56,6 +59,8 @@ module types whose capability is off for the tenant carry a warning.
   item's one tooltip, to the right of the row, replacing the rail's name
   tooltip. The line follows the current state without a reload (see
   [platform-shell](./platform-shell.md)). Operators never see it.
+- `/dashboard/preview/{documentId}` and `/tenants/{id}/preview/{documentId}`:
+  the draft preview of one post or landing page (see "Draft preview" below).
 - Outside the platform, `pnpm --filter @shinefold/studio dev` runs the same config
   standalone through the Sanity CLI (`sanity.config.ts`, title "Blog").
 
@@ -194,6 +199,41 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   actions and no "new document" entry, and wraps the landing page's publish
   action with landing redirects ([landing-tree](./landing-tree.md)).
 
+## Draft preview
+
+- A preview page frames the tenant's own site showing a document's latest
+  saved draft. It sits behind the same gate as the Studio route
+  (`resolveDashboardTenant`, any member; `requireTenantById`, any admin), so a
+  signed-out visitor, a non-member and a member removed since their last load
+  get no frame and no token.
+- On every load the page asks `apps/web`'s
+  `POST /api/internal/pages/{documentId}/path` (signed under
+  `INTERNAL_PAGES_SECRET`, through `postToInternalPagesRoute`, which the
+  Leads page's title lookup shares) for the draft's public path, then signs
+  `{ tenantId, path, expiresAt }` with `@shinefold/utils/preview-token` under
+  `PREVIEW_LINK_SECRET`, valid for five minutes. The frame's address is the
+  tenant's main address (`siteUrl`, a custom domain when that is the primary
+  one) plus the path exactly as returned, plus `?preview=<token>`; it is
+  always built on the server. The browser keeps nothing that grants access
+  later.
+- The chrome: the page title, a notice that this is the latest saved draft,
+  the site's address and the page's path, then a toolbar with the Look page's
+  device widths (`PREVIEW_DEVICE`), Reload, and a link to the published page
+  in a new tab. Reload refreshes the route, which signs a new token and so
+  reloads the frame with the latest saved draft.
+- Refusals replace the frame with a message that says why: a document with no
+  public path (404), a draft in a language the site does not serve (409, "switch
+  this language on"), a suspended or archived tenant, and a preview the
+  platform cannot prepare. Only the last is logged (`DRAFT_PREVIEW_LOG`): a
+  missing `PREVIEW_LINK_SECRET`, `WEB_APP_URL` or `INTERNAL_PAGES_SECRET`, or
+  a failed path request.
+- Framing: `next.config.ts` gives only the two preview routes a static CSP
+  whose `frame-src` is `https:` (`buildContentSecurityPolicy`'s
+  `canFrameAnySecureSite`); every other platform page keeps its Stripe-only
+  `frame-src`, and every page keeps `frame-ancestors 'none'`. The site itself
+  allows framing only for a valid token, by the platform's origin
+  ([rendering-and-caching](./rendering-and-caching.md)).
+
 ## Dependencies
 
 - `@shinefold/studio` (schema, structure, plugins: structure, vision, code input,
@@ -205,6 +245,8 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   [tenant-provisioning](./tenant-provisioning.md),
   [module-system](./module-system.md), [languages](./languages.md).
 - Env: none in the platform for the mount (ids come from the tenant row). The
+  draft preview reads `PREVIEW_LINK_SECRET`, `WEB_APP_URL` and
+  `INTERNAL_PAGES_SECRET`. The
   standalone CLI Studio reads `SANITY_STUDIO_PROJECT_ID` and
   `SANITY_STUDIO_DATASET`.
 
@@ -221,6 +263,8 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
 - `apps/platform/src/app/[locale]/tenants/[tenantId]/(detail)/studio/[[...tool]]/page.tsx`
 - `apps/platform/src/server/settings-features/get-enabled-capabilities.ts`
 - `apps/platform/src/utils/content-security-policy/content-security-policy.ts`
+- `apps/platform/src/server/draft-preview/resolve-draft-preview.ts`
+- `apps/platform/src/components/features/draft-preview/draft-preview-page-content/draft-preview-page-content.tsx`
 
 ## Tests and stories
 
@@ -232,6 +276,8 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   Studio page test, `utils/owner-studio-access/owner-studio-access.test.ts`
   and `server/owner-access/request-owner-access.test.ts`.
 - `apps/platform/src/utils/content-security-policy/content-security-policy.test.ts`.
+- Draft preview: `server/draft-preview/*.test.ts` and
+  `components/features/draft-preview/**/*.test.tsx`.
 - Capability and plan warnings: `packages/studio/src/schema-types/inputs/requirement-warning-input/**/*.test.ts(x)`.
 - Login provider: `packages/studio/src/auth/login-provider-auth.test.ts`.
 - No Storybook in either workspace.
