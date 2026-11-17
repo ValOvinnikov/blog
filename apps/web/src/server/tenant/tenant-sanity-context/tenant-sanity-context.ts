@@ -1,5 +1,6 @@
 import type { TMaybeUndefined } from '@shinefold/config';
 import { queries } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   getPlatformSanityContext,
   type TTenantSanityContext,
@@ -31,14 +32,23 @@ export const getHostTenantSanityContext = cache(
   },
 );
 
+export type TTenantSanityWriteContext = {
+  tenant: TMaybeUndefined<TTenantSanityContext>;
+  tenantId: TMaybeUndefined<string>;
+  isActive: boolean;
+};
+
 export type THostTenantSanityWriteContext =
-  | {
-      isResolvable: true;
-      tenant: TMaybeUndefined<TTenantSanityContext>;
-      tenantId: TMaybeUndefined<string>;
-      isActive: boolean;
-    }
+  | ({ isResolvable: true } & TTenantSanityWriteContext)
   | { isResolvable: false };
+
+export const toTenantSanityWriteContext = (
+  tenant: TTenant,
+): TTenantSanityWriteContext => ({
+  tenant: queries.tenants.toTenantSanityWriteCredentials(tenant),
+  tenantId: tenant.id,
+  isActive: isTenantActive(tenant),
+});
 
 export const getHostTenantSanityWriteContext = cache(
   async (): Promise<THostTenantSanityWriteContext> => {
@@ -58,9 +68,7 @@ export const getHostTenantSanityWriteContext = cache(
 
     return {
       isResolvable: true,
-      tenant: queries.tenants.toTenantSanityWriteCredentials(resolvedTenant),
-      tenantId: resolvedTenant.id,
-      isActive: isTenantActive(resolvedTenant),
+      ...toTenantSanityWriteContext(resolvedTenant),
     };
   },
 );

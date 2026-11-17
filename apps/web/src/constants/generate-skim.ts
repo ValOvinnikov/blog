@@ -12,4 +12,6 @@ export const GENERATE_SKIM_LOG = {
   GENERATION_FAILED: 'generate_skim.generation_failed',
   WRITE_CLIENT_UNCONFIGURED: 'generate_skim.write_client_unconfigured',
   DRAFT_SAVE_FAILED: 'generate_skim.draft_save_failed',
+  PUBLISHED_AT_LOOKUP_FAILED: 'generate_skim.published_at_lookup_failed',
+  PUBLISH_START_FAILED: 'generate_skim.publish_start_failed',
 } as const;

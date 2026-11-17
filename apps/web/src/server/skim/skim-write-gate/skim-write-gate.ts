@@ -1,31 +1,24 @@
-import {
-  HTTP_STATUS,
-  type TMaybeNull,
-  type TMaybeUndefined,
-} from '@shinefold/config';
+import { HTTP_STATUS, type TMaybeNull } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import type { TTakeawayGenerationClaim } from '@shinefold/db/queries/takeaway-generations/claim-takeaway-generation';
 import type { TTenantSanityContext } from '@shinefold/service';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
-import { skimResponse } from '@web/server/skim/skim-response/skim-response';
-import { getHostTenantSanityWriteContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
+import type { TTenantSanityWriteContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
-import type { NextResponse } from 'next/server';
 
-export const UNRESOLVED_TENANT_MESSAGE =
-  'Failed to resolve the requesting tenant.';
+export type TSkimRefusal = { message: string; status: number };
 
 type TSkimWriteGate =
   | {
       isAllowed: true;
-      tenant: TMaybeUndefined<TTenantSanityContext>;
+      tenant: TTenantSanityWriteContext['tenant'];
       claim: TMaybeNull<TTakeawayGenerationClaim>;
     }
-  | { isAllowed: false; response: NextResponse };
+  | { isAllowed: false; refusal: TSkimRefusal };
 
 const refuse = (message: string, status: number): TSkimWriteGate => ({
   isAllowed: false,
-  response: skimResponse(message, status),
+  refusal: { message, status },
 });
 
 const refuseInactive = (): TSkimWriteGate =>
@@ -34,16 +27,33 @@ const refuseInactive = (): TSkimWriteGate =>
     HTTP_STATUS.FORBIDDEN,
   );
 
-export const gateSkimWrite = async (
+const claimGeneration = async (
   postId: string,
+  tenantId: string,
+  tenant: TTenantSanityContext,
 ): Promise<TSkimWriteGate> => {
-  const writeTenant = await getHostTenantSanityWriteContext();
-  if (!writeTenant.isResolvable) {
-    logger.error(GENERATE_SKIM_LOG.WRITE_TENANT_UNRESOLVABLE, { postId });
-    return refuse(UNRESOLVED_TENANT_MESSAGE, HTTP_STATUS.NOT_FOUND);
+  let claim: TMaybeNull<TTakeawayGenerationClaim>;
+  try {
+    claim = await queries.takeawayGenerations.claimTakeawayGeneration(tenantId);
+  } catch (error) {
+    logger.error(GENERATE_SKIM_LOG.CLAIM_FAILED, { postId, tenantId, error });
+    return refuse(
+      'Failed to check the takeaways allowance.',
+      HTTP_STATUS.SERVICE_UNAVAILABLE,
+    );
+  }
+  if (!claim) {
+    logger.info(GENERATE_SKIM_LOG.ALLOWANCE_USED, { postId, tenantId });
+    return refuseInactive();
   }
 
-  const { tenant, tenantId, isActive } = writeTenant;
+  return { isAllowed: true, tenant, claim };
+};
+
+export const gateSkimWrite = async (
+  postId: string,
+  { tenant, tenantId, isActive }: TTenantSanityWriteContext,
+): Promise<TSkimWriteGate> => {
   if (!tenantId) {
     return { isAllowed: true, tenant, claim: null };
   }
@@ -62,22 +72,7 @@ export const gateSkimWrite = async (
     return refuseInactive();
   }
 
-  let claim: TMaybeNull<TTakeawayGenerationClaim>;
-  try {
-    claim = await queries.takeawayGenerations.claimTakeawayGeneration(tenantId);
-  } catch (error) {
-    logger.error(GENERATE_SKIM_LOG.CLAIM_FAILED, { postId, tenantId, error });
-    return refuse(
-      'Failed to check the takeaways allowance.',
-      HTTP_STATUS.SERVICE_UNAVAILABLE,
-    );
-  }
-  if (!claim) {
-    logger.info(GENERATE_SKIM_LOG.ALLOWANCE_USED, { postId, tenantId });
-    return refuseInactive();
-  }
-
-  return { isAllowed: true, tenant, claim };
+  return claimGeneration(postId, tenantId, tenant);
 };
 
 export const releaseSkimGeneration = async (
