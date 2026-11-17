@@ -5,8 +5,7 @@ import {
   BILLING_REFUSAL,
   type TBillingRefusal,
 } from '@platform/constants/billing';
-import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
-import { requireTenantOwnerOrAdmin } from '@platform/server/auth/require-tenant-owner-or-admin';
+import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { getStripeClient } from '@platform/server/billing/stripe-client';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -68,7 +67,7 @@ export const openBillingPortalAction = async (
   const parsed = tenantIdSchema.safeParse(tenantId);
   if (!parsed.success) return NO_CUSTOMER;
 
-  await requireTenantOwnerOrAdmin(parsed.data, isSuperAdmin);
+  await requireTenantOwner(parsed.data);
   const billing = await queries.tenants.getTenantBilling(parsed.data);
   const customer = billing?.stripeCustomerId;
   if (!customer) return NO_CUSTOMER;

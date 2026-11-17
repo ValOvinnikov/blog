@@ -31,6 +31,8 @@ export {
   type TArchivedSanityProjectAlertInput,
   buildNewsletterReputationAlertEmail,
   type TNewsletterReputationAlertInput,
+  buildSupportRequestEmail,
+  type TSupportRequestEmailInput,
 } from './templates/operator';
 export {
   buildOwnerInviteHeadsUpEmail,

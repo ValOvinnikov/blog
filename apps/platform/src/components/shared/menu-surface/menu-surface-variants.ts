@@ -10,8 +10,8 @@ export const MENU_POPUP_FIT_WIDTH =
 
 export const menuSurfaceVariants = tv({
   slots: {
-    // Above the sticky view bars (z-21), below dialogs (z-40) and toasts and tooltips (z-50).
-    positioner: ['z-30'],
+    // Above dialogs (z-40), so a Select inside one opens over it; below toasts and tooltips (z-50).
+    positioner: ['z-45'],
     popup: [
       'rounded-platform border border-platform-popover-line bg-platform-popover p-1',
       'text-platform-text shadow-platform-lg outline-none',

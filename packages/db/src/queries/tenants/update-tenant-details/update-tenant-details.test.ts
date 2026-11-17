@@ -716,6 +716,43 @@ describe(updateTenantDetails, () => {
       },
     );
 
+    it('ends the trial when an operator moves a trial site to Free', async () => {
+      await patchTestTenant(db(), tenantId, {
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.TRIAL,
+      });
+
+      const saved = await updateTenantDetails(tenantId, MOCK_ORIGINAL_DETAILS);
+
+      expect(unwrapUpdated(saved)).toMatchObject({
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ACTIVE,
+      });
+    });
+
+    it.each([
+      [TENANT_STATUS.TRIAL, TENANT_PLAN.STARTER],
+      [TENANT_STATUS.ACTIVE, TENANT_PLAN.FREE],
+      [TENANT_STATUS.PAST_DUE, TENANT_PLAN.FREE],
+      [TENANT_STATUS.SUSPENDED, TENANT_PLAN.FREE],
+      [TENANT_STATUS.ACTIVE, TENANT_PLAN.STARTER],
+    ])(
+      'keeps the status of a %s site an operator moves to %s',
+      async (status, plan) => {
+        await patchTestTenant(db(), tenantId, {
+          plan: TENANT_PLAN.GROWTH,
+          status,
+        });
+
+        const saved = await updateTenantDetails(tenantId, {
+          ...MOCK_ORIGINAL_DETAILS,
+          plan,
+        });
+
+        expect(unwrapUpdated(saved).status).toBe(status);
+      },
+    );
+
     it('refuses an owner-email change bundled with another field, leaving the invite', async () => {
       const result = await updateTenantDetails(tenantId, {
         ...MOCK_ORIGINAL_DETAILS,
@@ -927,6 +964,26 @@ describe(updateTenantDetails, () => {
       await expect(saveGrowthOnNewDomain()).rejects.toThrow();
 
       await expect(countLockedMemberships(db())).resolves.toBe(0);
+    });
+
+    it('keeps a trial site on its trial when its move to Free fails', async () => {
+      await patchTestTenant(db(), tenantId, {
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.TRIAL,
+      });
+
+      await expect(
+        updateTenantDetails(tenantId, {
+          ...MOCK_VALID_INPUT,
+          primaryDomain: MOCK_NEW_DOMAIN,
+        }),
+      ).rejects.toThrow();
+
+      const [row] = await db()
+        .select({ status: tenants.status })
+        .from(tenants)
+        .where(eq(tenants.id, tenantId));
+      expect(row?.status).toBe(TENANT_STATUS.TRIAL);
     });
 
     it('locks again the members the save unlocked', async () => {

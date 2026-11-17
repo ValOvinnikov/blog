@@ -1,8 +1,6 @@
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { screen, within } from '@platform/testing/custom-render';
-import { openLookRow } from '@platform/testing/look/look-form-interactions';
-import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
+import { saveChosenStyle } from '@platform/testing/look/look-form-save';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import {
   ACCOUNT_BUTTON_STYLE,
@@ -52,18 +50,8 @@ describe(`<${LookForm.name}/>`, () => {
         option: LOOK_FORM.accountPhonePlacementOptionLabel.MENU,
         saved: { accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU },
       },
-    ])(
-      'saves the chosen $group style',
-      async ({ row, group, option, saved }) => {
-        await openLookRow(user, row);
-        const [styleGroup] = screen.getAllByRole('group', { name: group });
-        const optionButton = within(styleGroup!).getByRole('button', {
-          name: option,
-        });
-        await user.click(optionButton);
-
-        await saveAndExpectLook(user, saved);
-      },
+    ])('saves the chosen $group style', (style) =>
+      saveChosenStyle(user, style),
     );
   });
 });

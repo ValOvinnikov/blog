@@ -28,7 +28,8 @@
     "signUpTitle": "Créer un compte",
     "onboarding": "Créer votre site",
     "billing": "Facturation · Administration",
-    "upgrade": "Changer d'offre"
+    "upgrade": "Changer d'offre",
+    "help": "Aide"
   },
   "signInPage": {
     "heading": "Connexion",
@@ -188,6 +189,7 @@
   },
   "account": {
     "signOut": "Se déconnecter",
+    "signingOut": "Déconnexion…",
     "signedInAs": "Connecté en tant que {email}",
     "menuLabel": "Compte",
     "triggerCollapsedLabel": "Compte : {name}, {email}",
@@ -244,7 +246,9 @@
     "blockedSignups": "Inscriptions bloquées",
     "dataRequests": "Demandes de données",
     "badgeUnreadLeads": "{count, plural, one {# nouveau} other {# nouveaux}}",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Assistance",
+    "help": "Aide"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -527,6 +531,7 @@
       "SUSPENSION_REASON": "Motif : {category}",
       "SUSPENSION_REFERENCE": "Référence : {reference}",
       "PLAN": "Formule : {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Formule : {from} → {to}",
       "SIGN_IN_PROVIDER": "Fournisseur de connexion : {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Secret client remplacé"
     }
@@ -1579,9 +1584,11 @@
       "provisioningStarted": "Le provisionnement de ce locataire a déjà commencé ; ses détails ne peuvent plus être modifiés.",
       "ownerAlreadyJoined": "Le propriétaire de ce locataire s'est déjà connecté : son e-mail ne peut plus être corrigé ici — cela transférerait la propriété.",
       "ownerHasFreeTenant": "Ce propriétaire a déjà un site gratuit. Archivez-le ou laissez ce site sur son offre actuelle.",
+      "planFollowsSubscription": "Ce site a un abonnement actif, son offre suit donc Stripe. Modifiez-la depuis la page Facturation du propriétaire ou dans le tableau de bord Stripe.",
       "saveFailed": "Impossible d'enregistrer les informations du locataire — veuillez réessayer."
     },
-    "fieldLockedReasonCustomMainDomain": "Verrouillé — l'adresse principale est le domaine propre du site. Pour la modifier, revenez au sous-domaine depuis la page Domaine."
+    "fieldLockedReasonCustomMainDomain": "Verrouillé — l'adresse principale est le domaine propre du site. Pour la modifier, revenez au sous-domaine depuis la page Domaine.",
+    "fieldLockedReasonSubscribed": "Verrouillé — ce site a un abonnement actif, son offre suit donc Stripe. Modifiez-la depuis la page Facturation du propriétaire ou dans le tableau de bord Stripe."
   },
   "tenantFieldErrors": {
     "nameRequired": "Saisissez un nom de locataire.",
@@ -2297,6 +2304,7 @@
     "currentPlan": "Votre site est sur {plan}, payé {interval, select, YEARLY {à l'année} other {au mois}}.",
     "pendingChange": "Votre site passe à {plan}, payé {interval, select, YEARLY {à l'année} other {au mois}}, le <time>{date}</time>.",
     "changeNow": "Le changement commence aujourd'hui. Vous payez maintenant la différence pour le reste de la période en cours.",
+    "changeNowNewPeriod": "Le changement commence aujourd'hui, avec une nouvelle période {interval, select, YEARLY {annuelle} other {mensuelle}}. Vous payez maintenant la nouvelle période, moins le temps non utilisé de la période en cours.",
     "changeAtRenewal": "Le changement commence le <time>{date}</time>, à la fin de la période en cours. Rien ne change d'ici là.",
     "keepCurrentDescription": "Votre site reste sur {plan}, et le changement prévu le <time>{date}</time> est annulé.",
     "changeUnchanged": "C'est votre formule actuelle. Choisissez une autre formule ou période de facturation pour la changer.",
@@ -2313,5 +2321,27 @@
     "NOT_ACTIVE": "Votre abonnement demande votre attention avant de pouvoir changer de formule. Ouvrez Facturation pour le régler.",
     "UNCHANGED": "Votre site est déjà sur cette formule.",
     "CARD_DECLINED": "Votre carte a été refusée, donc rien n'a changé. Mettez-la à jour dans Facturation et réessayez."
+  },
+  "helpView": {
+    "title": "Aide",
+    "description": "Envoyez un message à notre équipe d'assistance. Nous y joignons votre site, votre offre et ce compte, pour que vous n'ayez pas à le faire.",
+    "helpCentre": "Centre d'aide",
+    "unavailableTitle": "Le formulaire d'aide n'est pas disponible",
+    "unavailableDescription": "Impossible d'envoyer des messages d'ici pour le moment. Réessayez plus tard."
+  },
+  "helpForm": {
+    "title": "Contacter l'assistance",
+    "responseTime": "Nous répondons généralement sous deux jours ouvrés.",
+    "subjectLabel": "Objet",
+    "messageLabel": "Message",
+    "messageHint": "Dites ce que vous essayiez de faire et ce qui s'est passé à la place.",
+    "required": "Remplissez ce champ.",
+    "tooLong": "Restez sous {limit} caractères.",
+    "send": "Envoyer le message",
+    "sending": "Envoi…",
+    "sent": "Message envoyé. Nous vous en avons envoyé une copie par e-mail.",
+    "rateLimited": "Vous avez envoyé plusieurs messages en peu de temps. Réessayez plus tard.",
+    "unavailable": "Le formulaire d'aide n'est pas disponible pour le moment. Réessayez plus tard.",
+    "sendFailed": "Impossible d'envoyer votre message — réessayez."
   }
 }
