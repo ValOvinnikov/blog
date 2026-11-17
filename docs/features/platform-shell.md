@@ -72,10 +72,12 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   reload or shared link keeps them; `listTenants`' own default order stays by
   name, which the dashboard tenant picker relies on.
 - **Operator tenant view**: `/tenants/{id}` and its Look, Voice, Features,
-  Languages, Domain, Email, Studio, Provisioning and Danger zone pages. The
-  sidebar shows the Platform section plus the tenant's own sections.
+  Languages, Domain, Email, Studio, Provisioning, Danger zone and Help pages.
+  The sidebar shows the Platform section plus the tenant's own sections, ending
+  with Support.
 - **Owner dashboard**: `/dashboard` and its Look, Voice, Features,
-  Languages, Domain, Email and Studio pages. `/dashboard/select-tenant` is a
+  Languages, Domain, Email, Studio and Help pages. The sidebar ends with a
+  Support section holding Help on every plan (see [support](./support.md)). `/dashboard/select-tenant` is a
   picker for a user with several workspaces: rows sorted by name, each with
   its domain and "role · plan" (role hidden for a SUPERADMIN's virtual
   membership), archived workspaces in their own read-only group, and a

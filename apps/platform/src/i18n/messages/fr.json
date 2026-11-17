@@ -28,7 +28,8 @@
     "signUpTitle": "Créer un compte",
     "onboarding": "Créer votre site",
     "billing": "Facturation · Administration",
-    "upgrade": "Changer d'offre"
+    "upgrade": "Changer d'offre",
+    "help": "Aide"
   },
   "signInPage": {
     "heading": "Connexion",
@@ -244,7 +245,9 @@
     "blockedSignups": "Inscriptions bloquées",
     "dataRequests": "Demandes de données",
     "badgeUnreadLeads": "{count, plural, one {# nouveau} other {# nouveaux}}",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Assistance",
+    "help": "Aide"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -2311,5 +2314,27 @@
     "NOT_ACTIVE": "Votre abonnement demande votre attention avant de pouvoir changer de formule. Ouvrez Facturation pour le régler.",
     "UNCHANGED": "Votre site est déjà sur cette formule.",
     "CARD_DECLINED": "Votre carte a été refusée, donc rien n'a changé. Mettez-la à jour dans Facturation et réessayez."
+  },
+  "helpView": {
+    "title": "Aide",
+    "description": "Envoyez un message à notre équipe d'assistance. Nous y joignons votre site, votre offre et ce compte, pour que vous n'ayez pas à le faire.",
+    "helpCentre": "Centre d'aide",
+    "unavailableTitle": "Le formulaire d'aide n'est pas disponible",
+    "unavailableDescription": "Impossible d'envoyer des messages d'ici pour le moment. Réessayez plus tard."
+  },
+  "helpForm": {
+    "title": "Contacter l'assistance",
+    "responseTime": "Nous répondons généralement par e-mail sous deux jours ouvrés.",
+    "subjectLabel": "Objet",
+    "messageLabel": "Message",
+    "messageHint": "Dites ce que vous essayiez de faire et ce qui s'est passé à la place.",
+    "required": "Remplissez ce champ.",
+    "tooLong": "Restez sous {limit} caractères.",
+    "send": "Envoyer le message",
+    "sending": "Envoi…",
+    "sent": "Message envoyé. Nous vous en avons envoyé une copie par e-mail.",
+    "rateLimited": "Vous avez envoyé plusieurs messages en peu de temps. Réessayez plus tard.",
+    "unavailable": "Le formulaire d'aide n'est pas disponible pour le moment. Réessayez plus tard.",
+    "sendFailed": "Impossible d'envoyer votre message — réessayez."
   }
 }

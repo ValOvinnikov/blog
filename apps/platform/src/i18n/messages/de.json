@@ -28,7 +28,8 @@
     "signUpTitle": "Konto erstellen",
     "onboarding": "Website erstellen",
     "billing": "Abrechnung · Admin",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "help": "Hilfe"
   },
   "signInPage": {
     "heading": "Anmelden",
@@ -244,7 +245,9 @@
     "blockedSignups": "Gesperrte Registrierungen",
     "dataRequests": "Datenanfragen",
     "badgeUnreadLeads": "{count} neu",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Support",
+    "help": "Hilfe"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -2311,5 +2314,27 @@
     "NOT_ACTIVE": "Dein Abonnement braucht deine Aufmerksamkeit, bevor sich der Tarif ändern kann. Öffne die Abrechnung, um das zu klären.",
     "UNCHANGED": "Deine Website nutzt diesen Tarif bereits.",
     "CARD_DECLINED": "Deine Karte wurde abgelehnt, daher hat sich nichts geändert. Aktualisiere sie in der Abrechnung und versuch es erneut."
+  },
+  "helpView": {
+    "title": "Hilfe",
+    "description": "Schreib unserem Support-Team. Wir schicken deine Website, deinen Tarif und dieses Konto automatisch mit.",
+    "helpCentre": "Hilfe-Center",
+    "unavailableTitle": "Das Hilfe-Formular ist nicht verfügbar",
+    "unavailableDescription": "Nachrichten können gerade nicht von hier gesendet werden. Bitte versuch es später noch einmal."
+  },
+  "helpForm": {
+    "title": "Support kontaktieren",
+    "responseTime": "Wir antworten in der Regel innerhalb von zwei Werktagen per E-Mail.",
+    "subjectLabel": "Betreff",
+    "messageLabel": "Nachricht",
+    "messageHint": "Beschreib, was du tun wolltest und was stattdessen passiert ist.",
+    "required": "Bitte ausfüllen.",
+    "tooLong": "Bitte weniger als {limit} Zeichen.",
+    "send": "Nachricht senden",
+    "sending": "Wird gesendet…",
+    "sent": "Nachricht gesendet. Wir haben dir eine Kopie gemailt.",
+    "rateLimited": "Du hast in kurzer Zeit mehrere Nachrichten gesendet. Bitte versuch es später noch einmal.",
+    "unavailable": "Das Hilfe-Formular ist gerade nicht verfügbar. Bitte versuch es später noch einmal.",
+    "sendFailed": "Deine Nachricht konnte nicht gesendet werden – versuch es noch einmal."
   }
 }

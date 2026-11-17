@@ -12,7 +12,9 @@ import { resolveTenantPageAccess } from '@platform/server/auth/resolve-tenant-pa
 import { upgradeStateFor } from '@platform/server/billing/upgrade-state-for';
 import { loadPlatformShellChrome } from '@platform/server/layout/load-platform-shell-chrome';
 import { dashboardNavSections } from '@platform/utils/dashboard-nav-sections/dashboard-nav-sections';
+import { helpNavSection } from '@platform/utils/help-nav-section/help-nav-section';
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { toTenantSwitcherItems } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 import { queries } from '@shinefold/db';
 import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
@@ -41,12 +43,15 @@ export default async function DashboardTenantLayout({ children }: TProps) {
   return (
     <PlatformShell
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
-      sections={dashboardNavSections(
-        tNavSections,
-        access,
-        studioAccess,
-        unreadLeadsCount,
-      )}
+      sections={[
+        ...dashboardNavSections(
+          tNavSections,
+          access,
+          studioAccess,
+          unreadLeadsCount,
+        ),
+        helpNavSection(tNavSections, adminRoutes.dashboardHelp()),
+      ]}
       switcher={
         hasArrayGotMultipleItems(tenants) ? (
           <TenantSwitcher
