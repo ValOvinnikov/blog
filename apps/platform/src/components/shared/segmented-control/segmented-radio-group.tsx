@@ -47,8 +47,7 @@ export const SegmentedRadioGroup = <TValue extends string>({
   const idPrefix = useId();
   const { label: ariaLabel, labelledBy, describedBy } = aria;
   const isTiles = layout === SEGMENTED_RADIO_LAYOUT.TILES;
-  const { isLocked: isPlanLocked = false, isDisabled = false } = lock;
-  const isLocked = isPlanLocked || isDisabled;
+  const isInactive = Boolean(lock.isLocked || lock.isDisabled);
   const selectedIndex = options.findIndex(
     ({ value: optionValue }) => optionValue === value,
   );
@@ -57,7 +56,7 @@ export const SegmentedRadioGroup = <TValue extends string>({
       selectedIndex,
       fadeWidth: SEGMENTED_FADE_WIDTH_PX,
     });
-  const { setOptionRef, onKeyDown } = useLockedArrowFocus(isLocked, {
+  const { setOptionRef, onKeyDown } = useLockedArrowFocus(isInactive, {
     hasVerticalArrows: true,
   });
   const { descriptionId, description, groupDescribedBy } =
@@ -77,7 +76,7 @@ export const SegmentedRadioGroup = <TValue extends string>({
         ref={trackRef}
         value={value}
         onValueChange={(nextValue: TValue) => onChange(nextValue)}
-        readOnly={isLocked}
+        readOnly={isInactive}
         aria-label={ariaLabel}
         aria-labelledby={labelledBy}
         aria-describedby={isTiles ? groupDescribedBy : describedBy}
@@ -93,8 +92,7 @@ export const SegmentedRadioGroup = <TValue extends string>({
             idPrefix={idPrefix}
             layout={layout}
             isSelected={option.value === value}
-            isLocked={isLocked}
-            isPlanLocked={isPlanLocked}
+            lock={lock}
           />
         ))}
       </RadioGroup>

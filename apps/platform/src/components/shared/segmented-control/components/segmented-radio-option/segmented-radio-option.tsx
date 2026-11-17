@@ -9,6 +9,7 @@ import {
   SEGMENTED_RADIO_LAYOUT,
   type TSegmentedRadioLayout,
 } from '@platform/constants/segmented-control';
+import type { TControlLock } from '@shinefold/config';
 import type { ReactNode, Ref } from 'react';
 
 export type TSegmentedRadioOption<TValue extends string> = {
@@ -24,8 +25,7 @@ type TSegmentedRadioOptionProps<TValue extends string> = {
   idPrefix: string;
   layout: TSegmentedRadioLayout;
   isSelected: boolean;
-  isLocked: boolean;
-  isPlanLocked: boolean;
+  lock: TControlLock;
   ref: Ref<HTMLButtonElement>;
 };
 
@@ -34,17 +34,17 @@ export const SegmentedRadioOption = <TValue extends string>({
   idPrefix,
   layout,
   isSelected,
-  isLocked,
-  isPlanLocked,
+  lock: { isLocked = false, isDisabled = false },
   ref,
 }: TSegmentedRadioOptionProps<TValue>) => {
   const isTiles = layout === SEGMENTED_RADIO_LAYOUT.TILES;
   const ids = optionBodyIds(idPrefix, value);
   const hasInlineDescription = Boolean(description) && !isTiles;
+  const isInactive = isLocked || isDisabled;
   const slots = segmentedRadioGroupVariants({
     layout,
+    isInactive,
     isLocked,
-    isPlanLocked,
     isWide,
     isSelected,
   });
@@ -57,7 +57,7 @@ export const SegmentedRadioOption = <TValue extends string>({
       render={<button type="button" />}
       aria-labelledby={ids.labelId}
       aria-describedby={hasInlineDescription ? ids.descriptionId : undefined}
-      aria-disabled={isLocked || undefined}
+      aria-disabled={isInactive || undefined}
       className={slots.option()}
     >
       <OptionBody

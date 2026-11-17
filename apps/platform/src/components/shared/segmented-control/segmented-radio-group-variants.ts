@@ -68,11 +68,11 @@ export const segmentedRadioGroupVariants = tv({
       true: {},
       false: {},
     },
-    isLocked: {
+    isInactive: {
       true: {},
       false: {},
     },
-    isPlanLocked: {
+    isLocked: {
       true: {},
       false: {},
     },
@@ -83,24 +83,24 @@ export const segmentedRadioGroupVariants = tv({
   compoundVariants: [
     {
       layout: SEGMENTED_RADIO_LAYOUT.TRACK,
-      isLocked: false,
+      isInactive: false,
       isSelected: false,
       class: { option: ['hover:bg-platform-hover-tint'] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: false,
+      isInactive: false,
       class: { option: ['cursor-pointer'], check: [SELECTED_TICK_CLASSES] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: false,
+      isInactive: false,
       isSelected: true,
       class: { option: [...SELECTED_CHOICE_CLASSES, 'font-semibold'] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: false,
+      isInactive: false,
       isSelected: false,
       class: {
         option: [
@@ -111,7 +111,7 @@ export const segmentedRadioGroupVariants = tv({
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: true,
+      isInactive: true,
       class: {
         option: [...UNSELECTED_CHOICE_CLASSES, 'cursor-not-allowed'],
         glyph: ['opacity-(--platform-locked-fade)'],
@@ -120,13 +120,13 @@ export const segmentedRadioGroupVariants = tv({
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: true,
+      isInactive: true,
       isSelected: true,
       class: { option: ['border-platform-control-line'] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: true,
+      isInactive: true,
       isSelected: false,
       class: {
         option: [
@@ -136,13 +136,13 @@ export const segmentedRadioGroupVariants = tv({
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isPlanLocked: true,
+      isLocked: true,
       isSelected: true,
       class: { option: ['text-platform-muted'] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isPlanLocked: true,
+      isLocked: true,
       isSelected: false,
       class: { option: ['text-platform-faint'] },
     },
@@ -150,7 +150,7 @@ export const segmentedRadioGroupVariants = tv({
   defaultVariants: {
     layout: SEGMENTED_RADIO_LAYOUT.TRACK,
     isSelected: false,
+    isInactive: false,
     isLocked: false,
-    isPlanLocked: false,
   },
 });
