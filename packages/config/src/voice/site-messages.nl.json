@@ -334,7 +334,8 @@
         "OWN_SIGN_IN_APPS": "Je eigen inlogapps",
         "CONTACT_FORM": "Contactformulier",
         "READER_ACCOUNTS": "Lezersaccounts en bladwijzers",
-        "NEWSLETTER_SUBSCRIBERS": "Inbegrepen nieuwsbriefabonnees"
+        "NEWSLETTER_SUBSCRIBERS": "Inbegrepen nieuwsbriefabonnees",
+        "TAKEAWAYS_PER_MONTH": "AI-kernpunten per maand"
       }
     }
   },

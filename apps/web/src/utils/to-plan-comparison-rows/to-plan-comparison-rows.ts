@@ -78,6 +78,8 @@ const PLAN_COMPARISON_READERS: Record<
     hasCapabilities(plan, CAPABILITY.NEWSLETTER)
       ? SUBSCRIBER_BAND_CEILINGS[0]
       : false,
+  [PLAN_COMPARISON_ROW.TAKEAWAYS_PER_MONTH]: (plan) =>
+    PLAN_ENTITLEMENTS[plan].takeawaysPerMonth,
 };
 
 export const toPlanComparisonRows = (): IPlanComparisonRow[] =>

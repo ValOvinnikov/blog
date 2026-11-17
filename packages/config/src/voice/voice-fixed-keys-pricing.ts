@@ -32,4 +32,5 @@ export const PRICING_VOICE_FIXED_KEYS = [
   'pricingModule.compare.rows.CONTACT_FORM',
   'pricingModule.compare.rows.READER_ACCOUNTS',
   'pricingModule.compare.rows.NEWSLETTER_SUBSCRIBERS',
+  'pricingModule.compare.rows.TAKEAWAYS_PER_MONTH',
 ] as const;

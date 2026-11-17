@@ -10694,6 +10694,14 @@
         "file": "apps/web/src/constants/pricing.ts"
       }
     ],
+    "TAKEAWAYS_PER_MONTH": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.TAKEAWAYS_PER_MONTH",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
     "proxy.tenant_lookup_failed": [
       {
         "ref": "PROXY_LOG.TENANT_LOOKUP_FAILED",

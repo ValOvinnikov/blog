@@ -334,7 +334,8 @@
         "OWN_SIGN_IN_APPS": "Your own sign-in apps",
         "CONTACT_FORM": "Contact form",
         "READER_ACCOUNTS": "Reader accounts and bookmarks",
-        "NEWSLETTER_SUBSCRIBERS": "Newsletter subscribers included"
+        "NEWSLETTER_SUBSCRIBERS": "Newsletter subscribers included",
+        "TAKEAWAYS_PER_MONTH": "AI takeaways a month"
       }
     }
   },

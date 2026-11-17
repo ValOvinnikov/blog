@@ -334,7 +334,8 @@
         "OWN_SIGN_IN_APPS": "Eigene Anmelde-Apps",
         "CONTACT_FORM": "Kontaktformular",
         "READER_ACCOUNTS": "Leserkonten und Lesezeichen",
-        "NEWSLETTER_SUBSCRIBERS": "Enthaltene Newsletter-Abonnenten"
+        "NEWSLETTER_SUBSCRIBERS": "Enthaltene Newsletter-Abonnenten",
+        "TAKEAWAYS_PER_MONTH": "KI-Kernaussagen pro Monat"
       }
     }
   },

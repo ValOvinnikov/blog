@@ -334,7 +334,8 @@
         "OWN_SIGN_IN_APPS": "Vos propres applis de connexion",
         "CONTACT_FORM": "Formulaire de contact",
         "READER_ACCOUNTS": "Comptes lecteurs et favoris",
-        "NEWSLETTER_SUBSCRIBERS": "Abonnés à la newsletter inclus"
+        "NEWSLETTER_SUBSCRIBERS": "Abonnés à la newsletter inclus",
+        "TAKEAWAYS_PER_MONTH": "Points clés IA par mois"
       }
     }
   },

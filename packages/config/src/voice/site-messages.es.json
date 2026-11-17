@@ -334,7 +334,8 @@
         "OWN_SIGN_IN_APPS": "Tus propias apps de inicio de sesión",
         "CONTACT_FORM": "Formulario de contacto",
         "READER_ACCOUNTS": "Cuentas de lectores y marcadores",
-        "NEWSLETTER_SUBSCRIBERS": "Suscriptores del boletín incluidos"
+        "NEWSLETTER_SUBSCRIBERS": "Suscriptores del boletín incluidos",
+        "TAKEAWAYS_PER_MONTH": "Resúmenes con IA al mes"
       }
     }
   },
