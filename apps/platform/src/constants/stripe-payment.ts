@@ -6,7 +6,13 @@ export const STRIPE_PAYMENT_INTENT_STATUS = {
   REQUIRES_ACTION: 'requires_action',
   REQUIRES_PAYMENT_METHOD: 'requires_payment_method',
   PROCESSING: 'processing',
+  SUCCEEDED: 'succeeded',
 } as const;
+
+export const STRIPE_PAYMENT_GOING_THROUGH = [
+  STRIPE_PAYMENT_INTENT_STATUS.PROCESSING,
+  STRIPE_PAYMENT_INTENT_STATUS.SUCCEEDED,
+] as const;
 
 export const STRIPE_JS_ERROR_TYPE = {
   CARD_ERROR: 'card_error',

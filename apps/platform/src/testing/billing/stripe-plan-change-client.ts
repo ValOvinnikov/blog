@@ -48,13 +48,18 @@ export const mockStripePlanChangeClient = (
     },
   } as unknown as Stripe;
 
-  const holdForPayment = (status: Stripe.PaymentIntent.Status) => {
+  const holdForPayment = (
+    status: Stripe.PaymentIntent.Status,
+    { hasConfirmationSecret = true } = {},
+  ) => {
     calls.updateSubscription.mockResolvedValue({
       ...subscription,
       pending_update: { expires_at: MOCK_PERIOD_END },
       latest_invoice: {
         id: MOCK_STRIPE_INVOICE_ID,
-        confirmation_secret: { client_secret: MOCK_PAYMENT_CLIENT_SECRET },
+        confirmation_secret: hasConfirmationSecret
+          ? { client_secret: MOCK_PAYMENT_CLIENT_SECRET }
+          : null,
         payments: {
           data: [{ payment: { payment_intent: MOCK_PAYMENT_INTENT_ID } }],
         },

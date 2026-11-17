@@ -11,6 +11,7 @@ import {
 } from '@platform/constants/plan-change';
 import {
   STRIPE_PAYMENT_BEHAVIOR,
+  STRIPE_PAYMENT_GOING_THROUGH,
   STRIPE_PAYMENT_INTENT_STATUS,
   STRIPE_PENDING_PAYMENT_EXPAND,
 } from '@platform/constants/stripe-payment';
@@ -257,12 +258,32 @@ describe(changeSubscriptionPlan, () => {
       expect(result).toBe(PLAN_CHANGE_REFUSAL.CARD_DECLINED);
     });
 
-    it('reports the move up as made while the payment is processing', async () => {
-      const { result } = await moveUpHeldFor(
-        STRIPE_PAYMENT_INTENT_STATUS.PROCESSING,
+    it.each(STRIPE_PAYMENT_GOING_THROUGH)(
+      'reports the move up as made when the payment is %s',
+      async (status) => {
+        const { result } = await moveUpHeldFor(status);
+
+        expect(result).toBe(PLAN_CHANGE_TIMING.NOW);
+      },
+    );
+
+    it('logs a bank step it cannot hand to the card', async () => {
+      const { result } = await change(
+        { lookupKeys: [STARTER_MONTHLY] },
+        MOCK_GROWTH_MONTHLY_CHOICE,
+        (client) =>
+          client.holdForPayment(STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_ACTION, {
+            hasConfirmationSecret: false,
+          }),
       );
 
-      expect(result).toBe(PLAN_CHANGE_TIMING.NOW);
+      expect(result).toBeUndefined();
+      expect(vi.mocked(logger).error).toHaveBeenCalledExactlyOnceWith(
+        BILLING_LOG.PLAN_CHANGE_PAYMENT_UNKNOWN,
+        expect.objectContaining({
+          status: STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_ACTION,
+        }),
+      );
     });
 
     it('logs a held change with no payment to read', async () => {

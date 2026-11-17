@@ -9004,6 +9004,14 @@
         "file": "apps/platform/src/constants/stripe-payment.ts"
       }
     ],
+    "succeeded": [
+      {
+        "ref": "STRIPE_PAYMENT_INTENT_STATUS.SUCCEEDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
     "card_error": [
       {
         "ref": "STRIPE_JS_ERROR_TYPE.CARD_ERROR",

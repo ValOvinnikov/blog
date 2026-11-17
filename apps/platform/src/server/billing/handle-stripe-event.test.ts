@@ -10,7 +10,13 @@ import {
   MOCK_UNHANDLED_EVENT_TYPE,
   mockStripeInvoice,
 } from '@platform/testing/billing/fixtures';
-import { mockStripeEvent } from '@platform/testing/billing/stripe-subscription';
+import { MOCK_SCHEDULE_ID } from '@platform/testing/billing/plan-subscription';
+import { mockStripePlanChangeClient } from '@platform/testing/billing/stripe-plan-change-client';
+import {
+  mockPendingUpdateClearedEvent,
+  mockStripeEvent,
+  mockStripeSubscription,
+} from '@platform/testing/billing/stripe-subscription';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
@@ -154,6 +160,20 @@ describe(handleStripeEvent, () => {
 
     expect(recordStripeEventMock).toHaveBeenCalledWith(MOCK_STRIPE_EVENT_ID);
     expect(after).not.toHaveBeenCalled();
+  });
+
+  it('releases the planned move when a held move up is applied', async () => {
+    const { stripe, releaseSchedule } = mockStripePlanChangeClient(
+      mockStripeSubscription(),
+    );
+
+    await handleStripeEvent(
+      stripe,
+      mockPendingUpdateClearedEvent({}, { isApplied: true }),
+    );
+
+    expect(releaseSchedule).toHaveBeenCalledExactlyOnceWith(MOCK_SCHEDULE_ID);
+    expect(releaseSchedule).toHaveBeenCalledBefore(recordStripeEventMock);
   });
 
   it('records nothing when the sync throws, so Stripe retries', async () => {

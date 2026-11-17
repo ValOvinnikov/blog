@@ -777,7 +777,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/stripe-payment` — `apps/platform/src/constants/stripe-payment.ts`
 
 - **STRIPE_PAYMENT_BEHAVIOR**: `PENDING_IF_INCOMPLETE`=`"pending_if_incomplete"`
-- **STRIPE_PAYMENT_INTENT_STATUS**: `REQUIRES_ACTION`=`"requires_action"`, `REQUIRES_PAYMENT_METHOD`=`"requires_payment_method"`, `PROCESSING`=`"processing"`
+- **STRIPE_PAYMENT_INTENT_STATUS**: `REQUIRES_ACTION`=`"requires_action"`, `REQUIRES_PAYMENT_METHOD`=`"requires_payment_method"`, `PROCESSING`=`"processing"`, `SUCCEEDED`=`"succeeded"`
 - **STRIPE_JS_ERROR_TYPE**: `CARD_ERROR`=`"card_error"`
 - **STRIPE_JS_ERROR_CODE**: `AUTHENTICATION_FAILURE`=`"payment_intent_authentication_failure"`
 

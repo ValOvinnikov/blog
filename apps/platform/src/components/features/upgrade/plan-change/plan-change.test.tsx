@@ -21,6 +21,7 @@ import {
 import { MOCK_RENEWS_AT } from '@platform/testing/billing/plan-subscription';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import { mockLocaleRouter } from '@platform/testing/mock-locale-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -212,21 +213,28 @@ describe(`<${PlanChange.name}/>`, () => {
 
         await choose(user, planNames.GROWTH);
         await user.click(submitButton());
-        const refusal = await screen.findByText(upgradePage.CARD_DECLINED);
+        const alert = await screen.findByRole('alert');
 
-        expect(refusal).toBeVisible();
+        expect(alert).toHaveTextContent(upgradePage.CARD_DECLINED);
       });
 
-      it('says nothing changed when Stripe.js cannot load', async () => {
-        vi.mocked(loadStripe).mockResolvedValue(null);
+      it.each([
+        [
+          'Stripe.js cannot load',
+          () => vi.mocked(loadStripe).mockRejectedValue(MOCK_NETWORK_ERROR),
+        ],
+        [
+          "the bank's step cannot be reached",
+          () => handleNextAction.mockRejectedValue(MOCK_NETWORK_ERROR),
+        ],
+      ])('says nothing changed when %s', async (_case, arrange) => {
+        arrange();
 
         await choose(user, planNames.GROWTH);
         await user.click(submitButton());
-        const notice = await screen.findByText(
-          upgradePage.PAYMENT_NOT_CONFIRMED,
-        );
+        const alert = await screen.findByRole('alert');
 
-        expect(notice).toBeVisible();
+        expect(alert).toHaveTextContent(upgradePage.PAYMENT_NOT_CONFIRMED);
       });
     });
 
