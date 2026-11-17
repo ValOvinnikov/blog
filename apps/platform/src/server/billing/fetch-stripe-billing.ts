@@ -92,13 +92,11 @@ export const previewRenewal = async (
   subscriptionId: string,
 ): Promise<TBillingRenewal> => {
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-  const endsAt = subscriptionEndsAt(subscription);
-  if (
-    endsAt ||
-    !isOneOf(STRIPE_LIVE_SUBSCRIPTION_STATUSES, subscription.status)
-  ) {
-    return { nextPayment: undefined, endsAt };
+  if (!isOneOf(STRIPE_LIVE_SUBSCRIPTION_STATUSES, subscription.status)) {
+    return { nextPayment: undefined, endsAt: undefined };
   }
+  const endsAt = subscriptionEndsAt(subscription);
+  if (endsAt) return { nextPayment: undefined, endsAt };
   const nextPayment = await previewNextPayment(
     stripe,
     customer,

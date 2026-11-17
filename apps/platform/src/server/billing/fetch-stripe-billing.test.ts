@@ -173,17 +173,27 @@ describe(previewRenewal, () => {
     });
   });
 
-  it('finds no next payment without a preview when the subscription has ended', async () => {
-    retrieveSubscriptionMock.mockResolvedValue(
-      mockStripeSubscription({ status: STRIPE_SUBSCRIPTION_STATUS.CANCELED }),
-    );
+  it.each([
+    ['has ended', {}],
+    ['ended after a Portal cancel', { cancelAt: MOCK_CANCEL_AT }],
+    ['ended at its period end', { cancelAtPeriodEnd: true }],
+  ])(
+    'reads no next payment and no end date when the subscription %s',
+    async (_label, overrides) => {
+      retrieveSubscriptionMock.mockResolvedValue(
+        mockStripeSubscription({
+          status: STRIPE_SUBSCRIPTION_STATUS.CANCELED,
+          ...overrides,
+        }),
+      );
 
-    await expect(preview()).resolves.toEqual({
-      nextPayment: undefined,
-      endsAt: undefined,
-    });
-    expect(createPreviewMock).not.toHaveBeenCalled();
-  });
+      await expect(preview()).resolves.toEqual({
+        nextPayment: undefined,
+        endsAt: undefined,
+      });
+      expect(createPreviewMock).not.toHaveBeenCalled();
+    },
+  );
 
   it.each([
     ['the Portal cancelled', { cancelAt: MOCK_CANCEL_AT }, MOCK_ENDS_AT],

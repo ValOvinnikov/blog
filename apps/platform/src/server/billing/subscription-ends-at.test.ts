@@ -1,3 +1,4 @@
+import { STRIPE_SUBSCRIPTION_STATUS } from '@platform/constants/billing';
 import {
   MOCK_CANCEL_AT,
   MOCK_ENDS_AT,
@@ -33,6 +34,17 @@ describe(subscriptionEndsAt, () => {
     );
 
     expect(endsAt).toEqual(MOCK_ENDS_AT);
+  });
+
+  it('ends nothing for a subscription that has already ended', () => {
+    const endsAt = subscriptionEndsAt(
+      mockStripeSubscription({
+        status: STRIPE_SUBSCRIPTION_STATUS.CANCELED,
+        cancelAt: MOCK_CANCEL_AT,
+      }),
+    );
+
+    expect(endsAt).toBeUndefined();
   });
 
   it('ends nothing for a renewing subscription', () => {
