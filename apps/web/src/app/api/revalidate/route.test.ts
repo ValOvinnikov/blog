@@ -47,6 +47,7 @@ const {
   stampFirstPostPublishedMock,
   startNewsletterPostSendMock,
   schedulePostPurgeMock,
+  startSkimGenerationMock,
   envMock,
 } = vi.hoisted(() => ({
   verifyRevalidateSignatureMock: vi.fn(),
@@ -61,6 +62,7 @@ const {
   stampFirstPostPublishedMock: vi.fn(),
   startNewsletterPostSendMock: vi.fn(),
   schedulePostPurgeMock: vi.fn(),
+  startSkimGenerationMock: vi.fn(),
   envMock: {} as { SANITY_REVALIDATE_SECRET?: string },
 }));
 
@@ -128,6 +130,13 @@ vi.mock(
   '@web/server/revalidate/schedule-post-purge/schedule-post-purge',
   () => ({
     schedulePostPurge: schedulePostPurgeMock,
+  }),
+);
+
+vi.mock(
+  '@web/server/revalidate/start-skim-generation/start-skim-generation',
+  () => ({
+    startSkimGeneration: startSkimGenerationMock,
   }),
 );
 
@@ -316,25 +325,31 @@ describe(POST, () => {
       },
     );
 
-    it("hands the webhook's event and the tenant's Sanity context to the scheduled purge", async () => {
-      getTenantSanityCredentialsMock.mockResolvedValue(
-        MOCK_TENANT_SANITY_CONTEXT,
-      );
+    it.each([
+      ['scheduled purge', schedulePostPurgeMock],
+      ['takeaway generation', startSkimGenerationMock],
+    ])(
+      "hands the webhook's event and the tenant's Sanity context to the %s",
+      async (_label, handlerMock) => {
+        getTenantSanityCredentialsMock.mockResolvedValue(
+          MOCK_TENANT_SANITY_CONTEXT,
+        );
 
-      await POST(
-        makePostRequest({
-          [SANITY_OPERATION_HEADER]: SANITY_WEBHOOK_OPERATION.UPDATE,
-        }),
-      );
+        await POST(
+          makePostRequest({
+            [SANITY_OPERATION_HEADER]: SANITY_WEBHOOK_OPERATION.UPDATE,
+          }),
+        );
 
-      expect(schedulePostPurgeMock).toHaveBeenCalledWith({
-        operation: SANITY_WEBHOOK_OPERATION.UPDATE,
-        type: POST_TYPE,
-        id: MOCK_POST_ID,
-        tenantId: MOCK_TENANT_ID,
-        tenant: MOCK_TENANT_SANITY_CONTEXT,
-      });
-    });
+        expect(handlerMock).toHaveBeenCalledWith({
+          operation: SANITY_WEBHOOK_OPERATION.UPDATE,
+          type: POST_TYPE,
+          id: MOCK_POST_ID,
+          tenantId: MOCK_TENANT_ID,
+          tenant: MOCK_TENANT_SANITY_CONTEXT,
+        });
+      },
+    );
 
     it('ignores the event and revalidates nothing when the tenant is archived', async () => {
       getTenantByIdMock.mockResolvedValue(undefined);

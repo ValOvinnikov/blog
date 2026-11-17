@@ -10432,6 +10432,70 @@
         "file": "apps/web/src/constants/generate-skim.ts"
       }
     ],
+    "generate_skim.published_at_lookup_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.PUBLISHED_AT_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.publish_start_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.PUBLISH_START_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.go_live_enqueue_skipped": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GO_LIVE_ENQUEUE_SKIPPED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.go_live_enqueue_refused": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GO_LIVE_ENQUEUE_REFUSED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.go_live_enqueue_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GO_LIVE_ENQUEUE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.go_live_secret_missing": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GO_LIVE_SECRET_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.go_live_tenant_lookup_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GO_LIVE_TENANT_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.takeaways_lookup_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TAKEAWAYS_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
     "header_style.site_config_fetch_failed": [
       {
         "ref": "HEADER_STYLE_LOG.SITE_CONFIG_FETCH_FAILED",

@@ -1,14 +1,13 @@
 import { faker } from '@faker-js/faker';
 import {
-  HTTP_METHOD,
   HTTP_STATUS,
   SANITY_WEBHOOK_OPERATION,
 } from '@shinefold/config/constants';
 import { okResult } from '@shinefold/utils';
-import { buildEnqueueHeaders } from '@shinefold/utils/enqueue-signature';
 import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import type * as DeriveRevalidatePathsModule from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
+import { mockSignedRequest } from '@web/testing/server/signed-request/fixtures';
 import { mockTenantSanityCredentials } from '@web/testing/server/tenant/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
@@ -71,18 +70,12 @@ const MOCK_BODY = { tenantId: MOCK_TENANT_ID, postId: MOCK_POST_ID };
 
 const POST_TAGS = getRevalidateTagsForType(POST_TYPE, MOCK_POST_ID);
 
-const signedRequest = (body: unknown): Request => {
-  const rawBody = JSON.stringify(body);
-  return new Request(MOCK_URL, {
-    method: HTTP_METHOD.POST,
-    headers: buildEnqueueHeaders({
-      secret: MOCK_SECRET,
-      path: MOCK_PATH,
-      rawBody,
-    }),
-    body: rawBody,
+const signedRequest = (body: unknown): Request =>
+  mockSignedRequest({
+    url: MOCK_URL,
+    secret: MOCK_SECRET,
+    rawBody: JSON.stringify(body),
   });
-};
 
 describe(POST, () => {
   beforeEach(() => {
