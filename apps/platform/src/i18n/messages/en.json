@@ -724,8 +724,8 @@
     "viewTabsAriaLabel": "Look view",
     "jumpIndexAriaLabel": "Look sections",
     "growthAddsColour": "A logo hue of its own",
-    "growthAddsType": "Heading and body fonts",
-    "growthAddsShape": "Corners and spacing",
+    "growthAddsType": "Fonts, heading weight and case",
+    "growthAddsShape": "Corners, spacing, image proportions and dividers",
     "growthAddsCards": "Card style",
     "growthAddsButtons": "Busy state and spinner",
     "growthAddsHeader": "Layout, sub-menus, bar, header buttons and account controls",
@@ -776,6 +776,34 @@
       "DEFAULT": "Comfortable",
       "COMPACT": "Compact"
     },
+    "headingWeightLabel": "Heading weight",
+    "headingWeightDescription": "How heavy every heading on your site looks.",
+    "headingWeightOptionLabel": {
+      "REGULAR": "Regular",
+      "MEDIUM": "Medium",
+      "SEMIBOLD": "Semibold",
+      "BOLD": "Bold"
+    },
+    "headingCaseLabel": "Heading case",
+    "headingCaseDescription": "Changes page and section titles. Card titles and headings in posts keep the case you wrote, so longer text stays easy to read.",
+    "headingCaseOptionLabel": {
+      "AS_WRITTEN": "As written",
+      "UPPERCASE": "Uppercase"
+    },
+    "imageProportionLabel": "Image proportions",
+    "imageProportionDescription": "Changes images set to Wide and images with no shape choice. Square and round images keep their shape.",
+    "imageProportionOptionLabel": {
+      "AS_DESIGNED": "As designed",
+      "WIDE": "Wide",
+      "CLASSIC": "Classic",
+      "SQUARE": "Square"
+    },
+    "dividerWidthLabel": "Section dividers",
+    "dividerWidthDescription": "How thick the line is between sections that show a divider.",
+    "dividerWidthOptionLabel": {
+      "HAIRLINE": "Hairline",
+      "BOLD": "Bold"
+    },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Accent bar",
       "OUTLINED": "Outlined",
@@ -820,7 +848,7 @@
     "languageSwitcherSingleLanguage": "Add another language in Languages settings to choose a style.",
     "languageSwitcherFreeDescription": "Your plan publishes one language. Upgrade to add languages and choose a switcher style.",
     "lockLineGrowthFields": "Fields marked Growth keep the {preset} preset's value.",
-    "lockLineTypeFonts": "On this plan, Type keeps the {preset} preset's fonts. Picking another preset changes them.",
+    "lockLineTypeFonts": "On this plan, Type keeps the {preset} preset's fonts and heading style. Picking another preset changes them.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globe",

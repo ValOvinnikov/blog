@@ -724,8 +724,8 @@
     "viewTabsAriaLabel": "Vista de Look",
     "jumpIndexAriaLabel": "Secciones de Look",
     "growthAddsColour": "Un tono de logotipo propio",
-    "growthAddsType": "Fuentes de títulos y de texto",
-    "growthAddsShape": "Esquinas y espaciado",
+    "growthAddsType": "Fuentes, grosor y mayúsculas de los títulos",
+    "growthAddsShape": "Esquinas, espaciado, proporciones de imagen y separadores",
     "growthAddsCards": "Estilo de tarjeta",
     "growthAddsButtons": "Estado de carga e indicador de progreso",
     "growthAddsHeader": "Diseño, submenús, barra, botones de la cabecera y controles de cuenta",
@@ -776,6 +776,34 @@
       "DEFAULT": "Cómoda",
       "COMPACT": "Compacta"
     },
+    "headingWeightLabel": "Grosor de los títulos",
+    "headingWeightDescription": "Lo marcado que se ve cada título de tu sitio.",
+    "headingWeightOptionLabel": {
+      "REGULAR": "Normal",
+      "MEDIUM": "Medio",
+      "SEMIBOLD": "Seminegrita",
+      "BOLD": "Negrita"
+    },
+    "headingCaseLabel": "Mayúsculas en títulos",
+    "headingCaseDescription": "Cambia los títulos de páginas y secciones. Los títulos de tarjetas y de entradas mantienen cómo los escribiste, para que los textos largos se lean bien.",
+    "headingCaseOptionLabel": {
+      "AS_WRITTEN": "Como se escribió",
+      "UPPERCASE": "Mayúsculas"
+    },
+    "imageProportionLabel": "Proporciones de imagen",
+    "imageProportionDescription": "Cambia las imágenes con forma Ancha y las que no tienen forma elegida. Las imágenes cuadradas y redondas mantienen su forma.",
+    "imageProportionOptionLabel": {
+      "AS_DESIGNED": "Según diseño",
+      "WIDE": "Ancha",
+      "CLASSIC": "Clásica",
+      "SQUARE": "Cuadrada"
+    },
+    "dividerWidthLabel": "Separadores de sección",
+    "dividerWidthDescription": "El grosor de la línea entre secciones que muestran un separador.",
+    "dividerWidthOptionLabel": {
+      "HAIRLINE": "Fino",
+      "BOLD": "Grueso"
+    },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Barra de acento",
       "OUTLINED": "Con contorno",
@@ -820,7 +848,7 @@
     "languageSwitcherSingleLanguage": "Añade otro idioma en Idiomas para elegir un estilo.",
     "languageSwitcherFreeDescription": "Tu plan publica un idioma. Mejora el plan para añadir idiomas y elegir un estilo de selector.",
     "lockLineGrowthFields": "Los campos marcados con Growth mantienen el valor del ajuste predefinido {preset}.",
-    "lockLineTypeFonts": "Con este plan, Tipografía mantiene las fuentes del ajuste predefinido {preset}. Elegir otro ajuste predefinido las cambia.",
+    "lockLineTypeFonts": "Con este plan, Tipografía mantiene las fuentes y el estilo de títulos del ajuste predefinido {preset}. Elegir otro ajuste predefinido los cambia.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Código",
       "MENU_GLOBE": "Globo",

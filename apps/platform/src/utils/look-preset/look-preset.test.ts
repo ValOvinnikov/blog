@@ -12,6 +12,7 @@ import {
   BUSY_BUTTON_STYLE,
   BUTTON_SHAPE,
   COOKIE_SETTINGS_BUTTON,
+  DIVIDER_WIDTH,
   FONT_CHOICE,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
@@ -19,8 +20,11 @@ import {
   HEADER_CONTROL_SHAPE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
+  HEADING_CASE,
+  HEADING_WEIGHT,
   HUE_MAX,
   HUE_MIN,
+  IMAGE_PROPORTION,
   LANGUAGE_SWITCHER_STYLE,
   NAV_LINK_STYLE,
   PRESET_ID,
@@ -50,9 +54,13 @@ describe(applyPresetDefaults, () => {
       accentHue: MOCK_ACCENT_HUE,
       logoHue: MOCK_LOGO_HUE,
       radiusScale: RADIUS_SCALE.XL,
+      headingWeight: HEADING_WEIGHT.BOLD,
+      headingCase: HEADING_CASE.UPPERCASE,
+      imageProportion: IMAGE_PROPORTION.SQUARE,
+      dividerWidth: DIVIDER_WIDTH.BOLD,
     };
     const { themeTokens, cardStyle, headerControlStyle, spinnerStyle } =
-      PRESET_REGISTRY[PRESET_ID.EDITORIAL];
+      EDITORIAL;
 
     expect(applyPresetDefaults(PRESET_ID.EDITORIAL, current)).toMatchObject({
       preset: PRESET_ID.EDITORIAL,
@@ -65,71 +73,49 @@ describe(applyPresetDefaults, () => {
       cardStyle,
       headerControlStyle,
       spinnerStyle,
+      headingWeight: EDITORIAL.headingWeight,
+      headingCase: EDITORIAL.headingCase,
+      imageProportion: EDITORIAL.imageProportion,
+      dividerWidth: EDITORIAL.dividerWidth,
     });
   });
 
-  it('keeps the footer layout, background, surface and cookie settings button', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      footerLayout: FOOTER_LAYOUT.COMPACT,
-      footerBackground: BRAND_VARIANT.PRIMARY,
-      footerSurface: FOOTER_SURFACE.CARD,
-      cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
-    };
+  it.each([
+    {
+      group: 'footer layout and surface',
+      kept: {
+        footerLayout: FOOTER_LAYOUT.COMPACT,
+        footerBackground: BRAND_VARIANT.PRIMARY,
+        footerSurface: FOOTER_SURFACE.CARD,
+        cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
+      },
+    },
+    {
+      group: 'header layout and bar',
+      kept: {
+        headerLayout: HEADER_LAYOUT.CENTRED_BRAND,
+        headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
+        headerBarStyle: HEADER_BAR_STYLE.FLOATING,
+      },
+    },
+    {
+      group: 'account controls',
+      kept: {
+        accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
+        accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
+        accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
+      },
+    },
+    {
+      group: 'busy button',
+      kept: { busyButtonStyle: BUSY_BUTTON_STYLE.EDGE },
+    },
+  ])('keeps the $group', ({ kept }) => {
+    const current = { ...defaultLookFormValues(), ...kept };
 
     const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
 
-    expect(next).toMatchObject({
-      footerLayout: FOOTER_LAYOUT.COMPACT,
-      footerBackground: BRAND_VARIANT.PRIMARY,
-      footerSurface: FOOTER_SURFACE.CARD,
-      cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
-    });
-  });
-
-  it('keeps the header layout, sub-menus and bar', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      headerLayout: HEADER_LAYOUT.CENTRED_BRAND,
-      headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
-      headerBarStyle: HEADER_BAR_STYLE.FLOATING,
-    };
-
-    const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
-
-    expect(next).toMatchObject({
-      headerLayout: HEADER_LAYOUT.CENTRED_BRAND,
-      headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
-      headerBarStyle: HEADER_BAR_STYLE.FLOATING,
-    });
-  });
-
-  it('keeps the account button, panel and phone placement', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
-      accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
-      accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
-    };
-
-    const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
-
-    expect(next).toMatchObject({
-      accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
-      accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
-      accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
-    });
-  });
-
-  it('keeps the busy button style', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
-    };
-
-    const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
-
-    expect(next.busyButtonStyle).toBe(BUSY_BUTTON_STYLE.EDGE);
+    expect(next).toMatchObject(kept);
   });
 
   it('keeps the language switcher style and both brand images', () => {
@@ -176,6 +162,10 @@ describe(switchPreset, () => {
     { field: 'buttonShape', value: BUTTON_SHAPE.PILL },
     { field: 'navLinkStyle', value: NAV_LINK_STYLE.PILL },
     { field: 'headerControlShape', value: HEADER_CONTROL_SHAPE.SQUARE },
+    { field: 'headingWeight', value: HEADING_WEIGHT.BOLD },
+    { field: 'headingCase', value: HEADING_CASE.UPPERCASE },
+    { field: 'imageProportion', value: IMAGE_PROPORTION.SQUARE },
+    { field: 'dividerWidth', value: DIVIDER_WIDTH.BOLD },
     { field: 'accentHue', value: CONSOLE.themeTokens.accentHue + 1 },
   ] as const)('keeps a $field the owner changed', ({ field, value }) => {
     const current = { ...defaultLookFormValues(), [field]: value };

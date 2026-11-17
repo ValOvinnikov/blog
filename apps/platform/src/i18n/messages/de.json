@@ -724,8 +724,8 @@
     "viewTabsAriaLabel": "Look-Ansicht",
     "jumpIndexAriaLabel": "Look-Abschnitte",
     "growthAddsColour": "Ein eigener Logo-Farbton",
-    "growthAddsType": "Überschrift- und Fließtextschriften",
-    "growthAddsShape": "Ecken und Abstände",
+    "growthAddsType": "Schriften, Stärke und Schreibweise der Überschriften",
+    "growthAddsShape": "Ecken, Abstände, Bildproportionen und Trennlinien",
     "growthAddsCards": "Kartenstil",
     "growthAddsButtons": "Ladezustand und Spinner",
     "growthAddsHeader": "Layout, Untermenüs, Leiste, Header-Schaltflächen und Kontosteuerung",
@@ -776,6 +776,34 @@
       "DEFAULT": "Komfortabel",
       "COMPACT": "Kompakt"
     },
+    "headingWeightLabel": "Überschriftenstärke",
+    "headingWeightDescription": "Wie kräftig jede Überschrift auf deiner Website wirkt.",
+    "headingWeightOptionLabel": {
+      "REGULAR": "Normal",
+      "MEDIUM": "Mittel",
+      "SEMIBOLD": "Halbfett",
+      "BOLD": "Fett"
+    },
+    "headingCaseLabel": "Schreibweise der Überschriften",
+    "headingCaseDescription": "Ändert Seiten- und Abschnittstitel. Kartentitel und Überschriften in Beiträgen bleiben, wie du sie geschrieben hast, damit längere Texte gut lesbar bleiben.",
+    "headingCaseOptionLabel": {
+      "AS_WRITTEN": "Wie geschrieben",
+      "UPPERCASE": "Großbuchstaben"
+    },
+    "imageProportionLabel": "Bildproportionen",
+    "imageProportionDescription": "Ändert Bilder mit der Form Breit und Bilder ohne Formauswahl. Quadratische und runde Bilder behalten ihre Form.",
+    "imageProportionOptionLabel": {
+      "AS_DESIGNED": "Wie gestaltet",
+      "WIDE": "Breit",
+      "CLASSIC": "Klassisch",
+      "SQUARE": "Quadrat"
+    },
+    "dividerWidthLabel": "Abschnittstrenner",
+    "dividerWidthDescription": "Wie dick die Linie zwischen Abschnitten ist, die einen Trenner zeigen.",
+    "dividerWidthOptionLabel": {
+      "HAIRLINE": "Haarlinie",
+      "BOLD": "Kräftig"
+    },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Akzentleiste",
       "OUTLINED": "Umrandet",
@@ -820,7 +848,7 @@
     "languageSwitcherSingleLanguage": "Fügen Sie unter Sprachen eine weitere Sprache hinzu, um einen Stil zu wählen.",
     "languageSwitcherFreeDescription": "Ihr Tarif veröffentlicht eine Sprache. Mit einem Upgrade können Sie Sprachen hinzufügen und einen Stil für die Sprachauswahl wählen.",
     "lockLineGrowthFields": "Mit Growth markierte Felder behalten den Wert der Vorlage {preset}.",
-    "lockLineTypeFonts": "In diesem Tarif behält Schrift die Schriften der Vorlage {preset}. Eine andere Vorlage ändert sie.",
+    "lockLineTypeFonts": "In diesem Tarif behält Schrift die Schriften und den Überschriftenstil der Vorlage {preset}. Eine andere Vorlage ändert sie.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globus",

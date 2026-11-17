@@ -24,6 +24,12 @@ import { useTranslations } from 'next-intl';
 
 import { lookSampleVariants } from './look-sample-variants';
 
+export type TLookSampleHeaderState = Pick<
+  TSampleSiteHeaderProps,
+  'hasReaderAccounts' | 'shouldAlwaysShowLanguageSwitcher'
+> &
+  Partial<Pick<TSampleSiteHeaderProps, 'isSignedIn' | 'isSubmenuOpen'>>;
+
 export type TLookSampleProps = {
   brand: TSampleSiteHeaderProps['brand'];
   theme: TSitePreviewTheme;
@@ -31,10 +37,7 @@ export type TLookSampleProps = {
   header: TSampleHeaderStyle;
   footer: TSampleFooterStyle;
   busy: IBusyStyle;
-  hasReaderAccounts: boolean;
-  isSignedIn?: boolean;
-  isSubmenuOpen?: boolean;
-  shouldAlwaysShowLanguageSwitcher?: boolean;
+  headerState: TLookSampleHeaderState;
 };
 
 export const LookSample = ({
@@ -44,14 +47,17 @@ export const LookSample = ({
   header,
   footer,
   busy,
-  hasReaderAccounts,
-  isSignedIn = false,
-  isSubmenuOpen = false,
-  shouldAlwaysShowLanguageSwitcher = false,
+  headerState: {
+    hasReaderAccounts,
+    isSignedIn = false,
+    isSubmenuOpen = false,
+    shouldAlwaysShowLanguageSwitcher = false,
+  },
 }: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
-  const { root, main, hero, title, lead, actionsRow } = lookSampleVariants();
+  const { root, main, hero, title, lead, actionsRow, divider } =
+    lookSampleVariants();
 
   return (
     <SiteThemeFrame
@@ -93,6 +99,7 @@ export const LookSample = ({
           </div>
         </div>
         <LookSamplePosts />
+        <hr className={divider()} />
         <LookSampleFaq />
         <LookSampleForm />
         <LookSampleQuote />

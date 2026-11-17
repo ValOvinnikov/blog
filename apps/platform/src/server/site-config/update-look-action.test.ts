@@ -30,6 +30,7 @@ import {
   CARD_STYLE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
+  DIVIDER_WIDTH,
   FONT_CHOICE,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
@@ -39,8 +40,11 @@ import {
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
+  HEADING_CASE,
+  HEADING_WEIGHT,
   HUE_MAX,
   HUE_MIN,
+  IMAGE_PROPORTION,
   isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
   NAV_LINK_STYLE,
@@ -53,6 +57,7 @@ import {
 import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import {
   BRAND_NAME_MAX_LENGTH,
+  LOOK_FIELD,
   SITE_CONFIG_SAVED_AT,
 } from '@shinefold/db/constants';
 import { toEffectiveLook } from '@shinefold/db/utils/effective-look/effective-look';
@@ -100,11 +105,7 @@ vi.mock('@shinefold/db', () => ({
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const MOCK_DB_ERROR_MESSAGE = faker.lorem.words(3);
-const UNSUPPORTED_CARD_STYLE = 'SHADOWED';
-const UNSUPPORTED_HEADER_LAYOUT = 'ZIGZAG';
-const UNSUPPORTED_BUSY_BUTTON_STYLE = 'SHAKE';
-const UNSUPPORTED_ACCOUNT_PANEL_STYLE = 'DRAWER';
-const UNSUPPORTED_FOOTER_LAYOUT = 'MASONRY';
+const MOCK_UNSUPPORTED_LOOK_VALUE = 'HEAVY';
 
 const MOCK_BRAND_NAME = faker.company.name();
 
@@ -124,6 +125,10 @@ const VALID_INPUT: TUpdateLookInput = {
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
   headerBarStyle: HEADER_BAR_STYLE.FLOATING,
   navLinkStyle: NAV_LINK_STYLE.UNDERLINE,
+  headingWeight: HEADING_WEIGHT.BOLD,
+  headingCase: HEADING_CASE.UPPERCASE,
+  imageProportion: IMAGE_PROPORTION.SQUARE,
+  dividerWidth: DIVIDER_WIDTH.BOLD,
   accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
   accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
   accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
@@ -312,67 +317,20 @@ describe(updateLookAction, () => {
     expect(requireTenantMembership).not.toHaveBeenCalled();
   });
 
-  it('rejects a card style the site has no tokens for without writing it', async () => {
+  it.each([
+    LOOK_FIELD.CARD_STYLE,
+    LOOK_FIELD.FOOTER_LAYOUT,
+    LOOK_FIELD.HEADER_LAYOUT,
+    LOOK_FIELD.BUSY_BUTTON_STYLE,
+    LOOK_FIELD.ACCOUNT_PANEL_STYLE,
+    LOOK_FIELD.HEADING_WEIGHT,
+    LOOK_FIELD.HEADING_CASE,
+    LOOK_FIELD.IMAGE_PROPORTION,
+    LOOK_FIELD.DIVIDER_WIDTH,
+  ])('rejects a %s outside its options without writing it', async (field) => {
     const result = await updateLookAction(MOCK_TENANT_ID, {
       ...VALID_INPUT,
-      // @ts-expect-error -- an unsupported card style is the invalid input under test
-      cardStyle: UNSUPPORTED_CARD_STYLE,
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: {},
-    });
-    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
-  });
-
-  it('rejects a footer layout the site has no arrangement for without writing it', async () => {
-    const result = await updateLookAction(MOCK_TENANT_ID, {
-      ...VALID_INPUT,
-      // @ts-expect-error -- an unsupported footer layout is the invalid input under test
-      footerLayout: UNSUPPORTED_FOOTER_LAYOUT,
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: {},
-    });
-    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
-  });
-
-  it('rejects a header layout the site has no arrangement for without writing it', async () => {
-    const result = await updateLookAction(MOCK_TENANT_ID, {
-      ...VALID_INPUT,
-      // @ts-expect-error -- an unsupported header layout is the invalid input under test
-      headerLayout: UNSUPPORTED_HEADER_LAYOUT,
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: {},
-    });
-    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
-  });
-
-  it('rejects a busy button style the site has no treatment for without writing it', async () => {
-    const result = await updateLookAction(MOCK_TENANT_ID, {
-      ...VALID_INPUT,
-      // @ts-expect-error -- an unsupported busy button style is the invalid input under test
-      busyButtonStyle: UNSUPPORTED_BUSY_BUTTON_STYLE,
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: {},
-    });
-    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
-  });
-
-  it('rejects an account panel the site has no layout for without writing it', async () => {
-    const result = await updateLookAction(MOCK_TENANT_ID, {
-      ...VALID_INPUT,
-      // @ts-expect-error -- an unsupported account panel style is the invalid input under test
-      accountPanelStyle: UNSUPPORTED_ACCOUNT_PANEL_STYLE,
+      [field]: MOCK_UNSUPPORTED_LOOK_VALUE,
     });
 
     expect(result).toEqual({

@@ -13,16 +13,11 @@ export const LookSampleSection = ({
   children,
 }: TLookSampleSectionProps) => {
   const headingId = useId();
-  const { root, heading: headingClass } = lookSampleSectionVariants();
+  const { root } = lookSampleSectionVariants();
 
   return (
     <section aria-labelledby={headingId} className={root()}>
-      <Heading
-        level={2}
-        visual="preview"
-        id={headingId}
-        className={headingClass()}
-      >
+      <Heading level={2} visual="section" id={headingId}>
         {heading}
       </Heading>
       {children}

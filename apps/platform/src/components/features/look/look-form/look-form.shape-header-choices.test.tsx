@@ -16,10 +16,14 @@ import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { UNSAVED_CHANGES } from '@platform/testing/render-in-settings-form';
 import {
   CARD_STYLE,
+  DIVIDER_WIDTH,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
+  HEADING_CASE,
+  HEADING_WEIGHT,
+  IMAGE_PROPORTION,
   NAV_LINK_STYLE,
 } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -70,6 +74,30 @@ describe(`<${LookForm.name}/>`, () => {
         group: LOOK_FORM.navLinkStyleLabel,
         option: LOOK_FORM.navLinkStyleOptionLabel.SOFT,
         saved: { navLinkStyle: NAV_LINK_STYLE.SOFT },
+      },
+      {
+        row: LOOK_ROW.TYPE,
+        group: LOOK_FORM.headingWeightLabel,
+        option: LOOK_FORM.headingWeightOptionLabel.BOLD,
+        saved: { headingWeight: HEADING_WEIGHT.BOLD },
+      },
+      {
+        row: LOOK_ROW.TYPE,
+        group: LOOK_FORM.headingCaseLabel,
+        option: LOOK_FORM.headingCaseOptionLabel.UPPERCASE,
+        saved: { headingCase: HEADING_CASE.UPPERCASE },
+      },
+      {
+        row: LOOK_ROW.SHAPE,
+        group: LOOK_FORM.imageProportionLabel,
+        option: LOOK_FORM.imageProportionOptionLabel.SQUARE,
+        saved: { imageProportion: IMAGE_PROPORTION.SQUARE },
+      },
+      {
+        row: LOOK_ROW.SHAPE,
+        group: LOOK_FORM.dividerWidthLabel,
+        option: LOOK_FORM.dividerWidthOptionLabel.BOLD,
+        saved: { dividerWidth: DIVIDER_WIDTH.BOLD },
       },
     ])(
       'saves the chosen $group style',

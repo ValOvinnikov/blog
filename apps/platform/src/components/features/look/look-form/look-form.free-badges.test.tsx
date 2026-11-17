@@ -20,6 +20,7 @@ import {
   withLookTenant,
 } from '@platform/testing/look/look-form-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -107,7 +108,7 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
       });
 
       expect(growthRowBadge(LOOK_ROW.TYPE)).not.toBeInTheDocument();
-      expect(fieldBadges).toHaveLength(2);
+      expect(fieldBadges).toHaveLength(CARD_FIELDS[LOOK_ROW.TYPE].length);
     });
 
     it('never shows the old Growth plan lock wording', () => {

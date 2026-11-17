@@ -113,8 +113,10 @@ export const OnboardingPreview = ({
             header={toSampleHeaderStyle(look)}
             footer={footer}
             busy={toSampleBusyStyle(look)}
-            hasReaderAccounts={false}
-            shouldAlwaysShowLanguageSwitcher={true}
+            headerState={{
+              hasReaderAccounts: false,
+              shouldAlwaysShowLanguageSwitcher: true,
+            }}
           />
           {footer.hasCookieSettingsButton && (
             <DeviceFrame.Overlay>

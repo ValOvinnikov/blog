@@ -724,8 +724,8 @@
     "viewTabsAriaLabel": "Vue Look",
     "jumpIndexAriaLabel": "Sections de Look",
     "growthAddsColour": "Une teinte de logo à part",
-    "growthAddsType": "Polices des titres et du texte",
-    "growthAddsShape": "Coins et espacement",
+    "growthAddsType": "Polices, graisse et casse des titres",
+    "growthAddsShape": "Coins, espacement, proportions des images et séparateurs",
     "growthAddsCards": "Style de carte",
     "growthAddsButtons": "État de chargement et indicateur de progression",
     "growthAddsHeader": "Mise en page, sous-menus, barre, boutons d'en-tête et commandes du compte",
@@ -776,6 +776,34 @@
       "DEFAULT": "Confortable",
       "COMPACT": "Compacte"
     },
+    "headingWeightLabel": "Graisse des titres",
+    "headingWeightDescription": "L'épaisseur de chaque titre de votre site.",
+    "headingWeightOptionLabel": {
+      "REGULAR": "Normale",
+      "MEDIUM": "Moyenne",
+      "SEMIBOLD": "Demi-gras",
+      "BOLD": "Gras"
+    },
+    "headingCaseLabel": "Casse des titres",
+    "headingCaseDescription": "Change les titres des pages et des sections. Les titres des cartes et des articles gardent la casse saisie, pour que les textes longs restent lisibles.",
+    "headingCaseOptionLabel": {
+      "AS_WRITTEN": "Telle quelle",
+      "UPPERCASE": "Majuscules"
+    },
+    "imageProportionLabel": "Proportions des images",
+    "imageProportionDescription": "Change les images réglées sur Large et celles sans choix de forme. Les images carrées et rondes gardent leur forme.",
+    "imageProportionOptionLabel": {
+      "AS_DESIGNED": "Par défaut",
+      "WIDE": "Large",
+      "CLASSIC": "Classique",
+      "SQUARE": "Carré"
+    },
+    "dividerWidthLabel": "Séparateurs de section",
+    "dividerWidthDescription": "L'épaisseur du trait entre les sections qui affichent un séparateur.",
+    "dividerWidthOptionLabel": {
+      "HAIRLINE": "Fin",
+      "BOLD": "Épais"
+    },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Barre d'accent",
       "OUTLINED": "À contour",
@@ -820,7 +848,7 @@
     "languageSwitcherSingleLanguage": "Ajoutez une autre langue dans Langues pour choisir un style.",
     "languageSwitcherFreeDescription": "Votre formule publie une seule langue. Passez à une formule supérieure pour ajouter des langues et choisir un style de sélecteur.",
     "lockLineGrowthFields": "Les champs marqués Growth gardent la valeur du préréglage {preset}.",
-    "lockLineTypeFonts": "Avec cette formule, Typographie garde les polices du préréglage {preset}. Choisir un autre préréglage les change.",
+    "lockLineTypeFonts": "Avec cette formule, Typographie garde les polices et le style des titres du préréglage {preset}. Choisir un autre préréglage les change.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globe",
