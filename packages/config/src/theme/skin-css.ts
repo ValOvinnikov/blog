@@ -1,3 +1,5 @@
+import { isOneOf } from '@shinefold/utils/primitives';
+
 import {
   COLOR_SCHEME,
   PRESET_ID,
@@ -6,14 +8,10 @@ import {
   type TColorScheme,
 } from '@shinefold/config/constants';
 
+import { TOKEN_ALIASES } from './contrast-surfaces';
 import { formatPaletteDeclarations } from './palette-ramps';
 import { effectiveSchemeOf } from './skin-contrast';
-import {
-  SKIN_ALIASES,
-  SKIN_SCRIM_ROLES,
-  SKIN_STOP_ROLES,
-  type TSkinRoles,
-} from './skin-roles';
+import { SKIN_ROLES, type TSkinRoles } from './skin-roles';
 import { SKIN_REGISTRY, STORYBOOK_SKINS, type TSkin } from './skins';
 
 export const SKIN_CSS_REPO_PATH = 'configs/tailwind/skins.css';
@@ -37,14 +35,15 @@ const formatBlock = (selector: string, declarations: string[]): string[] => [
   '',
 ];
 
+const SKIN_ROLE_ALIASES = Object.entries(TOKEN_ALIASES).filter(
+  ([alias, target]) =>
+    !isOneOf(SKIN_ROLES, alias) && isOneOf(SKIN_ROLES, target),
+);
+
 const roleDeclarations = (roles: TSkinRoles): string[] =>
-  [
-    ...[...SKIN_STOP_ROLES, ...SKIN_SCRIM_ROLES].map((role) => [
-      role,
-      roles[role],
-    ]),
-    ...Object.entries(SKIN_ALIASES),
-  ].map(([property, token]) => `${property}: var(${token})`);
+  [...SKIN_ROLES.map((role) => [role, roles[role]]), ...SKIN_ROLE_ALIASES].map(
+    ([property, token]) => `${property}: var(${token})`,
+  );
 
 const scopeBlock = (
   key: string,

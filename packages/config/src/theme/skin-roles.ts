@@ -2,25 +2,32 @@ import { COLOR_SCHEME, type TColorScheme } from '@shinefold/config/constants';
 
 import type { TThemeToken } from './contrast-pairs';
 import { SCHEME_RAMPS } from './contrast-scheme-ramps';
-import { BRAND_PRIMARY, BRAND_PRIMARY_MUTED } from './contrast-surfaces';
+import {
+  BORDER_EMPHASIS,
+  BRAND_PRIMARY,
+  BRAND_PRIMARY_MUTED,
+  BRAND_PRIMARY_WASH,
+  ERROR_MUTED,
+  SURFACE_2,
+  TEXT,
+  TEXT_MUTED,
+} from './contrast-surfaces';
 import { PALETTE } from './palette-ramps';
 
 export type TPaletteStop = keyof typeof PALETTE;
-
-const TEXT_MUTED = '--text-muted' satisfies TThemeToken;
-const BORDER_EMPHASIS = '--border-emphasis' satisfies TThemeToken;
 
 export const SKIN_GROUND_ROLES = ['--ambient', '--backdrop'] as const;
 
 export const SKIN_FILL_ROLES = [
   '--surface',
-  '--surface-2',
+  SURFACE_2,
   BRAND_PRIMARY_MUTED,
+  BRAND_PRIMARY_WASH,
 ] as const;
 
 const SKIN_INK_ROLES = [
   '--divider',
-  '--text',
+  TEXT,
   TEXT_MUTED,
   '--text-subtle',
   '--border',
@@ -37,7 +44,7 @@ const SKIN_INK_ROLES = [
   '--error',
   '--success-muted',
   '--warn-muted',
-  '--error-muted',
+  ERROR_MUTED,
 ] as const;
 
 export const SKIN_STOP_ROLES = [
@@ -52,12 +59,7 @@ export const SKIN_SCRIM_ROLES = [
   '--scrim-weak',
 ] as const;
 
-// A var() in a custom property resolves where it is declared, so each scope re-declares these.
-export const SKIN_ALIASES = {
-  '--ring': BRAND_PRIMARY,
-  '--info': BRAND_PRIMARY,
-  '--info-muted': BRAND_PRIMARY_MUTED,
-} as const satisfies Record<TThemeToken, TSkinStopRole>;
+export const SKIN_ROLES = [...SKIN_STOP_ROLES, ...SKIN_SCRIM_ROLES];
 
 export type TSkinStopRole = (typeof SKIN_STOP_ROLES)[number];
 

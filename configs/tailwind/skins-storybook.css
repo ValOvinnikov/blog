@@ -9,6 +9,7 @@
   --surface: var(--palette-neutral-2000);
   --surface-2: var(--palette-neutral-1900);
   --brand-primary-muted: var(--palette-brand-1600);
+  --brand-primary-wash: var(--palette-brand-1700);
   --divider: var(--palette-neutral-1600);
   --text: var(--palette-neutral-400);
   --text-muted: var(--palette-neutral-800);
@@ -16,7 +17,7 @@
   --border: var(--palette-neutral-1600);
   --border-strong: var(--palette-neutral-1400);
   --border-emphasis: var(--palette-neutral-1200);
-  --field-boundary: var(--palette-neutral-1200);
+  --field-boundary: var(--palette-neutral-1100);
   --brand-primary: var(--palette-brand-600);
   --brand-primary-hover: var(--palette-brand-400);
   --brand-primary-solid: var(--palette-brand-600);
@@ -34,6 +35,8 @@
   --ring: var(--brand-primary);
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
+  --code-fg: var(--text);
+  --code-comment: var(--text-muted);
 }
 
 .dark [data-skin='STORYBOOK_INVERSE'] {
@@ -43,6 +46,7 @@
   --surface: var(--palette-neutral-2000);
   --surface-2: var(--palette-neutral-1900);
   --brand-primary-muted: var(--palette-brand-1600);
+  --brand-primary-wash: var(--palette-brand-1700);
   --divider: var(--palette-neutral-1600);
   --text: var(--palette-neutral-400);
   --text-muted: var(--palette-neutral-800);
@@ -50,7 +54,7 @@
   --border: var(--palette-neutral-1600);
   --border-strong: var(--palette-neutral-1400);
   --border-emphasis: var(--palette-neutral-1200);
-  --field-boundary: var(--palette-neutral-1200);
+  --field-boundary: var(--palette-neutral-1100);
   --brand-primary: var(--palette-brand-600);
   --brand-primary-hover: var(--palette-brand-400);
   --brand-primary-solid: var(--palette-brand-600);
@@ -68,4 +72,6 @@
   --ring: var(--brand-primary);
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
+  --code-fg: var(--text);
+  --code-comment: var(--text-muted);
 }

@@ -395,6 +395,7 @@
   --field-boundary: var(--border-emphasis);
   --text: oklch(0.95 0.004 250);
   --text-muted: oklch(0.72 0.008 250);
+  --text-subtle: var(--text-muted);
   --brand-primary: oklch(0.7 0.16 250);
   --brand-primary-hover: oklch(0.76 0.16 250);
   --brand-primary-muted: oklch(0.3 0.06 250);

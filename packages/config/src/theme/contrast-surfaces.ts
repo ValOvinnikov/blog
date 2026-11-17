@@ -2,14 +2,29 @@ import type { TThemeToken } from './contrast-pairs';
 
 export const PRIMARY_SUBTLE = '--primary-subtle' satisfies TThemeToken;
 export const SECONDARY = '--secondary' satisfies TThemeToken;
-const SURFACE_2 = '--surface-2' satisfies TThemeToken;
+export const SURFACE_2 = '--surface-2' satisfies TThemeToken;
 export const BRAND_PRIMARY_MUTED =
   '--brand-primary-muted' satisfies TThemeToken;
 export const ERROR_MUTED = '--error-muted' satisfies TThemeToken;
+export const AMBIENT = '--ambient' satisfies TThemeToken;
+export const FIELD_BOUNDARY = '--field-boundary' satisfies TThemeToken;
 export const TEXT = '--text' satisfies TThemeToken;
+export const TEXT_MUTED = '--text-muted' satisfies TThemeToken;
+export const BORDER_EMPHASIS = '--border-emphasis' satisfies TThemeToken;
+export const BRAND_PRIMARY_WASH = '--brand-primary-wash' satisfies TThemeToken;
 export const BRAND_PRIMARY = '--brand-primary' satisfies TThemeToken;
 export const ITEM_ACCENT_BRAND_SHARE =
   '--item-accent-brand-share' satisfies TThemeToken;
+
+// A var() in a custom property resolves where it is declared, so a nested scope that moves the target re-declares the alias.
+export const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
+  '--ring': BRAND_PRIMARY,
+  '--info': BRAND_PRIMARY,
+  '--info-muted': BRAND_PRIMARY_MUTED,
+  '--code-fg': TEXT,
+  '--code-comment': TEXT_MUTED,
+  [FIELD_BOUNDARY]: BORDER_EMPHASIS,
+};
 
 export const BANDS = [
   '--primary',
@@ -22,7 +37,7 @@ export const BANDS = [
 
 export const FILLED_ITEM_SURFACES = [
   ...BANDS,
-  '--brand-primary-wash',
+  BRAND_PRIMARY_WASH,
 ] as const satisfies readonly TThemeToken[];
 
 export const TEXT_SURFACES = [

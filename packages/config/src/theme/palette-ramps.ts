@@ -41,7 +41,6 @@ export const NEUTRAL_PALETTE = {
 export const BRAND_PALETTE = {
   '--palette-brand-100': { l: 0.975, c: 0.015 },
   '--palette-brand-200': { l: 0.95, c: 0.03 },
-  '--palette-brand-250': { l: 0.9, c: 0.044 },
   '--palette-brand-300': { l: 0.8, c: 0.14 },
   '--palette-brand-400': { l: 0.76, c: 0.16 },
   '--palette-brand-500': { l: 0.73, c: 0.13 },
@@ -55,7 +54,6 @@ export const BRAND_PALETTE = {
   '--palette-brand-1300': { l: 0.45, c: 0.17 },
   '--palette-brand-1400': { l: 0.39, c: 0.17 },
   '--palette-brand-1500': { l: 0.35, c: 0.12 },
-  '--palette-brand-1550': { l: 0.34, c: 0.07 },
   '--palette-brand-1600': { l: 0.3, c: 0.06 },
   '--palette-brand-1700': { l: 0.25, c: 0.04 },
   '--palette-brand-1800': { l: 0.22, c: 0.06 },

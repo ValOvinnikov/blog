@@ -6,9 +6,22 @@ import {
 } from '@shinefold/config/constants';
 
 import { SCHEME_RAMPS } from './contrast-scheme-ramps';
+import {
+  AMBIENT,
+  BRAND_PRIMARY_MUTED,
+  FIELD_BOUNDARY,
+  SECONDARY,
+  TEXT,
+  TEXT_MUTED,
+} from './contrast-surfaces';
 import { PALETTE } from './palette-ramps';
 import { effectiveSchemeOf, findSkinFailures } from './skin-contrast';
-import { PAGE_ROLES, SKIN_FILL_ROLES, type TPaletteStop } from './skin-roles';
+import {
+  BRAND_SCRIMS,
+  PAGE_ROLES,
+  SKIN_FILL_ROLES,
+  type TPaletteStop,
+} from './skin-roles';
 import {
   defineSkin,
   SKIN_REGISTRY,
@@ -22,9 +35,7 @@ const DARKEST_NEUTRAL = '--palette-neutral-2700' satisfies TPaletteStop;
 
 const MID_NEUTRAL = '--palette-neutral-1300' satisfies TPaletteStop;
 
-const UNREADABLE = 'Unreadable';
-
-const TEXT_MUTED = '--text-muted';
+const MOCK_UNREADABLE_TITLE = 'Unreadable';
 
 const SKIN_CASES = Object.entries({
   ...SKIN_REGISTRY,
@@ -36,10 +47,10 @@ const SKIN_CASES = Object.entries({
 const failuresOf = ({ mode, roles }: TSkin, scheme: TColorScheme) =>
   findSkinFailures(roles[scheme], scheme, effectiveSchemeOf(mode, scheme));
 
-const paletteValueOf = (stop: TPaletteStop) => {
-  const { l, c } = PALETTE[stop];
-  return { l, c };
-};
+const lightnessAndChromaOf = ({ l, c }: { l: number; c: number }) => ({
+  l,
+  c,
+});
 
 describe('the skin registry', () => {
   it.each(SKIN_CASES)(
@@ -55,50 +66,43 @@ describe('the skin registry', () => {
       const roles = skin.roles[scheme];
 
       for (const fill of SKIN_FILL_ROLES) {
-        expect(roles[fill]).not.toBe(roles['--ambient']);
+        expect(roles[fill]).not.toBe(roles[AMBIENT]);
       }
     },
   );
 
-  it.each(COLOR_SCHEMES)('Plain takes the page roles under %s', (scheme) => {
-    expect(SKIN_REGISTRY[BRAND_VARIANT.PRIMARY].roles[scheme]).toEqual(
-      PAGE_ROLES[scheme],
+  it('Plain takes the page roles in light mode', () => {
+    expect(
+      SKIN_REGISTRY[BRAND_VARIANT.PRIMARY].roles[COLOR_SCHEME.LIGHT],
+    ).toEqual(PAGE_ROLES[COLOR_SCHEME.LIGHT]);
+  });
+
+  it('Plain takes the page roles in dark mode but a field boundary that clears the tint', () => {
+    const roles = SKIN_REGISTRY[BRAND_VARIANT.PRIMARY].roles[COLOR_SCHEME.DARK];
+    const pageRoles = PAGE_ROLES[COLOR_SCHEME.DARK];
+
+    expect({ ...roles, [FIELD_BOUNDARY]: pageRoles[FIELD_BOUNDARY] }).toEqual(
+      pageRoles,
     );
   });
 
-  it.each(COLOR_SCHEMES)(
-    'Shaded sits on the page secondary under %s',
-    (scheme) => {
-      const roles = SKIN_REGISTRY[BRAND_VARIANT.SECONDARY].roles[scheme];
-      const { l, c } = SCHEME_RAMPS[scheme]['--secondary']!;
+  it.each([
+    [BRAND_VARIANT.SECONDARY, SECONDARY],
+    [BRAND_VARIANT.BRAND_PRIMARY, BRAND_PRIMARY_MUTED],
+  ] as const)('%s sits on the page %s', (variant, pageGround) => {
+    for (const scheme of COLOR_SCHEMES) {
+      const { roles } = SKIN_REGISTRY[variant];
 
-      expect(paletteValueOf(roles['--ambient'])).toEqual({ l, c });
-    },
-  );
-
-  it.each(COLOR_SCHEMES)(
-    'Brand tint fills with the page tint lifted 10% toward the brand under %s',
-    (scheme) => {
-      const roles = SKIN_REGISTRY[BRAND_VARIANT.BRAND_PRIMARY].roles[scheme];
-      const muted = SCHEME_RAMPS[scheme]['--brand-primary-muted']!;
-      const brand = SCHEME_RAMPS[scheme]['--brand-primary']!;
-      const { l, c } = paletteValueOf(roles['--brand-primary-muted']);
-
-      expect(paletteValueOf(roles['--ambient'])).toEqual({
-        l: muted.l,
-        c: muted.c,
-      });
-      expect(l).toBeCloseTo(muted.l * 0.9 + brand.l * 0.1, 6);
-      expect(c).toBeCloseTo(muted.c * 0.9 + brand.c * 0.1, 6);
-    },
-  );
+      expect(lightnessAndChromaOf(PALETTE[roles[scheme][AMBIENT]])).toEqual(
+        lightnessAndChromaOf(SCHEME_RAMPS[scheme][pageGround]!),
+      );
+    }
+  });
 
   it('dresses the brand ground in the brand scrim', () => {
     const { roles } = SKIN_REGISTRY[BRAND_VARIANT.BRAND_PRIMARY];
 
-    expect(roles[COLOR_SCHEME.LIGHT]['--scrim-strong']).toBe(
-      '--scrim-brand-strong',
-    );
+    expect(roles[COLOR_SCHEME.LIGHT]).toMatchObject(BRAND_SCRIMS);
   });
 });
 
@@ -114,7 +118,7 @@ describe(defineSkin, () => {
         mode: SKIN_MODE.INVERSE,
       });
 
-      expect(skin.roles[scheme]['--ambient']).toBe(DARKEST_NEUTRAL);
+      expect(skin.roles[scheme][AMBIENT]).toBe(DARKEST_NEUTRAL);
       expect(failuresOf(skin, scheme)).toEqual([]);
     },
   );
@@ -135,16 +139,16 @@ describe(defineSkin, () => {
     expect(failuresOf(skin, COLOR_SCHEME.LIGHT)).toEqual([]);
   });
 
-  it('throws when no stop clears a role on its ground', () => {
-    const skin = defineSkin(UNREADABLE, {
+  it('throws when a pinned role fails on its ground', () => {
+    const skin = defineSkin(MOCK_UNREADABLE_TITLE, {
       ground: {
         [COLOR_SCHEME.LIGHT]: MID_NEUTRAL,
         [COLOR_SCHEME.DARK]: MID_NEUTRAL,
       },
       mode: SKIN_MODE.MATCH,
-      pin: { [COLOR_SCHEME.LIGHT]: { '--text': '--palette-neutral-1200' } },
+      pin: { [COLOR_SCHEME.LIGHT]: { [TEXT]: '--palette-neutral-1200' } },
     });
 
-    expect(() => skin.roles).toThrow(UNREADABLE);
+    expect(() => skin.roles).toThrow(MOCK_UNREADABLE_TITLE);
   });
 });

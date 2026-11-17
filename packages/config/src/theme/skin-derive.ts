@@ -41,6 +41,9 @@ const familyOf = (stop: TPaletteStop): string => stop.replace(/-\d+$/, '');
 const lightnessGap = (from: TPaletteStop, to: TPaletteStop): number =>
   Math.abs(PALETTE[from].l - PALETTE[to].l);
 
+const chromaGap = (from: TPaletteStop, to: TPaletteStop): number =>
+  Math.abs(PALETTE[from].c - PALETTE[to].c);
+
 const candidatesFor = (
   current: TPaletteStop,
   ground: TMaybeGround,
@@ -50,7 +53,7 @@ const candidatesFor = (
   ).sort(
     (a, b) =>
       lightnessGap(current, a) - lightnessGap(current, b) ||
-      Number(b === current) - Number(a === current),
+      chromaGap(current, a) - chromaGap(current, b),
   );
 
 const failuresOf = (
@@ -83,6 +86,9 @@ export const deriveSkinRoles = (derivation: TSkinDerivation): TSkinRoles => {
   const { ground, scheme, effectiveScheme, pin } = derivation;
   const movable = SKIN_STOP_ROLES.filter(
     (role) => !(role in pin) && !isOneOf(SKIN_GROUND_ROLES, role),
+  ).sort(
+    (a, b) =>
+      Number(isOneOf(SKIN_FILL_ROLES, a)) - Number(isOneOf(SKIN_FILL_ROLES, b)),
   );
   let roles: TSkinRoles = {
     ...PAGE_ROLES[effectiveScheme],
@@ -92,15 +98,19 @@ export const deriveSkinRoles = (derivation: TSkinDerivation): TSkinRoles => {
     ...pin,
   };
 
-  if (!hasLength(findSkinFailures(roles, scheme, effectiveScheme))) {
-    return roles;
-  }
-  for (let pass = 0; pass < movable.length; pass += 1) {
+  const holds = (candidate: TSkinRoles): boolean =>
+    SKIN_FILL_ROLES.every((fill) => candidate[fill] !== ground) &&
+    !hasLength(findSkinFailures(candidate, scheme, effectiveScheme));
+
+  for (let pass = 0; pass <= movable.length && !holds(roles); pass += 1) {
     const before = roles;
     for (const role of movable) {
       roles = { ...roles, [role]: settleRole(role, roles, derivation) };
     }
-    if (movable.every((role) => roles[role] === before[role])) return roles;
+    if (movable.every((role) => roles[role] === before[role])) break;
   }
-  throw new Error(`${derivation.title}: its roles never settle`);
+  if (!holds(roles)) {
+    throw new Error(`${derivation.title}: its roles fail their pairs`);
+  }
+  return roles;
 };

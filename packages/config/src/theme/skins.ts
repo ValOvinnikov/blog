@@ -86,16 +86,7 @@ export const SKIN_REGISTRY = {
       [COLOR_SCHEME.DARK]: '--palette-brand-1600',
     },
     mode: SKIN_MODE.MATCH,
-    pin: {
-      [COLOR_SCHEME.LIGHT]: {
-        ...TINTED_BAND_PIN[COLOR_SCHEME.LIGHT],
-        '--brand-primary-muted': '--palette-brand-250',
-      },
-      [COLOR_SCHEME.DARK]: {
-        ...TINTED_BAND_PIN[COLOR_SCHEME.DARK],
-        '--brand-primary-muted': '--palette-brand-1550',
-      },
-    },
+    pin: TINTED_BAND_PIN,
   }),
 } as const satisfies Record<TBrandVariant, TSkin>;
 

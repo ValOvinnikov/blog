@@ -15,7 +15,11 @@ import type {
 import { ALL_OF, CARD_STYLE_DECLARATIONS } from './card-style-declarations';
 import type { TThemeToken } from './contrast-pairs';
 import { SCHEME_RAMPS } from './contrast-scheme-ramps';
-import { ITEM_ACCENT_BRAND_SHARE } from './contrast-surfaces';
+import {
+  BRAND_PRIMARY,
+  ITEM_ACCENT_BRAND_SHARE,
+  TOKEN_ALIASES,
+} from './contrast-surfaces';
 import { NAV_LINK_STYLE_DECLARATIONS } from './nav-link-declarations';
 import {
   HEADER_CONTROL_STYLE_DECLARATIONS,
@@ -37,16 +41,6 @@ export type TContrastContext = TContrastStyles &
   TContrastScope & {
     hue: number;
   };
-
-const BRAND_PRIMARY: TThemeToken = '--brand-primary';
-
-const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
-  '--ring': BRAND_PRIMARY,
-  '--info': BRAND_PRIMARY,
-  '--code-fg': '--text',
-  '--code-comment': '--text-muted',
-  '--field-boundary': '--border-emphasis',
-};
 
 const TRANSPARENT = 'transparent';
 
