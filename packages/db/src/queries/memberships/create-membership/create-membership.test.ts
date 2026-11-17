@@ -43,9 +43,7 @@ describe(createMembership, () => {
 
     const rows = await db().select().from(schema.memberships);
     expect(rows).toEqual([membership]);
-    expect(membership).toEqual({
-      id: membership.id,
-      createdAt: membership.createdAt,
+    expect(membership).toMatchObject({
       userId: MOCK_USER_ID,
       tenantId,
       role: MEMBERSHIP_ROLE.OWNER,

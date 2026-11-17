@@ -380,6 +380,14 @@
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
+    "TEAM_MEMBER": [
+      {
+        "ref": "AUDIT_TARGET_TYPE.TEAM_MEMBER",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
     "CREATED": [
       {
         "ref": "AUDIT_ACTION.CREATED",
@@ -597,6 +605,30 @@
     "NEWSLETTER_PAUSE_CLEARED": [
       {
         "ref": "AUDIT_ACTION.NEWSLETTER_PAUSE_CLEARED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "MEMBER_INVITED": [
+      {
+        "ref": "AUDIT_ACTION.MEMBER_INVITED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "MEMBER_REMOVED": [
+      {
+        "ref": "AUDIT_ACTION.MEMBER_REMOVED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "MEMBER_INVITE_CANCELLED": [
+      {
+        "ref": "AUDIT_ACTION.MEMBER_INVITE_CANCELLED",
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
@@ -3848,6 +3880,12 @@
         "file": "packages/db/src/constants/billing.ts"
       },
       {
+        "ref": "MEMBERSHIP_REMOVAL_OUTCOME.NOT_FOUND",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
+      },
+      {
         "ref": "LEAD_REFUSAL.NOT_FOUND",
         "scope": "app:platform",
         "from": "@platform/constants/lead",
@@ -3998,6 +4036,56 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sort.ts"
+      }
+    ],
+    "INVITE_SENT": [
+      {
+        "ref": "STUDIO_ACCESS.INVITE_SENT",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/studio-access.ts"
+      }
+    ],
+    "ACTIVATING": [
+      {
+        "ref": "STUDIO_ACCESS.ACTIVATING",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/studio-access.ts"
+      }
+    ],
+    "READY": [
+      {
+        "ref": "STUDIO_ACCESS.READY",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/studio-access.ts"
+      },
+      {
+        "ref": "TENANT_PROVISIONING_STATUS.READY",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "NEWSLETTER_POST_STATE.READY",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "STALLED": [
+      {
+        "ref": "STUDIO_ACCESS.STALLED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/studio-access.ts"
+      },
+      {
+        "ref": "ELEVATE_TENANT_OWNER_OUTCOME.STALLED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
     "ALREADY_PENDING": [
@@ -4580,6 +4668,30 @@
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
+    "REMOVED": [
+      {
+        "ref": "MEMBERSHIP_REMOVAL_OUTCOME.REMOVED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
+      }
+    ],
+    "LAST_OWNER": [
+      {
+        "ref": "MEMBERSHIP_REMOVAL_OUTCOME.LAST_OWNER",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
+      }
+    ],
+    "SELF": [
+      {
+        "ref": "MEMBERSHIP_REMOVAL_OUTCOME.SELF",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
+      }
+    ],
     "SENT": [
       {
         "ref": "NEWSLETTER_POST_SEND_OUTCOME.SENT",
@@ -4894,26 +5006,6 @@
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
-    "READY": [
-      {
-        "ref": "TENANT_PROVISIONING_STATUS.READY",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/tenant-provisioning.ts"
-      },
-      {
-        "ref": "OWNER_STUDIO_ACCESS.READY",
-        "scope": "app:platform",
-        "from": "@platform/constants/owner-studio-access",
-        "file": "apps/platform/src/constants/owner-studio-access.ts"
-      },
-      {
-        "ref": "NEWSLETTER_POST_STATE.READY",
-        "scope": "app:worker",
-        "from": "@worker/constants/newsletter-send",
-        "file": "apps/worker/src/constants/newsletter-send.ts"
-      }
-    ],
     "FAILED": [
       {
         "ref": "TENANT_PROVISIONING_STATUS.FAILED",
@@ -5148,20 +5240,6 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
-      }
-    ],
-    "STALLED": [
-      {
-        "ref": "ELEVATE_TENANT_OWNER_OUTCOME.STALLED",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/tenant-provisioning.ts"
-      },
-      {
-        "ref": "OWNER_STUDIO_ACCESS.STALLED",
-        "scope": "app:platform",
-        "from": "@platform/constants/owner-studio-access",
-        "file": "apps/platform/src/constants/owner-studio-access.ts"
       }
     ],
     "AMBIGUOUS_MEMBERSHIP": [
@@ -7692,22 +7770,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/owner-access",
         "file": "apps/platform/src/constants/owner-access.ts"
-      }
-    ],
-    "INVITE_SENT": [
-      {
-        "ref": "OWNER_STUDIO_ACCESS.INVITE_SENT",
-        "scope": "app:platform",
-        "from": "@platform/constants/owner-studio-access",
-        "file": "apps/platform/src/constants/owner-studio-access.ts"
-      }
-    ],
-    "ACTIVATING": [
-      {
-        "ref": "OWNER_STUDIO_ACCESS.ACTIVATING",
-        "scope": "app:platform",
-        "from": "@platform/constants/owner-studio-access",
-        "file": "apps/platform/src/constants/owner-studio-access.ts"
       }
     ],
     "NOW": [

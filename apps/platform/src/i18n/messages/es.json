@@ -507,7 +507,10 @@
       "OAUTH_APP_SAVED": "App de inicio de sesión guardada",
       "OAUTH_APP_REPLACED": "App de inicio de sesión sustituida",
       "OAUTH_APP_REMOVED": "App de inicio de sesión eliminada",
-      "NEWSLETTER_PAUSE_CLEARED": "Pausa del boletín retirada"
+      "NEWSLETTER_PAUSE_CLEARED": "Pausa del boletín retirada",
+      "MEMBER_INVITED": "Miembro del equipo invitado",
+      "MEMBER_REMOVED": "Miembro del equipo eliminado",
+      "MEMBER_INVITE_CANCELLED": "Invitación al equipo cancelada"
     },
     "detail": {
       "field": {

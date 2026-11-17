@@ -507,7 +507,10 @@
       "OAUTH_APP_SAVED": "Sign-in app saved",
       "OAUTH_APP_REPLACED": "Sign-in app replaced",
       "OAUTH_APP_REMOVED": "Sign-in app removed",
-      "NEWSLETTER_PAUSE_CLEARED": "Newsletter pause cleared"
+      "NEWSLETTER_PAUSE_CLEARED": "Newsletter pause cleared",
+      "MEMBER_INVITED": "Team member invited",
+      "MEMBER_REMOVED": "Team member removed",
+      "MEMBER_INVITE_CANCELLED": "Team invite cancelled"
     },
     "detail": {
       "field": {

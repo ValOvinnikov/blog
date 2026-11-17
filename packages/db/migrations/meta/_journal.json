@@ -190,6 +190,13 @@
       "when": 1794822534977,
       "tag": "0026_site-config-look-details",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1794909992255,
+      "tag": "0027_military_stark_industries",
+      "breakpoints": true
     }
   ]
 }

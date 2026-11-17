@@ -507,7 +507,10 @@
       "OAUTH_APP_SAVED": "Inlog-app opgeslagen",
       "OAUTH_APP_REPLACED": "Inlog-app vervangen",
       "OAUTH_APP_REMOVED": "Inlog-app verwijderd",
-      "NEWSLETTER_PAUSE_CLEARED": "Nieuwsbriefpauze opgeheven"
+      "NEWSLETTER_PAUSE_CLEARED": "Nieuwsbriefpauze opgeheven",
+      "MEMBER_INVITED": "Teamlid uitgenodigd",
+      "MEMBER_REMOVED": "Teamlid verwijderd",
+      "MEMBER_INVITE_CANCELLED": "Teamuitnodiging geannuleerd"
     },
     "detail": {
       "field": {

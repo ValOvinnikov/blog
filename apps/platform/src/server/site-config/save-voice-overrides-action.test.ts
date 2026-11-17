@@ -8,16 +8,21 @@ import {
   MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
+import { mockEditorMembershipContext } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_THEME_FIELDS,
   mockSiteConfigThemeAndAssets,
 } from '@platform/testing/site-config/fixtures';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  mockReadyTenant,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  NEXT_NAVIGATION_ERROR,
   type TMaybeNull,
   VOICE_FIELD_ERROR,
 } from '@shinefold/config';
@@ -82,6 +87,17 @@ describe(saveVoiceOverridesAction, () => {
     upsertSiteConfigMock.mockResolvedValue(okResult());
     stampSiteConfigSavedAtMock.mockReset();
     insertAuditEventMock.mockReset();
+  });
+
+  it('refuses an editor and writes nothing', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockEditorMembershipContext(mockReadyTenant({ id: MOCK_TENANT_ID })),
+    );
+
+    await expect(
+      saveVoiceOverridesAction(MOCK_TENANT_ID, overridesByLocale),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('keeps the saved preset and writes no other Look column', async () => {

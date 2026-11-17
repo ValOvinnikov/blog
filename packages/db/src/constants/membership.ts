@@ -14,3 +14,14 @@ export const MEMBERSHIP_INVITE_OUTCOME = {
   ALREADY_CONSUMED: 'ALREADY_CONSUMED',
   SEAT_LIMIT: 'SEAT_LIMIT',
 } as const;
+
+export const MEMBERSHIP_REMOVAL_OUTCOME = {
+  REMOVED: 'REMOVED',
+  NOT_FOUND: 'NOT_FOUND',
+  LAST_OWNER: 'LAST_OWNER',
+  SELF: 'SELF',
+} as const;
+
+export type TMembershipRemovalOutcome = TValueOf<
+  typeof MEMBERSHIP_REMOVAL_OUTCOME
+>;

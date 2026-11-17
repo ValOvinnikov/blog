@@ -73,6 +73,7 @@ export * from './site-type';
 export * from './subscriber-outcome';
 export * from './size';
 export * from './sort';
+export * from './studio-access';
 export * from './table';
 export * from './taxonomy';
 export * from './tenant-plan';

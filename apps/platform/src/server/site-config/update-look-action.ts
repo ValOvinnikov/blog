@@ -2,7 +2,7 @@
 
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { stampSavedAt } from '@platform/server/site-config/stamp-saved-at';
 import {
@@ -43,7 +43,7 @@ export const updateLookAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
   const { preset, brandName, ...rest } = parsed.data;
 
   try {
