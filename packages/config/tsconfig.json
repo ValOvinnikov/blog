@@ -12,5 +12,5 @@
     // hoisting layout — matches @shinefold/ui, @shinefold/service, and web.
     "types": ["node", "vitest/globals"]
   },
-  "include": ["src"]
+  "include": ["src", "scripts"]
 }

@@ -9,6 +9,7 @@ export * from './header-control-shape-declarations';
 export * from './heading-declarations';
 export * from './image-proportion-declarations';
 export * from './nav-link-declarations';
+export * from './palette-ramps';
 export * from './radius-declarations';
 export * from './resolve-tenant-email-brand';
 export * from './theme-declarations';

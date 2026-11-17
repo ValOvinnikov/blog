@@ -20,31 +20,6 @@ export type TOklchStop = { l: number; c: number; h?: number; alpha?: number };
 
 export type TOklchRamp = Record<`--${string}`, TOklchStop>;
 
-export const LOGO_RAMP_LIGHT = {
-  '--logo-1': { l: 0.52, c: 0.17 },
-  '--logo-2': { l: 0.63, c: 0.16 },
-  '--logo-3': { l: 0.73, c: 0.13 },
-  '--logo-tile': { l: 0.52, c: 0.17 },
-  '--logo-tile-contrast': { l: 1, c: 0, h: 0 },
-} as const satisfies TOklchRamp;
-
-export const LOGO_RAMP_DARK = {
-  '--logo-1': { l: 0.58, c: 0.17 },
-  '--logo-2': { l: 0.68, c: 0.16 },
-  '--logo-3': { l: 0.8, c: 0.14 },
-  '--logo-tile': { l: 0.8, c: 0.14 },
-  '--logo-tile-contrast': { l: 0.22, c: 0.06 },
-} as const satisfies TOklchRamp;
-
-// A scrim darkens the photo under it in either mode, so this ramp has no dark twin.
-export const IMAGE_SCRIM_RAMP = {
-  '--on-image': { l: 1, c: 0, h: 0 },
-  '--on-image-muted': { l: 1, c: 0, h: 0, alpha: 0.85 },
-  '--scrim-brand-strong': { l: 0.2, c: 0.06, alpha: 0.92 },
-  '--scrim-brand-mid': { l: 0.35, c: 0.12, alpha: 0.72 },
-  '--scrim-brand-weak': { l: 0.45, c: 0.14, alpha: 0.4 },
-} as const satisfies TOklchRamp;
-
 export const DENSITY_DECLARATIONS: Record<TDensity, TThemeDeclarations> = {
   [DENSITY.DEFAULT]: {
     '--spacing-gutter': 'clamp(1rem, 5vw, 2.5rem)',

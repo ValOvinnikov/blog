@@ -2,9 +2,9 @@ import { oklchToHex, renderedContrastRatio } from '@shinefold/utils/color';
 
 import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config/constants';
 
-import { ACCENT_RAMP_LIGHT } from './accent-ramps';
+import { ACCENT_RAMP_LIGHT, LOGO_RAMP_LIGHT } from './accent-ramps';
 import { resolveTenantEmailBrand } from './resolve-tenant-email-brand';
-import { LOGO_RAMP_LIGHT, type TOklchStop } from './theme-declarations';
+import type { TOklchStop } from './theme-declarations';
 
 vi.mock(import('@shinefold/utils/color'), async (importOriginal) => {
   const actual = await importOriginal();

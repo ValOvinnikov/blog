@@ -13,6 +13,7 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
+    "gen:skins": "tsx scripts/gen-skins.ts",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
@@ -30,6 +31,7 @@
     "@types/react": "^19.3.0",
     "eslint": "catalog:",
     "prettier": "catalog:",
+    "tsx": "^4.23.15",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
