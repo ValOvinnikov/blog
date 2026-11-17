@@ -20,6 +20,7 @@ const REQUIRED_ENV_VARS = {
 
 const OPTIONAL_ENV_VARS = {
   VERCEL_TEAM_ID: MOCK_ENV.vercelTeamId,
+  MARKETING_SITE_URL: `https://${MOCK_ENV.marketingHost}/`,
   GITHUB_ACTOR: MOCK_ENV.githubActor,
   GITHUB_RUN_ID: MOCK_ENV.githubRunId,
   GITHUB_REPOSITORY: MOCK_ENV.githubRepository,
@@ -59,6 +60,7 @@ describe(loadDeprovisionEnv, () => {
       ...MOCK_ENV,
       dryRun: true,
       vercelTeamId: undefined,
+      marketingHost: undefined,
       githubActor: undefined,
       githubRunId: undefined,
       githubRepository: undefined,
@@ -66,6 +68,20 @@ describe(loadDeprovisionEnv, () => {
       webAppUrl: undefined,
       siteConfigRevalidateSecret: undefined,
     });
+  });
+
+  it('leaves the marketing host undefined when MARKETING_SITE_URL is empty', () => {
+    vi.stubEnv('MARKETING_SITE_URL', '');
+
+    expect(loadDeprovisionEnv(true).marketingHost).toBeUndefined();
+  });
+
+  it('throws when MARKETING_SITE_URL is not a valid URL', () => {
+    vi.stubEnv('MARKETING_SITE_URL', MOCK_ENV.marketingHost);
+
+    expect(() => loadDeprovisionEnv(true)).toThrow(
+      'deprovision-tenant: MARKETING_SITE_URL is not a valid URL.',
+    );
   });
 
   it.each(Object.keys(REQUIRED_ENV_VARS))(

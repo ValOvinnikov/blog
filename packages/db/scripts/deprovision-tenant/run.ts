@@ -4,9 +4,7 @@ import {
   type TDeprovisioningStep,
   type TTenantProvisioningStepStatus,
 } from '@shinefold/db/constants';
-import { listTenantHosts } from '@shinefold/db/queries/tenant-domains/list-tenant-hosts';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import { isPlatformTenant } from '@shinefold/db/utils/is-platform-tenant/is-platform-tenant';
 import { sanitizeLogMessage } from '@shinefold/insight';
 import { isUndefined } from '@shinefold/utils/primitives';
 
@@ -18,6 +16,7 @@ import {
 import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 import { workflowRunUrl } from '../lib/workflow-run-url/workflow-run-url';
 
+import { assertNotPlatformTenant } from './lib/assert-not-platform-tenant';
 import { loadDeprovisionEnv, type TDeprovisionEnv } from './lib/env';
 import { getTenantRow } from './lib/get-tenant-row';
 import {
@@ -206,12 +205,7 @@ export async function runDeprovisioning(
   confirm: string,
   env: TDeprovisionEnv,
 ): Promise<TRunDeprovisioningResult> {
-  const hosts = await listTenantHosts(tenant);
-  if (isPlatformTenant(hosts, env.tenantRootDomain)) {
-    throw new Error(
-      `deprovision-tenant: tenant "${tenant.id}" ("${tenant.name}") holds the platform root domain "${env.tenantRootDomain}" — the platform tenant is never deprovisioned, aborting before any destructive action.`,
-    );
-  }
+  await assertNotPlatformTenant(tenant, env);
 
   if (tenant.deprovisionedAt) {
     console.warn(

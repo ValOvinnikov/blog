@@ -37,7 +37,7 @@
   "packages/config/src/constants/icon.ts": 125,
   "packages/config/src/theme/contrast-pairs.ts": 131,
   "packages/config/src/voice/voice-fixed-keys.ts": 213,
-  "packages/db/scripts/deprovision-tenant/run.ts": 224,
+  "packages/db/scripts/deprovision-tenant/run.ts": 218,
   "packages/db/scripts/seed-tenant.ts": 176,
   "packages/db/scripts/validate-tenant-documents/run.ts": 181,
   "packages/db/src/constants/email-template-defaults.ts": 138,
