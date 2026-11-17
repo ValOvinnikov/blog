@@ -1,3 +1,4 @@
+import { SELLABLE_TENANT_PLANS } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   INACTIVITY_STAGE,
@@ -16,11 +17,18 @@ import {
   isNotNull,
   isNull,
   lte,
+  notInArray,
+  or,
   sql,
   type SQL,
 } from 'drizzle-orm';
 
 const isWritable = inArray(tenants.status, WRITABLE_TENANT_STATUSES);
+
+const hasNoLiveSubscription = or(
+  isNull(tenants.stripeSubscriptionId),
+  notInArray(tenants.plan, [...SELLABLE_TENANT_PLANS]),
+);
 
 const isSuspendedForInactivity = and(
   eq(tenants.status, TENANT_STATUS.SUSPENDED),
@@ -62,6 +70,7 @@ export function inactivityStageDue(
 
   return and(
     isNull(tenants.deprovisionedAt),
+    hasNoLiveSubscription,
     lte(tenants.lastActivityAt, cutoff),
     stageCondition[stage],
   );
