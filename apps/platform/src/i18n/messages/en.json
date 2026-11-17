@@ -2255,6 +2255,7 @@
     "nextPaymentLabel": "Next payment",
     "nextPayment": "{amount} on <time>{date}</time>",
     "noNextPayment": "None scheduled",
+    "planEnds": "Your plan ends on <time>{date}</time>.",
     "noPayments": "Your site has no payments yet.",
     "invoicesTitle": "Invoices",
     "invoicesEmpty": "No invoices yet.",
@@ -2319,6 +2320,7 @@
     "billingLink": "Billing",
     "NOT_SUBSCRIBED": "Your site has no paid plan to change yet. Choose one at checkout.",
     "NOT_ACTIVE": "Your subscription needs attention before its plan can change. Open Billing to settle it.",
+    "planEnds": "Your plan ends on <time>{date}</time>, so it can't change. To keep it, undo the cancellation from Billing.",
     "UNCHANGED": "Your site is already on this plan.",
     "CARD_DECLINED": "Your card was declined, so nothing changed. Update it in Billing and try again."
   },

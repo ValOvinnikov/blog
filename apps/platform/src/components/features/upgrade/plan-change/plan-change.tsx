@@ -8,12 +8,12 @@ import { LinkButton } from '@platform/components/shared/link-button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TPlanChoice } from '@platform/constants/plan-change';
 import type { TPendingPlanChange } from '@platform/server/billing/load-subscription-plan';
-import { formatDate } from '@platform/utils/format-date/format-date';
 import { isSamePlanChoice } from '@platform/utils/plan-change-timing/plan-change-timing';
+import { richDate } from '@platform/utils/rich-date/rich-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { ALERT_TYPE, type TMaybeUndefined } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
 
 import { PlanChangeStatus } from './components/plan-change-status/plan-change-status';
 import { PlanChangeSummary } from './components/plan-change-summary/plan-change-summary';
@@ -62,10 +62,7 @@ export const PlanChange = ({
             role="note"
             description={t.rich('pendingChange', {
               ...choiceText(pending),
-              date: formatDate(pending.startsAt, locale),
-              time: (chunks: ReactNode) => (
-                <time dateTime={pending.startsAt.toISOString()}>{chunks}</time>
-              ),
+              ...richDate(pending.startsAt, locale),
             })}
           />
         )}

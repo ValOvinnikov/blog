@@ -1,12 +1,11 @@
 import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
-import { formatDate } from '@platform/utils/format-date/format-date';
+import { richDate } from '@platform/utils/rich-date/rich-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { ALERT_TYPE, SIZE } from '@shinefold/config';
 import type { TTenantPlan } from '@shinefold/config/constants';
 import type { TGraceLocks } from '@shinefold/db/utils/grace-locks/grace-locks';
 import { useLocale, useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
 
 export type TGraceNoticeProps = {
   plan: TTenantPlan;
@@ -24,12 +23,7 @@ export const GraceNotice = ({
   const t = useTranslations('billingStatusNotice');
   const tPlan = useTranslations('planNames');
   const locale = useLocale();
-  const dateValues = {
-    date: formatDate(endsAt, locale),
-    time: (chunks: ReactNode) => (
-      <time dateTime={endsAt.toISOString()}>{chunks}</time>
-    ),
-  };
+  const dateValues = richDate(endsAt, locale);
 
   return (
     <Alert

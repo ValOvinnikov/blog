@@ -2255,6 +2255,7 @@
     "nextPaymentLabel": "Próximo pago",
     "nextPayment": "{amount} el <time>{date}</time>",
     "noNextPayment": "Ninguno programado",
+    "planEnds": "Tu plan termina el <time>{date}</time>.",
     "noPayments": "Tu sitio aún no tiene pagos.",
     "invoicesTitle": "Facturas",
     "invoicesEmpty": "Aún no hay facturas.",
@@ -2319,6 +2320,7 @@
     "billingLink": "Facturación",
     "NOT_SUBSCRIBED": "Tu sitio aún no tiene un plan de pago que cambiar. Elige uno en el pago.",
     "NOT_ACTIVE": "Tu suscripción necesita atención antes de poder cambiar de plan. Abre Facturación para resolverlo.",
+    "planEnds": "Tu plan termina el <time>{date}</time>, así que no puede cambiar. Para conservarlo, anula la cancelación desde Facturación.",
     "UNCHANGED": "Tu sitio ya está en este plan.",
     "CARD_DECLINED": "Tu tarjeta ha sido rechazada, así que no ha cambiado nada. Actualízala en Facturación e inténtalo de nuevo."
   },
