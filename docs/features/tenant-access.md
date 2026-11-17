@@ -89,7 +89,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
   - `requireTenantById` guards `/tenants/{id}`.
   - `listSessionTenants` and `resolveDashboardTenant` guard `/dashboard`.
 - **Server Actions call a gate themselves.**
-  - Every tenant-scoped settings save (Look, Voice, Features, Languages, Email settings, templates, logo and test send, brand assets) calls `requireTenantManager`: the tenant's own OWNER or an operator. An editor keeps the Studio and cannot save any of them. Reads and the custom-domain status poll still call `requireTenantMembership`. Both gates exclude archived tenants.
+  - Every tenant-scoped settings save (Look, Voice, Features and its analytics id, Languages, Email settings, templates, logo and test send, brand assets) calls `requireTenantManager`: the tenant's own OWNER or an operator. An editor keeps the Studio and cannot save any of them. Reads and the custom-domain status poll still call `requireTenantMembership`. Both gates exclude archived tenants.
   - Creating a tenant and editing its details need `requireAdmin`.
   - Deprovision, reactivate, delete, the deprovisioning status poll and the blocklist add and remove actions need `requireSuperAdmin`.
   - The provisioning status poll needs the tenant's own OWNER or any admin; retry, Check now and Resend invite need the tenant's own OWNER or a SUPERADMIN (`requireTenantOwnerOrAdmin`).
