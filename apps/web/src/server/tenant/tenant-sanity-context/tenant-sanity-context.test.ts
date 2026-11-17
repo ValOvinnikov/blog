@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import { TENANT_STATUS } from '@shinefold/db/constants';
+import type { TTenantSanityWriteCredentials } from '@shinefold/db/queries/tenants/get-tenant-sanity-write-credentials/get-tenant-sanity-write-credentials';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { getPlatformSanityContext } from '@shinefold/service';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
@@ -102,8 +104,13 @@ describe(getHostTenantSanityContext, () => {
 });
 
 describe(getHostTenantSanityWriteContext, () => {
+  let credentials: TTenantSanityWriteCredentials;
+
+  beforeEach(() => {
+    credentials = mockTenantSanityWriteCredentials();
+  });
+
   it('resolves the tenant Sanity write credentials for a resolved tenant', async () => {
-    const credentials = mockTenantSanityWriteCredentials();
     vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReturnValue(
       credentials,
     );
@@ -112,12 +119,12 @@ describe(getHostTenantSanityWriteContext, () => {
       isResolvable: true,
       tenant: credentials,
       tenantId: MOCK_TENANT_ID,
+      plan: TENANT_PLAN.GROWTH,
       isActive: true,
     });
   });
 
   it('reports a suspended resolved tenant as not active', async () => {
-    const credentials = mockTenantSanityWriteCredentials();
     vi.mocked(resolveRequestTenant).mockResolvedValueOnce(
       mockServableTenant({ status: TENANT_STATUS.SUSPENDED }),
     );
@@ -129,6 +136,7 @@ describe(getHostTenantSanityWriteContext, () => {
       isResolvable: true,
       tenant: credentials,
       tenantId: MOCK_TENANT_ID,
+      plan: TENANT_PLAN.GROWTH,
       isActive: false,
     });
   });
@@ -152,6 +160,7 @@ describe(getHostTenantSanityWriteContext, () => {
       isResolvable: true,
       tenant: undefined,
       tenantId: undefined,
+      plan: undefined,
       isActive: true,
     });
   });
@@ -161,6 +170,7 @@ describe(getHostTenantSanityWriteContext, () => {
       isResolvable: true,
       tenant: undefined,
       tenantId: MOCK_TENANT_ID,
+      plan: TENANT_PLAN.GROWTH,
       isActive: true,
     });
   });
