@@ -19,6 +19,12 @@ export async function readEmailSendCounts(
   return db.select().from(schema.emailSendCounts);
 }
 
+export async function readPlatformEmailSendCounts(
+  db: TTestDb,
+): Promise<schema.TPlatformEmailSendCount[]> {
+  return db.select().from(schema.platformEmailSendCounts);
+}
+
 export async function readEmailDeliveryOutcomeCounts(
   db: TTestDb,
 ): Promise<schema.TEmailDeliveryOutcomeCount[]> {

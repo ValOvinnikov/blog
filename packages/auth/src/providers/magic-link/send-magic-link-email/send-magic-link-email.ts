@@ -1,8 +1,9 @@
+import { buildMagicLinkSendTags } from '@shinefold/auth/providers/magic-link/build-magic-link-send-tags/build-magic-link-send-tags';
 import {
   findPendingInviteTenants,
   type TPendingInviteTenant,
 } from '@shinefold/auth/providers/magic-link/find-pending-invite-tenants/find-pending-invite-tenants';
-import { recordSignInSendSafely } from '@shinefold/auth/providers/magic-link/record-sign-in-send-safely/record-sign-in-send-safely';
+import { recordMagicLinkSendSafely } from '@shinefold/auth/providers/magic-link/record-magic-link-send-safely/record-magic-link-send-safely';
 import { resolveMagicLinkEmailSettings } from '@shinefold/auth/providers/magic-link/resolve-magic-link-email-settings/resolve-magic-link-email-settings';
 import { resolveRecipientLocale } from '@shinefold/auth/providers/magic-link/resolve-recipient-locale/resolve-recipient-locale';
 import { resolveTenantEmailIdentity } from '@shinefold/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
@@ -10,6 +11,7 @@ import {
   AUTH_APP,
   EMAIL_ACCOUNT,
   EMAIL_TEMPLATE_TYPE,
+  EMAIL_TYPE,
   type TAuthApp,
 } from '@shinefold/config/constants';
 import type { IMagicLinkSendHandlers } from '@shinefold/config/types';
@@ -18,7 +20,6 @@ import {
   applyTenantSenderName,
   buildInviteMagicLinkEmail,
   buildMagicLinkEmail,
-  buildSiteEmailTag,
   sendEmail,
 } from '@shinefold/email';
 import { hasLength } from '@shinefold/utils/primitives';
@@ -95,11 +96,17 @@ export async function sendMagicLinkEmail({
     subject,
     html,
     replyTo: emailSettings?.replyTo,
-    tags: readerSiteId ? [buildSiteEmailTag(readerSiteId)] : undefined,
+    tags: buildMagicLinkSendTags(isSentByPlatform, readerSiteId),
   });
 
-  if (readerSiteId) {
-    await recordSignInSendSafely(readerSiteId, onSendCountFailed);
+  if (isSentByPlatform || readerSiteId) {
+    await recordMagicLinkSendSafely(
+      {
+        siteId: readerSiteId,
+        emailType: isInvite ? EMAIL_TYPE.INVITE : EMAIL_TYPE.SIGN_IN,
+      },
+      onSendCountFailed,
+    );
   }
 }
 
