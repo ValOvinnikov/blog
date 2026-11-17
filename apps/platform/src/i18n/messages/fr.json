@@ -1728,9 +1728,32 @@
       "RATINGS": "Permettre aux lecteurs de noter les articles.",
       "BOOKMARKS": "Permettre aux lecteurs d'enregistrer des articles pour plus tard.",
       "NEWSLETTER": "Afficher le formulaire d'inscription à la newsletter sur le site.",
-      "ANALYTICS": "Activer le suivi statistique sur le site.",
+      "ANALYTICS": "Connectez votre propre Google Analytics ou Plausible. Laissez l’ID vide pour ne charger aucun outil d’analyse.",
       "CONSENT_BANNER": "Afficher aux visiteurs une bannière de consentement aux cookies avant le chargement des cookies ou scripts non essentiels.",
       "CONTACT_FORM": "Afficher le formulaire de contact sur le site."
+    },
+    "analyticsProviderLabel": "Outil d’analyse",
+    "analyticsProviderOption": {
+      "GOOGLE_ANALYTICS": "Google Analytics",
+      "PLAUSIBLE": "Plausible"
+    },
+    "analyticsIdDraftLabel": "ID d’analyse",
+    "analyticsIdEmpty": "Aucun",
+    "analyticsIdLabel": {
+      "GOOGLE_ANALYTICS": "ID de mesure",
+      "PLAUSIBLE": "Domaine du site"
+    },
+    "analyticsIdHint": {
+      "GOOGLE_ANALYTICS": "Vous le trouverez dans Google Analytics sous Administration, Flux de données.",
+      "PLAUSIBLE": "Le domaine sous lequel votre site est enregistré dans Plausible."
+    },
+    "analyticsIdPlaceholder": {
+      "GOOGLE_ANALYTICS": "G-A1B2C3D4E5",
+      "PLAUSIBLE": "example.com"
+    },
+    "analyticsIdInvalid": {
+      "GOOGLE_ANALYTICS": "Saisissez un ID de mesure : G- suivi de majuscules et de chiffres, par exemple G-A1B2C3D4E5.",
+      "PLAUSIBLE": "Saisissez un domaine seul, sans https:// ni chemin, par exemple example.com."
     }
   },
   "languagePicker": {

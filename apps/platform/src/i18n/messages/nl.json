@@ -1728,9 +1728,32 @@
       "RATINGS": "Laat lezers berichten beoordelen.",
       "BOOKMARKS": "Laat lezers berichten bewaren om later te lezen.",
       "NEWSLETTER": "Toon het aanmeldformulier voor de nieuwsbrief op de site.",
-      "ANALYTICS": "Schakel analysetracking op de site in.",
+      "ANALYTICS": "Koppel je eigen Google Analytics of Plausible. Laat de ID leeg om geen analysetool te laden.",
       "CONSENT_BANNER": "Toon bezoekers een cookiemelding voordat niet-essentiële cookies of scripts worden geladen.",
       "CONTACT_FORM": "Toon het contactformulier op de site."
+    },
+    "analyticsProviderLabel": "Analysetool",
+    "analyticsProviderOption": {
+      "GOOGLE_ANALYTICS": "Google Analytics",
+      "PLAUSIBLE": "Plausible"
+    },
+    "analyticsIdDraftLabel": "Analyse-ID",
+    "analyticsIdEmpty": "Geen",
+    "analyticsIdLabel": {
+      "GOOGLE_ANALYTICS": "Metings-ID",
+      "PLAUSIBLE": "Sitedomein"
+    },
+    "analyticsIdHint": {
+      "GOOGLE_ANALYTICS": "Je vindt hem in Google Analytics onder Beheer, Gegevensstreams.",
+      "PLAUSIBLE": "Het domein waaronder je site in Plausible staat."
+    },
+    "analyticsIdPlaceholder": {
+      "GOOGLE_ANALYTICS": "G-A1B2C3D4E5",
+      "PLAUSIBLE": "example.com"
+    },
+    "analyticsIdInvalid": {
+      "GOOGLE_ANALYTICS": "Voer een metings-ID in: G- gevolgd door hoofdletters en cijfers, zoals G-A1B2C3D4E5.",
+      "PLAUSIBLE": "Voer alleen een domein in, zonder https:// of pad, zoals example.com."
     }
   },
   "languagePicker": {

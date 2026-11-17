@@ -2,37 +2,31 @@
 
 import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
+import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
+import type { TFeaturesFormValues } from '@platform/utils/analytics-draft/analytics-draft';
 import {
-  SettingsFormShell,
-  useSettingsForm,
-} from '@platform/components/shared/settings-form-shell';
-import { useToast } from '@platform/context/toast-provider';
-import {
-  updateFeaturesAction,
-  type TUpdateFeaturesResult,
-} from '@platform/server/settings-features/update-features-action';
-import {
-  CAPABILITY_TOGGLES,
   SHOWN_CAPABILITY_TOGGLES,
   type TSettingsFeaturesValues,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
-import { ALERT_TYPE, FORM_STATUS, type TCapability } from '@shinefold/config';
+import {
+  ALERT_TYPE,
+  CAPABILITY,
+  FORM_STATUS,
+  type TCapability,
+} from '@shinefold/config';
 import { isUndefined } from '@shinefold/utils/primitives';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useId } from 'react';
 
+import { AnalyticsSettingRow } from './components/analytics-setting-row';
 import { CapabilityToggleRow } from './components/capability-toggle-row';
-
-const countChanges = (
-  a: TSettingsFeaturesValues,
-  b: TSettingsFeaturesValues,
-): number =>
-  CAPABILITY_TOGGLES.filter(({ field }) => a[field] !== b[field]).length;
+import { useFeaturesForm } from './use-features-form';
 
 export type TFeaturesSettingsProps = {
   tenantId: string;
   entitledCapabilities: TCapability[];
-  initialValues: TSettingsFeaturesValues;
+  hasOwnAnalytics: boolean;
+  initialValues: TFeaturesFormValues;
   savedAt?: Date;
   archivedAt?: Date;
 };
@@ -42,13 +36,13 @@ export type TFeaturesSettingsProps = {
 export const FeaturesSettings = ({
   tenantId,
   entitledCapabilities,
+  hasOwnAnalytics,
   initialValues,
   savedAt,
   archivedAt,
 }: TFeaturesSettingsProps) => {
   const t = useTranslations('featuresSettings');
-  const toast = useToast();
-  const router = useRouter();
+  const analyticsIdFieldId = useId();
   const {
     values,
     setValues,
@@ -57,30 +51,13 @@ export const FeaturesSettings = ({
     isArchived,
     archivedNoticeId,
     form,
-  } = useSettingsForm<TSettingsFeaturesValues, TUpdateFeaturesResult>({
+    analyticsFieldErrors,
+  } = useFeaturesForm({
+    tenantId,
     initialValues,
+    savedAt,
     archivedAt,
-    onSubmit: (vals) => updateFeaturesAction(tenantId, vals),
-    onSuccess: () => {
-      toast.success({
-        message: t('alertSuccess'),
-      });
-      router.refresh();
-    },
-    countChanges,
-    draft: {
-      tenantId,
-      page: 'features',
-      savedAt,
-      fields: CAPABILITY_TOGGLES.filter(
-        ({ isComingSoon }) => !isComingSoon,
-      ).map(({ capability, field }) => ({
-        id: field,
-        label: t(`toggleLabel.${capability}`),
-        display: (draftValues: TSettingsFeaturesValues) =>
-          draftValues[field] ? t('switchOn') : t('switchOff'),
-      })),
-    },
+    analyticsIdFieldId,
   });
 
   const handleToggle = (
@@ -105,6 +82,25 @@ export const FeaturesSettings = ({
         <Card.Body>
           {SHOWN_CAPABILITY_TOGGLES.map((toggle) => {
             const { capability, field, parentField } = toggle;
+
+            if (capability === CAPABILITY.ANALYTICS) {
+              return (
+                <AnalyticsSettingRow
+                  key={capability}
+                  draft={values}
+                  hasOwnAnalytics={hasOwnAnalytics}
+                  idFieldId={analyticsIdFieldId}
+                  isIdInvalid={Boolean(analyticsFieldErrors.analyticsId)}
+                  onChange={({ analyticsProvider, analyticsId }) =>
+                    setValues((prev) => ({
+                      ...prev,
+                      analyticsProvider,
+                      analyticsId,
+                    }))
+                  }
+                />
+              );
+            }
 
             return (
               <CapabilityToggleRow

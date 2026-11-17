@@ -1728,9 +1728,32 @@
       "RATINGS": "Let readers rate posts.",
       "BOOKMARKS": "Let readers save posts to read later.",
       "NEWSLETTER": "Show the newsletter signup form on the site.",
-      "ANALYTICS": "Enable on-site analytics tracking.",
+      "ANALYTICS": "Connect your own Google Analytics or Plausible. Leave the ID empty to load no analytics tool.",
       "CONSENT_BANNER": "Show visitors a cookie-consent banner before non-essential cookies or scripts load.",
       "CONTACT_FORM": "Show the contact form on the site."
+    },
+    "analyticsProviderLabel": "Analytics tool",
+    "analyticsProviderOption": {
+      "GOOGLE_ANALYTICS": "Google Analytics",
+      "PLAUSIBLE": "Plausible"
+    },
+    "analyticsIdDraftLabel": "Analytics ID",
+    "analyticsIdEmpty": "None",
+    "analyticsIdLabel": {
+      "GOOGLE_ANALYTICS": "Measurement ID",
+      "PLAUSIBLE": "Site domain"
+    },
+    "analyticsIdHint": {
+      "GOOGLE_ANALYTICS": "Find it in Google Analytics under Admin, Data streams.",
+      "PLAUSIBLE": "The domain your site is registered under in Plausible."
+    },
+    "analyticsIdPlaceholder": {
+      "GOOGLE_ANALYTICS": "G-A1B2C3D4E5",
+      "PLAUSIBLE": "example.com"
+    },
+    "analyticsIdInvalid": {
+      "GOOGLE_ANALYTICS": "Enter a measurement ID: G- followed by capital letters and numbers, like G-A1B2C3D4E5.",
+      "PLAUSIBLE": "Enter a domain on its own, without https:// or a path, like example.com."
     }
   },
   "languagePicker": {
