@@ -2,6 +2,8 @@ import { faker } from '@faker-js/faker';
 import type { TMaybeNull } from '@shinefold/config';
 import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
 import { errorResult, okResult } from '@shinefold/utils';
+import { isNull } from '@shinefold/utils/primitives';
+import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
 import {
   MOCK_TENANT_ID,
   MOCK_TENANT_SANITY_CONTEXT,
@@ -17,6 +19,8 @@ const {
   getHostTenantSanityContextMock,
   getHostTenantSanityWriteContextMock,
   getPlatformSanityWriteContextMock,
+  claimTakeawayGenerationMock,
+  releaseTakeawayGenerationMock,
   envMock,
   MOCK_SKIM_MODEL,
 } = vi.hoisted(() => ({
@@ -26,11 +30,22 @@ const {
   getHostTenantSanityContextMock: vi.fn(),
   getHostTenantSanityWriteContextMock: vi.fn(),
   getPlatformSanityWriteContextMock: vi.fn(),
+  claimTakeawayGenerationMock: vi.fn(),
+  releaseTakeawayGenerationMock: vi.fn(),
   envMock: {} as {
     SANITY_GENERATE_SECRET?: string;
     ANTHROPIC_API_KEY?: string;
   },
-  MOCK_SKIM_MODEL: 'claude-haiku-4-5',
+  MOCK_SKIM_MODEL: 'claude-haiku-5-5',
+}));
+
+vi.mock('@shinefold/db', () => ({
+  queries: {
+    takeawayGenerations: {
+      claimTakeawayGeneration: claimTakeawayGenerationMock,
+      releaseTakeawayGeneration: releaseTakeawayGenerationMock,
+    },
+  },
 }));
 
 vi.mock('@shinefold/service', () => ({
@@ -64,7 +79,6 @@ vi.mock('@web/utils/env/env', () => ({ env: envMock }));
 
 faker.seed(6009);
 
-const UNPROCESSABLE_ENTITY_STATUS = 422;
 const MOCK_GENERATE_SKIM_URL = faker.internet.url({ appendSlash: false });
 const MOCK_SECRET = faker.string.alphanumeric(16);
 const MOCK_WRONG_SECRET = faker.string.alphanumeric(16);
@@ -75,6 +89,7 @@ const MOCK_TAKEAWAYS = faker.helpers.multiple(() => faker.lorem.sentence(), {
   count: 3,
 });
 const MOCK_ERROR = new Error(faker.lorem.sentence());
+const MOCK_CLAIM = { tenantId: MOCK_TENANT_ID, month: '2026-11-01' };
 
 const buildCredentials = () => ({
   projectId: faker.string.alphanumeric(8),
@@ -96,7 +111,7 @@ const buildRequest = (
   secret: TMaybeNull<string> = MOCK_SECRET,
 ): Request => {
   const url = new URL(MOCK_GENERATE_SKIM_URL);
-  if (secret !== null) url.searchParams.set('secret', secret);
+  if (!isNull(secret)) url.searchParams.set('secret', secret);
   return new Request(url, { method: HTTP_METHOD.POST, body: rawBody });
 };
 
@@ -127,6 +142,10 @@ describe(POST, () => {
       tenantId: undefined,
       isActive: true,
     });
+    claimTakeawayGenerationMock.mockReset();
+    claimTakeawayGenerationMock.mockResolvedValue(MOCK_CLAIM);
+    releaseTakeawayGenerationMock.mockReset();
+    releaseTakeawayGenerationMock.mockResolvedValue(undefined);
     getPlatformSanityWriteContextMock.mockReset();
     getPlatformSanityWriteContextMock.mockReturnValue(
       MOCK_PLATFORM_CREDENTIALS,
@@ -171,6 +190,7 @@ describe(POST, () => {
 
     expect(response.status).toBe(HTTP_STATUS.OK);
     expect(json).toEqual({ ok: true, count: MOCK_TAKEAWAYS.length });
+    expect(claimTakeawayGenerationMock).not.toHaveBeenCalled();
     expect(getPublishedPostBodyMock).toHaveBeenCalledWith(
       MOCK_POST_ID,
       undefined,
@@ -216,6 +236,7 @@ describe(POST, () => {
     const response = await POST(postRequest());
 
     expect(response.status).toBe(HTTP_STATUS.OK);
+    expect(claimTakeawayGenerationMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(saveSkimDraftMock).toHaveBeenCalledWith(
       MOCK_SAVED_DRAFT,
       MOCK_WRITE_CREDENTIALS,
@@ -250,7 +271,7 @@ describe(POST, () => {
 
     expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
     expect(logger.error).toHaveBeenCalledWith(
-      'generate_skim.tenant_write_credentials_missing',
+      GENERATE_SKIM_LOG.TENANT_WRITE_CREDENTIALS_MISSING,
       { postId: MOCK_POST_ID, tenantId: MOCK_TENANT_ID },
     );
     expect(generateTakeawaysMock).not.toHaveBeenCalled();
@@ -270,11 +291,8 @@ describe(POST, () => {
 
     expect(response.status).toBe(HTTP_STATUS.FORBIDDEN);
     expect(logger.warn).toHaveBeenCalledWith(
-      'generate_skim.tenant_not_active',
-      {
-        postId: MOCK_POST_ID,
-        tenantId: MOCK_TENANT_ID,
-      },
+      GENERATE_SKIM_LOG.TENANT_NOT_ACTIVE,
+      { postId: MOCK_POST_ID, tenantId: MOCK_TENANT_ID },
     );
     expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
     expect(generateTakeawaysMock).not.toHaveBeenCalled();
@@ -295,7 +313,7 @@ describe(POST, () => {
 
     const response = await POST(postRequest());
 
-    expect(response.status).toBe(UNPROCESSABLE_ENTITY_STATUS);
+    expect(response.status).toBe(HTTP_STATUS.UNPROCESSABLE_ENTITY);
     expect(saveSkimDraftMock).not.toHaveBeenCalled();
   });
 
@@ -309,7 +327,7 @@ describe(POST, () => {
     expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
     expect(saveSkimDraftMock).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(
-      'generate_skim.write_client_unconfigured',
+      GENERATE_SKIM_LOG.WRITE_CLIENT_UNCONFIGURED,
       { postId: MOCK_POST_ID, error: MOCK_ERROR },
     );
   });
@@ -320,5 +338,84 @@ describe(POST, () => {
     const response = await POST(postRequest());
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  });
+
+  describe('for a resolved tenant', () => {
+    beforeEach(() => {
+      getHostTenantSanityWriteContextMock.mockResolvedValue({
+        isResolvable: true,
+        tenant: MOCK_WRITE_CREDENTIALS,
+        tenantId: MOCK_TENANT_ID,
+        isActive: true,
+      });
+    });
+
+    it('refuses a used allowance like an inactive tenant, without generating', async () => {
+      claimTakeawayGenerationMock.mockResolvedValue(null);
+
+      const response = await POST(postRequest());
+
+      expect(response.status).toBe(HTTP_STATUS.FORBIDDEN);
+      expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
+      expect(generateTakeawaysMock).not.toHaveBeenCalled();
+      expect(saveSkimDraftMock).not.toHaveBeenCalled();
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.warn).not.toHaveBeenCalled();
+    });
+
+    it('answers unavailable and logs it when the claim cannot be made', async () => {
+      claimTakeawayGenerationMock.mockRejectedValue(MOCK_ERROR);
+
+      const response = await POST(postRequest());
+
+      expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
+      expect(logger.error).toHaveBeenCalledWith(
+        GENERATE_SKIM_LOG.CLAIM_FAILED,
+        {
+          postId: MOCK_POST_ID,
+          tenantId: MOCK_TENANT_ID,
+          error: MOCK_ERROR,
+        },
+      );
+      expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
+    });
+
+    it('keeps the claim when the takeaways are saved', async () => {
+      await POST(postRequest());
+
+      expect(releaseTakeawayGenerationMock).not.toHaveBeenCalled();
+    });
+
+    it('gives the claim back when the post body cannot be read', async () => {
+      getPublishedPostBodyMock.mockResolvedValue(errorResult(MOCK_ERROR));
+
+      await POST(postRequest());
+
+      expect(releaseTakeawayGenerationMock).toHaveBeenCalledWith(MOCK_CLAIM);
+    });
+
+    describe('when generation fails', () => {
+      beforeEach(() => {
+        generateTakeawaysMock.mockRejectedValue(MOCK_ERROR);
+      });
+
+      it('gives the claim back', async () => {
+        await POST(postRequest());
+
+        expect(releaseTakeawayGenerationMock).toHaveBeenCalledWith(MOCK_CLAIM);
+      });
+
+      it('logs a failed claim release and still answers the failure', async () => {
+        releaseTakeawayGenerationMock.mockRejectedValue(MOCK_ERROR);
+
+        const response = await POST(postRequest());
+
+        expect(response.status).toBe(HTTP_STATUS.UNPROCESSABLE_ENTITY);
+        expect(logger.error).toHaveBeenCalledWith(
+          GENERATE_SKIM_LOG.CLAIM_RELEASE_FAILED,
+          { postId: MOCK_POST_ID, tenantId: MOCK_TENANT_ID, error: MOCK_ERROR },
+        );
+      });
+    });
   });
 });
