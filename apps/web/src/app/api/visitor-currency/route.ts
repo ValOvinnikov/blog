@@ -1,14 +1,15 @@
-import type { TMaybeUndefined } from '@shinefold/config';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import {
   BILLING_CURRENCY,
   type TBillingCurrency,
 } from '@shinefold/db/constants';
 import { COUNTRY_CODE } from '@web/constants/country';
-import { CURRENCY_COOKIE_NAME } from '@web/utils/currency-cookie';
-import { REMEMBERED_COOKIE_OPTIONS } from '@web/utils/remembered-cookie-options';
-import type { NextRequest, NextResponse } from 'next/server';
-
-export const VISITOR_COUNTRY_HEADER = 'x-vercel-ip-country';
+import { CACHE_CONTROL } from '@web/constants/http';
+import {
+  VISITOR_COUNTRY_HEADER,
+  type TVisitorCurrency,
+} from '@web/utils/visitor-currency';
+import { NextResponse } from 'next/server';
 
 const EURO_COUNTRIES = [
   COUNTRY_CODE.AD,
@@ -57,28 +58,16 @@ const CURRENCY_BY_COUNTRY: Readonly<Record<string, TBillingCurrency>> = {
 };
 
 const currencyForCountry = (
-  country: TMaybeUndefined<string>,
+  country: TMaybeNull<string>,
 ): TMaybeUndefined<TBillingCurrency> =>
   country ? CURRENCY_BY_COUNTRY[country.toUpperCase()] : undefined;
 
-export const rememberVisitorCurrency = (
-  request: NextRequest,
-  response: NextResponse,
-): void => {
-  const country = request.headers.get(VISITOR_COUNTRY_HEADER);
-  if (!country) return;
-
-  const currency = currencyForCountry(country);
-  const remembered = request.cookies.get(CURRENCY_COOKIE_NAME)?.value;
-  if (currency === remembered) return;
-
-  if (!currency) {
-    response.cookies.delete(CURRENCY_COOKIE_NAME);
-    return;
-  }
-  response.cookies.set(
-    CURRENCY_COOKIE_NAME,
-    currency,
-    REMEMBERED_COOKIE_OPTIONS,
+export function GET(request: Request): NextResponse<TVisitorCurrency> {
+  const currency = currencyForCountry(
+    request.headers.get(VISITOR_COUNTRY_HEADER),
   );
-};
+  return NextResponse.json(
+    { currency },
+    { headers: { 'Cache-Control': CACHE_CONTROL.PRIVATE_NO_STORE } },
+  );
+}

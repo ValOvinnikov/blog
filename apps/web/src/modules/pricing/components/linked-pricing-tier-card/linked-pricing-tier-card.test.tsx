@@ -18,7 +18,6 @@ import {
   formatMockUnitAmount,
   percentOffUnitAmount,
 } from '@web/testing/modules/pricing/live-price-fixtures';
-import { CURRENCY_COOKIE_NAME } from '@web/utils/currency-cookie';
 import { reportClientError } from '@web/utils/report-client-error';
 
 import {
@@ -26,7 +25,15 @@ import {
   type ILinkedPricingTierCardProps,
 } from './linked-pricing-tier-card';
 
+const { useVisitorCurrencyMock } = vi.hoisted(() => ({
+  useVisitorCurrencyMock: vi.fn(),
+}));
+
 vi.mock('@web/i18n/navigation');
+
+vi.mock('@web/hooks/use-visitor-currency', () => ({
+  useVisitorCurrency: useVisitorCurrencyMock,
+}));
 
 vi.mock('@web/utils/report-client-error', () => ({
   reportClientError: vi.fn(),
@@ -35,6 +42,11 @@ vi.mock('@web/utils/report-client-error', () => ({
 const MOCK_FULL_DOLLAR_PRICE = formatMockUnitAmount(
   MOCK_DOLLAR_AMOUNT,
   BILLING_CURRENCY.USD,
+);
+
+const MOCK_FULL_EURO_PRICE = formatMockUnitAmount(
+  MOCK_EURO_AMOUNT,
+  BILLING_CURRENCY.EUR,
 );
 
 const LinkedCardWithPromotion = (props: ILinkedPricingTierCardProps) => (
@@ -56,30 +68,45 @@ const respondWith = (status: number, body?: unknown) =>
   );
 
 describe(`<${LinkedPricingTierCard.name}/>`, () => {
+  beforeEach(() => {
+    useVisitorCurrencyMock.mockReturnValue(BILLING_CURRENCY.USD);
+  });
+
   afterEach(() => {
-    document.cookie = `${CURRENCY_COOKIE_NAME}=; max-age=0`;
     window.history.replaceState(null, '', '/');
     vi.unstubAllGlobals();
   });
 
-  it('shows the default currency price without a currency cookie', () => {
+  it("shows the price in the visitor's currency", () => {
+    useVisitorCurrencyMock.mockReturnValue(BILLING_CURRENCY.EUR);
+
     setup();
 
-    const price = screen.getByText(MOCK_FULL_DOLLAR_PRICE);
+    const price = screen.getByText(MOCK_FULL_EURO_PRICE);
 
     expect(price).toBeVisible();
   });
 
-  it('shows the price in the currency the cookie remembers', () => {
-    document.cookie = `${CURRENCY_COOKIE_NAME}=${BILLING_CURRENCY.EUR}`;
+  it("shows no price until the visitor's currency is known", () => {
+    useVisitorCurrencyMock.mockReturnValue(undefined);
 
     setup();
 
-    const price = screen.getByText(
-      formatMockUnitAmount(MOCK_EURO_AMOUNT, BILLING_CURRENCY.EUR),
-    );
+    const dollarPrice = screen.queryByText(MOCK_FULL_DOLLAR_PRICE);
+    const euroPrice = screen.queryByText(MOCK_FULL_EURO_PRICE);
+    const name = screen.getByText(mockPricingCard().name);
 
-    expect(price).toBeVisible();
+    expect(dollarPrice).not.toBeInTheDocument();
+    expect(euroPrice).not.toBeInTheDocument();
+    expect(name).toBeVisible();
+  });
+
+  it('asks for the currency with the plan default to fall back on', () => {
+    setup();
+
+    expect(useVisitorCurrencyMock).toHaveBeenCalledWith(
+      mockLivePlanPrice().defaultCurrency,
+    );
   });
 
   describe('with a promo code in the address', () => {

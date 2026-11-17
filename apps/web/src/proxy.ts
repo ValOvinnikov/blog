@@ -11,7 +11,6 @@ import { prependTenantSegment } from '@web/server/proxy/prepend-tenant-segment/p
 import { redirectSwitchedOffLocale } from '@web/server/proxy/redirect-switched-off-locale/redirect-switched-off-locale';
 import { redirectToMainAddress } from '@web/server/proxy/redirect-to-main-address/redirect-to-main-address';
 import { redirectToPreferredTranslation } from '@web/server/proxy/redirect-to-preferred-translation/redirect-to-preferred-translation';
-import { rememberVisitorCurrency } from '@web/server/proxy/remember-visitor-currency/remember-visitor-currency';
 import { setRoutingRequestHeaders } from '@web/server/proxy/set-routing-request-headers/set-routing-request-headers';
 import {
   TENANT_ID_HEADER,
@@ -101,11 +100,8 @@ const routeRequest = async (request: NextRequest): Promise<NextResponse> => {
     return translationRedirect;
   }
 
-  const intlResponse = getIntlMiddleware(defaultLocale, liveLocales)(request);
-  rememberVisitorCurrency(request, intlResponse);
-
   return prependTenantSegment(
-    intlResponse,
+    getIntlMiddleware(defaultLocale, liveLocales)(request),
     tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
     request,
     Boolean(previewToken),
