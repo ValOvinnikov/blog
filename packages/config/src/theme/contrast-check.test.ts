@@ -9,6 +9,7 @@ import {
 
 import { findContrastFailures } from './contrast-check';
 import { KNOWN_CONTRAST_FAILURES } from './contrast-known-failures';
+import { ITEM_ACCENT_BRAND_SHARE } from './contrast-surfaces';
 import { measureContrast } from './contrast-tokens';
 
 const MOCK_LIGHT_ACCENT_BAR = {
@@ -25,6 +26,7 @@ const MOCK_TRANSPARENT_FILLS = {
 };
 
 const BRAND_PRIMARY_TOKEN = '--brand-primary';
+const SURFACE = '--surface';
 const TEXT_TOKEN = '--text';
 const HEADER_CONTROL_FILL_TOKEN = '--header-control-fill' as const;
 const SECONDARY_TOKEN = '--secondary';
@@ -45,11 +47,19 @@ describe(measureContrast, () => {
 
   it('resolves the item accent colour from the card style', () => {
     expect(
-      measureContrast('--item-accent-color', '--surface', {
+      measureContrast(ITEM_ACCENT_BRAND_SHARE, SURFACE, {
         ...MOCK_LIGHT_ACCENT_BAR,
         cardStyle: CARD_STYLE.OUTLINED,
       }),
-    ).toBe(measureContrast('--border', '--surface', MOCK_LIGHT_ACCENT_BAR));
+    ).toBe(measureContrast('--border', SURFACE, MOCK_LIGHT_ACCENT_BAR));
+  });
+
+  it('paints the accent edge in the brand colour under the accent bar', () => {
+    expect(
+      measureContrast(ITEM_ACCENT_BRAND_SHARE, SURFACE, MOCK_LIGHT_ACCENT_BAR),
+    ).toBe(
+      measureContrast(BRAND_PRIMARY_TOKEN, SURFACE, MOCK_LIGHT_ACCENT_BAR),
+    );
   });
 
   it('resolves the header control fill from the header control style', () => {

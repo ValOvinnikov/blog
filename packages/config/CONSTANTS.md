@@ -301,6 +301,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SIZE**: `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/skin.ts`
+
+- **SKIN_MODE**: `MATCH`, `INVERSE`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/sort.ts`
 
 - **SORT_DIRECTION**: `ASCENDING`=`"ascending"`, `DESCENDING`=`"descending"`

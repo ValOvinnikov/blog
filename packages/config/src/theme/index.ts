@@ -12,5 +12,6 @@ export * from './nav-link-declarations';
 export * from './palette-ramps';
 export * from './radius-declarations';
 export * from './resolve-tenant-email-brand';
+export * from './skins';
 export * from './theme-declarations';
 export * from './theme-ramps';

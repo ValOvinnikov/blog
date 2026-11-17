@@ -8,14 +8,13 @@ import {
   ERROR_MUTED,
   FIELD_SURFACES,
   FILLED_ITEM_SURFACES,
-  PRIMARY_SUBTLE,
   SCRIM_STOPS_UNDER_COPY,
-  SECONDARY,
   TEXT,
   TEXT_SURFACES,
   TINTED_FIELD_SURFACES,
 } from './contrast-surfaces';
 import { HEADER_CONTRAST_PAIRS } from './header-contrast-pairs';
+import { ITEM_CONTRAST_PAIRS } from './item-contrast-pairs';
 
 export type TThemeToken = `--${string}`;
 
@@ -123,18 +122,7 @@ export const CONTRAST_PAIRS = {
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,
   },
-  ITEM_ACCENT: {
-    foreground: '--item-accent-color',
-    surfaces: [
-      '--primary',
-      PRIMARY_SUBTLE,
-      SECONDARY,
-      '--surface',
-      BRAND_PRIMARY_MUTED,
-    ],
-    role: CONTRAST_ROLE.DECORATIVE,
-    followsAccentHue: true,
-  },
+  ...ITEM_CONTRAST_PAIRS,
   ...HEADER_CONTRAST_PAIRS,
   BRAND_PRIMARY_ON_TINT: {
     foreground: BRAND_PRIMARY,

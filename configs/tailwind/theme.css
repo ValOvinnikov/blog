@@ -25,8 +25,6 @@
  * those components correctly.
  */
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 @theme inline {
   /* Semantic colour utilities: bg-primary, text-text-muted, border-border, ... */
   --color-primary: var(--primary); /* @role page background */
@@ -56,9 +54,9 @@
   --color-header-control-fill: var(--header-control-fill); /* @role header control resting fill */
   --color-text: var(--text); /* @role primary ink */
   --color-text-muted: var(--text-muted); /* @role secondary body text */
-  --color-text-subtle: var(--text-muted); /* @role metadata / low emphasis */
+  --color-text-subtle: var(--text-subtle); /* @role metadata / low emphasis */
   --color-muted: var(--text-muted); /* @role secondary body text (alias) */
-  --color-subtle: var(--text-muted); /* @role metadata (alias) */
+  --color-subtle: var(--text-subtle); /* @role metadata (alias) */
   --color-brand-primary: var(--brand-primary); /* @role links / interactive */
   --color-brand-primary-hover: var(
     --brand-primary-hover
@@ -300,9 +298,10 @@
   /* 3:1 (WCAG 1.4.11) against --surface and against --secondary or
      --brand-primary-muted at every accent hue, where --border-emphasis falls short. */
   --field-boundary-tinted: oklch(0.58 0.006 250);
-  --field-boundary: var(--border-emphasis);
+  --field-boundary: oklch(0.62 0.006 250);
   --text: oklch(0.2 0.01 250);
   --text-muted: oklch(0.46 0.01 250);
+  --text-subtle: var(--text-muted);
   --brand-primary: oklch(0.45 0.17 250);
   --brand-primary-hover: oklch(0.39 0.17 250);
   --brand-primary-muted: oklch(0.95 0.03 250);
@@ -352,11 +351,14 @@
   --scrim-neutral-strong: oklch(0.18 0.01 250 / 0.9);
   --scrim-neutral-mid: oklch(0.26 0.015 250 / 0.68);
   --scrim-neutral-weak: oklch(0.32 0.02 250 / 0.4);
+  --scrim-strong: var(--scrim-neutral-strong);
+  --scrim-mid: var(--scrim-neutral-mid);
+  --scrim-weak: var(--scrim-neutral-weak);
 
   --item-radius: var(--radius-md);
   --item-border-width: 0px;
   --item-accent-width: 2px;
-  --item-accent-color: var(--brand-primary);
+  --item-accent-brand-share: 100%;
   --item-shadow: none;
   --item-fill-mix: 0%;
   --item-clear-mix: 0%;
@@ -390,9 +392,10 @@
     0.55 0.01 250
   ); /* see :root comment — verified dark ratio 3.73:1 vs --primary-subtle */
   --field-boundary-tinted: oklch(0.59 0.01 250);
-  --field-boundary: var(--border-emphasis);
+  --field-boundary: oklch(0.58 0.006 250);
   --text: oklch(0.95 0.004 250);
   --text-muted: oklch(0.72 0.008 250);
+  --text-subtle: var(--text-muted);
   --brand-primary: oklch(0.7 0.16 250);
   --brand-primary-hover: oklch(0.76 0.16 250);
   --brand-primary-muted: oklch(0.3 0.06 250);
@@ -686,7 +689,12 @@
     top: var(--radius-item);
     bottom: var(--radius-item);
     left: calc(-1 * var(--item-border-width));
-    border-left: var(--item-accent-width) solid var(--item-accent-color);
+    border-left: var(--item-accent-width) solid
+      color-mix(
+        in oklch,
+        var(--brand-primary) var(--item-accent-brand-share),
+        var(--border)
+      );
     pointer-events: none;
   }
 }

@@ -82,7 +82,7 @@ describe(`<${LookPreview.name}/>`, () => {
       values: { cardStyle: CARD_STYLE.OUTLINED },
       tokens: {
         '--item-border-width': '1px',
-        '--item-accent-color': 'var(--border)',
+        '--item-accent-brand-share': '0%',
       },
     },
   ])('carries $name onto the preview surface', ({ values, tokens }) => {
