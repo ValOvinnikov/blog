@@ -1699,6 +1699,8 @@
     "suspendFailed": "Kon de tenant niet opschorten — probeer het opnieuw.",
     "liftSuspensionFailed": "Kon de tenant niet opnieuw activeren — probeer het opnieuw.",
     "ownerEmailUnknown": "De eigenaar van deze tenant heeft nog geen e-mailadres vastgelegd, dus het kan niet worden geblokkeerd.",
+    "subscriptionCancelFailed": "Het Stripe-abonnement van de site kon niet worden opgezegd, dus de site is niet gearchiveerd. Probeer het opnieuw of zeg het eerst op in Stripe.",
+    "subscriptionLive": "Stripe factureert deze site nog. Zeg het abonnement op voordat je de site verwijdert.",
     "invalidInput": "Controleer de gegevens en probeer het opnieuw."
   },
   "featuresSettings": {

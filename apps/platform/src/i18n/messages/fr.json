@@ -1699,6 +1699,8 @@
     "suspendFailed": "Impossible de suspendre le locataire — réessayez.",
     "liftSuspensionFailed": "Impossible de réactiver le locataire — réessayez.",
     "ownerEmailUnknown": "Le propriétaire de ce locataire n’a pas encore d’adresse e-mail enregistrée : elle ne peut donc pas être bloquée.",
+    "subscriptionCancelFailed": "L'abonnement Stripe du site n'a pas pu être résilié, il n'a donc pas été archivé. Réessayez, ou résiliez-le d'abord dans Stripe.",
+    "subscriptionLive": "Stripe facture encore ce site. Résiliez son abonnement avant de le supprimer.",
     "invalidInput": "Vérifiez les informations et réessayez."
   },
   "featuresSettings": {

@@ -1699,6 +1699,8 @@
     "suspendFailed": "Couldn't suspend the tenant — try again.",
     "liftSuspensionFailed": "Couldn't reactivate the tenant — try again.",
     "ownerEmailUnknown": "This tenant's owner has no email address on record yet, so it can't be blocked.",
+    "subscriptionCancelFailed": "The site's Stripe subscription couldn't be cancelled, so it wasn't archived. Try again, or cancel it in Stripe first.",
+    "subscriptionLive": "Stripe still bills this site. Cancel its subscription before deleting it.",
     "invalidInput": "Check the details and try again."
   },
   "featuresSettings": {

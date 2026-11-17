@@ -5896,6 +5896,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "STRIPE_PAUSE_BEHAVIOR.VOID",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscription-lifecycle",
+        "file": "apps/platform/src/constants/subscription-lifecycle.ts"
       }
     ],
     "invoice_upcoming_none": [
@@ -8742,6 +8748,30 @@
         "file": "apps/platform/src/constants/stripe-key-mode.ts"
       }
     ],
+    "billing.subscription_collection_failed": [
+      {
+        "ref": "SUBSCRIPTION_LIFECYCLE_LOG.COLLECTION_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscription-lifecycle",
+        "file": "apps/platform/src/constants/subscription-lifecycle.ts"
+      }
+    ],
+    "billing.subscription_cancel_failed": [
+      {
+        "ref": "SUBSCRIPTION_LIFECYCLE_LOG.CANCEL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscription-lifecycle",
+        "file": "apps/platform/src/constants/subscription-lifecycle.ts"
+      }
+    ],
+    "billing.live_subscription_check_failed": [
+      {
+        "ref": "SUBSCRIPTION_LIFECYCLE_LOG.LIVE_CHECK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscription-lifecycle",
+        "file": "apps/platform/src/constants/subscription-lifecycle.ts"
+      }
+    ],
     "CONFIRM_REQUIRED": [
       {
         "ref": "TENANT_FIELD_ERROR.CONFIRM_REQUIRED",
@@ -8925,6 +8955,22 @@
     "STUDIO_NOT_PROVISIONED": [
       {
         "ref": "TENANT_REFUSAL.STUDIO_NOT_PROVISIONED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "SUBSCRIPTION_CANCEL_FAILED": [
+      {
+        "ref": "TENANT_REFUSAL.SUBSCRIPTION_CANCEL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "SUBSCRIPTION_LIVE": [
+      {
+        "ref": "TENANT_REFUSAL.SUBSCRIPTION_LIVE",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"
