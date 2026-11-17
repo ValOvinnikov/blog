@@ -298,6 +298,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/analytics-provider.ts"
+      },
+      {
+        "ref": "COOKIE_ID.GOOGLE_ANALYTICS",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
     "PLAUSIBLE": [
@@ -854,6 +860,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
+      },
+      {
+        "ref": "CONSENT_CATEGORY.ANALYTICS",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/consent-category.ts"
       }
     ],
     "CONSENT_BANNER": [
@@ -2192,6 +2204,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "COOKIE_PROVIDER.GOOGLE",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
     "BOOKMARK": [
@@ -9912,6 +9930,14 @@
         "file": "apps/web/src/constants/contact-form.ts"
       }
     ],
+    "FIRST_PARTY": [
+      {
+        "ref": "COOKIE_PROVIDER.FIRST_PARTY",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
     "CONSENT": [
       {
         "ref": "COOKIE_ID.CONSENT",
@@ -9995,6 +10021,14 @@
     "THEME": [
       {
         "ref": "COOKIE_ID.THEME",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "GOOGLE_ANALYTICS_VISIT": [
+      {
+        "ref": "COOKIE_ID.GOOGLE_ANALYTICS_VISIT",
         "scope": "app:web",
         "from": "@web/constants/cookie-list",
         "file": "apps/web/src/constants/cookie-list.ts"
@@ -11411,6 +11445,14 @@
     "site_config.plan_fetch_failed": [
       {
         "ref": "SITE_CONFIG_LOG.PLAN_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-config",
+        "file": "apps/web/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.analytics_fetch_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.ANALYTICS_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/site-config",
         "file": "apps/web/src/constants/site-config.ts"

@@ -11,6 +11,8 @@ export const CONSENT_VOICE_FIXED_KEYS = [
   'consent.preferences.savedStatus',
   'consent.categories.necessary.label',
   'consent.categories.necessary.description',
+  'consent.categories.analytics.label',
+  'consent.categories.analytics.description',
   'consent.categories.externalMedia.label',
   'consent.categories.externalMedia.description',
   'consent.placeholder.allowLabel',

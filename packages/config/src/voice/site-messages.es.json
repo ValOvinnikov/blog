@@ -342,7 +342,7 @@
   "consent": {
     "banner": {
       "heading": "Cookies en este sitio",
-      "message": "Solo usamos las cookies necesarias para que este sitio funcione, a menos que permitas los medios externos. Puedes cambiar tu elección en cualquier momento desde Configuración de cookies en el pie de página.",
+      "message": "Solo usamos las cookies necesarias para que este sitio funcione, a menos que permitas la analítica o los medios externos. Puedes cambiar tu elección en cualquier momento desde Configuración de cookies en el pie de página.",
       "acceptLabel": "Aceptar todo",
       "rejectLabel": "Rechazar todo",
       "settingsLabel": "Configuración",
@@ -359,6 +359,10 @@
         "label": "Necesarias",
         "description": "Necesarias para que el sitio funcione. Siempre activas."
       },
+      "analytics": {
+        "label": "Analítica",
+        "description": "Mide las visitas a este sitio con herramientas que establecen sus propias cookies, como Google Analytics."
+      },
       "externalMedia": {
         "label": "Medios externos",
         "description": "Contenido de proveedores externos, como vídeos y mapas, que pueden establecer sus propias cookies."
@@ -373,6 +377,7 @@
   "cookieList": {
     "ariaLabel": "Cookies y almacenamiento del navegador",
     "intro": "Todo lo que aparece a continuación lo establece este sitio y es estrictamente necesario.",
+    "introWithGoogleAnalytics": "Todo lo que aparece a continuación lo establece este sitio. Las cookies de Google Analytics solo se establecen si permites la analítica; todo lo demás es estrictamente necesario.",
     "columns": {
       "name": "Nombre",
       "purpose": "Finalidad",
@@ -426,6 +431,14 @@
       "THEME": {
         "purpose": "Recuerda si elegiste el tema claro u oscuro. Se guarda en el almacenamiento local de tu navegador.",
         "duration": "Hasta que borres los datos de tu navegador"
+      },
+      "GOOGLE_ANALYTICS": {
+        "purpose": "Distingue las visitas de distintos navegadores para que Google Analytics pueda contar visitantes.",
+        "duration": "2 años"
+      },
+      "GOOGLE_ANALYTICS_VISIT": {
+        "purpose": "Sigue tu visita actual para Google Analytics.",
+        "duration": "2 años"
       }
     },
     "analyticsNote": "Cuando este sitio mide las visitas y la velocidad de las páginas, usa Vercel Web Analytics y Speed Insights. No instalan cookies y se cargan sea cual sea tu elección sobre cookies."

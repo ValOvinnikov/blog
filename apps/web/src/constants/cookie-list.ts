@@ -10,8 +10,9 @@ import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscri
 import { NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME } from '@web/utils/newsletter-unsubscribe-token-cookie-name';
 import { SIGNED_IN_HINT_COOKIE_NAME } from '@web/utils/signed-in-hint-cookie';
 
-const COOKIE_PROVIDER = {
+export const COOKIE_PROVIDER = {
   FIRST_PARTY: 'FIRST_PARTY',
+  GOOGLE: 'GOOGLE',
 } as const;
 
 type TCookieProvider = TValueOf<typeof COOKIE_PROVIDER>;
@@ -29,6 +30,8 @@ export const COOKIE_ID = {
   NEWSLETTER_UNSUBSCRIBE_TOKEN: 'NEWSLETTER_UNSUBSCRIBE_TOKEN',
   READING_DEPTH: 'READING_DEPTH',
   THEME: 'THEME',
+  GOOGLE_ANALYTICS: 'GOOGLE_ANALYTICS',
+  GOOGLE_ANALYTICS_VISIT: 'GOOGLE_ANALYTICS_VISIT',
 } as const;
 
 type TCookieId = TValueOf<typeof COOKIE_ID>;
@@ -52,7 +55,7 @@ const necessaryFirstPartyEntry = (
   category: CONSENT_CATEGORY.NECESSARY,
 });
 
-/** Every cookie and browser-storage key the public site sets, under its production name; each id needs a purpose and duration under `cookieList.cookies` in the site catalog. */
+/** Every cookie and browser-storage key the public site sets whatever its analytics tool, under its production name; each id needs a purpose and duration under `cookieList.cookies` in the site catalog. */
 export const COOKIE_LIST: readonly ICookieListEntry[] = [
   necessaryFirstPartyEntry(COOKIE_ID.CONSENT, CONSENT_COOKIE_NAME),
   necessaryFirstPartyEntry(COOKIE_ID.LANGUAGE, LANGUAGE_COOKIE_NAME),

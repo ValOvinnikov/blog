@@ -342,7 +342,7 @@
   "consent": {
     "banner": {
       "heading": "Cookies op deze site",
-      "message": "We gebruiken alleen cookies die nodig zijn om deze site te laten werken, tenzij je externe media toestaat. Je kunt je keuze op elk moment wijzigen via Cookie-instellingen in de footer.",
+      "message": "We gebruiken alleen cookies die nodig zijn om deze site te laten werken, tenzij je analyse of externe media toestaat. Je kunt je keuze op elk moment wijzigen via Cookie-instellingen in de footer.",
       "acceptLabel": "Alles accepteren",
       "rejectLabel": "Alles weigeren",
       "settingsLabel": "Instellingen",
@@ -359,6 +359,10 @@
         "label": "Noodzakelijk",
         "description": "Nodig om de site te laten werken. Altijd ingeschakeld."
       },
+      "analytics": {
+        "label": "Analyse",
+        "description": "Meet bezoeken aan deze site met tools die hun eigen cookies plaatsen, zoals Google Analytics."
+      },
       "externalMedia": {
         "label": "Externe media",
         "description": "Inhoud van externe aanbieders, zoals video's en kaarten, die mogelijk hun eigen cookies plaatsen."
@@ -373,6 +377,7 @@
   "cookieList": {
     "ariaLabel": "Cookies en browseropslag",
     "intro": "Alles hieronder wordt door deze site zelf geplaatst en is strikt noodzakelijk.",
+    "introWithGoogleAnalytics": "Alles hieronder wordt door deze site geplaatst. De Google Analytics-cookies worden alleen geplaatst als je analyse toestaat; al het andere is strikt noodzakelijk.",
     "columns": {
       "name": "Naam",
       "purpose": "Doel",
@@ -426,6 +431,14 @@
       "THEME": {
         "purpose": "Onthoudt of je het lichte of donkere thema hebt gekozen. Opgeslagen in de lokale opslag van je browser.",
         "duration": "Tot je je browsergegevens wist"
+      },
+      "GOOGLE_ANALYTICS": {
+        "purpose": "Onderscheidt bezoeken uit verschillende browsers, zodat Google Analytics bezoekers kan tellen.",
+        "duration": "2 jaar"
+      },
+      "GOOGLE_ANALYTICS_VISIT": {
+        "purpose": "Houdt je huidige bezoek bij voor Google Analytics.",
+        "duration": "2 jaar"
       }
     },
     "analyticsNote": "Als deze site bezoeken en paginasnelheid meet, gebruikt ze Vercel Web Analytics en Speed Insights. Die plaatsen geen cookies en laden ongeacht je cookiekeuze."

@@ -66,20 +66,24 @@ describe(`<${ConsentBannerSlot.name}/>`, () => {
       expect(heading).toBeVisible();
     });
 
-    it('links the cookie statement', () => {
-      const link = screen.getByRole('link', { name: COOKIE_STATEMENT_LINK });
+    describe('the cookie statement link', () => {
+      let link: HTMLElement;
 
-      expect(link).toHaveAttribute('href', routes.cookieStatement());
-    });
+      beforeEach(() => {
+        link = screen.getByRole('link', { name: COOKIE_STATEMENT_LINK });
+      });
 
-    it('leaves the choice unanswered when the cookie statement is followed', async () => {
-      const link = screen.getByRole('link', { name: COOKIE_STATEMENT_LINK });
+      it('goes to the cookie statement', () => {
+        expect(link).toHaveAttribute('href', routes.cookieStatement());
+      });
 
-      await user.click(link);
+      it('leaves the choice unanswered when followed', async () => {
+        await user.click(link);
 
-      const heading = screen.getByRole('heading', { name: BANNER_HEADING });
-      expect(heading).toBeVisible();
-      expect(readGrantedConsent()).toBeUndefined();
+        const heading = screen.getByRole('heading', { name: BANNER_HEADING });
+        expect(heading).toBeVisible();
+        expect(readGrantedConsent()).toBeUndefined();
+      });
     });
 
     it('hides and remembers the choice on accept all', async () => {
@@ -89,7 +93,10 @@ describe(`<${ConsentBannerSlot.name}/>`, () => {
 
       const heading = screen.queryByRole('heading', { name: BANNER_HEADING });
       expect(heading).not.toBeInTheDocument();
-      expect(readGrantedConsent()).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
+      expect(readGrantedConsent()).toEqual([
+        CONSENT_CATEGORY.ANALYTICS,
+        CONSENT_CATEGORY.EXTERNAL_MEDIA,
+      ]);
     });
 
     it('hides and remembers the choice on reject all', async () => {

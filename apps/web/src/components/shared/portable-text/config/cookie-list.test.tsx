@@ -3,7 +3,13 @@ import {
   SITE_MESSAGES,
   SITE_MESSAGES_BY_LOCALE,
 } from '@shinefold/config';
+import type { TTenantAnalytics } from '@shinefold/db/queries/tenant-analytics/save-tenant-analytics';
+import {
+  MOCK_GOOGLE_ANALYTICS,
+  MOCK_PLAUSIBLE_ANALYTICS,
+} from '@shinefold/db/testing/tenant-analytics/fixtures';
 import { COOKIE_ID, COOKIE_LIST } from '@web/constants/cookie-list';
+import { SiteAnalyticsProvider } from '@web/context/site-analytics-provider';
 import { renderElement, screen, within } from '@web/testing/custom-render';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
 import { NextIntlClientProvider } from 'next-intl';
@@ -11,7 +17,18 @@ import { NextIntlClientProvider } from 'next-intl';
 import { CookieList } from './cookie-list';
 
 const NL_MESSAGES = SITE_MESSAGES_BY_LOCALE.NL;
-const { ariaLabel, cookies, intro, analyticsNote } = SITE_MESSAGES.cookieList;
+const { ariaLabel, cookies, intro, introWithGoogleAnalytics, analyticsNote } =
+  SITE_MESSAGES.cookieList;
+
+const GOOGLE_ANALYTICS_COOKIE = '_ga';
+const MOCK_GOOGLE_ANALYTICS_VISIT_COOKIE = `${GOOGLE_ANALYTICS_COOKIE}_${MOCK_GOOGLE_ANALYTICS.analyticsId.replace(/^G-/, '')}`;
+
+const renderWithAnalytics = (analytics: TTenantAnalytics) =>
+  renderElement(
+    <SiteAnalyticsProvider value={analytics}>
+      <CookieList />
+    </SiteAnalyticsProvider>,
+  );
 
 const getCookieRow = (name: string) =>
   screen.getByRole('row', {
@@ -23,37 +40,48 @@ const getStackedEntries = () =>
     'listitem',
   );
 
+const expectRowWith = (name: string, purpose: string, duration: string) => {
+  const row = within(getCookieRow(name));
+  const purposeCell = row.getByText(purpose);
+  const durationCell = row.getByText(duration);
+  expect(purposeCell).toBeVisible();
+  expect(durationCell).toBeVisible();
+};
+
 describe(`<${CookieList.name}/>`, () => {
-  it.each(COOKIE_LIST)(
-    'lists $name in the table with its purpose and duration',
-    ({ id, name }) => {
+  describe('without an analytics tool', () => {
+    beforeEach(() => {
       renderElement(<CookieList />);
+    });
 
-      const row = within(getCookieRow(name));
-      const { purpose, duration } = cookies[id];
-      expect(row.getByText(purpose)).toBeVisible();
-      expect(row.getByText(duration)).toBeVisible();
-    },
-  );
+    it.each(COOKIE_LIST)(
+      'lists $name in the table with its purpose and duration',
+      ({ id, name }) => {
+        const { purpose, duration } = cookies[id];
+        expectRowWith(name, purpose, duration);
+      },
+    );
 
-  it.each(COOKIE_LIST.map((entry, index) => ({ ...entry, index })))(
-    'stacks $name with its purpose and duration',
-    ({ id, name, index }) => {
-      renderElement(<CookieList />);
+    it.each(COOKIE_LIST.map((entry, index) => ({ ...entry, index })))(
+      'stacks $name with its purpose and duration',
+      ({ id, name, index }) => {
+        const entry = getStackedEntries()[index];
+        const { purpose, duration } = cookies[id];
+        expect(entry).toHaveTextContent(name);
+        expect(entry).toHaveTextContent(purpose);
+        expect(entry).toHaveTextContent(duration);
+      },
+    );
 
-      const entry = getStackedEntries()[index];
-      const { purpose, duration } = cookies[id];
-      expect(entry).toHaveTextContent(name);
-      expect(entry).toHaveTextContent(purpose);
-      expect(entry).toHaveTextContent(duration);
-    },
-  );
+    it('says every item is set by this site and strictly necessary', () => {
+      const sentence = screen.getByText(intro);
+      expect(sentence).toBeVisible();
+    });
 
-  it('says every item is set by this site and strictly necessary', () => {
-    renderElement(<CookieList />);
-
-    const sentence = screen.getByText(intro);
-    expect(sentence).toBeVisible();
+    it('shows the analytics note below the list', () => {
+      const note = screen.getByText(analyticsNote);
+      expect(note).toBeVisible();
+    });
   });
 
   it('renders the list in the page language', () => {
@@ -66,22 +94,50 @@ describe(`<${CookieList.name}/>`, () => {
       </NextIntlClientProvider>,
     );
 
-    const table = screen.getByRole('region', {
-      name: NL_MESSAGES.cookieList.ariaLabel,
-    });
-    const sentence = screen.getByText(NL_MESSAGES.cookieList.intro);
+    const {
+      ariaLabel: nlAriaLabel,
+      intro: nlIntro,
+      cookies: nlCookies,
+    } = NL_MESSAGES.cookieList;
+    const table = screen.getByRole('region', { name: nlAriaLabel });
+    const sentence = screen.getByText(nlIntro);
     const row = within(getCookieRow(LANGUAGE_COOKIE_NAME));
+    const purpose = row.getByText(nlCookies[COOKIE_ID.LANGUAGE].purpose);
     expect(table).toBeVisible();
     expect(sentence).toBeVisible();
-    expect(
-      row.getByText(NL_MESSAGES.cookieList.cookies[COOKIE_ID.LANGUAGE].purpose),
-    ).toBeVisible();
+    expect(purpose).toBeVisible();
   });
 
-  it('shows the analytics note below the list', () => {
-    renderElement(<CookieList />);
+  describe('with Google Analytics configured', () => {
+    beforeEach(() => {
+      renderWithAnalytics(MOCK_GOOGLE_ANALYTICS);
+    });
 
-    const note = screen.getByText(analyticsNote);
-    expect(note).toBeVisible();
+    it.each([
+      { name: GOOGLE_ANALYTICS_COOKIE, id: COOKIE_ID.GOOGLE_ANALYTICS },
+      {
+        name: MOCK_GOOGLE_ANALYTICS_VISIT_COOKIE,
+        id: COOKIE_ID.GOOGLE_ANALYTICS_VISIT,
+      },
+    ])('lists $name with its purpose and duration', ({ name, id }) => {
+      const { purpose, duration } = cookies[id];
+      expectRowWith(name, purpose, duration);
+    });
+
+    it('says the Google Analytics cookies need the visitor to allow analytics', () => {
+      const sentence = screen.getByText(introWithGoogleAnalytics);
+      const necessaryOnlySentence = screen.queryByText(intro);
+      expect(sentence).toBeVisible();
+      expect(necessaryOnlySentence).not.toBeInTheDocument();
+    });
+  });
+
+  it('lists no Google cookie for a site on Plausible', () => {
+    renderWithAnalytics(MOCK_PLAUSIBLE_ANALYTICS);
+
+    const entries = getStackedEntries();
+    const sentence = screen.getByText(intro);
+    expect(entries).toHaveLength(COOKIE_LIST.length);
+    expect(sentence).toBeVisible();
   });
 });

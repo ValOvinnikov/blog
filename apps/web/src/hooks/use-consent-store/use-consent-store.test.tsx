@@ -35,23 +35,50 @@ describe(useConsentStore, () => {
     expect(result.current.granted).toEqual([]);
   });
 
-  it('reads a stored answer', () => {
-    document.cookie = MOCK_ANSWERED_CONSENT_COOKIE;
+  describe('with a stored answer', () => {
+    let result: ReturnType<
+      typeof renderHook<ReturnType<typeof useConsentStore>, unknown>
+    >['result'];
+    let rerender: () => void;
 
-    const { result } = renderHook(() => useConsentStore());
+    beforeEach(() => {
+      document.cookie = MOCK_ANSWERED_CONSENT_COOKIE;
+      ({ result, rerender } = renderHook(() => useConsentStore()));
+    });
 
-    expect(result.current.status).toBe(CONSENT_STATUS.ANSWERED);
-    expect(result.current.granted).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
-  });
+    it('reads it', () => {
+      expect(result.current.status).toBe(CONSENT_STATUS.ANSWERED);
+      expect(result.current.granted).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
+    });
 
-  it('returns the same answer between renders while the cookie is unchanged', () => {
-    document.cookie = MOCK_ANSWERED_CONSENT_COOKIE;
-    const { result, rerender } = renderHook(() => useConsentStore());
-    const { granted } = result.current;
+    it('returns the same answer between renders while the cookie is unchanged', () => {
+      const { granted } = result.current;
 
-    rerender();
+      rerender();
 
-    expect(result.current.granted).toBe(granted);
+      expect(result.current.granted).toBe(granted);
+    });
+
+    it('grants nothing on reject all but still counts as answered', () => {
+      act(() => result.current.rejectAll());
+
+      expect(result.current.status).toBe(CONSENT_STATUS.ANSWERED);
+      expect(result.current.granted).toEqual([]);
+    });
+
+    it('advances the save revision even when a save repeats the answer', () => {
+      const { saveRevision } = result.current;
+
+      let returnedRevision = saveRevision;
+      act(() => {
+        returnedRevision = result.current.save([
+          CONSENT_CATEGORY.EXTERNAL_MEDIA,
+        ]);
+      });
+
+      expect(result.current.saveRevision).not.toBe(saveRevision);
+      expect(result.current.saveRevision).toBe(returnedRevision);
+    });
   });
 
   describe('with no stored answer', () => {
@@ -67,7 +94,10 @@ describe(useConsentStore, () => {
       act(() => result.current.acceptAll());
 
       expect(result.current.status).toBe(CONSENT_STATUS.ANSWERED);
-      expect(result.current.granted).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
+      expect(result.current.granted).toEqual([
+        CONSENT_CATEGORY.ANALYTICS,
+        CONSENT_CATEGORY.EXTERNAL_MEDIA,
+      ]);
     });
 
     it('persists exactly the categories passed to save', () => {
@@ -76,30 +106,6 @@ describe(useConsentStore, () => {
       expect(result.current.granted).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
       expect(document.cookie).toContain(MOCK_ANSWERED_CONSENT_PAIR);
     });
-  });
-
-  it('grants nothing on reject all but still counts as answered', () => {
-    document.cookie = MOCK_ANSWERED_CONSENT_COOKIE;
-    const { result } = renderHook(() => useConsentStore());
-
-    act(() => result.current.rejectAll());
-
-    expect(result.current.status).toBe(CONSENT_STATUS.ANSWERED);
-    expect(result.current.granted).toEqual([]);
-  });
-
-  it('reports a new save revision for every save, even one that repeats the stored answer', () => {
-    document.cookie = MOCK_ANSWERED_CONSENT_COOKIE;
-    const { result } = renderHook(() => useConsentStore());
-    const { saveRevision } = result.current;
-
-    let returnedRevision = saveRevision;
-    act(() => {
-      returnedRevision = result.current.save([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
-    });
-
-    expect(result.current.saveRevision).not.toBe(saveRevision);
-    expect(result.current.saveRevision).toBe(returnedRevision);
   });
 
   it('updates every mounted tree when consent is written', () => {

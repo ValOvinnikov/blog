@@ -43,6 +43,11 @@ export const useConsentPreferencesForm = () => {
       isLocked: true,
     },
     {
+      id: CONSENT_CATEGORY.ANALYTICS,
+      label: t('categories.analytics.label'),
+      description: t('categories.analytics.description'),
+    },
+    {
       id: CONSENT_CATEGORY.EXTERNAL_MEDIA,
       label: t('categories.externalMedia.label'),
       description: t('categories.externalMedia.description'),
