@@ -11,6 +11,7 @@ import { TenantSuspensionControl } from '@platform/components/features/tenants/t
 import { DetailCardSkeleton } from '@platform/components/shared/detail-card-skeleton';
 import { DOMAIN_CARD_ROW_COUNT } from '@platform/constants/domain';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
+import { hasStoredSubscription } from '@platform/server/billing/upgrade-state-for';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { loadOperatorSuspension } from '@platform/server/tenants/load-operator-suspension';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
@@ -76,10 +77,13 @@ export const TenantOverviewView = async ({
         <TenantProvisioningSection
           tenant={clientTenant}
           owner={owner}
-          isPrimaryCustom={isCustomDomain(
-            primaryDomain,
-            env.TENANT_ROOT_DOMAIN,
-          )}
+          lockFlags={{
+            isPrimaryCustom: isCustomDomain(
+              primaryDomain,
+              env.TENANT_ROOT_DOMAIN,
+            ),
+            isSubscribed: hasStoredSubscription(tenant),
+          }}
           isStudioReinviteUnsent={
             !isNull(unsentReinviteFormerOwnerEmailEncrypted)
           }
