@@ -8332,6 +8332,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/sign-in-apps",
         "file": "apps/platform/src/constants/sign-in-apps.ts"
+      },
+      {
+        "ref": "SUPPORT_FIELD_ERROR.REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "NO_SAVED_APP": [
@@ -8770,6 +8776,38 @@
         "scope": "app:platform",
         "from": "@platform/constants/stripe-schedule",
         "file": "apps/platform/src/constants/stripe-schedule.ts"
+      }
+    ],
+    "TOO_LONG": [
+      {
+        "ref": "SUPPORT_FIELD_ERROR.TOO_LONG",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
+      }
+    ],
+    "support.address_missing": [
+      {
+        "ref": "SUPPORT_LOG.ADDRESS_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
+      }
+    ],
+    "support.send_failed": [
+      {
+        "ref": "SUPPORT_LOG.SEND_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
+      }
+    ],
+    "support.copy_failed": [
+      {
+        "ref": "SUPPORT_LOG.COPY_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "CONFIRM_REQUIRED": [
@@ -11702,6 +11740,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/dns",
         "file": "apps/platform/src/constants/dns.ts"
+      },
+      {
+        "ref": "SUPPORT_LIMIT.MESSAGES_PER_WINDOW",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "6": [
@@ -11802,6 +11846,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/device-frame",
         "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "150": [
+      {
+        "ref": "SUPPORT_LIMIT.SUBJECT_MAX_LENGTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "200": [
@@ -11968,6 +12020,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
+      },
+      {
+        "ref": "SUPPORT_LIMIT.ORIGIN_PATH_MAX_LENGTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "502": [
@@ -12016,6 +12074,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "5000": [
+      {
+        "ref": "SUPPORT_LIMIT.MESSAGE_MAX_LENGTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "10000": [

@@ -28,7 +28,8 @@
     "signUpTitle": "Account aanmaken",
     "onboarding": "Je site maken",
     "billing": "Facturering · Admin",
-    "upgrade": "Upgraden"
+    "upgrade": "Upgraden",
+    "help": "Help"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -245,7 +246,9 @@
     "blockedSignups": "Geblokkeerde aanmeldingen",
     "dataRequests": "Gegevensverzoeken",
     "badgeUnreadLeads": "{count} nieuw",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Ondersteuning",
+    "help": "Help"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -2316,5 +2319,27 @@
     "NOT_ACTIVE": "Je abonnement vraagt eerst je aandacht voordat het kan wijzigen. Open Facturering om het op te lossen.",
     "UNCHANGED": "Je site zit al op dit abonnement.",
     "CARD_DECLINED": "Je kaart is geweigerd, dus er is niets gewijzigd. Werk hem bij in Facturering en probeer het opnieuw."
+  },
+  "helpView": {
+    "title": "Help",
+    "description": "Stuur een bericht naar ons supportteam. We sturen je site, je abonnement en dit account automatisch mee.",
+    "helpCentre": "Helpcentrum",
+    "unavailableTitle": "Het helpformulier is niet beschikbaar",
+    "unavailableDescription": "Berichten kunnen hier nu niet worden verstuurd. Probeer het later opnieuw."
+  },
+  "helpForm": {
+    "title": "Contact met support",
+    "responseTime": "We antwoorden meestal binnen twee werkdagen.",
+    "subjectLabel": "Onderwerp",
+    "messageLabel": "Bericht",
+    "messageHint": "Vertel wat je probeerde te doen en wat er in plaats daarvan gebeurde.",
+    "required": "Vul dit in.",
+    "tooLong": "Gebruik minder dan {limit} tekens.",
+    "send": "Bericht versturen",
+    "sending": "Versturen…",
+    "sent": "Bericht verstuurd. We hebben je een kopie gemaild.",
+    "rateLimited": "Je hebt in korte tijd meerdere berichten verstuurd. Probeer het later opnieuw.",
+    "unavailable": "Het helpformulier is nu niet beschikbaar. Probeer het later opnieuw.",
+    "sendFailed": "Je bericht kon niet worden verstuurd — probeer het opnieuw."
   }
 }

@@ -28,7 +28,8 @@
     "signUpTitle": "Crear una cuenta",
     "onboarding": "Crear tu sitio",
     "billing": "Facturación · Administración",
-    "upgrade": "Mejorar plan"
+    "upgrade": "Mejorar plan",
+    "help": "Ayuda"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -245,7 +246,9 @@
     "blockedSignups": "Registros bloqueados",
     "dataRequests": "Solicitudes de datos",
     "badgeUnreadLeads": "{count, plural, one {# nuevo} other {# nuevos}}",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Soporte",
+    "help": "Ayuda"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -2316,5 +2319,27 @@
     "NOT_ACTIVE": "Tu suscripción necesita atención antes de poder cambiar de plan. Abre Facturación para resolverlo.",
     "UNCHANGED": "Tu sitio ya está en este plan.",
     "CARD_DECLINED": "Tu tarjeta ha sido rechazada, así que no ha cambiado nada. Actualízala en Facturación e inténtalo de nuevo."
+  },
+  "helpView": {
+    "title": "Ayuda",
+    "description": "Envía un mensaje a nuestro equipo de soporte. Incluimos tu sitio, tu plan y esta cuenta, para que no tengas que hacerlo tú.",
+    "helpCentre": "Centro de ayuda",
+    "unavailableTitle": "El formulario de ayuda no está disponible",
+    "unavailableDescription": "Ahora mismo no se pueden enviar mensajes desde aquí. Vuelve a intentarlo más tarde."
+  },
+  "helpForm": {
+    "title": "Contactar con soporte",
+    "responseTime": "Solemos responder en un plazo de dos días laborables.",
+    "subjectLabel": "Asunto",
+    "messageLabel": "Mensaje",
+    "messageHint": "Cuenta qué intentabas hacer y qué pasó en su lugar.",
+    "required": "Rellena este campo.",
+    "tooLong": "Usa menos de {limit} caracteres.",
+    "send": "Enviar mensaje",
+    "sending": "Enviando…",
+    "sent": "Mensaje enviado. Te hemos enviado una copia por correo.",
+    "rateLimited": "Has enviado varios mensajes en poco tiempo. Vuelve a intentarlo más tarde.",
+    "unavailable": "El formulario de ayuda no está disponible ahora mismo. Vuelve a intentarlo más tarde.",
+    "sendFailed": "No se pudo enviar tu mensaje. Inténtalo de nuevo."
   }
 }

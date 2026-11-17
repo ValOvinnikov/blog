@@ -28,7 +28,8 @@
     "signUpTitle": "Create an account",
     "onboarding": "Create your site",
     "billing": "Billing · Admin",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "help": "Help"
   },
   "signInPage": {
     "heading": "Sign in",
@@ -245,7 +246,9 @@
     "blockedSignups": "Blocked sign-ups",
     "dataRequests": "Data requests",
     "badgeUnreadLeads": "{count} new",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Support",
+    "help": "Help"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -2316,5 +2319,27 @@
     "NOT_ACTIVE": "Your subscription needs attention before its plan can change. Open Billing to settle it.",
     "UNCHANGED": "Your site is already on this plan.",
     "CARD_DECLINED": "Your card was declined, so nothing changed. Update it in Billing and try again."
+  },
+  "helpView": {
+    "title": "Help",
+    "description": "Send a message to our support team. We include your site, plan and this account with it, so you don't need to.",
+    "helpCentre": "Help centre",
+    "unavailableTitle": "The Help form is unavailable",
+    "unavailableDescription": "Messages can't be sent from here right now. Please try again later."
+  },
+  "helpForm": {
+    "title": "Contact support",
+    "responseTime": "We usually reply within two working days.",
+    "subjectLabel": "Subject",
+    "messageLabel": "Message",
+    "messageHint": "Say what you were trying to do and what happened instead.",
+    "required": "Fill this in.",
+    "tooLong": "Keep this under {limit} characters.",
+    "send": "Send message",
+    "sending": "Sending…",
+    "sent": "Message sent. We've emailed you a copy.",
+    "rateLimited": "You've sent several messages in a short time. Please try again later.",
+    "unavailable": "The Help form is unavailable right now. Please try again later.",
+    "sendFailed": "Couldn't send your message — try again."
   }
 }
