@@ -22,9 +22,11 @@ const PAID_SITE_STATUSES: readonly TTenantStatus[] = [
 
 const planType = sql.raw(tenantPlanEnum.enumName);
 
+export const isOnTrial = sql`${tenants.status} = ${TENANT_STATUS.TRIAL}`;
+
 const isLeavingPaidPlanOrTrial = or(
   sql`${tenants.plan} <> ${TENANT_PLAN.FREE}::${planType}`,
-  sql`${tenants.status} = ${TENANT_STATUS.TRIAL}`,
+  isOnTrial,
 );
 
 function startsGrace(column: SQL, value: SQL): SQL {
