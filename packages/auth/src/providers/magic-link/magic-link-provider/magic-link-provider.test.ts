@@ -38,7 +38,6 @@ import {
   EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
 } from '@shinefold/db/constants';
 import {
-  buildPlatformEmailTag,
   buildSiteEmailTag,
   escapeHtml,
   PLATFORM_EMAIL_BRAND_NAME,
@@ -88,7 +87,6 @@ const SITE_ENVELOPE = { ...DEFAULT_ENVELOPE, account: EMAIL_ACCOUNT.TENANT };
 const PLATFORM_ENVELOPE = {
   ...DEFAULT_ENVELOPE,
   account: EMAIL_ACCOUNT.PLATFORM,
-  tags: [buildPlatformEmailTag()],
 };
 
 const mockAuthoredBlock = (
@@ -382,7 +380,7 @@ describe(buildMagicLinkProvider, () => {
       ['sign-in', () => {}, EMAIL_TYPE.SIGN_IN],
       ['invite', () => withPendingInvite(), EMAIL_TYPE.INVITE],
     ])(
-      'tags the %s as platform mail and counts it in the platform bucket',
+      'counts a platform %s in the platform bucket',
       async (_, arrange, emailType) => {
         arrange();
 
@@ -391,7 +389,6 @@ describe(buildMagicLinkProvider, () => {
           url: PLATFORM_CALLBACK_URL,
         });
 
-        expect(sentEmail().tags).toEqual([buildPlatformEmailTag()]);
         expect(recordPlatformEmailSendMock).toHaveBeenCalledExactlyOnceWith(
           emailType,
         );
@@ -554,7 +551,6 @@ describe(buildMagicLinkProvider, () => {
         url: PLATFORM_CALLBACK_URL,
       });
 
-      expect(sentEmail().tags).toEqual([buildPlatformEmailTag()]);
       expect(recordPlatformEmailSendMock).toHaveBeenCalledExactlyOnceWith(
         EMAIL_TYPE.SIGN_IN,
       );

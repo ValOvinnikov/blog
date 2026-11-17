@@ -2,7 +2,7 @@ import 'server-only';
 
 import { EMAIL_ACCOUNT, type TEmailAccount } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
-import type { TEmailTag } from '@shinefold/email/tags';
+import { buildPlatformEmailTag, type TEmailTag } from '@shinefold/email/tags';
 import { SendEmailError } from '@shinefold/email/transport/send-email-error';
 import { env } from '@shinefold/email/utils/env/env';
 import { isUndefined } from '@shinefold/utils/primitives';
@@ -32,6 +32,15 @@ function readApiKey(account: TEmailAccount): TMaybeUndefined<string> {
   return account === EMAIL_ACCOUNT.PLATFORM
     ? env.RESEND_PLATFORM_API_KEY
     : env.RESEND_TENANT_API_KEY;
+}
+
+function tagForAccount(
+  account: TEmailAccount,
+  tags: TMaybeUndefined<TEmailTag[]>,
+): TMaybeUndefined<TEmailTag[]> {
+  return account === EMAIL_ACCOUNT.PLATFORM
+    ? [...(tags ?? []), buildPlatformEmailTag()]
+    : tags;
 }
 
 export function isEmailAccountConfigured(account: TEmailAccount): boolean {
@@ -79,7 +88,7 @@ export async function sendEmail({
     text,
     headers,
     replyTo,
-    tags,
+    tags: tagForAccount(account, tags),
   };
   const { emails } = getResendClient(account);
   const { error } = await (isUndefined(idempotencyKey)

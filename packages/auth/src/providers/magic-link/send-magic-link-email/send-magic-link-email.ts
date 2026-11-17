@@ -1,4 +1,3 @@
-import { buildMagicLinkSendTags } from '@shinefold/auth/providers/magic-link/build-magic-link-send-tags/build-magic-link-send-tags';
 import {
   findPendingInviteTenants,
   type TPendingInviteTenant,
@@ -20,6 +19,7 @@ import {
   applyTenantSenderName,
   buildInviteMagicLinkEmail,
   buildMagicLinkEmail,
+  buildSiteEmailTag,
   sendEmail,
 } from '@shinefold/email';
 import { hasLength } from '@shinefold/utils/primitives';
@@ -96,7 +96,7 @@ export async function sendMagicLinkEmail({
     subject,
     html,
     replyTo: emailSettings?.replyTo,
-    tags: buildMagicLinkSendTags(isSentByPlatform, readerSiteId),
+    tags: readerSiteId ? [buildSiteEmailTag(readerSiteId)] : undefined,
   });
 
   if (isSentByPlatform || readerSiteId) {
