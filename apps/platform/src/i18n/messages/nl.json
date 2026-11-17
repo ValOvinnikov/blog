@@ -188,6 +188,7 @@
   },
   "account": {
     "signOut": "Uitloggen",
+    "signingOut": "Bezig met uitloggen…",
     "signedInAs": "Ingelogd als {email}",
     "menuLabel": "Account",
     "triggerCollapsedLabel": "Account: {name}, {email}",
@@ -527,6 +528,7 @@
       "SUSPENSION_REASON": "Reden: {category}",
       "SUSPENSION_REFERENCE": "Referentie: {reference}",
       "PLAN": "Abonnement: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Abonnement: {from} → {to}",
       "SIGN_IN_PROVIDER": "Aanmeldprovider: {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Clientgeheim vervangen"
     }
@@ -2295,6 +2297,7 @@
     "currentPlan": "Je site zit op {plan}, {interval, select, YEARLY {per jaar} other {per maand}} betaald.",
     "pendingChange": "Je site gaat op <time>{date}</time> over naar {plan}, {interval, select, YEARLY {per jaar} other {per maand}} betaald.",
     "changeNow": "De wijziging gaat vandaag in. Je betaalt nu het verschil voor de rest van de huidige periode.",
+    "changeNowNewPeriod": "De wijziging gaat vandaag in, en daarmee begint een nieuwe {interval, select, YEARLY {jaarlijkse} other {maandelijkse}} periode. Je betaalt nu voor de nieuwe periode, min de ongebruikte tijd van je huidige.",
     "changeAtRenewal": "De wijziging gaat in op <time>{date}</time>, als de huidige periode afloopt. Tot dan verandert er niets.",
     "keepCurrentDescription": "Je site blijft op {plan} en de wijziging die voor <time>{date}</time> gepland stond, wordt geannuleerd.",
     "changeUnchanged": "Dit is je huidige abonnement. Kies een ander abonnement of een andere betaalperiode om het te wijzigen.",

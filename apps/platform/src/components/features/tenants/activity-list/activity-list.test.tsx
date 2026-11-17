@@ -11,6 +11,7 @@ import {
   GITHUB_AUDIT_ACTOR_ID_PREFIX,
   WORKER_AUDIT_ACTOR_ID,
 } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 
 import { ActivityList } from './activity-list';
 
@@ -148,6 +149,23 @@ describe(`<${ActivityList.name}/>`, () => {
     );
 
     expect(mainAddress).toBeVisible();
+  });
+
+  it('shows an operator plan change from one plan to the other', () => {
+    setup({
+      events: [
+        mockAuditEvent({
+          action: AUDIT_ACTION.SETTINGS_UPDATED,
+          details: {
+            planChanged: { from: TENANT_PLAN.GROWTH, to: TENANT_PLAN.STARTER },
+          },
+        }),
+      ],
+    });
+
+    const planChange = screen.getByText('Plan: Growth → Starter');
+
+    expect(planChange).toBeVisible();
   });
 
   it('shows no raw detail keys it does not know', () => {

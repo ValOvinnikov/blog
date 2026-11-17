@@ -188,6 +188,7 @@
   },
   "account": {
     "signOut": "Abmelden",
+    "signingOut": "Wird abgemeldet…",
     "signedInAs": "Angemeldet als {email}",
     "menuLabel": "Konto",
     "triggerCollapsedLabel": "Konto: {name}, {email}",
@@ -527,6 +528,7 @@
       "SUSPENSION_REASON": "Grund: {category}",
       "SUSPENSION_REFERENCE": "Referenz: {reference}",
       "PLAN": "Tarif: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Tarif: {from} → {to}",
       "SIGN_IN_PROVIDER": "Anmeldeanbieter: {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Client-Geheimnis ersetzt"
     }
@@ -2295,6 +2297,7 @@
     "currentPlan": "Deine Website nutzt {plan}, {interval, select, YEARLY {jährlich} other {monatlich}} bezahlt.",
     "pendingChange": "Deine Website wechselt am <time>{date}</time> zu {plan}, {interval, select, YEARLY {jährlich} other {monatlich}} bezahlt.",
     "changeNow": "Die Änderung gilt ab heute. Du zahlst jetzt die Differenz für den Rest des laufenden Zeitraums.",
+    "changeNowNewPeriod": "Die Änderung gilt ab heute, und ein neuer {interval, select, YEARLY {jährlicher} other {monatlicher}} Zeitraum beginnt damit. Du zahlst jetzt für den neuen Zeitraum, abzüglich der ungenutzten Zeit deines aktuellen.",
     "changeAtRenewal": "Die Änderung gilt ab dem <time>{date}</time>, wenn der laufende Zeitraum endet. Bis dahin ändert sich nichts.",
     "keepCurrentDescription": "Deine Website bleibt bei {plan}, und die für den <time>{date}</time> geplante Änderung wird storniert.",
     "changeUnchanged": "Das ist dein aktueller Tarif. Wähle einen anderen Tarif oder Abrechnungszeitraum, um ihn zu ändern.",

@@ -5430,6 +5430,14 @@
         "file": "apps/platform/src/constants/activity.ts"
       }
     ],
+    "PLAN_CHANGED": [
+      {
+        "ref": "ACTIVITY_DETAIL.PLAN_CHANGED",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
     "SIGN_IN_PROVIDER": [
       {
         "ref": "ACTIVITY_DETAIL.SIGN_IN_PROVIDER",
