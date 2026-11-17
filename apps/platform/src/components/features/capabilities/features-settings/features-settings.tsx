@@ -31,8 +31,7 @@ export type TFeaturesSettingsProps = {
   archivedAt?: Date;
 };
 
-// A capability outside the plan is shown locked rather than hidden; the Server
-// Action re-checks entitlement, so the locked switch is only a courtesy.
+// A locked control is only a courtesy; the Server Actions re-check the plan.
 export const FeaturesSettings = ({
   tenantId,
   entitledCapabilities,
@@ -52,6 +51,7 @@ export const FeaturesSettings = ({
     archivedNoticeId,
     form,
     analyticsFieldErrors,
+    clearAnalyticsFieldErrors,
   } = useFeaturesForm({
     tenantId,
     initialValues,
@@ -91,13 +91,14 @@ export const FeaturesSettings = ({
                   hasOwnAnalytics={hasOwnAnalytics}
                   idFieldId={analyticsIdFieldId}
                   isIdInvalid={Boolean(analyticsFieldErrors.analyticsId)}
-                  onChange={({ analyticsProvider, analyticsId }) =>
+                  onChange={({ analyticsProvider, analyticsId }) => {
+                    clearAnalyticsFieldErrors();
                     setValues((prev) => ({
                       ...prev,
                       analyticsProvider,
                       analyticsId,
-                    }))
-                  }
+                    }));
+                  }}
                 />
               );
             }

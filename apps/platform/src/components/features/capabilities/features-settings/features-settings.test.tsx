@@ -5,7 +5,7 @@ import {
   updateFeaturesAction,
   type TUpdateFeaturesResult,
 } from '@platform/server/settings-features/update-features-action';
-import { ARIA_DISABLED } from '@platform/testing/aria';
+import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
   customRender,
@@ -569,7 +569,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         setup();
       });
 
-      it('saves a new Google Analytics id, then the toggles', async () => {
+      it('saves a new Google Analytics id without re-saving the toggles', async () => {
         const idField = screen.getByRole('textbox', {
           name: MEASUREMENT_ID_LABEL,
         });
@@ -582,10 +582,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
           analyticsProvider: MOCK_GOOGLE_ANALYTICS.provider,
           analyticsId: MOCK_GOOGLE_ANALYTICS.analyticsId,
         });
-        expect(updateFeaturesActionMock).toHaveBeenCalledWith(
-          MOCK_TENANT_ID,
-          MOCK_INITIAL_FEATURES,
-        );
+        expect(updateFeaturesActionMock).not.toHaveBeenCalled();
         expect(toast).toBeVisible();
       });
 
@@ -606,6 +603,31 @@ describe(`<${FeaturesSettings.name}/>`, () => {
           analyticsId: MOCK_PLAUSIBLE_ANALYTICS.analyticsId,
         });
       });
+    });
+
+    it('keeps a saved id saved when the toggles then fail', async () => {
+      updateFeaturesActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+      setup();
+      const idField = screen.getByRole('textbox', {
+        name: MEASUREMENT_ID_LABEL,
+      });
+      const contactFormSwitch = screen.getByRole('switch', {
+        name: CONTACT_FORM_LABEL,
+      });
+
+      await user.type(idField, MOCK_GOOGLE_ANALYTICS.analyticsId);
+      await user.click(contactFormSwitch);
+      await saveChanges();
+      await screen.findByRole('alert');
+      const discardButton = screen.getByRole('button', {
+        name: saveBar.discard,
+      });
+      await user.click(discardButton);
+
+      expect(idField).toHaveValue(MOCK_GOOGLE_ANALYTICS.analyticsId);
+      expect(contactFormSwitch).toBeChecked();
     });
 
     it('saves a cleared id', async () => {
@@ -653,6 +675,19 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       it('saves none of the toggles', () => {
         expect(updateFeaturesActionMock).not.toHaveBeenCalled();
       });
+
+      it('withdraws the message on the next keystroke', async () => {
+        await screen.findByText(
+          analyticsIdInvalid[ANALYTICS_PROVIDER.GOOGLE_ANALYTICS],
+        );
+
+        await user.type(idField, MOCK_GOOGLE_ANALYTICS.analyticsId);
+        const message = screen.queryByText(
+          analyticsIdInvalid[ANALYTICS_PROVIDER.GOOGLE_ANALYTICS],
+        );
+
+        expect(message).not.toBeInTheDocument();
+      });
     });
 
     describe('on a plan without its own analytics', () => {
@@ -691,7 +726,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
           name: GOOGLE_ANALYTICS_OPTION,
         });
 
-        expect(googleOption).toHaveAttribute('aria-pressed', 'true');
+        expect(googleOption).toHaveAttribute(ARIA_PRESSED, 'true');
       });
     });
   });

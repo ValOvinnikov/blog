@@ -18,10 +18,12 @@ import {
 } from '@platform/utils/analytics-draft/analytics-draft';
 import { CAPABILITY_TOGGLES } from '@platform/utils/settings-features-fields/settings-features-fields';
 import {
+  ACTION_OUTCOME,
   isOutcomeInvalid,
   isOutcomeSuccess,
   type TFieldErrors,
 } from '@shinefold/config';
+import { toOutcome } from '@shinefold/utils/to-outcome';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -36,12 +38,19 @@ type TUseFeaturesFormArgs = {
   analyticsIdFieldId: string;
 };
 
-const countChanges = (
+const countToggleChanges = (
   values: TFeaturesFormValues,
   savedValues: TFeaturesFormValues,
 ): number =>
   CAPABILITY_TOGGLES.filter(({ field }) => values[field] !== savedValues[field])
-    .length + countAnalyticsChanges(values, savedValues);
+    .length;
+
+const countChanges = (
+  values: TFeaturesFormValues,
+  savedValues: TFeaturesFormValues,
+): number =>
+  countToggleChanges(values, savedValues) +
+  countAnalyticsChanges(values, savedValues);
 
 export const useFeaturesForm = ({
   tenantId,
@@ -68,15 +77,28 @@ export const useFeaturesForm = ({
     }),
     onDiscard: () => setAnalyticsFieldErrors({}),
     onSubmit: async (values) => {
+      const { savedValues, setSavedValues } = settings;
       const { features, analytics } = splitFeaturesFormValues(values);
-      if (countAnalyticsChanges(values, settings.savedValues) > 0) {
+      let saved = savedValues;
+
+      if (countAnalyticsChanges(values, savedValues) > 0) {
         const result = await updateAnalyticsAction(tenantId, analytics);
         setAnalyticsFieldErrors(
           isOutcomeInvalid(result) ? result.fieldErrors : {},
         );
         if (!isOutcomeSuccess(result)) return result;
+        saved = { ...saved, ...analytics };
       }
-      return updateFeaturesAction(tenantId, features);
+
+      if (countToggleChanges(values, savedValues) > 0) {
+        const result = await updateFeaturesAction(tenantId, features);
+        if (!isOutcomeSuccess(result)) {
+          setSavedValues(saved);
+          return result;
+        }
+      }
+
+      return toOutcome(ACTION_OUTCOME.SUCCESS);
     },
     onSuccess: () => {
       toast.success({ message: t('alertSuccess') });
@@ -91,5 +113,9 @@ export const useFeaturesForm = ({
     },
   });
 
-  return { ...settings, analyticsFieldErrors };
+  return {
+    ...settings,
+    analyticsFieldErrors,
+    clearAnalyticsFieldErrors: () => setAnalyticsFieldErrors({}),
+  };
 };

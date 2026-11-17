@@ -91,7 +91,7 @@ const CLEARED_INPUT: TUpdateAnalyticsInput = {
   analyticsProvider: ANALYTICS_PROVIDER.GOOGLE_ANALYTICS,
   analyticsId: ' ',
 };
-const ID_INVALID = {
+const MOCK_ID_INVALID_RESULT = {
   outcome: ACTION_OUTCOME.INVALID,
   fieldErrors: { analyticsId: { reason: ANALYTICS_FIELD_ERROR.ID_INVALID } },
 };
@@ -157,7 +157,7 @@ describe(updateAnalyticsAction, () => {
     ])('refuses %s and writes nothing', async (_, input) => {
       const result = await updateAnalyticsAction(MOCK_TENANT_ID, input);
 
-      expect(result).toEqual(ID_INVALID);
+      expect(result).toEqual(MOCK_ID_INVALID_RESULT);
       expect(saveTenantAnalyticsMock).not.toHaveBeenCalled();
       expect(revalidateSiteConfig).not.toHaveBeenCalled();
     });
