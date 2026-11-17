@@ -29,7 +29,8 @@
     "onboarding": "Create your site",
     "billing": "Billing · Admin",
     "upgrade": "Upgrade",
-    "help": "Help"
+    "help": "Help",
+    "draftPreview": "Draft preview"
   },
   "signInPage": {
     "heading": "Sign in",
@@ -2371,5 +2372,23 @@
     "rateLimited": "You've sent several messages in a short time. Please try again later.",
     "unavailable": "The Help form is unavailable right now. Please try again later.",
     "sendFailed": "Couldn't send your message — try again."
+  },
+  "draftPreview": {
+    "title": "Draft preview",
+    "draftNotice": "This is the latest saved draft, not the published page. Only members of this site can open this preview.",
+    "siteLabel": "Site",
+    "pathLabel": "Page",
+    "frameRegionLabel": "Draft preview",
+    "frameTitle": "Draft of this page on your site",
+    "toolbarAriaLabel": "Preview options",
+    "reload": "Reload",
+    "reloading": "Reloading…",
+    "openPublished": "Open published page",
+    "refusedTitle": "This draft can't be previewed",
+    "refusalNotFound": "This page has no address on your site. Only posts and landing pages can be previewed, and a landing page needs every parent page set.",
+    "refusalLanguageOff": "This page is in a language your site doesn't serve. Switch this language on to preview it.",
+    "refusalSuspended": "This site is suspended, so its drafts can't be previewed.",
+    "refusalArchived": "This site is archived, so its drafts can't be previewed.",
+    "refusalUnavailable": "The platform couldn't prepare this preview. The problem has been logged for the platform team."
   }
 }

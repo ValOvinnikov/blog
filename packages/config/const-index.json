@@ -174,6 +174,12 @@
         "file": "apps/platform/src/constants/billing.ts"
       },
       {
+        "ref": "DRAFT_PREVIEW_REFUSAL.UNAVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      },
+      {
         "ref": "SITE_ADDRESS_STATUS.UNAVAILABLE",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -802,6 +808,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.READER_ACCOUNTS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
       }
     ],
     "COMMENTS": [
@@ -858,6 +870,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.CONTACT_FORM",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
       }
     ],
     "WIDE": [
@@ -3690,6 +3708,12 @@
         "file": "packages/db/src/constants/tenant.ts"
       },
       {
+        "ref": "DRAFT_PREVIEW_REFUSAL.ARCHIVED",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      },
+      {
         "ref": "TENANT_REFUSAL.ARCHIVED",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
@@ -3884,6 +3908,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/membership.ts"
+      },
+      {
+        "ref": "DRAFT_PREVIEW_REFUSAL.NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
       },
       {
         "ref": "LEAD_REFUSAL.NOT_FOUND",
@@ -5280,6 +5310,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "DRAFT_PREVIEW_REFUSAL.SUSPENDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
       }
     ],
     "TRIAL": [
@@ -6418,6 +6454,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.CUSTOM_DOMAIN",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
       }
     ],
     "SUBDOMAIN": [
@@ -6864,6 +6906,46 @@
         "scope": "app:platform",
         "from": "@platform/constants/domain",
         "file": "apps/platform/src/constants/domain.ts"
+      }
+    ],
+    "LANGUAGE_OFF": [
+      {
+        "ref": "DRAFT_PREVIEW_REFUSAL.LANGUAGE_OFF",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
+    "draft_preview.secret_missing": [
+      {
+        "ref": "DRAFT_PREVIEW_LOG.SECRET_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
+    "draft_preview.path_skipped": [
+      {
+        "ref": "DRAFT_PREVIEW_LOG.PATH_SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
+    "draft_preview.path_failed": [
+      {
+        "ref": "DRAFT_PREVIEW_LOG.PATH_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
+    "draft_preview.path_error": [
+      {
+        "ref": "DRAFT_PREVIEW_LOG.PATH_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
       }
     ],
     "email_config.update_audit_failed": [
@@ -10693,6 +10775,78 @@
     "pricing_module.visitor_currency_fetch_failed": [
       {
         "ref": "PRICING_LOG.VISITOR_CURRENCY_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "LANGUAGES": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.LANGUAGES",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "SEATS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.SEATS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "NO_POWERED_BY_MARK": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.NO_POWERED_BY_MARK",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "LOOK_SETTINGS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.LOOK_SETTINGS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "SECTION_TYPES": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.SECTION_TYPES",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "OWN_ANALYTICS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.OWN_ANALYTICS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "OWN_SIGN_IN_APPS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.OWN_SIGN_IN_APPS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "NEWSLETTER_SUBSCRIBERS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.NEWSLETTER_SUBSCRIBERS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "TAKEAWAYS_PER_MONTH": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.TAKEAWAYS_PER_MONTH",
         "scope": "app:web",
         "from": "@web/constants/pricing",
         "file": "apps/web/src/constants/pricing.ts"

@@ -534,6 +534,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **DOMAIN_AVAILABILITY**: `NOT_CONFIGURED`, `AVAILABLE`, `IN_USE`, `ERROR`
 - **ROUTING_RECORD_TYPE**: `A`, `CNAME`
 
+### `@platform/constants/draft-preview` — `apps/platform/src/constants/draft-preview.ts`
+
+- **DRAFT_PREVIEW_REFUSAL**: `NOT_FOUND`, `LANGUAGE_OFF`, `SUSPENDED`, `ARCHIVED`, `UNAVAILABLE`
+- **DRAFT_PREVIEW_LOG**: `SECRET_MISSING`=`"draft_preview.secret_missing"`, `PATH_SKIPPED`=`"draft_preview.path_skipped"`, `PATH_FAILED`=`"draft_preview.path_failed"`, `PATH_ERROR`=`"draft_preview.path_error"`
+
 ### `@platform/constants/email-config` — `apps/platform/src/constants/email-config.ts`
 
 - **EMAIL_CONFIG_LOG**: `UPDATE_AUDIT_FAILED`=`"email_config.update_audit_failed"`, `UPDATE_FAILED`=`"email_config.update_failed"`
@@ -956,6 +961,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **PRICING_LOG**: `MODULE_FETCH_FAILED`=`"pricing_module.fetch_failed"`, `SITE_SETTINGS_FAILED`=`"pricing_module.site_settings_failed"`, `PLAN_PRICES_FETCH_FAILED`=`"pricing_module.plan_prices_fetch_failed"`, `PROMOTION_CODE_LOOKUP_FAILED`=`"pricing_module.promotion_code_lookup_failed"`, `PROMOTION_CODE_FETCH_FAILED`=`"pricing_module.promotion_code_fetch_failed"`, `VISITOR_CURRENCY_FETCH_FAILED`=`"pricing_module.visitor_currency_fetch_failed"`
 - **PRICING_SEARCH_PARAM**: `PROMO`=`"promo"`
+- **PLAN_COMPARISON_ROW**: `LANGUAGES`, `SEATS`, `CUSTOM_DOMAIN`, `NO_POWERED_BY_MARK`, `LOOK_SETTINGS`, `SECTION_TYPES`, `OWN_ANALYTICS`, `OWN_SIGN_IN_APPS`, `CONTACT_FORM`, `READER_ACCOUNTS`, `NEWSLETTER_SUBSCRIBERS`, `TAKEAWAYS_PER_MONTH`
 
 ### `@web/constants/proxy` — `apps/web/src/constants/proxy.ts`
 

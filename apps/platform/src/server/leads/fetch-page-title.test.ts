@@ -1,9 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { LEAD_LOG } from '@platform/constants/lead';
 import { MOCK_WEB_APP_URL } from '@platform/testing/env/fixtures';
+import { mockedEnv } from '@platform/testing/env/mocked-env';
+import { mockedWebSecretsEnv } from '@platform/testing/env/mocked-web-secrets-env';
 import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
-import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { HTTP_METHOD, HTTP_STATUS, LOCALE_ISO_CODES } from '@shinefold/config';
 import {
@@ -17,8 +18,8 @@ import { fetchPageTitle } from './fetch-page-title';
 faker.seed(5761);
 
 vi.mock('@platform/utils/env/env');
+vi.mock('@platform/utils/web-secrets-env/web-secrets-env');
 
-const envMock: Partial<Record<keyof typeof env, string>> = env;
 const loggerErrorMock = vi.mocked(logger.error);
 
 const MOCK_SECRET = faker.string.alphanumeric(32);
@@ -41,8 +42,8 @@ describe(fetchPageTitle, () => {
     fetchMock.mockReset();
     fetchMock.mockResolvedValue(Response.json({ title: MOCK_PAGE_TITLE }));
     vi.stubGlobal('fetch', fetchMock);
-    envMock.WEB_APP_URL = MOCK_WEB_APP_URL;
-    envMock.INTERNAL_PAGES_SECRET = MOCK_SECRET;
+    mockedEnv.WEB_APP_URL = MOCK_WEB_APP_URL;
+    mockedWebSecretsEnv.INTERNAL_PAGES_SECRET = MOCK_SECRET;
   });
 
   afterEach(() => {
@@ -74,16 +75,24 @@ describe(fetchPageTitle, () => {
   });
 
   it.each([
-    ['website URL', 'WEB_APP_URL', { hasWebAppUrl: false, hasSecret: true }],
+    [
+      'website URL',
+      () => {
+        mockedEnv.WEB_APP_URL = undefined;
+      },
+      { hasWebAppUrl: false, hasSecret: true },
+    ],
     [
       'secret',
-      'INTERNAL_PAGES_SECRET',
+      () => {
+        mockedWebSecretsEnv.INTERNAL_PAGES_SECRET = undefined;
+      },
       { hasWebAppUrl: true, hasSecret: false },
     ],
-  ] as const)(
+  ])(
     'asks nothing and logs without a %s',
-    async (_label, key, configured) => {
-      envMock[key] = undefined;
+    async (_label, unset, configured) => {
+      unset();
 
       const title = await fetchTitle();
 

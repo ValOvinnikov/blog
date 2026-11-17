@@ -29,7 +29,8 @@
     "onboarding": "Website erstellen",
     "billing": "Abrechnung · Admin",
     "upgrade": "Upgrade",
-    "help": "Hilfe"
+    "help": "Hilfe",
+    "draftPreview": "Entwurfsvorschau"
   },
   "signInPage": {
     "heading": "Anmelden",
@@ -2371,5 +2372,23 @@
     "rateLimited": "Du hast in kurzer Zeit mehrere Nachrichten gesendet. Bitte versuch es später noch einmal.",
     "unavailable": "Das Hilfe-Formular ist gerade nicht verfügbar. Bitte versuch es später noch einmal.",
     "sendFailed": "Deine Nachricht konnte nicht gesendet werden – versuch es noch einmal."
+  },
+  "draftPreview": {
+    "title": "Entwurfsvorschau",
+    "draftNotice": "Das ist der zuletzt gespeicherte Entwurf, nicht die veröffentlichte Seite. Nur Mitglieder dieser Website können diese Vorschau öffnen.",
+    "siteLabel": "Website",
+    "pathLabel": "Seite",
+    "frameRegionLabel": "Entwurfsvorschau",
+    "frameTitle": "Entwurf dieser Seite auf deiner Website",
+    "toolbarAriaLabel": "Vorschauoptionen",
+    "reload": "Neu laden",
+    "reloading": "Wird neu geladen …",
+    "openPublished": "Veröffentlichte Seite öffnen",
+    "refusedTitle": "Dieser Entwurf kann nicht angezeigt werden",
+    "refusalNotFound": "Diese Seite hat keine Adresse auf deiner Website. Nur Beiträge und Landingpages haben eine Vorschau, und bei einer Landingpage müssen alle übergeordneten Seiten gesetzt sein.",
+    "refusalLanguageOff": "Diese Seite ist in einer Sprache, die deine Website nicht anbietet. Schalte diese Sprache ein, um die Vorschau zu sehen.",
+    "refusalSuspended": "Diese Website ist gesperrt, daher gibt es keine Vorschau ihrer Entwürfe.",
+    "refusalArchived": "Diese Website ist archiviert, daher gibt es keine Vorschau ihrer Entwürfe.",
+    "refusalUnavailable": "Die Plattform konnte diese Vorschau nicht vorbereiten. Das Problem wurde für das Plattform-Team protokolliert."
   }
 }
