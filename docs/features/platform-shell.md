@@ -489,26 +489,33 @@ save still settles as the form's generic server error.
 - Selected is one rule per family, from `utils/selected-choice-classes/`.
   `selected` and `selected-line` are #ffc233 in every theme, `on-selected`
   is #12141a / #0f1115, `selected-tint` is #ffe08a / #4a3b10, and
-  `selected-edge` is #12141a in Light and transparent in Dark, because
-  yellow on white is 1.61:1, below 3:1, while in Dark yellow passes alone.
+  `selected-edge` is #12141a in Light and #ffc233 in Dark, because neither
+  tint reaches 3:1 on its ground (the light tint on white is 1.29:1, the dark
+  tint on the card about 1.6:1), so the edge carries a picked control's 3:1.
   Compact controls (segmented options at every width, preview toolbar
   toggles, the Follow solo, rich-text toolbar toggles,
   segmented view tabs, the language picker and other segmented radio
   tracks, appearance menu radio items, Voice section chips, preset chips
-  and the phone jump index) are solid `selected` with an `on-selected`
-  label and a `selected-edge` border or inset ring
-  (`SELECTED_COMPACT_CHOICE_CLASSES` for the bordered chips). Tiles (card
+  and the phone jump index) fill with `selected-tint` and a `text` label
+  with a `selected-edge` border or inset ring
+  (`SELECTED_COMPACT_FILL_CLASSES`, `SELECTED_COMPACT_CHOICE_CLASSES` for
+  the bordered chips). Tiles (card
   style tiles, preset picker cards, the preset grid) are `selected-tint`
   with a 1.5px `selected-line` border and a 1px `selected-edge` hairline
   (`SELECTED_CHOICE_CLASSES`), and a yellow tick (`SELECTED_TICK_CLASSES`).
-  Rows (preset rows, the selected lead, the open accordion row, the
-  current top-bar menu row) are `selected-tint` with a 3px `selected-line`
-  bar and a 1px `selected-edge` (`SELECTED_ROW_CLASSES`). A switch that is
-  on has a `selected` track with a `selected-edge` ring and an
-  `switch-thumb-on` thumb (#12141a / #0f1115); a checked checkbox and the
-  chosen preset's dot are `selected` with an `on-selected` tick. Underline
-  tabs and the desktop jump index mark the current entry with a
-  `selected-line` underline and a bold `text` label. An open popup trigger
+  Rows (preset rows, the selected lead, the current top-bar menu row) are
+  `selected-tint` with a 3px `selected-line` bar and a 1px `selected-edge`
+  (`SELECTED_ROW_CLASSES`). The open accordion row is not selected: its
+  title row takes `surface-head` with no frame, and the 3px bar
+  (`SELECTED_STRIPE_CLASSES`) runs down the item, title and open panel; a
+  folded row hovers to `hover-tint`. A switch that is on has a
+  `selected-tint` track with a `selected-edge` ring and a `switch-thumb-on`
+  thumb (#12141a / #ffc233). Only small marks keep the solid `selected`
+  fill with an `on-selected` tick: a checked checkbox, a tile's tick and the
+  chosen preset's dot (`SELECTED_MARK_FILL_CLASSES`). Underline tabs and
+  the desktop jump index mark the current entry with a `selected-line`
+  underline (a straight 2px bar inside the jump link's padding) and a bold
+  `text` label. An open popup trigger
   other than a select has a `brand-ink` border on the `hover-tint` ground.
   The preview toolbar's groups and the Follow solo rest on `theme-track`.
   Three yellow marks stay below 3:1 in Light, and a bold near-black label
@@ -532,14 +539,15 @@ save still settles as the form's generic server error.
   that is off darkens its track to `control-line-hover`; a text link's
   `highlight` stroke thickens from 2px to 3px; the asset upload drop area
   takes the tint and a `brand-ink` dashed border. A select keeps the
-  field rule (a `brand-ink` border, no tint). Table, list, accordion,
-  tenant picker, menu and sidebar rows keep their grey hover, and a
+  field rule (a `brand-ink` border, no tint). Table, list, list-accordion,
+  tenant picker, menu and sidebar rows keep their grey hover (a folded
+  row-accordion row takes `hover-tint`), and a
   selected, pressed, checked, current or open control does not change on
   hover. Disabled and `aria-disabled` controls take no hover.
 - Focus is one gapped ring on every control, built by
   `utils/focus-ring-classes/focus-ring-classes.ts` for a named
   `FOCUS_RING_GROUND` (side, bg, surface, surface-2, surface-head, popover,
-  popover-hover, on-selected, hover-tint, theme-track, selected-tint): a 2px gap in that ground, then a
+  popover-hover, hover-tint, theme-track, selected-tint): a 2px gap in that ground, then a
   2px `focus-ring` (#ffc233 in both themes), then in Light a 1px `focus-edge`
   (#12141a) around it; Dark has no edge. The ground reaches the
   `shadow-platform-focus-ring` token through `--platform-focus-ground`, which
@@ -553,18 +561,20 @@ save still settles as the form's generic server error.
   their border turns `brand-ink` inside a 3px `focus-ring` glow
   (`FIELD_FOCUS_CLASSES`, `EDITABLE_SHELL_FOCUS_CLASSES`,
   `utils/field-surface-classes/`), kept when the field is invalid. The ring sits on `surface` for checkboxes, select
-  triggers, closed accordion triggers (an open one takes it on `surface-2`), underline view tabs, preset cards, the
+  triggers, closed list-accordion triggers (an open one takes it on `surface-2`), underline view tabs, preset cards, the
   hue slider's thumb (focused or dragged) and the rich-text toolbar buttons;
   segmented options take it on `bg`, and segmented view tabs on `theme-track`. A ring
   that a clipping parent would cut off is drawn inset
   (`insetFocusRingClasses`, an inset shadow that stacks with a drop shadow):
   the data table's scroll region and its sort buttons, which fill their head
-  cell; lead rows, the open accordion row and the current top-bar menu row
-  (on `selected-tint` when selected, the bar and edge drawn above the ring);
+  cell; lead rows and the current top-bar menu row (on `selected-tint` when
+  selected, the bar and edge drawn above the ring); row-accordion triggers
+  (on `surface`, or `surface-head` when open, the item's bar drawn above
+  the ring); the current phone jump chip (on `selected-tint`);
   menu, select, tenant switcher and top-bar menu
   items on keyboard focus only (on `popover-hover`); the appearance menu
-  radio items on keyboard focus only (on `hover-tint`, or `on-selected` for
-  the checked radio, so the yellow ring shows against its yellow fill); the Look preset sheet's rows (on `selected-tint` when
+  radio items on keyboard focus only (on `hover-tint`, or `selected-tint`
+  for the checked radio); the Look preset sheet's rows (on `selected-tint` when
   selected, the 3px bar a pseudo-element
   above the ring); and the full-screen preview stage (on `theme-track`). An
   inset ring's ground is the row's own fill. The more-presets grid's

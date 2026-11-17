@@ -8,24 +8,11 @@ import {
 } from '@platform/components/shared/icon';
 import { useToolbarTabStop } from '@platform/components/shared/toolbar-tab-stop';
 import { Tooltip } from '@platform/components/shared/tooltip';
-import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
-import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
-import { tv } from '@platform/utils/tv/tv';
 import type { IWithClassName } from '@shinefold/config/types';
 import type { ReactElement } from 'react';
 
-const iconSoloControlVariants = tv({
-  base: [
-    // md:size-11 outranks the md:h-8 of the Button this control may render.
-    'inline-flex size-11 flex-none cursor-pointer items-center justify-center md:size-11 lg:size-8.5 pointer-coarse:size-11',
-    'rounded-platform-5 border border-platform-control-line bg-platform-theme-track text-platform-text',
-    'hover:bg-platform-hover-tint',
-    'data-[pressed]:border-platform-selected-edge data-[pressed]:bg-platform-selected data-[pressed]:text-platform-on-selected',
-    'data-[pressed]:hover:bg-platform-selected',
-    focusRingClasses(FOCUS_RING_GROUND.SURFACE),
-  ],
-});
+import { iconSoloControlVariants } from './icon-solo-control-variants';
 
 type TIconSoloControlProps = {
   control: ReactElement;

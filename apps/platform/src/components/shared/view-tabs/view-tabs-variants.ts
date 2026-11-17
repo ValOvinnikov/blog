@@ -17,7 +17,7 @@ export const viewTabsVariants = tv({
           'min-h-11 rounded-platform-control px-[14px] py-[7px] md:min-h-0',
           'text-platform-13 font-medium text-platform-muted',
           'not-data-[active]:hover:bg-platform-hover-tint not-data-[active]:hover:text-platform-text',
-          'data-[active]:bg-platform-selected data-[active]:text-platform-on-selected',
+          'data-[active]:bg-platform-selected-tint data-[active]:text-platform-text',
           'data-[active]:inset-ring data-[active]:inset-ring-platform-selected-edge',
           focusRingClasses(FOCUS_RING_GROUND.THEME_TRACK),
         ],
