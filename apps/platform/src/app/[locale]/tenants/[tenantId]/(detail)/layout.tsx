@@ -2,10 +2,12 @@ import { PlatformShell } from '@platform/components/features/layout/platform-she
 import { TenantBreadcrumb } from '@platform/components/features/layout/tenant-breadcrumb';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { loadPlatformShellChrome } from '@platform/server/layout/load-platform-shell-chrome';
+import { helpNavSection } from '@platform/utils/help-nav-section/help-nav-section';
 import {
   operatorNavSections,
   tenantNavSections,
 } from '@platform/utils/nav-sections/nav-sections';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { queries } from '@shinefold/db';
 import { getTranslations } from 'next-intl/server';
 
@@ -39,6 +41,7 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
           tenant.name,
           unreadLeadsCount,
         ),
+        helpNavSection(tNavSections, adminRoutes.tenantHelp(tenant.id)),
       ]}
       crumb={<TenantBreadcrumb tenantId={tenant.id} tenantName={tenant.name} />}
       account={{

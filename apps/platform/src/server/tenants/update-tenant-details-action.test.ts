@@ -16,6 +16,7 @@ import {
   MOCK_OPERATOR_ID,
   MOCK_OPERATOR_EMAIL,
 } from '@platform/testing/admins/operator';
+import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
@@ -46,6 +47,7 @@ import {
   TENANT_DETAILS_UPDATE_OUTCOME,
   TENANT_PROVISIONING_STEP,
 } from '@shinefold/db/constants';
+import { revalidatePath } from 'next/cache';
 import type { Session } from 'next-auth';
 
 import { updateTenantDetailsAction } from './update-tenant-details-action';
@@ -90,6 +92,8 @@ vi.mock('@platform/server/tenants/send-owner-invite-email', () => ({
 vi.mock('@platform/server/tenants/notify-owner-of-plan-change', () => ({
   notifyOwnerOfPlanChange: vi.fn(),
 }));
+
+vi.mock('next/cache');
 
 vi.mock('next/server', () => ({
   after: (task: () => unknown) => task(),
@@ -237,6 +241,56 @@ describe(updateTenantDetailsAction, () => {
         input,
       );
     });
+  });
+
+  describe('while the site has a live subscription', () => {
+    beforeEach(() => {
+      getTenantByIdMock.mockResolvedValue(
+        mockTenant({
+          plan: TENANT_PLAN.GROWTH,
+          stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
+        }),
+      );
+    });
+
+    it('refuses a plan change without saving anything', async () => {
+      const result = await updateTenantDetailsAction(
+        MOCK_TENANT_ID,
+        validInput,
+      );
+
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.PLAN_FOLLOWS_SUBSCRIPTION,
+      });
+      expect(updateTenantDetailsMock).not.toHaveBeenCalled();
+      expect(notifyOwnerOfPlanChangeMock).not.toHaveBeenCalled();
+    });
+
+    it('still saves other fields while the plan is unchanged', async () => {
+      const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
+        ...validInput,
+        plan: TENANT_PLAN.GROWTH,
+      });
+
+      expect(result).toMatchObject({ outcome: ACTION_OUTCOME.SUCCESS });
+    });
+  });
+
+  it('saves a plan change once a cancelled subscription moved the site to Free', async () => {
+    getTenantByIdMock.mockResolvedValue(
+      mockTenant({
+        plan: TENANT_PLAN.FREE,
+        stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
+      }),
+    );
+
+    const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
+      ...validInput,
+      plan: TENANT_PLAN.GROWTH,
+    });
+
+    expect(result).toMatchObject({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('returns field errors for an invalid domain', async () => {
@@ -406,6 +460,10 @@ describe(updateTenantDetailsAction, () => {
       expect(revalidateSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     });
 
+    it('refreshes the Tenants list after a successful update', () => {
+      expect(revalidatePath).toHaveBeenCalledOnce();
+    });
+
     it('records a SETTINGS_UPDATED audit event with the operator as actor', () => {
       expect(insertAuditEventMock).toHaveBeenCalledWith({
         actorId: MOCK_OPERATOR_ID,
@@ -423,19 +481,36 @@ describe(updateTenantDetailsAction, () => {
     });
   });
 
-  it('tells the owner about the plan change from the stored plan to the saved one', async () => {
-    getTenantByIdMock.mockResolvedValue(
-      mockTenant({ plan: TENANT_PLAN.GROWTH }),
-    );
+  describe('when the stored plan differs from the saved one', () => {
+    beforeEach(() => {
+      getTenantByIdMock.mockResolvedValue(
+        mockTenant({ plan: TENANT_PLAN.GROWTH }),
+      );
+    });
 
-    const result = await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
+    it('tells the owner about the plan change from the stored plan to the saved one', async () => {
+      const result = await updateTenantDetailsAction(
+        MOCK_TENANT_ID,
+        validInput,
+      );
 
-    expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
-    expect(notifyOwnerOfPlanChangeMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      TENANT_PLAN.GROWTH,
-      MOCK_UPDATED_TENANT.plan,
-    );
+      expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
+      expect(notifyOwnerOfPlanChangeMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        TENANT_PLAN.GROWTH,
+        MOCK_UPDATED_TENANT.plan,
+      );
+    });
+
+    it('records the plan change from the stored plan to the saved one', async () => {
+      await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
+
+      const [event] = insertAuditEventMock.mock.lastCall ?? [];
+      expect(event.details.planChanged).toStrictEqual({
+        from: TENANT_PLAN.GROWTH,
+        to: MOCK_UPDATED_TENANT.plan,
+      });
+    });
   });
 
   it('sends no plan change notice when the update is refused', async () => {

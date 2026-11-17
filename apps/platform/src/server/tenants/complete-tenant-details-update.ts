@@ -22,7 +22,10 @@ import type {
 } from '@shinefold/db/queries/tenants/update-tenant-details/update-tenant-details';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { isUndefined } from '@shinefold/utils/primitives';
+import { revalidatePath } from 'next/cache';
 import { after } from 'next/server';
+
+const TENANTS_LIST_ROUTE = '/[locale]/(operator)/tenants';
 
 type TTenantDetailsUpdate = Extract<
   TUpdateTenantDetailsResult,
@@ -64,6 +67,7 @@ export const completeTenantDetailsUpdate = async (
   previousTenant: TTenant,
 ): Promise<TTenantDetailsSaved> => {
   await revalidateSiteConfig(tenantId);
+  revalidatePath(TENANTS_LIST_ROUTE, 'page');
   after(() => onTenantPlanChange(tenantId, previousTenant.plan, tenant.plan));
   const studioReinvite = await reinviteIfOwnerChanged(
     tenant,
@@ -86,6 +90,9 @@ export const completeTenantDetailsUpdate = async (
         previousTenant,
         previousOwnerEmail,
       ),
+      ...(previousTenant.plan !== tenant.plan && {
+        planChanged: { from: previousTenant.plan, to: tenant.plan },
+      }),
       ownerEmailUpdated: !isUndefined(previousOwnerEmail),
       studioReinviteRequested,
       studioReinviteUnsent: isStudioReinviteUnsent,

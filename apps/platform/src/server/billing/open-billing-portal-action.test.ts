@@ -82,20 +82,8 @@ describe(openBillingPortalAction, () => {
     expect(redirect).toHaveBeenCalledWith(MOCK_BILLING_PORTAL_URL);
   });
 
-  it('sends a super admin to the portal', async () => {
-    getAdminByUserIdMock.mockResolvedValue(
-      mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
-    );
-    getMembershipMock.mockResolvedValue(undefined);
-
-    await expect(openPortal()).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(redirect).toHaveBeenCalledWith(MOCK_BILLING_PORTAL_URL);
-  });
-
   it.each([
+    ['a super admin', mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }), undefined],
     ['a moderator', mockAdmin({ role: ADMIN_ROLE.MODERATOR }), undefined],
     ['an editor', undefined, mockMembership({ role: MEMBERSHIP_ROLE.EDITOR })],
   ])('opens nothing for %s', async (_label, admin, membership) => {

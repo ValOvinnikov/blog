@@ -1,5 +1,6 @@
 import type { TTenantEmailBrand } from '@shinefold/config';
 import { renderEmailAction } from '@shinefold/email/html/email-action/email-action';
+import { renderEmailMessageQuote } from '@shinefold/email/html/email-message-quote/email-message-quote';
 import { escapeHtml } from '@shinefold/email/html/escape-html/escape-html';
 import { buildTenantShell } from '@shinefold/email/html/tenant-shell/tenant-shell';
 import { sanitizeHref } from '@shinefold/utils';
@@ -30,12 +31,6 @@ function renderPageLink(pageUrl: string): string {
     : escapedLabel;
 }
 
-function renderMessageQuote(message: string, brand: TTenantEmailBrand): string {
-  const messageHtml = escapeHtml(message).replace(/\r\n|\r|\n/g, '<br />');
-
-  return `<blockquote style="margin:0 0 16px;padding:12px 16px;border-left:3px solid ${brand.border};background-color:${brand.surface2};color:${brand.text};">${messageHtml}</blockquote>`;
-}
-
 /** Send it with `replyTo` set to the visitor, or its "reply to this email" line is false. */
 export function buildContactNotificationEmail({
   siteName,
@@ -52,7 +47,7 @@ export function buildContactNotificationEmail({
 
   const bodyHtml = [
     `<p style="margin:0 0 16px;"><strong>${escapedVisitorName}</strong> (${escapeHtml(visitorEmail)}) sent a message from ${renderPageLink(pageUrl)}.</p>`,
-    renderMessageQuote(message, brand),
+    renderEmailMessageQuote(message, brand),
     `<p style="margin:0;color:${brand.textMuted};">Reply to this email to answer ${escapedVisitorName} directly.</p>`,
   ].join('');
 

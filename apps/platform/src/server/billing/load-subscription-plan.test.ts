@@ -8,6 +8,8 @@ import {
 } from '@platform/testing/billing/fixtures';
 import {
   MOCK_BAND_ITEM_ID,
+  MOCK_CANCEL_AT,
+  MOCK_ENDS_AT,
   MOCK_BAND_QUANTITY,
   MOCK_PERIOD_END,
   MOCK_PLAN_ITEM_ID,
@@ -48,6 +50,7 @@ describe(loadSubscriptionPlan, () => {
       },
       isChangeable: true,
       renewsAt: MOCK_RENEWS_AT,
+      endsAt: undefined,
       scheduleId: undefined,
       pending: undefined,
       planItemId: MOCK_PLAN_ITEM_ID,
@@ -95,7 +98,8 @@ describe(loadSubscriptionPlan, () => {
 
   it.each([
     ['past due', { status: STRIPE_SUBSCRIPTION_STATUS.PAST_DUE }],
-    ['set to cancel', { cancelAtPeriodEnd: true }],
+    ['set to cancel at period end', { cancelAtPeriodEnd: true }],
+    ['cancelled from the Portal', { cancelAt: MOCK_CANCEL_AT }],
   ])('marks a subscription %s as not changeable', async (_case, overrides) => {
     const plan = await load({
       lookupKeys: [STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY],
@@ -103,6 +107,15 @@ describe(loadSubscriptionPlan, () => {
     });
 
     expect(plan?.isChangeable).toBe(false);
+  });
+
+  it('reads when a subscription cancelled from the Portal ends', async () => {
+    const plan = await load({
+      lookupKeys: [STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY],
+      cancelAt: MOCK_CANCEL_AT,
+    });
+
+    expect(plan?.endsAt).toEqual(MOCK_ENDS_AT);
   });
 
   it('reads nothing from a subscription on an unknown Price', async () => {

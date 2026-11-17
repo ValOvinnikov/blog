@@ -4,7 +4,10 @@ import { ProvisioningBanner } from '@platform/components/features/tenants/provis
 import { TenantDetailsPanel } from '@platform/components/features/tenants/tenant-details-panel';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
-import { computeTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
+import {
+  computeTenantFieldLocks,
+  type TTenantFieldLockFlags,
+} from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { useProvisioningPoll } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import type { TMaybeUndefined } from '@shinefold/config';
 import type { TTenantOwnerMembership } from '@shinefold/db/queries/memberships';
@@ -13,14 +16,14 @@ import { useId } from 'react';
 export type TTenantProvisioningSectionProps = {
   tenant: TClientTenant;
   owner: TMaybeUndefined<TTenantOwnerMembership>;
-  isPrimaryCustom: boolean;
+  lockFlags: TTenantFieldLockFlags;
   isStudioReinviteUnsent: boolean;
 };
 
 export const TenantProvisioningSection = ({
   tenant,
   owner,
-  isPrimaryCustom,
+  lockFlags,
   isStudioReinviteUnsent,
 }: TTenantProvisioningSectionProps) => {
   const { id, archivedAt } = tenant;
@@ -42,7 +45,7 @@ export const TenantProvisioningSection = ({
           provisioningSteps,
           provisioningStatus,
           owner,
-          isPrimaryCustom,
+          lockFlags,
         )}
         owner={owner}
         isStudioReinviteUnsent={isStudioReinviteUnsent}

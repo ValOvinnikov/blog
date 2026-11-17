@@ -7,6 +7,7 @@ import type {
 import {
   COOKIE_STATEMENT_SLUG,
   NEWSLETTER_RESULT_SLUGS,
+  PLAN_COMPARISON_ANCHOR_ID,
   type TLegalPageKind,
   type TLocaleIsoCode,
   type TNewsletterResult,
@@ -53,7 +54,11 @@ export const routes = {
     `/api/switch-language?${new URLSearchParams({ to, from }).toString()}`,
   rssFeed: () => '/rss.xml',
   tagRssFeed: (slug: string) => `${routes.tag(slug)}/rss.xml`,
+  pricingComparison: () => `/pricing#${PLAN_COMPARISON_ANCHOR_ID}`,
 } as const;
+
+export const pricingPageUrl = (platformMainAddress: string) =>
+  `https://${platformMainAddress}${routes.pricingComparison()}`;
 
 const PAGE_HREF_BUILDERS = {
   page_home: () => routes.home(),

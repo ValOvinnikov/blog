@@ -8,8 +8,8 @@ import { NestableMenuRoot } from '@platform/components/shared/nestable-menu-root
 import { NestableMenuTrigger } from '@platform/components/shared/nestable-menu-trigger';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { AVATAR_VARIANT } from '@platform/constants/avatar';
+import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
-import { Link } from '@platform/i18n/navigation';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 import { ICONS } from '@shinefold/config';
@@ -61,7 +61,11 @@ export const TenantSwitcher = ({
           <span className={nameRow()}>
             <span className={name()}>{active.name}</span>
             {active.isArchived && (
-              <StatusBadge tone="neutral" hasDot={false} className={badge()}>
+              <StatusBadge
+                tone={BADGE_TONE.NEUTRAL}
+                hasDot={false}
+                className={badge()}
+              >
                 {t('archived')}
               </StatusBadge>
             )}
@@ -77,9 +81,7 @@ export const TenantSwitcher = ({
           align="start"
           className={positioner()}
         >
-          {/* Base UI points the popup's aria-labelledby at the trigger unconditionally,
-              which wins over any aria-label here per the accname algorithm — and the
-              trigger's own text (active tenant + domain) is already the right name. */}
+          {/* Base UI's aria-labelledby (the trigger, already the right name) outranks any aria-label. */}
           <Menu.Popup className={surfacePopup({ class: popup() })}>
             {tenants.map((tenant) => (
               <Menu.LinkItem
@@ -87,9 +89,9 @@ export const TenantSwitcher = ({
                 closeOnClick={true}
                 className={item()}
                 render={
-                  <Link
+                  // A document load: a client navigation keeps the dashboard layout of the site switched from.
+                  <a
                     href={adminRoutes.dashboardSelectTenantHref(tenant.id)}
-                    prefetch={false}
                     aria-current={tenant.id === active.id ? 'true' : undefined}
                   />
                 }
@@ -98,7 +100,7 @@ export const TenantSwitcher = ({
                   <span className={itemName()}>{tenant.name}</span>
                   {tenant.isArchived && (
                     <StatusBadge
-                      tone="neutral"
+                      tone={BADGE_TONE.NEUTRAL}
                       hasDot={false}
                       className={itemBadge()}
                     >
