@@ -1,5 +1,4 @@
 import type { TMaybeUndefined } from '@shinefold/config';
-import type { TTenantPlan } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import {
   getPlatformSanityContext,
@@ -37,7 +36,6 @@ export type THostTenantSanityWriteContext =
       isResolvable: true;
       tenant: TMaybeUndefined<TTenantSanityContext>;
       tenantId: TMaybeUndefined<string>;
-      plan: TMaybeUndefined<TTenantPlan>;
       isActive: boolean;
     }
   | { isResolvable: false };
@@ -54,7 +52,6 @@ export const getHostTenantSanityWriteContext = cache(
         isResolvable: true,
         tenant: undefined,
         tenantId: undefined,
-        plan: undefined,
         isActive: true,
       };
     }
@@ -63,7 +60,6 @@ export const getHostTenantSanityWriteContext = cache(
       isResolvable: true,
       tenant: queries.tenants.toTenantSanityWriteCredentials(resolvedTenant),
       tenantId: resolvedTenant.id,
-      plan: resolvedTenant.plan,
       isActive: isTenantActive(resolvedTenant),
     };
   },

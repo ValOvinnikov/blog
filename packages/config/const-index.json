@@ -10082,6 +10082,14 @@
         "file": "apps/web/src/constants/generate-skim.ts"
       }
     ],
+    "generate_skim.claim_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.CLAIM_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
     "generate_skim.claim_release_failed": [
       {
         "ref": "GENERATE_SKIM_LOG.CLAIM_RELEASE_FAILED",

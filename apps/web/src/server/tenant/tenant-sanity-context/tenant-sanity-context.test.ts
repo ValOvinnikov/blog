@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { TENANT_PLAN } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import { TENANT_STATUS } from '@shinefold/db/constants';
 import type { TTenantSanityWriteCredentials } from '@shinefold/db/queries/tenants/get-tenant-sanity-write-credentials/get-tenant-sanity-write-credentials';
@@ -119,7 +118,6 @@ describe(getHostTenantSanityWriteContext, () => {
       isResolvable: true,
       tenant: credentials,
       tenantId: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.GROWTH,
       isActive: true,
     });
   });
@@ -136,7 +134,6 @@ describe(getHostTenantSanityWriteContext, () => {
       isResolvable: true,
       tenant: credentials,
       tenantId: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.GROWTH,
       isActive: false,
     });
   });
@@ -160,7 +157,6 @@ describe(getHostTenantSanityWriteContext, () => {
       isResolvable: true,
       tenant: undefined,
       tenantId: undefined,
-      plan: undefined,
       isActive: true,
     });
   });
@@ -170,7 +166,6 @@ describe(getHostTenantSanityWriteContext, () => {
       isResolvable: true,
       tenant: undefined,
       tenantId: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.GROWTH,
       isActive: true,
     });
   });

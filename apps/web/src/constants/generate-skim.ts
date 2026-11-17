@@ -6,6 +6,7 @@ export const GENERATE_SKIM_LOG = {
     'generate_skim.tenant_write_credentials_missing',
   TENANT_NOT_ACTIVE: 'generate_skim.tenant_not_active',
   ALLOWANCE_USED: 'generate_skim.allowance_used',
+  CLAIM_FAILED: 'generate_skim.claim_failed',
   CLAIM_RELEASE_FAILED: 'generate_skim.claim_release_failed',
   POST_BODY_FETCH_FAILED: 'generate_skim.post_body_fetch_failed',
   GENERATION_FAILED: 'generate_skim.generation_failed',

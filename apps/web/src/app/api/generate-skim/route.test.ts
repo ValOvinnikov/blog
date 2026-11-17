@@ -1,10 +1,6 @@
 import { faker } from '@faker-js/faker';
 import type { TMaybeNull } from '@shinefold/config';
-import {
-  HTTP_METHOD,
-  HTTP_STATUS,
-  TENANT_PLAN,
-} from '@shinefold/config/constants';
+import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
 import { errorResult, okResult } from '@shinefold/utils';
 import { isNull } from '@shinefold/utils/primitives';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
@@ -144,7 +140,6 @@ describe(POST, () => {
       isResolvable: true,
       tenant: undefined,
       tenantId: undefined,
-      plan: undefined,
       isActive: true,
     });
     claimTakeawayGenerationMock.mockReset();
@@ -235,17 +230,13 @@ describe(POST, () => {
       isResolvable: true,
       tenant: MOCK_WRITE_CREDENTIALS,
       tenantId: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.FREE,
       isActive: true,
     });
 
     const response = await POST(postRequest());
 
     expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(claimTakeawayGenerationMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      TENANT_PLAN.FREE,
-    );
+    expect(claimTakeawayGenerationMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(saveSkimDraftMock).toHaveBeenCalledWith(
       MOCK_SAVED_DRAFT,
       MOCK_WRITE_CREDENTIALS,
@@ -273,7 +264,6 @@ describe(POST, () => {
       isResolvable: true,
       tenant: undefined,
       tenantId: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.FREE,
       isActive: true,
     });
 
@@ -294,7 +284,6 @@ describe(POST, () => {
       isResolvable: true,
       tenant: MOCK_WRITE_CREDENTIALS,
       tenantId: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.FREE,
       isActive: false,
     });
 
@@ -351,13 +340,12 @@ describe(POST, () => {
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
   });
 
-  describe('for a tenant on a plan', () => {
+  describe('for a resolved tenant', () => {
     beforeEach(() => {
       getHostTenantSanityWriteContextMock.mockResolvedValue({
         isResolvable: true,
         tenant: MOCK_WRITE_CREDENTIALS,
         tenantId: MOCK_TENANT_ID,
-        plan: TENANT_PLAN.FREE,
         isActive: true,
       });
     });
@@ -373,6 +361,23 @@ describe(POST, () => {
       expect(saveSkimDraftMock).not.toHaveBeenCalled();
       expect(logger.error).not.toHaveBeenCalled();
       expect(logger.warn).not.toHaveBeenCalled();
+    });
+
+    it('answers unavailable and logs it when the claim cannot be made', async () => {
+      claimTakeawayGenerationMock.mockRejectedValue(MOCK_ERROR);
+
+      const response = await POST(postRequest());
+
+      expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
+      expect(logger.error).toHaveBeenCalledWith(
+        GENERATE_SKIM_LOG.CLAIM_FAILED,
+        {
+          postId: MOCK_POST_ID,
+          tenantId: MOCK_TENANT_ID,
+          error: MOCK_ERROR,
+        },
+      );
+      expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
     });
 
     it('keeps the claim when the takeaways are saved', async () => {

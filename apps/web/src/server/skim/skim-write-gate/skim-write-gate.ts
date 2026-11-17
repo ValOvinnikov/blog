@@ -43,8 +43,8 @@ export const gateSkimWrite = async (
     return refuse(UNRESOLVED_TENANT_MESSAGE, HTTP_STATUS.NOT_FOUND);
   }
 
-  const { tenant, tenantId, plan, isActive } = writeTenant;
-  if (!tenantId || !plan) {
+  const { tenant, tenantId, isActive } = writeTenant;
+  if (!tenantId) {
     return { isAllowed: true, tenant, claim: null };
   }
   if (!tenant) {
@@ -62,12 +62,18 @@ export const gateSkimWrite = async (
     return refuseInactive();
   }
 
-  const claim = await queries.takeawayGenerations.claimTakeawayGeneration(
-    tenantId,
-    plan,
-  );
+  let claim: TMaybeNull<TTakeawayGenerationClaim>;
+  try {
+    claim = await queries.takeawayGenerations.claimTakeawayGeneration(tenantId);
+  } catch (error) {
+    logger.error(GENERATE_SKIM_LOG.CLAIM_FAILED, { postId, tenantId, error });
+    return refuse(
+      'Failed to check the takeaways allowance.',
+      HTTP_STATUS.SERVICE_UNAVAILABLE,
+    );
+  }
   if (!claim) {
-    logger.info(GENERATE_SKIM_LOG.ALLOWANCE_USED, { postId, tenantId, plan });
+    logger.info(GENERATE_SKIM_LOG.ALLOWANCE_USED, { postId, tenantId });
     return refuseInactive();
   }
 

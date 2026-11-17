@@ -1,18 +1,25 @@
-import type { TTenantPlan } from '@shinefold/config/constants';
 import type { TMaybeNull } from '@shinefold/config/types';
 import { getDb } from '@shinefold/db/client';
 import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import { takeawayGenerationCounts } from '@shinefold/db/schema/takeaway-generation-counts';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { utcMonthStartDay } from '@shinefold/utils/date';
-import { lt, sql } from 'drizzle-orm';
+import { lt, type SQL, sql } from 'drizzle-orm';
 
 export type TTakeawayGenerationClaim = { tenantId: string; month: string };
 
+function tenantMonthlyAllowance(tenantId: string): SQL<number> {
+  const allowanceByPlan = Object.entries(PLAN_ENTITLEMENTS).map(
+    ([plan, { takeawaysPerMonth }]) =>
+      sql`WHEN ${plan} THEN ${takeawaysPerMonth}::int`,
+  );
+
+  return sql<number>`(SELECT CASE ${tenants.plan}::text ${sql.join(allowanceByPlan, sql` `)} END FROM ${tenants} WHERE ${tenants.id} = ${tenantId})`;
+}
+
 export async function claimTakeawayGeneration(
   tenantId: string,
-  plan: TTenantPlan,
 ): Promise<TMaybeNull<TTakeawayGenerationClaim>> {
-  const { takeawaysPerMonth } = PLAN_ENTITLEMENTS[plan];
   const month = utcMonthStartDay(new Date());
   const [claimed] = await getDb()
     .insert(takeawayGenerationCounts)
@@ -23,7 +30,10 @@ export async function claimTakeawayGeneration(
         takeawayGenerationCounts.month,
       ],
       set: { count: sql`${takeawayGenerationCounts.count} + 1` },
-      setWhere: lt(takeawayGenerationCounts.count, takeawaysPerMonth),
+      setWhere: lt(
+        takeawayGenerationCounts.count,
+        tenantMonthlyAllowance(tenantId),
+      ),
     })
     .returning({ month: takeawayGenerationCounts.month });
 
