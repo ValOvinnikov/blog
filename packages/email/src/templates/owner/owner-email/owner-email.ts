@@ -1,6 +1,7 @@
 import {
   renderEmailAction,
   type TEmailAction,
+  type TEmailLink,
 } from '@shinefold/email/html/email-action/email-action';
 import {
   detailsAsPlainText,
@@ -20,6 +21,7 @@ export type TOwnerEmailInput = {
   paragraphs: string[];
   details?: TEmailDetail[];
   action?: TEmailAction;
+  secondaryLink?: TEmailLink;
 };
 
 export type TOwnerEmail = {
@@ -35,6 +37,7 @@ export function buildOwnerEmail({
   paragraphs,
   details,
   action,
+  secondaryLink,
 }: TOwnerEmailInput): TOwnerEmail {
   const paragraphsHtml = paragraphs
     .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
@@ -43,6 +46,10 @@ export function buildOwnerEmail({
   const bodyHtml = hasDetails
     ? paragraphsHtml + renderEmailDetails(details)
     : paragraphsHtml;
+  const actions: TEmailAction[] = [
+    ...(action ? [action] : []),
+    ...(secondaryLink ? [{ ...secondaryLink, variant: 'link' as const }] : []),
+  ];
 
   return {
     subject,
@@ -51,13 +58,17 @@ export function buildOwnerEmail({
       title: subject,
       previewText,
       bodyHtml,
-      actionHtml: action
-        ? renderEmailAction(action, PLATFORM_EMAIL_BRAND)
+      actionHtml: hasLength(actions)
+        ? actions
+            .map((emailAction) =>
+              renderEmailAction(emailAction, PLATFORM_EMAIL_BRAND),
+            )
+            .join('')
         : undefined,
     }),
     text: buildPlainTextBody(
       hasDetails ? [...paragraphs, detailsAsPlainText(details)] : paragraphs,
-      action,
+      ...actions,
     ),
   };
 }
