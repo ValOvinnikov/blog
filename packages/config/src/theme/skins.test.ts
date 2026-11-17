@@ -77,7 +77,7 @@ describe('the skin registry', () => {
     ).toEqual(PAGE_ROLES[COLOR_SCHEME.LIGHT]);
   });
 
-  it('Plain takes the page roles in dark mode but a field boundary that clears the tint', () => {
+  it('Plain moves only its dark field boundary off the page roles', () => {
     const roles = SKIN_REGISTRY[BRAND_VARIANT.PRIMARY].roles[COLOR_SCHEME.DARK];
     const pageRoles = PAGE_ROLES[COLOR_SCHEME.DARK];
 
