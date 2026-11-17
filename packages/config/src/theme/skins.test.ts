@@ -9,7 +9,6 @@ import { SCHEME_RAMPS } from './contrast-scheme-ramps';
 import {
   AMBIENT,
   BRAND_PRIMARY_MUTED,
-  FIELD_BOUNDARY,
   SECONDARY,
   TEXT,
   TEXT_MUTED,
@@ -71,18 +70,9 @@ describe('the skin registry', () => {
     },
   );
 
-  it('Plain takes the page roles in light mode', () => {
-    expect(
-      SKIN_REGISTRY[BRAND_VARIANT.PRIMARY].roles[COLOR_SCHEME.LIGHT],
-    ).toEqual(PAGE_ROLES[COLOR_SCHEME.LIGHT]);
-  });
-
-  it('Plain moves only its dark field boundary off the page roles', () => {
-    const roles = SKIN_REGISTRY[BRAND_VARIANT.PRIMARY].roles[COLOR_SCHEME.DARK];
-    const pageRoles = PAGE_ROLES[COLOR_SCHEME.DARK];
-
-    expect({ ...roles, [FIELD_BOUNDARY]: pageRoles[FIELD_BOUNDARY] }).toEqual(
-      pageRoles,
+  it.each(COLOR_SCHEMES)('Plain takes the page roles under %s', (scheme) => {
+    expect(SKIN_REGISTRY[BRAND_VARIANT.PRIMARY].roles[scheme]).toEqual(
+      PAGE_ROLES[scheme],
     );
   });
 

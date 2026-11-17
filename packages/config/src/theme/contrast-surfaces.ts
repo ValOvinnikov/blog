@@ -23,7 +23,6 @@ export const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
   '--info-muted': BRAND_PRIMARY_MUTED,
   '--code-fg': TEXT,
   '--code-comment': TEXT_MUTED,
-  [FIELD_BOUNDARY]: BORDER_EMPHASIS,
 };
 
 export const BANDS = [

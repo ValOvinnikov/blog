@@ -298,7 +298,7 @@
   /* 3:1 (WCAG 1.4.11) against --surface and against --secondary or
      --brand-primary-muted at every accent hue, where --border-emphasis falls short. */
   --field-boundary-tinted: oklch(0.58 0.006 250);
-  --field-boundary: var(--border-emphasis);
+  --field-boundary: oklch(0.62 0.006 250);
   --text: oklch(0.2 0.01 250);
   --text-muted: oklch(0.46 0.01 250);
   --text-subtle: var(--text-muted);
@@ -392,7 +392,7 @@
     0.55 0.01 250
   ); /* see :root comment — verified dark ratio 3.73:1 vs --primary-subtle */
   --field-boundary-tinted: oklch(0.59 0.01 250);
-  --field-boundary: var(--border-emphasis);
+  --field-boundary: oklch(0.58 0.006 250);
   --text: oklch(0.95 0.004 250);
   --text-muted: oklch(0.72 0.008 250);
   --text-subtle: var(--text-muted);

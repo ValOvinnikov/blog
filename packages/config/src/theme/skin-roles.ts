@@ -85,7 +85,6 @@ const PAGE_ROLE_SOURCES: Partial<Record<TSkinStopRole, TThemeToken>> = {
   '--backdrop': '--primary',
   '--divider': '--border',
   '--text-subtle': TEXT_MUTED,
-  '--field-boundary': BORDER_EMPHASIS,
 };
 
 const stopEquals = (
