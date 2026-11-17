@@ -176,18 +176,6 @@ describe(runDowngradeGraceSweep, () => {
       );
     });
 
-    it('names what a site leaving Starter lost', async () => {
-      emailDue(GRACE_EMAIL.STARTED, [
-        inGraceFor(0, { downgradedFromPlan: TENANT_PLAN.STARTER }),
-      ]);
-
-      await sweep();
-
-      expect(sentEmails()[0]?.text).toContain(
-        COPY.stopped[TENANT_PLAN.STARTER],
-      );
-    });
-
     it('sends nothing when another sweep already sent it', async () => {
       vi.mocked(claimGraceEmail).mockResolvedValue(null);
 

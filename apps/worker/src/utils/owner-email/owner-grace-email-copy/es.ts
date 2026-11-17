@@ -1,4 +1,3 @@
-import { TENANT_PLAN } from '@shinefold/config/constants';
 import { GRACE_EMAIL } from '@shinefold/db/constants';
 import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 
@@ -11,12 +10,7 @@ export const OWNER_GRACE_EMAIL_COPY_ES: TOwnerGraceEmailCopy = {
     `El ${date}, ${count} ${count === 1 ? 'miembro del equipo perderá' : 'miembros del equipo perderán'} el acceso a la administración del sitio. Sus cuentas se conservan y el acceso vuelve en cuanto mejore su plan.`,
   domainLock: ({ customDomain, subdomain, date }) =>
     `El ${date}, la dirección principal de su sitio pasará de ${customDomain} a ${subdomain}.`,
-  stopped: {
-    [TENANT_PLAN.GROWTH]:
-      'Las secciones Growth, el boletín, las cuentas de lectores y los ajustes de Look adicionales se han desactivado. No se ha eliminado nada: todo vuelve en cuanto mejore su plan.',
-    [TENANT_PLAN.STARTER]:
-      'El formulario de contacto y su propia herramienta de analítica se han desactivado, y la mención «Powered by» vuelve al pie de página. No se ha eliminado nada: todo vuelve en cuanto mejore su plan.',
-  },
+  planComparisonLabel: 'Vea lo que incluye cada plan',
   emails: {
     [GRACE_EMAIL.STARTED]: ({ siteName }) => ({
       subject: `${siteName} está ahora en el plan gratuito`,

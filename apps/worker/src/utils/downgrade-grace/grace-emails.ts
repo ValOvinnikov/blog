@@ -1,5 +1,3 @@
-import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
-import type { TMaybeNull } from '@shinefold/config/types';
 import { GRACE_EMAIL, type TGraceEmail } from '@shinefold/db/constants';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { graceEndDate } from '@shinefold/db/utils/grace-end-date/grace-end-date';
@@ -17,10 +15,7 @@ import { OWNER_DASHBOARD_PATH } from '@worker/constants/owner-email';
 import { formatInactivityDate } from '@worker/utils/inactivity-sweep/inactivity-dates';
 import type { TInactivitySweepEnv } from '@worker/utils/inactivity-sweep/inactivity-sweep-env';
 import { OWNER_DASHBOARD_ACTION_LABEL } from '@worker/utils/owner-email/owner-dashboard-action-label';
-import type {
-  TDowngradedPlan,
-  TOwnerGraceEmailCopy,
-} from '@worker/utils/owner-email/owner-email-copy-types';
+import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 import { OWNER_GRACE_EMAIL_COPY } from '@worker/utils/owner-email/owner-grace-email-copy/owner-grace-email-copy';
 import { sendOwnerMessage } from '@worker/utils/owner-email/send-owner-message';
 
@@ -49,17 +44,11 @@ function lockParagraphs(
   return [...members, ...domain];
 }
 
-function downgradedPlanOf(plan: TMaybeNull<TTenantPlan>): TDowngradedPlan {
-  return plan === TENANT_PLAN.STARTER
-    ? TENANT_PLAN.STARTER
-    : TENANT_PLAN.GROWTH;
-}
-
 export async function sendOwnerGraceEmail(
   email: TGraceEmail,
   { tenant, graceStartedAt, ownerEmail, locks, env }: TGraceEmailInput,
 ): Promise<void> {
-  const { id: tenantId, name, locale, downgradedFromPlan } = tenant;
+  const { id: tenantId, name, locale } = tenant;
   const copy = OWNER_GRACE_EMAIL_COPY[locale];
   const date = formatInactivityDate(graceEndDate(graceStartedAt), locale);
   const { paragraphs, ...text } = copy.emails[email]({ siteName: name, date });
@@ -75,9 +64,6 @@ export async function sendOwnerGraceEmail(
       ...text,
       paragraphs: [
         ...paragraphs,
-        ...(email === GRACE_EMAIL.STARTED
-          ? [copy.stopped[downgradedPlanOf(downgradedFromPlan)]]
-          : []),
         ...lockParagraphs(copy, locks, date),
         closing,
       ],

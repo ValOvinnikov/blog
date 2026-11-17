@@ -1,4 +1,3 @@
-import { TENANT_PLAN } from '@shinefold/config/constants';
 import { GRACE_EMAIL } from '@shinefold/db/constants';
 import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 
@@ -10,12 +9,7 @@ export const OWNER_GRACE_EMAIL_COPY_NL: TOwnerGraceEmailCopy = {
     `Op ${date} verliezen ${count} ${count === 1 ? 'teamlid' : 'teamleden'} de toegang tot het beheer van de site. Hun accounts blijven bestaan en de toegang komt terug zodra je upgradet.`,
   domainLock: ({ customDomain, subdomain, date }) =>
     `Op ${date} verhuist het hoofdadres van je site van ${customDomain} terug naar ${subdomain}.`,
-  stopped: {
-    [TENANT_PLAN.GROWTH]:
-      'Growth-secties, de nieuwsbrief, lezersaccounts en de extra Look-instellingen zijn gestopt. Er is niets verwijderd: alles komt terug zodra je upgradet.',
-    [TENANT_PLAN.STARTER]:
-      'Het contactformulier en je eigen analysetool zijn gestopt, en het “Powered by”-merk staat weer in de footer. Er is niets verwijderd: alles komt terug zodra je upgradet.',
-  },
+  planComparisonLabel: 'Bekijk wat elk abonnement bevat',
   emails: {
     [GRACE_EMAIL.STARTED]: ({ siteName }) => ({
       subject: `${siteName} staat nu op het gratis abonnement`,
