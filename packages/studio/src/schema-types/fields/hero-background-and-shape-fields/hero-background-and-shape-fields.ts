@@ -1,14 +1,9 @@
-import {
-  BRAND_VARIANT,
-  FULL_BRAND_VARIANT_LIST,
-  HERO_VARIANT,
-} from '@shinefold/config/constants';
+import { BRAND_VARIANT, HERO_VARIANT } from '@shinefold/config/constants';
 import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { variantField } from '@shinefold/studio/schema-types/fields/variant-field/variant-field';
 
 export const heroBackgroundAndShapeFields = () => [
   brandVariantField({
-    list: FULL_BRAND_VARIANT_LIST,
     initialValue: BRAND_VARIANT.BRAND_PRIMARY,
     descriptionSuffix: ' On a Banner, this tints the image.',
   }),

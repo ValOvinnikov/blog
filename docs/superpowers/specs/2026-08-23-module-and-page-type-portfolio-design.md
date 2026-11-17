@@ -913,7 +913,7 @@ does:
 | Field              | Type                                                            | Notes                                                                                   |
 | ------------------ | --------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `title`            | `titleField()`                                                  | Editor-facing name, never rendered                                                      |
-| `brandVariant`     | `brandVariantField({ list: FULL_BRAND_VARIANT_LIST })`          |                                                                                         |
+| `brandVariant`     | `brandVariantField()`                                           |                                                                                         |
 | `headingBlock`     | `headingBlockField()`                                           | Required heading, optional supporting text                                              |
 | `features`         | array of references → `block_feature`, `unique()`, 2–8          | Authored order is display order                                                         |
 | `ctaButtons`       | `ctaButtonsField()`                                             | 0–2 actions under the grid — "See all services", "Get in touch"                         |
@@ -1594,7 +1594,7 @@ for index-page slots:
 
 ```ts
 type TTaxonomyListModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: Extract<TBrandVariant, 'PRIMARY' | 'SECONDARY'>;
   headingBlock: THeadingBlock;
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
@@ -1797,7 +1797,7 @@ One query, the `module_heroBlog` shape:
 
 ```ts
 type TPostFeaturedModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: Extract<TBrandVariant, 'PRIMARY' | 'SECONDARY'>;
   headingBlock: THeadingBlock;
   posts: TPostCard[];
   layout: TMaybeUndefined<TLayout>;

@@ -373,9 +373,10 @@ name, and links a card's name to it when set, leaving the name as plain
 text when it is unset.
 
 Every `module_*` document also carries a **required** `brandVariant` field,
-titled Background, from `brandVariantField()`. **Every module offers all three
-`BRAND_VARIANT` values** — Plain (`PRIMARY`), Shaded (`SECONDARY`) and Brand
-tint (`BRAND_PRIMARY`) — and starts on Plain; the heroes are the one family
+titled Background, from `brandVariantField()`. **Every module offers every
+`SKIN_REGISTRY` entry** (`@shinefold/config`'s theme), titled and ordered as
+the registry has them — today Plain (`PRIMARY`), Shaded (`SECONDARY`) and
+Brand tint (`BRAND_PRIMARY`) — and starts on Plain; the heroes are the one family
 that starts on Brand tint, and on a Banner hero the value also tints the
 image. A module that must not sit on the brand band states why rather than
 trimming its list. On `module_cta` this field means the card's own fill
@@ -1403,9 +1404,8 @@ Sanity webhook keeps it fresh; the title is never stored. The panel keeps
 fetched titles in memory for the visit, keyed by document id and language,
 and falls back to the path when the call fails or the page is gone.
 
-`service.modules.<type>.v1` projects `brandVariant` as a required
-`TBrandVariantOf<...>` (narrowed per module to exactly the options its
-schema allows), `layout` as `TLayout | undefined`, and (where applicable)
+`service.modules.<type>.v1` projects `brandVariant` as the required full
+`TBrandVariant` union, `layout` as `TLayout | undefined`, and (where applicable)
 `headingBlock` as a required `THeadingBlock` — with no faked defaults
 anywhere: what is unset stays unset end to end. In `apps/web`, every module
 component that renders a `@shinefold/ui` organism — including those reached through a

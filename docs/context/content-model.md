@@ -44,9 +44,9 @@ exist, and every one is live — schema, service adaptor and renderer all presen
 - **`title`** — required, internal Studio label only, never rendered. Via
   `titleField()`, so a module stays listable and previewable independent of its
   display fields.
-- **`brandVariant`** — required, via `brandVariantField()`. `PRIMARY` /
-  `SECONDARY` by default; the hero family and `module_cta` pass the wider list
-  including `BRAND_PRIMARY`.
+- **`brandVariant`** — required, via `brandVariantField()`. Every module offers
+  every `SKIN_REGISTRY` skin, in registry order; a module narrows the list only
+  through the helper's `list` option.
 - **`layout`** — optional. `spacingTop` / `spacingBottom` (five named scales),
   `dividerTop` / `dividerBottom` hairlines, and `containerWidth` capping the
   inner content. Spacing is padding rather than margin, so consecutive bands
