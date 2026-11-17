@@ -4,6 +4,7 @@ import { errorResult, okResult } from '@shinefold/utils';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
 import { STARTER_DOCUMENT_ID_PREFIX } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
+import { enqueueWorkerRun } from '@web/server/revalidate/enqueue-worker-run/enqueue-worker-run';
 import { generatePostSkim } from '@web/server/skim/generate-post-skim/generate-post-skim';
 import { resolveTenantById } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { toTenantSanityWriteContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
@@ -34,6 +35,10 @@ vi.mock('next/server', () => ({
   after: vi.fn((callback: () => Promise<void>) => {
     afterWork.push(callback());
   }),
+}));
+
+vi.mock('@web/server/revalidate/enqueue-worker-run/enqueue-worker-run', () => ({
+  enqueueWorkerRun: vi.fn(),
 }));
 
 vi.mock('@web/server/skim/generate-post-skim/generate-post-skim', () => ({
@@ -104,6 +109,7 @@ describe(startSkimGeneration, () => {
   it("generates after the response with the tenant's Sanity contexts", async () => {
     await start();
 
+    expect(enqueueWorkerRun).not.toHaveBeenCalled();
     expect(after).toHaveBeenCalledOnce();
     expect(toTenantSanityWriteContext).toHaveBeenCalledWith(MOCK_TENANT);
     expect(generatePostSkim).toHaveBeenCalledWith({
@@ -136,15 +142,36 @@ describe(startSkimGeneration, () => {
     expect(after).not.toHaveBeenCalled();
   });
 
-  it.each([
-    ['dated in the future', MOCK_FUTURE_PUBLISHED_AT],
-    ['without a publish date', null],
-  ])('generates nothing for a post %s', async (_case, publishedAt) => {
-    getPostPublishedAtMock.mockResolvedValue(okResult(publishedAt));
+  it('generates nothing for a post without a publish date', async () => {
+    getPostPublishedAtMock.mockResolvedValue(okResult(undefined));
 
     await start();
 
     expect(generatePostSkim).not.toHaveBeenCalled();
+    expect(enqueueWorkerRun).not.toHaveBeenCalled();
+  });
+
+  it('hands a future-dated post to the worker for its go-live', async () => {
+    getPostPublishedAtMock.mockResolvedValue(
+      okResult(MOCK_FUTURE_PUBLISHED_AT),
+    );
+
+    await start();
+
+    expect(generatePostSkim).not.toHaveBeenCalled();
+    expect(enqueueWorkerRun).toHaveBeenCalledWith({
+      path: '/api/scheduled-post-skim',
+      request: {
+        tenantId: MOCK_TENANT_ID,
+        postId: MOCK_POST_ID,
+        publishedAt: MOCK_FUTURE_PUBLISHED_AT,
+      },
+      log: {
+        SKIPPED: GENERATE_SKIM_LOG.GO_LIVE_ENQUEUE_SKIPPED,
+        REFUSED: GENERATE_SKIM_LOG.GO_LIVE_ENQUEUE_REFUSED,
+        FAILED: GENERATE_SKIM_LOG.GO_LIVE_ENQUEUE_FAILED,
+      },
+    });
   });
 
   it('logs a failed publish-date lookup and generates nothing', async () => {

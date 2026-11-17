@@ -14,4 +14,10 @@ export const GENERATE_SKIM_LOG = {
   DRAFT_SAVE_FAILED: 'generate_skim.draft_save_failed',
   PUBLISHED_AT_LOOKUP_FAILED: 'generate_skim.published_at_lookup_failed',
   PUBLISH_START_FAILED: 'generate_skim.publish_start_failed',
+  GO_LIVE_ENQUEUE_SKIPPED: 'generate_skim.go_live_enqueue_skipped',
+  GO_LIVE_ENQUEUE_REFUSED: 'generate_skim.go_live_enqueue_refused',
+  GO_LIVE_ENQUEUE_FAILED: 'generate_skim.go_live_enqueue_failed',
+  GO_LIVE_SECRET_MISSING: 'generate_skim.go_live_secret_missing',
+  GO_LIVE_TENANT_LOOKUP_FAILED: 'generate_skim.go_live_tenant_lookup_failed',
+  TAKEAWAYS_LOOKUP_FAILED: 'generate_skim.takeaways_lookup_failed',
 } as const;
