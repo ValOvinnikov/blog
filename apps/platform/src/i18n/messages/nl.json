@@ -29,7 +29,8 @@
     "onboarding": "Je site maken",
     "billing": "Facturering · Admin",
     "upgrade": "Upgraden",
-    "help": "Help"
+    "help": "Help",
+    "draftPreview": "Conceptvoorbeeld"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -2371,5 +2372,23 @@
     "rateLimited": "Je hebt in korte tijd meerdere berichten verstuurd. Probeer het later opnieuw.",
     "unavailable": "Het helpformulier is nu niet beschikbaar. Probeer het later opnieuw.",
     "sendFailed": "Je bericht kon niet worden verstuurd — probeer het opnieuw."
+  },
+  "draftPreview": {
+    "title": "Conceptvoorbeeld",
+    "draftNotice": "Dit is het laatst opgeslagen concept, niet de gepubliceerde pagina. Alleen leden van deze site kunnen dit voorbeeld openen.",
+    "siteLabel": "Site",
+    "pathLabel": "Pagina",
+    "frameRegionLabel": "Conceptvoorbeeld",
+    "frameTitle": "Concept van deze pagina op je site",
+    "toolbarAriaLabel": "Voorbeeldopties",
+    "reload": "Opnieuw laden",
+    "reloading": "Opnieuw laden…",
+    "openPublished": "Gepubliceerde pagina openen",
+    "refusedTitle": "Dit concept heeft geen voorbeeld",
+    "refusalNotFound": "Deze pagina heeft geen adres op je site. Alleen berichten en landingspagina's hebben een voorbeeld, en een landingspagina heeft al haar bovenliggende pagina's nodig.",
+    "refusalLanguageOff": "Deze pagina is in een taal die je site niet aanbiedt. Zet deze taal aan om het voorbeeld te zien.",
+    "refusalSuspended": "Deze site is opgeschort, dus de concepten hebben geen voorbeeld.",
+    "refusalArchived": "Deze site is gearchiveerd, dus de concepten hebben geen voorbeeld.",
+    "refusalUnavailable": "Het platform kon dit voorbeeld niet voorbereiden. Het probleem is gelogd voor het platformteam."
   }
 }

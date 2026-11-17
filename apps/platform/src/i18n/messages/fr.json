@@ -29,7 +29,8 @@
     "onboarding": "Créer votre site",
     "billing": "Facturation · Administration",
     "upgrade": "Changer d'offre",
-    "help": "Aide"
+    "help": "Aide",
+    "draftPreview": "Aperçu du brouillon"
   },
   "signInPage": {
     "heading": "Connexion",
@@ -2371,5 +2372,23 @@
     "rateLimited": "Vous avez envoyé plusieurs messages en peu de temps. Réessayez plus tard.",
     "unavailable": "Le formulaire d'aide n'est pas disponible pour le moment. Réessayez plus tard.",
     "sendFailed": "Impossible d'envoyer votre message — réessayez."
+  },
+  "draftPreview": {
+    "title": "Aperçu du brouillon",
+    "draftNotice": "Il s'agit du dernier brouillon enregistré, pas de la page publiée. Seuls les membres de ce site peuvent ouvrir cet aperçu.",
+    "siteLabel": "Site",
+    "pathLabel": "Page",
+    "frameRegionLabel": "Aperçu du brouillon",
+    "frameTitle": "Brouillon de cette page sur votre site",
+    "toolbarAriaLabel": "Options d'aperçu",
+    "reload": "Recharger",
+    "reloading": "Rechargement…",
+    "openPublished": "Ouvrir la page publiée",
+    "refusedTitle": "Impossible d'afficher l'aperçu de ce brouillon",
+    "refusalNotFound": "Cette page n'a pas d'adresse sur votre site. Seuls les articles et les pages d'atterrissage ont un aperçu, et une page d'atterrissage doit avoir toutes ses pages parentes.",
+    "refusalLanguageOff": "Cette page est dans une langue que votre site ne propose pas. Activez cette langue pour l'afficher en aperçu.",
+    "refusalSuspended": "Ce site est suspendu : l'aperçu de ses brouillons est impossible.",
+    "refusalArchived": "Ce site est archivé : l'aperçu de ses brouillons est impossible.",
+    "refusalUnavailable": "La plateforme n'a pas pu préparer cet aperçu. Le problème a été consigné pour l'équipe de la plateforme."
   }
 }

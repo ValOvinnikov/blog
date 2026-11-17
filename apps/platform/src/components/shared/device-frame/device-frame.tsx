@@ -14,16 +14,15 @@ import {
   PREVIEW_DEVICE,
   PREVIEW_DEVICE_HEIGHT,
   PREVIEW_DEVICE_WIDTH,
-  type TPreviewDevice,
 } from '@platform/constants/preview';
 import { mapCompoundSlots, type TCompoundComponent } from '@platform/lib/react';
 import type { TDeviceFrameFit } from '@platform/utils/device-frame-scale/device-frame-scale';
 import { useTranslations } from 'next-intl';
-import { Fragment, type ElementType, type ReactNode, type Ref } from 'react';
+import { Fragment, type ElementType } from 'react';
 
+import type { TDeviceFrameProps } from './device-frame-props';
 import { deviceFrameVariants } from './device-frame-variants';
 import { useDeviceFrame } from './use-device-frame';
-import type { TDeviceFrameHandle } from './use-device-frame-handle';
 
 const DeviceFrameParts = {
   Overlay: DeviceFrameOverlay,
@@ -31,24 +30,12 @@ const DeviceFrameParts = {
 
 const PAGE_FIT: TDeviceFrameFit = { mode: DEVICE_FRAME_FIT.PAGE };
 
-type TDeviceFrameProps = {
-  device: TPreviewDevice;
-  host?: string;
-  fit?: TDeviceFrameFit;
-  isDark: boolean;
-  onScaleChange?(scale: number): void;
-  onHandScroll?(): void;
-  children: ReactNode;
-  ref?: Ref<TDeviceFrameHandle>;
-};
-
 const DeviceFrameRoot = ({
   device,
-  host,
+  chrome: { host, isDark },
   fit = PAGE_FIT,
-  isDark,
-  onScaleChange,
-  onHandScroll,
+  listeners,
+  isInteractive = false,
   children,
   ref,
 }: TDeviceFrameProps) => {
@@ -68,7 +55,7 @@ const DeviceFrameRoot = ({
     verticalThumb,
     horizontalThumb,
     scrollerProps,
-  } = useDeviceFrame({ device, fit, onScaleChange, onHandScroll, ref });
+  } = useDeviceFrame({ device, fit, ...listeners, ref });
   const {
     stage,
     frame,
@@ -108,7 +95,7 @@ const DeviceFrameRoot = ({
             <div className={sizerSlot()} style={sizer}>
               <div
                 ref={contentRef}
-                inert={true}
+                inert={!isInteractive}
                 className={content()}
                 style={{ width, minHeight: height, transform }}
                 data-testid={DEVICE_FRAME_TEST_ID.CONTENT}

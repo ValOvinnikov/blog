@@ -18,6 +18,18 @@ describe('adminRoutes', () => {
     );
   });
 
+  it('puts a draft id in the preview routes as one path segment', () => {
+    const draftId = `drafts.${MOCK_TENANT_SLUG}/x`;
+    const encodedId = encodeURIComponent(draftId);
+
+    expect(adminRoutes.dashboardDraftPreview(draftId)).toBe(
+      `/dashboard/preview/${encodedId}`,
+    );
+    expect(adminRoutes.tenantDraftPreview(MOCK_TENANT_ID, draftId)).toBe(
+      `/tenants/${MOCK_TENANT_ID}/preview/${encodedId}`,
+    );
+  });
+
   describe('tenants', () => {
     it('leaves the default visibility, sort and search out of the URL', () => {
       const href = adminRoutes.tenants({

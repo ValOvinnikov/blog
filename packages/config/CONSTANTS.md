@@ -534,6 +534,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **DOMAIN_AVAILABILITY**: `NOT_CONFIGURED`, `AVAILABLE`, `IN_USE`, `ERROR`
 - **ROUTING_RECORD_TYPE**: `A`, `CNAME`
 
+### `@platform/constants/draft-preview` — `apps/platform/src/constants/draft-preview.ts`
+
+- **DRAFT_PREVIEW_REFUSAL**: `NOT_FOUND`, `LANGUAGE_OFF`, `SUSPENDED`, `ARCHIVED`, `UNAVAILABLE`
+- **DRAFT_PREVIEW_LOG**: `SECRET_MISSING`=`"draft_preview.secret_missing"`, `PATH_SKIPPED`=`"draft_preview.path_skipped"`, `PATH_FAILED`=`"draft_preview.path_failed"`, `PATH_ERROR`=`"draft_preview.path_error"`
+
 ### `@platform/constants/email-config` — `apps/platform/src/constants/email-config.ts`
 
 - **EMAIL_CONFIG_LOG**: `UPDATE_AUDIT_FAILED`=`"email_config.update_audit_failed"`, `UPDATE_FAILED`=`"email_config.update_failed"`
