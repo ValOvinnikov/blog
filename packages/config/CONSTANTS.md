@@ -160,7 +160,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/http-statuses.ts`
 
-- **HTTP_STATUS**: `OK`=`200`, `CREATED`=`201`, `ACCEPTED`=`202`, `NO_CONTENT`=`204`, `MOVED_PERMANENTLY`=`301`, `SEE_OTHER`=`303`, `TEMPORARY_REDIRECT`=`307`, `BAD_REQUEST`=`400`, `UNAUTHORIZED`=`401`, `PAYMENT_REQUIRED`=`402`, `FORBIDDEN`=`403`, `NOT_FOUND`=`404`, `REQUEST_TIMEOUT`=`408`, `CONFLICT`=`409`, `TOO_EARLY`=`425`, `TOO_MANY_REQUESTS`=`429`, `INTERNAL_SERVER_ERROR`=`500`, `BAD_GATEWAY`=`502`, `SERVICE_UNAVAILABLE`=`503`
+- **HTTP_STATUS**: `OK`=`200`, `CREATED`=`201`, `ACCEPTED`=`202`, `NO_CONTENT`=`204`, `MOVED_PERMANENTLY`=`301`, `SEE_OTHER`=`303`, `TEMPORARY_REDIRECT`=`307`, `BAD_REQUEST`=`400`, `UNAUTHORIZED`=`401`, `PAYMENT_REQUIRED`=`402`, `FORBIDDEN`=`403`, `NOT_FOUND`=`404`, `REQUEST_TIMEOUT`=`408`, `CONFLICT`=`409`, `UNPROCESSABLE_ENTITY`=`422`, `TOO_EARLY`=`425`, `TOO_MANY_REQUESTS`=`429`, `INTERNAL_SERVER_ERROR`=`500`, `BAD_GATEWAY`=`502`, `SERVICE_UNAVAILABLE`=`503`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/icon.ts`
 
@@ -882,6 +882,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/footer` — `apps/web/src/constants/footer.ts`
 
 - **FOOTER_LOG**: `CONTENT_FETCH_FAILED`=`"footer.layout_fetch_failed"`, `SITE_CONFIG_FETCH_FAILED`=`"footer.site_config_fetch_failed"`, `POWERED_BY_UNCONFIGURED`=`"footer.powered_by_unconfigured"`
+
+### `@web/constants/generate-skim` — `apps/web/src/constants/generate-skim.ts`
+
+- **GENERATE_SKIM_LOG**: `CONFIG_MISSING`=`"generate_skim.config_missing"`, `HOST_UNRESOLVABLE`=`"generate_skim.host_unresolvable"`, `WRITE_TENANT_UNRESOLVABLE`=`"generate_skim.write_tenant_unresolvable"`, `TENANT_WRITE_CREDENTIALS_MISSING`=`"generate_skim.tenant_write_credentials_missing"`, `TENANT_NOT_ACTIVE`=`"generate_skim.tenant_not_active"`, `ALLOWANCE_USED`=`"generate_skim.allowance_used"`, `CLAIM_FAILED`=`"generate_skim.claim_failed"`, `CLAIM_RELEASE_FAILED`=`"generate_skim.claim_release_failed"`, `POST_BODY_FETCH_FAILED`=`"generate_skim.post_body_fetch_failed"`, `GENERATION_FAILED`=`"generate_skim.generation_failed"`, `WRITE_CLIENT_UNCONFIGURED`=`"generate_skim.write_client_unconfigured"`, `DRAFT_SAVE_FAILED`=`"generate_skim.draft_save_failed"`
 
 ### `@web/constants/header-style` — `apps/web/src/constants/header-style.ts`
 

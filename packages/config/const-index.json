@@ -10174,6 +10174,102 @@
         "file": "apps/web/src/constants/footer.ts"
       }
     ],
+    "generate_skim.config_missing": [
+      {
+        "ref": "GENERATE_SKIM_LOG.CONFIG_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.host_unresolvable": [
+      {
+        "ref": "GENERATE_SKIM_LOG.HOST_UNRESOLVABLE",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.write_tenant_unresolvable": [
+      {
+        "ref": "GENERATE_SKIM_LOG.WRITE_TENANT_UNRESOLVABLE",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.tenant_write_credentials_missing": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TENANT_WRITE_CREDENTIALS_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.tenant_not_active": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TENANT_NOT_ACTIVE",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.allowance_used": [
+      {
+        "ref": "GENERATE_SKIM_LOG.ALLOWANCE_USED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.claim_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.CLAIM_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.claim_release_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.CLAIM_RELEASE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.post_body_fetch_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.POST_BODY_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.generation_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GENERATION_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.write_client_unconfigured": [
+      {
+        "ref": "GENERATE_SKIM_LOG.WRITE_CLIENT_UNCONFIGURED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.draft_save_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.DRAFT_SAVE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
     "header_style.site_config_fetch_failed": [
       {
         "ref": "HEADER_STYLE_LOG.SITE_CONFIG_FETCH_FAILED",
@@ -12113,6 +12209,14 @@
     "409": [
       {
         "ref": "HTTP_STATUS.CONFLICT",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "422": [
+      {
+        "ref": "HTTP_STATUS.UNPROCESSABLE_ENTITY",
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"

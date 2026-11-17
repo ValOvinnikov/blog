@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { queries } from '@shinefold/db';
 import { TENANT_STATUS } from '@shinefold/db/constants';
+import type { TTenantSanityWriteCredentials } from '@shinefold/db/queries/tenants/get-tenant-sanity-write-credentials/get-tenant-sanity-write-credentials';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { getPlatformSanityContext } from '@shinefold/service';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
@@ -102,8 +103,13 @@ describe(getHostTenantSanityContext, () => {
 });
 
 describe(getHostTenantSanityWriteContext, () => {
+  let credentials: TTenantSanityWriteCredentials;
+
+  beforeEach(() => {
+    credentials = mockTenantSanityWriteCredentials();
+  });
+
   it('resolves the tenant Sanity write credentials for a resolved tenant', async () => {
-    const credentials = mockTenantSanityWriteCredentials();
     vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReturnValue(
       credentials,
     );
@@ -117,7 +123,6 @@ describe(getHostTenantSanityWriteContext, () => {
   });
 
   it('reports a suspended resolved tenant as not active', async () => {
-    const credentials = mockTenantSanityWriteCredentials();
     vi.mocked(resolveRequestTenant).mockResolvedValueOnce(
       mockServableTenant({ status: TENANT_STATUS.SUSPENDED }),
     );
