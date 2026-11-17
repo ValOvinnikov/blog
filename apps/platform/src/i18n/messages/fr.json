@@ -2326,7 +2326,7 @@
   },
   "helpForm": {
     "title": "Contacter l'assistance",
-    "responseTime": "Nous répondons généralement par e-mail sous deux jours ouvrés.",
+    "responseTime": "Nous répondons généralement sous deux jours ouvrés.",
     "subjectLabel": "Objet",
     "messageLabel": "Message",
     "messageHint": "Dites ce que vous essayiez de faire et ce qui s'est passé à la place.",

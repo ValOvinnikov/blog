@@ -2326,7 +2326,7 @@
   },
   "helpForm": {
     "title": "Contact support",
-    "responseTime": "We usually answer by email within two working days.",
+    "responseTime": "We usually reply within two working days.",
     "subjectLabel": "Subject",
     "messageLabel": "Message",
     "messageHint": "Say what you were trying to do and what happened instead.",

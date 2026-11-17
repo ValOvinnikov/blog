@@ -2326,7 +2326,7 @@
   },
   "helpForm": {
     "title": "Contactar con soporte",
-    "responseTime": "Solemos responder por correo en un plazo de dos días laborables.",
+    "responseTime": "Solemos responder en un plazo de dos días laborables.",
     "subjectLabel": "Asunto",
     "messageLabel": "Mensaje",
     "messageHint": "Cuenta qué intentabas hacer y qué pasó en su lugar.",

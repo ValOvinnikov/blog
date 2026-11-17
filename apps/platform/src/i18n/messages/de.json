@@ -2326,7 +2326,7 @@
   },
   "helpForm": {
     "title": "Support kontaktieren",
-    "responseTime": "Wir antworten in der Regel innerhalb von zwei Werktagen per E-Mail.",
+    "responseTime": "Wir antworten in der Regel innerhalb von zwei Werktagen.",
     "subjectLabel": "Betreff",
     "messageLabel": "Nachricht",
     "messageHint": "Beschreib, was du tun wolltest und was stattdessen passiert ist.",
