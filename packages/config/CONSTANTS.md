@@ -100,7 +100,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/email-type.ts`
 
-- **EMAIL_TYPE**: `SIGN_IN`, `NEWSLETTER_CONFIRMATION`, `NEWSLETTER_ISSUE`
+- **EMAIL_TYPE**: `SIGN_IN`, `INVITE`, `NEWSLETTER_CONFIRMATION`, `NEWSLETTER_ISSUE`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/embed.ts`
 
@@ -559,6 +559,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/email-test` — `apps/platform/src/constants/email-test.ts`
 
 - **EMAIL_TEST_LOG**: `SEND_FAILED`=`"email_test.send_failed"`
+
+### `@platform/constants/email-usage` — `apps/platform/src/constants/email-usage.ts`
+
+- **EMAIL_USAGE_LOG**: `SEND_COUNT_FAILED`=`"email_usage.send_count_failed"`
 
 ### `@platform/constants/field-appearance` — `apps/platform/src/constants/field-appearance.ts`
 

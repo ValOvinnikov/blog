@@ -1,7 +1,11 @@
 import { faker } from '@faker-js/faker';
 import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
-import { buildSiteEmailTag } from '@shinefold/email/tags';
+import {
+  buildPlatformEmailTag,
+  buildSiteEmailTag,
+  type TEmailTag,
+} from '@shinefold/email/tags';
 import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@shinefold/email/templates/tenant/unsubscribe/unsubscribe';
 import {
   MOCK_BODY_HTML,
@@ -99,6 +103,15 @@ describe(sendEmail, () => {
     await send({ ...MOCK_EMAIL, account });
 
     expect(resendCtorMock).toHaveBeenCalledWith(key);
+  });
+
+  it.each<[string, TEmailTag[]]>([
+    ['no tags', []],
+    ['a site tag', [buildSiteEmailTag(MOCK_TENANT_ID)]],
+  ])('tags platform mail with %s as platform mail', async (_name, tags) => {
+    await send({ ...MOCK_EMAIL, tags, account: EMAIL_ACCOUNT.PLATFORM });
+
+    expect(sentEmail()?.tags).toEqual([...tags, buildPlatformEmailTag()]);
   });
 
   it('keeps one Resend client per account', async () => {

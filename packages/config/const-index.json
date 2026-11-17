@@ -1288,6 +1288,20 @@
         "file": "packages/config/src/constants/email-type.ts"
       }
     ],
+    "INVITE": [
+      {
+        "ref": "EMAIL_TYPE.INVITE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/email-type.ts"
+      },
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
     "NEWSLETTER_ISSUE": [
       {
         "ref": "EMAIL_TYPE.NEWSLETTER_ISSUE",
@@ -6634,14 +6648,6 @@
         "file": "apps/platform/src/constants/data-request.ts"
       }
     ],
-    "INVITE": [
-      {
-        "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
-      }
-    ],
     "STUDIO_REINVITE": [
       {
         "ref": "DATA_REQUEST_MATCH_KIND.STUDIO_REINVITE",
@@ -7058,6 +7064,20 @@
         "scope": "app:platform",
         "from": "@platform/constants/email-test",
         "file": "apps/platform/src/constants/email-test.ts"
+      }
+    ],
+    "email_usage.send_count_failed": [
+      {
+        "ref": "EMAIL_USAGE_LOG.SEND_COUNT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-usage",
+        "file": "apps/platform/src/constants/email-usage.ts"
+      },
+      {
+        "ref": "EMAIL_USAGE_LOG.SEND_COUNT_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
       }
     ],
     "WIZARD": [
@@ -10263,14 +10283,6 @@
     "email_usage.delivery_outcome_record_failed": [
       {
         "ref": "EMAIL_USAGE_LOG.DELIVERY_OUTCOME_RECORD_FAILED",
-        "scope": "app:web",
-        "from": "@web/constants/email-usage",
-        "file": "apps/web/src/constants/email-usage.ts"
-      }
-    ],
-    "email_usage.send_count_failed": [
-      {
-        "ref": "EMAIL_USAGE_LOG.SEND_COUNT_FAILED",
         "scope": "app:web",
         "from": "@web/constants/email-usage",
         "file": "apps/web/src/constants/email-usage.ts"
