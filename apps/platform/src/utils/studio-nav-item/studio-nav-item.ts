@@ -1,32 +1,30 @@
 import type { TSidebarNavItem } from '@platform/components/features/layout/sidebar';
 import type { TRegisteredIconName } from '@platform/components/shared/icon';
-import {
-  OWNER_STUDIO_ACCESS,
-  type TOwnerStudioAccess,
-  type TPendingOwnerStudioAccess,
-} from '@platform/constants/owner-studio-access';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import { ownerStudioAccessTone } from '@platform/utils/status-tone/status-tone';
 import { ICONS } from '@shinefold/config';
+import {
+  STUDIO_ACCESS,
+  type TStudioAccess,
+  type TPendingStudioAccess,
+} from '@shinefold/config/constants';
 
 const STUDIO_ACCESS_LINE_ICON: Record<
-  TPendingOwnerStudioAccess,
+  TPendingStudioAccess,
   TRegisteredIconName
 > = {
-  [OWNER_STUDIO_ACCESS.INVITE_SENT]: ICONS.MAIL,
-  [OWNER_STUDIO_ACCESS.ACTIVATING]: ICONS.CLOCK,
-  [OWNER_STUDIO_ACCESS.STALLED]: ICONS.WARNING,
+  [STUDIO_ACCESS.INVITE_SENT]: ICONS.MAIL,
+  [STUDIO_ACCESS.ACTIVATING]: ICONS.CLOCK,
+  [STUDIO_ACCESS.STALLED]: ICONS.WARNING,
 };
 
-const isPending = (
-  access?: TOwnerStudioAccess,
-): access is TPendingOwnerStudioAccess =>
-  !!access && access !== OWNER_STUDIO_ACCESS.READY;
+const isPending = (access?: TStudioAccess): access is TPendingStudioAccess =>
+  !!access && access !== STUDIO_ACCESS.READY;
 
 export const studioNavItem = (
   t: TLooseTranslator,
   href: string,
-  access?: TOwnerStudioAccess,
+  access?: TStudioAccess,
 ): TSidebarNavItem => ({
   label: t('studio'),
   icon: ICONS.STUDIO,

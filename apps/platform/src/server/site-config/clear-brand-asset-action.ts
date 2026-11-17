@@ -2,7 +2,7 @@
 
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { deleteBlobBestEffort } from '@platform/server/blob/delete-blob-best-effort';
 import { UNRECOGNIZED_UPLOAD_TARGET_RESULT } from '@platform/server/blob/unrecognized-upload-target';
 import {
@@ -28,7 +28,7 @@ export const clearBrandAssetAction = async (
   tenantId: string,
   kind: TBrandAssetKind,
 ): Promise<TClearUploadResult> => {
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
 
   const parsedKind = brandAssetKindSchema.safeParse(kind);
   if (!parsedKind.success) return UNRECOGNIZED_UPLOAD_TARGET_RESULT;

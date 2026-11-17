@@ -2,10 +2,6 @@
 
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
-import {
-  OWNER_STUDIO_ACCESS,
-  type TPendingOwnerStudioAccess,
-} from '@platform/constants/owner-studio-access';
 import { useToast } from '@platform/context/toast-provider';
 import { checkOwnerAccessAction } from '@platform/server/owner-access/check-owner-access-action';
 import type { TOwnerAccessRequestResult } from '@platform/server/owner-access/request-owner-access';
@@ -15,6 +11,10 @@ import {
   type TUnreachedAction,
 } from '@platform/utils/settle-action/settle-action';
 import { isOutcomeSuccess, SIZE } from '@shinefold/config';
+import {
+  STUDIO_ACCESS,
+  type TPendingStudioAccess,
+} from '@shinefold/config/constants';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
@@ -25,7 +25,7 @@ const ACTION_BUTTON_DEFAULTS = { size: SIZE.SM } as const;
 
 export type TOwnerAccessActionsProps = {
   tenantId: string;
-  studioAccess: TPendingOwnerStudioAccess;
+  studioAccess: TPendingStudioAccess;
 };
 
 export const OwnerAccessActions = ({
@@ -38,8 +38,8 @@ export const OwnerAccessActions = ({
   const [isChecking, startCheck] = useTransition();
   const [isResending, startResend] = useTransition();
 
-  const isInviteSent = studioAccess === OWNER_STUDIO_ACCESS.INVITE_SENT;
-  const isStalled = studioAccess === OWNER_STUDIO_ACCESS.STALLED;
+  const isInviteSent = studioAccess === STUDIO_ACCESS.INVITE_SENT;
+  const isStalled = studioAccess === STUDIO_ACCESS.STALLED;
 
   const settle = (
     result: TOwnerAccessRequestResult | TUnreachedAction,

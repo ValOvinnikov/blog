@@ -511,7 +511,10 @@
       "OAUTH_APP_SAVED": "Application de connexion enregistrée",
       "OAUTH_APP_REPLACED": "Application de connexion remplacée",
       "OAUTH_APP_REMOVED": "Application de connexion supprimée",
-      "NEWSLETTER_PAUSE_CLEARED": "Pause de la newsletter levée"
+      "NEWSLETTER_PAUSE_CLEARED": "Pause de la newsletter levée",
+      "MEMBER_INVITED": "Membre de l’équipe invité",
+      "MEMBER_REMOVED": "Membre de l’équipe retiré",
+      "MEMBER_INVITE_CANCELLED": "Invitation à l’équipe annulée"
     },
     "detail": {
       "field": {

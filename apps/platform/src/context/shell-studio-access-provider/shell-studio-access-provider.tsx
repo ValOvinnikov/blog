@@ -1,14 +1,14 @@
 'use client';
 
-import type { TOwnerStudioAccess } from '@platform/constants/owner-studio-access';
 import type { TMaybeUndefined } from '@shinefold/config';
+import type { TStudioAccess } from '@shinefold/config/constants';
 import { createContext, useContext, type ReactNode } from 'react';
 
 const ShellStudioAccessContext =
-  createContext<TMaybeUndefined<TOwnerStudioAccess>>(undefined);
+  createContext<TMaybeUndefined<TStudioAccess>>(undefined);
 
 type TShellStudioAccessProviderProps = {
-  studioAccess: TMaybeUndefined<TOwnerStudioAccess>;
+  studioAccess: TMaybeUndefined<TStudioAccess>;
   children: ReactNode;
 };
 
@@ -22,5 +22,5 @@ export const ShellStudioAccessProvider = ({
   </ShellStudioAccessContext.Provider>
 );
 
-export const useShellStudioAccess = (): TMaybeUndefined<TOwnerStudioAccess> =>
+export const useShellStudioAccess = (): TMaybeUndefined<TStudioAccess> =>
   useContext(ShellStudioAccessContext);

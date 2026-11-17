@@ -2,7 +2,7 @@
 
 import { EMAIL_TEST_LOG } from '@platform/constants/email-test';
 import { auth } from '@platform/server/auth/auth';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
 import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
 import { takeTestEmailSend } from '@platform/server/email/test-email-rate-limit';
@@ -60,7 +60,7 @@ export const sendTestEmailAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
   const session = await auth();
   const userId = session?.user?.id;
   const to = session?.user?.email;

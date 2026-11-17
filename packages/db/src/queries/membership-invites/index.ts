@@ -4,3 +4,5 @@ export * from './find-pending-invite-by-email';
 export * from './count-membership-invites-for-tenant';
 export * from './delete-membership-invites-for-tenant';
 export * from './stop-pending-invites-over-seats';
+export * from './cancel-membership-invite';
+export * from './list-pending-membership-invites';

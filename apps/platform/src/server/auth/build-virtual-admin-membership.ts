@@ -16,6 +16,11 @@ export const buildVirtualAdminMembership = (
   role: MEMBERSHIP_ROLE.OWNER,
   createdAt: new Date(0),
   lockedAt: null,
+  sanityInviteId: null,
+  sanityInviteSentAt: null,
+  sanityInviteAcceptedAt: null,
+  sanityUserId: null,
+  sanityLoginProvider: null,
 });
 
 /** Check before displaying `membership.role`: a virtual membership would show a SUPERADMIN as the tenant's OWNER. */
