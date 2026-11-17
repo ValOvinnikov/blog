@@ -387,10 +387,6 @@
         "purpose": "Remembers the language you chose for this site.",
         "duration": "1 year"
       },
-      "CURRENCY": {
-        "purpose": "Remembers which currency to show prices in, based on the country you visit from.",
-        "duration": "1 year"
-      },
       "SESSION": {
         "purpose": "Keeps you signed in.",
         "duration": "Until your sign-in ends"

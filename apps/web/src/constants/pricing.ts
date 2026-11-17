@@ -4,6 +4,7 @@ export const PRICING_LOG = {
   PLAN_PRICES_FETCH_FAILED: 'pricing_module.plan_prices_fetch_failed',
   PROMOTION_CODE_LOOKUP_FAILED: 'pricing_module.promotion_code_lookup_failed',
   PROMOTION_CODE_FETCH_FAILED: 'pricing_module.promotion_code_fetch_failed',
+  VISITOR_CURRENCY_FETCH_FAILED: 'pricing_module.visitor_currency_fetch_failed',
 } as const;
 
 export const PRICING_SEARCH_PARAM = {

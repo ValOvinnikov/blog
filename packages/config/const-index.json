@@ -9840,14 +9840,6 @@
         "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
-    "CURRENCY": [
-      {
-        "ref": "COOKIE_ID.CURRENCY",
-        "scope": "app:web",
-        "from": "@web/constants/cookie-list",
-        "file": "apps/web/src/constants/cookie-list.ts"
-      }
-    ],
     "CSRF": [
       {
         "ref": "COOKIE_ID.CSRF",
@@ -10795,6 +10787,14 @@
     "pricing_module.promotion_code_fetch_failed": [
       {
         "ref": "PRICING_LOG.PROMOTION_CODE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "pricing_module.visitor_currency_fetch_failed": [
+      {
+        "ref": "PRICING_LOG.VISITOR_CURRENCY_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/pricing",
         "file": "apps/web/src/constants/pricing.ts"

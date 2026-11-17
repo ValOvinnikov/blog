@@ -387,10 +387,6 @@
         "purpose": "Speichert die Sprache, die du für diese Website gewählt hast.",
         "duration": "1 Jahr"
       },
-      "CURRENCY": {
-        "purpose": "Speichert, in welcher Währung Preise angezeigt werden, je nach dem Land, aus dem du die Website besuchst.",
-        "duration": "1 Jahr"
-      },
       "SESSION": {
         "purpose": "Hält dich angemeldet.",
         "duration": "Bis deine Anmeldung endet"

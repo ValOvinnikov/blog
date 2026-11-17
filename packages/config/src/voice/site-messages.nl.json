@@ -387,10 +387,6 @@
         "purpose": "Onthoudt de taal die je voor deze site hebt gekozen.",
         "duration": "1 jaar"
       },
-      "CURRENCY": {
-        "purpose": "Onthoudt in welke valuta prijzen worden getoond, op basis van het land van waaruit je de site bezoekt.",
-        "duration": "1 jaar"
-      },
       "SESSION": {
         "purpose": "Houdt je ingelogd.",
         "duration": "Tot je uitlogt of je sessie verloopt"

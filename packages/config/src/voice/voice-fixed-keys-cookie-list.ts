@@ -8,8 +8,6 @@ export const COOKIE_LIST_VOICE_FIXED_KEYS = [
   'cookieList.cookies.CONSENT.duration',
   'cookieList.cookies.LANGUAGE.purpose',
   'cookieList.cookies.LANGUAGE.duration',
-  'cookieList.cookies.CURRENCY.purpose',
-  'cookieList.cookies.CURRENCY.duration',
   'cookieList.cookies.SESSION.purpose',
   'cookieList.cookies.SESSION.duration',
   'cookieList.cookies.CSRF.purpose',

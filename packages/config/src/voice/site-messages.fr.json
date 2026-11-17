@@ -387,10 +387,6 @@
         "purpose": "Mémorise la langue que vous avez choisie pour ce site.",
         "duration": "1 an"
       },
-      "CURRENCY": {
-        "purpose": "Mémorise la devise dans laquelle afficher les prix, selon le pays depuis lequel vous visitez le site.",
-        "duration": "1 an"
-      },
       "SESSION": {
         "purpose": "Vous garde connecté.",
         "duration": "Jusqu’à la fin de votre connexion"
