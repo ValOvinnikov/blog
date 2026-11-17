@@ -2246,6 +2246,7 @@
     "nextPaymentLabel": "Nächste Zahlung",
     "nextPayment": "{amount} am <time>{date}</time>",
     "noNextPayment": "Keine geplant",
+    "planEnds": "Ihr Tarif endet am <time>{date}</time>.",
     "noPayments": "Für Ihre Website gibt es noch keine Zahlungen.",
     "invoicesTitle": "Rechnungen",
     "invoicesEmpty": "Noch keine Rechnungen.",
@@ -2309,6 +2310,7 @@
     "billingLink": "Abrechnung",
     "NOT_SUBSCRIBED": "Deine Website hat noch keinen bezahlten Tarif, der geändert werden kann. Wähle einen an der Kasse.",
     "NOT_ACTIVE": "Dein Abonnement braucht deine Aufmerksamkeit, bevor sich der Tarif ändern kann. Öffne die Abrechnung, um das zu klären.",
+    "planEnds": "Dein Tarif endet am <time>{date}</time> und kann sich deshalb nicht mehr ändern. Um ihn zu behalten, nimm die Kündigung in der Abrechnung zurück.",
     "UNCHANGED": "Deine Website nutzt diesen Tarif bereits.",
     "CARD_DECLINED": "Deine Karte wurde abgelehnt, daher hat sich nichts geändert. Aktualisiere sie in der Abrechnung und versuch es erneut."
   }

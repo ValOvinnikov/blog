@@ -13,6 +13,7 @@ import { isOneOf } from '@shinefold/utils/primitives';
 import Stripe from 'stripe';
 
 import { fromStripeTime } from './stripe-time';
+import { subscriptionEndsAt } from './subscription-ends-at';
 
 export type TBillingInvoice = {
   id: string;
@@ -25,6 +26,11 @@ export type TBillingInvoice = {
 export type TBillingNextPayment = {
   dueAt: Date;
   amount: TStripeAmount;
+};
+
+export type TBillingRenewal = {
+  nextPayment: TMaybeUndefined<TBillingNextPayment>;
+  endsAt: TMaybeUndefined<Date>;
 };
 
 const toBillingInvoice = ({
@@ -61,20 +67,11 @@ const isNoUpcomingInvoice = (error: unknown): boolean =>
   error instanceof Stripe.errors.StripeError &&
   error.code === STRIPE_ERROR_CODE.INVOICE_UPCOMING_NONE;
 
-export const previewNextPayment = async (
+const previewNextPayment = async (
   stripe: Stripe,
   customer: string,
   subscription: string,
 ): Promise<TMaybeUndefined<TBillingNextPayment>> => {
-  const { status, cancel_at_period_end } =
-    await stripe.subscriptions.retrieve(subscription);
-  if (
-    cancel_at_period_end ||
-    !isOneOf(STRIPE_LIVE_SUBSCRIPTION_STATUSES, status)
-  ) {
-    return undefined;
-  }
-
   try {
     const { next_payment_attempt, created, amount_due, currency } =
       await stripe.invoices.createPreview({ customer, subscription });
@@ -87,4 +84,25 @@ export const previewNextPayment = async (
     if (isNoUpcomingInvoice(error)) return undefined;
     throw error;
   }
+};
+
+export const previewRenewal = async (
+  stripe: Stripe,
+  customer: string,
+  subscriptionId: string,
+): Promise<TBillingRenewal> => {
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const endsAt = subscriptionEndsAt(subscription);
+  if (
+    endsAt ||
+    !isOneOf(STRIPE_LIVE_SUBSCRIPTION_STATUSES, subscription.status)
+  ) {
+    return { nextPayment: undefined, endsAt };
+  }
+  const nextPayment = await previewNextPayment(
+    stripe,
+    customer,
+    subscriptionId,
+  );
+  return { nextPayment, endsAt };
 };

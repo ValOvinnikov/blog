@@ -33,6 +33,7 @@ export type TMockStripeSubscription = {
   tenantId?: string;
   promotionCode?: string;
   cancelAtPeriodEnd?: boolean;
+  cancelAt?: number;
   schedule?: Stripe.SubscriptionSchedule | string | null;
 };
 
@@ -42,6 +43,7 @@ export const mockStripeSubscription = ({
   tenantId,
   promotionCode,
   cancelAtPeriodEnd = false,
+  cancelAt,
   schedule = null,
 }: TMockStripeSubscription = {}): Stripe.Subscription =>
   ({
@@ -49,6 +51,7 @@ export const mockStripeSubscription = ({
     customer: MOCK_STRIPE_CUSTOMER_ID,
     status,
     cancel_at_period_end: cancelAtPeriodEnd,
+    cancel_at: cancelAt ?? null,
     schedule,
     metadata: tenantId ? { [STRIPE_TENANT_METADATA_KEY]: tenantId } : {},
     discounts: promotionCode

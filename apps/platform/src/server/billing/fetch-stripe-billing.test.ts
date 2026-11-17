@@ -17,13 +17,15 @@ import {
   MOCK_DRAFT_INVOICE_STATUS,
   MOCK_STRIPE_AMOUNT,
 } from '@platform/testing/billing/overview';
+import {
+  MOCK_CANCEL_AT,
+  MOCK_ENDS_AT,
+  MOCK_RENEWS_AT,
+} from '@platform/testing/billing/plan-subscription';
 import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
 import Stripe from 'stripe';
 
-import {
-  listBillingInvoices,
-  previewNextPayment,
-} from './fetch-stripe-billing';
+import { listBillingInvoices, previewRenewal } from './fetch-stripe-billing';
 
 const {
   autoPagingToArrayMock,
@@ -116,13 +118,13 @@ describe(listBillingInvoices, () => {
   });
 });
 
-describe(previewNextPayment, () => {
+describe(previewRenewal, () => {
   beforeEach(() => {
     retrieveSubscriptionMock.mockResolvedValue(mockStripeSubscription());
   });
 
   const preview = () =>
-    previewNextPayment(
+    previewRenewal(
       MOCK_STRIPE,
       MOCK_STRIPE_CUSTOMER_ID,
       MOCK_STRIPE_SUBSCRIPTION_ID,
@@ -133,15 +135,18 @@ describe(previewNextPayment, () => {
       mockStripeInvoice({ next_payment_attempt: MOCK_NEXT_ATTEMPT_SECONDS }),
     );
 
-    const nextPayment = await preview();
+    const renewal = await preview();
 
     expect(createPreviewMock).toHaveBeenCalledWith({
       customer: MOCK_STRIPE_CUSTOMER_ID,
       subscription: MOCK_STRIPE_SUBSCRIPTION_ID,
     });
-    expect(nextPayment).toEqual({
-      dueAt: new Date(MOCK_NEXT_ATTEMPT_SECONDS * MILLISECONDS_PER_SECOND),
-      amount: MOCK_STRIPE_AMOUNT,
+    expect(renewal).toEqual({
+      nextPayment: {
+        dueAt: new Date(MOCK_NEXT_ATTEMPT_SECONDS * MILLISECONDS_PER_SECOND),
+        amount: MOCK_STRIPE_AMOUNT,
+      },
+      endsAt: undefined,
     });
   });
 
@@ -150,7 +155,7 @@ describe(previewNextPayment, () => {
       mockStripeInvoice({ created: MOCK_CREATED_SECONDS }),
     );
 
-    const nextPayment = await preview();
+    const { nextPayment } = await preview();
 
     expect(nextPayment?.dueAt).toEqual(
       new Date(MOCK_CREATED_SECONDS * MILLISECONDS_PER_SECOND),
@@ -162,24 +167,38 @@ describe(previewNextPayment, () => {
       stripeError(STRIPE_ERROR_CODE.INVOICE_UPCOMING_NONE),
     );
 
-    await expect(preview()).resolves.toBeUndefined();
+    await expect(preview()).resolves.toEqual({
+      nextPayment: undefined,
+      endsAt: undefined,
+    });
+  });
+
+  it('finds no next payment without a preview when the subscription has ended', async () => {
+    retrieveSubscriptionMock.mockResolvedValue(
+      mockStripeSubscription({ status: STRIPE_SUBSCRIPTION_STATUS.CANCELED }),
+    );
+
+    await expect(preview()).resolves.toEqual({
+      nextPayment: undefined,
+      endsAt: undefined,
+    });
+    expect(createPreviewMock).not.toHaveBeenCalled();
   });
 
   it.each([
-    [
-      'has ended',
-      mockStripeSubscription({ status: STRIPE_SUBSCRIPTION_STATUS.CANCELED }),
-    ],
-    [
-      'cancels at the end of its period',
-      { ...mockStripeSubscription(), cancel_at_period_end: true },
-    ],
+    ['the Portal cancelled', { cancelAt: MOCK_CANCEL_AT }, MOCK_ENDS_AT],
+    ['cancels at period end', { cancelAtPeriodEnd: true }, MOCK_RENEWS_AT],
   ])(
-    'finds no next payment without a preview when the subscription %s',
-    async (_label, subscription) => {
-      retrieveSubscriptionMock.mockResolvedValue(subscription);
+    'reads when a subscription %s ends, with no next payment',
+    async (_label, overrides, endsAt) => {
+      retrieveSubscriptionMock.mockResolvedValue(
+        mockStripeSubscription(overrides),
+      );
 
-      await expect(preview()).resolves.toBeUndefined();
+      await expect(preview()).resolves.toEqual({
+        nextPayment: undefined,
+        endsAt,
+      });
       expect(createPreviewMock).not.toHaveBeenCalled();
     },
   );

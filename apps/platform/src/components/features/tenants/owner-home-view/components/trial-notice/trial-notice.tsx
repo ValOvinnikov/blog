@@ -1,12 +1,11 @@
 import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
-import { formatDate } from '@platform/utils/format-date/format-date';
+import { richDate } from '@platform/utils/rich-date/rich-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTrial } from '@platform/utils/trial-for/trial-for';
 import { ALERT_TYPE, SIZE } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { useLocale, useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
 
 export type TTrialNoticeProps = {
   trial: TTrial;
@@ -32,10 +31,7 @@ export const TrialNotice = ({
         {
           plan: planName,
           freePlan: tPlan(TENANT_PLAN.FREE),
-          date: formatDate(endsAt, locale),
-          time: (chunks: ReactNode) => (
-            <time dateTime={endsAt.toISOString()}>{chunks}</time>
-          ),
+          ...richDate(endsAt, locale),
         },
       )}
       action={

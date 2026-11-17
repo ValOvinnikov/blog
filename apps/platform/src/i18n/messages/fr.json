@@ -2246,6 +2246,7 @@
     "nextPaymentLabel": "Prochain paiement",
     "nextPayment": "{amount} le <time>{date}</time>",
     "noNextPayment": "Aucun prévu",
+    "planEnds": "Votre formule prend fin le <time>{date}</time>.",
     "noPayments": "Votre site n'a encore aucun paiement.",
     "invoicesTitle": "Factures",
     "invoicesEmpty": "Aucune facture pour l'instant.",
@@ -2309,6 +2310,7 @@
     "billingLink": "Facturation",
     "NOT_SUBSCRIBED": "Votre site n'a pas encore de formule payante à changer. Choisissez-en une au paiement.",
     "NOT_ACTIVE": "Votre abonnement demande votre attention avant de pouvoir changer de formule. Ouvrez Facturation pour le régler.",
+    "planEnds": "Votre formule prend fin le <time>{date}</time> et ne peut donc plus changer. Pour la garder, annulez la résiliation depuis Facturation.",
     "UNCHANGED": "Votre site est déjà sur cette formule.",
     "CARD_DECLINED": "Votre carte a été refusée, donc rien n'a changé. Mettez-la à jour dans Facturation et réessayez."
   }
