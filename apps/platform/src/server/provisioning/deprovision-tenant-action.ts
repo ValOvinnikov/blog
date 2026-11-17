@@ -11,6 +11,7 @@ import {
 } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { cancelLiveSubscription } from '@platform/server/billing/tenant-subscription-lifecycle';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { logger } from '@platform/utils/logger/logger';
 import {
@@ -37,6 +38,7 @@ export type TDeprovisionTenantResult = TTenantLifecycleResult<
   | typeof TENANT_REFUSAL.NOT_FOUND
   | typeof TENANT_REFUSAL.ALREADY_DEPROVISIONED
   | typeof TENANT_REFUSAL.PLATFORM_TENANT
+  | typeof TENANT_REFUSAL.SUBSCRIPTION_CANCEL_FAILED
 >;
 
 /** The worker's run checks neither the typed name nor the platform tenant, so this action is the only guard. */
@@ -71,6 +73,13 @@ export const deprovisionTenantAction = async (
     return {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.PLATFORM_TENANT,
+    };
+  }
+
+  if (!(await cancelLiveSubscription(tenant))) {
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.SUBSCRIPTION_CANCEL_FAILED,
     };
   }
 

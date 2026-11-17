@@ -8,15 +8,16 @@ import { LinkButton } from '@platform/components/shared/link-button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TPlanChoice } from '@platform/constants/plan-change';
 import type { TPendingPlanChange } from '@platform/server/billing/load-subscription-plan';
-import { formatDate } from '@platform/utils/format-date/format-date';
 import { isSamePlanChoice } from '@platform/utils/plan-change-timing/plan-change-timing';
+import { richDate } from '@platform/utils/rich-date/rich-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { ALERT_TYPE, type TMaybeUndefined } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
 
 import { PlanChangeStatus } from './components/plan-change-status/plan-change-status';
 import { PlanChangeSummary } from './components/plan-change-summary/plan-change-summary';
+import { planChangeVariants } from './plan-change-variants';
 import { usePlanChange } from './use-plan-change';
 
 export type TPlanChangeProps = {
@@ -40,6 +41,7 @@ export const PlanChange = ({
     tenantId,
     current.plan,
   );
+  const { body } = planChangeVariants();
   const isCurrent = isSamePlanChoice(choice, current);
   const choiceText = ({ plan, interval }: TPlanChoice) => ({
     plan: tPlan(plan),
@@ -53,17 +55,14 @@ export const PlanChange = ({
         supportingText={t('currentPlan', choiceText(current))}
         actions={<PlanChoices choice={choice} onChange={setChoice} />}
       />
-      <Card.Body>
+      <Card.Body className={body()}>
         {pending && (
           <Alert
             type={ALERT_TYPE.INFO}
             role="note"
             description={t.rich('pendingChange', {
               ...choiceText(pending),
-              date: formatDate(pending.startsAt, locale),
-              time: (chunks: ReactNode) => (
-                <time dateTime={pending.startsAt.toISOString()}>{chunks}</time>
-              ),
+              ...richDate(pending.startsAt, locale),
             })}
           />
         )}

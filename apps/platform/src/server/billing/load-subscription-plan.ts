@@ -12,6 +12,7 @@ import type Stripe from 'stripe';
 import { planFromPriceKeys, pricesFromKeys } from './plan-from-price-keys';
 import { stripeIdOf } from './stripe-id';
 import { fromStripeTime } from './stripe-time';
+import { subscriptionEndsAt } from './subscription-ends-at';
 
 type TSubscribedChoice = TPlanChoice & {
   ceiling: TMaybeNull<TPaidSubscriberBandCeiling>;
@@ -24,6 +25,7 @@ export type TSubscriptionPlan = {
   current: TSubscribedChoice;
   isChangeable: boolean;
   renewsAt: Date;
+  endsAt: TMaybeUndefined<Date>;
   scheduleId: TMaybeUndefined<string>;
   pending: TMaybeUndefined<TPendingPlanChange>;
   planItemId: string;
@@ -72,10 +74,10 @@ export const loadSubscriptionPlan = async (
   stripe: Stripe,
   subscriptionId: string,
 ): Promise<TMaybeUndefined<TSubscriptionPlan>> => {
-  const { id, status, cancel_at_period_end, schedule, items } =
-    await stripe.subscriptions.retrieve(subscriptionId, {
-      expand: SUBSCRIPTION_EXPAND,
-    });
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+    expand: SUBSCRIPTION_EXPAND,
+  });
+  const { id, status, schedule, items } = subscription;
   const current = subscribedChoice(items.data.map(({ price }) => price));
   const planItem = items.data.find(({ price }) =>
     planFromPriceKeys([price.lookup_key]),
@@ -83,11 +85,13 @@ export const loadSubscriptionPlan = async (
   if (!current || !planItem) return undefined;
 
   const band = items.data.find((item) => item !== planItem);
+  const endsAt = subscriptionEndsAt(subscription);
   return {
     id,
     current,
-    isChangeable: !cancel_at_period_end && isOneOf(CHANGEABLE_STATUSES, status),
+    isChangeable: !endsAt && isOneOf(CHANGEABLE_STATUSES, status),
     renewsAt: fromStripeTime(planItem.current_period_end),
+    endsAt,
     scheduleId: schedule ? stripeIdOf(schedule) : undefined,
     pending: pendingChangeOf(schedule, current),
     planItemId: planItem.id,

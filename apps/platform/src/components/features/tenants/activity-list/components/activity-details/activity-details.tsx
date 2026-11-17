@@ -13,6 +13,7 @@ export const ActivityDetails = ({ details }: TActivityDetailsProps) => {
   const t = useTranslations('activityList.detail');
   const tCategory = useTranslations('suspensionCategory');
   const tLanguage = useTranslations('languageNames');
+  const tPlan = useTranslations('planNames');
   const locale = useLocale();
   const { list, item } = activityDetailsVariants();
   const listFormat = new Intl.ListFormat(LOCALE_BCP47_TAGS[locale], {
@@ -45,6 +46,11 @@ export const ActivityDetails = ({ details }: TActivityDetailsProps) => {
         return t(detail.kind, { reference: detail.reference });
       case ACTIVITY_DETAIL.PLAN:
         return t(detail.kind, { plan: detail.plan });
+      case ACTIVITY_DETAIL.PLAN_CHANGED:
+        return t(detail.kind, {
+          from: tPlan(detail.from),
+          to: tPlan(detail.to),
+        });
       case ACTIVITY_DETAIL.SIGN_IN_PROVIDER:
         return t(detail.kind, { provider: detail.provider });
       default:

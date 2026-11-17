@@ -30,6 +30,8 @@ const REFUSAL_KEYS = {
   [TENANT_REFUSAL.NOT_SUSPENDED]: 'notSuspended',
   [TENANT_REFUSAL.PLATFORM_TENANT]: 'platformTenant',
   [TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN]: 'ownerEmailUnknown',
+  [TENANT_REFUSAL.SUBSCRIPTION_CANCEL_FAILED]: 'subscriptionCancelFailed',
+  [TENANT_REFUSAL.SUBSCRIPTION_LIVE]: 'subscriptionLive',
 } satisfies Record<TTenantLifecycleRefusal, string>;
 
 type TServerErrorKey =

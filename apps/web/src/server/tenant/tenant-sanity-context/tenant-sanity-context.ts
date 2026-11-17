@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import {
   getPlatformSanityContext,
@@ -12,12 +13,7 @@ export type THostTenantSanityContext =
   | { isResolvable: true; tenant: TTenantSanityContext }
   | { isResolvable: false };
 
-/**
- * For routes `proxy.ts` excludes (URLs containing a dot), which never get the
- * `x-tenant-id` header. `isResolvable: false` means production saw no servable
- * tenant for the host — the caller must render as though it has no content,
- * never fall back to the platform's own project.
- */
+/** For routes `proxy.ts` excludes, which never get `x-tenant-id`; when unresolvable, render no content rather than the platform's own project. */
 export const getHostTenantSanityContext = cache(
   async (): Promise<THostTenantSanityContext> => {
     const resolvedTenant = await resolveRequestTenant();
@@ -38,8 +34,8 @@ export const getHostTenantSanityContext = cache(
 export type THostTenantSanityWriteContext =
   | {
       isResolvable: true;
-      tenant: TTenantSanityContext | undefined;
-      tenantId: string | undefined;
+      tenant: TMaybeUndefined<TTenantSanityContext>;
+      tenantId: TMaybeUndefined<string>;
       isActive: boolean;
     }
   | { isResolvable: false };

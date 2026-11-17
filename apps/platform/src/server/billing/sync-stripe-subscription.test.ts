@@ -11,6 +11,10 @@ import {
   MOCK_STRIPE_PROMOTION_CODE,
   MOCK_STRIPE_SUBSCRIPTION_ID,
 } from '@platform/testing/billing/fixtures';
+import {
+  MOCK_CANCEL_AT,
+  MOCK_SCHEDULE_ID,
+} from '@platform/testing/billing/plan-subscription';
 import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
@@ -37,12 +41,14 @@ const {
   setTenantPlanMock,
   setTenantBillingMock,
   retrieveSubscriptionMock,
+  releaseScheduleMock,
 } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
   getTenantBillingMock: vi.fn(),
   setTenantPlanMock: vi.fn(),
   setTenantBillingMock: vi.fn(),
   retrieveSubscriptionMock: vi.fn(),
+  releaseScheduleMock: vi.fn(),
 }));
 
 vi.mock('@shinefold/db', async () => ({
@@ -61,6 +67,7 @@ vi.mock('./resolve-stripe-tenant', () => ({ resolveStripeTenant: vi.fn() }));
 
 const MOCK_STRIPE = {
   subscriptions: { retrieve: retrieveSubscriptionMock },
+  subscriptionSchedules: { release: releaseScheduleMock },
 } as unknown as Stripe;
 
 const sync = () =>
@@ -216,6 +223,32 @@ describe(syncStripeSubscription, () => {
       expect(writtenBilling()?.stripeSubscriptionId).toBe(
         MOCK_STRIPE_SUBSCRIPTION_ID,
       );
+    });
+  });
+
+  describe('a subscription with a planned change', () => {
+    it('releases the planned change once the Portal cancels the subscription', async () => {
+      retrieveSubscriptionMock.mockResolvedValue(
+        mockStripeSubscription({
+          cancelAt: MOCK_CANCEL_AT,
+          schedule: MOCK_SCHEDULE_ID,
+        }),
+      );
+
+      await sync();
+
+      expect(releaseScheduleMock).toHaveBeenCalledWith(MOCK_SCHEDULE_ID);
+      expect(setTenantPlanMock).toHaveBeenCalled();
+    });
+
+    it('keeps the planned change while the subscription renews', async () => {
+      retrieveSubscriptionMock.mockResolvedValue(
+        mockStripeSubscription({ schedule: MOCK_SCHEDULE_ID }),
+      );
+
+      await sync();
+
+      expect(releaseScheduleMock).not.toHaveBeenCalled();
     });
   });
 
