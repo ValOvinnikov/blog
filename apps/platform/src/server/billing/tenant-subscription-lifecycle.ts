@@ -12,10 +12,10 @@ import {
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import type { TMaybeUndefined } from '@shinefold/config';
+import { queries } from '@shinefold/db';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import Stripe from 'stripe';
 
-import { applySubscriptionSync } from './apply-subscription-sync';
 import { getStripeClient } from './stripe-client';
 import { hasStoredSubscription } from './upgrade-state-for';
 
@@ -70,6 +70,19 @@ const cancelNow = async (stripe: Stripe, subscriptionId: string) => {
   }
 };
 
+const logCancelFailed = (
+  tenantId: string,
+  subscriptionId: string,
+  cause: object,
+) => {
+  logger.error(SUBSCRIPTION_LIFECYCLE_LOG.CANCEL_FAILED, {
+    tenantId,
+    subscriptionId,
+    ...cause,
+  });
+  return false;
+};
+
 export const cancelLiveSubscription = async (
   tenant: TSubscribedTenant,
 ): Promise<boolean> => {
@@ -80,14 +93,15 @@ export const cancelLiveSubscription = async (
 
   try {
     await cancelNow(stripe, subscriptionId);
-    await applySubscriptionSync(stripe, subscriptionId);
-    return true;
-  } catch (error) {
-    logger.error(SUBSCRIPTION_LIFECYCLE_LOG.CANCEL_FAILED, {
-      tenantId: tenant.id,
+    const freed = await queries.tenants.setCancelledTenantFree(
+      tenant.id,
       subscriptionId,
-      ...toLoggableError(error),
-    });
-    return false;
+    );
+    return (
+      freed.ok ||
+      logCancelFailed(tenant.id, subscriptionId, { errorCode: freed.error })
+    );
+  } catch (error) {
+    return logCancelFailed(tenant.id, subscriptionId, toLoggableError(error));
   }
 };

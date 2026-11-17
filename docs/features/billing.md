@@ -25,6 +25,7 @@ code:
   - packages/db/src/utils/grace-end-date/**
   - packages/db/src/utils/grace-locks/**
   - packages/db/src/queries/tenants/set-tenant-plan/**
+  - packages/db/src/queries/tenants/set-cancelled-tenant-free/**
   - packages/db/src/queries/tenants/get-tenant-id-by-stripe-ids/**
   - packages/db/src/queries/stripe-webhook-events/**
   - apps/platform/src/cli/sync-stripe-catalogue.ts
@@ -97,7 +98,7 @@ A site with no live subscription (Free, a trial, a lapsed site) buys Starter or 
 Billing follows an operator's lifecycle actions. A live subscription is the one `hasStoredSubscription` reads: a stored subscription id on a plan in `SELLABLE_TENANT_PLANS` (`server/billing/tenant-subscription-lifecycle.ts`). A site without one suspends, archives and deletes without a Stripe call.
 
 - **Suspend** (`suspendTenantAction`), once the suspension is saved, sets the subscription's `pause_collection` to `void`, so Stripe voids the invoices it would raise while the site is suspended; **Reactivate** (`liftTenantSuspensionAction`) clears it. The suspension is never refused over billing: a failed call is logged (`billing.subscription_collection_failed`, with `isPaused`), and no key is logged `billing.stripe_unconfigured`. The inactivity sweep's suspension does not pause billing.
-- **Archive** (`deprovisionTenantAction`) cancels the subscription at once with `prorate: false` (no refund for the unused period) before it enqueues the worker, then syncs the tenant from the cancelled subscription the way the webhook does (`applySubscriptionSync`), so the site is on Free while it can still be written; the later `customer.subscription.deleted` event changes nothing. A subscription Stripe already reports cancelled counts as cancelled, so a retry after a failed sync works. A failed cancel or sync, or no key, refuses the archive with `SUBSCRIPTION_CANCEL_FAILED` ("…couldn't be cancelled, so it wasn't archived") and logs `billing.subscription_cancel_failed` or `billing.stripe_unconfigured`; nothing is enqueued or audited. A suspended site cannot take a plan write, so archiving one cancels its subscription but leaves its plan as it was (logged `billing.tenant_not_writable`).
+- **Archive** (`deprovisionTenantAction`) cancels the subscription at once with `prorate: false` (no refund for the unused period) before it enqueues the worker, then moves the site to Free with `setCancelledTenantFree` (`@shinefold/db`), whatever its status, so a suspended site lands on Free too and a reactivated site comes back on Free. That write keeps the subscription id, clears the band and any downgrade grace, starts no grace and sends no plan-change email. The later `customer.subscription.deleted` event changes nothing. A subscription Stripe already reports cancelled counts as cancelled, so a retry works. A failed cancel or Free write, or no key, refuses the archive with `SUBSCRIPTION_CANCEL_FAILED` and logs `billing.subscription_cancel_failed` or `billing.stripe_unconfigured`; nothing is enqueued or audited.
 - **Delete** (`deleteTenantAction`) asks Stripe for the stored customer's subscriptions and refuses with `SUBSCRIPTION_LIVE` while any is `active`, `trialing` or `past_due`. A site with no stored customer is not asked. A failed list, or no key, is a server error, logged `billing.live_subscription_check_failed` or `billing.stripe_unconfigured`.
 
 ### Webhook

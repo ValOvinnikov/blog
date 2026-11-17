@@ -13,12 +13,13 @@ import {
 } from '@platform/testing/billing/fixtures';
 import { stripeCall } from '@platform/testing/billing/stripe-call';
 import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
+import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
-import { TENANT_PLAN } from '@shinefold/config/constants';
+import { ERROR_CODE, TENANT_PLAN } from '@shinefold/config/constants';
+import { errorResult, okResult } from '@shinefold/utils';
 import Stripe from 'stripe';
 
-import { applySubscriptionSync } from './apply-subscription-sync';
 import { getStripeClient } from './stripe-client';
 import {
   cancelLiveSubscription,
@@ -26,8 +27,13 @@ import {
 } from './tenant-subscription-lifecycle';
 
 vi.mock('./stripe-client');
-vi.mock('./apply-subscription-sync', () => ({
-  applySubscriptionSync: vi.fn(),
+const { setCancelledTenantFreeMock } = vi.hoisted(() => ({
+  setCancelledTenantFreeMock: vi.fn(),
+}));
+
+vi.mock('@shinefold/db', async () => ({
+  ...(await mockDbConstants()),
+  queries: { tenants: { setCancelledTenantFree: setCancelledTenantFreeMock } },
 }));
 
 const MOCK_ALREADY_CANCELLED = new Stripe.errors.StripeInvalidRequestError({
@@ -58,6 +64,7 @@ let stripe: ReturnType<typeof mockLifecycleStripe>;
 
 beforeEach(() => {
   stripe = mockLifecycleStripe();
+  setCancelledTenantFreeMock.mockReset().mockResolvedValue(okResult());
 });
 
 describe(setSubscriptionCollectionPaused, () => {
@@ -109,14 +116,14 @@ describe(setSubscriptionCollectionPaused, () => {
 });
 
 describe(cancelLiveSubscription, () => {
-  it('cancels at once without proration, then syncs the site to it', async () => {
+  it('cancels at once without proration, then moves the site to Free', async () => {
     await expect(cancelLiveSubscription(payingTenant)).resolves.toBe(true);
 
     expect(stripe.cancel).toHaveBeenCalledWith(MOCK_STRIPE_SUBSCRIPTION_ID, {
       prorate: false,
     });
-    expect(applySubscriptionSync).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(setCancelledTenantFreeMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
       MOCK_STRIPE_SUBSCRIPTION_ID,
     );
   });
@@ -137,7 +144,7 @@ describe(cancelLiveSubscription, () => {
       });
 
       await expect(cancelLiveSubscription(payingTenant)).resolves.toBe(true);
-      expect(applySubscriptionSync).toHaveBeenCalled();
+      expect(setCancelledTenantFreeMock).toHaveBeenCalled();
     });
 
     it('fails and logs when the subscription is still live', async () => {
@@ -152,10 +159,26 @@ describe(cancelLiveSubscription, () => {
     });
   });
 
-  it('fails when the sync after the cancel fails', async () => {
-    vi.mocked(applySubscriptionSync).mockRejectedValueOnce(MOCK_NETWORK_ERROR);
+  it('fails when the Free write after the cancel throws', async () => {
+    setCancelledTenantFreeMock.mockRejectedValueOnce(MOCK_NETWORK_ERROR);
 
     await expect(cancelLiveSubscription(payingTenant)).resolves.toBe(false);
+  });
+
+  it('fails and logs when the Free write matches no site', async () => {
+    setCancelledTenantFreeMock.mockResolvedValueOnce(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
+
+    await expect(cancelLiveSubscription(payingTenant)).resolves.toBe(false);
+    expect(logger.error).toHaveBeenCalledWith(
+      SUBSCRIPTION_LIFECYCLE_LOG.CANCEL_FAILED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        subscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
+        errorCode: ERROR_CODE.DB_NOT_FOUND,
+      },
+    );
   });
 
   it('fails and logs when Stripe has no key', async () => {

@@ -2,11 +2,13 @@ import 'server-only';
 
 import { BILLING_LOG } from '@platform/constants/billing';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
-import { applySubscriptionSync } from '@platform/server/billing/apply-subscription-sync';
 import { handleCatalogueEvent } from '@platform/server/billing/catalogue/handle-catalogue-event';
 import { revalidatePlatformSite } from '@platform/server/billing/catalogue/revalidate-platform-site';
 import { sendPaymentReceipt } from '@platform/server/billing/send-payment-receipt';
 import { subscriptionIdFromEvent } from '@platform/server/billing/subscription-id-from-event';
+import { syncStripeSubscription } from '@platform/server/billing/sync-stripe-subscription';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { onTenantPlanChange } from '@platform/server/tenants/on-tenant-plan-change';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import type { TTenantPlan } from '@shinefold/config/constants';
@@ -43,7 +45,12 @@ export const handleStripeEvent = async (
   const subscriptionId = subscriptionIdFromEvent(event);
   if (!subscriptionId) return;
 
-  const synced = await applySubscriptionSync(stripe, subscriptionId);
+  const synced = await syncStripeSubscription(stripe, subscriptionId);
+  if (synced && synced.fromPlan !== synced.toPlan) {
+    const { tenantId, fromPlan, toPlan } = synced;
+    after(() => revalidateSiteConfig(tenantId));
+    after(() => onTenantPlanChange(tenantId, fromPlan, toPlan));
+  }
 
   const recorded = await queries.stripeWebhookEvents.recordStripeEvent(
     event.id,
