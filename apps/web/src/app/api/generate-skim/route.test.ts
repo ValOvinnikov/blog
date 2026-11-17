@@ -394,6 +394,35 @@ describe(POST, () => {
       expect(releaseTakeawayGenerationMock).toHaveBeenCalledWith(MOCK_CLAIM);
     });
 
+    it.each([
+      [
+        'the post body cannot be read',
+        GENERATE_SKIM_LOG.POST_BODY_FETCH_FAILED,
+        () =>
+          getPublishedPostBodyMock.mockResolvedValue(errorResult(MOCK_ERROR)),
+      ],
+      [
+        'generation fails',
+        GENERATE_SKIM_LOG.GENERATION_FAILED,
+        () => generateTakeawaysMock.mockRejectedValue(MOCK_ERROR),
+      ],
+      [
+        'the draft cannot be saved',
+        GENERATE_SKIM_LOG.DRAFT_SAVE_FAILED,
+        () => saveSkimDraftMock.mockResolvedValue(errorResult(MOCK_ERROR)),
+      ],
+    ])("logs the tenant's id when %s", async (_case, event, fail) => {
+      fail();
+
+      await POST(postRequest());
+
+      expect(logger.error).toHaveBeenCalledWith(event, {
+        tenantId: MOCK_TENANT_ID,
+        postId: MOCK_POST_ID,
+        error: MOCK_ERROR,
+      });
+    });
+
     describe('when generation fails', () => {
       beforeEach(() => {
         generateTakeawaysMock.mockRejectedValue(MOCK_ERROR);

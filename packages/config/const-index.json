@@ -10584,6 +10584,22 @@
         "file": "apps/web/src/constants/generate-skim.ts"
       }
     ],
+    "generate_skim.tenant_not_servable": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TENANT_NOT_SERVABLE",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.tenant_resolve_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TENANT_RESOLVE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
     "header_style.site_config_fetch_failed": [
       {
         "ref": "HEADER_STYLE_LOG.SITE_CONFIG_FETCH_FAILED",
