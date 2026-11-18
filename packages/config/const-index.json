@@ -11946,6 +11946,54 @@
         "file": "apps/worker/src/constants/inactivity-sweep.ts"
       }
     ],
+    "member_access.check_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.CHECK_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.check_now_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.CHECK_NOW_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.resend_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.RESEND_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.revoke_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.REVOKE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.invite_delete_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.INVITE_DELETE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.sweep_member_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.SWEEP_MEMBER_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
     "newsletter_send.start_failed": [
       {
         "ref": "NEWSLETTER_SEND_LOG.START_FAILED",
@@ -12107,6 +12155,22 @@
     "owner_access.check_failed": [
       {
         "ref": "OWNER_ACCESS_LOG.CHECK_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.check_now_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.CHECK_NOW_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.resend_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.RESEND_FAILED",
         "scope": "app:worker",
         "from": "@worker/constants/owner-access",
         "file": "apps/worker/src/constants/owner-access.ts"

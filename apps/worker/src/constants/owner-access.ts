@@ -11,6 +11,8 @@ export const OWNER_ACCESS_FINDING_AFTER_MS = 30 * 60_000;
 export const OWNER_ACCESS_FINDING_IDENTIFIER = 'owner-access';
 export const OWNER_ACCESS_LOG = {
   CHECK_FAILED: 'owner_access.check_failed',
+  CHECK_NOW_FAILED: 'owner_access.check_now_failed',
+  RESEND_FAILED: 'owner_access.resend_failed',
   REPORT_FAILED: 'owner_access.report_failed',
   ACTIVITY_TOUCH_FAILED: 'owner_access.activity_touch_failed',
   INVITE_DELETE_FAILED: 'owner_access.invite_delete_failed',

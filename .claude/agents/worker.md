@@ -63,7 +63,8 @@ default to zero".
   `@shinefold/studio`. Needing one is a signal to stop and report.
 - **Nothing imports `apps/worker`.** The platform reaches it only through
   its signed endpoints — `POST /api/provision`, `POST /api/deprovision`,
-  `POST /api/owner-access/*`, `POST /api/custom-domain/*` and
+  `POST /api/owner-access/*`, `POST /api/member-access/*`,
+  `POST /api/custom-domain/*` and
   `POST /api/newsletter/post-send` and `POST /api/scheduled-post-purge`
   — every one authenticated by the shared enqueue secret. The other routes
   are Vercel Cron's `GET /api/inactivity-sweep` and
@@ -115,6 +116,9 @@ default to zero".
   STALLED or a failed check. The hourly owner-access sweep makes one check
   for every tenant whose owner is not yet administrator, and replaces a run
   older than 45 minutes, which can only be one left on an earlier deploy.
+  A member's Studio access (`ensureMemberAccess`) runs the same poll per
+  membership on the same shared helpers (`src/utils/studio-access/`,
+  `src/utils/access-run/`), and the same sweep covers members.
 - **Secrets.** `SANITY_MANAGEMENT_TOKEN`, `TENANT_TOKEN_ENCRYPTION_KEY`, the
   registry `DATABASE_URL`, `SANITY_REVALIDATE_SECRET` and `VERCEL_TOKEN` live
   on this app alone, plus the enqueue secret it shares with the platform.

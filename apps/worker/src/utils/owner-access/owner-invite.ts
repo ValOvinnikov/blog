@@ -1,49 +1,21 @@
-import { SANITY_PROJECT_ROLE } from '@shinefold/config';
 import { TENANT_OWNER_EMAIL } from '@shinefold/db/constants';
 import { setTenantOwnerAccess } from '@shinefold/db/queries/tenants';
-import {
-  createSanityProjectInvite,
-  deleteSanityProjectInvite,
-  listSanityProjectInvites,
-  type TSanityInvite,
-} from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
 import { sanitizeLogMessage } from '@shinefold/insight';
-import {
-  OWNER_ACCESS_LOG,
-  SANITY_PENDING_INVITE_STATUS,
-} from '@worker/constants/owner-access';
+import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
 import { sendOwnerEmailOnce } from '@worker/utils/owner-email/send-owner-email';
+import {
+  deleteInvites,
+  ensureViewerInvite,
+  listPendingInvites,
+} from '@worker/utils/studio-access/studio-invites';
 
-import { hasOwnerEmail, type TOwnerAccessTarget } from './owner-access-target';
-
-async function listOwnerInvites(
-  target: TOwnerAccessTarget,
-): Promise<TSanityInvite[]> {
-  const invites = await listSanityProjectInvites({
-    token: target.token,
-    projectId: target.projectId,
-  });
-  return invites.filter(
-    ({ email, status }) =>
-      status === SANITY_PENDING_INVITE_STATUS && hasOwnerEmail(target, email),
-  );
-}
-
-async function deleteInvites(
-  target: TOwnerAccessTarget,
-  invites: TSanityInvite[],
-): Promise<void> {
-  const { projectId, token } = target;
-  for (const { id } of invites) {
-    if (id) await deleteSanityProjectInvite({ token, projectId, inviteId: id });
-  }
-}
+import type { TOwnerAccessTarget } from './owner-access-target';
 
 async function deleteOwnerInvites(target: TOwnerAccessTarget): Promise<void> {
   const { tenant } = target;
 
-  const invites = await listOwnerInvites(target);
+  const invites = await listPendingInvites(target, target.ownerEmail);
   await deleteInvites(target, invites);
 
   const isRecordedInviteDeleted = invites.some(
@@ -78,28 +50,15 @@ export async function sendOwnerInvite(
   target: TOwnerAccessTarget,
   options: { replaceExisting: boolean },
 ): Promise<Date> {
-  const { tenant, projectId, ownerEmail, token } = target;
+  const { tenant, ownerEmail } = target;
 
-  const existing = await listOwnerInvites(target);
-  if (options.replaceExisting) await deleteInvites(target, existing);
-
-  let [invite] = options.replaceExisting ? [] : existing;
-  if (!invite) {
-    // The invites endpoint rejects `administrator` with a 403.
-    await createSanityProjectInvite({
-      token,
-      projectId,
-      email: ownerEmail,
-      role: SANITY_PROJECT_ROLE.VIEWER,
-    });
-    [invite] = await listOwnerInvites(target);
-  }
-
-  const inviteSentAt = invite?.createdAt
-    ? new Date(invite.createdAt)
-    : new Date();
+  const { inviteId, inviteSentAt } = await ensureViewerInvite(
+    target,
+    ownerEmail,
+    options,
+  );
   const recorded = await setTenantOwnerAccess(tenant.id, {
-    sanityInviteId: invite?.id ?? null,
+    sanityInviteId: inviteId,
     inviteSentAt,
     inviteAcceptedAt: null,
     ...(options.replaceExisting && {

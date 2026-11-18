@@ -30,8 +30,6 @@
   "apps/web/src/vitest-setup.ts": 166,
   "apps/worker/src/steps/verify-seeded-content.ts": 191,
   "apps/worker/src/testing/owner-access/fixtures.ts": 121,
-  "apps/worker/src/utils/owner-access/grant-owner-administrator.ts": 121,
-  "apps/worker/src/utils/owner-access/revoke-former-owner-access.ts": 136,
   "apps/worker/src/utils/owner-email/owner-email-copy.ts": 153,
   "packages/config/src/constants/icon.ts": 125,
   "packages/config/src/theme/contrast-pairs.ts": 131,
