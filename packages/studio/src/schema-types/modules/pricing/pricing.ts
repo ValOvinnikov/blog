@@ -1,16 +1,9 @@
-import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
-import {
-  appearanceFieldGroups,
-  appearanceFields,
-  appearanceFieldsets,
-} from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
-import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { cardModuleAppearance } from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { pricingTierSchema } from '@shinefold/studio/schema-types/objects/pricing-tier/pricing-tier';
-import { wideLayoutField } from '@shinefold/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { validateLocalizedMaxLength } from '@shinefold/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { validatePricingSingleHighlightedTier } from '@shinefold/studio/schema-types/validation/validate-pricing-single-highlighted-tier/validate-pricing-single-highlighted-tier';
@@ -26,9 +19,7 @@ export const pricingSchema = defineType({
   type: 'document',
   description: 'A table of plans and their prices, used to sell an offer.',
   icon: DollarSign,
-  fieldsets: appearanceFieldsets,
-  groups: appearanceFieldGroups,
-  fields: appearanceFields({
+  ...cardModuleAppearance({
     content: [
       titleField(),
       moduleHeadingBlockField(),
@@ -61,11 +52,7 @@ export const pricingSchema = defineType({
       }),
       ctaButtonsField(),
     ],
-    appearance: [
-      brandVariantField(),
-      ...alignmentFields([], { title: 'Heading Alignment', hasActions: true }),
-    ],
-    layout: wideLayoutField,
+    headingAlignment: { hasActions: true },
     hasColumns: false,
   }),
   preview: {

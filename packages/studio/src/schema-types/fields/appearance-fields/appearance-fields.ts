@@ -1,9 +1,19 @@
+import {
+  alignmentFields,
+  type TAlignmentFieldsOptions,
+} from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { cardFields } from '@shinefold/studio/schema-types/fields/appearance-fields/card-fields';
+import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import {
+  displayModeField,
+  isCarouselMode,
+  type TDisplayModeFieldOptions,
+} from '@shinefold/studio/schema-types/fields/display-mode-field/display-mode-field';
+import { wideLayoutField } from '@shinefold/studio/schema-types/objects/wide-layout/wide-layout-field';
 import type {
   FieldDefinition,
   FieldGroupDefinition,
   FieldsetDefinition,
-  StringDefinition,
 } from 'sanity';
 
 const CONTENT_GROUP = {
@@ -17,22 +27,21 @@ const APPEARANCE_GROUP = {
   title: 'Appearance',
 } satisfies FieldGroupDefinition;
 
-export const appearanceFieldGroups = [CONTENT_GROUP, APPEARANCE_GROUP];
-
 const CARDS_FIELDSET = {
   name: 'cards',
   title: 'Cards',
   options: { collapsible: true, collapsed: false },
 } satisfies FieldsetDefinition;
 
-export const appearanceFieldsets = [CARDS_FIELDSET];
-
-type TAppearanceFieldsOptions = {
+type TCardModuleAppearanceOptions = {
   content: readonly FieldDefinition[];
-  appearance: readonly FieldDefinition[];
-  layout: FieldDefinition;
+  fieldsets?: readonly FieldsetDefinition[];
+  beforeDisplayMode?: readonly FieldDefinition[];
+  displayMode?: boolean | TDisplayModeFieldOptions;
+  headingAlignment?: Omit<TAlignmentFieldsOptions, 'title'>;
+  afterHeadingAlignment?: readonly FieldDefinition[];
+  layout?: FieldDefinition;
   hasColumns?: boolean;
-  columnsHidden?: StringDefinition['hidden'];
 };
 
 const inGroup =
@@ -43,17 +52,41 @@ const inFieldset =
   ({ name }: FieldsetDefinition) =>
   (field: FieldDefinition): FieldDefinition => ({ ...field, fieldset: name });
 
-export const appearanceFields = ({
+const displayModeFields = (
+  displayMode: TCardModuleAppearanceOptions['displayMode'],
+) => {
+  if (!displayMode) return [];
+
+  return [displayModeField(displayMode === true ? undefined : displayMode)];
+};
+
+export const cardModuleAppearance = ({
   content,
-  appearance,
-  layout,
+  fieldsets = [],
+  beforeDisplayMode = [],
+  displayMode = false,
+  headingAlignment,
+  afterHeadingAlignment = [],
+  layout = wideLayoutField,
   hasColumns = true,
-  columnsHidden,
-}: TAppearanceFieldsOptions) => [
-  ...content.map(inGroup(CONTENT_GROUP)),
-  ...[
-    ...appearance,
-    ...cardFields(hasColumns, columnsHidden).map(inFieldset(CARDS_FIELDSET)),
-    layout,
-  ].map(inGroup(APPEARANCE_GROUP)),
-];
+}: TCardModuleAppearanceOptions) => ({
+  fieldsets: [...fieldsets, CARDS_FIELDSET],
+  groups: [CONTENT_GROUP, APPEARANCE_GROUP],
+  fields: [
+    ...content.map(inGroup(CONTENT_GROUP)),
+    ...[
+      brandVariantField(),
+      ...beforeDisplayMode,
+      ...displayModeFields(displayMode),
+      ...alignmentFields([], {
+        ...headingAlignment,
+        title: 'Heading Alignment',
+      }),
+      ...afterHeadingAlignment,
+      ...cardFields(hasColumns, displayMode ? isCarouselMode : undefined).map(
+        inFieldset(CARDS_FIELDSET),
+      ),
+      layout,
+    ].map(inGroup(APPEARANCE_GROUP)),
+  ],
+});
