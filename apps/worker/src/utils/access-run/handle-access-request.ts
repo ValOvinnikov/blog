@@ -8,46 +8,49 @@ import {
   readSignedRequest,
   respond,
   respondError,
-  tenantRequestBodySchema,
 } from '@worker/utils/signed-tenant-request/signed-tenant-request';
-import { z } from 'zod';
+import type { z } from 'zod';
 
-import { wakeOwnerAccess } from './owner-access-run';
+type TAccessRequestBody = { tenantId: string };
 
-const ownerAccessRequestBodySchema = tenantRequestBodySchema.extend({
-  formerOwnerEmail: z.string().trim().pipe(z.email()).optional(),
-});
+export type TAccessRequestHandler<TBody extends TAccessRequestBody> = {
+  schema: z.ZodType<TBody>;
+  failureEvent: string;
+  wake: (body: TBody) => Promise<void>;
+  exists?: (body: TBody) => Promise<boolean>;
+  before?: (body: TBody) => Promise<void>;
+  logContext?: (body: TBody) => Record<string, string>;
+};
 
-export async function handleOwnerAccessRequest(
+export async function handleAccessRequest<TBody extends TAccessRequestBody>(
   request: Request,
-  input: {
-    failureEvent: string;
-    before?: (tenantId: string, formerOwnerEmail?: string) => Promise<void>;
-  },
+  handler: TAccessRequestHandler<TBody>,
 ): Promise<Response> {
+  const { schema, failureEvent, wake, exists, before, logContext } = handler;
   const signed = await readSignedRequest(
     request,
-    ownerAccessRequestBodySchema,
+    schema,
     env.WORKER_ENQUEUE_SECRET,
   );
   if (!signed.ok) return signed.error;
-  const { tenantId, formerOwnerEmail } = signed.data;
+  const body = signed.data;
 
   try {
-    const tenant = await getTenantById(tenantId);
-    if (!tenant) {
+    const tenant = await getTenantById(body.tenantId);
+    if (!tenant || (exists && !(await exists(body)))) {
       return respondError(HTTP_STATUS.NOT_FOUND, ENQUEUE_ERROR.NOT_FOUND);
     }
     if (!tenant.sanityProjectId) {
       return respondError(HTTP_STATUS.CONFLICT, ENQUEUE_ERROR.NOT_PROVISIONED);
     }
 
-    await input.before?.(tenantId, formerOwnerEmail);
-    await wakeOwnerAccess(tenantId);
+    await before?.(body);
+    await wake(body);
     return respond(HTTP_STATUS.ACCEPTED, {});
   } catch (error) {
-    logger.error(input.failureEvent, {
-      tenantId,
+    logger.error(failureEvent, {
+      tenantId: body.tenantId,
+      ...logContext?.(body),
       error: sanitizeLogMessage(error),
     });
     return respondError(

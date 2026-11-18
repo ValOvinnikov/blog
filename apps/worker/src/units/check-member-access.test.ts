@@ -264,16 +264,36 @@ describe(checkMemberAccess, () => {
       ]);
     });
 
-    it('changes nothing', async () => {
+    it('changes nothing in Sanity or the record', async () => {
       const result = await check();
 
       expect(grantSanityProjectRole).not.toHaveBeenCalled();
       expect(revokeSanityProjectRole).not.toHaveBeenCalled();
-      expect(setMemberStudioAccess).not.toHaveBeenCalled();
+      expect(setMemberStudioAccess).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_MEMBERSHIP_ID,
+        {},
+      );
       expect(result).toEqual({
         outcome: ALREADY_ADMINISTRATOR,
         hasFailed: false,
       });
+    });
+
+    it('revokes administrator when the member was removed since it was read', async () => {
+      vi.mocked(setMemberStudioAccess).mockResolvedValue(
+        errorResult(ERROR_CODE.DB_NOT_FOUND),
+      );
+
+      const result = await check();
+
+      expect(revokeSanityProjectRole).toHaveBeenCalledWith({
+        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        projectId: MOCK_SANITY_PROJECT_ID,
+        projectUserId: MOCK_MEMBER_PROJECT_USER_ID,
+        roleName: SANITY_PROJECT_ROLE.ADMINISTRATOR,
+      });
+      expect(result).toEqual({ outcome: null, hasFailed: false });
     });
   });
 

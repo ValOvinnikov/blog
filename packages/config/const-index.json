@@ -12152,6 +12152,22 @@
         "file": "apps/worker/src/constants/owner-access.ts"
       }
     ],
+    "owner_access.check_now_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.CHECK_NOW_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.resend_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.RESEND_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
     "owner_access.report_failed": [
       {
         "ref": "OWNER_ACCESS_LOG.REPORT_FAILED",

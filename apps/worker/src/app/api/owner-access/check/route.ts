@@ -1,7 +1,10 @@
-import { handleOwnerAccessRequest } from '@worker/utils/owner-access-run/handle-owner-access-request';
+import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
+import { handleAccessRequest } from '@worker/utils/access-run/handle-access-request';
+import { ownerAccessRequest } from '@worker/utils/owner-access-run/owner-access-request';
 
 export function POST(request: Request): Promise<Response> {
-  return handleOwnerAccessRequest(request, {
-    failureEvent: 'owner_access.check_now_failed',
+  return handleAccessRequest(request, {
+    ...ownerAccessRequest,
+    failureEvent: OWNER_ACCESS_LOG.CHECK_NOW_FAILED,
   });
 }

@@ -1,9 +1,13 @@
+import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { resendOwnerInvite } from '@worker/units/resend-owner-invite';
-import { handleOwnerAccessRequest } from '@worker/utils/owner-access-run/handle-owner-access-request';
+import { handleAccessRequest } from '@worker/utils/access-run/handle-access-request';
+import { ownerAccessRequest } from '@worker/utils/owner-access-run/owner-access-request';
 
 export function POST(request: Request): Promise<Response> {
-  return handleOwnerAccessRequest(request, {
-    failureEvent: 'owner_access.resend_failed',
-    before: resendOwnerInvite,
+  return handleAccessRequest(request, {
+    ...ownerAccessRequest,
+    failureEvent: OWNER_ACCESS_LOG.RESEND_FAILED,
+    before: ({ tenantId, formerOwnerEmail }) =>
+      resendOwnerInvite(tenantId, formerOwnerEmail),
   });
 }

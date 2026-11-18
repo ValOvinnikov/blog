@@ -20,7 +20,7 @@ function isGrantRecorded(
   return !!inviteAcceptedAt && sanityUserId === user.sanityUserId;
 }
 
-// Resolves null when the membership was removed meanwhile; the role it just granted is revoked again.
+// Resolves null when the membership was removed meanwhile, revoking the role again; an empty patch only confirms the row still exists.
 export async function grantMemberAdministrator(
   target: TMemberAccessTarget,
   user: TSanityUser,
@@ -28,20 +28,23 @@ export async function grantMemberAdministrator(
   const hasChanged = await grantAdministrator(target, user);
   await deleteMemberInvitesAfterGrant(target);
 
-  if (!isGrantRecorded(target, user)) {
-    const { inviteSentAt, inviteAcceptedAt } = target.access;
-    const acceptedAt = inviteAcceptedAt ?? new Date();
-    const isRecorded = await recordMemberAccess(target, {
-      sanityInviteId: null,
-      inviteSentAt: inviteSentAt ?? acceptedAt,
-      inviteAcceptedAt: acceptedAt,
-      sanityUserId: user.sanityUserId,
-      loginProvider: toLoginProvider(user.profile.provider),
-    });
-    if (!isRecorded) {
-      await revokeProjectRoles(target, [user]);
-      return null;
-    }
+  const { inviteSentAt, inviteAcceptedAt } = target.access;
+  const acceptedAt = inviteAcceptedAt ?? new Date();
+  const isRecorded = await recordMemberAccess(
+    target,
+    isGrantRecorded(target, user)
+      ? {}
+      : {
+          sanityInviteId: null,
+          inviteSentAt: inviteSentAt ?? acceptedAt,
+          inviteAcceptedAt: acceptedAt,
+          sanityUserId: user.sanityUserId,
+          loginProvider: toLoginProvider(user.profile.provider),
+        },
+  );
+  if (!isRecorded) {
+    await revokeProjectRoles(target, [user]);
+    return null;
   }
 
   return hasChanged
