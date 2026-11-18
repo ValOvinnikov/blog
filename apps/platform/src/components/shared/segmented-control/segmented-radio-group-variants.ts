@@ -68,6 +68,10 @@ export const segmentedRadioGroupVariants = tv({
       true: {},
       false: {},
     },
+    isInactive: {
+      true: {},
+      false: {},
+    },
     isLocked: {
       true: {},
       false: {},
@@ -79,24 +83,24 @@ export const segmentedRadioGroupVariants = tv({
   compoundVariants: [
     {
       layout: SEGMENTED_RADIO_LAYOUT.TRACK,
-      isLocked: false,
+      isInactive: false,
       isSelected: false,
       class: { option: ['hover:bg-platform-hover-tint'] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: false,
+      isInactive: false,
       class: { option: ['cursor-pointer'], check: [SELECTED_TICK_CLASSES] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: false,
+      isInactive: false,
       isSelected: true,
       class: { option: [...SELECTED_CHOICE_CLASSES, 'font-semibold'] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: false,
+      isInactive: false,
       isSelected: false,
       class: {
         option: [
@@ -107,7 +111,7 @@ export const segmentedRadioGroupVariants = tv({
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: true,
+      isInactive: true,
       class: {
         option: [...UNSELECTED_CHOICE_CLASSES, 'cursor-not-allowed'],
         glyph: ['opacity-(--platform-locked-fade)'],
@@ -116,13 +120,13 @@ export const segmentedRadioGroupVariants = tv({
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: true,
+      isInactive: true,
       isSelected: true,
       class: { option: ['border-platform-control-line'] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: true,
+      isInactive: true,
       isSelected: false,
       class: {
         option: [
@@ -130,10 +134,23 @@ export const segmentedRadioGroupVariants = tv({
         ],
       },
     },
+    {
+      layout: SEGMENTED_RADIO_LAYOUT.TILES,
+      isLocked: true,
+      isSelected: true,
+      class: { option: ['text-platform-muted'] },
+    },
+    {
+      layout: SEGMENTED_RADIO_LAYOUT.TILES,
+      isLocked: true,
+      isSelected: false,
+      class: { option: ['text-platform-faint'] },
+    },
   ],
   defaultVariants: {
     layout: SEGMENTED_RADIO_LAYOUT.TRACK,
     isSelected: false,
+    isInactive: false,
     isLocked: false,
   },
 });
