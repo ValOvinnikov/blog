@@ -18,6 +18,8 @@ export async function purgeScheduledPost(
     tenantId,
     postId,
     publishedAt,
+    // A re-dated post's update enqueues its own purge run.
+    isRedateFollowed: false,
     onDue: () => purgeScheduledPostPages(tenantId, postId),
   });
 }

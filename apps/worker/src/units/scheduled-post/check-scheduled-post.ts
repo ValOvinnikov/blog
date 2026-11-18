@@ -6,7 +6,8 @@ import { readPostPublishedAt } from '@worker/utils/scheduled-post/read-post-publ
 export type TScheduledPostCheck =
   | { state: typeof SCHEDULED_POST_STATE.DUE }
   | { state: typeof SCHEDULED_POST_STATE.SCHEDULED; waitMs: number }
-  | { state: typeof SCHEDULED_POST_STATE.STALE };
+  | { state: typeof SCHEDULED_POST_STATE.STALE }
+  | { state: typeof SCHEDULED_POST_STATE.REDATED; publishedAt: string };
 
 const STALE: TScheduledPostCheck = { state: SCHEDULED_POST_STATE.STALE };
 
@@ -22,8 +23,12 @@ export async function checkScheduledPost(
 
   const currentPublishedAt = await readPostPublishedAt(credentials, postId);
   const publishAtMs = Date.parse(publishedAt);
-  if (!currentPublishedAt || Date.parse(currentPublishedAt) !== publishAtMs) {
-    return STALE;
+  if (!currentPublishedAt) return STALE;
+  if (Date.parse(currentPublishedAt) !== publishAtMs) {
+    return {
+      state: SCHEDULED_POST_STATE.REDATED,
+      publishedAt: currentPublishedAt,
+    };
   }
 
   const waitMs = publishAtMs - Date.now();

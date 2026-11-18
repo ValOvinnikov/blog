@@ -14,7 +14,8 @@ export type TScheduledPostRun = {
   tenantId: string;
   postId: string;
   publishedAt: string;
-  onDue: () => Promise<void>;
+  isRedateFollowed: boolean;
+  onDue: (goLiveAt: string) => Promise<void>;
 };
 
 /** Callable only from a workflow, since it sleeps and holds a run hook. */
@@ -24,6 +25,7 @@ export async function runAtScheduledPostDate({
   tenantId,
   postId,
   publishedAt,
+  isRedateFollowed,
   onDue,
 }: TScheduledPostRun): Promise<void> {
   const run = createHook<null>({
@@ -32,13 +34,23 @@ export async function runAtScheduledPostDate({
   try {
     if (await run.getConflict()) return;
 
-    let check = await checkScheduledPost(tenantId, postId, publishedAt);
-    while (check.state === SCHEDULED_POST_STATE.SCHEDULED) {
-      await sleep(check.waitMs);
-      check = await checkScheduledPost(tenantId, postId, publishedAt);
+    let goLiveAt = publishedAt;
+    let check = await checkScheduledPost(tenantId, postId, goLiveAt);
+    for (;;) {
+      if (check.state === SCHEDULED_POST_STATE.SCHEDULED) {
+        await sleep(check.waitMs);
+      } else if (
+        check.state === SCHEDULED_POST_STATE.REDATED &&
+        isRedateFollowed
+      ) {
+        goLiveAt = check.publishedAt;
+      } else {
+        break;
+      }
+      check = await checkScheduledPost(tenantId, postId, goLiveAt);
     }
     if (check.state === SCHEDULED_POST_STATE.DUE) {
-      await onDue();
+      await onDue(goLiveAt);
     }
   } catch (error) {
     await reportRunFailed(

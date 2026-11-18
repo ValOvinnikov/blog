@@ -12320,6 +12320,14 @@
         "file": "apps/worker/src/constants/scheduled-post.ts"
       }
     ],
+    "REDATED": [
+      {
+        "ref": "SCHEDULED_POST_STATE.REDATED",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post",
+        "file": "apps/worker/src/constants/scheduled-post.ts"
+      }
+    ],
     "pending": [
       {
         "ref": "WORKFLOW_RUN_STATUS.PENDING",

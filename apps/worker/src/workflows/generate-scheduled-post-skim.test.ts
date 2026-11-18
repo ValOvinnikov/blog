@@ -15,8 +15,8 @@ vi.mock('@worker/workflows/scheduled-post-run');
 
 describe(generateScheduledPostSkim, () => {
   it("requests the post's takeaways once its go-live date arrives", async () => {
-    vi.mocked(runAtScheduledPostDate).mockImplementation(({ onDue }) =>
-      onDue(),
+    vi.mocked(runAtScheduledPostDate).mockImplementation(
+      ({ onDue, publishedAt }) => onDue(publishedAt),
     );
 
     await generateScheduledPostSkim(
@@ -32,6 +32,7 @@ describe(generateScheduledPostSkim, () => {
         tenantId: MOCK_TENANT_ID,
         postId: MOCK_POST_ID,
         publishedAt: MOCK_PUBLISHED_AT,
+        isRedateFollowed: true,
       }),
     );
     expect(requestScheduledPostSkim).toHaveBeenCalledExactlyOnceWith(

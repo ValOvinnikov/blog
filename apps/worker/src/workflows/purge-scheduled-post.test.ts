@@ -15,8 +15,8 @@ vi.mock('@worker/workflows/scheduled-post-run');
 
 describe(purgeScheduledPost, () => {
   it("purges the post's pages once its publish date arrives", async () => {
-    vi.mocked(runAtScheduledPostDate).mockImplementation(({ onDue }) =>
-      onDue(),
+    vi.mocked(runAtScheduledPostDate).mockImplementation(
+      ({ onDue, publishedAt }) => onDue(publishedAt),
     );
 
     await purgeScheduledPost(MOCK_TENANT_ID, MOCK_POST_ID, MOCK_PUBLISHED_AT);
@@ -28,6 +28,7 @@ describe(purgeScheduledPost, () => {
         tenantId: MOCK_TENANT_ID,
         postId: MOCK_POST_ID,
         publishedAt: MOCK_PUBLISHED_AT,
+        isRedateFollowed: false,
       }),
     );
     expect(purgeScheduledPostPages).toHaveBeenCalledExactlyOnceWith(

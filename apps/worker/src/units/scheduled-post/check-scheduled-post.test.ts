@@ -70,11 +70,17 @@ describe(checkScheduledPost, () => {
     });
   });
 
-  it.each([
-    ['rescheduled', MOCK_LATER_PUBLISHED_AT],
-    ['unpublished or deleted', undefined],
-  ])('is stale when the post was %s', async (_label, currentPublishedAt) => {
-    vi.mocked(readPostPublishedAt).mockResolvedValue(currentPublishedAt);
+  it('reports the new date when the post was rescheduled', async () => {
+    vi.mocked(readPostPublishedAt).mockResolvedValue(MOCK_LATER_PUBLISHED_AT);
+
+    await expect(runCheck()).resolves.toEqual({
+      state: SCHEDULED_POST_STATE.REDATED,
+      publishedAt: MOCK_LATER_PUBLISHED_AT,
+    });
+  });
+
+  it('is stale when the post was unpublished or deleted', async () => {
+    vi.mocked(readPostPublishedAt).mockResolvedValue(undefined);
 
     await expect(runCheck()).resolves.toEqual(STALE);
   });

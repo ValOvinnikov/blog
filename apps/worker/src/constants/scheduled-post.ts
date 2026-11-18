@@ -4,6 +4,7 @@ export const SCHEDULED_POST_STATE = {
   DUE: 'DUE',
   SCHEDULED: 'SCHEDULED',
   STALE: 'STALE',
+  REDATED: 'REDATED',
 } as const;
 
 // Covers web's enqueue hop for a post dated only seconds ahead.

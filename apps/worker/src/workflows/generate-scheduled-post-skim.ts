@@ -18,6 +18,8 @@ export async function generateScheduledPostSkim(
     tenantId,
     postId,
     publishedAt,
-    onDue: () => requestScheduledPostSkim(tenantId, postId, publishedAt),
+    // Web enqueues this run on a first publish only, so a re-dated post gets no other.
+    isRedateFollowed: true,
+    onDue: (goLiveAt) => requestScheduledPostSkim(tenantId, postId, goLiveAt),
   });
 }

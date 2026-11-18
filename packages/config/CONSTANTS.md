@@ -1139,7 +1139,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@worker/constants/scheduled-post` — `apps/worker/src/constants/scheduled-post.ts`
 
-- **SCHEDULED_POST_STATE**: `DUE`, `SCHEDULED`, `STALE`
+- **SCHEDULED_POST_STATE**: `DUE`, `SCHEDULED`, `STALE`, `REDATED`
 
 ### `@worker/constants/workflow` — `apps/worker/src/constants/workflow.ts`
 
