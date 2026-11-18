@@ -148,7 +148,7 @@ describe(runDowngradeGraceSweep, () => {
       emailDue(GRACE_EMAIL.STARTED, [inGraceFor(0)]);
     });
 
-    it('tells the owner the site is on Free even when nothing will lock', async () => {
+    it('says the site is on Free and links the plans, even with nothing to lock', async () => {
       await sweep();
 
       const [email] = sentEmails();
@@ -160,6 +160,8 @@ describe(runDowngradeGraceSweep, () => {
       expect(email?.to).toBe(MOCK_OWNER_EMAIL);
       expect(email?.subject).toBe(subject);
       expect(email?.text).toContain(COPY.upgradeAnyTime);
+      expect(email?.text).toContain(COPY.planComparisonLabel);
+      expect(email?.html).toContain(MOCK_SWEEP_ENV.pricingPageUrl);
     });
 
     it('names the members who will lose access and when', async () => {
@@ -174,18 +176,6 @@ describe(runDowngradeGraceSweep, () => {
           count: MOCK_EXTRA_MEMBERS,
           date: MOCK_DAY_0_GRACE_END_DATE,
         }),
-      );
-    });
-
-    it('names what a site leaving Starter lost', async () => {
-      emailDue(GRACE_EMAIL.STARTED, [
-        inGraceFor(0, { downgradedFromPlan: TENANT_PLAN.STARTER }),
-      ]);
-
-      await sweep();
-
-      expect(sentEmails()[0]?.text).toContain(
-        COPY.stopped[TENANT_PLAN.STARTER],
       );
     });
 

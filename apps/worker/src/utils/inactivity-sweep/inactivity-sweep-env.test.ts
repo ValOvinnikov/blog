@@ -1,3 +1,4 @@
+import { routes } from '@shinefold/config';
 import { MOCK_MARKETING_TENANT_DOMAIN } from '@shinefold/db/testing/tenant-domains/fixtures';
 import { mockInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
 import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
@@ -7,6 +8,7 @@ import { getInactivitySweepEnv } from './inactivity-sweep-env';
 vi.mock('@worker/utils/env/env');
 
 const MOCK_SWEEP_ENV = mockInactivitySweepEnv();
+const MOCK_LOCAL_MARKETING_SITE_URL = 'http://localhost:3004';
 
 beforeEach(() => {
   mockEnv.PLATFORM_APP_BASE_URL = MOCK_SWEEP_ENV.platformAppBaseUrl;
@@ -28,5 +30,19 @@ describe(getInactivitySweepEnv, () => {
 
   it('leaves the marketing host unset without a marketing site address', () => {
     expect(getInactivitySweepEnv().marketingHost).toBeUndefined();
+  });
+
+  it('links the plan comparison on the marketing site, keeping its scheme', () => {
+    mockEnv.MARKETING_SITE_URL = MOCK_LOCAL_MARKETING_SITE_URL;
+
+    expect(getInactivitySweepEnv().pricingPageUrl).toBe(
+      `${MOCK_LOCAL_MARKETING_SITE_URL}${routes.pricingComparison()}`,
+    );
+  });
+
+  it('links the plan comparison on the root domain apex otherwise', () => {
+    expect(getInactivitySweepEnv().pricingPageUrl).toBe(
+      `https://${MOCK_SWEEP_ENV.tenantRootDomain}${routes.pricingComparison()}`,
+    );
   });
 });

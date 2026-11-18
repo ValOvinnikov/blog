@@ -1,20 +1,15 @@
-import { TENANT_PLAN } from '@shinefold/config/constants';
 import { GRACE_EMAIL } from '@shinefold/db/constants';
 import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 
 export const OWNER_GRACE_EMAIL_COPY_EN: TOwnerGraceEmailCopy = {
-  upgradeAnyTime: 'You can upgrade at any time to switch them back on.',
+  upgradeAnyTime:
+    'Nothing has been deleted. You can upgrade at any time to switch your plan’s features back on.',
   keepAsTheyAre: (date) => `Upgrade before ${date} to keep things as they are.`,
   memberLock: ({ count, date }) =>
     `On ${date}, ${count} team ${count === 1 ? 'member' : 'members'} will lose access to the site’s admin. Their accounts are kept, and access comes back when you upgrade.`,
   domainLock: ({ customDomain, subdomain, date }) =>
     `On ${date}, your site’s main address moves from ${customDomain} back to ${subdomain}.`,
-  stopped: {
-    [TENANT_PLAN.GROWTH]:
-      'Growth sections, the newsletter, reader accounts and the extra Look settings have stopped. Nothing has been deleted: they come back as soon as you upgrade.',
-    [TENANT_PLAN.STARTER]:
-      'The contact form and your own analytics tool have stopped, and the “Powered by” mark is back in the footer. Nothing has been deleted: they come back as soon as you upgrade.',
-  },
+  planComparisonLabel: 'See what each plan includes',
   emails: {
     [GRACE_EMAIL.STARTED]: ({ siteName }) => ({
       subject: `${siteName} is now on the Free plan`,
