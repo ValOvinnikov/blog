@@ -29,7 +29,7 @@ const READY_TENANT = {
   provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
 };
 
-const LOCKED_WITH_ACCESS = {
+const MOCK_LOCKED_WITH_ACCESS = {
   lockedAt: MOCK_NOW,
   ...toMemberStudioAccessColumns(mockMemberStudioAccess()),
 };
@@ -91,7 +91,12 @@ describe(listLockedMembersWithStudioAccess, () => {
     'excludes a locked member with Studio access on %s',
     async (_description, tenantOverrides) => {
       const { id } = await insertTestTenant(db(), tenantOverrides);
-      await insertTestMember(db(), id, MOCK_EDITOR_EMAIL, LOCKED_WITH_ACCESS);
+      await insertTestMember(
+        db(),
+        id,
+        MOCK_EDITOR_EMAIL,
+        MOCK_LOCKED_WITH_ACCESS,
+      );
 
       await expect(listLockedMembersWithStudioAccess()).resolves.toEqual([]);
     },
