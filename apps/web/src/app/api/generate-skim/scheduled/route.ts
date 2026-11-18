@@ -1,8 +1,10 @@
-import { HTTP_STATUS } from '@shinefold/config/constants';
+import { HTTP_STATUS, type TMaybeUndefined } from '@shinefold/config';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { service, type TTenantSanityContext } from '@shinefold/service';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
 import { readSignedTenantRequest } from '@web/server/signed-request/read-signed-tenant-request/read-signed-tenant-request';
 import { generatePostSkim } from '@web/server/skim/generate-post-skim/generate-post-skim';
+import { hasExistingTakeaways } from '@web/server/skim/has-existing-takeaways/has-existing-takeaways';
 import { skimResponse } from '@web/server/skim/skim-response/skim-response';
 import { resolveTenantById } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { toTenantSanityWriteContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
@@ -22,12 +24,10 @@ const requestBodySchema = z.object({
 
 type TGoLiveRequest = z.infer<typeof requestBodySchema>;
 
-const LOOKUP_FAILED = { isLookupFailed: true } as const;
-
-const isGoingLiveNow = async (
+const refuseUnlessGoingLive = async (
   { tenantId, postId, publishedAt }: TGoLiveRequest,
   readTenant: TTenantSanityContext,
-): Promise<boolean | typeof LOOKUP_FAILED> => {
+): Promise<TMaybeUndefined<NextResponse>> => {
   const result = await service.entities.posts.v1.getPostPublishedAt(
     postId,
     readTenant,
@@ -38,31 +38,40 @@ const isGoingLiveNow = async (
       postId,
       error: result.error,
     });
-    return LOOKUP_FAILED;
+    return respondEmpty(HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
   const { data: currentPublishedAt } = result;
-  if (!currentPublishedAt) return false;
-
   const goLiveMs = Date.parse(publishedAt);
-  return Date.parse(currentPublishedAt) === goLiveMs && goLiveMs <= Date.now();
+  if (!currentPublishedAt || Date.parse(currentPublishedAt) !== goLiveMs) {
+    return respondEmpty(HTTP_STATUS.NO_CONTENT);
+  }
+  // A non-2xx makes the worker retry, so a run that wakes just before the date still generates.
+  if (goLiveMs > Date.now()) {
+    return respondEmpty(HTTP_STATUS.TOO_EARLY);
+  }
+  return undefined;
 };
 
-const hasTakeaways = async (
-  { tenantId, postId }: TGoLiveRequest,
-  writeTenant: TTenantSanityContext,
-): Promise<boolean | typeof LOOKUP_FAILED> => {
-  const result = await service.editorial.skim.v1.hasPostTakeaways(
-    postId,
-    writeTenant,
-  );
-  if (result.ok) return result.data;
-
-  logger.error(GENERATE_SKIM_LOG.TAKEAWAYS_LOOKUP_FAILED, {
-    tenantId,
-    postId,
-    error: result.error,
-  });
-  return LOOKUP_FAILED;
+const resolveGoLiveTenant = async ({
+  tenantId,
+  postId,
+}: TGoLiveRequest): Promise<TTenant | NextResponse> => {
+  let tenant: TMaybeUndefined<TTenant>;
+  try {
+    tenant = await resolveTenantById(tenantId);
+  } catch (error) {
+    logger.error(GENERATE_SKIM_LOG.TENANT_RESOLVE_FAILED, {
+      tenantId,
+      postId,
+      error,
+    });
+    return respondEmpty(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+  if (!tenant) {
+    logger.warn(GENERATE_SKIM_LOG.TENANT_NOT_SERVABLE, { tenantId, postId });
+    return respondEmpty(HTTP_STATUS.NOT_FOUND);
+  }
+  return tenant;
 };
 
 export async function POST(request: Request): Promise<NextResponse> {
@@ -85,28 +94,19 @@ export async function POST(request: Request): Promise<NextResponse> {
     return respondEmpty(HTTP_STATUS.SERVICE_UNAVAILABLE);
   }
 
-  const isDue = await isGoingLiveNow(body, readTenant);
-  if (isDue === LOOKUP_FAILED) {
-    return respondEmpty(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-  }
-  if (!isDue) {
-    return respondEmpty(HTTP_STATUS.NO_CONTENT);
-  }
+  const notDue = await refuseUnlessGoingLive(body, readTenant);
+  if (notDue) return notDue;
 
-  const tenant = await resolveTenantById(tenantId);
-  if (!tenant) {
-    return respondEmpty(HTTP_STATUS.NOT_FOUND);
-  }
+  const tenant = await resolveGoLiveTenant(body);
+  if (tenant instanceof NextResponse) return tenant;
   const writeContext = toTenantSanityWriteContext(tenant);
 
-  if (writeContext.tenant) {
-    const isDone = await hasTakeaways(body, writeContext.tenant);
-    if (isDone === LOOKUP_FAILED) {
-      return respondEmpty(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    }
-    if (isDone) {
-      return respondEmpty(HTTP_STATUS.NO_CONTENT);
-    }
+  const existing = await hasExistingTakeaways(postId, writeContext);
+  if (!existing.ok) {
+    return respondEmpty(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+  if (existing.data) {
+    return respondEmpty(HTTP_STATUS.NO_CONTENT);
   }
 
   const result = await generatePostSkim({
