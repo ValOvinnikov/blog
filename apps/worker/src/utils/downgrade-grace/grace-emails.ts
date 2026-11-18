@@ -71,6 +71,10 @@ export async function sendOwnerGraceEmail(
         label: OWNER_DASHBOARD_ACTION_LABEL[locale],
         url: new URL(OWNER_DASHBOARD_PATH, env.platformAppBaseUrl).toString(),
       },
+      secondaryLink: {
+        label: copy.planComparisonLabel,
+        url: env.pricingPageUrl,
+      },
     }),
     failedEvent: DOWNGRADE_GRACE_LOG.EMAIL_SEND_FAILED,
     context: { tenantId, email },
