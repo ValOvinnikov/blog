@@ -2,6 +2,7 @@ export const CONSENT_VOICE_FIXED_KEYS = [
   'consent.preferences.closeLabel',
   'consent.banner.heading',
   'consent.banner.message',
+  'consent.banner.messageWithAnalytics',
   'consent.banner.acceptLabel',
   'consent.banner.rejectLabel',
   'consent.banner.settingsLabel',

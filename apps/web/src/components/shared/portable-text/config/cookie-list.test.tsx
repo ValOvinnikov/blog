@@ -3,14 +3,13 @@ import {
   SITE_MESSAGES,
   SITE_MESSAGES_BY_LOCALE,
 } from '@shinefold/config';
-import type { TTenantAnalytics } from '@shinefold/db/queries/tenant-analytics/save-tenant-analytics';
 import {
   MOCK_GOOGLE_ANALYTICS,
   MOCK_PLAUSIBLE_ANALYTICS,
 } from '@shinefold/db/testing/tenant-analytics/fixtures';
 import { COOKIE_ID, COOKIE_LIST } from '@web/constants/cookie-list';
-import { SiteAnalyticsProvider } from '@web/context/site-analytics-provider';
 import { renderElement, screen, within } from '@web/testing/custom-render';
+import { withSiteAnalytics } from '@web/testing/shared/site-analytics/with-site-analytics';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
 import { NextIntlClientProvider } from 'next-intl';
 
@@ -22,13 +21,6 @@ const { ariaLabel, cookies, intro, introWithGoogleAnalytics, analyticsNote } =
 
 const GOOGLE_ANALYTICS_COOKIE = '_ga';
 const MOCK_GOOGLE_ANALYTICS_VISIT_COOKIE = `${GOOGLE_ANALYTICS_COOKIE}_${MOCK_GOOGLE_ANALYTICS.analyticsId.replace(/^G-/, '')}`;
-
-const renderWithAnalytics = (analytics: TTenantAnalytics) =>
-  renderElement(
-    <SiteAnalyticsProvider value={analytics}>
-      <CookieList />
-    </SiteAnalyticsProvider>,
-  );
 
 const getCookieRow = (name: string) =>
   screen.getByRole('row', {
@@ -110,7 +102,7 @@ describe(`<${CookieList.name}/>`, () => {
 
   describe('with Google Analytics configured', () => {
     beforeEach(() => {
-      renderWithAnalytics(MOCK_GOOGLE_ANALYTICS);
+      renderElement(withSiteAnalytics(<CookieList />, MOCK_GOOGLE_ANALYTICS));
     });
 
     it.each([
@@ -133,7 +125,7 @@ describe(`<${CookieList.name}/>`, () => {
   });
 
   it('lists no Google cookie for a site on Plausible', () => {
-    renderWithAnalytics(MOCK_PLAUSIBLE_ANALYTICS);
+    renderElement(withSiteAnalytics(<CookieList />, MOCK_PLAUSIBLE_ANALYTICS));
 
     const entries = getStackedEntries();
     const sentence = screen.getByText(intro);

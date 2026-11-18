@@ -342,7 +342,8 @@
   "consent": {
     "banner": {
       "heading": "Cookies sur ce site",
-      "message": "Nous n'utilisons que les cookies nécessaires au fonctionnement de ce site, sauf si vous autorisez la mesure d'audience ou les médias externes. Vous pouvez modifier votre choix à tout moment via Paramètres des cookies dans le pied de page.",
+      "message": "Nous n'utilisons que les cookies nécessaires au fonctionnement de ce site, sauf si vous autorisez les médias externes. Vous pouvez modifier votre choix à tout moment via Paramètres des cookies dans le pied de page.",
+      "messageWithAnalytics": "Nous n'utilisons que les cookies nécessaires au fonctionnement de ce site, sauf si vous autorisez la mesure d'audience ou les médias externes. Vous pouvez modifier votre choix à tout moment via Paramètres des cookies dans le pied de page.",
       "acceptLabel": "Tout accepter",
       "rejectLabel": "Tout refuser",
       "settingsLabel": "Paramètres",

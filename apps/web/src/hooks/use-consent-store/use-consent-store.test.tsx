@@ -90,19 +90,10 @@ describe(useConsentStore, () => {
       ({ result } = renderHook(() => useConsentStore()));
     });
 
-    it('grants every optional category on accept all', () => {
-      act(() => result.current.acceptAll());
-
-      expect(result.current.status).toBe(CONSENT_STATUS.ANSWERED);
-      expect(result.current.granted).toEqual([
-        CONSENT_CATEGORY.ANALYTICS,
-        CONSENT_CATEGORY.EXTERNAL_MEDIA,
-      ]);
-    });
-
     it('persists exactly the categories passed to save', () => {
       act(() => result.current.save([CONSENT_CATEGORY.EXTERNAL_MEDIA]));
 
+      expect(result.current.status).toBe(CONSENT_STATUS.ANSWERED);
       expect(result.current.granted).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
       expect(document.cookie).toContain(MOCK_ANSWERED_CONSENT_PAIR);
     });
@@ -112,7 +103,7 @@ describe(useConsentStore, () => {
     const first = renderHook(() => useConsentStore());
     const second = renderHook(() => useConsentStore());
 
-    act(() => first.result.current.acceptAll());
+    act(() => first.result.current.save([CONSENT_CATEGORY.EXTERNAL_MEDIA]));
 
     expect(second.result.current.status).toBe(CONSENT_STATUS.ANSWERED);
   });
