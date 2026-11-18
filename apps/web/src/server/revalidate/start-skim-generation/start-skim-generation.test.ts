@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
+import { STARTER_DOCUMENT_ID_PREFIX } from '@shinefold/config';
 import { SANITY_WEBHOOK_OPERATION } from '@shinefold/config/constants';
 import { errorResult, okResult } from '@shinefold/utils';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
-import { STARTER_DOCUMENT_ID_PREFIX } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { enqueueWorkerRun } from '@web/server/revalidate/enqueue-worker-run/enqueue-worker-run';
 import { generatePostSkim } from '@web/server/skim/generate-post-skim/generate-post-skim';

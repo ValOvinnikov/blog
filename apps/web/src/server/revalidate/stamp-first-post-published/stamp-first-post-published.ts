@@ -1,9 +1,7 @@
+import { STARTER_DOCUMENT_ID_PREFIX } from '@shinefold/config';
 import { SANITY_WEBHOOK_OPERATION } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
-import {
-  REVALIDATE_LOG,
-  STARTER_DOCUMENT_ID_PREFIX,
-} from '@web/constants/revalidate';
+import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import type { TPostWebhookEvent } from '@web/server/revalidate/post-webhook-event/post-webhook-event';
 import { logger } from '@web/utils/logger/logger';

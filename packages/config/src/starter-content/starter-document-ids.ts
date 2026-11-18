@@ -1,3 +1,5 @@
+export const STARTER_DOCUMENT_ID_PREFIX = 'starter.';
+
 export const STARTER_DOCUMENT_IDS = {
   NAVIGATION: 'settings_navigation',
   FOOTER: 'settings_footer',

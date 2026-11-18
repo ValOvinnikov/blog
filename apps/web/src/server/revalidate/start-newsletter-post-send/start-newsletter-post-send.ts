@@ -1,3 +1,4 @@
+import { STARTER_DOCUMENT_ID_PREFIX } from '@shinefold/config';
 import {
   CAPABILITY,
   SANITY_WEBHOOK_OPERATION,
@@ -5,10 +6,7 @@ import {
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import { queries } from '@shinefold/db';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import {
-  REVALIDATE_LOG,
-  STARTER_DOCUMENT_ID_PREFIX,
-} from '@web/constants/revalidate';
+import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { enqueueNewsletterPostSend } from '@web/server/revalidate/enqueue-newsletter-post-send/enqueue-newsletter-post-send';
 import type { TPostWebhookEvent } from '@web/server/revalidate/post-webhook-event/post-webhook-event';
