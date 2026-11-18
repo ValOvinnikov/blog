@@ -1807,11 +1807,13 @@
     "allowance": "{used} de {allowed} idiomas adicionales en uso en su plan.",
     "noticeTitle": "Límite del plan",
     "upgradeNotice": "Su plan solo publica el idioma predeterminado. Mejore su plan para añadir más idiomas.",
+    "atLimitNotice": "Su plan publica {allowed, plural, one {# idioma adicional} other {# idiomas adicionales}} y todos están en uso.",
     "downgradeNotice": "Su plan publica {allowed, plural, one {# idioma adicional} other {# idiomas adicionales}}, pero hay {stored} guardados. Los primeros {allowed} siguen publicados; los demás se conservan y no se elimina nada.",
     "keptBadge": "Conservado, no publicado en su plan",
     "planLockedBadge": "No incluido en su plan",
     "atLimitLockedReason": "Desactive uno para activar este",
-    "overLimitLockedReason": "Mejore su plan para cambiar esto"
+    "overLimitLockedReason": "Mejore su plan para cambiar esto",
+    "allowanceGranted": "{used} de {allowed} idiomas adicionales en uso."
   },
   "saveBar": {
     "regionLabel": "Cambios sin guardar",
@@ -2393,5 +2395,138 @@
     "refusalSuspended": "Este sitio está suspendido, así que sus borradores no se pueden previsualizar.",
     "refusalArchived": "Este sitio está archivado, así que sus borradores no se pueden previsualizar.",
     "refusalUnavailable": "La plataforma no pudo preparar esta vista previa. El problema se ha registrado para el equipo de la plataforma."
+  },
+  "grantEntitlement": {
+    "trigger": "Conceder a este cliente",
+    "triggerAriaLabel": "Conceder a este cliente: {item}",
+    "title": "Conceder {item} a {tenant}",
+    "description": "{tenant} obtiene {item} fuera de su plan {plan}. Su propietario lo ve desbloqueado y puede activarlo. No se cobra nada.",
+    "granted": "{item} concedido.",
+    "failed": "No se pudo conceder {item}. Inténtalo de nuevo."
+  },
+  "grantDialog": {
+    "confirmButton": "Conceder",
+    "confirmingButton": "Concediendo…"
+  },
+  "grantExpiryFields": {
+    "expiresLabel": "Caduca",
+    "expiresHint": "La concesión termina sola pasado este plazo.",
+    "expiry": {
+      "NEVER": "Nunca: hasta que se revoque",
+      "DAYS_30": "30 días",
+      "DAYS_90": "90 días",
+      "YEAR_1": "1 año"
+    },
+    "noteLabel": "Nota",
+    "noteHint": "Opcional. Por qué se concede: se muestra en la tarjeta Concesiones y en el registro de actividad."
+  },
+  "grantModulePack": {
+    "trigger": "Conceder un paquete de módulos",
+    "title": "Conceder un paquete de módulos a {tenant}",
+    "description": "Sus editores obtienen los módulos del paquete en Studio, fuera del plan {plan}. No se cobra nada.",
+    "packLabel": "Paquete de módulos",
+    "packPlaceholder": "Elige un paquete de módulos",
+    "packIncluded": "{pack} (incluido en el plan)",
+    "packGranted": "{pack} (ya concedido)"
+  },
+  "grantLanguages": {
+    "trigger": "Conceder más idiomas",
+    "title": "Conceder más idiomas a {tenant}",
+    "description": "El plan {plan} solo publica el idioma predeterminado. Elige cuántos idiomas más puede publicar {tenant}. No se cobra nada.",
+    "descriptionWithAllowance": "El plan {plan} publica {n, plural, one {# idioma adicional} other {# idiomas adicionales}}. Elige cuántos idiomas más puede publicar {tenant}. No se cobra nada.",
+    "countLabel": "Idiomas adicionales",
+    "countHint": "Si el plan permite más después, se aplica el número mayor."
+  },
+  "grantItemNames": {
+    "languages": "{count, plural, one {# idioma adicional} other {# idiomas adicionales}}",
+    "modulePack": {
+      "CORE": "Módulos Core",
+      "STARTER": "Módulos Starter",
+      "GROWTH": "Módulos Growth"
+    },
+    "lookField": {
+      "preset": "Ajuste predefinido",
+      "accentHue": "Tono de acento",
+      "logoHue": "Tono del logotipo",
+      "headingFont": "Fuente de títulos",
+      "bodyFont": "Fuente del texto",
+      "radiusScale": "Escala de radio",
+      "density": "Densidad",
+      "languageSwitcherStyle": "Estilo del selector de idioma",
+      "cardStyle": "Estilo de tarjeta",
+      "headerControlStyle": "Botones de la cabecera",
+      "headerControlShape": "Forma de los botones de la cabecera",
+      "accountButtonStyle": "Botón de la cuenta",
+      "accountPanelStyle": "Panel de la cuenta",
+      "accountPhonePlacement": "Posición de la cuenta en teléfonos",
+      "busyButtonStyle": "Estilo del botón ocupado",
+      "spinnerStyle": "Estilo del indicador de carga",
+      "buttonShape": "Forma de los botones",
+      "headerLayout": "Diseño de la cabecera",
+      "headerSubmenuStyle": "Submenús de la cabecera",
+      "headerBarStyle": "Barra de la cabecera",
+      "navLinkStyle": "Enlaces de navegación",
+      "headingWeight": "Grosor de los títulos",
+      "headingCase": "Mayúsculas en títulos",
+      "imageProportion": "Proporciones de imagen",
+      "dividerWidth": "Separadores de sección",
+      "footerLayout": "Diseño del pie de página",
+      "footerBackground": "Fondo del pie de página",
+      "footerSurface": "Superficie del pie de página",
+      "cookieSettingsButton": "Botón de configuración de cookies",
+      "brandName": "Nombre de la marca",
+      "logoAssetUrl": "Imagen del logotipo",
+      "faviconAssetUrl": "Imagen del favicon"
+    }
+  },
+  "grantedBadge": {
+    "label": "Concedido",
+    "labelUntil": "Concedido hasta el {date}"
+  },
+  "grantsCard": {
+    "title": "Concesiones",
+    "supportingText": "Lo que este cliente tiene fuera de su plan.",
+    "empty": "No hay concesiones: todo lo que tiene este cliente procede de su plan.",
+    "kind": {
+      "CAPABILITY": "Función",
+      "LOOK_FIELD": "Aspecto",
+      "MODULE_PACK": "Paquete de módulos",
+      "LOCALE_LIMIT": "Idiomas"
+    },
+    "expired": "Caducada",
+    "included": "Incluida en el plan",
+    "metaUntilRevoked": "{who} · {date} · Hasta que se revoque",
+    "metaExpires": "{who} · {date} · Caduca el {expiry}",
+    "metaExpired": "{who} · {date} · Caducó el {expiry}"
+  },
+  "revokeGrantControl": {
+    "revoke": {
+      "trigger": "Revocar",
+      "triggerAriaLabel": "Revocar {item}",
+      "title": "Revocar {item} a {tenant}",
+      "description": "{item} se vuelve a bloquear desde la próxima carga de página. Lo que el cliente configuró se conserva, así que concederlo de nuevo lo restaura.",
+      "confirmButton": "Revocar",
+      "confirmingButton": "Revocando…",
+      "failed": "No se pudo revocar la concesión. Inténtalo de nuevo.",
+      "done": "{item} revocado."
+    },
+    "remove": {
+      "trigger": "Quitar",
+      "triggerAriaLabel": "Quitar la concesión de {item}",
+      "title": "Quitar {item} de {tenant}",
+      "description": "Esta concesión ha caducado, así que {item} ya está bloqueado. Al quitarla desaparece de la lista y se podrá conceder de nuevo.",
+      "confirmButton": "Quitar",
+      "confirmingButton": "Quitando…",
+      "failed": "No se pudo quitar la concesión. Inténtalo de nuevo.",
+      "done": "{item} quitado."
+    }
+  },
+  "entitlementGrantErrors": {
+    "notFound": "Este cliente ya no existe.",
+    "archived": "Este cliente está archivado, así que sus concesiones no se pueden cambiar.",
+    "comingSoon": "Esta función aún no está disponible, así que no se puede conceder.",
+    "alreadyGranted": "Esto ya está concedido.",
+    "includedInPlan": "Esto ya está incluido en el plan del cliente.",
+    "grantNotOpen": "Esta concesión ya se quitó o ha caducado."
   }
 }

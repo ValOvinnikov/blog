@@ -122,6 +122,17 @@ describe(toPlatformTenant, () => {
     expect(entitlements.modulePacks).toContain(MODULE_PACK.GROWTH);
   });
 
+  it('lists what a grant adds beyond the plan, with when it ends', () => {
+    const { grantedEntitlements } = toPlatformTenant(
+      mockTenant({ plan: TENANT_PLAN.FREE }),
+      [mockEntitlementGrant({ key: CAPABILITY.READER_ACCOUNTS })],
+    );
+
+    expect(grantedEntitlements.capabilities).toEqual({
+      [CAPABILITY.READER_ACCOUNTS]: { expiresAt: null },
+    });
+  });
+
   it('ignores a grant that expired before now', () => {
     const { pageAccess } = toPlatformTenant(
       mockTenant({ plan: TENANT_PLAN.FREE }),

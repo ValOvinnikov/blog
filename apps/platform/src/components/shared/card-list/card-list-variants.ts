@@ -9,7 +9,9 @@ export const cardListVariants = tv({
       'border-b border-platform-line-2 last:border-b-0',
     ],
     body: ['min-w-0 flex-1'],
-    primary: ['block text-platform-13 text-platform-text'],
+    primary: [
+      'flex flex-wrap items-center gap-2 text-platform-13 text-platform-text',
+    ],
     secondary: ['block text-platform-12 text-platform-muted'],
     time: ['flex-none text-platform-12 text-platform-muted'],
   },

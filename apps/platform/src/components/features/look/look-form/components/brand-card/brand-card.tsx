@@ -1,6 +1,7 @@
 import { BrandAssetField } from '@platform/components/features/look/brand-asset-field';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { FormFieldControlProvider } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
@@ -32,6 +33,7 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
   } = useLookForm();
   const t = useTranslations('lookForm');
   const hintId = useId();
+  const brandNameLock = useLookFieldLock('brandName');
   const describedBy = joinIds(hintId, archivedDescribedBy);
 
   const fieldProps = (kind: TBrandAssetKind) => ({
@@ -60,7 +62,7 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
             ? t('brandNameTooLong', { max: BRAND_NAME_MAX_LENGTH })
             : undefined
         }
-        isDisabled={isArchived}
+        lock={brandNameLock}
       >
         <FormFieldControlProvider
           id={brandNameFieldId}

@@ -12,6 +12,7 @@ type TOptionSelectOption<TValue extends string> = Pick<
 > & {
   value: TValue;
   label: string;
+  isDisabled?: boolean;
   triggerGlyph?: ReactNode;
 };
 
@@ -58,6 +59,7 @@ export const OptionSelect = <TValue extends string>({
             key={option.value}
             value={option.value}
             glyph={option.glyph}
+            isDisabled={option.isDisabled}
           >
             <Select.ItemText>{option.label}</Select.ItemText>
           </Select.Item>

@@ -8,14 +8,20 @@ import type { ReactNode } from 'react';
 export type TSelectItemProps = {
   value: string;
   glyph?: ReactNode;
+  isDisabled?: boolean;
   children: ReactNode;
 };
 
-export const SelectItem = ({ value, glyph, children }: TSelectItemProps) => {
+export const SelectItem = ({
+  value,
+  glyph,
+  isDisabled = false,
+  children,
+}: TSelectItemProps) => {
   const { item, indicator, glyph: glyphSlot } = selectVariants();
 
   return (
-    <BaseSelect.Item value={value} className={item()}>
+    <BaseSelect.Item value={value} disabled={isDisabled} className={item()}>
       <span className={indicator()}>
         <BaseSelect.ItemIndicator>
           <Icon name={ICONS.CHECK} />

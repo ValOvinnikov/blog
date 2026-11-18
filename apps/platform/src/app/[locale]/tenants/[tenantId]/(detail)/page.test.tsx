@@ -10,6 +10,7 @@ import {
   mockJoinedOwner,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 
 import TenantOverviewPage from './page';
 
@@ -43,6 +44,7 @@ vi.mock('@platform/server/tenants/tenant-suspension-actions', () => ({
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     memberships: { getTenantOwnerMembership: getTenantOwnerMembershipMock },
     auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
     findings: { listFindingsForTenant: listFindingsForTenantMock },

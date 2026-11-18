@@ -11,6 +11,7 @@ import {
 import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { CAPABILITY, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { queries } from '@shinefold/db';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 import { redirect } from 'next/navigation';
 
 import { requireTenantById } from './require-tenant-by-id';
@@ -112,11 +113,28 @@ describe(requireTenantById, () => {
         tenant: resolvedTenant,
         admin: mockAdmin(),
         viewer: mockViewer({ admin: mockAdmin() }),
+        canGrantEntitlements: false,
       });
       expect(getTenantById).toHaveBeenCalledWith(MOCK_TENANT_ID, {
         includeArchived: true,
       });
       expect(redirect).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    { role: ADMIN_ROLE.SUPERADMIN, canGrant: true },
+    { role: ADMIN_ROLE.ADMIN, canGrant: false },
+    { role: ADMIN_ROLE.MODERATOR, canGrant: false },
+  ])(
+    'lets a $role admin grant entitlements: $canGrant',
+    async ({ role, canGrant }) => {
+      getTenantById.mockResolvedValue(tenant);
+      vi.mocked(requireAdmin).mockResolvedValueOnce(mockAdmin({ role }));
+
+      const { canGrantEntitlements } = await requireTenantById(MOCK_TENANT_ID);
+
+      expect(canGrantEntitlements).toBe(canGrant);
     },
   );
 

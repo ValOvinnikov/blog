@@ -2,6 +2,7 @@ import { LookForm } from '@platform/components/features/look/look-form';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
+import { toGrantTarget } from '@platform/utils/grant-target/grant-target';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
 import { CAPABILITY } from '@shinefold/config';
@@ -11,11 +12,13 @@ import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effect
 export type TLookPageContentProps = {
   tenant: TPlatformTenant;
   viewer: TPlatformViewer;
+  canGrantEntitlements?: boolean;
 };
 
 export const LookPageContent = async ({
   tenant,
   viewer,
+  canGrantEntitlements = false,
 }: TLookPageContentProps) => {
   const [siteConfig, enabledCapabilities] = await Promise.all([
     queries.siteConfig.getSiteConfig(tenant.id),
@@ -35,6 +38,10 @@ export const LookPageContent = async ({
           id: tenant.id,
           name: tenant.name,
           siteHost: tenant.primaryDomain,
+          grants: {
+            target: toGrantTarget(tenant, canGrantEntitlements),
+            granted: tenant.grantedEntitlements.lookFields,
+          },
           lookFields: tenant.entitlements.lookFields,
           archivedAt: tenant.archivedAt,
         }}

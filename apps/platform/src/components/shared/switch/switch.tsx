@@ -15,6 +15,7 @@ export type TSwitchProps = {
   labels: TSwitchLabels;
   isDisabled?: boolean;
   isLocked?: boolean;
+  id?: string;
 };
 
 export const Switch = ({
@@ -24,6 +25,7 @@ export const Switch = ({
   labels,
   isDisabled = false,
   isLocked = false,
+  id,
 }: TSwitchProps) => {
   const { label, labelledBy, describedBy } = aria;
   const { root, track, thumb, stateText, stateOption } = switchVariants({
@@ -34,6 +36,7 @@ export const Switch = ({
     <label className={root()}>
       {/* A native button keeps `aria.label` as the name; a span would be renamed after the wrapping label. */}
       <BaseSwitch.Root
+        id={id}
         checked={isChecked}
         onCheckedChange={(checked) => {
           if (!isLocked) onCheckedChange(checked);

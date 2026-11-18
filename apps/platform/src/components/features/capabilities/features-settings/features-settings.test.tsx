@@ -3,6 +3,7 @@ import {
   FEATURES_FIELD_ERROR,
 } from '@platform/constants/settings-features';
 import messages from '@platform/i18n/messages/en.json';
+import { grantEntitlementAction } from '@platform/server/entitlement-grants/grant-entitlement-action';
 import { updateAnalyticsAction } from '@platform/server/settings-features/update-analytics-action';
 import {
   updateFeaturesAction,
@@ -31,9 +32,17 @@ import {
 } from '@platform/testing/settings-features/fixtures';
 import {
   MOCK_ARCHIVED_AT,
+  MOCK_TENANT_CREATED_AT,
   MOCK_TENANT_ID,
+  mockGrantAccess,
+  mockGrantTarget,
 } from '@platform/testing/tenants/fixtures';
-import { ACTION_OUTCOME, CAPABILITY } from '@shinefold/config';
+import { formatDate } from '@platform/utils/format-date/format-date';
+import {
+  ACTION_OUTCOME,
+  CAPABILITY,
+  LOCALE_ISO_CODES,
+} from '@shinefold/config';
 import {
   ANALYTICS_PROVIDER,
   TENANT_PLAN,
@@ -50,6 +59,8 @@ import { FeaturesSettings } from './features-settings';
 vi.mock('@platform/server/settings-features/update-features-action', () => ({
   updateFeaturesAction: vi.fn(),
 }));
+
+vi.mock('@platform/server/entitlement-grants/grant-entitlement-action');
 
 vi.mock('@platform/server/settings-features/update-analytics-action', () => ({
   updateAnalyticsAction: vi.fn(),
@@ -95,7 +106,9 @@ const READER_ACCOUNTS_LABEL = toggleLabel[CAPABILITY.READER_ACCOUNTS];
 const BOOKMARKS_LABEL = toggleLabel[CAPABILITY.BOOKMARKS];
 const CONSENT_BANNER_LABEL = toggleLabel[CAPABILITY.CONSENT_BANNER];
 const CONTACT_FORM_LABEL = toggleLabel[CAPABILITY.CONTACT_FORM];
-const { saveBar } = messages;
+const { saveBar, grantedBadge } = messages;
+const tGrant = makeEnTranslator('grantEntitlement');
+const tGrantedBadge = makeEnTranslator('grantedBadge');
 const planLockedBadge = (plan: TTenantPlan) =>
   makeEnTranslator('featuresSettings')('planLockedBadge', { plan });
 const RESTORE_ONE_CHANGE = makeEnTranslator('draftRecovery')('restore', {
@@ -114,6 +127,7 @@ const toggleContactFormAndSave = async (user: UserEvent) => {
 const setup = customRender(FeaturesSettings, {
   tenantId: MOCK_TENANT_ID,
   entitledCapabilities: ALL_ENTITLED,
+  grants: mockGrantAccess(),
   hasOwnAnalytics: true,
   initialValues: MOCK_INITIAL_VALUES,
 });
@@ -496,6 +510,140 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
     expect(readerAccountsSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+  });
+
+  describe('grants', () => {
+    const OUT_OF_PLAN = [CAPABILITY.CONSENT_BANNER, CAPABILITY.CONTACT_FORM];
+    const grantTrigger = (label: string) => ({
+      name: tGrant('triggerAriaLabel', { item: label }),
+    });
+
+    describe('for a super admin on a plan without Reader accounts', () => {
+      beforeEach(() => {
+        setup({
+          entitledCapabilities: OUT_OF_PLAN,
+          grants: mockGrantAccess({ target: mockGrantTarget() }),
+        });
+      });
+
+      it('offers a grant action before each plan-locked switch', () => {
+        const readerAccountsGrant = screen.getByRole(
+          'button',
+          grantTrigger(READER_ACCOUNTS_LABEL),
+        );
+        const bookmarksGrant = screen.getByRole(
+          'button',
+          grantTrigger(BOOKMARKS_LABEL),
+        );
+        const readerAccountsSwitch = screen.getByRole('switch', {
+          name: READER_ACCOUNTS_LABEL,
+        });
+
+        expect(readerAccountsGrant).toBeVisible();
+        expect(bookmarksGrant).toBeVisible();
+        expect(
+          readerAccountsGrant.compareDocumentPosition(readerAccountsSwitch),
+        ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      });
+
+      it('moves focus to the row switch once the capability is granted', async () => {
+        vi.mocked(grantEntitlementAction).mockResolvedValueOnce({
+          outcome: ACTION_OUTCOME.SUCCESS,
+        });
+        const trigger = screen.getByRole(
+          'button',
+          grantTrigger(READER_ACCOUNTS_LABEL),
+        );
+        await user.click(trigger);
+        const confirm = await screen.findByRole('button', {
+          name: messages.grantDialog.confirmButton,
+        });
+        await user.click(confirm);
+
+        const readerAccountsSwitch = screen.getByRole('switch', {
+          name: READER_ACCOUNTS_LABEL,
+        });
+
+        await waitFor(() => expect(readerAccountsSwitch).toHaveFocus());
+      });
+
+      it('offers no grant action on an entitled or coming-soon row', () => {
+        const contactFormGrant = screen.queryByRole(
+          'button',
+          grantTrigger(CONTACT_FORM_LABEL),
+        );
+        const newsletterGrant = screen.queryByRole(
+          'button',
+          grantTrigger(toggleLabel[CAPABILITY.NEWSLETTER]),
+        );
+
+        expect(contactFormGrant).not.toBeInTheDocument();
+        expect(newsletterGrant).not.toBeInTheDocument();
+      });
+    });
+
+    it('offers no grant action to anyone who cannot grant', () => {
+      setup({ entitledCapabilities: OUT_OF_PLAN });
+
+      const grantActions = screen.queryAllByRole('button', {
+        name: new RegExp(tGrant('trigger')),
+      });
+
+      expect(grantActions).toHaveLength(0);
+    });
+
+    describe('a capability granted beyond the plan', () => {
+      beforeEach(() => {
+        setup({
+          entitledCapabilities: [...OUT_OF_PLAN, CAPABILITY.READER_ACCOUNTS],
+          grants: mockGrantAccess({
+            granted: {
+              [CAPABILITY.READER_ACCOUNTS]: { expiresAt: null },
+            },
+          }),
+        });
+      });
+
+      it('shows Granted in place of the plan lock, and lets the switch work', () => {
+        const readerAccountsSwitch = screen.getByRole('switch', {
+          name: READER_ACCOUNTS_LABEL,
+        });
+
+        expect(readerAccountsSwitch).toHaveAccessibleDescription(
+          `${toggleDescription[CAPABILITY.READER_ACCOUNTS]} ${grantedBadge.label}`,
+        );
+        expect(readerAccountsSwitch).not.toHaveAttribute(ARIA_DISABLED);
+      });
+
+      it('keeps the plan lock on a capability that is not granted', () => {
+        const bookmarksSwitch = screen.getByRole('switch', {
+          name: BOOKMARKS_LABEL,
+        });
+
+        expect(bookmarksSwitch).toHaveAccessibleDescription(
+          `${toggleDescription[CAPABILITY.BOOKMARKS]} ${planLockedBadge(TENANT_PLAN.GROWTH)}`,
+        );
+      });
+    });
+
+    it('says until when a granted capability lasts', () => {
+      setup({
+        entitledCapabilities: [CAPABILITY.READER_ACCOUNTS],
+        grants: mockGrantAccess({
+          granted: {
+            [CAPABILITY.READER_ACCOUNTS]: { expiresAt: MOCK_TENANT_CREATED_AT },
+          },
+        }),
+      });
+
+      const badge = screen.getByText(
+        tGrantedBadge('labelUntil', {
+          date: formatDate(MOCK_TENANT_CREATED_AT, LOCALE_ISO_CODES.EN),
+        }),
+      );
+
+      expect(badge).toBeVisible();
+    });
   });
 
   describe('for an archived tenant', () => {

@@ -2,7 +2,7 @@
 
 import type { TMaybeUndefined } from '@shinefold/config';
 import type { TResult } from '@shinefold/utils';
-import { useState, useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 
 export type TConfirmDialogActionResult = TResult<void, TMaybeUndefined<string>>;
 
@@ -10,19 +10,23 @@ export type TUseConfirmDialogArgs = {
   onConfirm: (confirmValue: string) => Promise<TConfirmDialogActionResult>;
   onConfirmed?: () => void;
   onOpenChange?: (isOpen: boolean) => void;
+  returnFocusId?: string;
 };
 
 export const useConfirmDialog = ({
   onConfirm,
   onConfirmed,
   onOpenChange,
+  returnFocusId,
 }: TUseConfirmDialogArgs) => {
   const [isOpen, setIsOpen] = useState(false);
   const [confirmValue, setConfirmValue] = useState('');
   const [error, setError] = useState<TMaybeUndefined<string>>(undefined);
   const [isPending, startTransition] = useTransition();
+  const hasConfirmed = useRef(false);
 
   const changeOpen = (nextIsOpen: boolean) => {
+    if (nextIsOpen) hasConfirmed.current = false;
     setIsOpen(nextIsOpen);
     if (!nextIsOpen) {
       setConfirmValue('');
@@ -39,10 +43,18 @@ export const useConfirmDialog = ({
         setError(result.error);
         return;
       }
+      hasConfirmed.current = true;
       changeOpen(false);
       onConfirmed?.();
     });
   };
+
+  const finalFocus = returnFocusId
+    ? () =>
+        (hasConfirmed.current
+          ? document.getElementById(returnFocusId)
+          : null) ?? true
+    : undefined;
 
   return {
     isOpen,
@@ -52,5 +64,6 @@ export const useConfirmDialog = ({
     error,
     isPending,
     confirm,
+    finalFocus,
   };
 };

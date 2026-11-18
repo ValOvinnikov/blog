@@ -15,15 +15,25 @@ import {
   arrangeLookPageQueries,
   setupLookPageContent as setup,
 } from '@platform/testing/look/look-page-content-setup';
-import { mockViewer } from '@platform/testing/memberships/fixtures';
+import {
+  mockOperatorViewer,
+  mockViewer,
+} from '@platform/testing/memberships/fixtures';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
+  mockEntitlementGrant,
   mockReadyTenant,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { PRESET_ID, RADIUS_SCALE } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
+import {
+  ADMIN_ROLE,
+  ENTITLEMENT_KIND,
+  LOOK_FIELD,
+} from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPageContent } from './look-page-content';
@@ -166,6 +176,59 @@ describe(`<${LookPageContent.name}/>`, () => {
       expect(storedRadius).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(storedRadius).toBeEnabled();
       expect(sampleTokens).toHaveStyle({ '--radius-md': '16px' });
+    });
+  });
+
+  describe('grants on a Free tenant', () => {
+    const GRANT_RADIUS_SCALE = {
+      name: makeEnTranslator('grantEntitlement')('triggerAriaLabel', {
+        item: messages.lookForm.radiusScaleLabel,
+      }),
+    };
+
+    it('offers a super admin the grant on a locked field', async () => {
+      await setup({
+        tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }),
+        viewer: mockOperatorViewer(ADMIN_ROLE.SUPERADMIN),
+        canGrantEntitlements: true,
+      });
+      await openLookRow(user, LOOK_ROW.SHAPE);
+
+      const grant = screen.getByRole('button', GRANT_RADIUS_SCALE);
+
+      expect(grant).toBeVisible();
+    });
+
+    it('offers a super admin no grant outside the operator tenant pages', async () => {
+      await setup({
+        tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }),
+        viewer: mockOperatorViewer(ADMIN_ROLE.SUPERADMIN),
+      });
+      await openLookRow(user, LOOK_ROW.SHAPE);
+
+      const grant = screen.queryByRole('button', GRANT_RADIUS_SCALE);
+
+      expect(grant).not.toBeInTheDocument();
+    });
+
+    it('unlocks a granted field and says it is granted', async () => {
+      await setup({
+        tenant: mockTenant({ plan: TENANT_PLAN.FREE }, [
+          mockEntitlementGrant({
+            kind: ENTITLEMENT_KIND.LOOK_FIELD,
+            key: LOOK_FIELD.RADIUS_SCALE,
+          }),
+        ]),
+      });
+      await openLookRow(user, LOOK_ROW.SHAPE);
+
+      const noneRadius = screen.getByRole('button', {
+        name: RADIUS_LABEL.NONE,
+      });
+      const granted = screen.getByText(messages.grantedBadge.label);
+
+      expect(noneRadius).toBeEnabled();
+      expect(granted).toBeVisible();
     });
   });
 

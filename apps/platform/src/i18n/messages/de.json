@@ -1807,11 +1807,13 @@
     "allowance": "{used} von {allowed} zusätzlichen Sprachen Ihres Tarifs in Verwendung.",
     "noticeTitle": "Tarifgrenze",
     "upgradeNotice": "Ihr Tarif veröffentlicht nur die Standardsprache. Führen Sie ein Upgrade durch, um weitere Sprachen hinzuzufügen.",
+    "atLimitNotice": "Ihr Tarif veröffentlicht {allowed, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}, und alle sind in Verwendung.",
     "downgradeNotice": "Ihr Tarif veröffentlicht {allowed, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}, gespeichert sind jedoch {stored}. Die ersten {allowed} bleiben live; die anderen bleiben erhalten, und nichts wird gelöscht.",
     "keptBadge": "Erhalten, in Ihrem Tarif nicht live",
     "planLockedBadge": "Nicht in Ihrem Tarif",
     "atLimitLockedReason": "Schalten Sie eine aus, um diese einzuschalten",
-    "overLimitLockedReason": "Führen Sie ein Tarif-Upgrade durch, um dies zu ändern"
+    "overLimitLockedReason": "Führen Sie ein Tarif-Upgrade durch, um dies zu ändern",
+    "allowanceGranted": "{used} von {allowed} zusätzlichen Sprachen in Verwendung."
   },
   "saveBar": {
     "regionLabel": "Ungespeicherte Änderungen",
@@ -2393,5 +2395,138 @@
     "refusalSuspended": "Diese Website ist gesperrt, daher gibt es keine Vorschau ihrer Entwürfe.",
     "refusalArchived": "Diese Website ist archiviert, daher gibt es keine Vorschau ihrer Entwürfe.",
     "refusalUnavailable": "Die Plattform konnte diese Vorschau nicht vorbereiten. Das Problem wurde für das Plattform-Team protokolliert."
+  },
+  "grantEntitlement": {
+    "trigger": "Diesem Mandanten gewähren",
+    "triggerAriaLabel": "Diesem Mandanten gewähren: {item}",
+    "title": "{item} für {tenant} gewähren",
+    "description": "{tenant} erhält {item} außerhalb des Tarifs {plan}. Der Inhaber sieht die Funktion freigeschaltet und kann sie einschalten. Es entstehen keine Kosten.",
+    "granted": "{item} gewährt.",
+    "failed": "{item} konnte nicht gewährt werden – bitte erneut versuchen."
+  },
+  "grantDialog": {
+    "confirmButton": "Gewähren",
+    "confirmingButton": "Wird gewährt…"
+  },
+  "grantExpiryFields": {
+    "expiresLabel": "Läuft ab",
+    "expiresHint": "Die Gewährung endet danach von selbst.",
+    "expiry": {
+      "NEVER": "Nie – bis zum Widerruf",
+      "DAYS_30": "30 Tage",
+      "DAYS_90": "90 Tage",
+      "YEAR_1": "1 Jahr"
+    },
+    "noteLabel": "Notiz",
+    "noteHint": "Optional. Warum sie gewährt wird – sichtbar auf der Karte „Gewährungen“ und im Aktivitätsprotokoll."
+  },
+  "grantModulePack": {
+    "trigger": "Modulpaket gewähren",
+    "title": "Modulpaket für {tenant} gewähren",
+    "description": "Seine Redakteure erhalten die Module des Pakets in Studio, außerhalb des Tarifs {plan}. Es entstehen keine Kosten.",
+    "packLabel": "Modulpaket",
+    "packPlaceholder": "Modulpaket wählen",
+    "packIncluded": "{pack} (im Tarif enthalten)",
+    "packGranted": "{pack} (bereits gewährt)"
+  },
+  "grantLanguages": {
+    "trigger": "Weitere Sprachen gewähren",
+    "title": "Weitere Sprachen für {tenant} gewähren",
+    "description": "Der Tarif {plan} veröffentlicht nur die Standardsprache. Wählen Sie, wie viele weitere Sprachen {tenant} veröffentlichen darf. Es entstehen keine Kosten.",
+    "descriptionWithAllowance": "Der Tarif {plan} veröffentlicht {n, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}. Wählen Sie, wie viele weitere Sprachen {tenant} veröffentlichen darf. Es entstehen keine Kosten.",
+    "countLabel": "Zusätzliche Sprachen",
+    "countHint": "Erlaubt der Tarif später mehr, gilt die höhere Zahl."
+  },
+  "grantItemNames": {
+    "languages": "{count, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}",
+    "modulePack": {
+      "CORE": "Core-Module",
+      "STARTER": "Starter-Module",
+      "GROWTH": "Growth-Module"
+    },
+    "lookField": {
+      "preset": "Vorlage",
+      "accentHue": "Akzentfarbton",
+      "logoHue": "Logo-Farbton",
+      "headingFont": "Überschriftenschrift",
+      "bodyFont": "Fließtextschrift",
+      "radiusScale": "Eckenradius",
+      "density": "Dichte",
+      "languageSwitcherStyle": "Stil der Sprachauswahl",
+      "cardStyle": "Kartenstil",
+      "headerControlStyle": "Header-Schaltflächen",
+      "headerControlShape": "Form der Header-Schaltflächen",
+      "accountButtonStyle": "Konto-Schaltfläche",
+      "accountPanelStyle": "Konto-Bereich",
+      "accountPhonePlacement": "Position des Kontos auf Telefonen",
+      "busyButtonStyle": "Stil bei Beschäftigung",
+      "spinnerStyle": "Spinner-Stil",
+      "buttonShape": "Form der Schaltflächen",
+      "headerLayout": "Header-Layout",
+      "headerSubmenuStyle": "Header-Untermenüs",
+      "headerBarStyle": "Header-Leiste",
+      "navLinkStyle": "Navigationslinks",
+      "headingWeight": "Überschriftenstärke",
+      "headingCase": "Schreibweise der Überschriften",
+      "imageProportion": "Bildproportionen",
+      "dividerWidth": "Abschnittstrenner",
+      "footerLayout": "Fußzeilen-Layout",
+      "footerBackground": "Fußzeilen-Hintergrund",
+      "footerSurface": "Fußzeilen-Fläche",
+      "cookieSettingsButton": "Schaltfläche für Cookie-Einstellungen",
+      "brandName": "Markenname",
+      "logoAssetUrl": "Logo-Bild",
+      "faviconAssetUrl": "Favicon-Bild"
+    }
+  },
+  "grantedBadge": {
+    "label": "Gewährt",
+    "labelUntil": "Gewährt bis {date}"
+  },
+  "grantsCard": {
+    "title": "Gewährungen",
+    "supportingText": "Was dieser Mandant außerhalb seines Tarifs hat.",
+    "empty": "Keine Gewährungen – alles, was dieser Mandant hat, stammt aus seinem Tarif.",
+    "kind": {
+      "CAPABILITY": "Funktion",
+      "LOOK_FIELD": "Look",
+      "MODULE_PACK": "Modulpaket",
+      "LOCALE_LIMIT": "Sprachen"
+    },
+    "expired": "Abgelaufen",
+    "included": "Im Tarif enthalten",
+    "metaUntilRevoked": "{who} · {date} · Bis zum Widerruf",
+    "metaExpires": "{who} · {date} · Läuft ab am {expiry}",
+    "metaExpired": "{who} · {date} · Abgelaufen am {expiry}"
+  },
+  "revokeGrantControl": {
+    "revoke": {
+      "trigger": "Widerrufen",
+      "triggerAriaLabel": "{item} widerrufen",
+      "title": "{item} für {tenant} widerrufen",
+      "description": "{item} ist ab dem nächsten Seitenaufruf wieder gesperrt. Was der Mandant eingerichtet hat, bleibt erhalten – wird {item} erneut gewährt, ist alles wieder da.",
+      "confirmButton": "Widerrufen",
+      "confirmingButton": "Wird widerrufen…",
+      "failed": "Die Gewährung konnte nicht widerrufen werden – bitte erneut versuchen.",
+      "done": "{item} widerrufen."
+    },
+    "remove": {
+      "trigger": "Entfernen",
+      "triggerAriaLabel": "Gewährung {item} entfernen",
+      "title": "{item} für {tenant} entfernen",
+      "description": "Diese Gewährung ist abgelaufen, {item} ist also bereits gesperrt. Beim Entfernen verschwindet sie aus der Liste und kann erneut gewährt werden.",
+      "confirmButton": "Entfernen",
+      "confirmingButton": "Wird entfernt…",
+      "failed": "Die Gewährung konnte nicht entfernt werden – bitte erneut versuchen.",
+      "done": "{item} entfernt."
+    }
+  },
+  "entitlementGrantErrors": {
+    "notFound": "Diesen Mandanten gibt es nicht mehr.",
+    "archived": "Dieser Mandant ist archiviert, seine Gewährungen lassen sich nicht ändern.",
+    "comingSoon": "Diese Funktion ist noch nicht verfügbar und kann nicht gewährt werden.",
+    "alreadyGranted": "Das ist bereits gewährt.",
+    "includedInPlan": "Das ist bereits im Tarif des Mandanten enthalten.",
+    "grantNotOpen": "Diese Gewährung wurde bereits entfernt oder ist abgelaufen."
   }
 }

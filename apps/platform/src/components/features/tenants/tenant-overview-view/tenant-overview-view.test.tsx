@@ -47,6 +47,7 @@ import {
   MOCK_TENANT_ID,
   mockInvitedOwner,
   mockJoinedOwner,
+  mockListedEntitlementGrant,
 } from '@platform/testing/tenants/fixtures';
 import { STEP_POLL_INTERVAL_MS } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
 import { AUDIT_TARGET_TYPE } from '@shinefold/config';
@@ -73,12 +74,14 @@ const {
   listFindingsForTenantMock,
   getDomainVerificationStatusMock,
   getNewsletterPausedAtMock,
+  listEntitlementGrantsMock,
 } = vi.hoisted(() => ({
   getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
   listFindingsForTenantMock: vi.fn(),
   getDomainVerificationStatusMock: vi.fn(),
   getNewsletterPausedAtMock: vi.fn(),
+  listEntitlementGrantsMock: vi.fn(),
 }));
 
 vi.mock('@shinefold/db', async () => ({
@@ -88,6 +91,9 @@ vi.mock('@shinefold/db', async () => ({
     auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
     findings: { listFindingsForTenant: listFindingsForTenantMock },
     emailConfig: { getNewsletterPausedAt: getNewsletterPausedAtMock },
+    tenantEntitlementGrants: {
+      listEntitlementGrants: listEntitlementGrantsMock,
+    },
   },
 }));
 
@@ -167,6 +173,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     );
     resolveIsPlatformTenantMock.mockReset().mockResolvedValue(false);
     getNewsletterPausedAtMock.mockReset().mockResolvedValue(undefined);
+    listEntitlementGrantsMock.mockReset().mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -252,6 +259,54 @@ describe(`<${TenantOverviewView.name}/>`, () => {
         expect(pausedOn).toBeVisible();
         expect(clearPause).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe('grants', () => {
+    const GRANTS_HEADING = { name: en.grantsCard.title };
+    const GRANT_MODULE_PACK = { name: en.grantModulePack.trigger };
+
+    it('shows an operator the grants card with its empty state', async () => {
+      await setup({ viewer: mockOperatorViewer(ADMIN_ROLE.MODERATOR) });
+
+      const heading = screen.getByRole('heading', GRANTS_HEADING);
+      const empty = screen.getByText(en.grantsCard.empty);
+      const grantAction = screen.queryByRole('button', GRANT_MODULE_PACK);
+
+      expect(heading).toBeVisible();
+      expect(empty).toBeVisible();
+      expect(grantAction).not.toBeInTheDocument();
+    });
+
+    it('lists the grants a tenant has outside its plan', async () => {
+      listEntitlementGrantsMock.mockResolvedValue([
+        mockListedEntitlementGrant(),
+      ]);
+      await setup();
+
+      const row = screen.getByText(
+        en.featuresSettings.toggleLabel.CONTACT_FORM,
+      );
+
+      expect(row).toBeVisible();
+    });
+
+    it('lets a super admin grant a module pack', async () => {
+      await setup();
+
+      const grantAction = screen.getByRole('button', GRANT_MODULE_PACK);
+
+      expect(grantAction).toBeVisible();
+    });
+
+    it('offers a super admin no grant action on an archived tenant', async () => {
+      await setup({
+        tenant: mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+      });
+
+      const grantAction = screen.queryByRole('button', GRANT_MODULE_PACK);
+
+      expect(grantAction).not.toBeInTheDocument();
     });
   });
 

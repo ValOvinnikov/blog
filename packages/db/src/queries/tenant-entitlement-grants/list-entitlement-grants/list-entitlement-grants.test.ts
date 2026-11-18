@@ -8,9 +8,9 @@ import {
 import { useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
-  insertClosedTestEntitlementGrants,
   insertTestEntitlementGrant,
   MOCK_GRANT_FUTURE,
+  MOCK_GRANT_PAST,
 } from '@shinefold/db/testing/tenant-entitlement-grants/fixtures';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
@@ -44,8 +44,20 @@ describe(listEntitlementGrants, () => {
     ]);
   });
 
-  it('leaves out revoked and expired grants', async () => {
-    await insertClosedTestEntitlementGrants(db(), tenant().id);
+  it('lists an expired grant that is not revoked', async () => {
+    const { id } = await insertTestEntitlementGrant(db(), tenant().id, {
+      expiresAt: MOCK_GRANT_PAST,
+    });
+
+    expect(await listEntitlementGrants(tenant().id)).toEqual([
+      expect.objectContaining({ id, expiresAt: MOCK_GRANT_PAST }),
+    ]);
+  });
+
+  it('leaves out a revoked grant', async () => {
+    await insertTestEntitlementGrant(db(), tenant().id, {
+      revokedAt: MOCK_GRANT_PAST,
+    });
 
     expect(await listEntitlementGrants(tenant().id)).toEqual([]);
   });

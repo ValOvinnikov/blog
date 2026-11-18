@@ -49,8 +49,7 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
       <LookField
         field="headingFont"
         label={headingFontLabel}
-        labelId={headingFontLock.labelId}
-        growthBadgeId={headingFontLock.growthBadgeId}
+        lock={headingFontLock}
       >
         <FontPicker
           aria={headingFontLock.aria}
@@ -62,12 +61,7 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
         <PresetValueButton field="headingFont" fieldLabel={headingFontLabel} />
       </LookField>
 
-      <LookField
-        field="bodyFont"
-        label={bodyFontLabel}
-        labelId={bodyFontLock.labelId}
-        growthBadgeId={bodyFontLock.growthBadgeId}
-      >
+      <LookField field="bodyFont" label={bodyFontLabel} lock={bodyFontLock}>
         <FontPicker
           aria={bodyFontLock.aria}
           value={bodyFont}

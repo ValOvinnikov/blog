@@ -1,4 +1,5 @@
 import { FormField } from '@platform/components/shared/form-field';
+import { LockedReason } from '@platform/components/shared/locked-reason';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { SettingRow } from '@platform/components/shared/setting-row';
 import { TextInput } from '@platform/components/shared/text-input';
@@ -45,11 +46,12 @@ export const AnalyticsSettingRow = ({
       <SettingRow
         label={t(`toggleLabel.${CAPABILITY.ANALYTICS}`)}
         description={t(`toggleDescription.${CAPABILITY.ANALYTICS}`)}
-        isLocked={!hasOwnAnalytics}
-        lockedReason={
-          hasOwnAnalytics
-            ? undefined
-            : t('planLockedBadge', { plan: ANALYTICS_PLAN })
+        status={
+          !hasOwnAnalytics && (
+            <LockedReason>
+              {t('planLockedBadge', { plan: ANALYTICS_PLAN })}
+            </LockedReason>
+          )
         }
         className={row()}
       >

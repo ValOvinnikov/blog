@@ -11,6 +11,7 @@ import {
   useEntitlementGrantAdmin,
 } from '@shinefold/db/testing/tenant-entitlement-grants/fixtures';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
+import { isNull } from '@shinefold/utils/primitives';
 import { eq } from 'drizzle-orm';
 
 import {
@@ -84,6 +85,54 @@ describe(grantEntitlement, () => {
     expect(await grant(item)).toEqual({
       ok: false,
       error: ERROR_CODE.DB_ENTITLEMENT_ALREADY_GRANTED,
+    });
+  });
+
+  describe('with an open language grant', () => {
+    const LOWER_LOCALE_LIMIT = {
+      kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+      value: MOCK_GRANTED_LOCALE_LIMIT - 1,
+    } as const;
+
+    it('replaces it with a higher one, closing it as the granting admin', async () => {
+      await grant(LOWER_LOCALE_LIMIT);
+
+      const raised = await grant(LOCALE_LIMIT);
+
+      const rows = await rowsFor(tenant().id);
+      expect(raised).toMatchObject({
+        ok: true,
+        data: {
+          ...LOCALE_LIMIT,
+          note: MOCK_GRANT_NOTE,
+          expiresAt: MOCK_GRANT_FUTURE,
+          grantedBy: admin(),
+          revokedAt: null,
+        },
+      });
+      expect(rows).toContainEqual(
+        expect.objectContaining({
+          value: LOWER_LOCALE_LIMIT.value,
+          revokedBy: admin(),
+          revokedAt: expect.any(Date),
+        }),
+      );
+      expect(rows.filter(({ revokedAt }) => isNull(revokedAt))).toHaveLength(1);
+    });
+
+    it('refuses a lower one and keeps the open grant', async () => {
+      await grant(LOCALE_LIMIT);
+
+      const lowered = await grant(LOWER_LOCALE_LIMIT);
+
+      const rows = await rowsFor(tenant().id);
+      expect(lowered).toEqual({
+        ok: false,
+        error: ERROR_CODE.DB_ENTITLEMENT_ALREADY_GRANTED,
+      });
+      expect(rows).toEqual([
+        expect.objectContaining({ ...LOCALE_LIMIT, revokedAt: null }),
+      ]);
     });
   });
 

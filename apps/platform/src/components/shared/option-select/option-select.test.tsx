@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { KEY } from '@platform/constants/keyboard';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -128,18 +129,49 @@ describe(`<${OptionSelect.name}/>`, () => {
     expect(triggerGlyphInOption).not.toBeInTheDocument();
   });
 
-  it('reports the option chosen from the list', async () => {
-    const onChange = vi.fn();
-    setup({ onChange });
+  describe('choosing from the list', () => {
+    let onChange: Mock<(value: string) => void>;
 
-    const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
-    await user.click(trigger);
-    const option = await screen.findByRole('option', {
-      name: MOCK_SECOND_LABEL,
+    beforeEach(() => {
+      onChange = vi.fn();
     });
-    await user.click(option);
 
-    expect(onChange).toHaveBeenCalledWith(MOCK_SECOND_VALUE);
+    it('reports the option chosen from the list', async () => {
+      setup({ onChange });
+
+      const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
+      await user.click(trigger);
+      const option = await screen.findByRole('option', {
+        name: MOCK_SECOND_LABEL,
+      });
+      await user.click(option);
+
+      expect(onChange).toHaveBeenCalledWith(MOCK_SECOND_VALUE);
+    });
+
+    it('lists a disabled option but never reports it as chosen', async () => {
+      setup({
+        onChange,
+        options: [
+          { value: MOCK_FIRST_VALUE, label: MOCK_FIRST_LABEL },
+          {
+            value: MOCK_SECOND_VALUE,
+            label: MOCK_SECOND_LABEL,
+            isDisabled: true,
+          },
+        ],
+      });
+
+      const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
+      await user.click(trigger);
+      const disabledOption = await screen.findByRole('option', {
+        name: MOCK_SECOND_LABEL,
+      });
+      await user.click(disabledOption);
+
+      expect(disabledOption).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(onChange).not.toHaveBeenCalled();
+    });
   });
 
   it('leaves the Tab order when disabled', async () => {
@@ -203,7 +235,7 @@ describe(`<${OptionSelect.name}/>`, () => {
         const trigger = screen.getByRole('combobox');
 
         expect(trigger).toHaveFocus();
-        expect(trigger).toHaveAttribute('aria-disabled', 'true');
+        expect(trigger).toHaveAttribute(ARIA_DISABLED, 'true');
         expect(trigger).toBeEnabled();
       });
 

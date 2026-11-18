@@ -22,6 +22,7 @@ import type { Dispatch, SetStateAction } from 'react';
 type TBuildLookFormContextArgs = Pick<
   TLookFormContext,
   | 'tenantName'
+  | 'grants'
   | 'values'
   | 'updateField'
   | 'accentHueFieldId'

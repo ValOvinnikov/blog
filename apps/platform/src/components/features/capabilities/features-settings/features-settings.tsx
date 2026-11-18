@@ -8,6 +8,7 @@ import {
   withConsentBannerForGoogleAnalytics,
   type TFeaturesFormValues,
 } from '@platform/utils/analytics-draft/analytics-draft';
+import type { TGrantAccess } from '@platform/utils/grant-target/grant-target';
 import {
   SHOWN_CAPABILITY_TOGGLES,
   type TSettingsFeaturesValues,
@@ -29,6 +30,7 @@ import { useFeaturesForm } from './use-features-form';
 export type TFeaturesSettingsProps = {
   tenantId: string;
   entitledCapabilities: readonly TCapability[];
+  grants: TGrantAccess<TCapability>;
   hasOwnAnalytics: boolean;
   initialValues: TFeaturesFormValues;
   savedAt?: Date;
@@ -39,6 +41,7 @@ export type TFeaturesSettingsProps = {
 export const FeaturesSettings = ({
   tenantId,
   entitledCapabilities,
+  grants,
   hasOwnAnalytics,
   initialValues,
   savedAt,
@@ -50,9 +53,6 @@ export const FeaturesSettings = ({
     values,
     setValues,
     status,
-    isPending,
-    isArchived,
-    archivedNoticeId,
     form,
     analyticsFieldErrors,
     featuresFieldErrors,
@@ -127,14 +127,13 @@ export const FeaturesSettings = ({
                 toggle={toggle}
                 isEntitled={entitledCapabilities.includes(capability)}
                 isChecked={values[field]}
-                isDisabled={
-                  isPending ||
-                  (!isUndefined(parentField) && !values[parentField])
+                isParentOff={!isUndefined(parentField) && !values[parentField]}
+                constraint={
+                  capability === CAPABILITY.CONSENT_BANNER
+                    ? consentBannerState
+                    : undefined
                 }
-                isArchived={isArchived}
-                {...(capability === CAPABILITY.CONSENT_BANNER &&
-                  consentBannerState)}
-                describedBy={isArchived ? archivedNoticeId : undefined}
+                grants={grants}
                 onCheckedChange={(checked) => handleToggle(field, checked)}
               />
             );

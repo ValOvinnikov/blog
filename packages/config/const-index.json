@@ -4970,6 +4970,12 @@
         "file": "packages/db/src/constants/tenant.ts"
       },
       {
+        "ref": "GRANT_STATUS.ACTIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      },
+      {
         "ref": "STEP_INDICATOR_STATE.ACTIVE",
         "scope": "app:platform",
         "from": "@platform/constants/step-indicator",
@@ -7176,6 +7182,118 @@
         "scope": "app:web",
         "from": "@web/constants/email-usage",
         "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "NEVER": [
+      {
+        "ref": "ENTITLEMENT_GRANT_EXPIRY.NEVER",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "DAYS_30": [
+      {
+        "ref": "ENTITLEMENT_GRANT_EXPIRY.DAYS_30",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "DAYS_90": [
+      {
+        "ref": "ENTITLEMENT_GRANT_EXPIRY.DAYS_90",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "YEAR_1": [
+      {
+        "ref": "ENTITLEMENT_GRANT_EXPIRY.YEAR_1",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "COMING_SOON": [
+      {
+        "ref": "ENTITLEMENT_GRANT_REFUSAL.COMING_SOON",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "ALREADY_GRANTED": [
+      {
+        "ref": "ENTITLEMENT_GRANT_REFUSAL.ALREADY_GRANTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "INCLUDED_IN_PLAN": [
+      {
+        "ref": "ENTITLEMENT_GRANT_REFUSAL.INCLUDED_IN_PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "GRANT_NOT_OPEN": [
+      {
+        "ref": "ENTITLEMENT_GRANT_REFUSAL.GRANT_NOT_OPEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "EXPIRED": [
+      {
+        "ref": "GRANT_STATUS.EXPIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "INCLUDED": [
+      {
+        "ref": "GRANT_STATUS.INCLUDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.grant_failed": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.GRANT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.grant_audit_failed": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.GRANT_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.revoke_failed": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.REVOKE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.revoke_audit_failed": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.REVOKE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
       }
     ],
     "WIZARD": [

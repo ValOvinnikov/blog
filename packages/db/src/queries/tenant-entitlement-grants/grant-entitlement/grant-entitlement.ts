@@ -14,6 +14,8 @@ import { uniqueViolationConstraint } from '@shinefold/db/utils/constraint-violat
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { and, eq, isNull, lte, sql } from 'drizzle-orm';
 
+import { raiseLocaleLimitGrant } from './raise-locale-limit-grant';
+
 export type TGrantEntitlementInput = {
   tenantId: string;
   item: TEntitlementGrantItem;
@@ -54,10 +56,19 @@ export async function grantEntitlement({
     );
 
   try {
-    const [grant] = await db
-      .insert(tenantEntitlementGrants)
-      .values({ tenantId, ...stored, grantedBy, expiresAt, note })
-      .returning();
+    const [grant] =
+      item.kind === ENTITLEMENT_KIND.LOCALE_LIMIT
+        ? await raiseLocaleLimitGrant({
+            tenantId,
+            value: item.value,
+            grantedBy,
+            expiresAt,
+            note,
+          })
+        : await db
+            .insert(tenantEntitlementGrants)
+            .values({ tenantId, ...stored, grantedBy, expiresAt, note })
+            .returning();
 
     if (!grant) {
       throw new Error('grantEntitlement: insert returned no row.');
