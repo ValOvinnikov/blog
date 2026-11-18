@@ -125,11 +125,12 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   per live language. A `delete` (which includes an unpublish), a `redirect`
   and a `module_postList` change purge that same set. A `redirect` adds its
   `source` and `previousSource` (`previousSource ?? source` on a delete) in
-  its body's `language` (`build-redirect-paths`). Where no list holds the
+  its body's `language`, plus `previousSource ?? source` in its
+  `previousLanguage` when that differs (`build-redirect-paths`). Where no list holds the
   stale addresses, `is-landing-route-purged` adds
   `revalidatePath('/[tenant]/[locale]/[...slug]', 'page')`: a prefix redirect
-  (`isPrefix` anything but `false`, so a webhook that predates the field
-  counts) and a deleted landing page, whose projected slug is its last
+  (unless both `isPrefix` and `previousIsPrefix` are `false`, so a webhook
+  that predates either field counts) and a deleted landing page, whose projected slug is its last
   segment only. That pattern refreshes every tenant's landing pages, never
   their post, blog, topic or tag pages. Two gaps stay until the 24-hour
   backstop: a `module_postList` page-size change can leave index, topic and

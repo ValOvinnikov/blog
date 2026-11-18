@@ -32,10 +32,9 @@ export const isRevalidateWebhookBody = (
   if (typeof value !== 'object' || isNull(value)) {
     return false;
   }
-  const { _type, _id, slug, previousSlug } = value as Record<string, unknown>;
-  const { source, previousSource, language, previousLanguage } =
-    value as Record<string, unknown>;
-  const { isPrefix, previousIsPrefix } = value as Record<string, unknown>;
+  const body = value as Record<string, unknown>;
+  const { _type, _id, slug, previousSlug, source, previousSource } = body;
+  const { language, previousLanguage, isPrefix, previousIsPrefix } = body;
   return (
     isString(_type) &&
     isString(_id) &&
