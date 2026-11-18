@@ -8,7 +8,8 @@ import {
 } from '@shinefold/auth/testing/magic-link-fixtures';
 import { resolveTenantEmailBrand } from '@shinefold/config';
 import { LOCALE_ISO_CODES, TENANT_PLAN } from '@shinefold/config/constants';
-import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
+import { ENTITLEMENT_KIND, PLAN_LOCALE_LIMIT } from '@shinefold/db/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/fixtures';
 
 import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';
 
@@ -74,13 +75,11 @@ describe(resolveTenantEmailIdentity, () => {
     );
     getSiteConfigMock.mockResolvedValue(MOCK_SITE_CONFIG);
     listResolvableEntitlementGrantsMock.mockResolvedValue([
-      {
+      mockEntitlementGrant({
         kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
         key: ENTITLEMENT_KIND.LOCALE_LIMIT,
-        value: 2,
-        expiresAt: null,
-        revokedAt: null,
-      },
+        value: PLAN_LOCALE_LIMIT[TENANT_PLAN.FREE] + 1,
+      }),
     ]);
 
     const result = await resolveTenantEmailIdentity(MOCK_TENANT_HOST);

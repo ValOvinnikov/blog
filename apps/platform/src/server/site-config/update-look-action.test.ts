@@ -225,7 +225,7 @@ describe(updateLookAction, () => {
         outcome: ACTION_OUTCOME.REFUSED,
         reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
         values: { plan: TENANT_PLAN.FREE },
-        items: ['radiusScale'],
+        items: [LOOK_FIELD.RADIUS_SCALE],
       });
       expect(upsertSiteConfigMock).not.toHaveBeenCalled();
     });
@@ -265,19 +265,6 @@ describe(updateLookAction, () => {
       MOCK_TENANT_ID,
       expect.objectContaining({ brandName: null }),
     );
-  });
-
-  it('rejects a brand name over the length limit without writing it', async () => {
-    const result = await updateLookAction(MOCK_TENANT_ID, {
-      ...VALID_INPUT,
-      brandName: 'x'.repeat(BRAND_NAME_MAX_LENGTH + 1),
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: {},
-    });
-    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
   });
 
   describe('after a successful save', () => {
@@ -321,19 +308,20 @@ describe(updateLookAction, () => {
   });
 
   it.each([
-    LOOK_FIELD.CARD_STYLE,
-    LOOK_FIELD.FOOTER_LAYOUT,
-    LOOK_FIELD.HEADER_LAYOUT,
-    LOOK_FIELD.BUSY_BUTTON_STYLE,
-    LOOK_FIELD.ACCOUNT_PANEL_STYLE,
-    LOOK_FIELD.HEADING_WEIGHT,
-    LOOK_FIELD.HEADING_CASE,
-    LOOK_FIELD.IMAGE_PROPORTION,
-    LOOK_FIELD.DIVIDER_WIDTH,
-  ])('rejects a %s outside its options without writing it', async (field) => {
+    [LOOK_FIELD.CARD_STYLE, MOCK_UNSUPPORTED_LOOK_VALUE],
+    [LOOK_FIELD.FOOTER_LAYOUT, MOCK_UNSUPPORTED_LOOK_VALUE],
+    [LOOK_FIELD.HEADER_LAYOUT, MOCK_UNSUPPORTED_LOOK_VALUE],
+    [LOOK_FIELD.BUSY_BUTTON_STYLE, MOCK_UNSUPPORTED_LOOK_VALUE],
+    [LOOK_FIELD.ACCOUNT_PANEL_STYLE, MOCK_UNSUPPORTED_LOOK_VALUE],
+    [LOOK_FIELD.HEADING_WEIGHT, MOCK_UNSUPPORTED_LOOK_VALUE],
+    [LOOK_FIELD.HEADING_CASE, MOCK_UNSUPPORTED_LOOK_VALUE],
+    [LOOK_FIELD.IMAGE_PROPORTION, MOCK_UNSUPPORTED_LOOK_VALUE],
+    [LOOK_FIELD.DIVIDER_WIDTH, MOCK_UNSUPPORTED_LOOK_VALUE],
+    [LOOK_FIELD.BRAND_NAME, 'x'.repeat(BRAND_NAME_MAX_LENGTH + 1)],
+  ])('rejects an invalid %s without writing it', async (field, value) => {
     const result = await updateLookAction(MOCK_TENANT_ID, {
       ...VALID_INPUT,
-      [field]: MOCK_UNSUPPORTED_LOOK_VALUE,
+      [field]: value,
     });
 
     expect(result).toEqual({

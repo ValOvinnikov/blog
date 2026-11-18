@@ -1,5 +1,6 @@
 import {
   resolveTenantEmailBrand,
+  type TMaybeUndefined,
   type TTenantEmailBrand,
 } from '@shinefold/config';
 import type { TLocaleIsoCode } from '@shinefold/config/constants';
@@ -14,15 +15,10 @@ export type TResolvedTenantEmailIdentity = {
   liveLocales: TLocaleIsoCode[];
 };
 
-/**
- * Resolves the tenant that owns `host` to its email brand, best-effort — a
- * host matching no tenant, a tenant with no site config yet, or a failed
- * lookup all yield `undefined` so the caller can render neutral rather than
- * fail delivery of the magic-link email itself.
- */
+/** Any failed lookup yields `undefined`, so the email renders neutral instead of failing delivery. */
 export async function resolveTenantEmailIdentity(
   host: string,
-): Promise<TResolvedTenantEmailIdentity | undefined> {
+): Promise<TMaybeUndefined<TResolvedTenantEmailIdentity>> {
   try {
     const tenant = await queries.tenantDomains.getTenantByDomain(host);
     if (!tenant) return undefined;

@@ -82,6 +82,10 @@ const STORED_LOOK: TLook = {
 
 const GROWTH = PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH];
 const FREE = PLAN_ENTITLEMENTS[TENANT_PLAN.FREE];
+const MOCK_ENTITLEMENTS_LABEL = 'a heading-font grant';
+const MOCK_ENTITLEMENTS = {
+  lookFields: [LOOK_FIELD.PRESET, LOOK_FIELD.HEADING_FONT],
+};
 
 describe(toEffectiveLookWithin, () => {
   it('returns every stored value on Growth', () => {
@@ -133,21 +137,37 @@ describe(toEffectiveLookWithin, () => {
       { preset, headingFont: FONT_CHOICE.FRAUNCES, extra },
     );
   });
+
+  it('keeps a granted stored value and replaces the rest', () => {
+    const { preset, headingFont, bodyFont } = STORED_LOOK;
+
+    expect(
+      toEffectiveLookWithin(
+        { preset, headingFont, bodyFont },
+        MOCK_ENTITLEMENTS,
+      ),
+    ).toEqual({ preset, headingFont, bodyFont: FONT_CHOICE.INTER });
+  });
 });
 
 describe(isLookFieldWithin, () => {
   it.each([
-    ['preset', TENANT_PLAN.FREE, true],
-    ['logoAssetUrl', TENANT_PLAN.FREE, true],
-    ['brandName', TENANT_PLAN.FREE, true],
-    ['headingFont', TENANT_PLAN.FREE, false],
-    ['cookieSettingsButton', TENANT_PLAN.FREE, true],
-    ['footerLayout', TENANT_PLAN.FREE, false],
-    ['headerControlShape', TENANT_PLAN.FREE, false],
-    ['headingFont', TENANT_PLAN.GROWTH, true],
-  ] as const)('reports %s on %s as %s', (field, plan, expected) => {
-    expect(isLookFieldWithin(field, PLAN_ENTITLEMENTS[plan])).toBe(expected);
-  });
+    ['preset', TENANT_PLAN.FREE, FREE, true],
+    ['logoAssetUrl', TENANT_PLAN.FREE, FREE, true],
+    ['brandName', TENANT_PLAN.FREE, FREE, true],
+    ['headingFont', TENANT_PLAN.FREE, FREE, false],
+    ['cookieSettingsButton', TENANT_PLAN.FREE, FREE, true],
+    ['footerLayout', TENANT_PLAN.FREE, FREE, false],
+    ['headerControlShape', TENANT_PLAN.FREE, FREE, false],
+    ['headingFont', TENANT_PLAN.GROWTH, GROWTH, true],
+    ['headingFont', MOCK_ENTITLEMENTS_LABEL, MOCK_ENTITLEMENTS, true],
+    ['bodyFont', MOCK_ENTITLEMENTS_LABEL, MOCK_ENTITLEMENTS, false],
+  ] as const)(
+    'reports %s within %s as %s',
+    (field, _, entitlements, expected) => {
+      expect(isLookFieldWithin(field, entitlements)).toBe(expected);
+    },
+  );
 });
 
 describe(pickLookWithin, () => {
@@ -158,33 +178,10 @@ describe(pickLookWithin, () => {
       pickLookWithin({ preset, accentHue, headingFont, logoHue }, FREE),
     ).toEqual({ preset, accentHue });
   });
-});
-
-describe('entitlement-taking forms', () => {
-  const MOCK_ENTITLEMENTS = {
-    lookFields: [LOOK_FIELD.PRESET, LOOK_FIELD.HEADING_FONT],
-  };
-  const { preset, headingFont, bodyFont } = STORED_LOOK;
-
-  it('reports a granted field as entitled', () => {
-    expect(isLookFieldWithin(LOOK_FIELD.HEADING_FONT, MOCK_ENTITLEMENTS)).toBe(
-      true,
-    );
-    expect(isLookFieldWithin(LOOK_FIELD.BODY_FONT, MOCK_ENTITLEMENTS)).toBe(
-      false,
-    );
-  });
-
-  it('keeps a granted stored value and replaces the rest', () => {
-    expect(
-      toEffectiveLookWithin(
-        { preset, headingFont, bodyFont },
-        MOCK_ENTITLEMENTS,
-      ),
-    ).toEqual({ preset, headingFont, bodyFont: FONT_CHOICE.INTER });
-  });
 
   it('picks only the granted fields', () => {
+    const { preset, headingFont, bodyFont } = STORED_LOOK;
+
     expect(
       pickLookWithin({ preset, headingFont, bodyFont }, MOCK_ENTITLEMENTS),
     ).toEqual({ preset, headingFont });

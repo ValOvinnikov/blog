@@ -6,12 +6,26 @@ import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
 import { insertTestAdmin, type TTestDb } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
 import { createMockFaker } from '@shinefold/db/testing/mock-faker';
+import type { TResolvableGrant } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 
 const grantsFaker = createMockFaker(678001);
 
 export const MOCK_GRANT_NOTE = grantsFaker.lorem.sentence();
 export const MOCK_GRANT_PAST = grantsFaker.date.past({ refDate: MOCK_NOW });
 export const MOCK_GRANT_FUTURE = grantsFaker.date.future({ refDate: MOCK_NOW });
+
+export function mockEntitlementGrant(
+  overrides: Partial<TResolvableGrant> = {},
+): TResolvableGrant {
+  return {
+    kind: ENTITLEMENT_KIND.CAPABILITY,
+    key: CAPABILITY.CONTACT_FORM,
+    value: null,
+    expiresAt: null,
+    revokedAt: null,
+    ...overrides,
+  };
+}
 
 export async function insertTestEntitlementGrant(
   db: TTestDb,
