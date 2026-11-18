@@ -18,6 +18,21 @@ export function hexToOklch(hex: string): TOklchColor {
   return { l: color.l, c: color.c, h: color.h ?? 0 };
 }
 
+/** CSS `color-mix(in oklch, base, toward share)`, hue taking the shorter arc. */
+export function mixOklch(
+  base: TOklchColor,
+  toward: TOklchColor,
+  share: number,
+): TOklchColor {
+  const hueGap = ((toward.h - base.h + 540) % 360) - 180;
+
+  return {
+    l: base.l + (toward.l - base.l) * share,
+    c: base.c + (toward.c - base.c) * share,
+    h: (base.h + hueGap * share + 360) % 360,
+  };
+}
+
 /** WCAG 2 AA contrast-ratio floor for normal text. */
 export const WCAG_AA_CONTRAST_MIN = 4.5;
 
@@ -67,12 +82,7 @@ function compositeLayers(layers: readonly TOklchColor[], toSrgb: TToSrgb): Rgb {
   );
 }
 
-/**
- * Contrast as a browser could paint it: browsers differ in how they bring an
- * out-of-gamut OKLCH colour into sRGB, so this is the worse of CSS Color 4
- * gamut mapping and per-channel clipping. `backgroundLayers` stack bottom
- * first, over black.
- */
+/** Contrast as a browser could paint it, the worse of CSS Color 4 gamut mapping and per-channel clipping, over `backgroundLayers` stacked bottom first on black. */
 export function renderedContrastRatio(
   foreground: TOklchColor,
   backgroundLayers: readonly TOklchColor[],

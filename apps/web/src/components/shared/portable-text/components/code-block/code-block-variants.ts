@@ -14,6 +14,6 @@ export const codeBlockVariants = tv({
       'text-code',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary',
     ],
-    highlightedLine: ['bg-brand-primary-muted'],
+    highlightedLine: ['bg-(--code-highlight)'],
   },
 });

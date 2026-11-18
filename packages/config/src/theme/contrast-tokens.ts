@@ -1,5 +1,6 @@
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
+  mixOklch,
   renderedContrastRatio,
   type TOklchColor,
 } from '@shinefold/utils/color';
@@ -18,6 +19,7 @@ import { SCHEME_RAMPS } from './contrast-scheme-ramps';
 import {
   BRAND_PRIMARY,
   ITEM_ACCENT_BRAND_SHARE,
+  MIXED_SURFACES,
   TOKEN_ALIASES,
 } from './contrast-surfaces';
 import { NAV_LINK_STYLE_DECLARATIONS } from './nav-link-declarations';
@@ -93,6 +95,14 @@ const resolveColor = (
   token: TThemeToken,
   context: TContrastContext,
 ): TOklchColor => {
+  const mix = MIXED_SURFACES[token];
+  if (mix) {
+    return mixOklch(
+      resolveColor(mix.base, context),
+      resolveColor(mix.toward, context),
+      mix.share,
+    );
+  }
   const { h, ...stop } = resolveStop(token, context);
   return { ...stop, h: h ?? context.hue };
 };
@@ -112,4 +122,12 @@ export const measureContrast = (
 export const tokenFollowsAccentHue = (
   token: TThemeToken,
   context: Omit<TContrastContext, 'hue'>,
-): boolean => isUndefined(resolveStop(token, context).h);
+): boolean => {
+  const mix = MIXED_SURFACES[token];
+  if (mix) {
+    return [mix.base, mix.toward].some((part) =>
+      tokenFollowsAccentHue(part, context),
+    );
+  }
+  return isUndefined(resolveStop(token, context).h);
+};

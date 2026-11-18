@@ -12,6 +12,11 @@
   --code-variable: light-dark(oklch(0.5 0.17 250), oklch(0.75 0.13 250));
   --code-constant: light-dark(oklch(0.48 0.14 55), oklch(0.78 0.11 55));
   --code-url: light-dark(oklch(0.48 0.11 200), oklch(0.75 0.09 200));
+  --code-highlight: color-mix(
+    in oklch,
+    var(--surface-2),
+    var(--brand-primary) 10%
+  );
 }
 
 :root,

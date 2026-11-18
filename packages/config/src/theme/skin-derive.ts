@@ -9,6 +9,7 @@ import {
   findSkinFailures,
   isSkinForeground,
   pairsInvolving,
+  partsOf,
   SKIN_CONTRAST_PAIRS,
 } from './skin-contrast';
 import {
@@ -67,7 +68,8 @@ const failuresOf = (
 ) =>
   findSkinFailures(roles, scheme, effectiveScheme, pairsInvolving(role)).filter(
     ({ pair, surface }) =>
-      surface === role || isSkinForeground(role, SKIN_CONTRAST_PAIRS[pair]!),
+      partsOf(surface).includes(role) ||
+      isSkinForeground(role, SKIN_CONTRAST_PAIRS[pair]!),
   );
 
 const settleRole = (

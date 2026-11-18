@@ -1,4 +1,4 @@
-import type { STORYBOOK_SKINS } from '@shinefold/config';
+import { BRAND_VARIANT, type STORYBOOK_SKINS } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { CodeBlock } from './code-block';
@@ -48,6 +48,17 @@ export const OnInverseSkin: TStory = {
   decorators: [
     (Story) => (
       <div data-skin={INVERSE_SKIN} className="bg-ambient p-6">
+        <Story />
+      </div>
+    ),
+  ],
+};
+
+export const OnBrandTint: TStory = {
+  args: { highlightedLines: [3] },
+  decorators: [
+    (Story) => (
+      <div data-skin={BRAND_VARIANT.BRAND_PRIMARY} className="bg-ambient p-6">
         <Story />
       </div>
     ),

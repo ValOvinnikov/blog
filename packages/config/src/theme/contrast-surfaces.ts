@@ -67,7 +67,16 @@ export const SCRIM_STOPS_UNDER_COPY = [
   '--scrim-neutral-mid',
 ] as const satisfies readonly TThemeToken[];
 
+export const CODE_HIGHLIGHT = '--code-highlight' satisfies TThemeToken;
+
+// apps/web/index.css declares --code-highlight as this same color-mix(in oklch, …), share as a percentage.
+export const MIXED_SURFACES: Partial<
+  Record<TThemeToken, { base: TThemeToken; toward: TThemeToken; share: number }>
+> = {
+  [CODE_HIGHLIGHT]: { base: SURFACE_2, toward: BRAND_PRIMARY, share: 0.1 },
+};
+
 export const CODE_SURFACES = [
   SURFACE_2,
-  BRAND_PRIMARY_MUTED,
+  CODE_HIGHLIGHT,
 ] as const satisfies readonly TThemeToken[];
