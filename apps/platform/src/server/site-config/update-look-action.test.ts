@@ -60,9 +60,10 @@ import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import {
   BRAND_NAME_MAX_LENGTH,
   LOOK_FIELD,
+  PLAN_ENTITLEMENTS,
   SITE_CONFIG_SAVED_AT,
 } from '@shinefold/db/constants';
-import { toEffectiveLook } from '@shinefold/db/utils/effective-look/effective-look';
+import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 import type { Session } from 'next-auth';
 
 import { updateLookAction } from './update-look-action';
@@ -243,9 +244,9 @@ describe(updateLookAction, () => {
     });
 
     it('saves when the Growth-only fields hold the preset values the Free page shows', async () => {
-      const presetValues = toEffectiveLook(
+      const presetValues = toEffectiveLookWithin(
         { ...VALID_INPUT, logoHue: undefined, radiusScale: RADIUS_SCALE.LG },
-        TENANT_PLAN.FREE,
+        PLAN_ENTITLEMENTS[TENANT_PLAN.FREE],
       );
 
       const result = await updateLookAction(MOCK_TENANT_ID, {

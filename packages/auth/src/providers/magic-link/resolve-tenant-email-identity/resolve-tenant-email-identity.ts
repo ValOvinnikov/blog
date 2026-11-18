@@ -4,6 +4,7 @@ import {
 } from '@shinefold/config';
 import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
+import { resolveTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 
 export type TResolvedTenantEmailIdentity = {
   brand: TTenantEmailBrand;
@@ -26,7 +27,12 @@ export async function resolveTenantEmailIdentity(
     const tenant = await queries.tenantDomains.getTenantByDomain(host);
     if (!tenant) return undefined;
 
-    const siteConfig = await queries.siteConfig.getSiteConfig(tenant.id);
+    const [siteConfig, grants] = await Promise.all([
+      queries.siteConfig.getSiteConfig(tenant.id),
+      queries.tenantEntitlementGrants.listResolvableEntitlementGrants(
+        tenant.id,
+      ),
+    ]);
     if (!siteConfig) return undefined;
 
     return {
@@ -38,7 +44,10 @@ export async function resolveTenantEmailIdentity(
       brandName: tenant.name,
       tenantId: tenant.id,
       defaultLocale: tenant.locale,
-      liveLocales: queries.tenants.selectLiveLocales(tenant),
+      liveLocales: queries.tenants.selectLiveLocalesWithin(
+        tenant,
+        resolveTenantEntitlements(tenant.plan, grants, new Date()),
+      ),
     };
   } catch {
     return undefined;

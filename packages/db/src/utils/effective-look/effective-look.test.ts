@@ -28,15 +28,12 @@ import {
   SPINNER_STYLE,
   TENANT_PLAN,
 } from '@shinefold/config/constants';
-import { LOOK_FIELD } from '@shinefold/db/constants';
+import { LOOK_FIELD, PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import { MOCK_ACCENT_HUE } from '@shinefold/db/testing/site-config/fixtures';
 
 import {
-  isLookFieldEntitled,
   isLookFieldWithin,
-  pickEntitledLook,
   pickLookWithin,
-  toEffectiveLook,
   toEffectiveLookWithin,
   type TLook,
 } from './effective-look';
@@ -83,15 +80,16 @@ const STORED_LOOK: TLook = {
   faviconAssetUrl: MOCK_FAVICON_ASSET_URL,
 };
 
-describe(toEffectiveLook, () => {
+const GROWTH = PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH];
+const FREE = PLAN_ENTITLEMENTS[TENANT_PLAN.FREE];
+
+describe(toEffectiveLookWithin, () => {
   it('returns every stored value on Growth', () => {
-    expect(toEffectiveLook(STORED_LOOK, TENANT_PLAN.GROWTH)).toEqual(
-      STORED_LOOK,
-    );
+    expect(toEffectiveLookWithin(STORED_LOOK, GROWTH)).toEqual(STORED_LOOK);
   });
 
   it("replaces every Growth-only value with the preset's on Free", () => {
-    expect(toEffectiveLook(STORED_LOOK, TENANT_PLAN.FREE)).toEqual({
+    expect(toEffectiveLookWithin(STORED_LOOK, FREE)).toEqual({
       preset: PRESET_ID.EDITORIAL,
       accentHue: MOCK_ACCENT_HUE,
       logoHue: undefined,
@@ -131,13 +129,13 @@ describe(toEffectiveLook, () => {
     const { preset, headingFont } = STORED_LOOK;
     const extra = faker.lorem.word();
 
-    expect(
-      toEffectiveLook({ preset, headingFont, extra }, TENANT_PLAN.FREE),
-    ).toEqual({ preset, headingFont: FONT_CHOICE.FRAUNCES, extra });
+    expect(toEffectiveLookWithin({ preset, headingFont, extra }, FREE)).toEqual(
+      { preset, headingFont: FONT_CHOICE.FRAUNCES, extra },
+    );
   });
 });
 
-describe(isLookFieldEntitled, () => {
+describe(isLookFieldWithin, () => {
   it.each([
     ['preset', TENANT_PLAN.FREE, true],
     ['logoAssetUrl', TENANT_PLAN.FREE, true],
@@ -148,19 +146,16 @@ describe(isLookFieldEntitled, () => {
     ['headerControlShape', TENANT_PLAN.FREE, false],
     ['headingFont', TENANT_PLAN.GROWTH, true],
   ] as const)('reports %s on %s as %s', (field, plan, expected) => {
-    expect(isLookFieldEntitled(field, plan)).toBe(expected);
+    expect(isLookFieldWithin(field, PLAN_ENTITLEMENTS[plan])).toBe(expected);
   });
 });
 
-describe(pickEntitledLook, () => {
+describe(pickLookWithin, () => {
   it('drops every field the plan does not include', () => {
     const { preset, accentHue, headingFont, logoHue } = STORED_LOOK;
 
     expect(
-      pickEntitledLook(
-        { preset, accentHue, headingFont, logoHue },
-        TENANT_PLAN.FREE,
-      ),
+      pickLookWithin({ preset, accentHue, headingFont, logoHue }, FREE),
     ).toEqual({ preset, accentHue });
   });
 });
