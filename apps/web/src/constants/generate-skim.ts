@@ -1,5 +1,6 @@
-// A run waking just before the go-live date is due within seconds, and every early answer spends a worker retry.
-export const GO_LIVE_RETRY_AFTER_SECONDS = 5;
+// Two attempts plus the body read and save must finish inside the scheduled route's 80s maxDuration, or a cut-off call keeps its allowance claim.
+export const SKIM_GENERATION_TIMEOUT_MS = 30_000;
+export const SKIM_GENERATION_MAX_RETRIES = 1;
 
 export const GENERATE_SKIM_LOG = {
   CONFIG_MISSING: 'generate_skim.config_missing',

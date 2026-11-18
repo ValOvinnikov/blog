@@ -3,6 +3,10 @@ import type { TTenant } from '@shinefold/db/schema/tenants';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
 import { readSignedTenantRequest } from '@web/server/signed-request/read-signed-tenant-request/read-signed-tenant-request';
 import { generatePostSkim } from '@web/server/skim/generate-post-skim/generate-post-skim';
+import {
+  goLiveRequestSchema,
+  type TGoLiveRequest,
+} from '@web/server/skim/go-live-request/go-live-request';
 import { hasExistingTakeaways } from '@web/server/skim/has-existing-takeaways/has-existing-takeaways';
 import { refuseUnlessGoingLive } from '@web/server/skim/refuse-unless-going-live/refuse-unless-going-live';
 import { skimResponse } from '@web/server/skim/skim-response/skim-response';
@@ -12,19 +16,10 @@ import { respondEmpty } from '@web/utils/empty-response/empty-response';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 
 export const runtime = 'nodejs';
 // Below the worker's 90s call timeout, so a retry never overlaps a call still generating; route segment config must be a literal.
 export const maxDuration = 80;
-
-const requestBodySchema = z.object({
-  tenantId: z.uuid(),
-  postId: z.string().min(1),
-  publishedAt: z.string().min(1),
-});
-
-type TGoLiveRequest = z.infer<typeof requestBodySchema>;
 
 const resolveGoLiveTenant = async ({
   tenantId,
@@ -49,7 +44,7 @@ const resolveGoLiveTenant = async ({
 };
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const signed = await readSignedTenantRequest(request, requestBodySchema, {
+  const signed = await readSignedTenantRequest(request, goLiveRequestSchema, {
     secret: env.SANITY_REVALIDATE_SECRET,
     log: {
       SECRET_MISSING: GENERATE_SKIM_LOG.GO_LIVE_SECRET_MISSING,

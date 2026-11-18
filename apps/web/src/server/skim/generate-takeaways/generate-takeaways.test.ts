@@ -60,7 +60,9 @@ describe(generateTakeaways, () => {
     await generateTakeaways(MOCK_BODY, MOCK_API_KEY);
 
     const [request] = parseMock.mock.calls[0] ?? [];
-    expect(anthropicCtorMock).toHaveBeenCalledWith({ apiKey: MOCK_API_KEY });
+    expect(anthropicCtorMock).toHaveBeenCalledWith(
+      expect.objectContaining({ apiKey: MOCK_API_KEY }),
+    );
     expect(request.model).toBe(SKIM_GENERATION_MODEL);
     expect(request).not.toHaveProperty('temperature');
   });

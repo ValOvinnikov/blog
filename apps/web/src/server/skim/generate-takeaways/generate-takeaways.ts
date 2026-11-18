@@ -2,6 +2,10 @@ import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import type { ArticleText } from '@shinefold/config';
 import { hasLength } from '@shinefold/utils/primitives';
+import {
+  SKIM_GENERATION_MAX_RETRIES,
+  SKIM_GENERATION_TIMEOUT_MS,
+} from '@web/constants/generate-skim';
 import { z } from 'zod';
 
 export const SKIM_GENERATION_MODEL = 'claude-haiku-5-5';
@@ -40,7 +44,11 @@ export const generateTakeaways = async (
   body: ArticleText,
   apiKey: string,
 ): Promise<string[]> => {
-  const client = new Anthropic({ apiKey });
+  const client = new Anthropic({
+    apiKey,
+    timeout: SKIM_GENERATION_TIMEOUT_MS,
+    maxRetries: SKIM_GENERATION_MAX_RETRIES,
+  });
 
   const message = await client.messages.parse({
     model: SKIM_GENERATION_MODEL,
