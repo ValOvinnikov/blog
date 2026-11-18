@@ -2,9 +2,10 @@ import { TENANT_PLAN } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import { AUTH_ACTION } from '@web/constants/session';
 import { SIGN_IN_LOG } from '@web/constants/sign-in';
-import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
+import { getEffectiveEntitlements } from '@web/server/site-config/get-effective-entitlements/get-effective-entitlements';
 import { resolveTenant } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { MOCK_SITE_OAUTH_CREDENTIALS } from '@web/testing/server/auth/site-oauth-credentials-fixtures';
+import { mockTenantEntitlements } from '@web/testing/server/settings-features/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_TENANT_HOST,
@@ -30,7 +31,9 @@ vi.mock('@shinefold/db', () => ({
   },
 }));
 
-vi.mock('@web/server/site-config/get-effective-plan/get-effective-plan');
+vi.mock(
+  '@web/server/site-config/get-effective-entitlements/get-effective-entitlements',
+);
 
 vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
   resolveTenant: vi.fn(),
@@ -39,7 +42,7 @@ vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
 const getTenantOAuthCredentialsMock = vi.mocked(
   queries.tenantOAuthCredentials.getTenantOAuthCredentials,
 );
-const getEffectivePlanMock = vi.mocked(getEffectivePlan);
+const getEffectiveEntitlementsMock = vi.mocked(getEffectiveEntitlements);
 const resolveTenantMock = vi.mocked(resolveTenant);
 
 const MOCK_SECONDARY_HOST = 'secondary.example.com';
@@ -67,7 +70,9 @@ describe(getSiteOAuthCredentials, () => {
   });
 
   it('keeps the shared apps after a downgrade, without reading stored credentials', async () => {
-    getEffectivePlanMock.mockResolvedValueOnce(TENANT_PLAN.FREE);
+    getEffectiveEntitlementsMock.mockResolvedValueOnce(
+      mockTenantEntitlements(TENANT_PLAN.FREE),
+    );
 
     await expect(getSiteOAuthCredentials(MOCK_TENANT_ID)).resolves.toEqual({});
     expect(getTenantOAuthCredentialsMock).not.toHaveBeenCalled();

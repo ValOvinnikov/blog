@@ -1,10 +1,11 @@
 import { faker } from '@faker-js/faker';
 import { PRESET_ID, TENANT_PLAN } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
-import { toEffectiveLook } from '@shinefold/db/utils/effective-look/effective-look';
+import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 import { errorResult, okResult } from '@shinefold/utils';
-import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
+import { getEffectiveEntitlements } from '@web/server/site-config/get-effective-entitlements/get-effective-entitlements';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
+import { mockTenantEntitlements } from '@web/testing/server/settings-features/fixtures';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import {
   MOCK_DYNAMIC_SERVER_USAGE_ERROR,
@@ -20,10 +21,12 @@ import { getSiteConfig } from './get-site-config';
 faker.seed(6010);
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
-vi.mock('@web/server/site-config/get-effective-plan/get-effective-plan');
+vi.mock(
+  '@web/server/site-config/get-effective-entitlements/get-effective-entitlements',
+);
 
 vi.mock('@shinefold/db/utils/effective-look/effective-look', () => ({
-  toEffectiveLook: vi.fn((look: unknown) => look),
+  toEffectiveLookWithin: vi.fn((look: unknown) => look),
 }));
 
 vi.mock(
@@ -103,19 +106,21 @@ describe(getSiteConfig, () => {
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it("applies the tenant's plan to the row's Look", async () => {
+  it("applies the tenant's entitlements to the row's Look", async () => {
     const effectiveRow = mockSiteConfig({ tenantId: MOCK_TENANT_ID });
     getSiteConfigMock.mockResolvedValue(MOCK_SITE_CONFIG_ROW_A);
-    vi.mocked(getEffectivePlan).mockResolvedValue(TENANT_PLAN.FREE);
-    vi.mocked(toEffectiveLook).mockReturnValueOnce(effectiveRow);
+    vi.mocked(getEffectiveEntitlements).mockResolvedValue(
+      mockTenantEntitlements(TENANT_PLAN.FREE),
+    );
+    vi.mocked(toEffectiveLookWithin).mockReturnValueOnce(effectiveRow);
 
     const result = await getSiteConfig(MOCK_TENANT_ID);
 
     expect(result).toEqual(okResult(effectiveRow));
-    expect(getEffectivePlan).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(toEffectiveLook).toHaveBeenCalledWith(
+    expect(getEffectiveEntitlements).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(toEffectiveLookWithin).toHaveBeenCalledWith(
       MOCK_SITE_CONFIG_ROW_A,
-      TENANT_PLAN.FREE,
+      mockTenantEntitlements(TENANT_PLAN.FREE),
     );
   });
 
@@ -125,6 +130,6 @@ describe(getSiteConfig, () => {
     const result = await getSiteConfig(MOCK_TENANT_ID);
 
     expect(result).toEqual(okResult());
-    expect(toEffectiveLook).not.toHaveBeenCalled();
+    expect(toEffectiveLookWithin).not.toHaveBeenCalled();
   });
 });

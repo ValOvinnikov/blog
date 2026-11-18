@@ -10,6 +10,7 @@ import { REQUEST_CONTEXT_LOG } from '@web/constants/request-context';
 import { DRAFT_PREVIEW_MARKER } from '@web/server/draft-preview/constants/constants';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { setMockEnv } from '@web/testing/server/infra/set-mock-env';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
 import {
   MOCK_TENANT_BASE_URL,
@@ -32,14 +33,14 @@ faker.seed(6010);
 const {
   getTenantByIdMock,
   toTenantSanityCredentialsMock,
-  selectLiveLocalesMock,
+  selectTenantLiveLocalesMock,
   hasDraftPreviewTokenMock,
   mockEnv,
 } = vi.hoisted(() => ({
+  selectTenantLiveLocalesMock: vi.fn(),
   hasDraftPreviewTokenMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
   toTenantSanityCredentialsMock: vi.fn(),
-  selectLiveLocalesMock: vi.fn(),
   mockEnv: {},
 }));
 
@@ -49,9 +50,11 @@ vi.mock('@shinefold/db', async () => ({
     tenants: {
       getTenantById: getTenantByIdMock,
       toTenantSanityCredentials: toTenantSanityCredentialsMock,
-      selectLiveLocales: selectLiveLocalesMock,
     },
   },
+}));
+vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales', () => ({
+  selectTenantLiveLocales: selectTenantLiveLocalesMock,
 }));
 vi.mock('@shinefold/service', () => ({
   getPlatformSanityContext: () => MOCK_PLATFORM_CONTEXT,
@@ -67,7 +70,6 @@ const NO_TENANT_ENTERED = 'with no tenant entered';
 
 const MOCK_UNSERVED_LOCALE = faker.string.alpha(8);
 const MOCK_NON_UUID_TENANT = faker.lorem.word();
-const MOCK_DB_ERROR_MESSAGE = faker.lorem.sentence();
 const MOCK_DEPROVISIONED_AT = faker.date.past({ refDate: '2026-01-01' });
 
 const MOCK_PLATFORM_CONTEXT = {
@@ -129,7 +131,7 @@ describe('request-context', () => {
   beforeEach(() => {
     getTenantByIdMock.mockResolvedValue(MOCK_SERVABLE_TENANT);
     toTenantSanityCredentialsMock.mockReturnValue(MOCK_TENANT_CREDENTIALS);
-    selectLiveLocalesMock.mockReturnValue([
+    selectTenantLiveLocalesMock.mockResolvedValue([
       LOCALE_ISO_CODES.EN,
       LOCALE_ISO_CODES.NL,
     ]);
@@ -161,7 +163,9 @@ describe('request-context', () => {
       isOperatorSuspended: false,
       isDraftPreview: false,
     });
-    expect(selectLiveLocalesMock).toHaveBeenCalledWith(MOCK_SERVABLE_TENANT);
+    expect(selectTenantLiveLocalesMock).toHaveBeenCalledWith(
+      MOCK_SERVABLE_TENANT,
+    );
   });
 
   it('marks a tenant an operator suspended', async () => {
@@ -398,7 +402,7 @@ describe('request-context', () => {
       getTenantByIdMock.mockResolvedValue(
         mockTenant({ locale: LOCALE_ISO_CODES.DE }),
       );
-      selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.DE]);
+      selectTenantLiveLocalesMock.mockResolvedValue([LOCALE_ISO_CODES.DE]);
 
       await expect(
         enterAndReadNotFound(MOCK_TENANT_ID, MOCK_UNSERVED_LOCALE),
@@ -409,7 +413,7 @@ describe('request-context', () => {
     });
 
     it("falls back to the tenant's default language for a switched-off one", async () => {
-      selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
+      selectTenantLiveLocalesMock.mockResolvedValue([LOCALE_ISO_CODES.EN]);
 
       await expect(
         enterAndReadNotFound(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL),
@@ -436,22 +440,34 @@ describe('request-context', () => {
       expect(getTenantByIdMock).toHaveBeenCalledTimes(1);
     });
 
-    it('serves the entered language and logs when the tenants row cannot be read', async () => {
-      const error = new Error(MOCK_DB_ERROR_MESSAGE);
-      getTenantByIdMock.mockRejectedValue(error);
-
-      await expect(
-        enterAndReadNotFound(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL),
-      ).resolves.toEqual({
-        tenantId: MOCK_TENANT_ID,
-        locale: LOCALE_ISO_CODES.NL,
-      });
-      const { logger } = await import('@web/utils/logger/logger');
-      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+    it.each([
+      [
+        'the tenants row',
+        getTenantByIdMock,
         REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED,
-        { error },
-      );
-    });
+      ],
+      [
+        'its live languages',
+        selectTenantLiveLocalesMock,
+        REQUEST_CONTEXT_LOG.NOT_FOUND_LIVE_LOCALES_FAILED,
+      ],
+    ])(
+      'serves the entered language and logs when %s cannot be read',
+      async (_read, readMock, event) => {
+        readMock.mockRejectedValue(MOCK_ERROR);
+
+        await expect(
+          enterAndReadNotFound(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL),
+        ).resolves.toEqual({
+          tenantId: MOCK_TENANT_ID,
+          locale: LOCALE_ISO_CODES.NL,
+        });
+        const { logger } = await import('@web/utils/logger/logger');
+        expect(vi.mocked(logger.error)).toHaveBeenCalledWith(event, {
+          error: MOCK_ERROR,
+        });
+      },
+    );
 
     describe(NO_TENANT_ENTERED, () => {
       it.each([

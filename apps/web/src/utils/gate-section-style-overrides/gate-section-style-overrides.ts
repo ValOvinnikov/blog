@@ -1,6 +1,6 @@
-import type { TTenantPlan } from '@shinefold/config/constants';
 import { LOOK_FIELD, type TLookField } from '@shinefold/db/constants';
-import { isLookFieldEntitled } from '@shinefold/db/utils/effective-look/effective-look';
+import { isLookFieldWithin } from '@shinefold/db/utils/effective-look/effective-look';
+import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 import type { TModuleAppearance } from '@shinefold/service';
 
 export type TSectionStyleOverrides = Pick<
@@ -16,10 +16,10 @@ const OVERRIDE_LOOK_FIELD = {
 
 export const gateSectionStyleOverrides = (
   overrides: TSectionStyleOverrides,
-  plan: TTenantPlan,
+  entitlements: Pick<TTenantEntitlements, 'lookFields'>,
 ): TSectionStyleOverrides => {
   const isEntitled = (field: keyof TSectionStyleOverrides) =>
-    isLookFieldEntitled(OVERRIDE_LOOK_FIELD[field], plan);
+    isLookFieldWithin(OVERRIDE_LOOK_FIELD[field], entitlements);
 
   return {
     cardStyle: isEntitled('cardStyle') ? overrides.cardStyle : undefined,

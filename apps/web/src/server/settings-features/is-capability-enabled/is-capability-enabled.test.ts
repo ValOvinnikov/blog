@@ -2,14 +2,14 @@ import { faker } from '@faker-js/faker';
 import { CAPABILITY, type TCapability } from '@shinefold/config';
 import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
-import {
-  EFFECTIVE_FETCH_FAILED_EVENT,
-  PLAN_FETCH_FAILED_EVENT,
-} from '@web/constants/settings-features';
+import { SETTINGS_FEATURES_LOG } from '@web/constants/settings-features';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
-import { mockSettingsFeaturesRowEnabling } from '@web/testing/server/settings-features/fixtures';
+import {
+  mockEntitlementGrant,
+  mockSettingsFeaturesRowEnabling,
+} from '@web/testing/server/settings-features/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_OTHER_TENANT_ID,
@@ -33,6 +33,9 @@ vi.mock('@shinefold/db', async () => ({
   ...(await vi.importActual('@shinefold/db/constants')),
   queries: {
     tenants: { getTenantById: vi.fn() },
+    tenantEntitlementGrants: (
+      await import('@web/testing/server/settings-features/entitlement-grants-db')
+    ).tenantEntitlementGrants,
     settingsFeatures: { getSettingsFeatures: vi.fn() },
     siteConfig: { getSiteConfig: vi.fn() },
   },
@@ -80,6 +83,30 @@ describe(isCapabilityEnabled, () => {
     },
   );
 
+  describe('with a granted capability', () => {
+    beforeEach(() => {
+      vi.mocked(
+        queries.tenantEntitlementGrants.listEntitlementGrants,
+      ).mockResolvedValue([mockEntitlementGrant()]);
+    });
+
+    it('resolves true on a plan without it when its toggle is on', async () => {
+      arrangeTenant(TENANT_PLAN.FREE, [CAPABILITY.CONTACT_FORM]);
+
+      await expect(isCapabilityEnabled(CAPABILITY.CONTACT_FORM)).resolves.toBe(
+        true,
+      );
+    });
+
+    it('resolves false when its toggle is off', async () => {
+      arrangeTenant(TENANT_PLAN.FREE, []);
+
+      await expect(isCapabilityEnabled(CAPABILITY.CONTACT_FORM)).resolves.toBe(
+        false,
+      );
+    });
+  });
+
   it('resolves false when no tenant is resolved for either read', async () => {
     vi.mocked(getRequestTenantId)
       .mockResolvedValueOnce(undefined)
@@ -92,20 +119,26 @@ describe(isCapabilityEnabled, () => {
     getTenantByIdMock.mockRejectedValue(MOCK_ERROR);
 
     await expect(isCapabilityEnabled(CAPABILITY.COMMENTS)).resolves.toBe(false);
-    expect(logger.error).toHaveBeenCalledWith(PLAN_FETCH_FAILED_EVENT, {
-      capability: CAPABILITY.COMMENTS,
-      error: MOCK_ERROR,
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      SETTINGS_FEATURES_LOG.PLAN_FETCH_FAILED,
+      {
+        capability: CAPABILITY.COMMENTS,
+        error: MOCK_ERROR,
+      },
+    );
   });
 
   it('resolves false and logs when the effective features fetch fails', async () => {
     getSettingsFeaturesMock.mockRejectedValue(MOCK_ERROR);
 
     await expect(isCapabilityEnabled(CAPABILITY.COMMENTS)).resolves.toBe(false);
-    expect(logger.error).toHaveBeenCalledWith(EFFECTIVE_FETCH_FAILED_EVENT, {
-      capability: CAPABILITY.COMMENTS,
-      error: MOCK_ERROR,
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      SETTINGS_FEATURES_LOG.EFFECTIVE_FETCH_FAILED,
+      {
+        capability: CAPABILITY.COMMENTS,
+        error: MOCK_ERROR,
+      },
+    );
   });
 
   describe('tenant resolution', () => {

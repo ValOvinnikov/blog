@@ -56,6 +56,9 @@ vi.mock('@shinefold/db', async () => ({
       createPendingSubscriber: createPendingSubscriberMock,
     }),
     tenants: { getTenantById: getTenantByIdMock },
+    tenantEntitlementGrants: (
+      await import('@web/testing/server/settings-features/entitlement-grants-db')
+    ).tenantEntitlementGrants,
     settingsFeatures: { getSettingsFeatures: getSettingsFeaturesMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },

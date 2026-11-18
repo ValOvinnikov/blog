@@ -6,27 +6,22 @@ import {
 } from '@shinefold/config';
 import { CACHE_CONTROL } from '@web/constants/http';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import { selectTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { mockTenant } from '@web/testing/shared/tenant/fixtures';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
-import { NextRequest } from 'next/server';
+import { NextRequest, type NextResponse } from 'next/server';
 
 faker.seed(6009);
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const {
-  isPlatformFallbackAllowedMock,
-  selectLiveLocalesMock,
-  getTenantTranslationMapMock,
-} = vi.hoisted(() => ({
-  isPlatformFallbackAllowedMock: vi.fn(),
-  selectLiveLocalesMock: vi.fn(),
-  getTenantTranslationMapMock: vi.fn(),
-}));
+const { isPlatformFallbackAllowedMock, getTenantTranslationMapMock } =
+  vi.hoisted(() => ({
+    isPlatformFallbackAllowedMock: vi.fn(),
+    getTenantTranslationMapMock: vi.fn(),
+  }));
 
-vi.mock('@shinefold/db', () => ({
-  queries: { tenants: { selectLiveLocales: selectLiveLocalesMock } },
-}));
+vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales');
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
   isPlatformFallbackAllowed: isPlatformFallbackAllowedMock,
@@ -74,36 +69,39 @@ const switchTo = (to: string, from: string) =>
   );
 
 const serveTenant = (liveLocales: TLocaleIsoCode[]) => {
-  selectLiveLocalesMock.mockReturnValue(liveLocales);
+  vi.mocked(selectTenantLiveLocales).mockResolvedValue(liveLocales);
 };
 
 describe(GET, () => {
   beforeEach(() => {
     isPlatformFallbackAllowedMock.mockReset();
     isPlatformFallbackAllowedMock.mockReturnValue(false);
-    selectLiveLocalesMock.mockReset();
     getTenantTranslationMapMock.mockReset();
     getTenantTranslationMapMock.mockResolvedValue(translationMap);
     serveTenant([EN, NL, FR]);
   });
 
-  it("redirects to the current page's translation and remembers the language", async () => {
-    const response = await switchTo(NL, MOCK_PAGE_PATH);
+  describe('switching a translated page', () => {
+    let response: NextResponse;
 
-    expect(response.headers.get('location')).toBe(
-      `${MOCK_ORIGIN}/nl/${MOCK_TRANSLATED_SLUG}`,
-    );
-    expect(response.cookies.get(LANGUAGE_COOKIE_NAME)?.value).toBe(NL);
-    expect(getTenantTranslationMapMock).toHaveBeenCalledWith(tenant);
-  });
+    beforeEach(async () => {
+      response = await switchTo(NL, MOCK_PAGE_PATH);
+    });
 
-  it('forbids any cache from storing the redirect', async () => {
-    const response = await switchTo(NL, MOCK_PAGE_PATH);
+    it("redirects to the current page's translation and remembers the language", () => {
+      expect(response.headers.get('location')).toBe(
+        `${MOCK_ORIGIN}/nl/${MOCK_TRANSLATED_SLUG}`,
+      );
+      expect(response.cookies.get(LANGUAGE_COOKIE_NAME)?.value).toBe(NL);
+      expect(getTenantTranslationMapMock).toHaveBeenCalledWith(tenant);
+    });
 
-    expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
-    expect(response.headers.get('cache-control')).toBe(
-      CACHE_CONTROL.PRIVATE_NO_STORE,
-    );
+    it('forbids any cache from storing the redirect', () => {
+      expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
+      expect(response.headers.get('cache-control')).toBe(
+        CACHE_CONTROL.PRIVATE_NO_STORE,
+      );
+    });
   });
 
   it("redirects to the language's home page when the page has no translation", async () => {
