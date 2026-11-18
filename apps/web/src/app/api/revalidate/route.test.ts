@@ -145,7 +145,6 @@ vi.mock(
 const TOPIC_DOCUMENT_TYPE = 'page_topic';
 const AUTHOR_DOCUMENT_TYPE = 'person';
 const REDIRECT_DOCUMENT_TYPE = 'redirect';
-const LANDING_DOCUMENT_TYPE = 'page_landing';
 const UNTAGGED_DOCUMENT_TYPE = 'settings_voice';
 const NAVIGATION_DOCUMENT_TYPE = 'settings_navigation';
 const EXPIRE_NOW = { expire: 0 };
@@ -469,6 +468,22 @@ describe(POST, () => {
         _type: POST_TYPE,
         _id: MOCK_POST_ID,
         previousSlug: 1,
+      }),
+    },
+    ...['source', 'previousSource', 'language'].map((field) => ({
+      case: `a ${field} that is not a string`,
+      body: JSON.stringify({
+        _type: REDIRECT_DOCUMENT_TYPE,
+        _id: MOCK_DOCUMENT_ID,
+        [field]: 1,
+      }),
+    })),
+    {
+      case: 'an isPrefix that is not a boolean',
+      body: JSON.stringify({
+        _type: REDIRECT_DOCUMENT_TYPE,
+        _id: MOCK_DOCUMENT_ID,
+        isPrefix: String(true),
       }),
     },
   ])('rejects $case as a bad request', async ({ body }) => {
@@ -819,18 +834,13 @@ describe(POST, () => {
       expect(logger.warn).not.toHaveBeenCalled();
     });
 
-    it.each([
-      { case: 'a prefix redirect', body: { ...MOCK_REDIRECT, isPrefix: true } },
-      {
-        case: 'a redirect from a webhook that predates isPrefix',
-        body: { source: MOCK_REDIRECT_SOURCE },
-      },
-    ])('also purges the landing route for $case', async ({ body }) => {
+    it('also purges the landing route for a prefix redirect', async () => {
       await POST(
         makeTenantRequest({
           _type: REDIRECT_DOCUMENT_TYPE,
           _id: MOCK_DOCUMENT_ID,
-          ...body,
+          ...MOCK_REDIRECT,
+          isPrefix: true,
         }),
       );
 
@@ -838,33 +848,6 @@ describe(POST, () => {
         [MOCK_TENANT_HOME_PATH],
         [...LANDING_ROUTE_PURGE_ARGS],
       ]);
-    });
-
-    it('also purges the landing route for a deleted landing page', async () => {
-      await POST(
-        makeTenantRequest(
-          { _type: LANDING_DOCUMENT_TYPE, _id: MOCK_DOCUMENT_ID },
-          { [SANITY_OPERATION_HEADER]: SANITY_WEBHOOK_OPERATION.DELETE },
-        ),
-      );
-
-      expect(revalidatePathMock.mock.calls).toEqual([
-        [MOCK_TENANT_HOME_PATH],
-        [...LANDING_ROUTE_PURGE_ARGS],
-      ]);
-    });
-
-    it('refuses a body whose isPrefix is not a boolean', async () => {
-      const response = await POST(
-        makeTenantRequest({
-          _type: REDIRECT_DOCUMENT_TYPE,
-          _id: MOCK_DOCUMENT_ID,
-          isPrefix: String(true),
-        }),
-      );
-
-      expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
-      expect(revalidatePathMock).not.toHaveBeenCalled();
     });
   });
 

@@ -13,28 +13,25 @@ const [SOURCE, PREVIOUS_SOURCE] = faker.helpers.uniqueArray(
 ) as [string, string];
 
 describe(buildRedirectPaths, () => {
-  it('builds the source and the previous source in the redirect’s language', () => {
-    expect(
-      buildRedirectPaths(UPDATE, {
-        source: SOURCE,
-        previousSource: PREVIOUS_SOURCE,
-        language: LANGUAGE,
-      }),
-    ).toEqual([
-      { language: LANGUAGE, path: SOURCE },
-      { language: LANGUAGE, path: PREVIOUS_SOURCE },
-    ]);
-  });
-
-  it('builds only the source on a create', () => {
-    expect(
-      buildRedirectPaths(CREATE, {
-        source: SOURCE,
-        previousSource: null,
-        language: LANGUAGE,
-      }),
-    ).toEqual([{ language: LANGUAGE, path: SOURCE }]);
-  });
+  it.each([
+    {
+      operation: UPDATE,
+      previousSource: PREVIOUS_SOURCE,
+      paths: [SOURCE, PREVIOUS_SOURCE],
+    },
+    { operation: CREATE, previousSource: null, paths: [SOURCE] },
+  ])(
+    'builds the addresses of a $operation in the redirect’s language',
+    ({ operation, previousSource, paths }) => {
+      expect(
+        buildRedirectPaths(operation, {
+          source: SOURCE,
+          previousSource,
+          language: LANGUAGE,
+        }),
+      ).toEqual(paths.map((path) => ({ language: LANGUAGE, path })));
+    },
+  );
 
   it.each([
     {
@@ -61,15 +58,5 @@ describe(buildRedirectPaths, () => {
     expect(buildRedirectPaths(UPDATE, { source: SOURCE, language })).toEqual(
       [],
     );
-  });
-
-  it('builds nothing for a document that is not a redirect', () => {
-    expect(
-      buildRedirectPaths(UPDATE, {
-        source: null,
-        previousSource: null,
-        language: null,
-      }),
-    ).toEqual([]);
   });
 });

@@ -2461,13 +2461,18 @@ post no longer occupies, with no way to detect it). A renamed slug — of a
 post, topic, tag or privacy or legal document — reaches the webhook as
 `previousSlug`, and its old address (a topic's or tag's with its pagination)
 is purged in every live language of the publishing tenant; a renamed landing
-page is covered by its `redirect`, whose publish runs the whole-site purge. Every other tagged type, a post the lookup no longer finds and a
+page is covered by its `redirect`, whose publish purges that tenant's pages and the redirect's addresses. Every other tagged type, a post the lookup no longer finds and a
 Look, Voice or Features save purge every page the publishing tenant renders —
 the sitemap's page lists plus the index, legal and newsletter pages, the page
-after each listing's last, and the changed document's own path — so one
-tenant's change never expires another tenant's pages. A `delete` of any type
-but a post, a `redirect` and a `module_postList` change — whose stale paths no
-list holds — and an unresolved tenant or failed lookup fall back to a logged
+after each listing's last, and the changed document's own path. A `delete`, a
+`redirect` and a `module_postList` change purge that set too; a redirect adds
+its `source` and `previousSource` in its own language. A prefix redirect
+(`isPrefix` not `false`, so a webhook that predates the field counts) and a
+deleted landing page also purge the landing route by pattern, the one purge
+that reaches other tenants: it refreshes their landing pages, never their post,
+blog, topic or tag pages. A `module_postList` page-size change and a deleted
+topic's or tag's pagination can leave pages past the new last page cached for
+up to 24 hours. An unresolved tenant or a failed lookup falls back to a logged
 whole-site purge.
 
 The webhook also purges **by reverse lookup**. On every publish of a type that

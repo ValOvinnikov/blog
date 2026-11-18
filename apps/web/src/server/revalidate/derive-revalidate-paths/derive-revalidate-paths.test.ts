@@ -16,6 +16,8 @@ import { deriveRevalidatePaths, POST_TYPE } from './derive-revalidate-paths';
 
 faker.seed(7384);
 
+const { UPDATE, DELETE } = SANITY_WEBHOOK_OPERATION;
+
 vi.mock(
   '@web/server/revalidate/derive-post-publish-paths/derive-post-publish-paths',
   () => ({ derivePostPublishPaths: vi.fn() }),
@@ -44,7 +46,7 @@ const MOCK_POST_INPUT = {
   id: faker.string.uuid(),
   slug: MOCK_SLUG,
   previousSlug: undefined,
-  operation: SANITY_WEBHOOK_OPERATION.UPDATE,
+  operation: UPDATE,
   redirect: {},
 };
 
@@ -59,15 +61,23 @@ describe(deriveRevalidatePaths, () => {
   });
 
   it.each([
-    { type: 'settings_navigation', documentHref: undefined },
-    { type: 'module_heroBlog', documentHref: undefined },
-    { type: 'page_landing', documentHref: `/${MOCK_SLUG}` },
-    { type: 'blog_tag', documentHref: undefined },
-    { type: 'page_tag', documentHref: `/tags/${MOCK_SLUG}` },
+    { type: 'settings_navigation', operation: UPDATE, documentHref: undefined },
+    { type: 'module_heroBlog', operation: UPDATE, documentHref: undefined },
+    { type: 'page_landing', operation: UPDATE, documentHref: `/${MOCK_SLUG}` },
+    { type: 'blog_tag', operation: UPDATE, documentHref: undefined },
+    { type: 'page_tag', operation: UPDATE, documentHref: `/tags/${MOCK_SLUG}` },
+    { type: 'redirect', operation: UPDATE, documentHref: undefined },
+    { type: 'module_postList', operation: UPDATE, documentHref: undefined },
+    { type: 'page_landing', operation: DELETE, documentHref: `/${MOCK_SLUG}` },
+    { type: 'blog_tag', operation: DELETE, documentHref: undefined },
   ])(
-    'resolves every page of the tenant for a $type change',
-    async ({ type, documentHref }) => {
-      const result = await deriveRevalidatePaths({ ...MOCK_POST_INPUT, type });
+    'resolves every page of the tenant for a $type $operation',
+    async ({ type, operation, documentHref }) => {
+      const result = await deriveRevalidatePaths({
+        ...MOCK_POST_INPUT,
+        type,
+        operation,
+      });
 
       expect(result).toEqual(okResult(MOCK_SITE_PATHS));
       expect(deriveTenantSitePaths).toHaveBeenCalledWith({
@@ -142,25 +152,6 @@ describe(deriveRevalidatePaths, () => {
     expect(deriveTenantSitePaths).not.toHaveBeenCalled();
   });
 
-  it.each([
-    { type: 'redirect', operation: SANITY_WEBHOOK_OPERATION.UPDATE },
-    { type: 'module_postList', operation: SANITY_WEBHOOK_OPERATION.UPDATE },
-    { type: 'page_landing', operation: SANITY_WEBHOOK_OPERATION.DELETE },
-    { type: 'blog_tag', operation: SANITY_WEBHOOK_OPERATION.DELETE },
-  ])(
-    'resolves every page of the tenant for a $type $operation',
-    async ({ type, operation }) => {
-      const result = await deriveRevalidatePaths({
-        ...MOCK_POST_INPUT,
-        type,
-        operation,
-      });
-
-      expect(result).toEqual(okResult(MOCK_SITE_PATHS));
-      expect(deriveTenantSitePaths).toHaveBeenCalledOnce();
-    },
-  );
-
   it('hands a redirect’s addresses in its language to the tenant page derivation', async () => {
     await deriveRevalidatePaths({
       ...MOCK_POST_INPUT,
@@ -212,7 +203,7 @@ describe(deriveRevalidatePaths, () => {
     it('still resolves the tenant’s pages on a delete', async () => {
       const result = await deriveRevalidatePaths({
         ...MOCK_POST_INPUT,
-        operation: SANITY_WEBHOOK_OPERATION.DELETE,
+        operation: DELETE,
       });
 
       expect(result).toEqual(okResult(MOCK_SITE_PATHS));
