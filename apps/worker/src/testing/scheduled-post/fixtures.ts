@@ -9,3 +9,6 @@ export const MOCK_PUBLISHED_AT = publishedAt.toISOString();
 export const MOCK_LATER_PUBLISHED_AT = mockFaker.date
   .soon({ refDate: publishedAt })
   .toISOString();
+export const MOCK_EARLIER_PUBLISHED_AT = mockFaker.date
+  .recent({ refDate: MOCK_NOW })
+  .toISOString();

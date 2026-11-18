@@ -1,12 +1,13 @@
 import { getTenantSanityCredentials } from '@shinefold/db/queries/tenants';
-import { SCHEDULED_POST_STATE } from '@worker/constants/scheduled-post-purge';
+import { SCHEDULED_POST_STATE } from '@worker/constants/scheduled-post';
 import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
-import { readPostPublishedAt } from '@worker/utils/scheduled-post-purge/read-post-published-at';
+import { readPostPublishedAt } from '@worker/utils/scheduled-post/read-post-published-at';
 
 export type TScheduledPostCheck =
   | { state: typeof SCHEDULED_POST_STATE.DUE }
   | { state: typeof SCHEDULED_POST_STATE.SCHEDULED; waitMs: number }
-  | { state: typeof SCHEDULED_POST_STATE.STALE };
+  | { state: typeof SCHEDULED_POST_STATE.STALE }
+  | { state: typeof SCHEDULED_POST_STATE.REDATED; publishedAt: string };
 
 const STALE: TScheduledPostCheck = { state: SCHEDULED_POST_STATE.STALE };
 
@@ -22,8 +23,14 @@ export async function checkScheduledPost(
 
   const currentPublishedAt = await readPostPublishedAt(credentials, postId);
   const publishAtMs = Date.parse(publishedAt);
-  if (!currentPublishedAt || Date.parse(currentPublishedAt) !== publishAtMs) {
+  if (!currentPublishedAt || Number.isNaN(Date.parse(currentPublishedAt))) {
     return STALE;
+  }
+  if (Date.parse(currentPublishedAt) !== publishAtMs) {
+    return {
+      state: SCHEDULED_POST_STATE.REDATED,
+      publishedAt: currentPublishedAt,
+    };
   }
 
   const waitMs = publishAtMs - Date.now();
