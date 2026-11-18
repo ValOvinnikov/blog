@@ -134,6 +134,19 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     });
   });
 
+  it('shows the consent banner on and locked while a Google Analytics id is stored', async () => {
+    getStoredTenantAnalyticsMock.mockResolvedValueOnce(MOCK_GOOGLE_ANALYTICS);
+
+    await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.STARTER }) });
+
+    const consentSwitch = screen.getByRole('switch', {
+      name: toggleLabel[CAPABILITY.CONSENT_BANNER],
+    });
+
+    expect(consentSwitch).toBeChecked();
+    expect(consentSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+  });
+
   it('lets a Starter owner edit the analytics id', async () => {
     await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.STARTER }) });
 

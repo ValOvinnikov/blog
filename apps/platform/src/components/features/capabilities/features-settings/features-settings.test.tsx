@@ -1,4 +1,7 @@
-import { ANALYTICS_FIELD_ERROR } from '@platform/constants/settings-features';
+import {
+  ANALYTICS_FIELD_ERROR,
+  FEATURES_FIELD_ERROR,
+} from '@platform/constants/settings-features';
 import messages from '@platform/i18n/messages/en.json';
 import { updateAnalyticsAction } from '@platform/server/settings-features/update-analytics-action';
 import {
@@ -84,6 +87,8 @@ const {
   analyticsProviderOption,
   analyticsIdLabel,
   analyticsIdInvalid,
+  consentBannerRequiredNote,
+  consentBannerRequiredError,
 } = messages.featuresSettings;
 
 const READER_ACCOUNTS_LABEL = toggleLabel[CAPABILITY.READER_ACCOUNTS];
@@ -555,6 +560,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     const SITE_DOMAIN_LABEL = analyticsIdLabel[ANALYTICS_PROVIDER.PLAUSIBLE];
     const MOCK_SAVED_ANALYTICS_VALUES = mockFeaturesFormValues({
       ...MOCK_INITIAL_FEATURES,
+      consentBannerEnabled: true,
       analyticsProvider: MOCK_GOOGLE_ANALYTICS.provider,
       analyticsId: MOCK_GOOGLE_ANALYTICS.analyticsId,
     });
@@ -687,6 +693,91 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
         expect(message).not.toBeInTheDocument();
       });
+    });
+
+    describe('with a Google Analytics id saved', () => {
+      let consentSwitch: HTMLElement;
+
+      beforeEach(() => {
+        setup({ initialValues: MOCK_SAVED_ANALYTICS_VALUES });
+        consentSwitch = screen.getByRole('switch', {
+          name: CONSENT_BANNER_LABEL,
+        });
+      });
+
+      it('locks the consent banner on, with the reason', () => {
+        const note = screen.getByText(consentBannerRequiredNote);
+
+        expect(consentSwitch).toBeChecked();
+        expect(consentSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(note).toBeVisible();
+      });
+
+      it('unlocks the consent banner once Plausible is picked', async () => {
+        const plausibleOption = screen.getByRole('button', {
+          name: PLAUSIBLE_OPTION,
+        });
+
+        await user.click(plausibleOption);
+        const note = screen.queryByText(consentBannerRequiredNote);
+
+        expect(consentSwitch).not.toHaveAttribute(ARIA_DISABLED);
+        expect(note).not.toBeInTheDocument();
+      });
+
+      it('lets the consent banner be switched off once the id is cleared', async () => {
+        const idField = screen.getByRole('textbox', {
+          name: MEASUREMENT_ID_LABEL,
+        });
+
+        await user.clear(idField);
+        await user.click(consentSwitch);
+
+        expect(consentSwitch).not.toBeChecked();
+      });
+    });
+
+    it('switches the consent banner on for a typed Google Analytics id', async () => {
+      setup();
+      const idField = screen.getByRole('textbox', {
+        name: MEASUREMENT_ID_LABEL,
+      });
+      const consentSwitch = screen.getByRole('switch', {
+        name: CONSENT_BANNER_LABEL,
+      });
+
+      await user.type(idField, MOCK_GOOGLE_ANALYTICS.analyticsId);
+      await saveChanges();
+      await screen.findByText(alertSuccess);
+
+      expect(consentSwitch).toBeChecked();
+      expect(updateFeaturesActionMock).not.toHaveBeenCalled();
+    });
+
+    it('explains a refused consent banner switch-off', async () => {
+      updateFeaturesActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: {
+          consentBannerEnabled: {
+            reason: FEATURES_FIELD_ERROR.CONSENT_BANNER_REQUIRED,
+          },
+        },
+      });
+      setup({
+        initialValues: mockFeaturesFormValues({
+          ...MOCK_INITIAL_FEATURES,
+          consentBannerEnabled: true,
+        }),
+      });
+      const consentSwitch = screen.getByRole('switch', {
+        name: CONSENT_BANNER_LABEL,
+      });
+
+      await user.click(consentSwitch);
+      await saveChanges();
+      const message = await screen.findByText(consentBannerRequiredError);
+
+      expect(message).toBeVisible();
     });
 
     describe('on a plan without its own analytics', () => {

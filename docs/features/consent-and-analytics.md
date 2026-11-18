@@ -27,6 +27,7 @@ code:
   - apps/web/src/config/analytics-origins.ts
   - apps/web/src/utils/is-web-analytics-enabled/**
   - apps/platform/src/server/settings-features/update-analytics-action.ts
+  - apps/platform/src/server/settings-features/turn-consent-banner-on.ts
   - apps/platform/src/utils/analytics-draft/**
   - apps/platform/src/components/features/capabilities/**
 epics: [3774, 3726, 5037, 5029, 7149]
@@ -61,7 +62,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 
 ## Configuration
 
-- **Owner or operator (platform Features)** — `CONSENT_BANNER` (in every plan, preset default off), and the Analytics row: a choice of Google Analytics or Plausible and the measurement id or site domain, on `STARTER` and `GROWTH`. On `FREE` the row is locked with a Starter badge and shows a kept id read-only, and the provider choice greys its text like the Look page's locked controls. On an archived site the provider choice is disabled with the archived fade instead, never plan-locked. `updateAnalyticsAction` saves it with the rest of the page and, like every settings save, calls `requireTenantManager`, so an editor is refused: a blank id clears it, setting one on a plan without `hasOwnAnalytics` is refused as not in the plan (clearing is not), and an id `saveTenantAnalyticsInputSchema` rejects returns `ANALYTICS_FIELD_ERROR.ID_INVALID`, which the form words with an example of the chosen provider's format. A save revalidates the site config and records a `SETTINGS_UPDATED` audit event. The stored `ANALYTICS` toggle is no longer shown and no longer read by the site; it keeps its stored value.
+- **Owner or operator (platform Features)** — `CONSENT_BANNER` (in every plan, preset default off), and the Analytics row: a choice of Google Analytics or Plausible and the measurement id or site domain, on `STARTER` and `GROWTH`. On `FREE` the row is locked with a Starter badge and shows a kept id read-only, and the provider choice greys its text like the Look page's locked controls. On an archived site the provider choice is disabled with the archived fade instead, never plan-locked. `updateAnalyticsAction` saves it with the rest of the page and, like every settings save, calls `requireTenantManager`, so an editor is refused: a blank id clears it, setting one on a plan without `hasOwnAnalytics` is refused as not in the plan (clearing is not), and an id `saveTenantAnalyticsInputSchema` rejects returns `ANALYTICS_FIELD_ERROR.ID_INVALID`, which the form words with an example of the chosen provider's format. A save revalidates the site config and records a `SETTINGS_UPDATED` audit event. Google Analytics loads only after consent, so a Google Analytics id keeps the banner on (decided, owner, 2026-11-18): saving one also turns `CONSENT_BANNER` on (`turnConsentBannerOn`), and while one is stored, or typed into the form (`hasGoogleAnalyticsId`), the banner switch shows on and locked with `featuresSettings.consentBannerRequiredNote`. `updateFeaturesAction` refuses switching it off then with `FEATURES_FIELD_ERROR.CONSENT_BANNER_REQUIRED`, worded under the switch, and writes nothing; clearing the id or switching to Plausible unlocks it. The stored `ANALYTICS` toggle is no longer shown and no longer read by the site; it keeps its stored value.
 - **Operator (env)** — `WEB_ANALYTICS_ENABLED=true` loads Vercel Web Analytics and Speed Insights on every site, for the operator; it follows no tenant capability and does not affect the owner's tool.
 - **Content security policy** — `script-src` and `connect-src` allow Plausible (`https://plausible.io`) and Google's documented GA4 sources (`*.googletagmanager.com`, `*.google-analytics.com`, `*.analytics.google.com`, the first two also in `img-src`), from `apps/web/src/config/analytics-origins.ts`.
 - **Voice** — none; banner, dialog, module, footer-link and embed-placeholder copy are fixed keys (`consent.*`), the Analytics category's name and description included (`consent.categories.analytics.*`; decided, owner, 2026-11-17: fixed for now). The placeholder's allow label and scope note are `consent.placeholder.allowLabel` and `consent.placeholder.scopeNote`; its settings action reuses `consent.footerSettingsLabel`.
@@ -92,7 +93,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 
 - `apps/web/src/utils/consent-cookie/consent-cookie.ts` — `encodeConsent`, `decodeConsent`
 - `packages/db/src/queries/tenant-analytics/` — `getTenantAnalytics`, `getStoredTenantAnalytics`, `saveTenantAnalytics`, `clearTenantAnalytics`
-- `apps/platform/src/server/settings-features/update-analytics-action.ts`
+- `apps/platform/src/server/settings-features/update-analytics-action.ts`, `turn-consent-banner-on.ts`, `update-features-action.ts`
 - `apps/platform/src/components/features/capabilities/features-settings/components/analytics-setting-row/analytics-setting-row.tsx`
 - `apps/web/src/hooks/use-consent-store/use-consent-store.ts`
 - `apps/web/src/hooks/use-consent/use-consent.ts`
@@ -113,7 +114,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 
 - `apps/web/src/utils/consent-cookie/consent-cookie.test.ts`, `use-consent.test.tsx`, `use-consent-store.test.tsx`, `consent-gate.test.tsx`, `consent-preferences-provider.test.tsx`, `consent-banner-slot.test.tsx`, `consent-preferences-dialog.test.tsx`, `cookie-settings-form.test.tsx`, `cookie-settings-module.test.tsx`, `cookie-settings-button.test.tsx`, `floating-cookie-settings-button.test.tsx`, `site-analytics.test.tsx`, `google-analytics.test.tsx`, `get-site-analytics.test.ts`, `cookie-list.test.tsx`, `is-web-analytics-enabled.test.ts`.
 - `packages/db/src/queries/tenant-analytics/**/*.test.ts`.
-- `apps/platform/src/server/settings-features/update-analytics-action.test.ts`, `features-settings.test.tsx`, `features-page-content.test.tsx`.
+- `apps/platform/src/server/settings-features/update-analytics-action.test.ts`, `update-features-action.test.ts`, `features-settings.test.tsx`, `features-page-content.test.tsx`.
 - `packages/ui/src/components/molecules/consent-*/**/*.test.tsx`.
 - Stories: `consent-banner.stories.tsx`, `consent-preferences.stories.tsx`, `consent-placeholder.stories.tsx` (ui); `cookie-settings-module-view.stories.tsx` (web).
 
@@ -129,3 +130,4 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - #7151 — the owner enters their analytics id in place of the Analytics switch (epic #7149).
 - #7152 — the site loads the owner's analytics tool, Google Analytics only after consent (epic #7149).
 - #6743 — owners choose the footer link, the floating button or both; with the banner off neither shows.
+- #7570 — the consent banner stays on while a Google Analytics id is saved (epic #7149).

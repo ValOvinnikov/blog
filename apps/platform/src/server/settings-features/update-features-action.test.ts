@@ -1,6 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
-import { SETTINGS_FEATURES_LOG } from '@platform/constants/settings-features';
+import {
+  FEATURES_FIELD_ERROR,
+  SETTINGS_FEATURES_LOG,
+} from '@platform/constants/settings-features';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -32,6 +35,10 @@ import {
 } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { PLAN_REGISTRY } from '@shinefold/db/constants';
+import {
+  MOCK_GOOGLE_ANALYTICS,
+  MOCK_PLAUSIBLE_ANALYTICS,
+} from '@shinefold/db/testing/tenant-analytics/fixtures';
 import type { Session } from 'next-auth';
 
 import {
@@ -45,10 +52,12 @@ const {
   upsertSettingsFeaturesMock,
   insertAuditEventMock,
   getSettingsFeaturesOrDefaultsMock,
+  getStoredTenantAnalyticsMock,
 } = vi.hoisted(() => ({
   upsertSettingsFeaturesMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
   getSettingsFeaturesOrDefaultsMock: vi.fn(),
+  getStoredTenantAnalyticsMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/require-tenant-membership');
@@ -66,6 +75,7 @@ vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     settingsFeatures: { upsertSettingsFeatures: upsertSettingsFeaturesMock },
+    tenantAnalytics: { getStoredTenantAnalytics: getStoredTenantAnalyticsMock },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
 }));
@@ -127,6 +137,8 @@ describe(updateFeaturesAction, () => {
       values: ALL_OFF,
       savedAt: undefined,
     });
+    getStoredTenantAnalyticsMock.mockReset();
+    getStoredTenantAnalyticsMock.mockResolvedValue(undefined);
   });
 
   it('re-resolves the tenant from the session before writing', async () => {
@@ -370,6 +382,45 @@ describe(updateFeaturesAction, () => {
       );
     },
   );
+
+  describe('while a Google Analytics id is stored', () => {
+    beforeEach(() => {
+      getStoredTenantAnalyticsMock.mockResolvedValue(MOCK_GOOGLE_ANALYTICS);
+    });
+
+    it('refuses switching the consent banner off, and writes nothing', async () => {
+      const result = await updateFeaturesAction(MOCK_TENANT_ID, ALL_OFF);
+
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: {
+          consentBannerEnabled: {
+            reason: FEATURES_FIELD_ERROR.CONSENT_BANNER_REQUIRED,
+          },
+        },
+      });
+      expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
+      expect(revalidateSiteConfig).not.toHaveBeenCalled();
+    });
+
+    it('saves with the consent banner on', async () => {
+      const result = await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    });
+  });
+
+  it('lets the consent banner be switched off while a Plausible domain is stored', async () => {
+    getStoredTenantAnalyticsMock.mockResolvedValue(MOCK_PLAUSIBLE_ANALYTICS);
+
+    const result = await updateFeaturesAction(MOCK_TENANT_ID, ALL_OFF);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      ALL_OFF,
+    );
+  });
 
   it('reports a server error when reading the stored toggles fails', async () => {
     getSettingsFeaturesOrDefaultsMock.mockRejectedValue(

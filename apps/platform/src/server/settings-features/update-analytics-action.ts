@@ -7,7 +7,9 @@ import {
 } from '@platform/constants/settings-features';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
+import { turnConsentBannerOn } from '@platform/server/settings-features/turn-consent-banner-on';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { hasGoogleAnalyticsId } from '@platform/utils/analytics-draft/analytics-draft';
 import { blankToNull } from '@platform/utils/blank-to-null/blank-to-null';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
@@ -41,10 +43,16 @@ export type TUpdateAnalyticsResult =
     >
   | TNotInPlanRefusal;
 
-const writeAnalytics = (tenantId: string, input: TUpdateAnalyticsInput) => {
+const writeAnalytics = async (
+  tenantId: string,
+  input: TUpdateAnalyticsInput,
+) => {
   const analyticsId = blankToNull(input.analyticsId);
   if (isNull(analyticsId)) {
     return queries.tenantAnalytics.clearTenantAnalytics(tenantId);
+  }
+  if (hasGoogleAnalyticsId(input)) {
+    await turnConsentBannerOn(tenantId);
   }
   return queries.tenantAnalytics.saveTenantAnalytics(tenantId, {
     provider: input.analyticsProvider,
@@ -52,7 +60,7 @@ const writeAnalytics = (tenantId: string, input: TUpdateAnalyticsInput) => {
   });
 };
 
-/** A blank id clears the stored one; setting an id needs the plan's own-analytics entitlement, while clearing never does. */
+/** A blank id clears the stored one, setting an id needs the plan's own-analytics entitlement while clearing never does, and a Google Analytics id also turns the consent banner on. */
 export const updateAnalyticsAction = async (
   tenantId: string,
   input: TUpdateAnalyticsInput,

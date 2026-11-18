@@ -1,11 +1,19 @@
 'use server';
 
 import type { TSettingsRefusal } from '@platform/constants/settings';
-import { SETTINGS_FEATURES_LOG } from '@platform/constants/settings-features';
+import {
+  FEATURES_FIELD_ERROR,
+  SETTINGS_FEATURES_LOG,
+  type TFeaturesFieldErrorReason,
+} from '@platform/constants/settings-features';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import {
+  hasGoogleAnalyticsId,
+  toAnalyticsDraft,
+} from '@platform/utils/analytics-draft/analytics-draft';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { blockSwitchOnWhileParentOff } from '@platform/utils/parent-toggle/parent-toggle';
@@ -45,12 +53,12 @@ export type TUpdateFeaturesResult =
   | TActionResult<
       typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
       keyof TUpdateFeaturesInput,
-      never,
+      TFeaturesFieldErrorReason,
       TSettingsRefusal
     >
   | TNotInPlanRefusal;
 
-/** Writes "Coming soon" capabilities off, keeps out-of-plan toggles at their stored value but refuses switching one on, and lets a toggle under an off parent be switched off, never on. */
+/** Writes "Coming soon" capabilities off, keeps out-of-plan toggles at their stored value but refuses switching one on, lets a toggle under an off parent be switched off but never on, and refuses the consent banner off while a Google Analytics id is stored. */
 export const updateFeaturesAction = async (
   tenantId: string,
   input: TUpdateFeaturesInput,
@@ -66,7 +74,25 @@ export const updateFeaturesAction = async (
   const entitled = PLAN_REGISTRY[tenant.plan];
 
   try {
-    const { values: stored } = await getSettingsFeaturesOrDefaults(tenant.id);
+    const [{ values: stored }, storedAnalytics] = await Promise.all([
+      getSettingsFeaturesOrDefaults(tenant.id),
+      queries.tenantAnalytics.getStoredTenantAnalytics(tenant.id),
+    ]);
+
+    if (
+      !values.consentBannerEnabled &&
+      hasGoogleAnalyticsId(toAnalyticsDraft(storedAnalytics))
+    ) {
+      return {
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: {
+          consentBannerEnabled: {
+            reason: FEATURES_FIELD_ERROR.CONSENT_BANNER_REQUIRED,
+          },
+        },
+      };
+    }
+
     const outOfPlan = listSwitchedOnOutOfPlan(values, stored, entitled);
 
     if (hasArrayGotItems(outOfPlan)) {

@@ -18,6 +18,7 @@ import {
   mockOperatorMembershipContext,
 } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { mockSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import {
@@ -48,11 +49,15 @@ faker.seed(7151);
 const {
   saveTenantAnalyticsMock,
   clearTenantAnalyticsMock,
+  upsertSettingsFeaturesMock,
   insertAuditEventMock,
+  getSettingsFeaturesOrDefaultsMock,
 } = vi.hoisted(() => ({
   saveTenantAnalyticsMock: vi.fn(),
   clearTenantAnalyticsMock: vi.fn(),
+  upsertSettingsFeaturesMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
+  getSettingsFeaturesOrDefaultsMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/require-tenant-membership');
@@ -62,6 +67,11 @@ vi.mock('@platform/server/auth/auth');
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@shinefold/db/client', () => ({ getDb: vi.fn() }));
+
+vi.mock(
+  '@platform/server/settings-features/settings-features-or-defaults',
+  () => ({ getSettingsFeaturesOrDefaults: getSettingsFeaturesOrDefaultsMock }),
+);
 
 vi.mock('@shinefold/db', async () => {
   const { saveTenantAnalyticsInputSchema } =
@@ -75,6 +85,7 @@ vi.mock('@shinefold/db', async () => {
         clearTenantAnalytics: clearTenantAnalyticsMock,
         saveTenantAnalyticsInputSchema,
       },
+      settingsFeatures: { upsertSettingsFeatures: upsertSettingsFeaturesMock },
       auditEvents: { insertAuditEvent: insertAuditEventMock },
     },
   };
@@ -99,6 +110,10 @@ const MOCK_ID_INVALID_RESULT = {
   fieldErrors: { analyticsId: { reason: ANALYTICS_FIELD_ERROR.ID_INVALID } },
 };
 
+const BANNER_OFF_FEATURES = mockSettingsFeaturesValues({
+  contactFormEnabled: true,
+});
+
 const arrangeTenantPlan = (plan: TTenantPlan) => {
   vi.mocked(requireTenantMembership).mockResolvedValueOnce(
     mockMembershipContext(
@@ -112,6 +127,10 @@ describe(updateAnalyticsAction, () => {
   beforeEach(() => {
     authMock.mockResolvedValue({
       user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
+    });
+    getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
+      values: BANNER_OFF_FEATURES,
+      savedAt: undefined,
     });
   });
 
@@ -196,6 +215,55 @@ describe(updateAnalyticsAction, () => {
         expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
       );
       expect(revalidateSiteConfig).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('the consent banner', () => {
+    beforeEach(() => {
+      arrangeTenantPlan(TENANT_PLAN.GROWTH);
+    });
+
+    it('is switched on with a Google Analytics id, keeping the other toggles', async () => {
+      await updateAnalyticsAction(MOCK_TENANT_ID, GOOGLE_ANALYTICS_INPUT);
+
+      expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+        ...BANNER_OFF_FEATURES,
+        consentBannerEnabled: true,
+      });
+    });
+
+    it('is left as it is when already on', async () => {
+      getSettingsFeaturesOrDefaultsMock.mockResolvedValueOnce({
+        values: { ...BANNER_OFF_FEATURES, consentBannerEnabled: true },
+        savedAt: undefined,
+      });
+
+      await updateAnalyticsAction(MOCK_TENANT_ID, GOOGLE_ANALYTICS_INPUT);
+
+      expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ['a Plausible domain', PLAUSIBLE_INPUT],
+      ['a cleared id', CLEARED_INPUT],
+    ])('is left alone for %s', async (_, input) => {
+      await updateAnalyticsAction(MOCK_TENANT_ID, input);
+
+      expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
+    });
+
+    it('leaves the id unsaved when switching it on fails', async () => {
+      upsertSettingsFeaturesMock.mockRejectedValueOnce(
+        new Error(faker.lorem.words(3)),
+      );
+
+      const result = await updateAnalyticsAction(
+        MOCK_TENANT_ID,
+        GOOGLE_ANALYTICS_INPUT,
+      );
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(saveTenantAnalyticsMock).not.toHaveBeenCalled();
     });
   });
 

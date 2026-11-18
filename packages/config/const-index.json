@@ -8610,6 +8610,14 @@
         "file": "apps/platform/src/constants/settings-features.ts"
       }
     ],
+    "CONSENT_BANNER_REQUIRED": [
+      {
+        "ref": "FEATURES_FIELD_ERROR.CONSENT_BANNER_REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-features",
+        "file": "apps/platform/src/constants/settings-features.ts"
+      }
+    ],
     "NOT_IN_PLAN": [
       {
         "ref": "SETTINGS_REFUSAL.NOT_IN_PLAN",

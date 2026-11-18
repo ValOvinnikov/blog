@@ -15,6 +15,7 @@ faker.seed(5995);
 const MOCK_LABEL = faker.lorem.words(2);
 const MOCK_DESCRIPTION = faker.lorem.sentence();
 const MOCK_LOCKED_REASON = faker.lorem.sentence();
+const MOCK_ERROR = faker.lorem.sentence();
 const MOCK_CONTROL_LABEL = faker.lorem.word();
 const MOCK_ARCHIVED_NOTICE_ID = faker.string.alpha(8);
 const MOCK_ARCHIVED_NOTICE = faker.lorem.sentence();
@@ -43,20 +44,30 @@ describe(`<${SettingRow.name}/>`, () => {
     expect(control).toBeVisible();
   });
 
-  it('shows the locked reason when locked', () => {
-    setup({ isLocked: true, lockedReason: MOCK_LOCKED_REASON });
+  it('shows the error it is given', () => {
+    setup({ error: MOCK_ERROR });
 
-    const lockedReason = screen.getByText(MOCK_LOCKED_REASON);
+    const error = screen.getByText(MOCK_ERROR);
 
-    expect(lockedReason).toBeVisible();
+    expect(error).toBeVisible();
   });
 
-  it('shows a decorative lock icon beside the locked reason', () => {
-    setup({ isLocked: true, lockedReason: MOCK_LOCKED_REASON });
+  describe('when locked with a reason', () => {
+    beforeEach(() => {
+      setup({ isLocked: true, lockedReason: MOCK_LOCKED_REASON });
+    });
 
-    const lockIcon = screen.getByTestId(ICON_TEST_ID);
+    it('shows the locked reason', () => {
+      const lockedReason = screen.getByText(MOCK_LOCKED_REASON);
 
-    expect(lockIcon).toHaveAttribute(ARIA_HIDDEN, 'true');
+      expect(lockedReason).toBeVisible();
+    });
+
+    it('shows a decorative lock icon beside the locked reason', () => {
+      const lockIcon = screen.getByTestId(ICON_TEST_ID);
+
+      expect(lockIcon).toHaveAttribute(ARIA_HIDDEN, 'true');
+    });
   });
 
   it('omits the locked reason when not locked, even if one is passed', () => {
