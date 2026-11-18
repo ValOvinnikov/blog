@@ -147,7 +147,7 @@ describe(runDowngradeGraceSweep, () => {
       emailDue(GRACE_EMAIL.STARTED, [inGraceFor(0)]);
     });
 
-    it('tells the owner the site is on Free and links the plan comparison, even when nothing will lock', async () => {
+    it('says the site is on Free and links the plans, even with nothing to lock', async () => {
       await sweep();
 
       const [email] = sentEmails();
