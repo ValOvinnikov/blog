@@ -1722,6 +1722,8 @@
     "alertSuccess": "Funktionen gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "planLockedBadge": "{plan, select, FREE {Free-Tarif} STARTER {Starter-Tarif} other {Growth-Tarif}}",
+    "consentBannerRequiredNote": "Für Google Analytics nötig, das Besucher um Zustimmung bittet.",
+    "consentBannerRequiredError": "Google Analytics ist eingerichtet, daher muss das Cookie-Einwilligungsbanner aktiv bleiben. Entfernen Sie zuerst die Mess-ID oder wechseln Sie zu Plausible.",
     "comingSoonBadge": "Demnächst",
     "switchOn": "An",
     "switchOff": "Aus",

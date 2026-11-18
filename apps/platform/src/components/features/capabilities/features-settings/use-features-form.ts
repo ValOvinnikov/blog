@@ -1,7 +1,10 @@
 'use client';
 
 import { useSettingsForm } from '@platform/components/shared/settings-form-shell';
-import type { TAnalyticsFieldErrorReason } from '@platform/constants/settings-features';
+import type {
+  TAnalyticsFieldErrorReason,
+  TFeaturesFieldErrorReason,
+} from '@platform/constants/settings-features';
 import { useToast } from '@platform/context/toast-provider';
 import {
   updateAnalyticsAction,
@@ -14,9 +17,10 @@ import {
 import {
   countAnalyticsChanges,
   splitFeaturesFormValues,
+  withConsentBannerForGoogleAnalytics,
   type TFeaturesFormValues,
 } from '@platform/utils/analytics-draft/analytics-draft';
-import { CAPABILITY_TOGGLES } from '@platform/utils/settings-features-fields/settings-features-fields';
+import { countToggleChanges } from '@platform/utils/settings-features-fields/settings-features-fields';
 import {
   ACTION_OUTCOME,
   isOutcomeInvalid,
@@ -38,13 +42,6 @@ type TUseFeaturesFormArgs = {
   analyticsIdFieldId: string;
 };
 
-const countToggleChanges = (
-  values: TFeaturesFormValues,
-  savedValues: TFeaturesFormValues,
-): number =>
-  CAPABILITY_TOGGLES.filter(({ field }) => values[field] !== savedValues[field])
-    .length;
-
 const countChanges = (
   values: TFeaturesFormValues,
   savedValues: TFeaturesFormValues,
@@ -65,6 +62,14 @@ export const useFeaturesForm = ({
   const [analyticsFieldErrors, setAnalyticsFieldErrors] = useState<
     TFieldErrors<'analyticsId', TAnalyticsFieldErrorReason>
   >({});
+  const [featuresFieldErrors, setFeaturesFieldErrors] = useState<
+    TFieldErrors<'consentBannerEnabled', TFeaturesFieldErrorReason>
+  >({});
+
+  const clearFieldErrors = () => {
+    setAnalyticsFieldErrors({});
+    setFeaturesFieldErrors({});
+  };
 
   const settings = useSettingsForm<
     TFeaturesFormValues,
@@ -75,7 +80,7 @@ export const useFeaturesForm = ({
     invalidControls: () => ({
       ids: analyticsFieldErrors.analyticsId ? [analyticsIdFieldId] : [],
     }),
-    onDiscard: () => setAnalyticsFieldErrors({}),
+    onDiscard: clearFieldErrors,
     onSubmit: async (values) => {
       const { savedValues, setSavedValues } = settings;
       const { features, analytics } = splitFeaturesFormValues(values);
@@ -87,11 +92,14 @@ export const useFeaturesForm = ({
           isOutcomeInvalid(result) ? result.fieldErrors : {},
         );
         if (!isOutcomeSuccess(result)) return result;
-        saved = { ...saved, ...analytics };
+        saved = withConsentBannerForGoogleAnalytics({ ...saved, ...analytics });
       }
 
-      if (countToggleChanges(values, savedValues) > 0) {
+      if (countToggleChanges(values, saved) > 0) {
         const result = await updateFeaturesAction(tenantId, features);
+        setFeaturesFieldErrors(
+          isOutcomeInvalid(result) ? result.fieldErrors : {},
+        );
         if (!isOutcomeSuccess(result)) {
           setSavedValues(saved);
           return result;
@@ -116,6 +124,7 @@ export const useFeaturesForm = ({
   return {
     ...settings,
     analyticsFieldErrors,
-    clearAnalyticsFieldErrors: () => setAnalyticsFieldErrors({}),
+    featuresFieldErrors,
+    clearFieldErrors,
   };
 };

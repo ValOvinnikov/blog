@@ -12,6 +12,8 @@ export type TCapabilityToggleRowProps = {
   isChecked: boolean;
   isDisabled: boolean;
   isArchived: boolean;
+  requiredReason?: string;
+  error?: string;
   describedBy?: string;
   onCheckedChange: (checked: boolean) => void;
 };
@@ -22,6 +24,8 @@ export const CapabilityToggleRow = ({
   isChecked,
   isDisabled,
   isArchived,
+  requiredReason,
+  error,
   describedBy,
   onCheckedChange,
 }: TCapabilityToggleRowProps) => {
@@ -30,7 +34,11 @@ export const CapabilityToggleRow = ({
   const isNested = !isUndefined(parentField);
   const label = t(`toggleLabel.${capability}`);
   const description = t(`toggleDescription.${capability}`);
-  const isLocked = !isEntitled || isArchived;
+  const isRequired = !isUndefined(requiredReason);
+  const isLocked = !isEntitled || isArchived || isRequired;
+  const lockedReason = isEntitled
+    ? requiredReason
+    : t('planLockedBadge', { plan: lowestPlanWithCapability(capability) });
 
   if (isComingSoon) {
     return (
@@ -45,12 +53,9 @@ export const CapabilityToggleRow = ({
       label={label}
       description={description}
       isNested={isNested}
-      isLocked={!isEntitled}
-      lockedReason={
-        isEntitled
-          ? undefined
-          : t('planLockedBadge', { plan: lowestPlanWithCapability(capability) })
-      }
+      isLocked={!isEntitled || isRequired}
+      lockedReason={lockedReason}
+      error={error}
     >
       <Switch
         aria={{ label, describedBy }}

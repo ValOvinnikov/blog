@@ -1722,6 +1722,8 @@
     "alertSuccess": "Funciones guardadas.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
     "planLockedBadge": "{plan, select, FREE {Plan Free} STARTER {Plan Starter} other {Plan Growth}}",
+    "consentBannerRequiredNote": "Necesario para Google Analytics, que pide el consentimiento de los visitantes.",
+    "consentBannerRequiredError": "Google Analytics está configurado, así que el banner de consentimiento debe seguir activo. Borre primero el ID de medición o cambie a Plausible.",
     "comingSoonBadge": "Próximamente",
     "switchOn": "Activado",
     "switchOff": "Desactivado",

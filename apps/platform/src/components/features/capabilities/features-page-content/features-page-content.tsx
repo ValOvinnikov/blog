@@ -1,6 +1,9 @@
 import { FeaturesSettings } from '@platform/components/features/capabilities/features-settings';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
-import { toAnalyticsDraft } from '@platform/utils/analytics-draft/analytics-draft';
+import {
+  toAnalyticsDraft,
+  withConsentBannerForGoogleAnalytics,
+} from '@platform/utils/analytics-draft/analytics-draft';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import {
   clampToEntitlement,
@@ -22,10 +25,13 @@ export const FeaturesPageContent = async ({
     getSettingsFeaturesOrDefaults(id),
     queries.tenantAnalytics.getStoredTenantAnalytics(id),
   ]);
-  const initialValues = {
+  const storedValues = {
     ...withComingSoonOff(clampToEntitlement(values, entitledCapabilities)),
     ...toAnalyticsDraft(storedAnalytics),
   };
+  const initialValues = entitlements.hasOwnAnalytics
+    ? withConsentBannerForGoogleAnalytics(storedValues)
+    : storedValues;
 
   return (
     <FeaturesSettings

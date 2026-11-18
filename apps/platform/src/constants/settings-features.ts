@@ -14,3 +14,9 @@ export const ANALYTICS_FIELD_ERROR = {
 } as const;
 
 export type TAnalyticsFieldErrorReason = TValueOf<typeof ANALYTICS_FIELD_ERROR>;
+
+export const FEATURES_FIELD_ERROR = {
+  CONSENT_BANNER_REQUIRED: 'CONSENT_BANNER_REQUIRED',
+} as const;
+
+export type TFeaturesFieldErrorReason = TValueOf<typeof FEATURES_FIELD_ERROR>;
