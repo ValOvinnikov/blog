@@ -1,4 +1,3 @@
-export * from './clear-member-studio-access';
 export * from './count-memberships-over-seats';
 export * from './create-membership';
 export * from './get-member-studio-access';

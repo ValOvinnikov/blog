@@ -12,7 +12,10 @@ import {
 } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
 import { deleteSeatRows } from '@shinefold/db/testing/membership-invites/fixtures';
-import { insertTestMember } from '@shinefold/db/testing/memberships/fixtures';
+import {
+  MOCK_EDITOR_EMAIL,
+  insertTestMember,
+} from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_SANITY_USER_ID } from '@shinefold/db/testing/sanity-management-client/fixtures';
 import { eq } from 'drizzle-orm';
@@ -25,7 +28,6 @@ faker.seed(7167);
 
 const db = useQueryTestDb();
 
-const MOCK_EDITOR_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_JOINED_AT = faker.date.past({ refDate: MOCK_NOW });
 
 let tenantId: string;

@@ -1,7 +1,15 @@
 import { faker } from '@faker-js/faker';
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
-import { insertTestMember } from '@shinefold/db/testing/memberships/fixtures';
+import {
+  MOCK_EDITOR_EMAIL,
+  insertTestMember,
+} from '@shinefold/db/testing/memberships/fixtures';
 import {
   mockMemberStudioAccess,
   toMemberStudioAccessColumns,
@@ -17,9 +25,16 @@ faker.seed(76071);
 
 const db = useQueryTestDb();
 
-const MOCK_EDITOR_EMAIL = faker.internet.email().toLowerCase();
+const READY_TENANT = {
+  provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+};
 
-const tenant = useTestTenant(db);
+const LOCKED_WITH_ACCESS = {
+  lockedAt: MOCK_NOW,
+  ...toMemberStudioAccessColumns(mockMemberStudioAccess()),
+};
+
+const tenant = useTestTenant(db, READY_TENANT);
 
 afterEach(async () => {
   await db().delete(schema.users);
@@ -65,4 +80,20 @@ describe(listLockedMembersWithStudioAccess, () => {
 
     await expect(listLockedMembersWithStudioAccess()).resolves.toEqual([]);
   });
+
+  it.each([
+    ['an ARCHIVED site', { ...READY_TENANT, status: TENANT_STATUS.ARCHIVED }],
+    [
+      'a site still provisioning',
+      { provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING },
+    ],
+  ])(
+    'excludes a locked member with Studio access on %s',
+    async (_description, tenantOverrides) => {
+      const { id } = await insertTestTenant(db(), tenantOverrides);
+      await insertTestMember(db(), id, MOCK_EDITOR_EMAIL, LOCKED_WITH_ACCESS);
+
+      await expect(listLockedMembersWithStudioAccess()).resolves.toEqual([]);
+    },
+  );
 });

@@ -2,7 +2,10 @@ import { faker } from '@faker-js/faker';
 import * as schema from '@shinefold/db/schema';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
-import { insertTestMember } from '@shinefold/db/testing/memberships/fixtures';
+import {
+  MOCK_EDITOR_EMAIL,
+  insertTestMember,
+} from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_SANITY_USER_ID } from '@shinefold/db/testing/sanity-management-client/fixtures';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
@@ -15,8 +18,6 @@ faker.seed(7607);
 
 const db = useQueryTestDb();
 
-const MOCK_EDITOR_EMAIL = faker.internet.email().toLowerCase();
-
 const tenant = useTestTenant(db);
 
 afterEach(async () => {
@@ -25,8 +26,12 @@ afterEach(async () => {
 
 describe(getMemberStudioIdentity, () => {
   it.each([
-    ['an unlocked member', {}],
-    ['a locked member', { lockedAt: MOCK_NOW }],
+    ['an unlocked member', { sanityUserId: MOCK_SANITY_USER_ID }],
+    [
+      'a locked member',
+      { sanityUserId: MOCK_SANITY_USER_ID, lockedAt: MOCK_NOW },
+    ],
+    ['a member with no Sanity user yet', { sanityUserId: undefined }],
   ])(
     'returns the decrypted email and Sanity user id of %s',
     async (_description, overrides) => {
@@ -34,23 +39,15 @@ describe(getMemberStudioIdentity, () => {
         db(),
         tenant().id,
         MOCK_EDITOR_EMAIL,
-        { sanityUserId: MOCK_SANITY_USER_ID, ...overrides },
+        overrides,
       );
 
       await expect(getMemberStudioIdentity(tenant().id, id)).resolves.toEqual({
         email: MOCK_EDITOR_EMAIL,
-        sanityUserId: MOCK_SANITY_USER_ID,
+        sanityUserId: overrides.sanityUserId,
       });
     },
   );
-
-  it('reads a member with no Sanity user yet as no Sanity user id', async () => {
-    const { id } = await insertTestMember(db(), tenant().id, MOCK_EDITOR_EMAIL);
-
-    const identity = await getMemberStudioIdentity(tenant().id, id);
-
-    expect(identity?.sanityUserId).toBeUndefined();
-  });
 
   it('finds no member of another tenant', async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
