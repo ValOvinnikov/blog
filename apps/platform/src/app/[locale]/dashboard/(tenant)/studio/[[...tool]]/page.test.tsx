@@ -112,7 +112,7 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
-  it("mounts Studio for the session tenant under the dashboard's Studio path", async () => {
+  it('mounts the dashboard Studio with its Studio and preview paths', async () => {
     const tenant = await renderForTenant();
 
     const studioMount = screen.getByTestId(STUDIO_MOUNT_TEST_ID);
@@ -123,6 +123,7 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
         projectId: MOCK_SANITY_PROJECT_ID,
         dataset: tenant.sanityDataset,
         basePath: adminRoutes.dashboardStudio(),
+        previewBasePath: adminRoutes.dashboardDraftPreviews(),
         title: MOCK_TENANT_NAME,
         enabledCapabilities: [],
         entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,

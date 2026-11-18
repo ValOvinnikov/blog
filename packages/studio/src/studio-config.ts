@@ -6,21 +6,8 @@ import {
   type TLocaleIsoCode,
 } from '@shinefold/config/constants';
 import { buildLoginProviderAuth } from '@shinefold/studio/auth/login-provider-auth';
-import { documentOptions } from '@shinefold/studio/document-actions/document-options/document-options';
+import { buildDocumentOptions } from '@shinefold/studio/document-actions/document-options/document-options';
 import { schemaTypes } from '@shinefold/studio/schema-types';
-import { PAGE_COOKIE_STATEMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
-import { PAGE_HOME_TYPE } from '@shinefold/studio/schema-types/documents/pages/home/home-type';
-import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
-import { PAGE_LEGAL_DOCUMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/legal-document/legal-document-type';
-import { PAGE_LEGAL_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/legal-index/legal-index-type';
-import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
-import { PAGE_POST_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/post-index/post-index-type';
-import { PAGE_PRIVACY_DOCUMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/privacy-document/privacy-document-type';
-import { PAGE_PRIVACY_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/privacy-index/privacy-index-type';
-import { PAGE_TAG_TYPE } from '@shinefold/studio/schema-types/documents/pages/tag/tag-type';
-import { PAGE_TAG_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/tag-index/tag-index-type';
-import { PAGE_TOPIC_TYPE } from '@shinefold/studio/schema-types/documents/pages/topic/topic-type';
-import { PAGE_TOPIC_INDEX_TYPE } from '@shinefold/studio/schema-types/documents/pages/topic-index/topic-index-type';
 import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 import { createLanguageSwitcherField } from '@shinefold/studio/schema-types/inputs/language-switcher-field/language-switcher-field';
 import {
@@ -53,26 +40,10 @@ import { media, mediaAssetSource } from 'sanity-plugin-media';
 
 import type { TBuildStudioConfigParams } from './studio-config-params';
 import { createStudioStructure } from './studio-structure';
-
-const ONE_PER_LANGUAGE_DOCUMENT_TYPES: string[] = [
-  PAGE_HOME_TYPE,
-  PAGE_POST_INDEX_TYPE,
-  PAGE_TOPIC_INDEX_TYPE,
-  PAGE_TAG_INDEX_TYPE,
-  PAGE_PRIVACY_INDEX_TYPE,
-  PAGE_LEGAL_INDEX_TYPE,
-  PAGE_COOKIE_STATEMENT_TYPE,
-];
-
-const TRANSLATED_DOCUMENT_TYPES: string[] = [
-  ...ONE_PER_LANGUAGE_DOCUMENT_TYPES,
-  PAGE_LANDING_TYPE,
-  PAGE_POST_TYPE,
-  PAGE_TOPIC_TYPE,
-  PAGE_TAG_TYPE,
-  PAGE_PRIVACY_DOCUMENT_TYPE,
-  PAGE_LEGAL_DOCUMENT_TYPE,
-];
+import {
+  ONE_PER_LANGUAGE_DOCUMENT_TYPES,
+  TRANSLATED_DOCUMENT_TYPES,
+} from './translated-document-types';
 
 const translationLinks = definePlugin<TTranslationLinkOptions>((options) => ({
   name: 'translation-links',
@@ -123,6 +94,7 @@ export const buildStudioConfig = ({
   defaultLocale = LOCALE_ISO_CODES.EN,
   liveLocales,
   loginProvider,
+  previewBasePath,
 }: TBuildStudioConfigParams) => {
   const entitledModulePacks = entitlements?.modulePacks ?? EVERY_MODULE_PACK;
   setDefaultLanguage(defaultLocale);
@@ -196,6 +168,6 @@ export const buildStudioConfig = ({
       file: { assetSources: [mediaAssetSource] },
     },
 
-    document: documentOptions,
+    document: buildDocumentOptions(previewBasePath),
   });
 };

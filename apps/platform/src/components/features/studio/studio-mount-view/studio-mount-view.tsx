@@ -14,6 +14,7 @@ import { studioMountViewVariants } from './studio-mount-view-variants';
 export type TStudioMountViewProps = {
   tenant: TPlatformTenant;
   basePath: string;
+  previewBasePath: string;
   loginProvider?: TSanityLoginProvider;
   shouldRecordFirstEntry?: boolean;
 };
@@ -21,6 +22,7 @@ export type TStudioMountViewProps = {
 export const StudioMountView = async ({
   tenant,
   basePath,
+  previewBasePath,
   loginProvider,
   shouldRecordFirstEntry,
 }: TStudioMountViewProps) => {
@@ -63,6 +65,7 @@ export const StudioMountView = async ({
       projectId={sanityProjectId}
       dataset={sanityDataset}
       basePath={basePath}
+      previewBasePath={previewBasePath}
       title={tenant.name}
       enabledCapabilities={enabledCapabilities}
       entitlements={{ modulePacks }}

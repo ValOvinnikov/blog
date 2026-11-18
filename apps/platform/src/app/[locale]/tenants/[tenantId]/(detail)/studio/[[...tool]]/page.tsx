@@ -22,6 +22,7 @@ export default async function TenantStudioPage({ params }: TProps) {
       StudioMountView({
         tenant,
         basePath: adminRoutes.tenantStudio(tenant.id),
+        previewBasePath: adminRoutes.tenantDraftPreviews(tenant.id),
       }),
   );
 }

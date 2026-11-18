@@ -20,4 +20,5 @@ export type TBuildStudioConfigParams = {
   defaultLocale?: TLocaleIsoCode;
   liveLocales?: readonly TLocaleIsoCode[];
   loginProvider?: TSanityLoginProvider;
+  previewBasePath?: string;
 };
