@@ -43,16 +43,10 @@ export type TUpdateAnalyticsResult =
     >
   | TNotInPlanRefusal;
 
-const writeAnalytics = async (
-  tenantId: string,
-  input: TUpdateAnalyticsInput,
-) => {
+const writeAnalytics = (tenantId: string, input: TUpdateAnalyticsInput) => {
   const analyticsId = blankToNull(input.analyticsId);
   if (isNull(analyticsId)) {
     return queries.tenantAnalytics.clearTenantAnalytics(tenantId);
-  }
-  if (hasGoogleAnalyticsId(input)) {
-    await turnConsentBannerOn(tenantId);
   }
   return queries.tenantAnalytics.saveTenantAnalytics(tenantId, {
     provider: input.analyticsProvider,
@@ -99,6 +93,9 @@ export const updateAnalyticsAction = async (
   }
 
   try {
+    const isConsentBannerTurnedOn =
+      hasGoogleAnalyticsId(parsed.data) &&
+      (await turnConsentBannerOn(tenant.id));
     await writeAnalytics(tenant.id, parsed.data);
     await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
@@ -106,7 +103,11 @@ export const updateAnalyticsAction = async (
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SETTINGS_FEATURES,
       targetId: tenant.id,
-      details: { analyticsProvider, isCleared: isClearing },
+      details: {
+        analyticsProvider,
+        isCleared: isClearing,
+        isConsentBannerTurnedOn,
+      },
     });
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {

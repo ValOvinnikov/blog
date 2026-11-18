@@ -195,6 +195,7 @@ describe(updateAnalyticsAction, () => {
         details: {
           analyticsProvider: PLAUSIBLE_INPUT.analyticsProvider,
           isCleared: false,
+          isConsentBannerTurnedOn: false,
         },
       });
     });
@@ -223,12 +224,24 @@ describe(updateAnalyticsAction, () => {
       arrangeTenantPlan(TENANT_PLAN.GROWTH);
     });
 
-    it('is switched on with a Google Analytics id, keeping the other toggles', async () => {
-      await updateAnalyticsAction(MOCK_TENANT_ID, GOOGLE_ANALYTICS_INPUT);
+    describe('once a Google Analytics id is saved', () => {
+      beforeEach(async () => {
+        await updateAnalyticsAction(MOCK_TENANT_ID, GOOGLE_ANALYTICS_INPUT);
+      });
 
-      expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-        ...BANNER_OFF_FEATURES,
-        consentBannerEnabled: true,
+      it('is switched on, keeping the other toggles', () => {
+        expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+          { ...BANNER_OFF_FEATURES, consentBannerEnabled: true },
+        );
+      });
+
+      it('is recorded as switched on in the audit event', () => {
+        expect(insertAuditEventMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            details: expect.objectContaining({ isConsentBannerTurnedOn: true }),
+          }),
+        );
       });
     });
 

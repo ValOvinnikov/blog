@@ -74,9 +74,10 @@ export const FeaturesSettings = ({
   };
 
   const consentBannerState = {
-    requiredReason: hasGoogleAnalyticsId(values)
-      ? t('consentBannerRequiredNote')
-      : undefined,
+    requiredReason:
+      hasOwnAnalytics && hasGoogleAnalyticsId(values)
+        ? t('consentBannerRequiredNote')
+        : undefined,
     error: featuresFieldErrors.consentBannerEnabled
       ? t('consentBannerRequiredError')
       : undefined,

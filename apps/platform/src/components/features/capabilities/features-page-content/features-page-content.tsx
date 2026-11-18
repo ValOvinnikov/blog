@@ -25,10 +25,13 @@ export const FeaturesPageContent = async ({
     getSettingsFeaturesOrDefaults(id),
     queries.tenantAnalytics.getStoredTenantAnalytics(id),
   ]);
-  const initialValues = withConsentBannerForGoogleAnalytics({
+  const storedValues = {
     ...withComingSoonOff(clampToEntitlement(values, entitledCapabilities)),
     ...toAnalyticsDraft(storedAnalytics),
-  });
+  };
+  const initialValues = entitlements.hasOwnAnalytics
+    ? withConsentBannerForGoogleAnalytics(storedValues)
+    : storedValues;
 
   return (
     <FeaturesSettings

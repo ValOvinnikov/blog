@@ -385,6 +385,7 @@ describe(updateFeaturesAction, () => {
 
   describe('while a Google Analytics id is stored', () => {
     beforeEach(() => {
+      arrangeTenantPlan(TENANT_PLAN.GROWTH);
       getStoredTenantAnalyticsMock.mockResolvedValue(MOCK_GOOGLE_ANALYTICS);
     });
 
@@ -408,6 +409,18 @@ describe(updateFeaturesAction, () => {
 
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     });
+  });
+
+  it('lets a FREE tenant switch the consent banner off with a kept Google Analytics id', async () => {
+    getStoredTenantAnalyticsMock.mockResolvedValue(MOCK_GOOGLE_ANALYTICS);
+
+    const result = await updateFeaturesAction(MOCK_TENANT_ID, ALL_OFF);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      ALL_OFF,
+    );
   });
 
   it('lets the consent banner be switched off while a Plausible domain is stored', async () => {

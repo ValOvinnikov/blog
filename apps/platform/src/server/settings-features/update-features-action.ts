@@ -8,12 +8,9 @@ import {
 } from '@platform/constants/settings-features';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
+import { requiresConsentBanner } from '@platform/server/settings-features/requires-consent-banner';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
-import {
-  hasGoogleAnalyticsId,
-  toAnalyticsDraft,
-} from '@platform/utils/analytics-draft/analytics-draft';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { blockSwitchOnWhileParentOff } from '@platform/utils/parent-toggle/parent-toggle';
@@ -74,14 +71,14 @@ export const updateFeaturesAction = async (
   const entitled = PLAN_REGISTRY[tenant.plan];
 
   try {
-    const [{ values: stored }, storedAnalytics] = await Promise.all([
-      getSettingsFeaturesOrDefaults(tenant.id),
-      queries.tenantAnalytics.getStoredTenantAnalytics(tenant.id),
-    ]);
+    const { values: stored } = await getSettingsFeaturesOrDefaults(tenant.id);
 
     if (
       !values.consentBannerEnabled &&
-      hasGoogleAnalyticsId(toAnalyticsDraft(storedAnalytics))
+      (await requiresConsentBanner(
+        tenant.id,
+        tenant.entitlements.hasOwnAnalytics,
+      ))
     ) {
       return {
         outcome: ACTION_OUTCOME.INVALID,

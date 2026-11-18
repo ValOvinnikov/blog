@@ -793,6 +793,16 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         });
       });
 
+      it('leaves the consent banner unlocked', () => {
+        const consentSwitch = screen.getByRole('switch', {
+          name: CONSENT_BANNER_LABEL,
+        });
+        const note = screen.queryByText(consentBannerRequiredNote);
+
+        expect(consentSwitch).not.toHaveAttribute(ARIA_DISABLED);
+        expect(note).not.toBeInTheDocument();
+      });
+
       it('shows the kept id read-only', () => {
         const idField = screen.getByRole('textbox', {
           name: MEASUREMENT_ID_LABEL,
