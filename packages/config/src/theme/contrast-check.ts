@@ -72,7 +72,12 @@ export const findPairFailures = (
         );
 
         return surfaces.flatMap((surface) => {
-          const failingHues = (followsAccentHue ? ALL_HUES : [0]).filter(
+          const isHueDependent =
+            followsAccentHue &&
+            [foreground, surface].some((token) =>
+              tokenFollowsAccentHue(token, context),
+            );
+          const failingHues = (isHueDependent ? ALL_HUES : [0]).filter(
             (hue) =>
               measureContrast(foreground, surface, { ...context, hue }) <
               CONTRAST_ROLE_MIN[role],
@@ -84,7 +89,7 @@ export const findPairFailures = (
             surface,
             scheme,
             ...varyingStyles,
-            hues: formatHueRanges(followsAccentHue ? failingHues : ALL_HUES),
+            hues: formatHueRanges(isHueDependent ? failingHues : ALL_HUES),
           };
         });
       }),
