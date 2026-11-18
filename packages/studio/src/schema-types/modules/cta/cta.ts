@@ -2,9 +2,9 @@ import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
-  FULL_BRAND_VARIANT_LIST,
   MEDIA_ORDER,
 } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { contentPositionFields } from '@shinefold/studio/schema-types/fields/content-position-fields/content-position-fields';
@@ -20,6 +20,7 @@ import { localizedImageWithAltSchema } from '@shinefold/studio/schema-types/obje
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
 import { validateLocalizedMaxLength } from '@shinefold/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { Megaphone } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -39,27 +40,25 @@ export const ctaSchema = defineType({
     brandVariantField({
       title: 'Card background',
       description: 'The fill of the card itself.',
-      list: FULL_BRAND_VARIANT_LIST,
       initialValue: BRAND_VARIANT.SECONDARY,
     }),
     brandVariantField({
       name: 'bandTone',
       description: 'The background behind the card.',
-      list: FULL_BRAND_VARIANT_LIST,
       initialValue: BRAND_VARIANT.PRIMARY,
       hidden: ({ parent }) =>
-        (parent as TCtaParent | undefined)?.variant === CTA_VARIANT.BANNER,
+        (parent as TMaybeUndefined<TCtaParent>)?.variant === CTA_VARIANT.BANNER,
       validation: (rule) => [
         rule.required(),
         rule
           .custom((value, context) => {
-            const parent = context.parent as TCtaParent | undefined;
+            const parent = context.parent as TMaybeUndefined<TCtaParent>;
 
             if (parent?.variant === CTA_VARIANT.BANNER) {
               return true;
             }
 
-            return value !== undefined && value === parent?.brandVariant
+            return !isUndefined(value) && value === parent?.brandVariant
               ? 'Background matches Card background — the card will blend into the section. Sometimes that’s intentional, but usually they should contrast.'
               : true;
           })
@@ -85,7 +84,8 @@ export const ctaSchema = defineType({
       description: 'Optional image, placed according to the Shape.',
       validation: (rule) =>
         rule.custom<{ asset?: unknown }>((value, context) => {
-          const variant = (context.parent as TCtaParent | undefined)?.variant;
+          const variant = (context.parent as TMaybeUndefined<TCtaParent>)
+            ?.variant;
 
           if (
             !value?.asset &&
