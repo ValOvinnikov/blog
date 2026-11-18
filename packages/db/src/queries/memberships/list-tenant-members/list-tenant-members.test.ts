@@ -60,6 +60,7 @@ describe(listTenantMembers, () => {
         role: MEMBERSHIP_ROLE.OWNER,
         hasSignedIn: false,
         joinedAt: MOCK_NOW,
+        lockedAt: undefined,
         studioAccess: undefined,
       },
       {
@@ -69,6 +70,7 @@ describe(listTenantMembers, () => {
         role: MEMBERSHIP_ROLE.EDITOR,
         hasSignedIn: false,
         joinedAt: MOCK_JOINED_AT,
+        lockedAt: undefined,
         studioAccess: undefined,
       },
     ]);
@@ -84,6 +86,17 @@ describe(listTenantMembers, () => {
     const [member] = await listTenantMembers(tenantId, MOCK_NOW);
 
     expect(member?.hasSignedIn).toBe(true);
+  });
+
+  it('lists a locked member with its lock date', async () => {
+    await insertTestMember(db(), tenantId, MOCK_EDITOR_EMAIL, {
+      role: MEMBERSHIP_ROLE.EDITOR,
+      lockedAt: MOCK_NOW,
+    });
+
+    const [member] = await listTenantMembers(tenantId, MOCK_NOW);
+
+    expect(member?.lockedAt).toEqual(MOCK_NOW);
   });
 
   it.each([
