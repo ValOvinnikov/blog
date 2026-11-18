@@ -1,21 +1,16 @@
-import { TENANT_PLAN } from '@shinefold/config/constants';
 import { GRACE_EMAIL } from '@shinefold/db/constants';
 import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 
 export const OWNER_GRACE_EMAIL_COPY_DE: TOwnerGraceEmailCopy = {
-  upgradeAnyTime: 'Sie können jederzeit upgraden, um sie wieder einzuschalten.',
+  upgradeAnyTime:
+    'Nichts wurde gelöscht. Sie können jederzeit upgraden, um die Funktionen Ihres Tarifs wieder einzuschalten.',
   keepAsTheyAre: (date) =>
     `Upgraden Sie vor dem ${date}, damit alles so bleibt, wie es ist.`,
   memberLock: ({ count, date }) =>
     `Am ${date} ${count === 1 ? 'verliert 1 Teammitglied' : `verlieren ${count} Teammitglieder`} den Zugang zur Verwaltung der Website. Die Konten bleiben erhalten, und der Zugang kehrt zurück, sobald Sie upgraden.`,
   domainLock: ({ customDomain, subdomain, date }) =>
     `Am ${date} wechselt die Hauptadresse Ihrer Website von ${customDomain} zurück zu ${subdomain}.`,
-  stopped: {
-    [TENANT_PLAN.GROWTH]:
-      'Growth-Bereiche, der Newsletter, Leserkonten und die zusätzlichen Look-Einstellungen sind abgeschaltet. Nichts wurde gelöscht: Alles kehrt zurück, sobald Sie upgraden.',
-    [TENANT_PLAN.STARTER]:
-      'Das Kontaktformular und Ihr eigenes Analysetool sind abgeschaltet, und der „Powered by“-Hinweis steht wieder in der Fußzeile. Nichts wurde gelöscht: Alles kehrt zurück, sobald Sie upgraden.',
-  },
+  planComparisonLabel: 'Sehen Sie, was jeder Tarif enthält',
   emails: {
     [GRACE_EMAIL.STARTED]: ({ siteName }) => ({
       subject: `${siteName} ist jetzt im kostenlosen Tarif`,

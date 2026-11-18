@@ -4,22 +4,21 @@ import {
   type TSetTenantOwnerAccessInput,
 } from '@shinefold/db/queries/tenants';
 import {
-  deleteSanityProjectInvite,
-  listSanityProjectAcl,
   listSanityProjectInvites,
-  revokeSanityProjectRole,
   type TSanityInvite,
 } from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
 import {
   listSanityProjectUsers,
   type TSanityUser,
 } from '@shinefold/db/utils/sanity-management-client/sanity-project-users';
-import { sanityRoleChangeToken } from '@shinefold/db/utils/sanity-management-client/sanity-role-change-token';
 import { normalizeEmail } from '@shinefold/utils/normalize-email-identity';
 import { hasArrayGotItems } from '@shinefold/utils/primitives';
-import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
+import { revokeProjectRoles } from '@worker/utils/studio-access/revoke-project-roles';
+import {
+  deleteInvites,
+  isPendingInviteFor,
+} from '@worker/utils/studio-access/studio-invites';
 
-import { findProjectAclEntry } from './find-project-acl-entry';
 import { hasOwnerEmail, type TOwnerAccessTarget } from './owner-access-target';
 
 function findFormerEmails(
@@ -51,31 +50,6 @@ function isFormerEmail(
   email: TMaybeUndefined<string>,
 ): boolean {
   return !!email && formerEmails.includes(normalizeEmail(email));
-}
-
-async function revokeFormerRoles(
-  target: TOwnerAccessTarget,
-  formerUsers: TSanityUser[],
-): Promise<void> {
-  const { projectId, token, env } = target;
-  const acl = await listSanityProjectAcl({ token, projectId });
-
-  for (const user of formerUsers) {
-    const entry = findProjectAclEntry(acl, user, projectId);
-    if (!entry) continue;
-    for (const { name } of entry.roles) {
-      await revokeSanityProjectRole({
-        token: sanityRoleChangeToken({
-          roleName: name,
-          organizationToken: env.sanityManagementToken,
-          projectToken: token,
-        }),
-        projectId,
-        projectUserId: entry.projectUserId,
-        roleName: name,
-      });
-    }
-  }
 }
 
 async function clearOwnerAccess(
@@ -123,16 +97,13 @@ export async function revokeFormerOwnerAccess(
     return;
   }
 
-  for (const { id, email, status } of invites) {
-    if (
-      id &&
-      status === SANITY_PENDING_INVITE_STATUS &&
-      isFormerEmail(formerEmails, email)
-    ) {
-      await deleteSanityProjectInvite({ token, projectId, inviteId: id });
-    }
-  }
-  await revokeFormerRoles(
+  await deleteInvites(
+    target,
+    invites.filter((invite) =>
+      isPendingInviteFor(invite, (email) => isFormerEmail(formerEmails, email)),
+    ),
+  );
+  await revokeProjectRoles(
     target,
     users.filter(({ profile }) => isFormerEmail(formerEmails, profile.email)),
   );

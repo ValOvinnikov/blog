@@ -23,6 +23,9 @@ vi.mock('@shinefold/db', async () => ({
   ...(await vi.importActual('@shinefold/db/constants')),
   queries: {
     tenants: { getTenantById: vi.fn() },
+    tenantEntitlementGrants: (
+      await import('@web/testing/server/settings-features/entitlement-grants-db')
+    ).tenantEntitlementGrants,
     settingsFeatures: { getSettingsFeatures: vi.fn() },
     siteConfig: { getSiteConfig: vi.fn() },
   },

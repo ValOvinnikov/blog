@@ -16,6 +16,7 @@ import {
   startDeprovisioningRun,
 } from '@shinefold/db/queries/tenants';
 import type { TTenant } from '@shinefold/db/schema/tenants';
+import { MOCK_MARKETING_TENANT_DOMAIN } from '@shinefold/db/testing/tenant-domains/fixtures';
 import { requestTenantCacheInvalidation } from '@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation';
 import { sendEmail } from '@shinefold/email';
 import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
@@ -39,7 +40,10 @@ import { OWNER_INACTIVITY_EMAIL_COPY } from '@worker/utils/owner-email/owner-ina
 import { deprovisionTenant } from '@worker/workflows/deprovision-tenant';
 import { start } from 'workflow/api';
 
-import { runInactivitySweep } from './run-inactivity-sweep';
+import {
+  runInactivitySweep,
+  type TInactivitySweepResult,
+} from './run-inactivity-sweep';
 
 faker.seed(7013);
 
@@ -108,62 +112,89 @@ describe(runInactivitySweep, () => {
       vi.mocked(stampTenantInactivityStage).mockResolvedValue(tenant);
     });
 
-    it('stamps the warning before sending it', async () => {
-      await sweep();
+    describe('once swept', () => {
+      let result: TInactivitySweepResult;
 
-      expect(stampTenantInactivityStage).toHaveBeenCalledWith(
-        MOCK_TENANT_ID,
-        INACTIVITY_STAGE.SUSPENSION_WARNING,
-        MOCK_NOW,
-      );
-    });
-
-    it("warns the owner once, in the site's language, with the pause date", async () => {
-      await sweep();
-
-      const { subject } = OWNER_INACTIVITY_EMAIL_COPY.FR[
-        INACTIVITY_STAGE.SUSPENSION_WARNING
-      ]({
-        siteName: tenant.name,
-        siteUrl: MOCK_SITE_URL,
-        date: '28 octobre 2026',
+      beforeEach(async () => {
+        result = await sweep();
       });
-      const ownerEmails = sentEmails().filter(
-        ({ to }) => to === MOCK_OWNER_EMAIL,
-      );
-      expect(ownerEmails).toHaveLength(1);
-      expect(ownerEmails[0]?.subject).toBe(subject);
-      expect(ownerEmails[0]?.html).toContain(
-        `href="${MOCK_SWEEP_ENV.platformAppBaseUrl}/dashboard"`,
-      );
+
+      it('stamps the warning before sending it', async () => {
+        expect(stampTenantInactivityStage).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+          INACTIVITY_STAGE.SUSPENSION_WARNING,
+          MOCK_NOW,
+        );
+      });
+
+      it("warns the owner once, in the site's language, with the pause date", async () => {
+        const { subject } = OWNER_INACTIVITY_EMAIL_COPY.FR[
+          INACTIVITY_STAGE.SUSPENSION_WARNING
+        ]({
+          siteName: tenant.name,
+          siteUrl: MOCK_SITE_URL,
+          date: '28 octobre 2026',
+        });
+        const ownerEmails = sentEmails().filter(
+          ({ to }) => to === MOCK_OWNER_EMAIL,
+        );
+        expect(ownerEmails).toHaveLength(1);
+        expect(ownerEmails[0]?.subject).toBe(subject);
+        expect(ownerEmails[0]?.html).toContain(
+          `href="${MOCK_SWEEP_ENV.platformAppBaseUrl}/dashboard"`,
+        );
+      });
+
+      it('warns every super admin once, in English', async () => {
+        const alerts = sentEmails().filter(({ to }) =>
+          MOCK_SUPERADMIN_EMAILS.includes(to),
+        );
+        expect(alerts.map(({ to }) => to)).toEqual(MOCK_SUPERADMIN_EMAILS);
+        expect(alerts[0]?.subject).toContain('October 28, 2026');
+      });
+
+      it('reports the tenant as advanced', async () => {
+        expect(result).toEqual({
+          ...MOCK_NO_STAGE_ADVANCED,
+          [INACTIVITY_STAGE.SUSPENSION_WARNING]: 1,
+        });
+      });
     });
 
-    it('warns every super admin once, in English', async () => {
+    it('sends nothing for a tenant another sweep already moved into the stage', async () => {
+      vi.mocked(stampTenantInactivityStage).mockResolvedValue(null);
+
+      await expect(sweep()).resolves.toEqual(MOCK_NO_STAGE_ADVANCED);
+      expect(sendEmail).not.toHaveBeenCalled();
+    });
+
+    it('logs a failed owner email and still alerts the super admins', async () => {
+      vi.mocked(sendEmail).mockImplementation(async ({ to }) => {
+        if (to === MOCK_OWNER_EMAIL) throw new Error(MOCK_RESEND_DOWN);
+      });
+
       await sweep();
 
-      const alerts = sentEmails().filter(({ to }) =>
-        MOCK_SUPERADMIN_EMAILS.includes(to),
+      const alertedAdmins = sentTo().filter((to) => to !== MOCK_OWNER_EMAIL);
+      expect(alertedAdmins).toEqual(MOCK_SUPERADMIN_EMAILS);
+      expect(logger.error).toHaveBeenCalledWith(
+        INACTIVITY_SWEEP_LOG.EMAIL_SEND_FAILED,
+        {
+          tenantId: MOCK_TENANT_ID,
+          stage: INACTIVITY_STAGE.SUSPENSION_WARNING,
+          error: MOCK_RESEND_DOWN,
+        },
       );
-      expect(alerts.map(({ to }) => to)).toEqual(MOCK_SUPERADMIN_EMAILS);
-      expect(alerts[0]?.subject).toContain('October 28, 2026');
-    });
-
-    it('reports the tenant as advanced', async () => {
-      await expect(sweep()).resolves.toEqual({
-        ...MOCK_NO_STAGE_ADVANCED,
-        [INACTIVITY_STAGE.SUSPENSION_WARNING]: 1,
-      });
     });
   });
 
   describe('at day 30', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       dueAt(INACTIVITY_STAGE.SUSPENSION, [inactiveFor(30)]);
+      await sweep();
     });
 
     it('suspends the tenant for inactivity', async () => {
-      await sweep();
-
       expect(stampTenantInactivityStage).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
         INACTIVITY_STAGE.SUSPENSION,
@@ -172,8 +203,6 @@ describe(runInactivitySweep, () => {
     });
 
     it('purges the site cache so the next load serves the suspended site', async () => {
-      await sweep();
-
       expect(requestTenantCacheInvalidation).toHaveBeenCalledWith({
         webAppUrl: MOCK_SWEEP_ENV.webAppBaseUrl,
         secret: MOCK_SWEEP_ENV.siteConfigRevalidateSecret,
@@ -227,14 +256,6 @@ describe(runInactivitySweep, () => {
     });
   });
 
-  it('sends nothing for a tenant another sweep already moved into the stage', async () => {
-    dueAt(INACTIVITY_STAGE.SUSPENSION_WARNING, [inactiveFor(23)]);
-    vi.mocked(stampTenantInactivityStage).mockResolvedValue(null);
-
-    await expect(sweep()).resolves.toEqual(MOCK_NO_STAGE_ADVANCED);
-    expect(sendEmail).not.toHaveBeenCalled();
-  });
-
   it('logs a tenant with no owner and sends it nothing', async () => {
     dueAt(INACTIVITY_STAGE.DELETION_NOTICE, [inactiveFor(50)]);
     vi.mocked(getTenantOwnerEmail).mockResolvedValue(undefined);
@@ -247,26 +268,6 @@ describe(runInactivitySweep, () => {
       {
         tenantId: MOCK_TENANT_ID,
         stage: INACTIVITY_STAGE.DELETION_NOTICE,
-      },
-    );
-  });
-
-  it('logs a failed owner email and still alerts the super admins', async () => {
-    dueAt(INACTIVITY_STAGE.SUSPENSION_WARNING, [inactiveFor(23)]);
-    vi.mocked(sendEmail).mockImplementation(async ({ to }) => {
-      if (to === MOCK_OWNER_EMAIL) throw new Error(MOCK_RESEND_DOWN);
-    });
-
-    await sweep();
-
-    const alertedAdmins = sentTo().filter((to) => to !== MOCK_OWNER_EMAIL);
-    expect(alertedAdmins).toEqual(MOCK_SUPERADMIN_EMAILS);
-    expect(logger.error).toHaveBeenCalledWith(
-      INACTIVITY_SWEEP_LOG.EMAIL_SEND_FAILED,
-      {
-        tenantId: MOCK_TENANT_ID,
-        stage: INACTIVITY_STAGE.SUSPENSION_WARNING,
-        error: MOCK_RESEND_DOWN,
       },
     );
   });
@@ -335,6 +336,35 @@ describe(runInactivitySweep, () => {
         INACTIVITY_SWEEP_LOG.PLATFORM_TENANT_SKIPPED,
         { tenantId: platformTenantId },
       );
+    });
+
+    describe('on the marketing site host', () => {
+      beforeEach(() => {
+        vi.mocked(listTenantHosts).mockResolvedValue([
+          MOCK_MARKETING_TENANT_DOMAIN,
+        ]);
+        dueAt(INACTIVITY_STAGE.DEPROVISIONING, [inactiveFor(60)]);
+      });
+
+      it('is skipped and logged once', async () => {
+        await expect(sweep()).resolves.toEqual(MOCK_NO_STAGE_ADVANCED);
+        expect(start).not.toHaveBeenCalled();
+        expect(logger.info).toHaveBeenCalledExactlyOnceWith(
+          INACTIVITY_SWEEP_LOG.PLATFORM_TENANT_SKIPPED,
+          { tenantId: MOCK_TENANT_ID },
+        );
+      });
+
+      it('is swept like any other without a marketing site', async () => {
+        await runInactivitySweep({
+          now: MOCK_NOW,
+          env: { ...MOCK_SWEEP_ENV, marketingHost: undefined },
+        });
+
+        expect(start).toHaveBeenCalledExactlyOnceWith(deprovisionTenant, [
+          MOCK_TENANT_ID,
+        ]);
+      });
     });
 
     it('still sweeps every other tenant due beside it', async () => {

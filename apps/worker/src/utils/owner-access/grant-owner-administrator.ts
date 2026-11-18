@@ -1,10 +1,4 @@
 import {
-  SANITY_LOGIN_PROVIDER,
-  SANITY_PROJECT_ROLE,
-  type TSanityLoginProvider,
-} from '@shinefold/config/constants';
-import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
-import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   SANITY_PROJECT_ROLE as STORED_SANITY_PROJECT_ROLE,
   type TElevateTenantOwnerOutcome,
@@ -13,32 +7,14 @@ import {
   setTenantOwnerAccess,
   touchTenantActivity,
 } from '@shinefold/db/queries/tenants';
-import {
-  grantSanityProjectRole,
-  listSanityProjectAcl,
-  revokeSanityProjectRole,
-  type TSanityAclEntry,
-} from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
 import type { TSanityUser } from '@shinefold/db/utils/sanity-management-client/sanity-project-users';
-import { sanityRoleChangeToken } from '@shinefold/db/utils/sanity-management-client/sanity-role-change-token';
-import { hasLength } from '@shinefold/utils/primitives';
 import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
+import { grantAdministrator } from '@worker/utils/studio-access/grant-administrator';
+import { toLoginProvider } from '@worker/utils/studio-access/login-provider';
 
-import { findProjectAclEntry } from './find-project-acl-entry';
 import { resolveOwnerAccessFinding } from './owner-access-finding';
 import type { TOwnerAccessTarget } from './owner-access-target';
-
-function toLoginProvider(
-  provider: TMaybeUndefined<string>,
-): TMaybeNull<TSanityLoginProvider> {
-  const normalized = provider?.toUpperCase();
-  return (
-    Object.values(SANITY_LOGIN_PROVIDER).find(
-      (value) => value === normalized,
-    ) ?? null
-  );
-}
 
 async function touchActivityOnInviteAcceptance(
   tenantId: string,
@@ -53,59 +29,13 @@ async function touchActivityOnInviteAcceptance(
   }
 }
 
-function rolesBesideAdministrator(entry: TSanityAclEntry): string[] {
-  return entry.roles
-    .map(({ name }) => name)
-    .filter((name) => name !== SANITY_PROJECT_ROLE.ADMINISTRATOR);
-}
-
-async function revokeRoles(
-  target: TOwnerAccessTarget,
-  entry: TSanityAclEntry,
-  roleNames: string[],
-): Promise<void> {
-  const { projectId, token } = target;
-  for (const name of roleNames) {
-    await revokeSanityProjectRole({
-      token,
-      projectId,
-      projectUserId: entry.projectUserId,
-      roleName: name,
-    });
-  }
-}
-
 export async function grantOwnerAdministrator(
   target: TOwnerAccessTarget,
   owner: TSanityUser,
 ): Promise<TElevateTenantOwnerOutcome> {
-  const { tenant, projectId, token, env } = target;
+  const { tenant } = target;
 
-  const acl = await listSanityProjectAcl({ token, projectId });
-  const entry = findProjectAclEntry(acl, owner, projectId);
-  if (!entry) {
-    throw new Error(
-      `Tenant "${tenant.id}"'s owner is a project member with no ACL entry yet.`,
-    );
-  }
-
-  const isAdministrator = entry.roles.some(
-    ({ name }) => name === SANITY_PROJECT_ROLE.ADMINISTRATOR,
-  );
-  const otherRoles = rolesBesideAdministrator(entry);
-  if (!isAdministrator) {
-    await grantSanityProjectRole({
-      token: sanityRoleChangeToken({
-        roleName: SANITY_PROJECT_ROLE.ADMINISTRATOR,
-        organizationToken: env.sanityManagementToken,
-        projectToken: token,
-      }),
-      projectId,
-      projectUserId: entry.projectUserId,
-      role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
-    });
-  }
-  await revokeRoles(target, entry, otherRoles);
+  const hasChanged = await grantAdministrator(target, owner);
   // Before recording administrator: a granted tenant leaves the sweep, so a finding still open then never clears.
   await resolveOwnerAccessFinding(tenant.id);
 
@@ -126,7 +56,7 @@ export async function grantOwnerAdministrator(
     await touchActivityOnInviteAcceptance(tenant.id, inviteAcceptedAt);
   }
 
-  return isAdministrator && !hasLength(otherRoles)
-    ? ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR
-    : ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED;
+  return hasChanged
+    ? ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED
+    : ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR;
 }

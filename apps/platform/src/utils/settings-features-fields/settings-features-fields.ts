@@ -120,3 +120,10 @@ export const withComingSoonOff = (
   }
   return clamped;
 };
+
+export const countToggleChanges = (
+  values: TSettingsFeaturesValues,
+  savedValues: TSettingsFeaturesValues,
+): number =>
+  CAPABILITY_TOGGLES.filter(({ field }) => values[field] !== savedValues[field])
+    .length;

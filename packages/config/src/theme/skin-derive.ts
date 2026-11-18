@@ -3,6 +3,7 @@ import { hasLength, isOneOf, objectKeys } from '@shinefold/utils/primitives';
 import type { TColorScheme } from '@shinefold/config/constants';
 
 import type { TThemeToken } from './contrast-pairs';
+import { AMBIENT, AMBIENT_RAISED } from './contrast-surfaces';
 import { PALETTE } from './palette-ramps';
 import {
   findSkinFailures,
@@ -37,6 +38,9 @@ const PALETTE_STOPS = objectKeys(PALETTE);
 const BRAND_FAMILY = '--palette-brand';
 
 const familyOf = (stop: TPaletteStop): string => stop.replace(/-\d+$/, '');
+
+export const isBrandStop = (stop: TPaletteStop): boolean =>
+  familyOf(stop) === BRAND_FAMILY;
 
 const lightnessGap = (from: TPaletteStop, to: TPaletteStop): number =>
   Math.abs(PALETTE[from].l - PALETTE[to].l);
@@ -92,9 +96,10 @@ export const deriveSkinRoles = (derivation: TSkinDerivation): TSkinRoles => {
   );
   let roles: TSkinRoles = {
     ...PAGE_ROLES[effectiveScheme],
-    '--ambient': ground,
+    [AMBIENT]: ground,
     '--backdrop': ground,
-    ...(familyOf(ground) === BRAND_FAMILY ? BRAND_SCRIMS : NEUTRAL_SCRIMS),
+    [AMBIENT_RAISED]: ground,
+    ...(isBrandStop(ground) ? BRAND_SCRIMS : NEUTRAL_SCRIMS),
     ...pin,
   };
 

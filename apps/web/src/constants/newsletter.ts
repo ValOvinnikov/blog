@@ -20,4 +20,6 @@ export const NEWSLETTER_LOG = {
   CONFIRMATION_RESEND_FAILED: 'newsletter.confirmation_resend_failed',
   RESEND_CONFIRMATION_TENANT_NOT_ACTIVE:
     'newsletter.resend_confirmation_tenant_not_active',
+  LINK_LOCALE_TENANT_LOOKUP_FAILED:
+    'newsletter.link_locale_tenant_lookup_failed',
 } as const;

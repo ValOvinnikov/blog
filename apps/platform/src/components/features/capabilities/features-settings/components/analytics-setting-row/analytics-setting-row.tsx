@@ -67,8 +67,8 @@ export const AnalyticsSettingRow = ({
             onChange({ ...draft, analyticsProvider: provider })
           }
           lock={{
-            isLocked: !hasOwnAnalytics || isArchived,
-            isDisabled: isPending,
+            isLocked: !hasOwnAnalytics && !isArchived,
+            isDisabled: isArchived || isPending,
           }}
         />
       </SettingRow>

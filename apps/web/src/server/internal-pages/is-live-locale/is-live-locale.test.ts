@@ -1,15 +1,12 @@
 import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { getTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 import { isLiveLocale } from './is-live-locale';
 
-const { getTenantLiveLocalesMock } = vi.hoisted(() => ({
-  getTenantLiveLocalesMock: vi.fn(),
-}));
+vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales');
 
-vi.mock('@shinefold/db', () => ({
-  queries: { tenants: { getTenantLiveLocales: getTenantLiveLocalesMock } },
-}));
+const getTenantLiveLocalesMock = vi.mocked(getTenantLiveLocales);
 
 const { EN, NL } = LOCALE_ISO_CODES;
 

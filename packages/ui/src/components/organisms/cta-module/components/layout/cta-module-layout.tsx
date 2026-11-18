@@ -1,4 +1,8 @@
-import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import type {
+  IWithClassName,
+  IWithDataTestId,
+  TBrandVariant,
+} from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { CtaModuleSlotParts } from '@shinefold/ui/components/organisms/cta-module/cta-module-slot-parts';
 import type {
@@ -13,6 +17,7 @@ import { cloneElement, Fragment } from 'react';
 
 export type TCtaModuleLayoutProps = IWithClassName &
   IWithDataTestId & {
+    tone: TBrandVariant;
     styles: TCtaModuleStyles;
     bannerStyles?: TCtaModuleBannerStyles;
     heading: string;
@@ -22,6 +27,7 @@ export type TCtaModuleLayoutProps = IWithClassName &
 
 /** The markup every `CtaModule` layout shares, styled by the layout that renders it. */
 export const CtaModuleLayout = ({
+  tone,
   styles: s,
   bannerStyles: banner,
   heading,
@@ -38,6 +44,7 @@ export const CtaModuleLayout = ({
       className={s.root({
         class: [banner?.root(), banner?.copy(), className],
       })}
+      data-skin={tone}
       data-testid={dataTestId}
     >
       <div className={s.body()}>

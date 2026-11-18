@@ -40,7 +40,7 @@ export const segmentedControlVariants = tv({
         ],
       },
     },
-    isLocked: {
+    isInactive: {
       true: {
         root: ['lg:border-platform-control-line-locked'],
         option: [
@@ -59,8 +59,15 @@ export const segmentedControlVariants = tv({
         ],
       },
     },
+    isLocked: {
+      true: {
+        option: ['text-platform-faint data-[pressed]:text-platform-muted'],
+      },
+      false: {},
+    },
   },
   defaultVariants: {
+    isInactive: false,
     isLocked: false,
     hasGlyphs: false,
     layout: SEGMENTED_LAYOUT.FIT,

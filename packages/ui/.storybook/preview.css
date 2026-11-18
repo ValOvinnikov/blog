@@ -1,3 +1,6 @@
+@import '../index.css';
+@import '@shinefold/tailwind-config/skins-storybook.css';
+
 /* Unlayered and class-scoped so it beats Storybook's base body background, which outranks theme.css's @layer base. */
 body.sb-show-main {
   background: var(--primary);

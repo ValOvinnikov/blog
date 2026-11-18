@@ -17,6 +17,7 @@ import {
 import { SCHEME_RAMPS } from './contrast-scheme-ramps';
 import {
   AMBIENT,
+  AMBIENT_RAISED,
   FIELD_BOUNDARY,
   PRIMARY_SUBTLE,
   SECONDARY,
@@ -36,7 +37,7 @@ import type { TOklchRamp } from './theme-declarations';
 
 const SKIN_SURFACE_OF: Record<TThemeToken, TThemeToken> = {
   '--primary': AMBIENT,
-  [PRIMARY_SUBTLE]: AMBIENT,
+  [PRIMARY_SUBTLE]: AMBIENT_RAISED,
   [SECONDARY]: AMBIENT,
   ...Object.fromEntries(
     [NEUTRAL_SCRIMS, BRAND_SCRIMS].flatMap((scrims) =>

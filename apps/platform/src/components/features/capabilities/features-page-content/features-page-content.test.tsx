@@ -121,17 +121,48 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
       expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
     });
 
-    it('shows the analytics id kept from a paid plan, read-only', async () => {
-      getStoredTenantAnalyticsMock.mockResolvedValueOnce(MOCK_GOOGLE_ANALYTICS);
+    describe('with a Google Analytics id kept from a paid plan', () => {
+      beforeEach(async () => {
+        getStoredTenantAnalyticsMock.mockResolvedValueOnce(
+          MOCK_GOOGLE_ANALYTICS,
+        );
+        await setup();
+      });
 
-      await setup();
+      it('leaves the consent banner off and unlocked', () => {
+        const consentSwitch = screen.getByRole('switch', {
+          name: toggleLabel[CAPABILITY.CONSENT_BANNER],
+        });
 
-      const field = screen.getByRole('textbox', { name: MEASUREMENT_ID_LABEL });
+        expect(consentSwitch).not.toBeChecked();
+        expect(consentSwitch).toBeEnabled();
+      });
 
-      expect(getStoredTenantAnalyticsMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-      expect(field).toHaveValue(MOCK_GOOGLE_ANALYTICS.analyticsId);
-      expect(field).toHaveAttribute('readonly');
+      it('shows the id read-only', () => {
+        const field = screen.getByRole('textbox', {
+          name: MEASUREMENT_ID_LABEL,
+        });
+
+        expect(getStoredTenantAnalyticsMock).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+        );
+        expect(field).toHaveValue(MOCK_GOOGLE_ANALYTICS.analyticsId);
+        expect(field).toHaveAttribute('readonly');
+      });
     });
+  });
+
+  it('shows the consent banner on and locked while a Google Analytics id is stored', async () => {
+    getStoredTenantAnalyticsMock.mockResolvedValueOnce(MOCK_GOOGLE_ANALYTICS);
+
+    await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.STARTER }) });
+
+    const consentSwitch = screen.getByRole('switch', {
+      name: toggleLabel[CAPABILITY.CONSENT_BANNER],
+    });
+
+    expect(consentSwitch).toBeChecked();
+    expect(consentSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
   });
 
   it('lets a Starter owner edit the analytics id', async () => {

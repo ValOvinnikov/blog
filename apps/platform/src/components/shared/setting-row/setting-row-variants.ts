@@ -11,6 +11,7 @@ export const settingRowVariants = tv({
     label: ['block text-platform-13 font-semibold text-platform-text'],
     description: ['mt-0.5 block'],
     control: ['flex shrink-0 items-center gap-2'],
+    error: ['mt-1 block text-platform-11-5 text-platform-bad'],
   },
   variants: {
     isNested: {

@@ -3,7 +3,11 @@
 import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
-import type { TFeaturesFormValues } from '@platform/utils/analytics-draft/analytics-draft';
+import {
+  hasGoogleAnalyticsId,
+  withConsentBannerForGoogleAnalytics,
+  type TFeaturesFormValues,
+} from '@platform/utils/analytics-draft/analytics-draft';
 import {
   SHOWN_CAPABILITY_TOGGLES,
   type TSettingsFeaturesValues,
@@ -51,7 +55,8 @@ export const FeaturesSettings = ({
     archivedNoticeId,
     form,
     analyticsFieldErrors,
-    clearAnalyticsFieldErrors,
+    featuresFieldErrors,
+    clearFieldErrors,
   } = useFeaturesForm({
     tenantId,
     initialValues,
@@ -64,7 +69,18 @@ export const FeaturesSettings = ({
     field: keyof TSettingsFeaturesValues,
     checked: boolean,
   ) => {
+    clearFieldErrors();
     setValues((prev) => ({ ...prev, [field]: checked }));
+  };
+
+  const consentBannerState = {
+    requiredReason:
+      hasOwnAnalytics && hasGoogleAnalyticsId(values)
+        ? t('consentBannerRequiredNote')
+        : undefined,
+    error: featuresFieldErrors.consentBannerEnabled
+      ? t('consentBannerRequiredError')
+      : undefined,
   };
 
   return (
@@ -92,12 +108,14 @@ export const FeaturesSettings = ({
                   idFieldId={analyticsIdFieldId}
                   isIdInvalid={Boolean(analyticsFieldErrors.analyticsId)}
                   onChange={({ analyticsProvider, analyticsId }) => {
-                    clearAnalyticsFieldErrors();
-                    setValues((prev) => ({
-                      ...prev,
-                      analyticsProvider,
-                      analyticsId,
-                    }));
+                    clearFieldErrors();
+                    setValues((prev) =>
+                      withConsentBannerForGoogleAnalytics({
+                        ...prev,
+                        analyticsProvider,
+                        analyticsId,
+                      }),
+                    );
                   }}
                 />
               );
@@ -114,6 +132,8 @@ export const FeaturesSettings = ({
                   (!isUndefined(parentField) && !values[parentField])
                 }
                 isArchived={isArchived}
+                {...(capability === CAPABILITY.CONSENT_BANNER &&
+                  consentBannerState)}
                 describedBy={isArchived ? archivedNoticeId : undefined}
                 onCheckedChange={(checked) => handleToggle(field, checked)}
               />

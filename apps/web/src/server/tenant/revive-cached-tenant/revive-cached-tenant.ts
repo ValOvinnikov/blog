@@ -1,11 +1,8 @@
-import type { TMaybeJsonDates, TMaybeNull } from '@shinefold/config';
+import type { TMaybeJsonDates } from '@shinefold/config';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import { isNull } from '@shinefold/utils/primitives';
+import { toMaybeDate } from '@web/utils/to-maybe-date';
 
 const toDate = (value: Date | string): Date => new Date(value);
-
-const toMaybeDate = (value: TMaybeNull<Date | string>): TMaybeNull<Date> =>
-  isNull(value) ? null : new Date(value);
 
 export const reviveCachedTenant = (
   tenant: TMaybeJsonDates<TTenant>,

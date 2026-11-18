@@ -1722,6 +1722,8 @@
     "alertSuccess": "Features saved.",
     "alertError": "Couldn't save — try again.",
     "planLockedBadge": "{plan, select, FREE {Free plan} STARTER {Starter plan} other {Growth plan}}",
+    "consentBannerRequiredNote": "Needed for Google Analytics, which asks visitors for consent.",
+    "consentBannerRequiredError": "Google Analytics is set up, so the consent banner has to stay on. Clear the Measurement ID or switch to Plausible first.",
     "comingSoonBadge": "Coming soon",
     "switchOn": "On",
     "switchOff": "Off",
@@ -2201,25 +2203,23 @@
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Open your dashboard",
+    "plansLinkLabel": "See what each plan includes",
     "GROWTH": {
       "subject": "Your site is now on the Growth plan",
       "previewText": "{siteName} can now use every Growth option.",
       "changed": "{siteName} is now on the Growth plan.",
-      "options": "Growth options are now available on your site: more languages, every Look setting, extra page modules, and features such as the contact form, bookmarks and analytics.",
-      "kept": "If you used Growth before, your earlier choices are back as you left them."
+      "kept": "Nothing is deleted. If you used Growth before, your earlier choices are back as you left them."
     },
     "STARTER": {
       "subject": "Your site is now on the Starter plan",
       "previewText": "{siteName} can now use the Starter options.",
       "changed": "{siteName} is now on the Starter plan.",
-      "options": "On Starter your site can use its own domain and the contact form, and its footer has no “Powered by” mark. More languages, every Look setting and the other page modules come with Growth.",
       "kept": "Nothing is deleted. Your content and settings are kept, and anything from Growth is back as you left it if you move to Growth."
     },
     "FREE": {
       "subject": "Your site is now on the Free plan",
       "previewText": "Paid-plan options are switched off on {siteName}.",
       "changed": "{siteName} is now on the Free plan.",
-      "options": "Paid-plan options are switched off on your site: extra languages, the Growth Look settings, paid page modules, and features such as the contact form, bookmarks and analytics.",
       "kept": "Nothing is deleted. Your content and settings are kept, and they come back if you move to a paid plan again."
     }
   },

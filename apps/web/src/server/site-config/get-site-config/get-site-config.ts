@@ -1,8 +1,8 @@
 import { TENANT_CONFIG_REVALIDATE_SECONDS } from '@shinefold/config';
 import { queries } from '@shinefold/db';
-import { toEffectiveLook } from '@shinefold/db/utils/effective-look/effective-look';
+import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 import { safeAsync } from '@shinefold/utils';
-import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
+import { getEffectiveEntitlements } from '@web/server/site-config/get-effective-entitlements/get-effective-entitlements';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { buildSiteConfigCacheTag } from '@web/utils/tenant-cache-tags';
 import { unstable_cache } from 'next/cache';
@@ -23,13 +23,13 @@ const getSiteConfigForTenantId = cache(
   safeAsync(async (tenantId?: string) => {
     if (!tenantId) return undefined;
 
-    const [siteConfig, plan] = await Promise.all([
+    const [siteConfig, entitlements] = await Promise.all([
       getCachedSiteConfigForTenant(tenantId),
-      getEffectivePlan(tenantId),
+      getEffectiveEntitlements(tenantId),
     ]);
     if (!siteConfig) return undefined;
 
-    return toEffectiveLook(siteConfig, plan);
+    return toEffectiveLookWithin(siteConfig, entitlements);
   }),
 );
 

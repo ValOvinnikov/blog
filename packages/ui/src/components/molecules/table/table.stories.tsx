@@ -4,6 +4,7 @@ import {
   RADIUS_SCALE,
   type TRadiusScale,
 } from '@shinefold/config';
+import { SurfaceBands } from '@shinefold/ui/testing/surface-bands';
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 
@@ -47,6 +48,10 @@ const sparseRows = createRows(
   () => faker.helpers.maybe(shortCell, { probability: 0.4 }) ?? '',
 );
 const secondHeaderRow = createColumns(columns.length);
+const narrowColumns = createColumns(2);
+const narrowRows = createRows(narrowColumns.length, 3, () =>
+  faker.lorem.word(),
+);
 
 const renderHeaderRow = (headings: TTableStoryCell[]) => (
   <Table.Row>
@@ -79,6 +84,12 @@ const atPhoneWidth: Decorator = (Story) => (
   <div className="max-w-[390px] outline outline-dashed outline-divider">
     <Story />
   </div>
+);
+
+const onSurfaceBands: Decorator = (Story) => (
+  <SurfaceBands>
+    <Story />
+  </SurfaceBands>
 );
 
 const atRadiusScale = (radiusScale: TRadiusScale): Decorator => {
@@ -245,5 +256,30 @@ export const EmptyCellsAtPhoneWidthInDarkMode: TStory = {
 
 export const LongContentAtPhoneWidthInDarkMode: TStory = {
   ...LongContentAtPhoneWidth,
+  globals: { theme: 'dark' },
+};
+
+export const WideTableOnBandsAtPhoneWidth: TStory = {
+  ...WideTableAtPhoneWidth,
+  decorators: [onSurfaceBands],
+};
+
+export const WideTableOnBandsAtPhoneWidthInDarkMode: TStory = {
+  ...WideTableOnBandsAtPhoneWidth,
+  globals: { theme: 'dark' },
+};
+
+export const NarrowTableOnBandsAtPhoneWidth: TStory = {
+  args: {
+    children: [
+      <Table.Head key="head">{renderHeaderRow(narrowColumns)}</Table.Head>,
+      renderBodyRows(narrowRows),
+    ],
+  },
+  decorators: [onSurfaceBands],
+};
+
+export const NarrowTableOnBandsAtPhoneWidthInDarkMode: TStory = {
+  ...NarrowTableOnBandsAtPhoneWidth,
   globals: { theme: 'dark' },
 };

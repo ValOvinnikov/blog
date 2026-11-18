@@ -33,7 +33,7 @@ const meta = {
   argTypes: {
     tone: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.tone),
+      options: Object.values(BRAND_VARIANT),
     },
     contentPosition: {
       control: 'select',

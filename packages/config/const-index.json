@@ -8610,6 +8610,14 @@
         "file": "apps/platform/src/constants/settings-features.ts"
       }
     ],
+    "CONSENT_BANNER_REQUIRED": [
+      {
+        "ref": "FEATURES_FIELD_ERROR.CONSENT_BANNER_REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-features",
+        "file": "apps/platform/src/constants/settings-features.ts"
+      }
+    ],
     "NOT_IN_PLAN": [
       {
         "ref": "SETTINGS_REFUSAL.NOT_IN_PLAN",
@@ -10954,6 +10962,14 @@
         "file": "apps/web/src/constants/newsletter.ts"
       }
     ],
+    "newsletter.link_locale_tenant_lookup_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.LINK_LOCALE_TENANT_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
     "post_featured_module.fetch_failed": [
       {
         "ref": "POST_FEATURED_LOG.MODULE_FETCH_FAILED",
@@ -11141,6 +11157,14 @@
     "request_context.not_found_tenant_load_failed": [
       {
         "ref": "REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/request-context",
+        "file": "apps/web/src/constants/request-context.ts"
+      }
+    ],
+    "request_context.not_found_live_locales_failed": [
+      {
+        "ref": "REQUEST_CONTEXT_LOG.NOT_FOUND_LIVE_LOCALES_FAILED",
         "scope": "app:web",
         "from": "@web/constants/request-context",
         "file": "apps/web/src/constants/request-context.ts"
@@ -11490,6 +11514,22 @@
         "file": "apps/web/src/constants/session.ts"
       }
     ],
+    "settings_features.plan_fetch_failed": [
+      {
+        "ref": "SETTINGS_FEATURES_LOG.PLAN_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/settings-features",
+        "file": "apps/web/src/constants/settings-features.ts"
+      }
+    ],
+    "settings_features.effective_fetch_failed": [
+      {
+        "ref": "SETTINGS_FEATURES_LOG.EFFECTIVE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/settings-features",
+        "file": "apps/web/src/constants/settings-features.ts"
+      }
+    ],
     "auth.site_oauth_credentials_failed": [
       {
         "ref": "SIGN_IN_LOG.SITE_CREDENTIALS_FAILED",
@@ -11688,6 +11728,14 @@
         "scope": "app:web",
         "from": "@web/constants/tenant-email-identity",
         "file": "apps/web/src/constants/tenant-email-identity.ts"
+      }
+    ],
+    "tenant_entitlements.grants_fetch_failed": [
+      {
+        "ref": "TENANT_ENTITLEMENTS_LOG.GRANTS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tenant-entitlements",
+        "file": "apps/web/src/constants/tenant-entitlements.ts"
       }
     ],
     "tenant_write.unresolved": [
@@ -11938,6 +11986,54 @@
         "file": "apps/worker/src/constants/inactivity-sweep.ts"
       }
     ],
+    "member_access.check_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.CHECK_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.check_now_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.CHECK_NOW_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.resend_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.RESEND_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.revoke_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.REVOKE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.invite_delete_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.INVITE_DELETE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.sweep_member_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.SWEEP_MEMBER_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
     "newsletter_send.start_failed": [
       {
         "ref": "NEWSLETTER_SEND_LOG.START_FAILED",
@@ -12099,6 +12195,22 @@
     "owner_access.check_failed": [
       {
         "ref": "OWNER_ACCESS_LOG.CHECK_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.check_now_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.CHECK_NOW_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.resend_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.RESEND_FAILED",
         "scope": "app:worker",
         "from": "@worker/constants/owner-access",
         "file": "apps/worker/src/constants/owner-access.ts"

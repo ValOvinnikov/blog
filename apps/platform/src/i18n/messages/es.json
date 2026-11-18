@@ -1722,6 +1722,8 @@
     "alertSuccess": "Funciones guardadas.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
     "planLockedBadge": "{plan, select, FREE {Plan Free} STARTER {Plan Starter} other {Plan Growth}}",
+    "consentBannerRequiredNote": "Necesario para Google Analytics, que pide el consentimiento de los visitantes.",
+    "consentBannerRequiredError": "Google Analytics está configurado, así que el banner de consentimiento debe seguir activo. Borre primero el ID de medición o cambie a Plausible.",
     "comingSoonBadge": "Próximamente",
     "switchOn": "Activado",
     "switchOff": "Desactivado",
@@ -2201,25 +2203,23 @@
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Abrir tu panel",
+    "plansLinkLabel": "Mira qué incluye cada plan",
     "GROWTH": {
       "subject": "Tu sitio ya está en el plan Growth",
       "previewText": "{siteName} ya puede usar todas las opciones de Growth.",
       "changed": "{siteName} ya está en el plan Growth.",
-      "options": "Las opciones de Growth ya están disponibles en tu sitio: más idiomas, todos los ajustes de Aspecto, módulos de página adicionales y funciones como el formulario de contacto, los marcadores y las estadísticas.",
-      "kept": "Si ya usaste Growth antes, tus opciones anteriores vuelven tal como las dejaste."
+      "kept": "No se borra nada. Si ya usaste Growth antes, tus opciones anteriores vuelven tal como las dejaste."
     },
     "STARTER": {
       "subject": "Tu sitio ya está en el plan Starter",
       "previewText": "{siteName} ya puede usar las opciones de Starter.",
       "changed": "{siteName} ya está en el plan Starter.",
-      "options": "Con Starter tu sitio puede usar su propio dominio y el formulario de contacto, y su pie de página no muestra «Con la tecnología de». Más idiomas, todos los ajustes de Aspecto y los demás módulos de página vienen con Growth.",
       "kept": "No se borra nada. Tu contenido y tus ajustes se conservan, y lo de Growth vuelve tal como lo dejaste si cambias a Growth."
     },
     "FREE": {
       "subject": "Tu sitio ya está en el plan Free",
       "previewText": "Las opciones de los planes de pago están desactivadas en {siteName}.",
       "changed": "{siteName} ya está en el plan Free.",
-      "options": "Las opciones de los planes de pago están desactivadas en tu sitio: idiomas adicionales, los ajustes de Aspecto de Growth, los módulos de página de pago y funciones como el formulario de contacto, los marcadores y las estadísticas.",
       "kept": "No se borra nada. Tu contenido y tus ajustes se conservan y vuelven si cambias de nuevo a un plan de pago."
     }
   },

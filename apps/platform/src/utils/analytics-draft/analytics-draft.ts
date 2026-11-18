@@ -1,3 +1,4 @@
+import { blankToNull } from '@platform/utils/blank-to-null/blank-to-null';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
 import type { TMaybeUndefined } from '@shinefold/config';
 import {
@@ -5,6 +6,7 @@ import {
   type TAnalyticsProvider,
 } from '@shinefold/config/constants';
 import type { TTenantAnalytics } from '@shinefold/db/queries/tenant-analytics';
+import { isNull } from '@shinefold/utils/primitives';
 
 export type TAnalyticsDraft = {
   analyticsProvider: TAnalyticsProvider;
@@ -40,3 +42,18 @@ export const splitFeaturesFormValues = ({
   features: TSettingsFeaturesValues;
   analytics: TAnalyticsDraft;
 } => ({ features, analytics: { analyticsProvider, analyticsId } });
+
+export const hasGoogleAnalyticsId = ({
+  analyticsProvider,
+  analyticsId,
+}: TAnalyticsDraft): boolean =>
+  analyticsProvider === ANALYTICS_PROVIDER.GOOGLE_ANALYTICS &&
+  !isNull(blankToNull(analyticsId));
+
+/** Google Analytics loads only after a visitor allows it in the consent banner, so its id keeps the banner on. */
+export const withConsentBannerForGoogleAnalytics = (
+  values: TFeaturesFormValues,
+): TFeaturesFormValues =>
+  hasGoogleAnalyticsId(values)
+    ? { ...values, consentBannerEnabled: true }
+    : values;

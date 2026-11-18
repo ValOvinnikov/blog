@@ -8,6 +8,7 @@ import { resolveTenant, resolveTenantRouting } from './resolve-tenant';
 faker.seed(6109);
 
 vi.mock('@web/utils/is-production-environment');
+vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales');
 vi.mock(
   'next/cache',
   () => import('@web/testing/server/next-cache/memoizing-next-cache'),
@@ -16,7 +17,7 @@ vi.mock('@shinefold/db', async () => ({
   ...(await import('@shinefold/db/constants')),
   queries: {
     tenantDomains: { getTenantByDomain: vi.fn() },
-    tenants: { listTenants: vi.fn(), selectLiveLocales: vi.fn() },
+    tenants: { listTenants: vi.fn() },
   },
 }));
 
@@ -29,13 +30,15 @@ const getTenantByDomainMock = vi.mocked(
 );
 
 describe('resolveTenant caching', () => {
+  let host: string;
+
   beforeEach(() => {
     vi.resetAllMocks();
     vi.mocked(queries.tenants.listTenants).mockResolvedValue([]);
+    host = faker.internet.domainName();
   });
 
   it('resolves a repeated host from the cache with its timestamps intact', async () => {
-    const host = faker.internet.domainName();
     getTenantByDomainMock.mockResolvedValue(MOCK_TENANT);
 
     await resolveTenant(host);
@@ -45,7 +48,6 @@ describe('resolveTenant caching', () => {
   });
 
   it('looks a host up again after it resolved no tenant', async () => {
-    const host = faker.internet.domainName();
     getTenantByDomainMock
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(MOCK_TENANT);
@@ -57,7 +59,6 @@ describe('resolveTenant caching', () => {
   });
 
   it('rethrows a failed lookup without caching it', async () => {
-    const host = faker.internet.domainName();
     getTenantByDomainMock
       .mockRejectedValueOnce(MOCK_ERROR)
       .mockResolvedValueOnce(MOCK_TENANT);

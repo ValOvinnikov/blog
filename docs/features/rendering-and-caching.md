@@ -17,7 +17,8 @@ code:
   - apps/web/src/server/tenant/tenant-live-locales/**
   - apps/web/src/server/tenant/tenant-page-lists/**
   - apps/web/src/server/site-config/get-site-config/**
-  - apps/web/src/server/settings-features/get-tenant-plan/**
+  - apps/web/src/server/settings-features/get-tenant-entitlements/**
+  - apps/web/src/server/tenant/tenant-entitlements/**
   - apps/web/src/server/settings-features/get-effective-settings-features/**
   - apps/platform/src/server/site-config/revalidate-site-config.ts
   - apps/web/src/server/draft-preview/**
@@ -46,7 +47,7 @@ A member can see an unpublished draft on the tenant's real site through a signed
 ## Data
 
 - **Sanity Data Cache** — every `@shinefold/service` loader but the two below passes `isr(tags, projectId)`, which emits `revalidate: 86400` (`SANITY_CONTENT_REVALIDATE_SECONDS`) and tags prefixed `t:<projectId>:<tag>`. With `SANITY_LIVE_CONTENT=1` in development it returns `cache: 'no-store'`. Those two are never cached, because the revalidate webhook acts on their answer: the publish-date read (`getPostPublishedAt`, `cache: 'no-store'`) and the referencing-module lookup (`getReferencingModuleIds`, `revalidate: 0`). The Sanity client runs with `useCdn: false`.
-- **Tenant config Data Cache** — `getSiteConfig`, `getTenantPlan`, `getEffectiveSettingsFeatures`, `resolveTenant` and `getPlanPrices` wrap their `@shinefold/db` reads in `unstable_cache`, tagged `site-config:<tenantId>`, `tenant-plan:<tenantId>`, `settings-features:<tenantId>`, `tenant-by-host` and `stripe-catalogue`, `revalidate: 86400` (`TENANT_CONFIG_REVALIDATE_SECONDS`).
+- **Tenant config Data Cache** — `getSiteConfig`, `getTenantEntitlements`, `getEffectiveSettingsFeatures`, `resolveTenant` and `getPlanPrices` wrap their `@shinefold/db` reads in `unstable_cache`, tagged `site-config:<tenantId>`, `tenant-plan:<tenantId>`, `settings-features:<tenantId>`, `tenant-by-host` and `stripe-catalogue`, `revalidate: 86400` (`TENANT_CONFIG_REVALIDATE_SECONDS`). The one exception is the proxy's read of a tenant's entitlement grants, which has its own entry tagged `site-config:<tenantId>` with a one-hour revalidate.
 - **Full Route Cache** — `CONTENT_ROUTE_REVALIDATE_SECONDS` (86400) is the backstop; each route hardcodes the literal. A page caches only as long as the shortest window among its route and every Data Cache read it makes, so the three windows are held equal at 24 hours.
 - **`REVALIDATE_TAGS`** (`apps/web/src/utils/revalidate-tags`) maps a document `_type` to the tags its publish purges. Module types also purge `module:<id>`; any module whose markup embeds the published document is found through `service.entities.modules.v1.getReferencingModuleIds` and purged by its `module:<id>` too.
 - Per-request memoisation uses `React.cache` (tenant row, base URL, page loaders), never the Data Cache.
@@ -54,7 +55,7 @@ A member can see an unpublished draft on the tenant's real site through a signed
 ## Configuration
 
 - No editor or operator settings. Editors trigger purges by publishing; owners trigger them by saving Look, Voice or Features (see [look](./look.md), [voice](./voice.md), [plans-and-entitlements](./plans-and-entitlements.md)).
-- Provisioning creates each tenant project's Sanity webhook (`createSanityWebhook` in `@shinefold/db`). Its projection sends `_type`, `_id`, `slug` and `previousSlug` — the slug before the change, from `before()`, `null` on a create — so a renamed page's old address is known. `listSanityWebhooks` exposes each hook's projection and `updateSanityWebhookProjection` replaces it by sending the whole rule (`on` and `projection`), so a `filter` set on the hook is dropped — provisioned hooks set none — and the hook's secret is untouched.
+- Provisioning creates each tenant project's Sanity webhook (`createSanityWebhook` in `@shinefold/db`). Its projection sends `_type`, `_id`, `slug` and `previousSlug` — the slug before the change, from `before()`, `null` on a create — so a renamed page's old address is known. It also sends `source`, `previousSource` and `language`, set only for a `redirect` (`previousSource` from `before()`, `null` on a create) and `null` for every other type, so a redirect's old and new addresses on its tenant are known. `listSanityWebhooks` exposes each hook's projection and `updateSanityWebhookProjection` replaces it by sending the whole rule (`on` and `projection`), so a `filter` set on the hook is dropped — provisioned hooks set none — and the hook's secret is untouched.
 
 ## Constraints and invariants
 
@@ -99,7 +100,7 @@ A member can see an unpublished draft on the tenant's real site through a signed
 
 ## Tests and stories
 
-- Web: `app/api/revalidate/route.test.ts`, `app/api/revalidate-site-config/route.test.ts`, `revalidate-tags.test.ts`, `tenant-cache-tags.test.ts`, `derive-revalidate-paths.test.ts`, `derive-post-publish-paths.test.ts`, `derive-tenant-site-paths.test.ts`, `build-tenant-site-paths.test.ts`, `build-next-page-paths.test.ts`, `tenant-live-locales.test.ts`, `resolve-tenant-site-paths.test.ts`, `resolve-referencing-module-tags.test.ts`, `build-post-publish-paths.test.ts`, `get-site-config.test.ts`, `get-tenant-plan.test.ts`, `get-effective-settings-features.test.ts`, `has-draft-preview-token.test.ts`, `enter-draft-preview.test.ts`, and the draft preview cases in `proxy.test.ts` and `request-context.test.ts`; each route's `page.test.tsx` asserts its `revalidate` literal.
+- Web: `app/api/revalidate/route.test.ts`, `app/api/revalidate-site-config/route.test.ts`, `revalidate-tags.test.ts`, `tenant-cache-tags.test.ts`, `derive-revalidate-paths.test.ts`, `derive-post-publish-paths.test.ts`, `derive-tenant-site-paths.test.ts`, `build-tenant-site-paths.test.ts`, `build-next-page-paths.test.ts`, `tenant-live-locales.test.ts`, `resolve-tenant-site-paths.test.ts`, `resolve-referencing-module-tags.test.ts`, `build-post-publish-paths.test.ts`, `get-site-config.test.ts`, `get-tenant-entitlements.test.ts`, `tenant-entitlements.test.ts`, `get-effective-settings-features.test.ts`, `has-draft-preview-token.test.ts`, `enter-draft-preview.test.ts`, and the draft preview cases in `proxy.test.ts` and `request-context.test.ts`; each route's `page.test.tsx` asserts its `revalidate` literal.
 - Service: `packages/service/src/sanity/query/isr.test.ts`.
 - Utils: `packages/utils/src/preview-token/preview-token.test.ts`.
 - Scripts: `scripts/check-revalidate-tags-sync.test.mjs`.

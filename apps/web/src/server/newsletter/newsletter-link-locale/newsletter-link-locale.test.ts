@@ -1,5 +1,5 @@
 import { LOCALE_ISO_CODES } from '@shinefold/config';
-import type { TTenant } from '@shinefold/db/schema/tenants';
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { mockNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -9,21 +9,7 @@ import { resolveNewsletterLinkLocale } from './newsletter-link-locale';
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-vi.mock('@shinefold/db', () => ({
-  queries: {
-    tenants: {
-      selectLiveLocales: ({
-        locale,
-        additionalLocales,
-      }: Pick<TTenant, 'locale' | 'additionalLocales'>) => [
-        locale,
-        ...additionalLocales,
-      ],
-    },
-  },
-}));
-
-const MOCK_LOOKUP_FAILED_EVENT = 'newsletter.link_locale_tenant_lookup_failed';
+vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales');
 
 describe(resolveNewsletterLinkLocale, () => {
   it('keeps a language the tenant offers', async () => {
@@ -58,7 +44,7 @@ describe(resolveNewsletterLinkLocale, () => {
 
     expect(linkLocale).toEqual(mockNewsletterLinkLocale());
     expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
-      MOCK_LOOKUP_FAILED_EVENT,
+      NEWSLETTER_LOG.LINK_LOCALE_TENANT_LOOKUP_FAILED,
       { error: MOCK_ERROR },
     );
   });

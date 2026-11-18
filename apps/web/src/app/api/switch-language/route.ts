@@ -1,9 +1,9 @@
 import { HTTP_STATUS } from '@shinefold/config/constants';
-import { queries } from '@shinefold/db';
 import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { SINGLE_LANGUAGE_ROUTING } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { isPlatformFallbackAllowed } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import { selectTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { getTenantTranslationMap } from '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map';
 import { rememberLanguage } from '@web/utils/language-cookie';
 import { parseSwitchLanguageRequest } from '@web/utils/parse-switch-language-request';
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const { defaultLocale, liveLocales } = tenant
     ? {
         defaultLocale: tenant.locale,
-        liveLocales: queries.tenants.selectLiveLocales(tenant),
+        liveLocales: await selectTenantLiveLocales(tenant),
       }
     : SINGLE_LANGUAGE_ROUTING;
   const switchRequest = parseSwitchLanguageRequest(

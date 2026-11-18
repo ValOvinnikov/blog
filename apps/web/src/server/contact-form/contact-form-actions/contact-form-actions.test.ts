@@ -55,6 +55,9 @@ vi.mock('@shinefold/db', async () => ({
   queries: {
     leads: { createLead: vi.fn() },
     tenants: { getTenantById: vi.fn() },
+    tenantEntitlementGrants: (
+      await import('@web/testing/server/settings-features/entitlement-grants-db')
+    ).tenantEntitlementGrants,
     settingsFeatures: { getSettingsFeatures: vi.fn() },
     siteConfig: { getSiteConfig: vi.fn() },
     emailConfig: { getContactRecipient: vi.fn(), getEmailConfig: vi.fn() },

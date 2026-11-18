@@ -5,14 +5,18 @@ export const SECONDARY = '--secondary' satisfies TThemeToken;
 export const SURFACE_2 = '--surface-2' satisfies TThemeToken;
 export const BRAND_PRIMARY_MUTED =
   '--brand-primary-muted' satisfies TThemeToken;
+export const ERROR = '--error' satisfies TThemeToken;
 export const ERROR_MUTED = '--error-muted' satisfies TThemeToken;
 export const AMBIENT = '--ambient' satisfies TThemeToken;
+export const AMBIENT_RAISED = '--ambient-raised' satisfies TThemeToken;
 export const FIELD_BOUNDARY = '--field-boundary' satisfies TThemeToken;
 export const TEXT = '--text' satisfies TThemeToken;
 export const TEXT_MUTED = '--text-muted' satisfies TThemeToken;
 export const BORDER_EMPHASIS = '--border-emphasis' satisfies TThemeToken;
 export const BRAND_PRIMARY_WASH = '--brand-primary-wash' satisfies TThemeToken;
 export const BRAND_PRIMARY = '--brand-primary' satisfies TThemeToken;
+export const BRAND_PRIMARY_CONTRAST =
+  '--brand-primary-contrast' satisfies TThemeToken;
 export const ITEM_ACCENT_BRAND_SHARE =
   '--item-accent-brand-share' satisfies TThemeToken;
 
