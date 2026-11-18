@@ -154,7 +154,7 @@ describe(buildThemePreviewStyle, () => {
     },
   );
 
-  it('colours the brand palette, and the logo ramp when no logo hue is set, at the accent hue', () => {
+  it('colours the brand palette and a logo with no hue at the accent hue', () => {
     const style = buildThemePreviewStyle(MOCK_PREVIEW_VALUES, false);
 
     expect(style).toMatchObject({
