@@ -79,8 +79,11 @@ describe(checkScheduledPost, () => {
     });
   });
 
-  it('is stale when the post was unpublished or deleted', async () => {
-    vi.mocked(readPostPublishedAt).mockResolvedValue(undefined);
+  it.each([
+    ['was unpublished or deleted', undefined],
+    ['carries a date that cannot be read', 'not-a-date'],
+  ])('is stale when the post %s', async (_label, currentPublishedAt) => {
+    vi.mocked(readPostPublishedAt).mockResolvedValue(currentPublishedAt);
 
     await expect(runCheck()).resolves.toEqual(STALE);
   });

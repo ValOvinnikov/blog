@@ -23,7 +23,9 @@ export async function checkScheduledPost(
 
   const currentPublishedAt = await readPostPublishedAt(credentials, postId);
   const publishAtMs = Date.parse(publishedAt);
-  if (!currentPublishedAt) return STALE;
+  if (!currentPublishedAt || Number.isNaN(Date.parse(currentPublishedAt))) {
+    return STALE;
+  }
   if (Date.parse(currentPublishedAt) !== publishAtMs) {
     return {
       state: SCHEDULED_POST_STATE.REDATED,
