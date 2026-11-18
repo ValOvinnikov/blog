@@ -22,6 +22,7 @@ export * from './subscribers';
 export * from './takeaway-generation-counts';
 export * from './tenant-analytics';
 export * from './tenant-domains';
+export * from './tenant-entitlement-grants';
 export * from './tenant-enums';
 export * from './tenant-oauth-credentials';
 export * from './tenant-suspensions';

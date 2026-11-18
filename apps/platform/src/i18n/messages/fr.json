@@ -515,7 +515,9 @@
       "NEWSLETTER_PAUSE_CLEARED": "Pause de la newsletter levée",
       "MEMBER_INVITED": "Membre de l’équipe invité",
       "MEMBER_REMOVED": "Membre de l’équipe retiré",
-      "MEMBER_INVITE_CANCELLED": "Invitation à l’équipe annulée"
+      "MEMBER_INVITE_CANCELLED": "Invitation à l’équipe annulée",
+      "ENTITLEMENT_GRANTED": "Fonctionnalité accordée",
+      "ENTITLEMENT_REVOKED": "Fonctionnalité accordée révoquée"
     },
     "detail": {
       "field": {

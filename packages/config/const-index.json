@@ -640,6 +640,22 @@
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
+    "ENTITLEMENT_GRANTED": [
+      {
+        "ref": "AUDIT_ACTION.ENTITLEMENT_GRANTED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "ENTITLEMENT_REVOKED": [
+      {
+        "ref": "AUDIT_ACTION.ENTITLEMENT_REVOKED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
     "SITE": [
       {
         "ref": "AUTH_APP.SITE",
@@ -1445,6 +1461,14 @@
     "DB_DOMAIN_CLAIM_EXISTS": [
       {
         "ref": "ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
+    "DB_ENTITLEMENT_ALREADY_GRANTED": [
+      {
+        "ref": "ERROR_CODE.DB_ENTITLEMENT_ALREADY_GRANTED",
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
@@ -4680,6 +4704,38 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "CAPABILITY": [
+      {
+        "ref": "ENTITLEMENT_KIND.CAPABILITY",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
+      }
+    ],
+    "MODULE_PACK": [
+      {
+        "ref": "ENTITLEMENT_KIND.MODULE_PACK",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
+      }
+    ],
+    "LOOK_FIELD": [
+      {
+        "ref": "ENTITLEMENT_KIND.LOOK_FIELD",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
+      }
+    ],
+    "LOCALE_LIMIT": [
+      {
+        "ref": "ENTITLEMENT_KIND.LOCALE_LIMIT",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
       }
     ],
     "OWNER": [

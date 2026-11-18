@@ -515,7 +515,9 @@
       "NEWSLETTER_PAUSE_CLEARED": "Nieuwsbriefpauze opgeheven",
       "MEMBER_INVITED": "Teamlid uitgenodigd",
       "MEMBER_REMOVED": "Teamlid verwijderd",
-      "MEMBER_INVITE_CANCELLED": "Teamuitnodiging geannuleerd"
+      "MEMBER_INVITE_CANCELLED": "Teamuitnodiging geannuleerd",
+      "ENTITLEMENT_GRANTED": "Functie toegekend",
+      "ENTITLEMENT_REVOKED": "Functietoekenning ingetrokken"
     },
     "detail": {
       "field": {

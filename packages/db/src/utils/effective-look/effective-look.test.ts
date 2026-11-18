@@ -28,12 +28,16 @@ import {
   SPINNER_STYLE,
   TENANT_PLAN,
 } from '@shinefold/config/constants';
+import { LOOK_FIELD } from '@shinefold/db/constants';
 import { MOCK_ACCENT_HUE } from '@shinefold/db/testing/site-config/fixtures';
 
 import {
   isLookFieldEntitled,
+  isLookFieldWithin,
   pickEntitledLook,
+  pickLookWithin,
   toEffectiveLook,
+  toEffectiveLookWithin,
   type TLook,
 } from './effective-look';
 
@@ -158,5 +162,36 @@ describe(pickEntitledLook, () => {
         TENANT_PLAN.FREE,
       ),
     ).toEqual({ preset, accentHue });
+  });
+});
+
+describe('entitlement-taking forms', () => {
+  const MOCK_ENTITLEMENTS = {
+    lookFields: [LOOK_FIELD.PRESET, LOOK_FIELD.HEADING_FONT],
+  };
+  const { preset, headingFont, bodyFont } = STORED_LOOK;
+
+  it('reports a granted field as entitled', () => {
+    expect(isLookFieldWithin(LOOK_FIELD.HEADING_FONT, MOCK_ENTITLEMENTS)).toBe(
+      true,
+    );
+    expect(isLookFieldWithin(LOOK_FIELD.BODY_FONT, MOCK_ENTITLEMENTS)).toBe(
+      false,
+    );
+  });
+
+  it('keeps a granted stored value and replaces the rest', () => {
+    expect(
+      toEffectiveLookWithin(
+        { preset, headingFont, bodyFont },
+        MOCK_ENTITLEMENTS,
+      ),
+    ).toEqual({ preset, headingFont, bodyFont: FONT_CHOICE.INTER });
+  });
+
+  it('picks only the granted fields', () => {
+    expect(
+      pickLookWithin({ preset, headingFont, bodyFont }, MOCK_ENTITLEMENTS),
+    ).toEqual({ preset, headingFont });
   });
 });
