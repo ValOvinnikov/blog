@@ -64,8 +64,10 @@ export const adminRoutes = {
       ? `/tenants/${tenantId}/activity?page=${page}`
       : `/tenants/${tenantId}/activity`,
   tenantStudio: (tenantId: string) => `/tenants/${tenantId}/${STUDIO_SEGMENT}`,
+  tenantDraftPreviews: (tenantId: string) =>
+    `/tenants/${tenantId}/${DRAFT_PREVIEW_SEGMENT}`,
   tenantDraftPreview: (tenantId: string, documentId: string) =>
-    `/tenants/${tenantId}/${DRAFT_PREVIEW_SEGMENT}/${encodeURIComponent(documentId)}`,
+    `${adminRoutes.tenantDraftPreviews(tenantId)}/${encodeURIComponent(documentId)}`,
   tenantHelp: (tenantId: string) => `/tenants/${tenantId}/help`,
   dashboard: () => '/dashboard',
   dashboardDomain: () => '/dashboard/domain',
@@ -79,8 +81,9 @@ export const adminRoutes = {
   dashboardUpgrade: () => '/dashboard/upgrade',
   dashboardBilling: () => '/dashboard/billing',
   dashboardStudio: () => `/dashboard/${STUDIO_SEGMENT}`,
+  dashboardDraftPreviews: () => `/dashboard/${DRAFT_PREVIEW_SEGMENT}`,
   dashboardDraftPreview: (documentId: string) =>
-    `/dashboard/${DRAFT_PREVIEW_SEGMENT}/${encodeURIComponent(documentId)}`,
+    `${adminRoutes.dashboardDraftPreviews()}/${encodeURIComponent(documentId)}`,
   dashboardHelp: () => '/dashboard/help',
   dashboardSelectTenant: () => '/dashboard/select-tenant',
   dashboardSelectTenantHref: (tenantId: string) =>

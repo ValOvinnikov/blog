@@ -8,6 +8,7 @@ export const MOCK_DEPROVISION_ENV = {
   vercelTeamId: undefined,
   vercelWebProjectId: `prj_${faker.string.alphanumeric(12)}`,
   tenantRootDomain: faker.internet.domainName(),
+  marketingHost: faker.internet.domainName(),
   dryRun: false,
   githubActor: faker.internet.username(),
   githubRunId: faker.string.numeric(10),

@@ -7,6 +7,8 @@ code:
   - packages/studio/src/studio-mount.test.tsx
   - packages/studio/src/studio-config.ts
   - packages/studio/src/studio-config.test.ts
+  - packages/studio/src/document-actions/document-options/**
+  - packages/studio/src/document-actions/preview-action/**
   - packages/studio/src/index.ts
   - packages/studio/sanity.config.ts
   - packages/studio/sanity-env.ts
@@ -237,6 +239,14 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   `frame-src`, and every page keeps `frame-ancestors 'none'`. The site itself
   allows framing only for a valid token, by the platform's origin
   ([rendering-and-caching](./rendering-and-caching.md)).
+- The Studio opens it: given `previewBasePath` (a plain string `StudioMount`
+  takes, like `basePath`), posts and landing pages carry a "Preview" document
+  action, after the others, that opens `{previewBasePath}/{documentId}` in a
+  new tab — disabled until the document has been saved. `StudioMountView`
+  passes `adminRoutes.dashboardDraftPreviews()` for the owner's Studio and
+  `adminRoutes.tenantDraftPreviews(id)` for the operator's. Other document
+  types, and a Studio opened without a preview base path (the Sanity CLI
+  Studio), show no Preview action.
 - The preview CSP comes from `next.config` `headers()`, so it applies only to a
   full page load: a client-side navigation into a preview route keeps the
   Stripe-only `frame-src` and the frame is blocked. Anything that opens the
@@ -263,6 +273,8 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
 
 - `packages/studio/src/studio-mount.tsx`
 - `packages/studio/src/studio-config.ts`
+- `packages/studio/src/document-actions/document-options/document-options.ts`
+- `packages/studio/src/document-actions/preview-action/preview-action.ts`
 - `apps/platform/src/components/features/studio/studio-mount-view/studio-mount-view.tsx`
 - `apps/platform/src/components/features/studio/dashboard-studio-view/dashboard-studio-view.tsx`
 - `apps/platform/src/components/features/studio/owner-studio-access-view/owner-studio-access-view.tsx`

@@ -1,4 +1,5 @@
-import { CONSENT_CATEGORY, routes } from '@shinefold/config';
+import { CONSENT_CATEGORY, routes, SITE_MESSAGES } from '@shinefold/config';
+import { MOCK_GOOGLE_ANALYTICS } from '@shinefold/db/testing/tenant-analytics/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import {
   customRender,
@@ -14,11 +15,14 @@ import {
   PREFERENCES_OPEN_TEXT,
   PreferencesState,
 } from '@web/testing/shared/consent/consent-preferences-probes';
+import { withSiteAnalytics } from '@web/testing/shared/site-analytics/with-site-analytics';
 
 import { ConsentBannerSlot } from './consent-banner-slot';
 
 const BANNER_HEADING = 'Cookies on this site';
 const COOKIE_STATEMENT_LINK = 'Cookie statement';
+const { acceptLabel, message, messageWithAnalytics } =
+  SITE_MESSAGES.consent.banner;
 
 const setup = customRender(ConsentBannerSlot, { isEnabled: true });
 
@@ -66,24 +70,34 @@ describe(`<${ConsentBannerSlot.name}/>`, () => {
       expect(heading).toBeVisible();
     });
 
-    it('links the cookie statement', () => {
-      const link = screen.getByRole('link', { name: COOKIE_STATEMENT_LINK });
+    it('asks about external media only', () => {
+      const sentence = screen.getByText(message);
 
-      expect(link).toHaveAttribute('href', routes.cookieStatement());
+      expect(sentence).toBeVisible();
     });
 
-    it('leaves the choice unanswered when the cookie statement is followed', async () => {
-      const link = screen.getByRole('link', { name: COOKIE_STATEMENT_LINK });
+    describe('the cookie statement link', () => {
+      let link: HTMLElement;
 
-      await user.click(link);
+      beforeEach(() => {
+        link = screen.getByRole('link', { name: COOKIE_STATEMENT_LINK });
+      });
 
-      const heading = screen.getByRole('heading', { name: BANNER_HEADING });
-      expect(heading).toBeVisible();
-      expect(readGrantedConsent()).toBeUndefined();
+      it('goes to the cookie statement', () => {
+        expect(link).toHaveAttribute('href', routes.cookieStatement());
+      });
+
+      it('leaves the choice unanswered when followed', async () => {
+        await user.click(link);
+
+        const heading = screen.getByRole('heading', { name: BANNER_HEADING });
+        expect(heading).toBeVisible();
+        expect(readGrantedConsent()).toBeUndefined();
+      });
     });
 
     it('hides and remembers the choice on accept all', async () => {
-      const acceptButton = screen.getByRole('button', { name: 'Accept all' });
+      const acceptButton = screen.getByRole('button', { name: acceptLabel });
 
       await user.click(acceptButton);
 
@@ -111,6 +125,34 @@ describe(`<${ConsentBannerSlot.name}/>`, () => {
       const heading = screen.getByRole('heading', { name: BANNER_HEADING });
       expect(openState).toBeVisible();
       expect(heading).toBeVisible();
+    });
+  });
+
+  describe('on a site that loads Google Analytics', () => {
+    beforeEach(() => {
+      renderElement(
+        withSiteAnalytics(
+          <ConsentBannerSlot isEnabled={true} />,
+          MOCK_GOOGLE_ANALYTICS,
+        ),
+      );
+    });
+
+    it('asks about analytics as well', () => {
+      const sentence = screen.getByText(messageWithAnalytics);
+
+      expect(sentence).toBeVisible();
+    });
+
+    it('grants analytics on accept all', async () => {
+      const acceptButton = screen.getByRole('button', { name: acceptLabel });
+
+      await user.click(acceptButton);
+
+      expect(readGrantedConsent()).toEqual([
+        CONSENT_CATEGORY.ANALYTICS,
+        CONSENT_CATEGORY.EXTERNAL_MEDIA,
+      ]);
     });
   });
 });

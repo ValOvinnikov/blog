@@ -30,6 +30,7 @@ export const DashboardStudioView = async ({
       await StudioMountView({
         tenant,
         basePath: adminRoutes.dashboardStudio(),
+        previewBasePath: adminRoutes.dashboardDraftPreviews(),
         loginProvider: studioAccess
           ? (tenant.ownerLoginProvider ?? undefined)
           : undefined,
