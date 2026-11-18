@@ -5,13 +5,17 @@ import {
   MOCK_TENANT_NAME,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { ACTION_OUTCOME } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 
 import { resolveConfirmedTenant } from './resolve-confirmed-tenant';
 
 vi.mock('@shinefold/db', () => ({
-  queries: { tenants: { getTenantById: vi.fn() } },
+  queries: {
+    ...noEntitlementGrantQueries(),
+    tenants: { getTenantById: vi.fn() },
+  },
 }));
 
 const getTenantByIdMock = vi.mocked(queries.tenants.getTenantById);

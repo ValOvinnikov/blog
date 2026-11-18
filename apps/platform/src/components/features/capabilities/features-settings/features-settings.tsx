@@ -28,7 +28,7 @@ import { useFeaturesForm } from './use-features-form';
 
 export type TFeaturesSettingsProps = {
   tenantId: string;
-  entitledCapabilities: TCapability[];
+  entitledCapabilities: readonly TCapability[];
   hasOwnAnalytics: boolean;
   initialValues: TFeaturesFormValues;
   savedAt?: Date;

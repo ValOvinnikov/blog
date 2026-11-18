@@ -72,7 +72,7 @@ export const featureDefaultsToValues = (
 
 export const clampToEntitlement = (
   values: TSettingsFeaturesValues,
-  entitledCapabilities: TCapability[],
+  entitledCapabilities: readonly TCapability[],
 ): TSettingsFeaturesValues => {
   const clamped = { ...values };
   for (const { capability, field } of CAPABILITY_TOGGLES) {
@@ -86,7 +86,7 @@ export const clampToEntitlement = (
 export const keepStoredOutOfPlan = (
   values: TSettingsFeaturesValues,
   stored: TSettingsFeaturesValues,
-  entitledCapabilities: TCapability[],
+  entitledCapabilities: readonly TCapability[],
 ): TSettingsFeaturesValues => {
   const kept = { ...values };
   for (const { capability, field } of CAPABILITY_TOGGLES) {
@@ -100,7 +100,7 @@ export const keepStoredOutOfPlan = (
 export const listSwitchedOnOutOfPlan = (
   values: TSettingsFeaturesValues,
   stored: TSettingsFeaturesValues,
-  entitledCapabilities: TCapability[],
+  entitledCapabilities: readonly TCapability[],
 ): (keyof TSettingsFeaturesValues)[] =>
   CAPABILITY_TOGGLES.filter(
     ({ capability, field }) =>

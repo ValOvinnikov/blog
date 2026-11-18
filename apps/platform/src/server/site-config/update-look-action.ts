@@ -26,7 +26,7 @@ import {
 } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { SITE_CONFIG_SAVED_AT } from '@shinefold/db/constants';
-import { pickEntitledLook } from '@shinefold/db/utils/effective-look/effective-look';
+import { pickLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
@@ -53,7 +53,7 @@ export const updateLookAction = async (
     const refused = listRefusedLookFields(
       { ...parsed.data, logoHue: parsed.data.logoHue ?? undefined },
       stored,
-      tenant.plan,
+      tenant.entitlements,
     );
     if (hasArrayGotItems(refused)) {
       return toNotInPlanRefusal(tenant.plan, refused);
@@ -61,9 +61,9 @@ export const updateLookAction = async (
 
     const look = {
       preset,
-      ...pickEntitledLook(
+      ...pickLookWithin(
         { ...rest, brandName: blankToNull(brandName) },
-        tenant.plan,
+        tenant.entitlements,
       ),
     };
     await queries.siteConfig.upsertSiteConfig(tenant.id, look);

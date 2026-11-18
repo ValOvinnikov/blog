@@ -12,6 +12,7 @@ import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import {
   MOCK_FREE_STUDIO_ENTITLEMENTS,
   mockStudioReadyTenant,
@@ -52,11 +53,12 @@ vi.mock('@platform/server/studio-entry/resolve-has-entered-studio');
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     memberships: {
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },
     tenants: {
-      selectLiveLocales: vi.fn(() => []),
+      selectLiveLocalesWithin: vi.fn(() => []),
     },
     admins: { getAdminByUserId: vi.fn() },
   },

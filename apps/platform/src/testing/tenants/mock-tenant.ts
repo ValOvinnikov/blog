@@ -13,6 +13,7 @@ import type { TTenant } from '@shinefold/db/schema/tenants';
 import { MOCK_NO_BILLING } from '@shinefold/db/testing/tenants/billing';
 import { MOCK_NO_HOLD } from '@shinefold/db/testing/tenants/inactivity';
 import { MOCK_NO_OWNER_ACCESS } from '@shinefold/db/testing/tenants/owner-access';
+import type { TResolvableGrant } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 
 import {
   mockDoneProvisioningSteps,
@@ -29,7 +30,10 @@ import {
 export const MOCK_TRIAL_ENDS_AT = new Date('2026-04-16T00:00:00.000Z');
 const TENANT_SEEDED_AT = new Date('2026-01-01T00:00:00.000Z');
 
-export const mockTenant = (overrides: Partial<TTenant> = {}): TPlatformTenant =>
+export const mockTenant = (
+  overrides: Partial<TTenant> = {},
+  grants: readonly TResolvableGrant[] = [],
+): TPlatformTenant =>
   toPlatformTenant(
     {
       id: MOCK_TENANT_ID,
@@ -67,6 +71,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TPlatformTenant =>
       updatedAt: MOCK_TENANT_CREATED_AT,
       ...overrides,
     },
+    grants,
     MOCK_TENANT_CREATED_AT,
   );
 

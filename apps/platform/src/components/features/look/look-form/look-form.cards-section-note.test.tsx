@@ -6,7 +6,7 @@ import { OUTLINED } from '@platform/testing/look/look-form-fixtures';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
 import {
   setupLookForm,
-  withLookTenant,
+  withLookPlan,
 } from '@platform/testing/look/look-form-setup';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -82,7 +82,7 @@ describe(`<${LookForm.name}/> card style section note`, () => {
   });
 
   it('shows the note on Free with Card style locked', async () => {
-    setupLookForm(withLookTenant({ plan: TENANT_PLAN.FREE }));
+    setupLookForm(withLookPlan(TENANT_PLAN.FREE));
     await openLookRow(user, LOOK_ROW.CARDS);
 
     const note = screen.getByText(SECTION_NOTE);

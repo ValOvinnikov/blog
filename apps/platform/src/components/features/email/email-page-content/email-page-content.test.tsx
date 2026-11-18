@@ -54,7 +54,7 @@ vi.mock('@shinefold/db', async () => ({
       listEmailTemplateLogoUrls: listEmailTemplateLogoUrlsMock,
       listAuthoredEmailTemplates: listAuthoredEmailTemplatesMock,
     },
-    tenants: { selectLiveLocales: selectLiveLocalesMock },
+    tenants: { selectLiveLocalesWithin: selectLiveLocalesMock },
   },
 }));
 

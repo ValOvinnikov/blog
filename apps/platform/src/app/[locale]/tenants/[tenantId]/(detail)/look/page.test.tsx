@@ -3,6 +3,7 @@ import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockTenant, MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import LookPage from './page';
@@ -21,10 +22,11 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     admins: { getAdminByUserId: getAdminByUserIdMock },
     tenants: {
       getTenantById: getTenantByIdMock,
-      selectLiveLocales: vi.fn(() => [LOCALE_ISO_CODES.EN]),
+      selectLiveLocalesWithin: vi.fn(() => [LOCALE_ISO_CODES.EN]),
     },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },

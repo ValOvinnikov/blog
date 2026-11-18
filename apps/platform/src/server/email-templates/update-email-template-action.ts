@@ -64,7 +64,11 @@ export const updateEmailTemplateAction = async (
   }
 
   const { tenant } = await requireTenantManager(tenantId);
-  if (!queries.tenants.selectLiveLocales(tenant).includes(parsedLocale.data)) {
+  if (
+    !queries.tenants
+      .selectLiveLocalesWithin(tenant, tenant.entitlements)
+      .includes(parsedLocale.data)
+  ) {
     return {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SETTINGS_REFUSAL.LOCALE_NOT_LIVE,

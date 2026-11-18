@@ -8,6 +8,7 @@ import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import TenantDomainPage from './page';
@@ -26,6 +27,7 @@ vi.mock('@platform/utils/env/env');
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     admins: { getAdminByUserId: getAdminByUserIdMock },
     tenants: { getTenantById: getTenantByIdMock },
     tenantDomains: { listTenantDomains: vi.fn(async () => []) },

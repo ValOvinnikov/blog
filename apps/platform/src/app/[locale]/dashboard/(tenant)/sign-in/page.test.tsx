@@ -4,6 +4,7 @@ import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockMembershipWithTenant } from '@platform/testing/memberships/membership-with-tenant';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockTenant } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@shinefold/config';
 import { redirect } from 'next/navigation';
@@ -22,6 +23,7 @@ vi.mock('@platform/server/auth/auth');
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     memberships: {
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },

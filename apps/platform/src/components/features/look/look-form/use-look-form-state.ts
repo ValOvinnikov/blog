@@ -11,36 +11,32 @@ import {
   isBrandAssetKind,
   listLostStagedFiles,
 } from '@platform/utils/look-form-values/look-form-values';
-import { isAccentHueAccessible, type TTenantPlan } from '@shinefold/config';
-import { toEffectiveLook } from '@shinefold/db/utils/effective-look/effective-look';
+import { isAccentHueAccessible } from '@shinefold/config';
+import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
 import { buildLookFormContext } from './build-look-form-context';
+import type { TLookFormTenant } from './look-form-tenant';
 import { useLookDraftFields } from './use-look-draft-fields';
 import { useLookSave } from './use-look-save';
 import { useLookSaveErrors } from './use-look-save-errors';
 import { usePreviewDevice } from './use-preview-device';
 
 type TUseLookFormStateArgs = {
-  tenantId: string;
-  tenantName: string;
+  tenant: TLookFormTenant;
   initialValues: TLookFormValues;
-  plan: TTenantPlan;
   savedAt?: Date;
-  archivedAt?: Date;
   revealInvalidField: (row: TLookRow) => void;
 };
 
 export const useLookFormState = ({
-  tenantId,
-  tenantName,
+  tenant,
   initialValues,
-  plan,
   savedAt,
-  archivedAt,
   revealInvalidField,
 }: TUseLookFormStateArgs) => {
+  const { id: tenantId, name: tenantName, lookFields, archivedAt } = tenant;
   const accentHueFieldId = useId();
   const brandNameFieldId = useId();
   const brandAssetFieldIds = { logo: useId(), favicon: useId() };
@@ -96,7 +92,7 @@ export const useLookFormState = ({
       onRestore: (draftValues) => {
         setRepickKinds(listLostStagedFiles(draftValues));
         setValues((prev) => ({
-          ...toEffectiveLook(draftValues, plan),
+          ...toEffectiveLookWithin(draftValues, { lookFields }),
           logo: prev.logo,
           favicon: prev.favicon,
         }));
@@ -123,7 +119,7 @@ export const useLookFormState = ({
     savedValues,
     setValues,
     updateField,
-    plan,
+    lookFields,
     accentHueFieldId,
     brandNameFieldId,
     repickKinds,

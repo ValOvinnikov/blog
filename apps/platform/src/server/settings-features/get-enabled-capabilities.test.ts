@@ -1,5 +1,9 @@
 import { mockAllOnSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_ID,
+  mockEntitlementGrant,
+  mockTenantEntitlements,
+} from '@platform/testing/tenants/fixtures';
 import { CAPABILITY } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 
@@ -34,7 +38,7 @@ describe(getEnabledCapabilities, () => {
   it('includes a capability the plan entitles and the toggle enables', async () => {
     const result = await getEnabledCapabilities({
       id: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.GROWTH,
+      entitlements: mockTenantEntitlements(TENANT_PLAN.GROWTH),
     });
 
     expect(getSettingsFeaturesOrDefaultsMock).toHaveBeenCalledWith(
@@ -48,7 +52,7 @@ describe(getEnabledCapabilities, () => {
 
     const result = await getEnabledCapabilities({
       id: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.GROWTH,
+      entitlements: mockTenantEntitlements(TENANT_PLAN.GROWTH),
     });
 
     expect(result).not.toContain(CAPABILITY.NEWSLETTER);
@@ -58,11 +62,22 @@ describe(getEnabledCapabilities, () => {
   it('omits a capability the plan does not entitle', async () => {
     const result = await getEnabledCapabilities({
       id: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.FREE,
+      entitlements: mockTenantEntitlements(TENANT_PLAN.FREE),
     });
 
     expect(result).not.toContain(CAPABILITY.CONTACT_FORM);
     expect(result).toContain(CAPABILITY.CONSENT_BANNER);
+  });
+
+  it('includes a capability granted outside the plan', async () => {
+    const result = await getEnabledCapabilities({
+      id: MOCK_TENANT_ID,
+      entitlements: mockTenantEntitlements(TENANT_PLAN.FREE, [
+        mockEntitlementGrant({ key: CAPABILITY.CONTACT_FORM }),
+      ]),
+    });
+
+    expect(result).toContain(CAPABILITY.CONTACT_FORM);
   });
 
   it('omits every Reader accounts sub-item while Reader accounts is off', async () => {
@@ -70,7 +85,7 @@ describe(getEnabledCapabilities, () => {
 
     const result = await getEnabledCapabilities({
       id: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.GROWTH,
+      entitlements: mockTenantEntitlements(TENANT_PLAN.GROWTH),
     });
 
     expect(result).not.toContain(CAPABILITY.READER_ACCOUNTS);

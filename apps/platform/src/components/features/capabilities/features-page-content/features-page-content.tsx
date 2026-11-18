@@ -10,7 +10,6 @@ import {
   withComingSoonOff,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
 import { queries } from '@shinefold/db';
-import { PLAN_REGISTRY } from '@shinefold/db/constants';
 
 export type TFeaturesPageContentProps = {
   tenant: TPlatformTenant;
@@ -19,8 +18,8 @@ export type TFeaturesPageContentProps = {
 export const FeaturesPageContent = async ({
   tenant,
 }: TFeaturesPageContentProps) => {
-  const { id, plan, entitlements, archivedAt } = tenant;
-  const entitledCapabilities = PLAN_REGISTRY[plan];
+  const { id, entitlements, archivedAt } = tenant;
+  const entitledCapabilities = entitlements.capabilities;
   const [{ values, savedAt }, storedAnalytics] = await Promise.all([
     getSettingsFeaturesOrDefaults(id),
     queries.tenantAnalytics.getStoredTenantAnalytics(id),

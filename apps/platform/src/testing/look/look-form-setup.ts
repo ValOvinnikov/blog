@@ -1,7 +1,5 @@
-import {
-  LookForm,
-  type TLookFormTenant,
-} from '@platform/components/features/look/look-form/look-form';
+import { LookForm } from '@platform/components/features/look/look-form/look-form';
+import type { TLookFormTenant } from '@platform/components/features/look/look-form/look-form-tenant';
 import { customRender } from '@platform/testing/custom-render';
 import { MOCK_LOGO_URL } from '@platform/testing/site-config/fixtures';
 import {
@@ -12,18 +10,22 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { LOCALE_ISO_CODES } from '@shinefold/config';
-import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 
 const MOCK_LOOK_TENANT: TLookFormTenant = {
   id: MOCK_TENANT_ID,
   name: MOCK_TENANT_NAME,
   siteHost: MOCK_TENANT_DOMAIN,
-  plan: TENANT_PLAN.GROWTH,
+  lookFields: PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH].lookFields,
 };
 
 export const withLookTenant = (overrides: Partial<TLookFormTenant>) => ({
   tenant: { ...MOCK_LOOK_TENANT, ...overrides },
 });
+
+export const withLookPlan = (plan: TTenantPlan) =>
+  withLookTenant({ lookFields: PLAN_ENTITLEMENTS[plan].lookFields });
 
 export const setupLookForm = customRender(LookForm, {
   tenant: MOCK_LOOK_TENANT,

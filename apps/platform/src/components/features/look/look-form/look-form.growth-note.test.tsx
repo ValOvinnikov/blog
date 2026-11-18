@@ -5,7 +5,7 @@ import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { lookRowTrigger } from '@platform/testing/look/look-form-interactions';
 import {
   setupLookForm,
-  withLookTenant,
+  withLookPlan,
 } from '@platform/testing/look/look-form-setup';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -36,7 +36,7 @@ describe(`<${LookForm.name}/> Growth note`, () => {
 
   describe('on Free', () => {
     beforeEach(() => {
-      setupLookForm(withLookTenant({ plan: TENANT_PLAN.FREE }));
+      setupLookForm(withLookPlan(TENANT_PLAN.FREE));
     });
 
     it('puts the note above the preset strip, folded', () => {
@@ -90,7 +90,7 @@ describe(`<${LookForm.name}/> Growth note`, () => {
   });
 
   it('shows no note on Growth', () => {
-    setupLookForm(withLookTenant({ plan: TENANT_PLAN.GROWTH }));
+    setupLookForm(withLookPlan(TENANT_PLAN.GROWTH));
 
     const title = screen.queryByText(GROWTH_NOTE.title);
 

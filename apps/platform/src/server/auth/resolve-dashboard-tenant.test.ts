@@ -25,6 +25,8 @@ vi.mock('@platform/server/auth/list-session-tenants', () => ({
   listSessionTenants: vi.fn(),
 }));
 
+vi.mock('@platform/server/tenants/load-platform-tenant');
+
 faker.seed(5997);
 
 const MOCK_USER_ID = faker.string.uuid();

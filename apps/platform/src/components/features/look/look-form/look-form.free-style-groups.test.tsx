@@ -2,7 +2,7 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import {
   setupLookForm,
-  withLookTenant,
+  withLookPlan,
 } from '@platform/testing/look/look-form-setup';
 import { expectStyleGroupLockedAtDefault } from '@platform/testing/look/look-free-locks';
 import { TENANT_PLAN } from '@shinefold/config/constants';
@@ -29,7 +29,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   describe('on Free', () => {
     beforeEach(() => {
-      setupLookForm(withLookTenant({ plan: TENANT_PLAN.FREE }));
+      setupLookForm(withLookPlan(TENANT_PLAN.FREE));
     });
 
     it.each([

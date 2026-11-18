@@ -17,6 +17,7 @@ import {
   MOCK_TENANT_NAME,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { logger } from '@platform/utils/logger/logger';
 import {
   ACTION_OUTCOME,
@@ -37,6 +38,7 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@shinefold/db', () => ({
   queries: {
+    ...noEntitlementGrantQueries(),
     tenants: { getTenantById: vi.fn(), deleteTenant: vi.fn() },
     auditEvents: { insertAuditEvent: vi.fn() },
   },

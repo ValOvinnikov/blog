@@ -32,6 +32,7 @@ import {
   mockReadyTenant,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { MOCK_UNSUPPORTED_LOCALE } from '@platform/testing/tenants/unsupported-locale';
 import { logger } from '@platform/utils/logger/logger';
 import {
@@ -102,6 +103,7 @@ vi.mock('next/server', () => ({
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     tenants: {
       getTenantById: getTenantByIdMock,
       updateTenantDetails: updateTenantDetailsMock,

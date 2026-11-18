@@ -24,7 +24,7 @@ vi.mock('@shinefold/db', async () => ({
   ).mockDbConstants()),
   queries: {
     siteConfig: { getSiteConfig: getSiteConfigMock },
-    tenants: { selectLiveLocales: selectLiveLocalesMock },
+    tenants: { selectLiveLocalesWithin: selectLiveLocalesMock },
   },
 }));
 
@@ -37,7 +37,7 @@ describe(`<${LookPageContent.name}/> preview`, () => {
   beforeEach(() => {
     arrangeLookPageQueries({
       getSiteConfig: getSiteConfigMock,
-      selectLiveLocales: selectLiveLocalesMock,
+      selectLiveLocalesWithin: selectLiveLocalesMock,
     });
   });
 

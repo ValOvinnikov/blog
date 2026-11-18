@@ -4,19 +4,23 @@ import {
   type TLocaleIsoCode,
 } from '@shinefold/config/constants';
 import { getDb } from '@shinefold/db/client';
-import { PLAN_LOCALE_LIMIT } from '@shinefold/db/constants';
+import { listResolvableEntitlementGrants } from '@shinefold/db/queries/tenant-entitlement-grants/list-resolvable-entitlement-grants';
 import { getTenantLocales } from '@shinefold/db/queries/tenants/get-tenant-locales';
 import { tenants } from '@shinefold/db/schema/tenants';
+import { resolveTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { eq } from 'drizzle-orm';
 
-// Past the plan limit only already-stored locales are kept, so a downgraded
+// Past the limit only already-stored locales are kept, so a downgraded
 // tenant can reorder which ones are live without losing the rest.
 export async function setTenantAdditionalLocales(
   tenantId: string,
   additionalLocales: TLocaleIsoCode[],
 ): Promise<TResult<TLocaleIsoCode[], TErrorCode>> {
-  const locales = await getTenantLocales(tenantId);
+  const [locales, grants] = await Promise.all([
+    getTenantLocales(tenantId),
+    listResolvableEntitlementGrants(tenantId),
+  ]);
 
   if (!locales) {
     return errorResult(ERROR_CODE.DB_NOT_FOUND);
@@ -29,12 +33,13 @@ export async function setTenantAdditionalLocales(
     return errorResult(ERROR_CODE.DB_DEFAULT_LOCALE_REPEATED);
   }
 
-  const overPlanLimit = uniqueLocales.length + 1 > PLAN_LOCALE_LIMIT[plan];
+  const { localeLimit } = resolveTenantEntitlements(plan, grants, new Date());
+  const overLimit = uniqueLocales.length + 1 > localeLimit;
   const addsUnstoredLocale = uniqueLocales.some(
     (locale) => !storedLocales.includes(locale),
   );
 
-  if (overPlanLimit && addsUnstoredLocale) {
+  if (overLimit && addsUnstoredLocale) {
     return errorResult(ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED);
   }
 
