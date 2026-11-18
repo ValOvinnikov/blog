@@ -32,7 +32,7 @@ describe(getInactivitySweepEnv, () => {
     expect(getInactivitySweepEnv().marketingHost).toBeUndefined();
   });
 
-  it('links the plan comparison on the configured marketing site, keeping its scheme', () => {
+  it('links the plan comparison on the marketing site, keeping its scheme', () => {
     mockEnv.MARKETING_SITE_URL = MOCK_LOCAL_MARKETING_SITE_URL;
 
     expect(getInactivitySweepEnv().pricingPageUrl).toBe(
@@ -40,7 +40,7 @@ describe(getInactivitySweepEnv, () => {
     );
   });
 
-  it('links the plan comparison on the root domain apex without a marketing site address', () => {
+  it('links the plan comparison on the root domain apex otherwise', () => {
     expect(getInactivitySweepEnv().pricingPageUrl).toBe(
       `https://${MOCK_SWEEP_ENV.tenantRootDomain}${routes.pricingComparison()}`,
     );
