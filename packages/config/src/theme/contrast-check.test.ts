@@ -1,13 +1,16 @@
 import {
   CARD_STYLE,
   COLOR_SCHEME,
+  CONTRAST_ROLE,
   HEADER_CONTROL_STYLE,
+  HUE_MAX,
+  HUE_MIN,
   NAV_LINK_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
 } from '@shinefold/config/constants';
 
-import { findContrastFailures } from './contrast-check';
+import { findContrastFailures, findPairFailures } from './contrast-check';
 import { KNOWN_CONTRAST_FAILURES } from './contrast-known-failures';
 import { ITEM_ACCENT_BRAND_SHARE } from './contrast-surfaces';
 import { measureContrast } from './contrast-tokens';
@@ -35,6 +38,26 @@ const NAV_LINK_FILL_TOKEN = '--nav-link-fill' as const;
 describe(findContrastFailures, () => {
   it('finds exactly the known failures across every hue, scheme and card style', () => {
     expect(findContrastFailures()).toEqual(KNOWN_CONTRAST_FAILURES);
+  });
+});
+
+describe(findPairFailures, () => {
+  it('reports every hue for a hue-following pair whose colours stay fixed', () => {
+    const failures = findPairFailures(
+      {
+        SAME_SURFACE: {
+          foreground: SURFACE,
+          surfaces: [SURFACE],
+          role: CONTRAST_ROLE.TEXT,
+          followsAccentHue: true,
+        },
+      },
+      [{ scheme: COLOR_SCHEME.LIGHT }],
+    );
+
+    expect(failures).toEqual([
+      expect.objectContaining({ hues: `${HUE_MIN}-${HUE_MAX - 1}` }),
+    ]);
   });
 });
 

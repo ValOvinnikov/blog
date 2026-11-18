@@ -34,4 +34,5 @@ export const COOKIE_LIST_VOICE_FIXED_KEYS = [
   'cookieList.cookies.GOOGLE_ANALYTICS_VISIT.purpose',
   'cookieList.cookies.GOOGLE_ANALYTICS_VISIT.duration',
   'cookieList.analyticsNote',
+  'cookieList.plausibleNote',
 ] as const;
