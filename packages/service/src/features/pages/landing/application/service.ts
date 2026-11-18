@@ -1,5 +1,6 @@
 import { getPageSlugs } from '@shinefold/service/features/pages/landing/adaptor/detail-page-params/loader';
 import { getRedirect } from '@shinefold/service/features/pages/landing/adaptor/redirect/loader';
+import { getRedirectSource } from '@shinefold/service/features/pages/landing/adaptor/redirect-source/loader';
 import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
 import type { TPageQueryPageParams } from '@shinefold/service/shared/types/page/page-query-page-params';
 import { safeAsync } from '@shinefold/utils';
@@ -19,6 +20,9 @@ export function createLandingPageService() {
       getRedirect: safeAsync(
         (segments: string[], tenant: TTenantSanityContext) =>
           getRedirect(segments, tenant),
+      ),
+      getRedirectSource: safeAsync((id: string, tenant: TTenantSanityContext) =>
+        getRedirectSource(id, tenant),
       ),
     },
   };

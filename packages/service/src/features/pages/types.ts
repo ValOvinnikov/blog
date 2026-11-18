@@ -4,6 +4,7 @@ export type {
   TLandingBreadcrumb,
   TLandingPage,
   TLandingRedirect,
+  TLandingRedirectSource,
   TLandingSectionNavigation,
   TLandingSectionPage,
 } from './landing';
