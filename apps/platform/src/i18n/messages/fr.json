@@ -1807,6 +1807,7 @@
     "allowance": "{used} sur {allowed} langues supplémentaires utilisées avec votre formule.",
     "noticeTitle": "Limite de la formule",
     "upgradeNotice": "Votre formule ne publie que la langue par défaut. Passez à une formule supérieure pour ajouter d'autres langues.",
+    "atLimitNotice": "Votre formule publie {allowed, plural, one {# langue supplémentaire} other {# langues supplémentaires}}, et toutes sont utilisées.",
     "downgradeNotice": "Votre formule publie {allowed, plural, one {# langue supplémentaire} other {# langues supplémentaires}}, mais {stored} sont enregistrées. Les {allowed} premières restent en ligne ; les autres sont conservées et rien n'est supprimé.",
     "keptBadge": "Conservée, non publiée avec votre formule",
     "planLockedBadge": "Non incluse dans votre formule",
@@ -2431,6 +2432,7 @@
     "trigger": "Accorder plus de langues",
     "title": "Accorder plus de langues à {tenant}",
     "description": "La formule {plan} ne publie que la langue par défaut. Choisissez combien de langues de plus {tenant} peut publier. Rien n'est facturé.",
+    "descriptionWithAllowance": "La formule {plan} publie {n, plural, one {# langue supplémentaire} other {# langues supplémentaires}}. Choisissez combien de langues de plus {tenant} peut publier. Rien n'est facturé.",
     "countLabel": "Langues supplémentaires",
     "countHint": "Si la formule en autorise plus plus tard, le nombre le plus élevé s'applique."
   },

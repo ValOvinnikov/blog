@@ -1807,6 +1807,7 @@
     "allowance": "{used} von {allowed} zusätzlichen Sprachen Ihres Tarifs in Verwendung.",
     "noticeTitle": "Tarifgrenze",
     "upgradeNotice": "Ihr Tarif veröffentlicht nur die Standardsprache. Führen Sie ein Upgrade durch, um weitere Sprachen hinzuzufügen.",
+    "atLimitNotice": "Ihr Tarif veröffentlicht {allowed, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}, und alle sind in Verwendung.",
     "downgradeNotice": "Ihr Tarif veröffentlicht {allowed, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}, gespeichert sind jedoch {stored}. Die ersten {allowed} bleiben live; die anderen bleiben erhalten, und nichts wird gelöscht.",
     "keptBadge": "Erhalten, in Ihrem Tarif nicht live",
     "planLockedBadge": "Nicht in Ihrem Tarif",
@@ -2431,6 +2432,7 @@
     "trigger": "Weitere Sprachen gewähren",
     "title": "Weitere Sprachen für {tenant} gewähren",
     "description": "Der Tarif {plan} veröffentlicht nur die Standardsprache. Wählen Sie, wie viele weitere Sprachen {tenant} veröffentlichen darf. Es entstehen keine Kosten.",
+    "descriptionWithAllowance": "Der Tarif {plan} veröffentlicht {n, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}. Wählen Sie, wie viele weitere Sprachen {tenant} veröffentlichen darf. Es entstehen keine Kosten.",
     "countLabel": "Zusätzliche Sprachen",
     "countHint": "Erlaubt der Tarif später mehr, gilt die höhere Zahl."
   },

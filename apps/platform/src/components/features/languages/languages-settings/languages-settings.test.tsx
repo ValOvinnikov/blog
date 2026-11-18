@@ -204,6 +204,71 @@ describe(`<${LanguagesSettings.name}/>`, () => {
       });
     });
 
+    describe('for a super admin on a plan whose allowance is used', () => {
+      beforeEach(() => {
+        setup({
+          locales: {
+            stored: [NL, FR],
+            live: [NL, FR],
+            limit: ADDITIONAL_LOCALE_LIMIT,
+          },
+          grants: { target: mockGrantTarget(), granted: undefined },
+        });
+      });
+
+      it('says the allowance is used and offers the grant in the notice', () => {
+        const notice = findPlanLimitNotice();
+        const usedNotice = within(notice).getByText(
+          t('atLimitNotice', { allowed: ADDITIONAL_LOCALE_LIMIT }),
+        );
+        const grant = within(notice).getByRole('button', GRANT_MORE_LANGUAGES);
+
+        expect(usedNotice).toBeVisible();
+        expect(grant).toBeVisible();
+      });
+    });
+
+    it('offers no grant while the allowance has room', () => {
+      setup({
+        locales: { stored: [NL], live: [NL], limit: ADDITIONAL_LOCALE_LIMIT },
+        grants: { target: mockGrantTarget(), granted: undefined },
+      });
+
+      const grant = screen.queryByRole('button', GRANT_MORE_LANGUAGES);
+
+      expect(grant).not.toBeInTheDocument();
+    });
+
+    it('offers no grant once every language is allowed', () => {
+      const everyAdditional = [NL, FR, DE, ES];
+      setup({
+        locales: {
+          stored: everyAdditional,
+          live: everyAdditional,
+          limit: everyAdditional.length,
+        },
+        grants: { target: mockGrantTarget(), granted: undefined },
+      });
+
+      const grant = screen.queryByRole('button', GRANT_MORE_LANGUAGES);
+
+      expect(grant).not.toBeInTheDocument();
+    });
+
+    it('shows the owner no notice when the allowance is used', () => {
+      setup({
+        locales: {
+          stored: [NL, FR],
+          live: [NL, FR],
+          limit: ADDITIONAL_LOCALE_LIMIT,
+        },
+      });
+
+      const notice = screen.queryByText(languagesSettings.noticeTitle);
+
+      expect(notice).not.toBeInTheDocument();
+    });
+
     it('offers no grant to anyone who cannot grant', () => {
       setup({ locales: NO_LANGUAGES_ALLOWED });
 

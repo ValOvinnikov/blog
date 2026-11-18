@@ -1807,6 +1807,7 @@
     "allowance": "{used} de {allowed} idiomas adicionales en uso en su plan.",
     "noticeTitle": "Límite del plan",
     "upgradeNotice": "Su plan solo publica el idioma predeterminado. Mejore su plan para añadir más idiomas.",
+    "atLimitNotice": "Su plan publica {allowed, plural, one {# idioma adicional} other {# idiomas adicionales}} y todos están en uso.",
     "downgradeNotice": "Su plan publica {allowed, plural, one {# idioma adicional} other {# idiomas adicionales}}, pero hay {stored} guardados. Los primeros {allowed} siguen publicados; los demás se conservan y no se elimina nada.",
     "keptBadge": "Conservado, no publicado en su plan",
     "planLockedBadge": "No incluido en su plan",
@@ -2431,6 +2432,7 @@
     "trigger": "Conceder más idiomas",
     "title": "Conceder más idiomas a {tenant}",
     "description": "El plan {plan} solo publica el idioma predeterminado. Elige cuántos idiomas más puede publicar {tenant}. No se cobra nada.",
+    "descriptionWithAllowance": "El plan {plan} publica {n, plural, one {# idioma adicional} other {# idiomas adicionales}}. Elige cuántos idiomas más puede publicar {tenant}. No se cobra nada.",
     "countLabel": "Idiomas adicionales",
     "countHint": "Si el plan permite más después, se aplica el número mayor."
   },

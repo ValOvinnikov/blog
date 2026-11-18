@@ -1,6 +1,10 @@
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import type { TValueOf } from '@shinefold/config/utils';
 
 export const ENTITLEMENT_GRANT_NOTE_MAX_LENGTH = 500;
+
+export const MOST_ADDITIONAL_LANGUAGES =
+  Object.values(LOCALE_ISO_CODES).length - 1;
 
 export const ENTITLEMENT_GRANT_EXPIRY = {
   NEVER: 'NEVER',

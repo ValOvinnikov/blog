@@ -1807,6 +1807,7 @@
     "allowance": "{used} van {allowed} extra talen in gebruik binnen uw abonnement.",
     "noticeTitle": "Abonnementslimiet",
     "upgradeNotice": "Uw abonnement publiceert alleen de standaardtaal. Upgrade om meer talen toe te voegen.",
+    "atLimitNotice": "Uw abonnement publiceert {allowed, plural, one {# extra taal} other {# extra talen}}, en ze zijn allemaal in gebruik.",
     "downgradeNotice": "Uw abonnement publiceert {allowed, plural, one {# extra taal} other {# extra talen}}, maar er zijn er {stored} opgeslagen. De eerste {allowed} blijven live; de andere worden bewaard en er wordt niets verwijderd.",
     "keptBadge": "Bewaard, niet live binnen uw abonnement",
     "planLockedBadge": "Niet in uw abonnement",
@@ -2431,6 +2432,7 @@
     "trigger": "Meer talen toekennen",
     "title": "Meer talen toekennen aan {tenant}",
     "description": "Het {plan}-abonnement publiceert alleen de standaardtaal. Kies hoeveel talen extra {tenant} mag publiceren. Er wordt niets in rekening gebracht.",
+    "descriptionWithAllowance": "Het {plan}-abonnement publiceert {n, plural, one {# extra taal} other {# extra talen}}. Kies hoeveel talen extra {tenant} mag publiceren. Er wordt niets in rekening gebracht.",
     "countLabel": "Extra talen",
     "countHint": "Staat het abonnement later meer toe, dan geldt het hogere aantal."
   },

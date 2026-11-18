@@ -1,16 +1,11 @@
 import {
   ENTITLEMENT_GRANT_EXPIRY,
   ENTITLEMENT_GRANT_NOTE_MAX_LENGTH,
+  MOST_ADDITIONAL_LANGUAGES,
 } from '@platform/constants/entitlement-grant';
-import {
-  CAPABILITY,
-  LOCALE_ISO_CODES,
-  MODULE_PACK,
-} from '@shinefold/config/constants';
+import { CAPABILITY, MODULE_PACK } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND, LOOK_FIELD } from '@shinefold/db/constants';
 import { z } from 'zod';
-
-const LOCALE_COUNT = Object.values(LOCALE_ISO_CODES).length;
 
 const grantItemSchema = z.discriminatedUnion('kind', [
   z.object({
@@ -27,7 +22,11 @@ const grantItemSchema = z.discriminatedUnion('kind', [
   }),
   z.object({
     kind: z.literal(ENTITLEMENT_KIND.LOCALE_LIMIT),
-    value: z.number().int().min(2).max(LOCALE_COUNT),
+    value: z
+      .number()
+      .int()
+      .min(2)
+      .max(MOST_ADDITIONAL_LANGUAGES + 1),
   }),
 ]);
 

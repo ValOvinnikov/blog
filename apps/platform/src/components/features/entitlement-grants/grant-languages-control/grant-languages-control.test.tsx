@@ -23,7 +23,13 @@ const THREE_LANGUAGES = tNames('languages', { count: 3 });
 const ONE_LANGUAGE = tNames('languages', { count: 1 });
 const FOUR_LANGUAGES = tNames('languages', { count: 4 });
 
-const setup = customRender(GrantLanguagesControl, { target: TARGET });
+const GROWTH_TARGET = mockGrantTarget({ plan: TENANT_PLAN.GROWTH });
+const GROWTH_ALLOWANCE = 2;
+
+const setup = customRender(GrantLanguagesControl, {
+  target: TARGET,
+  allowed: 0,
+});
 
 describe(`<${GrantLanguagesControl.name}/>`, () => {
   let user: UserEvent;
@@ -32,6 +38,65 @@ describe(`<${GrantLanguagesControl.name}/>`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     refresh = mockRouterRefresh();
+  });
+
+  const openDialog = async () => {
+    const trigger = screen.getByRole('button', {
+      name: grantLanguages.trigger,
+    });
+    await user.click(trigger);
+
+    return screen.findByRole('combobox', { name: grantLanguages.countLabel });
+  };
+
+  describe('on a plan that already allows some additional languages', () => {
+    let countSelect: HTMLElement;
+
+    beforeEach(async () => {
+      setup({ target: GROWTH_TARGET, allowed: GROWTH_ALLOWANCE });
+      countSelect = await openDialog();
+    });
+
+    it('says how many the plan publishes', () => {
+      const description = screen.getByText(
+        t('descriptionWithAllowance', {
+          plan: en.planNames[GROWTH_TARGET.plan],
+          n: GROWTH_ALLOWANCE,
+          tenant: GROWTH_TARGET.tenantName,
+        }),
+      );
+
+      expect(description).toBeVisible();
+    });
+
+    it('offers only counts above the plan, the lowest by default', async () => {
+      await user.click(countSelect);
+
+      const options = await screen.findAllByRole('option');
+      const optionNames = options.map((option) => option.textContent);
+
+      expect(countSelect).toHaveTextContent(THREE_LANGUAGES);
+      expect(optionNames).toEqual([THREE_LANGUAGES, FOUR_LANGUAGES]);
+    });
+
+    it('grants the chosen count plus the default language', async () => {
+      vi.mocked(grantEntitlementAction).mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
+      const grant = screen.getByRole('button', {
+        name: grantDialog.confirmButton,
+      });
+      await user.click(grant);
+
+      await screen.findByText(tGrant('granted', { item: THREE_LANGUAGES }));
+
+      expect(grantEntitlementAction).toHaveBeenCalledWith(
+        GROWTH_TARGET.tenantId,
+        expect.objectContaining({
+          item: { kind: ENTITLEMENT_KIND.LOCALE_LIMIT, value: 4 },
+        }),
+      );
+    });
   });
 
   describe('with the dialog open', () => {
