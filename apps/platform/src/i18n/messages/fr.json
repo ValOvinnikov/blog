@@ -2201,25 +2201,23 @@
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Ouvrir votre tableau de bord",
+    "plansLinkLabel": "Voir ce que comprend chaque offre",
     "GROWTH": {
       "subject": "Votre site est passé à l’offre Growth",
       "previewText": "{siteName} peut désormais utiliser toutes les options Growth.",
       "changed": "{siteName} est désormais sur l’offre Growth.",
-      "options": "Les options Growth sont maintenant disponibles sur votre site : plus de langues, tous les réglages d’Apparence, des modules de page supplémentaires et des fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
-      "kept": "Si vous avez déjà utilisé Growth, vos choix précédents sont de retour, tels que vous les aviez laissés."
+      "kept": "Rien n’est supprimé. Si vous avez déjà utilisé Growth, vos choix précédents sont de retour, tels que vous les aviez laissés."
     },
     "STARTER": {
       "subject": "Votre site est passé à l’offre Starter",
       "previewText": "{siteName} peut désormais utiliser les options Starter.",
       "changed": "{siteName} est désormais sur l’offre Starter.",
-      "options": "Avec Starter, votre site peut utiliser son propre domaine et le formulaire de contact, et son pied de page n’affiche pas la mention « Propulsé par ». Les langues supplémentaires, tous les réglages d’Apparence et les autres modules de page sont inclus dans Growth.",
       "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés, et ce qui vient de Growth revient tel que vous l’aviez laissé si vous passez à Growth."
     },
     "FREE": {
       "subject": "Votre site est passé à l’offre Free",
       "previewText": "Les options des offres payantes sont désactivées sur {siteName}.",
       "changed": "{siteName} est désormais sur l’offre Free.",
-      "options": "Les options des offres payantes sont désactivées sur votre site : langues supplémentaires, réglages d’Apparence Growth, modules de page payants et fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
       "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés et reviendront si vous repassez à une offre payante."
     }
   },

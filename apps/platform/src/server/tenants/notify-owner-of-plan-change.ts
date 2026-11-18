@@ -4,7 +4,9 @@ import { TENANT_LOG } from '@platform/constants/tenant';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { toMarketingSiteUrl } from '@platform/utils/marketing-site-url/marketing-site-url';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { routes } from '@shinefold/config';
 import { EMAIL_ACCOUNT, type TTenantPlan } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import {
@@ -18,8 +20,12 @@ const sendPlanChangeEmail = async (
   tenantId: string,
   toPlan: TTenantPlan,
 ): Promise<void> => {
-  const { OWNER_EMAIL_FROM_ADDRESS: from, PLATFORM_APP_BASE_URL: baseUrl } =
-    env;
+  const {
+    OWNER_EMAIL_FROM_ADDRESS: from,
+    PLATFORM_APP_BASE_URL: baseUrl,
+    MARKETING_SITE_URL: marketingSiteUrl,
+    TENANT_ROOT_DOMAIN: rootDomain,
+  } = env;
   if (!from || !baseUrl) {
     logger.warn(TENANT_LOG.PLAN_CHANGE_EMAIL_UNCONFIGURED, { tenantId });
     return;
@@ -39,15 +45,12 @@ const sendPlanChangeEmail = async (
     namespace: 'ownerPlanChangeEmail',
   });
   const values = { siteName: tenant.name };
+  const siteUrl = toMarketingSiteUrl({ marketingSiteUrl, rootDomain });
   const message = buildOwnerPlanChangeEmail({
     brandName: PLATFORM_EMAIL_BRAND_NAME,
     subject: t(`${toPlan}.subject`),
     previewText: t(`${toPlan}.previewText`, values),
-    paragraphs: [
-      t(`${toPlan}.changed`, values),
-      t(`${toPlan}.options`),
-      t(`${toPlan}.kept`),
-    ],
+    paragraphs: [t(`${toPlan}.changed`, values), t(`${toPlan}.kept`)],
     action: {
       label: t('actionLabel'),
       url: new URL(
@@ -55,6 +58,12 @@ const sendPlanChangeEmail = async (
         baseUrl,
       ).toString(),
     },
+    secondaryLink: siteUrl
+      ? {
+          label: t('plansLinkLabel'),
+          url: new URL(routes.pricingComparison(), siteUrl).href,
+        }
+      : undefined,
   });
 
   await sendEmail({
