@@ -979,7 +979,7 @@
     },
     "footerBackgroundLabel": "Arrière-plan",
     "footerBackgroundDescription": "La couleur du pied de page. Chacune suit le thème clair ou sombre du lecteur.",
-    "footerBackgroundOptionLabel": {
+    "skinLabel": {
       "PRIMARY": "Uni",
       "SECONDARY": "Ombré",
       "BRAND_PRIMARY": "Teinte de marque"
@@ -1098,7 +1098,12 @@
     "footerFinePrintAriaLabel": "Mentions légales",
     "footerPrivacy": "Politique de confidentialité",
     "footerPoweredByLabel": "Propulsé par",
-    "footerCookieSettings": "Paramètres des cookies"
+    "footerCookieSettings": "Paramètres des cookies",
+    "bandHeading": "Depuis la capitainerie",
+    "bandText": "Tables des marées, avis de mouillage et météo de la semaine, réunis au même endroit.",
+    "bandLink": "Voir tous les avis",
+    "bandCardTitle": "Avis de mouillage d’hiver",
+    "bandCardExcerpt": "Les mouillages du quai nord se déplacent vers l’intérieur à partir de novembre."
   },
   "lookFollow": {
     "followToggle": "Suivre la carte que vous modifiez",

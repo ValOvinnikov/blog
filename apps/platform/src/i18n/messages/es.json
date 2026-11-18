@@ -979,7 +979,7 @@
     },
     "footerBackgroundLabel": "Fondo",
     "footerBackgroundDescription": "El color del pie de página. Cada uno sigue el tema claro u oscuro del lector.",
-    "footerBackgroundOptionLabel": {
+    "skinLabel": {
       "PRIMARY": "Liso",
       "SECONDARY": "Sombreado",
       "BRAND_PRIMARY": "Tono de marca"
@@ -1098,7 +1098,12 @@
     "footerFinePrintAriaLabel": "Legal",
     "footerPrivacy": "Política de privacidad",
     "footerPoweredByLabel": "Con la tecnología de",
-    "footerCookieSettings": "Configuración de cookies"
+    "footerCookieSettings": "Configuración de cookies",
+    "bandHeading": "Desde la capitanía",
+    "bandText": "Tablas de mareas, avisos de amarre y el tiempo de la semana, reunidos en un solo lugar.",
+    "bandLink": "Ver todos los avisos",
+    "bandCardTitle": "Aviso de amarres de invierno",
+    "bandCardExcerpt": "Los amarres del muelle norte se desplazan hacia dentro a partir de noviembre."
   },
   "lookFollow": {
     "followToggle": "Seguir la tarjeta que estás editando",
