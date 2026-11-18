@@ -1,7 +1,10 @@
-import { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
+'use client';
+
+import { CONSENT_CATEGORY, PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
 import { InlineCode } from '@shinefold/ui/components/atoms/inline-code';
 import { Table } from '@shinefold/ui/components/molecules/table';
-import { COOKIE_LIST } from '@web/constants/cookie-list';
+import { useSiteAnalytics } from '@web/context/site-analytics-provider';
+import { toCookieList } from '@web/utils/to-cookie-list';
 import { useTranslations } from 'next-intl';
 
 import { cookieListVariants } from './cookie-list-variants';
@@ -14,12 +17,16 @@ export const CookieList = () => {
   const ariaLabel = t('ariaLabel');
   const purposeLabel = t('columns.purpose');
   const durationLabel = t('columns.duration');
+  const cookieList = toCookieList(useSiteAnalytics());
+  const isAllNecessary = cookieList.every(
+    ({ category }) => category === CONSENT_CATEGORY.NECESSARY,
+  );
 
   return (
     <>
-      <p>{t('intro')}</p>
+      <p>{t(isAllNecessary ? 'intro' : 'introWithGoogleAnalytics')}</p>
       <ul aria-label={ariaLabel} className={s.stack()}>
-        {COOKIE_LIST.map(({ id, name }) => (
+        {cookieList.map(({ id, name }) => (
           <li key={name} className={s.entry()}>
             <InlineCode>{name}</InlineCode>
             <dl>
@@ -40,7 +47,7 @@ export const CookieList = () => {
               <Table.HeaderCell>{durationLabel}</Table.HeaderCell>
             </Table.Row>
           </Table.Head>
-          {COOKIE_LIST.map(({ id, name }) => (
+          {cookieList.map(({ id, name }) => (
             <Table.Row key={name}>
               <Table.HeaderCell isRowHeader={true}>
                 <InlineCode>{name}</InlineCode>

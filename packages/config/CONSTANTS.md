@@ -65,7 +65,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/consent-category.ts`
 
-- **CONSENT_CATEGORY**: `NECESSARY`, `EXTERNAL_MEDIA`
+- **CONSENT_CATEGORY**: `NECESSARY`, `ANALYTICS`, `EXTERNAL_MEDIA`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/contrast.ts`
 
@@ -869,7 +869,8 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/cookie-list` — `apps/web/src/constants/cookie-list.ts`
 
-- **COOKIE_ID**: `CONSENT`, `LANGUAGE`, `SESSION`, `CSRF`, `SIGN_IN_RETURN`, `OAUTH_VERIFIER`, `OAUTH_STATE`, `SIGNED_IN_HINT`, `NEWSLETTER_SUBSCRIBED`, `NEWSLETTER_UNSUBSCRIBE_TOKEN`, `READING_DEPTH`, `THEME`
+- **COOKIE_PROVIDER**: `FIRST_PARTY`, `GOOGLE`
+- **COOKIE_ID**: `CONSENT`, `LANGUAGE`, `SESSION`, `CSRF`, `SIGN_IN_RETURN`, `OAUTH_VERIFIER`, `OAUTH_STATE`, `SIGNED_IN_HINT`, `NEWSLETTER_SUBSCRIBED`, `NEWSLETTER_UNSUBSCRIBE_TOKEN`, `READING_DEPTH`, `THEME`, `GOOGLE_ANALYTICS`, `GOOGLE_ANALYTICS_VISIT`
 
 ### `@web/constants/cookie-statement` — `apps/web/src/constants/cookie-statement.ts`
 
@@ -1029,7 +1030,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/site-config` — `apps/web/src/constants/site-config.ts`
 
-- **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `BRAND_NAME_FETCH_FAILED`=`"brand_name.site_config_fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`
+- **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `BRAND_NAME_FETCH_FAILED`=`"brand_name.site_config_fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `ANALYTICS_FETCH_FAILED`=`"site_config.analytics_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`
 
 ### `@web/constants/sitemap` — `apps/web/src/constants/sitemap.ts`
 

@@ -6,7 +6,6 @@ import {
   CONSENT_COOKIE_NAME,
   decodeConsent,
   encodeConsent,
-  OPTIONAL_CONSENT_CATEGORIES,
 } from '@web/utils/consent-cookie';
 import { readCookie } from '@web/utils/read-cookie';
 import { useSyncExternalStore } from 'react';
@@ -70,8 +69,6 @@ const save = (granted: readonly TConsentCategory[]): number => {
   return saveRevision;
 };
 
-const acceptAll = () => save(OPTIONAL_CONSENT_CATEGORIES);
-
 const rejectAll = () => save([]);
 
 export const useConsentStore = () => {
@@ -80,5 +77,5 @@ export const useConsentStore = () => {
     getSnapshot,
     getServerSnapshot,
   );
-  return { status, granted, saveRevision, save, acceptAll, rejectAll };
+  return { status, granted, saveRevision, save, rejectAll };
 };
