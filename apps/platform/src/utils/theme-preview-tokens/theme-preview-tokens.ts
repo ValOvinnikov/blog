@@ -6,6 +6,7 @@ import {
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
+  BRAND_PALETTE,
   formatOklchRamp,
   HUE_MAX,
   HUE_MIN,
@@ -36,6 +37,7 @@ export const buildThemePreviewStyle = (
   isDark: boolean,
 ): CSSProperties =>
   ({
+    ...formatOklchRamp(BRAND_PALETTE, accentHue),
     ...buildAccentPreviewTokens(accentHue, isDark),
     ...buildLogoPreviewTokens(logoHue ?? accentHue, isDark),
     ...buildShapePreviewTokens(shape),

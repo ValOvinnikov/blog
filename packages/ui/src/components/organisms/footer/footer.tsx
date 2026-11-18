@@ -64,7 +64,7 @@ export type TFooterProps = IWithClassName &
 /** The public site's footer, where readers find the site's links, contact details and legal fine print. */
 const FooterRoot = ({
   layout = FOOTER_LAYOUT.COLUMNS,
-  surface = FOOTER_SURFACE.FULL_WIDTH,
+  surface,
   tone = BRAND_VARIANT.BRAND_PRIMARY,
   children,
   className,

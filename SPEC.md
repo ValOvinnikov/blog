@@ -1471,7 +1471,7 @@ how each `CtaModule` part uses the space `Section` gives it.
 
 **`Hero`'s Banner carries the same scrim contract**, for the same reason:
 its image is a full-bleed background, so the copy needs a floor under it.
-`Hero` takes an optional `tone` that **only `BANNER` reads** — it renders an
+`Hero` takes a required `tone` that **only `BANNER` reads** — it renders an
 `aria-hidden` gradient scrim between the image (`-z-20`) and the copy
 (`-z-10`), taking its colours from the skin `tone` names — the Banner
 renders `data-skin={tone}`, and the gradients read that skin's
@@ -3057,11 +3057,8 @@ would bake in the `:root` value and an override would do nothing.
 
 **Surfaces set them; components read them.** Two `@utility` classes,
 `surface-secondary` and `surface-brand-primary`, retarget both at once and are
-applied by whatever element paints the background:
-
-- `apps/web`'s `Section`, per `brandVariant`.
-- `@shinefold/ui` organisms that paint their own flat background behind focusable
-  children — `CtaModule.Split`, `CtaModule.Callout` and `Footer`.
+applied by `apps/web`'s `Section`, per `brandVariant`. The `@shinefold/ui`
+organisms that paint their own background render a skin instead (below).
 
 Two more utilities cover the item-level fills inside a band:
 
@@ -3081,16 +3078,21 @@ no `:root` default: the `@theme inline` colours fall back to
 `--brand-primary-muted`, so it resolves at the element. `surface-brand-primary`
 sets it to a 10% mix toward `--brand-primary`, so nothing tinted on a Brand
 primary band takes the band's own colour; Primary and Secondary bands keep
-`--brand-primary-muted`. A `[data-skin]` scope unsets it, with the band item
-fills, so inside a skin every tint fill reads the skin's
-`--brand-primary-muted`. A focused `TaxonomyCard` points `--ambient` at the
-tint it paints.
+`--brand-primary-muted`. A `[data-skin]` scope unsets it, with `--media-fill`
+and the band item fills, so a band around the skin never leaks in: on a
+neutral ground the hover tint reads the skin's `--brand-primary-muted` and the
+icon tile falls back to `--surface-2`, while a skin on a brand ground (Brand
+tint) publishes the same 10% `--tint`, `--media-fill` and item fills
+`surface-brand-primary` sets. `surface-tint` points `--ambient` at that tint,
+with the tinted bands' divider and field boundary, for a card whose own focus
+fill it is (`TaxonomyCard`).
 
 `CtaModule`, `Hero`'s Banner and `Footer` render `data-skin={tone}` and paint
 `bg-ambient`, so everything inside them reads that skin's roles. A Banner over
 a photo re-points the skin's text, border and link roles at the on-image
-colours (`skin-on-image`); one without a photo paints the skin's
-`--ambient-raised` (`skin-raised`).
+colours (`skin-on-image`), and every Banner paints the skin's
+`--ambient-raised` (`skin-raised`), which a photo covers and a photo-less one
+shows.
 
 **Elevation is two tokens** (`shadow-card` also carries a heavier `.dark`
 value; `shadow-float` has one value for both modes). `shadow-card` marks a

@@ -25,7 +25,7 @@ import {
 import {
   defineSkin,
   SKIN_REGISTRY,
-  STORYBOOK_SKINS,
+  SKINS_WITH_STORYBOOK,
   type TSkin,
 } from './skins';
 
@@ -37,10 +37,7 @@ const MID_NEUTRAL = '--palette-neutral-1300' satisfies TPaletteStop;
 
 const MOCK_UNREADABLE_TITLE = 'Unreadable';
 
-const SKIN_CASES = Object.entries({
-  ...SKIN_REGISTRY,
-  ...STORYBOOK_SKINS,
-}).flatMap(([key, skin]) =>
+const SKIN_CASES = Object.entries(SKINS_WITH_STORYBOOK).flatMap(([key, skin]) =>
   COLOR_SCHEMES.map((scheme) => ({ key, skin, scheme })),
 );
 

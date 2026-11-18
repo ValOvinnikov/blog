@@ -10,27 +10,16 @@ import {
 import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Text } from '@shinefold/ui/components/atoms/text';
+import { HERO_TEST_ID } from '@shinefold/ui/constants/hero';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@shinefold/ui/lib/react';
-import { cloneElement, Fragment, type ElementType } from 'react';
+import { cloneElement, Fragment } from 'react';
 
-import { HeroAvatar } from './components/avatar/hero-avatar';
-import { HeroBody } from './components/body/hero-body';
-import { HeroCta } from './components/cta/hero-cta';
-import { HeroMedia } from './components/media/hero-media';
-import { HeroSocial } from './components/social/hero-social';
+import { HeroParts } from './hero-parts';
 import { resolveHeroStyles } from './hero-styles';
-
-const HeroParts = {
-  Avatar: HeroAvatar,
-  Media: HeroMedia,
-  Body: HeroBody,
-  Cta: HeroCta,
-  Social: HeroSocial,
-} satisfies Record<string, ElementType>;
 
 export type THeroProps = IWithClassName &
   IWithDataTestId & {
@@ -48,7 +37,6 @@ export type THeroProps = IWithClassName &
     children?: TCompoundChildren<typeof HeroParts>;
   };
 
-/** The page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Avatar`, `Hero.Body`, `Hero.Cta`, `Hero.Media`, and `Hero.Social` slots. */
 const HeroRoot = ({
   title,
   titleId,
@@ -92,7 +80,7 @@ const HeroRoot = ({
       <div className={s.grid()}>
         <div
           className={s.copy({ class: banner?.copy() })}
-          data-testid="hero-copy"
+          data-testid={HERO_TEST_ID.COPY}
         >
           {slots.Avatar &&
             cloneElement(slots.Avatar, {
@@ -144,7 +132,7 @@ const HeroRoot = ({
         {slots.Media && (
           <div
             className={s.media({ class: banner?.media() })}
-            data-testid="hero-media"
+            data-testid={HERO_TEST_ID.MEDIA}
           >
             {cloneElement(
               slots.Media,
@@ -161,7 +149,7 @@ const HeroRoot = ({
           <div
             className={banner.overlay()}
             aria-hidden="true"
-            data-testid="hero-overlay"
+            data-testid={HERO_TEST_ID.OVERLAY}
           />
         )}
       </div>
@@ -173,5 +161,6 @@ const HeroRoot = ({
   );
 };
 
+/** The page-top band every hero kind renders, where a page states what it is. */
 export const Hero: TCompoundComponent<typeof HeroRoot, typeof HeroParts> =
   Object.assign(HeroRoot, HeroParts);

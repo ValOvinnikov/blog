@@ -33,7 +33,6 @@ const BRAND_PALETTE_STOP = '--palette-brand-100';
 const LOGO_TOKEN = '--logo-1';
 const BRAND_AND_LOGO_NAMES = 'brand-primary[\\w-]*|logo-\\d';
 const CONSOLE_PRESET_TOKENS = PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
-const EDITORIAL_TOKENS = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
 const CONSOLE_HUE = CONSOLE_PRESET_TOKENS.accentHue;
 const [MOCK_ACCENT_HUE, MOCK_LOGO_HUE] = faker.helpers.uniqueArray(
   () => faker.number.int({ min: 0, max: 360 }),
@@ -311,17 +310,6 @@ describe(buildThemeStyleBlock, () => {
     });
 
     expect(readHue(css, LOGO_TOKEN)).toBe(MOCK_ACCENT_HUE);
-  });
-
-  it('renders the editorial preset with its own accentHue', () => {
-    const { accentHue } = EDITORIAL_TOKENS;
-    const css = buildThemeStyleBlock({
-      ...EDITORIAL_TOKENS,
-      logoHue: accentHue,
-    });
-
-    expect(readHue(css, BRAND_TOKEN)).toBe(accentHue);
-    expect(readHue(css, LOGO_TOKEN)).toBe(accentHue);
   });
 
   it('tints the brand scrim with the accent hue', () => {

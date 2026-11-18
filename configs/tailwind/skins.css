@@ -254,6 +254,10 @@
   --info-muted: var(--brand-primary-muted);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
+  --tint: color-mix(in oklch, var(--backdrop), var(--brand-primary) 10%);
+  --media-fill: var(--tint);
+  --item-fill: var(--brand-primary-wash);
+  --item-nested-fill: var(--surface);
 }
 
 .dark [data-skin='BRAND_PRIMARY'] {
@@ -292,4 +296,8 @@
   --info-muted: var(--brand-primary-muted);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
+  --tint: color-mix(in oklch, var(--backdrop), var(--brand-primary) 10%);
+  --media-fill: var(--tint);
+  --item-fill: var(--brand-primary-wash);
+  --item-nested-fill: var(--surface);
 }

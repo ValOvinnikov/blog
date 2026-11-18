@@ -11,7 +11,7 @@ import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/500.css';
 import './preview.css';
 
-import { SKIN_REGISTRY, STORYBOOK_SKINS } from '@shinefold/config';
+import { SKINS_WITH_STORYBOOK } from '@shinefold/config';
 import { withThemeByClassName } from '@storybook/addon-themes';
 import type { Decorator, Preview, ReactRenderer } from '@storybook/react-vite';
 import { createElement } from 'react';
@@ -20,9 +20,10 @@ const NO_SKIN = '';
 
 const SKIN_ITEMS = [
   { value: NO_SKIN, title: 'Page' },
-  ...Object.entries({ ...SKIN_REGISTRY, ...STORYBOOK_SKINS }).map(
-    ([value, { title }]) => ({ value, title }),
-  ),
+  ...Object.entries(SKINS_WITH_STORYBOOK).map(([value, { title }]) => ({
+    value,
+    title,
+  })),
 ];
 
 const withSkin: Decorator = (Story, { globals }) => {
@@ -36,7 +37,6 @@ const withSkin: Decorator = (Story, { globals }) => {
 };
 
 const preview: Preview = {
-  // preview.css keys the canvas background off this same `.dark` class.
   globalTypes: {
     skin: {
       description: 'The band skin the story renders on',
@@ -44,6 +44,7 @@ const preview: Preview = {
     },
   },
   initialGlobals: { skin: NO_SKIN },
+  // preview.css keys the canvas background off this same `.dark` class.
   decorators: [
     withSkin,
     withThemeByClassName<ReactRenderer>({

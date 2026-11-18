@@ -12,7 +12,7 @@ export const bannerVariants = tv({
       ...FULL_BLEED,
       ...BANNER_LAYOUT,
       'min-h-[calc(var(--banner-top)+var(--banner-bottom))] px-gutter',
-      'bg-ambient',
+      'skin-raised bg-ambient',
     ],
     media: [
       'absolute inset-0 -z-20 mx-auto overflow-hidden',
@@ -31,10 +31,7 @@ export const bannerVariants = tv({
       true: { root: ['skin-on-image'] },
       // Slotted copy styled for a photo (`*-on-image`) takes the surface's ink when there is none.
       false: {
-        root: [
-          'skin-raised',
-          '[--on-image:var(--text)] [--on-image-muted:var(--text-muted)]',
-        ],
+        root: ['[--on-image:var(--text)] [--on-image-muted:var(--text-muted)]'],
         text: ['text-on-image-muted'],
       },
     },

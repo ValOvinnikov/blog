@@ -13,7 +13,7 @@ import {
 import { AMBIENT_RAISED } from './contrast-surfaces';
 import { effectiveSchemeOf } from './skin-contrast';
 import { deriveSkinRoles } from './skin-derive';
-import type { TPaletteStop, TSkinRoles } from './skin-roles';
+import { PAGE_ROLES, type TPaletteStop, type TSkinRoles } from './skin-roles';
 
 export type TSkin = {
   title: string;
@@ -72,10 +72,9 @@ export const SKIN_REGISTRY = {
       [COLOR_SCHEME.DARK]: '--palette-neutral-2600',
     },
     mode: SKIN_MODE.MATCH,
-    pin: {
-      [COLOR_SCHEME.LIGHT]: { [AMBIENT_RAISED]: '--palette-neutral-300' },
-      [COLOR_SCHEME.DARK]: { [AMBIENT_RAISED]: '--palette-neutral-2100' },
-    },
+    pin: mapKeysToRecord(COLOR_SCHEMES, (scheme) => ({
+      [AMBIENT_RAISED]: PAGE_ROLES[scheme][AMBIENT_RAISED],
+    })),
   }),
   [BRAND_VARIANT.SECONDARY]: defineSkin('Shaded', {
     ground: {
@@ -103,4 +102,9 @@ export const STORYBOOK_SKINS = {
     },
     mode: SKIN_MODE.INVERSE,
   }),
+} as const satisfies Record<string, TSkin>;
+
+export const SKINS_WITH_STORYBOOK = {
+  ...SKIN_REGISTRY,
+  ...STORYBOOK_SKINS,
 } as const satisfies Record<string, TSkin>;

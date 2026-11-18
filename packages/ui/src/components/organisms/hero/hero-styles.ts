@@ -2,24 +2,21 @@ import {
   CONTENT_ALIGNMENT,
   HERO_VARIANT,
   MEDIA_ORDER,
-  type TContentAlignment,
-  type THeroVariant,
-  type TMediaOrder,
-  type TSpacingScale,
 } from '@shinefold/config';
 import { bannerVariants } from '@shinefold/ui/lib/styling';
 
+import type { THeroProps } from './hero';
 import { heroVariants } from './hero-variants';
 
-type THeroStylesInput = {
-  variant?: THeroVariant;
-  hasMedia: boolean;
-  contentPosition?: TContentAlignment;
-  contentAlignment?: TContentAlignment;
-  mediaOrder?: TMediaOrder;
-  spacingTop?: TSpacingScale;
-  spacingBottom?: TSpacingScale;
-};
+type THeroStylesInput = Pick<
+  THeroProps,
+  | 'variant'
+  | 'contentPosition'
+  | 'contentAlignment'
+  | 'mediaOrder'
+  | 'spacingTop'
+  | 'spacingBottom'
+> & { hasMedia: boolean };
 
 export const resolveHeroStyles = ({
   variant = HERO_VARIANT.SPLIT,

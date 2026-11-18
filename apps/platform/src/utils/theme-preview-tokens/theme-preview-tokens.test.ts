@@ -4,6 +4,7 @@ import { defaultLookFormValues } from '@platform/utils/default-look-values/defau
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
+  BRAND_PALETTE,
   BUTTON_SHAPE,
   BUTTON_SHAPE_DECLARATIONS,
   CARD_STYLE,
@@ -153,10 +154,13 @@ describe(buildThemePreviewStyle, () => {
     },
   );
 
-  it('colours the logo ramp from the accent hue when no logo hue is set', () => {
+  it('colours the brand palette, and the logo ramp when no logo hue is set, at the accent hue', () => {
     const style = buildThemePreviewStyle(MOCK_PREVIEW_VALUES, false);
 
-    expect(style).toMatchObject(buildLogoPreviewTokens(MOCK_ACCENT_HUE, false));
+    expect(style).toMatchObject({
+      ...formatOklchRamp(BRAND_PALETTE, MOCK_ACCENT_HUE),
+      ...buildLogoPreviewTokens(MOCK_ACCENT_HUE, false),
+    });
   });
 
   it('switches every ramp to its dark values in dark mode', () => {

@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { HERO_VARIANT, SITE_MESSAGES } from '@shinefold/config';
+import { HERO_TEST_ID } from '@shinefold/ui/constants/hero';
 import {
   customRender,
   isInaccessible,
@@ -44,36 +45,39 @@ const setup = customRender(HeroProfileModuleView, {
 });
 
 describe(`<${HeroProfileModuleView.name}/>`, () => {
-  it('names the section by its top-level heading', () => {
-    setup();
-
-    const heading = screen.getByRole('heading', {
-      level: 1,
-      name: MOCK_HERO_PROFILE_HEADING,
-    });
-    const region = screen.getByRole('region', {
-      name: MOCK_HERO_PROFILE_HEADING,
+  describe('its heading', () => {
+    beforeEach(() => {
+      setup();
     });
 
-    expect(heading).toBeVisible();
-    expect(region).toBeVisible();
-  });
+    it('names the section by its top-level heading', () => {
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: MOCK_HERO_PROFILE_HEADING,
+      });
+      const region = screen.getByRole('region', {
+        name: MOCK_HERO_PROFILE_HEADING,
+      });
 
-  it('gives two instances of the same module distinct heading ids', () => {
-    setup();
-    setup();
-
-    const headings = screen.getAllByRole('heading', {
-      level: 1,
-      name: MOCK_HERO_PROFILE_HEADING,
+      expect(heading).toBeVisible();
+      expect(region).toBeVisible();
     });
-    const regions = screen.getAllByRole('region', {
-      name: MOCK_HERO_PROFILE_HEADING,
-    });
-    const headingIds = headings.map(({ id }) => id);
 
-    expect(new Set(headingIds).size).toBe(2);
-    expect(regions).toHaveLength(2);
+    it('gives two instances of the same module distinct heading ids', () => {
+      setup();
+
+      const headings = screen.getAllByRole('heading', {
+        level: 1,
+        name: MOCK_HERO_PROFILE_HEADING,
+      });
+      const regions = screen.getAllByRole('region', {
+        name: MOCK_HERO_PROFILE_HEADING,
+      });
+      const headingIds = headings.map(({ id }) => id);
+
+      expect(new Set(headingIds).size).toBe(2);
+      expect(regions).toHaveLength(2);
+    });
   });
 
   it('renders the photo sized for an avatar on Stacked', () => {
@@ -150,7 +154,7 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
       });
 
       const image = screen.queryByRole('img');
-      const media = screen.queryByTestId('hero-media');
+      const media = screen.queryByTestId(HERO_TEST_ID.MEDIA);
 
       expect(image).not.toBeInTheDocument();
       expect(media).not.toBeInTheDocument();

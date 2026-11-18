@@ -42,8 +42,6 @@
   --color-ambient: var(
     --ambient
   ); /* @role ring-offset colour of the surface in scope */
-  /* prettier-ignore */
-  --color-ambient-raised: var(--ambient-raised); /* @role lifted field of the surface in scope */
   --color-divider: var(
     --divider
   ); /* @role divider colour of the surface in scope */
@@ -580,8 +578,8 @@
   max-width: var(--container-copy);
 }
 
-/* A skin scope starts its own tint fills, so a band around it never leaks in. */
-[data-skin] {
+/* A skin scope starts its own tint fills, so a band around it never leaks in; :where() lets a skin that publishes its own win. */
+:where([data-skin]) {
   --tint: initial;
   --media-fill: initial;
   --item-fill: initial;
@@ -634,6 +632,13 @@
   --media-fill: var(--tint);
   --item-fill: var(--brand-primary-wash);
   --item-nested-fill: var(--surface);
+}
+
+@utility surface-tint {
+  --ambient: var(--tint, var(--brand-primary-muted));
+  --backdrop: var(--tint, var(--brand-primary-muted));
+  --divider: var(--border-strong);
+  --field-boundary: var(--field-boundary-tinted);
 }
 
 /* --border against --surface-2 (1.25:1 light / 1.21:1 dark) reads weaker than
