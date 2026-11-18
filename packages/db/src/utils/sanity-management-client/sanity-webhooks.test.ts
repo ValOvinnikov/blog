@@ -23,6 +23,7 @@ import {
 import {
   createSanityWebhook,
   listSanityWebhooks,
+  REVALIDATE_WEBHOOK_PROJECTION,
   updateSanityWebhookProjection,
   updateSanityWebhookSecret,
 } from './sanity-webhooks';
@@ -42,7 +43,7 @@ const MOCK_EXPECTED_WEBHOOK_RULE = {
     SANITY_WEBHOOK_OPERATION.UPDATE,
     SANITY_WEBHOOK_OPERATION.DELETE,
   ],
-  projection: expect.stringContaining('"previousSlug": before().slug.current'),
+  projection: REVALIDATE_WEBHOOK_PROJECTION,
 };
 const MOCK_UPDATE_INPUT = mockSanityProjectInput({
   webhookId: MOCK_SANITY_WEBHOOK_ID,
