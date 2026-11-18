@@ -1,4 +1,3 @@
-import { CAPABILITY } from '@shinefold/config/constants';
 import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@shinefold/db/schema';
 import {
@@ -9,9 +8,9 @@ import {
 import { useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
+  insertClosedTestEntitlementGrants,
   insertTestEntitlementGrant,
   MOCK_GRANT_FUTURE,
-  MOCK_GRANT_PAST,
 } from '@shinefold/db/testing/tenant-entitlement-grants/fixtures';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
@@ -46,13 +45,7 @@ describe(listEntitlementGrants, () => {
   });
 
   it('leaves out revoked and expired grants', async () => {
-    await insertTestEntitlementGrant(db(), tenant().id, {
-      revokedAt: MOCK_GRANT_PAST,
-    });
-    await insertTestEntitlementGrant(db(), tenant().id, {
-      key: CAPABILITY.ANALYTICS,
-      expiresAt: MOCK_GRANT_PAST,
-    });
+    await insertClosedTestEntitlementGrants(db(), tenant().id);
 
     expect(await listEntitlementGrants(tenant().id)).toEqual([]);
   });

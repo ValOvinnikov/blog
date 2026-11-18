@@ -11722,6 +11722,14 @@
         "file": "apps/web/src/constants/tenant-email-identity.ts"
       }
     ],
+    "tenant_entitlements.grants_fetch_failed": [
+      {
+        "ref": "TENANT_ENTITLEMENTS_LOG.GRANTS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tenant-entitlements",
+        "file": "apps/web/src/constants/tenant-entitlements.ts"
+      }
+    ],
     "tenant_write.unresolved": [
       {
         "ref": "TENANT_WRITE_LOG.UNRESOLVED",

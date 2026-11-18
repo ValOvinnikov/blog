@@ -2,7 +2,6 @@ import { faker } from '@faker-js/faker';
 import { CAPABILITY, type TCapability } from '@shinefold/config';
 import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
-import type { TListedEntitlementGrant } from '@shinefold/db/queries/tenant-entitlement-grants/list-entitlement-grants/list-entitlement-grants';
 import type { TSettingsFeatures } from '@shinefold/db/schema/settings-features';
 import {
   resolveTenantEntitlements,
@@ -55,19 +54,12 @@ export const mockTenantEntitlements = (
   resolveTenantEntitlements(plan, grants, MOCK_SETTINGS_FEATURES_CREATED_AT);
 
 export const mockEntitlementGrant = (
-  overrides: Partial<TListedEntitlementGrant> = {},
-): TListedEntitlementGrant => ({
-  id: faker.string.uuid(),
-  tenantId: MOCK_TENANT_ID,
+  overrides: Partial<TResolvableGrant> = {},
+): TResolvableGrant => ({
   kind: ENTITLEMENT_KIND.CAPABILITY,
   key: CAPABILITY.CONTACT_FORM,
   value: null,
-  note: null,
-  grantedBy: null,
-  grantedAt: MOCK_SETTINGS_FEATURES_CREATED_AT,
   expiresAt: null,
   revokedAt: null,
-  revokedBy: null,
-  grantedByEmail: null,
   ...overrides,
 });

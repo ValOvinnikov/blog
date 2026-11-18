@@ -86,7 +86,7 @@ describe(isCapabilityEnabled, () => {
   describe('with a granted capability', () => {
     beforeEach(() => {
       vi.mocked(
-        queries.tenantEntitlementGrants.listEntitlementGrants,
+        queries.tenantEntitlementGrants.listResolvableEntitlementGrants,
       ).mockResolvedValue([mockEntitlementGrant()]);
     });
 

@@ -1,16 +1,19 @@
 import { faker } from '@faker-js/faker';
 import { CAPABILITY, TENANT_PLAN } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
+import { TENANT_ENTITLEMENTS_LOG } from '@web/constants/tenant-entitlements';
 import { ONE_HOUR_IN_SECONDS } from '@web/constants/time';
 import {
   clearNextCache,
   revalidateTag,
 } from '@web/testing/server/next-cache/json-round-trip-next-cache';
 import { mockEntitlementGrant } from '@web/testing/server/settings-features/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { buildSiteConfigCacheTag } from '@web/utils/tenant-cache-tags';
 
 import {
@@ -24,7 +27,7 @@ faker.seed(6781);
 vi.mock('@shinefold/db', () => ({
   queries: {
     tenants: { getTenantById: vi.fn() },
-    tenantEntitlementGrants: { listEntitlementGrants: vi.fn() },
+    tenantEntitlementGrants: { listResolvableEntitlementGrants: vi.fn() },
   },
 }));
 
@@ -40,9 +43,12 @@ const MOCK_AN_HOUR_LATER = new Date(
   MOCK_FILLED_AT.getTime() + ONE_HOUR_IN_SECONDS * 1000,
 );
 
+const FAILED_GRANTS_READ_CASE =
+  'resolves the plan alone and logs when the grants cannot be read';
+
 const getTenantByIdMock = vi.mocked(queries.tenants.getTenantById);
-const listEntitlementGrantsMock = vi.mocked(
-  queries.tenantEntitlementGrants.listEntitlementGrants,
+const listResolvableEntitlementGrantsMock = vi.mocked(
+  queries.tenantEntitlementGrants.listResolvableEntitlementGrants,
 );
 
 describe(getCachedTenantEntitlements, () => {
@@ -50,7 +56,7 @@ describe(getCachedTenantEntitlements, () => {
     clearNextCache();
     vi.useFakeTimers({ toFake: ['Date'], now: MOCK_FILLED_AT });
     getTenantByIdMock.mockResolvedValue(mockTenant({ plan: TENANT_PLAN.FREE }));
-    listEntitlementGrantsMock.mockResolvedValue([]);
+    listResolvableEntitlementGrantsMock.mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -64,7 +70,9 @@ describe(getCachedTenantEntitlements, () => {
   });
 
   it('adds a granted capability', async () => {
-    listEntitlementGrantsMock.mockResolvedValue([mockEntitlementGrant()]);
+    listResolvableEntitlementGrantsMock.mockResolvedValue([
+      mockEntitlementGrant(),
+    ]);
 
     const entitlements = await getCachedTenantEntitlements(MOCK_TENANT_ID);
 
@@ -77,7 +85,9 @@ describe(getCachedTenantEntitlements, () => {
     expect(getTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       includeArchived: true,
     });
-    expect(listEntitlementGrantsMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(listResolvableEntitlementGrantsMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+    );
   });
 
   it('resolves nothing for an unknown tenant', async () => {
@@ -90,7 +100,7 @@ describe(getCachedTenantEntitlements, () => {
 
   describe('with a grant that expires after the cache fills', () => {
     beforeEach(async () => {
-      listEntitlementGrantsMock.mockResolvedValue([
+      listResolvableEntitlementGrantsMock.mockResolvedValue([
         mockEntitlementGrant({ expiresAt: MOCK_GRANT_EXPIRES_AT }),
       ]);
       await getCachedTenantEntitlements(MOCK_TENANT_ID);
@@ -108,7 +118,7 @@ describe(getCachedTenantEntitlements, () => {
       const entitlements = await getCachedTenantEntitlements(MOCK_TENANT_ID);
 
       expect(entitlements?.capabilities).not.toContain(CAPABILITY.CONTACT_FORM);
-      expect(listEntitlementGrantsMock).toHaveBeenCalledOnce();
+      expect(listResolvableEntitlementGrantsMock).toHaveBeenCalledOnce();
     });
   });
 });
@@ -117,7 +127,7 @@ describe(resolveTenantPlanEntitlements, () => {
   beforeEach(() => {
     clearNextCache();
     getTenantByIdMock.mockResolvedValue(mockTenant({ plan: TENANT_PLAN.FREE }));
-    listEntitlementGrantsMock.mockResolvedValue([]);
+    listResolvableEntitlementGrantsMock.mockResolvedValue([]);
   });
 
   it('resolves the supplied plan over the cached one', async () => {
@@ -130,7 +140,9 @@ describe(resolveTenantPlanEntitlements, () => {
   });
 
   it('adds the cached grants to the supplied plan', async () => {
-    listEntitlementGrantsMock.mockResolvedValue([mockEntitlementGrant()]);
+    listResolvableEntitlementGrantsMock.mockResolvedValue([
+      mockEntitlementGrant(),
+    ]);
 
     const entitlements = await resolveTenantPlanEntitlements(
       MOCK_TENANT_ID,
@@ -138,6 +150,21 @@ describe(resolveTenantPlanEntitlements, () => {
     );
 
     expect(entitlements.capabilities).toContain(CAPABILITY.CONTACT_FORM);
+  });
+
+  it(FAILED_GRANTS_READ_CASE, async () => {
+    listResolvableEntitlementGrantsMock.mockRejectedValue(MOCK_ERROR);
+
+    const entitlements = await resolveTenantPlanEntitlements(
+      MOCK_TENANT_ID,
+      TENANT_PLAN.GROWTH,
+    );
+
+    expect(entitlements.capabilities).toContain(CAPABILITY.CONTACT_FORM);
+    expect(logger.error).toHaveBeenCalledWith(
+      TENANT_ENTITLEMENTS_LOG.GRANTS_FETCH_FAILED,
+      { error: MOCK_ERROR },
+    );
   });
 
   it('resolves the plan alone for an unknown tenant', async () => {
@@ -160,9 +187,11 @@ describe(resolveProxyTenantPlanEntitlements, () => {
     clearNextCache();
     vi.useFakeTimers({ toFake: ['Date'], now: MOCK_FILLED_AT });
     getTenantByIdMock.mockResolvedValue(mockTenant({ plan: TENANT_PLAN.FREE }));
-    listEntitlementGrantsMock.mockResolvedValue([]);
+    listResolvableEntitlementGrantsMock.mockResolvedValue([]);
     await resolveFreeForProxy();
-    listEntitlementGrantsMock.mockResolvedValue([mockEntitlementGrant()]);
+    listResolvableEntitlementGrantsMock.mockResolvedValue([
+      mockEntitlementGrant(),
+    ]);
   });
 
   afterEach(() => {
@@ -189,5 +218,22 @@ describe(resolveProxyTenantPlanEntitlements, () => {
     const entitlements = await resolveFreeForProxy();
 
     expect(entitlements.capabilities).toContain(CAPABILITY.CONTACT_FORM);
+  });
+
+  it("reads only the tenant's grants, never its row", () => {
+    expect(getTenantByIdMock).not.toHaveBeenCalled();
+  });
+
+  it(FAILED_GRANTS_READ_CASE, async () => {
+    clearNextCache();
+    listResolvableEntitlementGrantsMock.mockRejectedValue(MOCK_ERROR);
+
+    const entitlements = await resolveFreeForProxy();
+
+    expect(entitlements.capabilities).not.toContain(CAPABILITY.CONTACT_FORM);
+    expect(logger.error).toHaveBeenCalledWith(
+      TENANT_ENTITLEMENTS_LOG.GRANTS_FETCH_FAILED,
+      { error: MOCK_ERROR },
+    );
   });
 });

@@ -1,7 +1,7 @@
-import type { TListedEntitlementGrant } from '@shinefold/db/queries/tenant-entitlement-grants/list-entitlement-grants/list-entitlement-grants';
+import type { TResolvableGrant } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 
 export const tenantEntitlementGrants = {
-  listEntitlementGrants: vi.fn(
-    async (): Promise<TListedEntitlementGrant[]> => [],
+  listResolvableEntitlementGrants: vi.fn(
+    async (): Promise<TResolvableGrant[]> => [],
   ),
 };

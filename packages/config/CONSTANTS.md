@@ -1064,6 +1064,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **TENANT_EMAIL_IDENTITY_LOG**: `TENANT_ROW_NOT_FOUND`=`"tenant_email_identity.tenant_row_not_found"`
 
+### `@web/constants/tenant-entitlements` — `apps/web/src/constants/tenant-entitlements.ts`
+
+- **TENANT_ENTITLEMENTS_LOG**: `GRANTS_FETCH_FAILED`=`"tenant_entitlements.grants_fetch_failed"`
+
 ### `@web/constants/tenant-write` — `apps/web/src/constants/tenant-write.ts`
 
 - **TENANT_WRITE_LOG**: `UNRESOLVED`=`"tenant_write.unresolved"`
