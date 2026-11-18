@@ -58,7 +58,7 @@ type TAlignmentFieldExtra = Omit<TAlignmentField, 'list'> & {
   allow: readonly TContentAlignment[];
 };
 
-type TAlignmentFieldsOptions = {
+export type TAlignmentFieldsOptions = {
   title?: string;
   hasActions?: boolean;
   alignsItems?: boolean;

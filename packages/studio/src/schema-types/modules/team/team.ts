@@ -3,24 +3,13 @@ import {
   CONTENT_ALIGNMENT,
 } from '@shinefold/config/constants';
 import { personSchema } from '@shinefold/studio/schema-types/documents/person/person';
-import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
-import {
-  appearanceFieldGroups,
-  appearanceFields,
-  appearanceFieldsets,
-} from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
-import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { cardModuleAppearance } from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { cardAlignmentField } from '@shinefold/studio/schema-types/fields/card-alignment-field/card-alignment-field';
 import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
-import {
-  displayModeField,
-  isCarouselMode,
-} from '@shinefold/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { imageShapeField } from '@shinefold/studio/schema-types/fields/image-shape-field/image-shape-field';
 import { showToggleField } from '@shinefold/studio/schema-types/fields/show-toggle-field/show-toggle-field';
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { wideLayoutField } from '@shinefold/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Users } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -34,9 +23,7 @@ export const teamSchema = defineType({
   description:
     'People drawn from existing Persons, shown as a single spotlight or a set of cards — used to introduce a founder, a team, staff, or contributors.',
   icon: Users,
-  fieldsets: appearanceFieldsets,
-  groups: appearanceFieldGroups,
-  fields: appearanceFields({
+  ...cardModuleAppearance({
     content: [
       titleField(),
       moduleHeadingBlockField(),
@@ -75,27 +62,25 @@ export const teamSchema = defineType({
       }),
       ctaButtonsField(),
     ],
-    appearance: [
-      brandVariantField(),
+    beforeDisplayMode: [
       imageShapeField({
         values: [CARD_IMAGE_SHAPE.CIRCLE, CARD_IMAGE_SHAPE.SQUARE],
         initialValue: CARD_IMAGE_SHAPE.CIRCLE,
         subject: 'photo',
       }),
-      displayModeField(),
-      ...alignmentFields([], {
-        title: 'Heading Alignment',
-        allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-        hasActions: true,
-        alignsCarousel: true,
-      }),
+    ],
+    displayMode: true,
+    headingAlignment: {
+      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+      hasActions: true,
+      alignsCarousel: true,
+    },
+    afterHeadingAlignment: [
       cardAlignmentField({
         initialValue: CONTENT_ALIGNMENT.CENTER,
         hasSpotlight: true,
       }),
     ],
-    layout: wideLayoutField,
-    columnsHidden: isCarouselMode,
   }),
   preview: {
     select: {

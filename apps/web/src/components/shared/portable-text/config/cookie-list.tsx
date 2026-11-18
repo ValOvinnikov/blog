@@ -1,6 +1,7 @@
 'use client';
 
 import { CONSENT_CATEGORY, PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
+import { ANALYTICS_PROVIDER } from '@shinefold/config/constants';
 import { InlineCode } from '@shinefold/ui/components/atoms/inline-code';
 import { Table } from '@shinefold/ui/components/molecules/table';
 import { useSiteAnalytics } from '@web/context/site-analytics-provider';
@@ -17,7 +18,9 @@ export const CookieList = () => {
   const ariaLabel = t('ariaLabel');
   const purposeLabel = t('columns.purpose');
   const durationLabel = t('columns.duration');
-  const cookieList = toCookieList(useSiteAnalytics());
+  const analytics = useSiteAnalytics();
+  const cookieList = toCookieList(analytics);
+  const isOnPlausible = analytics?.provider === ANALYTICS_PROVIDER.PLAUSIBLE;
   const isAllNecessary = cookieList.every(
     ({ category }) => category === CONSENT_CATEGORY.NECESSARY,
   );
@@ -59,6 +62,7 @@ export const CookieList = () => {
         </Table>
       </div>
       <p>{t('analyticsNote')}</p>
+      {isOnPlausible && <p>{t('plausibleNote')}</p>}
     </>
   );
 };
