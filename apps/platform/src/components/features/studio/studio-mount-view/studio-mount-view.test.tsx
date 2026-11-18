@@ -66,6 +66,7 @@ const MOCK_TENANT = mockProvisionedTenant();
 const setup = customRenderAsync(StudioMountView, {
   tenant: MOCK_TENANT,
   basePath: adminRoutes.dashboardStudio(),
+  previewBasePath: adminRoutes.dashboardDraftPreviews(),
 });
 
 describe(`<${StudioMountView.name}/>`, () => {

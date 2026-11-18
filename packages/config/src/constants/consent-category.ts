@@ -2,6 +2,7 @@ import type { TValueOf } from '@shinefold/config/utils';
 
 export const CONSENT_CATEGORY = {
   NECESSARY: 'NECESSARY',
+  ANALYTICS: 'ANALYTICS',
   EXTERNAL_MEDIA: 'EXTERNAL_MEDIA',
 } as const;
 

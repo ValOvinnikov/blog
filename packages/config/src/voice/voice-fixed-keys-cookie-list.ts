@@ -1,6 +1,7 @@
 export const COOKIE_LIST_VOICE_FIXED_KEYS = [
   'cookieList.ariaLabel',
   'cookieList.intro',
+  'cookieList.introWithGoogleAnalytics',
   'cookieList.columns.name',
   'cookieList.columns.purpose',
   'cookieList.columns.duration',
@@ -28,5 +29,9 @@ export const COOKIE_LIST_VOICE_FIXED_KEYS = [
   'cookieList.cookies.READING_DEPTH.duration',
   'cookieList.cookies.THEME.purpose',
   'cookieList.cookies.THEME.duration',
+  'cookieList.cookies.GOOGLE_ANALYTICS.purpose',
+  'cookieList.cookies.GOOGLE_ANALYTICS.duration',
+  'cookieList.cookies.GOOGLE_ANALYTICS_VISIT.purpose',
+  'cookieList.cookies.GOOGLE_ANALYTICS_VISIT.duration',
   'cookieList.analyticsNote',
 ] as const;

@@ -19,15 +19,18 @@ import { after } from 'next/server';
 
 import { startSkimGeneration } from './start-skim-generation';
 
-const { getPostPublishedAtMock, envMock, afterWork } = vi.hoisted(() => ({
-  getPostPublishedAtMock: vi.fn(),
-  envMock: {} as { ANTHROPIC_API_KEY?: string },
-  afterWork: [] as Promise<void>[],
-}));
+const { getPostPublishedAtMock, hasPostTakeawaysMock, envMock, afterWork } =
+  vi.hoisted(() => ({
+    getPostPublishedAtMock: vi.fn(),
+    hasPostTakeawaysMock: vi.fn(),
+    envMock: {} as { ANTHROPIC_API_KEY?: string },
+    afterWork: [] as Promise<void>[],
+  }));
 
 vi.mock('@shinefold/service', () => ({
   service: {
     entities: { posts: { v1: { getPostPublishedAt: getPostPublishedAtMock } } },
+    editorial: { skim: { v1: { hasPostTakeaways: hasPostTakeawaysMock } } },
   },
 }));
 
@@ -98,6 +101,7 @@ describe(startSkimGeneration, () => {
     vi.setSystemTime(MOCK_NOW);
     envMock.ANTHROPIC_API_KEY = MOCK_API_KEY;
     getPostPublishedAtMock.mockResolvedValue(okResult(MOCK_PAST_PUBLISHED_AT));
+    hasPostTakeawaysMock.mockResolvedValue(okResult(false));
     vi.mocked(resolveTenantById).mockResolvedValue(MOCK_TENANT);
     vi.mocked(toTenantSanityWriteContext).mockReturnValue(MOCK_WRITE_CONTEXT);
   });
@@ -186,11 +190,39 @@ describe(startSkimGeneration, () => {
     expect(generatePostSkim).not.toHaveBeenCalled();
   });
 
-  it('generates nothing for a tenant that is no longer servable', async () => {
+  it('logs and generates nothing for a tenant that is no longer servable', async () => {
     vi.mocked(resolveTenantById).mockResolvedValue(undefined);
 
     await start();
 
+    expect(logger.warn).toHaveBeenCalledWith(
+      GENERATE_SKIM_LOG.TENANT_NOT_SERVABLE,
+      { tenantId: MOCK_TENANT_ID, postId: MOCK_POST_ID },
+    );
+    expect(generatePostSkim).not.toHaveBeenCalled();
+  });
+
+  it('spends nothing on a republished post that already has takeaways', async () => {
+    hasPostTakeawaysMock.mockResolvedValue(okResult(true));
+
+    await start();
+
+    expect(hasPostTakeawaysMock).toHaveBeenCalledWith(
+      MOCK_POST_ID,
+      MOCK_TENANT_SANITY_CONTEXT,
+    );
+    expect(generatePostSkim).not.toHaveBeenCalled();
+  });
+
+  it('logs a failed takeaways lookup and generates nothing', async () => {
+    hasPostTakeawaysMock.mockResolvedValue(errorResult(MOCK_ERROR));
+
+    await start();
+
+    expect(logger.error).toHaveBeenCalledWith(
+      GENERATE_SKIM_LOG.TAKEAWAYS_LOOKUP_FAILED,
+      { tenantId: MOCK_TENANT_ID, postId: MOCK_POST_ID, error: MOCK_ERROR },
+    );
     expect(generatePostSkim).not.toHaveBeenCalled();
   });
 

@@ -83,6 +83,8 @@ jobs:
       # The CLI refuses the tenant holding this apex (or its www host), and
       # refuses every tenant when it is unset.
       TENANT_ROOT_DOMAIN: ${{ vars.TENANT_ROOT_DOMAIN }}
+      # Optional: the CLI also refuses the tenant holding this URL's host.
+      MARKETING_SITE_URL: ${{ vars.MARKETING_SITE_URL }}
       # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
       # specifically — deliberately its own secret, distinct from
       # `DATABASE_URL_UNPOOLED` (which `deploy-production.yml`'s `migrate-db`

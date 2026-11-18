@@ -176,16 +176,32 @@ describe(POST, () => {
     expect(generatePostSkim).not.toHaveBeenCalled();
   });
 
-  it('does nothing for a signed date still ahead', async () => {
-    getPostPublishedAtMock.mockResolvedValue(okResult(MOCK_MOVED_GO_LIVE_AT));
-
-    const response = await goLive({
+  describe('for a call arriving before its date', () => {
+    const MOCK_EARLY_BODY = {
       ...MOCK_BODY,
       publishedAt: MOCK_MOVED_GO_LIVE_AT,
+    };
+
+    beforeEach(() => {
+      getPostPublishedAtMock.mockResolvedValue(okResult(MOCK_MOVED_GO_LIVE_AT));
     });
 
-    expect(response.status).toBe(HTTP_STATUS.NO_CONTENT);
-    expect(generatePostSkim).not.toHaveBeenCalled();
+    it('answers too early, so the worker retries', async () => {
+      const response = await goLive(MOCK_EARLY_BODY);
+
+      expect(response.status).toBe(HTTP_STATUS.TOO_EARLY);
+      expect(generatePostSkim).not.toHaveBeenCalled();
+    });
+
+    it('generates when retried once the date has passed', async () => {
+      await goLive(MOCK_EARLY_BODY);
+      vi.setSystemTime(MOCK_MOVED_GO_LIVE_AT);
+
+      const retry = await goLive(MOCK_EARLY_BODY);
+
+      expect(retry.status).toBe(HTTP_STATUS.OK);
+      expect(generatePostSkim).toHaveBeenCalledOnce();
+    });
   });
 
   it.each([
@@ -216,12 +232,29 @@ describe(POST, () => {
     },
   );
 
-  it('answers 404 for a tenant that is no longer servable', async () => {
+  it('logs and answers 404 for a tenant that is no longer servable', async () => {
     vi.mocked(resolveTenantById).mockResolvedValue(undefined);
 
     const response = await goLive();
 
     expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
+    expect(logger.warn).toHaveBeenCalledWith(
+      GENERATE_SKIM_LOG.TENANT_NOT_SERVABLE,
+      { tenantId: MOCK_TENANT_ID, postId: MOCK_POST_ID },
+    );
+    expect(generatePostSkim).not.toHaveBeenCalled();
+  });
+
+  it('logs and answers 500 when resolving the tenant throws', async () => {
+    vi.mocked(resolveTenantById).mockRejectedValue(MOCK_ERROR);
+
+    const response = await goLive();
+
+    expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    expect(logger.error).toHaveBeenCalledWith(
+      GENERATE_SKIM_LOG.TENANT_RESOLVE_FAILED,
+      { tenantId: MOCK_TENANT_ID, postId: MOCK_POST_ID, error: MOCK_ERROR },
+    );
     expect(generatePostSkim).not.toHaveBeenCalled();
   });
 

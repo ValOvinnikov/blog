@@ -21,44 +21,50 @@ code:
   - apps/web/src/components/shared/cookie-settings-button/**
   - apps/web/src/modules/cookie-settings/**
   - apps/web/src/components/shared/site-analytics/**
+  - apps/web/src/server/site-config/get-site-analytics/**
+  - apps/web/src/context/site-analytics-provider/**
+  - apps/web/src/utils/to-cookie-list/**
+  - apps/web/src/config/analytics-origins.ts
   - apps/web/src/utils/is-web-analytics-enabled/**
   - apps/platform/src/server/settings-features/update-analytics-action.ts
   - apps/platform/src/utils/analytics-draft/**
   - apps/platform/src/components/features/capabilities/**
-epics: [3774, 3726, 5037, 5029]
+epics: [3774, 3726, 5037, 5029, 7149]
 ---
 
 # Consent and analytics
 
 ## What it does
 
-A site can show a cookie consent banner that lets the reader accept all, reject all or open settings, and a "Cookie settings" footer link, a floating button or both — the owner's choice on Look — reopen the preferences dialog at any time. An editor can also place a Cookie settings module on the home or a landing page (a privacy page, say), where the reader changes the choice inline. The banner links to the site's cookie statement, which lists every cookie the site sets and can reopen the preferences from its text. The reader's choice is a first-party cookie read on the client. Separately, a site can load Vercel Web Analytics and Speed Insights. The consent machinery has one optional category, external media, which gates every embed (videos, maps, booking widgets) until the reader allows it; analytics is not gated on consent.
+A site can show a cookie consent banner that lets the reader accept all, reject all or open settings, and a "Cookie settings" footer link, a floating button or both — the owner's choice on Look — reopen the preferences dialog at any time. An editor can also place a Cookie settings module on the home or a landing page (a privacy page, say), where the reader changes the choice inline. The banner links to the site's cookie statement, which lists every cookie the site sets and can reopen the preferences from its text. The reader's choice is a first-party cookie read on the client. A site on Starter or Growth loads its owner's own analytics tool: Plausible on every page, Google Analytics only once the reader allows the Analytics category. The operator can separately load Vercel Web Analytics and Speed Insights on every site. The consent machinery has two optional categories: Analytics, which gates Google Analytics and is offered only on a site that loads it, and External media, which gates every embed (videos, maps, booking widgets) until the reader allows it.
 
 ## Surfaces and routes
 
 - **Banner** — `ConsentBannerSlot`, mounted once in `SiteProviders`, shows when the `CONSENT_BANNER` capability is on and the reader has no valid consent cookie. Its policy link goes to `/legal/cookie-statement` (`routes.cookieStatement()`), labelled by the fixed `consent.banner.policyLinkLabel` (./footer-and-legal-pages.md).
-- **Cookie list** — a rich-text block on the cookie statement (or any article text) rendered from `COOKIE_LIST` in `apps/web/src/constants/cookie-list.ts`: name, purpose and duration, three columns from `sm` up and stacked entries on phones. Purposes and durations are fixed catalog keys (`cookieList.*`). A cookie the site starts setting joins that list in the same change.
+- **Cookie list** — a rich-text block on the cookie statement (or any article text) rendered from `COOKIE_LIST` in `apps/web/src/constants/cookie-list.ts`, plus `_ga` and `_ga_<id>` when the site uses Google Analytics (`toCookieList`): name, purpose and duration, three columns from `sm` up and stacked entries on phones. Its intro says everything is strictly necessary, or, with Google Analytics, that its cookies need the reader's consent (`cookieList.introWithGoogleAnalytics`). Purposes and durations are fixed catalog keys (`cookieList.*`). A cookie the site starts setting joins that list in the same change.
 - **Cookie-preferences link** — a rich-text annotation that turns the editor's text into a button opening the preferences dialog (./rich-text.md).
-- **Preferences dialog** — `ConsentPreferencesDialog`: Necessary (locked on) and External media switches, Save and Close. Opened from the banner's settings button, from the footer's `CookieSettingsButton` and from the floating button. On close focus returns to the control that opened it; when that control has gone (the banner, after Save), it falls back to the floating button, else the footer link.
+- **Preferences dialog** — `ConsentPreferencesDialog`: Necessary (locked on), Analytics (only on a site that loads Google Analytics) and External media switches, Save and Close. Opened from the banner's settings button, from the footer's `CookieSettingsButton` and from the floating button. On close focus returns to the control that opened it; when that control has gone (the banner, after Save), it falls back to the floating button, else the footer link.
 - **Floating button** — `FloatingCookieSettingsButton`, a 44px round icon button fixed bottom left and named "Cookie settings". `SiteFooter` mounts it when Look's Cookie settings choice is Floating button or Both and the `CONSENT_BANNER` capability is on. It renders only once the reader has answered the banner, never during SSR, sits below toasts and the banner (`z-20`), and hides while a header overlay is open.
 - **Cookie settings module** — `module_cookieSettings` on the home and landing pages. Renders the same switches and Save inline, under the editor's heading or, without one, `consent.preferences.heading`. The switches appear only once the reader's saved choice is known, and a `role="status"` line confirms each save (`consent.preferences.savedStatus`), re-announced on a repeat Save and cleared when a switch changes or another surface saves.
-- **Analytics** — `SiteAnalytics`, rendered in the tenant layout, mounts `<Analytics />` and `<SpeedInsights />`.
+- **Analytics** — `SiteAnalytics`, rendered in the tenant layout, mounts `<Analytics />` and `<SpeedInsights />` when `WEB_ANALYTICS_ENABLED` is on, and the tenant's own tool from `getSiteAnalytics`: Plausible's script with the site domain, or `GoogleAnalytics`, a client leaf that loads gtag only while the Analytics category is granted and sets Google's `ga-disable-<id>` opt-out flag whenever it is not, so a withdrawn choice stops a loaded gtag sending anything.
 - No platform page of its own: both are rows on the Features page (see [plans-and-entitlements](./plans-and-entitlements.md)). The only Studio surface is the Cookie settings module document.
 
 ## Data
 
-- `CONSENT_CATEGORY` (`@shinefold/config`): `NECESSARY`, `EXTERNAL_MEDIA`. Optional categories are every category but `NECESSARY`.
+- `CONSENT_CATEGORY` (`@shinefold/config`): `NECESSARY`, `ANALYTICS`, `EXTERNAL_MEDIA`. Optional categories are every category but `NECESSARY`.
 - Cookie `consent`, value `1.<granted categories, comma-separated>` (version `1`; an empty list means rejected), 180 days, `Path=/`, `SameSite=Lax`, `Secure`. Written from the browser; no server reads it.
 - `useConsentStore` also reports a `saveRevision` that every `save` advances, even one that rewrites the same choice; `save` returns the new revision.
+- `useOfferedConsentCategories` lists the optional categories the site asks about: Analytics only when `SiteAnalyticsProvider` holds a Google Analytics id, since Vercel Web Analytics and Plausible set no cookies (decided, owner, 2026-11-18). The banner's Accept all grants exactly these, its message is `consent.banner.messageWithAnalytics` when they include Analytics and `consent.banner.message` otherwise, and the dialog and the module show a switch for each.
 - `useConsentStore` turns the cookie into `UNKNOWN` (server and first render), `UNANSWERED` (missing or invalid cookie) or `ANSWERED`; `useConsent(category)` answers `GRANTED` or `DENIED` per category and exposes `grant()`.
 - Sanity `module_cookieSettings`: `brandVariant`, optional `headingBlock`, `layout`. The capability flags come from `settings_features`, cached per tenant like every other capability.
-- `tenant_analytics` (Neon): at most one row per tenant holding the owner's own analytics tool, `provider` (`ANALYTICS_PROVIDER` in `@shinefold/config`: `GOOGLE_ANALYTICS` or `PLAUSIBLE`) and `analytics_id` (a measurement id or a site domain); no row means none. `saveTenantAnalytics` stores or replaces it and `clearTenantAnalytics` removes it. The save is the only write path and checks the id per provider, because the site puts it into a script tag: Google Analytics must match `GOOGLE_ANALYTICS_ID_PATTERN` (`G-` then uppercase letters and digits), Plausible must be a bare domain (`DOMAIN_PATTERN`, lowercased); anything else throws. `getTenantAnalytics` owns the plan gate, reading `tenants.plan` itself: it returns the row only when the plan's `hasOwnAnalytics` allows (`STARTER`, `GROWTH`); on `FREE` it returns nothing and the row is kept. A caller never re-gates it on `getEffectivePlan`; when the read fails it throws and loads nothing. `getStoredTenantAnalytics` is the ungated read for the platform's Features form, so an owner on `FREE` still sees the kept id behind the lock. The site does not read it yet.
+- `tenant_analytics` (Neon): at most one row per tenant holding the owner's own analytics tool, `provider` (`ANALYTICS_PROVIDER` in `@shinefold/config`: `GOOGLE_ANALYTICS` or `PLAUSIBLE`) and `analytics_id` (a measurement id or a site domain); no row means none. `saveTenantAnalytics` stores or replaces it and `clearTenantAnalytics` removes it. The save is the only write path and checks the id per provider, because the site puts it into a script tag: Google Analytics must match `GOOGLE_ANALYTICS_ID_PATTERN` (`G-` then uppercase letters and digits), Plausible must be a bare domain (`DOMAIN_PATTERN`, lowercased); anything else throws. `getTenantAnalytics` owns the plan gate, reading `tenants.plan` itself: it returns the row only when the plan's `hasOwnAnalytics` allows (`STARTER`, `GROWTH`); on `FREE` it returns nothing and the row is kept. A caller never re-gates it on `getEffectivePlan`; when the read fails it throws and loads nothing. `getStoredTenantAnalytics` is the ungated read for the platform's Features form, so an owner on `FREE` still sees the kept id behind the lock. The site reads it through `getSiteAnalytics`, cached per tenant under the site-config and plan tags, so a save or a plan change shows on the next request; a failed read logs `site_config.analytics_fetch_failed` and loads nothing. `SiteProviders` hands it to client components through `SiteAnalyticsProvider`.
 
 ## Configuration
 
-- **Owner or operator (platform Features)** — `CONSENT_BANNER` (in every plan, preset default off), and the Analytics row: a choice of Google Analytics or Plausible and the measurement id or site domain, on `STARTER` and `GROWTH`. On `FREE` the row is locked with a Starter badge and shows a kept id read-only. `updateAnalyticsAction` saves it with the rest of the page and, like every settings save, calls `requireTenantManager`, so an editor is refused: a blank id clears it, setting one on a plan without `hasOwnAnalytics` is refused as not in the plan (clearing is not), and an id `saveTenantAnalyticsInputSchema` rejects returns `ANALYTICS_FIELD_ERROR.ID_INVALID`, which the form words with an example of the chosen provider's format. A save revalidates the site config and records a `SETTINGS_UPDATED` audit event. The stored `ANALYTICS` toggle is no longer shown; it keeps its stored value and still gates Vercel Web Analytics until the site loads the owner's tool.
-- **Operator (env)** — `WEB_ANALYTICS_ENABLED=true` is required as well; analytics loads only when the env flag and the capability both allow it.
-- **Voice** — none; banner, dialog, module, footer-link and embed-placeholder copy are fixed keys (`consent.*`). The placeholder's allow label and scope note are `consent.placeholder.allowLabel` and `consent.placeholder.scopeNote`; its settings action reuses `consent.footerSettingsLabel`.
+- **Owner or operator (platform Features)** — `CONSENT_BANNER` (in every plan, preset default off), and the Analytics row: a choice of Google Analytics or Plausible and the measurement id or site domain, on `STARTER` and `GROWTH`. On `FREE` the row is locked with a Starter badge and shows a kept id read-only, and the provider choice greys its text like the Look page's locked controls. On an archived site the provider choice is disabled with the archived fade instead, never plan-locked. `updateAnalyticsAction` saves it with the rest of the page and, like every settings save, calls `requireTenantManager`, so an editor is refused: a blank id clears it, setting one on a plan without `hasOwnAnalytics` is refused as not in the plan (clearing is not), and an id `saveTenantAnalyticsInputSchema` rejects returns `ANALYTICS_FIELD_ERROR.ID_INVALID`, which the form words with an example of the chosen provider's format. A save revalidates the site config and records a `SETTINGS_UPDATED` audit event. The stored `ANALYTICS` toggle is no longer shown and no longer read by the site; it keeps its stored value.
+- **Operator (env)** — `WEB_ANALYTICS_ENABLED=true` loads Vercel Web Analytics and Speed Insights on every site, for the operator; it follows no tenant capability and does not affect the owner's tool.
+- **Content security policy** — `script-src` and `connect-src` allow Plausible (`https://plausible.io`) and Google's documented GA4 sources (`*.googletagmanager.com`, `*.google-analytics.com`, `*.analytics.google.com`, the first two also in `img-src`), from `apps/web/src/config/analytics-origins.ts`.
+- **Voice** — none; banner, dialog, module, footer-link and embed-placeholder copy are fixed keys (`consent.*`), the Analytics category's name and description included (`consent.categories.analytics.*`; decided, owner, 2026-11-17: fixed for now). The placeholder's allow label and scope note are `consent.placeholder.allowLabel` and `consent.placeholder.scopeNote`; its settings action reuses `consent.footerSettingsLabel`.
 - **Look** — the banner, dialog and placeholder are `@shinefold/ui` molecules and follow the site's Look. Look › Footer › Cookie settings (Footer link default · Floating button · Both, every plan; stored as `COOKIE_SETTINGS_BUTTON` `HIDDEN` · `ONLY` · `SHOWN`) picks which controls reopen the dialog, read through `getFooterStyle`; `resolveCookieSettingsControls` turns the choice and the capability into the footer link and the floating button.
 
 ## Constraints and invariants
@@ -70,7 +76,8 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - The dialog and the module share `useConsentPreferencesForm`: one category list, and switches that start from the saved choice and re-derive on every save from any surface (keyed on `saveRevision`, not the cookie value), discarding unsaved changes.
 - The module renders no switches while the store is `UNKNOWN`, so Save can never write an empty choice over a granted one before the cookie is read.
 - `ConsentGate` (`apps/web/src/components/shared/consent-gate/`) gates content on one category: it renders its `pending` node while the store is `UNKNOWN` (so the server render never holds the gated content), its `fallback` while the category is unanswered or denied, and its children once granted. The embed module is its first consumer, with `ConsentPlaceholder` as the fallback.
-- Vercel Analytics and Speed Insights load regardless of the reader's consent choice.
+- Vercel Analytics, Speed Insights and Plausible set no cookies and load regardless of the reader's consent choice. Google Analytics loads nothing before the Analytics category is granted; a reader whose stored choice predates the category has it denied until they allow it.
+- The choice is read on the client, so the analytics tool never makes a page dynamic.
 - A tenant holds one analytics provider and id or none; a downgrade never deletes it.
 - A capability switched off hides the banner, the footer link and the floating button, whatever Look's choice; a Cookie settings module on a page still renders. With it on, at least one of the link and the button shows.
 
@@ -78,7 +85,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 
 - Layers: `config` (categories, `CAPABILITY`), `ui` (`ConsentBanner`, `ConsentPreferences`, `ConsentPlaceholder`, `Dialog`), `web`.
 - Features: [plans-and-entitlements](./plans-and-entitlements.md), [footer-and-legal-pages](./footer-and-legal-pages.md), [rich-text](./rich-text.md), [embed-module](./embed-module.md) (the first external-media consumer), [rendering-and-caching](./rendering-and-caching.md).
-- Packages: `@vercel/analytics`, `@vercel/speed-insights`.
+- Packages: `@vercel/analytics`, `@vercel/speed-insights`. Plausible and gtag load from their providers' own script URLs.
 - Env: `WEB_ANALYTICS_ENABLED`.
 
 ## Entry points
@@ -97,13 +104,14 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - `apps/web/src/components/shared/floating-cookie-settings-button/floating-cookie-settings-button.tsx`
 - `apps/web/src/context/consent-preferences-provider/consent-preferences-provider.tsx` — the footer and floating control refs and the focus-return fallback
 - `apps/web/src/components/features/layout/site-providers/site-providers.tsx`
-- `apps/web/src/components/shared/site-analytics/site-analytics.tsx`
+- `apps/web/src/components/shared/site-analytics/site-analytics.tsx`, `components/google-analytics/google-analytics.tsx`
+- `apps/web/src/server/site-config/get-site-analytics/get-site-analytics.ts`
 - `apps/web/src/constants/cookie-list.ts`, `apps/web/src/components/shared/portable-text/config/cookie-list.tsx`, `cookie-preferences-link.tsx`
 - `apps/web/src/app/[tenant]/[locale]/layout.tsx`
 
 ## Tests and stories
 
-- `apps/web/src/utils/consent-cookie/consent-cookie.test.ts`, `use-consent.test.tsx`, `use-consent-store.test.tsx`, `consent-gate.test.tsx`, `consent-preferences-provider.test.tsx`, `consent-banner-slot.test.tsx`, `consent-preferences-dialog.test.tsx`, `cookie-settings-form.test.tsx`, `cookie-settings-module.test.tsx`, `cookie-settings-button.test.tsx`, `floating-cookie-settings-button.test.tsx`, `site-analytics.test.tsx`, `is-web-analytics-enabled.test.ts`.
+- `apps/web/src/utils/consent-cookie/consent-cookie.test.ts`, `use-consent.test.tsx`, `use-consent-store.test.tsx`, `consent-gate.test.tsx`, `consent-preferences-provider.test.tsx`, `consent-banner-slot.test.tsx`, `consent-preferences-dialog.test.tsx`, `cookie-settings-form.test.tsx`, `cookie-settings-module.test.tsx`, `cookie-settings-button.test.tsx`, `floating-cookie-settings-button.test.tsx`, `site-analytics.test.tsx`, `google-analytics.test.tsx`, `get-site-analytics.test.ts`, `cookie-list.test.tsx`, `is-web-analytics-enabled.test.ts`.
 - `packages/db/src/queries/tenant-analytics/**/*.test.ts`.
 - `apps/platform/src/server/settings-features/update-analytics-action.test.ts`, `features-settings.test.tsx`, `features-page-content.test.tsx`.
 - `packages/ui/src/components/molecules/consent-*/**/*.test.tsx`.
@@ -119,4 +127,5 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - #6505 — the banner's cookie-statement link, the cookie list and the cookie-preferences link.
 - #7150 — a tenant stores its analytics provider and id (epic #7149).
 - #7151 — the owner enters their analytics id in place of the Analytics switch (epic #7149).
+- #7152 — the site loads the owner's analytics tool, Google Analytics only after consent (epic #7149).
 - #6743 — owners choose the footer link, the floating button or both; with the banner off neither shows.

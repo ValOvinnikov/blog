@@ -42,6 +42,7 @@ export const generatePostSkim = async ({
   readTenant,
   writeContext,
 }: TGeneratePostSkimInput): Promise<TGeneratePostSkimResult> => {
+  const { tenantId } = writeContext;
   const gate = await gateSkimWrite(postId, writeContext);
   if (!gate.isAllowed) {
     return { isGenerated: false, ...gate.refusal };
@@ -54,6 +55,7 @@ export const generatePostSkim = async ({
   );
   if (!bodyResult.ok) {
     logger.error(GENERATE_SKIM_LOG.POST_BODY_FETCH_FAILED, {
+      tenantId,
       postId,
       error: bodyResult.error,
     });
@@ -68,7 +70,11 @@ export const generatePostSkim = async ({
   try {
     takeaways = await generateTakeaways(bodyResult.data, apiKey);
   } catch (error) {
-    logger.error(GENERATE_SKIM_LOG.GENERATION_FAILED, { postId, error });
+    logger.error(GENERATE_SKIM_LOG.GENERATION_FAILED, {
+      tenantId,
+      postId,
+      error,
+    });
     await releaseSkimGeneration(claim, postId);
     return refuse(
       'Failed to generate takeaways.',
@@ -81,6 +87,7 @@ export const generatePostSkim = async ({
     resolvedWriteTenant = writeTenant ?? getPlatformSanityWriteContext();
   } catch (error) {
     logger.error(GENERATE_SKIM_LOG.WRITE_CLIENT_UNCONFIGURED, {
+      tenantId,
       postId,
       error,
     });
@@ -93,6 +100,7 @@ export const generatePostSkim = async ({
   );
   if (!saveResult.ok) {
     logger.error(GENERATE_SKIM_LOG.DRAFT_SAVE_FAILED, {
+      tenantId,
       postId,
       error: saveResult.error,
     });

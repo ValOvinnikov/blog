@@ -6,6 +6,7 @@ import {
   SANITY_DOCUMENT_ACTION,
   SANITY_LOGIN_PROVIDER,
   type TLocaleIsoCode,
+  type TSanityDocumentAction,
 } from '@shinefold/config/constants';
 import { PAGE_COOKIE_STATEMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
 import { PAGE_HOME_TYPE } from '@shinefold/studio/schema-types/documents/pages/home/home-type';
@@ -46,6 +47,7 @@ const MOCK_DATASET = faker.lorem.word();
 const MOCK_TITLE = faker.company.name();
 const MOCK_BASE_PATH = `/${faker.lorem.word()}/studio`;
 const MOCK_DOCUMENT_ID = faker.string.uuid();
+const MOCK_PREVIEW_BASE_PATH = `/${faker.lorem.word()}/preview`;
 const MOCK_UNTRANSLATED_TYPE = faker.lorem.word();
 
 const TRANSLATIONS_PLUGIN_NAME = '@sanity/document-internationalization';
@@ -66,6 +68,28 @@ const hasEntitlementGates = (overrides: Partial<TBuildStudioConfigParams>) =>
     (plugin) =>
       typeof plugin === 'object' && plugin.name === ENTITLEMENT_GATES_NAME,
   );
+
+const mockAction = (name: TSanityDocumentAction) => {
+  const action: DocumentActionComponent = () => null;
+  action.action = name;
+  return action;
+};
+
+type TResolveActions = (
+  prev: DocumentActionComponent[],
+  schemaType: string,
+) => DocumentActionComponent[];
+
+const actionsOf = (
+  built: ReturnType<typeof buildStudioConfig>,
+): TResolveActions => {
+  const resolver = built.document?.actions;
+  if (typeof resolver !== 'function') {
+    throw new Error('expected config.document.actions to be a function');
+  }
+  return (prev, schemaType) =>
+    resolver(prev, { schemaType } as DocumentActionsContext);
+};
 
 describe(buildStudioConfig, () => {
   let config: ReturnType<typeof buildStudioConfig>;
@@ -104,18 +128,11 @@ describe(buildStudioConfig, () => {
   });
 
   describe('document actions', () => {
-    let actions: (
-      prev: DocumentActionComponent[],
-      schemaType: string,
-    ) => DocumentActionComponent[];
+    const publish = mockAction(SANITY_DOCUMENT_ACTION.PUBLISH);
+    let actions: TResolveActions;
 
     beforeEach(() => {
-      const resolver = config.document?.actions;
-      if (typeof resolver !== 'function') {
-        throw new Error('expected config.document.actions to be a function');
-      }
-      actions = (prev, schemaType) =>
-        resolver(prev, { schemaType } as DocumentActionsContext);
+      actions = actionsOf(config);
     });
 
     it('offers no document actions on the migration ledger', () => {
@@ -123,10 +140,7 @@ describe(buildStudioConfig, () => {
     });
 
     it('wraps only the landing page publish action', () => {
-      const publish: DocumentActionComponent = () => null;
-      publish.action = SANITY_DOCUMENT_ACTION.PUBLISH;
-      const discard: DocumentActionComponent = () => null;
-      discard.action = SANITY_DOCUMENT_ACTION.DISCARD_CHANGES;
+      const discard = mockAction(SANITY_DOCUMENT_ACTION.DISCARD_CHANGES);
 
       const [landingPublish, landingDiscard] = actions(
         [publish, discard],
@@ -141,11 +155,7 @@ describe(buildStudioConfig, () => {
     });
 
     it('offers no delete, duplicate or unpublish action on the cookie statement', () => {
-      const prev = Object.values(SANITY_DOCUMENT_ACTION).map((name) => {
-        const action: DocumentActionComponent = () => null;
-        action.action = name;
-        return action;
-      });
+      const prev = Object.values(SANITY_DOCUMENT_ACTION).map(mockAction);
 
       const names = actions(prev, PAGE_COOKIE_STATEMENT_TYPE).map(
         ({ action }) => action,
@@ -155,6 +165,32 @@ describe(buildStudioConfig, () => {
         SANITY_DOCUMENT_ACTION.PUBLISH,
         SANITY_DOCUMENT_ACTION.DISCARD_CHANGES,
       ]);
+    });
+
+    describe('with a preview base path', () => {
+      beforeEach(() => {
+        actions = actionsOf(
+          buildConfig({ previewBasePath: MOCK_PREVIEW_BASE_PATH }),
+        );
+      });
+
+      it.each([PAGE_POST_TYPE, PAGE_LANDING_TYPE])(
+        'adds a preview action after the others on %s',
+        (schemaType) => {
+          const resolved = actions([publish], schemaType);
+
+          expect(resolved).toHaveLength(2);
+          expect(resolved.at(-1)?.action).toBeUndefined();
+        },
+      );
+
+      it('adds no preview action to other document types', () => {
+        expect(actions([publish], PAGE_TOPIC_TYPE)).toEqual([publish]);
+      });
+    });
+
+    it('adds no preview action without a preview base path', () => {
+      expect(actions([publish], PAGE_POST_TYPE)).toEqual([publish]);
     });
   });
 

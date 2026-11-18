@@ -32,7 +32,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@shinefold/config/constants` — `packages/config/src/constants/audit.ts`
 
 - **AUDIT_TARGET_TYPE**: `TENANT`, `SITE_CONFIG`, `SETTINGS_FEATURES`, `RELEASE`, `BLOCKED_SIGNUP_IDENTITY`, `PERSONAL_DATA`, `TEAM_MEMBER`
-- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`, `OAUTH_APP_SAVED`, `OAUTH_APP_REPLACED`, `OAUTH_APP_REMOVED`, `NEWSLETTER_PAUSE_CLEARED`, `MEMBER_INVITED`, `MEMBER_REMOVED`, `MEMBER_INVITE_CANCELLED`
+- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`, `OAUTH_APP_SAVED`, `OAUTH_APP_REPLACED`, `OAUTH_APP_REMOVED`, `NEWSLETTER_PAUSE_CLEARED`, `MEMBER_INVITED`, `MEMBER_REMOVED`, `MEMBER_INVITE_CANCELLED`, `ENTITLEMENT_GRANTED`, `ENTITLEMENT_REVOKED`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/auth-app.ts`
 
@@ -65,7 +65,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/consent-category.ts`
 
-- **CONSENT_CATEGORY**: `NECESSARY`, `EXTERNAL_MEDIA`
+- **CONSENT_CATEGORY**: `NECESSARY`, `ANALYTICS`, `EXTERNAL_MEDIA`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/contrast.ts`
 
@@ -108,7 +108,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/error.ts`
 
-- **ERROR_CODE**: `DB_NOT_FOUND`, `DB_DUPLICATE_DOMAIN`, `DB_LAST_LINKED_METHOD`, `DB_HOLDS_PLATFORM_ROLE`, `DB_ALREADY_PROVISIONING`, `DB_INVALID_DOMAIN`, `DB_INVALID_EMAIL`, `DB_LOCALE_LIMIT_EXCEEDED`, `DB_DEFAULT_LOCALE_REPEATED`, `DB_ALREADY_OWNS_FREE_TENANT`, `DB_DOMAIN_CLAIM_EXISTS`
+- **ERROR_CODE**: `DB_NOT_FOUND`, `DB_DUPLICATE_DOMAIN`, `DB_LAST_LINKED_METHOD`, `DB_HOLDS_PLATFORM_ROLE`, `DB_ALREADY_PROVISIONING`, `DB_INVALID_DOMAIN`, `DB_INVALID_EMAIL`, `DB_LOCALE_LIMIT_EXCEEDED`, `DB_DEFAULT_LOCALE_REPEATED`, `DB_ALREADY_OWNS_FREE_TENANT`, `DB_DOMAIN_CLAIM_EXISTS`, `DB_ENTITLEMENT_ALREADY_GRANTED`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/finding.ts`
 
@@ -371,6 +371,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **EMAIL_DELIVERY_OUTCOME**: `DELIVERED`, `BOUNCED`, `COMPLAINED`
 - **EMAIL_REPUTATION_LEVEL**: `OK`, `WARN`, `SLOW`, `STOP`
+
+### `@shinefold/db/constants` — `packages/db/src/constants/entitlement.ts`
+
+- **ENTITLEMENT_KIND**: `CAPABILITY`, `MODULE_PACK`, `LOOK_FIELD`, `LOCALE_LIMIT`
 
 ### `@shinefold/db/constants` — `packages/db/src/constants/membership.ts`
 
@@ -865,7 +869,8 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/cookie-list` — `apps/web/src/constants/cookie-list.ts`
 
-- **COOKIE_ID**: `CONSENT`, `LANGUAGE`, `SESSION`, `CSRF`, `SIGN_IN_RETURN`, `OAUTH_VERIFIER`, `OAUTH_STATE`, `SIGNED_IN_HINT`, `NEWSLETTER_SUBSCRIBED`, `NEWSLETTER_UNSUBSCRIBE_TOKEN`, `READING_DEPTH`, `THEME`
+- **COOKIE_PROVIDER**: `FIRST_PARTY`, `GOOGLE`
+- **COOKIE_ID**: `CONSENT`, `LANGUAGE`, `SESSION`, `CSRF`, `SIGN_IN_RETURN`, `OAUTH_VERIFIER`, `OAUTH_STATE`, `SIGNED_IN_HINT`, `NEWSLETTER_SUBSCRIBED`, `NEWSLETTER_UNSUBSCRIBE_TOKEN`, `READING_DEPTH`, `THEME`, `GOOGLE_ANALYTICS`, `GOOGLE_ANALYTICS_VISIT`
 
 ### `@web/constants/cookie-statement` — `apps/web/src/constants/cookie-statement.ts`
 
@@ -907,7 +912,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/generate-skim` — `apps/web/src/constants/generate-skim.ts`
 
-- **GENERATE_SKIM_LOG**: `CONFIG_MISSING`=`"generate_skim.config_missing"`, `HOST_UNRESOLVABLE`=`"generate_skim.host_unresolvable"`, `WRITE_TENANT_UNRESOLVABLE`=`"generate_skim.write_tenant_unresolvable"`, `TENANT_WRITE_CREDENTIALS_MISSING`=`"generate_skim.tenant_write_credentials_missing"`, `TENANT_NOT_ACTIVE`=`"generate_skim.tenant_not_active"`, `ALLOWANCE_USED`=`"generate_skim.allowance_used"`, `CLAIM_FAILED`=`"generate_skim.claim_failed"`, `CLAIM_RELEASE_FAILED`=`"generate_skim.claim_release_failed"`, `POST_BODY_FETCH_FAILED`=`"generate_skim.post_body_fetch_failed"`, `GENERATION_FAILED`=`"generate_skim.generation_failed"`, `WRITE_CLIENT_UNCONFIGURED`=`"generate_skim.write_client_unconfigured"`, `DRAFT_SAVE_FAILED`=`"generate_skim.draft_save_failed"`, `PUBLISHED_AT_LOOKUP_FAILED`=`"generate_skim.published_at_lookup_failed"`, `PUBLISH_START_FAILED`=`"generate_skim.publish_start_failed"`, `GO_LIVE_ENQUEUE_SKIPPED`=`"generate_skim.go_live_enqueue_skipped"`, `GO_LIVE_ENQUEUE_REFUSED`=`"generate_skim.go_live_enqueue_refused"`, `GO_LIVE_ENQUEUE_FAILED`=`"generate_skim.go_live_enqueue_failed"`, `GO_LIVE_SECRET_MISSING`=`"generate_skim.go_live_secret_missing"`, `GO_LIVE_TENANT_LOOKUP_FAILED`=`"generate_skim.go_live_tenant_lookup_failed"`, `TAKEAWAYS_LOOKUP_FAILED`=`"generate_skim.takeaways_lookup_failed"`
+- **GENERATE_SKIM_LOG**: `CONFIG_MISSING`=`"generate_skim.config_missing"`, `HOST_UNRESOLVABLE`=`"generate_skim.host_unresolvable"`, `WRITE_TENANT_UNRESOLVABLE`=`"generate_skim.write_tenant_unresolvable"`, `TENANT_WRITE_CREDENTIALS_MISSING`=`"generate_skim.tenant_write_credentials_missing"`, `TENANT_NOT_ACTIVE`=`"generate_skim.tenant_not_active"`, `ALLOWANCE_USED`=`"generate_skim.allowance_used"`, `CLAIM_FAILED`=`"generate_skim.claim_failed"`, `CLAIM_RELEASE_FAILED`=`"generate_skim.claim_release_failed"`, `POST_BODY_FETCH_FAILED`=`"generate_skim.post_body_fetch_failed"`, `GENERATION_FAILED`=`"generate_skim.generation_failed"`, `WRITE_CLIENT_UNCONFIGURED`=`"generate_skim.write_client_unconfigured"`, `DRAFT_SAVE_FAILED`=`"generate_skim.draft_save_failed"`, `PUBLISHED_AT_LOOKUP_FAILED`=`"generate_skim.published_at_lookup_failed"`, `PUBLISH_START_FAILED`=`"generate_skim.publish_start_failed"`, `GO_LIVE_ENQUEUE_SKIPPED`=`"generate_skim.go_live_enqueue_skipped"`, `GO_LIVE_ENQUEUE_REFUSED`=`"generate_skim.go_live_enqueue_refused"`, `GO_LIVE_ENQUEUE_FAILED`=`"generate_skim.go_live_enqueue_failed"`, `GO_LIVE_SECRET_MISSING`=`"generate_skim.go_live_secret_missing"`, `GO_LIVE_TENANT_LOOKUP_FAILED`=`"generate_skim.go_live_tenant_lookup_failed"`, `TAKEAWAYS_LOOKUP_FAILED`=`"generate_skim.takeaways_lookup_failed"`, `TENANT_NOT_SERVABLE`=`"generate_skim.tenant_not_servable"`, `TENANT_RESOLVE_FAILED`=`"generate_skim.tenant_resolve_failed"`
 
 ### `@web/constants/header-style` — `apps/web/src/constants/header-style.ts`
 
@@ -1025,7 +1030,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/site-config` — `apps/web/src/constants/site-config.ts`
 
-- **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `BRAND_NAME_FETCH_FAILED`=`"brand_name.site_config_fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`
+- **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `BRAND_NAME_FETCH_FAILED`=`"brand_name.site_config_fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `ANALYTICS_FETCH_FAILED`=`"site_config.analytics_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`
 
 ### `@web/constants/sitemap` — `apps/web/src/constants/sitemap.ts`
 

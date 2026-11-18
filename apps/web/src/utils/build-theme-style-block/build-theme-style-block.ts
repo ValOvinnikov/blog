@@ -1,6 +1,7 @@
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
+  BRAND_PALETTE,
   BUTTON_SHAPE,
   BUTTON_SHAPE_DECLARATIONS,
   CARD_STYLE,
@@ -36,9 +37,9 @@ const formatDeclarations = (declarations: TThemeDeclarations): string => {
 };
 
 /**
- * The site's runtime overrides for `configs/tailwind/theme.css`, whose static
- * defaults must stay identical to the Console preset's output so a site with
- * no saved look renders the same.
+ * The site's runtime overrides for `configs/tailwind/theme.css` and
+ * `skins.css`, whose static defaults must stay identical to the Console
+ * preset's output so a site with no saved look renders the same.
  */
 export const buildThemeStyleBlock = ({
   accentHue,
@@ -59,6 +60,7 @@ export const buildThemeStyleBlock = ({
 
   return `:root {
     ${formatDeclarations({
+      ...formatOklchRamp(BRAND_PALETTE, accentHue),
       ...formatOklchRamp(ACCENT_RAMP_LIGHT, accentHue),
       ...formatOklchRamp(LOGO_RAMP_LIGHT, resolvedLogoHue),
       ...formatOklchRamp(IMAGE_SCRIM_RAMP, accentHue),

@@ -25,6 +25,10 @@ const MOCK_PARAGRAPH = faker.lorem.sentence();
 const MOCK_SECOND_PARAGRAPH = faker.lorem.sentence();
 const MOCK_PREVIEW_TEXT = faker.lorem.words(4);
 const MOCK_FIRST_DETAIL_VALUE = MOCK_EMAIL_DETAILS[0]?.value ?? '';
+const MOCK_SECONDARY_LINK = {
+  label: faker.lorem.words(3),
+  url: `${faker.internet.url({ appendSlash: false })}/${faker.lorem.slug()}`,
+};
 
 describe(buildOwnerEmail, () => {
   describe('with copy and an action', () => {
@@ -103,6 +107,49 @@ describe(buildOwnerEmail, () => {
 
       expect(copyAt).toBeLessThan(detailAt);
       expect(detailAt).toBeLessThan(actionAt);
+    });
+  });
+
+  describe('with a secondary link', () => {
+    let email: ReturnType<typeof buildOwnerEmail>;
+
+    beforeEach(() => {
+      email = buildOwnerEmail({
+        ...MOCK_OWNER_EMAIL_INPUT,
+        secondaryLink: MOCK_SECONDARY_LINK,
+      });
+    });
+
+    it('renders it as a link after the action button', () => {
+      const buttonAt = email.html.indexOf(
+        `>${MOCK_OWNER_EMAIL_INPUT.action.label}</a>`,
+      );
+      const linkAt = email.html.indexOf(`>${MOCK_SECONDARY_LINK.label}</a>`);
+
+      expect(email.html).toContain(`href="${MOCK_SECONDARY_LINK.url}"`);
+      expect(buttonAt).toBeGreaterThan(-1);
+      expect(buttonAt).toBeLessThan(linkAt);
+    });
+
+    it('ends the plain text with the action, then the link', () => {
+      expect(email.text).toBe(
+        `${MOCK_UNSAFE_MARKUP}\n\n${MOCK_OWNER_EMAIL_INPUT.action.label}: ${MOCK_OWNER_EMAIL_INPUT.action.url}\n\n${MOCK_SECONDARY_LINK.label}: ${MOCK_SECONDARY_LINK.url}`,
+      );
+    });
+
+    it('escapes its label and percent-encodes its url', () => {
+      const { html } = buildOwnerEmail({
+        ...MOCK_OWNER_EMAIL_INPUT,
+        paragraphs: [MOCK_PARAGRAPH],
+        secondaryLink: {
+          label: MOCK_UNSAFE_MARKUP,
+          url: `${MOCK_URL}/?q=${MOCK_ATTRIBUTE_BREAKOUT}`,
+        },
+      });
+
+      expect(html).not.toContain(MOCK_UNSAFE_MARKUP);
+      expect(html).not.toContain(MOCK_ATTRIBUTE_BREAKOUT);
+      expect(html).toContain(MOCK_PERCENT_ENCODED_ATTRIBUTE_BREAKOUT);
     });
   });
 
