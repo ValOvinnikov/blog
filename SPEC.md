@@ -1493,10 +1493,10 @@ set nor the on-image tokens change under `.dark`; `ActionGroup` and
 never scrim-less: white copy over an unscrimmed photograph is less legible
 than no treatment at all. With a photo the Banner (`skin-on-image`)
 re-points the skin's text, border and link roles at the on-image colours,
-so a ghost or link `Button` inside it needs no prop; without one
-(`skin-raised`) it paints the skin's `--ambient-raised` — Plain's lifted
+so a ghost or link `Button` inside it needs no prop. Every Banner adds
+`skin-raised`, which paints the skin's `--ambient-raised` — Plain's lifted
 `--primary-subtle`, every other skin's own ground — and points `--ambient`
-at it. Each hero view passes
+at it; a photo covers that field and a photo-less Banner shows it. Each hero view passes
 `isOnDark` to its `ActionGroup` on Banner, so the actions are painted for a
 dark ground too.
 

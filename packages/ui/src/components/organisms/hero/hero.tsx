@@ -16,10 +16,23 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@shinefold/ui/lib/react';
-import { cloneElement, Fragment } from 'react';
+import { cloneElement, Fragment, type ElementType } from 'react';
 
-import { HeroParts } from './hero-parts';
+import { HeroAvatar } from './components/avatar/hero-avatar';
+import { HeroBody } from './components/body/hero-body';
+import { HeroCta } from './components/cta/hero-cta';
+import { HeroMedia } from './components/media/hero-media';
+import { HeroMediaArea } from './components/media-area/hero-media-area';
+import { HeroSocial } from './components/social/hero-social';
 import { resolveHeroStyles } from './hero-styles';
+
+const HeroParts = {
+  Avatar: HeroAvatar,
+  Media: HeroMedia,
+  Body: HeroBody,
+  Cta: HeroCta,
+  Social: HeroSocial,
+} satisfies Record<string, ElementType>;
 
 export type THeroProps = IWithClassName &
   IWithDataTestId & {
@@ -54,22 +67,21 @@ const HeroRoot = ({
   dataTestId,
 }: THeroProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeroParts);
-  const hasMedia = Boolean(slots.Media);
-  const {
-    variant: resolvedVariant,
-    isBanner,
-    alignment: resolvedAlignment,
-    styles: s,
-    banner,
-  } = resolveHeroStyles({
+  const heroStyles = resolveHeroStyles({
     variant,
-    hasMedia,
+    hasMedia: Boolean(slots.Media),
     contentPosition,
     contentAlignment,
     mediaOrder,
     spacingTop,
     spacingBottom,
   });
+  const {
+    isBanner,
+    alignment: resolvedAlignment,
+    styles: s,
+    banner,
+  } = heroStyles;
 
   return (
     <div
@@ -130,27 +142,7 @@ const HeroRoot = ({
             })}
         </div>
         {slots.Media && (
-          <div
-            className={s.media({ class: banner?.media() })}
-            data-testid={HERO_TEST_ID.MEDIA}
-          >
-            {cloneElement(
-              slots.Media,
-              isBanner
-                ? { isFramed: false }
-                : {
-                    variant: resolvedVariant,
-                    contentAlignment: resolvedAlignment,
-                  },
-            )}
-          </div>
-        )}
-        {banner && hasMedia && (
-          <div
-            className={banner.overlay()}
-            aria-hidden="true"
-            data-testid={HERO_TEST_ID.OVERLAY}
-          />
+          <HeroMediaArea media={slots.Media} heroStyles={heroStyles} />
         )}
       </div>
 

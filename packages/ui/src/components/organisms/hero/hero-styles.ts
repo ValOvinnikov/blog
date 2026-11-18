@@ -54,3 +54,5 @@ export const resolveHeroStyles = ({
       : undefined,
   };
 };
+
+export type THeroStyles = ReturnType<typeof resolveHeroStyles>;

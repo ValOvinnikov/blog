@@ -51,5 +51,5 @@
   "packages/studio/src/schema-types/inputs/localization-notice-input/localization-notice-input.tsx": 155,
   "packages/studio/src/studio-config.ts": 161,
   "packages/ui/src/components/molecules/toast/toast.tsx": 151,
-  "packages/ui/src/components/organisms/hero/hero.tsx": 160
+  "packages/ui/src/components/organisms/hero/hero.tsx": 151
 }

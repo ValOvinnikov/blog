@@ -22,6 +22,7 @@ import {
   HEADING_WEIGHT_DECLARATIONS,
   HUE_MAX,
   HUE_MIN,
+  IMAGE_SCRIM_RAMP,
   IMAGE_PROPORTION,
   IMAGE_PROPORTION_DECLARATIONS,
   LOGO_RAMP_DARK,
@@ -154,11 +155,12 @@ describe(buildThemePreviewStyle, () => {
     },
   );
 
-  it('colours the brand palette and a logo with no hue at the accent hue', () => {
+  it('colours the brand palette, scrim and a logo with no hue at the accent hue', () => {
     const style = buildThemePreviewStyle(MOCK_PREVIEW_VALUES, false);
 
     expect(style).toMatchObject({
       ...formatOklchRamp(BRAND_PALETTE, MOCK_ACCENT_HUE),
+      ...formatOklchRamp(IMAGE_SCRIM_RAMP, MOCK_ACCENT_HUE),
       ...buildLogoPreviewTokens(MOCK_ACCENT_HUE, false),
     });
   });
