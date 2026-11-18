@@ -1,5 +1,5 @@
 import {
-  ENTITLEMENT_GRANT_FIELD_ERROR,
+  ENTITLEMENT_GRANT_EXPIRY,
   ENTITLEMENT_GRANT_REFUSAL,
 } from '@platform/constants/entitlement-grant';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
@@ -48,8 +48,8 @@ const grantEntitlement = vi.mocked(
 );
 const MOCK_SUPER_ADMIN = mockAdmin({ role: ADMIN_ROLE.SUPERADMIN });
 const MOCK_NOTE = 'Launch partner';
-const MOCK_FUTURE = new Date('2099-01-01T00:00:00.000Z');
-const MOCK_PAST = new Date('2000-01-01T00:00:00.000Z');
+const MOCK_NOW = new Date('2026-11-18T10:00:00.000Z');
+const MOCK_IN_30_DAYS = new Date('2026-12-18T10:00:00.000Z');
 const CONTACT_FORM_ITEM = {
   kind: ENTITLEMENT_KIND.CAPABILITY,
   key: CAPABILITY.CONTACT_FORM,
@@ -58,13 +58,18 @@ const CONTACT_FORM_ITEM = {
 const grant = (overrides = {}) =>
   grantEntitlementAction(MOCK_TENANT_ID, {
     item: CONTACT_FORM_ITEM,
-    expiresAt: MOCK_FUTURE,
+    expiry: ENTITLEMENT_GRANT_EXPIRY.DAYS_30,
     note: MOCK_NOTE,
     ...overrides,
   });
 
 describe(grantEntitlementAction, () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   beforeEach(() => {
+    vi.useFakeTimers({ now: MOCK_NOW });
     vi.mocked(requireSuperAdmin).mockResolvedValue(MOCK_SUPER_ADMIN);
     vi.mocked(resolveLiveTenant).mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
@@ -72,7 +77,10 @@ describe(grantEntitlementAction, () => {
     });
     grantEntitlement.mockResolvedValue(
       okResult(
-        mockEntitlementGrantRow({ expiresAt: MOCK_FUTURE, note: MOCK_NOTE }),
+        mockEntitlementGrantRow({
+          expiresAt: MOCK_IN_30_DAYS,
+          note: MOCK_NOTE,
+        }),
       ),
     );
   });
@@ -93,7 +101,7 @@ describe(grantEntitlementAction, () => {
       tenantId: MOCK_TENANT_ID,
       item: CONTACT_FORM_ITEM,
       grantedBy: MOCK_SUPER_ADMIN.id,
-      expiresAt: MOCK_FUTURE,
+      expiresAt: MOCK_IN_30_DAYS,
       note: MOCK_NOTE,
     });
     expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
@@ -106,7 +114,7 @@ describe(grantEntitlementAction, () => {
         kind: ENTITLEMENT_KIND.CAPABILITY,
         key: CAPABILITY.CONTACT_FORM,
         value: null,
-        expiresAt: MOCK_FUTURE,
+        expiresAt: MOCK_IN_30_DAYS,
         note: MOCK_NOTE,
       },
     });
@@ -132,16 +140,12 @@ describe(grantEntitlementAction, () => {
     expect(grantEntitlement).not.toHaveBeenCalled();
   });
 
-  it('rejects an expiry that is not in the future', async () => {
-    const result = await grant({ expiresAt: MOCK_PAST });
+  it('stores no expiry for a grant that never expires', async () => {
+    await grant({ expiry: ENTITLEMENT_GRANT_EXPIRY.NEVER });
 
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: {
-        expiresAt: { reason: ENTITLEMENT_GRANT_FIELD_ERROR.EXPIRY_NOT_FUTURE },
-      },
-    });
-    expect(grantEntitlement).not.toHaveBeenCalled();
+    expect(grantEntitlement).toHaveBeenCalledWith(
+      expect.objectContaining({ expiresAt: null }),
+    );
   });
 
   it('rejects a language limit no plan could need', async () => {

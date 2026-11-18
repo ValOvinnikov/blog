@@ -1,10 +1,8 @@
 'use server';
 
 import {
-  ENTITLEMENT_GRANT_FIELD_ERROR,
   ENTITLEMENT_GRANT_LOG,
   ENTITLEMENT_GRANT_REFUSAL,
-  type TEntitlementGrantFieldError,
   type TEntitlementGrantRefusal,
 } from '@platform/constants/entitlement-grant';
 import type { TENANT_REFUSAL } from '@platform/constants/tenant';
@@ -12,6 +10,7 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { resolveLiveTenant } from '@platform/server/tenants/resolve-live-tenant';
+import { grantExpiresAt } from '@platform/utils/grant-expires-at/grant-expires-at';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {
@@ -33,8 +32,8 @@ import {
 
 export type TGrantEntitlementResult = TActionResult<
   typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
-  'expiresAt',
-  TEntitlementGrantFieldError,
+  never,
+  never,
   | typeof TENANT_REFUSAL.NOT_FOUND
   | typeof TENANT_REFUSAL.ARCHIVED
   | TEntitlementGrantRefusal
@@ -51,15 +50,7 @@ export const grantEntitlementAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const { item, expiresAt, note } = parsed.data;
-  if (expiresAt && expiresAt <= new Date()) {
-    return {
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: {
-        expiresAt: { reason: ENTITLEMENT_GRANT_FIELD_ERROR.EXPIRY_NOT_FUTURE },
-      },
-    };
-  }
+  const { item, expiry, note } = parsed.data;
   if (
     item.kind === ENTITLEMENT_KIND.CAPABILITY &&
     isComingSoonCapability(item.key)
@@ -74,6 +65,7 @@ export const grantEntitlementAction = async (
   if (!isOutcomeSuccess(resolved)) return resolved;
 
   try {
+    const expiresAt = grantExpiresAt(expiry, new Date());
     const granted = await queries.tenantEntitlementGrants.grantEntitlement({
       tenantId,
       item,

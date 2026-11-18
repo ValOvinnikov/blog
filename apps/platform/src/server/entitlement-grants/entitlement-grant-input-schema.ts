@@ -1,4 +1,7 @@
-import { ENTITLEMENT_GRANT_NOTE_MAX_LENGTH } from '@platform/constants/entitlement-grant';
+import {
+  ENTITLEMENT_GRANT_EXPIRY,
+  ENTITLEMENT_GRANT_NOTE_MAX_LENGTH,
+} from '@platform/constants/entitlement-grant';
 import {
   CAPABILITY,
   LOCALE_ISO_CODES,
@@ -30,7 +33,7 @@ const grantItemSchema = z.discriminatedUnion('kind', [
 
 export const entitlementGrantInputSchema = z.object({
   item: grantItemSchema,
-  expiresAt: z.coerce.date().nullable(),
+  expiry: z.enum(ENTITLEMENT_GRANT_EXPIRY),
   note: z
     .string()
     .trim()
