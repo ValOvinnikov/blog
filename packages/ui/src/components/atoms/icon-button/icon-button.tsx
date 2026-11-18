@@ -22,7 +22,7 @@ export type TIconButtonProps = IWithClassName &
     ref?: Ref<HTMLButtonElement>;
   };
 
-/** A compact button for icon, labelled, or avatar-triggered actions: a 22×22 icon-only default, a `bordered` variant sized to its text label, a 32×32 circular `avatar` variant, a 36×36 outlined `control` variant for a standalone control (e.g. carousel navigation), and a 44×44 round outlined `circle` variant sized to the minimum touch target. */
+/** A compact button for an icon, short label or avatar action. */
 export const IconButton = ({
   ariaLabel,
   title,

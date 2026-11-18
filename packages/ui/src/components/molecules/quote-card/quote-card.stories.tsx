@@ -3,10 +3,7 @@ import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
 import { Carousel } from '@shinefold/ui/components/organisms/carousel';
-import {
-  BRAND_BAND_LABELS,
-  BrandBand,
-} from '@shinefold/ui/testing/brand-bands';
+import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -172,15 +169,13 @@ export const LinkedNameDescendersAndWrapping: TStory = {
 };
 
 const OnEveryBand = (args: TQuoteCardProps) => (
-  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
-    {objectKeys(BRAND_BAND_LABELS).map((tone) => (
-      <BrandBand key={tone} tone={tone}>
-        <div style={{ maxWidth: 312 }}>
-          <QuoteCard {...args} />
-        </div>
-      </BrandBand>
-    ))}
-  </div>
+  <EveryBrandBand>
+    {() => (
+      <div style={{ maxWidth: 312 }}>
+        <QuoteCard {...args} />
+      </div>
+    )}
+  </EveryBrandBand>
 );
 
 export const OnEveryBrandVariant: TStory = {

@@ -67,7 +67,7 @@ Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### IconButton — `components/atoms/icon-button/icon-button.tsx`
 
-A compact button for icon, labelled, or avatar-triggered actions: a 22×22 icon-only default, a `bordered` variant sized to its text label, a 32×32 circular `avatar` variant, a 36×36 outlined `control` variant for a standalone control (e.g. carousel navigation), and a 44×44 round outlined `circle` variant sized to the minimum touch target.
+A compact button for an icon, short label or avatar action.
 Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · isFocusableWhenDisabled?: boolean · isInert?: boolean · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, TIconButtonVariants, IWithDataTestId)_
 Variants: variant: bordered|avatar|control|circle
 

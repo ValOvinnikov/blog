@@ -6,6 +6,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Carousel } from './carousel';
 import { carouselVariants } from './carousel-variants';
 
+const LATEST_POSTS = 'Latest posts';
+const TRUSTED_BY = 'Trusted by';
+const PREVIOUS_SLIDE = 'Previous slide';
+const NEXT_SLIDE = 'Next slide';
+
 type TSampleItem = { id: number; body: string };
 
 const buildItems = (count: number): TSampleItem[] =>
@@ -77,9 +82,9 @@ const meta = {
     },
   },
   args: {
-    ariaLabel: 'Latest posts',
-    previousLabel: 'Previous slide',
-    nextLabel: 'Next slide',
+    ariaLabel: LATEST_POSTS,
+    previousLabel: PREVIOUS_SLIDE,
+    nextLabel: NEXT_SLIDE,
     items: buildItems(3),
     renderItem: renderSampleItem,
   },
@@ -130,9 +135,9 @@ export const WithPlainImages: TStory = {
     <Carousel
       items={buildImageItems(6)}
       renderItem={renderImageItem}
-      ariaLabel="Latest posts"
-      previousLabel="Previous slide"
-      nextLabel="Next slide"
+      ariaLabel={LATEST_POSTS}
+      previousLabel={PREVIOUS_SLIDE}
+      nextLabel={NEXT_SLIDE}
     />
   ),
 };
@@ -142,9 +147,9 @@ export const FixedWidthContentSizing: TStory = {
     <Carousel
       items={buildLogoItems(10)}
       renderItem={renderLogoItem}
-      ariaLabel="Trusted by"
-      previousLabel="Previous slide"
-      nextLabel="Next slide"
+      ariaLabel={TRUSTED_BY}
+      previousLabel={PREVIOUS_SLIDE}
+      nextLabel={NEXT_SLIDE}
       slideSize="content"
     />
   ),
@@ -155,9 +160,9 @@ export const AlignedLeftFitsViewport: TStory = {
     <Carousel
       items={buildLogoItems(3)}
       renderItem={renderLogoItem}
-      ariaLabel="Trusted by"
-      previousLabel="Previous slide"
-      nextLabel="Next slide"
+      ariaLabel={TRUSTED_BY}
+      previousLabel={PREVIOUS_SLIDE}
+      nextLabel={NEXT_SLIDE}
       slideSize="content"
       contentAlignment={CONTENT_ALIGNMENT.LEFT}
     />
@@ -169,9 +174,9 @@ export const AlignedCenterFitsViewport: TStory = {
     <Carousel
       items={buildLogoItems(3)}
       renderItem={renderLogoItem}
-      ariaLabel="Trusted by"
-      previousLabel="Previous slide"
-      nextLabel="Next slide"
+      ariaLabel={TRUSTED_BY}
+      previousLabel={PREVIOUS_SLIDE}
+      nextLabel={NEXT_SLIDE}
       slideSize="content"
       contentAlignment={CONTENT_ALIGNMENT.CENTER}
     />
@@ -183,9 +188,9 @@ export const AlignedCenterOverflowsStaysLeft: TStory = {
     <Carousel
       items={buildLogoItems(10)}
       renderItem={renderLogoItem}
-      ariaLabel="Trusted by"
-      previousLabel="Previous slide"
-      nextLabel="Next slide"
+      ariaLabel={TRUSTED_BY}
+      previousLabel={PREVIOUS_SLIDE}
+      nextLabel={NEXT_SLIDE}
       slideSize="content"
       contentAlignment={CONTENT_ALIGNMENT.CENTER}
     />

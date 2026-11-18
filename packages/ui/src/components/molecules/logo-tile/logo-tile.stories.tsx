@@ -3,6 +3,7 @@ import { BRAND_VARIANT, type TBrandVariant } from '@shinefold/config';
 import {
   BRAND_BAND_LABELS,
   BrandBand,
+  EveryBrandBand,
   focusLastLink,
 } from '@shinefold/ui/testing/brand-bands';
 import { objectKeys } from '@shinefold/utils/primitives';
@@ -57,13 +58,7 @@ export const Interactive: TStory = {
 };
 
 const OnEveryBand = (args: TLogoTileProps) => (
-  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
-    {objectKeys(BRAND_BAND_LABELS).map((tone) => (
-      <BrandBand key={tone} tone={tone}>
-        <LogoTile {...args} />
-      </BrandBand>
-    ))}
-  </div>
+  <EveryBrandBand>{() => <LogoTile {...args} />}</EveryBrandBand>
 );
 
 export const StaticOnEveryBrandVariant: TStory = {

@@ -6,10 +6,7 @@ import {
 } from '@shinefold/config';
 import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
-import {
-  BRAND_BAND_LABELS,
-  BrandBand,
-} from '@shinefold/ui/testing/brand-bands';
+import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
 import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
 import { HeaderControlShapes } from '@shinefold/ui/testing/header-control-shapes';
 import { objectKeys } from '@shinefold/utils/primitives';
@@ -41,10 +38,6 @@ type TStory = StoryObj<typeof meta>;
 
 const NEXT_SLIDE = 'Next slide';
 
-// Hover the rendered button in the canvas to check the hover affordance —
-// the `border-emphasis` ring clears WCAG 1.4.11's 3:1 non-text minimum
-// against `bg` on its own in both themes (see icon-button-variants.ts),
-// with the `surface-2` fill as a secondary tint.
 export const Default: TStory = {};
 
 export const WithMoonIcon: TStory = {
@@ -158,20 +151,18 @@ export const Control: TStory = {
 };
 
 const ControlOnEveryBand = ({ isDisabled }: { isDisabled?: boolean }) => (
-  <div style={{ display: 'flex', gap: '1.5rem' }}>
-    {objectKeys(BRAND_BAND_LABELS).map((tone) => (
-      <BrandBand key={tone} tone={tone}>
-        <IconButton
-          variant="control"
-          ariaLabel={NEXT_SLIDE}
-          title={NEXT_SLIDE}
-          isDisabled={isDisabled}
-        >
-          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
-        </IconButton>
-      </BrandBand>
-    ))}
-  </div>
+  <EveryBrandBand>
+    {() => (
+      <IconButton
+        variant="control"
+        ariaLabel={NEXT_SLIDE}
+        title={NEXT_SLIDE}
+        isDisabled={isDisabled}
+      >
+        <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
+      </IconButton>
+    )}
+  </EveryBrandBand>
 );
 
 export const ControlOnGrounds: TStory = {
