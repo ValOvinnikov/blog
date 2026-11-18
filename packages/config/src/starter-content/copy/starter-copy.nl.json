@@ -271,5 +271,78 @@
         "metaDescription": "Een voorbeeldhandleiding gemaakt met je site. Gebruik haar voor veelvoorkomende problemen, hun oorzaak en de oplossing."
       }
     ]
+  },
+  "business": {
+    "hero": {
+      "eyebrow": "Welkom",
+      "heading": "Heldere, betrouwbare hulp voor je bedrijf",
+      "supportingText": "Zeg in één zin wat je doet en voor wie."
+    },
+    "intro": {
+      "body": [
+        "Welkom. We helpen onze klanten het werk goed, op tijd en zonder verrassingen gedaan te krijgen.",
+        "Vervang deze tekst door een kort overzicht van je bedrijf: wat je aanbiedt, voor wie en wat je anders maakt."
+      ]
+    },
+    "faq": {
+      "heading": "Veelgestelde vragen",
+      "questions": [
+        {
+          "question": "Wat bieden jullie aan?",
+          "answer": [
+            "Vat je belangrijkste diensten samen in een zin of twee, en verwijs naar de pagina Diensten voor de details."
+          ]
+        },
+        {
+          "question": "Wat kost het?",
+          "answer": [
+            "Leg uit hoe je je werk prijst, of nodig bezoekers uit om contact op te nemen voor een offerte."
+          ]
+        },
+        {
+          "question": "Hoe beginnen we?",
+          "answer": [
+            "Beschrijf de eerste stap, zoals een kort gesprek of een schriftelijke briefing, en wat daarna gebeurt."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Laten we praten",
+      "supportingText": "Vertel ons wat je nodig hebt en we nemen contact met je op."
+    },
+    "services": {
+      "title": "Diensten",
+      "slug": "diensten",
+      "summary": "Wat we aanbieden en hoe we werken.",
+      "body": [
+        "Beschrijf elke dienst in een korte alinea: wat erbij hoort en voor wie hij is.",
+        "Voeg prijzen, pakketten of voorbeelden van eerder werk toe zodra je die hebt."
+      ],
+      "metaTitle": "Diensten — wat we aanbieden en hoe we werken",
+      "metaDescription": "Een voorbeeldpagina met diensten, aangemaakt met je site. Vervang hem door wat je bedrijf aanbiedt."
+    },
+    "about": {
+      "title": "Over ons",
+      "slug": "over-ons",
+      "summary": "Wie we zijn en waar we voor staan.",
+      "body": [
+        "Vertel bezoekers hoe het bedrijf begon, wie erachter zit en wat je belangrijk vindt.",
+        "Een paar regels is genoeg. Voeg foto's van het team toe zodra je die hebt."
+      ],
+      "metaTitle": "Over ons — wie we zijn en waar we voor staan",
+      "metaDescription": "Een voorbeeldpagina over je bedrijf, aangemaakt met je site. Vertel bezoekers wie erachter zit."
+    },
+    "contact": {
+      "title": "Contact",
+      "slug": "contact",
+      "summary": "Zo bereik je ons.",
+      "body": [
+        "Geef bezoekers de beste manier om je te bereiken: een e-mailadres, een telefoonnummer of allebei.",
+        "Voeg je openingstijden en je locatie toe, en zeg hoe snel je meestal antwoordt."
+      ],
+      "metaTitle": "Contact — zo bereik je ons en wanneer we antwoorden",
+      "metaDescription": "Een voorbeeldpagina voor contact, aangemaakt met je site. Voeg je e-mailadres, telefoonnummer en openingstijden toe."
+    }
   }
 }

@@ -271,5 +271,78 @@
         "metaDescription": "Un guide d'exemple créé avec votre site. Utilisez-le pour les problèmes courants, leurs causes et leurs solutions."
       }
     ]
+  },
+  "business": {
+    "hero": {
+      "eyebrow": "Bienvenue",
+      "heading": "Une aide claire et fiable pour votre entreprise",
+      "supportingText": "Dites en une phrase ce que vous faites et pour qui."
+    },
+    "intro": {
+      "body": [
+        "Bienvenue. Nous aidons nos clients à mener leur travail à bien, dans les délais et sans surprise.",
+        "Remplacez ce texte par une courte présentation de votre entreprise : ce que vous proposez, à qui et ce qui vous distingue."
+      ]
+    },
+    "faq": {
+      "heading": "Questions fréquentes",
+      "questions": [
+        {
+          "question": "Que proposez-vous ?",
+          "answer": [
+            "Résumez vos principaux services en une ou deux phrases, et renvoyez à la page Services pour les détails."
+          ]
+        },
+        {
+          "question": "Combien cela coûte-t-il ?",
+          "answer": [
+            "Expliquez comment vous fixez vos tarifs, ou invitez les visiteurs à vous contacter pour un devis."
+          ]
+        },
+        {
+          "question": "Comment commencer ?",
+          "answer": [
+            "Décrivez la première étape, comme un court appel ou un cahier des charges, et ce qui suit."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Parlons-en",
+      "supportingText": "Dites-nous ce dont vous avez besoin et nous vous répondrons."
+    },
+    "services": {
+      "title": "Services",
+      "slug": "services",
+      "summary": "Ce que nous proposons et comment nous travaillons.",
+      "body": [
+        "Décrivez chaque service en un court paragraphe : ce qu'il comprend et à qui il s'adresse.",
+        "Ajoutez des tarifs, des formules ou des exemples de réalisations dès que vous en avez."
+      ],
+      "metaTitle": "Services — nos prestations et notre façon de travailler",
+      "metaDescription": "Une page de services d'exemple créée avec votre site. Remplacez-la par ce que propose votre entreprise."
+    },
+    "about": {
+      "title": "À propos",
+      "slug": "a-propos",
+      "summary": "Qui nous sommes et ce qui nous anime.",
+      "body": [
+        "Racontez aux visiteurs comment l'entreprise est née, qui la porte et ce qui compte pour vous.",
+        "Quelques lignes suffisent. Ajoutez des photos de l'équipe dès que vous en avez."
+      ],
+      "metaTitle": "À propos — qui nous sommes et ce qui nous anime",
+      "metaDescription": "Une page à propos d'exemple créée avec votre site. Présentez aux visiteurs les personnes derrière l'entreprise."
+    },
+    "contact": {
+      "title": "Contact",
+      "slug": "contact",
+      "summary": "Comment nous joindre.",
+      "body": [
+        "Indiquez aux visiteurs le meilleur moyen de vous joindre : une adresse e-mail, un numéro de téléphone ou les deux.",
+        "Ajoutez vos horaires et votre adresse, et précisez sous quel délai vous répondez en général."
+      ],
+      "metaTitle": "Contact — comment nous joindre et quand nous répondons",
+      "metaDescription": "Une page de contact d'exemple créée avec votre site. Ajoutez votre e-mail, votre téléphone et vos horaires."
+    }
   }
 }

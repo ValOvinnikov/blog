@@ -33,10 +33,12 @@ const STARTER_SITE_TYPES = [
   SITE_TYPE.PORTFOLIO,
   SITE_TYPE.PERSONAL,
   SITE_TYPE.DOCS,
+  SITE_TYPE.BUSINESS,
   SITE_TYPE.BLANK,
 ] as const;
 const LOCALES = Object.values(LOCALE_ISO_CODES);
 const COOKIE_STATEMENT_TYPE = 'page_cookieStatement';
+const BUSINESS_COPY = STARTER_COPY_BY_LOCALE.EN.business;
 
 const build = (
   siteType: (typeof STARTER_SITE_TYPES)[number] = SITE_TYPE.BLANK,
@@ -354,6 +356,64 @@ describe(buildStarterDocuments, () => {
     expect(parents).toEqual([section?._id, section?._id, section?._id]);
   });
 
+  describe('the Business site', () => {
+    let documents: TStarterDocumentUnion[];
+
+    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
+    const pageBehind = (linkId?: string) => {
+      const link = byId(linkId);
+      return link && 'internalReference' in link
+        ? byId(link.internalReference?._ref)
+        : undefined;
+    };
+    const slugOf = (document?: TStarterDocumentUnion) =>
+      document && 'slug' in document ? document.slug?.current : undefined;
+
+    beforeEach(() => {
+      documents = build(SITE_TYPE.BUSINESS);
+    });
+
+    it('opens the home on a services hero and closes on a contact CTA', () => {
+      const { hero, modules = [] } = findByType(documents, 'template_home');
+      const sections = [hero?._ref, ...modules.map(({ _ref }) => _ref)].map(
+        byId,
+      );
+
+      const sequence = sections.map((document) => ({
+        _type: document?._type,
+        actionTarget:
+          document && 'ctaButtons' in document
+            ? slugOf(pageBehind(document.ctaButtons?.[0]?.link?._ref))
+            : undefined,
+      }));
+
+      expect(sequence).toEqual([
+        {
+          _type: 'module_heroStatement',
+          actionTarget: BUSINESS_COPY.services.slug,
+        },
+        { _type: 'module_content', actionTarget: undefined },
+        { _type: 'module_faq', actionTarget: undefined },
+        { _type: 'module_cta', actionTarget: BUSINESS_COPY.contact.slug },
+      ]);
+    });
+
+    it('links the navigation to three top-level pages', () => {
+      const { items = [] } = findByType(documents, 'settings_navigation');
+
+      const targets = items.map((item) => {
+        const page = pageBehind('link' in item ? item.link?._ref : undefined);
+        return { slug: slugOf(page), hasParent: !!page && 'parent' in page };
+      });
+
+      expect(targets).toEqual([
+        { slug: BUSINESS_COPY.services.slug, hasParent: false },
+        { slug: BUSINESS_COPY.about.slug, hasParent: false },
+        { slug: BUSINESS_COPY.contact.slug, hasParent: false },
+      ]);
+    });
+  });
+
   it('the NL home page takes its copy from the Dutch catalogue', () => {
     const { headingBlock } = findByType(
       build(SITE_TYPE.BLANK, LOCALE_ISO_CODES.NL),
@@ -422,7 +482,7 @@ describe(toStarterSiteType, () => {
     expect(toStarterSiteType(SITE_TYPE.BLOG)).toBe(SITE_TYPE.BLOG);
   });
 
-  it.each([null, SITE_TYPE.BUSINESS])(
+  it.each([null, SITE_TYPE.PRODUCT])(
     'starts %s from the Blank site',
     (siteType) => {
       expect(toStarterSiteType(siteType)).toBe(SITE_TYPE.BLANK);
