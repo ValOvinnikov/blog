@@ -7,6 +7,7 @@ import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { ALERT_TYPE } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -36,12 +37,14 @@ export const ConfirmDialogContent = ({
     error,
     isPending,
     confirm,
+    finalFocus,
   } = useConfirmDialogContext();
 
   return (
     <AlertDialogShell
       title={title}
       description={description}
+      finalFocus={finalFocus}
       actions={
         <>
           <AlertDialog.Close
@@ -55,7 +58,7 @@ export const ConfirmDialogContent = ({
             onClick={confirm}
             isDisabled={
               isConfirmDisabled ||
-              (expectedValue !== undefined && confirmValue !== expectedValue)
+              (!isUndefined(expectedValue) && confirmValue !== expectedValue)
             }
             isPending={isPending}
             pendingLabel={confirmingButtonLabel}
@@ -67,7 +70,7 @@ export const ConfirmDialogContent = ({
     >
       {error && <Alert type={ALERT_TYPE.ERROR} title={error} />}
 
-      {expectedValue !== undefined && (
+      {!isUndefined(expectedValue) && (
         <FormField
           label={t('confirmLabel', { name: expectedValue })}
           hint={t('confirmHint')}

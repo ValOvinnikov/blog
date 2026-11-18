@@ -17,15 +17,18 @@ import {
   MOCK_TENANT_ID,
   mockEntitlementGrantRow,
 } from '@platform/testing/tenants/fixtures';
+import { mockTenant } from '@platform/testing/tenants/mock-tenant';
 import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   CAPABILITY,
+  MODULE_PACK,
   NEXT_NAVIGATION_ERROR,
+  TENANT_PLAN,
 } from '@shinefold/config';
 import { ERROR_CODE } from '@shinefold/config/constants';
-import { ENTITLEMENT_KIND, queries } from '@shinefold/db';
+import { ENTITLEMENT_KIND, LOOK_FIELD, queries } from '@shinefold/db';
 import { errorResult, okResult } from '@shinefold/utils';
 import { notFound } from 'next/navigation';
 
@@ -49,14 +52,14 @@ const grantEntitlement = vi.mocked(
 const MOCK_NOTE = 'Launch partner';
 const MOCK_NOW = new Date('2026-11-18T10:00:00.000Z');
 const MOCK_IN_30_DAYS = new Date('2026-12-18T10:00:00.000Z');
-const CONTACT_FORM_ITEM = {
+const MOCK_CONTACT_FORM_ITEM = {
   kind: ENTITLEMENT_KIND.CAPABILITY,
   key: CAPABILITY.CONTACT_FORM,
 } as const;
 
 const grant = (overrides = {}) =>
   grantEntitlementAction(MOCK_TENANT_ID, {
-    item: CONTACT_FORM_ITEM,
+    item: MOCK_CONTACT_FORM_ITEM,
     expiry: ENTITLEMENT_GRANT_EXPIRY.DAYS_30,
     note: MOCK_NOTE,
     ...overrides,
@@ -95,7 +98,7 @@ describe(grantEntitlementAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(grantEntitlement).toHaveBeenCalledWith({
       tenantId: MOCK_TENANT_ID,
-      item: CONTACT_FORM_ITEM,
+      item: MOCK_CONTACT_FORM_ITEM,
       grantedBy: MOCK_SUPER_ADMIN.id,
       expiresAt: MOCK_IN_30_DAYS,
       note: MOCK_NOTE,
@@ -135,6 +138,57 @@ describe(grantEntitlementAction, () => {
     });
     expect(grantEntitlement).not.toHaveBeenCalled();
   });
+
+  it('passes a language limit grant through as the item', async () => {
+    const item = { kind: ENTITLEMENT_KIND.LOCALE_LIMIT, value: 3 } as const;
+
+    const result = await grant({ item });
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(grantEntitlement).toHaveBeenCalledWith(
+      expect.objectContaining({ item }),
+    );
+  });
+
+  it.each([
+    {
+      item: 'a capability',
+      plan: TENANT_PLAN.STARTER,
+      grantItem: MOCK_CONTACT_FORM_ITEM,
+    },
+    {
+      item: 'a module pack',
+      plan: TENANT_PLAN.FREE,
+      grantItem: { kind: ENTITLEMENT_KIND.MODULE_PACK, key: MODULE_PACK.CORE },
+    },
+    {
+      item: 'a look field',
+      plan: TENANT_PLAN.FREE,
+      grantItem: { kind: ENTITLEMENT_KIND.LOOK_FIELD, key: LOOK_FIELD.PRESET },
+    },
+    {
+      item: 'a language limit',
+      plan: TENANT_PLAN.GROWTH,
+      grantItem: { kind: ENTITLEMENT_KIND.LOCALE_LIMIT, value: 3 },
+    },
+  ])(
+    'refuses $item the plan already includes without writing or auditing',
+    async ({ plan, grantItem }) => {
+      vi.mocked(resolveLiveTenant).mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SUCCESS,
+        tenant: mockTenant({ plan }),
+      });
+
+      const result = await grant({ item: grantItem });
+
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: ENTITLEMENT_GRANT_REFUSAL.INCLUDED_IN_PLAN,
+      });
+      expect(grantEntitlement).not.toHaveBeenCalled();
+      expect(recordAuditEvent).not.toHaveBeenCalled();
+    },
+  );
 
   it('stores no expiry for a grant that never expires', async () => {
     await grant({ expiry: ENTITLEMENT_GRANT_EXPIRY.NEVER });

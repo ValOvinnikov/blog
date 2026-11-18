@@ -3,6 +3,7 @@ import {
   ENTITLEMENT_GRANT_NOTE_MAX_LENGTH,
   MOST_ADDITIONAL_LANGUAGES,
 } from '@platform/constants/entitlement-grant';
+import { toLocaleLimit } from '@platform/utils/locale-limit/locale-limit';
 import { CAPABILITY, MODULE_PACK } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND, LOOK_FIELD } from '@shinefold/db/constants';
 import { z } from 'zod';
@@ -25,8 +26,8 @@ const grantItemSchema = z.discriminatedUnion('kind', [
     value: z
       .number()
       .int()
-      .min(2)
-      .max(MOST_ADDITIONAL_LANGUAGES + 1),
+      .min(toLocaleLimit(1))
+      .max(toLocaleLimit(MOST_ADDITIONAL_LANGUAGES)),
   }),
 ]);
 

@@ -32,7 +32,7 @@ export const selectVariants = tv({
       'outline-none',
       'data-[selected]:bg-platform-popover-hover data-[highlighted]:bg-platform-popover-hover',
       ...DISABLED_AFFORDANCE_CLASSES,
-      'data-[disabled]:text-platform-faint',
+      'data-[disabled]:text-platform-muted',
       insetFocusRingClasses(FOCUS_RING_GROUND.POPOVER_HOVER),
     ],
     indicator: ['w-4 shrink-0 text-platform-brand-ink'],

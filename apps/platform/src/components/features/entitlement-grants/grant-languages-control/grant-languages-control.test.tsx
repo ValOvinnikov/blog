@@ -24,7 +24,7 @@ const ONE_LANGUAGE = tNames('languages', { count: 1 });
 const FOUR_LANGUAGES = tNames('languages', { count: 4 });
 
 const GROWTH_TARGET = mockGrantTarget({ plan: TENANT_PLAN.GROWTH });
-const GROWTH_ALLOWANCE = 2;
+const MOCK_GROWTH_ALLOWANCE = 2;
 
 const setup = customRender(GrantLanguagesControl, {
   target: TARGET,
@@ -53,7 +53,7 @@ describe(`<${GrantLanguagesControl.name}/>`, () => {
     let countSelect: HTMLElement;
 
     beforeEach(async () => {
-      setup({ target: GROWTH_TARGET, allowed: GROWTH_ALLOWANCE });
+      setup({ target: GROWTH_TARGET, allowed: MOCK_GROWTH_ALLOWANCE });
       countSelect = await openDialog();
     });
 
@@ -61,7 +61,7 @@ describe(`<${GrantLanguagesControl.name}/>`, () => {
       const description = screen.getByText(
         t('descriptionWithAllowance', {
           plan: en.planNames[GROWTH_TARGET.plan],
-          n: GROWTH_ALLOWANCE,
+          n: MOCK_GROWTH_ALLOWANCE,
           tenant: GROWTH_TARGET.tenantName,
         }),
       );

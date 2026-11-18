@@ -3,6 +3,7 @@ import {
   FEATURES_FIELD_ERROR,
 } from '@platform/constants/settings-features';
 import messages from '@platform/i18n/messages/en.json';
+import { grantEntitlementAction } from '@platform/server/entitlement-grants/grant-entitlement-action';
 import { updateAnalyticsAction } from '@platform/server/settings-features/update-analytics-action';
 import {
   updateFeaturesAction,
@@ -543,6 +544,27 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         expect(
           readerAccountsGrant.compareDocumentPosition(readerAccountsSwitch),
         ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      });
+
+      it('moves focus to the row switch once the capability is granted', async () => {
+        vi.mocked(grantEntitlementAction).mockResolvedValueOnce({
+          outcome: ACTION_OUTCOME.SUCCESS,
+        });
+        const trigger = screen.getByRole(
+          'button',
+          grantTrigger(READER_ACCOUNTS_LABEL),
+        );
+        await user.click(trigger);
+        const confirm = await screen.findByRole('button', {
+          name: messages.grantDialog.confirmButton,
+        });
+        await user.click(confirm);
+
+        const readerAccountsSwitch = screen.getByRole('switch', {
+          name: READER_ACCOUNTS_LABEL,
+        });
+
+        await waitFor(() => expect(readerAccountsSwitch).toHaveFocus());
       });
 
       it('offers no grant action on an entitled or coming-soon row', () => {

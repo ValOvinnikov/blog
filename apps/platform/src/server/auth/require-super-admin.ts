@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 import { isSuperAdmin } from './is-super-admin';
 import { requireAdmin } from './require-admin';
 
-/** Gates actions only a SUPERADMIN may take, such as deprovisioning a tenant or granting it an entitlement; any lesser role 404s. */
+/** Admits only a SUPERADMIN; any other role 404s. */
 export const requireSuperAdmin = async (): Promise<TAdmin> => {
   const admin = await requireAdmin();
 

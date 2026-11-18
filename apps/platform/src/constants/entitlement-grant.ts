@@ -1,10 +1,16 @@
+import { toAdditionalLanguages } from '@platform/utils/locale-limit/locale-limit';
 import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import type { TValueOf } from '@shinefold/config/utils';
 
 export const ENTITLEMENT_GRANT_NOTE_MAX_LENGTH = 500;
 
-export const MOST_ADDITIONAL_LANGUAGES =
-  Object.values(LOCALE_ISO_CODES).length - 1;
+export const GRANTS_CARD_HEADING_ID = 'grants-card-heading';
+
+export const LANGUAGES_CARD_HEADING_ID = 'languages-card-heading';
+
+export const MOST_ADDITIONAL_LANGUAGES = toAdditionalLanguages(
+  Object.values(LOCALE_ISO_CODES).length,
+);
 
 export const ENTITLEMENT_GRANT_EXPIRY = {
   NEVER: 'NEVER',
@@ -27,6 +33,7 @@ export const ENTITLEMENT_GRANT_EXPIRY_DAYS = {
 export const ENTITLEMENT_GRANT_REFUSAL = {
   COMING_SOON: 'COMING_SOON',
   ALREADY_GRANTED: 'ALREADY_GRANTED',
+  INCLUDED_IN_PLAN: 'INCLUDED_IN_PLAN',
   GRANT_NOT_OPEN: 'GRANT_NOT_OPEN',
 } as const;
 

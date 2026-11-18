@@ -2426,7 +2426,8 @@
     "description": "Seine Redakteure erhalten die Module des Pakets in Studio, außerhalb des Tarifs {plan}. Es entstehen keine Kosten.",
     "packLabel": "Modulpaket",
     "packPlaceholder": "Modulpaket wählen",
-    "packIncluded": "{pack} (im Tarif enthalten)"
+    "packIncluded": "{pack} (im Tarif enthalten)",
+    "packGranted": "{pack} (bereits gewährt)"
   },
   "grantLanguages": {
     "trigger": "Weitere Sprachen gewähren",
@@ -2525,6 +2526,7 @@
     "archived": "Dieser Mandant ist archiviert, seine Gewährungen lassen sich nicht ändern.",
     "comingSoon": "Diese Funktion ist noch nicht verfügbar und kann nicht gewährt werden.",
     "alreadyGranted": "Das ist bereits gewährt.",
+    "includedInPlan": "Das ist bereits im Tarif des Mandanten enthalten.",
     "grantNotOpen": "Diese Gewährung wurde bereits entfernt oder ist abgelaufen."
   }
 }

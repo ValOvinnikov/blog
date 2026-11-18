@@ -7,6 +7,7 @@ import {
   useSettingsForm,
 } from '@platform/components/shared/settings-form-shell';
 import { Text } from '@platform/components/shared/text';
+import { LANGUAGES_CARD_HEADING_ID } from '@platform/constants/entitlement-grant';
 import { useToast } from '@platform/context/toast-provider';
 import {
   updateTenantLanguagesAction,
@@ -26,6 +27,7 @@ import { useState } from 'react';
 import { LanguageToggleRow } from './components/language-toggle-row';
 import { LanguagesLimitNotice } from './components/languages-limit-notice/languages-limit-notice';
 import { languagesSettingsVariants } from './languages-settings-variants';
+import { useLanguageDraftFields } from './use-language-draft-fields';
 import { useLanguageLockedReason } from './use-language-locked-reason';
 
 const SUPPORTED_LOCALES = Object.values(LOCALE_ISO_CODES);
@@ -58,6 +60,7 @@ export const LanguagesSettings = ({
   const toast = useToast();
   const router = useRouter();
   const [savedLocales, setSavedLocales] = useState(stored);
+  const draftFields = useLanguageDraftFields(defaultLocale);
   const isOverLimit = savedLocales.length > additionalLocaleLimit;
   const {
     values,
@@ -91,14 +94,7 @@ export const LanguagesSettings = ({
       tenantId,
       page: 'languages',
       savedAt,
-      fields: SUPPORTED_LOCALES.filter(
-        (locale) => locale !== defaultLocale,
-      ).map((locale) => ({
-        id: locale,
-        label: tLanguage(locale),
-        display: (liveLocales: TLocaleIsoCode[]) =>
-          liveLocales.includes(locale) ? t('switchOn') : t('switchOff'),
-      })),
+      fields: draftFields,
     },
   });
 
@@ -133,6 +129,8 @@ export const LanguagesSettings = ({
       <Card>
         <Card.Header
           title={t('additionalHeading')}
+          titleId={LANGUAGES_CARD_HEADING_ID}
+          titleTabIndex={-1}
           supportingText={t(grants.granted ? 'allowanceGranted' : 'allowance', {
             used: values.length,
             allowed: additionalLocaleLimit,

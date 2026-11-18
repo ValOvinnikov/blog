@@ -22,7 +22,10 @@ const TARGET = mockGrantTarget({ plan: TENANT_PLAN.STARTER });
 const GROWTH_MODULES = grantItemNames.modulePack[MODULE_PACK.GROWTH];
 const STARTER_MODULES = grantItemNames.modulePack[MODULE_PACK.STARTER];
 
-const setup = customRender(GrantModulePackControl, { target: TARGET });
+const setup = customRender(GrantModulePackControl, {
+  target: TARGET,
+  grantedPacks: [],
+});
 
 describe(`<${GrantModulePackControl.name}/>`, () => {
   let user: UserEvent;

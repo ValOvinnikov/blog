@@ -6,6 +6,7 @@ import { SettingRow } from '@platform/components/shared/setting-row';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Switch } from '@platform/components/shared/switch';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
+import { grantFocusId } from '@platform/utils/grant-focus-id/grant-focus-id';
 import type { TGrantAccess } from '@platform/utils/grant-target/grant-target';
 import { lowestPlanWithCapability } from '@platform/utils/lowest-plan-with-capability/lowest-plan-with-capability';
 import type { TCapabilityToggle } from '@platform/utils/settings-features-fields/settings-features-fields';
@@ -49,6 +50,7 @@ export const CapabilityToggleRow = ({
     ? requiredReason
     : t('planLockedBadge', { plan: lowestPlanWithCapability(capability) });
   const granted = grants.granted[capability];
+  const switchId = grantFocusId(capability);
 
   if (isComingSoon) {
     return (
@@ -79,9 +81,11 @@ export const CapabilityToggleRow = ({
           target={grants.target}
           item={{ kind: ENTITLEMENT_KIND.CAPABILITY, key: capability }}
           itemLabel={label}
+          returnFocusId={switchId}
         />
       )}
       <Switch
+        id={switchId}
         aria={{ label, describedBy: archivedDescribedBy }}
         isChecked={isChecked}
         onCheckedChange={onCheckedChange}

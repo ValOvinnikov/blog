@@ -1,5 +1,6 @@
 import { LanguagesSettings } from '@platform/components/features/languages/languages-settings';
 import { toGrantTarget } from '@platform/utils/grant-target/grant-target';
+import { toAdditionalLanguages } from '@platform/utils/locale-limit/locale-limit';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { queries } from '@shinefold/db';
 
@@ -34,7 +35,7 @@ export const LanguagesPageContent = async ({
       locales={{
         stored: additionalLocales,
         live: liveAdditionalLocales,
-        limit: entitlements.localeLimit - 1,
+        limit: toAdditionalLanguages(entitlements.localeLimit),
       }}
       grants={{
         target: toGrantTarget(tenant, canGrantEntitlements),

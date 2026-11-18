@@ -23,6 +23,7 @@ export type TGrantEntitlementDialogProps = {
   tenantId: string;
   item: TMaybeUndefined<TEntitlementGrantInput['item']>;
   labels: TGrantEntitlementDialogLabels;
+  returnFocusId: string;
   onClose?: () => void;
   children?: ReactNode;
 };
@@ -31,6 +32,7 @@ export const GrantEntitlementDialog = ({
   tenantId,
   item,
   labels,
+  returnFocusId,
   onClose,
   children,
 }: TGrantEntitlementDialogProps) => {
@@ -50,6 +52,7 @@ export const GrantEntitlementDialog = ({
       onConfirm={onConfirm}
       onConfirmed={onConfirmed}
       onOpenChange={onOpenChange}
+      returnFocusId={returnFocusId}
     >
       <ConfirmDialog.Trigger
         variant={BUTTON_VARIANT.SECONDARY}

@@ -15,7 +15,10 @@ import {
   PLAN_REGISTRY,
   type TLookField,
 } from '@shinefold/db/constants';
-import type { TResolvableGrant } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
+import {
+  isEntitlementGrantActive,
+  type TResolvableGrant,
+} from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 import { isNull, isOneOf } from '@shinefold/utils/primitives';
 
 export type TGrantProvenance = { expiresAt: TMaybeNull<Date> };
@@ -29,11 +32,6 @@ export type TGrantedEntitlements = {
 
 const CAPABILITIES = Object.values(CAPABILITY);
 const MODULE_PACKS = Object.values(MODULE_PACK);
-
-export const hasGrantExpired = (
-  expiresAt: TMaybeNull<Date>,
-  now: Date,
-): boolean => !isNull(expiresAt) && expiresAt <= now;
 
 const longestLived = (
   current: TMaybeUndefined<TGrantProvenance>,
@@ -70,8 +68,10 @@ export const grantedEntitlements = (
     localeLimit: undefined,
   };
 
-  for (const { kind, key, value, expiresAt, revokedAt } of grants) {
-    if (!isNull(revokedAt) || hasGrantExpired(expiresAt, now)) continue;
+  for (const grant of grants) {
+    if (!isEntitlementGrantActive(grant, now)) continue;
+
+    const { kind, key, value, expiresAt } = grant;
 
     if (kind === ENTITLEMENT_KIND.CAPABILITY && isOneOf(CAPABILITIES, key)) {
       const parent = CAPABILITY_PARENT[key];

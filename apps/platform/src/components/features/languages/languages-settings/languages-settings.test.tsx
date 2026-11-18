@@ -1,4 +1,5 @@
 import messages from '@platform/i18n/messages/en.json';
+import { grantEntitlementAction } from '@platform/server/entitlement-grants/grant-entitlement-action';
 import { updateTenantLanguagesAction } from '@platform/server/tenants/update-tenant-languages-action';
 import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
@@ -20,7 +21,9 @@ import {
   mockGrantTarget,
 } from '@platform/testing/tenants/fixtures';
 import { formatDate } from '@platform/utils/format-date/format-date';
+import { toLocaleLimit } from '@platform/utils/locale-limit/locale-limit';
 import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@shinefold/config';
+import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LanguagesSettings } from './languages-settings';
@@ -305,6 +308,71 @@ describe(`<${LanguagesSettings.name}/>`, () => {
         const granted = screen.getByText(messages.grantedBadge.label);
 
         expect(granted).toBeVisible();
+      });
+    });
+
+    describe('for a super admin raising an open language grant that is used up', () => {
+      const GRANTED_LIMIT = 2;
+      const THREE_ADDITIONAL = 3;
+      const tNames = makeEnTranslator('grantItemNames');
+      const tGrant = makeEnTranslator('grantEntitlement');
+      const THREE_LANGUAGES = tNames('languages', { count: THREE_ADDITIONAL });
+      const FOUR_LANGUAGES = tNames('languages', { count: 4 });
+
+      beforeEach(async () => {
+        setup({
+          locales: {
+            stored: [NL, FR],
+            live: [NL, FR],
+            limit: GRANTED_LIMIT,
+          },
+          grants: { target: mockGrantTarget(), granted: { expiresAt: null } },
+        });
+        const grant = within(findPlanLimitNotice()).getByRole(
+          'button',
+          GRANT_MORE_LANGUAGES,
+        );
+        await user.click(grant);
+      });
+
+      it('offers only counts above the open grant', async () => {
+        const countSelect = await screen.findByRole('combobox', {
+          name: messages.grantLanguages.countLabel,
+        });
+        await user.click(countSelect);
+
+        const options = await screen.findAllByRole('option');
+
+        expect(options.map((option) => option.textContent)).toEqual([
+          THREE_LANGUAGES,
+          FOUR_LANGUAGES,
+        ]);
+      });
+
+      it('raises the grant, then moves focus to the Languages heading', async () => {
+        vi.mocked(grantEntitlementAction).mockResolvedValueOnce({
+          outcome: ACTION_OUTCOME.SUCCESS,
+        });
+        const confirm = await screen.findByRole('button', {
+          name: messages.grantDialog.confirmButton,
+        });
+        await user.click(confirm);
+
+        await screen.findByText(tGrant('granted', { item: THREE_LANGUAGES }));
+        const heading = screen.getByRole('heading', {
+          name: languagesSettings.additionalHeading,
+        });
+
+        expect(grantEntitlementAction).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+          expect.objectContaining({
+            item: {
+              kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+              value: toLocaleLimit(THREE_ADDITIONAL),
+            },
+          }),
+        );
+        await waitFor(() => expect(heading).toHaveFocus());
       });
     });
 

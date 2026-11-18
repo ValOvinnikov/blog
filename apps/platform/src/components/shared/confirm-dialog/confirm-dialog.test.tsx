@@ -23,6 +23,8 @@ const MOCK_CONFIRMING_LABEL = faker.lorem.words(2);
 const MOCK_CONFIRM_ERROR = faker.lorem.sentence();
 const MOCK_DISABLED_REASON = faker.lorem.sentence();
 const MOCK_UNTYPED_TRIGGER_LABEL = faker.lorem.words(3);
+const MOCK_RETURN_FOCUS_ID = faker.lorem.word();
+const MOCK_RETURN_FOCUS_LABEL = faker.lorem.words(2);
 const CONFIRM_FIELD_NAME = t('confirmLabel', { name: MOCK_EXPECTED_VALUE });
 
 type THarnessProps = Omit<
@@ -33,19 +35,28 @@ type THarnessProps = Omit<
 };
 
 const ConfirmDialogHarness = ({ disabledReason, ...props }: THarnessProps) => (
-  <ConfirmDialog expectedValue={MOCK_EXPECTED_VALUE} {...props}>
-    <ConfirmDialog.Trigger disabledReason={disabledReason}>
-      {MOCK_TRIGGER_LABEL}
-    </ConfirmDialog.Trigger>
-    <ConfirmDialog.Content
-      title={MOCK_TITLE}
-      description={MOCK_DESCRIPTION}
-      confirmButtonLabel={MOCK_CONFIRM_LABEL}
-      confirmingButtonLabel={MOCK_CONFIRMING_LABEL}
+  <>
+    <ConfirmDialog
+      expectedValue={MOCK_EXPECTED_VALUE}
+      returnFocusId={MOCK_RETURN_FOCUS_ID}
+      {...props}
     >
-      <span>{MOCK_EXTRA_CONTENT}</span>
-    </ConfirmDialog.Content>
-  </ConfirmDialog>
+      <ConfirmDialog.Trigger disabledReason={disabledReason}>
+        {MOCK_TRIGGER_LABEL}
+      </ConfirmDialog.Trigger>
+      <ConfirmDialog.Content
+        title={MOCK_TITLE}
+        description={MOCK_DESCRIPTION}
+        confirmButtonLabel={MOCK_CONFIRM_LABEL}
+        confirmingButtonLabel={MOCK_CONFIRMING_LABEL}
+      >
+        <span>{MOCK_EXTRA_CONTENT}</span>
+      </ConfirmDialog.Content>
+    </ConfirmDialog>
+    <button type="button" id={MOCK_RETURN_FOCUS_ID}>
+      {MOCK_RETURN_FOCUS_LABEL}
+    </button>
+  </>
 );
 
 const UntypedConfirmDialogHarness = (
@@ -96,10 +107,9 @@ describe(`<${ConfirmDialog.name}/>`, () => {
   });
 
   describe('once opened', () => {
+    let confirmField: HTMLElement;
+
     const typeExpectedValueAndConfirm = async () => {
-      const confirmField = screen.getByRole('textbox', {
-        name: CONFIRM_FIELD_NAME,
-      });
       await user.type(confirmField, MOCK_EXPECTED_VALUE);
       const confirmButton = await findConfirmButton();
       await user.click(confirmButton);
@@ -109,6 +119,9 @@ describe(`<${ConfirmDialog.name}/>`, () => {
       setup();
       const trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
       await user.click(trigger);
+      confirmField = screen.getByRole('textbox', {
+        name: CONFIRM_FIELD_NAME,
+      });
     });
 
     it('shows the title, description and extra content', async () => {
@@ -124,18 +137,11 @@ describe(`<${ConfirmDialog.name}/>`, () => {
     });
 
     it('names the confirm field after the expected value, with the hint', () => {
-      const confirmField = screen.getByRole('textbox', {
-        name: CONFIRM_FIELD_NAME,
-      });
-
       expect(confirmField).toHaveAccessibleDescription(t('confirmHint'));
       expect(confirmField).not.toHaveAttribute('aria-label');
     });
 
     it('enables confirm only once the typed value matches exactly', async () => {
-      const confirmField = screen.getByRole('textbox', {
-        name: CONFIRM_FIELD_NAME,
-      });
       const confirmButton = await findConfirmButton();
       expect(confirmButton).toBeDisabled();
 
@@ -146,27 +152,79 @@ describe(`<${ConfirmDialog.name}/>`, () => {
       expect(confirmButton).toBeEnabled();
     });
 
-    it('confirms with the typed value, then closes and reports it', async () => {
-      await typeExpectedValueAndConfirm();
+    describe('when confirmed', () => {
+      beforeEach(async () => {
+        await typeExpectedValueAndConfirm();
+      });
 
-      await vi.waitFor(() => expect(onConfirmedMock).toHaveBeenCalledTimes(1));
-      const dialog = screen.queryByRole('alertdialog');
+      it('confirms with the typed value, then closes and reports it', async () => {
+        await vi.waitFor(() =>
+          expect(onConfirmedMock).toHaveBeenCalledTimes(1),
+        );
+        const dialog = screen.queryByRole('alertdialog');
 
-      expect(onConfirmMock).toHaveBeenCalledWith(MOCK_EXPECTED_VALUE);
-      expect(dialog).not.toBeInTheDocument();
+        expect(onConfirmMock).toHaveBeenCalledWith(MOCK_EXPECTED_VALUE);
+        expect(dialog).not.toBeInTheDocument();
+      });
+
+      it('moves focus to the return target', async () => {
+        const returnTarget = screen.getByRole('button', {
+          name: MOCK_RETURN_FOCUS_LABEL,
+        });
+
+        await vi.waitFor(() => expect(returnTarget).toHaveFocus());
+      });
     });
 
-    it('shows the server error inline and stays open when confirming fails', async () => {
-      onConfirmMock.mockResolvedValueOnce(errorResult(MOCK_CONFIRM_ERROR));
+    it('returns focus to the trigger when cancelled', async () => {
+      const cancelButton = screen.getByRole('button', {
+        name: t('cancelButton'),
+      });
+      await user.click(cancelButton);
 
-      await typeExpectedValueAndConfirm();
+      const trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
 
-      const error = await screen.findByText(MOCK_CONFIRM_ERROR);
-      const dialog = screen.getByRole('alertdialog');
+      await vi.waitFor(() => expect(trigger).toHaveFocus());
+    });
 
-      expect(error).toBeVisible();
-      expect(dialog).toBeVisible();
-      expect(onConfirmedMock).not.toHaveBeenCalled();
+    describe('when confirming fails', () => {
+      beforeEach(async () => {
+        onConfirmMock.mockResolvedValueOnce(errorResult(MOCK_CONFIRM_ERROR));
+        await typeExpectedValueAndConfirm();
+      });
+
+      it('shows the server error inline and stays open', async () => {
+        const error = await screen.findByText(MOCK_CONFIRM_ERROR);
+        const dialog = screen.getByRole('alertdialog');
+
+        expect(error).toBeVisible();
+        expect(dialog).toBeVisible();
+        expect(onConfirmedMock).not.toHaveBeenCalled();
+      });
+
+      it('resets the typed value and the error when cancelled', async () => {
+        await screen.findByText(MOCK_CONFIRM_ERROR);
+
+        const cancelButton = screen.getByRole('button', {
+          name: t('cancelButton'),
+        });
+        await user.click(cancelButton);
+        const closedDialog = screen.queryByRole('alertdialog');
+        const trigger = screen.getByRole('button', {
+          name: MOCK_TRIGGER_LABEL,
+        });
+        await user.click(trigger);
+
+        const reopenedField = screen.getByRole('textbox', {
+          name: CONFIRM_FIELD_NAME,
+        });
+        const error = screen.queryByText(MOCK_CONFIRM_ERROR);
+
+        expect(closedDialog).not.toBeInTheDocument();
+        expect(onOpenChangeMock).toHaveBeenCalledWith(false);
+        expect(reopenedField).toHaveValue('');
+        expect(error).not.toBeInTheDocument();
+      });
     });
 
     it('shows and announces the pending label while confirming', async () => {
@@ -181,39 +239,17 @@ describe(`<${ConfirmDialog.name}/>`, () => {
       expect(pendingButton).toHaveAttribute('aria-busy', 'true');
       expect(status).toHaveTextContent(MOCK_CONFIRMING_LABEL);
     });
-
-    it('resets the typed value and the error when cancelled', async () => {
-      onConfirmMock.mockResolvedValueOnce(errorResult(MOCK_CONFIRM_ERROR));
-      await typeExpectedValueAndConfirm();
-      await screen.findByText(MOCK_CONFIRM_ERROR);
-
-      const cancelButton = screen.getByRole('button', {
-        name: t('cancelButton'),
-      });
-      await user.click(cancelButton);
-      const closedDialog = screen.queryByRole('alertdialog');
-      const trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
-      await user.click(trigger);
-
-      const confirmField = screen.getByRole('textbox', {
-        name: CONFIRM_FIELD_NAME,
-      });
-      const error = screen.queryByText(MOCK_CONFIRM_ERROR);
-
-      expect(closedDialog).not.toBeInTheDocument();
-      expect(onOpenChangeMock).toHaveBeenCalledWith(false);
-      expect(confirmField).toHaveValue('');
-      expect(error).not.toBeInTheDocument();
-    });
   });
 
   describe('with a disabled reason', () => {
+    let trigger: HTMLElement;
+
     beforeEach(() => {
       setup({ disabledReason: MOCK_DISABLED_REASON });
+      trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
     });
 
     it('keeps the trigger focusable but aria-disabled, described by the reason', async () => {
-      const trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
       const reason = screen.getByText(MOCK_DISABLED_REASON);
 
       await user.tab();
@@ -226,8 +262,6 @@ describe(`<${ConfirmDialog.name}/>`, () => {
     });
 
     it('never opens the dialog by click or keyboard', async () => {
-      const trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
-
       await user.click(trigger);
       await user.keyboard('{Enter}');
       await user.keyboard(' ');

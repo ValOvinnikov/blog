@@ -18,12 +18,14 @@ export type TGrantEntitlementControlProps = {
   target: TGrantTarget;
   item: TGrantedFeatureItem;
   itemLabel: string;
+  returnFocusId: string;
 };
 
 export const GrantEntitlementControl = ({
   target,
   item,
   itemLabel,
+  returnFocusId,
 }: TGrantEntitlementControlProps) => {
   const t = useTranslations('grantEntitlement');
   const tPlan = useTranslations('planNames');
@@ -33,6 +35,7 @@ export const GrantEntitlementControl = ({
     <GrantEntitlementDialog
       tenantId={tenantId}
       item={item}
+      returnFocusId={returnFocusId}
       labels={{
         trigger: t('trigger'),
         triggerAriaLabel: t('triggerAriaLabel', { item: itemLabel }),

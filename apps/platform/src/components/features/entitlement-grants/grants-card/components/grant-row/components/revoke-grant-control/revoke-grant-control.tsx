@@ -2,6 +2,7 @@
 
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { GRANTS_CARD_HEADING_ID } from '@platform/constants/entitlement-grant';
 import { useToast } from '@platform/context/toast-provider';
 import { revokeEntitlementGrantAction } from '@platform/server/entitlement-grants/revoke-entitlement-grant-action';
 import type { TGrantTarget } from '@platform/utils/grant-target/grant-target';
@@ -34,6 +35,7 @@ export const RevokeGrantControl = ({
   return (
     <ConfirmDialog
       tone={BUTTON_VARIANT.DANGER}
+      returnFocusId={GRANTS_CARD_HEADING_ID}
       onConfirm={() => settle(revokeEntitlementGrantAction(tenantId, grantId))}
       onConfirmed={() => {
         toast.success({ message: t(`${copyKey}.done`, values) });

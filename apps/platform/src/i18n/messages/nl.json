@@ -2426,7 +2426,8 @@
     "description": "De redacteuren krijgen de modules van het pakket in Studio, buiten het {plan}-abonnement. Er wordt niets in rekening gebracht.",
     "packLabel": "Modulepakket",
     "packPlaceholder": "Kies een modulepakket",
-    "packIncluded": "{pack} (inbegrepen in het abonnement)"
+    "packIncluded": "{pack} (inbegrepen in het abonnement)",
+    "packGranted": "{pack} (al toegekend)"
   },
   "grantLanguages": {
     "trigger": "Meer talen toekennen",
@@ -2525,6 +2526,7 @@
     "archived": "Deze tenant is gearchiveerd, dus de toekenningen kunnen niet meer wijzigen.",
     "comingSoon": "Deze functie is nog niet beschikbaar en kan dus niet worden toegekend.",
     "alreadyGranted": "Dit is al toegekend.",
+    "includedInPlan": "Dit zit al in het abonnement van de tenant.",
     "grantNotOpen": "Deze toekenning is al verwijderd of verlopen."
   }
 }

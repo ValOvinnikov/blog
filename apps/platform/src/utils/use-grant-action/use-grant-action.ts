@@ -23,6 +23,7 @@ const REFUSAL_KEYS = {
   [TENANT_REFUSAL.ARCHIVED]: 'archived',
   [ENTITLEMENT_GRANT_REFUSAL.COMING_SOON]: 'comingSoon',
   [ENTITLEMENT_GRANT_REFUSAL.ALREADY_GRANTED]: 'alreadyGranted',
+  [ENTITLEMENT_GRANT_REFUSAL.INCLUDED_IN_PLAN]: 'includedInPlan',
   [ENTITLEMENT_GRANT_REFUSAL.GRANT_NOT_OPEN]: 'grantNotOpen',
 } satisfies Record<TGrantRefusalReason, string>;
 

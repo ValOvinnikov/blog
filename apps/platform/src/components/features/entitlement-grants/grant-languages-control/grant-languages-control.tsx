@@ -2,8 +2,12 @@
 
 import { GrantChoiceField } from '@platform/components/features/entitlement-grants/grant-choice-field';
 import { GrantEntitlementDialog } from '@platform/components/features/entitlement-grants/grant-entitlement-dialog';
-import { MOST_ADDITIONAL_LANGUAGES } from '@platform/constants/entitlement-grant';
+import {
+  LANGUAGES_CARD_HEADING_ID,
+  MOST_ADDITIONAL_LANGUAGES,
+} from '@platform/constants/entitlement-grant';
 import type { TGrantTarget } from '@platform/utils/grant-target/grant-target';
+import { toLocaleLimit } from '@platform/utils/locale-limit/locale-limit';
 import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -38,8 +42,9 @@ export const GrantLanguagesControl = ({
       tenantId={tenantId}
       item={{
         kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
-        value: Number(count) + 1,
+        value: toLocaleLimit(Number(count)),
       }}
+      returnFocusId={LANGUAGES_CARD_HEADING_ID}
       onClose={() => setCount(fewest)}
       labels={{
         trigger: t('trigger'),

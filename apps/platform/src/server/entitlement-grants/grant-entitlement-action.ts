@@ -11,6 +11,10 @@ import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { resolveLiveTenant } from '@platform/server/tenants/resolve-live-tenant';
 import { grantExpiresAt } from '@platform/utils/grant-expires-at/grant-expires-at';
+import {
+  isCoveredByPlan,
+  type TPlanCoverageItem,
+} from '@platform/utils/is-covered-by-plan/is-covered-by-plan';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {
@@ -39,6 +43,13 @@ export type TGrantEntitlementResult = TActionResult<
   | TEntitlementGrantRefusal
 >;
 
+const toCoverageItem = (
+  item: TEntitlementGrantInput['item'],
+): TPlanCoverageItem =>
+  item.kind === ENTITLEMENT_KIND.LOCALE_LIMIT
+    ? { kind: item.kind, key: item.kind, value: item.value }
+    : { kind: item.kind, key: item.key, value: null };
+
 export const grantEntitlementAction = async (
   tenantId: string,
   input: TEntitlementGrantInput,
@@ -63,6 +74,13 @@ export const grantEntitlementAction = async (
 
   const resolved = await resolveLiveTenant(tenantId);
   if (!isOutcomeSuccess(resolved)) return resolved;
+
+  if (isCoveredByPlan(resolved.tenant.plan, toCoverageItem(item))) {
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: ENTITLEMENT_GRANT_REFUSAL.INCLUDED_IN_PLAN,
+    };
+  }
 
   try {
     const expiresAt = grantExpiresAt(expiry, new Date());

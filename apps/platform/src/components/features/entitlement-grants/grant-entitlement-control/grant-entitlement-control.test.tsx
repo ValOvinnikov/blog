@@ -15,6 +15,7 @@ import {
   mockGrantTarget,
 } from '@platform/testing/tenants/fixtures';
 import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
+import { grantFocusId } from '@platform/utils/grant-focus-id/grant-focus-id';
 import { ACTION_OUTCOME } from '@shinefold/config';
 import { CAPABILITY, TENANT_PLAN } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
@@ -28,17 +29,19 @@ const { grantDialog, grantExpiryFields, entitlementGrantErrors } = en;
 const t = makeEnTranslator('grantEntitlement');
 const ITEM_LABEL = en.featuresSettings.toggleLabel[CAPABILITY.READER_ACCOUNTS];
 const TARGET = mockGrantTarget({ plan: TENANT_PLAN.STARTER });
-const ITEM = {
+const MOCK_ITEM = {
   kind: ENTITLEMENT_KIND.CAPABILITY,
   key: CAPABILITY.READER_ACCOUNTS,
 } as const;
 const GRANT_BUTTON = { name: grantDialog.confirmButton };
+const MOCK_RETURN_FOCUS_ID = grantFocusId(CAPABILITY.READER_ACCOUNTS);
 const VALUES = { item: ITEM_LABEL, tenant: TARGET.tenantName };
 
 const setup = customRender(GrantEntitlementControl, {
   target: TARGET,
-  item: ITEM,
+  item: MOCK_ITEM,
   itemLabel: ITEM_LABEL,
+  returnFocusId: MOCK_RETURN_FOCUS_ID,
 });
 
 describe(`<${GrantEntitlementControl.name}/>`, () => {
@@ -119,7 +122,7 @@ describe(`<${GrantEntitlementControl.name}/>`, () => {
       const dialog = screen.queryByRole('alertdialog');
 
       expect(grantEntitlementAction).toHaveBeenCalledWith(TARGET.tenantId, {
-        item: ITEM,
+        item: MOCK_ITEM,
         expiry: ENTITLEMENT_GRANT_EXPIRY.DAYS_90,
         note: MOCK_GRANT_NOTE,
       });

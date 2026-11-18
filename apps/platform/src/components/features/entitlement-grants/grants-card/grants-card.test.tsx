@@ -1,8 +1,11 @@
 import {
+  ENTITLEMENT_GRANT_EXPIRY,
+  ENTITLEMENT_GRANT_EXPIRY_DAYS,
   ENTITLEMENT_GRANT_REFUSAL,
   GRANT_STATUS,
 } from '@platform/constants/entitlement-grant';
 import en from '@platform/i18n/messages/en.json';
+import { grantEntitlementAction } from '@platform/server/entitlement-grants/grant-entitlement-action';
 import { revokeEntitlementGrantAction } from '@platform/server/entitlement-grants/revoke-entitlement-grant-action';
 import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
@@ -19,23 +22,32 @@ import {
 import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@shinefold/config';
-import { CAPABILITY, TENANT_PLAN } from '@shinefold/config/constants';
+import {
+  CAPABILITY,
+  MODULE_PACK,
+  TENANT_PLAN,
+} from '@shinefold/config/constants';
 import { DAY_MS, ENTITLEMENT_KIND } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { GrantsCard } from './grants-card';
 
+vi.mock('@platform/server/entitlement-grants/grant-entitlement-action');
 vi.mock('@platform/server/entitlement-grants/revoke-entitlement-grant-action');
 
 const { grantsCard, grantModulePack, revokeGrantControl, featuresSettings } =
   en;
 const t = makeEnTranslator('grantsCard');
 const tRevoke = makeEnTranslator('revokeGrantControl');
+const tModulePack = makeEnTranslator('grantModulePack');
 const READER_ACCOUNTS =
   featuresSettings.toggleLabel[CAPABILITY.READER_ACCOUNTS];
 const TARGET = mockGrantTarget({ plan: TENANT_PLAN.STARTER });
 const GRANTED_ON = formatDate(MOCK_TENANT_CREATED_AT, LOCALE_ISO_CODES.EN);
-const ENDS_AT = new Date(MOCK_TENANT_CREATED_AT.getTime() + 30 * DAY_MS);
+const ENDS_AT = new Date(
+  MOCK_TENANT_CREATED_AT.getTime() +
+    ENTITLEMENT_GRANT_EXPIRY_DAYS[ENTITLEMENT_GRANT_EXPIRY.DAYS_30] * DAY_MS,
+);
 const ENDS_ON = formatDate(ENDS_AT, LOCALE_ISO_CODES.EN);
 const VALUES = { item: READER_ACCOUNTS, tenant: TARGET.tenantName };
 const READER_ACCOUNTS_GRANT = mockGrantRow({ key: CAPABILITY.READER_ACCOUNTS });
@@ -248,13 +260,14 @@ describe(`<${GrantsCard.name}/>`, () => {
       expect(description).toBeVisible();
     });
 
-    it('revokes the grant, then confirms by name and refreshes', async () => {
+    it('revokes the grant, confirms by name, refreshes and focuses the card heading', async () => {
       vi.mocked(revokeEntitlementGrantAction).mockResolvedValueOnce({
         outcome: ACTION_OUTCOME.SUCCESS,
       });
       await user.click(revokeButton);
 
       const toast = await screen.findByText(tRevoke('revoke.done', VALUES));
+      const heading = screen.getByRole('heading', { name: grantsCard.title });
 
       expect(revokeEntitlementGrantAction).toHaveBeenCalledWith(
         TARGET.tenantId,
@@ -262,6 +275,18 @@ describe(`<${GrantsCard.name}/>`, () => {
       );
       expect(toast).toBeVisible();
       expect(refresh).toHaveBeenCalledTimes(1);
+      await vi.waitFor(() => expect(heading).toHaveFocus());
+    });
+
+    it('keeps focus on the trigger when the dialog is cancelled', async () => {
+      const cancel = screen.getByRole('button', {
+        name: en.confirmDialog.cancelButton,
+      });
+      await user.click(cancel);
+
+      const trigger = screen.getByRole('button', REVOKE_TRIGGER);
+
+      await vi.waitFor(() => expect(trigger).toHaveFocus());
     });
 
     it('blocks a second click while the revoke is pending', async () => {
@@ -355,7 +380,66 @@ describe(`<${GrantsCard.name}/>`, () => {
         TARGET.tenantId,
         MOCK_GRANT_ID,
       );
+      const heading = screen.getByRole('heading', { name: grantsCard.title });
+
       expect(toast).toBeVisible();
+      await vi.waitFor(() => expect(heading).toHaveFocus());
+    });
+  });
+
+  describe('granting a module pack', () => {
+    it('moves focus to the card heading once the pack is granted', async () => {
+      vi.mocked(grantEntitlementAction).mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
+      setup();
+      const trigger = screen.getByRole('button', {
+        name: grantModulePack.trigger,
+      });
+      await user.click(trigger);
+      const packSelect = await screen.findByRole('combobox', {
+        name: grantModulePack.packLabel,
+      });
+      await user.click(packSelect);
+      const growthPack = await screen.findByRole('option', {
+        name: en.grantItemNames.modulePack[MODULE_PACK.GROWTH],
+      });
+      await user.click(growthPack);
+      const confirm = screen.getByRole('button', {
+        name: en.grantDialog.confirmButton,
+      });
+      await user.click(confirm);
+
+      const heading = screen.getByRole('heading', { name: grantsCard.title });
+
+      await vi.waitFor(() => expect(heading).toHaveFocus());
+    });
+
+    it('disables a pack that is already granted', async () => {
+      setup({
+        grants: [
+          mockGrantRow({
+            kind: ENTITLEMENT_KIND.MODULE_PACK,
+            key: MODULE_PACK.GROWTH,
+          }),
+        ],
+      });
+      const trigger = screen.getByRole('button', {
+        name: grantModulePack.trigger,
+      });
+      await user.click(trigger);
+      const packSelect = await screen.findByRole('combobox', {
+        name: grantModulePack.packLabel,
+      });
+      await user.click(packSelect);
+
+      const granted = await screen.findByRole('option', {
+        name: tModulePack('packGranted', {
+          pack: en.grantItemNames.modulePack[MODULE_PACK.GROWTH],
+        }),
+      });
+
+      expect(granted).toHaveAttribute(ARIA_DISABLED, 'true');
     });
   });
 });

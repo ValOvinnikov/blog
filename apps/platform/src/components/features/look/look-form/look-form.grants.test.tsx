@@ -1,7 +1,9 @@
+import { LOOK_FIELD_LABEL_TEST_ID } from '@platform/constants/look-form';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
+import { grantEntitlementAction } from '@platform/server/entitlement-grants/grant-entitlement-action';
 import { ARIA_DISABLED } from '@platform/testing/aria';
-import { screen, within } from '@platform/testing/custom-render';
+import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   CONSOLE,
@@ -23,7 +25,7 @@ import {
   mockGrantTarget,
 } from '@platform/testing/tenants/fixtures';
 import { formatDate } from '@platform/utils/format-date/format-date';
-import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { LOOK_FIELD, PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -95,6 +97,23 @@ describe(`<${LookForm.name}/> grants`, () => {
       const badge = within(typeRow).getByText(GROWTH);
 
       expect(badge).toBeVisible();
+    });
+
+    it('moves focus to the field once it is granted', async () => {
+      vi.mocked(grantEntitlementAction).mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
+      await user.click(radiusGrant);
+      const confirm = await screen.findByRole('button', {
+        name: messages.grantDialog.confirmButton,
+      });
+      await user.click(confirm);
+
+      const radiusField = screen
+        .getAllByTestId(LOOK_FIELD_LABEL_TEST_ID)
+        .find((row) => within(row).queryByText(RADIUS_SCALE));
+
+      await waitFor(() => expect(radiusField).toHaveFocus());
     });
 
     it('opens the grant dialog naming the field and the tenant', async () => {

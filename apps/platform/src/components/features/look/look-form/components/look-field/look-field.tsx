@@ -4,7 +4,9 @@ import type { TLookFieldLock } from '@platform/components/features/look/look-for
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { FieldLabel } from '@platform/components/shared/field-label';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
+import { LOOK_FIELD_LABEL_TEST_ID } from '@platform/constants/look-form';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { grantFocusId } from '@platform/utils/grant-focus-id/grant-focus-id';
 import { isBrandAssetKind } from '@platform/utils/look-form-values/look-form-values';
 import type { IWithChildren } from '@shinefold/config/react';
 import { useTranslations } from 'next-intl';
@@ -39,13 +41,19 @@ export const LookField = ({
     field: fieldSlot,
     labelRow,
     label: labelSlot,
+    labelText,
     optional,
     hint: hintSlot,
     error: errorSlot,
   } = lookFieldVariants();
 
   const labelContent = (
-    <>
+    <span
+      id={grantFocusId(field)}
+      tabIndex={-1}
+      data-testid={LOOK_FIELD_LABEL_TEST_ID}
+      className={labelText()}
+    >
       {label}
       {isBrandAssetKind(field) && (
         <>
@@ -59,7 +67,7 @@ export const LookField = ({
           <UnsavedDot label={t('fieldUnsavedLabel')} />
         </>
       )}
-    </>
+    </span>
   );
   const badge = (
     <LookFieldBadge field={field} label={label} growthBadgeId={growthBadgeId} />

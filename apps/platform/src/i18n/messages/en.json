@@ -2426,7 +2426,8 @@
     "description": "Its editors get the pack's modules in Studio, outside the {plan} plan. Nothing is charged.",
     "packLabel": "Module pack",
     "packPlaceholder": "Choose a module pack",
-    "packIncluded": "{pack} (in the plan)"
+    "packIncluded": "{pack} (in the plan)",
+    "packGranted": "{pack} (already granted)"
   },
   "grantLanguages": {
     "trigger": "Grant more languages",
@@ -2525,6 +2526,7 @@
     "archived": "This tenant is archived, so its grants can't change.",
     "comingSoon": "This feature isn't available yet, so it can't be granted.",
     "alreadyGranted": "This is already granted.",
+    "includedInPlan": "This is already included in the tenant's plan.",
     "grantNotOpen": "This grant was already removed or has ended."
   }
 }

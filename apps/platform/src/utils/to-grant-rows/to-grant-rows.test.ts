@@ -67,6 +67,15 @@ describe(toGrantRows, () => {
     expect(status).toBe(GRANT_STATUS.EXPIRED);
   });
 
+  it('marks a grant ending exactly now expired', () => {
+    const status = statusOn(TENANT_PLAN.STARTER, {
+      key: CAPABILITY.READER_ACCOUNTS,
+      expiresAt: NOW,
+    });
+
+    expect(status).toBe(GRANT_STATUS.EXPIRED);
+  });
+
   it('keeps a grant that ends later active', () => {
     const status = statusOn(TENANT_PLAN.STARTER, {
       key: CAPABILITY.READER_ACCOUNTS,

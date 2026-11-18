@@ -3,6 +3,7 @@ import { GrantedBadge } from '@platform/components/features/entitlement-grants/g
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { GrowthBadge } from '@platform/components/shared/growth-badge';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { grantFocusId } from '@platform/utils/grant-focus-id/grant-focus-id';
 import type { TMaybeUndefined } from '@shinefold/config';
 import { ENTITLEMENT_KIND, LOOK_FIELDS } from '@shinefold/db/constants';
 import { isOneOf } from '@shinefold/utils/primitives';
@@ -31,6 +32,7 @@ export const LookFieldBadge = ({
             target={grants.target}
             item={{ kind: ENTITLEMENT_KIND.LOOK_FIELD, key: field }}
             itemLabel={label}
+            returnFocusId={grantFocusId(field)}
           />
         )}
       </>

@@ -14,7 +14,7 @@ import {
   PLAN_LOCALE_LIMIT,
 } from '@shinefold/db/constants';
 
-import { grantedEntitlements, hasGrantExpired } from './granted-entitlements';
+import { grantedEntitlements } from './granted-entitlements';
 
 const NOW = MOCK_TENANT_CREATED_AT;
 const IN_A_DAY = new Date(NOW.getTime() + DAY_MS);
@@ -30,17 +30,6 @@ const grantedOnStarter = (
     grants.map((grant) => mockEntitlementGrant(grant)),
     NOW,
   );
-
-describe(hasGrantExpired, () => {
-  it.each([
-    { expiresAt: null, expected: false },
-    { expiresAt: IN_A_DAY, expected: false },
-    { expiresAt: NOW, expected: true },
-    { expiresAt: A_DAY_AGO, expected: true },
-  ])('is $expected for an expiry of $expiresAt', ({ expiresAt, expected }) => {
-    expect(hasGrantExpired(expiresAt, NOW)).toBe(expected);
-  });
-});
 
 describe(grantedEntitlements, () => {
   it('lists a capability the plan lacks with the end of its grant', () => {

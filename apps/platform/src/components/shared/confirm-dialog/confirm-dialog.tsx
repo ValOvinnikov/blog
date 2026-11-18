@@ -30,6 +30,7 @@ type TConfirmDialogProps = {
   onConfirm: TUseConfirmDialogArgs['onConfirm'];
   onConfirmed?: TUseConfirmDialogArgs['onConfirmed'];
   onOpenChange?: TUseConfirmDialogArgs['onOpenChange'];
+  returnFocusId?: TUseConfirmDialogArgs['returnFocusId'];
   tone?: TConfirmDialogTone;
   children: TCompoundChildren<typeof ConfirmDialogParts>;
 };
@@ -39,10 +40,16 @@ const ConfirmDialogRoot = ({
   onConfirm,
   onConfirmed,
   onOpenChange,
+  returnFocusId,
   tone = BUTTON_VARIANT.DANGER,
   children,
 }: TConfirmDialogProps) => {
-  const dialog = useConfirmDialog({ onConfirm, onConfirmed, onOpenChange });
+  const dialog = useConfirmDialog({
+    onConfirm,
+    onConfirmed,
+    onOpenChange,
+    returnFocusId,
+  });
   const { slots, unmatched } = mapCompoundSlots(children, ConfirmDialogParts);
 
   return (

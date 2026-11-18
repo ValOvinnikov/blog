@@ -19,7 +19,7 @@ export type TTenantByIdContext = {
   canGrantEntitlements: boolean;
 };
 
-/** Gates `/tenants/{id}/*` for any admin, archived tenants included, so only an unknown id 404s; only this tree offers grant controls, which only a super admin gets. */
+/** Gates `/tenants/{id}/*` for any admin, archived tenants included, so only an unknown id 404s. */
 export const requireTenantById = cache(
   async (tenantId: string): Promise<TTenantByIdContext> => {
     // Settled, not `Promise.all`: the gate's redirect or 404 must beat a malformed id's read error.
