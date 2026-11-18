@@ -5,6 +5,7 @@ import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-butto
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { layoutField } from '@shinefold/studio/schema-types/objects/layout/layout-field';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { countLabel } from '@shinefold/studio/schema-types/preview/count-label/count-label';
 import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { MessageCircleQuestion } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -60,13 +61,11 @@ export const faqSchema = defineType({
       questions: 'questions',
     },
     prepare({ title, brandVariant, questions }) {
-      const count = Array.isArray(questions) ? questions.length : 0;
-
       return {
         title: title ?? 'Unknown',
         subtitle: moduleSubtitle(
           brandVariant,
-          `${String(count)} question${count === 1 ? '' : 's'}`,
+          countLabel(questions, 'question'),
         ),
       };
     },

@@ -1,5 +1,6 @@
 import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { linkRefSchema } from '@shinefold/studio/schema-types/objects/link-ref/link-ref';
+import { countLabel } from '@shinefold/studio/schema-types/preview/count-label/count-label';
 import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
 import { validateDefaultLanguageFilled } from '@shinefold/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
 import { Rows3 } from 'lucide-react';
@@ -31,11 +32,9 @@ export const footerLinkGroupSchema = defineType({
   preview: {
     select: { heading: 'heading', links: 'links' },
     prepare({ heading, links }) {
-      const count = Array.isArray(links) ? links.length : 0;
-
       return {
         title: defaultLanguageValue(heading) ?? 'Untitled group',
-        subtitle: `${String(count)} link${count === 1 ? '' : 's'}`,
+        subtitle: countLabel(links, 'link'),
       };
     },
   },

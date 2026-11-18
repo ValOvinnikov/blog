@@ -4,6 +4,7 @@ import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { pricingTierSchema } from '@shinefold/studio/schema-types/objects/pricing-tier/pricing-tier';
+import { countLabel } from '@shinefold/studio/schema-types/preview/count-label/count-label';
 import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { validateLocalizedMaxLength } from '@shinefold/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { validatePricingSingleHighlightedTier } from '@shinefold/studio/schema-types/validation/validate-pricing-single-highlighted-tier/validate-pricing-single-highlighted-tier';
@@ -62,14 +63,9 @@ export const pricingSchema = defineType({
       tiers: 'tiers',
     },
     prepare({ title, brandVariant, tiers }) {
-      const count = Array.isArray(tiers) ? tiers.length : 0;
-
       return {
         title: title ?? 'Unknown',
-        subtitle: moduleSubtitle(
-          brandVariant,
-          `${String(count)} tier${count === 1 ? '' : 's'}`,
-        ),
+        subtitle: moduleSubtitle(brandVariant, countLabel(tiers, 'tier')),
       };
     },
   },

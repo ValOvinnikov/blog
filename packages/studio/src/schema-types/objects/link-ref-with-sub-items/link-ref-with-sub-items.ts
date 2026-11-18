@@ -5,6 +5,7 @@ import {
 } from '@shinefold/studio/schema-types/fields/link-reference-field/link-reference-preview';
 import { linkRefSchema } from '@shinefold/studio/schema-types/objects/link-ref/link-ref';
 import { toToolbarIcon } from '@shinefold/studio/schema-types/portable-text/toolbar-icon/toolbar-icon';
+import { countLabel } from '@shinefold/studio/schema-types/preview/count-label/count-label';
 import { ListTree } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -31,11 +32,9 @@ export const linkRefWithSubItemsSchema = defineType({
   preview: {
     select: { ...linkReferencePreviewSelect, subItems: 'subItems' },
     prepare({ subItems, ...value }) {
-      const count = Array.isArray(subItems) ? subItems.length : 0;
-
       return {
         title: toLinkReferencePreviewTitle(value),
-        subtitle: `${String(count)} sub-item${count === 1 ? '' : 's'}`,
+        subtitle: countLabel(subItems, 'sub-item'),
       };
     },
   },

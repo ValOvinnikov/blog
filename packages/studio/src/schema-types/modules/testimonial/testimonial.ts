@@ -5,6 +5,7 @@ import { cardAlignmentField } from '@shinefold/studio/schema-types/fields/card-a
 import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { countLabel } from '@shinefold/studio/schema-types/preview/count-label/count-label';
 import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { MessageSquareQuote } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -68,13 +69,11 @@ export const testimonialSchema = defineType({
       testimonials: 'testimonials',
     },
     prepare({ title, brandVariant, testimonials }) {
-      const count = Array.isArray(testimonials) ? testimonials.length : 0;
-
       return {
         title: title ?? 'Unknown',
         subtitle: moduleSubtitle(
           brandVariant,
-          `${String(count)} testimonial${count === 1 ? '' : 's'}`,
+          countLabel(testimonials, 'testimonial'),
         ),
       };
     },

@@ -122,7 +122,7 @@ export const ctaSchema = defineType({
       bannerValue: CTA_VARIANT.BANNER,
     }),
     mediaOrderField({
-      kind: 'MOBILE',
+      isAlwaysStacked: false,
       name: 'mobileMediaOrder',
       initialValue: MEDIA_ORDER.LAST,
       hidden: isNotVariant(CTA_VARIANT.SPLIT),

@@ -10,6 +10,7 @@ import { titleField } from '@shinefold/studio/schema-types/fields/title-field/ti
 import { layoutField } from '@shinefold/studio/schema-types/objects/layout/layout-field';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { timelineItemSchema } from '@shinefold/studio/schema-types/objects/timeline-item/timeline-item';
+import { countLabel } from '@shinefold/studio/schema-types/preview/count-label/count-label';
 import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { validateTimelineHorizontalItemCap } from '@shinefold/studio/schema-types/validation/validate-timeline-horizontal-item-cap/validate-timeline-horizontal-item-cap';
 import { toTitleCase } from '@shinefold/utils/primitives';
@@ -97,14 +98,9 @@ export const timelineSchema = defineType({
       items: 'items',
     },
     prepare({ title, brandVariant, items }) {
-      const count = Array.isArray(items) ? items.length : 0;
-
       return {
         title: title ?? 'Unknown',
-        subtitle: moduleSubtitle(
-          brandVariant,
-          `${String(count)} item${count === 1 ? '' : 's'}`,
-        ),
+        subtitle: moduleSubtitle(brandVariant, countLabel(items, 'item')),
       };
     },
   },

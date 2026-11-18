@@ -4,7 +4,7 @@ import { isNotVariant } from '@shinefold/studio/schema-types/fields/variant-fiel
 
 export const heroMediaOrderSplitField = () =>
   mediaOrderField({
-    kind: 'MOBILE',
+    isAlwaysStacked: false,
     name: 'mediaOrderSplit',
     initialValue: MEDIA_ORDER.LAST,
     hidden: isNotVariant(HERO_VARIANT.SPLIT),
@@ -12,7 +12,7 @@ export const heroMediaOrderSplitField = () =>
 
 export const heroMediaOrderStackedField = () =>
   mediaOrderField({
-    kind: 'STACKED',
+    isAlwaysStacked: true,
     name: 'mediaOrderStacked',
     initialValue: MEDIA_ORDER.LAST,
     hidden: isNotVariant(HERO_VARIANT.STACKED),

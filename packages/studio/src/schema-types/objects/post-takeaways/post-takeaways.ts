@@ -1,4 +1,7 @@
+import { countLabel } from '@shinefold/studio/schema-types/preview/count-label/count-label';
 import { defineField, defineType } from 'sanity';
+
+const SET_BY_PIPELINE_DESCRIPTION = 'Set by the reading-depth pipeline.';
 
 export const postTakeawaysSchema = defineType({
   name: 'postTakeaways',
@@ -20,14 +23,14 @@ export const postTakeawaysSchema = defineType({
       name: 'generatedAt',
       title: 'Generated At',
       type: 'datetime',
-      description: 'Set by the reading-depth pipeline.',
+      description: SET_BY_PIPELINE_DESCRIPTION,
       readOnly: true,
     }),
     defineField({
       name: 'model',
       title: 'Model',
       type: 'string',
-      description: 'Set by the reading-depth pipeline.',
+      description: SET_BY_PIPELINE_DESCRIPTION,
       readOnly: true,
     }),
   ],
@@ -37,7 +40,7 @@ export const postTakeawaysSchema = defineType({
       return {
         title: 'Takeaways',
         subtitle: takeaways?.length
-          ? `${takeaways.length} takeaway${takeaways.length === 1 ? '' : 's'}`
+          ? countLabel(takeaways, 'takeaway')
           : 'No takeaways yet',
       };
     },
