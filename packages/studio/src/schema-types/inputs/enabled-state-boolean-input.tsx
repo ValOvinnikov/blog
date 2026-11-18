@@ -1,13 +1,6 @@
 import { Card, Flex, Switch, Text } from '@sanity/ui';
 import { FormField, type BooleanInputProps } from 'sanity';
 
-/**
- * Sanity's default boolean input reuses the field's `title` as both the
- * header label and the switch's own inline text, so a "Divider" field always
- * renders "Divider" next to the switch regardless of its value. This input
- * keeps the title as a normal field label and shows the current value
- * ("Enabled"/"Disabled") next to the switch instead.
- */
 export const EnabledStateBooleanInput = (props: BooleanInputProps) => {
   const {
     schemaType,

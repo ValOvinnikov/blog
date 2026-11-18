@@ -1,8 +1,9 @@
 import { LINK_TYPE } from '@shinefold/config/constants';
-import { LINK_PAGE_TYPES } from '@shinefold/studio/schema-types/documents/link/link-page-types';
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { onePagePerTranslationGroupFilter } from '@shinefold/studio/schema-types/filters/one-page-per-translation-group';
 import { localizedStringValues } from '@shinefold/studio/schema-types/validation/localized-string-values/localized-string-values';
+import { TRANSLATED_DOCUMENT_TYPES } from '@shinefold/studio/translated-document-types';
+import { hasLength } from '@shinefold/utils/primitives';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -13,9 +14,12 @@ type TLinkDocument = {
 const isLinkType = (document: unknown, linkType: string): boolean =>
   (document as TLinkDocument | undefined)?.linkType === linkType;
 
+const INTERNAL_LINK_TITLE = 'Internal Link';
+const EXTERNAL_LINK_TITLE = 'External Link';
+
 const LINK_TYPE_OPTIONS = [
-  { title: 'Internal Link', value: LINK_TYPE.INTERNAL },
-  { title: 'External Link', value: LINK_TYPE.EXTERNAL },
+  { title: INTERNAL_LINK_TITLE, value: LINK_TYPE.INTERNAL },
+  { title: EXTERNAL_LINK_TITLE, value: LINK_TYPE.EXTERNAL },
 ];
 
 const LABEL_MAX_LENGTH = 60;
@@ -60,7 +64,7 @@ export const linkSchema = defineType({
         rule.custom((value) => {
           const labels = localizedStringValues(value);
 
-          if (labels.length === 0) {
+          if (!hasLength(labels)) {
             return 'Enter a label.';
           }
 
@@ -85,10 +89,10 @@ export const linkSchema = defineType({
     }),
     defineField({
       name: 'internalReference',
-      title: 'Internal Link',
+      title: INTERNAL_LINK_TITLE,
       type: 'reference',
       description: 'The page this links to.',
-      to: LINK_PAGE_TYPES.map((type) => ({ type })),
+      to: TRANSLATED_DOCUMENT_TYPES.map((type) => ({ type })),
       options: { filter: onePagePerTranslationGroupFilter },
       hidden: ({ document }) => !isLinkType(document, LINK_TYPE.INTERNAL),
       validation: (rule) =>
@@ -102,7 +106,7 @@ export const linkSchema = defineType({
     }),
     defineField({
       name: 'url',
-      title: 'External Link',
+      title: EXTERNAL_LINK_TITLE,
       type: 'internationalizedArrayString',
       description: 'The full web address this links to, including https://.',
       hidden: ({ document }) => !isLinkType(document, LINK_TYPE.EXTERNAL),
@@ -114,7 +118,7 @@ export const linkSchema = defineType({
 
           const urls = localizedStringValues(value);
 
-          if (urls.length === 0) {
+          if (!hasLength(urls)) {
             return 'Enter a full web address, including https://.';
           }
 
