@@ -297,28 +297,28 @@ describe(`<${LookSample.name}/>`, () => {
       expect(ctaText).toBeVisible();
     });
 
-    it('shows one band per registry skin, in registry order', () => {
+    it.each(SKINS)('labels the %s band with its admin name', (skin) => {
+      const label = screen.getByText(SKIN_LABEL[skin]);
+
+      expect(label).toBeVisible();
+    });
+
+    it('shows one band per registry skin in registry order, each with a heading, a link and a linked card', () => {
       const bands = screen.getAllByTestId(LOOK_SAMPLE_BAND_TEST_ID);
       const bandSkins = bands.map((band) => band.getAttribute(SKIN_ATTRIBUTE));
 
       expect(bandSkins).toEqual(SKINS);
-    });
 
-    it.each(SKINS.map((skin, index) => ({ skin, index })))(
-      'labels the $skin band and gives it a heading, a link and a linked card',
-      ({ skin, index }) => {
-        const band = within(
-          screen.getAllByTestId(LOOK_SAMPLE_BAND_TEST_ID)[index],
-        );
+      bands.forEach((element) => {
+        const band = within(element);
 
-        expect(band.getByText(SKIN_LABEL[skin])).toBeVisible();
         expect(
           band.getByRole('heading', { level: 2, name: BAND_HEADING }),
         ).toBeVisible();
         expect(band.getByRole('link', { name: BAND_LINK })).toBeVisible();
         expect(band.getByRole('link', { name: BAND_CARD_TITLE })).toBeVisible();
-      },
-    );
+      });
+    });
 
     it('marks the header and the footer as sample parts', () => {
       const header = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
