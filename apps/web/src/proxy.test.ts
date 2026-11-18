@@ -356,6 +356,7 @@ describe(proxy, () => {
       `/${MOCK_TENANT_ID}${DRAFT_PREVIEW_MARKER}/en${BLOG_POST_PATH}`,
       `/en/%7Epreview${BLOG_POST_PATH}`,
       `/en/%7epreview${BLOG_POST_PATH}`,
+      `/${MOCK_TENANT_ID}~%70review/en${BLOG_POST_PATH}`,
     ])('answers not found for the draft marker in %s', async (path) => {
       const response = await visit(path);
 
