@@ -7,9 +7,12 @@ import { titleField } from '@shinefold/studio/schema-types/fields/title-field/ti
 import { featureHighlightSchema } from '@shinefold/studio/schema-types/objects/feature-highlight/feature-highlight';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { wideLayoutField } from '@shinefold/studio/schema-types/objects/wide-layout/wide-layout-field';
+import { countLabel } from '@shinefold/studio/schema-types/preview/count-label/count-label';
 import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Rows3 } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+
+const TOO_FEW_ROWS_ERROR = 'Add at least two rows.';
 
 export const featureHighlightsSchema = defineType({
   name: 'module_featureHighlights',
@@ -29,14 +32,14 @@ export const featureHighlightsSchema = defineType({
         'The rows in the order they should be read. Images alternate sides from the first row; on phones every image sits above its text.',
       of: [defineArrayMember({ type: featureHighlightSchema.name })],
       validation: (rule) => [
-        rule.required().error('Add at least two rows.'),
-        rule.min(2).error('Add at least two rows.'),
+        rule.required().error(TOO_FEW_ROWS_ERROR),
+        rule.min(2).error(TOO_FEW_ROWS_ERROR),
         rule.max(6).error('Feature highlights hold at most six rows.'),
       ],
     }),
     ctaButtonsField(),
     mediaOrderField({
-      kind: 'STACKED',
+      isAlwaysStacked: true,
       name: 'mediaOrder',
       initialValue: MEDIA_ORDER.FIRST,
       isRequired: true,
@@ -51,14 +54,9 @@ export const featureHighlightsSchema = defineType({
       highlights: 'highlights',
     },
     prepare({ title, brandVariant, highlights }) {
-      const count = Array.isArray(highlights) ? highlights.length : 0;
-
       return {
         title: title ?? 'Unknown',
-        subtitle: moduleSubtitle(
-          brandVariant,
-          `${String(count)} row${count === 1 ? '' : 's'}`,
-        ),
+        subtitle: moduleSubtitle(brandVariant, countLabel(highlights, 'row')),
       };
     },
   },

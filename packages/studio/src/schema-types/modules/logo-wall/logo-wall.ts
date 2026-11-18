@@ -7,9 +7,12 @@ import { titleField } from '@shinefold/studio/schema-types/fields/title-field/ti
 import { layoutField } from '@shinefold/studio/schema-types/objects/layout/layout-field';
 import { logoItemSchema } from '@shinefold/studio/schema-types/objects/logo-item/logo-item';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { countLabel } from '@shinefold/studio/schema-types/preview/count-label/count-label';
 import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Images } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+
+const NO_LOGOS_ERROR = 'A logo wall needs at least one logo.';
 
 export const logoWallSchema = defineType({
   name: 'module_logoWall',
@@ -29,8 +32,8 @@ export const logoWallSchema = defineType({
       description: 'The logos shown in this section, in display order.',
       of: [defineArrayMember({ type: logoItemSchema.name })],
       validation: (rule) => [
-        rule.required().error('A logo wall needs at least one logo.'),
-        rule.min(1).error('A logo wall needs at least one logo.'),
+        rule.required().error(NO_LOGOS_ERROR),
+        rule.min(1).error(NO_LOGOS_ERROR),
         rule.max(12).error('A logo wall holds at most twelve logos.'),
       ],
     }),
@@ -51,14 +54,9 @@ export const logoWallSchema = defineType({
       logos: 'logos',
     },
     prepare({ title, brandVariant, logos }) {
-      const count = Array.isArray(logos) ? logos.length : 0;
-
       return {
         title: title ?? 'Unknown',
-        subtitle: moduleSubtitle(
-          brandVariant,
-          `${String(count)} logo${count === 1 ? '' : 's'}`,
-        ),
+        subtitle: moduleSubtitle(brandVariant, countLabel(logos, 'logo')),
       };
     },
   },

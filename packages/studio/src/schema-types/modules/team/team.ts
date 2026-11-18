@@ -10,6 +10,7 @@ import { imageShapeField } from '@shinefold/studio/schema-types/fields/image-sha
 import { showToggleField } from '@shinefold/studio/schema-types/fields/show-toggle-field/show-toggle-field';
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { countLabel } from '@shinefold/studio/schema-types/preview/count-label/count-label';
 import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Users } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -89,13 +90,11 @@ export const teamSchema = defineType({
       members: 'members',
     },
     prepare({ title, brandVariant, members }) {
-      const count = Array.isArray(members) ? members.length : 0;
-
       return {
         title: title ?? 'Unknown',
         subtitle: moduleSubtitle(
           brandVariant,
-          `${String(count)} ${count === 1 ? 'person' : 'people'}`,
+          countLabel(members, 'person', 'people'),
         ),
       };
     },

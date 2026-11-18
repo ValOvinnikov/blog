@@ -2,20 +2,19 @@ import { MEDIA_ORDER, type TMediaOrder } from '@shinefold/config/constants';
 import { toTitleCase } from '@shinefold/utils/primitives';
 import { defineField, type StringDefinition } from 'sanity';
 
-const mediaOrderCopy = {
-  MOBILE: {
-    title: 'Mobile Media Order',
-    description:
-      'Whether the image comes before or after the text once the columns stack on small screens.',
-  },
-  STACKED: {
-    title: 'Media Order',
-    description: 'Whether the image comes before or after the text.',
-  },
+const STACKED_COPY = {
+  title: 'Media Order',
+  description: 'Whether the image comes before or after the text.',
+};
+
+const MOBILE_COPY = {
+  title: 'Mobile Media Order',
+  description:
+    'Whether the image comes before or after the text once the columns stack on small screens.',
 };
 
 type TMediaOrderFieldOptions = {
-  kind: keyof typeof mediaOrderCopy;
+  isAlwaysStacked: boolean;
   name: string;
   initialValue: TMediaOrder;
   hidden?: StringDefinition['hidden'];
@@ -23,7 +22,7 @@ type TMediaOrderFieldOptions = {
 };
 
 export const mediaOrderField = ({
-  kind,
+  isAlwaysStacked,
   name,
   initialValue,
   hidden,
@@ -31,7 +30,7 @@ export const mediaOrderField = ({
 }: TMediaOrderFieldOptions) =>
   defineField({
     name,
-    ...mediaOrderCopy[kind],
+    ...(isAlwaysStacked ? STACKED_COPY : MOBILE_COPY),
     type: 'string',
     options: {
       layout: 'dropdown',

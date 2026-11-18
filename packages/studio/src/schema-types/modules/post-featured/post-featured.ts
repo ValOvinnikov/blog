@@ -6,6 +6,7 @@ import { showImagesField } from '@shinefold/studio/schema-types/fields/show-imag
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { publishedPostFilter } from '@shinefold/studio/schema-types/filters/published-post';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { countLabel } from '@shinefold/studio/schema-types/preview/count-label/count-label';
 import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { validateNewestFeaturedHasCandidate } from '@shinefold/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
 import { hasLength, toTitleCase } from '@shinefold/utils/primitives';
@@ -127,14 +128,12 @@ export const postFeaturedSchema = defineType({
       limit: 'limit',
     },
     prepare({ title, brandVariant, postSource, posts, limit }) {
-      const pinnedCount = Array.isArray(posts) ? posts.length : 0;
-
       return {
         title: title ?? 'Unknown',
         subtitle: moduleSubtitle(
           brandVariant,
           postSource === POST_SOURCE.PINNED
-            ? `Pinned: ${String(pinnedCount)} post${pinnedCount === 1 ? '' : 's'}`
+            ? `Pinned: ${countLabel(posts, 'post')}`
             : `Newest featured (limit ${String(limit ?? 3)})`,
         ),
       };
