@@ -34,7 +34,7 @@ export type TQuoteCardProps = IWithClassName &
     align?: TQuoteCardVariants['align'];
     isSpotlight?: boolean;
     isInteractive?: TQuoteCardVariants['isInteractive'];
-    tone: TBrandVariant;
+    tone?: TBrandVariant;
     children?: TCompoundChildren<typeof QuoteCardParts>;
   };
 

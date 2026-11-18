@@ -10,6 +10,7 @@ import {
   type TSkinMode,
 } from '@shinefold/config/constants';
 
+import { AMBIENT_RAISED } from './contrast-surfaces';
 import { effectiveSchemeOf } from './skin-contrast';
 import { deriveSkinRoles } from './skin-derive';
 import type { TPaletteStop, TSkinRoles } from './skin-roles';
@@ -71,6 +72,10 @@ export const SKIN_REGISTRY = {
       [COLOR_SCHEME.DARK]: '--palette-neutral-2600',
     },
     mode: SKIN_MODE.MATCH,
+    pin: {
+      [COLOR_SCHEME.LIGHT]: { [AMBIENT_RAISED]: '--palette-neutral-300' },
+      [COLOR_SCHEME.DARK]: { [AMBIENT_RAISED]: '--palette-neutral-2100' },
+    },
   }),
   [BRAND_VARIANT.SECONDARY]: defineSkin('Shaded', {
     ground: {

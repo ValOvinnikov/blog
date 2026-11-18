@@ -3,11 +3,13 @@ import { COLOR_SCHEME, type TColorScheme } from '@shinefold/config/constants';
 import type { TThemeToken } from './contrast-pairs';
 import { SCHEME_RAMPS } from './contrast-scheme-ramps';
 import {
+  AMBIENT_RAISED,
   BORDER_EMPHASIS,
   BRAND_PRIMARY,
   BRAND_PRIMARY_MUTED,
   BRAND_PRIMARY_WASH,
   ERROR_MUTED,
+  PRIMARY_SUBTLE,
   SURFACE_2,
   TEXT,
   TEXT_MUTED,
@@ -16,7 +18,11 @@ import { PALETTE } from './palette-ramps';
 
 export type TPaletteStop = keyof typeof PALETTE;
 
-export const SKIN_GROUND_ROLES = ['--ambient', '--backdrop'] as const;
+export const SKIN_GROUND_ROLES = [
+  '--ambient',
+  '--backdrop',
+  AMBIENT_RAISED,
+] as const;
 
 export const SKIN_FILL_ROLES = [
   '--surface',
@@ -83,6 +89,7 @@ export const BRAND_SCRIMS = {
 const PAGE_ROLE_SOURCES: Partial<Record<TSkinStopRole, TThemeToken>> = {
   '--ambient': '--primary',
   '--backdrop': '--primary',
+  [AMBIENT_RAISED]: PRIMARY_SUBTLE,
   '--divider': '--border',
   '--text-subtle': TEXT_MUTED,
 };

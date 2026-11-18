@@ -26,7 +26,7 @@ export const buttonVariants = tv({
       // Forced colours paint transparent borders, so the link drops its border there.
       link: 'border-transparent bg-transparent text-brand-primary hover:text-brand-primary-hover forced-colors:border-0',
       danger:
-        'border-error/55 bg-transparent text-error hover:border-error hover:bg-error hover:text-primary',
+        'border-error/55 bg-transparent text-error hover:border-error hover:bg-error hover:text-ambient',
     },
     size: {
       [SIZE.SM]: 'px-3 py-1.5 text-sm',

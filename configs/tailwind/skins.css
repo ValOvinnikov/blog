@@ -70,6 +70,7 @@
   color-scheme: light;
   --ambient: var(--palette-neutral-100);
   --backdrop: var(--palette-neutral-100);
+  --ambient-raised: var(--palette-neutral-300);
   --surface: var(--palette-achromatic-100);
   --surface-2: var(--palette-neutral-200);
   --brand-primary-muted: var(--palette-brand-200);
@@ -107,6 +108,7 @@
   color-scheme: dark;
   --ambient: var(--palette-neutral-2600);
   --backdrop: var(--palette-neutral-2600);
+  --ambient-raised: var(--palette-neutral-2100);
   --surface: var(--palette-neutral-2000);
   --surface-2: var(--palette-neutral-1900);
   --brand-primary-muted: var(--palette-brand-1600);
@@ -144,6 +146,7 @@
   color-scheme: light;
   --ambient: var(--palette-neutral-500);
   --backdrop: var(--palette-neutral-500);
+  --ambient-raised: var(--palette-neutral-500);
   --surface: var(--palette-achromatic-100);
   --surface-2: var(--palette-neutral-200);
   --brand-primary-muted: var(--palette-brand-200);
@@ -181,6 +184,7 @@
   color-scheme: dark;
   --ambient: var(--palette-neutral-1800);
   --backdrop: var(--palette-neutral-1800);
+  --ambient-raised: var(--palette-neutral-1800);
   --surface: var(--palette-neutral-2000);
   --surface-2: var(--palette-neutral-1900);
   --brand-primary-muted: var(--palette-brand-1600);
@@ -218,6 +222,7 @@
   color-scheme: light;
   --ambient: var(--palette-brand-200);
   --backdrop: var(--palette-brand-200);
+  --ambient-raised: var(--palette-brand-200);
   --surface: var(--palette-achromatic-100);
   --surface-2: var(--palette-neutral-200);
   --brand-primary-muted: var(--palette-brand-100);
@@ -255,6 +260,7 @@
   color-scheme: dark;
   --ambient: var(--palette-brand-1600);
   --backdrop: var(--palette-brand-1600);
+  --ambient-raised: var(--palette-brand-1600);
   --surface: var(--palette-neutral-2000);
   --surface-2: var(--palette-neutral-1900);
   --brand-primary-muted: var(--palette-brand-1700);

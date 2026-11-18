@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT } from '@shinefold/config';
 import {
   CardStyles,
   FilledAndPlainOnEachBand,
@@ -100,7 +101,11 @@ export const WithRichContent: TStory = {
 };
 
 const OnSecondary = () => (
-  <div className="bg-secondary surface-secondary" style={{ padding: '1.5rem' }}>
+  <div
+    className="bg-ambient"
+    data-skin={BRAND_VARIANT.SECONDARY}
+    style={{ padding: '1.5rem' }}
+  >
     <Accordion>{renderItems(threeItems)}</Accordion>
   </div>
 );
@@ -116,7 +121,8 @@ export const OnSecondaryBackgroundFocused: TStory = {
 
 const OnBrandPrimary = () => (
   <div
-    className="bg-brand-primary-muted surface-brand-primary"
+    className="bg-ambient"
+    data-skin={BRAND_VARIANT.BRAND_PRIMARY}
     style={{ padding: '1.5rem' }}
   >
     <Accordion>{renderItems(threeItems)}</Accordion>

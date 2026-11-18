@@ -167,7 +167,8 @@ export const ControlOnGrounds: TStory = {
   render: () => (
     <div style={{ display: 'flex', gap: '1.5rem' }}>
       <div
-        className="bg-primary"
+        className="bg-ambient"
+        data-skin={BRAND_VARIANT.PRIMARY}
         style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
       >
         <IconButton
@@ -180,7 +181,8 @@ export const ControlOnGrounds: TStory = {
         </IconButton>
       </div>
       <div
-        className="bg-secondary surface-secondary"
+        className="bg-ambient"
+        data-skin={BRAND_VARIANT.SECONDARY}
         style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
       >
         <IconButton
@@ -193,7 +195,8 @@ export const ControlOnGrounds: TStory = {
         </IconButton>
       </div>
       <div
-        className="bg-brand-primary-muted surface-brand-primary"
+        className="bg-ambient"
+        data-skin={BRAND_VARIANT.BRAND_PRIMARY}
         style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
       >
         <IconButton
@@ -220,7 +223,8 @@ export const ControlDisabledOnGrounds: TStory = {
   render: () => (
     <div style={{ display: 'flex', gap: '1.5rem' }}>
       <div
-        className="bg-primary"
+        className="bg-ambient"
+        data-skin={BRAND_VARIANT.PRIMARY}
         style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
       >
         <IconButton
@@ -234,7 +238,8 @@ export const ControlDisabledOnGrounds: TStory = {
         </IconButton>
       </div>
       <div
-        className="bg-secondary surface-secondary"
+        className="bg-ambient"
+        data-skin={BRAND_VARIANT.SECONDARY}
         style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
       >
         <IconButton
@@ -248,7 +253,8 @@ export const ControlDisabledOnGrounds: TStory = {
         </IconButton>
       </div>
       <div
-        className="bg-brand-primary-muted surface-brand-primary"
+        className="bg-ambient"
+        data-skin={BRAND_VARIANT.BRAND_PRIMARY}
         style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
       >
         <IconButton

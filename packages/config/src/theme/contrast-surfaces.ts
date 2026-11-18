@@ -7,6 +7,7 @@ export const BRAND_PRIMARY_MUTED =
   '--brand-primary-muted' satisfies TThemeToken;
 export const ERROR_MUTED = '--error-muted' satisfies TThemeToken;
 export const AMBIENT = '--ambient' satisfies TThemeToken;
+export const AMBIENT_RAISED = '--ambient-raised' satisfies TThemeToken;
 export const FIELD_BOUNDARY = '--field-boundary' satisfies TThemeToken;
 export const TEXT = '--text' satisfies TThemeToken;
 export const TEXT_MUTED = '--text-muted' satisfies TThemeToken;

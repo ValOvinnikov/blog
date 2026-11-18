@@ -3,6 +3,7 @@ import { hasLength, isOneOf, objectKeys } from '@shinefold/utils/primitives';
 import type { TColorScheme } from '@shinefold/config/constants';
 
 import type { TThemeToken } from './contrast-pairs';
+import { AMBIENT_RAISED } from './contrast-surfaces';
 import { PALETTE } from './palette-ramps';
 import {
   findSkinFailures,
@@ -94,6 +95,7 @@ export const deriveSkinRoles = (derivation: TSkinDerivation): TSkinRoles => {
     ...PAGE_ROLES[effectiveScheme],
     '--ambient': ground,
     '--backdrop': ground,
+    [AMBIENT_RAISED]: ground,
     ...(familyOf(ground) === BRAND_FAMILY ? BRAND_SCRIMS : NEUTRAL_SCRIMS),
     ...pin,
   };

@@ -1,5 +1,11 @@
 import { faker } from '@faker-js/faker';
-import { FORM_STATUS, CONTENT_ALIGNMENT, ICONS, SIZE } from '@shinefold/config';
+import {
+  BRAND_VARIANT,
+  FORM_STATUS,
+  CONTENT_ALIGNMENT,
+  ICONS,
+  SIZE,
+} from '@shinefold/config';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { NewsletterSignup } from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
@@ -172,7 +178,7 @@ export const WideContainer: TStory = {
 export const BrandPrimaryBand: TStory = {
   decorators: [
     (Story) => (
-      <div className="surface-brand-primary bg-brand-primary-muted p-8">
+      <div className="bg-ambient p-8" data-skin={BRAND_VARIANT.BRAND_PRIMARY}>
         <Story />
       </div>
     ),

@@ -42,6 +42,8 @@
   --color-ambient: var(
     --ambient
   ); /* @role ring-offset colour of the surface in scope */
+  /* prettier-ignore */
+  --color-ambient-raised: var(--ambient-raised); /* @role lifted field of the surface in scope */
   --color-divider: var(
     --divider
   ); /* @role divider colour of the surface in scope */
@@ -64,8 +66,6 @@
   --color-brand-primary-muted: var(
     --brand-primary-muted
   ); /* @role tint / selection */
-  /* prettier-ignore */
-  --color-tint: var(--tint, var(--brand-primary-muted)); /* @role brand tint of the surface in scope */
   /* prettier-ignore */
   --color-item-hover: color-mix(in oklch, var(--tint, var(--brand-primary-muted)), var(--item-nested-fill, var(--brand-primary-wash)) var(--item-hover-mix, 0%)); /* @role hovered or focused item card */
   /* prettier-ignore */
@@ -294,6 +294,7 @@
      inside it, with no per-component prop. */
   --ambient: var(--primary);
   --backdrop: var(--primary);
+  --ambient-raised: var(--primary-subtle);
   --divider: var(--border);
   /* 3:1 (WCAG 1.4.11) against --surface and against --secondary or
      --brand-primary-muted at every accent hue, where --border-emphasis falls short. */
@@ -579,6 +580,33 @@
   max-width: var(--container-copy);
 }
 
+/* A skin scope starts its own tint fills, so a band around it never leaks in. */
+[data-skin] {
+  --tint: initial;
+  --media-fill: initial;
+  --item-fill: initial;
+  --item-nested-fill: initial;
+}
+
+/* Unlayered, and one class more specific than the skin scopes, so they re-point roles on the element that sets data-skin. */
+[data-skin].skin-raised,
+.dark [data-skin].skin-raised {
+  --ambient: var(--ambient-raised);
+  --backdrop: var(--ambient-raised);
+}
+
+[data-skin].skin-on-image,
+.dark [data-skin].skin-on-image {
+  --text: var(--on-image);
+  --text-muted: var(--on-image-muted);
+  --text-subtle: var(--on-image-muted);
+  --border: var(--on-image-muted);
+  --border-strong: var(--on-image-muted);
+  --divider: var(--on-image-muted);
+  --brand-primary: var(--on-image);
+  --brand-primary-hover: var(--on-image-muted);
+}
+
 /* Ambient-surface overrides: apply to an element that changes its own
    background, so descendants' ring-offset-ambient/border-divider utilities
    resolve against that background instead of the page default. */
@@ -606,13 +634,6 @@
   --media-fill: var(--tint);
   --item-fill: var(--brand-primary-wash);
   --item-nested-fill: var(--surface);
-}
-
-@utility surface-tint {
-  --ambient: var(--tint, var(--brand-primary-muted));
-  --backdrop: var(--tint, var(--brand-primary-muted));
-  --divider: var(--border-strong);
-  --field-boundary: var(--field-boundary-tinted);
 }
 
 /* --border against --surface-2 (1.25:1 light / 1.21:1 dark) reads weaker than

@@ -17,7 +17,7 @@ export const taxonomyCardVariants = tv({
       true: {
         root: [
           INTERACTIVE_ITEM_CARD,
-          'focus-within:surface-tint',
+          'focus-within:[--ambient:var(--tint,var(--brand-primary-muted))]',
           'has-[li:hover]:bg-surface',
         ],
       },

@@ -308,7 +308,7 @@ Slots:
 ### QuoteCard — `components/molecules/quote-card/quote-card.tsx`
 
 A testimonial quote rendered as a figure; composes a caller-supplied `QuoteCard.Quote`, `QuoteCard.Avatar`, and `QuoteCard.Name` for the quoted person.
-Props: role?: string · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · isInteractive?: TQuoteCardVariants['isInteractive'] · tone: TBrandVariant · children?: TCompoundChildren<typeof QuoteCardParts> _(extends IWithClassName, IWithDataTestId)_
+Props: role?: string · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · isInteractive?: TQuoteCardVariants['isInteractive'] · tone?: TBrandVariant · children?: TCompoundChildren<typeof QuoteCardParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: align: left|center · isSpotlight: (boolean) · isInteractive: (boolean)
 
 Slots:
@@ -437,8 +437,8 @@ Props: isOpen: boolean · onOpenChange: (isOpen: boolean) => void · heading: st
 ### Footer — `components/organisms/footer/footer.tsx`
 
 The public site's footer, where readers find the site's links, contact details and legal fine print.
-Props: layout?: TFooterVariants['layout'] · surface?: TFooterVariants['surface'] · tone?: TFooterVariants['tone'] · children?: TCompoundChildren<typeof FooterSlotParts> _(extends IWithClassName, IWithDataTestId)_
-Variants: layout: FOOTER_LAYOUT.COLUMNS|FOOTER_LAYOUT.CENTRED|FOOTER_LAYOUT.COMPACT|FOOTER_LAYOUT.BIG_WORDMARK · surface: FOOTER_SURFACE.FULL_WIDTH|FOOTER_SURFACE.CARD · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
+Props: layout?: TFooterVariants['layout'] · surface?: TFooterVariants['surface'] · tone?: TBrandVariant · children?: TCompoundChildren<typeof FooterSlotParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: layout: FOOTER_LAYOUT.COLUMNS|FOOTER_LAYOUT.CENTRED|FOOTER_LAYOUT.COMPACT|FOOTER_LAYOUT.BIG_WORDMARK · surface: FOOTER_SURFACE.FULL_WIDTH|FOOTER_SURFACE.CARD
 
 Slots:
 

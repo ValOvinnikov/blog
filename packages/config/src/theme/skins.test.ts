@@ -8,6 +8,7 @@ import {
 import { SCHEME_RAMPS } from './contrast-scheme-ramps';
 import {
   AMBIENT,
+  AMBIENT_RAISED,
   BRAND_PRIMARY_MUTED,
   SECONDARY,
   TEXT,
@@ -88,6 +89,17 @@ describe('the skin registry', () => {
       );
     }
   });
+
+  it.each([BRAND_VARIANT.SECONDARY, BRAND_VARIANT.BRAND_PRIMARY])(
+    '%s raises a banner on its own ground',
+    (variant) => {
+      for (const scheme of COLOR_SCHEMES) {
+        const roles = SKIN_REGISTRY[variant].roles[scheme];
+
+        expect(roles[AMBIENT_RAISED]).toBe(roles[AMBIENT]);
+      }
+    },
+  );
 
   it('dresses the brand ground in the brand scrim', () => {
     const { roles } = SKIN_REGISTRY[BRAND_VARIANT.BRAND_PRIMARY];

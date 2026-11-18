@@ -1,7 +1,4 @@
 import {
-  CONTENT_ALIGNMENT,
-  HERO_VARIANT,
-  MEDIA_ORDER,
   type IWithClassName,
   type IWithDataTestId,
   type TBrandVariant,
@@ -18,7 +15,6 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@shinefold/ui/lib/react';
-import { bannerVariants } from '@shinefold/ui/lib/styling';
 import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { HeroAvatar } from './components/avatar/hero-avatar';
@@ -26,7 +22,7 @@ import { HeroBody } from './components/body/hero-body';
 import { HeroCta } from './components/cta/hero-cta';
 import { HeroMedia } from './components/media/hero-media';
 import { HeroSocial } from './components/social/hero-social';
-import { heroVariants } from './hero-variants';
+import { resolveHeroStyles } from './hero-styles';
 
 const HeroParts = {
   Avatar: HeroAvatar,
@@ -71,38 +67,26 @@ const HeroRoot = ({
 }: THeroProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeroParts);
   const hasMedia = Boolean(slots.Media);
-  const resolvedVariant = variant ?? HERO_VARIANT.SPLIT;
-  const isSplit = resolvedVariant === HERO_VARIANT.SPLIT;
-  const isBanner = resolvedVariant === HERO_VARIANT.BANNER;
-
-  const resolvedPosition = contentPosition ?? CONTENT_ALIGNMENT.LEFT;
-  const resolvedAlignment = isSplit
-    ? contentAlignment
-    : (contentAlignment ?? CONTENT_ALIGNMENT.LEFT);
-  const resolvedMediaOrder = isBanner
-    ? undefined
-    : (mediaOrder ?? MEDIA_ORDER.LAST);
-
-  const s = heroVariants({
+  const {
     variant: resolvedVariant,
-    hasMedia,
-    position: resolvedPosition,
+    isBanner,
     alignment: resolvedAlignment,
-    mediaOrder: resolvedMediaOrder,
+    styles: s,
+    banner,
+  } = resolveHeroStyles({
+    variant,
+    hasMedia,
+    contentPosition,
+    contentAlignment,
+    mediaOrder,
+    spacingTop,
+    spacingBottom,
   });
-  const banner = isBanner
-    ? bannerVariants({
-        tone,
-        hasMedia,
-        position: resolvedPosition,
-        spacingTop,
-        spacingBottom,
-      })
-    : undefined;
 
   return (
     <div
       className={s.root({ class: [banner?.root(), className] })}
+      data-skin={isBanner ? tone : undefined}
       data-testid={dataTestId}
     >
       <div className={s.grid()}>

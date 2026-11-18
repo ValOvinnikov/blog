@@ -1,8 +1,4 @@
-import {
-  BRAND_VARIANT,
-  FOOTER_LAYOUT,
-  FOOTER_SURFACE,
-} from '@shinefold/config';
+import { FOOTER_LAYOUT, FOOTER_SURFACE } from '@shinefold/config';
 import { tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -45,55 +41,17 @@ export const footerVariants = tv({
     },
     surface: {
       [FOOTER_SURFACE.FULL_WIDTH]: {
-        root: ['border-t border-border-strong'],
+        root: ['border-t border-border-strong bg-ambient'],
       },
       [FOOTER_SURFACE.CARD]: {
         root: ['px-3 pb-3'],
-        inner: ['rounded-card border border-border shadow-card'],
+        inner: ['rounded-card border border-border bg-ambient shadow-card'],
       },
     },
-    tone: {
-      [BRAND_VARIANT.PRIMARY]: {},
-      [BRAND_VARIANT.SECONDARY]: {},
-      [BRAND_VARIANT.BRAND_PRIMARY]: {},
-    },
   },
-  compoundVariants: [
-    {
-      surface: FOOTER_SURFACE.FULL_WIDTH,
-      tone: BRAND_VARIANT.PRIMARY,
-      class: { root: ['bg-primary'] },
-    },
-    {
-      surface: FOOTER_SURFACE.FULL_WIDTH,
-      tone: BRAND_VARIANT.SECONDARY,
-      class: { root: ['bg-secondary', 'surface-secondary'] },
-    },
-    {
-      surface: FOOTER_SURFACE.FULL_WIDTH,
-      tone: BRAND_VARIANT.BRAND_PRIMARY,
-      class: { root: ['bg-brand-primary-muted', 'surface-brand-primary'] },
-    },
-    {
-      surface: FOOTER_SURFACE.CARD,
-      tone: BRAND_VARIANT.PRIMARY,
-      class: { inner: ['bg-primary'] },
-    },
-    {
-      surface: FOOTER_SURFACE.CARD,
-      tone: BRAND_VARIANT.SECONDARY,
-      class: { inner: ['bg-secondary', 'surface-secondary'] },
-    },
-    {
-      surface: FOOTER_SURFACE.CARD,
-      tone: BRAND_VARIANT.BRAND_PRIMARY,
-      class: { inner: ['bg-brand-primary-muted', 'surface-brand-primary'] },
-    },
-  ],
   defaultVariants: {
     layout: FOOTER_LAYOUT.COLUMNS,
     surface: FOOTER_SURFACE.FULL_WIDTH,
-    tone: BRAND_VARIANT.BRAND_PRIMARY,
   },
 });
 

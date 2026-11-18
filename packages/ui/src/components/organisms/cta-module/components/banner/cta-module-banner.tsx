@@ -39,14 +39,13 @@ export const CtaModuleBanner = ({
   dataTestId,
 }: TCtaModuleBannerProps) => (
   <CtaModuleLayout
+    tone={tone}
     styles={ctaModuleVariants({
       variant: CTA_VARIANT.BANNER,
-      tone,
       position: contentPosition,
       alignment: contentAlignment,
     })}
     bannerStyles={bannerVariants({
-      tone,
       position: contentPosition,
       spacingTop,
       spacingBottom,
