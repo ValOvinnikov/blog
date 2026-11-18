@@ -12,6 +12,10 @@ export const heroProfilePortraitVariants = tv({
   base: ['w-full'],
 });
 
+export const heroProfileNameAvatarVariants = tv({
+  base: ['mb-0'],
+});
+
 export const heroProfileNameVariants = tv({
   base: ['sr-only'],
 });

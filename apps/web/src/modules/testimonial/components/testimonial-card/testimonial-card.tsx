@@ -12,7 +12,7 @@ import { SmartLink } from '@web/components/shared/smart-link';
 
 import { testimonialAvatarImageVariants } from './testimonial-card-variants';
 
-const AVATAR_IMAGE_SIZE_PX = { default: 80, spotlight: 112 } as const;
+const AVATAR_IMAGE_SIZE_PX = { DEFAULT: 80, SPOTLIGHT: 112 } as const;
 
 export interface ITestimonialCardProps extends IWithClassName, IWithDataTestId {
   item: TTestimonialItem;
@@ -28,8 +28,8 @@ export const TestimonialCard = ({
   dataTestId,
 }: ITestimonialCardProps) => {
   const imageSize = isSpotlight
-    ? AVATAR_IMAGE_SIZE_PX.spotlight
-    : AVATAR_IMAGE_SIZE_PX.default;
+    ? AVATAR_IMAGE_SIZE_PX.SPOTLIGHT
+    : AVATAR_IMAGE_SIZE_PX.DEFAULT;
 
   return (
     <QuoteCard

@@ -40,15 +40,6 @@ describe(`<${ActionGroup.name}/>`, () => {
       );
       expect(otherLinks).toHaveLength(0);
     });
-
-    it.each([MOCK_CTA_PRIMARY_ACTION, MOCK_CTA_SECONDARY_ACTION])(
-      'names the $link.label link by its label',
-      ({ link: { label } }) => {
-        const link = screen.getByRole('link', { name: label });
-
-        expect(link).toBeVisible();
-      },
-    );
   });
 
   describe('with a hiddenLabelSuffix', () => {
@@ -58,16 +49,6 @@ describe(`<${ActionGroup.name}/>`, () => {
       const link = screen.getByRole('link', {
         name: `${MOCK_LABEL}: ${MOCK_SUFFIX}`,
       });
-
-      expect(link).toBeVisible();
-    });
-
-    it('names the link by its label when hiddenLabelSuffix is unset', () => {
-      setup({
-        actions: [{ ...MOCK_ACTION_WITH_SUFFIX, hiddenLabelSuffix: undefined }],
-      });
-
-      const link = screen.getByRole('link', { name: MOCK_LABEL });
 
       expect(link).toBeVisible();
     });

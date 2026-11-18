@@ -74,4 +74,4 @@ An editor introduces a founder, a team, staff or contributors by picking existin
 - #4987 — epic: accessible text and colour on the public site. #5013 scales square-shape initials with their tile.
 - #5028 — epic: text roles. #5039 moves the card role, bio and spotlight name and role onto shared text roles.
 - #5047 — epic: plans and entitlements. Proposes Team as a Growth module.
-- #5016 — epic: one-entry skins. The carousel's `tone` prop goes when band surfaces render their skin.
+- #5016 — epic: one-entry skins. #5023 retires `Carousel`'s `tone` prop, which the view no longer passes.

@@ -47,7 +47,7 @@ export const ActionGroup = ({ actions }: IActionGroupProps) => (
           href={action.link.href}
           target={action.link.target}
           variant={variant}
-          className={actionGroupVariants({ isInline: variant === 'link' })}
+          className={actionGroupVariants({ variant })}
         >
           {action.link.label}
           {action.hiddenLabelSuffix && (

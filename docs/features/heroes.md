@@ -79,6 +79,6 @@ A hero is the optional opening band of a page. It replaces the page's own headin
 ## Related
 
 - #3600 — decide whether author- and post-mediated link targets need precise purging, which would let Blog and Profile drop their page-type tags.
-- #5016 — epic: one-entry skins. The Banner recipe renders `data-skin`, and `isOnDark` and tone props go.
+- #5016 — epic: one-entry skins. #5023 retires the remaining `tone` props and band surface utilities; `Hero` keeps `tone`.
 - #5028 — epic: text roles. #5033 gives Hero one eyebrow, intro and footnote style.
 - #3527 — the Profile Banner backdrop test stops reaching for the image through `container.querySelector`.

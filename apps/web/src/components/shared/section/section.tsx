@@ -1,23 +1,24 @@
 import type {
+  IWithClassName,
   IWithDataTestId,
   TBrandVariant,
   TLayout,
 } from '@shinefold/config';
+import type { IWithChildren } from '@shinefold/config/react';
 import {
   buildSectionScopeDeclarations,
   type TSectionAppearance,
 } from '@web/utils/build-section-scope-declarations';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties } from 'react';
 
 import { sectionVariants } from './section-variants';
 
-export interface ISectionProps extends IWithDataTestId {
+export interface ISectionProps
+  extends IWithChildren, IWithClassName, IWithDataTestId {
   brandVariant: TBrandVariant;
   layout?: TLayout;
   appearance?: TSectionAppearance;
   titleId?: string;
-  children: ReactNode;
-  className?: string;
 }
 
 export type TModuleSection = Pick<

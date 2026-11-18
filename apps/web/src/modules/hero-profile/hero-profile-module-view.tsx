@@ -4,6 +4,7 @@ import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import { Hero } from '@shinefold/ui/components/organisms/hero';
 import { hasLength } from '@shinefold/utils/primitives';
 import { HeroModuleShell } from '@web/components/shared/hero-module-shell';
+import { heroMediaImageVariants } from '@web/components/shared/hero-module-shell/hero-module-shell-variants';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SocialLinks } from '@web/components/shared/social-links';
@@ -11,6 +12,7 @@ import { SocialLinks } from '@web/components/shared/social-links';
 import {
   heroProfileAvatarFallbackVariants,
   heroProfileAvatarVariants,
+  heroProfileNameAvatarVariants,
   heroProfileNameVariants,
   heroProfilePortraitVariants,
 } from './hero-profile-module-view-variants';
@@ -78,13 +80,13 @@ export const HeroProfileModuleView = ({
             width={900}
             height={900}
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className="size-full object-cover"
+            className={heroMediaImageVariants()}
           />
         </Hero.Media>
       )}
 
       {variant === HERO_VARIANT.SPLIT && !sanityImage && (
-        <Hero.Avatar className="mb-0">
+        <Hero.Avatar className={heroProfileNameAvatarVariants()}>
           <span className={heroProfileNameVariants()}>{avatarName}</span>
         </Hero.Avatar>
       )}
@@ -97,7 +99,7 @@ export const HeroProfileModuleView = ({
             height={675}
             sizes="(min-width: 1024px) 50vw, 100vw"
             priority={true}
-            className="size-full object-cover"
+            className={heroMediaImageVariants()}
             alt=""
           />
         </Hero.Media>

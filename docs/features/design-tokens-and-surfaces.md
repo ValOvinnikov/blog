@@ -65,7 +65,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 
 ## Constraints and invariants
 
-- **Surfaces set, components read.** `--ambient` (default `var(--primary)`, read by `ring-offset-ambient`), `--divider` (default `var(--border)`, read by `border-divider`) and `--field-boundary` (default `neutral-900` in light, `neutral-1100` in dark, read by `border-field-boundary`/`bg-field-boundary`) are inherited. Four utilities retarget them:
+- **Surfaces set, components read.** `--ambient` (default `var(--primary)`, read by `ring-offset-ambient`), `--divider` (default `var(--border)`, read by `border-divider`) and `--field-boundary` (default `neutral-900` in light, `neutral-1100` in dark, read by `border-field-boundary`/`bg-field-boundary`) are inherited. A skin scope sets them on every band; four utilities also retarget them, and no band applies the first two any more:
   - `surface-secondary`: ambient → `secondary`, divider → `border-strong`, field boundary → `field-boundary-tinted`, item fill → `brand-primary-muted`.
   - `surface-brand-primary`: ambient → `brand-primary-muted`, divider → `border-strong`, field boundary → `field-boundary-tinted`, item fill → `brand-primary-wash`, tint → a 10% mix toward `brand-primary`.
   - `surface-card`: ambient → `surface`, divider → `border`.

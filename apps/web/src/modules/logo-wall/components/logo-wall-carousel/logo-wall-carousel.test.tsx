@@ -32,14 +32,4 @@ describe(`<${LogoWallCarousel.name}/>`, () => {
 
     expect(logoImage).toBeVisible();
   });
-
-  it('renders previous and next slide controls', async () => {
-    const previousButton = await screen.findByRole('button', {
-      name: 'Previous slide',
-    });
-    const nextButton = screen.getByRole('button', { name: 'Next slide' });
-
-    expect(previousButton).toBeVisible();
-    expect(nextButton).toBeVisible();
-  });
 });

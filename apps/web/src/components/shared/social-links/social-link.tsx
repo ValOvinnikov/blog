@@ -10,6 +10,8 @@ import type { TTextLinkVariants } from '@shinefold/ui/components/atoms/text-link
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 
+import { socialLinkVariants } from './social-links-variants';
+
 export type TSocialLinkProps = TSocialProfile & {
   variant?: TTextLinkVariants['variant'];
 };
@@ -26,6 +28,7 @@ export const SocialLink = ({ platform, link, variant }: TSocialLinkProps) => {
       href={link.href}
       target={link.target}
       variant={variant}
+      className={socialLinkVariants()}
       ariaLabel={label}
       title={label}
     >

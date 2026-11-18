@@ -76,6 +76,6 @@ A grid or carousel of feature cards that summarises a set of capabilities or off
 
 - #3252 — a visual icon picker for `block_feature.icon`.
 - #4858 — card hover and the feature icon tile stay visible on a Brand tint band.
-- #5016 — one-entry skins: #5019 (Background field lists the skin registry), #5022 (`Section` renders its skin; `tone` threading leaves the feature-list carousel and view).
+- #5016 — one-entry skins: #5019 (Background field lists the skin registry).
 - #5028 — text roles: #5032 (card titles step up from one container), #5034 (card body text takes the card roles).
 - #4987 — accessible text and colour: #5007 (a card's focus ring outlines the whole card).

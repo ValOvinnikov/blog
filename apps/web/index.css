@@ -2,16 +2,20 @@
 
 @source '../../packages/ui/src/**/*.{ts,tsx}';
 
-/* Every scope that sets color-scheme re-declares these, since var() and the compiled light-dark() both resolve where declared; an inverse skin takes the other set. */
+/* Declared on every scope that sets color-scheme, so the light-dark() pairs follow the band and an inverse skin takes the other set. */
 :root,
 .dark,
 [data-skin] {
-  --code-fg: var(--text);
-  --code-comment: var(--text-muted);
   --code-keyword: light-dark(oklch(0.5 0.19 310), oklch(0.78 0.14 310));
   --code-property: light-dark(oklch(0.5 0.19 15), oklch(0.75 0.13 15));
   --code-string: light-dark(oklch(0.45 0.14 145), oklch(0.75 0.12 145));
   --code-variable: light-dark(oklch(0.5 0.17 250), oklch(0.75 0.13 250));
   --code-constant: light-dark(oklch(0.48 0.14 55), oklch(0.78 0.11 55));
   --code-url: light-dark(oklch(0.48 0.11 200), oklch(0.75 0.09 200));
+}
+
+:root,
+.dark {
+  --code-fg: var(--text);
+  --code-comment: var(--text-muted);
 }
