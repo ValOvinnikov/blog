@@ -83,6 +83,11 @@ module types whose capability is off for the tenant carry a warning.
   STALLED once the worker reports a stall, INVITE_SENT otherwise. With no
   recognisable owner-elevation outcome, STALLED falls back to the invite's
   age against `OWNER_ACCESS_STALL_AFTER_MS`, the worker's own threshold.
+- Neon `memberships` Studio access columns (`sanityInviteSentAt`,
+  `sanityInviteAcceptedAt`, `sanityUserId`) give an EDITOR's access state
+  the same way, by the shared `studioAccessOf`. The worker grants an editor
+  `administrator`, as it does the owner, and revokes it when they are
+  removed ([tenant provisioning](./tenant-provisioning.md)).
 - Neon `settings_features`: the saved capability toggles, clamped to the plan's
   entitlement (`getEnabledCapabilities`), become `enabledCapabilities`.
 - Content lives in the tenant's own Sanity project and dataset; the Studio
@@ -315,3 +320,4 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   READY.
 - #4035 localize the Studio interface for editors.
 - #1036 draft preview with Sanity Presentation.
+- #7168 a team member gets Studio access through the owner's flow.

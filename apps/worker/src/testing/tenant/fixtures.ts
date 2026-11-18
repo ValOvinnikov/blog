@@ -21,6 +21,10 @@ export const MOCK_TENANT_MANAGEMENT_TOKEN = 'sk-tenant-management';
 export const MOCK_TENANT_MANAGEMENT_ROBOT_ID = 'robot-tenant-management';
 export const MOCK_ENCRYPTED_TOKEN = 'encrypted-read-token';
 export const MOCK_ENCRYPTED_WEBHOOK_SECRET = mockFaker.string.alphanumeric(32);
+export const MOCK_TENANT_PROJECT_CALL = {
+  token: MOCK_TENANT_MANAGEMENT_TOKEN,
+  projectId: MOCK_SANITY_PROJECT_ID,
+};
 export const MOCK_SANITY_CREDENTIALS = {} as TTenantSanityCredentials;
 
 export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
