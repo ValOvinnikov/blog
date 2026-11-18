@@ -19,6 +19,7 @@ import {
   setTenantPrimaryDomain,
 } from '@shinefold/db/queries/tenants';
 import type { TTenant } from '@shinefold/db/schema/tenants';
+import { MOCK_MARKETING_TENANT_DOMAIN } from '@shinefold/db/testing/tenant-domains/fixtures';
 import {
   daysAfter,
   daysBefore,
@@ -394,12 +395,29 @@ describe(runDowngradeGraceSweep, () => {
     });
   });
 
-  it('never touches the platform tenant', async () => {
+  it.each([
+    ['the platform root domain', MOCK_TENANT_ROOT_DOMAIN],
+    ['the marketing site host', MOCK_MARKETING_TENANT_DOMAIN],
+  ])('never touches the platform tenant on %s', async (_, host) => {
     vi.mocked(listTenantsDueForGraceEnd).mockResolvedValue([inGraceFor(14)]);
-    vi.mocked(listTenantHosts).mockResolvedValue([MOCK_TENANT_ROOT_DOMAIN]);
+    vi.mocked(listTenantHosts).mockResolvedValue([host]);
 
     await expect(sweep()).resolves.toEqual(MOCK_NOTHING_DONE);
     expect(lockMembershipsOverSeats).not.toHaveBeenCalled();
+  });
+
+  it('runs the marketing site host like any other without a marketing site', async () => {
+    vi.mocked(listTenantsDueForGraceEnd).mockResolvedValue([inGraceFor(14)]);
+    vi.mocked(listTenantHosts).mockResolvedValue([
+      MOCK_MARKETING_TENANT_DOMAIN,
+    ]);
+
+    await runDowngradeGraceSweep({
+      now: MOCK_NOW,
+      env: { ...MOCK_SWEEP_ENV, marketingHost: undefined },
+    });
+
+    expect(lockMembershipsOverSeats).toHaveBeenCalled();
   });
 
   it('logs a tenant whose step fails and carries on with the next', async () => {

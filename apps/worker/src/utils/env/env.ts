@@ -42,6 +42,8 @@ export const env = createEnv({
       .regex(DOMAIN_PATTERN)
       .optional(),
     // @env-optional
+    MARKETING_SITE_URL: z.string().url().optional(),
+    // @env-optional
     WORKER_ENQUEUE_SECRET: z.string().min(1).optional(),
     // Only the post routes web enqueues accept it, so apps/web never holds WORKER_ENQUEUE_SECRET.
     // @env-optional
@@ -88,6 +90,7 @@ export const env = createEnv({
     SANITY_REVALIDATE_SECRET: process.env.SANITY_REVALIDATE_SECRET,
     SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
     TENANT_ROOT_DOMAIN: process.env.TENANT_ROOT_DOMAIN,
+    MARKETING_SITE_URL: process.env.MARKETING_SITE_URL,
     WORKER_ENQUEUE_SECRET: process.env.WORKER_ENQUEUE_SECRET,
     WORKER_NEWSLETTER_ENQUEUE_SECRET:
       process.env.WORKER_NEWSLETTER_ENQUEUE_SECRET,

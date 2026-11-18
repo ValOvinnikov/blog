@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import { env } from '@worker/utils/env/env';
 import { requireValues } from '@worker/utils/require-values/require-values';
 
@@ -6,6 +7,7 @@ export type TInactivitySweepEnv = {
   webAppBaseUrl: string;
   siteConfigRevalidateSecret: string;
   tenantRootDomain: string;
+  marketingHost: TMaybeUndefined<string>;
 };
 
 export function getInactivitySweepEnv(): TInactivitySweepEnv {
@@ -14,6 +16,7 @@ export function getInactivitySweepEnv(): TInactivitySweepEnv {
     WEB_APP_URL,
     SITE_CONFIG_REVALIDATE_SECRET,
     TENANT_ROOT_DOMAIN,
+    MARKETING_SITE_URL,
   } = env;
   const required = requireValues({
     PLATFORM_APP_BASE_URL,
@@ -27,5 +30,6 @@ export function getInactivitySweepEnv(): TInactivitySweepEnv {
     webAppBaseUrl: required.WEB_APP_URL,
     siteConfigRevalidateSecret: required.SITE_CONFIG_REVALIDATE_SECRET,
     tenantRootDomain: required.TENANT_ROOT_DOMAIN,
+    marketingHost: MARKETING_SITE_URL && new URL(MARKETING_SITE_URL).hostname,
   };
 }
