@@ -3060,12 +3060,33 @@ resolving it to a literal at build time, so an ancestor that redefines the
 property changes what every descendant resolves to. A non-inline `@theme`
 would bake in the `:root` value and an override would do nothing.
 
-**Surfaces set them; components read them.** Every band renders a skin
-(below), which sets both. Two `@utility` classes, `surface-secondary` and
-`surface-brand-primary`, still retarget both at once, but no band applies them
-any more.
+**Surfaces set them; components read them.** Colour is two tiers, and a band
+background is one entry in the second:
 
-Two more utilities cover the item-level fills inside a band:
+- **Palette.** `@shinefold/config`'s `palette-ramps.ts` holds every colour as
+  an opaque stop, `--palette-<family>-<step>`, in four families (achromatic,
+  neutral, brand, status). Roles point at stops, never at literals.
+  `buildThemeStyleBlock` re-declares the brand stops at the tenant's accent
+  hue, so every role on a brand stop follows it in both modes.
+- **Skins.** `SKIN_REGISTRY` (`satisfies Record<TBrandVariant, TSkin>`) holds
+  one entry per band background, in Studio's order: Plain (`PRIMARY`), Shaded
+  (`SECONDARY`) and Brand tint (`BRAND_PRIMARY`). Each entry is a
+  `defineSkin(title, { ground, mode, pin })` call — a palette ground per page
+  mode, a `SKIN_MODE` (`MATCH` follows the page, `INVERSE` is dark in both)
+  and any pinned roles. `defineSkin` derives every other role — ground and
+  context, ink, borders, fills, the brand ramp, status colours and scrims — by
+  moving it to the nearest stop in its family that clears its
+  `SKIN_CONTRAST_PAIRS` at **every accent hue**, and throws if any pair, pins
+  included, still fails. That is the per-hue contrast guarantee: a skin that
+  fails at any hue never ships. `formatSkinCss()` renders each entry as a
+  `[data-skin='X']` and a `.dark [data-skin='X']` scope into the generated
+  `configs/tailwind/skins.css` (`gen:skins`; a test fails on drift).
+
+Adding a band background means adding one registry entry; no component,
+utility or prop changes. No `surface-*` utility paints or retargets a band.
+
+Two utilities cover the item-level fills inside a band, reading the skin's own
+`--surface` and `--surface-2`:
 
 - `surface-card` retargets `--ambient` to `--surface` (divider stays
   `--border`). Every `bg-surface` card root applies it — `Panel`,
@@ -3087,13 +3108,14 @@ Brand tint band takes the band's own colour; Plain and Shaded bands keep
 and the band item fills, so a band around the skin never leaks in: on a
 neutral ground the hover tint reads the skin's `--brand-primary-muted` and the
 icon tile falls back to `--surface-2`, while a skin on a brand ground (Brand
-tint) publishes the same 10% `--tint`, `--media-fill` and item fills
-`surface-brand-primary` sets. `surface-tint` points `--ambient` at that tint,
+tint) publishes the 10% `--tint`, `--media-fill` and its item fills.
+`surface-tint` points `--ambient` at that tint,
 with the tinted bands' divider and field boundary, for a card whose own focus
 fill it is (`TaxonomyCard`).
 
-`apps/web`'s `Section` renders `data-skin={brandVariant}`, and `CtaModule`,
-`Hero`'s Banner and `Footer` render `data-skin={tone}`; each paints
+**Which components set `data-skin`.** `apps/web`'s `Section` renders
+`data-skin={brandVariant}`, and `CtaModule`, `Hero`'s Banner and `Footer`
+render `data-skin={tone}`; each paints
 `bg-ambient`, so everything inside them reads that skin's roles. A Banner over
 a photo re-points the skin's text, border and link roles at the on-image
 colours (`skin-on-image`), and every Banner paints the skin's
@@ -3112,17 +3134,12 @@ surface's frame, not its depth, is what bounds it.
 **No props and no context.** Everything stays server-renderable, dark mode
 follows automatically because the defaults are references rather than literals
 and `.dark` already overrides `--primary`/`--border`, and a background added
-later works by setting the two properties. This is deliberate: the rejected
-alternative was a `tone` prop on every component and every consumer.
+later works by adding a skin. This is deliberate: the rejected alternative
+was a `tone` prop on every component and every consumer, and no component
+inside a band takes one.
 
-`tone` props were not removed, but what survives of them varies. `IconButton`'s
-still drives its `control` variant's border, background and text. `QuoteCardName`'s
-is now fully inert — the ring offset was the only thing it ever drove — and is
-kept solely because it is required by `QuoteCard` and `TestimonialCard` and
-threaded from `apps/web`, so dropping it is an API break rather than a cleanup.
-
-**Secondary and Brand-primary dividers resolve to `--border-strong`, one step
-heavier than Primary's own `--border` hairline — enough to read on a darker
+**Shaded and Brand tint dividers resolve to `--border-strong`, one step
+heavier than Plain's own `--border` hairline — enough to read on a darker
 ground, deliberately not enough for WCAG 1.4.11's 3:1.** That threshold
 governs graphics required to identify a control, and these dividers are
 decorative — an accordion row is already a real `<button>` with its own focus
@@ -3194,12 +3211,12 @@ which rests on a tint and so hovers to the band's `--item-nested-fill`
 non-card such as `LogoTile` keeps the tint), and draws a 1px `--border-strong`
 outline on hover and focus-within (`--item-card-hover-edge`), so the card keeps
 an edge against every band. Under `PLAIN` an item card's `surface-card` keeps
-the band's `--backdrop` as its `--ambient` (every band utility publishes
+the band's `--backdrop` as its `--ambient` (every skin publishes
 `--backdrop` beside `--ambient`), so ring offsets and covering fills inside a
 frameless card match the section behind it; the other styles and
 `surface-card` panels keep `--surface`.
-The `CtaModule` box takes no `surface-card`: its band variant's `bg-*` (and
-`surface-*` retarget) overrides the utility's `--surface` fill, so a card style
+The `CtaModule` box takes no `surface-card`: its skin's `bg-ambient`
+overrides the utility's `--surface` fill, so a card style
 frames the band surface and never paints it.
 
 **Button shape** is one inherited property, `--radius-button`, read by the

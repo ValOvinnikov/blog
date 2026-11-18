@@ -1,4 +1,3 @@
-import { BRAND_VARIANT } from '@shinefold/config';
 import { LINK_UNDERLINE, tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -16,11 +15,6 @@ export const quoteCardNameVariants = tv({
     isSpotlight: {
       true: [],
       false: [],
-    },
-    tone: {
-      [BRAND_VARIANT.PRIMARY]: [],
-      [BRAND_VARIANT.SECONDARY]: [],
-      [BRAND_VARIANT.BRAND_PRIMARY]: [],
     },
   },
   defaultVariants: {

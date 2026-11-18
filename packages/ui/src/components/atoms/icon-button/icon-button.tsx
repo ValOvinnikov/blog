@@ -1,8 +1,4 @@
-import type {
-  IWithClassName,
-  IWithDataTestId,
-  TBrandVariant,
-} from '@shinefold/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import type { AriaAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 
 import {
@@ -20,20 +16,18 @@ export type TIconButtonProps = IWithClassName &
     isDisabled?: boolean;
     isFocusableWhenDisabled?: boolean;
     isInert?: boolean;
-    tone?: TBrandVariant;
     'aria-expanded'?: AriaAttributes['aria-expanded'];
     'aria-controls'?: AriaAttributes['aria-controls'];
     'aria-haspopup'?: AriaAttributes['aria-haspopup'];
     ref?: Ref<HTMLButtonElement>;
   };
 
-/** A compact button for icon, labelled, or avatar-triggered actions: a 22×22 icon-only default, a `bordered` variant sized to its text label, a 32×32 circular `avatar` variant, a 36×36 outlined `control` variant for a standalone control (e.g. carousel navigation), and a 44×44 round outlined `circle` variant sized to the minimum touch target. */
+/** A compact button for an icon, short label or avatar action. */
 export const IconButton = ({
   ariaLabel,
   title,
   className,
   variant,
-  tone,
   children,
   dataTestId,
   ref,
@@ -61,7 +55,7 @@ export const IconButton = ({
       aria-controls={ariaControls}
       aria-haspopup={ariaHaspopup}
       data-testid={dataTestId}
-      className={iconButtonVariants({ variant, tone, class: className })}
+      className={iconButtonVariants({ variant, class: className })}
     >
       {children}
     </button>
