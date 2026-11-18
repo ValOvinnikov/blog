@@ -2,10 +2,13 @@ import {
   clampRgb,
   converter,
   formatHex,
+  interpolate,
   type Rgb,
   toGamut,
   wcagContrast,
 } from 'culori';
+
+import { isUndefined } from '@shinefold/utils/primitives';
 
 export function oklchToHex(l: number, c: number, h: number): string {
   return formatHex({ mode: 'oklch', l, c, h });
@@ -24,13 +27,17 @@ export function mixOklch(
   toward: TOklchColor,
   share: number,
 ): TOklchColor {
-  const hueGap = ((toward.h - base.h + 540) % 360) - 180;
+  const { l, c, h, alpha } = interpolate(
+    [
+      { mode: 'oklch', ...base },
+      { mode: 'oklch', ...toward },
+    ],
+    'oklch',
+  )(share);
 
-  return {
-    l: base.l + (toward.l - base.l) * share,
-    c: base.c + (toward.c - base.c) * share,
-    h: (base.h + hueGap * share + 360) % 360,
-  };
+  const hue = ((h ?? 0) % 360) + 360;
+
+  return { l, c, h: hue % 360, ...(isUndefined(alpha) ? {} : { alpha }) };
 }
 
 /** WCAG 2 AA contrast-ratio floor for normal text. */

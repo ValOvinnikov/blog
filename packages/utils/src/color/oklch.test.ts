@@ -51,11 +51,11 @@ describe(mixOklch, () => {
   it('takes the shorter arc between hues across 0', () => {
     const mixed = mixOklch(
       { l: 0.5, c: 0.1, h: 350 },
-      { l: 0.5, c: 0.1, h: 10 },
+      { l: 0.5, c: 0.1, h: 30 },
       0.5,
     );
 
-    expect(mixed.h).toBeCloseTo(0);
+    expect(mixed.h).toBeCloseTo(10);
   });
 });
 

@@ -69,7 +69,6 @@ export const SCRIM_STOPS_UNDER_COPY = [
 
 export const CODE_HIGHLIGHT = '--code-highlight' satisfies TThemeToken;
 
-// apps/web/index.css declares --code-highlight as this same color-mix(in oklch, …), share as a percentage.
 export const MIXED_SURFACES: Partial<
   Record<TThemeToken, { base: TThemeToken; toward: TThemeToken; share: number }>
 > = {
