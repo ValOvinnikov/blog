@@ -6,7 +6,7 @@ import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-t
 import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
 import { CAPABILITY } from '@shinefold/config';
 import { queries } from '@shinefold/db';
-import { toEffectiveLook } from '@shinefold/db/utils/effective-look/effective-look';
+import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 
 export type TLookPageContentProps = {
   tenant: TPlatformTenant;
@@ -21,7 +21,10 @@ export const LookPageContent = async ({
     queries.siteConfig.getSiteConfig(tenant.id),
     getEnabledCapabilities(tenant),
   ]);
-  const liveLocales = queries.tenants.selectLiveLocales(tenant);
+  const liveLocales = queries.tenants.selectLiveLocalesWithin(
+    tenant,
+    tenant.entitlements,
+  );
 
   return (
     <PoweredByMarkProvider
@@ -32,12 +35,12 @@ export const LookPageContent = async ({
           id: tenant.id,
           name: tenant.name,
           siteHost: tenant.primaryDomain,
-          plan: tenant.plan,
+          lookFields: tenant.entitlements.lookFields,
           archivedAt: tenant.archivedAt,
         }}
-        initialValues={toEffectiveLook(
+        initialValues={toEffectiveLookWithin(
           lookFormValuesOrDefaults(siteConfig),
-          tenant.plan,
+          tenant.entitlements,
         )}
         isOperator={viewer.isOperator}
         liveLocales={liveLocales}

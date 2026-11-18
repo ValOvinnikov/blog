@@ -5,7 +5,6 @@ import { TenantSwitcher } from '@platform/components/features/layout/tenant-swit
 import { OwnerSuspensionBanner } from '@platform/components/features/tenants/owner-suspension-banner';
 import { UPGRADE_STATE } from '@platform/constants/billing';
 import { ShellStudioAccessProvider } from '@platform/context/shell-studio-access-provider';
-import { TenantPlanProvider } from '@platform/context/tenant-plan-provider';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
 import { resolveTenantPageAccess } from '@platform/server/auth/resolve-tenant-page-access';
@@ -85,7 +84,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
       }}
     >
       <ShellStudioAccessProvider studioAccess={studioAccess}>
-        <TenantPlanProvider plan={tenant.plan}>{children}</TenantPlanProvider>
+        {children}
       </ShellStudioAccessProvider>
     </PlatformShell>
   );

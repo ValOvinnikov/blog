@@ -13,6 +13,7 @@ import type { TTenant } from '@shinefold/db/schema/tenants';
 import { mockReadyTenant, mockTenant } from './mock-tenant';
 import { MOCK_TENANT_DOMAIN, MOCK_TENANT_NAME } from './tenant-identity';
 
+export * from './entitlement-grants';
 export * from './mock-tenant';
 export * from './provisioning-steps';
 export * from './tenant-identity';

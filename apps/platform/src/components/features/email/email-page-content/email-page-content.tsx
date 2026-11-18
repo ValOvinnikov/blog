@@ -21,7 +21,10 @@ export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
       requireTenantMembership(id),
     ]);
 
-  const liveLocales = queries.tenants.selectLiveLocales(tenant);
+  const liveLocales = queries.tenants.selectLiveLocalesWithin(
+    tenant,
+    tenant.entitlements,
+  );
 
   const initialDraft = buildEmailDraft({
     sender: {

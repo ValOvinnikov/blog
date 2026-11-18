@@ -1,6 +1,5 @@
 'use client';
 
-import { useTenantPlan } from '@platform/context/tenant-plan-provider';
 import {
   isNotInPlanRefusal,
   type TNotInPlanRefusal,
@@ -22,7 +21,6 @@ export const usePlanRefusal = <TValues>(
   const t = useTranslations('saveBar');
   const format = useFormatter();
   const router = useRouter();
-  const renderedPlan = useTenantPlan();
   const [refusal, setRefusal] = useState<TMaybeUndefined<TNotInPlanRefusal>>();
 
   const submit = async <TResult extends TOutcome<TActionOutcome>>(
@@ -37,7 +35,7 @@ export const usePlanRefusal = <TValues>(
         restoreRefusedItems(current, savedValues, result.items),
       );
       setRefusal(result);
-      if (result.values.plan !== renderedPlan) router.refresh();
+      router.refresh();
     }
     return result;
   };

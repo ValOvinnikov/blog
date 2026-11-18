@@ -10,6 +10,7 @@ import {
   mockJoinedOwner,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 
 import DashboardOverviewPage from './page';
 
@@ -30,6 +31,7 @@ vi.mock('@platform/server/auth/auth');
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     memberships: {
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
       getTenantOwnerMembership: getTenantOwnerMembershipMock,

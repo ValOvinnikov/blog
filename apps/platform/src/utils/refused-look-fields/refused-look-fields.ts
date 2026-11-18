@@ -1,24 +1,27 @@
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
-import type { TTenantPlan } from '@shinefold/config/constants';
 import {
-  isLookFieldEntitled,
-  toEffectiveLook,
+  isLookFieldWithin,
+  toEffectiveLookWithin,
 } from '@shinefold/db/utils/effective-look/effective-look';
+import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 
 export type TLookChoices = Omit<TLookFormValues, 'logo' | 'favicon'>;
 
-/** A locked field is a change only when it differs from both the stored value and the preset value the plan shows instead. */
+/** A locked field is a change only when it differs from both the stored value and the preset value shown in its place. */
 export const listRefusedLookFields = (
   submitted: TLookChoices,
   stored: TLookFormValues,
-  plan: TTenantPlan,
+  entitlements: Pick<TTenantEntitlements, 'lookFields'>,
 ): (keyof TLookChoices)[] => {
-  const shown = toEffectiveLook({ ...stored, preset: submitted.preset }, plan);
+  const shown = toEffectiveLookWithin(
+    { ...stored, preset: submitted.preset },
+    entitlements,
+  );
   const fields = Object.keys(submitted) as (keyof TLookChoices)[];
 
   return fields.filter(
     (field) =>
-      !isLookFieldEntitled(field, plan) &&
+      !isLookFieldWithin(field, entitlements) &&
       submitted[field] !== stored[field] &&
       submitted[field] !== shown[field],
   );

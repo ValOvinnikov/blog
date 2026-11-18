@@ -1,8 +1,8 @@
 import 'server-only';
 
 import {
-  type TPlatformTenant,
-  toPlatformTenant,
+  type TPlatformTenantSummary,
+  toPlatformTenantSummary,
 } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TMaybeUndefined } from '@shinefold/config/types';
@@ -21,7 +21,7 @@ export type TSessionTenants = {
   userId: string;
   admin: TMaybeUndefined<TAdmin>;
   memberships: TMembership[];
-  tenants: TPlatformTenant[];
+  tenants: TPlatformTenantSummary[];
 };
 
 /** Zero memberships sends the user to `/onboarding`; a SUPERADMIN resolves against every tenant through virtual memberships. */
@@ -43,7 +43,7 @@ export const listSessionTenants = cache(async (): Promise<TSessionTenants> => {
       memberships: tenants.map((tenant) =>
         buildVirtualAdminMembership(userId, tenant.id),
       ),
-      tenants: tenants.map((tenant) => toPlatformTenant(tenant)),
+      tenants: tenants.map((tenant) => toPlatformTenantSummary(tenant)),
     };
   }
 
@@ -56,7 +56,7 @@ export const listSessionTenants = cache(async (): Promise<TSessionTenants> => {
     admin,
     memberships: membershipsWithTenants.map(({ membership }) => membership),
     tenants: membershipsWithTenants.map(({ tenant }) =>
-      toPlatformTenant(tenant),
+      toPlatformTenantSummary(tenant),
     ),
   };
 });

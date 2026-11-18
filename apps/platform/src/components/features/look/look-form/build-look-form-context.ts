@@ -14,9 +14,9 @@ import {
   withPresetValue,
 } from '@platform/utils/look-preset/look-preset';
 import { isAccentHueAccessible, type TPresetId } from '@shinefold/config';
-import type { TTenantPlan } from '@shinefold/config/constants';
 import { LOOK_FIELDS, type TLookField } from '@shinefold/db/constants';
-import { isLookFieldEntitled } from '@shinefold/db/utils/effective-look/effective-look';
+import { isLookFieldWithin } from '@shinefold/db/utils/effective-look/effective-look';
+import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 import type { Dispatch, SetStateAction } from 'react';
 
 type TBuildLookFormContextArgs = Pick<
@@ -36,19 +36,20 @@ type TBuildLookFormContextArgs = Pick<
 > & {
   savedValues: TLookFormValues;
   setValues: Dispatch<SetStateAction<TLookFormValues>>;
-  plan: TTenantPlan;
+  lookFields: TTenantEntitlements['lookFields'];
 };
 
 export const buildLookFormContext = ({
   values,
   savedValues,
   setValues,
-  plan,
+  lookFields,
   ...rest
 }: TBuildLookFormContextArgs): TLookFormContext => {
   const hasFieldChanged = (field: keyof TLookFormValues) =>
     isFieldChanged(field, values, savedValues);
-  const isLocked = (field: TLookField) => !isLookFieldEntitled(field, plan);
+  const isLocked = (field: TLookField) =>
+    !isLookFieldWithin(field, { lookFields });
   const hasLockedFields = LOOK_FIELDS.some(isLocked);
 
   return {

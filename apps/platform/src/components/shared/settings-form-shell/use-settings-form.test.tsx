@@ -213,7 +213,7 @@ describe(useSettingsForm, () => {
       expect(result.current.values).toEqual(MOCK_SAVED_VALUES);
     });
 
-    it('refreshes the page once so it takes the current plan', async () => {
+    it('refreshes the page once so it takes the current entitlements', async () => {
       expect(refresh).toHaveBeenCalledTimes(1);
     });
 

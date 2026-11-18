@@ -12,7 +12,10 @@ export const getPlatformTenant = async (
   tenantId: string,
   options?: TGetTenantByIdOptions,
 ): Promise<TMaybeUndefined<TPlatformTenant>> => {
-  const tenant = await queries.tenants.getTenantById(tenantId, options);
+  const [tenant, grants] = await Promise.all([
+    queries.tenants.getTenantById(tenantId, options),
+    queries.tenantEntitlementGrants.listResolvableEntitlementGrants(tenantId),
+  ]);
 
-  return tenant && toPlatformTenant(tenant);
+  return tenant && toPlatformTenant(tenant, grants);
 };

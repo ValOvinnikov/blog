@@ -11,6 +11,7 @@ import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@shinefold/db/constants';
@@ -28,6 +29,7 @@ vi.mock('@shinefold/db', async () => {
   return {
     ...(await mockDbConstants()),
     queries: {
+      ...noEntitlementGrantQueries(),
       tenants: { getTenantById: vi.fn() },
       memberships: { getMembership: vi.fn() },
       admins: { getAdminByUserId: vi.fn() },

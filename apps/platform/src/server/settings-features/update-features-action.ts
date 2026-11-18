@@ -29,7 +29,7 @@ import {
   AUDIT_TARGET_TYPE,
   type TActionResult,
 } from '@shinefold/config';
-import { PLAN_REGISTRY, queries } from '@shinefold/db';
+import { queries } from '@shinefold/db';
 import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
@@ -68,7 +68,7 @@ export const updateFeaturesAction = async (
   const { tenant } = await requireTenantManager(tenantId);
   const values = withComingSoonOff(parsed.data);
 
-  const entitled = PLAN_REGISTRY[tenant.plan];
+  const entitled = tenant.entitlements.capabilities;
 
   try {
     const { values: stored } = await getSettingsFeaturesOrDefaults(tenant.id);

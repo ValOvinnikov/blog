@@ -13,7 +13,10 @@ export type TVoicePageContentProps = {
 
 export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
   const config = await queries.siteConfig.getSiteConfig(tenant.id);
-  const liveLocales = queries.tenants.selectLiveLocales(tenant);
+  const liveLocales = queries.tenants.selectLiveLocalesWithin(
+    tenant,
+    tenant.entitlements,
+  );
   const {
     accentHue,
     logoHue,

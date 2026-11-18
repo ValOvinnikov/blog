@@ -1,9 +1,9 @@
 import 'server-only';
 
-import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import type { TPlatformTenantSummary } from '@platform/utils/platform-tenant/platform-tenant';
 
 export type TClientTenant = Pick<
-  TPlatformTenant,
+  TPlatformTenantSummary,
   | 'id'
   | 'name'
   | 'primaryDomain'
@@ -23,7 +23,9 @@ export type TClientTenant = Pick<
   hasSanityReadToken: boolean;
 };
 
-export const toClientTenant = (tenant: TPlatformTenant): TClientTenant => {
+export const toClientTenant = (
+  tenant: TPlatformTenantSummary,
+): TClientTenant => {
   const {
     id,
     name,

@@ -6,6 +6,7 @@ import {
   MOCK_OTHER_TENANT_NAME,
   MOCK_SANITY_PROJECT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import {
   MOCK_FREE_STUDIO_ENTITLEMENTS,
   mockStudioReadyTenant,
@@ -36,10 +37,11 @@ vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     admins: { getAdminByUserId: getAdminByUserIdMock },
     tenants: {
       getTenantById: getTenantByIdMock,
-      selectLiveLocales: vi.fn(() => []),
+      selectLiveLocalesWithin: vi.fn(() => []),
     },
   },
 }));

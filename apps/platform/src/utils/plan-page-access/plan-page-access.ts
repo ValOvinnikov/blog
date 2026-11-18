@@ -1,10 +1,5 @@
 import { CAPABILITY } from '@shinefold/config';
-import type { TTenantPlan } from '@shinefold/config/constants';
-import {
-  PLAN_ENTITLEMENTS,
-  PLAN_LOCALE_LIMIT,
-  PLAN_REGISTRY,
-} from '@shinefold/db/constants';
+import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 
 export type TPlanPageAccess = {
   languages: boolean;
@@ -33,17 +28,20 @@ const EMAIL_SENDING_CAPABILITIES = [
   CAPABILITY.CONTACT_FORM,
 ];
 
-export const planPageAccess = (plan: TTenantPlan): TPlanPageAccess => {
-  const capabilities = PLAN_REGISTRY[plan];
-
-  return {
-    languages: PLAN_LOCALE_LIMIT[plan] > 1,
-    email: EMAIL_SENDING_CAPABILITIES.some((capability) =>
-      capabilities.includes(capability),
-    ),
-    leads: capabilities.includes(CAPABILITY.CONTACT_FORM),
-    subscribers: capabilities.includes(CAPABILITY.NEWSLETTER),
-    team: PLAN_ENTITLEMENTS[plan].seats > 1,
-    billing: true,
-  };
-};
+export const entitlementPageAccess = ({
+  capabilities,
+  localeLimit,
+  seats,
+}: Pick<
+  TTenantEntitlements,
+  'capabilities' | 'localeLimit' | 'seats'
+>): TPlanPageAccess => ({
+  languages: localeLimit > 1,
+  email: EMAIL_SENDING_CAPABILITIES.some((capability) =>
+    capabilities.includes(capability),
+  ),
+  leads: capabilities.includes(CAPABILITY.CONTACT_FORM),
+  subscribers: capabilities.includes(CAPABILITY.NEWSLETTER),
+  team: seats > 1,
+  billing: true,
+});

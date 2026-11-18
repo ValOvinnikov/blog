@@ -57,7 +57,10 @@ export const StudioMountView = async ({
     getEnabledCapabilities(tenant),
     resolveIsPlatformTenant(tenant),
   ]);
-  const liveLocales = queries.tenants.selectLiveLocales(tenant);
+  const liveLocales = queries.tenants.selectLiveLocalesWithin(
+    tenant,
+    tenant.entitlements,
+  );
   const { modulePacks } = tenant.entitlements;
 
   return (

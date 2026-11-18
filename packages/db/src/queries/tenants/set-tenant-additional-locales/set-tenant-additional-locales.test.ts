@@ -5,10 +5,15 @@ import {
   TENANT_PLAN,
   type TTenantPlan,
 } from '@shinefold/config/constants';
+import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import { tenants } from '@shinefold/db/schema/tenants';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import {
+  insertTestEntitlementGrant,
+  MOCK_GRANT_PAST,
+} from '@shinefold/db/testing/tenant-entitlement-grants/fixtures';
 import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
@@ -19,6 +24,20 @@ vi.mock('@shinefold/db/client');
 const db = useQueryTestDb();
 
 const { EN, NL, FR, DE, ES } = LOCALE_ISO_CODES;
+
+const MOCK_GRANTED_LOCALE_LIMIT = 3;
+
+function grantLocaleLimit(
+  tenantId: string,
+  overrides: { revokedAt?: Date } = {},
+) {
+  return insertTestEntitlementGrant(db(), tenantId, {
+    kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+    key: ENTITLEMENT_KIND.LOCALE_LIMIT,
+    value: MOCK_GRANTED_LOCALE_LIMIT,
+    ...overrides,
+  });
+}
 
 async function insertTenant(
   plan: TTenantPlan,
@@ -131,6 +150,46 @@ describe(setTenantAdditionalLocales, () => {
       error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
     });
     expect(stored).toEqual([NL, FR]);
+  });
+
+  describe('a FREE tenant with a language grant', () => {
+    let tenantId: string;
+
+    beforeEach(async () => {
+      tenantId = await insertTenant(TENANT_PLAN.FREE);
+    });
+
+    describe('while the grant is open', () => {
+      beforeEach(async () => {
+        await grantLocaleLimit(tenantId);
+      });
+
+      it('saves additional locales up to the granted limit', async () => {
+        const result = await setTenantAdditionalLocales(tenantId, [NL, FR]);
+
+        expect(result).toEqual({ ok: true, data: [NL, FR] });
+      });
+
+      it('rejects locales past the granted limit', async () => {
+        const result = await setTenantAdditionalLocales(tenantId, [NL, FR, DE]);
+
+        expect(result).toEqual({
+          ok: false,
+          error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
+        });
+      });
+    });
+
+    it('ignores a revoked grant', async () => {
+      await grantLocaleLimit(tenantId, { revokedAt: MOCK_GRANT_PAST });
+
+      const result = await setTenantAdditionalLocales(tenantId, [NL]);
+
+      expect(result).toEqual({
+        ok: false,
+        error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
+      });
+    });
   });
 
   it('reports a missing tenant as not found', async () => {

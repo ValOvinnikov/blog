@@ -14,7 +14,7 @@ import {
 import {
   setupArchived,
   setupLookForm,
-  withLookTenant,
+  withLookPlan,
 } from '@platform/testing/look/look-form-setup';
 import { LOCALE_ISO_CODES } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
@@ -47,7 +47,7 @@ describe(`<${LookForm.name}/>`, () => {
   ])('on Free with $languages', ({ liveLocales }) => {
     beforeEach(() => {
       setupLookForm({
-        ...withLookTenant({ plan: TENANT_PLAN.FREE }),
+        ...withLookPlan(TENANT_PLAN.FREE),
         liveLocales,
       });
     });
@@ -95,7 +95,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   it('keeps the Free message and a disabled style, unbadged, on an archived Free site', async () => {
     setupArchived({
-      ...withLookTenant({ plan: TENANT_PLAN.FREE }),
+      ...withLookPlan(TENANT_PLAN.FREE),
       liveLocales: [LOCALE_ISO_CODES.EN],
     });
     await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);

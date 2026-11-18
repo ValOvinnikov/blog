@@ -4,6 +4,7 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockUnsavedSettingsFeaturesAndPreset } from '@platform/testing/settings-features/fixtures';
 import { mockTenant, MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import FeaturesPage from './page';
@@ -23,6 +24,7 @@ vi.mock('@platform/server/auth/auth');
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     admins: { getAdminByUserId: getAdminByUserIdMock },
     tenants: { getTenantById: getTenantByIdMock },
     settingsFeatures: {

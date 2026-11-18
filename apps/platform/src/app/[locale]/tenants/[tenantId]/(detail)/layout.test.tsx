@@ -10,6 +10,7 @@ import {
   MOCK_TENANT_NAME,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 
 import TenantDetailLayout from './layout';
 
@@ -35,6 +36,7 @@ vi.mock('next/headers', () => ({
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     admins: { getAdminByUserId: getAdminByUserIdMock },
     tenants: { getTenantById: getTenantByIdMock },
     leads: { countUnreadLeadsForTenant: countUnreadLeadsForTenantMock },

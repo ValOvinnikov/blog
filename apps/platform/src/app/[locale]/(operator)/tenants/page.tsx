@@ -1,7 +1,7 @@
 import { TenantsView } from '@platform/components/features/tenants/tenants-view';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
-import { toPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import { toPlatformTenantSummary } from '@platform/utils/platform-tenant/platform-tenant';
 import {
   parseTenantsListQuery,
   type TTenantsListSearchParams,
@@ -32,7 +32,7 @@ export default async function TenantsPage({ searchParams }: TProps) {
   return (
     <TenantsView
       tenants={tenants.map((tenant) =>
-        toClientTenant(toPlatformTenant(tenant)),
+        toClientTenant(toPlatformTenantSummary(tenant)),
       )}
       listQuery={listQuery}
       isEmailAlertingConfigured={isEmailAccountConfigured(

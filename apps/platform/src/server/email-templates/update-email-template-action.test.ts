@@ -13,6 +13,7 @@ import {
   mockEmailTemplateResult,
 } from '@platform/testing/email/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { logger } from '@platform/utils/logger/logger';
 import {
   ACTION_OUTCOME,
@@ -31,9 +32,10 @@ import {
 
 vi.mock('@shinefold/db', () => ({
   queries: {
+    ...noEntitlementGrantQueries(),
     emailTemplates: { upsertEmailTemplate: vi.fn() },
     auditEvents: { insertAuditEvent: vi.fn() },
-    tenants: { selectLiveLocales: vi.fn() },
+    tenants: { selectLiveLocalesWithin: vi.fn() },
   },
 }));
 
@@ -56,15 +58,15 @@ const VALID_INPUT: TUpdateEmailTemplateInput = {
 
 const { upsertEmailTemplate } = queries.emailTemplates;
 const { insertAuditEvent } = queries.auditEvents;
-const { selectLiveLocales } = queries.tenants;
+const { selectLiveLocalesWithin } = queries.tenants;
 
 describe(updateEmailTemplateAction, () => {
   beforeEach(() => {
     vi.mocked(requireTenantMembership).mockReset();
     vi.mocked(upsertEmailTemplate).mockReset();
     vi.mocked(insertAuditEvent).mockReset();
-    vi.mocked(selectLiveLocales).mockReset();
-    vi.mocked(selectLiveLocales).mockReturnValue([EN, FR]);
+    vi.mocked(selectLiveLocalesWithin).mockReset();
+    vi.mocked(selectLiveLocalesWithin).mockReturnValue([EN, FR]);
   });
 
   it('writes the copy in the requested language for the routed tenant', async () => {

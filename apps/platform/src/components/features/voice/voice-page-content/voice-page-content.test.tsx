@@ -45,7 +45,7 @@ vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     siteConfig: { getSiteConfig: getSiteConfigMock },
-    tenants: { selectLiveLocales: selectLiveLocalesMock },
+    tenants: { selectLiveLocalesWithin: selectLiveLocalesMock },
   },
 }));
 

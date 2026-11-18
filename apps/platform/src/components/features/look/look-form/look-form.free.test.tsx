@@ -12,10 +12,12 @@ import {
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
 import {
   setupLookForm,
+  withLookPlan,
   withLookTenant,
 } from '@platform/testing/look/look-form-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { TENANT_PLAN } from '@shinefold/config/constants';
+import { LOOK_FIELD, PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -43,7 +45,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   describe('on Free', () => {
     beforeEach(() => {
-      setupLookForm(withLookTenant({ plan: TENANT_PLAN.FREE }));
+      setupLookForm(withLookPlan(TENANT_PLAN.FREE));
     });
 
     it.each([
@@ -80,6 +82,30 @@ describe(`<${LookForm.name}/>`, () => {
       expect(lockLine).toBeVisible();
       expect(headingFont).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(headingFont).toHaveAccessibleDescription(GROWTH_BADGE_TEXT);
+    });
+  });
+
+  describe('on Free with the heading font granted', () => {
+    beforeEach(() => {
+      setupLookForm(
+        withLookTenant({
+          lookFields: [
+            ...PLAN_ENTITLEMENTS[TENANT_PLAN.FREE].lookFields,
+            LOOK_FIELD.HEADING_FONT,
+          ],
+        }),
+      );
+    });
+
+    it('leaves the granted font unlocked', async () => {
+      await openLookRow(user, LOOK_ROW.TYPE);
+
+      const headingFont = screen.getByRole('combobox', {
+        name: LOOK_FORM.headingFontLabel,
+      });
+
+      expect(headingFont).not.toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(headingFont).not.toHaveAccessibleDescription(GROWTH_BADGE_TEXT);
     });
   });
 });
