@@ -3,7 +3,10 @@ import { TENANT_PLAN } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import { errorResult, okResult } from '@shinefold/utils';
 import { routing } from '@web/i18n/routing';
-import { resolveTenantPlanEntitlements } from '@web/server/tenant/tenant-entitlements/tenant-entitlements';
+import {
+  resolveProxyTenantPlanEntitlements,
+  resolveTenantPlanEntitlements,
+} from '@web/server/tenant/tenant-entitlements/tenant-entitlements';
 import { mockTenantEntitlements } from '@web/testing/server/settings-features/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
@@ -11,6 +14,7 @@ import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import {
   getTenantLiveLocales,
   resolveTenantLiveLocales,
+  selectProxyTenantLiveLocales,
   selectTenantLiveLocales,
 } from './tenant-live-locales';
 
@@ -55,6 +59,19 @@ describe(selectTenantLiveLocales, () => {
       MOCK_LOCALE_TENANT,
       mockTenantEntitlements(TENANT_PLAN.FREE),
     );
+  });
+});
+
+describe(selectProxyTenantLiveLocales, () => {
+  it("selects the tenant's languages within the proxy's own read of its grants", async () => {
+    expect(await selectProxyTenantLiveLocales(MOCK_LOCALE_TENANT)).toEqual(
+      MOCK_LIVE_LOCALES,
+    );
+    expect(resolveProxyTenantPlanEntitlements).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      TENANT_PLAN.FREE,
+    );
+    expect(resolveTenantPlanEntitlements).not.toHaveBeenCalled();
   });
 });
 

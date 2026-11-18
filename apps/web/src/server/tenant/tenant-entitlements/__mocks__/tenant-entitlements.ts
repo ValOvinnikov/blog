@@ -8,3 +8,7 @@ export const getCachedTenantEntitlements = vi.fn<
 export const resolveTenantPlanEntitlements = vi.fn<
   typeof TModule.resolveTenantPlanEntitlements
 >(async (_tenantId, plan) => mockTenantEntitlements(plan));
+
+export const resolveProxyTenantPlanEntitlements = vi.fn<
+  typeof TModule.resolveProxyTenantPlanEntitlements
+>(async (_tenantId, plan) => mockTenantEntitlements(plan));

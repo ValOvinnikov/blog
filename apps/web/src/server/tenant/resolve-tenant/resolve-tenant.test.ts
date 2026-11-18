@@ -6,7 +6,7 @@ import {
   TENANT_STATUS,
 } from '@shinefold/db/constants';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import { selectTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
+import { selectProxyTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { mockServableTenant } from '@web/testing/server/tenant/fixtures';
 import {
   MOCK_OTHER_TENANT_ID,
@@ -301,7 +301,9 @@ describe(resolveTenantRouting, () => {
     });
 
     it('resolves the routing for the tenant owning the host', async () => {
-      vi.mocked(selectTenantLiveLocales).mockResolvedValue(MOCK_LIVE_LOCALES);
+      vi.mocked(selectProxyTenantLiveLocales).mockResolvedValue(
+        MOCK_LIVE_LOCALES,
+      );
 
       await expect(resolveTenantRouting(MOCK_TENANT_HOST)).resolves.toEqual({
         tenant: MOCK_TENANT,
@@ -310,7 +312,7 @@ describe(resolveTenantRouting, () => {
         liveLocales: MOCK_LIVE_LOCALES,
         isSecondaryHost: false,
       });
-      expect(selectTenantLiveLocales).toHaveBeenCalledWith(MOCK_TENANT);
+      expect(selectProxyTenantLiveLocales).toHaveBeenCalledWith(MOCK_TENANT);
     });
 
     it('marks a host that is not its main address as secondary', async () => {
@@ -344,7 +346,7 @@ describe(resolveTenantRouting, () => {
       await expect(
         resolveTenantRouting(MOCK_UNKNOWN_HOST),
       ).resolves.toBeUndefined();
-      expect(selectTenantLiveLocales).not.toHaveBeenCalled();
+      expect(selectProxyTenantLiveLocales).not.toHaveBeenCalled();
     });
   });
 });

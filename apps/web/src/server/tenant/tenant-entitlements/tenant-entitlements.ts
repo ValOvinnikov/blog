@@ -10,7 +10,11 @@ import {
   type TResolvableGrant,
   type TTenantEntitlements,
 } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
-import { buildTenantPlanCacheTag } from '@web/utils/tenant-cache-tags';
+import { ONE_HOUR_IN_SECONDS } from '@web/constants/time';
+import {
+  buildSiteConfigCacheTag,
+  buildTenantPlanCacheTag,
+} from '@web/utils/tenant-cache-tags';
 import { toMaybeDate } from '@web/utils/to-maybe-date';
 import { unstable_cache } from 'next/cache';
 
@@ -49,6 +53,13 @@ const getCachedEntitlementRows = (tenantId: string) =>
     revalidate: TENANT_CONFIG_REVALIDATE_SECONDS,
   })(tenantId);
 
+// The proxy's cache is its own, so a lapse is the only refresh guaranteed to reach it.
+const getProxyCachedEntitlementRows = (tenantId: string) =>
+  unstable_cache(loadEntitlementRows, ['proxy-tenant-entitlements', tenantId], {
+    tags: [buildSiteConfigCacheTag(tenantId)],
+    revalidate: ONE_HOUR_IN_SECONDS,
+  })(tenantId);
+
 const reviveGrant = ({
   expiresAt,
   revokedAt,
@@ -79,3 +90,9 @@ export const resolveTenantPlanEntitlements = async (
   plan: TTenantPlan,
 ): Promise<TTenantEntitlements> =>
   resolveRows(plan, (await getCachedEntitlementRows(tenantId))?.grants);
+
+export const resolveProxyTenantPlanEntitlements = async (
+  tenantId: string,
+  plan: TTenantPlan,
+): Promise<TTenantEntitlements> =>
+  resolveRows(plan, (await getProxyCachedEntitlementRows(tenantId))?.grants);

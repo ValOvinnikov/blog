@@ -3,15 +3,33 @@ import { queries } from '@shinefold/db';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { routing } from '@web/i18n/routing';
-import { resolveTenantPlanEntitlements } from '@web/server/tenant/tenant-entitlements/tenant-entitlements';
+import {
+  resolveProxyTenantPlanEntitlements,
+  resolveTenantPlanEntitlements,
+} from '@web/server/tenant/tenant-entitlements/tenant-entitlements';
+
+type TLiveLocaleTenant = Pick<
+  TTenant,
+  'id' | 'locale' | 'additionalLocales' | 'plan'
+>;
 
 export const selectTenantLiveLocales = async (
-  tenant: Pick<TTenant, 'id' | 'locale' | 'additionalLocales' | 'plan'>,
+  tenant: TLiveLocaleTenant,
 ): Promise<TLocaleIsoCode[]> => {
   const { id, plan } = tenant;
   return queries.tenants.selectLiveLocalesWithin(
     tenant,
     await resolveTenantPlanEntitlements(id, plan),
+  );
+};
+
+export const selectProxyTenantLiveLocales = async (
+  tenant: TLiveLocaleTenant,
+): Promise<TLocaleIsoCode[]> => {
+  const { id, plan } = tenant;
+  return queries.tenants.selectLiveLocalesWithin(
+    tenant,
+    await resolveProxyTenantPlanEntitlements(id, plan),
   );
 };
 

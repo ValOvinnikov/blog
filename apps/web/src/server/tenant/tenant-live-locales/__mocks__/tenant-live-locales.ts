@@ -6,6 +6,10 @@ export const selectTenantLiveLocales = vi.fn<
   typeof TModule.selectTenantLiveLocales
 >(async ({ locale, additionalLocales }) => [locale, ...additionalLocales]);
 
+export const selectProxyTenantLiveLocales = vi.fn<
+  typeof TModule.selectProxyTenantLiveLocales
+>(async ({ locale, additionalLocales }) => [locale, ...additionalLocales]);
+
 export const getTenantLiveLocales = vi.fn<typeof TModule.getTenantLiveLocales>(
   async () => [routing.defaultLocale],
 );
