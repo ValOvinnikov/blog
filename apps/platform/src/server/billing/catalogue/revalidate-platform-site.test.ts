@@ -1,6 +1,8 @@
 import { BILLING_LOG } from '@platform/constants/billing';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
+  MOCK_MARKETING_HOST,
+  MOCK_MARKETING_SITE_URL,
   MOCK_TENANT_ID,
   MOCK_TENANT_ROOT_DOMAIN,
 } from '@platform/testing/tenants/fixtures';
@@ -24,7 +26,8 @@ const envMock: Partial<Record<keyof typeof env, string>> = env;
 describe(revalidatePlatformSite, () => {
   beforeEach(() => {
     envMock.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
-    getTenantByDomainMock.mockResolvedValue({ id: MOCK_TENANT_ID });
+    envMock.MARKETING_SITE_URL = undefined;
+    getTenantByDomainMock.mockReset().mockResolvedValue({ id: MOCK_TENANT_ID });
   });
 
   it('revalidates the tenant that holds the root domain', async () => {
@@ -32,6 +35,32 @@ describe(revalidatePlatformSite, () => {
 
     expect(getTenantByDomainMock).toHaveBeenCalledWith(MOCK_TENANT_ROOT_DOMAIN);
     expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+  });
+
+  describe('with a marketing site configured', () => {
+    beforeEach(() => {
+      envMock.MARKETING_SITE_URL = MOCK_MARKETING_SITE_URL;
+    });
+
+    it('revalidates the tenant that holds the marketing site host', async () => {
+      await revalidatePlatformSite();
+
+      expect(getTenantByDomainMock).toHaveBeenCalledExactlyOnceWith(
+        MOCK_MARKETING_HOST,
+      );
+      expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    });
+
+    it('falls back to the root domain when no tenant holds the marketing site host', async () => {
+      getTenantByDomainMock.mockResolvedValueOnce(undefined);
+
+      await revalidatePlatformSite();
+
+      expect(getTenantByDomainMock).toHaveBeenLastCalledWith(
+        MOCK_TENANT_ROOT_DOMAIN,
+      );
+      expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    });
   });
 
   it('logs and skips when no root domain is configured', async () => {
@@ -52,7 +81,7 @@ describe(revalidatePlatformSite, () => {
 
     expect(logger.error).toHaveBeenCalledWith(
       BILLING_LOG.CATALOGUE_PLATFORM_TENANT_MISSING,
-      { rootDomain: MOCK_TENANT_ROOT_DOMAIN },
+      { rootDomain: MOCK_TENANT_ROOT_DOMAIN, marketingHost: undefined },
     );
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
   });
