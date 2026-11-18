@@ -14,5 +14,5 @@ export const isLandingRoutePurged = ({
 }: TLandingRoutePurgeInput): boolean =>
   // An older webhook sends no `isPrefix`, so only an explicit `false` marks an exact redirect.
   type === 'redirect'
-    ? redirect.isPrefix !== false
+    ? redirect.isPrefix !== false || redirect.previousIsPrefix !== false
     : type === 'page_landing' && operation === SANITY_WEBHOOK_OPERATION.DELETE;
