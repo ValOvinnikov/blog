@@ -168,7 +168,9 @@ const MOCK_REDIRECT = {
   source: MOCK_REDIRECT_SOURCE,
   previousSource: MOCK_PREVIOUS_REDIRECT_SOURCE,
   language: LOCALE_ISO_CODES.NL,
+  previousLanguage: LOCALE_ISO_CODES.NL,
   isPrefix: false,
+  previousIsPrefix: false,
 };
 const MOCK_UNKNOWN_TYPE = faker.string.alphanumeric(12);
 const MOCK_REVALIDATE_URL = faker.internet.url();
@@ -470,22 +472,24 @@ describe(POST, () => {
         previousSlug: 1,
       }),
     },
-    ...['source', 'previousSource', 'language'].map((field) => ({
-      case: `a ${field} that is not a string`,
+    ...['source', 'previousSource', 'language', 'previousLanguage'].map(
+      (field) => ({
+        case: `a ${field} that is not a string`,
+        body: JSON.stringify({
+          _type: REDIRECT_DOCUMENT_TYPE,
+          _id: MOCK_DOCUMENT_ID,
+          [field]: 1,
+        }),
+      }),
+    ),
+    ...['isPrefix', 'previousIsPrefix'].map((field) => ({
+      case: `an ${field} that is not a boolean`,
       body: JSON.stringify({
         _type: REDIRECT_DOCUMENT_TYPE,
         _id: MOCK_DOCUMENT_ID,
-        [field]: 1,
+        [field]: String(true),
       }),
     })),
-    {
-      case: 'an isPrefix that is not a boolean',
-      body: JSON.stringify({
-        _type: REDIRECT_DOCUMENT_TYPE,
-        _id: MOCK_DOCUMENT_ID,
-        isPrefix: String(true),
-      }),
-    },
   ])('rejects $case as a bad request', async ({ body }) => {
     const request = new Request(MOCK_REVALIDATE_URL, {
       method: HTTP_METHOD.POST,

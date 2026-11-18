@@ -5,7 +5,9 @@ export interface IRevalidateWebhookRedirect {
   source?: TNullable<string>;
   previousSource?: TNullable<string>;
   language?: TNullable<string>;
+  previousLanguage?: TNullable<string>;
   isPrefix?: TNullable<boolean>;
+  previousIsPrefix?: TNullable<boolean>;
 }
 
 export interface IRevalidateWebhookBody extends IRevalidateWebhookRedirect {
@@ -30,17 +32,20 @@ export const isRevalidateWebhookBody = (
   if (typeof value !== 'object' || isNull(value)) {
     return false;
   }
-  const { _type, _id, slug, previousSlug } = value as Record<string, unknown>;
-  const { source, previousSource, language, isPrefix } = value as Record<
-    string,
-    unknown
-  >;
+  const body = value as Record<string, unknown>;
+  const { _type, _id, slug, previousSlug, source, previousSource } = body;
+  const { language, previousLanguage, isPrefix, previousIsPrefix } = body;
   return (
     isString(_type) &&
     isString(_id) &&
-    [slug, previousSlug, source, previousSource, language].every(
-      isNullableString,
-    ) &&
-    isNullableBoolean(isPrefix)
+    [
+      slug,
+      previousSlug,
+      source,
+      previousSource,
+      language,
+      previousLanguage,
+    ].every(isNullableString) &&
+    [isPrefix, previousIsPrefix].every(isNullableBoolean)
   );
 };

@@ -2464,8 +2464,10 @@ Look, Voice or Features save purge every page the publishing tenant renders —
 the sitemap's page lists plus the index, legal and newsletter pages, the page
 after each listing's last, and the changed document's own path. A `delete`, a
 `redirect` and a `module_postList` change purge that set too; a redirect adds
-its `source` and `previousSource` in its own language. A prefix redirect
-(`isPrefix` not `false`, so a webhook that predates the field counts) and a
+its `source` and `previousSource` in its own language, and on a language change
+`previousSource ?? source` in its `previousLanguage`. A prefix redirect
+(unless both `isPrefix` and `previousIsPrefix` are `false`, so a webhook that
+predates either field counts) and a
 deleted landing page also purge the landing route by pattern, the one purge
 that reaches other tenants: it refreshes their landing pages, never their post,
 blog, topic or tag pages. A `module_postList` page-size change and a deleted

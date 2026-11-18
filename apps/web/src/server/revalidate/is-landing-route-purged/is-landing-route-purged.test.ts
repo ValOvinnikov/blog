@@ -27,6 +27,24 @@ describe(isLandingRoutePurged, () => {
       redirect: {},
     },
     {
+      case: 'a prefix redirect turned exact',
+      type: REDIRECT_TYPE,
+      operation: UPDATE,
+      redirect: { isPrefix: false, previousIsPrefix: true },
+    },
+    {
+      case: 'an exact redirect from a webhook that sends no previousIsPrefix',
+      type: REDIRECT_TYPE,
+      operation: UPDATE,
+      redirect: { isPrefix: false },
+    },
+    {
+      case: 'an exact redirect from a webhook that sends a null previousIsPrefix',
+      type: REDIRECT_TYPE,
+      operation: UPDATE,
+      redirect: { isPrefix: false, previousIsPrefix: null },
+    },
+    {
       case: 'a deleted landing page',
       type: LANDING_TYPE,
       operation: DELETE,
@@ -41,13 +59,13 @@ describe(isLandingRoutePurged, () => {
       case: 'an exact redirect update',
       type: REDIRECT_TYPE,
       operation: UPDATE,
-      redirect: { isPrefix: false },
+      redirect: { isPrefix: false, previousIsPrefix: false },
     },
     {
       case: 'an exact redirect delete',
       type: REDIRECT_TYPE,
       operation: DELETE,
-      redirect: { isPrefix: false },
+      redirect: { isPrefix: false, previousIsPrefix: false },
     },
     {
       case: 'a landing page update',

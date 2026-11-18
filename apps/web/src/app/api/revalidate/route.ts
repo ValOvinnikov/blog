@@ -86,8 +86,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const { _type: type, _id: id, slug, previousSlug } = parsedBody;
-  const { source, previousSource, language, isPrefix } = parsedBody;
+  const { _type: type, _id: id, slug, previousSlug, ...redirect } = parsedBody;
   const tenantId = verified.data;
 
   const tenantRefusal = await resolveWebhookTenant(tenantId, tenantProjectId);
@@ -117,7 +116,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     slug: slug ?? undefined,
     previousSlug: previousSlug ?? undefined,
     operation,
-    redirect: { source, previousSource, language, isPrefix },
+    redirect,
     tenantId,
     tenant: tenantSanity,
   });
