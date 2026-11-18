@@ -3,12 +3,14 @@ import { SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
   HTTP_METHOD,
   HTTP_STATUS,
+  LOCALE_ISO_CODES,
   SANITY_WEBHOOK_OPERATION,
 } from '@shinefold/config/constants';
 import { errorResult, okResult } from '@shinefold/utils';
 import { isUndefined } from '@shinefold/utils/primitives';
 import {
   FETCH_FAILED_REASON,
+  LANDING_ROUTE_PURGE_ARGS,
   REVALIDATE_LOG,
   SIGNATURE_REFUSED_REASON,
   TENANT_LOOKUP_FAILED_MESSAGE,
@@ -142,6 +144,7 @@ vi.mock(
 
 const TOPIC_DOCUMENT_TYPE = 'page_topic';
 const AUTHOR_DOCUMENT_TYPE = 'person';
+const REDIRECT_DOCUMENT_TYPE = 'redirect';
 const UNTAGGED_DOCUMENT_TYPE = 'settings_voice';
 const NAVIGATION_DOCUMENT_TYPE = 'settings_navigation';
 const EXPIRE_NOW = { expire: 0 };
@@ -156,6 +159,17 @@ const MOCK_PREVIOUS_POST_SLUG = faker.lorem.slug();
 const MOCK_TOPIC_ID = faker.string.uuid();
 const MOCK_AUTHOR_ID = faker.string.uuid();
 const MOCK_DOCUMENT_ID = faker.string.uuid();
+const [MOCK_REDIRECT_SOURCE, MOCK_PREVIOUS_REDIRECT_SOURCE] =
+  faker.helpers.uniqueArray(() => `/${faker.lorem.slug()}`, 2) as [
+    string,
+    string,
+  ];
+const MOCK_REDIRECT = {
+  source: MOCK_REDIRECT_SOURCE,
+  previousSource: MOCK_PREVIOUS_REDIRECT_SOURCE,
+  language: LOCALE_ISO_CODES.NL,
+  isPrefix: false,
+};
 const MOCK_UNKNOWN_TYPE = faker.string.alphanumeric(12);
 const MOCK_REVALIDATE_URL = faker.internet.url();
 const MOCK_REVALIDATE_SECRET = faker.string.alphanumeric(32);
@@ -456,6 +470,22 @@ describe(POST, () => {
         previousSlug: 1,
       }),
     },
+    ...['source', 'previousSource', 'language'].map((field) => ({
+      case: `a ${field} that is not a string`,
+      body: JSON.stringify({
+        _type: REDIRECT_DOCUMENT_TYPE,
+        _id: MOCK_DOCUMENT_ID,
+        [field]: 1,
+      }),
+    })),
+    {
+      case: 'an isPrefix that is not a boolean',
+      body: JSON.stringify({
+        _type: REDIRECT_DOCUMENT_TYPE,
+        _id: MOCK_DOCUMENT_ID,
+        isPrefix: String(true),
+      }),
+    },
   ])('rejects $case as a bad request', async ({ body }) => {
     const request = new Request(MOCK_REVALIDATE_URL, {
       method: HTTP_METHOD.POST,
@@ -715,6 +745,7 @@ describe(POST, () => {
         slug: MOCK_POST_SLUG,
         previousSlug: MOCK_PREVIOUS_POST_SLUG,
         operation: null,
+        redirect: {},
         tenantId: MOCK_TENANT_ID,
         tenant: MOCK_TENANT_SANITY_CONTEXT,
       });
@@ -767,11 +798,56 @@ describe(POST, () => {
         id: MOCK_AUTHOR_ID,
         slug: undefined,
         operation: null,
+        redirect: {},
         tenantId: MOCK_TENANT_ID,
         tenant: MOCK_TENANT_SANITY_CONTEXT,
       });
       expect(revalidatePathMock.mock.calls).toEqual([[MOCK_TENANT_HOME_PATH]]);
       expect(logger.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('landing route purge', () => {
+    beforeEach(() => {
+      verifyRevalidateSignatureMock.mockResolvedValue(okResult(MOCK_TENANT_ID));
+      getTenantSanityCredentialsMock.mockResolvedValue(
+        MOCK_TENANT_SANITY_CONTEXT,
+      );
+      deriveRevalidatePathsMock.mockResolvedValue(
+        okResult([MOCK_TENANT_HOME_PATH]),
+      );
+    });
+
+    it('purges only the tenant’s paths for an exact redirect', async () => {
+      await POST(
+        makeTenantRequest({
+          _type: REDIRECT_DOCUMENT_TYPE,
+          _id: MOCK_DOCUMENT_ID,
+          ...MOCK_REDIRECT,
+        }),
+      );
+
+      expect(deriveRevalidatePathsMock).toHaveBeenCalledWith(
+        expect.objectContaining({ redirect: MOCK_REDIRECT }),
+      );
+      expect(revalidatePathMock.mock.calls).toEqual([[MOCK_TENANT_HOME_PATH]]);
+      expect(logger.warn).not.toHaveBeenCalled();
+    });
+
+    it('also purges the landing route for a prefix redirect', async () => {
+      await POST(
+        makeTenantRequest({
+          _type: REDIRECT_DOCUMENT_TYPE,
+          _id: MOCK_DOCUMENT_ID,
+          ...MOCK_REDIRECT,
+          isPrefix: true,
+        }),
+      );
+
+      expect(revalidatePathMock.mock.calls).toEqual([
+        [MOCK_TENANT_HOME_PATH],
+        [...LANDING_ROUTE_PURGE_ARGS],
+      ]);
     });
   });
 

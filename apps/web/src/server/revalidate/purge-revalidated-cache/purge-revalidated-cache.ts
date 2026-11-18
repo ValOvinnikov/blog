@@ -1,10 +1,12 @@
 import { hasLength } from '@shinefold/utils/primitives';
+import { LANDING_ROUTE_PURGE_ARGS } from '@web/constants/revalidate';
+import { isLandingRoutePurged } from '@web/server/revalidate/is-landing-route-purged/is-landing-route-purged';
 import { purgeDerivedPaths } from '@web/server/revalidate/purge-derived-paths/purge-derived-paths';
 import {
   resolveDerivedRevalidatePaths,
   type TResolveDerivedRevalidatePathsInput,
 } from '@web/server/revalidate/resolve-derived-revalidate-paths/resolve-derived-revalidate-paths';
-import { revalidateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export type TPurgeRevalidatedCacheInput =
   TResolveDerivedRevalidatePathsInput & { tags: string[] };
@@ -29,5 +31,8 @@ export const purgeRevalidatedCache = async ({
     id,
     tenantId,
   });
+  if (isLandingRoutePurged(document)) {
+    revalidatePath(...LANDING_ROUTE_PURGE_ARGS);
+  }
   return true;
 };

@@ -105,6 +105,7 @@ describe(POST, () => {
       id: MOCK_POST_ID,
       slug: undefined,
       operation: SANITY_WEBHOOK_OPERATION.UPDATE,
+      redirect: {},
       tenantId: MOCK_TENANT_ID,
       tenant: MOCK_CREDENTIALS,
     });

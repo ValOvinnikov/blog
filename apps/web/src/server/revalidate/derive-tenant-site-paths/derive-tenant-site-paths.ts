@@ -7,16 +7,16 @@ import {
   type TTenantPageListResults,
   type TTenantPageLists,
 } from '@web/server/tenant/tenant-page-lists/tenant-page-lists';
-import type { TRenamedDocument } from '@web/utils/build-renamed-document-hrefs';
-import { buildTenantSitePaths } from '@web/utils/build-tenant-site-paths';
+import {
+  buildTenantSitePaths,
+  type TBuildTenantSitePathsInput,
+} from '@web/utils/build-tenant-site-paths';
 import { logger } from '@web/utils/logger/logger';
 
-export type TDeriveTenantSitePathsInput = {
-  tenantId: string;
-  tenant: TTenantSanityContext;
-  documentHref?: string;
-  renamedDocument?: TRenamedDocument;
-};
+export type TDeriveTenantSitePathsInput = Omit<
+  TBuildTenantSitePathsInput,
+  'locales' | 'lists'
+> & { tenant: TTenantSanityContext };
 
 type TPageListFailure = { list: string; error: unknown };
 
@@ -57,13 +57,12 @@ const toPageLists = (
 };
 
 export const deriveTenantSitePaths = async ({
-  tenantId,
   tenant,
-  documentHref,
-  renamedDocument,
+  ...document
 }: TDeriveTenantSitePathsInput): Promise<
   TResult<string[], typeof FETCH_FAILED_REASON>
 > => {
+  const { tenantId } = document;
   const locales = await resolveTenantLiveLocales(tenantId);
   if (!locales.ok) {
     logger.error(REVALIDATE_LOG.LIVE_LOCALES_LOOKUP_FAILED, {
@@ -84,11 +83,9 @@ export const deriveTenantSitePaths = async ({
   }
   return okResult(
     buildTenantSitePaths({
-      tenantId,
+      ...document,
       locales: locales.data,
       lists: lists.data,
-      documentHref,
-      renamedDocument,
     }),
   );
 };
