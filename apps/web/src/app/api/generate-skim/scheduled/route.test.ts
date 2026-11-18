@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { HTTP_STATUS } from '@shinefold/config/constants';
 import { errorResult, okResult } from '@shinefold/utils';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
+import { RETRY_AFTER_HEADER } from '@web/constants/http';
 import { generatePostSkim } from '@web/server/skim/generate-post-skim/generate-post-skim';
 import { resolveTenantById } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { toTenantSanityWriteContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
@@ -186,10 +187,13 @@ describe(POST, () => {
       getPostPublishedAtMock.mockResolvedValue(okResult(MOCK_MOVED_GO_LIVE_AT));
     });
 
-    it('answers too early, so the worker retries', async () => {
+    it('answers too early with a retry delay, so the worker retries', async () => {
       const response = await goLive(MOCK_EARLY_BODY);
 
       expect(response.status).toBe(HTTP_STATUS.TOO_EARLY);
+      expect(Number(response.headers.get(RETRY_AFTER_HEADER))).toBeGreaterThan(
+        0,
+      );
       expect(generatePostSkim).not.toHaveBeenCalled();
     });
 

@@ -1,10 +1,10 @@
 import { HTTP_STATUS, type TMaybeUndefined } from '@shinefold/config';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import { service, type TTenantSanityContext } from '@shinefold/service';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
 import { readSignedTenantRequest } from '@web/server/signed-request/read-signed-tenant-request/read-signed-tenant-request';
 import { generatePostSkim } from '@web/server/skim/generate-post-skim/generate-post-skim';
 import { hasExistingTakeaways } from '@web/server/skim/has-existing-takeaways/has-existing-takeaways';
+import { refuseUnlessGoingLive } from '@web/server/skim/refuse-unless-going-live/refuse-unless-going-live';
 import { skimResponse } from '@web/server/skim/skim-response/skim-response';
 import { resolveTenantById } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { toTenantSanityWriteContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
@@ -15,6 +15,8 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
 export const runtime = 'nodejs';
+// Below the worker's 90s call timeout, so a retry never overlaps a call still generating; route segment config must be a literal.
+export const maxDuration = 80;
 
 const requestBodySchema = z.object({
   tenantId: z.uuid(),
@@ -23,34 +25,6 @@ const requestBodySchema = z.object({
 });
 
 type TGoLiveRequest = z.infer<typeof requestBodySchema>;
-
-const refuseUnlessGoingLive = async (
-  { tenantId, postId, publishedAt }: TGoLiveRequest,
-  readTenant: TTenantSanityContext,
-): Promise<TMaybeUndefined<NextResponse>> => {
-  const result = await service.entities.posts.v1.getPostPublishedAt(
-    postId,
-    readTenant,
-  );
-  if (!result.ok) {
-    logger.error(GENERATE_SKIM_LOG.PUBLISHED_AT_LOOKUP_FAILED, {
-      tenantId,
-      postId,
-      error: result.error,
-    });
-    return respondEmpty(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-  }
-  const { data: currentPublishedAt } = result;
-  const goLiveMs = Date.parse(publishedAt);
-  if (!currentPublishedAt || Date.parse(currentPublishedAt) !== goLiveMs) {
-    return respondEmpty(HTTP_STATUS.NO_CONTENT);
-  }
-  // A non-2xx makes the worker retry, so a run that wakes just before the date still generates.
-  if (goLiveMs > Date.now()) {
-    return respondEmpty(HTTP_STATUS.TOO_EARLY);
-  }
-  return undefined;
-};
 
 const resolveGoLiveTenant = async ({
   tenantId,

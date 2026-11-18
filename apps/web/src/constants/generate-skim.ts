@@ -1,3 +1,6 @@
+// A run waking just before the go-live date is due within seconds, and every early answer spends a worker retry.
+export const GO_LIVE_RETRY_AFTER_SECONDS = 5;
+
 export const GENERATE_SKIM_LOG = {
   CONFIG_MISSING: 'generate_skim.config_missing',
   HOST_UNRESOLVABLE: 'generate_skim.host_unresolvable',
