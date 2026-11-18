@@ -1811,7 +1811,8 @@
     "keptBadge": "Kept, not live on your plan",
     "planLockedBadge": "Not on your plan",
     "atLimitLockedReason": "Turn one off to switch this on",
-    "overLimitLockedReason": "Upgrade your plan to change this"
+    "overLimitLockedReason": "Upgrade your plan to change this",
+    "allowanceGranted": "{used} of {allowed} additional languages in use."
   },
   "saveBar": {
     "regionLabel": "Unsaved changes",
@@ -2393,5 +2394,135 @@
     "refusalSuspended": "This site is suspended, so its drafts can't be previewed.",
     "refusalArchived": "This site is archived, so its drafts can't be previewed.",
     "refusalUnavailable": "The platform couldn't prepare this preview. The problem has been logged for the platform team."
+  },
+  "grantEntitlement": {
+    "trigger": "Grant to this tenant",
+    "triggerAriaLabel": "Grant to this tenant: {item}",
+    "title": "Grant {item} to {tenant}",
+    "description": "{tenant} gets {item} outside its {plan} plan. Its owner sees it unlocked and can switch it on. Nothing is charged.",
+    "granted": "{item} granted.",
+    "failed": "Couldn't grant {item} — try again."
+  },
+  "grantDialog": {
+    "confirmButton": "Grant",
+    "confirmingButton": "Granting…"
+  },
+  "grantExpiryFields": {
+    "expiresLabel": "Expires",
+    "expiresHint": "The grant ends on its own after this.",
+    "expiry": {
+      "NEVER": "Never — until revoked",
+      "DAYS_30": "30 days",
+      "DAYS_90": "90 days",
+      "YEAR_1": "1 year"
+    },
+    "noteLabel": "Note",
+    "noteHint": "Optional. Why it's granted — shown on the Grants card and in the activity log."
+  },
+  "grantModulePack": {
+    "trigger": "Grant a module pack",
+    "title": "Grant a module pack to {tenant}",
+    "description": "Its editors get the pack's modules in Studio, outside the {plan} plan. Nothing is charged.",
+    "packLabel": "Module pack",
+    "packPlaceholder": "Choose a module pack",
+    "packIncluded": "{pack} (in the plan)"
+  },
+  "grantLanguages": {
+    "trigger": "Grant more languages",
+    "title": "Grant more languages to {tenant}",
+    "description": "The {plan} plan publishes the default language only. Choose how many more {tenant} may publish. Nothing is charged.",
+    "countLabel": "Additional languages",
+    "countHint": "If the plan later allows more, the higher number applies."
+  },
+  "grantItemNames": {
+    "languages": "{count, plural, one {# additional language} other {# additional languages}}",
+    "modulePack": {
+      "CORE": "Core modules",
+      "STARTER": "Starter modules",
+      "GROWTH": "Growth modules"
+    },
+    "lookField": {
+      "preset": "Preset",
+      "accentHue": "Accent hue",
+      "logoHue": "Logo hue",
+      "headingFont": "Heading font",
+      "bodyFont": "Body font",
+      "radiusScale": "Radius scale",
+      "density": "Density",
+      "languageSwitcherStyle": "Language switcher style",
+      "cardStyle": "Card style",
+      "headerControlStyle": "Header buttons",
+      "headerControlShape": "Header buttons shape",
+      "accountButtonStyle": "Account button",
+      "accountPanelStyle": "Account panel",
+      "accountPhonePlacement": "Account position on phones",
+      "busyButtonStyle": "Busy button style",
+      "spinnerStyle": "Spinner style",
+      "buttonShape": "Button shape",
+      "headerLayout": "Header layout",
+      "headerSubmenuStyle": "Header sub-menus",
+      "headerBarStyle": "Header bar",
+      "navLinkStyle": "Navigation links",
+      "headingWeight": "Heading weight",
+      "headingCase": "Heading case",
+      "imageProportion": "Image proportions",
+      "dividerWidth": "Section dividers",
+      "footerLayout": "Footer layout",
+      "footerBackground": "Footer background",
+      "footerSurface": "Footer surface",
+      "cookieSettingsButton": "Cookie settings button",
+      "brandName": "Brand name",
+      "logoAssetUrl": "Logo image",
+      "faviconAssetUrl": "Favicon image"
+    }
+  },
+  "grantedBadge": {
+    "label": "Granted",
+    "labelUntil": "Granted until {date}"
+  },
+  "grantsCard": {
+    "title": "Grants",
+    "supportingText": "What this tenant has outside its plan.",
+    "empty": "No grants — everything this tenant has comes from its plan.",
+    "kind": {
+      "CAPABILITY": "Feature",
+      "LOOK_FIELD": "Look",
+      "MODULE_PACK": "Module pack",
+      "LOCALE_LIMIT": "Languages"
+    },
+    "expired": "Expired",
+    "included": "Included in the plan",
+    "metaUntilRevoked": "{who} · {date} · Until revoked",
+    "metaExpires": "{who} · {date} · Expires {expiry}",
+    "metaExpired": "{who} · {date} · Expired {expiry}"
+  },
+  "revokeGrantControl": {
+    "revoke": {
+      "trigger": "Revoke",
+      "triggerAriaLabel": "Revoke {item}",
+      "title": "Revoke {item} for {tenant}",
+      "description": "{item} locks again from the next page load. What the tenant set up is kept, so granting it again restores it.",
+      "confirmButton": "Revoke",
+      "confirmingButton": "Revoking…",
+      "failed": "Couldn't revoke the grant — try again.",
+      "done": "{item} revoked."
+    },
+    "remove": {
+      "trigger": "Remove",
+      "triggerAriaLabel": "Remove grant {item}",
+      "title": "Remove {item} for {tenant}",
+      "description": "This grant has ended, so {item} is already locked. Removing it clears it from the list, so it can be granted again.",
+      "confirmButton": "Remove",
+      "confirmingButton": "Removing…",
+      "failed": "Couldn't remove the grant — try again.",
+      "done": "{item} removed."
+    }
+  },
+  "entitlementGrantErrors": {
+    "notFound": "This tenant no longer exists.",
+    "archived": "This tenant is archived, so its grants can't change.",
+    "comingSoon": "This feature isn't available yet, so it can't be granted.",
+    "alreadyGranted": "This is already granted.",
+    "grantNotOpen": "This grant was already removed or has ended."
   }
 }

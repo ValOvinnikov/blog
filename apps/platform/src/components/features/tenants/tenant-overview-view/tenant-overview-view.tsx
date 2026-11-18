@@ -1,3 +1,4 @@
+import { GrantsCard } from '@platform/components/features/entitlement-grants/grants-card';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
 import { LiveDomainCard } from '@platform/components/features/tenants/live-domain-card';
@@ -17,9 +18,11 @@ import { loadOperatorSuspension } from '@platform/server/tenants/load-operator-s
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { env } from '@platform/utils/env/env';
+import { toGrantTarget } from '@platform/utils/grant-target/grant-target';
 import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { toGrantRows } from '@platform/utils/to-grant-rows/to-grant-rows';
 import { AUDIT_TARGET_TYPE, FINDING_STATUS } from '@shinefold/config';
 import { queries, TENANT_STATUS } from '@shinefold/db';
 import { isNull, isUndefined } from '@shinefold/utils/primitives';
@@ -49,18 +52,23 @@ export const TenantOverviewView = async ({
   } = tenant;
   const clientTenant = toClientTenant(tenant);
   const domainVerificationStatus = getDomainVerificationStatus(primaryDomain);
-  const [owner, auditEvents, findings, suspension, newsletterPausedAt] =
-    await Promise.all([
-      queries.memberships.getTenantOwnerMembership(id),
-      queries.auditEvents.listAuditEventsForTarget(
-        AUDIT_TARGET_TYPE.TENANT,
-        id,
-        { limit: 5 },
-      ),
-      queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
-      loadOperatorSuspension(tenant),
-      queries.emailConfig.getNewsletterPausedAt(id),
-    ]);
+  const [
+    owner,
+    auditEvents,
+    findings,
+    suspension,
+    newsletterPausedAt,
+    listedGrants,
+  ] = await Promise.all([
+    queries.memberships.getTenantOwnerMembership(id),
+    queries.auditEvents.listAuditEventsForTarget(AUDIT_TARGET_TYPE.TENANT, id, {
+      limit: 5,
+    }),
+    queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
+    loadOperatorSuspension(tenant),
+    queries.emailConfig.getNewsletterPausedAt(id),
+    queries.tenantEntitlementGrants.listEntitlementGrants(id),
+  ]);
   const canChangeSuspension =
     viewer.isSuperAdmin && !isArchived && status !== TENANT_STATUS.ARCHIVED;
   const isSuspensionControlShown =
@@ -87,6 +95,11 @@ export const TenantOverviewView = async ({
           isStudioReinviteUnsent={
             !isNull(unsentReinviteFormerOwnerEmailEncrypted)
           }
+        />
+
+        <GrantsCard
+          grants={toGrantRows(listedGrants, plan, new Date())}
+          target={toGrantTarget(tenant, viewer.isSuperAdmin)}
         />
 
         <FindingsCard tenantId={id} findings={findings} />

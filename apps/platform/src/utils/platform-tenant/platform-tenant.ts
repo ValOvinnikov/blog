@@ -1,4 +1,8 @@
 import {
+  grantedEntitlements,
+  type TGrantedEntitlements,
+} from '@platform/utils/granted-entitlements/granted-entitlements';
+import {
   entitlementPageAccess,
   type TPlanPageAccess,
 } from '@platform/utils/plan-page-access/plan-page-access';
@@ -21,6 +25,7 @@ export type TPlatformTenantSummary = TTenant & {
 
 export type TPlatformTenant = TPlatformTenantSummary & {
   entitlements: TTenantEntitlements;
+  grantedEntitlements: TGrantedEntitlements;
   pageAccess: TPlanPageAccess;
 };
 
@@ -50,6 +55,7 @@ export const toPlatformTenant = (
   return {
     ...toPlatformTenantSummary(tenant, now),
     entitlements,
+    grantedEntitlements: grantedEntitlements(tenant.plan, grants, now),
     pageAccess: entitlementPageAccess(entitlements),
   };
 };

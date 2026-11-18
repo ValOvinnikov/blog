@@ -41,6 +41,7 @@ export const lookPreview = ({
 }: TRenderPreviewOptions = {}) => {
   const lookForm: TLookFormContext = {
     tenantName: MOCK_TENANT_NAME,
+    grants: { target: undefined, granted: {} },
     values: {
       ...defaultLookFormValues(),
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,

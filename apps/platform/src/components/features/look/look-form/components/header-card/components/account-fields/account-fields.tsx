@@ -46,8 +46,7 @@ export const AccountFields = () => {
         label={t('accountButtonStyleLabel')}
         hint={t('accountButtonStyleDescription')}
         isGroup={true}
-        labelId={buttonLock.labelId}
-        growthBadgeId={buttonLock.growthBadgeId}
+        lock={buttonLock}
       >
         <SegmentedControl<TAccountButtonStyle>
           aria={buttonLock.aria}
@@ -63,8 +62,7 @@ export const AccountFields = () => {
         label={t('accountPanelStyleLabel')}
         hint={t('accountPanelStyleDescription')}
         isGroup={true}
-        labelId={panelLock.labelId}
-        growthBadgeId={panelLock.growthBadgeId}
+        lock={panelLock}
       >
         <SegmentedControl<TAccountPanelStyle>
           aria={panelLock.aria}
@@ -80,8 +78,7 @@ export const AccountFields = () => {
         label={t('accountPhonePlacementLabel')}
         hint={t('accountPhonePlacementDescription')}
         isGroup={true}
-        labelId={placementLock.labelId}
-        growthBadgeId={placementLock.growthBadgeId}
+        lock={placementLock}
       >
         <SegmentedControl<TAccountPhonePlacement>
           aria={placementLock.aria}

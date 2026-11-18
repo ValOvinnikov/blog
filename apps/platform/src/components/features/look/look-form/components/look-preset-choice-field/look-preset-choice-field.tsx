@@ -44,8 +44,7 @@ export const LookPresetChoiceField = <
       label={label}
       hint={hint}
       isGroup={true}
-      labelId={lock.labelId}
-      growthBadgeId={lock.growthBadgeId}
+      lock={lock}
     >
       <SegmentedControl<TLookFormValues[TField]>
         aria={lock.aria}

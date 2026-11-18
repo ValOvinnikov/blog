@@ -2,12 +2,15 @@ import messages from '@platform/i18n/messages/en.json';
 import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
 import {
   mockReadyTenant,
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
+  mockEntitlementGrant,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
 import {
@@ -183,5 +186,56 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     });
 
     expectArchivedOffersNoSave();
+  });
+
+  describe('grants', () => {
+    const grantTrigger = {
+      name: makeEnTranslator('grantEntitlement')('triggerAriaLabel', {
+        item: toggleLabel[CAPABILITY.READER_ACCOUNTS],
+      }),
+    };
+
+    it('unlocks a capability granted beyond the plan and says it is granted', async () => {
+      await setup({
+        tenant: mockTenant({ plan: TENANT_PLAN.FREE }, [
+          mockEntitlementGrant({ key: CAPABILITY.READER_ACCOUNTS }),
+        ]),
+      });
+
+      const readerAccountsSwitch = screen.getByRole('switch', {
+        name: toggleLabel[CAPABILITY.READER_ACCOUNTS],
+      });
+      const granted = screen.getByText(messages.grantedBadge.label);
+
+      expect(readerAccountsSwitch).toBeEnabled();
+      expect(granted).toBeVisible();
+    });
+
+    it('offers the grant action when the page may grant', async () => {
+      await setup({ canGrantEntitlements: true });
+
+      const grant = screen.getByRole('button', grantTrigger);
+
+      expect(grant).toBeVisible();
+    });
+
+    it('offers no grant action by default', async () => {
+      await setup();
+
+      const grant = screen.queryByRole('button', grantTrigger);
+
+      expect(grant).not.toBeInTheDocument();
+    });
+
+    it('offers no grant action on an archived tenant', async () => {
+      await setup({
+        canGrantEntitlements: true,
+        tenant: mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+      });
+
+      const grant = screen.queryByRole('button', grantTrigger);
+
+      expect(grant).not.toBeInTheDocument();
+    });
   });
 });

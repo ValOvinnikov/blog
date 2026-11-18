@@ -5,6 +5,8 @@ import type { TControlAria, TMaybeUndefined } from '@shinefold/config';
 import type { TLookField } from '@shinefold/db/constants';
 import { useId } from 'react';
 
+export type TLookFieldLock = ReturnType<typeof useLookFieldLock>;
+
 export const useLookFieldLock = (field: TLookField) => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const { isLocked } = useLookForm();

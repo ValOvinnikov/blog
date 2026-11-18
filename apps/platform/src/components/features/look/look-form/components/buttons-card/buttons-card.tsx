@@ -85,8 +85,7 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
           label={t('busyButtonStyleLabel')}
           hint={t('busyButtonStyleDescription')}
           isGroup={true}
-          labelId={busyLock.labelId}
-          growthBadgeId={busyLock.growthBadgeId}
+          lock={busyLock}
         >
           <SegmentedControl<TBusyButtonStyle>
             aria={busyLock.aria}
@@ -100,8 +99,7 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
           field="spinnerStyle"
           label={spinnerStyleLabel}
           hint={t('spinnerStyleDescription')}
-          labelId={spinnerLock.labelId}
-          growthBadgeId={spinnerLock.growthBadgeId}
+          lock={spinnerLock}
         >
           <OptionSelect
             appearance={SELECT_APPEARANCE.COMPACT}

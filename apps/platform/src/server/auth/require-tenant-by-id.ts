@@ -16,9 +16,10 @@ export type TTenantByIdContext = {
   tenant: TPlatformTenant;
   admin: TAdmin;
   viewer: TPlatformViewer;
+  canGrantEntitlements: boolean;
 };
 
-/** Gates `/tenants/{id}/*` for any admin, archived tenants included, so only an unknown id 404s. */
+/** Gates `/tenants/{id}/*` for any admin, archived tenants included, so only an unknown id 404s; only this tree offers grant controls, which only a super admin gets. */
 export const requireTenantById = cache(
   async (tenantId: string): Promise<TTenantByIdContext> => {
     // Settled, not `Promise.all`: the gate's redirect or 404 must beat a malformed id's read error.
@@ -47,11 +48,13 @@ export const requireTenantById = cache(
     }
 
     const admin = adminResult.value;
+    const viewer = toPlatformViewer({ admin });
 
     return {
       tenant: toPlatformTenant(tenant, grantsResult.value),
       admin,
-      viewer: toPlatformViewer({ admin }),
+      viewer,
+      canGrantEntitlements: viewer.isSuperAdmin,
     };
   },
 );

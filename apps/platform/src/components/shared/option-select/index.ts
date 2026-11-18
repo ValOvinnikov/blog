@@ -1,1 +1,1 @@
-export { OptionSelect } from './option-select';
+export { OptionSelect, type TOptionSelectProps } from './option-select';

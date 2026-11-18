@@ -32,7 +32,7 @@ import {
 
 export type TGrantEntitlementResult = TActionResult<
   typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
-  never,
+  keyof TEntitlementGrantInput,
   never,
   | typeof TENANT_REFUSAL.NOT_FOUND
   | typeof TENANT_REFUSAL.ARCHIVED

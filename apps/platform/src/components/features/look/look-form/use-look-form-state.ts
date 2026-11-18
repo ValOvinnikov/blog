@@ -1,7 +1,6 @@
-import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
+import type { TLookRow } from '@platform/constants/look-row';
 import { useToast } from '@platform/context/toast-provider';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
-import { isBrandNameTooLong } from '@platform/utils/brand-name/brand-name';
 import type {
   TLookFormFieldSetter,
   TLookFormValues,
@@ -11,13 +10,13 @@ import {
   isBrandAssetKind,
   listLostStagedFiles,
 } from '@platform/utils/look-form-values/look-form-values';
-import { isAccentHueAccessible } from '@shinefold/config';
 import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
 import { buildLookFormContext } from './build-look-form-context';
 import type { TLookFormTenant } from './look-form-tenant';
+import { canSaveLook, lookInvalidControls } from './look-save-checks';
 import { useLookDraftFields } from './use-look-draft-fields';
 import { useLookSave } from './use-look-save';
 import { useLookSaveErrors } from './use-look-save-errors';
@@ -36,7 +35,13 @@ export const useLookFormState = ({
   savedAt,
   revealInvalidField,
 }: TUseLookFormStateArgs) => {
-  const { id: tenantId, name: tenantName, lookFields, archivedAt } = tenant;
+  const {
+    id: tenantId,
+    name: tenantName,
+    grants,
+    lookFields,
+    archivedAt,
+  } = tenant;
   const accentHueFieldId = useId();
   const brandNameFieldId = useId();
   const brandAssetFieldIds = { logo: useId(), favicon: useId() };
@@ -69,21 +74,13 @@ export const useLookFormState = ({
     },
     onDiscard: () => setRepickKinds([]),
     countChanges,
-    canSave: ({ accentHue, brandName }) =>
-      isAccentHueAccessible(accentHue) && !isBrandNameTooLong(brandName),
-    invalidControls: ({ accentHue, brandName }) => {
-      const isHueRejected = !isAccentHueAccessible(accentHue);
-      const isNameTooLong = isBrandNameTooLong(brandName);
-
-      return {
-        ids: [
-          ...(isHueRejected ? [accentHueFieldId] : []),
-          ...(isNameTooLong ? [brandNameFieldId] : []),
-        ],
-        revealFirst: () =>
-          revealInvalidField(isHueRejected ? LOOK_ROW.COLOUR : LOOK_ROW.BRAND),
-      };
-    },
+    canSave: canSaveLook,
+    invalidControls: (checked) =>
+      lookInvalidControls(
+        checked,
+        { accentHue: accentHueFieldId, brandName: brandNameFieldId },
+        revealInvalidField,
+      ),
     draft: {
       tenantId,
       page: 'look',
@@ -115,6 +112,7 @@ export const useLookFormState = ({
 
   const lookForm = buildLookFormContext({
     tenantName,
+    grants,
     values,
     savedValues,
     setValues,

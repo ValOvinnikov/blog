@@ -1,8 +1,8 @@
 import { Field } from '@base-ui/react/field';
 import { Fieldset } from '@base-ui/react/fieldset';
+import type { TLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { FieldLabel } from '@platform/components/shared/field-label';
-import { GrowthBadge } from '@platform/components/shared/growth-badge';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { isBrandAssetKind } from '@platform/utils/look-form-values/look-form-values';
@@ -10,6 +10,7 @@ import type { IWithChildren } from '@shinefold/config/react';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
+import { LookFieldBadge } from './components/look-field-badge/look-field-badge';
 import { lookFieldVariants } from './look-field-variants';
 
 export type TLookFieldProps = IWithChildren & {
@@ -18,9 +19,7 @@ export type TLookFieldProps = IWithChildren & {
   hint?: string;
   error?: string;
   isGroup?: boolean;
-  isDisabled?: boolean;
-  labelId?: string;
-  growthBadgeId?: string;
+  lock?: TLookFieldLock;
 };
 
 export const LookField = ({
@@ -29,12 +28,11 @@ export const LookField = ({
   hint,
   error,
   isGroup = false,
-  isDisabled = false,
-  labelId,
-  growthBadgeId,
+  lock,
   children,
 }: TLookFieldProps) => {
   const { hasFieldChanged } = useLookForm();
+  const { labelId, growthBadgeId, isDisabled = false } = lock ?? {};
   const t = useTranslations('lookForm');
   const hintId = useId();
   const {
@@ -63,7 +61,9 @@ export const LookField = ({
       )}
     </>
   );
-  const growthBadge = growthBadgeId && <GrowthBadge id={growthBadgeId} />;
+  const badge = (
+    <LookFieldBadge field={field} label={label} growthBadgeId={growthBadgeId} />
+  );
   const description = hint && (
     <Field.Description id={hintId} className={hintSlot()}>
       {hint}
@@ -86,7 +86,7 @@ export const LookField = ({
             <Fieldset.Legend id={labelId} className={labelSlot()}>
               {labelContent}
             </Fieldset.Legend>
-            {growthBadge}
+            {badge}
           </div>
           {description}
           {children}
@@ -97,7 +97,7 @@ export const LookField = ({
             <FieldLabel id={labelId} className={labelSlot()}>
               {labelContent}
             </FieldLabel>
-            {growthBadge}
+            {badge}
           </div>
           {description}
           {children}

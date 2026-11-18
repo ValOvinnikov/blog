@@ -62,8 +62,7 @@ export const LanguageSwitcherCard = ({
           label={t('languageSwitcherStyleLabel')}
           hint={isStylePlanLocked ? description : undefined}
           isGroup={true}
-          labelId={lock.labelId}
-          growthBadgeId={lock.growthBadgeId}
+          lock={lock}
         >
           <SegmentedControl<TLanguageSwitcherStyle>
             aria={lock.aria}

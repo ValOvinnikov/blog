@@ -4,6 +4,7 @@ import {
   toAnalyticsDraft,
   withConsentBannerForGoogleAnalytics,
 } from '@platform/utils/analytics-draft/analytics-draft';
+import { toGrantTarget } from '@platform/utils/grant-target/grant-target';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import {
   clampToEntitlement,
@@ -13,12 +14,14 @@ import { queries } from '@shinefold/db';
 
 export type TFeaturesPageContentProps = {
   tenant: TPlatformTenant;
+  canGrantEntitlements?: boolean;
 };
 
 export const FeaturesPageContent = async ({
   tenant,
+  canGrantEntitlements = false,
 }: TFeaturesPageContentProps) => {
-  const { id, entitlements, archivedAt } = tenant;
+  const { id, entitlements, grantedEntitlements, archivedAt } = tenant;
   const entitledCapabilities = entitlements.capabilities;
   const [{ values, savedAt }, storedAnalytics] = await Promise.all([
     getSettingsFeaturesOrDefaults(id),
@@ -36,6 +39,10 @@ export const FeaturesPageContent = async ({
     <FeaturesSettings
       tenantId={id}
       entitledCapabilities={entitledCapabilities}
+      grants={{
+        target: toGrantTarget(tenant, canGrantEntitlements),
+        granted: grantedEntitlements.capabilities,
+      }}
       hasOwnAnalytics={entitlements.hasOwnAnalytics}
       initialValues={initialValues}
       savedAt={savedAt}

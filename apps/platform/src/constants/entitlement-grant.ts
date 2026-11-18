@@ -30,6 +30,14 @@ export type TEntitlementGrantRefusal = TValueOf<
   typeof ENTITLEMENT_GRANT_REFUSAL
 >;
 
+export const GRANT_STATUS = {
+  ACTIVE: 'ACTIVE',
+  EXPIRED: 'EXPIRED',
+  INCLUDED: 'INCLUDED',
+} as const;
+
+export type TGrantStatus = TValueOf<typeof GRANT_STATUS>;
+
 export const ENTITLEMENT_GRANT_LOG = {
   GRANT_FAILED: 'entitlement_grants.grant_failed',
   GRANT_AUDIT_FAILED: 'entitlement_grants.grant_audit_failed',

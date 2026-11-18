@@ -572,6 +572,13 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **EMAIL_USAGE_LOG**: `SEND_COUNT_FAILED`=`"email_usage.send_count_failed"`
 
+### `@platform/constants/entitlement-grant` — `apps/platform/src/constants/entitlement-grant.ts`
+
+- **ENTITLEMENT_GRANT_EXPIRY**: `NEVER`, `DAYS_30`, `DAYS_90`, `YEAR_1`
+- **ENTITLEMENT_GRANT_REFUSAL**: `COMING_SOON`, `ALREADY_GRANTED`, `GRANT_NOT_OPEN`
+- **GRANT_STATUS**: `ACTIVE`, `EXPIRED`, `INCLUDED`
+- **ENTITLEMENT_GRANT_LOG**: `GRANT_FAILED`=`"entitlement_grants.grant_failed"`, `GRANT_AUDIT_FAILED`=`"entitlement_grants.grant_audit_failed"`, `REVOKE_FAILED`=`"entitlement_grants.revoke_failed"`, `REVOKE_AUDIT_FAILED`=`"entitlement_grants.revoke_audit_failed"`
+
 ### `@platform/constants/field-appearance` — `apps/platform/src/constants/field-appearance.ts`
 
 - **FIELD_APPEARANCE**: `DEFAULT`, `WIZARD`

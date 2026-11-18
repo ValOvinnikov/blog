@@ -7,6 +7,7 @@ import type {
   TLookFormFieldSetter,
   TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
+import type { TGrantAccess } from '@platform/utils/grant-target/grant-target';
 import type { TPresetSeededField } from '@platform/utils/look-preset/look-preset';
 import type { TMaybeUndefined, TPresetId } from '@shinefold/config';
 import type { IWithChildren } from '@shinefold/config/react';
@@ -15,6 +16,7 @@ import { createContext, useContext } from 'react';
 
 export type TLookFormContext = {
   tenantName: string;
+  grants: TGrantAccess<TLookField>;
   values: TLookFormValues;
   updateField: TLookFormFieldSetter;
   isLocked: (field: TLookField) => boolean;

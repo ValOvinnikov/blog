@@ -1811,7 +1811,8 @@
     "keptBadge": "Bewaard, niet live binnen uw abonnement",
     "planLockedBadge": "Niet in uw abonnement",
     "atLimitLockedReason": "Zet er een uit om deze aan te zetten",
-    "overLimitLockedReason": "Upgrade uw abonnement om dit te wijzigen"
+    "overLimitLockedReason": "Upgrade uw abonnement om dit te wijzigen",
+    "allowanceGranted": "{used} van {allowed} extra talen in gebruik."
   },
   "saveBar": {
     "regionLabel": "Niet-opgeslagen wijzigingen",
@@ -2393,5 +2394,135 @@
     "refusalSuspended": "Deze site is opgeschort, dus de concepten hebben geen voorbeeld.",
     "refusalArchived": "Deze site is gearchiveerd, dus de concepten hebben geen voorbeeld.",
     "refusalUnavailable": "Het platform kon dit voorbeeld niet voorbereiden. Het probleem is gelogd voor het platformteam."
+  },
+  "grantEntitlement": {
+    "trigger": "Aan deze tenant toekennen",
+    "triggerAriaLabel": "Aan deze tenant toekennen: {item}",
+    "title": "{item} toekennen aan {tenant}",
+    "description": "{tenant} krijgt {item} buiten het {plan}-abonnement. De eigenaar ziet het ontgrendeld en kan het inschakelen. Er wordt niets in rekening gebracht.",
+    "granted": "{item} toegekend.",
+    "failed": "{item} toekennen mislukt — probeer het opnieuw."
+  },
+  "grantDialog": {
+    "confirmButton": "Toekennen",
+    "confirmingButton": "Bezig met toekennen…"
+  },
+  "grantExpiryFields": {
+    "expiresLabel": "Verloopt",
+    "expiresHint": "De toekenning eindigt daarna vanzelf.",
+    "expiry": {
+      "NEVER": "Nooit — tot intrekking",
+      "DAYS_30": "30 dagen",
+      "DAYS_90": "90 dagen",
+      "YEAR_1": "1 jaar"
+    },
+    "noteLabel": "Notitie",
+    "noteHint": "Optioneel. Waarom het is toegekend — zichtbaar op de kaart Toekenningen en in het activiteitenlogboek."
+  },
+  "grantModulePack": {
+    "trigger": "Modulepakket toekennen",
+    "title": "Modulepakket toekennen aan {tenant}",
+    "description": "De redacteuren krijgen de modules van het pakket in Studio, buiten het {plan}-abonnement. Er wordt niets in rekening gebracht.",
+    "packLabel": "Modulepakket",
+    "packPlaceholder": "Kies een modulepakket",
+    "packIncluded": "{pack} (inbegrepen in het abonnement)"
+  },
+  "grantLanguages": {
+    "trigger": "Meer talen toekennen",
+    "title": "Meer talen toekennen aan {tenant}",
+    "description": "Het {plan}-abonnement publiceert alleen de standaardtaal. Kies hoeveel talen extra {tenant} mag publiceren. Er wordt niets in rekening gebracht.",
+    "countLabel": "Extra talen",
+    "countHint": "Staat het abonnement later meer toe, dan geldt het hogere aantal."
+  },
+  "grantItemNames": {
+    "languages": "{count, plural, one {# extra taal} other {# extra talen}}",
+    "modulePack": {
+      "CORE": "Core-modules",
+      "STARTER": "Starter-modules",
+      "GROWTH": "Growth-modules"
+    },
+    "lookField": {
+      "preset": "Voorinstelling",
+      "accentHue": "Accenttint",
+      "logoHue": "Logotint",
+      "headingFont": "Koplettertype",
+      "bodyFont": "Tekstlettertype",
+      "radiusScale": "Afrondingsschaal",
+      "density": "Dichtheid",
+      "languageSwitcherStyle": "Stijl van de taalkeuze",
+      "cardStyle": "Kaartstijl",
+      "headerControlStyle": "Headerknoppen",
+      "headerControlShape": "Vorm van headerknoppen",
+      "accountButtonStyle": "Accountknop",
+      "accountPanelStyle": "Accountpaneel",
+      "accountPhonePlacement": "Positie van het account op telefoons",
+      "busyButtonStyle": "Stijl van de bezig-knop",
+      "spinnerStyle": "Spinnerstijl",
+      "buttonShape": "Vorm van knoppen",
+      "headerLayout": "Headerindeling",
+      "headerSubmenuStyle": "Submenu’s van de header",
+      "headerBarStyle": "Headerbalk",
+      "navLinkStyle": "Navigatielinks",
+      "headingWeight": "Dikte van koppen",
+      "headingCase": "Hoofdletters in koppen",
+      "imageProportion": "Beeldverhoudingen",
+      "dividerWidth": "Sectiescheidingen",
+      "footerLayout": "Indeling van de voettekst",
+      "footerBackground": "Achtergrond van de voettekst",
+      "footerSurface": "Oppervlak van de voettekst",
+      "cookieSettingsButton": "Knop voor cookie-instellingen",
+      "brandName": "Merknaam",
+      "logoAssetUrl": "Logoafbeelding",
+      "faviconAssetUrl": "Faviconafbeelding"
+    }
+  },
+  "grantedBadge": {
+    "label": "Toegekend",
+    "labelUntil": "Toegekend tot {date}"
+  },
+  "grantsCard": {
+    "title": "Toekenningen",
+    "supportingText": "Wat deze tenant buiten zijn abonnement heeft.",
+    "empty": "Geen toekenningen — alles wat deze tenant heeft, komt uit zijn abonnement.",
+    "kind": {
+      "CAPABILITY": "Functie",
+      "LOOK_FIELD": "Look",
+      "MODULE_PACK": "Modulepakket",
+      "LOCALE_LIMIT": "Talen"
+    },
+    "expired": "Verlopen",
+    "included": "Inbegrepen in het abonnement",
+    "metaUntilRevoked": "{who} · {date} · Tot intrekking",
+    "metaExpires": "{who} · {date} · Verloopt op {expiry}",
+    "metaExpired": "{who} · {date} · Verlopen op {expiry}"
+  },
+  "revokeGrantControl": {
+    "revoke": {
+      "trigger": "Intrekken",
+      "triggerAriaLabel": "{item} intrekken",
+      "title": "{item} intrekken voor {tenant}",
+      "description": "{item} wordt vanaf de volgende paginaweergave weer vergrendeld. Wat de tenant heeft ingesteld blijft bewaard, dus opnieuw toekennen herstelt het.",
+      "confirmButton": "Intrekken",
+      "confirmingButton": "Bezig met intrekken…",
+      "failed": "Toekenning intrekken mislukt — probeer het opnieuw.",
+      "done": "{item} ingetrokken."
+    },
+    "remove": {
+      "trigger": "Verwijderen",
+      "triggerAriaLabel": "Toekenning {item} verwijderen",
+      "title": "{item} verwijderen voor {tenant}",
+      "description": "Deze toekenning is verlopen, dus {item} is al vergrendeld. Verwijderen haalt haar uit de lijst, zodat ze opnieuw kan worden toegekend.",
+      "confirmButton": "Verwijderen",
+      "confirmingButton": "Bezig met verwijderen…",
+      "failed": "Toekenning verwijderen mislukt — probeer het opnieuw.",
+      "done": "{item} verwijderd."
+    }
+  },
+  "entitlementGrantErrors": {
+    "notFound": "Deze tenant bestaat niet meer.",
+    "archived": "Deze tenant is gearchiveerd, dus de toekenningen kunnen niet meer wijzigen.",
+    "comingSoon": "Deze functie is nog niet beschikbaar en kan dus niet worden toegekend.",
+    "alreadyGranted": "Dit is al toegekend.",
+    "grantNotOpen": "Deze toekenning is al verwijderd of verlopen."
   }
 }

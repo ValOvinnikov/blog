@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert } from '@platform/components/shared/alert';
+import { GrantedBadge } from '@platform/components/features/entitlement-grants/granted-badge';
 import { Card } from '@platform/components/shared/card';
 import {
   SettingsFormShell,
@@ -13,8 +13,8 @@ import {
   type TUpdateTenantLanguagesResult,
 } from '@platform/server/tenants/update-tenant-languages-action';
 import { additionalLocalesToSave } from '@platform/utils/additional-locales-to-save/additional-locales-to-save';
+import type { TLanguageGrants } from '@platform/utils/grant-target/grant-target';
 import {
-  ALERT_TYPE,
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
   FORM_STATUS,
@@ -24,7 +24,9 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import { LanguageToggleRow } from './components/language-toggle-row';
+import { LanguagesLimitNotice } from './components/languages-limit-notice/languages-limit-notice';
 import { languagesSettingsVariants } from './languages-settings-variants';
+import { useLanguageLockedReason } from './use-language-locked-reason';
 
 const SUPPORTED_LOCALES = Object.values(LOCALE_ISO_CODES);
 
@@ -36,6 +38,7 @@ export type TLanguagesSettingsProps = {
     live: TLocaleIsoCode[];
     limit: number;
   };
+  grants: TLanguageGrants;
   savedAt?: Date;
   archivedAt?: Date;
 };
@@ -44,6 +47,7 @@ export const LanguagesSettings = ({
   tenantId,
   defaultLocale,
   locales,
+  grants,
   savedAt,
   archivedAt,
 }: TLanguagesSettingsProps) => {
@@ -106,28 +110,10 @@ export const LanguagesSettings = ({
     );
   };
 
-  const lockedReason = (() => {
-    if (additionalLocaleLimit === 0) {
-      return t('planLockedBadge');
-    }
-    if (isOverLimit) {
-      return t('overLimitLockedReason');
-    }
-    return t('atLimitLockedReason');
-  })();
-
-  const notice = (() => {
-    if (additionalLocaleLimit === 0) {
-      return t('upgradeNotice');
-    }
-    if (isOverLimit) {
-      return t('downgradeNotice', {
-        allowed: additionalLocaleLimit,
-        stored: savedLocales.length,
-      });
-    }
-    return undefined;
-  })();
+  const lockedReason = useLanguageLockedReason(
+    additionalLocaleLimit,
+    isOverLimit,
+  );
 
   return (
     <SettingsFormShell
@@ -147,19 +133,22 @@ export const LanguagesSettings = ({
       <Card>
         <Card.Header
           title={t('additionalHeading')}
-          supportingText={t('allowance', {
+          supportingText={t(grants.granted ? 'allowanceGranted' : 'allowance', {
             used: values.length,
             allowed: additionalLocaleLimit,
           })}
+          actions={
+            grants.granted && (
+              <GrantedBadge expiresAt={grants.granted.expiresAt} />
+            )
+          }
         />
         <Card.Body>
-          {notice && (
-            <Alert
-              type={ALERT_TYPE.INFO}
-              title={t('noticeTitle')}
-              description={notice}
-            />
-          )}
+          <LanguagesLimitNotice
+            allowed={additionalLocaleLimit}
+            storedCount={savedLocales.length}
+            grantTarget={grants.target}
+          />
           {SUPPORTED_LOCALES.filter((locale) => locale !== defaultLocale).map(
             (locale) => {
               const isLive = values.includes(locale);
