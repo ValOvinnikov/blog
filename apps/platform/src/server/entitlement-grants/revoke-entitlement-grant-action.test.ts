@@ -2,14 +2,15 @@ import { ENTITLEMENT_GRANT_REFUSAL } from '@platform/constants/entitlement-grant
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
-import { resolveLiveTenant } from '@platform/server/tenants/resolve-live-tenant';
-import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
+import {
+  MOCK_SUPER_ADMIN,
+  usePassedGrantActionGate,
+} from '@platform/testing/entitlement-grants/grant-action-gate';
 import {
   MOCK_GRANT_ID,
   MOCK_TENANT_ID,
   mockEntitlementGrantRow,
-  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import {
   ACTION_OUTCOME,
@@ -18,7 +19,7 @@ import {
   CAPABILITY,
   NEXT_NAVIGATION_ERROR,
 } from '@shinefold/config';
-import { ADMIN_ROLE, ENTITLEMENT_KIND, queries } from '@shinefold/db';
+import { ENTITLEMENT_KIND, queries } from '@shinefold/db';
 import { notFound } from 'next/navigation';
 
 import { revokeEntitlementGrantAction } from './revoke-entitlement-grant-action';
@@ -26,9 +27,7 @@ import { revokeEntitlementGrantAction } from './revoke-entitlement-grant-action'
 vi.mock('@platform/server/auth/require-super-admin');
 vi.mock('@platform/server/audit/record-audit-event');
 vi.mock('@platform/server/site-config/revalidate-site-config');
-vi.mock('@platform/server/tenants/resolve-live-tenant', () => ({
-  resolveLiveTenant: vi.fn(),
-}));
+vi.mock('@platform/server/tenants/resolve-live-tenant');
 
 vi.mock('@shinefold/db', async () => ({
   ...(await (
@@ -40,19 +39,15 @@ vi.mock('@shinefold/db', async () => ({
 const revokeEntitlementGrant = vi.mocked(
   queries.tenantEntitlementGrants.revokeEntitlementGrant,
 );
-const MOCK_SUPER_ADMIN = mockAdmin({ role: ADMIN_ROLE.SUPERADMIN });
 const MOCK_MALFORMED_GRANT_ID = 'not-a-grant';
 
 const revoke = (grantId = MOCK_GRANT_ID) =>
   revokeEntitlementGrantAction(MOCK_TENANT_ID, grantId);
 
 describe(revokeEntitlementGrantAction, () => {
+  usePassedGrantActionGate();
+
   beforeEach(() => {
-    vi.mocked(requireSuperAdmin).mockResolvedValue(MOCK_SUPER_ADMIN);
-    vi.mocked(resolveLiveTenant).mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-      tenant: mockTenant(),
-    });
     revokeEntitlementGrant.mockResolvedValue(mockEntitlementGrantRow());
   });
 

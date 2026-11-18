@@ -7,13 +7,15 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { resolveLiveTenant } from '@platform/server/tenants/resolve-live-tenant';
-import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
+import {
+  MOCK_SUPER_ADMIN,
+  usePassedGrantActionGate,
+} from '@platform/testing/entitlement-grants/grant-action-gate';
 import {
   MOCK_GRANT_ID,
   MOCK_TENANT_ID,
   mockEntitlementGrantRow,
-  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import {
   ACTION_OUTCOME,
@@ -23,7 +25,7 @@ import {
   NEXT_NAVIGATION_ERROR,
 } from '@shinefold/config';
 import { ERROR_CODE } from '@shinefold/config/constants';
-import { ADMIN_ROLE, ENTITLEMENT_KIND, queries } from '@shinefold/db';
+import { ENTITLEMENT_KIND, queries } from '@shinefold/db';
 import { errorResult, okResult } from '@shinefold/utils';
 import { notFound } from 'next/navigation';
 
@@ -32,9 +34,7 @@ import { grantEntitlementAction } from './grant-entitlement-action';
 vi.mock('@platform/server/auth/require-super-admin');
 vi.mock('@platform/server/audit/record-audit-event');
 vi.mock('@platform/server/site-config/revalidate-site-config');
-vi.mock('@platform/server/tenants/resolve-live-tenant', () => ({
-  resolveLiveTenant: vi.fn(),
-}));
+vi.mock('@platform/server/tenants/resolve-live-tenant');
 
 vi.mock('@shinefold/db', async () => ({
   ...(await (
@@ -46,7 +46,6 @@ vi.mock('@shinefold/db', async () => ({
 const grantEntitlement = vi.mocked(
   queries.tenantEntitlementGrants.grantEntitlement,
 );
-const MOCK_SUPER_ADMIN = mockAdmin({ role: ADMIN_ROLE.SUPERADMIN });
 const MOCK_NOTE = 'Launch partner';
 const MOCK_NOW = new Date('2026-11-18T10:00:00.000Z');
 const MOCK_IN_30_DAYS = new Date('2026-12-18T10:00:00.000Z');
@@ -64,17 +63,14 @@ const grant = (overrides = {}) =>
   });
 
 describe(grantEntitlementAction, () => {
+  usePassedGrantActionGate();
+
   afterEach(() => {
     vi.useRealTimers();
   });
 
   beforeEach(() => {
     vi.useFakeTimers({ now: MOCK_NOW });
-    vi.mocked(requireSuperAdmin).mockResolvedValue(MOCK_SUPER_ADMIN);
-    vi.mocked(resolveLiveTenant).mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-      tenant: mockTenant(),
-    });
     grantEntitlement.mockResolvedValue(
       okResult(
         mockEntitlementGrantRow({
