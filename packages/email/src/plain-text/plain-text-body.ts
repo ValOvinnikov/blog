@@ -3,11 +3,11 @@ import { sanitizeHref } from '@shinefold/utils';
 
 export function buildPlainTextBody(
   paragraphs: string[],
-  action?: TEmailAction,
+  ...actions: TEmailAction[]
 ): string {
-  const actionLine = action
-    ? [`${action.label}: ${sanitizeHref(action.url) ?? ''}`]
-    : [];
+  const actionLines = actions.map(
+    ({ label, url }) => `${label}: ${sanitizeHref(url) ?? ''}`,
+  );
 
-  return [...paragraphs, ...actionLine].join('\n\n');
+  return [...paragraphs, ...actionLines].join('\n\n');
 }

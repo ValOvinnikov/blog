@@ -53,6 +53,7 @@ export const StudioMount: FC<TStudioMountProps> = ({
   defaultLocale,
   liveLocales,
   loginProvider,
+  previewBasePath,
   scheme,
   onSchemeChange,
   onSignedIn,
@@ -68,6 +69,7 @@ export const StudioMount: FC<TStudioMountProps> = ({
     defaultLocale,
     liveLocales,
     loginProvider,
+    previewBasePath,
   };
   // Keyed by value: callers pass fresh arrays each render, and a new config resets Sanity's pane state.
   const paramsKey = JSON.stringify(params);

@@ -6,6 +6,7 @@ export * from './downgrade-grace';
 export * from './email-config';
 export * from './email-template-defaults';
 export * from './email-usage';
+export * from './entitlement';
 export * from './lead';
 export * from './look';
 export * from './membership';

@@ -25,6 +25,7 @@ export * as subscribers from './subscribers';
 export * as takeawayGenerations from './takeaway-generations';
 export * as tenantAnalytics from './tenant-analytics';
 export * as tenantDomains from './tenant-domains';
+export * as tenantEntitlementGrants from './tenant-entitlement-grants';
 export * as tenantOAuthCredentials from './tenant-oauth-credentials';
 export * as tenantSuspensions from './tenant-suspensions';
 export * as tenants from './tenants';

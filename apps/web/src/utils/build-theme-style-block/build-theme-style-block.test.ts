@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { dirname, join } from 'node:path';
 
 import { faker } from '@faker-js/faker';
 import {
@@ -28,6 +29,7 @@ faker.seed(107);
 
 const DARK_SELECTOR = '.dark';
 const BRAND_TOKEN = '--brand-primary';
+const BRAND_PALETTE_STOP = '--palette-brand-100';
 const LOGO_TOKEN = '--logo-1';
 const BRAND_AND_LOGO_NAMES = 'brand-primary[\\w-]*|logo-\\d';
 const CONSOLE_PRESET_TOKENS = PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
@@ -43,10 +45,12 @@ const CONSOLE_TOKENS: TThemeTokens = {
   logoHue: CONSOLE_HUE,
 };
 
-const THEME_CSS = readFileSync(
-  createRequire(import.meta.url).resolve(
-    '@shinefold/tailwind-config/theme.css',
-  ),
+const THEME_CSS_PATH = createRequire(import.meta.url).resolve(
+  '@shinefold/tailwind-config/theme.css',
+);
+const THEME_CSS = readFileSync(THEME_CSS_PATH, 'utf8');
+const SKINS_CSS = readFileSync(
+  join(dirname(THEME_CSS_PATH), 'skins.css'),
   'utf8',
 );
 const THEME_ROOT_BLOCK = THEME_CSS.slice(
@@ -184,9 +188,13 @@ describe(buildThemeStyleBlock, () => {
     it('leaves the neutral scrim to the static theme', () => {
       expect(css).not.toContain('--scrim-neutral');
     });
+
+    it('leaves the fixed-hue palette stops to skins.css', () => {
+      expect(css).not.toMatch(/--palette-(?!brand-)/);
+    });
   });
 
-  describe('against the static theme.css defaults', () => {
+  describe('against the static theme.css and skins.css defaults', () => {
     it.each([
       {
         group: 'brand and logo colours in :root',
@@ -199,6 +207,12 @@ describe(buildThemeStyleBlock, () => {
         source: THEME_DARK_BLOCK,
         names: BRAND_AND_LOGO_NAMES,
         scope: 'dark' as const,
+      },
+      {
+        group: 'brand palette stops in skins.css',
+        source: SKINS_CSS,
+        names: 'palette-brand-\\d+',
+        scope: 'root' as const,
       },
       {
         group: 'on-image and brand scrim tokens',
@@ -277,6 +291,14 @@ describe(buildThemeStyleBlock, () => {
     expect(readHue(root, LOGO_TOKEN)).toBe(MOCK_LOGO_HUE);
     expect(readHue(dark, BRAND_TOKEN)).toBe(MOCK_ACCENT_HUE);
     expect(readHue(dark, LOGO_TOKEN)).toBe(MOCK_LOGO_HUE);
+  });
+
+  it('builds the brand palette stops at accentHue', () => {
+    const { root } = splitModes(
+      buildThemeStyleBlock({ ...CONSOLE_TOKENS, accentHue: MOCK_ACCENT_HUE! }),
+    );
+
+    expect(readHue(root, BRAND_PALETTE_STOP)).toBe(MOCK_ACCENT_HUE);
   });
 
   it('falls back to accentHue for logo colours when logoHue is unset', () => {

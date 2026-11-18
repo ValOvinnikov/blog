@@ -1,4 +1,5 @@
 import { CONSENT_CATEGORY } from '@shinefold/config';
+import { MOCK_GOOGLE_ANALYTICS } from '@shinefold/db/testing/tenant-analytics/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ConsentBannerSlot } from '@web/components/features/layout/site-providers/components/consent-banner-slot/consent-banner-slot';
 import { CookieSettingsButton } from '@web/components/shared/cookie-settings-button';
@@ -12,11 +13,13 @@ import {
   OPEN_PREFERENCES_BUTTON_NAME,
   OpenPreferencesButton,
 } from '@web/testing/shared/consent/consent-preferences-probes';
+import { withSiteAnalytics } from '@web/testing/shared/site-analytics/with-site-analytics';
 
 import { ConsentPreferencesDialog } from './consent-preferences-dialog';
 
 const DIALOG_NAME = 'Cookie settings';
 const EXTERNAL_MEDIA_SWITCH_NAME = 'External media';
+const ANALYTICS_SWITCH_NAME = 'Analytics';
 const SAVE_BUTTON_NAME = 'Save';
 const CLOSE_BUTTON_NAME = 'Close';
 
@@ -83,6 +86,14 @@ describe(`<${ConsentPreferencesDialog.name}/>`, () => {
       expect(externalMediaSwitch).not.toBeChecked();
     });
 
+    it('offers no analytics switch on a site without Google Analytics', () => {
+      const analyticsSwitch = screen.queryByRole('switch', {
+        name: ANALYTICS_SWITCH_NAME,
+      });
+
+      expect(analyticsSwitch).not.toBeInTheDocument();
+    });
+
     it('saves the chosen categories and closes', async () => {
       const saveButton = screen.getByRole('button', { name: SAVE_BUTTON_NAME });
 
@@ -118,6 +129,33 @@ describe(`<${ConsentPreferencesDialog.name}/>`, () => {
         });
         expect(reopenedSwitch).not.toBeChecked();
       });
+    });
+  });
+
+  describe('on a site that loads Google Analytics', () => {
+    beforeEach(async () => {
+      renderElement(
+        withSiteAnalytics(
+          <>
+            <OpenPreferencesButton />
+            <ConsentPreferencesDialog />
+          </>,
+          MOCK_GOOGLE_ANALYTICS,
+        ),
+      );
+      await openPreferences();
+    });
+
+    it('saves analytics once it is switched on', async () => {
+      const analyticsSwitch = screen.getByRole('switch', {
+        name: ANALYTICS_SWITCH_NAME,
+      });
+      const saveButton = screen.getByRole('button', { name: SAVE_BUTTON_NAME });
+
+      await user.click(analyticsSwitch);
+      await user.click(saveButton);
+
+      expect(readGrantedConsent()).toEqual([CONSENT_CATEGORY.ANALYTICS]);
     });
   });
 

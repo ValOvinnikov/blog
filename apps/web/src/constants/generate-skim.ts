@@ -20,4 +20,6 @@ export const GENERATE_SKIM_LOG = {
   GO_LIVE_SECRET_MISSING: 'generate_skim.go_live_secret_missing',
   GO_LIVE_TENANT_LOOKUP_FAILED: 'generate_skim.go_live_tenant_lookup_failed',
   TAKEAWAYS_LOOKUP_FAILED: 'generate_skim.takeaways_lookup_failed',
+  TENANT_NOT_SERVABLE: 'generate_skim.tenant_not_servable',
+  TENANT_RESOLVE_FAILED: 'generate_skim.tenant_resolve_failed',
 } as const;

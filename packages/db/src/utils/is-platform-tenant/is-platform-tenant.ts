@@ -1,6 +1,18 @@
-export function isPlatformTenant(hosts: string[], rootDomain: string): boolean {
-  const root = rootDomain.trim().toLowerCase();
-  const platformHosts = [root, `www.${root}`];
+function normaliseHost(host: string): string {
+  return host.trim().toLowerCase();
+}
 
-  return hosts.some((host) => platformHosts.includes(host.toLowerCase()));
+export function isPlatformTenant(
+  hosts: string[],
+  rootDomain: string,
+  marketingHost?: string,
+): boolean {
+  const root = normaliseHost(rootDomain);
+  const marketing = normaliseHost(marketingHost ?? '');
+  const platformHosts = [root, `www.${root}`];
+  if (marketing) {
+    platformHosts.push(marketing);
+  }
+
+  return hosts.some((host) => platformHosts.includes(normaliseHost(host)));
 }

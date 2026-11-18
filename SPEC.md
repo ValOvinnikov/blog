@@ -1868,9 +1868,7 @@ storage-layer-vocabulary exception. `TENANT_PLAN`, its key, lives in
 `is-capability-enabled.ts` (`apps/web/src/server/settings-features/is-capability-enabled/`)
 resolves the two-layer check per request and never throws; a disabled
 capability is omitted silently at its own render site (`module_newsletter`
-and `module_contactForm` in `renderModules`; the bookmark button on the post-detail page; Vercel
-Analytics/Speed Insights in `[locale]/layout.tsx`, ANDed with the
-pre-existing `WEB_ANALYTICS_ENABLED` env gate; the header's `AuthMenu`, which
+and `module_contactForm` in `renderModules`; the bookmark button on the post-detail page; the header's `AuthMenu`, which
 `is-reader-account-enabled.ts` shows only when at least one of `bookmarks`/
 `comments`/`newsletter` is enabled, the same check that makes `/account` and
 `/bookmarks` answer 404 otherwise) — same pattern as an unknown module type,
@@ -1890,11 +1888,12 @@ the visitor consents, whatever the tenant's settings — a forgotten toggle
 costs convenience, never compliance.
 
 - _Categories._ `@shinefold/config`'s `CONSENT_CATEGORY` is
-  `{ NECESSARY, EXTERNAL_MEDIA }`. Necessary is implicit, always granted and
-  never written to the cookie; External media covers third-party iframes
-  (embeds, maps). A new category is a code change to that const. Vercel
-  Analytics sets no cookies and stays outside consent; any future feature that
-  sets a non-essential cookie goes behind the gate before it ships.
+  `{ NECESSARY, ANALYTICS, EXTERNAL_MEDIA }`. Necessary is implicit, always
+  granted and never written to the cookie; Analytics gates Google Analytics;
+  External media covers third-party iframes (embeds, maps). A new category is
+  a code change to that const. Vercel Analytics and Plausible set no cookies
+  and stay outside consent; any future feature that sets a non-essential
+  cookie goes behind the gate before it ships.
 - _Cookie._ A first-party `consent` cookie written client-side — `Secure`,
   `SameSite=Lax`, `path=/`, not `httpOnly`, 180 days. Its value is
   `<version>.<CATEGORY>,…` (`1.EXTERNAL_MEDIA` granted, `1.` all declined). A

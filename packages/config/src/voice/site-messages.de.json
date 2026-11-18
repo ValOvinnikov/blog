@@ -343,6 +343,7 @@
     "banner": {
       "heading": "Cookies auf dieser Website",
       "message": "Wir verwenden nur Cookies, die für den Betrieb dieser Website notwendig sind, es sei denn, du erlaubst externe Medien. Du kannst deine Auswahl jederzeit über Cookie-Einstellungen im Footer ändern.",
+      "messageWithAnalytics": "Wir verwenden nur Cookies, die für den Betrieb dieser Website notwendig sind, es sei denn, du erlaubst Analyse oder externe Medien. Du kannst deine Auswahl jederzeit über Cookie-Einstellungen im Footer ändern.",
       "acceptLabel": "Alle akzeptieren",
       "rejectLabel": "Alle ablehnen",
       "settingsLabel": "Einstellungen",
@@ -359,6 +360,10 @@
         "label": "Notwendig",
         "description": "Erforderlich, damit die Website funktioniert. Immer aktiv."
       },
+      "analytics": {
+        "label": "Analyse",
+        "description": "Misst Besuche auf dieser Website mit Tools, die eigene Cookies setzen, etwa Google Analytics."
+      },
       "externalMedia": {
         "label": "Externe Medien",
         "description": "Inhalte von Drittanbietern, etwa Videos und Karten, die möglicherweise eigene Cookies setzen."
@@ -373,6 +378,7 @@
   "cookieList": {
     "ariaLabel": "Cookies und Browserspeicher",
     "intro": "Alles Folgende setzt diese Website selbst, und es ist unbedingt erforderlich.",
+    "introWithGoogleAnalytics": "Alles Folgende setzt diese Website. Die Google-Analytics-Cookies werden nur gesetzt, wenn du Analyse erlaubst; alles andere ist unbedingt erforderlich.",
     "columns": {
       "name": "Name",
       "purpose": "Zweck",
@@ -426,6 +432,14 @@
       "THEME": {
         "purpose": "Speichert, ob du das helle oder dunkle Design gewählt hast. Liegt im lokalen Speicher deines Browsers.",
         "duration": "Bis du deine Browserdaten löschst"
+      },
+      "GOOGLE_ANALYTICS": {
+        "purpose": "Unterscheidet Besuche aus verschiedenen Browsern, damit Google Analytics Besucher zählen kann.",
+        "duration": "2 Jahre"
+      },
+      "GOOGLE_ANALYTICS_VISIT": {
+        "purpose": "Verfolgt deinen aktuellen Besuch für Google Analytics.",
+        "duration": "2 Jahre"
       }
     },
     "analyticsNote": "Wenn diese Website Besuche und Seitengeschwindigkeit misst, nutzt sie Vercel Web Analytics und Speed Insights. Diese setzen keine Cookies und laden unabhängig von deiner Cookie-Auswahl."

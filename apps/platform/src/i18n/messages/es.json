@@ -515,7 +515,9 @@
       "NEWSLETTER_PAUSE_CLEARED": "Pausa del boletín retirada",
       "MEMBER_INVITED": "Miembro del equipo invitado",
       "MEMBER_REMOVED": "Miembro del equipo eliminado",
-      "MEMBER_INVITE_CANCELLED": "Invitación al equipo cancelada"
+      "MEMBER_INVITE_CANCELLED": "Invitación al equipo cancelada",
+      "ENTITLEMENT_GRANTED": "Función concedida",
+      "ENTITLEMENT_REVOKED": "Concesión de función revocada"
     },
     "detail": {
       "field": {

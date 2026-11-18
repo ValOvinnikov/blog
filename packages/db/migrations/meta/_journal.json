@@ -211,6 +211,13 @@
       "when": 1794924978949,
       "tag": "0029_platform-email-send-counts",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1794945030030,
+      "tag": "0030_tenant-entitlement-grants",
+      "breakpoints": true
     }
   ]
 }

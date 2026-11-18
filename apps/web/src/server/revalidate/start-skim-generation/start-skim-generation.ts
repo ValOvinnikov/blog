@@ -7,6 +7,7 @@ import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive
 import { enqueueWorkerRun } from '@web/server/revalidate/enqueue-worker-run/enqueue-worker-run';
 import type { TPostWebhookEvent } from '@web/server/revalidate/post-webhook-event/post-webhook-event';
 import { generatePostSkim } from '@web/server/skim/generate-post-skim/generate-post-skim';
+import { hasExistingTakeaways } from '@web/server/skim/has-existing-takeaways/has-existing-takeaways';
 import { resolveTenantById } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { toTenantSanityWriteContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { env } from '@web/utils/env/env';
@@ -68,17 +69,19 @@ const generateFirstPublishSkim = async ({
   }
 
   const tenant = await resolveTenantById(tenantId);
-  if (!tenant) return;
+  if (!tenant) {
+    logger.warn(GENERATE_SKIM_LOG.TENANT_NOT_SERVABLE, { tenantId, postId });
+    return;
+  }
+  const writeContext = toTenantSanityWriteContext(tenant);
 
-  await generatePostSkim({
-    postId,
-    apiKey,
-    readTenant,
-    writeContext: toTenantSanityWriteContext(tenant),
-  });
+  const existing = await hasExistingTakeaways(postId, writeContext);
+  if (!existing.ok || existing.data) return;
+
+  await generatePostSkim({ postId, apiKey, readTenant, writeContext });
 };
 
-// Only `create` is a first publish: the editor's approval publish arrives as `update` and must not spend the allowance again.
+// The approval publish arrives as `update`; a republish or redelivered `create` finds the existing takeaways and spends nothing.
 export const startSkimGeneration = ({
   operation,
   type,

@@ -298,6 +298,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/analytics-provider.ts"
+      },
+      {
+        "ref": "COOKIE_ID.GOOGLE_ANALYTICS",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
     "PLAUSIBLE": [
@@ -640,6 +646,22 @@
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
+    "ENTITLEMENT_GRANTED": [
+      {
+        "ref": "AUDIT_ACTION.ENTITLEMENT_GRANTED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "ENTITLEMENT_REVOKED": [
+      {
+        "ref": "AUDIT_ACTION.ENTITLEMENT_REVOKED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
     "SITE": [
       {
         "ref": "AUTH_APP.SITE",
@@ -854,6 +876,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
+      },
+      {
+        "ref": "CONSENT_CATEGORY.ANALYTICS",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/consent-category.ts"
       }
     ],
     "CONSENT_BANNER": [
@@ -1445,6 +1473,14 @@
     "DB_DOMAIN_CLAIM_EXISTS": [
       {
         "ref": "ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
+    "DB_ENTITLEMENT_ALREADY_GRANTED": [
+      {
+        "ref": "ERROR_CODE.DB_ENTITLEMENT_ALREADY_GRANTED",
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
@@ -2192,6 +2228,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "COOKIE_PROVIDER.GOOGLE",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
     "BOOKMARK": [
@@ -4680,6 +4722,38 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "CAPABILITY": [
+      {
+        "ref": "ENTITLEMENT_KIND.CAPABILITY",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
+      }
+    ],
+    "MODULE_PACK": [
+      {
+        "ref": "ENTITLEMENT_KIND.MODULE_PACK",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
+      }
+    ],
+    "LOOK_FIELD": [
+      {
+        "ref": "ENTITLEMENT_KIND.LOOK_FIELD",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
+      }
+    ],
+    "LOCALE_LIMIT": [
+      {
+        "ref": "ENTITLEMENT_KIND.LOCALE_LIMIT",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
       }
     ],
     "OWNER": [
@@ -9912,6 +9986,14 @@
         "file": "apps/web/src/constants/contact-form.ts"
       }
     ],
+    "FIRST_PARTY": [
+      {
+        "ref": "COOKIE_PROVIDER.FIRST_PARTY",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
     "CONSENT": [
       {
         "ref": "COOKIE_ID.CONSENT",
@@ -9995,6 +10077,14 @@
     "THEME": [
       {
         "ref": "COOKIE_ID.THEME",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "GOOGLE_ANALYTICS_VISIT": [
+      {
+        "ref": "COOKIE_ID.GOOGLE_ANALYTICS_VISIT",
         "scope": "app:web",
         "from": "@web/constants/cookie-list",
         "file": "apps/web/src/constants/cookie-list.ts"
@@ -10579,6 +10669,22 @@
     "generate_skim.takeaways_lookup_failed": [
       {
         "ref": "GENERATE_SKIM_LOG.TAKEAWAYS_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.tenant_not_servable": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TENANT_NOT_SERVABLE",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.tenant_resolve_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TENANT_RESOLVE_FAILED",
         "scope": "app:web",
         "from": "@web/constants/generate-skim",
         "file": "apps/web/src/constants/generate-skim.ts"
@@ -11411,6 +11517,14 @@
     "site_config.plan_fetch_failed": [
       {
         "ref": "SITE_CONFIG_LOG.PLAN_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-config",
+        "file": "apps/web/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.analytics_fetch_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.ANALYTICS_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/site-config",
         "file": "apps/web/src/constants/site-config.ts"
