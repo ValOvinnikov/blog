@@ -24,7 +24,7 @@ export const LookSampleBanner = () => {
       <div className={media()}>
         <LookSampleImage />
       </div>
-      <div className={overlay()} />
+      <div className={overlay()} aria-hidden="true" />
       <div className={copy()}>
         <Heading level={2} visual="section" className={title()}>
           {t('bannerHeading')}
