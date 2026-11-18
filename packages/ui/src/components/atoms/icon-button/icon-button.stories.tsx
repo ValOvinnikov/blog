@@ -1,5 +1,4 @@
 import {
-  BRAND_VARIANT,
   HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
   ICONS,
@@ -7,6 +6,10 @@ import {
 } from '@shinefold/config';
 import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
+import {
+  BRAND_BAND_LABELS,
+  BrandBand,
+} from '@shinefold/ui/testing/brand-bands';
 import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
 import { HeaderControlShapes } from '@shinefold/ui/testing/header-control-shapes';
 import { objectKeys } from '@shinefold/utils/primitives';
@@ -25,10 +28,6 @@ const meta = {
     variant: {
       control: 'select',
       options: objectKeys(iconButtonVariants.variants.variant),
-    },
-    tone: {
-      control: 'select',
-      options: objectKeys(iconButtonVariants.variants.tone),
     },
   },
   args: {
@@ -158,58 +157,26 @@ export const Control: TStory = {
   },
 };
 
-// One brand-outline rest state on every ground; hover fills with the tint on
-// the two neutral grounds and with the solid brand fill on the brand-tint
-// ground, where the tint has nowhere else to go. Toggle the toolbar theme to
-// check both light and dark.
+const ControlOnEveryBand = ({ isDisabled }: { isDisabled?: boolean }) => (
+  <div style={{ display: 'flex', gap: '1.5rem' }}>
+    {objectKeys(BRAND_BAND_LABELS).map((tone) => (
+      <BrandBand key={tone} tone={tone}>
+        <IconButton
+          variant="control"
+          ariaLabel={NEXT_SLIDE}
+          title={NEXT_SLIDE}
+          isDisabled={isDisabled}
+        >
+          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
+        </IconButton>
+      </BrandBand>
+    ))}
+  </div>
+);
+
 export const ControlOnGrounds: TStory = {
   name: 'Control — on every ground',
-  render: () => (
-    <div style={{ display: 'flex', gap: '1.5rem' }}>
-      <div
-        className="bg-ambient"
-        data-skin={BRAND_VARIANT.PRIMARY}
-        style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
-      >
-        <IconButton
-          variant="control"
-          tone={BRAND_VARIANT.PRIMARY}
-          ariaLabel={NEXT_SLIDE}
-          title={NEXT_SLIDE}
-        >
-          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
-        </IconButton>
-      </div>
-      <div
-        className="bg-ambient"
-        data-skin={BRAND_VARIANT.SECONDARY}
-        style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
-      >
-        <IconButton
-          variant="control"
-          tone={BRAND_VARIANT.SECONDARY}
-          ariaLabel={NEXT_SLIDE}
-          title={NEXT_SLIDE}
-        >
-          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
-        </IconButton>
-      </div>
-      <div
-        className="bg-ambient"
-        data-skin={BRAND_VARIANT.BRAND_PRIMARY}
-        style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
-      >
-        <IconButton
-          variant="control"
-          tone={BRAND_VARIANT.BRAND_PRIMARY}
-          ariaLabel={NEXT_SLIDE}
-          title={NEXT_SLIDE}
-        >
-          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
-        </IconButton>
-      </div>
-    </div>
-  ),
+  render: () => <ControlOnEveryBand />,
   play: ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const buttons = canvas.getAllByRole('button', { name: NEXT_SLIDE });
@@ -217,58 +184,9 @@ export const ControlOnGrounds: TStory = {
   },
 };
 
-// A disabled control keeps its brand ring and fades with it; toggle the toolbar theme to check both modes.
 export const ControlDisabledOnGrounds: TStory = {
   name: 'Control — disabled, on every ground',
-  render: () => (
-    <div style={{ display: 'flex', gap: '1.5rem' }}>
-      <div
-        className="bg-ambient"
-        data-skin={BRAND_VARIANT.PRIMARY}
-        style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
-      >
-        <IconButton
-          variant="control"
-          tone={BRAND_VARIANT.PRIMARY}
-          ariaLabel={NEXT_SLIDE}
-          title={NEXT_SLIDE}
-          isDisabled={true}
-        >
-          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
-        </IconButton>
-      </div>
-      <div
-        className="bg-ambient"
-        data-skin={BRAND_VARIANT.SECONDARY}
-        style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
-      >
-        <IconButton
-          variant="control"
-          tone={BRAND_VARIANT.SECONDARY}
-          ariaLabel={NEXT_SLIDE}
-          title={NEXT_SLIDE}
-          isDisabled={true}
-        >
-          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
-        </IconButton>
-      </div>
-      <div
-        className="bg-ambient"
-        data-skin={BRAND_VARIANT.BRAND_PRIMARY}
-        style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
-      >
-        <IconButton
-          variant="control"
-          tone={BRAND_VARIANT.BRAND_PRIMARY}
-          ariaLabel={NEXT_SLIDE}
-          title={NEXT_SLIDE}
-          isDisabled={true}
-        >
-          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
-        </IconButton>
-      </div>
-    </div>
-  ),
+  render: () => <ControlOnEveryBand isDisabled={true} />,
 };
 
 export const ButtonShapesRow: TStory = {

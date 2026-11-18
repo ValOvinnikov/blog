@@ -9,20 +9,18 @@ import {
 export type TQuoteCardNameProps = IWithClassName &
   IWithDataTestId & {
     isSpotlight?: TQuoteCardNameVariants['isSpotlight'];
-    tone?: TQuoteCardNameVariants['tone'];
     children: ReactNode;
   };
 
 /** The name slot of a `QuoteCard`; wraps the quoted person's link or text in the link/focus treatment, on an element the component itself owns rather than the caller's link or text. */
 export const QuoteCardName = ({
   isSpotlight,
-  tone,
   className,
   dataTestId,
   children,
 }: TQuoteCardNameProps) => (
   <span
-    className={quoteCardNameVariants({ isSpotlight, tone, class: className })}
+    className={quoteCardNameVariants({ isSpotlight, class: className })}
     data-testid={dataTestId}
   >
     {children}

@@ -1,8 +1,4 @@
-import type {
-  IWithClassName,
-  IWithDataTestId,
-  TBrandVariant,
-} from '@shinefold/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import type { AriaAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 
 import {
@@ -20,7 +16,6 @@ export type TIconButtonProps = IWithClassName &
     isDisabled?: boolean;
     isFocusableWhenDisabled?: boolean;
     isInert?: boolean;
-    tone?: TBrandVariant;
     'aria-expanded'?: AriaAttributes['aria-expanded'];
     'aria-controls'?: AriaAttributes['aria-controls'];
     'aria-haspopup'?: AriaAttributes['aria-haspopup'];
@@ -33,7 +28,6 @@ export const IconButton = ({
   title,
   className,
   variant,
-  tone,
   children,
   dataTestId,
   ref,
@@ -61,7 +55,7 @@ export const IconButton = ({
       aria-controls={ariaControls}
       aria-haspopup={ariaHaspopup}
       data-testid={dataTestId}
-      className={iconButtonVariants({ variant, tone, class: className })}
+      className={iconButtonVariants({ variant, class: className })}
     >
       {children}
     </button>

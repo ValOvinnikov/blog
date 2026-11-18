@@ -1,11 +1,9 @@
 import {
-  BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   ICONS,
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
-  type TBrandVariant,
 } from '@shinefold/config';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
@@ -21,7 +19,6 @@ export interface ICarouselProps<T> extends IWithClassName, IWithDataTestId {
   ariaLabel: string;
   previousLabel: string;
   nextLabel: string;
-  tone?: TBrandVariant;
   slideSize?: TCarouselVariants['slideSize'];
   contentAlignment?: TCarouselVariants['alignment'];
 }
@@ -34,7 +31,6 @@ export const Carousel = <T,>({
   ariaLabel,
   previousLabel,
   nextLabel,
-  tone = BRAND_VARIANT.PRIMARY,
   slideSize = 'fraction',
   contentAlignment = CONTENT_ALIGNMENT.LEFT,
   className,
@@ -77,7 +73,6 @@ export const Carousel = <T,>({
             isDisabled={!canScrollPrev}
             isFocusableWhenDisabled={true}
             variant="control"
-            tone={tone}
           >
             <Icon name={ICONS.CHEVRON_LEFT} size={SIZE.SM} />
           </IconButton>
@@ -88,7 +83,6 @@ export const Carousel = <T,>({
             isDisabled={!canScrollNext}
             isFocusableWhenDisabled={true}
             variant="control"
-            tone={tone}
           >
             <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
           </IconButton>

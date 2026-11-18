@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { BRAND_VARIANT } from '@shinefold/config';
 import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
@@ -11,7 +10,6 @@ import {
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { quoteCardNameVariants } from './components/name/quote-card-name-variants';
 import { QuoteCard, type TQuoteCardProps } from './quote-card';
 import { quoteCardVariants } from './quote-card-variants';
 
@@ -30,14 +28,9 @@ const meta = {
       control: 'select',
       options: objectKeys(quoteCardVariants.variants.align),
     },
-    tone: {
-      control: 'select',
-      options: objectKeys(quoteCardNameVariants.variants.tone),
-    },
   },
   args: {
     role: `${faker.person.jobTitle()}, ${faker.company.name()}`,
-    tone: BRAND_VARIANT.PRIMARY,
     children: (
       <>
         <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
@@ -183,7 +176,7 @@ const OnEveryBand = (args: TQuoteCardProps) => (
     {objectKeys(BRAND_BAND_LABELS).map((tone) => (
       <BrandBand key={tone} tone={tone}>
         <div style={{ maxWidth: 312 }}>
-          <QuoteCard {...args} tone={tone} />
+          <QuoteCard {...args} />
         </div>
       </BrandBand>
     ))}
@@ -230,7 +223,6 @@ const renderUnevenQuote = (
     key={item.id}
     role={item.role}
     align={align}
-    tone={BRAND_VARIANT.PRIMARY}
     dataTestId={`quote-card-${item.id}`}
   >
     <QuoteCard.Quote>{item.quote}</QuoteCard.Quote>

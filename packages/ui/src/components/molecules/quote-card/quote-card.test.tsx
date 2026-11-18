@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { BRAND_VARIANT } from '@shinefold/config';
 import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import { QUOTE_CARD_CAPTION_TEST_ID } from '@shinefold/ui/constants/quote-card';
 import {
@@ -49,7 +48,6 @@ const buildChildrenWithAvatar = (avatar: ReactNode) => [
 ];
 
 const setup = customRender(QuoteCard, {
-  tone: BRAND_VARIANT.PRIMARY,
   children: buildChildren(),
 });
 
@@ -185,7 +183,7 @@ describe(`<${QuoteCard.name}/>`, () => {
     setup({
       children: [
         ...buildChildren(),
-        <QuoteCard.Name key="duplicate">
+        <QuoteCard.Name key="second-name">
           <span>{MOCK_DUPLICATE_NAME}</span>
         </QuoteCard.Name>,
       ],

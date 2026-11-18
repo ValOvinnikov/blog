@@ -68,8 +68,8 @@ Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 ### IconButton — `components/atoms/icon-button/icon-button.tsx`
 
 A compact button for icon, labelled, or avatar-triggered actions: a 22×22 icon-only default, a `bordered` variant sized to its text label, a 32×32 circular `avatar` variant, a 36×36 outlined `control` variant for a standalone control (e.g. carousel navigation), and a 44×44 round outlined `circle` variant sized to the minimum touch target.
-Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · isFocusableWhenDisabled?: boolean · isInert?: boolean · tone?: TBrandVariant · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, TIconButtonVariants, IWithDataTestId)_
-Variants: variant: bordered|avatar|control|circle · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
+Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · isFocusableWhenDisabled?: boolean · isInert?: boolean · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, TIconButtonVariants, IWithDataTestId)_
+Variants: variant: bordered|avatar|control|circle
 
 ### InlineCode — `components/atoms/inline-code/inline-code.tsx`
 
@@ -308,14 +308,14 @@ Slots:
 ### QuoteCard — `components/molecules/quote-card/quote-card.tsx`
 
 A testimonial: what someone said about the site, and who said it.
-Props: role?: string · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · isInteractive?: TQuoteCardVariants['isInteractive'] · tone?: TBrandVariant · children?: TCompoundChildren<typeof QuoteCardParts> _(extends IWithClassName, IWithDataTestId)_
+Props: role?: string · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · isInteractive?: TQuoteCardVariants['isInteractive'] · children?: TCompoundChildren<typeof QuoteCardParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: align: left|center · isSpotlight: (boolean) · isInteractive: (boolean)
 
 Slots:
 
 - **QuoteCard.Quote** — The quote slot of a `QuoteCard`; owns the figure's `<blockquote>`, so the caller passes the quote's inner content and never a `<blockquote>` of its own. Props: isSpotlight?: TQuoteCardQuoteVariants['isSpotlight'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean)
 - **QuoteCard.Avatar** — The avatar slot of a `QuoteCard`; positions the caller's own `Avatar` element beside the quoted person's name. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **QuoteCard.Name** — The name slot of a `QuoteCard`; wraps the quoted person's link or text in the link/focus treatment, on an element the component itself owns rather than the caller's link or text. Props: isSpotlight?: TQuoteCardNameVariants['isSpotlight'] · tone?: TQuoteCardNameVariants['tone'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
+- **QuoteCard.Name** — The name slot of a `QuoteCard`; wraps the quoted person's link or text in the link/focus treatment, on an element the component itself owns rather than the caller's link or text. Props: isSpotlight?: TQuoteCardNameVariants['isSpotlight'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean)
 
 ### SettingRow — `components/molecules/setting-row/setting-row.tsx`
 
@@ -405,7 +405,7 @@ Variants: columns: 1|2|3|4
 ### Carousel — `components/organisms/carousel/carousel.tsx`
 
 Scrolls through a row of items, revealing more of them as the viewport widens.
-Props: items: readonly T[] · renderItem: (args: { item: T; index: number }) => ReactNode · getItemKey?: (args: { item: T; index: number }) => Key · ariaLabel: string · previousLabel: string · nextLabel: string · tone?: TBrandVariant · slideSize?: TCarouselVariants['slideSize'] · contentAlignment?: TCarouselVariants['alignment'] _(extends IWithClassName, IWithDataTestId)_
+Props: items: readonly T[] · renderItem: (args: { item: T; index: number }) => ReactNode · getItemKey?: (args: { item: T; index: number }) => Key · ariaLabel: string · previousLabel: string · nextLabel: string · slideSize?: TCarouselVariants['slideSize'] · contentAlignment?: TCarouselVariants['alignment'] _(extends IWithClassName, IWithDataTestId)_
 Variants: slideSize: fraction|stepped|singleHalvesThirds|content · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER
 
 ### ContentModule — `components/organisms/content-module/content-module.tsx`
