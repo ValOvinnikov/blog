@@ -1,4 +1,7 @@
-import { tenantSiteUrl } from '@platform/utils/routes/routes';
+import {
+  type IMarketingSiteSource,
+  toMarketingSiteUrl,
+} from '@platform/utils/marketing-site-url/marketing-site-url';
 import {
   LEGAL_PAGE_KIND,
   routes,
@@ -10,18 +13,10 @@ export type TLegalPageUrls = {
   privacy: string;
 };
 
-interface ILegalPageUrlsSource {
-  marketingSiteUrl: TMaybeUndefined<string>;
-  rootDomain: TMaybeUndefined<string>;
-}
-
-/** The terms and privacy pages live on the marketing site, which the root domain's apex serves unless its URL is configured. */
-export const toLegalPageUrls = ({
-  marketingSiteUrl,
-  rootDomain,
-}: ILegalPageUrlsSource): TMaybeUndefined<TLegalPageUrls> => {
-  const siteUrl =
-    marketingSiteUrl ?? (rootDomain ? tenantSiteUrl(rootDomain) : undefined);
+export const toLegalPageUrls = (
+  source: IMarketingSiteSource,
+): TMaybeUndefined<TLegalPageUrls> => {
+  const siteUrl = toMarketingSiteUrl(source);
   if (!siteUrl) return undefined;
 
   return {

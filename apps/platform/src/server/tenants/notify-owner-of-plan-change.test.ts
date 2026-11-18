@@ -1,5 +1,9 @@
+import { faker } from '@faker-js/faker';
 import { TENANT_LOG } from '@platform/constants/tenant';
+import deMessages from '@platform/i18n/messages/de.json';
 import enMessages from '@platform/i18n/messages/en.json';
+import esMessages from '@platform/i18n/messages/es.json';
+import frMessages from '@platform/i18n/messages/fr.json';
 import nlMessages from '@platform/i18n/messages/nl.json';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import {
@@ -18,10 +22,11 @@ import {
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
+  MOCK_TENANT_ROOT_DOMAIN,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
-import { adminRoutes } from '@platform/utils/routes/routes';
-import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { adminRoutes, tenantSiteUrl } from '@platform/utils/routes/routes';
+import { LOCALE_ISO_CODES, pricingPageUrl, routes } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { sendEmail } from '@shinefold/email';
 
@@ -35,6 +40,9 @@ vi.mock('@shinefold/email');
 
 const sendEmailMock = vi.mocked(sendEmail);
 
+const MOCK_MARKETING_SITE_URL = faker.internet.url({ appendSlash: false });
+const PRICING_URL = pricingPageUrl(MOCK_MARKETING_SITE_URL);
+
 const sentEmail = () => sendEmailMock.mock.calls[0]?.[0];
 
 const notifyDowngrade = () =>
@@ -44,6 +52,8 @@ describe(notifyOwnerOfPlanChange, () => {
   beforeEach(() => {
     mockedEnv.OWNER_EMAIL_FROM_ADDRESS = MOCK_OWNER_EMAIL_FROM_ADDRESS;
     mockedEnv.PLATFORM_APP_BASE_URL = MOCK_PLATFORM_APP_BASE_URL;
+    mockedEnv.MARKETING_SITE_URL = MOCK_MARKETING_SITE_URL;
+    mockedEnv.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
     getTenantByIdMock.mockReset().mockResolvedValue(mockTenant());
     getTenantOwnerEmailMock.mockReset().mockResolvedValue(MOCK_OWNER_EMAIL);
     sendEmailMock.mockReset().mockResolvedValue(undefined);
@@ -75,6 +85,61 @@ describe(notifyOwnerOfPlanChange, () => {
           MOCK_PLATFORM_APP_BASE_URL,
         ).toString(),
       );
+    });
+  });
+
+  it('emails the owner once, naming Starter, when the site moves from Free to Starter', async () => {
+    await notifyOwnerOfPlanChange(
+      MOCK_TENANT_ID,
+      TENANT_PLAN.FREE,
+      TENANT_PLAN.STARTER,
+    );
+
+    expect(sendEmailMock).toHaveBeenCalledOnce();
+    expect(sentEmail()?.subject).toBe(
+      enMessages.ownerPlanChangeEmail.STARTER.subject,
+    );
+  });
+
+  it.each([
+    [LOCALE_ISO_CODES.EN, enMessages],
+    [LOCALE_ISO_CODES.DE, deMessages],
+    [LOCALE_ISO_CODES.ES, esMessages],
+    [LOCALE_ISO_CODES.FR, frMessages],
+    [LOCALE_ISO_CODES.NL, nlMessages],
+  ])(
+    'links a %s email to the pricing page’s plan comparison',
+    async (locale, messages) => {
+      getTenantByIdMock.mockResolvedValue(mockTenant({ locale }));
+
+      await notifyDowngrade();
+
+      expect(sentEmail()?.text).toContain(
+        `${messages.ownerPlanChangeEmail.plansLinkLabel}: ${PRICING_URL}`,
+      );
+    },
+  );
+
+  describe('without a marketing site URL', () => {
+    beforeEach(() => {
+      mockedEnv.MARKETING_SITE_URL = undefined;
+    });
+
+    it('links to the root domain’s pricing page', async () => {
+      await notifyDowngrade();
+
+      expect(sentEmail()?.text).toContain(
+        pricingPageUrl(tenantSiteUrl(MOCK_TENANT_ROOT_DOMAIN)),
+      );
+    });
+
+    it('still sends, without the pricing link, when no root domain is set either', async () => {
+      mockedEnv.TENANT_ROOT_DOMAIN = undefined;
+
+      await notifyDowngrade();
+
+      expect(sendEmailMock).toHaveBeenCalledOnce();
+      expect(sentEmail()?.text).not.toContain(routes.pricingComparison());
     });
   });
 

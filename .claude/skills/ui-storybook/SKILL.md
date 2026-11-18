@@ -122,8 +122,8 @@ argTypes: {
 ```
 
 - **Narrow to the subset the prop accepts.** A prop typed
-  `TBrandVariantOf<'PRIMARY' | 'SECONDARY'>` lists
-  `[BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY]`; a blanket
+  `Extract<TContentAlignment, 'LEFT' | 'CENTER'>` lists
+  `[CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER]`; a blanket
   `Object.values()` offers a value the type rejects.
 - **A prop that is both dictionary-typed and fed into `tv()` takes the `tv()`
   source.** The variant map is what renders, so it keeps the control honest
