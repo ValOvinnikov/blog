@@ -143,7 +143,9 @@ site as a 14-day Growth trial, with no card.
   when too long — on the toolbar row when the section is wide enough and on
   its own line otherwise. The frame (an image named "Sample page at {width}
   px") draws the desktop bar's three dots without a host, and lays Look's
-  sample (`LookSample`) out at the device width, scaled to the stage's width
+  sample (`LookSample`, so it also shows the band per registry skin and the
+  Banner sample, as intended — the owner sees the chosen hue on every
+  background) out at the device width, scaled to the stage's width
   (less its border, bezel and bar) and, in the Full tier, its inner height
   too (no 608px cap), so the whole frame stays inside the stage. The sample
   wears the typed name ("Your site" while empty) with no logo, the chosen

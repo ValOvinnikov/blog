@@ -1,5 +1,6 @@
 import { LookSampleActions } from '@platform/components/features/site-preview/look-sample/components/look-sample-actions/look-sample-actions';
 import { LookSampleBand } from '@platform/components/features/site-preview/look-sample/components/look-sample-band/look-sample-band';
+import { LookSampleBanner } from '@platform/components/features/site-preview/look-sample/components/look-sample-banner/look-sample-banner';
 import { LookSampleCta } from '@platform/components/features/site-preview/look-sample/components/look-sample-cta/look-sample-cta';
 import { LookSampleFaq } from '@platform/components/features/site-preview/look-sample/components/look-sample-faq/look-sample-faq';
 import { LookSampleForm } from '@platform/components/features/site-preview/look-sample/components/look-sample-form/look-sample-form';
@@ -101,6 +102,7 @@ export const LookSample = ({
       {objectKeys(SKIN_REGISTRY).map((skin) => (
         <LookSampleBand key={skin} skin={skin} />
       ))}
+      <LookSampleBanner />
       <SampleSiteFooter brand={brand} footer={footer} />
     </SiteThemeFrame>
   );

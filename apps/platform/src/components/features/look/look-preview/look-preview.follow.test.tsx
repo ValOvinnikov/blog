@@ -112,9 +112,9 @@ describe(`<${LookPreview.name}/> follow`, () => {
     });
 
     it.each([
-      { row: LOOK_ROW.CARDS, partCount: 6 },
-      { row: LOOK_ROW.SHAPE, partCount: 8 },
-      { row: LOOK_ROW.BUTTONS, partCount: 6 },
+      { row: LOOK_ROW.CARDS, partCount: 9 },
+      { row: LOOK_ROW.SHAPE, partCount: 11 },
+      { row: LOOK_ROW.BUTTONS, partCount: 12 },
       { row: LOOK_ROW.BRAND, partCount: 2 },
     ])(
       'outlines all $partCount sample parts $row changes under one tag',

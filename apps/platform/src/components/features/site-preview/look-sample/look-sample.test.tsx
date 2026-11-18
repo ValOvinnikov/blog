@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
 import {
+  LOOK_SAMPLE_BAND_LABEL_TEST_ID,
   LOOK_SAMPLE_BAND_TEST_ID,
+  LOOK_SAMPLE_BANNER_TEST_ID,
   LOOK_SAMPLE_TOKENS_TEST_ID,
 } from '@platform/constants/look-sample';
 import {
@@ -116,6 +118,8 @@ const {
   bandHeading: BAND_HEADING,
   bandLink: BAND_LINK,
   bandCardTitle: BAND_CARD_TITLE,
+  bannerHeading: BANNER_HEADING,
+  bannerText: BANNER_TEXT,
 } = messages.lookPreview;
 
 const { skinLabel: SKIN_LABEL } = messages.lookForm;
@@ -297,17 +301,17 @@ describe(`<${LookSample.name}/>`, () => {
       expect(ctaText).toBeVisible();
     });
 
-    it.each(SKINS)('labels the %s band with its admin name', (skin) => {
-      const label = screen.getByText(SKIN_LABEL[skin]);
-
-      expect(label).toBeVisible();
-    });
-
     it('shows a band per registry skin, each with a heading, link and card', () => {
       const bands = screen.getAllByTestId(LOOK_SAMPLE_BAND_TEST_ID);
       const bandSkins = bands.map((band) => band.getAttribute(SKIN_ATTRIBUTE));
 
+      const bandLabels = bands.map(
+        (band) =>
+          within(band).getByTestId(LOOK_SAMPLE_BAND_LABEL_TEST_ID).textContent,
+      );
+
       expect(bandSkins).toEqual(SKINS);
+      expect(bandLabels).toEqual(SKINS.map((skin) => SKIN_LABEL[skin]));
 
       bands.forEach((element) => {
         const band = within(element);
@@ -318,6 +322,22 @@ describe(`<${LookSample.name}/>`, () => {
         expect(band.getByRole('link', { name: BAND_LINK })).toBeVisible();
         expect(band.getByRole('link', { name: BAND_CARD_TITLE })).toBeVisible();
       });
+    });
+
+    it('sets the banner on the Brand tint skin with its heading and text', () => {
+      const banner = screen.getByTestId(LOOK_SAMPLE_BANNER_TEST_ID);
+      const bannerHeading = within(banner).getByRole('heading', {
+        level: 2,
+        name: BANNER_HEADING,
+      });
+      const bannerText = within(banner).getByText(BANNER_TEXT);
+
+      expect(banner).toHaveAttribute(
+        SKIN_ATTRIBUTE,
+        BRAND_VARIANT.BRAND_PRIMARY,
+      );
+      expect(bannerHeading).toBeVisible();
+      expect(bannerText).toBeVisible();
     });
 
     it('marks the header and the footer as sample parts', () => {
@@ -429,25 +449,14 @@ describe(`<${LookSample.name}/>`, () => {
     });
   });
 
-  describe('in a dark preview', () => {
-    beforeEach(() => {
-      setup({ theme: { ...MOCK_SITE_PREVIEW_THEME, isDark: true } });
+  it('offers the light theme from a dark preview', () => {
+    setup({ theme: { ...MOCK_SITE_PREVIEW_THEME, isDark: true } });
+
+    const themeToggle = screen.getByRole('button', {
+      name: 'Switch to light theme',
     });
 
-    it('shows one band per registry skin', () => {
-      const bands = screen.getAllByTestId(LOOK_SAMPLE_BAND_TEST_ID);
-      const bandSkins = bands.map((band) => band.getAttribute(SKIN_ATTRIBUTE));
-
-      expect(bandSkins).toEqual(SKINS);
-    });
-
-    it('offers the light theme', () => {
-      const themeToggle = screen.getByRole('button', {
-        name: 'Switch to light theme',
-      });
-
-      expect(themeToggle).toBeVisible();
-    });
+    expect(themeToggle).toBeVisible();
   });
 
   describe('without reader accounts', () => {

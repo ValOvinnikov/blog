@@ -1103,7 +1103,9 @@
     "bandText": "Tablas de mareas, avisos de amarre y el tiempo de la semana, reunidos en un solo lugar.",
     "bandLink": "Ver todos los avisos",
     "bandCardTitle": "Aviso de amarres de invierno",
-    "bandCardExcerpt": "Los amarres del muelle norte se desplazan hacia dentro a partir de noviembre."
+    "bandCardExcerpt": "Los amarres del muelle norte se desplazan hacia dentro a partir de noviembre.",
+    "bannerHeading": "Mareas vivas este fin de semana",
+    "bannerText": "La marea más alta del año llega al muelle norte el sábado por la mañana."
   },
   "lookFollow": {
     "followToggle": "Seguir la tarjeta que estás editando",

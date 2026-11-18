@@ -1103,7 +1103,9 @@
     "bandText": "Tide tables, berth notices and the week's weather, gathered in one place.",
     "bandLink": "See all notices",
     "bandCardTitle": "Winter berth notice",
-    "bandCardExcerpt": "Moorings on the north quay move inward from November."
+    "bandCardExcerpt": "Moorings on the north quay move inward from November.",
+    "bannerHeading": "Spring tides this weekend",
+    "bannerText": "The highest water of the year reaches the north quay on Saturday morning."
   },
   "lookFollow": {
     "followToggle": "Follow the card you are editing",

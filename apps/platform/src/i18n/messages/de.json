@@ -1103,7 +1103,9 @@
     "bandText": "Gezeitentafeln, Liegeplatzhinweise und das Wetter der Woche an einem Ort.",
     "bandLink": "Alle Hinweise ansehen",
     "bandCardTitle": "Hinweis zu Winterliegeplätzen",
-    "bandCardExcerpt": "Die Liegeplätze am Nordkai rücken ab November nach innen."
+    "bandCardExcerpt": "Die Liegeplätze am Nordkai rücken ab November nach innen.",
+    "bannerHeading": "Springflut an diesem Wochenende",
+    "bannerText": "Das höchste Wasser des Jahres erreicht den Nordkai am Samstagmorgen."
   },
   "lookFollow": {
     "followToggle": "Der Karte folgen, die du bearbeitest",
