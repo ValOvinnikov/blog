@@ -1,4 +1,5 @@
 import {
+  SCHEDULED_POST_SKIM_MAX_RETRIES,
   SCHEDULED_POST_SKIM_TIMEOUT_MS,
   WEB_SCHEDULED_POST_SKIM_PATH,
 } from '@worker/constants/scheduled-post-skim';
@@ -18,3 +19,5 @@ export async function requestScheduledPostSkim(
     action: 'generate takeaways for a scheduled post',
   });
 }
+
+requestScheduledPostSkim.maxRetries = SCHEDULED_POST_SKIM_MAX_RETRIES;
