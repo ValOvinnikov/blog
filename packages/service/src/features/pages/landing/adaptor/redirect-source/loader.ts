@@ -3,12 +3,12 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@shinefold/service/sanity/query/query';
+import { uncachedRead } from '@shinefold/service/sanity/query/uncached-read';
 
 import { redirectSourceQuery } from './query';
 import { toLandingRedirectSource } from './transformer';
 import type { TLandingRedirectSource } from './types';
 
-/** Read past the Data Cache: a publish webhook must see the source it was fired for. */
 export async function getRedirectSource(
   id: string,
   tenant: TTenantSanityContext,
@@ -16,7 +16,7 @@ export async function getRedirectSource(
   const raw = await runQuery(redirectSourceQuery, {
     parameters: { id },
     tenant,
-    cache: 'no-store',
+    ...uncachedRead(),
   });
 
   if (!raw) return undefined;

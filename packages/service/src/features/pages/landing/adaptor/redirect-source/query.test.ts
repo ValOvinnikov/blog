@@ -15,7 +15,7 @@ const MOCK_REDIRECT_ID = faker.string.uuid();
 const MOCK_PAGE_ID = faker.string.uuid();
 const MOCK_SOURCE = `/${mockSlug()}`;
 
-const dataset = [
+const MOCK_DATASET = [
   {
     _id: MOCK_REDIRECT_ID,
     _type: 'redirect',
@@ -45,9 +45,14 @@ describe('redirectSourceQuery', () => {
     ['nothing for an id that is not a redirect', MOCK_PAGE_ID, null],
   ])('resolves %s', async (_, id, expected) => {
     await expect(
-      evaluateGroqExpression(redirectSourceQuery.query, dataset, undefined, {
-        id,
-      }),
+      evaluateGroqExpression(
+        redirectSourceQuery.query,
+        MOCK_DATASET,
+        undefined,
+        {
+          id,
+        },
+      ),
     ).resolves.toEqual(expected);
   });
 });
