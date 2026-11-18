@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Text } from './text';
 import { textVariants } from './text-variants';
 
-const meta: Meta<typeof Text> = {
+const meta = {
   title: 'Atoms/Text',
   component: Text,
   tags: ['autodocs'],
@@ -19,10 +19,10 @@ const meta: Meta<typeof Text> = {
       options: Object.values(TEXT_ROLE),
     },
   },
-};
+} satisfies Meta<typeof Text>;
 export default meta;
 
-type TStory = StoryObj<typeof Text>;
+type TStory = StoryObj<typeof meta>;
 
 export const Lead: TStory = {
   args: {

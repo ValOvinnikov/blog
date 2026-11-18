@@ -46,12 +46,7 @@ export const Typography: TStory = {
 export const TextRoles: TStory = {
   render: () => (
     <TokenSection title="Text roles">
-      <div className="grid gap-6 md:grid-cols-2">
-        <TextRoleSpecimens />
-        <div className="dark">
-          <TextRoleSpecimens />
-        </div>
-      </div>
+      <TextRoleSpecimens />
     </TokenSection>
   ),
 };

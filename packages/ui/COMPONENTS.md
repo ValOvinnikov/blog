@@ -129,7 +129,7 @@ Variants: variant: default|accent · interactive: (boolean)
 
 ### Text — `components/atoms/text/text.tsx`
 
-Body copy whose typography comes from a text role in the registry, or from a legacy `variant`.
+The one primitive for copy that is not a heading, wherever on the page it sits.
 Props: as?: TTextElement · textRole?: TTextRole · variant?: TTextVariants['variant'] · style?: CSSProperties · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: variant: lead|muted|hero|card|supporting|statement|meta|emphasis|footnote · textRole: TEXT_ROLE.HERO_TITLE|TEXT_ROLE.POST_TITLE|TEXT_ROLE.PAGE_TITLE|TEXT_ROLE.SECTION_TITLE|TEXT_ROLE.CARD_TITLE|TEXT_ROLE.ITEM_TITLE|TEXT_ROLE.DIALOG_TITLE|TEXT_ROLE.PROSE_H2|TEXT_ROLE.PROSE_H3|TEXT_ROLE.PROSE_H4|TEXT_ROLE.INTRO|TEXT_ROLE.BODY|TEXT_ROLE.CARD_BODY|TEXT_ROLE.META|TEXT_ROLE.EYEBROW|TEXT_ROLE.LABEL|TEXT_ROLE.FOOTNOTE|TEXT_ROLE.CAPTION|TEXT_ROLE.QUOTE|TEXT_ROLE.ATTRIBUTION|TEXT_ROLE.FIGURE|TEXT_ROLE.FIGURE_LABEL
 

@@ -1,13 +1,13 @@
 import {
-  DD_AS_CONST,
-  DIV_AS_CONST,
-  DT_AS_CONST,
-  FIGCAPTION_AS_CONST,
+  type DD_AS_CONST,
+  type DIV_AS_CONST,
+  type DT_AS_CONST,
+  type FIGCAPTION_AS_CONST,
   type IWithClassName,
   type IWithDataTestId,
-  LI_AS_CONST,
+  type LI_AS_CONST,
   P_AS_CONST,
-  SPAN_AS_CONST,
+  type SPAN_AS_CONST,
   type TTextRole,
 } from '@shinefold/config';
 import type { CSSProperties, ReactNode } from 'react';
@@ -34,7 +34,7 @@ export type TTextProps = IWithClassName &
 
 const DEFAULT_VARIANT: NonNullable<TTextVariants['variant']> = 'lead';
 
-/** Body copy whose typography comes from a text role in the registry, or from a legacy `variant`. */
+/** The one primitive for copy that is not a heading, wherever on the page it sits. */
 export const Text = ({
   as: Tag = P_AS_CONST,
   textRole,
