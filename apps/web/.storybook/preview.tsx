@@ -1,4 +1,4 @@
-import '../index.css';
+import './preview.css';
 
 import type { Decorator, Preview } from '@storybook/nextjs-vite';
 import { AppProviders } from '@web/testing/providers';

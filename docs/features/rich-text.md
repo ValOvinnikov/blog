@@ -61,7 +61,7 @@ Editors write formatted text in Sanity's Portable Text editor, and the public si
 ## Configuration
 
 - Editors choose the content inside the shapes; which shape a field uses is fixed in the schema.
-- Not plan-gated. Look reaches it through tokens: prose sizes, link and quote colours, the aside and code-block surfaces (`--code-*` properties in `apps/web/index.css`, light and dark). See ./look.md and ./design-tokens-and-surfaces.md.
+- Not plan-gated. Look reaches it through tokens: prose sizes, link and quote colours, the aside and code-block surfaces (`--code-*` properties in `apps/web/index.css`, a light and dark pair that follows the band's `color-scheme`). See ./look.md and ./design-tokens-and-surfaces.md.
 - Aside labels in the post body are fixed catalog copy (`blogPostPage.asideKind.*`), not Voice.
 
 ## Constraints and invariants

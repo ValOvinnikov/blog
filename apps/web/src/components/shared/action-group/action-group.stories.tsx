@@ -4,7 +4,7 @@ import {
   MOCK_CTA_PRIMARY_ACTION,
   MOCK_CTA_SECONDARY_ACTION,
 } from '@web/testing/modules/cta/fixtures';
-import { onDarkDecorators } from '@web/testing/shared/on-dark/decorators';
+import { onImageDecorators } from '@web/testing/shared/on-image/decorators';
 
 import { ActionGroup } from './action-group';
 
@@ -48,20 +48,18 @@ export const MobileStacked: TStory = {
   globals: { viewport: 'mobile' },
 };
 
-export const OnDarkContained: TStory = {
+export const OnImageContained: TStory = {
   args: {
-    isOnDark: true,
     actions: [
       shortAction,
       { ...longAction, appearance: CTA_ACTION_APPEARANCE.CONTAINED },
     ],
   },
-  decorators: onDarkDecorators,
+  decorators: onImageDecorators,
 };
 
-export const OnDarkInline: TStory = {
+export const OnImageInline: TStory = {
   args: {
-    isOnDark: true,
     actions: [
       {
         ...shortAction,
@@ -73,7 +71,7 @@ export const OnDarkInline: TStory = {
       },
     ],
   },
-  decorators: onDarkDecorators,
+  decorators: onImageDecorators,
 };
 
 export const InlineAppearance: TStory = {

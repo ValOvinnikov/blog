@@ -52,7 +52,7 @@ export const HeroModuleShell = ({
   const heroChildren = [
     hasLength(ctaButtons) && (
       <Hero.Cta>
-        <ActionGroup actions={ctaButtons} isOnDark={isBanner} />
+        <ActionGroup actions={ctaButtons} />
       </Hero.Cta>
     ),
     sanityImage && (

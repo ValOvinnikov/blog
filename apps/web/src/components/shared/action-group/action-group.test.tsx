@@ -22,7 +22,6 @@ const MOCK_ACTION_WITH_SUFFIX = {
 
 const setup = customRender(ActionGroup, {
   actions: [MOCK_CTA_PRIMARY_ACTION, MOCK_CTA_SECONDARY_ACTION],
-  isOnDark: undefined,
 });
 
 describe(`<${ActionGroup.name}/>`, () => {

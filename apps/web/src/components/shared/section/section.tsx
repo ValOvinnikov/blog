@@ -35,7 +35,6 @@ export const Section = ({
   dataTestId,
 }: ISectionProps) => {
   const s = sectionVariants({
-    brandVariant,
     spacingTop: layout?.spacingTop,
     spacingBottom: layout?.spacingBottom,
     containerWidth: layout?.containerWidth,
@@ -46,6 +45,7 @@ export const Section = ({
   return (
     <section
       aria-labelledby={titleId}
+      data-skin={brandVariant}
       className={s.root({ class: className })}
       style={
         appearance &&

@@ -1,13 +1,15 @@
 import { BRAND_VARIANT } from '@shinefold/config';
 import type { Decorator } from '@storybook/nextjs-vite';
-import { Section } from '@web/components/shared/section';
 
-export const onDarkDecorators: Decorator[] = [
+export const onImageDecorators: Decorator[] = [
   (Story) => (
     <div className="dark">
-      <Section brandVariant={BRAND_VARIANT.PRIMARY}>
+      <div
+        data-skin={BRAND_VARIANT.PRIMARY}
+        className="skin-on-image bg-ambient p-8"
+      >
         <Story />
-      </Section>
+      </div>
     </div>
   ),
 ];

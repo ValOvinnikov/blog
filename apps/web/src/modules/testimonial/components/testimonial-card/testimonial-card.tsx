@@ -2,7 +2,6 @@ import {
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
-  type TBrandVariant,
 } from '@shinefold/config';
 import type { TTestimonialItem } from '@shinefold/service';
 import { Avatar } from '@shinefold/ui/components/atoms/avatar';
@@ -18,14 +17,12 @@ const AVATAR_IMAGE_SIZE_PX = { default: 80, spotlight: 112 } as const;
 export interface ITestimonialCardProps extends IWithClassName, IWithDataTestId {
   item: TTestimonialItem;
   align: 'left' | 'center';
-  tone: TBrandVariant;
   isSpotlight?: boolean;
 }
 
 export const TestimonialCard = ({
   item,
   align,
-  tone,
   isSpotlight = false,
   className,
   dataTestId,
@@ -40,7 +37,6 @@ export const TestimonialCard = ({
       align={align}
       isSpotlight={isSpotlight}
       className={className}
-      tone={tone}
       dataTestId={dataTestId}
     >
       <QuoteCard.Quote>

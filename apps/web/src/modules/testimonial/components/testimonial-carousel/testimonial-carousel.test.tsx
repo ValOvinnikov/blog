@@ -1,4 +1,3 @@
-import { BRAND_VARIANT } from '@shinefold/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_TESTIMONIAL_HEADING,
@@ -14,7 +13,6 @@ const CAROUSEL_LABEL = `${MOCK_TESTIMONIAL_HEADING} carousel`;
 const setup = customRender(TestimonialCarousel, {
   items: MOCK_TESTIMONIAL_ITEMS,
   align: 'left',
-  tone: BRAND_VARIANT.PRIMARY,
   title: MOCK_TESTIMONIAL_HEADING,
 });
 

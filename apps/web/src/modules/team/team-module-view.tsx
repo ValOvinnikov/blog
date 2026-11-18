@@ -66,7 +66,6 @@ export const TeamModuleView = ({
           imageShape={imageShape}
           align={cardAlign}
           title={headingBlock.heading}
-          tone={section.brandVariant}
           contentAlignment={contentAlignment}
         />
       ) : (

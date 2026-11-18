@@ -1,6 +1,9 @@
+import type { STORYBOOK_SKINS } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { CodeBlock } from './code-block';
+
+const INVERSE_SKIN: keyof typeof STORYBOOK_SKINS = 'STORYBOOK_INVERSE';
 
 const SAMPLE_CODE = `// Greets a visitor by name
 function greet(name: string): string {
@@ -24,20 +27,8 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-/**
- * Light theme (default) — the code block's background is `bg-surface-2`
- * from the wrapping `<figure>`; syntax token colors read from the `:root`
- * `--code-*` custom properties in `index.css`.
- */
 export const Light: TStory = {};
 
-/**
- * Dark theme — wraps the story in a `.dark`-classed container, the same
- * mechanism `apps/web`'s `ThemeToggleButton` applies to `<html>` at runtime.
- * `.dark` flips `--surface-2` and every `--code-*` token in `index.css`, so
- * the code block's background and syntax colors follow it without any
- * client-side theme-detection code in `CodeBlock` itself.
- */
 export const Dark: TStory = {
   decorators: [
     (Story) => (
@@ -48,9 +39,17 @@ export const Dark: TStory = {
   ],
 };
 
-/**
- * Highlighted lines use the theme-aware `bg-brand-primary-muted`.
- */
 export const WithHighlightedLines: TStory = {
   args: { highlightedLines: [3] },
+};
+
+export const OnInverseSkin: TStory = {
+  args: { highlightedLines: [3] },
+  decorators: [
+    (Story) => (
+      <div data-skin={INVERSE_SKIN} className="bg-ambient p-6">
+        <Story />
+      </div>
+    ),
+  ],
 };

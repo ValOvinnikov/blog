@@ -1488,17 +1488,15 @@ scrims, the band padding and the min-height, so `Hero` and
 `--scrim-brand-*` (Brand tint) or `--scrim-neutral-*` (Plain, Shaded): the brand scrim takes the tenant's accent hue at fixed
 lightness and chroma (emitted by the theme block below), while the neutral
 scrim stays hue-free. A scrim darkens the photo in either mode, so neither
-set nor the on-image tokens change under `.dark`; `ActionGroup` and
-`SocialLink` paint their `isOnDark` state from the same on-image tokens. `tone` **is required**, so a Banner always sits in a skin and is
+set nor the on-image tokens change under `.dark`. `tone` **is required**, so a Banner always sits in a skin and is
 never scrim-less: white copy over an unscrimmed photograph is less legible
 than no treatment at all. With a photo the Banner (`skin-on-image`)
 re-points the skin's text, border and link roles at the on-image colours,
-so a ghost or link `Button` inside it needs no prop. Every Banner adds
+so a ghost or link `Button`, `ActionGroup` or `SocialLink` inside it needs no
+prop. Every Banner adds
 `skin-raised`, which paints the skin's `--ambient-raised` — Plain's lifted
 `--primary-subtle`, every other skin's own ground — and points `--ambient`
-at it; a photo covers that field and a photo-less Banner shows it. Each hero view passes
-`isOnDark` to its `ActionGroup` on Banner, so the actions are painted for a
-dark ground too.
+at it; a photo covers that field and a photo-less Banner shows it.
 
 **And it breaks out the same way**, for the same reason a scrim is needed at
 all: a band that stops at `Section`'s inner container is a card, not a band.

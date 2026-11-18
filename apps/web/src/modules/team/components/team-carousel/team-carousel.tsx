@@ -11,7 +11,6 @@ export interface ITeamCarouselProps extends IWithClassName, IWithDataTestId {
   imageShape: TTeamModule['imageShape'];
   align: 'left' | 'center';
   title: string;
-  tone: TTeamModule['brandVariant'];
   contentAlignment?: ICarouselProps<TTeamMember>['contentAlignment'];
 }
 
@@ -20,7 +19,6 @@ export const TeamCarousel = ({
   imageShape,
   align,
   title,
-  tone,
   contentAlignment,
   className,
   dataTestId,
@@ -32,7 +30,6 @@ export const TeamCarousel = ({
     )}
     getItemKey={({ item }) => item.id}
     title={title}
-    tone={tone}
     contentAlignment={contentAlignment}
     className={className}
     slideSize="singleHalvesThirds"

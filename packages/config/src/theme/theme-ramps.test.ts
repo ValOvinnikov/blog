@@ -38,6 +38,22 @@ const readOklchDeclarations = (
   );
 };
 
+const readLightDarkDeclarations = (
+  css: string,
+  selector: string,
+): Record<string, string>[] => {
+  const declarations = [
+    ...readCssBlock(css, selector).matchAll(
+      /(--[\w-]+): light-dark\((oklch\([^)]*\)), (oklch\([^)]*\))\);/g,
+    ),
+  ];
+  return [1, 2].map((index) =>
+    Object.fromEntries(
+      declarations.map((match) => [match[1], match[index + 1]]),
+    ),
+  );
+};
+
 const formatRamps = (...ramps: TOklchRamp[]): Record<string, string> =>
   Object.assign({}, ...ramps.map((ramp) => formatOklchRamp(ramp, CONSOLE_HUE)));
 
@@ -69,15 +85,12 @@ describe('theme ramps', () => {
     );
   });
 
-  it("match the code-block colours apps/web's index.css sets in :root", () => {
-    expect(readOklchDeclarations(webCss, ':root')).toEqual(
+  it("match the light and dark code-block colours apps/web's index.css sets", () => {
+    expect(
+      readLightDarkDeclarations(webCss, ':root, .dark, [data-skin]'),
+    ).toEqual([
       formatRamps(CODE_SYNTAX_RAMP_LIGHT),
-    );
-  });
-
-  it("match the code-block colours apps/web's index.css sets in .dark", () => {
-    expect(readOklchDeclarations(webCss, '.dark')).toEqual(
       formatRamps(CODE_SYNTAX_RAMP_DARK),
-    );
+    ]);
   });
 });

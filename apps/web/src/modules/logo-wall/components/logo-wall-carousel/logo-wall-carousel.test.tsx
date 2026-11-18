@@ -1,4 +1,3 @@
-import { BRAND_VARIANT } from '@shinefold/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_LOGO_ITEMS,
@@ -11,7 +10,6 @@ vi.mock('@web/i18n/navigation');
 
 const setup = customRender(LogoWallCarousel, {
   logos: MOCK_LOGO_ITEMS,
-  tone: BRAND_VARIANT.PRIMARY,
   title: MOCK_LOGO_WALL_HEADING,
 });
 

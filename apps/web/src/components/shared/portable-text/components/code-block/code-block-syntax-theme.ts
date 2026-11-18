@@ -1,11 +1,6 @@
 import type { CSSProperties } from 'react';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-/**
- * Prism token → CSS custom property map, defined for both `:root` and
- * `.dark` in `apps/web/index.css`. Kept web-local (not `@shinefold/tailwind-config`)
- * since `react-syntax-highlighter` is a web-only dependency.
- */
 const CODE_FG = 'var(--code-fg)';
 const CODE_COMMENT = 'var(--code-comment)';
 const CODE_KEYWORD = 'var(--code-keyword)';
@@ -15,13 +10,6 @@ const CODE_VARIABLE = 'var(--code-variable)';
 const CODE_CONSTANT = 'var(--code-constant)';
 const CODE_URL = 'var(--code-url)';
 
-/**
- * `oneDark` with its literal HSL colors replaced by theme-aware CSS custom
- * properties, and its hard-coded background stripped so the wrapping
- * `<figure>`'s `bg-surface-2` (`code-block-variants.ts`) shows through.
- * Every non-color declaration is kept as-is from `oneDark`; only the base
- * surface + core token colors are remapped.
- */
 export const codeBlockSyntaxTheme: Record<string, CSSProperties> = {
   ...oneDark,
   'code[class*="language-"]': {
@@ -35,12 +23,7 @@ export const codeBlockSyntaxTheme: Record<string, CSSProperties> = {
     background: 'transparent',
     textShadow: 'none',
     color: CODE_FG,
-    // The wrapping `<figure>` already owns spacing and top-corner rounding
-    // for the whole card, incl. the `<figcaption>` filename bar rendered
-    // above this `<pre>` — zero `oneDark`'s own margin/top-radius so they
-    // don't fight the figure's. Bottom corners are left as `oneDark`'s
-    // default since the figure's own `overflow-hidden rounded-lg` already
-    // governs the visible outer shape.
+    // The wrapping <figure> owns spacing and the top corners, above the filename bar.
     margin: 0,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,

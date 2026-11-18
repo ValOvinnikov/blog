@@ -111,11 +111,7 @@ export const HeroProfileModuleView = ({
 
       {hasLength(socialLinks) && (
         <Hero.Social>
-          <SocialLinks
-            profiles={socialLinks}
-            variant="outlined"
-            isOnDark={isBanner}
-          />
+          <SocialLinks profiles={socialLinks} variant="outlined" />
         </Hero.Social>
       )}
     </HeroModuleShell>

@@ -3,7 +3,6 @@
 import type {
   IWithClassName,
   IWithDataTestId,
-  TBrandVariant,
   TCardImageShape,
 } from '@shinefold/config';
 import type { TFeatureListItem } from '@shinefold/service';
@@ -18,7 +17,6 @@ export interface IFeatureListCarouselProps
   align: 'left' | 'center';
   imageSizes: string;
   title: string;
-  tone?: TBrandVariant;
   contentAlignment?: ICarouselProps<TFeatureListItem>['contentAlignment'];
   hasAnyImage?: boolean;
 }
@@ -29,7 +27,6 @@ export const FeatureListCarousel = ({
   align,
   imageSizes,
   title,
-  tone,
   contentAlignment,
   hasAnyImage,
   className,
@@ -49,7 +46,6 @@ export const FeatureListCarousel = ({
     )}
     getItemKey={({ item }) => item.id}
     title={title}
-    tone={tone}
     contentAlignment={contentAlignment}
     className={className}
     dataTestId={dataTestId}
