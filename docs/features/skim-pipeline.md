@@ -1,27 +1,29 @@
 ---
 title: Skim pipeline
-status: partial
+status: done
 layers: [studio, service, web, worker, db]
 code:
   - apps/web/src/app/api/generate-skim/**
   - apps/web/src/server/revalidate/start-skim-generation/**
   - apps/web/src/server/skim/**
+  - apps/worker/src/workflows/generate-scheduled-post-skim.ts
+  - apps/worker/src/units/scheduled-post-skim/**
   - packages/service/src/features/editorial/skim/**
   - packages/service/src/sanity/write-client/**
   - packages/studio/src/schema-types/objects/post-takeaways/**
-epics: [1028, 1027]
+epics: [1028]
 ---
 
 # Skim pipeline
 
 ## What it does
 
-When a post is first published, the public site asks Claude for 3–7 one-sentence takeaways of it and writes them onto the post's **draft** as its `postTakeaways`. Nothing reaches readers until an editor reviews the takeaways in the Studio and publishes the post again; publishing is the approval. Approved takeaways switch on the post's **30s** depth (./reading-experience.md). Generation rides the tenant's existing revalidation webhook; a manual endpoint regenerates on demand. The worker's go-live run is not built yet, so a post first published with a future date gets no takeaways today and its enqueue is logged as refused; that is why the status is partial.
+When a post is first published, the public site asks Claude for 3–7 one-sentence takeaways of it and writes them onto the post's **draft** as its `postTakeaways`. Nothing reaches readers until an editor reviews the takeaways in the Studio and publishes the post again; publishing is the approval. Approved takeaways switch on the post's **30s** depth (./reading-experience.md). Generation rides the tenant's existing revalidation webhook; a manual endpoint regenerates on demand. A post first published with a future date gets its takeaways from a worker run when it goes live.
 
 ## Triggers
 
 - **First publish:** `POST /api/revalidate` (./rendering-and-caching.md), on a `create` of a `page_post` from a tenant project, calls `startSkimGeneration`, which works in `after()` so the webhook answers first. No second Sanity webhook is registered. It starts nothing for an `update` (so the editor's approval publish never spends the allowance again), a `delete` (which includes an unpublish), a starter post (`starter.` id), a platform-project webhook, a tenant with no read credentials or a missing `ANTHROPIC_API_KEY`. In `after()` it reads `publishedAt` uncached: a post with no date gets nothing; one already live resolves the servable tenant by id (a tenant no longer servable logs `generate_skim.tenant_not_servable`), skips a post whose draft or published document already has takeaways (`hasExistingTakeaways`, shared with the go-live route; a failed read logs `generate_skim.takeaways_lookup_failed`), and otherwise runs the shared pipeline with the tenant's own read and write credentials; one dated ahead is handed to the worker for its go-live (below) and nothing is generated now. A failed date read logs `generate_skim.published_at_lookup_failed`; anything that throws logs `generate_skim.publish_start_failed`; neither reaches the webhook's response. Unpublishing and republishing a post sends a `create`, as does a redelivered webhook; for a post that has takeaways it generates nothing, claims no allowance and leaves its takeaways as they were.
-- **Go-live of a post first published with a future date:** web `POST`s `{ tenantId, postId, publishedAt }` to `<WORKER_ENQUEUE_URL>/api/scheduled-post-skim`, signed under `WORKER_NEWSLETTER_ENQUEUE_SECRET` (`generate_skim.go_live_enqueue_skipped`, `_refused`, `_failed` when it does not start). The worker run sleeps until the post's current date and calls `POST /api/generate-skim/scheduled` with the same body, signed with the enqueue signature under `SANITY_REVALIDATE_SECRET` and that path. The route generates at most once: an unsigned call answers 401, a malformed body 400, an unknown or no longer servable tenant 404 (`generate_skim.tenant_not_servable`), a tenant lookup that throws 500 (`generate_skim.tenant_resolve_failed`); a post whose current `publishedAt` differs from the signed one, or is missing, answers 204 with nothing done; a matching date still ahead answers 425 Too Early, which the worker retries, so a run waking slightly early still generates; a post whose draft or published document already has takeaways (`hasExistingTakeaways`) answers 204, which makes a retried or duplicated call a no-op and never overwrites hand-written takeaways. A failed date or takeaways read answers 500 (`generate_skim.published_at_lookup_failed`, `generate_skim.takeaways_lookup_failed`), a missing `ANTHROPIC_API_KEY` 503 (`generate_skim.config_missing`); otherwise it runs the shared pipeline and answers as the manual route does from the write gate on (200 with the count, or the gate's refusal). No table records the go-live; the worker's run hook token keeps one run per tenant, post and date.
+- **Go-live of a post first published with a future date:** web `POST`s `{ tenantId, postId, publishedAt }` to `<WORKER_ENQUEUE_URL>/api/scheduled-post-skim`, signed under `WORKER_NEWSLETTER_ENQUEUE_SECRET` (`generate_skim.go_live_enqueue_skipped`, `_refused`, `_failed` when it does not start). The worker refuses a date more than 60 seconds past (`SCHEDULED_POST_GRACE_MS`) and starts a `generateScheduledPostSkim` run, the same sleep-and-recheck run as the scheduled-post purge ([posts](./posts.md)): it sleeps until the post's date, re-reading it at least daily, ends with nothing done if the post was re-dated, unpublished or deleted, and otherwise calls `POST /api/generate-skim/scheduled` with the same body, signed with the enqueue signature under `SANITY_REVALIDATE_SECRET` and that path. The route generates at most once: an unsigned call answers 401, a malformed body 400, an unknown or no longer servable tenant 404 (`generate_skim.tenant_not_servable`), a tenant lookup that throws 500 (`generate_skim.tenant_resolve_failed`); a post whose current `publishedAt` differs from the signed one, or is missing, answers 204 with nothing done; a matching date still ahead answers 425 Too Early, which the worker retries, so a run waking slightly early still generates; a post whose draft or published document already has takeaways (`hasExistingTakeaways`) answers 204, which makes a retried or duplicated call a no-op and never overwrites hand-written takeaways. A failed date or takeaways read answers 500 (`generate_skim.published_at_lookup_failed`, `generate_skim.takeaways_lookup_failed`), a missing `ANTHROPIC_API_KEY` 503 (`generate_skim.config_missing`); otherwise it runs the shared pipeline and answers as the manual route does from the write gate on (200 with the count, or the gate's refusal). No table records the go-live; the worker's run hook token (`scheduled-post-skim:<tenantId>:<postId>:<publishedAt>`) keeps one run per tenant, post and date. The worker's call to the route waits up to 90 seconds; a 408, 425 or 429 is retried (at its `Retry-After` when sent), any other 4xx (a 403 for a used allowance or an unwritable tenant, a 422 for a failed generation) ends the run, and a 5xx or timeout is retried on the step's default schedule. Retrying a 5xx is deliberate: most happen before the claim or give it back, so a retry is the only way the post still gets takeaways, and the one that keeps its claim, a failed save, costs at most one generation per retry, as a webhook retry does on the publish path. A run that still fails after its retries logs `scheduled_post_skim.run_failed`; one that cannot be started logs `scheduled_post_skim.start_failed` and answers web 500.
 - **Manual:** `POST /api/generate-skim?secret=` regenerates on demand, for any post, whatever its earlier takeaways.
 
 ## Surfaces and routes
@@ -73,6 +75,9 @@ When a post is first published, the public site asks Claude for 3–7 one-senten
 - `apps/web/src/server/skim/has-existing-takeaways/has-existing-takeaways.ts`
 - `apps/web/src/server/skim/generate-takeaways/generate-takeaways.ts`
 - `apps/web/src/server/skim/skim-write-gate/skim-write-gate.ts`
+- `apps/worker/src/app/api/scheduled-post-skim/route.ts`
+- `apps/worker/src/workflows/generate-scheduled-post-skim.ts`
+- `apps/worker/src/units/scheduled-post-skim/request-scheduled-post-skim.ts`
 - `packages/db/src/queries/takeaway-generations/`
 - `apps/web/src/server/tenant/tenant-sanity-context/tenant-sanity-context.ts`
 - `packages/service/src/features/editorial/skim/application/service.ts`
@@ -85,10 +90,10 @@ When a post is first published, the public site asks Claude for 3–7 one-senten
 
 - `apps/web/src/app/api/generate-skim/route.test.ts` (the shared pipeline, through the manual route), `apps/web/src/app/api/generate-skim/scheduled/route.test.ts` (go-live guard, including the retry no-op), `apps/web/src/server/revalidate/start-skim-generation/start-skim-generation.test.ts`, `apps/web/src/app/api/revalidate/route.test.ts`, `apps/web/src/server/skim/generate-takeaways/generate-takeaways.test.ts`, `apps/web/src/server/tenant/tenant-sanity-context/tenant-sanity-context.test.ts`.
 - `packages/db/src/queries/takeaway-generations/**/*.test.ts`.
+- `apps/worker/src/app/api/scheduled-post-skim/route.test.ts`, `apps/worker/src/workflows/generate-scheduled-post-skim.test.ts`, `apps/worker/src/units/scheduled-post-skim/request-scheduled-post-skim.test.ts`; the shared run, enqueue route and web call are covered by `apps/worker/src/workflows/scheduled-post-run.test.ts`, `apps/worker/src/utils/scheduled-post/start-scheduled-post-run.test.ts` and `apps/worker/src/utils/scheduled-post/post-to-web.test.ts`.
 - `packages/service/src/features/editorial/skim/**/*.test.ts`, `packages/service/src/sanity/write-client/write-client.test.ts`.
 - No stories: the pipeline has no UI of its own.
 
 ## Related
 
-- #1027 the worker's go-live run for a post first published with a future date.
 - #1028 epic: skip regeneration on redundant publishes, with a body fingerprint and a force override (#1029 studio, #1030 service, #1031 web); it could widen the publish trigger to `update`.

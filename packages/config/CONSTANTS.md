@@ -1132,6 +1132,13 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@worker/constants/scheduled-post-purge` — `apps/worker/src/constants/scheduled-post-purge.ts`
 
 - **SCHEDULED_POST_PURGE_LOG**: `START_FAILED`=`"scheduled_post_purge.start_failed"`, `RUN_FAILED`=`"scheduled_post_purge.run_failed"`
+
+### `@worker/constants/scheduled-post-skim` — `apps/worker/src/constants/scheduled-post-skim.ts`
+
+- **SCHEDULED_POST_SKIM_LOG**: `START_FAILED`=`"scheduled_post_skim.start_failed"`, `RUN_FAILED`=`"scheduled_post_skim.run_failed"`
+
+### `@worker/constants/scheduled-post` — `apps/worker/src/constants/scheduled-post.ts`
+
 - **SCHEDULED_POST_STATE**: `DUE`, `SCHEDULED`, `STALE`
 
 ### `@worker/constants/workflow` — `apps/worker/src/constants/workflow.ts`

@@ -1,22 +1,22 @@
 import { getTenantSanityCredentials } from '@shinefold/db/queries/tenants';
-import { SCHEDULED_POST_STATE } from '@worker/constants/scheduled-post-purge';
+import { SCHEDULED_POST_STATE } from '@worker/constants/scheduled-post';
 import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
 import { MOCK_ONE_HOUR_MS } from '@worker/testing/clock/frozen-clock';
 import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import {
   MOCK_LATER_PUBLISHED_AT,
   MOCK_PUBLISHED_AT,
-} from '@worker/testing/scheduled-post-purge/fixtures';
+} from '@worker/testing/scheduled-post/fixtures';
 import {
   MOCK_SANITY_CREDENTIALS,
   MOCK_TENANT_ID,
 } from '@worker/testing/tenant/fixtures';
-import { readPostPublishedAt } from '@worker/utils/scheduled-post-purge/read-post-published-at';
+import { readPostPublishedAt } from '@worker/utils/scheduled-post/read-post-published-at';
 
 import { checkScheduledPost } from './check-scheduled-post';
 
 vi.mock('@shinefold/db/queries/tenants');
-vi.mock('@worker/utils/scheduled-post-purge/read-post-published-at');
+vi.mock('@worker/utils/scheduled-post/read-post-published-at');
 
 const MOCK_PUBLISH_MS = Date.parse(MOCK_PUBLISHED_AT);
 const STALE = { state: SCHEDULED_POST_STATE.STALE };

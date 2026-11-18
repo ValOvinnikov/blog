@@ -8208,8 +8208,8 @@
       {
         "ref": "SCHEDULED_POST_STATE.DUE",
         "scope": "app:worker",
-        "from": "@worker/constants/scheduled-post-purge",
-        "file": "apps/worker/src/constants/scheduled-post-purge.ts"
+        "from": "@worker/constants/scheduled-post",
+        "file": "apps/worker/src/constants/scheduled-post.ts"
       }
     ],
     "development": [
@@ -12044,8 +12044,8 @@
       {
         "ref": "SCHEDULED_POST_STATE.SCHEDULED",
         "scope": "app:worker",
-        "from": "@worker/constants/scheduled-post-purge",
-        "file": "apps/worker/src/constants/scheduled-post-purge.ts"
+        "from": "@worker/constants/scheduled-post",
+        "file": "apps/worker/src/constants/scheduled-post.ts"
       }
     ],
     "CANCELLED": [
@@ -12296,12 +12296,28 @@
         "file": "apps/worker/src/constants/scheduled-post-purge.ts"
       }
     ],
+    "scheduled_post_skim.start_failed": [
+      {
+        "ref": "SCHEDULED_POST_SKIM_LOG.START_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post-skim",
+        "file": "apps/worker/src/constants/scheduled-post-skim.ts"
+      }
+    ],
+    "scheduled_post_skim.run_failed": [
+      {
+        "ref": "SCHEDULED_POST_SKIM_LOG.RUN_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post-skim",
+        "file": "apps/worker/src/constants/scheduled-post-skim.ts"
+      }
+    ],
     "STALE": [
       {
         "ref": "SCHEDULED_POST_STATE.STALE",
         "scope": "app:worker",
-        "from": "@worker/constants/scheduled-post-purge",
-        "file": "apps/worker/src/constants/scheduled-post-purge.ts"
+        "from": "@worker/constants/scheduled-post",
+        "file": "apps/worker/src/constants/scheduled-post.ts"
       }
     ],
     "pending": [
