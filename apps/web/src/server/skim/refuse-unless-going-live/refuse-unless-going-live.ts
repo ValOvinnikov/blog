@@ -1,7 +1,8 @@
 import { HTTP_STATUS, type TMaybeUndefined } from '@shinefold/config';
 import { service, type TTenantSanityContext } from '@shinefold/service';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
-import { MS_PER_SECOND, RETRY_AFTER_HEADER } from '@web/constants/http';
+import { RETRY_AFTER_HEADER } from '@web/constants/http';
+import { MS_PER_SECOND } from '@web/constants/time';
 import type { TGoLiveRequest } from '@web/server/skim/go-live-request/go-live-request';
 import { respondEmpty } from '@web/utils/empty-response/empty-response';
 import { logger } from '@web/utils/logger/logger';
@@ -31,10 +32,7 @@ export const refuseUnlessGoingLive = async (
   const msUntilGoLive = goLiveMs - Date.now();
   // A non-2xx makes the worker retry, so a run that wakes just before the date still generates.
   if (msUntilGoLive > 0) {
-    const retryAfterSeconds = Math.max(
-      1,
-      Math.ceil(msUntilGoLive / MS_PER_SECOND),
-    );
+    const retryAfterSeconds = Math.ceil(msUntilGoLive / MS_PER_SECOND);
     return respondEmpty(HTTP_STATUS.TOO_EARLY, {
       [RETRY_AFTER_HEADER]: String(retryAfterSeconds),
     });

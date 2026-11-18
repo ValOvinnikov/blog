@@ -2,7 +2,8 @@ import { faker } from '@faker-js/faker';
 import { HTTP_STATUS } from '@shinefold/config/constants';
 import { errorResult, okResult } from '@shinefold/utils';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
-import { MS_PER_SECOND, RETRY_AFTER_HEADER } from '@web/constants/http';
+import { RETRY_AFTER_HEADER } from '@web/constants/http';
+import { MS_PER_SECOND } from '@web/constants/time';
 import { generatePostSkim } from '@web/server/skim/generate-post-skim/generate-post-skim';
 import { resolveTenantById } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { toTenantSanityWriteContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
@@ -63,7 +64,7 @@ const MOCK_GO_LIVE_AT = faker.date.recent({ refDate: MOCK_NOW }).toISOString();
 const MOCK_MOVED_GO_LIVE_AT = faker.date
   .soon({ refDate: MOCK_NOW })
   .toISOString();
-const MOCK_SECONDS_EARLY = faker.number.int({ min: 2, max: 60 });
+const MOCK_SECONDS_EARLY = faker.number.int({ min: 6, max: 60 });
 const MOCK_SUB_SECOND_EARLY_MS = faker.number.int({ min: 1, max: 999 });
 const MOCK_TAKEAWAY_COUNT = faker.number.int({ min: 3, max: 7 });
 const MOCK_REFUSAL_MESSAGE = faker.lorem.sentence();

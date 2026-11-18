@@ -8,4 +8,3 @@ export const ROBOTS_DIRECTIVE = {
 } as const;
 
 export const RETRY_AFTER_HEADER = 'retry-after';
-export const MS_PER_SECOND = 1000;
