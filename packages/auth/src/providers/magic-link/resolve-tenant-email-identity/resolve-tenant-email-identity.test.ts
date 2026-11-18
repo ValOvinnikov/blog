@@ -9,7 +9,7 @@ import {
 import { resolveTenantEmailBrand } from '@shinefold/config';
 import { LOCALE_ISO_CODES, TENANT_PLAN } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND, PLAN_LOCALE_LIMIT } from '@shinefold/db/constants';
-import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/fixtures';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 
 import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';
 

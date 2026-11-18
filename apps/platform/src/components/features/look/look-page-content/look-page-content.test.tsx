@@ -23,7 +23,6 @@ import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
-  mockEntitlementGrant,
   mockReadyTenant,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
@@ -34,6 +33,7 @@ import {
   ENTITLEMENT_KIND,
   LOOK_FIELD,
 } from '@shinefold/db/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPageContent } from './look-page-content';

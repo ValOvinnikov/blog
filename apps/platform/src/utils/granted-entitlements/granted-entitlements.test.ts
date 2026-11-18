@@ -1,7 +1,4 @@
-import {
-  MOCK_TENANT_CREATED_AT,
-  mockEntitlementGrant,
-} from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_CREATED_AT } from '@platform/testing/tenants/fixtures';
 import {
   CAPABILITY,
   MODULE_PACK,
@@ -13,6 +10,7 @@ import {
   LOOK_FIELD,
   PLAN_LOCALE_LIMIT,
 } from '@shinefold/db/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 
 import { grantedEntitlements } from './granted-entitlements';
 

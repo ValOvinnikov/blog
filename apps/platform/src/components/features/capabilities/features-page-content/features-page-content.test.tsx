@@ -9,7 +9,6 @@ import {
   mockReadyTenant,
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
-  mockEntitlementGrant,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
@@ -21,6 +20,7 @@ import {
 import { ANALYTICS_PROVIDER, TENANT_PLAN } from '@shinefold/config/constants';
 import type { TTenantAnalytics } from '@shinefold/db/queries/tenant-analytics';
 import { MOCK_GOOGLE_ANALYTICS } from '@shinefold/db/testing/tenant-analytics/fixtures';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 
 import { FeaturesPageContent } from './features-page-content';
 

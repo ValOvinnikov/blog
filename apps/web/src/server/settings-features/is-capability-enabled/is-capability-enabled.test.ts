@@ -2,14 +2,12 @@ import { faker } from '@faker-js/faker';
 import { CAPABILITY, type TCapability } from '@shinefold/config';
 import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import { SETTINGS_FEATURES_LOG } from '@web/constants/settings-features';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
-import {
-  mockEntitlementGrant,
-  mockSettingsFeaturesRowEnabling,
-} from '@web/testing/server/settings-features/fixtures';
+import { mockSettingsFeaturesRowEnabling } from '@web/testing/server/settings-features/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_OTHER_TENANT_ID,

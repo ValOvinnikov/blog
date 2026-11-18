@@ -1,13 +1,13 @@
 import { faker } from '@faker-js/faker';
 import { CAPABILITY, TENANT_PLAN } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import { TENANT_ENTITLEMENTS_LOG } from '@web/constants/tenant-entitlements';
 import { ONE_HOUR_IN_SECONDS } from '@web/constants/time';
 import {
   clearNextCache,
   revalidateTag,
 } from '@web/testing/server/next-cache/json-round-trip-next-cache';
-import { mockEntitlementGrant } from '@web/testing/server/settings-features/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_TENANT_ID,

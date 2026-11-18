@@ -152,16 +152,16 @@ describe(toEffectiveLookWithin, () => {
 
 describe(isLookFieldWithin, () => {
   it.each([
-    ['preset', TENANT_PLAN.FREE, FREE, true],
-    ['logoAssetUrl', TENANT_PLAN.FREE, FREE, true],
-    ['brandName', TENANT_PLAN.FREE, FREE, true],
-    ['headingFont', TENANT_PLAN.FREE, FREE, false],
-    ['cookieSettingsButton', TENANT_PLAN.FREE, FREE, true],
-    ['footerLayout', TENANT_PLAN.FREE, FREE, false],
-    ['headerControlShape', TENANT_PLAN.FREE, FREE, false],
-    ['headingFont', TENANT_PLAN.GROWTH, GROWTH, true],
-    ['headingFont', MOCK_ENTITLEMENTS_LABEL, MOCK_ENTITLEMENTS, true],
-    ['bodyFont', MOCK_ENTITLEMENTS_LABEL, MOCK_ENTITLEMENTS, false],
+    [LOOK_FIELD.PRESET, TENANT_PLAN.FREE, FREE, true],
+    [LOOK_FIELD.LOGO_ASSET_URL, TENANT_PLAN.FREE, FREE, true],
+    [LOOK_FIELD.BRAND_NAME, TENANT_PLAN.FREE, FREE, true],
+    [LOOK_FIELD.HEADING_FONT, TENANT_PLAN.FREE, FREE, false],
+    [LOOK_FIELD.COOKIE_SETTINGS_BUTTON, TENANT_PLAN.FREE, FREE, true],
+    [LOOK_FIELD.FOOTER_LAYOUT, TENANT_PLAN.FREE, FREE, false],
+    [LOOK_FIELD.HEADER_CONTROL_SHAPE, TENANT_PLAN.FREE, FREE, false],
+    [LOOK_FIELD.HEADING_FONT, TENANT_PLAN.GROWTH, GROWTH, true],
+    [LOOK_FIELD.HEADING_FONT, MOCK_ENTITLEMENTS_LABEL, MOCK_ENTITLEMENTS, true],
+    [LOOK_FIELD.BODY_FONT, MOCK_ENTITLEMENTS_LABEL, MOCK_ENTITLEMENTS, false],
   ] as const)(
     'reports %s within %s as %s',
     (field, _, entitlements, expected) => {

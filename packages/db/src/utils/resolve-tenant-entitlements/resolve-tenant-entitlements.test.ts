@@ -8,8 +8,8 @@ import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
 import {
   MOCK_GRANT_FUTURE,
   MOCK_GRANT_PAST,
-  mockEntitlementGrant,
 } from '@shinefold/db/testing/tenant-entitlement-grants/fixtures';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 
 import {
   resolveTenantEntitlements,
