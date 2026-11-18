@@ -3,9 +3,9 @@ import type { TMaybeNull } from '@shinefold/config/types';
 import { SANITY_API_PATH } from '@shinefold/db/utils/sanity-management-client/sanity-api-paths';
 import { sanityWebhooksRequest } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks-request';
 
-// `before()` is null on a create, so `previousSlug` and `previousSource` are too.
+// `before()` is null on a create, so every `previous*` field but `previousIsPrefix` is too.
 export const REVALIDATE_WEBHOOK_PROJECTION =
-  '{_type, _id, "slug": slug.current, "previousSlug": before().slug.current, "source": select(_type == "redirect" => source), "previousSource": select(_type == "redirect" => before().source), "language": select(_type == "redirect" => language), "isPrefix": select(_type == "redirect" => coalesce(isPrefix, false))}';
+  '{_type, _id, "slug": slug.current, "previousSlug": before().slug.current, "source": select(_type == "redirect" => source), "previousSource": select(_type == "redirect" => before().source), "language": select(_type == "redirect" => language), "previousLanguage": select(_type == "redirect" => before().language), "isPrefix": select(_type == "redirect" => coalesce(isPrefix, false)), "previousIsPrefix": select(_type == "redirect" => coalesce(before().isPrefix, false))}';
 
 const REVALIDATE_WEBHOOK_RULE = {
   on: [
