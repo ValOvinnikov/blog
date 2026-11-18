@@ -34,7 +34,6 @@ export type TTextProps = IWithClassName &
 
 const DEFAULT_VARIANT: NonNullable<TTextVariants['variant']> = 'lead';
 
-/** The one primitive for copy that is not a heading, wherever on the page it sits. */
 export const Text = ({
   as: Tag = P_AS_CONST,
   textRole,

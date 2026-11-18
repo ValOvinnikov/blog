@@ -10,6 +10,8 @@ import {
   extractVariants,
   findOwnPropsType,
   findPropsType,
+  missingDescriptions,
+  NAME_IS_PURPOSE,
   parseSource,
 } from './gen-ui-index.mjs';
 
@@ -270,5 +272,22 @@ describe('extractVariants', () => {
       ),
       [],
     );
+  });
+});
+
+describe('missingDescriptions', () => {
+  it('lists an undescribed component unless its name is its purpose', () => {
+    const [exempt] = NAME_IS_PURPOSE;
+    const layers = [
+      {
+        entries: [
+          { name: exempt },
+          { name: 'Widget' },
+          { name: 'Gadget', purpose: 'x' },
+        ],
+      },
+    ];
+
+    assert.deepEqual(missingDescriptions(layers), ['Widget']);
   });
 });
