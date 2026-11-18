@@ -1,1 +1,4 @@
-export { buildTenantSitePaths } from './build-tenant-site-paths';
+export {
+  buildTenantSitePaths,
+  type TBuildTenantSitePathsInput,
+} from './build-tenant-site-paths';

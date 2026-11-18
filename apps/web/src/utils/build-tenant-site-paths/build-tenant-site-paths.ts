@@ -16,6 +16,7 @@ export type TBuildTenantSitePathsInput = {
   locales: readonly string[];
   lists: TTenantPageLists;
   documentHref?: string;
+  localizedDocumentPaths?: TLocalizedPath[];
   renamedDocument?: TRenamedDocument;
 };
 
@@ -39,6 +40,7 @@ export const buildTenantSitePaths = ({
   locales,
   lists,
   documentHref,
+  localizedDocumentPaths = [],
   renamedDocument,
 }: TBuildTenantSitePathsInput): string[] => {
   const { posts, topics, tags, topicPages, tagPages, blogPages } = lists;
@@ -70,6 +72,7 @@ export const buildTenantSitePaths = ({
     ...toLocalizedPaths(landingPages, routes.landingPage),
     ...toLocalizedPaths(privacyDocuments, routes.privacyDocument),
     ...toLocalizedPaths(legalDocuments, routes.legalDocument),
+    ...localizedDocumentPaths,
   ];
 
   const scopedPaths = [
