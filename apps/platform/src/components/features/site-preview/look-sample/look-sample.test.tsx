@@ -303,7 +303,7 @@ describe(`<${LookSample.name}/>`, () => {
       expect(label).toBeVisible();
     });
 
-    it('shows one band per registry skin in registry order, each with a heading, a link and a linked card', () => {
+    it('shows a band per registry skin, each with a heading, link and card', () => {
       const bands = screen.getAllByTestId(LOOK_SAMPLE_BAND_TEST_ID);
       const bandSkins = bands.map((band) => band.getAttribute(SKIN_ATTRIBUTE));
 
