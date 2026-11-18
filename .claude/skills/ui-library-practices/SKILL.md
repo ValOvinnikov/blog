@@ -140,7 +140,12 @@ src/components/molecules/media-card/
     keeps in its own `tv()` only what `Heading` can't express — interaction
     state (`hover:`, `transition-colors`). Font family, size, leading and
     tracking come from `visual` (`card` for card titles); repeating them in
-    both places is how the two drift.
+    both places is how the two drift. `visual` and `Text`'s `textRole` read
+    the text-role registry, `TYPOGRAPHY` in `lib/styling/typography.ts`,
+    keyed by `TEXT_ROLE` from `@shinefold/config`: it is the one place a
+    role's font, size, weight, leading, tracking and colour are chosen, so a
+    new look is a registry entry, never a class list in a component's
+    `tv()`.
 
 - **Also:** semantic elements first (`button`, `nav`, `article`, `time`);
   images require `alt`; interactive atoms show a `focus-visible` style (the

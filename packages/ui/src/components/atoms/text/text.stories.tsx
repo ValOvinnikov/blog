@@ -1,3 +1,4 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -12,6 +13,10 @@ const meta: Meta<typeof Text> = {
     variant: {
       control: 'select',
       options: objectKeys(textVariants.variants.variant),
+    },
+    textRole: {
+      control: 'select',
+      options: Object.values(TEXT_ROLE),
     },
   },
 };
@@ -81,5 +86,13 @@ export const Footnote: TStory = {
   args: {
     variant: 'footnote',
     children: 'A shared footnote style for module type, rendered subtle.',
+  },
+};
+
+export const Intro: TStory = {
+  args: {
+    textRole: TEXT_ROLE.INTRO,
+    children:
+      'An intro beneath a heading, read through the typography registry.',
   },
 };

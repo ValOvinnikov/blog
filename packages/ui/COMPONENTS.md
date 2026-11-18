@@ -57,7 +57,7 @@ Variants: hasHref: (boolean)
 
 Semantic heading — `level` picks the rendered `h1`–`h4` tag for the page outline, independently of `visual`, which drives the rendered size instead (e.g. a deep Portable Text heading can still read as subordinate to the page's title).
 Props: level: THeadingLevel · visual?: THeadingVariants['visual'] · size?: THeadingVariants['size'] · id?: string · style?: CSSProperties · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: visual: hero|post|card|page|section|prose-h2|prose-h3|prose-h4|preview|copy · size: SIZE.XS|SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL
+Variants: visual: TEXT_ROLE.HERO_TITLE|TEXT_ROLE.POST_TITLE|TEXT_ROLE.PAGE_TITLE|TEXT_ROLE.SECTION_TITLE|TEXT_ROLE.CARD_TITLE|TEXT_ROLE.ITEM_TITLE|TEXT_ROLE.DIALOG_TITLE|TEXT_ROLE.PROSE_H2|TEXT_ROLE.PROSE_H3|TEXT_ROLE.PROSE_H4|hero|post|page|section|card|prose-h2|prose-h3|prose-h4|preview|copy · size: SIZE.XS|SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL
 
 ### Icon — `components/atoms/icon/icon.tsx`
 
@@ -129,9 +129,9 @@ Variants: variant: default|accent · interactive: (boolean)
 
 ### Text — `components/atoms/text/text.tsx`
 
-The body-copy paragraph primitive: applies a `variant` from the type scale to a `<p>`.
-Props: style?: CSSProperties · children?: ReactNode _(extends IWithClassName, TTextVariants, IWithDataTestId)_
-Variants: variant: lead|muted|hero|card|supporting|statement|meta|emphasis|footnote
+Body copy whose typography comes from a text role in the registry, or from a legacy `variant`.
+Props: as?: TTextElement · textRole?: TTextRole · variant?: TTextVariants['variant'] · style?: CSSProperties · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Variants: variant: lead|muted|hero|card|supporting|statement|meta|emphasis|footnote · textRole: TEXT_ROLE.HERO_TITLE|TEXT_ROLE.POST_TITLE|TEXT_ROLE.PAGE_TITLE|TEXT_ROLE.SECTION_TITLE|TEXT_ROLE.CARD_TITLE|TEXT_ROLE.ITEM_TITLE|TEXT_ROLE.DIALOG_TITLE|TEXT_ROLE.PROSE_H2|TEXT_ROLE.PROSE_H3|TEXT_ROLE.PROSE_H4|TEXT_ROLE.INTRO|TEXT_ROLE.BODY|TEXT_ROLE.CARD_BODY|TEXT_ROLE.META|TEXT_ROLE.EYEBROW|TEXT_ROLE.LABEL|TEXT_ROLE.FOOTNOTE|TEXT_ROLE.CAPTION|TEXT_ROLE.QUOTE|TEXT_ROLE.ATTRIBUTION|TEXT_ROLE.FIGURE|TEXT_ROLE.FIGURE_LABEL
 
 ### TextInput — `components/atoms/text-input/text-input.tsx`
 
