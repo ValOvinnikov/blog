@@ -57,8 +57,8 @@ export const routes = {
   pricingComparison: () => `/pricing#${PLAN_COMPARISON_ANCHOR_ID}`,
 } as const;
 
-export const pricingPageUrl = (platformMainAddress: string) =>
-  `https://${platformMainAddress}${routes.pricingComparison()}`;
+export const pricingPageUrl = (marketingSiteUrl: string) =>
+  new URL(routes.pricingComparison(), marketingSiteUrl).href;
 
 const PAGE_HREF_BUILDERS = {
   page_home: () => routes.home(),

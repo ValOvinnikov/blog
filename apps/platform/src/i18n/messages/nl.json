@@ -2201,25 +2201,23 @@
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Open je dashboard",
+    "plansLinkLabel": "Bekijk wat elk plan bevat",
     "GROWTH": {
       "subject": "Je site staat nu op het Growth-plan",
       "previewText": "{siteName} kan nu alle Growth-opties gebruiken.",
       "changed": "{siteName} staat nu op het Growth-plan.",
-      "options": "De Growth-opties zijn nu beschikbaar op je site: meer talen, alle instellingen voor Uiterlijk, extra paginamodules en functies zoals het contactformulier, bladwijzers en statistieken.",
-      "kept": "Als je Growth eerder hebt gebruikt, zijn je eerdere keuzes terug zoals je ze achterliet."
+      "kept": "Er wordt niets verwijderd. Als je Growth eerder hebt gebruikt, zijn je eerdere keuzes terug zoals je ze achterliet."
     },
     "STARTER": {
       "subject": "Je site staat nu op het Starter-plan",
       "previewText": "{siteName} kan nu de Starter-opties gebruiken.",
       "changed": "{siteName} staat nu op het Starter-plan.",
-      "options": "Met Starter kan je site een eigen domein en het contactformulier gebruiken, en de footer toont geen ‘Mogelijk gemaakt door’. Meer talen, alle instellingen voor Uiterlijk en de andere paginamodules horen bij Growth.",
       "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard, en alles uit Growth is terug zoals je het achterliet als je overstapt naar Growth."
     },
     "FREE": {
       "subject": "Je site staat nu op het Free-plan",
       "previewText": "De opties van de betaalde plannen staan uit op {siteName}.",
       "changed": "{siteName} staat nu op het Free-plan.",
-      "options": "De opties van de betaalde plannen staan uit op je site: extra talen, de Growth-instellingen voor Uiterlijk, betaalde paginamodules en functies zoals het contactformulier, bladwijzers en statistieken.",
       "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard en komen terug als je weer overstapt naar een betaald plan."
     }
   },
