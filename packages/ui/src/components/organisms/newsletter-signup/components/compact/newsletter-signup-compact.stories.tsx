@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import {
+  BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   FORM_STATUS,
   NEWSLETTER_VARIANT,
@@ -117,7 +118,7 @@ export const RightAligned: TStory = {
 export const BrandPrimaryBand: TStory = {
   decorators: [
     (Story) => (
-      <div className="surface-brand-primary bg-brand-primary-muted p-8">
+      <div className="bg-ambient p-8" data-skin={BRAND_VARIANT.BRAND_PRIMARY}>
         <Story />
       </div>
     ),

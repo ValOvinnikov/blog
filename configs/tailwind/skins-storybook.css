@@ -6,6 +6,7 @@
   color-scheme: dark;
   --ambient: var(--palette-neutral-2200);
   --backdrop: var(--palette-neutral-2200);
+  --ambient-raised: var(--palette-neutral-2200);
   --surface: var(--palette-neutral-2000);
   --surface-2: var(--palette-neutral-1900);
   --brand-primary-muted: var(--palette-brand-1600);
@@ -43,6 +44,7 @@
   color-scheme: dark;
   --ambient: var(--palette-neutral-2700);
   --backdrop: var(--palette-neutral-2700);
+  --ambient-raised: var(--palette-neutral-2700);
   --surface: var(--palette-neutral-2000);
   --surface-2: var(--palette-neutral-1900);
   --brand-primary-muted: var(--palette-brand-1600);

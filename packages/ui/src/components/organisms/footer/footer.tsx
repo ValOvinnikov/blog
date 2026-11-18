@@ -1,7 +1,10 @@
 import {
+  BRAND_VARIANT,
   FOOTER_LAYOUT,
+  FOOTER_SURFACE,
   type IWithClassName,
   type IWithDataTestId,
+  type TBrandVariant,
 } from '@shinefold/config';
 import {
   mapCompoundSlots,
@@ -54,7 +57,7 @@ export type TFooterProps = IWithClassName &
   IWithDataTestId & {
     layout?: TFooterVariants['layout'];
     surface?: TFooterVariants['surface'];
-    tone?: TFooterVariants['tone'];
+    tone?: TBrandVariant;
     children?: TCompoundChildren<typeof FooterSlotParts>;
   };
 
@@ -62,7 +65,7 @@ export type TFooterProps = IWithClassName &
 const FooterRoot = ({
   layout = FOOTER_LAYOUT.COLUMNS,
   surface,
-  tone,
+  tone = BRAND_VARIANT.BRAND_PRIMARY,
   children,
   className,
   dataTestId,
@@ -78,16 +81,17 @@ const FooterRoot = ({
   const { root, inner, main, brand, bottom } = footerVariants({
     layout,
     surface,
-    tone,
   });
+  const isCard = surface === FOOTER_SURFACE.CARD;
 
   return (
     <footer
       className={root({ class: className })}
       data-layout={layout}
+      data-skin={isCard ? undefined : tone}
       data-testid={dataTestId}
     >
-      <div className={inner()}>
+      <div className={inner()} data-skin={isCard ? tone : undefined}>
         {hasMain && (
           <div className={main()}>
             {hasBrand && (

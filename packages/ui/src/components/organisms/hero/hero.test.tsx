@@ -6,6 +6,7 @@ import {
   MEDIA_ORDER,
 } from '@shinefold/config';
 import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { HERO_TEST_ID } from '@shinefold/ui/constants/hero';
 import {
   customRender,
   renderElement,
@@ -21,9 +22,6 @@ import { Hero, type THeroProps } from './hero';
 
 faker.seed(6013);
 
-const MEDIA_TEST_ID = 'hero-media';
-const OVERLAY_TEST_ID = 'hero-overlay';
-const COPY_TEST_ID = 'hero-copy';
 const MOCK_TITLE_ID = faker.string.uuid();
 const MOCK_BODY_TEXT = faker.lorem.sentence();
 const MOCK_EYEBROW = faker.lorem.words(3);
@@ -162,7 +160,7 @@ describe(`<${Hero.name}/>`, () => {
     });
 
     it('nests the CTA inside the copy column, alongside the heading', () => {
-      const copyColumn = screen.getByTestId(COPY_TEST_ID);
+      const copyColumn = screen.getByTestId(HERO_TEST_ID.COPY);
       const heading = screen.getByRole('heading', { name: MOCK_POST_TITLE });
       const cta = screen.getByRole('link', { name: MOCK_CTA_LABEL });
 
@@ -199,7 +197,7 @@ describe(`<${Hero.name}/>`, () => {
     renderHero(props, heroMedia);
 
     const heading = screen.getByRole('heading', { name: MOCK_POST_TITLE });
-    const media = screen.getByTestId(MEDIA_TEST_ID);
+    const media = screen.getByTestId(HERO_TEST_ID.MEDIA);
 
     expectFollows(heading, media);
   });
@@ -210,7 +208,7 @@ describe(`<${Hero.name}/>`, () => {
       heroMedia,
     );
 
-    const overlay = screen.getByTestId(OVERLAY_TEST_ID);
+    const overlay = screen.getByTestId(HERO_TEST_ID.OVERLAY);
 
     expect(overlay).toHaveAttribute('aria-hidden', 'true');
   });
@@ -220,7 +218,7 @@ describe(`<${Hero.name}/>`, () => {
     (variant) => {
       renderHero({ variant, tone: BRAND_VARIANT.BRAND_PRIMARY }, heroMedia);
 
-      const overlay = screen.queryByTestId(OVERLAY_TEST_ID);
+      const overlay = screen.queryByTestId(HERO_TEST_ID.OVERLAY);
 
       expect(overlay).not.toBeInTheDocument();
     },

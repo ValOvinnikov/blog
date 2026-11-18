@@ -26,7 +26,7 @@ const meta = {
   argTypes: {
     tone: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.tone),
+      options: Object.values(BRAND_VARIANT),
     },
     contentAlignment: {
       control: 'select',
@@ -91,7 +91,7 @@ export const ByCardStyle: TStory = {
   render: (args) => (
     <CardStyles>
       {(cardStyle) =>
-        objectKeys(ctaModuleVariants.variants.tone).map((tone) => (
+        Object.values(BRAND_VARIANT).map((tone) => (
           <CtaModule.Callout
             key={tone}
             {...args}

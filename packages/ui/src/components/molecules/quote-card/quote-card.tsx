@@ -34,11 +34,11 @@ export type TQuoteCardProps = IWithClassName &
     align?: TQuoteCardVariants['align'];
     isSpotlight?: boolean;
     isInteractive?: TQuoteCardVariants['isInteractive'];
-    tone: TBrandVariant;
+    tone?: TBrandVariant;
     children?: TCompoundChildren<typeof QuoteCardParts>;
   };
 
-/** A testimonial quote rendered as a figure; composes a caller-supplied `QuoteCard.Quote`, `QuoteCard.Avatar`, and `QuoteCard.Name` for the quoted person. */
+/** A testimonial: what someone said about the site, and who said it. */
 const QuoteCardRoot = ({
   role,
   align,

@@ -8,11 +8,17 @@ import {
   type TColorScheme,
 } from '@shinefold/config/constants';
 
-import { TOKEN_ALIASES } from './contrast-surfaces';
+import { AMBIENT, TOKEN_ALIASES } from './contrast-surfaces';
 import { formatPaletteDeclarations } from './palette-ramps';
 import { effectiveSchemeOf } from './skin-contrast';
+import { isBrandStop } from './skin-derive';
 import { SKIN_ROLES, type TSkinRoles } from './skin-roles';
-import { SKIN_REGISTRY, STORYBOOK_SKINS, type TSkin } from './skins';
+import {
+  SKIN_REGISTRY,
+  SKINS_WITH_STORYBOOK,
+  STORYBOOK_SKINS,
+  type TSkin,
+} from './skins';
 
 export const SKIN_CSS_REPO_PATH = 'configs/tailwind/skins.css';
 
@@ -45,6 +51,17 @@ const roleDeclarations = (roles: TSkinRoles): string[] =>
     ([property, token]) => `${property}: var(${token})`,
   );
 
+// 10% lifts the tint off a brand ground by ~1.13:1 light / ~1.16:1 dark while brand-primary-hover text on it holds ≥5.86:1 / ≥5.11:1 across hues.
+const BRAND_GROUND_FILLS = [
+  '--tint: color-mix(in oklch, var(--backdrop), var(--brand-primary) 10%)',
+  '--media-fill: var(--tint)',
+  '--item-fill: var(--brand-primary-wash)',
+  '--item-nested-fill: var(--surface)',
+];
+
+const groundFillDeclarations = (roles: TSkinRoles): string[] =>
+  isBrandStop(roles[AMBIENT]) ? BRAND_GROUND_FILLS : [];
+
 const scopeBlock = (
   key: string,
   { mode, roles }: TSkin,
@@ -57,6 +74,7 @@ const scopeBlock = (
     [
       `color-scheme: ${effectiveSchemeOf(mode, scheme).toLowerCase()}`,
       ...roleDeclarations(roles[scheme]),
+      ...groundFillDeclarations(roles[scheme]),
     ],
   );
 
@@ -99,6 +117,6 @@ export const formatStorybookSkinCss = (): string =>
   [
     HEADER,
     '',
-    ...formatDarkVariant({ ...SKIN_REGISTRY, ...STORYBOOK_SKINS }),
+    ...formatDarkVariant(SKINS_WITH_STORYBOOK),
     ...formatSkinScopes(STORYBOOK_SKINS),
   ].join('\n');

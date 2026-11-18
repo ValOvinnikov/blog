@@ -37,9 +37,9 @@ export const CtaModuleSplit = ({
   dataTestId,
 }: TCtaModuleSplitProps) => (
   <CtaModuleLayout
+    tone={tone}
     styles={ctaModuleVariants({
       variant: CTA_VARIANT.SPLIT,
-      tone,
       position: contentPosition,
       alignment: contentAlignment,
       mobileMediaOrder,

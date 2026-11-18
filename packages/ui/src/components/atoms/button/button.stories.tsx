@@ -1,4 +1,4 @@
-import { SIZE } from '@shinefold/config';
+import { BRAND_VARIANT, SIZE } from '@shinefold/config';
 import {
   BUSY_STYLES,
   SPINNER_VARIANTS,
@@ -90,7 +90,11 @@ export const Disabled: TStory = {
 };
 
 const OnSecondary = () => (
-  <div className="bg-secondary surface-secondary" style={{ padding: '1.5rem' }}>
+  <div
+    className="bg-ambient"
+    data-skin={BRAND_VARIANT.SECONDARY}
+    style={{ padding: '1.5rem' }}
+  >
     <Button variant="primary">Continue</Button>
   </div>
 );
@@ -106,7 +110,8 @@ export const OnSecondaryBackgroundFocused: TStory = {
 
 const OnBrandPrimary = () => (
   <div
-    className="bg-brand-primary-muted surface-brand-primary"
+    className="bg-ambient"
+    data-skin={BRAND_VARIANT.BRAND_PRIMARY}
     style={{ padding: '1.5rem' }}
   >
     <Button variant="primary">Continue</Button>

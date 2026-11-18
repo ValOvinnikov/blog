@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Article } from './article';
@@ -15,6 +16,11 @@ const bodyParagraphs = faker.lorem
   .split('\n\n')
   .map((paragraph) => <p key={paragraph}>{paragraph}</p>);
 
+const ENGINEERING_TOPIC = {
+  label: 'Engineering',
+  href: '/topics/engineering',
+};
+
 const meta = {
   title: 'Organisms/Article',
   component: Article,
@@ -25,7 +31,7 @@ const meta = {
       <>
         <Article.Header
           title={faker.lorem.sentence({ min: 4, max: 8 })}
-          topic={{ label: 'Engineering', href: '/topics/engineering' }}
+          topic={ENGINEERING_TOPIC}
           lead={faker.lorem.paragraph()}
           meta={{
             author: {
@@ -54,7 +60,7 @@ export const WithCoverMedia: TStory = {
       <>
         <Article.Header
           title={faker.lorem.sentence({ min: 4, max: 8 })}
-          topic={{ label: 'Engineering', href: '/topics/engineering' }}
+          topic={ENGINEERING_TOPIC}
           lead={faker.lorem.paragraph()}
           meta={{
             author: {
@@ -84,7 +90,7 @@ export const WithUnlinkedTopic: TStory = {
       <>
         <Article.Header
           title={faker.lorem.sentence({ min: 4, max: 8 })}
-          topic={{ label: 'Engineering' }}
+          topic={{ label: ENGINEERING_TOPIC.label }}
           lead={faker.lorem.paragraph()}
           meta={{
             author: { name: faker.person.fullName() },
@@ -194,11 +200,15 @@ export const WithShareSlot: TStory = {
 };
 
 const OnSecondaryBackground = () => (
-  <div className="bg-secondary surface-secondary" style={{ padding: '1.5rem' }}>
+  <div
+    className="bg-ambient"
+    data-skin={BRAND_VARIANT.SECONDARY}
+    style={{ padding: '1.5rem' }}
+  >
     <Article>
       <Article.Header
         title={faker.lorem.sentence({ min: 4, max: 8 })}
-        topic={{ label: 'Engineering', href: '/topics/engineering' }}
+        topic={ENGINEERING_TOPIC}
         lead={faker.lorem.paragraph()}
         meta={{
           author: {

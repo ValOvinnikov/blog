@@ -1,37 +1,18 @@
-import {
-  BRAND_VARIANT,
-  CONTENT_ALIGNMENT,
-  SPACING_SCALE,
-} from '@shinefold/config';
+import { CONTENT_ALIGNMENT, SPACING_SCALE } from '@shinefold/config';
 
 import { BAND_SPACING_BOTTOM, BAND_SPACING_TOP } from './band-spacing';
 import { BANNER_LAYOUT, BANNER_POSITION } from './banner-layout';
 import { FULL_BLEED, MEDIA_MAX_WIDTH } from './full-bleed';
-import {
-  BRAND_SCRIM_CENTER,
-  BRAND_SCRIM_CENTER_FROM_LG,
-  BRAND_SCRIM_LEFT_FROM_LG,
-  BRAND_SCRIM_LEFT_FROM_SM,
-  BRAND_SCRIM_RIGHT_FROM_LG,
-  BRAND_SCRIM_RIGHT_FROM_SM,
-  NEUTRAL_SCRIM_CENTER,
-  NEUTRAL_SCRIM_CENTER_FROM_LG,
-  NEUTRAL_SCRIM_LEFT_FROM_LG,
-  NEUTRAL_SCRIM_LEFT_FROM_SM,
-  NEUTRAL_SCRIM_RIGHT_FROM_LG,
-  NEUTRAL_SCRIM_RIGHT_FROM_SM,
-} from './scrims';
 import { tv } from './tv';
 
-const NEUTRAL_TONES = [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY];
-
-/** The IMAGE_SCRIM surface: the tone's full-bleed band with its copy held to the page column, optionally carrying a photo under a scrim. */
+/** The IMAGE_SCRIM surface: a skin's full-bleed band with its copy held to the page column, optionally carrying a photo under a scrim. */
 export const bannerVariants = tv({
   slots: {
     root: [
       ...FULL_BLEED,
       ...BANNER_LAYOUT,
       'min-h-[calc(var(--banner-top)+var(--banner-bottom))] px-gutter',
+      'skin-raised bg-ambient',
     ],
     media: [
       'absolute inset-0 -z-20 mx-auto overflow-hidden',
@@ -46,13 +27,8 @@ export const bannerVariants = tv({
     text: ['text-on-image'],
   },
   variants: {
-    tone: {
-      [BRAND_VARIANT.PRIMARY]: { root: ['bg-primary-subtle'] },
-      [BRAND_VARIANT.SECONDARY]: { root: ['bg-secondary'] },
-      [BRAND_VARIANT.BRAND_PRIMARY]: { root: ['bg-brand-primary-muted'] },
-    },
     hasMedia: {
-      true: {},
+      true: { root: ['skin-on-image'] },
       // Slotted copy styled for a photo (`*-on-image`) takes the surface's ink when there is none.
       false: {
         root: ['[--on-image:var(--text)] [--on-image-muted:var(--text-muted)]'],
@@ -122,70 +98,6 @@ export const bannerVariants = tv({
   },
   compoundVariants: [
     {
-      tone: BRAND_VARIANT.SECONDARY,
-      hasMedia: false,
-      class: { root: ['surface-secondary'] },
-    },
-    {
-      tone: BRAND_VARIANT.BRAND_PRIMARY,
-      hasMedia: false,
-      class: { root: ['surface-brand-primary'] },
-    },
-    {
-      tone: BRAND_VARIANT.BRAND_PRIMARY,
-      position: CONTENT_ALIGNMENT.LEFT,
-      class: {
-        overlay: [
-          BRAND_SCRIM_CENTER,
-          BRAND_SCRIM_LEFT_FROM_SM,
-          BRAND_SCRIM_LEFT_FROM_LG,
-        ],
-      },
-    },
-    {
-      tone: BRAND_VARIANT.BRAND_PRIMARY,
-      position: CONTENT_ALIGNMENT.CENTER,
-      class: { overlay: [BRAND_SCRIM_CENTER, BRAND_SCRIM_CENTER_FROM_LG] },
-    },
-    {
-      tone: BRAND_VARIANT.BRAND_PRIMARY,
-      position: CONTENT_ALIGNMENT.RIGHT,
-      class: {
-        overlay: [
-          BRAND_SCRIM_CENTER,
-          BRAND_SCRIM_RIGHT_FROM_SM,
-          BRAND_SCRIM_RIGHT_FROM_LG,
-        ],
-      },
-    },
-    {
-      tone: NEUTRAL_TONES,
-      position: CONTENT_ALIGNMENT.LEFT,
-      class: {
-        overlay: [
-          NEUTRAL_SCRIM_CENTER,
-          NEUTRAL_SCRIM_LEFT_FROM_SM,
-          NEUTRAL_SCRIM_LEFT_FROM_LG,
-        ],
-      },
-    },
-    {
-      tone: NEUTRAL_TONES,
-      position: CONTENT_ALIGNMENT.CENTER,
-      class: { overlay: [NEUTRAL_SCRIM_CENTER, NEUTRAL_SCRIM_CENTER_FROM_LG] },
-    },
-    {
-      tone: NEUTRAL_TONES,
-      position: CONTENT_ALIGNMENT.RIGHT,
-      class: {
-        overlay: [
-          NEUTRAL_SCRIM_CENTER,
-          NEUTRAL_SCRIM_RIGHT_FROM_SM,
-          NEUTRAL_SCRIM_RIGHT_FROM_LG,
-        ],
-      },
-    },
-    {
       position: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.RIGHT],
       class: {
         copy: ['max-sm:text-center'],
@@ -195,7 +107,6 @@ export const bannerVariants = tv({
     },
   ],
   defaultVariants: {
-    tone: BRAND_VARIANT.PRIMARY,
     hasMedia: true,
     position: CONTENT_ALIGNMENT.LEFT,
     spacingTop: SPACING_SCALE.MD,

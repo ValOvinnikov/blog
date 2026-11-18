@@ -4,9 +4,9 @@ import { FOCUS_RING, TRANSITION_COLORS } from './interaction';
 export const MENU_ROW = [
   'rounded-md',
   TRANSITION_COLORS,
-  'hover:bg-tint hover:text-brand-primary',
-  'focus-visible:bg-tint focus-visible:text-brand-primary',
-  'aria-[current=page]:bg-tint aria-[current=page]:font-semibold aria-[current=page]:text-brand-primary',
+  'hover:bg-brand-primary-muted hover:text-brand-primary',
+  'focus-visible:bg-brand-primary-muted focus-visible:text-brand-primary',
+  'aria-[current=page]:bg-brand-primary-muted aria-[current=page]:font-semibold aria-[current=page]:text-brand-primary',
   FOCUS_RING,
   'forced-colors:hover:outline-1 forced-colors:hover:outline-solid forced-colors:hover:outline-[CanvasText] forced-colors:hover:-outline-offset-1',
 ];

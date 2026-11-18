@@ -6,9 +6,11 @@ import {
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
+  BRAND_PALETTE,
   formatOklchRamp,
   HUE_MAX,
   HUE_MIN,
+  IMAGE_SCRIM_RAMP,
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
   type TFontChoice,
@@ -36,6 +38,8 @@ export const buildThemePreviewStyle = (
   isDark: boolean,
 ): CSSProperties =>
   ({
+    ...formatOklchRamp(BRAND_PALETTE, accentHue),
+    ...formatOklchRamp(IMAGE_SCRIM_RAMP, accentHue),
     ...buildAccentPreviewTokens(accentHue, isDark),
     ...buildLogoPreviewTokens(logoHue ?? accentHue, isDark),
     ...buildShapePreviewTokens(shape),

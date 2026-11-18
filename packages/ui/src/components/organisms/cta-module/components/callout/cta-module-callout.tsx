@@ -31,9 +31,9 @@ export const CtaModuleCallout = ({
   dataTestId,
 }: TCtaModuleCalloutProps) => (
   <CtaModuleLayout
+    tone={tone}
     styles={ctaModuleVariants({
       variant: CTA_VARIANT.CALLOUT,
-      tone,
       alignment: contentAlignment,
     })}
     heading={heading}
