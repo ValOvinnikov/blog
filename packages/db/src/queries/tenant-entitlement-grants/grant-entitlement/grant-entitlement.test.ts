@@ -1,3 +1,4 @@
+import type { TMaybeNull } from '@shinefold/config';
 import { CAPABILITY, ERROR_CODE } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
@@ -6,6 +7,7 @@ import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   insertTestEntitlementGrant,
   MOCK_GRANT_FUTURE,
+  MOCK_GRANT_LATER,
   MOCK_GRANT_NOTE,
   MOCK_GRANT_PAST,
   useEntitlementGrantAdmin,
@@ -37,12 +39,15 @@ const LOCALE_LIMIT = {
 
 const admin = useEntitlementGrantAdmin(db);
 
-function grant(item: TGrantEntitlementInput['item']) {
+function grant(
+  item: TGrantEntitlementInput['item'],
+  expiresAt: TMaybeNull<Date> = MOCK_GRANT_FUTURE,
+) {
   return grantEntitlement({
     tenantId: tenant().id,
     item,
     grantedBy: admin(),
-    expiresAt: MOCK_GRANT_FUTURE,
+    expiresAt,
     note: MOCK_GRANT_NOTE,
   });
 }
@@ -58,21 +63,27 @@ describe(grantEntitlement, () => {
   it('records the grant with who, when and why', async () => {
     expect(await grant(CONTACT_FORM)).toEqual({
       ok: true,
-      data: expect.objectContaining({
-        ...CONTACT_FORM,
-        value: null,
-        grantedBy: admin(),
-        grantedAt: MOCK_NOW,
-        expiresAt: MOCK_GRANT_FUTURE,
-        note: MOCK_GRANT_NOTE,
-        revokedAt: null,
-      }),
+      data: {
+        grant: expect.objectContaining({
+          ...CONTACT_FORM,
+          value: null,
+          grantedBy: admin(),
+          grantedAt: MOCK_NOW,
+          expiresAt: MOCK_GRANT_FUTURE,
+          note: MOCK_GRANT_NOTE,
+          revokedAt: null,
+        }),
+        closedGrantId: null,
+      },
     });
   });
 
   it('stores a language limit under its kind, with its value', async () => {
     expect(await grant(LOCALE_LIMIT)).toMatchObject({
-      data: { ...LOCALE_LIMIT, key: ENTITLEMENT_KIND.LOCALE_LIMIT },
+      data: {
+        grant: { ...LOCALE_LIMIT, key: ENTITLEMENT_KIND.LOCALE_LIMIT },
+        closedGrantId: null,
+      },
     });
   });
 
@@ -95,7 +106,7 @@ describe(grantEntitlement, () => {
     } as const;
 
     it('replaces it with a higher one, closing it as the granting admin', async () => {
-      await grant(LOWER_LOCALE_LIMIT);
+      const lower = await grant(LOWER_LOCALE_LIMIT);
 
       const raised = await grant(LOCALE_LIMIT);
 
@@ -103,11 +114,14 @@ describe(grantEntitlement, () => {
       expect(raised).toMatchObject({
         ok: true,
         data: {
-          ...LOCALE_LIMIT,
-          note: MOCK_GRANT_NOTE,
-          expiresAt: MOCK_GRANT_FUTURE,
-          grantedBy: admin(),
-          revokedAt: null,
+          grant: {
+            ...LOCALE_LIMIT,
+            note: MOCK_GRANT_NOTE,
+            expiresAt: MOCK_GRANT_FUTURE,
+            grantedBy: admin(),
+            revokedAt: null,
+          },
+          closedGrantId: lower.ok && lower.data.grant.id,
         },
       });
       expect(rows).toContainEqual(
@@ -119,6 +133,43 @@ describe(grantEntitlement, () => {
       );
       expect(rows.filter(({ revokedAt }) => isNull(revokedAt))).toHaveLength(1);
     });
+
+    it.each([
+      ['the same expiry', MOCK_GRANT_FUTURE, MOCK_GRANT_FUTURE],
+      ['a later expiry', MOCK_GRANT_FUTURE, MOCK_GRANT_LATER],
+      ['no expiry', MOCK_GRANT_FUTURE, null],
+      ['no expiry over no expiry', null, null],
+    ] as const)('raises with %s', async (_, openExpiry, raisedExpiry) => {
+      await grant(LOWER_LOCALE_LIMIT, openExpiry);
+
+      expect(await grant(LOCALE_LIMIT, raisedExpiry)).toMatchObject({
+        ok: true,
+      });
+    });
+
+    it.each([
+      ['an earlier expiry', MOCK_GRANT_LATER, MOCK_GRANT_FUTURE],
+      ['an expiry over no expiry', null, MOCK_GRANT_FUTURE],
+    ] as const)(
+      'refuses a raise with %s and keeps the open grant',
+      async (_, openExpiry, raisedExpiry) => {
+        await grant(LOWER_LOCALE_LIMIT, openExpiry);
+
+        const shortened = await grant(LOCALE_LIMIT, raisedExpiry);
+
+        expect(shortened).toEqual({
+          ok: false,
+          error: ERROR_CODE.DB_ENTITLEMENT_EXPIRY_SHORTENED,
+        });
+        expect(await rowsFor(tenant().id)).toEqual([
+          expect.objectContaining({
+            ...LOWER_LOCALE_LIMIT,
+            expiresAt: openExpiry,
+            revokedAt: null,
+          }),
+        ]);
+      },
+    );
 
     it('refuses a lower one and keeps the open grant', async () => {
       await grant(LOCALE_LIMIT);

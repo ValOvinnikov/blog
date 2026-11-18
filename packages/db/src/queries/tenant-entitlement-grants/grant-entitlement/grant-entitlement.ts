@@ -1,4 +1,4 @@
-import type { TMaybeNull } from '@shinefold/config';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
 import { getDb } from '@shinefold/db/client';
 import {
@@ -11,10 +11,14 @@ import {
   type TTenantEntitlementGrant,
 } from '@shinefold/db/schema/tenant-entitlement-grants';
 import { uniqueViolationConstraint } from '@shinefold/db/utils/constraint-violation/constraint-violation';
+import { toStoredEntitlementItem } from '@shinefold/db/utils/stored-entitlement-item/stored-entitlement-item';
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { and, eq, isNull, lte, sql } from 'drizzle-orm';
 
-import { raiseLocaleLimitGrant } from './raise-locale-limit-grant';
+import {
+  localeLimitRaiseRefusal,
+  raiseLocaleLimitGrant,
+} from './raise-locale-limit-grant';
 
 export type TGrantEntitlementInput = {
   tenantId: string;
@@ -24,11 +28,10 @@ export type TGrantEntitlementInput = {
   note: TMaybeNull<string>;
 };
 
-function toStoredItem(item: TEntitlementGrantItem) {
-  return item.kind === ENTITLEMENT_KIND.LOCALE_LIMIT
-    ? { kind: item.kind, key: item.kind, value: item.value }
-    : { kind: item.kind, key: item.key, value: null };
-}
+export type TGrantedEntitlement = {
+  grant: TTenantEntitlementGrant;
+  closedGrantId: TMaybeNull<string>;
+};
 
 export async function grantEntitlement({
   tenantId,
@@ -36,11 +39,9 @@ export async function grantEntitlement({
   grantedBy,
   expiresAt,
   note,
-}: TGrantEntitlementInput): Promise<
-  TResult<TTenantEntitlementGrant, TErrorCode>
-> {
+}: TGrantEntitlementInput): Promise<TResult<TGrantedEntitlement, TErrorCode>> {
   const db = getDb();
-  const stored = toStoredItem(item);
+  const stored = toStoredEntitlementItem(item);
 
   await db
     .update(tenantEntitlementGrants)
@@ -56,7 +57,7 @@ export async function grantEntitlement({
     );
 
   try {
-    const [grant] =
+    const granted =
       item.kind === ENTITLEMENT_KIND.LOCALE_LIMIT
         ? await raiseLocaleLimitGrant({
             tenantId,
@@ -65,23 +66,41 @@ export async function grantEntitlement({
             expiresAt,
             note,
           })
-        : await db
-            .insert(tenantEntitlementGrants)
-            .values({ tenantId, ...stored, grantedBy, expiresAt, note })
-            .returning();
+        : await insertGrant({
+            tenantId,
+            ...stored,
+            grantedBy,
+            expiresAt,
+            note,
+          });
 
-    if (!grant) {
+    if (!granted) {
       throw new Error('grantEntitlement: insert returned no row.');
     }
 
-    return okResult(grant);
+    return okResult(granted);
   } catch (error) {
     if (
-      uniqueViolationConstraint(error) ===
+      uniqueViolationConstraint(error) !==
       TENANT_ENTITLEMENT_GRANTS_OPEN_UNIQUE_NAME
     ) {
-      return errorResult(ERROR_CODE.DB_ENTITLEMENT_ALREADY_GRANTED);
+      throw error;
     }
-    throw error;
+    return errorResult(
+      item.kind === ENTITLEMENT_KIND.LOCALE_LIMIT
+        ? await localeLimitRaiseRefusal(tenantId, item.value)
+        : ERROR_CODE.DB_ENTITLEMENT_ALREADY_GRANTED,
+    );
   }
+}
+
+async function insertGrant(
+  values: typeof tenantEntitlementGrants.$inferInsert,
+): Promise<TMaybeUndefined<TGrantedEntitlement>> {
+  const [grant] = await getDb()
+    .insert(tenantEntitlementGrants)
+    .values(values)
+    .returning();
+
+  return grant && { grant, closedGrantId: null };
 }

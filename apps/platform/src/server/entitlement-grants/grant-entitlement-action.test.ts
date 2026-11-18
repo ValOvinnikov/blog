@@ -75,12 +75,13 @@ describe(grantEntitlementAction, () => {
   beforeEach(() => {
     vi.useFakeTimers({ now: MOCK_NOW });
     grantEntitlement.mockResolvedValue(
-      okResult(
-        mockEntitlementGrantRow({
+      okResult({
+        grant: mockEntitlementGrantRow({
           expiresAt: MOCK_IN_30_DAYS,
           note: MOCK_NOTE,
         }),
-      ),
+        closedGrantId: null,
+      }),
     );
   });
 
