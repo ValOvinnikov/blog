@@ -29,7 +29,7 @@ const MOCK_GRANTED_LOCALE_LIMIT = 3;
 
 function grantLocaleLimit(
   tenantId: string,
-  overrides: { revokedAt?: Date } = {},
+  overrides: { revokedAt?: Date; expiresAt?: Date } = {},
 ) {
   return insertTestEntitlementGrant(db(), tenantId, {
     kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
@@ -177,6 +177,17 @@ describe(setTenantAdditionalLocales, () => {
           ok: false,
           error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
         });
+      });
+    });
+
+    it('ignores an expired grant', async () => {
+      await grantLocaleLimit(tenantId, { expiresAt: MOCK_GRANT_PAST });
+
+      const result = await setTenantAdditionalLocales(tenantId, [NL]);
+
+      expect(result).toEqual({
+        ok: false,
+        error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
       });
     });
 

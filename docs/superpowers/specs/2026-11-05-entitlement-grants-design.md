@@ -15,7 +15,7 @@ about twenty such reads:
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@shinefold/db`                 | `isLookFieldEntitled` / `toEffectiveLook` / `pickEntitledLook` (`utils/effective-look/`), `selectLiveLocales` / `getTenantLiveLocales`, `setTenantAdditionalLocales`                                                                  |
 | `apps/platform` — server        | `planPageAccess` (nav, `renderTenantScopedPage`, `resolveTenantPageAccess`, `canEditContactRecipient`), `updateFeaturesAction`, `getEnabledCapabilities`, `updateLookAction` + `listRefusedLookFields`, `updateTenantLanguagesAction` |
-| `apps/platform` — render/client | `FeaturesPageContent`, `LanguagesPageContent`, `LeadsPageContent`, `StudioMountView` (module packs into `StudioMount`), `LookPageContent`, `useLookFormState` (client, via `TenantPlanProvider`)                                      |
+| `apps/platform` — render/client | `FeaturesPageContent`, `LanguagesPageContent`, `LeadsPageContent`, `StudioMountView` (module packs into `StudioMount`), `LookPageContent`, `useLookFormState` (client, via the Look form's `tenant` prop)                             |
 | `apps/web`                      | `getTenantPlan` (cached, tag `tenant-plan:<id>`) → `isCapabilityEnabled`, `isModuleEntitled` / `ModuleGate`, `getSiteConfig` (Look); live locales through `getTenantLiveLocales`                                                      |
 
 So a grant cannot be "one more check" bolted onto a single gate: either every
@@ -47,9 +47,9 @@ Every gate then reads the resolved record, never `PLAN_*[plan]`:
 - the `@shinefold/db` helpers above take `TTenantEntitlements` instead of a plan;
   `getTenantLiveLocales` and `setTenantAdditionalLocales` read the grants
   themselves, since they already load the tenant;
-- `apps/platform` resolves once per request in the tenant layouts and passes the
-  record down; `TenantPlanProvider` carries it alongside the plan, so the Look
-  form's client-side `toEffectiveLook` sees grants too;
+- `apps/platform` resolves once per request in the tenant loaders and passes the
+  record down; the Look form receives `lookFields` in its `tenant` prop, so its
+  client-side `toEffectiveLookWithin` sees grants too;
 - `apps/web` replaces `getTenantPlan`'s cached value with
   `getTenantEntitlements` — plan and grants read together, cached under the
   **existing** `tenant-plan:<id>` tag, so the revalidation route needs no new
@@ -182,8 +182,8 @@ A grant is independent of the plan:
    module gate, Look and live locales read it. Lands before any grant can be
    written, so the site honours a grant from the first one.
 3. **platform** (read path) — tenant layouts resolve once; every reader in the
-   table above converts; `TenantPlanProvider` carries the record; Studio gets
-   the resolved `modulePacks`.
+   table above converts; the Look form takes `lookFields` as a prop; Studio
+   gets the resolved `modulePacks`.
 4. **platform** (write path) — the grant dialog on Features, Look and
    Languages, the Grants card with revoke, both actions behind
    `requireSuperAdmin`, audit + revalidation. Owns the manual-test issue.
