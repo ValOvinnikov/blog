@@ -63,7 +63,6 @@ export const PostCardsSection = ({
           items={items}
           hasImages={hasImages}
           title={heading}
-          tone={brandVariant}
           contentAlignment={contentAlignment}
         />
       ) : (

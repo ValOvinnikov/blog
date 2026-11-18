@@ -45,7 +45,7 @@ export const CtaModuleView = ({ id, module }: ICtaModuleViewProps) => {
       )}
       {hasLength(ctaButtons) && (
         <CtaModuleUi.Actions>
-          <ActionGroup actions={ctaButtons} isOnDark={isBanner} />
+          <ActionGroup actions={ctaButtons} />
         </CtaModuleUi.Actions>
       )}
       {footnote && <CtaModuleUi.Footnote>{footnote}</CtaModuleUi.Footnote>}

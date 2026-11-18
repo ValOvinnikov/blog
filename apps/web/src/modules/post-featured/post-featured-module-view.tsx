@@ -61,7 +61,6 @@ export const PostFeaturedModuleView = ({
           items={items}
           hasImages={hasImages}
           title={heading}
-          tone={brandVariant}
           contentAlignment={contentAlignment}
         />
       )}

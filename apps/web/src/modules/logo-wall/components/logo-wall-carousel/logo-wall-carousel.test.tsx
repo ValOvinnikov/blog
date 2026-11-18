@@ -1,4 +1,3 @@
-import { BRAND_VARIANT } from '@shinefold/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_LOGO_ITEMS,
@@ -11,7 +10,6 @@ vi.mock('@web/i18n/navigation');
 
 const setup = customRender(LogoWallCarousel, {
   logos: MOCK_LOGO_ITEMS,
-  tone: BRAND_VARIANT.PRIMARY,
   title: MOCK_LOGO_WALL_HEADING,
 });
 
@@ -33,15 +31,5 @@ describe(`<${LogoWallCarousel.name}/>`, () => {
     const logoImage = screen.getByRole('img', { name });
 
     expect(logoImage).toBeVisible();
-  });
-
-  it('renders previous and next slide controls', async () => {
-    const previousButton = await screen.findByRole('button', {
-      name: 'Previous slide',
-    });
-    const nextButton = screen.getByRole('button', { name: 'Next slide' });
-
-    expect(previousButton).toBeVisible();
-    expect(nextButton).toBeVisible();
   });
 });

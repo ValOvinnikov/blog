@@ -1,10 +1,6 @@
 'use client';
 
-import type {
-  IWithClassName,
-  IWithDataTestId,
-  TBrandVariant,
-} from '@shinefold/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import type { TLogoItem } from '@shinefold/service';
 import type { ICarouselProps } from '@shinefold/ui/components/organisms/carousel';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
@@ -14,14 +10,12 @@ export interface ILogoWallCarouselProps
   extends IWithClassName, IWithDataTestId {
   logos: TLogoItem[];
   title: string;
-  tone?: TBrandVariant;
   contentAlignment?: ICarouselProps<TLogoItem>['contentAlignment'];
 }
 
 export const LogoWallCarousel = ({
   logos,
   title,
-  tone,
   contentAlignment,
   className,
   dataTestId,
@@ -31,7 +25,6 @@ export const LogoWallCarousel = ({
     renderItem={({ item }) => <LogoWallTile logo={item} />}
     getItemKey={({ item }) => item.id}
     title={title}
-    tone={tone}
     slideSize="content"
     contentAlignment={contentAlignment}
     className={className}

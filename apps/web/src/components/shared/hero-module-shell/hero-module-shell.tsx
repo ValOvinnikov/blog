@@ -15,6 +15,8 @@ import { Section } from '@web/components/shared/section';
 import { resolveHeroLayout } from '@web/utils/resolve-hero-layout';
 import { useId } from 'react';
 
+import { heroMediaImageVariants } from './hero-module-shell-variants';
+
 export interface IHeroModuleShellProps extends IWithDataTestId {
   brandVariant: TBrandVariant;
   presentation: THeroPresentation;
@@ -52,7 +54,7 @@ export const HeroModuleShell = ({
   const heroChildren = [
     hasLength(ctaButtons) && (
       <Hero.Cta>
-        <ActionGroup actions={ctaButtons} isOnDark={isBanner} />
+        <ActionGroup actions={ctaButtons} />
       </Hero.Cta>
     ),
     sanityImage && (
@@ -63,7 +65,7 @@ export const HeroModuleShell = ({
           height={675}
           sizes="(min-width: 1024px) 50vw, 100vw"
           priority={true}
-          className="size-full object-cover"
+          className={heroMediaImageVariants()}
           alt={isBanner ? '' : undefined}
         />
       </Hero.Media>

@@ -68,6 +68,6 @@ A section of written content placed between a page's other modules: headings, pa
 
 ## Related
 
-- #5016 — one-entry skins: #5019 (Background field lists the skin registry), #5022 (`Section` renders its skin).
+- #5016 — one-entry skins: #5019 (Background field lists the skin registry).
 - #5028 — text roles: #5042 (`Prose` chooses typography only through the registry).
 - #4987 — accessible text and colour: #4989 (prose-sized headings keep their text colour), #5008 (a sideways-scrolling code block can be focused and is named), #5010 (a link's resting underline is visible on every band).

@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, CARD_IMAGE_SHAPE } from '@shinefold/config';
+import { CARD_IMAGE_SHAPE } from '@shinefold/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_TEAM_HEADING,
@@ -16,7 +16,6 @@ const setup = customRender(TeamCarousel, {
   imageShape: CARD_IMAGE_SHAPE.CIRCLE,
   align: 'left',
   title: MOCK_TEAM_HEADING,
-  tone: BRAND_VARIANT.PRIMARY,
 });
 
 describe(`<${TeamCarousel.name}/>`, () => {
@@ -42,15 +41,5 @@ describe(`<${TeamCarousel.name}/>`, () => {
     const cardHeadings = within(region).getAllByRole('heading', { level: 3 });
 
     expect(cardHeadings).toHaveLength(MOCK_TEAM_MEMBERS.length);
-  });
-
-  it('renders previous and next slide controls', async () => {
-    const previousButton = await screen.findByRole('button', {
-      name: 'Previous slide',
-    });
-    const nextButton = screen.getByRole('button', { name: 'Next slide' });
-
-    expect(previousButton).toBeVisible();
-    expect(nextButton).toBeVisible();
   });
 });

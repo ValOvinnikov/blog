@@ -1,5 +1,6 @@
 import { DISPLAY_MODE } from '@shinefold/config';
 import type { TLogoWallModule } from '@shinefold/service';
+import { hasLength } from '@shinefold/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
@@ -45,7 +46,6 @@ export const LogoWallModuleView = ({
         <LogoWallCarousel
           logos={logos}
           title={headingBlock.heading}
-          tone={brandVariant}
           contentAlignment={contentAlignment}
         />
       ) : (
@@ -58,7 +58,7 @@ export const LogoWallModuleView = ({
           ))}
         </div>
       )}
-      {ctaButtons.length > 0 && (
+      {hasLength(ctaButtons) && (
         <div className={s.actions()}>
           <ActionGroup actions={ctaButtons} />
         </div>

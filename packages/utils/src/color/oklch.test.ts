@@ -1,5 +1,6 @@
 import {
   hexToOklch,
+  mixOklch,
   oklchToHex,
   renderedContrastRatio,
   WCAG_AA_CONTRAST_MIN,
@@ -31,6 +32,30 @@ describe(hexToOklch, () => {
 
   it('throws on a value that is not a colour', () => {
     expect(() => hexToOklch('not-a-colour')).toThrow();
+  });
+});
+
+describe(mixOklch, () => {
+  it('moves lightness and chroma by the share', () => {
+    const mixed = mixOklch(
+      { l: 0.9, c: 0, h: 250 },
+      { l: 0.4, c: 0.2, h: 250 },
+      0.1,
+    );
+
+    expect(mixed.l).toBeCloseTo(0.85);
+    expect(mixed.c).toBeCloseTo(0.02);
+    expect(mixed.h).toBeCloseTo(250);
+  });
+
+  it('takes the shorter arc between hues across 0', () => {
+    const mixed = mixOklch(
+      { l: 0.5, c: 0.1, h: 350 },
+      { l: 0.5, c: 0.1, h: 30 },
+      0.5,
+    );
+
+    expect(mixed.h).toBeCloseTo(10);
   });
 });
 

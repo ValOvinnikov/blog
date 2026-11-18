@@ -19,6 +19,7 @@ import {
   AMBIENT,
   AMBIENT_RAISED,
   FIELD_BOUNDARY,
+  MIXED_SURFACES,
   PRIMARY_SUBTLE,
   SECONDARY,
   TOKEN_ALIASES,
@@ -56,6 +57,14 @@ const SKIN_FOREGROUND_OF: Record<TThemeToken, TThemeToken> = {
 
 const isSkinRole = (token: TThemeToken): boolean => isOneOf(SKIN_ROLES, token);
 
+export const partsOf = (surface: TThemeToken): TThemeToken[] => {
+  const mix = MIXED_SURFACES[surface];
+  return mix ? [mix.base, mix.toward] : [surface];
+};
+
+const isSkinSurface = (surface: TThemeToken): boolean =>
+  partsOf(surface).every(isSkinRole);
+
 export const SKIN_CONTRAST_PAIRS: Record<string, TContrastPair> =
   Object.fromEntries(
     Object.entries(CONTRAST_PAIRS).flatMap(([id, pair]) => {
@@ -65,7 +74,7 @@ export const SKIN_CONTRAST_PAIRS: Record<string, TContrastPair> =
           pair.surfaces.map((surface) => SKIN_SURFACE_OF[surface] ?? surface),
         ),
       ];
-      const bandSurfaces = surfaces.filter(isSkinRole);
+      const bandSurfaces = surfaces.filter(isSkinSurface);
       if (!hasLength(bandSurfaces)) return [];
       if (bandSurfaces.length !== surfaces.length) {
         throw new Error(`${id} mixes band surfaces with ones no skin sets`);
@@ -105,7 +114,8 @@ export const pairsInvolving = (
   Object.fromEntries(
     Object.entries(SKIN_CONTRAST_PAIRS).filter(
       ([, pair]) =>
-        isSkinForeground(role, pair) || pair.surfaces.includes(role),
+        isSkinForeground(role, pair) ||
+        pair.surfaces.some((surface) => partsOf(surface).includes(role)),
     ),
   );
 

@@ -1488,17 +1488,15 @@ scrims, the band padding and the min-height, so `Hero` and
 `--scrim-brand-*` (Brand tint) or `--scrim-neutral-*` (Plain, Shaded): the brand scrim takes the tenant's accent hue at fixed
 lightness and chroma (emitted by the theme block below), while the neutral
 scrim stays hue-free. A scrim darkens the photo in either mode, so neither
-set nor the on-image tokens change under `.dark`; `ActionGroup` and
-`SocialLink` paint their `isOnDark` state from the same on-image tokens. `tone` **is required**, so a Banner always sits in a skin and is
+set nor the on-image tokens change under `.dark`. `tone` **is required**, so a Banner always sits in a skin and is
 never scrim-less: white copy over an unscrimmed photograph is less legible
 than no treatment at all. With a photo the Banner (`skin-on-image`)
 re-points the skin's text, border and link roles at the on-image colours,
-so a ghost or link `Button` inside it needs no prop. Every Banner adds
+so a ghost or link `Button`, `ActionGroup` or `SocialLink` inside it needs no
+prop. Every Banner adds
 `skin-raised`, which paints the skin's `--ambient-raised` — Plain's lifted
 `--primary-subtle`, every other skin's own ground — and points `--ambient`
-at it; a photo covers that field and a photo-less Banner shows it. Each hero view passes
-`isOnDark` to its `ActionGroup` on Banner, so the actions are painted for a
-dark ground too.
+at it; a photo covers that field and a photo-less Banner shows it.
 
 **And it breaks out the same way**, for the same reason a scrim is needed at
 all: a band that stops at `Section`'s inner container is a card, not a band.
@@ -3060,10 +3058,10 @@ resolving it to a literal at build time, so an ancestor that redefines the
 property changes what every descendant resolves to. A non-inline `@theme`
 would bake in the `:root` value and an override would do nothing.
 
-**Surfaces set them; components read them.** Two `@utility` classes,
-`surface-secondary` and `surface-brand-primary`, retarget both at once and are
-applied by `apps/web`'s `Section`, per `brandVariant`. The `@shinefold/ui`
-organisms that paint their own background render a skin instead (below).
+**Surfaces set them; components read them.** Every band renders a skin
+(below), which sets both. Two `@utility` classes, `surface-secondary` and
+`surface-brand-primary`, still retarget both at once, but no band applies them
+any more.
 
 Two more utilities cover the item-level fills inside a band:
 
@@ -3080,9 +3078,9 @@ A third inherited property, `--tint`, is the brand tint an element paints
 inside a band — interactive cards' hover and focus-within fill and the
 `MediaCard` icon tile, read through `bg-item-hover` and `bg-media-fill`. It has
 no `:root` default: the `@theme inline` colours fall back to
-`--brand-primary-muted`, so it resolves at the element. `surface-brand-primary`
-sets it to a 10% mix toward `--brand-primary`, so nothing tinted on a Brand
-primary band takes the band's own colour; Primary and Secondary bands keep
+`--brand-primary-muted`, so it resolves at the element. A skin on a brand
+ground sets it to a 10% mix toward `--brand-primary`, so nothing tinted on a
+Brand tint band takes the band's own colour; Plain and Shaded bands keep
 `--brand-primary-muted`. A `[data-skin]` scope unsets it, with `--media-fill`
 and the band item fills, so a band around the skin never leaks in: on a
 neutral ground the hover tint reads the skin's `--brand-primary-muted` and the
@@ -3092,7 +3090,8 @@ tint) publishes the same 10% `--tint`, `--media-fill` and item fills
 with the tinted bands' divider and field boundary, for a card whose own focus
 fill it is (`TaxonomyCard`).
 
-`CtaModule`, `Hero`'s Banner and `Footer` render `data-skin={tone}` and paint
+`apps/web`'s `Section` renders `data-skin={brandVariant}`, and `CtaModule`,
+`Hero`'s Banner and `Footer` render `data-skin={tone}`; each paints
 `bg-ambient`, so everything inside them reads that skin's roles. A Banner over
 a photo re-points the skin's text, border and link roles at the on-image
 colours (`skin-on-image`), and every Banner paints the skin's
@@ -3165,10 +3164,9 @@ nested scope such as a per-module block — decides which of the two it shows.
 The fill is `--surface` mixed toward `--item-fill` by `--item-fill-mix`. A
 band owns `--item-fill`, the tint a filled card takes on it, and
 `--item-nested-fill`, the fill of a card inside a card, each a single ramp
-token the contrast guard measures text against (`surface-secondary` →
-`--brand-primary-muted` / `--brand-primary-wash`, `surface-brand-primary` →
-`--brand-primary-wash` / `--surface`, the page ground's fallbacks
-`--brand-primary-muted` / `--brand-primary-wash`, both unset by
+token the contrast guard measures text against (Brand tint's skin sets
+`--brand-primary-wash` / `--surface`; Plain, Shaded and the page ground take
+the fallbacks `--brand-primary-muted` / `--brand-primary-wash`, both unset by
 `surface-popover`); card style sets only the mix, because a `var()` inside a
 custom property resolves where it is declared, so a colour declared on `:root`
 would ignore the band. That colour is then mixed toward `transparent` by

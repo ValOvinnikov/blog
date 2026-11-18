@@ -82,4 +82,4 @@ A section of the questions a visitor asks before getting in touch, each a disclo
 
 - #4987 — accessible text and colour: #5011 (answers space their paragraphs and lists).
 - #5028 — text roles: #5032 (the question takes ITEM_TITLE), #5034 (the answer takes the card-body role).
-- #5016 — one-entry skins: the Background field lists the skin registry (#5019) and `Section` renders its skin (#5022).
+- #5016 — one-entry skins: the Background field lists the skin registry (#5019).

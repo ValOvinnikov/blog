@@ -74,7 +74,6 @@ export const FeatureListModuleView = ({
           align={cardAlign}
           imageSizes={CAROUSEL_IMAGE_SIZES}
           title={headingBlock.heading}
-          tone={brandVariant}
           contentAlignment={contentAlignment}
           hasAnyImage={hasAnyImage}
         />

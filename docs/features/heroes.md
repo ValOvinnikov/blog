@@ -47,7 +47,7 @@ A hero is the optional opening band of a page. It replaces the page's own headin
 - A page renders exactly one `<h1>`. `renderHeroModule` calls the hero component directly; when it returns nothing (no post resolved, a failed fetch, an unknown type) the page renders its `PageHeading` instead.
 - Blog Hero: the pinned post resolves to its translation in the request language; an untranslated pin renders nothing quietly, any other missing post renders nothing and logs `hero_blog_module.post_unresolved`. The Studio blocks publishing Newest featured when no published post is Featured, and warns when a pinned post lacks a translation. The primary action always links to the resolved post.
 - Profile Hero image precedence is per variant: Stacked and Split use the module image, else the author's photo; Banner uses the module image or none. Without a photo, Stacked shows initials, Split renders no media and keeps the author's name for assistive technology, Banner shows its scrim band alone. Nothing renders the author's name as copy.
-- Banner: the outer `Section` is forced to Plain with no spacing or dividers (`BANNER_SECTION_LAYOUT`); the hero's own spacing sets the Banner height, `brandVariant` tints the image, the image is decorative (`alt=""`) and actions render for a dark ground. Divider fields hide on Banner.
+- Banner: the outer `Section` is forced to Plain with no spacing or dividers (`BANNER_SECTION_LAYOUT`); the hero's own spacing sets the Banner height, `brandVariant` tints the image, the image is decorative (`alt=""`), and actions and social links follow the photo Banner's re-pointed text, border and link roles. Divider fields hide on Banner.
 - Banner copy over a photo keeps 4.5:1 over a white photo at every position, width and hue: titles and running text are both `text-on-image`, and no copy sits past the scrim's mid stop. Below `lg` the gradients never fade past mid, because the copy measure can span the band; from `lg` the weak tail starts beyond the measure. The scrim stops live in `packages/ui/src/lib/styling/scrims.ts`, one recipe per position, and read the skin's `--scrim-strong/-mid/-weak`, so the skin `tone` names picks the scrim. A Banner with no image keeps the skin's ink, with running text in `text-muted`, on the skin's lifted `--ambient-raised` field.
 - The shell's 1200×675 image and the Profile Banner image load with `priority`. The Profile Split 900×900 portrait and the Stacked 256×256 avatar load normally.
 - `contentPosition` and `mediaOrder` reach the view as single values; `toHeroPresentation` picks the field that matches the variant.
@@ -79,6 +79,6 @@ A hero is the optional opening band of a page. It replaces the page's own headin
 ## Related
 
 - #3600 — decide whether author- and post-mediated link targets need precise purging, which would let Blog and Profile drop their page-type tags.
-- #5016 — epic: one-entry skins. The Banner recipe renders `data-skin`, and `isOnDark` and tone props go.
+- #5016 — epic: one-entry skins. #5023 retires the remaining `tone` props and band surface utilities; `Hero` keeps `tone`.
 - #5028 — epic: text roles. #5033 gives Hero one eyebrow, intro and footnote style.
 - #3527 — the Profile Banner backdrop test stops reaching for the image through `container.querySelector`.

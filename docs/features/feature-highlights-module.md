@@ -70,4 +70,4 @@ A short story told in two to six rows, each pairing an image with a heading, a s
 ## Related
 
 - #5028 — text roles: #5039 (the row title moves to ITEM_TITLE).
-- #5016 — one-entry skins: #5019 (Background field lists the skin registry), #5022 (`Section` renders its skin).
+- #5016 — one-entry skins: #5019 (Background field lists the skin registry).

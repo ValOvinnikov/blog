@@ -1,10 +1,6 @@
 'use client';
 
-import type {
-  IWithClassName,
-  IWithDataTestId,
-  TBrandVariant,
-} from '@shinefold/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import type { TTestimonialItem } from '@shinefold/service';
 import type { ICarouselProps } from '@shinefold/ui/components/organisms/carousel';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
@@ -15,7 +11,6 @@ export interface ITestimonialCarouselProps
   items: TTestimonialItem[];
   align: 'left' | 'center';
   title: string;
-  tone: TBrandVariant;
   contentAlignment?: ICarouselProps<TTestimonialItem>['contentAlignment'];
 }
 
@@ -23,19 +18,15 @@ export const TestimonialCarousel = ({
   items,
   align,
   title,
-  tone,
   contentAlignment,
   className,
   dataTestId,
 }: ITestimonialCarouselProps) => (
   <LabelledCarousel
     items={items}
-    renderItem={({ item }) => (
-      <TestimonialCard item={item} align={align} tone={tone} />
-    )}
+    renderItem={({ item }) => <TestimonialCard item={item} align={align} />}
     getItemKey={({ item }) => item.id}
     title={title}
-    tone={tone}
     contentAlignment={contentAlignment}
     className={className}
     slideSize="stepped"
