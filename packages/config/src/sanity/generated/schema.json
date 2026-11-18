@@ -8863,6 +8863,36 @@
   },
   {
     "type": "type",
+    "name": "page_landing.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "page_landing"
+    }
+  },
+  {
+    "type": "type",
     "name": "page_postIndex.reference",
     "value": {
       "type": "object",
@@ -8893,6 +8923,36 @@
   },
   {
     "type": "type",
+    "name": "page_topic.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "page_topic"
+    }
+  },
+  {
+    "type": "type",
     "name": "page_topicIndex.reference",
     "value": {
       "type": "object",
@@ -8919,6 +8979,36 @@
         }
       },
       "dereferencesTo": "page_topicIndex"
+    }
+  },
+  {
+    "type": "type",
+    "name": "page_tag.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "page_tag"
     }
   },
   {
@@ -8983,156 +9073,6 @@
   },
   {
     "type": "type",
-    "name": "page_legalIndex.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "page_legalIndex"
-    }
-  },
-  {
-    "type": "type",
-    "name": "page_cookieStatement.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "page_cookieStatement"
-    }
-  },
-  {
-    "type": "type",
-    "name": "page_landing.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "page_landing"
-    }
-  },
-  {
-    "type": "type",
-    "name": "page_topic.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "page_topic"
-    }
-  },
-  {
-    "type": "type",
-    "name": "page_tag.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "page_tag"
-    }
-  },
-  {
-    "type": "type",
     "name": "page_privacyDocument.reference",
     "value": {
       "type": "object",
@@ -9159,6 +9099,36 @@
         }
       },
       "dereferencesTo": "page_privacyDocument"
+    }
+  },
+  {
+    "type": "type",
+    "name": "page_legalIndex.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "page_legalIndex"
     }
   },
   {
@@ -9192,6 +9162,36 @@
     }
   },
   {
+    "type": "type",
+    "name": "page_cookieStatement.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "page_cookieStatement"
+    }
+  },
+  {
     "name": "internationalizedArrayReferenceValue",
     "type": "type",
     "value": {
@@ -9215,11 +9215,27 @@
               },
               {
                 "type": "inline",
+                "name": "page_landing.reference"
+              },
+              {
+                "type": "inline",
+                "name": "page_post.reference"
+              },
+              {
+                "type": "inline",
                 "name": "page_postIndex.reference"
               },
               {
                 "type": "inline",
+                "name": "page_topic.reference"
+              },
+              {
+                "type": "inline",
                 "name": "page_topicIndex.reference"
+              },
+              {
+                "type": "inline",
+                "name": "page_tag.reference"
               },
               {
                 "type": "inline",
@@ -9231,35 +9247,19 @@
               },
               {
                 "type": "inline",
-                "name": "page_legalIndex.reference"
-              },
-              {
-                "type": "inline",
-                "name": "page_cookieStatement.reference"
-              },
-              {
-                "type": "inline",
-                "name": "page_landing.reference"
-              },
-              {
-                "type": "inline",
-                "name": "page_post.reference"
-              },
-              {
-                "type": "inline",
-                "name": "page_topic.reference"
-              },
-              {
-                "type": "inline",
-                "name": "page_tag.reference"
-              },
-              {
-                "type": "inline",
                 "name": "page_privacyDocument.reference"
               },
               {
                 "type": "inline",
+                "name": "page_legalIndex.reference"
+              },
+              {
+                "type": "inline",
                 "name": "page_legalDocument.reference"
+              },
+              {
+                "type": "inline",
+                "name": "page_cookieStatement.reference"
               }
             ]
           },

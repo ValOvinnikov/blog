@@ -1369,6 +1369,13 @@ export type Page_homeReference = {
   [internalGroqTypeReferenceTo]?: 'page_home';
 };
 
+export type Page_landingReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_landing';
+};
+
 export type Page_postIndexReference = {
   _ref: string;
   _type: 'reference';
@@ -1376,11 +1383,25 @@ export type Page_postIndexReference = {
   [internalGroqTypeReferenceTo]?: 'page_postIndex';
 };
 
+export type Page_topicReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_topic';
+};
+
 export type Page_topicIndexReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'page_topicIndex';
+};
+
+export type Page_tagReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_tag';
 };
 
 export type Page_tagIndexReference = {
@@ -1397,46 +1418,18 @@ export type Page_privacyIndexReference = {
   [internalGroqTypeReferenceTo]?: 'page_privacyIndex';
 };
 
-export type Page_legalIndexReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_legalIndex';
-};
-
-export type Page_cookieStatementReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_cookieStatement';
-};
-
-export type Page_landingReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_landing';
-};
-
-export type Page_topicReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_topic';
-};
-
-export type Page_tagReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_tag';
-};
-
 export type Page_privacyDocumentReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'page_privacyDocument';
+};
+
+export type Page_legalIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_legalIndex';
 };
 
 export type Page_legalDocumentReference = {
@@ -1446,22 +1439,29 @@ export type Page_legalDocumentReference = {
   [internalGroqTypeReferenceTo]?: 'page_legalDocument';
 };
 
+export type Page_cookieStatementReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_cookieStatement';
+};
+
 export type InternationalizedArrayReferenceValue = {
   _type: 'internationalizedArrayReferenceValue';
   value?:
     | Page_homeReference
-    | Page_postIndexReference
-    | Page_topicIndexReference
-    | Page_tagIndexReference
-    | Page_privacyIndexReference
-    | Page_legalIndexReference
-    | Page_cookieStatementReference
     | Page_landingReference
     | Page_postReference
+    | Page_postIndexReference
     | Page_topicReference
+    | Page_topicIndexReference
     | Page_tagReference
+    | Page_tagIndexReference
+    | Page_privacyIndexReference
     | Page_privacyDocumentReference
-    | Page_legalDocumentReference;
+    | Page_legalIndexReference
+    | Page_legalDocumentReference
+    | Page_cookieStatementReference;
   language?: string;
 };
 
@@ -2762,17 +2762,17 @@ export type AllSanitySchemaTypes =
   | TranslationMetadata
   | InternationalizedArrayReference
   | Page_homeReference
+  | Page_landingReference
   | Page_postIndexReference
+  | Page_topicReference
   | Page_topicIndexReference
+  | Page_tagReference
   | Page_tagIndexReference
   | Page_privacyIndexReference
-  | Page_legalIndexReference
-  | Page_cookieStatementReference
-  | Page_landingReference
-  | Page_topicReference
-  | Page_tagReference
   | Page_privacyDocumentReference
+  | Page_legalIndexReference
   | Page_legalDocumentReference
+  | Page_cookieStatementReference
   | InternationalizedArrayReferenceValue
   | Template_homeReference
   | Page_home
