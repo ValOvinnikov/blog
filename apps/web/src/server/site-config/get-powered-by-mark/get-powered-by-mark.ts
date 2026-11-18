@@ -1,15 +1,14 @@
 import type { TMaybeUndefined } from '@shinefold/config';
-import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import { FOOTER_LOG } from '@web/constants/footer';
-import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
+import { getEffectiveEntitlements } from '@web/server/site-config/get-effective-entitlements/get-effective-entitlements';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 
 export const getPoweredByMark = async (
   tenant: string,
 ): Promise<TMaybeUndefined<string>> => {
-  const plan = await getEffectivePlan(tenant);
-  if (!PLAN_ENTITLEMENTS[plan].hasPoweredByMark) return undefined;
+  const { hasPoweredByMark } = await getEffectiveEntitlements(tenant);
+  if (!hasPoweredByMark) return undefined;
 
   const { MARKETING_SITE_URL: href } = env;
   if (!href) {

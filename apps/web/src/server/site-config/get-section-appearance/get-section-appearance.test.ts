@@ -2,9 +2,10 @@ import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import { SECTION_APPEARANCE_LOG } from '@web/constants/section-appearance';
-import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
+import { getEffectiveEntitlements } from '@web/server/site-config/get-effective-entitlements/get-effective-entitlements';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
+import { mockTenantEntitlements } from '@web/testing/server/settings-features/fixtures';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
@@ -18,7 +19,9 @@ import { logger } from '@web/utils/logger/logger';
 import { getSectionAppearance } from './get-section-appearance';
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
-vi.mock('@web/server/site-config/get-effective-plan/get-effective-plan');
+vi.mock(
+  '@web/server/site-config/get-effective-entitlements/get-effective-entitlements',
+);
 
 vi.mock(
   '@shinefold/db',
@@ -51,7 +54,9 @@ describe(getSectionAppearance, () => {
   });
 
   it('drops the overrides on a Free site', async () => {
-    vi.mocked(getEffectivePlan).mockResolvedValueOnce(TENANT_PLAN.FREE);
+    vi.mocked(getEffectiveEntitlements).mockResolvedValueOnce(
+      mockTenantEntitlements(TENANT_PLAN.FREE),
+    );
 
     const { overrides } = await getSectionAppearance(
       MOCK_TENANT_ID,
@@ -61,19 +66,13 @@ describe(getSectionAppearance, () => {
     expect(overrides).toEqual(MOCK_NO_SECTION_STYLE_OVERRIDES);
   });
 
-  it('drops the overrides without a tenant', async () => {
-    const { overrides } = await getSectionAppearance(
-      undefined,
-      MOCK_SECTION_STYLE_OVERRIDES,
-    );
-
-    expect(overrides).toEqual(MOCK_NO_SECTION_STYLE_OVERRIDES);
-  });
-
-  it('reads the site config without a request header lookup when no tenant resolved', async () => {
+  it('reads the unresolved tenant without a request header lookup', async () => {
     await getSectionAppearance(undefined, MOCK_SECTION_STYLE_OVERRIDES);
 
     expect(getRequestTenantId).toHaveBeenCalledWith(
+      UNRESOLVED_TENANT_PLACEHOLDER,
+    );
+    expect(getEffectiveEntitlements).toHaveBeenCalledWith(
       UNRESOLVED_TENANT_PLACEHOLDER,
     );
   });

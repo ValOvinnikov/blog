@@ -17,7 +17,9 @@ import { getAccountControl } from './get-account-control';
 faker.seed(6061);
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
-vi.mock('@web/server/settings-features/get-tenant-plan/get-tenant-plan');
+vi.mock(
+  '@web/server/settings-features/get-tenant-entitlements/get-tenant-entitlements',
+);
 
 vi.mock(
   '@shinefold/db',

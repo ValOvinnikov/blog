@@ -1,5 +1,6 @@
 import type { TMaybeNull } from '@shinefold/config';
 import { getDb } from '@shinefold/db/client';
+import { isOpenGrantOf } from '@shinefold/db/queries/tenant-entitlement-grants/open-grant-condition';
 import { admins } from '@shinefold/db/schema/admins';
 import { users } from '@shinefold/db/schema/auth';
 import {
@@ -7,7 +8,7 @@ import {
   type TTenantEntitlementGrant,
 } from '@shinefold/db/schema/tenant-entitlement-grants';
 import { decryptOptionalPersonalValue } from '@shinefold/db/utils/personal-data/personal-data';
-import { and, asc, eq, gt, isNull, or } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 
 export type TListedEntitlementGrant = TTenantEntitlementGrant & {
   grantedByEmail: TMaybeNull<string>;
@@ -24,16 +25,7 @@ export async function listEntitlementGrants(
     .from(tenantEntitlementGrants)
     .leftJoin(admins, eq(admins.id, tenantEntitlementGrants.grantedBy))
     .leftJoin(users, eq(users.id, admins.userId))
-    .where(
-      and(
-        eq(tenantEntitlementGrants.tenantId, tenantId),
-        isNull(tenantEntitlementGrants.revokedAt),
-        or(
-          isNull(tenantEntitlementGrants.expiresAt),
-          gt(tenantEntitlementGrants.expiresAt, new Date()),
-        ),
-      ),
-    )
+    .where(isOpenGrantOf(tenantId))
     .orderBy(asc(tenantEntitlementGrants.grantedAt));
 
   return rows.map(({ grant, grantedByEmailEncrypted }) => ({

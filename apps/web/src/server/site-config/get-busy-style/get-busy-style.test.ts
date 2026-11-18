@@ -10,7 +10,9 @@ import { logger } from '@web/utils/logger/logger';
 import { getBusyStyle } from './get-busy-style';
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
-vi.mock('@web/server/settings-features/get-tenant-plan/get-tenant-plan');
+vi.mock(
+  '@web/server/settings-features/get-tenant-entitlements/get-tenant-entitlements',
+);
 
 vi.mock(
   '@shinefold/db',

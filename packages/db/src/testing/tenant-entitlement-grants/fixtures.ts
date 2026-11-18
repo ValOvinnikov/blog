@@ -32,6 +32,19 @@ export async function insertTestEntitlementGrant(
   );
 }
 
+export async function insertClosedTestEntitlementGrants(
+  db: TTestDb,
+  tenantId: string,
+): Promise<void> {
+  await insertTestEntitlementGrant(db, tenantId, {
+    revokedAt: MOCK_GRANT_PAST,
+  });
+  await insertTestEntitlementGrant(db, tenantId, {
+    key: CAPABILITY.ANALYTICS,
+    expiresAt: MOCK_GRANT_PAST,
+  });
+}
+
 export function useEntitlementGrantAdmin(db: () => TTestDb): () => string {
   let adminId: string;
 

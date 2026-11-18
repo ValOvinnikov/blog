@@ -10962,6 +10962,14 @@
         "file": "apps/web/src/constants/newsletter.ts"
       }
     ],
+    "newsletter.link_locale_tenant_lookup_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.LINK_LOCALE_TENANT_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
     "post_featured_module.fetch_failed": [
       {
         "ref": "POST_FEATURED_LOG.MODULE_FETCH_FAILED",
@@ -11149,6 +11157,14 @@
     "request_context.not_found_tenant_load_failed": [
       {
         "ref": "REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/request-context",
+        "file": "apps/web/src/constants/request-context.ts"
+      }
+    ],
+    "request_context.not_found_live_locales_failed": [
+      {
+        "ref": "REQUEST_CONTEXT_LOG.NOT_FOUND_LIVE_LOCALES_FAILED",
         "scope": "app:web",
         "from": "@web/constants/request-context",
         "file": "apps/web/src/constants/request-context.ts"
@@ -11498,6 +11514,22 @@
         "file": "apps/web/src/constants/session.ts"
       }
     ],
+    "settings_features.plan_fetch_failed": [
+      {
+        "ref": "SETTINGS_FEATURES_LOG.PLAN_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/settings-features",
+        "file": "apps/web/src/constants/settings-features.ts"
+      }
+    ],
+    "settings_features.effective_fetch_failed": [
+      {
+        "ref": "SETTINGS_FEATURES_LOG.EFFECTIVE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/settings-features",
+        "file": "apps/web/src/constants/settings-features.ts"
+      }
+    ],
     "auth.site_oauth_credentials_failed": [
       {
         "ref": "SIGN_IN_LOG.SITE_CREDENTIALS_FAILED",
@@ -11696,6 +11728,14 @@
         "scope": "app:web",
         "from": "@web/constants/tenant-email-identity",
         "file": "apps/web/src/constants/tenant-email-identity.ts"
+      }
+    ],
+    "tenant_entitlements.grants_fetch_failed": [
+      {
+        "ref": "TENANT_ENTITLEMENTS_LOG.GRANTS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tenant-entitlements",
+        "file": "apps/web/src/constants/tenant-entitlements.ts"
       }
     ],
     "tenant_write.unresolved": [

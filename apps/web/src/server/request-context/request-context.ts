@@ -6,10 +6,12 @@ import { REQUEST_CONTEXT_LOG } from '@web/constants/request-context';
 import { routing } from '@web/i18n/routing';
 import { hasDraftPreviewToken } from '@web/server/draft-preview/has-draft-preview-token/has-draft-preview-token';
 import { parseTenantSegment } from '@web/server/draft-preview/parse-tenant-segment/parse-tenant-segment';
+import { resolveNotFoundLocale } from '@web/server/request-context/resolve-not-found-locale/resolve-not-found-locale';
 import { toSanityContext } from '@web/server/request-context/to-sanity-context/to-sanity-context';
 import { isOperatorSuspended } from '@web/server/tenant/operator-suspension/operator-suspension';
 import { isTenantServable } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { toTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import { selectTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { isValidTenantId } from '@web/utils/is-tenant-shaped-path-segment';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -99,7 +101,7 @@ const buildRequestContext = async (
     },
     metadataBase: toMetadataBase(row),
     defaultLocale: row?.locale,
-    liveLocales: row && queries.tenants.selectLiveLocales(row),
+    liveLocales: row && (await selectTenantLiveLocales(row)),
     isOperatorSuspended: Boolean(row && isOperatorSuspended(row)),
     isDraftPreview,
   };
@@ -169,13 +171,8 @@ const buildNotFoundContext = async (
 ): Promise<TNotFoundContext> => {
   const { tenantId, locale } = await store.requestedRoute;
   const row = await loadTenantRowForNotFound(store, tenantId);
-  const defaultLocale = row?.locale ?? routing.defaultLocale;
-  const liveLocales = row
-    ? queries.tenants.selectLiveLocales(row)
-    : routing.locales;
-  const servedLocale = hasLocale(liveLocales, locale) ? locale : defaultLocale;
 
-  return { tenantId, locale: servedLocale };
+  return { tenantId, locale: await resolveNotFoundLocale(row, locale) };
 };
 
 export const getNotFoundContext = (): Promise<TNotFoundContext> => {

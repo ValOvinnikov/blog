@@ -1,52 +1,41 @@
 import type { TCapability } from '@shinefold/config';
-import { PLAN_REGISTRY } from '@shinefold/db';
-import {
-  EFFECTIVE_FETCH_FAILED_EVENT,
-  PLAN_FETCH_FAILED_EVENT,
-} from '@web/constants/settings-features';
+import { SETTINGS_FEATURES_LOG } from '@web/constants/settings-features';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getEffectiveSettingsFeatures } from '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features';
-import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
+import { getTenantEntitlements } from '@web/server/settings-features/get-tenant-entitlements/get-tenant-entitlements';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { logger } from '@web/utils/logger/logger';
 
-/**
- * Most-restrictive-wins capability gate: a capability is enabled only when
- * the tenant's plan entitles it (`PLAN_REGISTRY`) *and* its own effective
- * `settings_features` toggle is on. Every failure path — no tenant
- * resolved, a fetch error — resolves `false` rather than throwing, so a
- * caller can gate on this with a plain `if` and a capability simply omits
- * rather than breaking the page.
- */
+/** A grant raises the ceiling but never switches a capability on: the owner's own toggle must be on as well. */
 export const isCapabilityEnabledForTenant = async (
   tenantId: string,
   capability: TCapability,
 ): Promise<boolean> => {
-  const [planResult, featuresResult] = await Promise.all([
-    getTenantPlan(tenantId),
+  const [entitlementsResult, featuresResult] = await Promise.all([
+    getTenantEntitlements(tenantId),
     getEffectiveSettingsFeatures(tenantId),
   ]);
 
-  if (!planResult.ok) {
-    logger.error(PLAN_FETCH_FAILED_EVENT, {
+  if (!entitlementsResult.ok) {
+    logger.error(SETTINGS_FEATURES_LOG.PLAN_FETCH_FAILED, {
       capability,
-      error: planResult.error,
+      error: entitlementsResult.error,
     });
     return false;
   }
   if (!featuresResult.ok) {
-    logger.error(EFFECTIVE_FETCH_FAILED_EVENT, {
+    logger.error(SETTINGS_FEATURES_LOG.EFFECTIVE_FETCH_FAILED, {
       capability,
       error: featuresResult.error,
     });
     return false;
   }
 
-  const { data: plan } = planResult;
+  const { data: entitlements } = entitlementsResult;
   const { data: features } = featuresResult;
-  if (!plan || !features) return false;
+  if (!entitlements || !features) return false;
 
-  return PLAN_REGISTRY[plan].includes(capability) && features[capability];
+  return entitlements.capabilities.includes(capability) && features[capability];
 };
 
 /** Server actions run outside the `[tenant]/[locale]` layout, so they gate with `isCapabilityEnabledForTenant` instead. */

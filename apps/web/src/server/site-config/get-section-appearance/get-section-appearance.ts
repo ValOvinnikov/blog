@@ -1,7 +1,6 @@
 import type { TMaybeUndefined } from '@shinefold/config';
-import { TENANT_PLAN } from '@shinefold/config/constants';
 import { SECTION_APPEARANCE_LOG } from '@web/constants/section-appearance';
-import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
+import { getEffectiveEntitlements } from '@web/server/site-config/get-effective-entitlements/get-effective-entitlements';
 import { getSiteConfigWithPreset } from '@web/server/site-config/get-site-config-with-preset/get-site-config-with-preset';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import type { TSectionAppearance } from '@web/utils/build-section-scope-declarations';
@@ -14,16 +13,17 @@ export const getSectionAppearance = async (
   tenantId: TMaybeUndefined<string>,
   overrides: TSectionStyleOverrides,
 ): Promise<TSectionAppearance> => {
-  const [{ row, preset }, plan] = await Promise.all([
+  const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
+  const [{ row, preset }, entitlements] = await Promise.all([
     getSiteConfigWithPreset(
       SECTION_APPEARANCE_LOG.SITE_CONFIG_FETCH_FAILED,
-      tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
+      tenant,
     ),
-    tenantId ? getEffectivePlan(tenantId) : TENANT_PLAN.FREE,
+    getEffectiveEntitlements(tenant),
   ]);
 
   return {
-    overrides: gateSectionStyleOverrides(overrides, plan),
+    overrides: gateSectionStyleOverrides(overrides, entitlements),
     look: {
       cardStyle: row?.cardStyle ?? preset.cardStyle,
       buttonShape: row?.buttonShape ?? preset.buttonShape,

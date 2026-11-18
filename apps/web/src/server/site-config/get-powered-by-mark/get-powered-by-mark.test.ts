@@ -1,21 +1,24 @@
 import { faker } from '@faker-js/faker';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { FOOTER_LOG } from '@web/constants/footer';
-import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
+import { getEffectiveEntitlements } from '@web/server/site-config/get-effective-entitlements/get-effective-entitlements';
 import { setMockEnv } from '@web/testing/server/infra/set-mock-env';
+import { mockTenantEntitlements } from '@web/testing/server/settings-features/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { getPoweredByMark } from './get-powered-by-mark';
 
-vi.mock('@web/server/site-config/get-effective-plan/get-effective-plan');
+vi.mock(
+  '@web/server/site-config/get-effective-entitlements/get-effective-entitlements',
+);
 vi.mock('@web/utils/env/env');
 
 faker.seed(6796);
 
 const MOCK_MARKETING_SITE_URL = faker.internet.url();
 
-const getEffectivePlanMock = vi.mocked(getEffectivePlan);
+const getEffectiveEntitlementsMock = vi.mocked(getEffectiveEntitlements);
 
 describe(getPoweredByMark, () => {
   beforeEach(() => {
@@ -23,16 +26,20 @@ describe(getPoweredByMark, () => {
   });
 
   it('returns the marketing site on a Free site', async () => {
-    getEffectivePlanMock.mockResolvedValueOnce(TENANT_PLAN.FREE);
+    getEffectiveEntitlementsMock.mockResolvedValueOnce(
+      mockTenantEntitlements(TENANT_PLAN.FREE),
+    );
 
     await expect(getPoweredByMark(MOCK_TENANT_ID)).resolves.toBe(
       MOCK_MARKETING_SITE_URL,
     );
-    expect(getEffectivePlanMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getEffectiveEntitlementsMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('returns no mark on a Growth site', async () => {
-    getEffectivePlanMock.mockResolvedValueOnce(TENANT_PLAN.GROWTH);
+    getEffectiveEntitlementsMock.mockResolvedValueOnce(
+      mockTenantEntitlements(TENANT_PLAN.GROWTH),
+    );
 
     await expect(getPoweredByMark(MOCK_TENANT_ID)).resolves.toBeUndefined();
     expect(logger.error).not.toHaveBeenCalled();
@@ -40,7 +47,9 @@ describe(getPoweredByMark, () => {
 
   it('returns no mark on a Free site and logs when the marketing site address is unset', async () => {
     setMockEnv({});
-    getEffectivePlanMock.mockResolvedValueOnce(TENANT_PLAN.FREE);
+    getEffectiveEntitlementsMock.mockResolvedValueOnce(
+      mockTenantEntitlements(TENANT_PLAN.FREE),
+    );
 
     await expect(getPoweredByMark(MOCK_TENANT_ID)).resolves.toBeUndefined();
     expect(logger.error).toHaveBeenCalledWith(
