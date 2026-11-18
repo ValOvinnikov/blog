@@ -34,7 +34,8 @@ async function advanceTenant(
 ): Promise<boolean> {
   try {
     const hosts = await listTenantHosts(tenant);
-    if (isPlatformTenant(hosts, run.env.tenantRootDomain)) {
+    const { tenantRootDomain, marketingHost } = run.env;
+    if (isPlatformTenant(hosts, tenantRootDomain, marketingHost)) {
       run.skippedTenantIds.add(tenant.id);
       return false;
     }

@@ -62,7 +62,8 @@ async function runForTenant(
 ): Promise<boolean> {
   try {
     const hosts = await listTenantHosts(tenant);
-    if (isPlatformTenant(hosts, ctx.env.tenantRootDomain)) return false;
+    const { tenantRootDomain, marketingHost } = ctx.env;
+    if (isPlatformTenant(hosts, tenantRootDomain, marketingHost)) return false;
     return await run({ tenant, hosts, ctx });
   } catch (error) {
     logger.error(DOWNGRADE_GRACE_LOG.STEP_FAILED, {
