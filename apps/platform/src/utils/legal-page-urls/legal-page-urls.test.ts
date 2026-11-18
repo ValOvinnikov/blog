@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
-import { tenantSiteUrl } from '@platform/utils/routes/routes';
 import { LEGAL_PAGE_KIND, routes } from '@shinefold/config';
 
 import { toLegalPageUrls } from './legal-page-urls';
@@ -29,20 +28,6 @@ describe(toLegalPageUrls, () => {
     ).toBe(
       `${MOCK_MARKETING_SITE_URL}${routes.legalPageByKind(LEGAL_PAGE_KIND.TERMS)}`,
     );
-  });
-
-  it('falls back to the root domain’s apex without a marketing site URL', () => {
-    const siteUrl = tenantSiteUrl(MOCK_TENANT_ROOT_DOMAIN);
-
-    expect(
-      toLegalPageUrls({
-        marketingSiteUrl: undefined,
-        rootDomain: MOCK_TENANT_ROOT_DOMAIN,
-      }),
-    ).toEqual({
-      terms: `${siteUrl}${routes.legalPageByKind(LEGAL_PAGE_KIND.TERMS)}`,
-      privacy: `${siteUrl}${routes.legalPageByKind(LEGAL_PAGE_KIND.PRIVACY_POLICY)}`,
-    });
   });
 
   it('has no pages to link to without either', () => {

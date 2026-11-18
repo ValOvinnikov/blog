@@ -55,8 +55,9 @@ export const selectVariants = tv({
     isLocked: {
       true: {
         trigger: [
-          'cursor-not-allowed border-platform-control-line-locked bg-platform-bg',
+          'cursor-not-allowed border-platform-control-line-locked bg-platform-bg text-platform-muted',
         ],
+        icon: ['text-platform-faint'],
       },
       false: {
         trigger: [

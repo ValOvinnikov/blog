@@ -7,7 +7,7 @@ export const leadRowVariants = tv({
   slots: {
     row: [
       'flex w-full min-w-0 min-h-11 flex-col gap-1 text-left',
-      'border-b border-l-[3px] border-b-platform-line-2 px-[15px] py-3',
+      'border-b border-l-[3px] border-b-platform-line-2 border-l-transparent px-[15px] py-3',
       'cursor-pointer hover:bg-platform-surface-2',
     ],
     top: ['flex min-w-0 items-center gap-2'],
@@ -19,14 +19,14 @@ export const leadRowVariants = tv({
   },
   variants: {
     isRead: {
-      true: { row: ['border-l-transparent'], name: ['font-normal'] },
-      false: { row: ['border-l-platform-brand'], name: ['font-semibold'] },
+      true: { name: ['font-normal'] },
+      false: { name: ['font-semibold'] },
     },
     isSelected: {
       true: {
         row: [
           ...SELECTED_ROW_CLASSES,
-          'border-l-transparent hover:bg-platform-selected-tint',
+          'hover:bg-platform-selected-tint',
           'before:-left-platform-bar after:-left-platform-bar',
           insetFocusRingClasses(FOCUS_RING_GROUND.SELECTED_TINT),
         ],
