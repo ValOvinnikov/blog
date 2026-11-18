@@ -1,19 +1,11 @@
 import { POST_SOURCE, type TPostSource } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
-import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
-import {
-  appearanceFieldGroups,
-  appearanceFields,
-  appearanceFieldsets,
-} from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
-import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { displayModeField } from '@shinefold/studio/schema-types/fields/display-mode-field/display-mode-field';
+import { cardModuleAppearance } from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { showImagesField } from '@shinefold/studio/schema-types/fields/show-images-field/show-images-field';
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { publishedPostFilter } from '@shinefold/studio/schema-types/filters/published-post';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { wideLayoutField } from '@shinefold/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { validateNewestFeaturedHasCandidate } from '@shinefold/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
 import { hasLength, toTitleCase } from '@shinefold/utils/primitives';
@@ -34,16 +26,14 @@ export const postFeaturedSchema = defineType({
   description:
     'A spotlight on up to three posts, with the first shown larger as the lead. Pin the posts yourself, or let it pick the newest ones marked Featured.',
   icon: Pin,
-  fieldsets: [
-    {
-      name: POSTS_FIELDSET,
-      title: 'Posts',
-      description: 'Which posts this spotlight features.',
-    },
-    ...appearanceFieldsets,
-  ],
-  groups: appearanceFieldGroups,
-  fields: appearanceFields({
+  ...cardModuleAppearance({
+    fieldsets: [
+      {
+        name: POSTS_FIELDSET,
+        title: 'Posts',
+        description: 'Which posts this spotlight features.',
+      },
+    ],
     content: [
       titleField(),
       moduleHeadingBlockField(),
@@ -124,15 +114,8 @@ export const postFeaturedSchema = defineType({
       }),
       showImagesField({ subject: 'post' }),
     ],
-    appearance: [
-      brandVariantField(),
-      displayModeField(),
-      ...alignmentFields([], {
-        title: 'Heading Alignment',
-        alignsCarousel: true,
-      }),
-    ],
-    layout: wideLayoutField,
+    displayMode: true,
+    headingAlignment: { alignsCarousel: true },
     hasColumns: false,
   }),
   preview: {

@@ -1,12 +1,6 @@
 import { CONTENT_ALIGNMENT } from '@shinefold/config/constants';
 import { faqBlockSchema } from '@shinefold/studio/schema-types/documents/blocks/faq/faq';
-import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
-import {
-  appearanceFieldGroups,
-  appearanceFields,
-  appearanceFieldsets,
-} from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
-import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { cardModuleAppearance } from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { layoutField } from '@shinefold/studio/schema-types/objects/layout/layout-field';
@@ -22,9 +16,7 @@ export const faqSchema = defineType({
   description:
     'The questions a visitor asks before getting in touch, gathered here with their answers.',
   icon: MessageCircleQuestion,
-  fieldsets: appearanceFieldsets,
-  groups: appearanceFieldGroups,
-  fields: appearanceFields({
+  ...cardModuleAppearance({
     content: [
       titleField(),
       moduleHeadingBlockField(),
@@ -53,15 +45,11 @@ export const faqSchema = defineType({
       }),
       ctaButtonsField(),
     ],
-    appearance: [
-      brandVariantField(),
-      ...alignmentFields([], {
-        title: 'Heading Alignment',
-        allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-        hasActions: true,
-        alignsItems: true,
-      }),
-    ],
+    headingAlignment: {
+      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+      hasActions: true,
+      alignsItems: true,
+    },
     layout: layoutField,
     hasColumns: false,
   }),
