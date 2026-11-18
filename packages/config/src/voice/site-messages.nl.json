@@ -442,7 +442,8 @@
         "duration": "2 jaar"
       }
     },
-    "analyticsNote": "Als deze site bezoeken en paginasnelheid meet, gebruikt ze Vercel Web Analytics en Speed Insights. Die plaatsen geen cookies en laden ongeacht je cookiekeuze."
+    "analyticsNote": "Als deze site bezoeken en paginasnelheid meet, gebruikt ze Vercel Web Analytics en Speed Insights. Die plaatsen geen cookies en laden ongeacht je cookiekeuze.",
+    "plausibleNote": "Deze site meet bezoeken ook met Plausible, dat geen cookies plaatst."
   },
   "table": {
     "regionLabel": "Tabel"

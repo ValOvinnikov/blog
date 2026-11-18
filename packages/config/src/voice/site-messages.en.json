@@ -442,7 +442,8 @@
         "duration": "2 years"
       }
     },
-    "analyticsNote": "Where this site measures visits and page speed, it uses Vercel Web Analytics and Speed Insights. They set no cookies and load regardless of your cookie choice."
+    "analyticsNote": "Where this site measures visits and page speed, it uses Vercel Web Analytics and Speed Insights. They set no cookies and load regardless of your cookie choice.",
+    "plausibleNote": "This site also measures visits with Plausible, which sets no cookies."
   },
   "table": {
     "regionLabel": "Table"

@@ -16,8 +16,14 @@ import { NextIntlClientProvider } from 'next-intl';
 import { CookieList } from './cookie-list';
 
 const NL_MESSAGES = SITE_MESSAGES_BY_LOCALE.NL;
-const { ariaLabel, cookies, intro, introWithGoogleAnalytics, analyticsNote } =
-  SITE_MESSAGES.cookieList;
+const {
+  ariaLabel,
+  cookies,
+  intro,
+  introWithGoogleAnalytics,
+  analyticsNote,
+  plausibleNote,
+} = SITE_MESSAGES.cookieList;
 
 const GOOGLE_ANALYTICS_COOKIE = '_ga';
 const MOCK_GOOGLE_ANALYTICS_VISIT_COOKIE = `${GOOGLE_ANALYTICS_COOKIE}_${MOCK_GOOGLE_ANALYTICS.analyticsId.replace(/^G-/, '')}`;
@@ -39,6 +45,12 @@ const expectRowWith = (name: string, purpose: string, duration: string) => {
   expect(purposeCell).toBeVisible();
   expect(durationCell).toBeVisible();
 };
+
+const itSaysNothingAboutPlausible = () =>
+  it('says nothing about Plausible', () => {
+    const note = screen.queryByText(plausibleNote);
+    expect(note).not.toBeInTheDocument();
+  });
 
 describe(`<${CookieList.name}/>`, () => {
   describe('without an analytics tool', () => {
@@ -74,6 +86,8 @@ describe(`<${CookieList.name}/>`, () => {
       const note = screen.getByText(analyticsNote);
       expect(note).toBeVisible();
     });
+
+    itSaysNothingAboutPlausible();
   });
 
   it('renders the list in the page language', () => {
@@ -122,14 +136,35 @@ describe(`<${CookieList.name}/>`, () => {
       expect(sentence).toBeVisible();
       expect(necessaryOnlySentence).not.toBeInTheDocument();
     });
+
+    itSaysNothingAboutPlausible();
   });
 
-  it('lists no Google cookie for a site on Plausible', () => {
-    renderElement(withSiteAnalytics(<CookieList />, MOCK_PLAUSIBLE_ANALYTICS));
+  describe('with Plausible configured', () => {
+    it('lists no Google cookie', () => {
+      renderElement(
+        withSiteAnalytics(<CookieList />, MOCK_PLAUSIBLE_ANALYTICS),
+      );
 
-    const entries = getStackedEntries();
-    const sentence = screen.getByText(intro);
-    expect(entries).toHaveLength(COOKIE_LIST.length);
-    expect(sentence).toBeVisible();
+      const entries = getStackedEntries();
+      const sentence = screen.getByText(intro);
+      expect(entries).toHaveLength(COOKIE_LIST.length);
+      expect(sentence).toBeVisible();
+    });
+
+    it.each(Object.values(LOCALE_ISO_CODES))(
+      'says the site measures visits with Plausible in %s',
+      (locale) => {
+        const messages = SITE_MESSAGES_BY_LOCALE[locale];
+        renderElement(
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            {withSiteAnalytics(<CookieList />, MOCK_PLAUSIBLE_ANALYTICS)}
+          </NextIntlClientProvider>,
+        );
+
+        const note = screen.getByText(messages.cookieList.plausibleNote);
+        expect(note).toBeVisible();
+      },
+    );
   });
 });
