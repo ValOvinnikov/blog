@@ -26,7 +26,7 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes, tenantSiteUrl } from '@platform/utils/routes/routes';
-import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
+import { LOCALE_ISO_CODES, pricingPageUrl, routes } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { sendEmail } from '@shinefold/email';
 
@@ -41,8 +41,7 @@ vi.mock('@shinefold/email');
 const sendEmailMock = vi.mocked(sendEmail);
 
 const MOCK_MARKETING_SITE_URL = faker.internet.url({ appendSlash: false });
-const PRICING_URL = new URL(routes.pricingComparison(), MOCK_MARKETING_SITE_URL)
-  .href;
+const PRICING_URL = pricingPageUrl(MOCK_MARKETING_SITE_URL);
 
 const sentEmail = () => sendEmailMock.mock.calls[0]?.[0];
 
@@ -130,10 +129,7 @@ describe(notifyOwnerOfPlanChange, () => {
       await notifyDowngrade();
 
       expect(sentEmail()?.text).toContain(
-        new URL(
-          routes.pricingComparison(),
-          tenantSiteUrl(MOCK_TENANT_ROOT_DOMAIN),
-        ).href,
+        pricingPageUrl(tenantSiteUrl(MOCK_TENANT_ROOT_DOMAIN)),
       );
     });
 

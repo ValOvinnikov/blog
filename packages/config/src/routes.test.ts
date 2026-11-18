@@ -20,7 +20,7 @@ const COOKIE_STATEMENT_PATH = '/legal/cookie-statement';
 const PRIVACY_INDEX_PATH = '/privacy';
 const LEGAL_INDEX_PATH = '/legal';
 const PRICING_COMPARISON_PATH = '/pricing#compare';
-const MOCK_MAIN_ADDRESS = faker.internet.domainName();
+const MOCK_MARKETING_SITE_URL = faker.internet.url({ appendSlash: false });
 
 describe('routes', () => {
   it.each([
@@ -133,9 +133,12 @@ describe('routes', () => {
 });
 
 describe(pricingPageUrl, () => {
-  it('builds the pricing comparison address on the given main address', () => {
-    expect(pricingPageUrl(MOCK_MAIN_ADDRESS)).toBe(
-      `https://${MOCK_MAIN_ADDRESS}${PRICING_COMPARISON_PATH}`,
+  it.each([
+    ['the marketing site URL', MOCK_MARKETING_SITE_URL],
+    ['a marketing site URL ending in a slash', `${MOCK_MARKETING_SITE_URL}/`],
+  ])('builds the pricing comparison address on %s', (_, siteUrl) => {
+    expect(pricingPageUrl(siteUrl)).toBe(
+      `${MOCK_MARKETING_SITE_URL}${PRICING_COMPARISON_PATH}`,
     );
   });
 });

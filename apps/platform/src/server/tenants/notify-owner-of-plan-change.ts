@@ -6,7 +6,7 @@ import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { toMarketingSiteUrl } from '@platform/utils/marketing-site-url/marketing-site-url';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { routes } from '@shinefold/config';
+import { pricingPageUrl } from '@shinefold/config';
 import { EMAIL_ACCOUNT, type TTenantPlan } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import {
@@ -61,7 +61,7 @@ const sendPlanChangeEmail = async (
     secondaryLink: siteUrl
       ? {
           label: t('plansLinkLabel'),
-          url: new URL(routes.pricingComparison(), siteUrl).href,
+          url: pricingPageUrl(siteUrl),
         }
       : undefined,
   });
