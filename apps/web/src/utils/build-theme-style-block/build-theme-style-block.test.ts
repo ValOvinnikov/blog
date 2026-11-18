@@ -57,8 +57,10 @@ const THEME_ROOT_BLOCK = THEME_CSS.slice(
   THEME_CSS.indexOf(':root {'),
   THEME_CSS.indexOf(`${DARK_SELECTOR} {`),
 );
+const THEME_DARK_START = THEME_CSS.indexOf(`${DARK_SELECTOR} {`);
 const THEME_DARK_BLOCK = THEME_CSS.slice(
-  THEME_CSS.indexOf(`${DARK_SELECTOR} {`),
+  THEME_DARK_START,
+  THEME_CSS.indexOf('\n}\n', THEME_DARK_START),
 );
 
 const RADIUS_TOKENS = [
