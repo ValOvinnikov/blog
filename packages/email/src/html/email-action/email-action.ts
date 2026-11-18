@@ -8,6 +8,8 @@ export type TEmailAction = {
   variant?: 'button' | 'link';
 };
 
+export type TEmailLink = Omit<TEmailAction, 'variant'>;
+
 export type TEmailActionBrand = {
   brandPrimary: string;
   brandPrimarySolid: string;
