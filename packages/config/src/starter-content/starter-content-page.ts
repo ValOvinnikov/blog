@@ -27,12 +27,12 @@ export type TPageCopy = {
   metaDescription: string;
 };
 
-export type TSectionPageCopy = TPageCopy & {
+export type TContentPageCopy = TPageCopy & {
   summary: string;
   body: readonly string[];
 };
 
-export function buildSectionChildPage({
+export function buildContentPage({
   locale,
   pageId,
   parentId,
@@ -40,8 +40,8 @@ export function buildSectionChildPage({
 }: {
   locale: TLocaleIsoCode;
   pageId: string;
-  parentId: string;
-  page: TSectionPageCopy;
+  parentId?: string;
+  page: TContentPageCopy;
 }): TStarterDocumentUnion[] {
   const templateId = `${pageId}Template`;
   const bodyId = `${pageId}Body`;
@@ -64,7 +64,7 @@ export function buildSectionChildPage({
       _type: 'page_landing',
       language: locale,
       title: page.title,
-      parent: reference(parentId),
+      ...(parentId && { parent: reference(parentId) }),
       slug: slug(page.slug),
       headingBlock: pageHeadingBlock(page.title, page.summary),
       template: reference(templateId),

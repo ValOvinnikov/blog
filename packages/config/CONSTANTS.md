@@ -334,6 +334,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **TENANT_WRITE_REFUSAL**: `UNRESOLVED`, `INACTIVE`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/text-role.ts`
+
+- **TEXT_ROLE**: `HERO_TITLE`, `POST_TITLE`, `PAGE_TITLE`, `SECTION_TITLE`, `CARD_TITLE`, `ITEM_TITLE`, `DIALOG_TITLE`, `PROSE_H2`, `PROSE_H3`, `PROSE_H4`, `INTRO`, `BODY`, `CARD_BODY`, `META`, `EYEBROW`, `LABEL`, `FOOTNOTE`, `CAPTION`, `QUOTE`, `ATTRIBUTION`, `FIGURE`, `FIGURE_LABEL`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/timeline.ts`
 
 - **TIMELINE_MARKER_STYLE**: `NUMBERED`, `LABELLED`
