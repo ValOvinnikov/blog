@@ -175,7 +175,7 @@ from `useSettingsFormState()`:
   names the scroll region. A card title with its count
   (`DataTableShell.Title`), a filter strip (`DataTableShell.Toolbar`), a note
   under the rows (`DataTableShell.Note`) and fixed column widths (a column's
-  `width`) are the shell's own opt-in parts, kept in the empty state; a mode it
+  `width`, px or %) are the shell's own opt-in parts, kept in the empty state; a mode it
   still lacks goes into the shell, never a hand-built `<table>`.
 
 ### Editing a shared primitive
@@ -620,8 +620,8 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
   classes.
 - Tables scroll sideways inside their card, and fact lists stack the term above
   the value below `md`. A table may opt into stacked rows instead
-  (`DataTableShell`'s `isStacked`: head row hidden, cells stacked, empty cells
-  not rendered); one that sorts from its head row never does.
+  (`DataTableShell`'s `isStacked`: head row hidden, each cell named by its
+  column for screen readers, empty cells not rendered); one that sorts from its head row never does.
   `DataTableShell` and `DetailList` own all of this; never add it per page.
 - A Desktop/Mobile preview toggle is offered only where it changes what renders;
   an email's Desktop preview is a real 600px frame.

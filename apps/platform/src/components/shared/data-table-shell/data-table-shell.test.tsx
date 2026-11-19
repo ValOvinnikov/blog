@@ -30,6 +30,27 @@ const MOCK_TITLE = faker.lorem.words(2);
 const MOCK_COUNT = faker.lorem.words(2);
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_NOTE = faker.lorem.sentence();
+const MOCK_ACTIONS_LABEL = faker.lorem.word();
+
+const renderStackedTable = () =>
+  renderWithIntl(
+    <DataTableShell
+      items={MOCK_ITEMS}
+      emptyMessage={MOCK_EMPTY_MESSAGE}
+      ariaLabel={MOCK_ARIA_LABEL}
+      isStacked={true}
+      columns={[
+        { key: 'name', label: MOCK_COLUMN_LABEL },
+        { key: 'actions', label: MOCK_ACTIONS_LABEL },
+      ]}
+      renderRow={(item) => (
+        <DataTableShell.Row key={item.id}>
+          <DataTableShell.Cell>{item.name}</DataTableShell.Cell>
+          <DataTableShell.Cell>{null}</DataTableShell.Cell>
+        </DataTableShell.Row>
+      )}
+    />,
+  );
 
 const renderTable = (
   items: TItem[],
@@ -110,6 +131,32 @@ describe(`<${DataTableShell.name}/>`, () => {
 
       expect(region).toContainElement(table);
       expect(region).toHaveAttribute('tabindex', '0');
+    });
+  });
+
+  describe('stacked', () => {
+    beforeEach(() => {
+      renderStackedTable();
+    });
+
+    it.each([MOCK_FIRST_ITEM, MOCK_SECOND_ITEM])(
+      'names the cell for $name after its column',
+      ({ name }) => {
+        const cell = screen.getByRole('cell', {
+          name: `${MOCK_COLUMN_LABEL} ${name}`,
+        });
+
+        expect(cell).toBeInTheDocument();
+      },
+    );
+
+    it('leaves an empty cell unlabelled, naming its column only in the head row', () => {
+      const actionsLabels = screen.getAllByText(MOCK_ACTIONS_LABEL);
+      const actionsHeader = screen.getByRole('columnheader', {
+        name: MOCK_ACTIONS_LABEL,
+      });
+
+      expect(actionsLabels).toEqual([actionsHeader]);
     });
   });
 

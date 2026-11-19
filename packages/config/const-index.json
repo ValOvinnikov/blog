@@ -3468,6 +3468,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/portable-text-block-type.ts"
+      },
+      {
+        "ref": "ARIA_ROLE.TABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
       }
     ],
     "CONSOLE": [
@@ -5884,6 +5890,30 @@
         "scope": "app:platform",
         "from": "@platform/constants/activity",
         "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "rowgroup": [
+      {
+        "ref": "ARIA_ROLE.ROWGROUP",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
+      }
+    ],
+    "row": [
+      {
+        "ref": "ARIA_ROLE.ROW",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
+      }
+    ],
+    "cell": [
+      {
+        "ref": "ARIA_ROLE.CELL",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
       }
     ],
     "FRAMED": [

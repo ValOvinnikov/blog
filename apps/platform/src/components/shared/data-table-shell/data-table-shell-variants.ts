@@ -34,6 +34,7 @@ export const dataTableShellVariants = tv({
       'px-[14px] py-3 align-middle text-platform-13-5 text-platform-text break-words',
       'max-md:group-data-stacked/table:block max-md:group-data-stacked/table:p-0 max-md:group-data-stacked/table:empty:hidden',
     ],
+    stackedCellLabel: ['sr-only md:hidden'],
     empty: ['p-[50px] text-center text-platform-13-5 text-platform-muted'],
     note: [
       'border-t border-platform-line-2 px-[14px] py-4',
