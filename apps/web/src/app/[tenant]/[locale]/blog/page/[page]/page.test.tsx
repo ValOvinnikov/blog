@@ -1,13 +1,14 @@
 import { routes } from '@shinefold/config';
 import { buildPostIndexMetadata } from '@web/metadata/post-index-metadata';
 import { testPageRouteContract } from '@web/testing/app/page-route-contract';
-import { testPaginatedRouteContract } from '@web/testing/app/paginated-route-contract';
+import {
+  MOCK_SECOND_PAGE,
+  testPaginatedRouteContract,
+} from '@web/testing/app/paginated-route-contract';
 import { mockRouteParams } from '@web/testing/app/route-params';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import PostIndexNumberedPage, { generateMetadata, revalidate } from './page';
-
-const SECOND_PAGE = '2';
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -25,7 +26,7 @@ vi.mock('@web/components/pages/post-index-page', () => ({
 
 const paramsFor = (page: string) => mockRouteParams({ page });
 
-const params = paramsFor(SECOND_PAGE);
+const params = paramsFor(MOCK_SECOND_PAGE);
 
 const setup = customRenderAsync(PostIndexNumberedPage, { params });
 
@@ -35,7 +36,7 @@ testPageRouteContract({
   revalidate,
   params,
   buildMetadata: buildPostIndexMetadata,
-  buildMetadataArgs: [Number(SECOND_PAGE)],
+  buildMetadataArgs: [Number(MOCK_SECOND_PAGE)],
 });
 
 testPaginatedRouteContract({
@@ -50,6 +51,6 @@ describe(`<${PostIndexNumberedPage.name}/>`, () => {
 
     const postIndexPage = screen.getByTestId('post-index-page');
 
-    expect(postIndexPage).toHaveTextContent(SECOND_PAGE);
+    expect(postIndexPage).toHaveTextContent(MOCK_SECOND_PAGE);
   });
 });
