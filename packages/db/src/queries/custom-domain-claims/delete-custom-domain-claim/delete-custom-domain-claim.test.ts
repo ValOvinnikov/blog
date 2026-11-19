@@ -3,7 +3,10 @@ import * as schema from '@shinefold/db/schema';
 import { insertTestCustomDomainClaim } from '@shinefold/db/testing/custom-domain-claims/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_TENANT_DOMAIN } from '@shinefold/db/testing/tenants/fixtures';
-import { useTestTenant } from '@shinefold/db/testing/test-tenant';
+import {
+  patchTestTenant,
+  useTestTenant,
+} from '@shinefold/db/testing/test-tenant';
 
 import { deleteCustomDomainClaim } from './delete-custom-domain-claim';
 
@@ -37,7 +40,7 @@ describe(deleteCustomDomainClaim, () => {
     });
 
     it('keeps the claim once the site has left the given plan', async () => {
-      await db().update(schema.tenants).set({ plan: TENANT_PLAN.GROWTH });
+      await patchTestTenant(db(), tenant().id, { plan: TENANT_PLAN.GROWTH });
 
       await expect(
         deleteCustomDomainClaim(tenant().id, TENANT_PLAN.FREE),

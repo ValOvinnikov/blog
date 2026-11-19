@@ -28,7 +28,11 @@ export async function patchTestTenant(
   patch: Partial<
     Pick<
       TTenant,
-      'plan' | 'status' | 'selfServeOwnerEmailIndex' | 'suspensionReason'
+      | 'plan'
+      | 'status'
+      | 'selfServeOwnerEmailIndex'
+      | 'suspensionReason'
+      | 'firstPostPublishedAt'
     >
   >,
 ): Promise<void> {

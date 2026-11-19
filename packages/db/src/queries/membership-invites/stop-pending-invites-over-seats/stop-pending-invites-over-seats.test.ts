@@ -11,7 +11,10 @@ import {
   MOCK_USER_ID,
 } from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
-import { useTestTenant } from '@shinefold/db/testing/test-tenant';
+import {
+  patchTestTenant,
+  useTestTenant,
+} from '@shinefold/db/testing/test-tenant';
 
 import { stopPendingInvitesOverSeats } from './stop-pending-invites-over-seats';
 
@@ -50,7 +53,7 @@ describe(stopPendingInvitesOverSeats, () => {
 
     describe('once the site has moved to Growth', () => {
       beforeEach(async () => {
-        await db().update(schema.tenants).set({ plan: TENANT_PLAN.GROWTH });
+        await patchTestTenant(db(), tenant().id, { plan: TENANT_PLAN.GROWTH });
       });
 
       it('keeps the earliest ones that still fit the seats', async () => {

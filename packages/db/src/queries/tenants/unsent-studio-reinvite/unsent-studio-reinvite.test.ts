@@ -1,9 +1,10 @@
-import * as schema from '@shinefold/db/schema';
 import { MOCK_OWNER_EMAIL } from '@shinefold/db/testing/fixtures';
 import { usePersonalDataKeys } from '@shinefold/db/testing/personal-data';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
-import { useTestTenant } from '@shinefold/db/testing/test-tenant';
-import { eq } from 'drizzle-orm';
+import {
+  readTestTenant,
+  useTestTenant,
+} from '@shinefold/db/testing/test-tenant';
 
 import {
   clearUnsentStudioReinvite,
@@ -16,16 +17,6 @@ vi.mock('@shinefold/db/client');
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);
 usePersonalDataKeys();
-
-async function readStoredValue(tenantId: string) {
-  const [row] = await db()
-    .select({
-      value: schema.tenants.unsentReinviteFormerOwnerEmailEncrypted,
-    })
-    .from(schema.tenants)
-    .where(eq(schema.tenants.id, tenantId));
-  return row?.value;
-}
 
 describe('the unsent Studio re-invite', () => {
   describe('once stored', () => {
@@ -40,7 +31,8 @@ describe('the unsent Studio re-invite', () => {
     });
 
     it('never stores the address in readable form', async () => {
-      const stored = await readStoredValue(tenant().id);
+      const { unsentReinviteFormerOwnerEmailEncrypted: stored } =
+        await readTestTenant(db(), tenant().id);
 
       expect(stored).not.toContain(MOCK_OWNER_EMAIL);
     });

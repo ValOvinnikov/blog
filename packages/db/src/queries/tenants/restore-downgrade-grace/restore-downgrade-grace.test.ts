@@ -1,13 +1,14 @@
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { endDowngradeGrace } from '@shinefold/db/queries/tenants/end-downgrade-grace';
 import { listTenantsDueForGraceEnd } from '@shinefold/db/queries/tenants/list-tenants-due-for-grace-end';
-import { tenants } from '@shinefold/db/schema/tenants';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { daysBeforeNow } from '@shinefold/db/testing/tenants/grace';
-import { useTestTenant } from '@shinefold/db/testing/test-tenant';
+import {
+  patchTestTenant,
+  useTestTenant,
+} from '@shinefold/db/testing/test-tenant';
 import { daysAfter } from '@shinefold/db/utils/day-offset/day-offset';
-import { eq } from 'drizzle-orm';
 
 import { restoreDowngradeGrace } from './restore-downgrade-grace';
 
@@ -42,10 +43,7 @@ describe(restoreDowngradeGrace, () => {
   });
 
   it('leaves a site that paid in between untouched', async () => {
-    await db()
-      .update(tenants)
-      .set({ plan: TENANT_PLAN.GROWTH })
-      .where(eq(tenants.id, tenant().id));
+    await patchTestTenant(db(), tenant().id, { plan: TENANT_PLAN.GROWTH });
 
     await expect(
       restoreDowngradeGrace(tenant().id, MOCK_GIVEN_BACK),

@@ -20,7 +20,10 @@ import {
   MOCK_MISSING_USER_ID,
 } from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
-import { useTestTenant } from '@shinefold/db/testing/test-tenant';
+import {
+  patchTestTenant,
+  useTestTenant,
+} from '@shinefold/db/testing/test-tenant';
 import { eq } from 'drizzle-orm';
 
 import { consumeMembershipInvite } from './consume-membership-invite';
@@ -151,10 +154,7 @@ describe(consumeMembershipInvite, () => {
     });
 
     it('is accepted once the plan has a seat for it', async () => {
-      await db()
-        .update(schema.tenants)
-        .set({ plan: TENANT_PLAN.GROWTH })
-        .where(eq(schema.tenants.id, tenant().id));
+      await patchTestTenant(db(), tenant().id, { plan: TENANT_PLAN.GROWTH });
 
       const membership = await consumeMembershipInvite(
         editorInviteId,
