@@ -4,34 +4,26 @@ import { tv } from '@shinefold/ui/lib/styling';
 export const moduleHeadingVariants = tv({
   slots: {
     wrapper: ['max-w-measure text-prose mb-5'],
-    label: ['m-0'],
-    supportingText: ['font-body text-prose text-muted', 'm-0 mt-3'],
+    heading: ['m-0'],
+    supportingText: ['m-0 mt-3'],
   },
   variants: {
-    variant: {
-      label: {
-        label: [
-          'font-mono text-label font-normal uppercase tracking-label text-subtle',
-        ],
-      },
-      section: {},
-    },
     align: {
       [CONTENT_ALIGNMENT.LEFT]: {
-        label: ['text-left'],
+        heading: ['text-left'],
         supportingText: ['text-left'],
       },
       [CONTENT_ALIGNMENT.CENTER]: {
         wrapper: ['mx-auto'],
-        label: ['text-center'],
+        heading: ['text-center'],
         supportingText: ['text-center'],
       },
       [CONTENT_ALIGNMENT.RIGHT]: {
         wrapper: ['ml-auto'],
-        label: ['text-right'],
+        heading: ['text-right'],
         supportingText: ['text-right'],
       },
     },
   },
-  defaultVariants: { variant: 'label', align: CONTENT_ALIGNMENT.LEFT },
+  defaultVariants: { align: CONTENT_ALIGNMENT.LEFT },
 });

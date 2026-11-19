@@ -921,6 +921,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **EMBED_LOG**: `MODULE_FETCH_FAILED`=`"embed_module.fetch_failed"`
 
+### `@web/constants/error-boundary` — `apps/web/src/constants/error-boundary.ts`
+
+- **ERROR_BOUNDARY_LOG**: `GLOBAL_RENDER_FAILED`=`"global_error_boundary.render_failed"`, `LOCALE_RENDER_FAILED`=`"locale_error_boundary.render_failed"`
+
 ### `@web/constants/faq` — `apps/web/src/constants/faq.ts`
 
 - **FAQ_LOG**: `MODULE_FETCH_FAILED`=`"faq_module.fetch_failed"`

@@ -10954,6 +10954,22 @@
         "file": "apps/web/src/constants/embed.ts"
       }
     ],
+    "global_error_boundary.render_failed": [
+      {
+        "ref": "ERROR_BOUNDARY_LOG.GLOBAL_RENDER_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/error-boundary",
+        "file": "apps/web/src/constants/error-boundary.ts"
+      }
+    ],
+    "locale_error_boundary.render_failed": [
+      {
+        "ref": "ERROR_BOUNDARY_LOG.LOCALE_RENDER_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/error-boundary",
+        "file": "apps/web/src/constants/error-boundary.ts"
+      }
+    ],
     "faq_module.fetch_failed": [
       {
         "ref": "FAQ_LOG.MODULE_FETCH_FAILED",
