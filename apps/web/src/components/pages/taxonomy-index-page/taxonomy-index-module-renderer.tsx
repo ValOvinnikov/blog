@@ -1,6 +1,7 @@
 import type {
   THeadingBlock,
   TMaybeUndefined,
+  TPageTagIndexType,
   TPageTopicIndexType,
   TContentAlignmentOf,
 } from '@shinefold/config';
@@ -19,31 +20,34 @@ import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import type { ReactNode } from 'react';
 
-const TOPIC_INDEX_MAP: Partial<Record<TPageTopicIndexType, TModuleComponent>> =
-  {
-    module_heroBlog: HeroBlogModule,
-    module_taxonomyList: TaxonomyListModule,
-    module_postLatest: PostLatestModule,
-    module_cta: CtaModule,
-    module_newsletter: NewsletterModule,
-    module_content: ContentModule,
-  };
+type TTaxonomyIndexModuleType = TPageTagIndexType | TPageTopicIndexType;
 
-export interface ITopicIndexModuleRendererProps {
-  hero: TMaybeUndefined<TModule<TPageTopicIndexType>>;
+const TAXONOMY_INDEX_MAP: Partial<
+  Record<TTaxonomyIndexModuleType, TModuleComponent>
+> = {
+  module_heroBlog: HeroBlogModule,
+  module_taxonomyList: TaxonomyListModule,
+  module_postLatest: PostLatestModule,
+  module_cta: CtaModule,
+  module_newsletter: NewsletterModule,
+  module_content: ContentModule,
+};
+
+export interface ITaxonomyIndexModuleRendererProps {
+  hero: TMaybeUndefined<TModule<TTaxonomyIndexModuleType>>;
   headingBlock: THeadingBlock;
   headingAlignment: TContentAlignmentOf<'LEFT' | 'CENTER'>;
-  modules: TModule<TPageTopicIndexType>[];
+  modules: TModule<TTaxonomyIndexModuleType>[];
 }
 
-export const TopicIndexModuleRenderer = async ({
+export const TaxonomyIndexModuleRenderer = async ({
   hero,
   headingBlock,
   headingAlignment,
   modules,
-}: ITopicIndexModuleRendererProps): Promise<ReactNode> => {
+}: ITaxonomyIndexModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
-    ? await renderHeroModule({ hero, map: TOPIC_INDEX_MAP })
+    ? await renderHeroModule({ hero, map: TAXONOMY_INDEX_MAP })
     : null;
 
   return (
@@ -51,7 +55,7 @@ export const TopicIndexModuleRenderer = async ({
       {heroNode ?? (
         <PageHeading headingBlock={headingBlock} align={headingAlignment} />
       )}
-      {renderModules({ modules, map: TOPIC_INDEX_MAP })}
+      {renderModules({ modules, map: TAXONOMY_INDEX_MAP })}
     </>
   );
 };
