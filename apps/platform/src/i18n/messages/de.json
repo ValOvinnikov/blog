@@ -2534,6 +2534,7 @@
     "archived": "Dieser Mandant ist archiviert, seine Gewährungen lassen sich nicht ändern.",
     "comingSoon": "Diese Funktion ist noch nicht verfügbar und kann nicht gewährt werden.",
     "alreadyGranted": "Das ist bereits gewährt.",
+    "expiryShortened": "Die aktuelle Sprachgewährung läuft länger. Wähle ein späteres Ablaufdatum oder widerrufe diese Gewährung zuerst.",
     "includedInPlan": "Das ist bereits im Tarif des Mandanten enthalten.",
     "grantNotOpen": "Diese Gewährung wurde bereits entfernt oder ist abgelaufen."
   }

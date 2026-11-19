@@ -194,6 +194,10 @@ describe(`<${GrantEntitlementControl.name}/>`, () => {
         message: entitlementGrantErrors.comingSoon,
       },
       {
+        reason: ENTITLEMENT_GRANT_REFUSAL.EXPIRY_SHORTENED,
+        message: entitlementGrantErrors.expiryShortened,
+      },
+      {
         reason: TENANT_REFUSAL.ARCHIVED,
         message: entitlementGrantErrors.archived,
       },
