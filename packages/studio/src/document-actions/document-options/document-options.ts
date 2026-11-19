@@ -4,6 +4,7 @@ import {
 } from '@shinefold/config/constants';
 import { createPreviewAction } from '@shinefold/studio/document-actions/preview-action/preview-action';
 import { withLandingRedirects } from '@shinefold/studio/document-actions/with-landing-redirects/with-landing-redirects';
+import { SampleBadge } from '@shinefold/studio/document-badges/sample-badge/sample-badge';
 import { PAGE_COOKIE_STATEMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
 import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
 import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
@@ -43,6 +44,7 @@ export const buildDocumentOptions = (previewBasePath?: string) => {
     : undefined;
 
   return {
+    badges: (prev) => [...prev, SampleBadge],
     actions: (prev, { schemaType }) => {
       if (schemaType === migrationStateSchema.name) return [];
       if (schemaType === PAGE_COOKIE_STATEMENT_TYPE) {

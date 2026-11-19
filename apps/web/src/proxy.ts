@@ -119,14 +119,14 @@ export const config = {
   // The UUID is BotID's fixed path prefix, which the tenant-shaped guard would otherwise 404.
   // A dotted final segment skips the proxy unless it is a feed, or the `.rsc` suffix Next matches RSC requests with.
   // The middle entries reach the proxy only so an operator-suspended site can answer them with 503; newsletter unsubscribe, sign-in and account export stay reachable.
-  // The last two send every request carrying a preview token or the draft marker here, so none escapes the framing headers `next.config` leaves to the proxy and no outside request reaches a draft route; Next requires literals, not the constants.
+  // The last two send every request carrying a preview token, a `~` or a `%` here, so none escapes the framing headers `next.config` leaves to the proxy and no encoding of the draft marker reaches a draft route; Next requires literals, not the constants.
   matcher: [
     '/((?!api|_next|_vercel|icon|\\.well-known|149e9513-01fa-4fb0-aad4-566afd725d1b|(?:.*/)?(?!rss\\.xml$|[^/]*\\.rsc$)[^/]*\\.[^/]*$).*)',
     '/sitemap.xml',
     '/api/newsletter/confirm',
     '/api/switch-language',
     '/api/generate-skim',
-    '/(.*(?:~|%7[Ee])preview.*)',
+    '/(.*[~%].*)',
     { source: '/:path*', has: [{ type: 'query', key: 'preview' }] },
   ],
 };

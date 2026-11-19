@@ -1,21 +1,22 @@
 'use client';
 
 import { ACTION_OUTCOME, routes } from '@shinefold/config';
+import type { TValueOf } from '@shinefold/config/utils';
 import { Button } from '@shinefold/ui/components/atoms/button';
+import { PROVIDER_LINK_ACTION } from '@web/constants/provider-link';
 import { useBusyStyle } from '@web/context/busy-style-provider';
-import { useToast } from '@web/context/toast-provider';
+import { useActionToast } from '@web/hooks/use-action-toast';
 import {
   unlinkProviderAction,
   type TLinkableProvider,
 } from '@web/server/account/identity-actions/identity-actions';
-import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 
 export type TProviderLinkControlProps = {
   provider: TLinkableProvider;
-  action: 'link' | 'unlink';
+  action: TValueOf<typeof PROVIDER_LINK_ACTION>;
 };
 
 // signIn(provider) from an already-authenticated session links the provider to that account instead of signing in afresh.
@@ -25,11 +26,10 @@ export const ProviderLinkControl = ({
 }: TProviderLinkControlProps) => {
   const t = useTranslations('accountPage.identity');
   const { busyStyle, spinnerVariant } = useBusyStyle();
-  const toast = useToast();
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const { isPending, run } = useActionToast();
+  const [isLinkPending, startTransition] = useTransition();
 
-  const isLink = action === 'link';
+  const isLink = action === PROVIDER_LINK_ACTION.LINK;
 
   const handleLink = () => {
     startTransition(async () => {
@@ -38,40 +38,18 @@ export const ProviderLinkControl = ({
   };
 
   const handleUnlink = () => {
-    startTransition(async () => {
-      try {
-        await toast.promise(
-          (async () => {
-            const result = await unlinkProviderAction(provider);
-            if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
-              throw new Error(result.outcome);
-            }
-            return result;
-          })(),
-          {
-            loading: { message: t('unlinkToastLoadingMessage') },
-            success: { message: t('unlinkToastSuccessMessage') },
-            error: (error: unknown) => ({
-              message:
-                error instanceof Error &&
-                error.message === ACTION_OUTCOME.BLOCKED
-                  ? t('unlinkLastMethodError')
-                  : t('unlinkError'),
-            }),
-          },
-        );
-      } catch {
-        return;
-      }
-
-      router.refresh();
+    run(() => unlinkProviderAction(provider), {
+      loading: t('unlinkToastLoadingMessage'),
+      success: t('unlinkToastSuccessMessage'),
+      error: t('unlinkError'),
+      errorByOutcome: { [ACTION_OUTCOME.BLOCKED]: t('unlinkLastMethodError') },
     });
   };
 
   return (
     <Button
       variant="ghost"
-      isBusy={isPending}
+      isBusy={isPending || isLinkPending}
       busyLabel={isLink ? undefined : t('unlinkingLabel')}
       busyStyle={busyStyle}
       spinnerVariant={spinnerVariant}
