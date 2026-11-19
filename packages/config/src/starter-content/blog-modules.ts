@@ -1,9 +1,3 @@
-import type {
-  Module_heroBlog,
-  Module_postLatest,
-  Module_taxonomyList,
-} from '@shinefold/config/sanity/generated/types';
-
 import {
   BRAND_VARIANT,
   CTA_ACTION_APPEARANCE,
@@ -13,6 +7,11 @@ import {
   TAXONOMY_SORT,
   type TLocaleIsoCode,
 } from '@shinefold/config/constants';
+import type {
+  Module_heroBlog,
+  Module_postLatest,
+  Module_taxonomyList,
+} from '@shinefold/config/sanity/generated/types';
 
 import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion, TStarterModule } from './starter-document';

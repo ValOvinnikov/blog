@@ -1,13 +1,12 @@
+import {
+  BRAND_VARIANT,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 import type {
   Module_sectionPages,
   Page_landing,
   Template_landing,
 } from '@shinefold/config/sanity/generated/types';
-
-import {
-  BRAND_VARIANT,
-  type TLocaleIsoCode,
-} from '@shinefold/config/constants';
 
 import {
   buildContentPage,

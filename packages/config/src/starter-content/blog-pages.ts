@@ -1,11 +1,10 @@
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import type {
   Page_landing,
   Page_topic,
   Template_landing,
   Template_topic,
 } from '@shinefold/config/sanity/generated/types';
-
-import type { TLocaleIsoCode } from '@shinefold/config/constants';
 
 import type { TStarterCopy } from './copy/starter-copy';
 import type {
