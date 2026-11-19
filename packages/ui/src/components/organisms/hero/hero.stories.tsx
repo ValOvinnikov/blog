@@ -106,29 +106,9 @@ const meta = {
       control: 'select',
       options: objectKeys(heroVariants.variants.variant),
     },
-    contentPosition: {
-      control: 'select',
-      options: objectKeys(heroVariants.variants.position),
-    },
-    contentAlignment: {
-      control: 'select',
-      options: objectKeys(heroVariants.variants.alignment),
-    },
-    mediaOrder: {
-      control: 'select',
-      options: objectKeys(heroVariants.variants.mediaOrder),
-    },
     tone: {
       control: 'select',
       options: objectKeys(BRAND_VARIANT),
-    },
-    spacingTop: {
-      control: 'select',
-      options: objectKeys(SPACING_SCALE),
-    },
-    spacingBottom: {
-      control: 'select',
-      options: objectKeys(SPACING_SCALE),
     },
   },
   args: {
@@ -200,28 +180,36 @@ export const WithoutImage: TStory = {
 export const SplitContentLeft: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+    },
   },
 };
 
 export const SplitContentRight: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    contentPosition: CONTENT_ALIGNMENT.RIGHT,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.RIGHT,
+    },
   },
 };
 
 export const SplitContentAlignmentRight: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    },
   },
 };
 
 export const SplitContentAlignmentCenter: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    },
   },
 };
 
@@ -234,21 +222,27 @@ export const StackedDefault: TStory = {
 export const StackedContentAlignmentLeft: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    },
   },
 };
 
 export const StackedContentAlignmentRight: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    },
   },
 };
 
 export const StackedContentAlignmentCenter: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    },
   },
 };
 
@@ -256,8 +250,10 @@ export const BannerContentLeft: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
-    contentPosition: CONTENT_ALIGNMENT.LEFT,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    },
     children: bannerContent(BANNER_IMAGE_ALT),
   },
 };
@@ -266,14 +262,16 @@ export const BannerWithBody: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
-    contentPosition: CONTENT_ALIGNMENT.LEFT,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    },
     children: (
       <>
         <Hero.Media>
           <img
             src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
-            alt="Bright mountain sunrise"
+            alt={BANNER_IMAGE_ALT}
             className="size-full object-cover"
           />
         </Hero.Media>
@@ -297,8 +295,10 @@ export const BannerContentCenter: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.PRIMARY,
-    contentPosition: CONTENT_ALIGNMENT.CENTER,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.CENTER,
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    },
     children: bannerContent(BANNER_IMAGE_ALT),
   },
 };
@@ -307,8 +307,10 @@ export const BannerContentRight: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.SECONDARY,
-    contentPosition: CONTENT_ALIGNMENT.RIGHT,
-    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.RIGHT,
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    },
     children: bannerContent(BANNER_IMAGE_ALT),
   },
 };
@@ -317,8 +319,10 @@ export const BannerToneBrandPrimary: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
-    contentPosition: CONTENT_ALIGNMENT.LEFT,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    },
     children: bannerContent(BANNER_IMAGE_ALT),
   },
 };
@@ -327,8 +331,10 @@ export const BannerTonePrimary: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.PRIMARY,
-    contentPosition: CONTENT_ALIGNMENT.LEFT,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    },
     children: bannerContent(BANNER_IMAGE_ALT),
   },
 };
@@ -337,8 +343,10 @@ export const BannerToneSecondary: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.SECONDARY,
-    contentPosition: CONTENT_ALIGNMENT.LEFT,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    },
     children: bannerContent(BANNER_IMAGE_ALT),
   },
 };
@@ -474,24 +482,33 @@ export const BannerProfileWithMediaToneBrandPrimary: TStory = {
 export const BannerSpacingNone: TStory = {
   args: {
     ...BannerContentLeft.args,
-    spacingTop: SPACING_SCALE.NONE,
-    spacingBottom: SPACING_SCALE.NONE,
+    layout: {
+      ...BannerContentLeft.args?.layout,
+      spacingTop: SPACING_SCALE.NONE,
+      spacingBottom: SPACING_SCALE.NONE,
+    },
   },
 };
 
 export const BannerSpacingMd: TStory = {
   args: {
     ...BannerContentLeft.args,
-    spacingTop: SPACING_SCALE.MD,
-    spacingBottom: SPACING_SCALE.MD,
+    layout: {
+      ...BannerContentLeft.args?.layout,
+      spacingTop: SPACING_SCALE.MD,
+      spacingBottom: SPACING_SCALE.MD,
+    },
   },
 };
 
 export const BannerSpacingXl: TStory = {
   args: {
     ...BannerContentLeft.args,
-    spacingTop: SPACING_SCALE.XL,
-    spacingBottom: SPACING_SCALE.XL,
+    layout: {
+      ...BannerContentLeft.args?.layout,
+      spacingTop: SPACING_SCALE.XL,
+      spacingBottom: SPACING_SCALE.XL,
+    },
   },
 };
 
@@ -515,7 +532,9 @@ export const StackedAtLg: TStory = {
 export const StackedMediaFirstAtLg: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    mediaOrder: MEDIA_ORDER.FIRST,
+    layout: {
+      mediaOrder: MEDIA_ORDER.FIRST,
+    },
   },
   globals: { viewport: 'desktop' },
 };
@@ -523,28 +542,36 @@ export const StackedMediaFirstAtLg: TStory = {
 export const SplitMediaOrderFirst: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    mediaOrder: MEDIA_ORDER.FIRST,
+    layout: {
+      mediaOrder: MEDIA_ORDER.FIRST,
+    },
   },
 };
 
 export const SplitMediaOrderLast: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    mediaOrder: MEDIA_ORDER.LAST,
+    layout: {
+      mediaOrder: MEDIA_ORDER.LAST,
+    },
   },
 };
 
 export const StackedMediaOrderFirst: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    mediaOrder: MEDIA_ORDER.FIRST,
+    layout: {
+      mediaOrder: MEDIA_ORDER.FIRST,
+    },
   },
 };
 
 export const StackedMediaOrderLast: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    mediaOrder: MEDIA_ORDER.LAST,
+    layout: {
+      mediaOrder: MEDIA_ORDER.LAST,
+    },
   },
 };
 
@@ -584,7 +611,9 @@ export const StackedProfileToneSecondary: TStory = {
 export const CenteredActions: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    },
     children: (
       <Hero.Cta>
         <TextLink appearance="nav" href="/posts/design-system">
@@ -633,7 +662,9 @@ export const SplitSquarePortraitTablet: TStory = {
 export const SplitSquarePortraitCenterTablet: TStory = {
   args: {
     ...SplitSquarePortrait.args,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    },
   },
   globals: { viewport: 'tablet' },
 };

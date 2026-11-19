@@ -39,14 +39,6 @@ export const Muted: TStory = {
   },
 };
 
-export const Hero: TStory = {
-  args: {
-    variant: 'hero',
-    children:
-      'Base-size excerpt used beneath the hero heading. Slightly smaller than lead with muted color.',
-  },
-};
-
 export const Card: TStory = {
   args: {
     variant: 'card',

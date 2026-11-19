@@ -10,7 +10,6 @@ export const heroVariants = tv({
     root: ['w-full'],
     grid: ['grid grid-cols-1 items-stretch gap-[clamp(1.25rem,4vw,2rem)]'],
     copy: ['flex h-full flex-col', 'min-w-0'],
-    eyebrow: [],
     group: ['flex flex-col', 'max-w-measure', 'text-prose'],
     title: ['mt-2.5 mb-3'],
     heading: [],

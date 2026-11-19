@@ -131,7 +131,7 @@ Variants: variant: default|accent · interactive: (boolean)
 
 Renders any text role, or a legacy variant, in a non-heading element.
 Props: as?: TTextElement · textRole?: TTextRole · variant?: TTextVariants['variant'] · style?: CSSProperties · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: variant: lead|muted|hero|card|supporting|statement|meta|emphasis|footnote · textRole: TEXT_ROLE.HERO_TITLE|TEXT_ROLE.POST_TITLE|TEXT_ROLE.PAGE_TITLE|TEXT_ROLE.SECTION_TITLE|TEXT_ROLE.CARD_TITLE|TEXT_ROLE.ITEM_TITLE|TEXT_ROLE.DIALOG_TITLE|TEXT_ROLE.PROSE_H2|TEXT_ROLE.PROSE_H3|TEXT_ROLE.PROSE_H4|TEXT_ROLE.INTRO|TEXT_ROLE.BODY|TEXT_ROLE.CARD_BODY|TEXT_ROLE.META|TEXT_ROLE.EYEBROW|TEXT_ROLE.LABEL|TEXT_ROLE.FOOTNOTE|TEXT_ROLE.CAPTION|TEXT_ROLE.QUOTE|TEXT_ROLE.ATTRIBUTION|TEXT_ROLE.FIGURE|TEXT_ROLE.FIGURE_LABEL
+Variants: variant: lead|muted|card|supporting|statement|meta|emphasis|footnote · textRole: TEXT_ROLE.HERO_TITLE|TEXT_ROLE.POST_TITLE|TEXT_ROLE.PAGE_TITLE|TEXT_ROLE.SECTION_TITLE|TEXT_ROLE.CARD_TITLE|TEXT_ROLE.ITEM_TITLE|TEXT_ROLE.DIALOG_TITLE|TEXT_ROLE.PROSE_H2|TEXT_ROLE.PROSE_H3|TEXT_ROLE.PROSE_H4|TEXT_ROLE.INTRO|TEXT_ROLE.BODY|TEXT_ROLE.CARD_BODY|TEXT_ROLE.META|TEXT_ROLE.EYEBROW|TEXT_ROLE.LABEL|TEXT_ROLE.FOOTNOTE|TEXT_ROLE.CAPTION|TEXT_ROLE.QUOTE|TEXT_ROLE.ATTRIBUTION|TEXT_ROLE.FIGURE|TEXT_ROLE.FIGURE_LABEL
 
 ### TextInput — `components/atoms/text-input/text-input.tsx`
 
@@ -470,7 +470,7 @@ Slots:
 ### Hero — `components/organisms/hero/hero.tsx`
 
 The page-top band every hero kind renders, where a page states what it is.
-Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mediaOrder?: TMediaOrder · tone: TBrandVariant · spacingTop?: TSpacingScale · spacingBottom?: TSpacingScale · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
+Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · layout?: THeroLayout · tone: TBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST
 
 Slots:

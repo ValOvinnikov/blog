@@ -5,27 +5,24 @@ import {
 } from '@shinefold/config';
 import { bannerVariants } from '@shinefold/ui/lib/styling';
 
-import type { THeroProps } from './hero';
+import type { THeroLayout, THeroProps } from './hero';
 import { heroVariants } from './hero-variants';
 
-type THeroStylesInput = Pick<
-  THeroProps,
-  | 'variant'
-  | 'contentPosition'
-  | 'contentAlignment'
-  | 'mediaOrder'
-  | 'spacingTop'
-  | 'spacingBottom'
-> & { hasMedia: boolean };
+type THeroStylesInput = Pick<THeroProps, 'variant'> & {
+  hasMedia: boolean;
+  layout?: THeroLayout;
+};
 
 export const resolveHeroStyles = ({
   variant = HERO_VARIANT.SPLIT,
   hasMedia,
-  contentPosition = CONTENT_ALIGNMENT.LEFT,
-  contentAlignment,
-  mediaOrder,
-  spacingTop,
-  spacingBottom,
+  layout: {
+    contentPosition = CONTENT_ALIGNMENT.LEFT,
+    contentAlignment,
+    mediaOrder,
+    spacingTop,
+    spacingBottom,
+  } = {},
 }: THeroStylesInput) => {
   const isBanner = variant === HERO_VARIANT.BANNER;
   const alignment =

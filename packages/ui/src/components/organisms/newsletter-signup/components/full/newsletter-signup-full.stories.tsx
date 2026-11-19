@@ -194,9 +194,7 @@ export const DarkTheme: TStory = {
 
 export const OnEveryBrandBand: TStory = {
   render: (args) => (
-    <EveryBrandBand>
-      {(tone) => <NewsletterSignup.Full key={tone} {...args} />}
-    </EveryBrandBand>
+    <EveryBrandBand>{() => <NewsletterSignup.Full {...args} />}</EveryBrandBand>
   ),
   args: { trustCues },
 };

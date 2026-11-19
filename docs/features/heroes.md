@@ -50,7 +50,7 @@ A hero is the optional opening band of a page. It replaces the page's own headin
 - Banner: the outer `Section` is forced to Plain with no spacing or dividers (`BANNER_SECTION_LAYOUT`); the hero's own spacing sets the Banner height, `brandVariant` tints the image, the image is decorative (`alt=""`), and actions and social links follow the photo Banner's re-pointed text, border and link roles. Divider fields hide on Banner.
 - Banner copy over a photo keeps 4.5:1 over a white photo at every position, width and hue: titles and running text are both `text-on-image`, and no copy sits past the scrim's mid stop. Below `lg` the gradients never fade past mid, because the copy measure can span the band; from `lg` the weak tail starts beyond the measure. The scrim stops live in `packages/ui/src/lib/styling/scrims.ts`, one recipe per position, and read the skin's `--scrim-strong/-mid/-weak`, so the skin `tone` names picks the scrim. A Banner with no image keeps the skin's ink, with running text in `text-muted`, on the skin's lifted `--ambient-raised` field.
 - The shell's 1200×675 image and the Profile Banner image load with `priority`. The Profile Split 900×900 portrait and the Stacked 256×256 avatar load normally.
-- `contentPosition` and `mediaOrder` reach the view as single values; `toHeroPresentation` picks the field that matches the variant.
+- `contentPosition` and `mediaOrder` reach the view as single values; `toHeroPresentation` picks the field that matches the variant. `HeroModuleShell` passes them, with `contentAlignment` and the hero's own spacing, to `Hero` as one `layout` object.
 
 ## Dependencies
 

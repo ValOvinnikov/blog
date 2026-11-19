@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { BRAND_VARIANT } from '@shinefold/config';
 import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -198,42 +197,6 @@ export const WithShareSlot: TStory = {
       </>
     ),
   },
-};
-
-const OnSecondaryBackground = () => (
-  <div
-    className="bg-ambient"
-    data-skin={BRAND_VARIANT.SECONDARY}
-    style={{ padding: '1.5rem' }}
-  >
-    <Article>
-      <Article.Header
-        title={faker.lorem.sentence({ min: 4, max: 8 })}
-        topic={ENGINEERING_TOPIC}
-        lead={faker.lorem.paragraph()}
-        meta={{
-          author: {
-            name: faker.person.fullName(),
-            imageUrl: faker.image.avatarGitHub(),
-          },
-          publishedAt,
-          formattedDate,
-          readingTime: `${faker.number.int({ min: 3, max: 15 })} min read`,
-        }}
-      />
-      <Article.Body>{bodyParagraphs}</Article.Body>
-      <Article.Footer
-        tags={faker.helpers
-          .multiple(() => faker.lorem.word(), { count: 4 })
-          .map((label) => ({ label, href: `/tag/${label}` }))}
-      />
-    </Article>
-  </div>
-);
-
-export const OnSecondaryBackgroundStory: TStory = {
-  name: 'On a Secondary background',
-  render: OnSecondaryBackground,
 };
 
 export const HeaderOnEveryBrandBand: TStory = {

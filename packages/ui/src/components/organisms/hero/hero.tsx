@@ -33,6 +33,14 @@ const HeroParts = {
   Social: HeroSocial,
 } satisfies Record<string, ElementType>;
 
+export type THeroLayout = {
+  contentPosition?: TContentAlignment;
+  contentAlignment?: TContentAlignment;
+  mediaOrder?: TMediaOrder;
+  spacingTop?: TSpacingScale;
+  spacingBottom?: TSpacingScale;
+};
+
 export type THeroProps = IWithClassName &
   IWithDataTestId & {
     title: string;
@@ -40,12 +48,8 @@ export type THeroProps = IWithClassName &
     eyebrow?: string;
     excerpt?: string;
     variant?: THeroVariant;
-    contentPosition?: TContentAlignment;
-    contentAlignment?: TContentAlignment;
-    mediaOrder?: TMediaOrder;
+    layout?: THeroLayout;
     tone: TBrandVariant;
-    spacingTop?: TSpacingScale;
-    spacingBottom?: TSpacingScale;
     children?: TCompoundChildren<typeof HeroParts>;
   };
 
@@ -55,12 +59,8 @@ const HeroRoot = ({
   eyebrow,
   excerpt,
   variant,
-  contentPosition,
-  contentAlignment,
-  mediaOrder,
+  layout,
   tone,
-  spacingTop,
-  spacingBottom,
   children,
   className,
   dataTestId,
@@ -69,11 +69,7 @@ const HeroRoot = ({
   const heroStyles = resolveHeroStyles({
     variant,
     hasMedia: Boolean(slots.Media),
-    contentPosition,
-    contentAlignment,
-    mediaOrder,
-    spacingTop,
-    spacingBottom,
+    layout,
   });
   const {
     isBanner,
@@ -97,11 +93,7 @@ const HeroRoot = ({
             cloneElement(slots.Avatar, {
               contentAlignment: resolvedAlignment,
             })}
-          {eyebrow && (
-            <Eyebrow className={s.eyebrow({ class: banner?.title() })}>
-              {eyebrow}
-            </Eyebrow>
-          )}
+          {eyebrow && <Eyebrow className={banner?.title()}>{eyebrow}</Eyebrow>}
           <div className={s.group({ class: banner?.block() })}>
             <HeroHeadline
               title={title}
