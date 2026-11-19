@@ -11282,6 +11282,46 @@
         "file": "apps/web/src/constants/internal-pages.ts"
       }
     ],
+    "website": [
+      {
+        "ref": "OG_TYPE.WEBSITE",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
+    "article": [
+      {
+        "ref": "OG_TYPE.ARTICLE",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
+    "summary": [
+      {
+        "ref": "TWITTER_CARD.SUMMARY",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
+    "summary_large_image": [
+      {
+        "ref": "TWITTER_CARD.SUMMARY_LARGE_IMAGE",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
+    "application/rss+xml": [
+      {
+        "ref": "ALTERNATE_TYPE.RSS",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
     "module_renderer.unknown_module_type": [
       {
         "ref": "MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE",
