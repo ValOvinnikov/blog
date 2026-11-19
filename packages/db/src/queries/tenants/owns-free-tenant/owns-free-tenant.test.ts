@@ -4,13 +4,13 @@ import {
   TENANT_STATUS,
   type TMembershipRole,
 } from '@shinefold/db/constants';
-import { inviteEmailColumns } from '@shinefold/db/queries/membership-invites/invite-email-columns';
 import * as schema from '@shinefold/db/schema';
 import { MOCK_NOT_AN_ADDRESS } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
 import {
   insertTestTenant,
   insertTestUser,
 } from '@shinefold/db/testing/fixtures';
+import { mockMembershipInvite } from '@shinefold/db/testing/membership-invites/fixtures';
 import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
 import {
   mockAccountEmailIndex,
@@ -170,13 +170,9 @@ describe(ownsFreeTenant, () => {
 
   it('is false for a person whose OWNER invite on a Free tenant is still unaccepted', async () => {
     const tenant = await insertTestTenant(db());
-    await db()
-      .insert(schema.membershipInvites)
-      .values({
-        tenantId: tenant.id,
-        ...inviteEmailColumns(MOCK_SELF_SERVE_OWNER_EMAIL),
-        role: MEMBERSHIP_ROLE.OWNER,
-      });
+    await mockMembershipInvite(db(), tenant.id, {
+      email: MOCK_SELF_SERVE_OWNER_EMAIL,
+    });
 
     const result = await ownsFreeTenant(MOCK_SELF_SERVE_OWNER_EMAIL);
 

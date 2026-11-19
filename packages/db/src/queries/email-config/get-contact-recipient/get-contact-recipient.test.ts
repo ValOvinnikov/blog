@@ -1,3 +1,4 @@
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import {
   MOCK_EMAIL_CONFIG,
@@ -30,7 +31,11 @@ describe(getContactRecipient, () => {
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
     const { id: ownerId } = await insertTestReader(db(), MOCK_OWNER_EMAIL);
-    await mockMembership(db(), { userId: ownerId, tenantId });
+    await mockMembership(db(), {
+      userId: ownerId,
+      tenantId,
+      role: MEMBERSHIP_ROLE.OWNER,
+    });
   });
 
   it('returns the override when one is set', async () => {

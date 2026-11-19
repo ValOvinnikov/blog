@@ -4,7 +4,7 @@ import * as schema from '@shinefold/db/schema';
 import type { TTenantEntitlementGrant } from '@shinefold/db/schema/tenant-entitlement-grants';
 import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
 import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
-import { type TTestDb } from '@shinefold/db/testing/fixtures';
+import type { TTestDb } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
 import { createMockFaker } from '@shinefold/db/testing/mock-faker';
 

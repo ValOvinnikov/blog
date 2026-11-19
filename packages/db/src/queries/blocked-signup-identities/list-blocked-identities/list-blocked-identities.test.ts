@@ -47,13 +47,6 @@ async function insertBlockedDomain(
     });
 }
 
-async function insertAdmin(
-  user: Partial<typeof schema.users.$inferInsert>,
-): Promise<string> {
-  const { id } = await insertTestAdmin(db(), user);
-  return id;
-}
-
 async function listEntries(): Promise<TBlockedIdentityListing[]> {
   const result = await listBlockedIdentities();
   if (!result.ok) throw new Error('failed to list blocked identities');
@@ -89,7 +82,7 @@ describe(listBlockedIdentities, () => {
 
   describe('the adding admin email', () => {
     it('lists the decrypted email and nothing else from the user', async () => {
-      const createdByAdminId = await insertAdmin({
+      const { id: createdByAdminId } = await insertTestAdmin(db(), {
         name: MOCK_ADMIN_NAME,
         ...userPersonalColumns({ email: MOCK_OPERATOR_EMAIL }),
       });
@@ -102,7 +95,8 @@ describe(listBlockedIdentities, () => {
     });
 
     it('is null once the admin is gone', async () => {
-      const createdByAdminId = await insertAdmin(
+      const { id: createdByAdminId } = await insertTestAdmin(
+        db(),
         userPersonalColumns({ email: MOCK_OPERATOR_EMAIL }),
       );
       await insertBlockedDomain({ createdByAdminId });

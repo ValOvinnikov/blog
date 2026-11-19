@@ -9,7 +9,6 @@ import {
   TENANT_STATUS,
   type TTenantProvisioningStatus,
 } from '@shinefold/db/constants';
-import { inviteEmailColumns } from '@shinefold/db/queries/membership-invites/invite-email-columns';
 import { lockMembershipsOverSeats } from '@shinefold/db/queries/memberships/lock-memberships-over-seats';
 import {
   getUnsentStudioReinviteEmail,
@@ -34,6 +33,7 @@ import {
   insertTestTenant,
   insertTestUser,
 } from '@shinefold/db/testing/fixtures';
+import { mockMembershipInvite } from '@shinefold/db/testing/membership-invites/fixtures';
 import {
   countLockedMemberships,
   insertTeam,
@@ -156,13 +156,7 @@ async function insertTenantWithDomain(overrides?: {
 }
 
 async function insertOwnerInvite(tenantId: string, email: string) {
-  await db()
-    .insert(membershipInvites)
-    .values({
-      tenantId,
-      ...inviteEmailColumns(email),
-      role: MEMBERSHIP_ROLE.OWNER,
-    });
+  await mockMembershipInvite(db(), tenantId, { email });
 }
 
 async function insertOwnerMember(
@@ -171,7 +165,11 @@ async function insertOwnerMember(
 ): Promise<string> {
   const { id: userId } = await insertTestUser(db(), user);
 
-  await mockMembership(db(), { tenantId, userId });
+  await mockMembership(db(), {
+    tenantId,
+    userId,
+    role: MEMBERSHIP_ROLE.OWNER,
+  });
 
   return userId;
 }
@@ -402,13 +400,10 @@ describe(updateTenantDetails, () => {
       });
 
       it('returns owner-email-taken when the new email matches another invite', async () => {
-        await db()
-          .insert(membershipInvites)
-          .values({
-            tenantId,
-            ...inviteEmailColumns(MOCK_MEMBER_EMAIL),
-            role: MEMBERSHIP_ROLE.EDITOR,
-          });
+        await mockMembershipInvite(db(), tenantId, {
+          email: MOCK_MEMBER_EMAIL,
+          role: MEMBERSHIP_ROLE.EDITOR,
+        });
 
         const result = await updateTenantDetails(tenantId, {
           ...MOCK_VALID_INPUT,

@@ -146,7 +146,11 @@ describe(deleteAccount, () => {
   });
 
   it('refuses a tenant owner and keeps the account and its membership', async () => {
-    await mockMembership(db(), { userId, tenantId });
+    await mockMembership(db(), {
+      userId,
+      tenantId,
+      role: MEMBERSHIP_ROLE.OWNER,
+    });
 
     const result = await deleteAccount(userId);
 
