@@ -5,14 +5,12 @@ import type { TValueOf } from '@shinefold/config/utils';
 import { Button } from '@shinefold/ui/components/atoms/button';
 import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
 import { useBusyStyle } from '@web/context/busy-style-provider';
-import { useToast } from '@web/context/toast-provider';
+import { useActionToast } from '@web/hooks/use-action-toast';
 import {
   resendConfirmationAction,
   unsubscribeAction,
 } from '@web/server/newsletter/newsletter-subscription-actions/newsletter-subscription-actions';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useTransition } from 'react';
 
 export type TNewsletterSubscriptionControlProps = {
   action: TValueOf<typeof NEWSLETTER_SUBSCRIPTION_ACTION>;
@@ -23,9 +21,7 @@ export const NewsletterSubscriptionControl = ({
 }: TNewsletterSubscriptionControlProps) => {
   const t = useTranslations('accountPage.newsletter');
   const { busyStyle, spinnerVariant } = useBusyStyle();
-  const toast = useToast();
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const { isPending, run } = useActionToast();
 
   const isUnsubscribe = action === NEWSLETTER_SUBSCRIPTION_ACTION.UNSUBSCRIBE;
   const loadingMessageKey = isUnsubscribe
@@ -37,33 +33,11 @@ export const NewsletterSubscriptionControl = ({
   const errorMessageKey = isUnsubscribe ? 'unsubscribeError' : 'resendError';
 
   const handleClick = () => {
-    startTransition(async () => {
-      let isUnavailable = false;
-      try {
-        await toast.promise(
-          (async () => {
-            const result = isUnsubscribe
-              ? await unsubscribeAction()
-              : await resendConfirmationAction();
-            if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
-              isUnavailable = result.outcome === ACTION_OUTCOME.UNAVAILABLE;
-              throw new Error(`Failed to ${action}`);
-            }
-            return result;
-          })(),
-          {
-            loading: { message: t(loadingMessageKey) },
-            success: { message: t(successMessageKey) },
-            error: () => ({
-              message: t(isUnavailable ? 'resendUnavailable' : errorMessageKey),
-            }),
-          },
-        );
-      } catch {
-        return;
-      }
-
-      router.refresh();
+    run(isUnsubscribe ? unsubscribeAction : resendConfirmationAction, {
+      loading: t(loadingMessageKey),
+      success: t(successMessageKey),
+      error: t(errorMessageKey),
+      errorByOutcome: { [ACTION_OUTCOME.UNAVAILABLE]: t('resendUnavailable') },
     });
   };
 
