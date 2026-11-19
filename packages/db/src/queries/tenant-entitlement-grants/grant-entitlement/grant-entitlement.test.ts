@@ -16,7 +16,7 @@ import {
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { toStoredEntitlementItem } from '@shinefold/db/utils/stored-entitlement-item/stored-entitlement-item';
 import { errorResult, okResult } from '@shinefold/utils';
-import { eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 
 import {
   grantEntitlement,
@@ -64,17 +64,23 @@ async function granted(
   item: TGrantItem,
   expiresAt?: TMaybeNull<Date>,
 ): Promise<TTenantEntitlementGrant> {
-  const result = await grant(item, expiresAt);
+  return grantOf(await grant(item, expiresAt));
+}
+
+type TGrantResult = Awaited<ReturnType<typeof grant>>;
+
+function grantOf(result: TGrantResult): TTenantEntitlementGrant {
   if (!result.ok) throw new Error(result.error);
   return result.data.grant;
 }
 
 function expectedGrant(
   item: TGrantItem,
+  id: string,
   overrides: Partial<TTenantEntitlementGrant> = {},
 ): TTenantEntitlementGrant {
   return {
-    id: expect.any(String),
+    id,
     tenantId: tenant().id,
     ...toStoredEntitlementItem(item),
     note: MOCK_GRANT_NOTE,
@@ -91,23 +97,28 @@ function rowsFor(tenantId: string) {
   return db()
     .select()
     .from(schema.tenantEntitlementGrants)
-    .where(eq(schema.tenantEntitlementGrants.tenantId, tenantId));
+    .where(eq(schema.tenantEntitlementGrants.tenantId, tenantId))
+    .orderBy(asc(schema.tenantEntitlementGrants.value));
 }
 
 describe(grantEntitlement, () => {
   it('records the grant with who, when and why', async () => {
-    expect(await grant(MOCK_CONTACT_FORM)).toEqual(
+    const result = await grant(MOCK_CONTACT_FORM);
+
+    expect(result).toEqual(
       okResult({
-        grant: expectedGrant(MOCK_CONTACT_FORM),
+        grant: expectedGrant(MOCK_CONTACT_FORM, grantOf(result).id),
         closedGrantId: null,
       }),
     );
   });
 
   it('stores a language limit under its kind, with its value', async () => {
-    expect(await grant(MOCK_LOCALE_LIMIT)).toEqual(
+    const result = await grant(MOCK_LOCALE_LIMIT);
+
+    expect(result).toEqual(
       okResult({
-        grant: expectedGrant(MOCK_LOCALE_LIMIT),
+        grant: expectedGrant(MOCK_LOCALE_LIMIT, grantOf(result).id),
         closedGrantId: null,
       }),
     );
@@ -139,18 +150,14 @@ describe(grantEntitlement, () => {
 
       const raised = await grant(MOCK_LOCALE_LIMIT);
 
+      const raisedGrant = expectedGrant(MOCK_LOCALE_LIMIT, grantOf(raised).id);
       expect(raised).toEqual(
-        okResult({
-          grant: expectedGrant(MOCK_LOCALE_LIMIT),
-          closedGrantId: lower.id,
-        }),
+        okResult({ grant: raisedGrant, closedGrantId: lower.id }),
       );
-      expect(await rowsFor(tenant().id)).toEqual(
-        expect.arrayContaining([
-          { ...lower, revokedAt: MOCK_NOW, revokedBy: admin() },
-          expectedGrant(MOCK_LOCALE_LIMIT),
-        ]),
-      );
+      expect(await rowsFor(tenant().id)).toEqual([
+        { ...lower, revokedAt: MOCK_NOW, revokedBy: admin() },
+        raisedGrant,
+      ]);
     });
 
     it.each([
@@ -160,9 +167,13 @@ describe(grantEntitlement, () => {
     ] as const)('raises with %s', async (_, openExpiry, raisedExpiry) => {
       const open = await granted(MOCK_LOWER_LOCALE_LIMIT, openExpiry);
 
-      expect(await grant(MOCK_LOCALE_LIMIT, raisedExpiry)).toEqual(
+      const raised = await grant(MOCK_LOCALE_LIMIT, raisedExpiry);
+
+      expect(raised).toEqual(
         okResult({
-          grant: expectedGrant(MOCK_LOCALE_LIMIT, { expiresAt: raisedExpiry }),
+          grant: expectedGrant(MOCK_LOCALE_LIMIT, grantOf(raised).id, {
+            expiresAt: raisedExpiry,
+          }),
           closedGrantId: open.id,
         }),
       );
@@ -202,7 +213,14 @@ describe(grantEntitlement, () => {
       revokedAt: MOCK_GRANT_PAST,
     });
 
-    expect(await grant(MOCK_CONTACT_FORM)).toMatchObject({ ok: true });
+    const result = await grant(MOCK_CONTACT_FORM);
+
+    expect(result).toEqual(
+      okResult({
+        grant: expectedGrant(MOCK_CONTACT_FORM, grantOf(result).id),
+        closedGrantId: null,
+      }),
+    );
   });
 
   it('closes an expired grant at its expiry and grants again', async () => {
@@ -210,7 +228,14 @@ describe(grantEntitlement, () => {
       expiresAt: MOCK_GRANT_PAST,
     });
 
-    expect(await grant(MOCK_CONTACT_FORM)).toMatchObject({ ok: true });
+    const result = await grant(MOCK_CONTACT_FORM);
+
+    expect(result).toEqual(
+      okResult({
+        grant: expectedGrant(MOCK_CONTACT_FORM, grantOf(result).id),
+        closedGrantId: null,
+      }),
+    );
     expect(await rowsFor(tenant().id)).toContainEqual({
       ...expired,
       revokedAt: MOCK_GRANT_PAST,

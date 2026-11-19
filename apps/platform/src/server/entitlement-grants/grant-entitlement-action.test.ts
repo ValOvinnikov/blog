@@ -73,6 +73,15 @@ const grant = (overrides = {}) =>
     ...overrides,
   });
 
+const expectedGrantInput = (overrides = {}) => ({
+  tenantId: MOCK_TENANT_ID,
+  item: MOCK_CONTACT_FORM_ITEM,
+  grantedBy: MOCK_SUPER_ADMIN.id,
+  expiresAt: MOCK_IN_30_DAYS,
+  note: MOCK_NOTE,
+  ...overrides,
+});
+
 describe(grantEntitlementAction, () => {
   usePassedGrantActionGate();
 
@@ -105,13 +114,7 @@ describe(grantEntitlementAction, () => {
     const result = await grant();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(grantEntitlement).toHaveBeenCalledWith({
-      tenantId: MOCK_TENANT_ID,
-      item: MOCK_CONTACT_FORM_ITEM,
-      grantedBy: MOCK_SUPER_ADMIN.id,
-      expiresAt: MOCK_IN_30_DAYS,
-      note: MOCK_NOTE,
-    });
+    expect(grantEntitlement).toHaveBeenCalledWith(expectedGrantInput());
     expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(firstRecordedAuditEvent(vi.mocked(recordAuditEvent))).toEqual({
       action: AUDIT_ACTION.ENTITLEMENT_GRANTED,
@@ -132,7 +135,7 @@ describe(grantEntitlementAction, () => {
     await grant({ note: ' ' });
 
     expect(grantEntitlement).toHaveBeenCalledWith(
-      expect.objectContaining({ note: null }),
+      expectedGrantInput({ note: null }),
     );
   });
 
@@ -153,7 +156,7 @@ describe(grantEntitlementAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(grantEntitlement).toHaveBeenCalledWith(
-      expect.objectContaining({ item: MOCK_LOCALE_LIMIT_ITEM }),
+      expectedGrantInput({ item: MOCK_LOCALE_LIMIT_ITEM }),
     );
   });
 
@@ -201,7 +204,7 @@ describe(grantEntitlementAction, () => {
     await grant({ expiry: ENTITLEMENT_GRANT_EXPIRY.NEVER });
 
     expect(grantEntitlement).toHaveBeenCalledWith(
-      expect.objectContaining({ expiresAt: null }),
+      expectedGrantInput({ expiresAt: null }),
     );
   });
 
