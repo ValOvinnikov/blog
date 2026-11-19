@@ -5,6 +5,7 @@ import {
   KEY_ARROW_DOWN,
   KEY_ARROW_UP,
   KEY_END,
+  KEY_ESCAPE,
   KEY_HOME,
 } from '@web/testing/shared/keyboard/constants';
 
@@ -23,7 +24,7 @@ export const expectMenuOpen = (trigger: HTMLElement) => {
 
 type TGetUser = () => UserEvent;
 
-const openMenuAtLastItem = async (getUser: TGetUser) => {
+const openMenuAtLastItemGetFirst = async (getUser: TGetUser) => {
   const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
   await getUser().click(trigger);
   const firstItem = screen.getByRole('button', { name: MENU_FIRST_ITEM_NAME });
@@ -68,7 +69,7 @@ export const testCoreDismissibleMenuBehavior = (getUser: TGetUser) => {
     const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
     await getUser().click(trigger);
 
-    await getUser().keyboard('{Escape}');
+    await getUser().keyboard(KEY_ESCAPE);
 
     expectMenuClosed(trigger);
     expect(trigger).toHaveFocus();
@@ -95,7 +96,7 @@ export const testCoreDismissibleMenuBehavior = (getUser: TGetUser) => {
   });
 
   it('wraps Tab from the last item back to the first', async () => {
-    const firstItem = await openMenuAtLastItem(getUser);
+    const firstItem = await openMenuAtLastItemGetFirst(getUser);
 
     await getUser().tab();
 
@@ -140,7 +141,7 @@ export const testArrowUpAndHomeBehavior = (getUser: TGetUser) => {
   });
 
   it('moves focus up with ArrowUp from the last item', async () => {
-    const firstItem = await openMenuAtLastItem(getUser);
+    const firstItem = await openMenuAtLastItemGetFirst(getUser);
 
     await getUser().keyboard(KEY_ARROW_UP);
 
@@ -148,7 +149,7 @@ export const testArrowUpAndHomeBehavior = (getUser: TGetUser) => {
   });
 
   it('focuses the first item on Home', async () => {
-    const firstItem = await openMenuAtLastItem(getUser);
+    const firstItem = await openMenuAtLastItemGetFirst(getUser);
 
     await getUser().keyboard(KEY_HOME);
 

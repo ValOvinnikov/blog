@@ -1,10 +1,12 @@
+import type { TValueOf } from '@shinefold/config/utils';
 import { type TSeoResolved, urlForSanityImage } from '@shinefold/service';
+import { ALTERNATE_TYPE, OG_TYPE, TWITTER_CARD } from '@web/constants/metadata';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import type { Metadata } from 'next';
 
 export type TToMetadataOptions = {
   canonical: string;
-  ogType: 'website' | 'article';
+  ogType: TValueOf<typeof OG_TYPE>;
   titleAbsolute?: boolean;
   feedUrl?: string;
   article?: {
@@ -22,24 +24,27 @@ export const toMetadata = async (
   opts: TToMetadataOptions,
 ): Promise<Metadata> => {
   const { canonical, ogType, titleAbsolute, feedUrl, article } = opts;
+  const { title, description, ogTitle, ogDescription, ogImage } = seo;
   const { sanityContext } = await getRequestContext();
-  const ogImageUrl = seo.ogImage
-    ? urlForSanityImage(seo.ogImage, sanityContext)
+  const ogImageUrl = ogImage
+    ? urlForSanityImage(ogImage, sanityContext)
     : undefined;
   const ogImages = ogImageUrl ? [{ url: ogImageUrl }] : undefined;
   const twitterImages = ogImageUrl ? [ogImageUrl] : undefined;
-  const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
+  const twitterCard = ogImageUrl
+    ? TWITTER_CARD.SUMMARY_LARGE_IMAGE
+    : TWITTER_CARD.SUMMARY;
 
   return {
-    title: titleAbsolute ? { absolute: seo.title } : seo.title,
-    description: seo.description,
+    title: titleAbsolute ? { absolute: title } : title,
+    description,
     alternates: {
       canonical,
-      ...(feedUrl && { types: { 'application/rss+xml': feedUrl } }),
+      ...(feedUrl && { types: { [ALTERNATE_TYPE.RSS]: feedUrl } }),
     },
     openGraph: {
-      title: seo.ogTitle,
-      description: seo.ogDescription,
+      title: ogTitle,
+      description: ogDescription,
       images: ogImages,
       type: ogType,
       ...(article?.publishedTime && { publishedTime: article.publishedTime }),
@@ -47,8 +52,8 @@ export const toMetadata = async (
     },
     twitter: {
       card: twitterCard,
-      title: seo.ogTitle,
-      description: seo.ogDescription,
+      title: ogTitle,
+      description: ogDescription,
       images: twitterImages,
     },
   };
