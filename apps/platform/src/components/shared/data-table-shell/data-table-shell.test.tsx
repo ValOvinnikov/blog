@@ -9,7 +9,7 @@ import { DataTableShell } from './data-table-shell';
 
 faker.seed(5995);
 
-type TItem = { id: string; name: string };
+type TItem = { id: string; name: string; status?: string };
 type TShellProps = ComponentProps<typeof DataTableShell<TItem>>;
 type TColumn = TShellProps['columns'][number];
 
@@ -19,6 +19,7 @@ const MOCK_COLUMN_LABEL = faker.lorem.word();
 const MOCK_FIRST_ITEM: TItem = {
   id: faker.string.uuid(),
   name: faker.company.name(),
+  status: faker.lorem.word(),
 };
 const MOCK_SECOND_ITEM: TItem = {
   id: faker.string.uuid(),
@@ -32,6 +33,25 @@ const MOCK_COUNT = faker.lorem.words(2);
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_NOTE = faker.lorem.sentence();
 const MOCK_ACTIONS_LABEL = faker.lorem.word();
+const MOCK_STATUS_LABEL = faker.lorem.words(2);
+const MOCK_ID_LABEL = faker.lorem.words(3);
+const NAME_COLUMN = faker.string.alpha(8);
+const STATUS_COLUMN = faker.string.alpha(8);
+const ID_COLUMN = faker.string.alpha(8);
+const ACTIONS_COLUMN = faker.string.alpha(8);
+
+const ItemRow = ({ item }: { item: TItem }) => (
+  <DataTableShell.Row>
+    <DataTableShell.Cell column={NAME_COLUMN}>{item.name}</DataTableShell.Cell>
+    {item.status && (
+      <DataTableShell.Cell column={STATUS_COLUMN}>
+        {item.status}
+      </DataTableShell.Cell>
+    )}
+    <DataTableShell.Cell column={ID_COLUMN}>{item.id}</DataTableShell.Cell>
+    <DataTableShell.Cell column={ACTIONS_COLUMN}>{null}</DataTableShell.Cell>
+  </DataTableShell.Row>
+);
 
 const renderTable = (
   items: TItem[],
@@ -48,15 +68,12 @@ const renderTable = (
       ariaLabel={MOCK_ARIA_LABEL}
       isStacked={isStacked}
       columns={[
-        { key: 'name', label: MOCK_COLUMN_LABEL, sort },
-        { key: 'actions', label: MOCK_ACTIONS_LABEL },
+        { key: NAME_COLUMN, label: MOCK_COLUMN_LABEL, sort },
+        { key: STATUS_COLUMN, label: MOCK_STATUS_LABEL },
+        { key: ID_COLUMN, label: MOCK_ID_LABEL },
+        { key: ACTIONS_COLUMN, label: MOCK_ACTIONS_LABEL },
       ]}
-      renderRow={(item) => (
-        <DataTableShell.Row key={item.id}>
-          <DataTableShell.Cell>{item.name}</DataTableShell.Cell>
-          <DataTableShell.Cell>{null}</DataTableShell.Cell>
-        </DataTableShell.Row>
-      )}
+      renderRow={(item) => <ItemRow key={item.id} item={item} />}
     >
       {children}
     </DataTableShell>,
@@ -124,15 +141,27 @@ describe(`<${DataTableShell.name}/>`, () => {
     });
 
     it.each([MOCK_FIRST_ITEM, MOCK_SECOND_ITEM])(
-      'names the cell for $name after its column',
-      ({ name }) => {
-        const cell = screen.getByRole(ARIA_ROLE.CELL, {
+      'names each cell of a wrapped row for $name after its own column',
+      ({ name, id }) => {
+        const nameCell = screen.getByRole(ARIA_ROLE.CELL, {
           name: `${MOCK_COLUMN_LABEL} ${name}`,
         });
+        const idCell = screen.getByRole(ARIA_ROLE.CELL, {
+          name: `${MOCK_ID_LABEL} ${id}`,
+        });
 
-        expect(cell).toBeInTheDocument();
+        expect(nameCell).toBeInTheDocument();
+        expect(idCell).toBeInTheDocument();
       },
     );
+
+    it('names a conditional middle cell after its column', () => {
+      const statusCell = screen.getByRole(ARIA_ROLE.CELL, {
+        name: `${MOCK_STATUS_LABEL} ${MOCK_FIRST_ITEM.status}`,
+      });
+
+      expect(statusCell).toBeInTheDocument();
+    });
 
     it('leaves an empty cell unlabelled, naming its column only in the head row', () => {
       const actionsLabels = screen.getAllByText(MOCK_ACTIONS_LABEL);

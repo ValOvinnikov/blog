@@ -8,13 +8,7 @@ import {
 import type { TMaybeUndefined } from '@shinefold/config';
 import type { TValueOf } from '@shinefold/config/utils';
 import { hasLength } from '@shinefold/utils/primitives';
-import {
-  cloneElement,
-  isValidElement,
-  type ElementType,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import type { ElementType, ReactElement, ReactNode } from 'react';
 
 import { DataTableShellCell } from './components/cell/data-table-shell-cell';
 import {
@@ -22,10 +16,8 @@ import {
   type TDataTableShellColumnSort,
 } from './components/head-cell/data-table-shell-head-cell';
 import { DataTableShellNote } from './components/note/data-table-shell-note';
-import {
-  DataTableShellRow,
-  type TDataTableShellRowProps,
-} from './components/row/data-table-shell-row';
+import { DataTableShellRow } from './components/row/data-table-shell-row';
+import { DataTableShellStackedProvider } from './components/stacked-provider/data-table-shell-stacked-provider';
 import {
   DataTableShellTitle,
   type TDataTableShellTitleProps,
@@ -78,12 +70,9 @@ const DataTableShellRoot = <TItem,>({
       hasWidths,
     });
   const { slots } = mapCompoundSlots(children, DataTableShellSlots);
-  const renderStackedRow = (item: TItem) => {
-    const row = renderRow(item);
-    return isValidElement<TDataTableShellRowProps>(row)
-      ? cloneElement(row, { stackedLabels: columns.map(({ label }) => label) })
-      : row;
-  };
+  const stackedLabels = isStacked
+    ? Object.fromEntries(columns.map(({ key, label }) => [key, label]))
+    : undefined;
   const stackedRole = (role: TValueOf<typeof ARIA_ROLE>) =>
     isStacked ? role : undefined;
   const title = slots.Title as TMaybeUndefined<
@@ -128,7 +117,9 @@ const DataTableShellRoot = <TItem,>({
                 </tr>
               </thead>
               <tbody className={tbody()} role={stackedRole(ARIA_ROLE.ROWGROUP)}>
-                {items.map(isStacked ? renderStackedRow : renderRow)}
+                <DataTableShellStackedProvider labels={stackedLabels}>
+                  {items.map(renderRow)}
+                </DataTableShellStackedProvider>
               </tbody>
             </table>
           </div>

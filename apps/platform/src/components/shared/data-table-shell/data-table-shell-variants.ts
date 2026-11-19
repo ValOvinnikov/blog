@@ -21,6 +21,7 @@ export const dataTableShellVariants = tv({
       'flex w-full cursor-pointer items-center gap-1 px-platform-cell-inset py-2.5 uppercase',
       insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE),
       'hover:text-platform-text',
+      'md:group-data-has-widths/table:px-2 md:group-data-has-widths/table:[th:first-child>&]:pl-platform-cell-inset md:group-data-has-widths/table:[th:last-child>&]:pr-platform-cell-inset',
     ],
     sortIcon: [],
     toolbar: [

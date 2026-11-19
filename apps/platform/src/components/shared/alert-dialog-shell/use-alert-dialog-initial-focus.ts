@@ -12,10 +12,10 @@ export const useAlertDialogInitialFocus = () => {
     const bodyControl = Array.from(
       popup.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
     ).find((element) => !actions.contains(element));
-    const lastAction = actions.lastElementChild;
+    const keepAction = actions.firstElementChild;
 
     return (
-      bodyControl ?? (lastAction instanceof HTMLElement ? lastAction : true)
+      bodyControl ?? (keepAction instanceof HTMLElement ? keepAction : true)
     );
   };
 
