@@ -1,4 +1,5 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const accordionTriggerVariants = tv({
   slots: {
@@ -6,7 +7,7 @@ export const accordionTriggerVariants = tv({
     trigger: [
       'group flex w-[calc(100%+1rem)] items-center justify-between gap-3',
       '-mx-2 border-0 bg-transparent px-2 py-card-y text-left',
-      'font-display text-lg font-medium text-text',
+      TYPOGRAPHY[TEXT_ROLE.ITEM_TITLE],
       'transition-colors duration-base ease-smooth',
       'hover:text-brand-primary',
       'rounded-sm focus-visible:relative focus-visible:z-1 focus-visible:outline-none',

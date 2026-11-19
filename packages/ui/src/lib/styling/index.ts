@@ -7,7 +7,7 @@ export { FULL_BLEED, MEDIA_MAX_WIDTH } from './full-bleed';
 export { BELOW_HEADER, HEADER_ANCHOR } from './header-anchor';
 export { HEADER_CONTROL, HEADER_CONTROL_FRAME } from './header-control';
 export { FOCUS_RING, TRANSITION_COLORS } from './interaction';
-export { INTERACTIVE_ITEM_CARD } from './item-card';
+export { CARD_CONTAINER, INTERACTIVE_ITEM_CARD } from './item-card';
 export {
   LINK_UNDERLINE,
   LINK_UNDERLINE_AT_REST,

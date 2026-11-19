@@ -8,7 +8,7 @@ export const mediaCardTitleVariants = tv({
   variants: {
     isLead: {
       true: [],
-      false: ['line-clamp-4', '@2xs:text-lg'],
+      false: ['line-clamp-4'],
     },
   },
   defaultVariants: {

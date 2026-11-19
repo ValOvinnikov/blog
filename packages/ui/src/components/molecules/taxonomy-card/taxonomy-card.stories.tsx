@@ -6,9 +6,39 @@ import {
   BrandBand,
   focusLastLink,
 } from '@shinefold/ui/testing/brand-bands';
+import { inNarrowColumn, threeAcross } from '@shinefold/ui/testing/card-widths';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { TaxonomyCard } from './taxonomy-card';
+
+const REACT_TAG = {
+  title: 'react',
+  href: '/tags/react',
+  postCountLabel: '1 post',
+};
+
+const ENGINEERING_POSTS = [
+  {
+    id: '1',
+    title: 'Refactoring the build pipeline',
+    href: '/posts/refactoring-the-build-pipeline',
+  },
+  {
+    id: '2',
+    title: 'Why we moved to a monorepo',
+    href: '/posts/why-we-moved-to-a-monorepo',
+  },
+];
+
+const ENGINEERING_DESCRIPTION =
+  'Posts about building things — architecture, tooling, and the craft of software.';
+
+const ENGINEERING_TOPIC = {
+  title: 'Engineering',
+  href: '/topics/engineering',
+  headingLevel: 2,
+  postCountLabel: '12 posts',
+} as const;
 
 const meta = {
   title: 'Molecules/TaxonomyCard',
@@ -22,10 +52,7 @@ const meta = {
     },
   },
   args: {
-    title: 'Engineering',
-    href: '/topics/engineering',
-    headingLevel: 2,
-    postCountLabel: '12 posts',
+    ...ENGINEERING_TOPIC,
     isInteractive: true,
   },
 } satisfies Meta<typeof TaxonomyCard>;
@@ -35,60 +62,52 @@ type TStory = StoryObj<typeof meta>;
 
 export const WithDescription: TStory = {
   args: {
-    description:
-      'Posts about building things — architecture, tooling, and the craft of software.',
+    description: ENGINEERING_DESCRIPTION,
+  },
+};
+
+export const NarrowColumn: TStory = {
+  decorators: [inNarrowColumn],
+  args: {
+    description: ENGINEERING_DESCRIPTION,
+  },
+};
+
+export const ThreeAcross: TStory = {
+  decorators: [threeAcross],
+  args: {
+    description: ENGINEERING_DESCRIPTION,
   },
 };
 
 export const Static: TStory = {
   args: {
     isInteractive: false,
-    description:
-      'Posts about building things — architecture, tooling, and the craft of software.',
+    description: ENGINEERING_DESCRIPTION,
   },
 };
 
 export const WithoutDescription: TStory = {
-  args: {
-    title: 'react',
-    href: '/tags/react',
-    postCountLabel: '1 post',
-  },
+  args: REACT_TAG,
 };
 
 export const WithTwoPosts: TStory = {
   args: {
-    description:
-      'Posts about building things — architecture, tooling, and the craft of software.',
+    description: ENGINEERING_DESCRIPTION,
   },
   render: (args) => (
     <TaxonomyCard {...args}>
       <TaxonomyCard.Posts
         ariaLabel={`Latest posts in ${args.title}`}
         label="Latest"
-        posts={[
-          {
-            id: '1',
-            title: 'Refactoring the build pipeline',
-            href: '/posts/refactoring-the-build-pipeline',
-          },
-          {
-            id: '2',
-            title: 'Why we moved to a monorepo',
-            href: '/posts/why-we-moved-to-a-monorepo',
-          },
-        ]}
+        posts={ENGINEERING_POSTS}
       />
     </TaxonomyCard>
   ),
 };
 
 export const WithOnePost: TStory = {
-  args: {
-    title: 'react',
-    href: '/tags/react',
-    postCountLabel: '1 post',
-  },
+  args: REACT_TAG,
   render: (args) => (
     <TaxonomyCard {...args}>
       <TaxonomyCard.Posts
@@ -108,8 +127,7 @@ export const WithOnePost: TStory = {
 
 export const WithNoPosts: TStory = {
   args: {
-    description:
-      'Posts about building things — architecture, tooling, and the craft of software.',
+    description: ENGINEERING_DESCRIPTION,
   },
   render: (args) => (
     <TaxonomyCard {...args}>
@@ -149,27 +167,13 @@ export const Grid: TStory = {
   render: () => (
     <CardGrid>
       <TaxonomyCard
-        title="Engineering"
-        href="/topics/engineering"
-        headingLevel={2}
-        description="Posts about building things — architecture, tooling, and the craft of software."
-        postCountLabel="12 posts"
+        {...ENGINEERING_TOPIC}
+        description={ENGINEERING_DESCRIPTION}
       >
         <TaxonomyCard.Posts
           ariaLabel="Latest posts in Engineering"
           label="Latest"
-          posts={[
-            {
-              id: '1',
-              title: 'Refactoring the build pipeline',
-              href: '/posts/refactoring-the-build-pipeline',
-            },
-            {
-              id: '2',
-              title: 'Why we moved to a monorepo',
-              href: '/posts/why-we-moved-to-a-monorepo',
-            },
-          ]}
+          posts={ENGINEERING_POSTS}
         />
       </TaxonomyCard>
       <TaxonomyCard
@@ -191,12 +195,7 @@ export const Grid: TStory = {
           ]}
         />
       </TaxonomyCard>
-      <TaxonomyCard
-        title="react"
-        href="/tags/react"
-        headingLevel={2}
-        postCountLabel="1 post"
-      />
+      <TaxonomyCard {...REACT_TAG} headingLevel={2} />
     </CardGrid>
   ),
 };
