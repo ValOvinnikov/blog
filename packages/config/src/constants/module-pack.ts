@@ -1,6 +1,6 @@
-import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
 import { isNull } from '@shinefold/utils/primitives';
 
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
 import type { TValueOf } from '@shinefold/config/utils';
 
 import { CAPABILITY, type TCapability } from './capability';

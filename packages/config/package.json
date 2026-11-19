@@ -7,7 +7,14 @@
     ".": "./src/index.ts",
     "./react": "./src/react/index.ts",
     "./constants": "./src/constants/index.ts",
-    "./utils": "./src/utils.ts"
+    "./constants/*": "./src/constants/*.ts",
+    "./client/objects": "./src/client/objects.ts",
+    "./sanity/generated/types": "./src/sanity/generated/types.ts",
+    "./testing/theme-css": "./src/testing/theme-css.ts",
+    "./theme": "./src/theme/index.ts",
+    "./types": "./src/types/index.ts",
+    "./utils": "./src/utils.ts",
+    "./voice": "./src/voice/index.ts"
   },
   "scripts": {
     "lint": "eslint .",

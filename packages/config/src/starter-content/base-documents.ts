@@ -1,3 +1,4 @@
+import { PRICE_PERIOD, type TLocaleIsoCode } from '@shinefold/config/constants';
 import type {
   Page_home,
   Page_postIndex,
@@ -8,8 +9,6 @@ import type {
   Template_postIndex,
 } from '@shinefold/config/sanity/generated/types';
 import { SITE_MESSAGES_BY_LOCALE } from '@shinefold/config/voice';
-
-import { PRICE_PERIOD, type TLocaleIsoCode } from '@shinefold/config/constants';
 
 import type { TStarterCopy } from './copy/starter-copy';
 import { buildLegalPages } from './legal-pages';

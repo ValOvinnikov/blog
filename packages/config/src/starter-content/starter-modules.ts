@@ -1,3 +1,9 @@
+import {
+  BRAND_VARIANT,
+  CTA_VARIANT,
+  HERO_VARIANT,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 import type {
   ArticleText,
   Module_content,
@@ -6,13 +12,6 @@ import type {
   Module_postList,
   Person,
 } from '@shinefold/config/sanity/generated/types';
-
-import {
-  BRAND_VARIANT,
-  CTA_VARIANT,
-  HERO_VARIANT,
-  type TLocaleIsoCode,
-} from '@shinefold/config/constants';
 
 import type { TStarterDocument, TStarterModule } from './starter-document';
 import {

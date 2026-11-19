@@ -1,3 +1,9 @@
+import {
+  BRAND_VARIANT,
+  TAXONOMY_KIND,
+  type TLocaleIsoCode,
+  type TTaxonomyKind,
+} from '@shinefold/config/constants';
 import type {
   Module_taxonomyList,
   Page_tagIndex,
@@ -5,13 +11,6 @@ import type {
   Template_tagIndex,
   Template_topicIndex,
 } from '@shinefold/config/sanity/generated/types';
-
-import {
-  BRAND_VARIANT,
-  TAXONOMY_KIND,
-  type TLocaleIsoCode,
-  type TTaxonomyKind,
-} from '@shinefold/config/constants';
 
 import type { TStarterCopy } from './copy/starter-copy';
 import type {
