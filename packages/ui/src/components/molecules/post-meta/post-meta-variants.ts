@@ -1,11 +1,12 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const postMetaVariants = tv({
   slots: {
     root: [
       'flex flex-wrap items-center gap-2',
       'border-t border-divider py-[14px]',
-      'font-mono text-label text-subtle',
+      TYPOGRAPHY[TEXT_ROLE.META],
     ],
     author: ['flex items-center gap-2'],
     authorName: ['text-text font-medium'],

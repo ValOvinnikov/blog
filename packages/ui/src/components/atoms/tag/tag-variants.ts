@@ -1,12 +1,13 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const tagVariants = tv({
   base: [
     'inline-flex items-center',
     'rounded-button',
-    'font-mono text-xs font-medium',
-    'tracking-[.06em] uppercase whitespace-nowrap',
+    TYPOGRAPHY[TEXT_ROLE.LABEL],
+    'whitespace-nowrap',
     'px-2 py-0.5',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
