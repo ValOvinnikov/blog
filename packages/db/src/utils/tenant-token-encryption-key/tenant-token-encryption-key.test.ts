@@ -1,5 +1,6 @@
 import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
+  unsetTenantTokenEncryptionKey,
   useTenantTokenEncryptionKey,
 } from '@shinefold/db/testing/tenant-token-encryption-key';
 import { MOCK_REVALIDATE_WEBHOOK_SECRET } from '@shinefold/db/testing/tenants/fixtures';
@@ -11,10 +12,6 @@ import {
 
 useTenantTokenEncryptionKey();
 
-function unsetEncryptionKey(): void {
-  vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
-}
-
 describe(encryptTenantSecret, () => {
   it('produces a value that decrypts back to the plaintext', () => {
     const encrypted = encryptTenantSecret(MOCK_REVALIDATE_WEBHOOK_SECRET);
@@ -24,7 +21,7 @@ describe(encryptTenantSecret, () => {
   });
 
   it('throws when the encryption key is not configured', () => {
-    unsetEncryptionKey();
+    unsetTenantTokenEncryptionKey();
 
     expect(() => encryptTenantSecret(MOCK_REVALIDATE_WEBHOOK_SECRET)).toThrow(
       MISSING_TENANT_TOKEN_KEY_ERROR,
@@ -35,7 +32,7 @@ describe(encryptTenantSecret, () => {
 describe(decryptTenantSecret, () => {
   it('throws without a configured key, even for a value it encrypted', () => {
     const encrypted = encryptTenantSecret(MOCK_REVALIDATE_WEBHOOK_SECRET);
-    unsetEncryptionKey();
+    unsetTenantTokenEncryptionKey();
 
     expect(() => decryptTenantSecret(encrypted)).toThrow(
       MISSING_TENANT_TOKEN_KEY_ERROR,

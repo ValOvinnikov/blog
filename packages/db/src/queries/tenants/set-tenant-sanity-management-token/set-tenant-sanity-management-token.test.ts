@@ -4,6 +4,7 @@ import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
+  unsetTenantTokenEncryptionKey,
   useTenantTokenEncryptionKey,
 } from '@shinefold/db/testing/tenant-token-encryption-key';
 import {
@@ -58,7 +59,7 @@ describe(setTenantSanityManagementToken, () => {
   });
 
   it('throws without a configured encryption key, leaving the row untouched', async () => {
-    vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
+    unsetTenantTokenEncryptionKey();
 
     await expect(
       setTenantSanityManagementToken(tenant.id, MOCK_MINTED),

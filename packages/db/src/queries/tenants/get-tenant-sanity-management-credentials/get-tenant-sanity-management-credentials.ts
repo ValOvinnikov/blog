@@ -24,11 +24,15 @@ export async function getTenantSanityManagementCredentials(
     .from(tenants)
     .where(eq(tenants.id, tenantId));
 
-  if (!tenant?.projectId || !tenant.tokenEncrypted) return undefined;
+  if (!tenant) return undefined;
+
+  const { projectId, tokenEncrypted, managementRobotId } = tenant;
+
+  if (!projectId || !tokenEncrypted) return undefined;
 
   return {
-    projectId: tenant.projectId,
-    token: decryptTenantSecret(tenant.tokenEncrypted),
-    managementRobotId: tenant.managementRobotId,
+    projectId,
+    token: decryptTenantSecret(tokenEncrypted),
+    managementRobotId,
   };
 }
