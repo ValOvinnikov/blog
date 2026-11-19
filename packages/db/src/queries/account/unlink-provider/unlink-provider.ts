@@ -1,11 +1,11 @@
 import type { TOutcome } from '@shinefold/config';
-import type { TOAuthProvider } from '@shinefold/config/constants';
-import { getDb } from '@shinefold/db/client';
 import {
-  ROW_LOCK,
+  type TOAuthProvider,
   type TUnlinkProviderOutcome,
   UNLINK_PROVIDER_OUTCOME,
-} from '@shinefold/db/constants';
+} from '@shinefold/config/constants';
+import { getDb } from '@shinefold/db/client';
+import { ROW_LOCK } from '@shinefold/db/constants';
 import { accounts, users } from '@shinefold/db/schema/auth';
 import { hasLength } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
@@ -16,7 +16,7 @@ export type TLinkableProvider = TOAuthProvider;
 
 export type TUnlinkProviderResult = TOutcome<TUnlinkProviderOutcome>;
 
-// Guard and delete share one statement because `neon-http` has no transactions, and the CTE's `FOR UPDATE` lock stops two concurrent unlinks leaving zero methods; no authorization check is made.
+// One statement because `neon-http` has no transactions; the CTE's `FOR UPDATE` lock stops concurrent unlinks leaving zero methods.
 export async function unlinkProvider(
   userId: string,
   provider: TLinkableProvider,

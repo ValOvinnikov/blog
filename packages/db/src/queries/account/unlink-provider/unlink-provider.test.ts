@@ -1,4 +1,4 @@
-import { UNLINK_PROVIDER_OUTCOME } from '@shinefold/db/constants';
+import { UNLINK_PROVIDER_OUTCOME } from '@shinefold/config/constants';
 import * as schema from '@shinefold/db/schema';
 import {
   GITHUB_PROVIDER,

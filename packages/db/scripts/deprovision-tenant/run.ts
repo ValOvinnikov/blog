@@ -89,7 +89,7 @@ async function recordStepStatus(
     });
   } catch (reportError) {
     console.error(
-      `deprovision-tenant: failed to record step "${step}" status "${status}" for tenant "${tenantId}": ${sanitizeLogMessage(reportError)}`,
+      `${TOOL}: failed to record step "${step}" status "${status}" for tenant "${tenantId}": ${sanitizeLogMessage(reportError)}`,
     );
   }
 }
@@ -111,7 +111,7 @@ async function recordRunStart(
     });
   } catch (error) {
     console.error(
-      `deprovision-tenant: failed to record run start for tenant "${tenant.id}": ${sanitizeLogMessage(error)}`,
+      `${TOOL}: failed to record run start for tenant "${tenant.id}": ${sanitizeLogMessage(error)}`,
     );
   }
 }
@@ -121,7 +121,7 @@ async function recordRunFinish(tenantId: string): Promise<void> {
     await reportDeprovisioningRunFinish(tenantId);
   } catch (error) {
     console.error(
-      `deprovision-tenant: failed to record run finish for tenant "${tenantId}": ${sanitizeLogMessage(error)}`,
+      `${TOOL}: failed to record run finish for tenant "${tenantId}": ${sanitizeLogMessage(error)}`,
     );
   }
 }
@@ -135,7 +135,7 @@ export async function runSteps(
   }
 
   for (const step of STEPS) {
-    console.warn(`deprovision-tenant: running step "${step.name}"...`);
+    console.warn(`${TOOL}: running step "${step.name}"...`);
 
     if (env.dryRun === false) {
       await recordStepStatus(
@@ -147,7 +147,7 @@ export async function runSteps(
 
     try {
       await step.run(tenant, env);
-      console.warn(`deprovision-tenant: step "${step.name}" done.`);
+      console.warn(`${TOOL}: step "${step.name}" done.`);
 
       if (env.dryRun === false) {
         await recordStepStatus(
@@ -158,9 +158,7 @@ export async function runSteps(
       }
     } catch (error) {
       const message = sanitizeLogMessage(error);
-      console.error(
-        `deprovision-tenant: step "${step.name}" failed: ${message}`,
-      );
+      console.error(`${TOOL}: step "${step.name}" failed: ${message}`);
 
       if (env.dryRun === false) {
         await recordStepStatus(
@@ -194,20 +192,20 @@ export async function runDeprovisioning(
 
   if (tenant.deprovisionedAt) {
     console.warn(
-      `deprovision-tenant: tenant "${tenant.id}" is already deprovisioned (at ${tenant.deprovisionedAt.toISOString()}) — nothing to do.`,
+      `${TOOL}: tenant "${tenant.id}" is already deprovisioned (at ${tenant.deprovisionedAt.toISOString()}) — nothing to do.`,
     );
     return { ok: true, skipped: true };
   }
 
   if (confirm !== tenant.name) {
     throw new Error(
-      `deprovision-tenant: --confirm="${confirm}" does not match tenant name "${tenant.name}" — aborting before any destructive action.`,
+      `${TOOL}: --confirm="${confirm}" does not match tenant name "${tenant.name}" — aborting before any destructive action.`,
     );
   }
 
   if (env.dryRun) {
     console.warn(
-      `deprovision-tenant: DRY RUN for tenant "${tenant.id}" ("${tenant.name}") — no changes will be made.`,
+      `${TOOL}: DRY RUN for tenant "${tenant.id}" ("${tenant.name}") — no changes will be made.`,
     );
   }
 

@@ -65,20 +65,20 @@ async function recheckOne(
       case ELEVATE_TENANT_OWNER_OUTCOME.STALLED:
         summary.stalled += 1;
         console.error(
-          `recheck-tenant-owners: tenant "${tenant.id}" ("${tenant.name}")'s owner still hasn't accepted their Sanity invite — administrator grant is stalled, not failed.`,
+          `${TOOL}: tenant "${tenant.id}" ("${tenant.name}")'s owner still hasn't accepted their Sanity invite — administrator grant is stalled, not failed.`,
         );
         break;
       case ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP:
         summary.ambiguous += 1;
         console.error(
-          `recheck-tenant-owners: tenant "${tenant.id}" ("${tenant.name}")'s Sanity project has more than one human member — cannot tell which is the owner, so no role was granted. Needs manual review.`,
+          `${TOOL}: tenant "${tenant.id}" ("${tenant.name}")'s Sanity project has more than one human member — cannot tell which is the owner, so no role was granted. Needs manual review.`,
         );
         break;
     }
   } catch (error) {
     summary.errors += 1;
     console.error(
-      `recheck-tenant-owners: elevate-tenant-owner failed for tenant "${tenant.id}" ("${tenant.name}"): ${sanitizeLogMessage(error)}`,
+      `${TOOL}: elevate-tenant-owner failed for tenant "${tenant.id}" ("${tenant.name}"): ${sanitizeLogMessage(error)}`,
     );
   }
 }
@@ -93,7 +93,7 @@ export async function runRecheck(env: TRecheckEnv): Promise<TRecheckSummary> {
   }
 
   console.log(
-    `recheck-tenant-owners: checked ${summary.checked} tenant(s) — ` +
+    `${TOOL}: checked ${summary.checked} tenant(s) — ` +
       `elevated=${summary.elevated} alreadyAdministrator=${summary.alreadyAdministrator} ` +
       `pendingAcceptance=${summary.pendingAcceptance} stalled=${summary.stalled} ` +
       `ambiguous=${summary.ambiguous} errors=${summary.errors}`,

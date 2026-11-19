@@ -1,13 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { ACTION_OUTCOME } from '@shinefold/config';
-import { OAUTH_PROVIDER } from '@shinefold/config/constants';
-import { queries } from '@shinefold/db';
-import { UNLINK_PROVIDER_OUTCOME } from '@shinefold/db/constants';
-import { toOutcome } from '@shinefold/utils/to-outcome';
 import {
-  DISPLAY_NAME_UPDATE_FAILED_EVENT,
-  PROVIDER_UNLINK_FAILED_EVENT,
-} from '@web/constants/account';
+  OAUTH_PROVIDER,
+  UNLINK_PROVIDER_OUTCOME,
+} from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { toOutcome } from '@shinefold/utils/to-outcome';
+import { ACCOUNT_LOG } from '@web/constants/account';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import { auth } from '@web/server/auth/auth';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -86,10 +85,13 @@ describe(unlinkProviderAction, () => {
     const result = await unlinkProviderAction(MOCK_PROVIDER);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(logger.error).toHaveBeenCalledWith(PROVIDER_UNLINK_FAILED_EVENT, {
-      provider: MOCK_PROVIDER,
-      error: MOCK_ERROR,
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      ACCOUNT_LOG.PROVIDER_UNLINK_FAILED,
+      {
+        provider: MOCK_PROVIDER,
+        error: MOCK_ERROR,
+      },
+    );
   });
 });
 
@@ -132,7 +134,7 @@ describe(updateDisplayNameAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
-      DISPLAY_NAME_UPDATE_FAILED_EVENT,
+      ACCOUNT_LOG.DISPLAY_NAME_UPDATE_FAILED,
       {
         error: MOCK_ERROR,
       },

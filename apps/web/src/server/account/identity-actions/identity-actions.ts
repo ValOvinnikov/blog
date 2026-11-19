@@ -4,15 +4,12 @@ import { ACTION_OUTCOME, type TActionResult } from '@shinefold/config';
 import {
   OAUTH_PROVIDER,
   type TOAuthProvider,
+  UNLINK_PROVIDER_OUTCOME,
 } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
-import { UNLINK_PROVIDER_OUTCOME } from '@shinefold/db/constants';
 import { hasLength } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
-import {
-  DISPLAY_NAME_UPDATE_FAILED_EVENT,
-  PROVIDER_UNLINK_FAILED_EVENT,
-} from '@web/constants/account';
+import { ACCOUNT_LOG } from '@web/constants/account';
 import {
   FIELD_ERROR,
   type TFieldErrorReason,
@@ -59,7 +56,7 @@ export const unlinkProviderAction = async (
     }
     return SUCCESS;
   } catch (error) {
-    logger.error(PROVIDER_UNLINK_FAILED_EVENT, { provider, error });
+    logger.error(ACCOUNT_LOG.PROVIDER_UNLINK_FAILED, { provider, error });
     return SERVER_ERROR;
   }
 };
@@ -83,7 +80,7 @@ export const updateDisplayNameAction = async (
     await queries.account.updateDisplayName(userId, trimmedName);
     return SUCCESS;
   } catch (error) {
-    logger.error(DISPLAY_NAME_UPDATE_FAILED_EVENT, { error });
+    logger.error(ACCOUNT_LOG.DISPLAY_NAME_UPDATE_FAILED, { error });
     return SERVER_ERROR;
   }
 };
