@@ -1,9 +1,14 @@
 import { PRESET_REGISTRY, type TPresetId } from '@shinefold/config/constants';
 
 import { isAccentHueAccessible } from './accent-hue-guard';
-import { ACCENT_RAMP_LIGHT, LOGO_RAMP_LIGHT } from './accent-ramps';
-import { oklchStopToHex } from './theme-declarations';
-import { NEUTRAL_RAMP_LIGHT } from './theme-ramps';
+import {
+  ACCENT_RAMP_DARK,
+  ACCENT_RAMP_LIGHT,
+  LOGO_RAMP_DARK,
+  LOGO_RAMP_LIGHT,
+} from './accent-ramps';
+import { oklchStopToHex, type TOklchStop } from './theme-declarations';
+import { NEUTRAL_RAMP_DARK, NEUTRAL_RAMP_LIGHT } from './theme-ramps';
 
 export type TResolveTenantEmailBrandInput = {
   preset: TPresetId;
@@ -25,48 +30,66 @@ export type TTenantEmailBrand = {
   logo3: string;
 };
 
-/**
- * Resolves a tenant's brand palette to literal hex for email, running the
- * same light-mode OKLCH recipes `apps/web` injects as CSS custom properties
- * and applying the WCAG AA accent-hue guard email cannot express as CSS.
- */
-export const resolveTenantEmailBrand = ({
-  preset,
-  accentHue,
-  logoHue,
-}: TResolveTenantEmailBrandInput): TTenantEmailBrand => {
+type TEmailBrandRamps = {
+  neutral: Record<
+    '--surface' | '--surface-2' | '--border' | '--text' | '--text-muted',
+    TOklchStop
+  >;
+  accent: Record<
+    '--brand-primary' | '--brand-primary-solid' | '--brand-primary-contrast',
+    TOklchStop
+  >;
+  logo: Record<'--logo-1' | '--logo-2' | '--logo-3', TOklchStop>;
+};
+
+const LIGHT_EMAIL_RAMPS: TEmailBrandRamps = {
+  neutral: NEUTRAL_RAMP_LIGHT,
+  accent: ACCENT_RAMP_LIGHT,
+  logo: LOGO_RAMP_LIGHT,
+};
+
+const DARK_EMAIL_RAMPS: TEmailBrandRamps = {
+  neutral: NEUTRAL_RAMP_DARK,
+  accent: ACCENT_RAMP_DARK,
+  logo: LOGO_RAMP_DARK,
+};
+
+const resolveEmailBrand = (
+  { neutral, accent, logo }: TEmailBrandRamps,
+  { preset, accentHue, logoHue }: TResolveTenantEmailBrandInput,
+): TTenantEmailBrand => {
   const base = PRESET_REGISTRY[preset].themeTokens;
   const resolvedAccentHue = isAccentHueAccessible(accentHue)
     ? accentHue
     : base.accentHue;
   const resolvedLogoHue = logoHue ?? base.logoHue ?? resolvedAccentHue;
+  const accentHex = (stop: TOklchStop) =>
+    oklchStopToHex(stop, resolvedAccentHue);
+  const logoHex = (stop: TOklchStop) => oklchStopToHex(stop, resolvedLogoHue);
 
   return {
-    surface: oklchStopToHex(NEUTRAL_RAMP_LIGHT['--surface'], resolvedAccentHue),
-    surface2: oklchStopToHex(
-      NEUTRAL_RAMP_LIGHT['--surface-2'],
-      resolvedAccentHue,
-    ),
-    border: oklchStopToHex(NEUTRAL_RAMP_LIGHT['--border'], resolvedAccentHue),
-    text: oklchStopToHex(NEUTRAL_RAMP_LIGHT['--text'], resolvedAccentHue),
-    textMuted: oklchStopToHex(
-      NEUTRAL_RAMP_LIGHT['--text-muted'],
-      resolvedAccentHue,
-    ),
-    brandPrimary: oklchStopToHex(
-      ACCENT_RAMP_LIGHT['--brand-primary'],
-      resolvedAccentHue,
-    ),
-    brandPrimarySolid: oklchStopToHex(
-      ACCENT_RAMP_LIGHT['--brand-primary-solid'],
-      resolvedAccentHue,
-    ),
-    brandPrimaryContrast: oklchStopToHex(
-      ACCENT_RAMP_LIGHT['--brand-primary-contrast'],
-      resolvedAccentHue,
-    ),
-    logo1: oklchStopToHex(LOGO_RAMP_LIGHT['--logo-1'], resolvedLogoHue),
-    logo2: oklchStopToHex(LOGO_RAMP_LIGHT['--logo-2'], resolvedLogoHue),
-    logo3: oklchStopToHex(LOGO_RAMP_LIGHT['--logo-3'], resolvedLogoHue),
+    surface: accentHex(neutral['--surface']),
+    surface2: accentHex(neutral['--surface-2']),
+    border: accentHex(neutral['--border']),
+    text: accentHex(neutral['--text']),
+    textMuted: accentHex(neutral['--text-muted']),
+    brandPrimary: accentHex(accent['--brand-primary']),
+    brandPrimarySolid: accentHex(accent['--brand-primary-solid']),
+    brandPrimaryContrast: accentHex(accent['--brand-primary-contrast']),
+    logo1: logoHex(logo['--logo-1']),
+    logo2: logoHex(logo['--logo-2']),
+    logo3: logoHex(logo['--logo-3']),
   };
 };
+
+/**
+ * Resolves a tenant's light brand palette to literal hex for email, applying
+ * the WCAG AA accent-hue guard email cannot express as CSS.
+ */
+export const resolveTenantEmailBrand = (
+  input: TResolveTenantEmailBrandInput,
+): TTenantEmailBrand => resolveEmailBrand(LIGHT_EMAIL_RAMPS, input);
+
+export const resolveTenantEmailDarkBrand = (
+  input: TResolveTenantEmailBrandInput,
+): TTenantEmailBrand => resolveEmailBrand(DARK_EMAIL_RAMPS, input);
