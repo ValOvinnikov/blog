@@ -10,11 +10,11 @@ import {
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { MOCK_WORKER_URL } from '@platform/testing/worker/fixtures';
 import {
-  MOCK_WORKER_SECRET,
-  MOCK_WORKER_URL,
-} from '@platform/testing/worker/fixtures';
-import { env } from '@platform/utils/env/env';
+  stubWorkerFetch,
+  type TWorkerFetchMock,
+} from '@platform/testing/worker/stub-worker-fetch';
 import { logger } from '@platform/utils/logger/logger';
 import {
   ACTION_OUTCOME,
@@ -56,32 +56,19 @@ const MOCK_USER_ID = faker.string.uuid();
 const MOCK_WORKER_PATH = `/${faker.lorem.slug()}`;
 const MOCK_MEMBERSHIP_ID = faker.string.uuid();
 
-const envMock: Partial<Record<keyof typeof env, string>> = env;
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 const getMembership = vi.mocked(queries.memberships.getMembership);
 const getAdminByUserId = vi.mocked(queries.admins.getAdminByUserId);
-const fetchMock = vi.fn<(url: URL, init?: RequestInit) => Promise<Response>>();
+const fetchMock: TWorkerFetchMock = vi.fn();
 
 const requestedUrls = (): string[] =>
   fetchMock.mock.calls.map(([url]) => url.href);
 
 beforeEach(() => {
   authMock.mockResolvedValue({ user: { id: MOCK_USER_ID } });
-  getAdminByUserId.mockReset();
   getAdminByUserId.mockResolvedValue(undefined);
-  getMembership.mockReset();
   getMembership.mockResolvedValue(mockMembership({ userId: MOCK_USER_ID }));
-  fetchMock.mockReset();
-  fetchMock.mockResolvedValue(
-    new Response(null, { status: HTTP_STATUS.ACCEPTED }),
-  );
-  vi.stubGlobal('fetch', fetchMock);
-  envMock.WORKER_ENQUEUE_URL = MOCK_WORKER_URL;
-  envMock.WORKER_ENQUEUE_SECRET = MOCK_WORKER_SECRET;
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
+  stubWorkerFetch(fetchMock);
 });
 
 describe(requestOwnerAccess, () => {

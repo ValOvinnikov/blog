@@ -59,22 +59,6 @@ const withMember = (role: TMembershipRole) =>
     .mockResolvedValue([mockTenantMember({ role })]);
 
 describe(removeTeamMemberAction, () => {
-  beforeEach(() => {
-    vi.mocked(requireTenantMembership)
-      .mockReset()
-      .mockResolvedValue(mockMembershipContext(mockReadyTenant()));
-    withMember(MEMBERSHIP_ROLE.EDITOR);
-    vi.mocked(memberships.getMemberStudioIdentity).mockResolvedValue({
-      email: MOCK_MEMBER_EMAIL,
-      sanityUserId: MOCK_SANITY_USER_ID,
-    });
-    removeMembership
-      .mockReset()
-      .mockResolvedValue(MEMBERSHIP_REMOVAL_OUTCOME.REMOVED);
-    vi.mocked(revokeMemberStudioAccess).mockReset();
-    vi.mocked(recordAuditEvent).mockReset();
-  });
-
   it('removes an editor, revokes Studio access, audits without the address', async () => {
     const result = await remove();
 

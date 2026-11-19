@@ -41,13 +41,7 @@ const ACTIONS = [
 
 describe.each(ACTIONS)('%s', (_name, action, path) => {
   beforeEach(() => {
-    vi.mocked(requireTenantOwnerOrAdmin).mockReset();
-    getAccess
-      .mockReset()
-      .mockResolvedValue(
-        mockMemberStudioAccessTarget({ role: MEMBERSHIP_ROLE.EDITOR }),
-      );
-    enqueue.mockReset().mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
+    enqueue.mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it("asks the worker about an unlocked editor's Studio access", async () => {

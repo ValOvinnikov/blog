@@ -1,7 +1,11 @@
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
-import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import {
+  MEMBERSHIP_INVITE_OUTCOME,
+  MEMBERSHIP_REMOVAL_OUTCOME,
+  MEMBERSHIP_ROLE,
+} from '@shinefold/db/constants';
 import type { TPendingMembershipInvite } from '@shinefold/db/queries/membership-invites';
 import type {
   TMemberStudioAccessTarget,
@@ -21,15 +25,21 @@ export const mockTeamDb = async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: {
-      listTenantMembers: vi.fn(),
-      getMemberStudioIdentity: vi.fn(),
-      getMemberStudioAccess: vi.fn(),
-      removeMembership: vi.fn(),
+      listTenantMembers: vi.fn(async () => [mockTenantMember()]),
+      getMemberStudioIdentity: vi.fn(async () => ({
+        email: MOCK_MEMBER_EMAIL,
+        sanityUserId: MOCK_SANITY_USER_ID,
+      })),
+      getMemberStudioAccess: vi.fn(async () => mockMemberStudioAccessTarget()),
+      removeMembership: vi.fn(async () => MEMBERSHIP_REMOVAL_OUTCOME.REMOVED),
     },
     membershipInvites: {
-      createMembershipInvite: vi.fn(),
-      cancelMembershipInvite: vi.fn(),
-      listPendingMembershipInvites: vi.fn(),
+      createMembershipInvite: vi.fn(async () => ({
+        outcome: MEMBERSHIP_INVITE_OUTCOME.CREATED,
+        invite: mockInviteRow(),
+      })),
+      cancelMembershipInvite: vi.fn(async () => true),
+      listPendingMembershipInvites: vi.fn(async () => [mockPendingInvite()]),
     },
   },
 });

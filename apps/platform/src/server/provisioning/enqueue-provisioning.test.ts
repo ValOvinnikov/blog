@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { CUSTOM_DOMAIN_PATH } from '@platform/constants/custom-domain';
 import { WORKER_LOG } from '@platform/constants/worker';
+import { mockedEnv } from '@platform/testing/env/mocked-env';
 import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_ID,
@@ -9,7 +10,10 @@ import {
   MOCK_WORKER_SECRET,
   MOCK_WORKER_URL,
 } from '@platform/testing/worker/fixtures';
-import { env } from '@platform/utils/env/env';
+import {
+  stubWorkerFetch,
+  type TWorkerFetchMock,
+} from '@platform/testing/worker/stub-worker-fetch';
 import { logger } from '@platform/utils/logger/logger';
 import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config';
 import {
@@ -27,26 +31,15 @@ vi.mock('@platform/utils/env/env');
 
 faker.seed(5997);
 
-const envMock: Partial<Record<keyof typeof env, string>> = env;
 const loggerErrorMock = vi.mocked(logger.error);
-const fetchMock = vi.fn();
+const fetchMock: TWorkerFetchMock = vi.fn();
 
 const MOCK_NETWORK_ERROR_MESSAGE = faker.lorem.words(2);
 const PROVISION_PATH = '/api/provision';
 
 describe(enqueueProvisioning, () => {
   beforeEach(() => {
-    fetchMock.mockReset();
-    fetchMock.mockResolvedValue(
-      new Response(null, { status: HTTP_STATUS.ACCEPTED }),
-    );
-    vi.stubGlobal('fetch', fetchMock);
-    envMock.WORKER_ENQUEUE_URL = MOCK_WORKER_URL;
-    envMock.WORKER_ENQUEUE_SECRET = MOCK_WORKER_SECRET;
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
+    stubWorkerFetch(fetchMock);
   });
 
   it.each([
@@ -65,7 +58,7 @@ describe(enqueueProvisioning, () => {
   ] as const)(
     'skips the request, logs and returns null without a $missing',
     async ({ key, hasWorkerUrl, hasSecret }) => {
-      envMock[key] = undefined;
+      mockedEnv[key] = undefined;
 
       const status = await enqueueProvisioning(MOCK_TENANT_ID);
 

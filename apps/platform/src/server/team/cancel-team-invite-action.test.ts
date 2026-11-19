@@ -3,7 +3,6 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import {
   mockEditorMembershipContext,
-  mockMembershipContext,
   mockOperatorMembershipContext,
 } from '@platform/testing/memberships/fixtures';
 import {
@@ -48,15 +47,6 @@ const notFound = {
 };
 
 describe(cancelTeamInviteAction, () => {
-  beforeEach(() => {
-    vi.mocked(requireTenantMembership)
-      .mockReset()
-      .mockResolvedValue(mockMembershipContext(mockReadyTenant()));
-    listInvites.mockReset().mockResolvedValue([mockPendingInvite()]);
-    cancelInvite.mockReset().mockResolvedValue(true);
-    vi.mocked(recordAuditEvent).mockReset();
-  });
-
   it('deletes the invite and records it without the address', async () => {
     const result = await cancel();
 

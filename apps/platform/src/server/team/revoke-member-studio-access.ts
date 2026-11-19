@@ -6,6 +6,7 @@ import {
   TEAM_ACCESS_LOG,
 } from '@platform/constants/team-access';
 import {
+  isWorkerRequestFailure,
   sendWorkerRequest,
   type TWorkerResponse,
 } from '@platform/server/provisioning/enqueue-provisioning';
@@ -30,7 +31,7 @@ const isSettled = ({ status }: TWorkerResponse) =>
     status < HTTP_STATUS.INTERNAL_SERVER_ERROR);
 
 const toFailureContext = (response: TWorkerResponse) =>
-  'failureEvent' in response
+  isWorkerRequestFailure(response)
     ? { cause: response.failureEvent, ...response.failure }
     : { responseStatus: response.status };
 

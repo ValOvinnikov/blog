@@ -29,6 +29,11 @@ export type TWorkerResponse =
       failure: Record<string, unknown>;
     };
 
+export const isWorkerRequestFailure = (
+  response: TWorkerResponse,
+): response is Extract<TWorkerResponse, { status: null }> =>
+  'failureEvent' in response;
+
 /** Never throws and never logs: a missing worker URL or secret, or a network failure, comes back as the failure to log. */
 export const sendWorkerRequest = async (
   path: string,
@@ -78,7 +83,7 @@ export const enqueueWorkerRequest = async (
 ): Promise<TMaybeNull<number>> => {
   const response = await sendWorkerRequest(path, body);
 
-  if ('failureEvent' in response) {
+  if (isWorkerRequestFailure(response)) {
     const { failureEvent, failure } = response;
     logger.error(failureEvent, { tenantId: body.tenantId, path, ...failure });
   }

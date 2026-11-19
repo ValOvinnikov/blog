@@ -6,15 +6,17 @@ import {
 import { WORKER_LOG } from '@platform/constants/worker';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
+import { requestedUrl } from '@platform/testing/http/requested-url';
 import {
   MOCK_MEMBER_EMAIL,
   MOCK_SANITY_USER_ID,
 } from '@platform/testing/team/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_WORKER_URL } from '@platform/testing/worker/fixtures';
 import {
-  MOCK_WORKER_SECRET,
-  MOCK_WORKER_URL,
-} from '@platform/testing/worker/fixtures';
+  stubWorkerFetch,
+  type TWorkerFetchMock,
+} from '@platform/testing/worker/stub-worker-fetch';
 import { logger } from '@platform/utils/logger/logger';
 import { HTTP_STATUS } from '@shinefold/config';
 
@@ -29,7 +31,7 @@ const MOCK_REMOVED = {
   sanityUserId: MOCK_SANITY_USER_ID,
 };
 
-const fetchMock = vi.fn<(url: URL, init?: RequestInit) => Promise<Response>>();
+const fetchMock: TWorkerFetchMock = vi.fn();
 
 const respondWith = (status: number) => new Response(null, { status });
 
@@ -45,25 +47,19 @@ const revoke = async () => {
 describe(revokeMemberStudioAccess, () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    mockedEnv.WORKER_ENQUEUE_URL = MOCK_WORKER_URL;
-    mockedEnv.WORKER_ENQUEUE_SECRET = MOCK_WORKER_SECRET;
-    fetchMock
-      .mockReset()
-      .mockImplementation(async () => respondWith(HTTP_STATUS.ACCEPTED));
-    vi.stubGlobal('fetch', fetchMock);
+    stubWorkerFetch(fetchMock);
   });
 
   afterEach(() => {
-    vi.unstubAllGlobals();
     vi.useRealTimers();
   });
 
   it("sends the removed member's address and Sanity user to the revoke route", async () => {
     await revoke();
 
-    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    const [, init] = fetchMock.mock.calls[0] ?? [];
     expect(fetchMock).toHaveBeenCalledOnce();
-    expect(url?.href).toBe(
+    expect(requestedUrl(fetchMock, 0).href).toBe(
       new URL(MEMBER_ACCESS_PATH.REVOKE, MOCK_WORKER_URL).href,
     );
     expect(JSON.parse(String(init?.body))).toEqual({
@@ -152,5 +148,9 @@ describe(revokeMemberStudioAccess, () => {
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(loggedEvents()).toEqual([TEAM_ACCESS_LOG.REVOKE_FAILED]);
+    expect(logger.error).toHaveBeenCalledWith(
+      TEAM_ACCESS_LOG.REVOKE_FAILED,
+      expect.objectContaining({ cause: WORKER_LOG.ENQUEUE_SKIPPED }),
+    );
   });
 });

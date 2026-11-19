@@ -12,7 +12,6 @@ import {
 import { MOCK_NOT_AN_EMAIL } from '@platform/testing/data-requests/fixtures';
 import {
   mockEditorMembershipContext,
-  mockMembershipContext,
   mockOperatorMembershipContext,
 } from '@platform/testing/memberships/fixtures';
 import {
@@ -68,24 +67,13 @@ const emailError = (reason: string, email?: string) => ({
 
 describe(inviteTeamMemberAction, () => {
   beforeEach(() => {
-    vi.mocked(requireTenantMembership)
-      .mockReset()
-      .mockResolvedValue(mockMembershipContext(mockReadyTenant()));
-    vi.mocked(memberships.listTenantMembers)
-      .mockReset()
-      .mockResolvedValue([
-        mockTenantMember({
-          email: MOCK_OWNER_EMAIL,
-          role: MEMBERSHIP_ROLE.OWNER,
-        }),
-      ]);
-    createInvite.mockReset().mockResolvedValue({
-      outcome: MEMBERSHIP_INVITE_OUTCOME.CREATED,
-      invite: mockInviteRow(),
-    });
-    cancelInvite.mockReset().mockResolvedValue(true);
-    signInMock.mockReset().mockResolvedValue(MOCK_VERIFY_REQUEST_URL);
-    vi.mocked(recordAuditEvent).mockReset();
+    vi.mocked(memberships.listTenantMembers).mockResolvedValue([
+      mockTenantMember({
+        email: MOCK_OWNER_EMAIL,
+        role: MEMBERSHIP_ROLE.OWNER,
+      }),
+    ]);
+    signInMock.mockResolvedValue(MOCK_VERIFY_REQUEST_URL);
   });
 
   it('creates and emails one editor invite, audited without the address', async () => {
