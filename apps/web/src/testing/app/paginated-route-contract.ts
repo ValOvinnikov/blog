@@ -11,7 +11,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
-const FIRST_PAGE = '1';
+const MOCK_FIRST_PAGE = '1';
 const MOCK_NON_CANONICAL_PAGES = ['abc', '02'];
 
 type TPageParams = ITenantLocalizedParams & { page: string };
@@ -31,7 +31,7 @@ export const testPaginatedRouteContract = <TParams extends TPageParams>({
   buildMetadata,
   firstPageHref,
 }: IPaginatedRouteContractOptions<TParams>) => {
-  const firstPageParams = paramsFor(FIRST_PAGE);
+  const firstPageParams = paramsFor(MOCK_FIRST_PAGE);
   const setup = customRenderAsync(page, { params: firstPageParams });
 
   describe('paginated route contract', () => {
@@ -58,7 +58,7 @@ export const testPaginatedRouteContract = <TParams extends TPageParams>({
       },
     );
 
-    it.each([FIRST_PAGE, ...MOCK_NON_CANONICAL_PAGES])(
+    it.each([MOCK_FIRST_PAGE, ...MOCK_NON_CANONICAL_PAGES])(
       'returns empty metadata without building any for page param %s',
       async (pageParam) => {
         const metadata = await generateMetadata({
