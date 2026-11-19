@@ -1,6 +1,6 @@
 'use client';
 
-import { routes } from '@shinefold/config';
+import { routes, TEXT_ROLE } from '@shinefold/config';
 import { Button } from '@shinefold/ui/components/atoms/button';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Text } from '@shinefold/ui/components/atoms/text';
@@ -8,6 +8,7 @@ import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
 import { errorPageLayoutVariants } from '@web/components/shared/error-page-layout';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { VoiceRichText } from '@web/components/shared/voice-rich-text';
+import { ERROR_BOUNDARY_LOG } from '@web/constants/error-boundary';
 import { useVoiceRich } from '@web/context/voice-rich-provider';
 import { reportClientError } from '@web/utils/report-client-error';
 import { useTranslations } from 'next-intl';
@@ -20,11 +21,7 @@ export type TLocaleErrorPageProps = {
 
 const s = errorPageLayoutVariants();
 
-/**
- * Sits below `NextIntlClientProvider`, so unlike `GlobalErrorPage` it can
- * translate its copy and link home with `SmartLink`. An error thrown by
- * `[tenant]/[locale]/layout.tsx` itself goes to `GlobalErrorPage` instead.
- */
+/** An error thrown by `[tenant]/[locale]/layout.tsx` itself reaches `GlobalErrorPage`, not this boundary. */
 export const LocaleErrorPage = ({ error, reset }: TLocaleErrorPageProps) => {
   const t = useTranslations('localeErrorPage');
   const description = useVoiceRich('localeErrorDescription');
@@ -33,17 +30,14 @@ export const LocaleErrorPage = ({ error, reset }: TLocaleErrorPageProps) => {
   const reportedErrorRef = useRef<Error | null>(null);
 
   useEffect(() => {
-    // Guarded on the error identity itself, not effect re-entry — `t` must
-    // stay a real dependency for the announcement below, but its identity
-    // isn't ours to rely on for "did the error actually change".
+    // `t` can change identity without a new error, so report once per error.
     if (reportedErrorRef.current !== error) {
       reportedErrorRef.current = error;
-      reportClientError('locale_error_boundary.render_failed', error, {
+      reportClientError(ERROR_BOUNDARY_LOG.LOCALE_RENDER_FAILED, error, {
         digest: error.digest,
       });
     }
-    // Written after mount, not on first paint — a live region that's
-    // already populated when it enters the DOM is unreliably announced.
+    // A live region already populated when it mounts is unreliably announced.
     if (announcementRef.current) {
       announcementRef.current.textContent = t('announcement');
     }
@@ -58,10 +52,10 @@ export const LocaleErrorPage = ({ error, reset }: TLocaleErrorPageProps) => {
         aria-atomic="true"
         className={s.announcement()}
       />
-      <Heading level={1} visual="hero">
+      <Heading level={1} visual={TEXT_ROLE.HERO_TITLE}>
         {t('title')}
       </Heading>
-      <Text className={s.copy()}>
+      <Text textRole={TEXT_ROLE.INTRO} className={s.copy()}>
         <VoiceRichText value={description} />
       </Text>
       <div className={s.actions()}>
