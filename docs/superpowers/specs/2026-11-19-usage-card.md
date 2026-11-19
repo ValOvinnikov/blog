@@ -52,16 +52,16 @@ and the mock differ, the primitive wins.
 ## Rows
 
 Rows appear in this order. Each allowance is plan plus open grants
-(`resolveTenantEntitlements`), never the plan record alone. Every row shows
-on every plan (decided, owner, 2026-11-19); a row the plan does not include
-shows in its "Not in plan" state (see States).
+(`resolveTenantEntitlements`), never the plan record alone. A row shows only
+when the plan or a grant includes it (decided, owner, 2026-11-19); a row
+with nothing used still shows, as "0 of {n}".
 
-| Row label                    | Value                         | Link        | Not in plan when                       |
-| ---------------------------- | ----------------------------- | ----------- | -------------------------------------- |
-| AI takeaways this month      | `{used} of {allowance}`       | none        | Never (Free 5, Starter 20, Growth 100) |
-| Newsletter emails this month | `{sent} of {allowance}`       | Subscribers | `NEWSLETTER` not in the entitlements   |
-| Team seats                   | `{used} of {seats}`           | Team        | `seats` is 1                           |
-| Additional languages         | `{live} of {localeLimit − 1}` | Languages   | `localeLimit` is 1                     |
+| Row label                    | Value                         | Link        | Shows when                              |
+| ---------------------------- | ----------------------------- | ----------- | --------------------------------------- |
+| AI takeaways this month      | `{used} of {allowance}`       | none        | Always (Free 5, Starter 20, Growth 100) |
+| Newsletter emails this month | `{sent} of {allowance}`       | Subscribers | `NEWSLETTER` in the entitlements        |
+| Team seats                   | `{used} of {seats}`           | Team        | `seats` above 1                         |
+| Additional languages         | `{live} of {localeLimit − 1}` | Languages   | `localeLimit` above 1                   |
 
 - **Takeaways**: used is this UTC month's `takeaway_generation_counts` count;
   allowance `takeawaysPerMonth`.
@@ -112,11 +112,6 @@ used up. Used above the allowance (a downgrade, a lowered grant) counts as
 
 - **Normal, near, used up**: per row, at the thresholds above. One row's
   state never changes another's.
-- **Not in plan**: the row keeps its label and value ("0 of 0" emails or
-  languages, "1 of 1" seats on Free and Starter), drops the meter, and shows
-  the note "Not included in your plan." in 13/18 `muted` 400. The owner sees
-  no link, because the plan does not open that page; the operator keeps it.
-  The value is never coloured.
 - **Nothing used**: "0 of {n}" with an empty track and the under-80% note.
   There is no empty card, because the takeaways row always shows.
 - **Failed read**: that row keeps its label and link and drops the value,
@@ -146,7 +141,6 @@ five locales. English:
 - Value: "{used} of {allowance}".
 - Links: "Subscribers", "Team", "Languages".
 - Notes as the table above.
-- Not in plan: "Not included in your plan."
 - Failed: "Couldn't load this count. Reload the page to try again."
 - Footer: "Your plan sets these limits." and "See what each plan includes".
 
@@ -159,7 +153,7 @@ Decided by the owner on 2026-11-19:
    when they are full.
 3. **Free and Starter footer**: the plan-comparison link, owner only, with no
    upgrade button on the card.
-4. **Rows the plan does not include**: shown, in the Not in plan state, never
-   hidden.
+4. **Rows the plan does not include**: hidden. A row with nothing used still
+   shows, as "0 of {n}".
 5. **Takeaways row link**: none until the Studio regenerate control (#7614)
    gives it somewhere to point.
