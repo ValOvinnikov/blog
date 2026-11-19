@@ -539,7 +539,11 @@
       "PLAN": "Formule : {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
       "PLAN_CHANGED": "Formule : {from} → {to}",
       "SIGN_IN_PROVIDER": "Fournisseur de connexion : {provider, select, google {Google} github {GitHub} other {{provider}}}",
-      "CLIENT_SECRET_REPLACED": "Secret client remplacé"
+      "CLIENT_SECRET_REPLACED": "Secret client remplacé",
+      "GRANT_ITEM": "Élément : {item}",
+      "GRANT_EXPIRY": "Jusqu'au {date}",
+      "GRANT_UNTIL_REVOKED": "Jusqu'à révocation",
+      "GRANT_NOTE": "Note : {note}"
     }
   },
   "tenantDomainPage": {
@@ -2447,6 +2451,7 @@
   },
   "grantItemNames": {
     "languages": "{count, plural, one {# langue supplémentaire} other {# langues supplémentaires}}",
+    "additionalLanguages": "Langues supplémentaires",
     "modulePack": {
       "CORE": "Modules Core",
       "STARTER": "Modules Starter",

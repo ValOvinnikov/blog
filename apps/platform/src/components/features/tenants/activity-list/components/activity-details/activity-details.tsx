@@ -1,5 +1,7 @@
-import type { TActivityDetail } from '@platform/components/features/tenants/activity-list/to-activity-details';
+import type { TActivityDetail } from '@platform/components/features/tenants/activity-list/activity-detail';
 import { ACTIVITY_DETAIL } from '@platform/constants/activity';
+import { formatDate } from '@platform/utils/format-date/format-date';
+import { useGrantItemLabel } from '@platform/utils/use-grant-item-label/use-grant-item-label';
 import { LOCALE_BCP47_TAGS } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -15,6 +17,7 @@ export const ActivityDetails = ({ details }: TActivityDetailsProps) => {
   const tLanguage = useTranslations('languageNames');
   const tPlan = useTranslations('planNames');
   const locale = useLocale();
+  const grantItemLabel = useGrantItemLabel();
   const { list, item } = activityDetailsVariants();
   const listFormat = new Intl.ListFormat(LOCALE_BCP47_TAGS[locale], {
     type: 'conjunction',
@@ -53,6 +56,12 @@ export const ActivityDetails = ({ details }: TActivityDetailsProps) => {
         });
       case ACTIVITY_DETAIL.SIGN_IN_PROVIDER:
         return t(detail.kind, { provider: detail.provider });
+      case ACTIVITY_DETAIL.GRANT_ITEM:
+        return t(detail.kind, { item: grantItemLabel(detail.item) });
+      case ACTIVITY_DETAIL.GRANT_EXPIRY:
+        return t(detail.kind, { date: formatDate(detail.expiresAt, locale) });
+      case ACTIVITY_DETAIL.GRANT_NOTE:
+        return t(detail.kind, { note: detail.note });
       default:
         return t(detail.kind);
     }
