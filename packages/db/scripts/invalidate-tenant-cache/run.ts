@@ -5,8 +5,7 @@ import { parseDryRun, readRequiredTenantId } from '../lib/cli-flags';
 import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 
 import { loadInvalidateCacheEnv, type TInvalidateCacheEnv } from './lib/env';
-
-const TOOL = 'invalidate-tenant-cache';
+import { TOOL } from './lib/tool';
 
 export type TRunInvalidateTenantCacheResult = { ok: boolean };
 
@@ -19,16 +18,11 @@ export async function runInvalidateTenantCache(
   try {
     await invalidateTenantCache(tenant, env);
   } catch (error) {
-    console.error(
-      `invalidate-tenant-cache: failed for tenant "${tenant.id}":`,
-      error,
-    );
+    console.error(`${TOOL}: failed for tenant "${tenant.id}":`, error);
     return { ok: false };
   }
 
-  console.warn(
-    `invalidate-tenant-cache: done for tenant "${tenant.id}" ("${tenant.name}").`,
-  );
+  console.warn(`${TOOL}: done for tenant "${tenant.id}" ("${tenant.name}").`);
   return { ok: true };
 }
 

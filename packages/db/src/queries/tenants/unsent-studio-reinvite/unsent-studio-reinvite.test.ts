@@ -1,11 +1,10 @@
-import * as schema from '@shinefold/db/schema';
-import {
-  insertTestTenant,
-  MOCK_OWNER_EMAIL,
-} from '@shinefold/db/testing/fixtures';
+import { MOCK_OWNER_EMAIL } from '@shinefold/db/testing/fixtures';
 import { usePersonalDataKeys } from '@shinefold/db/testing/personal-data';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
-import { eq } from 'drizzle-orm';
+import {
+  readTestTenant,
+  useTestTenant,
+} from '@shinefold/db/testing/test-tenant';
 
 import {
   clearUnsentStudioReinvite,
@@ -16,50 +15,36 @@ import {
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 usePersonalDataKeys();
 
-async function readStoredValue(tenantId: string) {
-  const [row] = await db()
-    .select({
-      value: schema.tenants.unsentReinviteFormerOwnerEmailEncrypted,
-    })
-    .from(schema.tenants)
-    .where(eq(schema.tenants.id, tenantId));
-  return row?.value;
-}
-
 describe('the unsent Studio re-invite', () => {
-  let tenantId: string;
+  describe('once stored', () => {
+    beforeEach(async () => {
+      await setUnsentStudioReinvite(tenant().id, MOCK_OWNER_EMAIL);
+    });
 
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
+    it('reads back the former owner email it stored', async () => {
+      const email = await getUnsentStudioReinviteEmail(tenant().id);
 
-  it('reads back the former owner email it stored', async () => {
-    await setUnsentStudioReinvite(tenantId, MOCK_OWNER_EMAIL);
+      expect(email).toBe(MOCK_OWNER_EMAIL);
+    });
 
-    const email = await getUnsentStudioReinviteEmail(tenantId);
+    it('never stores the address in readable form', async () => {
+      const { unsentReinviteFormerOwnerEmailEncrypted: stored } =
+        await readTestTenant(db(), tenant().id);
 
-    expect(email).toBe(MOCK_OWNER_EMAIL);
-  });
+      expect(stored).not.toContain(MOCK_OWNER_EMAIL);
+    });
 
-  it('never stores the address in readable form', async () => {
-    await setUnsentStudioReinvite(tenantId, MOCK_OWNER_EMAIL);
+    it('reads nothing once cleared', async () => {
+      await clearUnsentStudioReinvite(tenant().id);
 
-    const stored = await readStoredValue(tenantId);
-
-    expect(stored).not.toContain(MOCK_OWNER_EMAIL);
-  });
-
-  it('reads nothing once cleared', async () => {
-    await setUnsentStudioReinvite(tenantId, MOCK_OWNER_EMAIL);
-
-    await clearUnsentStudioReinvite(tenantId);
-
-    expect(await getUnsentStudioReinviteEmail(tenantId)).toBeNull();
+      expect(await getUnsentStudioReinviteEmail(tenant().id)).toBeNull();
+    });
   });
 
   it('reads nothing for a tenant that never had one', async () => {
-    expect(await getUnsentStudioReinviteEmail(tenantId)).toBeNull();
+    expect(await getUnsentStudioReinviteEmail(tenant().id)).toBeNull();
   });
 });

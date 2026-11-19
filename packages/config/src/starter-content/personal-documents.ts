@@ -8,6 +8,10 @@ import { buildFaqModule } from './starter-faq';
 import { keyedReference, paragraphs, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
 import {
+  INTRODUCTION_MODULE_TITLE,
+  QUESTIONS_MODULE_TITLE,
+} from './starter-module-titles';
+import {
   buildAuthor,
   buildCalloutCta,
   buildContentModule,
@@ -52,13 +56,13 @@ export function buildPersonalDocuments({
     }),
     buildContentModule({
       id: ids.PERSONAL_INTRO,
-      title: 'Introduction',
+      title: INTRODUCTION_MODULE_TITLE,
       locale,
       body: paragraphs(intro.body),
     }),
     ...buildFaqModule({
       id: ids.PERSONAL_FAQ,
-      title: 'Questions',
+      title: QUESTIONS_MODULE_TITLE,
       locale,
       faq,
     }),

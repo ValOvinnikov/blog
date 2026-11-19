@@ -1,12 +1,13 @@
 'use client';
 
-import { routes } from '@shinefold/config';
+import { routes, TEXT_ROLE } from '@shinefold/config';
 import { Button } from '@shinefold/ui/components/atoms/button';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Text } from '@shinefold/ui/components/atoms/text';
 import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
 import { errorBoundaryCopy } from '@web/components/shared/error-boundary-copy';
 import { errorPageLayoutVariants } from '@web/components/shared/error-page-layout';
+import { ERROR_BOUNDARY_LOG } from '@web/constants/error-boundary';
 import { reportClientError } from '@web/utils/report-client-error';
 import { useEffect, useRef } from 'react';
 
@@ -17,22 +18,16 @@ export type TGlobalErrorPageProps = {
 
 const s = errorPageLayoutVariants();
 
-/**
- * The content rendered inside `app/global-error.tsx`'s own `<html>`/`<body>`
- * — this boundary replaces the root layout entirely, so like `ErrorPage` it
- * can't assume `NextIntlClientProvider`, staying hardcoded English with a
- * plain anchor for "Go home" instead of `SmartLink`.
- */
+/** Replaces the root layout, so it has no `NextIntlClientProvider` and its copy stays hardcoded English. */
 export const GlobalErrorPage = ({ error, reset }: TGlobalErrorPageProps) => {
   const announcementRef = useRef<HTMLSpanElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    reportClientError('global_error_boundary.render_failed', error, {
+    reportClientError(ERROR_BOUNDARY_LOG.GLOBAL_RENDER_FAILED, error, {
       digest: error.digest,
     });
-    // Written after mount, not on first paint — a live region that's
-    // already populated when it enters the DOM is unreliably announced.
+    // A live region already populated when it mounts is unreliably announced.
     if (announcementRef.current) {
       announcementRef.current.textContent = errorBoundaryCopy.announcement;
     }
@@ -47,10 +42,10 @@ export const GlobalErrorPage = ({ error, reset }: TGlobalErrorPageProps) => {
         aria-atomic="true"
         className={s.announcement()}
       />
-      <Heading level={1} visual="hero">
+      <Heading level={1} visual={TEXT_ROLE.HERO_TITLE}>
         {errorBoundaryCopy.heading}
       </Heading>
-      <Text className={s.copy()}>
+      <Text textRole={TEXT_ROLE.INTRO} className={s.copy()}>
         An unexpected error occurred. Try reloading the page.
       </Text>
       <div className={s.actions()}>

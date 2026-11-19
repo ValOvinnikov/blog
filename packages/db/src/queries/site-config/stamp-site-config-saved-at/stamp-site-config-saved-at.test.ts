@@ -2,7 +2,7 @@ import { SITE_CONFIG_SAVED_AT } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
-import { MOCK_SITE_CONFIG_FIELDS } from '@shinefold/db/testing/site-config/fixtures';
+import { insertTestSiteConfig } from '@shinefold/db/testing/site-config/fixtures';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { stampSiteConfigSavedAt } from './stamp-site-config-saved-at';
@@ -23,10 +23,7 @@ describe(stampSiteConfigSavedAt, () => {
   ])(
     'stamps $savedAt, leaving every other column untouched',
     async ({ savedAt, stamped }) => {
-      const [before] = await db()
-        .insert(schema.siteConfig)
-        .values({ tenantId: tenant().id, ...MOCK_SITE_CONFIG_FIELDS })
-        .returning();
+      const before = await insertTestSiteConfig(db(), tenant().id);
 
       await stampSiteConfigSavedAt(tenant().id, savedAt);
 

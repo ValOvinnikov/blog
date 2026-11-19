@@ -1,5 +1,6 @@
 import { LOCALE_OPEN_GRAPH_TAGS } from '@shinefold/config';
 import type { TSeoResolved } from '@shinefold/service';
+import { hasLength } from '@shinefold/utils/primitives';
 import { routing } from '@web/i18n/routing';
 import { toMetadata, type TToMetadataOptions } from '@web/metadata/to-metadata';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -9,7 +10,10 @@ import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import { withLanguageAlternates } from '@web/utils/with-language-alternates';
 import type { Metadata } from 'next';
 
-type TToLocalizedPageMetadataOptions = Omit<TToMetadataOptions, 'canonical'> & {
+export type TToLocalizedPageMetadataOptions = Omit<
+  TToMetadataOptions,
+  'canonical'
+> & {
   href: string;
   translations: readonly TLanguagePage[];
 };
@@ -44,7 +48,7 @@ export const toLocalizedPageMetadata = async (
         ...metadata.openGraph,
         locale: LOCALE_OPEN_GRAPH_TAGS[locale],
         url: canonical,
-        ...(alternateLocales.length > 0 && {
+        ...(hasLength(alternateLocales) && {
           alternateLocale: alternateLocales,
         }),
       },

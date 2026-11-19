@@ -53,5 +53,3 @@ export const TENANT_UNRESOLVED_REASON = 'tenant_unresolved';
 export const REVALIDATE_SIGNATURE_MAX_AGE_MS = 5 * 60 * 1000;
 
 export const SIGNATURE_REFUSED_REASON = 'signature_refused';
-
-export const STARTER_DOCUMENT_ID_PREFIX = 'starter.';

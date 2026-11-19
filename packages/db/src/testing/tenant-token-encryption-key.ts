@@ -10,5 +10,9 @@ export function useTenantTokenEncryptionKey(): void {
   });
 }
 
+export function unsetTenantTokenEncryptionKey(): void {
+  vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
+}
+
 export const MISSING_TENANT_TOKEN_KEY_ERROR =
   'TENANT_TOKEN_ENCRYPTION_KEY is not configured.';

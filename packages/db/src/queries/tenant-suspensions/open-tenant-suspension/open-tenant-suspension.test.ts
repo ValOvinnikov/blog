@@ -1,9 +1,7 @@
 import { SUSPENSION_CATEGORY } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
-import {
-  insertTestAdmin,
-  insertTestTenant,
-} from '@shinefold/db/testing/fixtures';
+import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
+import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   insertTestTenantSuspension,

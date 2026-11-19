@@ -1,12 +1,11 @@
 import { faker } from '@faker-js/faker';
-import {
-  ADMIN_ROLE,
-  GRANTED_VIA,
-  type TAdminRole,
-} from '@shinefold/db/constants';
+import { ADMIN_ROLE, type TAdminRole } from '@shinefold/db/constants';
 import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@shinefold/db/schema';
-import { insertTestUser } from '@shinefold/db/testing/fixtures';
+import {
+  insertTestAdmin,
+  MOCK_SUPERADMIN_GRANT,
+} from '@shinefold/db/testing/admins/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { listSuperadminEmails } from './list-superadmin-emails';
@@ -26,12 +25,7 @@ async function insertAdmin(
   user: Partial<typeof schema.users.$inferInsert>,
   role: TAdminRole = ADMIN_ROLE.SUPERADMIN,
 ): Promise<void> {
-  const { id: userId } = await insertTestUser(db(), user);
-  await db().insert(schema.admins).values({
-    userId,
-    role,
-    grantedVia: GRANTED_VIA.BREAK_GLASS,
-  });
+  await insertTestAdmin(db(), user, { ...MOCK_SUPERADMIN_GRANT, role });
 }
 
 afterEach(async () => {
@@ -40,40 +34,43 @@ afterEach(async () => {
 });
 
 describe(listSuperadminEmails, () => {
-  it('lists the decrypted email of every SUPERADMIN', async () => {
-    await insertAdmin(userPersonalColumns({ email: MOCK_SUPER_ONE_EMAIL }));
-    await insertAdmin(userPersonalColumns({ email: MOCK_SUPER_TWO_EMAIL }));
+  describe('with a SUPERADMIN who has an address', () => {
+    beforeEach(async () => {
+      await insertAdmin(userPersonalColumns({ email: MOCK_SUPER_ONE_EMAIL }));
+    });
 
-    const emails = await listSuperadminEmails();
+    it('lists the decrypted email of every SUPERADMIN', async () => {
+      await insertAdmin(userPersonalColumns({ email: MOCK_SUPER_TWO_EMAIL }));
 
-    expect(emails.sort()).toEqual(
-      [MOCK_SUPER_ONE_EMAIL, MOCK_SUPER_TWO_EMAIL].sort(),
-    );
-  });
+      const emails = await listSuperadminEmails();
 
-  it('drops a SUPERADMIN with no address', async () => {
-    await insertAdmin({});
-    await insertAdmin(userPersonalColumns({ email: MOCK_SUPER_ONE_EMAIL }));
+      expect(emails.sort()).toEqual(
+        [MOCK_SUPER_ONE_EMAIL, MOCK_SUPER_TWO_EMAIL].sort(),
+      );
+    });
 
-    const emails = await listSuperadminEmails();
+    it('drops a SUPERADMIN with no address', async () => {
+      await insertAdmin({});
 
-    expect(emails).toEqual([MOCK_SUPER_ONE_EMAIL]);
-  });
+      const emails = await listSuperadminEmails();
 
-  it('excludes ADMIN and MODERATOR admins', async () => {
-    await insertAdmin(userPersonalColumns({ email: MOCK_SUPER_ONE_EMAIL }));
-    await insertAdmin(
-      userPersonalColumns({ email: MOCK_ADMIN_EMAIL }),
-      ADMIN_ROLE.ADMIN,
-    );
-    await insertAdmin(
-      userPersonalColumns({ email: MOCK_MODERATOR_EMAIL }),
-      ADMIN_ROLE.MODERATOR,
-    );
+      expect(emails).toEqual([MOCK_SUPER_ONE_EMAIL]);
+    });
 
-    const emails = await listSuperadminEmails();
+    it('excludes ADMIN and MODERATOR admins', async () => {
+      await insertAdmin(
+        userPersonalColumns({ email: MOCK_ADMIN_EMAIL }),
+        ADMIN_ROLE.ADMIN,
+      );
+      await insertAdmin(
+        userPersonalColumns({ email: MOCK_MODERATOR_EMAIL }),
+        ADMIN_ROLE.MODERATOR,
+      );
 
-    expect(emails).toEqual([MOCK_SUPER_ONE_EMAIL]);
+      const emails = await listSuperadminEmails();
+
+      expect(emails).toEqual([MOCK_SUPER_ONE_EMAIL]);
+    });
   });
 
   it('returns an empty array when there are no admins at all', async () => {

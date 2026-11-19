@@ -271,5 +271,78 @@
         "metaDescription": "Eine Beispielanleitung, erstellt mit deiner Website. Nutze sie für häufige Probleme, ihre Ursachen und Lösungen."
       }
     ]
+  },
+  "business": {
+    "hero": {
+      "eyebrow": "Willkommen",
+      "heading": "Klare, verlässliche Hilfe für Ihr Unternehmen",
+      "supportingText": "Sagen Sie in einem Satz, was Sie tun und für wen."
+    },
+    "intro": {
+      "body": [
+        "Wir helfen unseren Kunden, ihre Arbeit gut, pünktlich und ohne Überraschungen zu erledigen.",
+        "Ersetzen Sie diesen Text durch einen kurzen Überblick über Ihr Unternehmen: was Sie anbieten, für wen und was Sie auszeichnet."
+      ]
+    },
+    "faq": {
+      "heading": "Häufige Fragen",
+      "questions": [
+        {
+          "question": "Was bieten Sie an?",
+          "answer": [
+            "Fassen Sie Ihre wichtigsten Leistungen in ein, zwei Sätzen zusammen und verweisen Sie für Details auf die Seite Leistungen."
+          ]
+        },
+        {
+          "question": "Was kostet das?",
+          "answer": [
+            "Erklären Sie, wie Sie Ihre Preise gestalten, oder laden Sie Besucher ein, ein Angebot anzufragen."
+          ]
+        },
+        {
+          "question": "Wie fangen wir an?",
+          "answer": [
+            "Beschreiben Sie den ersten Schritt, etwa ein kurzes Gespräch oder ein schriftliches Briefing, und was danach passiert."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Sprechen wir",
+      "supportingText": "Sagen Sie uns, was Sie brauchen, und wir melden uns bei Ihnen."
+    },
+    "services": {
+      "title": "Leistungen",
+      "slug": "leistungen",
+      "summary": "Was wir anbieten und wie wir arbeiten.",
+      "body": [
+        "Beschreiben Sie jede Leistung in einem kurzen Absatz: was dazugehört und für wen sie gedacht ist.",
+        "Ergänzen Sie Preise, Pakete oder Beispiele früherer Arbeiten, sobald Sie welche haben."
+      ],
+      "metaTitle": "Leistungen — was wir anbieten und wie wir arbeiten",
+      "metaDescription": "Eine Beispielseite für Leistungen, mit Ihrer Website erstellt. Ersetzen Sie sie durch Ihr Angebot."
+    },
+    "about": {
+      "title": "Über uns",
+      "slug": "ueber-uns",
+      "summary": "Wer wir sind und wofür wir stehen.",
+      "body": [
+        "Erzählen Sie Besuchern, wie das Unternehmen entstanden ist, wer dahintersteht und was Ihnen wichtig ist.",
+        "Ein paar Zeilen genügen. Fügen Sie Fotos des Teams hinzu, sobald Sie welche haben."
+      ],
+      "metaTitle": "Über uns — wer wir sind und wofür wir stehen",
+      "metaDescription": "Eine Beispielseite über Ihr Unternehmen, mit Ihrer Website erstellt. Zeigen Sie, wer dahintersteht."
+    },
+    "contact": {
+      "title": "Kontakt",
+      "slug": "kontakt",
+      "summary": "So erreichen Sie uns.",
+      "body": [
+        "Nennen Sie Besuchern den besten Weg, Sie zu erreichen: eine E-Mail-Adresse, eine Telefonnummer oder beides.",
+        "Ergänzen Sie Ihre Öffnungszeiten und Ihren Standort, und sagen Sie, wie schnell Sie meist antworten."
+      ],
+      "metaTitle": "Kontakt — so erreichen Sie uns und wann wir antworten",
+      "metaDescription": "Eine Beispielseite für den Kontakt, mit Ihrer Website erstellt. Fügen Sie E-Mail, Telefon und Öffnungszeiten hinzu."
+    }
   }
 }

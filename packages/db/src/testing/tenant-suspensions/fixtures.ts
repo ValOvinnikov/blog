@@ -1,6 +1,7 @@
 import { SUSPENSION_CATEGORY } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import type { TTenantSuspension } from '@shinefold/db/schema/tenant-suspensions';
+import { useTestAdmin } from '@shinefold/db/testing/admins/fixtures';
 import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
 import type { TTestDb } from '@shinefold/db/testing/fixtures';
 import { createMockFaker } from '@shinefold/db/testing/mock-faker';
@@ -32,4 +33,14 @@ export async function insertTestTenantSuspension(
 
 export function toReferenceNumber({ reference }: TTenantSuspension): number {
   return Number(reference.slice(reference.indexOf('-') + 1));
+}
+
+export function useSuspensionAdmin(db: () => TTestDb): () => string {
+  const admin = useTestAdmin(db);
+
+  afterEach(async () => {
+    await db().delete(schema.tenantSuspensions);
+  });
+
+  return admin;
 }

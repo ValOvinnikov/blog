@@ -1,48 +1,30 @@
 import { TAXONOMY_KIND } from '@shinefold/config';
-import { FaqPageSchema } from '@web/components/features/faq-page-schema';
 import { TagBreadcrumbs } from '@web/components/features/tag/tag-breadcrumbs';
-import { PageShell } from '@web/components/page-templates/page-shell';
+import { TaxonomyPage } from '@web/components/pages/taxonomy-page';
 import { TAG_LOG } from '@web/constants/tag';
 import { getTagPage } from '@web/server/tag/get-tag-page/get-tag-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
-import { TagModuleRenderer } from './tag-module-renderer';
-
-type TTagPageProps = {
+interface ITagPageProps {
   slug: string;
   page?: number;
-};
+}
 
-export const TagPage = async ({ slug, page }: TTagPageProps) => {
+export const TagPage = async ({ slug, page }: ITagPageProps) => {
   const result = await getTagPage(slug);
   const pageData = guardPageLoaderResult(result, TAG_LOG.PAGE_FETCH_FAILED, {
     slug,
   });
-  const { tag, headingBlock, headingAlignment, hero, modules, faqs } = pageData;
-
-  const currentPage = page ?? 1;
+  const { tag, hero } = pageData;
 
   return (
-    <PageShell>
-      <PageShell.Breadcrumbs>
-        <TagBreadcrumbs slug={slug} isAbovePageHeading={!hero} />
-      </PageShell.Breadcrumbs>
-      <FaqPageSchema faqs={faqs} />
-      <TagModuleRenderer
-        hero={hero}
-        headingBlock={headingBlock}
-        headingAlignment={headingAlignment}
-        modules={modules}
-        context={{
-          page: currentPage,
-          archive: {
-            id: tag.id,
-            kind: TAXONOMY_KIND.TAGS,
-            slug,
-            name: tag.title,
-          },
-        }}
-      />
-    </PageShell>
+    <TaxonomyPage
+      kind={TAXONOMY_KIND.TAGS}
+      slug={slug}
+      page={page}
+      term={tag}
+      pageData={pageData}
+      breadcrumbs={<TagBreadcrumbs slug={slug} isAbovePageHeading={!hero} />}
+    />
   );
 };

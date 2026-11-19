@@ -10,7 +10,7 @@ export const pageHeadingVariants = tv({
     inner: ['mx-auto w-full max-w-page px-gutter'],
     text: ['max-w-prose'],
     heading: [],
-    supportingText: ['text-muted'],
+    supportingText: [],
   },
   variants: {
     align: {

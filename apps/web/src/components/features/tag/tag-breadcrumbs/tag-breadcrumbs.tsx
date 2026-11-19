@@ -1,54 +1,29 @@
 import { routes } from '@shinefold/config';
-import {
-  Breadcrumbs,
-  type IBreadcrumbItem,
-} from '@shinefold/ui/components/molecules/breadcrumbs';
-import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
-import { JsonLd } from '@web/components/shared/json-ld';
-import { SmartLink } from '@web/components/shared/smart-link';
+import { TaxonomyBreadcrumbs } from '@web/components/shared/taxonomy-breadcrumbs';
 import { TAG_LOG } from '@web/constants/tag';
-import { getHomeBreadcrumb } from '@web/server/site-settings/get-home-breadcrumb/get-home-breadcrumb';
 import { getTagPage } from '@web/server/tag/get-tag-page/get-tag-page';
-import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
-import { getTranslations } from 'next-intl/server';
 
-export type TTagBreadcrumbsProps = {
+interface ITagBreadcrumbsProps {
   slug: string;
   isAbovePageHeading?: boolean;
-};
+}
 
 export const TagBreadcrumbs = async ({
   slug,
   isAbovePageHeading,
-}: TTagBreadcrumbsProps) => {
+}: ITagBreadcrumbsProps) => {
   const result = await getTagPage(slug);
-  const page = guardPageLoaderResult(result, TAG_LOG.BREADCRUMBS_FETCH_FAILED, {
-    slug,
-  });
-  const { tag } = page;
-
-  const [homeBreadcrumb, t] = await Promise.all([
-    getHomeBreadcrumb(),
-    getTranslations('breadcrumbs'),
-  ]);
-
-  const breadcrumbTrail: IBreadcrumbItem[] = [
-    homeBreadcrumb,
-    { label: tag.title, href: routes.tag(slug) },
-  ];
-  const breadcrumbListSchema = await buildBreadcrumbListSchema(breadcrumbTrail);
+  const { tag } = guardPageLoaderResult(
+    result,
+    TAG_LOG.BREADCRUMBS_FETCH_FAILED,
+    { slug },
+  );
 
   return (
-    <>
-      {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
-      <BreadcrumbBar isAbovePageHeading={isAbovePageHeading}>
-        <Breadcrumbs
-          items={breadcrumbTrail}
-          ariaLabel={t('ariaLabel')}
-          linkAs={SmartLink}
-        />
-      </BreadcrumbBar>
-    </>
+    <TaxonomyBreadcrumbs
+      term={{ label: tag.title, href: routes.tag(slug) }}
+      isAbovePageHeading={isAbovePageHeading}
+    />
   );
 };

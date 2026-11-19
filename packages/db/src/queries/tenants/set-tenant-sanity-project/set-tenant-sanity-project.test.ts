@@ -1,6 +1,4 @@
 import * as schema from '@shinefold/db/schema';
-import type { TTenant } from '@shinefold/db/schema/tenants';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
@@ -8,12 +6,17 @@ import {
   MOCK_SANITY_PROJECT_ID,
 } from '@shinefold/db/testing/sanity-management-client/fixtures';
 import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { setTenantSanityProject } from './set-tenant-sanity-project';
 
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db, {
+  sanityProjectId: null,
+  sanityDataset: null,
+});
 useFrozenClock();
 
 const MOCK_SANITY_PROJECT = {
@@ -21,26 +24,13 @@ const MOCK_SANITY_PROJECT = {
   sanityDataset: MOCK_SANITY_DATASET,
 };
 
-afterEach(async () => {
-  await db().delete(schema.tenants);
-});
-
 describe(setTenantSanityProject, () => {
-  let tenant: TTenant;
-
-  beforeEach(async () => {
-    tenant = await insertTestTenant(db(), {
-      sanityProjectId: null,
-      sanityDataset: null,
-    });
-  });
-
   it('sets the Sanity project id and dataset, leaving every other column untouched', async () => {
-    await setTenantSanityProject(tenant.id, MOCK_SANITY_PROJECT);
+    await setTenantSanityProject(tenant().id, MOCK_SANITY_PROJECT);
 
     const rows = await db().select().from(schema.tenants);
     expect(rows).toEqual([
-      { ...tenant, ...MOCK_SANITY_PROJECT, updatedAt: MOCK_NOW },
+      { ...tenant(), ...MOCK_SANITY_PROJECT, updatedAt: MOCK_NOW },
     ]);
   });
 
@@ -48,6 +38,6 @@ describe(setTenantSanityProject, () => {
     await setTenantSanityProject(MOCK_MISSING_TENANT_ID, MOCK_SANITY_PROJECT);
 
     const rows = await db().select().from(schema.tenants);
-    expect(rows).toEqual([tenant]);
+    expect(rows).toEqual([tenant()]);
   });
 });

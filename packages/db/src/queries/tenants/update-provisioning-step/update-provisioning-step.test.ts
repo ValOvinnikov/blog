@@ -6,8 +6,6 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   WORKER_PROVISIONING_STEP,
 } from '@shinefold/db/constants';
-import * as schema from '@shinefold/db/schema';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
@@ -17,12 +15,17 @@ import {
   MOCK_STEP_ERROR,
   unwrapOk,
 } from '@shinefold/db/testing/tenants/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { updateProvisioningStep } from './update-provisioning-step';
 
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db, {
+  provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+  provisioningSteps: MOCK_IDLE_PROVISIONING_STEPS,
+});
 useFrozenClock(new Date(MOCK_RUN_AT));
 
 const { SANITY_PROJECT, SEED_CONTENT, MAP_DOMAIN, OWNER_ELEVATION } =
@@ -30,24 +33,11 @@ const { SANITY_PROJECT, SEED_CONTENT, MAP_DOMAIN, OWNER_ELEVATION } =
 const { RUNNING, DONE, FAILED } = TENANT_PROVISIONING_STEP_STATUS;
 const { STALLED } = ELEVATE_TENANT_OWNER_OUTCOME;
 
-afterEach(async () => {
-  await db().delete(schema.tenants);
-});
-
 describe(updateProvisioningStep, () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db(), {
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-      provisioningSteps: MOCK_IDLE_PROVISIONING_STEPS,
-    }));
-  });
-
   it('updates only the given step, leaving every other step untouched', async () => {
     const { provisioningSteps } = unwrapOk(
       await updateProvisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: SANITY_PROJECT,
         status: RUNNING,
       }),
@@ -61,13 +51,13 @@ describe(updateProvisioningStep, () => {
 
   it('does not clobber an earlier updated step when a later one is updated', async () => {
     await updateProvisioningStep({
-      tenantId,
+      tenantId: tenant().id,
       step: SANITY_PROJECT,
       status: DONE,
     });
     const { provisioningSteps } = unwrapOk(
       await updateProvisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: SEED_CONTENT,
         status: RUNNING,
       }),
@@ -83,7 +73,7 @@ describe(updateProvisioningStep, () => {
   it('stores the error message only when one is supplied', async () => {
     const { provisioningSteps } = unwrapOk(
       await updateProvisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: SANITY_PROJECT,
         status: FAILED,
         error: MOCK_STEP_ERROR,
@@ -100,7 +90,7 @@ describe(updateProvisioningStep, () => {
   it('stores the detail only when one is supplied', async () => {
     const { provisioningSteps } = unwrapOk(
       await updateProvisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: OWNER_ELEVATION,
         status: DONE,
         detail: STALLED,
@@ -117,7 +107,7 @@ describe(updateProvisioningStep, () => {
   it('stores when the step started failing, replaced by the next write without one', async () => {
     const failing = unwrapOk(
       await updateProvisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: OWNER_ELEVATION,
         status: DONE,
         failingSince: MOCK_RUN_AT,
@@ -125,7 +115,7 @@ describe(updateProvisioningStep, () => {
     );
     const recovered = unwrapOk(
       await updateProvisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: OWNER_ELEVATION,
         status: DONE,
       }),
@@ -145,7 +135,7 @@ describe(updateProvisioningStep, () => {
   it('leaves the overall provisioningStatus untouched when not supplied', async () => {
     const { provisioningStatus } = unwrapOk(
       await updateProvisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: SANITY_PROJECT,
         status: DONE,
       }),
@@ -157,7 +147,7 @@ describe(updateProvisioningStep, () => {
   it('updates the overall provisioningStatus when supplied on the last step', async () => {
     const { provisioningStatus, provisioningSteps } = unwrapOk(
       await updateProvisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: MAP_DOMAIN,
         status: DONE,
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
@@ -174,7 +164,7 @@ describe(updateProvisioningStep, () => {
   it('leaves lastNotifiedOwnerElevationOutcome untouched when not supplied', async () => {
     const { lastNotifiedOwnerElevationOutcome } = unwrapOk(
       await updateProvisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: OWNER_ELEVATION,
         status: DONE,
         detail: STALLED,
@@ -187,7 +177,7 @@ describe(updateProvisioningStep, () => {
   it('records the notified owner-elevation outcome alongside the step detail', async () => {
     const { lastNotifiedOwnerElevationOutcome, provisioningSteps } = unwrapOk(
       await updateProvisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: OWNER_ELEVATION,
         status: DONE,
         detail: STALLED,
@@ -206,7 +196,7 @@ describe(updateProvisioningStep, () => {
   it('adds a worker unit step alongside the existing steps', async () => {
     const { provisioningSteps } = unwrapOk(
       await updateProvisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: WORKER_PROVISIONING_STEP.ENSURE_INFRASTRUCTURE,
         status: DONE,
       }),
