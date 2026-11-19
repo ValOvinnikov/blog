@@ -15,6 +15,7 @@ import {
   getTenantSanityCredentials,
 } from '@shinefold/db/queries/tenants';
 import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
+import type { TResolvableGrant } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 import { NEWSLETTER_POST_STATE } from '@worker/constants/newsletter-send';
 import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
 import { MOCK_ONE_HOUR_MS } from '@worker/testing/clock/frozen-clock';
@@ -41,6 +42,15 @@ vi.mock('@worker/utils/newsletter-send/read-newsletter-post');
 
 const MOCK_NOW = new Date('2031-05-15T12:00:00Z');
 const CANCELLED = { state: NEWSLETTER_POST_STATE.CANCELLED };
+
+function arrangeClosedNewsletterGrant(closed: Partial<TResolvableGrant>) {
+  vi.mocked(getTenantById).mockResolvedValue(
+    mockTenant({ plan: TENANT_PLAN.FREE }),
+  );
+  vi.mocked(listResolvableEntitlementGrants).mockResolvedValue([
+    mockEntitlementGrant({ key: CAPABILITY.NEWSLETTER, ...closed }),
+  ]);
+}
 
 function runCheck() {
   return checkNewsletterPost(MOCK_TENANT_ID, MOCK_POST_ID, MOCK_CLAIMED_AT);
@@ -151,6 +161,14 @@ describe(checkNewsletterPost, () => {
             status: TENANT_STATUS.SUSPENDED,
           }),
         ),
+    ],
+    [
+      'an expired newsletter grant on a plan without it',
+      () => arrangeClosedNewsletterGrant({ expiresAt: new Date(0) }),
+    ],
+    [
+      'a revoked newsletter grant on a plan without it',
+      () => arrangeClosedNewsletterGrant({ revokedAt: new Date(0) }),
     ],
     [
       'the Newsletter switch off',
