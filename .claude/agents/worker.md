@@ -83,7 +83,8 @@ default to zero".
   returning a result: `ensureInfrastructure` (project, dataset, CORS, tokens,
   webhook; the custom domain only when one exists), `inviteOwner`,
   `applySiteTemplate(siteType, plan, locale)`, `verifyTenant`,
-  `ensureOwnerAccess`. A unit never reaches into another's state.
+  `ensureOwnerAccess`. `removeSampleContent` runs on an owner's request,
+  outside provisioning (`docs/features/site-templates.md`). A unit never reaches into another's state.
 - **Deprovisioning** (`deprovisionTenant`) runs `runDeprovisioningStep` once
   per `DEPROVISIONING_STEP`, in the CLI's order, reusing `@shinefold/db`'s shared
   pieces (`purgeTenantReaderData`, `deleteVercelProjectDomain`,

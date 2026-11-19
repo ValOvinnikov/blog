@@ -5,6 +5,8 @@ layers: [config, worker, db, studio]
 code:
   - packages/config/src/starter-content/**
   - apps/worker/src/units/apply-site-template.ts
+  - apps/worker/src/units/remove-sample-content.ts
+  - apps/worker/src/utils/sample-content/**
   - apps/worker/src/steps/seed-content.ts
   - apps/worker/src/utils/migration-ledger/**
   - packages/db/src/queries/site-config/insert-site-config-if-missing/**
@@ -48,6 +50,14 @@ No route of its own. The seeded documents are what the public site renders and w
 - **Every seeded document is schema-valid.** No placeholder images: no Blog or Blank field needs one, and the hero renders without media.
 - **No Growth layer yet.** Every built type seeds the same documents on every plan; Growth layers (Portfolio's, Personal's and Business's), their placeholder images and applying them on upgrade are #5714.
 
+## Removing samples
+
+The worker's `removeSampleContent(tenantId)` unit clears the samples in one Sanity transaction and returns what it removed, what it kept as **edited** and what it kept as **referenced**. The owner-facing action is #4972.
+
+- **Edited** — a `starter.*` document changed since seeding (`_updatedAt` differs from `_createdAt`), or one with a pending draft or release version, is kept.
+- **Unlinked** — each unedited sample is deleted, and the array items referencing it are removed by `_key` from the seeded home template's modules, the navigation's links and the post-index template's modules, guarded by each document's revision.
+- **Referenced** — an unedited sample is kept when a single field holds it (the home hero, the topic and tag index templates), when the array item holding it also holds something else (a navigation link with the owner's sub-items, so no array drops below its minimum), or when any other document references it: the owner's own content, a draft, or an edited sample. A kept document keeps the samples it references in turn.
+
 ## Dependencies
 
 [Tenant provisioning](tenant-provisioning.md) runs the `applySiteTemplate` unit (`SEED_CONTENT` step). [Cross-tenant migrations](cross-tenant-migrations.md) seeds the index pages for tenants seeded before templates, and reads the migration ledger the seed writes.
@@ -57,6 +67,7 @@ No route of its own. The seeded documents are what the public site renders and w
 - `packages/studio/src/starter-content.test.ts` — every Blog, Portfolio, Personal, Docs, Business and Blank document passes Studio validation in every default language.
 - `packages/config/src/starter-content/starter-content.test.ts` — ids are stable and unique, every reference resolves, values carry the requested locale, SEO stays within its bounds.
 - `packages/config/src/starter-content/copy/starter-copy.test.ts` — every locale matches the `en` catalogue's shape.
+- `apps/worker/src/units/remove-sample-content.test.ts`, `apps/worker/src/utils/sample-content/plan-sample-content-removal.test.ts` — what is removed, unlinked and kept, and why.
 - `apps/worker/src/units/apply-site-template.test.ts`, `apps/worker/src/steps/seed-content.test.ts`, `apps/worker/src/utils/migration-ledger/migration-ledger.test.ts`.
 
 ## Related epics

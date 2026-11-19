@@ -3736,6 +3736,14 @@
         "file": "packages/config/src/constants/sanity-perspective.ts"
       }
     ],
+    "raw": [
+      {
+        "ref": "SANITY_PERSPECTIVE.RAW",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/sanity-perspective.ts"
+      }
+    ],
     "ALREADY_GONE": [
       {
         "ref": "SANITY_PROJECT_DELETE_OUTCOME.ALREADY_GONE",
@@ -12902,6 +12910,14 @@
         "scope": "app:worker",
         "from": "@worker/constants/revalidate-webhook",
         "file": "apps/worker/src/constants/revalidate-webhook.ts"
+      }
+    ],
+    "sample_content.removal_failed": [
+      {
+        "ref": "SAMPLE_CONTENT_LOG.REMOVAL_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/sample-content",
+        "file": "apps/worker/src/constants/sample-content.ts"
       }
     ],
     "scheduled_post_purge.start_failed": [

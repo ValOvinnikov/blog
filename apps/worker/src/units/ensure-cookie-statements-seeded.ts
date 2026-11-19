@@ -1,13 +1,10 @@
 import { buildStarterCookieStatement } from '@shinefold/config';
 import type { TLocaleIsoCode } from '@shinefold/config/constants';
-import { getTenantSanityWriteCredentials } from '@shinefold/db/queries/tenants';
 import { sanitizeLogMessage } from '@shinefold/insight';
 import { COOKIE_STATEMENT_LOG } from '@worker/constants/cookie-statement';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
-import { SANITY_API_VERSION } from '@worker/constants/sanity-api';
 import { logger } from '@worker/utils/logger/logger';
-import { createClientWithTimeout } from '@worker/utils/step-deps/step-deps';
-import { FatalError } from 'workflow';
+import { createTenantWriteClient } from '@worker/utils/tenant-content/tenant-write-client';
 
 import { isFinalStepAttempt } from './run-reported-step';
 
@@ -18,21 +15,7 @@ export async function ensureCookieStatementsSeeded(
   'use step';
 
   try {
-    const credentials = await getTenantSanityWriteCredentials(tenantId);
-    if (!credentials) {
-      throw new FatalError(
-        `Tenant "${tenantId}" has no Sanity write credentials.`,
-      );
-    }
-
-    const { projectId, dataset, token } = credentials;
-    const transaction = createClientWithTimeout({
-      projectId,
-      dataset,
-      token,
-      apiVersion: SANITY_API_VERSION,
-      useCdn: false,
-    }).transaction();
+    const transaction = (await createTenantWriteClient(tenantId)).transaction();
     for (const locale of locales) {
       transaction.createIfNotExists(buildStarterCookieStatement(locale));
     }
