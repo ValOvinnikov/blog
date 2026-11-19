@@ -1,4 +1,9 @@
-import { INTERACTIVE_ITEM_CARD, tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import {
+  INTERACTIVE_ITEM_CARD,
+  tv,
+  TYPOGRAPHY,
+} from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const quoteCardVariants = tv({
@@ -7,7 +12,7 @@ export const quoteCardVariants = tv({
     quoteMark: ['text-brand-primary'],
     caption: ['mt-auto flex items-center gap-3'],
     person: ['flex flex-col justify-center'],
-    role: ['text-sm text-subtle'],
+    role: [TYPOGRAPHY[TEXT_ROLE.META]],
   },
   variants: {
     align: {
