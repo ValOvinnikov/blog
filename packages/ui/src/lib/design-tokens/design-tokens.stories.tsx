@@ -6,6 +6,7 @@ import { ColorTable } from './components/color-table';
 import { KvList } from './components/kv-list';
 import { ShapeSample } from './components/shape-sample';
 import { SpacingSample } from './components/spacing-sample';
+import { TextRoleSpecimens } from './components/text-role-specimens';
 import { TokenSection } from './components/token-section';
 import { TypeSpecimens } from './components/type-specimens';
 import type { TToken } from './parse-theme-tokens';
@@ -40,6 +41,14 @@ export const Typography: TStory = {
     section('Typography', tokensByCategory.typography, (t) => (
       <TypeSpecimens tokens={t} />
     )),
+};
+
+export const TextRoles: TStory = {
+  render: () => (
+    <TokenSection title="Text roles">
+      <TextRoleSpecimens />
+    </TokenSection>
+  ),
 };
 
 export const Fonts: TStory = {
