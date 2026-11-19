@@ -1,4 +1,5 @@
 import { routes } from '@shinefold/config';
+import { OG_TYPE } from '@web/constants/metadata';
 import { TAG_LOG } from '@web/constants/tag';
 import { toPaginatedPageMetadata } from '@web/metadata/to-paginated-page-metadata';
 import { getTagPage } from '@web/server/tag/get-tag-page/get-tag-page';
@@ -29,7 +30,7 @@ export const buildTagMetadata = async (
       language,
       href: routes.tag(translatedSlug),
     })),
-    ogType: 'website',
+    ogType: OG_TYPE.WEBSITE,
     feedUrl: routes.tagRssFeed(slug),
   });
 };

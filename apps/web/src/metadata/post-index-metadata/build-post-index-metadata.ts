@@ -1,4 +1,5 @@
 import { routes } from '@shinefold/config';
+import { OG_TYPE } from '@web/constants/metadata';
 import { POST_INDEX_LOG } from '@web/constants/post-index';
 import { toPaginatedPageMetadata } from '@web/metadata/to-paginated-page-metadata';
 import { getPostIndexPage } from '@web/server/post-index/get-post-index-page/get-post-index-page';
@@ -31,7 +32,7 @@ export const buildPostIndexMetadata = async (
       language,
       href: routes.blogIndex(),
     })),
-    ogType: 'website',
+    ogType: OG_TYPE.WEBSITE,
     feedUrl: routes.rssFeed(),
   });
 };

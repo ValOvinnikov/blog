@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
+import { OG_TYPE } from '@web/constants/metadata';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   MOCK_BILINGUAL_REQUEST_CONTEXT,
@@ -28,7 +29,7 @@ const buildForPage = (page: number, seo = MOCK_SEO) =>
     page,
     href: routes.blogIndex(page),
     translations: MOCK_TRANSLATIONS,
-    ogType: 'website',
+    ogType: OG_TYPE.WEBSITE,
   });
 
 describe(toPaginatedPageMetadata, () => {

@@ -1,4 +1,5 @@
 import { routes } from '@shinefold/config';
+import { OG_TYPE } from '@web/constants/metadata';
 import { TOPIC_LOG } from '@web/constants/topic';
 import { toPaginatedPageMetadata } from '@web/metadata/to-paginated-page-metadata';
 import { getTopicPage } from '@web/server/topic/get-topic-page/get-topic-page';
@@ -32,6 +33,6 @@ export const buildTopicMetadata = async (
       language,
       href: routes.topic(translatedSlug),
     })),
-    ogType: 'website',
+    ogType: OG_TYPE.WEBSITE,
   });
 };
