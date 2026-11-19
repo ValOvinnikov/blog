@@ -9,18 +9,17 @@ import type { TModuleInput } from './starter-modules';
 
 export function buildStatementHero({
   id,
-  title,
   locale,
   hero: { eyebrow, heading, supportingText },
   linkId,
-}: TModuleInput & {
+}: Omit<TModuleInput, 'title'> & {
   hero: { eyebrow: string; heading: string; supportingText: string };
   linkId: string;
 }): TStarterModule<Module_heroStatement> {
   return {
     _id: id,
     _type: 'module_heroStatement',
-    title,
+    title: 'Statement Hero',
     brandVariant: BRAND_VARIANT.PRIMARY,
     variant: HERO_VARIANT.STACKED,
     headingBlock: moduleHeadingBlock(locale, heading, supportingText),

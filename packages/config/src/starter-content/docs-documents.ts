@@ -7,6 +7,10 @@ import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import { buildFaqModule } from './starter-faq';
 import { keyedReference, paragraphs, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
+import {
+  INTRODUCTION_MODULE_TITLE,
+  QUESTIONS_MODULE_TITLE,
+} from './starter-module-titles';
 import { buildContentModule } from './starter-modules';
 import { buildSectionPages } from './starter-section-pages';
 import { buildStatementHero } from './starter-statement-hero';
@@ -34,18 +38,22 @@ export function buildDocsDocuments({
     }),
     buildStatementHero({
       id: ids.DOCS_HERO,
-      title: 'Statement Hero',
       locale,
       hero,
       linkId: ids.DOCS_GUIDES_LINK,
     }),
     buildContentModule({
       id: ids.DOCS_INTRO,
-      title: 'Introduction',
+      title: INTRODUCTION_MODULE_TITLE,
       locale,
       body: paragraphs(intro.body),
     }),
-    ...buildFaqModule({ id: ids.DOCS_FAQ, title: 'Questions', locale, faq }),
+    ...buildFaqModule({
+      id: ids.DOCS_FAQ,
+      title: QUESTIONS_MODULE_TITLE,
+      locale,
+      faq,
+    }),
     internalLink(ids.DOCS_GUIDES_LINK, guides.title, locale, ids.DOCS_GUIDES),
     ...buildSectionPages({
       locale,

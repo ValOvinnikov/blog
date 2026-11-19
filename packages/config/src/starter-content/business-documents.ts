@@ -8,6 +8,10 @@ import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import { buildFaqModule } from './starter-faq';
 import { keyedReference, paragraphs, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
+import {
+  INTRODUCTION_MODULE_TITLE,
+  QUESTIONS_MODULE_TITLE,
+} from './starter-module-titles';
 import { buildCalloutCta, buildContentModule } from './starter-modules';
 import { buildStatementHero } from './starter-statement-hero';
 
@@ -53,20 +57,19 @@ export function buildBusinessDocuments({
     }),
     buildStatementHero({
       id: ids.BUSINESS_HERO,
-      title: 'Statement Hero',
       locale,
       hero,
       linkId: ids.BUSINESS_SERVICES_LINK,
     }),
     buildContentModule({
       id: ids.BUSINESS_INTRO,
-      title: 'Introduction',
+      title: INTRODUCTION_MODULE_TITLE,
       locale,
       body: paragraphs(intro.body),
     }),
     ...buildFaqModule({
       id: ids.BUSINESS_FAQ,
-      title: 'Questions',
+      title: QUESTIONS_MODULE_TITLE,
       locale,
       faq,
     }),

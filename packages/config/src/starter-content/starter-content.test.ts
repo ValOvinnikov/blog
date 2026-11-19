@@ -64,6 +64,19 @@ function findByType<TType extends TStarterType>(
   return document;
 }
 
+const byId = (documents: TStarterDocumentUnion[], id?: string) =>
+  documents.find(({ _id }) => _id === id);
+
+const pageBehind = (documents: TStarterDocumentUnion[], linkId?: string) => {
+  const link = byId(documents, linkId);
+  return link && 'internalReference' in link
+    ? byId(documents, link.internalReference?._ref)
+    : undefined;
+};
+
+const slugOf = (document?: TStarterDocumentUnion) =>
+  document && 'slug' in document ? document.slug?.current : undefined;
+
 function referencedIds(documents: TStarterDocumentUnion[]): string[] {
   const ids: string[] = [];
   JSON.stringify(documents, (key, value: unknown) => {
@@ -212,22 +225,19 @@ describe(buildStarterDocuments, () => {
     '%s in %s seeds a legal hub whose modules link the cookie statement',
     (siteType, locale) => {
       const documents = build(siteType, locale);
-      const byId = (id?: string) => documents.find(({ _id }) => _id === id);
       const { template } = findByType(documents, 'page_legalIndex');
-      const legalTemplate = byId(template._ref);
+      const legalTemplate = byId(documents, template._ref);
       const linkedIds = referencedIds(
         legalTemplate && 'modules' in legalTemplate
           ? (legalTemplate.modules ?? []).flatMap(({ _ref }) => {
-              const module = byId(_ref);
+              const module = byId(documents, _ref);
               return module ? [module] : [];
             })
           : [],
       );
       const linkTargets = linkedIds.flatMap((id) => {
-        const link = byId(id);
-        return link && 'internalReference' in link
-          ? [byId(link.internalReference?._ref)?._type]
-          : [];
+        const page = pageBehind(documents, id);
+        return page ? [page._type] : [];
       });
 
       expect(linkTargets).toEqual([COOKIE_STATEMENT_TYPE]);
@@ -255,18 +265,17 @@ describe(buildStarterDocuments, () => {
 
   it('opens the Blog home with a hero pinning a post, then posts, topics and a CTA', () => {
     const documents = build(SITE_TYPE.BLOG);
-    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
     const { hero, modules = [] } = findByType(documents, 'template_home');
-    const heroDocument = byId(hero?._ref);
+    const heroDocument = byId(documents, hero?._ref);
     const pinned =
       heroDocument && 'post' in heroDocument
-        ? byId(heroDocument.post?._ref)
+        ? byId(documents, heroDocument.post?._ref)
         : undefined;
 
     const sequence = [
       heroDocument,
       pinned,
-      ...modules.map(({ _ref }) => byId(_ref)),
+      ...modules.map(({ _ref }) => byId(documents, _ref)),
     ].map((document) => ({ _type: document?._type }));
 
     expect(sequence).toEqual([
@@ -288,19 +297,13 @@ describe(buildStarterDocuments, () => {
 
   it('opens the Personal home with a profile hero, then an introduction, questions and a CTA to the post index', () => {
     const documents = build(SITE_TYPE.PERSONAL);
-    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
     const { hero, modules = [] } = findByType(documents, 'template_home');
     const cta = findByType(documents, 'module_cta');
-    const ctaLink = byId(cta.ctaButtons?.[0]?.link?._ref);
-    const ctaTarget =
-      ctaLink && 'internalReference' in ctaLink
-        ? byId(ctaLink.internalReference?._ref)
-        : undefined;
 
     const sequence = [
-      byId(hero?._ref),
-      ...modules.map(({ _ref }) => byId(_ref)),
-      ctaTarget,
+      byId(documents, hero?._ref),
+      ...modules.map(({ _ref }) => byId(documents, _ref)),
+      pageBehind(documents, cta.ctaButtons?.[0]?.link?._ref),
     ].map((document) => ({ _type: document?._type }));
 
     expect(sequence).toEqual([
@@ -314,21 +317,16 @@ describe(buildStarterDocuments, () => {
 
   it('opens the Docs home with a statement hero linking to the guides, then an introduction and questions', () => {
     const documents = build(SITE_TYPE.DOCS);
-    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
     const { hero, modules = [] } = findByType(documents, 'template_home');
-    const heroDocument = byId(hero?._ref);
-    const heroLink =
-      heroDocument && 'ctaButtons' in heroDocument
-        ? byId(heroDocument.ctaButtons?.[0]?.link?._ref)
-        : undefined;
+    const heroDocument = byId(documents, hero?._ref);
     const heroTarget =
-      heroLink && 'internalReference' in heroLink
-        ? byId(heroLink.internalReference?._ref)
+      heroDocument && 'ctaButtons' in heroDocument
+        ? pageBehind(documents, heroDocument.ctaButtons?.[0]?.link?._ref)
         : undefined;
 
     const sequence = [
       heroDocument,
-      ...modules.map(({ _ref }) => byId(_ref)),
+      ...modules.map(({ _ref }) => byId(documents, _ref)),
       heroTarget,
     ].map((document) => ({ _type: document?._type }));
 
@@ -359,16 +357,6 @@ describe(buildStarterDocuments, () => {
   describe('the Business site', () => {
     let documents: TStarterDocumentUnion[];
 
-    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
-    const pageBehind = (linkId?: string) => {
-      const link = byId(linkId);
-      return link && 'internalReference' in link
-        ? byId(link.internalReference?._ref)
-        : undefined;
-    };
-    const slugOf = (document?: TStarterDocumentUnion) =>
-      document && 'slug' in document ? document.slug?.current : undefined;
-
     beforeEach(() => {
       documents = build(SITE_TYPE.BUSINESS);
     });
@@ -376,14 +364,16 @@ describe(buildStarterDocuments, () => {
     it('opens the home on a services hero and closes on a contact CTA', () => {
       const { hero, modules = [] } = findByType(documents, 'template_home');
       const sections = [hero?._ref, ...modules.map(({ _ref }) => _ref)].map(
-        byId,
+        (id) => byId(documents, id),
       );
 
       const sequence = sections.map((document) => ({
         _type: document?._type,
         actionTarget:
           document && 'ctaButtons' in document
-            ? slugOf(pageBehind(document.ctaButtons?.[0]?.link?._ref))
+            ? slugOf(
+                pageBehind(documents, document.ctaButtons?.[0]?.link?._ref),
+              )
             : undefined,
       }));
 
@@ -402,7 +392,10 @@ describe(buildStarterDocuments, () => {
       const { items = [] } = findByType(documents, 'settings_navigation');
 
       const targets = items.map((item) => {
-        const page = pageBehind('link' in item ? item.link?._ref : undefined);
+        const page = pageBehind(
+          documents,
+          'link' in item ? item.link?._ref : undefined,
+        );
         return { slug: slugOf(page), hasParent: !!page && 'parent' in page };
       });
 
