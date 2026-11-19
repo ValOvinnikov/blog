@@ -8,7 +8,7 @@ import { MAGIC_LINK_PROVIDER_ID } from '@shinefold/auth/providers/magic-link/mag
 
 const AUTH_ERROR_PARAM = 'error';
 
-/** Never throws: resolves whether the magic-link email went out, logging `failureEvent` when it did not. */
+/** Never throws; resolves whether the email went out. */
 export const sendOwnerInviteEmail = async (
   tenantId: string,
   email: string,

@@ -5,6 +5,10 @@ import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_WORKER_SECRET,
+  MOCK_WORKER_URL,
+} from '@platform/testing/worker/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config';
@@ -27,8 +31,6 @@ const envMock: Partial<Record<keyof typeof env, string>> = env;
 const loggerErrorMock = vi.mocked(logger.error);
 const fetchMock = vi.fn();
 
-const MOCK_WORKER_URL = `https://${faker.internet.domainName()}`;
-const MOCK_SECRET = faker.string.alphanumeric(32);
 const MOCK_NETWORK_ERROR_MESSAGE = faker.lorem.words(2);
 const PROVISION_PATH = '/api/provision';
 
@@ -40,7 +42,7 @@ describe(enqueueProvisioning, () => {
     );
     vi.stubGlobal('fetch', fetchMock);
     envMock.WORKER_ENQUEUE_URL = MOCK_WORKER_URL;
-    envMock.WORKER_ENQUEUE_SECRET = MOCK_SECRET;
+    envMock.WORKER_ENQUEUE_SECRET = MOCK_WORKER_SECRET;
   });
 
   afterEach(() => {
@@ -91,7 +93,7 @@ describe(enqueueProvisioning, () => {
     });
     expect(
       isValidEnqueueSignature({
-        secret: MOCK_SECRET,
+        secret: MOCK_WORKER_SECRET,
         timestamp: headers[ENQUEUE_TIMESTAMP_HEADER] ?? null,
         signature: headers[ENQUEUE_SIGNATURE_HEADER] ?? null,
         path: PROVISION_PATH,
@@ -115,7 +117,7 @@ describe(enqueueProvisioning, () => {
     });
     expect(
       isValidEnqueueSignature({
-        secret: MOCK_SECRET,
+        secret: MOCK_WORKER_SECRET,
         timestamp: headers[ENQUEUE_TIMESTAMP_HEADER] ?? null,
         signature: headers[ENQUEUE_SIGNATURE_HEADER] ?? null,
         path: CUSTOM_DOMAIN_PATH.CONNECT,

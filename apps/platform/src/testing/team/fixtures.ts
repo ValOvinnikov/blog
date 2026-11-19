@@ -1,17 +1,20 @@
-import { faker } from '@faker-js/faker';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { createMockFaker } from '@platform/testing/mock-faker';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import type { TPendingMembershipInvite } from '@shinefold/db/queries/membership-invites';
-import type { TTenantMember } from '@shinefold/db/queries/memberships';
+import type {
+  TMemberStudioAccessTarget,
+  TTenantMember,
+} from '@shinefold/db/queries/memberships';
 import type { TMembershipInvite } from '@shinefold/db/schema/membership-invites';
 
-faker.seed(7608);
+const teamFaker = createMockFaker(7608);
 
-export const MOCK_MEMBER_EMAIL = 'anna@example.com';
-export const MOCK_MEMBER_ID = faker.string.uuid();
-export const MOCK_INVITE_ID = faker.string.uuid();
-export const MOCK_SANITY_USER_ID = `p${faker.string.alphanumeric(8)}`;
+export const MOCK_MEMBER_EMAIL = teamFaker.internet.email().toLowerCase();
+export const MOCK_MEMBER_ID = teamFaker.string.uuid();
+export const MOCK_INVITE_ID = teamFaker.string.uuid();
+export const MOCK_SANITY_USER_ID = `p${teamFaker.string.alphanumeric(8)}`;
 export const MOCK_JOINED_AT = new Date('2026-10-02T09:00:00.000Z');
 
 export const mockTeamDb = async () => ({
@@ -35,7 +38,7 @@ export const mockTenantMember = (
   overrides: Partial<TTenantMember> = {},
 ): TTenantMember => ({
   membershipId: MOCK_MEMBER_ID,
-  userId: faker.string.uuid(),
+  userId: teamFaker.string.uuid(),
   email: MOCK_MEMBER_EMAIL,
   role: MEMBERSHIP_ROLE.EDITOR,
   hasSignedIn: true,
@@ -58,10 +61,26 @@ export const mockPendingInvite = (
 export const mockInviteRow = (): TMembershipInvite => ({
   id: MOCK_INVITE_ID,
   tenantId: MOCK_TENANT_ID,
-  emailEncrypted: faker.string.alphanumeric(24),
-  emailIndex: faker.string.alphanumeric(24),
-  emailExactIndex: faker.string.alphanumeric(24),
+  emailEncrypted: teamFaker.string.alphanumeric(24),
+  emailIndex: teamFaker.string.alphanumeric(24),
+  emailExactIndex: teamFaker.string.alphanumeric(24),
   role: MEMBERSHIP_ROLE.EDITOR,
   createdAt: MOCK_JOINED_AT,
   consumedAt: null,
+});
+
+export const mockMemberStudioAccessTarget = (
+  overrides: Partial<TMemberStudioAccessTarget> = {},
+): TMemberStudioAccessTarget => ({
+  membershipId: MOCK_MEMBER_ID,
+  role: MEMBERSHIP_ROLE.EDITOR,
+  email: MOCK_MEMBER_EMAIL,
+  access: {
+    sanityInviteId: undefined,
+    inviteSentAt: undefined,
+    inviteAcceptedAt: undefined,
+    sanityUserId: undefined,
+    loginProvider: undefined,
+  },
+  ...overrides,
 });

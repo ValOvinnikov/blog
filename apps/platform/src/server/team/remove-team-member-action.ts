@@ -54,13 +54,20 @@ export const removeTeamMemberAction = async (
       return refusedTeamAction(outcome);
 
     const { role, email, sanityUserId } = removed;
-    if (role === MEMBERSHIP_ROLE.EDITOR && email) {
-      after(() =>
-        revokeMemberStudioAccess(tenantId, {
-          memberEmail: email,
-          sanityUserId,
-        }),
-      );
+    if (role === MEMBERSHIP_ROLE.EDITOR) {
+      if (email) {
+        after(() =>
+          revokeMemberStudioAccess(tenantId, {
+            memberEmail: email,
+            sanityUserId,
+          }),
+        );
+      } else {
+        logger.warn(TEAM_ACCESS_LOG.REVOKE_SKIPPED_NO_EMAIL, {
+          tenantId,
+          membershipId,
+        });
+      }
     }
 
     await recordAuditEvent({

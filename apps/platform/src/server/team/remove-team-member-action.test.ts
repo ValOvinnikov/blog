@@ -41,9 +41,7 @@ vi.mock('./revoke-member-studio-access', () => ({
   revokeMemberStudioAccess: vi.fn(),
 }));
 
-vi.mock('next/server', () => ({
-  after: (task: () => unknown) => task(),
-}));
+vi.mock('next/server');
 
 vi.mock('@shinefold/db', async () =>
   (await import('@platform/testing/team/fixtures')).mockTeamDb(),
@@ -108,6 +106,20 @@ describe(removeTeamMemberAction, () => {
       expect(revokeMemberStudioAccess).not.toHaveBeenCalled();
     },
   );
+
+  it('logs, without a revoke, an editor whose address cannot be read', async () => {
+    vi.mocked(memberships.getMemberStudioIdentity).mockResolvedValue({
+      email: undefined,
+      sanityUserId: MOCK_SANITY_USER_ID,
+    });
+
+    expect(await remove()).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(revokeMemberStudioAccess).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
+      TEAM_ACCESS_LOG.REVOKE_SKIPPED_NO_EMAIL,
+      { tenantId: MOCK_TENANT_ID, membershipId: MOCK_MEMBER_ID },
+    );
+  });
 
   it('lets an operator remove on any tenant', async () => {
     vi.mocked(requireTenantMembership).mockResolvedValue(

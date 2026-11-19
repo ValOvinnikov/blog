@@ -9412,6 +9412,14 @@
         "file": "apps/platform/src/constants/team-access.ts"
       }
     ],
+    "team_access.revoke_skipped_no_email": [
+      {
+        "ref": "TEAM_ACCESS_LOG.REVOKE_SKIPPED_NO_EMAIL",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
     "team_access.cancel_failed": [
       {
         "ref": "TEAM_ACCESS_LOG.CANCEL_FAILED",

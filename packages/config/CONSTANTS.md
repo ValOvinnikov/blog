@@ -818,7 +818,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **TEAM_INVITE_FIELD_ERROR**: `ALREADY_MEMBER`, `ALREADY_INVITED`
 - **TEAM_REFUSAL**: `OWNER_INVITE`
 - **MEMBER_ACCESS_PATH**: `CHECK`=`"/api/member-access/check"`, `RESEND`=`"/api/member-access/resend"`, `REVOKE`=`"/api/member-access/revoke"`
-- **TEAM_ACCESS_LOG**: `INVITE_FAILED`=`"team_access.invite_failed"`, `INVITE_EMAIL_FAILED`=`"team_access.invite_email_failed"`, `INVITE_AUDIT_FAILED`=`"team_access.invite_audit_failed"`, `REMOVE_FAILED`=`"team_access.remove_failed"`, `REMOVE_AUDIT_FAILED`=`"team_access.remove_audit_failed"`, `REVOKE_FAILED`=`"team_access.revoke_failed"`, `CANCEL_FAILED`=`"team_access.cancel_failed"`, `CANCEL_AUDIT_FAILED`=`"team_access.cancel_audit_failed"`, `ACCESS_REQUEST_FAILED`=`"team_access.access_request_failed"`
+- **TEAM_ACCESS_LOG**: `INVITE_FAILED`=`"team_access.invite_failed"`, `INVITE_EMAIL_FAILED`=`"team_access.invite_email_failed"`, `INVITE_AUDIT_FAILED`=`"team_access.invite_audit_failed"`, `REMOVE_FAILED`=`"team_access.remove_failed"`, `REMOVE_AUDIT_FAILED`=`"team_access.remove_audit_failed"`, `REVOKE_FAILED`=`"team_access.revoke_failed"`, `REVOKE_SKIPPED_NO_EMAIL`=`"team_access.revoke_skipped_no_email"`, `CANCEL_FAILED`=`"team_access.cancel_failed"`, `CANCEL_AUDIT_FAILED`=`"team_access.cancel_audit_failed"`, `ACCESS_REQUEST_FAILED`=`"team_access.access_request_failed"`
 
 ### `@platform/constants/tenant` — `apps/platform/src/constants/tenant.ts`
 

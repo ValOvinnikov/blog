@@ -39,6 +39,7 @@ export const TEAM_ACCESS_LOG = {
   REMOVE_FAILED: 'team_access.remove_failed',
   REMOVE_AUDIT_FAILED: 'team_access.remove_audit_failed',
   REVOKE_FAILED: 'team_access.revoke_failed',
+  REVOKE_SKIPPED_NO_EMAIL: 'team_access.revoke_skipped_no_email',
   CANCEL_FAILED: 'team_access.cancel_failed',
   CANCEL_AUDIT_FAILED: 'team_access.cancel_audit_failed',
   ACCESS_REQUEST_FAILED: 'team_access.access_request_failed',

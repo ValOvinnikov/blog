@@ -2,14 +2,13 @@ import { MEMBER_ACCESS_PATH } from '@platform/constants/team-access';
 import { requireTenantOwnerOrAdmin } from '@platform/server/auth/require-tenant-owner-or-admin';
 import { enqueueOwnerAccessRequest } from '@platform/server/owner-access/request-owner-access';
 import {
-  MOCK_MEMBER_EMAIL,
   MOCK_MEMBER_ID,
+  mockMemberStudioAccessTarget,
 } from '@platform/testing/team/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
-import type { TMemberStudioAccessTarget } from '@shinefold/db/queries/memberships';
 
 import { checkMemberAccessAction } from './check-member-access-action';
 import { resendMemberInviteAction } from './resend-member-invite-action';
@@ -26,21 +25,6 @@ vi.mock('@shinefold/db', async () =>
 
 const getAccess = vi.mocked(queries.memberships.getMemberStudioAccess);
 const enqueue = vi.mocked(enqueueOwnerAccessRequest);
-
-const accessTarget = (
-  role: TMemberStudioAccessTarget['role'],
-): TMemberStudioAccessTarget => ({
-  membershipId: MOCK_MEMBER_ID,
-  role,
-  email: MOCK_MEMBER_EMAIL,
-  access: {
-    sanityInviteId: undefined,
-    inviteSentAt: undefined,
-    inviteAcceptedAt: undefined,
-    sanityUserId: undefined,
-    loginProvider: undefined,
-  },
-});
 
 const ACTIONS = [
   [
@@ -60,7 +44,9 @@ describe.each(ACTIONS)('%s', (_name, action, path) => {
     vi.mocked(requireTenantOwnerOrAdmin).mockReset();
     getAccess
       .mockReset()
-      .mockResolvedValue(accessTarget(MEMBERSHIP_ROLE.EDITOR));
+      .mockResolvedValue(
+        mockMemberStudioAccessTarget({ role: MEMBERSHIP_ROLE.EDITOR }),
+      );
     enqueue.mockReset().mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
@@ -85,7 +71,10 @@ describe.each(ACTIONS)('%s', (_name, action, path) => {
   });
 
   it.each([
-    ['a reader', accessTarget(MEMBERSHIP_ROLE.READER)],
+    [
+      'a reader',
+      mockMemberStudioAccessTarget({ role: MEMBERSHIP_ROLE.READER }),
+    ],
     ['a locked or missing member', undefined],
   ])('refuses %s', async (_case, target) => {
     getAccess.mockResolvedValue(target);

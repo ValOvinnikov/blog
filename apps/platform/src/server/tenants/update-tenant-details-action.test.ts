@@ -96,9 +96,7 @@ vi.mock('@platform/server/tenants/notify-owner-of-plan-change', () => ({
 
 vi.mock('next/cache');
 
-vi.mock('next/server', () => ({
-  after: (task: () => unknown) => task(),
-}));
+vi.mock('next/server');
 
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),

@@ -20,6 +20,7 @@ import {
   MEMBERSHIP_INVITE_OUTCOME,
   MEMBERSHIP_ROLE,
 } from '@shinefold/db/constants';
+import { normalizeEmail } from '@shinefold/utils/normalize-email-identity';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { sendTeamInviteOrCancel } from './send-team-invite';
@@ -49,7 +50,7 @@ const emailError = (
 
 const isMemberEmail = async (tenantId: string, email: string) =>
   (await queries.memberships.listTenantMembers(tenantId)).some(
-    (member) => member.email?.toLowerCase() === email,
+    (member) => !!member.email && normalizeEmail(member.email) === email,
   );
 
 export const inviteTeamMemberAction = async (

@@ -9,6 +9,7 @@ import {
   MOCK_AUTH_ERROR_URL,
   MOCK_VERIFY_REQUEST_URL,
 } from '@platform/testing/auth/fixtures';
+import { MOCK_NOT_AN_EMAIL } from '@platform/testing/data-requests/fixtures';
 import {
   mockEditorMembershipContext,
   mockMembershipContext,
@@ -137,7 +138,7 @@ describe(inviteTeamMemberAction, () => {
   });
 
   it('refuses a malformed address', async () => {
-    expect(await invite('not-an-address')).toEqual(
+    expect(await invite(MOCK_NOT_AN_EMAIL)).toEqual(
       emailError(TEAM_INVITE_FIELD_ERROR.EMAIL_INVALID),
     );
     expect(createInvite).not.toHaveBeenCalled();

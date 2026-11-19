@@ -10,6 +10,10 @@ import {
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_WORKER_SECRET,
+  MOCK_WORKER_URL,
+} from '@platform/testing/worker/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import {
@@ -50,8 +54,6 @@ faker.seed(6105);
 
 const MOCK_USER_ID = faker.string.uuid();
 const MOCK_WORKER_PATH = `/${faker.lorem.slug()}`;
-const MOCK_WORKER_URL = `https://${faker.internet.domainName()}`;
-const MOCK_SECRET = faker.string.alphanumeric(32);
 const MOCK_MEMBERSHIP_ID = faker.string.uuid();
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
@@ -75,7 +77,7 @@ beforeEach(() => {
   );
   vi.stubGlobal('fetch', fetchMock);
   envMock.WORKER_ENQUEUE_URL = MOCK_WORKER_URL;
-  envMock.WORKER_ENQUEUE_SECRET = MOCK_SECRET;
+  envMock.WORKER_ENQUEUE_SECRET = MOCK_WORKER_SECRET;
 });
 
 afterEach(() => {
