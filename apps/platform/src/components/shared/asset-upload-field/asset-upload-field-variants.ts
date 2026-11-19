@@ -13,7 +13,7 @@ export const assetUploadFieldVariants = tv({
     size: {
       [SIZE.MD]: {
         root: [
-          'flex-col rounded-platform border-[1.5px] border-dashed border-platform-line p-[14px]',
+          'flex-col rounded-platform border-platform-strong border-dashed border-platform-line p-[14px]',
         ],
       },
       [SIZE.SM]: {

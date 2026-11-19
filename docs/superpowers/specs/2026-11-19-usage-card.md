@@ -56,20 +56,25 @@ Rows appear in this order. Each allowance is plan plus open grants
 when the plan or a grant includes it (decided, owner, 2026-11-19); a row
 with nothing used still shows, as "0 of {n}".
 
-| Row label                    | Value                         | Link        | Shows when                              |
-| ---------------------------- | ----------------------------- | ----------- | --------------------------------------- |
-| AI takeaways this month      | `{used} of {allowance}`       | none        | Always (Free 5, Starter 20, Growth 100) |
-| Newsletter emails this month | `{sent} of {allowance}`       | Subscribers | `NEWSLETTER` in the entitlements        |
-| Team seats                   | `{used} of {seats}`           | Team        | `seats` above 1                         |
-| Additional languages         | `{live} of {localeLimit − 1}` | Languages   | `localeLimit` above 1                   |
+| Row label               | Value                         | Link        | Shows when                              |
+| ----------------------- | ----------------------------- | ----------- | --------------------------------------- |
+| AI takeaways this month | `{used} of {allowance}`       | none        | Always (Free 5, Starter 20, Growth 100) |
+| Emails sent this month  | `{sent} of {allowance}`       | Subscribers | `NEWSLETTER` in the entitlements        |
+| Team seats              | `{used} of {seats}`           | Team        | `seats` above 1                         |
+| Additional languages    | `{live} of {localeLimit − 1}` | Languages   | `localeLimit` above 1                   |
 
 - **Takeaways**: used is this UTC month's `takeaway_generation_counts` count;
   allowance `takeawaysPerMonth`.
-- **Emails**: sent is this UTC month's email sends; allowance
-  `monthlySendAllowance(plan, activeSubscriberCount)`, at Growth's rate for a
-  granted Newsletter.
-- **Seats**: counted exactly as `create-membership-invite`'s seat limit counts:
-  the owner, every membership (locked included) and every pending invite.
+- **Emails**: sent is this UTC month's newsletter post sends only
+  (`countEmailSendsThisMonth(tenantId, EMAIL_TYPE.NEWSLETTER_ISSUE)`), the
+  same number the Subscribers page shows; magic links and other mail are not
+  counted. Allowance `monthlySendAllowance(plan, activeSubscriberCount)`, at
+  Growth's rate for a granted Newsletter. The label matches the Subscribers
+  page's meter name.
+- **Seats**: counted exactly as `create-membership-invite/seat-limit.ts`
+  counts, and as the Team page shows: every membership (the owner's own
+  included, locked ones included) plus every pending invite, a pending OWNER
+  invite included. Nobody is counted twice.
 - **Languages**: live additional locales, so the default is not counted.
 - Numbers use the viewer's locale grouping ("4,180 of 15,000").
 
@@ -87,7 +92,15 @@ in the viewer's platform language, with no year ("1 December").
 
 `{pct}` rounds down, so 99.6% reads 99% and only a full allowance reads as
 used up. Used above the allowance (a downgrade, a lowered grant) counts as
-100%.
+100%, and the value is capped as the Team page caps it: "{allowance} of
+{allowance}", never "4 of 3".
+
+**Emails paused for the month.** When the site's sending is paused for the
+month (the Subscribers page's "Paused: month used" state: a post was skipped
+because it no longer fit whole), the emails row shows its used-up state
+whatever the percentage: count and fill `bad`, note "Sending paused until
+{d MMMM}." It reads the same paused state the Subscribers page reads, so the
+two pages never disagree. A band pause shows on the Subscribers page only.
 
 ## Row anatomy
 
@@ -96,7 +109,8 @@ used up. Used above the allowance (a downgrade, a lowered grant) counts as
   `GrantedBadge` ("Granted", or "Granted until {date}"); then the link, right
   aligned, the shared `TextLink` at 12.5/18. The label is plain text, not the
   link.
-- Value: the used count 22/28 700 tabular, then "of {allowance}" 14/20
+- Value: the used count 24 (`text-platform-24`) 700 tabular, as the
+  Subscribers page's limit cards, then "of {allowance}" 14/20
   `muted`. The count is `warn` at 80–99% and `bad` when a monthly row is used
   up; `warn` when seats or languages are full.
 - Meter: `role="meter"`, `aria-valuemin` 0, `aria-valuemax` the allowance,
@@ -106,7 +120,9 @@ used up. Used above the allowance (a downgrade, a lowered grant) counts as
   languages. The fill end is rounded below 100% and square at 100%.
 - Note: 13/18. Under 80% `muted` 400; near `warn` 500; used up `bad` 600 on
   monthly rows, `warn` 500 on seats and languages. In a near note the reset
-  part stays `muted` 400 after a `faint` "·" separator.
+  part stays `muted` 400 after a `faint` "·" separator. The near note is one
+  ICU message with rich-text tags for the muted part and the separator, never
+  two strings joined in code.
 
 ## States
 
@@ -136,8 +152,9 @@ five locales. English:
 
 - `title` "Usage"; `description` "What your plan includes and how much is
   used."
-- Labels: "AI takeaways this month", "Newsletter emails this month", "Team
+- Labels: "AI takeaways this month", "Emails sent this month", "Team
   seats", "Additional languages".
+- Emails paused note: "Sending paused until {d MMMM}."
 - Value: "{used} of {allowance}".
 - Links: "Subscribers", "Team", "Languages".
 - Notes as the table above.
@@ -157,3 +174,17 @@ Decided by the owner on 2026-11-19:
    shows, as "0 of {n}".
 5. **Takeaways row link**: none until the Studio regenerate control (#7614)
    gives it somewhere to point.
+
+Calls this spec made, listed so the owner can confirm or change them
+(2026-11-19):
+
+6. **Owner placement**: after Your site, before the Domain and Owner pair.
+7. **Archived tenant**: no Usage card.
+8. **Emails row and the switches**: it shows whenever `NEWSLETTER` is in the
+   entitlements, even with Newsletter off in Features or sending switched off.
+9. **Percentages**: round down; used above the allowance reads as 100% with a
+   capped value.
+10. **Failures**: a failed count shows that row's warning; when the
+    entitlements cannot be read, the whole card is left out.
+11. **Phone dates**: the reset date keeps its full month name ("1 December"),
+    where the Subscribers phone layout shortens it.

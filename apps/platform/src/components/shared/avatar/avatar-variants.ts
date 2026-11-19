@@ -18,6 +18,14 @@ export const avatarVariants = tv({
         'size-[22px] rounded-platform-control text-platform-11 font-bold',
         'bg-platform-brand-weak text-platform-brand-strong',
       ],
+      [AVATAR_VARIANT.MEMBER]: [
+        'size-8 rounded-full text-platform-12-5 font-semibold',
+        'bg-platform-pill-neutral text-platform-muted',
+      ],
+      [AVATAR_VARIANT.PENDING]: [
+        'size-8 rounded-full text-platform-12-5 font-semibold',
+        'border-platform-strong border-dashed border-platform-control-line text-platform-muted',
+      ],
     },
   },
 });

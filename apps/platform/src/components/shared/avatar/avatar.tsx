@@ -1,16 +1,19 @@
+import { AVATAR_UNKNOWN_INITIAL } from '@platform/constants/avatar';
+import type { IWithClassName } from '@shinefold/config/types';
+import { hasLength } from '@shinefold/utils/primitives';
+
 import { avatarVariants, type TAvatarVariants } from './avatar-variants';
 
-export type TAvatarProps = {
+export type TAvatarProps = IWithClassName & {
   name: string;
   email?: string;
   variant: NonNullable<TAvatarVariants['variant']>;
-  className?: string;
 };
 
 const getInitials = (name: string): string => {
   const words = name.trim().split(/\s+/).filter(Boolean);
 
-  if (words.length === 0) {
+  if (!hasLength(words)) {
     return '';
   }
 
@@ -24,13 +27,14 @@ const getInitials = (name: string): string => {
   return `${first}${last}`.toUpperCase();
 };
 
-/** Always `aria-hidden`: it sits beside the name it represents. */
 export const Avatar = ({ name, email, variant, className }: TAvatarProps) => (
   <span
     aria-hidden="true"
     data-testid="avatar"
     className={avatarVariants({ variant, class: className })}
   >
-    {getInitials(name) || (email ?? '').charAt(0).toUpperCase()}
+    {getInitials(name) ||
+      (email ?? '').charAt(0).toUpperCase() ||
+      AVATAR_UNKNOWN_INITIAL}
   </span>
 );

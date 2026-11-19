@@ -1,15 +1,17 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ROLE } from '@platform/constants/aria-role';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { SORT_DIRECTION } from '@shinefold/config/constants';
-import userEvent from '@testing-library/user-event';
-import type { ComponentProps, ReactNode } from 'react';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { ComponentProps } from 'react';
 
 import { DataTableShell } from './data-table-shell';
 
 faker.seed(5995);
 
-type TItem = { id: string; name: string };
-type TColumn = ComponentProps<typeof DataTableShell<TItem>>['columns'][number];
+type TItem = { id: string; name: string; status?: string };
+type TShellProps = ComponentProps<typeof DataTableShell<TItem>>;
+type TColumn = TShellProps['columns'][number];
 
 const MOCK_EMPTY_MESSAGE = faker.lorem.sentence();
 const MOCK_ARIA_LABEL = faker.lorem.word();
@@ -17,6 +19,7 @@ const MOCK_COLUMN_LABEL = faker.lorem.word();
 const MOCK_FIRST_ITEM: TItem = {
   id: faker.string.uuid(),
   name: faker.company.name(),
+  status: faker.lorem.word(),
 };
 const MOCK_SECOND_ITEM: TItem = {
   id: faker.string.uuid(),
@@ -24,28 +27,60 @@ const MOCK_SECOND_ITEM: TItem = {
 };
 const MOCK_ITEMS = [MOCK_FIRST_ITEM, MOCK_SECOND_ITEM];
 const MOCK_TOOLBAR_LABEL = faker.lorem.words(2);
-const MOCK_TOOLBAR = <button type="button">{MOCK_TOOLBAR_LABEL}</button>;
+const MOCK_TITLE_ID = faker.lorem.slug();
+const MOCK_TITLE = faker.lorem.words(2);
+const MOCK_COUNT = faker.lorem.words(2);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_NOTE = faker.lorem.sentence();
+const MOCK_ACTIONS_LABEL = faker.lorem.word();
+const MOCK_STATUS_LABEL = faker.lorem.words(2);
+const MOCK_ID_LABEL = faker.lorem.words(3);
+const MOCK_NAME_COLUMN = faker.string.alpha(8);
+const MOCK_STATUS_COLUMN = faker.string.alpha(8);
+const MOCK_ID_COLUMN = faker.string.alpha(8);
+const MOCK_ACTIONS_COLUMN = faker.string.alpha(8);
+
+const ItemRow = ({ item }: { item: TItem }) => (
+  <DataTableShell.Row>
+    <DataTableShell.Cell column={MOCK_NAME_COLUMN}>
+      {item.name}
+    </DataTableShell.Cell>
+    {item.status && (
+      <DataTableShell.Cell column={MOCK_STATUS_COLUMN}>
+        {item.status}
+      </DataTableShell.Cell>
+    )}
+    <DataTableShell.Cell column={MOCK_ID_COLUMN}>{item.id}</DataTableShell.Cell>
+    <DataTableShell.Cell column={MOCK_ACTIONS_COLUMN}>
+      {null}
+    </DataTableShell.Cell>
+  </DataTableShell.Row>
+);
 
 const renderTable = (
   items: TItem[],
-  { sort, toolbar }: Pick<TColumn, 'sort'> & { toolbar?: ReactNode } = {},
+  {
+    sort,
+    isStacked,
+    children,
+  }: Pick<TColumn, 'sort'> & Pick<TShellProps, 'isStacked' | 'children'> = {},
 ) =>
   renderWithIntl(
     <DataTableShell
       items={items}
       emptyMessage={MOCK_EMPTY_MESSAGE}
       ariaLabel={MOCK_ARIA_LABEL}
-      toolbar={toolbar}
+      isStacked={isStacked}
       columns={[
-        { key: 'name', label: MOCK_COLUMN_LABEL, sort },
-        { key: 'actions', label: null },
+        { key: MOCK_NAME_COLUMN, label: MOCK_COLUMN_LABEL, sort },
+        { key: MOCK_STATUS_COLUMN, label: MOCK_STATUS_LABEL },
+        { key: MOCK_ID_COLUMN, label: MOCK_ID_LABEL },
+        { key: MOCK_ACTIONS_COLUMN, label: MOCK_ACTIONS_LABEL },
       ]}
-      renderRow={(item) => (
-        <tr key={item.id}>
-          <td>{item.name}</td>
-        </tr>
-      )}
-    />,
+      renderRow={(item) => <ItemRow key={item.id} item={item} />}
+    >
+      {children}
+    </DataTableShell>,
   );
 
 describe(`<${DataTableShell.name}/>`, () => {
@@ -83,7 +118,7 @@ describe(`<${DataTableShell.name}/>`, () => {
     it.each([MOCK_FIRST_ITEM, MOCK_SECOND_ITEM])(
       'renders a row for $name',
       ({ name }) => {
-        const cell = screen.getByRole('cell', { name });
+        const cell = screen.getByRole(ARIA_ROLE.CELL, { name });
 
         expect(cell).toBeVisible();
       },
@@ -104,15 +139,54 @@ describe(`<${DataTableShell.name}/>`, () => {
     });
   });
 
+  describe('stacked', () => {
+    beforeEach(() => {
+      renderTable(MOCK_ITEMS, { isStacked: true });
+    });
+
+    it.each([MOCK_FIRST_ITEM, MOCK_SECOND_ITEM])(
+      'names each cell of a wrapped row for $name after its own column',
+      ({ name, id }) => {
+        const nameCell = screen.getByRole(ARIA_ROLE.CELL, {
+          name: `${MOCK_COLUMN_LABEL} ${name}`,
+        });
+        const idCell = screen.getByRole(ARIA_ROLE.CELL, {
+          name: `${MOCK_ID_LABEL} ${id}`,
+        });
+
+        expect(nameCell).toBeInTheDocument();
+        expect(idCell).toBeInTheDocument();
+      },
+    );
+
+    it('names a conditional middle cell after its column', () => {
+      const statusCell = screen.getByRole(ARIA_ROLE.CELL, {
+        name: `${MOCK_STATUS_LABEL} ${MOCK_FIRST_ITEM.status}`,
+      });
+
+      expect(statusCell).toBeInTheDocument();
+    });
+
+    it('leaves an empty cell unlabelled, naming its column only in the head row', () => {
+      const actionsLabels = screen.getAllByText(MOCK_ACTIONS_LABEL);
+      const actionsHeader = screen.getByRole('columnheader', {
+        name: MOCK_ACTIONS_LABEL,
+      });
+
+      expect(actionsLabels).toEqual([actionsHeader]);
+    });
+  });
+
   describe('with a sortable column', () => {
     const onSort = vi.fn();
+    let user: UserEvent;
 
     beforeEach(() => {
       onSort.mockReset();
+      user = userEvent.setup();
     });
 
     it('marks the sorted column and asks to sort when its header is clicked', async () => {
-      const user = userEvent.setup();
       renderTable(MOCK_ITEMS, {
         sort: { direction: SORT_DIRECTION.ASCENDING, onSort },
       });
@@ -140,16 +214,55 @@ describe(`<${DataTableShell.name}/>`, () => {
     });
   });
 
-  it.each([
+  describe.each([
     ['above the rows', MOCK_ITEMS],
     ['above the empty message', []],
-  ])('keeps the toolbar %s', (_, items) => {
-    renderTable(items, { toolbar: MOCK_TOOLBAR });
-
-    const toolbarControl = screen.getByRole('button', {
-      name: MOCK_TOOLBAR_LABEL,
+  ])('with every opt-in part %s', (_, items) => {
+    beforeEach(() => {
+      renderTable(items, {
+        children: (
+          <>
+            <DataTableShell.Title
+              id={MOCK_TITLE_ID}
+              count={MOCK_COUNT}
+              supportingText={MOCK_SUPPORTING_TEXT}
+            >
+              {MOCK_TITLE}
+            </DataTableShell.Title>
+            <DataTableShell.Toolbar>
+              <button type="button">{MOCK_TOOLBAR_LABEL}</button>
+            </DataTableShell.Toolbar>
+            <DataTableShell.Note>{MOCK_NOTE}</DataTableShell.Note>
+          </>
+        ),
+      });
     });
 
-    expect(toolbarControl).toBeVisible();
+    it('names the card after a focusable title heading', () => {
+      const heading = screen.getByRole('heading', { name: MOCK_TITLE });
+      const card = screen.getByRole('region', { name: MOCK_TITLE });
+
+      expect(heading).toHaveAttribute('id', MOCK_TITLE_ID);
+      expect(heading).toHaveAttribute('tabindex', '-1');
+      expect(card).toContainElement(heading);
+    });
+
+    it.each([
+      ['count', MOCK_COUNT],
+      ['supporting line', MOCK_SUPPORTING_TEXT],
+      ['note', MOCK_NOTE],
+    ])('shows the %s', (_part, text) => {
+      const shown = screen.getByText(text);
+
+      expect(shown).toBeVisible();
+    });
+
+    it('keeps the toolbar', () => {
+      const toolbarControl = screen.getByRole('button', {
+        name: MOCK_TOOLBAR_LABEL,
+      });
+
+      expect(toolbarControl).toBeVisible();
+    });
   });
 });

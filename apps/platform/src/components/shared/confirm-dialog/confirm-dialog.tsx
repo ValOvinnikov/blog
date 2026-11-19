@@ -54,7 +54,10 @@ const ConfirmDialogRoot = ({
 
   return (
     <ConfirmDialogContext.Provider value={{ ...dialog, expectedValue, tone }}>
-      <AlertDialog.Root open={dialog.isOpen} onOpenChange={dialog.changeOpen}>
+      <AlertDialog.Root
+        open={dialog.isOpen}
+        onOpenChange={dialog.requestOpenChange}
+      >
         {slots.Trigger}
         {slots.Content}
         {unmatched.map((node, i) => (

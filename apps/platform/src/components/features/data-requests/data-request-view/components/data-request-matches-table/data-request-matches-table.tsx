@@ -14,18 +14,10 @@ import {
 } from '@platform/constants/data-request';
 import type { TDataRequestMatch } from '@platform/server/data-requests/to-data-request-matches';
 import { formatDate } from '@platform/utils/format-date/format-date';
-import { tv } from '@platform/utils/tv/tv';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { dataRequestMatchesTableVariants } from './data-request-matches-table-variants';
 import { useDataRequestMatchesTable } from './use-data-request-matches-table';
-
-const dataRequestMatchesTableVariants = tv({
-  slots: {
-    secondary: ['text-platform-muted'],
-    searchField: ['min-w-0 flex-1 basis-56'],
-    kindField: ['w-full sm:w-56'],
-  },
-});
 
 const COLUMN_LABEL_KEYS = {
   [DATA_REQUEST_MATCH_COLUMN.KIND]: 'columnKind',
@@ -76,33 +68,6 @@ export const DataRequestMatchesTable = ({
         items={pageRows}
         emptyMessage={t('noResults')}
         ariaLabel={t('regionLabel')}
-        toolbar={
-          <>
-            <div className={searchField()}>
-              <FormField label={t('searchLabel')}>
-                <TextInput type="search" value={query} onChange={changeQuery} />
-              </FormField>
-            </div>
-            <div className={kindField()}>
-              <FormField label={t('kindFilterLabel')}>
-                <OptionSelect
-                  options={[
-                    {
-                      value: DATA_REQUEST_KIND_FILTER.ALL,
-                      label: t('allKinds'),
-                    },
-                    ...kindOptions.map((kind) => ({
-                      value: kind,
-                      label: tKind(kind),
-                    })),
-                  ]}
-                  value={kindFilter}
-                  onChange={changeKindFilter}
-                />
-              </FormField>
-            </div>
-          </>
-        }
         columns={Object.values(DATA_REQUEST_MATCH_COLUMN).map((column) => ({
           key: column,
           label: t(COLUMN_LABEL_KEYS[column]),
@@ -137,7 +102,33 @@ export const DataRequestMatchesTable = ({
             </DataTableShell.Cell>
           </DataTableShell.Row>
         )}
-      />
+      >
+        <DataTableShell.Toolbar>
+          <div className={searchField()}>
+            <FormField label={t('searchLabel')}>
+              <TextInput type="search" value={query} onChange={changeQuery} />
+            </FormField>
+          </div>
+          <div className={kindField()}>
+            <FormField label={t('kindFilterLabel')}>
+              <OptionSelect
+                options={[
+                  {
+                    value: DATA_REQUEST_KIND_FILTER.ALL,
+                    label: t('allKinds'),
+                  },
+                  ...kindOptions.map((kind) => ({
+                    value: kind,
+                    label: tKind(kind),
+                  })),
+                ]}
+                value={kindFilter}
+                onChange={changeKindFilter}
+              />
+            </FormField>
+          </div>
+        </DataTableShell.Toolbar>
+      </DataTableShell>
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </>
   );
