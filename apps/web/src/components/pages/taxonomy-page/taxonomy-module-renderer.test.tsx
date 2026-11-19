@@ -1,13 +1,11 @@
 import { faker } from '@faker-js/faker';
 import { CONTENT_ALIGNMENT } from '@shinefold/config';
 import { TAXONOMY_KIND } from '@shinefold/config/constants';
+import { MODULE_SLOT_TEST_ID } from '@web/constants/module-renderer';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
-import {
-  renderModules,
-  type TModuleComponentProps,
-} from '@web/modules/module-renderer';
+import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
-import { customRenderAsync } from '@web/testing/custom-render';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   MOCK_CTA_STUB_TEST_ID,
@@ -34,7 +32,6 @@ import { TaxonomyModuleRenderer } from './taxonomy-module-renderer';
 
 faker.seed(1186);
 
-vi.mock('@web/modules/module-renderer', { spy: true });
 vi.mock('@web/modules/module-gate/module-gate');
 vi.mock('@web/server/settings-features/is-module-entitled/is-module-entitled');
 
@@ -121,11 +118,11 @@ describe(`<${TaxonomyModuleRenderer.name}/>`, () => {
     );
   });
 
-  it('passes no slot to the modules when there are no children', async () => {
+  it('renders no slot wrapper without children or a Post List', async () => {
     await setup({ modules: [mockModule('module_cta')] });
 
-    expect(renderModules).toHaveBeenCalledWith(
-      expect.objectContaining({ slot: undefined }),
-    );
+    const slot = screen.queryByTestId(MODULE_SLOT_TEST_ID);
+
+    expect(slot).not.toBeInTheDocument();
   });
 });
