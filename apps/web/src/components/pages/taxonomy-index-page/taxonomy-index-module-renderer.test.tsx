@@ -19,7 +19,7 @@ import {
 } from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
 import { logger } from '@web/utils/logger/logger';
 
-import { TagIndexModuleRenderer } from './tag-index-module-renderer';
+import { TaxonomyIndexModuleRenderer } from './taxonomy-index-module-renderer';
 
 faker.seed(4410);
 
@@ -37,14 +37,14 @@ const loggerWarnMock = vi.mocked(logger.warn);
 
 const MOCK_PAGE_HEADING = faker.lorem.sentence();
 
-const setup = customRenderAsync(TagIndexModuleRenderer, {
+const setup = customRenderAsync(TaxonomyIndexModuleRenderer, {
   hero: undefined,
   headingBlock: mockHeadingBlock({ heading: MOCK_PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
 
-describe(`<${TagIndexModuleRenderer.name}/>`, () => {
+describe(`<${TaxonomyIndexModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({ setup, headingText: MOCK_PAGE_HEADING });
   testResolvedHero({ setup });
   testHeroBeforeModules({
@@ -66,7 +66,7 @@ describe(`<${TagIndexModuleRenderer.name}/>`, () => {
     loggerWarnMock,
     unknownModule: mockModule('module_postList'),
     description:
-      'warns once and renders nothing for a module outside the tag index allow-list',
+      'warns once and renders nothing for a module outside the taxonomy index allow-list',
   });
   testRendersAllowedModulesInOrder({
     setup,

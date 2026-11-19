@@ -1,6 +1,7 @@
 import type {
   THeadingBlock,
   TMaybeUndefined,
+  TPageTagType,
   TPageTopicType,
   TContentAlignmentOf,
 } from '@shinefold/config';
@@ -22,7 +23,9 @@ import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import type { ReactNode } from 'react';
 
-const TOPIC_MAP: Partial<Record<TPageTopicType, TModuleComponent>> = {
+type TTaxonomyModuleType = TPageTagType | TPageTopicType;
+
+const TAXONOMY_MAP: Partial<Record<TTaxonomyModuleType, TModuleComponent>> = {
   module_heroBlog: HeroBlogModule,
   module_postList: PostListModule,
   module_postLatest: PostLatestModule,
@@ -33,25 +36,25 @@ const TOPIC_MAP: Partial<Record<TPageTopicType, TModuleComponent>> = {
   module_faq: FaqModule,
 };
 
-export interface ITopicModuleRendererProps {
-  hero: TMaybeUndefined<TModule<TPageTopicType>>;
+export interface ITaxonomyModuleRendererProps {
+  hero: TMaybeUndefined<TModule<TTaxonomyModuleType>>;
   headingBlock: THeadingBlock;
   headingAlignment: TContentAlignmentOf<'LEFT' | 'CENTER'>;
-  modules: TModule<TPageTopicType>[];
+  modules: TModule<TTaxonomyModuleType>[];
   context?: TModuleComponentProps['context'];
   children?: ReactNode;
 }
 
-export const TopicModuleRenderer = async ({
+export const TaxonomyModuleRenderer = async ({
   hero,
   headingBlock,
   headingAlignment,
   modules,
   context,
   children,
-}: ITopicModuleRendererProps): Promise<ReactNode> => {
+}: ITaxonomyModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
-    ? await renderHeroModule({ hero, map: TOPIC_MAP })
+    ? await renderHeroModule({ hero, map: TAXONOMY_MAP })
     : null;
 
   return (
@@ -61,9 +64,11 @@ export const TopicModuleRenderer = async ({
       )}
       {renderModules({
         modules,
-        map: TOPIC_MAP,
+        map: TAXONOMY_MAP,
         context,
-        slot: { moduleType: 'module_postList', node: children },
+        slot: children
+          ? { moduleType: 'module_postList', node: children }
+          : undefined,
       })}
     </>
   );

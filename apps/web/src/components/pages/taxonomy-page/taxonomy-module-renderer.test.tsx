@@ -7,7 +7,10 @@ import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
+  MOCK_CTA_STUB_TEST_ID,
   MOCK_FAQ_STUB_TEST_ID,
+  MOCK_HERO_STUB_TEST_ID,
+  MOCK_POST_LIST_STUB_TEST_ID,
   mockModule,
 } from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
@@ -17,13 +20,14 @@ import {
 import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
+  testHeroBeforeModules,
   testRendersAllowedModulesInOrder,
   testResolvedHero,
   testWarnsForUnknownModule,
 } from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
 import { logger } from '@web/utils/logger/logger';
 
-import { TopicModuleRenderer } from './topic-module-renderer';
+import { TaxonomyModuleRenderer } from './taxonomy-module-renderer';
 
 faker.seed(1186);
 
@@ -56,16 +60,25 @@ const MOCK_CONTEXT = {
   },
 };
 
-const setup = customRenderAsync(TopicModuleRenderer, {
+const setup = customRenderAsync(TaxonomyModuleRenderer, {
   hero: undefined,
   headingBlock: mockHeadingBlock({ heading: MOCK_PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
 
-describe(`<${TopicModuleRenderer.name}/>`, () => {
+describe(`<${TaxonomyModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({ setup, headingText: MOCK_PAGE_HEADING });
   testResolvedHero({ setup });
+  testHeroBeforeModules({
+    setup,
+    modules: [mockModule('module_cta'), mockModule('module_postList')],
+    expectedTestIds: [
+      MOCK_HERO_STUB_TEST_ID,
+      MOCK_CTA_STUB_TEST_ID,
+      MOCK_POST_LIST_STUB_TEST_ID,
+    ],
+  });
   testFallsBackToHeadingWithoutHero({
     setup,
     heroBlogModuleMock: vi.mocked(HeroBlogModule),
@@ -78,7 +91,7 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
     loggerWarnMock,
     unknownModule: mockModule('module_stats'),
     description:
-      'warns once and renders nothing for a module outside the topic page allow-list',
+      'warns once and renders nothing for a module outside the taxonomy page allow-list',
   });
   testRendersAllowedModulesInOrder({
     setup,
