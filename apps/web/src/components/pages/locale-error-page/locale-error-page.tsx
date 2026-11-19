@@ -1,6 +1,6 @@
 'use client';
 
-import { routes, TEXT_ROLE } from '@shinefold/config';
+import { routes, TEXT_ROLE, type TMaybeNull } from '@shinefold/config';
 import { Button } from '@shinefold/ui/components/atoms/button';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Text } from '@shinefold/ui/components/atoms/text';
@@ -27,7 +27,7 @@ export const LocaleErrorPage = ({ error, reset }: TLocaleErrorPageProps) => {
   const description = useVoiceRich('localeErrorDescription');
   const announcementRef = useRef<HTMLSpanElement>(null);
   const mainRef = useRef<HTMLElement>(null);
-  const reportedErrorRef = useRef<Error | null>(null);
+  const reportedErrorRef = useRef<TMaybeNull<Error>>(null);
 
   useEffect(() => {
     // `t` can change identity without a new error, so report once per error.
