@@ -34,6 +34,7 @@ export type TTextProps = IWithClassName &
 
 const DEFAULT_VARIANT: NonNullable<TTextVariants['variant']> = 'lead';
 
+/** Renders any text role, or a legacy variant, in a non-heading element. */
 export const Text = ({
   as: Tag = P_AS_CONST,
   textRole,

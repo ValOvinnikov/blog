@@ -646,14 +646,11 @@ const render = (layers) => {
   return `${out.join('\n')}\n`;
 };
 
-// A component whose name already says what it is for carries no doc comment.
-export const NAME_IS_PURPOSE = new Set(['Text']);
-
-export const missingDescriptions = (layers) => {
+const missingDescriptions = (layers) => {
   const missing = [];
   for (const { entries } of layers) {
     for (const e of entries) {
-      if (!e.purpose && !NAME_IS_PURPOSE.has(e.name)) missing.push(e.name);
+      if (!e.purpose) missing.push(e.name);
       for (const s of e.members ?? []) if (!s.purpose) missing.push(s.accessor);
       for (const s of e.slots ?? []) if (!s.purpose) missing.push(s.accessor);
     }
