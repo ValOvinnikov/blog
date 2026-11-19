@@ -14,18 +14,10 @@ import {
 } from '@platform/constants/data-request';
 import type { TDataRequestMatch } from '@platform/server/data-requests/to-data-request-matches';
 import { formatDate } from '@platform/utils/format-date/format-date';
-import { tv } from '@platform/utils/tv/tv';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { dataRequestMatchesTableVariants } from './data-request-matches-table-variants';
 import { useDataRequestMatchesTable } from './use-data-request-matches-table';
-
-const dataRequestMatchesTableVariants = tv({
-  slots: {
-    secondary: ['text-platform-muted'],
-    searchField: ['min-w-0 flex-1 basis-56'],
-    kindField: ['w-full sm:w-56'],
-  },
-});
 
 const COLUMN_LABEL_KEYS = {
   [DATA_REQUEST_MATCH_COLUMN.KIND]: 'columnKind',

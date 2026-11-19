@@ -173,10 +173,11 @@ from `useSettingsFormState()`:
 - A translated label on every column (`sr-only` for actions), `<time dateTime>`
   for dates, `emptyMessage` for the empty list. `ariaLabel`, the page's title,
   names the scroll region. A card title with its count
-  (`DataTableShell.Title`), a filter strip (`DataTableShell.Toolbar`), a note
-  under the rows (`DataTableShell.Note`) and fixed column widths (a column's
-  `width`, px or %) are the shell's own opt-in parts, kept in the empty state; a mode it
-  still lacks goes into the shell, never a hand-built `<table>`.
+  (`DataTableShell.Title`), a filter strip (`DataTableShell.Toolbar`) and a
+  note under the rows (`DataTableShell.Note`) are the shell's own opt-in
+  parts, kept in the empty state; a column's `width` (px or %) fixes the
+  table's columns. A mode the shell still lacks goes into it, never a
+  hand-built `<table>`.
 
 ### Editing a shared primitive
 

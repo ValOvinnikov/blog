@@ -50,17 +50,6 @@ export const ConfirmDialogContent = ({
       finalFocus={finalFocus}
       actions={
         <>
-          <AlertDialog.Close
-            render={
-              <Button
-                type="button"
-                variant={BUTTON_VARIANT.SECONDARY}
-                isDisabled={isPending}
-              />
-            }
-          >
-            {keepLabel}
-          </AlertDialog.Close>
           <Button
             type="button"
             variant={tone}
@@ -74,6 +63,17 @@ export const ConfirmDialogContent = ({
           >
             {confirmButtonLabel}
           </Button>
+          <AlertDialog.Close
+            render={
+              <Button
+                type="button"
+                variant={BUTTON_VARIANT.SECONDARY}
+                isDisabled={isPending}
+              />
+            }
+          >
+            {keepLabel}
+          </AlertDialog.Close>
         </>
       }
     >

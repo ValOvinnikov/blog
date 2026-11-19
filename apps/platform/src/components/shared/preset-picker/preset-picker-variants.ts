@@ -24,7 +24,7 @@ export const presetPickerVariants = tv({
       'text-platform-12-5 leading-platform-1-4 text-platform-muted',
     ],
     dot: [
-      'flex size-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px]',
+      'flex size-[18px] shrink-0 items-center justify-center rounded-full border-platform-ring',
     ],
   },
   variants: {

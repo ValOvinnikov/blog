@@ -68,8 +68,10 @@ const SPACING_TOKENS = [
   'site-y',
   'card-x',
   'card-y',
-  ...platformTokens('card'),
+  ...platformTokens('card', 'cell-inset'),
 ];
+
+const BORDER_WIDTH_TOKENS = platformTokens('ring');
 
 const RADIUS_TOKENS = [
   'platform',
@@ -101,6 +103,7 @@ export const tv = createTV({
         'font-weight': [{ font: FONT_WEIGHT_TOKENS }],
         leading: [{ leading: LEADING_TOKENS }],
         tracking: [{ tracking: TRACKING_TOKENS }],
+        'border-w': [{ border: BORDER_WIDTH_TOKENS }],
         rounded: [{ rounded: RADIUS_TOKENS }],
         'rounded-t': [{ 'rounded-t': RADIUS_TOKENS }],
         'rounded-b': [{ 'rounded-b': RADIUS_TOKENS }],

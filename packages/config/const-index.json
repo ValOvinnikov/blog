@@ -5900,6 +5900,14 @@
         "file": "apps/platform/src/constants/activity.ts"
       }
     ],
+    "region": [
+      {
+        "ref": "ARIA_ROLE.REGION",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
+      }
+    ],
     "rowgroup": [
       {
         "ref": "ARIA_ROLE.ROWGROUP",

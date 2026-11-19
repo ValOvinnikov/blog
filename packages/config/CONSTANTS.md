@@ -456,7 +456,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/aria-role` — `apps/platform/src/constants/aria-role.ts`
 
-- **ARIA_ROLE**: `TABLE`=`"table"`, `ROWGROUP`=`"rowgroup"`, `ROW`=`"row"`, `CELL`=`"cell"`
+- **ARIA_ROLE**: `REGION`=`"region"`, `TABLE`=`"table"`, `ROWGROUP`=`"rowgroup"`, `ROW`=`"row"`, `CELL`=`"cell"`
 
 ### `@platform/constants/asset-upload` — `apps/platform/src/constants/asset-upload.ts`
 

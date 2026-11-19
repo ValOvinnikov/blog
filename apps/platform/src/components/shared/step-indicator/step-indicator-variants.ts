@@ -57,7 +57,7 @@ export const stepIndicatorVariants = tv({
       state: STEP_INDICATOR_STATE.UPCOMING,
       class: {
         circle: [
-          'border-[1.5px] border-platform-rail-muted bg-transparent text-platform-rail-muted',
+          'border-platform-ring border-platform-rail-muted bg-transparent text-platform-rail-muted',
         ],
       },
     },

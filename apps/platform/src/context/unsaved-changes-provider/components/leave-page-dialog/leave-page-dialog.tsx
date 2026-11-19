@@ -38,11 +38,12 @@ export const LeavePageDialog = ({
         actions={
           <>
             <Button
-              variant={BUTTON_VARIANT.GHOST}
-              onClick={onStay}
-              isDisabled={isSaving}
+              variant={BUTTON_VARIANT.PRIMARY}
+              onClick={onSave}
+              isPending={isSaving}
+              pendingLabel={t('saving')}
             >
-              {t('stay')}
+              {t('saveAndLeave')}
             </Button>
             <Button
               variant={BUTTON_VARIANT.DANGER}
@@ -52,12 +53,11 @@ export const LeavePageDialog = ({
               {t('discardAndLeave')}
             </Button>
             <Button
-              variant={BUTTON_VARIANT.PRIMARY}
-              onClick={onSave}
-              isPending={isSaving}
-              pendingLabel={t('saving')}
+              variant={BUTTON_VARIANT.GHOST}
+              onClick={onStay}
+              isDisabled={isSaving}
             >
-              {t('saveAndLeave')}
+              {t('stay')}
             </Button>
           </>
         }

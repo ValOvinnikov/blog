@@ -78,13 +78,10 @@ const DataTableShellRoot = <TItem,>({
       hasWidths,
     });
   const { slots } = mapCompoundSlots(children, DataTableShellSlots);
-  const stackedLabels = isStacked
-    ? columns.map(({ label }) => label)
-    : undefined;
-  const renderShellRow = (item: TItem) => {
+  const renderStackedRow = (item: TItem) => {
     const row = renderRow(item);
     return isValidElement<TDataTableShellRowProps>(row)
-      ? cloneElement(row, { stackedLabels })
+      ? cloneElement(row, { stackedLabels: columns.map(({ label }) => label) })
       : row;
   };
   const stackedRole = (role: TValueOf<typeof ARIA_ROLE>) =>
@@ -102,7 +99,7 @@ const DataTableShellRoot = <TItem,>({
           // Focusable so Safari, which skips scroll containers, can scroll it by keyboard.
           <div
             className={scrollRegion()}
-            role="region"
+            role={ARIA_ROLE.REGION}
             aria-label={ariaLabel}
             tabIndex={0}
           >
@@ -130,7 +127,7 @@ const DataTableShellRoot = <TItem,>({
                 </tr>
               </thead>
               <tbody className={tbody()} role={stackedRole(ARIA_ROLE.ROWGROUP)}>
-                {items.map(renderShellRow)}
+                {items.map(isStacked ? renderStackedRow : renderRow)}
               </tbody>
             </table>
           </div>

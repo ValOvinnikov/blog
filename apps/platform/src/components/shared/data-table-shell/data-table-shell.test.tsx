@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ROLE } from '@platform/constants/aria-role';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { SORT_DIRECTION } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -32,15 +33,22 @@ const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_NOTE = faker.lorem.sentence();
 const MOCK_ACTIONS_LABEL = faker.lorem.word();
 
-const renderStackedTable = () =>
+const renderTable = (
+  items: TItem[],
+  {
+    sort,
+    isStacked,
+    children,
+  }: Pick<TColumn, 'sort'> & Pick<TShellProps, 'isStacked' | 'children'> = {},
+) =>
   renderWithIntl(
     <DataTableShell
-      items={MOCK_ITEMS}
+      items={items}
       emptyMessage={MOCK_EMPTY_MESSAGE}
       ariaLabel={MOCK_ARIA_LABEL}
-      isStacked={true}
+      isStacked={isStacked}
       columns={[
-        { key: 'name', label: MOCK_COLUMN_LABEL },
+        { key: 'name', label: MOCK_COLUMN_LABEL, sort },
         { key: 'actions', label: MOCK_ACTIONS_LABEL },
       ]}
       renderRow={(item) => (
@@ -48,30 +56,6 @@ const renderStackedTable = () =>
           <DataTableShell.Cell>{item.name}</DataTableShell.Cell>
           <DataTableShell.Cell>{null}</DataTableShell.Cell>
         </DataTableShell.Row>
-      )}
-    />,
-  );
-
-const renderTable = (
-  items: TItem[],
-  {
-    sort,
-    children,
-  }: Pick<TColumn, 'sort'> & Pick<TShellProps, 'children'> = {},
-) =>
-  renderWithIntl(
-    <DataTableShell
-      items={items}
-      emptyMessage={MOCK_EMPTY_MESSAGE}
-      ariaLabel={MOCK_ARIA_LABEL}
-      columns={[
-        { key: 'name', label: MOCK_COLUMN_LABEL, sort },
-        { key: 'actions', label: null },
-      ]}
-      renderRow={(item) => (
-        <tr key={item.id}>
-          <td>{item.name}</td>
-        </tr>
       )}
     >
       {children}
@@ -113,7 +97,7 @@ describe(`<${DataTableShell.name}/>`, () => {
     it.each([MOCK_FIRST_ITEM, MOCK_SECOND_ITEM])(
       'renders a row for $name',
       ({ name }) => {
-        const cell = screen.getByRole('cell', { name });
+        const cell = screen.getByRole(ARIA_ROLE.CELL, { name });
 
         expect(cell).toBeVisible();
       },
@@ -136,13 +120,13 @@ describe(`<${DataTableShell.name}/>`, () => {
 
   describe('stacked', () => {
     beforeEach(() => {
-      renderStackedTable();
+      renderTable(MOCK_ITEMS, { isStacked: true });
     });
 
     it.each([MOCK_FIRST_ITEM, MOCK_SECOND_ITEM])(
       'names the cell for $name after its column',
       ({ name }) => {
-        const cell = screen.getByRole('cell', {
+        const cell = screen.getByRole(ARIA_ROLE.CELL, {
           name: `${MOCK_COLUMN_LABEL} ${name}`,
         });
 

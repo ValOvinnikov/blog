@@ -46,6 +46,14 @@ describe(`<${Dialog.name}/>`, () => {
     expect(footerButton).toBeVisible();
   });
 
+  it('focuses the first control in its body on open', async () => {
+    setup({ children: <input aria-label={MOCK_BODY} /> });
+
+    const field = screen.getByRole('textbox', { name: MOCK_BODY });
+
+    await vi.waitFor(() => expect(field).toHaveFocus());
+  });
+
   it('renders nothing while closed', () => {
     setup({ isOpen: false });
 

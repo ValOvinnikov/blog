@@ -103,9 +103,8 @@ opt-in modes; a caller that does not set them is unchanged:
   when a row is gone), a `Text variant="meta"` count beside it, an optional
   supporting line under it;
 - a note under the rows;
-- column widths, in px or % only (a `<col>` takes no `fr`): Role `96px`,
-  actions `128px`; Person and Studio access share the rest, spaced by the
-  shell's cell padding;
+- column widths: Person `1.5fr`, Role `96px`, Studio access `1.7fr`, actions
+  `128px`, gap 16px;
 - a stacked mode below `md` (Phone), which the Team page's two tables turn
   on. Other tables keep scrolling sideways; `TenantsTable` sorts from its head
   row, which the stacked mode hides.

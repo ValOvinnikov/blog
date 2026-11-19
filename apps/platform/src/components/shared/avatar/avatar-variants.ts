@@ -24,7 +24,7 @@ export const avatarVariants = tv({
       ],
       [AVATAR_VARIANT.PENDING]: [
         'size-8 rounded-full text-platform-12-5 font-semibold',
-        'border-[1.5px] border-dashed border-platform-control-line text-platform-muted',
+        'border-platform-ring border-dashed border-platform-control-line text-platform-muted',
       ],
     },
   },

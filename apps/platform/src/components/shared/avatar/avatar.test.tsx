@@ -3,6 +3,7 @@ import {
   AVATAR_UNKNOWN_INITIAL,
   AVATAR_VARIANT,
 } from '@platform/constants/avatar';
+import { ARIA_HIDDEN } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 
 import { Avatar } from './avatar';
@@ -80,6 +81,6 @@ describe(`<${Avatar.name}/>`, () => {
 
     const initials = screen.getByText(MOCK_INITIALS);
 
-    expect(initials).toHaveAttribute('aria-hidden', 'true');
+    expect(initials).toHaveAttribute(ARIA_HIDDEN, 'true');
   });
 });
