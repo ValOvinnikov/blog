@@ -1,23 +1,16 @@
 import {
-  SIZE,
   TEXT_ROLE,
   type ILink,
   type IWithClassName,
   type IWithDataTestId,
 } from '@shinefold/config';
 import type { TAnchorElementType } from '@shinefold/config/react';
-import { Button } from '@shinefold/ui/components/atoms/button';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Text } from '@shinefold/ui/components/atoms/text';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import type { ReactNode } from 'react';
 
 import { consentBannerVariants } from './consent-banner-variants';
-
-export interface IConsentBannerLabels {
-  accept: string;
-  reject: string;
-  settings: string;
-}
 
 export type TConsentBannerProps = IWithClassName &
   IWithDataTestId & {
@@ -25,10 +18,7 @@ export type TConsentBannerProps = IWithClassName &
     message: string;
     policyLink?: Pick<ILink, 'href' | 'label'>;
     linkAs?: TAnchorElementType;
-    labels: IConsentBannerLabels;
-    onAccept: () => void;
-    onReject: () => void;
-    onOpenSettings: () => void;
+    actions: ReactNode;
   };
 
 const s = consentBannerVariants();
@@ -39,10 +29,7 @@ export const ConsentBanner = ({
   message,
   policyLink,
   linkAs,
-  labels,
-  onAccept,
-  onReject,
-  onOpenSettings,
+  actions,
   className,
   dataTestId,
 }: TConsentBannerProps) => (
@@ -61,21 +48,6 @@ export const ConsentBanner = ({
         </>
       )}
     </Text>
-    <div className={s.actions()}>
-      <Button variant="primary" size={SIZE.SM} onClick={onAccept}>
-        {labels.accept}
-      </Button>
-      <Button variant="primary" size={SIZE.SM} onClick={onReject}>
-        {labels.reject}
-      </Button>
-      <Button
-        variant="link"
-        size={SIZE.SM}
-        onClick={onOpenSettings}
-        className={s.settings()}
-      >
-        {labels.settings}
-      </Button>
-    </div>
+    <div className={s.actions()}>{actions}</div>
   </div>
 );

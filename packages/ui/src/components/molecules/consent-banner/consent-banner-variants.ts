@@ -10,6 +10,5 @@ export const consentBannerVariants = tv({
       'sm:rounded-md sm:border',
     ],
     actions: ['flex flex-wrap items-center gap-2 pt-1'],
-    settings: ['ml-auto'],
   },
 });
