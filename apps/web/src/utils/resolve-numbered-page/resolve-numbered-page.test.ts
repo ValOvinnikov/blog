@@ -18,8 +18,8 @@ faker.seed(7645);
 
 const MOCK_FIRST_PAGE_HREF = `/${faker.lorem.slug(2)}`;
 const MOCK_PAGE = faker.number.int({ min: 2, max: 999 });
-const FIRST_PAGE = '1';
-const NON_CANONICAL_PAGES = ['abc', '02'];
+const MOCK_FIRST_PAGE = '1';
+const MOCK_NON_CANONICAL_PAGES = ['abc', '02'];
 
 describe(resolveNumberedPage, () => {
   it('returns a page past the first', async () => {
@@ -40,7 +40,7 @@ describe(resolveNumberedPage, () => {
     });
 
     await expect(
-      resolveNumberedPage(FIRST_PAGE, MOCK_FIRST_PAGE_HREF),
+      resolveNumberedPage(MOCK_FIRST_PAGE, MOCK_FIRST_PAGE_HREF),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(permanentRedirect).toHaveBeenCalledWith({
@@ -49,7 +49,7 @@ describe(resolveNumberedPage, () => {
     });
   });
 
-  it.each(NON_CANONICAL_PAGES)(
+  it.each(MOCK_NON_CANONICAL_PAGES)(
     'hard-404s a non-canonical page param (%s)',
     async (rawPage) => {
       await expect(
@@ -67,7 +67,7 @@ describe(toNumberedMetadataPage, () => {
     expect(toNumberedMetadataPage(String(MOCK_PAGE))).toBe(MOCK_PAGE);
   });
 
-  it.each([FIRST_PAGE, ...NON_CANONICAL_PAGES])(
+  it.each([MOCK_FIRST_PAGE, ...MOCK_NON_CANONICAL_PAGES])(
     'returns null for page param %s',
     (rawPage) => {
       expect(toNumberedMetadataPage(rawPage)).toBeNull();
