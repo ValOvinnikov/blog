@@ -3,7 +3,10 @@ import { STARTER_DOCUMENT_ID_PREFIX } from '@shinefold/config/constants';
 import { sanitizeLogMessage } from '@shinefold/insight';
 import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
-import { SAMPLE_CONTENT_LOG } from '@worker/constants/sample-content';
+import {
+  REVISION_LOCK_PSEUDO_FIELD,
+  SAMPLE_CONTENT_LOG,
+} from '@worker/constants/sample-content';
 import { logger } from '@worker/utils/logger/logger';
 import { planSampleContentRemoval } from '@worker/utils/sample-content/plan-sample-content-removal';
 import { createTenantWriteClient } from '@worker/utils/tenant-content/tenant-write-client';
@@ -47,7 +50,10 @@ export async function removeSampleContent(
         });
       }
       for (const { documentId, revision } of removals) {
-        transaction.patch(documentId, { ifRevisionID: revision });
+        transaction.patch(documentId, {
+          ifRevisionID: revision,
+          unset: [REVISION_LOCK_PSEUDO_FIELD],
+        });
         transaction.delete(documentId);
       }
       await transaction.commit();

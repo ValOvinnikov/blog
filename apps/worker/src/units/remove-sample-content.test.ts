@@ -1,11 +1,15 @@
 import { STARTER_DOCUMENT_IDS } from '@shinefold/config';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
-import { SAMPLE_CONTENT_LOG } from '@worker/constants/sample-content';
+import {
+  REVISION_LOCK_PSEUDO_FIELD,
+  SAMPLE_CONTENT_LOG,
+} from '@worker/constants/sample-content';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
   MOCK_REVISION,
   mockKeyedReference,
   mockReference,
+  mockRevision,
   mockSanityDocument,
 } from '@worker/testing/sample-content/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
@@ -26,8 +30,10 @@ const deleteDocument = vi.fn();
 const commit = vi.fn();
 const transaction = vi.fn(() => ({ patch, delete: deleteDocument, commit }));
 
+const MOCK_CTA_REVISION = mockRevision();
+
 const MOCK_STARTER_DOCUMENTS = [
-  mockSanityDocument(ids.BLOG_CTA),
+  mockSanityDocument(ids.BLOG_CTA, {}, { revision: MOCK_CTA_REVISION }),
   mockSanityDocument(ids.BLOG_HERO),
   mockSanityDocument(ids.BLOG_ABOUT, {}, { isEdited: true }),
 ];
@@ -78,12 +84,19 @@ describe(removeSampleContent, () => {
     expect(commit).toHaveBeenCalledOnce();
   });
 
-  it('guards each delete with the revision the plan read', async () => {
+  it('guards each delete with the revision the plan read for that document', async () => {
     await removeSampleContent(MOCK_TENANT_ID);
 
     expect(patch).toHaveBeenCalledWith(ids.BLOG_CTA, {
-      ifRevisionID: MOCK_REVISION,
+      ifRevisionID: MOCK_CTA_REVISION,
+      unset: [REVISION_LOCK_PSEUDO_FIELD],
     });
+    const guardIndex = patch.mock.calls.findIndex(
+      ([documentId]) => documentId === ids.BLOG_CTA,
+    );
+    expect(patch.mock.invocationCallOrder[guardIndex]).toBeLessThan(
+      Math.min(...deleteDocument.mock.invocationCallOrder),
+    );
   });
 
   it('writes nothing when no sample can be removed', async () => {

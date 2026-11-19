@@ -5,7 +5,11 @@ const mockFaker = createMockFaker(4971);
 
 const MOCK_SEEDED_AT = mockFaker.date.past().toISOString();
 const MOCK_EDITED_AT = mockFaker.date.recent().toISOString();
-export const MOCK_REVISION = mockFaker.string.alphanumeric(22);
+export function mockRevision(): string {
+  return mockFaker.string.alphanumeric(22);
+}
+
+export const MOCK_REVISION = mockRevision();
 export const MOCK_OWNER_DOCUMENT_ID = mockFaker.string.uuid();
 
 export function mockReference(id: string) {
@@ -19,12 +23,12 @@ export function mockKeyedReference(id: string) {
 export function mockSanityDocument(
   _id: string,
   fields: Record<string, unknown> = {},
-  { isEdited = false } = {},
+  { isEdited = false, revision = MOCK_REVISION } = {},
 ): SanityDocument {
   return {
     _id,
     _type: mockFaker.lorem.word(),
-    _rev: MOCK_REVISION,
+    _rev: revision,
     _createdAt: MOCK_SEEDED_AT,
     _updatedAt: isEdited ? MOCK_EDITED_AT : MOCK_SEEDED_AT,
     ...fields,
