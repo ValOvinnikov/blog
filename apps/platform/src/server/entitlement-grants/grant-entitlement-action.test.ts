@@ -52,6 +52,14 @@ const grantEntitlement = vi.mocked(
 const MOCK_NOTE = 'Launch partner';
 const MOCK_NOW = new Date('2026-11-18T10:00:00.000Z');
 const MOCK_IN_30_DAYS = new Date('2026-12-18T10:00:00.000Z');
+const MOCK_LOCALE_LIMIT_ITEM = {
+  kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+  value: 3,
+} as const;
+const MOCK_UNNEEDED_LOCALE_LIMIT_ITEM = {
+  kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+  value: 1,
+} as const;
 const MOCK_CONTACT_FORM_ITEM = {
   kind: ENTITLEMENT_KIND.CAPABILITY,
   key: CAPABILITY.CONTACT_FORM,
@@ -65,6 +73,15 @@ const grant = (overrides = {}) =>
     ...overrides,
   });
 
+const expectedGrantInput = (overrides = {}) => ({
+  tenantId: MOCK_TENANT_ID,
+  item: MOCK_CONTACT_FORM_ITEM,
+  grantedBy: MOCK_SUPER_ADMIN.id,
+  expiresAt: MOCK_IN_30_DAYS,
+  note: MOCK_NOTE,
+  ...overrides,
+});
+
 describe(grantEntitlementAction, () => {
   usePassedGrantActionGate();
 
@@ -75,12 +92,13 @@ describe(grantEntitlementAction, () => {
   beforeEach(() => {
     vi.useFakeTimers({ now: MOCK_NOW });
     grantEntitlement.mockResolvedValue(
-      okResult(
-        mockEntitlementGrantRow({
+      okResult({
+        grant: mockEntitlementGrantRow({
           expiresAt: MOCK_IN_30_DAYS,
           note: MOCK_NOTE,
         }),
-      ),
+        closedGrantId: null,
+      }),
     );
   });
 
@@ -96,13 +114,7 @@ describe(grantEntitlementAction, () => {
     const result = await grant();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(grantEntitlement).toHaveBeenCalledWith({
-      tenantId: MOCK_TENANT_ID,
-      item: MOCK_CONTACT_FORM_ITEM,
-      grantedBy: MOCK_SUPER_ADMIN.id,
-      expiresAt: MOCK_IN_30_DAYS,
-      note: MOCK_NOTE,
-    });
+    expect(grantEntitlement).toHaveBeenCalledWith(expectedGrantInput());
     expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(firstRecordedAuditEvent(vi.mocked(recordAuditEvent))).toEqual({
       action: AUDIT_ACTION.ENTITLEMENT_GRANTED,
@@ -123,7 +135,7 @@ describe(grantEntitlementAction, () => {
     await grant({ note: ' ' });
 
     expect(grantEntitlement).toHaveBeenCalledWith(
-      expect.objectContaining({ note: null }),
+      expectedGrantInput({ note: null }),
     );
   });
 
@@ -140,13 +152,11 @@ describe(grantEntitlementAction, () => {
   });
 
   it('passes a language limit grant through as the item', async () => {
-    const item = { kind: ENTITLEMENT_KIND.LOCALE_LIMIT, value: 3 } as const;
-
-    const result = await grant({ item });
+    const result = await grant({ item: MOCK_LOCALE_LIMIT_ITEM });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(grantEntitlement).toHaveBeenCalledWith(
-      expect.objectContaining({ item }),
+      expectedGrantInput({ item: MOCK_LOCALE_LIMIT_ITEM }),
     );
   });
 
@@ -169,7 +179,7 @@ describe(grantEntitlementAction, () => {
     {
       item: 'a language limit',
       plan: TENANT_PLAN.GROWTH,
-      grantItem: { kind: ENTITLEMENT_KIND.LOCALE_LIMIT, value: 3 },
+      grantItem: MOCK_LOCALE_LIMIT_ITEM,
     },
   ])(
     'refuses $item the plan already includes without writing or auditing',
@@ -194,13 +204,13 @@ describe(grantEntitlementAction, () => {
     await grant({ expiry: ENTITLEMENT_GRANT_EXPIRY.NEVER });
 
     expect(grantEntitlement).toHaveBeenCalledWith(
-      expect.objectContaining({ expiresAt: null }),
+      expectedGrantInput({ expiresAt: null }),
     );
   });
 
   it('rejects a language limit no plan could need', async () => {
     const result = await grant({
-      item: { kind: ENTITLEMENT_KIND.LOCALE_LIMIT, value: 1 },
+      item: MOCK_UNNEEDED_LOCALE_LIMIT_ITEM,
     });
 
     expect(result).toEqual({

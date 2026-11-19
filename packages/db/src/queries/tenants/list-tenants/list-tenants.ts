@@ -9,6 +9,7 @@ import type {
   TMaybeUndefined,
 } from '@shinefold/config/types';
 import { getDb } from '@shinefold/db/client';
+import { isNotDeprovisioned } from '@shinefold/db/queries/tenants/not-deprovisioned';
 import { tenantDomains } from '@shinefold/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import {
@@ -19,7 +20,6 @@ import {
   exists,
   getTableColumns,
   ilike,
-  isNull,
   or,
   sql,
   type SQL,
@@ -100,7 +100,7 @@ export async function listTenants({
     .from(tenants)
     .where(
       and(
-        includeArchived ? undefined : isNull(tenants.deprovisionedAt),
+        includeArchived ? undefined : isNotDeprovisioned,
         trimmedSearch ? matchesSearch(pattern) : undefined,
       ),
     )

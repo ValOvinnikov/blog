@@ -8,6 +8,7 @@ import {
   TENANT_STATUS,
   type TInactivityStage,
 } from '@shinefold/db/constants';
+import { isNotDeprovisioned } from '@shinefold/db/queries/tenants/not-deprovisioned';
 import { tenants } from '@shinefold/db/schema/tenants';
 import { daysBefore } from '@shinefold/db/utils/day-offset/day-offset';
 import {
@@ -69,7 +70,7 @@ export function inactivityStageDue(
   const cutoff = daysBefore(now, INACTIVITY_STAGE_DAY[stage]);
 
   return and(
-    isNull(tenants.deprovisionedAt),
+    isNotDeprovisioned,
     hasNoLiveSubscription,
     lte(tenants.lastActivityAt, cutoff),
     stageCondition[stage],

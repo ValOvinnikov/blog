@@ -1,23 +1,16 @@
 import type { TTenantPlan } from '@shinefold/config/constants';
-import type { TMaybeNull } from '@shinefold/config/types';
 import {
   ENTITLEMENT_KIND,
   PLAN_ENTITLEMENTS,
   PLAN_LOCALE_LIMIT,
   PLAN_REGISTRY,
-  type TEntitlementKind,
 } from '@shinefold/db/constants';
+import type { TStoredEntitlementItem } from '@shinefold/db/utils/stored-entitlement-item/stored-entitlement-item';
 import { isNull, isOneOf } from '@shinefold/utils/primitives';
-
-export type TPlanCoverageItem = {
-  kind: TEntitlementKind;
-  key: string;
-  value: TMaybeNull<number>;
-};
 
 export const isCoveredByPlan = (
   plan: TTenantPlan,
-  { kind, key, value }: TPlanCoverageItem,
+  { kind, key, value }: TStoredEntitlementItem,
 ): boolean => {
   const planEntitlements = PLAN_ENTITLEMENTS[plan];
 

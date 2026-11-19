@@ -2,7 +2,7 @@ import type { TMaybeNull } from '@shinefold/config';
 import { isNull } from '@shinefold/utils/primitives';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
+import { parsePageParam } from '@web/utils/parse-page-param';
 import { notFound } from 'next/navigation';
 
 export const resolveNumberedPage = async (

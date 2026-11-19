@@ -1,12 +1,8 @@
 import type { TMaybeUndefined } from '@shinefold/config/types';
 
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`deprovision-tenant: missing required env var ${name}.`);
-  }
-  return value;
-}
+import { requireEnv } from '../../lib/require-env';
+
+import { TOOL } from './tool';
 
 function readMarketingHost(): TMaybeUndefined<string> {
   const value = process.env['MARKETING_SITE_URL'];
@@ -14,9 +10,7 @@ function readMarketingHost(): TMaybeUndefined<string> {
     return undefined;
   }
   if (!URL.canParse(value)) {
-    throw new Error(
-      'deprovision-tenant: MARKETING_SITE_URL is not a valid URL.',
-    );
+    throw new Error(`${TOOL}: MARKETING_SITE_URL is not a valid URL.`);
   }
   return new URL(value).hostname;
 }
@@ -39,11 +33,11 @@ export type TDeprovisionEnv = {
 
 export function loadDeprovisionEnv(dryRun: boolean): TDeprovisionEnv {
   return {
-    sanityManagementToken: requireEnv('SANITY_MANAGEMENT_TOKEN'),
-    vercelToken: requireEnv('VERCEL_TOKEN'),
+    sanityManagementToken: requireEnv(TOOL, 'SANITY_MANAGEMENT_TOKEN'),
+    vercelToken: requireEnv(TOOL, 'VERCEL_TOKEN'),
     vercelTeamId: process.env['VERCEL_TEAM_ID'],
-    vercelWebProjectId: requireEnv('VERCEL_PROJECT_ID_WEB'),
-    tenantRootDomain: requireEnv('TENANT_ROOT_DOMAIN'),
+    vercelWebProjectId: requireEnv(TOOL, 'VERCEL_PROJECT_ID_WEB'),
+    tenantRootDomain: requireEnv(TOOL, 'TENANT_ROOT_DOMAIN'),
     marketingHost: readMarketingHost(),
     dryRun,
     githubActor: process.env['GITHUB_ACTOR'],

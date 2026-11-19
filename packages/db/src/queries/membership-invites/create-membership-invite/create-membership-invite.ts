@@ -9,9 +9,12 @@ import {
   type TMembershipInvite,
 } from '@shinefold/db/schema/membership-invites';
 import { tenants } from '@shinefold/db/schema/tenants';
+import {
+  castTo,
+  columnDefault,
+} from '@shinefold/db/utils/insert-select-columns/insert-select-columns';
 import { and, eq, sql } from 'drizzle-orm';
 
-import { castTo, columnDefault } from './insert-select-columns';
 import {
   membershipsCount,
   pendingInvitesCount,

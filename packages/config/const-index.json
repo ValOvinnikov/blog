@@ -1492,6 +1492,14 @@
         "file": "packages/config/src/constants/error.ts"
       }
     ],
+    "DB_ENTITLEMENT_EXPIRY_SHORTENED": [
+      {
+        "ref": "ERROR_CODE.DB_ENTITLEMENT_EXPIRY_SHORTENED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
     "DOCUMENT_VALIDATION": [
       {
         "ref": "FINDING_SOURCE.DOCUMENT_VALIDATION",
@@ -1652,6 +1660,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/button",
         "file": "apps/platform/src/constants/button.ts"
+      },
+      {
+        "ref": "PROVIDER_LINK_ACTION.LINK",
+        "scope": "app:web",
+        "from": "@web/constants/provider-link",
+        "file": "apps/web/src/constants/provider-link.ts"
       }
     ],
     "COOKIE_SETTINGS": [
@@ -4578,6 +4592,22 @@
         "scope": "app:platform",
         "from": "@platform/constants/device-frame",
         "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "UNLINKED": [
+      {
+        "ref": "UNLINK_PROVIDER_OUTCOME.UNLINKED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/unlink-provider-outcome.ts"
+      }
+    ],
+    "LAST_METHOD": [
+      {
+        "ref": "UNLINK_PROVIDER_OUTCOME.LAST_METHOD",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/unlink-provider-outcome.ts"
       }
     ],
     "SUPERADMIN": [
@@ -9488,6 +9518,134 @@
         "file": "apps/platform/src/constants/support.ts"
       }
     ],
+    "ALREADY_MEMBER": [
+      {
+        "ref": "TEAM_INVITE_FIELD_ERROR.ALREADY_MEMBER",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "ALREADY_INVITED": [
+      {
+        "ref": "TEAM_INVITE_FIELD_ERROR.ALREADY_INVITED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "OWNER_INVITE": [
+      {
+        "ref": "TEAM_REFUSAL.OWNER_INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "/api/member-access/check": [
+      {
+        "ref": "MEMBER_ACCESS_PATH.CHECK",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "/api/member-access/resend": [
+      {
+        "ref": "MEMBER_ACCESS_PATH.RESEND",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "/api/member-access/revoke": [
+      {
+        "ref": "MEMBER_ACCESS_PATH.REVOKE",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.invite_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.INVITE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.invite_email_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.INVITE_EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.invite_audit_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.INVITE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.remove_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.REMOVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.remove_audit_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.REMOVE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.revoke_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.REVOKE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.revoke_skipped_no_email": [
+      {
+        "ref": "TEAM_ACCESS_LOG.REVOKE_SKIPPED_NO_EMAIL",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.cancel_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.CANCEL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.cancel_audit_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.CANCEL_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.access_request_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.ACCESS_REQUEST_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
     "CONFIRM_REQUIRED": [
       {
         "ref": "TENANT_FIELD_ERROR.CONFIRM_REQUIRED",
@@ -10186,6 +10344,22 @@
         "scope": "app:web",
         "from": "@web/constants/account-control",
         "file": "apps/web/src/constants/account-control.ts"
+      }
+    ],
+    "account.provider_unlink_failed": [
+      {
+        "ref": "ACCOUNT_LOG.PROVIDER_UNLINK_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/account",
+        "file": "apps/web/src/constants/account.ts"
+      }
+    ],
+    "account.display_name_update_failed": [
+      {
+        "ref": "ACCOUNT_LOG.DISPLAY_NAME_UPDATE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/account",
+        "file": "apps/web/src/constants/account.ts"
       }
     ],
     "bookmark_button.status_fetch_failed": [
@@ -11108,6 +11282,46 @@
         "file": "apps/web/src/constants/internal-pages.ts"
       }
     ],
+    "website": [
+      {
+        "ref": "OG_TYPE.WEBSITE",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
+    "article": [
+      {
+        "ref": "OG_TYPE.ARTICLE",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
+    "summary": [
+      {
+        "ref": "TWITTER_CARD.SUMMARY",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
+    "summary_large_image": [
+      {
+        "ref": "TWITTER_CARD.SUMMARY_LARGE_IMAGE",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
+    "application/rss+xml": [
+      {
+        "ref": "ALTERNATE_TYPE.RSS",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
     "module_renderer.unknown_module_type": [
       {
         "ref": "MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE",
@@ -11434,6 +11648,14 @@
         "scope": "app:web",
         "from": "@web/constants/pricing",
         "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "UNLINK": [
+      {
+        "ref": "PROVIDER_LINK_ACTION.UNLINK",
+        "scope": "app:web",
+        "from": "@web/constants/provider-link",
+        "file": "apps/web/src/constants/provider-link.ts"
       }
     ],
     "proxy.tenant_lookup_failed": [

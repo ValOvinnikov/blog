@@ -15,9 +15,7 @@ export const reinviteChangedOwner = async (
 ): Promise<TMaybeUndefined<TOwnerAccessRequestResult>> => {
   await sendOwnerInviteEmail(tenant.id, ownerEmail);
   if (!tenant.sanityProjectId) return undefined;
-  return enqueueOwnerAccessRequest(
-    OWNER_INVITE_RESEND_PATH,
-    tenant.id,
+  return enqueueOwnerAccessRequest(OWNER_INVITE_RESEND_PATH, tenant.id, {
     formerOwnerEmail,
-  );
+  });
 };
