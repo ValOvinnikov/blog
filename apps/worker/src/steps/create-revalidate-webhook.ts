@@ -23,7 +23,7 @@ import { requireTenantManagementToken } from '@worker/utils/tenant-management-to
 const WEBHOOK_NAME = 'web-revalidate (provisioned)';
 
 export function revalidateWebhookUrl(webAppBaseUrl: string): string {
-  return `${webAppBaseUrl}/api/revalidate`;
+  return new URL('/api/revalidate', webAppBaseUrl).href;
 }
 
 async function webhooksTargeting(

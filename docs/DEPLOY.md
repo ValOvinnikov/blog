@@ -620,7 +620,8 @@ break-glass deprovision for an operator without the platform) and
 `.github/workflows/recheck-tenant-owners.yml`/`validate-tenant-documents.yml`/
 `sync-revalidate-webhooks.yml` all bind to whichever
 Environment their dispatch's `environment` input names (`development`/
-`production`, default `production`) — every credential they need, including
+`production`, default `production`, except `sync-revalidate-webhooks.yml`,
+which defaults to `development`) — every credential they need, including
 the tenant registry connection string, resolves from that same Environment,
 never a mix of the two.
 

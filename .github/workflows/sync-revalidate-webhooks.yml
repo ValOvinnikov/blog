@@ -1,8 +1,5 @@
 name: Sync Revalidate Webhooks
 
-# Runs the worker's revalidate-webhook step for every live tenant (`sync`) or
-# rotates a per-tenant secret onto every tenant still without one
-# (`rotate-secrets`). See `apps/worker/src/cli/`.
 on:
   workflow_dispatch:
     inputs:
@@ -22,7 +19,7 @@ on:
 permissions:
   contents: read
 
-# Both scripts write the same webhooks and secret columns, so any two runs queue.
+# Both scripts write each tenant's webhook and secret, so any two runs queue.
 concurrency:
   group: sync-revalidate-webhooks
   cancel-in-progress: false
