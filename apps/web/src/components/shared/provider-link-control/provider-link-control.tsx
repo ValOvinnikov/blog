@@ -1,7 +1,9 @@
 'use client';
 
 import { ACTION_OUTCOME, routes } from '@shinefold/config';
+import type { TValueOf } from '@shinefold/config/utils';
 import { Button } from '@shinefold/ui/components/atoms/button';
+import { PROVIDER_LINK_ACTION } from '@web/constants/provider-link';
 import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useActionToast } from '@web/hooks/use-action-toast';
 import {
@@ -14,7 +16,7 @@ import { useTransition } from 'react';
 
 export type TProviderLinkControlProps = {
   provider: TLinkableProvider;
-  action: 'link' | 'unlink';
+  action: TValueOf<typeof PROVIDER_LINK_ACTION>;
 };
 
 // signIn(provider) from an already-authenticated session links the provider to that account instead of signing in afresh.
@@ -27,7 +29,7 @@ export const ProviderLinkControl = ({
   const { isPending, run } = useActionToast();
   const [isLinkPending, startTransition] = useTransition();
 
-  const isLink = action === 'link';
+  const isLink = action === PROVIDER_LINK_ACTION.LINK;
 
   const handleLink = () => {
     startTransition(async () => {

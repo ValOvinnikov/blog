@@ -991,6 +991,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **PRICING_SEARCH_PARAM**: `PROMO`=`"promo"`
 - **PLAN_COMPARISON_ROW**: `LANGUAGES`, `SEATS`, `CUSTOM_DOMAIN`, `NO_POWERED_BY_MARK`, `LOOK_SETTINGS`, `SECTION_TYPES`, `OWN_ANALYTICS`, `OWN_SIGN_IN_APPS`, `CONTACT_FORM`, `READER_ACCOUNTS`, `NEWSLETTER_SUBSCRIBERS`, `TAKEAWAYS_PER_MONTH`
 
+### `@web/constants/provider-link` — `apps/web/src/constants/provider-link.ts`
+
+- **PROVIDER_LINK_ACTION**: `LINK`, `UNLINK`
+
 ### `@web/constants/proxy` — `apps/web/src/constants/proxy.ts`
 
 - **PROXY_LOG**: `TENANT_LOOKUP_FAILED`=`"proxy.tenant_lookup_failed"`
