@@ -2,7 +2,10 @@ import { faker } from '@faker-js/faker';
 import { routes } from '@shinefold/config';
 import { buildTopicMetadata } from '@web/metadata/topic-metadata';
 import { testPageRouteContract } from '@web/testing/app/page-route-contract';
-import { testPaginatedRouteContract } from '@web/testing/app/paginated-route-contract';
+import {
+  MOCK_SECOND_PAGE,
+  testPaginatedRouteContract,
+} from '@web/testing/app/paginated-route-contract';
 import { mockRouteParams } from '@web/testing/app/route-params';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 
@@ -11,7 +14,6 @@ import TopicNumberedPage, { generateMetadata, revalidate } from './page';
 faker.seed(6009);
 
 const MOCK_TOPIC_SLUG = faker.lorem.slug();
-const SECOND_PAGE = '2';
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -30,7 +32,7 @@ vi.mock('@web/components/pages/topic-page', () => ({
 const paramsFor = (page: string) =>
   mockRouteParams({ slug: MOCK_TOPIC_SLUG, page });
 
-const params = paramsFor(SECOND_PAGE);
+const params = paramsFor(MOCK_SECOND_PAGE);
 
 const setup = customRenderAsync(TopicNumberedPage, { params });
 
@@ -40,14 +42,12 @@ testPageRouteContract({
   revalidate,
   params,
   buildMetadata: buildTopicMetadata,
-  buildMetadataArgs: [MOCK_TOPIC_SLUG, Number(SECOND_PAGE)],
+  buildMetadataArgs: [MOCK_TOPIC_SLUG, Number(MOCK_SECOND_PAGE)],
 });
 
 testPaginatedRouteContract({
   page: TopicNumberedPage,
-  generateMetadata,
   paramsFor,
-  buildMetadata: buildTopicMetadata,
   firstPageHref: routes.topic(MOCK_TOPIC_SLUG, 1),
 });
 
@@ -57,6 +57,8 @@ describe(`<${TopicNumberedPage.name}/>`, () => {
 
     const topicPage = screen.getByTestId('topic-page');
 
-    expect(topicPage).toHaveTextContent(`${MOCK_TOPIC_SLUG}:${SECOND_PAGE}`);
+    expect(topicPage).toHaveTextContent(
+      `${MOCK_TOPIC_SLUG}:${MOCK_SECOND_PAGE}`,
+    );
   });
 });

@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
-import { routes } from '@shinefold/config';
+import { routes, type TMaybeNull } from '@shinefold/config';
+import { ALTERNATE_TYPE, OG_TYPE, TWITTER_CARD } from '@web/constants/metadata';
 import { mockMetadataSeo } from '@web/testing/metadata/to-metadata/fixtures';
 import { MOCK_EN_POST_SLUG } from '@web/testing/shared/post/fixtures';
 import { MOCK_OG_IMAGE_URL } from '@web/testing/shared/seo/og-image-fixtures';
@@ -15,13 +16,6 @@ import { toMetadata } from './to-metadata';
 vi.mock('@web/server/request-context/request-context');
 
 faker.seed(5210);
-
-const OG_TYPE = { WEBSITE: 'website', ARTICLE: 'article' } as const;
-const TWITTER_CARD = {
-  SUMMARY: 'summary',
-  SUMMARY_LARGE_IMAGE: 'summary_large_image',
-} as const;
-const RSS_FEED_TYPE = 'application/rss+xml';
 
 const HOME_PATH = routes.home();
 const POST_PATH = routes.post(MOCK_EN_POST_SLUG);
@@ -54,7 +48,7 @@ describe(toMetadata, () => {
         ogType,
       });
 
-      expect((metadata.openGraph as TOpenGraphWithType | null)?.type).toBe(
+      expect((metadata.openGraph as TMaybeNull<TOpenGraphWithType>)?.type).toBe(
         ogType,
       );
     },
@@ -68,7 +62,7 @@ describe(toMetadata, () => {
 
     expect(metadata.openGraph?.images).toBeUndefined();
     expect(metadata.twitter?.images).toBeUndefined();
-    expect((metadata.twitter as TTwitterWithCard | null)?.card).toBe(
+    expect((metadata.twitter as TMaybeNull<TTwitterWithCard>)?.card).toBe(
       TWITTER_CARD.SUMMARY,
     );
   });
@@ -120,7 +114,7 @@ describe(toMetadata, () => {
     });
 
     expect(metadata.alternates?.types).toEqual({
-      [RSS_FEED_TYPE]: routes.rssFeed(),
+      [ALTERNATE_TYPE.RSS]: routes.rssFeed(),
     });
   });
 
@@ -150,7 +144,7 @@ describe(toMetadata, () => {
     });
 
     it('maps twitter card, title, description, and images', () => {
-      expect((metadata.twitter as TTwitterWithCard | null)?.card).toBe(
+      expect((metadata.twitter as TMaybeNull<TTwitterWithCard>)?.card).toBe(
         TWITTER_CARD.SUMMARY_LARGE_IMAGE,
       );
       expect(metadata.twitter?.title).toBe(ogTitle);
