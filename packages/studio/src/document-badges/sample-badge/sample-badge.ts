@@ -1,4 +1,4 @@
-import { STARTER_DOCUMENT_ID_PREFIX } from '@shinefold/config';
+import { STARTER_DOCUMENT_ID_PREFIX } from '@shinefold/config/constants';
 import type { DocumentBadgeComponent } from 'sanity';
 
 export const SampleBadge: DocumentBadgeComponent = ({ id }) =>

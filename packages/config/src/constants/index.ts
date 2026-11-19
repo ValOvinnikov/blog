@@ -85,3 +85,4 @@ export * from './terms';
 export * from './theme-tokens';
 export * from './timeline';
 export * from './toast';
+export * from './starter-document';

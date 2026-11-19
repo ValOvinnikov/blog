@@ -1,7 +1,7 @@
-import { STARTER_DOCUMENT_ID_PREFIX } from '@shinefold/config';
 import {
   CAPABILITY,
   SANITY_WEBHOOK_OPERATION,
+  STARTER_DOCUMENT_ID_PREFIX,
 } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import { queries } from '@shinefold/db';

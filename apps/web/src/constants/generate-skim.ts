@@ -23,3 +23,5 @@ export const GENERATE_SKIM_LOG = {
   TENANT_NOT_SERVABLE: 'generate_skim.tenant_not_servable',
   TENANT_RESOLVE_FAILED: 'generate_skim.tenant_resolve_failed',
 } as const;
+
+export const SKIM_GO_LIVE_PATH = '/api/scheduled-post-skim';

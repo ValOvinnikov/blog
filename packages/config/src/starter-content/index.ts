@@ -10,4 +10,3 @@ export type {
   TStarterDocument,
   TStarterDocumentUnion,
 } from './starter-document';
-export { STARTER_DOCUMENT_ID_PREFIX } from './starter-document-ids';
