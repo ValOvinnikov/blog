@@ -10,11 +10,14 @@ import {
   growthBadgesOutsideNote,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
-import { setupLookPageContent as setup } from '@platform/testing/look/look-page-content-setup';
 import {
   arrangeLookPageQueries,
+  setupLookPageContent as setup,
+} from '@platform/testing/look/look-page-content-setup';
+import {
   getSiteConfigMock,
-} from '@platform/testing/look/mock-look-page-db';
+  selectLiveLocalesMock,
+} from '@platform/testing/look/look-page-db';
 import { mockViewer } from '@platform/testing/memberships/fixtures';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
@@ -29,7 +32,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { LookPageContent } from './look-page-content';
 
 vi.mock('@shinefold/db', async () =>
-  (await import('@platform/testing/look/mock-look-page-db')).mockLookPageDb(),
+  (await import('@platform/testing/look/look-page-db')).mockLookPageDb(),
 );
 
 vi.mock('@platform/server/settings-features/get-enabled-capabilities');
@@ -46,7 +49,10 @@ describe(`<${LookPageContent.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    arrangeLookPageQueries();
+    arrangeLookPageQueries({
+      getSiteConfig: getSiteConfigMock,
+      selectLiveLocalesWithin: selectLiveLocalesMock,
+    });
   });
 
   it('renders the Console defaults when the tenant has no saved look yet', async () => {

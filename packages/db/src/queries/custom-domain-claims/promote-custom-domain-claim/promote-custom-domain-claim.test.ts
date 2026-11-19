@@ -7,6 +7,7 @@ import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_SHARED_TENANT_DOMAIN,
+  insertTestTenantDomain,
 } from '@shinefold/db/testing/tenant-domains/fixtures';
 import { MOCK_TENANT_DOMAIN } from '@shinefold/db/testing/tenants/fixtures';
 import { errorResult } from '@shinefold/utils';
@@ -56,9 +57,11 @@ describe(promoteCustomDomainClaim, () => {
     });
 
     it('keeps the claim and reports a duplicate when the domain is held', async () => {
-      await db()
-        .insert(schema.tenantDomains)
-        .values({ tenantId: otherTenantId, domain: MOCK_SHARED_TENANT_DOMAIN });
+      await insertTestTenantDomain(
+        db(),
+        otherTenantId,
+        MOCK_SHARED_TENANT_DOMAIN,
+      );
 
       const result = await promoteCustomDomainClaim(tenantId, claim.id);
 

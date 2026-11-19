@@ -23,7 +23,7 @@ import { requireTenantManagementToken } from '@worker/utils/tenant-management-to
 const WEBHOOK_NAME = 'web-revalidate (provisioned)';
 
 export function revalidateWebhookUrl(webAppBaseUrl: string): string {
-  return `${webAppBaseUrl}/api/revalidate`;
+  return new URL('/api/revalidate', webAppBaseUrl).href;
 }
 
 async function webhooksTargeting(
@@ -70,7 +70,7 @@ async function updateStaleProjections(
 // hook at an old `WEB_APP_URL`, or one deleted in Sanity, must be replaced.
 export async function createTenantRevalidateWebhook(
   tenant: TTenant,
-  env: TProvisionEnv,
+  { webAppBaseUrl }: Pick<TProvisionEnv, 'webAppBaseUrl'>,
 ): Promise<TRevalidateWebhookChange> {
   const {
     id: tenantId,
@@ -90,7 +90,7 @@ export async function createTenantRevalidateWebhook(
     token: await requireTenantManagementToken(tenantId),
     projectId: sanityProjectId,
     dataset: sanityDataset,
-    url: revalidateWebhookUrl(env.webAppBaseUrl),
+    url: revalidateWebhookUrl(webAppBaseUrl),
   };
 
   const existing = await webhooksTargeting(target);

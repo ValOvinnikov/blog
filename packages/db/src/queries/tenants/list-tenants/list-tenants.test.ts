@@ -9,6 +9,7 @@ import * as schema from '@shinefold/db/schema';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { insertTestTenantDomain } from '@shinefold/db/testing/tenant-domains/fixtures';
 import { MOCK_DEPROVISIONED_AT } from '@shinefold/db/testing/tenants/fixtures';
 
 import { listTenants } from './list-tenants';
@@ -33,9 +34,9 @@ const MOCK_SECOND_EXTRA_DOMAIN = `b-${MOCK_SLUG}.example.com`;
 const MOCK_SEARCH_PRIMARY_DOMAIN = `${MOCK_SEARCH_WORD}-site.example.com`;
 
 async function insertTenantDomains(tenantId: string, domains: string[]) {
-  await db()
-    .insert(schema.tenantDomains)
-    .values(domains.map((domain) => ({ tenantId, domain })));
+  for (const domain of domains) {
+    await insertTestTenantDomain(db(), tenantId, domain);
+  }
 }
 
 afterEach(async () => {

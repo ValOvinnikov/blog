@@ -9,7 +9,6 @@ import {
   TENANT_STATUS,
   type TTenantProvisioningStatus,
 } from '@shinefold/db/constants';
-import { inviteEmailColumns } from '@shinefold/db/queries/membership-invites/invite-email-columns';
 import { lockMembershipsOverSeats } from '@shinefold/db/queries/memberships/lock-memberships-over-seats';
 import {
   getUnsentStudioReinviteEmail,
@@ -34,9 +33,11 @@ import {
   insertTestTenant,
   insertTestUser,
 } from '@shinefold/db/testing/fixtures';
+import { mockMembershipInvite } from '@shinefold/db/testing/membership-invites/fixtures';
 import {
   countLockedMemberships,
   insertTeam,
+  mockMembership,
 } from '@shinefold/db/testing/memberships/fixtures';
 import {
   decryptTestPersonalValue,
@@ -44,6 +45,7 @@ import {
 } from '@shinefold/db/testing/personal-data';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_SANITY_PROJECT_ID } from '@shinefold/db/testing/sanity-management-client/fixtures';
+import { insertTestTenantDomain } from '@shinefold/db/testing/tenant-domains/fixtures';
 import {
   MOCK_IDLE_PROVISIONING_STEPS,
   MOCK_MISSING_TENANT_ID,
@@ -148,19 +150,13 @@ async function insertTenantWithDomain(overrides?: {
     provisioningSteps: overrides?.provisioningSteps,
   });
 
-  await db().insert(tenantDomains).values({ tenantId: tenant.id, domain });
+  await insertTestTenantDomain(db(), tenant.id, domain);
 
   return tenant.id;
 }
 
 async function insertOwnerInvite(tenantId: string, email: string) {
-  await db()
-    .insert(membershipInvites)
-    .values({
-      tenantId,
-      ...inviteEmailColumns(email),
-      role: MEMBERSHIP_ROLE.OWNER,
-    });
+  await mockMembershipInvite(db(), tenantId, { email });
 }
 
 async function insertOwnerMember(
@@ -169,9 +165,11 @@ async function insertOwnerMember(
 ): Promise<string> {
   const { id: userId } = await insertTestUser(db(), user);
 
-  await db()
-    .insert(memberships)
-    .values({ tenantId, userId, role: MEMBERSHIP_ROLE.OWNER });
+  await mockMembership(db(), {
+    tenantId,
+    userId,
+    role: MEMBERSHIP_ROLE.OWNER,
+  });
 
   return userId;
 }
@@ -402,13 +400,10 @@ describe(updateTenantDetails, () => {
       });
 
       it('returns owner-email-taken when the new email matches another invite', async () => {
-        await db()
-          .insert(membershipInvites)
-          .values({
-            tenantId,
-            ...inviteEmailColumns(MOCK_MEMBER_EMAIL),
-            role: MEMBERSHIP_ROLE.EDITOR,
-          });
+        await mockMembershipInvite(db(), tenantId, {
+          email: MOCK_MEMBER_EMAIL,
+          role: MEMBERSHIP_ROLE.EDITOR,
+        });
 
         const result = await updateTenantDetails(tenantId, {
           ...MOCK_VALID_INPUT,
@@ -515,9 +510,7 @@ describe(updateTenantDetails, () => {
     });
 
     it('returns domain-taken when renaming onto its own secondary domain', async () => {
-      await db()
-        .insert(tenantDomains)
-        .values({ tenantId, domain: MOCK_ALT_DOMAIN });
+      await insertTestTenantDomain(db(), tenantId, MOCK_ALT_DOMAIN);
 
       const result = await updateTenantDetails(tenantId, {
         ...MOCK_VALID_INPUT,

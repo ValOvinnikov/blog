@@ -108,7 +108,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/error.ts`
 
-- **ERROR_CODE**: `DB_NOT_FOUND`, `DB_DUPLICATE_DOMAIN`, `DB_LAST_LINKED_METHOD`, `DB_HOLDS_PLATFORM_ROLE`, `DB_ALREADY_PROVISIONING`, `DB_INVALID_DOMAIN`, `DB_INVALID_EMAIL`, `DB_LOCALE_LIMIT_EXCEEDED`, `DB_DEFAULT_LOCALE_REPEATED`, `DB_ALREADY_OWNS_FREE_TENANT`, `DB_DOMAIN_CLAIM_EXISTS`, `DB_ENTITLEMENT_ALREADY_GRANTED`
+- **ERROR_CODE**: `DB_NOT_FOUND`, `DB_DUPLICATE_DOMAIN`, `DB_LAST_LINKED_METHOD`, `DB_HOLDS_PLATFORM_ROLE`, `DB_ALREADY_PROVISIONING`, `DB_INVALID_DOMAIN`, `DB_INVALID_EMAIL`, `DB_LOCALE_LIMIT_EXCEEDED`, `DB_DEFAULT_LOCALE_REPEATED`, `DB_ALREADY_OWNS_FREE_TENANT`, `DB_DOMAIN_CLAIM_EXISTS`, `DB_ENTITLEMENT_ALREADY_GRANTED`, `DB_ENTITLEMENT_EXPIRY_SHORTENED`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/finding.ts`
 
@@ -334,6 +334,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **TENANT_WRITE_REFUSAL**: `UNRESOLVED`, `INACTIVE`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/text-role.ts`
+
+- **TEXT_ROLE**: `HERO_TITLE`, `POST_TITLE`, `PAGE_TITLE`, `SECTION_TITLE`, `CARD_TITLE`, `ITEM_TITLE`, `DIALOG_TITLE`, `PROSE_H2`, `PROSE_H3`, `PROSE_H4`, `INTRO`, `BODY`, `CARD_BODY`, `META`, `EYEBROW`, `LABEL`, `FOOTNOTE`, `CAPTION`, `QUOTE`, `ATTRIBUTION`, `FIGURE`, `FIGURE_LABEL`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/timeline.ts`
 
 - **TIMELINE_MARKER_STYLE**: `NUMBERED`, `LABELLED`
@@ -342,6 +346,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@shinefold/config/constants` — `packages/config/src/constants/toast.ts`
 
 - **TOAST_TYPE**: `SUCCESS`, `INFO`, `WARNING`, `ERROR`
+
+### `@shinefold/config/constants` — `packages/config/src/constants/unlink-provider-outcome.ts`
+
+- **UNLINK_PROVIDER_OUTCOME**: `UNLINKED`, `LAST_METHOD`
 
 ## db
 
@@ -813,6 +821,13 @@ Every key/value const an agent should reuse before writing a literal. The
 - **SUPPORT_LIMIT**: `SUBJECT_MAX_LENGTH`=`150`, `MESSAGE_MAX_LENGTH`=`5000`, `ORIGIN_PATH_MAX_LENGTH`=`500`, `MESSAGES_PER_WINDOW`=`5`
 - **SUPPORT_LOG**: `ADDRESS_MISSING`=`"support.address_missing"`, `SEND_FAILED`=`"support.send_failed"`, `COPY_FAILED`=`"support.copy_failed"`
 
+### `@platform/constants/team-access` — `apps/platform/src/constants/team-access.ts`
+
+- **TEAM_INVITE_FIELD_ERROR**: `ALREADY_MEMBER`, `ALREADY_INVITED`
+- **TEAM_REFUSAL**: `OWNER_INVITE`
+- **MEMBER_ACCESS_PATH**: `CHECK`=`"/api/member-access/check"`, `RESEND`=`"/api/member-access/resend"`, `REVOKE`=`"/api/member-access/revoke"`
+- **TEAM_ACCESS_LOG**: `INVITE_FAILED`=`"team_access.invite_failed"`, `INVITE_EMAIL_FAILED`=`"team_access.invite_email_failed"`, `INVITE_AUDIT_FAILED`=`"team_access.invite_audit_failed"`, `REMOVE_FAILED`=`"team_access.remove_failed"`, `REMOVE_AUDIT_FAILED`=`"team_access.remove_audit_failed"`, `REVOKE_FAILED`=`"team_access.revoke_failed"`, `REVOKE_SKIPPED_NO_EMAIL`=`"team_access.revoke_skipped_no_email"`, `CANCEL_FAILED`=`"team_access.cancel_failed"`, `CANCEL_AUDIT_FAILED`=`"team_access.cancel_audit_failed"`, `ACCESS_REQUEST_FAILED`=`"team_access.access_request_failed"`
+
 ### `@platform/constants/tenant` — `apps/platform/src/constants/tenant.ts`
 
 - **TENANT_FIELD_ERROR**: `CONFIRM_REQUIRED`, `NAME_MISMATCH`, `NAME_REQUIRED`, `DOMAIN_INVALID`, `DOMAIN_TAKEN`, `DOMAIN_ATTACHED_ELSEWHERE`, `DOMAIN_LOCKED`, `DOMAIN_CUSTOM_MAIN`, `SLUG_REQUIRED`, `SLUG_INVALID`, `SLUG_RESERVED`, `SLUG_TAKEN`, `EMAIL_INVALID`, `LOCALE_UNSUPPORTED`, `PLAN_UNSUPPORTED`, `OWNER_EMAIL_TAKEN`
@@ -853,6 +868,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/account-control` — `apps/web/src/constants/account-control.ts`
 
 - **ACCOUNT_CONTROL_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"account_control.site_config_fetch_failed"`
+
+### `@web/constants/account` — `apps/web/src/constants/account.ts`
+
+- **ACCOUNT_LOG**: `PROVIDER_UNLINK_FAILED`=`"account.provider_unlink_failed"`, `DISPLAY_NAME_UPDATE_FAILED`=`"account.display_name_update_failed"`
 
 ### `@web/constants/bookmark` — `apps/web/src/constants/bookmark.ts`
 
@@ -951,6 +970,12 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **INTERNAL_PAGES_LOG**: `SECRET_MISSING`=`"internal_pages.secret_missing"`, `TENANT_LOOKUP_FAILED`=`"internal_pages.tenant_lookup_failed"`, `TITLE_FETCH_FAILED`=`"internal_pages.title_fetch_failed"`, `PATH_FETCH_FAILED`=`"internal_pages.path_fetch_failed"`
 
+### `@web/constants/metadata` — `apps/web/src/constants/metadata.ts`
+
+- **OG_TYPE**: `WEBSITE`=`"website"`, `ARTICLE`=`"article"`
+- **TWITTER_CARD**: `SUMMARY`=`"summary"`, `SUMMARY_LARGE_IMAGE`=`"summary_large_image"`
+- **ALTERNATE_TYPE**: `RSS`=`"application/rss+xml"`
+
 ### `@web/constants/module-renderer` — `apps/web/src/constants/module-renderer.ts`
 
 - **MODULE_RENDERER_LOG**: `UNKNOWN_MODULE_TYPE`=`"module_renderer.unknown_module_type"`, `UNKNOWN_HERO_TYPE`=`"hero_slot.unknown_hero_type"`, `PLAN_FETCH_FAILED`=`"module_renderer.plan_fetch_failed"`
@@ -990,6 +1015,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **PRICING_LOG**: `MODULE_FETCH_FAILED`=`"pricing_module.fetch_failed"`, `SITE_SETTINGS_FAILED`=`"pricing_module.site_settings_failed"`, `PLAN_PRICES_FETCH_FAILED`=`"pricing_module.plan_prices_fetch_failed"`, `PROMOTION_CODE_LOOKUP_FAILED`=`"pricing_module.promotion_code_lookup_failed"`, `PROMOTION_CODE_FETCH_FAILED`=`"pricing_module.promotion_code_fetch_failed"`, `VISITOR_CURRENCY_FETCH_FAILED`=`"pricing_module.visitor_currency_fetch_failed"`
 - **PRICING_SEARCH_PARAM**: `PROMO`=`"promo"`
 - **PLAN_COMPARISON_ROW**: `LANGUAGES`, `SEATS`, `CUSTOM_DOMAIN`, `NO_POWERED_BY_MARK`, `LOOK_SETTINGS`, `SECTION_TYPES`, `OWN_ANALYTICS`, `OWN_SIGN_IN_APPS`, `CONTACT_FORM`, `READER_ACCOUNTS`, `NEWSLETTER_SUBSCRIBERS`, `TAKEAWAYS_PER_MONTH`
+
+### `@web/constants/provider-link` — `apps/web/src/constants/provider-link.ts`
+
+- **PROVIDER_LINK_ACTION**: `LINK`, `UNLINK`
 
 ### `@web/constants/proxy` — `apps/web/src/constants/proxy.ts`
 

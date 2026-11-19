@@ -34,6 +34,8 @@ their site's content there and operators can open any tenant's. The Studio is
 configured per tenant: its languages follow the tenant's live locales, and
 module types whose capability is off for the tenant carry a warning.
 
+Seeded starter content is badged: `SampleBadge` (`packages/studio/src/document-badges/`, wired in `buildDocumentOptions`) shows **Sample** on every document whose id starts with `STARTER_DOCUMENT_ID_PREFIX`, the starter content [Tenant provisioning](tenant-provisioning.md) seeds. It reads the published id, so a starter document's draft is badged too.
+
 ## Surfaces and routes
 
 - `/dashboard/studio/**`: the owner's Studio for the active workspace.

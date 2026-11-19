@@ -96,9 +96,7 @@ vi.mock('@platform/server/tenants/notify-owner-of-plan-change', () => ({
 
 vi.mock('next/cache');
 
-vi.mock('next/server', () => ({
-  after: (task: () => unknown) => task(),
-}));
+vi.mock('next/server');
 
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
@@ -600,7 +598,7 @@ describe(updateTenantDetailsAction, () => {
     expect(enqueueOwnerAccessRequestMock).toHaveBeenCalledExactlyOnceWith(
       OWNER_INVITE_RESEND_PATH,
       MOCK_TENANT_ID,
-      MOCK_OWNER_EMAIL,
+      { formerOwnerEmail: MOCK_OWNER_EMAIL },
     );
     expect(sendOwnerInviteEmailMock.mock.invocationCallOrder[0]).toBeLessThan(
       enqueueOwnerAccessRequestMock.mock.invocationCallOrder[0] ?? 0,

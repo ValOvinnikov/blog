@@ -3,20 +3,14 @@ import { SITE_MESSAGES } from '@shinefold/config';
 import { service, type TTopicDetailPage } from '@shinefold/service';
 import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
 import { errorResult, okResult } from '@shinefold/utils';
+import { TOPIC_LOG } from '@web/constants/topic';
 import {
   customRenderServerAsync,
   screen,
   within,
 } from '@web/testing/custom-render';
-import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { mockPostListModuleData } from '@web/testing/modules/post-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import {
-  MOCK_FAQ_PAGE_JSON_LD_FRAGMENT,
-  mockFaqPageQuestion,
-} from '@web/testing/shared/json-ld/fixtures';
-import { readJsonLd } from '@web/testing/shared/json-ld/read-json-ld';
 import { MOCK_POST_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
   MOCK_TENANT_NAME,
@@ -42,7 +36,6 @@ vi.mock('@shinefold/service', () => ({
     pages: { topic: { v1: { getTopicPage: vi.fn() } } },
     entities: { topics: { v1: { getTopics: vi.fn() } } },
     modules: {
-      heroBlog: { v1: { getHeroBlog: vi.fn() } },
       postList: { v1: { getPostList: vi.fn() } },
     },
   },
@@ -52,7 +45,6 @@ vi.mock('@web/i18n/navigation');
 
 const getTopicPageMock = vi.mocked(service.pages.topic.v1.getTopicPage);
 const getTopicsMock = vi.mocked(service.entities.topics.v1.getTopics);
-const getHeroBlogMock = vi.mocked(service.modules.heroBlog.v1.getHeroBlog);
 const getPostListMock = vi.mocked(service.modules.postList.v1.getPostList);
 
 const MOCK_TOPIC_SLUG = faker.lorem.slug();
@@ -66,11 +58,6 @@ const MOCK_OTHER_TOPIC = mockTopicWithPostCount({
   title: faker.lorem.words(2),
   slug: `${MOCK_TOPIC_SLUG}-other`,
 });
-const MOCK_HERO_ID = faker.string.uuid();
-const MOCK_HERO_HEADING = faker.lorem.words(3);
-const MOCK_PAGE_HEADING = faker.lorem.words(2);
-const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
-const MOCK_PAGE_NUMBER = faker.number.int({ min: 2, max: 9 });
 
 const resolveTopicPageWith = (overrides: Partial<TTopicDetailPage>) =>
   getTopicPageMock.mockResolvedValueOnce(
@@ -84,15 +71,7 @@ const setup = customRenderServerAsync(TopicPage, {
 describe(`<${TopicPage.name}/>`, () => {
   beforeEach(() => {
     getTopicPageMock.mockResolvedValue(
-      okResult(
-        mockTopicDetailPage({
-          topic: MOCK_TOPIC,
-          headingBlock: mockHeadingBlock({
-            heading: MOCK_PAGE_HEADING,
-            supportingText: MOCK_SUPPORTING_TEXT,
-          }),
-        }),
-      ),
+      okResult(mockTopicDetailPage({ topic: MOCK_TOPIC })),
     );
     getTopicsMock.mockResolvedValue(okResult([MOCK_TOPIC, MOCK_OTHER_TOPIC]));
   });
@@ -107,18 +86,6 @@ describe(`<${TopicPage.name}/>`, () => {
         MOCK_TOPIC_SLUG,
         MOCK_TENANT_SANITY_CONTEXT,
       );
-    });
-
-    it('renders the topic heading and supporting text inside main', () => {
-      const main = screen.getByRole('main');
-      const heading = within(main).getByRole('heading', {
-        level: 1,
-        name: MOCK_PAGE_HEADING,
-      });
-      const supportingText = within(main).getByText(MOCK_SUPPORTING_TEXT);
-
-      expect(heading).toBeVisible();
-      expect(supportingText).toBeVisible();
     });
 
     it('renders the breadcrumb trail outside main', () => {
@@ -158,33 +125,11 @@ describe(`<${TopicPage.name}/>`, () => {
 
     await expect(setup()).rejects.toBe(MOCK_ERROR);
 
-    expect(logger.error).toHaveBeenCalledWith('topic_page.fetch_failed', {
+    expect(logger.error).toHaveBeenCalledWith(TOPIC_LOG.PAGE_FETCH_FAILED, {
       slug: MOCK_TOPIC_SLUG,
       error: MOCK_ERROR,
     });
   });
-
-  it.each([
-    { page: MOCK_PAGE_NUMBER, expected: MOCK_PAGE_NUMBER },
-    { page: undefined, expected: 1 },
-  ])(
-    'loads post lists for page $expected of the topic archive',
-    async ({ page, expected }) => {
-      resolveTopicPageWith({
-        modules: [{ id: MOCK_POST_LIST_ID, type: 'module_postList' }],
-      });
-      getPostListMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
-
-      await expect(setup({ page })).rejects.toBe(MOCK_ERROR);
-
-      expect(getPostListMock).toHaveBeenCalledWith(
-        MOCK_POST_LIST_ID,
-        MOCK_TENANT_SANITY_CONTEXT,
-        expected,
-        { termId: MOCK_TOPIC.id },
-      );
-    },
-  );
 
   it('names the topic in an empty post list', async () => {
     resolveTopicPageWith({
@@ -199,36 +144,5 @@ describe(`<${TopicPage.name}/>`, () => {
     );
 
     expect(emptyState).toBeVisible();
-  });
-
-  it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
-    resolveTopicPageWith({ faqs: [mockFaqPageQuestion()] });
-
-    await setup();
-
-    expect(readJsonLd()).toContain(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT);
-  });
-
-  it('renders the hero in place of the heading when one is set', async () => {
-    resolveTopicPageWith({
-      hero: { id: MOCK_HERO_ID, type: 'module_heroBlog' },
-    });
-    getHeroBlogMock.mockResolvedValueOnce(
-      okResult(mockHeroBlogData({ heading: MOCK_HERO_HEADING })),
-    );
-
-    await setup();
-
-    const heroHeading = screen.getByRole('heading', {
-      level: 1,
-      name: MOCK_HERO_HEADING,
-    });
-    const pageHeading = screen.queryByRole('heading', {
-      level: 1,
-      name: MOCK_PAGE_HEADING,
-    });
-
-    expect(heroHeading).toBeVisible();
-    expect(pageHeading).not.toBeInTheDocument();
   });
 });

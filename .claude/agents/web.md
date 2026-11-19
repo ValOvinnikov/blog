@@ -180,15 +180,13 @@ if (!result.ok) {
   an entry in the map of every page that allows it — never a
   `src/components/` component.
 - **Metadata builders**: `src/metadata/<name>/` (`post-metadata/`), one folder
-  per builder with a co-located test and a barrel. The bare
-  `metadata/to-metadata.ts` is drift: it gets a folder when a diff touches it.
+  per builder with a co-located test and a barrel.
 - **Helpers** (slot builders, transformers, formatters):
   `src/utils/<name>/` — one folder per function or closely related group,
   holding the file, its test and an `index.ts` barrel
   (`utils/to-post-list-items/`); never a bare file directly under
   `src/utils/`. `utils/logger/` and `utils/env/` carry no barrel and are
   imported by file (`@web/utils/logger/logger`, `@web/utils/env/env`).
-  `parse-page-param/` lacks one too — add it when a diff touches it.
 - **Context providers**: `src/context/<name>-provider/`, with a barrel.
 - **Size and hooks:** budgets → CLAUDE.md → "File size budgets"; what to
   extract and where hooks live → `react-component-practices` → "Size and

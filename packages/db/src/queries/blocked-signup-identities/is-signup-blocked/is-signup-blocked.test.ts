@@ -3,6 +3,7 @@ import { ERROR_CODE } from '@shinefold/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
 import { addBlockedIdentity } from '@shinefold/db/queries/blocked-signup-identities/add-blocked-identity';
 import * as schema from '@shinefold/db/schema';
+import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
 import {
   MOCK_BLOCK_REASON,
   MOCK_BLOCKED_ADDRESS,
@@ -14,7 +15,6 @@ import {
   MOCK_NOT_AN_ADDRESS,
   MOCK_SAME_DOMAIN_OTHER_ADDRESS,
 } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
-import { insertTestAdmin } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
 

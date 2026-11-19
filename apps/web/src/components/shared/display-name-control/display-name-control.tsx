@@ -1,16 +1,16 @@
 'use client';
 
-import { ACTION_OUTCOME, ICONS, SIZE, type TNullable } from '@shinefold/config';
+import { ICONS, SIZE, type TNullable } from '@shinefold/config';
 import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import { Button } from '@shinefold/ui/components/atoms/button';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { TextInput } from '@shinefold/ui/components/atoms/text-input';
+import { hasLength } from '@shinefold/utils/primitives';
 import { useBusyStyle } from '@web/context/busy-style-provider';
-import { useToast } from '@web/context/toast-provider';
+import { useActionToast } from '@web/hooks/use-action-toast';
 import { updateDisplayNameAction } from '@web/server/account/identity-actions/identity-actions';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 
 import { displayNameControlVariants } from './display-name-control-variants';
 
@@ -27,39 +27,20 @@ export const DisplayNameControl = ({
 }: TDisplayNameControlProps) => {
   const t = useTranslations('accountPage.identity');
   const { busyStyle, spinnerVariant } = useBusyStyle();
-  const toast = useToast();
-  const router = useRouter();
+  const { isPending, run } = useActionToast();
   const [name, setName] = useState(initialName);
   const [imageFailed, setImageFailed] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const { root, avatarInputRow, field, button } = displayNameControlVariants();
 
   const avatarName = name.trim() || email || '';
   const avatarSrc = imageFailed ? undefined : (image ?? undefined);
-  const isNameEmpty = name.trim().length === 0;
+  const isNameEmpty = !hasLength(name.trim());
 
   const handleSave = () => {
-    startTransition(async () => {
-      try {
-        await toast.promise(
-          (async () => {
-            const result = await updateDisplayNameAction(name);
-            if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
-              throw new Error('Failed to update display name');
-            }
-            return result;
-          })(),
-          {
-            loading: { message: t('saveToastLoadingMessage') },
-            success: { message: t('saveToastSuccessMessage') },
-            error: { message: t('saveError') },
-          },
-        );
-      } catch {
-        return;
-      }
-
-      router.refresh();
+    run(() => updateDisplayNameAction(name), {
+      loading: t('saveToastLoadingMessage'),
+      success: t('saveToastSuccessMessage'),
+      error: t('saveError'),
     });
   };
 

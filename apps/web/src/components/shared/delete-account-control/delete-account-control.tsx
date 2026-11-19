@@ -4,12 +4,12 @@ import { ACTION_OUTCOME, routes } from '@shinefold/config';
 import { Button } from '@shinefold/ui/components/atoms/button';
 import { TextInput } from '@shinefold/ui/components/atoms/text-input';
 import { useBusyStyle } from '@web/context/busy-style-provider';
-import { useToast } from '@web/context/toast-provider';
+import { useActionToast } from '@web/hooks/use-action-toast';
 import { deleteAccountAction } from '@web/server/account/account-actions/account-actions';
 import { encodeClearedSignedInHint } from '@web/utils/signed-in-hint-cookie';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 
 import { deleteAccountControlVariants } from './delete-account-control-variants';
 
@@ -22,42 +22,24 @@ export const DeleteAccountControl = ({
 }: TDeleteAccountControlProps) => {
   const t = useTranslations('accountPage.privacy');
   const { busyStyle, spinnerVariant } = useBusyStyle();
-  const toast = useToast();
+  const { isPending, run } = useActionToast();
   const [typed, setTyped] = useState('');
-  const [isPending, startTransition] = useTransition();
   const s = deleteAccountControlVariants();
 
   const isArmed = typed.trim().toLowerCase() === handle.toLowerCase();
 
   const handleDelete = () => {
-    startTransition(async () => {
-      try {
-        await toast.promise(
-          (async () => {
-            const result = await deleteAccountAction();
-            if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
-              throw new Error(result.outcome);
-            }
-            return result;
-          })(),
-          {
-            loading: { message: t('deleteToastLoadingMessage') },
-            success: { message: t('deleteToastSuccessMessage') },
-            error: (error: unknown) => ({
-              message:
-                error instanceof Error &&
-                error.message === ACTION_OUTCOME.BLOCKED
-                  ? t('deletePlatformRoleError')
-                  : t('deleteError'),
-            }),
-          },
-        );
-      } catch {
-        return;
-      }
-
-      document.cookie = encodeClearedSignedInHint();
-      await signOut({ callbackUrl: routes.home() });
+    run(deleteAccountAction, {
+      loading: t('deleteToastLoadingMessage'),
+      success: t('deleteToastSuccessMessage'),
+      error: t('deleteError'),
+      errorByOutcome: {
+        [ACTION_OUTCOME.BLOCKED]: t('deletePlatformRoleError'),
+      },
+      onSuccess: async () => {
+        document.cookie = encodeClearedSignedInHint();
+        await signOut({ callbackUrl: routes.home() });
+      },
     });
   };
 

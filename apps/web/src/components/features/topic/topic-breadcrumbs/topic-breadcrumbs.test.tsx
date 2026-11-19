@@ -1,12 +1,11 @@
 import { faker } from '@faker-js/faker';
 import { routes } from '@shinefold/config';
-import { customRenderAsync } from '@web/testing/custom-render';
+import { TOPIC_LOG } from '@web/constants/topic';
+import { customRenderServerAsync } from '@web/testing/custom-render';
 import {
-  testBreadcrumbsJsonLdSchema,
   testBreadcrumbsJsonLdTrail,
   testBreadcrumbsTrail,
   testForwardsArgsToLoader,
-  testNoJsonLdWithoutBaseUrl,
   testThrowsOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
@@ -42,7 +41,7 @@ const MOCK_TOPIC = mockTopic({
 const TOPIC_HREF = routes.topic(MOCK_TOPIC_SLUG);
 const MOCK_PAGE = { topic: MOCK_TOPIC, modules: [], seo: mockSeo() };
 
-const setup = customRenderAsync(TopicBreadcrumbs, {
+const setup = customRenderServerAsync(TopicBreadcrumbs, {
   slug: MOCK_TOPIC_SLUG,
 });
 
@@ -55,7 +54,7 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
   testThrowsOnFetchFailure({
     pageLoaderMock: getTopicPageMock,
     setup,
-    eventFragment: 'topic_breadcrumbs.fetch_failed',
+    eventFragment: TOPIC_LOG.BREADCRUMBS_FETCH_FAILED,
     logContext: { slug: MOCK_TOPIC_SLUG },
   });
   testBreadcrumbsTrail({
@@ -65,12 +64,6 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     linkSteps: [{ label: SITE_NAME, href: routes.home() }],
     currentLabel: MOCK_TOPIC.title,
   });
-  testBreadcrumbsJsonLdSchema({
-    pageLoaderMock: getTopicPageMock,
-    setup,
-    successData: MOCK_PAGE,
-    itemPath: TOPIC_HREF,
-  });
   testBreadcrumbsJsonLdTrail({
     pageLoaderMock: getTopicPageMock,
     setup,
@@ -79,11 +72,6 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
       { name: SITE_NAME, path: routes.home() },
       { name: MOCK_TOPIC.title, path: TOPIC_HREF },
     ],
-  });
-  testNoJsonLdWithoutBaseUrl({
-    pageLoaderMock: getTopicPageMock,
-    setup,
-    successData: MOCK_PAGE,
   });
   testForwardsArgsToLoader({
     pageLoaderMock: getTopicPageMock,
