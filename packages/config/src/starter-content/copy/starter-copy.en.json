@@ -271,5 +271,78 @@
         "metaDescription": "A sample guide created with your site. Use it for common problems, their causes and their fixes."
       }
     ]
+  },
+  "business": {
+    "hero": {
+      "eyebrow": "Welcome",
+      "heading": "Clear, reliable help for your business",
+      "supportingText": "Say in a sentence what you do and who you do it for."
+    },
+    "intro": {
+      "body": [
+        "We help our clients get the work done well, on time and without surprises.",
+        "Replace this text with a short overview of your business: what you offer, who it is for and what makes you different."
+      ]
+    },
+    "faq": {
+      "heading": "Frequently asked questions",
+      "questions": [
+        {
+          "question": "What do you offer?",
+          "answer": [
+            "Sum up your main services in a sentence or two, and link to the Services page for the details."
+          ]
+        },
+        {
+          "question": "How much does it cost?",
+          "answer": [
+            "Explain how you price your work, or invite visitors to get in touch for a quote."
+          ]
+        },
+        {
+          "question": "How do we get started?",
+          "answer": [
+            "Describe the first step, such as a short call or a written brief, and what happens after it."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Let's talk",
+      "supportingText": "Tell us what you need and we'll get back to you."
+    },
+    "services": {
+      "title": "Services",
+      "slug": "services",
+      "summary": "What we offer and how we work.",
+      "body": [
+        "Describe each service in a short paragraph: what it includes and who it is for.",
+        "Add prices, packages or examples of past work once you have them."
+      ],
+      "metaTitle": "Services — what we offer and how we work with you",
+      "metaDescription": "A sample services page created with your site. Replace it with what your business offers."
+    },
+    "about": {
+      "title": "About",
+      "slug": "about",
+      "summary": "Who we are and what we stand for.",
+      "body": [
+        "Tell visitors how the business started, who is behind it and what you care about.",
+        "A few lines are enough. Add photos of the team once you have them."
+      ],
+      "metaTitle": "About — who we are and what we stand for",
+      "metaDescription": "A sample about page created with your site. Tell visitors who is behind the business."
+    },
+    "contact": {
+      "title": "Contact",
+      "slug": "contact",
+      "summary": "How to reach us.",
+      "body": [
+        "Give visitors the best way to reach you: an email address, a phone number or both.",
+        "Add your opening hours and where you are based, and say how quickly you usually reply."
+      ],
+      "metaTitle": "Contact — how to reach us and when we reply",
+      "metaDescription": "A sample contact page created with your site. Add your email address, phone number and opening hours."
+    }
   }
 }
