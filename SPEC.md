@@ -2708,7 +2708,8 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   `migrate-db` job reads the `production` Environment's own
   `DATABASE_URL_UNPOOLED` (`main`); the tenant lifecycle workflows
   (`deprovision-tenant.yml`/`recheck-tenant-owners.yml`/
-  `invalidate-tenant-cache.yml`/`validate-tenant-documents.yml`) read their own
+  `invalidate-tenant-cache.yml`/`validate-tenant-documents.yml`/
+  `sync-revalidate-webhooks.yml`) read their own
   Environment's
   `TENANT_REGISTRY_DATABASE_URL` secret instead
   (#2056, merged 2026-08-25) — before that split, both purposes shared one
