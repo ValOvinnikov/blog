@@ -4,7 +4,7 @@ import { TopicPage } from '@web/components/pages/topic-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildTopicMetadata } from '@web/metadata/topic-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';
-import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
+import { parsePageParam } from '@web/utils/parse-page-param';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 

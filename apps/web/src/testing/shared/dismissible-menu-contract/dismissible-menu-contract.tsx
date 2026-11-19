@@ -23,6 +23,14 @@ export const expectMenuOpen = (trigger: HTMLElement) => {
 
 type TGetUser = () => UserEvent;
 
+const openMenuAtLastItem = async (getUser: TGetUser) => {
+  const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+  await getUser().click(trigger);
+  const firstItem = screen.getByRole('button', { name: MENU_FIRST_ITEM_NAME });
+  await getUser().keyboard(KEY_END);
+  return firstItem;
+};
+
 export const testCoreDismissibleMenuBehavior = (getUser: TGetUser) => {
   it('starts closed, with the panel contents unreachable', () => {
     const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
@@ -87,12 +95,7 @@ export const testCoreDismissibleMenuBehavior = (getUser: TGetUser) => {
   });
 
   it('wraps Tab from the last item back to the first', async () => {
-    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
-    await getUser().click(trigger);
-    const firstItem = screen.getByRole('button', {
-      name: MENU_FIRST_ITEM_NAME,
-    });
-    await getUser().keyboard(KEY_END);
+    const firstItem = await openMenuAtLastItem(getUser);
 
     await getUser().tab();
 
@@ -137,12 +140,7 @@ export const testArrowUpAndHomeBehavior = (getUser: TGetUser) => {
   });
 
   it('moves focus up with ArrowUp from the last item', async () => {
-    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
-    await getUser().click(trigger);
-    const firstItem = screen.getByRole('button', {
-      name: MENU_FIRST_ITEM_NAME,
-    });
-    await getUser().keyboard(KEY_END);
+    const firstItem = await openMenuAtLastItem(getUser);
 
     await getUser().keyboard(KEY_ARROW_UP);
 
@@ -150,12 +148,7 @@ export const testArrowUpAndHomeBehavior = (getUser: TGetUser) => {
   });
 
   it('focuses the first item on Home', async () => {
-    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
-    await getUser().click(trigger);
-    const firstItem = screen.getByRole('button', {
-      name: MENU_FIRST_ITEM_NAME,
-    });
-    await getUser().keyboard(KEY_END);
+    const firstItem = await openMenuAtLastItem(getUser);
 
     await getUser().keyboard(KEY_HOME);
 

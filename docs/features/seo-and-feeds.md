@@ -75,7 +75,7 @@ Every public page emits the title, description, canonical, Open Graph and Twitte
 
 ## Entry points
 
-- `apps/web/src/metadata/to-metadata.ts`, `apps/web/src/metadata/to-localized-page-metadata/to-localized-page-metadata.ts`, `apps/web/src/metadata/*/build-*-metadata.ts`
+- `apps/web/src/metadata/to-metadata/to-metadata.ts`, `apps/web/src/metadata/to-localized-page-metadata/to-localized-page-metadata.ts`, `apps/web/src/metadata/*/build-*-metadata.ts`
 - `apps/web/src/app/[tenant]/[locale]/layout.tsx` (`generateMetadata`, robots gate)
 - `apps/web/src/app/sitemap.ts`, `apps/web/src/app/robots.ts`, `apps/web/src/app/icon.tsx`
 - `apps/web/src/app/[tenant]/[locale]/rss.xml/route.ts`, `apps/web/src/app/[tenant]/[locale]/tags/[slug]/rss.xml/route.ts`, `apps/web/src/server/feed/get-feed-context/get-feed-context.ts`
