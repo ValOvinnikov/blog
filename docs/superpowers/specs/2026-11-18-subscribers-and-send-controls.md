@@ -164,7 +164,7 @@ A published post is never emailed in three cases: it was skipped for a limit (ba
 
 ### **(unboarded)** The platform routes the Studio calls
 
-The status, test-send and send-now routes admit the people who can open the site's Studio: the tenant's OWNER and EDITOR members and operators (an admin's virtual membership). A READER membership has no Studio access and is refused. The tenant comes from that access check, never from the request body, and a refusal comes back as the route's own `FORBIDDEN` code rather than a `notFound()` or redirect. The send-now route re-checks eligibility on the server with the same off-cause read as the status route.
+The status, test-send and send-now routes admit the people who can open the site's Studio: the tenant's OWNER and EDITOR members and operators (an admin's virtual membership). A READER membership has no Studio access and is refused. The route finds the tenant from the Studio's Sanity project id (`getTenantIdBySanityProjectId`) and then requires the caller's access to that tenant; a tenant id in the request is never trusted. A refusal comes back as the route's own `FORBIDDEN` code rather than a `notFound()` or redirect. The send-now route re-checks eligibility on the server with the same off-cause read as the status route.
 
 ### "Send me a test"
 
