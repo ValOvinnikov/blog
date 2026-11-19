@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@shinefold/config/constants';
+import { CAPABILITY, TENANT_PLAN } from '@shinefold/config/constants';
 import {
   TENANT_STATUS,
   NEWSLETTER_POST_SEND_OUTCOME,
@@ -9,10 +9,12 @@ import {
   getSettingsFeatures,
   type TSettingsFeaturesResult,
 } from '@shinefold/db/queries/settings-features';
+import { listResolvableEntitlementGrants } from '@shinefold/db/queries/tenant-entitlement-grants';
 import {
   getTenantById,
   getTenantSanityCredentials,
 } from '@shinefold/db/queries/tenants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import { NEWSLETTER_POST_STATE } from '@worker/constants/newsletter-send';
 import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
 import { MOCK_ONE_HOUR_MS } from '@worker/testing/clock/frozen-clock';
@@ -33,6 +35,7 @@ import { checkNewsletterPost } from './check-newsletter-post';
 vi.mock('@shinefold/db/queries/email-config');
 vi.mock('@shinefold/db/queries/newsletter-post-sends');
 vi.mock('@shinefold/db/queries/settings-features');
+vi.mock('@shinefold/db/queries/tenant-entitlement-grants');
 vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/newsletter-send/read-newsletter-post');
 
@@ -52,6 +55,7 @@ describe(checkNewsletterPost, () => {
     vi.mocked(getSettingsFeatures).mockResolvedValue({
       newsletterEnabled: true,
     } as TSettingsFeaturesResult);
+    vi.mocked(listResolvableEntitlementGrants).mockResolvedValue([]);
     vi.mocked(getEmailNewPosts).mockResolvedValue(true);
     vi.mocked(getTenantSanityCredentials).mockResolvedValue(
       MOCK_SANITY_CREDENTIALS,
@@ -104,6 +108,20 @@ describe(checkNewsletterPost, () => {
     await expect(runCheck()).resolves.toEqual({
       state: NEWSLETTER_POST_STATE.SCHEDULED,
       waitMs: SCHEDULED_POST_RECHECK_MS,
+    });
+  });
+
+  it('sends for a plan without the newsletter when it is granted', async () => {
+    vi.mocked(getTenantById).mockResolvedValue(
+      mockTenant({ plan: TENANT_PLAN.FREE }),
+    );
+    vi.mocked(listResolvableEntitlementGrants).mockResolvedValue([
+      mockEntitlementGrant({ key: CAPABILITY.NEWSLETTER }),
+    ]);
+
+    await expect(runCheck()).resolves.toEqual({
+      state: NEWSLETTER_POST_STATE.READY,
+      post: MOCK_NEWSLETTER_POST,
     });
   });
 
