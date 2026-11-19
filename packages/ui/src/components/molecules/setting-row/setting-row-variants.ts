@@ -8,10 +8,7 @@ export const settingRowVariants = tv({
       'gap-x-6 gap-y-3 py-3',
     ],
     content: ['min-w-0 flex-1'],
-    title: [
-      'flex flex-wrap items-center gap-2',
-      'font-mono text-copy font-medium text-text',
-    ],
+    title: ['flex flex-wrap items-center gap-2'],
     description: ['mt-1 font-body text-copy text-subtle'],
     control: ['flex flex-wrap items-center justify-end gap-2'],
   },

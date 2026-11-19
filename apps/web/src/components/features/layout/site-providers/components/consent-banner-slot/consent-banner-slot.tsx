@@ -1,6 +1,7 @@
 'use client';
 
-import { CONSENT_CATEGORY, routes } from '@shinefold/config';
+import { CONSENT_CATEGORY, routes, SIZE } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
 import { ConsentBanner } from '@shinefold/ui/components/molecules/consent-banner';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { CONSENT_STATUS } from '@web/constants/consent';
@@ -26,7 +27,6 @@ export const ConsentBannerSlot = ({ isEnabled }: IConsentBannerSlotProps) => {
 
   return (
     <ConsentBanner
-      headingLevel={2}
       heading={t('heading')}
       message={t(offersAnalytics ? 'messageWithAnalytics' : 'message')}
       policyLink={{
@@ -34,12 +34,28 @@ export const ConsentBannerSlot = ({ isEnabled }: IConsentBannerSlotProps) => {
         label: t('policyLinkLabel'),
       }}
       linkAs={SmartLink}
-      acceptLabel={t('acceptLabel')}
-      rejectLabel={t('rejectLabel')}
-      settingsLabel={t('settingsLabel')}
-      onAccept={() => save(offeredCategories)}
-      onReject={rejectAll}
-      onOpenSettings={open}
+      actions={
+        <>
+          <Button
+            variant="primary"
+            size={SIZE.SM}
+            onClick={() => save(offeredCategories)}
+          >
+            {t('acceptLabel')}
+          </Button>
+          <Button variant="primary" size={SIZE.SM} onClick={rejectAll}>
+            {t('rejectLabel')}
+          </Button>
+          <Button
+            variant="link"
+            size={SIZE.SM}
+            onClick={open}
+            className="ml-auto"
+          >
+            {t('settingsLabel')}
+          </Button>
+        </>
+      }
       dataTestId="consent-banner"
     />
   );

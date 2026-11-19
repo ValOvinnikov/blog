@@ -200,7 +200,7 @@ Props: dateValue: string · dateLabel: string · readingTime?: string _(extends 
 ### ConsentBanner — `components/molecules/consent-banner/consent-banner.tsx`
 
 A persistent, non-modal card offering cookie-consent choices, fixed to the bottom of the viewport.
-Props: headingLevel: THeadingLevel · heading: string · message: string · policyLink?: Pick<ILink, 'href' | 'label'> · linkAs?: TAnchorElementType · acceptLabel: string · rejectLabel: string · settingsLabel: string · onAccept: () => void · onReject: () => void · onOpenSettings: () => void _(extends IWithClassName, IWithDataTestId)_
+Props: heading: string · message: string · policyLink?: Pick<ILink, 'href' | 'label'> · linkAs?: TAnchorElementType · actions: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### ConsentPlaceholder — `components/molecules/consent-placeholder/consent-placeholder.tsx`
 
@@ -319,8 +319,8 @@ Slots:
 
 ### SettingRow — `components/molecules/setting-row/setting-row.tsx`
 
-A label + description + control-slot row shared by every `/account` section (privacy & data, email preferences, connected accounts).
-Props: label: ReactNode · labelLevel?: THeadingProps['level'] · description?: ReactNode · tone?: TSettingRowVariants['tone'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+One labelled setting in a settings list, with an optional description and a slot for its controls.
+Props: _(extends PropsWithChildren< IWithClassName & IWithDataTe…)_
 Variants: tone: default|danger
 
 ### ShareLink — `components/molecules/share-link/share-link.tsx`
@@ -432,7 +432,7 @@ Compound component:
 ### Dialog — `components/organisms/dialog/dialog.tsx`
 
 A modal window over the page, named by its heading; client-only, so the consumer declares the client boundary.
-Props: isOpen: boolean · onOpenChange: (isOpen: boolean) => void · heading: string · headingLevel: THeadingLevel · closeLabel?: string · fallbackFocusRef?: RefObject<HTMLElement | null> · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Props: _(extends PropsWithChildren< IWithClassName & IWithDataTe…)_
 
 ### Footer — `components/organisms/footer/footer.tsx`
 

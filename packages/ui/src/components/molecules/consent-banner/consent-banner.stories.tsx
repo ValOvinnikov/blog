@@ -1,4 +1,5 @@
-import { routes } from '@shinefold/config';
+import { routes, SIZE } from '@shinefold/config';
+import { Button } from '@shinefold/ui/components/atoms/button';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { ConsentBanner } from './consent-banner';
@@ -9,16 +10,22 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   args: {
-    headingLevel: 2,
     heading: 'We use cookies',
     message:
       'We use cookies to understand how the site is used and to remember your preferences.',
-    acceptLabel: 'Accept all',
-    rejectLabel: 'Reject all',
-    settingsLabel: 'Settings',
-    onAccept: () => {},
-    onReject: () => {},
-    onOpenSettings: () => {},
+    actions: (
+      <>
+        <Button variant="primary" size={SIZE.SM}>
+          Accept all
+        </Button>
+        <Button variant="primary" size={SIZE.SM}>
+          Reject all
+        </Button>
+        <Button variant="link" size={SIZE.SM} className="ml-auto">
+          Settings
+        </Button>
+      </>
+    ),
   },
 } satisfies Meta<typeof ConsentBanner>;
 

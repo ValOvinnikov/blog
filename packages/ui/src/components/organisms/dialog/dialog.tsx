@@ -2,27 +2,30 @@ import { Dialog as BaseDialog } from '@base-ui/react/dialog';
 import {
   ICONS,
   SIZE,
+  TEXT_ROLE,
   type IWithClassName,
   type IWithDataTestId,
+  type TMaybeNull,
 } from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
 import type { THeadingLevel } from '@shinefold/ui/lib/react';
-import { useRef, type ReactNode, type RefObject } from 'react';
+import { useRef, type PropsWithChildren, type RefObject } from 'react';
 
 import { dialogVariants } from './dialog-variants';
 
-export type TDialogProps = IWithClassName &
-  IWithDataTestId & {
-    isOpen: boolean;
-    onOpenChange: (isOpen: boolean) => void;
-    heading: string;
-    headingLevel: THeadingLevel;
-    closeLabel?: string;
-    fallbackFocusRef?: RefObject<HTMLElement | null>;
-    children?: ReactNode;
-  };
+export type TDialogProps = PropsWithChildren<
+  IWithClassName &
+    IWithDataTestId & {
+      isOpen: boolean;
+      onOpenChange: (isOpen: boolean) => void;
+      heading: string;
+      headingLevel: THeadingLevel;
+      closeLabel?: string;
+      fallbackFocusRef?: RefObject<TMaybeNull<HTMLElement>>;
+    }
+>;
 
 const s = dialogVariants();
 
@@ -38,7 +41,7 @@ export const Dialog = ({
   className,
   dataTestId,
 }: TDialogProps) => {
-  const openerRef = useRef<Element | null>(null);
+  const openerRef = useRef<TMaybeNull<Element>>(null);
 
   const captureOpener = () => {
     openerRef.current = document.activeElement;
@@ -66,9 +69,8 @@ export const Dialog = ({
               render={({ id }) => (
                 <Heading
                   level={headingLevel}
-                  size={SIZE.SM}
+                  visual={TEXT_ROLE.DIALOG_TITLE}
                   id={id}
-                  className={s.heading()}
                 >
                   {heading}
                 </Heading>

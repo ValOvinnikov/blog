@@ -1,56 +1,43 @@
 import {
-  SIZE,
+  TEXT_ROLE,
   type ILink,
   type IWithClassName,
   type IWithDataTestId,
 } from '@shinefold/config';
 import type { TAnchorElementType } from '@shinefold/config/react';
-import { Button } from '@shinefold/ui/components/atoms/button';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Text } from '@shinefold/ui/components/atoms/text';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
-import type { THeadingLevel } from '@shinefold/ui/lib/react';
+import type { ReactNode } from 'react';
 
 import { consentBannerVariants } from './consent-banner-variants';
 
 export type TConsentBannerProps = IWithClassName &
   IWithDataTestId & {
-    headingLevel: THeadingLevel;
     heading: string;
     message: string;
     policyLink?: Pick<ILink, 'href' | 'label'>;
     linkAs?: TAnchorElementType;
-    acceptLabel: string;
-    rejectLabel: string;
-    settingsLabel: string;
-    onAccept: () => void;
-    onReject: () => void;
-    onOpenSettings: () => void;
+    actions: ReactNode;
   };
 
 const s = consentBannerVariants();
 
 /** A persistent, non-modal card offering cookie-consent choices, fixed to the bottom of the viewport. */
 export const ConsentBanner = ({
-  headingLevel,
   heading,
   message,
   policyLink,
   linkAs,
-  acceptLabel,
-  rejectLabel,
-  settingsLabel,
-  onAccept,
-  onReject,
-  onOpenSettings,
+  actions,
   className,
   dataTestId,
 }: TConsentBannerProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
-    <Heading level={headingLevel} size={SIZE.SM} className={s.heading()}>
+    <Heading level={2} visual={TEXT_ROLE.DIALOG_TITLE}>
       {heading}
     </Heading>
-    <Text variant="card" className={s.message()}>
+    <Text textRole={TEXT_ROLE.CARD_BODY}>
       {message}
       {policyLink && (
         <>
@@ -61,21 +48,6 @@ export const ConsentBanner = ({
         </>
       )}
     </Text>
-    <div className={s.actions()}>
-      <Button variant="primary" size={SIZE.SM} onClick={onAccept}>
-        {acceptLabel}
-      </Button>
-      <Button variant="primary" size={SIZE.SM} onClick={onReject}>
-        {rejectLabel}
-      </Button>
-      <Button
-        variant="link"
-        size={SIZE.SM}
-        onClick={onOpenSettings}
-        className={s.settings()}
-      >
-        {settingsLabel}
-      </Button>
-    </div>
+    <div className={s.actions()}>{actions}</div>
   </div>
 );
