@@ -1,11 +1,12 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const pricingCardPriceVariants = tv({
   slots: {
     root: ['flex flex-col gap-1'],
-    prefix: ['font-mono text-label uppercase tracking-label', 'text-muted'],
+    prefix: [TYPOGRAPHY[TEXT_ROLE.LABEL], 'text-muted'],
     headline: ['block'],
-    amount: ['font-display text-2xl font-semibold', 'text-text'],
+    amount: [TYPOGRAPHY[TEXT_ROLE.FIGURE]],
     period: ['inline-block text-sm', 'text-muted'],
     compareAtLabel: ['sr-only'],
     compareAtValue: ['text-sm line-through', 'text-muted'],

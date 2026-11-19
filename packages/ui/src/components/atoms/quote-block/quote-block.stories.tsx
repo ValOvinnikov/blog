@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { QuoteBlock } from './quote-block';
@@ -24,5 +25,18 @@ export const InArticleBody: TStory = {
       <QuoteBlock {...args} />
       <p>{faker.lorem.paragraph()}</p>
     </div>
+  ),
+};
+
+export const OnEveryBrandVariant: TStory = {
+  name: 'On every brand variant',
+  render: (args) => (
+    <EveryBrandBand>
+      {() => (
+        <div className="max-w-xs">
+          <QuoteBlock {...args} />
+        </div>
+      )}
+    </EveryBrandBand>
   ),
 };
