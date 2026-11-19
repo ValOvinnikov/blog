@@ -1,11 +1,9 @@
-import {
-  mockEntitlementGrant,
-  mockTenantEntitlements,
-} from '@platform/testing/tenants/fixtures';
+import { mockTenantEntitlements } from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { HUE_MIN, PRESET_ID, RADIUS_SCALE } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND, LOOK_FIELD } from '@shinefold/db/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 
 import { listRefusedLookFields } from './refused-look-fields';

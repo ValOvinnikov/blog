@@ -6,6 +6,7 @@ import {
   GRACE_EMAIL_DUE_UNTIL_DAY,
   type TGraceEmail,
 } from '@shinefold/db/constants';
+import { isNotDeprovisioned } from '@shinefold/db/queries/tenants/not-deprovisioned';
 import { tenants } from '@shinefold/db/schema/tenants';
 import {
   daysBefore,
@@ -32,7 +33,7 @@ export function graceEmailDue(
   const stamp: AnyPgColumn = tenants[GRACE_EMAIL_STAMP[email]];
 
   return and(
-    isNull(tenants.deprovisionedAt),
+    isNotDeprovisioned,
     lt(
       tenants.downgradeGraceStartedAt,
       startedBeforeSweepDay(now, GRACE_EMAIL_DAY[email]),
@@ -47,7 +48,7 @@ export function graceEmailDue(
 
 export function graceEndDue(now: Date): TMaybeUndefined<SQL> {
   return and(
-    isNull(tenants.deprovisionedAt),
+    isNotDeprovisioned,
     lt(
       tenants.downgradeGraceStartedAt,
       startedBeforeSweepDay(now, DOWNGRADE_GRACE_DAYS),

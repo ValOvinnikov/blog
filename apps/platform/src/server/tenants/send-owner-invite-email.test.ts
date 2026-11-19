@@ -1,3 +1,4 @@
+import { TEAM_ACCESS_LOG } from '@platform/constants/team-access';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { signIn } from '@platform/server/auth/auth';
 import {
@@ -43,28 +44,19 @@ describe(sendOwnerInviteEmail, () => {
     });
   });
 
-  it('logs nothing when Auth.js sends the reader on to check their inbox', async () => {
-    await sendOwnerInviteEmail(MOCK_TENANT_ID, MOCK_OWNER_EMAIL);
+  it('reports the email sent, logging nothing, on the check-inbox page', async () => {
+    const isSent = await sendOwnerInviteEmail(MOCK_TENANT_ID, MOCK_OWNER_EMAIL);
 
+    expect(isSent).toBe(true);
     expect(loggerErrorMock).not.toHaveBeenCalled();
-  });
-
-  it('logs the tenant and Auth.js error when the send lands on the error page', async () => {
-    signInMock.mockResolvedValue(MOCK_AUTH_ERROR_URL);
-
-    await sendOwnerInviteEmail(MOCK_TENANT_ID, MOCK_OWNER_EMAIL);
-
-    expect(loggerErrorMock).toHaveBeenCalledExactlyOnceWith(
-      TENANT_LOG.OWNER_INVITE_EMAIL_FAILED,
-      { tenantId: MOCK_TENANT_ID, reason: MOCK_AUTH_ERROR_TYPE },
-    );
   });
 
   it('logs the error name and code, never the owner email, when the send throws', async () => {
     signInMock.mockRejectedValue(mockQueryError(MOCK_OWNER_EMAIL));
 
-    await sendOwnerInviteEmail(MOCK_TENANT_ID, MOCK_OWNER_EMAIL);
+    const isSent = await sendOwnerInviteEmail(MOCK_TENANT_ID, MOCK_OWNER_EMAIL);
 
+    expect(isSent).toBe(false);
     expect(loggerErrorMock).toHaveBeenCalledExactlyOnceWith(
       TENANT_LOG.OWNER_INVITE_EMAIL_FAILED,
       {
@@ -73,5 +65,37 @@ describe(sendOwnerInviteEmail, () => {
         errorCode: MOCK_POSTGRES_ERROR_CODE,
       },
     );
+  });
+
+  describe('when the send lands on the error page', () => {
+    beforeEach(() => {
+      signInMock.mockResolvedValue(MOCK_AUTH_ERROR_URL);
+    });
+
+    it('logs the tenant and Auth.js error', async () => {
+      const isSent = await sendOwnerInviteEmail(
+        MOCK_TENANT_ID,
+        MOCK_OWNER_EMAIL,
+      );
+
+      expect(isSent).toBe(false);
+      expect(loggerErrorMock).toHaveBeenCalledExactlyOnceWith(
+        TENANT_LOG.OWNER_INVITE_EMAIL_FAILED,
+        { tenantId: MOCK_TENANT_ID, reason: MOCK_AUTH_ERROR_TYPE },
+      );
+    });
+
+    it('logs a failed send under the event its caller names', async () => {
+      await sendOwnerInviteEmail(
+        MOCK_TENANT_ID,
+        MOCK_OWNER_EMAIL,
+        TEAM_ACCESS_LOG.INVITE_EMAIL_FAILED,
+      );
+
+      expect(loggerErrorMock).toHaveBeenCalledExactlyOnceWith(
+        TEAM_ACCESS_LOG.INVITE_EMAIL_FAILED,
+        { tenantId: MOCK_TENANT_ID, reason: MOCK_AUTH_ERROR_TYPE },
+      );
+    });
   });
 });

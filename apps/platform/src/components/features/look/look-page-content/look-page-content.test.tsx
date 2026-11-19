@@ -1,9 +1,8 @@
 import { LOOK_ROW } from '@platform/constants/look-row';
-import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -11,7 +10,14 @@ import {
   growthBadgesOutsideNote,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
-import { setupLookPageContent as setup } from '@platform/testing/look/look-page-content-setup';
+import {
+  arrangeLookPageQueries,
+  setupLookPageContent as setup,
+} from '@platform/testing/look/look-page-content-setup';
+import {
+  getSiteConfigMock,
+  selectLiveLocalesMock,
+} from '@platform/testing/look/look-page-db';
 import { mockViewer } from '@platform/testing/memberships/fixtures';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
@@ -19,23 +25,20 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
-import { PRESET_ID, RADIUS_SCALE } from '@shinefold/config';
+import { PRESET_ID } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
-import { queries } from '@shinefold/db';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPageContent } from './look-page-content';
 
-vi.mock(
-  '@shinefold/db',
-  () => import('@platform/testing/site-config/site-config-db'),
+vi.mock('@shinefold/db', async () =>
+  (await import('@platform/testing/look/look-page-db')).mockLookPageDb(),
 );
 
 vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 
 vi.mock('@platform/utils/env/env');
 
-const getSiteConfig = vi.mocked(queries.siteConfig.getSiteConfig);
 const MOCK_ACCENT_HUE = 28;
 const { radiusScaleOptionLabel: RADIUS_LABEL } = messages.lookForm;
 
@@ -46,6 +49,10 @@ describe(`<${LookPageContent.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
+    arrangeLookPageQueries({
+      getSiteConfig: getSiteConfigMock,
+      selectLiveLocalesWithin: selectLiveLocalesMock,
+    });
   });
 
   it('renders the Console defaults when the tenant has no saved look yet', async () => {
@@ -54,13 +61,13 @@ describe(`<${LookPageContent.name}/>`, () => {
     const heading = screen.getByRole('heading', { name: 'Look' });
     const consoleRadio = screen.getByRole('radio', { name: 'Console' });
 
-    expect(getSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(heading).toBeVisible();
     expect(consoleRadio).toBeChecked();
   });
 
   it("renders the tenant's saved look when one exists", async () => {
-    getSiteConfig.mockResolvedValue(
+    getSiteConfigMock.mockResolvedValue(
       mockSiteConfig({
         preset: PRESET_ID.EDITORIAL,
         accentHue: MOCK_ACCENT_HUE,
@@ -118,40 +125,6 @@ describe(`<${LookPageContent.name}/>`, () => {
         expect(lockedRadius).toHaveAttribute(ARIA_DISABLED, 'true');
       },
     );
-  });
-
-  describe('with a stored Growth-only corner radius', () => {
-    beforeEach(() => {
-      getSiteConfig.mockResolvedValue(
-        mockSiteConfig({ radiusScale: RADIUS_SCALE.XL }),
-      );
-    });
-
-    it("shows and previews the preset's radius on Free", async () => {
-      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }) });
-      await openLookRow(user, LOOK_ROW.SHAPE);
-
-      const presetRadius = screen.getByRole('button', {
-        name: RADIUS_LABEL.MD,
-      });
-      const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
-      expect(presetRadius).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(presetRadius).toHaveAttribute(ARIA_DISABLED, 'true');
-      expect(sampleTokens).not.toHaveStyle({ '--radius-md': '16px' });
-    });
-
-    it('shows and previews the stored radius on Growth', async () => {
-      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.GROWTH }) });
-      await openLookRow(user, LOOK_ROW.SHAPE);
-
-      const storedRadius = screen.getByRole('button', {
-        name: RADIUS_LABEL.XL,
-      });
-      const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
-      expect(storedRadius).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(storedRadius).toBeEnabled();
-      expect(sampleTokens).toHaveStyle({ '--radius-md': '16px' });
-    });
   });
 
   it('shows the archived notice for a deprovisioned tenant', async () => {

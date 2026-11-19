@@ -3,7 +3,10 @@ import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
-import { insertTestMember } from '@shinefold/db/testing/memberships/fixtures';
+import {
+  MOCK_EDITOR_EMAIL,
+  insertTestMember,
+} from '@shinefold/db/testing/memberships/fixtures';
 import {
   mockMemberStudioAccess,
   toMemberStudioAccessColumns,
@@ -18,8 +21,6 @@ vi.mock('@shinefold/db/client');
 faker.seed(7168);
 
 const db = useQueryTestDb();
-
-const MOCK_EDITOR_EMAIL = faker.internet.email().toLowerCase();
 
 const tenant = useTestTenant(db);
 

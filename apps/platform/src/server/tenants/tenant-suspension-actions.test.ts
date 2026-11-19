@@ -70,9 +70,7 @@ const {
   reopenTenantSuspensionMock: vi.fn(),
 }));
 
-vi.mock('next/server', () => ({
-  after: (task: () => unknown) => task(),
-}));
+vi.mock('next/server');
 
 vi.mock('@platform/server/tenants/notify-owner-of-suspension', () => ({
   notifyOwnerOfSuspension: vi.fn(),

@@ -56,13 +56,14 @@ describe(generateTakeaways, () => {
     expect(takeaways).toEqual(MOCK_TAKEAWAYS);
   });
 
-  it('asks Claude for a draft with the given api key', async () => {
+  it('asks Claude for a draft with the given api key, under one abort deadline', async () => {
     await generateTakeaways(MOCK_BODY, MOCK_API_KEY);
 
-    const [request] = parseMock.mock.calls[0] ?? [];
+    const [request, options] = parseMock.mock.calls[0] ?? [];
     expect(anthropicCtorMock).toHaveBeenCalledWith({ apiKey: MOCK_API_KEY });
     expect(request.model).toBe(SKIM_GENERATION_MODEL);
     expect(request).not.toHaveProperty('temperature');
+    expect(options.signal).toBeInstanceOf(AbortSignal);
   });
 
   it('propagates the SDK error when the response fails validation', async () => {

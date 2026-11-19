@@ -334,6 +334,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **TENANT_WRITE_REFUSAL**: `UNRESOLVED`, `INACTIVE`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/text-role.ts`
+
+- **TEXT_ROLE**: `HERO_TITLE`, `POST_TITLE`, `PAGE_TITLE`, `SECTION_TITLE`, `CARD_TITLE`, `ITEM_TITLE`, `DIALOG_TITLE`, `PROSE_H2`, `PROSE_H3`, `PROSE_H4`, `INTRO`, `BODY`, `CARD_BODY`, `META`, `EYEBROW`, `LABEL`, `FOOTNOTE`, `CAPTION`, `QUOTE`, `ATTRIBUTION`, `FIGURE`, `FIGURE_LABEL`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/timeline.ts`
 
 - **TIMELINE_MARKER_STYLE**: `NUMBERED`, `LABELLED`
@@ -812,6 +816,13 @@ Every key/value const an agent should reuse before writing a literal. The
 - **SUPPORT_FIELD_ERROR**: `REQUIRED`, `TOO_LONG`
 - **SUPPORT_LIMIT**: `SUBJECT_MAX_LENGTH`=`150`, `MESSAGE_MAX_LENGTH`=`5000`, `ORIGIN_PATH_MAX_LENGTH`=`500`, `MESSAGES_PER_WINDOW`=`5`
 - **SUPPORT_LOG**: `ADDRESS_MISSING`=`"support.address_missing"`, `SEND_FAILED`=`"support.send_failed"`, `COPY_FAILED`=`"support.copy_failed"`
+
+### `@platform/constants/team-access` — `apps/platform/src/constants/team-access.ts`
+
+- **TEAM_INVITE_FIELD_ERROR**: `ALREADY_MEMBER`, `ALREADY_INVITED`
+- **TEAM_REFUSAL**: `OWNER_INVITE`
+- **MEMBER_ACCESS_PATH**: `CHECK`=`"/api/member-access/check"`, `RESEND`=`"/api/member-access/resend"`, `REVOKE`=`"/api/member-access/revoke"`
+- **TEAM_ACCESS_LOG**: `INVITE_FAILED`=`"team_access.invite_failed"`, `INVITE_EMAIL_FAILED`=`"team_access.invite_email_failed"`, `INVITE_AUDIT_FAILED`=`"team_access.invite_audit_failed"`, `REMOVE_FAILED`=`"team_access.remove_failed"`, `REMOVE_AUDIT_FAILED`=`"team_access.remove_audit_failed"`, `REVOKE_FAILED`=`"team_access.revoke_failed"`, `REVOKE_SKIPPED_NO_EMAIL`=`"team_access.revoke_skipped_no_email"`, `CANCEL_FAILED`=`"team_access.cancel_failed"`, `CANCEL_AUDIT_FAILED`=`"team_access.cancel_audit_failed"`, `ACCESS_REQUEST_FAILED`=`"team_access.access_request_failed"`
 
 ### `@platform/constants/tenant` — `apps/platform/src/constants/tenant.ts`
 

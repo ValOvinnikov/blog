@@ -65,7 +65,7 @@ describe(`<${LookForm.name}/>`, () => {
       {
         row: LOOK_ROW.FOOTER,
         group: LOOK_FORM.footerBackgroundLabel,
-        option: LOOK_FORM.footerBackgroundOptionLabel.SECONDARY,
+        option: LOOK_FORM.skinLabel.SECONDARY,
         saved: { footerBackground: BRAND_VARIANT.SECONDARY },
       },
       {

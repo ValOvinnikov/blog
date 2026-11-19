@@ -550,7 +550,7 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
   - A page under a gated layout takes the tenant from the layout's cached
     resolver.
   - Never query again for a row you already have. Derive from it, for example
-    `queries.tenants.selectLiveLocales(tenant)`.
+    `queries.tenants.selectLiveLocalesWithin(tenant, tenant.entitlements)`.
   - Next does not dedupe a `fetch` that passes `signal`, which includes every
     call using `AbortSignal.timeout`. Make one external request serve everything
     a page needs from it.
@@ -722,7 +722,7 @@ of them:
 | `isArchived` + `archivedNoticeId` passed to every card under `SettingsFormShell`                                 | `useSettingsFormState()` in each card                                                                                             |
 | `const a = await x(); const b = await y();` where `y` doesn't use `a`                                            | `const [a, b] = await Promise.all([x(), y()])`                                                                                    |
 | `auth()` called directly, or a tenant query repeated in a layout or page                                         | The `cache()`-wrapped resolver: `getSession`, `requireAdmin`, `requireTenantById`, `resolveDashboardTenant`, `listSessionTenants` |
-| `queries.tenants.getX(tenant.id)` when `tenant` is already in hand                                               | Derive it from the row, e.g. `queries.tenants.selectLiveLocales(tenant)`                                                          |
+| `queries.tenants.getX(tenant.id)` when `tenant` is already in hand                                               | Derive it from the row, e.g. `queries.tenants.selectLiveLocalesWithin(tenant, tenant.entitlements)`                               |
 | Awaiting a slow external call (the Vercel API) in a page's top-level `Promise.all`                               | An async section inside `<Suspense>`, fallback `Skeleton`                                                                         |
 | Loading data that only a closed Disclosure, Menu or inactive tab shows                                           | A Server Action called on first open with a `Spinner`, or a route segment per tab                                                 |
 | `tenant={row}` or `hrefFor={() => …}` passed to a `'use client'` component                                       | A server-side projection of only the fields it renders, with hrefs computed on the server                                         |

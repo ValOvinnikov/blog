@@ -10,6 +10,9 @@ const membershipsFaker = createMockFaker(60221);
 
 export const MOCK_USER_ID = membershipsFaker.string.uuid();
 export const MOCK_MISSING_USER_ID = membershipsFaker.string.uuid();
+export const MOCK_EDITOR_EMAIL = membershipsFaker.internet
+  .email()
+  .toLowerCase();
 
 export async function mockMembership(
   db: TTestDb,

@@ -1,6 +1,8 @@
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import { getDb } from '@shinefold/db/client';
+import { isNotDeprovisioned } from '@shinefold/db/queries/tenants/not-deprovisioned';
 import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 export type TGetTenantByIdOptions = {
   includeArchived?: boolean;
@@ -9,12 +11,12 @@ export type TGetTenantByIdOptions = {
 export async function getTenantById(
   id: string,
   options: TGetTenantByIdOptions = {},
-): Promise<TTenant | undefined> {
+): Promise<TMaybeUndefined<TTenant>> {
   const db = getDb();
 
   const conditions = [eq(tenants.id, id)];
   if (!options.includeArchived) {
-    conditions.push(isNull(tenants.deprovisionedAt));
+    conditions.push(isNotDeprovisioned);
   }
 
   const [tenant] = await db

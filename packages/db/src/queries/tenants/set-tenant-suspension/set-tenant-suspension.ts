@@ -7,10 +7,11 @@ import {
   type TSuspensionStatus,
 } from '@shinefold/db/constants';
 import { heldStatusFields } from '@shinefold/db/queries/tenants/held-status-fields';
+import { isNotDeprovisioned } from '@shinefold/db/queries/tenants/not-deprovisioned';
 import { resumedTenantFields } from '@shinefold/db/queries/tenants/resumed-tenant-fields';
 import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
-import { and, eq, inArray, isNull } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 
 const isSuspended = eq(tenants.status, TENANT_STATUS.SUSPENDED);
 
@@ -44,7 +45,7 @@ export async function setTenantSuspension(
   const [tenant] = await getDb()
     .update(tenants)
     .set(fields())
-    .where(and(eq(tenants.id, tenantId), from, isNull(tenants.deprovisionedAt)))
+    .where(and(eq(tenants.id, tenantId), from, isNotDeprovisioned))
     .returning();
 
   if (!tenant) {

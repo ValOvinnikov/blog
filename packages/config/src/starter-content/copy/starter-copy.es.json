@@ -271,5 +271,78 @@
         "metaDescription": "Una guía de ejemplo creada con tu sitio. Úsala para los problemas habituales, sus causas y sus soluciones."
       }
     ]
+  },
+  "business": {
+    "hero": {
+      "eyebrow": "Bienvenido",
+      "heading": "Ayuda clara y fiable para tu negocio",
+      "supportingText": "Di en una frase qué haces y para quién."
+    },
+    "intro": {
+      "body": [
+        "Ayudamos a nuestros clientes a sacar el trabajo adelante bien, a tiempo y sin sorpresas.",
+        "Sustituye este texto por una breve descripción de tu negocio: qué ofreces, para quién y qué te distingue."
+      ]
+    },
+    "faq": {
+      "heading": "Preguntas frecuentes",
+      "questions": [
+        {
+          "question": "¿Qué ofrecéis?",
+          "answer": [
+            "Resume tus servicios principales en una o dos frases y enlaza a la página Servicios para los detalles."
+          ]
+        },
+        {
+          "question": "¿Cuánto cuesta?",
+          "answer": [
+            "Explica cómo fijas tus precios o invita a los visitantes a escribirte para pedir un presupuesto."
+          ]
+        },
+        {
+          "question": "¿Cómo empezamos?",
+          "answer": [
+            "Describe el primer paso, como una llamada breve o un encargo por escrito, y lo que viene después."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Hablemos",
+      "supportingText": "Cuéntanos qué necesitas y te responderemos."
+    },
+    "services": {
+      "title": "Servicios",
+      "slug": "servicios",
+      "summary": "Qué ofrecemos y cómo trabajamos.",
+      "body": [
+        "Describe cada servicio en un párrafo breve: qué incluye y para quién es.",
+        "Añade precios, paquetes o ejemplos de trabajos anteriores cuando los tengas."
+      ],
+      "metaTitle": "Servicios — qué ofrecemos y cómo trabajamos",
+      "metaDescription": "Una página de servicios de ejemplo creada con tu sitio. Sustitúyela por lo que ofrece tu negocio."
+    },
+    "about": {
+      "title": "Sobre nosotros",
+      "slug": "sobre-nosotros",
+      "summary": "Quiénes somos y qué defendemos.",
+      "body": [
+        "Cuenta a los visitantes cómo empezó el negocio, quién está detrás y qué te importa.",
+        "Bastan unas líneas. Añade fotos del equipo cuando las tengas."
+      ],
+      "metaTitle": "Sobre nosotros — quiénes somos y qué defendemos",
+      "metaDescription": "Una página sobre nosotros de ejemplo creada con tu sitio. Cuenta quién está detrás del negocio."
+    },
+    "contact": {
+      "title": "Contacto",
+      "slug": "contacto",
+      "summary": "Cómo contactarnos.",
+      "body": [
+        "Indica a los visitantes la mejor forma de contactarte: un correo electrónico, un teléfono o ambos.",
+        "Añade tu horario y dónde estás, y di en cuánto tiempo sueles responder."
+      ],
+      "metaTitle": "Contacto — cómo contactarnos y cuándo respondemos",
+      "metaDescription": "Una página de contacto de ejemplo creada con tu sitio. Añade tu correo, tu teléfono y tu horario."
+    }
   }
 }

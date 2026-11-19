@@ -1,10 +1,12 @@
+import { LookSampleActions } from '@platform/components/features/site-preview/look-sample/components/look-sample-actions/look-sample-actions';
+import { LookSampleBand } from '@platform/components/features/site-preview/look-sample/components/look-sample-band/look-sample-band';
+import { LookSampleBanner } from '@platform/components/features/site-preview/look-sample/components/look-sample-banner/look-sample-banner';
 import { LookSampleCta } from '@platform/components/features/site-preview/look-sample/components/look-sample-cta/look-sample-cta';
 import { LookSampleFaq } from '@platform/components/features/site-preview/look-sample/components/look-sample-faq/look-sample-faq';
 import { LookSampleForm } from '@platform/components/features/site-preview/look-sample/components/look-sample-form/look-sample-form';
 import { LookSamplePosts } from '@platform/components/features/site-preview/look-sample/components/look-sample-posts/look-sample-posts';
 import { LookSampleQuote } from '@platform/components/features/site-preview/look-sample/components/look-sample-quote/look-sample-quote';
 import { SampleBusyButton } from '@platform/components/features/site-preview/sample-busy-button';
-import { SamplePart } from '@platform/components/features/site-preview/sample-part';
 import { SampleSiteFooter } from '@platform/components/features/site-preview/sample-site-footer';
 import {
   SampleSiteHeader,
@@ -12,14 +14,17 @@ import {
 } from '@platform/components/features/site-preview/sample-site-header';
 import { SiteThemeFrame } from '@platform/components/features/site-preview/site-theme-frame';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
-import { SAMPLE_PART } from '@platform/constants/sample-part';
 import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
-import { type IBusyStyle, SIZE, type TLocaleIsoCode } from '@shinefold/config';
-import { Button } from '@shinefold/ui/components/atoms/button';
+import {
+  type IBusyStyle,
+  SKIN_REGISTRY,
+  type TLocaleIsoCode,
+} from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Text } from '@shinefold/ui/components/atoms/text';
+import { objectKeys } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 import { lookSampleVariants } from './look-sample-variants';
@@ -56,8 +61,7 @@ export const LookSample = ({
 }: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
-  const { root, main, hero, title, lead, actionsRow, divider } =
-    lookSampleVariants();
+  const { root, main, hero, title, lead, divider } = lookSampleVariants();
 
   return (
     <SiteThemeFrame
@@ -84,19 +88,9 @@ export const LookSample = ({
           <Text variant="supporting" className={lead()}>
             {t('samplePara')}
           </Text>
-          <div className={actionsRow()}>
-            <SamplePart part={SAMPLE_PART.BUTTON}>
-              <Button type="button" size={SIZE.SM}>
-                {t('subscribeButton')}
-              </Button>
-            </SamplePart>
-            <SamplePart part={SAMPLE_PART.BUTTON}>
-              <Button type="button" variant="ghost" size={SIZE.SM}>
-                {t('readMoreButton')}
-              </Button>
-            </SamplePart>
+          <LookSampleActions>
             <SampleBusyButton busy={busy} />
-          </div>
+          </LookSampleActions>
         </div>
         <LookSamplePosts />
         <hr className={divider()} />
@@ -105,6 +99,10 @@ export const LookSample = ({
         <LookSampleQuote />
         <LookSampleCta />
       </div>
+      {objectKeys(SKIN_REGISTRY).map((skin) => (
+        <LookSampleBand key={skin} skin={skin} />
+      ))}
+      <LookSampleBanner />
       <SampleSiteFooter brand={brand} footer={footer} />
     </SiteThemeFrame>
   );

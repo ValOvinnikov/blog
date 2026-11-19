@@ -2,7 +2,14 @@ import { SAMPLE_HEADER_FULL_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { screen, within } from '@platform/testing/custom-render';
-import { setupLookPageContent as setup } from '@platform/testing/look/look-page-content-setup';
+import {
+  arrangeLookPageQueries,
+  setupLookPageContent as setup,
+} from '@platform/testing/look/look-page-content-setup';
+import {
+  getSiteConfigMock,
+  selectLiveLocalesMock,
+} from '@platform/testing/look/look-page-db';
 import { mockReadyTenant } from '@platform/testing/tenants/fixtures';
 import { CAPABILITY } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
@@ -10,9 +17,8 @@ import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 
 import { LookPageContent } from './look-page-content';
 
-vi.mock(
-  '@shinefold/db',
-  () => import('@platform/testing/site-config/site-config-db'),
+vi.mock('@shinefold/db', async () =>
+  (await import('@platform/testing/look/look-page-db')).mockLookPageDb(),
 );
 
 vi.mock('@platform/server/settings-features/get-enabled-capabilities');
@@ -21,6 +27,13 @@ const SIGN_IN = 'Sign in';
 const POWERED_BY_MARK = `${messages.lookPreview.footerPoweredByLabel} ${SHINEFOLD_LOGO_NAME}`;
 
 describe(`<${LookPageContent.name}/> preview`, () => {
+  beforeEach(() => {
+    arrangeLookPageQueries({
+      getSiteConfig: getSiteConfigMock,
+      selectLiveLocalesWithin: selectLiveLocalesMock,
+    });
+  });
+
   it('previews Sign in when Reader accounts is on', async () => {
     vi.mocked(getEnabledCapabilities).mockResolvedValueOnce([
       CAPABILITY.READER_ACCOUNTS,
