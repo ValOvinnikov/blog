@@ -12,7 +12,7 @@ export const shellFrameVariants = tv({
       'w-full max-w-[1180px] px-4 md:px-platform-content',
       '*:my-4 md:*:mt-platform-content',
     ],
-    content: ['flex-1'],
+    content: ['flex-1 outline-none'],
   },
   variants: {
     // Never cap or clip `root` (the document must scroll to keep `Sidebar` reachable); full-bleed pins `main` to the viewport instead.

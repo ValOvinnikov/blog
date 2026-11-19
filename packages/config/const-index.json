@@ -7434,6 +7434,14 @@
         "file": "apps/platform/src/constants/entitlement-grant.ts"
       }
     ],
+    "EXPIRY_SHORTENED": [
+      {
+        "ref": "ENTITLEMENT_GRANT_REFUSAL.EXPIRY_SHORTENED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
     "INCLUDED_IN_PLAN": [
       {
         "ref": "ENTITLEMENT_GRANT_REFUSAL.INCLUDED_IN_PLAN",

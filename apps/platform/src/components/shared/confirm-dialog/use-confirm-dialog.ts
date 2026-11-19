@@ -1,5 +1,6 @@
 'use client';
 
+import { SHELL_MAIN_ID } from '@platform/constants/shell-frame';
 import type { TMaybeUndefined } from '@shinefold/config';
 import type { TResult } from '@shinefold/utils';
 import { useRef, useState, useTransition } from 'react';
@@ -11,6 +12,18 @@ export type TUseConfirmDialogArgs = {
   onConfirmed?: () => void;
   onOpenChange?: (isOpen: boolean) => void;
   returnFocusId?: string;
+};
+
+// Base UI moves focus into a non-tabbable target's first tabbable child, so the main region is focused here.
+const focusAfterConfirm = (returnFocusId: string) => {
+  const returnTarget = document.getElementById(returnFocusId);
+  if (returnTarget) return returnTarget;
+
+  const main = document.getElementById(SHELL_MAIN_ID);
+  if (!main) return true;
+
+  main.focus({ preventScroll: true });
+  return false;
 };
 
 export const useConfirmDialog = ({
@@ -50,10 +63,7 @@ export const useConfirmDialog = ({
   };
 
   const finalFocus = returnFocusId
-    ? () =>
-        (hasConfirmed.current
-          ? document.getElementById(returnFocusId)
-          : null) ?? true
+    ? () => (hasConfirmed.current ? focusAfterConfirm(returnFocusId) : true)
     : undefined;
 
   return {

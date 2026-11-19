@@ -2533,6 +2533,7 @@
     "archived": "Este cliente está archivado, así que sus concesiones no se pueden cambiar.",
     "comingSoon": "Esta función aún no está disponible, así que no se puede conceder.",
     "alreadyGranted": "Esto ya está concedido.",
+    "expiryShortened": "La concesión de idiomas actual dura más. Elige una caducidad posterior o revoca primero esa concesión.",
     "includedInPlan": "Esto ya está incluido en el plan del cliente.",
     "grantNotOpen": "Esta concesión ya se quitó o ha caducado."
   }

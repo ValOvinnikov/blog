@@ -1,6 +1,7 @@
 'use client';
 
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
+import { SHELL_MAIN_ID } from '@platform/constants/shell-frame';
 import { STUDIO_SEGMENT } from '@platform/utils/routes/routes';
 import { useSelectedLayoutSegment } from 'next/navigation';
 import type { ReactNode } from 'react';
@@ -38,7 +39,9 @@ export const ShellFrame = ({
         <div className={main()}>
           {topbar}
           {notice && <div className={noticeSlot()}>{notice}</div>}
-          <main className={content()}>{children}</main>
+          <main id={SHELL_MAIN_ID} tabIndex={-1} className={content()}>
+            {children}
+          </main>
         </div>
       </SidebarCollapseProvider>
     </div>

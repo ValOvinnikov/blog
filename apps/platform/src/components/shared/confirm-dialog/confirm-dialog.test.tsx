@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { SHELL_MAIN_ID } from '@platform/constants/shell-frame';
 import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -25,6 +26,7 @@ const MOCK_DISABLED_REASON = faker.lorem.sentence();
 const MOCK_UNTYPED_TRIGGER_LABEL = faker.lorem.words(3);
 const MOCK_RETURN_FOCUS_ID = faker.lorem.word();
 const MOCK_RETURN_FOCUS_LABEL = faker.lorem.words(2);
+const MOCK_MISSING_RETURN_FOCUS_ID = faker.string.uuid();
 const CONFIRM_FIELD_NAME = t('confirmLabel', { name: MOCK_EXPECTED_VALUE });
 
 type THarnessProps = Omit<
@@ -78,6 +80,12 @@ const UntypedConfirmDialogHarness = (
   </ConfirmDialog>
 );
 
+const InShellMainHarness = (props: THarnessProps) => (
+  <main id={SHELL_MAIN_ID} tabIndex={-1}>
+    <ConfirmDialogHarness {...props} />
+  </main>
+);
+
 const onConfirmMock = vi.fn();
 const onConfirmedMock = vi.fn();
 const onOpenChangeMock = vi.fn();
@@ -86,6 +94,11 @@ const setup = customRender(ConfirmDialogHarness, {
   onConfirm: onConfirmMock,
   onConfirmed: onConfirmedMock,
   onOpenChange: onOpenChangeMock,
+});
+
+const setupInShellMain = customRender(InShellMainHarness, {
+  onConfirm: onConfirmMock,
+  returnFocusId: MOCK_MISSING_RETURN_FOCUS_ID,
 });
 
 const setupUntyped = customRender(UntypedConfirmDialogHarness, {
@@ -104,6 +117,22 @@ describe(`<${ConfirmDialog.name}/>`, () => {
     user = userEvent.setup();
     onConfirmMock.mockReset();
     onConfirmMock.mockResolvedValue(okResult());
+  });
+
+  it('moves focus to the page main region when the return target is gone', async () => {
+    setupInShellMain();
+    const trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
+    await user.click(trigger);
+    const confirmField = screen.getByRole('textbox', {
+      name: CONFIRM_FIELD_NAME,
+    });
+    await user.type(confirmField, MOCK_EXPECTED_VALUE);
+    const confirmButton = await findConfirmButton();
+    await user.click(confirmButton);
+
+    const main = screen.getByRole('main');
+
+    await vi.waitFor(() => expect(main).toHaveFocus());
   });
 
   describe('once opened', () => {
