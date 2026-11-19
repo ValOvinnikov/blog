@@ -1,4 +1,5 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const mediaCardFooterVariants = tv({
   slots: {
@@ -6,11 +7,8 @@ export const mediaCardFooterVariants = tv({
       'relative z-10 flex items-center gap-2',
       'pointer-events-none [&_a]:pointer-events-auto [&_button]:pointer-events-auto',
       'mt-auto pt-3',
-      'font-mono text-meta',
+      TYPOGRAPHY[TEXT_ROLE.META],
     ],
-    topic: [
-      'inline-flex items-center gap-1 leading-none',
-      'text-subtle lowercase',
-    ],
+    topic: ['inline-flex items-center gap-1 leading-none lowercase'],
   },
 });
