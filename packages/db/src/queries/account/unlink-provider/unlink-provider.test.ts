@@ -1,3 +1,4 @@
+import { UNLINK_PROVIDER_OUTCOME } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import {
   GITHUB_PROVIDER,
@@ -16,8 +17,8 @@ import { unlinkProvider } from './unlink-provider';
 
 vi.mock('@shinefold/db/client');
 
-const UNLINKED = toOutcome('unlinked');
-const LAST_METHOD = toOutcome('last-method');
+const UNLINKED = toOutcome(UNLINK_PROVIDER_OUTCOME.UNLINKED);
+const LAST_METHOD = toOutcome(UNLINK_PROVIDER_OUTCOME.LAST_METHOD);
 
 const db = useQueryTestDb();
 

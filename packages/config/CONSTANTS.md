@@ -345,6 +345,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## db
 
+### `@shinefold/db/constants` — `packages/db/src/constants/account.ts`
+
+- **UNLINK_PROVIDER_OUTCOME**: `UNLINKED`, `LAST_METHOD`
+
 ### `@shinefold/db/constants` — `packages/db/src/constants/admin.ts`
 
 - **ADMIN_ROLE**: `SUPERADMIN`, `ADMIN`, `MODERATOR`

@@ -11,6 +11,7 @@ import { elevateTenantOwner } from './lib/elevate-tenant-owner';
 import { loadRecheckEnv, type TRecheckEnv } from './lib/env';
 import { notifyOwnerElevationOutcome } from './lib/notify-owner-elevation-outcome';
 import { reportOwnerElevationOutcome } from './lib/report-owner-elevation-outcome';
+import { TOOL } from './lib/tool';
 
 export type TRecheckSummary = {
   checked: number;
@@ -114,4 +115,4 @@ async function main(): Promise<void> {
   }
 }
 
-runIfEntrypoint(import.meta.url, main, 'recheck-tenant-owners');
+runIfEntrypoint(import.meta.url, main, TOOL);

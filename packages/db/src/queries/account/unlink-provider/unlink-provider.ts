@@ -1,24 +1,22 @@
 import type { TOutcome } from '@shinefold/config';
 import type { TOAuthProvider } from '@shinefold/config/constants';
 import { getDb } from '@shinefold/db/client';
-import { ROW_LOCK } from '@shinefold/db/constants';
+import {
+  ROW_LOCK,
+  type TUnlinkProviderOutcome,
+  UNLINK_PROVIDER_OUTCOME,
+} from '@shinefold/db/constants';
 import { accounts, users } from '@shinefold/db/schema/auth';
 import { hasLength } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import { and, eq, sql } from 'drizzle-orm';
 
-// The magic-link method has no `accounts` row to delete, so it is not a
-// valid target; dropping it means clearing `users.emailVerified` instead.
+// Magic link has no `accounts` row to delete; dropping it means clearing `users.emailVerified` instead.
 export type TLinkableProvider = TOAuthProvider;
 
-export type TUnlinkProviderResult =
-  TOutcome<'unlinked'> | TOutcome<'last-method'>;
+export type TUnlinkProviderResult = TOutcome<TUnlinkProviderOutcome>;
 
-// Refuses to remove the user's last sign-in method. The guard and the delete
-// are one statement because `neon-http` has no transactions: the CTE locks
-// every `accounts` row for the user `FOR UPDATE`, so two concurrent unlinks
-// of different providers cannot both pass the count and leave zero methods.
-// Performs no authorization check — pass the session's own user id.
+// Guard and delete share one statement because `neon-http` has no transactions, and the CTE's `FOR UPDATE` lock stops two concurrent unlinks leaving zero methods; no authorization check is made.
 export async function unlinkProvider(
   userId: string,
   provider: TLinkableProvider,
@@ -49,10 +47,10 @@ export async function unlinkProvider(
         ) >= 1`,
       ),
     )
-    .returning();
+    .returning({ provider: accounts.provider });
 
   if (hasLength(deletedRows)) {
-    return toOutcome('unlinked');
+    return toOutcome(UNLINK_PROVIDER_OUTCOME.UNLINKED);
   }
 
   const [stillLinked] = await db
@@ -60,5 +58,7 @@ export async function unlinkProvider(
     .from(accounts)
     .where(and(eq(accounts.userId, userId), eq(accounts.provider, provider)));
 
-  return stillLinked ? toOutcome('last-method') : toOutcome('unlinked');
+  return stillLinked
+    ? toOutcome(UNLINK_PROVIDER_OUTCOME.LAST_METHOD)
+    : toOutcome(UNLINK_PROVIDER_OUTCOME.UNLINKED);
 }

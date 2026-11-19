@@ -5,8 +5,7 @@ import { parseDryRun, readRequiredTenantId } from '../lib/cli-flags';
 import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 
 import { loadInvalidateCacheEnv, type TInvalidateCacheEnv } from './lib/env';
-
-const TOOL = 'invalidate-tenant-cache';
+import { TOOL } from './lib/tool';
 
 export type TRunInvalidateTenantCacheResult = { ok: boolean };
 

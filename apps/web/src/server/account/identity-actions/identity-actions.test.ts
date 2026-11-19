@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { ACTION_OUTCOME } from '@shinefold/config';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
+import { UNLINK_PROVIDER_OUTCOME } from '@shinefold/db/constants';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import {
   DISPLAY_NAME_UPDATE_FAILED_EVENT,
@@ -29,8 +31,8 @@ vi.mock('@shinefold/db', () => ({
 
 faker.seed(6010);
 
-const MOCK_PROVIDER: TLinkableProvider = 'github';
-const MOCK_OTHER_PROVIDER: TLinkableProvider = 'google';
+const MOCK_PROVIDER: TLinkableProvider = OAUTH_PROVIDER.GITHUB;
+const MOCK_OTHER_PROVIDER: TLinkableProvider = OAUTH_PROVIDER.GOOGLE;
 const MOCK_UNSUPPORTED_PROVIDER =
   `${faker.lorem.word()};--` as TLinkableProvider;
 const MOCK_DISPLAY_NAME = faker.person.fullName();
@@ -56,7 +58,7 @@ describe(unlinkProviderAction, () => {
 
   it("unlinks the session user's provider and answers success", async () => {
     vi.mocked(queries.account.unlinkProvider).mockResolvedValueOnce(
-      toOutcome('unlinked'),
+      toOutcome(UNLINK_PROVIDER_OUTCOME.UNLINKED),
     );
 
     const result = await unlinkProviderAction(MOCK_PROVIDER);
@@ -70,7 +72,7 @@ describe(unlinkProviderAction, () => {
 
   it('answers blocked when the last sign-in method would be removed', async () => {
     vi.mocked(queries.account.unlinkProvider).mockResolvedValueOnce(
-      toOutcome('last-method'),
+      toOutcome(UNLINK_PROVIDER_OUTCOME.LAST_METHOD),
     );
 
     const result = await unlinkProviderAction(MOCK_OTHER_PROVIDER);

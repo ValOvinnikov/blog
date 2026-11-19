@@ -8,22 +8,20 @@ import type { TTenant } from '@shinefold/db/schema/tenants';
 import { sanitizeLogMessage } from '@shinefold/insight';
 import { isUndefined } from '@shinefold/utils/primitives';
 
-import {
-  parseDryRun,
-  parseFlagValue,
-  readRequiredTenantId,
-} from '../lib/cli-flags';
+import { parseDryRun, readRequiredTenantId } from '../lib/cli-flags';
 import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 import { workflowRunUrl } from '../lib/workflow-run-url/workflow-run-url';
 
 import { assertNotPlatformTenant } from './lib/assert-not-platform-tenant';
 import { loadDeprovisionEnv, type TDeprovisionEnv } from './lib/env';
 import { getTenantRow } from './lib/get-tenant-row';
+import { parseConfirm } from './lib/parse-confirm';
 import {
   reportDeprovisioningRunFinish,
   reportDeprovisioningRunStart,
 } from './lib/report-deprovisioning-run';
 import { reportDeprovisioningStepStatus } from './lib/report-deprovisioning-step-status';
+import { TOOL } from './lib/tool';
 import { archiveTenantSanityProject } from './steps/archive-sanity-project';
 import { archiveTenantRow } from './steps/archive-tenant';
 import { clearTenantArtifacts } from './steps/clear-artifacts';
@@ -31,19 +29,6 @@ import { invalidateTenantCache } from './steps/invalidate-tenant-cache';
 import { purgeTenantReaderData } from './steps/purge-reader-data';
 import { removeTenantDomain } from './steps/remove-domain';
 import { revokeTenantSanityTokens } from './steps/revoke-sanity-tokens';
-
-const TOOL = 'deprovision-tenant';
-const CONFIRM_FLAG = '--confirm=';
-
-function parseConfirm(argv: string[]): string {
-  const value = parseFlagValue(argv, CONFIRM_FLAG) ?? process.env['CONFIRM'];
-  if (!value) {
-    throw new Error(
-      `${TOOL}: missing required ${CONFIRM_FLAG}<tenant-name> (or CONFIRM env var).`,
-    );
-  }
-  return value;
-}
 
 type TStep = {
   key: TDeprovisioningStep;

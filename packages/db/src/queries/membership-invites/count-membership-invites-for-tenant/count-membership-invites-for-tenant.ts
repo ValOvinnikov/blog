@@ -1,16 +1,16 @@
 import { getDb } from '@shinefold/db/client';
 import { membershipInvites } from '@shinefold/db/schema/membership-invites';
-import { eq } from 'drizzle-orm';
+import { count, eq } from 'drizzle-orm';
 
 export async function countMembershipInvitesForTenant(
   tenantId: string,
 ): Promise<number> {
   const db = getDb();
 
-  const rows = await db
-    .select({ id: membershipInvites.id })
+  const [row] = await db
+    .select({ total: count() })
     .from(membershipInvites)
     .where(eq(membershipInvites.tenantId, tenantId));
 
-  return rows.length;
+  return row?.total ?? 0;
 }

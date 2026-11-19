@@ -4408,6 +4408,22 @@
         "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
+    "UNLINKED": [
+      {
+        "ref": "UNLINK_PROVIDER_OUTCOME.UNLINKED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/account.ts"
+      }
+    ],
+    "LAST_METHOD": [
+      {
+        "ref": "UNLINK_PROVIDER_OUTCOME.LAST_METHOD",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/account.ts"
+      }
+    ],
     "SUPERADMIN": [
       {
         "ref": "ADMIN_ROLE.SUPERADMIN",

@@ -1,3 +1,4 @@
+export * from './account';
 export * from './admin';
 export * from './audit-event';
 export * from './billing';
