@@ -375,8 +375,8 @@ text when it is unset.
 Every `module_*` document also carries a **required** `brandVariant` field,
 titled Background, from `brandVariantField()`. **Every module offers every
 `SKIN_REGISTRY` entry** (`@shinefold/config`'s theme), titled and ordered as
-the registry has them — today Plain (`PRIMARY`), Shaded (`SECONDARY`) and
-Brand tint (`BRAND_PRIMARY`) — and starts on Plain; the heroes are the one family
+the registry has them — today Plain (`PRIMARY`), Shaded (`SECONDARY`),
+Brand tint (`BRAND_PRIMARY`) and Ink (`INK`) — and starts on Plain; the heroes are the one family
 that starts on Brand tint, and on a Banner hero the value also tints the
 image. A module that must not sit on the brand band states why rather than
 trimming its list. On `module_cta` this field means the card's own fill
@@ -1485,7 +1485,7 @@ Both organisms compose one `bannerVariants` recipe
 (`packages/ui/src/lib/styling/banner.ts`), which owns the breakout, the
 scrims, the band padding and the min-height, so `Hero` and
 `CtaModule.Banner` cannot drift apart. Each skin points its scrim roles at
-`--scrim-brand-*` (Brand tint) or `--scrim-neutral-*` (Plain, Shaded): the brand scrim takes the tenant's accent hue at fixed
+`--scrim-brand-*` (Brand tint) or `--scrim-neutral-*` (Plain, Shaded, Ink): the brand scrim takes the tenant's accent hue at fixed
 lightness and chroma (emitted by the theme block below), while the neutral
 scrim stays hue-free. A scrim darkens the photo in either mode, so neither
 set nor the on-image tokens change under `.dark`. `tone` **is required**, so a Banner always sits in a skin and is
@@ -3070,7 +3070,8 @@ background is one entry in the second:
   hue, so every role on a brand stop follows it in both modes.
 - **Skins.** `SKIN_REGISTRY` (`satisfies Record<TBrandVariant, TSkin>`) holds
   one entry per band background, in Studio's order: Plain (`PRIMARY`), Shaded
-  (`SECONDARY`) and Brand tint (`BRAND_PRIMARY`). Each entry is a
+  (`SECONDARY`), Brand tint (`BRAND_PRIMARY`) and Ink (`INK`), the one
+  `INVERSE` registry skin. Each entry is a
   `defineSkin(title, { ground, mode, pin })` call — a palette ground per page
   mode, a `SKIN_MODE` (`MATCH` follows the page, `INVERSE` is dark in both)
   and any pinned roles. `defineSkin` derives every other role — ground and

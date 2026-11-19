@@ -5,12 +5,14 @@ import { SCHEME_RAMPS } from './contrast-scheme-ramps';
 import {
   AMBIENT,
   AMBIENT_RAISED,
+  BORDER,
   BORDER_EMPHASIS,
   BRAND_PRIMARY,
   BRAND_PRIMARY_MUTED,
   BRAND_PRIMARY_WASH,
   ERROR_MUTED,
   FIELD_BOUNDARY,
+  PRIMARY,
   PRIMARY_SUBTLE,
   SURFACE,
   SURFACE_2,
@@ -20,6 +22,8 @@ import {
 import { PALETTE } from './palette-ramps';
 
 export type TPaletteStop = keyof typeof PALETTE;
+
+export const DARKEST_NEUTRAL = '--palette-neutral-2700' satisfies TPaletteStop;
 
 export const SKIN_GROUND_ROLES = [
   AMBIENT,
@@ -39,7 +43,7 @@ const SKIN_INK_ROLES = [
   TEXT,
   TEXT_MUTED,
   '--text-subtle',
-  '--border',
+  BORDER,
   '--border-strong',
   BORDER_EMPHASIS,
   FIELD_BOUNDARY,
@@ -90,10 +94,10 @@ export const BRAND_SCRIMS = {
 } as const satisfies Record<TSkinScrimRole, TThemeToken>;
 
 const PAGE_ROLE_SOURCES: Partial<Record<TSkinStopRole, TThemeToken>> = {
-  [AMBIENT]: '--primary',
-  '--backdrop': '--primary',
+  [AMBIENT]: PRIMARY,
+  '--backdrop': PRIMARY,
   [AMBIENT_RAISED]: PRIMARY_SUBTLE,
-  '--divider': '--border',
+  '--divider': BORDER,
   '--text-subtle': TEXT_MUTED,
 };
 

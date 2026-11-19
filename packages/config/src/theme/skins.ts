@@ -13,7 +13,12 @@ import {
 import { AMBIENT_RAISED, FIELD_BOUNDARY } from './contrast-surfaces';
 import { effectiveSchemeOf } from './skin-contrast';
 import { deriveSkinRoles } from './skin-derive';
-import { PAGE_ROLES, type TPaletteStop, type TSkinRoles } from './skin-roles';
+import {
+  DARKEST_NEUTRAL,
+  PAGE_ROLES,
+  type TPaletteStop,
+  type TSkinRoles,
+} from './skin-roles';
 
 export type TSkin = {
   title: string;
@@ -53,8 +58,6 @@ export const defineSkin = (
     },
   };
 };
-
-const DEEPEST_NEUTRAL = '--palette-neutral-2700' satisfies TPaletteStop;
 
 const TINTED_BAND_PIN = {
   [COLOR_SCHEME.LIGHT]: {
@@ -97,7 +100,7 @@ export const SKIN_REGISTRY = {
   [BRAND_VARIANT.INK]: defineSkin('Ink', {
     ground: {
       [COLOR_SCHEME.LIGHT]: '--palette-neutral-2100',
-      [COLOR_SCHEME.DARK]: DEEPEST_NEUTRAL,
+      [COLOR_SCHEME.DARK]: DARKEST_NEUTRAL,
     },
     mode: SKIN_MODE.INVERSE,
   }),
@@ -107,7 +110,7 @@ export const STORYBOOK_SKINS = {
   STORYBOOK_INVERSE: defineSkin('Inverse (Storybook)', {
     ground: {
       [COLOR_SCHEME.LIGHT]: '--palette-neutral-2200',
-      [COLOR_SCHEME.DARK]: DEEPEST_NEUTRAL,
+      [COLOR_SCHEME.DARK]: DARKEST_NEUTRAL,
     },
     mode: SKIN_MODE.INVERSE,
   }),

@@ -13,8 +13,11 @@ import {
 import { findContrastFailures, findPairFailures } from './contrast-check';
 import { KNOWN_CONTRAST_FAILURES } from './contrast-known-failures';
 import {
+  BORDER,
   BRAND_PRIMARY,
+  BRAND_PRIMARY_MUTED,
   ITEM_ACCENT_BRAND_SHARE,
+  PRIMARY,
   SECONDARY,
   SURFACE,
   TEXT,
@@ -65,8 +68,8 @@ describe(findPairFailures, () => {
 
 describe(measureContrast, () => {
   it('measures an alias as the token it points at', () => {
-    expect(measureContrast('--ring', '--primary', MOCK_LIGHT_ACCENT_BAR)).toBe(
-      measureContrast(BRAND_PRIMARY, '--primary', MOCK_LIGHT_ACCENT_BAR),
+    expect(measureContrast('--ring', PRIMARY, MOCK_LIGHT_ACCENT_BAR)).toBe(
+      measureContrast(BRAND_PRIMARY, PRIMARY, MOCK_LIGHT_ACCENT_BAR),
     );
   });
 
@@ -76,7 +79,7 @@ describe(measureContrast, () => {
         ...MOCK_LIGHT_ACCENT_BAR,
         cardStyle: CARD_STYLE.OUTLINED,
       }),
-    ).toBe(measureContrast('--border', SURFACE, MOCK_LIGHT_ACCENT_BAR));
+    ).toBe(measureContrast(BORDER, SURFACE, MOCK_LIGHT_ACCENT_BAR));
   });
 
   it('paints the accent edge in the brand colour under the accent bar', () => {
@@ -91,7 +94,7 @@ describe(measureContrast, () => {
         ...MOCK_LIGHT_ACCENT_BAR,
         headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
       }),
-    ).toBe(measureContrast(TEXT, '--border', MOCK_LIGHT_ACCENT_BAR));
+    ).toBe(measureContrast(TEXT, BORDER, MOCK_LIGHT_ACCENT_BAR));
   });
 
   it.each([
@@ -99,7 +102,7 @@ describe(measureContrast, () => {
     ['navigation link', NAV_LINK_FILL_TOKEN],
   ])('measures a transparent %s against the page background', (_, fill) => {
     expect(measureContrast(TEXT, fill, MOCK_TRANSPARENT_FILLS)).toBe(
-      measureContrast(TEXT, '--primary', MOCK_LIGHT_ACCENT_BAR),
+      measureContrast(TEXT, PRIMARY, MOCK_LIGHT_ACCENT_BAR),
     );
   });
 
@@ -112,7 +115,7 @@ describe(measureContrast, () => {
     ).toBe(
       measureContrast(
         BRAND_PRIMARY,
-        '--brand-primary-muted',
+        BRAND_PRIMARY_MUTED,
         MOCK_LIGHT_ACCENT_BAR,
       ),
     );
@@ -141,7 +144,7 @@ describe(measureContrast, () => {
 
   it('throws for a token with no registered value', () => {
     expect(() =>
-      measureContrast('--unregistered', '--primary', MOCK_LIGHT_ACCENT_BAR),
+      measureContrast('--unregistered', PRIMARY, MOCK_LIGHT_ACCENT_BAR),
     ).toThrow('No LIGHT value registered for --unregistered');
   });
 });
