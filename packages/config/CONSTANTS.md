@@ -273,7 +273,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/sanity-perspective.ts`
 
-- **SANITY_PERSPECTIVE**: `PUBLISHED`=`"published"`, `DRAFTS`=`"drafts"`
+- **SANITY_PERSPECTIVE**: `PUBLISHED`=`"published"`, `DRAFTS`=`"drafts"`, `RAW`=`"raw"`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/sanity-project.ts`
 
@@ -1181,6 +1181,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **REVALIDATE_WEBHOOK_LOG**: `ROTATION_TENANT_FAILED`=`"webhook_secret_rotation.tenant_failed"`, `ROTATION_FINISHED`=`"webhook_secret_rotation.finished"`, `ROTATION_FAILED`=`"webhook_secret_rotation.failed"`, `SYNC_TENANT_FAILED`=`"revalidate_webhook_sync.tenant_failed"`, `SYNC_FINISHED`=`"revalidate_webhook_sync.finished"`, `SYNC_FAILED`=`"revalidate_webhook_sync.failed"`
 - **REVALIDATE_WEBHOOK_CHANGE**: `UPDATED`, `UNCHANGED`
+
+### `@worker/constants/sample-content` — `apps/worker/src/constants/sample-content.ts`
+
+- **SAMPLE_CONTENT_LOG**: `REMOVAL_FAILED`=`"sample_content.removal_failed"`
 
 ### `@worker/constants/scheduled-post-purge` — `apps/worker/src/constants/scheduled-post-purge.ts`
 
