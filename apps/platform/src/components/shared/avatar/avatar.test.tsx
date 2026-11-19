@@ -1,5 +1,8 @@
 import { faker } from '@faker-js/faker';
-import { AVATAR_VARIANT } from '@platform/constants/avatar';
+import {
+  AVATAR_UNKNOWN_INITIAL,
+  AVATAR_VARIANT,
+} from '@platform/constants/avatar';
 import { customRender, screen } from '@platform/testing/custom-render';
 
 import { Avatar } from './avatar';
@@ -48,12 +51,12 @@ describe(`<${Avatar.name}/>`, () => {
     expect(initials).toBeVisible();
   });
 
-  it('renders no initials for an empty name', () => {
+  it('shows a question mark with neither a name nor an email', () => {
     setup({ name: '' });
 
     const avatar = screen.getByTestId(AVATAR_TEST_ID);
 
-    expect(avatar).toBeEmptyDOMElement();
+    expect(avatar).toHaveTextContent(AVATAR_UNKNOWN_INITIAL);
   });
 
   it("shows the email's first letter when there is no name", () => {

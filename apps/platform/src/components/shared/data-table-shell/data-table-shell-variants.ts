@@ -9,7 +9,9 @@ export const dataTableShellVariants = tv({
       'overflow-x-auto',
       insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
-    table: ['w-full border-collapse text-left'],
+    table: ['group/table w-full border-collapse text-left'],
+    thead: [],
+    tbody: [],
     head: [
       'border-b border-platform-line-2 px-[14px] py-2.5',
       'text-left text-platform-11 font-bold text-platform-muted uppercase tracking-platform-caps',
@@ -26,9 +28,17 @@ export const dataTableShellVariants = tv({
     ],
     row: [
       'border-b border-platform-line-2 last:border-b-0 hover:bg-platform-surface-2',
+      'max-md:group-data-stacked/table:flex max-md:group-data-stacked/table:flex-col max-md:group-data-stacked/table:gap-2 max-md:group-data-stacked/table:p-[14px]',
     ],
-    cell: ['px-[14px] py-3 align-middle text-platform-13-5 text-platform-text'],
+    cell: [
+      'px-[14px] py-3 align-middle text-platform-13-5 text-platform-text break-words',
+      'max-md:group-data-stacked/table:block max-md:group-data-stacked/table:p-0 max-md:group-data-stacked/table:empty:hidden',
+    ],
     empty: ['p-[50px] text-center text-platform-13-5 text-platform-muted'],
+    note: [
+      'border-t border-platform-line-2 px-[14px] py-4',
+      'text-center text-platform-13-5 text-platform-muted',
+    ],
   },
   variants: {
     isAscending: {
@@ -36,6 +46,16 @@ export const dataTableShellVariants = tv({
     },
     isSortable: {
       true: { head: ['p-0'] },
+    },
+    isStacked: {
+      true: {
+        table: ['max-md:block'],
+        thead: ['max-md:hidden'],
+        tbody: ['max-md:block'],
+      },
+    },
+    hasWidths: {
+      true: { table: ['md:table-fixed'] },
     },
   },
 });

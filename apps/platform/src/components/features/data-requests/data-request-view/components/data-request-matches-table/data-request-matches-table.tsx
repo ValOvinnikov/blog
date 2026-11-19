@@ -76,33 +76,6 @@ export const DataRequestMatchesTable = ({
         items={pageRows}
         emptyMessage={t('noResults')}
         ariaLabel={t('regionLabel')}
-        toolbar={
-          <>
-            <div className={searchField()}>
-              <FormField label={t('searchLabel')}>
-                <TextInput type="search" value={query} onChange={changeQuery} />
-              </FormField>
-            </div>
-            <div className={kindField()}>
-              <FormField label={t('kindFilterLabel')}>
-                <OptionSelect
-                  options={[
-                    {
-                      value: DATA_REQUEST_KIND_FILTER.ALL,
-                      label: t('allKinds'),
-                    },
-                    ...kindOptions.map((kind) => ({
-                      value: kind,
-                      label: tKind(kind),
-                    })),
-                  ]}
-                  value={kindFilter}
-                  onChange={changeKindFilter}
-                />
-              </FormField>
-            </div>
-          </>
-        }
         columns={Object.values(DATA_REQUEST_MATCH_COLUMN).map((column) => ({
           key: column,
           label: t(COLUMN_LABEL_KEYS[column]),
@@ -137,7 +110,33 @@ export const DataRequestMatchesTable = ({
             </DataTableShell.Cell>
           </DataTableShell.Row>
         )}
-      />
+      >
+        <DataTableShell.Toolbar>
+          <div className={searchField()}>
+            <FormField label={t('searchLabel')}>
+              <TextInput type="search" value={query} onChange={changeQuery} />
+            </FormField>
+          </div>
+          <div className={kindField()}>
+            <FormField label={t('kindFilterLabel')}>
+              <OptionSelect
+                options={[
+                  {
+                    value: DATA_REQUEST_KIND_FILTER.ALL,
+                    label: t('allKinds'),
+                  },
+                  ...kindOptions.map((kind) => ({
+                    value: kind,
+                    label: tKind(kind),
+                  })),
+                ]}
+                value={kindFilter}
+                onChange={changeKindFilter}
+              />
+            </FormField>
+          </div>
+        </DataTableShell.Toolbar>
+      </DataTableShell>
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </>
   );

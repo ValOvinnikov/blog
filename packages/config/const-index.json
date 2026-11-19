@@ -4258,6 +4258,12 @@
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       },
       {
+        "ref": "AVATAR_VARIANT.PENDING",
+        "scope": "app:platform",
+        "from": "@platform/constants/avatar",
+        "file": "apps/platform/src/constants/avatar.ts"
+      },
+      {
         "ref": "DOMAIN_VERIFICATION_STATUS.PENDING",
         "scope": "app:platform",
         "from": "@platform/constants/domain",
@@ -5915,6 +5921,14 @@
     "SWITCHER": [
       {
         "ref": "AVATAR_VARIANT.SWITCHER",
+        "scope": "app:platform",
+        "from": "@platform/constants/avatar",
+        "file": "apps/platform/src/constants/avatar.ts"
+      }
+    ],
+    "MEMBER": [
+      {
+        "ref": "AVATAR_VARIANT.MEMBER",
         "scope": "app:platform",
         "from": "@platform/constants/avatar",
         "file": "apps/platform/src/constants/avatar.ts"

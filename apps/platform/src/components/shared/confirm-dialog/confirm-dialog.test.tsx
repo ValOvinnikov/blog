@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { SIZE } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -25,6 +26,7 @@ const MOCK_DISABLED_REASON = faker.lorem.sentence();
 const MOCK_UNTYPED_TRIGGER_LABEL = faker.lorem.words(3);
 const MOCK_RETURN_FOCUS_ID = faker.lorem.word();
 const MOCK_RETURN_FOCUS_LABEL = faker.lorem.words(2);
+const MOCK_KEEP_LABEL = faker.lorem.words(2);
 const CONFIRM_FIELD_NAME = t('confirmLabel', { name: MOCK_EXPECTED_VALUE });
 
 type THarnessProps = Omit<
@@ -32,9 +34,14 @@ type THarnessProps = Omit<
   'expectedValue' | 'children'
 > & {
   disabledReason?: string;
+  keepButtonLabel?: string;
 };
 
-const ConfirmDialogHarness = ({ disabledReason, ...props }: THarnessProps) => (
+const ConfirmDialogHarness = ({
+  disabledReason,
+  keepButtonLabel,
+  ...props
+}: THarnessProps) => (
   <>
     <ConfirmDialog
       expectedValue={MOCK_EXPECTED_VALUE}
@@ -49,6 +56,7 @@ const ConfirmDialogHarness = ({ disabledReason, ...props }: THarnessProps) => (
         description={MOCK_DESCRIPTION}
         confirmButtonLabel={MOCK_CONFIRM_LABEL}
         confirmingButtonLabel={MOCK_CONFIRMING_LABEL}
+        keepButtonLabel={keepButtonLabel}
       >
         <span>{MOCK_EXTRA_CONTENT}</span>
       </ConfirmDialog.Content>
@@ -227,17 +235,61 @@ describe(`<${ConfirmDialog.name}/>`, () => {
       });
     });
 
-    it('shows and announces the pending label while confirming', async () => {
-      onConfirmMock.mockReturnValueOnce(new Promise(() => {}));
+    describe('while confirming', () => {
+      beforeEach(async () => {
+        onConfirmMock.mockReturnValueOnce(new Promise(() => {}));
+        await typeExpectedValueAndConfirm();
+      });
 
-      await typeExpectedValueAndConfirm();
+      it('shows and announces the pending label', async () => {
+        const pendingButton = await findConfirmButton(MOCK_CONFIRMING_LABEL);
+        const status = screen.getByRole('status');
+        const cancelButton = screen.getByRole('button', {
+          name: t('cancelButton'),
+        });
 
-      const pendingButton = await findConfirmButton(MOCK_CONFIRMING_LABEL);
-      const status = screen.getByRole('status');
+        expect(cancelButton).toBeDisabled();
+        expect(pendingButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(pendingButton).toHaveAttribute('aria-busy', 'true');
+        expect(status).toHaveTextContent(MOCK_CONFIRMING_LABEL);
+      });
 
-      expect(pendingButton).toHaveAttribute(ARIA_DISABLED, 'true');
-      expect(pendingButton).toHaveAttribute('aria-busy', 'true');
-      expect(status).toHaveTextContent(MOCK_CONFIRMING_LABEL);
+      it('ignores Escape', async () => {
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
+        const dialog = screen.getByRole('alertdialog');
+
+        expect(dialog).toBeVisible();
+        expect(onOpenChangeMock).not.toHaveBeenCalledWith(false);
+      });
+    });
+  });
+
+  describe('with a keep label', () => {
+    let keepButton: HTMLElement;
+
+    beforeEach(async () => {
+      setup({ keepButtonLabel: MOCK_KEEP_LABEL });
+      const trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
+      await user.click(trigger);
+      keepButton = screen.getByRole('button', { name: MOCK_KEEP_LABEL });
+    });
+
+    it('shows it in place of Cancel', () => {
+      const cancelButton = screen.queryByRole('button', {
+        name: t('cancelButton'),
+      });
+
+      expect(keepButton).toBeEnabled();
+      expect(cancelButton).not.toBeInTheDocument();
+    });
+
+    it('closes the dialog without confirming', async () => {
+      await user.click(keepButton);
+
+      const dialog = screen.queryByRole('alertdialog');
+
+      expect(dialog).not.toBeInTheDocument();
+      expect(onConfirmMock).not.toHaveBeenCalled();
     });
   });
 

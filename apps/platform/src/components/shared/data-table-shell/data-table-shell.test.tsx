@@ -1,15 +1,16 @@
 import { faker } from '@faker-js/faker';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { SORT_DIRECTION } from '@shinefold/config/constants';
-import userEvent from '@testing-library/user-event';
-import type { ComponentProps, ReactNode } from 'react';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { ComponentProps } from 'react';
 
 import { DataTableShell } from './data-table-shell';
 
 faker.seed(5995);
 
 type TItem = { id: string; name: string };
-type TColumn = ComponentProps<typeof DataTableShell<TItem>>['columns'][number];
+type TShellProps = ComponentProps<typeof DataTableShell<TItem>>;
+type TColumn = TShellProps['columns'][number];
 
 const MOCK_EMPTY_MESSAGE = faker.lorem.sentence();
 const MOCK_ARIA_LABEL = faker.lorem.word();
@@ -24,18 +25,24 @@ const MOCK_SECOND_ITEM: TItem = {
 };
 const MOCK_ITEMS = [MOCK_FIRST_ITEM, MOCK_SECOND_ITEM];
 const MOCK_TOOLBAR_LABEL = faker.lorem.words(2);
-const MOCK_TOOLBAR = <button type="button">{MOCK_TOOLBAR_LABEL}</button>;
+const MOCK_TITLE_ID = faker.lorem.slug();
+const MOCK_TITLE = faker.lorem.words(2);
+const MOCK_COUNT = faker.lorem.words(2);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_NOTE = faker.lorem.sentence();
 
 const renderTable = (
   items: TItem[],
-  { sort, toolbar }: Pick<TColumn, 'sort'> & { toolbar?: ReactNode } = {},
+  {
+    sort,
+    children,
+  }: Pick<TColumn, 'sort'> & Pick<TShellProps, 'children'> = {},
 ) =>
   renderWithIntl(
     <DataTableShell
       items={items}
       emptyMessage={MOCK_EMPTY_MESSAGE}
       ariaLabel={MOCK_ARIA_LABEL}
-      toolbar={toolbar}
       columns={[
         { key: 'name', label: MOCK_COLUMN_LABEL, sort },
         { key: 'actions', label: null },
@@ -45,7 +52,9 @@ const renderTable = (
           <td>{item.name}</td>
         </tr>
       )}
-    />,
+    >
+      {children}
+    </DataTableShell>,
   );
 
 describe(`<${DataTableShell.name}/>`, () => {
@@ -106,13 +115,14 @@ describe(`<${DataTableShell.name}/>`, () => {
 
   describe('with a sortable column', () => {
     const onSort = vi.fn();
+    let user: UserEvent;
 
     beforeEach(() => {
       onSort.mockReset();
+      user = userEvent.setup();
     });
 
     it('marks the sorted column and asks to sort when its header is clicked', async () => {
-      const user = userEvent.setup();
       renderTable(MOCK_ITEMS, {
         sort: { direction: SORT_DIRECTION.ASCENDING, onSort },
       });
@@ -140,16 +150,55 @@ describe(`<${DataTableShell.name}/>`, () => {
     });
   });
 
-  it.each([
+  describe.each([
     ['above the rows', MOCK_ITEMS],
     ['above the empty message', []],
-  ])('keeps the toolbar %s', (_, items) => {
-    renderTable(items, { toolbar: MOCK_TOOLBAR });
-
-    const toolbarControl = screen.getByRole('button', {
-      name: MOCK_TOOLBAR_LABEL,
+  ])('with every opt-in part %s', (_, items) => {
+    beforeEach(() => {
+      renderTable(items, {
+        children: (
+          <>
+            <DataTableShell.Title
+              id={MOCK_TITLE_ID}
+              count={MOCK_COUNT}
+              supportingText={MOCK_SUPPORTING_TEXT}
+            >
+              {MOCK_TITLE}
+            </DataTableShell.Title>
+            <DataTableShell.Toolbar>
+              <button type="button">{MOCK_TOOLBAR_LABEL}</button>
+            </DataTableShell.Toolbar>
+            <DataTableShell.Note>{MOCK_NOTE}</DataTableShell.Note>
+          </>
+        ),
+      });
     });
 
-    expect(toolbarControl).toBeVisible();
+    it('names the card after a focusable title heading', () => {
+      const heading = screen.getByRole('heading', { name: MOCK_TITLE });
+      const card = screen.getByRole('region', { name: MOCK_TITLE });
+
+      expect(heading).toHaveAttribute('id', MOCK_TITLE_ID);
+      expect(heading).toHaveAttribute('tabindex', '-1');
+      expect(card).toContainElement(heading);
+    });
+
+    it.each([
+      ['count', MOCK_COUNT],
+      ['supporting line', MOCK_SUPPORTING_TEXT],
+      ['note', MOCK_NOTE],
+    ])('shows the %s', (_part, text) => {
+      const shown = screen.getByText(text);
+
+      expect(shown).toBeVisible();
+    });
+
+    it('keeps the toolbar', () => {
+      const toolbarControl = screen.getByRole('button', {
+        name: MOCK_TOOLBAR_LABEL,
+      });
+
+      expect(toolbarControl).toBeVisible();
+    });
   });
 });

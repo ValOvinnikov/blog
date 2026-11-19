@@ -460,7 +460,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/avatar` — `apps/platform/src/constants/avatar.ts`
 
-- **AVATAR_VARIANT**: `TABLE`, `ACCOUNT`, `SWITCHER`
+- **AVATAR_VARIANT**: `TABLE`, `ACCOUNT`, `SWITCHER`, `MEMBER`, `PENDING`
 
 ### `@platform/constants/badge-tone` — `apps/platform/src/constants/badge-tone.ts`
 

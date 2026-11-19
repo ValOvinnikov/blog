@@ -35,6 +35,11 @@ export const useConfirmDialog = ({
     onOpenChange?.(nextIsOpen);
   };
 
+  const requestOpenChange = (nextIsOpen: boolean) => {
+    if (!nextIsOpen && isPending) return;
+    changeOpen(nextIsOpen);
+  };
+
   const confirm = () => {
     setError(undefined);
     startTransition(async () => {
@@ -58,7 +63,7 @@ export const useConfirmDialog = ({
 
   return {
     isOpen,
-    changeOpen,
+    requestOpenChange,
     confirmValue,
     setConfirmValue,
     error,
