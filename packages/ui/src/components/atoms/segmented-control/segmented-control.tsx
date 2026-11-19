@@ -69,9 +69,10 @@ export const SegmentedControl = <TValue extends string = string>({
             type="button"
             role="radio"
             aria-checked={selected}
+            data-value={option.value}
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(option.value)}
-            className={s.option({ selected })}
+            className={s.option()}
           >
             {option.label}
           </button>

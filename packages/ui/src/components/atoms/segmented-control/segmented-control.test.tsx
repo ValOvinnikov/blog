@@ -62,6 +62,15 @@ describe(`<${SegmentedControl.name}/>`, () => {
       expect(deepRadio).not.toBeChecked();
     });
 
+    it.each(MOCK_OPTIONS)(
+      'exposes the $value option value on its radio',
+      ({ value, label }) => {
+        const radio = screen.getByRole('radio', { name: label });
+
+        expect(radio).toHaveAttribute('data-value', value);
+      },
+    );
+
     it('puts only the checked option in the tab order', async () => {
       const readRadio = screen.getByRole('radio', { name: MOCK_READ_LABEL });
 
@@ -73,16 +82,6 @@ describe(`<${SegmentedControl.name}/>`, () => {
 
       expect(readRadio).not.toHaveFocus();
     });
-  });
-
-  it('calls onChange with the clicked option value', async () => {
-    setup({ onChange });
-
-    const deepRadio = screen.getByRole('radio', { name: MOCK_DEEP_LABEL });
-    await user.click(deepRadio);
-
-    expect(onChange).toHaveBeenCalledTimes(1);
-    expect(onChange).toHaveBeenCalledWith(DEPTH.DEEP);
   });
 
   it('only checks a clicked option once the caller updates value', async () => {
@@ -124,12 +123,24 @@ describe(`<${SegmentedControl.name}/>`, () => {
     expect(targetRadio).toHaveFocus();
   });
 
-  it('ignores non-navigation keys', async () => {
-    setup({ onChange });
+  describe('with the default value and an onChange spy', () => {
+    beforeEach(() => {
+      setup({ onChange });
+    });
 
-    await user.tab();
-    await user.keyboard('a');
+    it('calls onChange with the clicked option value', async () => {
+      const deepRadio = screen.getByRole('radio', { name: MOCK_DEEP_LABEL });
+      await user.click(deepRadio);
 
-    expect(onChange).not.toHaveBeenCalled();
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onChange).toHaveBeenCalledWith(DEPTH.DEEP);
+    });
+
+    it('ignores non-navigation keys', async () => {
+      await user.tab();
+      await user.keyboard('a');
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
   });
 });

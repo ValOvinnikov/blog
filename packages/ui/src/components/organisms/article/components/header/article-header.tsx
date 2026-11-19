@@ -30,6 +30,7 @@ export type TArticleHeaderProps = IWithClassName &
     lead?: string;
     meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'>;
     coverMedia?: ReactNode;
+    action?: ReactNode;
   };
 
 /** The opening of a post page, above its body. */
@@ -39,30 +40,37 @@ export const ArticleHeader = ({
   lead,
   meta,
   coverMedia,
+  action,
   className,
   dataTestId,
 }: TArticleHeaderProps) => {
-  const s = articleHeaderVariants();
+  const hasAction = Boolean(action);
+  const s = articleHeaderVariants({ hasAction });
+
+  const topicEyebrow = topic && (
+    <Eyebrow href={topic.href} linkAs={topic.linkAs} className={s.topic()}>
+      {topic.label}
+    </Eyebrow>
+  );
 
   return (
     <header className={s.root({ class: className })} data-testid={dataTestId}>
       <div className={s.headingGroup()}>
-        {topic && (
-          <Eyebrow
-            href={topic.href}
-            linkAs={topic.linkAs}
-            className={s.topic()}
-          >
-            {topic.label}
-          </Eyebrow>
+        {hasAction ? (
+          <div className={s.topicRow()}>
+            {topicEyebrow}
+            <div className={s.action()}>{action}</div>
+          </div>
+        ) : (
+          topicEyebrow
         )}
         <Heading level={1} visual={TEXT_ROLE.POST_TITLE} className={s.title()}>
           {title}
         </Heading>
         {lead && (
-          <Text textRole={TEXT_ROLE.INTRO} className={s.lead()}>
-            {lead}
-          </Text>
+          <div className={s.lead()} data-slot="lead">
+            <Text textRole={TEXT_ROLE.INTRO}>{lead}</Text>
+          </div>
         )}
         {meta && (
           <div className={s.meta()}>
@@ -78,9 +86,9 @@ export const ArticleHeader = ({
         )}
       </div>
       {coverMedia && (
-        <MediaFrame ratio={MEDIA_RATIO.VIDEO} className={s.coverMedia()}>
-          {coverMedia}
-        </MediaFrame>
+        <div className={s.coverMedia()} data-slot="cover-media">
+          <MediaFrame ratio={MEDIA_RATIO.VIDEO}>{coverMedia}</MediaFrame>
+        </div>
       )}
     </header>
   );
