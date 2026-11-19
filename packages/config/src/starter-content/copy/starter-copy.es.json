@@ -344,5 +344,49 @@
       "metaTitle": "Contacto — cómo contactarnos y cuándo respondemos",
       "metaDescription": "Una página de contacto de ejemplo creada con tu sitio. Añade tu correo, tu teléfono y tu horario."
     }
+  },
+  "product": {
+    "hero": {
+      "eyebrow": "Presentamos",
+      "heading": "La forma más sencilla de sacar adelante tu trabajo",
+      "supportingText": "Di en una frase qué hace tu producto y para quién es."
+    },
+    "intro": {
+      "body": [
+        "Bienvenido. Esta es la casa de tu producto: qué hace, a quién ayuda y por qué vale la pena probarlo.",
+        "Sustituye este texto por un breve resumen del problema que resuelve tu producto y de cómo lo resuelve."
+      ]
+    },
+    "faq": {
+      "heading": "Preguntas frecuentes",
+      "questions": [
+        {
+          "question": "¿Qué hace el producto?",
+          "answer": [
+            "Resume en una o dos frases la tarea principal de tu producto, con las palabras de tus clientes."
+          ]
+        },
+        {
+          "question": "¿Cuánto cuesta?",
+          "answer": [
+            "Explica tus planes y precios, o di si hay una prueba o una versión gratuitas."
+          ]
+        },
+        {
+          "question": "¿Cómo empiezo?",
+          "answer": [
+            "Describe el primer paso, como registrarse o reservar una demo, y qué ocurre después."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Mira las novedades",
+      "supportingText": "Cada versión, mejora y corrección, en un solo lugar."
+    },
+    "changelog": {
+      "linkLabel": "Novedades",
+      "listHeading": "Todas las versiones"
+    }
   }
 }

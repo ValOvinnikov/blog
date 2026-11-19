@@ -344,5 +344,49 @@
       "metaTitle": "Contact — comment nous joindre et quand nous répondons",
       "metaDescription": "Une page de contact d'exemple créée avec votre site. Ajoutez votre e-mail, votre téléphone et vos horaires."
     }
+  },
+  "product": {
+    "hero": {
+      "eyebrow": "Découvrez",
+      "heading": "La façon la plus simple d'avancer dans votre travail",
+      "supportingText": "Dites en une phrase ce que fait votre produit et à qui il s'adresse."
+    },
+    "intro": {
+      "body": [
+        "Bienvenue. Voici la page de votre produit : ce qu'il fait, à qui il sert et pourquoi il vaut la peine d'être essayé.",
+        "Remplacez ce texte par un bref aperçu du problème que résout votre produit et de la façon dont il le résout."
+      ]
+    },
+    "faq": {
+      "heading": "Questions fréquentes",
+      "questions": [
+        {
+          "question": "Que fait le produit ?",
+          "answer": [
+            "Résumez en une ou deux phrases la tâche principale de votre produit, avec les mots de vos clients."
+          ]
+        },
+        {
+          "question": "Combien ça coûte ?",
+          "answer": [
+            "Expliquez vos formules et vos tarifs, ou indiquez s'il existe un essai ou une offre gratuits."
+          ]
+        },
+        {
+          "question": "Comment commencer ?",
+          "answer": [
+            "Décrivez la première étape, comme l'inscription ou la réservation d'une démo, et ce qui se passe ensuite."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Découvrez les nouveautés",
+      "supportingText": "Chaque version, amélioration et correction, au même endroit."
+    },
+    "changelog": {
+      "linkLabel": "Nouveautés",
+      "listHeading": "Toutes les versions"
+    }
   }
 }
