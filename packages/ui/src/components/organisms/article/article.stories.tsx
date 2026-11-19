@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { BRAND_VARIANT } from '@shinefold/config';
+import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Article } from './article';
@@ -233,4 +234,10 @@ const OnSecondaryBackground = () => (
 export const OnSecondaryBackgroundStory: TStory = {
   name: 'On a Secondary background',
   render: OnSecondaryBackground,
+};
+
+export const HeaderOnEveryBrandBand: TStory = {
+  render: (args) => (
+    <EveryBrandBand>{() => <Article {...args} />}</EveryBrandBand>
+  ),
 };

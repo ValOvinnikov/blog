@@ -8,8 +8,6 @@ import {
   type TSpacingScale,
 } from '@shinefold/config';
 import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
-import { Heading } from '@shinefold/ui/components/atoms/heading';
-import { Text } from '@shinefold/ui/components/atoms/text';
 import { HERO_TEST_ID } from '@shinefold/ui/constants/hero';
 import {
   mapCompoundSlots,
@@ -21,6 +19,7 @@ import { cloneElement, Fragment, type ElementType } from 'react';
 import { HeroAvatar } from './components/avatar/hero-avatar';
 import { HeroBody } from './components/body/hero-body';
 import { HeroCta } from './components/cta/hero-cta';
+import { HeroHeadline } from './components/headline/hero-headline';
 import { HeroMedia } from './components/media/hero-media';
 import { HeroMediaArea } from './components/media-area/hero-media-area';
 import { HeroSocial } from './components/social/hero-social';
@@ -104,24 +103,12 @@ const HeroRoot = ({
             </Eyebrow>
           )}
           <div className={s.group({ class: banner?.block() })}>
-            <div className={s.title()}>
-              <Heading
-                id={titleId}
-                level={1}
-                visual="hero"
-                className={s.heading({ class: banner?.title() })}
-              >
-                {title}
-              </Heading>
-            </div>
-            {excerpt && (
-              <Text
-                variant="hero"
-                className={s.excerpt({ class: banner?.text() })}
-              >
-                {excerpt}
-              </Text>
-            )}
+            <HeroHeadline
+              title={title}
+              titleId={titleId}
+              excerpt={excerpt}
+              heroStyles={heroStyles}
+            />
             {slots.Body &&
               cloneElement(slots.Body, {
                 contentAlignment: resolvedAlignment,

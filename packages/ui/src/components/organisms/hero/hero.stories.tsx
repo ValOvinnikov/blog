@@ -5,17 +5,25 @@ import {
   ICONS,
   MEDIA_ORDER,
   SIZE,
+  SOCIAL_PLATFORM_LABEL,
+  SOCIAL_PLATFORMS,
   SPACING_SCALE,
 } from '@shinefold/config';
 import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { ShareLink } from '@shinefold/ui/components/molecules/share-link';
+import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Hero } from './hero';
 import { heroVariants } from './hero-variants';
+
+const PROFILE_EYEBROW = 'Senior frontend engineer';
+const PROFILE_EXCERPT =
+  'Architecture, performance, and design systems — from fintech and retail.';
+const BANNER_IMAGE_ALT = 'Bright mountain sunrise';
 
 const bannerContent = (alt: string) => (
   <>
@@ -66,21 +74,21 @@ const profileContent = (
         <li>
           <ShareLink
             href="https://github.com/janedoe"
-            label="GitHub"
+            label={SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.GITHUB]}
             icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
           />
         </li>
         <li>
           <ShareLink
             href="https://linkedin.com/in/janedoe"
-            label="LinkedIn"
+            label={SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.LINKEDIN]}
             icon={<Icon name={ICONS.LINKEDIN} size={SIZE.SM} />}
           />
         </li>
         <li>
           <ShareLink
             href="https://x.com/janedoe"
-            label="X"
+            label={SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.X]}
             icon={<Icon name={ICONS.X} size={SIZE.SM} />}
           />
         </li>
@@ -156,7 +164,7 @@ export const Full: TStory = {};
 
 export const Minimal: TStory = {
   args: {
-    eyebrow: 'Senior frontend engineer',
+    eyebrow: PROFILE_EYEBROW,
     title: 'Notes on shipping frontend at scale',
     excerpt:
       'Architecture, performance, and design systems — from fintech and retail. Written, not generated.',
@@ -250,7 +258,7 @@ export const BannerContentLeft: TStory = {
     tone: BRAND_VARIANT.BRAND_PRIMARY,
     contentPosition: CONTENT_ALIGNMENT.LEFT,
     contentAlignment: CONTENT_ALIGNMENT.LEFT,
-    children: bannerContent('Bright mountain sunrise'),
+    children: bannerContent(BANNER_IMAGE_ALT),
   },
 };
 
@@ -291,7 +299,7 @@ export const BannerContentCenter: TStory = {
     tone: BRAND_VARIANT.PRIMARY,
     contentPosition: CONTENT_ALIGNMENT.CENTER,
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    children: bannerContent('Bright mountain sunrise'),
+    children: bannerContent(BANNER_IMAGE_ALT),
   },
 };
 
@@ -301,7 +309,7 @@ export const BannerContentRight: TStory = {
     tone: BRAND_VARIANT.SECONDARY,
     contentPosition: CONTENT_ALIGNMENT.RIGHT,
     contentAlignment: CONTENT_ALIGNMENT.RIGHT,
-    children: bannerContent('Bright mountain sunrise'),
+    children: bannerContent(BANNER_IMAGE_ALT),
   },
 };
 
@@ -311,7 +319,7 @@ export const BannerToneBrandPrimary: TStory = {
     tone: BRAND_VARIANT.BRAND_PRIMARY,
     contentPosition: CONTENT_ALIGNMENT.LEFT,
     contentAlignment: CONTENT_ALIGNMENT.LEFT,
-    children: bannerContent('Bright mountain sunrise'),
+    children: bannerContent(BANNER_IMAGE_ALT),
   },
 };
 
@@ -321,7 +329,7 @@ export const BannerTonePrimary: TStory = {
     tone: BRAND_VARIANT.PRIMARY,
     contentPosition: CONTENT_ALIGNMENT.LEFT,
     contentAlignment: CONTENT_ALIGNMENT.LEFT,
-    children: bannerContent('Bright mountain sunrise'),
+    children: bannerContent(BANNER_IMAGE_ALT),
   },
 };
 
@@ -331,7 +339,7 @@ export const BannerToneSecondary: TStory = {
     tone: BRAND_VARIANT.SECONDARY,
     contentPosition: CONTENT_ALIGNMENT.LEFT,
     contentAlignment: CONTENT_ALIGNMENT.LEFT,
-    children: bannerContent('Bright mountain sunrise'),
+    children: bannerContent(BANNER_IMAGE_ALT),
   },
 };
 
@@ -407,7 +415,7 @@ const bannerProfileContent = (hasMedia: boolean) => (
         <li>
           <ShareLink
             href="https://github.com/janedoe"
-            label="GitHub"
+            label={SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.GITHUB]}
             icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
             className="text-on-image"
           />
@@ -415,7 +423,7 @@ const bannerProfileContent = (hasMedia: boolean) => (
         <li>
           <ShareLink
             href="https://linkedin.com/in/janedoe"
-            label="LinkedIn"
+            label={SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.LINKEDIN]}
             icon={<Icon name={ICONS.LINKEDIN} size={SIZE.SM} />}
             className="text-on-image"
           />
@@ -544,10 +552,9 @@ export const StackedProfileToneBrandPrimary: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
-    eyebrow: 'Senior frontend engineer',
+    eyebrow: PROFILE_EYEBROW,
     title: 'Jane Doe',
-    excerpt:
-      'Architecture, performance, and design systems — from fintech and retail.',
+    excerpt: PROFILE_EXCERPT,
     children: profileContent,
   },
 };
@@ -556,10 +563,9 @@ export const StackedProfileTonePrimary: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
     tone: BRAND_VARIANT.PRIMARY,
-    eyebrow: 'Senior frontend engineer',
+    eyebrow: PROFILE_EYEBROW,
     title: 'Jane Doe',
-    excerpt:
-      'Architecture, performance, and design systems — from fintech and retail.',
+    excerpt: PROFILE_EXCERPT,
     children: profileContent,
   },
 };
@@ -568,10 +574,9 @@ export const StackedProfileToneSecondary: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
     tone: BRAND_VARIANT.SECONDARY,
-    eyebrow: 'Senior frontend engineer',
+    eyebrow: PROFILE_EYEBROW,
     title: 'Jane Doe',
-    excerpt:
-      'Architecture, performance, and design systems — from fintech and retail.',
+    excerpt: PROFILE_EXCERPT,
     children: profileContent,
   },
 };
@@ -631,4 +636,21 @@ export const SplitSquarePortraitCenterTablet: TStory = {
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
   },
   globals: { viewport: 'tablet' },
+};
+
+export const SplitAndStackedOnEveryBrandBand: TStory = {
+  render: (args) => (
+    <EveryBrandBand>
+      {(tone) =>
+        [HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED].map((variant) => (
+          <Hero
+            key={variant}
+            {...args}
+            variant={variant}
+            titleId={`hero-title-${tone}-${variant}`}
+          />
+        ))
+      }
+    </EveryBrandBand>
+  ),
 };

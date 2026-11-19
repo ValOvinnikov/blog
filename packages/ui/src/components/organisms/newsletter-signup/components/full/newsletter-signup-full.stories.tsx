@@ -9,6 +9,7 @@ import {
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { NewsletterSignup } from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
 import {
   BUSY_STYLES,
   SPINNER_VARIANTS,
@@ -188,5 +189,14 @@ export const BrandPrimaryBand: TStory = {
 
 export const DarkTheme: TStory = {
   globals: { theme: 'dark' },
+  args: { trustCues },
+};
+
+export const OnEveryBrandBand: TStory = {
+  render: (args) => (
+    <EveryBrandBand>
+      {(tone) => <NewsletterSignup.Full key={tone} {...args} />}
+    </EveryBrandBand>
+  ),
   args: { trustCues },
 };

@@ -387,7 +387,7 @@ Props: children: TCompoundChildren<typeof ArticleParts> _(extends IWithClassName
 
 Slots:
 
-- **Article.Header** — Post detail heading area: topic eyebrow, title, lead paragraph, metadata strip, and an optional wide cover media slot. Props: title: string · topic?: IArticleHeaderTopic · lead?: string · meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'> · coverMedia?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Article.Header** — The opening of a post page, above its body. Props: title: string · topic?: IArticleHeaderTopic · lead?: string · meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'> · coverMedia?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Article.Body** — Reading-content wrapper that applies the prose measure and spacing for long-form body content. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Article.Footer** — End-of-article furniture; renders the post's tags as a chip list of links. Props: tags: IArticleFooterTag[] · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
