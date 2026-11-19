@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import * as schema from '@shinefold/db/schema';
 import { insertTestUser } from '@shinefold/db/testing/fixtures';
 import {
@@ -11,8 +10,6 @@ import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { getMembership } from './get-membership';
 
 vi.mock('@shinefold/db/client');
-
-faker.seed(6022);
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);

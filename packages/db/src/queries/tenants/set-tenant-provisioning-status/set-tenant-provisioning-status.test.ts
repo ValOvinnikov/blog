@@ -1,11 +1,12 @@
 import { ERROR_CODE } from '@shinefold/config/constants';
 import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
-import { tenants } from '@shinefold/db/schema/tenants';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
-import { useTestTenant } from '@shinefold/db/testing/test-tenant';
-import { eq } from 'drizzle-orm';
+import {
+  readTestTenant,
+  useTestTenant,
+} from '@shinefold/db/testing/test-tenant';
 
 import { setTenantProvisioningStatus } from './set-tenant-provisioning-status';
 
@@ -34,10 +35,7 @@ describe(setTenantProvisioningStatus, () => {
           provisioningStatus,
         );
 
-        const [row] = await db()
-          .select()
-          .from(tenants)
-          .where(eq(tenants.id, tenant().id));
+        const row = await readTestTenant(db(), tenant().id);
         expect(result).toEqual({ ok: true, data: reverted });
         expect(row).toEqual(reverted);
       },

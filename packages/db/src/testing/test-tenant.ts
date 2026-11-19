@@ -2,6 +2,7 @@ import * as schema from '@shinefold/db/schema';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
+import { firstRowOrThrow } from './first-row-or-throw';
 import { insertTestTenant, type TTestDb } from './fixtures';
 
 export function useTestTenant(
@@ -35,4 +36,17 @@ export async function patchTestTenant(
     .update(schema.tenants)
     .set(patch)
     .where(eq(schema.tenants.id, tenantId));
+}
+
+export async function readTestTenant(
+  db: TTestDb,
+  tenantId: string,
+): Promise<TTenant> {
+  return firstRowOrThrow(
+    await db
+      .select()
+      .from(schema.tenants)
+      .where(eq(schema.tenants.id, tenantId)),
+    `readTestTenant("${tenantId}")`,
+  );
 }

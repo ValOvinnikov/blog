@@ -1,4 +1,3 @@
-import { tenants } from '@shinefold/db/schema/tenants';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
@@ -8,10 +7,12 @@ import {
   MOCK_TENANT_MANAGEMENT_ROBOT_ID,
   MOCK_TENANT_MANAGEMENT_TOKEN,
 } from '@shinefold/db/testing/tenants/fixtures';
-import { useTestTenant } from '@shinefold/db/testing/test-tenant';
+import {
+  readTestTenant,
+  useTestTenant,
+} from '@shinefold/db/testing/test-tenant';
 import { decryptSecret } from '@shinefold/utils';
 import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
-import { eq } from 'drizzle-orm';
 
 import { setTenantSanityManagementToken } from './set-tenant-sanity-management-token';
 
@@ -30,21 +31,18 @@ describe(setTenantSanityManagementToken, () => {
   it('stores the token encrypted, not as plaintext, beside its robot id', async () => {
     await setTenantSanityManagementToken(tenant().id, MOCK_MINTED);
 
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenant().id));
+    const row = await readTestTenant(db(), tenant().id);
 
-    expect(row?.sanityManagementTokenEncrypted).not.toContain(
+    expect(row.sanityManagementTokenEncrypted).not.toContain(
       MOCK_TENANT_MANAGEMENT_TOKEN,
     );
     expect(
       decryptSecret(
-        row?.sanityManagementTokenEncrypted ?? '',
+        row.sanityManagementTokenEncrypted ?? '',
         MOCK_ENCRYPTION_KEY,
       ),
     ).toBe(MOCK_TENANT_MANAGEMENT_TOKEN);
-    expect(row?.sanityManagementRobotId).toBe(MOCK_TENANT_MANAGEMENT_ROBOT_ID);
+    expect(row.sanityManagementRobotId).toBe(MOCK_TENANT_MANAGEMENT_ROBOT_ID);
   });
 
   it('throws without a configured encryption key, leaving the row untouched', async () => {
@@ -54,10 +52,7 @@ describe(setTenantSanityManagementToken, () => {
       setTenantSanityManagementToken(tenant().id, MOCK_MINTED),
     ).rejects.toThrow(MISSING_TENANT_TOKEN_KEY_ERROR);
 
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenant().id));
+    const row = await readTestTenant(db(), tenant().id);
 
     expect(row).toEqual(tenant());
   });
