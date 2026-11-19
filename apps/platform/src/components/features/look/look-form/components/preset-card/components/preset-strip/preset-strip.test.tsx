@@ -1,5 +1,10 @@
 import messages from '@platform/i18n/messages/en.json';
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import {
+  customRender,
+  screen,
+  waitFor,
+  within,
+} from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { stubLgUpWindow } from '@platform/testing/match-media';
@@ -215,36 +220,38 @@ describe(`<${PresetStrip.name}/>`, () => {
       },
     );
 
-    it('re-measures when the edit column narrows', () => {
-      setup(MOCK_EDIT_COLUMN_1440);
-      const editorial = screen.getByRole('radio', { name: EDITORIAL });
-
-      editColumnWidth = MOCK_EDIT_COLUMN_1280;
-      resizeObservedElements();
-
-      const chips = screen.getAllByRole('radio');
-      expect(chips).toEqual([editorial]);
-    });
-
-    it('keeps More presets out of the radio group', () => {
-      setup(MOCK_EDIT_COLUMN_1440);
-      const group = screen.getByRole('radiogroup', { name: PRESET_LABEL });
-
-      const insideGroup = within(group).queryByRole('button', {
-        name: morePresetsName(3),
+    describe(`at ${MOCK_EDIT_COLUMN_1440}px on five presets`, () => {
+      beforeEach(() => {
+        setup(MOCK_EDIT_COLUMN_1440);
       });
 
-      expect(insideGroup).not.toBeInTheDocument();
-    });
+      it('re-measures when the edit column narrows', () => {
+        const editorial = screen.getByRole('radio', { name: EDITORIAL });
 
-    it('announces More presets as a dialog trigger', () => {
-      setup(MOCK_EDIT_COLUMN_1440);
+        editColumnWidth = MOCK_EDIT_COLUMN_1280;
+        resizeObservedElements();
 
-      const morePresets = screen.getByRole('button', {
-        name: morePresetsName(3),
+        const chips = screen.getAllByRole('radio');
+        expect(chips).toEqual([editorial]);
       });
 
-      expect(morePresets).toHaveAttribute(HAS_POPUP, DIALOG_POPUP);
+      it('keeps More presets out of the radio group', () => {
+        const group = screen.getByRole('radiogroup', { name: PRESET_LABEL });
+
+        const insideGroup = within(group).queryByRole('button', {
+          name: morePresetsName(3),
+        });
+
+        expect(insideGroup).not.toBeInTheDocument();
+      });
+
+      it('announces More presets as a dialog trigger', () => {
+        const morePresets = screen.getByRole('button', {
+          name: morePresetsName(3),
+        });
+
+        expect(morePresets).toHaveAttribute(HAS_POPUP, DIALOG_POPUP);
+      });
     });
 
     describe('with the picker open on twelve presets', () => {
@@ -264,6 +271,7 @@ describe(`<${PresetStrip.name}/>`, () => {
         });
         await user.click(morePresets);
         listbox = screen.getByRole('listbox', { name: CHOOSE_PRESET });
+        await waitFor(() => expect(listbox).toHaveFocus());
       });
 
       it('marks More presets expanded', () => {
@@ -336,10 +344,10 @@ describe(`<${PresetStrip.name}/>`, () => {
           expect(dialog).not.toBeInTheDocument();
         });
 
-        it('moves focus to the chosen chip', () => {
+        it('moves focus to the chosen chip', async () => {
           const ledger = screen.getByRole('radio', { name: LEDGER });
 
-          expect(ledger).toHaveFocus();
+          await waitFor(() => expect(ledger).toHaveFocus());
         });
       });
 
@@ -368,8 +376,8 @@ describe(`<${PresetStrip.name}/>`, () => {
           expect(onChange).not.toHaveBeenCalled();
         });
 
-        it('returns focus to More presets', () => {
-          expect(morePresets).toHaveFocus();
+        it('returns focus to More presets', async () => {
+          await waitFor(() => expect(morePresets).toHaveFocus());
         });
       });
     });
@@ -459,6 +467,8 @@ describe(`<${PresetStrip.name}/>`, () => {
           name: `${PRESET_LABEL} ${ALMANAC}`,
         });
         await user.click(presetButton);
+        const listbox = screen.getByRole('listbox', { name: CHOOSE_PRESET });
+        await waitFor(() => expect(listbox).toHaveFocus());
       });
 
       it('opens a modal Choose a preset sheet', () => {
