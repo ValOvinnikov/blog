@@ -176,7 +176,7 @@ from `useSettingsFormState()`:
   (`DataTableShell.Title`), a filter strip (`DataTableShell.Toolbar`) and a
   note under the rows (`DataTableShell.Note`) are the shell's own opt-in
   parts, kept in the empty state; a column's `width` (px or %) fixes the
-  table's columns. A mode the shell still lacks goes into it, never a
+  table's columns and narrows the gap between them to 16px. A mode the shell still lacks goes into it, never a
   hand-built `<table>`.
 
 ### Editing a shared primitive

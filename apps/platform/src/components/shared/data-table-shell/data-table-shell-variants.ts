@@ -15,6 +15,7 @@ export const dataTableShellVariants = tv({
     head: [
       'border-b border-platform-line-2 px-platform-cell-inset py-2.5',
       'text-left text-platform-11 font-bold text-platform-muted uppercase tracking-platform-caps',
+      'md:group-data-has-widths/table:px-2 md:group-data-has-widths/table:first:pl-platform-cell-inset md:group-data-has-widths/table:last:pr-platform-cell-inset',
     ],
     sortButton: [
       'flex w-full cursor-pointer items-center gap-1 px-platform-cell-inset py-2.5 uppercase',
@@ -33,6 +34,7 @@ export const dataTableShellVariants = tv({
     cell: [
       'px-platform-cell-inset py-3 align-middle text-platform-13-5 text-platform-text break-words',
       'max-md:group-data-stacked/table:block max-md:group-data-stacked/table:p-0 max-md:group-data-stacked/table:empty:hidden',
+      'md:group-data-has-widths/table:px-2 md:group-data-has-widths/table:first:pl-platform-cell-inset md:group-data-has-widths/table:last:pr-platform-cell-inset',
     ],
     stackedCellLabel: ['sr-only md:hidden'],
     empty: ['p-[50px] text-center text-platform-13-5 text-platform-muted'],

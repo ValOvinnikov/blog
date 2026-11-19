@@ -106,7 +106,9 @@ opt-in modes; a caller that does not set them is unchanged:
 - column widths: Role `96px`, actions `128px`; Person and Studio access split
   the rest 1.5 : 1.7 as `46.875%` and `53.125%` (a `<col>` takes no `fr` and
   drops a `calc()` with `%`; beside fixed columns, percentages share what is
-  left), gap 16px;
+  left), with a real 16px gap: a table that sets column widths gives its cells
+  8px side padding, keeping 14px on the first and last cells so the row edges
+  align with the title and note; tables without widths keep 14px;
 - a stacked mode below `md` (Phone), which the Team page's two tables turn
   on. Other tables keep scrolling sideways; `TenantsTable` sorts from its head
   row, which the stacked mode hides.

@@ -107,6 +107,7 @@ const DataTableShellRoot = <TItem,>({
               className={table()}
               role={stackedRole(ARIA_ROLE.TABLE)}
               data-stacked={isStacked || undefined}
+              data-has-widths={hasWidths || undefined}
             >
               {hasWidths && (
                 <colgroup>
