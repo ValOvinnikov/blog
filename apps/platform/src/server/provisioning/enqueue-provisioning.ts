@@ -13,6 +13,9 @@ const ENQUEUE_TIMEOUT_MS = 10_000;
 type TWorkerRequestBody = {
   tenantId: string;
   formerOwnerEmail?: string;
+  membershipId?: string;
+  memberEmail?: string;
+  sanityUserId?: string;
   domain?: string;
   locales?: TLocaleIsoCode[];
 };

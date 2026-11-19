@@ -74,7 +74,7 @@ describe(resendChangedOwnerStudioInviteAction, () => {
     expect(enqueueOwnerAccessRequestMock).toHaveBeenCalledExactlyOnceWith(
       OWNER_INVITE_RESEND_PATH,
       MOCK_TENANT_ID,
-      MOCK_OWNER_EMAIL,
+      { formerOwnerEmail: MOCK_OWNER_EMAIL },
     );
     expect(clearUnsentStudioReinviteMock).toHaveBeenCalledExactlyOnceWith(
       MOCK_TENANT_ID,
@@ -90,7 +90,7 @@ describe(resendChangedOwnerStudioInviteAction, () => {
     expect(enqueueOwnerAccessRequestMock).toHaveBeenCalledExactlyOnceWith(
       OWNER_INVITE_RESEND_PATH,
       MOCK_TENANT_ID,
-      undefined,
+      { formerOwnerEmail: undefined },
     );
   });
 

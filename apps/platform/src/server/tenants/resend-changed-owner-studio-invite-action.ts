@@ -42,7 +42,7 @@ export const resendChangedOwnerStudioInviteAction = async (
   const result = await enqueueOwnerAccessRequest(
     OWNER_INVITE_RESEND_PATH,
     tenantId,
-    formerOwnerEmail ?? undefined,
+    { formerOwnerEmail: formerOwnerEmail ?? undefined },
   );
   if (isOutcomeSuccess(result)) {
     await queries.tenants.clearUnsentStudioReinvite(tenantId);

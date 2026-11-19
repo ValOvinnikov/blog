@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { OWNER_ACCESS_LOG } from '@platform/constants/owner-access';
+import { TEAM_ACCESS_LOG } from '@platform/constants/team-access';
 import { WORKER_LOG } from '@platform/constants/worker';
 import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
@@ -51,6 +52,7 @@ const MOCK_USER_ID = faker.string.uuid();
 const MOCK_WORKER_PATH = `/${faker.lorem.slug()}`;
 const MOCK_WORKER_URL = `https://${faker.internet.domainName()}`;
 const MOCK_SECRET = faker.string.alphanumeric(32);
+const MOCK_MEMBERSHIP_ID = faker.string.uuid();
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
@@ -166,17 +168,43 @@ describe(enqueueOwnerAccessRequest, () => {
   });
 
   it('carries the former owner email to the worker when given one', async () => {
-    await enqueueOwnerAccessRequest(
-      MOCK_WORKER_PATH,
-      MOCK_TENANT_ID,
-      MOCK_OWNER_EMAIL,
-    );
+    await enqueueOwnerAccessRequest(MOCK_WORKER_PATH, MOCK_TENANT_ID, {
+      formerOwnerEmail: MOCK_OWNER_EMAIL,
+    });
 
     const [, init] = fetchMock.mock.calls[0] ?? [];
     expect(JSON.parse(String(init?.body))).toEqual({
       tenantId: MOCK_TENANT_ID,
       formerOwnerEmail: MOCK_OWNER_EMAIL,
     });
+  });
+
+  it('carries the membership to the worker and logs a failure as the member request', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: HTTP_STATUS.CONFLICT }),
+    );
+
+    const result = await enqueueOwnerAccessRequest(
+      MOCK_WORKER_PATH,
+      MOCK_TENANT_ID,
+      { membershipId: MOCK_MEMBERSHIP_ID },
+    );
+
+    const [, init] = fetchMock.mock.calls[0] ?? [];
+    expect(JSON.parse(String(init?.body))).toEqual({
+      tenantId: MOCK_TENANT_ID,
+      membershipId: MOCK_MEMBERSHIP_ID,
+    });
+    expect(logger.error).toHaveBeenCalledExactlyOnceWith(
+      TEAM_ACCESS_LOG.ACCESS_REQUEST_FAILED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        path: MOCK_WORKER_PATH,
+        responseStatus: HTTP_STATUS.CONFLICT,
+        membershipId: MOCK_MEMBERSHIP_ID,
+      },
+    );
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
   });
 });
 

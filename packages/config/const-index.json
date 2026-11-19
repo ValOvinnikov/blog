@@ -9316,6 +9316,126 @@
         "file": "apps/platform/src/constants/support.ts"
       }
     ],
+    "ALREADY_MEMBER": [
+      {
+        "ref": "TEAM_INVITE_FIELD_ERROR.ALREADY_MEMBER",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "ALREADY_INVITED": [
+      {
+        "ref": "TEAM_INVITE_FIELD_ERROR.ALREADY_INVITED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "OWNER_INVITE": [
+      {
+        "ref": "TEAM_REFUSAL.OWNER_INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "/api/member-access/check": [
+      {
+        "ref": "MEMBER_ACCESS_PATH.CHECK",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "/api/member-access/resend": [
+      {
+        "ref": "MEMBER_ACCESS_PATH.RESEND",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "/api/member-access/revoke": [
+      {
+        "ref": "MEMBER_ACCESS_PATH.REVOKE",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.invite_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.INVITE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.invite_email_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.INVITE_EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.invite_audit_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.INVITE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.remove_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.REMOVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.remove_audit_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.REMOVE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.revoke_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.REVOKE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.cancel_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.CANCEL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.cancel_audit_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.CANCEL_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.access_request_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.ACCESS_REQUEST_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
     "CONFIRM_REQUIRED": [
       {
         "ref": "TENANT_FIELD_ERROR.CONFIRM_REQUIRED",

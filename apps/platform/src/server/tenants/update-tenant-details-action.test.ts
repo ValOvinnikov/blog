@@ -600,7 +600,7 @@ describe(updateTenantDetailsAction, () => {
     expect(enqueueOwnerAccessRequestMock).toHaveBeenCalledExactlyOnceWith(
       OWNER_INVITE_RESEND_PATH,
       MOCK_TENANT_ID,
-      MOCK_OWNER_EMAIL,
+      { formerOwnerEmail: MOCK_OWNER_EMAIL },
     );
     expect(sendOwnerInviteEmailMock.mock.invocationCallOrder[0]).toBeLessThan(
       enqueueOwnerAccessRequestMock.mock.invocationCallOrder[0] ?? 0,

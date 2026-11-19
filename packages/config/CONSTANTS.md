@@ -813,6 +813,13 @@ Every key/value const an agent should reuse before writing a literal. The
 - **SUPPORT_LIMIT**: `SUBJECT_MAX_LENGTH`=`150`, `MESSAGE_MAX_LENGTH`=`5000`, `ORIGIN_PATH_MAX_LENGTH`=`500`, `MESSAGES_PER_WINDOW`=`5`
 - **SUPPORT_LOG**: `ADDRESS_MISSING`=`"support.address_missing"`, `SEND_FAILED`=`"support.send_failed"`, `COPY_FAILED`=`"support.copy_failed"`
 
+### `@platform/constants/team-access` — `apps/platform/src/constants/team-access.ts`
+
+- **TEAM_INVITE_FIELD_ERROR**: `ALREADY_MEMBER`, `ALREADY_INVITED`
+- **TEAM_REFUSAL**: `OWNER_INVITE`
+- **MEMBER_ACCESS_PATH**: `CHECK`=`"/api/member-access/check"`, `RESEND`=`"/api/member-access/resend"`, `REVOKE`=`"/api/member-access/revoke"`
+- **TEAM_ACCESS_LOG**: `INVITE_FAILED`=`"team_access.invite_failed"`, `INVITE_EMAIL_FAILED`=`"team_access.invite_email_failed"`, `INVITE_AUDIT_FAILED`=`"team_access.invite_audit_failed"`, `REMOVE_FAILED`=`"team_access.remove_failed"`, `REMOVE_AUDIT_FAILED`=`"team_access.remove_audit_failed"`, `REVOKE_FAILED`=`"team_access.revoke_failed"`, `CANCEL_FAILED`=`"team_access.cancel_failed"`, `CANCEL_AUDIT_FAILED`=`"team_access.cancel_audit_failed"`, `ACCESS_REQUEST_FAILED`=`"team_access.access_request_failed"`
+
 ### `@platform/constants/tenant` — `apps/platform/src/constants/tenant.ts`
 
 - **TENANT_FIELD_ERROR**: `CONFIRM_REQUIRED`, `NAME_MISMATCH`, `NAME_REQUIRED`, `DOMAIN_INVALID`, `DOMAIN_TAKEN`, `DOMAIN_ATTACHED_ELSEWHERE`, `DOMAIN_LOCKED`, `DOMAIN_CUSTOM_MAIN`, `SLUG_REQUIRED`, `SLUG_INVALID`, `SLUG_RESERVED`, `SLUG_TAKEN`, `EMAIL_INVALID`, `LOCALE_UNSUPPORTED`, `PLAN_UNSUPPORTED`, `OWNER_EMAIL_TAKEN`
