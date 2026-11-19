@@ -47,7 +47,7 @@ Shell: the tenant sidebar, "Subscribers" selected, no "Coming soon" badge. Main 
 
 ## 2. Notices
 
-Built on the shared `Alert` (non-note), extended with a large size: radius 12, padding 20, gap 16, a 22 icon (top-aligned, 2 down), title `h2` 16/600, body 14/1.5 (title and body 4 apart), then an action row 12 below — primary button (44, padding 0 18, radius 10, `brand` fill, `on-brand-ink`, 14/600) and a 13 `muted` note, wrapping (gap 12/16). Warn notices use `Alert`'s warning tone and a warning-triangle icon in `warn`; paused notices use its critical tone and a pause-circle icon in `bad`.
+Built on the shared `Alert` (non-note), extended with a large size: radius 12, padding 20, gap 16, a 22 icon (top-aligned, 2 down), title `h2` 16/600, body 14/1.5 (title and body 4 apart), then an action row 12 below — primary button (44, padding 0 18, radius 10, `brand` fill, `on-brand-ink`, 14/600) and a 13 `muted` note, wrapping (gap 12/16). Warn notices use `Alert`'s warning tone and a warning-triangle icon in `warn`; paused notices use its error tone (`ALERT_TYPE.ERROR`) and a pause-circle icon in `bad`.
 
 | State                          | Role   | Title                                       | Body                                                                                                                                                                                                                                                    | Note after the button                                          |
 | ------------------------------ | ------ | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
@@ -91,7 +91,7 @@ Both use the platform's one dialog shell, `AlertDialogShell` (`role="alertdialog
 - Export CSV disabled with no icon (`line` border, transparent, `muted`).
 - Both limit cards at 0 with their detail lines, empty tracks and no notes.
 - No sending card and no list. In their place, one card, padding 56/32, centred, gap 12:
-  - a 56 tile (radius 16, `brand-weak` — the highlight-weak token) with a 26 mail icon in `brand`;
+  - a 56 tile (radius 16, `brand-weak`) with a 26 mail icon in `brand`;
   - `h2` "Your first subscribers will show up here" (20/600);
   - text 14/1.5 `muted`, max 460: "Readers join from the sign-up form on your site and appear once they confirm by email. Each new post is then emailed to them.";
   - primary link button "Add a sign-up form to a page" (8 above) → the Studio's page list (`/dashboard/studio`, Pages).
@@ -118,40 +118,68 @@ Two boards: within limits and paused (over band), each light and dark.
 
 Uses the Studio's own switch, tones, menu and toast (owner), not the boards' colours.
 
+### When a site isn't sending (owner, 2026-11-19)
+
+**Sending is on** when all of these hold: the site's plan includes Newsletter (with any grant), Newsletter is on in Features, the "Email new posts to subscribers" setting is on, the site is active (`WRITABLE_TENANT_STATUSES`) and not paused, and it is within its band. The band and the operator pause are the gate's (§9). The other four are the **off causes**, checked in this order, and the first that applies is the one the Studio shows:
+
+| Off cause                                  | Stored skip reason (§9) | The switch, before publishing                                                           | Status once published                                                                                                                                    | Send emails                                                                      |
+| ------------------------------------------ | ----------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| No Newsletter in the plan (Free, Starter)  | `NOT_IN_PLAN`           | hidden                                                                                  | hidden: the claim is recorded but never shown                                                                                                            | hidden, and never offered for this post, even after an upgrade                   |
+| **(unboarded)** Site not active            | `SITE_INACTIVE`         | disabled; description "Sending is paused for this site."                                | "Sending is paused for this site.", as the operator pause                                                                                                | never offered                                                                    |
+| **(unboarded)** Newsletter off in Features | `NEWSLETTER_OFF`        | disabled; description "The newsletter is off for this site. Turn it on in Features."    | "**Not emailed** — the newsletter is off in Features." and, while it is still off, the link "Open Features" → `/dashboard/features`                      | offered; disabled "Turn on Newsletter in Features to send this." until on        |
+| **(unboarded)** The sending setting off    | `SENDING_OFF`           | disabled; description "Emailing posts is off for this site. Turn it on in Subscribers." | "**Not emailed** — sending was off when this was published." and, while it is still off, the link "Turn it on in Subscribers" → `/dashboard/subscribers` | offered; disabled "Turn on emailing posts in Subscribers to send this." until on |
+
+- **On a plan without Newsletter** the field — the switch, its status and Send emails — is hidden, while the cause holds and afterwards. The post still takes a claim on its first publish, recorded as `NOT_IN_PLAN` and never shown, so it is never emailed after an upgrade: a republish finds the claim taken, and Send emails is never offered for it. After an upgrade, posts published from then on show the field as on Growth.
+- The status read the Studio uses returns which off cause applies, never one "sending off" flag, so the Studio can pick the right copy and the right place to fix it (Features or Subscribers).
+- A link that fixes a cause shows only while that cause still applies; the "Not emailed" line itself stays.
+
+### The switch and the status
+
 - **Switch field** title "Send to subscribers"; description "Emails this post to your {count} confirmed subscribers when it's first published. Later edits never send it again." ("your confirmed subscribers" while the count is loading or 0).
-- With no claim — never published, or a claim the worker released (the post's switch was off, a scheduled post's site stopped sending, or the site has no mail key) — the switch shows as before publishing; once the post is published, Send emails sits under it.
+- With no claim — never published, or a claim the worker released (the post's switch was off, a scheduled post's site stopped sending, or the site has no mail key) — the switch shows as before publishing, or disabled as the table above says; once the post is published, Send emails sits under it.
 - Once a claim exists, the switch is replaced by a read-only status (field title kept, plus a caption naming the state). Sizes as the Studio board.
   - Sent: check icon, whole line in the positive tone: "**Emailed** to {n} subscribers on {d Mon yyyy}."
   - Sending: "Sending… {done} of {n} so far." in the muted tone, no icon; before the run has counted its recipients, "Sending…" alone. It refreshes every 10 s while the document is open and stops once settled.
   - **(unboarded)** Scheduled: clock icon, muted tone: "**Scheduled** — emailed on {d Mon yyyy}." (the post's publish date).
-  - **(unboarded)** Sending off: muted tone: "**Not emailed** — sending was off when this was published."
+  - **(unboarded)** Not emailed because sending was off: muted tone, per the off-cause table above (`NEWSLETTER_OFF`, `SENDING_OFF`; `NOT_IN_PLAN` shows nothing).
   - Skipped: critical-tone card: "**Not emailed.**" + reason + one sentence + link "Open Subscribers" (600) → `/dashboard/subscribers` in the same tab, then Send emails below it (band and month only). Reasons:
     - band — "Sending was paused — your site passed its {ceiling}-subscriber band." + " Once you're within your band, you can send it with Send emails. ";
     - month — "Sending was paused — this month's emails were used." + " Once the allowance covers it, you can send it with Send emails. ";
-    - **(unboarded)** operator pause or reputation stop — "Sending is paused for this site.", with no further sentence and no Send emails.
-- **(unboarded) Send emails** (owner, 2026-11-19, #4083). A published post is never emailed in three cases: it was skipped for a limit (band or month), it was published while the site's sending was off, or it was published with its own switch off. In each, the post shows a secondary button "Send emails" under its status — under the skipped card, under "Not emailed — sending was off…", and, for a published post with no claim, under the switch, which stays exactly as it is. It never shows for an operator pause or reputation stop, or for a post that is scheduled, sending or sent.
-  - **Enabled** only once the cause is gone: the site's sending is on (the setting on, the site active and not paused, within its band) and this month's emails left cover every confirmed subscriber. Otherwise it is disabled, with the reason as its description (13, muted), first that applies:
-    - sending off — "Turn on emailing posts in Subscribers to send this.";
-    - over the band — "Your site is over its {ceiling}-subscriber band.";
-    - month — "This needs {count} emails and {left} are left until {date}."
-  - **Confirm first** — the Studio's own dialog. Title "Email this post to {count} subscribers?"; body "This uses {count} of the {left} emails left this month. It sends once and can't be sent again."; buttons "Cancel" and "Send emails" (primary). Focus starts on Cancel; Escape closes.
-  - **Then it sends like a normal first publish:** the same post email and the same gate, and it counts against the month's allowance. The status becomes Sending, then Sent. Toast "Sending to {count} subscribers."
-  - **Once per post.** Pressing it records the hand start on the post's claim; a post that has started sending never shows the button again. If the gate refuses the send before it starts (the allowance or band changed meanwhile), the post is skipped again with that reason, and the button comes back disabled until the cause is gone.
-  - **Who:** anyone who can publish the post. The platform route admits the same people as the status route (S12).
-  - Refusal toast: "This post can't be sent right now." The status then refreshes and shows why.
-- Site sending off and no claim: the switch is disabled; description "Emailing posts is off for this site. Turn it on in Subscribers."
-- **"Send me a test"** — first item of the document actions menu (before Duplicate and Delete), send icon, hint "Emails this post to you only".
-  - It sends the document as last saved (the draft if one exists, else the published version) to the signed-in user only. The Studio sends the saved fields (title, excerpt, takeaways, cover URL, slug, locale) to the platform, which validates them and never reads Sanity.
-  - It goes through the platform Resend account, like the existing settings test email, so it never counts against the site.
-  - Anyone who can open the Studio may use it, within the test-email limit: a stored count of 5 an hour and 20 a day per person, shared with the email settings test (owner, 2026-11-18).
-  - Success toast: "Test sent to {your email} — only you got it."
-  - **(unboarded)** Failure toast: "The test couldn't be sent. Try again in a minute."
-  - **(unboarded)** Limit toast: "You've sent the most tests for now. Try again at {time}." — the time comes from the refusal.
+    - **(unboarded)** operator pause, reputation stop or site not active — "Sending is paused for this site.", with no further sentence, no link and no Send emails.
+
+### **(unboarded)** Send emails (owner, 2026-11-19, #4083)
+
+A published post is never emailed in three cases: it was skipped for a limit (band or month), it was published while sending was off (Newsletter off in Features, or the sending setting off), or it was published with its own switch off. In each, the post shows a secondary button "Send emails" under its status — under the skipped card, under the "Not emailed" line, and, for a published post with no claim, under the switch, which stays exactly as it is. It never shows on a plan without Newsletter, for an operator pause, a reputation stop or a site not active, or for a post that is scheduled, sending or sent.
+
+- **Enabled** only once the cause is gone: sending is on (the five conditions above) and this month's emails left cover every confirmed subscriber. Otherwise it is disabled, with the reason as its description (13, muted), first that applies, naming the right place:
+  - Newsletter off in Features — "Turn on Newsletter in Features to send this.";
+  - the sending setting off — "Turn on emailing posts in Subscribers to send this.";
+  - over the band — "Your site is over its {ceiling}-subscriber band.";
+  - month — "This needs {count} emails and {left} are left until {date}."
+- **Confirm first** — the Studio's own dialog. Title "Email this post to {count} subscribers?"; body "This uses {count} of the {left} emails left this month. It sends once and can't be sent again."; buttons "Cancel" and "Send emails" (primary). Focus starts on Cancel; Escape closes.
+- **Then it sends like a normal first publish:** the same post email and the same gate, and it counts against the month's allowance. The status becomes Sending, then Sent. Toast "Sending to {count} subscribers."
+- **Once per post.** Pressing it records the hand start on the post's claim; a post that has started sending never shows the button again. If the gate refuses the send before it starts (the allowance or band changed meanwhile), the post is skipped again with that reason, and the button comes back disabled until the cause is gone. If the run is cancelled before it sends anything (§9), the post goes back to having no claim and the button is offered again.
+- **Who:** anyone who can publish the post. Owners and editors hold Sanity's administrator role ([tenant access](../../features/tenant-access.md)), so everyone who can open the Studio can publish, and the platform's routes are the whole check (below); the Studio adds no permission check of its own.
+- Refusal toast: "This post can't be sent right now." The status then refreshes and shows why.
+
+### **(unboarded)** The platform routes the Studio calls
+
+The status, test-send and send-now routes admit the people who can open the site's Studio: the tenant's OWNER and EDITOR members and operators (an admin's virtual membership). A READER membership has no Studio access and is refused. The tenant comes from that access check, never from the request body, and a refusal comes back as the route's own `FORBIDDEN` code rather than a `notFound()` or redirect. The send-now route re-checks eligibility on the server with the same off-cause read as the status route.
+
+### "Send me a test"
+
+- First item of the document actions menu (before Duplicate and Delete), send icon, hint "Emails this post to you only".
+- It sends the document as last saved (the draft if one exists, else the published version) to the signed-in user only. The Studio sends the saved fields (title, excerpt, takeaways, cover URL, slug, locale) to the platform, which validates them and never reads Sanity.
+- It goes through the platform Resend account, like the existing settings test email, so it never counts against the site.
+- Anyone who can open the Studio may use it, within the test-email limit: a stored count of 5 an hour and 20 a day per person, shared with the email settings test (owner, 2026-11-18).
+- Success toast: "Test sent to {your email} — only you got it."
+- **(unboarded)** Failure toast: "The test couldn't be sent. Try again in a minute."
+- **(unboarded)** Limit toast: "You've sent the most tests for now. Try again at {time}." — the time comes from the refusal.
 
 ## 7. The post email
 
 - Page: desktop 600 wide, padding 32/40; phone 375, padding 16/12; blocks 16 apart.
-- Optional test banner (radius 8, padding 10/14, 13/600; light: highlight-weak fill, ink text; dark: `#33290d` fill, `#ffe08a` text): "Test email — only you got this. Your subscribers get it when the post is first published." Fixed copy, in the post's locale.
+- Optional test banner (radius 8, padding 10/14, 13/600; light: a pale yellow fill and `SHINEFOLD_LOGO_COLOR.INK` text; dark: `#33290d` fill, `#ffe08a` text — fixed values in the email builder, not tenant or platform tokens): "Test email — only you got this. Your subscribers get it when the post is first published." Fixed copy, in the post's locale.
 - Site name: tenant heading font, 20/600, centred, padding 8/0.
 - Card: tenant surface, 1 px tenant border, radius 12. Cover full width, 280 tall desktop / 200 phone, cropped to fill. With no cover image the card starts at the inner padding, with no placeholder. Inner padding 32/36/36 desktop, 22/18/24 phone, gap 18.
 - Title: tenant heading font, 34 desktop / 28 phone, 600, line-height 1.15.
@@ -173,9 +201,9 @@ Uses the Studio's own switch, tones, menu and toast (owner), not the boards' col
   - The triggering limit's value is in `warn` (near) or `bad` (over) at 600, with an 8 bar under it whose fill end is square.
   - The near emails also show the other limit's row, value `muted` 400, with no bar.
   - The paused emails show only the triggering row (owner).
-- **After the usage box:** a closing line, then the button "Open Subscribers" (highlight fill, ink text, radius 10, padding 13/22, 15/600) → `/dashboard/subscribers`.
+- **After the usage box:** a closing line, then the button "Open Subscribers" (`SHINEFOLD_LOGO_COLOR.YELLOW` fill, `SHINEFOLD_LOGO_COLOR.INK` text, radius 10, padding 13/22, 15/600) → `/dashboard/subscribers`.
 - **Footer:** 12 `muted` centred: "You get this because you own {site} on Shinefold."
-- Both are dark-mode like §7.
+- Both are dark-mode like §7, in a dark counterpart of `PLATFORM_EMAIL_BRAND` added in `@shinefold/email` — never the tenant's palette.
 - Each kind is sent at most once a month per site (the existing limit-notice record). The two paused emails share one kind (`SENDING_PAUSED`), so at most one paused email goes out a month, whichever cause comes first.
 
 The four emails:
@@ -190,17 +218,26 @@ The four emails:
 
 A post's claim (`newsletter_post_sends`) is in exactly one state, and the Studio (§6) and the page (§2) read it:
 
-| State                        | Stored as                                        | Written by                                                                                                                      |
-| ---------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| Scheduled                    | no outcome, `scheduled_for` in the future        | worker, in its check step, which already reads the post's publish date; it updates the date when it changes (owner, 2026-11-18) |
-| Sending                      | no outcome, started (recipient count set)        | worker                                                                                                                          |
-| Sent                         | outcome `SENT`                                   | worker                                                                                                                          |
-| Skipped for a limit or pause | outcome `SKIPPED`, the existing skip reasons     | worker                                                                                                                          |
-| Sending off                  | outcome `SKIPPED`, new skip reason `SENDING_OFF` | web, when it claims while the site isn't sending                                                                                |
-| Sent by hand, queued         | no outcome, `hand_started_at` set, not started   | platform, from Send emails (§6): it clears a `SKIPPED` outcome, or claims a post with no claim, then starts the worker run      |
+| State                        | Stored as                                           | Written by                                                                                                                      |
+| ---------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Scheduled                    | no outcome, `scheduled_for` in the future           | worker, in its check step, which already reads the post's publish date; it updates the date when it changes (owner, 2026-11-18) |
+| Sending                      | no outcome, started (recipient count set)           | worker                                                                                                                          |
+| Sent                         | outcome `SENT`                                      | worker                                                                                                                          |
+| Skipped for a limit or pause | outcome `SKIPPED`, the existing skip reasons        | worker                                                                                                                          |
+| Not in the plan              | outcome `SKIPPED`, new skip reason `NOT_IN_PLAN`    | web, when it claims on a site whose plan, with its grants, has no Newsletter                                                    |
+| Site not active              | outcome `SKIPPED`, new skip reason `SITE_INACTIVE`  | web, when it claims on a site outside `WRITABLE_TENANT_STATUSES`                                                                |
+| Newsletter off               | outcome `SKIPPED`, new skip reason `NEWSLETTER_OFF` | web, when it claims while Newsletter is off in Features                                                                         |
+| Sending off                  | outcome `SKIPPED`, new skip reason `SENDING_OFF`    | web, when it claims while the "Email new posts to subscribers" setting is off                                                   |
+| Sent by hand, queued         | no outcome, `hand_started_at` set, not started      | platform, from Send emails (§6): it clears a `SKIPPED` outcome, or claims a post with no claim, then starts the worker run      |
 
-`SENDING_OFF` never counts as a paused-notice post (§0) and sends no owner email. A claim the worker releases is deleted, which is the no-claim state (§6).
+**The off causes are told apart.** `NOT_IN_PLAN`, `SITE_INACTIVE`, `NEWSLETTER_OFF` and `SENDING_OFF` are the four off causes of §6, in that order. One `@shinefold/db` read returns the first that applies for a site, or none when the site sends posts; web (to pick the skip reason), the worker (to cancel a run) and the platform (for the Studio's status and Send emails) all use it, in place of web's and the worker's own `isSiteSendingPosts`. It reads the plan's capabilities with their grants, as web does today, so plan and Features are never folded into one boolean. The operator pause and the band stay the gate's.
 
-A hand-started send (§6) shows as "Sending…" until the run counts its recipients. The worker runs it like a first publish, with one difference: it does not check the post's own switch, because pressing Send emails is the choice the switch records. Its gate is unchanged, so a refused hand send is skipped with the gate's reason. `hand_started_at` is never cleared, and the route refuses a post that has started sending or been sent.
+None of the four counts as a paused-notice post (§0), and none sends an owner email. `NOT_IN_PLAN` is never shown and never offered Send emails, so a post published before an upgrade is never emailed. A claim the worker releases is deleted, which is the no-claim state (§6).
 
-The Studio reads these states through a platform route, because it can import neither `@shinefold/db` nor the platform. The contract between them has one home in `@shinefold/config`, the one package both import: the state kinds, the skip reasons (moved there from `@shinefold/db`, since the Studio now reads them), the test-send and send-now refusal codes, the response types and the route paths.
+A hand-started send (§6) shows as "Sending…" until the run counts its recipients. The worker runs it like a first publish, with one difference: it does not check the post's own switch, because pressing Send emails is the choice the switch records. Its gate is unchanged, so a refused hand send is skipped with the gate's reason. `hand_started_at` is never cleared while the claim exists, and the route refuses a post that has started sending or been sent.
+
+**Only some skips can be sent by hand.** The db statement that starts a hand send accepts a `SKIPPED` claim only with `OVER_SUBSCRIBER_BAND`, `OVER_MONTHLY_ALLOWANCE`, `NEWSLETTER_OFF` or `SENDING_OFF`, or a post with no claim. It refuses `NOT_IN_PLAN`, `SITE_INACTIVE`, `SITE_PAUSED` and `REPUTATION_STOP` itself, as it refuses a claim that is queued, scheduled, sending or sent — not only through the route's pre-check.
+
+**A cancelled hand run releases its claim.** When the run's check step cancels a hand send before anything is sent (the site stopped sending, the mail key is gone, or the post was unpublished), it releases the claim like any cancelled run. The post goes back to no claim: the earlier skip and `hand_started_at` go with it, and Send emails is offered again under the switch, disabled while the cause is there. Nothing was sent, so once per post still holds.
+
+The Studio reads these states through a platform route, because it can import neither `@shinefold/db` nor the platform. The contract between them has one home in `@shinefold/config`, the one package both import: the state kinds, the skip reasons (moved there from `@shinefold/db`, since the Studio now reads them), the off causes, the test-send and send-now refusal codes, the response types and the route paths.
