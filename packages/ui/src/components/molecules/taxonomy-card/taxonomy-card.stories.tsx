@@ -33,6 +33,13 @@ const ENGINEERING_POSTS = [
 const ENGINEERING_DESCRIPTION =
   'Posts about building things — architecture, tooling, and the craft of software.';
 
+const ENGINEERING_TOPIC = {
+  title: 'Engineering',
+  href: '/topics/engineering',
+  headingLevel: 2,
+  postCountLabel: '12 posts',
+} as const;
+
 const meta = {
   title: 'Molecules/TaxonomyCard',
   component: TaxonomyCard,
@@ -45,10 +52,7 @@ const meta = {
     },
   },
   args: {
-    title: 'Engineering',
-    href: '/topics/engineering',
-    headingLevel: 2,
-    postCountLabel: '12 posts',
+    ...ENGINEERING_TOPIC,
     isInteractive: true,
   },
 } satisfies Meta<typeof TaxonomyCard>;
@@ -163,11 +167,8 @@ export const Grid: TStory = {
   render: () => (
     <CardGrid>
       <TaxonomyCard
-        title="Engineering"
-        href="/topics/engineering"
-        headingLevel={2}
+        {...ENGINEERING_TOPIC}
         description={ENGINEERING_DESCRIPTION}
-        postCountLabel="12 posts"
       >
         <TaxonomyCard.Posts
           ariaLabel="Latest posts in Engineering"

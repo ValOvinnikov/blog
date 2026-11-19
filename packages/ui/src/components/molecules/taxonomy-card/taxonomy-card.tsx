@@ -32,7 +32,6 @@ export type TTaxonomyCardProps = IWithClassName &
     postCountLabel: string;
     href: string;
     headingLevel: THeadingLevel;
-    accessibleNameSeparator?: string;
     linkAs?: TAnchorElementType;
     isInteractive?: TTaxonomyCardVariants['isInteractive'];
     children?: TCompoundChildren<typeof TaxonomyCardParts>;
@@ -45,7 +44,6 @@ const TaxonomyCardRoot = ({
   postCountLabel,
   href,
   headingLevel,
-  accessibleNameSeparator = ', ',
   linkAs,
   isInteractive,
   children,
@@ -73,7 +71,7 @@ const TaxonomyCardRoot = ({
           <span aria-hidden="true">{title}</span>
           <span className={s.accessibleName()}>
             {title}
-            {accessibleNameSeparator}
+            {', '}
             {postCountLabel}
           </span>
         </TextLink>

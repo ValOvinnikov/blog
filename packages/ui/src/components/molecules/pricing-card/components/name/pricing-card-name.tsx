@@ -11,7 +11,7 @@ export type TPricingCardNameProps = IWithClassName &
     children: ReactNode;
   };
 
-/** The `<h3>` naming a `PricingCard`'s tier. */
+/** Names a `PricingCard`'s tier. */
 export const PricingCardName = ({
   className,
   dataTestId,

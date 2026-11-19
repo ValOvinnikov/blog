@@ -285,7 +285,7 @@ Variants: isHighlighted: (boolean)
 Slots:
 
 - **PricingCard.Badge** — The raised-tier callout pinned to the top edge of a highlighted `PricingCard`. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **PricingCard.Name** — The `<h3>` naming a `PricingCard`'s tier. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **PricingCard.Name** — Names a `PricingCard`'s tier. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Description** — The one- or two-line summary of a `PricingCard`'s tier. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Price** — A `PricingCard`'s headline price, taking pre-formatted strings and never formatting currency or numbers itself. Props: amount: string · period?: string · prefix?: string _(extends IWithClassName, IWithDataTestId, ( | { compareAt?: undefined; compareAtLabel?: n…)_
 - **PricingCard.Extra** — One smaller price line below a `PricingCard`'s headline `Price` (e.g. a one-time setup fee). Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
@@ -354,7 +354,7 @@ Props: tags: (string | ITagListItem)[] · linkAs?: TAnchorElementType _(extends 
 ### TaxonomyCard — `components/molecules/taxonomy-card/taxonomy-card.tsx`
 
 Summary card for a topic or tag in a listing, linking to its archive.
-Props: title: string · description?: string · postCountLabel: string · href: string · headingLevel: THeadingLevel · accessibleNameSeparator?: string · linkAs?: TAnchorElementType · isInteractive?: TTaxonomyCardVariants['isInteractive'] · children?: TCompoundChildren<typeof TaxonomyCardParts> _(extends IWithClassName, IWithDataTestId)_
+Props: title: string · description?: string · postCountLabel: string · href: string · headingLevel: THeadingLevel · linkAs?: TAnchorElementType · isInteractive?: TTaxonomyCardVariants['isInteractive'] · children?: TCompoundChildren<typeof TaxonomyCardParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: isInteractive: (boolean)
 
 Slots:
