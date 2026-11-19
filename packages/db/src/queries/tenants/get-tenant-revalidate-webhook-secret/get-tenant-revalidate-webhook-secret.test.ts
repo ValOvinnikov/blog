@@ -1,7 +1,4 @@
 import { setTenantRevalidateWebhookSecret } from '@shinefold/db/queries/tenants/set-tenant-revalidate-webhook-secret';
-import * as schema from '@shinefold/db/schema';
-import type { TTenant } from '@shinefold/db/schema/tenants';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_SANITY_PROJECT_ID } from '@shinefold/db/testing/sanity-management-client/fixtures';
 import {
@@ -12,32 +9,22 @@ import {
   MOCK_REVALIDATE_WEBHOOK_SECRET,
   MOCK_UNKNOWN_SANITY_PROJECT_ID,
 } from '@shinefold/db/testing/tenants/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { getTenantRevalidateWebhookSecret } from './get-tenant-revalidate-webhook-secret';
 
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db, { sanityProjectId: MOCK_SANITY_PROJECT_ID });
 
 useTenantTokenEncryptionKey();
 
-afterEach(async () => {
-  await db().delete(schema.tenants);
-});
-
 describe(getTenantRevalidateWebhookSecret, () => {
-  let tenant: TTenant;
-
-  beforeEach(async () => {
-    tenant = await insertTestTenant(db(), {
-      sanityProjectId: MOCK_SANITY_PROJECT_ID,
-    });
-  });
-
   describe('with a secret stored', () => {
     beforeEach(async () => {
       await setTenantRevalidateWebhookSecret(
-        tenant.id,
+        tenant().id,
         MOCK_REVALIDATE_WEBHOOK_SECRET,
       );
     });
@@ -48,7 +35,7 @@ describe(getTenantRevalidateWebhookSecret, () => {
       );
 
       expect(result).toEqual({
-        tenantId: tenant.id,
+        tenantId: tenant().id,
         secret: MOCK_REVALIDATE_WEBHOOK_SECRET,
       });
     });
@@ -67,7 +54,7 @@ describe(getTenantRevalidateWebhookSecret, () => {
       MOCK_SANITY_PROJECT_ID,
     );
 
-    expect(result).toEqual({ tenantId: tenant.id, secret: undefined });
+    expect(result).toEqual({ tenantId: tenant().id, secret: undefined });
   });
 
   it('resolves undefined for a project id no tenant owns', async () => {

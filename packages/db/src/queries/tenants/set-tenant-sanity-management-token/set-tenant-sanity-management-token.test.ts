@@ -1,6 +1,4 @@
-import * as schema from '@shinefold/db/schema';
-import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
@@ -10,6 +8,7 @@ import {
   MOCK_TENANT_MANAGEMENT_ROBOT_ID,
   MOCK_TENANT_MANAGEMENT_TOKEN,
 } from '@shinefold/db/testing/tenants/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { decryptSecret } from '@shinefold/utils';
 import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
 import { eq } from 'drizzle-orm';
@@ -19,6 +18,7 @@ import { setTenantSanityManagementToken } from './set-tenant-sanity-management-t
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 useTenantTokenEncryptionKey();
 
 const MOCK_MINTED = {
@@ -26,24 +26,14 @@ const MOCK_MINTED = {
   robotId: MOCK_TENANT_MANAGEMENT_ROBOT_ID,
 };
 
-afterEach(async () => {
-  await db().delete(schema.tenants);
-});
-
 describe(setTenantSanityManagementToken, () => {
-  let tenant: TTenant;
-
-  beforeEach(async () => {
-    tenant = await insertTestTenant(db());
-  });
-
   it('stores the token encrypted, not as plaintext, beside its robot id', async () => {
-    await setTenantSanityManagementToken(tenant.id, MOCK_MINTED);
+    await setTenantSanityManagementToken(tenant().id, MOCK_MINTED);
 
     const [row] = await db()
       .select()
       .from(tenants)
-      .where(eq(tenants.id, tenant.id));
+      .where(eq(tenants.id, tenant().id));
 
     expect(row?.sanityManagementTokenEncrypted).not.toContain(
       MOCK_TENANT_MANAGEMENT_TOKEN,
@@ -61,14 +51,14 @@ describe(setTenantSanityManagementToken, () => {
     vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
 
     await expect(
-      setTenantSanityManagementToken(tenant.id, MOCK_MINTED),
+      setTenantSanityManagementToken(tenant().id, MOCK_MINTED),
     ).rejects.toThrow(MISSING_TENANT_TOKEN_KEY_ERROR);
 
     const [row] = await db()
       .select()
       .from(tenants)
-      .where(eq(tenants.id, tenant.id));
+      .where(eq(tenants.id, tenant().id));
 
-    expect(row).toEqual(tenant);
+    expect(row).toEqual(tenant());
   });
 });

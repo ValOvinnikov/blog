@@ -6,7 +6,6 @@ import * as schema from '@shinefold/db/schema';
 import { GITHUB_PROVIDER } from '@shinefold/db/testing/account/fixtures';
 import {
   insertTestAccount,
-  insertTestTenant,
   insertTestUser,
   MOCK_EMAIL_VERIFIED_AT,
   MOCK_OWNER_EMAIL,
@@ -20,6 +19,7 @@ import {
   mockMembership,
 } from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { isNull } from '@shinefold/utils/primitives';
 
 import { getTenantOwnerMembership } from './get-tenant-owner-membership';
@@ -29,6 +29,7 @@ vi.mock('@shinefold/db/client');
 faker.seed(5765);
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 
 const MOCK_SIGNED_IN_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_INVITED_EMAIL = faker.internet.email().toLowerCase();
@@ -37,17 +38,10 @@ const MOCK_MEMBER_USER_ID = faker.string.uuid();
 afterEach(async () => {
   await db().delete(schema.memberships);
   await db().delete(schema.membershipInvites);
-  await db().delete(schema.tenants);
   await db().delete(schema.users);
 });
 
 describe(getTenantOwnerMembership, () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
   async function insertMember(
     email: TMaybeNull<string>,
     role: TMembershipRole,
@@ -60,7 +54,7 @@ describe(getTenantOwnerMembership, () => {
     });
     return mockMembership(db(), {
       userId: MOCK_MEMBER_USER_ID,
-      tenantId,
+      tenantId: tenant().id,
       role,
     });
   }
@@ -74,7 +68,7 @@ describe(getTenantOwnerMembership, () => {
     role: TMembershipRole;
     consumedAt?: TMaybeNull<Date>;
   }): Promise<schema.TMembershipInvite> {
-    return mockMembershipInvite(db(), tenantId, { email, role, consumedAt });
+    return mockMembershipInvite(db(), tenant().id, { email, role, consumedAt });
   }
 
   it('returns a signed-in OWNER as joined, decrypted', async () => {
@@ -83,7 +77,7 @@ describe(getTenantOwnerMembership, () => {
       MEMBERSHIP_ROLE.OWNER,
     );
 
-    const result = await getTenantOwnerMembership(tenantId);
+    const result = await getTenantOwnerMembership(tenant().id);
 
     expect(result).toEqual({
       email: MOCK_OWNER_EMAIL,
@@ -104,7 +98,7 @@ describe(getTenantOwnerMembership, () => {
     });
 
     it('is returned as invited', async () => {
-      const result = await getTenantOwnerMembership(tenantId);
+      const result = await getTenantOwnerMembership(tenant().id);
 
       expect(result).toEqual({
         email: MOCK_OWNER_EMAIL,
@@ -116,7 +110,7 @@ describe(getTenantOwnerMembership, () => {
     it('counts a linked OAuth account as a sign-in', async () => {
       await insertTestAccount(db(), MOCK_MEMBER_USER_ID, GITHUB_PROVIDER);
 
-      const result = await getTenantOwnerMembership(tenantId);
+      const result = await getTenantOwnerMembership(tenant().id);
 
       expect(result).toEqual({
         email: MOCK_OWNER_EMAIL,
@@ -129,7 +123,7 @@ describe(getTenantOwnerMembership, () => {
   it('ignores a non-OWNER membership on the same tenant', async () => {
     await insertMember(MOCK_EDITOR_EMAIL, MEMBERSHIP_ROLE.EDITOR);
 
-    const result = await getTenantOwnerMembership(tenantId);
+    const result = await getTenantOwnerMembership(tenant().id);
 
     expect(result).toBeUndefined();
   });
@@ -140,7 +134,7 @@ describe(getTenantOwnerMembership, () => {
       role: MEMBERSHIP_ROLE.OWNER,
     });
 
-    const result = await getTenantOwnerMembership(tenantId);
+    const result = await getTenantOwnerMembership(tenant().id);
 
     expect(result).toEqual({
       email: MOCK_OWNER_EMAIL,
@@ -156,7 +150,7 @@ describe(getTenantOwnerMembership, () => {
       consumedAt: MOCK_INVITE_CONSUMED_AT,
     });
 
-    const result = await getTenantOwnerMembership(tenantId);
+    const result = await getTenantOwnerMembership(tenant().id);
 
     expect(result).toBeUndefined();
   });
@@ -167,7 +161,7 @@ describe(getTenantOwnerMembership, () => {
       role: MEMBERSHIP_ROLE.EDITOR,
     });
 
-    const result = await getTenantOwnerMembership(tenantId);
+    const result = await getTenantOwnerMembership(tenant().id);
 
     expect(result).toBeUndefined();
   });
@@ -182,7 +176,7 @@ describe(getTenantOwnerMembership, () => {
       role: MEMBERSHIP_ROLE.OWNER,
     });
 
-    const result = await getTenantOwnerMembership(tenantId);
+    const result = await getTenantOwnerMembership(tenant().id);
 
     expect(result).toEqual({
       email: MOCK_SIGNED_IN_EMAIL,
@@ -192,7 +186,7 @@ describe(getTenantOwnerMembership, () => {
   });
 
   it('returns undefined when the tenant has no OWNER membership or invite', async () => {
-    const result = await getTenantOwnerMembership(tenantId);
+    const result = await getTenantOwnerMembership(tenant().id);
 
     expect(result).toBeUndefined();
   });
@@ -208,7 +202,7 @@ describe(getTenantOwnerMembership, () => {
         role: MEMBERSHIP_ROLE.OWNER,
       });
 
-      const result = await getTenantOwnerMembership(tenantId);
+      const result = await getTenantOwnerMembership(tenant().id);
 
       expect(result).toEqual({
         email: MOCK_INVITED_EMAIL,
@@ -218,7 +212,7 @@ describe(getTenantOwnerMembership, () => {
     });
 
     it('returns undefined with no invite', async () => {
-      const result = await getTenantOwnerMembership(tenantId);
+      const result = await getTenantOwnerMembership(tenant().id);
 
       expect(result).toBeUndefined();
     });

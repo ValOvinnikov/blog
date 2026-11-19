@@ -10,10 +10,10 @@ import { GITHUB_PROVIDER } from '@shinefold/db/testing/account/fixtures';
 import { insertTestAuditEvent } from '@shinefold/db/testing/audit-events/fixtures';
 import {
   insertTestAccount,
-  insertTestTenant,
   insertTestUser,
 } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { errorResult, okResult } from '@shinefold/utils';
 import { eq } from 'drizzle-orm';
 
@@ -30,12 +30,8 @@ const MOCK_POST_ID = faker.string.uuid();
 const MOCK_SESSION_EXPIRES = faker.date.future({ refDate: MOCK_REF_DATE });
 
 const db = useQueryTestDb();
-let tenantId: string;
+const tenant = useTestTenant(db);
 let userId: string;
-
-beforeEach(async () => {
-  ({ id: tenantId } = await insertTestTenant(db()));
-});
 
 afterEach(async () => {
   await db().delete(schema.auditEvents);
@@ -43,7 +39,6 @@ afterEach(async () => {
   await db().delete(schema.sessions);
   await db().delete(schema.accounts);
   await db().delete(schema.users);
-  await db().delete(schema.tenants);
 });
 
 async function seedUserWithRelatedRows(): Promise<string> {
@@ -56,7 +51,7 @@ async function seedUserWithRelatedRows(): Promise<string> {
   });
   await db()
     .insert(schema.bookmarks)
-    .values({ tenantId, userId: id, postId: MOCK_POST_ID });
+    .values({ tenantId: tenant().id, userId: id, postId: MOCK_POST_ID });
 
   return id;
 }
@@ -134,7 +129,7 @@ describe(deleteAccount, () => {
   it('deletes a user whose only memberships are below owner', async () => {
     await db()
       .insert(schema.memberships)
-      .values({ userId, tenantId, role: MEMBERSHIP_ROLE.EDITOR });
+      .values({ userId, tenantId: tenant().id, role: MEMBERSHIP_ROLE.EDITOR });
 
     const result = await deleteAccount(userId);
 
@@ -145,7 +140,7 @@ describe(deleteAccount, () => {
   it('refuses a tenant owner and keeps the account and its membership', async () => {
     await db()
       .insert(schema.memberships)
-      .values({ userId, tenantId, role: MEMBERSHIP_ROLE.OWNER });
+      .values({ userId, tenantId: tenant().id, role: MEMBERSHIP_ROLE.OWNER });
 
     const result = await deleteAccount(userId);
 

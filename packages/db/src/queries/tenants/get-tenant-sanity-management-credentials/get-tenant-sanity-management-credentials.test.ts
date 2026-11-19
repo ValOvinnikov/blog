@@ -1,8 +1,5 @@
 import { setTenantSanityManagementToken } from '@shinefold/db/queries/tenants/set-tenant-sanity-management-token';
 import { setTenantSanityWriteToken } from '@shinefold/db/queries/tenants/set-tenant-sanity-write-token';
-import * as schema from '@shinefold/db/schema';
-import type { TTenant } from '@shinefold/db/schema/tenants';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
@@ -15,6 +12,7 @@ import {
   MOCK_TENANT_VALUES,
   MOCK_TENANT_WRITE_TOKEN,
 } from '@shinefold/db/testing/tenants/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { getTenantSanityManagementCredentials } from './get-tenant-sanity-management-credentials';
 
@@ -24,28 +22,21 @@ const db = useQueryTestDb();
 useTenantTokenEncryptionKey();
 
 const { sanityProjectId } = MOCK_TENANT_VALUES;
-
-afterEach(async () => {
-  await db().delete(schema.tenants);
-});
+const tenant = useTestTenant(db, { sanityProjectId });
 
 describe(getTenantSanityManagementCredentials, () => {
-  let tenant: TTenant;
-
-  beforeEach(async () => {
-    tenant = await insertTestTenant(db(), { sanityProjectId });
-  });
-
   describe('with a management token set', () => {
     beforeEach(async () => {
-      await setTenantSanityManagementToken(tenant.id, {
+      await setTenantSanityManagementToken(tenant().id, {
         token: MOCK_TENANT_MANAGEMENT_TOKEN,
         robotId: MOCK_TENANT_MANAGEMENT_ROBOT_ID,
       });
     });
 
     it('resolves the decrypted token, its robot id and the project it is scoped to', async () => {
-      const credentials = await getTenantSanityManagementCredentials(tenant.id);
+      const credentials = await getTenantSanityManagementCredentials(
+        tenant().id,
+      );
 
       expect(credentials).toEqual({
         projectId: sanityProjectId,
@@ -58,21 +49,21 @@ describe(getTenantSanityManagementCredentials, () => {
       vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
 
       await expect(
-        getTenantSanityManagementCredentials(tenant.id),
+        getTenantSanityManagementCredentials(tenant().id),
       ).rejects.toThrow(MISSING_TENANT_TOKEN_KEY_ERROR);
     });
   });
 
   it('resolves undefined when the tenant has no management token set yet', async () => {
-    const credentials = await getTenantSanityManagementCredentials(tenant.id);
+    const credentials = await getTenantSanityManagementCredentials(tenant().id);
 
     expect(credentials).toBeUndefined();
   });
 
   it('resolves undefined when only the write token is set', async () => {
-    await setTenantSanityWriteToken(tenant.id, MOCK_TENANT_WRITE_TOKEN);
+    await setTenantSanityWriteToken(tenant().id, MOCK_TENANT_WRITE_TOKEN);
 
-    const credentials = await getTenantSanityManagementCredentials(tenant.id);
+    const credentials = await getTenantSanityManagementCredentials(tenant().id);
 
     expect(credentials).toBeUndefined();
   });

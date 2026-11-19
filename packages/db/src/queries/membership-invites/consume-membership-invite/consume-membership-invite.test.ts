@@ -4,7 +4,6 @@ import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import { createMembership } from '@shinefold/db/queries/memberships';
 import * as schema from '@shinefold/db/schema';
 import {
-  insertTestTenant,
   insertTestUser,
   MOCK_INVITE_EMAIL,
 } from '@shinefold/db/testing/fixtures';
@@ -21,6 +20,7 @@ import {
   MOCK_MISSING_USER_ID,
 } from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { eq } from 'drizzle-orm';
 
 import { consumeMembershipInvite } from './consume-membership-invite';
@@ -38,6 +38,7 @@ faker.seed(6022);
 const MOCK_MISSING_INVITE_ID = faker.string.uuid();
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 
 async function readInvite(inviteId: string) {
   const [invite] = await db()
@@ -53,14 +54,12 @@ afterEach(async () => {
 });
 
 describe(consumeMembershipInvite, () => {
-  let tenantId: string;
   let inviteId: string;
 
   beforeEach(async () => {
     vi.useFakeTimers({ now: MOCK_INVITE_CONSUMED_AT, toFake: ['Date'] });
     await insertTestUser(db(), { id: MOCK_USER_ID });
-    ({ id: tenantId } = await insertTestTenant(db()));
-    ({ id: inviteId } = await mockMembershipInvite(db(), tenantId, {
+    ({ id: inviteId } = await mockMembershipInvite(db(), tenant().id, {
       email: MOCK_INVITE_EMAIL,
     }));
   });
@@ -72,7 +71,7 @@ describe(consumeMembershipInvite, () => {
     const rows = await db().select().from(schema.memberships);
     expect(rows).toEqual([membership]);
     expect(membership?.role).toBe(MEMBERSHIP_ROLE.OWNER);
-    expect(membership?.tenantId).toBe(tenantId);
+    expect(membership?.tenantId).toBe(tenant().id);
     expect(membership?.userId).toBe(MOCK_USER_ID);
     expect(invite?.consumedAt).toEqual(MOCK_INVITE_CONSUMED_AT);
   });
@@ -117,7 +116,7 @@ describe(consumeMembershipInvite, () => {
   it('returns the existing membership when the pair already has one', async () => {
     const existingMembership = await mockMembership(db(), {
       userId: MOCK_USER_ID,
-      tenantId,
+      tenantId: tenant().id,
       role: MEMBERSHIP_ROLE.READER,
     });
 
@@ -135,8 +134,8 @@ describe(consumeMembershipInvite, () => {
       const { id: ownerId } = await insertTestUser(db(), {
         id: faker.string.uuid(),
       });
-      await mockMembership(db(), { userId: ownerId, tenantId });
-      ({ id: editorInviteId } = await mockMembershipInvite(db(), tenantId, {
+      await mockMembership(db(), { userId: ownerId, tenantId: tenant().id });
+      ({ id: editorInviteId } = await mockMembershipInvite(db(), tenant().id, {
         role: MEMBERSHIP_ROLE.EDITOR,
       }));
     });
@@ -155,7 +154,7 @@ describe(consumeMembershipInvite, () => {
       await db()
         .update(schema.tenants)
         .set({ plan: TENANT_PLAN.GROWTH })
-        .where(eq(schema.tenants.id, tenantId));
+        .where(eq(schema.tenants.id, tenant().id));
 
       const membership = await consumeMembershipInvite(
         editorInviteId,
@@ -167,12 +166,16 @@ describe(consumeMembershipInvite, () => {
   });
 
   it('locks the member who joined last when a racing accept filled the seat', async () => {
-    const { id: editorInviteId } = await mockMembershipInvite(db(), tenantId, {
-      role: MEMBERSHIP_ROLE.EDITOR,
-    });
+    const { id: editorInviteId } = await mockMembershipInvite(
+      db(),
+      tenant().id,
+      {
+        role: MEMBERSHIP_ROLE.EDITOR,
+      },
+    );
     const realCreate = vi.mocked(createMembership).getMockImplementation();
     vi.mocked(createMembership).mockImplementationOnce(async (...args) => {
-      await insertTeam(db(), tenantId, [MEMBERSHIP_ROLE.EDITOR]);
+      await insertTeam(db(), tenant().id, [MEMBERSHIP_ROLE.EDITOR]);
       return realCreate!(...args);
     });
 

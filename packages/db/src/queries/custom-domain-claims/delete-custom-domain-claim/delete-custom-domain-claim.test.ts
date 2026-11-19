@@ -1,43 +1,35 @@
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import * as schema from '@shinefold/db/schema';
 import { insertTestCustomDomainClaim } from '@shinefold/db/testing/custom-domain-claims/fixtures';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_TENANT_DOMAIN } from '@shinefold/db/testing/tenants/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { deleteCustomDomainClaim } from './delete-custom-domain-claim';
 
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db, { primaryDomain: MOCK_TENANT_DOMAIN });
 
 afterEach(async () => {
   await db().delete(schema.customDomainClaims);
-  await db().delete(schema.tenants);
 });
 
 describe(deleteCustomDomainClaim, () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db(), {
-      primaryDomain: MOCK_TENANT_DOMAIN,
-    }));
-  });
-
   it('returns false when the site has no claim', async () => {
-    const result = await deleteCustomDomainClaim(tenantId);
+    const result = await deleteCustomDomainClaim(tenant().id);
 
     expect(result).toBe(false);
   });
 
   describe('with a pending claim', () => {
     beforeEach(async () => {
-      await insertTestCustomDomainClaim(db(), { tenantId });
+      await insertTestCustomDomainClaim(db(), { tenantId: tenant().id });
     });
 
     it('deletes the claim and returns true', async () => {
-      const result = await deleteCustomDomainClaim(tenantId);
+      const result = await deleteCustomDomainClaim(tenant().id);
 
       const rows = await db().select().from(schema.customDomainClaims);
       expect(result).toBe(true);
@@ -48,7 +40,7 @@ describe(deleteCustomDomainClaim, () => {
       await db().update(schema.tenants).set({ plan: TENANT_PLAN.GROWTH });
 
       await expect(
-        deleteCustomDomainClaim(tenantId, TENANT_PLAN.FREE),
+        deleteCustomDomainClaim(tenant().id, TENANT_PLAN.FREE),
       ).resolves.toBe(false);
     });
   });
