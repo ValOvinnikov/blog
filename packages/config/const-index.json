@@ -3476,6 +3476,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/portable-text-block-type.ts"
+      },
+      {
+        "ref": "ARIA_ROLE.TABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
       }
     ],
     "CONSOLE": [
@@ -4272,6 +4278,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "AVATAR_VARIANT.PENDING",
+        "scope": "app:platform",
+        "from": "@platform/constants/avatar",
+        "file": "apps/platform/src/constants/avatar.ts"
       },
       {
         "ref": "DOMAIN_VERIFICATION_STATUS.PENDING",
@@ -5896,6 +5908,38 @@
         "file": "apps/platform/src/constants/activity.ts"
       }
     ],
+    "region": [
+      {
+        "ref": "ARIA_ROLE.REGION",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
+      }
+    ],
+    "rowgroup": [
+      {
+        "ref": "ARIA_ROLE.ROWGROUP",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
+      }
+    ],
+    "row": [
+      {
+        "ref": "ARIA_ROLE.ROW",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
+      }
+    ],
+    "cell": [
+      {
+        "ref": "ARIA_ROLE.CELL",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
+      }
+    ],
     "FRAMED": [
       {
         "ref": "ASSET_UPLOAD_LAYOUT.FRAMED",
@@ -5931,6 +5975,14 @@
     "SWITCHER": [
       {
         "ref": "AVATAR_VARIANT.SWITCHER",
+        "scope": "app:platform",
+        "from": "@platform/constants/avatar",
+        "file": "apps/platform/src/constants/avatar.ts"
+      }
+    ],
+    "MEMBER": [
+      {
+        "ref": "AVATAR_VARIANT.MEMBER",
         "scope": "app:platform",
         "from": "@platform/constants/avatar",
         "file": "apps/platform/src/constants/avatar.ts"

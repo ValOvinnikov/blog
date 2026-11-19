@@ -172,8 +172,12 @@ from `useSettingsFormState()`:
   `block text-platform-12 text-platform-muted`.
 - A translated label on every column (`sr-only` for actions), `<time dateTime>`
   for dates, `emptyMessage` for the empty list. `ariaLabel`, the page's title,
-  names the scroll region. A mode the shell lacks (a card title) goes into the
-  shell, kept in the empty state, never a hand-built `<table>`.
+  names the scroll region. A card title with its count
+  (`DataTableShell.Title`), a filter strip (`DataTableShell.Toolbar`) and a
+  note under the rows (`DataTableShell.Note`) are the shell's own opt-in
+  parts, kept in the empty state; a column's `width` (px or %) fixes the
+  table's columns and narrows the gap between them to 16px. A mode the shell still lacks goes into it, never a
+  hand-built `<table>`.
 
 ### Editing a shared primitive
 
@@ -610,11 +614,19 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
   `role="tabpanel"` below `lg` only. A page whose tabbed layout follows its
   content width instead passes `useViewTabs({ isTabbed })`, and the tabs and
   roles follow that. Voice keeps its per-card preview toggle.
-- A dialog keeps a 16px gutter (`w-[calc(100%-2rem)] max-w-md`), which
-  `AlertDialogShell` owns for `ConfirmDialog` and `LeavePageDialog`.
+- A dialog sits at the bottom of the screen, 16px from the sides and bottom,
+  its footer buttons full width and stacked with the primary or danger one on
+  top; from `md` up it is centred at `max-w-md`. `AlertDialogShell` owns this
+  for `ConfirmDialog` and `LeavePageDialog`, and the shared `Dialog` shares its
+  classes.
 - Tables scroll sideways inside their card, and fact lists stack the term above
-  the value below `md`. `DataTableShell` and `DetailList` own both; never
-  add them per page.
+  the value below `md`. A table may opt into stacked rows instead
+  (`DataTableShell`'s `isStacked`: head row hidden, each cell named by its
+  column for screen readers, empty cells not rendered). A stacked table
+  passes each `Cell` its `column` key and keeps a conditional cell at the
+  `Cell` level (`{x && <Cell>}`), since a cell holding a component that
+  renders `null` is not empty); one that sorts from its head row never does.
+  `DataTableShell` and `DetailList` own all of this; never add it per page.
 - A Desktop/Mobile preview toggle is offered only where it changes what renders;
   an email's Desktop preview is a real 600px frame.
 - Check in a browser at the manual-test matrix's 390, 820 and 1280px
