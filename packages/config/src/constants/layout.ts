@@ -4,6 +4,7 @@ export const BRAND_VARIANT = {
   PRIMARY: 'PRIMARY',
   SECONDARY: 'SECONDARY',
   BRAND_PRIMARY: 'BRAND_PRIMARY',
+  INK: 'INK',
 } as const;
 
 export type TBrandVariant = TValueOf<typeof BRAND_VARIANT>;

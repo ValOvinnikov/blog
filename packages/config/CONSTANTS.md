@@ -180,7 +180,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/layout.ts`
 
-- **BRAND_VARIANT**: `PRIMARY`, `SECONDARY`, `BRAND_PRIMARY`
+- **BRAND_VARIANT**: `PRIMARY`, `SECONDARY`, `BRAND_PRIMARY`, `INK`
 - **SPACING_SCALE**: `NONE`, `SM`, `MD`, `LG`, `XL`
 - **CONTAINER_WIDTH**: `NARROW`, `WIDE`, `FULL`
 - **CONTENT_ALIGNMENT**: `LEFT`, `CENTER`, `RIGHT`

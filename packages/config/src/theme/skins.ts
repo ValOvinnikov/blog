@@ -10,7 +10,7 @@ import {
   type TSkinMode,
 } from '@shinefold/config/constants';
 
-import { AMBIENT_RAISED } from './contrast-surfaces';
+import { AMBIENT_RAISED, FIELD_BOUNDARY } from './contrast-surfaces';
 import { effectiveSchemeOf } from './skin-contrast';
 import { deriveSkinRoles } from './skin-derive';
 import { PAGE_ROLES, type TPaletteStop, type TSkinRoles } from './skin-roles';
@@ -54,14 +54,16 @@ export const defineSkin = (
   };
 };
 
+const DEEPEST_NEUTRAL = '--palette-neutral-2700' satisfies TPaletteStop;
+
 const TINTED_BAND_PIN = {
   [COLOR_SCHEME.LIGHT]: {
     '--divider': '--palette-neutral-700',
-    '--field-boundary': '--palette-neutral-1100',
+    [FIELD_BOUNDARY]: '--palette-neutral-1100',
   },
   [COLOR_SCHEME.DARK]: {
     '--divider': '--palette-neutral-1400',
-    '--field-boundary': '--palette-neutral-1000',
+    [FIELD_BOUNDARY]: '--palette-neutral-1000',
   },
 } as const satisfies TSkinDefinition['pin'];
 
@@ -92,13 +94,20 @@ export const SKIN_REGISTRY = {
     mode: SKIN_MODE.MATCH,
     pin: TINTED_BAND_PIN,
   }),
+  [BRAND_VARIANT.INK]: defineSkin('Ink', {
+    ground: {
+      [COLOR_SCHEME.LIGHT]: '--palette-neutral-2100',
+      [COLOR_SCHEME.DARK]: DEEPEST_NEUTRAL,
+    },
+    mode: SKIN_MODE.INVERSE,
+  }),
 } as const satisfies Record<TBrandVariant, TSkin>;
 
 export const STORYBOOK_SKINS = {
   STORYBOOK_INVERSE: defineSkin('Inverse (Storybook)', {
     ground: {
       [COLOR_SCHEME.LIGHT]: '--palette-neutral-2200',
-      [COLOR_SCHEME.DARK]: '--palette-neutral-2700',
+      [COLOR_SCHEME.DARK]: DEEPEST_NEUTRAL,
     },
     mode: SKIN_MODE.INVERSE,
   }),

@@ -10,7 +10,9 @@ import {
   BRAND_PRIMARY_MUTED,
   BRAND_PRIMARY_WASH,
   ERROR_MUTED,
+  FIELD_BOUNDARY,
   PRIMARY_SUBTLE,
+  SURFACE,
   SURFACE_2,
   TEXT,
   TEXT_MUTED,
@@ -26,7 +28,7 @@ export const SKIN_GROUND_ROLES = [
 ] as const;
 
 export const SKIN_FILL_ROLES = [
-  '--surface',
+  SURFACE,
   SURFACE_2,
   BRAND_PRIMARY_MUTED,
   BRAND_PRIMARY_WASH,
@@ -40,7 +42,7 @@ const SKIN_INK_ROLES = [
   '--border',
   '--border-strong',
   BORDER_EMPHASIS,
-  '--field-boundary',
+  FIELD_BOUNDARY,
   BRAND_PRIMARY,
   '--brand-primary-hover',
   '--brand-primary-solid',

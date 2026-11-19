@@ -2844,6 +2844,14 @@
         "file": "packages/config/src/constants/layout.ts"
       }
     ],
+    "INK": [
+      {
+        "ref": "BRAND_VARIANT.INK",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
     "NONE": [
       {
         "ref": "SPACING_SCALE.NONE",
