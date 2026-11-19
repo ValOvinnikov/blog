@@ -347,6 +347,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **TOAST_TYPE**: `SUCCESS`, `INFO`, `WARNING`, `ERROR`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/unlink-provider-outcome.ts`
+
+- **UNLINK_PROVIDER_OUTCOME**: `UNLINKED`, `LAST_METHOD`
+
 ## db
 
 ### `@shinefold/db/constants` — `packages/db/src/constants/admin.ts`
@@ -864,6 +868,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/account-control` — `apps/web/src/constants/account-control.ts`
 
 - **ACCOUNT_CONTROL_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"account_control.site_config_fetch_failed"`
+
+### `@web/constants/account` — `apps/web/src/constants/account.ts`
+
+- **ACCOUNT_LOG**: `PROVIDER_UNLINK_FAILED`=`"account.provider_unlink_failed"`, `DISPLAY_NAME_UPDATE_FAILED`=`"account.display_name_update_failed"`
 
 ### `@web/constants/bookmark` — `apps/web/src/constants/bookmark.ts`
 

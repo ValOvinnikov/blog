@@ -1,11 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { ACTION_OUTCOME } from '@shinefold/config';
+import {
+  OAUTH_PROVIDER,
+  UNLINK_PROVIDER_OUTCOME,
+} from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import { toOutcome } from '@shinefold/utils/to-outcome';
-import {
-  DISPLAY_NAME_UPDATE_FAILED_EVENT,
-  PROVIDER_UNLINK_FAILED_EVENT,
-} from '@web/constants/account';
+import { ACCOUNT_LOG } from '@web/constants/account';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import { auth } from '@web/server/auth/auth';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -29,8 +30,8 @@ vi.mock('@shinefold/db', () => ({
 
 faker.seed(6010);
 
-const MOCK_PROVIDER: TLinkableProvider = 'github';
-const MOCK_OTHER_PROVIDER: TLinkableProvider = 'google';
+const MOCK_PROVIDER: TLinkableProvider = OAUTH_PROVIDER.GITHUB;
+const MOCK_OTHER_PROVIDER: TLinkableProvider = OAUTH_PROVIDER.GOOGLE;
 const MOCK_UNSUPPORTED_PROVIDER =
   `${faker.lorem.word()};--` as TLinkableProvider;
 const MOCK_DISPLAY_NAME = faker.person.fullName();
@@ -56,7 +57,7 @@ describe(unlinkProviderAction, () => {
 
   it("unlinks the session user's provider and answers success", async () => {
     vi.mocked(queries.account.unlinkProvider).mockResolvedValueOnce(
-      toOutcome('unlinked'),
+      toOutcome(UNLINK_PROVIDER_OUTCOME.UNLINKED),
     );
 
     const result = await unlinkProviderAction(MOCK_PROVIDER);
@@ -70,7 +71,7 @@ describe(unlinkProviderAction, () => {
 
   it('answers blocked when the last sign-in method would be removed', async () => {
     vi.mocked(queries.account.unlinkProvider).mockResolvedValueOnce(
-      toOutcome('last-method'),
+      toOutcome(UNLINK_PROVIDER_OUTCOME.LAST_METHOD),
     );
 
     const result = await unlinkProviderAction(MOCK_OTHER_PROVIDER);
@@ -84,10 +85,13 @@ describe(unlinkProviderAction, () => {
     const result = await unlinkProviderAction(MOCK_PROVIDER);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(logger.error).toHaveBeenCalledWith(PROVIDER_UNLINK_FAILED_EVENT, {
-      provider: MOCK_PROVIDER,
-      error: MOCK_ERROR,
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      ACCOUNT_LOG.PROVIDER_UNLINK_FAILED,
+      {
+        provider: MOCK_PROVIDER,
+        error: MOCK_ERROR,
+      },
+    );
   });
 });
 
@@ -130,7 +134,7 @@ describe(updateDisplayNameAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
-      DISPLAY_NAME_UPDATE_FAILED_EVENT,
+      ACCOUNT_LOG.DISPLAY_NAME_UPDATE_FAILED,
       {
         error: MOCK_ERROR,
       },

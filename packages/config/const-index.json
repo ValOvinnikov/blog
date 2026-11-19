@@ -4594,6 +4594,22 @@
         "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
+    "UNLINKED": [
+      {
+        "ref": "UNLINK_PROVIDER_OUTCOME.UNLINKED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/unlink-provider-outcome.ts"
+      }
+    ],
+    "LAST_METHOD": [
+      {
+        "ref": "UNLINK_PROVIDER_OUTCOME.LAST_METHOD",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/unlink-provider-outcome.ts"
+      }
+    ],
     "SUPERADMIN": [
       {
         "ref": "ADMIN_ROLE.SUPERADMIN",
@@ -10328,6 +10344,22 @@
         "scope": "app:web",
         "from": "@web/constants/account-control",
         "file": "apps/web/src/constants/account-control.ts"
+      }
+    ],
+    "account.provider_unlink_failed": [
+      {
+        "ref": "ACCOUNT_LOG.PROVIDER_UNLINK_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/account",
+        "file": "apps/web/src/constants/account.ts"
+      }
+    ],
+    "account.display_name_update_failed": [
+      {
+        "ref": "ACCOUNT_LOG.DISPLAY_NAME_UPDATE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/account",
+        "file": "apps/web/src/constants/account.ts"
       }
     ],
     "bookmark_button.status_fetch_failed": [
