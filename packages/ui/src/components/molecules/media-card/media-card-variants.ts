@@ -1,7 +1,9 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import {
   CARD_CONTAINER,
   INTERACTIVE_ITEM_CARD,
   tv,
+  TYPOGRAPHY,
 } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -14,7 +16,7 @@ export const mediaCardVariants = tv({
     ],
     media: [],
     content: ['flex flex-col flex-1', 'px-card-x py-card-y gap-2'],
-    excerpt: ['text-lead text-muted line-clamp-3'],
+    excerpt: [TYPOGRAPHY[TEXT_ROLE.CARD_BODY], 'line-clamp-3'],
     tags: ['flex flex-wrap gap-1.5 mt-1'],
   },
   variants: {

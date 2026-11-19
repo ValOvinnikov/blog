@@ -1,4 +1,8 @@
-import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import {
+  type IWithClassName,
+  type IWithDataTestId,
+  TEXT_ROLE,
+} from '@shinefold/config';
 import { Text } from '@shinefold/ui/components/atoms/text';
 import type { ReactNode } from 'react';
 
@@ -13,7 +17,11 @@ export const PricingCardDescription = ({
   dataTestId,
   children,
 }: TPricingCardDescriptionProps) => (
-  <Text variant="supporting" className={className} dataTestId={dataTestId}>
+  <Text
+    textRole={TEXT_ROLE.CARD_BODY}
+    className={className}
+    dataTestId={dataTestId}
+  >
     {children}
   </Text>
 );
