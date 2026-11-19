@@ -8,15 +8,15 @@ import { redirectMissingLanguagePage } from '@web/utils/redirect-missing-languag
 export const TagIndexPage = async () => {
   const result = await getTagIndexPage();
   await redirectMissingLanguagePage(result);
-  const { headingBlock, headingAlignment, hero, modules } =
-    guardPageLoaderResult(result, TAG_INDEX_LOG.PAGE_FETCH_FAILED);
+  const pageData = guardPageLoaderResult(
+    result,
+    TAG_INDEX_LOG.PAGE_FETCH_FAILED,
+  );
+  const { hero } = pageData;
 
   return (
     <TaxonomyIndexPage
-      hero={hero}
-      headingBlock={headingBlock}
-      headingAlignment={headingAlignment}
-      modules={modules}
+      pageData={pageData}
       breadcrumbs={<TagIndexBreadcrumbs isAbovePageHeading={!hero} />}
     />
   );

@@ -2,7 +2,10 @@ import { faker } from '@faker-js/faker';
 import { CONTENT_ALIGNMENT } from '@shinefold/config';
 import { TAXONOMY_KIND } from '@shinefold/config/constants';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
-import type { TModuleComponentProps } from '@web/modules/module-renderer';
+import {
+  renderModules,
+  type TModuleComponentProps,
+} from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -31,6 +34,7 @@ import { TaxonomyModuleRenderer } from './taxonomy-module-renderer';
 
 faker.seed(1186);
 
+vi.mock('@web/modules/module-renderer', { spy: true });
 vi.mock('@web/modules/module-gate/module-gate');
 vi.mock('@web/server/settings-features/is-module-entitled/is-module-entitled');
 
@@ -114,6 +118,14 @@ describe(`<${TaxonomyModuleRenderer.name}/>`, () => {
     expect(PostListModule).toHaveBeenCalledWith(
       { id: postListModule.id, context: MOCK_CONTEXT },
       undefined,
+    );
+  });
+
+  it('passes no slot to the modules when there are no children', async () => {
+    await setup({ modules: [mockModule('module_cta')] });
+
+    expect(renderModules).toHaveBeenCalledWith(
+      expect.objectContaining({ slot: undefined }),
     );
   });
 });

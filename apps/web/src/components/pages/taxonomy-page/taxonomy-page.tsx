@@ -24,7 +24,7 @@ interface ITaxonomyPageProps {
 export const TaxonomyPage = async ({
   kind,
   slug,
-  page,
+  page = 1,
   term,
   pageData,
   breadcrumbs,
@@ -42,7 +42,7 @@ export const TaxonomyPage = async ({
         headingAlignment={headingAlignment}
         modules={modules}
         context={{
-          page: page ?? 1,
+          page,
           archive: { id: term.id, kind, slug, name: term.title },
         }}
       >

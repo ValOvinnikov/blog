@@ -15,7 +15,11 @@ import {
   mockFaqPageQuestion,
 } from '@web/testing/shared/json-ld/fixtures';
 import { readJsonLd } from '@web/testing/shared/json-ld/read-json-ld';
-import { MOCK_POST_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
+import {
+  MOCK_BREADCRUMBS_STUB_TEST_ID,
+  MOCK_CHILDREN_STUB_TEST_ID,
+  MOCK_POST_LIST_ID,
+} from '@web/testing/shared/module-renderer-contract/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import {
   mockTopic,
@@ -45,9 +49,6 @@ vi.mock('@web/i18n/navigation');
 const getHeroBlogMock = vi.mocked(service.modules.heroBlog.v1.getHeroBlog);
 const getPostListMock = vi.mocked(service.modules.postList.v1.getPostList);
 
-const BREADCRUMBS_TEST_ID = 'taxonomy-page-breadcrumbs';
-const CHILDREN_TEST_ID = 'taxonomy-page-children';
-
 const MOCK_TERM = mockTopic({
   id: faker.string.uuid(),
   title: faker.lorem.word(),
@@ -75,13 +76,15 @@ const setup = customRenderServerAsync(TaxonomyPage, {
   slug: faker.lorem.slug(),
   term: MOCK_TERM,
   pageData: MOCK_PAGE_DATA,
-  breadcrumbs: <nav data-testid={BREADCRUMBS_TEST_ID} />,
+  breadcrumbs: <nav data-testid={MOCK_BREADCRUMBS_STUB_TEST_ID} />,
 });
 
 describe(`<${TaxonomyPage.name}/>`, () => {
   describe('with the default page', () => {
     beforeEach(async () => {
-      await setup({ children: <div data-testid={CHILDREN_TEST_ID} /> });
+      await setup({
+        children: <div data-testid={MOCK_CHILDREN_STUB_TEST_ID} />,
+      });
     });
 
     it('renders the page heading and supporting text inside main', () => {
@@ -97,14 +100,14 @@ describe(`<${TaxonomyPage.name}/>`, () => {
     });
 
     it('renders the given breadcrumbs outside main', () => {
-      const breadcrumbs = screen.getByTestId(BREADCRUMBS_TEST_ID);
+      const breadcrumbs = screen.getByTestId(MOCK_BREADCRUMBS_STUB_TEST_ID);
       const main = screen.getByRole('main');
 
       expect(main).not.toContainElement(breadcrumbs);
     });
 
     it('renders the given children inside main', () => {
-      const children = screen.getByTestId(CHILDREN_TEST_ID);
+      const children = screen.getByTestId(MOCK_CHILDREN_STUB_TEST_ID);
       const main = screen.getByRole('main');
 
       expect(main).toContainElement(children);

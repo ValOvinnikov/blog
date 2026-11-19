@@ -62,7 +62,7 @@ The Taxonomy List shows a browsable grid of topics or tags, each card carrying t
 
 ## Tests and stories
 
-- Web: `taxonomy-list-module.test.tsx`, `taxonomy-list-module-view.test.tsx`, and the index page renderer tests (`topic-index-module-renderer.test.tsx`, `tag-index-module-renderer.test.tsx`).
+- Web: `taxonomy-list-module.test.tsx`, `taxonomy-list-module-view.test.tsx`, and the index page renderer test (`taxonomy-index-module-renderer.test.tsx`).
 - Service: `features/modules/taxonomy-list/**/*.test.ts`.
 - Studio: `validate-taxonomy-list-matches-kind.test.ts`. UI: `taxonomy-card.test.tsx`.
 - Stories: `taxonomy-list-module-view.stories.tsx`, `packages/ui/src/components/molecules/taxonomy-card/taxonomy-card.stories.tsx`.
