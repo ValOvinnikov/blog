@@ -47,7 +47,7 @@ export const TeamSpotlight = ({
             height={IMAGE_SIZE_PX}
             sizes="(min-width: 1024px) 18rem, (min-width: 640px) 16rem, 12rem"
             loading="lazy"
-            className="size-full object-cover"
+            className={s.image()}
           />
         ) : (
           <Avatar
