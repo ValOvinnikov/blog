@@ -1,11 +1,14 @@
-import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
-import { MOCK_EMAIL_CONFIG } from '@shinefold/db/testing/email-config/fixtures';
+import {
+  MOCK_EMAIL_CONFIG,
+  insertTestEmailConfig,
+} from '@shinefold/db/testing/email-config/fixtures';
 import {
   insertTestTenant,
   insertTestReader,
   MOCK_OWNER_EMAIL,
 } from '@shinefold/db/testing/fixtures';
+import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { getContactRecipient } from './get-contact-recipient';
@@ -27,16 +30,11 @@ describe(getContactRecipient, () => {
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
     const { id: ownerId } = await insertTestReader(db(), MOCK_OWNER_EMAIL);
-    await db().insert(schema.memberships).values({
-      userId: ownerId,
-      tenantId,
-      role: MEMBERSHIP_ROLE.OWNER,
-    });
+    await mockMembership(db(), { userId: ownerId, tenantId });
   });
 
   it('returns the override when one is set', async () => {
-    await db().insert(schema.emailConfig).values({
-      tenantId,
+    await insertTestEmailConfig(db(), tenantId, {
       contactRecipient: MOCK_EMAIL_CONFIG.contactRecipient,
     });
 
@@ -46,7 +44,7 @@ describe(getContactRecipient, () => {
   });
 
   it("falls back to the owner's email when the override is unset", async () => {
-    await db().insert(schema.emailConfig).values({ tenantId });
+    await insertTestEmailConfig(db(), tenantId);
 
     const result = await getContactRecipient(tenantId);
 

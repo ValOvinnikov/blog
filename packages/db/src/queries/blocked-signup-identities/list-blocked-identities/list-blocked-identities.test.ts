@@ -1,21 +1,14 @@
 import { faker } from '@faker-js/faker';
-import {
-  ADMIN_ROLE,
-  BLOCKED_IDENTITY_KIND,
-  GRANTED_VIA,
-} from '@shinefold/db/constants';
+import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
 import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@shinefold/db/schema';
+import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
 import {
   MOCK_BLOCK_REASON,
   MOCK_BLOCKED_ADDRESS_DOMAIN,
   MOCK_BLOCKED_DOMAIN,
 } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
-import {
-  MOCK_OPERATOR_EMAIL,
-  insertTestAdmin,
-  insertTestUser,
-} from '@shinefold/db/testing/fixtures';
+import { MOCK_OPERATOR_EMAIL } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import {
@@ -57,17 +50,8 @@ async function insertBlockedDomain(
 async function insertAdmin(
   user: Partial<typeof schema.users.$inferInsert>,
 ): Promise<string> {
-  const { id: userId } = await insertTestUser(db(), user);
-  const [admin] = await db()
-    .insert(schema.admins)
-    .values({
-      userId,
-      role: ADMIN_ROLE.ADMIN,
-      grantedVia: GRANTED_VIA.PROMOTION,
-    })
-    .returning();
-  if (!admin) throw new Error('failed to seed an admin row');
-  return admin.id;
+  const { id } = await insertTestAdmin(db(), user);
+  return id;
 }
 
 async function listEntries(): Promise<TBlockedIdentityListing[]> {

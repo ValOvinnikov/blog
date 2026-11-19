@@ -11,6 +11,7 @@ import {
   insertTestTenant,
   insertTestUser,
 } from '@shinefold/db/testing/fixtures';
+import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
 import {
   mockAccountEmailIndex,
   testPersonalEmailIndex,
@@ -43,9 +44,7 @@ async function seedMember(
     emailIndex: mockAccountEmailIndex(email),
   });
   const tenant = await insertTestTenant(db(), overrides);
-  await db()
-    .insert(schema.memberships)
-    .values({ userId: user.id, tenantId: tenant.id, role });
+  await mockMembership(db(), { userId: user.id, tenantId: tenant.id, role });
 }
 
 afterEach(async () => {

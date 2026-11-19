@@ -1,7 +1,7 @@
 import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@shinefold/db/schema';
+import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
 import {
-  insertTestAdmin,
   insertTestTenant,
   MOCK_OPERATOR_EMAIL,
 } from '@shinefold/db/testing/fixtures';

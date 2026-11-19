@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import { ERROR_CODE } from '@shinefold/config/constants';
-import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import { isSignupBlocked } from '@shinefold/db/queries/blocked-signup-identities/is-signup-blocked';
 import { ownsFreeTenant } from '@shinefold/db/queries/tenants/owns-free-tenant';
 import {
@@ -14,6 +13,7 @@ import {
   MOCK_INVITE_EMAIL,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@shinefold/db/testing/fixtures';
+import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
 import { testPersonalEmailIndex } from '@shinefold/db/testing/personal-data';
 import {
   deleteTestPersonalDataRows,
@@ -178,11 +178,7 @@ describe(erasePersonalData, () => {
     });
 
     it("refuses to delete a site owner's account but still erases the site records", async () => {
-      await db().insert(schema.memberships).values({
-        tenantId,
-        userId: readerId,
-        role: MEMBERSHIP_ROLE.OWNER,
-      });
+      await mockMembership(db(), { tenantId, userId: readerId });
 
       const result = await erasePersonalData(
         MOCK_SUBSCRIBER_EMAIL,

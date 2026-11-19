@@ -1,12 +1,11 @@
 import { faker } from '@faker-js/faker';
 import { CARD_STYLE, LOCALE_ISO_CODES } from '@shinefold/config/constants';
-import * as schema from '@shinefold/db/schema';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   DEFAULT_CONTROL_STYLES,
   MOCK_NOT_FOUND_HEADING,
-  MOCK_SITE_CONFIG_FIELDS,
+  insertTestSiteConfig,
 } from '@shinefold/db/testing/site-config/fixtures';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
@@ -37,10 +36,7 @@ describe(getSiteConfig, () => {
   });
 
   it('maps null theme columns to undefined', async () => {
-    const [row] = await db()
-      .insert(schema.siteConfig)
-      .values({ tenantId, ...MOCK_SITE_CONFIG_FIELDS })
-      .returning();
+    const row = await insertTestSiteConfig(db(), tenantId);
 
     const result = await getSiteConfig(tenantId);
 
@@ -58,9 +54,7 @@ describe(getSiteConfig, () => {
   });
 
   it('reads the default control styles for a row stored without them', async () => {
-    await db()
-      .insert(schema.siteConfig)
-      .values({ tenantId, ...MOCK_SITE_CONFIG_FIELDS });
+    await insertTestSiteConfig(db(), tenantId);
 
     const result = await getSiteConfig(tenantId);
 
@@ -75,14 +69,9 @@ describe(getSiteConfig, () => {
       [LOCALE_ISO_CODES.DE]: { notFoundHeading: MOCK_NOT_FOUND_HEADING },
       [LOCALE_ISO_CODES.EN]: { notFoundHeading: MOCK_EN_NOT_FOUND_HEADING },
     };
-    const [row] = await db()
-      .insert(schema.siteConfig)
-      .values({
-        tenantId: germanTenantId,
-        ...MOCK_SITE_CONFIG_FIELDS,
-        voiceOverridesByLocale,
-      })
-      .returning();
+    const row = await insertTestSiteConfig(db(), germanTenantId, {
+      voiceOverridesByLocale,
+    });
 
     const result = await getSiteConfig(germanTenantId);
 
@@ -99,13 +88,9 @@ describe(getSiteConfig, () => {
   });
 
   it('returns when the Look was last saved', async () => {
-    await db()
-      .insert(schema.siteConfig)
-      .values({
-        tenantId,
-        ...MOCK_SITE_CONFIG_FIELDS,
-        lookSavedAt: MOCK_LOOK_SAVED_AT,
-      });
+    await insertTestSiteConfig(db(), tenantId, {
+      lookSavedAt: MOCK_LOOK_SAVED_AT,
+    });
 
     const result = await getSiteConfig(tenantId);
 

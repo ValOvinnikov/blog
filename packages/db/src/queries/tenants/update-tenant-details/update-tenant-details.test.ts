@@ -37,6 +37,7 @@ import {
 import {
   countLockedMemberships,
   insertTeam,
+  mockMembership,
 } from '@shinefold/db/testing/memberships/fixtures';
 import {
   decryptTestPersonalValue,
@@ -44,6 +45,7 @@ import {
 } from '@shinefold/db/testing/personal-data';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_SANITY_PROJECT_ID } from '@shinefold/db/testing/sanity-management-client/fixtures';
+import { insertTestTenantDomain } from '@shinefold/db/testing/tenant-domains/fixtures';
 import {
   MOCK_IDLE_PROVISIONING_STEPS,
   MOCK_MISSING_TENANT_ID,
@@ -148,7 +150,7 @@ async function insertTenantWithDomain(overrides?: {
     provisioningSteps: overrides?.provisioningSteps,
   });
 
-  await db().insert(tenantDomains).values({ tenantId: tenant.id, domain });
+  await insertTestTenantDomain(db(), tenant.id, domain);
 
   return tenant.id;
 }
@@ -169,9 +171,7 @@ async function insertOwnerMember(
 ): Promise<string> {
   const { id: userId } = await insertTestUser(db(), user);
 
-  await db()
-    .insert(memberships)
-    .values({ tenantId, userId, role: MEMBERSHIP_ROLE.OWNER });
+  await mockMembership(db(), { tenantId, userId });
 
   return userId;
 }
@@ -515,9 +515,7 @@ describe(updateTenantDetails, () => {
     });
 
     it('returns domain-taken when renaming onto its own secondary domain', async () => {
-      await db()
-        .insert(tenantDomains)
-        .values({ tenantId, domain: MOCK_ALT_DOMAIN });
+      await insertTestTenantDomain(db(), tenantId, MOCK_ALT_DOMAIN);
 
       const result = await updateTenantDetails(tenantId, {
         ...MOCK_VALID_INPUT,

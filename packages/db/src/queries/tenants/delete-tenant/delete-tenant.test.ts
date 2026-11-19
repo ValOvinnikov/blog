@@ -5,13 +5,7 @@ import {
   TENANT_DELETE_OUTCOME,
   TENANT_DELETE_SANITY_PROJECT_OUTCOME,
 } from '@shinefold/config';
-import {
-  DENSITY,
-  FONT_CHOICE,
-  PRESET_ID,
-  RADIUS_SCALE,
-} from '@shinefold/config/constants';
-import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@shinefold/db/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import {
@@ -20,6 +14,7 @@ import {
   insertTestUser,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@shinefold/db/testing/fixtures';
+import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   emptyResponse,
@@ -34,6 +29,8 @@ import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_SANITY_TOKEN,
 } from '@shinefold/db/testing/sanity-management-client/fixtures';
+import { insertTestSiteConfig } from '@shinefold/db/testing/site-config/fixtures';
+import { insertTestTenantDomain } from '@shinefold/db/testing/tenant-domains/fixtures';
 import {
   MOCK_DEPROVISIONED_AT,
   MOCK_MISSING_TENANT_ID,
@@ -51,7 +48,6 @@ const db = useQueryTestDb();
 
 const MOCK_USER_ID = faker.string.uuid();
 const MOCK_POST_ID = faker.string.uuid();
-const MOCK_ACCENT_HUE = faker.number.int({ min: 0, max: 359 });
 const MOCK_ERROR_BODY = faker.lorem.sentence();
 const MOCK_BILLING_DENIED_BODY = {
   code: HTTP_STATUS.UNAUTHORIZED,
@@ -109,15 +105,8 @@ describe(deleteTenant, () => {
       });
 
       it('cascades to the tenant membership and tenant_domains rows', async () => {
-        await db().insert(schema.memberships).values({
-          userId: MOCK_USER_ID,
-          tenantId,
-          role: MEMBERSHIP_ROLE.OWNER,
-        });
-        await db().insert(schema.tenantDomains).values({
-          tenantId,
-          domain: MOCK_TENANT_DOMAIN,
-        });
+        await mockMembership(db(), { userId: MOCK_USER_ID, tenantId });
+        await insertTestTenantDomain(db(), tenantId, MOCK_TENANT_DOMAIN);
 
         await deleteTenant(tenantId);
 
@@ -157,15 +146,7 @@ describe(deleteTenant, () => {
     });
 
     it('cascades to a dependent site_config row for that tenant', async () => {
-      await db().insert(schema.siteConfig).values({
-        tenantId,
-        preset: PRESET_ID.CONSOLE,
-        accentHue: MOCK_ACCENT_HUE,
-        headingFont: FONT_CHOICE.SPACE_GROTESK,
-        bodyFont: FONT_CHOICE.NEWSREADER,
-        radiusScale: RADIUS_SCALE.MD,
-        density: DENSITY.DEFAULT,
-      });
+      await insertTestSiteConfig(db(), tenantId);
 
       await deleteTenant(tenantId);
 
