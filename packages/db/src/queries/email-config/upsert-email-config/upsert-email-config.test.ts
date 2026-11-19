@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker';
 import * as schema from '@shinefold/db/schema';
 import { MOCK_EMAIL_CONFIG } from '@shinefold/db/testing/email-config/fixtures';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { upsertEmailConfig } from './upsert-email-config';
 
@@ -15,29 +15,23 @@ const MOCK_INVALID_EMAIL = faker.lorem.word();
 const MOCK_UPDATED_SENDER_NAME = faker.company.name();
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 
 afterEach(async () => {
   await db().delete(schema.emailConfig);
-  await db().delete(schema.tenants);
 });
 
 describe(upsertEmailConfig, () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
   it('inserts a new row when the tenant has no email config yet', async () => {
     const { senderName, replyToAddress } = MOCK_EMAIL_CONFIG;
 
-    const result = await upsertEmailConfig(tenantId, {
+    const result = await upsertEmailConfig(tenant().id, {
       senderName,
       replyToAddress,
     });
 
     expect(result).toMatchObject({
-      tenantId,
+      tenantId: tenant().id,
       senderName,
       replyToAddress,
       logoAssetUrl: undefined,
@@ -46,9 +40,9 @@ describe(upsertEmailConfig, () => {
   });
 
   it('turns emailing new posts off and leaves it off on a later save', async () => {
-    await upsertEmailConfig(tenantId, { emailNewPosts: false });
+    await upsertEmailConfig(tenant().id, { emailNewPosts: false });
 
-    const result = await upsertEmailConfig(tenantId, {
+    const result = await upsertEmailConfig(tenant().id, {
       senderName: MOCK_EMAIL_CONFIG.senderName,
     });
 
@@ -56,11 +50,11 @@ describe(upsertEmailConfig, () => {
   });
 
   it('updates the existing row, leaving one row per tenant', async () => {
-    await upsertEmailConfig(tenantId, {
+    await upsertEmailConfig(tenant().id, {
       senderName: MOCK_EMAIL_CONFIG.senderName,
     });
 
-    const result = await upsertEmailConfig(tenantId, {
+    const result = await upsertEmailConfig(tenant().id, {
       senderName: MOCK_UPDATED_SENDER_NAME,
     });
 
@@ -69,14 +63,15 @@ describe(upsertEmailConfig, () => {
     expect(rows).toHaveLength(1);
   });
 
-  it('rejects a malformed reply-to address', async () => {
-    await expect(
-      upsertEmailConfig(tenantId, { replyToAddress: MOCK_INVALID_EMAIL }),
-    ).rejects.toThrow();
+  it.each([
+    ['reply-to address', { replyToAddress: MOCK_INVALID_EMAIL }],
+    ['contact recipient', { contactRecipient: MOCK_INVALID_EMAIL }],
+  ])('rejects a malformed %s', async (_field, input) => {
+    await expect(upsertEmailConfig(tenant().id, input)).rejects.toThrow();
   });
 
   it('stores the contact recipient override', async () => {
-    const result = await upsertEmailConfig(tenantId, {
+    const result = await upsertEmailConfig(tenant().id, {
       contactRecipient: MOCK_EMAIL_CONFIG.contactRecipient,
     });
 
@@ -84,21 +79,15 @@ describe(upsertEmailConfig, () => {
   });
 
   it('clears the contact recipient override when set to null', async () => {
-    await upsertEmailConfig(tenantId, {
+    await upsertEmailConfig(tenant().id, {
       contactRecipient: MOCK_EMAIL_CONFIG.contactRecipient,
     });
 
-    const result = await upsertEmailConfig(tenantId, {
+    const result = await upsertEmailConfig(tenant().id, {
       contactRecipient: null,
     });
 
     expect(result.contactRecipient).toBeUndefined();
-  });
-
-  it('rejects a malformed contact recipient', async () => {
-    await expect(
-      upsertEmailConfig(tenantId, { contactRecipient: MOCK_INVALID_EMAIL }),
-    ).rejects.toThrow();
   });
 
   it('rejects a tenantId with no matching tenants row', async () => {
@@ -111,13 +100,13 @@ describe(upsertEmailConfig, () => {
 
   describe('partial updates', () => {
     beforeEach(async () => {
-      await upsertEmailConfig(tenantId, {
+      await upsertEmailConfig(tenant().id, {
         footerPostalAddress: MOCK_EMAIL_CONFIG.footerPostalAddress,
       });
     });
 
     it('preserves footerPostalAddress when a later update omits the field', async () => {
-      const result = await upsertEmailConfig(tenantId, {
+      const result = await upsertEmailConfig(tenant().id, {
         senderName: MOCK_EMAIL_CONFIG.senderName,
       });
 
@@ -127,7 +116,7 @@ describe(upsertEmailConfig, () => {
     });
 
     it('clears footerPostalAddress when explicitly set to null', async () => {
-      const result = await upsertEmailConfig(tenantId, {
+      const result = await upsertEmailConfig(tenant().id, {
         footerPostalAddress: null,
       });
 

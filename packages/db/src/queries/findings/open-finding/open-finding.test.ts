@@ -17,8 +17,8 @@ import {
   MOCK_FINDING_NOW,
   mockOpenFindingInput,
 } from '@shinefold/db/testing/findings/fixtures';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { eq } from 'drizzle-orm';
 
 import { openFinding } from './open-finding';
@@ -28,21 +28,19 @@ faker.seed(6021009);
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 
 afterEach(async () => {
   vi.useRealTimers();
   vi.restoreAllMocks();
   await db().delete(schema.findings);
-  await db().delete(schema.tenants);
 });
 
 describe(openFinding, () => {
-  let tenantId: string;
   let input: TOpenFindingInput;
 
   beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-    input = mockOpenFindingInput({ tenantId });
+    input = mockOpenFindingInput({ tenantId: tenant().id });
     vi.useFakeTimers({ now: MOCK_FINDING_NOW, toFake: ['Date'] });
   });
 
@@ -64,7 +62,7 @@ describe(openFinding, () => {
 
     expect(row).toEqual({
       id: row?.id,
-      tenantId,
+      tenantId: tenant().id,
       source: input.source,
       kind: input.kind,
       severity: input.severity,
@@ -79,7 +77,7 @@ describe(openFinding, () => {
 
   it('detecting the same condition twice yields one open row, not two', async () => {
     const stalledInput = mockOpenFindingInput({
-      tenantId,
+      tenantId: tenant().id,
       source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
       kind: FINDING_KIND.OWNER_CHECK_STALLED,
     });
@@ -95,7 +93,7 @@ describe(openFinding, () => {
     const rows = await db()
       .select()
       .from(schema.findings)
-      .where(eq(schema.findings.tenantId, tenantId));
+      .where(eq(schema.findings.tenantId, tenant().id));
     expect(second).toEqual({
       ok: true,
       data: {
@@ -122,7 +120,7 @@ describe(openFinding, () => {
     const rows = await db()
       .select()
       .from(schema.findings)
-      .where(eq(schema.findings.tenantId, tenantId));
+      .where(eq(schema.findings.tenantId, tenant().id));
     const reopened = rows.find(({ id }) => id !== first.data.finding.id);
     expect(second).toEqual({
       ok: true,
@@ -171,7 +169,9 @@ describe(openFinding, () => {
     });
 
     it('removes a finding when its owning tenant is deleted', async () => {
-      await db().delete(schema.tenants).where(eq(schema.tenants.id, tenantId));
+      await db()
+        .delete(schema.tenants)
+        .where(eq(schema.tenants.id, tenant().id));
 
       const rows = await db().select().from(schema.findings);
       expect(rows).toHaveLength(0);

@@ -29,11 +29,14 @@ code:
   - apps/web/src/components/pages/tag-page/**
   - apps/web/src/components/pages/topic-index-page/**
   - apps/web/src/components/pages/tag-index-page/**
+  - apps/web/src/components/pages/taxonomy-page/**
+  - apps/web/src/components/pages/taxonomy-index-page/**
   - apps/web/src/components/features/topic/**
   - apps/web/src/components/features/tag/**
   - apps/web/src/components/features/topic-index/**
   - apps/web/src/components/features/tag-index/**
   - apps/web/src/components/shared/topic-chip-list/**
+  - apps/web/src/components/shared/taxonomy-breadcrumbs/**
   - apps/web/src/server/topic/**
   - apps/web/src/server/tag/**
   - apps/web/src/server/topic-index/**
@@ -98,14 +101,14 @@ Posts are classified two ways: each post has exactly one **topic** (its primary 
 - `packages/studio/src/schema-types/documents/pages/taxonomy-index/taxonomy-index-page.ts`
 - `packages/service/src/shared/fragments/archive-page/archive-page-slug.ts`
 - `packages/service/src/features/pages/topic/adaptor/detail-page/query.ts` (and the tag equivalent)
-- `apps/web/src/components/pages/topic-page/topic-page.tsx`, `tag-page/tag-page.tsx`
+- `apps/web/src/components/pages/taxonomy-page/taxonomy-page.tsx` (shared by `topic-page/` and `tag-page/`), `taxonomy-index-page/taxonomy-index-page.tsx` (shared by both index pages)
 - `apps/web/src/app/[tenant]/[locale]/tags/[slug]/rss.xml/route.ts`
 
 ## Tests and stories
 
 - Studio: `validate-has-page.test.ts`, `validate-unique-taxonomy-reference.test.ts`, `validate-taxonomy-list-matches-kind.test.ts`.
 - Service: `packages/service/src/features/pages/{topic,tag,topic-index,tag-index}/**/*.test.ts`, `features/entities/{topics,tags}/**/*.test.ts`, `topic.test.ts`, `tag.test.ts`, `archive-page-slug.test.ts`.
-- Web: the four page tests and their `*-module-renderer.test.tsx`, `topic-chips.test.tsx`, `topic-breadcrumbs.test.tsx`, `tag-breadcrumbs.test.tsx`, the four metadata builders' tests.
+- Web: the four page tests, `taxonomy-page.test.tsx`, `taxonomy-module-renderer.test.tsx`, `taxonomy-index-module-renderer.test.tsx`, `topic-chips.test.tsx`, `topic-breadcrumbs.test.tsx`, `tag-breadcrumbs.test.tsx`, `taxonomy-breadcrumbs.test.tsx`, the four metadata builders' tests.
 - Stories: `tag-index-page.stories.tsx`, `topic-index-page.stories.tsx`.
 
 ## Related

@@ -982,7 +982,8 @@
     "skinLabel": {
       "PRIMARY": "Plain",
       "SECONDARY": "Shaded",
-      "BRAND_PRIMARY": "Brand tint"
+      "BRAND_PRIMARY": "Brand tint",
+      "INK": "Ink"
     },
     "footerSurfaceLabel": "Surface",
     "footerSurfaceDescription": "Whether the footer spans the page or sits as a card.",

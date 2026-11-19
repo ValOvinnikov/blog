@@ -1,0 +1,59 @@
+name: Sync Revalidate Webhooks
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'GitHub Environment the run resolves its credentials from'
+        required: true
+        type: choice
+        options: [development, production]
+        default: development
+      script:
+        description: "sync updates every live tenant's webhook; rotate-secrets gives each tenant without one its own secret"
+        required: true
+        type: choice
+        options: [sync, rotate-secrets]
+        default: sync
+
+permissions:
+  contents: read
+
+# Both scripts write each tenant's webhook and secret, so any two runs queue.
+concurrency:
+  group: sync-revalidate-webhooks
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 11.21.0
+  NODE_VERSION: '24'
+
+jobs:
+  sync:
+    name: Sync revalidate webhooks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: ${{ inputs.environment }}
+    env:
+      DATABASE_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL }}
+      TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
+      # Must equal the environment's web URL exactly: the step finds each hook by URL, so a mismatch adds a second one.
+      WEB_APP_URL: ${{ vars.WEB_APP_URL }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+          install-filter: 'worker...'
+      - name: Run the webhook step
+        env:
+          SCRIPT: ${{ inputs.script }}
+        run: |
+          case "$SCRIPT" in
+            sync) pnpm --filter worker sync-revalidate-webhooks ;;
+            rotate-secrets) pnpm --filter worker rotate-webhook-secrets ;;
+            *) echo "Unknown script: $SCRIPT" >&2; exit 1 ;;
+          esac

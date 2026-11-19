@@ -1,15 +1,9 @@
-import { faker } from '@faker-js/faker';
-import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@shinefold/config';
 import { buildSectionIndexMetadata } from '@web/metadata/section-index-metadata';
-import { enterRequestContext } from '@web/server/request-context/request-context';
+import { testPageRouteContract } from '@web/testing/app/page-route-contract';
 import { mockRouteParams } from '@web/testing/app/route-params';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import PrivacyIndexRoute, { generateMetadata, revalidate } from './page';
-
-faker.seed(6524);
-
-const MOCK_METADATA = { title: faker.lorem.words(2) };
 
 const params = mockRouteParams();
 
@@ -27,41 +21,21 @@ vi.mock('@web/metadata/section-index-metadata', () => ({
 
 const setup = customRenderAsync(PrivacyIndexRoute, { params });
 
+testPageRouteContract({
+  page: PrivacyIndexRoute,
+  generateMetadata,
+  revalidate,
+  params,
+  buildMetadata: buildSectionIndexMetadata,
+  buildMetadataArgs: ['page_privacyIndex'],
+});
+
 describe(`<${PrivacyIndexRoute.name}/>`, () => {
-  beforeEach(async () => {
+  it('renders the privacy hub', async () => {
     await setup();
-  });
 
-  it('declares the shared content-route revalidate backstop', () => {
-    expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
-  });
-
-  it('enters the request context with the route params', () => {
-    expect(enterRequestContext).toHaveBeenCalledWith(params);
-  });
-
-  it('renders the privacy hub', () => {
     const page = screen.getByTestId('section-index-page');
 
     expect(page).toHaveTextContent('page_privacyIndex');
-  });
-});
-
-describe(generateMetadata, () => {
-  beforeEach(() => {
-    vi.mocked(buildSectionIndexMetadata).mockResolvedValue(MOCK_METADATA);
-  });
-
-  it('returns the privacy hub metadata', async () => {
-    const metadata = await generateMetadata({ params });
-
-    expect(metadata).toBe(MOCK_METADATA);
-    expect(buildSectionIndexMetadata).toHaveBeenCalledWith('page_privacyIndex');
-  });
-
-  it('enters the request context before building the metadata', async () => {
-    await generateMetadata({ params });
-
-    expect(enterRequestContext).toHaveBeenCalledWith(params);
   });
 });

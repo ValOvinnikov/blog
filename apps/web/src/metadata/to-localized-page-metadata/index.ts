@@ -1,1 +1,4 @@
-export { toLocalizedPageMetadata } from './to-localized-page-metadata';
+export {
+  toLocalizedPageMetadata,
+  type TToLocalizedPageMetadataOptions,
+} from './to-localized-page-metadata';

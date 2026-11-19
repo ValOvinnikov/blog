@@ -5,6 +5,7 @@ import {
   type TBlockedIdentityKind,
 } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
+import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
 import {
   MOCK_BLOCK_REASON,
   MOCK_BLOCKED_ADDRESS,
@@ -16,7 +17,6 @@ import {
   MOCK_NOT_A_DOMAIN,
   MOCK_NOT_AN_ADDRESS,
 } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
-import { insertTestAdmin } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
 

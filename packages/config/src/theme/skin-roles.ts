@@ -5,12 +5,16 @@ import { SCHEME_RAMPS } from './contrast-scheme-ramps';
 import {
   AMBIENT,
   AMBIENT_RAISED,
+  BORDER,
   BORDER_EMPHASIS,
   BRAND_PRIMARY,
   BRAND_PRIMARY_MUTED,
   BRAND_PRIMARY_WASH,
   ERROR_MUTED,
+  FIELD_BOUNDARY,
+  PRIMARY,
   PRIMARY_SUBTLE,
+  SURFACE,
   SURFACE_2,
   TEXT,
   TEXT_MUTED,
@@ -19,6 +23,8 @@ import { PALETTE } from './palette-ramps';
 
 export type TPaletteStop = keyof typeof PALETTE;
 
+export const DARKEST_NEUTRAL = '--palette-neutral-2700' satisfies TPaletteStop;
+
 export const SKIN_GROUND_ROLES = [
   AMBIENT,
   '--backdrop',
@@ -26,7 +32,7 @@ export const SKIN_GROUND_ROLES = [
 ] as const;
 
 export const SKIN_FILL_ROLES = [
-  '--surface',
+  SURFACE,
   SURFACE_2,
   BRAND_PRIMARY_MUTED,
   BRAND_PRIMARY_WASH,
@@ -37,10 +43,10 @@ const SKIN_INK_ROLES = [
   TEXT,
   TEXT_MUTED,
   '--text-subtle',
-  '--border',
+  BORDER,
   '--border-strong',
   BORDER_EMPHASIS,
-  '--field-boundary',
+  FIELD_BOUNDARY,
   BRAND_PRIMARY,
   '--brand-primary-hover',
   '--brand-primary-solid',
@@ -88,10 +94,10 @@ export const BRAND_SCRIMS = {
 } as const satisfies Record<TSkinScrimRole, TThemeToken>;
 
 const PAGE_ROLE_SOURCES: Partial<Record<TSkinStopRole, TThemeToken>> = {
-  [AMBIENT]: '--primary',
-  '--backdrop': '--primary',
+  [AMBIENT]: PRIMARY,
+  '--backdrop': PRIMARY,
   [AMBIENT_RAISED]: PRIMARY_SUBTLE,
-  '--divider': '--border',
+  '--divider': BORDER,
   '--text-subtle': TEXT_MUTED,
 };
 

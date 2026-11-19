@@ -1,12 +1,15 @@
 'use server';
 
 import { ACTION_OUTCOME, type TActionResult } from '@shinefold/config';
-import { queries } from '@shinefold/db';
-import { toOutcome } from '@shinefold/utils/to-outcome';
 import {
-  DISPLAY_NAME_UPDATE_FAILED_EVENT,
-  PROVIDER_UNLINK_FAILED_EVENT,
-} from '@web/constants/account';
+  OAUTH_PROVIDER,
+  type TOAuthProvider,
+  UNLINK_PROVIDER_OUTCOME,
+} from '@shinefold/config/constants';
+import { queries } from '@shinefold/db';
+import { hasLength } from '@shinefold/utils/primitives';
+import { toOutcome } from '@shinefold/utils/to-outcome';
+import { ACCOUNT_LOG } from '@web/constants/account';
 import {
   FIELD_ERROR,
   type TFieldErrorReason,
@@ -14,9 +17,10 @@ import {
 import { auth } from '@web/server/auth/auth';
 import { logger } from '@web/utils/logger/logger';
 
-export type TLinkableProvider = 'github' | 'google';
+export type TLinkableProvider = TOAuthProvider;
 
-const LINKABLE_PROVIDERS: readonly TLinkableProvider[] = ['github', 'google'];
+const LINKABLE_PROVIDERS: readonly TLinkableProvider[] =
+  Object.values(OAUTH_PROVIDER);
 
 // A server action's endpoint can be called directly with any string, so the parameter type alone does not guard it.
 const isLinkableProvider = (value: string): value is TLinkableProvider => {
@@ -47,12 +51,12 @@ export const unlinkProviderAction = async (
 
   try {
     const result = await queries.account.unlinkProvider(userId, provider);
-    if (result.outcome === 'last-method') {
+    if (result.outcome === UNLINK_PROVIDER_OUTCOME.LAST_METHOD) {
       return toOutcome(ACTION_OUTCOME.BLOCKED);
     }
     return SUCCESS;
   } catch (error) {
-    logger.error(PROVIDER_UNLINK_FAILED_EVENT, { provider, error });
+    logger.error(ACCOUNT_LOG.PROVIDER_UNLINK_FAILED, { provider, error });
     return SERVER_ERROR;
   }
 };
@@ -65,7 +69,7 @@ export const updateDisplayNameAction = async (
   if (!userId) return SERVER_ERROR;
 
   const trimmedName = name.trim();
-  if (trimmedName.length === 0) {
+  if (!hasLength(trimmedName)) {
     return {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: { name: { reason: FIELD_ERROR.INVALID } },
@@ -76,7 +80,7 @@ export const updateDisplayNameAction = async (
     await queries.account.updateDisplayName(userId, trimmedName);
     return SUCCESS;
   } catch (error) {
-    logger.error(DISPLAY_NAME_UPDATE_FAILED_EVENT, { error });
+    logger.error(ACCOUNT_LOG.DISPLAY_NAME_UPDATE_FAILED, { error });
     return SERVER_ERROR;
   }
 };

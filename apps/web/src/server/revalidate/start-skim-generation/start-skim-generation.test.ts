@@ -1,8 +1,13 @@
 import { faker } from '@faker-js/faker';
-import { SANITY_WEBHOOK_OPERATION } from '@shinefold/config/constants';
+import {
+  SANITY_WEBHOOK_OPERATION,
+  STARTER_DOCUMENT_ID_PREFIX,
+} from '@shinefold/config/constants';
 import { errorResult, okResult } from '@shinefold/utils';
-import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
-import { STARTER_DOCUMENT_ID_PREFIX } from '@web/constants/revalidate';
+import {
+  GENERATE_SKIM_LOG,
+  SKIM_GO_LIVE_PATH,
+} from '@web/constants/generate-skim';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { enqueueWorkerRun } from '@web/server/revalidate/enqueue-worker-run/enqueue-worker-run';
 import { generatePostSkim } from '@web/server/skim/generate-post-skim/generate-post-skim';
@@ -164,7 +169,7 @@ describe(startSkimGeneration, () => {
 
     expect(generatePostSkim).not.toHaveBeenCalled();
     expect(enqueueWorkerRun).toHaveBeenCalledWith({
-      path: '/api/scheduled-post-skim',
+      path: SKIM_GO_LIVE_PATH,
       request: {
         tenantId: MOCK_TENANT_ID,
         postId: MOCK_POST_ID,
@@ -178,17 +183,32 @@ describe(startSkimGeneration, () => {
     });
   });
 
-  it('logs a failed publish-date lookup and generates nothing', async () => {
-    getPostPublishedAtMock.mockResolvedValue(errorResult(MOCK_ERROR));
-
-    await start();
-
-    expect(logger.error).toHaveBeenCalledWith(
+  it.each([
+    [
+      'publish-date',
+      getPostPublishedAtMock,
       GENERATE_SKIM_LOG.PUBLISHED_AT_LOOKUP_FAILED,
-      { tenantId: MOCK_TENANT_ID, postId: MOCK_POST_ID, error: MOCK_ERROR },
-    );
-    expect(generatePostSkim).not.toHaveBeenCalled();
-  });
+    ],
+    [
+      'takeaways',
+      hasPostTakeawaysMock,
+      GENERATE_SKIM_LOG.TAKEAWAYS_LOOKUP_FAILED,
+    ],
+  ])(
+    'logs a failed %s lookup and generates nothing',
+    async (_lookup, lookupMock, event) => {
+      lookupMock.mockResolvedValue(errorResult(MOCK_ERROR));
+
+      await start();
+
+      expect(logger.error).toHaveBeenCalledWith(event, {
+        tenantId: MOCK_TENANT_ID,
+        postId: MOCK_POST_ID,
+        error: MOCK_ERROR,
+      });
+      expect(generatePostSkim).not.toHaveBeenCalled();
+    },
+  );
 
   it('logs and generates nothing for a tenant that is no longer servable', async () => {
     vi.mocked(resolveTenantById).mockResolvedValue(undefined);
@@ -210,18 +230,6 @@ describe(startSkimGeneration, () => {
     expect(hasPostTakeawaysMock).toHaveBeenCalledWith(
       MOCK_POST_ID,
       MOCK_TENANT_SANITY_CONTEXT,
-    );
-    expect(generatePostSkim).not.toHaveBeenCalled();
-  });
-
-  it('logs a failed takeaways lookup and generates nothing', async () => {
-    hasPostTakeawaysMock.mockResolvedValue(errorResult(MOCK_ERROR));
-
-    await start();
-
-    expect(logger.error).toHaveBeenCalledWith(
-      GENERATE_SKIM_LOG.TAKEAWAYS_LOOKUP_FAILED,
-      { tenantId: MOCK_TENANT_ID, postId: MOCK_POST_ID, error: MOCK_ERROR },
     );
     expect(generatePostSkim).not.toHaveBeenCalled();
   });

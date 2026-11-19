@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { ERROR_BOUNDARY_LOG } from '@web/constants/error-boundary';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import {
   customRender,
@@ -63,59 +64,75 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
       ({ rerender } = setup());
     });
 
-    it('renders the translated heading, copy, and actions', () => {
+    it('renders the translated heading and copy', () => {
       const heading = screen.getByRole('heading', {
         level: 1,
         name: HEADING,
       });
       const copy = screen.getByText(DESCRIPTION);
-      const tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
 
       expect(heading).toBeVisible();
       expect(copy).toBeVisible();
-      expect(tryAgainButton).toBeVisible();
     });
 
-    it('renders "Go home" as a real link, not a button', () => {
-      const goHomeLink = screen.getByRole('link', { name: GO_HOME });
+    describe('its actions', () => {
+      let tryAgainButton: HTMLElement;
+      let goHomeLink: HTMLElement;
 
-      expect(goHomeLink).toBeVisible();
-      expect(goHomeLink).toHaveAttribute('href', routes.home());
-    });
-
-    it('announces the error to assistive technology after mount', () => {
-      const liveRegion = screen.getByText(announcement, {
-        selector: ARIA_LIVE_ASSERTIVE_SELECTOR,
+      beforeEach(() => {
+        tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
+        goHomeLink = screen.getByRole('link', { name: GO_HOME });
       });
 
-      expect(liveRegion).toBeVisible();
-    });
-
-    it('names both actions in the announcement as the controls render them', () => {
-      const tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
-      const goHomeLink = screen.getByRole('link', { name: GO_HOME });
-      const lowerAnnouncement = announcement.toLowerCase();
-
-      expect(lowerAnnouncement).toContain(
-        (tryAgainButton.textContent ?? '').toLowerCase(),
-      );
-      expect(lowerAnnouncement).toContain(
-        (goHomeLink.textContent ?? '').toLowerCase(),
-      );
-    });
-
-    it('sets aria-atomic on the live region', () => {
-      const liveRegion = screen.getByText(announcement, {
-        selector: ARIA_LIVE_ASSERTIVE_SELECTOR,
+      it('renders a try-again button', () => {
+        expect(tryAgainButton).toBeVisible();
       });
 
-      expect(liveRegion).toHaveAttribute('aria-atomic', 'true');
+      it('calls reset when "Try again" is clicked', async () => {
+        await user.click(tryAgainButton);
+
+        expect(reset).toHaveBeenCalledTimes(1);
+      });
+
+      it('renders "Go home" as a real link, not a button', () => {
+        expect(goHomeLink).toBeVisible();
+        expect(goHomeLink).toHaveAttribute('href', routes.home());
+      });
+
+      it('names both actions in the announcement as the controls render them', () => {
+        const lowerAnnouncement = announcement.toLowerCase();
+
+        expect(lowerAnnouncement).toContain(
+          (tryAgainButton.textContent ?? '').toLowerCase(),
+        );
+        expect(lowerAnnouncement).toContain(
+          (goHomeLink.textContent ?? '').toLowerCase(),
+        );
+      });
+    });
+
+    describe('its live region', () => {
+      let liveRegion: HTMLElement;
+
+      beforeEach(() => {
+        liveRegion = screen.getByText(announcement, {
+          selector: ARIA_LIVE_ASSERTIVE_SELECTOR,
+        });
+      });
+
+      it('announces the error to assistive technology after mount', () => {
+        expect(liveRegion).toBeVisible();
+      });
+
+      it('sets aria-atomic on the live region', () => {
+        expect(liveRegion).toHaveAttribute('aria-atomic', 'true');
+      });
     });
 
     it('reports the error exactly once on mount, with its digest', () => {
       expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
       expect(reportClientErrorMock).toHaveBeenCalledWith(
-        'locale_error_boundary.render_failed',
+        ERROR_BOUNDARY_LOG.LOCALE_RENDER_FAILED,
         error,
         { digest: MOCK_ERROR_DIGEST },
       );
@@ -125,14 +142,6 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
       rerender(<LocaleErrorPage error={error} reset={reset} />);
 
       expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
-    });
-
-    it('calls reset when "Try again" is clicked', async () => {
-      const tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
-
-      await user.click(tryAgainButton);
-
-      expect(reset).toHaveBeenCalledTimes(1);
     });
 
     it('moves focus to the page container on mount', () => {

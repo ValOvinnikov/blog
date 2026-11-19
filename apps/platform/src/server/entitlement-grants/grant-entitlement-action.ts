@@ -11,10 +11,7 @@ import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { resolveLiveTenant } from '@platform/server/tenants/resolve-live-tenant';
 import { grantExpiresAt } from '@platform/utils/grant-expires-at/grant-expires-at';
-import {
-  isCoveredByPlan,
-  type TPlanCoverageItem,
-} from '@platform/utils/is-covered-by-plan/is-covered-by-plan';
+import { isCoveredByPlan } from '@platform/utils/is-covered-by-plan/is-covered-by-plan';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {
@@ -27,6 +24,7 @@ import {
   type TActionResult,
 } from '@shinefold/config';
 import { ENTITLEMENT_KIND, queries } from '@shinefold/db';
+import { toStoredEntitlementItem } from '@shinefold/db/utils/stored-entitlement-item/stored-entitlement-item';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import {
@@ -42,13 +40,6 @@ export type TGrantEntitlementResult = TActionResult<
   | typeof TENANT_REFUSAL.ARCHIVED
   | TEntitlementGrantRefusal
 >;
-
-const toCoverageItem = (
-  item: TEntitlementGrantInput['item'],
-): TPlanCoverageItem =>
-  item.kind === ENTITLEMENT_KIND.LOCALE_LIMIT
-    ? { kind: item.kind, key: item.kind, value: item.value }
-    : { kind: item.kind, key: item.key, value: null };
 
 export const grantEntitlementAction = async (
   tenantId: string,
@@ -75,7 +66,7 @@ export const grantEntitlementAction = async (
   const resolved = await resolveLiveTenant(tenantId);
   if (!isOutcomeSuccess(resolved)) return resolved;
 
-  if (isCoveredByPlan(resolved.tenant.plan, toCoverageItem(item))) {
+  if (isCoveredByPlan(resolved.tenant.plan, toStoredEntitlementItem(item))) {
     return {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: ENTITLEMENT_GRANT_REFUSAL.INCLUDED_IN_PLAN,
@@ -102,7 +93,7 @@ export const grantEntitlementAction = async (
       throw new Error(granted.error);
     }
 
-    const { id, kind, key, value } = granted.data;
+    const { id, kind, key, value } = granted.data.grant;
     await revalidateSiteConfig(tenantId);
     await recordAuditEvent({
       logEvent: ENTITLEMENT_GRANT_LOG.GRANT_AUDIT_FAILED,

@@ -5,7 +5,9 @@ import {
 } from '@worker/constants/revalidate-webhook';
 import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import { mockTenantWithWebhook } from '@worker/testing/tenant/fixtures';
+import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { logger } from '@worker/utils/logger/logger';
 
 import {
@@ -13,7 +15,7 @@ import {
   runRevalidateWebhookStepForEach,
 } from './revalidate-webhook-backfill';
 
-vi.mock('@worker/utils/provision-env/provision-env');
+vi.mock('@worker/utils/env/env');
 vi.mock('@worker/steps/create-revalidate-webhook');
 
 faker.seed(7471);
@@ -24,6 +26,45 @@ const EVENTS = {
 };
 
 describe(runRevalidateWebhookStepForEach, () => {
+  const { webAppBaseUrl } = MOCK_PROVISION_ENV;
+
+  beforeEach(() => {
+    Object.assign(mockEnv, { WEB_APP_URL: webAppBaseUrl });
+  });
+
+  afterEach(() => {
+    delete mockEnv['WEB_APP_URL'];
+  });
+
+  it('runs the step with WEB_APP_URL as the only env it needs', async () => {
+    const tenant = mockTenantWithWebhook();
+    vi.mocked(createTenantRevalidateWebhook).mockResolvedValue(
+      REVALIDATE_WEBHOOK_CHANGE.UNCHANGED,
+    );
+
+    await runRevalidateWebhookStepForEach(
+      [tenant],
+      REVALIDATE_WEBHOOK_LOG.SYNC_TENANT_FAILED,
+    );
+
+    expect(createTenantRevalidateWebhook).toHaveBeenCalledExactlyOnceWith(
+      tenant,
+      { webAppBaseUrl },
+    );
+  });
+
+  it('refuses to start without WEB_APP_URL', async () => {
+    delete mockEnv['WEB_APP_URL'];
+
+    await expect(
+      runRevalidateWebhookStepForEach(
+        [mockTenantWithWebhook()],
+        REVALIDATE_WEBHOOK_LOG.SYNC_TENANT_FAILED,
+      ),
+    ).rejects.toThrow('WEB_APP_URL');
+    expect(createTenantRevalidateWebhook).not.toHaveBeenCalled();
+  });
+
   it('sorts each tenant by whether the step changed its hook', async () => {
     const stale = mockTenantWithWebhook();
     const current = mockTenantWithWebhook();

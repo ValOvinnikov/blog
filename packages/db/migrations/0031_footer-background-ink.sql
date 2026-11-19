@@ -1,0 +1,1 @@
+ALTER TYPE "public"."footer_background" ADD VALUE 'INK';

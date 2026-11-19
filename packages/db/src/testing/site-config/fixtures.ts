@@ -25,6 +25,10 @@ import {
   RADIUS_SCALE,
 } from '@shinefold/config/constants';
 import type { TUpdateSiteConfigInput } from '@shinefold/db/queries/site-config/upsert-site-config';
+import * as schema from '@shinefold/db/schema';
+import type { TSiteConfig } from '@shinefold/db/schema/site-config';
+import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
+import type { TTestDb } from '@shinefold/db/testing/fixtures';
 import { createMockFaker } from '@shinefold/db/testing/mock-faker';
 
 const siteConfigFaker = createMockFaker(60222);
@@ -67,3 +71,17 @@ export const DEFAULT_CONTROL_STYLES = {
   footerSurface: FOOTER_SURFACE.FULL_WIDTH,
   cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN,
 } satisfies Partial<TUpdateSiteConfigInput>;
+
+export async function insertTestSiteConfig(
+  db: TTestDb,
+  tenantId: string,
+  overrides: Partial<typeof schema.siteConfig.$inferInsert> = {},
+): Promise<TSiteConfig> {
+  return firstRowOrThrow(
+    await db
+      .insert(schema.siteConfig)
+      .values({ tenantId, ...MOCK_SITE_CONFIG_FIELDS, ...overrides })
+      .returning(),
+    'insertTestSiteConfig',
+  );
+}

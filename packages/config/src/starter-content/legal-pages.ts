@@ -30,6 +30,7 @@ import {
   seo,
 } from './starter-fields';
 import { internalLink } from './starter-links';
+import { INTRODUCTION_MODULE_TITLE } from './starter-module-titles';
 import { buildContentModule } from './starter-modules';
 
 const COOKIE_STATEMENT_LINK_MARK_KEY = 'cookieStatementLink';
@@ -93,7 +94,7 @@ export function buildLegalPages(
     ),
     buildContentModule({
       id: STARTER_DOCUMENT_IDS.LEGAL_INDEX_INTRO,
-      title: 'Introduction',
+      title: INTRODUCTION_MODULE_TITLE,
       locale,
       body: legalIndexIntro(legalIndex.intro, cookieStatement.title),
     }),
