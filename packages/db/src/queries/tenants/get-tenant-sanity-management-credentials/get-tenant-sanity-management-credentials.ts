@@ -1,8 +1,7 @@
 import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
 import { getDb } from '@shinefold/db/client';
 import { tenants } from '@shinefold/db/schema/tenants';
-import { requireTenantTokenEncryptionKey } from '@shinefold/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
-import { decryptSecret } from '@shinefold/utils';
+import { decryptTenantSecret } from '@shinefold/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
 import { eq } from 'drizzle-orm';
 
 export type TTenantSanityManagementCredentials = {
@@ -29,10 +28,7 @@ export async function getTenantSanityManagementCredentials(
 
   return {
     projectId: tenant.projectId,
-    token: decryptSecret(
-      tenant.tokenEncrypted,
-      requireTenantTokenEncryptionKey(),
-    ),
+    token: decryptTenantSecret(tenant.tokenEncrypted),
     managementRobotId: tenant.managementRobotId,
   };
 }
