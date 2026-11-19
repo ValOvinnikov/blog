@@ -180,13 +180,16 @@ describe(`<${Hero.name}/>`, () => {
   it.each([
     {
       name: 'keeps copy before media at the mobile-collapsed Split order',
-      props: { variant: HERO_VARIANT.SPLIT, mediaOrder: MEDIA_ORDER.FIRST },
+      props: {
+        variant: HERO_VARIANT.SPLIT,
+        layout: { mediaOrder: MEDIA_ORDER.FIRST },
+      },
     },
     {
       name: 'keeps copy before media at the two-column Split order',
       props: {
         variant: HERO_VARIANT.SPLIT,
-        contentPosition: CONTENT_ALIGNMENT.RIGHT,
+        layout: { contentPosition: CONTENT_ALIGNMENT.RIGHT },
       },
     },
     {

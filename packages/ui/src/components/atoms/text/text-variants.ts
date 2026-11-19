@@ -6,7 +6,6 @@ export const textVariants = tv({
     variant: {
       lead: ['font-read text-lead leading-[1.72]', 'text-text'],
       muted: ['font-read text-lead leading-[1.72]', 'text-muted'],
-      hero: ['font-read text-base leading-[1.6]', 'text-muted'],
       card: ['font-read text-lead leading-[1.55]', 'text-muted'],
       supporting: ['font-read text-lead', 'text-text-muted'],
       statement: ['font-read text-lg font-medium', 'text-text'],

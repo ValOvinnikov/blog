@@ -5,24 +5,32 @@ import {
   ICONS,
   MEDIA_ORDER,
   SIZE,
+  SOCIAL_PLATFORM_LABEL,
+  SOCIAL_PLATFORMS,
   SPACING_SCALE,
 } from '@shinefold/config';
 import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { ShareLink } from '@shinefold/ui/components/molecules/share-link';
+import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Hero } from './hero';
 import { heroVariants } from './hero-variants';
 
-const bannerContent = (alt: string) => (
+const PROFILE_EYEBROW = 'Senior frontend engineer';
+const PROFILE_EXCERPT =
+  'Architecture, performance, and design systems — from fintech and retail.';
+const BANNER_IMAGE_ALT = 'Bright mountain sunrise';
+
+const bannerContent = (
   <>
     <Hero.Media>
       <img
         src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
-        alt={alt}
+        alt={BANNER_IMAGE_ALT}
         className="size-full object-cover"
       />
     </Hero.Media>
@@ -66,21 +74,21 @@ const profileContent = (
         <li>
           <ShareLink
             href="https://github.com/janedoe"
-            label="GitHub"
+            label={SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.GITHUB]}
             icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
           />
         </li>
         <li>
           <ShareLink
             href="https://linkedin.com/in/janedoe"
-            label="LinkedIn"
+            label={SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.LINKEDIN]}
             icon={<Icon name={ICONS.LINKEDIN} size={SIZE.SM} />}
           />
         </li>
         <li>
           <ShareLink
             href="https://x.com/janedoe"
-            label="X"
+            label={SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.X]}
             icon={<Icon name={ICONS.X} size={SIZE.SM} />}
           />
         </li>
@@ -98,29 +106,9 @@ const meta = {
       control: 'select',
       options: objectKeys(heroVariants.variants.variant),
     },
-    contentPosition: {
-      control: 'select',
-      options: objectKeys(heroVariants.variants.position),
-    },
-    contentAlignment: {
-      control: 'select',
-      options: objectKeys(heroVariants.variants.alignment),
-    },
-    mediaOrder: {
-      control: 'select',
-      options: objectKeys(heroVariants.variants.mediaOrder),
-    },
     tone: {
       control: 'select',
       options: objectKeys(BRAND_VARIANT),
-    },
-    spacingTop: {
-      control: 'select',
-      options: objectKeys(SPACING_SCALE),
-    },
-    spacingBottom: {
-      control: 'select',
-      options: objectKeys(SPACING_SCALE),
     },
   },
   args: {
@@ -156,7 +144,7 @@ export const Full: TStory = {};
 
 export const Minimal: TStory = {
   args: {
-    eyebrow: 'Senior frontend engineer',
+    eyebrow: PROFILE_EYEBROW,
     title: 'Notes on shipping frontend at scale',
     excerpt:
       'Architecture, performance, and design systems — from fintech and retail. Written, not generated.',
@@ -192,28 +180,36 @@ export const WithoutImage: TStory = {
 export const SplitContentLeft: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+    },
   },
 };
 
 export const SplitContentRight: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    contentPosition: CONTENT_ALIGNMENT.RIGHT,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.RIGHT,
+    },
   },
 };
 
 export const SplitContentAlignmentRight: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    },
   },
 };
 
 export const SplitContentAlignmentCenter: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    },
   },
 };
 
@@ -226,21 +222,27 @@ export const StackedDefault: TStory = {
 export const StackedContentAlignmentLeft: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    },
   },
 };
 
 export const StackedContentAlignmentRight: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    },
   },
 };
 
 export const StackedContentAlignmentCenter: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    },
   },
 };
 
@@ -248,9 +250,11 @@ export const BannerContentLeft: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
-    contentPosition: CONTENT_ALIGNMENT.LEFT,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
-    children: bannerContent('Bright mountain sunrise'),
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    },
+    children: bannerContent,
   },
 };
 
@@ -258,14 +262,16 @@ export const BannerWithBody: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
-    contentPosition: CONTENT_ALIGNMENT.LEFT,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    },
     children: (
       <>
         <Hero.Media>
           <img
             src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
-            alt="Bright mountain sunrise"
+            alt={BANNER_IMAGE_ALT}
             className="size-full object-cover"
           />
         </Hero.Media>
@@ -289,9 +295,11 @@ export const BannerContentCenter: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.PRIMARY,
-    contentPosition: CONTENT_ALIGNMENT.CENTER,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    children: bannerContent('Bright mountain sunrise'),
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.CENTER,
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    },
+    children: bannerContent,
   },
 };
 
@@ -299,9 +307,11 @@ export const BannerContentRight: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.SECONDARY,
-    contentPosition: CONTENT_ALIGNMENT.RIGHT,
-    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
-    children: bannerContent('Bright mountain sunrise'),
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.RIGHT,
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    },
+    children: bannerContent,
   },
 };
 
@@ -309,9 +319,11 @@ export const BannerToneBrandPrimary: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
-    contentPosition: CONTENT_ALIGNMENT.LEFT,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
-    children: bannerContent('Bright mountain sunrise'),
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    },
+    children: bannerContent,
   },
 };
 
@@ -319,9 +331,11 @@ export const BannerTonePrimary: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.PRIMARY,
-    contentPosition: CONTENT_ALIGNMENT.LEFT,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
-    children: bannerContent('Bright mountain sunrise'),
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    },
+    children: bannerContent,
   },
 };
 
@@ -329,9 +343,11 @@ export const BannerToneSecondary: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.SECONDARY,
-    contentPosition: CONTENT_ALIGNMENT.LEFT,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
-    children: bannerContent('Bright mountain sunrise'),
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    },
+    children: bannerContent,
   },
 };
 
@@ -407,7 +423,7 @@ const bannerProfileContent = (hasMedia: boolean) => (
         <li>
           <ShareLink
             href="https://github.com/janedoe"
-            label="GitHub"
+            label={SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.GITHUB]}
             icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
             className="text-on-image"
           />
@@ -415,7 +431,7 @@ const bannerProfileContent = (hasMedia: boolean) => (
         <li>
           <ShareLink
             href="https://linkedin.com/in/janedoe"
-            label="LinkedIn"
+            label={SOCIAL_PLATFORM_LABEL[SOCIAL_PLATFORMS.LINKEDIN]}
             icon={<Icon name={ICONS.LINKEDIN} size={SIZE.SM} />}
             className="text-on-image"
           />
@@ -466,24 +482,33 @@ export const BannerProfileWithMediaToneBrandPrimary: TStory = {
 export const BannerSpacingNone: TStory = {
   args: {
     ...BannerContentLeft.args,
-    spacingTop: SPACING_SCALE.NONE,
-    spacingBottom: SPACING_SCALE.NONE,
+    layout: {
+      ...BannerContentLeft.args?.layout,
+      spacingTop: SPACING_SCALE.NONE,
+      spacingBottom: SPACING_SCALE.NONE,
+    },
   },
 };
 
 export const BannerSpacingMd: TStory = {
   args: {
     ...BannerContentLeft.args,
-    spacingTop: SPACING_SCALE.MD,
-    spacingBottom: SPACING_SCALE.MD,
+    layout: {
+      ...BannerContentLeft.args?.layout,
+      spacingTop: SPACING_SCALE.MD,
+      spacingBottom: SPACING_SCALE.MD,
+    },
   },
 };
 
 export const BannerSpacingXl: TStory = {
   args: {
     ...BannerContentLeft.args,
-    spacingTop: SPACING_SCALE.XL,
-    spacingBottom: SPACING_SCALE.XL,
+    layout: {
+      ...BannerContentLeft.args?.layout,
+      spacingTop: SPACING_SCALE.XL,
+      spacingBottom: SPACING_SCALE.XL,
+    },
   },
 };
 
@@ -507,7 +532,9 @@ export const StackedAtLg: TStory = {
 export const StackedMediaFirstAtLg: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    mediaOrder: MEDIA_ORDER.FIRST,
+    layout: {
+      mediaOrder: MEDIA_ORDER.FIRST,
+    },
   },
   globals: { viewport: 'desktop' },
 };
@@ -515,28 +542,36 @@ export const StackedMediaFirstAtLg: TStory = {
 export const SplitMediaOrderFirst: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    mediaOrder: MEDIA_ORDER.FIRST,
+    layout: {
+      mediaOrder: MEDIA_ORDER.FIRST,
+    },
   },
 };
 
 export const SplitMediaOrderLast: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    mediaOrder: MEDIA_ORDER.LAST,
+    layout: {
+      mediaOrder: MEDIA_ORDER.LAST,
+    },
   },
 };
 
 export const StackedMediaOrderFirst: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    mediaOrder: MEDIA_ORDER.FIRST,
+    layout: {
+      mediaOrder: MEDIA_ORDER.FIRST,
+    },
   },
 };
 
 export const StackedMediaOrderLast: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    mediaOrder: MEDIA_ORDER.LAST,
+    layout: {
+      mediaOrder: MEDIA_ORDER.LAST,
+    },
   },
 };
 
@@ -544,10 +579,9 @@ export const StackedProfileToneBrandPrimary: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
-    eyebrow: 'Senior frontend engineer',
+    eyebrow: PROFILE_EYEBROW,
     title: 'Jane Doe',
-    excerpt:
-      'Architecture, performance, and design systems — from fintech and retail.',
+    excerpt: PROFILE_EXCERPT,
     children: profileContent,
   },
 };
@@ -556,10 +590,9 @@ export const StackedProfileTonePrimary: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
     tone: BRAND_VARIANT.PRIMARY,
-    eyebrow: 'Senior frontend engineer',
+    eyebrow: PROFILE_EYEBROW,
     title: 'Jane Doe',
-    excerpt:
-      'Architecture, performance, and design systems — from fintech and retail.',
+    excerpt: PROFILE_EXCERPT,
     children: profileContent,
   },
 };
@@ -568,10 +601,9 @@ export const StackedProfileToneSecondary: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
     tone: BRAND_VARIANT.SECONDARY,
-    eyebrow: 'Senior frontend engineer',
+    eyebrow: PROFILE_EYEBROW,
     title: 'Jane Doe',
-    excerpt:
-      'Architecture, performance, and design systems — from fintech and retail.',
+    excerpt: PROFILE_EXCERPT,
     children: profileContent,
   },
 };
@@ -579,7 +611,9 @@ export const StackedProfileToneSecondary: TStory = {
 export const CenteredActions: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    },
     children: (
       <Hero.Cta>
         <TextLink appearance="nav" href="/posts/design-system">
@@ -628,7 +662,26 @@ export const SplitSquarePortraitTablet: TStory = {
 export const SplitSquarePortraitCenterTablet: TStory = {
   args: {
     ...SplitSquarePortrait.args,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    },
   },
   globals: { viewport: 'tablet' },
+};
+
+export const SplitAndStackedOnEveryBrandBand: TStory = {
+  render: (args) => (
+    <EveryBrandBand>
+      {(tone) =>
+        [HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED].map((variant) => (
+          <Hero
+            key={variant}
+            {...args}
+            variant={variant}
+            titleId={`hero-title-${tone}-${variant}`}
+          />
+        ))
+      }
+    </EveryBrandBand>
+  ),
 };

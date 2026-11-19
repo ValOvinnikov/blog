@@ -87,11 +87,13 @@ export const HeroModuleShell = ({
         title={title}
         titleId={titleId}
         excerpt={excerpt}
-        contentPosition={contentPosition}
-        contentAlignment={contentAlignment}
-        mediaOrder={mediaOrder}
-        spacingTop={heroSpacingTop}
-        spacingBottom={heroSpacingBottom}
+        layout={{
+          contentPosition,
+          contentAlignment,
+          mediaOrder,
+          spacingTop: heroSpacingTop,
+          spacingBottom: heroSpacingBottom,
+        }}
       >
         {heroChildren}
       </Hero>

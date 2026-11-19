@@ -1,7 +1,8 @@
-import type {
-  IWithClassName,
-  IWithDataTestId,
-  TBrandVariant,
+import {
+  type IWithClassName,
+  type IWithDataTestId,
+  type TBrandVariant,
+  TEXT_ROLE,
 } from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { CtaModuleSlotParts } from '@shinefold/ui/components/organisms/cta-module/cta-module-slot-parts';
@@ -58,7 +59,7 @@ export const CtaModuleLayout = ({
           <Heading
             id={headingId}
             level={2}
-            visual="section"
+            visual={TEXT_ROLE.SECTION_TITLE}
             className={s.heading({ class: banner?.title() })}
           >
             {heading}

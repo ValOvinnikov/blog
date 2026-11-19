@@ -1,4 +1,9 @@
-import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import {
+  type IWithClassName,
+  type IWithDataTestId,
+  TEXT_ROLE,
+} from '@shinefold/config';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import type { ReactNode } from 'react';
 
 export type TCtaModuleFootnoteProps = IWithClassName &
@@ -10,7 +15,11 @@ export const CtaModuleFootnote = ({
   dataTestId,
   children,
 }: TCtaModuleFootnoteProps) => (
-  <p className={className} data-testid={dataTestId}>
+  <Text
+    textRole={TEXT_ROLE.FOOTNOTE}
+    className={className}
+    dataTestId={dataTestId}
+  >
     {children}
-  </p>
+  </Text>
 );
