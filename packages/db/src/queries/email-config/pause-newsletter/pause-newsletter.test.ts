@@ -1,6 +1,7 @@
 import { DAY_MS } from '@shinefold/db/constants';
 import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config/get-newsletter-paused-at';
 import * as schema from '@shinefold/db/schema';
+import { insertTestEmailConfig } from '@shinefold/db/testing/email-config/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
@@ -39,9 +40,7 @@ describe(pauseNewsletter, () => {
   });
 
   it('leaves the rest of an existing email config row alone', async () => {
-    await db()
-      .insert(schema.emailConfig)
-      .values({ tenantId, emailNewPosts: false });
+    await insertTestEmailConfig(db(), tenantId, { emailNewPosts: false });
 
     await pauseNewsletter(tenantId);
 

@@ -4,6 +4,7 @@ import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_WWW_TENANT_DOMAIN,
+  insertTestTenantDomain,
 } from '@shinefold/db/testing/tenant-domains/fixtures';
 import { MOCK_TENANT_DOMAIN } from '@shinefold/db/testing/tenants/fixtures';
 
@@ -31,13 +32,9 @@ describe(listTenantDomains, () => {
     const { id: otherTenantId } = await insertTestTenant(db(), {
       primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
     });
-    await db()
-      .insert(schema.tenantDomains)
-      .values([
-        { tenantId, domain: MOCK_TENANT_DOMAIN },
-        { tenantId, domain: MOCK_WWW_TENANT_DOMAIN },
-        { tenantId: otherTenantId, domain: MOCK_OTHER_TENANT_DOMAIN },
-      ]);
+    await insertTestTenantDomain(db(), tenantId, MOCK_TENANT_DOMAIN);
+    await insertTestTenantDomain(db(), tenantId, MOCK_WWW_TENANT_DOMAIN);
+    await insertTestTenantDomain(db(), otherTenantId, MOCK_OTHER_TENANT_DOMAIN);
 
     const result = await listTenantDomains(tenantId);
 

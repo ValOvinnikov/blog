@@ -982,7 +982,8 @@
     "skinLabel": {
       "PRIMARY": "Schlicht",
       "SECONDARY": "Schattiert",
-      "BRAND_PRIMARY": "Markenton"
+      "BRAND_PRIMARY": "Markenton",
+      "INK": "Tinte"
     },
     "footerSurfaceLabel": "Fläche",
     "footerSurfaceDescription": "Ob die Fußzeile die ganze Breite einnimmt oder als Karte erscheint.",

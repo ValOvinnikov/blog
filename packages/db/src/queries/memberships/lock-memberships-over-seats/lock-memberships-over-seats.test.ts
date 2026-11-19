@@ -5,14 +5,15 @@ import { countMembershipsOverSeats } from '@shinefold/db/queries/memberships/cou
 import { getMembership } from '@shinefold/db/queries/memberships/get-membership';
 import { listMembershipsWithTenantsForUser } from '@shinefold/db/queries/memberships/list-memberships-with-tenants-for-user';
 import * as schema from '@shinefold/db/schema';
-import {
-  insertTestTenant,
-  insertTestUser,
-} from '@shinefold/db/testing/fixtures';
+import { insertTestUser } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
 import { deleteSeatRows } from '@shinefold/db/testing/membership-invites/fixtures';
 import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import {
+  patchTestTenant,
+  useTestTenant,
+} from '@shinefold/db/testing/test-tenant';
 
 import { lockMembershipsOverSeats } from './lock-memberships-over-seats';
 
@@ -21,14 +22,18 @@ vi.mock('@shinefold/db/client');
 faker.seed(6875);
 
 const db = useQueryTestDb();
-
-let tenantId: string;
+const tenant = useTestTenant(db);
 
 async function addMember(role: TMembershipRole, createdAt: Date) {
   const { id: userId } = await insertTestUser(db(), {
     id: faker.string.uuid(),
   });
-  return mockMembership(db(), { userId, tenantId, role, createdAt });
+  return mockMembership(db(), {
+    userId,
+    tenantId: tenant().id,
+    role,
+    createdAt,
+  });
 }
 
 afterEach(async () => {
@@ -38,9 +43,7 @@ afterEach(async () => {
 describe(lockMembershipsOverSeats, () => {
   describe('a Growth site with four members', () => {
     beforeEach(async () => {
-      ({ id: tenantId } = await insertTestTenant(db(), {
-        plan: TENANT_PLAN.GROWTH,
-      }));
+      await patchTestTenant(db(), tenant().id, { plan: TENANT_PLAN.GROWTH });
     });
 
     it('locks the member who joined last and keeps the owner seated', async () => {
@@ -53,17 +56,19 @@ describe(lockMembershipsOverSeats, () => {
       const owner = await addMember(MEMBERSHIP_ROLE.OWNER, MOCK_NOW);
 
       await expect(
-        lockMembershipsOverSeats(tenantId, TENANT_PLAN.GROWTH, MOCK_NOW),
+        lockMembershipsOverSeats(tenant().id, TENANT_PLAN.GROWTH, MOCK_NOW),
       ).resolves.toBe(1);
 
       await expect(
-        getMembership(locked.userId, tenantId),
+        getMembership(locked.userId, tenant().id),
       ).resolves.toBeUndefined();
       await expect(
         listMembershipsWithTenantsForUser(locked.userId),
       ).resolves.toEqual([]);
-      await expect(getMembership(kept.userId, tenantId)).resolves.toEqual(kept);
-      await expect(getMembership(owner.userId, tenantId)).resolves.toEqual(
+      await expect(getMembership(kept.userId, tenant().id)).resolves.toEqual(
+        kept,
+      );
+      await expect(getMembership(owner.userId, tenant().id)).resolves.toEqual(
         owner,
       );
     });
@@ -71,14 +76,13 @@ describe(lockMembershipsOverSeats, () => {
 
   describe('an owner and one editor on Free', () => {
     beforeEach(async () => {
-      ({ id: tenantId } = await insertTestTenant(db()));
       await addMember(MEMBERSHIP_ROLE.OWNER, MOCK_NOW);
       await addMember(MEMBERSHIP_ROLE.EDITOR, MOCK_NOW);
     });
 
     describe('once locked', () => {
       beforeEach(async () => {
-        await lockMembershipsOverSeats(tenantId, TENANT_PLAN.FREE, MOCK_NOW);
+        await lockMembershipsOverSeats(tenant().id, TENANT_PLAN.FREE, MOCK_NOW);
       });
 
       it('keeps the locked membership row', async () => {
@@ -89,16 +93,16 @@ describe(lockMembershipsOverSeats, () => {
 
       it('locks nothing a second time', async () => {
         await expect(
-          lockMembershipsOverSeats(tenantId, TENANT_PLAN.FREE, MOCK_NOW),
+          lockMembershipsOverSeats(tenant().id, TENANT_PLAN.FREE, MOCK_NOW),
         ).resolves.toBe(0);
       });
     });
 
     it('locks nothing once the site has moved to a paid plan', async () => {
-      await db().update(schema.tenants).set({ plan: TENANT_PLAN.GROWTH });
+      await patchTestTenant(db(), tenant().id, { plan: TENANT_PLAN.GROWTH });
 
       await expect(
-        lockMembershipsOverSeats(tenantId, TENANT_PLAN.FREE, MOCK_NOW),
+        lockMembershipsOverSeats(tenant().id, TENANT_PLAN.FREE, MOCK_NOW),
       ).resolves.toBe(0);
     });
   });
@@ -106,13 +110,12 @@ describe(lockMembershipsOverSeats, () => {
 
 describe(countMembershipsOverSeats, () => {
   it('counts the unlocked members past the seats', async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
     await addMember(MEMBERSHIP_ROLE.OWNER, MOCK_NOW);
     await addMember(MEMBERSHIP_ROLE.EDITOR, MOCK_NOW);
     await addMember(MEMBERSHIP_ROLE.EDITOR, MOCK_NOW);
 
-    await expect(countMembershipsOverSeats(tenantId, 1)).resolves.toBe(2);
-    await lockMembershipsOverSeats(tenantId, TENANT_PLAN.FREE, MOCK_NOW);
-    await expect(countMembershipsOverSeats(tenantId, 1)).resolves.toBe(0);
+    await expect(countMembershipsOverSeats(tenant().id, 1)).resolves.toBe(2);
+    await lockMembershipsOverSeats(tenant().id, TENANT_PLAN.FREE, MOCK_NOW);
+    await expect(countMembershipsOverSeats(tenant().id, 1)).resolves.toBe(0);
   });
 });

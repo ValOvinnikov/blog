@@ -85,6 +85,12 @@ describe(revalidateWebhookUrl, () => {
       MOCK_REVALIDATE_WEBHOOK_URL,
     );
   });
+
+  it('ignores a trailing slash on the base origin', () => {
+    expect(revalidateWebhookUrl(`${webAppBaseUrl}/`)).toBe(
+      MOCK_REVALIDATE_WEBHOOK_URL,
+    );
+  });
 });
 
 describe(createTenantRevalidateWebhook, () => {

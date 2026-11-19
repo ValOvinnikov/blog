@@ -41,7 +41,7 @@ The site footer closes every page with a brand column (the Look logo, an about l
 - **Public site, legal pages:** `/privacy` and `/legal` (hubs), `/privacy/[slug]` and `/legal/[slug]` (documents), `/legal/cookie-statement` (the cookie statement), and `/api/legal-page/[kind]`, which redirects to the published document of that kind in the tenant's default language. All five page routes are in the sitemap and follow the language switch.
 - **Studio:** Privacy Index Page and Legal Index Page (one per language, with their templates), Privacy Page and Legal Page (`page_privacyDocument`, `page_legalDocument`) and Cookie Statement (`page_cookieStatement`).
 - **Studio, footer:** Settings → Footer, the `settings_footer` singleton — Social Links, Groups, About, Address, Copyright name, Fine Print, Show language switcher, Show RSS feed. The copyright line shows Copyright name, or the brand name when it is blank; the Big wordmark always shows the brand name. The brand name is set on Look's Brand card, or is the tenant name when that is blank (./look.md).
-- **Platform:** Look › Footer sets Footer layout (Columns default · Centred · Compact · Big wordmark), Background (Plain · Shaded · Brand tint default) and Surface (Full width default · Card), all Growth-only, plus the Cookie settings button (./consent-and-analytics.md). Look also picks the switcher style and the theme tokens.
+- **Platform:** Look › Footer sets Footer layout (Columns default · Centred · Compact · Big wordmark), Background (Plain · Shaded · Brand tint default · Ink) and Surface (Full width default · Card), all Growth-only, plus the Cookie settings button (./consent-and-analytics.md). Look also picks the switcher style and the theme tokens.
 
 ## Data
 

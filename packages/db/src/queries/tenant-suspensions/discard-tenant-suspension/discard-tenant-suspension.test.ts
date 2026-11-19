@@ -1,23 +1,22 @@
 import * as schema from '@shinefold/db/schema';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { insertTestTenantSuspension } from '@shinefold/db/testing/tenant-suspensions/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { discardTenantSuspension } from './discard-tenant-suspension';
 
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 
 afterEach(async () => {
   await db().delete(schema.tenantSuspensions);
-  await db().delete(schema.tenants);
 });
 
 describe(discardTenantSuspension, () => {
   it('removes the case', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-    const { id } = await insertTestTenantSuspension(db(), tenantId);
+    const { id } = await insertTestTenantSuspension(db(), tenant().id);
 
     await discardTenantSuspension(id);
 

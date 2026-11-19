@@ -4,10 +4,7 @@ import {
   SUBSCRIBER_STATUS,
 } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
-import {
-  insertTestSubscriber,
-  insertTestTenant,
-} from '@shinefold/db/testing/fixtures';
+import { insertTestSubscriber } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   justPast,
@@ -15,6 +12,7 @@ import {
   MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
 } from '@shinefold/db/testing/retention/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { daysBefore } from '@shinefold/db/utils/day-offset/day-offset';
 
 import { deletePendingSubscribersPastRetention } from './delete-pending-subscribers-past-retention';
@@ -22,6 +20,7 @@ import { deletePendingSubscribersPastRetention } from './delete-pending-subscrib
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 
 faker.seed(6022);
 
@@ -32,18 +31,15 @@ const CUTOFF = daysBefore(
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
-  await db().delete(schema.tenants);
 });
 
 describe(deletePendingSubscribersPastRetention, () => {
-  let tenantId: string;
-
   async function insertSubscriber(
     overrides: Partial<typeof schema.subscribers.$inferInsert>,
   ): Promise<string> {
     const { id } = await insertTestSubscriber(
       db(),
-      tenantId,
+      tenant().id,
       faker.internet.email().toLowerCase(),
       overrides,
     );
@@ -56,10 +52,6 @@ describe(deletePendingSubscribersPastRetention, () => {
       .from(schema.subscribers);
     return rows.map(({ id }) => id);
   }
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
 
   it('keeps a pending subscriber whose confirmation email is within the period', async () => {
     const recentId = await insertSubscriber({

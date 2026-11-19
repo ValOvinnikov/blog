@@ -1,10 +1,6 @@
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`recheck-tenant-owners: missing required env var ${name}.`);
-  }
-  return value;
-}
+import { requireEnv } from '../../lib/require-env';
+
+import { TOOL } from './tool';
 
 export type TRecheckEnv = {
   sanityManagementToken: string;
@@ -12,6 +8,6 @@ export type TRecheckEnv = {
 
 export function loadRecheckEnv(): TRecheckEnv {
   return {
-    sanityManagementToken: requireEnv('SANITY_MANAGEMENT_TOKEN'),
+    sanityManagementToken: requireEnv(TOOL, 'SANITY_MANAGEMENT_TOKEN'),
   };
 }

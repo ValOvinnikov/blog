@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, type TBrandVariant } from '@shinefold/config';
+import type { IWithChildren } from '@shinefold/config/react';
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { ReactNode } from 'react';
 import { within } from 'storybook/test';
@@ -7,15 +8,13 @@ export const BRAND_BAND_LABELS = {
   [BRAND_VARIANT.PRIMARY]: 'Primary',
   [BRAND_VARIANT.SECONDARY]: 'Secondary',
   [BRAND_VARIANT.BRAND_PRIMARY]: 'Brand primary',
+  [BRAND_VARIANT.INK]: 'Ink',
 } as const satisfies Record<TBrandVariant, string>;
 
 export const BrandBand = ({
   tone,
   children,
-}: {
-  tone: TBrandVariant;
-  children: ReactNode;
-}) => (
+}: IWithChildren & { tone: TBrandVariant }) => (
   <div
     className="bg-ambient"
     data-skin={tone}

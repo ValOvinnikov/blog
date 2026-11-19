@@ -3,8 +3,6 @@ import {
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@shinefold/db/constants';
-import * as schema from '@shinefold/db/schema';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
@@ -14,34 +12,26 @@ import {
   MOCK_STEP_ERROR,
   unwrapOk,
 } from '@shinefold/db/testing/tenants/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { updateDeprovisioningStep } from './update-deprovisioning-step';
 
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db, {
+  deprovisioningSteps: MOCK_IDLE_DEPROVISIONING_STEPS,
+});
 useFrozenClock(new Date(MOCK_RUN_AT));
 
 const { REMOVE_DOMAIN, ARCHIVE_SANITY_PROJECT } = DEPROVISIONING_STEP;
 const { RUNNING, DONE, FAILED } = TENANT_PROVISIONING_STEP_STATUS;
 
-afterEach(async () => {
-  await db().delete(schema.tenants);
-});
-
 describe(updateDeprovisioningStep, () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db(), {
-      deprovisioningSteps: MOCK_IDLE_DEPROVISIONING_STEPS,
-    }));
-  });
-
   it('updates only the given step, leaving every other step untouched', async () => {
     const { deprovisioningSteps } = unwrapOk(
       await updateDeprovisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: REMOVE_DOMAIN,
         status: RUNNING,
       }),
@@ -55,13 +45,13 @@ describe(updateDeprovisioningStep, () => {
 
   it('does not clobber an earlier updated step when a later one is updated', async () => {
     await updateDeprovisioningStep({
-      tenantId,
+      tenantId: tenant().id,
       step: REMOVE_DOMAIN,
       status: DONE,
     });
     const { deprovisioningSteps } = unwrapOk(
       await updateDeprovisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: ARCHIVE_SANITY_PROJECT,
         status: RUNNING,
       }),
@@ -77,7 +67,7 @@ describe(updateDeprovisioningStep, () => {
   it('stores the error message only when one is supplied', async () => {
     const { deprovisioningSteps } = unwrapOk(
       await updateDeprovisioningStep({
-        tenantId,
+        tenantId: tenant().id,
         step: ARCHIVE_SANITY_PROJECT,
         status: FAILED,
         error: MOCK_STEP_ERROR,
