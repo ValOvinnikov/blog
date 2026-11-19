@@ -4,6 +4,7 @@ import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { HTTP_METHOD, type TMaybeNull } from '@shinefold/config';
 import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
 import { buildEnqueueHeaders } from '@shinefold/utils/enqueue-signature';
 
 const PROVISION_PATH = '/api/provision';
@@ -13,27 +14,43 @@ const ENQUEUE_TIMEOUT_MS = 10_000;
 type TWorkerRequestBody = {
   tenantId: string;
   formerOwnerEmail?: string;
+  membershipId?: string;
+  memberEmail?: string;
+  sanityUserId?: string;
   domain?: string;
   locales?: TLocaleIsoCode[];
 };
 
-/** Never throws: a missing worker URL or secret, or a network failure, is logged and returns `null`; any response returns its status. */
-export const enqueueWorkerRequest = async (
+export type TWorkerResponse =
+  | { status: number }
+  | {
+      status: null;
+      failureEvent: TValueOf<typeof WORKER_LOG>;
+      failure: Record<string, unknown>;
+    };
+
+export const isWorkerRequestFailure = (
+  response: TWorkerResponse,
+): response is Extract<TWorkerResponse, { status: null }> =>
+  'failureEvent' in response;
+
+/** Never throws and never logs: a missing worker URL or secret, or a network failure, comes back as the failure to log. */
+export const sendWorkerRequest = async (
   path: string,
   body: TWorkerRequestBody,
-): Promise<TMaybeNull<number>> => {
-  const { tenantId } = body;
+): Promise<TWorkerResponse> => {
   const workerUrl = env.WORKER_ENQUEUE_URL;
   const secret = env.WORKER_ENQUEUE_SECRET;
 
   if (!workerUrl || !secret) {
-    logger.error(WORKER_LOG.ENQUEUE_SKIPPED, {
-      tenantId,
-      path,
-      hasWorkerUrl: Boolean(workerUrl),
-      hasSecret: Boolean(secret),
-    });
-    return null;
+    return {
+      status: null,
+      failureEvent: WORKER_LOG.ENQUEUE_SKIPPED,
+      failure: {
+        hasWorkerUrl: Boolean(workerUrl),
+        hasSecret: Boolean(secret),
+      },
+    };
   }
 
   const url = new URL(path, workerUrl);
@@ -49,15 +66,28 @@ export const enqueueWorkerRequest = async (
       body: rawBody,
       signal: AbortSignal.timeout(ENQUEUE_TIMEOUT_MS),
     });
-    return response.status;
+    return { status: response.status };
   } catch (error) {
-    logger.error(WORKER_LOG.ENQUEUE_ERROR, {
-      tenantId,
-      path,
-      ...toLoggableError(error),
-    });
-    return null;
+    return {
+      status: null,
+      failureEvent: WORKER_LOG.ENQUEUE_ERROR,
+      failure: toLoggableError(error),
+    };
   }
+};
+
+/** Never throws: a missing worker URL or secret, or a network failure, is logged and returns `null`; any response returns its status. */
+export const enqueueWorkerRequest = async (
+  path: string,
+  body: TWorkerRequestBody,
+): Promise<TMaybeNull<number>> => {
+  const response = await sendWorkerRequest(path, body);
+
+  if (isWorkerRequestFailure(response)) {
+    const { failureEvent, failure } = response;
+    logger.error(failureEvent, { tenantId: body.tenantId, path, ...failure });
+  }
+  return response.status;
 };
 
 export const enqueueProvisioning = (
