@@ -1,9 +1,11 @@
 import type { TMaybeNull } from '@shinefold/config';
-import { ERROR_CODE } from '@shinefold/config/constants';
 import { getDb } from '@shinefold/db/client';
 import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
-import { isOpenGrantOf } from '@shinefold/db/queries/tenant-entitlement-grants/open-grant-condition';
 import { tenantEntitlementGrants } from '@shinefold/db/schema/tenant-entitlement-grants';
+import {
+  castTo,
+  columnDefault,
+} from '@shinefold/db/utils/insert-select-columns/insert-select-columns';
 import { isNull as isNullValue } from '@shinefold/utils/primitives';
 import { and, eq, isNotNull, isNull, lt, lte, sql } from 'drizzle-orm';
 
@@ -22,8 +24,7 @@ function endsNoLaterThan(expiresAt: TMaybeNull<Date>) {
       );
 }
 
-// One statement, because `neon-http` has no transactions: the open grant closes
-// and the raise opens together, so the site never drops to its plan's limit.
+// The insert reads the update's CTE, so the close runs before the open-grant unique check.
 export async function raiseLocaleLimitGrant({
   tenantId,
   value,
@@ -62,20 +63,32 @@ export async function raiseLocaleLimitGrant({
       .select(
         db
           .select({
-            id: sql<string>`gen_random_uuid()`.as('id'),
-            tenantId: sql<string>`${tenantId}::uuid`.as('tenant_id'),
-            kind: sql<string>`${ENTITLEMENT_KIND.LOCALE_LIMIT}`.as('kind'),
-            key: sql<string>`${ENTITLEMENT_KIND.LOCALE_LIMIT}`.as('key'),
-            value: sql<number>`${value}::integer`.as('value'),
-            note: sql<TMaybeNull<string>>`${note}::text`.as('note'),
-            grantedBy: sql<string>`${grantedBy}::uuid`.as('granted_by'),
-            grantedAt: sql<Date>`now()`.as('granted_at'),
-            expiresAt: sql<TMaybeNull<Date>>`${sql.param(
-              expiresAt,
+            id: columnDefault(tenantEntitlementGrants.id),
+            tenantId: castTo(
+              tenantEntitlementGrants.tenantId,
+              sql`${tenantId}`,
+            ),
+            kind: castTo(
+              tenantEntitlementGrants.kind,
+              sql`${ENTITLEMENT_KIND.LOCALE_LIMIT}`,
+            ),
+            key: castTo(
+              tenantEntitlementGrants.key,
+              sql`${ENTITLEMENT_KIND.LOCALE_LIMIT}`,
+            ),
+            value: castTo(tenantEntitlementGrants.value, sql`${value}`),
+            note: castTo(tenantEntitlementGrants.note, sql`${note}`),
+            grantedBy: castTo(
+              tenantEntitlementGrants.grantedBy,
+              sql`${grantedBy}`,
+            ),
+            grantedAt: columnDefault(tenantEntitlementGrants.grantedAt),
+            expiresAt: castTo(
               tenantEntitlementGrants.expiresAt,
-            )}::timestamp`.as('expires_at'),
-            revokedAt: sql<null>`null::timestamp`.as('revoked_at'),
-            revokedBy: sql<null>`null::uuid`.as('revoked_by'),
+              sql`${sql.param(expiresAt, tenantEntitlementGrants.expiresAt)}`,
+            ),
+            revokedAt: castTo(tenantEntitlementGrants.revokedAt, sql`null`),
+            revokedBy: castTo(tenantEntitlementGrants.revokedBy, sql`null`),
           })
           .from(closedGrant),
       )
@@ -94,22 +107,4 @@ export async function raiseLocaleLimitGrant({
       closedGrantId: raised.closed_grant.closedGrantId,
     }
   );
-}
-
-export async function localeLimitRaiseRefusal(tenantId: string, value: number) {
-  const [open] = await getDb()
-    .select({ value: tenantEntitlementGrants.value })
-    .from(tenantEntitlementGrants)
-    .where(
-      and(
-        isOpenGrantOf(tenantId),
-        eq(tenantEntitlementGrants.kind, ENTITLEMENT_KIND.LOCALE_LIMIT),
-      ),
-    );
-
-  const openValue = open?.value ?? null;
-
-  return !isNullValue(openValue) && openValue < value
-    ? ERROR_CODE.DB_ENTITLEMENT_EXPIRY_SHORTENED
-    : ERROR_CODE.DB_ENTITLEMENT_ALREADY_GRANTED;
 }

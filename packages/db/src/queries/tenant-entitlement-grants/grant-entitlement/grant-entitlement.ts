@@ -15,10 +15,8 @@ import { toStoredEntitlementItem } from '@shinefold/db/utils/stored-entitlement-
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { and, eq, isNull, lte, sql } from 'drizzle-orm';
 
-import {
-  localeLimitRaiseRefusal,
-  raiseLocaleLimitGrant,
-} from './raise-locale-limit-grant';
+import { localeLimitRaiseRefusal } from './locale-limit-raise-refusal';
+import { raiseLocaleLimitGrant } from './raise-locale-limit-grant';
 
 export type TGrantEntitlementInput = {
   tenantId: string;
