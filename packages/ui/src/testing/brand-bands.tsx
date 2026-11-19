@@ -7,6 +7,7 @@ export const BRAND_BAND_LABELS = {
   [BRAND_VARIANT.PRIMARY]: 'Primary',
   [BRAND_VARIANT.SECONDARY]: 'Secondary',
   [BRAND_VARIANT.BRAND_PRIMARY]: 'Brand primary',
+  [BRAND_VARIANT.INK]: 'Ink',
 } as const satisfies Record<TBrandVariant, string>;
 
 export const BrandBand = ({
