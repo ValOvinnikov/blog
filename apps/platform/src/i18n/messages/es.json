@@ -982,7 +982,8 @@
     "skinLabel": {
       "PRIMARY": "Liso",
       "SECONDARY": "Sombreado",
-      "BRAND_PRIMARY": "Tono de marca"
+      "BRAND_PRIMARY": "Tono de marca",
+      "INK": "Tinta"
     },
     "footerSurfaceLabel": "Superficie",
     "footerSurfaceDescription": "Si el pie de página ocupa todo el ancho o aparece como una tarjeta.",

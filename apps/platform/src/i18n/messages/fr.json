@@ -982,7 +982,8 @@
     "skinLabel": {
       "PRIMARY": "Uni",
       "SECONDARY": "Ombré",
-      "BRAND_PRIMARY": "Teinte de marque"
+      "BRAND_PRIMARY": "Teinte de marque",
+      "INK": "Encre"
     },
     "footerSurfaceLabel": "Surface",
     "footerSurfaceDescription": "Si le pied de page occupe toute la largeur ou s’affiche comme une carte.",

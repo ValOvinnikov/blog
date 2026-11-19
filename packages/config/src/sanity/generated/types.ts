@@ -22,7 +22,7 @@ export type Module_embed = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   headingBlock?: ModuleHeadingBlock;
   embed?: Embed;
   ctaButtons?: Array<
@@ -63,7 +63,7 @@ export type Module_sectionPages = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   headingBlock?: ModuleHeadingBlock;
   contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
@@ -88,7 +88,7 @@ export type Module_pricing = {
       _key: string;
     } & CtaButton
   >;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   contentAlignment?: 'LEFT' | 'CENTER';
   cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
   radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
@@ -118,7 +118,7 @@ export type Module_cookieSettings = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   headingBlock?: ModuleHeadingBlock;
   layout?: Layout;
 };
@@ -130,7 +130,7 @@ export type Module_contactForm = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   headingBlock?: ModuleHeadingBlock;
   successMessage?: InternationalizedArrayString;
   privacyNote?: InternationalizedArrayParagraphText;
@@ -151,7 +151,7 @@ export type Module_newsletter = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   variant?: 'FULL' | 'COMPACT';
   headingBlock?: ModuleHeadingBlock;
   content?: InternationalizedArrayText;
@@ -177,8 +177,8 @@ export type Module_cta = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
-  bandTone?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
+  bandTone?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
   headingBlock?: ModuleHeadingBlock;
   eyebrow?: InternationalizedArrayString;
@@ -235,7 +235,7 @@ export type Module_content = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   body?: InternationalizedArrayArticleText;
   layout?: Layout;
 };
@@ -271,7 +271,7 @@ export type Module_faq = {
       _key: string;
     } & CtaButton
   >;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   contentAlignment?: 'LEFT' | 'CENTER';
   cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
   radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
@@ -286,7 +286,7 @@ export type Module_timeline = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   headingBlock?: ModuleHeadingBlock;
   markerStyle?: 'NUMBERED' | 'LABELLED';
   items?: Array<
@@ -312,7 +312,7 @@ export type Module_stats = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   headingBlock?: ModuleHeadingBlock;
   stats?: Array<
     {
@@ -356,7 +356,7 @@ export type Module_team = {
       _key: string;
     } & CtaButton
   >;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   imageShape?: 'CIRCLE' | 'SQUARE';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
@@ -393,7 +393,7 @@ export type Module_testimonial = {
       _key: string;
     } & CtaButton
   >;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   cardAlignment?: 'LEFT' | 'CENTER';
@@ -411,7 +411,7 @@ export type Module_logoWall = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   headingBlock?: ModuleHeadingBlock;
   logos?: Array<
     {
@@ -435,7 +435,7 @@ export type Module_featureHighlights = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   headingBlock?: ModuleHeadingBlock;
   highlights?: Array<
     {
@@ -477,7 +477,7 @@ export type Module_featureList = {
       _key: string;
     } & CtaButton
   >;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   imageShape?: 'WIDE' | 'SQUARE' | 'CIRCLE' | 'ICON';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
@@ -499,7 +499,7 @@ export type Module_postRelated = {
   headingBlock?: ModuleHeadingBlock;
   limit?: number;
   showImages?: boolean;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
   cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
@@ -532,7 +532,7 @@ export type Module_postFeatured = {
   >;
   limit?: number;
   showImages?: boolean;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
   cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
@@ -551,7 +551,7 @@ export type Module_postLatest = {
   headingBlock?: ModuleHeadingBlock;
   limit?: number;
   showImages?: boolean;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
   cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
@@ -571,7 +571,7 @@ export type Module_postList = {
   headingBlock?: ModuleHeadingBlock;
   pageSize?: number;
   showImages?: boolean;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   contentAlignment?: 'LEFT' | 'CENTER';
   cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
   radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
@@ -1709,7 +1709,7 @@ export type Module_heroBlog = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   post?: Page_postReference;
@@ -2232,7 +2232,7 @@ export type Module_taxonomyList = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   headingBlock?: ModuleHeadingBlock;
   taxonomy?: 'TOPICS' | 'TAGS';
   sortOrder?: 'ALPHABETICAL' | 'MOST_POSTS';
@@ -2495,7 +2495,7 @@ export type Module_heroStatement = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   headingBlock?: ModuleHeadingBlock;
   eyebrow?: InternationalizedArrayString;
@@ -2520,7 +2520,7 @@ export type Module_heroProfile = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   headingBlock?: ModuleHeadingBlock;
   author?: PersonReference;

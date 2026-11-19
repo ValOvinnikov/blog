@@ -18,6 +18,7 @@ import { PALETTE } from './palette-ramps';
 import { effectiveSchemeOf, findSkinFailures } from './skin-contrast';
 import {
   BRAND_SCRIMS,
+  DARKEST_NEUTRAL,
   PAGE_ROLES,
   SKIN_FILL_ROLES,
   type TPaletteStop,
@@ -30,8 +31,6 @@ import {
 } from './skins';
 
 const COLOR_SCHEMES = Object.values(COLOR_SCHEME);
-
-const DARKEST_NEUTRAL = '--palette-neutral-2700' satisfies TPaletteStop;
 
 const MID_NEUTRAL = '--palette-neutral-1300' satisfies TPaletteStop;
 
