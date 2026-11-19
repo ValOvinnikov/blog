@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
@@ -11,11 +12,13 @@ import { toPaginatedPageMetadata } from './to-paginated-page-metadata';
 
 vi.mock('@web/server/request-context/request-context');
 
+faker.seed(5211);
+
 const { EN, NL } = LOCALE_ISO_CODES;
 const MOCK_SEO = mockMetadataSeo();
 const { title, ogTitle } = MOCK_SEO;
 const BLOG_PATH = routes.blogIndex();
-const TRANSLATIONS = [
+const MOCK_TRANSLATIONS = [
   { language: EN, href: BLOG_PATH },
   { language: NL, href: BLOG_PATH },
 ];
@@ -24,7 +27,7 @@ const buildForPage = (page: number, seo = MOCK_SEO) =>
   toPaginatedPageMetadata(seo, {
     page,
     href: routes.blogIndex(page),
-    translations: TRANSLATIONS,
+    translations: MOCK_TRANSLATIONS,
     ogType: 'website',
   });
 
