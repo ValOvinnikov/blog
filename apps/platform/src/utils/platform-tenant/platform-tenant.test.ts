@@ -2,7 +2,6 @@ import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_CREATED_AT,
   MOCK_TENANT_URL,
-  mockEntitlementGrant,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import {
@@ -15,6 +14,7 @@ import {
   TENANT_PLAN,
 } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 
 import { toPlatformTenant, toPlatformTenantSummary } from './platform-tenant';
 

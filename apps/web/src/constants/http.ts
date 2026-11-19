@@ -6,3 +6,5 @@ export const CACHE_CONTROL = {
 export const ROBOTS_DIRECTIVE = {
   NOINDEX: 'noindex',
 } as const;
+
+export const RETRY_AFTER_HEADER = 'retry-after';

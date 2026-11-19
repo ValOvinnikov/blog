@@ -19,6 +19,7 @@ export type TTenantMember = {
   role: TMembershipRole;
   hasSignedIn: boolean;
   joinedAt: Date;
+  lockedAt: TMaybeUndefined<Date>;
   studioAccess: TMaybeUndefined<TStudioAccess>;
 };
 
@@ -34,6 +35,7 @@ export async function listTenantMembers(
       role: memberships.role,
       hasSignedIn: userHasSignedIn(),
       joinedAt: memberships.createdAt,
+      lockedAt: memberships.lockedAt,
       inviteSentAt: memberships.sanityInviteSentAt,
       inviteAcceptedAt: memberships.sanityInviteAcceptedAt,
       sanityUserId: memberships.sanityUserId,
@@ -50,6 +52,7 @@ export async function listTenantMembers(
   return rows.map(
     ({
       emailEncrypted,
+      lockedAt,
       inviteSentAt,
       inviteAcceptedAt,
       sanityUserId,
@@ -57,6 +60,7 @@ export async function listTenantMembers(
     }) => ({
       ...member,
       email: decryptOptionalPersonalValue(emailEncrypted) ?? undefined,
+      lockedAt: lockedAt ?? undefined,
       studioAccess: inviteSentAt
         ? studioAccessOf(
             { inviteAcceptedAt, sanityUserId },

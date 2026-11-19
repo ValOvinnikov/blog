@@ -46,7 +46,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
   );
   const backgroundOptions = Object.values(BRAND_VARIANT).map((background) => ({
     value: background,
-    label: t(`footerBackgroundOptionLabel.${background}`),
+    label: t(`skinLabel.${background}`),
     glyph: (
       <FooterBackgroundGlyph background={background} accentHue={accentHue} />
     ),

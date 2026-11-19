@@ -63,8 +63,8 @@ describe(`<${LookForm.name}/>`, () => {
       {
         row: LOOK_ROW.FOOTER,
         group: LOOK_FORM.footerBackgroundLabel,
-        current: LOOK_FORM.footerBackgroundOptionLabel.BRAND_PRIMARY,
-        other: LOOK_FORM.footerBackgroundOptionLabel.SECONDARY,
+        current: LOOK_FORM.skinLabel.BRAND_PRIMARY,
+        other: LOOK_FORM.skinLabel.SECONDARY,
       },
       {
         row: LOOK_ROW.FOOTER,

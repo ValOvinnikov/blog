@@ -1,5 +1,10 @@
 import { faker } from '@faker-js/faker';
-import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
+import {
+  LOOK_SAMPLE_BAND_LABEL_TEST_ID,
+  LOOK_SAMPLE_BAND_TEST_ID,
+  LOOK_SAMPLE_BANNER_TEST_ID,
+  LOOK_SAMPLE_TOKENS_TEST_ID,
+} from '@platform/constants/look-sample';
 import {
   SAMPLE_BUSY_BUTTON_TEST_ID,
   SAMPLE_BUSY_STYLE_ATTRIBUTE,
@@ -49,9 +54,11 @@ import {
   HEADER_SUBMENU_STYLE,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
+  SKIN_REGISTRY,
   SPINNER_STYLE,
   type IBusyStyle,
 } from '@shinefold/config';
+import { objectKeys } from '@shinefold/utils/primitives';
 import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 import type { CSSProperties } from 'react';
 
@@ -80,6 +87,9 @@ const TOPICS = 'Topics';
 const ALL_TOPICS = 'All topics';
 const HARBOUR_NOTES = 'harbour notes';
 const HARBOUR_NOTES_INITIAL = 'H';
+const SKIN_ATTRIBUTE = 'data-skin';
+const SKINS = objectKeys(SKIN_REGISTRY);
+const SUBSCRIBE_BUTTONS_OUTSIDE_BANDS = 3;
 
 const {
   accountHeading: ACCOUNT,
@@ -105,7 +115,14 @@ const {
   quoteRole: QUOTE_ROLE,
   ctaHeading: CTA_HEADING,
   ctaText: CTA_TEXT,
+  bandHeading: BAND_HEADING,
+  bandLink: BAND_LINK,
+  bandCardTitle: BAND_CARD_TITLE,
+  bannerHeading: BANNER_HEADING,
+  bannerText: BANNER_TEXT,
 } = messages.lookPreview;
+
+const { skinLabel: SKIN_LABEL } = messages.lookForm;
 
 const MOCK_BUSY: IBusyStyle = {
   busyStyle: BUSY_BUTTON_STYLE.LABEL,
@@ -173,14 +190,16 @@ describe(`<${LookSample.name}/>`, () => {
       setup();
     });
 
-    it('shows the tenant name and three Subscribe buttons', () => {
+    it('shows the tenant name and a Subscribe button in the page and in every band', () => {
       const tenantNames = screen.getAllByText(MOCK_TENANT_NAME);
       const subscribeButtons = screen.getAllByRole('button', {
         name: SUBSCRIBE,
       });
 
       expect(tenantNames.length).toBeGreaterThan(0);
-      expect(subscribeButtons).toHaveLength(3);
+      expect(subscribeButtons).toHaveLength(
+        SUBSCRIBE_BUTTONS_OUTSIDE_BANDS + SKINS.length,
+      );
     });
 
     it('keeps the sample out of the tab order and the page outline', () => {
@@ -280,6 +299,45 @@ describe(`<${LookSample.name}/>`, () => {
 
       expect(ctaHeading).toBeVisible();
       expect(ctaText).toBeVisible();
+    });
+
+    it('shows a band per registry skin, each with a heading, link and card', () => {
+      const bands = screen.getAllByTestId(LOOK_SAMPLE_BAND_TEST_ID);
+      const bandSkins = bands.map((band) => band.getAttribute(SKIN_ATTRIBUTE));
+
+      const bandLabels = bands.map(
+        (band) =>
+          within(band).getByTestId(LOOK_SAMPLE_BAND_LABEL_TEST_ID).textContent,
+      );
+
+      expect(bandSkins).toEqual(SKINS);
+      expect(bandLabels).toEqual(SKINS.map((skin) => SKIN_LABEL[skin]));
+
+      bands.forEach((element) => {
+        const band = within(element);
+
+        expect(
+          band.getByRole('heading', { level: 2, name: BAND_HEADING }),
+        ).toBeVisible();
+        expect(band.getByRole('link', { name: BAND_LINK })).toBeVisible();
+        expect(band.getByRole('link', { name: BAND_CARD_TITLE })).toBeVisible();
+      });
+    });
+
+    it('sets the banner on the Brand tint skin with its heading and text', () => {
+      const banner = screen.getByTestId(LOOK_SAMPLE_BANNER_TEST_ID);
+      const bannerHeading = within(banner).getByRole('heading', {
+        level: 2,
+        name: BANNER_HEADING,
+      });
+      const bannerText = within(banner).getByText(BANNER_TEXT);
+
+      expect(banner).toHaveAttribute(
+        SKIN_ATTRIBUTE,
+        BRAND_VARIANT.BRAND_PRIMARY,
+      );
+      expect(bannerHeading).toBeVisible();
+      expect(bannerText).toBeVisible();
     });
 
     it('marks the header and the footer as sample parts', () => {

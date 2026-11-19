@@ -1,3 +1,4 @@
+import { SAMPLE_LINK_HREF } from '@platform/constants/sample-link';
 import type { IAccountControl, TAccountButtonStyle } from '@shinefold/config';
 import { AccountPanel } from '@shinefold/ui/components/molecules/account-panel';
 import { AccountTrigger } from '@shinefold/ui/components/molecules/account-trigger';
@@ -6,8 +7,6 @@ import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
 import { sampleAccountControlVariants } from './sample-account-control-variants';
-
-const SAMPLE_LINK_HREF = '#';
 
 export type TSampleAccountControlProps = {
   account: IAccountControl;

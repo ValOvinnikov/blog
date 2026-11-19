@@ -15,7 +15,7 @@ export const useFooterDraftFields = () => {
       id: 'footerBackground',
       label: t('footerBackgroundLabel'),
       display: ({ footerBackground }: TLookFormValues) =>
-        t(`footerBackgroundOptionLabel.${footerBackground}`),
+        t(`skinLabel.${footerBackground}`),
     },
     {
       id: 'footerSurface',

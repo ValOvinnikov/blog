@@ -15,7 +15,10 @@ import {
   MOCK_INVITE_CONSUMED_AT,
   mockMembershipInvite,
 } from '@shinefold/db/testing/membership-invites/fixtures';
-import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
+import {
+  MOCK_EDITOR_EMAIL,
+  mockMembership,
+} from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { isNull } from '@shinefold/utils/primitives';
 
@@ -27,7 +30,6 @@ faker.seed(5765);
 
 const db = useQueryTestDb();
 
-const MOCK_EDITOR_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_SIGNED_IN_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_INVITED_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_MEMBER_USER_ID = faker.string.uuid();
@@ -90,36 +92,37 @@ describe(getTenantOwnerMembership, () => {
     });
   });
 
-  it('returns an OWNER account that has never signed in as invited', async () => {
-    const membership = await insertMember(
-      MOCK_OWNER_EMAIL,
-      MEMBERSHIP_ROLE.OWNER,
-      null,
-    );
+  describe('an OWNER account that has never signed in', () => {
+    let membership: schema.TMembership;
 
-    const result = await getTenantOwnerMembership(tenantId);
-
-    expect(result).toEqual({
-      email: MOCK_OWNER_EMAIL,
-      hasSignedIn: false,
-      invitedAt: membership.createdAt,
+    beforeEach(async () => {
+      membership = await insertMember(
+        MOCK_OWNER_EMAIL,
+        MEMBERSHIP_ROLE.OWNER,
+        null,
+      );
     });
-  });
 
-  it('counts a linked OAuth account as a sign-in', async () => {
-    const membership = await insertMember(
-      MOCK_OWNER_EMAIL,
-      MEMBERSHIP_ROLE.OWNER,
-      null,
-    );
-    await insertTestAccount(db(), MOCK_MEMBER_USER_ID, GITHUB_PROVIDER);
+    it('is returned as invited', async () => {
+      const result = await getTenantOwnerMembership(tenantId);
 
-    const result = await getTenantOwnerMembership(tenantId);
+      expect(result).toEqual({
+        email: MOCK_OWNER_EMAIL,
+        hasSignedIn: false,
+        invitedAt: membership.createdAt,
+      });
+    });
 
-    expect(result).toEqual({
-      email: MOCK_OWNER_EMAIL,
-      hasSignedIn: true,
-      joinedAt: membership.createdAt,
+    it('counts a linked OAuth account as a sign-in', async () => {
+      await insertTestAccount(db(), MOCK_MEMBER_USER_ID, GITHUB_PROVIDER);
+
+      const result = await getTenantOwnerMembership(tenantId);
+
+      expect(result).toEqual({
+        email: MOCK_OWNER_EMAIL,
+        hasSignedIn: true,
+        joinedAt: membership.createdAt,
+      });
     });
   });
 
@@ -188,33 +191,36 @@ describe(getTenantOwnerMembership, () => {
     });
   });
 
-  it('returns the pending invite when the joined OWNER has no address', async () => {
-    await insertMember(null, MEMBERSHIP_ROLE.OWNER);
-    const invite = await insertInvite({
-      email: MOCK_INVITED_EMAIL,
-      role: MEMBERSHIP_ROLE.OWNER,
-    });
-
-    const result = await getTenantOwnerMembership(tenantId);
-
-    expect(result).toEqual({
-      email: MOCK_INVITED_EMAIL,
-      hasSignedIn: false,
-      invitedAt: invite.createdAt,
-    });
-  });
-
   it('returns undefined when the tenant has no OWNER membership or invite', async () => {
     const result = await getTenantOwnerMembership(tenantId);
 
     expect(result).toBeUndefined();
   });
 
-  it('returns undefined when the joined OWNER has no address and no invite', async () => {
-    await insertMember(null, MEMBERSHIP_ROLE.OWNER);
+  describe('a joined OWNER with no address', () => {
+    beforeEach(async () => {
+      await insertMember(null, MEMBERSHIP_ROLE.OWNER);
+    });
 
-    const result = await getTenantOwnerMembership(tenantId);
+    it('returns the pending invite', async () => {
+      const invite = await insertInvite({
+        email: MOCK_INVITED_EMAIL,
+        role: MEMBERSHIP_ROLE.OWNER,
+      });
 
-    expect(result).toBeUndefined();
+      const result = await getTenantOwnerMembership(tenantId);
+
+      expect(result).toEqual({
+        email: MOCK_INVITED_EMAIL,
+        hasSignedIn: false,
+        invitedAt: invite.createdAt,
+      });
+    });
+
+    it('returns undefined with no invite', async () => {
+      const result = await getTenantOwnerMembership(tenantId);
+
+      expect(result).toBeUndefined();
+    });
   });
 });
