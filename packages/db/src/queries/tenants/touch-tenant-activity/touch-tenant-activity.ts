@@ -1,9 +1,10 @@
 import { ERROR_CODE, type TErrorCode } from '@shinefold/config/constants';
 import { getDb } from '@shinefold/db/client';
 import { TENANT_STATUS } from '@shinefold/db/constants';
+import { isNotDeprovisioned } from '@shinefold/db/queries/tenants/not-deprovisioned';
 import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
-import { and, eq, isNull, ne, sql } from 'drizzle-orm';
+import { and, eq, ne, sql } from 'drizzle-orm';
 
 export async function touchTenantActivity(
   tenantId: string,
@@ -20,7 +21,7 @@ export async function touchTenantActivity(
       and(
         eq(tenants.id, tenantId),
         ne(tenants.status, TENANT_STATUS.ARCHIVED),
-        isNull(tenants.deprovisionedAt),
+        isNotDeprovisioned,
       ),
     )
     .returning();

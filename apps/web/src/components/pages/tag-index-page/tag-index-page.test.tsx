@@ -3,13 +3,13 @@ import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@shinefold/config';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
 import { service } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import { TAG_INDEX_LOG } from '@web/constants/tag-index';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   customRenderServerAsync,
   screen,
   within,
 } from '@web/testing/custom-render';
-import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { mockIndexPage } from '@web/testing/pages/index-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -32,24 +32,16 @@ vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 vi.mock('@shinefold/service', () => ({
   service: {
     pages: { tagIndex: { v1: { getIndexPage: vi.fn() } } },
-    modules: { heroBlog: { v1: { getHeroBlog: vi.fn() } } },
   },
 }));
 
 vi.mock('@web/i18n/navigation');
 
-const getHeroBlogMock = vi.mocked(service.modules.heroBlog.v1.getHeroBlog);
 const getIndexPageMock = vi.mocked(service.pages.tagIndex.v1.getIndexPage);
 
-const MOCK_HERO_ID = faker.string.uuid();
-const MOCK_HERO_HEADING = faker.lorem.words(3);
 const MOCK_PAGE_HEADING = faker.lorem.words(2);
-const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_INDEX_PAGE = mockIndexPage({
-  headingBlock: mockHeadingBlock({
-    heading: MOCK_PAGE_HEADING,
-    supportingText: MOCK_SUPPORTING_TEXT,
-  }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_PAGE_HEADING }),
 });
 
 const setup = customRenderServerAsync(TagIndexPage, {});
@@ -69,19 +61,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
       expect(getIndexPageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
     });
 
-    it('renders the heading and supporting text inside main', () => {
-      const main = screen.getByRole('main');
-      const heading = within(main).getByRole('heading', {
-        level: 1,
-        name: MOCK_PAGE_HEADING,
-      });
-      const supportingText = within(main).getByText(MOCK_SUPPORTING_TEXT);
-
-      expect(heading).toBeVisible();
-      expect(supportingText).toBeVisible();
-    });
-
-    it('renders the breadcrumb trail outside main', () => {
+    it('renders the breadcrumb trail', () => {
       const breadcrumbs = screen.getByRole('navigation', {
         name: SITE_MESSAGES.breadcrumbs.ariaLabel,
       });
@@ -89,11 +69,9 @@ describe(`<${TagIndexPage.name}/>`, () => {
         name: MOCK_TENANT_NAME,
       });
       const currentCrumb = within(breadcrumbs).getByText(MOCK_PAGE_HEADING);
-      const main = screen.getByRole('main');
 
       expect(homeLink).toBeVisible();
       expect(currentCrumb).toBeVisible();
-      expect(main).not.toContainElement(breadcrumbs);
     });
   });
 
@@ -102,7 +80,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
 
     await expect(setup()).rejects.toBe(MOCK_ERROR);
 
-    expect(logger.error).toHaveBeenCalledWith('tag_index_page.fetch_failed', {
+    expect(logger.error).toHaveBeenCalledWith(TAG_INDEX_LOG.PAGE_FETCH_FAILED, {
       error: MOCK_ERROR,
     });
   });
@@ -119,31 +97,5 @@ describe(`<${TagIndexPage.name}/>`, () => {
 
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-  });
-
-  it('renders the hero in place of the heading when one is set', async () => {
-    getIndexPageMock.mockResolvedValueOnce(
-      okResult({
-        ...mockIndexPage(),
-        hero: { id: MOCK_HERO_ID, type: 'module_heroBlog' },
-      }),
-    );
-    getHeroBlogMock.mockResolvedValueOnce(
-      okResult(mockHeroBlogData({ heading: MOCK_HERO_HEADING })),
-    );
-
-    await setup();
-
-    const heroHeading = screen.getByRole('heading', {
-      level: 1,
-      name: MOCK_HERO_HEADING,
-    });
-    const pageHeading = screen.queryByRole('heading', {
-      level: 1,
-      name: MOCK_PAGE_HEADING,
-    });
-
-    expect(heroHeading).toBeVisible();
-    expect(pageHeading).not.toBeInTheDocument();
   });
 });

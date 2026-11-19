@@ -31,6 +31,8 @@ code:
   - apps/platform/src/server/create-site-gate/admit-create-site.ts
   - apps/platform/src/app/**/blocked-signups/*.tsx
   - apps/platform/src/components/features/blocked-signups/**
+  - apps/platform/src/server/team/**
+  - apps/platform/src/constants/team-access.ts
 epics: [4840, 4979, 5649]
 ---
 
@@ -69,6 +71,12 @@ The platform decides who may run which tenant. Platform operators hold an `admin
   - `listMembersPendingStudioAccess` returns each unlocked EDITOR, on a writable tenant whose provisioning is READY, whose Studio access is not yet READY, for the hourly owner-access sweep. The owner is left to the owner flow, which keeps its state on `tenants`.
   - `listLockedMembersWithStudioAccess` returns each locked membership, on a writable tenant whose provisioning is READY, with any Studio access recorded, with its tenant, email and Sanity user id, for the sweep that revokes it.
   - Changing a role has no query yet.
+- **Team actions** (`apps/platform/src/server/team/`). Invite, remove and cancel are gated by `requireTenantManager` (the tenant's OWNER or any operator); Check now and Resend invite by `requireTenantOwnerOrAdmin` with SUPERADMIN only.
+  - **Invite** trims and lower-cases the address and refuses a malformed one, a current member's (the owner's included) and, through `createMembershipInvite` with role EDITOR, an accepted invite's, a pending invite's or one past the seat limit — each as its own field error naming the address, with no email sent. On `CREATED` it sends the Auth.js magic link through `sendOwnerInviteEmail`, which reports whether the email went out; when it did not, the failure is logged once as `team_access.invite_email_failed` and the invite is cancelled, so the next try creates and sends a fresh one.
+  - **Remove** reads the member's role, email and Sanity user id, then calls `removeMembership`; `SELF`, `LAST_OWNER` and not found come back as refusals and change nothing. Removing an EDITOR then asks the worker's `POST /api/member-access/revoke` to revoke their Studio access after the response: up to three attempts, 1s then 3s apart, stopping early on a 4xx the worker will never accept, and logging `team_access.revoke_failed` once at the end with the last status or transport failure, while the removal stands. A READER has no Studio access and an OWNER no member-level record, so neither is revoked; an editor with no readable address cannot be revoked by address, so the removal logs `team_access.revoke_skipped_no_email` instead.
+  - **Cancel** refuses a pending OWNER invite and answers not found for an invite no longer pending.
+  - **Check now and Resend invite** for a member reach `/api/member-access/check` and `/resend` through `enqueueOwnerAccessRequest` with the membership id; any membership that is not an unlocked EDITOR 404s, like a denied gate. A refused member request logs `team_access.access_request_failed`.
+  - Invite, remove and cancel record `MEMBER_INVITED`, `MEMBER_REMOVED` and `MEMBER_INVITE_CANCELLED` against `TEAM_MEMBER` (the invite or membership id), with only the role in the details, never an address.
 - **Personal data reads.** `getTenantOwnerMembership` returns the OWNER's user email and whether they have signed in, else the pending OWNER invite's email. The SUPERADMIN alert recipients and the blocklist's "added by" are user emails too. Every one of these reads the encrypted column and decrypts it. Create site finds an existing owner with `findUserByEmail`, the same exact-address index lookup sign-in uses.
 - **Cascades:** `admins` and `memberships` cascade on user delete. Memberships and invites cascade on tenant delete. An invite has no user until it is consumed.
 - **`blocked_signup_identities`:** unique on `(kind, value)`. An ADDRESS entry stores only the keyed personal-data index (`PERSONAL_DATA_INDEX_KEY`) of the normalised address (lower-cased, `+tag` dropped), never the address. A DOMAIN entry stores the lower-cased domain. Each entry records `reason`, `createdByAdminId` and `createdAt`. Adds and removes are audited as `SIGNUP_BLOCK_ADDED` / `SIGNUP_BLOCK_REMOVED` against `BLOCKED_SIGNUP_IDENTITY`; re-adding an entry already on the list keeps its reason and author and records no second `SIGNUP_BLOCK_ADDED`. An address entry's audit row carries its kind and reason, never the address or hash. "Added by" on the list page is the email of the admin in `createdByAdminId`, read in the same query as the entries, and "Unknown" once that admin is gone.
@@ -134,6 +142,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 - `apps/platform/src/app/api/dashboard/select-tenant/route.test.ts`.
 - The `dashboard/select-tenant` page test and `tenant-switcher.test.tsx`.
 - `packages/auth/src/events/consume-pending-invites-on-sign-in.test.ts`.
+- `apps/platform/src/server/team/*.test.ts`, with builders in `apps/platform/src/testing/team/fixtures.ts`.
 - `apps/platform/src/server/signup-block/*.test.ts`, `admit-create-site.test.ts`, the `blocked-signups` layout and page tests, `blocked-signups-view.test.tsx` and `tenant-suspension-control.test.tsx`.
 - `packages/db/src/queries/{memberships,membership-invites,admins}/**` tests (PGlite), and `packages/db/src/utils/studio-access/studio-access.test.ts`.
 - No Storybook.
@@ -144,6 +153,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 - 4960: shared `/sign-in`, `/signup`, `/onboarding` and self-serve tenant creation.
 - 4955: owner Studio access through invite tracking, acceptance polling and grant.
 - 4959: owner provisioning status and Studio access states.
+- 7608: the Team page's invite, remove, cancel, check and resend actions.
 - 7168: a team member gets Studio access through the owner's flow and loses it on removal.
 - 4979: web and platform stay separate (sessions, language).
 - 4982: the platform refuses sessions it did not issue.

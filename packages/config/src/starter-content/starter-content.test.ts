@@ -33,10 +33,12 @@ const STARTER_SITE_TYPES = [
   SITE_TYPE.PORTFOLIO,
   SITE_TYPE.PERSONAL,
   SITE_TYPE.DOCS,
+  SITE_TYPE.BUSINESS,
   SITE_TYPE.BLANK,
 ] as const;
 const LOCALES = Object.values(LOCALE_ISO_CODES);
 const COOKIE_STATEMENT_TYPE = 'page_cookieStatement';
+const BUSINESS_COPY = STARTER_COPY_BY_LOCALE.EN.business;
 
 const build = (
   siteType: (typeof STARTER_SITE_TYPES)[number] = SITE_TYPE.BLANK,
@@ -61,6 +63,19 @@ function findByType<TType extends TStarterType>(
   if (!document) throw new Error(`no ${type} starter document`);
   return document;
 }
+
+const byId = (documents: TStarterDocumentUnion[], id?: string) =>
+  documents.find(({ _id }) => _id === id);
+
+const pageBehind = (documents: TStarterDocumentUnion[], linkId?: string) => {
+  const link = byId(documents, linkId);
+  return link && 'internalReference' in link
+    ? byId(documents, link.internalReference?._ref)
+    : undefined;
+};
+
+const slugOf = (document?: TStarterDocumentUnion) =>
+  document && 'slug' in document ? document.slug?.current : undefined;
 
 function referencedIds(documents: TStarterDocumentUnion[]): string[] {
   const ids: string[] = [];
@@ -210,22 +225,19 @@ describe(buildStarterDocuments, () => {
     '%s in %s seeds a legal hub whose modules link the cookie statement',
     (siteType, locale) => {
       const documents = build(siteType, locale);
-      const byId = (id?: string) => documents.find(({ _id }) => _id === id);
       const { template } = findByType(documents, 'page_legalIndex');
-      const legalTemplate = byId(template._ref);
+      const legalTemplate = byId(documents, template._ref);
       const linkedIds = referencedIds(
         legalTemplate && 'modules' in legalTemplate
           ? (legalTemplate.modules ?? []).flatMap(({ _ref }) => {
-              const module = byId(_ref);
+              const module = byId(documents, _ref);
               return module ? [module] : [];
             })
           : [],
       );
       const linkTargets = linkedIds.flatMap((id) => {
-        const link = byId(id);
-        return link && 'internalReference' in link
-          ? [byId(link.internalReference?._ref)?._type]
-          : [];
+        const page = pageBehind(documents, id);
+        return page ? [page._type] : [];
       });
 
       expect(linkTargets).toEqual([COOKIE_STATEMENT_TYPE]);
@@ -253,18 +265,17 @@ describe(buildStarterDocuments, () => {
 
   it('opens the Blog home with a hero pinning a post, then posts, topics and a CTA', () => {
     const documents = build(SITE_TYPE.BLOG);
-    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
     const { hero, modules = [] } = findByType(documents, 'template_home');
-    const heroDocument = byId(hero?._ref);
+    const heroDocument = byId(documents, hero?._ref);
     const pinned =
       heroDocument && 'post' in heroDocument
-        ? byId(heroDocument.post?._ref)
+        ? byId(documents, heroDocument.post?._ref)
         : undefined;
 
     const sequence = [
       heroDocument,
       pinned,
-      ...modules.map(({ _ref }) => byId(_ref)),
+      ...modules.map(({ _ref }) => byId(documents, _ref)),
     ].map((document) => ({ _type: document?._type }));
 
     expect(sequence).toEqual([
@@ -286,19 +297,13 @@ describe(buildStarterDocuments, () => {
 
   it('opens the Personal home with a profile hero, then an introduction, questions and a CTA to the post index', () => {
     const documents = build(SITE_TYPE.PERSONAL);
-    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
     const { hero, modules = [] } = findByType(documents, 'template_home');
     const cta = findByType(documents, 'module_cta');
-    const ctaLink = byId(cta.ctaButtons?.[0]?.link?._ref);
-    const ctaTarget =
-      ctaLink && 'internalReference' in ctaLink
-        ? byId(ctaLink.internalReference?._ref)
-        : undefined;
 
     const sequence = [
-      byId(hero?._ref),
-      ...modules.map(({ _ref }) => byId(_ref)),
-      ctaTarget,
+      byId(documents, hero?._ref),
+      ...modules.map(({ _ref }) => byId(documents, _ref)),
+      pageBehind(documents, cta.ctaButtons?.[0]?.link?._ref),
     ].map((document) => ({ _type: document?._type }));
 
     expect(sequence).toEqual([
@@ -312,21 +317,16 @@ describe(buildStarterDocuments, () => {
 
   it('opens the Docs home with a statement hero linking to the guides, then an introduction and questions', () => {
     const documents = build(SITE_TYPE.DOCS);
-    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
     const { hero, modules = [] } = findByType(documents, 'template_home');
-    const heroDocument = byId(hero?._ref);
-    const heroLink =
-      heroDocument && 'ctaButtons' in heroDocument
-        ? byId(heroDocument.ctaButtons?.[0]?.link?._ref)
-        : undefined;
+    const heroDocument = byId(documents, hero?._ref);
     const heroTarget =
-      heroLink && 'internalReference' in heroLink
-        ? byId(heroLink.internalReference?._ref)
+      heroDocument && 'ctaButtons' in heroDocument
+        ? pageBehind(documents, heroDocument.ctaButtons?.[0]?.link?._ref)
         : undefined;
 
     const sequence = [
       heroDocument,
-      ...modules.map(({ _ref }) => byId(_ref)),
+      ...modules.map(({ _ref }) => byId(documents, _ref)),
       heroTarget,
     ].map((document) => ({ _type: document?._type }));
 
@@ -352,6 +352,59 @@ describe(buildStarterDocuments, () => {
     );
 
     expect(parents).toEqual([section?._id, section?._id, section?._id]);
+  });
+
+  describe('the Business site', () => {
+    let documents: TStarterDocumentUnion[];
+
+    beforeEach(() => {
+      documents = build(SITE_TYPE.BUSINESS);
+    });
+
+    it('opens the home on a services hero and closes on a contact CTA', () => {
+      const { hero, modules = [] } = findByType(documents, 'template_home');
+      const sections = [hero?._ref, ...modules.map(({ _ref }) => _ref)].map(
+        (id) => byId(documents, id),
+      );
+
+      const sequence = sections.map((document) => ({
+        _type: document?._type,
+        actionTarget:
+          document && 'ctaButtons' in document
+            ? slugOf(
+                pageBehind(documents, document.ctaButtons?.[0]?.link?._ref),
+              )
+            : undefined,
+      }));
+
+      expect(sequence).toEqual([
+        {
+          _type: 'module_heroStatement',
+          actionTarget: BUSINESS_COPY.services.slug,
+        },
+        { _type: 'module_content', actionTarget: undefined },
+        { _type: 'module_faq', actionTarget: undefined },
+        { _type: 'module_cta', actionTarget: BUSINESS_COPY.contact.slug },
+      ]);
+    });
+
+    it('links the navigation to three top-level pages', () => {
+      const { items = [] } = findByType(documents, 'settings_navigation');
+
+      const targets = items.map((item) => {
+        const page = pageBehind(
+          documents,
+          'link' in item ? item.link?._ref : undefined,
+        );
+        return { slug: slugOf(page), hasParent: !!page && 'parent' in page };
+      });
+
+      expect(targets).toEqual([
+        { slug: BUSINESS_COPY.services.slug, hasParent: false },
+        { slug: BUSINESS_COPY.about.slug, hasParent: false },
+        { slug: BUSINESS_COPY.contact.slug, hasParent: false },
+      ]);
+    });
   });
 
   it('the NL home page takes its copy from the Dutch catalogue', () => {
@@ -422,7 +475,7 @@ describe(toStarterSiteType, () => {
     expect(toStarterSiteType(SITE_TYPE.BLOG)).toBe(SITE_TYPE.BLOG);
   });
 
-  it.each([null, SITE_TYPE.BUSINESS])(
+  it.each([null, SITE_TYPE.PRODUCT])(
     'starts %s from the Blank site',
     (siteType) => {
       expect(toStarterSiteType(siteType)).toBe(SITE_TYPE.BLANK);

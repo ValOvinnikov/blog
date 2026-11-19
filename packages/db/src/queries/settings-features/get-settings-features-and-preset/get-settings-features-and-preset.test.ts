@@ -3,7 +3,7 @@ import * as schema from '@shinefold/db/schema';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { mockSettingsFeaturesToggles } from '@shinefold/db/testing/settings-features/fixtures';
-import { MOCK_SITE_CONFIG_FIELDS } from '@shinefold/db/testing/site-config/fixtures';
+import { insertTestSiteConfig } from '@shinefold/db/testing/site-config/fixtures';
 
 import { getSettingsFeaturesAndPreset } from './get-settings-features-and-preset';
 
@@ -37,13 +37,7 @@ describe(getSettingsFeaturesAndPreset, () => {
   });
 
   it('returns the preset alone when only site config exists', async () => {
-    await db()
-      .insert(schema.siteConfig)
-      .values({
-        tenantId,
-        ...MOCK_SITE_CONFIG_FIELDS,
-        preset: PRESET_ID.EDITORIAL,
-      });
+    await insertTestSiteConfig(db(), tenantId, { preset: PRESET_ID.EDITORIAL });
 
     const result = await getSettingsFeaturesAndPreset(tenantId);
 

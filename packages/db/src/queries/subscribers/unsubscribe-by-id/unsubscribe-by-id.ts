@@ -1,6 +1,6 @@
 import { SUBSCRIBER_OUTCOME } from '@shinefold/config';
 import { getDb } from '@shinefold/db/client';
-import type { TUnsubscribeByLinkResult } from '@shinefold/db/queries/subscribers/unsubscribe-by-token/unsubscribe-by-token';
+import type { TUnsubscribeByLinkResult } from '@shinefold/db/queries/subscribers/unsubscribe-types';
 import { subscribers } from '@shinefold/db/schema/subscribers';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';

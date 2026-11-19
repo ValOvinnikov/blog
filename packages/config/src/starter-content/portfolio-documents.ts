@@ -6,6 +6,7 @@ import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import { keyedReference, paragraphs, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
+import { INTRODUCTION_MODULE_TITLE } from './starter-module-titles';
 import {
   buildAuthor,
   buildCalloutCta,
@@ -48,7 +49,7 @@ export function buildPortfolioDocuments({
     }),
     buildContentModule({
       id: ids.PORTFOLIO_INTRO,
-      title: 'Introduction',
+      title: INTRODUCTION_MODULE_TITLE,
       locale,
       body: paragraphs(intro.body),
     }),

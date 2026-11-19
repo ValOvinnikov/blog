@@ -1,5 +1,9 @@
-import { ADMIN_ROLE, GRANTED_VIA } from '@shinefold/db/constants';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
+import {
+  insertTestAdminForUser,
+  MOCK_SUPERADMIN_GRANT,
+} from '@shinefold/db/testing/admins/fixtures';
 import { insertTestUser } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
@@ -22,11 +26,7 @@ describe(getAdminByUserId, () => {
   });
 
   it('returns the row for an existing admin user', async () => {
-    await db().insert(schema.admins).values({
-      userId,
-      role: ADMIN_ROLE.SUPERADMIN,
-      grantedVia: GRANTED_VIA.BREAK_GLASS,
-    });
+    await insertTestAdminForUser(db(), userId, MOCK_SUPERADMIN_GRANT);
 
     const result = await getAdminByUserId(userId);
 

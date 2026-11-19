@@ -1,10 +1,11 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Text } from './text';
 import { textVariants } from './text-variants';
 
-const meta: Meta<typeof Text> = {
+const meta = {
   title: 'Atoms/Text',
   component: Text,
   tags: ['autodocs'],
@@ -13,11 +14,15 @@ const meta: Meta<typeof Text> = {
       control: 'select',
       options: objectKeys(textVariants.variants.variant),
     },
+    textRole: {
+      control: 'select',
+      options: Object.values(TEXT_ROLE),
+    },
   },
-};
+} satisfies Meta<typeof Text>;
 export default meta;
 
-type TStory = StoryObj<typeof Text>;
+type TStory = StoryObj<typeof meta>;
 
 export const Lead: TStory = {
   args: {
@@ -81,5 +86,13 @@ export const Footnote: TStory = {
   args: {
     variant: 'footnote',
     children: 'A shared footnote style for module type, rendered subtle.',
+  },
+};
+
+export const Intro: TStory = {
+  args: {
+    textRole: TEXT_ROLE.INTRO,
+    children:
+      'An intro beneath a heading, read through the typography registry.',
   },
 };

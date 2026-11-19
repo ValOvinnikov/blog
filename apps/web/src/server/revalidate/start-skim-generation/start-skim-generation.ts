@@ -1,8 +1,13 @@
-import { SANITY_WEBHOOK_OPERATION } from '@shinefold/config/constants';
+import {
+  SANITY_WEBHOOK_OPERATION,
+  STARTER_DOCUMENT_ID_PREFIX,
+} from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import { service, type TTenantSanityContext } from '@shinefold/service';
-import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
-import { STARTER_DOCUMENT_ID_PREFIX } from '@web/constants/revalidate';
+import {
+  GENERATE_SKIM_LOG,
+  SKIM_GO_LIVE_PATH,
+} from '@web/constants/generate-skim';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { enqueueWorkerRun } from '@web/server/revalidate/enqueue-worker-run/enqueue-worker-run';
 import type { TPostWebhookEvent } from '@web/server/revalidate/post-webhook-event/post-webhook-event';
@@ -24,8 +29,6 @@ type TFirstPublish = {
   readTenant: TTenantSanityContext;
   apiKey: string;
 };
-
-const SKIM_GO_LIVE_PATH = '/api/scheduled-post-skim';
 
 const readPublishedAt = async (
   postId: string,
