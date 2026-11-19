@@ -13,6 +13,7 @@ import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
+  unsetTenantTokenEncryptionKey,
   useTenantTokenEncryptionKey,
 } from '@shinefold/db/testing/tenant-token-encryption-key';
 import {
@@ -87,7 +88,7 @@ describe(getTenantSanityWriteCredentials, () => {
     });
 
     it('throws when the encryption key is not configured', async () => {
-      vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
+      unsetTenantTokenEncryptionKey();
 
       await expect(getTenantSanityWriteCredentials(tenant.id)).rejects.toThrow(
         MISSING_TENANT_TOKEN_KEY_ERROR,
@@ -158,7 +159,7 @@ describe(toTenantSanityWriteCredentials, () => {
     });
 
     it('throws mapping the row when the encryption key is not configured', () => {
-      vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
+      unsetTenantTokenEncryptionKey();
 
       expect(() => toTenantSanityWriteCredentials(row)).toThrow(
         MISSING_TENANT_TOKEN_KEY_ERROR,
