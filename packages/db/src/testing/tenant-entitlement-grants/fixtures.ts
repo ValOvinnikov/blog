@@ -2,7 +2,7 @@ import { CAPABILITY } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import type { TTenantEntitlementGrant } from '@shinefold/db/schema/tenant-entitlement-grants';
-import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
+import { useTestAdmin } from '@shinefold/db/testing/admins/fixtures';
 import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
 import type { TTestDb } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
@@ -50,17 +50,11 @@ export async function insertClosedTestEntitlementGrants(
 }
 
 export function useEntitlementGrantAdmin(db: () => TTestDb): () => string {
-  let adminId: string;
-
-  beforeEach(async () => {
-    ({ id: adminId } = await insertTestAdmin(db()));
-  });
+  const admin = useTestAdmin(db);
 
   afterEach(async () => {
     await db().delete(schema.tenantEntitlementGrants);
-    await db().delete(schema.admins);
-    await db().delete(schema.users);
   });
 
-  return () => adminId;
+  return admin;
 }

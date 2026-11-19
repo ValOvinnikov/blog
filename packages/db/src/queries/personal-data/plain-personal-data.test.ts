@@ -8,7 +8,6 @@ import { applyOwnerEmailChange } from '@shinefold/db/queries/tenants/update-tena
 import * as schema from '@shinefold/db/schema';
 import {
   insertTestReader,
-  insertTestTenant,
   MOCK_INVITE_EMAIL,
   MOCK_LEAD_EMAIL,
   MOCK_LEAD_MESSAGE,
@@ -20,6 +19,7 @@ import {
 } from '@shinefold/db/testing/fixtures';
 import { inviteOf } from '@shinefold/db/testing/membership-invites/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { sql } from 'drizzle-orm';
 
 vi.mock('@shinefold/db/client');
@@ -34,6 +34,7 @@ const DROPPED_PLAIN_COLUMNS = {
 };
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 
 async function existingColumns(
   table: string,
@@ -62,7 +63,6 @@ afterEach(async () => {
   await db().delete(schema.leads);
   await db().delete(schema.membershipInvites);
   await db().delete(schema.subscribers);
-  await db().delete(schema.tenants);
   await db().delete(schema.users);
 });
 
@@ -75,7 +75,7 @@ describe('plain personal data', () => {
   );
 
   it('is never written to a user by a write path that takes an email or name', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+    const { id: tenantId } = tenant();
     const { id: userId } = await insertTestReader(db(), MOCK_USER_EMAIL);
     const invite = inviteOf(
       await createMembershipInvite(

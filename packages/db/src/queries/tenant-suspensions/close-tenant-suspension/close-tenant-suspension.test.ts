@@ -1,43 +1,35 @@
-import * as schema from '@shinefold/db/schema';
-import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
-import { insertTestTenantSuspension } from '@shinefold/db/testing/tenant-suspensions/fixtures';
+import {
+  insertTestTenantSuspension,
+  useSuspensionAdmin,
+} from '@shinefold/db/testing/tenant-suspensions/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { closeTenantSuspension } from './close-tenant-suspension';
 
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
-
-afterEach(async () => {
-  await db().delete(schema.tenantSuspensions);
-  await db().delete(schema.tenants);
-  await db().delete(schema.admins);
-  await db().delete(schema.users);
-});
+const tenant = useTestTenant(db);
+const liftedBy = useSuspensionAdmin(db);
 
 describe(closeTenantSuspension, () => {
-  let tenantId: string;
-  let liftedBy: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-    ({ id: liftedBy } = await insertTestAdmin(db()));
-  });
-
   it('stamps who lifted the open case and when', async () => {
-    const { reference } = await insertTestTenantSuspension(db(), tenantId);
+    const { reference } = await insertTestTenantSuspension(db(), tenant().id);
 
-    const closed = await closeTenantSuspension(tenantId, liftedBy);
+    const closed = await closeTenantSuspension(tenant().id, liftedBy());
 
-    expect(closed).toMatchObject({ reference, liftedBy });
+    expect(closed).toMatchObject({ reference, liftedBy: liftedBy() });
     expect(closed?.liftedAt).toBeInstanceOf(Date);
   });
 
   it('leaves an already lifted case alone', async () => {
-    await insertTestTenantSuspension(db(), tenantId, { liftedAt: new Date() });
+    await insertTestTenantSuspension(db(), tenant().id, {
+      liftedAt: new Date(),
+    });
 
-    expect(await closeTenantSuspension(tenantId, liftedBy)).toBeUndefined();
+    expect(
+      await closeTenantSuspension(tenant().id, liftedBy()),
+    ).toBeUndefined();
   });
 });

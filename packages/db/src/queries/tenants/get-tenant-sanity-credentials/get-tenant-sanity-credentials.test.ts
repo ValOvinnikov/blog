@@ -4,11 +4,8 @@ import {
   TENANT_STATUS,
 } from '@shinefold/db/constants';
 import { archiveTenant } from '@shinefold/db/queries/tenants/archive-tenant';
-import { createTenant } from '@shinefold/db/queries/tenants/create-tenant';
 import { setTenantProvisioningStatus } from '@shinefold/db/queries/tenants/set-tenant-provisioning-status';
 import { setTenantSanityToken } from '@shinefold/db/queries/tenants/set-tenant-sanity-token';
-import * as schema from '@shinefold/db/schema';
-import type { TTenant } from '@shinefold/db/schema/tenants';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
@@ -20,8 +17,8 @@ import {
   MOCK_MISSING_TENANT_ID,
   MOCK_TENANT_READ_TOKEN,
   MOCK_TENANT_VALUES,
-  unwrapOk,
 } from '@shinefold/db/testing/tenants/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { getTenantSanityCredentials } from './get-tenant-sanity-credentials';
 
@@ -30,32 +27,21 @@ vi.mock('@shinefold/db/client');
 const db = useQueryTestDb();
 useTenantTokenEncryptionKey();
 useFrozenClock();
+const tenant = useTestTenant(db, {
+  ...MOCK_TENANT_VALUES,
+  status: TENANT_STATUS.ACTIVE,
+});
 
 const { sanityProjectId, sanityDataset } = MOCK_TENANT_VALUES;
 
-afterEach(async () => {
-  await db().delete(schema.tenants);
-});
-
 describe(getTenantSanityCredentials, () => {
-  let tenant: TTenant;
-
-  beforeEach(async () => {
-    tenant = unwrapOk(
-      await createTenant({
-        ...MOCK_TENANT_VALUES,
-        status: TENANT_STATUS.ACTIVE,
-      }),
-    );
-  });
-
   describe('with a token set', () => {
     beforeEach(async () => {
-      await setTenantSanityToken(tenant.id, MOCK_TENANT_READ_TOKEN);
+      await setTenantSanityToken(tenant().id, MOCK_TENANT_READ_TOKEN);
     });
 
     it('resolves the decrypted token, project, dataset and state for an active tenant', async () => {
-      const credentials = await getTenantSanityCredentials(tenant.id);
+      const credentials = await getTenantSanityCredentials(tenant().id);
 
       expect(credentials).toEqual({
         projectId: sanityProjectId,
@@ -69,9 +55,9 @@ describe(getTenantSanityCredentials, () => {
     });
 
     it('still resolves credentials for an archived tenant, with its deprovisionedAt', async () => {
-      await archiveTenant(tenant.id);
+      await archiveTenant(tenant().id);
 
-      const credentials = await getTenantSanityCredentials(tenant.id);
+      const credentials = await getTenantSanityCredentials(tenant().id);
 
       expect(credentials).toEqual({
         projectId: sanityProjectId,
@@ -87,7 +73,7 @@ describe(getTenantSanityCredentials, () => {
     it('throws when the encryption key is not configured', async () => {
       unsetTenantTokenEncryptionKey();
 
-      await expect(getTenantSanityCredentials(tenant.id)).rejects.toThrow(
+      await expect(getTenantSanityCredentials(tenant().id)).rejects.toThrow(
         MISSING_TENANT_TOKEN_KEY_ERROR,
       );
     });
@@ -99,16 +85,16 @@ describe(getTenantSanityCredentials, () => {
   ])(
     'resolves undefined for a %s tenant with no token set yet',
     async (status) => {
-      await setTenantProvisioningStatus(tenant.id, status);
+      await setTenantProvisioningStatus(tenant().id, status);
 
-      const credentials = await getTenantSanityCredentials(tenant.id);
+      const credentials = await getTenantSanityCredentials(tenant().id);
 
       expect(credentials).toBeUndefined();
     },
   );
 
   it('resolves undefined when the tenant has no token set yet', async () => {
-    const credentials = await getTenantSanityCredentials(tenant.id);
+    const credentials = await getTenantSanityCredentials(tenant().id);
 
     expect(credentials).toBeUndefined();
   });

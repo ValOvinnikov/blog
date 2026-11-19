@@ -6,8 +6,8 @@ import {
   mockOpenFindingInput,
   openTestFinding,
 } from '@shinefold/db/testing/findings/fixtures';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { resolveFinding } from './resolve-finding';
 
@@ -16,23 +16,22 @@ faker.seed(6021007);
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 
 afterEach(async () => {
   vi.useRealTimers();
   await db().delete(schema.findings);
-  await db().delete(schema.tenants);
 });
 
 describe(resolveFinding, () => {
-  let tenantId: string;
-
   beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
     vi.useFakeTimers({ now: MOCK_FINDING_NOW, toFake: ['Date'] });
   });
 
   it('marks an open finding resolved and stamps resolvedAt', async () => {
-    const opened = await openTestFinding(mockOpenFindingInput({ tenantId }));
+    const opened = await openTestFinding(
+      mockOpenFindingInput({ tenantId: tenant().id }),
+    );
 
     const result = await resolveFinding(opened.id);
 
@@ -55,7 +54,7 @@ describe(resolveFinding, () => {
       finding: 'a finding that is already resolved',
       arrangeId: async () => {
         const opened = await openTestFinding(
-          mockOpenFindingInput({ tenantId }),
+          mockOpenFindingInput({ tenantId: tenant().id }),
         );
         await resolveFinding(opened.id);
 

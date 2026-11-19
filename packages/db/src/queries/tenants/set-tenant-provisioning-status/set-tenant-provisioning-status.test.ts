@@ -1,12 +1,12 @@
 import { ERROR_CODE } from '@shinefold/config/constants';
 import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
-import * as schema from '@shinefold/db/schema';
-import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
-import { eq } from 'drizzle-orm';
+import {
+  readTestTenant,
+  useTestTenant,
+} from '@shinefold/db/testing/test-tenant';
 
 import { setTenantProvisioningStatus } from './set-tenant-provisioning-status';
 
@@ -15,34 +15,27 @@ vi.mock('@shinefold/db/client');
 const db = useQueryTestDb();
 useFrozenClock();
 
-afterEach(async () => {
-  await db().delete(schema.tenants);
-});
-
 describe(setTenantProvisioningStatus, () => {
   describe('a PROVISIONING tenant', () => {
-    let tenant: TTenant;
-
-    beforeEach(async () => {
-      tenant = await insertTestTenant(db(), {
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      });
+    const tenant = useTestTenant(db, {
+      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     });
 
     it.each([TENANT_PROVISIONING_STATUS.PENDING, null])(
       'reverts it to %s, leaving every other column untouched',
       async (provisioningStatus) => {
-        const reverted = { ...tenant, provisioningStatus, updatedAt: MOCK_NOW };
+        const reverted = {
+          ...tenant(),
+          provisioningStatus,
+          updatedAt: MOCK_NOW,
+        };
 
         const result = await setTenantProvisioningStatus(
-          tenant.id,
+          tenant().id,
           provisioningStatus,
         );
 
-        const [row] = await db()
-          .select()
-          .from(tenants)
-          .where(eq(tenants.id, tenant.id));
+        const row = await readTestTenant(db(), tenant().id);
         expect(result).toEqual({ ok: true, data: reverted });
         expect(row).toEqual(reverted);
       },

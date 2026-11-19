@@ -1,9 +1,11 @@
 import { faker } from '@faker-js/faker';
-import * as schema from '@shinefold/db/schema';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
-import { useTestTenant } from '@shinefold/db/testing/test-tenant';
-import { eq } from 'drizzle-orm';
+import {
+  patchTestTenant,
+  readTestTenant,
+  useTestTenant,
+} from '@shinefold/db/testing/test-tenant';
 
 import { stampTenantFirstPostPublished } from './stamp-tenant-first-post-published';
 
@@ -17,19 +19,11 @@ const db = useQueryTestDb();
 const tenant = useTestTenant(db);
 useFrozenClock();
 
-async function readTenant() {
-  const [row] = await db()
-    .select()
-    .from(schema.tenants)
-    .where(eq(schema.tenants.id, tenant().id));
-  return row;
-}
-
 describe(stampTenantFirstPostPublished, () => {
   it('records when the first post was published, leaving every other column untouched', async () => {
     await stampTenantFirstPostPublished(tenant().id);
 
-    const row = await readTenant();
+    const row = await readTestTenant(db(), tenant().id);
     expect(row).toEqual({
       ...tenant(),
       firstPostPublishedAt: MOCK_NOW,
@@ -38,14 +32,13 @@ describe(stampTenantFirstPostPublished, () => {
   });
 
   it('keeps the first stamp on a later publish', async () => {
-    await db()
-      .update(schema.tenants)
-      .set({ firstPostPublishedAt: MOCK_FIRST_POST_PUBLISHED_AT })
-      .where(eq(schema.tenants.id, tenant().id));
+    await patchTestTenant(db(), tenant().id, {
+      firstPostPublishedAt: MOCK_FIRST_POST_PUBLISHED_AT,
+    });
 
     await stampTenantFirstPostPublished(tenant().id);
 
-    const row = await readTenant();
-    expect(row?.firstPostPublishedAt).toEqual(MOCK_FIRST_POST_PUBLISHED_AT);
+    const row = await readTestTenant(db(), tenant().id);
+    expect(row.firstPostPublishedAt).toEqual(MOCK_FIRST_POST_PUBLISHED_AT);
   });
 });
