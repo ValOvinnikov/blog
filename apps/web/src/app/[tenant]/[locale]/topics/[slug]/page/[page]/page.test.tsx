@@ -1,12 +1,8 @@
 import { faker } from '@faker-js/faker';
-import {
-  CONTENT_ROUTE_REVALIDATE_SECONDS,
-  LOCALE_ISO_CODES,
-  NEXT_NAVIGATION_ERROR,
-  routes,
-} from '@shinefold/config';
-import { permanentRedirect } from '@web/i18n/navigation';
+import { routes } from '@shinefold/config';
 import { buildTopicMetadata } from '@web/metadata/topic-metadata';
+import { testPageRouteContract } from '@web/testing/app/page-route-contract';
+import { testPaginatedRouteContract } from '@web/testing/app/paginated-route-contract';
 import { mockRouteParams } from '@web/testing/app/route-params';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 
@@ -15,8 +11,7 @@ import TopicNumberedPage, { generateMetadata, revalidate } from './page';
 faker.seed(6009);
 
 const MOCK_TOPIC_SLUG = faker.lorem.slug();
-const MOCK_METADATA = { title: faker.lorem.words(2) };
-const MOCK_PAGE = faker.number.int({ min: 2, max: 999 });
+const SECOND_PAGE = '2';
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -35,42 +30,31 @@ vi.mock('@web/components/pages/topic-page', () => ({
 const paramsFor = (page: string) =>
   mockRouteParams({ slug: MOCK_TOPIC_SLUG, page });
 
-const pageParams = paramsFor(String(MOCK_PAGE));
+const params = paramsFor(SECOND_PAGE);
 
-const setup = customRenderAsync(TopicNumberedPage, { params: pageParams });
+const setup = customRenderAsync(TopicNumberedPage, { params });
+
+testPageRouteContract({
+  page: TopicNumberedPage,
+  generateMetadata,
+  revalidate,
+  params,
+  buildMetadata: buildTopicMetadata,
+  buildMetadataArgs: [MOCK_TOPIC_SLUG, Number(SECOND_PAGE)],
+});
+
+testPaginatedRouteContract({
+  page: TopicNumberedPage,
+  paramsFor,
+  firstPageHref: routes.topic(MOCK_TOPIC_SLUG, 1),
+});
 
 describe(`<${TopicNumberedPage.name}/>`, () => {
-  it('declares the shared content-route revalidate backstop', () => {
-    expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
-  });
-
   it('renders TopicPage for the requested slug and page', async () => {
     await setup();
 
     const topicPage = screen.getByTestId('topic-page');
 
-    expect(topicPage).toHaveTextContent(`${MOCK_TOPIC_SLUG}:${MOCK_PAGE}`);
-  });
-
-  it('redirects page 1 to the topic first page', async () => {
-    await expect(setup({ params: paramsFor(String(1)) })).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(permanentRedirect).toHaveBeenCalledWith({
-      href: routes.topic(MOCK_TOPIC_SLUG, 1),
-      locale: LOCALE_ISO_CODES.EN,
-    });
-  });
-});
-
-describe(generateMetadata, () => {
-  it('builds the topic metadata for the requested page', async () => {
-    vi.mocked(buildTopicMetadata).mockResolvedValue(MOCK_METADATA);
-
-    const metadata = await generateMetadata({ params: pageParams });
-
-    expect(metadata).toBe(MOCK_METADATA);
-    expect(buildTopicMetadata).toHaveBeenCalledWith(MOCK_TOPIC_SLUG, MOCK_PAGE);
+    expect(topicPage).toHaveTextContent(`${MOCK_TOPIC_SLUG}:${SECOND_PAGE}`);
   });
 });
