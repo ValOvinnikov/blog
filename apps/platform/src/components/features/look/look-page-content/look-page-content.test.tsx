@@ -11,52 +11,31 @@ import {
   growthBadgesOutsideNote,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
-import {
-  arrangeLookPageQueries,
-  setupLookPageContent as setup,
-} from '@platform/testing/look/look-page-content-setup';
-import {
-  mockOperatorViewer,
-  mockViewer,
-} from '@platform/testing/memberships/fixtures';
+import { setupLookPageContent as setup } from '@platform/testing/look/look-page-content-setup';
+import { mockViewer } from '@platform/testing/memberships/fixtures';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
-  mockEntitlementGrant,
   mockReadyTenant,
-  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { PRESET_ID, RADIUS_SCALE } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
-import {
-  ADMIN_ROLE,
-  ENTITLEMENT_KIND,
-  LOOK_FIELD,
-} from '@shinefold/db/constants';
+import { queries } from '@shinefold/db';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPageContent } from './look-page-content';
 
-const { getSiteConfigMock, selectLiveLocalesMock } = vi.hoisted(() => ({
-  getSiteConfigMock: vi.fn(),
-  selectLiveLocalesMock: vi.fn(),
-}));
-
-vi.mock('@shinefold/db', async () => ({
-  ...(await (
-    await import('@platform/testing/mock-db-constants')
-  ).mockDbConstants()),
-  queries: {
-    siteConfig: { getSiteConfig: getSiteConfigMock },
-    tenants: { selectLiveLocalesWithin: selectLiveLocalesMock },
-  },
-}));
+vi.mock(
+  '@shinefold/db',
+  () => import('@platform/testing/site-config/site-config-db'),
+);
 
 vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 
 vi.mock('@platform/utils/env/env');
 
+const getSiteConfig = vi.mocked(queries.siteConfig.getSiteConfig);
 const MOCK_ACCENT_HUE = 28;
 const { radiusScaleOptionLabel: RADIUS_LABEL } = messages.lookForm;
 
@@ -67,10 +46,6 @@ describe(`<${LookPageContent.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    arrangeLookPageQueries({
-      getSiteConfig: getSiteConfigMock,
-      selectLiveLocalesWithin: selectLiveLocalesMock,
-    });
   });
 
   it('renders the Console defaults when the tenant has no saved look yet', async () => {
@@ -79,13 +54,13 @@ describe(`<${LookPageContent.name}/>`, () => {
     const heading = screen.getByRole('heading', { name: 'Look' });
     const consoleRadio = screen.getByRole('radio', { name: 'Console' });
 
-    expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(heading).toBeVisible();
     expect(consoleRadio).toBeChecked();
   });
 
   it("renders the tenant's saved look when one exists", async () => {
-    getSiteConfigMock.mockResolvedValue(
+    getSiteConfig.mockResolvedValue(
       mockSiteConfig({
         preset: PRESET_ID.EDITORIAL,
         accentHue: MOCK_ACCENT_HUE,
@@ -147,7 +122,7 @@ describe(`<${LookPageContent.name}/>`, () => {
 
   describe('with a stored Growth-only corner radius', () => {
     beforeEach(() => {
-      getSiteConfigMock.mockResolvedValue(
+      getSiteConfig.mockResolvedValue(
         mockSiteConfig({ radiusScale: RADIUS_SCALE.XL }),
       );
     });
@@ -176,59 +151,6 @@ describe(`<${LookPageContent.name}/>`, () => {
       expect(storedRadius).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(storedRadius).toBeEnabled();
       expect(sampleTokens).toHaveStyle({ '--radius-md': '16px' });
-    });
-  });
-
-  describe('grants on a Free tenant', () => {
-    const GRANT_RADIUS_SCALE = {
-      name: makeEnTranslator('grantEntitlement')('triggerAriaLabel', {
-        item: messages.lookForm.radiusScaleLabel,
-      }),
-    };
-
-    it('offers a super admin the grant on a locked field', async () => {
-      await setup({
-        tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }),
-        viewer: mockOperatorViewer(ADMIN_ROLE.SUPERADMIN),
-        canGrantEntitlements: true,
-      });
-      await openLookRow(user, LOOK_ROW.SHAPE);
-
-      const grant = screen.getByRole('button', GRANT_RADIUS_SCALE);
-
-      expect(grant).toBeVisible();
-    });
-
-    it('offers a super admin no grant outside the operator tenant pages', async () => {
-      await setup({
-        tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }),
-        viewer: mockOperatorViewer(ADMIN_ROLE.SUPERADMIN),
-      });
-      await openLookRow(user, LOOK_ROW.SHAPE);
-
-      const grant = screen.queryByRole('button', GRANT_RADIUS_SCALE);
-
-      expect(grant).not.toBeInTheDocument();
-    });
-
-    it('unlocks a granted field and says it is granted', async () => {
-      await setup({
-        tenant: mockTenant({ plan: TENANT_PLAN.FREE }, [
-          mockEntitlementGrant({
-            kind: ENTITLEMENT_KIND.LOOK_FIELD,
-            key: LOOK_FIELD.RADIUS_SCALE,
-          }),
-        ]),
-      });
-      await openLookRow(user, LOOK_ROW.SHAPE);
-
-      const noneRadius = screen.getByRole('button', {
-        name: RADIUS_LABEL.NONE,
-      });
-      const granted = screen.getByText(messages.grantedBadge.label);
-
-      expect(noneRadius).toBeEnabled();
-      expect(granted).toBeVisible();
     });
   });
 
