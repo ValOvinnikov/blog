@@ -1,3 +1,6 @@
+// One deadline over every attempt and retry wait, leaving the body read and save inside the scheduled route's 80s maxDuration; a cut-off call keeps its allowance claim.
+export const SKIM_GENERATION_DEADLINE_MS = 60_000;
+
 export const GENERATE_SKIM_LOG = {
   CONFIG_MISSING: 'generate_skim.config_missing',
   HOST_UNRESOLVABLE: 'generate_skim.host_unresolvable',

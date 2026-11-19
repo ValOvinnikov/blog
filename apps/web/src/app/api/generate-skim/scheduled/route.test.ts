@@ -2,6 +2,8 @@ import { faker } from '@faker-js/faker';
 import { HTTP_STATUS } from '@shinefold/config/constants';
 import { errorResult, okResult } from '@shinefold/utils';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
+import { RETRY_AFTER_HEADER } from '@web/constants/http';
+import { MS_PER_SECOND } from '@web/constants/time';
 import { generatePostSkim } from '@web/server/skim/generate-post-skim/generate-post-skim';
 import { resolveTenantById } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { toTenantSanityWriteContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
@@ -62,6 +64,8 @@ const MOCK_GO_LIVE_AT = faker.date.recent({ refDate: MOCK_NOW }).toISOString();
 const MOCK_MOVED_GO_LIVE_AT = faker.date
   .soon({ refDate: MOCK_NOW })
   .toISOString();
+const MOCK_SECONDS_EARLY = faker.number.int({ min: 6, max: 60 });
+const MOCK_SUB_SECOND_EARLY_MS = faker.number.int({ min: 1, max: 999 });
 const MOCK_TAKEAWAY_COUNT = faker.number.int({ min: 3, max: 7 });
 const MOCK_REFUSAL_MESSAGE = faker.lorem.sentence();
 const MOCK_CREDENTIALS = mockTenantSanityCredentials();
@@ -186,11 +190,36 @@ describe(POST, () => {
       getPostPublishedAtMock.mockResolvedValue(okResult(MOCK_MOVED_GO_LIVE_AT));
     });
 
-    it('answers too early, so the worker retries', async () => {
+    it('answers too early with a retry delay, so the worker retries', async () => {
       const response = await goLive(MOCK_EARLY_BODY);
 
       expect(response.status).toBe(HTTP_STATUS.TOO_EARLY);
+      expect(Number(response.headers.get(RETRY_AFTER_HEADER))).toBeGreaterThan(
+        0,
+      );
       expect(generatePostSkim).not.toHaveBeenCalled();
+    });
+
+    it('names the seconds left until the date', async () => {
+      vi.setSystemTime(
+        Date.parse(MOCK_MOVED_GO_LIVE_AT) - MOCK_SECONDS_EARLY * MS_PER_SECOND,
+      );
+
+      const response = await goLive(MOCK_EARLY_BODY);
+
+      expect(response.headers.get(RETRY_AFTER_HEADER)).toBe(
+        String(MOCK_SECONDS_EARLY),
+      );
+    });
+
+    it('names one second when less than a second is left', async () => {
+      vi.setSystemTime(
+        Date.parse(MOCK_MOVED_GO_LIVE_AT) - MOCK_SUB_SECOND_EARLY_MS,
+      );
+
+      const response = await goLive(MOCK_EARLY_BODY);
+
+      expect(response.headers.get(RETRY_AFTER_HEADER)).toBe(String(1));
     });
 
     it('generates when retried once the date has passed', async () => {
