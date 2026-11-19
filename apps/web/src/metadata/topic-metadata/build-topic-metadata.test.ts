@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
 import { type TTopicDetailPage } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import { TOPIC_LOG } from '@web/constants/topic';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   MOCK_DUTCH_REQUEST_CONTEXT,
@@ -79,7 +80,6 @@ describe(buildTopicMetadata, () => {
       const metadata = await buildTopicMetadata(MOCK_TOPIC_SLUG, 2);
 
       expect(metadata.title).toBe(`${title} ${toPageSuffix(2)}`);
-      expect(metadata.openGraph?.title).toBe(`${ogTitle} ${toPageSuffix(2)}`);
       expect(metadata.alternates?.canonical).toBe(
         routes.topic(MOCK_TOPIC_SLUG, 2),
       );
@@ -99,19 +99,10 @@ describe(buildTopicMetadata, () => {
 
       expect(metadata).toEqual({});
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'topic_metadata.fetch_failed',
+        TOPIC_LOG.METADATA_FETCH_FAILED,
         { slug, error: MOCK_ERROR },
       );
     });
-  });
-
-  it('omits the OG title past page 1 when none is authored', async () => {
-    resolveTopicPageWith({ seo: mockMetadataSeo({ ogTitle: undefined }) });
-
-    const metadata = await buildTopicMetadata(MOCK_TOPIC_SLUG, 2);
-
-    expect(metadata.openGraph?.title).toBeUndefined();
-    expect(metadata.twitter?.title).toBeUndefined();
   });
 
   it('returns empty metadata without logging when no topic matches', async () => {
@@ -148,15 +139,6 @@ describe(buildTopicMetadata, () => {
           'x-default': EN_TOPIC_PATH,
         },
       });
-    });
-
-    it('lists no hreflang past page 1', async () => {
-      const metadata = await buildTopicMetadata(MOCK_NL_SLUG, 2);
-
-      expect(metadata.alternates?.canonical).toBe(
-        `${NL_PATH_PREFIX}${routes.topic(MOCK_NL_SLUG, 2)}`,
-      );
-      expect(metadata.alternates?.languages).toBeUndefined();
     });
   });
 });

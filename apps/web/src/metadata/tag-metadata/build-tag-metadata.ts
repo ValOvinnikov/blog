@@ -1,22 +1,19 @@
 import { routes } from '@shinefold/config';
-import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
+import { OG_TYPE } from '@web/constants/metadata';
+import { TAG_LOG } from '@web/constants/tag';
+import { toPaginatedPageMetadata } from '@web/metadata/to-paginated-page-metadata';
 import { getTagPage } from '@web/server/tag/get-tag-page/get-tag-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 
-/** Page 2+ self-canonicalizes and carries no hreflang: each language's list need not run to the same number of pages. */
 export const buildTagMetadata = async (
   slug: string,
-  pageNumber?: number,
+  page = 1,
 ): Promise<Metadata> => {
-  const [result, t] = await Promise.all([
-    getTagPage(slug),
-    getTranslations('pagination'),
-  ]);
+  const result = await getTagPage(slug);
 
   if (!result.ok) {
-    logger.error('tag_metadata.fetch_failed', { slug, error: result.error });
+    logger.error(TAG_LOG.METADATA_FETCH_FAILED, { slug, error: result.error });
     return {};
   }
 
@@ -25,27 +22,15 @@ export const buildTagMetadata = async (
   }
 
   const { seo, translations } = result.data;
-  const resolvedSeo =
-    pageNumber === undefined
-      ? seo
-      : {
-          ...seo,
-          title: `${seo.title} ${t('pageSuffix', { page: pageNumber })}`,
-          ogTitle: seo.ogTitle
-            ? `${seo.ogTitle} ${t('pageSuffix', { page: pageNumber })}`
-            : undefined,
-        };
 
-  return toLocalizedPageMetadata(resolvedSeo, {
-    href: routes.tag(slug, pageNumber),
-    translations:
-      pageNumber === undefined
-        ? translations.map(({ language, slug: translatedSlug }) => ({
-            language,
-            href: routes.tag(translatedSlug),
-          }))
-        : [],
-    ogType: 'website',
+  return toPaginatedPageMetadata(seo, {
+    page,
+    href: routes.tag(slug, page),
+    translations: translations.map(({ language, slug: translatedSlug }) => ({
+      language,
+      href: routes.tag(translatedSlug),
+    })),
+    ogType: OG_TYPE.WEBSITE,
     feedUrl: routes.tagRssFeed(slug),
   });
 };

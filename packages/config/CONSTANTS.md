@@ -996,7 +996,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/post-index` — `apps/web/src/constants/post-index.ts`
 
-- **POST_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"post_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"post_index_breadcrumbs.fetch_failed"`
+- **POST_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"post_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"post_index_breadcrumbs.fetch_failed"`, `METADATA_FETCH_FAILED`=`"post_index_metadata.fetch_failed"`
 
 ### `@web/constants/post-latest` — `apps/web/src/constants/post-latest.ts`
 
@@ -1087,7 +1087,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/tag` — `apps/web/src/constants/tag.ts`
 
-- **TAG_LOG**: `PAGE_FETCH_FAILED`=`"tag_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"tag_breadcrumbs.fetch_failed"`
+- **TAG_LOG**: `PAGE_FETCH_FAILED`=`"tag_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"tag_breadcrumbs.fetch_failed"`, `METADATA_FETCH_FAILED`=`"tag_metadata.fetch_failed"`
 
 ### `@web/constants/taxonomy-list` — `apps/web/src/constants/taxonomy-list.ts`
 
@@ -1123,7 +1123,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/topic` — `apps/web/src/constants/topic.ts`
 
-- **TOPIC_LOG**: `PAGE_FETCH_FAILED`=`"topic_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_breadcrumbs.fetch_failed"`
+- **TOPIC_LOG**: `PAGE_FETCH_FAILED`=`"topic_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_breadcrumbs.fetch_failed"`, `METADATA_FETCH_FAILED`=`"topic_metadata.fetch_failed"`
 
 ## app:worker
 
