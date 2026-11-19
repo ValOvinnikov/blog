@@ -315,7 +315,7 @@ Slots:
 
 - **QuoteCard.Quote** — The quote slot of a `QuoteCard`; owns the figure's `<blockquote>`, so the caller passes the quote's inner content and never a `<blockquote>` of its own. Props: isSpotlight?: TQuoteCardQuoteVariants['isSpotlight'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean)
 - **QuoteCard.Avatar** — The avatar slot of a `QuoteCard`; positions the caller's own `Avatar` element beside the quoted person's name. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **QuoteCard.Name** — The name slot of a `QuoteCard`; wraps the quoted person's link or text in the link/focus treatment, on an element the component itself owns rather than the caller's link or text. Props: isSpotlight?: TQuoteCardNameVariants['isSpotlight'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean)
+- **QuoteCard.Name** — The name slot of a `QuoteCard`; wraps the quoted person's link or text in the link/focus treatment, on an element the component itself owns rather than the caller's link or text. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### SettingRow — `components/molecules/setting-row/setting-row.tsx`
 

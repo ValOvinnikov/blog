@@ -1,6 +1,5 @@
 import { TEXT_ROLE } from '@shinefold/config';
 import { LINK_UNDERLINE, tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
-import type { VariantProps } from 'tailwind-variants';
 
 export const quoteCardNameVariants = tv({
   base: [
@@ -13,15 +12,4 @@ export const quoteCardNameVariants = tv({
     'has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-primary',
     'has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-ambient',
   ],
-  variants: {
-    isSpotlight: {
-      true: [],
-      false: [],
-    },
-  },
-  defaultVariants: {
-    isSpotlight: false,
-  },
 });
-
-export type TQuoteCardNameVariants = VariantProps<typeof quoteCardNameVariants>;

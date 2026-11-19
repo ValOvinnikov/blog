@@ -66,7 +66,7 @@ const QuoteCardRoot = ({
       >
         {slots.Avatar}
         <div className={s.person()}>
-          {slots.Name && cloneElement(slots.Name, { isSpotlight })}
+          {slots.Name}
           {role && <span className={s.role()}>{role}</span>}
         </div>
       </figcaption>
