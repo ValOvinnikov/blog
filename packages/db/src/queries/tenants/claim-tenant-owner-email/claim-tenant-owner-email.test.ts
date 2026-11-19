@@ -5,8 +5,8 @@ import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
+import { readTestTenant } from '@shinefold/db/testing/test-tenant';
 import { isNull } from '@shinefold/utils/primitives';
-import { eq } from 'drizzle-orm';
 
 import { claimTenantOwnerEmail } from './claim-tenant-owner-email';
 
@@ -24,15 +24,6 @@ afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
-async function readTenant(id: string): Promise<schema.TTenant> {
-  const [row] = await db()
-    .select()
-    .from(schema.tenants)
-    .where(eq(schema.tenants.id, id));
-  if (!row) throw new Error('tenant row missing');
-  return row;
-}
-
 describe(claimTenantOwnerEmail, () => {
   let tenantId: string;
 
@@ -46,7 +37,7 @@ describe(claimTenantOwnerEmail, () => {
       TENANT_OWNER_EMAIL.INVITE_NUDGE,
     );
 
-    const { ownerInviteNudgeSentAt } = await readTenant(tenantId);
+    const { ownerInviteNudgeSentAt } = await readTestTenant(db(), tenantId);
     expect(claimedAt).toEqual(MOCK_NOW);
     expect(ownerInviteNudgeSentAt).toEqual(MOCK_NOW);
   });
@@ -60,7 +51,7 @@ describe(claimTenantOwnerEmail, () => {
       TENANT_OWNER_EMAIL.SITE_READY,
     );
 
-    const { ownerSiteReadySentAt } = await readTenant(tenantId);
+    const { ownerSiteReadySentAt } = await readTestTenant(db(), tenantId);
     expect(secondClaim).toBeNull();
     expect(ownerSiteReadySentAt).toEqual(MOCK_NOW);
   });

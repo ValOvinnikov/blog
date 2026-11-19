@@ -143,23 +143,21 @@ describe(getTenantOwnerMembership, () => {
     });
   });
 
-  it('ignores an OWNER invite that has already been consumed', async () => {
-    await insertInvite({
-      email: MOCK_OWNER_EMAIL,
-      role: MEMBERSHIP_ROLE.OWNER,
-      consumedAt: MOCK_INVITE_CONSUMED_AT,
-    });
-
-    const result = await getTenantOwnerMembership(tenant().id);
-
-    expect(result).toBeUndefined();
-  });
-
-  it('ignores a non-OWNER invite on the same tenant', async () => {
-    await insertInvite({
-      email: MOCK_EDITOR_EMAIL,
-      role: MEMBERSHIP_ROLE.EDITOR,
-    });
+  it.each([
+    [
+      'an OWNER invite that has already been consumed',
+      {
+        email: MOCK_OWNER_EMAIL,
+        role: MEMBERSHIP_ROLE.OWNER,
+        consumedAt: MOCK_INVITE_CONSUMED_AT,
+      },
+    ],
+    [
+      'a non-OWNER invite on the same tenant',
+      { email: MOCK_EDITOR_EMAIL, role: MEMBERSHIP_ROLE.EDITOR },
+    ],
+  ])('ignores %s', async (_case, invite) => {
+    await insertInvite(invite);
 
     const result = await getTenantOwnerMembership(tenant().id);
 

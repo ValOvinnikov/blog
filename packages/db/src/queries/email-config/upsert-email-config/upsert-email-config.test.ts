@@ -63,10 +63,11 @@ describe(upsertEmailConfig, () => {
     expect(rows).toHaveLength(1);
   });
 
-  it('rejects a malformed reply-to address', async () => {
-    await expect(
-      upsertEmailConfig(tenant().id, { replyToAddress: MOCK_INVALID_EMAIL }),
-    ).rejects.toThrow();
+  it.each([
+    ['reply-to address', { replyToAddress: MOCK_INVALID_EMAIL }],
+    ['contact recipient', { contactRecipient: MOCK_INVALID_EMAIL }],
+  ])('rejects a malformed %s', async (_field, input) => {
+    await expect(upsertEmailConfig(tenant().id, input)).rejects.toThrow();
   });
 
   it('stores the contact recipient override', async () => {
@@ -87,12 +88,6 @@ describe(upsertEmailConfig, () => {
     });
 
     expect(result.contactRecipient).toBeUndefined();
-  });
-
-  it('rejects a malformed contact recipient', async () => {
-    await expect(
-      upsertEmailConfig(tenant().id, { contactRecipient: MOCK_INVALID_EMAIL }),
-    ).rejects.toThrow();
   });
 
   it('rejects a tenantId with no matching tenants row', async () => {
