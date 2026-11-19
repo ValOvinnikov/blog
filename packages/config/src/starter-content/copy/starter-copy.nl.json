@@ -344,5 +344,49 @@
       "metaTitle": "Contact — zo bereik je ons en wanneer we antwoorden",
       "metaDescription": "Een voorbeeldpagina voor contact, aangemaakt met je site. Voeg je e-mailadres, telefoonnummer en openingstijden toe."
     }
+  },
+  "product": {
+    "hero": {
+      "eyebrow": "Maak kennis met",
+      "heading": "De eenvoudigste manier om je werk gedaan te krijgen",
+      "supportingText": "Zeg in één zin wat je product doet en voor wie het is."
+    },
+    "intro": {
+      "body": [
+        "Welkom. Dit is de thuisbasis van je product: wat het doet, wie het helpt en waarom het de moeite waard is.",
+        "Vervang deze tekst door een kort overzicht van het probleem dat je product oplost en hoe het dat doet."
+      ]
+    },
+    "faq": {
+      "heading": "Veelgestelde vragen",
+      "questions": [
+        {
+          "question": "Wat doet het product?",
+          "answer": [
+            "Vat in een zin of twee samen wat je product vooral doet, in de woorden van je klanten."
+          ]
+        },
+        {
+          "question": "Wat kost het?",
+          "answer": [
+            "Leg je abonnementen en prijzen uit, of vertel of er een gratis proefperiode of gratis versie is."
+          ]
+        },
+        {
+          "question": "Hoe begin ik?",
+          "answer": [
+            "Beschrijf de eerste stap, zoals aanmelden of een demo plannen, en wat er daarna gebeurt."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Bekijk wat er nieuw is",
+      "supportingText": "Elke release, verbetering en oplossing op één plek."
+    },
+    "changelog": {
+      "linkLabel": "Wijzigingen",
+      "listHeading": "Alle releases"
+    }
   }
 }

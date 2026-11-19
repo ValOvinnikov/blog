@@ -62,6 +62,7 @@ describe(applySiteTemplate, () => {
     [SITE_TYPE.PERSONAL, SITE_TYPE.PERSONAL, PRESET_ID.EDITORIAL],
     [SITE_TYPE.DOCS, SITE_TYPE.DOCS, PRESET_ID.CONSOLE],
     [SITE_TYPE.BUSINESS, SITE_TYPE.BUSINESS, PRESET_ID.CONSOLE],
+    [SITE_TYPE.PRODUCT, SITE_TYPE.PRODUCT, PRESET_ID.CONSOLE],
     [null, SITE_TYPE.BLANK, PRESET_ID.CONSOLE],
   ])(
     'seeds site type %s as %s with the %s preset and the template version',

@@ -34,6 +34,7 @@ const STARTER_SITE_TYPES = [
   SITE_TYPE.PERSONAL,
   SITE_TYPE.DOCS,
   SITE_TYPE.BUSINESS,
+  SITE_TYPE.PRODUCT,
   SITE_TYPE.BLANK,
 ] as const;
 const LOCALES = Object.values(LOCALE_ISO_CODES);
@@ -76,6 +77,21 @@ const pageBehind = (documents: TStarterDocumentUnion[], linkId?: string) => {
 
 const slugOf = (document?: TStarterDocumentUnion) =>
   document && 'slug' in document ? document.slug?.current : undefined;
+
+function homeThenHeroTarget(documents: TStarterDocumentUnion[]) {
+  const { hero, modules = [] } = findByType(documents, 'template_home');
+  const heroDocument = byId(documents, hero?._ref);
+  const heroTarget =
+    heroDocument && 'ctaButtons' in heroDocument
+      ? pageBehind(documents, heroDocument.ctaButtons?.[0]?.link?._ref)
+      : undefined;
+
+  return [
+    heroDocument,
+    ...modules.map(({ _ref }) => byId(documents, _ref)),
+    heroTarget,
+  ].map((document) => ({ _type: document?._type }));
+}
 
 function referencedIds(documents: TStarterDocumentUnion[]): string[] {
   const ids: string[] = [];
@@ -316,19 +332,7 @@ describe(buildStarterDocuments, () => {
   });
 
   it('opens the Docs home with a statement hero linking to the guides, then an introduction and questions', () => {
-    const documents = build(SITE_TYPE.DOCS);
-    const { hero, modules = [] } = findByType(documents, 'template_home');
-    const heroDocument = byId(documents, hero?._ref);
-    const heroTarget =
-      heroDocument && 'ctaButtons' in heroDocument
-        ? pageBehind(documents, heroDocument.ctaButtons?.[0]?.link?._ref)
-        : undefined;
-
-    const sequence = [
-      heroDocument,
-      ...modules.map(({ _ref }) => byId(documents, _ref)),
-      heroTarget,
-    ].map((document) => ({ _type: document?._type }));
+    const sequence = homeThenHeroTarget(build(SITE_TYPE.DOCS));
 
     expect(sequence).toEqual([
       { _type: 'module_heroStatement' },
@@ -407,6 +411,42 @@ describe(buildStarterDocuments, () => {
     });
   });
 
+  describe('the Product site', () => {
+    let documents: TStarterDocumentUnion[];
+
+    beforeEach(() => {
+      documents = build(SITE_TYPE.PRODUCT);
+    });
+
+    it('opens the home on a changelog hero and closes on a changelog CTA', () => {
+      const cta = findByType(documents, 'module_cta');
+
+      const sequence = [
+        ...homeThenHeroTarget(documents),
+        {
+          _type: pageBehind(documents, cta.ctaButtons?.[0]?.link?._ref)?._type,
+        },
+      ];
+
+      expect(sequence).toEqual([
+        { _type: 'module_heroStatement' },
+        { _type: 'module_content' },
+        { _type: 'module_faq' },
+        { _type: 'module_cta' },
+        { _type: 'page_postIndex' },
+        { _type: 'page_postIndex' },
+      ]);
+    });
+
+    it('lists the changelog on the post index template', () => {
+      const { modules = [] } = findByType(documents, 'template_postIndex');
+
+      const listed = modules.map(({ _ref }) => byId(documents, _ref)?._type);
+
+      expect(listed).toEqual(['module_postList']);
+    });
+  });
+
   it('the NL home page takes its copy from the Dutch catalogue', () => {
     const { headingBlock } = findByType(
       build(SITE_TYPE.BLANK, LOCALE_ISO_CODES.NL),
@@ -475,10 +515,7 @@ describe(toStarterSiteType, () => {
     expect(toStarterSiteType(SITE_TYPE.BLOG)).toBe(SITE_TYPE.BLOG);
   });
 
-  it.each([null, SITE_TYPE.PRODUCT])(
-    'starts %s from the Blank site',
-    (siteType) => {
-      expect(toStarterSiteType(siteType)).toBe(SITE_TYPE.BLANK);
-    },
-  );
+  it('starts a tenant with no site type from the Blank site', () => {
+    expect(toStarterSiteType(null)).toBe(SITE_TYPE.BLANK);
+  });
 });

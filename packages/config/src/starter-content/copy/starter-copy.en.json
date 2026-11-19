@@ -344,5 +344,49 @@
       "metaTitle": "Contact — how to reach us and when we reply",
       "metaDescription": "A sample contact page created with your site. Add your email address, phone number and opening hours."
     }
+  },
+  "product": {
+    "hero": {
+      "eyebrow": "Introducing",
+      "heading": "The simplest way to get your work done",
+      "supportingText": "Say in a sentence what your product does and who it is for."
+    },
+    "intro": {
+      "body": [
+        "Welcome. This is the home of your product: what it does, who it helps and why it is worth trying.",
+        "Replace this text with a short overview of the problem your product solves and how it solves it."
+      ]
+    },
+    "faq": {
+      "heading": "Frequently asked questions",
+      "questions": [
+        {
+          "question": "What does the product do?",
+          "answer": [
+            "Sum up the main job your product does in a sentence or two, in the words your customers use."
+          ]
+        },
+        {
+          "question": "How much does it cost?",
+          "answer": [
+            "Explain your plans and prices, or say whether there is a free trial or a free tier."
+          ]
+        },
+        {
+          "question": "How do I get started?",
+          "answer": [
+            "Describe the first step, such as signing up or booking a demo, and what happens after it."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "See what's new",
+      "supportingText": "Every release, improvement and fix, in one place."
+    },
+    "changelog": {
+      "linkLabel": "Changelog",
+      "listHeading": "All releases"
+    }
   }
 }

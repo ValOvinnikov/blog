@@ -1,5 +1,4 @@
 import type { TMaybeNull } from '@shinefold/config/types';
-import { isNull } from '@shinefold/utils/primitives';
 
 import {
   PRESET_ID,
@@ -17,6 +16,7 @@ import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
 import { buildDocsDocuments } from './docs-documents';
 import { buildPersonalDocuments } from './personal-documents';
 import { buildPortfolioDocuments } from './portfolio-documents';
+import { buildProductDocuments } from './product-documents';
 import type { TStarterDocumentUnion } from './starter-document';
 
 type TStarterInput = {
@@ -53,13 +53,19 @@ const BUILD_BY_SITE_TYPE = {
       locale,
       copy: STARTER_COPY_BY_LOCALE[locale],
     }),
+  [SITE_TYPE.PRODUCT]: ({ locale }: TStarterInput) =>
+    buildProductDocuments({
+      locale,
+      copy: STARTER_COPY_BY_LOCALE[locale],
+    }),
   [SITE_TYPE.BLANK]: ({ locale }: TStarterInput) =>
     buildBaseDocuments({
       locale,
       copy: STARTER_COPY_BY_LOCALE[locale],
     }),
-} satisfies Partial<
-  Record<TSiteType, (input: TStarterInput) => TStarterDocumentUnion[]>
+} satisfies Record<
+  TSiteType,
+  (input: TStarterInput) => TStarterDocumentUnion[]
 >;
 
 export type TStarterSiteType = keyof typeof BUILD_BY_SITE_TYPE;
@@ -73,20 +79,14 @@ export const STARTER_PRESET_BY_SITE_TYPE: Record<TStarterSiteType, TPresetId> =
     [SITE_TYPE.PERSONAL]: PRESET_ID.EDITORIAL,
     [SITE_TYPE.DOCS]: PRESET_ID.CONSOLE,
     [SITE_TYPE.BUSINESS]: PRESET_ID.CONSOLE,
+    [SITE_TYPE.PRODUCT]: PRESET_ID.CONSOLE,
     [SITE_TYPE.BLANK]: PRESET_ID.CONSOLE,
   };
 
-function isStarterSiteType(siteType: TSiteType): siteType is TStarterSiteType {
-  return siteType in BUILD_BY_SITE_TYPE;
-}
-
-// A tenant with no site type, or one whose template isn't built yet, starts from the Blank site.
 export function toStarterSiteType(
   siteType: TMaybeNull<TSiteType>,
 ): TStarterSiteType {
-  return !isNull(siteType) && isStarterSiteType(siteType)
-    ? siteType
-    : SITE_TYPE.BLANK;
+  return siteType ?? SITE_TYPE.BLANK;
 }
 
 export function buildStarterDocuments({
