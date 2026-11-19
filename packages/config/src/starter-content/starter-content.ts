@@ -11,6 +11,7 @@ import {
 
 import { buildBaseDocuments } from './base-documents';
 import { buildBlogDocuments } from './blog-documents';
+import { buildBusinessDocuments } from './business-documents';
 import { buildCookieStatementDocument } from './cookie-statement-document';
 import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
 import { buildDocsDocuments } from './docs-documents';
@@ -47,6 +48,11 @@ const BUILD_BY_SITE_TYPE = {
       locale,
       copy: STARTER_COPY_BY_LOCALE[locale],
     }),
+  [SITE_TYPE.BUSINESS]: ({ locale }: TStarterInput) =>
+    buildBusinessDocuments({
+      locale,
+      copy: STARTER_COPY_BY_LOCALE[locale],
+    }),
   [SITE_TYPE.BLANK]: ({ locale }: TStarterInput) =>
     buildBaseDocuments({
       locale,
@@ -66,6 +72,7 @@ export const STARTER_PRESET_BY_SITE_TYPE: Record<TStarterSiteType, TPresetId> =
     [SITE_TYPE.PORTFOLIO]: PRESET_ID.EDITORIAL,
     [SITE_TYPE.PERSONAL]: PRESET_ID.EDITORIAL,
     [SITE_TYPE.DOCS]: PRESET_ID.CONSOLE,
+    [SITE_TYPE.BUSINESS]: PRESET_ID.CONSOLE,
     [SITE_TYPE.BLANK]: PRESET_ID.CONSOLE,
   };
 

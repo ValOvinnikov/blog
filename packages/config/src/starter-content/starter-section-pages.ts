@@ -9,6 +9,11 @@ import {
   type TLocaleIsoCode,
 } from '@shinefold/config/constants';
 
+import {
+  buildContentPage,
+  type TPageCopy,
+  type TContentPageCopy,
+} from './starter-content-page';
 import type {
   TStarterDocument,
   TStarterDocumentUnion,
@@ -23,11 +28,6 @@ import {
   seo,
   slug,
 } from './starter-fields';
-import {
-  buildSectionChildPage,
-  type TPageCopy,
-  type TSectionPageCopy,
-} from './starter-section-child-page';
 
 type TSectionCopy = TPageCopy & {
   heading: string;
@@ -47,7 +47,7 @@ export function buildSectionPages({
   name: string;
   ids: { page: string; template: string; list: string; childPrefix: string };
   section: TSectionCopy;
-  pages: readonly TSectionPageCopy[];
+  pages: readonly TContentPageCopy[];
   hasSectionNavigation?: boolean;
 }): TStarterDocumentUnion[] {
   return [
@@ -79,7 +79,7 @@ export function buildSectionPages({
       seo: seo(section.metaTitle, section.metaDescription),
     } satisfies TStarterPage<Page_landing>,
     ...pages.flatMap((page, index) =>
-      buildSectionChildPage({
+      buildContentPage({
         locale,
         pageId: `${ids.childPrefix}${index + 1}`,
         parentId: ids.page,
