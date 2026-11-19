@@ -1,10 +1,14 @@
 import { HTTP_STATUS, type TMaybeUndefined } from '@shinefold/config';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import { service, type TTenantSanityContext } from '@shinefold/service';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
 import { readSignedTenantRequest } from '@web/server/signed-request/read-signed-tenant-request/read-signed-tenant-request';
 import { generatePostSkim } from '@web/server/skim/generate-post-skim/generate-post-skim';
+import {
+  goLiveRequestSchema,
+  type TGoLiveRequest,
+} from '@web/server/skim/go-live-request/go-live-request';
 import { hasExistingTakeaways } from '@web/server/skim/has-existing-takeaways/has-existing-takeaways';
+import { refuseUnlessGoingLive } from '@web/server/skim/refuse-unless-going-live/refuse-unless-going-live';
 import { skimResponse } from '@web/server/skim/skim-response/skim-response';
 import { resolveTenantById } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { toTenantSanityWriteContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
@@ -12,45 +16,10 @@ import { respondEmpty } from '@web/utils/empty-response/empty-response';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 
 export const runtime = 'nodejs';
-
-const requestBodySchema = z.object({
-  tenantId: z.uuid(),
-  postId: z.string().min(1),
-  publishedAt: z.string().min(1),
-});
-
-type TGoLiveRequest = z.infer<typeof requestBodySchema>;
-
-const refuseUnlessGoingLive = async (
-  { tenantId, postId, publishedAt }: TGoLiveRequest,
-  readTenant: TTenantSanityContext,
-): Promise<TMaybeUndefined<NextResponse>> => {
-  const result = await service.entities.posts.v1.getPostPublishedAt(
-    postId,
-    readTenant,
-  );
-  if (!result.ok) {
-    logger.error(GENERATE_SKIM_LOG.PUBLISHED_AT_LOOKUP_FAILED, {
-      tenantId,
-      postId,
-      error: result.error,
-    });
-    return respondEmpty(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-  }
-  const { data: currentPublishedAt } = result;
-  const goLiveMs = Date.parse(publishedAt);
-  if (!currentPublishedAt || Date.parse(currentPublishedAt) !== goLiveMs) {
-    return respondEmpty(HTTP_STATUS.NO_CONTENT);
-  }
-  // A non-2xx makes the worker retry, so a run that wakes just before the date still generates.
-  if (goLiveMs > Date.now()) {
-    return respondEmpty(HTTP_STATUS.TOO_EARLY);
-  }
-  return undefined;
-};
+// Below the worker's 90s call timeout, so a retry never overlaps a call still generating; route segment config must be a literal.
+export const maxDuration = 80;
 
 const resolveGoLiveTenant = async ({
   tenantId,
@@ -75,7 +44,7 @@ const resolveGoLiveTenant = async ({
 };
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const signed = await readSignedTenantRequest(request, requestBodySchema, {
+  const signed = await readSignedTenantRequest(request, goLiveRequestSchema, {
     secret: env.SANITY_REVALIDATE_SECRET,
     log: {
       SECRET_MISSING: GENERATE_SKIM_LOG.GO_LIVE_SECRET_MISSING,

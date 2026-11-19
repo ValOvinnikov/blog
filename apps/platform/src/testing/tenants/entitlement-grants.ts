@@ -6,11 +6,10 @@ import type {
   TGrantTarget,
 } from '@platform/utils/grant-target/grant-target';
 import type { TGrantRow } from '@platform/utils/to-grant-rows/to-grant-rows';
-import { CAPABILITY } from '@shinefold/config';
 import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
-import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
 import type { TListedEntitlementGrant } from '@shinefold/db/queries/tenant-entitlement-grants';
 import type { TTenantEntitlementGrant } from '@shinefold/db/schema/tenant-entitlement-grants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import {
   resolveTenantEntitlements,
   type TResolvableGrant,
@@ -29,17 +28,6 @@ const grantFaker = createMockFaker(6783);
 
 export const MOCK_GRANTED_BY_EMAIL = grantFaker.internet.email();
 export const MOCK_GRANT_NOTE = grantFaker.lorem.sentence();
-
-export const mockEntitlementGrant = (
-  overrides: Partial<TResolvableGrant> = {},
-): TResolvableGrant => ({
-  kind: ENTITLEMENT_KIND.CAPABILITY,
-  key: CAPABILITY.CONTACT_FORM,
-  value: null,
-  expiresAt: null,
-  revokedAt: null,
-  ...overrides,
-});
 
 export const mockTenantEntitlements = (
   plan: TTenantPlan,

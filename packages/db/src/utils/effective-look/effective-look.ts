@@ -1,13 +1,8 @@
 import {
   LANGUAGE_SWITCHER_STYLE,
   type TPresetId,
-  type TTenantPlan,
 } from '@shinefold/config/constants';
-import {
-  LOOK_FIELDS,
-  PLAN_ENTITLEMENTS,
-  type TLookField,
-} from '@shinefold/db/constants';
+import { LOOK_FIELDS, type TLookField } from '@shinefold/db/constants';
 import type { TSiteConfigResult } from '@shinefold/db/queries/site-config/get-site-config';
 import { presetSiteConfig } from '@shinefold/db/utils/preset-site-config/preset-site-config';
 import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
@@ -36,13 +31,6 @@ export function isLookFieldWithin(
   return lookFields.includes(field);
 }
 
-export function isLookFieldEntitled(
-  field: TLookField,
-  plan: TTenantPlan,
-): boolean {
-  return isLookFieldWithin(field, PLAN_ENTITLEMENTS[plan]);
-}
-
 /** The Look a site renders: every field outside the entitlements takes its preset's value, whatever is stored. */
 export function toEffectiveLookWithin<T extends TLookInput>(
   look: T,
@@ -59,13 +47,6 @@ export function toEffectiveLookWithin<T extends TLookInput>(
   };
 }
 
-export function toEffectiveLook<T extends TLookInput>(
-  look: T,
-  plan: TTenantPlan,
-): T {
-  return toEffectiveLookWithin(look, PLAN_ENTITLEMENTS[plan]);
-}
-
 export function pickLookWithin<T extends Partial<Record<TLookField, unknown>>>(
   look: T,
   entitlements: TLookEntitlements,
@@ -75,10 +56,4 @@ export function pickLookWithin<T extends Partial<Record<TLookField, unknown>>>(
       isLookFieldWithin(field as TLookField, entitlements),
     ),
   ) as Partial<T>;
-}
-
-export function pickEntitledLook<
-  T extends Partial<Record<TLookField, unknown>>,
->(look: T, plan: TTenantPlan): Partial<T> {
-  return pickLookWithin(look, PLAN_ENTITLEMENTS[plan]);
 }

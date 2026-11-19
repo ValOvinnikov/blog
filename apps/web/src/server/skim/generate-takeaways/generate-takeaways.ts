@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import type { ArticleText } from '@shinefold/config';
 import { hasLength } from '@shinefold/utils/primitives';
+import { SKIM_GENERATION_DEADLINE_MS } from '@web/constants/generate-skim';
 import { z } from 'zod';
 
 export const SKIM_GENERATION_MODEL = 'claude-haiku-5-5';
@@ -42,12 +43,15 @@ export const generateTakeaways = async (
 ): Promise<string[]> => {
   const client = new Anthropic({ apiKey });
 
-  const message = await client.messages.parse({
-    model: SKIM_GENERATION_MODEL,
-    max_tokens: 1024,
-    messages: [{ role: 'user', content: buildPrompt(bodyToPlainText(body)) }],
-    output_config: { format: zodOutputFormat(takeawaysSchema) },
-  });
+  const message = await client.messages.parse(
+    {
+      model: SKIM_GENERATION_MODEL,
+      max_tokens: 1024,
+      messages: [{ role: 'user', content: buildPrompt(bodyToPlainText(body)) }],
+      output_config: { format: zodOutputFormat(takeawaysSchema) },
+    },
+    { signal: AbortSignal.timeout(SKIM_GENERATION_DEADLINE_MS) },
+  );
 
   if (!message.parsed_output) {
     throw new Error('generateTakeaways: Claude returned no parseable output.');

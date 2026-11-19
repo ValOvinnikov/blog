@@ -979,7 +979,7 @@
     },
     "footerBackgroundLabel": "Hintergrund",
     "footerBackgroundDescription": "Die Farbe der Fußzeile. Jede folgt dem hellen oder dunklen Design der Leser.",
-    "footerBackgroundOptionLabel": {
+    "skinLabel": {
       "PRIMARY": "Schlicht",
       "SECONDARY": "Schattiert",
       "BRAND_PRIMARY": "Markenton"
@@ -1098,7 +1098,14 @@
     "footerFinePrintAriaLabel": "Rechtliches",
     "footerPrivacy": "Datenschutzerklärung",
     "footerPoweredByLabel": "Bereitgestellt von",
-    "footerCookieSettings": "Cookie-Einstellungen"
+    "footerCookieSettings": "Cookie-Einstellungen",
+    "bandHeading": "Aus dem Hafenamt",
+    "bandText": "Gezeitentafeln, Liegeplatzhinweise und das Wetter der Woche an einem Ort.",
+    "bandLink": "Alle Hinweise ansehen",
+    "bandCardTitle": "Hinweis zu Winterliegeplätzen",
+    "bandCardExcerpt": "Die Liegeplätze am Nordkai rücken ab November nach innen.",
+    "bannerHeading": "Springflut an diesem Wochenende",
+    "bannerText": "Das höchste Wasser des Jahres erreicht den Nordkai am Samstagmorgen."
   },
   "lookFollow": {
     "followToggle": "Der Karte folgen, die du bearbeitest",

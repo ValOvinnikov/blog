@@ -1,13 +1,11 @@
 import { MODULE_PACK, TENANT_PLAN } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import { errorResult, okResult } from '@shinefold/utils';
 import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTenantEntitlements } from '@web/server/settings-features/get-tenant-entitlements/get-tenant-entitlements';
-import {
-  mockEntitlementGrant,
-  mockTenantEntitlements,
-} from '@web/testing/server/settings-features/fixtures';
+import { mockTenantEntitlements } from '@web/testing/server/settings-features/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';

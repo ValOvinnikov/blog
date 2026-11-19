@@ -5,7 +5,8 @@ marketing page. Status lives on the project board and in each epic's sub-issue
 list; this page holds only the order, the decisions still open, and why. Written
 2026-10-14 from a platform inspection; restructured 2026-10-31 around a single
 launch; refreshed 2026-11-10; launch scope, plans and prices settled
-2026-11-11 after a competitor review.
+2026-11-11 after a competitor review; skins and text roles pulled into the
+launch 2026-11-17; refreshed 2026-11-19.
 
 ## One launch
 
@@ -41,6 +42,8 @@ old production project (`web-prod` v0.3.0, Sanity `7fuqzuyl`) is retired.
   (#6794, its manual test left), reader self-service on a downgraded site
   (#5062, #6437), and choosing the surviving language after a downgrade
   (#5064).
+- **Done since 2026-11-10:** more Look settings and per-module styles
+  (#5067).
 
 ## Before the launch
 
@@ -51,6 +54,8 @@ old production project (`web-prod` v0.3.0, Sanity `7fuqzuyl`) is retired.
 | **#5085** | Launch readiness: legal pages and links (#5086 → #5087 → #3726 → #5088 → #5089, then #5090's final text), newsletter guards, rehearsed restores of the Neon point-in-time window and of the encrypted tenant exports each release takes before migrating (#5096; daily backups, #5095, are deferred), production error shipping and uptime checks (#5349), and Lighthouse on the marketing pages (#5097, after the apex cutover).                                                                                                                                                                                                                                                                             |
 | **#4979** | The two apps stay separate: language, sign-in and sessions per app. Left: its manual test.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | **#4987** | Accessible text and colour on the public site, guarded by a brand-matrix CI job.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| **#5016** | Skins, pulled into the launch (owner, 2026-11-17): every band background comes from one `SKIN_REGISTRY` entry. Left: Ink, a dark inverse band skin, for sections and the footer (#7537; the footer part decided 2026-11-19), and the manual tests #5026 and #5027.                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **#5028** | Text roles, pulled into the launch (owner, 2026-11-17): one `TEXT_ROLE` registry, so the same role looks identical in every module. Left: the typography registry (#5030), the adoption fixes #5032 to #5040, then #5041 and #5042, and the manual tests #5043 to #5046.                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
 ### Added to the launch (owner, 2026-11-11)
 
@@ -188,6 +193,12 @@ First, in this order (owner, 2026-11-11; no tickets cut except where named):
 11. The project content type with its latest-projects cards and archive
     (#1291).
 
+The header background (#7635) runs in parallel with that list, not queued
+behind it (owner, 2026-11-19): the header takes its background from the skin
+registry, in sub-issues #7636 to #7641. It starts with a design pass covering
+the header bar, the panels that open from it and the breadcrumb row on each
+skin, light and dark.
+
 No other new module is needed for the launch: the embed module is the only
 one in its scope. The location module (#2792) ships with the Business site type.
 
@@ -201,9 +212,6 @@ Unchanged, behind those:
 
 | Epic      | What it delivers                                                                                                       |
 | --------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **#5028** | Text roles: one `TEXT_ROLE` registry, so the same role looks identical in every module.                                |
-| **#5016** | Skins: a palette tier and a role tier on `[data-skin]`, generated from `SKIN_REGISTRY`.                                |
-| **#5067** | Per-tenant module styles: more Look settings, then per-module overrides, then plan-gated named variants.               |
 | **#5106** | Convention infrastructure: shared types, helpers, recipes, test fakes, and file-size and prop-ceiling gates.           |
 | **#5134** | Component structure: long prop lists and oversized files fixed at their source.                                        |
 | **#5150** | Docs: retire the design docs and SPEC.md sections the feature catalogue now covers, and add a feature-docs check.      |

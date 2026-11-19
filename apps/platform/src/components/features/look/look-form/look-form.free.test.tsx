@@ -7,6 +7,8 @@ import { screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   CONSOLE,
+  FREE_LOOK_FIELDS,
+  GROWTH_FIELDS_LINE,
   GROWTH_BADGE_TEXT,
 } from '@platform/testing/look/look-form-fixtures';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
@@ -17,7 +19,7 @@ import {
 } from '@platform/testing/look/look-form-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { TENANT_PLAN } from '@shinefold/config/constants';
-import { LOOK_FIELD, PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
+import { LOOK_FIELD } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -31,9 +33,6 @@ vi.mock('@platform/server/site-config/clear-brand-asset-action');
 const { lookForm: LOOK_FORM } = messages;
 const tLookForm = makeEnTranslator('lookForm');
 
-const GROWTH_FIELDS_LINE = tLookForm('lockLineGrowthFields', {
-  preset: CONSOLE,
-});
 const HEADING_FONT = FONT_OPTIONS[defaultLookFormValues().headingFont].label;
 
 describe(`<${LookForm.name}/>`, () => {
@@ -89,10 +88,7 @@ describe(`<${LookForm.name}/>`, () => {
     beforeEach(() => {
       setupLookForm(
         withLookTenant({
-          lookFields: [
-            ...PLAN_ENTITLEMENTS[TENANT_PLAN.FREE].lookFields,
-            LOOK_FIELD.HEADING_FONT,
-          ],
+          lookFields: [...FREE_LOOK_FIELDS, LOOK_FIELD.HEADING_FONT],
         }),
       );
     });
