@@ -71,7 +71,7 @@ const SPACING_TOKENS = [
   ...platformTokens('card', 'cell-inset'),
 ];
 
-const BORDER_WIDTH_TOKENS = platformTokens('ring');
+const BORDER_WIDTH_TOKENS = platformTokens('strong');
 
 const RADIUS_TOKENS = [
   'platform',

@@ -32,7 +32,7 @@ export const spinnerVariants = tv({
     size: {
       [SIZE.SM]: { glyph: ['size-3.5'], unlit: ['border'] },
       [SIZE.MD]: { glyph: ['size-4.5'], unlit: ['border-[1.25px]'] },
-      [SIZE.LG]: { glyph: ['size-6'], unlit: ['border-platform-ring'] },
+      [SIZE.LG]: { glyph: ['size-6'], unlit: ['border-platform-strong'] },
     },
     tone: {
       [SPINNER_TONE.BRAND]: {

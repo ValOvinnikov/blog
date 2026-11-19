@@ -6,7 +6,6 @@ import { isUndefined } from '@shinefold/utils/primitives';
 import type { ComponentProps, ReactNode } from 'react';
 
 import { alertDialogShellVariants } from './alert-dialog-shell-variants';
-import { useAlertDialogInitialFocus } from './use-alert-dialog-initial-focus';
 
 type TAlertDialogShellProps = {
   title: ReactNode;
@@ -28,18 +27,13 @@ export const AlertDialogShell = ({
     description: descriptionSlot,
     actions: actionsSlot,
   } = alertDialogShellVariants();
-  const { actionsRef, initialFocus } = useAlertDialogInitialFocus();
 
   return (
     <AlertDialog.Portal>
       <AlertDialog.Backdrop
         className={dialogBackdropVariants({ tone: DIALOG_BACKDROP_TONE.DIM })}
       />
-      <AlertDialog.Popup
-        className={popup()}
-        initialFocus={initialFocus}
-        finalFocus={finalFocus}
-      >
+      <AlertDialog.Popup className={popup()} finalFocus={finalFocus}>
         <AlertDialog.Title className={headingVariants({ size: 'cardTitle' })}>
           {title}
         </AlertDialog.Title>
@@ -49,9 +43,7 @@ export const AlertDialogShell = ({
           </AlertDialog.Description>
         )}
         {children}
-        <div ref={actionsRef} className={actionsSlot()}>
-          {actions}
-        </div>
+        <div className={actionsSlot()}>{actions}</div>
       </AlertDialog.Popup>
     </AlertDialog.Portal>
   );

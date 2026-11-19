@@ -49,7 +49,12 @@ export const dataTableShellVariants = tv({
       true: { sortIcon: ['rotate-180'] },
     },
     isSortable: {
-      true: { head: ['p-0'] },
+      true: {
+        head: [
+          'p-0',
+          'md:group-data-has-widths/table:px-0 md:group-data-has-widths/table:first:pl-0 md:group-data-has-widths/table:last:pr-0',
+        ],
+      },
     },
     isStacked: {
       true: {

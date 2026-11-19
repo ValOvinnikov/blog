@@ -1,13 +1,13 @@
 // A picked choice's 1.5px border equals the 1px border plus 0.5px margin of an unpicked one, so its outer size never moves.
 export const SELECTED_CHOICE_CLASSES = [
-  'border-platform-ring border-platform-selected-line bg-platform-selected-tint shadow-platform-choice-ring',
+  'border-platform-strong border-platform-selected-line bg-platform-selected-tint shadow-platform-choice-ring',
 ];
 
 export const SELECTED_COMPACT_FILL_CLASSES =
   'border-platform-selected-edge bg-platform-selected-tint text-platform-text';
 
 export const SELECTED_COMPACT_CHOICE_CLASSES = [
-  'border-platform-ring',
+  'border-platform-strong',
   SELECTED_COMPACT_FILL_CLASSES,
 ];
 

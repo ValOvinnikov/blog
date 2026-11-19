@@ -25,11 +25,11 @@ describe(tv, () => {
 
   it('keeps a platform border width alongside a platform border colour', () => {
     const variants = tv({
-      base: 'border-platform-ring border-platform-control-line',
+      base: 'border-platform-strong border-platform-control-line',
     });
 
     expect(variants()).toBe(
-      'border-platform-ring border-platform-control-line',
+      'border-platform-strong border-platform-control-line',
     );
   });
 

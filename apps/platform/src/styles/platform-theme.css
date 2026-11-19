@@ -422,7 +422,7 @@
 
   --font-weight-platform-650: 650;
 
-  --border-width-platform-ring: 1.5px;
+  --border-width-platform-strong: 1.5px;
 
   /* Clears the sticky topbar for sticky panels and scroll targets. */
   --spacing-platform-topbar: var(--platform-topbar);

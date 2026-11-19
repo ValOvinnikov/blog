@@ -35,21 +35,25 @@ const MOCK_NOTE = faker.lorem.sentence();
 const MOCK_ACTIONS_LABEL = faker.lorem.word();
 const MOCK_STATUS_LABEL = faker.lorem.words(2);
 const MOCK_ID_LABEL = faker.lorem.words(3);
-const NAME_COLUMN = faker.string.alpha(8);
-const STATUS_COLUMN = faker.string.alpha(8);
-const ID_COLUMN = faker.string.alpha(8);
-const ACTIONS_COLUMN = faker.string.alpha(8);
+const MOCK_NAME_COLUMN = faker.string.alpha(8);
+const MOCK_STATUS_COLUMN = faker.string.alpha(8);
+const MOCK_ID_COLUMN = faker.string.alpha(8);
+const MOCK_ACTIONS_COLUMN = faker.string.alpha(8);
 
 const ItemRow = ({ item }: { item: TItem }) => (
   <DataTableShell.Row>
-    <DataTableShell.Cell column={NAME_COLUMN}>{item.name}</DataTableShell.Cell>
+    <DataTableShell.Cell column={MOCK_NAME_COLUMN}>
+      {item.name}
+    </DataTableShell.Cell>
     {item.status && (
-      <DataTableShell.Cell column={STATUS_COLUMN}>
+      <DataTableShell.Cell column={MOCK_STATUS_COLUMN}>
         {item.status}
       </DataTableShell.Cell>
     )}
-    <DataTableShell.Cell column={ID_COLUMN}>{item.id}</DataTableShell.Cell>
-    <DataTableShell.Cell column={ACTIONS_COLUMN}>{null}</DataTableShell.Cell>
+    <DataTableShell.Cell column={MOCK_ID_COLUMN}>{item.id}</DataTableShell.Cell>
+    <DataTableShell.Cell column={MOCK_ACTIONS_COLUMN}>
+      {null}
+    </DataTableShell.Cell>
   </DataTableShell.Row>
 );
 
@@ -68,10 +72,10 @@ const renderTable = (
       ariaLabel={MOCK_ARIA_LABEL}
       isStacked={isStacked}
       columns={[
-        { key: NAME_COLUMN, label: MOCK_COLUMN_LABEL, sort },
-        { key: STATUS_COLUMN, label: MOCK_STATUS_LABEL },
-        { key: ID_COLUMN, label: MOCK_ID_LABEL },
-        { key: ACTIONS_COLUMN, label: MOCK_ACTIONS_LABEL },
+        { key: MOCK_NAME_COLUMN, label: MOCK_COLUMN_LABEL, sort },
+        { key: MOCK_STATUS_COLUMN, label: MOCK_STATUS_LABEL },
+        { key: MOCK_ID_COLUMN, label: MOCK_ID_LABEL },
+        { key: MOCK_ACTIONS_COLUMN, label: MOCK_ACTIONS_LABEL },
       ]}
       renderRow={(item) => <ItemRow key={item.id} item={item} />}
     >

@@ -5,7 +5,7 @@ export const checkMarkVariants = tv({
   variants: {
     isDone: {
       true: ['bg-platform-ok text-platform-on-brand-ink'],
-      false: ['border-platform-ring border-platform-control-line'],
+      false: ['border-platform-strong border-platform-control-line'],
     },
   },
 });
