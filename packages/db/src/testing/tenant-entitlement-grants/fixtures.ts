@@ -12,6 +12,9 @@ const grantsFaker = createMockFaker(678001);
 export const MOCK_GRANT_NOTE = grantsFaker.lorem.sentence();
 export const MOCK_GRANT_PAST = grantsFaker.date.past({ refDate: MOCK_NOW });
 export const MOCK_GRANT_FUTURE = grantsFaker.date.future({ refDate: MOCK_NOW });
+export const MOCK_GRANT_LATER = grantsFaker.date.future({
+  refDate: MOCK_GRANT_FUTURE,
+});
 
 export async function insertTestEntitlementGrant(
   db: TTestDb,
