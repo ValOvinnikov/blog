@@ -1,4 +1,8 @@
-import type { IWithDataTestId } from '@shinefold/config';
+import {
+  type IWithDataTestId,
+  MEDIA_RATIO,
+  TEXT_ROLE,
+} from '@shinefold/config';
 import type { TFeatureHighlightItem } from '@shinefold/service';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { MediaFrame } from '@shinefold/ui/components/atoms/media-frame';
@@ -31,7 +35,7 @@ export const FeatureHighlightRow = ({
     >
       <div className={s.media()}>
         <MediaFrame
-          ratio="video"
+          ratio={MEDIA_RATIO.VIDEO}
           className={s.frame()}
           dataTestId={`${dataTestId}-media`}
         >
@@ -46,7 +50,11 @@ export const FeatureHighlightRow = ({
         </MediaFrame>
       </div>
       <div className={s.text()}>
-        <Heading level={3} visual="prose-h3" className={s.heading()}>
+        <Heading
+          level={3}
+          visual={TEXT_ROLE.ITEM_TITLE}
+          className={s.heading()}
+        >
           {item.heading}
         </Heading>
         <Prose className={s.body()}>

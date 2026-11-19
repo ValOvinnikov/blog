@@ -1,10 +1,15 @@
-import { CARD_IMAGE_SHAPE, type IWithDataTestId } from '@shinefold/config';
+import {
+  CARD_IMAGE_SHAPE,
+  type IWithDataTestId,
+  TEXT_ROLE,
+} from '@shinefold/config';
 import type { TTeamMember, TTeamModule } from '@shinefold/service';
 import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { MediaFrame } from '@shinefold/ui/components/atoms/media-frame';
 import { Prose } from '@shinefold/ui/components/atoms/prose';
 import { Text } from '@shinefold/ui/components/atoms/text';
+import { hasLength } from '@shinefold/utils/primitives';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -54,16 +59,16 @@ export const TeamSpotlight = ({
         )}
       </MediaFrame>
       <div className={s.text()}>
-        <Heading level={3} visual="prose-h3">
+        <Heading level={3} visual={TEXT_ROLE.ITEM_TITLE}>
           {profileUrl ? <SmartLink href={profileUrl}>{name}</SmartLink> : name}
         </Heading>
-        {role ? <Text variant="muted">{role}</Text> : null}
+        {role ? <Text textRole={TEXT_ROLE.META}>{role}</Text> : null}
         {bio && (
           <Prose className={s.bio()}>
             <PortableText value={bio} />
           </Prose>
         )}
-        {socialLinks.length > 0 && (
+        {hasLength(socialLinks) && (
           <div className={s.social()}>
             <SocialLinks profiles={socialLinks} variant="outlined" />
           </div>

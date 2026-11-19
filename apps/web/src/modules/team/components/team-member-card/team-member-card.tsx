@@ -1,11 +1,15 @@
 import {
   CARD_IMAGE_SHAPE,
+  DIV_AS_CONST,
   type IWithClassName,
   type IWithDataTestId,
+  TEXT_ROLE,
 } from '@shinefold/config';
 import type { TTeamMember, TTeamModule } from '@shinefold/service';
 import { Avatar } from '@shinefold/ui/components/atoms/avatar';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import { MediaCard } from '@shinefold/ui/components/molecules/media-card';
+import { hasLength } from '@shinefold/utils/primitives';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -74,13 +78,15 @@ export const TeamMemberCard = ({
             member.name
           )}
         </MediaCard.Title>
-        {member.role ? <p className={s.role()}>{member.role}</p> : null}
+        {member.role ? (
+          <Text textRole={TEXT_ROLE.META}>{member.role}</Text>
+        ) : null}
         {member.bio && (
-          <div className={s.bio()}>
+          <Text as={DIV_AS_CONST} textRole={TEXT_ROLE.CARD_BODY}>
             <PortableText value={member.bio} />
-          </div>
+          </Text>
         )}
-        {member.socialLinks.length > 0 && (
+        {hasLength(member.socialLinks) && (
           <MediaCard.Footer>
             <SocialLinks profiles={member.socialLinks} variant="outlined" />
           </MediaCard.Footer>
