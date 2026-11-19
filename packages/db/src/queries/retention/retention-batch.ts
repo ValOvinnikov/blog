@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import { getDb } from '@shinefold/db/client';
 import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { inArray, type SQL, type SQLWrapper, sql } from 'drizzle-orm';
@@ -20,7 +21,7 @@ function matchesBatch(keys: TBatchKey, batch: SQLWrapper): SQL {
 export async function deleteRetentionBatch(
   table: PgTable,
   keys: TBatchKey,
-  filter: SQL | undefined,
+  filter: TMaybeUndefined<SQL>,
   limit: number,
 ): Promise<number> {
   const db = getDb();
