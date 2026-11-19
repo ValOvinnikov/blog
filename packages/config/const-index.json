@@ -1652,6 +1652,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/button",
         "file": "apps/platform/src/constants/button.ts"
+      },
+      {
+        "ref": "PROVIDER_LINK_ACTION.LINK",
+        "scope": "app:web",
+        "from": "@web/constants/provider-link",
+        "file": "apps/web/src/constants/provider-link.ts"
       }
     ],
     "COOKIE_SETTINGS": [
@@ -11562,6 +11568,14 @@
         "scope": "app:web",
         "from": "@web/constants/pricing",
         "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "UNLINK": [
+      {
+        "ref": "PROVIDER_LINK_ACTION.UNLINK",
+        "scope": "app:web",
+        "from": "@web/constants/provider-link",
+        "file": "apps/web/src/constants/provider-link.ts"
       }
     ],
     "proxy.tenant_lookup_failed": [
