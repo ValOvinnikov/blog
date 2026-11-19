@@ -317,6 +317,7 @@ describe('proxy matcher for a preview token', () => {
   it.each([
     `/${MOCK_TENANT_ID}${DRAFT_PREVIEW_MARKER}/en/blog/a.b`,
     '/en/%7Epreview/blog/a.b',
+    `/${MOCK_TENANT_ID}~%70review/en/blog/a.b`,
   ])('runs the proxy for the dotted draft path %s', (path) => {
     expect(
       unstable_doesMiddlewareMatch({
@@ -356,7 +357,7 @@ describe(proxy, () => {
       `/${MOCK_TENANT_ID}${DRAFT_PREVIEW_MARKER}/en${BLOG_POST_PATH}`,
       `/en/%7Epreview${BLOG_POST_PATH}`,
       `/en/%7epreview${BLOG_POST_PATH}`,
-      `/${MOCK_TENANT_ID}~%70review/en${BLOG_POST_PATH}`,
+      '/x~%70review/en/blog/a.b',
     ])('answers not found for the draft marker in %s', async (path) => {
       const response = await visit(path);
 
