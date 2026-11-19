@@ -1,4 +1,5 @@
 import * as schema from '@shinefold/db/schema';
+import { insertTestEmailConfig } from '@shinefold/db/testing/email-config/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
@@ -25,15 +26,13 @@ describe(getEmailNewPosts, () => {
   });
 
   it('is on for a row that never set it', async () => {
-    await db().insert(schema.emailConfig).values({ tenantId });
+    await insertTestEmailConfig(db(), tenantId);
 
     expect(await getEmailNewPosts(tenantId)).toBe(true);
   });
 
   it('reads an owner who turned it off', async () => {
-    await db()
-      .insert(schema.emailConfig)
-      .values({ tenantId, emailNewPosts: false });
+    await insertTestEmailConfig(db(), tenantId, { emailNewPosts: false });
 
     expect(await getEmailNewPosts(tenantId)).toBe(false);
   });

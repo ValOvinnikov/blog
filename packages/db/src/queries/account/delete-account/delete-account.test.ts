@@ -1,17 +1,18 @@
 import { faker } from '@faker-js/faker';
 import { AUDIT_ACTION, ERROR_CODE } from '@shinefold/config/constants';
-import {
-  ADMIN_ROLE,
-  GRANTED_VIA,
-  MEMBERSHIP_ROLE,
-} from '@shinefold/db/constants';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import { GITHUB_PROVIDER } from '@shinefold/db/testing/account/fixtures';
+import {
+  insertTestAdminForUser,
+  MOCK_SUPERADMIN_GRANT,
+} from '@shinefold/db/testing/admins/fixtures';
 import { insertTestAuditEvent } from '@shinefold/db/testing/audit-events/fixtures';
 import {
   insertTestAccount,
   insertTestUser,
 } from '@shinefold/db/testing/fixtures';
+import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { errorResult, okResult } from '@shinefold/utils';
@@ -127,9 +128,11 @@ describe(deleteAccount, () => {
   });
 
   it('deletes a user whose only memberships are below owner', async () => {
-    await db()
-      .insert(schema.memberships)
-      .values({ userId, tenantId: tenant().id, role: MEMBERSHIP_ROLE.EDITOR });
+    await mockMembership(db(), {
+      userId,
+      tenantId: tenant().id,
+      role: MEMBERSHIP_ROLE.EDITOR,
+    });
 
     const result = await deleteAccount(userId);
 
@@ -138,9 +141,11 @@ describe(deleteAccount, () => {
   });
 
   it('refuses a tenant owner and keeps the account and its membership', async () => {
-    await db()
-      .insert(schema.memberships)
-      .values({ userId, tenantId: tenant().id, role: MEMBERSHIP_ROLE.OWNER });
+    await mockMembership(db(), {
+      userId,
+      tenantId: tenant().id,
+      role: MEMBERSHIP_ROLE.OWNER,
+    });
 
     const result = await deleteAccount(userId);
 
@@ -154,11 +159,7 @@ describe(deleteAccount, () => {
   });
 
   it('refuses a platform admin and keeps the account and its admins row', async () => {
-    await db().insert(schema.admins).values({
-      userId,
-      role: ADMIN_ROLE.SUPERADMIN,
-      grantedVia: GRANTED_VIA.BREAK_GLASS,
-    });
+    await insertTestAdminForUser(db(), userId, MOCK_SUPERADMIN_GRANT);
 
     const result = await deleteAccount(userId);
 

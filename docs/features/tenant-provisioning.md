@@ -65,6 +65,8 @@ An operator creates a tenant in the platform. That inserts a draft row and enque
 
 The run then verifies all of it. The platform polls each step's progress and offers Retry. Deprovisioning reverses the run: it archives the tenant, never hard-deletes it. Reactivation re-runs provisioning. Deletion is a separate, final hard delete of an archived tenant.
 
+Starter content is marked as a sample: every seeded document whose id starts with `STARTER_DOCUMENT_ID_PREFIX` (`starter.`) shows a **Sample** badge in the Studio, so owners can tell it from their own content and replace or delete it ([Embedded Studio](embedded-studio.md)). Base documents seeded under `provisioning.*` and the settings singletons carry no badge.
+
 ## Surfaces and routes
 
 - **Operator pages (any `admins` row):**

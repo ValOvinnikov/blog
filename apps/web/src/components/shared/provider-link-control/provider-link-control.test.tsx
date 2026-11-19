@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { ACTION_OUTCOME, routes, SITE_MESSAGES } from '@shinefold/config';
 import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { PROVIDER_LINK_ACTION } from '@web/constants/provider-link';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';
 import { stubRouterRefresh } from '@web/testing/shared/router/stub-router-refresh';
@@ -36,7 +37,7 @@ const {
 
 const setup = customRender(withToastProvider(ProviderLinkControl), {
   provider: PROVIDER,
-  action: 'link',
+  action: PROVIDER_LINK_ACTION.LINK,
 });
 
 describe(`<${ProviderLinkControl.name}/>`, () => {
@@ -86,7 +87,7 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
 
   describe('unlink action', () => {
     beforeEach(() => {
-      setup({ action: 'unlink' });
+      setup({ action: PROVIDER_LINK_ACTION.UNLINK });
     });
 
     it('unlinks the provider, announces it and refreshes the page', async () => {

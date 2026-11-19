@@ -6,6 +6,7 @@ import {
   MOCK_MISSING_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_WWW_TENANT_DOMAIN,
+  insertTestTenantDomain,
 } from '@shinefold/db/testing/tenant-domains/fixtures';
 import {
   MOCK_MISSING_TENANT_ID,
@@ -45,13 +46,9 @@ describe(setTenantPrimaryDomain, () => {
     ({ id: otherTenantId } = await insertTestTenant(db(), {
       primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
     }));
-    await db()
-      .insert(schema.tenantDomains)
-      .values([
-        { tenantId, domain: MOCK_TENANT_DOMAIN },
-        { tenantId, domain: MOCK_WWW_TENANT_DOMAIN },
-        { tenantId: otherTenantId, domain: MOCK_OTHER_TENANT_DOMAIN },
-      ]);
+    await insertTestTenantDomain(db(), tenantId, MOCK_TENANT_DOMAIN);
+    await insertTestTenantDomain(db(), tenantId, MOCK_WWW_TENANT_DOMAIN);
+    await insertTestTenantDomain(db(), otherTenantId, MOCK_OTHER_TENANT_DOMAIN);
   });
 
   it('switches to the custom domain and back without touching rows', async () => {

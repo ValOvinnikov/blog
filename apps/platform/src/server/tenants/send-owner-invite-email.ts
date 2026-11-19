@@ -8,26 +8,26 @@ import { MAGIC_LINK_PROVIDER_ID } from '@shinefold/auth/providers/magic-link/mag
 
 const AUTH_ERROR_PARAM = 'error';
 
+/** Never throws; resolves whether the email went out. */
 export const sendOwnerInviteEmail = async (
   tenantId: string,
-  ownerEmail: string,
-): Promise<void> => {
+  email: string,
+  failureEvent: string = TENANT_LOG.OWNER_INVITE_EMAIL_FAILED,
+): Promise<boolean> => {
   try {
     const redirectUrl: string = await signIn(MAGIC_LINK_PROVIDER_ID, {
-      email: ownerEmail,
+      email,
       redirect: false,
       redirectTo: toSafeCallbackPath(
         adminRoutes.dashboardSelectTenantHref(tenantId),
       ),
     });
     const reason = new URL(redirectUrl).searchParams.get(AUTH_ERROR_PARAM);
-    if (reason) {
-      logger.error(TENANT_LOG.OWNER_INVITE_EMAIL_FAILED, { tenantId, reason });
-    }
+    if (!reason) return true;
+
+    logger.error(failureEvent, { tenantId, reason });
   } catch (error) {
-    logger.error(TENANT_LOG.OWNER_INVITE_EMAIL_FAILED, {
-      tenantId,
-      ...toLoggableError(error),
-    });
+    logger.error(failureEvent, { tenantId, ...toLoggableError(error) });
   }
+  return false;
 };

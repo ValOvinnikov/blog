@@ -1,13 +1,10 @@
-import { type TOutcome, SUBSCRIBER_OUTCOME } from '@shinefold/config';
+import { SUBSCRIBER_OUTCOME } from '@shinefold/config';
 import { getDb } from '@shinefold/db/client';
+import type { TUnsubscribeByLinkResult } from '@shinefold/db/queries/subscribers/unsubscribe-types';
 import { subscribers } from '@shinefold/db/schema/subscribers';
 import { sha256Hex } from '@shinefold/utils/hash';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
-
-export type TUnsubscribeByLinkResult = TOutcome<
-  typeof SUBSCRIBER_OUTCOME.UNSUBSCRIBED | typeof SUBSCRIBER_OUTCOME.NOT_FOUND
->;
 
 export async function unsubscribeByToken(
   tenantId: string,

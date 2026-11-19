@@ -5,6 +5,7 @@ import {
   MOCK_MISSING_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_WWW_TENANT_DOMAIN,
+  insertTestTenantDomain,
 } from '@shinefold/db/testing/tenant-domains/fixtures';
 import { MOCK_TENANT_DOMAIN } from '@shinefold/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
@@ -31,9 +32,7 @@ describe(removeTenantDomain, () => {
     ({ id: otherTenantId } = await insertTestTenant(db(), {
       primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
     }));
-    await db()
-      .insert(schema.tenantDomains)
-      .values({ tenantId, domain: MOCK_WWW_TENANT_DOMAIN });
+    await insertTestTenantDomain(db(), tenantId, MOCK_WWW_TENANT_DOMAIN);
   });
 
   it('deletes the row for the matching tenant and domain', async () => {
@@ -67,9 +66,7 @@ describe(removeTenantDomain, () => {
   });
 
   it('keeps the row and returns false when it is the main address', async () => {
-    await db()
-      .insert(schema.tenantDomains)
-      .values({ tenantId, domain: MOCK_TENANT_DOMAIN });
+    await insertTestTenantDomain(db(), tenantId, MOCK_TENANT_DOMAIN);
 
     const removed = await removeTenantDomain(tenantId, MOCK_TENANT_DOMAIN);
 

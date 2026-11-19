@@ -3,6 +3,7 @@ import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_SANITY_PROJECT_ID } from '@shinefold/db/testing/sanity-management-client/fixtures';
 import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
+  unsetTenantTokenEncryptionKey,
   useTenantTokenEncryptionKey,
 } from '@shinefold/db/testing/tenant-token-encryption-key';
 import {
@@ -41,7 +42,7 @@ describe(getTenantRevalidateWebhookSecret, () => {
     });
 
     it('throws when the encryption key is not configured', async () => {
-      vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
+      unsetTenantTokenEncryptionKey();
 
       await expect(
         getTenantRevalidateWebhookSecret(MOCK_SANITY_PROJECT_ID),

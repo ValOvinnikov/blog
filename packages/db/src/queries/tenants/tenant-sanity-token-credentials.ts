@@ -4,8 +4,7 @@ import type {
   TTenantStatus,
 } from '@shinefold/db/constants';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import { requireTenantTokenEncryptionKey } from '@shinefold/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
-import { decryptSecret } from '@shinefold/utils';
+import { decryptTenantSecret } from '@shinefold/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
 
 export type TTenantSanityTokenCredentials = {
   projectId: string;
@@ -33,7 +32,7 @@ export function toTenantSanityTokenCredentials(
   return {
     projectId: sanityProjectId,
     dataset: sanityDataset,
-    token: decryptSecret(tokenEncrypted, requireTenantTokenEncryptionKey()),
+    token: decryptTenantSecret(tokenEncrypted),
     status,
     deprovisionedAt,
     provisioningStatus,

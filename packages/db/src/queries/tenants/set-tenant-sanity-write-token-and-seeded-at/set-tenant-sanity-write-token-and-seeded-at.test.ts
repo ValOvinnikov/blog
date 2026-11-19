@@ -1,6 +1,7 @@
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
+  unsetTenantTokenEncryptionKey,
   useTenantTokenEncryptionKey,
 } from '@shinefold/db/testing/tenant-token-encryption-key';
 import {
@@ -42,7 +43,7 @@ describe(setTenantSanityWriteTokenAndSeededAt, () => {
   });
 
   it('throws without a configured encryption key, leaving both columns untouched', async () => {
-    vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
+    unsetTenantTokenEncryptionKey();
 
     await expect(
       setTenantSanityWriteTokenAndSeededAt(

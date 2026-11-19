@@ -1,10 +1,10 @@
 import { SUSPENSION_CATEGORY } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import type { TTenantSuspension } from '@shinefold/db/schema/tenant-suspensions';
+import { useTestAdmin } from '@shinefold/db/testing/admins/fixtures';
 import { firstRowOrThrow } from '@shinefold/db/testing/first-row-or-throw';
 import type { TTestDb } from '@shinefold/db/testing/fixtures';
 import { createMockFaker } from '@shinefold/db/testing/mock-faker';
-import { useTestAdmin } from '@shinefold/db/testing/test-admin';
 
 const suspensionsFaker = createMockFaker(659001);
 

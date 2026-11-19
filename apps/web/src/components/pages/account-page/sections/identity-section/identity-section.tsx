@@ -1,8 +1,10 @@
-import { ICONS, SIZE } from '@shinefold/config';
+import { ICONS, SIZE, type TMaybeNull } from '@shinefold/config';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { DisplayNameControl } from '@web/components/shared/display-name-control';
 import { ProviderLinkControl } from '@web/components/shared/provider-link-control';
+import { PROVIDER_LINK_ACTION } from '@web/constants/provider-link';
 import type { TLinkableProvider } from '@web/server/account/identity-actions/identity-actions';
 import { auth } from '@web/server/auth/auth';
 import { toSessionUsername } from '@web/utils/to-session-username';
@@ -17,13 +19,6 @@ import {
 
 const s = identitySectionVariants();
 
-/**
- * Provider rows render as plain flex-row markup rather than `SettingRow`
- * (its label+description+control model doesn't fit a single-line
- * icon+name+status+action row). GitHub's `Icon` renders one `SIZE` step
- * larger than Google's/email's glyphs since the octocat SVG carries more
- * internal padding than the others.
- */
 export const IdentitySection = async () => {
   const session = await auth();
   if (!session?.user?.id) return null;
@@ -39,21 +34,22 @@ export const IdentitySection = async () => {
 
   const providerConfigs: {
     id: 'github' | 'google' | 'email';
-    provider: TLinkableProvider | null;
+    provider: TMaybeNull<TLinkableProvider>;
     icon: ReactNode;
     label: string;
     isLinked: boolean;
   }[] = [
     {
-      id: 'github',
-      provider: 'github',
+      id: OAUTH_PROVIDER.GITHUB,
+      provider: OAUTH_PROVIDER.GITHUB,
+      // The octocat SVG carries more internal padding than the other glyphs, so it sits one SIZE step up.
       icon: <Icon name={ICONS.GITHUB} size={SIZE.MD} />,
       label: t('githubLabel'),
       isLinked: linked.github,
     },
     {
-      id: 'google',
-      provider: 'google',
+      id: OAUTH_PROVIDER.GOOGLE,
+      provider: OAUTH_PROVIDER.GOOGLE,
       icon: <Icon name={ICONS.GOOGLE} size={SIZE.SM} />,
       label: t('googleLabel'),
       isLinked: linked.google,
@@ -83,7 +79,9 @@ export const IdentitySection = async () => {
       control: provider ? (
         <ProviderLinkControl
           provider={provider}
-          action={isLinked ? 'unlink' : 'link'}
+          action={
+            isLinked ? PROVIDER_LINK_ACTION.UNLINK : PROVIDER_LINK_ACTION.LINK
+          }
         />
       ) : null,
     }),
