@@ -7,21 +7,22 @@ import {
   Heading,
   type THeadingProps,
 } from '@shinefold/ui/components/atoms/heading';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 
 import {
   settingRowVariants,
   type TSettingRowVariants,
 } from './setting-row-variants';
 
-export type TSettingRowProps = IWithClassName &
-  IWithDataTestId & {
-    label: ReactNode;
-    labelLevel?: THeadingProps['level'];
-    description?: ReactNode;
-    tone?: TSettingRowVariants['tone'];
-    children?: ReactNode;
-  };
+export type TSettingRowProps = PropsWithChildren<
+  IWithClassName &
+    IWithDataTestId & {
+      label: ReactNode;
+      labelLevel?: THeadingProps['level'];
+      description?: ReactNode;
+      tone?: TSettingRowVariants['tone'];
+    }
+>;
 
 /** One labelled setting in a settings list, with an optional description and a slot for its controls. */
 export const SettingRow = ({

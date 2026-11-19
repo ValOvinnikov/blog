@@ -11,20 +11,21 @@ import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
 import type { THeadingLevel } from '@shinefold/ui/lib/react';
-import { useRef, type ReactNode, type RefObject } from 'react';
+import { useRef, type PropsWithChildren, type RefObject } from 'react';
 
 import { dialogVariants } from './dialog-variants';
 
-export type TDialogProps = IWithClassName &
-  IWithDataTestId & {
-    isOpen: boolean;
-    onOpenChange: (isOpen: boolean) => void;
-    heading: string;
-    headingLevel: THeadingLevel;
-    closeLabel?: string;
-    fallbackFocusRef?: RefObject<TMaybeNull<HTMLElement>>;
-    children?: ReactNode;
-  };
+export type TDialogProps = PropsWithChildren<
+  IWithClassName &
+    IWithDataTestId & {
+      isOpen: boolean;
+      onOpenChange: (isOpen: boolean) => void;
+      heading: string;
+      headingLevel: THeadingLevel;
+      closeLabel?: string;
+      fallbackFocusRef?: RefObject<TMaybeNull<HTMLElement>>;
+    }
+>;
 
 const s = dialogVariants();
 

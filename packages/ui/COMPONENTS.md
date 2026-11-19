@@ -320,7 +320,7 @@ Slots:
 ### SettingRow — `components/molecules/setting-row/setting-row.tsx`
 
 One labelled setting in a settings list, with an optional description and a slot for its controls.
-Props: label: ReactNode · labelLevel?: THeadingProps['level'] · description?: ReactNode · tone?: TSettingRowVariants['tone'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Props: _(extends PropsWithChildren< IWithClassName & IWithDataTe…)_
 Variants: tone: default|danger
 
 ### ShareLink — `components/molecules/share-link/share-link.tsx`
@@ -432,7 +432,7 @@ Compound component:
 ### Dialog — `components/organisms/dialog/dialog.tsx`
 
 A modal window over the page, named by its heading; client-only, so the consumer declares the client boundary.
-Props: isOpen: boolean · onOpenChange: (isOpen: boolean) => void · heading: string · headingLevel: THeadingLevel · closeLabel?: string · fallbackFocusRef?: RefObject<TMaybeNull<HTMLElement>> · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Props: _(extends PropsWithChildren< IWithClassName & IWithDataTe…)_
 
 ### Footer — `components/organisms/footer/footer.tsx`
 
