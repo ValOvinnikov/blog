@@ -9,8 +9,6 @@ export const consentBannerVariants = tv({
       'border-t border-border bg-surface shadow-lg',
       'sm:rounded-md sm:border',
     ],
-    heading: ['text-text'],
-    message: [],
     actions: ['flex flex-wrap items-center gap-2 pt-1'],
     settings: ['ml-auto'],
   },

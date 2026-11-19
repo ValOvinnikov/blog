@@ -1,5 +1,6 @@
 import {
   SIZE,
+  TEXT_ROLE,
   type ILink,
   type IWithClassName,
   type IWithDataTestId,
@@ -47,10 +48,10 @@ export const ConsentBanner = ({
   dataTestId,
 }: TConsentBannerProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
-    <Heading level={headingLevel} size={SIZE.SM} className={s.heading()}>
+    <Heading level={headingLevel} visual={TEXT_ROLE.DIALOG_TITLE}>
       {heading}
     </Heading>
-    <Text variant="card" className={s.message()}>
+    <Text textRole={TEXT_ROLE.CARD_BODY}>
       {message}
       {policyLink && (
         <>

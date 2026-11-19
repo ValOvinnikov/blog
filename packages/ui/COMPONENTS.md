@@ -319,7 +319,7 @@ Slots:
 
 ### SettingRow — `components/molecules/setting-row/setting-row.tsx`
 
-A label + description + control-slot row shared by every `/account` section (privacy & data, email preferences, connected accounts).
+One labelled setting in a settings list, with an optional description and a slot for its controls.
 Props: label: ReactNode · labelLevel?: THeadingProps['level'] · description?: ReactNode · tone?: TSettingRowVariants['tone'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: tone: default|danger
 
@@ -432,7 +432,7 @@ Compound component:
 ### Dialog — `components/organisms/dialog/dialog.tsx`
 
 A modal window over the page, named by its heading; client-only, so the consumer declares the client boundary.
-Props: isOpen: boolean · onOpenChange: (isOpen: boolean) => void · heading: string · headingLevel: THeadingLevel · closeLabel?: string · fallbackFocusRef?: RefObject<HTMLElement | null> · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Props: isOpen: boolean · onOpenChange: (isOpen: boolean) => void · heading: string · headingLevel: THeadingLevel · closeLabel?: string · fallbackFocusRef?: RefObject<TMaybeNull<HTMLElement>> · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Footer — `components/organisms/footer/footer.tsx`
 

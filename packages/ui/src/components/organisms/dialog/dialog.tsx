@@ -2,8 +2,10 @@ import { Dialog as BaseDialog } from '@base-ui/react/dialog';
 import {
   ICONS,
   SIZE,
+  TEXT_ROLE,
   type IWithClassName,
   type IWithDataTestId,
+  type TMaybeNull,
 } from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
@@ -20,7 +22,7 @@ export type TDialogProps = IWithClassName &
     heading: string;
     headingLevel: THeadingLevel;
     closeLabel?: string;
-    fallbackFocusRef?: RefObject<HTMLElement | null>;
+    fallbackFocusRef?: RefObject<TMaybeNull<HTMLElement>>;
     children?: ReactNode;
   };
 
@@ -38,7 +40,7 @@ export const Dialog = ({
   className,
   dataTestId,
 }: TDialogProps) => {
-  const openerRef = useRef<Element | null>(null);
+  const openerRef = useRef<TMaybeNull<Element>>(null);
 
   const captureOpener = () => {
     openerRef.current = document.activeElement;
@@ -66,9 +68,8 @@ export const Dialog = ({
               render={({ id }) => (
                 <Heading
                   level={headingLevel}
-                  size={SIZE.SM}
+                  visual={TEXT_ROLE.DIALOG_TITLE}
                   id={id}
-                  className={s.heading()}
                 >
                   {heading}
                 </Heading>
