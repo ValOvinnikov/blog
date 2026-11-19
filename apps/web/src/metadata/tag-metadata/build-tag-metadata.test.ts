@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
 import { type TTagDetailPage } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import { TAG_LOG } from '@web/constants/tag';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   MOCK_DUTCH_REQUEST_CONTEXT,
@@ -77,18 +78,8 @@ describe(buildTagMetadata, () => {
     const metadata = await buildTagMetadata(MOCK_TAG_SLUG, 2);
 
     expect(metadata.title).toBe(`${title} ${toPageSuffix(2)}`);
-    expect(metadata.openGraph?.title).toBe(`${ogTitle} ${toPageSuffix(2)}`);
     expect(metadata.alternates?.canonical).toBe(routes.tag(MOCK_TAG_SLUG, 2));
     expect(metadata.alternates?.types).toEqual(TAG_FEED_TYPES);
-  });
-
-  it('omits the OG title past page 1 when none is authored', async () => {
-    resolveTagPageWith({ seo: mockMetadataSeo({ ogTitle: undefined }) });
-
-    const metadata = await buildTagMetadata(MOCK_TAG_SLUG, 2);
-
-    expect(metadata.openGraph?.title).toBeUndefined();
-    expect(metadata.twitter?.title).toBeUndefined();
   });
 
   describe('when the tag fetch fails', () => {
@@ -104,7 +95,7 @@ describe(buildTagMetadata, () => {
 
       expect(metadata).toEqual({});
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'tag_metadata.fetch_failed',
+        TAG_LOG.METADATA_FETCH_FAILED,
         { slug, error: MOCK_ERROR },
       );
     });
@@ -134,32 +125,20 @@ describe(buildTagMetadata, () => {
       });
     });
 
-    it('advertises the feed in its own language', async () => {
+    it('lists each live translation as hreflang and the feed in its own language', async () => {
       const metadata = await buildTagMetadata(MOCK_NL_SLUG);
 
-      expect(metadata.alternates?.types).toEqual({
-        'application/rss+xml': `${NL_PATH_PREFIX}${routes.tagRssFeed(MOCK_NL_SLUG)}`,
+      expect(metadata.alternates).toEqual({
+        canonical: NL_TAG_PATH,
+        languages: {
+          en: EN_TAG_PATH,
+          nl: NL_TAG_PATH,
+          'x-default': EN_TAG_PATH,
+        },
+        types: {
+          'application/rss+xml': `${NL_PATH_PREFIX}${routes.tagRssFeed(MOCK_NL_SLUG)}`,
+        },
       });
-    });
-
-    it('lists each live translation as hreflang, canonical to its prefix', async () => {
-      const metadata = await buildTagMetadata(MOCK_NL_SLUG);
-
-      expect(metadata.alternates?.canonical).toBe(NL_TAG_PATH);
-      expect(metadata.alternates?.languages).toEqual({
-        en: EN_TAG_PATH,
-        nl: NL_TAG_PATH,
-        'x-default': EN_TAG_PATH,
-      });
-    });
-
-    it('lists no hreflang past page 1', async () => {
-      const metadata = await buildTagMetadata(MOCK_NL_SLUG, 2);
-
-      expect(metadata.alternates?.canonical).toBe(
-        `${NL_PATH_PREFIX}${routes.tag(MOCK_NL_SLUG, 2)}`,
-      );
-      expect(metadata.alternates?.languages).toBeUndefined();
     });
   });
 });

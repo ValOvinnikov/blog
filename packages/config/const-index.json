@@ -11112,6 +11112,14 @@
         "file": "apps/web/src/constants/post-index.ts"
       }
     ],
+    "post_index_metadata.fetch_failed": [
+      {
+        "ref": "POST_INDEX_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post-index",
+        "file": "apps/web/src/constants/post-index.ts"
+      }
+    ],
     "post_latest_module.fetch_failed": [
       {
         "ref": "POST_LATEST_LOG.MODULE_FETCH_FAILED",
@@ -11824,6 +11832,14 @@
         "file": "apps/web/src/constants/tag.ts"
       }
     ],
+    "tag_metadata.fetch_failed": [
+      {
+        "ref": "TAG_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tag",
+        "file": "apps/web/src/constants/tag.ts"
+      }
+    ],
     "taxonomy_list_module.fetch_failed": [
       {
         "ref": "TAXONOMY_LIST_LOG.MODULE_FETCH_FAILED",
@@ -11907,6 +11923,14 @@
     "topic_breadcrumbs.fetch_failed": [
       {
         "ref": "TOPIC_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic",
+        "file": "apps/web/src/constants/topic.ts"
+      }
+    ],
+    "topic_metadata.fetch_failed": [
+      {
+        "ref": "TOPIC_LOG.METADATA_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/topic",
         "file": "apps/web/src/constants/topic.ts"
