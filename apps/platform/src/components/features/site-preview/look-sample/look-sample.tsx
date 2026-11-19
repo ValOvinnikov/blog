@@ -62,7 +62,7 @@ export const LookSample = ({
 }: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
-  const { root, main, hero, lead, divider } = lookSampleVariants();
+  const { root, main, hero, divider } = lookSampleVariants();
 
   return (
     <SiteThemeFrame
@@ -86,9 +86,7 @@ export const LookSample = ({
           <Heading level={1} visual={TEXT_ROLE.SECTION_TITLE}>
             {t('sampleHeading')}
           </Heading>
-          <Text textRole={TEXT_ROLE.CARD_BODY} className={lead()}>
-            {t('samplePara')}
-          </Text>
+          <Text textRole={TEXT_ROLE.CARD_BODY}>{t('samplePara')}</Text>
           <LookSampleActions>
             <SampleBusyButton busy={busy} />
           </LookSampleActions>
