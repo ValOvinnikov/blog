@@ -24,6 +24,10 @@ function mockNavigationItem(linkId: string, fields = {}) {
   };
 }
 
+function toRemoval(documentId: string) {
+  return { documentId, revision: MOCK_REVISION };
+}
+
 function unedited(id: string, fields = {}) {
   return mockSanityDocument(id, fields);
 }
@@ -51,7 +55,9 @@ describe(planSampleContentRemoval, () => {
     });
 
     expect(plan).toEqual({
-      removeIds: [ids.BLOG_ABOUT_LINK, ids.BLOG_CTA, ids.BLOG_POST_LIST],
+      removals: [ids.BLOG_ABOUT_LINK, ids.BLOG_CTA, ids.BLOG_POST_LIST].map(
+        toRemoval,
+      ),
       unlinks: [
         {
           documentId: ids.HOME_TEMPLATE,
@@ -93,7 +99,7 @@ describe(planSampleContentRemoval, () => {
     });
 
     expect(plan).toEqual({
-      removeIds: [],
+      removals: [],
       unlinks: [],
       keptEdited: [ids.BLOG_CTA],
       keptReferenced: [],
@@ -116,7 +122,7 @@ describe(planSampleContentRemoval, () => {
     });
 
     expect(plan).toEqual({
-      removeIds: [],
+      removals: [],
       unlinks: [],
       keptEdited: [],
       keptReferenced: [ids.BLOG_AUTHOR, ids.BLOG_HERO, ids.BLOG_WELCOME_POST],
@@ -151,7 +157,7 @@ describe(planSampleContentRemoval, () => {
       referrers: [referrer],
     });
 
-    expect(plan.removeIds).toEqual([]);
+    expect(plan.removals).toEqual([]);
     expect(plan.keptReferenced).toEqual([ids.BLOG_TOPIC]);
   });
 
@@ -171,7 +177,7 @@ describe(planSampleContentRemoval, () => {
     });
 
     expect(plan).toEqual({
-      removeIds: [],
+      removals: [],
       unlinks: [],
       keptEdited: [],
       keptReferenced: [ids.BLOG_ABOUT_LINK],
@@ -191,7 +197,7 @@ describe(planSampleContentRemoval, () => {
     });
 
     expect(plan).toEqual({
-      removeIds: [ids.BLOG_ABOUT, ids.BLOG_ABOUT_TEMPLATE],
+      removals: [ids.BLOG_ABOUT, ids.BLOG_ABOUT_TEMPLATE].map(toRemoval),
       unlinks: [],
       keptEdited: [],
       keptReferenced: [],

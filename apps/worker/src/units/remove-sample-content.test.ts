@@ -26,12 +26,12 @@ const deleteDocument = vi.fn();
 const commit = vi.fn();
 const transaction = vi.fn(() => ({ patch, delete: deleteDocument, commit }));
 
-const STARTER_DOCUMENTS = [
+const MOCK_STARTER_DOCUMENTS = [
   mockSanityDocument(ids.BLOG_CTA),
   mockSanityDocument(ids.BLOG_HERO),
   mockSanityDocument(ids.BLOG_ABOUT, {}, { isEdited: true }),
 ];
-const REFERRERS = [
+const MOCK_REFERRERS = [
   mockSanityDocument(ids.HOME_TEMPLATE, {
     hero: mockReference(ids.BLOG_HERO),
     modules: [mockKeyedReference(ids.BLOG_CTA)],
@@ -39,8 +39,8 @@ const REFERRERS = [
 ];
 
 function mockDataset(
-  starterDocuments = STARTER_DOCUMENTS,
-  referrers = REFERRERS,
+  starterDocuments = MOCK_STARTER_DOCUMENTS,
+  referrers = MOCK_REFERRERS,
 ) {
   fetch
     .mockResolvedValueOnce(starterDocuments)
@@ -68,14 +68,22 @@ describe(removeSampleContent, () => {
 
     expect(createTenantWriteClient).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(fetch).toHaveBeenLastCalledWith(expect.any(String), {
-      ids: STARTER_DOCUMENTS.map(({ _id }) => _id),
+      ids: MOCK_STARTER_DOCUMENTS.map(({ _id }) => _id),
     });
-    expect(patch).toHaveBeenCalledExactlyOnceWith(ids.HOME_TEMPLATE, {
+    expect(patch).toHaveBeenCalledWith(ids.HOME_TEMPLATE, {
       ifRevisionID: MOCK_REVISION,
       unset: [`modules[_key=="${ids.BLOG_CTA}"]`],
     });
     expect(deleteDocument).toHaveBeenCalledExactlyOnceWith(ids.BLOG_CTA);
     expect(commit).toHaveBeenCalledOnce();
+  });
+
+  it('guards each delete with the revision the plan read', async () => {
+    await removeSampleContent(MOCK_TENANT_ID);
+
+    expect(patch).toHaveBeenCalledWith(ids.BLOG_CTA, {
+      ifRevisionID: MOCK_REVISION,
+    });
   });
 
   it('writes nothing when no sample can be removed', async () => {

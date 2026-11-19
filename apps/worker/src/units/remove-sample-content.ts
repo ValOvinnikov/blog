@@ -18,6 +18,7 @@ export type TRemoveSampleContentResult = {
 
 const STARTER_DOCUMENTS_QUERY = `*[_id in path("${STARTER_DOCUMENT_ID_PREFIX}**")]`;
 const PENDING_STARTER_IDS_QUERY = `*[_id in path("drafts.${STARTER_DOCUMENT_ID_PREFIX}**") || _id in path("versions.*.${STARTER_DOCUMENT_ID_PREFIX}**")]._id`;
+// Whole documents: a reference can sit in any field, and the planner walks them all.
 const REFERRERS_QUERY = '*[references($ids) && !(_id in $ids)]';
 
 export async function removeSampleContent(
@@ -34,10 +35,10 @@ export async function removeSampleContent(
     const referrers = await client.fetch<SanityDocument[]>(REFERRERS_QUERY, {
       ids: starterDocuments.map(({ _id }) => _id),
     });
-    const { removeIds, unlinks, keptEdited, keptReferenced } =
+    const { removals, unlinks, keptEdited, keptReferenced } =
       planSampleContentRemoval({ starterDocuments, pendingIds, referrers });
 
-    if (hasArrayGotItems(removeIds)) {
+    if (hasArrayGotItems(removals)) {
       const transaction = client.transaction();
       for (const { documentId, revision, field, keys } of unlinks) {
         transaction.patch(documentId, {
@@ -45,11 +46,18 @@ export async function removeSampleContent(
           unset: keys.map((key) => `${field}[_key=="${key}"]`),
         });
       }
-      for (const id of removeIds) transaction.delete(id);
+      for (const { documentId, revision } of removals) {
+        transaction.patch(documentId, { ifRevisionID: revision });
+        transaction.delete(documentId);
+      }
       await transaction.commit();
     }
 
-    return { removed: removeIds, keptEdited, keptReferenced };
+    return {
+      removed: removals.map(({ documentId }) => documentId),
+      keptEdited,
+      keptReferenced,
+    };
   } catch (error) {
     if (isFinalStepAttempt(error)) {
       logger.error(SAMPLE_CONTENT_LOG.REMOVAL_FAILED, {

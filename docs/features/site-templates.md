@@ -57,6 +57,8 @@ The worker's `removeSampleContent(tenantId)` unit clears the samples in one Sani
 - **Edited** — a `starter.*` document changed since seeding (`_updatedAt` differs from `_createdAt`), or one with a pending draft or release version, is kept.
 - **Unlinked** — each unedited sample is deleted, and the array items referencing it are removed by `_key` from the seeded home template's modules, the navigation's links and the post-index template's modules, guarded by each document's revision.
 - **Referenced** — an unedited sample is kept when a single field holds it (the home hero, the topic and tag index templates), when the array item holding it also holds something else (a navigation link with the owner's sub-items, so no array drops below its minimum), or when any other document references it: the owner's own content, a draft, or an edited sample. A kept document keeps the samples it references in turn.
+- **Revision-guarded** — every removed document and every unlinked seeded document carries the revision the step read, so an edit published mid-run fails the commit and the retry re-plans from a fresh read.
+- **Known edges** — a draft started mid-run on an unedited sample survives as an orphaned draft of a deleted document; a retry after a commit whose response was lost reports nothing removed, because the samples are already gone.
 
 ## Dependencies
 

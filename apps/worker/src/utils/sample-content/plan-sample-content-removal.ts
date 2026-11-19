@@ -21,8 +21,10 @@ type TSampleContentUnlink = {
   keys: string[];
 };
 
+type TSampleContentRemoval = { documentId: string; revision: string };
+
 export type TSampleContentRemovalPlan = {
-  removeIds: string[];
+  removals: TSampleContentRemoval[];
   unlinks: TSampleContentUnlink[];
   keptEdited: string[];
   keptReferenced: string[];
@@ -112,7 +114,10 @@ export function planSampleContentRemoval({
   } while (hasArrayGotItems(blockedIds));
 
   return {
-    removeIds: [...removable].sort(),
+    removals: starterDocuments
+      .filter(({ _id }) => removable.has(_id))
+      .map(({ _id, _rev }) => ({ documentId: _id, revision: _rev }))
+      .sort((a, b) => a.documentId.localeCompare(b.documentId)),
     unlinks: listUnlinks(listOutsideReferences(documents, removable)),
     keptEdited: [...edited].sort(),
     keptReferenced: keptReferenced.sort(),
