@@ -4,7 +4,6 @@ import { tv } from '@shinefold/ui/lib/styling';
 export const postListModuleViewVariants = tv({
   slots: {
     leadIn: ['mb-5 empty:hidden'],
-    emptyMessage: ['text-base text-muted'],
   },
   variants: {
     align: {

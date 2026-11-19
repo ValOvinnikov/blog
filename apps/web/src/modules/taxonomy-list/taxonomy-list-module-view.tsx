@@ -1,13 +1,14 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import type { TTaxonomyListModule } from '@shinefold/service';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import { TaxonomyCard } from '@shinefold/ui/components/molecules/taxonomy-card';
 import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
 import type { THeadingLevel } from '@shinefold/ui/lib/react';
+import { hasLength } from '@shinefold/utils/primitives';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
 import type { ReactNode } from 'react';
-
-import { taxonomyListModuleViewVariants } from './taxonomy-list-module-view-variants';
 
 type TTaxonomyListModulePost = {
   id: string;
@@ -54,8 +55,7 @@ export const TaxonomyListModuleView = ({
   showLatestPosts,
   latestLabel,
 }: ITaxonomyListModuleViewProps) => {
-  const isEmpty = items.length === 0;
-  const s = taxonomyListModuleViewVariants();
+  const isEmpty = !hasLength(items);
 
   return (
     <Section
@@ -69,10 +69,9 @@ export const TaxonomyListModuleView = ({
         id={titleId}
         level={headingLevel}
         align={contentAlignment}
-        variant="section"
       />
       {isEmpty ? (
-        <p className={s.emptyMessage()}>{emptyMessage}</p>
+        <Text textRole={TEXT_ROLE.CARD_BODY}>{emptyMessage}</Text>
       ) : (
         <CardGrid>
           {items.map((item) => (
@@ -86,7 +85,7 @@ export const TaxonomyListModuleView = ({
               linkAs={SmartLink}
               isInteractive={Boolean(item.href)}
             >
-              {showLatestPosts && item.posts.length > 0 && (
+              {showLatestPosts && hasLength(item.posts) && (
                 <TaxonomyCard.Posts
                   posts={item.posts}
                   ariaLabel={item.latestPostsLabel}
