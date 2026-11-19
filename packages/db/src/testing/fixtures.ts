@@ -1,17 +1,12 @@
 import type { PGlite } from '@electric-sql/pglite';
 import { LOCALE_ISO_CODES, TENANT_PLAN } from '@shinefold/config/constants';
-import {
-  ADMIN_ROLE,
-  GRANTED_VIA,
-  TENANT_STATUS,
-} from '@shinefold/db/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 import {
   leadContentColumns,
   type TLeadContent,
 } from '@shinefold/db/queries/leads/lead-content';
 import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@shinefold/db/schema';
-import type { TAdmin } from '@shinefold/db/schema/admins';
 import type { TUser } from '@shinefold/db/schema/auth';
 import type { TLead } from '@shinefold/db/schema/leads';
 import type { TSubscriber } from '@shinefold/db/schema/subscribers';
@@ -104,25 +99,6 @@ export async function insertTestSubscriber(
       })
       .returning(),
     'insertTestSubscriber',
-  );
-}
-
-export async function insertTestAdmin(
-  db: TTestDb,
-  user: Partial<typeof schema.users.$inferInsert> = {},
-): Promise<TAdmin> {
-  const { id: userId } = await insertTestUser(db, user);
-
-  return firstRowOrThrow(
-    await db
-      .insert(schema.admins)
-      .values({
-        userId,
-        role: ADMIN_ROLE.ADMIN,
-        grantedVia: GRANTED_VIA.PROMOTION,
-      })
-      .returning(),
-    'insertTestAdmin',
   );
 }
 
