@@ -22,6 +22,7 @@ import {
   isComingSoonCapability,
   isOutcomeSuccess,
   type TActionResult,
+  type TErrorCode,
 } from '@shinefold/config';
 import { ENTITLEMENT_KIND, queries } from '@shinefold/db';
 import { toStoredEntitlementItem } from '@shinefold/db/utils/stored-entitlement-item/stored-entitlement-item';
@@ -40,6 +41,14 @@ export type TGrantEntitlementResult = TActionResult<
   | typeof TENANT_REFUSAL.ARCHIVED
   | TEntitlementGrantRefusal
 >;
+
+const REFUSAL_BY_ERROR: Partial<Record<TErrorCode, TEntitlementGrantRefusal>> =
+  {
+    [ERROR_CODE.DB_ENTITLEMENT_ALREADY_GRANTED]:
+      ENTITLEMENT_GRANT_REFUSAL.ALREADY_GRANTED,
+    [ERROR_CODE.DB_ENTITLEMENT_EXPIRY_SHORTENED]:
+      ENTITLEMENT_GRANT_REFUSAL.EXPIRY_SHORTENED,
+  };
 
 export const grantEntitlementAction = async (
   tenantId: string,
@@ -84,17 +93,23 @@ export const grantEntitlementAction = async (
     });
 
     if (!granted.ok) {
-      if (granted.error === ERROR_CODE.DB_ENTITLEMENT_ALREADY_GRANTED) {
-        return {
-          outcome: ACTION_OUTCOME.REFUSED,
-          reason: ENTITLEMENT_GRANT_REFUSAL.ALREADY_GRANTED,
-        };
-      }
+      const reason = REFUSAL_BY_ERROR[granted.error];
+      if (reason) return { outcome: ACTION_OUTCOME.REFUSED, reason };
       throw new Error(granted.error);
     }
 
-    const { id, kind, key, value } = granted.data.grant;
+    const { grant, closedGrantId } = granted.data;
+    const { id, kind, key, value } = grant;
     await revalidateSiteConfig(tenantId);
+    if (closedGrantId) {
+      await recordAuditEvent({
+        logEvent: ENTITLEMENT_GRANT_LOG.REVOKE_AUDIT_FAILED,
+        action: AUDIT_ACTION.ENTITLEMENT_REVOKED,
+        targetType: AUDIT_TARGET_TYPE.TENANT,
+        targetId: tenantId,
+        details: { grantId: closedGrantId, kind, key, replacedBy: id },
+      });
+    }
     await recordAuditEvent({
       logEvent: ENTITLEMENT_GRANT_LOG.GRANT_AUDIT_FAILED,
       action: AUDIT_ACTION.ENTITLEMENT_GRANTED,

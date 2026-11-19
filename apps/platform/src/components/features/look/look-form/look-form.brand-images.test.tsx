@@ -1,4 +1,7 @@
-import { LOOK_EDIT_PANEL_TEST_ID } from '@platform/constants/look-form';
+import {
+  LOOK_EDIT_PANEL_TEST_ID,
+  LOOK_FIELD_LABEL_TEST_ID,
+} from '@platform/constants/look-form';
 import messages from '@platform/i18n/messages/en.json';
 import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
@@ -96,6 +99,14 @@ describe(`<${LookForm.name}/>`, () => {
 
         expect(logoGroup).toBeVisible();
         expect(faviconGroup).toBeVisible();
+      });
+
+      it('keeps the optional tag and unsaved marker out of the label focus returns to', () => {
+        const focusTargetTexts = screen
+          .getAllByTestId(LOOK_FIELD_LABEL_TEST_ID)
+          .map(({ textContent }) => textContent);
+
+        expect(focusTargetTexts).toContain(LOOK_FORM.logoFieldLabel);
       });
 
       it('uploads a staged logo on Save, then saves the rest of the look', async () => {

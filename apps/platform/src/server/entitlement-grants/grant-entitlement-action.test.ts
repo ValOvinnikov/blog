@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   ENTITLEMENT_GRANT_EXPIRY,
   ENTITLEMENT_GRANT_REFUSAL,
@@ -50,6 +51,7 @@ const grantEntitlement = vi.mocked(
   queries.tenantEntitlementGrants.grantEntitlement,
 );
 const MOCK_NOTE = 'Launch partner';
+const MOCK_CLOSED_GRANT_ID = faker.string.uuid();
 const MOCK_NOW = new Date('2026-11-18T10:00:00.000Z');
 const MOCK_IN_30_DAYS = new Date('2026-12-18T10:00:00.000Z');
 const MOCK_LOCALE_LIMIT_ITEM = {
@@ -245,6 +247,58 @@ describe(grantEntitlementAction, () => {
     });
     expect(recordAuditEvent).not.toHaveBeenCalled();
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
+  });
+
+  it('refuses a raise that would end before the open language grant and audits nothing', async () => {
+    grantEntitlement.mockResolvedValueOnce(
+      errorResult(ERROR_CODE.DB_ENTITLEMENT_EXPIRY_SHORTENED),
+    );
+
+    const result = await grant({ item: MOCK_LOCALE_LIMIT_ITEM });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: ENTITLEMENT_GRANT_REFUSAL.EXPIRY_SHORTENED,
+    });
+    expect(recordAuditEvent).not.toHaveBeenCalled();
+    expect(revalidateSiteConfig).not.toHaveBeenCalled();
+  });
+
+  it('audits the language grant a raise closed as revoked, then the new grant', async () => {
+    grantEntitlement.mockResolvedValueOnce(
+      okResult({
+        grant: mockEntitlementGrantRow({
+          kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+          key: ENTITLEMENT_KIND.LOCALE_LIMIT,
+          value: MOCK_LOCALE_LIMIT_ITEM.value,
+          expiresAt: MOCK_IN_30_DAYS,
+          note: MOCK_NOTE,
+        }),
+        closedGrantId: MOCK_CLOSED_GRANT_ID,
+      }),
+    );
+
+    await grant({ item: MOCK_LOCALE_LIMIT_ITEM });
+
+    const actions = vi
+      .mocked(recordAuditEvent)
+      .mock.calls.map(([{ action }]) => action);
+
+    expect(actions).toEqual([
+      AUDIT_ACTION.ENTITLEMENT_REVOKED,
+      AUDIT_ACTION.ENTITLEMENT_GRANTED,
+    ]);
+    expect(firstRecordedAuditEvent(vi.mocked(recordAuditEvent))).toEqual({
+      action: AUDIT_ACTION.ENTITLEMENT_REVOKED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TENANT_ID,
+      details: {
+        grantId: MOCK_CLOSED_GRANT_ID,
+        kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+        key: ENTITLEMENT_KIND.LOCALE_LIMIT,
+        replacedBy: MOCK_GRANT_ID,
+      },
+    });
   });
 
   it('reports a failed write as a server error and audits nothing', async () => {

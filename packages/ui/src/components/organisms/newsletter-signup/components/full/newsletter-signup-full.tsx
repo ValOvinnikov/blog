@@ -2,7 +2,9 @@ import {
   NEWSLETTER_VARIANT,
   type IWithClassName,
   type IWithDataTestId,
+  TEXT_ROLE,
 } from '@shinefold/config';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import { Panel } from '@shinefold/ui/components/molecules/panel';
 import {
   newsletterSignupVariants,
@@ -47,7 +49,9 @@ export const NewsletterSignupFull = ({
         {hasPitch && (
           <div className={s.pitchPane()}>
             {supportingText && (
-              <p className={s.supportingText()}>{supportingText}</p>
+              <Text textRole={TEXT_ROLE.INTRO} className={s.supportingText()}>
+                {supportingText}
+              </Text>
             )}
             {hasTrustCues && (
               <ul className={s.trustCues()}>

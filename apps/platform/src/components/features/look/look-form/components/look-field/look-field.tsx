@@ -48,13 +48,14 @@ export const LookField = ({
   } = lookFieldVariants();
 
   const labelContent = (
-    <span
-      id={grantFocusId(field)}
-      tabIndex={-1}
-      data-testid={LOOK_FIELD_LABEL_TEST_ID}
-      className={labelText()}
-    >
-      {label}
+    <span className={labelText()}>
+      <span
+        id={grantFocusId(field)}
+        tabIndex={-1}
+        data-testid={LOOK_FIELD_LABEL_TEST_ID}
+      >
+        {label}
+      </span>
       {isBrandAssetKind(field) && (
         <>
           {' '}

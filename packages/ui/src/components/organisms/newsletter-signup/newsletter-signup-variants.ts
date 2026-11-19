@@ -7,7 +7,7 @@ export const newsletterSignupVariants = tv({
     root: [],
     body: ['grid grid-cols-1 p-0', '@3xl:grid-cols-[1.1fr_1fr]'],
     pitchPane: ['flex flex-col gap-3 p-8'],
-    supportingText: ['font-body text-prose text-text', 'm-0'],
+    supportingText: ['m-0'],
     trustCues: [
       'flex flex-col gap-2 md:flex-row md:flex-wrap md:items-center md:gap-4',
       'm-0 list-none p-0',

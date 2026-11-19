@@ -23,7 +23,7 @@ export const ctaModuleVariants = tv({
     ],
     media: ['[&>*]:block [&>*]:h-full [&>*]:w-full [&>*]:object-cover'],
     actions: ['mt-5 flex flex-wrap items-center gap-3'],
-    footnote: ['mt-3.5 max-w-measure font-mono text-caption text-subtle'],
+    footnote: ['mt-3.5 max-w-measure'],
   },
   variants: {
     variant: {

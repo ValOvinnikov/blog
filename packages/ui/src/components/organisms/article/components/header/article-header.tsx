@@ -1,4 +1,9 @@
-import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import {
+  type IWithClassName,
+  type IWithDataTestId,
+  MEDIA_RATIO,
+  TEXT_ROLE,
+} from '@shinefold/config';
 import type { TAnchorElementType } from '@shinefold/config/react';
 import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
@@ -27,7 +32,7 @@ export type TArticleHeaderProps = IWithClassName &
     coverMedia?: ReactNode;
   };
 
-/** Post detail heading area: topic eyebrow, title, lead paragraph, metadata strip, and an optional wide cover media slot. */
+/** The opening of a post page, above its body. */
 export const ArticleHeader = ({
   title,
   topic,
@@ -51,13 +56,13 @@ export const ArticleHeader = ({
             {topic.label}
           </Eyebrow>
         )}
-        <Heading level={1} visual="post" className={s.title()}>
+        <Heading level={1} visual={TEXT_ROLE.POST_TITLE} className={s.title()}>
           {title}
         </Heading>
         {lead && (
-          <div className={s.lead()}>
-            <Text variant="lead">{lead}</Text>
-          </div>
+          <Text textRole={TEXT_ROLE.INTRO} className={s.lead()}>
+            {lead}
+          </Text>
         )}
         {meta && (
           <div className={s.meta()}>
@@ -73,7 +78,7 @@ export const ArticleHeader = ({
         )}
       </div>
       {coverMedia && (
-        <MediaFrame ratio="video" className={s.coverMedia()}>
+        <MediaFrame ratio={MEDIA_RATIO.VIDEO} className={s.coverMedia()}>
           {coverMedia}
         </MediaFrame>
       )}
