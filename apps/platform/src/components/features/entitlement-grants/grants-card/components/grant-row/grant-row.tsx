@@ -6,12 +6,12 @@ import { GRANT_STATUS } from '@platform/constants/entitlement-grant';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import type { TGrantTarget } from '@platform/utils/grant-target/grant-target';
 import type { TGrantRow } from '@platform/utils/to-grant-rows/to-grant-rows';
+import { useGrantItemLabel } from '@platform/utils/use-grant-item-label/use-grant-item-label';
 import type { TMaybeUndefined } from '@shinefold/config';
 import { isNull } from '@shinefold/utils/primitives';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { RevokeGrantControl } from './components/revoke-grant-control/revoke-grant-control';
-import { useGrantItemLabel } from './use-grant-item-label';
 
 export type TGrantRowProps = {
   grant: TGrantRow;

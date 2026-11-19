@@ -5908,6 +5908,38 @@
         "file": "apps/platform/src/constants/activity.ts"
       }
     ],
+    "GRANT_ITEM": [
+      {
+        "ref": "ACTIVITY_DETAIL.GRANT_ITEM",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "GRANT_EXPIRY": [
+      {
+        "ref": "ACTIVITY_DETAIL.GRANT_EXPIRY",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "GRANT_UNTIL_REVOKED": [
+      {
+        "ref": "ACTIVITY_DETAIL.GRANT_UNTIL_REVOKED",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "GRANT_NOTE": [
+      {
+        "ref": "ACTIVITY_DETAIL.GRANT_NOTE",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
     "region": [
       {
         "ref": "ARIA_ROLE.REGION",
