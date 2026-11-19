@@ -72,10 +72,9 @@ export const TaxonomyListModule = async ({ id }: ITaxonomyListModuleProps) => {
 
   return (
     <TaxonomyListModuleView
-      brandVariant={brandVariant}
+      section={{ brandVariant, layout }}
       headingBlock={headingBlock}
       items={items}
-      layout={layout}
       contentAlignment={contentAlignment}
       showLatestPosts={showLatestPosts}
       titleId={`taxonomy-list-${id}`}

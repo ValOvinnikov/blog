@@ -23,10 +23,9 @@ const MOCK_LATEST_LABEL = faker.lorem.word();
 const ITEM_TITLE_PATTERN = new RegExp(MOCK_TOPIC_LIST_ITEM.title);
 
 const setup = customRender(TaxonomyListModuleView, {
-  brandVariant: BRAND_VARIANT.PRIMARY,
+  section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
   headingBlock: mockHeadingBlock({ heading: MOCK_HEADING }),
   items: [MOCK_TOPIC_LIST_ITEM],
-  layout: undefined,
   contentAlignment: undefined,
   titleId: MOCK_TITLE_ID,
   dataTestId: MOCK_DATA_TEST_ID,

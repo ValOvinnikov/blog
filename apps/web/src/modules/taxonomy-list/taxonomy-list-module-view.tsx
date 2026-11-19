@@ -6,7 +6,7 @@ import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
 import type { THeadingLevel } from '@shinefold/ui/lib/react';
 import { hasLength } from '@shinefold/utils/primitives';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section } from '@web/components/shared/section';
+import { Section, type TModuleSection } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
 import type { ReactNode } from 'react';
 
@@ -28,8 +28,9 @@ export interface ITaxonomyListModuleItem {
 
 export interface ITaxonomyListModuleViewProps extends Omit<
   TTaxonomyListModule,
-  'entries' | 'taxonomy'
+  'entries' | 'taxonomy' | 'brandVariant' | 'layout'
 > {
+  section: TModuleSection;
   items: ITaxonomyListModuleItem[];
   titleId: string;
   dataTestId: string;
@@ -43,10 +44,9 @@ export interface ITaxonomyListModuleViewProps extends Omit<
  * a taxonomy entry, so no listing organism fits here.
  */
 export const TaxonomyListModuleView = ({
-  brandVariant,
+  section,
   headingBlock,
   items,
-  layout,
   titleId,
   dataTestId,
   headingLevel,
@@ -55,12 +55,14 @@ export const TaxonomyListModuleView = ({
   showLatestPosts,
   latestLabel,
 }: ITaxonomyListModuleViewProps) => {
+  const { brandVariant, layout, appearance } = section;
   const isEmpty = !hasLength(items);
 
   return (
     <Section
       brandVariant={brandVariant}
       layout={layout}
+      appearance={appearance}
       titleId={titleId}
       dataTestId={dataTestId}
     >
