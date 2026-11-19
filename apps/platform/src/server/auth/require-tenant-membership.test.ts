@@ -9,7 +9,6 @@ import {
 import {
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_ID,
-  mockEntitlementGrant,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
@@ -20,6 +19,7 @@ import {
 } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 

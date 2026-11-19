@@ -5,13 +5,13 @@ import { mockViewer } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
-  mockEntitlementGrant,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { CAPABILITY, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { ADMIN_ROLE } from '@shinefold/db/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import { redirect } from 'next/navigation';
 
 import { requireTenantById } from './require-tenant-by-id';

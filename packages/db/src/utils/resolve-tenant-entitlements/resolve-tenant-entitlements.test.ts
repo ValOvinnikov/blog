@@ -3,17 +3,13 @@ import {
   MODULE_PACK,
   TENANT_PLAN,
 } from '@shinefold/config/constants';
-import {
-  ENTITLEMENT_KIND,
-  LOOK_FIELD,
-  type TEntitlementGrantKey,
-  type TEntitlementKind,
-} from '@shinefold/db/constants';
+import { ENTITLEMENT_KIND, LOOK_FIELD } from '@shinefold/db/constants';
 import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
 import {
   MOCK_GRANT_FUTURE,
   MOCK_GRANT_PAST,
 } from '@shinefold/db/testing/tenant-entitlement-grants/fixtures';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 
 import {
   resolveTenantEntitlements,
@@ -22,25 +18,7 @@ import {
 
 const MOCK_GRANTED_LOCALE_LIMIT = 5;
 
-function grant(
-  kind: TEntitlementKind,
-  key: TEntitlementGrantKey,
-  overrides: Partial<TResolvableGrant> = {},
-): TResolvableGrant {
-  return {
-    kind,
-    key,
-    value: null,
-    expiresAt: null,
-    revokedAt: null,
-    ...overrides,
-  };
-}
-
-const CONTACT_FORM_GRANT = grant(
-  ENTITLEMENT_KIND.CAPABILITY,
-  CAPABILITY.CONTACT_FORM,
-);
+const CONTACT_FORM_GRANT = mockEntitlementGrant();
 
 function resolveFree(grants: TResolvableGrant[]) {
   return resolveTenantEntitlements(TENANT_PLAN.FREE, grants, MOCK_NOW);
@@ -75,8 +53,14 @@ describe(resolveTenantEntitlements, () => {
 
   it('resolves Reader accounts with a granted sub-feature, once', () => {
     const { capabilities } = resolveFree([
-      grant(ENTITLEMENT_KIND.CAPABILITY, CAPABILITY.BOOKMARKS),
-      grant(ENTITLEMENT_KIND.CAPABILITY, CAPABILITY.COMMENTS),
+      mockEntitlementGrant({
+        kind: ENTITLEMENT_KIND.CAPABILITY,
+        key: CAPABILITY.BOOKMARKS,
+      }),
+      mockEntitlementGrant({
+        kind: ENTITLEMENT_KIND.CAPABILITY,
+        key: CAPABILITY.COMMENTS,
+      }),
     ]);
 
     expect(
@@ -86,8 +70,14 @@ describe(resolveTenantEntitlements, () => {
 
   it('adds a granted Look field and module pack', () => {
     const { lookFields, modulePacks } = resolveFree([
-      grant(ENTITLEMENT_KIND.LOOK_FIELD, LOOK_FIELD.HEADING_FONT),
-      grant(ENTITLEMENT_KIND.MODULE_PACK, MODULE_PACK.GROWTH),
+      mockEntitlementGrant({
+        kind: ENTITLEMENT_KIND.LOOK_FIELD,
+        key: LOOK_FIELD.HEADING_FONT,
+      }),
+      mockEntitlementGrant({
+        kind: ENTITLEMENT_KIND.MODULE_PACK,
+        key: MODULE_PACK.GROWTH,
+      }),
     ]);
 
     expect(lookFields).toContain(LOOK_FIELD.HEADING_FONT);
@@ -95,11 +85,11 @@ describe(resolveTenantEntitlements, () => {
   });
 
   it("takes the larger of the plan's and the granted language limit", () => {
-    const localeGrant = grant(
-      ENTITLEMENT_KIND.LOCALE_LIMIT,
-      ENTITLEMENT_KIND.LOCALE_LIMIT,
-      { value: MOCK_GRANTED_LOCALE_LIMIT },
-    );
+    const localeGrant = mockEntitlementGrant({
+      kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+      key: ENTITLEMENT_KIND.LOCALE_LIMIT,
+      value: MOCK_GRANTED_LOCALE_LIMIT,
+    });
     const growth = resolveTenantEntitlements(TENANT_PLAN.GROWTH, [], MOCK_NOW);
 
     expect(resolveFree([localeGrant]).localeLimit).toBe(

@@ -117,6 +117,7 @@ const {
   listTenantsByIdsMock,
   getTenantByDomainMock,
   getSiteConfigMock,
+  listResolvableEntitlementGrantsMock,
   getEmailConfigMock,
   getEmailTemplateMock,
   sendEmailMock,
@@ -131,6 +132,7 @@ const {
   listTenantsByIdsMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
+  listResolvableEntitlementGrantsMock: vi.fn(),
   getEmailConfigMock: vi.fn(),
   getEmailTemplateMock: vi.fn(),
   sendEmailMock: vi.fn<(input: TSendEmailInput) => Promise<void>>(),
@@ -167,6 +169,9 @@ vi.mock('@shinefold/db', async () => ({
     },
     tenantDomains: { getTenantByDomain: getTenantByDomainMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
+    tenantEntitlementGrants: {
+      listResolvableEntitlementGrants: listResolvableEntitlementGrantsMock,
+    },
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },
     emailUsage: {
@@ -228,6 +233,7 @@ describe(buildMagicLinkProvider, () => {
     vi.stubEnv('MAGIC_LINK_FROM_ADDRESS', MOCK_FROM_ADDRESS);
     findPendingInviteByEmailMock.mockResolvedValue([]);
     getTenantByDomainMock.mockResolvedValue(undefined);
+    listResolvableEntitlementGrantsMock.mockResolvedValue([]);
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockResolvedValue(mockEmailTemplate());
     sendEmailMock.mockResolvedValue(undefined);

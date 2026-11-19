@@ -28,15 +28,12 @@ import {
   SPINNER_STYLE,
   TENANT_PLAN,
 } from '@shinefold/config/constants';
-import { LOOK_FIELD } from '@shinefold/db/constants';
+import { LOOK_FIELD, PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import { MOCK_ACCENT_HUE } from '@shinefold/db/testing/site-config/fixtures';
 
 import {
-  isLookFieldEntitled,
   isLookFieldWithin,
-  pickEntitledLook,
   pickLookWithin,
-  toEffectiveLook,
   toEffectiveLookWithin,
   type TLook,
 } from './effective-look';
@@ -83,15 +80,20 @@ const STORED_LOOK: TLook = {
   faviconAssetUrl: MOCK_FAVICON_ASSET_URL,
 };
 
-describe(toEffectiveLook, () => {
+const GROWTH = PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH];
+const FREE = PLAN_ENTITLEMENTS[TENANT_PLAN.FREE];
+const MOCK_ENTITLEMENTS_LABEL = 'a heading-font grant';
+const MOCK_ENTITLEMENTS = {
+  lookFields: [LOOK_FIELD.PRESET, LOOK_FIELD.HEADING_FONT],
+};
+
+describe(toEffectiveLookWithin, () => {
   it('returns every stored value on Growth', () => {
-    expect(toEffectiveLook(STORED_LOOK, TENANT_PLAN.GROWTH)).toEqual(
-      STORED_LOOK,
-    );
+    expect(toEffectiveLookWithin(STORED_LOOK, GROWTH)).toEqual(STORED_LOOK);
   });
 
   it("replaces every Growth-only value with the preset's on Free", () => {
-    expect(toEffectiveLook(STORED_LOOK, TENANT_PLAN.FREE)).toEqual({
+    expect(toEffectiveLookWithin(STORED_LOOK, FREE)).toEqual({
       preset: PRESET_ID.EDITORIAL,
       accentHue: MOCK_ACCENT_HUE,
       logoHue: undefined,
@@ -131,56 +133,14 @@ describe(toEffectiveLook, () => {
     const { preset, headingFont } = STORED_LOOK;
     const extra = faker.lorem.word();
 
-    expect(
-      toEffectiveLook({ preset, headingFont, extra }, TENANT_PLAN.FREE),
-    ).toEqual({ preset, headingFont: FONT_CHOICE.FRAUNCES, extra });
-  });
-});
-
-describe(isLookFieldEntitled, () => {
-  it.each([
-    ['preset', TENANT_PLAN.FREE, true],
-    ['logoAssetUrl', TENANT_PLAN.FREE, true],
-    ['brandName', TENANT_PLAN.FREE, true],
-    ['headingFont', TENANT_PLAN.FREE, false],
-    ['cookieSettingsButton', TENANT_PLAN.FREE, true],
-    ['footerLayout', TENANT_PLAN.FREE, false],
-    ['headerControlShape', TENANT_PLAN.FREE, false],
-    ['headingFont', TENANT_PLAN.GROWTH, true],
-  ] as const)('reports %s on %s as %s', (field, plan, expected) => {
-    expect(isLookFieldEntitled(field, plan)).toBe(expected);
-  });
-});
-
-describe(pickEntitledLook, () => {
-  it('drops every field the plan does not include', () => {
-    const { preset, accentHue, headingFont, logoHue } = STORED_LOOK;
-
-    expect(
-      pickEntitledLook(
-        { preset, accentHue, headingFont, logoHue },
-        TENANT_PLAN.FREE,
-      ),
-    ).toEqual({ preset, accentHue });
-  });
-});
-
-describe('entitlement-taking forms', () => {
-  const MOCK_ENTITLEMENTS = {
-    lookFields: [LOOK_FIELD.PRESET, LOOK_FIELD.HEADING_FONT],
-  };
-  const { preset, headingFont, bodyFont } = STORED_LOOK;
-
-  it('reports a granted field as entitled', () => {
-    expect(isLookFieldWithin(LOOK_FIELD.HEADING_FONT, MOCK_ENTITLEMENTS)).toBe(
-      true,
-    );
-    expect(isLookFieldWithin(LOOK_FIELD.BODY_FONT, MOCK_ENTITLEMENTS)).toBe(
-      false,
+    expect(toEffectiveLookWithin({ preset, headingFont, extra }, FREE)).toEqual(
+      { preset, headingFont: FONT_CHOICE.FRAUNCES, extra },
     );
   });
 
   it('keeps a granted stored value and replaces the rest', () => {
+    const { preset, headingFont, bodyFont } = STORED_LOOK;
+
     expect(
       toEffectiveLookWithin(
         { preset, headingFont, bodyFont },
@@ -188,8 +148,40 @@ describe('entitlement-taking forms', () => {
       ),
     ).toEqual({ preset, headingFont, bodyFont: FONT_CHOICE.INTER });
   });
+});
+
+describe(isLookFieldWithin, () => {
+  it.each([
+    [LOOK_FIELD.PRESET, TENANT_PLAN.FREE, FREE, true],
+    [LOOK_FIELD.LOGO_ASSET_URL, TENANT_PLAN.FREE, FREE, true],
+    [LOOK_FIELD.BRAND_NAME, TENANT_PLAN.FREE, FREE, true],
+    [LOOK_FIELD.HEADING_FONT, TENANT_PLAN.FREE, FREE, false],
+    [LOOK_FIELD.COOKIE_SETTINGS_BUTTON, TENANT_PLAN.FREE, FREE, true],
+    [LOOK_FIELD.FOOTER_LAYOUT, TENANT_PLAN.FREE, FREE, false],
+    [LOOK_FIELD.HEADER_CONTROL_SHAPE, TENANT_PLAN.FREE, FREE, false],
+    [LOOK_FIELD.HEADING_FONT, TENANT_PLAN.GROWTH, GROWTH, true],
+    [LOOK_FIELD.HEADING_FONT, MOCK_ENTITLEMENTS_LABEL, MOCK_ENTITLEMENTS, true],
+    [LOOK_FIELD.BODY_FONT, MOCK_ENTITLEMENTS_LABEL, MOCK_ENTITLEMENTS, false],
+  ] as const)(
+    'reports %s within %s as %s',
+    (field, _, entitlements, expected) => {
+      expect(isLookFieldWithin(field, entitlements)).toBe(expected);
+    },
+  );
+});
+
+describe(pickLookWithin, () => {
+  it('drops every field the plan does not include', () => {
+    const { preset, accentHue, headingFont, logoHue } = STORED_LOOK;
+
+    expect(
+      pickLookWithin({ preset, accentHue, headingFont, logoHue }, FREE),
+    ).toEqual({ preset, accentHue });
+  });
 
   it('picks only the granted fields', () => {
+    const { preset, headingFont, bodyFont } = STORED_LOOK;
+
     expect(
       pickLookWithin({ preset, headingFont, bodyFont }, MOCK_ENTITLEMENTS),
     ).toEqual({ preset, headingFont });

@@ -1,11 +1,11 @@
 import { mockAllOnSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
 import {
   MOCK_TENANT_ID,
-  mockEntitlementGrant,
   mockTenantEntitlements,
 } from '@platform/testing/tenants/fixtures';
 import { CAPABILITY } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 
 import { getEnabledCapabilities } from './get-enabled-capabilities';
 

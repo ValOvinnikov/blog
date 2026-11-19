@@ -72,7 +72,7 @@ module types whose capability is off for the tenant carry a warning.
   `sanityReadTokenEncrypted` decide whether the Studio can mount at all;
   `deprovisionedAt` decides whether it is replaced by the archived notice.
   `locale`, `additionalLocales` and `plan` give the live locales
-  (`selectLiveLocales`).
+  (`selectLiveLocalesWithin`, with the tenant's resolved entitlements).
 - Neon `tenants` owner-access columns (`ownerInviteSentAt`,
   `ownerInviteAcceptedAt`, `ownerSanityUserId`, `ownerSanityRole`,
   `ownerLoginProvider`) and the `OWNER_ELEVATION` step's outcome give the

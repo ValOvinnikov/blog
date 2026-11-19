@@ -1,9 +1,7 @@
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND, LOOK_FIELD } from '@shinefold/db/constants';
-import {
-  mockEntitlementGrant,
-  mockTenantEntitlements,
-} from '@web/testing/server/settings-features/fixtures';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
+import { mockTenantEntitlements } from '@web/testing/server/settings-features/fixtures';
 import {
   MOCK_NO_SECTION_STYLE_OVERRIDES,
   MOCK_SECTION_STYLE_OVERRIDES,
