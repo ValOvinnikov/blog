@@ -9,35 +9,43 @@ import { ConsentBanner } from './consent-banner';
 
 faker.seed(123);
 
-const HEADING_LEVEL = 2 as const;
 const MOCK_HEADING = faker.lorem.words(3);
 const MOCK_MESSAGE = faker.lorem.sentence();
-const MOCK_ACCEPT_LABEL = faker.lorem.words(2);
-const MOCK_REJECT_LABEL = faker.lorem.words(2);
-const MOCK_SETTINGS_LABEL = faker.lorem.words(2);
+const MOCK_LABELS = {
+  accept: faker.lorem.words(2),
+  reject: faker.lorem.words(2),
+  settings: faker.lorem.words(2),
+};
 const MOCK_POLICY_LINK = {
   href: `/${faker.lorem.slug()}`,
   label: faker.lorem.words(2),
 };
 
 const CONTROLS = [
-  { control: 'Accept', label: MOCK_ACCEPT_LABEL, handler: 'onAccept', tabs: 1 },
-  { control: 'Reject', label: MOCK_REJECT_LABEL, handler: 'onReject', tabs: 2 },
+  {
+    control: 'Accept',
+    label: MOCK_LABELS.accept,
+    handler: 'onAccept',
+    tabs: 1,
+  },
+  {
+    control: 'Reject',
+    label: MOCK_LABELS.reject,
+    handler: 'onReject',
+    tabs: 2,
+  },
   {
     control: 'Settings',
-    label: MOCK_SETTINGS_LABEL,
+    label: MOCK_LABELS.settings,
     handler: 'onOpenSettings',
     tabs: 3,
   },
 ] as const;
 
 const setup = customRender(ConsentBanner, {
-  headingLevel: HEADING_LEVEL,
   heading: MOCK_HEADING,
   message: MOCK_MESSAGE,
-  acceptLabel: MOCK_ACCEPT_LABEL,
-  rejectLabel: MOCK_REJECT_LABEL,
-  settingsLabel: MOCK_SETTINGS_LABEL,
+  labels: MOCK_LABELS,
   onAccept: vi.fn(),
   onReject: vi.fn(),
   onOpenSettings: vi.fn(),
@@ -57,11 +65,8 @@ describe(`<${ConsentBanner.name}/>`, () => {
     setup(handlers);
   });
 
-  it('renders the heading at the given level and the message', () => {
-    const heading = screen.getByRole('heading', {
-      level: HEADING_LEVEL,
-      name: MOCK_HEADING,
-    });
+  it('renders the heading and the message', () => {
+    const heading = screen.getByRole('heading', { name: MOCK_HEADING });
     const message = screen.getByText(MOCK_MESSAGE);
 
     expect(heading).toBeVisible();
@@ -107,7 +112,7 @@ describe(`<${ConsentBanner.name}/> with a policy link`, () => {
     expect(link).toHaveFocus();
 
     await user.tab();
-    const accept = screen.getByRole('button', { name: MOCK_ACCEPT_LABEL });
+    const accept = screen.getByRole('button', { name: MOCK_LABELS.accept });
     expect(accept).toHaveFocus();
   });
 });

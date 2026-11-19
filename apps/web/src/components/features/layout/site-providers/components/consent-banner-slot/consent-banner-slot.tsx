@@ -26,7 +26,6 @@ export const ConsentBannerSlot = ({ isEnabled }: IConsentBannerSlotProps) => {
 
   return (
     <ConsentBanner
-      headingLevel={2}
       heading={t('heading')}
       message={t(offersAnalytics ? 'messageWithAnalytics' : 'message')}
       policyLink={{
@@ -34,9 +33,11 @@ export const ConsentBannerSlot = ({ isEnabled }: IConsentBannerSlotProps) => {
         label: t('policyLinkLabel'),
       }}
       linkAs={SmartLink}
-      acceptLabel={t('acceptLabel')}
-      rejectLabel={t('rejectLabel')}
-      settingsLabel={t('settingsLabel')}
+      labels={{
+        accept: t('acceptLabel'),
+        reject: t('rejectLabel'),
+        settings: t('settingsLabel'),
+      }}
       onAccept={() => save(offeredCategories)}
       onReject={rejectAll}
       onOpenSettings={open}

@@ -10,20 +10,22 @@ import { Button } from '@shinefold/ui/components/atoms/button';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Text } from '@shinefold/ui/components/atoms/text';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
-import type { THeadingLevel } from '@shinefold/ui/lib/react';
 
 import { consentBannerVariants } from './consent-banner-variants';
 
+export interface IConsentBannerLabels {
+  accept: string;
+  reject: string;
+  settings: string;
+}
+
 export type TConsentBannerProps = IWithClassName &
   IWithDataTestId & {
-    headingLevel: THeadingLevel;
     heading: string;
     message: string;
     policyLink?: Pick<ILink, 'href' | 'label'>;
     linkAs?: TAnchorElementType;
-    acceptLabel: string;
-    rejectLabel: string;
-    settingsLabel: string;
+    labels: IConsentBannerLabels;
     onAccept: () => void;
     onReject: () => void;
     onOpenSettings: () => void;
@@ -33,14 +35,11 @@ const s = consentBannerVariants();
 
 /** A persistent, non-modal card offering cookie-consent choices, fixed to the bottom of the viewport. */
 export const ConsentBanner = ({
-  headingLevel,
   heading,
   message,
   policyLink,
   linkAs,
-  acceptLabel,
-  rejectLabel,
-  settingsLabel,
+  labels,
   onAccept,
   onReject,
   onOpenSettings,
@@ -48,7 +47,7 @@ export const ConsentBanner = ({
   dataTestId,
 }: TConsentBannerProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
-    <Heading level={headingLevel} visual={TEXT_ROLE.DIALOG_TITLE}>
+    <Heading level={2} visual={TEXT_ROLE.DIALOG_TITLE}>
       {heading}
     </Heading>
     <Text textRole={TEXT_ROLE.CARD_BODY}>
@@ -64,10 +63,10 @@ export const ConsentBanner = ({
     </Text>
     <div className={s.actions()}>
       <Button variant="primary" size={SIZE.SM} onClick={onAccept}>
-        {acceptLabel}
+        {labels.accept}
       </Button>
       <Button variant="primary" size={SIZE.SM} onClick={onReject}>
-        {rejectLabel}
+        {labels.reject}
       </Button>
       <Button
         variant="link"
@@ -75,7 +74,7 @@ export const ConsentBanner = ({
         onClick={onOpenSettings}
         className={s.settings()}
       >
-        {settingsLabel}
+        {labels.settings}
       </Button>
     </div>
   </div>

@@ -9,13 +9,14 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   args: {
-    headingLevel: 2,
     heading: 'We use cookies',
     message:
       'We use cookies to understand how the site is used and to remember your preferences.',
-    acceptLabel: 'Accept all',
-    rejectLabel: 'Reject all',
-    settingsLabel: 'Settings',
+    labels: {
+      accept: 'Accept all',
+      reject: 'Reject all',
+      settings: 'Settings',
+    },
     onAccept: () => {},
     onReject: () => {},
     onOpenSettings: () => {},
