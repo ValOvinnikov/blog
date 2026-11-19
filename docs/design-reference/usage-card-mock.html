@@ -1473,7 +1473,7 @@
           </section>
         </div>
         <div class="state">
-          <span class="state-label">Free or Starter</span>
+          <span class="state-label">Free (owner view)</span>
           <section class="card">
             <div class="card-header">
               <div>
@@ -1500,6 +1500,27 @@
                   <div class="fill" style="width: 60%"></div>
                 </div>
                 <p class="note">Resets on 1 December</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Newsletter emails this month</span>
+                </div>
+                <p class="value"><b>0</b><span>of 0</span></p>
+                <p class="note">Not included in your plan.</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Team seats</span>
+                </div>
+                <p class="value"><b>1</b><span>of 1</span></p>
+                <p class="note">Not included in your plan.</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Additional languages</span>
+                </div>
+                <p class="value"><b>0</b><span>of 0</span></p>
+                <p class="note">Not included in your plan.</p>
               </li>
             </ul>
             <div class="card-footer">
@@ -1554,6 +1575,20 @@
                   <div class="fill" style="width: 60%"></div>
                 </div>
                 <p class="note">Resets on 1 December</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Newsletter emails this month</span>
+                </div>
+                <p class="value"><b>0</b><span>of 0</span></p>
+                <p class="note">Not included in your plan.</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Team seats</span>
+                </div>
+                <p class="value"><b>1</b><span>of 1</span></p>
+                <p class="note">Not included in your plan.</p>
               </li>
               <li class="meter-row">
                 <div class="row-top">
@@ -1814,8 +1849,8 @@
       <span class="eyebrow">Board 5 · Rows</span>
       <h2>Every row, its copy and when it shows</h2>
       <p>
-        Rows appear in this order. Allowances are plan plus grants. A row shows
-        only when its allowance is above zero.
+        Rows appear in this order on every plan. Allowances are plan plus
+        grants. A row the plan does not include shows in its Not in plan state.
       </p>
     </div>
     <div class="table-wrap">
@@ -1825,7 +1860,7 @@
             <th>Row label</th>
             <th>Value</th>
             <th>Link</th>
-            <th>Shows when</th>
+            <th>Not in plan when</th>
             <th>Under 80% note</th>
             <th>Near note</th>
             <th>Used-up note</th>
@@ -1840,7 +1875,7 @@
               >
             </td>
             <td class="muted">None</td>
-            <td>Every plan</td>
+            <td>Never</td>
             <td>Resets on {d MMMM}</td>
             <td>{pct}% used — {left} left · Resets on {d MMMM}</td>
             <td>All used. New posts get no takeaways until {d MMMM}.</td>
@@ -1853,7 +1888,7 @@
               >
             </td>
             <td>Subscribers</td>
-            <td>Newsletter in plan or granted</td>
+            <td>No Newsletter, by plan or grant</td>
             <td>Resets on {d MMMM}</td>
             <td>{pct}% used — {left} left · Resets on {d MMMM}</td>
             <td>All used. New posts aren't emailed until {d MMMM}.</td>
@@ -1866,7 +1901,7 @@
               >
             </td>
             <td>Team</td>
-            <td>Seats above 1</td>
+            <td>Seats is 1</td>
             <td>Counts the owner, members and pending invites.</td>
             <td>{left} seat left.</td>
             <td>All seats in use. Remove someone to invite another.</td>
@@ -1879,7 +1914,7 @@
               >
             </td>
             <td>Languages</td>
-            <td>Limit above 1</td>
+            <td>Limit is 1</td>
             <td>Your default language isn't counted.</td>
             <td>{left} language left.</td>
             <td>All in use. Remove one to add another.</td>
@@ -1956,6 +1991,14 @@
             </td>
           </tr>
           <tr>
+            <td>Not in plan</td>
+            <td>
+              Label and value kept ("0 of 0", or "1 of 1" seats), no meter,
+              muted note "Not included in your plan." The owner sees no link;
+              the operator keeps it. The value is never coloured.
+            </td>
+          </tr>
+          <tr>
             <td>Empty</td>
             <td>
               No empty card: the takeaways row always shows. Zero used reads "0
@@ -1967,47 +2010,39 @@
     </div>
   </section>
 
-  <!-- 6. Opens -->
+  <!-- 6. Decisions -->
   <section class="board">
     <div class="board-head">
-      <span class="eyebrow">Opens for the owner</span>
-      <h2>Decisions this mock assumes</h2>
+      <span class="eyebrow">Decided by the owner, 19 November 2026</span>
+      <h2>Decisions</h2>
     </div>
     <ul class="opens">
       <li>
         <b>1. Operator placement</b
+        ><span class="rec">After Grants, before Findings.</span>
+      </li>
+      <li>
+        <b>2. Full seats and languages</b
         ><span class="rec"
-          ><strong>Recommend after Grants.</strong> The alternative is after
-          Findings, which keeps open problems higher.</span
+          >Warn, not bad. Nothing stops working when they are full.</span
         >
       </li>
       <li>
-        <b>2. Full seats and languages: warn, not bad</b
+        <b>3. Free and Starter footer</b
         ><span class="rec"
-          ><strong>Recommend warn.</strong> Nothing stops working when they're
-          full, unlike a used-up month of takeaways or emails.</span
+          >The plan-comparison link, owner only. No upgrade button on the
+          card.</span
         >
       </li>
       <li>
-        <b>3. Free and Starter footer link to the plan comparison</b
-        ><span class="rec"
-          ><strong>Recommend yes, owner only.</strong> No "Upgrade" button on
-          the card; Billing stays the one place to change plan. The operator
-          sees no footer.</span
-        >
-      </li>
-      <li>
-        <b>4. Hide rows whose allowance is zero</b
-        ><span class="rec"
-          ><strong>Recommend hide.</strong> "1 of 1 seats" on Free says nothing;
-          the plan comparison shows what a higher plan adds.</span
-        >
+        <b>4. Rows the plan does not include</b
+        ><span class="rec">Shown in the Not in plan state, never hidden.</span>
       </li>
       <li>
         <b>5. Takeaways row link</b
         ><span class="rec"
-          ><strong>Recommend none</strong> until the Studio regenerate control
-          (#7614) has a page to point at.</span
+          >None until the Studio regenerate control (#7614) gives it somewhere
+          to point.</span
         >
       </li>
     </ul>
