@@ -1,0 +1,2034 @@
+<title>Usage Card Mock</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+/>
+<style>
+  /* Layout: a design board — numbered boards stacked down one column, each a labelled stage holding the real card at platform scale. */
+  /* `--platform-*` prefixed: the tenant theme preview renders the site's unprefixed tokens in this same document. */
+  :root {
+    color-scheme: light;
+    --platform-bg: #f6f7f9;
+    --platform-surface: #ffffff;
+    --platform-surface-2: #fbfbfd;
+    --platform-surface-head: #eef1f6;
+    --platform-line: #e5e7eb;
+    --platform-line-2: #eef0f3;
+    --platform-control-line: #878f9d;
+    --platform-control-line-tint: #7c8493;
+    --platform-text: #12141a;
+    --platform-text-strong: #12141a;
+    --platform-logo-ink: #12141a;
+    --platform-muted: #5b6472;
+    --platform-faint: #7a8394;
+    --platform-brand: #12141a;
+    --platform-brand-ink: #12141a;
+    --platform-brand-strong: #2a303b;
+    --platform-brand-weak: #fff1c2;
+    --platform-brand-line: #ffd766;
+    --platform-brand-hover: #2a303b;
+    --platform-on-brand-ink: #ffffff;
+    --platform-spinner-on-brand-lit: var(--platform-highlight);
+    --platform-spinner-on-brand-unlit: #e8eaef;
+    --platform-spinner-on-brand-line: var(--platform-spinner-on-brand-unlit);
+    --platform-selected: #ffc233;
+    --platform-on-selected: #12141a;
+    --platform-selected-line: #ffc233;
+    --platform-selected-edge: #12141a;
+    --platform-focus-ring: #ffc233;
+    --platform-focus-edge: #12141a;
+    --platform-hover-tint: #fff1c2;
+    --platform-selected-tint: #ffe08a;
+    --platform-bad-hover: #fbdcd9;
+    --platform-control-line-hover: #5b6472;
+    --platform-ok: #16794d;
+    --platform-ok-weak: #e7f6ee;
+    --platform-warn: #9a3d0b;
+    --platform-warn-weak: #fdeee4;
+    --platform-bad: #b42318;
+    --platform-bad-weak: #fdeceb;
+    --platform-bad-line: #dd6152;
+    --platform-side: #eef0f3;
+    --platform-side-line: #d9dde4;
+    --platform-side-text: #2a303b;
+    --platform-side-muted: #5b6472;
+    --platform-side-raised: #ffffff;
+    --platform-side-accent: #12141a;
+    --platform-follow-mark: #ffc233;
+    --platform-follow-mark-ink: #12141a;
+    --platform-side-field: #ffffff;
+    --platform-side-field-line: #7c8493;
+    --platform-rail: #0f1115;
+    --platform-rail-line: #1c1f26;
+    --platform-rail-text: #c9cfda;
+    --platform-rail-muted: #7d8696;
+    --platform-rail-raised: #20242e;
+    --platform-rail-accent: #ffc233;
+    --platform-popover: #ffffff;
+    --platform-popover-line: #e5e7eb;
+    --platform-popover-hover: #eef1f6;
+    --platform-pill-neutral: #eef0f3;
+    --platform-pill-neutral-popover: #eef0f3;
+    --platform-switch-thumb: #ffffff;
+    --platform-switch-thumb-on: #12141a;
+    --platform-highlight: #ffc233;
+    --platform-theme-track: #eef0f3;
+    --platform-tooltip: #12141a;
+    --platform-tooltip-text: #ffffff;
+    --platform-tooltip-line: transparent;
+    --platform-scrim: rgba(10, 12, 15, 0.35);
+    --platform-shadow:
+      0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+    --platform-shadow-menu: 0 12px 40px rgba(16, 24, 40, 0.14);
+    --platform-note-line: rgba(18, 20, 26, 0.3);
+    --platform-control-line-locked: #c5cad3;
+    --platform-glyph-accent: #0d6466;
+    --platform-glyph-fill: #b3dad7;
+    --platform-glyph-line-soft: #6b7484;
+    --platform-glyph-raised: #ffffff;
+    --platform-locked-fade: 0.55;
+    --platform-frame-dot: #d5d9e0;
+    --platform-frame-track: rgba(18, 20, 26, 0.08);
+    --platform-frame-thumb: #5b6472;
+    --platform-frame-track-dark: rgba(232, 234, 239, 0.14);
+    --platform-frame-thumb-dark: #a3abb8;
+    --platform-fade-end: rgba(246, 247, 249, 0);
+    --platform-fade-end-surface: rgba(255, 255, 255, 0);
+    --platform-preview-stage: #eef0f3;
+    --platform-shadow-frame: 0 6px 20px rgba(16, 24, 40, 0.1);
+    --platform-shadow-sheet: 0 -8px 24px rgba(16, 24, 40, 0.18);
+    --platform-shadow-index: 0 1px 2px rgba(16, 24, 40, 0.05);
+    --platform-shadow-unsaved: 0 -4px 12px rgba(16, 24, 40, 0.08);
+    --platform-shadow-bar: 0 2px 8px rgba(16, 24, 40, 0.08);
+    --platform-shadow-dock: 0 -2px 8px rgba(16, 24, 40, 0.06);
+    --platform-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.08);
+    --platform-shadow-glyph: 0 2px 5px rgba(16, 24, 40, 0.22);
+    --platform-shadow-thumb: 0 1px 3px rgba(16, 24, 40, 0.25);
+    --platform-thumb-line: rgba(16, 24, 40, 0.12);
+    --platform-preview-column-line: transparent;
+    --platform-rail-header-line: transparent;
+    --platform-topbar: 67px;
+    --platform-view-tab: 44px;
+    --platform-view-tab-border: 1px;
+    --platform-view-tabs: calc(
+      var(--platform-view-tab) + var(--platform-view-tab-border)
+    );
+    /* The Look jump index's rendered height: the phone chip row, then the desktop bar from lg. */
+    --platform-look-index: 65px;
+    --platform-spinner-loop: 3s;
+    --platform-spinner-ease: cubic-bezier(0.6, 0, 0.3, 1);
+  }
+
+  @media (width >= 48rem) {
+    :root {
+      --platform-topbar: 59px;
+    }
+  }
+
+  @media (width >= 64rem) {
+    :root {
+      --platform-view-tabs: calc(
+        var(--platform-view-tab) + 2 * var(--platform-view-tab-border)
+      );
+      --platform-look-index: 46px;
+    }
+  }
+
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+    --platform-bg: #0f1115;
+    --platform-surface: #171a20;
+    --platform-surface-2: #1b1e25;
+    --platform-surface-head: #1d2027;
+    --platform-line: #2b303a;
+    --platform-line-2: #232730;
+    --platform-control-line: #737d8d;
+    --platform-control-line-tint: #737d8d;
+    --platform-text: #e8eaef;
+    --platform-text-strong: #ffffff;
+    --platform-logo-ink: #e8eaef;
+    --platform-muted: #a3abb8;
+    --platform-faint: #8590a0;
+    --platform-brand: #ffc233;
+    --platform-brand-ink: #ffdc7a;
+    --platform-brand-strong: #ffe08a;
+    --platform-brand-weak: #33290d;
+    --platform-brand-line: #5c4a14;
+    --platform-brand-hover: #ffcf5c;
+    --platform-on-brand-ink: #0f1115;
+    --platform-spinner-on-brand-lit: var(--platform-on-brand-ink);
+    --platform-spinner-on-brand-unlit: transparent;
+    --platform-spinner-on-brand-line: var(--platform-on-brand-ink);
+    --platform-selected: #ffc233;
+    --platform-on-selected: #0f1115;
+    --platform-selected-line: #ffc233;
+    --platform-selected-edge: #ffc233;
+    --platform-focus-ring: #ffc233;
+    --platform-focus-edge: transparent;
+    --platform-hover-tint: #33290d;
+    --platform-selected-tint: #4a3b10;
+    --platform-bad-hover: #442020;
+    --platform-control-line-hover: #5c6676;
+    --platform-ok: #6ee7a7;
+    --platform-ok-weak: #10291d;
+    --platform-warn: #ffa066;
+    --platform-warn-weak: #2e1a10;
+    --platform-bad: #fca5a0;
+    --platform-bad-weak: #331716;
+    --platform-bad-line: #e5675a;
+    --platform-side: #0a0c0f;
+    --platform-side-line: #1c1f26;
+    --platform-side-text: #c9cfda;
+    --platform-side-muted: #8d96a6;
+    --platform-side-raised: #20242e;
+    --platform-side-accent: #ffc233;
+    --platform-side-field: #171a20;
+    --platform-side-field-line: #737d8d;
+    --platform-popover: #262b35;
+    --platform-popover-line: #4a5260;
+    --platform-popover-hover: #323845;
+    --platform-pill-neutral: #262a33;
+    --platform-pill-neutral-popover: #323845;
+    --platform-switch-thumb: #e8eaef;
+    --platform-switch-thumb-on: #ffc233;
+    --platform-theme-track: #0f1115;
+    --platform-tooltip: #262b35;
+    --platform-tooltip-text: #e8eaef;
+    --platform-tooltip-line: #4a5260;
+    --platform-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --platform-shadow-menu: 0 12px 40px rgba(0, 0, 0, 0.55);
+    --platform-note-line: rgba(255, 194, 51, 0.3);
+    --platform-control-line-locked: #424956;
+    --platform-glyph-accent: #4fb3ad;
+    --platform-glyph-fill: #24504f;
+    --platform-glyph-line-soft: #8f99a8;
+    --platform-glyph-raised: #323945;
+    --platform-frame-dot: #3a404b;
+    --platform-fade-end: rgba(15, 17, 21, 0);
+    --platform-fade-end-surface: rgba(23, 26, 32, 0);
+    --platform-preview-stage: #1d2027;
+    --platform-shadow-frame: 0 6px 20px rgba(0, 0, 0, 0.45);
+    --platform-shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.55);
+    --platform-shadow-index: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --platform-shadow-unsaved: 0 -4px 12px rgba(0, 0, 0, 0.45);
+    --platform-shadow-bar: 0 2px 8px rgba(0, 0, 0, 0.45);
+    --platform-shadow-dock: 0 -2px 8px rgba(0, 0, 0, 0.4);
+    --platform-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --platform-shadow-glyph: 0 2px 5px rgba(0, 0, 0, 0.6);
+    --platform-shadow-thumb: 0 1px 3px rgba(0, 0, 0, 0.6);
+    --platform-thumb-line: #0f1115;
+    --platform-preview-column-line: #2b303a;
+    --platform-rail-header-line: #1c1f26;
+  }
+
+  /* Same values as the block above: with no stored choice the platform follows the device. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      color-scheme: dark;
+      --platform-bg: #0f1115;
+      --platform-surface: #171a20;
+      --platform-surface-2: #1b1e25;
+      --platform-surface-head: #1d2027;
+      --platform-line: #2b303a;
+      --platform-line-2: #232730;
+      --platform-control-line: #737d8d;
+      --platform-control-line-tint: #737d8d;
+      --platform-text: #e8eaef;
+      --platform-text-strong: #ffffff;
+      --platform-logo-ink: #e8eaef;
+      --platform-muted: #a3abb8;
+      --platform-faint: #8590a0;
+      --platform-brand: #ffc233;
+      --platform-brand-ink: #ffdc7a;
+      --platform-brand-strong: #ffe08a;
+      --platform-brand-weak: #33290d;
+      --platform-brand-line: #5c4a14;
+      --platform-brand-hover: #ffcf5c;
+      --platform-on-brand-ink: #0f1115;
+      --platform-spinner-on-brand-lit: var(--platform-on-brand-ink);
+      --platform-spinner-on-brand-unlit: transparent;
+      --platform-spinner-on-brand-line: var(--platform-on-brand-ink);
+      --platform-selected: #ffc233;
+      --platform-on-selected: #0f1115;
+      --platform-selected-line: #ffc233;
+      --platform-selected-edge: #ffc233;
+      --platform-focus-ring: #ffc233;
+      --platform-focus-edge: transparent;
+      --platform-hover-tint: #33290d;
+      --platform-selected-tint: #4a3b10;
+      --platform-bad-hover: #442020;
+      --platform-control-line-hover: #5c6676;
+      --platform-ok: #6ee7a7;
+      --platform-ok-weak: #10291d;
+      --platform-warn: #ffa066;
+      --platform-warn-weak: #2e1a10;
+      --platform-bad: #fca5a0;
+      --platform-bad-weak: #331716;
+      --platform-bad-line: #e5675a;
+      --platform-side: #0a0c0f;
+      --platform-side-line: #1c1f26;
+      --platform-side-text: #c9cfda;
+      --platform-side-muted: #8d96a6;
+      --platform-side-raised: #20242e;
+      --platform-side-accent: #ffc233;
+      --platform-side-field: #171a20;
+      --platform-side-field-line: #737d8d;
+      --platform-popover: #262b35;
+      --platform-popover-line: #4a5260;
+      --platform-popover-hover: #323845;
+      --platform-pill-neutral: #262a33;
+      --platform-pill-neutral-popover: #323845;
+      --platform-switch-thumb: #e8eaef;
+      --platform-switch-thumb-on: #ffc233;
+      --platform-theme-track: #0f1115;
+      --platform-tooltip: #262b35;
+      --platform-tooltip-text: #e8eaef;
+      --platform-tooltip-line: #4a5260;
+      --platform-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --platform-shadow-menu: 0 12px 40px rgba(0, 0, 0, 0.55);
+      --platform-note-line: rgba(255, 194, 51, 0.3);
+      --platform-control-line-locked: #424956;
+      --platform-glyph-accent: #4fb3ad;
+      --platform-glyph-fill: #24504f;
+      --platform-glyph-line-soft: #8f99a8;
+      --platform-glyph-raised: #323945;
+      --platform-frame-dot: #3a404b;
+      --platform-fade-end: rgba(15, 17, 21, 0);
+      --platform-fade-end-surface: rgba(23, 26, 32, 0);
+      --platform-preview-stage: #1d2027;
+      --platform-shadow-frame: 0 6px 20px rgba(0, 0, 0, 0.45);
+      --platform-shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.55);
+      --platform-shadow-index: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --platform-shadow-unsaved: 0 -4px 12px rgba(0, 0, 0, 0.45);
+      --platform-shadow-bar: 0 2px 8px rgba(0, 0, 0, 0.45);
+      --platform-shadow-dock: 0 -2px 8px rgba(0, 0, 0, 0.4);
+      --platform-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --platform-shadow-glyph: 0 2px 5px rgba(0, 0, 0, 0.6);
+      --platform-shadow-thumb: 0 1px 3px rgba(0, 0, 0, 0.6);
+      --platform-thumb-line: #0f1115;
+      --platform-preview-column-line: #2b303a;
+      --platform-rail-header-line: #1c1f26;
+    }
+  }
+  :root {
+    --board-stage: var(--platform-bg);
+    --board-label: var(--platform-faint);
+    --font-platform: 'Inter', system-ui, sans-serif;
+    --font-platform-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    background: var(--platform-surface-2);
+    color: var(--platform-text);
+    font-family: var(--font-platform);
+    font-size: 13.5px;
+    line-height: 1.45;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 32px 64px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .top h1 {
+    margin: 0;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .top p {
+    margin: 4px 0 0;
+    color: var(--platform-muted);
+    max-width: 62ch;
+  }
+  .theme {
+    display: inline-flex;
+    padding: 3px;
+    gap: 2px;
+    border-radius: 6px;
+    background: var(--platform-theme-track);
+    border: 1px solid var(--platform-line);
+  }
+  .theme button {
+    font: 500 12.5px/18px var(--font-platform);
+    color: var(--platform-muted);
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  .theme button[aria-pressed='true'] {
+    background: var(--platform-surface);
+    color: var(--platform-text);
+    box-shadow: var(--platform-shadow-xs);
+  }
+  .theme button:focus-visible,
+  a:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--platform-surface),
+      0 0 0 4px var(--platform-focus-ring),
+      0 0 0 5px var(--platform-focus-edge);
+  }
+
+  .board {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .board-head {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .eyebrow {
+    font-size: 11px;
+    line-height: 14px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--board-label);
+  }
+  .board-head h2 {
+    margin: 0;
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 600;
+  }
+  .board-head p {
+    margin: 0;
+    color: var(--platform-muted);
+    max-width: 70ch;
+  }
+  .stage {
+    background: var(--board-stage);
+    border: 1px solid var(--platform-line);
+    border-radius: 10px;
+    padding: 26px;
+    min-width: 0;
+  }
+  .states {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
+    gap: 24px;
+  }
+  .state {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .state-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--platform-muted);
+  }
+
+  /* --- Card: cardVariants --- */
+  .card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--platform-surface);
+    border: 1px solid var(--platform-line);
+    border-radius: 6px;
+    box-shadow: var(--platform-shadow);
+  }
+  .card-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    min-height: 50px;
+    padding: 12px 18px;
+    background: var(--platform-surface-head);
+    border-bottom: 1px solid var(--platform-line);
+    border-radius: 6px 6px 0 0;
+  }
+  .card-title {
+    margin: 0;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+  }
+  .card-desc {
+    display: block;
+    margin-top: 2px;
+    font-size: 12.5px;
+    line-height: 18px;
+    color: var(--platform-muted);
+  }
+  .card-footer {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 11px 18px;
+    background: var(--platform-surface-2);
+    border-top: 1px solid var(--platform-line-2);
+    border-radius: 0 0 6px 6px;
+    font-size: 12.5px;
+    line-height: 18px;
+    color: var(--platform-muted);
+  }
+  .card-footer svg {
+    flex: none;
+    margin-top: 1px;
+  }
+
+  /* --- Usage rows: a band of cells like YourSiteCard's BandCell --- */
+  .meters {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .meter-row {
+    min-width: 0;
+    padding: 16px 18px;
+    border-top: 1px solid var(--platform-line-2);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .meter-row:first-child {
+    border-top: 0;
+  }
+  @media (width >= 48rem) {
+    .meters.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .meters.two .meter-row:nth-child(2) {
+      border-top: 0;
+    }
+    .meters.two .meter-row:nth-child(even) {
+      border-left: 1px solid var(--platform-line-2);
+    }
+    .meters.two .meter-row:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+    .meter-row {
+      padding: 16px 20px 18px 18px;
+    }
+  }
+  .phone .meters.two {
+    grid-template-columns: 1fr;
+  }
+  .phone .meters.two .meter-row {
+    border-left: 0;
+    padding: 14px 16px 16px;
+  }
+  .phone .meters.two .meter-row:nth-child(2) {
+    border-top: 1px solid var(--platform-line-2);
+  }
+
+  .row-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .row-label {
+    font-size: 12.5px;
+    line-height: 18px;
+    color: var(--platform-muted);
+    font-weight: 400;
+  }
+  .row-link {
+    margin-left: auto;
+    font-size: 12.5px;
+    line-height: 18px;
+    font-weight: 500;
+    color: var(--platform-brand-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--platform-highlight);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .row-link:hover {
+    text-decoration-thickness: 3px;
+  }
+  .value {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .value b {
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 700;
+    color: var(--platform-text);
+    letter-spacing: -0.01em;
+  }
+  .value span {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--platform-muted);
+  }
+  .value.warn b {
+    color: var(--platform-warn);
+  }
+  .value.bad b {
+    color: var(--platform-bad);
+  }
+
+  .track {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--platform-line);
+    overflow: hidden;
+  }
+  .fill {
+    height: 100%;
+    background: var(--platform-brand);
+    border-radius: 999px;
+  }
+  .fill.warn {
+    background: var(--platform-warn);
+  }
+  .fill.bad {
+    background: var(--platform-bad);
+    border-radius: 999px 0 0 999px;
+  }
+  .fill.full {
+    border-radius: 999px 0 0 999px;
+  }
+
+  .note {
+    margin: 0;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--platform-muted);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+  }
+  .note.warn {
+    color: var(--platform-warn);
+    font-weight: 500;
+  }
+  .note.bad {
+    color: var(--platform-bad);
+    font-weight: 600;
+  }
+  .note .sep {
+    color: var(--platform-faint);
+    font-weight: 400;
+    padding: 0 4px;
+  }
+  .note-reset {
+    color: var(--platform-muted);
+    font-weight: 400;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 11.5px;
+    line-height: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge.ok {
+    color: var(--platform-ok);
+    background: var(--platform-ok-weak);
+  }
+  .badge.plan {
+    color: var(--platform-brand-strong);
+    background: var(--platform-brand-weak);
+  }
+
+  .failed {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--platform-muted);
+  }
+  .failed svg {
+    flex: none;
+    margin-top: 1px;
+    color: var(--platform-warn);
+  }
+
+  /* Skeleton of neighbouring cards in the placement boards */
+  .shell {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .page-title {
+    margin: 0;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .page-sub {
+    margin: 4px 0 0;
+    color: var(--platform-muted);
+    font-size: 13.5px;
+  }
+  .ghost {
+    border: 1px dashed var(--platform-control-line-locked);
+    border-radius: 6px;
+    padding: 14px 18px;
+    color: var(--platform-faint);
+    font-size: 12.5px;
+    background: transparent;
+  }
+  .ghost.tall {
+    min-height: 120px;
+  }
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  @media (width >= 48rem) {
+    .pair {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .here {
+    outline: 2px solid var(--platform-highlight);
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+
+  /* Phone frame */
+  .phone-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: center;
+  }
+  .phone {
+    width: 375px;
+    max-width: 100%;
+    border: 1px solid var(--platform-line);
+    border-radius: 22px;
+    background: var(--platform-bg);
+    overflow: hidden;
+    box-shadow: var(--platform-shadow-frame);
+  }
+  .phone-bar {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 8px 0 16px;
+    background: var(--platform-surface);
+    border-bottom: 1px solid var(--platform-line);
+  }
+  .phone-bar .mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--platform-brand-weak);
+    border: 1px solid var(--platform-brand-line);
+  }
+  .phone-bar b {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .phone-body {
+    padding: 20px 16px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Spec table */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--platform-line);
+    border-radius: 6px;
+    background: var(--platform-surface);
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 860px;
+    font-size: 13px;
+    line-height: 18px;
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: 10px 14px;
+    border-top: 1px solid var(--platform-line-2);
+  }
+  thead th {
+    border-top: 0;
+    background: var(--platform-surface-head);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--platform-muted);
+    font-weight: 600;
+  }
+  td code,
+  .mono {
+    font-family: var(--font-platform-mono);
+    font-size: 12px;
+  }
+  td .muted {
+    color: var(--platform-muted);
+  }
+
+  .opens {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .opens li {
+    background: var(--platform-surface);
+    border: 1px solid var(--platform-line);
+    border-radius: 6px;
+    padding: 14px 18px;
+    display: grid;
+    gap: 4px;
+  }
+  .opens b {
+    font-weight: 600;
+  }
+  .opens .rec {
+    color: var(--platform-muted);
+  }
+  .opens .rec strong {
+    color: var(--platform-text);
+    font-weight: 600;
+  }
+</style>
+
+<div class="page">
+  <header class="top">
+    <div>
+      <div class="eyebrow">#7693 · design</div>
+      <h1>The Usage card on the Overview</h1>
+      <p>
+        Every colour, size, radius and shadow here is read from
+        <span class="mono">apps/platform/src/styles/platform-theme.css</span>
+        and the card, badge, link and heading variants. Meter rules follow the
+        Subscribers spec: 8 tall, brand under 80%, warn from 80%, bad when used
+        up.
+      </p>
+    </div>
+    <div class="theme" role="group" aria-label="Theme">
+      <button type="button" id="t-system" data-set="" aria-pressed="true">
+        System
+      </button>
+      <button type="button" id="t-light" data-set="light" aria-pressed="false">
+        Light
+      </button>
+      <button type="button" id="t-dark" data-set="dark" aria-pressed="false">
+        Dark
+      </button>
+    </div>
+  </header>
+
+  <!-- 1. Owner placement -->
+  <section class="board">
+    <div class="board-head">
+      <span class="eyebrow">Board 1 · Owner Overview, desktop</span>
+      <h2>Placement on /dashboard</h2>
+      <p>
+        Right after Your site, before the Domain and Owner pair. A Growth site
+        in its normal state.
+      </p>
+    </div>
+    <div class="stage">
+      <div class="shell">
+        <div>
+          <h3 class="page-title">Overview</h3>
+          <p class="page-sub">Your site at a glance.</p>
+        </div>
+        <div class="ghost">
+          Trial notice · Site setup · Get started (when shown)
+        </div>
+        <div class="ghost">Your site</div>
+        <div class="here">
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Usage</h2>
+                <span class="card-desc"
+                  >What your plan includes and how much is used.</span
+                >
+              </div>
+            </div>
+            <ul class="meters two">
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">AI takeaways this month</span>
+                </div>
+                <p class="value"><b>38</b><span>of 100</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="AI takeaways this month"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="38"
+                >
+                  <div class="fill" style="width: 38%"></div>
+                </div>
+                <p class="note">Resets on 1 December</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Newsletter emails this month</span
+                  ><a class="row-link" href="#">Subscribers</a>
+                </div>
+                <p class="value"><b>4,180</b><span>of 15,000</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Newsletter emails this month"
+                  aria-valuemin="0"
+                  aria-valuemax="15000"
+                  aria-valuenow="4180"
+                >
+                  <div class="fill" style="width: 27.9%"></div>
+                </div>
+                <p class="note">Resets on 1 December</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Team seats</span
+                  ><a class="row-link" href="#">Team</a>
+                </div>
+                <p class="value"><b>2</b><span>of 3</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Team seats"
+                  aria-valuemin="0"
+                  aria-valuemax="3"
+                  aria-valuenow="2"
+                >
+                  <div class="fill" style="width: 66.7%"></div>
+                </div>
+                <p class="note">
+                  Counts the owner, members and pending invites.
+                </p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Additional languages</span
+                  ><a class="row-link" href="#">Languages</a>
+                </div>
+                <p class="value"><b>1</b><span>of 2</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Additional languages"
+                  aria-valuemin="0"
+                  aria-valuemax="2"
+                  aria-valuenow="1"
+                >
+                  <div class="fill" style="width: 50%"></div>
+                </div>
+                <p class="note">Your default language isn't counted.</p>
+              </li>
+            </ul>
+          </section>
+        </div>
+        <div class="pair">
+          <div class="ghost tall">Domain</div>
+          <div class="ghost tall">Owner</div>
+        </div>
+        <div class="ghost">Make it yours</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Operator placement -->
+  <section class="board">
+    <div class="board-head">
+      <span class="eyebrow">Board 2 · Operator Overview, desktop</span>
+      <h2>Placement on /tenants/{id}</h2>
+      <p>
+        Right after Grants, so what a grant raised sits next to what it raised.
+        Findings follow. Every operator role sees it; the copy is the same as
+        the owner's.
+      </p>
+    </div>
+    <div class="stage">
+      <div class="shell">
+        <div class="ghost">Tenant header · provisioning section</div>
+        <div class="ghost">Grants</div>
+        <div class="here">
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Usage</h2>
+                <span class="card-desc"
+                  >What your plan includes and how much is used.</span
+                >
+              </div>
+            </div>
+            <ul class="meters two">
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">AI takeaways this month</span>
+                </div>
+                <p class="value"><b>38</b><span>of 100</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="AI takeaways this month"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="38"
+                >
+                  <div class="fill" style="width: 38%"></div>
+                </div>
+                <p class="note">Resets on 1 December</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Newsletter emails this month</span
+                  ><a class="row-link" href="#">Subscribers</a>
+                </div>
+                <p class="value"><b>4,180</b><span>of 15,000</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Newsletter emails this month"
+                  aria-valuemin="0"
+                  aria-valuemax="15000"
+                  aria-valuenow="4180"
+                >
+                  <div class="fill" style="width: 27.9%"></div>
+                </div>
+                <p class="note">Resets on 1 December</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Team seats</span
+                  ><a class="row-link" href="#">Team</a>
+                </div>
+                <p class="value"><b>2</b><span>of 3</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Team seats"
+                  aria-valuemin="0"
+                  aria-valuemax="3"
+                  aria-valuenow="2"
+                >
+                  <div class="fill" style="width: 66.7%"></div>
+                </div>
+                <p class="note">
+                  Counts the owner, members and pending invites.
+                </p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Additional languages</span
+                  ><a class="row-link" href="#">Languages</a>
+                </div>
+                <p class="value"><b>1</b><span>of 2</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Additional languages"
+                  aria-valuemin="0"
+                  aria-valuemax="2"
+                  aria-valuenow="1"
+                >
+                  <div class="fill" style="width: 50%"></div>
+                </div>
+                <p class="note">Your default language isn't counted.</p>
+              </li>
+            </ul>
+          </section>
+        </div>
+        <div class="ghost">Findings</div>
+        <div class="pair">
+          <div class="ghost tall">Live domain · Owner · …</div>
+          <div class="ghost tall">Content workspace · Recent activity</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. States -->
+  <section class="board">
+    <div class="board-head">
+      <span class="eyebrow">Board 3 · States</span>
+      <h2>Per row, per plan</h2>
+      <p>
+        State is per row: one row near its limit or failed never changes the
+        others. Thresholds: under 80% normal, 80–99% near, 100% used up.
+        Percentages round down, so 99.6% reads 99%.
+      </p>
+    </div>
+    <div class="stage">
+      <div class="states">
+        <div class="state">
+          <span class="state-label">Near the limit (80–99%)</span>
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Usage</h2>
+                <span class="card-desc"
+                  >What your plan includes and how much is used.</span
+                >
+              </div>
+            </div>
+            <ul class="meters two">
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">AI takeaways this month</span>
+                </div>
+                <p class="value warn"><b>84</b><span>of 100</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="AI takeaways this month"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="84"
+                >
+                  <div class="fill warn" style="width: 84%"></div>
+                </div>
+                <p class="note warn">
+                  84% used — 16 left<span class="sep">·</span
+                  ><span class="note-reset">Resets on 1 December</span>
+                </p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Newsletter emails this month</span
+                  ><a class="row-link" href="#">Subscribers</a>
+                </div>
+                <p class="value warn"><b>12,900</b><span>of 15,000</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Newsletter emails this month"
+                  aria-valuemin="0"
+                  aria-valuemax="15000"
+                  aria-valuenow="12900"
+                >
+                  <div class="fill warn" style="width: 86%"></div>
+                </div>
+                <p class="note warn">
+                  86% used — 2,100 left<span class="sep">·</span
+                  ><span class="note-reset">Resets on 1 December</span>
+                </p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Team seats</span
+                  ><a class="row-link" href="#">Team</a>
+                </div>
+                <p class="value"><b>2</b><span>of 3</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Team seats"
+                  aria-valuemin="0"
+                  aria-valuemax="3"
+                  aria-valuenow="2"
+                >
+                  <div class="fill" style="width: 66.7%"></div>
+                </div>
+                <p class="note">
+                  Counts the owner, members and pending invites.
+                </p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Additional languages</span
+                  ><a class="row-link" href="#">Languages</a>
+                </div>
+                <p class="value"><b>1</b><span>of 2</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Additional languages"
+                  aria-valuemin="0"
+                  aria-valuemax="2"
+                  aria-valuenow="1"
+                >
+                  <div class="fill" style="width: 50%"></div>
+                </div>
+                <p class="note">Your default language isn't counted.</p>
+              </li>
+            </ul>
+          </section>
+        </div>
+        <div class="state">
+          <span class="state-label">Used up (100%)</span>
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Usage</h2>
+                <span class="card-desc"
+                  >What your plan includes and how much is used.</span
+                >
+              </div>
+            </div>
+            <ul class="meters two">
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">AI takeaways this month</span>
+                </div>
+                <p class="value bad"><b>100</b><span>of 100</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="AI takeaways this month"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="100"
+                >
+                  <div class="fill bad full" style="width: 100%"></div>
+                </div>
+                <p class="note bad">
+                  All used. New posts get no takeaways until 1 December.
+                </p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Newsletter emails this month</span
+                  ><a class="row-link" href="#">Subscribers</a>
+                </div>
+                <p class="value bad"><b>15,000</b><span>of 15,000</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Newsletter emails this month"
+                  aria-valuemin="0"
+                  aria-valuemax="15000"
+                  aria-valuenow="15000"
+                >
+                  <div class="fill bad full" style="width: 100%"></div>
+                </div>
+                <p class="note bad">
+                  All used. New posts aren't emailed until 1 December.
+                </p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Team seats</span
+                  ><a class="row-link" href="#">Team</a>
+                </div>
+                <p class="value warn"><b>3</b><span>of 3</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Team seats"
+                  aria-valuemin="0"
+                  aria-valuemax="3"
+                  aria-valuenow="3"
+                >
+                  <div class="fill warn full" style="width: 100%"></div>
+                </div>
+                <p class="note warn">
+                  All seats in use. Remove someone to invite another.
+                </p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Additional languages</span
+                  ><a class="row-link" href="#">Languages</a>
+                </div>
+                <p class="value warn"><b>2</b><span>of 2</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Additional languages"
+                  aria-valuemin="0"
+                  aria-valuemax="2"
+                  aria-valuenow="2"
+                >
+                  <div class="fill warn full" style="width: 100%"></div>
+                </div>
+                <p class="note warn">All in use. Remove one to add another.</p>
+              </li>
+            </ul>
+          </section>
+        </div>
+        <div class="state">
+          <span class="state-label">Nothing used yet</span>
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Usage</h2>
+                <span class="card-desc"
+                  >What your plan includes and how much is used.</span
+                >
+              </div>
+            </div>
+            <ul class="meters two">
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">AI takeaways this month</span>
+                </div>
+                <p class="value"><b>0</b><span>of 100</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="AI takeaways this month"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                >
+                  <div class="fill" style="width: 0%"></div>
+                </div>
+                <p class="note">Resets on 1 December</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Newsletter emails this month</span
+                  ><a class="row-link" href="#">Subscribers</a>
+                </div>
+                <p class="value"><b>0</b><span>of 15,000</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Newsletter emails this month"
+                  aria-valuemin="0"
+                  aria-valuemax="15000"
+                  aria-valuenow="0"
+                >
+                  <div class="fill" style="width: 0%"></div>
+                </div>
+                <p class="note">Resets on 1 December</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Team seats</span
+                  ><a class="row-link" href="#">Team</a>
+                </div>
+                <p class="value"><b>1</b><span>of 3</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Team seats"
+                  aria-valuemin="0"
+                  aria-valuemax="3"
+                  aria-valuenow="1"
+                >
+                  <div class="fill" style="width: 33.3%"></div>
+                </div>
+                <p class="note">
+                  Counts the owner, members and pending invites.
+                </p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Additional languages</span
+                  ><a class="row-link" href="#">Languages</a>
+                </div>
+                <p class="value"><b>0</b><span>of 2</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Additional languages"
+                  aria-valuemin="0"
+                  aria-valuemax="2"
+                  aria-valuenow="0"
+                >
+                  <div class="fill" style="width: 0%"></div>
+                </div>
+                <p class="note">Your default language isn't counted.</p>
+              </li>
+            </ul>
+          </section>
+        </div>
+        <div class="state">
+          <span class="state-label">One read failed</span>
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Usage</h2>
+                <span class="card-desc"
+                  >What your plan includes and how much is used.</span
+                >
+              </div>
+            </div>
+            <ul class="meters two">
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">AI takeaways this month</span>
+                </div>
+                <p class="value"><b>38</b><span>of 100</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="AI takeaways this month"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="38"
+                >
+                  <div class="fill" style="width: 38%"></div>
+                </div>
+                <p class="note">Resets on 1 December</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Newsletter emails this month</span
+                  ><a class="row-link" href="#">Subscribers</a>
+                </div>
+                <p class="failed">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 9v4" />
+                    <path d="M12 17h.01" />
+                    <path
+                      d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"
+                    /></svg
+                  ><span
+                    >Couldn't load this count. Reload the page to try
+                    again.</span
+                  >
+                </p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Team seats</span
+                  ><a class="row-link" href="#">Team</a>
+                </div>
+                <p class="value"><b>2</b><span>of 3</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Team seats"
+                  aria-valuemin="0"
+                  aria-valuemax="3"
+                  aria-valuenow="2"
+                >
+                  <div class="fill" style="width: 66.7%"></div>
+                </div>
+                <p class="note">
+                  Counts the owner, members and pending invites.
+                </p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Additional languages</span
+                  ><a class="row-link" href="#">Languages</a>
+                </div>
+                <p class="value"><b>1</b><span>of 2</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Additional languages"
+                  aria-valuemin="0"
+                  aria-valuemax="2"
+                  aria-valuenow="1"
+                >
+                  <div class="fill" style="width: 50%"></div>
+                </div>
+                <p class="note">Your default language isn't counted.</p>
+              </li>
+            </ul>
+          </section>
+        </div>
+        <div class="state">
+          <span class="state-label">Free or Starter</span>
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Usage</h2>
+                <span class="card-desc"
+                  >What your plan includes and how much is used.</span
+                >
+              </div>
+            </div>
+            <ul class="meters two">
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">AI takeaways this month</span>
+                </div>
+                <p class="value"><b>3</b><span>of 5</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="AI takeaways this month"
+                  aria-valuemin="0"
+                  aria-valuemax="5"
+                  aria-valuenow="3"
+                >
+                  <div class="fill" style="width: 60%"></div>
+                </div>
+                <p class="note">Resets on 1 December</p>
+              </li>
+            </ul>
+            <div class="card-footer">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 11v5" />
+                <path d="M12 8h.01" /></svg
+              ><span
+                >Your plan sets these limits.
+                <a class="row-link" style="margin-left: 0" href="#"
+                  >See what each plan includes</a
+                ></span
+              >
+            </div>
+          </section>
+        </div>
+        <div class="state">
+          <span class="state-label">Starter with a language grant</span>
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Usage</h2>
+                <span class="card-desc"
+                  >What your plan includes and how much is used.</span
+                >
+              </div>
+            </div>
+            <ul class="meters two">
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">AI takeaways this month</span>
+                </div>
+                <p class="value"><b>12</b><span>of 20</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="AI takeaways this month"
+                  aria-valuemin="0"
+                  aria-valuemax="20"
+                  aria-valuenow="12"
+                >
+                  <div class="fill" style="width: 60%"></div>
+                </div>
+                <p class="note">Resets on 1 December</p>
+              </li>
+              <li class="meter-row">
+                <div class="row-top">
+                  <span class="row-label">Additional languages</span
+                  ><span class="badge ok">Granted</span
+                  ><a class="row-link" href="#">Languages</a>
+                </div>
+                <p class="value warn"><b>2</b><span>of 2</span></p>
+                <div
+                  class="track"
+                  role="meter"
+                  aria-label="Additional languages"
+                  aria-valuemin="0"
+                  aria-valuemax="2"
+                  aria-valuenow="2"
+                >
+                  <div class="fill warn full" style="width: 100%"></div>
+                </div>
+                <p class="note warn">All in use. Remove one to add another.</p>
+              </li>
+            </ul>
+            <div class="card-footer">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 11v5" />
+                <path d="M12 8h.01" /></svg
+              ><span
+                >Your plan sets these limits.
+                <a class="row-link" style="margin-left: 0" href="#"
+                  >See what each plan includes</a
+                ></span
+              >
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Phone -->
+  <section class="board">
+    <div class="board-head">
+      <span class="eyebrow">Board 4 · Phone, 375 wide</span>
+      <h2>One column, rows stacked</h2>
+      <p>
+        Rows stack in one column with 16 side padding. Order and copy are
+        unchanged; the reset date keeps its full month.
+      </p>
+    </div>
+    <div class="stage">
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-bar">
+            <span class="mark" aria-hidden="true"></span><b>Northwind Notes</b>
+          </div>
+          <div class="phone-body">
+            <section class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">Usage</h2>
+                  <span class="card-desc"
+                    >What your plan includes and how much is used.</span
+                  >
+                </div>
+              </div>
+              <ul class="meters two">
+                <li class="meter-row">
+                  <div class="row-top">
+                    <span class="row-label">AI takeaways this month</span>
+                  </div>
+                  <p class="value"><b>38</b><span>of 100</span></p>
+                  <div
+                    class="track"
+                    role="meter"
+                    aria-label="AI takeaways this month"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="38"
+                  >
+                    <div class="fill" style="width: 38%"></div>
+                  </div>
+                  <p class="note">Resets on 1 December</p>
+                </li>
+                <li class="meter-row">
+                  <div class="row-top">
+                    <span class="row-label">Newsletter emails this month</span
+                    ><a class="row-link" href="#">Subscribers</a>
+                  </div>
+                  <p class="value"><b>4,180</b><span>of 15,000</span></p>
+                  <div
+                    class="track"
+                    role="meter"
+                    aria-label="Newsletter emails this month"
+                    aria-valuemin="0"
+                    aria-valuemax="15000"
+                    aria-valuenow="4180"
+                  >
+                    <div class="fill" style="width: 27.9%"></div>
+                  </div>
+                  <p class="note">Resets on 1 December</p>
+                </li>
+                <li class="meter-row">
+                  <div class="row-top">
+                    <span class="row-label">Team seats</span
+                    ><a class="row-link" href="#">Team</a>
+                  </div>
+                  <p class="value"><b>2</b><span>of 3</span></p>
+                  <div
+                    class="track"
+                    role="meter"
+                    aria-label="Team seats"
+                    aria-valuemin="0"
+                    aria-valuemax="3"
+                    aria-valuenow="2"
+                  >
+                    <div class="fill" style="width: 66.7%"></div>
+                  </div>
+                  <p class="note">
+                    Counts the owner, members and pending invites.
+                  </p>
+                </li>
+                <li class="meter-row">
+                  <div class="row-top">
+                    <span class="row-label">Additional languages</span
+                    ><a class="row-link" href="#">Languages</a>
+                  </div>
+                  <p class="value"><b>1</b><span>of 2</span></p>
+                  <div
+                    class="track"
+                    role="meter"
+                    aria-label="Additional languages"
+                    aria-valuemin="0"
+                    aria-valuemax="2"
+                    aria-valuenow="1"
+                  >
+                    <div class="fill" style="width: 50%"></div>
+                  </div>
+                  <p class="note">Your default language isn't counted.</p>
+                </li>
+              </ul>
+            </section>
+          </div>
+        </div>
+        <div class="phone">
+          <div class="phone-bar">
+            <span class="mark" aria-hidden="true"></span><b>Northwind Notes</b>
+          </div>
+          <div class="phone-body">
+            <section class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">Usage</h2>
+                  <span class="card-desc"
+                    >What your plan includes and how much is used.</span
+                  >
+                </div>
+              </div>
+              <ul class="meters two">
+                <li class="meter-row">
+                  <div class="row-top">
+                    <span class="row-label">AI takeaways this month</span>
+                  </div>
+                  <p class="value bad"><b>100</b><span>of 100</span></p>
+                  <div
+                    class="track"
+                    role="meter"
+                    aria-label="AI takeaways this month"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="100"
+                  >
+                    <div class="fill bad full" style="width: 100%"></div>
+                  </div>
+                  <p class="note bad">
+                    All used. New posts get no takeaways until 1 December.
+                  </p>
+                </li>
+                <li class="meter-row">
+                  <div class="row-top">
+                    <span class="row-label">Newsletter emails this month</span
+                    ><a class="row-link" href="#">Subscribers</a>
+                  </div>
+                  <p class="value warn"><b>12,900</b><span>of 15,000</span></p>
+                  <div
+                    class="track"
+                    role="meter"
+                    aria-label="Newsletter emails this month"
+                    aria-valuemin="0"
+                    aria-valuemax="15000"
+                    aria-valuenow="12900"
+                  >
+                    <div class="fill warn" style="width: 86%"></div>
+                  </div>
+                  <p class="note warn">
+                    86% used — 2,100 left<span class="sep">·</span
+                    ><span class="note-reset">Resets on 1 December</span>
+                  </p>
+                </li>
+                <li class="meter-row">
+                  <div class="row-top">
+                    <span class="row-label">Team seats</span
+                    ><a class="row-link" href="#">Team</a>
+                  </div>
+                  <p class="value warn"><b>3</b><span>of 3</span></p>
+                  <div
+                    class="track"
+                    role="meter"
+                    aria-label="Team seats"
+                    aria-valuemin="0"
+                    aria-valuemax="3"
+                    aria-valuenow="3"
+                  >
+                    <div class="fill warn full" style="width: 100%"></div>
+                  </div>
+                  <p class="note warn">
+                    All seats in use. Remove someone to invite another.
+                  </p>
+                </li>
+                <li class="meter-row">
+                  <div class="row-top">
+                    <span class="row-label">Additional languages</span
+                    ><a class="row-link" href="#">Languages</a>
+                  </div>
+                  <p class="value"><b>1</b><span>of 2</span></p>
+                  <div
+                    class="track"
+                    role="meter"
+                    aria-label="Additional languages"
+                    aria-valuemin="0"
+                    aria-valuemax="2"
+                    aria-valuenow="1"
+                  >
+                    <div class="fill" style="width: 50%"></div>
+                  </div>
+                  <p class="note">Your default language isn't counted.</p>
+                </li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Row spec -->
+  <section class="board">
+    <div class="board-head">
+      <span class="eyebrow">Board 5 · Rows</span>
+      <h2>Every row, its copy and when it shows</h2>
+      <p>
+        Rows appear in this order. Allowances are plan plus grants. A row shows
+        only when its allowance is above zero.
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Row label</th>
+            <th>Value</th>
+            <th>Link</th>
+            <th>Shows when</th>
+            <th>Under 80% note</th>
+            <th>Near note</th>
+            <th>Used-up note</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>AI takeaways this month</td>
+            <td>
+              <code>{used} of {allowance}</code><br /><span class="muted"
+                >Free 5, Starter 20, Growth 100</span
+              >
+            </td>
+            <td class="muted">None</td>
+            <td>Every plan</td>
+            <td>Resets on {d MMMM}</td>
+            <td>{pct}% used — {left} left · Resets on {d MMMM}</td>
+            <td>All used. New posts get no takeaways until {d MMMM}.</td>
+          </tr>
+          <tr>
+            <td>Newsletter emails this month</td>
+            <td>
+              <code>{sent} of {allowance}</code><br /><span class="muted"
+                >6 × band ceiling</span
+              >
+            </td>
+            <td>Subscribers</td>
+            <td>Newsletter in plan or granted</td>
+            <td>Resets on {d MMMM}</td>
+            <td>{pct}% used — {left} left · Resets on {d MMMM}</td>
+            <td>All used. New posts aren't emailed until {d MMMM}.</td>
+          </tr>
+          <tr>
+            <td>Team seats</td>
+            <td>
+              <code>{used} of {seats}</code><br /><span class="muted"
+                >Owner, members and pending invites</span
+              >
+            </td>
+            <td>Team</td>
+            <td>Seats above 1</td>
+            <td>Counts the owner, members and pending invites.</td>
+            <td>{left} seat left.</td>
+            <td>All seats in use. Remove someone to invite another.</td>
+          </tr>
+          <tr>
+            <td>Additional languages</td>
+            <td>
+              <code>{live} of {limit − 1}</code><br /><span class="muted"
+                >Live, not counting the default</span
+              >
+            </td>
+            <td>Languages</td>
+            <td>Limit above 1</td>
+            <td>Your default language isn't counted.</td>
+            <td>{left} language left.</td>
+            <td>All in use. Remove one to add another.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Part</th>
+            <th>Spec</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Card</td>
+            <td>
+              Shared <code>Card</code>. Header title "Usage" (h2, cardTitle
+              14/20 600), supporting text "What your plan includes and how much
+              is used." No header action. Body padding 0; rows in a 2-column
+              band from <code>md</code>, an odd last row spans both columns.
+              Footer only on Free and Starter: info icon + "Your plan sets these
+              limits." with the text link "See what each plan includes" to
+              <code>pricingPageUrl</code>.
+            </td>
+          </tr>
+          <tr>
+            <td>Row</td>
+            <td>
+              Padding 16/18 (16 on phone), gap 8. Label 12.5/18
+              <code>muted</code>; link right-aligned, the shared text link at
+              12.5. "Granted" badge (ok tone, no dot) after the label when
+              grants raise the allowance. Value 22/700 tabular, "of {n}" 14
+              <code>muted</code>; value turns <code>warn</code> near and
+              <code>bad</code> used up.
+            </td>
+          </tr>
+          <tr>
+            <td>Meter</td>
+            <td>
+              <code>role="meter"</code>, <code>aria-valuemin</code> 0, max the
+              allowance, now the used count (capped at max), named by the row
+              label. 8 tall, radius full, track <code>line</code>. Fill
+              <code>brand</code> under 80%, <code>warn</code> 80–99%,
+              <code>bad</code> at 100% (monthly rows) or <code>warn</code> at
+              100% (seats, languages). Fill end square at 100%.
+            </td>
+          </tr>
+          <tr>
+            <td>Note</td>
+            <td>
+              13/18. Under 80% <code>muted</code> 400; near
+              <code>warn</code> 500; used up <code>bad</code> 600 for monthly
+              rows, <code>warn</code> 500 for seats and languages. The reset
+              part stays <code>muted</code> 400 after a dot separator.
+            </td>
+          </tr>
+          <tr>
+            <td>Reset date</td>
+            <td>
+              "Resets on {d MMMM}" in the viewer's platform language, first day
+              of next UTC month, no year ("Resets on 1 December"). Monthly rows
+              only.
+            </td>
+          </tr>
+          <tr>
+            <td>Failed read</td>
+            <td>
+              That row keeps its label and link, drops value, meter and note,
+              and shows a warn alert icon with "Couldn't load this count. Reload
+              the page to try again." The read is logged; other rows render.
+            </td>
+          </tr>
+          <tr>
+            <td>Empty</td>
+            <td>
+              No empty card: the takeaways row always shows. Zero used reads "0
+              of {n}" with an empty track.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 6. Opens -->
+  <section class="board">
+    <div class="board-head">
+      <span class="eyebrow">Opens for the owner</span>
+      <h2>Decisions this mock assumes</h2>
+    </div>
+    <ul class="opens">
+      <li>
+        <b>1. Operator placement</b
+        ><span class="rec"
+          ><strong>Recommend after Grants.</strong> The alternative is after
+          Findings, which keeps open problems higher.</span
+        >
+      </li>
+      <li>
+        <b>2. Full seats and languages: warn, not bad</b
+        ><span class="rec"
+          ><strong>Recommend warn.</strong> Nothing stops working when they're
+          full, unlike a used-up month of takeaways or emails.</span
+        >
+      </li>
+      <li>
+        <b>3. Free and Starter footer link to the plan comparison</b
+        ><span class="rec"
+          ><strong>Recommend yes, owner only.</strong> No "Upgrade" button on
+          the card; Billing stays the one place to change plan. The operator
+          sees no footer.</span
+        >
+      </li>
+      <li>
+        <b>4. Hide rows whose allowance is zero</b
+        ><span class="rec"
+          ><strong>Recommend hide.</strong> "1 of 1 seats" on Free says nothing;
+          the plan comparison shows what a higher plan adds.</span
+        >
+      </li>
+      <li>
+        <b>5. Takeaways row link</b
+        ><span class="rec"
+          ><strong>Recommend none</strong> until the Studio regenerate control
+          (#7614) has a page to point at.</span
+        >
+      </li>
+    </ul>
+  </section>
+</div>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var buttons = document.querySelectorAll('.theme button');
+    function apply(value) {
+      if (value) root.setAttribute('data-theme', value);
+      else root.removeAttribute('data-theme');
+      buttons.forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.dataset.set === value));
+      });
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () {
+        apply(b.dataset.set);
+      });
+    });
+  })();
+</script>
