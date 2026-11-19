@@ -12,18 +12,10 @@ export const segmentedControlVariants = tv({
       'font-mono text-xs font-medium uppercase tracking-eyebrow',
       'cursor-pointer transition-colors duration-base ease-smooth',
       'text-muted hover:text-text',
+      'aria-checked:bg-brand-primary-solid aria-checked:text-brand-primary-contrast aria-checked:hover:text-brand-primary-contrast',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
       'disabled:pointer-events-none disabled:opacity-50',
     ],
-  },
-  variants: {
-    selected: {
-      true: {
-        option: [
-          'bg-brand-primary-solid text-brand-primary-contrast hover:text-brand-primary-contrast',
-        ],
-      },
-    },
   },
 });

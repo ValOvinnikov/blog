@@ -102,7 +102,6 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 A fully controlled switch between a small, mutually exclusive set of views (e.g. a reader's chosen depth for an article).
 Props: options: ISegmentedControlOption<TValue>[] · value: TValue · onChange: (value: TValue) => void · ariaLabel: string _(extends IWithClassName, IWithDataTestId)_
-Variants: selected: (boolean)
 
 ### Spinner — `components/atoms/spinner/spinner.tsx`
 
@@ -387,7 +386,7 @@ Props: children: TCompoundChildren<typeof ArticleParts> _(extends IWithClassName
 
 Slots:
 
-- **Article.Header** — The opening of a post page, above its body. Props: title: string · topic?: IArticleHeaderTopic · lead?: string · meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'> · coverMedia?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Article.Header** — The opening of a post page, above its body. Props: title: string · topic?: IArticleHeaderTopic · lead?: string · meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'> · coverMedia?: ReactNode · action?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: hasAction: (boolean)
 - **Article.Body** — Reading-content wrapper that applies the prose measure and spacing for long-form body content. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Article.Footer** — End-of-article furniture; renders the post's tags as a chip list of links. Props: tags: IArticleFooterTag[] · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
