@@ -1,4 +1,8 @@
-import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import {
+  type IWithClassName,
+  type IWithDataTestId,
+  TEXT_ROLE,
+} from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import type { ReactNode } from 'react';
 
@@ -15,7 +19,7 @@ export const TimelineHeading = ({
 }: TTimelineHeadingProps) => (
   <Heading
     level={3}
-    visual="card"
+    visual={TEXT_ROLE.ITEM_TITLE}
     className={className}
     dataTestId={dataTestId}
   >

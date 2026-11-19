@@ -2,6 +2,7 @@ import {
   A_AS_CONST,
   type IWithClassName,
   type IWithDataTestId,
+  TEXT_ROLE,
 } from '@shinefold/config';
 import type { TAnchorElementType } from '@shinefold/config/react';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
@@ -62,7 +63,7 @@ const TaxonomyCardRoot = ({
 
   return (
     <article className={s.root({ class: className })} data-testid={dataTestId}>
-      <Heading level={headingLevel} visual="card">
+      <Heading level={headingLevel} visual={TEXT_ROLE.CARD_TITLE}>
         <TextLink
           href={href}
           as={LinkComponent}
