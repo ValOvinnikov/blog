@@ -1,7 +1,6 @@
 import { getDb } from '@shinefold/db/client';
 import { tenants } from '@shinefold/db/schema/tenants';
-import { requireTenantTokenEncryptionKey } from '@shinefold/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
-import { encryptSecret } from '@shinefold/utils';
+import { encryptTenantSecret } from '@shinefold/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
 import { eq } from 'drizzle-orm';
 
 export async function setTenantSanityManagementToken(
@@ -9,10 +8,7 @@ export async function setTenantSanityManagementToken(
   minted: { token: string; robotId: string },
 ): Promise<void> {
   const db = getDb();
-  const encrypted = encryptSecret(
-    minted.token,
-    requireTenantTokenEncryptionKey(),
-  );
+  const encrypted = encryptTenantSecret(minted.token);
 
   await db
     .update(tenants)
