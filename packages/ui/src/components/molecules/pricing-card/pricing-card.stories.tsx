@@ -1,6 +1,7 @@
 import { Button } from '@shinefold/ui/components/atoms/button';
 import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
 import { CardStyles } from '@shinefold/ui/testing/card-styles';
+import { inNarrowColumn, threeAcross } from '@shinefold/ui/testing/card-widths';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { PricingCard } from './pricing-card';
@@ -41,6 +42,10 @@ const renderInEachCardStyle: TStory['render'] = (args) => (
 );
 
 export const Default: TStory = { render: renderInEachCardStyle };
+
+export const NarrowColumn: TStory = { decorators: [inNarrowColumn] };
+
+export const ThreeAcross: TStory = { decorators: [threeAcross] };
 
 export const Highlighted: TStory = {
   render: renderInEachCardStyle,
