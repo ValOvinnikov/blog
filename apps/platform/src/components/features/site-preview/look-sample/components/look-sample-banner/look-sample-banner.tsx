@@ -1,6 +1,6 @@
 import { LookSampleImage } from '@platform/components/features/site-preview/look-sample/components/look-sample-image/look-sample-image';
 import { LOOK_SAMPLE_BANNER_TEST_ID } from '@platform/constants/look-sample';
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@shinefold/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT, TEXT_ROLE } from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Text } from '@shinefold/ui/components/atoms/text';
 import { bannerVariants } from '@shinefold/ui/lib/styling';
@@ -26,10 +26,10 @@ export const LookSampleBanner = () => {
       </div>
       <div className={overlay()} aria-hidden="true" />
       <div className={copy()}>
-        <Heading level={2} visual="section" className={title()}>
+        <Heading level={2} visual={TEXT_ROLE.SECTION_TITLE} className={title()}>
           {t('bannerHeading')}
         </Heading>
-        <Text variant="supporting" className={text()}>
+        <Text textRole={TEXT_ROLE.CARD_BODY} className={text()}>
           {t('bannerText')}
         </Text>
       </div>

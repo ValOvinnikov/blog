@@ -6,7 +6,7 @@ import {
 } from '@platform/constants/look-sample';
 import { SAMPLE_LINK_HREF } from '@platform/constants/sample-link';
 import { SAMPLE_PART } from '@platform/constants/sample-part';
-import type { TBrandVariant } from '@shinefold/config';
+import { TEXT_ROLE, type TBrandVariant } from '@shinefold/config';
 import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Text } from '@shinefold/ui/components/atoms/text';
@@ -36,10 +36,10 @@ export const LookSampleBand = ({ skin }: TLookSampleBandProps) => {
           <Eyebrow dataTestId={LOOK_SAMPLE_BAND_LABEL_TEST_ID}>
             {tLook(`skinLabel.${skin}`)}
           </Eyebrow>
-          <Heading level={2} visual="section">
+          <Heading level={2} visual={TEXT_ROLE.SECTION_TITLE}>
             {t('bandHeading')}
           </Heading>
-          <Text variant="supporting">{t('bandText')}</Text>
+          <Text textRole={TEXT_ROLE.CARD_BODY}>{t('bandText')}</Text>
           <TextLink href={SAMPLE_LINK_HREF}>{t('bandLink')}</TextLink>
           <LookSampleActions />
         </div>

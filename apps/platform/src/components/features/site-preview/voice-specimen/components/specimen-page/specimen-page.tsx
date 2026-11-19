@@ -1,8 +1,11 @@
 import { VoiceKeyFrame } from '@platform/components/features/site-preview/voice-key-frame';
 import { VoiceRichText } from '@platform/components/features/site-preview/voice-rich-text';
-import type { TVoiceFieldId, TVoicePortableText } from '@shinefold/config';
+import {
+  TEXT_ROLE,
+  type TVoiceFieldId,
+  type TVoicePortableText,
+} from '@shinefold/config';
 import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
-import { headingVariants } from '@shinefold/ui/components/atoms/heading/heading-variants';
 import { Text } from '@shinefold/ui/components/atoms/text';
 import { isString } from '@shinefold/utils/primitives';
 import type { ReactNode } from 'react';
@@ -47,13 +50,13 @@ export const SpecimenPage = ({
           fieldId={heading.fieldId}
           isFocused={heading.fieldId === focusedFieldId}
         >
-          <p className={headingVariants({ visual: 'hero' })}>
+          <Text textRole={TEXT_ROLE.HERO_TITLE}>
             <VoiceRichText value={heading.value} />
-          </p>
+          </Text>
         </VoiceKeyFrame>
       )}
       {body && (
-        <Text className={s.copy()}>
+        <Text textRole={TEXT_ROLE.INTRO} className={s.copy()}>
           <VoiceKeyFrame
             fieldId={body.fieldId}
             isFocused={body.fieldId === focusedFieldId}
