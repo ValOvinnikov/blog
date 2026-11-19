@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker';
-import { SANITY_WEBHOOK_OPERATION } from '@shinefold/config/constants';
 import {
-  REVALIDATE_LOG,
+  SANITY_WEBHOOK_OPERATION,
   STARTER_DOCUMENT_ID_PREFIX,
-} from '@web/constants/revalidate';
+} from '@shinefold/config/constants';
+import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { enqueueNewsletterPostSend } from '@web/server/revalidate/enqueue-newsletter-post-send/enqueue-newsletter-post-send';
 import { isCapabilityEnabledForTenant } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';

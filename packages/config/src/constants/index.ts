@@ -86,3 +86,4 @@ export * from './text-role';
 export * from './theme-tokens';
 export * from './timeline';
 export * from './toast';
+export * from './starter-document';
