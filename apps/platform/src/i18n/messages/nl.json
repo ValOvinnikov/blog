@@ -982,7 +982,8 @@
     "skinLabel": {
       "PRIMARY": "Effen",
       "SECONDARY": "Gearceerd",
-      "BRAND_PRIMARY": "Merktint"
+      "BRAND_PRIMARY": "Merktint",
+      "INK": "Inkt"
     },
     "footerSurfaceLabel": "Oppervlak",
     "footerSurfaceDescription": "Of de voettekst de hele breedte beslaat of als kaart wordt getoond.",
@@ -2533,6 +2534,7 @@
     "archived": "Deze tenant is gearchiveerd, dus de toekenningen kunnen niet meer wijzigen.",
     "comingSoon": "Deze functie is nog niet beschikbaar en kan dus niet worden toegekend.",
     "alreadyGranted": "Dit is al toegekend.",
+    "expiryShortened": "De huidige taaltoekenning loopt langer. Kies een latere vervaldatum of trek die toekenning eerst in.",
     "includedInPlan": "Dit zit al in het abonnement van de tenant.",
     "grantNotOpen": "Deze toekenning is al verwijderd of verlopen."
   }

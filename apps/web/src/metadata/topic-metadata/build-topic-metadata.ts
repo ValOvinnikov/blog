@@ -1,22 +1,19 @@
 import { routes } from '@shinefold/config';
-import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
+import { OG_TYPE } from '@web/constants/metadata';
+import { TOPIC_LOG } from '@web/constants/topic';
+import { toPaginatedPageMetadata } from '@web/metadata/to-paginated-page-metadata';
 import { getTopicPage } from '@web/server/topic/get-topic-page/get-topic-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 
-/** Page 2+ self-canonicalizes and carries no hreflang: each language's list need not run to the same number of pages. */
 export const buildTopicMetadata = async (
   slug: string,
-  pageNumber?: number,
+  page = 1,
 ): Promise<Metadata> => {
-  const [result, t] = await Promise.all([
-    getTopicPage(slug),
-    getTranslations('pagination'),
-  ]);
+  const result = await getTopicPage(slug);
 
   if (!result.ok) {
-    logger.error('topic_metadata.fetch_failed', {
+    logger.error(TOPIC_LOG.METADATA_FETCH_FAILED, {
       slug,
       error: result.error,
     });
@@ -28,26 +25,14 @@ export const buildTopicMetadata = async (
   }
 
   const { seo, translations } = result.data;
-  const resolvedSeo =
-    pageNumber === undefined
-      ? seo
-      : {
-          ...seo,
-          title: `${seo.title} ${t('pageSuffix', { page: pageNumber })}`,
-          ogTitle: seo.ogTitle
-            ? `${seo.ogTitle} ${t('pageSuffix', { page: pageNumber })}`
-            : undefined,
-        };
 
-  return toLocalizedPageMetadata(resolvedSeo, {
-    href: routes.topic(slug, pageNumber),
-    translations:
-      pageNumber === undefined
-        ? translations.map(({ language, slug: translatedSlug }) => ({
-            language,
-            href: routes.topic(translatedSlug),
-          }))
-        : [],
-    ogType: 'website',
+  return toPaginatedPageMetadata(seo, {
+    page,
+    href: routes.topic(slug, page),
+    translations: translations.map(({ language, slug: translatedSlug }) => ({
+      language,
+      href: routes.topic(translatedSlug),
+    })),
+    ogType: OG_TYPE.WEBSITE,
   });
 };

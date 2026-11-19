@@ -1,10 +1,15 @@
-import { INTERACTIVE_ITEM_CARD, tv } from '@shinefold/ui/lib/styling';
+import {
+  CARD_CONTAINER,
+  INTERACTIVE_ITEM_CARD,
+  tv,
+} from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const taxonomyCardVariants = tv({
   slots: {
     root: [
-      '@container/card relative isolate flex h-full flex-col gap-2',
+      CARD_CONTAINER,
+      'relative isolate flex h-full flex-col gap-2',
       'item-card surface-card',
       'px-card-x py-card-y',
     ],

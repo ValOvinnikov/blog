@@ -982,7 +982,8 @@
     "skinLabel": {
       "PRIMARY": "Uni",
       "SECONDARY": "Ombré",
-      "BRAND_PRIMARY": "Teinte de marque"
+      "BRAND_PRIMARY": "Teinte de marque",
+      "INK": "Encre"
     },
     "footerSurfaceLabel": "Surface",
     "footerSurfaceDescription": "Si le pied de page occupe toute la largeur ou s’affiche comme une carte.",
@@ -2533,6 +2534,7 @@
     "archived": "Ce locataire est archivé, ses attributions ne peuvent donc pas changer.",
     "comingSoon": "Cette fonctionnalité n'est pas encore disponible, elle ne peut donc pas être accordée.",
     "alreadyGranted": "C'est déjà accordé.",
+    "expiryShortened": "L'attribution de langues actuelle dure plus longtemps. Choisissez une expiration plus tardive, ou révoquez d'abord cette attribution.",
     "includedInPlan": "C'est déjà inclus dans le forfait du locataire.",
     "grantNotOpen": "Cette attribution a déjà été retirée ou a expiré."
   }

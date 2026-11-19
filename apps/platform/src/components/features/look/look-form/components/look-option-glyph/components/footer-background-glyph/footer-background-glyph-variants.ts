@@ -15,6 +15,7 @@ export const footerBackgroundGlyphVariants = tv({
       [BRAND_VARIANT.BRAND_PRIMARY]: { swatch: ['bg-brand-primary-muted'] },
       [BRAND_VARIANT.PRIMARY]: { swatch: ['bg-primary'] },
       [BRAND_VARIANT.SECONDARY]: { swatch: ['bg-secondary'] },
+      [BRAND_VARIANT.INK]: { swatch: ['bg-ambient'] },
     },
   },
 });

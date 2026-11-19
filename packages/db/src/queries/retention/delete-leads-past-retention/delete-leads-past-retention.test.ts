@@ -1,10 +1,7 @@
 import { LEAD_RETENTION_MONTHS } from '@shinefold/db/constants';
 import { monthsBefore } from '@shinefold/db/queries/retention/retention-cutoff';
 import * as schema from '@shinefold/db/schema';
-import {
-  insertTestLead,
-  insertTestTenant,
-} from '@shinefold/db/testing/fixtures';
+import { insertTestLead } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   justPast,
@@ -12,30 +9,28 @@ import {
   MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
 } from '@shinefold/db/testing/retention/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { deleteLeadsPastRetention } from './delete-leads-past-retention';
 
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 
 const CUTOFF = monthsBefore(MOCK_RETENTION_NOW, LEAD_RETENTION_MONTHS);
 
 afterEach(async () => {
   await db().delete(schema.leads);
-  await db().delete(schema.tenants);
 });
 
 describe(deleteLeadsPastRetention, () => {
-  let tenantId: string;
-
   beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
+    await insertTestLead(db(), tenant().id, { createdAt: justPast(CUTOFF) });
   });
 
   it('deletes the leads received before the period and keeps newer ones', async () => {
-    await insertTestLead(db(), tenantId, { createdAt: justPast(CUTOFF) });
-    const recent = await insertTestLead(db(), tenantId, {
+    const recent = await insertTestLead(db(), tenant().id, {
       createdAt: justWithin(CUTOFF),
     });
 
@@ -48,8 +43,7 @@ describe(deleteLeadsPastRetention, () => {
   });
 
   it('deletes at most the given number of leads per call', async () => {
-    await insertTestLead(db(), tenantId, { createdAt: justPast(CUTOFF) });
-    await insertTestLead(db(), tenantId, { createdAt: justPast(CUTOFF) });
+    await insertTestLead(db(), tenant().id, { createdAt: justPast(CUTOFF) });
 
     await expect(deleteLeadsPastRetention(MOCK_RETENTION_NOW, 1)).resolves.toBe(
       1,
@@ -60,7 +54,6 @@ describe(deleteLeadsPastRetention, () => {
   });
 
   it('deletes nothing when run a second time', async () => {
-    await insertTestLead(db(), tenantId, { createdAt: justPast(CUTOFF) });
     await deleteLeadsPastRetention(MOCK_RETENTION_NOW, MOCK_RETENTION_LIMIT);
 
     await expect(

@@ -1,4 +1,8 @@
-import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import {
+  type IWithClassName,
+  type IWithDataTestId,
+  TEXT_ROLE,
+} from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import type { ReactNode } from 'react';
 
@@ -7,7 +11,7 @@ export type TPricingCardNameProps = IWithClassName &
     children: ReactNode;
   };
 
-/** The `<h3>` naming a `PricingCard`'s tier. */
+/** Names a `PricingCard`'s tier. */
 export const PricingCardName = ({
   className,
   dataTestId,
@@ -15,7 +19,7 @@ export const PricingCardName = ({
 }: TPricingCardNameProps) => (
   <Heading
     level={3}
-    visual="card"
+    visual={TEXT_ROLE.CARD_TITLE}
     className={className}
     dataTestId={dataTestId}
   >

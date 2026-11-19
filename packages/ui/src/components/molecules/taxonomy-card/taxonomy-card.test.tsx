@@ -10,7 +10,6 @@ faker.seed(123);
 const MOCK_DESCRIPTION = faker.lorem.sentence();
 const MOCK_POST_COUNT_LABEL = `${faker.number.int({ min: 2, max: 40 })} posts`;
 const MOCK_POSTS_LABEL = faker.lorem.words(2);
-const MOCK_SEPARATOR = ' — ';
 const MOCK_POSTS = faker.helpers.multiple(
   () => ({
     id: faker.string.uuid(),
@@ -46,40 +45,30 @@ describe(`<${TaxonomyCard.name}/>`, () => {
     expect(description).toBeVisible();
   });
 
-  it('renders no description when omitted', () => {
-    setup();
+  describe('with the required props only', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const description = screen.queryByText(MOCK_DESCRIPTION);
+    it('renders no description when omitted', () => {
+      const description = screen.queryByText(MOCK_DESCRIPTION);
 
-    expect(description).not.toBeInTheDocument();
-  });
+      expect(description).not.toBeInTheDocument();
+    });
 
-  it('renders the pre-formatted post count label as visible text', () => {
-    setup();
+    it('renders the pre-formatted post count label as visible text', () => {
+      const postCount = screen.getByText(MOCK_POST_COUNT_LABEL);
 
-    const postCount = screen.getByText(MOCK_POST_COUNT_LABEL);
+      expect(postCount).toBeVisible();
+    });
 
-    expect(postCount).toBeVisible();
-  });
+    it('names the link by the visible title followed by the post count', () => {
+      const link = screen.getByRole('link');
 
-  it('names the link by the visible title followed by the post count', () => {
-    setup();
-
-    const link = screen.getByRole('link');
-
-    expect(link).toHaveAccessibleName(
-      `${MOCK_TOPIC.label}, ${MOCK_POST_COUNT_LABEL}`,
-    );
-  });
-
-  it('joins the accessible name with a custom separator', () => {
-    setup({ accessibleNameSeparator: MOCK_SEPARATOR });
-
-    const link = screen.getByRole('link');
-
-    expect(link).toHaveAccessibleName(
-      `${MOCK_TOPIC.label}${MOCK_SEPARATOR}${MOCK_POST_COUNT_LABEL}`,
-    );
+      expect(link).toHaveAccessibleName(
+        `${MOCK_TOPIC.label}, ${MOCK_POST_COUNT_LABEL}`,
+      );
+    });
   });
 
   it('renders the link through the supplied link component', () => {

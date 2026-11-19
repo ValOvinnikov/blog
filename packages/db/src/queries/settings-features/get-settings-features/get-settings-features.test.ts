@@ -1,28 +1,22 @@
 import * as schema from '@shinefold/db/schema';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { mockSettingsFeaturesToggles } from '@shinefold/db/testing/settings-features/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { getSettingsFeatures } from './get-settings-features';
 
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 
 afterEach(async () => {
   await db().delete(schema.settingsFeatures);
-  await db().delete(schema.tenants);
 });
 
 describe(getSettingsFeatures, () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
   it('returns undefined when the tenant has no saved toggles', async () => {
-    const result = await getSettingsFeatures(tenantId);
+    const result = await getSettingsFeatures(tenant().id);
 
     expect(result).toBeUndefined();
   });
@@ -30,10 +24,10 @@ describe(getSettingsFeatures, () => {
   it('returns the stored toggles when a row exists', async () => {
     const [saved] = await db()
       .insert(schema.settingsFeatures)
-      .values({ tenantId, ...mockSettingsFeaturesToggles() })
+      .values({ tenantId: tenant().id, ...mockSettingsFeaturesToggles() })
       .returning();
 
-    const result = await getSettingsFeatures(tenantId);
+    const result = await getSettingsFeatures(tenant().id);
 
     expect(result).toEqual(saved);
   });

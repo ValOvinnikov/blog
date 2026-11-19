@@ -1,12 +1,12 @@
 import { ERROR_CODE } from '@shinefold/config/constants';
 import * as schema from '@shinefold/db/schema';
-import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_SHARED_TENANT_DOMAIN,
 } from '@shinefold/db/testing/tenant-domains/fixtures';
 import { MOCK_TENANT_DOMAIN } from '@shinefold/db/testing/tenants/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { errorResult } from '@shinefold/utils';
 
 import { restoreCustomDomainClaim } from './restore-custom-domain-claim';
@@ -14,26 +14,18 @@ import { restoreCustomDomainClaim } from './restore-custom-domain-claim';
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db, { primaryDomain: MOCK_TENANT_DOMAIN });
 const ORIGINAL_TOKEN = 'a'.repeat(64);
 const OTHER_TOKEN = 'b'.repeat(64);
 
 afterEach(async () => {
   await db().delete(schema.customDomainClaims);
-  await db().delete(schema.tenants);
 });
 
 describe(restoreCustomDomainClaim, () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db(), {
-      primaryDomain: MOCK_TENANT_DOMAIN,
-    }));
-  });
-
   it('recreates the claim with the given token', async () => {
     const result = await restoreCustomDomainClaim({
-      tenantId,
+      tenantId: tenant().id,
       domain: MOCK_SHARED_TENANT_DOMAIN,
       token: ORIGINAL_TOKEN,
     });
@@ -46,13 +38,13 @@ describe(restoreCustomDomainClaim, () => {
 
   it('refuses when the site already has a claim and keeps it', async () => {
     await restoreCustomDomainClaim({
-      tenantId,
+      tenantId: tenant().id,
       domain: MOCK_SHARED_TENANT_DOMAIN,
       token: ORIGINAL_TOKEN,
     });
 
     const result = await restoreCustomDomainClaim({
-      tenantId,
+      tenantId: tenant().id,
       domain: MOCK_OTHER_TENANT_DOMAIN,
       token: OTHER_TOKEN,
     });
@@ -65,7 +57,7 @@ describe(restoreCustomDomainClaim, () => {
 
   it('rejects an invalid domain without writing a row', async () => {
     const result = await restoreCustomDomainClaim({
-      tenantId,
+      tenantId: tenant().id,
       domain: `https://${MOCK_SHARED_TENANT_DOMAIN}`,
       token: ORIGINAL_TOKEN,
     });

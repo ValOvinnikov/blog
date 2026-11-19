@@ -2,6 +2,9 @@ import type { TThemeToken } from './contrast-pairs';
 
 export const PRIMARY_SUBTLE = '--primary-subtle' satisfies TThemeToken;
 export const SECONDARY = '--secondary' satisfies TThemeToken;
+export const PRIMARY = '--primary' satisfies TThemeToken;
+export const BORDER = '--border' satisfies TThemeToken;
+export const SURFACE = '--surface' satisfies TThemeToken;
 export const SURFACE_2 = '--surface-2' satisfies TThemeToken;
 export const BRAND_PRIMARY_MUTED =
   '--brand-primary-muted' satisfies TThemeToken;
@@ -30,10 +33,10 @@ export const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
 };
 
 export const BANDS = [
-  '--primary',
+  PRIMARY,
   PRIMARY_SUBTLE,
   SECONDARY,
-  '--surface',
+  SURFACE,
   SURFACE_2,
   BRAND_PRIMARY_MUTED,
 ] as const satisfies readonly TThemeToken[];
@@ -49,13 +52,13 @@ export const TEXT_SURFACES = [
 ] as const satisfies readonly TThemeToken[];
 
 export const FIELD_SURFACES = [
-  '--primary',
+  PRIMARY,
   PRIMARY_SUBTLE,
-  '--surface',
+  SURFACE,
 ] as const satisfies readonly TThemeToken[];
 
 export const TINTED_FIELD_SURFACES = [
-  '--surface',
+  SURFACE,
   SECONDARY,
   BRAND_PRIMARY_MUTED,
 ] as const satisfies readonly TThemeToken[];

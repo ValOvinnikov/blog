@@ -2858,6 +2858,14 @@
         "file": "packages/config/src/constants/layout.ts"
       }
     ],
+    "INK": [
+      {
+        "ref": "BRAND_VARIANT.INK",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
     "NONE": [
       {
         "ref": "SPACING_SCALE.NONE",
@@ -7478,6 +7486,14 @@
         "file": "apps/platform/src/constants/entitlement-grant.ts"
       }
     ],
+    "EXPIRY_SHORTENED": [
+      {
+        "ref": "ENTITLEMENT_GRANT_REFUSAL.EXPIRY_SHORTENED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
     "INCLUDED_IN_PLAN": [
       {
         "ref": "ENTITLEMENT_GRANT_REFUSAL.INCLUDED_IN_PLAN",
@@ -10990,6 +11006,22 @@
         "file": "apps/web/src/constants/embed.ts"
       }
     ],
+    "global_error_boundary.render_failed": [
+      {
+        "ref": "ERROR_BOUNDARY_LOG.GLOBAL_RENDER_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/error-boundary",
+        "file": "apps/web/src/constants/error-boundary.ts"
+      }
+    ],
+    "locale_error_boundary.render_failed": [
+      {
+        "ref": "ERROR_BOUNDARY_LOG.LOCALE_RENDER_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/error-boundary",
+        "file": "apps/web/src/constants/error-boundary.ts"
+      }
+    ],
     "faq_module.fetch_failed": [
       {
         "ref": "FAQ_LOG.MODULE_FETCH_FAILED",
@@ -11537,6 +11569,14 @@
     "post_index_breadcrumbs.fetch_failed": [
       {
         "ref": "POST_INDEX_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post-index",
+        "file": "apps/web/src/constants/post-index.ts"
+      }
+    ],
+    "post_index_metadata.fetch_failed": [
+      {
+        "ref": "POST_INDEX_LOG.METADATA_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/post-index",
         "file": "apps/web/src/constants/post-index.ts"
@@ -12262,6 +12302,14 @@
         "file": "apps/web/src/constants/tag.ts"
       }
     ],
+    "tag_metadata.fetch_failed": [
+      {
+        "ref": "TAG_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tag",
+        "file": "apps/web/src/constants/tag.ts"
+      }
+    ],
     "taxonomy_list_module.fetch_failed": [
       {
         "ref": "TAXONOMY_LIST_LOG.MODULE_FETCH_FAILED",
@@ -12345,6 +12393,14 @@
     "topic_breadcrumbs.fetch_failed": [
       {
         "ref": "TOPIC_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic",
+        "file": "apps/web/src/constants/topic.ts"
+      }
+    ],
+    "topic_metadata.fetch_failed": [
+      {
+        "ref": "TOPIC_LOG.METADATA_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/topic",
         "file": "apps/web/src/constants/topic.ts"

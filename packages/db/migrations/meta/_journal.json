@@ -218,6 +218,13 @@
       "when": 1794945030030,
       "tag": "0030_tenant-entitlement-grants",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1795078922776,
+      "tag": "0031_footer-background-ink",
+      "breakpoints": true
     }
   ]
 }
