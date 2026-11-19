@@ -76,6 +76,7 @@ describe(tenantNavSections, () => {
   let tenant: TSidebarNavSection;
   let content: TSidebarNavSection;
   let configuration: TSidebarNavSection;
+  let account: TSidebarNavSection;
   let platform: TSidebarNavSection;
 
   beforeEach(() => {
@@ -83,7 +84,8 @@ describe(tenantNavSections, () => {
     tenant = sections[0]!;
     content = sections[1]!;
     configuration = sections[2]!;
-    platform = sections[3]!;
+    account = sections[3]!;
+    platform = sections[4]!;
   });
 
   it("labels the main section with the tenant's name, not its id", () => {
@@ -93,8 +95,8 @@ describe(tenantNavSections, () => {
     expect(tenant.label).not.toContain(MOCK_TENANT_ID);
   });
 
-  it('gives the four sections distinct labels', () => {
-    const labels = [tenant, content, configuration, platform].map(
+  it('gives the five sections distinct labels', () => {
+    const labels = [tenant, content, configuration, account, platform].map(
       (section) => section.label,
     );
 
@@ -117,7 +119,7 @@ describe(tenantNavSections, () => {
     expect(rest).toEqual([]);
   });
 
-  it('lists every Configuration destination, Look through Team', () => {
+  it('lists every Configuration destination, Look through Subscribers', () => {
     expect(labelsOf(configuration)).toEqual(translated(CONFIGURATION_KEYS));
   });
 
@@ -136,7 +138,7 @@ describe(tenantNavSections, () => {
     expect(item?.href).toBe(href);
   });
 
-  it('marks only Subscribers and Team as unlinked coming soon, with no dot', () => {
+  it('marks only Subscribers as unlinked coming soon, with no dot', () => {
     const badged = configuration.items.filter((item) => item.badge);
 
     expect(badged.map((item) => item.label)).toEqual(
@@ -147,6 +149,15 @@ describe(tenantNavSections, () => {
       expect(item.badge?.hasDot).toBe(false);
       expect(item.href).toBeUndefined();
     }
+  });
+
+  it('puts only Team in the Account section, linked to the tenant', () => {
+    const [team, ...rest] = account.items;
+
+    expect(account.label).toBe(t('accountSectionLabel'));
+    expect(team?.label).toBe(t('team'));
+    expect(team?.href).toBe(adminRoutes.tenantTeam(MOCK_TENANT_ID));
+    expect(rest).toEqual([]);
   });
 
   it('links Provisioning and Danger zone, each badged as platform-only', () => {

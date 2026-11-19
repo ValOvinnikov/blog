@@ -3940,6 +3940,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "TEAM_COLUMN.ACCESS",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
       }
     ],
     "WEBHOOKS": [
@@ -9717,6 +9723,46 @@
     "team_access.access_request_failed": [
       {
         "ref": "TEAM_ACCESS_LOG.ACCESS_REQUEST_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "LOCKED": [
+      {
+        "ref": "TEAM_ROW_ACCESS.LOCKED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "NO_ACCESS": [
+      {
+        "ref": "TEAM_ROW_ACCESS.NO_ACCESS",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "PERSON": [
+      {
+        "ref": "TEAM_COLUMN.PERSON",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "ROLE": [
+      {
+        "ref": "TEAM_COLUMN.ROLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "ACTIONS": [
+      {
+        "ref": "TEAM_COLUMN.ACTIONS",
         "scope": "app:platform",
         "from": "@platform/constants/team-access",
         "file": "apps/platform/src/constants/team-access.ts"

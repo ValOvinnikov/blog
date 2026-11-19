@@ -10,6 +10,7 @@ import {
   LOCALE_BCP47_TAGS,
   type TLocaleIsoCode,
 } from '@shinefold/config';
+import { isSameLocalDay } from '@shinefold/utils/date';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -25,11 +26,9 @@ export type TDraftRecoveryBannerProps = {
   onDiscard: () => void;
 };
 
-const isSameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
-
 const formatMoment = (date: Date, now: Date, locale: TLocaleIsoCode) => {
   const tag = LOCALE_BCP47_TAGS[locale];
-  const isToday = isSameDay(date, now);
+  const isToday = isSameLocalDay(date, now);
   const text = isToday
     ? date.toLocaleTimeString(tag, { hour: 'numeric', minute: '2-digit' })
     : date.toLocaleString(tag, { dateStyle: 'medium', timeStyle: 'short' });

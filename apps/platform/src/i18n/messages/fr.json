@@ -30,7 +30,8 @@
     "billing": "Facturation · Administration",
     "upgrade": "Changer d'offre",
     "help": "Aide",
-    "draftPreview": "Aperçu du brouillon"
+    "draftPreview": "Aperçu du brouillon",
+    "team": "Équipe"
   },
   "signInPage": {
     "heading": "Connexion",
@@ -1557,7 +1558,7 @@
       "STALLED": "Votre invitation à Studio n'a pas été acceptée"
     },
     "description": {
-      "INVITE_SENT": "Studio fonctionne avec Sanity : il vous faut donc un compte Sanity gratuit pour modifier le contenu. Nous vous avons envoyé une invitation de Sanity. Acceptez-la : Studio s'ouvrira ici dès que votre accès sera confirmé.",
+      "INVITE_SENT": "Studio fonctionne avec Sanity : il vous faut donc un compte Sanity gratuit pour modifier le contenu. Nous vous avons envoyé une invitation à Studio. Acceptez-la : Studio s'ouvrira ici dès que votre accès sera confirmé.",
       "ACTIVATING": "Vous avez accepté l'invitation. Nous donnons à votre compte les droits de modification, ce qui prend généralement une minute.",
       "STALLED": "L'invitation a été envoyée il y a plus de trois jours et n'a pas été acceptée, nous avons donc arrêté de vérifier. Renvoyez-en une nouvelle ou vérifiez maintenant si vous venez de l'accepter."
     },
@@ -1567,7 +1568,11 @@
     "resending": "Envoi…",
     "checkStarted": "Nous vérifions votre accès. Actualisez la page dans une minute pour voir le résultat.",
     "inviteResent": "Une nouvelle invitation arrive dans votre boîte de réception.",
-    "requestFailed": "Le service de configuration est injoignable. Réessayez."
+    "requestFailed": "Le service de configuration est injoignable. Réessayez.",
+    "checkStartedFor": "Vérification de l'accès à Studio de {email} en cours. Actualisez dans une minute pour voir le résultat.",
+    "inviteResentTo": "Une nouvelle invitation à Studio est en route vers {email}.",
+    "checkNowAriaLabel": "Vérifier maintenant l'accès à Studio de {email}",
+    "resendInviteAriaLabel": "Renvoyer l'invitation à Studio à {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Détails du locataire",
@@ -2537,5 +2542,101 @@
     "expiryShortened": "L'attribution de langues actuelle dure plus longtemps. Choisissez une expiration plus tardive, ou révoquez d'abord cette attribution.",
     "includedInPlan": "C'est déjà inclus dans le forfait du locataire.",
     "grantNotOpen": "Cette attribution a déjà été retirée ou a expiré."
+  },
+  "teamPage": {
+    "title": "Équipe",
+    "description": "Les personnes qui rédigent et publient le contenu de ce site avec vous dans Studio.",
+    "seatsUsed": "{used} {seats, plural, one {place utilisée sur #} other {places utilisées sur #}}",
+    "inviteEditor": "Inviter un éditeur",
+    "seatLimitTitle": "Toutes les places sont prises",
+    "seatLimitBody": "{plan} comprend {seats, plural, one {# place} other {# places}}. Retirez un membre ou annulez une invitation pour inviter quelqu'un d'autre.",
+    "thisMember": "ce membre",
+    "columnPerson": "Personne",
+    "columnRole": "Rôle",
+    "columnStudioAccess": "Accès à Studio",
+    "columnActions": "Actions",
+    "members": {
+      "title": "Membres",
+      "count": "{count, plural, one {# personne} other {# personnes}}",
+      "empty": "Personne n'a encore rejoint ce site.",
+      "you": "(vous)",
+      "noEmail": "Aucune adresse e-mail enregistrée",
+      "joined": "A rejoint le <time>{date}</time>",
+      "joinedToday": "A rejoint <time>aujourd'hui</time>",
+      "joinedWithRole": "A rejoint le <time>{date}</time> · {role}",
+      "joinedTodayWithRole": "A rejoint <time>aujourd'hui</time> · {role}",
+      "noEditorsNoFreeSeats": "Aucun éditeur pour l'instant. Chaque place libre est réservée par une invitation en attente.",
+      "noEditors": "Aucun éditeur pour l'instant. Invitez jusqu'à {free, plural, one {# personne} other {# personnes}} à rédiger et publier avec vous dans Studio."
+    },
+    "invites": {
+      "title": "Invitations en attente",
+      "supportingText": "Chacune occupe une place jusqu'à ce que la personne rejoigne le site ou que vous l'annuliez.",
+      "count": "{count, plural, one {# invitation} other {# invitations}}",
+      "invited": "Invité le <time>{date}</time> · n'a pas encore rejoint",
+      "invitedToday": "Invité <time>aujourd'hui</time> · n'a pas encore rejoint",
+      "invitedWithRole": "Invité le <time>{date}</time> · n'a pas encore rejoint · {role}",
+      "invitedTodayWithRole": "Invité <time>aujourd'hui</time> · n'a pas encore rejoint · {role}",
+      "studioAccess": "Commence dès qu'il rejoint le site"
+    },
+    "studioAccess": {
+      "badge": {
+        "READY": "Prêt",
+        "INVITE_SENT": "Invitation envoyée",
+        "ACTIVATING": "Configuration…",
+        "STALLED": "Nécessite votre attention",
+        "LOCKED": "Verrouillé"
+      },
+      "hint": {
+        "INVITE_SENT": "En attente de l'acceptation de l'invitation à Studio",
+        "ACTIVATING": "Acceptée : les droits de modification prennent en général une minute",
+        "STALLED": "Non acceptée en 3 jours, nous avons donc arrêté de vérifier",
+        "LOCKED": "Au-delà des places de votre formule"
+      },
+      "noAccess": "Pas d'accès à Studio"
+    },
+    "inviteDialog": {
+      "title": "Inviter un éditeur",
+      "notice": "Un éditeur peut modifier, publier et supprimer tout le contenu du site dans Studio. Il ne peut pas changer son apparence, ses réglages ni sa facturation.",
+      "emailLabel": "Adresse e-mail",
+      "emailHint": "Nous lui enverrons un lien pour rejoindre le site. L'invitation occupe une place jusqu'à ce qu'il le rejoigne.",
+      "emailPlaceholder": "nom@exemple.com",
+      "cancel": "Annuler",
+      "send": "Envoyer l'invitation",
+      "sending": "Envoi…",
+      "sent": "Invitation envoyée à {email}.",
+      "failed": "Impossible d'envoyer l'invitation. Réessayez.",
+      "fieldError": {
+        "EMAIL_INVALID": "Saisissez une adresse e-mail, par exemple nom@exemple.com.",
+        "ALREADY_MEMBER": "{email} fait déjà partie de l'équipe.",
+        "ALREADY_INVITED": "{email} a déjà une invitation en attente.",
+        "SEAT_LIMIT": "Toutes les places de la formule {plan} sont prises."
+      }
+    },
+    "remove": {
+      "trigger": "Retirer",
+      "triggerAriaLabel": "Retirer {email}",
+      "title": "Retirer {email} ?",
+      "description": "Cette personne perd immédiatement l'accès à l'administration de ce site et à Studio, et sa place se libère. Le contenu qu'elle a rédigé reste sur le site.",
+      "keep": "Garder le membre",
+      "confirm": "Retirer le membre",
+      "confirming": "Retrait…",
+      "done": "{email} a été retiré. Son accès à Studio est en cours de révocation.",
+      "gone": "{email} ne fait plus partie de l'équipe.",
+      "failed": "Impossible de retirer {email}. Réessayez.",
+      "self": "Vous ne pouvez pas vous retirer vous-même de l'équipe.",
+      "lastOwner": "Un site garde toujours un propriétaire : {email} ne peut donc pas être retiré."
+    },
+    "cancelInvite": {
+      "trigger": "Annuler l'invitation",
+      "triggerAriaLabel": "Annuler l'invitation envoyée à {email}",
+      "title": "Annuler l'invitation envoyée à {email} ?",
+      "description": "Le lien de l'e-mail cesse de fonctionner et la place se libère. Vous pourrez l'inviter de nouveau plus tard.",
+      "keep": "Garder l'invitation",
+      "confirm": "Annuler l'invitation",
+      "confirming": "Annulation…",
+      "done": "L'invitation envoyée à {email} a été annulée.",
+      "gone": "Cette invitation n'est plus en attente.",
+      "failed": "Impossible d'annuler l'invitation. Réessayez."
+    }
   }
 }

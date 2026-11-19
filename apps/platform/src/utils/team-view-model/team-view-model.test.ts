@@ -1,0 +1,172 @@
+import { TEAM_ROW_ACCESS } from '@platform/constants/team-access';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
+import {
+  mockMembership,
+  mockOperatorViewer,
+  mockViewer,
+} from '@platform/testing/memberships/fixtures';
+import {
+  MOCK_JOINED_AT,
+  mockPendingInvite,
+  mockTenantMember,
+} from '@platform/testing/team/fixtures';
+import { mockTenant } from '@platform/testing/tenants/mock-tenant';
+import { STUDIO_ACCESS, TENANT_PLAN } from '@shinefold/config/constants';
+import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+
+import { teamViewModel } from './team-view-model';
+
+const MOCK_NOW = new Date(MOCK_JOINED_AT.getTime() + 60 * 60 * 1000);
+const MOCK_YESTERDAY = new Date(MOCK_NOW.getTime() - 24 * 60 * 60 * 1000);
+const MOCK_OWNER_USER_ID = 'owner-user';
+const MOCK_OWNER = mockTenantMember({
+  membershipId: 'owner-membership',
+  userId: MOCK_OWNER_USER_ID,
+  role: MEMBERSHIP_ROLE.OWNER,
+});
+const MOCK_GROWTH_TENANT = mockTenant({ plan: TENANT_PLAN.GROWTH });
+const OWNER_VIEWER = mockViewer({
+  membership: mockMembership({ userId: MOCK_OWNER_USER_ID }),
+});
+
+const modelFor = (
+  overrides: Partial<Parameters<typeof teamViewModel>[0]> = {},
+) =>
+  teamViewModel(
+    {
+      tenant: MOCK_GROWTH_TENANT,
+      viewer: OWNER_VIEWER,
+      currentUserId: MOCK_OWNER_USER_ID,
+      members: [MOCK_OWNER],
+      invites: [],
+      ...overrides,
+    },
+    MOCK_NOW,
+  );
+
+describe(teamViewModel, () => {
+  it('counts members and pending invites, an owner invite too, as seats', () => {
+    const { seats, shownUsed, isFull, freeSeats, invites } = modelFor({
+      invites: [
+        mockPendingInvite(),
+        mockPendingInvite({
+          inviteId: 'owner-invite',
+          role: MEMBERSHIP_ROLE.OWNER,
+        }),
+      ],
+    });
+
+    expect({ seats, shownUsed, isFull, freeSeats }).toEqual({
+      seats: 3,
+      shownUsed: 3,
+      isFull: true,
+      freeSeats: 0,
+    });
+    expect(invites).toHaveLength(1);
+  });
+
+  it('caps the shown count at the seats once a downgrade leaves more in use', () => {
+    const { shownUsed, isFull, freeSeats } = modelFor({
+      members: [
+        MOCK_OWNER,
+        mockTenantMember({ membershipId: 'a' }),
+        mockTenantMember({ membershipId: 'b', lockedAt: MOCK_JOINED_AT }),
+        mockTenantMember({ membershipId: 'c', lockedAt: MOCK_JOINED_AT }),
+      ],
+    });
+
+    expect({ shownUsed, isFull, freeSeats }).toEqual({
+      shownUsed: 3,
+      isFull: true,
+      freeSeats: 0,
+    });
+  });
+
+  it.each([
+    ['a locked editor', { lockedAt: MOCK_JOINED_AT }, TEAM_ROW_ACCESS.LOCKED],
+    ['a reader', { role: MEMBERSHIP_ROLE.READER }, TEAM_ROW_ACCESS.NO_ACCESS],
+    ['a just-joined editor', {}, STUDIO_ACCESS.ACTIVATING],
+    [
+      'an editor whose invite stalled',
+      { studioAccess: STUDIO_ACCESS.STALLED },
+      STUDIO_ACCESS.STALLED,
+    ],
+  ] as const)('reads the Studio access of %s', (_label, overrides, access) => {
+    const { members } = modelFor({
+      members: [MOCK_OWNER, mockTenantMember(overrides)],
+    });
+
+    expect(members[1]?.access).toBe(access);
+  });
+
+  it("reads the owner's row from the tenant's owner access", () => {
+    const { members } = modelFor({
+      tenant: mockTenant({
+        plan: TENANT_PLAN.GROWTH,
+        ownerInviteSentAt: MOCK_JOINED_AT,
+      }),
+    });
+
+    expect(members[0]?.access).toBe(STUDIO_ACCESS.INVITE_SENT);
+  });
+
+  it('offers Check now and Resend only to the owner and a SUPERADMIN', () => {
+    const editor = mockTenantMember({
+      studioAccess: STUDIO_ACCESS.INVITE_SENT,
+    });
+    const canRequestFor = (viewer: typeof OWNER_VIEWER) =>
+      modelFor({ viewer, members: [MOCK_OWNER, editor] }).members[1]
+        ?.canRequestAccess;
+
+    expect(canRequestFor(OWNER_VIEWER)).toBe(true);
+    expect(canRequestFor(mockOperatorViewer(ADMIN_ROLE.SUPERADMIN))).toBe(true);
+    expect(canRequestFor(mockOperatorViewer(ADMIN_ROLE.MODERATOR))).toBe(false);
+  });
+
+  it('offers no Studio buttons on a member with no address', () => {
+    const { members } = modelFor({
+      members: [MOCK_OWNER, mockTenantMember({ email: undefined })],
+    });
+
+    expect(members[1]?.canRequestAccess).toBe(false);
+  });
+
+  it('marks your own row and offers no Remove on it or on the last owner', () => {
+    const { members } = modelFor({
+      members: [MOCK_OWNER, mockTenantMember()],
+    });
+
+    expect(
+      members.map(({ isYou, canRemove }) => ({ isYou, canRemove })),
+    ).toEqual([
+      { isYou: true, canRemove: false },
+      { isYou: false, canRemove: true },
+    ]);
+  });
+
+  it('never marks a row as your own for an operator', () => {
+    const { members } = modelFor({
+      viewer: mockViewer({ admin: mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }) }),
+    });
+
+    expect(members[0]?.isYou).toBe(false);
+  });
+
+  it('tells a join today from an earlier one by the calendar day', () => {
+    const { members } = modelFor({
+      members: [MOCK_OWNER, mockTenantMember({ joinedAt: MOCK_YESTERDAY })],
+    });
+
+    expect(members.map(({ isJoinedToday }) => isJoinedToday)).toEqual([
+      true,
+      false,
+    ]);
+  });
+
+  it('notes whether the team has an editor yet', () => {
+    expect(modelFor().hasEditor).toBe(false);
+    expect(
+      modelFor({ members: [MOCK_OWNER, mockTenantMember()] }).hasEditor,
+    ).toBe(true);
+  });
+});

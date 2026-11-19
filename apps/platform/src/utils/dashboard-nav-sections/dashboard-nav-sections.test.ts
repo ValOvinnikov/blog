@@ -64,7 +64,7 @@ describe(dashboardNavSections, () => {
     );
   });
 
-  it.each(['languages', 'email', 'leads', 'subscribers', 'team'] as const)(
+  it.each(['languages', 'email', 'leads', 'subscribers'] as const)(
     'shows %s only when the plan can use it',
     (page) => {
       const withPage = configurationOfDashboard({
@@ -126,17 +126,36 @@ describe(dashboardNavSections, () => {
     ).toEqual([]);
   });
 
-  it('ends with an Account section linking Billing when the member can see it', () => {
+  it('ends with an Account section linking Team, then Billing', () => {
     const account = dashboardNavSections(t, EVERY_PLAN_PAGE).at(-1)!;
-    const [billing, ...rest] = account.items;
+    const [team, billing, ...rest] = account.items;
 
     expect(account.label).toBe(t('accountSectionLabel'));
-    expect(billing?.label).toBe(t('billing'));
+    expect(team?.href).toBe(adminRoutes.dashboardTeam());
     expect(billing?.href).toBe(adminRoutes.dashboardBilling());
     expect(rest).toEqual([]);
   });
 
-  it('has no Account section for a member who cannot see Billing', () => {
+  it('keeps Team out of Configuration', () => {
+    expect(labelsOf(configurationOfDashboard())).not.toContain(t('team'));
+  });
+
+  it.each([
+    ['team', { team: false }, [t('billing')]],
+    ['billing', { billing: false }, [t('team')]],
+  ] as const)(
+    'leaves %s out of Account when the member cannot open it',
+    (_page, hidden, labels) => {
+      const account = dashboardNavSections(t, {
+        ...EVERY_PLAN_PAGE,
+        ...hidden,
+      }).at(-1)!;
+
+      expect(labelsOf(account)).toEqual(labels);
+    },
+  );
+
+  it('has no Account section for a member who can open neither Team nor Billing', () => {
     const labels = dashboardNavSections(t, NO_PLAN_PAGE).map(
       (section) => section.label,
     );

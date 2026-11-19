@@ -30,7 +30,8 @@
     "billing": "Facturación · Administración",
     "upgrade": "Mejorar plan",
     "help": "Ayuda",
-    "draftPreview": "Vista previa del borrador"
+    "draftPreview": "Vista previa del borrador",
+    "team": "Equipo"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -1557,7 +1558,7 @@
       "STALLED": "Tu invitación a Studio no se ha aceptado"
     },
     "description": {
-      "INVITE_SENT": "Studio funciona con Sanity, así que necesitas una cuenta gratuita de Sanity para editar. Te hemos enviado una invitación de Sanity: acéptala y Studio se abrirá aquí en cuanto se confirme tu acceso.",
+      "INVITE_SENT": "Studio funciona con Sanity, así que necesitas una cuenta gratuita de Sanity para editar. Te hemos enviado una invitación a Studio: acéptala y Studio se abrirá aquí en cuanto se confirme tu acceso.",
       "ACTIVATING": "Has aceptado la invitación. Estamos dando a tu cuenta permisos de edición; suele tardar un minuto.",
       "STALLED": "La invitación se envió hace más de tres días y no se ha aceptado, así que hemos dejado de comprobarla. Reenvíala para recibir una nueva o compruébalo ahora si acabas de aceptarla."
     },
@@ -1567,7 +1568,11 @@
     "resending": "Enviando…",
     "checkStarted": "Estamos comprobando tu acceso. Recarga la página en un minuto para ver el resultado.",
     "inviteResent": "Una nueva invitación va de camino a tu bandeja de entrada.",
-    "requestFailed": "No se pudo contactar con el servicio de configuración. Inténtalo de nuevo."
+    "requestFailed": "No se pudo contactar con el servicio de configuración. Inténtalo de nuevo.",
+    "checkStartedFor": "Comprobando ahora el acceso a Studio de {email}. Actualiza en un minuto para ver el resultado.",
+    "inviteResentTo": "Una nueva invitación a Studio va de camino a {email}.",
+    "checkNowAriaLabel": "Comprobar ahora el acceso a Studio de {email}",
+    "resendInviteAriaLabel": "Reenviar la invitación a Studio a {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Detalles del cliente",
@@ -2537,5 +2542,101 @@
     "expiryShortened": "La concesión de idiomas actual dura más. Elige una caducidad posterior o revoca primero esa concesión.",
     "includedInPlan": "Esto ya está incluido en el plan del cliente.",
     "grantNotOpen": "Esta concesión ya se quitó o ha caducado."
+  },
+  "teamPage": {
+    "title": "Equipo",
+    "description": "Las personas que escriben y publican el contenido de este sitio contigo en Studio.",
+    "seatsUsed": "{used} de {seats, plural, one {# plaza usada} other {# plazas usadas}}",
+    "inviteEditor": "Invitar editor",
+    "seatLimitTitle": "Todas las plazas están ocupadas",
+    "seatLimitBody": "{plan} incluye {seats, plural, one {# plaza} other {# plazas}}. Quita a un miembro o cancela una invitación para invitar a otra persona.",
+    "thisMember": "este miembro",
+    "columnPerson": "Persona",
+    "columnRole": "Rol",
+    "columnStudioAccess": "Acceso a Studio",
+    "columnActions": "Acciones",
+    "members": {
+      "title": "Miembros",
+      "count": "{count, plural, one {# persona} other {# personas}}",
+      "empty": "Nadie se ha unido a este sitio todavía.",
+      "you": "(tú)",
+      "noEmail": "Sin correo registrado",
+      "joined": "Se unió el <time>{date}</time>",
+      "joinedToday": "Se unió <time>hoy</time>",
+      "joinedWithRole": "Se unió el <time>{date}</time> · {role}",
+      "joinedTodayWithRole": "Se unió <time>hoy</time> · {role}",
+      "noEditorsNoFreeSeats": "Todavía no hay editores. Cada plaza libre está reservada por una invitación pendiente.",
+      "noEditors": "Todavía no hay editores. Invita hasta a {free, plural, one {# persona} other {# personas}} a escribir y publicar en Studio contigo."
+    },
+    "invites": {
+      "title": "Invitaciones pendientes",
+      "supportingText": "Cada una ocupa una plaza hasta que la persona se una o la canceles.",
+      "count": "{count, plural, one {# invitación} other {# invitaciones}}",
+      "invited": "Invitado el <time>{date}</time> · aún no se ha unido",
+      "invitedToday": "Invitado <time>hoy</time> · aún no se ha unido",
+      "invitedWithRole": "Invitado el <time>{date}</time> · aún no se ha unido · {role}",
+      "invitedTodayWithRole": "Invitado <time>hoy</time> · aún no se ha unido · {role}",
+      "studioAccess": "Empieza cuando se una"
+    },
+    "studioAccess": {
+      "badge": {
+        "READY": "Listo",
+        "INVITE_SENT": "Invitación enviada",
+        "ACTIVATING": "Configurando…",
+        "STALLED": "Requiere atención",
+        "LOCKED": "Bloqueado"
+      },
+      "hint": {
+        "INVITE_SENT": "Esperando a que acepte la invitación a Studio",
+        "ACTIVATING": "Aceptada: los permisos de edición suelen tardar un minuto",
+        "STALLED": "No se aceptó en 3 días, así que dejamos de comprobarlo",
+        "LOCKED": "Supera las plazas de tu plan"
+      },
+      "noAccess": "Sin acceso a Studio"
+    },
+    "inviteDialog": {
+      "title": "Invitar a un editor",
+      "notice": "Un editor puede editar, publicar y eliminar todo el contenido del sitio en Studio. No puede cambiar su aspecto, ajustes ni facturación.",
+      "emailLabel": "Correo electrónico",
+      "emailHint": "Le enviaremos un enlace para unirse. La invitación ocupa una plaza hasta que se una.",
+      "emailPlaceholder": "nombre@ejemplo.com",
+      "cancel": "Cancelar",
+      "send": "Enviar invitación",
+      "sending": "Enviando…",
+      "sent": "Invitación enviada a {email}.",
+      "failed": "No se pudo enviar la invitación. Inténtalo de nuevo.",
+      "fieldError": {
+        "EMAIL_INVALID": "Escribe un correo electrónico, como nombre@ejemplo.com.",
+        "ALREADY_MEMBER": "{email} ya forma parte del equipo.",
+        "ALREADY_INVITED": "{email} ya tiene una invitación pendiente.",
+        "SEAT_LIMIT": "Todas las plazas de {plan} están ocupadas."
+      }
+    },
+    "remove": {
+      "trigger": "Quitar",
+      "triggerAriaLabel": "Quitar a {email}",
+      "title": "¿Quitar a {email}?",
+      "description": "Pierde el acceso a la administración de este sitio y a Studio de inmediato, y su plaza queda libre. El contenido que escribió se queda en el sitio.",
+      "keep": "Mantener miembro",
+      "confirm": "Quitar miembro",
+      "confirming": "Quitando…",
+      "done": "Se quitó a {email}. Se está revocando su acceso a Studio.",
+      "gone": "{email} ya no forma parte del equipo.",
+      "failed": "No se pudo quitar a {email}. Inténtalo de nuevo.",
+      "self": "No puedes quitarte a ti mismo del equipo.",
+      "lastOwner": "Un sitio siempre conserva un propietario, así que no se puede quitar a {email}."
+    },
+    "cancelInvite": {
+      "trigger": "Cancelar invitación",
+      "triggerAriaLabel": "Cancelar la invitación a {email}",
+      "title": "¿Cancelar la invitación a {email}?",
+      "description": "El enlace de su correo deja de funcionar y la plaza queda libre. Puedes volver a invitarle más adelante.",
+      "keep": "Mantener invitación",
+      "confirm": "Cancelar invitación",
+      "confirming": "Cancelando…",
+      "done": "Se canceló la invitación a {email}.",
+      "gone": "Esa invitación ya no está pendiente.",
+      "failed": "No se pudo cancelar la invitación. Inténtalo de nuevo."
+    }
   }
 }

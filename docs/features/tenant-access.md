@@ -32,6 +32,10 @@ code:
   - apps/platform/src/app/**/blocked-signups/*.tsx
   - apps/platform/src/components/features/blocked-signups/**
   - apps/platform/src/server/team/**
+  - apps/platform/src/app/**/team/*.tsx
+  - apps/platform/src/components/features/team/**
+  - apps/platform/src/utils/team-view-model/**
+  - apps/platform/src/utils/use-team-row-action/**
   - apps/platform/src/constants/team-access.ts
 epics: [4840, 4979, 5649]
 ---
@@ -77,6 +81,11 @@ The platform decides who may run which tenant. Platform operators hold an `admin
   - **Cancel** refuses a pending OWNER invite and answers not found for an invite no longer pending.
   - **Check now and Resend invite** for a member reach `/api/member-access/check` and `/resend` through `enqueueOwnerAccessRequest` with the membership id; any membership that is not an unlocked EDITOR 404s, like a denied gate. A refused member request logs `team_access.access_request_failed`.
   - Invite, remove and cancel record `MEMBER_INVITED`, `MEMBER_REMOVED` and `MEMBER_INVITE_CANCELLED` against `TEAM_MEMBER` (the invite or membership id), with only the role in the details, never an address.
+- **Team page** (`/dashboard/team` for the owner, `/tenants/{id}/team` for an operator). The owner reaches it on a plan with more than one seat; an editor or reader never sees it in the sidebar and gets a 404, and so does an owner on Free or Starter. `resolveTenantPageAccess` closes `team` to anyone who cannot manage the tenant. Operators reach it on every plan, from an Account section after Configuration; the owner's sidebar lists it in Account, before Billing.
+  - The header reads "{used} of {seats} seats used": `used` counts every membership (locked ones included) and every pending invite (a pending OWNER invite included), as the seat limit does, and is shown capped at the plan's seats. Once full, Invite editor is held and a warning under the header says why.
+  - Members lists owners first, then members by when they joined. The owner's row reads its Studio state from the tenant's owner access flow (`tenantOwnerStudioAccess`), whoever is viewing; a member's from its own record, and "Setting up…" until the worker's first invite. A locked member reads Locked, a reader "No Studio access". Check now and Resend invite show to the owner and a SUPERADMIN only, on rows with an address and a pending state, and their toasts name the address. Your own row and the last owner's offer no Remove, and an operator sees no "(you)".
+  - With no editor, a note gives the free seats; an operator on a tenant whose owner hasn't joined sees "No one has joined this site yet." Pending invites lists every invite but a pending OWNER one, oldest first.
+  - Invite, Remove and Cancel invite run the Team actions below. Removing a member or cancelling an invite that is already gone closes the confirmation, says so and refreshes; any other refusal or failure shows inside the dialog. Below `md` both tables stack, the role moving onto the person's second line.
 - **Personal data reads.** `getTenantOwnerMembership` returns the OWNER's user email and whether they have signed in, else the pending OWNER invite's email. The SUPERADMIN alert recipients and the blocklist's "added by" are user emails too. Every one of these reads the encrypted column and decrypts it. Create site finds an existing owner with `findUserByEmail`, the same exact-address index lookup sign-in uses.
 - **Cascades:** `admins` and `memberships` cascade on user delete. Memberships and invites cascade on tenant delete. An invite has no user until it is consumed.
 - **`blocked_signup_identities`:** unique on `(kind, value)`. An ADDRESS entry stores only the keyed personal-data index (`PERSONAL_DATA_INDEX_KEY`) of the normalised address (lower-cased, `+tag` dropped), never the address. A DOMAIN entry stores the lower-cased domain. Each entry records `reason`, `createdByAdminId` and `createdAt`. Adds and removes are audited as `SIGNUP_BLOCK_ADDED` / `SIGNUP_BLOCK_REMOVED` against `BLOCKED_SIGNUP_IDENTITY`; re-adding an entry already on the list keeps its reason and author and records no second `SIGNUP_BLOCK_ADDED`. An address entry's audit row carries its kind and reason, never the address or hash. "Added by" on the list page is the email of the admin in `createdByAdminId`, read in the same query as the entries, and "Unknown" once that admin is gone.
@@ -142,7 +151,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 - `apps/platform/src/app/api/dashboard/select-tenant/route.test.ts`.
 - The `dashboard/select-tenant` page test and `tenant-switcher.test.tsx`.
 - `packages/auth/src/events/consume-pending-invites-on-sign-in.test.ts`.
-- `apps/platform/src/server/team/*.test.ts`, with builders in `apps/platform/src/testing/team/fixtures.ts`.
+- `apps/platform/src/server/team/*.test.ts`, `team-view-model.test.ts`, the `components/features/team/` tests and the dashboard Team page test, with builders in `apps/platform/src/testing/team/fixtures.ts`.
 - `apps/platform/src/server/signup-block/*.test.ts`, `admit-create-site.test.ts`, the `blocked-signups` layout and page tests, `blocked-signups-view.test.tsx` and `tenant-suspension-control.test.tsx`.
 - `packages/db/src/queries/{memberships,membership-invites,admins}/**` tests (PGlite), and `packages/db/src/utils/studio-access/studio-access.test.ts`.
 - No Storybook.
@@ -155,6 +164,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 - 4959: owner provisioning status and Studio access states.
 - 7608: the Team page's invite, remove, cancel, check and resend actions.
 - 7168: a team member gets Studio access through the owner's flow and loses it on removal.
+- 7169: the Team page.
 - 4979: web and platform stay separate (sessions, language).
 - 4982: the platform refuses sessions it did not issue.
 - 4983: public sites never act on platform invites.
