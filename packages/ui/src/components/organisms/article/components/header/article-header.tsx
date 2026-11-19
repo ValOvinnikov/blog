@@ -69,7 +69,9 @@ export const ArticleHeader = ({
         </Heading>
         {lead && (
           <div className={s.lead()} data-slot="lead">
-            <Text textRole={TEXT_ROLE.INTRO}>{lead}</Text>
+            <Text textRole={TEXT_ROLE.INTRO} className={s.leadText()}>
+              {lead}
+            </Text>
           </div>
         )}
         {meta && (
