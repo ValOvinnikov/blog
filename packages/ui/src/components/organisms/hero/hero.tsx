@@ -4,8 +4,8 @@ import {
   type TBrandVariant,
   type TContentAlignment,
   type THeroVariant,
+  type TLayout,
   type TMediaOrder,
-  type TSpacingScale,
 } from '@shinefold/config';
 import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
 import { HERO_TEST_ID } from '@shinefold/ui/constants/hero';
@@ -33,12 +33,10 @@ const HeroParts = {
   Social: HeroSocial,
 } satisfies Record<string, ElementType>;
 
-export type THeroLayout = {
+export type THeroLayout = Pick<TLayout, 'spacingTop' | 'spacingBottom'> & {
   contentPosition?: TContentAlignment;
   contentAlignment?: TContentAlignment;
   mediaOrder?: TMediaOrder;
-  spacingTop?: TSpacingScale;
-  spacingBottom?: TSpacingScale;
 };
 
 export type THeroProps = IWithClassName &

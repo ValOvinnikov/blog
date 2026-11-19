@@ -25,12 +25,12 @@ const PROFILE_EXCERPT =
   'Architecture, performance, and design systems — from fintech and retail.';
 const BANNER_IMAGE_ALT = 'Bright mountain sunrise';
 
-const bannerContent = (alt: string) => (
+const bannerContent = (
   <>
     <Hero.Media>
       <img
         src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
-        alt={alt}
+        alt={BANNER_IMAGE_ALT}
         className="size-full object-cover"
       />
     </Hero.Media>
@@ -254,7 +254,7 @@ export const BannerContentLeft: TStory = {
       contentPosition: CONTENT_ALIGNMENT.LEFT,
       contentAlignment: CONTENT_ALIGNMENT.LEFT,
     },
-    children: bannerContent(BANNER_IMAGE_ALT),
+    children: bannerContent,
   },
 };
 
@@ -299,7 +299,7 @@ export const BannerContentCenter: TStory = {
       contentPosition: CONTENT_ALIGNMENT.CENTER,
       contentAlignment: CONTENT_ALIGNMENT.CENTER,
     },
-    children: bannerContent(BANNER_IMAGE_ALT),
+    children: bannerContent,
   },
 };
 
@@ -311,7 +311,7 @@ export const BannerContentRight: TStory = {
       contentPosition: CONTENT_ALIGNMENT.RIGHT,
       contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     },
-    children: bannerContent(BANNER_IMAGE_ALT),
+    children: bannerContent,
   },
 };
 
@@ -323,7 +323,7 @@ export const BannerToneBrandPrimary: TStory = {
       contentPosition: CONTENT_ALIGNMENT.LEFT,
       contentAlignment: CONTENT_ALIGNMENT.LEFT,
     },
-    children: bannerContent(BANNER_IMAGE_ALT),
+    children: bannerContent,
   },
 };
 
@@ -335,7 +335,7 @@ export const BannerTonePrimary: TStory = {
       contentPosition: CONTENT_ALIGNMENT.LEFT,
       contentAlignment: CONTENT_ALIGNMENT.LEFT,
     },
-    children: bannerContent(BANNER_IMAGE_ALT),
+    children: bannerContent,
   },
 };
 
@@ -347,7 +347,7 @@ export const BannerToneSecondary: TStory = {
       contentPosition: CONTENT_ALIGNMENT.LEFT,
       contentAlignment: CONTENT_ALIGNMENT.LEFT,
     },
-    children: bannerContent(BANNER_IMAGE_ALT),
+    children: bannerContent,
   },
 };
 
