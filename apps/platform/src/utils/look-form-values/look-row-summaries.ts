@@ -77,7 +77,7 @@ export const buildLookRowSummaries = (
     ]),
     [LOOK_ROW.FOOTER]: join([
       t(`footerLayoutOptionLabel.${footerLayout}`),
-      t(`footerBackgroundOptionLabel.${footerBackground}`),
+      t(`skinLabel.${footerBackground}`),
       t(`footerSurfaceOptionLabel.${footerSurface}`),
       t(`cookieSettingsButtonSummary.${cookieSettingsButton}`),
     ]),
