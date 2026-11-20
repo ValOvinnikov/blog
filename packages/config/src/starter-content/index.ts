@@ -7,7 +7,5 @@ export {
   type TStarterSiteType,
 } from './starter-content';
 export { STARTER_DOCUMENT_IDS } from './starter-document-ids';
-export type {
-  TStarterDocument,
-  TStarterDocumentUnion,
-} from './starter-document';
+export type { TStarterDocumentUnion } from './starter-document';
+export type { TStarterDocument } from './starter-document-shape';

@@ -12,12 +12,12 @@ import { SITE_MESSAGES_BY_LOCALE } from '@shinefold/config/voice';
 
 import type { TStarterCopy } from './copy/starter-copy';
 import { buildLegalPages } from './legal-pages';
+import type { TStarterDocumentUnion, TStarterPage } from './starter-document';
+import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import type {
   TStarterDocument,
-  TStarterDocumentUnion,
-  TStarterPage,
-} from './starter-document';
-import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
+  TStarterTemplate,
+} from './starter-document-shape';
 import {
   localizedString,
   pageHeadingBlock,
@@ -40,8 +40,8 @@ function pricePeriodWording(locale: TLocaleIsoCode) {
   };
 }
 
-type TStarterTemplateLayout<TTemplate extends Template_home> = Pick<
-  TTemplate,
+type TStarterHomeLayout = Pick<
+  TStarterTemplate<Template_home>,
   'hero' | 'modules'
 >;
 
@@ -49,8 +49,8 @@ export type TBaseDocumentsInput = {
   locale: TLocaleIsoCode;
   copy: TStarterCopy;
   navigationItems?: Settings_navigation['items'];
-  homeLayout?: TStarterTemplateLayout<Template_home>;
-  postIndexModules?: Template_postIndex['modules'];
+  homeLayout?: TStarterHomeLayout;
+  postIndexModules?: TStarterTemplate<Template_postIndex>['modules'];
 };
 
 export function buildBaseDocuments({
@@ -86,7 +86,7 @@ export function buildBaseDocuments({
       _type: 'template_home',
       title: 'Home Template',
       ...homeLayout,
-    } satisfies TStarterDocument<Template_home, 'title'>,
+    } satisfies TStarterTemplate<Template_home>,
     {
       _id: STARTER_DOCUMENT_IDS.HOME,
       _type: 'page_home',
@@ -101,7 +101,7 @@ export function buildBaseDocuments({
       _type: 'template_postIndex',
       title: 'Post Index Template',
       ...(postIndexModules && { modules: postIndexModules }),
-    } satisfies TStarterDocument<Template_postIndex, 'title'>,
+    } satisfies TStarterTemplate<Template_postIndex>,
     {
       _id: STARTER_DOCUMENT_IDS.POST_INDEX,
       _type: 'page_postIndex',

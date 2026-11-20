@@ -22,6 +22,13 @@ export function keyedReference(id: string) {
   return { _key: id, ...reference(id) };
 }
 
+export function moduleSlot<TModuleType extends string>(
+  id: string,
+  moduleType: TModuleType,
+) {
+  return { _key: id, _type: moduleType, _ref: id };
+}
+
 function localized<
   TValueType extends
     'internationalizedArrayStringValue' | 'internationalizedArrayTextValue',

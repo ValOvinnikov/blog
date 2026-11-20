@@ -15,14 +15,11 @@ import {
   cookieStatementDocumentId,
 } from './cookie-statement-document';
 import type { TStarterCopy } from './copy/starter-copy';
-import type {
-  TStarterDocument,
-  TStarterDocumentUnion,
-  TStarterPage,
-} from './starter-document';
+import type { TStarterDocumentUnion, TStarterPage } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
+import type { TStarterTemplate } from './starter-document-shape';
 import {
-  keyedReference,
+  moduleSlot,
   pageHeadingBlock,
   paragraphs,
   reference,
@@ -72,7 +69,7 @@ export function buildLegalPages(
       _id: STARTER_DOCUMENT_IDS.PRIVACY_INDEX_TEMPLATE,
       _type: 'template_privacyIndex',
       title: 'Privacy Index Template',
-    } satisfies TStarterDocument<Template_privacyIndex, 'title'>,
+    } satisfies TStarterTemplate<Template_privacyIndex>,
     {
       _id: STARTER_DOCUMENT_IDS.PRIVACY_INDEX,
       _type: 'page_privacyIndex',
@@ -101,8 +98,10 @@ export function buildLegalPages(
       _id: STARTER_DOCUMENT_IDS.LEGAL_INDEX_TEMPLATE,
       _type: 'template_legalIndex',
       title: 'Legal Index Template',
-      modules: [keyedReference(STARTER_DOCUMENT_IDS.LEGAL_INDEX_INTRO)],
-    } satisfies TStarterDocument<Template_legalIndex, 'title'>,
+      modules: [
+        moduleSlot(STARTER_DOCUMENT_IDS.LEGAL_INDEX_INTRO, 'module_content'),
+      ],
+    } satisfies TStarterTemplate<Template_legalIndex>,
     {
       _id: STARTER_DOCUMENT_IDS.LEGAL_INDEX,
       _type: 'page_legalIndex',
