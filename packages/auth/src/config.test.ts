@@ -1,5 +1,7 @@
+import { OAuthAccountNotLinked } from '@auth/core/errors';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { MAGIC_LINK_PROVIDER_ID } from '@shinefold/auth/providers/magic-link/magic-link-provider/magic-link-provider';
+import { GITHUB_USERINFO_WITH_EMAIL_VERIFIED } from '@shinefold/auth/providers/oauth/github-userinfo';
 import {
   MOCK_GITHUB_ID,
   MOCK_GITHUB_SECRET,
@@ -12,6 +14,7 @@ import {
 import {
   MOCK_AUTH_SECRET,
   MOCK_EMAIL,
+  MOCK_PROVIDER_ACCOUNT_ID,
   MOCK_SESSION_EXPIRES,
   MOCK_SESSION_TOKEN,
   MOCK_USER_ID,
@@ -85,7 +88,11 @@ function providerIdsOf(config: NextAuthConfig): unknown[] {
   });
 }
 
-type TOAuthProviderOptions = { clientId?: string; redirectProxyUrl?: string };
+type TOAuthProviderOptions = {
+  clientId?: string;
+  redirectProxyUrl?: string;
+  userinfo?: unknown;
+};
 
 function oauthProviderOptionsOf(
   config: NextAuthConfig,
@@ -94,7 +101,8 @@ function oauthProviderOptionsOf(
   const provider = config.providers.find(
     (candidate) => typeof candidate !== 'function' && candidate.id === id,
   );
-  return (provider as { options?: TOAuthProviderOptions } | undefined)?.options;
+  return (provider as TMaybeUndefined<{ options?: TOAuthProviderOptions }>)
+    ?.options;
 }
 
 function redirectProxyUrlOf(
@@ -198,6 +206,12 @@ describe(buildAuthConfig, () => {
       expect(redirectProxyUrlOf(options)).toBeFalsy();
     });
 
+    it("reads GitHub's profile through the userinfo that marks its email verified", () => {
+      expect(
+        oauthProviderOptionsOf(config, OAUTH_PROVIDER.GITHUB)?.userinfo,
+      ).toBe(GITHUB_USERINFO_WITH_EMAIL_VERIFIED);
+    });
+
     it('keeps the env credentials and redirect proxy for a provider the site lacks', () => {
       const options = oauthProviderOptionsOf(config, OAUTH_PROVIDER.GOOGLE);
 
@@ -233,6 +247,20 @@ describe(buildAuthConfig, () => {
         },
         expires: MOCK_SESSION_EXPIRES.toISOString(),
       });
+    });
+
+    it('refuses a provider sign-in whose email is not verified', () => {
+      expect(() =>
+        config.callbacks?.signIn?.({
+          user: MOCK_SIGNED_IN_USER,
+          account: {
+            provider: OAUTH_PROVIDER.GOOGLE,
+            providerAccountId: MOCK_PROVIDER_ACCOUNT_ID,
+            type: 'oidc',
+          },
+          profile: { email: MOCK_EMAIL, email_verified: false },
+        }),
+      ).toThrow(OAuthAccountNotLinked);
     });
 
     it('acts on neither invites nor signup terms on sign-in', async () => {

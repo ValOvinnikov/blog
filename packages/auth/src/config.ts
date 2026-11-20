@@ -4,6 +4,8 @@ import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { consumePendingInvitesOnSignIn } from '@shinefold/auth/events/consume-pending-invites-on-sign-in';
 import { recordSignupTermsOnSignIn } from '@shinefold/auth/events/record-signup-terms-on-sign-in';
 import { buildMagicLinkProvider } from '@shinefold/auth/providers/magic-link/magic-link-provider/magic-link-provider';
+import { GITHUB_USERINFO_WITH_EMAIL_VERIFIED } from '@shinefold/auth/providers/oauth/github-userinfo';
+import { requireVerifiedProviderEmail } from '@shinefold/auth/providers/oauth/require-verified-provider-email';
 import { buildAppCookies } from '@shinefold/auth/sessions/app-cookies';
 import { scopeAdapterToApp } from '@shinefold/auth/sessions/app-scoped-adapter';
 import { env } from '@shinefold/auth/utils/env/env';
@@ -27,13 +29,17 @@ import type { Provider } from 'next-auth/providers';
 import GitHub from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 
-type TOAuthProviderOptions = TOAuthCredentials & { redirectProxyUrl?: string };
+type TOAuthProviderOptions = TOAuthCredentials & {
+  redirectProxyUrl?: string;
+  allowDangerousEmailAccountLinking: boolean;
+};
 
 const OAUTH_PROVIDER_FACTORIES: Record<
   TOAuthProviderId,
   (options: TOAuthProviderOptions) => Provider
 > = {
-  [OAUTH_PROVIDER.GITHUB]: GitHub,
+  [OAUTH_PROVIDER.GITHUB]: (options) =>
+    GitHub({ ...options, userinfo: GITHUB_USERINFO_WITH_EMAIL_VERIFIED }),
   [OAUTH_PROVIDER.GOOGLE]: Google,
 };
 
@@ -50,6 +56,8 @@ function buildOAuthProviders(
     return [
       OAUTH_PROVIDER_FACTORIES[id]({
         ...credentials,
+        // Safe only because requireVerifiedProviderEmail refuses an address the provider has not verified.
+        allowDangerousEmailAccountLinking: true,
         ...(siteCredentials[id] && WITHOUT_REDIRECT_PROXY),
       }),
     ];
@@ -77,6 +85,8 @@ export function buildAuthConfig(
     useSecureCookies,
     cookies: buildAppCookies(app, useSecureCookies),
     callbacks: {
+      signIn: ({ account, profile }) =>
+        requireVerifiedProviderEmail(account, profile),
       // The returned object is the public /api/auth/session body, so it never spreads the session row.
       session: ({ session, user }) => ({
         user: {

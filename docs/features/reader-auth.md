@@ -51,6 +51,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 
 - Session strategy is `database`; the `session` callback returns only the user (`id`, `name`, `email`, `image`) and `expires` — `user.id` is what every authorization lookup keys on, and the session row's `sessionToken`, `userId` and `app` never reach `/api/auth/session`.
 - An `accounts` row never holds the provider's `access_token`, `refresh_token` or `id_token`: nothing calls Google or GitHub on a user's behalf, so the adapter drops them before the row is written. The columns stay because the adapter expects them.
+- Google and GitHub join an existing user with the same email (Auth.js's `allowDangerousEmailAccountLinking`, on for the shared apps and a site's own alike), so a reader who first signed in by email link or with the other provider lands in that same account. Only an address the provider vouches for gets in: Google's `email_verified` claim, and for GitHub the `verified` flag of the chosen address in its email list (`GITHUB_USERINFO_WITH_EMAIL_VERIFIED`; the public address, else the primary one). `requireVerifiedProviderEmail`, the `signIn` callback, refuses any other provider sign-in with `OAuthAccountNotLinked`, whether or not an account exists, and never creates a second user for an email.
 - A `sessions` row never holds the session cookie's value: the adapter stores and looks a session up by the SHA-256 hex of the cookie token, and only the cookie carries the raw token.
 - A user's email and name are read from their encrypted forms (`emailEncrypted`, `nameEncrypted`), decrypted with `PERSONAL_DATA_ENCRYPTION_KEY`, and a user is looked up by email (`findUserByEmail`) through `emailIndex`, `accountEmailIndex`'s keyed HMAC of the exact address (trimmed and lower-cased, `+tag` kept) under `PERSONAL_DATA_INDEX_KEY`. A lookup also checks the decrypted email equals the requested address, ignoring case, so `name+tag@domain` never opens the account of `name@domain` by magic link or OAuth linking. Every user write fills only the encrypted forms: `@shinefold/auth`'s `withEncryptedUsers` strips `email` and `name` before the Drizzle adapter writes, so the plain `users.email` and `users.name` columns, kept only because the adapter's table type requires them, stay null. `users.emailIndex` is unique, so two accounts never share an address. Every write and read throws while either personal-data key is unset.
 - The user handed back to Auth.js carries only `id`, `email`, `name`, `emailVerified` and `image` — never an encrypted or index column.
@@ -72,6 +73,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 - `packages/auth/src/config.ts` — `buildAuthConfig`
 - `packages/auth/src/providers/magic-link/magic-link-provider/magic-link-provider.ts`
 - `packages/auth/src/utils/oauth-providers/oauth-providers.ts`
+- `packages/auth/src/providers/oauth/require-verified-provider-email.ts` and `github-userinfo.ts` — joining an existing account by verified email
 - `packages/auth/src/events/consume-pending-invites-on-sign-in.ts`
 - `apps/web/src/server/auth/auth.ts` — lazy `NextAuth()`, `pages.error: '/'`
 - `apps/web/src/server/auth/site-oauth-credentials/site-oauth-credentials.ts` — the site's entitled credentials
@@ -92,5 +94,6 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 ## Related
 
 - #4979 — epic: web and platform stay separate. Per-app session cookies and session rows, the shared cookie domain retired, invites consumed only on the platform (#4982, #4983, #4986).
+- #7748 — Google and GitHub join an existing account with the same verified email.
 - #4958 — magic-link send limits per email and IP, and terms acceptance on first sign-in.
 - #4083 — epic: per-tenant email usage tracking and a separate Resend account for tenant mail.
