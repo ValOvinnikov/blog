@@ -220,9 +220,9 @@ ceiling, its exemptions and the drop → group → slot → hook → context lad
   `apps/web` and passed in (`web-component-practices`).
   ```tsx
   // ✅ PostMeta knows nothing about share state
-  export type TPostMetaProps = … & { share?: ReactNode };
+  export type TPostMetaProps = … & { actions?: ReactNode };
   // ❌ a state bag tunnelled through a component that reads none of it
-  export type TPostMetaProps = … & { share?: { url: string; isCopied: boolean; onCopy: () => void; … } };
+  export type TPostMetaProps = … & { actions?: { url: string; isCopied: boolean; onCopy: () => void; … } };
   ```
 - **Shape data props to the view-model you're fed.** Name a data prop's
   fields after the `@shinefold/service` view-model passed to it, so

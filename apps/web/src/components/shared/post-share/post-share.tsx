@@ -1,6 +1,6 @@
 'use client';
 
-import { ICONS, SIZE } from '@shinefold/config';
+import { ICONS, type IWithClassName, SIZE } from '@shinefold/config';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { PopoverMenu } from '@shinefold/ui/components/molecules/popover-menu';
 import { type IShareLinkItem } from '@shinefold/ui/components/molecules/share-link';
@@ -12,11 +12,10 @@ import { useId } from 'react';
 
 import { postShareLiveRegionVariants } from './post-share-variants';
 
-export type TPostShareProps = {
+export type TPostShareProps = IWithClassName & {
   url: string;
   title: string;
   links: IShareLinkItem[];
-  className?: string;
 };
 
 export const PostShare = ({
@@ -50,6 +49,7 @@ export const PostShare = ({
         id={panelId}
         isOpen={open}
         ariaLabel={t('panelAriaLabel')}
+        shouldOpenFromStartOnPhone={true}
       >
         <PopoverMenu.Item
           icon={

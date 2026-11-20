@@ -266,13 +266,13 @@ Props: children?: TCompoundChildren<typeof PopoverMenuSlotParts> _(extends IWith
 Slots:
 
 - **PopoverMenu.Trigger** — Icon-button that opens/closes a `PopoverMenu.Panel`. Props: ariaLabel: string · isOpen: boolean · panelId: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · variant?: TIconButtonVariants['variant'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
-- **PopoverMenu.Panel** — The non-modal menu surface (`role="menu"`) a `PopoverMenu.Trigger` opens. Props: id: string · isOpen: boolean · ariaLabel?: string · children?: ReactNode · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
+- **PopoverMenu.Panel** — The non-modal menu surface (`role="menu"`) a `PopoverMenu.Trigger` opens. Props: id: string · isOpen: boolean · ariaLabel?: string · shouldOpenFromStartOnPhone?: boolean · children?: ReactNode · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_ · Variants: shouldOpenFromStartOnPhone: (boolean)
 - **PopoverMenu.Item** — A single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: className?: string · icon?: ReactNode _(extends TPopoverMenuItemVariants, IWithDataTestId)_ · Variants: variant: bordered|outlined|tile
 - **PopoverMenu.Separator** — A thin hairline dividing groups of `PopoverMenu.Item`s inside a `PopoverMenu.Panel` (e.g. a "Copy link" action from a list of social-share links). Props: className?: string _(extends IWithDataTestId)_
 
 ### PostMeta — `components/molecules/post-meta/post-meta.tsx`
 
-The byline under a post title: who wrote it, when, how long it takes to read, and the actions on it.
+The byline under a post title.
 Props: author: { name: string; imageUrl?: string; href?: string; } · publishedAt: string · formattedDate: string · readingTime?: string · linkAs?: TAnchorElementType · actions?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### PricingCard — `components/molecules/pricing-card/pricing-card.tsx`

@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
+import { PostMetaActions } from '@shinefold/ui/testing/post-meta-actions';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
 
@@ -37,14 +38,6 @@ const plainMeta = {
   publishedAt,
   formattedDate,
 };
-
-const metaActions = (
-  <span className="inline-flex gap-2">
-    <button type="button">Save</button>
-    <button type="button">Share</button>
-    <button type="button">Summary</button>
-  </span>
-);
 
 const summaryCard = (
   <div className="rounded-md border border-divider p-4">
@@ -135,7 +128,7 @@ export const WithFooterTags: TStory = {
 export const WithMetaActions: TStory = {
   args: articleArgs({
     lead: faker.lorem.paragraph(),
-    meta: { ...fullMeta, actions: metaActions },
+    meta: { ...fullMeta, actions: <PostMetaActions /> },
   }),
 };
 
@@ -143,12 +136,14 @@ export const WithBelowMeta: TStory = {
   args: articleArgs({
     topic: ENGINEERING_TOPIC,
     lead: faker.lorem.paragraph(),
-    meta: { ...fullMeta, actions: metaActions },
+    meta: { ...fullMeta, actions: <PostMetaActions /> },
     belowMeta: summaryCard,
     coverMedia: coverImage,
   }),
 };
 
+// The meta actions take their own row below the real `sm:` breakpoint, so
+// the phone state only shows with the viewport pinned.
 export const WithBelowMetaOnPhone: TStory = {
   ...WithBelowMeta,
   globals: { viewport: 'phone' },

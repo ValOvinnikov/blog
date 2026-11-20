@@ -19,7 +19,7 @@ props.
 
 ```tsx
 // ✅ web builds the widget; PostMeta renders one opaque slot child
-<PostMeta author={post.author} share={<PostShare url={url} title={post.title} links={shareLinks} />} />
+<PostMeta author={post.author} actions={<PostShare url={url} title={post.title} links={shareLinks} />} />
 
 // ❌ a "share" component that owns PostMeta and tunnels a state bag through it
 <PostShareButtons author={post.author} publishedAt={…}

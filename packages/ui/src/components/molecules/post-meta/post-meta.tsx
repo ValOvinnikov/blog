@@ -27,7 +27,7 @@ export type TPostMetaProps = IWithClassName &
 
 const s = postMetaVariants();
 
-/** The byline under a post title: who wrote it, when, how long it takes to read, and the actions on it. */
+/** The byline under a post title. */
 export const PostMeta = ({
   author,
   publishedAt,

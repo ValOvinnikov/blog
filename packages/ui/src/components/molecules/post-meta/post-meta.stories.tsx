@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { PostMetaActions } from '@shinefold/ui/testing/post-meta-actions';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { PostMeta } from './post-meta';
@@ -41,16 +42,12 @@ export const WithoutAvatar: TStory = {
 export const WithActions: TStory = {
   args: {
     readingTime: `${faker.number.int({ min: 3, max: 15 })} min read`,
-    actions: (
-      <span className="inline-flex gap-2">
-        <button type="button">Save</button>
-        <button type="button">Share</button>
-        <button type="button">Summary</button>
-      </span>
-    ),
+    actions: <PostMetaActions />,
   },
 };
 
+// The actions take their own row below the real `sm:` breakpoint, so the
+// phone state only shows with the viewport pinned.
 export const WithActionsOnPhone: TStory = {
   ...WithActions,
   globals: { viewport: 'phone' },
