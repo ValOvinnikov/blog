@@ -67,7 +67,7 @@ site as a 14-day Growth trial, with no card.
   Google and GitHub join an existing account with the same email when the
   provider has verified it ([reader-auth](./reader-auth.md)), so an owner or
   editor who first signed in by email link gets back in with either.
-  `OAuthAccountNotLinked` (now only a provider email that is not verified)
+  `OAuthAccountNotLinked` (only a provider email that is not verified)
   gets its own message; any other error a general one.
 - `/signup?promo=<code>` (the marketing pricing page's tier actions) keeps
   the code for the visitor's first Checkout in the `platform-signup-promo`

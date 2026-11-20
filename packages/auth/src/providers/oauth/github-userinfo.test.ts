@@ -1,9 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { MOCK_EMAIL } from '@shinefold/auth/testing/session-fixtures';
 import { HTTP_STATUS } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
 import type { Profile } from 'next-auth';
 
 import { GITHUB_USERINFO_WITH_EMAIL_VERIFIED } from './github-userinfo';
+
+faker.seed(6027);
 
 const MOCK_ACCESS_TOKEN = faker.string.alphanumeric(40);
 const MOCK_OTHER_EMAIL = faker.internet.exampleEmail();
@@ -15,7 +18,7 @@ function jsonResponse(body: unknown): Response {
   return new Response(JSON.stringify(body));
 }
 
-function respondWith(profileEmail: string | null, emails: Response): void {
+function respondWith(profileEmail: TMaybeNull<string>, emails: Response): void {
   fetchMock
     .mockResolvedValueOnce(
       jsonResponse({ login: MOCK_LOGIN, email: profileEmail }),

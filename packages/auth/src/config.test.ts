@@ -1,6 +1,7 @@
 import { OAuthAccountNotLinked } from '@auth/core/errors';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { MAGIC_LINK_PROVIDER_ID } from '@shinefold/auth/providers/magic-link/magic-link-provider/magic-link-provider';
+import { GITHUB_USERINFO_WITH_EMAIL_VERIFIED } from '@shinefold/auth/providers/oauth/github-userinfo';
 import {
   MOCK_GITHUB_ID,
   MOCK_GITHUB_SECRET,
@@ -90,7 +91,7 @@ function providerIdsOf(config: NextAuthConfig): unknown[] {
 type TOAuthProviderOptions = {
   clientId?: string;
   redirectProxyUrl?: string;
-  allowDangerousEmailAccountLinking?: boolean;
+  userinfo?: unknown;
 };
 
 function oauthProviderOptionsOf(
@@ -100,7 +101,8 @@ function oauthProviderOptionsOf(
   const provider = config.providers.find(
     (candidate) => typeof candidate !== 'function' && candidate.id === id,
   );
-  return (provider as { options?: TOAuthProviderOptions } | undefined)?.options;
+  return (provider as TMaybeUndefined<{ options?: TOAuthProviderOptions }>)
+    ?.options;
 }
 
 function redirectProxyUrlOf(
@@ -171,21 +173,6 @@ describe(buildAuthConfig, () => {
       ]);
     });
 
-    it.each([OAUTH_PROVIDER.GITHUB, OAUTH_PROVIDER.GOOGLE])(
-      'lets %s join an existing account with the same email',
-      (id) => {
-        vi.stubEnv('AUTH_GOOGLE_ID', MOCK_GOOGLE_ID);
-        vi.stubEnv('AUTH_GOOGLE_SECRET', MOCK_GOOGLE_SECRET);
-
-        const options = oauthProviderOptionsOf(
-          buildAuthConfig(AUTH_APP.SITE, MAGIC_LINK_HANDLERS),
-          id,
-        );
-
-        expect(options?.allowDangerousEmailAccountLinking).toBe(true);
-      },
-    );
-
     it('uses the env credentials and redirect proxy without site credentials', () => {
       const options = oauthProviderOptionsOf(
         buildAuthConfig(AUTH_APP.SITE, MAGIC_LINK_HANDLERS),
@@ -216,8 +203,13 @@ describe(buildAuthConfig, () => {
       const options = oauthProviderOptionsOf(config, OAUTH_PROVIDER.GITHUB);
 
       expect(options?.clientId).toBe(MOCK_SITE_GITHUB_ID);
-      expect(options?.allowDangerousEmailAccountLinking).toBe(true);
       expect(redirectProxyUrlOf(options)).toBeFalsy();
+    });
+
+    it("reads GitHub's profile through the userinfo that marks its email verified", () => {
+      expect(
+        oauthProviderOptionsOf(config, OAUTH_PROVIDER.GITHUB)?.userinfo,
+      ).toBe(GITHUB_USERINFO_WITH_EMAIL_VERIFIED);
     });
 
     it('keeps the env credentials and redirect proxy for a provider the site lacks', () => {
