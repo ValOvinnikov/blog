@@ -193,27 +193,7 @@ describe(syncStripeSubscription, () => {
     });
   });
 
-  it.each([
-    STRIPE_SUBSCRIPTION_STATUS.CANCELED,
-    STRIPE_SUBSCRIPTION_STATUS.UNPAID,
-  ])('unsets the billing period and currency once %s', async (status) => {
-    retrieveSubscriptionMock.mockResolvedValue(
-      mockStripeSubscription({ status }),
-    );
-
-    await sync();
-
-    expect(writtenBilling()).toMatchObject({
-      billingInterval: null,
-      billingCurrency: null,
-    });
-    expect(logger.error).not.toHaveBeenCalledWith(
-      BILLING_LOG.CURRENCY_UNKNOWN,
-      expect.anything(),
-    );
-  });
-
-  it('moves a cancelled paid site to Free and starts the grace', async () => {
+  it('moves a cancelled paid site to Free, unsets period and currency, starts grace', async () => {
     getTenantByIdMock.mockResolvedValue(
       mockTenant({ plan: TENANT_PLAN.GROWTH }),
     );
@@ -229,8 +209,14 @@ describe(syncStripeSubscription, () => {
     });
     expect(writtenBilling()).toMatchObject({
       subscriberBandCeiling: null,
+      billingInterval: null,
+      billingCurrency: null,
       downgradeGraceStartedAt: expect.any(Date),
     });
+    expect(logger.error).not.toHaveBeenCalledWith(
+      BILLING_LOG.CURRENCY_UNKNOWN,
+      expect.anything(),
+    );
   });
 
   it('starts no grace for a cancelled subscription on a site already on Free', async () => {

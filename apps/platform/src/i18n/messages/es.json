@@ -2373,7 +2373,8 @@
     "CARD_DECLINED": "Tu tarjeta ha sido rechazada, así que no ha cambiado nada. Actualízala en Facturación e inténtalo de nuevo.",
     "PAYMENT_NOT_CONFIRMED": "La confirmación con tu banco no se completó, así que tu plan no ha cambiado. Inténtalo de nuevo cuando quieras.",
     "NO_NEXT_BAND": "Tu sitio no puede pasar a ese tramo ahora. Recarga la página para ver tu tramo actual.",
-    "PENDING_CHANGE": "Tu sitio tiene un cambio de plan pendiente para la renovación. Mantén primero tu plan actual desde Mejorar y luego sube de tramo."
+    "PENDING_CHANGE": "Tu sitio tiene un cambio de plan pendiente para la renovación. Mantén primero tu plan actual desde Mejorar y luego sube de tramo.",
+    "QUOTE_EXPIRED": "Este precio se mostró hace un rato. Cierra esto y vuelve a abrirlo para ver el precio de hoy."
   },
   "moveUpBand": {
     "trigger": "Pasar a {ceiling, number} suscriptores — {price} más al {interval, select, YEARLY {año} other {mes}}",

@@ -1,6 +1,7 @@
 import {
   BILLING_LOG,
   STRIPE_PRORATION_BEHAVIOR,
+  UPGRADE_STATE,
 } from '@platform/constants/billing';
 import { PLAN_CHANGE_REFUSAL } from '@platform/constants/plan-change';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -11,38 +12,33 @@ import {
 } from '@platform/testing/billing/catalogue-prices';
 import {
   MOCK_AMOUNT_PAID,
+  MOCK_BAND_CEILING,
+  MOCK_HIGHER_BAND_CEILING,
   MOCK_STRIPE_CURRENCY,
   MOCK_STRIPE_SUBSCRIPTION_ID,
 } from '@platform/testing/billing/fixtures';
 import { MOCK_MOVE_UP_QUOTE } from '@platform/testing/billing/move-up';
+import { mockPayingSiteContext } from '@platform/testing/billing/paying-site';
 import {
   MOCK_PLAN_ITEM_ID,
   MOCK_RENEWS_AT,
   priceIdFor,
 } from '@platform/testing/billing/plan-subscription';
-import { mockStripePlanChangeClient } from '@platform/testing/billing/stripe-plan-change-client';
+import { mockStripeClientWithSubscription } from '@platform/testing/billing/stripe-plan-change-client';
 import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
 import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
-import {
-  mockMembershipContext,
-  mockMembership,
-} from '@platform/testing/memberships/fixtures';
+import { mockOperatorViewer } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import {
-  MOCK_TENANT_ID,
-  mockReadyTenant,
-} from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import {
+  ADMIN_ROLE,
   BILLING_CURRENCY,
-  MEMBERSHIP_ROLE,
   STRIPE_PRICE_LOOKUP_KEY,
 } from '@shinefold/db/constants';
-import type Stripe from 'stripe';
 
 import { getMoveUpQuoteAction } from './get-move-up-quote-action';
-import { getStripeClient } from './stripe-client';
 
 const { listStripePricesMock } = vi.hoisted(() => ({
   listStripePricesMock: vi.fn(),
@@ -57,40 +53,28 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 
 vi.mock('./stripe-client');
 
-const MOCK_CARD = MOCK_MOVE_UP_QUOTE.card;
+const { card: MOCK_CARD } = MOCK_MOVE_UP_QUOTE;
 
-const growthSite = (
-  overrides: Parameters<typeof mockReadyTenant>[0] = {},
-  membership = mockMembership(),
-) =>
-  mockMembershipContext(
-    mockReadyTenant({
-      id: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.GROWTH,
-      stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
-      billingCurrency: BILLING_CURRENCY.USD,
-      ...overrides,
-    }),
-    membership,
-  );
+const growthSite = (tenant: Parameters<typeof mockPayingSiteContext>[0] = {}) =>
+  mockPayingSiteContext({
+    plan: TENANT_PLAN.GROWTH,
+    billingCurrency: BILLING_CURRENCY.USD,
+    ...tenant,
+  });
 
-const quote = () => getMoveUpQuoteAction(MOCK_TENANT_ID, { ceiling: 2_500 });
+const quote = () =>
+  getMoveUpQuoteAction(MOCK_TENANT_ID, { ceiling: MOCK_BAND_CEILING });
 
 describe(getMoveUpQuoteAction, () => {
-  let client: ReturnType<typeof mockStripePlanChangeClient>;
+  let client: ReturnType<typeof mockStripeClientWithSubscription>;
 
   beforeEach(() => {
     vi.mocked(requireTenantMembership).mockResolvedValue(growthSite());
-    const subscription = mockStripeSubscription();
-    client = mockStripePlanChangeClient(subscription);
-    client.retrieveSubscription.mockImplementation(async (_id, params) =>
-      (params as Stripe.SubscriptionRetrieveParams).expand?.includes(
-        'default_payment_method',
-      )
-        ? { ...subscription, default_payment_method: { card: MOCK_CARD } }
-        : subscription,
-    );
-    vi.mocked(getStripeClient).mockReturnValue(client.stripe);
+    client = mockStripeClientWithSubscription();
+    client.retrieveSubscription.mockResolvedValue({
+      ...mockStripeSubscription(),
+      default_payment_method: { card: MOCK_CARD },
+    });
     listStripePricesMock.mockResolvedValue(MOCK_GROWTH_CATALOGUE);
   });
 
@@ -102,6 +86,7 @@ describe(getMoveUpQuoteAction, () => {
           minorUnits: MOCK_AMOUNT_PAID,
           currency: MOCK_STRIPE_CURRENCY,
         },
+        prorationDate: expect.any(Number),
         renewsAt: MOCK_RENEWS_AT,
         total: {
           minorUnits: MOCK_GROWTH_MONTHLY_AMOUNT + MOCK_BAND_2500_AMOUNT,
@@ -112,8 +97,8 @@ describe(getMoveUpQuoteAction, () => {
     });
   });
 
-  it('previews the move as an immediate invoice without changing the subscription', async () => {
-    await quote();
+  it('previews the move as an immediate invoice at the quoted time, changing nothing', async () => {
+    const result = await quote();
 
     expect(client.createInvoicePreview).toHaveBeenCalledWith({
       subscription: MOCK_STRIPE_SUBSCRIPTION_ID,
@@ -126,25 +111,30 @@ describe(getMoveUpQuoteAction, () => {
           { price: priceIdFor(STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500) },
         ],
         proration_behavior: STRIPE_PRORATION_BEHAVIOR.ALWAYS_INVOICE,
+        proration_date: result.ok ? result.data.prorationDate : undefined,
       },
     });
     expect(client.updateSubscription).not.toHaveBeenCalled();
   });
 
-  it('refuses a member who is not the owner without calling Stripe', async () => {
-    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
-      growthSite({}, mockMembership({ role: MEMBERSHIP_ROLE.EDITOR })),
-    );
+  it('tells an operator only the owner can move up, without calling Stripe', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce({
+      ...growthSite({ billingCurrency: null }),
+      viewer: mockOperatorViewer(ADMIN_ROLE.SUPERADMIN),
+    });
 
-    const result = await quote();
-
-    expect(result.ok).toBe(false);
+    expect(await quote()).toEqual({
+      ok: false,
+      error: UPGRADE_STATE.NOT_OWNER,
+    });
     expect(client.retrieveSubscription).not.toHaveBeenCalled();
   });
 
   it('says why when the band is not the next one', async () => {
     expect(
-      await getMoveUpQuoteAction(MOCK_TENANT_ID, { ceiling: 5_000 }),
+      await getMoveUpQuoteAction(MOCK_TENANT_ID, {
+        ceiling: MOCK_HIGHER_BAND_CEILING,
+      }),
     ).toEqual({ ok: false, error: PLAN_CHANGE_REFUSAL.NO_NEXT_BAND });
   });
 
@@ -154,7 +144,7 @@ describe(getMoveUpQuoteAction, () => {
     );
 
     expect(await quote()).toEqual({ ok: false, error: undefined });
-    expect(client.retrieveSubscription).not.toHaveBeenCalled();
+    expect(client.createInvoicePreview).not.toHaveBeenCalled();
   });
 
   it('logs and quotes nothing when the catalogue lacks the price', async () => {

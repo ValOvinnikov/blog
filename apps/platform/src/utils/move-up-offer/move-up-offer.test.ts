@@ -5,8 +5,14 @@ import {
   MOCK_GROWTH_CATALOGUE,
   MOCK_GROWTH_MONTHLY_AMOUNT,
 } from '@platform/testing/billing/catalogue-prices';
+import {
+  MOCK_BAND_CEILING,
+  MOCK_LARGEST_BAND_CEILING,
+  MOCK_SECOND_LARGEST_BAND_CEILING,
+} from '@platform/testing/billing/fixtures';
 import { BILLING_INTERVAL, TENANT_PLAN } from '@shinefold/config/constants';
 import { BILLING_CURRENCY } from '@shinefold/db/constants';
+import { monthlySendAllowance } from '@shinefold/db/utils/monthly-send-allowance/monthly-send-allowance';
 
 import {
   moveUpOfferFor,
@@ -24,8 +30,8 @@ const GROWTH_MONTHLY: TMoveUpBilling = {
 describe(moveUpOfferFor, () => {
   it('prices the first band whole for a site on the included band', () => {
     expect(moveUpOfferFor(GROWTH_MONTHLY, MOCK_GROWTH_CATALOGUE)).toEqual({
-      ceiling: 2_500,
-      allowance: 15_000,
+      ceiling: MOCK_BAND_CEILING,
+      allowance: monthlySendAllowance(TENANT_PLAN.GROWTH, MOCK_BAND_CEILING),
       interval: BILLING_INTERVAL.MONTHLY,
       extra: {
         minorUnits: MOCK_BAND_2500_AMOUNT,
@@ -36,7 +42,7 @@ describe(moveUpOfferFor, () => {
 
   it('prices the difference between the next band and the current one', () => {
     const offer = moveUpOfferFor(
-      { ...GROWTH_MONTHLY, subscriberBandCeiling: 2_500 },
+      { ...GROWTH_MONTHLY, subscriberBandCeiling: MOCK_BAND_CEILING },
       MOCK_GROWTH_CATALOGUE,
     );
 
@@ -58,7 +64,7 @@ describe(moveUpOfferFor, () => {
   });
 
   it.each([
-    ['the largest band', { subscriberBandCeiling: 25_000 }],
+    ['the largest band', { subscriberBandCeiling: MOCK_LARGEST_BAND_CEILING }],
     ['no stored currency', { billingCurrency: null }],
     ['no stored billing period', { billingInterval: null }],
     [
@@ -81,7 +87,9 @@ describe(planTotalFor, () => {
   };
 
   it('adds the band to the plan price', () => {
-    expect(planTotalFor(MOCK_GROWTH_CATALOGUE, pricing, 2_500)).toEqual({
+    expect(
+      planTotalFor(MOCK_GROWTH_CATALOGUE, pricing, MOCK_BAND_CEILING),
+    ).toEqual({
       minorUnits: MOCK_GROWTH_MONTHLY_AMOUNT + MOCK_BAND_2500_AMOUNT,
       currency: BILLING_CURRENCY.USD,
     });
@@ -89,7 +97,11 @@ describe(planTotalFor, () => {
 
   it('has no total when the band has no price', () => {
     expect(
-      planTotalFor(MOCK_GROWTH_CATALOGUE, pricing, 10_000),
+      planTotalFor(
+        MOCK_GROWTH_CATALOGUE,
+        pricing,
+        MOCK_SECOND_LARGEST_BAND_CEILING,
+      ),
     ).toBeUndefined();
   });
 });

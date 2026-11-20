@@ -25,7 +25,7 @@ export type TPlanChangeProps = {
   current: TPlanChoice;
   renewsAt: Date;
   pending: TMaybeUndefined<TPendingPlanChange>;
-  publishableKey?: string;
+  publishableKey: TMaybeUndefined<string>;
 };
 
 export const PlanChange = ({

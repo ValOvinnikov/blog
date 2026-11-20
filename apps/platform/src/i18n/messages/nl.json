@@ -2373,7 +2373,8 @@
     "CARD_DECLINED": "Je kaart is geweigerd, dus er is niets gewijzigd. Werk hem bij in Facturering en probeer het opnieuw.",
     "PAYMENT_NOT_CONFIRMED": "De bevestiging bij je bank is niet afgerond, dus je abonnement is niet gewijzigd. Probeer het opnieuw wanneer je zover bent.",
     "NO_NEXT_BAND": "Je site kan nu niet naar die schijf. Laad de pagina opnieuw om je huidige schijf te zien.",
-    "PENDING_CHANGE": "Voor je site staat een abonnementswijziging gepland bij verlenging. Houd eerst je huidige abonnement via Upgraden en stap daarna een schijf hoger."
+    "PENDING_CHANGE": "Voor je site staat een abonnementswijziging gepland bij verlenging. Houd eerst je huidige abonnement via Upgraden en stap daarna een schijf hoger.",
+    "QUOTE_EXPIRED": "Deze prijs werd een tijd geleden getoond. Sluit dit venster en open het opnieuw voor de prijs van vandaag."
   },
   "moveUpBand": {
     "trigger": "Naar {ceiling, number} abonnees — {price} meer per {interval, select, YEARLY {jaar} other {maand}}",

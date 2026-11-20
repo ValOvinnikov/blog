@@ -1,3 +1,4 @@
+import { getStripeClient } from '@platform/server/billing/stripe-client';
 import {
   MOCK_PAYMENT_CLIENT_SECRET,
   MOCK_PAYMENT_INTENT_ID,
@@ -10,6 +11,10 @@ import {
   mockPrice,
 } from '@platform/testing/billing/plan-subscription';
 import { type TStripeCall } from '@platform/testing/billing/stripe-call';
+import {
+  mockStripeSubscription,
+  type TMockStripeSubscription,
+} from '@platform/testing/billing/stripe-subscription';
 import type Stripe from 'stripe';
 
 export const mockStripePlanChangeClient = (
@@ -72,4 +77,12 @@ export const mockStripePlanChangeClient = (
   };
 
   return { stripe, holdForPayment, ...calls };
+};
+
+export const mockStripeClientWithSubscription = (
+  overrides: TMockStripeSubscription = {},
+) => {
+  const client = mockStripePlanChangeClient(mockStripeSubscription(overrides));
+  vi.mocked(getStripeClient).mockReturnValue(client.stripe);
+  return client;
 };

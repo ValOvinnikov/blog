@@ -8714,6 +8714,14 @@
         "file": "apps/platform/src/constants/plan-change.ts"
       }
     ],
+    "QUOTE_EXPIRED": [
+      {
+        "ref": "PLAN_CHANGE_REFUSAL.QUOTE_EXPIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
     "ROWS": [
       {
         "ref": "PRESET_LIST_LAYOUT.ROWS",

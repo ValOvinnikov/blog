@@ -66,7 +66,7 @@ export const writeSubscriptionBilling = async (
   });
   if (!write.ok) {
     throw new Error(
-      `syncStripeSubscription: billing write for tenant "${tenantId}" failed with ${write.error}.`,
+      `writeSubscriptionBilling: billing write for tenant "${tenantId}" failed with ${write.error}.`,
     );
   }
 };

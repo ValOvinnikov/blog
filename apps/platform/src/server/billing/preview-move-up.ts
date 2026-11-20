@@ -8,12 +8,14 @@ import type Stripe from 'stripe';
 
 import type { TSubscriptionPlan } from './load-subscription-plan';
 import type { TTargetPrices } from './schedule-change-at-renewal';
+import { toStripeTime } from './stripe-time';
 import { subscriptionItemsFor } from './subscription-items';
 
 type TPaymentCard = { brand: string; last4: string };
 
 export type TMoveUpPreview = {
   dueToday: TStripeAmount;
+  prorationDate: number;
   card: TMaybeUndefined<TPaymentCard>;
 };
 
@@ -41,18 +43,21 @@ export const previewMoveUp = async (
   subscription: TSubscriptionPlan,
   prices: TTargetPrices,
 ): Promise<TMoveUpPreview> => {
+  const prorationDate = toStripeTime(new Date());
   const [invoice, { default_payment_method, customer }] = await Promise.all([
     stripe.invoices.createPreview({
       subscription: subscription.id,
       subscription_details: {
         items: subscriptionItemsFor(subscription, prices),
         proration_behavior: STRIPE_PRORATION_BEHAVIOR.ALWAYS_INVOICE,
+        proration_date: prorationDate,
       },
     }),
     stripe.subscriptions.retrieve(subscription.id, { expand: CARD_EXPAND }),
   ]);
   return {
     dueToday: { minorUnits: invoice.amount_due, currency: invoice.currency },
+    prorationDate,
     card: cardOf(default_payment_method) ?? cardOf(customerMethodOf(customer)),
   };
 };

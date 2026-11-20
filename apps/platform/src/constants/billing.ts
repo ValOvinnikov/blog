@@ -105,6 +105,9 @@ export const BILLING_GRACE = {
 
 export const MILLISECONDS_PER_SECOND = 1000;
 
+// Long enough to read the dialog, short enough that the charge stays the one it showed.
+export const MOVE_UP_QUOTE_MAX_AGE_SECONDS = 30 * 60;
+
 export const STRIPE_SIGNATURE_HEADER = 'stripe-signature';
 
 export const STRIPE_TENANT_METADATA_KEY = 'tenantId';

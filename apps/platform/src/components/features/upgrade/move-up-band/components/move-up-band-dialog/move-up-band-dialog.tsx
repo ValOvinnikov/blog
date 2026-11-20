@@ -43,7 +43,7 @@ export const MoveUpBandDialog = ({
             <Button
               type="button"
               variant={BUTTON_VARIANT.PRIMARY}
-              onClick={pay}
+              onClick={() => pay(quoted.prorationDate)}
               isDisabled={progress.isConfirming}
               isPending={isPending}
               pendingLabel={t('paying')}

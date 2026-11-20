@@ -11,7 +11,10 @@ import { isOutcomeRefused, type TMaybeUndefined } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
 
-import { moveUpBandSchema, type TMoveUpBandInput } from './move-up-band-input';
+import {
+  moveUpQuoteSchema,
+  type TMoveUpQuoteInput,
+} from './move-up-band-input';
 import { previewMoveUp, type TMoveUpPreview } from './preview-move-up';
 import { readChangeableSubscription } from './read-changeable-subscription';
 import { resolveMoveUpPrices } from './resolve-move-up-prices';
@@ -28,12 +31,11 @@ export type TMoveUpQuoteResult = TResult<
 
 export const getMoveUpQuoteAction = async (
   tenantId: string,
-  input: TMoveUpBandInput,
+  input: TMoveUpQuoteInput,
 ): Promise<TMoveUpQuoteResult> => {
   const membership = await requireTenantMembership(tenantId);
-  const parsed = moveUpBandSchema.safeParse(input);
-  const { billingCurrency: currency } = membership.tenant;
-  if (!parsed.success || !currency) return errorResult(undefined);
+  const parsed = moveUpQuoteSchema.safeParse(input);
+  if (!parsed.success) return errorResult(undefined);
   const { ceiling } = parsed.data;
 
   try {
@@ -42,6 +44,8 @@ export const getMoveUpQuoteAction = async (
       const { error } = read;
       return errorResult(isOutcomeRefused(error) ? error.reason : undefined);
     }
+    const currency = membership.tenant.billingCurrency;
+    if (!currency) return errorResult(undefined);
     const prices = await resolveMoveUpPrices(tenantId, read.data, ceiling);
     if (!prices.ok) return errorResult(prices.error);
 

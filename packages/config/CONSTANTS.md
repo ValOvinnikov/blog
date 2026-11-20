@@ -710,7 +710,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/plan-change` — `apps/platform/src/constants/plan-change.ts`
 
 - **PLAN_CHANGE_TIMING**: `NOW`, `AT_RENEWAL`, `CANCEL_PENDING`
-- **PLAN_CHANGE_REFUSAL**: `NOT_SUBSCRIBED`, `NOT_ACTIVE`, `UNCHANGED`, `CARD_DECLINED`, `PAYMENT_NOT_CONFIRMED`, `NO_NEXT_BAND`, `PENDING_CHANGE`
+- **PLAN_CHANGE_REFUSAL**: `NOT_SUBSCRIBED`, `NOT_ACTIVE`, `UNCHANGED`, `CARD_DECLINED`, `PAYMENT_NOT_CONFIRMED`, `NO_NEXT_BAND`, `PENDING_CHANGE`, `QUOTE_EXPIRED`
 
 ### `@platform/constants/preset-list` — `apps/platform/src/constants/preset-list.ts`
 

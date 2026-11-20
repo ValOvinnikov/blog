@@ -38,9 +38,11 @@ const updateItems = (
   stripe: Stripe,
   subscription: TSubscriptionPlan,
   prices: TTargetPrices,
+  prorationDate: TMaybeUndefined<number>,
 ) =>
   stripe.subscriptions.update(subscription.id, {
     items: subscriptionItemsFor(subscription, prices),
+    ...(prorationDate && { proration_date: prorationDate }),
     proration_behavior: STRIPE_PRORATION_BEHAVIOR.ALWAYS_INVOICE,
     payment_behavior: STRIPE_PAYMENT_BEHAVIOR.PENDING_IF_INCOMPLETE,
     expand: STRIPE_PENDING_PAYMENT_EXPAND,
@@ -104,11 +106,13 @@ export const changePlanNow = async (
   subscription: TSubscriptionPlan,
   prices: TTargetPrices,
   tenantId: string,
+  prorationDate?: number,
 ): Promise<TChangeNowResult> => {
   const { pending_update, latest_invoice, schedule } = await updateItems(
     stripe,
     subscription,
     prices,
+    prorationDate,
   );
   if (pending_update) {
     const invoice =

@@ -2373,7 +2373,8 @@
     "CARD_DECLINED": "Deine Karte wurde abgelehnt, daher hat sich nichts geändert. Aktualisiere sie in der Abrechnung und versuch es erneut.",
     "PAYMENT_NOT_CONFIRMED": "Die Bestätigung bei deiner Bank wurde nicht abgeschlossen, daher hat sich dein Tarif nicht geändert. Versuch es erneut, wenn du so weit bist.",
     "NO_NEXT_BAND": "Deine Website kann gerade nicht in diese Stufe wechseln. Lade die Seite neu, um deine aktuelle Stufe zu sehen.",
-    "PENDING_CHANGE": "Für deine Website ist ein Tarifwechsel zur Verlängerung geplant. Behalte zuerst unter Upgrade deinen aktuellen Tarif und wechsle dann eine Stufe höher."
+    "PENDING_CHANGE": "Für deine Website ist ein Tarifwechsel zur Verlängerung geplant. Behalte zuerst unter Upgrade deinen aktuellen Tarif und wechsle dann eine Stufe höher.",
+    "QUOTE_EXPIRED": "Dieser Preis wurde vor einer Weile angezeigt. Schließe das Fenster und öffne es erneut für den heutigen Preis."
   },
   "moveUpBand": {
     "trigger": "Auf {ceiling, number} Abonnenten wechseln — {price} mehr pro {interval, select, YEARLY {Jahr} other {Monat}}",

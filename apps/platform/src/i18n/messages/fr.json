@@ -2373,7 +2373,8 @@
     "CARD_DECLINED": "Votre carte a été refusée, donc rien n'a changé. Mettez-la à jour dans Facturation et réessayez.",
     "PAYMENT_NOT_CONFIRMED": "La confirmation auprès de votre banque n'a pas abouti, donc votre formule n'a pas changé. Réessayez quand vous êtes prêt.",
     "NO_NEXT_BAND": "Votre site ne peut pas passer à ce palier pour le moment. Rechargez la page pour voir votre palier actuel.",
-    "PENDING_CHANGE": "Un changement d'offre est prévu au renouvellement de votre site. Conservez d'abord votre offre actuelle depuis Mise à niveau, puis passez au palier supérieur."
+    "PENDING_CHANGE": "Un changement d'offre est prévu au renouvellement de votre site. Conservez d'abord votre offre actuelle depuis Mise à niveau, puis passez au palier supérieur.",
+    "QUOTE_EXPIRED": "Ce prix a été affiché il y a un moment. Fermez cette fenêtre et rouvrez-la pour voir le prix du jour."
   },
   "moveUpBand": {
     "trigger": "Passer à {ceiling, number} abonnés — {price} de plus par {interval, select, YEARLY {an} other {mois}}",

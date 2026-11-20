@@ -21,14 +21,14 @@ export const resolveMoveUpPrices = async (
   { stripe, subscription }: TTenantSubscriptionPlan,
   ceiling: TPaidSubscriberBandCeiling,
 ): Promise<TResult<TTargetPrices, TMaybeUndefined<TPlanChangeRefusalCode>>> => {
-  const { current, scheduleId } = subscription;
+  const { current, pending } = subscription;
   const isNextBand =
     nextSubscriberBand(current.ceiling) === ceiling &&
     Boolean(bandKeyFor(current.plan, current.interval, ceiling));
   if (!isNextBand) {
     return errorResult(PLAN_CHANGE_REFUSAL.NO_NEXT_BAND);
   }
-  if (scheduleId) {
+  if (pending) {
     return errorResult(PLAN_CHANGE_REFUSAL.PENDING_CHANGE);
   }
 

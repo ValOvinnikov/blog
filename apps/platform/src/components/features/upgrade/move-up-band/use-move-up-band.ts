@@ -33,19 +33,23 @@ export const useMoveUpBand = (
     onSettled: () =>
       router.push(adminRoutes.dashboardSubscribersMovedUp(ceiling)),
   });
-  const isPaying = isPending || progress.isConfirming;
+  const isPaying = isPending || (progress.isConfirming && !progress.isSlow);
 
   const requestOpenChange = (nextIsOpen: boolean) => {
     if (!nextIsOpen && isPaying) return;
     setIsOpen(nextIsOpen);
-    if (!nextIsOpen || quote?.ok) return;
+    if (!nextIsOpen) return;
+    setQuote(undefined);
     startLoading(async () => {
       setQuote(await getMoveUpQuoteAction(tenantId, { ceiling }));
     });
   };
 
-  const pay = () =>
-    submit(() => moveUpSubscriberBandAction(tenantId, { ceiling }), ceiling);
+  const pay = (prorationDate: number) =>
+    submit(
+      () => moveUpSubscriberBandAction(tenantId, { ceiling, prorationDate }),
+      ceiling,
+    );
 
   return {
     isOpen,

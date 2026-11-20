@@ -2373,7 +2373,8 @@
     "CARD_DECLINED": "Your card was declined, so nothing changed. Update it in Billing and try again.",
     "PAYMENT_NOT_CONFIRMED": "Your bank's confirmation wasn't completed, so your plan hasn't changed. Try again when you're ready.",
     "NO_NEXT_BAND": "Your site can't move up to that band now. Reload the page to see your current band.",
-    "PENDING_CHANGE": "Your site has a plan change waiting for renewal. Keep your current plan from Upgrade first, then move up."
+    "PENDING_CHANGE": "Your site has a plan change waiting for renewal. Keep your current plan from Upgrade first, then move up.",
+    "QUOTE_EXPIRED": "This price was shown a while ago. Close this and open it again for today's price."
   },
   "moveUpBand": {
     "trigger": "Move to {ceiling, number} subscribers — {price} a {interval, select, YEARLY {year} other {month}} more",

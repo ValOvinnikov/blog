@@ -3,10 +3,7 @@ import {
   PLAN_CHANGE_REFUSAL,
   PLAN_CHANGE_TIMING,
 } from '@platform/constants/plan-change';
-import {
-  STRIPE_JS_ERROR_CODE,
-  STRIPE_JS_ERROR_TYPE,
-} from '@platform/constants/stripe-payment';
+import { STRIPE_JS_ERROR_TYPE } from '@platform/constants/stripe-payment';
 import messages from '@platform/i18n/messages/en.json';
 import { changePlanAction } from '@platform/server/billing/change-plan-action';
 import { getTenantPlanAction } from '@platform/server/billing/get-tenant-plan-action';
@@ -19,6 +16,10 @@ import {
   MOCK_STARTER_MONTHLY_CHOICE,
 } from '@platform/testing/billing/plan-choices';
 import { MOCK_RENEWS_AT } from '@platform/testing/billing/plan-subscription';
+import {
+  MOCK_BANK_STEP_CANCELLED,
+  mockStripeNextAction,
+} from '@platform/testing/billing/stripe-js';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
@@ -27,7 +28,7 @@ import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { ACTION_OUTCOME } from '@shinefold/config';
 import { TENANT_PLAN, BILLING_INTERVAL } from '@shinefold/config/constants';
-import { loadStripe, type Stripe } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 
@@ -163,10 +164,7 @@ describe(`<${PlanChange.name}/>`, () => {
       let handleNextAction: Mock;
 
       beforeEach(() => {
-        handleNextAction = vi.fn(async () => ({}));
-        vi.mocked(loadStripe).mockResolvedValue({
-          handleNextAction,
-        } as unknown as Stripe);
+        handleNextAction = mockStripeNextAction();
         vi.mocked(changePlanAction).mockResolvedValueOnce({
           outcome: ACTION_OUTCOME.SUCCESS,
           timing: PLAN_CHANGE_TIMING.NOW,
@@ -189,12 +187,7 @@ describe(`<${PlanChange.name}/>`, () => {
       });
 
       it('says nothing changed when the bank step is cancelled', async () => {
-        handleNextAction.mockResolvedValue({
-          error: {
-            type: STRIPE_JS_ERROR_TYPE.CARD_ERROR,
-            code: STRIPE_JS_ERROR_CODE.AUTHENTICATION_FAILURE,
-          },
-        });
+        handleNextAction.mockResolvedValue(MOCK_BANK_STEP_CANCELLED);
 
         await choose(user, planNames.GROWTH);
         await user.click(submitButton());

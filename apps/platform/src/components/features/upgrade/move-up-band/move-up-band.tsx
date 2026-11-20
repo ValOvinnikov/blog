@@ -5,6 +5,7 @@ import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import type { TMoveUpOffer } from '@platform/utils/move-up-offer/move-up-offer';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { MoveUpBandDialog } from './components/move-up-band-dialog/move-up-band-dialog';
@@ -13,7 +14,7 @@ import { useMoveUpBand } from './use-move-up-band';
 export type TMoveUpBandProps = {
   tenantId: string;
   offer: TMoveUpOffer;
-  publishableKey?: string;
+  publishableKey: TMaybeUndefined<string>;
 };
 
 export const MoveUpBand = ({

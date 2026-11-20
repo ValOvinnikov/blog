@@ -1,16 +1,23 @@
+import {
+  MOCK_BAND_CEILING,
+  MOCK_HIGHER_BAND_CEILING,
+  MOCK_LARGEST_BAND_CEILING,
+  MOCK_SECOND_LARGEST_BAND_CEILING,
+} from '@platform/testing/billing/fixtures';
+
 import { nextSubscriberBand } from './next-subscriber-band';
 
 describe(nextSubscriberBand, () => {
   it.each([
-    [null, 2_500],
-    [2_500, 5_000],
-    [5_000, 10_000],
-    [10_000, 25_000],
-  ] as const)('moves a site on %s up to %s', (ceiling, next) => {
+    [null, MOCK_BAND_CEILING],
+    [MOCK_BAND_CEILING, MOCK_HIGHER_BAND_CEILING],
+    [MOCK_HIGHER_BAND_CEILING, MOCK_SECOND_LARGEST_BAND_CEILING],
+    [MOCK_SECOND_LARGEST_BAND_CEILING, MOCK_LARGEST_BAND_CEILING],
+  ])('moves a site on %s up to %s', (ceiling, next) => {
     expect(nextSubscriberBand(ceiling)).toBe(next);
   });
 
   it('offers nothing above the largest band', () => {
-    expect(nextSubscriberBand(25_000)).toBeUndefined();
+    expect(nextSubscriberBand(MOCK_LARGEST_BAND_CEILING)).toBeUndefined();
   });
 });
