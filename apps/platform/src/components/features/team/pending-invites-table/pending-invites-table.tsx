@@ -29,6 +29,9 @@ export const PendingInvitesTable = ({
   const locale = useLocale();
   const columns = useTeamTableColumns();
   const { accessNote } = pendingInvitesTableVariants();
+  const returnFocusId = hasArrayGotMultipleItems(invites)
+    ? TEAM_INVITES_HEADING_ID
+    : TEAM_MEMBERS_HEADING_ID;
 
   return (
     <DataTableShell
@@ -73,11 +76,7 @@ export const PendingInvitesTable = ({
                 tenantId={tenantId}
                 inviteId={inviteId}
                 email={email}
-                returnFocusId={
-                  hasArrayGotMultipleItems(invites)
-                    ? TEAM_INVITES_HEADING_ID
-                    : TEAM_MEMBERS_HEADING_ID
-                }
+                returnFocusId={returnFocusId}
               />
             </DataTableShell.Cell>
           </DataTableShell.Row>

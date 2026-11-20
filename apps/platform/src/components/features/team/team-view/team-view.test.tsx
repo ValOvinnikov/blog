@@ -18,6 +18,7 @@ import {
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { ACTION_OUTCOME } from '@shinefold/config';
 import { STUDIO_ACCESS, TENANT_PLAN } from '@shinefold/config/constants';
+import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TeamView } from './team-view';
@@ -39,6 +40,8 @@ vi.mock('@platform/server/owner-access/resend-owner-invite-action');
 const INVITE_EDITOR = 'Invite editor';
 const PENDING_INVITES = 'Pending invites';
 const SEAT_LIMIT_TITLE = 'Every seat is in use';
+const MOCK_READER_EMAIL = 'reader@example.com';
+const MOCK_PENDING_EMAIL = 'pending@example.com';
 
 const setup = customRender(TeamView, {
   tenantId: MOCK_TENANT_ID,
@@ -119,27 +122,73 @@ describe(`<${TeamView.name}/>`, () => {
     expect(note).not.toBeInTheDocument();
   });
 
-  it("marks your own row, offers Remove where allowed and explains each row's access", () => {
-    setup({
-      team: mockTeamViewModel({
-        hasEditor: true,
-        members: [
-          mockTeamOwnerRow(),
-          mockTeamMemberRow({ access: TEAM_ROW_ACCESS.LOCKED }),
-        ],
-      }),
+  describe('with a locked, a reader and a pending member', () => {
+    beforeEach(() => {
+      setup({
+        team: mockTeamViewModel({
+          hasEditor: true,
+          members: [
+            mockTeamOwnerRow(),
+            mockTeamMemberRow({ access: TEAM_ROW_ACCESS.LOCKED }),
+            mockTeamMemberRow({
+              membershipId: 'reader',
+              email: MOCK_READER_EMAIL,
+              role: MEMBERSHIP_ROLE.READER,
+              access: TEAM_ROW_ACCESS.NO_ACCESS,
+              canRemove: false,
+            }),
+            mockTeamMemberRow({
+              membershipId: 'pending',
+              email: MOCK_PENDING_EMAIL,
+              access: STUDIO_ACCESS.INVITE_SENT,
+              canRemove: false,
+            }),
+          ],
+        }),
+      });
     });
 
-    const you = screen.getByText('(you)');
-    const removeButtons = screen.getAllByRole('button', { name: /^Remove/ });
-    const removeMember = screen.getByRole('button', {
-      name: `Remove ${MOCK_MEMBER_EMAIL}`,
-    });
-    const lockedHint = screen.getByText("Over your plan's seats");
+    it('marks your own row and offers Remove only where allowed', () => {
+      const you = screen.getByText('(you)');
+      const removeButtons = screen.getAllByRole('button', { name: /^Remove/ });
+      const removeMember = screen.getByRole('button', {
+        name: `Remove ${MOCK_MEMBER_EMAIL}`,
+      });
 
-    expect(you).toBeVisible();
-    expect(removeButtons).toEqual([removeMember]);
-    expect(lockedHint).toBeVisible();
+      expect(you).toBeVisible();
+      expect(removeButtons).toEqual([removeMember]);
+    });
+
+    it('shows a locked row as Locked over the seats', () => {
+      const lockedBadge = screen.getByText('Locked');
+      const lockedHint = screen.getByText("Over your plan's seats");
+
+      expect(lockedBadge).toBeVisible();
+      expect(lockedHint).toBeVisible();
+    });
+
+    it('shows a reader no badge, only "No Studio access"', () => {
+      const readerRow = screen
+        .getAllByRole('row')
+        .find((row) => within(row).queryByText(MOCK_READER_EMAIL));
+      const hint = within(readerRow!).getByText('No Studio access');
+      const badges = within(readerRow!).queryAllByText(
+        /Ready|Invite sent|Locked/,
+      );
+
+      expect(hint).toBeVisible();
+      expect(badges).toEqual([]);
+    });
+
+    it('shows a pending row its badge but no Check now or Resend when not allowed', () => {
+      const badge = screen.getByText('Invite sent');
+      const checkNow = screen.queryByRole('button', { name: /^Check now/ });
+      const resend = screen.queryByRole('button', { name: /^Resend invite/ });
+
+      expect(badge).toBeVisible();
+      expect(checkNow).not.toBeInTheDocument();
+      expect(resend).not.toBeInTheDocument();
+    });
   });
 
   it("checks a member's Studio access and names them in the toast", async () => {

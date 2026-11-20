@@ -1,7 +1,7 @@
 import { TEAM_COLUMN } from '@platform/constants/team-access';
 import { useTranslations } from 'next-intl';
 
-import { useTeamTableColumnsVariants } from './use-team-table-columns-variants';
+import { teamTableColumnsVariants } from './use-team-table-columns-variants';
 
 const PERSON_SHARE = 1.5;
 const ACCESS_SHARE = 1.7;
@@ -27,9 +27,7 @@ export const useTeamTableColumns = () => {
     {
       key: TEAM_COLUMN.ACTIONS,
       label: (
-        <span className={useTeamTableColumnsVariants()}>
-          {t('columnActions')}
-        </span>
+        <span className={teamTableColumnsVariants()}>{t('columnActions')}</span>
       ),
       width: '128px' as const,
     },

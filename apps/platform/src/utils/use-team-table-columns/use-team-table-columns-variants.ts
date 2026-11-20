@@ -1,5 +1,5 @@
 import { tv } from '@platform/utils/tv/tv';
 
-export const useTeamTableColumnsVariants = tv({
+export const teamTableColumnsVariants = tv({
   base: ['sr-only'],
 });
