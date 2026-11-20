@@ -14,7 +14,6 @@ export interface IModuleHeadingProps {
   id: string;
   level: THeadingLevel;
   align?: TContentAlignment;
-  variant?: 'section';
 }
 
 export const ModuleHeading = ({

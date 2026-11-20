@@ -44,7 +44,6 @@ export const SectionPagesModuleView = ({
           id={titleId}
           level={2}
           align={contentAlignment}
-          variant="section"
         />
       )}
       <CardGrid columns={columns}>

@@ -5,6 +5,7 @@ import {
 } from '@shinefold/config';
 import type { TTimelineModule } from '@shinefold/service';
 import { Timeline } from '@shinefold/ui/components/organisms/timeline';
+import { hasLength } from '@shinefold/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { PortableText } from '@web/components/shared/portable-text';
@@ -50,7 +51,6 @@ export const TimelineModuleView = ({
           id={titleId}
           level={2}
           align={contentAlignment}
-          variant="section"
         />
         <Timeline
           orientation={orientation}
@@ -85,7 +85,7 @@ export const TimelineModuleView = ({
             );
           })}
         </Timeline>
-        {ctaButtons.length > 0 && (
+        {hasLength(ctaButtons) && (
           <div className={actions.actions()}>
             <ActionGroup actions={ctaButtons} />
           </div>

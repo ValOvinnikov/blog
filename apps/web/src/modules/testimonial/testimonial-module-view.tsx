@@ -72,7 +72,6 @@ export const TestimonialModuleView = ({
         id={titleId}
         level={2}
         align={contentAlignment}
-        variant="section"
       />
       {isSpotlight && spotlightItem ? (
         <TestimonialCard
