@@ -26,12 +26,27 @@ const MOCK_PATH = `/${faker.lorem.slug()}`;
 describe(fetchGitHub, () => {
   const github = useGitHubFetch();
 
-  it('returns the response for a 2xx', async () => {
-    github.respond(MOCK_PATH, () => mockGitHubResponse({}));
+  describe('for a 2xx', () => {
+    beforeEach(() => {
+      github.respond(MOCK_PATH, () => mockGitHubResponse({}));
+    });
 
-    const result = await fetchGitHub(MOCK_PATH);
+    it('returns the response', async () => {
+      const result = await fetchGitHub(MOCK_PATH);
 
-    expect(result.ok).toBe(true);
+      expect(result.ok).toBe(true);
+    });
+
+    it('caches the read for the window it is given', async () => {
+      const revalidate = faker.number.int({ min: 1, max: 600 });
+
+      await fetchGitHub(MOCK_PATH, revalidate);
+
+      expect(github.fetchMock).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ next: { revalidate } }),
+      );
+    });
   });
 
   it('returns NOT_CONFIGURED without calling GitHub when no token is set', async () => {
@@ -111,22 +126,6 @@ describe(fetchGitHub, () => {
       path: MOCK_PATH,
       errorName: thrown.name,
     });
-  });
-});
-
-describe(`${fetchGitHub.name} caching`, () => {
-  const github = useGitHubFetch();
-
-  it('caches a read for the window it is given', async () => {
-    const revalidate = faker.number.int({ min: 1, max: 600 });
-    github.respond(MOCK_PATH, () => mockGitHubResponse({}));
-
-    await fetchGitHub(MOCK_PATH, revalidate);
-
-    expect(github.fetchMock).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({ next: { revalidate } }),
-    );
   });
 });
 

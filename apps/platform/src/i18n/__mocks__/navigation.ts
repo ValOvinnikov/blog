@@ -1,5 +1,6 @@
 import { DATA_PREFETCH_ATTRIBUTE } from '@platform/testing/navigation';
 import { createRouterStub } from '@platform/testing/router-stub';
+import type { TNullable } from '@shinefold/config';
 import { type ComponentPropsWithoutRef, createElement } from 'react';
 
 export const Link = ({
@@ -7,7 +8,10 @@ export const Link = ({
   children,
   prefetch,
   ...rest
-}: ComponentPropsWithoutRef<'a'> & { href: string; prefetch?: boolean }) =>
+}: ComponentPropsWithoutRef<'a'> & {
+  href: string;
+  prefetch?: TNullable<boolean>;
+}) =>
   createElement(
     'a',
     { href, [DATA_PREFETCH_ATTRIBUTE]: prefetch, ...rest },
