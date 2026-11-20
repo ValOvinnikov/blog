@@ -1,3 +1,7 @@
+import {
+  PORTABLE_TEXT_BLOCK_TYPE,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 import type {
   ArticleText,
   Page_legalIndex,
@@ -5,11 +9,6 @@ import type {
   Template_legalIndex,
   Template_privacyIndex,
 } from '@shinefold/config/sanity/generated/types';
-
-import {
-  PORTABLE_TEXT_BLOCK_TYPE,
-  type TLocaleIsoCode,
-} from '@shinefold/config/constants';
 
 import {
   buildCookieStatementDocument,

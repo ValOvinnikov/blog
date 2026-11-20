@@ -1,9 +1,8 @@
+import { BRAND_VARIANT } from '@shinefold/config/constants';
 import type {
   Block_faq,
   Module_faq,
 } from '@shinefold/config/sanity/generated/types';
-
-import { BRAND_VARIANT } from '@shinefold/config/constants';
 
 import type {
   TStarterDocument,

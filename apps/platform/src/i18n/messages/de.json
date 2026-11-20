@@ -539,7 +539,11 @@
       "PLAN": "Tarif: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
       "PLAN_CHANGED": "Tarif: {from} → {to}",
       "SIGN_IN_PROVIDER": "Anmeldeanbieter: {provider, select, google {Google} github {GitHub} other {{provider}}}",
-      "CLIENT_SECRET_REPLACED": "Client-Geheimnis ersetzt"
+      "CLIENT_SECRET_REPLACED": "Client-Geheimnis ersetzt",
+      "GRANT_ITEM": "Element: {item}",
+      "GRANT_EXPIRY": "Bis {date}",
+      "GRANT_UNTIL_REVOKED": "Bis zum Widerruf",
+      "GRANT_NOTE": "Notiz: {note}"
     }
   },
   "tenantDomainPage": {
@@ -2447,6 +2451,7 @@
   },
   "grantItemNames": {
     "languages": "{count, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}",
+    "additionalLanguages": "Zusätzliche Sprachen",
     "modulePack": {
       "CORE": "Core-Module",
       "STARTER": "Starter-Module",

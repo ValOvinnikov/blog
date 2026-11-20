@@ -539,7 +539,11 @@
       "PLAN": "Abonnement: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
       "PLAN_CHANGED": "Abonnement: {from} → {to}",
       "SIGN_IN_PROVIDER": "Aanmeldprovider: {provider, select, google {Google} github {GitHub} other {{provider}}}",
-      "CLIENT_SECRET_REPLACED": "Clientgeheim vervangen"
+      "CLIENT_SECRET_REPLACED": "Clientgeheim vervangen",
+      "GRANT_ITEM": "Item: {item}",
+      "GRANT_EXPIRY": "Tot {date}",
+      "GRANT_UNTIL_REVOKED": "Tot intrekking",
+      "GRANT_NOTE": "Notitie: {note}"
     }
   },
   "tenantDomainPage": {
@@ -2447,6 +2451,7 @@
   },
   "grantItemNames": {
     "languages": "{count, plural, one {# extra taal} other {# extra talen}}",
+    "additionalLanguages": "Extra talen",
     "modulePack": {
       "CORE": "Core-modules",
       "STARTER": "Starter-modules",

@@ -539,7 +539,11 @@
       "PLAN": "Plan: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
       "PLAN_CHANGED": "Plan: {from} → {to}",
       "SIGN_IN_PROVIDER": "Sign-in provider: {provider, select, google {Google} github {GitHub} other {{provider}}}",
-      "CLIENT_SECRET_REPLACED": "Client secret replaced"
+      "CLIENT_SECRET_REPLACED": "Client secret replaced",
+      "GRANT_ITEM": "Item: {item}",
+      "GRANT_EXPIRY": "Until {date}",
+      "GRANT_UNTIL_REVOKED": "Until revoked",
+      "GRANT_NOTE": "Note: {note}"
     }
   },
   "tenantDomainPage": {
@@ -2447,6 +2451,7 @@
   },
   "grantItemNames": {
     "languages": "{count, plural, one {# additional language} other {# additional languages}}",
+    "additionalLanguages": "Additional languages",
     "modulePack": {
       "CORE": "Core modules",
       "STARTER": "Starter modules",

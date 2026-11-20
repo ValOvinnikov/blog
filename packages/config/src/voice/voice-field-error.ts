@@ -2,7 +2,6 @@ import type {
   TFieldErrorsByLocale,
   TReasonedFailure,
 } from '@shinefold/config/types';
-
 import type { TValueOf } from '@shinefold/config/utils';
 
 import type { TVoiceFieldId } from './voice-fields';

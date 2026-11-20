@@ -1,6 +1,5 @@
-import { readThemeDeclarations } from '@shinefold/config/testing/theme-css';
-
 import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config/constants';
+import { readThemeDeclarations } from '@shinefold/config/testing/theme-css';
 
 import { DIVIDER_WIDTH_DECLARATIONS } from './divider-declarations';
 import {

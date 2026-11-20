@@ -1,5 +1,10 @@
-import type { IWithDataTestId } from '@shinefold/config';
+import {
+  DIV_AS_CONST,
+  type IWithDataTestId,
+  TEXT_ROLE,
+} from '@shinefold/config';
 import type { TFaqModule } from '@shinefold/service';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import { Accordion } from '@shinefold/ui/components/organisms/accordion';
 import { ModuleActions } from '@web/components/shared/module-actions';
 import { ModuleSection } from '@web/components/shared/module-section';
@@ -42,7 +47,9 @@ export const FaqModuleView = ({
             <Accordion.Item key={question.id}>
               <Accordion.Trigger>{question.question}</Accordion.Trigger>
               <Accordion.Panel>
-                <PortableText value={question.answer} />
+                <Text as={DIV_AS_CONST} textRole={TEXT_ROLE.CARD_BODY}>
+                  <PortableText value={question.answer} />
+                </Text>
               </Accordion.Panel>
             </Accordion.Item>
           ))}

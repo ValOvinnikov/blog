@@ -422,9 +422,12 @@
 
   --font-weight-platform-650: 650;
 
+  --border-width-platform-strong: 1.5px;
+
   /* Clears the sticky topbar for sticky panels and scroll targets. */
   --spacing-platform-topbar: var(--platform-topbar);
   --spacing-platform-card: 18px;
+  --spacing-platform-cell-inset: 14px;
   --spacing-platform-hue-readout: 62px;
   --spacing-platform-bar: 3px;
   --spacing-platform-view-tab: var(--platform-view-tab);

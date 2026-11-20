@@ -3,6 +3,7 @@ import type {
   PortableTextMarkDefinition,
   PortableTextSpan,
 } from '@portabletext/types';
+
 import type { ILink } from '@shinefold/config/client/objects';
 import type { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config/constants/portable-text-block-type';
 import type { TMaybeUndefined } from '@shinefold/config/types';

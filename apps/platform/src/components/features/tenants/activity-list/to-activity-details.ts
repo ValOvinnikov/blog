@@ -1,49 +1,27 @@
+import type { TActivityDetail } from '@platform/components/features/tenants/activity-list/activity-detail';
+import { toGrantActivityDetails } from '@platform/components/features/tenants/activity-list/to-grant-activity-details';
 import { ACTIVITY_DETAIL } from '@platform/constants/activity';
-import {
-  TENANT_DETAILS_FIELD,
-  type TTenantDetailsField,
-} from '@platform/constants/tenant';
+import { TENANT_DETAILS_FIELD } from '@platform/constants/tenant';
 import {
   AUDIT_ACTION,
   LOCALE_ISO_CODES,
   type TAuditAction,
-  type TLocaleIsoCode,
   type TMaybeNull,
 } from '@shinefold/config';
+import { OAUTH_PROVIDER, TENANT_PLAN } from '@shinefold/config/constants';
+import { SUSPENSION_CATEGORY } from '@shinefold/db/constants';
 import {
-  OAUTH_PROVIDER,
-  type TOAuthProvider,
-  TENANT_PLAN,
-  type TTenantPlan,
-} from '@shinefold/config/constants';
-import {
-  SUSPENSION_CATEGORY,
-  type TSuspensionCategory,
-} from '@shinefold/db/constants';
-import { hasArrayGotItems, hasLength } from '@shinefold/utils/primitives';
+  hasArrayGotItems,
+  hasLength,
+  isOneOf,
+} from '@shinefold/utils/primitives';
 import { z } from 'zod';
 
 const D = ACTIVITY_DETAIL;
-
-export type TActivityDetail =
-  | { kind: typeof D.CHANGED_FIELDS; fields: readonly TTenantDetailsField[] }
-  | {
-      kind:
-        | typeof D.STUDIO_INVITE_SENT
-        | typeof D.STUDIO_INVITE_UNSENT
-        | typeof D.CLIENT_SECRET_REPLACED;
-    }
-  | { kind: typeof D.MAIN_ADDRESS_CHANGED; from: string; to: string }
-  | {
-      kind: typeof D.CUSTOM_DOMAIN_REQUESTED | typeof D.CUSTOM_DOMAIN_REMOVED;
-      domain: string;
-    }
-  | { kind: typeof D.ADDITIONAL_LANGUAGES; locales: TLocaleIsoCode[] }
-  | { kind: typeof D.SUSPENSION_REASON; category: TSuspensionCategory }
-  | { kind: typeof D.SUSPENSION_REFERENCE; reference: string }
-  | { kind: typeof D.PLAN; plan: TTenantPlan }
-  | { kind: typeof D.PLAN_CHANGED; from: TTenantPlan; to: TTenantPlan }
-  | { kind: typeof D.SIGN_IN_PROVIDER; provider: TOAuthProvider };
+const GRANT_AUDIT_ACTIONS = [
+  AUDIT_ACTION.ENTITLEMENT_GRANTED,
+  AUDIT_ACTION.ENTITLEMENT_REVOKED,
+];
 
 const optional = <T extends z.ZodType>(schema: T) =>
   schema.optional().catch(undefined);
@@ -70,6 +48,10 @@ export const toActivityDetails = (
   action: TAuditAction,
   details: TMaybeNull<Record<string, unknown>>,
 ): TActivityDetail[] => {
+  if (isOneOf(GRANT_AUDIT_ACTIONS, action)) {
+    return toGrantActivityDetails(details);
+  }
+
   const {
     changedFields,
     studioReinviteRequested,

@@ -1,6 +1,5 @@
-import type { Module_heroStatement } from '@shinefold/config/sanity/generated/types';
-
 import { BRAND_VARIANT, HERO_VARIANT } from '@shinefold/config/constants';
+import type { Module_heroStatement } from '@shinefold/config/sanity/generated/types';
 
 import type { TStarterModule } from './starter-document';
 import { localizedString, moduleHeadingBlock } from './starter-fields';

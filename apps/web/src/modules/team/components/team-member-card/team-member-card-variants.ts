@@ -6,8 +6,6 @@ export const teamMemberCardVariants = tv({
     card: [],
     media: [],
     image: ['size-full object-cover'],
-    role: ['text-sm text-subtle'],
-    bio: ['text-base text-muted'],
   },
   variants: {
     shape: {
