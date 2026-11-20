@@ -10,7 +10,7 @@ import type { TSubscriptionPlan } from './load-subscription-plan';
 import type { TTargetPrices } from './schedule-change-at-renewal';
 import { subscriptionItemsFor } from './subscription-items';
 
-export type TPaymentCard = { brand: string; last4: string };
+type TPaymentCard = { brand: string; last4: string };
 
 export type TMoveUpPreview = {
   dueToday: TStripeAmount;

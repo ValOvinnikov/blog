@@ -1,3 +1,4 @@
+import { MoveUpBand } from '@platform/components/features/upgrade/move-up-band';
 import { UPGRADE_POLL } from '@platform/constants/billing';
 import {
   PLAN_CHANGE_REFUSAL,
@@ -30,8 +31,6 @@ import { errorResult } from '@shinefold/utils';
 import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
-
-import { MoveUpBand } from './move-up-band';
 
 vi.mock('@platform/i18n/navigation');
 

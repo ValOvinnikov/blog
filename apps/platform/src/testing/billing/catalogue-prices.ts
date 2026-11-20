@@ -10,7 +10,7 @@ import { MOCK_STRIPE_PRODUCT_ID } from '@shinefold/db/testing/stripe-catalogue/f
 export const MOCK_GROWTH_MONTHLY_AMOUNT = 2_900;
 export const MOCK_BAND_2500_AMOUNT = 1_500;
 export const MOCK_BAND_5000_AMOUNT = 3_500;
-export const MOCK_GROWTH_YEARLY_AMOUNT = 29_000;
+const MOCK_GROWTH_YEARLY_AMOUNT = 29_000;
 export const MOCK_BAND_2500_YEARLY_AMOUNT = 15_000;
 
 const mockCataloguePrice = (
