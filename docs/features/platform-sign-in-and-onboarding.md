@@ -64,7 +64,10 @@ site as a 14-day Growth trial, with no card.
   so a crafted `callbackUrl` falls back to `/`. Auth.js's own
   `/api/auth/signin` redirects here.
 - Auth.js sends a sign-in failure back to `/sign-in?error=…`.
-  `OAuthAccountNotLinked` (the email already signs in with another provider)
+  Google and GitHub join an existing account with the same email when the
+  provider has verified it ([reader-auth](./reader-auth.md)), so an owner or
+  editor who first signed in by email link gets back in with either.
+  `OAuthAccountNotLinked` (now only a provider email that is not verified)
   gets its own message; any other error a general one.
 - `/signup?promo=<code>` (the marketing pricing page's tier actions) keeps
   the code for the visitor's first Checkout in the `platform-signup-promo`
