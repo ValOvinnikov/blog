@@ -40,6 +40,10 @@ vi.mock('@shinefold/db', async () => ({
   },
 }));
 
+vi.mock('@platform/server/usage/load-usage-meters');
+
+vi.mock('@platform/utils/env/env');
+
 vi.mock('@platform/server/provisioning/get-domain-verification-status', () => ({
   getDomainVerificationStatus: getDomainVerificationStatusMock,
 }));
