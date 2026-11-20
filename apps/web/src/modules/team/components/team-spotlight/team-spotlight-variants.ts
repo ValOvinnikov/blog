@@ -7,6 +7,7 @@ export const teamSpotlightVariants = tv({
       'lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-center lg:gap-12',
     ],
     media: ['mx-auto w-48 overflow-hidden sm:w-64 lg:mx-0 lg:w-full'],
+    image: ['size-full object-cover'],
     fallback: ['size-full text-5xl sm:text-6xl'],
     text: ['flex flex-col items-start gap-3 text-left'],
     bio: ['mt-1'],

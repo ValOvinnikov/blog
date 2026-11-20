@@ -1,3 +1,4 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import type { TPricingModule } from '@shinefold/service';
 import { Text } from '@shinefold/ui/components/atoms/text';
 import { PricingCardGrid } from '@shinefold/ui/components/organisms/pricing-card-grid';
@@ -90,7 +91,6 @@ export const PricingModuleView = ({
         id={titleId}
         level={2}
         align={contentAlignment}
-        variant="section"
       />
       {hasLivePrice ? (
         <PromotionCodeProvider>{tiers}</PromotionCodeProvider>
@@ -98,7 +98,7 @@ export const PricingModuleView = ({
         tiers
       )}
       {footnote && (
-        <Text variant="footnote" className={v.footnote()}>
+        <Text textRole={TEXT_ROLE.FOOTNOTE} className={v.footnote()}>
           {footnote}
         </Text>
       )}

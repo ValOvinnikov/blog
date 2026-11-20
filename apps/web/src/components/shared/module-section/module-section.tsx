@@ -40,7 +40,6 @@ export const ModuleSection = ({
         id={titleId}
         level={2}
         align={contentAlignment}
-        variant="section"
       />
       {children}
     </Section>
