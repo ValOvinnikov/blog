@@ -121,7 +121,7 @@ describe(grantEntitlementAction, () => {
     expect(recordAuditEvent).not.toHaveBeenCalled();
   });
 
-  it('writes the grant as the super admin, revalidates the site, audits it and emails the owner once', async () => {
+  it('writes, revalidates, audits and emails the owner once', async () => {
     const result = await grant();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -278,7 +278,7 @@ describe(grantEntitlementAction, () => {
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
   });
 
-  it('audits the language grant a raise closed as revoked, then the new grant, and emails the owner only about the new grant', async () => {
+  it('audits a raise as revoked plus granted, emailing only the new grant', async () => {
     const raised = mockEntitlementGrantRow({
       kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
       key: ENTITLEMENT_KIND.LOCALE_LIMIT,

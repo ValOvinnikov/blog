@@ -64,7 +64,7 @@ describe(revokeEntitlementGrantAction, () => {
     expect(revokeEntitlementGrant).not.toHaveBeenCalled();
   });
 
-  it('closes the grant as the super admin, revalidates the site, audits it and hands it to the owner email once', async () => {
+  it('closes, revalidates, audits and emails the owner once', async () => {
     const result = await revoke();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
