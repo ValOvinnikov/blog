@@ -5,19 +5,21 @@ import { screen, waitFor } from '@platform/testing/custom-render';
 import {
   BLANK_SENDER_INPUT,
   cleanUpEmailSettings,
-  getEditingPicker,
   MOCK_INITIAL_DRAFT,
   MOCK_INVALID_SENDER_NAME,
-  pickerText,
   prepareEmailSettings,
-  save,
-  selectSenderLogo,
   SENDER_NAME,
   setupEmailSettings,
   tStatus,
   updateEmailConfigActionMock,
   uploadEmailLogoActionMock,
 } from '@platform/testing/email/email-settings';
+import {
+  getEditingPicker,
+  pickerText,
+  save,
+  selectSenderLogo,
+} from '@platform/testing/email/email-settings-interactions';
 import {
   MOCK_TENANT_LOGO_TARGET,
   SEND_CONTACT_MESSAGES_TO,

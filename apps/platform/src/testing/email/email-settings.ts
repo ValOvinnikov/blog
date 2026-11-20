@@ -3,7 +3,7 @@ import en from '@platform/i18n/messages/en.json';
 import { uploadEmailLogoAction } from '@platform/server/email/upload-email-logo-action';
 import { updateEmailConfigAction } from '@platform/server/email-config/update-email-config-action';
 import { updateEmailTemplateAction } from '@platform/server/email-templates/update-email-template-action';
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import { customRender } from '@platform/testing/custom-render';
 import {
   mockEmailDraft,
   MOCK_EMAIL_DRAFT_LIVE_LOCALES,
@@ -11,31 +11,17 @@ import {
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import {
-  SAVE_CHANGES,
-  UNSAVED_CHANGES,
-} from '@platform/testing/render-in-settings-form';
-import { selectFile } from '@platform/testing/select-file';
-import { MOCK_STAGED_LOGO_BLOB_URL } from '@platform/testing/site-config/fixtures';
+import { stubStagedImageUrl } from '@platform/testing/staged-image';
 import { MOCK_TENANT_EMAIL_BRAND } from '@platform/testing/tenant-email-brand';
 import {
   MOCK_TENANT_NAME,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
-import {
-  EMAIL_SENDER_ITEM,
-  type TEmailPageItem,
-} from '@platform/utils/email-draft/email-draft';
-import {
-  EMAIL_TEMPLATE_TYPE,
-  LOCALE_ISO_CODES,
-  type TEmailTemplateType,
-  type TLocaleIsoCode,
-} from '@shinefold/config';
-import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@shinefold/config';
+import userEvent from '@testing-library/user-event';
 
 const { EN, FR } = LOCALE_ISO_CODES;
-const emailSettingsFaker = createMockFaker(5993);
+export const emailSettingsFaker = createMockFaker(5993);
 
 export const tForm = en.emailForm;
 export const tTemplate = en.emailTemplateEditor;
@@ -77,76 +63,11 @@ export const prepareEmailSettings = () => {
   updateEmailTemplateActionMock.mockReset();
   updateEmailConfigActionMock.mockReset();
   uploadEmailLogoActionMock.mockReset();
-  vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
+  stubStagedImageUrl();
   return { user: userEvent.setup(), refresh: mockRouterRefresh() };
 };
 
 export const cleanUpEmailSettings = () => {
   vi.restoreAllMocks();
   window.localStorage.clear();
-};
-
-const itemLabel = (item: TEmailPageItem) =>
-  item === EMAIL_SENDER_ITEM
-    ? tForm.senderItemLabel
-    : tTemplate.templateTypeLabel[item];
-
-const itemDescription = (item: TEmailPageItem) =>
-  item === EMAIL_SENDER_ITEM
-    ? tForm.senderItemDescription
-    : tTemplate.templateTypeDescription[item];
-
-export const pickerText = (item: TEmailPageItem, status: string) =>
-  item === EMAIL_SENDER_ITEM
-    ? `${itemLabel(item)}${status}`
-    : `${itemLabel(item)}${tForm.templateGroupLabel} · ${status}`;
-
-export const optionName = (item: TEmailPageItem, status: string) =>
-  `${itemLabel(item)} ${itemDescription(item)}${status}`;
-
-export const getEditingPicker = () =>
-  screen.getByRole('combobox', { name: tForm.editingLabel });
-
-export const getSaveBar = () =>
-  screen.getByRole('region', { name: UNSAVED_CHANGES });
-
-export const openPicker = async (user: UserEvent) => {
-  const editingPicker = getEditingPicker();
-  await user.click(editingPicker);
-  return screen.findByRole('listbox');
-};
-
-export const openTemplate = async (
-  user: UserEvent,
-  item: TEmailTemplateType,
-) => {
-  const list = await openPicker(user);
-  const option = within(list).getByRole('option', {
-    name: new RegExp(`^${itemLabel(item)}`),
-  });
-  await user.click(option);
-};
-
-export const chooseLanguage = (user: UserEvent, name: string) => {
-  const languageRadio = screen.getByRole('radio', { name });
-  return user.click(languageRadio);
-};
-
-export const typeFrenchSignInSubject = async (user: UserEvent) => {
-  await openTemplate(user, EMAIL_TEMPLATE_TYPE.MAGIC_LINK);
-  await chooseLanguage(user, FRENCH);
-  const frenchSubjectInput = screen.getByLabelText(SUBJECT_FRENCH);
-  await user.type(frenchSubjectInput, MOCK_FRENCH_SUBJECT);
-};
-
-export const selectSenderLogo = () =>
-  selectFile(
-    new File(['x'], emailSettingsFaker.system.commonFileName('png'), {
-      type: 'image/png',
-    }),
-  );
-
-export const save = async (user: UserEvent) => {
-  const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-  await user.click(saveButton);
 };

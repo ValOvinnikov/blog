@@ -20,19 +20,19 @@ import {
   pickAndSaveLogo,
   pickLogo,
 } from '@platform/testing/look/look-form-interactions';
-import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import {
+  prepareBrandImageForm,
+  setupLookForm,
+} from '@platform/testing/look/look-form-setup';
 import {
   GO_TO_THE_FIRST_ONE,
   ONE_FIELD_NEEDS_ATTENTION,
   SAVE_CHANGES,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
-import {
-  MOCK_STAGED_LOGO_BLOB_URL,
-  REPLACE_LOGO,
-} from '@platform/testing/site-config/fixtures';
+import { REPLACE_LOGO } from '@platform/testing/site-config/fixtures';
 import { ACTION_OUTCOME } from '@shinefold/config';
-import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
 
@@ -54,9 +54,7 @@ describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {
-    user = userEvent.setup();
-    vi.mocked(uploadBrandAssetAction).mockReset();
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
+    user = prepareBrandImageForm();
   });
 
   afterEach(() => {

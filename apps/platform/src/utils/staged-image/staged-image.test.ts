@@ -1,12 +1,15 @@
 import { faker } from '@faker-js/faker';
 import { UPLOAD_OPERATION, UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { MOCK_STAGED_LOGO_BLOB_URL } from '@platform/testing/site-config/fixtures';
+import { stubStagedImageUrl } from '@platform/testing/staged-image';
 import { ACTION_OUTCOME } from '@shinefold/config';
+import type { Mock } from 'vitest';
 
 import {
   createStagingHandlers,
   isSameStagedImage,
   persistStagedImage,
+  type TStagedImage,
 } from './staged-image';
 
 faker.seed(6006);
@@ -115,8 +118,11 @@ describe(isSameStagedImage, () => {
 });
 
 describe(createStagingHandlers, () => {
+  let onStage: Mock<(image: TStagedImage) => void>;
+
   beforeEach(() => {
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
+    onStage = vi.fn();
+    stubStagedImageUrl();
   });
 
   afterEach(() => {
@@ -124,7 +130,6 @@ describe(createStagingHandlers, () => {
   });
 
   it('stages a picked file with a local preview url', () => {
-    const onStage = vi.fn();
     const { onPick } = createStagingHandlers(onStage);
 
     onPick(MOCK_FILE);
@@ -136,7 +141,6 @@ describe(createStagingHandlers, () => {
   });
 
   it('stages an empty image when cleared', () => {
-    const onStage = vi.fn();
     const { onClear } = createStagingHandlers(onStage);
 
     onClear();

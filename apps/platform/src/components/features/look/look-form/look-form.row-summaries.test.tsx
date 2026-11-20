@@ -13,7 +13,7 @@ import {
   pickLogo,
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
-import { MOCK_STAGED_LOGO_BLOB_URL } from '@platform/testing/site-config/fixtures';
+import { stubStagedImageUrl } from '@platform/testing/staged-image';
 import { LOCALE_ISO_CODES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -32,7 +32,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
+    stubStagedImageUrl();
   });
 
   afterEach(() => {

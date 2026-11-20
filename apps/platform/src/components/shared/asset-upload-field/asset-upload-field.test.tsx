@@ -15,12 +15,15 @@ import {
   REPLACE_LOGO,
   UPLOAD_LOGO,
 } from '@platform/testing/site-config/fixtures';
+import { stubStagedImageUrl } from '@platform/testing/staged-image';
 import {
   ACCEPTED_IMAGE_MIME_TYPES,
   brandAssetKindSchema,
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { SIZE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { AssetUploadField, type TAssetUploadSpec } from './asset-upload-field';
 
@@ -65,10 +68,12 @@ const setup = customRender(AssetUploadField, {
 
 describe(`<${AssetUploadField.name}/>`, () => {
   let user: UserEvent;
+  let onStage: Mock<(image: TStagedImage) => void>;
 
   beforeEach(() => {
     user = userEvent.setup();
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
+    onStage = vi.fn();
+    stubStagedImageUrl();
   });
 
   afterEach(() => {
@@ -87,18 +92,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
     expect(removeButton).not.toBeInTheDocument();
   });
 
-  it('shows the thumbnail and a remove control once a value is set', () => {
-    setup({ image: { url: MOCK_LOGO_URL } });
-
-    const thumbnail = screen.getByAltText(CURRENT_LOGO);
-    const removeButton = screen.getByRole('button', { name: REMOVE });
-
-    expect(thumbnail).toBeVisible();
-    expect(removeButton).toBeVisible();
-  });
-
   it('shows a rejected file’s message without staging it', async () => {
-    const onStage = vi.fn();
     setup({ asset: MOCK_REJECTING_ASSET, onStage });
 
     await selectFile(mockPngFile());
@@ -110,7 +104,6 @@ describe(`<${AssetUploadField.name}/>`, () => {
   });
 
   it('stages a chosen file with a local preview URL', async () => {
-    const onStage = vi.fn();
     const file = mockPngFile();
     setup({ onStage });
 
@@ -123,7 +116,6 @@ describe(`<${AssetUploadField.name}/>`, () => {
   });
 
   it('stages a removal when remove is clicked', async () => {
-    const onStage = vi.fn();
     setup({ image: { url: MOCK_LOGO_URL }, onStage });
 
     const removeButton = screen.getByRole('button', { name: REMOVE });
@@ -148,16 +140,6 @@ describe(`<${AssetUploadField.name}/>`, () => {
       `${hint.id} ${ARCHIVED_NOTICE_ID}`,
     );
     expect(removeButton).toBeDisabled();
-  });
-
-  it('describes the upload and remove controls with the hint', () => {
-    setup({ image: { url: MOCK_LOGO_URL } });
-
-    const uploadButton = screen.getByRole('button', { name: REPLACE_LOGO });
-    const removeButton = screen.getByRole('button', { name: REMOVE });
-
-    expect(uploadButton).toHaveAccessibleDescription(MOCK_HINT);
-    expect(removeButton).toHaveAccessibleDescription(MOCK_HINT);
   });
 
   it('announces a rejected file and describes the upload control with it', async () => {
@@ -189,7 +171,31 @@ describe(`<${AssetUploadField.name}/>`, () => {
     expect(alert).not.toBeInTheDocument();
   });
 
+  describe('with a value set', () => {
+    beforeEach(() => {
+      setup({ image: { url: MOCK_LOGO_URL } });
+    });
+
+    it('shows the thumbnail and a remove control once a value is set', () => {
+      const thumbnail = screen.getByAltText(CURRENT_LOGO);
+      const removeButton = screen.getByRole('button', { name: REMOVE });
+
+      expect(thumbnail).toBeVisible();
+      expect(removeButton).toBeVisible();
+    });
+
+    it('describes the upload and remove controls with the hint', () => {
+      const uploadButton = screen.getByRole('button', { name: REPLACE_LOGO });
+      const removeButton = screen.getByRole('button', { name: REMOVE });
+
+      expect(uploadButton).toHaveAccessibleDescription(MOCK_HINT);
+      expect(removeButton).toHaveAccessibleDescription(MOCK_HINT);
+    });
+  });
+
   describe('in the bare row layout', () => {
+    const file = mockPngFile();
+
     it('shows the image and both controls, named for the asset', () => {
       setup({ asset: MOCK_BARE_ASSET, image: { url: MOCK_LOGO_URL } });
 
@@ -215,7 +221,6 @@ describe(`<${AssetUploadField.name}/>`, () => {
     });
 
     it('shows no title, file name or hint', () => {
-      const file = mockPngFile();
       setup({
         asset: MOCK_BARE_ASSET,
         image: { url: MOCK_STAGED_LOGO_BLOB_URL, file },
@@ -231,8 +236,6 @@ describe(`<${AssetUploadField.name}/>`, () => {
     });
 
     it('stages a chosen file', async () => {
-      const onStage = vi.fn();
-      const file = mockPngFile();
       setup({ asset: MOCK_BARE_ASSET, onStage });
 
       await selectFile(file);
@@ -244,7 +247,6 @@ describe(`<${AssetUploadField.name}/>`, () => {
     });
 
     it('stages a removal from its remove control', async () => {
-      const onStage = vi.fn();
       setup({
         asset: MOCK_BARE_ASSET,
         image: { url: MOCK_LOGO_URL },
