@@ -3,6 +3,7 @@
 import { useTenantOverviewFocus } from '@platform/components/features/tenants/tenant-overview-focus-provider';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { useToast } from '@platform/context/toast-provider';
 import { clearNewsletterPauseAction } from '@platform/server/newsletter-pause/clear-newsletter-pause-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { isOutcomeRefused, isOutcomeSuccess, SIZE } from '@shinefold/config';
@@ -20,6 +21,7 @@ export const ClearNewsletterPauseControl = ({
   const t = useTranslations('newsletterPauseCard');
   const router = useRouter();
   const { focusHeading } = useTenantOverviewFocus();
+  const toast = useToast();
 
   const leaveCard = () => {
     focusHeading();
@@ -31,8 +33,8 @@ export const ClearNewsletterPauseControl = ({
     if (isOutcomeSuccess(result)) return okResult();
     if (!isOutcomeRefused(result)) return errorResult(t('clearFailed'));
 
-    router.refresh();
-    return errorResult(t('alreadyCleared'));
+    toast.info({ message: t('alreadyCleared') });
+    return okResult();
   };
 
   return (

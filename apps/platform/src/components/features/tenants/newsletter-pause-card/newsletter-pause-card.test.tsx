@@ -1,3 +1,7 @@
+import {
+  TenantOverviewFocusProvider,
+  useTenantOverviewFocus,
+} from '@platform/components/features/tenants/tenant-overview-focus-provider';
 import { NEWSLETTER_PAUSE_REFUSAL } from '@platform/constants/newsletter-pause';
 import messages from '@platform/i18n/messages/en.json';
 import { clearNewsletterPauseAction } from '@platform/server/newsletter-pause/clear-newsletter-pause-action';
@@ -7,10 +11,14 @@ import {
   MOCK_NEWSLETTER_PAUSED_ON_TEXT,
 } from '@platform/testing/email/fixtures';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
 import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
 import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { ComponentProps } from 'react';
 
 import { NewsletterPauseCard } from './newsletter-pause-card';
 
@@ -21,7 +29,24 @@ const OPEN_DIALOG_BUTTON = { name: newsletterPauseCard.openDialogButton };
 const CONFIRM_BUTTON = { name: newsletterPauseCard.confirmButton };
 const DIALOG = { name: newsletterPauseCard.dialogTitle };
 
-const setup = customRender(NewsletterPauseCard, {
+const PageHeading = () => {
+  const { registerHeading } = useTenantOverviewFocus();
+
+  return (
+    <h1 ref={registerHeading} tabIndex={-1}>
+      {MOCK_TENANT_NAME}
+    </h1>
+  );
+};
+
+const OverviewHarness = (props: ComponentProps<typeof NewsletterPauseCard>) => (
+  <TenantOverviewFocusProvider>
+    <PageHeading />
+    <NewsletterPauseCard {...props} />
+  </TenantOverviewFocusProvider>
+);
+
+const setup = customRender(OverviewHarness, {
   tenantId: MOCK_TENANT_ID,
   pausedAt: MOCK_NEWSLETTER_PAUSED_AT,
   canClear: true,
@@ -69,7 +94,7 @@ describe(`<${NewsletterPauseCard.name}/>`, () => {
       await user.click(openDialog);
     });
 
-    it('clears the pause only after the operator confirms, then refreshes', async () => {
+    it('clears only once confirmed, then focuses the heading and refreshes', async () => {
       const dialog = await screen.findByRole('alertdialog', DIALOG);
 
       expect(dialog).toBeVisible();
@@ -78,8 +103,11 @@ describe(`<${NewsletterPauseCard.name}/>`, () => {
       const confirm = screen.getByRole('button', CONFIRM_BUTTON);
       await user.click(confirm);
 
+      const heading = screen.getByRole('heading', { name: MOCK_TENANT_NAME });
+
       expect(clearNewsletterPauseAction).toHaveBeenCalledWith(MOCK_TENANT_ID);
       expect(refresh).toHaveBeenCalledTimes(1);
+      await vi.waitFor(() => expect(heading).toHaveFocus());
     });
 
     it.each([
@@ -114,7 +142,7 @@ describe(`<${NewsletterPauseCard.name}/>`, () => {
       },
     );
 
-    it('says the pause was already cleared and refreshes the page', async () => {
+    it('closes on an already-cleared pause, says so and focuses the heading', async () => {
       vi.mocked(clearNewsletterPauseAction).mockResolvedValueOnce({
         outcome: ACTION_OUTCOME.REFUSED,
         reason: NEWSLETTER_PAUSE_REFUSAL.NOT_PAUSED,
@@ -123,10 +151,16 @@ describe(`<${NewsletterPauseCard.name}/>`, () => {
       const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
       await user.click(confirm);
 
-      const error = await screen.findByText(newsletterPauseCard.alreadyCleared);
+      const message = await screen.findByText(
+        newsletterPauseCard.alreadyCleared,
+      );
+      const heading = screen.getByRole('heading', { name: MOCK_TENANT_NAME });
+      const dialog = screen.queryByRole('alertdialog', DIALOG);
 
-      expect(error).toBeVisible();
+      expect(message).toBeVisible();
+      expect(dialog).not.toBeInTheDocument();
       expect(refresh).toHaveBeenCalledTimes(1);
+      await vi.waitFor(() => expect(heading).toHaveFocus());
     });
   });
 });
