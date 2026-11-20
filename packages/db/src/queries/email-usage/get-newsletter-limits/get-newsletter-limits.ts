@@ -7,17 +7,17 @@ import {
 import {
   PLAN_MONTHLY_SENDS_PER_SUBSCRIBER,
   SUBSCRIBER_BAND_CEILINGS,
+  type TSubscriberBandCeiling,
 } from '@shinefold/db/constants';
 import { countEmailSendsThisMonth } from '@shinefold/db/queries/email-usage/count-email-sends-this-month';
 import { countActiveSubscribers } from '@shinefold/db/queries/subscribers/count-active-subscribers';
-import { listResolvableEntitlementGrants } from '@shinefold/db/queries/tenant-entitlement-grants/list-resolvable-entitlement-grants';
+import { getTenantEntitlements } from '@shinefold/db/queries/tenant-entitlement-grants/get-tenant-entitlements';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { monthlySendAllowance } from '@shinefold/db/utils/monthly-send-allowance/monthly-send-allowance';
-import { resolveTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 
 export type TNewsletterLimits = {
   activeCount: number;
-  bandCeiling: number;
+  bandCeiling: TSubscriberBandCeiling;
   allowance: number;
   sentThisMonth: number;
 };
@@ -27,14 +27,13 @@ type TNewsletterLimitsTenant = Pick<
   'id' | 'plan' | 'subscriberBandCeiling'
 >;
 
-async function allowancePlan({
-  id,
-  plan,
-}: TNewsletterLimitsTenant): Promise<TTenantPlan> {
+async function allowancePlan(
+  tenant: TNewsletterLimitsTenant,
+): Promise<TTenantPlan> {
+  const { plan } = tenant;
   if (PLAN_MONTHLY_SENDS_PER_SUBSCRIBER[plan] > 0) return plan;
 
-  const grants = await listResolvableEntitlementGrants(id);
-  const { capabilities } = resolveTenantEntitlements(plan, grants, new Date());
+  const { capabilities } = await getTenantEntitlements(tenant);
   return capabilities.includes(CAPABILITY.NEWSLETTER)
     ? TENANT_PLAN.GROWTH
     : plan;

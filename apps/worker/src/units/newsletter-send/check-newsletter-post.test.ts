@@ -9,7 +9,7 @@ import {
   getSettingsFeatures,
   type TSettingsFeaturesResult,
 } from '@shinefold/db/queries/settings-features';
-import { listResolvableEntitlementGrants } from '@shinefold/db/queries/tenant-entitlement-grants';
+import { listResolvableEntitlementGrants } from '@shinefold/db/queries/tenant-entitlement-grants/list-resolvable-entitlement-grants';
 import {
   getTenantById,
   getTenantSanityCredentials,
@@ -36,7 +36,9 @@ import { checkNewsletterPost } from './check-newsletter-post';
 vi.mock('@shinefold/db/queries/email-config');
 vi.mock('@shinefold/db/queries/newsletter-post-sends');
 vi.mock('@shinefold/db/queries/settings-features');
-vi.mock('@shinefold/db/queries/tenant-entitlement-grants');
+vi.mock(
+  '@shinefold/db/queries/tenant-entitlement-grants/list-resolvable-entitlement-grants',
+);
 vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/newsletter-send/read-newsletter-post');
 
