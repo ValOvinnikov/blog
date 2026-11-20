@@ -1193,7 +1193,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@worker/constants/member-access` — `apps/worker/src/constants/member-access.ts`
 
-- **MEMBER_ACCESS_LOG**: `CHECK_FAILED`=`"member_access.check_failed"`, `CHECK_NOW_FAILED`=`"member_access.check_now_failed"`, `RESEND_FAILED`=`"member_access.resend_failed"`, `REVOKE_FAILED`=`"member_access.revoke_failed"`, `INVITE_DELETE_FAILED`=`"member_access.invite_delete_failed"`, `SWEEP_MEMBER_FAILED`=`"member_access.sweep_member_failed"`
+- **MEMBER_ACCESS_LOG**: `CHECK_FAILED`=`"member_access.check_failed"`, `CHECK_NOW_FAILED`=`"member_access.check_now_failed"`, `RESEND_FAILED`=`"member_access.resend_failed"`, `REVOKE_FAILED`=`"member_access.revoke_failed"`, `INVITE_DELETE_FAILED`=`"member_access.invite_delete_failed"`, `SWEEP_MEMBER_FAILED`=`"member_access.sweep_member_failed"`, `LOCKED_INVITE_DELETE_SKIPPED`=`"member_access.locked_invite_delete_skipped"`
 
 ### `@worker/constants/newsletter-send` — `apps/worker/src/constants/newsletter-send.ts`
 
