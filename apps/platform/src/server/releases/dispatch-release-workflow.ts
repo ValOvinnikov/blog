@@ -6,20 +6,22 @@ import { dispatchGitHubWorkflow } from '@platform/server/github/dispatch-github-
 
 type TDispatchReleaseWorkflowInput = {
   version: string;
+  headSha: string;
   isOverride: boolean;
 };
 
 export const dispatchReleaseWorkflow = ({
   version,
+  headSha,
   isOverride,
 }: TDispatchReleaseWorkflowInput): Promise<boolean> =>
   dispatchGitHubWorkflow({
     workflowFile: RELEASE_WORKFLOW_FILE,
-    inputs: { version, override: String(isOverride) },
+    inputs: { version, sha: headSha, override: String(isOverride) },
     logEvents: {
       skipped: RELEASE_LOG.RELEASE_DISPATCH_SKIPPED,
       failed: RELEASE_LOG.RELEASE_DISPATCH_FAILED,
       error: RELEASE_LOG.RELEASE_DISPATCH_ERROR,
     },
-    logContext: { version, isOverride },
+    logContext: { version, headSha, isOverride },
   });

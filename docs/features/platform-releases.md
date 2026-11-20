@@ -123,8 +123,9 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   with an `overrideReason` field error (`REASON_REQUIRED`) when an override is
   required and the reason is blank; and `SERVER_ERROR` when the dispatch
   fails, which the dialog reports as nothing started. Otherwise it dispatches
-  `release.yml` on `main` with inputs `version` and `override` (`"true"` or
-  `"false"`) and records `RELEASE_STARTED` (details: `headSha`,
+  `release.yml` on `main` with inputs `version`, `sha` (the candidate's
+  `headSha`, so the run ships exactly the commit the operator reviewed) and
+  `override` (`"true"` or `"false"`) and records `RELEASE_STARTED` (details: `headSha`,
   `isOverride`), plus `RELEASE_OVERRIDE` (details: `headSha`,
   `contrastStatus`, `reason`) when overridden, both on the `RELEASE` target
   with the version as `targetId`. The events attest the dispatch request, not

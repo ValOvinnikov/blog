@@ -15,6 +15,7 @@ import {
 } from '@platform/testing/admins/operator';
 import {
   MOCK_RELEASE_LAST_TAG,
+  MOCK_RELEASE_VERSION,
   mockReleaseRun,
 } from '@platform/testing/releases/fixtures';
 import {
@@ -77,7 +78,6 @@ vi.mock('@shinefold/db', () => ({
   queries: { auditEvents: { insertAuditEvent: insertAuditEventMock } },
 }));
 
-const MOCK_NEXT_VERSION = 'v1.5.0';
 const MOCK_OVERRIDE_REASON = faker.lorem.sentence();
 
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
@@ -114,18 +114,13 @@ describe(startReleaseAction, () => {
     insertAuditEventMock.mockReset();
   });
 
-  const overrideNeeded = () => {
-    getCandidateComparisonMock.mockResolvedValue(candidate(true, headSha));
-    resolveContrastStatusMock.mockResolvedValue(okResult(CONTRAST_STATUS.DUE));
-  };
-
   it('requires a super-admin before reading or dispatching anything', async () => {
     vi.mocked(requireSuperAdmin).mockRejectedValueOnce(
       new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
     );
 
     await expect(
-      startReleaseAction({ version: MOCK_NEXT_VERSION }),
+      startReleaseAction({ version: MOCK_RELEASE_VERSION }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(getCandidateComparisonMock).not.toHaveBeenCalled();
@@ -135,7 +130,7 @@ describe(startReleaseAction, () => {
   it('refuses while production releases are paused, touching nothing', async () => {
     releaseSwitch.isEnabled = false;
 
-    const result = await startReleaseAction({ version: MOCK_NEXT_VERSION });
+    const result = await startReleaseAction({ version: MOCK_RELEASE_VERSION });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -148,12 +143,13 @@ describe(startReleaseAction, () => {
 
   it('dispatches the release without an override and records who started it', async () => {
     const result = await startReleaseAction({
-      version: ` ${MOCK_NEXT_VERSION} `,
+      version: ` ${MOCK_RELEASE_VERSION} `,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(dispatchReleaseWorkflowMock).toHaveBeenCalledWith({
-      version: MOCK_NEXT_VERSION,
+      version: MOCK_RELEASE_VERSION,
+      headSha,
       isOverride: false,
     });
     expect(insertAuditEventMock).toHaveBeenCalledOnce();
@@ -161,7 +157,7 @@ describe(startReleaseAction, () => {
       actorId: MOCK_OPERATOR_ID,
       action: AUDIT_ACTION.RELEASE_STARTED,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
-      targetId: MOCK_NEXT_VERSION,
+      targetId: MOCK_RELEASE_VERSION,
       details: { headSha, isOverride: false },
     });
   });
@@ -172,61 +168,15 @@ describe(startReleaseAction, () => {
       okResult(CONTRAST_STATUS.GREEN),
     );
 
-    const result = await startReleaseAction({ version: MOCK_NEXT_VERSION });
+    const result = await startReleaseAction({ version: MOCK_RELEASE_VERSION });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(dispatchReleaseWorkflowMock).toHaveBeenCalledWith({
-      version: MOCK_NEXT_VERSION,
+      version: MOCK_RELEASE_VERSION,
+      headSha,
       isOverride: false,
     });
   });
-
-  it('dispatches an override and stores the reason with the actor', async () => {
-    overrideNeeded();
-
-    const result = await startReleaseAction({
-      version: MOCK_NEXT_VERSION,
-      overrideReason: MOCK_OVERRIDE_REASON,
-    });
-
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(dispatchReleaseWorkflowMock).toHaveBeenCalledWith({
-      version: MOCK_NEXT_VERSION,
-      isOverride: true,
-    });
-    expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: MOCK_OPERATOR_ID,
-      action: AUDIT_ACTION.RELEASE_OVERRIDE,
-      targetType: AUDIT_TARGET_TYPE.RELEASE,
-      targetId: MOCK_NEXT_VERSION,
-      details: {
-        headSha,
-        contrastStatus: CONTRAST_STATUS.DUE,
-        reason: MOCK_OVERRIDE_REASON,
-      },
-    });
-  });
-
-  it.each([undefined, '   '])(
-    'refuses an override with reason %j, dispatching nothing',
-    async (overrideReason) => {
-      overrideNeeded();
-
-      const result = await startReleaseAction({
-        version: MOCK_NEXT_VERSION,
-        overrideReason,
-      });
-
-      expect(result).toEqual({
-        outcome: ACTION_OUTCOME.INVALID,
-        fieldErrors: {
-          overrideReason: { reason: RELEASE_FIELD_ERROR.REASON_REQUIRED },
-        },
-      });
-      expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
-      expect(insertAuditEventMock).not.toHaveBeenCalled();
-    },
-  );
 
   it.each([
     ['1.5.0', RELEASE_FIELD_ERROR.VERSION_MALFORMED],
@@ -250,7 +200,9 @@ describe(startReleaseAction, () => {
     async (status) => {
       getReleaseRunMock.mockResolvedValue(okResult(mockReleaseRun({ status })));
 
-      const result = await startReleaseAction({ version: MOCK_NEXT_VERSION });
+      const result = await startReleaseAction({
+        version: MOCK_RELEASE_VERSION,
+      });
 
       expect(result).toEqual({
         outcome: ACTION_OUTCOME.REFUSED,
@@ -265,7 +217,7 @@ describe(startReleaseAction, () => {
       errorResult(GITHUB_FAILURE.RATE_LIMITED),
     );
 
-    const result = await startReleaseAction({ version: MOCK_NEXT_VERSION });
+    const result = await startReleaseAction({ version: MOCK_RELEASE_VERSION });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
     expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
@@ -276,30 +228,82 @@ describe(startReleaseAction, () => {
       errorResult(RELEASE_FAILURE.DB_ERROR),
     );
 
-    const result = await startReleaseAction({ version: MOCK_NEXT_VERSION });
+    const result = await startReleaseAction({ version: MOCK_RELEASE_VERSION });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
     expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
   });
 
-  it('records nothing when the dispatch fails', async () => {
-    overrideNeeded();
-    dispatchReleaseWorkflowMock.mockResolvedValue(false);
-
-    const result = await startReleaseAction({
-      version: MOCK_NEXT_VERSION,
-      overrideReason: MOCK_OVERRIDE_REASON,
-    });
-
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
-  });
-
   it('still succeeds when the audit write is lost', async () => {
     insertAuditEventMock.mockRejectedValue(new Error(faker.lorem.sentence()));
 
-    const result = await startReleaseAction({ version: MOCK_NEXT_VERSION });
+    const result = await startReleaseAction({ version: MOCK_RELEASE_VERSION });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+  });
+
+  describe('when an override is required', () => {
+    beforeEach(() => {
+      getCandidateComparisonMock.mockResolvedValue(candidate(true, headSha));
+      resolveContrastStatusMock.mockResolvedValue(
+        okResult(CONTRAST_STATUS.DUE),
+      );
+    });
+
+    it('dispatches an override and stores the reason with the actor', async () => {
+      const result = await startReleaseAction({
+        version: MOCK_RELEASE_VERSION,
+        overrideReason: MOCK_OVERRIDE_REASON,
+      });
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+      expect(dispatchReleaseWorkflowMock).toHaveBeenCalledWith({
+        version: MOCK_RELEASE_VERSION,
+        headSha,
+        isOverride: true,
+      });
+      expect(insertAuditEventMock).toHaveBeenCalledWith({
+        actorId: MOCK_OPERATOR_ID,
+        action: AUDIT_ACTION.RELEASE_OVERRIDE,
+        targetType: AUDIT_TARGET_TYPE.RELEASE,
+        targetId: MOCK_RELEASE_VERSION,
+        details: {
+          headSha,
+          contrastStatus: CONTRAST_STATUS.DUE,
+          reason: MOCK_OVERRIDE_REASON,
+        },
+      });
+    });
+
+    it.each([undefined, '   '])(
+      'refuses an override with reason %j, dispatching nothing',
+      async (overrideReason) => {
+        const result = await startReleaseAction({
+          version: MOCK_RELEASE_VERSION,
+          overrideReason,
+        });
+
+        expect(result).toEqual({
+          outcome: ACTION_OUTCOME.INVALID,
+          fieldErrors: {
+            overrideReason: { reason: RELEASE_FIELD_ERROR.REASON_REQUIRED },
+          },
+        });
+        expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
+        expect(insertAuditEventMock).not.toHaveBeenCalled();
+      },
+    );
+
+    it('records nothing when the dispatch fails', async () => {
+      dispatchReleaseWorkflowMock.mockResolvedValue(false);
+
+      const result = await startReleaseAction({
+        version: MOCK_RELEASE_VERSION,
+        overrideReason: MOCK_OVERRIDE_REASON,
+      });
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(insertAuditEventMock).not.toHaveBeenCalled();
+    });
   });
 });
