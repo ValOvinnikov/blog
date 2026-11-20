@@ -2,7 +2,6 @@ import { format } from 'node:util';
 
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import {
-  LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
   type TMaybeUndefined,
@@ -48,7 +47,7 @@ vi.mock('next-intl/server', () => ({
   ),
   getMessages: vi.fn(async () => messages),
   getFormatter: vi.fn(async () =>
-    createFormatter({ locale: LOCALE_BCP47_TAGS.EN }),
+    createFormatter({ locale: LOCALE_ISO_CODES.EN }),
   ),
 }));
 
