@@ -446,7 +446,6 @@
   --spacing-platform-status-row-touch: calc(var(--spacing) * 11 - 7px);
   /* Three 18px lines: the longest paused line beside its button on the phone Preview tab. */
   --spacing-platform-status-row-phone: 54px;
-  --spacing-platform-phone-footer-max: 85px;
 
   /* Keep equal to LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH in constants/look-layout.ts. */
   --container-look-split: 900px;
