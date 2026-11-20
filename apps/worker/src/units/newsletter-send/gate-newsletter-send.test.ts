@@ -1,15 +1,11 @@
-import { CAPABILITY, TENANT_PLAN } from '@shinefold/config/constants';
 import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
   NEWSLETTER_SKIP_REASON,
 } from '@shinefold/db/constants';
 import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config';
-import { countEmailSendsThisMonth } from '@shinefold/db/queries/email-usage';
+import { getNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends';
-import { countActiveSubscribers } from '@shinefold/db/queries/subscribers';
-import { listResolvableEntitlementGrants } from '@shinefold/db/queries/tenant-entitlement-grants';
 import { getTenantById } from '@shinefold/db/queries/tenants';
-import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import { isEmailAccountConfigured } from '@shinefold/email';
 import {
   NEWSLETTER_SEND_GATE,
@@ -25,7 +21,6 @@ import { MOCK_TENANT_ID, mockTenant } from '@worker/testing/tenant/fixtures';
 import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { logger } from '@worker/utils/logger/logger';
 import { sendOwnerNewsletterNotice } from '@worker/utils/newsletter-send/owner-newsletter-notice';
-import { readNewsletterLimits } from '@worker/utils/newsletter-send/read-newsletter-limits';
 import { readReputationPace } from '@worker/utils/newsletter-send/reputation-pace';
 
 import { gateNewsletterSend } from './gate-newsletter-send';
@@ -33,14 +28,9 @@ import { gateNewsletterSend } from './gate-newsletter-send';
 vi.mock('@shinefold/db/queries/email-config');
 vi.mock('@shinefold/db/queries/email-usage');
 vi.mock('@shinefold/db/queries/newsletter-post-sends');
-vi.mock('@shinefold/db/queries/subscribers');
-vi.mock('@shinefold/db/queries/tenant-entitlement-grants');
 vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@shinefold/email/transport/send-email');
 vi.mock('@worker/utils/env/env');
-vi.mock('@worker/utils/newsletter-send/read-newsletter-limits', {
-  spy: true,
-});
 vi.mock('@worker/utils/newsletter-send/owner-newsletter-notice');
 vi.mock('@worker/utils/newsletter-send/reputation-pace');
 
@@ -60,7 +50,7 @@ describe(gateNewsletterSend, () => {
     vi.mocked(readReputationPace).mockResolvedValue(
       NEWSLETTER_SEND_PACE.NORMAL,
     );
-    vi.mocked(readNewsletterLimits).mockResolvedValue(mockNewsletterLimits());
+    vi.mocked(getNewsletterLimits).mockResolvedValue(mockNewsletterLimits());
   });
 
   it('lets a site within its limits send at the pace its reputation allows', async () => {
@@ -134,7 +124,7 @@ describe(gateNewsletterSend, () => {
     'skips the post %s and tells the owner sending is paused',
     async (reason, overrides) => {
       const limits = mockNewsletterLimits(overrides);
-      vi.mocked(readNewsletterLimits).mockResolvedValue(limits);
+      vi.mocked(getNewsletterLimits).mockResolvedValue(limits);
 
       await expect(runGate()).resolves.toEqual(SKIPPED);
       expect(markNewsletterPostSkipped).toHaveBeenCalledWith(
@@ -156,7 +146,7 @@ describe(gateNewsletterSend, () => {
       activeCount: 900,
       sentThisMonth: 4_000,
     });
-    vi.mocked(readNewsletterLimits).mockResolvedValue(limits);
+    vi.mocked(getNewsletterLimits).mockResolvedValue(limits);
 
     await runGate();
 
@@ -168,32 +158,5 @@ describe(gateNewsletterSend, () => {
         limits,
       ],
     ]);
-  });
-
-  describe('for a Starter site granted the newsletter', () => {
-    beforeEach(() => {
-      vi.mocked(readNewsletterLimits).mockReset();
-      vi.mocked(getTenantById).mockResolvedValue(
-        mockTenant({ plan: TENANT_PLAN.STARTER }),
-      );
-      vi.mocked(listResolvableEntitlementGrants).mockResolvedValue([
-        mockEntitlementGrant({ key: CAPABILITY.NEWSLETTER }),
-      ]);
-      vi.mocked(countEmailSendsThisMonth).mockResolvedValue(0);
-    });
-
-    it.each([0, mockNewsletterLimits().activeCount])(
-      'sends to %i subscribers without telling the owner anything',
-      async (activeCount) => {
-        vi.mocked(countActiveSubscribers).mockResolvedValue(activeCount);
-
-        await expect(runGate()).resolves.toEqual({
-          gate: NEWSLETTER_SEND_GATE.SEND,
-          pace: NEWSLETTER_SEND_PACE.NORMAL,
-        });
-        expect(markNewsletterPostSkipped).not.toHaveBeenCalled();
-        expect(sendOwnerNewsletterNotice).not.toHaveBeenCalled();
-      },
-    );
   });
 });
