@@ -21,6 +21,7 @@ import {
   subscribeToNewsletterAction,
   type TSubscribeResult,
 } from '@web/server/newsletter/newsletter-actions/newsletter-actions';
+import { unlessPageOutOfDate } from '@web/utils/page-out-of-date';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -76,7 +77,14 @@ export const NewsletterForm = ({
     setStatus(FORM_STATUS.SUBMITTING);
     setErrorMessage(undefined);
 
-    const result = await subscribeToNewsletterAction(email);
+    const result = await unlessPageOutOfDate(
+      subscribeToNewsletterAction(email),
+    );
+
+    if (!result) {
+      setStatus(FORM_STATUS.IDLE);
+      return;
+    }
 
     if (isOutcomeSuccess(result)) {
       setStatus(FORM_STATUS.SUCCESS);

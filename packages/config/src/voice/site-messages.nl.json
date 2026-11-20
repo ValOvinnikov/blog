@@ -148,12 +148,16 @@
     "dismissLabel": "Melding sluiten",
     "mergeCountSuffix": " ×{count}"
   },
+  "outOfDateNotice": {
+    "message": "Deze pagina is verouderd. Herlaad de pagina om verder te gaan.",
+    "reloadLabel": "Herladen"
+  },
   "bookmarkButton": {
     "save": "Bewaren",
     "saved": "Bewaard",
     "saveAriaLabel": "Bericht bewaren",
     "removeAriaLabel": "Bladwijzer verwijderen",
-    "error": "Dat kon niet worden bewaard. Probeer het opnieuw.",
+    "errorSave": "Dat kon niet worden bewaard. Probeer het opnieuw.",
     "errorUnavailable": "Bladwijzers opslaan is op deze site momenteel niet beschikbaar.",
     "toastSavedMessage": "Bewaard in bladwijzers",
     "toastRemovedMessage": "Verwijderd uit bladwijzers",

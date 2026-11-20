@@ -1,25 +1,24 @@
 'use client';
 
-import { ACTION_OUTCOME, type IWithClassName } from '@shinefold/config';
+import {
+  type IWithClassName,
+  isOutcomeSuccess,
+  isOutcomeUnavailable,
+} from '@shinefold/config';
 import { BookmarkToggle } from '@shinefold/ui/components/atoms/bookmark-toggle';
-import { BOOKMARK_LOG } from '@web/constants/bookmark';
 import { SESSION_STATUS } from '@web/constants/session';
 import {
   ACCOUNT_OVERLAY_ID,
   useHeaderOverlay,
 } from '@web/context/header-overlay-provider';
 import { useToast } from '@web/context/toast-provider';
-import {
-  getBookmarkStatus,
-  setBookmarkStatus,
-} from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
-import { logger } from '@web/utils/logger/logger';
-import { reportClientError } from '@web/utils/report-client-error';
-import { useSession } from 'next-auth/react';
+import { setBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
+import { unlessPageOutOfDate } from '@web/utils/page-out-of-date';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState, useTransition } from 'react';
+import { useTransition } from 'react';
 
 import { bookmarkButtonVariants } from './bookmark-button-variants';
+import { useBookmarkStatus } from './use-bookmark-status';
 
 export type TBookmarkButtonProps = IWithClassName & {
   postId: string;
@@ -29,38 +28,10 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
   const t = useTranslations('bookmarkButton');
   const toast = useToast();
   const overlay = useHeaderOverlay();
-  const { status } = useSession();
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [isResolved, setIsResolved] = useState(false);
+  const { status, isBookmarked, setIsBookmarked, isResolved } =
+    useBookmarkStatus(postId);
   const [isPending, startTransition] = useTransition();
   const s = bookmarkButtonVariants();
-
-  useEffect(() => {
-    if (status !== SESSION_STATUS.AUTHENTICATED) return;
-
-    let cancelled = false;
-
-    getBookmarkStatus(postId)
-      .then((bookmarked) => {
-        if (cancelled) return;
-        setIsBookmarked(bookmarked);
-        setIsResolved(true);
-      })
-      .catch((fetchError: unknown) => {
-        logger.error(BOOKMARK_LOG.BUTTON_STATUS_FETCH_FAILED, {
-          postId,
-          error: fetchError,
-        });
-        reportClientError(BOOKMARK_LOG.BUTTON_STATUS_FETCH_FAILED, fetchError);
-        if (cancelled) return;
-        setIsBookmarked(false);
-        setIsResolved(true);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [status, postId]);
 
   const performUndo = (committedValue: boolean) => {
     const reverted = !committedValue;
@@ -68,14 +39,15 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
     setIsBookmarked(reverted);
 
     startTransition(async () => {
-      const result = await setBookmarkStatus(postId, reverted);
-      if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
+      const result = await unlessPageOutOfDate(
+        setBookmarkStatus(postId, reverted),
+      );
+      if (!result || !isOutcomeSuccess(result)) {
         setIsBookmarked(committedValue);
+        if (!result) return;
         toast.error({
           message: t(
-            result.outcome === ACTION_OUTCOME.UNAVAILABLE
-              ? 'errorUnavailable'
-              : 'error',
+            isOutcomeUnavailable(result) ? 'errorUnavailable' : 'errorSave',
           ),
         });
         return;
@@ -89,15 +61,16 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
     setIsBookmarked(next);
 
     startTransition(async () => {
-      const result = await setBookmarkStatus(postId, next);
-      if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
+      const result = await unlessPageOutOfDate(setBookmarkStatus(postId, next));
+      if (!result || !isOutcomeSuccess(result)) {
         setIsBookmarked(!next);
-        if (result.outcome === ACTION_OUTCOME.UNAVAILABLE) {
+        if (!result) return;
+        if (isOutcomeUnavailable(result)) {
           toast.error({ message: t('errorUnavailable') });
           return;
         }
         toast.error({
-          message: t('error'),
+          message: t('errorSave'),
           action: {
             label: t('toastRetryLabel'),
             keyHint: 'R',

@@ -4,6 +4,7 @@ import type { TMaybeUndefined } from '@shinefold/config';
 import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { SESSION_STATUS } from '@web/constants/session';
 import { isReaderSubscribedToNewsletter } from '@web/server/newsletter/reader-subscription-status/reader-subscription-status';
+import { unlessPageOutOfDate } from '@web/utils/page-out-of-date';
 import { reportClientError } from '@web/utils/report-client-error';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
@@ -19,7 +20,7 @@ export const useIsReaderSubscribed = (): TMaybeUndefined<boolean> => {
 
     let cancelled = false;
 
-    isReaderSubscribedToNewsletter()
+    unlessPageOutOfDate(isReaderSubscribedToNewsletter())
       .then((subscribed) => {
         if (!cancelled) setIsSubscribed(subscribed);
       })

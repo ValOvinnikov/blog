@@ -148,12 +148,16 @@
     "dismissLabel": "Fermer la notification",
     "mergeCountSuffix": " ×{count}"
   },
+  "outOfDateNotice": {
+    "message": "Cette page n'est plus à jour. Veuillez la recharger pour continuer.",
+    "reloadLabel": "Recharger"
+  },
   "bookmarkButton": {
     "save": "Enregistrer",
     "saved": "Enregistré",
     "saveAriaLabel": "Enregistrer l'article",
     "removeAriaLabel": "Retirer des favoris",
-    "error": "L'enregistrement a échoué. Veuillez réessayer.",
+    "errorSave": "L'enregistrement a échoué. Veuillez réessayer.",
     "errorUnavailable": "Les favoris ne sont pas disponibles sur ce site pour le moment.",
     "toastSavedMessage": "Ajouté aux favoris",
     "toastRemovedMessage": "Retiré des favoris",

@@ -1,6 +1,8 @@
 import {
   ACTION_OUTCOME,
   FORM_STATUS,
+  isOutcomeInvalid,
+  isOutcomeSuccess,
   type TFormStatus,
   type TLocaleIsoCode,
 } from '@shinefold/config';
@@ -10,6 +12,7 @@ import type {
   TContactRefusal,
   TSubmitContactResult,
 } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
+import { unlessPageOutOfDate } from '@web/utils/page-out-of-date';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import {
   type TContactField,
@@ -88,19 +91,22 @@ export const useContactForm = ({
     }
 
     setStatus(FORM_STATUS.SUBMITTING);
-    const result = await submitMessage({
-      ...fields,
-      website,
-      sourcePath,
-    }).catch(() => SERVER_ERROR);
+    const result = await unlessPageOutOfDate(
+      submitMessage({ ...fields, website, sourcePath }),
+    ).catch(() => SERVER_ERROR);
 
-    if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+    if (!result) {
+      setStatus(FORM_STATUS.IDLE);
+      return;
+    }
+
+    if (isOutcomeSuccess(result)) {
       setStatus(FORM_STATUS.SUCCESS);
       return;
     }
 
     setStatus(FORM_STATUS.ERROR);
-    if (result.outcome === ACTION_OUTCOME.INVALID) {
+    if (isOutcomeInvalid(result)) {
       reportInvalid(result.fieldErrors);
       return;
     }

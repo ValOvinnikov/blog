@@ -7,7 +7,8 @@ import {
   type TOutcome,
 } from '@shinefold/config';
 import { useToast } from '@web/context/toast-provider';
-import { useRouter } from 'next/navigation';
+import { useOutOfDateNotice } from '@web/hooks/use-out-of-date-notice';
+import { unstable_isUnrecognizedActionError, useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 
 export type TActionToastOptions = {
@@ -21,6 +22,7 @@ export type TActionToastOptions = {
 export const useActionToast = () => {
   const toast = useToast();
   const router = useRouter();
+  const outOfDateNotice = useOutOfDateNotice();
   const [isPending, startTransition] = useTransition();
 
   const run = (
@@ -47,10 +49,14 @@ export const useActionToast = () => {
           {
             loading: { message: loading },
             success: { message: success },
-            error: () => ({
-              message:
-                (failedOutcome && errorByOutcome?.[failedOutcome]) ?? error,
-            }),
+            error: (rejection) =>
+              unstable_isUnrecognizedActionError(rejection)
+                ? outOfDateNotice
+                : {
+                    message:
+                      (failedOutcome && errorByOutcome?.[failedOutcome]) ??
+                      error,
+                  },
           },
         );
       } catch {

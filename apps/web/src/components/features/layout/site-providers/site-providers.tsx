@@ -20,6 +20,7 @@ import { getNow, getTimeZone } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
 import { ConsentBannerSlot } from './components/consent-banner-slot/consent-banner-slot';
+import { OutOfDatePageNotice } from './components/out-of-date-page-notice/out-of-date-page-notice';
 
 export interface ISiteProvidersProps {
   children: ReactNode;
@@ -55,6 +56,7 @@ export const SiteProviders = async ({ children }: ISiteProvidersProps) => {
         <SessionProvider>
           <BusyStyleProvider value={busyStyle}>
             <ToastProvider>
+              <OutOfDatePageNotice />
               <VoiceRichProvider values={rich}>
                 <SiteAnalyticsProvider value={analytics}>
                   <ConsentPreferencesProvider>

@@ -148,12 +148,16 @@
     "dismissLabel": "Benachrichtigung schließen",
     "mergeCountSuffix": " ×{count}"
   },
+  "outOfDateNotice": {
+    "message": "Diese Seite ist nicht mehr aktuell. Bitte laden Sie sie neu, um fortzufahren.",
+    "reloadLabel": "Neu laden"
+  },
   "bookmarkButton": {
     "save": "Merken",
     "saved": "Gemerkt",
     "saveAriaLabel": "Beitrag merken",
     "removeAriaLabel": "Lesezeichen entfernen",
-    "error": "Das konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    "errorSave": "Das konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
     "errorUnavailable": "Lesezeichen sind auf dieser Website derzeit nicht verfügbar.",
     "toastSavedMessage": "Zu Lesezeichen hinzugefügt",
     "toastRemovedMessage": "Aus Lesezeichen entfernt",

@@ -15,6 +15,10 @@ import {
   getContactFormFields,
 } from '@web/testing/modules/contact-form/contact-form-fields';
 import { MOCK_CONTACT_MESSAGE } from '@web/testing/modules/contact-form/fixtures';
+import {
+  MOCK_UNRECOGNIZED_ACTION_ERROR,
+  mockUnrecognizedActionError,
+} from '@web/testing/shared/out-of-date/mock-unrecognized-action';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 import { ContactForm } from './contact-form';
@@ -67,25 +71,27 @@ describe(`<${ContactForm.name}/>`, () => {
       setup();
     });
 
-    it('sends the typed message with the page it was sent from', async () => {
-      await fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
-
-      expect(submitMessage).toHaveBeenCalledWith({
-        ...MOCK_SENT_INPUT,
-        sourcePath: MOCK_PATHNAME,
+    describe('once the visitor sends the form', () => {
+      beforeEach(async () => {
+        await fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
       });
-    });
 
-    it('replaces the form with the success message once sent', async () => {
-      await fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
-
-      const heading = await screen.findByRole('heading', {
-        name: successTitle,
+      it('sends the typed message with the page it was sent from', () => {
+        expect(submitMessage).toHaveBeenCalledWith({
+          ...MOCK_SENT_INPUT,
+          sourcePath: MOCK_PATHNAME,
+        });
       });
-      const sendButton = screen.queryByRole('button', { name: submitLabel });
 
-      expect(heading).toBeVisible();
-      expect(sendButton).not.toBeInTheDocument();
+      it('replaces the form with the success message', async () => {
+        const heading = await screen.findByRole('heading', {
+          name: successTitle,
+        });
+        const sendButton = screen.queryByRole('button', { name: submitLabel });
+
+        expect(heading).toBeVisible();
+        expect(sendButton).not.toBeInTheDocument();
+      });
     });
 
     it('announces the success message through a status region', async () => {
@@ -153,6 +159,21 @@ describe(`<${ContactForm.name}/>`, () => {
       expect(messageField).toHaveValue(MOCK_CONTACT_MESSAGE.message);
     },
   );
+
+  it('keeps what the visitor typed with no error when the action is unrecognised', async () => {
+    mockUnrecognizedActionError();
+    submitMessage.mockRejectedValue(MOCK_UNRECOGNIZED_ACTION_ERROR);
+    setup();
+
+    await fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
+
+    const sendButton = await screen.findByRole('button', { name: submitLabel });
+    const { messageField } = getContactFormFields();
+    const alert = screen.queryByRole('alert');
+    expect(sendButton).toBeEnabled();
+    expect(messageField).toHaveValue(MOCK_CONTACT_MESSAGE.message);
+    expect(alert).not.toBeInTheDocument();
+  });
 
   it('shows and focuses the field the server rejects', async () => {
     submitMessage.mockResolvedValue({
