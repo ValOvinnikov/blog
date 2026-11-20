@@ -1842,6 +1842,7 @@
     "goToFirstField": "Ir al primero",
     "notSaved": "No guardado",
     "notInPlan": "Su sitio está en el plan {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actual}}, que no incluye {items}, así que no se ha guardado nada.",
+    "languagesNotInPlan": "Su sitio está en el plan {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actual}}, que permite {limit, plural, one {# idioma} other {# idiomas}}, así que no se ha añadido {items}.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Descartar",
     "save": "Guardar cambios",

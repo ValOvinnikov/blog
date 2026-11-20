@@ -14,10 +14,8 @@ import {
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import type { Mock } from 'vitest';
 
-import {
-  useSettingsForm,
-  type TUseSettingsFormArgs,
-} from './use-settings-form';
+import type { TUseSettingsFormArgs } from './settings-form-types';
+import { useSettingsForm } from './use-settings-form';
 
 type TValues = { name: string };
 type TResult = { outcome: TActionOutcome };
@@ -221,6 +219,18 @@ describe(useSettingsForm, () => {
       act(() => result.current.form.discard());
 
       expect(result.current.form.planRefusal).toBeUndefined();
+    });
+
+    it('names the plan limit with the page message it was given', async () => {
+      ({ result } = renderSettingsForm({
+        onSubmit: refusePlan,
+        planRefusalMessageKey: 'languagesNotInPlan',
+      }));
+      await editAndSave(result);
+
+      expect(result.current.form.planRefusal).toBe(
+        `Your site is on the Free plan, which allows 1 language, so ${MOCK_FIELD_LABEL} wasn't added.`,
+      );
     });
   });
 });

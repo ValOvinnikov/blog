@@ -11,12 +11,16 @@ import type {
   TMaybeUndefined,
   TOutcome,
 } from '@shinefold/config';
+import { PLAN_LOCALE_LIMIT } from '@shinefold/db/constants';
 import { useRouter } from 'next/navigation';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState, type Dispatch, type SetStateAction } from 'react';
 
+import type { TPlanRefusalMessageKey } from './settings-form-types';
+
 export const usePlanRefusal = <TValues>(
   fields: TSettingsDraftField<TValues>[],
+  messageKey: TPlanRefusalMessageKey = 'notInPlan',
 ) => {
   const t = useTranslations('saveBar');
   const format = useFormatter();
@@ -45,8 +49,9 @@ export const usePlanRefusal = <TValues>(
 
   const message =
     refusal &&
-    t('notInPlan', {
+    t(messageKey, {
       plan: refusal.values.plan,
+      limit: PLAN_LOCALE_LIMIT[refusal.values.plan],
       items: format.list(refusal.items.map(labelOf)),
     });
 

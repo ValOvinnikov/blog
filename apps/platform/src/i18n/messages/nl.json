@@ -1842,6 +1842,7 @@
     "goToFirstField": "Naar het eerste veld",
     "notSaved": "Niet opgeslagen",
     "notInPlan": "Uw site gebruikt het abonnement {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {huidige}}, dat {items} niet bevat. Er is niets opgeslagen.",
+    "languagesNotInPlan": "Uw site gebruikt het abonnement {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {huidige}}, dat {limit, plural, one {# taal} other {# talen}} toestaat. {items} is niet toegevoegd.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Verwerpen",
     "save": "Wijzigingen opslaan",
