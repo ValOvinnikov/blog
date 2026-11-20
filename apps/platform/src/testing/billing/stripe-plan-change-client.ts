@@ -2,6 +2,7 @@ import {
   MOCK_PAYMENT_CLIENT_SECRET,
   MOCK_PAYMENT_INTENT_ID,
   MOCK_STRIPE_INVOICE_ID,
+  mockStripeInvoice,
 } from '@platform/testing/billing/fixtures';
 import {
   MOCK_PERIOD_END,
@@ -32,6 +33,7 @@ export const mockStripePlanChangeClient = (
     releaseSchedule: vi.fn<TStripeCall>(async () => ({})),
     retrieveSchedule: vi.fn<TStripeCall>(async () => ({})),
     retrievePaymentIntent: vi.fn<TStripeCall>(async () => ({})),
+    createInvoicePreview: vi.fn<TStripeCall>(async () => mockStripeInvoice()),
   };
   const stripe = {
     subscriptions: {
@@ -40,6 +42,7 @@ export const mockStripePlanChangeClient = (
     },
     prices: { list: calls.listPrices },
     paymentIntents: { retrieve: calls.retrievePaymentIntent },
+    invoices: { createPreview: calls.createInvoicePreview },
     subscriptionSchedules: {
       create: calls.createSchedule,
       update: calls.updateSchedule,

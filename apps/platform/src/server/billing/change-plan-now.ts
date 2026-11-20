@@ -24,6 +24,7 @@ import type { TSubscriptionPlan } from './load-subscription-plan';
 import { releaseSchedule } from './release-schedule';
 import type { TTargetPrices } from './schedule-change-at-renewal';
 import { stripeIdOf } from './stripe-id';
+import { subscriptionItemsFor } from './subscription-items';
 
 type TPaymentConfirmation = { clientSecret: string };
 
@@ -35,23 +36,15 @@ export type TChangeNowResult =
 
 const updateItems = (
   stripe: Stripe,
-  { id, planItemId, bandItem }: TSubscriptionPlan,
+  subscription: TSubscriptionPlan,
   prices: TTargetPrices,
-) => {
-  const bandItems = bandItem
-    ? [
-        prices.band
-          ? { id: bandItem.id, price: prices.band }
-          : { id: bandItem.id, deleted: true },
-      ]
-    : [];
-  return stripe.subscriptions.update(id, {
-    items: [{ id: planItemId, price: prices.plan }, ...bandItems],
+) =>
+  stripe.subscriptions.update(subscription.id, {
+    items: subscriptionItemsFor(subscription, prices),
     proration_behavior: STRIPE_PRORATION_BEHAVIOR.ALWAYS_INVOICE,
     payment_behavior: STRIPE_PAYMENT_BEHAVIOR.PENDING_IF_INCOMPLETE,
     expand: STRIPE_PENDING_PAYMENT_EXPAND,
   });
-};
 
 const releaseAfterChange = (
   stripe: Stripe,

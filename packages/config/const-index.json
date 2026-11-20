@@ -6346,6 +6346,14 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "billing.currency_unknown": [
+      {
+        "ref": "BILLING_LOG.CURRENCY_UNKNOWN",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "billing.subscription_superseded": [
       {
         "ref": "BILLING_LOG.SUBSCRIPTION_SUPERSEDED",
@@ -6485,6 +6493,14 @@
     "billing.plan_change_payment_unknown": [
       {
         "ref": "BILLING_LOG.PLAN_CHANGE_PAYMENT_UNKNOWN",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.move_up_quote_failed": [
+      {
+        "ref": "BILLING_LOG.MOVE_UP_QUOTE_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
@@ -8682,6 +8698,22 @@
         "file": "apps/platform/src/constants/plan-change.ts"
       }
     ],
+    "NO_NEXT_BAND": [
+      {
+        "ref": "PLAN_CHANGE_REFUSAL.NO_NEXT_BAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
+    "PENDING_CHANGE": [
+      {
+        "ref": "PLAN_CHANGE_REFUSAL.PENDING_CHANGE",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
     "ROWS": [
       {
         "ref": "PRESET_LIST_LAYOUT.ROWS",
@@ -9760,6 +9792,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/stripe-schedule",
         "file": "apps/platform/src/constants/stripe-schedule.ts"
+      }
+    ],
+    "MOVED_UP": [
+      {
+        "ref": "SUBSCRIBERS_SEARCH_PARAM.MOVED_UP",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
       }
     ],
     "billing.subscription_collection_failed": [

@@ -2371,7 +2371,28 @@
     "planEnds": "Dein Tarif endet am <time>{date}</time> und kann sich deshalb nicht mehr ändern. Um ihn zu behalten, nimm die Kündigung in der Abrechnung zurück.",
     "UNCHANGED": "Deine Website nutzt diesen Tarif bereits.",
     "CARD_DECLINED": "Deine Karte wurde abgelehnt, daher hat sich nichts geändert. Aktualisiere sie in der Abrechnung und versuch es erneut.",
-    "PAYMENT_NOT_CONFIRMED": "Die Bestätigung bei deiner Bank wurde nicht abgeschlossen, daher hat sich dein Tarif nicht geändert. Versuch es erneut, wenn du so weit bist."
+    "PAYMENT_NOT_CONFIRMED": "Die Bestätigung bei deiner Bank wurde nicht abgeschlossen, daher hat sich dein Tarif nicht geändert. Versuch es erneut, wenn du so weit bist.",
+    "NO_NEXT_BAND": "Deine Website kann gerade nicht in diese Stufe wechseln. Lade die Seite neu, um deine aktuelle Stufe zu sehen.",
+    "PENDING_CHANGE": "Für deine Website ist ein Tarifwechsel zur Verlängerung geplant. Behalte zuerst unter Upgrade deinen aktuellen Tarif und wechsle dann eine Stufe höher."
+  },
+  "moveUpBand": {
+    "trigger": "Auf {ceiling, number} Abonnenten wechseln — {price} mehr pro {interval, select, YEARLY {Jahr} other {Monat}}",
+    "title": "Auf {ceiling, number} Abonnenten wechseln?",
+    "lead": "Deine neuen Limits gelten, sobald die Zahlung durch ist.",
+    "loading": "Preis wird geladen…",
+    "quoteFailed": "Der Preis konnte nicht geladen werden. Schließe das Fenster und versuche es gleich noch einmal.",
+    "newLimitsTerm": "Neue Limits",
+    "newLimits": "{ceiling, number} Abonnenten · {allowance, number} E-Mails pro Monat",
+    "chargedTodayTerm": "Heute fällig",
+    "chargedTodayNote": "Die Differenz für den Rest dieses Abrechnungszeitraums, bis <time>{date}</time>.",
+    "renewalTerm": "Ab {date}",
+    "renewalTotal": "{total} pro {interval, select, YEARLY {Jahr} other {Monat}}",
+    "cardTerm": "Karte",
+    "card": "{brand, select, visa {Visa} mastercard {Mastercard} amex {American Express} discover {Discover} other {Karte}} mit Endung {last4}",
+    "moveDownNote": "Ein Wechsel in eine niedrigere Stufe erfolgt zur Verlängerung, ohne Erstattung.",
+    "cancel": "Abbrechen",
+    "pay": "{amount} zahlen und wechseln",
+    "paying": "Zahlung läuft…"
   },
   "helpView": {
     "title": "Hilfe",
