@@ -44,6 +44,14 @@ export type TNewsletterTestSendRefusal = TValueOf<
   typeof NEWSLETTER_TEST_SEND_REFUSAL
 >;
 
+export const NEWSLETTER_SEND_STATUS_REFUSAL = {
+  FORBIDDEN: NEWSLETTER_SEND_NOW_REFUSAL.FORBIDDEN,
+} as const;
+
+export type TNewsletterSendStatusRefusal = TValueOf<
+  typeof NEWSLETTER_SEND_STATUS_REFUSAL
+>;
+
 type TSendNowEligibility =
   | { isOffered: false }
   | { isOffered: true; disabledBy?: undefined; emailsLeft: number }
@@ -92,11 +100,16 @@ type TPostSendState =
       bandCeiling: number;
     };
 
-export type TNewsletterPostSendStatusResponse = TPostSendState & {
-  confirmedCount: number;
-  sendingOffCause: TMaybeUndefined<TNewsletterSendingOffCause>;
-  sendNow: TSendNowEligibility;
-};
+export type TNewsletterPostSendStatusResponse =
+  | ({ outcome: typeof ACTION_OUTCOME.SUCCESS } & TPostSendState & {
+        confirmedCount: number;
+        sendingOffCause: TMaybeUndefined<TNewsletterSendingOffCause>;
+        sendNow: TSendNowEligibility;
+      })
+  | {
+      outcome: typeof ACTION_OUTCOME.REFUSED;
+      reason: TNewsletterSendStatusRefusal;
+    };
 
 export type TNewsletterTestSendResult =
   | { outcome: typeof ACTION_OUTCOME.SUCCESS }
