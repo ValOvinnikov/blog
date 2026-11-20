@@ -43,10 +43,6 @@ vi.mock('@platform/server/auth/require-super-admin');
 vi.mock('@platform/server/audit/record-audit-event');
 vi.mock(
   '@platform/server/entitlement-grants/notify-owner-of-entitlement-change',
-  () => ({
-    notifyOwnerOfEntitlementGrant: vi.fn(),
-    notifyOwnerOfEntitlementRevoke: vi.fn(),
-  }),
 );
 vi.mock('@platform/server/site-config/revalidate-site-config');
 vi.mock('@platform/server/tenants/resolve-live-tenant');
