@@ -107,6 +107,17 @@ describe(revokeMemberAccess, () => {
     );
   });
 
+  it('revokes by Sanity user id alone, deleting no invite, when handed no address', async () => {
+    await revokeMemberAccess(MOCK_TENANT_ID, {
+      sanityUserId: MOCK_MEMBER_SANITY_USER_ID,
+    });
+
+    expect(listSanityProjectInvites).not.toHaveBeenCalled();
+    expect(revokeSanityProjectRole).toHaveBeenCalledWith(
+      expect.objectContaining({ projectUserId: MOCK_MEMBER_PROJECT_USER_ID }),
+    );
+  });
+
   it('never revokes the owner, even when handed their Sanity user id', async () => {
     await revokeMemberAccess(MOCK_TENANT_ID, {
       email: MOCK_RENAMED_MEMBER_EMAIL,

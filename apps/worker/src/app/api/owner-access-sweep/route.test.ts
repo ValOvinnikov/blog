@@ -14,7 +14,7 @@ import { runOwnerAccessSweep } from '@worker/utils/owner-access-sweep/run-owner-
 import { GET } from './route';
 
 const MOCK_SWEEP_URL = `${MOCK_WORKER_ORIGIN}/api/owner-access-sweep`;
-const MOCK_SWEEP_RESULT = { checked: 3, failed: 1 };
+const MOCK_SWEEP_RESULT = { checked: 3, revoked: 2, failed: 1 };
 
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/utils/owner-access-sweep/run-owner-access-sweep');
