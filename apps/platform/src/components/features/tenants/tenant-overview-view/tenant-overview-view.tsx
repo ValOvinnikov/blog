@@ -9,6 +9,7 @@ import { RecentActivityCard } from '@platform/components/features/tenants/recent
 import { TenantOverviewFocusProvider } from '@platform/components/features/tenants/tenant-overview-focus-provider';
 import { TenantOverviewHeader } from '@platform/components/features/tenants/tenant-overview-header';
 import { TenantSuspensionControl } from '@platform/components/features/tenants/tenant-suspension-control';
+import { UsageSection } from '@platform/components/features/usage/usage-section';
 import { DetailCardSkeleton } from '@platform/components/shared/detail-card-skeleton';
 import { DOMAIN_CARD_ROW_COUNT } from '@platform/constants/domain';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
@@ -101,6 +102,13 @@ export const TenantOverviewView = async ({
           grants={toGrantRows(listedGrants, plan, new Date())}
           target={toGrantTarget(tenant, viewer.isSuperAdmin)}
         />
+
+        {!isArchived && (
+          <UsageSection
+            tenant={tenant}
+            languagesHref={adminRoutes.languages(id)}
+          />
+        )}
 
         <FindingsCard tenantId={id} findings={findings} />
 

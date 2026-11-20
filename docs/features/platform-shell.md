@@ -89,13 +89,20 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   setup card (while setup is incomplete or failed), the Get started card (the
   real owner only, once setup is READY, until all four first-run steps are
   done; `platform-sign-in-and-onboarding.md` → "First run"), the Your site band, the
-  Domain and Owner pair, then Make it yours. Your site is a full-width card
+  Usage card (not for an archived tenant), the Domain and Owner pair, then Make
+  it yours. Your site is a full-width card
   whose header holds only the title; under it one row of four label-over-value
   cells (Name, Public domain, Plan, Language) in 3:3:2:2 widths, and below
   `md` two columns (Name and Public domain a full row each, Plan and Language
   sharing one). A footer strip carries the read-only hint. Domain and Owner sit
   in two equal columns from `md` and stack below; from `md` to below `lg`
   their detail lists stack label over value, following the window width.
+- **Usage card** sits on the owner Overview after Your site and on the
+  operator's `/tenants/{id}` Overview after Grants, before Findings, for every
+  role that opens the Overview, and not for an archived tenant. Its rows form a
+  band: one column below `md`, two from `md`, an odd last row spanning both,
+  separated by `line-2` borders. Rows and states:
+  [plans-and-entitlements](./plans-and-entitlements.md) → "Platform, Usage card".
 - `GET /api/dashboard/select-tenant?tenantId=` sets the active-workspace
   cookie and redirects to `/dashboard`. The Workspace switcher reaches it with
   a plain link, so choosing a site loads its dashboard as a new document; a

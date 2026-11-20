@@ -1,5 +1,6 @@
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
 import { TenantPageHeader } from '@platform/components/features/tenants/tenant-page-header';
+import { UsageSection } from '@platform/components/features/usage/usage-section';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { DetailCardSkeleton } from '@platform/components/shared/detail-card-skeleton';
 import {
@@ -61,6 +62,14 @@ export const OwnerHomeView = ({
       {getStarted && <GetStartedCard getStarted={getStarted} />}
 
       <YourSiteCard tenant={tenant} />
+
+      {!archivedAt && (
+        <UsageSection
+          tenant={tenant}
+          languagesHref={adminRoutes.dashboardLanguages()}
+          hasPlansFooter={true}
+        />
+      )}
 
       <div className={pair()}>
         <Suspense

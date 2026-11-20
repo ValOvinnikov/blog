@@ -99,6 +99,8 @@ vi.mock('@shinefold/db', async () => ({
 
 vi.mock('@platform/utils/env/env');
 
+vi.mock('@platform/server/usage/load-usage-meters');
+
 vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 
 const resolveIsPlatformTenantMock = vi.mocked(resolveIsPlatformTenant);
@@ -539,6 +541,15 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       expect(thirdLevelHeading).not.toBeInTheDocument();
     });
 
+    it('shows the Usage card straight after Grants', async () => {
+      const headings = await screen.findAllByRole('heading', { level: 2 });
+      const cardTitles = headings.map(({ textContent }) => textContent);
+
+      expect(cardTitles.indexOf(en.usageCard.title)).toBe(
+        cardTitles.indexOf(en.grantsCard.title) + 1,
+      );
+    });
+
     it('offers no Open Studio action', () => {
       const openStudioLink = screen.queryByRole('link', {
         name: 'Open Studio →',
@@ -559,6 +570,15 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     it('shows the archived notice', async () => {
       const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
       expect(archivedNotice).toBeVisible();
+    });
+
+    it('shows no Usage card', () => {
+      const usageTitle = screen.queryByRole('heading', {
+        level: 2,
+        name: en.usageCard.title,
+      });
+
+      expect(usageTitle).not.toBeInTheDocument();
     });
 
     it("describes the details panel's disabled Save with the archived notice", async () => {

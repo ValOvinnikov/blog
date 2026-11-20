@@ -23,11 +23,13 @@ import { STUDIO_ACCESS, TENANT_PLAN } from '@shinefold/config/constants';
 
 import { OwnerHomeView, type TOwnerHomeViewProps } from './owner-home-view';
 
-const { ownerHomePage } = messages;
+const { ownerHomePage, usageCard } = messages;
 
 vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
 vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
+
+vi.mock('@platform/server/usage/load-usage-meters');
 
 const ownerSite = (overrides: Parameters<typeof mockTenant>[0] = {}) =>
   mockTenant({
@@ -93,6 +95,15 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       const archivedNotice = screen.queryByText(ARCHIVED_NOTICE_TEXT);
 
       expect(archivedNotice).not.toBeInTheDocument();
+    });
+
+    it('shows the Usage card straight after Your site', async () => {
+      const headings = await screen.findAllByRole('heading', { level: 2 });
+      const cardTitles = headings.map(({ textContent }) => textContent);
+
+      expect(cardTitles.indexOf(usageCard.title)).toBe(
+        cardTitles.indexOf(ownerHomePage.yourSiteCardTitle) + 1,
+      );
     });
 
     it('shows the read-only Your site card with no editable fields', () => {
@@ -167,8 +178,13 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     });
 
     const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
+    const usageTitle = screen.queryByRole('heading', {
+      level: 2,
+      name: usageCard.title,
+    });
 
     expect(archivedNotice).toBeVisible();
+    expect(usageTitle).not.toBeInTheDocument();
   });
 
   it.each([

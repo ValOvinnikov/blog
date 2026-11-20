@@ -2512,6 +2512,47 @@
     "metaExpires": "{who} · {date} · Verloopt op {expiry}",
     "metaExpired": "{who} · {date} · Verlopen op {expiry}"
   },
+  "usageCard": {
+    "title": "Gebruik",
+    "description": "Wat uw abonnement bevat en hoeveel ervan gebruikt is.",
+    "labels": {
+      "TAKEAWAYS": "AI-kernpunten deze maand",
+      "EMAILS": "Deze maand verzonden e-mails",
+      "SEATS": "Teamplaatsen",
+      "LANGUAGES": "Extra talen"
+    },
+    "links": {
+      "LANGUAGES": "Talen"
+    },
+    "value": "<count>{used, number}</count> van {allowance, number}",
+    "failed": "Dit aantal kon niet worden geladen. Laad de pagina opnieuw om het nog eens te proberen.",
+    "footer": {
+      "limits": "Uw abonnement bepaalt deze limieten.",
+      "plansLink": "Bekijk wat elk abonnement bevat"
+    },
+    "notes": {
+      "TAKEAWAYS": {
+        "UNDER": "Wordt op {date} gereset",
+        "NEAR": "{percent}% gebruikt — nog {left, number} over<separator>·</separator><reset>Wordt op {date} gereset</reset>",
+        "FULL": "Alles gebruikt. Nieuwe berichten krijgen tot {date} geen kernpunten."
+      },
+      "EMAILS": {
+        "UNDER": "Wordt op {date} gereset",
+        "NEAR": "{percent}% gebruikt — nog {left, number} over<separator>·</separator><reset>Wordt op {date} gereset</reset>",
+        "FULL": "Alles gebruikt. Nieuwe berichten worden tot {date} niet gemaild."
+      },
+      "SEATS": {
+        "UNDER": "Telt de eigenaar, leden en openstaande uitnodigingen.",
+        "NEAR": "{left, plural, one {Nog # plaats over.} other {Nog # plaatsen over.}}",
+        "FULL": "Alle plaatsen bezet. Verwijder iemand om een ander uit te nodigen."
+      },
+      "LANGUAGES": {
+        "UNDER": "Uw standaardtaal telt niet mee.",
+        "NEAR": "{left, plural, one {Nog # taal over.} other {Nog # talen over.}}",
+        "FULL": "Alle in gebruik. Verwijder er een om een andere toe te voegen."
+      }
+    }
+  },
   "revokeGrantControl": {
     "revoke": {
       "trigger": "Intrekken",

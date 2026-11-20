@@ -3016,6 +3016,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module.ts"
+      },
+      {
+        "ref": "USAGE_LEVEL.FULL",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
       }
     ],
     "LEFT": [
@@ -10390,6 +10396,74 @@
         "file": "apps/platform/src/constants/upload.ts"
       }
     ],
+    "TAKEAWAYS": [
+      {
+        "ref": "USAGE_METER.TAKEAWAYS",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
+    "EMAILS": [
+      {
+        "ref": "USAGE_METER.EMAILS",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
+    "SEATS": [
+      {
+        "ref": "USAGE_METER.SEATS",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.SEATS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "LANGUAGES": [
+      {
+        "ref": "USAGE_METER.LANGUAGES",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.LANGUAGES",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "UNDER": [
+      {
+        "ref": "USAGE_LEVEL.UNDER",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
+    "NEAR": [
+      {
+        "ref": "USAGE_LEVEL.NEAR",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
+    "usage.meter_read_failed": [
+      {
+        "ref": "USAGE_LOG.METER_READ_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
     "SEGMENTED": [
       {
         "ref": "VIEW_TABS_VARIANT.SEGMENTED",
@@ -11705,22 +11779,6 @@
     "pricing_module.visitor_currency_fetch_failed": [
       {
         "ref": "PRICING_LOG.VISITOR_CURRENCY_FETCH_FAILED",
-        "scope": "app:web",
-        "from": "@web/constants/pricing",
-        "file": "apps/web/src/constants/pricing.ts"
-      }
-    ],
-    "LANGUAGES": [
-      {
-        "ref": "PLAN_COMPARISON_ROW.LANGUAGES",
-        "scope": "app:web",
-        "from": "@web/constants/pricing",
-        "file": "apps/web/src/constants/pricing.ts"
-      }
-    ],
-    "SEATS": [
-      {
-        "ref": "PLAN_COMPARISON_ROW.SEATS",
         "scope": "app:web",
         "from": "@web/constants/pricing",
         "file": "apps/web/src/constants/pricing.ts"
