@@ -47,7 +47,10 @@ export const DraftPreviewFrame = ({
     <PreviewFrame
       ariaLabel={t('frameRegionLabel')}
       controls={
-        <IconToolbar ariaLabel={t('toolbarAriaLabel')} groups={[deviceGroup]}>
+        <IconToolbar ariaLabel={t('toolbarAriaLabel')} groups={[deviceGroup]} />
+      }
+      actions={
+        <>
           <Button
             variant={BUTTON_VARIANT.SECONDARY}
             size={SIZE.SM}
@@ -64,7 +67,7 @@ export const DraftPreviewFrame = ({
           >
             {t('openPublished')}
           </ExternalLinkButton>
-        </IconToolbar>
+        </>
       }
     >
       <PreviewFrame.Stage>
