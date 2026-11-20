@@ -2,7 +2,6 @@ import { buildAppCookies } from '@shinefold/auth/sessions/app-cookies';
 import { CONSENT_CATEGORY, type TConsentCategory } from '@shinefold/config';
 import { AUTH_APP } from '@shinefold/config/constants';
 import type { TValueOf } from '@shinefold/config/utils';
-import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
 import { THEME_STORAGE_KEY } from '@web/config/theme-script';
 import { CONSENT_COOKIE_NAME } from '@web/utils/consent-cookie';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
@@ -28,7 +27,6 @@ export const COOKIE_ID = {
   SIGNED_IN_HINT: 'SIGNED_IN_HINT',
   NEWSLETTER_SUBSCRIBED: 'NEWSLETTER_SUBSCRIBED',
   NEWSLETTER_UNSUBSCRIBE_TOKEN: 'NEWSLETTER_UNSUBSCRIBE_TOKEN',
-  READING_DEPTH: 'READING_DEPTH',
   THEME: 'THEME',
   GOOGLE_ANALYTICS: 'GOOGLE_ANALYTICS',
   GOOGLE_ANALYTICS_VISIT: 'GOOGLE_ANALYTICS_VISIT',
@@ -85,6 +83,5 @@ export const COOKIE_LIST: readonly ICookieListEntry[] = [
     COOKIE_ID.NEWSLETTER_UNSUBSCRIBE_TOKEN,
     NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME,
   ),
-  necessaryFirstPartyEntry(COOKIE_ID.READING_DEPTH, DEPTH_STORAGE_KEY),
   necessaryFirstPartyEntry(COOKIE_ID.THEME, THEME_STORAGE_KEY),
 ];

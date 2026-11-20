@@ -47,3 +47,4 @@ export {
   buildOwnerNewsletterLimitNearEmail,
   type TOwnerNewsletterLimitNearEmailInput,
 } from './owner-newsletter-limit-near/owner-newsletter-limit-near';
+export type { TOwnerUsageRow } from './owner-usage-box/owner-usage-box';

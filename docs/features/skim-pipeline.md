@@ -18,7 +18,7 @@ epics: [1028]
 
 ## What it does
 
-When a post is first published, the public site asks Claude for 3–7 one-sentence takeaways of it and writes them onto the post's **draft** as its `postTakeaways`. Nothing reaches readers until an editor reviews the takeaways in the Studio and publishes the post again; publishing is the approval. Approved takeaways switch on the post's **30s** depth (./reading-experience.md). Generation rides the tenant's existing revalidation webhook; a manual endpoint regenerates on demand. A post first published with a future date gets its takeaways from a worker run when it goes live.
+When a post is first published, the public site asks Claude for 3–7 one-sentence takeaways of it and writes them onto the post's **draft** as its `postTakeaways`. Nothing reaches readers until an editor reviews the takeaways in the Studio and publishes the post again; publishing is the approval. Approved takeaways give the post its Summary card (./reading-experience.md). Generation rides the tenant's existing revalidation webhook; a manual endpoint regenerates on demand. A post first published with a future date gets its takeaways from a worker run when it goes live.
 
 ## Triggers
 

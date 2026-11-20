@@ -55,15 +55,11 @@
     "paginationAriaLabel": "Blogpagina's"
   },
   "blogPostPage": {
-    "depthToggle": {
-      "ariaLabel": "Leesdiepte",
-      "skim": "30s",
-      "read": "Lezen",
-      "deep": "Diepgaand"
-    },
-    "skimPanel": {
-      "label": "Samenvatting in 30 seconden",
-      "readFullArticle": "Lees het volledige artikel"
+    "postSummary": {
+      "button": "Samenvatting",
+      "title": "Kernpunten",
+      "readTime": "30 sec leestijd",
+      "readFullArticle": "Lees het volledige artikel · {count} min"
     },
     "asideKind": {
       "WHY_NOT": "Waarom niet X",
@@ -424,10 +420,6 @@
       "NEWSLETTER_UNSUBSCRIBE_TOKEN": {
         "purpose": "Bewaart de link uit je afmeldmail terwijl je bevestigt.",
         "duration": "1 uur"
-      },
-      "READING_DEPTH": {
-        "purpose": "Onthoudt hoeveel je van elk bericht wilt lezen. Opgeslagen in de lokale opslag van je browser.",
-        "duration": "Tot je je browsergegevens wist"
       },
       "THEME": {
         "purpose": "Onthoudt of je het lichte of donkere thema hebt gekozen. Opgeslagen in de lokale opslag van je browser.",

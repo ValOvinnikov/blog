@@ -11,10 +11,10 @@ import {
   type TAsideKind,
 } from '@shinefold/config';
 import type { TPortableTextBody } from '@shinefold/service';
+import { Aside } from '@shinefold/ui/components/molecules/aside';
 import { ImageWithCaption } from '@shinefold/ui/components/molecules/image-with-caption';
 import { Table } from '@shinefold/ui/components/molecules/table';
 import { hasLength } from '@shinefold/utils/primitives';
-import { DeepAside } from '@web/components/shared/deep-aside';
 import { CodeBlock } from '@web/components/shared/portable-text/components/code-block';
 import { portableTextVariants } from '@web/components/shared/portable-text/portable-text-variants';
 import { SanityImage } from '@web/components/shared/sanity-image';
@@ -81,12 +81,12 @@ export const makeAsideTypeComponent = (
     const label = asideKindLabels?.[kind] ?? kind;
 
     return (
-      <DeepAside kind={kind} label={label}>
+      <Aside kind={kind} label={label}>
         <PortableTextRoot
           value={value.body ?? []}
           components={baseComponents}
         />
-      </DeepAside>
+      </Aside>
     );
   };
 

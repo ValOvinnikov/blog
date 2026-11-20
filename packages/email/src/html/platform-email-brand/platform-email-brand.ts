@@ -17,7 +17,29 @@ export const PLATFORM_EMAIL_BRAND = {
   brandPrimary: SHINEFOLD_LOGO_COLOR.INK,
   brandPrimarySolid: SHINEFOLD_LOGO_COLOR.INK,
   brandPrimaryContrast: EMAIL_WHITE,
+  surfaceHead: '#eef1f6',
+  warn: '#9a3d0b',
+  bad: '#b42318',
 } as const;
+
+type TPlatformEmailBrand = Record<keyof typeof PLATFORM_EMAIL_BRAND, string>;
+
+const PLATFORM_DARK_BG = '#0f1115';
+
+// Mirrors the dark tokens in `apps/platform`'s `platform-theme.css`; the usage colours above mirror its light ones.
+export const PLATFORM_EMAIL_DARK_BRAND: TPlatformEmailBrand = {
+  surface: '#171a20',
+  surface2: PLATFORM_DARK_BG,
+  border: '#2b303a',
+  text: SHINEFOLD_LOGO_COLOR.PAPER,
+  textMuted: '#a3abb8',
+  brandPrimary: SHINEFOLD_LOGO_COLOR.YELLOW,
+  brandPrimarySolid: SHINEFOLD_LOGO_COLOR.YELLOW,
+  brandPrimaryContrast: PLATFORM_DARK_BG,
+  surfaceHead: '#1d2027',
+  warn: '#ffa066',
+  bad: '#fca5a0',
+};
 
 export const PLATFORM_EMAIL_BRAND_NAME = SHINEFOLD_LOGO_NAME;
 

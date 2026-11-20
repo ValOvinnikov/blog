@@ -60,6 +60,7 @@ export {
   type TOwnerNewsletterPausedEmailInput,
   buildOwnerNewsletterLimitNearEmail,
   type TOwnerNewsletterLimitNearEmailInput,
+  type TOwnerUsageRow,
 } from './templates/owner';
 export {
   buildMagicLinkEmail,

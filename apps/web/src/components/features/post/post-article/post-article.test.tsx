@@ -7,6 +7,8 @@ import {
   urlForSanityImage,
 } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { POST_LOG } from '@web/constants/post';
 import { SESSION_STATUS } from '@web/constants/session';
 import { ToastProvider } from '@web/context/toast-provider';
 import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
@@ -14,14 +16,18 @@ import { isCapabilityEnabled } from '@web/server/settings-features/is-capability
 import {
   customRenderServerAsync,
   screen,
-  waitFor,
   within,
 } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
   MOCK_POST_DETAIL,
   MOCK_POST_DETAIL_AUTHOR_IMAGE,
+  MOCK_POST_TAKEAWAYS,
 } from '@web/testing/pages/blog-post-page/fixtures';
+import {
+  ARIA_CONTROLS,
+  ARIA_EXPANDED,
+} from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 import { MOCK_TAG_SLUG, mockTag } from '@web/testing/shared/tag/fixtures';
@@ -87,6 +93,7 @@ const MOCK_POST = {
 const FORMATTED_PUBLISHED_DATE = 'January 15, 2026';
 const READING_TIME_TEXT = `${MOCK_POST_DETAIL.readingTimeMinutes} min read`;
 const HEADER_TEST_ID = 'post-article-header';
+const ARTICLE_BODY_TEST_ID = 'article-body-focus-target';
 
 const { author, topic } = MOCK_POST;
 const { saveAriaLabel } = SITE_MESSAGES.bookmarkButton;
@@ -94,6 +101,15 @@ const { label: contentsLabel } = SITE_MESSAGES.contentsRail;
 const shareButtonName = SITE_MESSAGES.postShare.shareAriaLabel.replace(
   '{title}',
   MOCK_POST_DETAIL.title,
+);
+const {
+  button: summaryButtonName,
+  title: summaryCardName,
+  readFullArticle,
+} = SITE_MESSAGES.blogPostPage.postSummary;
+const readFullArticleName = readFullArticle.replace(
+  '{count}',
+  String(MOCK_POST_DETAIL.readingTimeMinutes),
 );
 
 const setup = customRenderServerAsync(
@@ -129,33 +145,12 @@ describe(`<${PostArticle.name}/>`, () => {
     await expect(setup()).rejects.toBe(MOCK_ERROR);
 
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      'post_article.fetch_failed',
+      POST_LOG.ARTICLE_FETCH_FAILED,
       {
         slug: MOCK_POST_DETAIL.slug,
         error: MOCK_ERROR,
       },
     );
-  });
-
-  it('renders the bookmark toggle and share button in the header', async () => {
-    vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
-    getPostMock.mockResolvedValueOnce(
-      okResult({ ...MOCK_POST, tags: [], heroImage: undefined }),
-    );
-
-    await setup();
-
-    const header = screen.getByTestId(HEADER_TEST_ID);
-    const saveButton = await within(header).findByRole('button', {
-      name: saveAriaLabel,
-    });
-    await waitFor(() => expect(saveButton).toBeEnabled());
-    const shareButton = within(header).getByRole('button', {
-      name: shareButtonName,
-    });
-
-    expect(saveButton).toBeVisible();
-    expect(shareButton).toBeVisible();
   });
 
   it('renders the topic eyebrow as plain text when the topic has no topic page', async () => {
@@ -326,12 +321,96 @@ describe(`<${PostArticle.name}/>`, () => {
       expect(avatarImage).toHaveAttribute('src', expectedAvatarUrl);
     });
 
+    it('renders no Summary button without a summary', () => {
+      const summaryButton = screen.queryByRole('button', {
+        name: summaryButtonName,
+      });
+
+      expect(summaryButton).not.toBeInTheDocument();
+    });
+
     it('renders no tag chips when the post has no tags', () => {
       const typeScriptLink = screen.queryByRole('link', {
         name: MOCK_TYPESCRIPT_TAG.title,
       });
 
       expect(typeScriptLink).not.toBeInTheDocument();
+    });
+  });
+  describe('with a summary', () => {
+    let user: UserEvent;
+    let summaryButton: HTMLElement;
+
+    beforeEach(async () => {
+      vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
+      getPostMock.mockResolvedValue(
+        okResult({ ...MOCK_POST, postTakeaways: MOCK_POST_TAKEAWAYS }),
+      );
+      user = userEvent.setup();
+      await setup();
+      summaryButton = screen.getByRole('button', { name: summaryButtonName });
+    });
+
+    it('orders the header actions Save, Share, Summary', async () => {
+      const header = screen.getByTestId(HEADER_TEST_ID);
+      const saveButton = await within(header).findByRole('button', {
+        name: saveAriaLabel,
+      });
+      const shareButton = within(header).getByRole('button', {
+        name: shareButtonName,
+      });
+      const headerButtons = within(header).getAllByRole('button');
+
+      expect(headerButtons).toEqual([saveButton, shareButton, summaryButton]);
+    });
+
+    it('starts with the summary card closed', () => {
+      const card = screen.queryByRole('region', { name: summaryCardName });
+
+      expect(summaryButton).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(card).not.toBeInTheDocument();
+    });
+
+    describe('once Summary is pressed', () => {
+      beforeEach(async () => {
+        await user.click(summaryButton);
+      });
+
+      it('opens the card it controls and keeps focus on the button', () => {
+        const card = screen.getByRole('region', { name: summaryCardName });
+        const takeawayItems = within(card).getAllByRole('listitem');
+
+        expect(summaryButton).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(summaryButton).toHaveAttribute(ARIA_CONTROLS, card.id);
+        expect(takeawayItems.map((item) => item.textContent)).toEqual(
+          MOCK_POST_TAKEAWAYS.takeaways,
+        );
+        expect(summaryButton).toHaveFocus();
+      });
+
+      it('closes the card when Summary is pressed again', async () => {
+        await user.click(summaryButton);
+
+        const card = screen.queryByRole('region', { name: summaryCardName });
+
+        expect(summaryButton).toHaveAttribute(ARIA_EXPANDED, 'false');
+        expect(card).not.toBeInTheDocument();
+        expect(summaryButton).toHaveFocus();
+      });
+
+      it('closes the card and moves focus to the article body from its footer', async () => {
+        const readFullArticleButton = screen.getByRole('button', {
+          name: readFullArticleName,
+        });
+
+        await user.click(readFullArticleButton);
+
+        const card = screen.queryByRole('region', { name: summaryCardName });
+        const articleBody = screen.getByTestId(ARTICLE_BODY_TEST_ID);
+
+        expect(card).not.toBeInTheDocument();
+        expect(articleBody).toHaveFocus();
+      });
     });
   });
 });

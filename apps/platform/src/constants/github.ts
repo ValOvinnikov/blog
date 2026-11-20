@@ -18,6 +18,8 @@ export const GITHUB_RATE_LIMIT_REMAINING_HEADER = 'x-ratelimit-remaining';
 
 export const GITHUB_RATE_LIMIT_EXHAUSTED = String(0);
 
+export const GITHUB_PINNED_READ_REVALIDATE = false;
+
 export const GITHUB_FILE_STATUS = {
   ADDED: 'added',
   MODIFIED: 'modified',

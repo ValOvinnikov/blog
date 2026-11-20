@@ -1344,6 +1344,36 @@
         "file": "packages/config/src/constants/email-type.ts"
       }
     ],
+    "NORMAL": [
+      {
+        "ref": "EMAIL_USAGE_LEVEL.NORMAL",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/email-usage-level.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SEND_PACE.NORMAL",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "NEAR": [
+      {
+        "ref": "EMAIL_USAGE_LEVEL.NEAR",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/email-usage-level.ts"
+      }
+    ],
+    "OVER": [
+      {
+        "ref": "EMAIL_USAGE_LEVEL.OVER",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/email-usage-level.ts"
+      }
+    ],
     "YOUTUBE": [
       {
         "ref": "EMBED_PROVIDER.YOUTUBE",
@@ -10766,14 +10796,6 @@
         "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
-    "READING_DEPTH": [
-      {
-        "ref": "COOKIE_ID.READING_DEPTH",
-        "scope": "app:web",
-        "from": "@web/constants/cookie-list",
-        "file": "apps/web/src/constants/cookie-list.ts"
-      }
-    ],
     "THEME": [
       {
         "ref": "COOKIE_ID.THEME",
@@ -11780,6 +11802,22 @@
         "scope": "app:web",
         "from": "@web/constants/post-related",
         "file": "apps/web/src/constants/post-related.ts"
+      }
+    ],
+    "post_article.fetch_failed": [
+      {
+        "ref": "POST_LOG.ARTICLE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post",
+        "file": "apps/web/src/constants/post.ts"
+      }
+    ],
+    "blog_post_page.fetch_failed": [
+      {
+        "ref": "POST_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post",
+        "file": "apps/web/src/constants/post.ts"
       }
     ],
     "pricing_module.fetch_failed": [
@@ -12919,14 +12957,6 @@
     "UNCLAIMED": [
       {
         "ref": "NEWSLETTER_POST_STATE.UNCLAIMED",
-        "scope": "app:worker",
-        "from": "@worker/constants/newsletter-send",
-        "file": "apps/worker/src/constants/newsletter-send.ts"
-      }
-    ],
-    "NORMAL": [
-      {
-        "ref": "NEWSLETTER_SEND_PACE.NORMAL",
         "scope": "app:worker",
         "from": "@worker/constants/newsletter-send",
         "file": "apps/worker/src/constants/newsletter-send.ts"

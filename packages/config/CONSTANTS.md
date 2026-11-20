@@ -102,6 +102,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **EMAIL_TYPE**: `SIGN_IN`, `INVITE`, `NEWSLETTER_CONFIRMATION`, `NEWSLETTER_ISSUE`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/email-usage-level.ts`
+
+- **EMAIL_USAGE_LEVEL**: `NORMAL`, `NEAR`, `OVER`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/embed.ts`
 
 - **EMBED_PROVIDER**: `YOUTUBE`, `VIMEO`, `LOOM`, `CAL`, `GOOGLE_MAPS`
@@ -909,7 +913,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/cookie-list` — `apps/web/src/constants/cookie-list.ts`
 
 - **COOKIE_PROVIDER**: `FIRST_PARTY`, `GOOGLE`
-- **COOKIE_ID**: `CONSENT`, `LANGUAGE`, `SESSION`, `CSRF`, `SIGN_IN_RETURN`, `OAUTH_VERIFIER`, `OAUTH_STATE`, `SIGNED_IN_HINT`, `NEWSLETTER_SUBSCRIBED`, `NEWSLETTER_UNSUBSCRIBE_TOKEN`, `READING_DEPTH`, `THEME`, `GOOGLE_ANALYTICS`, `GOOGLE_ANALYTICS_VISIT`
+- **COOKIE_ID**: `CONSENT`, `LANGUAGE`, `SESSION`, `CSRF`, `SIGN_IN_RETURN`, `OAUTH_VERIFIER`, `OAUTH_STATE`, `SIGNED_IN_HINT`, `NEWSLETTER_SUBSCRIBED`, `NEWSLETTER_UNSUBSCRIBE_TOKEN`, `THEME`, `GOOGLE_ANALYTICS`, `GOOGLE_ANALYTICS_VISIT`
 
 ### `@web/constants/cookie-statement` — `apps/web/src/constants/cookie-statement.ts`
 
@@ -1025,6 +1029,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/post-related` — `apps/web/src/constants/post-related.ts`
 
 - **POST_RELATED_LOG**: `MISSING_POST_CONTEXT`=`"post_related_module.missing_post_context"`, `MODULE_FETCH_FAILED`=`"post_related_module.fetch_failed"`
+
+### `@web/constants/post` — `apps/web/src/constants/post.ts`
+
+- **POST_LOG**: `ARTICLE_FETCH_FAILED`=`"post_article.fetch_failed"`, `PAGE_FETCH_FAILED`=`"blog_post_page.fetch_failed"`
 
 ### `@web/constants/pricing` — `apps/web/src/constants/pricing.ts`
 
