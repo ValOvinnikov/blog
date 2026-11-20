@@ -1,5 +1,5 @@
 {
-  "id": "01fb9f38-0362-4e30-829a-09697356a151",
+  "id": "ada66476-083d-492e-a760-73499edb9cce",
   "prevId": "3fa4d2bc-b16b-4a7c-af25-fbd79c36e318",
   "version": "7",
   "dialect": "postgresql",
@@ -2378,6 +2378,39 @@
             },
             {
               "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "subscribers_tenant_status_confirmed_at_id_idx": {
+          "name": "subscribers_tenant_status_confirmed_at_id_idx",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "confirmed_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"

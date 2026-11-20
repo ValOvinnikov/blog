@@ -39,7 +39,7 @@ function mockConfirmedSubscriber(confirmedAt: Date) {
   return { status: SUBSCRIBER_STATUS.ACTIVE, confirmedAt };
 }
 
-export async function insertTestConfirmedSubscribers(
+export async function insertTestConfirmedSubscribersBesideAnotherSite(
   db: TTestDb,
   tenantId: string,
   subscribers: { email: string; confirmedAt: Date }[],

@@ -14,4 +14,5 @@ ALTER TABLE "newsletter_post_sends" ADD COLUMN "scheduled_for" timestamp;--> sta
 ALTER TABLE "newsletter_post_sends" ADD COLUMN "settled_at" timestamp;--> statement-breakpoint
 ALTER TABLE "newsletter_post_sends" ADD COLUMN "hand_started_at" timestamp;--> statement-breakpoint
 ALTER TABLE "tenants" ADD COLUMN "billing_interval" text;--> statement-breakpoint
-ALTER TABLE "tenants" ADD COLUMN "billing_currency" text;
+ALTER TABLE "tenants" ADD COLUMN "billing_currency" text;--> statement-breakpoint
+CREATE INDEX "subscribers_tenant_status_confirmed_at_id_idx" ON "subscribers" USING btree ("tenant_id","status","confirmed_at","id");

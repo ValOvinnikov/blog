@@ -6,7 +6,7 @@ import {
 } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
-import { insertTestConfirmedSubscribers } from '@shinefold/db/testing/subscribers/fixtures';
+import { insertTestConfirmedSubscribersBesideAnotherSite } from '@shinefold/db/testing/subscribers/fixtures';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { listSubscribersForExport } from './list-subscribers-for-export';
@@ -36,7 +36,7 @@ describe(listSubscribersForExport, () => {
   });
 
   it("holds the site's confirmed subscribers newest first, across batches", async () => {
-    const confirmed = await insertTestConfirmedSubscribers(
+    const confirmed = await insertTestConfirmedSubscribersBesideAnotherSite(
       db(),
       tenantId,
       MOCK_CONFIRMED,

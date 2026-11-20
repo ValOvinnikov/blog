@@ -10,10 +10,9 @@ import type { TMaybeUndefined } from '@shinefold/config/types';
 import { getDb } from '@shinefold/db/client';
 import { getEmailNewPosts } from '@shinefold/db/queries/email-config/get-email-new-posts';
 import { getSettingsFeaturesAndPreset } from '@shinefold/db/queries/settings-features/get-settings-features-and-preset';
-import { listResolvableEntitlementGrants } from '@shinefold/db/queries/tenant-entitlement-grants/list-resolvable-entitlement-grants';
+import { getTenantEntitlements } from '@shinefold/db/queries/tenant-entitlement-grants/get-tenant-entitlements';
 import { tenants } from '@shinefold/db/schema/tenants';
 import { newsletterSendingOffCause } from '@shinefold/db/utils/newsletter-sending-off-cause/newsletter-sending-off-cause';
-import { resolveTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { eq } from 'drizzle-orm';
 
@@ -40,16 +39,12 @@ export async function getNewsletterSendingOffCause(
     .where(eq(tenants.id, tenantId));
   if (!tenant) return errorResult(ERROR_CODE.DB_NOT_FOUND);
 
-  const [grants, newsletterEnabled, emailNewPosts] = await Promise.all([
-    listResolvableEntitlementGrants(tenantId),
-    isNewsletterEnabled(tenantId),
-    getEmailNewPosts(tenantId),
-  ]);
-  const { capabilities } = resolveTenantEntitlements(
-    tenant.plan,
-    grants,
-    new Date(),
-  );
+  const [{ capabilities }, newsletterEnabled, emailNewPosts] =
+    await Promise.all([
+      getTenantEntitlements({ id: tenantId, plan: tenant.plan }),
+      isNewsletterEnabled(tenantId),
+      getEmailNewPosts(tenantId),
+    ]);
 
   return okResult(
     newsletterSendingOffCause(tenant, {

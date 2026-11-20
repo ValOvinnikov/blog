@@ -11,6 +11,8 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 export type TNewsletterPostHandStart = {
   claimedAt: Date;
   clearedSkipReason: TMaybeUndefined<TNewsletterSkipReason>;
+  clearedEmailsNeeded: TMaybeUndefined<number>;
+  clearedAllowanceLeft: TMaybeUndefined<number>;
 };
 
 export async function startNewsletterPostSendByHand(
@@ -21,7 +23,11 @@ export async function startNewsletterPostSendByHand(
   const startedAt = new Date();
   const prior = db.$with('prior').as(
     db
-      .select({ skipReason: newsletterPostSends.skipReason })
+      .select({
+        skipReason: newsletterPostSends.skipReason,
+        emailsNeeded: newsletterPostSends.emailsNeeded,
+        allowanceLeft: newsletterPostSends.allowanceLeft,
+      })
       .from(newsletterPostSends)
       .where(
         and(
@@ -67,6 +73,12 @@ export async function startNewsletterPostSendByHand(
       clearedSkipReason: sql<
         TMaybeNull<TNewsletterSkipReason>
       >`(select ${prior.skipReason} from ${prior})`,
+      clearedEmailsNeeded: sql<
+        TMaybeNull<number>
+      >`(select ${prior.emailsNeeded} from ${prior})`,
+      clearedAllowanceLeft: sql<
+        TMaybeNull<number>
+      >`(select ${prior.allowanceLeft} from ${prior})`,
     });
 
   if (!started) return undefined;
@@ -74,5 +86,7 @@ export async function startNewsletterPostSendByHand(
   return {
     claimedAt: started.claimedAt,
     clearedSkipReason: started.clearedSkipReason ?? undefined,
+    clearedEmailsNeeded: started.clearedEmailsNeeded ?? undefined,
+    clearedAllowanceLeft: started.clearedAllowanceLeft ?? undefined,
   };
 }

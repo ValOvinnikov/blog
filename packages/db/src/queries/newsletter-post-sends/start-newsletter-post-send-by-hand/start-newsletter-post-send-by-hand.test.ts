@@ -43,7 +43,12 @@ describe(startNewsletterPostSendByHand, () => {
 
   it('claims a post with no claim as waiting to send', async () => {
     expect(await startNewsletterPostSendByHand(tenantId, MOCK_POST_ID)).toEqual(
-      { claimedAt: MOCK_NOW, clearedSkipReason: undefined },
+      {
+        claimedAt: MOCK_NOW,
+        clearedSkipReason: undefined,
+        clearedEmailsNeeded: undefined,
+        clearedAllowanceLeft: undefined,
+      },
     );
     expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual(
       mockNewsletterPostSend({ handStartedAt: MOCK_NOW }),
@@ -64,7 +69,12 @@ describe(startNewsletterPostSendByHand, () => {
 
       expect(
         await startNewsletterPostSendByHand(tenantId, MOCK_POST_ID),
-      ).toEqual({ claimedAt: MOCK_LATER, clearedSkipReason: skipReason });
+      ).toEqual({
+        claimedAt: MOCK_LATER,
+        clearedSkipReason: skipReason,
+        clearedEmailsNeeded: MOCK_SKIP_DETAILS.emailsNeeded,
+        clearedAllowanceLeft: MOCK_SKIP_DETAILS.allowanceLeft,
+      });
       expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual(
         mockNewsletterPostSend({
           claimedAt: MOCK_LATER,

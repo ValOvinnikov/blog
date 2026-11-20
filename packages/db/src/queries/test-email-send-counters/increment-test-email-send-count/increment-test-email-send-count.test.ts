@@ -5,6 +5,7 @@ import {
   MOCK_WINDOW_MS,
   MOCK_WINDOW_OPENED_AT,
 } from '@shinefold/db/testing/fixed-window-counters/fixtures';
+import { useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { incrementTestEmailSendCount } from './increment-test-email-send-count';
@@ -18,12 +19,9 @@ const MOCK_OTHER_KEY = faker.string.uuid();
 
 const db = useQueryTestDb();
 
-beforeEach(() => {
-  vi.useFakeTimers({ now: MOCK_WINDOW_OPENED_AT });
-});
+useFrozenClock(MOCK_WINDOW_OPENED_AT);
 
 afterEach(async () => {
-  vi.useRealTimers();
   await db().delete(schema.testEmailSendCounters);
 });
 
