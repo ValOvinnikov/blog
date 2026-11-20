@@ -1251,10 +1251,11 @@
     "sendTest": "Send test to me",
     "sendingTest": "Sending…",
     "testSent": "Test sent to {email}.",
-    "testRateLimited": "You've sent several tests recently — try again in a few minutes.",
+    "testRateLimited": "You've sent the most tests for now. Try again at {time}.",
     "testInvalid": "Fill in the subject and message before sending a test.",
     "testFailed": "Couldn't send the test — try again.",
     "testSubject": "[Test] {subject}",
+    "postTestBanner": "Test email — only you got this. Your subscribers get it when the post is first published.",
     "unsavedLogoNote": "A logo you haven't saved yet isn't included in the test."
   },
   "emailSettingsForm": {

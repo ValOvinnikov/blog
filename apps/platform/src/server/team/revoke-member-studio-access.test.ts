@@ -23,6 +23,7 @@ import { HTTP_STATUS } from '@shinefold/config';
 import { revokeMemberStudioAccess } from './revoke-member-studio-access';
 
 vi.mock('@platform/utils/env/env');
+vi.mock('@platform/utils/worker-secrets-env/worker-secrets-env');
 
 const [MOCK_FIRST_RETRY_DELAY_MS = 0, MOCK_SECOND_RETRY_DELAY_MS = 0] =
   MEMBER_ACCESS_REVOKE_RETRY_DELAYS_MS;

@@ -1251,10 +1251,11 @@
     "sendTest": "Test an mich senden",
     "sendingTest": "Wird gesendet…",
     "testSent": "Test an {email} gesendet.",
-    "testRateLimited": "Sie haben gerade mehrere Tests gesendet — bitte in ein paar Minuten erneut versuchen.",
+    "testRateLimited": "Sie haben vorerst die maximale Anzahl an Tests gesendet. Versuchen Sie es um {time} erneut.",
     "testInvalid": "Füllen Sie Betreff und Nachricht aus, bevor Sie einen Test senden.",
     "testFailed": "Der Test konnte nicht gesendet werden — bitte erneut versuchen.",
     "testSubject": "[Test] {subject}",
+    "postTestBanner": "Test-E-Mail — nur Sie haben sie erhalten. Ihre Abonnenten erhalten sie, wenn der Beitrag zum ersten Mal veröffentlicht wird.",
     "unsavedLogoNote": "Ein noch nicht gespeichertes Logo ist im Test nicht enthalten."
   },
   "emailSettingsForm": {

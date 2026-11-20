@@ -8,8 +8,8 @@ import {
 } from '@platform/server/auth/send-sign-in-link-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
 import {
-  ACTION_OUTCOME,
   isOutcomeInvalid,
+  isOutcomeRateLimited,
   isOutcomeServerError,
   isOutcomeSuccess,
   type TMaybeUndefined,
@@ -41,8 +41,7 @@ export const useEmailSignIn = ({
         isOutcomeInvalid(result) ? result.fieldErrors.email : undefined,
       );
       setSendRefusal(
-        result.outcome === ACTION_OUTCOME.RATE_LIMITED ||
-          isOutcomeServerError(result)
+        isOutcomeRateLimited(result) || isOutcomeServerError(result)
           ? result.outcome
           : undefined,
       );

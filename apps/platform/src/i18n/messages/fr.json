@@ -1251,10 +1251,11 @@
     "sendTest": "M'envoyer un test",
     "sendingTest": "Envoi…",
     "testSent": "Test envoyé à {email}.",
-    "testRateLimited": "Vous avez envoyé plusieurs tests récemment — réessayez dans quelques minutes.",
+    "testRateLimited": "Vous avez envoyé le nombre maximal de tests pour le moment. Réessayez à {time}.",
     "testInvalid": "Renseignez l'objet et le message avant d'envoyer un test.",
     "testFailed": "Impossible d'envoyer le test — veuillez réessayer.",
     "testSubject": "[Test] {subject}",
+    "postTestBanner": "E-mail de test — vous seul l'avez reçu. Vos abonnés le recevront à la première publication de l'article.",
     "unsavedLogoNote": "Un logo non encore enregistré n'est pas inclus dans le test."
   },
   "emailSettingsForm": {

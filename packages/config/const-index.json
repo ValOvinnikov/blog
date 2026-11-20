@@ -9914,6 +9914,38 @@
         "file": "apps/platform/src/constants/stripe-schedule.ts"
       }
     ],
+    "studio_newsletter.status_failed": [
+      {
+        "ref": "STUDIO_NEWSLETTER_LOG.STATUS_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/studio-newsletter",
+        "file": "apps/platform/src/constants/studio-newsletter.ts"
+      }
+    ],
+    "studio_newsletter.test_send_failed": [
+      {
+        "ref": "STUDIO_NEWSLETTER_LOG.TEST_SEND_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/studio-newsletter",
+        "file": "apps/platform/src/constants/studio-newsletter.ts"
+      }
+    ],
+    "studio_newsletter.send_now_failed": [
+      {
+        "ref": "STUDIO_NEWSLETTER_LOG.SEND_NOW_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/studio-newsletter",
+        "file": "apps/platform/src/constants/studio-newsletter.ts"
+      }
+    ],
+    "studio_newsletter.send_now_enqueue_refused": [
+      {
+        "ref": "STUDIO_NEWSLETTER_LOG.SEND_NOW_ENQUEUE_REFUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/studio-newsletter",
+        "file": "apps/platform/src/constants/studio-newsletter.ts"
+      }
+    ],
     "MOVED_UP": [
       {
         "ref": "SUBSCRIBERS_SEARCH_PARAM.MOVED_UP",

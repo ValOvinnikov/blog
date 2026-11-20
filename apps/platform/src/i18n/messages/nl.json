@@ -1251,10 +1251,11 @@
     "sendTest": "Test naar mij sturen",
     "sendingTest": "Versturen…",
     "testSent": "Test verstuurd naar {email}.",
-    "testRateLimited": "Je hebt net meerdere tests verstuurd — probeer het over een paar minuten opnieuw.",
+    "testRateLimited": "Je hebt voorlopig het maximum aantal tests verstuurd. Probeer het opnieuw om {time}.",
     "testInvalid": "Vul het onderwerp en bericht in voordat je een test verstuurt.",
     "testFailed": "De test kon niet worden verstuurd — probeer het opnieuw.",
     "testSubject": "[Test] {subject}",
+    "postTestBanner": "Testmail — alleen jij hebt deze gekregen. Je abonnees krijgen hem wanneer het bericht voor het eerst wordt gepubliceerd.",
     "unsavedLogoNote": "Een logo dat je nog niet hebt opgeslagen, zit niet in de test."
   },
   "emailSettingsForm": {

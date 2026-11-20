@@ -5,13 +5,9 @@ import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockedWebSecretsEnv } from '@platform/testing/env/mocked-web-secrets-env';
 import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { readSentSignedRequest } from '@platform/testing/worker/sent-signed-request';
 import { logger } from '@platform/utils/logger/logger';
 import { HTTP_METHOD, HTTP_STATUS, LOCALE_ISO_CODES } from '@shinefold/config';
-import {
-  ENQUEUE_SIGNATURE_HEADER,
-  ENQUEUE_TIMESTAMP_HEADER,
-  isValidEnqueueSignature,
-} from '@shinefold/utils/enqueue-signature';
 
 import { fetchPageTitle } from './fetch-page-title';
 
@@ -53,25 +49,17 @@ describe(fetchPageTitle, () => {
   it("asks the website's pages route for the title, signed so the website accepts it", async () => {
     const title = await fetchTitle();
 
-    const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
-    const headers = init.headers as Record<string, string>;
-    const rawBody = init.body as string;
-    const isSigned = isValidEnqueueSignature({
-      secret: MOCK_SECRET,
-      timestamp: headers[ENQUEUE_TIMESTAMP_HEADER] ?? null,
-      signature: headers[ENQUEUE_SIGNATURE_HEADER] ?? null,
-      path: MOCK_PAGE_PATH,
-      rawBody,
-    });
+    const { url, method, body, isSignedWith } =
+      readSentSignedRequest(fetchMock);
 
     expect(title).toBe(MOCK_PAGE_TITLE);
     expect(url.toString()).toBe(`${MOCK_WEB_APP_URL}${MOCK_PAGE_PATH}`);
-    expect(init.method).toBe(HTTP_METHOD.POST);
-    expect(JSON.parse(rawBody)).toEqual({
+    expect(method).toBe(HTTP_METHOD.POST);
+    expect(body).toEqual({
       tenantId: MOCK_TENANT_ID,
       locale: LOCALE_ISO_CODES.DE,
     });
-    expect(isSigned).toBe(true);
+    expect(isSignedWith(MOCK_SECRET, MOCK_PAGE_PATH)).toBe(true);
   });
 
   it.each([
