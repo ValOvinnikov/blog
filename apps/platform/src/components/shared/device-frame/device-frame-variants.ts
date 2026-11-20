@@ -20,7 +20,7 @@ export const deviceFrameVariants = tv({
       'pointer-events-none absolute bottom-0 left-0 origin-bottom-left',
     ],
     browserBar: [
-      'flex flex-none items-center gap-2.5 px-2.5',
+      'flex flex-none items-center gap-2.5 px-2.5 contain-inline-size',
       'border-b border-platform-line bg-platform-surface',
     ],
     dots: ['flex gap-[5px]'],
