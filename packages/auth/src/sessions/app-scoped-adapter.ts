@@ -65,6 +65,7 @@ function withAppScopedSessions(app: TAuthApp): TAdapterWrapper {
   };
 }
 
+// Auth.js sets the session cookie from the token of a session the adapter returns, so each one carries the raw token.
 function withHashedSessionTokens(adapter: Adapter): Adapter {
   const { createSession, getSessionAndUser, updateSession, deleteSession } =
     adapter;
@@ -78,12 +79,16 @@ function withHashedSessionTokens(adapter: Adapter): Adapter {
           ...session,
           sessionToken: sha256Hex(session.sessionToken),
         });
-        // Auth.js sets the cookie from the returned token, so it must be the raw one.
         return { ...created, sessionToken: session.sessionToken };
       }),
     getSessionAndUser:
       getSessionAndUser &&
-      ((sessionToken) => getSessionAndUser(sha256Hex(sessionToken))),
+      (async (sessionToken) => {
+        const found = await getSessionAndUser(sha256Hex(sessionToken));
+        return (
+          found && { ...found, session: { ...found.session, sessionToken } }
+        );
+      }),
     updateSession:
       updateSession &&
       ((session) =>
