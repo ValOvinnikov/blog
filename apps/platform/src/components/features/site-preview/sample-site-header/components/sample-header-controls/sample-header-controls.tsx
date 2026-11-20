@@ -1,5 +1,6 @@
 import { SampleAccountControl } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-account-control/sample-account-control';
 import { SampleLanguageSwitcher } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-language-switcher/sample-language-switcher';
+import type { TSampleReader } from '@platform/components/features/site-preview/sample-site-header/sample-reader';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import {
   HEADER_LAYOUT,
@@ -18,8 +19,7 @@ import { sampleHeaderControlsVariants } from './sample-header-controls-variants'
 export type TSampleHeaderControlsProps = IWithClassName & {
   liveLocales: readonly TLocaleIsoCode[];
   header: TSampleHeaderStyle;
-  hasReaderAccounts: boolean;
-  isSignedIn: boolean;
+  reader: TSampleReader;
   isDark: boolean;
   shouldAlwaysShowLanguageSwitcher: boolean;
 };
@@ -27,8 +27,7 @@ export type TSampleHeaderControlsProps = IWithClassName & {
 export const SampleHeaderControls = ({
   liveLocales,
   header: { layout, languageSwitcherStyle, account },
-  hasReaderAccounts,
-  isSignedIn,
+  reader,
   isDark,
   shouldAlwaysShowLanguageSwitcher,
   className,
@@ -51,11 +50,11 @@ export const SampleHeaderControls = ({
         darkLabel={t('themeToggleDark')}
         className={themeToggle()}
       />
-      {hasReaderAccounts && (
+      {reader.hasAccounts && (
         <SampleAccountControl
           account={account}
           appearance={account.buttonStyle}
-          isSignedIn={isSignedIn}
+          reader={reader}
         />
       )}
       {layout === HEADER_LAYOUT.MENU_BUTTON && (

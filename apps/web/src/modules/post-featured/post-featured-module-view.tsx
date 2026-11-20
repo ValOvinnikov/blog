@@ -54,7 +54,6 @@ export const PostFeaturedModuleView = ({
         id={titleId}
         level={2}
         align={contentAlignment}
-        variant="section"
       />
       {leadPost && displayMode === DISPLAY_MODE.CAROUSEL && (
         <CardCarousel

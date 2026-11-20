@@ -2517,6 +2517,48 @@
     "metaExpires": "{who} · {date} · Läuft ab am {expiry}",
     "metaExpired": "{who} · {date} · Abgelaufen am {expiry}"
   },
+  "usageCard": {
+    "title": "Nutzung",
+    "description": "Was Ihr Tarif enthält und wie viel davon genutzt ist.",
+    "labels": {
+      "TAKEAWAYS": "KI-Kernaussagen diesen Monat",
+      "EMAILS": "Diesen Monat gesendete E-Mails",
+      "SEATS": "Team-Plätze",
+      "LANGUAGES": "Zusätzliche Sprachen"
+    },
+    "links": {
+      "SEATS": "Team",
+      "LANGUAGES": "Sprachen"
+    },
+    "value": "<count>{used, number}</count> von {allowance, number}",
+    "failed": "Dieser Wert konnte nicht geladen werden. Laden Sie die Seite neu, um es erneut zu versuchen.",
+    "footer": {
+      "limits": "Ihr Tarif legt diese Grenzen fest.",
+      "plansLink": "Sehen Sie sich an, was jeder Tarif enthält"
+    },
+    "notes": {
+      "TAKEAWAYS": {
+        "UNDER": "Wird am {date} zurückgesetzt",
+        "NEAR": "{percent} % genutzt — noch {left, number}<separator>·</separator><reset>Wird am {date} zurückgesetzt</reset>",
+        "FULL": "Alles genutzt. Neue Beiträge erhalten bis zum {date} keine Kernaussagen."
+      },
+      "EMAILS": {
+        "UNDER": "Wird am {date} zurückgesetzt",
+        "NEAR": "{percent} % genutzt — noch {left, number}<separator>·</separator><reset>Wird am {date} zurückgesetzt</reset>",
+        "FULL": "Alles genutzt. Neue Beiträge werden bis zum {date} nicht per E-Mail versendet."
+      },
+      "SEATS": {
+        "UNDER": "Zählt Inhaber, Mitglieder und offene Einladungen.",
+        "NEAR": "{left, plural, one {Noch # Platz frei.} other {Noch # Plätze frei.}}",
+        "FULL": "Alle Plätze belegt. Entfernen Sie jemanden, um eine weitere Person einzuladen."
+      },
+      "LANGUAGES": {
+        "UNDER": "Ihre Standardsprache wird nicht mitgezählt.",
+        "NEAR": "{left, plural, one {Noch # Sprache frei.} other {Noch # Sprachen frei.}}",
+        "FULL": "Alle belegt. Entfernen Sie eine, um eine weitere hinzuzufügen."
+      }
+    }
+  },
   "revokeGrantControl": {
     "revoke": {
       "trigger": "Widerrufen",

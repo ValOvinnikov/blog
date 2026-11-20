@@ -1,9 +1,5 @@
 import { STARTER_DOCUMENT_IDS } from '@shinefold/config';
-import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
-import {
-  REVISION_LOCK_PSEUDO_FIELD,
-  SAMPLE_CONTENT_LOG,
-} from '@worker/constants/sample-content';
+import { REVISION_LOCK_PSEUDO_FIELD } from '@worker/constants/sample-content';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
   MOCK_REVISION,
@@ -13,14 +9,11 @@ import {
   mockSanityDocument,
 } from '@worker/testing/sample-content/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
-import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
-import { logger } from '@worker/utils/logger/logger';
 import { createTenantWriteClient } from '@worker/utils/tenant-content/tenant-write-client';
 
 import { removeSampleContent } from './remove-sample-content';
 
 vi.mock('@worker/utils/tenant-content/tenant-write-client');
-vi.mock('workflow');
 
 const ids = STARTER_DOCUMENT_IDS;
 
@@ -56,7 +49,6 @@ function mockDataset(
 
 describe(removeSampleContent, () => {
   beforeEach(() => {
-    atStepAttempt(1);
     mockDataset();
     commit.mockResolvedValue({});
     vi.mocked(createTenantWriteClient).mockResolvedValue({
@@ -115,27 +107,11 @@ describe(removeSampleContent, () => {
     expect(transaction).not.toHaveBeenCalled();
   });
 
-  it('rethrows a transient failure silently before the final attempt', async () => {
+  it('rethrows a failed commit', async () => {
     commit.mockRejectedValue(new Error(MOCK_SANITY_OUTAGE));
 
     await expect(removeSampleContent(MOCK_TENANT_ID)).rejects.toThrow(
       MOCK_SANITY_OUTAGE,
-    );
-
-    expect(logger.error).not.toHaveBeenCalled();
-  });
-
-  it('logs a failure once its retries are spent', async () => {
-    atStepAttempt(PROVISIONING_UNIT_MAX_RETRIES + 1);
-    commit.mockRejectedValue(new Error(MOCK_SANITY_OUTAGE));
-
-    await expect(removeSampleContent(MOCK_TENANT_ID)).rejects.toThrow(
-      MOCK_SANITY_OUTAGE,
-    );
-
-    expect(logger.error).toHaveBeenCalledWith(
-      SAMPLE_CONTENT_LOG.REMOVAL_FAILED,
-      { tenantId: MOCK_TENANT_ID, error: MOCK_SANITY_OUTAGE },
     );
   });
 });

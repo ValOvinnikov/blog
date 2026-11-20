@@ -1,5 +1,9 @@
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
 import { TenantPageHeader } from '@platform/components/features/tenants/tenant-page-header';
+import {
+  type TUsageSectionProps,
+  UsageSection,
+} from '@platform/components/features/usage/usage-section';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { DetailCardSkeleton } from '@platform/components/shared/detail-card-skeleton';
 import {
@@ -30,6 +34,7 @@ export type TOwnerHomeViewProps = {
   siteSetup?: TSiteSetup;
   getStarted?: TGetStarted;
   canUpgrade?: boolean;
+  usage: Omit<TUsageSectionProps, 'tenant'>;
 };
 
 export const OwnerHomeView = ({
@@ -39,6 +44,7 @@ export const OwnerHomeView = ({
   siteSetup,
   getStarted,
   canUpgrade = false,
+  usage,
 }: TOwnerHomeViewProps) => {
   const tOwnerHome = useTranslations('ownerHomePage');
   const { archivedAt, trial } = tenant;
@@ -61,6 +67,8 @@ export const OwnerHomeView = ({
       {getStarted && <GetStartedCard getStarted={getStarted} />}
 
       <YourSiteCard tenant={tenant} />
+
+      {!archivedAt && <UsageSection tenant={tenant} {...usage} />}
 
       <div className={pair()}>
         <Suspense

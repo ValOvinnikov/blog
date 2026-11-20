@@ -56,7 +56,6 @@ export const PostCardsSection = ({
         id={titleId}
         level={2}
         align={contentAlignment}
-        variant="section"
       />
       {displayMode === DISPLAY_MODE.CAROUSEL ? (
         <CardCarousel

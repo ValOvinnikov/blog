@@ -1,5 +1,4 @@
 import { HTTP_STATUS, LOCALE_ISO_CODES } from '@shinefold/config/constants';
-import { getTenantById } from '@shinefold/db/queries/tenants';
 import { sanitizeLogMessage } from '@shinefold/insight';
 import { COOKIE_STATEMENT_LOG } from '@worker/constants/cookie-statement';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
@@ -7,6 +6,7 @@ import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
 import {
   readSignedRequest,
+  refuseUnwritableTenant,
   respond,
   respondError,
   tenantRequestBodySchema,
@@ -32,13 +32,8 @@ export async function POST(request: Request): Promise<Response> {
   const { tenantId, locales } = signed.data;
 
   try {
-    const tenant = await getTenantById(tenantId);
-    if (!tenant) {
-      return respondError(HTTP_STATUS.NOT_FOUND, ENQUEUE_ERROR.NOT_FOUND);
-    }
-    if (!tenant.sanityProjectId || !tenant.sanityWriteTokenEncrypted) {
-      return respondError(HTTP_STATUS.CONFLICT, ENQUEUE_ERROR.NOT_PROVISIONED);
-    }
+    const refusal = await refuseUnwritableTenant(tenantId);
+    if (refusal) return refusal;
 
     const run = await start(seedCookieStatements, [tenantId, locales]);
     return respond(HTTP_STATUS.ACCEPTED, { runId: run.runId });

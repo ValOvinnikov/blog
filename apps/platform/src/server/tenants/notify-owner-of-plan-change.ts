@@ -4,9 +4,8 @@ import { TENANT_LOG } from '@platform/constants/tenant';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
-import { toMarketingSiteUrl } from '@platform/utils/marketing-site-url/marketing-site-url';
+import { toPricingPageUrl } from '@platform/utils/pricing-page-url/pricing-page-url';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { pricingPageUrl } from '@shinefold/config';
 import { EMAIL_ACCOUNT, type TTenantPlan } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import {
@@ -45,7 +44,7 @@ const sendPlanChangeEmail = async (
     namespace: 'ownerPlanChangeEmail',
   });
   const values = { siteName: tenant.name };
-  const siteUrl = toMarketingSiteUrl({ marketingSiteUrl, rootDomain });
+  const plansUrl = toPricingPageUrl({ marketingSiteUrl, rootDomain });
   const message = buildOwnerPlanChangeEmail({
     brandName: PLATFORM_EMAIL_BRAND_NAME,
     subject: t(`${toPlan}.subject`),
@@ -58,11 +57,8 @@ const sendPlanChangeEmail = async (
         baseUrl,
       ).toString(),
     },
-    secondaryLink: siteUrl
-      ? {
-          label: t('plansLinkLabel'),
-          url: pricingPageUrl(siteUrl),
-        }
+    secondaryLink: plansUrl
+      ? { label: t('plansLinkLabel'), url: plansUrl }
       : undefined,
   });
 
