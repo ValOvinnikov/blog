@@ -157,7 +157,7 @@
     "saved": "Gemerkt",
     "saveAriaLabel": "Beitrag merken",
     "removeAriaLabel": "Lesezeichen entfernen",
-    "error": "Das konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    "errorSave": "Das konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
     "errorUnavailable": "Lesezeichen sind auf dieser Website derzeit nicht verfügbar.",
     "toastSavedMessage": "Zu Lesezeichen hinzugefügt",
     "toastRemovedMessage": "Aus Lesezeichen entfernt",

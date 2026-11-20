@@ -157,7 +157,7 @@
     "saved": "Enregistré",
     "saveAriaLabel": "Enregistrer l'article",
     "removeAriaLabel": "Retirer des favoris",
-    "error": "L'enregistrement a échoué. Veuillez réessayer.",
+    "errorSave": "L'enregistrement a échoué. Veuillez réessayer.",
     "errorUnavailable": "Les favoris ne sont pas disponibles sur ce site pour le moment.",
     "toastSavedMessage": "Ajouté aux favoris",
     "toastRemovedMessage": "Retiré des favoris",

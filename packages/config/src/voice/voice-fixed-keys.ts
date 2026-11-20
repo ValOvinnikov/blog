@@ -55,7 +55,7 @@ export const VOICE_FIXED_KEYS = [
   'blogPostPage.asideKind.DIGRESSION',
   'blogPostPage.asideKind.CONTEXT',
 
-  'bookmarkButton.error',
+  'bookmarkButton.errorSave',
   'bookmarkButton.errorUnavailable',
   'bookmarkButton.toastSavedMessage',
   'bookmarkButton.toastRemovedMessage',

@@ -157,7 +157,7 @@
     "saved": "Saved",
     "saveAriaLabel": "Save post",
     "removeAriaLabel": "Remove bookmark",
-    "error": "Couldn't save that. Try again.",
+    "errorSave": "Couldn't save that. Try again.",
     "errorUnavailable": "Bookmarking isn't available on this site right now.",
     "toastSavedMessage": "Saved to bookmarks",
     "toastRemovedMessage": "Removed from bookmarks",

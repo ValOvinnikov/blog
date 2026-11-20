@@ -47,7 +47,7 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
         if (!result) return;
         toast.error({
           message: t(
-            isOutcomeUnavailable(result) ? 'errorUnavailable' : 'error',
+            isOutcomeUnavailable(result) ? 'errorUnavailable' : 'errorSave',
           ),
         });
         return;
@@ -70,7 +70,7 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
           return;
         }
         toast.error({
-          message: t('error'),
+          message: t('errorSave'),
           action: {
             label: t('toastRetryLabel'),
             keyHint: 'R',

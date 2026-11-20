@@ -157,7 +157,7 @@
     "saved": "Guardado",
     "saveAriaLabel": "Guardar artículo",
     "removeAriaLabel": "Quitar de guardados",
-    "error": "No se pudo guardar. Vuelva a intentarlo.",
+    "errorSave": "No se pudo guardar. Vuelva a intentarlo.",
     "errorUnavailable": "Los marcadores no están disponibles en este sitio en este momento.",
     "toastSavedMessage": "Añadido a guardados",
     "toastRemovedMessage": "Quitado de guardados",
