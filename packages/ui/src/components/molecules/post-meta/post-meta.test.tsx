@@ -16,7 +16,7 @@ const author = {
   imageUrl: faker.image.avatarGitHub(),
 };
 const readingTime = `${faker.number.int({ min: 3, max: 15 })} min read`;
-const MOCK_SHARE_LABEL = faker.lorem.word();
+const MOCK_ACTION_LABEL = faker.lorem.word();
 
 const setup = customRender(PostMeta, {
   author,
@@ -58,10 +58,10 @@ describe(`<${PostMeta.name}/>`, () => {
       expect(readingTimeText).not.toBeInTheDocument();
     });
 
-    it('omits the share trigger', () => {
-      const shareButton = screen.queryByRole('button', { name: /share/i });
+    it('omits the actions', () => {
+      const actionButton = screen.queryByRole('button');
 
-      expect(shareButton).not.toBeInTheDocument();
+      expect(actionButton).not.toBeInTheDocument();
     });
 
     it('renders the author name as plain text, not a link', () => {
@@ -87,11 +87,13 @@ describe(`<${PostMeta.name}/>`, () => {
     expect(authorNames).toHaveLength(1);
   });
 
-  it('renders the share slot', () => {
-    setup({ share: <button>{MOCK_SHARE_LABEL}</button> });
-    const shareButton = screen.getByRole('button', { name: MOCK_SHARE_LABEL });
+  it('renders the actions', () => {
+    setup({ actions: <button>{MOCK_ACTION_LABEL}</button> });
+    const actionButton = screen.getByRole('button', {
+      name: MOCK_ACTION_LABEL,
+    });
 
-    expect(shareButton).toBeVisible();
+    expect(actionButton).toBeVisible();
   });
 
   it('renders the author name as a link to the author page', () => {

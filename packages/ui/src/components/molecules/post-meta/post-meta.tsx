@@ -22,19 +22,19 @@ export type TPostMetaProps = IWithClassName &
     formattedDate: string;
     readingTime?: string;
     linkAs?: TAnchorElementType;
-    share?: ReactNode;
+    actions?: ReactNode;
   };
 
 const s = postMetaVariants();
 
-/** Post detail metadata strip: author avatar + name, publish date, and estimated reading time. */
+/** The byline under a post title: who wrote it, when, how long it takes to read, and the actions on it. */
 export const PostMeta = ({
   author,
   publishedAt,
   formattedDate,
   readingTime,
   linkAs,
-  share,
+  actions,
   className,
   dataTestId,
 }: TPostMetaProps) => (
@@ -58,6 +58,6 @@ export const PostMeta = ({
         <span>{readingTime}</span>
       </>
     )}
-    {share && <div className={s.share()}>{share}</div>}
+    {actions && <div className={s.actions()}>{actions}</div>}
   </div>
 );

@@ -38,10 +38,22 @@ export const WithoutAvatar: TStory = {
   args: { author: { name: faker.person.fullName() } },
 };
 
-export const WithShareSlot: TStory = {
+export const WithActions: TStory = {
   args: {
-    share: <button type="button">Share</button>,
+    readingTime: `${faker.number.int({ min: 3, max: 15 })} min read`,
+    actions: (
+      <span className="inline-flex gap-2">
+        <button type="button">Save</button>
+        <button type="button">Share</button>
+        <button type="button">Summary</button>
+      </span>
+    ),
   },
+};
+
+export const WithActionsOnPhone: TStory = {
+  ...WithActions,
+  globals: { viewport: 'phone' },
 };
 
 export const WithLinkedAuthor: TStory = {

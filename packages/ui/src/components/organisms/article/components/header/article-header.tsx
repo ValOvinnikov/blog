@@ -17,6 +17,8 @@ import { type ReactNode } from 'react';
 
 import { articleHeaderVariants } from './article-header-variants';
 
+const s = articleHeaderVariants();
+
 export interface IArticleHeaderTopic {
   label: string;
   href?: string;
@@ -30,7 +32,7 @@ export type TArticleHeaderProps = IWithClassName &
     lead?: string;
     meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'>;
     coverMedia?: ReactNode;
-    action?: ReactNode;
+    belowMeta?: ReactNode;
   };
 
 /** The opening of a post page, above its body. */
@@ -40,58 +42,45 @@ export const ArticleHeader = ({
   lead,
   meta,
   coverMedia,
-  action,
+  belowMeta,
   className,
   dataTestId,
-}: TArticleHeaderProps) => {
-  const hasAction = Boolean(action);
-  const s = articleHeaderVariants({ hasAction });
-
-  const topicEyebrow = topic && (
-    <Eyebrow href={topic.href} linkAs={topic.linkAs} className={s.topic()}>
-      {topic.label}
-    </Eyebrow>
-  );
-
-  return (
-    <header className={s.root({ class: className })} data-testid={dataTestId}>
-      <div className={s.headingGroup()}>
-        {hasAction ? (
-          <div className={s.topicRow()}>
-            {topicEyebrow}
-            <div className={s.action()}>{action}</div>
-          </div>
-        ) : (
-          topicEyebrow
-        )}
-        <Heading level={1} visual={TEXT_ROLE.POST_TITLE} className={s.title()}>
-          {title}
-        </Heading>
-        {lead && (
-          <div className={s.lead()} data-slot="lead">
-            <Text textRole={TEXT_ROLE.INTRO} className={s.leadText()}>
-              {lead}
-            </Text>
-          </div>
-        )}
-        {meta && (
-          <div className={s.meta()}>
-            <PostMeta
-              author={meta.author}
-              publishedAt={meta.publishedAt}
-              formattedDate={meta.formattedDate}
-              readingTime={meta.readingTime}
-              linkAs={meta.linkAs}
-              share={meta.share}
-            />
-          </div>
-        )}
-      </div>
-      {coverMedia && (
-        <div className={s.coverMedia()} data-slot="cover-media">
-          <MediaFrame ratio={MEDIA_RATIO.VIDEO}>{coverMedia}</MediaFrame>
+}: TArticleHeaderProps) => (
+  <header className={s.root({ class: className })} data-testid={dataTestId}>
+    <div className={s.headingGroup()}>
+      {topic && (
+        <Eyebrow href={topic.href} linkAs={topic.linkAs} className={s.topic()}>
+          {topic.label}
+        </Eyebrow>
+      )}
+      <Heading level={1} visual={TEXT_ROLE.POST_TITLE} className={s.title()}>
+        {title}
+      </Heading>
+      {lead && (
+        <div className={s.lead()}>
+          <Text textRole={TEXT_ROLE.INTRO} className={s.leadText()}>
+            {lead}
+          </Text>
         </div>
       )}
-    </header>
-  );
-};
+      {meta && (
+        <div className={s.meta()}>
+          <PostMeta
+            author={meta.author}
+            publishedAt={meta.publishedAt}
+            formattedDate={meta.formattedDate}
+            readingTime={meta.readingTime}
+            linkAs={meta.linkAs}
+            actions={meta.actions}
+          />
+        </div>
+      )}
+      {belowMeta && <div className={s.belowMeta()}>{belowMeta}</div>}
+    </div>
+    {coverMedia && (
+      <div className={s.coverMedia()}>
+        <MediaFrame ratio={MEDIA_RATIO.VIDEO}>{coverMedia}</MediaFrame>
+      </div>
+    )}
+  </header>
+);

@@ -38,7 +38,19 @@ const plainMeta = {
   formattedDate,
 };
 
-const headerAction = <button type="button">30s</button>;
+const metaActions = (
+  <span className="inline-flex gap-2">
+    <button type="button">Save</button>
+    <button type="button">Share</button>
+    <button type="button">Summary</button>
+  </span>
+);
+
+const summaryCard = (
+  <div className="rounded-md border border-divider p-4">
+    {faker.lorem.paragraph()}
+  </div>
+);
 
 const coverImage = (
   <img
@@ -120,35 +132,26 @@ export const WithFooterTags: TStory = {
   ),
 };
 
-export const WithShareSlot: TStory = {
+export const WithMetaActions: TStory = {
   args: articleArgs({
     lead: faker.lorem.paragraph(),
-    meta: { ...plainMeta, share: <button type="button">Share</button> },
+    meta: { ...fullMeta, actions: metaActions },
   }),
 };
 
-export const WithAction: TStory = {
+export const WithBelowMeta: TStory = {
   args: articleArgs({
     topic: ENGINEERING_TOPIC,
     lead: faker.lorem.paragraph(),
-    meta: fullMeta,
-    action: headerAction,
-  }),
-};
-
-export const WithActionAndNoTopic: TStory = {
-  args: articleArgs({ meta: plainMeta, action: headerAction }),
-};
-
-export const WithLeadAndCoverHidden: TStory = {
-  args: articleArgs({
-    topic: ENGINEERING_TOPIC,
-    lead: faker.lorem.paragraph(),
-    meta: fullMeta,
-    action: headerAction,
+    meta: { ...fullMeta, actions: metaActions },
+    belowMeta: summaryCard,
     coverMedia: coverImage,
-    className: '[&_[data-slot=lead]]:hidden [&_[data-slot=cover-media]]:hidden',
   }),
+};
+
+export const WithBelowMetaOnPhone: TStory = {
+  ...WithBelowMeta,
+  globals: { viewport: 'phone' },
 };
 
 export const HeaderOnEveryBrandBand: TStory = {

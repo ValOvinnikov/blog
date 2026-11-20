@@ -19,16 +19,6 @@ export type TPostShareProps = {
   className?: string;
 };
 
-/**
- * PostShare — the self-contained interactive share widget, passed into
- * `PostMeta`'s `share` slot (it never wraps `PostMeta` — see
- * `web-component-practices` Rule 1). Open/close/focus behaviour lives in
- * `usePopover`; clipboard state lives in `useCopyToClipboard` — this
- * component only wires refs and reads their results.
- *
- * @example
- * <PostMeta author={post.author} share={<PostShare url={url} title={post.title} links={shareLinks} />} />
- */
 export const PostShare = ({
   url,
   title,

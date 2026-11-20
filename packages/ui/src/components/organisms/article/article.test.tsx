@@ -23,8 +23,7 @@ const MOCK_FOOTER_TAGS = [MOCK_TAG, MOCK_OTHER_TAG];
 const MOCK_POST_BODY = faker.lorem.sentence();
 const MOCK_COVER_ALT = faker.lorem.words(3);
 const MOCK_COVER_SRC = faker.image.url();
-const MOCK_ACTION_LABEL = faker.lorem.words(2);
-const MOCK_ACTION = <button type="button">{MOCK_ACTION_LABEL}</button>;
+const MOCK_BELOW_META_TEXT = faker.lorem.sentence();
 
 const meta = {
   author: { name: MOCK_PERSON_NAME },
@@ -108,26 +107,26 @@ describe(`<${Article.name}/>`, () => {
     });
   });
 
-  describe('with an action', () => {
-    it('renders the action after the topic and before the title', () => {
-      renderArticle({ topic: MOCK_TOPIC, action: MOCK_ACTION });
-      const topicLink = screen.getByRole('link', { name: MOCK_TOPIC.label });
-      const action = screen.getByRole('button', { name: MOCK_ACTION_LABEL });
-      const title = screen.getByRole('heading', { level: 1 });
-      expect(topicLink.compareDocumentPosition(action)).toBe(
-        Node.DOCUMENT_POSITION_FOLLOWING,
-      );
-      expect(action.compareDocumentPosition(title)).toBe(
+  describe('with content below the meta', () => {
+    beforeEach(() => {
+      renderArticle({
+        belowMeta: <p>{MOCK_BELOW_META_TEXT}</p>,
+        coverMedia: <img src={MOCK_COVER_SRC} alt={MOCK_COVER_ALT} />,
+      });
+    });
+
+    it('renders it after the meta row', () => {
+      const date = screen.getByText(MOCK_FORMATTED_DATE);
+      const belowMeta = screen.getByText(MOCK_BELOW_META_TEXT);
+      expect(date.compareDocumentPosition(belowMeta)).toBe(
         Node.DOCUMENT_POSITION_FOLLOWING,
       );
     });
 
-    it('renders the action above the title when there is no topic', () => {
-      renderArticle({ action: MOCK_ACTION });
-      const action = screen.getByRole('button', { name: MOCK_ACTION_LABEL });
-      const title = screen.getByRole('heading', { level: 1 });
-      expect(action).toBeVisible();
-      expect(action.compareDocumentPosition(title)).toBe(
+    it('renders it before the cover media', () => {
+      const belowMeta = screen.getByText(MOCK_BELOW_META_TEXT);
+      const coverImage = screen.getByAltText(MOCK_COVER_ALT);
+      expect(belowMeta.compareDocumentPosition(coverImage)).toBe(
         Node.DOCUMENT_POSITION_FOLLOWING,
       );
     });
