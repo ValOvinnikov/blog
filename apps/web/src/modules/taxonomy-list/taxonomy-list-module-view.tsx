@@ -1,13 +1,14 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import type { TTaxonomyListModule } from '@shinefold/service';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import { TaxonomyCard } from '@shinefold/ui/components/molecules/taxonomy-card';
 import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
 import type { THeadingLevel } from '@shinefold/ui/lib/react';
+import { hasLength } from '@shinefold/utils/primitives';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section } from '@web/components/shared/section';
+import { Section, type TModuleSection } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
 import type { ReactNode } from 'react';
-
-import { taxonomyListModuleViewVariants } from './taxonomy-list-module-view-variants';
 
 type TTaxonomyListModulePost = {
   id: string;
@@ -27,8 +28,9 @@ export interface ITaxonomyListModuleItem {
 
 export interface ITaxonomyListModuleViewProps extends Omit<
   TTaxonomyListModule,
-  'entries' | 'taxonomy'
+  'entries' | 'taxonomy' | 'brandVariant' | 'layout'
 > {
+  section: TModuleSection;
   items: ITaxonomyListModuleItem[];
   titleId: string;
   dataTestId: string;
@@ -42,10 +44,9 @@ export interface ITaxonomyListModuleViewProps extends Omit<
  * a taxonomy entry, so no listing organism fits here.
  */
 export const TaxonomyListModuleView = ({
-  brandVariant,
+  section,
   headingBlock,
   items,
-  layout,
   titleId,
   dataTestId,
   headingLevel,
@@ -54,13 +55,14 @@ export const TaxonomyListModuleView = ({
   showLatestPosts,
   latestLabel,
 }: ITaxonomyListModuleViewProps) => {
-  const isEmpty = items.length === 0;
-  const s = taxonomyListModuleViewVariants();
+  const { brandVariant, layout, appearance } = section;
+  const isEmpty = !hasLength(items);
 
   return (
     <Section
       brandVariant={brandVariant}
       layout={layout}
+      appearance={appearance}
       titleId={titleId}
       dataTestId={dataTestId}
     >
@@ -69,10 +71,9 @@ export const TaxonomyListModuleView = ({
         id={titleId}
         level={headingLevel}
         align={contentAlignment}
-        variant="section"
       />
       {isEmpty ? (
-        <p className={s.emptyMessage()}>{emptyMessage}</p>
+        <Text textRole={TEXT_ROLE.CARD_BODY}>{emptyMessage}</Text>
       ) : (
         <CardGrid>
           {items.map((item) => (
@@ -86,7 +87,7 @@ export const TaxonomyListModuleView = ({
               linkAs={SmartLink}
               isInteractive={Boolean(item.href)}
             >
-              {showLatestPosts && item.posts.length > 0 && (
+              {showLatestPosts && hasLength(item.posts) && (
                 <TaxonomyCard.Posts
                   posts={item.posts}
                   ariaLabel={item.latestPostsLabel}
