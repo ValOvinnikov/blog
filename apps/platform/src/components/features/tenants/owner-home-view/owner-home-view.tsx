@@ -29,7 +29,7 @@ import { TrialNotice } from './components/trial-notice/trial-notice';
 import { YourSiteCard } from './components/your-site-card/your-site-card';
 import { ownerHomeViewVariants } from './owner-home-view-variants';
 
-export type TOwnerFirstRun = {
+type TOwnerFirstRun = {
   siteSetup?: TSiteSetup;
   getStarted?: TGetStarted;
   sampleContent?: TSampleContent;
