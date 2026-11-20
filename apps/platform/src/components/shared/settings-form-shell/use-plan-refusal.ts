@@ -11,7 +11,7 @@ import type {
   TMaybeUndefined,
   TOutcome,
 } from '@shinefold/config';
-import { PLAN_LOCALE_LIMIT } from '@shinefold/db/constants';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useRouter } from 'next/navigation';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState, type Dispatch, type SetStateAction } from 'react';
@@ -47,13 +47,18 @@ export const usePlanRefusal = <TValues>(
   const labelOf = (item: string) =>
     fields.find(({ id }) => id === item)?.label ?? item;
 
-  const message =
-    refusal &&
+  const toMessage = ({
+    values: { plan, localeLimit },
+    items,
+  }: TNotInPlanRefusal) =>
     t(messageKey, {
-      plan: refusal.values.plan,
-      limit: PLAN_LOCALE_LIMIT[refusal.values.plan],
-      items: format.list(refusal.items.map(labelOf)),
+      plan,
+      ...(!isUndefined(localeLimit) && { limit: localeLimit }),
+      count: items.length,
+      items: format.list(items.map(labelOf)),
     });
+
+  const message = refusal && toMessage(refusal);
 
   return { submit, clear: () => setRefusal(undefined), message };
 };

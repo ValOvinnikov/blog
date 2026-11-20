@@ -17,6 +17,7 @@ import {
 import {
   MOCK_TENANT_ID,
   mockReadyTenant,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { MOCK_UNSUPPORTED_LOCALE } from '@platform/testing/tenants/unsupported-locale';
 import { logger } from '@platform/utils/logger/logger';
@@ -30,6 +31,8 @@ import {
 } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
+import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import { errorResult, okResult } from '@shinefold/utils';
 import type { Session } from 'next-auth';
 
@@ -132,7 +135,7 @@ describe(updateTenantLanguagesAction, () => {
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
-      values: { plan: TENANT_PLAN.FREE },
+      values: { plan: TENANT_PLAN.FREE, localeLimit: 1 },
       items: [NL, FR],
     });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -162,6 +165,32 @@ describe(updateTenantLanguagesAction, () => {
     const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, [NL, FR]);
 
     expect(result).toEqual(expect.objectContaining({ items: [FR] }));
+  });
+
+  it('names the limit an open language grant raised, not the plan alone', async () => {
+    const GRANTED_LOCALE_LIMIT = 3;
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockMembershipContext(
+        mockTenant({ id: MOCK_TENANT_ID }, [
+          mockEntitlementGrant({
+            kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+            key: ENTITLEMENT_KIND.LOCALE_LIMIT,
+            value: GRANTED_LOCALE_LIMIT,
+          }),
+        ]),
+      ),
+    );
+    setTenantAdditionalLocalesMock.mockResolvedValueOnce(
+      errorResult(ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED),
+    );
+
+    const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, [NL, FR]);
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        values: { plan: TENANT_PLAN.FREE, localeLimit: GRANTED_LOCALE_LIMIT },
+      }),
+    );
   });
 
   it('reports the default language among the additional ones as invalid input', async () => {

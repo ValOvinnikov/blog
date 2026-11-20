@@ -221,15 +221,15 @@ describe(useSettingsForm, () => {
       expect(result.current.form.planRefusal).toBeUndefined();
     });
 
-    it('names the plan limit with the page message it was given', async () => {
+    it('names the limit the refusal sends with the page message it was given', async () => {
       ({ result } = renderSettingsForm({
-        onSubmit: refusePlan,
+        onSubmit: async () => toNotInPlanRefusal(TENANT_PLAN.FREE, ['name'], 3),
         planRefusalMessageKey: 'languagesNotInPlan',
       }));
       await editAndSave(result);
 
       expect(result.current.form.planRefusal).toBe(
-        `Your site is on the Free plan, which allows 1 language, so ${MOCK_FIELD_LABEL} wasn't added.`,
+        `Your site is on the Free plan, which allows 3 languages, so ${MOCK_FIELD_LABEL} wasn't added.`,
       );
     });
   });
