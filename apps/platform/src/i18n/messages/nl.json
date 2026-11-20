@@ -36,8 +36,8 @@
   "signInPage": {
     "heading": "Inloggen",
     "description": "Gebruik het account waarmee je je hebt aangemeld of bent uitgenodigd.",
-    "accountNotLinkedTitle": "Dit e-mailadres logt al op een andere manier in",
-    "accountNotLinkedDescription": "Je e-mailadres wordt al gebruikt met een andere inlogmethode. Log in zoals je de vorige keer deed.",
+    "accountNotLinkedTitle": "We konden dit e-mailadres niet bevestigen",
+    "accountNotLinkedDescription": "Google of GitHub heeft dit e-mailadres niet geverifieerd. Verifieer het daar en probeer het opnieuw, of log in met een inloglink per e-mail.",
     "signInFailedTitle": "We konden je niet inloggen",
     "signInFailedDescription": "Er ging iets mis bij het inloggen. Probeer het opnieuw of kies een andere manier om in te loggen.",
     "signUpPrompt": "Nieuw hier? <link>Maak een account aan</link>"

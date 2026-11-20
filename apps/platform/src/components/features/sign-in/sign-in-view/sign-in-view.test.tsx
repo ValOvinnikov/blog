@@ -100,13 +100,13 @@ describe(`<${SignInView.name}/>`, () => {
     });
   });
 
-  it('explains an email already linked to another sign-in method', () => {
+  it('explains a provider email that is not verified', () => {
     setup({ error: SIGN_IN_ERROR.ACCOUNT_NOT_LINKED });
 
     const alert = screen.getByRole('alert');
 
     expect(alert).toHaveTextContent(
-      'This email already signs in another wayYour email address is already used with a different sign-in method. Sign in the way you did before.',
+      "We couldn't confirm this emailGoogle or GitHub hasn't verified this email address. Verify it with them and try again, or sign in with an email link.",
     );
   });
 

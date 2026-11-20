@@ -36,8 +36,8 @@
   "signInPage": {
     "heading": "Connexion",
     "description": "Utilisez le compte avec lequel vous vous êtes inscrit ou avez été invité.",
-    "accountNotLinkedTitle": "Cette adresse se connecte déjà autrement",
-    "accountNotLinkedDescription": "Votre adresse e-mail est déjà utilisée avec une autre méthode de connexion. Connectez-vous comme la dernière fois.",
+    "accountNotLinkedTitle": "Nous n'avons pas pu confirmer cette adresse",
+    "accountNotLinkedDescription": "Google ou GitHub n'a pas vérifié cette adresse e-mail. Vérifiez-la auprès d'eux et réessayez, ou connectez-vous avec un lien par e-mail.",
     "signInFailedTitle": "Nous n'avons pas pu vous connecter",
     "signInFailedDescription": "Un problème est survenu lors de la connexion. Réessayez ou choisissez une autre méthode de connexion.",
     "signUpPrompt": "Nouveau ? <link>Créer un compte</link>"

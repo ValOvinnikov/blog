@@ -36,8 +36,8 @@
   "signInPage": {
     "heading": "Anmelden",
     "description": "Verwenden Sie das Konto, mit dem Sie sich registriert haben oder eingeladen wurden.",
-    "accountNotLinkedTitle": "Diese E-Mail-Adresse meldet sich bereits anders an",
-    "accountNotLinkedDescription": "Ihre E-Mail-Adresse wird bereits mit einer anderen Anmeldemethode verwendet. Melden Sie sich so an wie beim letzten Mal.",
+    "accountNotLinkedTitle": "Wir konnten diese E-Mail-Adresse nicht bestätigen",
+    "accountNotLinkedDescription": "Google oder GitHub hat diese E-Mail-Adresse nicht verifiziert. Verifizieren Sie sie dort und versuchen Sie es erneut, oder melden Sie sich mit einem Anmeldelink per E-Mail an.",
     "signInFailedTitle": "Anmeldung fehlgeschlagen",
     "signInFailedDescription": "Bei der Anmeldung ist etwas schiefgelaufen. Versuchen Sie es erneut oder wählen Sie eine andere Anmeldemethode.",
     "signUpPrompt": "Neu hier? <link>Konto erstellen</link>"

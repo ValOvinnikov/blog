@@ -36,8 +36,8 @@
   "signInPage": {
     "heading": "Iniciar sesión",
     "description": "Usa la cuenta con la que te registraste o te invitaron.",
-    "accountNotLinkedTitle": "Este correo ya inicia sesión de otra forma",
-    "accountNotLinkedDescription": "Tu correo electrónico ya se usa con otro método de inicio de sesión. Inicia sesión como lo hiciste la última vez.",
+    "accountNotLinkedTitle": "No hemos podido confirmar este correo",
+    "accountNotLinkedDescription": "Google o GitHub no ha verificado esta dirección de correo. Verifícala con ellos y vuelve a intentarlo, o inicia sesión con un enlace por correo.",
     "signInFailedTitle": "No hemos podido iniciar tu sesión",
     "signInFailedDescription": "Algo ha fallado al iniciar sesión. Inténtalo de nuevo o elige otra forma de iniciar sesión.",
     "signUpPrompt": "¿Eres nuevo? <link>Crea una cuenta</link>"
