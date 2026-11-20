@@ -68,13 +68,19 @@ with nothing used still shows, as "0 of {n}".
 - **Emails**: sent is this UTC month's newsletter post sends only
   (`countEmailSendsThisMonth(tenantId, EMAIL_TYPE.NEWSLETTER_ISSUE)`), the
   same number the Subscribers page shows; magic links and other mail are not
-  counted. Allowance `monthlySendAllowance(plan, activeSubscriberCount)`, at
-  Growth's rate for a granted Newsletter. The label matches the Subscribers
-  page's meter name.
-- **Seats**: counted exactly as `create-membership-invite/seat-limit.ts`
-  counts, and as the Team page shows: every membership (the owner's own
-  included, locked ones included) plus every pending invite, a pending OWNER
-  invite included. Nobody is counted twice.
+  counted. Allowance is the one the worker's send gate enforces, from the
+  site's stored band ceiling (the first band when none is set) at Growth's
+  rate for a granted Newsletter, read through `@shinefold/db`'s newsletter
+  limits read (#7736), so the card never disagrees with what is sent. The
+  label matches the Subscribers page's meter name.
+- **Seats**: `countSeatsInUse` (#7736), built from the same SQL as
+  `create-membership-invite/seat-limit.ts`, and shown as the Team page shows:
+  every membership (the owner's own included, locked ones included) plus
+  every pending invite, a pending OWNER invite included. Nobody is counted
+  twice.
+- **Links arrive with their pages** (decided, owner, 2026-11-20): the card
+  (#7695) ships the emails and seats rows without links. #7164 adds the
+  Subscribers link and #7169 the Team link, each with its page.
 - **Languages**: live additional locales, so the default is not counted.
 - Numbers use the viewer's locale grouping ("4,180 of 15,000").
 
@@ -101,6 +107,9 @@ because it no longer fit whole), the emails row shows its used-up state
 whatever the percentage: count and fill `bad`, note "Sending paused until
 {d MMMM}." It reads the same paused state the Subscribers page reads, so the
 two pages never disagree. A band pause shows on the Subscribers page only.
+That state is built for the Subscribers page, so #7164 adds it to the card
+(decided, owner, 2026-11-20); until then the emails row follows the
+percentage alone.
 
 ## Row anatomy
 
