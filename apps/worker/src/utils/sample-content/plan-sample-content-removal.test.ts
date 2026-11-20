@@ -1,5 +1,8 @@
 import { STARTER_DOCUMENT_IDS } from '@shinefold/config';
-import { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config/constants';
+import {
+  LOCALE_ISO_CODES,
+  PORTABLE_TEXT_BLOCK_TYPE,
+} from '@shinefold/config/constants';
 import { toDraftId } from '@shinefold/utils/sanity-document-id';
 import {
   MOCK_OWNER_DOCUMENT_ID,
@@ -12,6 +15,7 @@ import {
 import { planSampleContentRemoval } from './plan-sample-content-removal';
 
 const ids = STARTER_DOCUMENT_IDS;
+const locale = LOCALE_ISO_CODES.EN;
 
 const MOCK_RELEASE_ID = 'spring';
 
@@ -28,6 +32,10 @@ function toRemoval(documentId: string) {
   return { documentId, revision: MOCK_REVISION };
 }
 
+function kept(id: string) {
+  return expect.objectContaining({ id });
+}
+
 function unedited(id: string, fields = {}) {
   return mockSanityDocument(id, fields);
 }
@@ -35,6 +43,7 @@ function unedited(id: string, fields = {}) {
 describe(planSampleContentRemoval, () => {
   it('removes unedited samples and unlinks them from the seeded arrays by key', () => {
     const plan = planSampleContentRemoval({
+      locale,
       starterDocuments: [
         unedited(ids.BLOG_CTA),
         unedited(ids.BLOG_POST_LIST),
@@ -93,6 +102,7 @@ describe(planSampleContentRemoval, () => {
     ],
   ])('keeps a sample %s as edited', (_label, pendingIds, options) => {
     const plan = planSampleContentRemoval({
+      locale,
       starterDocuments: [mockSanityDocument(ids.BLOG_CTA, {}, options)],
       pendingIds,
       referrers: [],
@@ -101,13 +111,14 @@ describe(planSampleContentRemoval, () => {
     expect(plan).toEqual({
       removals: [],
       unlinks: [],
-      keptEdited: [ids.BLOG_CTA],
+      keptEdited: [kept(ids.BLOG_CTA)],
       keptReferenced: [],
     });
   });
 
   it('keeps a sample a single field holds, and the samples it references in turn', () => {
     const plan = planSampleContentRemoval({
+      locale,
       starterDocuments: [
         unedited(ids.BLOG_HERO, { post: mockReference(ids.BLOG_WELCOME_POST) }),
         unedited(ids.BLOG_WELCOME_POST, {
@@ -125,7 +136,11 @@ describe(planSampleContentRemoval, () => {
       removals: [],
       unlinks: [],
       keptEdited: [],
-      keptReferenced: [ids.BLOG_AUTHOR, ids.BLOG_HERO, ids.BLOG_WELCOME_POST],
+      keptReferenced: [
+        ids.BLOG_AUTHOR,
+        ids.BLOG_HERO,
+        ids.BLOG_WELCOME_POST,
+      ].map(kept),
     });
   });
 
@@ -152,17 +167,19 @@ describe(planSampleContentRemoval, () => {
     ],
   ])('keeps a sample %s references', (_label, referrer) => {
     const plan = planSampleContentRemoval({
+      locale,
       starterDocuments: [unedited(ids.BLOG_TOPIC)],
       pendingIds: [],
       referrers: [referrer],
     });
 
     expect(plan.removals).toEqual([]);
-    expect(plan.keptReferenced).toEqual([ids.BLOG_TOPIC]);
+    expect(plan.keptReferenced).toEqual([kept(ids.BLOG_TOPIC)]);
   });
 
   it('keeps a navigation link whose item also holds links the owner added', () => {
     const plan = planSampleContentRemoval({
+      locale,
       starterDocuments: [unedited(ids.BLOG_ABOUT_LINK)],
       pendingIds: [],
       referrers: [
@@ -180,12 +197,13 @@ describe(planSampleContentRemoval, () => {
       removals: [],
       unlinks: [],
       keptEdited: [],
-      keptReferenced: [ids.BLOG_ABOUT_LINK],
+      keptReferenced: [kept(ids.BLOG_ABOUT_LINK)],
     });
   });
 
   it('removes samples that only reference each other without unlinking anything', () => {
     const plan = planSampleContentRemoval({
+      locale,
       starterDocuments: [
         unedited(ids.BLOG_ABOUT, {
           template: mockReference(ids.BLOG_ABOUT_TEMPLATE),

@@ -1,14 +1,16 @@
 import type { SanityDocument } from '@sanity/client';
 import { STARTER_DOCUMENT_ID_PREFIX } from '@shinefold/config/constants';
+import { getTenantLocales } from '@shinefold/db/queries/tenants';
 import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { REVISION_LOCK_PSEUDO_FIELD } from '@worker/constants/sample-content';
+import type { TKeptSample } from '@worker/utils/sample-content/kept-samples';
 import { planSampleContentRemoval } from '@worker/utils/sample-content/plan-sample-content-removal';
 import { createTenantWriteClient } from '@worker/utils/tenant-content/tenant-write-client';
 
 export type TRemoveSampleContentResult = {
   removed: string[];
-  keptEdited: string[];
-  keptReferenced: string[];
+  keptEdited: TKeptSample[];
+  keptReferenced: TKeptSample[];
 };
 
 const STARTER_DOCUMENTS_QUERY = `*[_id in path("${STARTER_DOCUMENT_ID_PREFIX}**")]`;
@@ -19,7 +21,11 @@ const REFERRERS_QUERY = '*[references($ids) && !(_id in $ids)]';
 export async function removeSampleContent(
   tenantId: string,
 ): Promise<TRemoveSampleContentResult> {
-  const client = await createTenantWriteClient(tenantId);
+  const [client, locales] = await Promise.all([
+    createTenantWriteClient(tenantId),
+    getTenantLocales(tenantId),
+  ]);
+  if (!locales) throw new Error(`Tenant "${tenantId}" has no locale.`);
   const [starterDocuments, pendingIds] = await Promise.all([
     client.fetch<SanityDocument[]>(STARTER_DOCUMENTS_QUERY),
     client.fetch<string[]>(PENDING_STARTER_IDS_QUERY),
@@ -28,7 +34,12 @@ export async function removeSampleContent(
     ids: starterDocuments.map(({ _id }) => _id),
   });
   const { removals, unlinks, keptEdited, keptReferenced } =
-    planSampleContentRemoval({ starterDocuments, pendingIds, referrers });
+    planSampleContentRemoval({
+      starterDocuments,
+      pendingIds,
+      referrers,
+      locale: locales.defaultLocale,
+    });
 
   if (hasArrayGotItems(removals)) {
     const transaction = client.transaction();
