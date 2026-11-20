@@ -11,6 +11,9 @@ import {
   respondError,
 } from '@worker/utils/signed-tenant-request/signed-tenant-request';
 
+// Next requires a literal here, so it cannot import a const.
+export const maxDuration = 300;
+
 export async function POST(request: Request): Promise<Response> {
   const signed = await readSignedTenantRequest(request);
   if (!signed.ok) return signed.error;

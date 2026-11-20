@@ -59,46 +59,46 @@ describe('POST /api/sample-content/remove', () => {
     expect(removeSampleContent).toHaveBeenCalledExactlyOnceWith(MOCK_TENANT_ID);
   });
 
-  it('refuses an unsigned request', async () => {
-    const response = await POST(
-      new Request(MOCK_REMOVE_URL, {
-        method: HTTP_METHOD.POST,
-        body: JSON.stringify({ tenantId: MOCK_TENANT_ID }),
-      }),
-    );
+  it.each([
+    {
+      name: 'an unsigned request',
+      request: () =>
+        new Request(MOCK_REMOVE_URL, {
+          method: HTTP_METHOD.POST,
+          body: JSON.stringify({ tenantId: MOCK_TENANT_ID }),
+        }),
+    },
+    {
+      name: 'a request signed with the wrong secret',
+      request: () => removeRequest(MOCK_FORGED_SECRET),
+    },
+  ])('refuses $name', async ({ request }) => {
+    const response = await POST(request());
 
     expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
     expect(removeSampleContent).not.toHaveBeenCalled();
   });
 
-  it('refuses a request signed with the wrong secret', async () => {
-    const response = await POST(removeRequest(MOCK_FORGED_SECRET));
-
-    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
-    expect(removeSampleContent).not.toHaveBeenCalled();
-  });
-
-  it('answers not found for an unknown or archived tenant', async () => {
-    vi.mocked(getTenantById).mockResolvedValue(undefined);
-
-    const response = await POST(removeRequest());
-
-    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
-    await expect(response.json()).resolves.toEqual({
+  it.each([
+    {
+      name: 'not found for an unknown or archived tenant',
+      tenant: undefined,
+      status: HTTP_STATUS.NOT_FOUND,
       error: ENQUEUE_ERROR.NOT_FOUND,
-    });
-    expect(removeSampleContent).not.toHaveBeenCalled();
-  });
-
-  it('answers a conflict when the tenant has no Sanity write token yet', async () => {
-    vi.mocked(getTenantById).mockResolvedValue(mockProvisionedTenant());
+    },
+    {
+      name: 'a conflict when the tenant has no Sanity write token yet',
+      tenant: mockProvisionedTenant(),
+      status: HTTP_STATUS.CONFLICT,
+      error: ENQUEUE_ERROR.NOT_PROVISIONED,
+    },
+  ])('answers $name', async ({ tenant, status, error }) => {
+    vi.mocked(getTenantById).mockResolvedValue(tenant);
 
     const response = await POST(removeRequest());
 
-    expect(response.status).toBe(HTTP_STATUS.CONFLICT);
-    await expect(response.json()).resolves.toEqual({
-      error: ENQUEUE_ERROR.NOT_PROVISIONED,
-    });
+    expect(response.status).toBe(status);
+    await expect(response.json()).resolves.toEqual({ error });
     expect(removeSampleContent).not.toHaveBeenCalled();
   });
 
