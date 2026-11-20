@@ -1,6 +1,7 @@
 'use client';
 
 import { Menu } from '@base-ui/react/menu';
+import { IntentPrefetchLink } from '@platform/components/features/layout/intent-prefetch-link';
 import { NavItemContent } from '@platform/components/features/layout/nav-item-content';
 import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
 import { sidebarVariants } from '@platform/components/features/layout/sidebar/sidebar-variants';
@@ -8,7 +9,7 @@ import { Icon } from '@platform/components/shared/icon';
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
 import { Tooltip } from '@platform/components/shared/tooltip';
 import { NestedMenuProvider } from '@platform/context/nested-menu-provider';
-import { Link, usePathname } from '@platform/i18n/navigation';
+import { usePathname } from '@platform/i18n/navigation';
 import { isCurrentNavHref } from '@platform/utils/nav-sections/is-current-nav-href';
 import { ICONS, type TMaybeNull } from '@shinefold/config';
 import { hasArrayGotItems } from '@shinefold/utils/primitives';
@@ -99,7 +100,7 @@ export const TopbarNavMenu = ({
                                 key={item.label}
                                 closeOnClick={true}
                                 render={
-                                  <Link
+                                  <IntentPrefetchLink
                                     href={item.href}
                                     title={item.status ? undefined : item.label}
                                     aria-current={

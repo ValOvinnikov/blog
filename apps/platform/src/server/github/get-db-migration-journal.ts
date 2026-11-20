@@ -1,3 +1,4 @@
+import { GITHUB_PINNED_READ_REVALIDATE } from '@platform/constants/github';
 import { z } from 'zod';
 
 import { fetchGitHubJson, type TGitHubResult } from './fetch-github';
@@ -15,10 +16,10 @@ export type TDbMigrationJournalEntry = z.infer<
 >['entries'][number];
 
 export const getDbMigrationJournal = (
-  ref: string,
+  sha: string,
 ): Promise<TGitHubResult<TDbMigrationJournalEntry[]>> =>
   fetchGitHubJson(
-    `/contents/${DB_MIGRATION_JOURNAL_PATH}?ref=${encodeURIComponent(ref)}`,
+    `/contents/${DB_MIGRATION_JOURNAL_PATH}?ref=${encodeURIComponent(sha)}`,
     (body) => {
       const { content } = contentSchema.parse(body);
       const journal: unknown = JSON.parse(
@@ -27,4 +28,5 @@ export const getDbMigrationJournal = (
 
       return journalSchema.parse(journal).entries;
     },
+    GITHUB_PINNED_READ_REVALIDATE,
   );
