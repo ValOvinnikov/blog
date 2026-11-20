@@ -90,7 +90,7 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       const titleRow = screen.getByTestId('page-header-title-row');
       const planText = within(titleRow).queryByText(planNames.GROWTH);
       const openSiteLink = screen.getByRole('link', {
-        name: 'Open site (opens in new tab)',
+        name: `${tenantOverviewPage.openSiteAction} ${messages.externalLink.newTabHint}`,
       });
 
       expect(tenantHeading).toBeVisible();
@@ -142,7 +142,7 @@ describe(`<${OwnerHomeView.name}/>`, () => {
         name: tenantOverviewPage.recentActivityCardTitle,
       });
       const openStudioLink = screen.queryByRole('link', {
-        name: 'Open Studio →',
+        name: messages.getStartedCard.openStudio,
       });
 
       expect(contentWorkspaceHeading).not.toBeInTheDocument();

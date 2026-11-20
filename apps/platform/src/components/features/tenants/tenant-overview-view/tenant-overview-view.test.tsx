@@ -154,6 +154,7 @@ const TENANT_DETAILS = en.tenantDetailsPanel.heading;
 const LOCKED_WHILE_PROVISIONING_IS_RUNNING =
   en.tenantDetailsPanel.fieldLockedReasonRunning;
 const SUSPEND_TENANT = en.tenantSuspensionControl.ACTIVE.triggerButton;
+const OPEN_SITE_LINK_NAME = `${en.tenantOverviewPage.openSiteAction} ${en.externalLink.newTabHint}`;
 const NAME_FIELD = { name: en.tenantDetailsPanel.nameLabel };
 const UNSENT_INVITE_NOTICE = en.tenantDetailsPanel.studioInviteUnsentNotice;
 
@@ -368,8 +369,9 @@ describe(`<${TenantOverviewView.name}/>`, () => {
           },
         },
       }),
-      reason:
-        'Locked — the "Connect domain" step has already completed and used this value.',
+      reason: makeEnTranslator('tenantDetailsPanel')('fieldLockedReasonStep', {
+        step: en.provisioningStatusView.stepLabel.MAP_DOMAIN,
+      }),
     },
     {
       lock: 'while the main address is the custom domain',
@@ -487,7 +489,9 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     const ownerJoinedAt = screen.getByText('Aug 12, 2026');
     const sanityProject = screen.getByText(MOCK_SANITY_PROJECT_ID);
     const activityActor = screen.getByText(MOCK_AUDIT_ACTOR_EMAIL);
-    const finding = screen.getByText('Provisioning step failed');
+    const finding = screen.getByText(
+      en.findingKindLabel.PROVISIONING_STEP_FAILED,
+    );
 
     expect(domainStatus).toBeVisible();
     expect(ownerJoinedAt).toBeVisible();
@@ -516,7 +520,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     await setup({ tenant: mockTenant() });
 
     const link = screen.getByRole('link', {
-      name: 'Open site (opens in new tab)',
+      name: OPEN_SITE_LINK_NAME,
     });
     expect(link).toHaveAttribute('href', MOCK_TENANT_URL);
     expect(link).toHaveAttribute('target', '_blank');
@@ -555,7 +559,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
     it('offers no Open Studio action', () => {
       const openStudioLink = screen.queryByRole('link', {
-        name: 'Open Studio →',
+        name: en.getStartedCard.openStudio,
       });
       expect(openStudioLink).not.toBeInTheDocument();
     });

@@ -9,7 +9,9 @@ import { mockTenant } from '@platform/testing/tenants/fixtures';
 import { MOCK_MARKETING_SITE_URL } from '@platform/testing/tenants/tenant-identity';
 import {
   MOCK_USAGE_ALLOWANCE,
+  MOCK_USAGE_NEAR_USED,
   MOCK_USAGE_NOW,
+  MOCK_USAGE_OVER_USED,
   MOCK_USAGE_RESETS_ON,
   MOCK_USAGE_USED,
   mockUsageMeterRow,
@@ -31,9 +33,7 @@ const { markup } = createTranslator({
   namespace: 'usageCard',
 });
 const dropTag = () => '';
-const NEAR_USED = 17;
 const NEAR_PERCENT = 85;
-const OVER_USED = 23;
 const LANGUAGES_HREF = adminRoutes.dashboardLanguages();
 const TEAM_HREF = adminRoutes.dashboardTeam();
 const TAKEAWAYS_LABEL = t(`labels.${USAGE_METER.TAKEAWAYS}`);
@@ -94,7 +94,10 @@ describe(`<${UsageCard.name}/>`, () => {
   it('warns how much is left once a monthly meter is near its limit', async () => {
     vi.mocked(loadUsageMeters).mockResolvedValue([
       mockUsageMeterRow({
-        reading: { used: NEAR_USED, allowance: MOCK_USAGE_ALLOWANCE },
+        reading: {
+          used: MOCK_USAGE_NEAR_USED,
+          allowance: MOCK_USAGE_ALLOWANCE,
+        },
       }),
     ]);
 
@@ -103,20 +106,26 @@ describe(`<${UsageCard.name}/>`, () => {
     const warning = screen.getByText(
       markup(`notes.${USAGE_METER.TAKEAWAYS}.${USAGE_LEVEL.NEAR}`, {
         percent: NEAR_PERCENT,
-        left: MOCK_USAGE_ALLOWANCE - NEAR_USED,
+        left: MOCK_USAGE_ALLOWANCE - MOCK_USAGE_NEAR_USED,
         date: MOCK_USAGE_RESETS_ON,
         separator: dropTag,
         reset: dropTag,
       }),
     );
 
+    const resetNote = screen.getByText(RESETS_ON_NOTE);
+
     expect(warning).toBeVisible();
+    expect(resetNote).toBeVisible();
   });
 
   it('caps a used-up monthly meter at its allowance and says when it resets', async () => {
     vi.mocked(loadUsageMeters).mockResolvedValue([
       mockUsageMeterRow({
-        reading: { used: OVER_USED, allowance: MOCK_USAGE_ALLOWANCE },
+        reading: {
+          used: MOCK_USAGE_OVER_USED,
+          allowance: MOCK_USAGE_ALLOWANCE,
+        },
       }),
     ]);
 
