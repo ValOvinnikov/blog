@@ -7,6 +7,9 @@ code:
   - packages/ui/src/components/molecules/toast/**
   - packages/ui/src/components/organisms/toast-viewport/**
   - apps/web/src/context/toast-provider/**
+  - apps/web/src/utils/page-out-of-date/**
+  - apps/web/src/hooks/use-out-of-date-notice/**
+  - apps/web/src/components/features/layout/site-providers/components/out-of-date-page-notice/**
   - apps/platform/src/context/toast-provider/**
   - apps/platform/src/components/shared/toast/**
   - apps/platform/src/components/shared/toast-viewport/**
@@ -45,6 +48,7 @@ Short, non-blocking notices that confirm or report the outcome of an action: a s
 - `toast.promise` shows a loading toast only if the promise is still pending after 400 ms, then settles it in place into success or error.
 - Hover or focus pauses a toast's timer; leaving resumes it with the remaining time. Escape dismisses the focused toast, otherwise the newest, in both apps. Acting on a toast's action dismisses it.
 - Errors announce as `role="alert"` (assertive); other types as `role="status"` (polite).
+- A reader action from a page whose build is gone (opened before a deploy, past Skew Protection's max age, so the server rejects the action as unrecognised) shows one sticky error toast, "This page is out of date. Reload to continue.", with a Reload action, and never reloads by itself. Each reader action — bookmark status, save and undo, newsletter sign-up and subscriber gate, contact form, and the account controls through `useActionToast` — goes through `unlessPageOutOfDate`, which resolves to nothing and signals `OutOfDatePageNotice` (mounted in `SiteProviders`); the form or toggle returns to its previous state with no error of its own, and nothing is logged. A `useActionToast` call settles its loading toast into the same notice. Any other rejection keeps its own message. The copy is fixed catalogue keys (`outOfDateNotice.*`), not Voice.
 - The two apps share no toast code: `apps/web` and `apps/platform` each own a store and provider, and only the public site uses the `@shinefold/ui` `Toast` and `ToastViewport`.
 
 ## Dependencies
@@ -62,7 +66,7 @@ Short, non-blocking notices that confirm or report the outcome of an action: a s
 
 ## Tests and stories
 
-- Web: `toast-store.test.ts`, `toast-provider.test.tsx`.
+- Web: `toast-store.test.ts`, `toast-provider.test.tsx`, `page-out-of-date.test.ts`, `out-of-date-page-notice.test.tsx`.
 - Platform: `toast-store.test.ts`, `toast-provider.test.tsx`, `toast.test.tsx`, `toast-viewport.test.tsx`.
 - UI: `toast.test.tsx`, `toast-viewport.test.tsx`; stories `toast.stories.tsx`, `toast-viewport.stories.tsx`.
 - Visual reference: `docs/design-reference/toast-notification-mock.html`.

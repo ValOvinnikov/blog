@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import {
   ACTION_OUTCOME,
+  SITE_MESSAGES,
   type TActionOutcome,
   type TOutcome,
 } from '@shinefold/config';
@@ -8,6 +9,10 @@ import type { IWithChildren } from '@shinefold/config/react';
 import { ToastProvider } from '@web/context/toast-provider';
 import { act, renderHook, screen, waitFor } from '@web/testing/custom-render';
 import { AppProviders } from '@web/testing/providers';
+import {
+  MOCK_UNRECOGNIZED_ACTION_ERROR,
+  mockUnrecognizedActionError,
+} from '@web/testing/shared/out-of-date/mock-unrecognized-action';
 import { stubRouterRefresh } from '@web/testing/shared/router/stub-router-refresh';
 import { findToastStatus } from '@web/testing/shared/toast/find-toast-status';
 
@@ -99,6 +104,21 @@ describe(useActionToast, () => {
       expect(routerRefreshMock).not.toHaveBeenCalled();
     },
   );
+
+  it('settles an unrecognised action into the out-of-date notice', async () => {
+    mockUnrecognizedActionError();
+
+    runAction(() => Promise.reject(MOCK_UNRECOGNIZED_ACTION_ERROR));
+
+    const notice = await screen.findByRole('alert');
+    const reloadButton = screen.getByRole('button', {
+      name: SITE_MESSAGES.outOfDateNotice.reloadLabel,
+    });
+    expect(notice).toHaveTextContent(SITE_MESSAGES.outOfDateNotice.message);
+    expect(notice).not.toHaveTextContent(MOCK_ERROR);
+    expect(reloadButton).toBeVisible();
+    expect(routerRefreshMock).not.toHaveBeenCalled();
+  });
 
   it('reports pending until the action settles', async () => {
     const { promise, resolve } =

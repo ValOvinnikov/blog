@@ -147,6 +147,10 @@
     "dismissLabel": "Benachrichtigung schließen",
     "mergeCountSuffix": " ×{count}"
   },
+  "outOfDateNotice": {
+    "message": "Diese Seite ist nicht mehr aktuell. Bitte laden Sie sie neu, um fortzufahren.",
+    "reloadLabel": "Neu laden"
+  },
   "bookmarkButton": {
     "save": "Merken",
     "saved": "Gemerkt",

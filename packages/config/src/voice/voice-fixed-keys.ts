@@ -1,6 +1,7 @@
 import { CONSENT_VOICE_FIXED_KEYS } from './voice-fixed-keys-consent';
 import { COOKIE_LIST_VOICE_FIXED_KEYS } from './voice-fixed-keys-cookie-list';
 import { PRICING_VOICE_FIXED_KEYS } from './voice-fixed-keys-pricing';
+import { TOAST_VOICE_FIXED_KEYS } from './voice-fixed-keys-toast';
 
 /**
  * Every `site-messages.en.json` key that stays fixed rather than
@@ -11,6 +12,7 @@ export const VOICE_FIXED_KEYS = [
   ...CONSENT_VOICE_FIXED_KEYS,
   ...COOKIE_LIST_VOICE_FIXED_KEYS,
   ...PRICING_VOICE_FIXED_KEYS,
+  ...TOAST_VOICE_FIXED_KEYS,
   'breadcrumbs.ariaLabel',
   'localeErrorPage.announcement',
   'siteUnavailable.heading',
@@ -36,8 +38,6 @@ export const VOICE_FIXED_KEYS = [
   'authMenu.emailAriaLabel',
   'authMenu.accountMenuAriaLabel',
   'authMenu.loadingAccountStatus',
-  'toastProvider.viewportAriaLabel',
-  'toastProvider.dismissLabel',
   'bookmarkButton.saveAriaLabel',
   'bookmarkButton.removeAriaLabel',
   'accountPage.privacy.deleteConfirmAriaLabel',
@@ -84,7 +84,6 @@ export const VOICE_FIXED_KEYS = [
   'pagination.pageSuffix',
   'taxonomyListModule.topics.postsCount',
   'taxonomyListModule.tags.postsCount',
-  'toastProvider.mergeCountSuffix',
   'bookmarksPage.hint',
   'blogPostPage.readingTime',
   'postCard.readingTime',

@@ -147,6 +147,10 @@
     "dismissLabel": "Melding sluiten",
     "mergeCountSuffix": " ×{count}"
   },
+  "outOfDateNotice": {
+    "message": "Deze pagina is verouderd. Herlaad de pagina om verder te gaan.",
+    "reloadLabel": "Herladen"
+  },
   "bookmarkButton": {
     "save": "Bewaren",
     "saved": "Bewaard",
