@@ -2,17 +2,21 @@
 
 import {
   SIGN_IN_APP_LOG,
-  SIGN_IN_APP_REFUSAL,
   type TSignInAppRefusal,
 } from '@platform/constants/sign-in-apps';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
-import { ACTION_OUTCOME, type TActionResult } from '@shinefold/config';
+import {
+  ACTION_OUTCOME,
+  isOutcomeInvalid,
+  isOutcomeSuccess,
+  type TActionResult,
+} from '@shinefold/config';
 import type { TOAuthProvider } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
-import { requireSignInAppOwner } from './require-sign-in-app-owner';
+import { resolveWritableSignInApp } from './resolve-writable-sign-in-app';
 import { signInAppProviderSchema } from './sign-in-app-input';
 
 export type TConfirmSignInCallbackResult = TActionResult<
@@ -26,30 +30,29 @@ export const confirmSignInCallbackAction = async (
   tenantId: string,
   provider: TOAuthProvider,
 ): Promise<TConfirmSignInCallbackResult> => {
-  const { tenant } = await requireSignInAppOwner(tenantId);
-
-  const parsed = signInAppProviderSchema.safeParse(provider);
-  if (!parsed.success) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
-  const { id, primaryDomain, isArchived } = tenant;
-
-  if (isArchived) {
-    return {
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: SIGN_IN_APP_REFUSAL.ARCHIVED,
-    };
-  }
+  const resolved = await resolveWritableSignInApp(
+    tenantId,
+    signInAppProviderSchema,
+    provider,
+  );
+  if (isOutcomeInvalid(resolved)) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+  if (!isOutcomeSuccess(resolved)) return resolved;
+  const {
+    tenant: { id, primaryDomain },
+    input: parsedProvider,
+  } = resolved;
 
   try {
     await queries.tenantOAuthCredentials.confirmTenantOAuthCallbackDomain(
       id,
-      parsed.data,
+      parsedProvider,
       primaryDomain,
     );
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
     logger.error(SIGN_IN_APP_LOG.CONFIRM_CALLBACK_FAILED, {
       tenantId: id,
-      provider: parsed.data,
+      provider: parsedProvider,
       ...toLoggableError(error),
     });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
