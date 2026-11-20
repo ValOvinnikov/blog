@@ -1,4 +1,5 @@
 import { LookForm } from '@platform/components/features/look/look-form/look-form';
+import type { TLookFormFeatures } from '@platform/components/features/look/look-form/look-form-features';
 import type { TLookFormTenant } from '@platform/components/features/look/look-form/look-form-tenant';
 import { customRender } from '@platform/testing/custom-render';
 import { MOCK_LOGO_URL } from '@platform/testing/site-config/fixtures';
@@ -22,8 +23,18 @@ const MOCK_LOOK_TENANT: TLookFormTenant = {
   lookFields: PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH].lookFields,
 };
 
+const MOCK_LOOK_FEATURES: TLookFormFeatures = {
+  hasReaderAccounts: true,
+  hasBookmarks: true,
+  hasCookieBanner: true,
+};
+
 export const withLookTenant = (overrides: Partial<TLookFormTenant>) => ({
   tenant: { ...MOCK_LOOK_TENANT, ...overrides },
+});
+
+export const withLookFeatures = (overrides: Partial<TLookFormFeatures>) => ({
+  features: { ...MOCK_LOOK_FEATURES, ...overrides },
 });
 
 export const withLookPlan = (plan: TTenantPlan) =>
@@ -34,9 +45,7 @@ export const setupLookForm = customRender(LookForm, {
   initialValues: defaultLookFormValues(),
   isOperator: false,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
-  hasReaderAccounts: true,
-  hasBookmarks: true,
-  hasCookieBanner: true,
+  features: MOCK_LOOK_FEATURES,
 });
 
 export const setupWithSavedLogo = () =>

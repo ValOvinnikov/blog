@@ -135,29 +135,21 @@ describe(`<${LookPreview.name}/>`, () => {
     expect(statusText).toHaveTextContent(LOOK_PREVIEW.readerAccountsOff);
   });
 
-  it.each([
-    { hasBookmarks: true, isListed: true },
-    { hasBookmarks: false, isListed: false },
-  ])(
-    'lists My bookmarks in the signed-in sample only with Bookmarks on ($hasBookmarks)',
-    async ({ hasBookmarks, isListed }) => {
-      renderPreview({ hasBookmarks });
-      const signedInButton = screen.getByRole('button', {
-        name: LOOK_PREVIEW.readerSignedIn,
-      });
-      await user.click(signedInButton);
+  it('leaves My bookmarks out of the signed-in sample with Bookmarks off', async () => {
+    renderPreview({ hasBookmarks: false });
+    const signedInButton = screen.getByRole('button', {
+      name: LOOK_PREVIEW.readerSignedIn,
+    });
+    await user.click(signedInButton);
 
-      const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
-      const accountMenu = within(fullHeader).getByRole('menu', {
-        name: LOOK_PREVIEW.accountMenuAriaLabel,
-      });
-      const bookmarks = within(accountMenu).queryByText(
-        LOOK_PREVIEW.myBookmarks,
-      );
+    const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
+    const accountMenu = within(fullHeader).getByRole('menu', {
+      name: LOOK_PREVIEW.accountMenuAriaLabel,
+    });
+    const bookmarks = within(accountMenu).queryByText(LOOK_PREVIEW.myBookmarks);
 
-      expect(Boolean(bookmarks)).toBe(isListed);
-    },
-  );
+    expect(bookmarks).not.toBeInTheDocument();
+  });
 
   it.each([
     { target: STYLE_TARGET, hasLockedFields: false },

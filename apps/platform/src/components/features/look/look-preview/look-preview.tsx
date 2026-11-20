@@ -1,6 +1,7 @@
 'use client';
 
 import { Dialog } from '@base-ui/react/dialog';
+import type { TLookFormFeatures } from '@platform/components/features/look/look-form/look-form-features';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SampleCookieButton } from '@platform/components/features/site-preview/sample-cookie-button';
 import { DeviceFrame } from '@platform/components/shared/device-frame';
@@ -18,7 +19,7 @@ import { useRef, useState } from 'react';
 
 import { LookFollowMark } from './components/look-follow-mark';
 import { LookFullscreenDialog } from './components/look-fullscreen-dialog';
-import { LookPreviewSample } from './components/look-preview-sample';
+import { LookPreviewSample } from './components/look-preview-sample/look-preview-sample';
 import { LookPreviewSolos } from './components/look-preview-solos';
 import { LookPreviewStatus } from './components/look-preview-status';
 import { useFrameAvailableHeight } from './use-frame-available-height';
@@ -27,9 +28,7 @@ import { useLookPreviewToolbar } from './use-look-preview-toolbar';
 
 export type TLookPreviewProps = {
   liveLocales: readonly TLocaleIsoCode[];
-  hasReaderAccounts: boolean;
-  hasBookmarks: boolean;
-  hasCookieBanner: boolean;
+  features: TLookFormFeatures;
   siteHost: string;
   followTarget: TLookFollowTarget;
   isShown: boolean;
@@ -38,9 +37,7 @@ export type TLookPreviewProps = {
 
 export const LookPreview = ({
   liveLocales,
-  hasReaderAccounts,
-  hasBookmarks,
-  hasCookieBanner,
+  features: { hasReaderAccounts, hasBookmarks, hasCookieBanner },
   siteHost,
   followTarget,
   isShown,
@@ -81,9 +78,7 @@ export const LookPreview = ({
         theme={theme}
         footer={footer}
         liveLocales={liveLocales}
-        hasReaderAccounts={hasReaderAccounts}
-        hasBookmarks={hasBookmarks}
-        isSignedIn={isSignedIn}
+        reader={{ hasAccounts: hasReaderAccounts, hasBookmarks, isSignedIn }}
       />
       {footer.hasCookieSettingsButton && (
         <DeviceFrame.Overlay>

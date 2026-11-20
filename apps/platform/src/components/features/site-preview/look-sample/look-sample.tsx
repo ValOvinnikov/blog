@@ -30,11 +30,13 @@ import { useTranslations } from 'next-intl';
 
 import { lookSampleVariants } from './look-sample-variants';
 
-export type TLookSampleHeaderState = Pick<
-  TSampleSiteHeaderProps,
-  'hasReaderAccounts' | 'hasBookmarks' | 'shouldAlwaysShowLanguageSwitcher'
-> &
-  Partial<Pick<TSampleSiteHeaderProps, 'isSignedIn' | 'isSubmenuOpen'>>;
+export type TLookSampleHeaderState = Pick<TSampleSiteHeaderProps, 'reader'> &
+  Partial<
+    Pick<
+      TSampleSiteHeaderProps,
+      'isSubmenuOpen' | 'shouldAlwaysShowLanguageSwitcher'
+    >
+  >;
 
 export type TLookSampleProps = {
   brand: TSampleSiteHeaderProps['brand'];
@@ -54,9 +56,7 @@ export const LookSample = ({
   footer,
   busy,
   headerState: {
-    hasReaderAccounts,
-    hasBookmarks,
-    isSignedIn = false,
+    reader,
     isSubmenuOpen = false,
     shouldAlwaysShowLanguageSwitcher = false,
   },
@@ -75,12 +75,9 @@ export const LookSample = ({
         brand={brand}
         liveLocales={liveLocales}
         header={header}
-        hasReaderAccounts={hasReaderAccounts}
-        hasBookmarks={hasBookmarks}
-        isSignedIn={isSignedIn}
+        reader={reader}
         isDark={theme.isDark}
         isSubmenuOpen={isSubmenuOpen}
-        isEdgeToEdge={true}
         shouldAlwaysShowLanguageSwitcher={shouldAlwaysShowLanguageSwitcher}
       />
       <div className={main()}>

@@ -2,6 +2,7 @@
 
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
+import type { TSampleReader } from '@platform/components/features/site-preview/sample-site-header';
 import { toSampleBusyStyle } from '@platform/utils/sample-busy-style/sample-busy-style';
 import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
@@ -12,18 +13,14 @@ export type TLookPreviewSampleProps = {
   theme: TSitePreviewTheme;
   footer: TSampleFooterStyle;
   liveLocales: readonly TLocaleIsoCode[];
-  hasReaderAccounts: boolean;
-  hasBookmarks: boolean;
-  isSignedIn: boolean;
+  reader: TSampleReader;
 };
 
 export const LookPreviewSample = ({
   theme,
   footer,
   liveLocales,
-  hasReaderAccounts,
-  hasBookmarks,
-  isSignedIn,
+  reader,
 }: TLookPreviewSampleProps) => {
   const { shownBrandName, values, isSubmenuPreviewOpen } = useLookForm();
 
@@ -36,9 +33,7 @@ export const LookPreviewSample = ({
       footer={footer}
       busy={toSampleBusyStyle(values)}
       headerState={{
-        hasReaderAccounts,
-        hasBookmarks,
-        isSignedIn,
+        reader,
         isSubmenuOpen: isSubmenuPreviewOpen,
       }}
     />

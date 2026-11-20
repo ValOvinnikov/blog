@@ -77,9 +77,7 @@ export const lookPreview = ({
     <LookFormProvider value={lookForm}>
       <LookPreview
         liveLocales={[LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR]}
-        hasReaderAccounts={hasReaderAccounts}
-        hasBookmarks={hasBookmarks}
-        hasCookieBanner={hasCookieBanner}
+        features={{ hasReaderAccounts, hasBookmarks, hasCookieBanner }}
         siteHost={MOCK_TENANT_DOMAIN}
         followTarget={followTarget}
         isShown={true}
