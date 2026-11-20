@@ -2398,7 +2398,29 @@
     "planEnds": "Je abonnement eindigt op <time>{date}</time>, dus het kan niet meer wijzigen. Wil je het houden, maak de opzegging dan ongedaan via Facturering.",
     "UNCHANGED": "Je site zit al op dit abonnement.",
     "CARD_DECLINED": "Je kaart is geweigerd, dus er is niets gewijzigd. Werk hem bij in Facturering en probeer het opnieuw.",
-    "PAYMENT_NOT_CONFIRMED": "De bevestiging bij je bank is niet afgerond, dus je abonnement is niet gewijzigd. Probeer het opnieuw wanneer je zover bent."
+    "PAYMENT_NOT_CONFIRMED": "De bevestiging bij je bank is niet afgerond, dus je abonnement is niet gewijzigd. Probeer het opnieuw wanneer je zover bent.",
+    "NO_NEXT_BAND": "Je site kan nu niet naar die schijf. Laad de pagina opnieuw om je huidige schijf te zien.",
+    "PENDING_CHANGE": "Voor je site staat een abonnementswijziging gepland bij verlenging. Houd eerst je huidige abonnement via Upgraden en stap daarna een schijf hoger.",
+    "QUOTE_EXPIRED": "Deze prijs werd een tijd geleden getoond. Sluit dit venster en open het opnieuw voor de prijs van vandaag."
+  },
+  "moveUpBand": {
+    "trigger": "Naar {ceiling, number} abonnees — {price} meer per {interval, select, YEARLY {jaar} other {maand}}",
+    "title": "Naar {ceiling, number} abonnees?",
+    "lead": "Je nieuwe limieten gelden zodra de betaling rond is.",
+    "loading": "Prijs laden…",
+    "quoteFailed": "De prijs kon niet worden geladen. Sluit dit venster en probeer het zo opnieuw.",
+    "newLimitsTerm": "Nieuwe limieten",
+    "newLimits": "{ceiling, number} abonnees · {allowance, number} e-mails per maand",
+    "chargedTodayTerm": "Vandaag in rekening gebracht",
+    "chargedTodayNote": "Het verschil voor de rest van deze factuurperiode, tot <time>{date}</time>.",
+    "renewalTerm": "Vanaf {date}",
+    "renewalTotal": "{total} per {interval, select, YEARLY {jaar} other {maand}}",
+    "cardTerm": "Kaart",
+    "card": "{brand, select, visa {Visa} mastercard {Mastercard} amex {American Express} discover {Discover} other {Kaart}} eindigend op {last4}",
+    "moveDownNote": "Naar een lagere schijf gaan gebeurt bij verlenging, zonder terugbetaling.",
+    "cancel": "Annuleren",
+    "pay": "{amount} betalen en overstappen",
+    "paying": "Betalen…"
   },
   "helpView": {
     "title": "Help",

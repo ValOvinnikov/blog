@@ -1,5 +1,5 @@
 import { PLAN_CHANGE_TIMING } from '@platform/constants/plan-change';
-import type { TChangePlanResult } from '@platform/server/billing/change-plan-action';
+import type { TChangePlanResult } from '@platform/server/billing/plan-change-outcome';
 import { ACTION_OUTCOME } from '@shinefold/config';
 
 export const changePlanAction = vi.fn(async (): Promise<TChangePlanResult> => ({

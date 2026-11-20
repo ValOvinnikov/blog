@@ -4,6 +4,7 @@ import {
 } from '@platform/constants/billing';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
 import {
+  MOCK_STRIPE_CURRENCY,
   MOCK_STRIPE_CUSTOMER_ID,
   MOCK_STRIPE_SUBSCRIPTION_ID,
 } from '@platform/testing/billing/fixtures';
@@ -36,6 +37,7 @@ export type TMockStripeSubscription = {
   cancelAtPeriodEnd?: boolean;
   cancelAt?: number;
   schedule?: Stripe.SubscriptionSchedule | string | null;
+  currency?: string;
 };
 
 export const mockStripeSubscription = ({
@@ -46,9 +48,11 @@ export const mockStripeSubscription = ({
   cancelAtPeriodEnd = false,
   cancelAt,
   schedule = null,
+  currency = MOCK_STRIPE_CURRENCY,
 }: TMockStripeSubscription = {}): Stripe.Subscription =>
   ({
     id: MOCK_STRIPE_SUBSCRIPTION_ID,
+    currency,
     customer: MOCK_STRIPE_CUSTOMER_ID,
     status,
     cancel_at_period_end: cancelAtPeriodEnd,

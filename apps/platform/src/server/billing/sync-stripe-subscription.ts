@@ -4,13 +4,16 @@ import {
   BILLING_LOG,
   STRIPE_LIVE_SUBSCRIPTION_STATUSES,
 } from '@platform/constants/billing';
-import { graceBillingFields } from '@platform/server/billing/grace-billing-fields';
-import { planFromPriceKeys } from '@platform/server/billing/plan-from-price-keys';
+import { pricesFromKeys } from '@platform/server/billing/plan-from-price-keys';
 import { releaseSchedule } from '@platform/server/billing/release-schedule';
 import { resolveStripeTenant } from '@platform/server/billing/resolve-stripe-tenant';
 import { stripeIdOf } from '@platform/server/billing/stripe-id';
 import { subscriptionEndsAt } from '@platform/server/billing/subscription-ends-at';
 import { tenantStateFromSubscription } from '@platform/server/billing/tenant-state-from-subscription';
+import {
+  subscribedBillingOf,
+  writeSubscriptionBilling,
+} from '@platform/server/billing/write-subscription-billing';
 import { logger } from '@platform/utils/logger/logger';
 import type { TMaybeUndefined } from '@shinefold/config';
 import type { TTenantPlan } from '@shinefold/config/constants';
@@ -19,7 +22,7 @@ import {
   TENANT_PLAN_WRITE_OUTCOME,
   WRITABLE_TENANT_STATUSES,
 } from '@shinefold/db';
-import { isOneOf, isString } from '@shinefold/utils/primitives';
+import { isOneOf } from '@shinefold/utils/primitives';
 import type Stripe from 'stripe';
 
 export type TSyncedSubscription = {
@@ -29,16 +32,6 @@ export type TSyncedSubscription = {
 };
 
 const SUBSCRIPTION_EXPAND = ['discounts.promotion_code'];
-
-const promotionCodeOf = (
-  subscription: Stripe.Subscription,
-): TMaybeUndefined<string> =>
-  subscription.discounts
-    .map((discount) =>
-      isString(discount) ? undefined : discount.promotion_code,
-    )
-    .map((code) => (code && !isString(code) ? code.code : undefined))
-    .find(Boolean);
 
 const isSupersededBy = (
   storedSubscriptionId: TMaybeUndefined<string>,
@@ -59,10 +52,10 @@ export const syncStripeSubscription = async (
   const tenantId = await resolveStripeTenant(subscription, customerId);
   if (!tenantId) return undefined;
 
-  const subscribed = planFromPriceKeys(
+  const prices = pricesFromKeys(
     subscription.items.data.map(({ price }) => price.lookup_key),
   );
-  if (!subscribed) {
+  if (!prices) {
     logger.error(BILLING_LOG.PRICE_UNKNOWN, { tenantId, subscriptionId });
     return undefined;
   }
@@ -88,7 +81,7 @@ export const syncStripeSubscription = async (
 
   const state = tenantStateFromSubscription(
     subscription.status,
-    subscribed,
+    subscribedBillingOf(subscription, prices),
     tenant.plan,
   );
   if (!state) return undefined;
@@ -99,21 +92,9 @@ export const syncStripeSubscription = async (
     return undefined;
   }
 
-  const { plan, status, subscriberBandCeiling, grace } = state;
-  const billingWrite = await queries.tenants.setTenantBilling(tenantId, {
-    stripeCustomerId: customerId,
-    stripeSubscriptionId: subscriptionId,
-    stripePromotionCode:
-      billing.stripePromotionCode ?? promotionCodeOf(subscription),
-    subscriberBandCeiling,
-    ...graceBillingFields(grace, billing, new Date()),
-  });
-  if (!billingWrite.ok) {
-    throw new Error(
-      `syncStripeSubscription: billing write for tenant "${tenantId}" failed with ${billingWrite.error}.`,
-    );
-  }
+  await writeSubscriptionBilling(subscription, tenantId, billing, state);
 
+  const { plan, status } = state;
   const write = await queries.tenants.setTenantPlan(tenantId, {
     plan,
     status,

@@ -1,14 +1,14 @@
-import type { TPlanChangeProgress } from '@platform/components/features/upgrade/plan-change/use-plan-change';
 import { WebhookWaitStatus } from '@platform/components/features/upgrade/webhook-wait-status';
 import { Alert } from '@platform/components/shared/alert';
 import { PLAN_CHANGE_PAYMENT_REFUSALS } from '@platform/constants/plan-change';
+import type { TPaidChangeProgress } from '@platform/utils/use-paid-change/use-paid-change';
 import { ALERT_TYPE } from '@shinefold/config';
 import { isOneOf } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 export type TPlanChangeStatusProps = {
-  progress: TPlanChangeProgress;
+  progress: TPaidChangeProgress;
   fallback: ReactNode;
 };
 

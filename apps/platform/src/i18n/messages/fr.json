@@ -2398,7 +2398,29 @@
     "planEnds": "Votre formule prend fin le <time>{date}</time> et ne peut donc plus changer. Pour la garder, annulez la résiliation depuis Facturation.",
     "UNCHANGED": "Votre site est déjà sur cette formule.",
     "CARD_DECLINED": "Votre carte a été refusée, donc rien n'a changé. Mettez-la à jour dans Facturation et réessayez.",
-    "PAYMENT_NOT_CONFIRMED": "La confirmation auprès de votre banque n'a pas abouti, donc votre formule n'a pas changé. Réessayez quand vous êtes prêt."
+    "PAYMENT_NOT_CONFIRMED": "La confirmation auprès de votre banque n'a pas abouti, donc votre formule n'a pas changé. Réessayez quand vous êtes prêt.",
+    "NO_NEXT_BAND": "Votre site ne peut pas passer à ce palier pour le moment. Rechargez la page pour voir votre palier actuel.",
+    "PENDING_CHANGE": "Un changement d'offre est prévu au renouvellement de votre site. Conservez d'abord votre offre actuelle depuis Mise à niveau, puis passez au palier supérieur.",
+    "QUOTE_EXPIRED": "Ce prix a été affiché il y a un moment. Fermez cette fenêtre et rouvrez-la pour voir le prix du jour."
+  },
+  "moveUpBand": {
+    "trigger": "Passer à {ceiling, number} abonnés — {price} de plus par {interval, select, YEARLY {an} other {mois}}",
+    "title": "Passer à {ceiling, number} abonnés ?",
+    "lead": "Vos nouvelles limites s'appliquent dès que le paiement est accepté.",
+    "loading": "Chargement du prix…",
+    "quoteFailed": "Le prix n'a pas pu être chargé. Fermez cette fenêtre et réessayez dans un instant.",
+    "newLimitsTerm": "Nouvelles limites",
+    "newLimits": "{ceiling, number} abonnés · {allowance, number} e-mails par mois",
+    "chargedTodayTerm": "Débité aujourd'hui",
+    "chargedTodayNote": "La différence pour le reste de cette période de facturation, jusqu'au <time>{date}</time>.",
+    "renewalTerm": "À partir du {date}",
+    "renewalTotal": "{total} par {interval, select, YEARLY {an} other {mois}}",
+    "cardTerm": "Carte",
+    "card": "{brand, select, visa {Visa} mastercard {Mastercard} amex {American Express} discover {Discover} other {Carte}} se terminant par {last4}",
+    "moveDownNote": "Le passage à un palier inférieur se fait au renouvellement, sans remboursement.",
+    "cancel": "Annuler",
+    "pay": "Payer {amount} et passer au palier supérieur",
+    "paying": "Paiement…"
   },
   "helpView": {
     "title": "Aide",
