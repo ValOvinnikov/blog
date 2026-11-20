@@ -1,5 +1,6 @@
 import { STARTER_DOCUMENT_IDS } from '@shinefold/config';
 import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 import { getTenantById } from '@shinefold/db/queries/tenants';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { SAMPLE_CONTENT_LOG } from '@worker/constants/sample-content';
@@ -91,6 +92,15 @@ describe('POST /api/sample-content/remove', () => {
       tenant: mockProvisionedTenant(),
       status: HTTP_STATUS.CONFLICT,
       error: ENQUEUE_ERROR.NOT_PROVISIONED,
+    },
+    {
+      name: 'a conflict when the tenant is suspended',
+      tenant: mockProvisionedTenant({
+        status: TENANT_STATUS.SUSPENDED,
+        sanityWriteTokenEncrypted: MOCK_ENCRYPTED_TOKEN,
+      }),
+      status: HTTP_STATUS.CONFLICT,
+      error: ENQUEUE_ERROR.NOT_WRITABLE,
     },
   ])('answers $name', async ({ tenant, status, error }) => {
     vi.mocked(getTenantById).mockResolvedValue(tenant);

@@ -20,7 +20,9 @@ export async function POST(request: Request): Promise<Response> {
   const tenantId = signed.data;
 
   try {
-    const refusal = await refuseUnwritableTenant(tenantId);
+    const refusal = await refuseUnwritableTenant(tenantId, {
+      requiresWritableStatus: true,
+    });
     if (refusal) return refusal;
 
     return respond(HTTP_STATUS.OK, await removeSampleContent(tenantId));

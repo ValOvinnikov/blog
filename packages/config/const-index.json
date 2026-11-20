@@ -4880,6 +4880,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
+      },
+      {
+        "ref": "ENQUEUE_ERROR.NOT_WRITABLE",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
       }
     ],
     "ADDRESS": [
