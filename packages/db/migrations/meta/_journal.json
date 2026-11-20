@@ -225,6 +225,13 @@
       "when": 1795078922776,
       "tag": "0031_footer-background-ink",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1795181170491,
+      "tag": "0032_modern_cobalt_man",
+      "breakpoints": true
     }
   ]
 }

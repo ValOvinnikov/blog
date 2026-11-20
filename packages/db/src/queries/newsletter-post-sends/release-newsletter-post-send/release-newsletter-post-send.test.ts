@@ -8,7 +8,10 @@ import { markNewsletterPostSent } from '@shinefold/db/queries/newsletter-post-se
 import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends/mark-newsletter-post-skipped';
 import * as schema from '@shinefold/db/schema';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
-import { MOCK_POST_ID } from '@shinefold/db/testing/newsletter-post-sends/fixtures';
+import {
+  MOCK_EARLIER_CLAIMED_AT,
+  MOCK_POST_ID,
+} from '@shinefold/db/testing/newsletter-post-sends/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
@@ -28,7 +31,6 @@ const RECORD_OUTCOME: Record<
       NEWSLETTER_SKIP_REASON.SITE_PAUSED,
     ),
 };
-const MOCK_EARLIER_CLAIMED_AT = new Date(MOCK_NOW.getTime() - 60_000);
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);

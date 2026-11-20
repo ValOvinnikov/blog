@@ -11,6 +11,7 @@ import {
   type TIntervalPriceLookupKeys,
   type TPaidSubscriberBandCeiling,
 } from '@shinefold/db/constants';
+import { lookupKeyFor } from '@shinefold/db/utils/price-lookup-key/price-lookup-key';
 import {
   hasArrayGotMultipleItems,
   isUndefined,
@@ -29,11 +30,6 @@ type TPriceKeyMatch = { interval: TBillingInterval } & (
   | { plan: TTenantPlan; ceiling?: never }
   | { ceiling: TPaidSubscriberBandCeiling; plan?: never }
 );
-
-export const lookupKeyFor = (
-  { monthly, yearly }: TIntervalPriceLookupKeys,
-  interval: TBillingInterval,
-): string => (interval === BILLING_INTERVAL.YEARLY ? yearly : monthly);
 
 const byInterval = (
   keys: TIntervalPriceLookupKeys,
@@ -93,13 +89,4 @@ export const planFromPriceKeys = (
   if (!prices) return undefined;
   const { plan, subscriberBandCeiling } = prices;
   return { plan, subscriberBandCeiling };
-};
-
-export const bandKeyFor = (
-  plan: TTenantPlan,
-  interval: TBillingInterval,
-  ceiling: TMaybeNull<TPaidSubscriberBandCeiling>,
-): TMaybeUndefined<string> => {
-  const bands = PLAN_PRICE_LOOKUP_KEYS[plan]?.subscriberBands;
-  return bands && ceiling ? lookupKeyFor(bands[ceiling], interval) : undefined;
 };

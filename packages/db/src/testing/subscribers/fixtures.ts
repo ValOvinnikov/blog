@@ -27,3 +27,7 @@ export async function readTestSubscriber(
     `readTestSubscriber("${id}")`,
   );
 }
+
+export function mockConfirmedSubscriber(confirmedAt: Date) {
+  return { status: SUBSCRIBER_STATUS.ACTIVE, confirmedAt };
+}

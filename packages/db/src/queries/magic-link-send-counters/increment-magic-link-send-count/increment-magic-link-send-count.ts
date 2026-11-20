@@ -1,26 +1,14 @@
-import { getDb } from '@shinefold/db/client';
 import { magicLinkSendCounters } from '@shinefold/db/schema/magic-link-send-counters';
-import { sql } from 'drizzle-orm';
+import { incrementFixedWindowCount } from '@shinefold/db/utils/increment-fixed-window-count/increment-fixed-window-count';
 
 export async function incrementMagicLinkSendCount(
   key: string,
   windowMs: number,
 ): Promise<number> {
-  const now = new Date();
-  const windowStart = new Date(now.getTime() - windowMs);
-  const isWindowExpired = sql`${magicLinkSendCounters.windowStartedAt} <= ${windowStart.toISOString()}::timestamp`;
-
-  const [counter] = await getDb()
-    .insert(magicLinkSendCounters)
-    .values({ key, windowStartedAt: now, count: 1 })
-    .onConflictDoUpdate({
-      target: magicLinkSendCounters.key,
-      set: {
-        count: sql`CASE WHEN ${isWindowExpired} THEN 1 ELSE ${magicLinkSendCounters.count} + 1 END`,
-        windowStartedAt: sql`CASE WHEN ${isWindowExpired} THEN ${now.toISOString()}::timestamp ELSE ${magicLinkSendCounters.windowStartedAt} END`,
-      },
-    })
-    .returning({ count: magicLinkSendCounters.count });
-
-  return counter?.count ?? 1;
+  const { count } = await incrementFixedWindowCount(
+    magicLinkSendCounters,
+    key,
+    windowMs,
+  );
+  return count;
 }

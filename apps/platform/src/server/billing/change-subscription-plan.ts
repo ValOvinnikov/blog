@@ -11,11 +11,14 @@ import { logger } from '@platform/utils/logger/logger';
 import { planChangeTiming } from '@platform/utils/plan-change-timing/plan-change-timing';
 import type { TMaybeUndefined } from '@shinefold/config';
 import { PLAN_PRICE_LOOKUP_KEYS } from '@shinefold/db/constants';
+import {
+  bandKeyFor,
+  lookupKeyFor,
+} from '@shinefold/db/utils/price-lookup-key/price-lookup-key';
 import type Stripe from 'stripe';
 
 import { changePlanNow, type TChangeNowResult } from './change-plan-now';
 import type { TSubscriptionPlan } from './load-subscription-plan';
-import { bandKeyFor, lookupKeyFor } from './plan-from-price-keys';
 import { releaseSchedule } from './release-schedule';
 import {
   scheduleChangeAtRenewal,
