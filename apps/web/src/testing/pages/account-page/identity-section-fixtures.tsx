@@ -1,4 +1,5 @@
 import { ICONS, SIZE } from '@shinefold/config';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import { Button } from '@shinefold/ui/components/atoms/button';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { identitySectionVariants } from '@web/components/pages/account-page/sections/identity-section/identity-section-variants';
@@ -28,7 +29,7 @@ const makeIdentityProviderRow = (
   overrides: Partial<IIdentityProviderRow> = {},
 ): IIdentityProviderRow => {
   return {
-    id: 'github',
+    id: OAUTH_PROVIDER.GITHUB,
     icon: <Icon name={ICONS.GITHUB} size={SIZE.MD} />,
     label: MOCK_GITHUB_LABEL,
     isLinked: true,
@@ -49,10 +50,11 @@ export const mockIdentitySectionView = (
 ): IIdentitySectionViewProps => {
   return {
     heading: MOCK_IDENTITY_HEADING,
+    linkErrorNotice: null,
     providerRows: [
       makeIdentityProviderRow(),
       makeIdentityProviderRow({
-        id: 'google',
+        id: OAUTH_PROVIDER.GOOGLE,
         icon: <Icon name={ICONS.GOOGLE} size={SIZE.SM} />,
         label: MOCK_GOOGLE_LABEL,
         isLinked: false,

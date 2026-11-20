@@ -9,6 +9,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   mockTenant,
@@ -23,11 +24,14 @@ import { STUDIO_ACCESS, TENANT_PLAN } from '@shinefold/config/constants';
 
 import { OwnerHomeView, type TOwnerHomeViewProps } from './owner-home-view';
 
-const { ownerHomePage } = messages;
+const { ownerHomePage, usageCard, tenantOverviewPage, planNames } = messages;
+const tOwnerHome = makeEnTranslator('ownerHomePage');
 
 vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
 vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
+
+vi.mock('@platform/server/usage/load-usage-meters');
 
 const ownerSite = (overrides: Parameters<typeof mockTenant>[0] = {}) =>
   mockTenant({
@@ -44,6 +48,7 @@ const defaultProps: TOwnerHomeViewProps = {
     DOMAIN_VERIFICATION_STATUS.VERIFIED,
   ),
   owner: mockJoinedOwner(),
+  usage: { links: { languages: adminRoutes.dashboardLanguages() } },
 };
 
 const OwnerHomeViewElement = (props: TOwnerHomeViewProps) => (
@@ -52,10 +57,15 @@ const OwnerHomeViewElement = (props: TOwnerHomeViewProps) => (
 
 const MOCK_TRIAL_ENDS_AT = new Date('2026-11-26T09:00:00.000Z');
 const MOCK_TRIAL_ENDS_ON = 'Nov 26, 2026';
-const TRIAL_TITLE = 'Growth trial';
-const TRIAL_ENDED_TITLE = 'Growth trial ended';
+const TRIAL_TITLE = tOwnerHome('trialTitle', { plan: planNames.GROWTH });
+const TRIAL_ENDED_TITLE = tOwnerHome('trialEndedTitle', {
+  plan: planNames.GROWTH,
+});
 
-const GET_STARTED_HEADING = { level: 2, name: 'Get started' } as const;
+const GET_STARTED_HEADING = {
+  level: 2,
+  name: messages.getStartedCard.title,
+} as const;
 
 const setup = customRenderAsync(OwnerHomeViewElement, defaultProps);
 
@@ -76,11 +86,11 @@ describe(`<${OwnerHomeView.name}/>`, () => {
         level: 1,
         name: MOCK_SITE_NAME,
       });
-      const statusText = screen.getByText('Active');
+      const statusText = screen.getByText(messages.tenantsTable.status.ACTIVE);
       const titleRow = screen.getByTestId('page-header-title-row');
-      const planText = within(titleRow).queryByText('Growth');
+      const planText = within(titleRow).queryByText(planNames.GROWTH);
       const openSiteLink = screen.getByRole('link', {
-        name: 'Open site (opens in new tab)',
+        name: `${tenantOverviewPage.openSiteAction} ${messages.externalLink.newTabHint}`,
       });
 
       expect(tenantHeading).toBeVisible();
@@ -95,10 +105,19 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       expect(archivedNotice).not.toBeInTheDocument();
     });
 
+    it('shows the Usage card straight after Your site', async () => {
+      const headings = await screen.findAllByRole('heading', { level: 2 });
+      const cardTitles = headings.map(({ textContent }) => textContent);
+
+      expect(cardTitles.indexOf(usageCard.title)).toBe(
+        cardTitles.indexOf(ownerHomePage.yourSiteCardTitle) + 1,
+      );
+    });
+
     it('shows the read-only Your site card with no editable fields', () => {
       const yourSiteHeading = screen.getByRole('heading', {
         level: 2,
-        name: 'Your site',
+        name: ownerHomePage.yourSiteCardTitle,
       });
       const textbox = screen.queryByRole('textbox');
 
@@ -109,7 +128,7 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     it('shows the Make it yours card', () => {
       const makeItYoursHeading = screen.getByRole('heading', {
         level: 2,
-        name: 'Make it yours',
+        name: ownerHomePage.makeItYoursCardTitle,
       });
 
       expect(makeItYoursHeading).toBeVisible();
@@ -117,13 +136,13 @@ describe(`<${OwnerHomeView.name}/>`, () => {
 
     it('omits the platform-only Content workspace and Recent activity cards', () => {
       const contentWorkspaceHeading = screen.queryByRole('heading', {
-        name: 'Content workspace',
+        name: tenantOverviewPage.contentWorkspaceCardTitle,
       });
       const recentActivityHeading = screen.queryByRole('heading', {
-        name: 'Recent activity',
+        name: tenantOverviewPage.recentActivityCardTitle,
       });
       const openStudioLink = screen.queryByRole('link', {
-        name: 'Open Studio →',
+        name: messages.getStartedCard.openStudio,
       });
 
       expect(contentWorkspaceHeading).not.toBeInTheDocument();
@@ -167,8 +186,13 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     });
 
     const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
+    const usageTitle = screen.queryByRole('heading', {
+      level: 2,
+      name: usageCard.title,
+    });
 
     expect(archivedNotice).toBeVisible();
+    expect(usageTitle).not.toBeInTheDocument();
   });
 
   it.each([
@@ -248,13 +272,15 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     it('shows the Domain and Owner cards, linking DNS to the domain page', () => {
       const domainHeading = screen.getByRole('heading', {
         level: 2,
-        name: 'Domain',
+        name: tenantOverviewPage.domainCardTitle,
       });
       const ownerHeading = screen.getByRole('heading', {
         level: 2,
-        name: 'Owner',
+        name: tenantOverviewPage.ownerCardTitle,
       });
-      const dnsLink = screen.getByRole('link', { name: 'DNS' });
+      const dnsLink = screen.getByRole('link', {
+        name: tenantOverviewPage.dnsLinkButton,
+      });
 
       expect(domainHeading).toBeVisible();
       expect(ownerHeading).toBeVisible();
@@ -262,7 +288,9 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     });
 
     it('replaces the skeleton with the streamed domain status', () => {
-      const pendingStatusText = screen.getByText('Pending — awaiting DNS');
+      const pendingStatusText = screen.getByText(
+        tenantOverviewPage.dnsStatus.PENDING,
+      );
       const skeleton = screen.queryByTestId('skeleton');
 
       expect(pendingStatusText).toBeVisible();
@@ -283,11 +311,11 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     });
     const ownerHeading = screen.getByRole('heading', {
       level: 2,
-      name: 'Owner',
+      name: tenantOverviewPage.ownerCardTitle,
     });
     const domainHeading = screen.queryByRole('heading', {
       level: 2,
-      name: 'Domain',
+      name: tenantOverviewPage.domainCardTitle,
     });
     const skeletons = screen.getAllByTestId('skeleton');
 

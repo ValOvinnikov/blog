@@ -51,12 +51,15 @@ export const LookPageContent = async ({
         )}
         isOperator={viewer.isOperator}
         liveLocales={liveLocales}
-        hasReaderAccounts={enabledCapabilities.includes(
-          CAPABILITY.READER_ACCOUNTS,
-        )}
-        hasCookieBanner={enabledCapabilities.includes(
-          CAPABILITY.CONSENT_BANNER,
-        )}
+        features={{
+          hasReaderAccounts: enabledCapabilities.includes(
+            CAPABILITY.READER_ACCOUNTS,
+          ),
+          hasBookmarks: enabledCapabilities.includes(CAPABILITY.BOOKMARKS),
+          hasCookieBanner: enabledCapabilities.includes(
+            CAPABILITY.CONSENT_BANNER,
+          ),
+        }}
         savedAt={siteConfig?.updatedAt}
       />
     </PoweredByMarkProvider>

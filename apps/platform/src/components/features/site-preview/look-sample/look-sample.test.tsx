@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import type { TSampleReader } from '@platform/components/features/site-preview/sample-site-header';
 import {
   LOOK_SAMPLE_BAND_LABEL_TEST_ID,
   LOOK_SAMPLE_BAND_TEST_ID,
@@ -70,21 +71,14 @@ import {
 
 faker.seed(5994);
 
-const SUBSCRIBE = 'Subscribe';
-const SIGN_IN = 'Sign in';
-const MENU = 'Menu';
-const POSTS = 'Posts';
 const ENGLISH = 'English';
 const FRANCAIS = 'Français';
 const LANGUAGE_ENGLISH = 'Language: English';
-const CHARTING_THE_NEXT_SEASON = 'Charting the next season';
 const ENGLISH_CODE = LOCALE_ISO_CODES.EN.toUpperCase();
 const FRENCH_CODE = LOCALE_ISO_CODES.FR.toUpperCase();
 const MOCK_DARK_ACCENT = 'oklch(0.7 0.16 28)';
 const MOCK_LOGO_URL = faker.image.url();
 const CURRENT_LANGUAGE_TEST_ID = 'sample-language-code-current';
-const TOPICS = 'Topics';
-const ALL_TOPICS = 'All topics';
 const HARBOUR_NOTES = 'harbour notes';
 const HARBOUR_NOTES_INITIAL = 'H';
 const SKIN_ATTRIBUTE = 'data-skin';
@@ -93,7 +87,19 @@ const SUBSCRIBE_BUTTONS_OUTSIDE_BANDS = 3;
 
 const {
   accountHeading: ACCOUNT,
+  subscribeButton: SUBSCRIBE,
+  signIn: SIGN_IN,
+  menuButton: MENU,
+  navPosts: POSTS,
+  navAbout: ABOUT,
+  navTopics: TOPICS,
+  submenuLead: ALL_TOPICS,
+  themeToggleDark: SWITCH_TO_DARK,
+  themeToggleLight: SWITCH_TO_LIGHT,
+  firstCardTitle: FIRST_CARD_TITLE,
+  secondCardTitle: CHARTING_THE_NEXT_SEASON,
   accountMenuAriaLabel: ACCOUNT_MENU,
+  myBookmarks: MY_BOOKMARKS,
   myBookmarksDescription: BOOKMARKS_DESCRIPTION,
   signOut: SIGN_OUT,
   footerArchive: ARCHIVE,
@@ -144,7 +150,9 @@ const LOOK_SAMPLE_PROPS: TLookSampleProps = {
   header: MOCK_SAMPLE_HEADER_STYLE,
   footer: MOCK_FOOTER,
   busy: MOCK_BUSY,
-  headerState: { hasReaderAccounts: true },
+  headerState: {
+    reader: { hasAccounts: true, hasBookmarks: true, isSignedIn: false },
+  },
 };
 
 const setup = customRender(LookSample, LOOK_SAMPLE_PROPS);
@@ -155,6 +163,11 @@ const withHeaderState = (
   ...LOOK_SAMPLE_PROPS.headerState,
   ...headerState,
 });
+
+const withReader = (reader: Partial<TSampleReader>): TLookSampleHeaderState =>
+  withHeaderState({
+    reader: { ...LOOK_SAMPLE_PROPS.headerState.reader, ...reader },
+  });
 
 const withinFullHeader = () => {
   const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
@@ -222,7 +235,7 @@ describe(`<${LookSample.name}/>`, () => {
         screen.getByRole('region', { name: LATEST_POSTS }),
       );
       const linkedCard = latestPosts.getByRole('link', {
-        name: 'Notes from the harbour',
+        name: FIRST_CARD_TITLE,
       });
       const staticCardHeading = latestPosts.getByRole('heading', {
         level: 3,
@@ -356,7 +369,7 @@ describe(`<${LookSample.name}/>`, () => {
     it('opens with a header carrying the brand and two nav links', () => {
       const header = screen.getByRole('banner');
       const postsLink = screen.getByRole('link', { name: POSTS });
-      const aboutLink = screen.getByRole('link', { name: 'About' });
+      const aboutLink = screen.getByRole('link', { name: ABOUT });
 
       expect(header).toHaveTextContent(MOCK_TENANT_NAME);
       expect(postsLink).toBeVisible();
@@ -365,7 +378,7 @@ describe(`<${LookSample.name}/>`, () => {
 
     it('shows the theme toggle and a Sign in pill when the site has reader accounts', () => {
       const themeToggle = screen.getByRole('button', {
-        name: 'Switch to dark theme',
+        name: SWITCH_TO_DARK,
       });
       const signInButton = withinFullHeader().getByRole('button', {
         name: SIGN_IN,
@@ -453,7 +466,7 @@ describe(`<${LookSample.name}/>`, () => {
     setup({ theme: { ...MOCK_SITE_PREVIEW_THEME, isDark: true } });
 
     const themeToggle = screen.getByRole('button', {
-      name: 'Switch to light theme',
+      name: SWITCH_TO_LIGHT,
     });
 
     expect(themeToggle).toBeVisible();
@@ -461,7 +474,7 @@ describe(`<${LookSample.name}/>`, () => {
 
   describe('without reader accounts', () => {
     beforeEach(() => {
-      setup({ headerState: withHeaderState({ hasReaderAccounts: false }) });
+      setup({ headerState: withReader({ hasAccounts: false }) });
     });
 
     it('shows no Sign in', () => {
@@ -502,7 +515,7 @@ describe(`<${LookSample.name}/>`, () => {
     });
 
     it('opens the account menu from the Account button while signed in', () => {
-      setup({ headerState: withHeaderState({ isSignedIn: true }) });
+      setup({ headerState: withReader({ isSignedIn: true }) });
       const accountButton = withinFullHeader().getByRole('button', {
         name: ACCOUNT,
       });
@@ -523,7 +536,7 @@ describe(`<${LookSample.name}/>`, () => {
       ({ panelStyle, hasDescriptions }) => {
         setupWithAccount(
           { panelStyle },
-          { headerState: withHeaderState({ isSignedIn: true }) },
+          { headerState: withReader({ isSignedIn: true }) },
         );
 
         const description = withinFullHeader().queryByText(
@@ -531,6 +544,25 @@ describe(`<${LookSample.name}/>`, () => {
         );
 
         expect(Boolean(description)).toBe(hasDescriptions);
+      },
+    );
+
+    it.each([
+      { hasBookmarks: true, isListed: true },
+      { hasBookmarks: false, isListed: false },
+    ])(
+      'lists My bookmarks in the account menu only with Bookmarks on ($hasBookmarks)',
+      ({ hasBookmarks, isListed }) => {
+        setup({
+          headerState: withReader({ isSignedIn: true, hasBookmarks }),
+        });
+
+        const accountMenu = withinFullHeader().getByRole('menu', {
+          name: ACCOUNT_MENU,
+        });
+        const bookmarks = within(accountMenu).queryByText(MY_BOOKMARKS);
+
+        expect(Boolean(bookmarks)).toBe(isListed);
       },
     );
 

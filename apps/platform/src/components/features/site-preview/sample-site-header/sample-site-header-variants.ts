@@ -13,13 +13,15 @@ export const sampleSiteHeaderVariants = tv({
   variants: {
     barStyle: {
       [HEADER_BAR_STYLE.FULL_WIDTH]: {
-        root: ['border-b border-border'],
+        root: ['border-b border-border bg-primary'],
+        full: ['min-h-18 px-8'],
         bar: ['px-4 @[40rem]:px-8'],
       },
       [HEADER_BAR_STYLE.FLOATING]: {
         root: [
-          'rounded-card border border-border bg-primary px-3 py-2.5 shadow-float',
+          'mx-3 mt-3 rounded-card border border-border bg-primary px-3 py-2.5 shadow-float',
         ],
+        full: ['min-h-14'],
       },
     },
     layout: {
@@ -53,31 +55,12 @@ export const sampleSiteHeaderVariants = tv({
         group: ['flex items-center gap-4'],
       },
     },
-    isEdgeToEdge: {
-      true: {},
-      false: {},
-    },
     isWidePanelOpen: {
       true: {},
       false: {},
     },
   },
   compoundVariants: [
-    {
-      barStyle: HEADER_BAR_STYLE.FULL_WIDTH,
-      isEdgeToEdge: false,
-      class: { root: ['@max-[64rem]:-mx-card-x'], full: ['pb-3'] },
-    },
-    {
-      barStyle: HEADER_BAR_STYLE.FULL_WIDTH,
-      isEdgeToEdge: true,
-      class: { root: ['bg-primary'], full: ['min-h-18 px-8'] },
-    },
-    {
-      barStyle: HEADER_BAR_STYLE.FLOATING,
-      isEdgeToEdge: true,
-      class: { root: ['mx-3 mt-3'], full: ['min-h-14'] },
-    },
     {
       barStyle: HEADER_BAR_STYLE.FLOATING,
       isWidePanelOpen: true,

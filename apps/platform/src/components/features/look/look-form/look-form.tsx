@@ -27,6 +27,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 
+import type { TLookFormFeatures } from './look-form-features';
 import type { TLookFormTenant } from './look-form-tenant';
 import { lookFormVariants } from './look-form-variants';
 import { useLookFormState } from './use-look-form-state';
@@ -38,8 +39,7 @@ export type TLookFormProps = {
   initialValues: TLookFormValues;
   isOperator: boolean;
   liveLocales: readonly TLocaleIsoCode[];
-  hasReaderAccounts: boolean;
-  hasCookieBanner: boolean;
+  features: TLookFormFeatures;
   savedAt?: Date;
 };
 
@@ -54,11 +54,11 @@ export const LookForm = ({
   initialValues,
   isOperator,
   liveLocales,
-  hasReaderAccounts,
-  hasCookieBanner,
+  features,
   savedAt,
 }: TLookFormProps) => {
   const { siteHost } = tenant;
+  const { hasCookieBanner } = features;
   const layoutRef = useRef<HTMLDivElement>(null);
   const layoutWidth = useElementSize(layoutRef)?.width;
   const { view, hasTabPanels, tabsProps, panelProps } = useViewTabs({
@@ -133,8 +133,7 @@ export const LookForm = ({
             >
               <LookPreview
                 liveLocales={liveLocales}
-                hasReaderAccounts={hasReaderAccounts}
-                hasCookieBanner={hasCookieBanner}
+                features={features}
                 siteHost={siteHost}
                 followTarget={toLookFollowTarget(
                   jumpIndex.openRows,

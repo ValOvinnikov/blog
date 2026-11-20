@@ -1364,6 +1364,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/email-usage-level.ts"
+      },
+      {
+        "ref": "USAGE_LEVEL.NEAR",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
       }
     ],
     "OVER": [
@@ -3046,6 +3052,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module.ts"
+      },
+      {
+        "ref": "USAGE_LEVEL.FULL",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
       }
     ],
     "LEFT": [
@@ -4910,6 +4922,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
+      },
+      {
+        "ref": "ENQUEUE_ERROR.NOT_WRITABLE",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
       }
     ],
     "ADDRESS": [
@@ -10466,6 +10484,66 @@
         "file": "apps/platform/src/constants/upload.ts"
       }
     ],
+    "TAKEAWAYS": [
+      {
+        "ref": "USAGE_METER.TAKEAWAYS",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
+    "EMAILS": [
+      {
+        "ref": "USAGE_METER.EMAILS",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
+    "SEATS": [
+      {
+        "ref": "USAGE_METER.SEATS",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.SEATS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "LANGUAGES": [
+      {
+        "ref": "USAGE_METER.LANGUAGES",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.LANGUAGES",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "UNDER": [
+      {
+        "ref": "USAGE_LEVEL.UNDER",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
+    "usage.meter_read_failed": [
+      {
+        "ref": "USAGE_LOG.METER_READ_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
     "SEGMENTED": [
       {
         "ref": "VIEW_TABS_VARIANT.SEGMENTED",
@@ -11794,22 +11872,6 @@
         "file": "apps/web/src/constants/pricing.ts"
       }
     ],
-    "LANGUAGES": [
-      {
-        "ref": "PLAN_COMPARISON_ROW.LANGUAGES",
-        "scope": "app:web",
-        "from": "@web/constants/pricing",
-        "file": "apps/web/src/constants/pricing.ts"
-      }
-    ],
-    "SEATS": [
-      {
-        "ref": "PLAN_COMPARISON_ROW.SEATS",
-        "scope": "app:web",
-        "from": "@web/constants/pricing",
-        "file": "apps/web/src/constants/pricing.ts"
-      }
-    ],
     "NO_POWERED_BY_MARK": [
       {
         "ref": "PLAN_COMPARISON_ROW.NO_POWERED_BY_MARK",
@@ -12266,6 +12328,22 @@
         "file": "apps/web/src/constants/sign-in.ts"
       }
     ],
+    "OAuthAccountNotLinked": [
+      {
+        "ref": "AUTH_ERROR_TYPE.OAUTH_ACCOUNT_NOT_LINKED",
+        "scope": "app:web",
+        "from": "@web/constants/sign-in",
+        "file": "apps/web/src/constants/sign-in.ts"
+      }
+    ],
+    "error": [
+      {
+        "ref": "AUTH_QUERY_PARAM.ERROR",
+        "scope": "app:web",
+        "from": "@web/constants/sign-in",
+        "file": "apps/web/src/constants/sign-in.ts"
+      }
+    ],
     "site_config.fetch_failed": [
       {
         "ref": "SITE_CONFIG_LOG.FETCH_FAILED",
@@ -12496,6 +12574,14 @@
         "scope": "app:web",
         "from": "@web/constants/theme-tokens",
         "file": "apps/web/src/constants/theme-tokens.ts"
+      }
+    ],
+    "timeline_module.fetch_failed": [
+      {
+        "ref": "TIMELINE_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/timeline",
+        "file": "apps/web/src/constants/timeline.ts"
       }
     ],
     "topic_index_page.fetch_failed": [

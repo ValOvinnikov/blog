@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { buildAuthConfig } from '@shinefold/auth';
+import { routes } from '@shinefold/config';
 import { AUTH_APP } from '@shinefold/config/constants';
 import { logMagicLinkRefusal } from '@web/server/auth/log-magic-link-refusal';
 import { getRequestSiteOAuthCredentials } from '@web/server/auth/site-oauth-credentials/site-oauth-credentials';
@@ -18,8 +19,8 @@ const { handlers, auth } = NextAuth(async (request) => ({
     },
     await getRequestSiteOAuthCredentials(request),
   ),
-  // Sign-in is a header popover with no `/login` route; `useOAuthErrorParam` reads `?error=` from here.
-  pages: { error: '/' },
+  // Auth.js sends sign-in errors to `signIn` and the rest to `error`; the handler picks home or `/account` by session.
+  pages: { signIn: routes.signInError(), error: routes.signInError() },
   // The subscribed cookie belongs to the browser, so it must not outlive the reader who set it.
   events: {
     signIn: clearNewsletterSubscribedCookieSafely,

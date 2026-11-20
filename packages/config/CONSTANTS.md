@@ -860,6 +860,12 @@ Every key/value const an agent should reuse before writing a literal. The
 - **UPLOAD_REFUSAL**: `UPLOADS_NOT_CONFIGURED`, `FILE_MISSING`, `FILE_TOO_LARGE`, `UNREADABLE_IMAGE`, `UNRECOGNIZED_TARGET`, `BRAND_IMAGE_TYPE_UNSUPPORTED`, `IMAGE_TOO_SMALL`, `IMAGE_TOO_LARGE`, `FAVICON_NOT_SQUARE`, `SVG_FAVICON_NOT_SQUARE`, `EMAIL_LOGO_SVG`, `EMAIL_LOGO_WEBP`, `EMAIL_LOGO_TYPE_UNSUPPORTED`
 - **UPLOAD_OPERATION**: `UPLOAD`, `CLEAR`
 
+### `@platform/constants/usage` — `apps/platform/src/constants/usage.ts`
+
+- **USAGE_METER**: `TAKEAWAYS`, `EMAILS`, `SEATS`, `LANGUAGES`
+- **USAGE_LEVEL**: `UNDER`, `NEAR`, `FULL`
+- **USAGE_LOG**: `METER_READ_FAILED`=`"usage.meter_read_failed"`
+
 ### `@platform/constants/view-tabs` — `apps/platform/src/constants/view-tabs.ts`
 
 - **VIEW_TABS_VARIANT**: `SEGMENTED`, `UNDERLINE`
@@ -1086,6 +1092,8 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/sign-in` — `apps/web/src/constants/sign-in.ts`
 
 - **SIGN_IN_LOG**: `LINK_REFUSED`=`"auth.sign_in_link_refused"`, `SITE_CREDENTIALS_FAILED`=`"auth.site_oauth_credentials_failed"`
+- **AUTH_ERROR_TYPE**: `OAUTH_ACCOUNT_NOT_LINKED`=`"OAuthAccountNotLinked"`
+- **AUTH_QUERY_PARAM**: `ERROR`=`"error"`
 
 ### `@web/constants/site-config` — `apps/web/src/constants/site-config.ts`
 
@@ -1135,6 +1143,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **THEME_TOKENS_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"theme_tokens.site_config_fetch_failed"`
 
+### `@web/constants/timeline` — `apps/web/src/constants/timeline.ts`
+
+- **TIMELINE_LOG**: `MODULE_FETCH_FAILED`=`"timeline_module.fetch_failed"`
+
 ### `@web/constants/topic-index` — `apps/web/src/constants/topic-index.ts`
 
 - **TOPIC_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"topic_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_index_breadcrumbs.fetch_failed"`
@@ -1160,7 +1172,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@worker/constants/enqueue-error` — `apps/worker/src/constants/enqueue-error.ts`
 
-- **ENQUEUE_ERROR**: `UNAUTHORIZED`, `INVALID_BODY`, `SERVER_ERROR`, `ALREADY_IN_PROGRESS`, `NOT_FOUND`, `NOT_PROVISIONED`, `DOMAIN_NOT_ASSIGNED`, `DOMAIN_STILL_ASSIGNED`, `DOMAIN_RESERVED`
+- **ENQUEUE_ERROR**: `UNAUTHORIZED`, `INVALID_BODY`, `SERVER_ERROR`, `ALREADY_IN_PROGRESS`, `NOT_FOUND`, `NOT_PROVISIONED`, `NOT_WRITABLE`, `DOMAIN_NOT_ASSIGNED`, `DOMAIN_STILL_ASSIGNED`, `DOMAIN_RESERVED`
 
 ### `@worker/constants/inactivity-sweep` — `apps/worker/src/constants/inactivity-sweep.ts`
 

@@ -1,4 +1,5 @@
 import { SIGN_IN_ERROR } from '@platform/constants/sign-in';
+import messages from '@platform/i18n/messages/en.json';
 import { signInWithProviderAction } from '@platform/server/auth/sign-in-with-provider-action';
 import {
   MOCK_GITHUB_BUTTON,
@@ -21,6 +22,12 @@ vi.mock('@platform/server/auth/send-sign-in-link-action', () => ({
 }));
 
 const [GITHUB_PROVIDER_ID, GOOGLE_PROVIDER_ID] = OAUTH_PROVIDER_IDS;
+const {
+  accountNotLinkedTitle,
+  accountNotLinkedDescription,
+  signInFailedTitle,
+  signInFailedDescription,
+} = messages.signInPage;
 
 const setup = customRender(SignInView, {
   providerIds: OAUTH_PROVIDER_IDS,
@@ -100,13 +107,13 @@ describe(`<${SignInView.name}/>`, () => {
     });
   });
 
-  it('explains an email already linked to another sign-in method', () => {
+  it('explains a provider email that is not verified', () => {
     setup({ error: SIGN_IN_ERROR.ACCOUNT_NOT_LINKED });
 
     const alert = screen.getByRole('alert');
 
     expect(alert).toHaveTextContent(
-      'This email already signs in another wayYour email address is already used with a different sign-in method. Sign in the way you did before.',
+      `${accountNotLinkedTitle}${accountNotLinkedDescription}`,
     );
   });
 
@@ -116,7 +123,7 @@ describe(`<${SignInView.name}/>`, () => {
     const alert = screen.getByRole('alert');
 
     expect(alert).toHaveTextContent(
-      "We couldn't sign you inSomething went wrong while signing you in. Try again, or choose another way to sign in.",
+      `${signInFailedTitle}${signInFailedDescription}`,
     );
   });
 });

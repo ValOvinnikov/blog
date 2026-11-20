@@ -7,7 +7,7 @@ import {
   type TMaybeUndefined,
 } from '@shinefold/config';
 import { hasLength, isString } from '@shinefold/utils/primitives';
-import { createTranslator } from 'next-intl';
+import { createFormatter, createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
 import './vitest-jsdom-stand-ins';
@@ -46,6 +46,9 @@ vi.mock('next-intl/server', () => ({
     }),
   ),
   getMessages: vi.fn(async () => messages),
+  getFormatter: vi.fn(async () =>
+    createFormatter({ locale: LOCALE_ISO_CODES.EN }),
+  ),
 }));
 
 // Total: an export not listed here is undefined, so add it here, never per test.

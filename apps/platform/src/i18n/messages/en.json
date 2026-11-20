@@ -36,8 +36,8 @@
   "signInPage": {
     "heading": "Sign in",
     "description": "Use the account you signed up or were invited with.",
-    "accountNotLinkedTitle": "This email already signs in another way",
-    "accountNotLinkedDescription": "Your email address is already used with a different sign-in method. Sign in the way you did before.",
+    "accountNotLinkedTitle": "We couldn't confirm this email",
+    "accountNotLinkedDescription": "Google or GitHub hasn't verified this email address. Verify it with them and try again, or sign in with an email link.",
     "signInFailedTitle": "We couldn't sign you in",
     "signInFailedDescription": "Something went wrong while signing you in. Try again, or choose another way to sign in.",
     "signUpPrompt": "New here? <link>Create an account</link>"
@@ -2516,6 +2516,48 @@
     "metaUntilRevoked": "{who} · {date} · Until revoked",
     "metaExpires": "{who} · {date} · Expires {expiry}",
     "metaExpired": "{who} · {date} · Expired {expiry}"
+  },
+  "usageCard": {
+    "title": "Usage",
+    "description": "What your plan includes and how much is used.",
+    "labels": {
+      "TAKEAWAYS": "AI takeaways this month",
+      "EMAILS": "Emails sent this month",
+      "SEATS": "Team seats",
+      "LANGUAGES": "Additional languages"
+    },
+    "links": {
+      "SEATS": "Team",
+      "LANGUAGES": "Languages"
+    },
+    "value": "<count>{used, number}</count> of {allowance, number}",
+    "failed": "Couldn't load this count. Reload the page to try again.",
+    "footer": {
+      "limits": "Your plan sets these limits.",
+      "plansLink": "See what each plan includes"
+    },
+    "notes": {
+      "TAKEAWAYS": {
+        "UNDER": "Resets on {date}",
+        "NEAR": "{percent}% used — {left, number} left<separator>·</separator><reset>Resets on {date}</reset>",
+        "FULL": "All used. New posts get no takeaways until {date}."
+      },
+      "EMAILS": {
+        "UNDER": "Resets on {date}",
+        "NEAR": "{percent}% used — {left, number} left<separator>·</separator><reset>Resets on {date}</reset>",
+        "FULL": "All used. New posts aren't emailed until {date}."
+      },
+      "SEATS": {
+        "UNDER": "Counts the owner, members and pending invites.",
+        "NEAR": "{left, plural, one {# seat left.} other {# seats left.}}",
+        "FULL": "All seats in use. Remove someone to invite another."
+      },
+      "LANGUAGES": {
+        "UNDER": "Your default language isn't counted.",
+        "NEAR": "{left, plural, one {# language left.} other {# languages left.}}",
+        "FULL": "All in use. Remove one to add another."
+      }
+    }
   },
   "revokeGrantControl": {
     "revoke": {
