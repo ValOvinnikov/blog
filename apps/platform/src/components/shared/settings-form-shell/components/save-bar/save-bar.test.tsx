@@ -58,6 +58,14 @@ const BarWithHiddenField = () => {
   );
 };
 
+const expectSaveAndDiscardEnabled = () => {
+  const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+  const discardButton = screen.getByRole('button', { name: DISCARD });
+
+  expect(saveButton).toBeEnabled();
+  expect(discardButton).toBeEnabled();
+};
+
 describe(`<${SaveBar.name}/>`, () => {
   let user: UserEvent;
 
@@ -217,11 +225,7 @@ describe(`<${SaveBar.name}/>`, () => {
     });
 
     it('keeps Save and Discard available', () => {
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-      const discardButton = screen.getByRole('button', { name: DISCARD });
-
-      expect(saveButton).toBeEnabled();
-      expect(discardButton).toBeEnabled();
+      expectSaveAndDiscardEnabled();
     });
   });
 
@@ -241,11 +245,7 @@ describe(`<${SaveBar.name}/>`, () => {
     });
 
     it('keeps Save and Discard available to try again', () => {
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-      const discardButton = screen.getByRole('button', { name: DISCARD });
-
-      expect(saveButton).toBeEnabled();
-      expect(discardButton).toBeEnabled();
+      expectSaveAndDiscardEnabled();
     });
   });
 
