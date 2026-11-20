@@ -230,7 +230,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **NEWSLETTER_SEND_STATUS**: `NONE`, `SCHEDULED`, `SENDING`, `SENT`, `SKIPPED`
 - **NEWSLETTER_SEND_NOW_REFUSAL**: `NOT_ELIGIBLE`, `OVER_BAND`, `OVER_MONTH`, `ALREADY_SENT`, `SEND_FAILED`, `FORBIDDEN`
-- **NEWSLETTER_TEST_SEND_REFUSAL**: `INVALID_FIELDS`, `RATE_LIMITED`
+- **NEWSLETTER_TEST_SEND_REFUSAL**: `INVALID_FIELDS`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/newsletter-reputation.ts`
 

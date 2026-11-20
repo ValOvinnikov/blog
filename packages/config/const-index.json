@@ -152,12 +152,6 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/action-outcome.ts"
-      },
-      {
-        "ref": "NEWSLETTER_TEST_SEND_REFUSAL.RATE_LIMITED",
-        "scope": "config",
-        "from": "@shinefold/config/constants",
-        "file": "packages/config/src/constants/newsletter-post-send.ts"
       }
     ],
     "UNAVAILABLE": [

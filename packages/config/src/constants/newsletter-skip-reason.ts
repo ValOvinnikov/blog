@@ -13,7 +13,7 @@ export const NEWSLETTER_SKIP_REASON = {
 
 export type TNewsletterSkipReason = TValueOf<typeof NEWSLETTER_SKIP_REASON>;
 
-// Checked in this order; the first that applies is the one the Studio shows.
+// Checked in this order; the first that applies is the cause.
 export const NEWSLETTER_SENDING_OFF_CAUSES = [
   NEWSLETTER_SKIP_REASON.NOT_IN_PLAN,
   NEWSLETTER_SKIP_REASON.SITE_INACTIVE,

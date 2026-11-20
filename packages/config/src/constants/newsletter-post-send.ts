@@ -1,7 +1,7 @@
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import type { TValueOf } from '@shinefold/config/utils';
 
-import type { ACTION_OUTCOME } from './action-outcome';
+import { ACTION_OUTCOME } from './action-outcome';
 import {
   NEWSLETTER_SKIP_REASON,
   type TNewsletterSendingOffCause,
@@ -35,7 +35,7 @@ export type TNewsletterSendNowRefusal = TValueOf<
 
 export const NEWSLETTER_TEST_SEND_REFUSAL = {
   INVALID_FIELDS: 'INVALID_FIELDS',
-  RATE_LIMITED: 'RATE_LIMITED',
+  RATE_LIMITED: ACTION_OUTCOME.RATE_LIMITED,
   SEND_FAILED: NEWSLETTER_SEND_NOW_REFUSAL.SEND_FAILED,
   FORBIDDEN: NEWSLETTER_SEND_NOW_REFUSAL.FORBIDDEN,
 } as const;

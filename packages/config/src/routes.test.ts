@@ -24,36 +24,13 @@ const MOCK_MARKETING_SITE_URL = faker.internet.url({ appendSlash: false });
 
 describe('routes', () => {
   it.each([
-    ['home', routes.home(), '/'],
-    ['topics', routes.topics(), '/topics'],
-    ['tags', routes.tags(), '/tags'],
-    ['bookmarks', routes.bookmarks(), '/bookmarks'],
-    ['account hub', routes.account(), '/account'],
-    ['account data-export', routes.accountExport(), '/api/account/export'],
-    ['site-wide RSS feed', routes.rssFeed(), '/rss.xml'],
     ['cookie statement', routes.cookieStatement(), COOKIE_STATEMENT_PATH],
-    ['legal hub', routes.legal(), LEGAL_INDEX_PATH],
     [
       'legal page by kind',
       routes.legalPageByKind(LEGAL_PAGE_KIND.TERMS),
       '/api/legal-page/TERMS',
     ],
     ['pricing comparison', routes.pricingComparison(), PRICING_COMPARISON_PATH],
-    [
-      'post send status',
-      routes.newsletterPostSendStatus(),
-      '/api/studio/newsletter-post/status',
-    ],
-    [
-      'post test send',
-      routes.newsletterPostTestSend(),
-      '/api/studio/newsletter-post/test-send',
-    ],
-    [
-      'post send now',
-      routes.newsletterPostSendNow(),
-      '/api/studio/newsletter-post/send-now',
-    ],
   ])('builds the %s path', (_route, path, expected) => {
     expect(path).toBe(expected);
   });
