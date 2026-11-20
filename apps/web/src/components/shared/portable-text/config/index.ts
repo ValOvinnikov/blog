@@ -7,13 +7,13 @@ import {
 import { PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
 
 import { blockComponents } from './block';
-import { CookieList } from './cookie-list';
 import { makeExpandableSectionTypeComponent } from './expandable-section';
 import { listComponents } from './list';
 import { markComponents } from './marks';
 import {
   bodyImageTypeComponent,
   codeTypeComponent,
+  cookieListTypeComponent,
   makeAsideTypeComponent,
   makeTableTypeComponent,
   type TAsideKindLabels,
@@ -45,7 +45,7 @@ const makeArticleTextComponents = (
   types: {
     ...componentsWithoutAside.types,
     aside,
-    [PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST]: CookieList,
+    [PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST]: cookieListTypeComponent,
     [PORTABLE_TEXT_BLOCK_TYPE.TABLE]: tableTypeComponent,
   },
 });
