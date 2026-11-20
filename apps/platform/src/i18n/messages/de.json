@@ -402,7 +402,7 @@
       "trigger": "Beispielinhalte entfernen",
       "notWritable": "Beispielinhalte können nicht entfernt werden, solange Ihre Website gesperrt oder archiviert ist.",
       "dialogTitle": "Beispielinhalte entfernen?",
-      "dialogDescription": "Beispiele, die Sie nicht bearbeitet haben, werden von Ihrer Website gelöscht. Beispiele, die Sie bearbeitet haben oder die Ihre anderen Inhalte verwenden, bleiben erhalten.",
+      "dialogDescription": "Beispiele, die Sie nicht bearbeitet haben, werden von Ihrer Website gelöscht. Beispiele, die Sie bearbeitet haben oder die Ihre anderen Inhalte verwenden, bleiben erhalten. Das lässt sich nicht rückgängig machen.",
       "keep": "Beispiele behalten",
       "confirm": "Beispiele entfernen",
       "confirming": "Beispiele werden entfernt…",
@@ -414,6 +414,7 @@
       "kind": {
         "section": "Abschnitt",
         "page": "Seite",
+        "post": "Beitrag",
         "template": "Seitenvorlage",
         "link": "Navigationslink",
         "author": "Autor",

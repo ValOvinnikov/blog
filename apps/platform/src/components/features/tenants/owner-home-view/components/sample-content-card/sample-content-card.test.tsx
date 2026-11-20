@@ -1,6 +1,7 @@
 import { SAMPLE_KIND } from '@platform/constants/sample-content';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { MOCK_KEPT_SAMPLE_TITLE } from '@platform/testing/sample-content/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -18,18 +19,17 @@ vi.mock('@platform/server/sample-content/remove-sample-content-action', () => ({
 const t = makeEnTranslator('ownerHomePage.sampleContent');
 const tKind = makeEnTranslator('ownerHomePage.sampleContent.kind');
 
-const EDITED_TITLE = 'Our services';
-const REFERENCED_TITLE = 'Welcome to the blog';
-const REMOVED_COUNT = 4;
+const MOCK_REFERENCED_TITLE = 'Welcome to the blog';
+const MOCK_REMOVED_COUNT = 4;
 
 const removed = (overrides = {}) => ({
   outcome: ACTION_OUTCOME.SUCCESS,
-  removedCount: REMOVED_COUNT,
+  removedCount: MOCK_REMOVED_COUNT,
   keptEdited: [
-    { id: 'starter.a', kind: SAMPLE_KIND.PAGE, title: EDITED_TITLE },
+    { id: 'starter.a', kind: SAMPLE_KIND.PAGE, title: MOCK_KEPT_SAMPLE_TITLE },
   ],
   keptReferenced: [
-    { id: 'starter.b', kind: SAMPLE_KIND.PAGE, title: REFERENCED_TITLE },
+    { id: 'starter.b', kind: SAMPLE_KIND.PAGE, title: MOCK_REFERENCED_TITLE },
     { id: 'starter.c', kind: SAMPLE_KIND.LINK },
   ],
   ...overrides,
@@ -81,14 +81,16 @@ describe(`<${SampleContentCard.name}/>`, () => {
     it('removes the samples and lists the edited and referenced ones apart', async () => {
       await confirm();
       const toast = await screen.findByText(
-        t('done', { count: REMOVED_COUNT }),
+        t('done', { count: MOCK_REMOVED_COUNT }),
       );
       const edited = screen.getByRole('region', { name: t('keptEditedTitle') });
       const referenced = screen.getByRole('region', {
         name: t('keptReferencedTitle'),
       });
-      const editedSample = within(edited).getByText(EDITED_TITLE);
-      const referencedSample = within(referenced).getByText(REFERENCED_TITLE);
+      const editedSample = within(edited).getByText(MOCK_KEPT_SAMPLE_TITLE);
+      const referencedSample = within(referenced).getByText(
+        MOCK_REFERENCED_TITLE,
+      );
       const untitledLink = within(referenced).getByText(tKind('link'));
 
       expect(removeSampleContentActionMock).toHaveBeenCalledWith(

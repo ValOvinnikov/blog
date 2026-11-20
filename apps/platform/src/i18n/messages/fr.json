@@ -402,7 +402,7 @@
       "trigger": "Supprimer le contenu d’exemple",
       "notWritable": "Le contenu d’exemple ne peut pas être supprimé tant que votre site est suspendu ou archivé.",
       "dialogTitle": "Supprimer le contenu d’exemple ?",
-      "dialogDescription": "Les exemples que vous n’avez pas modifiés sont supprimés de votre site. Ceux que vous avez modifiés, ou que votre autre contenu utilise, sont conservés.",
+      "dialogDescription": "Les exemples que vous n’avez pas modifiés sont supprimés de votre site. Ceux que vous avez modifiés, ou que votre autre contenu utilise, sont conservés. Cette action est irréversible.",
       "keep": "Conserver les exemples",
       "confirm": "Supprimer les exemples",
       "confirming": "Suppression des exemples…",
@@ -414,6 +414,7 @@
       "kind": {
         "section": "Section",
         "page": "Page",
+        "post": "Article",
         "template": "Modèle de page",
         "link": "Lien de navigation",
         "author": "Auteur",

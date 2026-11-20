@@ -4,7 +4,12 @@ import {
 } from '@platform/constants/sample-content';
 import { z } from 'zod';
 
-export type TKeptSample = { id: string; kind: TSampleKind; title?: string };
+type TKeptSample = { id: string; kind: TSampleKind; title?: string };
+
+export type TKeptSamples = {
+  keptEdited: TKeptSample[];
+  keptReferenced: TKeptSample[];
+};
 
 const keptSampleSchema = z.object({
   id: z.string(),
@@ -25,6 +30,7 @@ const KIND_BY_TYPE_PREFIX = [
 ] as const;
 
 const KIND_BY_TYPE: Record<string, TSampleKind> = {
+  page_post: SAMPLE_KIND.POST,
   link: SAMPLE_KIND.LINK,
   person: SAMPLE_KIND.AUTHOR,
   blog_topic: SAMPLE_KIND.TOPIC,

@@ -402,7 +402,7 @@
       "trigger": "Voorbeeldinhoud verwijderen",
       "notWritable": "Voorbeeldinhoud kan niet worden verwijderd zolang je site is opgeschort of gearchiveerd.",
       "dialogTitle": "Voorbeeldinhoud verwijderen?",
-      "dialogDescription": "Voorbeelden die je niet hebt bewerkt, worden van je site verwijderd. Voorbeelden die je hebt bewerkt of die je andere inhoud gebruikt, blijven staan.",
+      "dialogDescription": "Voorbeelden die je niet hebt bewerkt, worden van je site verwijderd. Voorbeelden die je hebt bewerkt of die je andere inhoud gebruikt, blijven staan. Dit kan niet ongedaan worden gemaakt.",
       "keep": "Voorbeelden behouden",
       "confirm": "Voorbeelden verwijderen",
       "confirming": "Voorbeelden verwijderen…",
@@ -414,6 +414,7 @@
       "kind": {
         "section": "Sectie",
         "page": "Pagina",
+        "post": "Bericht",
         "template": "Paginasjabloon",
         "link": "Navigatielink",
         "author": "Auteur",

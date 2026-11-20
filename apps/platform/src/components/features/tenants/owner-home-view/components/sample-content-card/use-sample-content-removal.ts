@@ -2,7 +2,7 @@
 
 import type { TConfirmDialogActionResult } from '@platform/components/shared/confirm-dialog';
 import { useToast } from '@platform/context/toast-provider';
-import type { TKeptSample } from '@platform/server/sample-content/kept-sample';
+import type { TKeptSamples } from '@platform/server/sample-content/kept-sample';
 import { removeSampleContentAction } from '@platform/server/sample-content/remove-sample-content-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
 import {
@@ -13,11 +13,6 @@ import {
 import { errorResult, okResult } from '@shinefold/utils';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
-
-type TKeptSamples = {
-  keptEdited: TKeptSample[];
-  keptReferenced: TKeptSample[];
-};
 
 export const useSampleContentRemoval = (tenantId: string) => {
   const t = useTranslations('ownerHomePage.sampleContent');

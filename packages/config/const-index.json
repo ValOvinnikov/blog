@@ -2054,6 +2054,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-methods.ts"
+      },
+      {
+        "ref": "SAMPLE_KIND.POST",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       }
     ],
     "PUT": [

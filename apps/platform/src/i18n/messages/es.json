@@ -402,7 +402,7 @@
       "trigger": "Quitar el contenido de ejemplo",
       "notWritable": "No se puede quitar el contenido de ejemplo mientras tu sitio esté suspendido o archivado.",
       "dialogTitle": "¿Quitar el contenido de ejemplo?",
-      "dialogDescription": "Los ejemplos que no hayas editado se eliminan de tu sitio. Se conservan los que hayas editado o los que use tu otro contenido.",
+      "dialogDescription": "Los ejemplos que no hayas editado se eliminan de tu sitio. Se conservan los que hayas editado o los que use tu otro contenido. Esta acción no se puede deshacer.",
       "keep": "Conservar los ejemplos",
       "confirm": "Quitar los ejemplos",
       "confirming": "Quitando los ejemplos…",
@@ -414,6 +414,7 @@
       "kind": {
         "section": "Sección",
         "page": "Página",
+        "post": "Entrada",
         "template": "Plantilla de página",
         "link": "Enlace de navegación",
         "author": "Autor",

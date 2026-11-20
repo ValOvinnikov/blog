@@ -402,7 +402,7 @@
       "trigger": "Remove sample content",
       "notWritable": "Sample content can't be removed while your site is suspended or archived.",
       "dialogTitle": "Remove sample content?",
-      "dialogDescription": "Samples you haven't edited are deleted from your site. Samples you've edited, or that your other content uses, are kept.",
+      "dialogDescription": "Samples you haven't edited are deleted from your site. Samples you've edited, or that your other content uses, are kept. This can't be undone.",
       "keep": "Keep samples",
       "confirm": "Remove samples",
       "confirming": "Removing samples…",
@@ -414,6 +414,7 @@
       "kind": {
         "section": "Section",
         "page": "Page",
+        "post": "Post",
         "template": "Page template",
         "link": "Navigation link",
         "author": "Author",

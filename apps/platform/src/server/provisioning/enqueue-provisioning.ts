@@ -34,6 +34,10 @@ export type TWorkerResponse =
       failure: Record<string, unknown>;
     };
 
+// A gateway or protection page answers HTML, which keeps its status but carries no body to read.
+const readJsonBody = (response: Response): Promise<unknown> =>
+  response.json().catch(() => undefined);
+
 export const isWorkerRequestFailure = (
   response: TWorkerResponse,
 ): response is Extract<TWorkerResponse, { status: null }> =>
@@ -76,7 +80,9 @@ export const sendWorkerRequest = async (
       signal: AbortSignal.timeout(timeoutMs),
     });
     const { status } = response;
-    return readsBody ? { status, body: await response.json() } : { status };
+    return readsBody
+      ? { status, body: await readJsonBody(response) }
+      : { status };
   } catch (error) {
     return {
       status: null,

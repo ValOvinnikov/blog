@@ -5,7 +5,7 @@ import {
   SAMPLE_KIND,
   type TSampleKind,
 } from '@platform/constants/sample-content';
-import type { TKeptSample } from '@platform/server/sample-content/kept-sample';
+import type { TKeptSamples } from '@platform/server/sample-content/kept-sample';
 import { hasArrayGotItems, isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
@@ -15,6 +15,7 @@ import { keptSamplesVariants } from './kept-samples-variants';
 const SAMPLE_KIND_KEYS = {
   [SAMPLE_KIND.SECTION]: 'section',
   [SAMPLE_KIND.PAGE]: 'page',
+  [SAMPLE_KIND.POST]: 'post',
   [SAMPLE_KIND.TEMPLATE]: 'template',
   [SAMPLE_KIND.LINK]: 'link',
   [SAMPLE_KIND.AUTHOR]: 'author',
@@ -22,10 +23,7 @@ const SAMPLE_KIND_KEYS = {
   [SAMPLE_KIND.OTHER]: 'other',
 } as const satisfies Record<TSampleKind, string>;
 
-export type TKeptSamplesProps = {
-  keptEdited: TKeptSample[];
-  keptReferenced: TKeptSample[];
-};
+export type TKeptSamplesProps = TKeptSamples;
 
 export const KeptSamples = ({
   keptEdited,

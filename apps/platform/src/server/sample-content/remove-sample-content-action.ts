@@ -15,23 +15,31 @@ import { logger } from '@platform/utils/logger/logger';
 import { ACTION_OUTCOME, HTTP_STATUS } from '@shinefold/config';
 import { isTenantWritable } from '@shinefold/db/utils/is-tenant-writable/is-tenant-writable';
 import { toOutcome } from '@shinefold/utils/to-outcome';
+import { z } from 'zod';
 
 import {
   sampleRemovalResponseSchema,
-  type TKeptSample,
+  type TKeptSamples,
   toKeptSample,
 } from './kept-sample';
 
 // The worker removes every sample in one Sanity transaction before it answers.
 const SAMPLE_REMOVAL_TIMEOUT_MS = 60_000;
 
+const workerRefusalSchema = z.object({
+  error: z.literal(SAMPLE_CONTENT_REFUSAL.NOT_WRITABLE),
+});
+
+const refused = (): TRemoveSampleContentResult => ({
+  outcome: ACTION_OUTCOME.REFUSED,
+  reason: SAMPLE_CONTENT_REFUSAL.NOT_WRITABLE,
+});
+
 export type TRemoveSampleContentResult =
-  | {
+  | ({
       outcome: typeof ACTION_OUTCOME.SUCCESS;
       removedCount: number;
-      keptEdited: TKeptSample[];
-      keptReferenced: TKeptSample[];
-    }
+    } & TKeptSamples)
   | {
       outcome: typeof ACTION_OUTCOME.REFUSED;
       reason: TSampleContentRefusal;
@@ -43,12 +51,7 @@ export const removeSampleContentAction = async (
 ): Promise<TRemoveSampleContentResult> => {
   const { tenant } = await requireTenantManager(tenantId);
 
-  if (!isTenantWritable(tenant)) {
-    return {
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: SAMPLE_CONTENT_REFUSAL.NOT_WRITABLE,
-    };
-  }
+  if (!isTenantWritable(tenant)) return refused();
 
   const response = await sendWorkerRequest(
     SAMPLE_CONTENT_PATH.REMOVE,
@@ -63,6 +66,12 @@ export const removeSampleContentAction = async (
   }
 
   const { status, body } = response;
+  if (
+    status === HTTP_STATUS.CONFLICT &&
+    workerRefusalSchema.safeParse(body).success
+  ) {
+    return refused();
+  }
   if (status !== HTTP_STATUS.OK) {
     logger.error(SAMPLE_CONTENT_LOG.REMOVAL_FAILED, {
       tenantId,

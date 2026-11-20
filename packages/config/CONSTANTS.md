@@ -752,7 +752,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **SAMPLE_CONTENT_PATH**: `REMOVE`=`"/api/sample-content/remove"`
 - **SAMPLE_CONTENT_LOG**: `REMOVAL_FAILED`=`"sample_content.removal_failed"`, `REMOVAL_RESPONSE_INVALID`=`"sample_content.removal_response_invalid"`
 - **SAMPLE_CONTENT_REFUSAL**: `NOT_WRITABLE`
-- **SAMPLE_KIND**: `SECTION`, `PAGE`, `TEMPLATE`, `LINK`, `AUTHOR`, `TOPIC`, `OTHER`
+- **SAMPLE_KIND**: `SECTION`, `PAGE`, `POST`, `TEMPLATE`, `LINK`, `AUTHOR`, `TOPIC`, `OTHER`
 
 ### `@platform/constants/sample-part` — `apps/platform/src/constants/sample-part.ts`
 

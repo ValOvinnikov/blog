@@ -18,6 +18,7 @@ export type TSampleContentRefusal = TValueOf<typeof SAMPLE_CONTENT_REFUSAL>;
 export const SAMPLE_KIND = {
   SECTION: 'SECTION',
   PAGE: 'PAGE',
+  POST: 'POST',
   TEMPLATE: 'TEMPLATE',
   LINK: 'LINK',
   AUTHOR: 'AUTHOR',
