@@ -36,7 +36,7 @@ const mockTimelineItems = (count: number) =>
   );
 
 const setup = customRender(TimelineModuleView, {
-  brandVariant: BRAND_VARIANT.PRIMARY,
+  section: { brandVariant: BRAND_VARIANT.PRIMARY },
   headingBlock: mockHeadingBlock({ heading: MOCK_TIMELINE_HEADING }),
   markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
   items: mockTimelineItems(DEFAULT_ITEM_COUNT),
@@ -44,7 +44,6 @@ const setup = customRender(TimelineModuleView, {
   ctaButtons: [],
   contentAlignment: undefined,
   itemAlignment: CONTENT_ALIGNMENT.LEFT,
-  layout: undefined,
   titleId: MOCK_TITLE_ID,
   dataTestId: MOCK_DATA_TEST_ID,
 });

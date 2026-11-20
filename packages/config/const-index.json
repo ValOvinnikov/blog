@@ -12554,6 +12554,14 @@
         "file": "apps/web/src/constants/theme-tokens.ts"
       }
     ],
+    "timeline_module.fetch_failed": [
+      {
+        "ref": "TIMELINE_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/timeline",
+        "file": "apps/web/src/constants/timeline.ts"
+      }
+    ],
     "topic_index_page.fetch_failed": [
       {
         "ref": "TOPIC_INDEX_LOG.PAGE_FETCH_FAILED",
