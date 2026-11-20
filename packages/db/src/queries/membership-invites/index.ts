@@ -6,3 +6,4 @@ export * from './delete-membership-invites-for-tenant';
 export * from './stop-pending-invites-over-seats';
 export * from './cancel-membership-invite';
 export * from './list-pending-membership-invites';
+export * from './count-seats-in-use';

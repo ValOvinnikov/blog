@@ -6,6 +6,7 @@ import {
   type TNewsletterLimitNoticeKind,
   type TNewsletterSkipReason,
 } from '@shinefold/db/constants';
+import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
 import {
   markNewsletterLimitNoticeSent,
@@ -26,10 +27,7 @@ import {
 import { OWNER_DASHBOARD_PATH } from '@worker/constants/owner-email';
 import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
-import {
-  sentAfterThisPost,
-  type TNewsletterLimits,
-} from '@worker/utils/newsletter-send/newsletter-limits';
+import { sentAfterThisPost } from '@worker/utils/newsletter-send/newsletter-limits';
 import { OWNER_DASHBOARD_ACTION_LABEL } from '@worker/utils/owner-email/owner-dashboard-action-label';
 import { ownerEmailFromAddress } from '@worker/utils/owner-email/owner-email-context';
 import { OWNER_NEWSLETTER_LIMIT_COPY } from '@worker/utils/owner-email/owner-newsletter-limit-copy';

@@ -5,6 +5,7 @@ import {
   type TNewsletterSkipReason,
 } from '@shinefold/db/constants';
 import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config';
+import { getNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends';
 import { isEmailAccountConfigured } from '@shinefold/email';
 import {
@@ -22,7 +23,6 @@ import {
   newsletterSkipReason,
 } from '@worker/utils/newsletter-send/newsletter-limits';
 import { sendOwnerNewsletterNotice } from '@worker/utils/newsletter-send/owner-newsletter-notice';
-import { readNewsletterLimits } from '@worker/utils/newsletter-send/read-newsletter-limits';
 import { readReputationPace } from '@worker/utils/newsletter-send/reputation-pace';
 
 export type TNewsletterSendGateResult =
@@ -64,7 +64,7 @@ export async function gateNewsletterSend(
     return skip(tenantId, postId, NEWSLETTER_SKIP_REASON.REPUTATION_STOP);
   }
 
-  const limits = await readNewsletterLimits(tenant);
+  const limits = await getNewsletterLimits(tenant);
   const skipReason = newsletterSkipReason(limits);
   if (skipReason) {
     await sendOwnerNewsletterNotice(

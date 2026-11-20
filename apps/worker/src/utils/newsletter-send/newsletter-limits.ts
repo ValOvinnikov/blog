@@ -5,14 +5,8 @@ import {
   type TNewsletterLimitNoticeKind,
   type TNewsletterSkipReason,
 } from '@shinefold/db/constants';
+import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import { NEWSLETTER_LIMIT_NEAR_RATIO } from '@worker/constants/newsletter-send';
-
-export type TNewsletterLimits = {
-  activeCount: number;
-  bandCeiling: number;
-  allowance: number;
-  sentThisMonth: number;
-};
 
 export function sentAfterThisPost({
   activeCount,

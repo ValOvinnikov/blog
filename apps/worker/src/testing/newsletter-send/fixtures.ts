@@ -1,7 +1,7 @@
+import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import { NEWSLETTER_SEND_PACE } from '@worker/constants/newsletter-send';
 import { createMockFaker } from '@worker/testing/mock-faker';
 import type { TNewsletterPageResult } from '@worker/units/newsletter-send/send-newsletter-page';
-import type { TNewsletterLimits } from '@worker/utils/newsletter-send/newsletter-limits';
 import type { TNewsletterPost } from '@worker/utils/newsletter-send/read-newsletter-post';
 
 const mockFaker = createMockFaker(7162);
