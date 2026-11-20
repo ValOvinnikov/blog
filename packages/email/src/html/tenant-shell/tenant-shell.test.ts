@@ -19,12 +19,9 @@ import {
   MOCK_UNSAFE_MARKUP,
   PREHEADER_STYLE,
 } from '@shinefold/email/testing/email-fixtures';
+import { hexContrast } from '@shinefold/email/testing/hex-contrast';
 import { MOCK_TENANT_EMAIL_BRAND } from '@shinefold/email/testing/tenant-email-brand';
-import {
-  hexToOklch,
-  renderedContrastRatio,
-  WCAG_AA_CONTRAST_MIN,
-} from '@shinefold/utils/color';
+import { WCAG_AA_CONTRAST_MIN } from '@shinefold/utils/color';
 
 import { buildTenantShell } from './tenant-shell';
 
@@ -216,9 +213,7 @@ describe(buildTenantShell, () => {
 
     expect(letterColour).toBeDefined();
     expect(
-      renderedContrastRatio(hexToOklch(letterColour ?? ''), [
-        hexToOklch(MOCK_TENANT_EMAIL_BRAND.logo1),
-      ]),
+      hexContrast(letterColour ?? '', MOCK_TENANT_EMAIL_BRAND.logo1),
     ).toBeGreaterThanOrEqual(WCAG_AA_CONTRAST_MIN);
   });
 

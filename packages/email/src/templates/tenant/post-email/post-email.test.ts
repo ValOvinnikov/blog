@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { EMAIL_FONT_STACK, FONT_CHOICE } from '@shinefold/config/constants';
+import { POST_BOX_CLASS } from '@shinefold/email/templates/tenant/post-email-frame/post-email-frame';
 import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@shinefold/email/templates/tenant/unsubscribe/unsubscribe';
 import {
   MOCK_ESCAPED_UNSAFE_MARKUP,
@@ -66,8 +67,9 @@ describe(buildPostEmail, () => {
       expect(email.html).toContain(`href="${MOCK_ESCAPED_UNSUBSCRIBE_URL}"`);
     });
 
-    it('renders no cover image and no takeaway list', () => {
+    it('renders no cover image and no takeaways box', () => {
       expect(email.html).not.toContain('<img');
+      expect(email.html).not.toContain(`class="${POST_BOX_CLASS}"`);
       expect(email.html).not.toContain('<li');
     });
 

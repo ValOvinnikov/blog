@@ -4,6 +4,11 @@ import {
   PLATFORM_EMAIL_DARK_BRAND,
 } from '@shinefold/email/html/platform-email-brand/platform-email-brand';
 import {
+  OWNER_BAD_FILL_CLASS,
+  OWNER_MUTED_FILL_CLASS,
+  OWNER_WARN_FILL_CLASS,
+} from '@shinefold/email/templates/owner/owner-limit-email-frame/owner-limit-email-frame';
+import {
   MOCK_ESCAPED_UNSAFE_MARKUP,
   MOCK_UNSAFE_MARKUP,
 } from '@shinefold/email/testing/email-fixtures';
@@ -18,7 +23,17 @@ import {
   type TOwnerLimitEmailInput,
 } from './owner-limit-email';
 
-const NEAR_BAR_WIDTH = 'width="84%"';
+const NEAR_BAR_WIDTH = '84%';
+const FULL_BAR_WIDTH = '100%';
+
+function findBarFills(html: string, fillClass: string) {
+  return [
+    ...html.matchAll(new RegExp(`<table[^>]*class="${fillClass}"[^>]*>`, 'g')),
+  ].map(([tag]) => ({
+    width: tag.match(/width="([^"]+)"/)?.[1],
+    bgcolor: tag.match(/bgcolor="([^"]+)"/)?.[1],
+  }));
+}
 
 describe(buildOwnerLimitEmail, () => {
   describe('with every part given', () => {
@@ -60,10 +75,10 @@ describe(buildOwnerLimitEmail, () => {
     });
 
     it('draws a bar only for the row that asks for one, filled to its share of the limit', () => {
-      const barFills = email.html.match(/width="\d+%"[^>]*99px 0 0 99px/g);
-
-      expect(barFills).toHaveLength(1);
-      expect(barFills?.[0]).toContain(NEAR_BAR_WIDTH);
+      expect(findBarFills(email.html, OWNER_WARN_FILL_CLASS)).toEqual([
+        { width: NEAR_BAR_WIDTH, bgcolor: PLATFORM_EMAIL_BRAND.warn },
+      ]);
+      expect(findBarFills(email.html, OWNER_MUTED_FILL_CLASS)).toEqual([]);
     });
 
     it('colours the near row in the warning colour and the other row muted', () => {
@@ -104,9 +119,9 @@ describe(buildOwnerLimitEmail, () => {
       ],
     });
 
-    expect(html).toContain(
-      `width="100%" cellpadding="0" cellspacing="0" bgcolor="${PLATFORM_EMAIL_BRAND.bad}"`,
-    );
+    expect(findBarFills(html, OWNER_BAD_FILL_CLASS)).toEqual([
+      { width: FULL_BAR_WIDTH, bgcolor: PLATFORM_EMAIL_BRAND.bad },
+    ]);
   });
 
   it('leaves out the heading, usage box and footer when none is given', () => {
