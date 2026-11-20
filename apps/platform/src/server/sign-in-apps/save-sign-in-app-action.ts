@@ -17,10 +17,10 @@ import {
   AUDIT_TARGET_TYPE,
   type TActionResult,
 } from '@shinefold/config';
-import { queries } from '@shinefold/db';
 import { hasLength } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
+import { readSavedSignInApps } from './read-saved-sign-in-apps';
 import { requireSignInAppOwner } from './require-sign-in-app-owner';
 import {
   signInAppInputSchema,
@@ -64,9 +64,7 @@ export const saveSignInAppAction = async (
   }
 
   try {
-    const clients =
-      await queries.tenantOAuthCredentials.listTenantOAuthClients(id);
-    const hasOwnApp = clients.some((client) => client.provider === provider);
+    const hasOwnApp = (await readSavedSignInApps(id)).has(provider);
     const fieldErrors = {
       ...(clientId ? {} : { clientId: required }),
       ...(clientSecret || hasOwnApp ? {} : { clientSecret: required }),
