@@ -6,6 +6,9 @@ import {
   MOCK_LOGO_URL,
   MOCK_STAGED_LOGO_BLOB_URL,
 } from '@platform/testing/site-config/fixtures';
+import { stubStagedImageUrl } from '@platform/testing/staged-image';
+import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+import type { Mock } from 'vitest';
 
 import { BrandAssetField } from './brand-asset-field';
 
@@ -23,8 +26,11 @@ const setup = customRender(BrandAssetField, {
 });
 
 describe(`<${BrandAssetField.name}/>`, () => {
+  let onStage: Mock<(image: TStagedImage) => void>;
+
   beforeEach(() => {
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
+    onStage = vi.fn();
+    stubStagedImageUrl();
   });
 
   afterEach(() => {
@@ -60,7 +66,6 @@ describe(`<${BrandAssetField.name}/>`, () => {
   });
 
   it('stages a picked file with a local preview URL', async () => {
-    const onStage = vi.fn();
     const file = mockPngFile();
     setup({ onStage });
 
@@ -73,7 +78,6 @@ describe(`<${BrandAssetField.name}/>`, () => {
   });
 
   it('rejects an unsupported type without staging it', async () => {
-    const onStage = vi.fn();
     setup({ onStage });
 
     await selectFile(

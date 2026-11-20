@@ -19,9 +19,9 @@ import {
 } from '@platform/testing/look/look-form-setup';
 import {
   CURRENT_LOGO,
-  MOCK_STAGED_LOGO_BLOB_URL,
   UPLOAD_LOGO,
 } from '@platform/testing/site-config/fixtures';
+import { stubStagedImageUrl } from '@platform/testing/staged-image';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
@@ -54,7 +54,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
+    stubStagedImageUrl();
   });
 
   afterEach(() => {

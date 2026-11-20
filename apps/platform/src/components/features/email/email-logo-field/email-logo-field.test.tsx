@@ -6,6 +6,7 @@ import { MOCK_EMAIL_LOGO_URL } from '@platform/testing/email/fixtures';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
 import { MOCK_STAGED_LOGO_BLOB_URL } from '@platform/testing/site-config/fixtures';
+import { stubStagedImageUrl } from '@platform/testing/staged-image';
 
 import { EmailLogoField } from './email-logo-field';
 
@@ -25,7 +26,7 @@ const setup = customRenderInSettingsForm(EmailLogoField, {
 
 describe(`<${EmailLogoField.name}/>`, () => {
   beforeEach(() => {
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
+    stubStagedImageUrl();
   });
 
   afterEach(() => {

@@ -1,23 +1,25 @@
 import { faker } from '@faker-js/faker';
 import { screen, within } from '@platform/testing/custom-render';
 import {
-  chooseLanguage,
   cleanUpEmailSettings,
   fieldLabel,
   FRENCH,
   MOCK_FRENCH_SUBJECT,
   MOCK_INITIAL_DRAFT,
-  openPicker,
-  openTemplate,
-  optionName,
   prepareEmailSettings,
-  selectSenderLogo,
   setupEmailSettings,
   SUBJECT_FRENCH,
   tStatus,
   tTemplate,
-  typeFrenchSignInSubject,
 } from '@platform/testing/email/email-settings';
+import {
+  chooseLanguage,
+  openPicker,
+  openTemplate,
+  optionName,
+  selectSenderLogo,
+  typeFrenchSignInSubject,
+} from '@platform/testing/email/email-settings-interactions';
 import {
   mockEmailBody,
   MOCK_EMAIL_DRAFT_SUBJECT,

@@ -15,15 +15,15 @@ import {
   openLookRow,
   pickLogo,
 } from '@platform/testing/look/look-form-interactions';
-import { setupLookForm } from '@platform/testing/look/look-form-setup';
-import { GO_TO_THE_FIRST_ONE } from '@platform/testing/render-in-settings-form';
 import {
-  MOCK_STAGED_LOGO_BLOB_URL,
-  REPLACE_LOGO,
-} from '@platform/testing/site-config/fixtures';
+  prepareBrandImageForm,
+  setupLookForm,
+} from '@platform/testing/look/look-form-setup';
+import { GO_TO_THE_FIRST_ONE } from '@platform/testing/render-in-settings-form';
+import { REPLACE_LOGO } from '@platform/testing/site-config/fixtures';
 import type * as BlogConfig from '@shinefold/config';
 import { ACTION_OUTCOME, isAccentHueAccessible } from '@shinefold/config';
-import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { UserEvent } from '@testing-library/user-event';
 
 import { useLookOpenRows } from './use-look-open-rows';
 
@@ -50,10 +50,8 @@ describe(useLookOpenRows, () => {
   let user: UserEvent;
 
   beforeEach(() => {
-    user = userEvent.setup();
+    user = prepareBrandImageForm();
     vi.mocked(isAccentHueAccessible).mockReset();
-    vi.mocked(uploadBrandAssetAction).mockReset();
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
     setupLookForm();
   });
 
