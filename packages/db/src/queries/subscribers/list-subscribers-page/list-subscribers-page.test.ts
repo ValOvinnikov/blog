@@ -2,12 +2,11 @@ import { faker } from '@faker-js/faker';
 import * as schema from '@shinefold/db/schema';
 import {
   insertTestSubscriber,
-  insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
-import { mockConfirmedSubscriber } from '@shinefold/db/testing/subscribers/fixtures';
+import { insertTestConfirmedSubscribers } from '@shinefold/db/testing/subscribers/fixtures';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { listSubscribersPage } from './list-subscribers-page';
@@ -37,25 +36,12 @@ describe(listSubscribersPage, () => {
   });
 
   it("pages confirmed subscribers newest first with the site's total", async () => {
-    const { id: otherTenantId } = await insertTestTenant(db());
-    const confirmed = await Promise.all(
-      MOCK_CONFIRMED.map(async ({ email, confirmedAt }) => {
-        const { id } = await insertTestSubscriber(
-          db(),
-          tenantId,
-          email,
-          mockConfirmedSubscriber(confirmedAt),
-        );
-        return { id, email, confirmedAt };
-      }),
+    const confirmed = await insertTestConfirmedSubscribers(
+      db(),
+      tenantId,
+      MOCK_CONFIRMED,
     );
     await insertTestSubscriber(db(), tenantId, faker.internet.email());
-    await insertTestSubscriber(
-      db(),
-      otherTenantId,
-      MOCK_SUBSCRIBER_EMAIL,
-      mockConfirmedSubscriber(MOCK_NOW),
-    );
 
     const firstPage = await listSubscribersPage(tenantId, {
       page: 1,
