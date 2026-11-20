@@ -1720,6 +1720,12 @@
         "file": "apps/platform/src/constants/button.ts"
       },
       {
+        "ref": "SAMPLE_KIND.LINK",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
+      },
+      {
         "ref": "PROVIDER_LINK_ACTION.LINK",
         "scope": "app:web",
         "from": "@web/constants/provider-link",
@@ -2048,6 +2054,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-methods.ts"
+      },
+      {
+        "ref": "SAMPLE_KIND.POST",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       }
     ],
     "PUT": [
@@ -3178,6 +3190,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-suspension.ts"
+      },
+      {
+        "ref": "SAMPLE_KIND.OTHER",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       }
     ],
     "INTERNAL": [
@@ -5144,6 +5162,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
+      },
+      {
+        "ref": "SAMPLE_CONTENT_REFUSAL.NOT_WRITABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       },
       {
         "ref": "ENQUEUE_ERROR.NOT_WRITABLE",
@@ -7362,6 +7386,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/device-frame",
         "file": "apps/platform/src/constants/device-frame.ts"
+      },
+      {
+        "ref": "SAMPLE_KIND.PAGE",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       }
     ],
     "STAGE": [
@@ -7590,6 +7620,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/email-logo",
         "file": "apps/platform/src/constants/email-logo.ts"
+      },
+      {
+        "ref": "SAMPLE_KIND.TEMPLATE",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       }
     ],
     "email_logo.clear_audit_failed": [
@@ -8736,6 +8772,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/preview",
         "file": "apps/platform/src/constants/preview.ts"
+      },
+      {
+        "ref": "SAMPLE_KIND.SECTION",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       }
     ],
     "PHONE_TAB": [
@@ -9076,6 +9118,52 @@
         "scope": "app:web",
         "from": "@web/constants/request",
         "file": "apps/web/src/constants/request.ts"
+      }
+    ],
+    "/api/sample-content/remove": [
+      {
+        "ref": "SAMPLE_CONTENT_PATH.REMOVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
+      }
+    ],
+    "sample_content.removal_failed": [
+      {
+        "ref": "SAMPLE_CONTENT_LOG.REMOVAL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
+      },
+      {
+        "ref": "SAMPLE_CONTENT_LOG.REMOVAL_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/sample-content",
+        "file": "apps/worker/src/constants/sample-content.ts"
+      }
+    ],
+    "sample_content.removal_response_invalid": [
+      {
+        "ref": "SAMPLE_CONTENT_LOG.REMOVAL_RESPONSE_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
+      }
+    ],
+    "AUTHOR": [
+      {
+        "ref": "SAMPLE_KIND.AUTHOR",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
+      }
+    ],
+    "TOPIC": [
+      {
+        "ref": "SAMPLE_KIND.TOPIC",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       }
     ],
     "header": [
@@ -13376,14 +13464,6 @@
         "scope": "app:worker",
         "from": "@worker/constants/revalidate-webhook",
         "file": "apps/worker/src/constants/revalidate-webhook.ts"
-      }
-    ],
-    "sample_content.removal_failed": [
-      {
-        "ref": "SAMPLE_CONTENT_LOG.REMOVAL_FAILED",
-        "scope": "app:worker",
-        "from": "@worker/constants/sample-content",
-        "file": "apps/worker/src/constants/sample-content.ts"
       }
     ],
     "scheduled_post_purge.start_failed": [

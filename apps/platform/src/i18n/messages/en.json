@@ -395,7 +395,33 @@
     "siteSetupNotStartedContactDescription": "We couldn't start setting up your site. Ask your platform contact to start it.",
     "siteSetupStart": "Start setup",
     "siteSetupStarting": "Starting…",
-    "trialUpgrade": "Choose a plan"
+    "trialUpgrade": "Choose a plan",
+    "sampleContent": {
+      "title": "Sample content",
+      "supportingText": "Your site started with sample pages, sections and links. Remove the ones you haven't changed.",
+      "trigger": "Remove sample content",
+      "notWritable": "Sample content can't be removed while your site is suspended or archived.",
+      "dialogTitle": "Remove sample content?",
+      "dialogDescription": "Samples you haven't edited are deleted from your site. Samples you've edited, or that your other content uses, are kept. This can't be undone.",
+      "keep": "Keep samples",
+      "confirm": "Remove samples",
+      "confirming": "Removing samples…",
+      "failed": "The samples couldn't be removed. Try again.",
+      "done": "{count, plural, =0 {No samples needed removing.} one {# sample removed.} other {# samples removed.}}",
+      "nothingKept": "No samples were kept.",
+      "keptEditedTitle": "Kept because you edited them",
+      "keptReferencedTitle": "Kept because other content uses them",
+      "kind": {
+        "section": "Section",
+        "page": "Page",
+        "post": "Post",
+        "template": "Page template",
+        "link": "Navigation link",
+        "author": "Author",
+        "topic": "Topic",
+        "other": "Sample"
+      }
+    }
   },
   "getStartedCard": {
     "title": "Get started",

@@ -153,17 +153,19 @@ describe(`<${OwnerHomeView.name}/>`, () => {
 
   it('shows the Get started card when first-run steps are left', async () => {
     await setup({
-      getStarted: {
-        tenantId: tenant.id,
-        siteAddress: MOCK_CUSTOM_DOMAIN,
-        siteUrl: MOCK_CUSTOM_DOMAIN_URL,
-        doneSteps: {
-          [GET_STARTED_STEP.LOOK]: true,
-          [GET_STARTED_STEP.VOICE]: true,
-          [GET_STARTED_STEP.EDITOR_INVITE]: true,
-          [GET_STARTED_STEP.FIRST_POST]: false,
+      firstRun: {
+        getStarted: {
+          tenantId: tenant.id,
+          siteAddress: MOCK_CUSTOM_DOMAIN,
+          siteUrl: MOCK_CUSTOM_DOMAIN_URL,
+          doneSteps: {
+            [GET_STARTED_STEP.LOOK]: true,
+            [GET_STARTED_STEP.VOICE]: true,
+            [GET_STARTED_STEP.EDITOR_INVITE]: true,
+            [GET_STARTED_STEP.FIRST_POST]: false,
+          },
+          studioAccess: STUDIO_ACCESS.READY,
         },
-        studioAccess: STUDIO_ACCESS.READY,
       },
     });
 

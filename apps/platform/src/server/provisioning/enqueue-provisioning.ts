@@ -21,13 +21,22 @@ type TWorkerRequestBody = {
   locales?: TLocaleIsoCode[];
 };
 
+type TWorkerRequestOptions = {
+  timeoutMs?: number;
+  readsBody?: boolean;
+};
+
 export type TWorkerResponse =
-  | { status: number }
+  | { status: number; body?: unknown }
   | {
       status: null;
       failureEvent: TValueOf<typeof WORKER_LOG>;
       failure: Record<string, unknown>;
     };
+
+// A gateway or protection page answers HTML, which keeps its status but carries no body to read.
+const readJsonBody = (response: Response): Promise<unknown> =>
+  response.json().catch(() => undefined);
 
 export const isWorkerRequestFailure = (
   response: TWorkerResponse,
@@ -38,6 +47,10 @@ export const isWorkerRequestFailure = (
 export const sendWorkerRequest = async (
   path: string,
   body: TWorkerRequestBody,
+  {
+    timeoutMs = ENQUEUE_TIMEOUT_MS,
+    readsBody = false,
+  }: TWorkerRequestOptions = {},
 ): Promise<TWorkerResponse> => {
   const workerUrl = env.WORKER_ENQUEUE_URL;
   const secret = env.WORKER_ENQUEUE_SECRET;
@@ -64,9 +77,12 @@ export const sendWorkerRequest = async (
         ...buildEnqueueHeaders({ secret, path: url.pathname, rawBody }),
       },
       body: rawBody,
-      signal: AbortSignal.timeout(ENQUEUE_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
-    return { status: response.status };
+    const { status } = response;
+    return readsBody
+      ? { status, body: await readJsonBody(response) }
+      : { status };
   } catch (error) {
     return {
       status: null,

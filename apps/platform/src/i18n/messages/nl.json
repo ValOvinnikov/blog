@@ -395,7 +395,33 @@
     "siteSetupNotStartedContactDescription": "We konden het inrichten van je site niet starten. Vraag je platformcontactpersoon het te starten.",
     "siteSetupStart": "Inrichten starten",
     "siteSetupStarting": "Wordt gestart…",
-    "trialUpgrade": "Kies een abonnement"
+    "trialUpgrade": "Kies een abonnement",
+    "sampleContent": {
+      "title": "Voorbeeldinhoud",
+      "supportingText": "Je site begon met voorbeeldpagina’s, -secties en -links. Verwijder de items die je niet hebt aangepast.",
+      "trigger": "Voorbeeldinhoud verwijderen",
+      "notWritable": "Voorbeeldinhoud kan niet worden verwijderd zolang je site is opgeschort of gearchiveerd.",
+      "dialogTitle": "Voorbeeldinhoud verwijderen?",
+      "dialogDescription": "Voorbeelden die je niet hebt bewerkt, worden van je site verwijderd. Voorbeelden die je hebt bewerkt of die je andere inhoud gebruikt, blijven staan. Dit kan niet ongedaan worden gemaakt.",
+      "keep": "Voorbeelden behouden",
+      "confirm": "Voorbeelden verwijderen",
+      "confirming": "Voorbeelden verwijderen…",
+      "failed": "De voorbeelden konden niet worden verwijderd. Probeer het opnieuw.",
+      "done": "{count, plural, =0 {Er hoefden geen voorbeelden te worden verwijderd.} one {# voorbeeld verwijderd.} other {# voorbeelden verwijderd.}}",
+      "nothingKept": "Er zijn geen voorbeelden behouden.",
+      "keptEditedTitle": "Behouden omdat je ze hebt bewerkt",
+      "keptReferencedTitle": "Behouden omdat andere inhoud ze gebruikt",
+      "kind": {
+        "section": "Sectie",
+        "page": "Pagina",
+        "post": "Bericht",
+        "template": "Paginasjabloon",
+        "link": "Navigatielink",
+        "author": "Auteur",
+        "topic": "Onderwerp",
+        "other": "Voorbeeld"
+      }
+    }
   },
   "getStartedCard": {
     "title": "Aan de slag",
