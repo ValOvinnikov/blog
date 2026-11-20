@@ -7,6 +7,7 @@ import {
 } from '@shinefold/config';
 import type { TTimelineModule } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import { TIMELINE_LOG } from '@web/constants/timeline';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_TIMELINE_HEADING,
@@ -15,6 +16,7 @@ import {
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { TimelineModule } from './timeline-module';
 
@@ -65,7 +67,6 @@ const setup = customRenderAsync(TimelineModule, {
 
 describe(`<${TimelineModule.name}/>`, () => {
   beforeEach(() => {
-    getTimelineModuleMock.mockReset();
     getTimelineModuleMock.mockResolvedValue(okResult(mockTimelineModule()));
   });
 
@@ -78,12 +79,16 @@ describe(`<${TimelineModule.name}/>`, () => {
     );
   });
 
-  it('renders nothing when the fetch fails', async () => {
+  it('logs and renders nothing when the fetch fails', async () => {
     getTimelineModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      TIMELINE_LOG.MODULE_FETCH_FAILED,
+      { id: MOCK_MODULE_ID, error: MOCK_ERROR },
+    );
   });
 
   it('renders the resolved items as headings', async () => {
