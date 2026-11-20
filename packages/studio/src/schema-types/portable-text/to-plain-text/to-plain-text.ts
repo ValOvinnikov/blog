@@ -1,6 +1,6 @@
-export type TPlainTextBlock = { children?: { text?: string }[] };
+import type { TTextBlock } from '@shinefold/utils/portable-text';
 
-export const toPlainText = (blocks: TPlainTextBlock[] = []): string =>
+export const toPlainText = (blocks: readonly TTextBlock[] = []): string =>
   blocks
     .flatMap((block) => block.children ?? [])
     .map((child) => child.text ?? '')

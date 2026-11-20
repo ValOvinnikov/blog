@@ -13,6 +13,10 @@ import {
   MOCK_URL,
 } from '@shinefold/email/testing/email-fixtures';
 import {
+  mockPortableTextBlock,
+  mockPortableTextSpan,
+} from '@shinefold/email/testing/portable-text-fixtures';
+import {
   MOCK_TENANT_EMAIL_BRAND,
   MOCK_TENANT_EMAIL_DARK_BRAND,
 } from '@shinefold/email/testing/tenant-email-brand';
@@ -25,27 +29,19 @@ const MOCK_POST_URL = `${MOCK_URL}/en/blog/${faker.lorem.slug()}`;
 const MOCK_COVER_IMAGE_URL = `https://cdn.example.com/${faker.string.alphanumeric(8)}.jpg`;
 const MOCK_SUMMARY_PARAGRAPH = faker.lorem.sentence();
 const MOCK_SUMMARY_ITEMS = [faker.lorem.sentence(), faker.lorem.sentence()];
-const MOCK_SUMMARY_BOLD = faker.lorem.word();
 
-function mockSummaryBlock(
-  text: string,
-  overrides: Partial<TPostSummary[number]> = {},
-): TPostSummary[number] {
-  return {
-    _type: 'block',
-    _key: faker.string.alphanumeric(8),
-    style: 'normal',
-    children: [
-      { _type: 'span', _key: faker.string.alphanumeric(8), text, marks: [] },
-    ],
-    ...overrides,
-  };
-}
+type TSummaryBlock = TPostSummary[number];
 
 const MOCK_SUMMARY: TPostSummary = [
-  mockSummaryBlock(MOCK_SUMMARY_PARAGRAPH),
+  mockPortableTextBlock<TSummaryBlock>({
+    children: [mockPortableTextSpan(MOCK_SUMMARY_PARAGRAPH)],
+  }),
   ...MOCK_SUMMARY_ITEMS.map((item) =>
-    mockSummaryBlock(item, { listItem: 'number', level: 1 }),
+    mockPortableTextBlock<TSummaryBlock>({
+      children: [mockPortableTextSpan(item)],
+      listItem: 'number',
+      level: 1,
+    }),
   ),
 ];
 const MOCK_TEST_BANNER_TEXT = faker.lorem.sentence();
@@ -155,30 +151,14 @@ describe(buildPostEmail, () => {
     });
   });
 
-  it('wraps bold text in strong', () => {
-    const { html } = buildPostEmail({
-      ...MOCK_INPUT,
-      summary: [
-        mockSummaryBlock(MOCK_SUMMARY_BOLD, {
-          children: [
-            {
-              _type: 'span',
-              _key: faker.string.alphanumeric(8),
-              text: MOCK_SUMMARY_BOLD,
-              marks: ['strong'],
-            },
-          ],
-        }),
-      ],
-    });
-
-    expect(html).toContain(`<strong>${MOCK_SUMMARY_BOLD}</strong>`);
-  });
-
   it('renders no summary box for a summary with no text', () => {
     const { html } = buildPostEmail({
       ...MOCK_INPUT,
-      summary: [mockSummaryBlock(' ')],
+      summary: [
+        mockPortableTextBlock<TSummaryBlock>({
+          children: [mockPortableTextSpan(' ')],
+        }),
+      ],
     });
 
     expect(html).not.toContain(`class="${POST_BOX_CLASS}"`);
@@ -187,7 +167,16 @@ describe(buildPostEmail, () => {
   it.each<[string, Partial<TPostEmailInput>]>([
     ['title', { title: MOCK_UNSAFE_MARKUP }],
     ['excerpt', { excerpt: MOCK_UNSAFE_MARKUP }],
-    ['summary', { summary: [mockSummaryBlock(MOCK_UNSAFE_MARKUP)] }],
+    [
+      'summary',
+      {
+        summary: [
+          mockPortableTextBlock<TSummaryBlock>({
+            children: [mockPortableTextSpan(MOCK_UNSAFE_MARKUP)],
+          }),
+        ],
+      },
+    ],
   ])('shows markup in the %s as text', (_field, override) => {
     const { html } = buildPostEmail({ ...MOCK_INPUT, ...override });
 

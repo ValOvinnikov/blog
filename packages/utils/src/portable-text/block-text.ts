@@ -1,7 +1,7 @@
 import { countWords } from '@shinefold/utils/primitives';
 
 export type TTextBlock = {
-  children?: ReadonlyArray<{ text?: string }> | null;
+  children?: ReadonlyArray<{ text?: string | null }> | null;
 };
 
 export const toBlockText = ({ children }: TTextBlock): string =>

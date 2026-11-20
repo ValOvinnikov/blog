@@ -6,7 +6,10 @@ import {
   boldDecorator,
   italicDecorator,
 } from '@shinefold/studio/schema-types/portable-text/decorators/decorators';
-import { normalBlockStyle } from '@shinefold/studio/schema-types/portable-text/listed-text/listed-text';
+import {
+  listedTextLists,
+  normalBlockStyle,
+} from '@shinefold/studio/schema-types/portable-text/listed-text/listed-text';
 import { validateMaxWords } from '@shinefold/studio/schema-types/validation/validate-max-words/validate-max-words';
 import {
   countBlockWords,
@@ -34,10 +37,7 @@ export const postTakeawaysSchema = defineType({
         defineArrayMember({
           type: 'block',
           styles: [normalBlockStyle],
-          lists: [
-            { title: 'Bullet', value: 'bullet' },
-            { title: 'Numbered', value: 'number' },
-          ],
+          lists: listedTextLists,
           marks: {
             decorators: [boldDecorator, italicDecorator],
             annotations: [],
@@ -72,7 +72,10 @@ export const postTakeawaysSchema = defineType({
 
       return {
         title: 'Summary',
-        subtitle: words > 0 ? `${String(words)} words` : 'No summary yet',
+        subtitle:
+          words > 0
+            ? `${String(words)} ${words === 1 ? 'word' : 'words'}`
+            : 'No summary yet',
       };
     },
   },

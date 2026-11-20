@@ -26,6 +26,10 @@ export const draftSummary = async (
   }
 
   const words = countBlockWords(summary);
+  if (words === 0) {
+    logger.warn(GENERATE_SKIM_LOG.SUMMARY_EMPTY, context);
+    return errorResult('The generated summary has no words.');
+  }
   if (words > POST_SUMMARY_MAX_WORDS) {
     logger.warn(GENERATE_SKIM_LOG.SUMMARY_OVER_WORD_LIMIT, {
       ...context,

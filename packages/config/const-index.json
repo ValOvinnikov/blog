@@ -11350,6 +11350,14 @@
         "file": "apps/web/src/constants/generate-skim.ts"
       }
     ],
+    "generate_skim.summary_empty": [
+      {
+        "ref": "GENERATE_SKIM_LOG.SUMMARY_EMPTY",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
     "generate_skim.write_client_unconfigured": [
       {
         "ref": "GENERATE_SKIM_LOG.WRITE_CLIENT_UNCONFIGURED",

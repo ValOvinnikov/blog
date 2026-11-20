@@ -1,7 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { getWriteClient } from '@shinefold/service/sanity/write-client/write-client';
 import { MOCK_SKIM_SUMMARY } from '@shinefold/service/testing/editorial/fixtures';
-import { MOCK_POST_ID } from '@shinefold/service/testing/shared/fixtures';
+import {
+  MOCK_POST_ID,
+  mockRawParagraphTextBlock,
+} from '@shinefold/service/testing/shared/fixtures';
 import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { hasPostTakeaways } from './loader';
@@ -19,6 +22,12 @@ const MOCK_WITH_TAKEAWAYS = {
 };
 const MOCK_EMPTY_SUMMARY = {
   postTakeaways: { _type: 'postTakeaways', summary: [] },
+};
+const MOCK_TEXTLESS_SUMMARY = {
+  postTakeaways: {
+    _type: 'postTakeaways',
+    summary: [mockRawParagraphTextBlock({ text: ' ' })],
+  },
 };
 const MOCK_WITHOUT_TAKEAWAYS = { title: faker.lorem.sentence() };
 
@@ -53,6 +62,11 @@ describe(hasPostTakeaways, () => {
       MOCK_WITHOUT_TAKEAWAYS,
     ],
     ['the summary is empty', MOCK_EMPTY_SUMMARY, MOCK_EMPTY_SUMMARY],
+    [
+      'the summary has blocks but no text',
+      MOCK_TEXTLESS_SUMMARY,
+      MOCK_TEXTLESS_SUMMARY,
+    ],
     ['no document exists', undefined, undefined],
   ])('is false when %s', async (_case, draft, published) => {
     mockDocuments(draft, published);

@@ -1,12 +1,12 @@
 import type { PostTakeaways } from '@shinefold/config';
 import type { TTenantSanityContext } from '@shinefold/service/sanity/query/query';
 import { getWriteClient } from '@shinefold/service/sanity/write-client/write-client';
-import { hasArrayGotItems } from '@shinefold/utils/primitives';
+import { hasBlockText } from '@shinefold/utils/portable-text';
 import { toDraftId, toPublishedId } from '@shinefold/utils/sanity-document-id';
 
 type TPostTakeawaysDocument = { postTakeaways?: PostTakeaways };
 
-/** Reads the draft as well as the published post, so a summary awaiting an editor's review count. */
+/** Reads the draft as well as the published post, so a summary awaiting an editor's review counts. */
 export async function hasPostTakeaways(
   postId: string,
   tenant: TTenantSanityContext,
@@ -18,6 +18,6 @@ export async function hasPostTakeaways(
     ),
   );
   return documents.some((document) =>
-    hasArrayGotItems(document?.postTakeaways?.summary),
+    hasBlockText(document?.postTakeaways?.summary ?? []),
   );
 }

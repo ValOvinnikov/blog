@@ -30,17 +30,18 @@ describe(toBlockText, () => {
 });
 
 describe(countBlockWords, () => {
-  it('counts words across blocks', () => {
-    expect(
-      countBlockWords([
+  it.each([
+    {
+      behaviour: 'counts words across blocks',
+      blocks: [
         { children: [{ text: MOCK_WORD_START }, { text: MOCK_WORD_END }] },
         { children: [{ text: `${MOCK_SECOND_WORD} ${MOCK_SECOND_WORD}` }] },
-      ]),
-    ).toBe(3);
-  });
-
-  it('counts no words in no blocks', () => {
-    expect(countBlockWords([])).toBe(0);
+      ],
+      count: 3,
+    },
+    { behaviour: 'counts no words in no blocks', blocks: [], count: 0 },
+  ])('$behaviour: $count', ({ blocks, count }) => {
+    expect(countBlockWords(blocks)).toBe(count);
   });
 });
 

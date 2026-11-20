@@ -16,6 +16,7 @@ export const GENERATE_SKIM_LOG = {
   POST_BODY_FETCH_FAILED: 'generate_skim.post_body_fetch_failed',
   GENERATION_FAILED: 'generate_skim.generation_failed',
   SUMMARY_OVER_WORD_LIMIT: 'generate_skim.summary_over_word_limit',
+  SUMMARY_EMPTY: 'generate_skim.summary_empty',
   WRITE_CLIENT_UNCONFIGURED: 'generate_skim.write_client_unconfigured',
   DRAFT_SAVE_FAILED: 'generate_skim.draft_save_failed',
   PUBLISHED_AT_LOOKUP_FAILED: 'generate_skim.published_at_lookup_failed',

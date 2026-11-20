@@ -100,6 +100,10 @@ const MOCK_SUMMARY_BLOCKS = faker.helpers.multiple(
   }),
   { count: 2 },
 );
+const MOCK_TEXTLESS_SUMMARY_BLOCKS = [
+  { style: SUMMARY_BLOCK_STYLE.PARAGRAPH, text: ' ' },
+  { style: SUMMARY_BLOCK_STYLE.BULLET, text: '****' },
+];
 const MOCK_OVERLONG_SUMMARY_BLOCKS = [
   {
     style: SUMMARY_BLOCK_STYLE.PARAGRAPH,
@@ -441,9 +445,12 @@ describe(POST, () => {
       });
     });
 
-    describe('when the summary runs over the word limit', () => {
+    describe.each([
+      ['runs over the word limit', MOCK_OVERLONG_SUMMARY_BLOCKS],
+      ['has no text', MOCK_TEXTLESS_SUMMARY_BLOCKS],
+    ])('when the summary %s', (_case, blocks) => {
       beforeEach(() => {
-        generateTakeawaysMock.mockResolvedValue(MOCK_OVERLONG_SUMMARY_BLOCKS);
+        generateTakeawaysMock.mockResolvedValue(blocks);
       });
 
       it('refuses it, saves nothing and gives the claim back', async () => {
