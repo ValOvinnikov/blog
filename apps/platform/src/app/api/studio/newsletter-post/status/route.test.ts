@@ -1,6 +1,7 @@
 import { STUDIO_NEWSLETTER_LOG } from '@platform/constants/studio-newsletter';
 import { resolveStudioCaller } from '@platform/server/auth/resolve-studio-caller';
 import { readNewsletterPostSend } from '@platform/server/newsletter-post-send/read-newsletter-post-send';
+import { MOCK_PLATFORM_ORIGIN } from '@platform/testing/auth/fixtures';
 import {
   MOCK_STUDIO_CALLER,
   MOCK_STUDIO_PROJECT_ID,
@@ -29,10 +30,10 @@ const MOCK_CONFIRMED_COUNT = 9;
 
 const statusRequest = (query: Record<string, string>) =>
   new Request(
-    `https://platform.example${routes.newsletterPostSendStatus()}?${new URLSearchParams(query).toString()}`,
+    `${MOCK_PLATFORM_ORIGIN}${routes.newsletterPostSendStatus()}?${new URLSearchParams(query).toString()}`,
   );
 
-const POST_QUERY = {
+const MOCK_STATUS_QUERY = {
   projectId: MOCK_STUDIO_PROJECT_ID,
   postId: MOCK_POST_ID,
   isPublished: 'true',
@@ -54,7 +55,7 @@ describe(GET, () => {
   });
 
   it('answers the state, count, off cause and Send emails eligibility', async () => {
-    const response = await GET(statusRequest(POST_QUERY));
+    const response = await GET(statusRequest(MOCK_STATUS_QUERY));
 
     expect(response.status).toBe(HTTP_STATUS.OK);
     expect(await response.json()).toEqual({
@@ -77,7 +78,7 @@ describe(GET, () => {
   it('answers FORBIDDEN, reading nothing, for a caller who cannot open the Studio', async () => {
     vi.mocked(resolveStudioCaller).mockResolvedValue(undefined);
 
-    const response = await GET(statusRequest(POST_QUERY));
+    const response = await GET(statusRequest(MOCK_STATUS_QUERY));
 
     expect(response.status).toBe(HTTP_STATUS.FORBIDDEN);
     expect(await response.json()).toEqual({
@@ -88,7 +89,9 @@ describe(GET, () => {
   });
 
   it('refuses a request with no post', async () => {
-    const response = await GET(statusRequest({ ...POST_QUERY, postId: '' }));
+    const response = await GET(
+      statusRequest({ ...MOCK_STATUS_QUERY, postId: '' }),
+    );
 
     expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
     expect(resolveStudioCaller).not.toHaveBeenCalled();
@@ -97,7 +100,7 @@ describe(GET, () => {
   it('logs and fails a read that throws', async () => {
     vi.mocked(readNewsletterPostSend).mockRejectedValue(new Error());
 
-    const response = await GET(statusRequest(POST_QUERY));
+    const response = await GET(statusRequest(MOCK_STATUS_QUERY));
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(logger.error).toHaveBeenCalledWith(

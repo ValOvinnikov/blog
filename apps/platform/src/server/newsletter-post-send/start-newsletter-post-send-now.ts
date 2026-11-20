@@ -1,6 +1,9 @@
 import 'server-only';
 
-import { STUDIO_NEWSLETTER_LOG } from '@platform/constants/studio-newsletter';
+import {
+  NEWSLETTER_POST_SEND_PATH,
+  STUDIO_NEWSLETTER_LOG,
+} from '@platform/constants/studio-newsletter';
 import {
   readNewsletterPostSend,
   type TNewsletterPostSendRequest,
@@ -21,8 +24,6 @@ import {
 } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import type { TNewsletterPostHandStart } from '@shinefold/db/queries/newsletter-post-sends';
-
-const NEWSLETTER_POST_SEND_PATH = '/api/newsletter/post-send';
 
 const refused = (
   reason: TNewsletterSendNowRefusal,

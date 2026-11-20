@@ -38,22 +38,20 @@ describe(isHandSendableClaim, () => {
   });
 
   it.each([
-    NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND,
-    NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE,
-    NEWSLETTER_SKIP_REASON.NEWSLETTER_OFF,
-    NEWSLETTER_SKIP_REASON.SENDING_OFF,
-  ])('accepts a post skipped for %s', (skipReason) => {
-    expect(isHandSendableClaim(skippedFor(skipReason))).toBe(true);
-  });
-
-  it.each([
-    NEWSLETTER_SKIP_REASON.NOT_IN_PLAN,
-    NEWSLETTER_SKIP_REASON.SITE_INACTIVE,
-    NEWSLETTER_SKIP_REASON.SITE_PAUSED,
-    NEWSLETTER_SKIP_REASON.REPUTATION_STOP,
-  ])('refuses a post skipped for %s', (skipReason) => {
-    expect(isHandSendableClaim(skippedFor(skipReason))).toBe(false);
-  });
+    [NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND, true],
+    [NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE, true],
+    [NEWSLETTER_SKIP_REASON.NEWSLETTER_OFF, true],
+    [NEWSLETTER_SKIP_REASON.SENDING_OFF, true],
+    [NEWSLETTER_SKIP_REASON.NOT_IN_PLAN, false],
+    [NEWSLETTER_SKIP_REASON.SITE_INACTIVE, false],
+    [NEWSLETTER_SKIP_REASON.SITE_PAUSED, false],
+    [NEWSLETTER_SKIP_REASON.REPUTATION_STOP, false],
+  ])(
+    'judges a post skipped for %s hand-sendable: %s',
+    (skipReason, isSendable) => {
+      expect(isHandSendableClaim(skippedFor(skipReason))).toBe(isSendable);
+    },
+  );
 
   it('refuses a post that is sending or sent', () => {
     expect(isHandSendableClaim(mockNewsletterPostSend())).toBe(false);
@@ -137,32 +135,35 @@ describe(toSendNowEligibility, () => {
 });
 
 describe(toSendNowRefusal, () => {
-  it('admits an offered, enabled send', () => {
-    expect(
-      toSendNowRefusal(undefined, { isOffered: true, emailsLeft: 10 }),
-    ).toBeUndefined();
-  });
-
-  it('refuses a post that has started sending or was sent', () => {
-    expect(
-      toSendNowRefusal(mockNewsletterPostSend(), { isOffered: false }),
-    ).toBe(NEWSLETTER_SEND_NOW_REFUSAL.ALREADY_SENT);
-  });
-
-  it('refuses a post that is never offered the send', () => {
-    expect(
-      toSendNowRefusal(skippedFor(NEWSLETTER_SKIP_REASON.REPUTATION_STOP), {
-        isOffered: false,
-      }),
-    ).toBe(NEWSLETTER_SEND_NOW_REFUSAL.NOT_ELIGIBLE);
-  });
-
-  it('refuses with the cause while it is still there', () => {
-    expect(
-      toSendNowRefusal(skippedFor(NEWSLETTER_SKIP_REASON.NEWSLETTER_OFF), {
+  it.each([
+    {
+      name: 'admits an offered, enabled send',
+      claim: undefined,
+      sendNow: { isOffered: true, emailsLeft: MOCK_EMAILS_LEFT },
+      refusal: undefined,
+    },
+    {
+      name: 'refuses a post that has started sending or was sent',
+      claim: mockNewsletterPostSend(),
+      sendNow: { isOffered: false },
+      refusal: NEWSLETTER_SEND_NOW_REFUSAL.ALREADY_SENT,
+    },
+    {
+      name: 'refuses a post that is never offered the send',
+      claim: skippedFor(NEWSLETTER_SKIP_REASON.REPUTATION_STOP),
+      sendNow: { isOffered: false },
+      refusal: NEWSLETTER_SEND_NOW_REFUSAL.NOT_ELIGIBLE,
+    },
+    {
+      name: 'refuses with the cause while it is still there',
+      claim: skippedFor(NEWSLETTER_SKIP_REASON.NEWSLETTER_OFF),
+      sendNow: {
         isOffered: true,
         disabledBy: NEWSLETTER_SEND_NOW_REFUSAL.NEWSLETTER_OFF,
-      }),
-    ).toBe(NEWSLETTER_SEND_NOW_REFUSAL.NEWSLETTER_OFF);
+      },
+      refusal: NEWSLETTER_SEND_NOW_REFUSAL.NEWSLETTER_OFF,
+    },
+  ] as const)('$name', ({ claim, sendNow, refusal }) => {
+    expect(toSendNowRefusal(claim, sendNow)).toBe(refusal);
   });
 });

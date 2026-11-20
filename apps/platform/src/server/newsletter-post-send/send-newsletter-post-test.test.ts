@@ -3,8 +3,12 @@ import nl from '@platform/i18n/messages/nl.json';
 import {
   mockEmailConfig,
   MOCK_TEST_EMAIL_LIMIT_REFUSAL,
+  MOCK_TEST_EMAIL_SEND_ADMITTED,
 } from '@platform/testing/email/fixtures';
-import { mockTenant } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_STUDIO_CALLER,
+  MOCK_STUDIO_PROJECT_ID,
+} from '@platform/testing/newsletter-post-send/fixtures';
 import { env } from '@platform/utils/env/env';
 import {
   ACTION_OUTCOME,
@@ -28,7 +32,10 @@ vi.mock('@shinefold/db', () => ({
   queries: {
     emailConfig: { getEmailConfig: vi.fn() },
     siteConfig: { getSiteConfig: vi.fn() },
-    testEmailSendCounters: { incrementTestEmailSendCount: vi.fn() },
+    testEmailSendCounters: {
+      incrementTestEmailSendCount: vi.fn(),
+      getTestEmailSendCount: vi.fn(),
+    },
   },
 }));
 
@@ -36,31 +43,27 @@ faker.seed(7713);
 
 const MOCK_ALERT_ADDRESS = faker.internet.email();
 const MOCK_SENDER_NAME = faker.company.name();
-const MOCK_CALLER = {
-  tenant: mockTenant(),
-  userId: faker.string.uuid(),
-  email: faker.internet.email(),
-};
 const MOCK_TAKEAWAY = faker.lorem.sentence();
 
-const POST: TNewsletterPostTestSend = newsletterPostTestSendSchema.parse({
-  projectId: faker.string.alphanumeric(8),
-  title: faker.lorem.sentence(),
-  excerpt: faker.lorem.paragraph(),
-  takeaways: [
+const MOCK_TAKEAWAY_BLOCK = {
+  _type: 'block',
+  _key: faker.string.alphanumeric(6),
+  listItem: 'bullet',
+  markDefs: [],
+  children: [
     {
-      _type: 'block',
+      _type: 'span',
       _key: faker.string.alphanumeric(6),
-      listItem: 'bullet',
-      children: [
-        {
-          _type: 'span',
-          _key: faker.string.alphanumeric(6),
-          text: MOCK_TAKEAWAY,
-        },
-      ],
+      text: MOCK_TAKEAWAY,
     },
   ],
+};
+
+const MOCK_POST: TNewsletterPostTestSend = newsletterPostTestSendSchema.parse({
+  projectId: MOCK_STUDIO_PROJECT_ID,
+  title: faker.lorem.sentence(),
+  excerpt: faker.lorem.paragraph(),
+  takeaways: [MOCK_TAKEAWAY_BLOCK],
   slug: faker.lorem.slug(),
   locale: LOCALE_ISO_CODES.NL,
 });
@@ -77,32 +80,31 @@ describe(sendNewsletterPostTest, () => {
     vi.mocked(queries.emailConfig.getEmailConfig).mockResolvedValue(
       mockEmailConfig({ senderName: MOCK_SENDER_NAME }),
     );
-    incrementTestEmailSendCount.mockResolvedValue({
-      count: 1,
-      windowStartedAt: new Date(),
-    });
+    incrementTestEmailSendCount.mockResolvedValue(
+      MOCK_TEST_EMAIL_SEND_ADMITTED,
+    );
     vi.mocked(sendEmail).mockReset();
   });
 
   it("emails only the caller, via the platform account, bannered in the post's locale", async () => {
-    const result = await sendNewsletterPostTest(MOCK_CALLER, POST);
+    const result = await sendNewsletterPostTest(MOCK_STUDIO_CALLER, MOCK_POST);
 
     const [[email] = []] = vi.mocked(sendEmail).mock.calls;
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(email?.account).toBe(EMAIL_ACCOUNT.PLATFORM);
-    expect(email?.to).toBe(MOCK_CALLER.email);
+    expect(email?.to).toBe(MOCK_STUDIO_CALLER.email);
     expect(email?.from).toBe(`"${MOCK_SENDER_NAME}" <${MOCK_ALERT_ADDRESS}>`);
     expect(email?.html).toContain(nl.emailPreview.postTestBanner);
-    expect(email?.text).toContain(POST.title);
+    expect(email?.text).toContain(MOCK_POST.title);
     expect(email?.text).toContain(MOCK_TAKEAWAY);
-    expect(email?.text).toContain(POST.slug);
+    expect(email?.text).toContain(MOCK_POST.slug);
   });
 
   it('refuses at the test limit without sending, saying when to try again', async () => {
     const { count, windowStartedAt, retryAt } = MOCK_TEST_EMAIL_LIMIT_REFUSAL;
     incrementTestEmailSendCount.mockResolvedValue({ count, windowStartedAt });
 
-    const result = await sendNewsletterPostTest(MOCK_CALLER, POST);
+    const result = await sendNewsletterPostTest(MOCK_STUDIO_CALLER, MOCK_POST);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -114,6 +116,20 @@ describe(sendNewsletterPostTest, () => {
 });
 
 describe('newsletterPostTestSendSchema', () => {
+  it.each([[], null])(
+    'accepts a takeaway whose mark definitions are %o, as the summary type',
+    (markDefs) => {
+      const { takeaways } = newsletterPostTestSendSchema.parse({
+        ...MOCK_POST,
+        takeaways: [{ ...MOCK_TAKEAWAY_BLOCK, markDefs }],
+      });
+
+      expect(takeaways).toEqual([
+        expect.not.objectContaining({ markDefs: expect.anything() }),
+      ]);
+    },
+  );
+
   it.each([
     { name: 'a blank title', fields: { title: ' ' } },
     {
@@ -125,9 +141,14 @@ describe('newsletterPostTestSendSchema', () => {
       name: 'a takeaway that is not a block',
       fields: { takeaways: [{ _type: 'image' }] },
     },
+    {
+      name: 'a takeaway with mark definitions',
+      fields: { takeaways: [{ ...MOCK_TAKEAWAY_BLOCK, markDefs: [{}] }] },
+    },
   ])('refuses $name', ({ fields }) => {
     expect(
-      newsletterPostTestSendSchema.safeParse({ ...POST, ...fields }).success,
+      newsletterPostTestSendSchema.safeParse({ ...MOCK_POST, ...fields })
+        .success,
     ).toBe(false);
   });
 });

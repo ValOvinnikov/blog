@@ -1,11 +1,15 @@
 import { faker } from '@faker-js/faker';
-import { STUDIO_NEWSLETTER_LOG } from '@platform/constants/studio-newsletter';
+import {
+  NEWSLETTER_POST_SEND_PATH,
+  STUDIO_NEWSLETTER_LOG,
+} from '@platform/constants/studio-newsletter';
 import { WORKER_LOG } from '@platform/constants/worker';
 import { readNewsletterPostSend } from '@platform/server/newsletter-post-send/read-newsletter-post-send';
 import { mockedWorkerSecretsEnv } from '@platform/testing/env/mocked-env';
 import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
 import { MOCK_WORKER_URL } from '@platform/testing/worker/fixtures';
+import { readSentSignedRequest } from '@platform/testing/worker/sent-signed-request';
 import {
   stubWorkerFetch,
   type TWorkerFetchMock,
@@ -25,11 +29,6 @@ import {
   MOCK_SKIP_DETAILS,
   mockNewsletterPostSend,
 } from '@shinefold/db/testing/newsletter-post-sends/fixtures';
-import {
-  ENQUEUE_SIGNATURE_HEADER,
-  ENQUEUE_TIMESTAMP_HEADER,
-  isValidEnqueueSignature,
-} from '@shinefold/utils/enqueue-signature';
 
 import { startNewsletterPostSendNow } from './start-newsletter-post-send-now';
 
@@ -50,8 +49,7 @@ vi.mock('@shinefold/db', () => ({
 faker.seed(7712);
 
 const MOCK_NEWSLETTER_SECRET = faker.string.alphanumeric(32);
-const REQUEST = { postId: MOCK_POST_ID, isPublished: true };
-const NEWSLETTER_POST_SEND_PATH = '/api/newsletter/post-send';
+const MOCK_REQUEST = { postId: MOCK_POST_ID, isPublished: true };
 const { emailsNeeded, allowanceLeft } = MOCK_SKIP_DETAILS;
 
 const startByHand = vi.mocked(
@@ -76,7 +74,7 @@ const readsAs = (
     ...read,
   });
 
-const start = () => startNewsletterPostSendNow(mockTenant(), REQUEST);
+const start = () => startNewsletterPostSendNow(mockTenant(), MOCK_REQUEST);
 
 describe(startNewsletterPostSendNow, () => {
   const fetchMock: TWorkerFetchMock = vi.fn();
@@ -97,57 +95,31 @@ describe(startNewsletterPostSendNow, () => {
   it("starts the worker's post send, signed with the newsletter secret", async () => {
     const result = await start();
 
-    const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
-    const headers = init.headers as Record<string, string>;
-    const rawBody = init.body as string;
+    const { url, body, isSignedWith } = readSentSignedRequest(fetchMock);
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(startByHand).toHaveBeenCalledWith(MOCK_TENANT_ID, MOCK_POST_ID);
     expect(url.toString()).toBe(
       `${MOCK_WORKER_URL}${NEWSLETTER_POST_SEND_PATH}`,
     );
-    expect(JSON.parse(rawBody)).toEqual({
+    expect(body).toEqual({
       tenantId: MOCK_TENANT_ID,
       postId: MOCK_POST_ID,
       claimedAt: MOCK_NOW.toISOString(),
     });
     expect(
-      isValidEnqueueSignature({
-        secret: MOCK_NEWSLETTER_SECRET,
-        timestamp: headers[ENQUEUE_TIMESTAMP_HEADER] ?? null,
-        signature: headers[ENQUEUE_SIGNATURE_HEADER] ?? null,
-        path: NEWSLETTER_POST_SEND_PATH,
-        rawBody,
-      }),
+      isSignedWith(MOCK_NEWSLETTER_SECRET, NEWSLETTER_POST_SEND_PATH),
     ).toBe(true);
   });
 
-  it.each([
-    {
-      name: 'a post that started sending',
-      read: { claim: mockNewsletterPostSend(), sendNow: { isOffered: false } },
-      reason: NEWSLETTER_SEND_NOW_REFUSAL.ALREADY_SENT,
-    },
-    {
-      name: 'a post never offered the send',
-      read: { sendNow: { isOffered: false } },
-      reason: NEWSLETTER_SEND_NOW_REFUSAL.NOT_ELIGIBLE,
-    },
-    {
-      name: 'a post whose cause is still there',
-      read: {
-        sendNow: {
-          isOffered: true,
-          disabledBy: NEWSLETTER_SEND_NOW_REFUSAL.SENDING_OFF,
-        },
-      },
-      reason: NEWSLETTER_SEND_NOW_REFUSAL.SENDING_OFF,
-    },
-  ] as const)('refuses $name and starts nothing', async ({ read, reason }) => {
-    readsAs(read);
+  it('refuses a post its read refuses, and starts nothing', async () => {
+    readsAs({ sendNow: { isOffered: false } });
 
     const result = await start();
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.REFUSED, reason });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: NEWSLETTER_SEND_NOW_REFUSAL.NOT_ELIGIBLE,
+    });
     expect(startByHand).not.toHaveBeenCalled();
     expect(fetchMock).not.toHaveBeenCalled();
   });

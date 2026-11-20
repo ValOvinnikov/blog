@@ -1,9 +1,10 @@
 import 'server-only';
 
 import type { TStudioCaller } from '@platform/server/auth/resolve-studio-caller';
-import { findTestEmailSendRefusal } from '@platform/server/email/find-test-email-send-refusal';
 import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
 import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
+import { takeTestEmailSend } from '@platform/server/email/take-test-email-send';
+import { studioProjectSchema } from '@platform/server/newsletter-post-send/studio-route-request';
 import {
   ACTION_OUTCOME,
   LOCALE_ISO_CODES,
@@ -42,12 +43,15 @@ const takeawayBlockSchema = z.object({
   style: z.literal('normal').optional(),
   listItem: z.enum(['bullet', 'number']).optional(),
   level: z.number().int().positive().optional(),
-  markDefs: z.null().optional(),
+  // Sanity stores an edited block's empty mark definitions as `[]`; the summary type spells them `null`.
+  markDefs: z
+    .union([z.null(), z.array(z.never()).length(0)])
+    .optional()
+    .transform(() => undefined),
   children: z.array(takeawaySpanSchema).max(SPANS_PER_BLOCK_MAX).optional(),
 });
 
-export const newsletterPostTestSendSchema = z.object({
-  projectId: z.string().min(1).max(KEY_MAX_LENGTH),
+export const newsletterPostTestSendSchema = studioProjectSchema.extend({
   title: z.string().trim().min(1).max(TEXT_MAX_LENGTH),
   excerpt: z.string().trim().max(TEXT_MAX_LENGTH),
   takeaways: z.array(takeawayBlockSchema).max(TAKEAWAY_BLOCKS_MAX).default([]),
@@ -72,7 +76,7 @@ export const sendNewsletterPostTest = async (
     locale,
   }: TNewsletterPostTestSend,
 ): Promise<TNewsletterTestSendResult> => {
-  const refusal = await findTestEmailSendRefusal(userId);
+  const refusal = await takeTestEmailSend(userId);
   if (refusal) {
     return {
       outcome: ACTION_OUTCOME.REFUSED,

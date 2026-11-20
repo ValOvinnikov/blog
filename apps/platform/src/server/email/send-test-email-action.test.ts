@@ -9,6 +9,7 @@ import {
   mockEmailConfig,
   mockEmailTemplateResult,
   MOCK_TEST_EMAIL_LIMIT_REFUSAL,
+  MOCK_TEST_EMAIL_SEND_ADMITTED,
 } from '@platform/testing/email/fixtures';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
@@ -32,7 +33,10 @@ vi.mock('@shinefold/db', () => ({
     emailConfig: { getEmailConfig: vi.fn() },
     emailTemplates: { getEmailTemplate: vi.fn() },
     siteConfig: { getSiteConfig: vi.fn() },
-    testEmailSendCounters: { incrementTestEmailSendCount: vi.fn() },
+    testEmailSendCounters: {
+      incrementTestEmailSendCount: vi.fn(),
+      getTestEmailSendCount: vi.fn(),
+    },
   },
 }));
 
@@ -81,7 +85,7 @@ describe(sendTestEmailAction, () => {
     );
     vi.mocked(
       queries.testEmailSendCounters.incrementTestEmailSendCount,
-    ).mockResolvedValue({ count: 1, windowStartedAt: new Date() });
+    ).mockResolvedValue(MOCK_TEST_EMAIL_SEND_ADMITTED);
     vi.mocked(sendEmail).mockReset();
     vi.mocked(sendEmail).mockResolvedValue(undefined);
   });

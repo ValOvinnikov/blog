@@ -31,7 +31,7 @@ vi.mock(
 faker.seed(7714);
 
 const PATH = routes.newsletterPostTestSend();
-const BODY = {
+const MOCK_BODY = {
   projectId: MOCK_STUDIO_PROJECT_ID,
   title: faker.lorem.sentence(),
   excerpt: faker.lorem.paragraph(),
@@ -48,18 +48,18 @@ describe(POST, () => {
   });
 
   it('sends the saved fields to the caller', async () => {
-    const response = await POST(studioJsonRequest(PATH, BODY));
+    const response = await POST(studioJsonRequest(PATH, MOCK_BODY));
 
     expect(response.status).toBe(HTTP_STATUS.OK);
     expect(sendNewsletterPostTest).toHaveBeenCalledWith(MOCK_STUDIO_CALLER, {
-      ...BODY,
+      ...MOCK_BODY,
       takeaways: [],
     });
   });
 
   it('refuses invalid fields without sending', async () => {
     const response = await POST(
-      studioJsonRequest(PATH, { ...BODY, title: '' }),
+      studioJsonRequest(PATH, { ...MOCK_BODY, title: '' }),
     );
 
     expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
@@ -74,7 +74,7 @@ describe(POST, () => {
     vi.mocked(resolveStudioCaller).mockResolvedValue(undefined);
 
     const response = await POST(
-      studioJsonRequest(PATH, { ...BODY, title: '' }),
+      studioJsonRequest(PATH, { ...MOCK_BODY, title: '' }),
     );
 
     expect(response.status).toBe(HTTP_STATUS.FORBIDDEN);
@@ -89,7 +89,7 @@ describe(POST, () => {
     } as const;
     vi.mocked(sendNewsletterPostTest).mockResolvedValue(refusal);
 
-    const response = await POST(studioJsonRequest(PATH, BODY));
+    const response = await POST(studioJsonRequest(PATH, MOCK_BODY));
 
     expect(response.status).toBe(HTTP_STATUS.TOO_MANY_REQUESTS);
     expect(await response.json()).toEqual(refusal);
@@ -98,7 +98,7 @@ describe(POST, () => {
   it('answers SEND_FAILED when the send throws', async () => {
     vi.mocked(sendNewsletterPostTest).mockRejectedValue(new Error());
 
-    const response = await POST(studioJsonRequest(PATH, BODY));
+    const response = await POST(studioJsonRequest(PATH, MOCK_BODY));
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(await response.json()).toEqual({

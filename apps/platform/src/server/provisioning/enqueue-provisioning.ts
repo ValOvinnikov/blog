@@ -1,3 +1,4 @@
+import { PROVISION_PATH } from '@platform/constants/provisioning';
 import { WORKER_LOG } from '@platform/constants/worker';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -8,7 +9,6 @@ import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import type { TValueOf } from '@shinefold/config/utils';
 import { buildEnqueueHeaders } from '@shinefold/utils/enqueue-signature';
 
-const PROVISION_PATH = '/api/provision';
 // Twice the platform's other outbound calls: the worker admits the row and starts the run before it answers.
 const ENQUEUE_TIMEOUT_MS = 10_000;
 

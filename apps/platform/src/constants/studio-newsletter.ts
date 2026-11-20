@@ -1,3 +1,5 @@
+export const NEWSLETTER_POST_SEND_PATH = '/api/newsletter/post-send';
+
 export const STUDIO_NEWSLETTER_LOG = {
   STATUS_FAILED: 'studio_newsletter.status_failed',
   TEST_SEND_FAILED: 'studio_newsletter.test_send_failed',

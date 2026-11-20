@@ -22,7 +22,7 @@ vi.mock('@platform/server/auth/resolve-studio-caller');
 vi.mock('@platform/server/newsletter-post-send/start-newsletter-post-send-now');
 
 const PATH = routes.newsletterPostSendNow();
-const BODY = {
+const MOCK_BODY = {
   projectId: MOCK_STUDIO_PROJECT_ID,
   postId: MOCK_POST_ID,
   isPublished: true,
@@ -37,7 +37,7 @@ describe(POST, () => {
   });
 
   it("starts the post's send for the caller's site", async () => {
-    const response = await POST(studioJsonRequest(PATH, BODY));
+    const response = await POST(studioJsonRequest(PATH, MOCK_BODY));
 
     expect(response.status).toBe(HTTP_STATUS.OK);
     expect(await response.json()).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -54,7 +54,7 @@ describe(POST, () => {
     } as const;
     vi.mocked(startNewsletterPostSendNow).mockResolvedValue(refusal);
 
-    const response = await POST(studioJsonRequest(PATH, BODY));
+    const response = await POST(studioJsonRequest(PATH, MOCK_BODY));
 
     expect(response.status).toBe(HTTP_STATUS.CONFLICT);
     expect(await response.json()).toEqual(refusal);
@@ -63,7 +63,7 @@ describe(POST, () => {
   it('answers FORBIDDEN, starting nothing, for a caller who cannot open the Studio', async () => {
     vi.mocked(resolveStudioCaller).mockResolvedValue(undefined);
 
-    const response = await POST(studioJsonRequest(PATH, BODY));
+    const response = await POST(studioJsonRequest(PATH, MOCK_BODY));
 
     expect(response.status).toBe(HTTP_STATUS.FORBIDDEN);
     expect(startNewsletterPostSendNow).not.toHaveBeenCalled();
@@ -72,7 +72,7 @@ describe(POST, () => {
   it('answers SEND_FAILED when starting the send throws', async () => {
     vi.mocked(startNewsletterPostSendNow).mockRejectedValue(new Error());
 
-    const response = await POST(studioJsonRequest(PATH, BODY));
+    const response = await POST(studioJsonRequest(PATH, MOCK_BODY));
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(await response.json()).toEqual({

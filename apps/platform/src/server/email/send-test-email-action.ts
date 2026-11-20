@@ -3,9 +3,9 @@
 import { EMAIL_TEST_LOG } from '@platform/constants/email-test';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
-import { findTestEmailSendRefusal } from '@platform/server/email/find-test-email-send-refusal';
 import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
 import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
+import { takeTestEmailSend } from '@platform/server/email/take-test-email-send';
 import {
   emailSenderInputSchema,
   emailTemplateCopyInputSchema,
@@ -72,7 +72,7 @@ export const sendTestEmailAction = async (
   const body = parsed.data.copy.body as TEmailTemplateBlock[];
 
   try {
-    const refusal = await findTestEmailSendRefusal(userId);
+    const refusal = await takeTestEmailSend(userId);
     if (refusal) {
       return {
         outcome: ACTION_OUTCOME.RATE_LIMITED,
