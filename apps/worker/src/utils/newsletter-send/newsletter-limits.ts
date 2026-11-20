@@ -1,9 +1,11 @@
+import {
+  NEWSLETTER_SKIP_REASON,
+  type TNewsletterSkipReason,
+} from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
-  NEWSLETTER_SKIP_REASON,
   type TNewsletterLimitNoticeKind,
-  type TNewsletterSkipReason,
 } from '@shinefold/db/constants';
 import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import { NEWSLETTER_LIMIT_NEAR_RATIO } from '@worker/constants/newsletter-send';

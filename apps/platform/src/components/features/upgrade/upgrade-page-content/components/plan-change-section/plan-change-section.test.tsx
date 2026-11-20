@@ -1,4 +1,3 @@
-import { BILLING_INTERVAL } from '@platform/constants/billing';
 import messages from '@platform/i18n/messages/en.json';
 import type { TSubscriptionPlan } from '@platform/server/billing/load-subscription-plan';
 import { readTenantSubscriptionPlan } from '@platform/server/billing/read-tenant-subscription-plan';
@@ -15,7 +14,7 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_PLAN, BILLING_INTERVAL } from '@shinefold/config/constants';
 
 import { PlanChangeSection } from './plan-change-section';
 

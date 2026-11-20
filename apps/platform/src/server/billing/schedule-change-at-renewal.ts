@@ -3,13 +3,13 @@ import 'server-only';
 import {
   STRIPE_PRORATION_BEHAVIOR,
   STRIPE_RECURRING_INTERVAL,
-  type TBillingInterval,
 } from '@platform/constants/billing';
 import {
   STRIPE_BILLING_CYCLE_ANCHOR,
   STRIPE_SCHEDULE_END_BEHAVIOR,
 } from '@platform/constants/stripe-schedule';
 import type { TMaybeUndefined } from '@shinefold/config';
+import type { TBillingInterval } from '@shinefold/config/constants';
 import Stripe from 'stripe';
 
 import type { TSubscriptionPlan } from './load-subscription-plan';

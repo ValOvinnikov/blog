@@ -1,9 +1,10 @@
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import {
+  TENANT_PLAN,
+  type TTenantPlan,
   BILLING_INTERVAL,
   type TBillingInterval,
-} from '@platform/constants/billing';
-import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
-import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
+} from '@shinefold/config/constants';
 import {
   PAID_SUBSCRIBER_BAND_CEILINGS,
   PLAN_PRICE_LOOKUP_KEYS,

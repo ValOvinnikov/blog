@@ -1,7 +1,9 @@
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
-import { BILLING_INTERVAL } from '@platform/constants/billing';
 import { type TPlanChoice } from '@platform/constants/plan-change';
-import { SELLABLE_TENANT_PLANS } from '@shinefold/config/constants';
+import {
+  SELLABLE_TENANT_PLANS,
+  BILLING_INTERVAL,
+} from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 
 import { planChoicesVariants } from './plan-choices-variants';

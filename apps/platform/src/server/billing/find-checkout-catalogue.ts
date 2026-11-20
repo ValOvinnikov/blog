@@ -1,13 +1,13 @@
 import 'server-only';
 
-import {
-  BILLING_LOG,
-  type TBillingInterval,
-} from '@platform/constants/billing';
+import { BILLING_LOG } from '@platform/constants/billing';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import type { TMaybeUndefined } from '@shinefold/config';
-import { type TTenantPlan } from '@shinefold/config/constants';
+import {
+  type TTenantPlan,
+  type TBillingInterval,
+} from '@shinefold/config/constants';
 import { PLAN_PRICE_LOOKUP_KEYS } from '@shinefold/db/constants';
 import type Stripe from 'stripe';
 

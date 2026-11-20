@@ -1,5 +1,7 @@
-import { BILLING_INTERVAL } from '@platform/constants/billing';
-import { SELLABLE_TENANT_PLANS } from '@shinefold/config/constants';
+import {
+  SELLABLE_TENANT_PLANS,
+  BILLING_INTERVAL,
+} from '@shinefold/config/constants';
 import { z } from 'zod';
 
 const MAX_PROMOTION_CODE_LENGTH = 64;

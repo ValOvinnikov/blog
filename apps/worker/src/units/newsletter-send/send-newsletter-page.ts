@@ -1,7 +1,7 @@
 import { setTimeout as wait } from 'node:timers/promises';
 
+import { NEWSLETTER_SKIP_REASON } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
-import { NEWSLETTER_SKIP_REASON } from '@shinefold/db/constants';
 import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config';
 import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends';
 import { listActiveSubscribers } from '@shinefold/db/queries/subscribers';

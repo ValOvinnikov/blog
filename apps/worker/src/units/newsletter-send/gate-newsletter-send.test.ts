@@ -1,7 +1,5 @@
-import {
-  NEWSLETTER_LIMIT_NOTICE_KIND,
-  NEWSLETTER_SKIP_REASON,
-} from '@shinefold/db/constants';
+import { NEWSLETTER_SKIP_REASON } from '@shinefold/config/constants';
+import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@shinefold/db/constants';
 import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config';
 import { getNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends';

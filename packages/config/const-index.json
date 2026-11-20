@@ -696,6 +696,22 @@
         "file": "packages/config/src/constants/email-account.ts"
       }
     ],
+    "MONTHLY": [
+      {
+        "ref": "BILLING_INTERVAL.MONTHLY",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/billing-interval.ts"
+      }
+    ],
+    "YEARLY": [
+      {
+        "ref": "BILLING_INTERVAL.YEARLY",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/billing-interval.ts"
+      }
+    ],
     "DOT": [
       {
         "ref": "BRAND_TAGLINE_SEPARATORS.DOT",
@@ -2910,6 +2926,12 @@
         "file": "packages/config/src/constants/layout.ts"
       },
       {
+        "ref": "NEWSLETTER_SEND_STATUS.NONE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      },
+      {
         "ref": "RADIUS_SCALE.NONE",
         "scope": "config",
         "from": "@shinefold/config/constants",
@@ -3306,6 +3328,130 @@
         "file": "apps/platform/src/constants/view-tabs.ts"
       }
     ],
+    "SCHEDULED": [
+      {
+        "ref": "NEWSLETTER_SEND_STATUS.SCHEDULED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      },
+      {
+        "ref": "NEWSLETTER_POST_STATE.SCHEDULED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      },
+      {
+        "ref": "SCHEDULED_POST_STATE.SCHEDULED",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post",
+        "file": "apps/worker/src/constants/scheduled-post.ts"
+      }
+    ],
+    "SENDING": [
+      {
+        "ref": "NEWSLETTER_SEND_STATUS.SENDING",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "SENT": [
+      {
+        "ref": "NEWSLETTER_SEND_STATUS.SENT",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      },
+      {
+        "ref": "NEWSLETTER_POST_SEND_OUTCOME.SENT",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SUBSCRIBER_SEND.SENT",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "SKIPPED": [
+      {
+        "ref": "NEWSLETTER_SEND_STATUS.SKIPPED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      },
+      {
+        "ref": "NEWSLETTER_POST_SEND_OUTCOME.SKIPPED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SEND_GATE.SKIPPED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "NOT_ELIGIBLE": [
+      {
+        "ref": "NEWSLETTER_SEND_NOW_REFUSAL.NOT_ELIGIBLE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "OVER_BAND": [
+      {
+        "ref": "NEWSLETTER_SEND_NOW_REFUSAL.OVER_BAND",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "OVER_MONTH": [
+      {
+        "ref": "NEWSLETTER_SEND_NOW_REFUSAL.OVER_MONTH",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "ALREADY_SENT": [
+      {
+        "ref": "NEWSLETTER_SEND_NOW_REFUSAL.ALREADY_SENT",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "SEND_FAILED": [
+      {
+        "ref": "NEWSLETTER_SEND_NOW_REFUSAL.SEND_FAILED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "FORBIDDEN": [
+      {
+        "ref": "NEWSLETTER_SEND_NOW_REFUSAL.FORBIDDEN",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "INVALID_FIELDS": [
+      {
+        "ref": "NEWSLETTER_TEST_SEND_REFUSAL.INVALID_FIELDS",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
     "WARN": [
       {
         "ref": "NEWSLETTER_REPUTATION_ALERT_LEVEL.WARN",
@@ -3408,6 +3554,76 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/newsletter-result.ts"
+      }
+    ],
+    "OVER_SUBSCRIBER_BAND": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      }
+    ],
+    "OVER_MONTHLY_ALLOWANCE": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      }
+    ],
+    "REPUTATION_STOP": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.REPUTATION_STOP",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      }
+    ],
+    "SITE_PAUSED": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.SITE_PAUSED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      }
+    ],
+    "NOT_IN_PLAN": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.NOT_IN_PLAN",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      },
+      {
+        "ref": "SETTINGS_REFUSAL.NOT_IN_PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings",
+        "file": "apps/platform/src/constants/settings.ts"
+      }
+    ],
+    "SITE_INACTIVE": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.SITE_INACTIVE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      }
+    ],
+    "NEWSLETTER_OFF": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.NEWSLETTER_OFF",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      }
+    ],
+    "SENDING_OFF": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.SENDING_OFF",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
       }
     ],
     "DYNAMIC_SERVER_USAGE": [
@@ -5110,66 +5326,6 @@
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
-    "SENT": [
-      {
-        "ref": "NEWSLETTER_POST_SEND_OUTCOME.SENT",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/newsletter.ts"
-      },
-      {
-        "ref": "NEWSLETTER_SUBSCRIBER_SEND.SENT",
-        "scope": "app:worker",
-        "from": "@worker/constants/newsletter-send",
-        "file": "apps/worker/src/constants/newsletter-send.ts"
-      }
-    ],
-    "SKIPPED": [
-      {
-        "ref": "NEWSLETTER_POST_SEND_OUTCOME.SKIPPED",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/newsletter.ts"
-      },
-      {
-        "ref": "NEWSLETTER_SEND_GATE.SKIPPED",
-        "scope": "app:worker",
-        "from": "@worker/constants/newsletter-send",
-        "file": "apps/worker/src/constants/newsletter-send.ts"
-      }
-    ],
-    "OVER_SUBSCRIBER_BAND": [
-      {
-        "ref": "NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/newsletter.ts"
-      }
-    ],
-    "OVER_MONTHLY_ALLOWANCE": [
-      {
-        "ref": "NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/newsletter.ts"
-      }
-    ],
-    "REPUTATION_STOP": [
-      {
-        "ref": "NEWSLETTER_SKIP_REASON.REPUTATION_STOP",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/newsletter.ts"
-      }
-    ],
-    "SITE_PAUSED": [
-      {
-        "ref": "NEWSLETTER_SKIP_REASON.SITE_PAUSED",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/newsletter.ts"
-      }
-    ],
     "SUBSCRIBER_BAND_NEAR": [
       {
         "ref": "NEWSLETTER_LIMIT_NOTICE_KIND.SUBSCRIBER_BAND_NEAR",
@@ -6563,22 +6719,6 @@
     "KEEP": [
       {
         "ref": "BILLING_GRACE.KEEP",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      }
-    ],
-    "MONTHLY": [
-      {
-        "ref": "BILLING_INTERVAL.MONTHLY",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      }
-    ],
-    "YEARLY": [
-      {
-        "ref": "BILLING_INTERVAL.YEARLY",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
@@ -9098,14 +9238,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/settings-features",
         "file": "apps/platform/src/constants/settings-features.ts"
-      }
-    ],
-    "NOT_IN_PLAN": [
-      {
-        "ref": "SETTINGS_REFUSAL.NOT_IN_PLAN",
-        "scope": "app:platform",
-        "from": "@platform/constants/settings",
-        "file": "apps/platform/src/constants/settings.ts"
       }
     ],
     "LOCALE_NOT_LIVE": [
@@ -12958,20 +13090,6 @@
         "scope": "app:worker",
         "from": "@worker/constants/newsletter-send",
         "file": "apps/worker/src/constants/newsletter-send.ts"
-      }
-    ],
-    "SCHEDULED": [
-      {
-        "ref": "NEWSLETTER_POST_STATE.SCHEDULED",
-        "scope": "app:worker",
-        "from": "@worker/constants/newsletter-send",
-        "file": "apps/worker/src/constants/newsletter-send.ts"
-      },
-      {
-        "ref": "SCHEDULED_POST_STATE.SCHEDULED",
-        "scope": "app:worker",
-        "from": "@worker/constants/scheduled-post",
-        "file": "apps/worker/src/constants/scheduled-post.ts"
       }
     ],
     "CANCELLED": [

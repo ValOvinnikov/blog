@@ -1,5 +1,4 @@
 import {
-  BILLING_INTERVAL,
   BILLING_LOG,
   STRIPE_PRORATION_BEHAVIOR,
   STRIPE_RECURRING_INTERVAL,
@@ -47,6 +46,7 @@ import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { TMaybeNull } from '@shinefold/config';
+import { BILLING_INTERVAL } from '@shinefold/config/constants';
 import { STRIPE_PRICE_LOOKUP_KEY } from '@shinefold/db/constants';
 import Stripe from 'stripe';
 

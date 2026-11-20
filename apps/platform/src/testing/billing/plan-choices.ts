@@ -1,6 +1,5 @@
-import { BILLING_INTERVAL } from '@platform/constants/billing';
 import type { TPlanChoice } from '@platform/constants/plan-change';
-import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_PLAN, BILLING_INTERVAL } from '@shinefold/config/constants';
 
 export const MOCK_STARTER_MONTHLY_CHOICE: TPlanChoice = {
   plan: TENANT_PLAN.STARTER,

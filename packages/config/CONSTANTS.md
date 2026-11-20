@@ -38,6 +38,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **AUTH_APP**: `SITE`, `PLATFORM`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/billing-interval.ts`
+
+- **BILLING_INTERVAL**: `MONTHLY`, `YEARLY`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/brand-tagline.ts`
 
 - **BRAND_TAGLINE_SEPARATORS**: `DOT`, `PIPE`, `BULLET`, `SLASH`
@@ -222,6 +226,12 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **NAV_LINK_STYLE**: `PLAIN`, `UNDERLINE`, `SOFT`, `PILL`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/newsletter-post-send.ts`
+
+- **NEWSLETTER_SEND_STATUS**: `NONE`, `SCHEDULED`, `SENDING`, `SENT`, `SKIPPED`
+- **NEWSLETTER_SEND_NOW_REFUSAL**: `NOT_ELIGIBLE`, `OVER_BAND`, `OVER_MONTH`, `ALREADY_SENT`, `SEND_FAILED`, `FORBIDDEN`
+- **NEWSLETTER_TEST_SEND_REFUSAL**: `INVALID_FIELDS`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/newsletter-reputation.ts`
 
 - **NEWSLETTER_REPUTATION_ALERT_LEVEL**: `WARN`, `SLOW`, `STOP`
@@ -229,6 +239,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@shinefold/config/constants` — `packages/config/src/constants/newsletter-result.ts`
 
 - **NEWSLETTER_RESULT**: `CONFIRMED`, `CONFIRM_INVALID`, `CONFIRM_UNAVAILABLE`, `CONFIRM_FAILED`, `UNSUBSCRIBED`, `UNSUBSCRIBE_INVALID`, `UNSUBSCRIBE_FAILED`
+
+### `@shinefold/config/constants` — `packages/config/src/constants/newsletter-skip-reason.ts`
+
+- **NEWSLETTER_SKIP_REASON**: `OVER_SUBSCRIBER_BAND`, `OVER_MONTHLY_ALLOWANCE`, `REPUTATION_STOP`, `SITE_PAUSED`, `NOT_IN_PLAN`, `SITE_INACTIVE`, `NEWSLETTER_OFF`, `SENDING_OFF`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/next-dynamic-error.ts`
 
@@ -397,7 +411,6 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@shinefold/db/constants` — `packages/db/src/constants/newsletter.ts`
 
 - **NEWSLETTER_POST_SEND_OUTCOME**: `SENT`, `SKIPPED`
-- **NEWSLETTER_SKIP_REASON**: `OVER_SUBSCRIBER_BAND`, `OVER_MONTHLY_ALLOWANCE`, `REPUTATION_STOP`, `SITE_PAUSED`
 - **NEWSLETTER_LIMIT_NOTICE_KIND**: `SUBSCRIBER_BAND_NEAR`, `MONTHLY_ALLOWANCE_NEAR`, `SENDING_PAUSED`
 
 ### `@shinefold/db/constants` — `packages/db/src/constants/row-lock.ts`
@@ -486,7 +499,6 @@ Every key/value const an agent should reuse before writing a literal. The
 - **BILLING_OVERVIEW_STATE**: `NO_CUSTOMER`, `LOADED`, `UNAVAILABLE`
 - **BILLING_REFUSAL**: `NO_CUSTOMER`
 - **BILLING_GRACE**: `START`, `END`, `KEEP`
-- **BILLING_INTERVAL**: `MONTHLY`, `YEARLY`
 - **UPGRADE_STATE**: `AVAILABLE`, `SUBSCRIBED`, `NOT_OWNER`, `UNAVAILABLE`
 - **UPGRADE_PAYMENT**: `PAYMENT_PENDING`
 - **UPGRADE_SEARCH_PARAM**: `PROMO`=`"promo"`, `SESSION_ID`=`"session_id"`

@@ -1,8 +1,9 @@
-import { EMAIL_ACCOUNT, LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import {
-  NEWSLETTER_LIMIT_NOTICE_KIND,
+  EMAIL_ACCOUNT,
+  LOCALE_ISO_CODES,
   NEWSLETTER_SKIP_REASON,
-} from '@shinefold/db/constants';
+} from '@shinefold/config/constants';
+import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@shinefold/db/constants';
 import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
 import {
   markNewsletterLimitNoticeSent,

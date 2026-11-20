@@ -1,6 +1,6 @@
+import { NEWSLETTER_SKIP_REASON } from '@shinefold/config/constants';
 import {
   NEWSLETTER_POST_SEND_OUTCOME,
-  NEWSLETTER_SKIP_REASON,
   type TNewsletterPostSendOutcome,
 } from '@shinefold/db/constants';
 import { claimNewsletterPostSend } from '@shinefold/db/queries/newsletter-post-sends/claim-newsletter-post-send';

@@ -1,7 +1,5 @@
-import {
-  NEWSLETTER_POST_SEND_OUTCOME,
-  NEWSLETTER_SKIP_REASON,
-} from '@shinefold/db/constants';
+import { NEWSLETTER_SKIP_REASON } from '@shinefold/config/constants';
+import { NEWSLETTER_POST_SEND_OUTCOME } from '@shinefold/db/constants';
 import { claimNewsletterPostSend } from '@shinefold/db/queries/newsletter-post-sends/claim-newsletter-post-send';
 import { getNewsletterPostSend } from '@shinefold/db/queries/newsletter-post-sends/get-newsletter-post-send';
 import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends/mark-newsletter-post-skipped';

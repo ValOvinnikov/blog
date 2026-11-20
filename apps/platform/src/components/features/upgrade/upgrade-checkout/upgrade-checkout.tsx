@@ -4,10 +4,7 @@ import { PlanChoices } from '@platform/components/features/upgrade/plan-choices'
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
-import {
-  BILLING_INTERVAL,
-  type TUpgradeRefusal,
-} from '@platform/constants/billing';
+import { type TUpgradeRefusal } from '@platform/constants/billing';
 import { type TPlanChoice } from '@platform/constants/plan-change';
 import { createUpgradeCheckoutAction } from '@platform/server/billing/create-upgrade-checkout-action';
 import {
@@ -20,6 +17,7 @@ import {
 import {
   TENANT_PLAN,
   type TSellableTenantPlan,
+  BILLING_INTERVAL,
 } from '@shinefold/config/constants';
 import {
   EmbeddedCheckout,
