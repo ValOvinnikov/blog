@@ -109,13 +109,6 @@ export const STRIPE_TENANT_METADATA_KEY = 'tenantId';
 
 export type TBillingGrace = TValueOf<typeof BILLING_GRACE>;
 
-export const BILLING_INTERVAL = {
-  MONTHLY: 'MONTHLY',
-  YEARLY: 'YEARLY',
-} as const;
-
-export type TBillingInterval = TValueOf<typeof BILLING_INTERVAL>;
-
 export const UPGRADE_STATE = {
   AVAILABLE: 'AVAILABLE',
   SUBSCRIBED: 'SUBSCRIBED',

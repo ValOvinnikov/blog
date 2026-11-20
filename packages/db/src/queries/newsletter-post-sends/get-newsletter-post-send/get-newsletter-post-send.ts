@@ -1,9 +1,7 @@
+import type { TNewsletterSkipReason } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import { getDb } from '@shinefold/db/client';
-import type {
-  TNewsletterPostSendOutcome,
-  TNewsletterSkipReason,
-} from '@shinefold/db/constants';
+import type { TNewsletterPostSendOutcome } from '@shinefold/db/constants';
 import { newsletterPostSends } from '@shinefold/db/schema/newsletter-post-sends';
 import { and, eq } from 'drizzle-orm';
 

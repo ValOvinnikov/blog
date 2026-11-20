@@ -1,8 +1,8 @@
-import type {
-  TBillingInterval,
-  UPGRADE_STATE,
-} from '@platform/constants/billing';
-import type { TSellableTenantPlan } from '@shinefold/config/constants';
+import type { UPGRADE_STATE } from '@platform/constants/billing';
+import {
+  type TBillingInterval,
+  type TSellableTenantPlan,
+} from '@shinefold/config/constants';
 import type { TValueOf } from '@shinefold/config/utils';
 
 export type TPlanChoice = {

@@ -1,10 +1,12 @@
 import {
+  NEWSLETTER_SKIP_REASON,
+  type TNewsletterSkipReason,
+} from '@shinefold/config/constants';
+import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
   NEWSLETTER_POST_SEND_OUTCOME,
-  NEWSLETTER_SKIP_REASON,
   type TNewsletterLimitNoticeKind,
   type TNewsletterPostSendOutcome,
-  type TNewsletterSkipReason,
 } from '@shinefold/db/constants';
 import {
   date,

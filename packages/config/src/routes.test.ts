@@ -39,6 +39,21 @@ describe('routes', () => {
       '/api/legal-page/TERMS',
     ],
     ['pricing comparison', routes.pricingComparison(), PRICING_COMPARISON_PATH],
+    [
+      'post send status',
+      routes.newsletterPostSendStatus(),
+      '/api/studio/newsletter-post/status',
+    ],
+    [
+      'post test send',
+      routes.newsletterPostTestSend(),
+      '/api/studio/newsletter-post/test-send',
+    ],
+    [
+      'post send now',
+      routes.newsletterPostSendNow(),
+      '/api/studio/newsletter-post/send-now',
+    ],
   ])('builds the %s path', (_route, path, expected) => {
     expect(path).toBe(expected);
   });

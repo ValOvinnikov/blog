@@ -42,6 +42,9 @@ export const routes = {
   newsletterUnsubscribeConfirmation: () => '/newsletter/unsubscribe',
   newsletterResult: (result: TNewsletterResult) =>
     `/newsletter/${NEWSLETTER_RESULT_SLUGS[result]}`,
+  newsletterPostSendStatus: () => '/api/studio/newsletter-post/status',
+  newsletterPostTestSend: () => '/api/studio/newsletter-post/test-send',
+  newsletterPostSendNow: () => '/api/studio/newsletter-post/send-now',
   landingPage: (slug: string) => `/${slug}`,
   privacyDocument: (slug: string) => `/privacy/${slug}`,
   legalDocument: (slug: string) => `/legal/${slug}`,

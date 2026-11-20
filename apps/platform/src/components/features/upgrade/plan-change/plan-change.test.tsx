@@ -1,4 +1,4 @@
-import { BILLING_INTERVAL, UPGRADE_POLL } from '@platform/constants/billing';
+import { UPGRADE_POLL } from '@platform/constants/billing';
 import {
   PLAN_CHANGE_REFUSAL,
   PLAN_CHANGE_TIMING,
@@ -26,7 +26,7 @@ import { mockLocaleRouter } from '@platform/testing/mock-locale-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { ACTION_OUTCOME } from '@shinefold/config';
-import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_PLAN, BILLING_INTERVAL } from '@shinefold/config/constants';
 import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
