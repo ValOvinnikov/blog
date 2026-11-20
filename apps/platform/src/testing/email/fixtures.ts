@@ -12,7 +12,11 @@ export const MOCK_EMAIL_LOGO_URL =
   'https://example.blob.vercel-storage.com/sender-logo.png';
 export const SEND_CONTACT_MESSAGES_TO = 'Send contact messages to';
 export const SEND_TEST_TO_ME = 'Send test to me';
-export const MOCK_TEST_EMAIL_SENDS_PER_WINDOW = 5;
+export const MOCK_TEST_EMAIL_LIMIT_REFUSAL = {
+  count: 6,
+  windowStartedAt: new Date('2026-11-20T09:00:00.000Z'),
+  retryAt: '2026-11-20T10:00:00.000Z',
+};
 export const MOCK_NEWSLETTER_PAUSED_AT = new Date('2026-11-03T09:00:00.000Z');
 export const MOCK_NEWSLETTER_PAUSED_ON_TEXT = 'Nov 3, 2026';
 export const MOCK_TENANT_LOGO_TARGET = { type: 'tenant' } as const;

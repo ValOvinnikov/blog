@@ -36,6 +36,7 @@ import { resendOwnerInviteAction } from './resend-owner-invite-action';
 vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/utils/env/env');
+vi.mock('@platform/utils/worker-secrets-env/worker-secrets-env');
 
 vi.mock('@shinefold/db', async () => {
   const { mockDbConstants } =

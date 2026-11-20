@@ -830,6 +830,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **STRIPE_BILLING_CYCLE_ANCHOR**: `PHASE_START`=`"phase_start"`
 - **STRIPE_SCHEDULE_END_BEHAVIOR**: `RELEASE`=`"release"`
 
+### `@platform/constants/studio-newsletter` — `apps/platform/src/constants/studio-newsletter.ts`
+
+- **STUDIO_NEWSLETTER_LOG**: `STATUS_FAILED`=`"studio_newsletter.status_failed"`, `TEST_SEND_FAILED`=`"studio_newsletter.test_send_failed"`, `SEND_NOW_FAILED`=`"studio_newsletter.send_now_failed"`, `SEND_NOW_ENQUEUE_REFUSED`=`"studio_newsletter.send_now_enqueue_refused"`
+
 ### `@platform/constants/subscription-lifecycle` — `apps/platform/src/constants/subscription-lifecycle.ts`
 
 - **SUBSCRIPTION_LIFECYCLE_LOG**: `COLLECTION_FAILED`=`"billing.subscription_collection_failed"`, `CANCEL_FAILED`=`"billing.subscription_cancel_failed"`, `LIVE_CHECK_FAILED`=`"billing.live_subscription_check_failed"`

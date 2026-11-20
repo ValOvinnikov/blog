@@ -2,6 +2,7 @@ import { WORKER_LOG } from '@platform/constants/worker';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { workerSecretsEnv } from '@platform/utils/worker-secrets-env/worker-secrets-env';
 import { HTTP_METHOD, type TMaybeNull } from '@shinefold/config';
 import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import type { TValueOf } from '@shinefold/config/utils';
@@ -19,7 +20,11 @@ type TWorkerRequestBody = {
   sanityUserId?: string;
   domain?: string;
   locales?: TLocaleIsoCode[];
+  postId?: string;
+  claimedAt?: string;
 };
+
+type TWorkerSecretName = keyof typeof workerSecretsEnv;
 
 export type TWorkerResponse =
   | { status: number }
@@ -38,9 +43,10 @@ export const isWorkerRequestFailure = (
 export const sendWorkerRequest = async (
   path: string,
   body: TWorkerRequestBody,
+  secretName: TWorkerSecretName = 'WORKER_ENQUEUE_SECRET',
 ): Promise<TWorkerResponse> => {
   const workerUrl = env.WORKER_ENQUEUE_URL;
-  const secret = env.WORKER_ENQUEUE_SECRET;
+  const secret = workerSecretsEnv[secretName];
 
   if (!workerUrl || !secret) {
     return {

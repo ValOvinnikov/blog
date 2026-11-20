@@ -8,7 +8,7 @@ import {
   mockEmailBodyWithText,
   mockEmailConfig,
   mockEmailTemplateResult,
-  MOCK_TEST_EMAIL_SENDS_PER_WINDOW,
+  MOCK_TEST_EMAIL_LIMIT_REFUSAL,
 } from '@platform/testing/email/fixtures';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
@@ -32,6 +32,7 @@ vi.mock('@shinefold/db', () => ({
     emailConfig: { getEmailConfig: vi.fn() },
     emailTemplates: { getEmailTemplate: vi.fn() },
     siteConfig: { getSiteConfig: vi.fn() },
+    testEmailSendCounters: { incrementTestEmailSendCount: vi.fn() },
   },
 }));
 
@@ -78,6 +79,9 @@ describe(sendTestEmailAction, () => {
     vi.mocked(queries.emailTemplates.getEmailTemplate).mockResolvedValue(
       mockEmailTemplateResult(),
     );
+    vi.mocked(
+      queries.testEmailSendCounters.incrementTestEmailSendCount,
+    ).mockResolvedValue({ count: 1, windowStartedAt: new Date() });
     vi.mocked(sendEmail).mockReset();
     vi.mocked(sendEmail).mockResolvedValue(undefined);
   });
@@ -137,14 +141,19 @@ describe(sendTestEmailAction, () => {
       signInNewAdmin();
     });
 
-    it('refuses without sending once the admin hits the limit', async () => {
-      const results = [];
-      for (let send = 0; send <= MOCK_TEST_EMAIL_SENDS_PER_WINDOW; send += 1) {
-        results.push(await sendTestEmailAction(MOCK_TENANT_ID, INPUT));
-      }
+    it('refuses without sending once the admin hits the limit, saying when to try again', async () => {
+      const { count, windowStartedAt, retryAt } = MOCK_TEST_EMAIL_LIMIT_REFUSAL;
+      vi.mocked(
+        queries.testEmailSendCounters.incrementTestEmailSendCount,
+      ).mockResolvedValue({ count, windowStartedAt });
 
-      expect(results.at(-1)).toEqual({ outcome: ACTION_OUTCOME.RATE_LIMITED });
-      expect(sendEmail).toHaveBeenCalledTimes(MOCK_TEST_EMAIL_SENDS_PER_WINDOW);
+      const result = await sendTestEmailAction(MOCK_TENANT_ID, INPUT);
+
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.RATE_LIMITED,
+        retryAt,
+      });
+      expect(sendEmail).not.toHaveBeenCalled();
     });
 
     it('reports and logs a failed send without throwing', async () => {

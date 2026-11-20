@@ -1,7 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { CUSTOM_DOMAIN_PATH } from '@platform/constants/custom-domain';
 import { WORKER_LOG } from '@platform/constants/worker';
-import { mockedEnv } from '@platform/testing/env/mocked-env';
+import {
+  mockedEnv,
+  mockedWorkerSecretsEnv,
+} from '@platform/testing/env/mocked-env';
 import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_ID,
@@ -28,6 +31,7 @@ import {
 } from './enqueue-provisioning';
 
 vi.mock('@platform/utils/env/env');
+vi.mock('@platform/utils/worker-secrets-env/worker-secrets-env');
 
 faker.seed(5997);
 
@@ -45,20 +49,24 @@ describe(enqueueProvisioning, () => {
   it.each([
     {
       missing: 'worker URL',
-      key: 'WORKER_ENQUEUE_URL',
+      unset: () => {
+        mockedEnv.WORKER_ENQUEUE_URL = undefined;
+      },
       hasWorkerUrl: false,
       hasSecret: true,
     },
     {
       missing: 'enqueue secret',
-      key: 'WORKER_ENQUEUE_SECRET',
+      unset: () => {
+        mockedWorkerSecretsEnv.WORKER_ENQUEUE_SECRET = undefined;
+      },
       hasWorkerUrl: true,
       hasSecret: false,
     },
   ] as const)(
     'skips the request, logs and returns null without a $missing',
-    async ({ key, hasWorkerUrl, hasSecret }) => {
-      mockedEnv[key] = undefined;
+    async ({ unset, hasWorkerUrl, hasSecret }) => {
+      unset();
 
       const status = await enqueueProvisioning(MOCK_TENANT_ID);
 

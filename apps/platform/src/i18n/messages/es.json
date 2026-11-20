@@ -1225,10 +1225,11 @@
     "sendTest": "Enviarme una prueba",
     "sendingTest": "Enviando…",
     "testSent": "Prueba enviada a {email}.",
-    "testRateLimited": "Ha enviado varias pruebas recientemente. Vuelva a intentarlo en unos minutos.",
+    "testRateLimited": "Ha enviado el máximo de pruebas por ahora. Vuelva a intentarlo a las {time}.",
     "testInvalid": "Complete el asunto y el mensaje antes de enviar una prueba.",
     "testFailed": "No se pudo enviar la prueba. Vuelva a intentarlo.",
     "testSubject": "[Prueba] {subject}",
+    "postTestBanner": "Correo de prueba: solo usted lo ha recibido. Sus suscriptores lo recibirán cuando la entrada se publique por primera vez.",
     "unsavedLogoNote": "Un logotipo que aún no ha guardado no se incluye en la prueba."
   },
   "emailSettingsForm": {
