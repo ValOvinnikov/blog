@@ -12336,6 +12336,14 @@
         "file": "apps/web/src/constants/sign-in.ts"
       }
     ],
+    "error": [
+      {
+        "ref": "AUTH_QUERY_PARAM.ERROR",
+        "scope": "app:web",
+        "from": "@web/constants/sign-in",
+        "file": "apps/web/src/constants/sign-in.ts"
+      }
+    ],
     "site_config.fetch_failed": [
       {
         "ref": "SITE_CONFIG_LOG.FETCH_FAILED",

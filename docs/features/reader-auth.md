@@ -7,6 +7,8 @@ code:
   - packages/db/src/schema/auth.ts
   - apps/web/src/server/auth/**
   - apps/web/src/app/api/auth/**
+  - apps/web/src/app/api/sign-in-error/**
+  - apps/web/src/components/pages/account-page/sections/identity-section/components/provider-link-error-notice/**
   - apps/web/src/components/shared/site-header/components/auth-menu/**
   - apps/web/src/components/shared/site-navigation/components/account-menu-group/**
   - apps/web/src/components/shared/reader-account-panel/**
@@ -29,7 +31,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 - `/api/auth/*` — the Auth.js handlers (`GET`/`POST`).
 - **OAuth on any site host** — with `AUTH_REDIRECT_PROXY_URL` set, every site sends Google and GitHub the callback on one dedicated auth host. That host only redirects the reader back to the tenant host's own callback, which completes the sign-in, so the session and the reader's return page stay on the tenant's address. The platform does not use it.
 - **A site's own OAuth apps** — on a plan with `hasOwnOAuthApps` (Growth), a provider the site has saved its own client id and secret for signs in with that app on the site's own callback, skipping the redirect proxy, so the provider's screen shows the site's app and never our host. Only on the site's main address (`tenants.primaryDomain`), the one callback an owner registers with the provider: every other address of the site signs in through the shared apps. A page request on another address of the site is 301'd to the main address, and the session cookie does not follow, so a reader signed in on the old address signs in again there ([multi-tenancy](./multi-tenancy.md)). The other provider keeps the shared app. A reader is the same reader through either app: Google and GitHub give the same account id to every app, and the `accounts` row keys on it.
-- There is no `/login` page. Auth.js's `signIn` and `error` pages are both `/`, so every failed sign-in returns to the site's home page with `?error=` — never to Auth.js's own `/api/auth/signin` page. Auth.js drops the reader's callback URL on this redirect, so they land on the home page, not the page they started from. `useOAuthErrorParam` reads the error, strips it from the URL and the header shows an alert beside the account control: `authMenu.oauthAccountNotLinked` ("This email already signs in another way. Sign in the way you did last time.", fixed site copy) when the address already signs in with another provider (`OAuthAccountNotLinked` — accounts are never linked), and `authMenu.oauthError` ("Sign-in failed. Please try again.") for any other error.
+- There is no `/login` page. Auth.js's `signIn` and `error` pages are both `GET /api/sign-in-error` (`routes.signInError()`), which sends a signed-in reader to `/account` and anyone else to `/`, carrying only `?error=` — never to Auth.js's own `/api/auth/signin` page. Auth.js drops the reader's callback URL on this redirect, so a signed-out reader lands on the home page, not the page they started from. Signed out, the header's `AuthMenu` reads the error with `useOAuthErrorParam`, strips it from the URL and shows an alert beside the account control: `authMenu.oauthAccountNotLinked` ("Google or GitHub hasn't verified this email address. Verify it with them and try again, or sign in with an email link.") for `OAuthAccountNotLinked`, which on sign-in means only an unverified provider email (`requireVerifiedProviderEmail`), and `authMenu.oauthError` ("Sign-in failed. Please try again.") for any other error. Signed in — a provider link refused from Account › Connected accounts — the reader stays signed in and the Connected accounts panel shows the alert instead (`AuthMenu` leaves the parameter alone): `accountPage.identity.linkNotLinkedError` for `OAuthAccountNotLinked`, which on a link also means the provider account already belongs to another reader, and `accountPage.identity.linkError` otherwise. All four are fixed site copy.
 - The platform builds its own `NextAuth()` from the same `buildAuthConfig` (see [platform-sign-in-and-onboarding](./platform-sign-in-and-onboarding.md)).
 
 ## Data
@@ -75,7 +77,8 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 - `packages/auth/src/utils/oauth-providers/oauth-providers.ts`
 - `packages/auth/src/providers/oauth/require-verified-provider-email.ts` and `github-userinfo.ts` — joining an existing account by verified email
 - `packages/auth/src/events/consume-pending-invites-on-sign-in.ts`
-- `apps/web/src/server/auth/auth.ts` — lazy `NextAuth()`, `pages.signIn` and `pages.error` both `/`
+- `apps/web/src/server/auth/auth.ts` — lazy `NextAuth()`, `pages.signIn` and `pages.error` both `routes.signInError()`
+- `apps/web/src/app/api/sign-in-error/route.ts` — sends a refused sign-in to `/account` or `/` by session
 - `apps/web/src/server/auth/site-oauth-credentials/site-oauth-credentials.ts` — the site's entitled credentials
 - `apps/web/src/components/shared/site-header/components/auth-menu/auth-menu.tsx`
 - `apps/web/src/components/shared/site-navigation/components/account-menu-group/account-menu-group.tsx` — the phone menu's account row

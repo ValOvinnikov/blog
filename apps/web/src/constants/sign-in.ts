@@ -6,3 +6,7 @@ export const SIGN_IN_LOG = {
 export const AUTH_ERROR_TYPE = {
   OAUTH_ACCOUNT_NOT_LINKED: 'OAuthAccountNotLinked',
 } as const;
+
+export const AUTH_QUERY_PARAM = {
+  ERROR: 'error',
+} as const;

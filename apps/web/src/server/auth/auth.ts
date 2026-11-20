@@ -19,8 +19,8 @@ const { handlers, auth } = NextAuth(async (request) => ({
     },
     await getRequestSiteOAuthCredentials(request),
   ),
-  // Auth.js sends sign-in errors to `signIn` and the rest to `error`; both land on the header popover, which reads `?error=`.
-  pages: { signIn: routes.home(), error: routes.home() },
+  // Auth.js sends sign-in errors to `signIn` and the rest to `error`; the handler picks home or `/account` by session.
+  pages: { signIn: routes.signInError(), error: routes.signInError() },
   // The subscribed cookie belongs to the browser, so it must not outlive the reader who set it.
   events: {
     signIn: clearNewsletterSubscribedCookieSafely,

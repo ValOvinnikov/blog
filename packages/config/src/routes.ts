@@ -31,6 +31,7 @@ export const routes = {
   account: () => '/account',
   /** A Route Handler, not a page, so it's outside `[locale]`. */
   accountExport: () => '/api/account/export',
+  signInError: () => '/api/sign-in-error',
   newsletterConfirm: (token: string, locale?: TLocaleIsoCode) =>
     `/api/newsletter/confirm?${toNewsletterLinkQuery(token, locale)}`,
   newsletterUnsubscribe: (token: string, locale?: TLocaleIsoCode) =>

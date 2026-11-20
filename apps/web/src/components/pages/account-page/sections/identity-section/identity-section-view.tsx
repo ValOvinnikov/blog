@@ -25,6 +25,7 @@ export interface IIdentitySectionViewProps {
   displayNameLabel: string;
   displayNameDescription: string;
   displayNameControl: ReactNode;
+  linkErrorNotice: ReactNode;
 }
 
 export const IdentitySectionView = ({
@@ -33,10 +34,12 @@ export const IdentitySectionView = ({
   displayNameLabel,
   displayNameDescription,
   displayNameControl,
+  linkErrorNotice,
 }: IIdentitySectionViewProps) => (
   <Panel>
     <Panel.Header headingLevel={2}>{heading}</Panel.Header>
     <Panel.Body>
+      {linkErrorNotice}
       {providerRows.map(
         ({
           id,

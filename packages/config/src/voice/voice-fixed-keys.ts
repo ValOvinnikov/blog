@@ -1,3 +1,4 @@
+import { ACCOUNT_IDENTITY_VOICE_FIXED_KEYS } from './voice-fixed-keys-account-identity';
 import { AUTH_MENU_VOICE_FIXED_KEYS } from './voice-fixed-keys-auth-menu';
 import { CONSENT_VOICE_FIXED_KEYS } from './voice-fixed-keys-consent';
 import { COOKIE_LIST_VOICE_FIXED_KEYS } from './voice-fixed-keys-cookie-list';
@@ -9,6 +10,7 @@ import { PRICING_VOICE_FIXED_KEYS } from './voice-fixed-keys-pricing';
  * neither this list nor `VOICE_FIELDS`.
  */
 export const VOICE_FIXED_KEYS = [
+  ...ACCOUNT_IDENTITY_VOICE_FIXED_KEYS,
   ...AUTH_MENU_VOICE_FIXED_KEYS,
   ...CONSENT_VOICE_FIXED_KEYS,
   ...COOKIE_LIST_VOICE_FIXED_KEYS,
@@ -40,7 +42,6 @@ export const VOICE_FIXED_KEYS = [
   'bookmarkButton.saveAriaLabel',
   'bookmarkButton.removeAriaLabel',
   'accountPage.privacy.deleteConfirmAriaLabel',
-  'accountPage.identity.displayNameAriaLabel',
   'taxonomyListModule.topics.latestPostsLabel',
   'taxonomyListModule.tags.latestPostsLabel',
   'taxonomyListModule.topics.latestLabel',
@@ -72,13 +73,6 @@ export const VOICE_FIXED_KEYS = [
   'accountPage.newsletter.resendToastSuccessMessage',
   'accountPage.newsletter.resendError',
   'accountPage.newsletter.resendUnavailable',
-  'accountPage.identity.unlinkToastLoadingMessage',
-  'accountPage.identity.unlinkToastSuccessMessage',
-  'accountPage.identity.unlinkError',
-  'accountPage.identity.unlinkLastMethodError',
-  'accountPage.identity.saveToastLoadingMessage',
-  'accountPage.identity.saveToastSuccessMessage',
-  'accountPage.identity.saveError',
 
   'pagination.pageSuffix',
   'taxonomyListModule.topics.postsCount',
@@ -176,18 +170,5 @@ export const VOICE_FIXED_KEYS = [
   'accountPage.newsletter.pendingDescription',
   'accountPage.newsletter.resendButton',
   'accountPage.newsletter.resendingLabel',
-  'accountPage.identity.heading',
-  'accountPage.identity.githubLabel',
-  'accountPage.identity.googleLabel',
-  'accountPage.identity.emailLinkLabel',
-  'accountPage.identity.linkedStatus',
-  'accountPage.identity.linkButton',
-  'accountPage.identity.unlinkButton',
-  'accountPage.identity.unlinkingLabel',
-  'accountPage.identity.lastMethodNotice',
-  'accountPage.identity.displayNameLabel',
-  'accountPage.identity.displayNameDescription',
-  'accountPage.identity.saveButton',
-  'accountPage.identity.savingLabel',
   'table.regionLabel',
 ] as const;

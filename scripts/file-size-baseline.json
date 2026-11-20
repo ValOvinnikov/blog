@@ -29,7 +29,7 @@
   "apps/worker/src/testing/owner-access/fixtures.ts": 121,
   "apps/worker/src/utils/owner-email/owner-email-copy.ts": 153,
   "packages/config/src/constants/icon.ts": 125,
-  "packages/config/src/voice/voice-fixed-keys.ts": 186,
+  "packages/config/src/voice/voice-fixed-keys.ts": 167,
   "packages/db/scripts/deprovision-tenant/run.ts": 203,
   "packages/db/scripts/seed-tenant.ts": 176,
   "packages/db/scripts/validate-tenant-documents/run.ts": 181,

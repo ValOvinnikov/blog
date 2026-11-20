@@ -12,7 +12,7 @@ import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import { ARIA_CURRENT, ARIA_CURRENT_PAGE } from '@shinefold/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { SESSION_STATUS } from '@web/constants/session';
-import { AUTH_ERROR_TYPE } from '@web/constants/sign-in';
+import { AUTH_ERROR_TYPE, AUTH_QUERY_PARAM } from '@web/constants/sign-in';
 import { usePathname } from '@web/i18n/navigation';
 import { act, customRender, screen, within } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
@@ -542,7 +542,7 @@ describe(`<${AuthMenu.name}/>`, () => {
     ])(
       'shows an alert when the reader comes back from $title',
       async ({ error, message }) => {
-        setLocationSearch(`?error=${error}`);
+        setLocationSearch(`?${AUTH_QUERY_PARAM.ERROR}=${error}`);
         setup();
 
         const notice = await screen.findByRole('alert');

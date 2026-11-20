@@ -11,5 +11,6 @@ export const identitySectionVariants = tv({
     linkedStatus: ['font-mono text-copy text-success'],
     emailIcon: ['text-brand-primary text-lg leading-none'],
     lastMethodNotice: ['font-body text-copy text-text-subtle italic'],
+    linkError: ['font-mono text-meta text-error'],
   },
 });

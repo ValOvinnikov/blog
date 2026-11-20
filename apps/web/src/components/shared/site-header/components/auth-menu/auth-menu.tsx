@@ -34,7 +34,9 @@ export const AuthMenu = ({
   hasReaderAccounts,
 }: IAuthMenuProps) => {
   const { status, expires, user, onImageError } = useReaderAccount();
-  const oauthError = useOAuthErrorParam();
+  const oauthError = useOAuthErrorParam(
+    status === SESSION_STATUS.UNAUTHENTICATED,
+  );
   const t = useTranslations('authMenu');
   const popover = usePopover({ overlayId: ACCOUNT_OVERLAY_ID });
   const { panel, reveal, errorNotice } = authMenuVariants();
