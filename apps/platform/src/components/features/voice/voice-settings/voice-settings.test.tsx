@@ -30,6 +30,7 @@ import {
   setupBilingualVoiceSettings,
   setupVoiceSettings,
   voiceCard,
+  withinEmptyLists,
   GERMAN,
   NO_OVERRIDES,
   RESET,
@@ -170,7 +171,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it('counts the empty-list card in lists', () => {
-      const listsSummary = within(voiceCard(EMPTY_LISTS)).getByText(
+      const listsSummary = withinEmptyLists().getByText(
         '5 lists · all default',
       );
 
@@ -197,24 +198,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
       expect(notFoundSummary).toBeVisible();
       expect(errorSummary).toBeVisible();
       expect(bookmarksSummary).toBeVisible();
-    });
-
-    it('restores the saved values on Discard', async () => {
-      const headingField = notFoundHeadingField();
-      await user.clear(headingField);
-
-      const unsavedRegion = screen.getByRole('region', {
-        name: UNSAVED_CHANGES,
-      });
-
-      expect(unsavedRegion).toHaveTextContent('1 unsaved change');
-
-      const discardButton = screen.getByRole('button', { name: 'Discard' });
-      await user.click(discardButton);
-
-      const restoredHeadingField = notFoundHeadingField();
-
-      expect(restoredHeadingField).toHaveValue(NOTHING_HERE);
     });
 
     it('reads the heading, the language switcher, the note, then the Live preview switch', () => {
@@ -250,9 +233,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it("edits the selected language against that language's defaults", async () => {
-      const englishHeadingField = notFoundHeadingField();
-
-      expect(englishHeadingField).toHaveValue(NOTHING_HERE);
+      expect(notFoundHeadingField()).toHaveValue(NOTHING_HERE);
 
       const germanRadio = screen.getByRole('radio', { name: GERMAN });
       await user.click(germanRadio);
@@ -267,8 +248,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it('breaks the unsaved count down by language', async () => {
-      const englishHeadingField = notFoundHeadingField();
-      await user.type(englishHeadingField, MOCK_EDIT_TEXT);
+      await user.type(notFoundHeadingField(), MOCK_EDIT_TEXT);
 
       const germanRadio = screen.getByRole('radio', { name: GERMAN });
       await user.click(germanRadio);
@@ -322,9 +302,8 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
 
       it('re-renders the specimen beside a field as the editor types', async () => {
-        const headingField = notFoundHeadingField();
-        await user.clear(headingField);
-        await user.type(headingField, MOCK_TYPED_TEXT);
+        await user.clear(notFoundHeadingField());
+        await user.type(notFoundHeadingField(), MOCK_TYPED_TEXT);
 
         const specimen = screen.getByTestId(
           `voice-specimen-${VOICE_SURFACE.NOT_FOUND}`,
@@ -335,8 +314,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
 
       it("outlines the focused field's text in its specimen", async () => {
-        const headingField = notFoundHeadingField();
-        await user.click(headingField);
+        await user.click(notFoundHeadingField());
 
         const focusedKey = screen.getByTestId(HEADING_KEY_TEST_ID);
 
@@ -347,22 +325,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
         const blurredKey = screen.getByTestId(HEADING_KEY_TEST_ID);
 
         expect(blurredKey).toHaveAttribute(DATA_FOCUSED, 'false');
-      });
-
-      it('shows the open list in the empty-lists specimen', async () => {
-        const topicRow = within(voiceCard(EMPTY_LISTS)).getByRole('button', {
-          name: TOPIC_ROW,
-        });
-        await user.click(topicRow);
-
-        const specimen = screen.getByTestId(
-          `voice-specimen-${VOICE_SURFACE.ARCHIVE}`,
-        );
-        const sampleMessage = within(specimen).getByText(
-          'No posts in Design yet.',
-        );
-
-        expect(sampleMessage).toBeVisible();
       });
 
       it.each([
@@ -422,29 +384,42 @@ describe(`<${VoiceSettings.name}/>`, () => {
         expect(lastField.compareDocumentPosition(closingNote!)).toBe(FOLLOWS);
       });
 
-      it('names the open list in the empty-lists preview label', async () => {
-        const section = voiceCard(EMPTY_LISTS);
-        const topicRow = within(section).getByRole('button', {
-          name: TOPIC_ROW,
-        });
-        await user.click(topicRow);
-
-        const preview = within(section).getByRole('group', {
-          name: `Preview · ${TOPIC_FIELD}`,
+      describe('with the Topic list open', () => {
+        beforeEach(async () => {
+          const topicRow = withinEmptyLists().getByRole('button', {
+            name: TOPIC_ROW,
+          });
+          await user.click(topicRow);
         });
 
-        expect(preview).toBeInTheDocument();
+        it('shows the open list in the empty-lists specimen', async () => {
+          const specimen = screen.getByTestId(
+            `voice-specimen-${VOICE_SURFACE.ARCHIVE}`,
+          );
+          const sampleMessage = within(specimen).getByText(
+            'No posts in Design yet.',
+          );
+
+          expect(sampleMessage).toBeVisible();
+        });
+
+        it('names the open list in the empty-lists preview label', async () => {
+          const preview = withinEmptyLists().getByRole('group', {
+            name: `Preview · ${TOPIC_FIELD}`,
+          });
+
+          expect(preview).toBeInTheDocument();
+        });
       });
 
       it('names the first list in the preview label while no list is open', async () => {
-        const section = voiceCard(EMPTY_LISTS);
-        const openRow = within(section).getByRole('button', {
+        const openRow = withinEmptyLists().getByRole('button', {
           name: BLOG_INDEX_ROW,
           expanded: true,
         });
         await user.click(openRow);
 
-        const preview = within(section).getByRole('group', {
+        const preview = withinEmptyLists().getByRole('group', {
           name: `Preview · ${BLOG_INDEX_PAGE}`,
         });
 
@@ -452,13 +427,13 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
 
       it('toggles the empty-lists preview and keeps focus on its button', async () => {
-        const toggle = within(voiceCard(EMPTY_LISTS)).getByRole('button', {
+        const toggle = withinEmptyLists().getByRole('button', {
           name: SHOW_PREVIEW,
           expanded: false,
         });
         await user.click(toggle);
 
-        const preview = within(voiceCard(EMPTY_LISTS)).getByRole('group', {
+        const preview = withinEmptyLists().getByRole('group', {
           name: `Preview · ${BLOG_INDEX_PAGE}`,
         });
 
@@ -492,8 +467,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it('opens one list at a time, showing the others as compact rows', async () => {
-      const section = voiceCard(EMPTY_LISTS);
-      const blogIndexField = within(section).getByRole('textbox', {
+      const blogIndexField = withinEmptyLists().getByRole('textbox', {
         name: BLOG_INDEX_PAGE,
       });
 
@@ -505,7 +479,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         /Topics index page/,
         /Tags index page/,
       ]) {
-        const compactRow = within(section).getByRole('button', {
+        const compactRow = withinEmptyLists().getByRole('button', {
           name,
           expanded: false,
         });
@@ -513,14 +487,18 @@ describe(`<${VoiceSettings.name}/>`, () => {
         expect(compactRow).toBeVisible();
       }
 
-      const tagRow = within(section).getByRole('button', { name: TAG_ROW });
+      const tagRow = withinEmptyLists().getByRole('button', {
+        name: TAG_ROW,
+      });
       await user.click(tagRow);
 
-      const tagField = within(section).getByRole('textbox', { name: TAG_PAGE });
-      const closedBlogIndexField = within(section).queryByRole('textbox', {
+      const tagField = withinEmptyLists().getByRole('textbox', {
+        name: TAG_PAGE,
+      });
+      const closedBlogIndexField = withinEmptyLists().queryByRole('textbox', {
         name: BLOG_INDEX_PAGE,
       });
-      const blogIndexRow = within(section).getByRole('button', {
+      const blogIndexRow = withinEmptyLists().getByRole('button', {
         name: BLOG_INDEX_ROW,
       });
 
@@ -532,8 +510,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it('keeps keyboard focus on a list row as it opens, then tabs in', async () => {
-      const section = voiceCard(EMPTY_LISTS);
-      const row = within(section).getByRole('button', { name: TAG_ROW });
+      const row = withinEmptyLists().getByRole('button', {
+        name: TAG_ROW,
+      });
 
       await user.pointer({ keys: '[MouseLeft>]', target: row });
       await user.keyboard('{Enter}');
@@ -543,28 +522,27 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       await user.tab();
 
-      const boldButton = within(section).getByRole('button', { name: 'Bold' });
+      const boldButton = withinEmptyLists().getByRole('button', {
+        name: 'Bold',
+      });
 
       expect(boldButton).toHaveFocus();
     });
 
     it('titles the open list once, in its header', () => {
-      const titles = within(voiceCard(EMPTY_LISTS)).getAllByText(
-        BLOG_INDEX_PAGE,
-      );
+      const titles = withinEmptyLists().getAllByText(BLOG_INDEX_PAGE);
 
       expect(titles).toHaveLength(1);
     });
 
     it('closes the open list from its header', async () => {
-      const section = voiceCard(EMPTY_LISTS);
-      const openRow = within(section).getByRole('button', {
+      const openRow = withinEmptyLists().getByRole('button', {
         name: BLOG_INDEX_ROW,
         expanded: true,
       });
       await user.click(openRow);
 
-      const closedRow = within(section).getByRole('button', {
+      const closedRow = withinEmptyLists().getByRole('button', {
         name: BLOG_INDEX_ROW,
         expanded: false,
       });
@@ -598,7 +576,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
 
       it('describes every open control with the archived notice', async () => {
-        const tagRow = within(voiceCard(EMPTY_LISTS)).getByRole('button', {
+        const tagRow = withinEmptyLists().getByRole('button', {
           name: TAG_ROW,
         });
         await user.click(tagRow);

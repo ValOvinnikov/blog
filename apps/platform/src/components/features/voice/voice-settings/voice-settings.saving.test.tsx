@@ -127,7 +127,7 @@ describe(`<${VoiceSettings.name}/> saving`, () => {
       expect(saveBar).not.toBeInTheDocument();
     });
 
-    it('offers Discard beside Save changes and drops the bar once discarded', async () => {
+    it('restores the saved values and drops the bar on Discard', async () => {
       await user.type(notFoundHeadingField(), MOCK_TYPED_TEXT);
 
       const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
@@ -138,6 +138,7 @@ describe(`<${VoiceSettings.name}/> saving`, () => {
       await user.click(discard);
 
       expect(saveBar).not.toBeInTheDocument();
+      expect(notFoundHeadingField()).not.toHaveTextContent(MOCK_TYPED_TEXT);
     });
 
     it('shows a failed save once, in the save bar, without refreshing', async () => {

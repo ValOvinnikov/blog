@@ -140,7 +140,9 @@ the side gutter, 26px from `md` and 16px below — plus the visible bar's
 measured height, so the gap above the bar matches the sides and no extra room
 is left while no bar shows (archived included). From `md` the document's
 `scroll-padding-bottom` is the bar's 64px
-plus 16px so a focused field never sits under the bar, and when the bar
+plus 16px so a focused field never sits under the bar; below `md`, while the
+bar shows, it is the larger of the 120px dock room and the bar's measured
+height plus 16. When the bar
 first appears the focused control is scrolled into view (`block: 'nearest'`),
 since the bar's new room grows the page without scrolling it. The 64 and 16 are the
 `--spacing-platform-dock` / `-clearance` tokens, kept equal to

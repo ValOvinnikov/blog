@@ -130,11 +130,13 @@ export const SettingsFormShell = <TValues,>({
         <SaveBar
           ref={saveBarRef}
           changeCount={changeCount}
-          breakdown={formatLanguageChanges(changesByLanguage)}
-          invalidControls={invalidControls}
+          summary={{
+            breakdown: formatLanguageChanges(changesByLanguage),
+            invalidControls,
+            saveError,
+            unsavedCards,
+          }}
           isPending={isPending}
-          saveError={saveError}
-          unsavedCards={unsavedCards}
           onSave={() => void saveAndReturnFocus()}
           onDiscard={handleDiscard}
         />

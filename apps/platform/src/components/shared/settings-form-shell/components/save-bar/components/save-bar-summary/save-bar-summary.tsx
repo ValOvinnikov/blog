@@ -10,7 +10,7 @@ import { useTranslations } from 'next-intl';
 
 import { saveBarSummaryVariants } from './save-bar-summary-variants';
 
-type TSaveBarSummaryProps = {
+export type TSaveBarSummaryProps = {
   changeCount: number;
   breakdown: string;
   invalidControls: TInvalidControls;

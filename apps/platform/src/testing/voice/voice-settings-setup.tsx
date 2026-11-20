@@ -113,6 +113,8 @@ export const activeLanguageLabel = (language: string) =>
 
 export const voiceCard = (name: string) => screen.getByRole('region', { name });
 
+export const withinEmptyLists = () => within(voiceCard(EMPTY_LISTS));
+
 export const notFoundHeadingField = () =>
   within(voiceCard(PAGE_NOT_FOUND)).getByRole('textbox', { name: 'Heading' });
 
