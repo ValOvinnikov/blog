@@ -71,33 +71,32 @@ the same prefix (`shared/portable-text/components/code-block/` →
 ## Story shape
 
 ```tsx
-import { ASIDE_KIND } from '@shinefold/config';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { DeepAside } from './deep-aside';
+import { PageHeading } from './page-heading';
 
 const meta = {
-  title: 'Components/DeepAside',
-  component: DeepAside,
+  title: 'Components/PageHeading',
+  component: PageHeading,
   tags: ['autodocs'],
-  parameters: { layout: 'padded' },
   argTypes: {
-    kind: { control: 'select', options: Object.values(ASIDE_KIND) },
+    align: { control: 'select', options: Object.values(CONTENT_ALIGNMENT) },
   },
   args: {
-    kind: ASIDE_KIND.DIGRESSION,
-    label: 'Digression',
-    children: <p>…</p>,
+    headingBlock: {
+      heading: 'Notes on building things',
+      supportingText: undefined,
+    },
+    align: undefined,
   },
-} satisfies Meta<typeof DeepAside>;
+} satisfies Meta<typeof PageHeading>;
 
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-export const Digression: TStory = {};
-export const WhyNot: TStory = {
-  args: { kind: ASIDE_KIND.WHY_NOT, label: 'Why not X' },
-};
+export const Default: TStory = {};
+export const Centred: TStory = { args: { align: CONTENT_ALIGNMENT.CENTER } };
 ```
 
 Every dictionary-const, alias-union or `tv()`-backed prop gets an explicit

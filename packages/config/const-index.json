@@ -10646,14 +10646,6 @@
         "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
-    "READING_DEPTH": [
-      {
-        "ref": "COOKIE_ID.READING_DEPTH",
-        "scope": "app:web",
-        "from": "@web/constants/cookie-list",
-        "file": "apps/web/src/constants/cookie-list.ts"
-      }
-    ],
     "THEME": [
       {
         "ref": "COOKIE_ID.THEME",

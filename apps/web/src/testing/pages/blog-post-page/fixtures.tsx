@@ -1,4 +1,4 @@
-import type { TPostDetail } from '@shinefold/service';
+import type { TPostDetail, TPostTakeaways } from '@shinefold/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
@@ -18,6 +18,12 @@ export const MOCK_POST_DETAIL_AUTHOR_IMAGE = mockSanityImage({
   assetId: 'image-6205dacc42424f7a83d8e20a7000d895f7cdc7de-400x400-jpg',
   alt: MOCK_AUTHOR_NAME,
 });
+
+export const MOCK_POST_TAKEAWAYS: TPostTakeaways = {
+  takeaways: mockFaker.helpers.uniqueArray(mockFaker.lorem.sentence, 3),
+  generatedAt: '2026-01-16T00:00:00Z',
+  model: mockFaker.lorem.word(),
+};
 
 export const MOCK_POST_DETAIL: TPostDetail = {
   id: mockFaker.string.uuid(),

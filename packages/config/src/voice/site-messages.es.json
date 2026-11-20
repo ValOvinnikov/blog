@@ -55,15 +55,11 @@
     "paginationAriaLabel": "Páginas del blog"
   },
   "blogPostPage": {
-    "depthToggle": {
-      "ariaLabel": "Profundidad de lectura",
-      "skim": "30 s",
-      "read": "Leer",
-      "deep": "A fondo"
-    },
-    "skimPanel": {
-      "label": "Resumen en 30 segundos",
-      "readFullArticle": "Leer el artículo completo"
+    "postSummary": {
+      "button": "Resumen",
+      "title": "Puntos clave",
+      "readTime": "30 s de lectura",
+      "readFullArticle": "Leer el artículo completo · {count} min"
     },
     "asideKind": {
       "WHY_NOT": "Por qué no X",
@@ -424,10 +420,6 @@
       "NEWSLETTER_UNSUBSCRIBE_TOKEN": {
         "purpose": "Guarda el enlace de tu correo de baja mientras confirmas.",
         "duration": "1 hora"
-      },
-      "READING_DEPTH": {
-        "purpose": "Recuerda cuánto de cada artículo elegiste leer. Se guarda en el almacenamiento local de tu navegador.",
-        "duration": "Hasta que borres los datos de tu navegador"
       },
       "THEME": {
         "purpose": "Recuerda si elegiste el tema claro u oscuro. Se guarda en el almacenamiento local de tu navegador.",

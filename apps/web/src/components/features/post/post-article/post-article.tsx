@@ -5,22 +5,22 @@ import {
 } from '@shinefold/service';
 import { Prose } from '@shinefold/ui/components/atoms/prose';
 import { Article } from '@shinefold/ui/components/organisms/article';
-import { BookmarkButtonGate } from '@web/components/features/post/bookmark-button-gate';
+import { PostSummaryCard } from '@web/components/features/post/post-summary-card';
 import { ContentsRailLayout } from '@web/components/shared/contents-rail-layout';
 import {
   createPostBodyOverride,
   PortableText,
 } from '@web/components/shared/portable-text';
-import { PostShareLinks } from '@web/components/shared/post-share-links';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { routing } from '@web/i18n/routing';
+import { PostSummaryProvider } from '@web/context/post-summary-provider';
 import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
-import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
+import { ArticleBodyFocusTarget } from './components/article-body-focus-target';
+import { PostArticleActions } from './components/post-article-actions';
 import { postArticleVariants } from './post-article-variants';
 
 export type TPostArticleProps = {
@@ -56,18 +56,10 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
     publishedAt,
     readingTimeMinutes,
     heroImage,
+    postTakeaways,
   } = post;
 
-  const [
-    format,
-    blogPostT,
-    {
-      metadataBase,
-      sanityContext,
-      locale,
-      defaultLocale = routing.defaultLocale,
-    },
-  ] = await Promise.all([
+  const [format, blogPostT, { sanityContext }] = await Promise.all([
     getFormatter(),
     getTranslations('blogPostPage'),
     getRequestContext(),
@@ -82,12 +74,6 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
     month: 'long',
     day: 'numeric',
   });
-  const path = toLocalizedPathname({
-    href: routes.post(slug),
-    locale,
-    defaultLocale,
-  });
-  const url = metadataBase ? new URL(path, metadataBase).href : path;
   const asideKindLabels: Record<TAsideKind, string> = {
     [ASIDE_KIND.WHY_NOT]: blogPostT('asideKind.WHY_NOT'),
     [ASIDE_KIND.DIGRESSION]: blogPostT('asideKind.DIGRESSION'),
@@ -99,58 +85,72 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
   const components = createPostBodyOverride(asideKindLabels);
 
   return (
-    <Article>
-      <Article.Header
-        className={s.hero()}
-        dataTestId="post-article-header"
-        title={title}
-        topic={{
-          label: topic.title,
-          href: topic.slug ? routes.topic(topic.slug) : undefined,
-          linkAs: SmartLink,
-        }}
-        lead={excerpt}
-        meta={{
-          author: {
-            name: author.name,
-            imageUrl: authorImageUrl,
-            href: author.profileUrl,
-          },
-          publishedAt,
-          formattedDate,
-          readingTime,
-          linkAs: SmartLink,
-          actions: (
-            <div className={s.metaActions()}>
-              <BookmarkButtonGate postId={id} />
-              <PostShareLinks url={url} title={title} />
-            </div>
-          ),
-        }}
-        coverMedia={
-          heroImage ? (
-            <SanityImage
-              image={heroImage}
-              width={1200}
-              height={675}
-              sizes="(min-width: 1024px) 800px, 100vw"
-              priority={true}
-              className={s.coverImage()}
-            />
-          ) : undefined
-        }
-      />
+    <PostSummaryProvider>
+      <Article>
+        <Article.Header
+          className={s.hero()}
+          dataTestId="post-article-header"
+          title={title}
+          topic={{
+            label: topic.title,
+            href: topic.slug ? routes.topic(topic.slug) : undefined,
+            linkAs: SmartLink,
+          }}
+          lead={excerpt}
+          meta={{
+            author: {
+              name: author.name,
+              imageUrl: authorImageUrl,
+              href: author.profileUrl,
+            },
+            publishedAt,
+            formattedDate,
+            readingTime,
+            linkAs: SmartLink,
+            actions: (
+              <PostArticleActions
+                postId={id}
+                slug={slug}
+                title={title}
+                hasSummary={Boolean(postTakeaways)}
+              />
+            ),
+          }}
+          belowMeta={
+            postTakeaways && (
+              <PostSummaryCard
+                takeaways={postTakeaways}
+                readingTimeMinutes={readingTimeMinutes}
+              />
+            )
+          }
+          coverMedia={
+            heroImage ? (
+              <SanityImage
+                image={heroImage}
+                width={1200}
+                height={675}
+                sizes="(min-width: 1024px) 800px, 100vw"
+                priority={true}
+                className={s.coverImage()}
+              />
+            ) : undefined
+          }
+        />
 
-      <Article.Body className={s.body()}>
-        <ContentsRailLayout
-          body={body}
-          footer={<Article.Footer tags={footerTags} linkAs={SmartLink} />}
-        >
-          <Prose className={s.prose()}>
-            <PortableText value={body} components={components} />
-          </Prose>
-        </ContentsRailLayout>
-      </Article.Body>
-    </Article>
+        <Article.Body className={s.body()}>
+          <ArticleBodyFocusTarget>
+            <ContentsRailLayout
+              body={body}
+              footer={<Article.Footer tags={footerTags} linkAs={SmartLink} />}
+            >
+              <Prose className={s.prose()}>
+                <PortableText value={body} components={components} />
+              </Prose>
+            </ContentsRailLayout>
+          </ArticleBodyFocusTarget>
+        </Article.Body>
+      </Article>
+    </PostSummaryProvider>
   );
 };

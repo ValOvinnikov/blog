@@ -55,15 +55,11 @@
     "paginationAriaLabel": "Blogseiten"
   },
   "blogPostPage": {
-    "depthToggle": {
-      "ariaLabel": "Lesetiefe",
-      "skim": "30 s",
-      "read": "Lesen",
-      "deep": "Vertiefen"
-    },
-    "skimPanel": {
-      "label": "Zusammenfassung in 30 Sekunden",
-      "readFullArticle": "Ganzen Artikel lesen"
+    "postSummary": {
+      "button": "Kurzfassung",
+      "title": "Das Wichtigste",
+      "readTime": "30 Sek. Lesezeit",
+      "readFullArticle": "Ganzen Artikel lesen · {count} Min."
     },
     "asideKind": {
       "WHY_NOT": "Warum nicht X",
@@ -424,10 +420,6 @@
       "NEWSLETTER_UNSUBSCRIBE_TOKEN": {
         "purpose": "Bewahrt den Link aus deiner Abmelde-E-Mail auf, während du bestätigst.",
         "duration": "1 Stunde"
-      },
-      "READING_DEPTH": {
-        "purpose": "Speichert, wie viel von jedem Beitrag du lesen möchtest. Liegt im lokalen Speicher deines Browsers.",
-        "duration": "Bis du deine Browserdaten löschst"
       },
       "THEME": {
         "purpose": "Speichert, ob du das helle oder dunkle Design gewählt hast. Liegt im lokalen Speicher deines Browsers.",
