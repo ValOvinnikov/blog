@@ -1,14 +1,19 @@
-import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
-import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
+import type {
+  TSidebarNavItem,
+  TSidebarNavSection,
+} from '@platform/components/features/layout/sidebar';
 import {
   configurationNavItems,
   type TTenantNavHrefs,
-} from '@platform/utils/nav-sections/nav-sections';
+} from '@platform/utils/configuration-nav-items/configuration-nav-items';
+import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { studioNavItem } from '@platform/utils/studio-nav-item/studio-nav-item';
+import { teamNavItem } from '@platform/utils/team-nav-item/team-nav-item';
 import { ICONS } from '@shinefold/config';
 import type { TStudioAccess } from '@shinefold/config/constants';
+import { hasLength } from '@shinefold/utils/primitives';
 
 export const dashboardNavSections = (
   t: TLooseTranslator,
@@ -27,6 +32,19 @@ export const dashboardNavSections = (
     email: adminRoutes.dashboardEmail(),
     studio: adminRoutes.dashboardStudio(),
   };
+
+  const accountItems: TSidebarNavItem[] = [
+    ...(access.team ? [teamNavItem(t, adminRoutes.dashboardTeam())] : []),
+    ...(access.billing
+      ? [
+          {
+            label: t('billing'),
+            icon: ICONS.CHECK_SHEET,
+            href: adminRoutes.dashboardBilling(),
+          },
+        ]
+      : []),
+  ];
 
   return [
     {
@@ -47,19 +65,8 @@ export const dashboardNavSections = (
       label: t('configurationSectionLabel'),
       items: configurationNavItems(t, hrefs, access, unreadLeadsCount),
     },
-    ...(access.billing
-      ? [
-          {
-            label: t('accountSectionLabel'),
-            items: [
-              {
-                label: t('billing'),
-                icon: ICONS.CHECK_SHEET,
-                href: adminRoutes.dashboardBilling(),
-              },
-            ],
-          },
-        ]
+    ...(hasLength(accountItems)
+      ? [{ label: t('accountSectionLabel'), items: accountItems }]
       : []),
   ];
 };

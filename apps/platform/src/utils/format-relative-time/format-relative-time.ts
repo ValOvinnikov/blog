@@ -2,8 +2,8 @@ import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-tr
 import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@shinefold/config';
 
 const MINUTE_MS = 60 * 1000;
-const HOUR_MS = 60 * MINUTE_MS;
-const DAY_MS = 24 * HOUR_MS;
+export const HOUR_MS = 60 * MINUTE_MS;
+export const DAY_MS = 24 * HOUR_MS;
 
 const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   month: 'short',

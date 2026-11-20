@@ -37,16 +37,15 @@ const isStalled = (
   return hasStudioInviteStalled(ownerInviteSentAt, now);
 };
 
-/** Undefined when the viewer is not the tenant's own OWNER, or the worker never invited them — those get the Studio unconditionally. */
-export const ownerStudioAccessFor = (
+/** Undefined until the worker has sent the tenant's owner a Studio invite. */
+export const tenantOwnerStudioAccess = (
   tenant: TOwnerAccessTenant,
-  { isOwner }: TPlatformViewer,
   now: Date = new Date(),
 ): TMaybeUndefined<TStudioAccess> => {
   const { ownerInviteSentAt, ownerInviteAcceptedAt, ownerSanityUserId } =
     tenant;
 
-  return isOwner && ownerInviteSentAt
+  return ownerInviteSentAt
     ? studioAccessOf(
         {
           inviteAcceptedAt: ownerInviteAcceptedAt,
@@ -56,3 +55,11 @@ export const ownerStudioAccessFor = (
       )
     : undefined;
 };
+
+/** Undefined when the viewer is not the tenant's own OWNER, or the worker never invited them — those get the Studio unconditionally. */
+export const ownerStudioAccessFor = (
+  tenant: TOwnerAccessTenant,
+  { isOwner }: TPlatformViewer,
+  now: Date = new Date(),
+): TMaybeUndefined<TStudioAccess> =>
+  isOwner ? tenantOwnerStudioAccess(tenant, now) : undefined;

@@ -3,6 +3,7 @@ import { StudioMountView } from '@platform/components/features/studio/studio-mou
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { resolveHasEnteredStudio } from '@platform/server/studio-entry/resolve-has-entered-studio';
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
+import { isPendingStudioAccess } from '@platform/utils/pending-studio-access/pending-studio-access';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { STUDIO_ACCESS } from '@shinefold/config/constants';
@@ -23,20 +24,19 @@ export const DashboardStudioView = async ({
     studioAccess === STUDIO_ACCESS.READY &&
     !(await resolveHasEnteredStudio(tenant.id));
 
-  const view =
-    studioAccess && studioAccess !== STUDIO_ACCESS.READY ? (
-      <OwnerStudioAccessView tenantId={tenant.id} studioAccess={studioAccess} />
-    ) : (
-      await StudioMountView({
-        tenant,
-        basePath: adminRoutes.dashboardStudio(),
-        previewBasePath: adminRoutes.dashboardDraftPreviews(),
-        loginProvider: studioAccess
-          ? (tenant.ownerLoginProvider ?? undefined)
-          : undefined,
-        shouldRecordFirstEntry,
-      })
-    );
+  const view = isPendingStudioAccess(studioAccess) ? (
+    <OwnerStudioAccessView tenantId={tenant.id} studioAccess={studioAccess} />
+  ) : (
+    await StudioMountView({
+      tenant,
+      basePath: adminRoutes.dashboardStudio(),
+      previewBasePath: adminRoutes.dashboardDraftPreviews(),
+      loginProvider: studioAccess
+        ? (tenant.ownerLoginProvider ?? undefined)
+        : undefined,
+      shouldRecordFirstEntry,
+    })
+  );
 
   return (
     <>

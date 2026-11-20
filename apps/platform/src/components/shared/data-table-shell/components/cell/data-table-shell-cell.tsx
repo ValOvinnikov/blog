@@ -8,15 +8,19 @@ import { Children, type ReactNode } from 'react';
 
 export type TDataTableShellCellProps = {
   column?: string;
+  isHiddenWhenStacked?: boolean;
   children: ReactNode;
 };
 
 export const DataTableShellCell = ({
   column,
+  isHiddenWhenStacked = false,
   children,
 }: TDataTableShellCellProps) => {
   const stackedLabels = useDataTableShellStackedLabels();
-  const { cell, stackedCellLabel } = dataTableShellVariants();
+  const { cell, stackedCellLabel } = dataTableShellVariants({
+    isHiddenWhenStacked,
+  });
 
   if (!stackedLabels) {
     return <td className={cell()}>{children}</td>;

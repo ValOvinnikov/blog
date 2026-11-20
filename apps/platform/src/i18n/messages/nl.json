@@ -30,7 +30,8 @@
     "billing": "Facturering · Admin",
     "upgrade": "Upgraden",
     "help": "Help",
-    "draftPreview": "Conceptvoorbeeld"
+    "draftPreview": "Conceptvoorbeeld",
+    "team": "Team"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -1561,7 +1562,7 @@
       "STALLED": "Je Studio-uitnodiging is niet geaccepteerd"
     },
     "description": {
-      "INVITE_SENT": "Studio draait op Sanity, dus je hebt een gratis Sanity-account nodig om te bewerken. We hebben je een uitnodiging van Sanity gestuurd: accepteer die, en Studio opent hier zodra je toegang is bevestigd.",
+      "INVITE_SENT": "Studio draait op Sanity, dus je hebt een gratis Sanity-account nodig om te bewerken. We hebben je een Studio-uitnodiging gestuurd: accepteer die, en Studio opent hier zodra je toegang is bevestigd.",
       "ACTIVATING": "Je hebt de uitnodiging geaccepteerd. We geven je account bewerkrechten; dat duurt meestal een minuut.",
       "STALLED": "De uitnodiging is meer dan drie dagen geleden verstuurd en niet geaccepteerd, dus we controleren niet meer. Verstuur een nieuwe of controleer nu als je hem net hebt geaccepteerd."
     },
@@ -1571,7 +1572,11 @@
     "resending": "Wordt verstuurd…",
     "checkStarted": "We controleren je toegang. Vernieuw de pagina over een minuut om het resultaat te zien.",
     "inviteResent": "Er is een nieuwe uitnodiging onderweg naar je inbox.",
-    "requestFailed": "De inrichtingsservice was niet bereikbaar. Probeer het opnieuw."
+    "requestFailed": "De inrichtingsservice was niet bereikbaar. Probeer het opnieuw.",
+    "checkStartedFor": "De Studio-toegang van {email} wordt nu gecontroleerd. Vernieuw over een minuut om het resultaat te zien.",
+    "inviteResentTo": "Er is een nieuwe Studio-uitnodiging onderweg naar {email}.",
+    "checkNowAriaLabel": "Nu controleren voor {email}",
+    "resendInviteAriaLabel": "Uitnodiging opnieuw versturen naar {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Tenantgegevens",
@@ -2542,5 +2547,101 @@
     "expiryShortened": "De huidige taaltoekenning loopt langer. Kies een latere vervaldatum of trek die toekenning eerst in.",
     "includedInPlan": "Dit zit al in het abonnement van de tenant.",
     "grantNotOpen": "Deze toekenning is al verwijderd of verlopen."
+  },
+  "teamPage": {
+    "title": "Team",
+    "description": "De mensen die samen met jou de content van deze site in Studio schrijven en publiceren.",
+    "seatsUsed": "{used} van {seats, plural, one {# plek} other {# plekken}} in gebruik",
+    "inviteEditor": "Redacteur uitnodigen",
+    "seatLimitTitle": "Alle plekken zijn in gebruik",
+    "seatLimitBody": "{plan} heeft {seats, plural, one {# plek} other {# plekken}}. Verwijder een lid of trek een uitnodiging in om iemand anders uit te nodigen.",
+    "thisMember": "dit lid",
+    "columnPerson": "Persoon",
+    "columnRole": "Rol",
+    "columnStudioAccess": "Studio-toegang",
+    "columnActions": "Acties",
+    "members": {
+      "title": "Leden",
+      "count": "{count, plural, one {# persoon} other {# personen}}",
+      "empty": "Er is nog niemand lid geworden van deze site.",
+      "you": "(jij)",
+      "noEmail": "Geen e-mailadres bekend",
+      "joined": "Lid sinds <time>{date}</time>",
+      "joinedToday": "<time>Vandaag</time> lid geworden",
+      "joinedWithRole": "Lid sinds <time>{date}</time> · {role}",
+      "joinedTodayWithRole": "<time>Vandaag</time> lid geworden · {role}",
+      "noEditorsNoFreeSeats": "Nog geen redacteuren. Elke vrije plek is bezet door een openstaande uitnodiging.",
+      "noEditors": "Nog geen redacteuren. Nodig maximaal {free, plural, one {# persoon} other {# personen}} uit om samen met jou in Studio te schrijven en te publiceren."
+    },
+    "invites": {
+      "title": "Openstaande uitnodigingen",
+      "supportingText": "Elke uitnodiging bezet een plek tot de persoon lid wordt of jij hem intrekt.",
+      "count": "{count, plural, one {# uitnodiging} other {# uitnodigingen}}",
+      "invited": "Uitgenodigd op <time>{date}</time> · nog geen lid",
+      "invitedToday": "<time>Vandaag</time> uitgenodigd · nog geen lid",
+      "invitedWithRole": "Uitgenodigd op <time>{date}</time> · nog geen lid · {role}",
+      "invitedTodayWithRole": "<time>Vandaag</time> uitgenodigd · nog geen lid · {role}",
+      "studioAccess": "Begint zodra die lid wordt"
+    },
+    "studioAccess": {
+      "badge": {
+        "READY": "Klaar",
+        "INVITE_SENT": "Uitnodiging verstuurd",
+        "ACTIVATING": "Wordt ingesteld…",
+        "STALLED": "Vraagt aandacht",
+        "LOCKED": "Vergrendeld"
+      },
+      "hint": {
+        "INVITE_SENT": "Wacht tot de Studio-uitnodiging wordt geaccepteerd",
+        "ACTIVATING": "Geaccepteerd — bewerkrechten duren meestal een minuut",
+        "STALLED": "Na 3 dagen niet geaccepteerd, dus we controleren niet meer",
+        "LOCKED": "Boven de plekken van je abonnement"
+      },
+      "noAccess": "Geen Studio-toegang"
+    },
+    "inviteDialog": {
+      "title": "Een redacteur uitnodigen",
+      "notice": "Een redacteur kan alle content van de site in Studio bewerken, publiceren en verwijderen. Uiterlijk, instellingen en facturering kan die niet wijzigen.",
+      "emailLabel": "E-mailadres",
+      "emailHint": "We mailen een link om lid te worden. De uitnodiging bezet een plek tot de persoon lid wordt.",
+      "emailPlaceholder": "naam@voorbeeld.nl",
+      "cancel": "Annuleren",
+      "send": "Uitnodiging versturen",
+      "sending": "Versturen…",
+      "sent": "Uitnodiging verstuurd naar {email}.",
+      "failed": "De uitnodiging kon niet worden verstuurd — probeer het opnieuw.",
+      "fieldError": {
+        "EMAIL_INVALID": "Voer een e-mailadres in, zoals naam@voorbeeld.nl.",
+        "ALREADY_MEMBER": "{email} zit al in het team.",
+        "ALREADY_INVITED": "{email} heeft al een openstaande uitnodiging.",
+        "SEAT_LIMIT": "Alle plekken van {plan} zijn in gebruik."
+      }
+    },
+    "remove": {
+      "trigger": "Verwijderen",
+      "triggerAriaLabel": "Verwijderen: {email}",
+      "title": "{email} verwijderen?",
+      "description": "De toegang tot het beheer van deze site en tot Studio vervalt meteen, en de plek komt vrij. De geschreven content blijft op de site staan.",
+      "keep": "Lid behouden",
+      "confirm": "Lid verwijderen",
+      "confirming": "Verwijderen…",
+      "done": "{email} is verwijderd. De Studio-toegang wordt ingetrokken.",
+      "gone": "{email} zit niet meer in het team.",
+      "failed": "{email} kon niet worden verwijderd — probeer het opnieuw.",
+      "self": "Je kunt jezelf niet uit het team verwijderen.",
+      "lastOwner": "Een site houdt altijd één eigenaar, dus {email} kan niet worden verwijderd."
+    },
+    "cancelInvite": {
+      "trigger": "Uitnodiging intrekken",
+      "triggerAriaLabel": "Uitnodiging intrekken voor {email}",
+      "title": "Uitnodiging aan {email} intrekken?",
+      "description": "De link in de e-mail werkt dan niet meer en de plek komt vrij. Je kunt de persoon later opnieuw uitnodigen.",
+      "keep": "Uitnodiging behouden",
+      "confirm": "Uitnodiging intrekken",
+      "confirming": "Intrekken…",
+      "done": "De uitnodiging aan {email} is ingetrokken.",
+      "gone": "Die uitnodiging staat niet meer open.",
+      "failed": "De uitnodiging kon niet worden ingetrokken — probeer het opnieuw."
+    }
   }
 }

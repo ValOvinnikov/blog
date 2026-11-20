@@ -1,4 +1,5 @@
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import { STUDIO_ACCESS } from '@shinefold/config/constants';
 import type { TValueOf } from '@shinefold/config/utils';
 import {
   MEMBERSHIP_INVITE_OUTCOME,
@@ -44,3 +45,24 @@ export const TEAM_ACCESS_LOG = {
   CANCEL_AUDIT_FAILED: 'team_access.cancel_audit_failed',
   ACCESS_REQUEST_FAILED: 'team_access.access_request_failed',
 } as const;
+
+export const TEAM_ROW_ACCESS = {
+  ...STUDIO_ACCESS,
+  LOCKED: 'LOCKED',
+  NO_ACCESS: 'NO_ACCESS',
+} as const;
+
+export type TTeamRowAccess = TValueOf<typeof TEAM_ROW_ACCESS>;
+
+export const TEAM_COLUMN = {
+  PERSON: 'PERSON',
+  ROLE: 'ROLE',
+  ACCESS: 'ACCESS',
+  ACTIONS: 'ACTIONS',
+} as const;
+
+export const TEAM_MEMBERS_HEADING_ID = 'team-members-heading';
+
+export const TEAM_INVITES_HEADING_ID = 'team-invites-heading';
+
+export const TEAM_SEAT_NOTICE_ID = 'team-seat-notice';

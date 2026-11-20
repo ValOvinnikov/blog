@@ -23,9 +23,8 @@ export const CONFIGURATION_KEYS = [
   'signIn',
   'email',
   'subscribers',
-  'team',
 ];
-export const COMING_SOON_KEYS = ['subscribers', 'team'];
+export const COMING_SOON_KEYS = ['subscribers'];
 export const ALWAYS_AVAILABLE_KEYS = [
   'look',
   'voice',

@@ -30,7 +30,8 @@
     "billing": "Billing · Admin",
     "upgrade": "Upgrade",
     "help": "Help",
-    "draftPreview": "Draft preview"
+    "draftPreview": "Draft preview",
+    "team": "Team"
   },
   "signInPage": {
     "heading": "Sign in",
@@ -1561,7 +1562,7 @@
       "STALLED": "Your Studio invite hasn't been accepted"
     },
     "description": {
-      "INVITE_SENT": "Studio runs on Sanity, so you need a free Sanity account to edit. We've emailed you an invite from Sanity: accept it, and Studio opens here once your access is confirmed.",
+      "INVITE_SENT": "Studio runs on Sanity, so you need a free Sanity account to edit. We've emailed you a Studio invite: accept it, and Studio opens here once your access is confirmed.",
       "ACTIVATING": "You've accepted the invite. We're giving your account editing rights, which usually takes a minute.",
       "STALLED": "The invite was sent more than three days ago and hasn't been accepted, so we've stopped checking. Resend it for a fresh one, or check now if you've just accepted it."
     },
@@ -1571,7 +1572,11 @@
     "resending": "Sending…",
     "checkStarted": "Checking your access now. Refresh in a minute to see the result.",
     "inviteResent": "A new invite is on its way to your inbox.",
-    "requestFailed": "Couldn't reach the setup service — try again."
+    "requestFailed": "Couldn't reach the setup service — try again.",
+    "checkStartedFor": "Checking {email}'s Studio access now. Refresh in a minute to see the result.",
+    "inviteResentTo": "A new Studio invite is on its way to {email}.",
+    "checkNowAriaLabel": "Check now for {email}",
+    "resendInviteAriaLabel": "Resend invite to {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Tenant details",
@@ -2542,5 +2547,101 @@
     "expiryShortened": "The current language grant runs longer. Pick a later expiry, or revoke that grant first.",
     "includedInPlan": "This is already included in the tenant's plan.",
     "grantNotOpen": "This grant was already removed or has ended."
+  },
+  "teamPage": {
+    "title": "Team",
+    "description": "The people who write and publish this site's content with you in Studio.",
+    "seatsUsed": "{used} of {seats, plural, one {# seat} other {# seats}} used",
+    "inviteEditor": "Invite editor",
+    "seatLimitTitle": "Every seat is in use",
+    "seatLimitBody": "{plan} includes {seats, plural, one {# seat} other {# seats}}. Remove a member or cancel an invite to invite someone else.",
+    "thisMember": "this member",
+    "columnPerson": "Person",
+    "columnRole": "Role",
+    "columnStudioAccess": "Studio access",
+    "columnActions": "Actions",
+    "members": {
+      "title": "Members",
+      "count": "{count, plural, one {# person} other {# people}}",
+      "empty": "No one has joined this site yet.",
+      "you": "(you)",
+      "noEmail": "No email on file",
+      "joined": "Joined <time>{date}</time>",
+      "joinedToday": "Joined <time>today</time>",
+      "joinedWithRole": "Joined <time>{date}</time> · {role}",
+      "joinedTodayWithRole": "Joined <time>today</time> · {role}",
+      "noEditorsNoFreeSeats": "No editors yet. Every free seat is held by a pending invite.",
+      "noEditors": "No editors yet. Invite up to {free, plural, one {# person} other {# people}} to write and publish in Studio with you."
+    },
+    "invites": {
+      "title": "Pending invites",
+      "supportingText": "Each takes a seat until they join or you cancel it.",
+      "count": "{count, plural, one {# invite} other {# invites}}",
+      "invited": "Invited <time>{date}</time> · hasn't joined yet",
+      "invitedToday": "Invited <time>today</time> · hasn't joined yet",
+      "invitedWithRole": "Invited <time>{date}</time> · hasn't joined yet · {role}",
+      "invitedTodayWithRole": "Invited <time>today</time> · hasn't joined yet · {role}",
+      "studioAccess": "Starts once they join"
+    },
+    "studioAccess": {
+      "badge": {
+        "READY": "Ready",
+        "INVITE_SENT": "Invite sent",
+        "ACTIVATING": "Setting up…",
+        "STALLED": "Needs attention",
+        "LOCKED": "Locked"
+      },
+      "hint": {
+        "INVITE_SENT": "Waiting for them to accept the Studio invite",
+        "ACTIVATING": "Accepted — editing rights usually take a minute",
+        "STALLED": "Not accepted in 3 days, so we stopped checking",
+        "LOCKED": "Over your plan's seats"
+      },
+      "noAccess": "No Studio access"
+    },
+    "inviteDialog": {
+      "title": "Invite an editor",
+      "notice": "An editor can edit, publish and delete all of the site's content in Studio. They can't change its look, settings or billing.",
+      "emailLabel": "Email address",
+      "emailHint": "We'll email them a link to join. The invite takes a seat until they join.",
+      "emailPlaceholder": "name@example.com",
+      "cancel": "Cancel",
+      "send": "Send invite",
+      "sending": "Sending…",
+      "sent": "Invite sent to {email}.",
+      "failed": "Couldn't send the invite — try again.",
+      "fieldError": {
+        "EMAIL_INVALID": "Enter an email address, like name@example.com.",
+        "ALREADY_MEMBER": "{email} is already on the team.",
+        "ALREADY_INVITED": "{email} already has an invite waiting.",
+        "SEAT_LIMIT": "Every seat on {plan} is in use."
+      }
+    },
+    "remove": {
+      "trigger": "Remove",
+      "triggerAriaLabel": "Remove {email}",
+      "title": "Remove {email}?",
+      "description": "They lose access to this site's admin and to Studio straight away, and their seat is freed. The content they wrote stays on the site.",
+      "keep": "Keep member",
+      "confirm": "Remove member",
+      "confirming": "Removing…",
+      "done": "{email} was removed. Their Studio access is being revoked.",
+      "gone": "{email} is no longer on the team.",
+      "failed": "Couldn't remove {email} — try again.",
+      "self": "You can't remove yourself from the team.",
+      "lastOwner": "A site always keeps one owner, so {email} can't be removed."
+    },
+    "cancelInvite": {
+      "trigger": "Cancel invite",
+      "triggerAriaLabel": "Cancel invite to {email}",
+      "title": "Cancel the invite to {email}?",
+      "description": "The link in their email stops working and the seat is freed. You can invite them again later.",
+      "keep": "Keep invite",
+      "confirm": "Cancel invite",
+      "confirming": "Cancelling…",
+      "done": "The invite to {email} was cancelled.",
+      "gone": "That invite is no longer pending.",
+      "failed": "Couldn't cancel the invite — try again."
+    }
   }
 }
