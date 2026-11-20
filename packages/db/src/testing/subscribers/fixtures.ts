@@ -35,7 +35,7 @@ export async function readTestSubscriber(
   );
 }
 
-export function mockConfirmedSubscriber(confirmedAt: Date) {
+function mockConfirmedSubscriber(confirmedAt: Date) {
   return { status: SUBSCRIBER_STATUS.ACTIVE, confirmedAt };
 }
 
