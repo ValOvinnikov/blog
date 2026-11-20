@@ -35,6 +35,7 @@ export const setupLookForm = customRender(LookForm, {
   isOperator: false,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   hasReaderAccounts: true,
+  hasBookmarks: true,
   hasCookieBanner: true,
 });
 

@@ -19,6 +19,7 @@ export type TSampleHeaderControlsProps = IWithClassName & {
   liveLocales: readonly TLocaleIsoCode[];
   header: TSampleHeaderStyle;
   hasReaderAccounts: boolean;
+  hasBookmarks: boolean;
   isSignedIn: boolean;
   isDark: boolean;
   shouldAlwaysShowLanguageSwitcher: boolean;
@@ -28,6 +29,7 @@ export const SampleHeaderControls = ({
   liveLocales,
   header: { layout, languageSwitcherStyle, account },
   hasReaderAccounts,
+  hasBookmarks,
   isSignedIn,
   isDark,
   shouldAlwaysShowLanguageSwitcher,
@@ -55,6 +57,7 @@ export const SampleHeaderControls = ({
         <SampleAccountControl
           account={account}
           appearance={account.buttonStyle}
+          hasBookmarks={hasBookmarks}
           isSignedIn={isSignedIn}
         />
       )}

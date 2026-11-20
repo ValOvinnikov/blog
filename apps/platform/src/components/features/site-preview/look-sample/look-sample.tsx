@@ -32,7 +32,7 @@ import { lookSampleVariants } from './look-sample-variants';
 
 export type TLookSampleHeaderState = Pick<
   TSampleSiteHeaderProps,
-  'hasReaderAccounts' | 'shouldAlwaysShowLanguageSwitcher'
+  'hasReaderAccounts' | 'hasBookmarks' | 'shouldAlwaysShowLanguageSwitcher'
 > &
   Partial<Pick<TSampleSiteHeaderProps, 'isSignedIn' | 'isSubmenuOpen'>>;
 
@@ -55,6 +55,7 @@ export const LookSample = ({
   busy,
   headerState: {
     hasReaderAccounts,
+    hasBookmarks,
     isSignedIn = false,
     isSubmenuOpen = false,
     shouldAlwaysShowLanguageSwitcher = false,
@@ -75,6 +76,7 @@ export const LookSample = ({
         liveLocales={liveLocales}
         header={header}
         hasReaderAccounts={hasReaderAccounts}
+        hasBookmarks={hasBookmarks}
         isSignedIn={isSignedIn}
         isDark={theme.isDark}
         isSubmenuOpen={isSubmenuOpen}

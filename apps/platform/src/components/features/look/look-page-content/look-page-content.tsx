@@ -54,6 +54,7 @@ export const LookPageContent = async ({
         hasReaderAccounts={enabledCapabilities.includes(
           CAPABILITY.READER_ACCOUNTS,
         )}
+        hasBookmarks={enabledCapabilities.includes(CAPABILITY.BOOKMARKS)}
         hasCookieBanner={enabledCapabilities.includes(
           CAPABILITY.CONSENT_BANNER,
         )}

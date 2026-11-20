@@ -94,6 +94,7 @@ const SUBSCRIBE_BUTTONS_OUTSIDE_BANDS = 3;
 const {
   accountHeading: ACCOUNT,
   accountMenuAriaLabel: ACCOUNT_MENU,
+  myBookmarks: MY_BOOKMARKS,
   myBookmarksDescription: BOOKMARKS_DESCRIPTION,
   signOut: SIGN_OUT,
   footerArchive: ARCHIVE,
@@ -144,7 +145,7 @@ const LOOK_SAMPLE_PROPS: TLookSampleProps = {
   header: MOCK_SAMPLE_HEADER_STYLE,
   footer: MOCK_FOOTER,
   busy: MOCK_BUSY,
-  headerState: { hasReaderAccounts: true },
+  headerState: { hasReaderAccounts: true, hasBookmarks: true },
 };
 
 const setup = customRender(LookSample, LOOK_SAMPLE_PROPS);
@@ -531,6 +532,25 @@ describe(`<${LookSample.name}/>`, () => {
         );
 
         expect(Boolean(description)).toBe(hasDescriptions);
+      },
+    );
+
+    it.each([
+      { hasBookmarks: true, isListed: true },
+      { hasBookmarks: false, isListed: false },
+    ])(
+      'lists My bookmarks in the account menu only with Bookmarks on ($hasBookmarks)',
+      ({ hasBookmarks, isListed }) => {
+        setup({
+          headerState: withHeaderState({ isSignedIn: true, hasBookmarks }),
+        });
+
+        const accountMenu = withinFullHeader().getByRole('menu', {
+          name: ACCOUNT_MENU,
+        });
+        const bookmarks = within(accountMenu).queryByText(MY_BOOKMARKS);
+
+        expect(Boolean(bookmarks)).toBe(isListed);
       },
     );
 

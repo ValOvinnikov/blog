@@ -11,12 +11,14 @@ import { sampleAccountControlVariants } from './sample-account-control-variants'
 export type TSampleAccountControlProps = {
   account: IAccountControl;
   appearance: TAccountButtonStyle;
+  hasBookmarks: boolean;
   isSignedIn: boolean;
 };
 
 export const SampleAccountControl = ({
   account: { panelStyle },
   appearance,
+  hasBookmarks,
   isSignedIn,
 }: TSampleAccountControlProps) => {
   const t = useTranslations('lookPreview');
@@ -46,11 +48,13 @@ export const SampleAccountControl = ({
             ariaLabel: t('accountMenuAriaLabel'),
           }}
           links={{
-            bookmarks: {
-              href: SAMPLE_LINK_HREF,
-              label: t('myBookmarks'),
-              description: t('myBookmarksDescription'),
-            },
+            ...(hasBookmarks && {
+              bookmarks: {
+                href: SAMPLE_LINK_HREF,
+                label: t('myBookmarks'),
+                description: t('myBookmarksDescription'),
+              },
+            }),
             settings: {
               href: SAMPLE_LINK_HREF,
               label: t('accountSettings'),

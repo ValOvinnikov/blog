@@ -115,6 +115,7 @@ export const OnboardingPreview = ({
             busy={toSampleBusyStyle(look)}
             headerState={{
               hasReaderAccounts: false,
+              hasBookmarks: false,
               shouldAlwaysShowLanguageSwitcher: true,
             }}
           />

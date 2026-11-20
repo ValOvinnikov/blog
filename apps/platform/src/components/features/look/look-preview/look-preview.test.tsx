@@ -9,6 +9,7 @@ import {
   PREVIEW_FRAME_STATUS_TEST_ID,
 } from '@platform/constants/preview';
 import { SAMPLE_COOKIE_BUTTON_TEST_ID } from '@platform/constants/sample-footer';
+import { SAMPLE_HEADER_FULL_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_PRESSED } from '@platform/testing/aria';
 import { act, screen, within } from '@platform/testing/custom-render';
@@ -133,6 +134,30 @@ describe(`<${LookPreview.name}/>`, () => {
     expect(readerGroup).not.toBeInTheDocument();
     expect(statusText).toHaveTextContent(LOOK_PREVIEW.readerAccountsOff);
   });
+
+  it.each([
+    { hasBookmarks: true, isListed: true },
+    { hasBookmarks: false, isListed: false },
+  ])(
+    'lists My bookmarks in the signed-in sample only with Bookmarks on ($hasBookmarks)',
+    async ({ hasBookmarks, isListed }) => {
+      renderPreview({ hasBookmarks });
+      const signedInButton = screen.getByRole('button', {
+        name: LOOK_PREVIEW.readerSignedIn,
+      });
+      await user.click(signedInButton);
+
+      const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
+      const accountMenu = within(fullHeader).getByRole('menu', {
+        name: LOOK_PREVIEW.accountMenuAriaLabel,
+      });
+      const bookmarks = within(accountMenu).queryByText(
+        LOOK_PREVIEW.myBookmarks,
+      );
+
+      expect(Boolean(bookmarks)).toBe(isListed);
+    },
+  );
 
   it.each([
     { target: STYLE_TARGET, hasLockedFields: false },

@@ -29,6 +29,7 @@ export type TSampleSiteHeaderProps = {
   liveLocales: readonly TLocaleIsoCode[];
   header: TSampleHeaderStyle;
   hasReaderAccounts: boolean;
+  hasBookmarks: boolean;
   isSignedIn: boolean;
   isDark: boolean;
   isSubmenuOpen: boolean;
@@ -41,6 +42,7 @@ export const SampleSiteHeader = ({
   liveLocales,
   header,
   hasReaderAccounts,
+  hasBookmarks,
   isSignedIn,
   isDark,
   isSubmenuOpen,
@@ -84,6 +86,7 @@ export const SampleSiteHeader = ({
             liveLocales={liveLocales}
             header={header}
             hasReaderAccounts={hasReaderAccounts}
+            hasBookmarks={hasBookmarks}
             isSignedIn={isSignedIn}
             isDark={isDark}
             shouldAlwaysShowLanguageSwitcher={shouldAlwaysShowLanguageSwitcher}
@@ -95,6 +98,7 @@ export const SampleSiteHeader = ({
         brand={{ name, logoSrc }}
         account={account}
         hasReaderAccounts={hasReaderAccounts}
+        hasBookmarks={hasBookmarks}
         isSignedIn={isSignedIn}
         isBrandLarge={isEdgeToEdge}
         className={bar()}

@@ -39,6 +39,7 @@ export type TLookFormProps = {
   isOperator: boolean;
   liveLocales: readonly TLocaleIsoCode[];
   hasReaderAccounts: boolean;
+  hasBookmarks: boolean;
   hasCookieBanner: boolean;
   savedAt?: Date;
 };
@@ -55,6 +56,7 @@ export const LookForm = ({
   isOperator,
   liveLocales,
   hasReaderAccounts,
+  hasBookmarks,
   hasCookieBanner,
   savedAt,
 }: TLookFormProps) => {
@@ -134,6 +136,7 @@ export const LookForm = ({
               <LookPreview
                 liveLocales={liveLocales}
                 hasReaderAccounts={hasReaderAccounts}
+                hasBookmarks={hasBookmarks}
                 hasCookieBanner={hasCookieBanner}
                 siteHost={siteHost}
                 followTarget={toLookFollowTarget(

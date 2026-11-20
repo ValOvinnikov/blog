@@ -20,6 +20,7 @@ export type TSampleHeaderBarProps = IWithClassName & {
   brand: { name: string; logoSrc: TMaybeUndefined<string> };
   account: IAccountControl;
   hasReaderAccounts: boolean;
+  hasBookmarks: boolean;
   isSignedIn: boolean;
   isBrandLarge: boolean;
 };
@@ -28,6 +29,7 @@ export const SampleHeaderBar = ({
   brand: { name, logoSrc },
   account,
   hasReaderAccounts,
+  hasBookmarks,
   isSignedIn,
   isBrandLarge,
   className,
@@ -55,6 +57,7 @@ export const SampleHeaderBar = ({
           <SampleAccountControl
             account={account}
             appearance={ACCOUNT_BUTTON_STYLE.CIRCLE}
+            hasBookmarks={hasBookmarks}
             isSignedIn={isSignedIn}
           />
         )}
