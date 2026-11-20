@@ -134,6 +134,7 @@
     "emailInvalid": "Saisissez une adresse e-mail valide.",
     "sendLimited": "Trop de liens de connexion ont été demandés pour cette adresse. Réessayez dans une heure.",
     "oauthError": "La connexion a échoué. Veuillez réessayer.",
+    "oauthAccountNotLinked": "Cette adresse se connecte déjà autrement. Connectez-vous comme la dernière fois.",
     "accountMenuAriaLabel": "Menu du compte",
     "signOut": "Se déconnecter",
     "loadingAccountStatus": "Chargement de l'état du compte",

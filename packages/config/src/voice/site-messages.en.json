@@ -134,6 +134,7 @@
     "emailInvalid": "Enter a valid email address.",
     "sendLimited": "Too many sign-in links were requested for this address. Try again in an hour.",
     "oauthError": "Sign-in failed. Please try again.",
+    "oauthAccountNotLinked": "This email already signs in another way. Sign in the way you did last time.",
     "accountMenuAriaLabel": "Account menu",
     "signOut": "Sign out",
     "loadingAccountStatus": "Loading account status",

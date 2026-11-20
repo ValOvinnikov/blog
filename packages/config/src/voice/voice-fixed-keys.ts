@@ -1,3 +1,4 @@
+import { AUTH_MENU_VOICE_FIXED_KEYS } from './voice-fixed-keys-auth-menu';
 import { CONSENT_VOICE_FIXED_KEYS } from './voice-fixed-keys-consent';
 import { COOKIE_LIST_VOICE_FIXED_KEYS } from './voice-fixed-keys-cookie-list';
 import { PRICING_VOICE_FIXED_KEYS } from './voice-fixed-keys-pricing';
@@ -8,6 +9,7 @@ import { PRICING_VOICE_FIXED_KEYS } from './voice-fixed-keys-pricing';
  * neither this list nor `VOICE_FIELDS`.
  */
 export const VOICE_FIXED_KEYS = [
+  ...AUTH_MENU_VOICE_FIXED_KEYS,
   ...CONSENT_VOICE_FIXED_KEYS,
   ...COOKIE_LIST_VOICE_FIXED_KEYS,
   ...PRICING_VOICE_FIXED_KEYS,
@@ -33,9 +35,6 @@ export const VOICE_FIXED_KEYS = [
   'siteFooter.groupsAriaLabel',
   'siteFooter.finePrintAriaLabel',
   'siteFooter.poweredByLabel',
-  'authMenu.emailAriaLabel',
-  'authMenu.accountMenuAriaLabel',
-  'authMenu.loadingAccountStatus',
   'toastProvider.viewportAriaLabel',
   'toastProvider.dismissLabel',
   'bookmarkButton.saveAriaLabel',
@@ -135,31 +134,6 @@ export const VOICE_FIXED_KEYS = [
   'newsletterUnsubscribe.errorTitle',
   'newsletterUnsubscribe.errorMessage',
   'newsletterUnsubscribe.returnHome',
-
-  'authMenu.signIn',
-  'authMenu.signInHeading',
-  'authMenu.accountHeading',
-  'authMenu.continueWithGithub',
-  'authMenu.continueWithGoogle',
-  'authMenu.continuingWithGithub',
-  'authMenu.continuingWithGoogle',
-  'authMenu.or',
-  'authMenu.redirectHint',
-  'authMenu.emailPlaceholder',
-  'authMenu.sendSignInLink',
-  'authMenu.sending',
-  'authMenu.sentTitle',
-  'authMenu.sentMessage',
-  'authMenu.useDifferentEmail',
-  'authMenu.emailError',
-  'authMenu.emailInvalid',
-  'authMenu.sendLimited',
-  'authMenu.oauthError',
-  'authMenu.signOut',
-  'authMenu.myBookmarks',
-  'authMenu.myBookmarksDescription',
-  'authMenu.accountSettings',
-  'authMenu.accountSettingsDescription',
 
   'pagination.previous',
   'pagination.next',

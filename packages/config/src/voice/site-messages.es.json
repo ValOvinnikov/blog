@@ -134,6 +134,7 @@
     "emailInvalid": "Introduzca un correo electrónico válido.",
     "sendLimited": "Se han solicitado demasiados enlaces de inicio de sesión para esta dirección. Vuelva a intentarlo dentro de una hora.",
     "oauthError": "No se pudo iniciar sesión. Vuelva a intentarlo.",
+    "oauthAccountNotLinked": "Este correo ya inicia sesión de otra forma. Inicie sesión como lo hizo la última vez.",
     "accountMenuAriaLabel": "Menú de la cuenta",
     "signOut": "Cerrar sesión",
     "loadingAccountStatus": "Cargando el estado de la cuenta",

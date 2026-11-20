@@ -134,6 +134,7 @@
     "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
     "sendLimited": "Für diese Adresse wurden zu viele Anmeldelinks angefordert. Versuchen Sie es in einer Stunde erneut.",
     "oauthError": "Die Anmeldung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "oauthAccountNotLinked": "Diese E-Mail-Adresse meldet sich bereits anders an. Melden Sie sich so an wie beim letzten Mal.",
     "accountMenuAriaLabel": "Kontomenü",
     "signOut": "Abmelden",
     "loadingAccountStatus": "Kontostatus wird geladen",

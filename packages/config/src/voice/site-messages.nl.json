@@ -134,6 +134,7 @@
     "emailInvalid": "Voer een geldig e-mailadres in.",
     "sendLimited": "Er zijn te veel inloglinks aangevraagd voor dit adres. Probeer het over een uur opnieuw.",
     "oauthError": "Inloggen mislukt. Probeer het opnieuw.",
+    "oauthAccountNotLinked": "Dit e-mailadres meldt zich al op een andere manier aan. Meld u aan zoals de vorige keer.",
     "accountMenuAriaLabel": "Accountmenu",
     "signOut": "Uitloggen",
     "loadingAccountStatus": "Accountstatus laden",

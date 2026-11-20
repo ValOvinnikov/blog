@@ -9,6 +9,7 @@ import {
 } from '@web/components/shared/reader-account-panel';
 import { ReaderSignInPanel } from '@web/components/shared/reader-sign-in-panel';
 import { SESSION_STATUS } from '@web/constants/session';
+import { AUTH_ERROR_TYPE } from '@web/constants/sign-in';
 import { ACCOUNT_OVERLAY_ID } from '@web/context/header-overlay-provider';
 import { useOAuthErrorParam } from '@web/hooks/use-oauth-error-param';
 import { usePopover } from '@web/hooks/use-popover';
@@ -38,6 +39,10 @@ export const AuthMenu = ({
   const popover = usePopover({ overlayId: ACCOUNT_OVERLAY_ID });
   const { panel, reveal, errorNotice } = authMenuVariants();
   useSignedInHint(status, expires);
+  const oauthErrorMessage =
+    oauthError === AUTH_ERROR_TYPE.OAUTH_ACCOUNT_NOT_LINKED
+      ? t('oauthAccountNotLinked')
+      : t('oauthError');
 
   if (status === SESSION_STATUS.LOADING) {
     return (
@@ -79,7 +84,7 @@ export const AuthMenu = ({
         )}
         {!user && Boolean(oauthError) && !popover.open && (
           <p role="alert" className={errorNotice()}>
-            {t('oauthError')}
+            {oauthErrorMessage}
           </p>
         )}
       </PopoverMenu>
