@@ -8,13 +8,7 @@
   // (e.g. gate-bypass-guard.sh execs gate-bypass-guard.js), never imported
   // from TS/JS source — invisible to knip's import graph the same way the
   // *.sh hooks already are (knip doesn't scan shell files at all).
-  //
-  // TODO(#7169): drop the shared Dialog entry once the Team page imports it.
-  "ignore": [
-    "docs/design-reference/**",
-    ".claude/hooks/*.js",
-    "apps/platform/src/components/shared/dialog/index.ts"
-  ],
+  "ignore": ["docs/design-reference/**", ".claude/hooks/*.js"],
   // Root devDependency needed for prettier-plugin-tailwindcss to resolve at
   // runtime for any workspace's Prettier invocation (apps/web is the only
   // config that imports it); nothing in source imports it directly, so

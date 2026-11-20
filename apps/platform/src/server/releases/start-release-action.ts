@@ -6,9 +6,7 @@ import {
   RELEASE_OVERRIDE_REASON_MAX_LENGTH,
   RELEASE_REFUSAL,
   type TReleaseFieldError,
-  RELEASE_LOG,
 } from '@platform/constants/release';
-import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import {
   isReleaseOverrideRequired,
@@ -16,15 +14,13 @@ import {
 } from '@platform/utils/release-state/release-state';
 import {
   ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
   RELEASE_CHANGE,
   type TActionResult,
 } from '@shinefold/config';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
-import { dispatchReleaseWorkflow } from './dispatch-release-workflow';
+import { dispatchAuditedRelease } from './dispatch-audited-release';
 import { getCandidateComparison } from './get-candidate-comparison';
 import { getReleaseRun } from './get-release-run';
 import { releaseVersionError } from './release-version-error';
@@ -51,7 +47,6 @@ export type TStartReleaseResult = TActionResult<
   | typeof RELEASE_REFUSAL.RELEASES_PAUSED
 >;
 
-/** The audit events attest the dispatch request, not the workflow's outcome. */
 export const startReleaseAction = async (
   input: TStartReleaseInput,
 ): Promise<TStartReleaseResult> => {
@@ -112,29 +107,14 @@ export const startReleaseAction = async (
     };
   }
 
-  const isDispatched = await dispatchReleaseWorkflow({ version, isOverride });
-  if (!isDispatched) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
-
-  await recordAuditEvent({
-    logEvent: RELEASE_LOG.RELEASE_AUDIT_FAILED,
-    action: AUDIT_ACTION.RELEASE_STARTED,
-    targetType: AUDIT_TARGET_TYPE.RELEASE,
-    targetId: version,
-    details: { headSha, isOverride },
+  const isDispatched = await dispatchAuditedRelease({
+    version,
+    headSha,
+    isOverride,
+    contrastStatus: contrastStatus.data,
+    overrideReason,
   });
-  if (isOverride) {
-    await recordAuditEvent({
-      logEvent: RELEASE_LOG.RELEASE_OVERRIDE_AUDIT_FAILED,
-      action: AUDIT_ACTION.RELEASE_OVERRIDE,
-      targetType: AUDIT_TARGET_TYPE.RELEASE,
-      targetId: version,
-      details: {
-        headSha,
-        contrastStatus: contrastStatus.data,
-        reason: overrideReason,
-      },
-    });
-  }
+  if (!isDispatched) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
   return toOutcome(ACTION_OUTCOME.SUCCESS);
 };

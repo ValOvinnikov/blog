@@ -98,4 +98,16 @@ describe(resolveTenantPageAccess, () => {
 
     expect(billing).toBe(isOpen);
   });
+
+  it.each([
+    ['an owner on Growth', TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.OWNER, true],
+    ['an editor on Growth', TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.EDITOR, false],
+    ['a reader on Growth', TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.READER, false],
+    ['an owner on Starter', TENANT_PLAN.STARTER, MEMBERSHIP_ROLE.OWNER, false],
+    ['an owner on Free', TENANT_PLAN.FREE, MEMBERSHIP_ROLE.OWNER, false],
+  ])('opens Team to %s: %s', async (_label, plan, role, isOpen) => {
+    const { team } = await resolveFor(plan, role);
+
+    expect(team).toBe(isOpen);
+  });
 });

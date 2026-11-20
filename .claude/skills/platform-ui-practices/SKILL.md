@@ -625,7 +625,9 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
   column for screen readers, empty cells not rendered). A stacked table
   passes each `Cell` its `column` key and keeps a conditional cell at the
   `Cell` level (`{x && <Cell>}`), since a cell holding a component that
-  renders `null` is not empty); one that sorts from its head row never does.
+  renders `null` is not empty; a cell whose value moves elsewhere in the
+  stacked row takes `isHiddenWhenStacked`); one that sorts from its head row
+  never does.
   `DataTableShell` and `DetailList` own all of this; never add it per page.
 - A Desktop/Mobile preview toggle is offered only where it changes what renders;
   an email's Desktop preview is a real 600px frame.

@@ -55,6 +55,8 @@ Every email the product sends is built and sent by `@shinefold/email`. Tenant-fa
 - `EMAIL_TEMPLATE_TYPE`: `MAGIC_LINK`, `TENANT_INVITE`, `NEWSLETTER_CONFIRMATION`. Product default copy per language is `EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE` in `@shinefold/db`.
 - Logos are uploaded to Vercel Blob (PNG, JPEG or GIF, at most 100 KB), each upload under a unique name; a replaced or cleared logo's old blob is deleted best-effort.
 - The tenant palette is derived from the tenant's Look (`site_config`) at send time.
+- `@shinefold/config` resolves the tenant palette to literal hex in two modes from the same input: `resolveTenantEmailBrand` (light ramps) and `resolveTenantEmailDarkBrand` (dark neutral, accent and logo ramps). Both apply the accent-hue guard, so an accent hue that fails AA in either mode falls back to the preset's hue in both.
+- `EMAIL_FONT_STACK` (`@shinefold/config`) maps each `FONT_CHOICE` to an email font stack: the font's name, then a web-safe fallback — serif (Newsreader, Fraunces) `Georgia, serif`; sans (Space Grotesk, Inter) `Arial, Helvetica, sans-serif`; mono (JetBrains Mono) `'Courier New', monospace`. Stacks quote with single quotes only, because builders embed them in a double-quoted `style` attribute.
 
 ## Configuration
 
@@ -98,6 +100,7 @@ Every email the product sends is built and sent by `@shinefold/email`. Tenant-fa
 - `packages/email/src/html/tenant-shell/tenant-shell.ts`, `platform-shell/platform-shell.ts`, `operator-shell/operator-shell.ts`, `neutral-shell/neutral-shell.ts`, `email-layout/email-layout.ts`, `email-header/email-header.ts`, `platform-email-brand/platform-email-brand.ts`, `email-action/email-action.ts`
 - `packages/email/src/templates/tenant/**`, `packages/email/src/templates/operator/**`, `packages/email/src/templates/owner/**`
 - `packages/email/src/portable-text/serialize-portable-text.ts`
+- `packages/config/src/theme/resolve-tenant-email-brand.ts`, `packages/config/src/constants/email-font-stack.ts`
 - `packages/auth/src/providers/magic-link/magic-link-provider/magic-link-provider.ts`, `resolve-magic-link-email-settings/resolve-magic-link-email-settings.ts`
 - `apps/web/src/app/api/email-delivery-events/route.ts`
 - `apps/web/src/server/newsletter/newsletter-actions/newsletter-actions.ts`, `apps/web/src/utils/resolve-tenant-email-identity/resolve-tenant-email-identity.ts`

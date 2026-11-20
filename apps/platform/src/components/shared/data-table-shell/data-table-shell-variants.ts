@@ -66,5 +66,8 @@ export const dataTableShellVariants = tv({
     hasWidths: {
       true: { table: ['md:table-fixed'] },
     },
+    isHiddenWhenStacked: {
+      true: { cell: ['max-md:group-data-stacked/table:hidden'] },
+    },
   },
 });

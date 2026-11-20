@@ -1,6 +1,7 @@
 import type { TSidebarNavItem } from '@platform/components/features/layout/sidebar';
 import type { TRegisteredIconName } from '@platform/components/shared/icon';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
+import { isPendingStudioAccess } from '@platform/utils/pending-studio-access/pending-studio-access';
 import { ownerStudioAccessTone } from '@platform/utils/status-tone/status-tone';
 import { ICONS } from '@shinefold/config';
 import {
@@ -18,9 +19,6 @@ const STUDIO_ACCESS_LINE_ICON: Record<
   [STUDIO_ACCESS.STALLED]: ICONS.WARNING,
 };
 
-const isPending = (access?: TStudioAccess): access is TPendingStudioAccess =>
-  !!access && access !== STUDIO_ACCESS.READY;
-
 export const studioNavItem = (
   t: TLooseTranslator,
   href: string,
@@ -29,7 +27,7 @@ export const studioNavItem = (
   label: t('studio'),
   icon: ICONS.STUDIO,
   href,
-  ...(isPending(access) && {
+  ...(isPendingStudioAccess(access) && {
     status: {
       text: t(`studioAccessLine.${access}`),
       icon: STUDIO_ACCESS_LINE_ICON[access],
