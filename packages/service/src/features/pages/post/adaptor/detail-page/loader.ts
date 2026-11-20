@@ -1,4 +1,5 @@
 import type { TMaybeUndefined } from '@shinefold/config';
+import { SANITY_PERSPECTIVE } from '@shinefold/config/constants';
 import { isr } from '@shinefold/service/sanity/query/isr';
 import {
   runQuery,
@@ -15,7 +16,10 @@ export async function getPost(
   tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TPostDetail>> {
   const raw = await runQuery(postPageQuery, {
-    parameters: { slug },
+    parameters: {
+      slug,
+      isDraftPreview: tenant.perspective === SANITY_PERSPECTIVE.DRAFTS,
+    },
     tenant,
     ...isr(
       ['page_post', 'author', 'topic', 'tag', ...LINK_TARGET_CACHE_TAGS],
