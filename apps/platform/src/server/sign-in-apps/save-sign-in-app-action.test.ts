@@ -8,6 +8,7 @@ import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { mockGrowthOwnerContext } from '@platform/testing/custom-domain/fixtures';
 import {
   mockMembership,
   mockMembershipContext,
@@ -16,7 +17,6 @@ import {
   MOCK_CLIENT_ID,
   MOCK_CLIENT_SECRET,
   MOCK_REPLACEMENT_CLIENT_ID,
-  mockGrowthOwnerContext,
   mockOAuthClient,
 } from '@platform/testing/sign-in-apps/fixtures';
 import {

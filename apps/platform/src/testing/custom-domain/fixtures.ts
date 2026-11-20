@@ -7,6 +7,7 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import type { TCustomDomainClaim } from '@shinefold/db/schema/custom-domain-claims';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 
@@ -41,6 +42,9 @@ export const mockOwnerContext = (
       ...overrides,
     }),
   );
+
+export const mockGrowthOwnerContext = (overrides: Partial<TTenant> = {}) =>
+  mockOwnerContext({ plan: TENANT_PLAN.GROWTH, ...overrides });
 
 export const mockTenantDomainRows = () =>
   [{ domain: MOCK_TENANT_DOMAIN }, { domain: MOCK_CUSTOM_DOMAIN }] as never;

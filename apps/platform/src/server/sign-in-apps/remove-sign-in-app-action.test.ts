@@ -5,8 +5,10 @@ import {
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
-import { mockOwnerContext } from '@platform/testing/custom-domain/fixtures';
-import { mockGrowthOwnerContext } from '@platform/testing/sign-in-apps/fixtures';
+import {
+  mockGrowthOwnerContext,
+  mockOwnerContext,
+} from '@platform/testing/custom-domain/fixtures';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,

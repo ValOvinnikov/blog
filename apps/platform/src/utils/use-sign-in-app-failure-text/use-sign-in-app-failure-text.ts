@@ -1,24 +1,16 @@
 'use client';
 
-import type { TSignInAppRefusal } from '@platform/constants/sign-in-apps';
-import {
-  isOutcomeRefused,
-  type ACTION_OUTCOME,
-  type TActionOutcome,
-  type TOutcome,
-  type TReasonedFailure,
-} from '@shinefold/config';
+import type { TRemoveSignInAppResult } from '@platform/server/sign-in-apps/remove-sign-in-app-action';
+import type { TSaveSignInAppResult } from '@platform/server/sign-in-apps/save-sign-in-app-action';
+import { isOutcomeRefused } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
-
-type TRefused = typeof ACTION_OUTCOME.REFUSED;
-
-type TSignInAppFailure =
-  | TOutcome<Exclude<TActionOutcome, TRefused>>
-  | (TOutcome<TRefused> & TReasonedFailure<TSignInAppRefusal>);
 
 export const useSignInAppFailureText = () => {
   const t = useTranslations('signInAppsPage');
 
-  return (result: TSignInAppFailure, fallback: string): string =>
+  return (
+    result: TSaveSignInAppResult | TRemoveSignInAppResult,
+    fallback: string,
+  ): string =>
     isOutcomeRefused(result) ? t(`refusal.${result.reason}`) : fallback;
 };
