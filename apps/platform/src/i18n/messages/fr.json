@@ -395,7 +395,33 @@
     "siteSetupNotStartedContactDescription": "Nous n'avons pas pu lancer la configuration de votre site. Demandez à votre contact plateforme de la lancer.",
     "siteSetupStart": "Lancer la configuration",
     "siteSetupStarting": "Lancement…",
-    "trialUpgrade": "Choisir une offre"
+    "trialUpgrade": "Choisir une offre",
+    "sampleContent": {
+      "title": "Contenu d’exemple",
+      "supportingText": "Votre site a démarré avec des pages, des sections et des liens d’exemple. Supprimez ceux que vous n’avez pas modifiés.",
+      "trigger": "Supprimer le contenu d’exemple",
+      "notWritable": "Le contenu d’exemple ne peut pas être supprimé tant que votre site est suspendu ou archivé.",
+      "dialogTitle": "Supprimer le contenu d’exemple ?",
+      "dialogDescription": "Les exemples que vous n’avez pas modifiés sont supprimés de votre site. Ceux que vous avez modifiés, ou que votre autre contenu utilise, sont conservés. Cette action est irréversible.",
+      "keep": "Conserver les exemples",
+      "confirm": "Supprimer les exemples",
+      "confirming": "Suppression des exemples…",
+      "failed": "Les exemples n’ont pas pu être supprimés. Réessayez.",
+      "done": "{count, plural, =0 {Aucun exemple à supprimer.} one {# exemple supprimé.} other {# exemples supprimés.}}",
+      "nothingKept": "Aucun exemple n’a été conservé.",
+      "keptEditedTitle": "Conservés, car vous les avez modifiés",
+      "keptReferencedTitle": "Conservés, car un autre contenu les utilise",
+      "kind": {
+        "section": "Section",
+        "page": "Page",
+        "post": "Article",
+        "template": "Modèle de page",
+        "link": "Lien de navigation",
+        "author": "Auteur",
+        "topic": "Thème",
+        "other": "Exemple"
+      }
+    }
   },
   "getStartedCard": {
     "title": "Premiers pas",
@@ -1843,6 +1869,7 @@
     "goToFirstField": "Aller au premier",
     "notSaved": "Non enregistré",
     "notInPlan": "Votre site est sur la formule {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actuelle}}, qui n'inclut pas {items} : rien n'a été enregistré.",
+    "languagesNotInPlan": "Votre site est sur la formule {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actuelle}}, qui permet {limit, plural, one {# langue} other {# langues}} : {count, plural, one {{items} n'a pas été ajouté} other {{items} n'ont pas été ajoutés}}.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Annuler les modifications",
     "save": "Enregistrer les modifications",

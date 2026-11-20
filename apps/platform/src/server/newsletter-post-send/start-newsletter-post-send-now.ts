@@ -37,7 +37,7 @@ const enqueuePostSend = async (
   const response = await sendWorkerRequest(
     NEWSLETTER_POST_SEND_PATH,
     { tenantId, postId, claimedAt: claimedAt.toISOString() },
-    'WORKER_NEWSLETTER_ENQUEUE_SECRET',
+    { secretName: 'WORKER_NEWSLETTER_ENQUEUE_SECRET' },
   );
   if (isWorkerRequestFailure(response)) {
     const { failureEvent, failure } = response;

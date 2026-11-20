@@ -4,13 +4,10 @@ import type {
   Template_landing,
 } from '@shinefold/config/sanity/generated/types';
 
-import type {
-  TStarterDocument,
-  TStarterDocumentUnion,
-  TStarterPage,
-} from './starter-document';
+import type { TStarterDocumentUnion, TStarterPage } from './starter-document';
+import type { TStarterTemplate } from './starter-document-shape';
 import {
-  keyedReference,
+  moduleSlot,
   pageHeadingBlock,
   paragraphs,
   reference,
@@ -56,8 +53,8 @@ export function buildContentPage({
       _id: templateId,
       _type: 'template_landing',
       title: `${page.title} Template`,
-      modules: [keyedReference(bodyId)],
-    } satisfies TStarterDocument<Template_landing, 'title'>,
+      modules: [moduleSlot(bodyId, 'module_content')],
+    } satisfies TStarterTemplate<Template_landing>,
     {
       _id: pageId,
       _type: 'page_landing',

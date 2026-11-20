@@ -270,6 +270,23 @@ describe(buildStarterDocuments, () => {
     expect(missing).toEqual([]);
   });
 
+  it.each(STARTER_SITE_TYPES)(
+    'the %s site types every module slot as the module it references',
+    (siteType) => {
+      const documents = build(siteType);
+
+      const mismatched = documents.flatMap((document) =>
+        'modules' in document
+          ? (document.modules ?? []).flatMap(({ _type, _ref }) =>
+              byId(documents, _ref)?._type === _type ? [] : [_ref],
+            )
+          : [],
+      );
+
+      expect(mismatched).toEqual([]);
+    },
+  );
+
   it('the Blank home template has no hero and no modules', () => {
     const { hero, modules } = findByType(build(), 'template_home');
 

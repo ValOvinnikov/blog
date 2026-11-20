@@ -1,5 +1,3 @@
 export { SettingsFormShell } from './settings-form-shell';
-export {
-  useSettingsForm,
-  type TUseSettingsFormArgs,
-} from './use-settings-form';
+export type { TUseSettingsFormArgs } from './settings-form-types';
+export { useSettingsForm } from './use-settings-form';

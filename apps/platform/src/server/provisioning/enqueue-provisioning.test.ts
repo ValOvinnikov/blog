@@ -25,6 +25,7 @@ import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config';
 import {
   enqueueProvisioning,
   enqueueWorkerRequest,
+  sendWorkerRequest,
 } from './enqueue-provisioning';
 
 vi.mock('@platform/utils/env/env');
@@ -131,5 +132,55 @@ describe(enqueueProvisioning, () => {
       errorName: error.name,
     });
     expect(status).toBeNull();
+  });
+});
+
+describe(sendWorkerRequest, () => {
+  const MOCK_WORKER_BODY = { removed: [MOCK_TENANT_ID] };
+  const MOCK_TIMEOUT_MS = 60_000;
+  const MOCK_GATEWAY_PAGE = '<html>Bad gateway</html>';
+
+  const send = (options?: Parameters<typeof sendWorkerRequest>[2]) =>
+    sendWorkerRequest(PROVISION_PATH, { tenantId: MOCK_TENANT_ID }, options);
+
+  beforeEach(() => {
+    stubWorkerFetch(fetchMock);
+    fetchMock.mockResolvedValue(Response.json(MOCK_WORKER_BODY));
+  });
+
+  it('times the request out after the given limit', async () => {
+    const timeoutSpy = vi.spyOn(AbortSignal, 'timeout');
+
+    await send({ timeoutMs: MOCK_TIMEOUT_MS });
+
+    expect(timeoutSpy).toHaveBeenCalledExactlyOnceWith(MOCK_TIMEOUT_MS);
+  });
+
+  it('returns the status alone unless asked for the body', async () => {
+    const response = await send();
+
+    expect(response).toEqual({ status: HTTP_STATUS.OK });
+  });
+
+  it('returns the JSON body with its status when asked for it', async () => {
+    const response = await send({ readsBody: true });
+
+    expect(response).toEqual({
+      status: HTTP_STATUS.OK,
+      body: MOCK_WORKER_BODY,
+    });
+  });
+
+  it('keeps the status of an answer that is not JSON', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(MOCK_GATEWAY_PAGE, { status: HTTP_STATUS.BAD_GATEWAY }),
+    );
+
+    const response = await send({ readsBody: true });
+
+    expect(response).toEqual({
+      status: HTTP_STATUS.BAD_GATEWAY,
+      body: undefined,
+    });
   });
 });

@@ -7,12 +7,9 @@ import type {
 } from '@shinefold/config/sanity/generated/types';
 
 import type { TStarterCopy } from './copy/starter-copy';
-import type {
-  TStarterDocument,
-  TStarterDocumentUnion,
-  TStarterPage,
-} from './starter-document';
+import type { TStarterDocumentUnion, TStarterPage } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
+import type { TStarterTemplate } from './starter-document-shape';
 import { pageHeadingBlock, reference, seo, slug } from './starter-fields';
 
 const ids = STARTER_DOCUMENT_IDS;
@@ -26,7 +23,7 @@ export function buildBlogPages(
       _id: ids.BLOG_TOPIC_TEMPLATE,
       _type: 'template_topic',
       title: 'Topic Template',
-    } satisfies TStarterDocument<Template_topic, 'title'>,
+    } satisfies TStarterTemplate<Template_topic>,
     {
       _id: ids.BLOG_TOPIC_PAGE,
       _type: 'page_topic',
@@ -42,7 +39,7 @@ export function buildBlogPages(
       _id: ids.BLOG_ABOUT_TEMPLATE,
       _type: 'template_landing',
       title: 'About Template',
-    } satisfies TStarterDocument<Template_landing, 'title'>,
+    } satisfies TStarterTemplate<Template_landing>,
     {
       _id: ids.BLOG_ABOUT,
       _type: 'page_landing',

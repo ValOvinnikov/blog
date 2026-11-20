@@ -1,8 +1,10 @@
 import { LookForm } from '@platform/components/features/look/look-form/look-form';
 import type { TLookFormFeatures } from '@platform/components/features/look/look-form/look-form-features';
 import type { TLookFormTenant } from '@platform/components/features/look/look-form/look-form-tenant';
+import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
 import { customRender } from '@platform/testing/custom-render';
 import { MOCK_LOGO_URL } from '@platform/testing/site-config/fixtures';
+import { stubStagedImageUrl } from '@platform/testing/staged-image';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_DOMAIN,
@@ -14,6 +16,7 @@ import { defaultLookFormValues } from '@platform/utils/default-look-values/defau
 import { LOCALE_ISO_CODES } from '@shinefold/config';
 import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
+import userEvent from '@testing-library/user-event';
 
 const MOCK_LOOK_TENANT: TLookFormTenant = {
   id: MOCK_TENANT_ID,
@@ -60,3 +63,9 @@ export const setupArchived = (
     ...overrides,
     ...withLookTenant({ archivedAt: MOCK_ARCHIVED_AT, ...overrides.tenant }),
   });
+
+export const prepareBrandImageForm = () => {
+  vi.mocked(uploadBrandAssetAction).mockReset();
+  stubStagedImageUrl();
+  return userEvent.setup();
+};

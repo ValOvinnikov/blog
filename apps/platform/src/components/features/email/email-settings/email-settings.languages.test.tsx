@@ -4,24 +4,26 @@ import { MOCK_ADMIN_EMAIL } from '@platform/testing/admins/fixtures';
 import { screen, waitFor } from '@platform/testing/custom-render';
 import {
   BLANK_SENDER_INPUT,
-  chooseLanguage,
   cleanUpEmailSettings,
   ENGLISH,
   FRENCH,
-  getEditingPicker,
   MOCK_FRENCH_SUBJECT,
-  pickerText,
   prepareEmailSettings,
-  save,
   setupEmailSettings,
   SUBJECT_FRENCH,
   tForm,
   tSaveBar,
   tStatus,
-  typeFrenchSignInSubject,
   updateEmailConfigActionMock,
   updateEmailTemplateActionMock,
 } from '@platform/testing/email/email-settings';
+import {
+  chooseLanguage,
+  getEditingPicker,
+  pickerText,
+  save,
+  typeFrenchSignInSubject,
+} from '@platform/testing/email/email-settings-interactions';
 import { SEND_TEST_TO_ME } from '@platform/testing/email/fixtures';
 import { MOCK_EMAIL_DRAFT_SUBJECT } from '@platform/testing/email-draft';
 import type { mockRouterRefresh } from '@platform/testing/mock-router';

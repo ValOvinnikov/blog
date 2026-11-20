@@ -13,7 +13,8 @@ import type {
   Person,
 } from '@shinefold/config/sanity/generated/types';
 
-import type { TStarterDocument, TStarterModule } from './starter-document';
+import type { TStarterModule } from './starter-document';
+import type { TStarterDocument } from './starter-document-shape';
 import {
   localizedArticleBlocks,
   localizedString,
