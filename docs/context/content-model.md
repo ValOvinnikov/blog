@@ -562,10 +562,9 @@ registered only as `richText`'s body-array image member, so the layout
 choice can't leak into hero/avatar/OG/brand images), `seo` (`metaTitle`
 required, 30–60 characters; every other field optional and omitted from the
 page head when unset — there is no fallback) + `openGraph`,
-`proseText` / `richText`, `aside` (deep-dive block type registered in
-`richText`'s portable-text array; `kind` from `ASIDE_KIND`, required; `body`
-via `proseText`, required — part of the choose-your-depth reading feature,
-#957), `postTakeaways` (see `page_post` above), `layout`/`heroLayout` (all-optional
+`proseText` / `richText`, `aside` (block type registered in `richText`'s
+portable-text array and rendered inline; `kind` from `ASIDE_KIND`, required;
+`body` via `proseText`, required), `postTakeaways` (see `page_post` above), `layout`/`heroLayout` (all-optional
 fields, no defaults set at the schema level: `spacingTop`/`spacingBottom`
 (`SPACING_SCALE`), `containerWidth` (`CONTAINER_WIDTH`, `layout` only —
 `heroLayout` omits it, Hero's grid always manages its own width),

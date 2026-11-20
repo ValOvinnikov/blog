@@ -5,7 +5,6 @@ import {
 } from '@shinefold/service';
 import { Prose } from '@shinefold/ui/components/atoms/prose';
 import { Article } from '@shinefold/ui/components/organisms/article';
-import { PostSummaryCard } from '@web/components/features/post/post-summary-card';
 import { ContentsRailLayout } from '@web/components/shared/contents-rail-layout';
 import {
   createPostBodyOverride,
@@ -13,14 +12,16 @@ import {
 } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { POST_LOG } from '@web/constants/post';
 import { PostSummaryProvider } from '@web/context/post-summary-provider';
 import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
-import { ArticleBodyFocusTarget } from './components/article-body-focus-target';
-import { PostArticleActions } from './components/post-article-actions';
+import { ArticleBodyFocusTarget } from './components/article-body-focus-target/article-body-focus-target';
+import { PostArticleActions } from './components/post-article-actions/post-article-actions';
+import { PostSummaryCard } from './components/post-summary-card/post-summary-card';
 import { postArticleVariants } from './post-article-variants';
 
 export type TPostArticleProps = {
@@ -42,7 +43,7 @@ const AUTHOR_AVATAR_TRANSFORM: TImageTransformOptions = {
 
 export const PostArticle = async ({ slug }: TPostArticleProps) => {
   const result = await getPostPage(slug);
-  const post = guardPageLoaderResult(result, 'post_article.fetch_failed', {
+  const post = guardPageLoaderResult(result, POST_LOG.ARTICLE_FETCH_FAILED, {
     slug,
   });
   const {

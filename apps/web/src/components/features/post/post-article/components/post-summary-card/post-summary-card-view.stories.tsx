@@ -2,7 +2,7 @@ import { SITE_MESSAGES } from '@shinefold/config';
 import { Prose } from '@shinefold/ui/components/atoms/prose';
 import { Article } from '@shinefold/ui/components/organisms/article';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { PostSummaryButton } from '@web/components/features/post/post-summary-button';
+import { PostSummaryButton } from '@web/components/features/post/post-article/components/post-article-actions/components/post-summary-button/post-summary-button';
 import { PostSummaryProvider } from '@web/context/post-summary-provider';
 import {
   MOCK_POST_DETAIL,
@@ -21,6 +21,10 @@ const {
   readTime,
   readFullArticle,
 } = SITE_MESSAGES.blogPostPage.postSummary;
+
+const MOCK_FORMATTED_DATE = new Date(publishedAt).toLocaleDateString('en-GB', {
+  dateStyle: 'long',
+});
 
 const meta = {
   title: 'Features/Post/PostSummaryCardView',
@@ -45,7 +49,7 @@ const meta = {
           meta={{
             author: { name: author.name },
             publishedAt,
-            formattedDate: publishedAt,
+            formattedDate: MOCK_FORMATTED_DATE,
             readingTime: `${readingTimeMinutes} min read`,
             actions: <PostSummaryButton label={summaryLabel} />,
           }}

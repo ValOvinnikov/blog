@@ -47,7 +47,7 @@ A post is an article written in the Studio: a heading and lead, an optional hero
 - Editors write, schedule, feature and translate posts in the Studio. Posts are not plan-gated.
 - `featured` feeds the "newest featured" source of `module_heroBlog` and `module_postFeatured` (see [heroes](./heroes.md), [post-modules](./post-modules.md)).
 - Bookmark buttons appear only when the tenant has the bookmarks capability (see [plans-and-entitlements](./plans-and-entitlements.md)).
-- Fixed article strings (reading time, aside labels, depth toggle) are catalogue keys, not [Voice](./voice.md) fields.
+- Fixed article strings (reading time, aside labels, Summary card) are catalogue keys, not [Voice](./voice.md) fields.
 
 ## Constraints and invariants
 

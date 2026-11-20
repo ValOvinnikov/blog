@@ -3,6 +3,7 @@ import { SITE_MESSAGES } from '@shinefold/config';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
 import { service } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import { POST_LOG } from '@web/constants/post';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import {
   customRenderServerAsync,
@@ -139,7 +140,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await expect(setup()).rejects.toBe(MOCK_ERROR);
 
-    expect(logger.error).toHaveBeenCalledWith('blog_post_page.fetch_failed', {
+    expect(logger.error).toHaveBeenCalledWith(POST_LOG.PAGE_FETCH_FAILED, {
       slug: MOCK_POST_DETAIL.slug,
       error: MOCK_ERROR,
     });

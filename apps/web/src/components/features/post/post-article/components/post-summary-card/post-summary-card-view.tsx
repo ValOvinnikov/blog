@@ -5,8 +5,8 @@ import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { Prose } from '@shinefold/ui/components/atoms/prose';
 import { Text } from '@shinefold/ui/components/atoms/text';
 
-import { PostSummaryPanel } from './components/post-summary-panel';
-import { ReadFullArticleButton } from './components/read-full-article-button';
+import { PostSummaryPanel } from './components/post-summary-panel/post-summary-panel';
+import { ReadFullArticleButton } from './components/read-full-article-button/read-full-article-button';
 import { postSummaryCardVariants } from './post-summary-card-variants';
 
 export interface IPostSummaryCardViewProps {

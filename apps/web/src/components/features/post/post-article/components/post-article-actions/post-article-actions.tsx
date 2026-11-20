@@ -1,12 +1,12 @@
 import { routes } from '@shinefold/config';
 import { BookmarkButtonGate } from '@web/components/features/post/bookmark-button-gate';
-import { PostSummaryButton } from '@web/components/features/post/post-summary-button';
 import { PostShareLinks } from '@web/components/shared/post-share-links';
 import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import { getTranslations } from 'next-intl/server';
 
+import { PostSummaryButton } from './components/post-summary-button/post-summary-button';
 import { postArticleActionsVariants } from './post-article-actions-variants';
 
 export interface IPostArticleActionsProps {

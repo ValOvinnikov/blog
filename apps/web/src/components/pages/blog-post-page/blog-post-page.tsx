@@ -3,6 +3,7 @@ import { BlogPostingSchema } from '@web/components/features/post/blog-posting-sc
 import { PostArticle } from '@web/components/features/post/post-article';
 import { PostBreadcrumbs } from '@web/components/features/post/post-breadcrumbs';
 import { BackToTopButton } from '@web/components/shared/back-to-top-button';
+import { POST_LOG } from '@web/constants/post';
 import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
@@ -15,7 +16,7 @@ const s = blogPostPageVariants();
 
 export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
   const result = await getPostPage(slug);
-  const post = guardPageLoaderResult(result, 'blog_post_page.fetch_failed', {
+  const post = guardPageLoaderResult(result, POST_LOG.PAGE_FETCH_FAILED, {
     slug,
   });
   const { id, modules } = post;

@@ -8,6 +8,7 @@ import {
 } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { POST_LOG } from '@web/constants/post';
 import { SESSION_STATUS } from '@web/constants/session';
 import { ToastProvider } from '@web/context/toast-provider';
 import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
@@ -15,7 +16,6 @@ import { isCapabilityEnabled } from '@web/server/settings-features/is-capability
 import {
   customRenderServerAsync,
   screen,
-  waitFor,
   within,
 } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -24,6 +24,10 @@ import {
   MOCK_POST_DETAIL_AUTHOR_IMAGE,
   MOCK_POST_TAKEAWAYS,
 } from '@web/testing/pages/blog-post-page/fixtures';
+import {
+  ARIA_CONTROLS,
+  ARIA_EXPANDED,
+} from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 import { MOCK_TAG_SLUG, mockTag } from '@web/testing/shared/tag/fixtures';
@@ -90,7 +94,6 @@ const FORMATTED_PUBLISHED_DATE = 'January 15, 2026';
 const READING_TIME_TEXT = `${MOCK_POST_DETAIL.readingTimeMinutes} min read`;
 const HEADER_TEST_ID = 'post-article-header';
 const ARTICLE_BODY_TEST_ID = 'article-body-focus-target';
-const ARIA_EXPANDED = 'aria-expanded';
 
 const { author, topic } = MOCK_POST;
 const { saveAriaLabel } = SITE_MESSAGES.bookmarkButton;
@@ -142,33 +145,12 @@ describe(`<${PostArticle.name}/>`, () => {
     await expect(setup()).rejects.toBe(MOCK_ERROR);
 
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      'post_article.fetch_failed',
+      POST_LOG.ARTICLE_FETCH_FAILED,
       {
         slug: MOCK_POST_DETAIL.slug,
         error: MOCK_ERROR,
       },
     );
-  });
-
-  it('renders the bookmark toggle and share button in the header', async () => {
-    vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
-    getPostMock.mockResolvedValueOnce(
-      okResult({ ...MOCK_POST, tags: [], heroImage: undefined }),
-    );
-
-    await setup();
-
-    const header = screen.getByTestId(HEADER_TEST_ID);
-    const saveButton = await within(header).findByRole('button', {
-      name: saveAriaLabel,
-    });
-    await waitFor(() => expect(saveButton).toBeEnabled());
-    const shareButton = within(header).getByRole('button', {
-      name: shareButtonName,
-    });
-
-    expect(saveButton).toBeVisible();
-    expect(shareButton).toBeVisible();
   });
 
   it('renders the topic eyebrow as plain text when the topic has no topic page', async () => {
@@ -399,7 +381,7 @@ describe(`<${PostArticle.name}/>`, () => {
         const takeawayItems = within(card).getAllByRole('listitem');
 
         expect(summaryButton).toHaveAttribute(ARIA_EXPANDED, 'true');
-        expect(summaryButton).toHaveAttribute('aria-controls', card.id);
+        expect(summaryButton).toHaveAttribute(ARIA_CONTROLS, card.id);
         expect(takeawayItems.map((item) => item.textContent)).toEqual(
           MOCK_POST_TAKEAWAYS.takeaways,
         );

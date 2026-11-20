@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { flushSync } from 'react-dom';
 
 export interface IPostSummaryContextValue {
   isOpen: boolean;
@@ -32,7 +33,9 @@ export const PostSummaryProvider = ({ children }: IWithChildren) => {
   };
 
   const closeToArticleBody = () => {
-    setIsOpen(false);
+    flushSync(() => {
+      setIsOpen(false);
+    });
     articleBodyRef.current?.focus();
   };
 

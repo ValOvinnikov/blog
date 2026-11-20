@@ -77,8 +77,8 @@ dashboard. See
 "Deployments are temporarily manual"; restoring them is tracked in #2648.
 
 **Routing conventions, per-surface layout decisions, and their history**
-(pagination/canonical rules, the tag axis, post-detail layout, choose-your-depth
-reading, page canvas elevation) are documented in full in
+(pagination/canonical rules, the tag axis, post-detail layout, the post
+summary, page canvas elevation) are documented in full in
 [`docs/context/surfaces-and-routing.md`](./docs/context/surfaces-and-routing.md).
 
 ## 2. Architecture principles
