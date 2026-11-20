@@ -1,12 +1,12 @@
-import { ACCOUNT_PANEL_STYLE } from '@shinefold/config';
-import { tv } from '@shinefold/ui/lib/styling';
+import { ACCOUNT_PANEL_STYLE, TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const accountPanelIdentityVariants = tv({
   slots: {
     root: ['flex items-center gap-3'],
     avatar: [],
     text: ['min-w-0'],
-    name: ['truncate', 'font-display text-copy font-semibold text-text'],
+    name: ['truncate', TYPOGRAPHY[TEXT_ROLE.CARD_TITLE]],
     email: ['truncate', 'font-mono text-meta text-muted'],
   },
   variants: {
