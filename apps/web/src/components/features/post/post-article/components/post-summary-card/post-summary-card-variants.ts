@@ -9,6 +9,5 @@ export const postSummaryCardVariants = tv({
     header: ['flex flex-wrap items-baseline gap-x-3 gap-y-1'],
     time: ['inline-flex items-center gap-1.5 text-muted'],
     body: ['max-w-measure'],
-    list: ['flex list-disc flex-col gap-2 ps-5'],
   },
 });

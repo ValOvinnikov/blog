@@ -19,8 +19,19 @@ export const MOCK_POST_DETAIL_AUTHOR_IMAGE = mockSanityImage({
   alt: MOCK_AUTHOR_NAME,
 });
 
+export const MOCK_POST_SUMMARY_PARAGRAPH = mockFaker.lorem.sentence();
+export const MOCK_POST_SUMMARY_ITEMS = mockFaker.helpers.uniqueArray(
+  mockFaker.lorem.sentence,
+  2,
+);
+
 export const MOCK_POST_TAKEAWAYS: TPostTakeaways = {
-  takeaways: mockFaker.helpers.uniqueArray(mockFaker.lorem.sentence, 3),
+  summary: [
+    mockPortableTextBlock(MOCK_POST_SUMMARY_PARAGRAPH),
+    ...MOCK_POST_SUMMARY_ITEMS.map((item) =>
+      mockPortableTextBlock(item, { listItem: 'bullet', level: 1 }),
+    ),
+  ],
   generatedAt: '2026-01-16T00:00:00Z',
   model: mockFaker.lorem.word(),
 };
@@ -35,7 +46,6 @@ export const MOCK_POST_DETAIL: TPostDetail = {
   featured: false,
   body: [mockPortableTextBlock(MOCK_POST_DETAIL_BODY_TEXT)],
   postTakeaways: undefined,
-  hasAsides: false,
   modules: [{ id: mockFaker.string.uuid(), type: 'module_postRelated' }],
   seo: mockSeo({
     title: MOCK_POST_TITLE,

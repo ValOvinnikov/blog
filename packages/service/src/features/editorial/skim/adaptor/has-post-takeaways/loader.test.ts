@@ -1,7 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { getWriteClient } from '@shinefold/service/sanity/write-client/write-client';
-import { MOCK_SKIM_TAKEAWAYS } from '@shinefold/service/testing/editorial/fixtures';
-import { MOCK_POST_ID } from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_SKIM_SUMMARY } from '@shinefold/service/testing/editorial/fixtures';
+import {
+  MOCK_POST_ID,
+  mockRawParagraphTextBlock,
+} from '@shinefold/service/testing/shared/fixtures';
 import { mockTenant } from '@shinefold/service/testing/tenant';
 
 import { hasPostTakeaways } from './loader';
@@ -15,10 +18,16 @@ faker.seed(1027);
 const MOCK_DRAFT_ID = `drafts.${MOCK_POST_ID}`;
 const MOCK_TENANT = mockTenant();
 const MOCK_WITH_TAKEAWAYS = {
-  postTakeaways: { _type: 'postTakeaways', takeaways: MOCK_SKIM_TAKEAWAYS },
+  postTakeaways: { _type: 'postTakeaways', summary: MOCK_SKIM_SUMMARY },
 };
-const MOCK_EMPTY_TAKEAWAYS = {
-  postTakeaways: { _type: 'postTakeaways', takeaways: [] },
+const MOCK_EMPTY_SUMMARY = {
+  postTakeaways: { _type: 'postTakeaways', summary: [] },
+};
+const MOCK_TEXTLESS_SUMMARY = {
+  postTakeaways: {
+    _type: 'postTakeaways',
+    summary: [mockRawParagraphTextBlock({ text: ' ' })],
+  },
 };
 const MOCK_WITHOUT_TAKEAWAYS = { title: faker.lorem.sentence() };
 
@@ -38,7 +47,7 @@ describe(hasPostTakeaways, () => {
   it.each([
     ['the draft', MOCK_WITH_TAKEAWAYS, MOCK_WITHOUT_TAKEAWAYS],
     ['the published post', undefined, MOCK_WITH_TAKEAWAYS],
-  ])('is true when %s has takeaways', async (_case, draft, published) => {
+  ])('is true when %s has a summary', async (_case, draft, published) => {
     mockDocuments(draft, published);
 
     await expect(hasPostTakeaways(MOCK_POST_ID, MOCK_TENANT)).resolves.toBe(
@@ -48,11 +57,16 @@ describe(hasPostTakeaways, () => {
 
   it.each([
     [
-      'neither document has takeaways',
+      'neither document has a summary',
       MOCK_WITHOUT_TAKEAWAYS,
       MOCK_WITHOUT_TAKEAWAYS,
     ],
-    ['the takeaways are empty', MOCK_EMPTY_TAKEAWAYS, MOCK_EMPTY_TAKEAWAYS],
+    ['the summary is empty', MOCK_EMPTY_SUMMARY, MOCK_EMPTY_SUMMARY],
+    [
+      'the summary has blocks but no text',
+      MOCK_TEXTLESS_SUMMARY,
+      MOCK_TEXTLESS_SUMMARY,
+    ],
     ['no document exists', undefined, undefined],
   ])('is false when %s', async (_case, draft, published) => {
     mockDocuments(draft, published);

@@ -25,7 +25,21 @@ export const MOCK_NEWSLETTER_POST: TNewsletterPost = {
   publishedAt: mockFaker.date.past().toISOString(),
   isSendToSubscribersOn: true,
   coverImageUrl: mockFaker.image.url(),
-  takeaways: [mockFaker.lorem.sentence()],
+  summary: [
+    {
+      _type: 'block',
+      _key: mockFaker.string.alphanumeric(8),
+      style: 'normal',
+      children: [
+        {
+          _type: 'span',
+          _key: mockFaker.string.alphanumeric(8),
+          text: mockFaker.lorem.sentence(),
+          marks: [],
+        },
+      ],
+    },
+  ],
 };
 
 export function mockNewsletterLimits(

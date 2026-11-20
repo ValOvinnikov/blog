@@ -242,7 +242,7 @@ describe(POST, () => {
     [
       'existing takeaways',
       hasPostTakeawaysMock,
-      GENERATE_SKIM_LOG.TAKEAWAYS_LOOKUP_FAILED,
+      GENERATE_SKIM_LOG.SUMMARY_LOOKUP_FAILED,
     ],
   ])(
     'logs and answers 500 when the %s read fails',

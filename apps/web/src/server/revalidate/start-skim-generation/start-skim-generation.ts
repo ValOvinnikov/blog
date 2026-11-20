@@ -84,7 +84,7 @@ const generateFirstPublishSkim = async ({
   await generatePostSkim({ postId, apiKey, readTenant, writeContext });
 };
 
-// The approval publish arrives as `update`; a republish or redelivered `create` finds the existing takeaways and spends nothing.
+// The approval publish arrives as `update`; a republish or redelivered `create` finds the existing summary and spends nothing.
 export const startSkimGeneration = ({
   operation,
   type,

@@ -1,4 +1,4 @@
-import type { TTenantEmailBrand } from '@shinefold/config';
+import type { TPostSummary, TTenantEmailBrand } from '@shinefold/config';
 import type { TFontChoice } from '@shinefold/config/constants';
 import { renderEmailDocument } from '@shinefold/email/html/email-document/email-document';
 import { buildPlainTextBody } from '@shinefold/email/plain-text/plain-text-body';
@@ -33,7 +33,7 @@ export type TPostEmailInput = {
   headingFont?: TFontChoice;
   bodyFont?: TFontChoice;
   coverImageUrl?: string;
-  takeaways?: string[];
+  summary?: TPostSummary;
   logoImageUrl?: string;
   footerPostalAddress?: string;
   isTest?: boolean;
@@ -61,7 +61,7 @@ export function buildPostEmail({
   headingFont,
   bodyFont,
   coverImageUrl,
-  takeaways = [],
+  summary = [],
   logoImageUrl,
   footerPostalAddress,
   isTest,
@@ -69,7 +69,7 @@ export function buildPostEmail({
 }: TPostEmailInput): TPostEmailContent {
   const bannerText = isTest ? testBannerText : undefined;
   const fonts = resolvePostEmailFonts(headingFont, bodyFont);
-  const card = { title, excerpt, takeaways, postUrl, coverImageUrl };
+  const card = { title, excerpt, summary, postUrl, coverImageUrl };
   const unsubscribeAction = buildUnsubscribeAction(unsubscribeUrl);
   const footerLine = `You're getting this because you subscribed to ${brandName}.`;
 

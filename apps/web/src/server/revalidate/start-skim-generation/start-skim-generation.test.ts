@@ -192,7 +192,7 @@ describe(startSkimGeneration, () => {
     [
       'takeaways',
       hasPostTakeawaysMock,
-      GENERATE_SKIM_LOG.TAKEAWAYS_LOOKUP_FAILED,
+      GENERATE_SKIM_LOG.SUMMARY_LOOKUP_FAILED,
     ],
   ])(
     'logs a failed %s lookup and generates nothing',

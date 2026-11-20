@@ -4,6 +4,7 @@ import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { Prose } from '@shinefold/ui/components/atoms/prose';
 import { Text } from '@shinefold/ui/components/atoms/text';
+import { PortableText } from '@web/components/shared/portable-text';
 
 import { PostSummaryPanel } from './components/post-summary-panel/post-summary-panel';
 import { ReadFullArticleButton } from './components/read-full-article-button/read-full-article-button';
@@ -35,11 +36,7 @@ export const PostSummaryCardView = ({
       </Text>
     </div>
     <Prose className={s.body()}>
-      <ul className={s.list()}>
-        {takeaways.takeaways.map((takeaway, index) => (
-          <li key={index}>{takeaway}</li>
-        ))}
-      </ul>
+      <PortableText value={takeaways.summary} />
     </Prose>
     <ReadFullArticleButton label={readFullArticleLabel} />
   </PostSummaryPanel>

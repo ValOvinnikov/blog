@@ -93,7 +93,7 @@ describe(createSkimService, () => {
     });
   });
   describe('v1.hasPostTakeaways', () => {
-    it('returns whether the loader found takeaways for the tenant', async () => {
+    it('returns whether the loader found a summary for the tenant', async () => {
       mockHasPostTakeaways.mockResolvedValueOnce(true);
 
       const result = await createSkimService().v1.hasPostTakeaways(
@@ -108,7 +108,7 @@ describe(createSkimService, () => {
       );
     });
 
-    it('returns a failed takeaways read as an error result', async () => {
+    it('returns a failed summary read as an error result', async () => {
       const error = new Error(faker.lorem.sentence());
       mockHasPostTakeaways.mockRejectedValueOnce(error);
 

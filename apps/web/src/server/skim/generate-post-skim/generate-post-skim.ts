@@ -5,10 +5,8 @@ import {
   type TTenantSanityContext,
 } from '@shinefold/service';
 import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
-import {
-  generateTakeaways,
-  SKIM_GENERATION_MODEL,
-} from '@web/server/skim/generate-takeaways/generate-takeaways';
+import { draftSummary } from '@web/server/skim/draft-summary/draft-summary';
+import { SKIM_GENERATION_MODEL } from '@web/server/skim/generate-takeaways/generate-takeaways';
 import {
   gateSkimWrite,
   releaseSkimGeneration,
@@ -66,21 +64,15 @@ export const generatePostSkim = async ({
     );
   }
 
-  let takeaways: string[];
-  try {
-    takeaways = await generateTakeaways(bodyResult.data, apiKey);
-  } catch (error) {
-    logger.error(GENERATE_SKIM_LOG.GENERATION_FAILED, {
-      tenantId,
-      postId,
-      error,
-    });
+  const draft = await draftSummary(bodyResult.data, apiKey, {
+    tenantId,
+    postId,
+  });
+  if (!draft.ok) {
     await releaseSkimGeneration(claim, postId);
-    return refuse(
-      'Failed to generate takeaways.',
-      HTTP_STATUS.UNPROCESSABLE_ENTITY,
-    );
+    return refuse(draft.error, HTTP_STATUS.UNPROCESSABLE_ENTITY);
   }
+  const summary = draft.data;
 
   let resolvedWriteTenant: TTenantSanityContext;
   try {
@@ -95,7 +87,7 @@ export const generatePostSkim = async ({
   }
 
   const saveResult = await service.editorial.skim.v1.saveSkimDraft(
-    { postId, takeaways, model: SKIM_GENERATION_MODEL },
+    { postId, summary, model: SKIM_GENERATION_MODEL },
     resolvedWriteTenant,
   );
   if (!saveResult.ok) {
@@ -107,5 +99,5 @@ export const generatePostSkim = async ({
     return refuse(SAVE_FAILED_MESSAGE, HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
 
-  return { isGenerated: true, count: takeaways.length };
+  return { isGenerated: true, count: summary.length };
 };

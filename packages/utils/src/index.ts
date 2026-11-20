@@ -9,6 +9,7 @@ export * from './is-secret-match';
 export * from './merge';
 export * from './normalize-email-identity';
 export * from './pagination';
+export * from './portable-text';
 export * from './primitives';
 export * from './reading-time';
 export * from './result';

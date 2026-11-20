@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import type { ArticleText } from '@shinefold/config';
+import { SUMMARY_BLOCK_STYLE } from '@web/constants/generate-skim';
 
 import { generateTakeaways, SKIM_GENERATION_MODEL } from './generate-takeaways';
 
@@ -34,10 +35,9 @@ const MOCK_BODY: ArticleText = [
   },
 ];
 const MOCK_API_KEY = faker.string.alphanumeric(32);
-const MOCK_TAKEAWAYS = [
-  faker.lorem.sentence(),
-  faker.lorem.sentence(),
-  faker.lorem.sentence(),
+const MOCK_SUMMARY_BLOCKS = [
+  { style: SUMMARY_BLOCK_STYLE.PARAGRAPH, text: faker.lorem.sentence() },
+  { style: SUMMARY_BLOCK_STYLE.BULLET, text: faker.lorem.sentence() },
 ];
 const MOCK_SDK_ERROR_MESSAGE = faker.lorem.sentence();
 
@@ -46,14 +46,14 @@ describe(generateTakeaways, () => {
     parseMock.mockReset();
     anthropicCtorMock.mockReset();
     parseMock.mockResolvedValue({
-      parsed_output: { takeaways: MOCK_TAKEAWAYS },
+      parsed_output: { blocks: MOCK_SUMMARY_BLOCKS },
     });
   });
 
-  it('returns the parsed takeaways', async () => {
-    const takeaways = await generateTakeaways(MOCK_BODY, MOCK_API_KEY);
+  it('returns the parsed summary blocks', async () => {
+    const blocks = await generateTakeaways(MOCK_BODY, MOCK_API_KEY);
 
-    expect(takeaways).toEqual(MOCK_TAKEAWAYS);
+    expect(blocks).toEqual(MOCK_SUMMARY_BLOCKS);
   });
 
   it('asks Claude for a draft with the given api key, under one abort deadline', async () => {

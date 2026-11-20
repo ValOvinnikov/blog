@@ -16,7 +16,7 @@ export const hasExistingTakeaways = async (
     tenant,
   );
   if (!result.ok) {
-    logger.error(GENERATE_SKIM_LOG.TAKEAWAYS_LOOKUP_FAILED, {
+    logger.error(GENERATE_SKIM_LOG.SUMMARY_LOOKUP_FAILED, {
       tenantId,
       postId,
       error: result.error,

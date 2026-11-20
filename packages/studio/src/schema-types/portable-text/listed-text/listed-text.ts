@@ -8,6 +8,7 @@ import {
 import {
   defineArrayMember,
   defineType,
+  type BlockListDefinition,
   type BlockMarksDefinition,
   type BlockStyleDefinition,
 } from 'sanity';
@@ -18,6 +19,11 @@ export const normalBlockStyle: BlockStyleDefinition = {
 };
 
 export const listedTextStyles: BlockStyleDefinition[] = [normalBlockStyle];
+
+export const listedTextLists: BlockListDefinition[] = [
+  { title: 'Bullet', value: 'bullet' },
+  { title: 'Numbered', value: 'number' },
+];
 
 export const listedTextMarks: BlockMarksDefinition = {
   decorators: [
@@ -39,10 +45,7 @@ export const listedTextSchema = defineType({
     defineArrayMember({
       type: 'block',
       styles: listedTextStyles,
-      lists: [
-        { title: 'Bullet', value: 'bullet' },
-        { title: 'Numbered', value: 'number' },
-      ],
+      lists: listedTextLists,
       marks: listedTextMarks,
     }),
   ],

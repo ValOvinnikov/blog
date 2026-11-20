@@ -1,4 +1,4 @@
-import { isString, toInitial } from './strings';
+import { countWords, isString, toInitial } from './strings';
 
 describe(isString, () => {
   it.each([['abc'], ['']])('accepts the string %j', (value) => {
@@ -22,5 +22,20 @@ describe(toInitial, () => {
 
   it.each([[''], ['  — ']])('has no initial for %j', (name) => {
     expect(toInitial(name)).toBeUndefined();
+  });
+});
+
+describe(countWords, () => {
+  it.each([
+    { text: 'one two  three', count: 3 },
+    { text: '  leading and trailing  ', count: 3 },
+    { text: 'it’s a well-known fact — really.', count: 5 },
+    { text: 'Ship 3 posts, then 12 more!', count: 6 },
+  ])('counts $count words in "$text"', ({ text, count }) => {
+    expect(countWords(text)).toBe(count);
+  });
+
+  it.each([[''], ['  — … ']])('counts no words in %j', (text) => {
+    expect(countWords(text)).toBe(0);
   });
 });
