@@ -23,6 +23,11 @@ const MOCK_PROMISE_MESSAGES = {
   error: { title: faker.lorem.words(2), message: faker.lorem.sentence() },
 };
 
+const MOCK_COALESCING_PROMISE_MESSAGES = {
+  ...MOCK_PROMISE_MESSAGES,
+  error: { ...MOCK_PROMISE_MESSAGES.error, coalesceKey: MOCK_COALESCE_KEY },
+};
+
 const buildPayload = (overrides?: Partial<IToastPayload>): IToastPayload => ({
   title: MOCK_TITLE,
   message: MOCK_MESSAGE,
@@ -98,6 +103,15 @@ const showLoadingToast = async (store: TToastStore) => {
   return { resolvePromise, loadingId };
 };
 
+const showCoalescingLoadingToast = async (store: TToastStore) => {
+  const { promise, reject } = Promise.withResolvers<string>();
+  store.actions
+    .promise(promise, MOCK_COALESCING_PROMISE_MESSAGES)
+    .catch(() => {});
+  await vi.advanceTimersToNextTimerAsync();
+  return reject;
+};
+
 describe(createToastStore, () => {
   let store: TToastStore;
 
@@ -164,8 +178,13 @@ describe(createToastStore, () => {
   });
 
   describe('cap and eviction', () => {
+    let cap: number;
+
+    beforeEach(() => {
+      cap = discoverQueueCap();
+    });
+
     it('evicts the oldest non-error toast when one more than the cap is shown', () => {
-      const cap = discoverQueueCap();
       const ids = fillVisibleToCap(store, TOAST_TYPE.INFO, cap);
 
       const overflowId = store.actions.show(
@@ -176,26 +195,27 @@ describe(createToastStore, () => {
       expect(visibleIds(store)).toEqual([...ids.slice(1), overflowId]);
     });
 
-    it('queues a new toast when every slot holds an error', () => {
-      const cap = discoverQueueCap();
-      const errorIds = fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
+    describe('when every slot holds an error', () => {
+      let errorIds: string[];
+      let queuedId: string;
 
-      const queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
+      beforeEach(() => {
+        errorIds = fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
+        queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
+      });
 
-      expect(visibleIds(store)).toEqual(errorIds);
-      expect(pendingIds(store)).toEqual([queuedId]);
-    });
+      it('queues a new toast', () => {
+        expect(visibleIds(store)).toEqual(errorIds);
+        expect(pendingIds(store)).toEqual([queuedId]);
+      });
 
-    it('promotes the oldest pending toast once a visible slot frees up', () => {
-      const cap = discoverQueueCap();
-      const errorIds = fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
-      const queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
+      it('promotes the oldest pending toast once a visible slot frees up', () => {
+        store.actions.dismiss(errorIds[0]);
+        vi.advanceTimersToNextTimer();
 
-      store.actions.dismiss(errorIds[0]);
-      vi.advanceTimersToNextTimer();
-
-      expect(visibleIds(store)).toEqual([...errorIds.slice(1), queuedId]);
-      expect(pendingIds(store)).toEqual([]);
+        expect(visibleIds(store)).toEqual([...errorIds.slice(1), queuedId]);
+        expect(pendingIds(store)).toEqual([]);
+      });
     });
   });
 
@@ -308,21 +328,25 @@ describe(createToastStore, () => {
       expect(findVisible(store, id)?.phase).toBe('leaving');
     });
 
-    it('ignores a resume on a running toast', () => {
-      const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
+    describe('with a running toast', () => {
+      let id: string;
 
-      store.actions.resume(id);
+      beforeEach(() => {
+        id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
+      });
 
-      expect(findVisible(store, id)?.paused).toBe(false);
-    });
+      it('ignores a resume', () => {
+        store.actions.resume(id);
 
-    it('keeps a toast paused when it is paused twice', () => {
-      const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
+        expect(findVisible(store, id)?.paused).toBe(false);
+      });
 
-      store.actions.pause(id);
-      store.actions.pause(id);
+      it('keeps the toast paused when it is paused twice', () => {
+        store.actions.pause(id);
+        store.actions.pause(id);
 
-      expect(findVisible(store, id)?.paused).toBe(true);
+        expect(findVisible(store, id)?.paused).toBe(true);
+      });
     });
   });
 
@@ -415,6 +439,23 @@ describe(createToastStore, () => {
       expect(toast?.durationMs).toBeUndefined();
     });
 
+    it('settles into a toast that already holds its coalesce key', async () => {
+      const existingId = store.actions.show(
+        TOAST_TYPE.ERROR,
+        buildPayload({ coalesceKey: MOCK_COALESCE_KEY }),
+      );
+      const rejected = Promise.reject(new Error(faker.lorem.sentence()));
+
+      store.actions
+        .promise(rejected, MOCK_COALESCING_PROMISE_MESSAGES)
+        .catch(() => {});
+      await vi.advanceTimersByTimeAsync(0);
+
+      const toast = findVisible(store, existingId);
+      expect(visibleIds(store)).toEqual([existingId]);
+      expect(toast?.title).toBe(MOCK_PROMISE_MESSAGES.error.title);
+    });
+
     describe('with a loading toast on screen', () => {
       let resolvePromise: (value: string) => void;
       let loadingId: string;
@@ -444,6 +485,33 @@ describe(createToastStore, () => {
         expect(toast?.isLoading).toBe(false);
         expect(toast?.title).toBe(MOCK_PROMISE_MESSAGES.success.title);
         expect(toast?.durationMs).toBe(successLifeMs);
+      });
+
+      it('keeps the coalesce key it settles with in place', async () => {
+        const rejectPromise = await showCoalescingLoadingToast(store);
+        const [, settlingToast] = store.getState().visible;
+        rejectPromise(new Error(faker.lorem.sentence()));
+        await vi.advanceTimersByTimeAsync(0);
+
+        const repeatId = store.actions.show(
+          TOAST_TYPE.ERROR,
+          buildPayload({ coalesceKey: MOCK_COALESCE_KEY }),
+        );
+
+        expect(repeatId).toBe(settlingToast?.id);
+      });
+
+      it('leaves and coalesces when another toast holds its key', async () => {
+        const existingId = store.actions.show(
+          TOAST_TYPE.ERROR,
+          buildPayload({ coalesceKey: MOCK_COALESCE_KEY }),
+        );
+        const rejectPromise = await showCoalescingLoadingToast(store);
+
+        rejectPromise(new Error(faker.lorem.sentence()));
+        await vi.runAllTimersAsync();
+
+        expect(visibleIds(store)).toEqual([loadingId, existingId]);
       });
 
       it('does not resurrect a loading toast dismissed before it settled', async () => {

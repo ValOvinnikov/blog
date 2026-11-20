@@ -10,7 +10,7 @@ export const subscribeToPageOutOfDate = (onOutOfDate: () => void) => {
   };
 };
 
-// An action the server no longer recognises means this page's build is gone, so the request resolves to nothing; any other rejection still reaches the caller.
+// An unrecognised action means this page's build is gone.
 export const unlessPageOutOfDate = <TResult>(
   request: Promise<TResult>,
 ): Promise<TMaybeUndefined<TResult>> =>

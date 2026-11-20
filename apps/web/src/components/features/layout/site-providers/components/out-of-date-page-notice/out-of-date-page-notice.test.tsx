@@ -7,11 +7,11 @@ import {
   mockUnrecognizedActionError,
 } from '@web/testing/shared/out-of-date/mock-unrecognized-action';
 import { unlessPageOutOfDate } from '@web/utils/page-out-of-date';
-import { reloadPage } from '@web/utils/reload-page/reload-page';
+import { reloadPage } from '@web/utils/reload-page';
 
 import { OutOfDatePageNotice } from './out-of-date-page-notice';
 
-vi.mock('@web/utils/reload-page/reload-page');
+vi.mock('@web/utils/reload-page');
 
 const { message, reloadLabel } = SITE_MESSAGES.outOfDateNotice;
 

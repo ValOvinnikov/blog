@@ -18,8 +18,8 @@ import {
 } from 'react';
 
 import { toastProviderVariants } from './toast-provider-variants';
-import type { IToastPayload } from './toast-record';
-import { createToastStore, type IToastPromiseMessages } from './toast-store';
+import type { IToastPayload, IToastPromiseMessages } from './toast-record';
+import { createToastStore } from './toast-store';
 import { useToastRowPause } from './use-toast-row-pause';
 
 interface IUseToast {
@@ -162,7 +162,6 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
   );
 };
 
-/** Reads the imperative toast API — throws outside a `ToastProvider`. */
 export const useToast = (): IUseToast => {
   const context = useContext(ToastContext);
   if (!context) {

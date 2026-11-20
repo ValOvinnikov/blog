@@ -6,6 +6,7 @@ import {
   type TOutcome,
 } from '@shinefold/config';
 import type { IWithChildren } from '@shinefold/config/react';
+import { OutOfDatePageNotice } from '@web/components/features/layout/site-providers/components/out-of-date-page-notice/out-of-date-page-notice';
 import { ToastProvider } from '@web/context/toast-provider';
 import { act, renderHook, screen, waitFor } from '@web/testing/custom-render';
 import { AppProviders } from '@web/testing/providers';
@@ -15,6 +16,7 @@ import {
 } from '@web/testing/shared/out-of-date/mock-unrecognized-action';
 import { stubRouterRefresh } from '@web/testing/shared/router/stub-router-refresh';
 import { findToastStatus } from '@web/testing/shared/toast/find-toast-status';
+import { unlessPageOutOfDate } from '@web/utils/page-out-of-date';
 
 import { useActionToast } from './use-action-toast';
 
@@ -36,7 +38,10 @@ const MOCK_OPTIONS = {
 
 const wrapper = ({ children }: IWithChildren) => (
   <AppProviders>
-    <ToastProvider>{children}</ToastProvider>
+    <ToastProvider>
+      <OutOfDatePageNotice />
+      {children}
+    </ToastProvider>
   </AppProviders>
 );
 
@@ -105,19 +110,53 @@ describe(useActionToast, () => {
     },
   );
 
-  it('settles an unrecognised action into the out-of-date notice', async () => {
-    mockUnrecognizedActionError();
+  describe('when an action is unrecognised', () => {
+    const rejectAsUnrecognised = () =>
+      Promise.reject(MOCK_UNRECOGNIZED_ACTION_ERROR);
 
-    runAction(() => Promise.reject(MOCK_UNRECOGNIZED_ACTION_ERROR));
+    const flushSettledToasts = () =>
+      act(async () => {
+        await Promise.resolve();
+      });
 
-    const notice = await screen.findByRole('alert');
-    const reloadButton = screen.getByRole('button', {
-      name: SITE_MESSAGES.outOfDateNotice.reloadLabel,
+    let result: ReturnType<typeof runAction>;
+
+    beforeEach(async () => {
+      mockUnrecognizedActionError();
+      result = runAction(rejectAsUnrecognised);
+      await screen.findByRole('alert');
     });
-    expect(notice).toHaveTextContent(SITE_MESSAGES.outOfDateNotice.message);
-    expect(notice).not.toHaveTextContent(MOCK_ERROR);
-    expect(reloadButton).toBeVisible();
-    expect(routerRefreshMock).not.toHaveBeenCalled();
+
+    it('settles into the out-of-date notice with Reload', () => {
+      const notice = screen.getByRole('alert');
+      const reloadButton = screen.getByRole('button', {
+        name: SITE_MESSAGES.outOfDateNotice.reloadLabel,
+      });
+      expect(notice).toHaveTextContent(SITE_MESSAGES.outOfDateNotice.message);
+      expect(notice).not.toHaveTextContent(MOCK_ERROR);
+      expect(reloadButton).toBeVisible();
+      expect(routerRefreshMock).not.toHaveBeenCalled();
+    });
+
+    it('keeps one notice for two unrecognised runs', async () => {
+      act(() => {
+        result.current.run(rejectAsUnrecognised, MOCK_OPTIONS);
+      });
+      await flushSettledToasts();
+
+      const notices = screen.getAllByRole('alert');
+      expect(notices).toHaveLength(1);
+    });
+
+    it('keeps one notice for a run and another out-of-date signal', async () => {
+      await act(async () => {
+        await unlessPageOutOfDate(rejectAsUnrecognised());
+      });
+      await flushSettledToasts();
+
+      const notices = screen.getAllByRole('alert');
+      expect(notices).toHaveLength(1);
+    });
   });
 
   it('reports pending until the action settles', async () => {

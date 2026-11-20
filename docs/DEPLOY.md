@@ -1167,7 +1167,9 @@ stage`: `deploy --prebuilt --prod --skip-domain → request`; see "A deploy
    Unset, as in a local build, no `deploymentId` is set. It needs Next.js
    above 16.2.0-canary.15 and Vercel CLI above 50.3.3, and Skew Protection
    switched on in each project's settings. The worker serves no pages and
-   builds without one.
+   builds without one. web-dev's Skew Protection max age is 12 hours, so a
+   tab from an older build gets the public site's out-of-date notice
+   (`docs/features/toasts.md`) instead of reaching its build.
 
    **A deploy goes live only after every app starts.** Each stage job ends
    in `scripts/vercel-deploy-checked.sh stage <app> <path>`. It deploys with
