@@ -1,4 +1,6 @@
 import { STARTER_DOCUMENT_IDS } from '@shinefold/config';
+import { LOCALE_ISO_CODES, TENANT_PLAN } from '@shinefold/config/constants';
+import { getTenantLocales } from '@shinefold/db/queries/tenants';
 import { REVISION_LOCK_PSEUDO_FIELD } from '@worker/constants/sample-content';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
@@ -14,6 +16,7 @@ import { createTenantWriteClient } from '@worker/utils/tenant-content/tenant-wri
 import { removeSampleContent } from './remove-sample-content';
 
 vi.mock('@worker/utils/tenant-content/tenant-write-client');
+vi.mock('@shinefold/db/queries/tenants');
 
 const ids = STARTER_DOCUMENT_IDS;
 
@@ -24,12 +27,24 @@ const commit = vi.fn();
 const transaction = vi.fn(() => ({ patch, delete: deleteDocument, commit }));
 
 const MOCK_CTA_REVISION = mockRevision();
+const MOCK_ABOUT_TITLE = 'About';
 
+const MOCK_HERO = mockSanityDocument(ids.BLOG_HERO);
+const MOCK_EDITED_ABOUT = mockSanityDocument(
+  ids.BLOG_ABOUT,
+  { title: MOCK_ABOUT_TITLE },
+  { isEdited: true },
+);
 const MOCK_STARTER_DOCUMENTS = [
   mockSanityDocument(ids.BLOG_CTA, {}, { revision: MOCK_CTA_REVISION }),
-  mockSanityDocument(ids.BLOG_HERO),
-  mockSanityDocument(ids.BLOG_ABOUT, {}, { isEdited: true }),
+  MOCK_HERO,
+  MOCK_EDITED_ABOUT,
 ];
+const MOCK_KEPT_ABOUT = {
+  id: ids.BLOG_ABOUT,
+  type: MOCK_EDITED_ABOUT._type,
+  title: MOCK_ABOUT_TITLE,
+};
 const MOCK_REFERRERS = [
   mockSanityDocument(ids.HOME_TEMPLATE, {
     hero: mockReference(ids.BLOG_HERO),
@@ -51,6 +66,11 @@ describe(removeSampleContent, () => {
   beforeEach(() => {
     mockDataset();
     commit.mockResolvedValue({});
+    vi.mocked(getTenantLocales).mockResolvedValue({
+      defaultLocale: LOCALE_ISO_CODES.EN,
+      additionalLocales: [],
+      plan: TENANT_PLAN.FREE,
+    });
     vi.mocked(createTenantWriteClient).mockResolvedValue({
       fetch,
       transaction,
@@ -60,8 +80,8 @@ describe(removeSampleContent, () => {
   it('unlinks and deletes unedited samples in one transaction, listing the kept', async () => {
     await expect(removeSampleContent(MOCK_TENANT_ID)).resolves.toEqual({
       removed: [ids.BLOG_CTA],
-      keptEdited: [ids.BLOG_ABOUT],
-      keptReferenced: [ids.BLOG_HERO],
+      keptEdited: [MOCK_KEPT_ABOUT],
+      keptReferenced: [{ id: ids.BLOG_HERO, type: MOCK_HERO._type }],
     });
 
     expect(createTenantWriteClient).toHaveBeenCalledWith(MOCK_TENANT_ID);
@@ -93,17 +113,23 @@ describe(removeSampleContent, () => {
 
   it('writes nothing when no sample can be removed', async () => {
     fetch.mockReset();
-    mockDataset(
-      [mockSanityDocument(ids.BLOG_ABOUT, {}, { isEdited: true })],
-      [],
-    );
+    mockDataset([MOCK_EDITED_ABOUT], []);
 
     await expect(removeSampleContent(MOCK_TENANT_ID)).resolves.toEqual({
       removed: [],
-      keptEdited: [ids.BLOG_ABOUT],
+      keptEdited: [MOCK_KEPT_ABOUT],
       keptReferenced: [],
     });
 
+    expect(transaction).not.toHaveBeenCalled();
+  });
+
+  it('writes nothing when the tenant has no locale', async () => {
+    vi.mocked(getTenantLocales).mockResolvedValue(undefined);
+
+    await expect(removeSampleContent(MOCK_TENANT_ID)).rejects.toThrow(
+      MOCK_TENANT_ID,
+    );
     expect(transaction).not.toHaveBeenCalled();
   });
 

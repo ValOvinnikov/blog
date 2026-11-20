@@ -1,5 +1,6 @@
 import type { SanityDocument } from '@sanity/client';
 import { STARTER_DOCUMENT_IDS } from '@shinefold/config';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import { hasArrayGotItems, isUndefined } from '@shinefold/utils/primitives';
 
 import {
@@ -7,11 +8,13 @@ import {
   type TDocumentReference,
 } from './document-references';
 import { listEditedIds } from './edited-samples';
+import { listKeptSamples, type TKeptSample } from './kept-samples';
 
 export type TSampleContentSnapshot = {
   starterDocuments: SanityDocument[];
   pendingIds: string[];
   referrers: SanityDocument[];
+  locale: TLocaleIsoCode;
 };
 
 type TSampleContentUnlink = {
@@ -26,8 +29,8 @@ type TSampleContentRemoval = { documentId: string; revision: string };
 export type TSampleContentRemovalPlan = {
   removals: TSampleContentRemoval[];
   unlinks: TSampleContentUnlink[];
-  keptEdited: string[];
-  keptReferenced: string[];
+  keptEdited: TKeptSample[];
+  keptReferenced: TKeptSample[];
 };
 
 const MODULES_FIELD = 'modules';
@@ -94,13 +97,14 @@ export function planSampleContentRemoval({
   starterDocuments,
   pendingIds,
   referrers,
+  locale,
 }: TSampleContentSnapshot): TSampleContentRemovalPlan {
   const edited = listEditedIds(starterDocuments, pendingIds);
   const removable = new Set(
     starterDocuments.map(({ _id }) => _id).filter((id) => !edited.has(id)),
   );
   const documents = [...referrers, ...starterDocuments];
-  const keptReferenced: string[] = [];
+  const keptReferenced = new Set<string>();
 
   let blockedIds: string[];
   do {
@@ -109,7 +113,7 @@ export function planSampleContentRemoval({
       .map(({ reference }) => reference.targetId);
     for (const id of new Set(blockedIds)) {
       removable.delete(id);
-      keptReferenced.push(id);
+      keptReferenced.add(id);
     }
   } while (hasArrayGotItems(blockedIds));
 
@@ -119,7 +123,7 @@ export function planSampleContentRemoval({
       .map(({ _id, _rev }) => ({ documentId: _id, revision: _rev }))
       .sort((a, b) => a.documentId.localeCompare(b.documentId)),
     unlinks: listUnlinks(listOutsideReferences(documents, removable)),
-    keptEdited: [...edited].sort(),
-    keptReferenced: keptReferenced.sort(),
+    keptEdited: listKeptSamples(starterDocuments, edited, locale),
+    keptReferenced: listKeptSamples(starterDocuments, keptReferenced, locale),
   };
 }

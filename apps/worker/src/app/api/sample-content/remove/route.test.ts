@@ -25,8 +25,16 @@ import { POST } from './route';
 const MOCK_REMOVE_URL = `${MOCK_WORKER_ORIGIN}/api/sample-content/remove`;
 const MOCK_REMOVAL_RESULT = {
   removed: [STARTER_DOCUMENT_IDS.BLOG_CTA],
-  keptEdited: [STARTER_DOCUMENT_IDS.BLOG_ABOUT],
-  keptReferenced: [STARTER_DOCUMENT_IDS.BLOG_HERO],
+  keptEdited: [
+    {
+      id: STARTER_DOCUMENT_IDS.BLOG_ABOUT,
+      type: 'page_landing',
+      title: 'About',
+    },
+  ],
+  keptReferenced: [
+    { id: STARTER_DOCUMENT_IDS.BLOG_HERO, type: 'module_heroBlog' },
+  ],
 };
 
 vi.mock('@worker/utils/env/env');
