@@ -35,6 +35,14 @@ export const Open: TStory = {
   },
 };
 
+// The panel opens from the trigger's start edge below the real `sm:`
+// breakpoint, so this pins the phone viewport with the trigger at the left.
+export const OpenOnPhone: TStory = {
+  ...Open,
+  parameters: { layout: 'padded' },
+  globals: { viewport: 'phone' },
+};
+
 /**
  * "Copy link" flips to its copied state (icon + label) for `resetMs` after
  * a click — this pins that transient state open for review.

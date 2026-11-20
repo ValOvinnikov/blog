@@ -214,3 +214,38 @@ export const AvatarTrigger: TStory = {
     ),
   },
 };
+
+// The panel's start alignment forks on the real `sm:` breakpoint, so the
+// phone state only shows with the viewport pinned.
+export const OpenFromStartOnPhone: TStory = {
+  globals: { viewport: 'phone' },
+  args: {
+    children: (
+      <>
+        <PopoverMenu.Trigger
+          ariaLabel="Open menu"
+          isOpen={true}
+          panelId="popover-menu-panel-start"
+        >
+          <Icon name={ICONS.SHARE} size={SIZE.SM} />
+        </PopoverMenu.Trigger>
+        <PopoverMenu.Panel
+          id="popover-menu-panel-start"
+          isOpen={true}
+          ariaLabel="Menu"
+          shouldOpenFromStartOnPhone={true}
+        >
+          <PopoverMenu.Item
+            icon={<Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />}
+          >
+            Copy link
+          </PopoverMenu.Item>
+          <PopoverMenu.Separator />
+          <PopoverMenu.Item as="a" href="https://example.com">
+            Share on X
+          </PopoverMenu.Item>
+        </PopoverMenu.Panel>
+      </>
+    ),
+  },
+};

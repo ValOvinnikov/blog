@@ -120,7 +120,7 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
           formattedDate,
           readingTime,
           linkAs: SmartLink,
-          share: (
+          actions: (
             <div className={s.metaActions()}>
               <BookmarkButtonGate postId={id} />
               <PostShareLinks url={url} title={title} />

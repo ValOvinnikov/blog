@@ -1,6 +1,6 @@
 'use client';
 
-import { ICONS, SIZE } from '@shinefold/config';
+import { ICONS, type IWithClassName, SIZE } from '@shinefold/config';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { PopoverMenu } from '@shinefold/ui/components/molecules/popover-menu';
 import { type IShareLinkItem } from '@shinefold/ui/components/molecules/share-link';
@@ -12,23 +12,12 @@ import { useId } from 'react';
 
 import { postShareLiveRegionVariants } from './post-share-variants';
 
-export type TPostShareProps = {
+export type TPostShareProps = IWithClassName & {
   url: string;
   title: string;
   links: IShareLinkItem[];
-  className?: string;
 };
 
-/**
- * PostShare — the self-contained interactive share widget, passed into
- * `PostMeta`'s `share` slot (it never wraps `PostMeta` — see
- * `web-component-practices` Rule 1). Open/close/focus behaviour lives in
- * `usePopover`; clipboard state lives in `useCopyToClipboard` — this
- * component only wires refs and reads their results.
- *
- * @example
- * <PostMeta author={post.author} share={<PostShare url={url} title={post.title} links={shareLinks} />} />
- */
 export const PostShare = ({
   url,
   title,
@@ -60,6 +49,7 @@ export const PostShare = ({
         id={panelId}
         isOpen={open}
         ariaLabel={t('panelAriaLabel')}
+        shouldOpenFromStartOnPhone={true}
       >
         <PopoverMenu.Item
           icon={

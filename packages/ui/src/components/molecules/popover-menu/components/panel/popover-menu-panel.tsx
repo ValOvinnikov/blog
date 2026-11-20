@@ -8,6 +8,7 @@ export type TPopoverMenuPanelProps = IWithClassName &
     id: string;
     isOpen: boolean;
     ariaLabel?: string;
+    shouldOpenFromStartOnPhone?: boolean;
     children?: ReactNode;
     ref?: Ref<HTMLDivElement>;
   };
@@ -17,6 +18,7 @@ export const PopoverMenuPanel = ({
   id,
   isOpen,
   ariaLabel,
+  shouldOpenFromStartOnPhone,
   ref,
   className,
   children,
@@ -29,7 +31,10 @@ export const PopoverMenuPanel = ({
     aria-label={ariaLabel}
     hidden={!isOpen}
     data-testid={dataTestId}
-    className={popoverMenuPanelVariants({ class: className })}
+    className={popoverMenuPanelVariants({
+      shouldOpenFromStartOnPhone,
+      class: className,
+    })}
   >
     {children}
   </div>
