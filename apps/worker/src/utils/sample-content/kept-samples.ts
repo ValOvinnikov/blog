@@ -32,8 +32,8 @@ export function listKeptSamples(
   return starterDocuments
     .filter(({ _id }) => keptIds.has(_id))
     .sort((a, b) => a._id.localeCompare(b._id))
-    .map(({ _id, _type, title }) => {
-      const resolvedTitle = readTitle(title, locale);
+    .map(({ _id, _type, title, name }) => {
+      const resolvedTitle = readTitle(title ?? name, locale);
 
       return {
         id: _id,

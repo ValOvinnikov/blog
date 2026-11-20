@@ -51,8 +51,16 @@ describe(listKeptSamples, () => {
     );
   });
 
+  it('names an author by its name', () => {
+    const author = mockSanityDocument(ids.BLOG_AUTHOR, { name: MOCK_TITLE });
+
+    expect(
+      listKeptSamples([author], new Set([ids.BLOG_AUTHOR]), locale),
+    ).toEqual([{ id: ids.BLOG_AUTHOR, type: author._type, title: MOCK_TITLE }]);
+  });
+
   it.each([
-    ['no title field', {}],
+    ['neither a title nor a name', {}],
     ['an empty title', { title: '' }],
     [
       'a title only in another language',
