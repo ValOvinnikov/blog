@@ -1,48 +1,19 @@
 'use client';
 
-import type { TLanguageChangeCount } from '@platform/utils/format-language-changes/format-language-changes';
-import {
-  revealFirstInvalidControl,
-  type TInvalidControls,
-} from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
+import { revealFirstInvalidControl } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import {
   FORM_STATUS,
   type TActionOutcome,
-  type TMaybeUndefined,
   type TOutcome,
 } from '@shinefold/config';
 import { useId, useState } from 'react';
 
-import type { TSettingsForm } from './settings-form-types';
+import type {
+  TSettingsForm,
+  TUseSettingsFormArgs,
+} from './settings-form-types';
 import { usePlanRefusal } from './use-plan-refusal';
-import type { TSettingsFormDraft } from './use-settings-draft';
-
-type TSettingsFormDraftConfig<TValues> = Omit<
-  TSettingsFormDraft<TValues>,
-  'values' | 'savedValues' | 'onRestore'
-> & {
-  onRestore?: (values: TValues) => void;
-};
-
-export type TUseSettingsFormArgs<
-  TValues,
-  TResult extends TOutcome<TActionOutcome>,
-> = {
-  initialValues: TValues;
-  archivedAt: TMaybeUndefined<Date>;
-  onSubmit: (values: TValues) => Promise<TResult>;
-  onSuccess?: (values: TValues, result: TResult) => void;
-  onDiscard?: () => void;
-  countChanges: (values: TValues, savedValues: TValues) => number;
-  countChangesByLanguage?: (
-    values: TValues,
-    savedValues: TValues,
-  ) => TLanguageChangeCount[];
-  invalidControls?: (values: TValues) => TInvalidControls;
-  canSave?: (values: TValues) => boolean;
-  draft: TSettingsFormDraftConfig<TValues>;
-};
 
 export const useSettingsForm = <
   TValues,
@@ -57,12 +28,13 @@ export const useSettingsForm = <
   countChangesByLanguage,
   invalidControls,
   canSave,
+  planRefusalMessageKey,
   draft,
 }: TUseSettingsFormArgs<TValues, TResult>) => {
   const archivedNoticeId = useId();
   const isArchived = Boolean(archivedAt);
   const [savedValues, setSavedValues] = useState(initialValues);
-  const planRefusal = usePlanRefusal(draft.fields);
+  const planRefusal = usePlanRefusal(draft.fields, planRefusalMessageKey);
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TValues, TResult>({
       initialValues,

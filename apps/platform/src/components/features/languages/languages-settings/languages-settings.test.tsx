@@ -22,7 +22,9 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { toLocaleLimit } from '@platform/utils/locale-limit/locale-limit';
+import { toNotInPlanRefusal } from '@platform/utils/plan-refusal/plan-refusal';
 import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -124,6 +126,44 @@ describe(`<${LanguagesSettings.name}/>`, () => {
           [NL, FR],
         );
       });
+    });
+
+    it('says how many languages the plan allows when it refuses the save', async () => {
+      updateTenantLanguagesActionMock.mockResolvedValueOnce(
+        toNotInPlanRefusal(TENANT_PLAN.FREE, [DE], 1),
+      );
+      const germanSwitch = screen.getByRole(SWITCH, {
+        name: languageNames[DE],
+      });
+      await user.click(germanSwitch);
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      await user.click(saveButton);
+
+      const refusal = await screen.findByText(
+        "Your site is on the Free plan, which allows 1 language, so German wasn't added.",
+      );
+
+      expect(refusal).toBeInTheDocument();
+    });
+
+    it('names every refused language in one sentence', async () => {
+      updateTenantLanguagesActionMock.mockResolvedValueOnce(
+        toNotInPlanRefusal(TENANT_PLAN.STARTER, [NL, FR], 1),
+      );
+      const dutchSwitch = screen.getByRole(SWITCH, { name: languageNames[NL] });
+      const frenchSwitch = screen.getByRole(SWITCH, {
+        name: languageNames[FR],
+      });
+      await user.click(dutchSwitch);
+      await user.click(frenchSwitch);
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      await user.click(saveButton);
+
+      const refusal = await screen.findByText(
+        "Your site is on the Starter plan, which allows 1 language, so Dutch and French weren't added.",
+      );
+
+      expect(refusal).toBeInTheDocument();
     });
   });
 

@@ -10,17 +10,18 @@ import type { TTenantPlan } from '@shinefold/config/constants';
 export type TNotInPlanRefusal = {
   outcome: typeof ACTION_OUTCOME.REFUSED;
   reason: typeof SETTINGS_REFUSAL.NOT_IN_PLAN;
-  values: { plan: TTenantPlan };
+  values: { plan: TTenantPlan; localeLimit?: number };
   items: string[];
 };
 
 export const toNotInPlanRefusal = (
   plan: TTenantPlan,
   items: string[],
+  localeLimit?: number,
 ): TNotInPlanRefusal => ({
   outcome: ACTION_OUTCOME.REFUSED,
   reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
-  values: { plan },
+  values: { plan, localeLimit },
   items,
 });
 
