@@ -1,14 +1,14 @@
 import { Alert } from '@platform/components/shared/alert';
 import { OwnerAccessActions } from '@platform/components/shared/owner-access-actions';
 import { PageHeader } from '@platform/components/shared/page-header';
+import { PageStack } from '@platform/components/shared/page-stack';
+import { contentColumnClasses } from '@platform/utils/content-column-classes/content-column-classes';
 import { ALERT_TYPE } from '@shinefold/config';
 import {
   STUDIO_ACCESS,
   type TPendingStudioAccess,
 } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
-
-import { ownerStudioAccessViewVariants } from './owner-studio-access-view-variants';
 
 export type TStudioAccessViewProps = {
   tenantId: string;
@@ -21,10 +21,9 @@ export const OwnerStudioAccessView = ({
 }: TStudioAccessViewProps) => {
   const tStudio = useTranslations('studioPage');
   const t = useTranslations('ownerStudioAccess');
-  const { root } = ownerStudioAccessViewVariants();
 
   return (
-    <div className={root()}>
+    <PageStack className={contentColumnClasses()}>
       <PageHeader title={tStudio('title')} />
       <Alert
         type={
@@ -38,6 +37,6 @@ export const OwnerStudioAccessView = ({
           <OwnerAccessActions tenantId={tenantId} studioAccess={studioAccess} />
         }
       />
-    </div>
+    </PageStack>
   );
 };

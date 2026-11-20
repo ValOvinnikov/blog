@@ -221,9 +221,11 @@ from `useSettingsFormState()`:
   `RailIntro` is the page's only `<h1>`. Choices are visible light-surface
   link rows in one `Card`, none pre-selected. Dead-end pages (404, error,
   sign-in error) use `DeadEndView` on `CenteredCardFrame`.
-- The Studio route is full-bleed in every state, and is the only route that
-  is: neither `ShellFrame` nor `StudioMountView` adds padding around the
-  mounted Studio or its archived and not-provisioned states.
+- The Studio route is full-bleed, and is the only route that is: neither
+  `ShellFrame` nor `StudioMountView` adds padding around the mounted Studio or
+  its archived and not-provisioned states. The owner's pending-access state
+  (`OwnerStudioAccessView`) is a page like any other, so it takes the content
+  column's padding itself (`@platform/utils/content-column-classes`).
 
 ## Cards
 

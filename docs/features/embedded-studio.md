@@ -45,7 +45,9 @@ Seeded starter content is badged: `SampleBadge` (`packages/studio/src/document-b
   below `basePath`, including structure paths whose ids contain dots. The
   platform proxy skips only root-level dotted paths, so those still resolve.
 - The `studio` segment switches the shell to full-bleed: the content column is
-  pinned to the viewport and the Studio fills it (`ShellFrame`).
+  pinned to the viewport and the Studio fills it (`ShellFrame`). While the
+  owner's access is pending, the page's title and notice keep the padding of
+  every other dashboard page.
 - The sidebar shows a Studio item under "Content" in both trees. Under
   `/dashboard`, while the owner's access is not READY, the item carries one
   muted line under its label, inside the link: a 12px icon and text —
