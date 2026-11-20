@@ -1364,6 +1364,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/email-usage-level.ts"
+      },
+      {
+        "ref": "USAGE_LEVEL.NEAR",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
       }
     ],
     "OVER": [
@@ -10519,14 +10525,6 @@
     "UNDER": [
       {
         "ref": "USAGE_LEVEL.UNDER",
-        "scope": "app:platform",
-        "from": "@platform/constants/usage",
-        "file": "apps/platform/src/constants/usage.ts"
-      }
-    ],
-    "NEAR": [
-      {
-        "ref": "USAGE_LEVEL.NEAR",
         "scope": "app:platform",
         "from": "@platform/constants/usage",
         "file": "apps/platform/src/constants/usage.ts"
