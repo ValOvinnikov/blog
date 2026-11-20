@@ -24,6 +24,7 @@ export type TRenderPreviewOptions = {
   values?: Partial<TLookFormValues>;
   previewDevice?: TPreviewDevice;
   hasReaderAccounts?: boolean;
+  hasBookmarks?: boolean;
   hasCookieBanner?: boolean;
   followTarget?: TLookFollowTarget;
   hasLockedFields?: boolean;
@@ -35,6 +36,7 @@ export const lookPreview = ({
   values = {},
   previewDevice = PREVIEW_DEVICE.DESKTOP,
   hasReaderAccounts = true,
+  hasBookmarks = true,
   hasCookieBanner = true,
   followTarget = { kind: LOOK_FOLLOW_TARGET.IDLE },
   hasLockedFields = false,
@@ -75,8 +77,7 @@ export const lookPreview = ({
     <LookFormProvider value={lookForm}>
       <LookPreview
         liveLocales={[LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR]}
-        hasReaderAccounts={hasReaderAccounts}
-        hasCookieBanner={hasCookieBanner}
+        features={{ hasReaderAccounts, hasBookmarks, hasCookieBanner }}
         siteHost={MOCK_TENANT_DOMAIN}
         followTarget={followTarget}
         isShown={true}

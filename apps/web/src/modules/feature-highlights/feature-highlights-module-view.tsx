@@ -1,5 +1,6 @@
 import { MEDIA_ORDER } from '@shinefold/config';
 import type { TFeatureHighlightsModule } from '@shinefold/service';
+import { hasLength } from '@shinefold/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
@@ -58,7 +59,6 @@ export const FeatureHighlightsModuleView = ({
         id={titleId}
         level={2}
         align={contentAlignment}
-        variant="section"
       />
       <div className={s.rows()} data-testid={`${dataTestId}-rows`}>
         {highlights.map((item, index) => (
@@ -70,7 +70,7 @@ export const FeatureHighlightsModuleView = ({
           />
         ))}
       </div>
-      {ctaButtons.length > 0 && (
+      {hasLength(ctaButtons) && (
         <div className={actions.actions()}>
           <ActionGroup actions={ctaButtons} />
         </div>

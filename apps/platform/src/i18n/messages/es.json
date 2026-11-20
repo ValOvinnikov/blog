@@ -2517,6 +2517,48 @@
     "metaExpires": "{who} · {date} · Caduca el {expiry}",
     "metaExpired": "{who} · {date} · Caducó el {expiry}"
   },
+  "usageCard": {
+    "title": "Uso",
+    "description": "Lo que incluye su plan y cuánto se ha usado.",
+    "labels": {
+      "TAKEAWAYS": "Resúmenes con IA este mes",
+      "EMAILS": "Correos enviados este mes",
+      "SEATS": "Plazas del equipo",
+      "LANGUAGES": "Idiomas adicionales"
+    },
+    "links": {
+      "SEATS": "Equipo",
+      "LANGUAGES": "Idiomas"
+    },
+    "value": "<count>{used, number}</count> de {allowance, number}",
+    "failed": "No se pudo cargar este recuento. Recargue la página para intentarlo de nuevo.",
+    "footer": {
+      "limits": "Su plan fija estos límites.",
+      "plansLink": "Consulte lo que incluye cada plan"
+    },
+    "notes": {
+      "TAKEAWAYS": {
+        "UNDER": "Se reinicia el {date}",
+        "NEAR": "{percent} % usado — quedan {left, number}<separator>·</separator><reset>Se reinicia el {date}</reset>",
+        "FULL": "Todo usado. Las nuevas entradas no tendrán resúmenes hasta el {date}."
+      },
+      "EMAILS": {
+        "UNDER": "Se reinicia el {date}",
+        "NEAR": "{percent} % usado — quedan {left, number}<separator>·</separator><reset>Se reinicia el {date}</reset>",
+        "FULL": "Todo usado. Las nuevas entradas no se enviarán por correo hasta el {date}."
+      },
+      "SEATS": {
+        "UNDER": "Cuenta al propietario, los miembros y las invitaciones pendientes.",
+        "NEAR": "{left, plural, one {Queda # plaza.} other {Quedan # plazas.}}",
+        "FULL": "Todas las plazas ocupadas. Quite a alguien para invitar a otra persona."
+      },
+      "LANGUAGES": {
+        "UNDER": "Su idioma predeterminado no cuenta.",
+        "NEAR": "{left, plural, one {Queda # idioma.} other {Quedan # idiomas.}}",
+        "FULL": "Todos en uso. Quite uno para añadir otro."
+      }
+    }
+  },
   "revokeGrantControl": {
     "revoke": {
       "trigger": "Revocar",

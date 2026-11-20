@@ -1,5 +1,7 @@
 import { service } from '@shinefold/service';
+import { TIMELINE_LOG } from '@web/constants/timeline';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getModuleSection } from '@web/server/site-config/get-module-section/get-module-section';
 import { logger } from '@web/utils/logger/logger';
 
 import { TimelineModuleView } from './timeline-module-view';
@@ -9,20 +11,26 @@ export interface ITimelineModuleProps {
 }
 
 export const TimelineModule = async ({ id }: ITimelineModuleProps) => {
-  const { sanityContext } = await getRequestContext();
+  const { sanityContext, tenantId } = await getRequestContext();
   const result = await service.modules.timeline.v1.getTimelineModule(
     id,
     sanityContext,
   );
 
   if (!result.ok) {
-    logger.error('timeline_module.fetch_failed', { id, error: result.error });
+    logger.error(TIMELINE_LOG.MODULE_FETCH_FAILED, {
+      id,
+      error: result.error,
+    });
     return null;
   }
 
+  const { section, content } = await getModuleSection(tenantId, result.data);
+
   return (
     <TimelineModuleView
-      {...result.data}
+      {...content}
+      section={section}
       titleId={`timeline-${id}`}
       dataTestId={`timeline-module-${id}`}
     />

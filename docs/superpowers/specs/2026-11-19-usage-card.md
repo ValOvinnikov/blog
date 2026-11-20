@@ -87,7 +87,8 @@ with nothing used still shows, as "0 of {n}".
 ### Notes
 
 The line under each meter. `{d MMMM}` is the first day of the next UTC month
-in the viewer's platform language, with no year ("1 December").
+in the viewer's platform language and that locale's order, day and full month
+with no year ("December 1" in English, "1. Dezember" in German).
 
 | Row       | Under 80%                                      | 80–99%                                         | 100%                                                 |
 | --------- | ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------- |
@@ -195,5 +196,5 @@ Calls this spec made, listed so the owner can confirm or change them
    capped value.
 10. **Failures**: a failed count shows that row's warning; when the
     entitlements cannot be read, the whole card is left out.
-11. **Phone dates**: the reset date keeps its full month name ("1 December"),
+11. **Phone dates**: the reset date keeps its full month name ("December 1"),
     where the Subscribers phone layout shortens it.

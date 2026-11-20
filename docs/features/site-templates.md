@@ -6,6 +6,7 @@ code:
   - packages/config/src/starter-content/**
   - apps/worker/src/units/apply-site-template.ts
   - apps/worker/src/units/remove-sample-content.ts
+  - apps/worker/src/app/api/sample-content/remove/route.ts
   - apps/worker/src/utils/sample-content/**
   - apps/worker/src/steps/seed-content.ts
   - apps/worker/src/utils/migration-ledger/**
@@ -53,12 +54,12 @@ No route of its own. The seeded documents are what the public site renders and w
 
 ## Removing samples
 
-The worker's `removeSampleContent(tenantId)` unit clears the samples in one Sanity transaction and returns what it removed, what it kept as **edited** and what it kept as **referenced**. The owner-facing action is #4972.
+The worker's `removeSampleContent(tenantId)` unit clears the samples in one Sanity transaction and returns what it removed, what it kept as **edited** and what it kept as **referenced**. The platform triggers it with a signed `POST /api/sample-content/remove` (`{ tenantId }`, under `WORKER_ENQUEUE_SECRET`), which runs the removal in the request — not as a Workflow run — and answers `200` with `{ removed, keptEdited, keptReferenced }`. An unknown tenant gets `404 NOT_FOUND`, one without a Sanity project or write token `409 NOT_PROVISIONED`, one whose status is outside `WRITABLE_TENANT_STATUSES` (suspended or archived) `409 NOT_WRITABLE` — the worker is the backstop behind #4972's own status check — and a failed removal is logged once (`sample_content.removal_failed`) and answered `500 SERVER_ERROR`, which the platform shows as retryable. The owner-facing action is #4972.
 
 - **Edited** — a `starter.*` document changed since seeding (`_updatedAt` differs from `_createdAt`), or one with a pending draft or release version, is kept.
 - **Unlinked** — each unedited sample is deleted, and the array items referencing it are removed by `_key` from the seeded home template's modules, the navigation's links and the post-index template's modules, guarded by each document's revision.
 - **Referenced** — an unedited sample is kept when a single field holds it (the home hero, the topic and tag index templates), when the array item holding it also holds something else (a navigation link with the owner's sub-items, so no array drops below its minimum), or when any other document references it: the owner's own content, a draft, or an edited sample. A kept document keeps the samples it references in turn.
-- **Revision-guarded** — every removed document and every unlinked seeded document carries the revision the step read, so an edit published mid-run fails the commit and the retry re-plans from a fresh read.
+- **Revision-guarded** — every removed document and every unlinked seeded document carries the revision the step read, so an edit published mid-run fails the commit, and the owner's retry re-plans from a fresh read.
 - **Known edges** — a draft started mid-run on an unedited sample survives as an orphaned draft of a deleted document; a retry after a commit whose response was lost reports nothing removed, because the samples are already gone.
 
 ## Dependencies
@@ -71,6 +72,7 @@ The worker's `removeSampleContent(tenantId)` unit clears the samples in one Sani
 - `packages/config/src/starter-content/starter-content.test.ts` — ids are stable and unique, every reference resolves, values carry the requested locale, SEO stays within its bounds.
 - `packages/config/src/starter-content/copy/starter-copy.test.ts` — every locale matches the `en` catalogue's shape.
 - `apps/worker/src/units/remove-sample-content.test.ts`, `apps/worker/src/utils/sample-content/plan-sample-content-removal.test.ts` — what is removed, unlinked and kept, and why.
+- `apps/worker/src/app/api/sample-content/remove/route.test.ts` — the signature, tenant, provisioning and status refusals, the result body and a failed removal.
 - `apps/worker/src/units/apply-site-template.test.ts`, `apps/worker/src/steps/seed-content.test.ts`, `apps/worker/src/utils/migration-ledger/migration-ledger.test.ts`.
 
 ## Related epics

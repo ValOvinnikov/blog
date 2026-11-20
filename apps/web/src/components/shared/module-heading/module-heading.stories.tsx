@@ -22,10 +22,6 @@ const meta = {
       control: 'select',
       options: Object.values(CONTENT_ALIGNMENT),
     },
-    variant: {
-      control: 'select',
-      options: ['section'],
-    },
   },
   args: {
     headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
