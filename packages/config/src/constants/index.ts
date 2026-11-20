@@ -20,6 +20,7 @@ export * from './divider-width';
 export * from './display-mode';
 export * from './email-account';
 export * from './email-font-stack';
+export * from './email-usage-level';
 export * from './email-field-limits';
 export * from './email-template';
 export * from './email-type';

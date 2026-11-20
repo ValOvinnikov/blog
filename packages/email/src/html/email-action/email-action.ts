@@ -1,3 +1,4 @@
+import { renderEmailButton } from '@shinefold/email/html/email-button/email-button';
 import { FONT_STACK } from '@shinefold/email/html/email-metrics/email-metrics';
 import { escapeHtml } from '@shinefold/email/html/escape-html/escape-html';
 import { sanitizeHref } from '@shinefold/utils';
@@ -34,14 +35,16 @@ export function renderEmailAction(
     ].join('');
   }
 
-  // The anchor carries the padding so the whole button is clickable; the cell's fill covers Outlook desktop, which drops padding on links.
-  return [
-    '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto 0;">',
-    '<tr>',
-    `<td align="center" bgcolor="${brand.brandPrimarySolid}" style="border-radius:6px;background-color:${brand.brandPrimarySolid};">`,
-    `<a href="${escapedUrl}" style="display:inline-block;padding:11px 27px;border:1px solid ${brand.brandPrimarySolid};border-radius:6px;background-color:${brand.brandPrimarySolid};font-family:${FONT_STACK};font-size:16px;font-weight:600;color:${brand.brandPrimaryContrast};text-decoration:none;">${escapedLabel}</a>`,
-    '</td>',
-    '</tr>',
-    '</table>',
-  ].join('');
+  return renderEmailButton({
+    label: action.label,
+    url: action.url,
+    fill: brand.brandPrimarySolid,
+    textColor: brand.brandPrimaryContrast,
+    fontStack: FONT_STACK,
+    fontSizePx: 16,
+    radiusPx: 6,
+    paddingYPx: 12,
+    paddingXPx: 28,
+    tableStyle: 'margin:24px auto 0;',
+  });
 }

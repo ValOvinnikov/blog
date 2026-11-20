@@ -1,16 +1,13 @@
-import type { TEmailAction } from '@shinefold/email/html/email-action/email-action';
+import type { TOwnerEmail } from '@shinefold/email/templates/owner/owner-email/owner-email';
 import {
-  buildOwnerEmail,
-  type TOwnerEmail,
-  type TOwnerEmailInput,
-} from '@shinefold/email/templates/owner/owner-email/owner-email';
+  buildOwnerLimitEmail,
+  type TOwnerLimitEmailInput,
+} from '@shinefold/email/templates/owner/owner-limit-email/owner-limit-email';
 
-export type TOwnerNewsletterPausedEmailInput = TOwnerEmailInput & {
-  action: TEmailAction;
-};
+export type TOwnerNewsletterPausedEmailInput = TOwnerLimitEmailInput;
 
 export function buildOwnerNewsletterPausedEmail(
   input: TOwnerNewsletterPausedEmailInput,
 ): TOwnerEmail {
-  return buildOwnerEmail(input);
+  return buildOwnerLimitEmail(input);
 }

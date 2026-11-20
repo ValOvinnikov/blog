@@ -102,6 +102,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **EMAIL_TYPE**: `SIGN_IN`, `INVITE`, `NEWSLETTER_CONFIRMATION`, `NEWSLETTER_ISSUE`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/email-usage-level.ts`
+
+- **EMAIL_USAGE_LEVEL**: `NORMAL`, `NEAR`, `OVER`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/embed.ts`
 
 - **EMBED_PROVIDER**: `YOUTUBE`, `VIMEO`, `LOOM`, `CAL`, `GOOGLE_MAPS`
