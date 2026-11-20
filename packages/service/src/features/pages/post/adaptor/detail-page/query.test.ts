@@ -27,9 +27,11 @@ faker.seed(6016);
 const MOCK_EN_SLUG = faker.lorem.slug();
 const MOCK_NL_SLUG = faker.lorem.slug();
 const MOCK_SCHEDULED_SLUG = faker.lorem.slug();
+const MOCK_UNDATED_SLUG = faker.lorem.slug();
 const MOCK_EN_ID = faker.string.uuid();
 const MOCK_NL_ID = faker.string.uuid();
 const MOCK_SCHEDULED_ID = faker.string.uuid();
+const MOCK_UNDATED_ID = faker.string.uuid();
 const MOCK_METADATA_ID = faker.string.uuid();
 const MOCK_RICH_BLOCK_KEY = faker.string.uuid();
 const MOCK_LINK_MARK_KEY = faker.string.uuid();
@@ -197,6 +199,12 @@ describe('postPageQuery', () => {
         language: NL,
         publishedAt: MOCK_SCHEDULED_AT,
       }),
+      mockSlugPageDocument({
+        _id: MOCK_UNDATED_ID,
+        _type: 'page_post',
+        slug: MOCK_UNDATED_SLUG,
+        language: NL,
+      }),
       {
         _id: MOCK_METADATA_ID,
         _type: 'translation.metadata',
@@ -207,11 +215,16 @@ describe('postPageQuery', () => {
       },
     ];
 
-    function run(slug: string, locale: string): Promise<unknown> {
+    function run(
+      slug: string,
+      locale: string,
+      isDraftPreview = false,
+    ): Promise<unknown> {
       return evaluateGroqExpression(postPageQuery.query, dataset, null, {
         slug,
         locale,
         defaultLocale: EN,
+        isDraftPreview,
       });
     }
 
@@ -221,8 +234,17 @@ describe('postPageQuery', () => {
       expect(await run(MOCK_EN_SLUG, FR)).toBeNull();
     });
 
-    it('resolves nothing for a scheduled post', async () => {
-      expect(await run(MOCK_SCHEDULED_SLUG, NL)).toBeNull();
+    describe.each([
+      ['a scheduled post', MOCK_SCHEDULED_SLUG, MOCK_SCHEDULED_ID],
+      ['a post with no publish date', MOCK_UNDATED_SLUG, MOCK_UNDATED_ID],
+    ])('for %s', (_, slug, id) => {
+      it('resolves nothing on the public site', async () => {
+        expect(await run(slug, NL)).toBeNull();
+      });
+
+      it('resolves the post in a draft preview', async () => {
+        expect(await run(slug, NL, true)).toHaveProperty('_id', id);
+      });
     });
 
     it('returns the linked translations with their languages and slugs', async () => {
