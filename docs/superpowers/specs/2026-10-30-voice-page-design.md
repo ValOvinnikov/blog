@@ -234,13 +234,13 @@ in both themes (5.56:1 on the Dark brand #5850ec). No new token is added for it.
 New tokens this design needs (#6403, light values only; their dark
 values are drawn on `gap-theme-token-dark-values` and applied by #6291):
 
-| Value                           | Token                       | Dark (applied by #6291)     | Used by                                                 |
-| ------------------------------- | --------------------------- | --------------------------- | ------------------------------------------------------- |
-| #c7d2fe                         | `--color-admin-brand-line`  | #343a78                     | note border (A27), disabled phone Save fill (B2-16, E3) |
-| `0 2px 8px rgba(16,24,40,.08)`  | `--shadow-admin-bar`        | `0 2px 8px rgba(0,0,0,.45)` | pinned bar (B4-3, B1-3, U3, M2)                         |
-| `0 -2px 8px rgba(16,24,40,.06)` | `--shadow-admin-dock`       | `0 -2px 8px rgba(0,0,0,.4)` | docked save bar (A83, M3)                               |
-| `0 1px 2px rgba(16,24,40,.08)`  | `--shadow-admin-xs`         | `0 1px 2px rgba(0,0,0,.4)`  | selected language option (A23)                          |
-| #3730a3                         | `--color-admin-brand-hover` | #6159ee                     | active chip hover fill and border (A36; D6)             |
+| Value                           | Token                       | Dark (applied by #6291)     | Used by                                     |
+| ------------------------------- | --------------------------- | --------------------------- | ------------------------------------------- |
+| #c7d2fe                         | `--color-admin-brand-line`  | #343a78                     | note border (A27)                           |
+| `0 2px 8px rgba(16,24,40,.08)`  | `--shadow-admin-bar`        | `0 2px 8px rgba(0,0,0,.45)` | pinned bar (B4-3, B1-3, U3, M2)             |
+| `0 -2px 8px rgba(16,24,40,.06)` | `--shadow-admin-dock`       | `0 -2px 8px rgba(0,0,0,.4)` | docked save bar (A83, M3)                   |
+| `0 1px 2px rgba(16,24,40,.08)`  | `--shadow-admin-xs`         | `0 1px 2px rgba(0,0,0,.4)`  | selected language option (A23)              |
+| #3730a3                         | `--color-admin-brand-hover` | #6159ee                     | active chip hover fill and border (A36; D6) |
 
 Dropped from the earlier draft of #6403: `--color-admin-hover` (#6381
 adds the same #e2e5ea), `--text-admin-22` (#6357), `--font-admin-mono`
@@ -252,9 +252,8 @@ border, rgba(79,70,229,.3)) beside `brand-line`; both are note borders and
 render 1.18:1 apart. #6288 lands before either token exists, so the
 duplicate check is #6403's, which lands after #6381 and compares
 the two before adding `brand-line` (D48; decided 31 Oct): keep both.
-`brand-line` is an opaque #c7d2fe that also fills the disabled phone Save on
-white (B2-16, E3), where the translucent `note-line` would not give #c7d2fe,
-and the two Dark values differ (#343a78; rgba(165,180,252,.3)). #6403
+`brand-line` is an opaque #c7d2fe, which the translucent `note-line` would
+not give on white, and the two Dark values differ (#343a78; rgba(165,180,252,.3)). #6403
 records the comparison in its Reuse item.
 
 **Active chip hover (D6; theme spec § 20 item 3). Decided 31 Oct.**
@@ -1436,36 +1435,36 @@ overrides, the box states the rule's value.
 - [ ] B1-20 "Show preview" full width, 44, 6 below the list; only on Empty lists
 - [ ] B1-21 Bookmarks card 16 below Empty lists: field anatomy of § 11.8, editor with toolbar (D3), no preview, no Show preview
 - [ ] B1-21 editor text 16px
-- [ ] B1-22 footer: dot, "1 unsaved change" 13/600, Save 44; no Discard, no shortcut, no shadow; a region named by its status text
+- [ ] no save bar while nothing is unsaved; after one change the shared edge-to-edge bar: count, then Discard and Save changes in two 44px columns, as on Look
 
 ### S · Show preview pressed (`gap-voice-show-preview-pressed` S1)
 
 - [ ] S1 the button reads "Hide preview", aria-expanded true, keeps focus with the ring
 - [ ] S1 the preview 10 below: padding 14, #f6f7f9, #eef0f3 border, radius 6, gap 10
 - [ ] S1 with no row open: "PREVIEW · BLOG INDEX PAGE", the Blog index specimen ("Blog", "All posts", "0 posts", "Fresh notes are on the way."), min-height 260, then the note
-- [ ] pressing again restores "Show preview" and hides the group; the footer stays pinned throughout
+- [ ] pressing again restores "Show preview" and hides the group
 
 ### B2 · 390 phone, saved
 
 - [ ] B2-2 chips without counts where nothing is customised
 - [ ] B2-9 collapsed summary rows: padding 10/16, name, pill, chevron; no description, no count
-- [ ] B2-16 footer "All changes saved", no dot, Save disabled #c7d2fe / #3730a3, footer stays visible
+- [ ] once saved, no save bar
 
-### E · 390 phone footer (`gap-voice-phone-footer-states` E1–E5)
+### E · 390 phone save bar
 
 - [ ] E1 after Save with one invalid field: Empty states opened, Topic page opened and focused; chip "1 error"; meta red
-- [ ] E1 footer two rows, 85 tall: "1 field needs attention" 13/18 600 #b42318; then "Go to the first one" underlined (44 tall) and Save changes at the right; no dot, no count, no "Not saved"
+- [ ] E1 the bar shows "1 field needs attention" and "Go to the first one", with Discard and Save changes, as on the other settings pages
 - [ ] E2 two errors: Tag page closed with its collapsed-row note; chip "2 errors"; meta "6 fields · 2 fields need attention"; focus on "Go to the first one" shows the ring; activating it reopens Topic page and focuses it
-- [ ] E3 saving: dot and "1 unsaved change" stay; the button reads "Saving…" at 116 wide in #c7d2fe / #3730a3, keeps focus, is announced once; 65 tall; page inert, not dimmed
-- [ ] E4 at 320 the error footer is two rows, 85 tall; E5 at 320 saving is one row, 65 tall
-- [ ] the page's 96 bottom padding clears the 85 error footer
+- [ ] saving: Save reads "Saving…", keeps focus and is announced once; Discard disabled; page inert, not dimmed
+- [ ] Discard reverts the change and the bar goes
+- [ ] the last field on the page is never hidden behind the bar
 
 ### N · notices (`gap-voice-notices` NA–NC2)
 
 - [ ] NA archived: warning notice under the head, above the note row; language, Light / Dark, chips, Expand / Collapse, headers, summary rows, list rows and Show preview all work
-- [ ] NA editors and inputs read-only, in the open Topic page row as in the field cards: no toolbar, #eef0f3 fill and border, #5b6472 text, described by the notice; the hint and the "Keep {name}" note stay; no Reset, no dot, no save bar, no phone footer; bottom padding 48
+- [ ] NA editors and inputs read-only, in the open Topic page row as in the field cards: no toolbar, #eef0f3 fill and border, #5b6472 text, described by the notice; the hint and the "Keep {name}" note stay; no Reset, no dot, no save bar; bottom padding 48
 - [ ] NB save failed with no field errors: error Alert, title only, as wide as its text, role alert, under the head; the bar stays "1 unsaved change" with Discard and Save; the row keeps its dot; no chip error pill, chips keep their counts and metas their "N customised"
-- [ ] NC1 draft offered back: warning banner with "Restore 2 changes" and "Discard them"; saved values shown, no dot, no save bar (phone: the footer reads "All changes saved"); on load every section is collapsed (D9), and opening Empty states for the first time opens its first row (D40) — NC1 and NC2 draw it after that row was closed
+- [ ] NC1 draft offered back: warning banner with "Restore 2 changes" and "Discard them"; saved values shown, no dot, no save bar at any width; on load every section is collapsed (D9), and opening Empty states for the first time opens its first row (D40) — NC1 and NC2 draw it after that row was closed
 - [ ] at 390 the notices sit after the language track and before the note, each 16 from its neighbours
 - [ ] NC2 saved since the draft: error-tone banner, "Review the difference" open with Field / Saved / Your draft, "Restore anyway" and "Discard my draft"
 - [ ] each notice keeps today's Alert look; buttons ≈ 37 tall from `md`, 44 below
