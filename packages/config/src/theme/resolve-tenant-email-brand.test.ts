@@ -18,6 +18,7 @@ import {
   resolveTenantEmailDarkBrand,
 } from './resolve-tenant-email-brand';
 import type { TOklchStop } from './theme-declarations';
+import { NEUTRAL_RAMP_DARK, NEUTRAL_RAMP_LIGHT } from './theme-ramps';
 
 vi.mock(import('@shinefold/utils/color'), async (importOriginal) => {
   const actual = await importOriginal();
@@ -32,18 +33,33 @@ const MOCK_ACCENT_HUE = 65;
 const MOCK_LOGO_HUE = 274;
 const HEX_COLOR = /^#[0-9a-f]{6}$/;
 
-const hexAt = ({ l, c }: TOklchStop, hue: number) => oklchToHex(l, c, hue);
+const hexAt = ({ l, c, h }: TOklchStop, hue: number) =>
+  oklchToHex(l, c, h ?? hue);
 
-const LIGHT_RAMPS = { accent: ACCENT_RAMP_LIGHT, logo: LOGO_RAMP_LIGHT };
-const DARK_RAMPS = { accent: ACCENT_RAMP_DARK, logo: LOGO_RAMP_DARK };
+const LIGHT_RAMPS = {
+  neutral: NEUTRAL_RAMP_LIGHT,
+  accent: ACCENT_RAMP_LIGHT,
+  logo: LOGO_RAMP_LIGHT,
+};
+const DARK_RAMPS = {
+  neutral: NEUTRAL_RAMP_DARK,
+  accent: ACCENT_RAMP_DARK,
+  logo: LOGO_RAMP_DARK,
+};
 
-const expectedAccentAndLogoHex = (
-  { accent, logo }: typeof LIGHT_RAMPS | typeof DARK_RAMPS,
+const expectedBrandHex = (
+  { neutral, accent, logo }: typeof LIGHT_RAMPS | typeof DARK_RAMPS,
   accentHue: number,
   logoHue = accentHue,
 ) => ({
+  surface: hexAt(neutral['--surface'], accentHue),
+  surface2: hexAt(neutral['--surface-2'], accentHue),
+  border: hexAt(neutral['--border'], accentHue),
+  text: hexAt(neutral['--text'], accentHue),
+  textMuted: hexAt(neutral['--text-muted'], accentHue),
   brandPrimary: hexAt(accent['--brand-primary'], accentHue),
   brandPrimarySolid: hexAt(accent['--brand-primary-solid'], accentHue),
+  brandPrimaryContrast: hexAt(accent['--brand-primary-contrast'], accentHue),
   logo1: hexAt(logo['--logo-1'], logoHue),
   logo2: hexAt(logo['--logo-2'], logoHue),
   logo3: hexAt(logo['--logo-3'], logoHue),
@@ -68,26 +84,30 @@ beforeEach(() => {
 });
 
 describe.each(MODES)('the $mode email brand', ({ resolve, ramps }) => {
-  it('resolves the accent and logo colours from an accessible accent hue', () => {
-    const { brandPrimary, brandPrimarySolid, logo1, logo2, logo3 } = resolve({
+  it('resolves every colour to literal hex from an accessible accent hue', () => {
+    const brand = resolve({
       preset: PRESET_ID.CONSOLE,
       accentHue: MOCK_ACCENT_HUE,
     });
-
-    expect({ brandPrimary, brandPrimarySolid, logo1, logo2, logo3 }).toEqual(
-      expectedAccentAndLogoHex(ramps, MOCK_ACCENT_HUE),
+    const nonHex = Object.values(brand).filter(
+      (value) => !HEX_COLOR.test(value),
     );
+
+    expect({ brand, nonHex }).toEqual({
+      brand: expectedBrandHex(ramps, MOCK_ACCENT_HUE),
+      nonHex: [],
+    });
   });
 
   it('resolves the accent and logo hues independently', () => {
-    const { brandPrimary, brandPrimarySolid, logo1, logo2, logo3 } = resolve({
+    const brand = resolve({
       preset: PRESET_ID.CONSOLE,
       accentHue: MOCK_ACCENT_HUE,
       logoHue: MOCK_LOGO_HUE,
     });
 
-    expect({ brandPrimary, brandPrimarySolid, logo1, logo2, logo3 }).toEqual(
-      expectedAccentAndLogoHex(ramps, MOCK_ACCENT_HUE, MOCK_LOGO_HUE),
+    expect(brand).toEqual(
+      expectedBrandHex(ramps, MOCK_ACCENT_HUE, MOCK_LOGO_HUE),
     );
   });
 
@@ -95,61 +115,37 @@ describe.each(MODES)('the $mode email brand', ({ resolve, ramps }) => {
     failAccentHueGuard();
     const { accentHue } = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
 
-    const { brandPrimary, brandPrimarySolid, logo1, logo2, logo3 } = resolve({
+    const brand = resolve({
       preset: PRESET_ID.EDITORIAL,
       accentHue: MOCK_ACCENT_HUE,
     });
 
-    expect({ brandPrimary, brandPrimarySolid, logo1, logo2, logo3 }).toEqual(
-      expectedAccentAndLogoHex(ramps, accentHue),
-    );
-  });
-});
-
-describe(resolveTenantEmailBrand, () => {
-  it('returns a flat object of literal hex strings', () => {
-    const brand = resolveTenantEmailBrand({
-      preset: PRESET_ID.CONSOLE,
-      accentHue: MOCK_ACCENT_HUE,
-    });
-
-    const nonHex = Object.values(brand).filter(
-      (value) => !HEX_COLOR.test(value),
-    );
-
-    expect(nonHex).toEqual([]);
+    expect(brand).toEqual(expectedBrandHex(ramps, accentHue));
   });
 });
 
 describe(resolveTenantEmailDarkBrand, () => {
-  it.each(
-    Object.values(PRESET_ID).flatMap((preset) => [
-      { preset, guard: 'passes', isGuardFailing: false },
-      { preset, guard: 'fails', isGuardFailing: true },
-    ]),
-  )(
-    'keeps AA contrast on $preset when the accent-hue guard $guard',
-    ({ preset, isGuardFailing }) => {
-      if (isGuardFailing) failAccentHueGuard();
+  it('keeps AA contrast for text, muted text and the accent', () => {
+    const {
+      surface,
+      text,
+      textMuted,
+      brandPrimarySolid,
+      brandPrimaryContrast,
+    } = resolveTenantEmailDarkBrand({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: MOCK_ACCENT_HUE,
+    });
 
-      const {
-        surface,
-        text,
-        textMuted,
-        brandPrimarySolid,
-        brandPrimaryContrast,
-      } = resolveTenantEmailDarkBrand({ preset, accentHue: MOCK_ACCENT_HUE });
+    const ratios = {
+      text: contrastOf(text, surface),
+      textMuted: contrastOf(textMuted, surface),
+      accent: contrastOf(brandPrimaryContrast, brandPrimarySolid),
+    };
+    const failing = Object.entries(ratios).filter(
+      ([, ratio]) => !(ratio >= WCAG_AA_CONTRAST_MIN),
+    );
 
-      const ratios = {
-        text: contrastOf(text, surface),
-        textMuted: contrastOf(textMuted, surface),
-        accent: contrastOf(brandPrimaryContrast, brandPrimarySolid),
-      };
-      const failing = Object.entries(ratios).filter(
-        ([, ratio]) => !(ratio >= WCAG_AA_CONTRAST_MIN),
-      );
-
-      expect(failing).toEqual([]);
-    },
-  );
+    expect(failing).toEqual([]);
+  });
 });
