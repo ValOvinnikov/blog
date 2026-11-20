@@ -1,3 +1,4 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Panel } from '@shinefold/ui/components/molecules/panel';
 import { SettingRow } from '@shinefold/ui/components/molecules/setting-row';
@@ -26,10 +27,6 @@ export interface IIdentitySectionViewProps {
   displayNameControl: ReactNode;
 }
 
-/**
- * Each row and the display-name control arrive already resolved by the wrapper — this component has no knowledge
- * of the session, `@shinefold/db`, or translations.
- */
 export const IdentitySectionView = ({
   heading,
   providerRows,
@@ -52,7 +49,11 @@ export const IdentitySectionView = ({
           control,
         }) => (
           <div key={id} className={s.providerRow()}>
-            <Heading level={3} visual="copy" className={s.providerName()}>
+            <Heading
+              level={3}
+              visual={TEXT_ROLE.CARD_TITLE}
+              className={s.providerName()}
+            >
               {icon} {label}
             </Heading>
             <div className={s.providerStatus()}>
