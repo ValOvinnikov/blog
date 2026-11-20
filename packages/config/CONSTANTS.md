@@ -747,6 +747,13 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **REQUEST_LOG**: `UNHANDLED_ERROR`=`"request.unhandled_error"`
 
+### `@platform/constants/sample-content` — `apps/platform/src/constants/sample-content.ts`
+
+- **SAMPLE_CONTENT_PATH**: `REMOVE`=`"/api/sample-content/remove"`
+- **SAMPLE_CONTENT_LOG**: `REMOVAL_FAILED`=`"sample_content.removal_failed"`, `REMOVAL_RESPONSE_INVALID`=`"sample_content.removal_response_invalid"`
+- **SAMPLE_CONTENT_REFUSAL**: `NOT_WRITABLE`
+- **SAMPLE_KIND**: `SECTION`, `PAGE`, `TEMPLATE`, `LINK`, `AUTHOR`, `TOPIC`, `OTHER`
+
 ### `@platform/constants/sample-part` — `apps/platform/src/constants/sample-part.ts`
 
 - **SAMPLE_PART**: `HEADER`=`"header"`, `FOOTER`=`"footer"`, `BRAND`=`"brand"`, `POST_CARD`=`"post-card"`, `POST_IMAGE`=`"post-image"`, `FAQ_ITEM`=`"faq-item"`, `FORM_FIELD`=`"form-field"`, `QUOTE_CARD`=`"quote-card"`, `CTA_BOX`=`"cta-box"`, `BUTTON`=`"button"`, `BUSY_BUTTON`=`"busy-button"`

@@ -6,6 +6,7 @@ import { getStartedFor } from '@platform/server/onboarding/get-started-for';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { siteSetupFor } from '@platform/server/provisioning/site-setup-for';
+import { sampleContentFor } from '@platform/server/sample-content/sample-content-for';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { queries } from '@shinefold/db';
 import type { Metadata } from 'next';
@@ -30,8 +31,11 @@ export default async function DashboardOverviewPage() {
       tenant={tenant}
       domainVerificationStatus={domainVerificationStatus}
       owner={owner}
-      siteSetup={siteSetupFor(tenant, viewer)}
-      getStarted={getStarted}
+      firstRun={{
+        siteSetup: siteSetupFor(tenant, viewer),
+        getStarted,
+        sampleContent: sampleContentFor(tenant, viewer),
+      }}
       canUpgrade={upgradeStateFor(tenant, viewer) === UPGRADE_STATE.AVAILABLE}
       usage={{
         links: {

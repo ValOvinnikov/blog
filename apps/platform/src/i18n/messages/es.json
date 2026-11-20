@@ -395,7 +395,32 @@
     "siteSetupNotStartedContactDescription": "No pudimos empezar a configurar tu sitio. Pide a tu contacto de la plataforma que la inicie.",
     "siteSetupStart": "Iniciar configuración",
     "siteSetupStarting": "Iniciando…",
-    "trialUpgrade": "Elegir un plan"
+    "trialUpgrade": "Elegir un plan",
+    "sampleContent": {
+      "title": "Contenido de ejemplo",
+      "supportingText": "Tu sitio empezó con páginas, secciones y enlaces de ejemplo. Quita los que no hayas cambiado.",
+      "trigger": "Quitar el contenido de ejemplo",
+      "notWritable": "No se puede quitar el contenido de ejemplo mientras tu sitio esté suspendido o archivado.",
+      "dialogTitle": "¿Quitar el contenido de ejemplo?",
+      "dialogDescription": "Los ejemplos que no hayas editado se eliminan de tu sitio. Se conservan los que hayas editado o los que use tu otro contenido.",
+      "keep": "Conservar los ejemplos",
+      "confirm": "Quitar los ejemplos",
+      "confirming": "Quitando los ejemplos…",
+      "failed": "No se pudieron quitar los ejemplos. Inténtalo de nuevo.",
+      "done": "{count, plural, =0 {No había ejemplos que quitar.} one {Se quitó # ejemplo.} other {Se quitaron # ejemplos.}}",
+      "nothingKept": "No se conservó ningún ejemplo.",
+      "keptEditedTitle": "Conservados porque los editaste",
+      "keptReferencedTitle": "Conservados porque otro contenido los usa",
+      "kind": {
+        "section": "Sección",
+        "page": "Página",
+        "template": "Plantilla de página",
+        "link": "Enlace de navegación",
+        "author": "Autor",
+        "topic": "Tema",
+        "other": "Ejemplo"
+      }
+    }
   },
   "getStartedCard": {
     "title": "Primeros pasos",
