@@ -452,7 +452,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/activity` — `apps/platform/src/constants/activity.ts`
 
-- **ACTIVITY_DETAIL**: `CHANGED_FIELDS`, `STUDIO_INVITE_SENT`, `STUDIO_INVITE_UNSENT`, `MAIN_ADDRESS_CHANGED`, `CUSTOM_DOMAIN_REQUESTED`, `CUSTOM_DOMAIN_REMOVED`, `ADDITIONAL_LANGUAGES`, `SUSPENSION_REASON`, `SUSPENSION_REFERENCE`, `PLAN`, `PLAN_CHANGED`, `SIGN_IN_PROVIDER`, `CLIENT_SECRET_REPLACED`
+- **ACTIVITY_DETAIL**: `CHANGED_FIELDS`, `STUDIO_INVITE_SENT`, `STUDIO_INVITE_UNSENT`, `MAIN_ADDRESS_CHANGED`, `CUSTOM_DOMAIN_REQUESTED`, `CUSTOM_DOMAIN_REMOVED`, `ADDITIONAL_LANGUAGES`, `SUSPENSION_REASON`, `SUSPENSION_REFERENCE`, `PLAN`, `PLAN_CHANGED`, `SIGN_IN_PROVIDER`, `CLIENT_SECRET_REPLACED`, `GRANT_ITEM`, `GRANT_EXPIRY`, `GRANT_UNTIL_REVOKED`, `GRANT_NOTE`
+
+### `@platform/constants/aria-role` — `apps/platform/src/constants/aria-role.ts`
+
+- **ARIA_ROLE**: `REGION`=`"region"`, `TABLE`=`"table"`, `ROWGROUP`=`"rowgroup"`, `ROW`=`"row"`, `CELL`=`"cell"`
 
 ### `@platform/constants/asset-upload` — `apps/platform/src/constants/asset-upload.ts`
 
@@ -460,7 +464,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/avatar` — `apps/platform/src/constants/avatar.ts`
 
-- **AVATAR_VARIANT**: `TABLE`, `ACCOUNT`, `SWITCHER`
+- **AVATAR_VARIANT**: `TABLE`, `ACCOUNT`, `SWITCHER`, `MEMBER`, `PENDING`
 
 ### `@platform/constants/badge-tone` — `apps/platform/src/constants/badge-tone.ts`
 

@@ -1,9 +1,8 @@
+import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config/constants';
 import {
   readCssBlock,
   readRepoFile,
 } from '@shinefold/config/testing/theme-css';
-
-import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config/constants';
 
 import { BRAND_PALETTE, formatPaletteDeclarations } from './palette-ramps';
 

@@ -1,5 +1,3 @@
-import type { TMaybeNull } from '@shinefold/config/types';
-
 import {
   PRESET_ID,
   SITE_TYPE,
@@ -7,6 +5,7 @@ import {
   type TPresetId,
   type TSiteType,
 } from '@shinefold/config/constants';
+import type { TMaybeNull } from '@shinefold/config/types';
 
 import { buildBaseDocuments } from './base-documents';
 import { buildBlogDocuments } from './blog-documents';

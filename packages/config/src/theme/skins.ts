@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@shinefold/config/types';
 import { mapKeysToRecord } from '@shinefold/utils/primitives';
 
 import {
@@ -9,6 +8,7 @@ import {
   type TColorScheme,
   type TSkinMode,
 } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 
 import { AMBIENT_RAISED, FIELD_BOUNDARY } from './contrast-surfaces';
 import { effectiveSchemeOf } from './skin-contrast';

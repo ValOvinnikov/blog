@@ -1,9 +1,3 @@
-import type {
-  TMaybeNull,
-  TMaybeUndefined,
-  TNullable,
-} from '@shinefold/config/types';
-
 import {
   COOKIE_STATEMENT_SLUG,
   NEWSLETTER_RESULT_SLUGS,
@@ -12,6 +6,11 @@ import {
   type TLocaleIsoCode,
   type TNewsletterResult,
 } from '@shinefold/config/constants';
+import type {
+  TMaybeNull,
+  TMaybeUndefined,
+  TNullable,
+} from '@shinefold/config/types';
 
 const toNewsletterLinkQuery = (token: string, locale?: TLocaleIsoCode) => {
   const tokenQuery = `token=${encodeURIComponent(token)}`;

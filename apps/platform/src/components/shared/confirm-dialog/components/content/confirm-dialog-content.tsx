@@ -16,6 +16,7 @@ export type TConfirmDialogContentProps = {
   description: ReactNode;
   confirmButtonLabel: ReactNode;
   confirmingButtonLabel: string;
+  keepButtonLabel?: ReactNode;
   isConfirmDisabled?: boolean;
   children?: ReactNode;
 };
@@ -25,10 +26,12 @@ export const ConfirmDialogContent = ({
   description,
   confirmButtonLabel,
   confirmingButtonLabel,
+  keepButtonLabel,
   isConfirmDisabled = false,
   children,
 }: TConfirmDialogContentProps) => {
   const t = useTranslations('confirmDialog');
+  const keepLabel = keepButtonLabel ?? t('cancelButton');
   const {
     expectedValue,
     tone,
@@ -48,9 +51,15 @@ export const ConfirmDialogContent = ({
       actions={
         <>
           <AlertDialog.Close
-            render={<Button type="button" variant={BUTTON_VARIANT.GHOST} />}
+            render={
+              <Button
+                type="button"
+                variant={BUTTON_VARIANT.SECONDARY}
+                isDisabled={isPending}
+              />
+            }
           >
-            {t('cancelButton')}
+            {keepLabel}
           </AlertDialog.Close>
           <Button
             type="button"

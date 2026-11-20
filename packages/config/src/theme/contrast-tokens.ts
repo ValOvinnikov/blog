@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   mixOklch,
   renderedContrastRatio,
@@ -12,6 +11,7 @@ import type {
   THeaderControlStyle,
   TNavLinkStyle,
 } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 
 import { ALL_OF, CARD_STYLE_DECLARATIONS } from './card-style-declarations';
 import type { TThemeToken } from './contrast-pairs';
