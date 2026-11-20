@@ -3,6 +3,7 @@ import { SITE_MESSAGES } from '@shinefold/config';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
 import { service } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import { POST_LOG } from '@web/constants/post';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import {
   customRenderServerAsync,
@@ -58,17 +59,6 @@ vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
 const getPostMock = vi.mocked(service.pages.post.v1.getPost);
 
 const MOCK_MISSING_SLUG = faker.lorem.slug();
-const MOCK_FIRST_TAKEAWAY = faker.lorem.sentence();
-const MOCK_GENERATED_AT = faker.date.recent().toISOString();
-const MOCK_MODEL = faker.string.alphanumeric(12);
-const MOCK_TAKEAWAYS = [
-  MOCK_FIRST_TAKEAWAY,
-  faker.lorem.sentence(),
-  faker.lorem.sentence(),
-];
-
-const { depthToggle, skimPanel } = SITE_MESSAGES.blogPostPage;
-
 const setup = customRenderServerAsync(BlogPostPage, {
   slug: MOCK_POST_DETAIL.slug,
 });
@@ -132,16 +122,6 @@ describe(`<${BlogPostPage.name}/>`, () => {
       expect(h1Headings).toHaveLength(1);
       expect(titleHeading).toBeVisible();
     });
-
-    it('renders no reading-depth control without a skim or asides', () => {
-      const radiogroup = screen.queryByRole('radiogroup');
-      const summaryRegion = screen.queryByRole('region', {
-        name: skimPanel.label,
-      });
-
-      expect(radiogroup).not.toBeInTheDocument();
-      expect(summaryRegion).not.toBeInTheDocument();
-    });
   });
 
   it('calls notFound() without logging when no page_post matches the slug', async () => {
@@ -160,47 +140,9 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await expect(setup()).rejects.toBe(MOCK_ERROR);
 
-    expect(logger.error).toHaveBeenCalledWith('blog_post_page.fetch_failed', {
+    expect(logger.error).toHaveBeenCalledWith(POST_LOG.PAGE_FETCH_FAILED, {
       slug: MOCK_POST_DETAIL.slug,
       error: MOCK_ERROR,
     });
-  });
-
-  it('renders the reading-depth control once the post has asides', async () => {
-    getPostMock.mockResolvedValueOnce(
-      okResult({ ...MOCK_POST_DETAIL, modules: [], hasAsides: true }),
-    );
-
-    await setup();
-
-    const deepRadio = screen.getByRole('radio', { name: depthToggle.deep });
-
-    expect(deepRadio).toBeVisible();
-  });
-
-  it('renders the 30s option and the skim panel once the post has a skim', async () => {
-    getPostMock.mockResolvedValueOnce(
-      okResult({
-        ...MOCK_POST_DETAIL,
-        modules: [],
-        postTakeaways: {
-          takeaways: MOCK_TAKEAWAYS,
-          generatedAt: MOCK_GENERATED_AT,
-          model: MOCK_MODEL,
-        },
-      }),
-    );
-
-    await setup();
-
-    const thirtySecondRadio = screen.getByRole('radio', {
-      name: depthToggle.skim,
-    });
-    const main = screen.getByRole('main');
-    const skim = within(main).getByRole('region', { name: skimPanel.label });
-    const firstText = within(skim).getByText(MOCK_FIRST_TAKEAWAY);
-
-    expect(thirtySecondRadio).toBeVisible();
-    expect(firstText).toBeVisible();
   });
 });

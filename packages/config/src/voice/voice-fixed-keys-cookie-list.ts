@@ -25,8 +25,6 @@ export const COOKIE_LIST_VOICE_FIXED_KEYS = [
   'cookieList.cookies.NEWSLETTER_SUBSCRIBED.duration',
   'cookieList.cookies.NEWSLETTER_UNSUBSCRIBE_TOKEN.purpose',
   'cookieList.cookies.NEWSLETTER_UNSUBSCRIBE_TOKEN.duration',
-  'cookieList.cookies.READING_DEPTH.purpose',
-  'cookieList.cookies.READING_DEPTH.duration',
   'cookieList.cookies.THEME.purpose',
   'cookieList.cookies.THEME.duration',
   'cookieList.cookies.GOOGLE_ANALYTICS.purpose',

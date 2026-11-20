@@ -55,15 +55,11 @@
     "paginationAriaLabel": "Blog pages"
   },
   "blogPostPage": {
-    "depthToggle": {
-      "ariaLabel": "Reading depth",
-      "skim": "30s",
-      "read": "Read",
-      "deep": "Deep"
-    },
-    "skimPanel": {
-      "label": "30-second summary",
-      "readFullArticle": "Read the full article"
+    "postSummary": {
+      "button": "Summary",
+      "title": "Key takeaways",
+      "readTime": "30 sec read",
+      "readFullArticle": "Read the full article · {count} min"
     },
     "asideKind": {
       "WHY_NOT": "Why not X",
@@ -424,10 +420,6 @@
       "NEWSLETTER_UNSUBSCRIBE_TOKEN": {
         "purpose": "Keeps the link from your unsubscribe email while you confirm.",
         "duration": "1 hour"
-      },
-      "READING_DEPTH": {
-        "purpose": "Remembers how much of each post you chose to read. Kept in your browser’s local storage.",
-        "duration": "Until you clear your browser data"
       },
       "THEME": {
         "purpose": "Remembers whether you chose the light or dark theme. Kept in your browser’s local storage.",
