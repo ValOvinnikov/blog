@@ -2399,7 +2399,29 @@
     "planEnds": "Tu plan termina el <time>{date}</time>, así que no puede cambiar. Para conservarlo, anula la cancelación desde Facturación.",
     "UNCHANGED": "Tu sitio ya está en este plan.",
     "CARD_DECLINED": "Tu tarjeta ha sido rechazada, así que no ha cambiado nada. Actualízala en Facturación e inténtalo de nuevo.",
-    "PAYMENT_NOT_CONFIRMED": "La confirmación con tu banco no se completó, así que tu plan no ha cambiado. Inténtalo de nuevo cuando quieras."
+    "PAYMENT_NOT_CONFIRMED": "La confirmación con tu banco no se completó, así que tu plan no ha cambiado. Inténtalo de nuevo cuando quieras.",
+    "NO_NEXT_BAND": "Tu sitio no puede pasar a ese tramo ahora. Recarga la página para ver tu tramo actual.",
+    "PENDING_CHANGE": "Tu sitio tiene un cambio de plan pendiente para la renovación. Mantén primero tu plan actual desde Mejorar y luego sube de tramo.",
+    "QUOTE_EXPIRED": "Este precio se mostró hace un rato. Cierra esto y vuelve a abrirlo para ver el precio de hoy."
+  },
+  "moveUpBand": {
+    "trigger": "Pasar a {ceiling, number} suscriptores — {price} más al {interval, select, YEARLY {año} other {mes}}",
+    "title": "¿Pasar a {ceiling, number} suscriptores?",
+    "lead": "Tus nuevos límites se aplican en cuanto se complete el pago.",
+    "loading": "Cargando el precio…",
+    "quoteFailed": "No se pudo cargar el precio. Cierra esto e inténtalo de nuevo en un momento.",
+    "newLimitsTerm": "Nuevos límites",
+    "newLimits": "{ceiling, number} suscriptores · {allowance, number} correos al mes",
+    "chargedTodayTerm": "Cobrado hoy",
+    "chargedTodayNote": "La diferencia por el resto de este periodo de facturación, hasta el <time>{date}</time>.",
+    "renewalTerm": "Desde el {date}",
+    "renewalTotal": "{total} al {interval, select, YEARLY {año} other {mes}}",
+    "cardTerm": "Tarjeta",
+    "card": "{brand, select, visa {Visa} mastercard {Mastercard} amex {American Express} discover {Discover} other {Tarjeta}} terminada en {last4}",
+    "moveDownNote": "Bajar de tramo se aplica en la renovación, sin reembolso.",
+    "cancel": "Cancelar",
+    "pay": "Pagar {amount} y subir",
+    "paying": "Pagando…"
   },
   "helpView": {
     "title": "Ayuda",

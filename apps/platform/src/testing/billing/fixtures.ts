@@ -1,5 +1,5 @@
 import { STRIPE_INVOICE_STATUS } from '@platform/constants/billing';
-import { toStripeTime } from '@platform/testing/billing/stripe-time';
+import { toStripeTime } from '@platform/server/billing/stripe-time';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { TENANT_PLAN } from '@shinefold/config/constants';
@@ -41,6 +41,9 @@ export const PLAN_CHANGE_SECTION_TEST_ID = 'plan-change-section';
 export const MOCK_UNHANDLED_EVENT_TYPE = 'customer.created';
 export const MOCK_INCOMPLETE_SUBSCRIPTION_STATUS = 'incomplete';
 export const MOCK_BAND_CEILING: TPaidSubscriberBandCeiling = 2_500;
+export const MOCK_HIGHER_BAND_CEILING: TPaidSubscriberBandCeiling = 5_000;
+export const MOCK_SECOND_LARGEST_BAND_CEILING: TPaidSubscriberBandCeiling = 10_000;
+export const MOCK_LARGEST_BAND_CEILING: TPaidSubscriberBandCeiling = 25_000;
 export const MOCK_STRIPE_CLIENT = {} as Stripe;
 export const MOCK_GROWTH_UPGRADE = {
   tenantId: MOCK_TENANT_ID,
