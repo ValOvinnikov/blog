@@ -9,18 +9,22 @@ import { hasLength } from '@shinefold/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { PortableText } from '@web/components/shared/portable-text';
-import { Section } from '@web/components/shared/section';
+import { Section, type TModuleSection } from '@web/components/shared/section';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 
 import { timelineModuleViewVariants } from './timeline-module-view-variants';
 
-export interface ITimelineModuleViewProps extends TTimelineModule {
+export interface ITimelineModuleViewProps extends Omit<
+  TTimelineModule,
+  'brandVariant' | 'layout'
+> {
+  section: TModuleSection;
   titleId: string;
   dataTestId: string;
 }
 
 export const TimelineModuleView = ({
-  brandVariant,
+  section,
   headingBlock,
   markerStyle,
   items,
@@ -28,10 +32,10 @@ export const TimelineModuleView = ({
   ctaButtons,
   contentAlignment,
   itemAlignment,
-  layout,
   titleId,
   dataTestId,
 }: ITimelineModuleViewProps) => {
+  const { brandVariant, layout, appearance } = section;
   const actions = moduleGridActionsVariants({ align: contentAlignment });
   const orientation =
     items.length > TIMELINE_HORIZONTAL_ITEM_CAP
@@ -42,6 +46,7 @@ export const TimelineModuleView = ({
     <Section
       brandVariant={brandVariant}
       layout={layout}
+      appearance={appearance}
       titleId={titleId}
       dataTestId={dataTestId}
     >
@@ -76,7 +81,7 @@ export const TimelineModuleView = ({
                   </Timeline.Marker>
                 )}
                 <Timeline.Heading>{heading}</Timeline.Heading>
-                {!!body?.length && (
+                {hasLength(body) && (
                   <Timeline.Body>
                     <PortableText value={body} />
                   </Timeline.Body>

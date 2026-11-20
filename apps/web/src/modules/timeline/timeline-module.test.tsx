@@ -34,6 +34,10 @@ vi.mock('@shinefold/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
+vi.mock(
+  '@web/server/site-config/get-section-appearance/get-section-appearance',
+);
+
 faker.seed(22);
 
 const MOCK_MODULE_ID = faker.string.uuid();

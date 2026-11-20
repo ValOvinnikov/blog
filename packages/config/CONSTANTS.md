@@ -1127,6 +1127,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **THEME_TOKENS_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"theme_tokens.site_config_fetch_failed"`
 
+### `@web/constants/timeline` — `apps/web/src/constants/timeline.ts`
+
+- **TIMELINE_LOG**: `MODULE_FETCH_FAILED`=`"timeline_module.fetch_failed"`
+
 ### `@web/constants/topic-index` — `apps/web/src/constants/topic-index.ts`
 
 - **TOPIC_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"topic_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_index_breadcrumbs.fetch_failed"`

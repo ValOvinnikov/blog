@@ -24,10 +24,6 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    },
     contentAlignment: {
       control: 'select',
       options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
@@ -46,7 +42,7 @@ const meta = {
     },
   },
   args: {
-    brandVariant: BRAND_VARIANT.PRIMARY,
+    section: { brandVariant: BRAND_VARIANT.PRIMARY },
     headingBlock: mockHeadingBlock({ heading: 'How we work' }),
     markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
     items,
@@ -54,7 +50,6 @@ const meta = {
     ctaButtons: [],
     contentAlignment: undefined,
     itemAlignment: CONTENT_ALIGNMENT.LEFT,
-    layout: undefined,
     titleId: 'timeline-title',
     dataTestId: 'timeline-module-timeline-1',
   },
@@ -79,6 +74,10 @@ export const CenterAligned: TStory = {
     itemAlignment: CONTENT_ALIGNMENT.CENTER,
     orientation: TIMELINE_ORIENTATION.HORIZONTAL,
   },
+};
+
+export const Secondary: TStory = {
+  args: { section: { brandVariant: BRAND_VARIANT.SECONDARY } },
 };
 
 export const WithActions: TStory = {
