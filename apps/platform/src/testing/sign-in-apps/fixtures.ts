@@ -1,7 +1,9 @@
 import type { TSignInAppView } from '@platform/server/sign-in-apps/load-sign-in-apps';
+import { mockOwnerContext } from '@platform/testing/custom-domain/fixtures';
 import { MOCK_TENANT_URL } from '@platform/testing/tenants/fixtures';
-import { OAUTH_PROVIDER } from '@shinefold/config/constants';
+import { OAUTH_PROVIDER, TENANT_PLAN } from '@shinefold/config/constants';
 import type { TTenantOAuthClient } from '@shinefold/db/queries/tenant-oauth-credentials';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 export const MOCK_CLIENT_ID = '1234567890-abcdefghij.apps.example.com';
 export const MOCK_MASKED_CLIENT_ID = '123456••••••••';
@@ -20,6 +22,9 @@ export const mockSignInAppsDb = () => ({
     },
   },
 });
+
+export const mockGrowthOwnerContext = (overrides: Partial<TTenant> = {}) =>
+  mockOwnerContext({ plan: TENANT_PLAN.GROWTH, ...overrides });
 
 export const mockOAuthClient = (
   overrides: Partial<TTenantOAuthClient> = {},

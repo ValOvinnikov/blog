@@ -2,6 +2,7 @@ import 'server-only';
 
 import {
   OAUTH_PROVIDERS,
+  SIGN_IN_APPS_CALLBACK_WARNING_MODES,
   SIGN_IN_APPS_MODE,
   type TSignInAppsMode,
 } from '@platform/constants/sign-in-apps';
@@ -11,6 +12,7 @@ import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-t
 import type { TMaybeUndefined } from '@shinefold/config';
 import type { TOAuthProvider } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
+import { isOneOf } from '@shinefold/utils/primitives';
 
 export type TSignInAppView = {
   provider: TOAuthProvider;
@@ -41,8 +43,7 @@ export const loadSignInApps = async (
   const clients =
     await queries.tenantOAuthCredentials.listTenantOAuthClients(id);
   const isWarnable =
-    !isArchived &&
-    (mode === SIGN_IN_APPS_MODE.EDIT || mode === SIGN_IN_APPS_MODE.READ_ONLY);
+    !isArchived && isOneOf(SIGN_IN_APPS_CALLBACK_WARNING_MODES, mode);
 
   return OAUTH_PROVIDERS.map((provider) => {
     const client: TMaybeUndefined<(typeof clients)[number]> = clients.find(

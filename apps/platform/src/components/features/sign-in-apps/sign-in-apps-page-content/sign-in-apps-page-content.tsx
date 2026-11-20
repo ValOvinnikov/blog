@@ -7,12 +7,14 @@ import { Alert } from '@platform/components/shared/alert';
 import { PageHeader } from '@platform/components/shared/page-header';
 import {
   SIGN_IN_APPS_MODE,
+  SIGN_IN_APPS_READ_ONLY_CARD_MODES,
   type TSignInAppsMode,
 } from '@platform/constants/sign-in-apps';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { loadSignInApps } from '@platform/server/sign-in-apps/load-sign-in-apps';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { ALERT_TYPE } from '@shinefold/config';
+import { isOneOf } from '@shinefold/utils/primitives';
 import { getTranslations } from 'next-intl/server';
 
 import { signInAppsPageContentVariants } from './sign-in-apps-page-content-variants';
@@ -79,8 +81,7 @@ export const SignInAppsPageContent = async (
         </SignInAppsGuardProvider>
       )}
 
-      {(mode === SIGN_IN_APPS_MODE.READ_ONLY ||
-        mode === SIGN_IN_APPS_MODE.OPERATOR) &&
+      {isOneOf(SIGN_IN_APPS_READ_ONLY_CARD_MODES, mode) &&
         apps.map((app) => (
           <SignInAppReadOnlyCard
             key={app.provider}

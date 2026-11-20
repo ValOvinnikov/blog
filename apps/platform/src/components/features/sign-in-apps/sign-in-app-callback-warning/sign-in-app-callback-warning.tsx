@@ -6,6 +6,7 @@ import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useToast } from '@platform/context/toast-provider';
 import { confirmSignInCallbackAction } from '@platform/server/sign-in-apps/confirm-sign-in-callback-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import { useProviderName } from '@platform/utils/use-provider-name/use-provider-name';
 import { ALERT_TYPE, isOutcomeSuccess, SIZE } from '@shinefold/config';
 import type { TOAuthProvider } from '@shinefold/config/constants';
 import { useRouter } from 'next/navigation';
@@ -24,7 +25,7 @@ export const SignInAppCallbackWarning = ({
   confirm,
 }: TSignInAppCallbackWarningProps) => {
   const t = useTranslations('signInAppsPage');
-  const tProvider = useTranslations('signInAppsPage.providerName');
+  const toProviderName = useProviderName();
   const router = useRouter();
   const toast = useToast();
   const [isPending, startTransition] = useTransition();
@@ -49,7 +50,7 @@ export const SignInAppCallbackWarning = ({
       role="note"
       description={t('callbackWarning', {
         domain,
-        provider: tProvider(provider),
+        provider: toProviderName(provider),
       })}
       action={
         confirm && (

@@ -6,6 +6,7 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { mockOwnerContext } from '@platform/testing/custom-domain/fixtures';
+import { mockGrowthOwnerContext } from '@platform/testing/sign-in-apps/fixtures';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
@@ -17,7 +18,7 @@ import {
   AUDIT_TARGET_TYPE,
   NEXT_NAVIGATION_ERROR,
 } from '@shinefold/config';
-import { OAUTH_PROVIDER, TENANT_PLAN } from '@shinefold/config/constants';
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import { notFound } from 'next/navigation';
 
@@ -39,12 +40,12 @@ const remove = () =>
 
 describe(removeSignInAppAction, () => {
   beforeEach(() => {
-    vi.mocked(requireTenantMembership)
-      .mockReset()
-      .mockResolvedValue(mockOwnerContext({ plan: TENANT_PLAN.GROWTH }));
-    vi.mocked(tenantOAuthCredentials.clearTenantOAuthCredentials)
-      .mockReset()
-      .mockResolvedValue(true);
+    vi.mocked(requireTenantMembership).mockResolvedValue(
+      mockGrowthOwnerContext(),
+    );
+    vi.mocked(
+      tenantOAuthCredentials.clearTenantOAuthCredentials,
+    ).mockResolvedValue(true);
   });
 
   it('rejects a caller without access to the tenant', async () => {

@@ -4,6 +4,7 @@ import { CopyCallbackButton } from '@platform/components/features/sign-in-apps/c
 import { ExternalLink } from '@platform/components/shared/external-link';
 import { FormField } from '@platform/components/shared/form-field';
 import { OAUTH_PROVIDER_CONSOLE_URL } from '@platform/constants/sign-in-apps';
+import { useProviderName } from '@platform/utils/use-provider-name/use-provider-name';
 import type { TOAuthProvider } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 import type { Ref } from 'react';
@@ -24,9 +25,9 @@ export const SignInAppCallbackField = ({
   copyRef,
 }: TSignInAppCallbackFieldProps) => {
   const t = useTranslations('signInAppsPage');
-  const tProvider = useTranslations('signInAppsPage.providerName');
+  const toProviderName = useProviderName();
   const { hint, consoleLink, row, value } = signInAppCallbackFieldVariants();
-  const providerName = tProvider(provider);
+  const providerName = toProviderName(provider);
 
   return (
     <FormField

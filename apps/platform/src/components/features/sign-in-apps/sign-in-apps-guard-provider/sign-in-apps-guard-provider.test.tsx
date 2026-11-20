@@ -16,7 +16,7 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { OAUTH_PROVIDER } from '@shinefold/config/constants';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SignInAppsGuardProvider } from './sign-in-apps-guard-provider';
 
@@ -26,8 +26,17 @@ vi.mock('@platform/server/sign-in-apps/save-sign-in-app-action');
 const { signInAppsPage: page, leavePageDialog, navSections } = en;
 const t = makeEnTranslator();
 
+const cardFields = () => {
+  const [googleClientId] = screen.getAllByRole('textbox', {
+    name: page.clientIdLabel,
+  });
+  const [, githubSecret] = screen.getAllByLabelText(page.clientSecretLabel);
+  return { googleClientId, githubSecret };
+};
+
 describe(`<${SignInAppsGuardProvider.name}/>`, () => {
   const push = vi.mocked(vi.mocked(useGuardRouter)().push);
+  let user: UserEvent;
 
   beforeEach(async () => {
     push.mockReset();
@@ -49,11 +58,8 @@ describe(`<${SignInAppsGuardProvider.name}/>`, () => {
         </GuardedLink>
       </>,
     );
-    const user = userEvent.setup();
-    const [googleClientId] = screen.getAllByRole('textbox', {
-      name: page.clientIdLabel,
-    });
-    const [, githubSecret] = screen.getAllByLabelText(page.clientSecretLabel);
+    user = userEvent.setup();
+    const { googleClientId, githubSecret } = cardFields();
     await user.type(googleClientId!, MOCK_CLIENT_ID);
     await user.type(githubSecret!, MOCK_CLIENT_SECRET);
     const overview = screen.getByRole('link', { name: navSections.overview });
@@ -76,12 +82,9 @@ describe(`<${SignInAppsGuardProvider.name}/>`, () => {
       name: leavePageDialog.discardAndLeave,
     });
 
-    await userEvent.setup().click(discard);
+    await user.click(discard);
 
-    const [googleClientId] = screen.getAllByRole('textbox', {
-      name: page.clientIdLabel,
-    });
-    const [, githubSecret] = screen.getAllByLabelText(page.clientSecretLabel);
+    const { googleClientId, githubSecret } = cardFields();
     expect(push).toHaveBeenCalledWith(adminRoutes.dashboard());
     expect(googleClientId).toHaveValue('');
     expect(githubSecret).toHaveValue('');
