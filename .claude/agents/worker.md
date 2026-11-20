@@ -111,7 +111,7 @@ default to zero".
   current deployment, start the next one.
   The exceptions are the runs that sleep until a post's publish date,
   possibly months away — the newsletter post send (`sendNewsletterPost`) and
-  the scheduled-post purge and takeaways runs (`runAtScheduledPostDate`):
+  the scheduled-post purge and summary runs (`runAtScheduledPostDate`):
   each keeps the code of the deploy that started it, re-checks the post at
   least daily, and holds a hook named for its post so only one run acts.
 - **Owner Studio access polls in short runs** — at most 30 one-minute checks

@@ -756,7 +756,20 @@ export type Stat = {
 
 export type PostTakeaways = {
   _type: 'postTakeaways';
-  takeaways?: Array<string>;
+  summary?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: 'span';
+      _key: string;
+    }>;
+    style?: 'normal';
+    listItem?: 'bullet' | 'number';
+    markDefs?: null;
+    level?: number;
+    _type: 'block';
+    _key: string;
+  }>;
   generatedAt?: string;
   model?: string;
 };

@@ -6,7 +6,7 @@ import { toDraftId, toPublishedId } from '@shinefold/utils/sanity-document-id';
 
 type TPostTakeawaysDocument = { postTakeaways?: PostTakeaways };
 
-/** Reads the draft as well as the published post, so takeaways awaiting an editor's review count. */
+/** Reads the draft as well as the published post, so a summary awaiting an editor's review count. */
 export async function hasPostTakeaways(
   postId: string,
   tenant: TTenantSanityContext,
@@ -18,6 +18,6 @@ export async function hasPostTakeaways(
     ),
   );
   return documents.some((document) =>
-    hasArrayGotItems(document?.postTakeaways?.takeaways),
+    hasArrayGotItems(document?.postTakeaways?.summary),
   );
 }

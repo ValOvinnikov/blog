@@ -482,7 +482,8 @@ rather than 404ing), `content` (`articleText`, required), `featured`, `author`
 (→ `person`, required), `topic` (→ `blog_topic`, required — the single
 primary classification), `tags` (→ `blog_tag`, optional, max 6), `publishedAt`
 (required — it drives sort order and the date readers see), and
-`postTakeaways` (optional, the 30-second-skim summary).
+`postTakeaways` (optional; its `summary` is restricted Portable Text of at
+most 8 blocks and 100 words).
 
 **Other documents**
 

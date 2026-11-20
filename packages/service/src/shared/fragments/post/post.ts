@@ -20,7 +20,7 @@ import type { TRawModule } from '@shinefold/service/shared/transformers/module/t
 const postTakeawaysFragment = q
   .fragmentForType<'postTakeaways'>()
   .project((sub) => ({
-    takeaways: sub.field('takeaways[]').nullable(true),
+    summary: sub.field('summary[]').nullable(true),
     generatedAt: sub.field('generatedAt').nullable(true),
     model: sub.field('model').nullable(true),
   }));

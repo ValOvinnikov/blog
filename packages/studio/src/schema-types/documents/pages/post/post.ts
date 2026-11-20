@@ -109,10 +109,10 @@ export const postPageSchema = defineType({
     }),
     defineField({
       name: 'postTakeaways',
-      title: 'Takeaways',
+      title: 'Summary',
       type: postTakeawaysSchema.name,
       description:
-        '30-second-skim takeaways for the choose-your-depth reading experience.',
+        'The short summary readers open from the post page. Generated when the post is published; edit it here.',
     }),
     seoField(),
   ],

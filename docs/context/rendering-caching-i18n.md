@@ -224,11 +224,12 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   `ANTHROPIC_API_KEY`/`SANITY_GENERATE_SECRET` → 503; a missing/wrong
   `secret` → 401. On success it reads the published post body
   (`service.editorial.skim.v1.getPublishedPostBody`), asks Claude
-  (`claude-haiku-4-5`) for 3–7 zod-validated takeaways (a malformed response
-  → 422, draft untouched), then patches them onto the post's **draft**
+  (`claude-haiku-5-5`) for a zod-validated summary of 1–8 blocks (a malformed
+  response or one over 100 words → 422, draft untouched), then writes it as
+  Portable Text onto the post's **draft**
   (`service.editorial.skim.v1.saveSkimDraft` — never the published document).
-  Idempotent: re-running always overwrites only the draft's `skim` field. No
-  AI call ever happens on the reader path.
+  Idempotent: re-running always overwrites only the draft's
+  `postTakeaways`. No AI call ever happens on the reader path.
 - **Sanity CDN is deliberately bypassed** (`useCdn: false` in the service
   client): Next's tagged data cache is the sole caching layer. Reading through
   the CDN lets a just-purged tag refetch a still-stale CDN response and

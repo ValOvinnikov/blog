@@ -22,6 +22,8 @@ import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
   MOCK_POST_DETAIL,
   MOCK_POST_DETAIL_AUTHOR_IMAGE,
+  MOCK_POST_SUMMARY_ITEMS,
+  MOCK_POST_SUMMARY_PARAGRAPH,
   MOCK_POST_TAKEAWAYS,
 } from '@web/testing/pages/blog-post-page/fixtures';
 import {
@@ -378,12 +380,16 @@ describe(`<${PostArticle.name}/>`, () => {
 
       it('opens the card it controls and keeps focus on the button', () => {
         const card = screen.getByRole('region', { name: summaryCardName });
-        const takeawayItems = within(card).getAllByRole('listitem');
+        const summaryItems = within(card).getAllByRole('listitem');
+        const summaryParagraph = within(card).getByText(
+          MOCK_POST_SUMMARY_PARAGRAPH,
+        );
 
         expect(summaryButton).toHaveAttribute(ARIA_EXPANDED, 'true');
         expect(summaryButton).toHaveAttribute(ARIA_CONTROLS, card.id);
-        expect(takeawayItems.map((item) => item.textContent)).toEqual(
-          MOCK_POST_TAKEAWAYS.takeaways,
+        expect(summaryParagraph).toBeInTheDocument();
+        expect(summaryItems.map((item) => item.textContent)).toEqual(
+          MOCK_POST_SUMMARY_ITEMS,
         );
         expect(summaryButton).toHaveFocus();
       });

@@ -718,6 +718,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/brand-tagline.ts"
+      },
+      {
+        "ref": "SUMMARY_BLOCK_STYLE.BULLET",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
       }
     ],
     "SLASH": [
@@ -11258,6 +11264,14 @@
         "file": "apps/web/src/constants/generate-skim.ts"
       }
     ],
+    "generate_skim.summary_over_word_limit": [
+      {
+        "ref": "GENERATE_SKIM_LOG.SUMMARY_OVER_WORD_LIMIT",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
     "generate_skim.write_client_unconfigured": [
       {
         "ref": "GENERATE_SKIM_LOG.WRITE_CLIENT_UNCONFIGURED",
@@ -11330,9 +11344,9 @@
         "file": "apps/web/src/constants/generate-skim.ts"
       }
     ],
-    "generate_skim.takeaways_lookup_failed": [
+    "generate_skim.summary_lookup_failed": [
       {
-        "ref": "GENERATE_SKIM_LOG.TAKEAWAYS_LOOKUP_FAILED",
+        "ref": "GENERATE_SKIM_LOG.SUMMARY_LOOKUP_FAILED",
         "scope": "app:web",
         "from": "@web/constants/generate-skim",
         "file": "apps/web/src/constants/generate-skim.ts"
@@ -11349,6 +11363,22 @@
     "generate_skim.tenant_resolve_failed": [
       {
         "ref": "GENERATE_SKIM_LOG.TENANT_RESOLVE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "PARAGRAPH": [
+      {
+        "ref": "SUMMARY_BLOCK_STYLE.PARAGRAPH",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "NUMBER": [
+      {
+        "ref": "SUMMARY_BLOCK_STYLE.NUMBER",
         "scope": "app:web",
         "from": "@web/constants/generate-skim",
         "file": "apps/web/src/constants/generate-skim.ts"

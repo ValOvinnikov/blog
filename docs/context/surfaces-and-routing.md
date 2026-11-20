@@ -58,17 +58,17 @@
   sticky rail spans both grid rows so it descends to sit beside the footer
   instead of stopping at the end of the body (#996, superseding #987's
   full-width-footer approach).
-- **Post summary:** a post with takeaways gets a **Summary** disclosure
+- **Post summary:** a post with a summary gets a **Summary** disclosure
   button after Save and Share in the author row's action group. It opens a
-  card under the author row, in the title's column, that lists the takeaways
-  and ends with "Read the full article · N min", which closes the card and
+  card under the author row, in the title's column, that renders the summary's
+  rich text (paragraphs, lists, bold and italic) and ends with "Read the full article · N min", which closes the card and
   moves focus to the article body. The card ships in the server HTML, hidden
   and closed on every load, so nothing is stored and nothing flashes; ISR,
   canonical URL and SEO are unaffected. Authored `aside` blocks always render
   inline. A publish-time pipeline (`POST /api/generate-skim`,
   secret-verified — see
   [`rendering-caching-i18n.md`](./rendering-caching-i18n.md)) drafts the
-  takeaways for human approval; publishing the post **is** the approval step.
+  summary for human approval; publishing the post **is** the approval step.
 - The "Related reading" section is separated from the article by a
   `max-w-page`-width top rule (`--border-emphasis`), not a background
   fill — the page canvas itself (including the hero) is `--bg-subtle`

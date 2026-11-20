@@ -11,6 +11,7 @@ export * from './magic-link-send';
 export * from './oauth-credentials';
 export * from './outcome';
 export * from './page-module';
+export * from './post-summary';
 
 export type TMaybeUndefined<T> = T | undefined;
 

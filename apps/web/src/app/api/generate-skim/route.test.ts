@@ -1,9 +1,17 @@
 import { faker } from '@faker-js/faker';
 import type { TMaybeNull } from '@shinefold/config';
-import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
+import {
+  HTTP_METHOD,
+  HTTP_STATUS,
+  POST_SUMMARY_MAX_WORDS,
+} from '@shinefold/config/constants';
 import { errorResult, okResult } from '@shinefold/utils';
 import { isNull } from '@shinefold/utils/primitives';
-import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
+import {
+  GENERATE_SKIM_LOG,
+  SUMMARY_BLOCK_STYLE,
+} from '@web/constants/generate-skim';
+import { toSummaryPortableText } from '@web/server/skim/to-summary-portable-text/to-summary-portable-text';
 import {
   MOCK_TENANT_ID,
   MOCK_TENANT_SANITY_CONTEXT,
@@ -85,9 +93,19 @@ const MOCK_WRONG_SECRET = faker.string.alphanumeric(16);
 const MOCK_ANTHROPIC_KEY = faker.string.alphanumeric(16);
 const MOCK_POST_ID = faker.string.uuid();
 const MOCK_POST_BODY: unknown[] = [];
-const MOCK_TAKEAWAYS = faker.helpers.multiple(() => faker.lorem.sentence(), {
-  count: 3,
-});
+const MOCK_SUMMARY_BLOCKS = faker.helpers.multiple(
+  () => ({
+    style: SUMMARY_BLOCK_STYLE.PARAGRAPH,
+    text: faker.lorem.sentence(),
+  }),
+  { count: 2 },
+);
+const MOCK_OVERLONG_SUMMARY_BLOCKS = [
+  {
+    style: SUMMARY_BLOCK_STYLE.PARAGRAPH,
+    text: faker.lorem.words(POST_SUMMARY_MAX_WORDS + 1),
+  },
+];
 const MOCK_ERROR = new Error(faker.lorem.sentence());
 const MOCK_CLAIM = { tenantId: MOCK_TENANT_ID, month: '2026-11-01' };
 
@@ -102,7 +120,7 @@ const MOCK_WRITE_CREDENTIALS = buildCredentials();
 
 const MOCK_SAVED_DRAFT = {
   postId: MOCK_POST_ID,
-  takeaways: MOCK_TAKEAWAYS,
+  summary: toSummaryPortableText(MOCK_SUMMARY_BLOCKS),
   model: MOCK_SKIM_MODEL,
 };
 
@@ -127,7 +145,7 @@ describe(POST, () => {
     getPublishedPostBodyMock.mockReset();
     getPublishedPostBodyMock.mockResolvedValue(okResult(MOCK_POST_BODY));
     generateTakeawaysMock.mockReset();
-    generateTakeawaysMock.mockResolvedValue(MOCK_TAKEAWAYS);
+    generateTakeawaysMock.mockResolvedValue(MOCK_SUMMARY_BLOCKS);
     saveSkimDraftMock.mockReset();
     saveSkimDraftMock.mockResolvedValue(okResult());
     getHostTenantSanityContextMock.mockReset();
@@ -184,12 +202,12 @@ describe(POST, () => {
     expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
   });
 
-  it('saves generated takeaways to the draft with the platform credentials', async () => {
+  it('saves the summary to the draft with the platform credentials', async () => {
     const response = await POST(postRequest());
     const json = await response.json();
 
     expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(json).toEqual({ ok: true, count: MOCK_TAKEAWAYS.length });
+    expect(json).toEqual({ ok: true, count: MOCK_SUMMARY_BLOCKS.length });
     expect(claimTakeawayGenerationMock).not.toHaveBeenCalled();
     expect(getPublishedPostBodyMock).toHaveBeenCalledWith(
       MOCK_POST_ID,
@@ -380,7 +398,7 @@ describe(POST, () => {
       expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
     });
 
-    it('keeps the claim when the takeaways are saved', async () => {
+    it('keeps the claim when the summary is saved', async () => {
       await POST(postRequest());
 
       expect(releaseTakeawayGenerationMock).not.toHaveBeenCalled();
@@ -420,6 +438,20 @@ describe(POST, () => {
         tenantId: MOCK_TENANT_ID,
         postId: MOCK_POST_ID,
         error: MOCK_ERROR,
+      });
+    });
+
+    describe('when the summary runs over the word limit', () => {
+      beforeEach(() => {
+        generateTakeawaysMock.mockResolvedValue(MOCK_OVERLONG_SUMMARY_BLOCKS);
+      });
+
+      it('refuses it, saves nothing and gives the claim back', async () => {
+        const response = await POST(postRequest());
+
+        expect(response.status).toBe(HTTP_STATUS.UNPROCESSABLE_ENTITY);
+        expect(saveSkimDraftMock).not.toHaveBeenCalled();
+        expect(releaseTakeawayGenerationMock).toHaveBeenCalledWith(MOCK_CLAIM);
       });
     });
 

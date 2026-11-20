@@ -87,7 +87,7 @@ apps/web
   [`content-model.md`](./content-model.md)).
 - **Service also has a scoped write path, `service.editorial.*`** (e.g.
   `service.editorial.skim.v1`, which writes a post's drafted
-  takeaways) — separate from the read-only flow described above.
+  summary) — separate from the read-only flow described above.
   `packages/service/src/sanity/write-client/write-client.ts`'s `getWriteClient()` is a
   distinct client from the page-render read client, and is itself
   tenant-aware the same way `getClient()` is: called with no argument it
