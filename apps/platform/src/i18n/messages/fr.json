@@ -2517,6 +2517,48 @@
     "metaExpires": "{who} · {date} · Expire le {expiry}",
     "metaExpired": "{who} · {date} · Expirée le {expiry}"
   },
+  "usageCard": {
+    "title": "Utilisation",
+    "description": "Ce que comprend votre offre et ce qui est utilisé.",
+    "labels": {
+      "TAKEAWAYS": "Points clés IA ce mois-ci",
+      "EMAILS": "E-mails envoyés ce mois-ci",
+      "SEATS": "Places de l'équipe",
+      "LANGUAGES": "Langues supplémentaires"
+    },
+    "links": {
+      "SEATS": "Équipe",
+      "LANGUAGES": "Langues"
+    },
+    "value": "<count>{used, number}</count> sur {allowance, number}",
+    "failed": "Impossible de charger ce total. Rechargez la page pour réessayer.",
+    "footer": {
+      "limits": "Votre offre fixe ces limites.",
+      "plansLink": "Voir ce que comprend chaque offre"
+    },
+    "notes": {
+      "TAKEAWAYS": {
+        "UNDER": "Réinitialisation le {date}",
+        "NEAR": "{percent} % utilisés — il en reste {left, number}<separator>·</separator><reset>Réinitialisation le {date}</reset>",
+        "FULL": "Tout est utilisé. Les nouveaux articles n'auront pas de points clés avant le {date}."
+      },
+      "EMAILS": {
+        "UNDER": "Réinitialisation le {date}",
+        "NEAR": "{percent} % utilisés — il en reste {left, number}<separator>·</separator><reset>Réinitialisation le {date}</reset>",
+        "FULL": "Tout est utilisé. Les nouveaux articles ne seront pas envoyés par e-mail avant le {date}."
+      },
+      "SEATS": {
+        "UNDER": "Compte le propriétaire, les membres et les invitations en attente.",
+        "NEAR": "{left, plural, one {Il reste # place.} other {Il reste # places.}}",
+        "FULL": "Toutes les places sont prises. Retirez quelqu'un pour en inviter un autre."
+      },
+      "LANGUAGES": {
+        "UNDER": "Votre langue par défaut n'est pas comptée.",
+        "NEAR": "{left, plural, one {Il reste # langue.} other {Il reste # langues.}}",
+        "FULL": "Toutes sont utilisées. Retirez-en une pour en ajouter une autre."
+      }
+    }
+  },
   "revokeGrantControl": {
     "revoke": {
       "trigger": "Révoquer",

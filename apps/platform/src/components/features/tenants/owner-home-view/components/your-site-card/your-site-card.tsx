@@ -1,9 +1,7 @@
 import { Card } from '@platform/components/shared/card';
-import { Icon } from '@platform/components/shared/icon';
+import { CardFooterNote } from '@platform/components/shared/card-footer-note';
 import { StatusBadge } from '@platform/components/shared/status-badge';
-import { Text } from '@platform/components/shared/text';
-import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
-import { ICONS } from '@shinefold/config';
+import { BADGE_TONE } from '@platform/constants/badge-tone';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { useTranslations } from 'next-intl';
 
@@ -18,7 +16,7 @@ export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
   const t = useTranslations('ownerHomePage');
   const tPlan = useTranslations('planNames');
   const tLanguage = useTranslations('languageNames');
-  const { body, band, footer, icon, hint } = yourSiteCardVariants();
+  const { body, band } = yourSiteCardVariants();
 
   return (
     <Card>
@@ -36,7 +34,7 @@ export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
             {tenant.primaryDomain}
           </BandCell>
           <BandCell label={t('planLabel')}>
-            <StatusBadge tone="plan" hasDot={false}>
+            <StatusBadge tone={BADGE_TONE.PLAN} hasDot={false}>
               {tPlan(tenant.plan)}
             </StatusBadge>
           </BandCell>
@@ -45,17 +43,7 @@ export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
           </BandCell>
         </dl>
       </Card.Body>
-      <Card.Footer className={footer()}>
-        <Icon
-          name={ICONS.INFO}
-          size={ICON_SIZE.MD}
-          strokeWidth={ICON_STROKE_WIDTH.CONTROL}
-          className={icon()}
-        />
-        <Text variant="muted" className={hint()}>
-          {t('readOnlyHint')}
-        </Text>
-      </Card.Footer>
+      <CardFooterNote>{t('readOnlyHint')}</CardFooterNote>
     </Card>
   );
 };
