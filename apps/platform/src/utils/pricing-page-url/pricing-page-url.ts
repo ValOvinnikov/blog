@@ -4,7 +4,7 @@ import {
 } from '@platform/utils/marketing-site-url/marketing-site-url';
 import { pricingPageUrl, type TMaybeUndefined } from '@shinefold/config';
 
-export const pricingPageHref = (
+export const toPricingPageUrl = (
   source: IMarketingSiteSource,
 ): TMaybeUndefined<string> => {
   const siteUrl = toMarketingSiteUrl(source);

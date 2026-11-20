@@ -1,7 +1,9 @@
 import { USAGE_LOG, USAGE_METER } from '@platform/constants/usage';
+import { mockQueryError } from '@platform/testing/loggable-error/fixtures';
 import { mockEntitlementGrantRow } from '@platform/testing/tenants/entitlement-grants';
 import { mockTenant } from '@platform/testing/tenants/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/tenant-identity';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import {
@@ -31,12 +33,15 @@ vi.mock('@shinefold/db', async () => ({
   },
 }));
 
-const TAKEAWAYS_USED = 12;
-const EMAILS_SENT = 4180;
-const EMAIL_ALLOWANCE = 15000;
-const SEATS_USED = 2;
-const LANGUAGES_HREF = adminRoutes.languages(MOCK_TENANT_ID);
-const MOCK_READ_ERROR = new Error('read failed');
+const MOCK_TAKEAWAYS_USED = 12;
+const MOCK_EMAILS_SENT = 4180;
+const MOCK_EMAIL_ALLOWANCE = 15000;
+const MOCK_SEATS_USED = 2;
+const MOCK_READ_ERROR = mockQueryError();
+const LINKS = {
+  languages: adminRoutes.languages(MOCK_TENANT_ID),
+  team: adminRoutes.tenantTeam(MOCK_TENANT_ID),
+};
 
 const growthTenant = mockTenant({
   plan: TENANT_PLAN.GROWTH,
@@ -47,26 +52,26 @@ describe(loadUsageMeters.name, () => {
   beforeEach(() => {
     vi.mocked(
       queries.takeawayGenerations.countTakeawayGenerationsThisMonth,
-    ).mockResolvedValue(TAKEAWAYS_USED);
+    ).mockResolvedValue(MOCK_TAKEAWAYS_USED);
     vi.mocked(queries.emailUsage.getNewsletterLimits).mockResolvedValue({
       activeCount: 0,
       bandCeiling: SUBSCRIBER_BAND_CEILINGS[0],
-      allowance: EMAIL_ALLOWANCE,
-      sentThisMonth: EMAILS_SENT,
+      allowance: MOCK_EMAIL_ALLOWANCE,
+      sentThisMonth: MOCK_EMAILS_SENT,
     });
     vi.mocked(queries.membershipInvites.countSeatsInUse).mockResolvedValue(
-      SEATS_USED,
+      MOCK_SEATS_USED,
     );
   });
 
   it('shows only the takeaways row on a plan with no other allowance', async () => {
-    const meters = await loadUsageMeters(mockTenant(), LANGUAGES_HREF);
+    const meters = await loadUsageMeters(mockTenant(), LINKS);
 
     expect(meters).toEqual([
       {
         meter: USAGE_METER.TAKEAWAYS,
         reading: {
-          used: TAKEAWAYS_USED,
+          used: MOCK_TAKEAWAYS_USED,
           allowance: PLAN_ENTITLEMENTS[TENANT_PLAN.FREE].takeawaysPerMonth,
         },
         isMonthly: true,
@@ -77,24 +82,24 @@ describe(loadUsageMeters.name, () => {
   });
 
   it('reads every meter the plan includes, in the card order', async () => {
-    const meters = await loadUsageMeters(growthTenant, LANGUAGES_HREF);
+    const meters = await loadUsageMeters(growthTenant, LINKS);
     const { seats, takeawaysPerMonth } = PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH];
 
     expect(meters).toEqual([
       expect.objectContaining({
         meter: USAGE_METER.TAKEAWAYS,
-        reading: { used: TAKEAWAYS_USED, allowance: takeawaysPerMonth },
+        reading: { used: MOCK_TAKEAWAYS_USED, allowance: takeawaysPerMonth },
       }),
       expect.objectContaining({
         meter: USAGE_METER.EMAILS,
-        reading: { used: EMAILS_SENT, allowance: EMAIL_ALLOWANCE },
+        reading: { used: MOCK_EMAILS_SENT, allowance: MOCK_EMAIL_ALLOWANCE },
         href: undefined,
       }),
       expect.objectContaining({
         meter: USAGE_METER.SEATS,
-        reading: { used: SEATS_USED, allowance: seats },
+        reading: { used: MOCK_SEATS_USED, allowance: seats },
         isMonthly: false,
-        href: undefined,
+        href: LINKS.team,
       }),
       expect.objectContaining({
         meter: USAGE_METER.LANGUAGES,
@@ -102,7 +107,7 @@ describe(loadUsageMeters.name, () => {
           used: growthTenant.additionalLocales.length,
           allowance: growthTenant.entitlements.localeLimit - 1,
         },
-        href: LANGUAGES_HREF,
+        href: LINKS.languages,
       }),
     ]);
   });
@@ -125,7 +130,7 @@ describe(loadUsageMeters.name, () => {
       }),
     ]);
 
-    const meters = await loadUsageMeters(tenant, LANGUAGES_HREF);
+    const meters = await loadUsageMeters(tenant, LINKS);
 
     expect(meters.map(({ meter, grant }) => ({ meter, grant }))).toEqual([
       { meter: USAGE_METER.TAKEAWAYS, grant: undefined },
@@ -139,7 +144,7 @@ describe(loadUsageMeters.name, () => {
       MOCK_READ_ERROR,
     );
 
-    const meters = await loadUsageMeters(growthTenant, LANGUAGES_HREF);
+    const meters = await loadUsageMeters(growthTenant, LINKS);
 
     expect(meters.map(({ meter, reading }) => [meter, reading])).toEqual([
       [USAGE_METER.TAKEAWAYS, expect.any(Object)],
@@ -152,7 +157,7 @@ describe(loadUsageMeters.name, () => {
       {
         tenantId: MOCK_TENANT_ID,
         meter: USAGE_METER.SEATS,
-        error: MOCK_READ_ERROR,
+        ...toLoggableError(MOCK_READ_ERROR),
       },
     );
   });

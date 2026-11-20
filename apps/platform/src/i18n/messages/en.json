@@ -2527,6 +2527,7 @@
       "LANGUAGES": "Additional languages"
     },
     "links": {
+      "SEATS": "Team",
       "LANGUAGES": "Languages"
     },
     "value": "<count>{used, number}</count> of {allowance, number}",

@@ -2527,6 +2527,7 @@
       "LANGUAGES": "Extra talen"
     },
     "links": {
+      "SEATS": "Team",
       "LANGUAGES": "Talen"
     },
     "value": "<count>{used, number}</count> van {allowance, number}",

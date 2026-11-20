@@ -106,7 +106,10 @@ export const TenantOverviewView = async ({
         {!isArchived && (
           <UsageSection
             tenant={tenant}
-            languagesHref={adminRoutes.languages(id)}
+            links={{
+              languages: adminRoutes.languages(id),
+              team: adminRoutes.tenantTeam(id),
+            }}
           />
         )}
 

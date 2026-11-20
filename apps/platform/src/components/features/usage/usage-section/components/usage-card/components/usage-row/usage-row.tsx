@@ -1,13 +1,13 @@
 import { GrantedBadge } from '@platform/components/features/entitlement-grants/granted-badge';
-import { UsageFailed } from '@platform/components/features/usage/usage-section/components/usage-card/components/usage-failed/usage-failed';
-import { UsageMeter } from '@platform/components/features/usage/usage-section/components/usage-card/components/usage-meter/usage-meter';
-import { UsageNote } from '@platform/components/features/usage/usage-section/components/usage-card/components/usage-note/usage-note';
 import { TextLink } from '@platform/components/shared/text-link';
 import type { TUsageMeterRow } from '@platform/server/usage/load-usage-meters';
 import { toUsageSummary } from '@platform/utils/usage-summary/usage-summary';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
+import { UsageFailed } from './components/usage-failed/usage-failed';
+import { UsageMeter } from './components/usage-meter/usage-meter';
+import { UsageNote } from './components/usage-note/usage-note';
 import { usageRowVariants } from './usage-row-variants';
 
 export type TUsageRowProps = {

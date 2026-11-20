@@ -1,12 +1,12 @@
 import { MOCK_MARKETING_SITE_URL } from '@platform/testing/tenants/tenant-identity';
 import { pricingPageUrl } from '@shinefold/config';
 
-import { pricingPageHref } from './pricing-page-href';
+import { toPricingPageUrl } from './pricing-page-url';
 
-describe(pricingPageHref.name, () => {
+describe(toPricingPageUrl.name, () => {
   it('points at the pricing page on the configured marketing site', () => {
     expect(
-      pricingPageHref({
+      toPricingPageUrl({
         marketingSiteUrl: MOCK_MARKETING_SITE_URL,
         rootDomain: undefined,
       }),
@@ -15,7 +15,7 @@ describe(pricingPageHref.name, () => {
 
   it('is absent when neither the marketing site nor the root domain is configured', () => {
     expect(
-      pricingPageHref({ marketingSiteUrl: undefined, rootDomain: undefined }),
+      toPricingPageUrl({ marketingSiteUrl: undefined, rootDomain: undefined }),
     ).toBeUndefined();
   });
 });

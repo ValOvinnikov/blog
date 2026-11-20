@@ -1,14 +1,15 @@
 import { Card } from '@platform/components/shared/card';
-import { Icon } from '@platform/components/shared/icon';
-import { Text } from '@platform/components/shared/text';
+import { CardFooterNote } from '@platform/components/shared/card-footer-note';
 import { TextLink } from '@platform/components/shared/text-link';
-import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
-import { loadUsageMeters } from '@platform/server/usage/load-usage-meters';
+import {
+  loadUsageMeters,
+  type TUsageLinks,
+} from '@platform/server/usage/load-usage-meters';
 import { env } from '@platform/utils/env/env';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
-import { pricingPageHref } from '@platform/utils/pricing-page-href/pricing-page-href';
+import { toPricingPageUrl } from '@platform/utils/pricing-page-url/pricing-page-url';
 import { usageResetDate } from '@platform/utils/usage-reset-date/usage-reset-date';
-import { ICONS, TENANT_PLAN } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
 import { UsageRow } from './components/usage-row/usage-row';
@@ -22,17 +23,17 @@ const RESET_DATE_FORMAT = {
 
 export type TUsageCardProps = {
   tenant: TPlatformTenant;
-  languagesHref: string;
+  links: TUsageLinks;
   hasPlansFooter?: boolean;
 };
 
 export const UsageCard = async ({
   tenant,
-  languagesHref,
+  links,
   hasPlansFooter = false,
 }: TUsageCardProps) => {
   const [meters, t, format] = await Promise.all([
-    loadUsageMeters(tenant, languagesHref),
+    loadUsageMeters(tenant, links),
     getTranslations('usageCard'),
     getFormatter(),
   ]);
@@ -40,14 +41,14 @@ export const UsageCard = async ({
     usageResetDate(new Date()),
     RESET_DATE_FORMAT,
   );
-  const plansHref =
+  const plansUrl =
     hasPlansFooter && tenant.plan !== TENANT_PLAN.GROWTH
-      ? pricingPageHref({
+      ? toPricingPageUrl({
           marketingSiteUrl: env.MARKETING_SITE_URL,
           rootDomain: env.TENANT_ROOT_DOMAIN,
         })
       : undefined;
-  const { body, band, footer, icon, hint } = usageCardVariants();
+  const { body, band } = usageCardVariants();
 
   return (
     <Card>
@@ -59,19 +60,11 @@ export const UsageCard = async ({
           ))}
         </div>
       </Card.Body>
-      {plansHref ? (
-        <Card.Footer className={footer()}>
-          <Icon
-            name={ICONS.INFO}
-            size={ICON_SIZE.MD}
-            strokeWidth={ICON_STROKE_WIDTH.CONTROL}
-            className={icon()}
-          />
-          <Text variant="muted" className={hint()}>
-            {t('footer.limits')}{' '}
-            <TextLink href={plansHref}>{t('footer.plansLink')}</TextLink>
-          </Text>
-        </Card.Footer>
+      {plansUrl ? (
+        <CardFooterNote>
+          {t('footer.limits')}{' '}
+          <TextLink href={plansUrl}>{t('footer.plansLink')}</TextLink>
+        </CardFooterNote>
       ) : undefined}
     </Card>
   );

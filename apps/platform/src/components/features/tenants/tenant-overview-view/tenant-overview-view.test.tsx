@@ -2,7 +2,6 @@ import { faker } from '@faker-js/faker';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
-import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import {
   mockAuditEvent,
@@ -18,6 +17,7 @@ import {
   MOCK_NEWSLETTER_PAUSED_AT,
   MOCK_NEWSLETTER_PAUSED_ON_TEXT,
 } from '@platform/testing/email/fixtures';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockFinding } from '@platform/testing/findings/fixtures';
 import { mockOperatorViewer } from '@platform/testing/memberships/fixtures';
@@ -127,7 +127,6 @@ vi.mock('@platform/server/newsletter-pause/clear-newsletter-pause-action');
 
 vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
-const retryProvisioningStepActionMock = vi.mocked(retryProvisioningStepAction);
 const getTenantProvisioningStatusActionMock = vi.mocked(
   getTenantProvisioningStatusAction,
 );
@@ -151,31 +150,26 @@ const advancePoll = async () => {
   });
 };
 
-const TENANT_DETAILS = 'Tenant details';
+const TENANT_DETAILS = en.tenantDetailsPanel.heading;
 const LOCKED_WHILE_PROVISIONING_IS_RUNNING =
-  'Locked while provisioning is running.';
-const SUSPEND_TENANT = 'Suspend tenant';
+  en.tenantDetailsPanel.fieldLockedReasonRunning;
+const SUSPEND_TENANT = en.tenantSuspensionControl.ACTIVE.triggerButton;
+const NAME_FIELD = { name: en.tenantDetailsPanel.nameLabel };
 const UNSENT_INVITE_NOTICE = en.tenantDetailsPanel.studioInviteUnsentNotice;
 
 describe(`<${TenantOverviewView.name}/>`, () => {
   beforeEach(() => {
     mockedEnv.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
-    retryProvisioningStepActionMock.mockReset();
-    getTenantProvisioningStatusActionMock.mockReset();
-    getTenantOwnerMembershipMock.mockReset();
     getTenantOwnerMembershipMock.mockResolvedValue(mockJoinedOwner());
-    listAuditEventsForTargetMock.mockReset();
     listAuditEventsForTargetMock.mockResolvedValue([]);
-    listFindingsForTenantMock.mockReset();
     listFindingsForTenantMock.mockResolvedValue([]);
-    getDomainVerificationStatusMock.mockReset();
     getDomainVerificationStatusMock.mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
     );
-    resolveIsPlatformTenantMock.mockReset().mockResolvedValue(false);
-    getNewsletterPausedAtMock.mockReset().mockResolvedValue(undefined);
-    listEntitlementGrantsMock.mockReset().mockResolvedValue([]);
+    resolveIsPlatformTenantMock.mockResolvedValue(false);
+    getNewsletterPausedAtMock.mockResolvedValue(undefined);
+    listEntitlementGrantsMock.mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -195,8 +189,10 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       name: MOCK_TENANT_NAME,
     });
     const titleRow = screen.getByTestId('page-header-title-row');
-    const statusBadge = within(titleRow).getByText('Active');
-    const planBadge = within(titleRow).getByText('Free');
+    const statusBadge = within(titleRow).getByText(
+      en.tenantsTable.status.ACTIVE,
+    );
+    const planBadge = within(titleRow).getByText(en.planNames.FREE);
 
     expect(heading).toBeVisible();
     expect(statusBadge).toBeVisible();
@@ -337,7 +333,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     await setup({ tenant: mockTenant({ name: MOCK_TENANT_NAME }) });
 
     const detailsTitle = screen.getByText(TENANT_DETAILS);
-    const nameInput = screen.getByRole('textbox', { name: 'Name' });
+    const nameInput = screen.getByRole('textbox', NAME_FIELD);
 
     expect(detailsTitle).toBeVisible();
     expect(nameInput).toHaveValue(MOCK_TENANT_NAME);
@@ -350,7 +346,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       }),
     });
 
-    const nameInput = screen.getByRole('textbox', { name: 'Name' });
+    const nameInput = screen.getByRole('textbox', NAME_FIELD);
     const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
 
     expect(nameInput).toBeDisabled();
@@ -386,7 +382,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     const domainInput = screen.getByRole('textbox', {
       name: PRIMARY_DOMAIN_LABEL,
     });
-    const nameInput = screen.getByRole('textbox', { name: 'Name' });
+    const nameInput = screen.getByRole('textbox', NAME_FIELD);
 
     expect(domainInput).toBeDisabled();
     expect(domainInput).toHaveAccessibleDescription(reason);
@@ -401,7 +397,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       }),
     });
 
-    const nameInput = screen.getByRole('textbox', { name: 'Name' });
+    const nameInput = screen.getByRole('textbox', NAME_FIELD);
     const domainInput = screen.getByRole('textbox', {
       name: PRIMARY_DOMAIN_LABEL,
     });
@@ -430,8 +426,13 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
     await setup({ tenant });
 
-    const runningBanner = screen.getByText('Provisioning — step 2 of 6');
-    const nameInput = screen.getByRole('textbox', { name: 'Name' });
+    const runningBanner = screen.getByText(
+      makeEnTranslator('provisioningBanner')('runningTitle', {
+        step: 2,
+        total: 6,
+      }),
+    );
+    const nameInput = screen.getByRole('textbox', NAME_FIELD);
 
     expect(runningBanner).toBeVisible();
     expect(nameInput).toHaveAccessibleDescription(
@@ -440,12 +441,12 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
     await advancePoll();
 
-    const doneBanner = screen.getByText('Provisioned');
-    const lockedNameInput = screen.getByRole('textbox', { name: 'Name' });
+    const doneBanner = screen.getByText(en.provisioningBanner.readyTitle);
+    const lockedNameInput = screen.getByRole('textbox', NAME_FIELD);
 
     expect(doneBanner).toBeVisible();
     expect(lockedNameInput).toHaveAccessibleDescription(
-      'Locked — provisioning has already finished.',
+      en.tenantDetailsPanel.fieldLockedReasonSucceeded,
     );
   });
 
@@ -480,7 +481,9 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       MOCK_TENANT_DOMAIN,
     );
 
-    const domainStatus = screen.getByText('Verified');
+    const domainStatus = screen.getByText(
+      en.tenantOverviewPage.dnsStatus.VERIFIED,
+    );
     const ownerJoinedAt = screen.getByText('Aug 12, 2026');
     const sanityProject = screen.getByText(MOCK_SANITY_PROJECT_ID);
     const activityActor = screen.getByText(MOCK_AUDIT_ACTOR_EMAIL);
@@ -500,9 +503,9 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
     const ownerEmail = screen.getByText(MOCK_INVITED_OWNER_EMAIL);
     const ownerEmailInput = screen.getByRole('textbox', {
-      name: 'Owner email',
+      name: en.tenantDetailsPanel.ownerEmailLabel,
     });
-    const joinedLabel = screen.queryByText('Joined');
+    const joinedLabel = screen.queryByText(en.tenantOverviewPage.joinedLabel);
 
     expect(ownerEmail).toBeVisible();
     expect(ownerEmailInput).toHaveValue(MOCK_INVITED_OWNER_EMAIL);
@@ -527,11 +530,11 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     it("nests every card's title one level under the page's h1, with no h3", () => {
       const cardTitles = [
         TENANT_DETAILS,
-        'Domain',
-        'Owner',
-        'Content workspace',
-        'Recent activity',
-        'Open findings',
+        en.tenantOverviewPage.domainCardTitle,
+        en.tenantOverviewPage.ownerCardTitle,
+        en.tenantOverviewPage.contentWorkspaceCardTitle,
+        en.tenantOverviewPage.recentActivityCardTitle,
+        en.findingsCard.title,
       ].map((name) => screen.getByRole('heading', { level: 2, name }));
       const thirdLevelHeading = screen.queryByRole('heading', { level: 3 });
 

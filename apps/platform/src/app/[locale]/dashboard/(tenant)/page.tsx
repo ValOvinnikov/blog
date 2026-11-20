@@ -6,6 +6,7 @@ import { getStartedFor } from '@platform/server/onboarding/get-started-for';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { siteSetupFor } from '@platform/server/provisioning/site-setup-for';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { queries } from '@shinefold/db';
 import type { Metadata } from 'next';
 
@@ -32,6 +33,13 @@ export default async function DashboardOverviewPage() {
       siteSetup={siteSetupFor(tenant, viewer)}
       getStarted={getStarted}
       canUpgrade={upgradeStateFor(tenant, viewer) === UPGRADE_STATE.AVAILABLE}
+      usage={{
+        links: {
+          languages: adminRoutes.dashboardLanguages(),
+          team: viewer.canManage ? adminRoutes.dashboardTeam() : undefined,
+        },
+        hasPlansFooter: viewer.isOwner,
+      }}
     />
   );
 }

@@ -7,6 +7,7 @@ import {
 } from '@platform/constants/usage';
 import type { TGrantProvenance } from '@platform/utils/granted-entitlements/granted-entitlements';
 import { toAdditionalLanguages } from '@platform/utils/locale-limit/locale-limit';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import type { TUsageReading } from '@platform/utils/usage-summary/usage-summary';
@@ -19,6 +20,11 @@ export type TUsageMeterRow = {
   isMonthly: boolean;
   href: TMaybeUndefined<string>;
   grant: TMaybeUndefined<TGrantProvenance>;
+};
+
+export type TUsageLinks = {
+  languages: string;
+  team?: string;
 };
 
 type TUsageMeterSource = Omit<TUsageMeterRow, 'reading'> & {
@@ -35,7 +41,7 @@ const readMeter = async (
     logger.error(USAGE_LOG.METER_READ_FAILED, {
       tenantId,
       meter: row.meter,
-      error,
+      ...toLoggableError(error),
     });
     return { ...row, reading: undefined };
   }
@@ -43,7 +49,7 @@ const readMeter = async (
 
 const meterSources = (
   tenant: TPlatformTenant,
-  languagesHref: string,
+  links: TUsageLinks,
 ): TUsageMeterSource[] => {
   const { id, entitlements, grantedEntitlements } = tenant;
   const { takeawaysPerMonth, seats, capabilities, localeLimit } = entitlements;
@@ -82,7 +88,7 @@ const meterSources = (
           {
             meter: USAGE_METER.SEATS,
             isMonthly: false,
-            href: undefined,
+            href: links.team,
             grant: undefined,
             read: async () => ({
               used: await queries.membershipInvites.countSeatsInUse(id),
@@ -96,7 +102,7 @@ const meterSources = (
           {
             meter: USAGE_METER.LANGUAGES,
             isMonthly: false,
-            href: languagesHref,
+            href: links.languages,
             grant: grantedEntitlements.localeLimit,
             read: async () => {
               const [, ...liveAdditionalLocales] =
@@ -115,10 +121,8 @@ const meterSources = (
 
 export const loadUsageMeters = (
   tenant: TPlatformTenant,
-  languagesHref: string,
+  links: TUsageLinks,
 ): Promise<TUsageMeterRow[]> =>
   Promise.all(
-    meterSources(tenant, languagesHref).map((source) =>
-      readMeter(tenant.id, source),
-    ),
+    meterSources(tenant, links).map((source) => readMeter(tenant.id, source)),
   );
