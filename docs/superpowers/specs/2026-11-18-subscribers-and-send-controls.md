@@ -183,7 +183,7 @@ The status, test-send and send-now routes admit the people who can open the site
 - Site name: tenant heading font, 20/600, centred, padding 8/0.
 - Card: tenant surface, 1 px tenant border, radius 12. Cover full width, 280 tall desktop / 200 phone, cropped to fill. With no cover image the card starts at the inner padding, with no placeholder. Inner padding 32/36/36 desktop, 22/18/24 phone, gap 18.
 - Title: tenant heading font, 34 desktop / 28 phone, 600, line-height 1.15.
-- Fonts: body text in the tenant body font. The builder takes the tenant's heading and body fonts as `FONT_CHOICE` values; `@shinefold/config` maps each to an email font stack ending in a web-safe fallback (serif → Georgia, serif; sans → Arial, Helvetica, sans-serif; mono → "Courier New", monospace).
+- Fonts: body text in the tenant body font. The builder takes the tenant's heading and body fonts as `FONT_CHOICE` values; `@shinefold/config` maps each to an email font stack ending in a web-safe fallback (serif → Georgia, serif; sans → Arial, Helvetica, sans-serif; mono → 'Courier New', monospace).
 - Palette: the light palette from `resolveTenantEmailBrand`; the dark palette from a dark counterpart in `@shinefold/config` running the dark ramps with the same accent-hue guard.
 - Takeaways box (only when the post has takeaways): 1 px border, radius 10, padding 16/18, gap 10; heading "Takeaways" 12/600 uppercase, letter-spacing .08em, tenant accent; list 15/1.5, indent 18, item gap 8.
 - Excerpt 16/1.6 in the text colour. Button "Read the post": accent fill, on-accent text, radius 8, padding 12/22, 15/600.

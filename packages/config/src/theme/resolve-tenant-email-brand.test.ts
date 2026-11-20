@@ -52,51 +52,61 @@ const expectedAccentAndLogoHex = (
 const contrastOf = (foreground: string, background: string) =>
   renderedContrastRatio(hexToOklch(foreground), [hexToOklch(background)]);
 
+const failAccentHueGuard = () =>
+  vi
+    .mocked(renderedContrastRatio)
+    .mockReturnValueOnce(1)
+    .mockReturnValueOnce(1);
+
+const MODES = [
+  { mode: 'light', resolve: resolveTenantEmailBrand, ramps: LIGHT_RAMPS },
+  { mode: 'dark', resolve: resolveTenantEmailDarkBrand, ramps: DARK_RAMPS },
+];
+
 beforeEach(() => {
   vi.mocked(renderedContrastRatio).mockReset();
 });
 
-describe(resolveTenantEmailBrand, () => {
+describe.each(MODES)('the $mode email brand', ({ resolve, ramps }) => {
   it('resolves the accent and logo colours from an accessible accent hue', () => {
-    const { brandPrimary, brandPrimarySolid, logo1, logo2, logo3 } =
-      resolveTenantEmailBrand({
-        preset: PRESET_ID.CONSOLE,
-        accentHue: MOCK_ACCENT_HUE,
-      });
+    const { brandPrimary, brandPrimarySolid, logo1, logo2, logo3 } = resolve({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: MOCK_ACCENT_HUE,
+    });
 
     expect({ brandPrimary, brandPrimarySolid, logo1, logo2, logo3 }).toEqual(
-      expectedAccentAndLogoHex(LIGHT_RAMPS, MOCK_ACCENT_HUE),
+      expectedAccentAndLogoHex(ramps, MOCK_ACCENT_HUE),
     );
   });
 
   it('resolves the accent and logo hues independently', () => {
-    const { brandPrimary, brandPrimarySolid, logo1, logo2, logo3 } =
-      resolveTenantEmailBrand({
-        preset: PRESET_ID.CONSOLE,
-        accentHue: MOCK_ACCENT_HUE,
-        logoHue: MOCK_LOGO_HUE,
-      });
+    const { brandPrimary, brandPrimarySolid, logo1, logo2, logo3 } = resolve({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: MOCK_ACCENT_HUE,
+      logoHue: MOCK_LOGO_HUE,
+    });
 
     expect({ brandPrimary, brandPrimarySolid, logo1, logo2, logo3 }).toEqual(
-      expectedAccentAndLogoHex(LIGHT_RAMPS, MOCK_ACCENT_HUE, MOCK_LOGO_HUE),
+      expectedAccentAndLogoHex(ramps, MOCK_ACCENT_HUE, MOCK_LOGO_HUE),
     );
   });
 
   it('falls back to the preset accent hue when the requested one fails AA', () => {
-    vi.mocked(renderedContrastRatio).mockReturnValue(1);
+    failAccentHueGuard();
     const { accentHue } = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
 
-    const { brandPrimary, brandPrimarySolid, logo1, logo2, logo3 } =
-      resolveTenantEmailBrand({
-        preset: PRESET_ID.EDITORIAL,
-        accentHue: MOCK_ACCENT_HUE,
-      });
+    const { brandPrimary, brandPrimarySolid, logo1, logo2, logo3 } = resolve({
+      preset: PRESET_ID.EDITORIAL,
+      accentHue: MOCK_ACCENT_HUE,
+    });
 
     expect({ brandPrimary, brandPrimarySolid, logo1, logo2, logo3 }).toEqual(
-      expectedAccentAndLogoHex(LIGHT_RAMPS, accentHue),
+      expectedAccentAndLogoHex(ramps, accentHue),
     );
   });
+});
 
+describe(resolveTenantEmailBrand, () => {
   it('returns a flat object of literal hex strings', () => {
     const brand = resolveTenantEmailBrand({
       preset: PRESET_ID.CONSOLE,
@@ -112,37 +122,16 @@ describe(resolveTenantEmailBrand, () => {
 });
 
 describe(resolveTenantEmailDarkBrand, () => {
-  it('resolves the accent and logo colours from the dark ramps', () => {
-    const { brandPrimary, brandPrimarySolid, logo1, logo2, logo3 } =
-      resolveTenantEmailDarkBrand({
-        preset: PRESET_ID.CONSOLE,
-        accentHue: MOCK_ACCENT_HUE,
-        logoHue: MOCK_LOGO_HUE,
-      });
+  it.each(
+    Object.values(PRESET_ID).flatMap((preset) => [
+      { preset, guard: 'passes', isGuardFailing: false },
+      { preset, guard: 'fails', isGuardFailing: true },
+    ]),
+  )(
+    'keeps AA contrast on $preset when the accent-hue guard $guard',
+    ({ preset, isGuardFailing }) => {
+      if (isGuardFailing) failAccentHueGuard();
 
-    expect({ brandPrimary, brandPrimarySolid, logo1, logo2, logo3 }).toEqual(
-      expectedAccentAndLogoHex(DARK_RAMPS, MOCK_ACCENT_HUE, MOCK_LOGO_HUE),
-    );
-  });
-
-  it('falls back to the preset hue in dark mode for an inaccessible accent', () => {
-    vi.mocked(renderedContrastRatio).mockReturnValue(1);
-    const { accentHue } = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
-
-    const { brandPrimary, brandPrimarySolid, logo1, logo2, logo3 } =
-      resolveTenantEmailDarkBrand({
-        preset: PRESET_ID.EDITORIAL,
-        accentHue: MOCK_ACCENT_HUE,
-      });
-
-    expect({ brandPrimary, brandPrimarySolid, logo1, logo2, logo3 }).toEqual(
-      expectedAccentAndLogoHex(DARK_RAMPS, accentHue),
-    );
-  });
-
-  it.each(Object.values(PRESET_ID))(
-    'keeps AA contrast for text, muted text and the accent on %s',
-    (preset) => {
       const {
         surface,
         text,
@@ -157,7 +146,7 @@ describe(resolveTenantEmailDarkBrand, () => {
         accent: contrastOf(brandPrimaryContrast, brandPrimarySolid),
       };
       const failing = Object.entries(ratios).filter(
-        ([, ratio]) => ratio < WCAG_AA_CONTRAST_MIN,
+        ([, ratio]) => !(ratio >= WCAG_AA_CONTRAST_MIN),
       );
 
       expect(failing).toEqual([]);

@@ -54,6 +54,7 @@ const DARK_EMAIL_RAMPS: TEmailBrandRamps = {
   logo: LOGO_RAMP_DARK,
 };
 
+/** Applies the WCAG AA accent-hue guard, which email cannot express as CSS. */
 const resolveEmailBrand = (
   { neutral, accent, logo }: TEmailBrandRamps,
   { preset, accentHue, logoHue }: TResolveTenantEmailBrandInput,
@@ -82,10 +83,6 @@ const resolveEmailBrand = (
   };
 };
 
-/**
- * Resolves a tenant's light brand palette to literal hex for email, applying
- * the WCAG AA accent-hue guard email cannot express as CSS.
- */
 export const resolveTenantEmailBrand = (
   input: TResolveTenantEmailBrandInput,
 ): TTenantEmailBrand => resolveEmailBrand(LIGHT_EMAIL_RAMPS, input);
