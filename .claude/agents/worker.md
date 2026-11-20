@@ -64,7 +64,8 @@ default to zero".
 - **Nothing imports `apps/worker`.** The platform reaches it only through
   its signed endpoints — `POST /api/provision`, `POST /api/deprovision`,
   `POST /api/owner-access/*`, `POST /api/member-access/*`,
-  `POST /api/custom-domain/*` and
+  `POST /api/custom-domain/*`, `POST /api/cookie-statement/seed`,
+  `POST /api/sample-content/remove` and
   `POST /api/newsletter/post-send`, `POST /api/scheduled-post-purge` and
   `POST /api/scheduled-post-skim`
   — every one authenticated by the shared enqueue secret. The other routes
@@ -83,8 +84,9 @@ default to zero".
   returning a result: `ensureInfrastructure` (project, dataset, CORS, tokens,
   webhook; the custom domain only when one exists), `inviteOwner`,
   `applySiteTemplate(siteType, plan, locale)`, `verifyTenant`,
-  `ensureOwnerAccess`. `removeSampleContent` is not part of provisioning;
-  #4972 is its owner-facing action (`docs/features/site-templates.md`). A unit never reaches into another's state.
+  `ensureOwnerAccess`. `removeSampleContent` is not part of provisioning
+  and not a step: `POST /api/sample-content/remove` runs it in the request
+  (`docs/features/site-templates.md`). A unit never reaches into another's state.
 - **Deprovisioning** (`deprovisionTenant`) runs `runDeprovisioningStep` once
   per `DEPROVISIONING_STEP`, in the CLI's order, reusing `@shinefold/db`'s shared
   pieces (`purgeTenantReaderData`, `deleteVercelProjectDomain`,

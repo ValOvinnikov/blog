@@ -1,6 +1,7 @@
 import { HTTP_STATUS, type THttpStatus } from '@shinefold/config/constants';
-import type { TMaybeUndefined } from '@shinefold/config/types';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
 import { getTenantById } from '@shinefold/db/queries/tenants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   ENQUEUE_SIGNATURE_HEADER,
   ENQUEUE_TIMESTAMP_HEADER,
@@ -19,7 +20,7 @@ export const tenantRequestBodySchema = z.object({ tenantId: z.uuid() });
 
 export function respond(
   status: THttpStatus,
-  body: Record<string, string>,
+  body: Record<string, unknown>,
 ): Response {
   return Response.json(body, { status });
 }
@@ -79,15 +80,34 @@ export async function readSignedTenantRequest(
   return signed.ok ? okResult(signed.data.tenantId) : signed;
 }
 
-export async function refuseUnreadableTenant(
+async function refuseTenantWithout(
   tenantId: string,
+  pickToken: (tenant: TTenant) => TMaybeNull<string>,
 ): Promise<TMaybeUndefined<Response>> {
   const tenant = await getTenantById(tenantId);
   if (!tenant) {
     return respondError(HTTP_STATUS.NOT_FOUND, ENQUEUE_ERROR.NOT_FOUND);
   }
-  if (!tenant.sanityProjectId || !tenant.sanityReadTokenEncrypted) {
+  if (!tenant.sanityProjectId || !pickToken(tenant)) {
     return respondError(HTTP_STATUS.CONFLICT, ENQUEUE_ERROR.NOT_PROVISIONED);
   }
   return undefined;
+}
+
+export function refuseUnreadableTenant(
+  tenantId: string,
+): Promise<TMaybeUndefined<Response>> {
+  return refuseTenantWithout(
+    tenantId,
+    ({ sanityReadTokenEncrypted }) => sanityReadTokenEncrypted,
+  );
+}
+
+export function refuseUnwritableTenant(
+  tenantId: string,
+): Promise<TMaybeUndefined<Response>> {
+  return refuseTenantWithout(
+    tenantId,
+    ({ sanityWriteTokenEncrypted }) => sanityWriteTokenEncrypted,
+  );
 }
