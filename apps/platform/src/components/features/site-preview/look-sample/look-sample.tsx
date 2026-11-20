@@ -20,6 +20,7 @@ import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/the
 import {
   type IBusyStyle,
   SKIN_REGISTRY,
+  TEXT_ROLE,
   type TLocaleIsoCode,
 } from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
@@ -61,7 +62,7 @@ export const LookSample = ({
 }: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
-  const { root, main, hero, title, lead, divider } = lookSampleVariants();
+  const { root, main, hero, divider } = lookSampleVariants();
 
   return (
     <SiteThemeFrame
@@ -82,12 +83,10 @@ export const LookSample = ({
       />
       <div className={main()}>
         <div className={hero()}>
-          <Heading level={1} visual="preview" className={title()}>
+          <Heading level={1} visual={TEXT_ROLE.SECTION_TITLE}>
             {t('sampleHeading')}
           </Heading>
-          <Text variant="supporting" className={lead()}>
-            {t('samplePara')}
-          </Text>
+          <Text textRole={TEXT_ROLE.CARD_BODY}>{t('samplePara')}</Text>
           <LookSampleActions>
             <SampleBusyButton busy={busy} />
           </LookSampleActions>
