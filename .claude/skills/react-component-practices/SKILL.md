@@ -100,7 +100,9 @@ A domain is a module, a feature, a page, or a layout or app route.
   `IWithDataTestId`.
 - Exempt, and only these: the native-attribute primitives `Button`,
   `IconButton`, `TextInput` and `TextLink` in `@shinefold/ui`, and `Button`,
-  `TextInput` and the link primitive `IntentPrefetchLink` in `apps/platform`.
+  `TextInput` and the link primitive `IntentPrefetchLink` in `apps/platform`,
+  plus `SidebarNavLink`, a Base UI render target whose tooltip injects its
+  attributes, handlers and ref.
 - A component at the ceiling takes no new prop until it is restructured — in
   the same PR or one before it.
 - **The `reviewer` enforces it.** For every component whose file a diff
