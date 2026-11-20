@@ -5,7 +5,10 @@ import { getNewsletterPostSend } from '@shinefold/db/queries/newsletter-post-sen
 import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends/mark-newsletter-post-skipped';
 import * as schema from '@shinefold/db/schema';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
-import { MOCK_POST_ID } from '@shinefold/db/testing/newsletter-post-sends/fixtures';
+import {
+  mockNewsletterPostSend,
+  MOCK_POST_ID,
+} from '@shinefold/db/testing/newsletter-post-sends/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
@@ -31,11 +34,12 @@ describe(markNewsletterPostSent, () => {
 
   it('records a claimed post as sent', async () => {
     expect(await markNewsletterPostSent(tenantId, MOCK_POST_ID)).toBe(true);
-    expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual({
-      claimedAt: MOCK_NOW,
-      outcome: NEWSLETTER_POST_SEND_OUTCOME.SENT,
-      skipReason: undefined,
-    });
+    expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual(
+      mockNewsletterPostSend({
+        outcome: NEWSLETTER_POST_SEND_OUTCOME.SENT,
+        settledAt: MOCK_NOW,
+      }),
+    );
   });
 
   it('leaves a skipped post skipped', async () => {
@@ -46,10 +50,12 @@ describe(markNewsletterPostSent, () => {
     );
 
     expect(await markNewsletterPostSent(tenantId, MOCK_POST_ID)).toBe(false);
-    expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual({
-      claimedAt: MOCK_NOW,
-      outcome: NEWSLETTER_POST_SEND_OUTCOME.SKIPPED,
-      skipReason: NEWSLETTER_SKIP_REASON.SITE_PAUSED,
-    });
+    expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual(
+      mockNewsletterPostSend({
+        outcome: NEWSLETTER_POST_SEND_OUTCOME.SKIPPED,
+        skipReason: NEWSLETTER_SKIP_REASON.SITE_PAUSED,
+        settledAt: MOCK_NOW,
+      }),
+    );
   });
 });

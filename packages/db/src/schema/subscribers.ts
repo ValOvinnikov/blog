@@ -71,6 +71,12 @@ export const subscribers = pgTable(
       subscriber.status,
       subscriber.id,
     ),
+    index('subscribers_tenant_status_confirmed_at_id_idx').on(
+      subscriber.tenantId,
+      subscriber.status,
+      subscriber.confirmedAt,
+      subscriber.id,
+    ),
   ],
 );
 

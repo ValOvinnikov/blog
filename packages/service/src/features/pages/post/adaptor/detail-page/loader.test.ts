@@ -3,6 +3,7 @@ import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
 import {
   IMAGE_LAYOUT,
   PORTABLE_TEXT_BLOCK_TYPE,
+  SANITY_PERSPECTIVE,
 } from '@shinefold/config/constants';
 import {
   MOCK_SKIM_MODEL,
@@ -222,24 +223,42 @@ describe(getPost, () => {
     ]);
   });
 
-  it('queries the slug for the tenant and scopes its tags to it', async () => {
-    mockRun.mockResolvedValueOnce(mockRawPostDetail());
+  describe('the query it runs', () => {
+    beforeEach(() => {
+      mockRun.mockResolvedValueOnce(mockRawPostDetail());
+    });
 
-    await getPost(MOCK_POST_SLUG, tenant);
+    it('queries the slug for the tenant and scopes its tags to it', async () => {
+      await getPost(MOCK_POST_SLUG, tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(postPageQuery, {
-      parameters: { slug: MOCK_POST_SLUG },
-      tenant,
-      next: {
-        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
-        tags: [
-          MOCK_PAGE_POST_CACHE_TAG,
-          MOCK_AUTHOR_CACHE_TAG,
-          MOCK_TOPIC_CACHE_TAG,
-          MOCK_TAG_CACHE_TAG,
-          ...MOCK_LINK_TARGET_CACHE_TAGS,
-        ],
-      },
+      expect(mockRun).toHaveBeenCalledWith(postPageQuery, {
+        parameters: { slug: MOCK_POST_SLUG, isDraftPreview: false },
+        tenant,
+        next: {
+          revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+          tags: [
+            MOCK_PAGE_POST_CACHE_TAG,
+            MOCK_AUTHOR_CACHE_TAG,
+            MOCK_TOPIC_CACHE_TAG,
+            MOCK_TAG_CACHE_TAG,
+            ...MOCK_LINK_TARGET_CACHE_TAGS,
+          ],
+        },
+      });
+    });
+
+    it('reads every publish date when the tenant reads drafts', async () => {
+      await getPost(
+        MOCK_POST_SLUG,
+        mockTenant({ perspective: SANITY_PERSPECTIVE.DRAFTS }),
+      );
+
+      expect(mockRun).toHaveBeenCalledWith(
+        postPageQuery,
+        expect.objectContaining({
+          parameters: { slug: MOCK_POST_SLUG, isDraftPreview: true },
+        }),
+      );
     });
   });
 });

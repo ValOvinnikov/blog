@@ -1,4 +1,8 @@
-import type { TPaidSubscriberBandCeiling } from '@shinefold/db/constants';
+import type { TBillingInterval } from '@shinefold/config/constants';
+import type {
+  TBillingCurrency,
+  TPaidSubscriberBandCeiling,
+} from '@shinefold/db/constants';
 import { integer, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const tenantBillingColumns = {
@@ -8,6 +12,8 @@ export const tenantBillingColumns = {
   subscriberBandCeiling: integer(
     'subscriber_band_ceiling',
   ).$type<TPaidSubscriberBandCeiling>(),
+  billingInterval: text('billing_interval').$type<TBillingInterval>(),
+  billingCurrency: text('billing_currency').$type<TBillingCurrency>(),
   trialEndsAt: timestamp('trial_ends_at', { mode: 'date' }),
   downgradeGraceStartedAt: timestamp('downgrade_grace_started_at', {
     mode: 'date',

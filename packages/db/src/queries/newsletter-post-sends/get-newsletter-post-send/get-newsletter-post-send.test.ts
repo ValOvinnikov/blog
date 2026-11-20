@@ -1,7 +1,8 @@
 import { claimNewsletterPostSend } from '@shinefold/db/queries/newsletter-post-sends/claim-newsletter-post-send';
 import * as schema from '@shinefold/db/schema';
-import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import {
+  mockNewsletterPostSend,
   MOCK_OTHER_POST_ID,
   MOCK_POST_ID,
 } from '@shinefold/db/testing/newsletter-post-sends/fixtures';
@@ -36,10 +37,8 @@ describe(getNewsletterPostSend, () => {
   it('reads a claim with no outcome yet', async () => {
     await claimNewsletterPostSend(tenantId, MOCK_POST_ID);
 
-    expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual({
-      claimedAt: MOCK_NOW,
-      outcome: undefined,
-      skipReason: undefined,
-    });
+    expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual(
+      mockNewsletterPostSend(),
+    );
   });
 });

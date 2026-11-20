@@ -27,3 +27,4 @@ export * from './tenant-enums';
 export * from './tenant-oauth-credentials';
 export * from './tenant-suspensions';
 export * from './tenants';
+export * from './test-email-send-counters';
