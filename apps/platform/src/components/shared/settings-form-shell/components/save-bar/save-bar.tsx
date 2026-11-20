@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@platform/components/shared/button';
+import { ARIA_ROLE } from '@platform/constants/aria-role';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TInvalidControls } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
 import { SIZE } from '@shinefold/config';
@@ -8,7 +9,6 @@ import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { type Ref, useRef } from 'react';
 
-import { PhoneSaveFooter } from './components/phone-save-footer/phone-save-footer';
 import type { TUnsavedCard } from './components/save-bar-location/save-bar-location';
 import { SaveBarSummary } from './components/save-bar-summary/save-bar-summary';
 import { saveBarVariants } from './save-bar-variants';
@@ -22,7 +22,6 @@ export type TSaveBarProps = {
   isPending: boolean;
   saveError?: string;
   unsavedCards?: TUnsavedCard[];
-  hasPhoneFooter?: boolean;
   onSave: () => void;
   onDiscard: () => void;
 };
@@ -35,28 +34,24 @@ export const SaveBar = ({
   isPending,
   saveError,
   unsavedCards,
-  hasPhoneFooter,
   onSave,
   onDiscard,
 }: TSaveBarProps) => {
   const t = useTranslations('saveBar');
   const barRef = useRef<HTMLDivElement>(null);
-  const phoneFooterRef = useRef<HTMLDivElement>(null);
   const isDirty = changeCount > 0;
   const isSummaryAnError =
     !isUndefined(invalidControls.ids[0]) || Boolean(saveError);
-  const { container, root, actions, shortcut } = saveBarVariants({
-    hasPhoneFooter,
-  });
+  const { container, root, actions, shortcut } = saveBarVariants();
 
-  useSaveBarHeight(barRef, phoneFooterRef, isDirty);
+  useSaveBarHeight(barRef, isDirty);
 
   return (
     <div ref={ref} className={container()}>
       {isDirty && (
         <div
           ref={barRef}
-          role="region"
+          role={ARIA_ROLE.REGION}
           aria-label={t('regionLabel')}
           aria-busy={isPending || undefined}
           className={root()}
@@ -88,16 +83,6 @@ export const SaveBar = ({
             </Button>
           </div>
         </div>
-      )}
-      {hasPhoneFooter && (
-        <PhoneSaveFooter
-          ref={phoneFooterRef}
-          changeCount={changeCount}
-          invalidControls={invalidControls}
-          isPending={isPending}
-          saveError={saveError}
-          onSave={onSave}
-        />
       )}
     </div>
   );

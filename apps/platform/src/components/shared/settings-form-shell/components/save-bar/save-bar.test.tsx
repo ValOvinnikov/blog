@@ -5,6 +5,7 @@ import {
   screen,
 } from '@platform/testing/custom-render';
 import {
+  DISCARD,
   GO_TO_THE_FIRST_ONE,
   ONE_FIELD_NEEDS_ATTENTION,
   SAVE_CHANGES,
@@ -18,7 +19,6 @@ import { SaveBar, type TSaveBarProps } from './save-bar';
 faker.seed(5995);
 
 const THREE_UNSAVED_CHANGES = '3 unsaved changes';
-const DISCARD = 'Discard';
 const NOT_SAVED = 'Not saved';
 const SAVE_SHORTCUT = '⌘S / Ctrl+S';
 const MOCK_FIELD_LABEL = faker.lorem.word();
@@ -91,24 +91,27 @@ describe(`<${SaveBar.name}/>`, () => {
       </>
     );
 
+    const scrollIntoView = () => vi.mocked(Element.prototype.scrollIntoView);
+
+    beforeEach(() => {
+      vi.spyOn(Element.prototype, 'scrollIntoView');
+    });
+
     it('scrolls the focused control clear of the bar', async () => {
-      const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
       const { rerender } = renderWithIntl(<BarAfterField changeCount={0} />);
       const field = screen.getByRole('textbox', { name: MOCK_FIELD_LABEL });
       await user.click(field);
 
       rerender(<BarAfterField changeCount={1} />);
 
-      expect(scrollIntoView).toHaveBeenCalledTimes(1);
-      expect(scrollIntoView.mock.contexts[0]).toBe(field);
+      expect(scrollIntoView()).toHaveBeenCalledTimes(1);
+      expect(scrollIntoView().mock.contexts[0]).toBe(field);
     });
 
     it('scrolls nothing when no control has focus', () => {
-      const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
-
       setup();
 
-      expect(scrollIntoView).not.toHaveBeenCalled();
+      expect(scrollIntoView()).not.toHaveBeenCalled();
     });
   });
 

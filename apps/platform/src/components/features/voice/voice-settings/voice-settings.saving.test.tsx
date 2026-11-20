@@ -8,7 +8,8 @@ import {
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
-  ONE_UNSAVED_CHANGE,
+  DISCARD,
+  ONE_FIELD_NEEDS_ATTENTION,
   SAVE_CHANGES,
   SAVING,
   UNSAVED_CHANGES,
@@ -85,122 +86,131 @@ describe(`<${VoiceSettings.name}/> saving`, () => {
     });
   });
 
-  it('makes the page content inert while the phone footer keeps focus on Saving…', async () => {
-    let resolveSave: (result: TSaveVoiceOverridesResult) => void = () => {};
-    saveVoiceOverridesActionMock.mockReturnValueOnce(
-      new Promise((resolve) => {
-        resolveSave = resolve;
-      }),
-    );
-    setupVoiceSettings();
-
-    await openErrorPages();
-
-    await user.type(notFoundHeadingField(), MOCK_TYPED_TEXT);
-
-    const footer = screen.getByRole('region', { name: ONE_UNSAVED_CHANGE });
-    const footerSave = within(footer).getByRole('button', {
-      name: SAVE_CHANGES,
+  describe('in one language', () => {
+    beforeEach(async () => {
+      setupVoiceSettings();
+      await openErrorPages();
     });
-    await user.click(footerSave);
 
-    const cards = screen.getByTestId(VOICE_CARDS_TEST_ID);
-    const savingButton = within(footer).getByRole('button', { name: SAVING });
+    it('makes the page content inert while the save bar keeps focus on Saving…', async () => {
+      let resolveSave: (result: TSaveVoiceOverridesResult) => void = () => {};
+      saveVoiceOverridesActionMock.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveSave = resolve;
+        }),
+      );
+      await user.type(notFoundHeadingField(), MOCK_TYPED_TEXT);
 
-    expect(cards).toHaveAttribute('inert');
-    expect(footer).not.toContainElement(cards);
-    expect(cards).not.toContainElement(footer);
-    expect(savingButton).toHaveFocus();
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const barSave = within(saveBar).getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(barSave);
 
-    resolveSave({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    await screen.findAllByRole('alert');
-  });
+      const cards = screen.getByTestId(VOICE_CARDS_TEST_ID);
+      const savingButton = within(saveBar).getByRole('button', {
+        name: SAVING,
+      });
 
-  it('returns focus to the edited field after a save from the phone footer', async () => {
-    saveVoiceOverridesActionMock.mockResolvedValueOnce({
-      outcome: ACTION_OUTCOME.SUCCESS,
+      expect(cards).toHaveAttribute('inert');
+      expect(saveBar).not.toContainElement(cards);
+      expect(cards).not.toContainElement(saveBar);
+      expect(savingButton).toHaveFocus();
+
+      resolveSave({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      await screen.findAllByRole('alert');
     });
-    setupVoiceSettings();
 
-    await openErrorPages();
+    it('shows no save bar until something changes', () => {
+      const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
 
-    await user.type(notFoundHeadingField(), MOCK_TYPED_TEXT);
-
-    const footer = screen.getByRole('region', { name: ONE_UNSAVED_CHANGE });
-    const footerSave = within(footer).getByRole('button', {
-      name: SAVE_CHANGES,
+      expect(saveBar).not.toBeInTheDocument();
     });
-    await user.click(footerSave);
 
-    await screen.findByText(VOICE_SAVED);
-    await waitFor(() => expect(notFoundHeadingField()).toHaveFocus());
-  });
+    it('offers Discard beside Save changes and drops the bar once discarded', async () => {
+      await user.type(notFoundHeadingField(), MOCK_TYPED_TEXT);
 
-  it('shows a toast and refreshes after a successful save', async () => {
-    saveVoiceOverridesActionMock.mockResolvedValueOnce({
-      outcome: ACTION_OUTCOME.SUCCESS,
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const discard = within(saveBar).getByRole('button', { name: DISCARD });
+      const save = within(saveBar).getByRole('button', { name: SAVE_CHANGES });
+
+      expect(save).toBeVisible();
+      await user.click(discard);
+
+      expect(saveBar).not.toBeInTheDocument();
     });
-    setupVoiceSettings();
 
-    await openErrorPages();
+    it('shows a failed save once, in the save bar, without refreshing', async () => {
+      saveVoiceOverridesActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+      await editVoiceHeadingAndSave(user, MOCK_TYPED_TEXT);
 
-    await editVoiceHeadingAndSave(user, MOCK_TYPED_TEXT);
+      const alerts = await screen.findAllByRole('alert');
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const barAlert = within(saveBar).getByRole('alert');
 
-    const toast = await screen.findByText(VOICE_SAVED);
-
-    expect(toast).toBeVisible();
-    expect(refresh).toHaveBeenCalled();
-  });
-
-  it('shows the failure in the save bar and the phone footer and does not refresh when the save fails', async () => {
-    saveVoiceOverridesActionMock.mockResolvedValueOnce({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
+      expect(barAlert).toHaveTextContent(SAVE_FAILED);
+      expect(alerts).toEqual([barAlert]);
+      expect(refresh).not.toHaveBeenCalled();
     });
-    setupVoiceSettings();
 
-    await openErrorPages();
+    it('shows a rejected field inline until the editor changes it', async () => {
+      saveVoiceOverridesActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrorsByLocale: { [EN]: { notFoundHeading: TOO_LONG_ERROR } },
+      });
+      await editVoiceHeadingAndSave(user, MOCK_TYPED_TEXT);
 
-    await editVoiceHeadingAndSave(user, MOCK_TYPED_TEXT);
+      const fieldError = await screen.findByText(TOO_LONG_MESSAGE);
+      const rejectedField = notFoundHeadingField();
+      const alert = screen.queryByRole('alert');
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const firstFieldLink = within(saveBar).getByRole('link');
 
-    const alerts = await screen.findAllByRole('alert');
-    const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
-    const barAlert = within(saveBar).getByRole('alert');
+      expect(fieldError).toBeVisible();
+      expect(rejectedField).toHaveAccessibleDescription(
+        `${en.voiceFieldHints.notFoundHeading} ${TOO_LONG_MESSAGE}`,
+      );
+      expect(alert).not.toBeInTheDocument();
+      expect(saveBar).toHaveTextContent(ONE_FIELD_NEEDS_ATTENTION);
+      expect(firstFieldLink).toHaveAttribute('href', `#${rejectedField.id}`);
 
-    expect(barAlert).toHaveTextContent(SAVE_FAILED);
-    expect(alerts).toHaveLength(2);
-    alerts.forEach((alert) => expect(alert).toHaveTextContent(SAVE_FAILED));
-    expect(refresh).not.toHaveBeenCalled();
-  });
+      await user.type(rejectedField, MOCK_EDIT_TEXT);
 
-  it('shows a rejected field inline until the editor changes it', async () => {
-    saveVoiceOverridesActionMock.mockResolvedValueOnce({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrorsByLocale: { [EN]: { notFoundHeading: TOO_LONG_ERROR } },
+      const clearedError = screen.queryByText(TOO_LONG_MESSAGE);
+
+      expect(clearedError).not.toBeInTheDocument();
     });
-    setupVoiceSettings();
 
-    await openErrorPages();
+    describe('after a successful save', () => {
+      beforeEach(() => {
+        saveVoiceOverridesActionMock.mockResolvedValueOnce({
+          outcome: ACTION_OUTCOME.SUCCESS,
+        });
+      });
 
-    await editVoiceHeadingAndSave(user, MOCK_TYPED_TEXT);
+      it('returns focus to the edited field after a save from the save bar', async () => {
+        await user.type(notFoundHeadingField(), MOCK_TYPED_TEXT);
 
-    const fieldError = await screen.findByText(TOO_LONG_MESSAGE);
-    const rejectedField = notFoundHeadingField();
-    const alert = screen.queryByRole('alert');
-    const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
-    const firstFieldLink = within(saveBar).getByRole('link');
+        const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+        const barSave = within(saveBar).getByRole('button', {
+          name: SAVE_CHANGES,
+        });
+        await user.click(barSave);
 
-    expect(fieldError).toBeVisible();
-    expect(rejectedField).toHaveAccessibleDescription(
-      `${en.voiceFieldHints.notFoundHeading} ${TOO_LONG_MESSAGE}`,
-    );
-    expect(alert).not.toBeInTheDocument();
-    expect(saveBar).toHaveTextContent('1 field needs attention');
-    expect(firstFieldLink).toHaveAttribute('href', `#${rejectedField.id}`);
+        await screen.findByText(VOICE_SAVED);
+        await waitFor(() => expect(notFoundHeadingField()).toHaveFocus());
+      });
 
-    await user.type(rejectedField, MOCK_EDIT_TEXT);
+      it('shows a toast and refreshes', async () => {
+        await editVoiceHeadingAndSave(user, MOCK_TYPED_TEXT);
 
-    const clearedError = screen.queryByText(TOO_LONG_MESSAGE);
+        const toast = await screen.findByText(VOICE_SAVED);
 
-    expect(clearedError).not.toBeInTheDocument();
+        expect(toast).toBeVisible();
+        expect(refresh).toHaveBeenCalled();
+      });
+    });
   });
 });

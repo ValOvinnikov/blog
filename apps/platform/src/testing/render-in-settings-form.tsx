@@ -13,6 +13,7 @@ type TSettingsFormTestState = {
 export const ARCHIVED_NOTICE_ID = 'archived-notice';
 
 export const SAVE_CHANGES = 'Save changes';
+export const DISCARD = 'Discard';
 export const ALL_CHANGES_SAVED = 'All changes saved';
 export const UNSAVED_CHANGES = 'Unsaved changes';
 export const ONE_FIELD_NEEDS_ATTENTION = '1 field needs attention';

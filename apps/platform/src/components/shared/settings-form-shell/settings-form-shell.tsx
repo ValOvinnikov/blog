@@ -22,7 +22,6 @@ type TSettingsFormShellLayout = {
   isWide?: boolean;
   isTitleHiddenBelowLg?: boolean;
   stack?: TSettingsFormStack;
-  hasPhoneSaveFooter?: boolean;
 };
 
 export type TSettingsFormShellProps<TValues> = IWithChildren & {
@@ -78,13 +77,9 @@ export const SettingsFormShell = <TValues,>({
   const isSaveBarShown = isDirty && !isArchived && !isSaveBarHidden;
   const saveError = isPending ? undefined : (planRefusal ?? errorTitle);
   useSaveErrorToast(isDirty ? undefined : saveError, isPending);
-  const isPhoneSaveFooterShown =
-    Boolean(layout?.hasPhoneSaveFooter) && !isArchived && !isSaveBarHidden;
   const { root, liveStatus } = settingsFormShellVariants({
     isWide: layout?.isWide,
     stack: layout?.stack,
-    isArchived,
-    hasPhoneSaveFooter: layout?.hasPhoneSaveFooter,
     isSaveBarShown,
   });
 
@@ -131,16 +126,15 @@ export const SettingsFormShell = <TValues,>({
         {isDirty ? t('unsavedChanges', { count: changeCount }) : ''}
       </span>
 
-      {(isSaveBarShown || isPhoneSaveFooterShown) && (
+      {isSaveBarShown && (
         <SaveBar
           ref={saveBarRef}
           changeCount={changeCount}
           breakdown={formatLanguageChanges(changesByLanguage)}
           invalidControls={invalidControls}
           isPending={isPending}
-          saveError={isSaveBarShown ? saveError : undefined}
+          saveError={saveError}
           unsavedCards={unsavedCards}
-          hasPhoneFooter={layout?.hasPhoneSaveFooter}
           onSave={() => void saveAndReturnFocus()}
           onDiscard={handleDiscard}
         />

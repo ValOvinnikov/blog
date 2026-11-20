@@ -12,7 +12,7 @@ import {
   ALL_CHANGES_SAVED,
   ARCHIVED_NOTICE_ID,
   ARCHIVED_NOTICE_TEXT,
-  ONE_UNSAVED_CHANGE,
+  DISCARD,
   SAVE_CHANGES,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
@@ -123,13 +123,11 @@ const dispatchBeforeUnload = () => {
 
 const THREE_UNSAVED_CHANGES = '3 unsaved changes';
 const RESTORE_1_CHANGE = 'Restore 1 change';
-const DISCARD = 'Discard';
 const UNSAVED_CHANGES_ANNOUNCEMENT_TEST_ID = 'unsaved-changes-announcement';
 
 const TaglineSettings = ({
   hasSavedStatus,
-  layout,
-}: Pick<TSettingsFormShellProps<TValues>, 'hasSavedStatus' | 'layout'>) => {
+}: Pick<TSettingsFormShellProps<TValues>, 'hasSavedStatus'>) => {
   const [saved, setSaved] = useState(MOCK_SAVED_VALUES);
   const [values, setValues] = useState(MOCK_SAVED_VALUES);
 
@@ -137,7 +135,6 @@ const TaglineSettings = ({
     <SettingsFormShell
       {...baseProps}
       hasSavedStatus={hasSavedStatus}
-      layout={layout}
       form={formFor({
         changeCount: values.tagline === saved.tagline ? 0 : 1,
         save: async () => {
@@ -427,44 +424,6 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
 
     expect(saveBar).not.toBeInTheDocument();
-  });
-
-  describe('with the phone save footer', () => {
-    const phoneFooterLayout = { layout: { hasPhoneSaveFooter: true } };
-
-    it('keeps the footer saying all changes are saved with no unsaved changes', () => {
-      renderShell({}, phoneFooterLayout);
-
-      const footer = screen.getByRole('region', { name: ALL_CHANGES_SAVED });
-      const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
-
-      expect(footer).toBeVisible();
-      expect(saveBar).not.toBeInTheDocument();
-    });
-
-    it('offers Discard only in the docked bar, never in the footer', () => {
-      renderShell({ changeCount: 3 }, phoneFooterLayout);
-
-      const footer = screen.getByRole('region', {
-        name: THREE_UNSAVED_CHANGES,
-      });
-      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
-      const footerDiscard = within(footer).queryByRole('button', {
-        name: DISCARD,
-      });
-      const barDiscard = within(saveBar).getByRole('button', { name: DISCARD });
-
-      expect(footerDiscard).not.toBeInTheDocument();
-      expect(barDiscard).toBeVisible();
-    });
-
-    it('offers no footer to an archived tenant', () => {
-      renderShell({ archivedAt: MOCK_ARCHIVED_AT }, phoneFooterLayout);
-
-      const footer = screen.queryByRole('region', { name: ALL_CHANGES_SAVED });
-
-      expect(footer).not.toBeInTheDocument();
-    });
   });
 
   describe('a failed save', () => {
@@ -831,32 +790,14 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   });
 
   describe('focus after a save', () => {
-    const saveFrom = async (regionName: string) => {
-      const region = screen.getByRole('region', { name: regionName });
+    const saveFromBar = async () => {
+      const region = screen.getByRole('region', { name: UNSAVED_CHANGES });
       const saveButton = within(region).getByRole('button', {
         name: SAVE_CHANGES,
       });
       await user.click(saveButton);
       return saveButton;
     };
-
-    it('returns to the last control after a save from the save bar', async () => {
-      renderWithIntl(<TaglineSettings />);
-      await editTagline(user);
-
-      await saveFrom(UNSAVED_CHANGES);
-
-      await waitFor(() => expect(getTaglineInput()).toHaveFocus());
-    });
-
-    it('returns to the last control after a save from the phone footer', async () => {
-      renderWithIntl(<TaglineSettings layout={{ hasPhoneSaveFooter: true }} />);
-      await editTagline(user);
-
-      await saveFrom(ONE_UNSAVED_CHANGE);
-
-      await waitFor(() => expect(getTaglineInput()).toHaveFocus());
-    });
 
     it('moves to the page heading when the last control has left the page', async () => {
       renderShell({ changeCount: 1 }, { children: <RemovableControl /> });
@@ -865,7 +806,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       });
       await user.click(removeButton);
 
-      await saveFrom(UNSAVED_CHANGES);
+      await saveFromBar();
 
       const heading = screen.getByRole('heading', {
         level: 1,
@@ -874,20 +815,30 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       await waitFor(() => expect(heading).toHaveFocus());
     });
 
-    it('leaves focus where it was after a save from the shortcut', async () => {
-      renderWithIntl(<TaglineSettings />);
-      await editTagline(user);
+    describe('after an edit', () => {
+      beforeEach(async () => {
+        renderWithIntl(<TaglineSettings />);
+        await editTagline(user);
+      });
 
-      await user.keyboard(USER_EVENT_KEY.CONTROL_S);
+      it('returns to the last control after a save from the save bar', async () => {
+        await saveFromBar();
 
-      await screen.findByText(ALL_CHANGES_SAVED);
-      expect(getTaglineInput()).toHaveFocus();
+        await waitFor(() => expect(getTaglineInput()).toHaveFocus());
+      });
+
+      it('leaves focus where it was after a save from the shortcut', async () => {
+        await user.keyboard(USER_EVENT_KEY.CONTROL_S);
+
+        await screen.findByText(ALL_CHANGES_SAVED);
+        expect(getTaglineInput()).toHaveFocus();
+      });
     });
 
     it('stays on Save changes after a failed save', async () => {
       renderShell({ changeCount: 1, save: vi.fn().mockResolvedValue(false) });
 
-      const saveButton = await saveFrom(UNSAVED_CHANGES);
+      const saveButton = await saveFromBar();
 
       expect(saveButton).toHaveFocus();
     });

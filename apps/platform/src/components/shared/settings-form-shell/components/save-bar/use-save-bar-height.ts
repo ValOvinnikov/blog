@@ -14,17 +14,14 @@ const revealFocusedControl = () => {
 // Publishes the visible bar's height on <html>, where the page's bottom room and scroll padding read it.
 export const useSaveBarHeight = (
   barRef: RefObject<TMaybeNull<HTMLElement>>,
-  phoneFooterRef: RefObject<TMaybeNull<HTMLElement>>,
   isDirty: boolean,
 ) => {
   useEffect(() => {
     const root = document.documentElement;
-    const bars = [barRef.current, phoneFooterRef.current].filter(
-      (bar): bar is HTMLElement => !isNull(bar),
-    );
+    const bar = barRef.current;
 
     const measure = () => {
-      const height = Math.max(0, ...bars.map((bar) => bar.offsetHeight));
+      const height = bar?.offsetHeight ?? 0;
       if (height > 0) {
         root.style.setProperty(SAVE_BAR_HEIGHT_PROPERTY, `${height}px`);
       } else {
@@ -35,11 +32,11 @@ export const useSaveBarHeight = (
     measure();
     if (isDirty) revealFocusedControl();
     const observer = new ResizeObserver(measure);
-    bars.forEach((bar) => observer.observe(bar));
+    if (!isNull(bar)) observer.observe(bar);
 
     return () => {
       observer.disconnect();
       root.style.removeProperty(SAVE_BAR_HEIGHT_PROPERTY);
     };
-  }, [barRef, phoneFooterRef, isDirty]);
+  }, [barRef, isDirty]);
 };

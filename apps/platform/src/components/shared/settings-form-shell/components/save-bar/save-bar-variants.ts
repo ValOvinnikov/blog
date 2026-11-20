@@ -25,13 +25,4 @@ export const saveBarVariants = tv({
     ],
     shortcut: ['hidden text-platform-12 text-platform-muted lg:inline'],
   },
-  variants: {
-    hasPhoneFooter: {
-      true: { root: ['max-md:hidden'] },
-      false: {},
-    },
-  },
-  defaultVariants: {
-    hasPhoneFooter: false,
-  },
 });

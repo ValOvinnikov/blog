@@ -130,7 +130,7 @@ Discard is disabled and the bar is `aria-busy`. A save that fails with no
 field errors — a server error, offline, or a plan refusal — shows the page's
 failure message in the bar's left side in place of the dot, count and hint, as
 one `role="alert"`, and the changes stay unsaved; invalid fields keep that slot
-until they are cleared. A retry withdraws it while it is in flight, so a second failure announces again, and the next edit or a successful save clears it. The bar grows past 64px to fit a long message, and while it shows, the page's bottom room and scroll padding follow its measured height (`--platform-save-bar-height` on `<html>`), with the 64px dock and 85px phone footer as scroll-padding fallbacks. When the
+until they are cleared. A retry withdraws it while it is in flight, so a second failure announces again, and the next edit or a successful save clears it. The bar grows past 64px to fit a long message, and while it shows, the page's bottom room and scroll padding follow its measured height (`--platform-save-bar-height` on `<html>`), with the 64px dock as the scroll-padding fallback. When the
 failure leaves nothing unsaved (a plan refusal that restored every refused
 value), the message is an error toast instead, which stays until it is
 dismissed or the next save starts; the toast viewport sits above the bar's
@@ -156,25 +156,10 @@ narrow for both. What the user entered stays. Saving again withdraws it while
 the request is in flight, so a second failure announces again, and a
 successful save clears it.
 
-Voice opts into its own phone footer below `md` (`layout.hasPhoneSaveFooter`)
-in place of that bar; from `md` it docks like every other page. The footer is
-fixed to the viewport bottom, full width, flat with a top border, and stays
-mounted when clean (never for an archived tenant). It is a region named by its
-own status text — "N unsaved changes" with a dot, "All changes saved" with
-Save disabled, "N fields need attention" on a first row above "Go to the
-first one", or a failed save's message (an alert, while changes remain) — and has Save changes but no Discard and no shortcut hint. While
-saving it is `aria-busy` and Save reads "Saving…" and keeps focus; it renders
-outside Voice's `inert` content. Below `md` Voice's bottom room is the
-16px gutter plus the footer's measured height, and its `scroll-padding-bottom`
-is that height plus 16 (85px plus 16 before it is measured,
-`--spacing-platform-phone-footer-max`, the two-row error footer); an archived
-Voice page shows no footer, so it ends at the 16px gutter.
-
-A successful save pressed from Save changes — in the docked bar or Voice's
-phone footer — returns focus, without scrolling, to the control that had it
-before Save was pressed, so the bar unmounting or the footer's Save disabling
-never drops a keyboard user's place. If that control has left the page, focus
-moves to the page's `h1` instead. A save from ⌘S / Ctrl+S never moves focus,
+A successful save pressed from Save changes in the save bar returns focus,
+without scrolling, to the control that had it before Save was pressed, so the
+bar unmounting never drops a keyboard user's place. If that control has left
+the page, focus moves to the page's `h1` instead. A save from ⌘S / Ctrl+S never moves focus,
 and a failed or refused save leaves it where it is (a refused save reveals and
 focuses the first invalid field).
 
@@ -405,9 +390,7 @@ save still settles as the form's generic server error.
   focused field takes a `brand-ink` border (near-black in Light, yellow in
   Dark), kept over an invalid field's `bad-line` border, and a 3px
   `focus-ring` glow (`shadow-platform-focus-glow`).
-  The phone save footer's disabled or busy Save is the neutral
-  `pill-neutral` ground with `muted` text and a `control-line-locked`
-  border. A link
+  A link
   is `brand-ink` (or `brand-strong`) with a 2px `highlight` underline 3px
   below it. The sidebar's current row is `side-raised` with a
   `selected-line` bar and `brand-ink` text.
