@@ -105,6 +105,10 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   for an admin, `/dashboard` otherwise); `error.tsx` offers only Retry.
 
 Below `md` the sidebar is hidden and `TopbarNavMenu` carries the same sections.
+Their links prefetch only once hovered, touched or focused
+(`IntentPrefetchLink`), so a page view never renders every nav route's
+layouts in the background, and a pointed-at route still shows its skeleton at
+once.
 The content column and the notices above it start at the sidebar's right
 edge, never centred: at most 1180px wide, with 26px padding from `md` and
 16px below, and any spare width on the right. The column adds no gap of its

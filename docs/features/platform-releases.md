@@ -232,6 +232,16 @@ values are stored as plain `text`, so none of them needs a db migration:
   timeout, and a failed page fails the read with a reason code. A tag list
   still full at the page cap is reported as `tagListIncomplete`, never as a
   different latest tag.
+- GitHub reads are cached by how far their answer can move. A comparison and
+  a file's contents at a SHA are fixed by their inputs and cached with no
+  expiry (`GITHUB_PINNED_READ_REVALIDATE`); the tag list and `main`'s
+  head are cached for 60 seconds (`GITHUB_MOVING_REF_REVALIDATE_SECONDS`).
+  Workflow-run reads and every dispatch stay uncached, so the release card's
+  10-second poll sees live state. Only a 200 is cached, so a failure is
+  retried on the next read, and a response over Next's 2 MB cache limit is
+  simply re-fetched.
+- The candidate comparison is deduped per render (`React.cache`), so the
+  contrast-due banner and the releases page share one result.
 - At the 300-file limit the file list is truncated (`isFileListTruncated` on
   the candidate): it counts as touching every set, so a rendering change is
   never missed, and the migration counts are minimums.

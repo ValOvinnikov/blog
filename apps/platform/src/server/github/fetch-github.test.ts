@@ -114,6 +114,34 @@ describe(fetchGitHub, () => {
   });
 });
 
+describe(`${fetchGitHub.name} caching`, () => {
+  const github = useGitHubFetch();
+
+  beforeEach(() => {
+    github.respond(MOCK_PATH, () => mockGitHubResponse({}));
+  });
+
+  it('leaves a read uncached unless given a window', async () => {
+    await fetchGitHub(MOCK_PATH);
+
+    expect(github.fetchMock).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ next: { revalidate: 0 } }),
+    );
+  });
+
+  it('caches a read for the window it is given', async () => {
+    const revalidate = faker.number.int({ min: 1, max: 600 });
+
+    await fetchGitHub(MOCK_PATH, revalidate);
+
+    expect(github.fetchMock).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ next: { revalidate } }),
+    );
+  });
+});
+
 describe(fetchGitHubJson, () => {
   const github = useGitHubFetch();
   it('returns the parsed body', async () => {

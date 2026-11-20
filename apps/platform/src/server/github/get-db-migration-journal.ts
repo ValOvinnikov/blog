@@ -1,3 +1,4 @@
+import { GITHUB_PINNED_READ_REVALIDATE } from '@platform/constants/github';
 import { z } from 'zod';
 
 import { fetchGitHubJson, type TGitHubResult } from './fetch-github';
@@ -27,4 +28,5 @@ export const getDbMigrationJournal = (
 
       return journalSchema.parse(journal).entries;
     },
+    GITHUB_PINNED_READ_REVALIDATE,
   );

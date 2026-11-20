@@ -1,4 +1,8 @@
-import { type TGitHubFailure, GITHUB_LOG } from '@platform/constants/github';
+import {
+  GITHUB_LOG,
+  GITHUB_MOVING_REF_REVALIDATE_SECONDS,
+  type TGitHubFailure,
+} from '@platform/constants/github';
 import { RELEASE_FAILURE } from '@platform/constants/release';
 import { logger } from '@platform/utils/logger/logger';
 import type { TMaybeUndefined } from '@shinefold/config';
@@ -35,6 +39,7 @@ const listReleaseTagRefs = async (): Promise<
     const result = await fetchGitHubJson(
       `/git/matching-refs/tags/v?per_page=${TAG_PAGE_SIZE}&page=${page}`,
       (body) => tagRefsSchema.parse(body).map(({ ref }) => ref),
+      GITHUB_MOVING_REF_REVALIDATE_SECONDS,
     );
     if (!result.ok) return result;
 

@@ -1,12 +1,15 @@
 'use client';
 
+import {
+  IntentPrefetchLink,
+  type TIntentPrefetchLinkProps,
+} from '@platform/components/features/layout/intent-prefetch-link';
 import { sidebarVariants } from '@platform/components/features/layout/sidebar/sidebar-variants';
-import { Link, usePathname } from '@platform/i18n/navigation';
+import { usePathname } from '@platform/i18n/navigation';
 import { isCurrentNavHref } from '@platform/utils/nav-sections/is-current-nav-href';
-import type { ComponentProps } from 'react';
 
 export type TSidebarNavLinkProps = Omit<
-  ComponentProps<typeof Link>,
+  TIntentPrefetchLinkProps,
   'className' | 'aria-current'
 >;
 
@@ -17,7 +20,7 @@ export const SidebarNavLink = ({ href, ...props }: TSidebarNavLinkProps) => {
   const { row } = sidebarVariants();
 
   return (
-    <Link
+    <IntentPrefetchLink
       {...props}
       href={href}
       aria-current={isActive ? 'page' : undefined}

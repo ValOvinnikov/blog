@@ -1,3 +1,4 @@
+import { GITHUB_MOVING_REF_REVALIDATE_SECONDS } from '@platform/constants/github';
 import { z } from 'zod';
 
 import { fetchGitHubJson, type TGitHubResult } from './fetch-github';
@@ -10,4 +11,5 @@ export const getBranchHeadSha = (
   fetchGitHubJson(
     `/branches/${encodeURIComponent(branch)}`,
     (body) => branchSchema.parse(body).commit.sha,
+    GITHUB_MOVING_REF_REVALIDATE_SECONDS,
   );
