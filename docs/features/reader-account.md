@@ -53,7 +53,7 @@ A signed-in reader manages their own account at `/account`: edit the display nam
 - Every server write reads the session itself and never takes a user id from the client. The `db` account queries do no authorization of their own and act on whatever id they are given.
 - `unlinkProviderAction` re-validates the provider at runtime. `unlinkProvider` refuses to remove the last remaining sign-in method, counting OAuth rows plus `emailVerified`, in one locking SQL statement so two concurrent unlinks cannot both pass.
 - Email link cannot be unlinked.
-- Linking runs `signIn(provider)` while signed in, which Auth.js links to the current user, and returns to `/account`.
+- Linking runs `signIn(provider)` while signed in, which Auth.js links to the current user, and returns the reader to `/account`, still signed in, with the provider listed as linked. This holds on a site using the shared OAuth apps and on a site with its own. A link the provider refuses lands on `/` with `?error=`; returning it to `/account` with a message is #7746.
 - The display name is trimmed and an empty name is refused.
 - A reader's handle is their email's local part (`toSessionUsername`). A reader with no name — a magic-link sign-in — is shown by that handle in the account menu and the display-name field, so the handle the delete confirmation asks for is always visible.
 - The typed confirmation is a client-side guard; the server action requires only a session. Only a successful delete signs the reader out.
