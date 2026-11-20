@@ -2269,6 +2269,23 @@
       "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés et reviendront si vous repassez à une offre payante."
     }
   },
+  "ownerEntitlementEmail": {
+    "actionLabel": "Ouvrir votre tableau de bord",
+    "granted": {
+      "subject": "Accordé sur {siteName} : {item}",
+      "previewText": "Vous pouvez désormais utiliser {item} sur {siteName}. Rien n’est facturé.",
+      "granted": "Un accès a été accordé à {siteName}, en dehors de son offre : {item}.",
+      "untilRevoked": "Cet accès dure jusqu’à sa révocation.",
+      "expires": "Cet accès dure jusqu’au {date}.",
+      "free": "Rien n’est facturé."
+    },
+    "revoked": {
+      "subject": "Accès révoqué sur {siteName} : {item}",
+      "previewText": "Rien n’est supprimé.",
+      "revoked": "L’accès à {item} sur {siteName} a été révoqué.",
+      "kept": "Rien n’est supprimé. Ce que vous avez configuré avec est conservé et revient s’il est accordé à nouveau ou si votre offre l’inclut."
+    }
+  },
   "ownerReceiptEmail": {
     "subject": "Votre reçu de paiement pour {siteName}",
     "previewText": "Nous avons reçu {amount} pour {siteName}.",

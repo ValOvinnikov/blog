@@ -22,6 +22,8 @@ import { queries } from '@shinefold/db';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
+import { notifyOwnerOfEntitlementRevoke } from './notify-owner-of-entitlement-change';
+
 export type TRevokeEntitlementGrantResult = TActionResult<
   typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
   never,
@@ -71,6 +73,7 @@ export const revokeEntitlementGrantAction = async (
       targetId: tenantId,
       details: { grantId, kind, key, value, expiresAt, note },
     });
+    await notifyOwnerOfEntitlementRevoke(resolved.tenant, revoked);
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
     logger.error(ENTITLEMENT_GRANT_LOG.REVOKE_FAILED, {

@@ -50,6 +50,8 @@ export {
   type TOwnerDowngradeGraceEmailInput,
   buildOwnerPlanChangeEmail,
   type TOwnerPlanChangeEmailInput,
+  buildOwnerEntitlementEmail,
+  type TOwnerEntitlementEmailInput,
   buildOwnerReceiptEmail,
   type TOwnerReceiptEmailInput,
   buildOwnerSuspensionEmail,

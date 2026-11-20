@@ -2269,6 +2269,23 @@
       "kept": "Es wird nichts gelöscht. Deine Inhalte und Einstellungen bleiben erhalten und kommen zurück, wenn du wieder zu einem kostenpflichtigen Tarif wechselst."
     }
   },
+  "ownerEntitlementEmail": {
+    "actionLabel": "Dashboard öffnen",
+    "granted": {
+      "subject": "Freigeschaltet auf {siteName}: {item}",
+      "previewText": "Du kannst {item} jetzt auf {siteName} nutzen. Es entstehen keine Kosten.",
+      "granted": "Für {siteName} wurde außerhalb des Tarifs Folgendes freigeschaltet: {item}.",
+      "untilRevoked": "Die Freischaltung gilt, bis sie widerrufen wird.",
+      "expires": "Die Freischaltung gilt bis zum {date}.",
+      "free": "Es entstehen keine Kosten."
+    },
+    "revoked": {
+      "subject": "Freischaltung widerrufen auf {siteName}: {item}",
+      "previewText": "Es wird nichts gelöscht.",
+      "revoked": "Die Freischaltung von {item} für {siteName} wurde widerrufen.",
+      "kept": "Es wird nichts gelöscht. Was du damit eingerichtet hast, bleibt erhalten und ist wieder da, wenn es erneut freigeschaltet wird oder dein Tarif es enthält."
+    }
+  },
   "ownerReceiptEmail": {
     "subject": "Ihre Zahlungsbestätigung für {siteName}",
     "previewText": "Wir haben {amount} für {siteName} erhalten.",

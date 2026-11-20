@@ -2269,6 +2269,23 @@
       "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard en komen terug als je weer overstapt naar een betaald plan."
     }
   },
+  "ownerEntitlementEmail": {
+    "actionLabel": "Open je dashboard",
+    "granted": {
+      "subject": "Toegekend op {siteName}: {item}",
+      "previewText": "Je kunt {item} nu gebruiken op {siteName}. Er wordt niets in rekening gebracht.",
+      "granted": "Aan {siteName} is buiten het plan het volgende toegekend: {item}.",
+      "untilRevoked": "De toekenning geldt tot ze wordt ingetrokken.",
+      "expires": "De toekenning geldt tot {date}.",
+      "free": "Er wordt niets in rekening gebracht."
+    },
+    "revoked": {
+      "subject": "Toekenning ingetrokken op {siteName}: {item}",
+      "previewText": "Er wordt niets verwijderd.",
+      "revoked": "De toekenning van {item} op {siteName} is ingetrokken.",
+      "kept": "Er wordt niets verwijderd. Wat je ermee hebt ingesteld blijft bewaard en komt terug als het opnieuw wordt toegekend of je plan het bevat."
+    }
+  },
   "ownerReceiptEmail": {
     "subject": "Je betalingsbewijs voor {siteName}",
     "previewText": "We hebben {amount} ontvangen voor {siteName}.",

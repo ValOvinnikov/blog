@@ -2269,6 +2269,23 @@
       "kept": "Nothing is deleted. Your content and settings are kept, and they come back if you move to a paid plan again."
     }
   },
+  "ownerEntitlementEmail": {
+    "actionLabel": "Open your dashboard",
+    "granted": {
+      "subject": "Granted on {siteName}: {item}",
+      "previewText": "You can now use {item} on {siteName}. Nothing is charged.",
+      "granted": "{siteName} has been granted the following outside its plan: {item}.",
+      "untilRevoked": "The grant lasts until it is revoked.",
+      "expires": "The grant lasts until {date}.",
+      "free": "Nothing is charged."
+    },
+    "revoked": {
+      "subject": "Grant revoked on {siteName}: {item}",
+      "previewText": "Nothing is deleted.",
+      "revoked": "The grant of {item} on {siteName} has been revoked.",
+      "kept": "Nothing is deleted. What you set up with it is kept, and comes back if it is granted again or your plan includes it."
+    }
+  },
   "ownerReceiptEmail": {
     "subject": "Your payment receipt for {siteName}",
     "previewText": "We received {amount} for {siteName}.",
