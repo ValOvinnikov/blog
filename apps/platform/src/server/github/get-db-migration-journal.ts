@@ -16,10 +16,10 @@ export type TDbMigrationJournalEntry = z.infer<
 >['entries'][number];
 
 export const getDbMigrationJournal = (
-  ref: string,
+  sha: string,
 ): Promise<TGitHubResult<TDbMigrationJournalEntry[]>> =>
   fetchGitHubJson(
-    `/contents/${DB_MIGRATION_JOURNAL_PATH}?ref=${encodeURIComponent(ref)}`,
+    `/contents/${DB_MIGRATION_JOURNAL_PATH}?ref=${encodeURIComponent(sha)}`,
     (body) => {
       const { content } = contentSchema.parse(body);
       const journal: unknown = JSON.parse(

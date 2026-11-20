@@ -8,7 +8,7 @@ export type TIntentPrefetchLinkProps = Omit<
   'prefetch'
 >;
 
-/** Prefetches only once pointed at, touched or focused, so a nav of many links does not render every route in the background. */
+/** Keeps a nav of many links from rendering every route in the background. */
 export const IntentPrefetchLink = ({
   onMouseEnter,
   onTouchStart,

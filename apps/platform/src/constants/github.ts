@@ -20,9 +20,6 @@ export const GITHUB_RATE_LIMIT_EXHAUSTED = String(0);
 
 export const GITHUB_PINNED_READ_REVALIDATE = false;
 
-// A new tag or a merge to `main` shows within a minute; the release poll reads workflow runs, which stay live.
-export const GITHUB_MOVING_REF_REVALIDATE_SECONDS = 60;
-
 export const GITHUB_FILE_STATUS = {
   ADDED: 'added',
   MODIFIED: 'modified',

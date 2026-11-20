@@ -4,6 +4,7 @@ import {
   fireEvent,
   screen,
 } from '@platform/testing/custom-render';
+import { DATA_PREFETCH_ATTRIBUTE } from '@platform/testing/navigation';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent from '@testing-library/user-event';
 
@@ -14,7 +15,6 @@ vi.mock('@platform/i18n/navigation');
 faker.seed(6011);
 
 const MOCK_LINK_TEXT = faker.lorem.word();
-const PREFETCH_ATTRIBUTE = 'data-prefetch';
 
 const setup = customRender(IntentPrefetchLink, {
   href: adminRoutes.tenants(),
@@ -27,7 +27,7 @@ describe(`<${IntentPrefetchLink.name}/>`, () => {
   it('does not prefetch before the user shows intent', () => {
     setup();
 
-    expect(getLink()).toHaveAttribute(PREFETCH_ATTRIBUTE, String(false));
+    expect(getLink()).toHaveAttribute(DATA_PREFETCH_ATTRIBUTE, String(false));
   });
 
   it.each([
@@ -39,7 +39,7 @@ describe(`<${IntentPrefetchLink.name}/>`, () => {
 
     await showIntent();
 
-    expect(getLink()).not.toHaveAttribute(PREFETCH_ATTRIBUTE);
+    expect(getLink()).not.toHaveAttribute(DATA_PREFETCH_ATTRIBUTE);
   });
 
   it("still calls the caller's onMouseEnter", async () => {

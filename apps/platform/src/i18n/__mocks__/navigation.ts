@@ -1,3 +1,4 @@
+import { DATA_PREFETCH_ATTRIBUTE } from '@platform/testing/navigation';
 import { createRouterStub } from '@platform/testing/router-stub';
 import { type ComponentPropsWithoutRef, createElement } from 'react';
 
@@ -7,7 +8,11 @@ export const Link = ({
   prefetch,
   ...rest
 }: ComponentPropsWithoutRef<'a'> & { href: string; prefetch?: boolean }) =>
-  createElement('a', { href, 'data-prefetch': prefetch, ...rest }, children);
+  createElement(
+    'a',
+    { href, [DATA_PREFETCH_ATTRIBUTE]: prefetch, ...rest },
+    children,
+  );
 
 export const usePathname = vi.fn(() => '/');
 
