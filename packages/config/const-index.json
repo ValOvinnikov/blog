@@ -7806,6 +7806,30 @@
         "file": "apps/platform/src/constants/entitlement-grant.ts"
       }
     ],
+    "entitlement_grants.email_unconfigured": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.EMAIL_UNCONFIGURED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.email_owner_missing": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.EMAIL_OWNER_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.email_failed": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
     "WIZARD": [
       {
         "ref": "FIELD_APPEARANCE.WIZARD",

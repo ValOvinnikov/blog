@@ -2242,6 +2242,23 @@
       "kept": "No se borra nada. Tu contenido y tus ajustes se conservan y vuelven si cambias de nuevo a un plan de pago."
     }
   },
+  "ownerEntitlementEmail": {
+    "actionLabel": "Abrir tu panel",
+    "granted": {
+      "subject": "Concedido en {siteName}: {item}",
+      "previewText": "Ya puedes usar {item} en {siteName}. No se cobra nada.",
+      "granted": "Se ha concedido a {siteName}, fuera de su plan: {item}.",
+      "untilRevoked": "La concesión dura hasta que se revoque.",
+      "expires": "La concesión dura hasta el {date}.",
+      "free": "No se cobra nada."
+    },
+    "revoked": {
+      "subject": "Concesión revocada en {siteName}: {item}",
+      "previewText": "No se borra nada.",
+      "revoked": "Se ha revocado la concesión de {item} en {siteName}.",
+      "kept": "No se borra nada. Lo que configuraste con ello se conserva y vuelve si se concede de nuevo o si tu plan lo incluye."
+    }
+  },
   "ownerReceiptEmail": {
     "subject": "Tu recibo de pago de {siteName}",
     "previewText": "Hemos recibido {amount} por {siteName}.",

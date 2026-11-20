@@ -32,6 +32,7 @@ import {
   entitlementGrantInputSchema,
   type TEntitlementGrantInput,
 } from './entitlement-grant-input-schema';
+import { notifyOwnerOfEntitlementGrant } from './notify-owner-of-entitlement-change';
 
 export type TGrantEntitlementResult = TActionResult<
   typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
@@ -75,7 +76,8 @@ export const grantEntitlementAction = async (
   const resolved = await resolveLiveTenant(tenantId);
   if (!isOutcomeSuccess(resolved)) return resolved;
 
-  if (isCoveredByPlan(resolved.tenant.plan, toStoredEntitlementItem(item))) {
+  const { tenant } = resolved;
+  if (isCoveredByPlan(tenant.plan, toStoredEntitlementItem(item))) {
     return {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: ENTITLEMENT_GRANT_REFUSAL.INCLUDED_IN_PLAN,
@@ -117,6 +119,7 @@ export const grantEntitlementAction = async (
       targetId: tenantId,
       details: { grantId: id, kind, key, value, expiresAt, note },
     });
+    await notifyOwnerOfEntitlementGrant(tenant, grant);
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
     logger.error(ENTITLEMENT_GRANT_LOG.GRANT_FAILED, {

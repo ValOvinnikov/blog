@@ -1,6 +1,7 @@
 import { ENTITLEMENT_GRANT_REFUSAL } from '@platform/constants/entitlement-grant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { notifyOwnerOfEntitlementRevoke } from '@platform/server/entitlement-grants/notify-owner-of-entitlement-change';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
@@ -26,6 +27,13 @@ import { revokeEntitlementGrantAction } from './revoke-entitlement-grant-action'
 
 vi.mock('@platform/server/auth/require-super-admin');
 vi.mock('@platform/server/audit/record-audit-event');
+vi.mock(
+  '@platform/server/entitlement-grants/notify-owner-of-entitlement-change',
+  () => ({
+    notifyOwnerOfEntitlementGrant: vi.fn(),
+    notifyOwnerOfEntitlementRevoke: vi.fn(),
+  }),
+);
 vi.mock('@platform/server/site-config/revalidate-site-config');
 vi.mock('@platform/server/tenants/resolve-live-tenant');
 
@@ -85,6 +93,15 @@ describe(revokeEntitlementGrantAction, () => {
     });
   });
 
+  it('hands the revoked grant to the owner email once', async () => {
+    await revoke();
+
+    expect(notifyOwnerOfEntitlementRevoke).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ id: MOCK_TENANT_ID }),
+      mockEntitlementGrantRow(),
+    );
+  });
+
   it.each([
     {
       grantCase: 'no open grant',
@@ -107,6 +124,7 @@ describe(revokeEntitlementGrantAction, () => {
     });
     expect(recordAuditEvent).not.toHaveBeenCalled();
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
+    expect(notifyOwnerOfEntitlementRevoke).not.toHaveBeenCalled();
   });
 
   it('reports a failed write as a server error and audits nothing', async () => {

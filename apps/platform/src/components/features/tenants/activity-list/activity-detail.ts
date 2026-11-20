@@ -1,6 +1,6 @@
 import type { ACTIVITY_DETAIL } from '@platform/constants/activity';
 import type { TTenantDetailsField } from '@platform/constants/tenant';
-import type { TGrantItem } from '@platform/utils/use-grant-item-label/use-grant-item-label';
+import type { TGrantItem } from '@platform/utils/grant-item-label/grant-item-label';
 import type { TLocaleIsoCode } from '@shinefold/config';
 import type { TOAuthProvider, TTenantPlan } from '@shinefold/config/constants';
 import type { TSuspensionCategory } from '@shinefold/db/constants';

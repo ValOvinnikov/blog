@@ -605,7 +605,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **ENTITLEMENT_GRANT_EXPIRY**: `NEVER`, `DAYS_30`, `DAYS_90`, `YEAR_1`
 - **ENTITLEMENT_GRANT_REFUSAL**: `COMING_SOON`, `ALREADY_GRANTED`, `EXPIRY_SHORTENED`, `INCLUDED_IN_PLAN`, `GRANT_NOT_OPEN`
 - **GRANT_STATUS**: `ACTIVE`, `EXPIRED`, `INCLUDED`
-- **ENTITLEMENT_GRANT_LOG**: `GRANT_FAILED`=`"entitlement_grants.grant_failed"`, `GRANT_AUDIT_FAILED`=`"entitlement_grants.grant_audit_failed"`, `REVOKE_FAILED`=`"entitlement_grants.revoke_failed"`, `REVOKE_AUDIT_FAILED`=`"entitlement_grants.revoke_audit_failed"`
+- **ENTITLEMENT_GRANT_LOG**: `GRANT_FAILED`=`"entitlement_grants.grant_failed"`, `GRANT_AUDIT_FAILED`=`"entitlement_grants.grant_audit_failed"`, `REVOKE_FAILED`=`"entitlement_grants.revoke_failed"`, `REVOKE_AUDIT_FAILED`=`"entitlement_grants.revoke_audit_failed"`, `EMAIL_UNCONFIGURED`=`"entitlement_grants.email_unconfigured"`, `EMAIL_OWNER_MISSING`=`"entitlement_grants.email_owner_missing"`, `EMAIL_FAILED`=`"entitlement_grants.email_failed"`
 
 ### `@platform/constants/field-appearance` — `apps/platform/src/constants/field-appearance.ts`
 
