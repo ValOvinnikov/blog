@@ -10,11 +10,6 @@ import type {
   Template_topicIndex,
 } from '@shinefold/config/sanity/generated/types';
 
-/**
- * The `_type` a reference union member points at, read off typegen's
- * `internalGroqTypeReferenceTo` marker — distributes over a union so each
- * member resolves to its own referenced type.
- */
 type TReferencedType<TReference> = TReference extends {
   [internalGroqTypeReferenceTo]?: infer TName;
 }
@@ -25,7 +20,7 @@ type THeroKind<TPage extends { hero?: unknown }> = TReferencedType<
   NonNullable<TPage['hero']>
 >;
 
-type TModuleKind<TPage extends { modules?: readonly unknown[] }> =
+export type TModuleKind<TPage extends { modules?: readonly unknown[] }> =
   TReferencedType<NonNullable<TPage['modules']>[number]>;
 
 export type TPageHomeType =
@@ -37,7 +32,6 @@ export type TPageLandingType =
 export type TPagePostIndexType =
   THeroKind<Template_postIndex> | TModuleKind<Template_postIndex>;
 
-/** `page_post` has no `hero` field, so its union comes from `modules[]` alone. */
 export type TPagePostType = TModuleKind<Page_post>;
 
 export type TPageTagType = THeroKind<Template_tag> | TModuleKind<Template_tag>;

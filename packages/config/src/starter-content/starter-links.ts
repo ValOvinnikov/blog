@@ -7,7 +7,7 @@ import {
 } from '@shinefold/config/constants';
 import type { Link } from '@shinefold/config/sanity/generated/types';
 
-import type { TStarterDocument } from './starter-document';
+import type { TStarterDocument } from './starter-document-shape';
 import { localizedString, reference } from './starter-fields';
 
 export function navigationLink(linkId: string) {
