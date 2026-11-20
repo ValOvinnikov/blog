@@ -7,7 +7,10 @@ import {
   FOLLOW_ACCENT_HUE,
 } from '@platform/testing/look/look-form-fixtures';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
-import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import {
+  setupLookForm,
+  withLookFeatures,
+} from '@platform/testing/look/look-form-setup';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -114,7 +117,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   describe('the cookie settings choice', () => {
     const cookieChoice = async (hasCookieBanner: boolean) => {
-      setupLookForm({ hasCookieBanner });
+      setupLookForm(withLookFeatures({ hasCookieBanner }));
       await openLookRow(user, LOOK_ROW.FOOTER);
       const cookieButtonGroup = screen.getByRole('group', {
         name: LOOK_FORM.cookieSettingsButtonLabel,

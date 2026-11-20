@@ -53,7 +53,8 @@ export const OnboardingForm = ({
     goBack,
     handleSubmit,
   } = useOnboardingWizard(initialLocale, rootDomain);
-  const { isPhone, isRail, isFull } = useOnboardingTier();
+  const tier = useOnboardingTier();
+  const { isPhone, isRail, isFull } = tier;
   const previewOptions = useOnboardingPreviewOptions(isPhone);
   const {
     root,
@@ -75,8 +76,7 @@ export const OnboardingForm = ({
       locale={values.locale}
       preset={values.preset}
       accentHue={values.accentHue}
-      isPhone={isPhone}
-      isFull={isFull}
+      tier={tier}
       options={previewOptions}
     />
   );

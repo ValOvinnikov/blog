@@ -1,5 +1,6 @@
 import { SampleHeaderBrand } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-brand/sample-header-brand';
 import { SampleAccountControl } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-account-control/sample-account-control';
+import type { TSampleReader } from '@platform/components/features/site-preview/sample-site-header/sample-reader';
 import { SAMPLE_HEADER_BAR_TEST_ID } from '@platform/constants/sample-header';
 import {
   ACCOUNT_BUTTON_STYLE,
@@ -19,24 +20,20 @@ import { sampleHeaderBarVariants } from './sample-header-bar-variants';
 export type TSampleHeaderBarProps = IWithClassName & {
   brand: { name: string; logoSrc: TMaybeUndefined<string> };
   account: IAccountControl;
-  hasReaderAccounts: boolean;
-  isSignedIn: boolean;
-  isBrandLarge: boolean;
+  reader: TSampleReader;
 };
 
 export const SampleHeaderBar = ({
   brand: { name, logoSrc },
   account,
-  hasReaderAccounts,
-  isSignedIn,
-  isBrandLarge,
+  reader,
   className,
 }: TSampleHeaderBarProps) => {
   const t = useTranslations('lookPreview');
   const { root, controls, menuButton } = sampleHeaderBarVariants();
   const menuLabel = t('menuButton');
   const hasAccount =
-    hasReaderAccounts &&
+    reader.hasAccounts &&
     account.phonePlacement !== ACCOUNT_PHONE_PLACEMENT.MENU;
 
   return (
@@ -44,18 +41,13 @@ export const SampleHeaderBar = ({
       className={root({ class: className })}
       data-testid={SAMPLE_HEADER_BAR_TEST_ID}
     >
-      <SampleHeaderBrand
-        name={name}
-        logoSrc={logoSrc}
-        isCompact={true}
-        isLarge={isBrandLarge}
-      />
+      <SampleHeaderBrand name={name} logoSrc={logoSrc} isCompact={true} />
       <div className={controls()}>
         {hasAccount && (
           <SampleAccountControl
             account={account}
             appearance={ACCOUNT_BUTTON_STYLE.CIRCLE}
-            isSignedIn={isSignedIn}
+            reader={reader}
           />
         )}
         <IconButton
