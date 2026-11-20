@@ -39,6 +39,8 @@ import { notFound } from 'next/navigation';
 
 import { grantEntitlementAction } from './grant-entitlement-action';
 
+faker.seed(7717);
+
 vi.mock('@platform/server/auth/require-super-admin');
 vi.mock('@platform/server/audit/record-audit-event');
 vi.mock(
@@ -119,7 +121,7 @@ describe(grantEntitlementAction, () => {
     expect(recordAuditEvent).not.toHaveBeenCalled();
   });
 
-  it('writes the grant as the super admin, revalidates the site and audits it', async () => {
+  it('writes the grant as the super admin, revalidates the site, audits it and emails the owner once', async () => {
     const result = await grant();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -138,11 +140,6 @@ describe(grantEntitlementAction, () => {
         note: MOCK_NOTE,
       },
     });
-  });
-
-  it('emails the owner once about the new grant', async () => {
-    await grant();
-
     expect(notifyOwnerOfEntitlementGrant).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({ id: MOCK_TENANT_ID }),
       mockEntitlementGrantRow({ expiresAt: MOCK_IN_30_DAYS, note: MOCK_NOTE }),
@@ -281,18 +278,16 @@ describe(grantEntitlementAction, () => {
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
   });
 
-  it('audits the language grant a raise closed as revoked, then the new grant', async () => {
+  it('audits the language grant a raise closed as revoked, then the new grant, and emails the owner only about the new grant', async () => {
+    const raised = mockEntitlementGrantRow({
+      kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+      key: ENTITLEMENT_KIND.LOCALE_LIMIT,
+      value: MOCK_LOCALE_LIMIT_ITEM.value,
+      expiresAt: MOCK_IN_30_DAYS,
+      note: MOCK_NOTE,
+    });
     grantEntitlement.mockResolvedValueOnce(
-      okResult({
-        grant: mockEntitlementGrantRow({
-          kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
-          key: ENTITLEMENT_KIND.LOCALE_LIMIT,
-          value: MOCK_LOCALE_LIMIT_ITEM.value,
-          expiresAt: MOCK_IN_30_DAYS,
-          note: MOCK_NOTE,
-        }),
-        closedGrantId: MOCK_CLOSED_GRANT_ID,
-      }),
+      okResult({ grant: raised, closedGrantId: MOCK_CLOSED_GRANT_ID }),
     );
 
     await grant({ item: MOCK_LOCALE_LIMIT_ITEM });
@@ -316,20 +311,6 @@ describe(grantEntitlementAction, () => {
         replacedBy: MOCK_GRANT_ID,
       },
     });
-  });
-
-  it('emails the owner once about a raise, never about the grant it replaced', async () => {
-    const raised = mockEntitlementGrantRow({
-      kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
-      key: ENTITLEMENT_KIND.LOCALE_LIMIT,
-      value: MOCK_LOCALE_LIMIT_ITEM.value,
-    });
-    grantEntitlement.mockResolvedValueOnce(
-      okResult({ grant: raised, closedGrantId: MOCK_CLOSED_GRANT_ID }),
-    );
-
-    await grant({ item: MOCK_LOCALE_LIMIT_ITEM });
-
     expect(notifyOwnerOfEntitlementGrant).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({ id: MOCK_TENANT_ID }),
       raised,

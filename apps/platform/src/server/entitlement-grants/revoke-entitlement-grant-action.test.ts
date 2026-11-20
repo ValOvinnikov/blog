@@ -64,7 +64,7 @@ describe(revokeEntitlementGrantAction, () => {
     expect(revokeEntitlementGrant).not.toHaveBeenCalled();
   });
 
-  it('closes the grant as the super admin, revalidates the site and audits it', async () => {
+  it('closes the grant as the super admin, revalidates the site, audits it and hands it to the owner email once', async () => {
     const result = await revoke();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -87,11 +87,6 @@ describe(revokeEntitlementGrantAction, () => {
         note: null,
       },
     });
-  });
-
-  it('hands the revoked grant to the owner email once', async () => {
-    await revoke();
-
     expect(notifyOwnerOfEntitlementRevoke).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({ id: MOCK_TENANT_ID }),
       mockEntitlementGrantRow(),

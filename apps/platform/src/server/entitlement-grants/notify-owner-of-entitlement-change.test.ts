@@ -32,6 +32,8 @@ import {
   notifyOwnerOfEntitlementRevoke,
 } from './notify-owner-of-entitlement-change';
 
+faker.seed(7717);
+
 vi.mock('@platform/utils/env/env');
 
 vi.mock('@shinefold/db', () => mockOwnerEmailDb());

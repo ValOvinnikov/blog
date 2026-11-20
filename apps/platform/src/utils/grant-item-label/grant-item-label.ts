@@ -14,7 +14,7 @@ export type TGrantItem = {
   value: TMaybeNull<number>;
 };
 
-export type TGrantItemTranslators = {
+type TGrantItemTranslators = {
   tFeature: TLooseTranslator;
   tNames: TLooseTranslator;
 };

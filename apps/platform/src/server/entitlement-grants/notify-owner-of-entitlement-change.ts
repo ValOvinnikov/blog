@@ -1,13 +1,13 @@
 import 'server-only';
 
 import { ENTITLEMENT_GRANT_LOG } from '@platform/constants/entitlement-grant';
+import { dashboardUrl } from '@platform/utils/dashboard-url/dashboard-url';
 import { env } from '@platform/utils/env/env';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { toGrantItemLabel } from '@platform/utils/grant-item-label/grant-item-label';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import type { TTenantEntitlementGrant } from '@shinefold/db/schema/tenant-entitlement-grants';
@@ -66,10 +66,7 @@ const sendEntitlementEmail = async (
       ...compose(t, { siteName, item }),
       action: {
         label: t('actionLabel'),
-        url: new URL(
-          adminRoutes.dashboardSelectTenantHref(tenantId),
-          baseUrl,
-        ).toString(),
+        url: dashboardUrl(tenantId, baseUrl),
       },
     }),
   });
@@ -110,14 +107,15 @@ export const notifyOwnerOfEntitlementGrant = (
   }));
 };
 
-/** Sends nothing for a grant that had already ended by its date, since revoking it takes nothing away. */
 export const notifyOwnerOfEntitlementRevoke = async (
   tenant: TTenant,
   grant: TTenantEntitlementGrant,
 ): Promise<void> => {
-  if (!isEntitlementGrantActive({ ...grant, revokedAt: null }, new Date())) {
-    return;
-  }
+  const wasStillRunning = isEntitlementGrantActive(
+    { ...grant, revokedAt: null },
+    new Date(),
+  );
+  if (!wasStillRunning) return;
 
   await notifyOwner(tenant, grant, (t, values) => ({
     subject: t('revoked.subject', values),
