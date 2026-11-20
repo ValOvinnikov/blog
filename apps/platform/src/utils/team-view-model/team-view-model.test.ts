@@ -1,7 +1,6 @@
 import { TEAM_ROW_ACCESS } from '@platform/constants/team-access';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
-  mockMembership,
   mockOperatorViewer,
   mockViewer,
 } from '@platform/testing/memberships/fixtures';
@@ -10,37 +9,31 @@ import {
   mockPendingInvite,
   mockTenantMember,
 } from '@platform/testing/team/fixtures';
+import {
+  mockTeamOwner,
+  mockTeamOwnerViewer,
+  mockTeamViewModelInput,
+} from '@platform/testing/team/team-view';
 import { mockTenant } from '@platform/testing/tenants/mock-tenant';
+import {
+  DAY_MS,
+  HOUR_MS,
+} from '@platform/utils/format-relative-time/format-relative-time';
 import { STUDIO_ACCESS, TENANT_PLAN } from '@shinefold/config/constants';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 
 import { teamViewModel } from './team-view-model';
 
-const MOCK_NOW = new Date(MOCK_JOINED_AT.getTime() + 60 * 60 * 1000);
-const MOCK_YESTERDAY = new Date(MOCK_NOW.getTime() - 24 * 60 * 60 * 1000);
-const MOCK_OWNER_USER_ID = 'owner-user';
-const MOCK_OWNER = mockTenantMember({
-  membershipId: 'owner-membership',
-  userId: MOCK_OWNER_USER_ID,
-  role: MEMBERSHIP_ROLE.OWNER,
-});
-const MOCK_GROWTH_TENANT = mockTenant({ plan: TENANT_PLAN.GROWTH });
-const OWNER_VIEWER = mockViewer({
-  membership: mockMembership({ userId: MOCK_OWNER_USER_ID }),
-});
+const MOCK_NOW = new Date(2026, 9, 2, 12, 0);
+const MOCK_HOUR_AGO = new Date(MOCK_NOW.getTime() - HOUR_MS);
+const MOCK_YESTERDAY = new Date(MOCK_NOW.getTime() - DAY_MS);
+const MOCK_OWNER = mockTeamOwner();
 
 const modelFor = (
   overrides: Partial<Parameters<typeof teamViewModel>[0]> = {},
 ) =>
   teamViewModel(
-    {
-      tenant: MOCK_GROWTH_TENANT,
-      viewer: OWNER_VIEWER,
-      currentUserId: MOCK_OWNER_USER_ID,
-      members: [MOCK_OWNER],
-      invites: [],
-      ...overrides,
-    },
+    mockTeamViewModelInput({ members: [MOCK_OWNER], ...overrides }),
     MOCK_NOW,
   );
 
@@ -103,7 +96,7 @@ describe(teamViewModel, () => {
     const { members } = modelFor({
       tenant: mockTenant({
         plan: TENANT_PLAN.GROWTH,
-        ownerInviteSentAt: MOCK_JOINED_AT,
+        ownerInviteSentAt: MOCK_HOUR_AGO,
       }),
     });
 
@@ -114,11 +107,11 @@ describe(teamViewModel, () => {
     const editor = mockTenantMember({
       studioAccess: STUDIO_ACCESS.INVITE_SENT,
     });
-    const canRequestFor = (viewer: typeof OWNER_VIEWER) =>
+    const canRequestFor = (viewer: ReturnType<typeof mockTeamOwnerViewer>) =>
       modelFor({ viewer, members: [MOCK_OWNER, editor] }).members[1]
         ?.canRequestAccess;
 
-    expect(canRequestFor(OWNER_VIEWER)).toBe(true);
+    expect(canRequestFor(mockTeamOwnerViewer())).toBe(true);
     expect(canRequestFor(mockOperatorViewer(ADMIN_ROLE.SUPERADMIN))).toBe(true);
     expect(canRequestFor(mockOperatorViewer(ADMIN_ROLE.MODERATOR))).toBe(false);
   });
@@ -154,7 +147,10 @@ describe(teamViewModel, () => {
 
   it('tells a join today from an earlier one by the calendar day', () => {
     const { members } = modelFor({
-      members: [MOCK_OWNER, mockTenantMember({ joinedAt: MOCK_YESTERDAY })],
+      members: [
+        mockTenantMember({ membershipId: 'today', joinedAt: MOCK_HOUR_AGO }),
+        mockTenantMember({ membershipId: 'earlier', joinedAt: MOCK_YESTERDAY }),
+      ],
     });
 
     expect(members.map(({ isJoinedToday }) => isJoinedToday)).toEqual([

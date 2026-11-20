@@ -1,9 +1,14 @@
 import { TEAM_COLUMN } from '@platform/constants/team-access';
 import { useTranslations } from 'next-intl';
 
-import { teamTableColumnsVariants } from './team-table-columns-variants';
+import { useTeamTableColumnsVariants } from './use-team-table-columns-variants';
 
-// Person and Studio access split what Role and actions leave 1.5 : 1.7, since a `<col>` takes no `fr`.
+const PERSON_SHARE = 1.5;
+const ACCESS_SHARE = 1.7;
+
+const shareOfRest = (share: number) =>
+  `${(share / (PERSON_SHARE + ACCESS_SHARE)) * 100}%` as const;
+
 export const useTeamTableColumns = () => {
   const t = useTranslations('teamPage');
 
@@ -11,18 +16,20 @@ export const useTeamTableColumns = () => {
     {
       key: TEAM_COLUMN.PERSON,
       label: t('columnPerson'),
-      width: '46.875%' as const,
+      width: shareOfRest(PERSON_SHARE),
     },
     { key: TEAM_COLUMN.ROLE, label: t('columnRole'), width: '96px' as const },
     {
       key: TEAM_COLUMN.ACCESS,
       label: t('columnStudioAccess'),
-      width: '53.125%' as const,
+      width: shareOfRest(ACCESS_SHARE),
     },
     {
       key: TEAM_COLUMN.ACTIONS,
       label: (
-        <span className={teamTableColumnsVariants()}>{t('columnActions')}</span>
+        <span className={useTeamTableColumnsVariants()}>
+          {t('columnActions')}
+        </span>
       ),
       width: '128px' as const,
     },

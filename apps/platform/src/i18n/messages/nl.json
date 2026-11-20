@@ -1571,8 +1571,8 @@
     "requestFailed": "De inrichtingsservice was niet bereikbaar. Probeer het opnieuw.",
     "checkStartedFor": "De Studio-toegang van {email} wordt nu gecontroleerd. Vernieuw over een minuut om het resultaat te zien.",
     "inviteResentTo": "Er is een nieuwe Studio-uitnodiging onderweg naar {email}.",
-    "checkNowAriaLabel": "Studio-toegang van {email} nu controleren",
-    "resendInviteAriaLabel": "Studio-uitnodiging opnieuw naar {email} sturen"
+    "checkNowAriaLabel": "Nu controleren voor {email}",
+    "resendInviteAriaLabel": "Uitnodiging opnieuw versturen naar {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Tenantgegevens",
@@ -2614,7 +2614,7 @@
     },
     "remove": {
       "trigger": "Verwijderen",
-      "triggerAriaLabel": "{email} verwijderen",
+      "triggerAriaLabel": "Verwijderen: {email}",
       "title": "{email} verwijderen?",
       "description": "De toegang tot het beheer van deze site en tot Studio vervalt meteen, en de plek komt vrij. De geschreven content blijft op de site staan.",
       "keep": "Lid behouden",
@@ -2628,7 +2628,7 @@
     },
     "cancelInvite": {
       "trigger": "Uitnodiging intrekken",
-      "triggerAriaLabel": "Uitnodiging aan {email} intrekken",
+      "triggerAriaLabel": "Uitnodiging intrekken voor {email}",
       "title": "Uitnodiging aan {email} intrekken?",
       "description": "De link in de e-mail werkt dan niet meer en de plek komt vrij. Je kunt de persoon later opnieuw uitnodigen.",
       "keep": "Uitnodiging behouden",

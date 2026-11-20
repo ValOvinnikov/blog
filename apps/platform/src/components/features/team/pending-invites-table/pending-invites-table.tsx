@@ -1,18 +1,17 @@
 import { CancelInviteControl } from '@platform/components/features/team/cancel-invite-control';
-import { TeamDate } from '@platform/components/features/team/team-date';
 import { TeamPerson } from '@platform/components/features/team/team-person';
-import { useTeamTableColumns } from '@platform/components/features/team/team-table-columns';
 import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import { AVATAR_VARIANT } from '@platform/constants/avatar';
 import {
   TEAM_COLUMN,
   TEAM_INVITES_HEADING_ID,
+  TEAM_MEMBERS_HEADING_ID,
 } from '@platform/constants/team-access';
-import { formatDate } from '@platform/utils/format-date/format-date';
+import { richDate } from '@platform/utils/rich-date/rich-date';
 import type { TTeamInviteRow } from '@platform/utils/team-view-model/team-view-model';
-import type { TLocaleIsoCode } from '@shinefold/config';
+import { useTeamTableColumns } from '@platform/utils/use-team-table-columns/use-team-table-columns';
+import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { useLocale, useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
 
 import { pendingInvitesTableVariants } from './pending-invites-table-variants';
 
@@ -27,7 +26,7 @@ export const PendingInvitesTable = ({
 }: TPendingInvitesTableProps) => {
   const t = useTranslations('teamPage.invites');
   const tRole = useTranslations('roleLabel');
-  const locale = useLocale() as TLocaleIsoCode;
+  const locale = useLocale();
   const columns = useTeamTableColumns();
   const { accessNote } = pendingInvitesTableVariants();
 
@@ -40,11 +39,8 @@ export const PendingInvitesTable = ({
       isStacked={true}
       renderRow={({ inviteId, email, role, invitedAt, isInvitedToday }) => {
         const values = {
-          date: formatDate(invitedAt, locale),
+          ...richDate(invitedAt, locale),
           role: tRole(role),
-          time: (chunks: ReactNode) => (
-            <TeamDate date={invitedAt}>{chunks}</TeamDate>
-          ),
         };
 
         return (
@@ -77,6 +73,11 @@ export const PendingInvitesTable = ({
                 tenantId={tenantId}
                 inviteId={inviteId}
                 email={email}
+                returnFocusId={
+                  hasArrayGotMultipleItems(invites)
+                    ? TEAM_INVITES_HEADING_ID
+                    : TEAM_MEMBERS_HEADING_ID
+                }
               />
             </DataTableShell.Cell>
           </DataTableShell.Row>

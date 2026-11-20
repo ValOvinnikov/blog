@@ -1,20 +1,17 @@
 import { MemberStudioAccess } from '@platform/components/features/team/member-studio-access';
 import { RemoveMemberControl } from '@platform/components/features/team/remove-member-control';
-import { TeamDate } from '@platform/components/features/team/team-date';
 import { TeamPerson } from '@platform/components/features/team/team-person';
-import { useTeamTableColumns } from '@platform/components/features/team/team-table-columns';
 import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import { AVATAR_VARIANT } from '@platform/constants/avatar';
 import {
   TEAM_COLUMN,
   TEAM_MEMBERS_HEADING_ID,
 } from '@platform/constants/team-access';
-import { formatDate } from '@platform/utils/format-date/format-date';
+import { richDate } from '@platform/utils/rich-date/rich-date';
 import type { TTeamViewModel } from '@platform/utils/team-view-model/team-view-model';
-import type { TLocaleIsoCode } from '@shinefold/config';
+import { useTeamTableColumns } from '@platform/utils/use-team-table-columns/use-team-table-columns';
 import { hasLength } from '@shinefold/utils/primitives';
 import { useLocale, useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
 
 export type TMembersTableProps = {
   tenantId: string;
@@ -24,7 +21,7 @@ export type TMembersTableProps = {
 export const MembersTable = ({ tenantId, team }: TMembersTableProps) => {
   const t = useTranslations('teamPage.members');
   const tRole = useTranslations('roleLabel');
-  const locale = useLocale() as TLocaleIsoCode;
+  const locale = useLocale();
   const columns = useTeamTableColumns();
   const { members, hasEditor, freeSeats } = team;
 
@@ -38,11 +35,8 @@ export const MembersTable = ({ tenantId, team }: TMembersTableProps) => {
       renderRow={(member) => {
         const { membershipId, email, role, joinedAt, isJoinedToday } = member;
         const values = {
-          date: formatDate(joinedAt, locale),
+          ...richDate(joinedAt, locale),
           role: tRole(role),
-          time: (chunks: ReactNode) => (
-            <TeamDate date={joinedAt}>{chunks}</TeamDate>
-          ),
         };
 
         return (

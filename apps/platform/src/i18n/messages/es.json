@@ -1571,8 +1571,8 @@
     "requestFailed": "No se pudo contactar con el servicio de configuración. Inténtalo de nuevo.",
     "checkStartedFor": "Comprobando ahora el acceso a Studio de {email}. Actualiza en un minuto para ver el resultado.",
     "inviteResentTo": "Una nueva invitación a Studio va de camino a {email}.",
-    "checkNowAriaLabel": "Comprobar ahora el acceso a Studio de {email}",
-    "resendInviteAriaLabel": "Reenviar la invitación a Studio a {email}"
+    "checkNowAriaLabel": "Comprobar ahora para {email}",
+    "resendInviteAriaLabel": "Reenviar invitación a {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Detalles del cliente",
@@ -2628,7 +2628,7 @@
     },
     "cancelInvite": {
       "trigger": "Cancelar invitación",
-      "triggerAriaLabel": "Cancelar la invitación a {email}",
+      "triggerAriaLabel": "Cancelar invitación a {email}",
       "title": "¿Cancelar la invitación a {email}?",
       "description": "El enlace de su correo deja de funcionar y la plaza queda libre. Puedes volver a invitarle más adelante.",
       "keep": "Mantener invitación",

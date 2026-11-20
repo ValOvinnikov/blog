@@ -34,6 +34,7 @@ export const InviteEditorControl = ({
     isOpen,
     changeOpen,
     email,
+    emailRef,
     changeEmail,
     fieldError,
     hasFailed,
@@ -91,6 +92,7 @@ export const InviteEditorControl = ({
           }
         >
           <TextInput
+            ref={emailRef}
             type="email"
             value={email}
             onChange={changeEmail}

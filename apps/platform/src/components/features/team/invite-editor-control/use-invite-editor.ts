@@ -13,7 +13,7 @@ import {
 import type { TReasonedFailure } from '@shinefold/config/types';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 
 export const useInviteEditor = (tenantId: string) => {
   const t = useTranslations('teamPage.inviteDialog');
@@ -25,6 +25,7 @@ export const useInviteEditor = (tenantId: string) => {
     useState<TMaybeUndefined<TReasonedFailure<TTeamInviteFieldError>>>();
   const [hasFailed, setHasFailed] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const emailRef = useRef<HTMLInputElement>(null);
 
   const changeOpen = (nextIsOpen: boolean) => {
     setIsOpen(nextIsOpen);
@@ -53,6 +54,7 @@ export const useInviteEditor = (tenantId: string) => {
       }
       if (isOutcomeInvalid(result)) {
         setFieldError(result.fieldErrors.email);
+        emailRef.current?.focus();
         return;
       }
       setHasFailed(true);
@@ -63,6 +65,7 @@ export const useInviteEditor = (tenantId: string) => {
     isOpen,
     changeOpen,
     email,
+    emailRef,
     changeEmail,
     fieldError,
     hasFailed,

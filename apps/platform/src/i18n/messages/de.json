@@ -1571,8 +1571,8 @@
     "requestFailed": "Der Einrichtungsdienst war nicht erreichbar – versuchen Sie es erneut.",
     "checkStartedFor": "Der Studio-Zugang von {email} wird jetzt geprüft. Aktualisieren Sie in einer Minute, um das Ergebnis zu sehen.",
     "inviteResentTo": "Eine neue Studio-Einladung ist an {email} unterwegs.",
-    "checkNowAriaLabel": "Studio-Zugang von {email} jetzt prüfen",
-    "resendInviteAriaLabel": "Studio-Einladung erneut an {email} senden"
+    "checkNowAriaLabel": "Jetzt prüfen für {email}",
+    "resendInviteAriaLabel": "Einladung erneut senden an {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Mandantendetails",
@@ -2614,7 +2614,7 @@
     },
     "remove": {
       "trigger": "Entfernen",
-      "triggerAriaLabel": "{email} entfernen",
+      "triggerAriaLabel": "Entfernen: {email}",
       "title": "{email} entfernen?",
       "description": "Der Zugang zur Verwaltung dieser Website und zu Studio endet sofort, und der Platz wird frei. Die geschriebenen Inhalte bleiben auf der Website.",
       "keep": "Mitglied behalten",
@@ -2628,7 +2628,7 @@
     },
     "cancelInvite": {
       "trigger": "Einladung zurückziehen",
-      "triggerAriaLabel": "Einladung an {email} zurückziehen",
+      "triggerAriaLabel": "Einladung zurückziehen für {email}",
       "title": "Einladung an {email} zurückziehen?",
       "description": "Der Link in der E-Mail funktioniert dann nicht mehr, und der Platz wird frei. Sie können die Person später erneut einladen.",
       "keep": "Einladung behalten",

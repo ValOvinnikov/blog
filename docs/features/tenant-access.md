@@ -36,6 +36,7 @@ code:
   - apps/platform/src/components/features/team/**
   - apps/platform/src/utils/team-view-model/**
   - apps/platform/src/utils/use-team-row-action/**
+  - apps/platform/src/utils/use-team-table-columns/**
   - apps/platform/src/constants/team-access.ts
 epics: [4840, 4979, 5649]
 ---

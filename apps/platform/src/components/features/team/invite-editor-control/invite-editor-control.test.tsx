@@ -138,7 +138,7 @@ describe(`<${InviteEditorControl.name}/>`, () => {
           'Every seat on Growth is in use.',
         ],
       ])(
-        'shows the %s field error until the address changes',
+        'shows the %s field error on the focused field until it changes',
         async (reason, email, message) => {
           inviteTeamMemberActionMock.mockResolvedValue(
             invalidEmail(reason, email),
@@ -146,10 +146,11 @@ describe(`<${InviteEditorControl.name}/>`, () => {
 
           await user.click(send);
           const error = await screen.findByText(message);
+          const field = screen.getByLabelText(EMAIL_ADDRESS);
 
           expect(error).toBeVisible();
+          expect(field).toHaveFocus();
 
-          const field = screen.getByLabelText(EMAIL_ADDRESS);
           await user.type(field, 'x');
           const clearedError = screen.queryByText(message);
 

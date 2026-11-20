@@ -1571,8 +1571,8 @@
     "requestFailed": "Le service de configuration est injoignable. Réessayez.",
     "checkStartedFor": "Vérification de l'accès à Studio de {email} en cours. Actualisez dans une minute pour voir le résultat.",
     "inviteResentTo": "Une nouvelle invitation à Studio est en route vers {email}.",
-    "checkNowAriaLabel": "Vérifier maintenant l'accès à Studio de {email}",
-    "resendInviteAriaLabel": "Renvoyer l'invitation à Studio à {email}"
+    "checkNowAriaLabel": "Vérifier maintenant pour {email}",
+    "resendInviteAriaLabel": "Renvoyer l'invitation à {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Détails du locataire",
@@ -2628,7 +2628,7 @@
     },
     "cancelInvite": {
       "trigger": "Annuler l'invitation",
-      "triggerAriaLabel": "Annuler l'invitation envoyée à {email}",
+      "triggerAriaLabel": "Annuler l'invitation à {email}",
       "title": "Annuler l'invitation envoyée à {email} ?",
       "description": "Le lien de l'e-mail cesse de fonctionner et la place se libère. Vous pourrez l'inviter de nouveau plus tard.",
       "keep": "Garder l'invitation",

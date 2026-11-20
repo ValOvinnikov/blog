@@ -1571,8 +1571,8 @@
     "requestFailed": "Couldn't reach the setup service — try again.",
     "checkStartedFor": "Checking {email}'s Studio access now. Refresh in a minute to see the result.",
     "inviteResentTo": "A new Studio invite is on its way to {email}.",
-    "checkNowAriaLabel": "Check {email}'s Studio access now",
-    "resendInviteAriaLabel": "Resend the Studio invite to {email}"
+    "checkNowAriaLabel": "Check now for {email}",
+    "resendInviteAriaLabel": "Resend invite to {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Tenant details",
@@ -2628,7 +2628,7 @@
     },
     "cancelInvite": {
       "trigger": "Cancel invite",
-      "triggerAriaLabel": "Cancel the invite to {email}",
+      "triggerAriaLabel": "Cancel invite to {email}",
       "title": "Cancel the invite to {email}?",
       "description": "The link in their email stops working and the seat is freed. You can invite them again later.",
       "keep": "Keep invite",
