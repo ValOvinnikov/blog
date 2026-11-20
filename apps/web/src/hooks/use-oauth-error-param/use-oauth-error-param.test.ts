@@ -2,6 +2,7 @@
  * @vitest-environment jsdom
  */
 import { faker } from '@faker-js/faker';
+import { AUTH_QUERY_PARAM } from '@web/constants/sign-in';
 import { renderHook, waitFor } from '@web/testing/custom-render';
 
 import { useOAuthErrorParam } from './use-oauth-error-param';
@@ -28,28 +29,41 @@ describe(useOAuthErrorParam, () => {
     expect(result.current).toBeNull();
   });
 
-  it('returns the error param value on mount', async () => {
-    setLocation(`?error=${MOCK_ERROR_CODE}`);
-
-    const { result } = renderHook(() => useOAuthErrorParam());
-
-    await waitFor(() => {
-      expect(result.current).toBe(MOCK_ERROR_CODE);
+  describe('with an error param', () => {
+    beforeEach(() => {
+      setLocation(`?${AUTH_QUERY_PARAM.ERROR}=${MOCK_ERROR_CODE}`);
     });
-  });
 
-  it('strips the error param from the URL bar once read', async () => {
-    setLocation(`?error=${MOCK_ERROR_CODE}`);
+    it('returns the error param value on mount', async () => {
+      const { result } = renderHook(() => useOAuthErrorParam());
 
-    renderHook(() => useOAuthErrorParam());
+      await waitFor(() => {
+        expect(result.current).toBe(MOCK_ERROR_CODE);
+      });
+    });
 
-    await waitFor(() => {
-      expect(window.location.search).toBe('');
+    it('strips the error param from the URL bar once read', async () => {
+      renderHook(() => useOAuthErrorParam());
+
+      await waitFor(() => {
+        expect(window.location.search).toBe('');
+      });
+    });
+
+    it('leaves the error param for another reader while disabled', () => {
+      const { result } = renderHook(() => useOAuthErrorParam(false));
+
+      expect(result.current).toBeNull();
+      expect(window.location.search).toBe(
+        `?${AUTH_QUERY_PARAM.ERROR}=${MOCK_ERROR_CODE}`,
+      );
     });
   });
 
   it('preserves other query params when stripping the error param', async () => {
-    setLocation(`?${MOCK_OTHER_PARAM}&error=${MOCK_ERROR_CODE}`);
+    setLocation(
+      `?${MOCK_OTHER_PARAM}&${AUTH_QUERY_PARAM.ERROR}=${MOCK_ERROR_CODE}`,
+    );
 
     renderHook(() => useOAuthErrorParam());
 

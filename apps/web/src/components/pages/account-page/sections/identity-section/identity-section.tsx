@@ -11,6 +11,7 @@ import { toSessionUsername } from '@web/utils/to-session-username';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
+import { ProviderLinkErrorNotice } from './components/provider-link-error-notice';
 import { identitySectionVariants } from './identity-section-variants';
 import {
   IdentitySectionView,
@@ -93,6 +94,7 @@ export const IdentitySection = async () => {
       providerRows={providerRows}
       displayNameLabel={t('displayNameLabel')}
       displayNameDescription={t('displayNameDescription')}
+      linkErrorNotice={<ProviderLinkErrorNotice />}
       displayNameControl={
         <DisplayNameControl
           initialName={name ?? toSessionUsername(name, email)}
