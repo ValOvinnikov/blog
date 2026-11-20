@@ -1344,6 +1344,36 @@
         "file": "packages/config/src/constants/email-type.ts"
       }
     ],
+    "NORMAL": [
+      {
+        "ref": "EMAIL_USAGE_LEVEL.NORMAL",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/email-usage-level.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SEND_PACE.NORMAL",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "NEAR": [
+      {
+        "ref": "EMAIL_USAGE_LEVEL.NEAR",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/email-usage-level.ts"
+      }
+    ],
+    "OVER": [
+      {
+        "ref": "EMAIL_USAGE_LEVEL.OVER",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/email-usage-level.ts"
+      }
+    ],
     "YOUTUBE": [
       {
         "ref": "EMBED_PROVIDER.YOUTUBE",
@@ -12869,14 +12899,6 @@
     "UNCLAIMED": [
       {
         "ref": "NEWSLETTER_POST_STATE.UNCLAIMED",
-        "scope": "app:worker",
-        "from": "@worker/constants/newsletter-send",
-        "file": "apps/worker/src/constants/newsletter-send.ts"
-      }
-    ],
-    "NORMAL": [
-      {
-        "ref": "NEWSLETTER_SEND_PACE.NORMAL",
         "scope": "app:worker",
         "from": "@worker/constants/newsletter-send",
         "file": "apps/worker/src/constants/newsletter-send.ts"
