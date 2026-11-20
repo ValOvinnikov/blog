@@ -5,7 +5,7 @@ import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import { buildFaqModule } from './starter-faq';
-import { keyedReference, paragraphs, reference } from './starter-fields';
+import { moduleSlot, paragraphs, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
 import {
   INTRODUCTION_MODULE_TITLE,
@@ -36,11 +36,15 @@ export function buildProductDocuments({
       navigationItems: [navigationLink(ids.PRODUCT_CHANGELOG_LINK)],
       homeLayout: {
         hero: reference(ids.PRODUCT_HERO),
-        modules: [ids.PRODUCT_INTRO, ids.PRODUCT_FAQ, ids.PRODUCT_CTA].map(
-          keyedReference,
-        ),
+        modules: [
+          moduleSlot(ids.PRODUCT_INTRO, 'module_content'),
+          moduleSlot(ids.PRODUCT_FAQ, 'module_faq'),
+          moduleSlot(ids.PRODUCT_CTA, 'module_cta'),
+        ],
       },
-      postIndexModules: [keyedReference(ids.PRODUCT_CHANGELOG_LIST)],
+      postIndexModules: [
+        moduleSlot(ids.PRODUCT_CHANGELOG_LIST, 'module_postList'),
+      ],
     }),
     buildStatementHero({
       id: ids.PRODUCT_HERO,

@@ -20,6 +20,7 @@ import { portableTextVariants } from '@web/components/shared/portable-text/porta
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { useTranslations } from 'next-intl';
 
+import { CookieList } from './cookie-list';
 import { FULL_BLEED_DATA_ATTR } from './full-bleed';
 
 const s = portableTextVariants();
@@ -71,6 +72,8 @@ export const codeTypeComponent = ({ value }: { value: Code }) => (
     highlightedLines={value.highlightedLines}
   />
 );
+
+export const cookieListTypeComponent = () => <CookieList />;
 
 export const makeAsideTypeComponent = (
   baseComponents: PortableTextReactComponents,

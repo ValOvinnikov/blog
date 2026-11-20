@@ -1,3 +1,4 @@
+import { contentColumnClasses } from '@platform/utils/content-column-classes/content-column-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const shellFrameVariants = tv({
@@ -22,7 +23,7 @@ export const shellFrameVariants = tv({
         content: ['min-h-0 overflow-hidden'],
       },
       false: {
-        content: ['w-full max-w-[1180px] p-4 md:p-platform-content'],
+        content: [contentColumnClasses()],
       },
     },
   },

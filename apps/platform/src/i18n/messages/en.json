@@ -1868,6 +1868,7 @@
     "goToFirstField": "Go to the first one",
     "notSaved": "Not saved",
     "notInPlan": "Your site is on the {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {current}} plan, which doesn't include {items}, so nothing was saved.",
+    "languagesNotInPlan": "Your site is on the {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {current}} plan, which allows {limit, plural, one {# language} other {# languages}}, so {count, plural, one {{items} wasn't added} other {{items} weren't added}}.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Discard",
     "save": "Save changes",

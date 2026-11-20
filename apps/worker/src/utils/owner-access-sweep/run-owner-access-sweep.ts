@@ -11,7 +11,13 @@ import { logger } from '@worker/utils/logger/logger';
 import { wakeMemberAccess } from '@worker/utils/member-access-run/member-access-run';
 import { wakeOwnerAccess } from '@worker/utils/owner-access-run/owner-access-run';
 
-export type TOwnerAccessSweepResult = { checked: number; failed: number };
+import { revokeLockedMembers } from './revoke-locked-members';
+
+export type TOwnerAccessSweepResult = {
+  checked: number;
+  revoked: number;
+  failed: number;
+};
 
 export async function runOwnerAccessSweep(): Promise<TOwnerAccessSweepResult> {
   const tenants = await listTenantsPendingOwnerElevation();
@@ -20,7 +26,7 @@ export async function runOwnerAccessSweep(): Promise<TOwnerAccessSweepResult> {
       ownerSanityRole !== SANITY_PROJECT_ROLE.ADMINISTRATOR,
   );
 
-  const result: TOwnerAccessSweepResult = { checked: 0, failed: 0 };
+  const result: TOwnerAccessSweepResult = { checked: 0, revoked: 0, failed: 0 };
   for (const { id: tenantId } of pending) {
     try {
       await wakeOwnerAccess(tenantId, OWNER_ACCESS_SWEEP_CHECKS);
@@ -50,5 +56,9 @@ export async function runOwnerAccessSweep(): Promise<TOwnerAccessSweepResult> {
       });
     }
   }
+
+  const { revoked, failed } = await revokeLockedMembers();
+  result.revoked = revoked;
+  result.failed += failed;
   return result;
 }

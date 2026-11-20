@@ -19,7 +19,7 @@ import { requireTenantManagementToken } from '@worker/utils/tenant-management-to
 import { loadTenant } from './run-reported-step';
 
 export type TRemovedMember = {
-  email: string;
+  email?: string;
   sanityUserId?: string;
 };
 
@@ -29,9 +29,10 @@ function isRemovedUser(
   user: TSanityUser,
 ): boolean {
   const { sanityUserId, profile } = user;
+  const { email } = removed;
   return (
     sanityUserId !== ownerSanityUserId &&
-    (isSameEmail(removed.email, profile.email) ||
+    ((!!email && isSameEmail(email, profile.email)) ||
       sanityUserId === removed.sanityUserId)
   );
 }
@@ -42,7 +43,8 @@ export async function revokeMemberAccess(
 ): Promise<void> {
   const { ownerSanityUserId, sanityProjectId } = await loadTenant(tenantId);
   if (!sanityProjectId) return;
-  if (await isTenantOwnerEmail(tenantId, removed.email)) return;
+  const { email } = removed;
+  if (email && (await isTenantOwnerEmail(tenantId, email))) return;
 
   const project: TStudioProject = {
     projectId: sanityProjectId,
@@ -51,7 +53,7 @@ export async function revokeMemberAccess(
   };
   const { projectId, token } = project;
   const [invites, users] = await Promise.all([
-    listPendingInvites(project, removed.email),
+    email ? listPendingInvites(project, email) : [],
     listSanityProjectUsers({ token, projectId }),
   ]);
 

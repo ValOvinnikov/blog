@@ -4,11 +4,8 @@ import type {
   Module_faq,
 } from '@shinefold/config/sanity/generated/types';
 
-import type {
-  TStarterDocument,
-  TStarterDocumentUnion,
-  TStarterModule,
-} from './starter-document';
+import type { TStarterDocumentUnion, TStarterModule } from './starter-document';
+import type { TStarterDocument } from './starter-document-shape';
 import {
   keyedReference,
   localizedListedText,

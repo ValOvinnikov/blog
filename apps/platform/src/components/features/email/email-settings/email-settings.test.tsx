@@ -8,21 +8,23 @@ import {
   EDIT,
   ENGLISH,
   FRENCH,
+  prepareEmailSettings,
+  PREVIEW,
+  SENDER_NAME,
+  setupEmailSettings,
+  SUBJECT_ENGLISH,
+  tStatus,
+  updateEmailConfigActionMock,
+} from '@platform/testing/email/email-settings';
+import {
   getEditingPicker,
   openPicker,
   openTemplate,
   optionName,
   pickerText,
-  prepareEmailSettings,
-  PREVIEW,
   save,
-  SENDER_NAME,
-  setupEmailSettings,
-  SUBJECT_ENGLISH,
-  tStatus,
   typeFrenchSignInSubject,
-  updateEmailConfigActionMock,
-} from '@platform/testing/email/email-settings';
+} from '@platform/testing/email/email-settings-interactions';
 import {
   MOCK_CONTACT_RECIPIENT,
   SEND_CONTACT_MESSAGES_TO,

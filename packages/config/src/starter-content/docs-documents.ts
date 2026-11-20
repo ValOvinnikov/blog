@@ -5,7 +5,7 @@ import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import { buildFaqModule } from './starter-faq';
-import { keyedReference, paragraphs, reference } from './starter-fields';
+import { moduleSlot, paragraphs, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
 import {
   INTRODUCTION_MODULE_TITLE,
@@ -33,7 +33,10 @@ export function buildDocsDocuments({
       navigationItems: [navigationLink(ids.DOCS_GUIDES_LINK)],
       homeLayout: {
         hero: reference(ids.DOCS_HERO),
-        modules: [ids.DOCS_INTRO, ids.DOCS_FAQ].map(keyedReference),
+        modules: [
+          moduleSlot(ids.DOCS_INTRO, 'module_content'),
+          moduleSlot(ids.DOCS_FAQ, 'module_faq'),
+        ],
       },
     }),
     buildStatementHero({

@@ -6,7 +6,7 @@ import { buildContentPage } from './starter-content-page';
 import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import { buildFaqModule } from './starter-faq';
-import { keyedReference, paragraphs, reference } from './starter-fields';
+import { moduleSlot, paragraphs, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
 import {
   INTRODUCTION_MODULE_TITLE,
@@ -50,9 +50,11 @@ export function buildBusinessDocuments({
       navigationItems: pages.map(({ linkId }) => navigationLink(linkId)),
       homeLayout: {
         hero: reference(ids.BUSINESS_HERO),
-        modules: [ids.BUSINESS_INTRO, ids.BUSINESS_FAQ, ids.BUSINESS_CTA].map(
-          keyedReference,
-        ),
+        modules: [
+          moduleSlot(ids.BUSINESS_INTRO, 'module_content'),
+          moduleSlot(ids.BUSINESS_FAQ, 'module_faq'),
+          moduleSlot(ids.BUSINESS_CTA, 'module_cta'),
+        ],
       },
     }),
     buildStatementHero({

@@ -8,7 +8,13 @@ import {
 } from '@shinefold/config/constants';
 import { siteSettingsSchema } from '@shinefold/studio/schema-types/documents/settings/site-settings/site-settings';
 import { mockGroqFetch } from '@shinefold/studio/testing/mock-groq-fetch';
-import { prepareConfig, type SanityDocument, type Schema } from 'sanity';
+import { isNull } from '@shinefold/utils/primitives';
+import {
+  prepareConfig,
+  type SanityDocument,
+  type Schema,
+  type SchemaType,
+} from 'sanity';
 
 import { buildStudioConfig } from './studio-config';
 
@@ -54,6 +60,41 @@ const toSanityDocument = (document: TStarterDocument): SanityDocument => ({
   _updatedAt: MOCK_PUBLISHED_AT,
   _rev: MOCK_REVISION,
 });
+
+type TSeededValue = { _type?: string } & Record<string, unknown>;
+
+const isSeededObject = (value: unknown): value is TSeededValue =>
+  typeof value === 'object' && !isNull(value) && !Array.isArray(value);
+
+const undeclaredArrayItems = (
+  type: SchemaType,
+  value: unknown,
+  path: string,
+): string[] => {
+  if (type.jsonType === 'array' && Array.isArray(value)) {
+    return value.flatMap((item: unknown, index) => {
+      if (!isSeededObject(item)) return [];
+      const itemPath = `${path}[${index}]`;
+      const member = type.of.find(({ name }) => name === item._type);
+
+      return member
+        ? undeclaredArrayItems(member, item, itemPath)
+        : [`${itemPath} ${item._type}`];
+    });
+  }
+
+  if (type.jsonType === 'object' && isSeededObject(value)) {
+    return type.fields.flatMap((field) =>
+      undeclaredArrayItems(
+        field.type,
+        value[field.name],
+        `${path}.${field.name}`,
+      ),
+    );
+  }
+
+  return [];
+};
 
 const buildDocuments = (
   siteType: (typeof STARTER_SITE_TYPES)[number],
@@ -114,6 +155,17 @@ describe(buildStarterDocuments, () => {
         '$siteType $_type $_id passes Studio validation',
         async ({ document, dataset }) => {
           expect(await validateStarterDocument(document, dataset)).toEqual([]);
+        },
+      );
+
+      it.each(starterCases)(
+        '$siteType $_type $_id seeds every array item as a member its field declares',
+        ({ document }) => {
+          const documentType = schema.get(document._type)!;
+
+          expect(
+            undeclaredArrayItems(documentType, document, document._id),
+          ).toEqual([]);
         },
       );
 

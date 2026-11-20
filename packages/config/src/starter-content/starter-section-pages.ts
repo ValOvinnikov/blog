@@ -14,13 +14,13 @@ import {
   type TContentPageCopy,
 } from './starter-content-page';
 import type {
-  TStarterDocument,
   TStarterDocumentUnion,
   TStarterModule,
   TStarterPage,
 } from './starter-document';
+import type { TStarterTemplate } from './starter-document-shape';
 import {
-  keyedReference,
+  moduleSlot,
   moduleHeadingBlock,
   pageHeadingBlock,
   reference,
@@ -61,8 +61,8 @@ export function buildSectionPages({
       _id: ids.template,
       _type: 'template_landing',
       title: `${name} Template`,
-      modules: [keyedReference(ids.list)],
-    } satisfies TStarterDocument<Template_landing, 'title'>,
+      modules: [moduleSlot(ids.list, 'module_sectionPages')],
+    } satisfies TStarterTemplate<Template_landing>,
     {
       _id: ids.page,
       _type: 'page_landing',

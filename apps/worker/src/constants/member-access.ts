@@ -6,4 +6,5 @@ export const MEMBER_ACCESS_LOG = {
   REVOKE_FAILED: 'member_access.revoke_failed',
   INVITE_DELETE_FAILED: 'member_access.invite_delete_failed',
   SWEEP_MEMBER_FAILED: 'member_access.sweep_member_failed',
+  LOCKED_INVITE_DELETE_SKIPPED: 'member_access.locked_invite_delete_skipped',
 } as const;

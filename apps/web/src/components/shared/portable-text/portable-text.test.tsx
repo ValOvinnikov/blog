@@ -5,8 +5,14 @@ import {
   SITE_MESSAGES,
   type TPortableTextBlock,
 } from '@shinefold/config';
+import {
+  MOCK_GOOGLE_ANALYTICS,
+  MOCK_PLAUSIBLE_ANALYTICS,
+} from '@shinefold/db/testing/tenant-analytics/fixtures';
 import type { TPortableTextBody } from '@shinefold/service';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { CookieList } from '@web/components/shared/portable-text/config/cookie-list';
+import type * as TCookieListModule from '@web/components/shared/portable-text/config/cookie-list';
 import {
   customRender,
   renderElement,
@@ -21,11 +27,19 @@ import {
   mockTableBlock,
   mockTableRow,
 } from '@web/testing/shared/portable-text/fixtures';
+import { withSiteAnalytics } from '@web/testing/shared/site-analytics/with-site-analytics';
 
 import { createPostBodyOverride } from './config';
 import { PortableText } from './portable-text';
 
 vi.mock('@web/i18n/navigation');
+vi.mock(
+  '@web/components/shared/portable-text/config/cookie-list',
+  async (importOriginal) => {
+    const actual = await importOriginal<typeof TCookieListModule>();
+    return { CookieList: vi.fn(actual.CookieList) };
+  },
+);
 
 faker.seed(6007);
 
@@ -77,6 +91,10 @@ const MOCK_CELL_LINK_TEXT = faker.lorem.words(2);
 const ARIA_EXPANDED = 'aria-expanded';
 const TABLE_REGION_NAME = SITE_MESSAGES.table.regionLabel;
 const CODE_REGION_NAME = SITE_MESSAGES.codeBlock.regionLabel;
+const COOKIE_LIST_NAME = SITE_MESSAGES.cookieList.ariaLabel;
+const COOKIE_LIST_BODY: TPortableTextBody = [
+  { _type: PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST, _key: MOCK_LINK_KEY },
+];
 
 const RESOLVED_LINK_REF = {
   _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
@@ -342,17 +360,24 @@ describe(`<${PortableText.name}/>`, () => {
     expect(button).toBeVisible();
   });
 
-  it('renders a cookie-list block as the cookie table', () => {
-    setup({
-      value: [
-        { _type: PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST, _key: MOCK_LINK_KEY },
-      ],
+  describe('with a cookie-list block', () => {
+    it.each([
+      { label: 'no analytics tool', analytics: undefined },
+      { label: 'Plausible', analytics: MOCK_PLAUSIBLE_ANALYTICS },
+      { label: 'Google Analytics', analytics: MOCK_GOOGLE_ANALYTICS },
+    ])('renders the cookie table with $label', ({ analytics }) => {
+      const body = <PortableText value={COOKIE_LIST_BODY} />;
+      renderElement(analytics ? withSiteAnalytics(body, analytics) : body);
+
+      const table = screen.getByRole('region', { name: COOKIE_LIST_NAME });
+      expect(table).toBeVisible();
     });
 
-    const table = screen.getByRole('region', {
-      name: SITE_MESSAGES.cookieList.ariaLabel,
+    it('hands the client cookie list no renderer props', () => {
+      setup({ value: COOKIE_LIST_BODY });
+
+      expect(CookieList).toHaveBeenCalledWith({}, undefined);
     });
-    expect(table).toBeVisible();
   });
 
   describe('with a table', () => {

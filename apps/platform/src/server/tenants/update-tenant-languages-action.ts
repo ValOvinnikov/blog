@@ -78,6 +78,7 @@ export const updateTenantLanguagesAction = async (
             parsed.data.filter(
               (locale) => !tenant.additionalLocales.includes(locale),
             ),
+            tenant.entitlements.localeLimit,
           )
         : INVALID_LANGUAGES;
     }

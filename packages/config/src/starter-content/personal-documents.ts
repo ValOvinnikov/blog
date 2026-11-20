@@ -5,7 +5,7 @@ import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import { buildFaqModule } from './starter-faq';
-import { keyedReference, paragraphs, reference } from './starter-fields';
+import { moduleSlot, paragraphs, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
 import {
   INTRODUCTION_MODULE_TITLE,
@@ -39,11 +39,13 @@ export function buildPersonalDocuments({
       navigationItems: [navigationLink(ids.PERSONAL_WRITING_LINK)],
       homeLayout: {
         hero: reference(ids.PERSONAL_HERO),
-        modules: [ids.PERSONAL_INTRO, ids.PERSONAL_FAQ, ids.PERSONAL_CTA].map(
-          keyedReference,
-        ),
+        modules: [
+          moduleSlot(ids.PERSONAL_INTRO, 'module_content'),
+          moduleSlot(ids.PERSONAL_FAQ, 'module_faq'),
+          moduleSlot(ids.PERSONAL_CTA, 'module_cta'),
+        ],
       },
-      postIndexModules: [keyedReference(ids.PERSONAL_POST_LIST)],
+      postIndexModules: [moduleSlot(ids.PERSONAL_POST_LIST, 'module_postList')],
     }),
     buildAuthor(ids.PERSONAL_AUTHOR, siteName),
     buildProfileHero({

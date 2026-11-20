@@ -13122,6 +13122,14 @@
         "file": "apps/worker/src/constants/member-access.ts"
       }
     ],
+    "member_access.locked_invite_delete_skipped": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.LOCKED_INVITE_DELETE_SKIPPED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
     "newsletter_send.start_failed": [
       {
         "ref": "NEWSLETTER_SEND_LOG.START_FAILED",

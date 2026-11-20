@@ -1868,6 +1868,7 @@
     "goToFirstField": "Aller au premier",
     "notSaved": "Non enregistré",
     "notInPlan": "Votre site est sur la formule {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actuelle}}, qui n'inclut pas {items} : rien n'a été enregistré.",
+    "languagesNotInPlan": "Votre site est sur la formule {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actuelle}}, qui permet {limit, plural, one {# langue} other {# langues}} : {count, plural, one {{items} n'a pas été ajouté} other {{items} n'ont pas été ajoutés}}.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Annuler les modifications",
     "save": "Enregistrer les modifications",
