@@ -29,4 +29,5 @@ export * as tenantEntitlementGrants from './tenant-entitlement-grants';
 export * as tenantOAuthCredentials from './tenant-oauth-credentials';
 export * as tenantSuspensions from './tenant-suspensions';
 export * as tenants from './tenants';
+export * as testEmailSendCounters from './test-email-send-counters';
 export * as users from './users';

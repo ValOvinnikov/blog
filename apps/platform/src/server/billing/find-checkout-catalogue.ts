@@ -9,9 +9,8 @@ import {
   type TBillingInterval,
 } from '@shinefold/config/constants';
 import { PLAN_PRICE_LOOKUP_KEYS } from '@shinefold/db/constants';
+import { lookupKeyFor } from '@shinefold/db/utils/price-lookup-key/price-lookup-key';
 import type Stripe from 'stripe';
-
-import { lookupKeyFor } from './plan-from-price-keys';
 
 export type TPromoContext = { tenantId: string; promo?: string };
 

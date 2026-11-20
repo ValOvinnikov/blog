@@ -14,6 +14,7 @@ import {
   getTenantById,
   getTenantSanityCredentials,
 } from '@shinefold/db/queries/tenants';
+import { mockNewsletterPostSend } from '@shinefold/db/testing/newsletter-post-sends/fixtures';
 import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import type { TResolvableGrant } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 import { NEWSLETTER_POST_STATE } from '@worker/constants/newsletter-send';
@@ -73,11 +74,9 @@ describe(checkNewsletterPost, () => {
       MOCK_SANITY_CREDENTIALS,
     );
     vi.mocked(readNewsletterPost).mockResolvedValue(MOCK_NEWSLETTER_POST);
-    vi.mocked(getNewsletterPostSend).mockResolvedValue({
-      claimedAt: new Date(MOCK_CLAIMED_AT),
-      outcome: undefined,
-      skipReason: undefined,
-    });
+    vi.mocked(getNewsletterPostSend).mockResolvedValue(
+      mockNewsletterPostSend({ claimedAt: new Date(MOCK_CLAIMED_AT) }),
+    );
   });
 
   afterEach(() => {
@@ -195,19 +194,16 @@ describe(checkNewsletterPost, () => {
     ['no claim at all', undefined],
     [
       'a newer claim',
-      {
+      mockNewsletterPostSend({
         claimedAt: new Date(Date.parse(MOCK_CLAIMED_AT) + MOCK_ONE_HOUR_MS),
-        outcome: undefined,
-        skipReason: undefined,
-      },
+      }),
     ],
     [
       'a claim that already has an outcome',
-      {
+      mockNewsletterPostSend({
         claimedAt: new Date(MOCK_CLAIMED_AT),
         outcome: NEWSLETTER_POST_SEND_OUTCOME.SKIPPED,
-        skipReason: undefined,
-      },
+      }),
     ],
   ])('ends a run started for %s, reading nothing else', async (_, claim) => {
     vi.mocked(getNewsletterPostSend).mockResolvedValue(claim);

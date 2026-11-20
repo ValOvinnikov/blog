@@ -1,5 +1,9 @@
+import type { TBillingInterval } from '@shinefold/config/constants';
 import type { TMaybeUndefined, TNullableRow } from '@shinefold/config/types';
-import type { TPaidSubscriberBandCeiling } from '@shinefold/db/constants';
+import type {
+  TBillingCurrency,
+  TPaidSubscriberBandCeiling,
+} from '@shinefold/db/constants';
 import { tenants } from '@shinefold/db/schema/tenants';
 
 export type TTenantBilling = {
@@ -7,6 +11,8 @@ export type TTenantBilling = {
   stripeSubscriptionId: TMaybeUndefined<string>;
   stripePromotionCode: TMaybeUndefined<string>;
   subscriberBandCeiling: TMaybeUndefined<TPaidSubscriberBandCeiling>;
+  billingInterval: TMaybeUndefined<TBillingInterval>;
+  billingCurrency: TMaybeUndefined<TBillingCurrency>;
   trialEndsAt: TMaybeUndefined<Date>;
   downgradeGraceStartedAt: TMaybeUndefined<Date>;
   graceStartedEmailSentAt: TMaybeUndefined<Date>;
@@ -19,6 +25,8 @@ export const tenantBillingColumns = {
   stripeSubscriptionId: tenants.stripeSubscriptionId,
   stripePromotionCode: tenants.stripePromotionCode,
   subscriberBandCeiling: tenants.subscriberBandCeiling,
+  billingInterval: tenants.billingInterval,
+  billingCurrency: tenants.billingCurrency,
   trialEndsAt: tenants.trialEndsAt,
   downgradeGraceStartedAt: tenants.downgradeGraceStartedAt,
   graceStartedEmailSentAt: tenants.graceStartedEmailSentAt,
@@ -34,6 +42,8 @@ export function toTenantBilling(
     stripeSubscriptionId: row.stripeSubscriptionId ?? undefined,
     stripePromotionCode: row.stripePromotionCode ?? undefined,
     subscriberBandCeiling: row.subscriberBandCeiling ?? undefined,
+    billingInterval: row.billingInterval ?? undefined,
+    billingCurrency: row.billingCurrency ?? undefined,
     trialEndsAt: row.trialEndsAt ?? undefined,
     downgradeGraceStartedAt: row.downgradeGraceStartedAt ?? undefined,
     graceStartedEmailSentAt: row.graceStartedEmailSentAt ?? undefined,
