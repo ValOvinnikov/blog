@@ -1,9 +1,11 @@
+import type { TLeadsLoading } from '@platform/components/features/leads/leads-inbox/use-leads-pages';
 import { Card } from '@platform/components/shared/card';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
 import type { TMaybeUndefined } from '@shinefold/config';
-import { type ReactNode, type Ref, useId } from 'react';
+import { type Ref, useId } from 'react';
 
 import { LeadRow } from './components/lead-row';
+import { LoadMoreFooter } from './components/load-more-footer';
 import { leadGroupVariants } from './lead-group-variants';
 
 export type TLeadGroupProps = {
@@ -12,7 +14,7 @@ export type TLeadGroupProps = {
   selectedId: TMaybeUndefined<string>;
   rowRef: (leadId: string) => Ref<HTMLButtonElement>;
   onOpen: (lead: TInboxLead) => void;
-  footer?: ReactNode;
+  loading?: TLeadsLoading;
 };
 
 export const LeadGroup = ({
@@ -21,7 +23,7 @@ export const LeadGroup = ({
   selectedId,
   rowRef,
   onOpen,
-  footer,
+  loading,
 }: TLeadGroupProps) => {
   const labelId = useId();
   const { root, label, list } = leadGroupVariants();
@@ -44,7 +46,7 @@ export const LeadGroup = ({
             </li>
           ))}
         </ul>
-        {footer}
+        {loading && <LoadMoreFooter loading={loading} />}
       </Card>
     </div>
   );

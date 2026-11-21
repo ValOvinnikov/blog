@@ -1,11 +1,8 @@
 import type { TLeadsLoading } from '@platform/components/features/leads/leads-inbox/use-leads-pages';
-import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
-import { Spinner } from '@platform/components/shared/spinner';
 import { Text } from '@platform/components/shared/text';
-import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
-import { SIZE, type TMaybeUndefined } from '@shinefold/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import type { Ref } from 'react';
@@ -38,10 +35,11 @@ export const LeadsList = ({
     loadedCount: unreadLeads.length + earlierLeads.length,
     onReach: loadMore,
   });
-  const { groups, sentinel, footer } = leadsListVariants();
+  const { groups, sentinel } = leadsListVariants();
+  const hasUnread = hasArrayGotItems(unreadLeads);
   const hasEarlier = hasArrayGotItems(earlierLeads);
 
-  if (!hasArrayGotItems(unreadLeads) && !hasEarlier) {
+  if (!hasUnread && !hasEarlier) {
     return (
       <Card>
         <Card.Body>
@@ -51,32 +49,16 @@ export const LeadsList = ({
     );
   }
 
-  const loadFooter = (isLoading || hasLoadFailed) && (
-    <div className={footer()}>
-      {isLoading ? (
-        <Spinner label={t('loadingMore')} hasLabel={true} />
-      ) : (
-        <Button
-          size={SIZE.SM}
-          variant={BUTTON_VARIANT.SECONDARY}
-          onClick={loadMore}
-        >
-          {t('loadMoreFailed')}
-        </Button>
-      )}
-    </div>
-  );
-
   const groupProps = { selectedId, rowRef, onOpen };
 
   return (
     <>
       <div className={groups()}>
-        {hasArrayGotItems(unreadLeads) && (
+        {hasUnread && (
           <LeadGroup
             title={t('unreadGroup', { count: unreadLeads.length })}
             leads={unreadLeads}
-            footer={hasEarlier ? undefined : loadFooter}
+            loading={hasEarlier ? undefined : loading}
             {...groupProps}
           />
         )}
@@ -84,7 +66,7 @@ export const LeadsList = ({
           <LeadGroup
             title={t('earlierGroup')}
             leads={earlierLeads}
-            footer={loadFooter}
+            loading={loading}
             {...groupProps}
           />
         )}
