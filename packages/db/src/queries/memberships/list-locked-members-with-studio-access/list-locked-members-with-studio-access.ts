@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@shinefold/config/types';
 import { getDb } from '@shinefold/db/client';
 import {
   TENANT_PROVISIONING_STATUS,
@@ -17,6 +18,7 @@ import { and, asc, eq, inArray, isNotNull, or } from 'drizzle-orm';
 export type TLockedMemberWithStudioAccess = TMemberStudioIdentity & {
   tenantId: string;
   membershipId: string;
+  sanityInviteId: TMaybeUndefined<string>;
 };
 
 export async function listLockedMembersWithStudioAccess(): Promise<
@@ -26,6 +28,7 @@ export async function listLockedMembersWithStudioAccess(): Promise<
     .select({
       tenantId: memberships.tenantId,
       membershipId: memberships.id,
+      sanityInviteId: memberStudioAccessColumns.sanityInviteId,
       ...memberStudioIdentityColumns,
     })
     .from(memberships)
@@ -41,9 +44,12 @@ export async function listLockedMembersWithStudioAccess(): Promise<
     )
     .orderBy(asc(memberships.lockedAt), asc(memberships.id));
 
-  return rows.map(({ tenantId, membershipId, ...identity }) => ({
-    tenantId,
-    membershipId,
-    ...toMemberStudioIdentity(identity),
-  }));
+  return rows.map(
+    ({ tenantId, membershipId, sanityInviteId, ...identity }) => ({
+      tenantId,
+      membershipId,
+      sanityInviteId: sanityInviteId ?? undefined,
+      ...toMemberStudioIdentity(identity),
+    }),
+  );
 }

@@ -32,16 +32,17 @@ async function revokeLockedMember({
   membershipId,
   email,
   sanityUserId,
+  sanityInviteId,
 }: TLockedMemberWithStudioAccess): Promise<boolean> {
   if (await isUnlocked(tenantId, membershipId)) return false;
 
-  if (!email) {
+  if (!email && !sanityInviteId) {
     logger.warn(MEMBER_ACCESS_LOG.LOCKED_INVITE_DELETE_SKIPPED, {
       tenantId,
       membershipId,
     });
   }
-  await revokeMemberAccess(tenantId, { email, sanityUserId });
+  await revokeMemberAccess(tenantId, { email, sanityUserId, sanityInviteId });
 
   await setMemberStudioAccess(tenantId, membershipId, CLEARED_MEMBER_ACCESS);
   return true;

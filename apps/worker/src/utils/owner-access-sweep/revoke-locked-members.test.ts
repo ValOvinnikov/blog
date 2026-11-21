@@ -9,6 +9,7 @@ import { MEMBER_ACCESS_LOG } from '@worker/constants/member-access';
 import {
   MOCK_MEMBERSHIP_ID,
   MOCK_MEMBER_EMAIL,
+  MOCK_MEMBER_INVITE_ID,
   MOCK_MEMBER_SANITY_USER_ID,
   mockMemberTarget,
 } from '@worker/testing/member-access/fixtures';
@@ -26,6 +27,7 @@ const MOCK_LOCKED_MEMBER = {
   membershipId: MOCK_MEMBERSHIP_ID,
   email: MOCK_MEMBER_EMAIL,
   sanityUserId: MOCK_MEMBER_SANITY_USER_ID,
+  sanityInviteId: MOCK_MEMBER_INVITE_ID,
 };
 
 const MOCK_CLEARED_ACCESS = {
@@ -56,6 +58,7 @@ describe(revokeLockedMembers, () => {
     expect(revokeMemberAccess).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       email: MOCK_MEMBER_EMAIL,
       sanityUserId: MOCK_MEMBER_SANITY_USER_ID,
+      sanityInviteId: MOCK_MEMBER_INVITE_ID,
     });
     expect(setMemberStudioAccess).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
@@ -75,9 +78,9 @@ describe(revokeLockedMembers, () => {
     expect(result).toEqual({ revoked: 0, failed: 0 });
   });
 
-  it('revokes a member with no readable address by Sanity user id alone', async () => {
+  it('revokes by Sanity user id when neither address nor invite is known', async () => {
     vi.mocked(listLockedMembersWithStudioAccess).mockResolvedValue([
-      { ...MOCK_LOCKED_MEMBER, email: undefined },
+      { ...MOCK_LOCKED_MEMBER, email: undefined, sanityInviteId: undefined },
     ]);
 
     const result = await revokeLockedMembers();
@@ -89,8 +92,24 @@ describe(revokeLockedMembers, () => {
     expect(revokeMemberAccess).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       email: undefined,
       sanityUserId: MOCK_MEMBER_SANITY_USER_ID,
+      sanityInviteId: undefined,
     });
     expect(result).toEqual({ revoked: 1, failed: 0 });
+  });
+
+  it('hands over the recorded invite of a member with only an invite recorded', async () => {
+    vi.mocked(listLockedMembersWithStudioAccess).mockResolvedValue([
+      { ...MOCK_LOCKED_MEMBER, email: undefined, sanityUserId: undefined },
+    ]);
+
+    await revokeLockedMembers();
+
+    expect(logger.warn).not.toHaveBeenCalled();
+    expect(revokeMemberAccess).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+      email: undefined,
+      sanityUserId: undefined,
+      sanityInviteId: MOCK_MEMBER_INVITE_ID,
+    });
   });
 
   it('logs a failed revoke, keeps the recorded access and carries on with the rest', async () => {

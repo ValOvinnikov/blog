@@ -1,4 +1,5 @@
 import type { TMaybeNull } from '@shinefold/config/types';
+import type { TSanityInvite } from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
 import {
   listSanityProjectUsers,
   type TSanityUser,
@@ -21,6 +22,7 @@ import { loadTenant } from './run-reported-step';
 export type TRemovedMember = {
   email?: string;
   sanityUserId?: string;
+  sanityInviteId?: string;
 };
 
 function isRemovedUser(
@@ -35,6 +37,17 @@ function isRemovedUser(
     ((!!email && isSameEmail(email, profile.email)) ||
       sanityUserId === removed.sanityUserId)
   );
+}
+
+async function listRemovedInvites(
+  project: TStudioProject,
+  { email, sanityInviteId }: TRemovedMember,
+): Promise<TSanityInvite[]> {
+  const pending = email ? await listPendingInvites(project, email) : [];
+  if (!sanityInviteId || pending.some(({ id }) => id === sanityInviteId)) {
+    return pending;
+  }
+  return [...pending, { id: sanityInviteId }];
 }
 
 export async function revokeMemberAccess(
@@ -53,13 +66,16 @@ export async function revokeMemberAccess(
   };
   const { projectId, token } = project;
   const [invites, users] = await Promise.all([
-    email ? listPendingInvites(project, email) : [],
+    listRemovedInvites(project, removed),
     listSanityProjectUsers({ token, projectId }),
   ]);
 
-  await deleteInvites(project, invites);
-  await revokeProjectRoles(
-    project,
-    users.filter((user) => isRemovedUser(removed, ownerSanityUserId, user)),
-  );
+  try {
+    await deleteInvites(project, invites);
+  } finally {
+    await revokeProjectRoles(
+      project,
+      users.filter((user) => isRemovedUser(removed, ownerSanityUserId, user)),
+    );
+  }
 }

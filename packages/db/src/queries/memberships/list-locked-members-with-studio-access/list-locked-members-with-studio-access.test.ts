@@ -63,6 +63,7 @@ describe(listLockedMembersWithStudioAccess, () => {
       {
         tenantId: tenant().id,
         membershipId: id,
+        sanityInviteId: access.sanityInviteId,
         email: MOCK_EDITOR_EMAIL,
         sanityUserId: access.sanityUserId,
       },
