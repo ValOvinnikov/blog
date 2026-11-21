@@ -1,7 +1,8 @@
-import { MOCK_AMOUNT_PAID } from '@platform/testing/billing/fixtures';
-import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 
 import { formatStripeAmount } from './format-stripe-amount';
+
+const MOCK_AMOUNT_PAID = 2_900;
 
 describe(formatStripeAmount, () => {
   it.each([

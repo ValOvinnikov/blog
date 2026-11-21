@@ -4,6 +4,7 @@ import {
   STRIPE_PRICE_LOOKUP_KEY,
 } from '@shinefold/db/constants';
 import {
+  mockStripePrice,
   MOCK_DOLLAR_AMOUNT,
   MOCK_EURO_AMOUNT,
   MOCK_STRIPE_PRODUCT_ID,
@@ -13,7 +14,6 @@ import {
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
 import {
-  mockStripePrice,
   mockLinkedPricingTier,
   MOCK_UNLISTED_CURRENCY,
 } from '@web/testing/modules/pricing/live-price-fixtures';

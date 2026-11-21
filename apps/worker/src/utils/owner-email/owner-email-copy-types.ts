@@ -9,7 +9,7 @@ type TOwnerEmailCopyInput = {
   ownerEmail: string;
 };
 
-export type TOwnerEmailText = {
+type TOwnerEmailText = {
   subject: string;
   previewText: string;
   paragraphs: string[];

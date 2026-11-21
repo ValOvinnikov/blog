@@ -17,6 +17,13 @@ export function sentAfterThisPost({
   return sentThisMonth + activeCount;
 }
 
+export function allowanceLeft({
+  allowance,
+  sentThisMonth,
+}: TNewsletterLimits): number {
+  return Math.max(0, allowance - sentThisMonth);
+}
+
 export function newsletterSkipReason(
   limits: TNewsletterLimits,
 ): TMaybeUndefined<TNewsletterSkipReason> {

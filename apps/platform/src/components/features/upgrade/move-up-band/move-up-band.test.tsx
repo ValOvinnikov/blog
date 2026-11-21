@@ -27,9 +27,12 @@ import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { mockLocaleRouter } from '@platform/testing/mock-locale-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { formatDate } from '@platform/utils/format-date/format-date';
-import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@shinefold/config';
+import {
+  formatStripeAmount,
+  ACTION_OUTCOME,
+  LOCALE_ISO_CODES,
+} from '@shinefold/config';
 import { errorResult } from '@shinefold/utils';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';

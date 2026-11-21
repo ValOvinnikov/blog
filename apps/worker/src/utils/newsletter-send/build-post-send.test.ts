@@ -1,6 +1,11 @@
-import { resolveTenantEmailBrand } from '@shinefold/config';
+import {
+  resolveTenantEmailBrand,
+  resolveTenantEmailDarkBrand,
+} from '@shinefold/config';
 import {
   EMAIL_ACCOUNT,
+  EMAIL_FONT_STACK,
+  FONT_CHOICE,
   LOCALE_ISO_CODES,
   PRESET_ID,
   PRESET_REGISTRY,
@@ -26,6 +31,11 @@ import type { TNewsletterSendContext } from '@worker/utils/newsletter-send/newsl
 import { buildPostSend, postSendIdempotencyKey } from './build-post-send';
 
 const MOCK_SITE_URL = `https://${MOCK_TENANT_DOMAIN}`;
+const MOCK_BRAND_INPUT = {
+  preset: PRESET_ID.CONSOLE,
+  accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
+};
+const MOCK_DARK_BRAND = resolveTenantEmailDarkBrand(MOCK_BRAND_INPUT);
 const MOCK_CONTEXT: TNewsletterSendContext = {
   siteUrl: MOCK_SITE_URL,
   locale: LOCALE_ISO_CODES.NL,
@@ -35,10 +45,10 @@ const MOCK_CONTEXT: TNewsletterSendContext = {
   logoImageUrl: undefined,
   footerPostalAddress: undefined,
   unsubscribeKey: MOCK_UNSUBSCRIBE_KEY,
-  brand: resolveTenantEmailBrand({
-    preset: PRESET_ID.CONSOLE,
-    accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
-  }),
+  brand: resolveTenantEmailBrand(MOCK_BRAND_INPUT),
+  darkBrand: MOCK_DARK_BRAND,
+  headingFont: FONT_CHOICE.FRAUNCES,
+  bodyFont: FONT_CHOICE.INTER,
 };
 const [SUBSCRIBER_ID = '', OTHER_SUBSCRIBER_ID = ''] = MOCK_SUBSCRIBER_IDS;
 const [EMAIL = ''] = MOCK_SUBSCRIBER_EMAILS;
@@ -71,6 +81,14 @@ describe(buildPostSend, () => {
     expect(buildFor(SUBSCRIBER_ID).html).toContain(
       `${MOCK_SITE_URL}/blog/${MOCK_NEWSLETTER_POST.slug}`,
     );
+  });
+
+  it('sets the post in the site’s fonts, with its dark palette for dark mode', () => {
+    const { html } = buildFor(SUBSCRIBER_ID);
+
+    expect(html).toContain(EMAIL_FONT_STACK[FONT_CHOICE.FRAUNCES]);
+    expect(html).toContain(EMAIL_FONT_STACK[FONT_CHOICE.INTER]);
+    expect(html).toContain(MOCK_DARK_BRAND.surface);
   });
 
   it('carries an unsubscribe link for this subscriber in the site’s default language', () => {

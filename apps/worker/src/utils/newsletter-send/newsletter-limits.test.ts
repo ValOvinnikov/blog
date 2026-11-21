@@ -3,6 +3,7 @@ import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@shinefold/db/constants';
 import { mockNewsletterLimits } from '@worker/testing/newsletter-send/fixtures';
 
 import {
+  allowanceLeft,
   nearLimitNotices,
   newsletterSkipReason,
   sentAfterThisPost,
@@ -59,5 +60,15 @@ describe(sentAfterThisPost, () => {
         mockNewsletterLimits({ activeCount: 300, sentThisMonth: 1_200 }),
       ),
     ).toBe(1_500);
+  });
+});
+
+describe(allowanceLeft, () => {
+  it('never reports less than none left', () => {
+    expect(
+      allowanceLeft(
+        mockNewsletterLimits({ allowance: 6_000, sentThisMonth: 6_100 }),
+      ),
+    ).toBe(0);
   });
 });

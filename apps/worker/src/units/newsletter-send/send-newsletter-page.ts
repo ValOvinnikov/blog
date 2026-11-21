@@ -2,8 +2,10 @@ import { setTimeout as wait } from 'node:timers/promises';
 
 import { NEWSLETTER_SKIP_REASON } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
-import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config';
-import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends';
+import {
+  setNewsletterPostSendProgress,
+  markNewsletterPostSkipped,
+} from '@shinefold/db/queries/newsletter-post-sends';
 import { listActiveSubscribers } from '@shinefold/db/queries/subscribers';
 import {
   NEWSLETTER_SEND_INTERVAL_MS,
@@ -15,7 +17,6 @@ import {
   type TNewsletterSendPace,
 } from '@worker/constants/newsletter-send';
 import { loadTenant } from '@worker/units/run-reported-step';
-import { isSiteSendingPosts } from '@worker/utils/newsletter-send/is-site-sending-posts';
 import { loadNewsletterSendContext } from '@worker/utils/newsletter-send/newsletter-send-context';
 import type { TNewsletterPost } from '@worker/utils/newsletter-send/read-newsletter-post';
 import { readReputationPace } from '@worker/utils/newsletter-send/reputation-pace';
@@ -23,18 +24,22 @@ import {
   assertPageReadable,
   sendToSubscriber,
 } from '@worker/utils/newsletter-send/send-to-subscriber';
+import { readPageStopReason } from '@worker/utils/newsletter-send/sending-off-cause';
 
 export type TNewsletterPageInput = {
   tenantId: string;
   postId: string;
+  claimedAt: string;
   post: TNewsletterPost;
   afterId: TMaybeUndefined<string>;
+  reachedBefore: number;
 };
 
 export type TNewsletterPageResult = {
   pace: TNewsletterSendPace;
   lastId: TMaybeUndefined<string>;
   isLastPage: boolean;
+  reachedCount: number;
   sentCount: number;
   unreadableCount: number;
 };
@@ -44,33 +49,25 @@ export async function sendNewsletterPage(
 ): Promise<TNewsletterPageResult> {
   'use step';
 
-  const { tenantId, postId, afterId } = input;
+  const { tenantId, postId, claimedAt, afterId, reachedBefore } = input;
   const stopped = {
     pace: NEWSLETTER_SEND_PACE.STOPPED,
     lastId: afterId,
     isLastPage: true,
+    reachedCount: reachedBefore,
     sentCount: 0,
     unreadableCount: 0,
   };
   const tenant = await loadTenant(tenantId);
-  if (
-    (await getNewsletterPausedAt(tenantId)) ||
-    !(await isSiteSendingPosts(tenant))
-  ) {
-    await markNewsletterPostSkipped(
-      tenantId,
-      postId,
-      NEWSLETTER_SKIP_REASON.SITE_PAUSED,
-    );
-    return stopped;
-  }
-
-  const pace = await readReputationPace(tenant, { isOperatorAlerted: false });
+  const stopReason = await readPageStopReason(tenantId);
+  const pace = stopReason
+    ? NEWSLETTER_SEND_PACE.STOPPED
+    : await readReputationPace(tenant, { isOperatorAlerted: false });
   if (pace === NEWSLETTER_SEND_PACE.STOPPED) {
     await markNewsletterPostSkipped(
       tenantId,
       postId,
-      NEWSLETTER_SKIP_REASON.REPUTATION_STOP,
+      stopReason ?? NEWSLETTER_SKIP_REASON.REPUTATION_STOP,
     );
     return stopped;
   }
@@ -85,11 +82,19 @@ export async function sendNewsletterPage(
     if (index > 0) await wait(NEWSLETTER_SEND_INTERVAL_MS);
     sends.push(await sendToSubscriber(input, context, subscriber));
   }
+  const reachedCount = reachedBefore + subscribers.length;
+  await setNewsletterPostSendProgress(
+    tenantId,
+    postId,
+    new Date(claimedAt),
+    reachedCount,
+  );
 
   return {
     pace,
     lastId: subscribers.at(-1)?.id ?? afterId,
     isLastPage: subscribers.length < NEWSLETTER_SEND_PAGE_SIZE,
+    reachedCount,
     sentCount: countOf(sends, NEWSLETTER_SUBSCRIBER_SEND.SENT),
     unreadableCount: countOf(sends, NEWSLETTER_SUBSCRIBER_SEND.UNREADABLE),
   };

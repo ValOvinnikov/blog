@@ -6,9 +6,9 @@ import {
   type TPlanChangeRefusalCode,
 } from '@platform/constants/plan-change';
 import { logger } from '@platform/utils/logger/logger';
-import { nextSubscriberBand } from '@platform/utils/next-subscriber-band/next-subscriber-band';
 import type { TMaybeUndefined } from '@shinefold/config';
 import type { TPaidSubscriberBandCeiling } from '@shinefold/db/constants';
+import { nextSubscriberBand } from '@shinefold/db/utils/next-subscriber-band/next-subscriber-band';
 import { bandKeyFor } from '@shinefold/db/utils/price-lookup-key/price-lookup-key';
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
 

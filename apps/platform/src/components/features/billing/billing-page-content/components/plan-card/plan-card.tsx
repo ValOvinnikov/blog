@@ -4,11 +4,14 @@ import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import type { TBillingNextPayment } from '@platform/server/billing/fetch-stripe-billing';
-import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import { richDate } from '@platform/utils/rich-date/rich-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
-import { SIZE, type TMaybeUndefined } from '@shinefold/config';
+import {
+  formatStripeAmount,
+  SIZE,
+  type TMaybeUndefined,
+} from '@shinefold/config';
 import type { TTenantPlan } from '@shinefold/config/constants';
 import type { TTenantStatus } from '@shinefold/db/constants';
 import { useLocale, useTranslations } from 'next-intl';

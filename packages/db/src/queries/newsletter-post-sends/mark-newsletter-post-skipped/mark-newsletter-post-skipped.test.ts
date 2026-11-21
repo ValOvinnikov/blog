@@ -80,6 +80,7 @@ describe(markNewsletterPostSkipped, () => {
     expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual(
       mockNewsletterPostSend({
         outcome: NEWSLETTER_POST_SEND_OUTCOME.SENT,
+        recipientCount: 0,
         settledAt: MOCK_NOW,
       }),
     );

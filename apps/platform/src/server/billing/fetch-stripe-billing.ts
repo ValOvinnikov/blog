@@ -7,8 +7,7 @@ import {
   STRIPE_LIVE_SUBSCRIPTION_STATUSES,
   type TBilledInvoiceStatus,
 } from '@platform/constants/billing';
-import type { TStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
-import type { TMaybeUndefined } from '@shinefold/config';
+import { type TStripeAmount, type TMaybeUndefined } from '@shinefold/config';
 import { isOneOf } from '@shinefold/utils/primitives';
 import Stripe from 'stripe';
 

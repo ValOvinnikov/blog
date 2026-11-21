@@ -10,6 +10,7 @@ export const NEWSLETTER_SEND_LOG = {
   SEND_FAILED: 'newsletter_send.send_failed',
   OWNER_EMAIL_FAILED: 'newsletter_send.owner_email_failed',
   OWNER_EMAIL_MISSING: 'newsletter_send.owner_email_missing',
+  MOVE_UP_PRICE_FAILED: 'newsletter_send.move_up_price_failed',
   ALERT_NO_RECIPIENTS: 'newsletter_send.alert_no_recipients',
   ALERT_FAILED: 'newsletter_send.alert_failed',
   RUN_FAILED: 'newsletter_send.run_failed',
@@ -19,6 +20,7 @@ export const NEWSLETTER_POST_STATE = {
   READY: 'READY',
   SCHEDULED: 'SCHEDULED',
   CANCELLED: 'CANCELLED',
+  SKIPPED: 'SKIPPED',
   UNCLAIMED: 'UNCLAIMED',
 } as const;
 

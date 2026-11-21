@@ -8,6 +8,6 @@ export * from './release-newsletter-limit-notice';
 export * from './get-newsletter-sending-off-cause';
 export * from './set-newsletter-post-send-schedule';
 export * from './record-newsletter-post-send-start';
-export * from './add-newsletter-post-send-progress';
+export * from './set-newsletter-post-send-progress';
 export * from './start-newsletter-post-send-by-hand';
 export * from './get-latest-skipped-newsletter-post';

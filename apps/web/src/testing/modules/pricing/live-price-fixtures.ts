@@ -3,9 +3,7 @@ import { TENANT_PLAN } from '@shinefold/config/constants';
 import {
   BILLING_CURRENCY,
   STRIPE_COUPON_DURATION,
-  STRIPE_PRICE_LOOKUP_KEY,
 } from '@shinefold/db/constants';
-import type { TStripePrice } from '@shinefold/db/queries/stripe-catalogue/list-stripe-prices';
 import {
   MOCK_DOLLAR_AMOUNT,
   MOCK_EURO_AMOUNT,
@@ -52,16 +50,6 @@ export const mockLinkedPricingTier = (
     prices: [],
     ...overrides,
   });
-
-export const mockStripePrice = (
-  overrides: Partial<TStripePrice> = {},
-): TStripePrice => ({
-  lookupKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY,
-  currency: BILLING_CURRENCY.USD,
-  unitAmount: MOCK_DOLLAR_AMOUNT,
-  stripeProductId: MOCK_STRIPE_PRODUCT_ID,
-  ...overrides,
-});
 
 export const mockLivePlanPrice = (
   overrides: Partial<ILivePlanPrice> = {},

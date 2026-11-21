@@ -3,9 +3,8 @@
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
-import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import type { TMoveUpOffer } from '@platform/utils/move-up-offer/move-up-offer';
-import type { TMaybeUndefined } from '@shinefold/config';
+import { formatStripeAmount, type TMaybeUndefined } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { MoveUpBandDialog } from './components/move-up-band-dialog/move-up-band-dialog';

@@ -1,6 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { PRICE_PERIOD, SITE_MESSAGES } from '@shinefold/config';
-import { MOCK_DOLLAR_AMOUNT } from '@shinefold/db/testing/stripe-catalogue/fixtures';
+import {
+  mockStripePrice,
+  MOCK_DOLLAR_AMOUNT,
+} from '@shinefold/db/testing/stripe-catalogue/fixtures';
 import { errorResult, okResult } from '@shinefold/utils';
 import { PRICING_LOG } from '@web/constants/pricing';
 import { getPlanPrices } from '@web/server/pricing/get-plan-prices/get-plan-prices';
@@ -13,7 +16,6 @@ import {
   mockPricingTier,
 } from '@web/testing/modules/pricing/fixtures';
 import {
-  mockStripePrice,
   formatMockUnitAmount,
   mockLinkedPricingTier,
 } from '@web/testing/modules/pricing/live-price-fixtures';

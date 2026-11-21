@@ -1,4 +1,7 @@
-import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@shinefold/config';
+import {
+  LOCALE_BCP47_TAGS,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 
 const DECIMAL_BASE = 10;
 
