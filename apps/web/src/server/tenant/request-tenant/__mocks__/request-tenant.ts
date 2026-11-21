@@ -11,3 +11,7 @@ export const resolveRequestTenant = vi.fn<typeof TModule.resolveRequestTenant>(
 export const getRequestTenantId = vi.fn<typeof TModule.getRequestTenantId>(
   async () => MOCK_TENANT_ID,
 );
+
+export const isRequestHostPlatformFallback = vi.fn<
+  typeof TModule.isRequestHostPlatformFallback
+>(async () => true);

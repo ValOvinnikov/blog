@@ -6,7 +6,7 @@ import {
   getPlatformSanityContext,
   type TTenantSanityContext,
 } from '@shinefold/service';
-import { isPlatformFallbackAllowed } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { notFound } from 'next/navigation';
 
 /** A draft preview reads only the tenant's own project, never the platform fallback. */
@@ -24,7 +24,7 @@ export const toSanityContext = (
       : credentials;
   }
 
-  if (isDraftPreview || !isPlatformFallbackAllowed()) {
+  if (isDraftPreview || isProductionEnvironment()) {
     notFound();
   }
   return getPlatformSanityContext();

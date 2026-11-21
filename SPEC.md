@@ -1572,7 +1572,9 @@ its `Host` header against `@shinefold/db`'s `tenant_domains`
 (`resolveTenantRouting()`, uncached, `apps/web/src/server/tenant/resolve-tenant/`), falling back to the
 sole `tenants` row outside production (`isProductionEnvironment()` — never
 `NODE_ENV`, which is `production` on every Vercel build including the live
-`web-dev` deployment) and 404ing on an unmatched host in production; the
+`web-dev` deployment) only for `localhost`, the `NEXT_PUBLIC_SITE_URL` host
+or a request with no `Host` header (`isPlatformFallbackHost()`), and 404ing
+on any other unmatched host; the
 resolved `tenantId` is threaded to Server Components/Actions via the
 `x-tenant-id` request header (unconditionally cleared before the conditional
 set, so a client-supplied value can never survive an unresolved lookup),

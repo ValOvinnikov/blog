@@ -5,7 +5,10 @@ import {
   type TLocaleIsoCode,
 } from '@shinefold/config';
 import { CACHE_CONTROL } from '@web/constants/http';
-import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import {
+  isRequestHostPlatformFallback,
+  resolveRequestTenant,
+} from '@web/server/tenant/request-tenant/request-tenant';
 import { selectTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { mockTenant } from '@web/testing/shared/tenant/fixtures';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
@@ -15,17 +18,12 @@ faker.seed(6009);
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const { isPlatformFallbackAllowedMock, getTenantTranslationMapMock } =
-  vi.hoisted(() => ({
-    isPlatformFallbackAllowedMock: vi.fn(),
-    getTenantTranslationMapMock: vi.fn(),
-  }));
+const { getTenantTranslationMapMock } = vi.hoisted(() => ({
+  getTenantTranslationMapMock: vi.fn(),
+}));
 
 vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales');
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
-vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
-  isPlatformFallbackAllowed: isPlatformFallbackAllowedMock,
-}));
 vi.mock(
   '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map',
   () => ({ getTenantTranslationMap: getTenantTranslationMapMock }),
@@ -74,8 +72,7 @@ const serveTenant = (liveLocales: TLocaleIsoCode[]) => {
 
 describe(GET, () => {
   beforeEach(() => {
-    isPlatformFallbackAllowedMock.mockReset();
-    isPlatformFallbackAllowedMock.mockReturnValue(false);
+    vi.mocked(isRequestHostPlatformFallback).mockResolvedValue(false);
     getTenantTranslationMapMock.mockReset();
     getTenantTranslationMapMock.mockResolvedValue(translationMap);
     serveTenant([EN, NL, FR]);

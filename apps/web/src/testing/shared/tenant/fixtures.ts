@@ -21,6 +21,10 @@ const MOCK_TENANT_CREATED_AT = mockFaker.date.past();
 
 export const MOCK_TENANT_HOST = 'tenant.example.com';
 
+export const MOCK_LOCAL_HOSTNAME = 'localhost';
+
+export const MOCK_LOCAL_HOST = `${MOCK_LOCAL_HOSTNAME}:3000`;
+
 export const MOCK_TENANT_BASE_URL = 'https://example.com';
 
 export const MOCK_TENANT_SANITY_CONTEXT: TTenantSanityContext = {

@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@shinefold/config';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   TENANT_ID_HEADER,
@@ -7,13 +8,14 @@ import {
   resolveTenant,
   resolveTenantById,
 } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import { isPlatformFallbackHost } from '@web/utils/is-platform-fallback-host';
 import { isValidTenantId } from '@web/utils/is-tenant-shaped-path-segment';
 import { headers } from 'next/headers';
 import { cache } from 'react';
 
 /** `proxy.ts` leaves `x-tenant-id` unsanitised on most `/api/*` and dotted paths, so it is never trusted here. */
 export const resolveRequestTenant = cache(
-  async (tenant?: string): Promise<TTenant | undefined> => {
+  async (tenant?: string): Promise<TMaybeUndefined<TTenant>> => {
     if (tenant === UNRESOLVED_TENANT_PLACEHOLDER) return undefined;
     if (tenant) return resolveTenantById(tenant);
 
@@ -26,7 +28,7 @@ export const resolveRequestTenant = cache(
  * Preferring `tenant` over the header avoids the header read, which makes a route dynamic.
  */
 export const getRequestTenantId = cache(
-  async (tenant?: string): Promise<string | undefined> => {
+  async (tenant?: string): Promise<TMaybeUndefined<string>> => {
     if (tenant === UNRESOLVED_TENANT_PLACEHOLDER) return undefined;
     if (tenant) return isValidTenantId(tenant) ? tenant : undefined;
 
@@ -37,4 +39,8 @@ export const getRequestTenantId = cache(
     }
     return headerTenantId;
   },
+);
+
+export const isRequestHostPlatformFallback = cache(async (): Promise<boolean> =>
+  isPlatformFallbackHost((await headers()).get('host')),
 );

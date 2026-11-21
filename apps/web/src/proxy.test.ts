@@ -6,6 +6,7 @@ import {
   routes,
   SITE_MESSAGES_BY_LOCALE,
   type TLocaleIsoCode,
+  type TMaybeNull,
 } from '@shinefold/config';
 import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
 import { SUSPENSION_REASON, TENANT_STATUS } from '@shinefold/db/constants';
@@ -31,6 +32,7 @@ import { CACHE_CONTROL_HEADER } from '@web/testing/shared/http/constants';
 import { MOCK_TAG_SLUG } from '@web/testing/shared/tag/fixtures';
 import {
   MOCK_TENANT_BASE_URL,
+  MOCK_LOCAL_HOST,
   MOCK_TENANT_HOST,
   MOCK_TENANT_ID,
   mockTenant,
@@ -200,7 +202,7 @@ const visit = (
     headers = {},
     method = HTTP_METHOD.GET,
   }: {
-    host?: string | null;
+    host?: TMaybeNull<string>;
     headers?: Record<string, string>;
     method?: string;
   } = {},
@@ -587,8 +589,8 @@ describe(proxy, () => {
         resolveTenantRoutingMock.mockResolvedValue(undefined);
       });
 
-      it('serves a placeholder tenant segment outside production', async () => {
-        const response = await visit(BLOG_PATH, { host: MOCK_UNKNOWN_HOST });
+      it('serves a placeholder tenant segment on localhost outside production', async () => {
+        const response = await visit(BLOG_PATH, { host: MOCK_LOCAL_HOST });
 
         expect(response.headers.get(REWRITE_HEADER)).toBe(
           `${MOCK_TENANT_BASE_URL}/${UNRESOLVED_TENANT_PLACEHOLDER}/${EN}${BLOG_PATH}`,
@@ -597,21 +599,24 @@ describe(proxy, () => {
 
       it('drops a client-supplied tenant header outside production', async () => {
         const response = await visit(BLOG_PATH, {
-          host: MOCK_UNKNOWN_HOST,
+          host: MOCK_LOCAL_HOST,
           headers: { [TENANT_ID_HEADER]: MOCK_SPOOFED_TENANT_ID },
         });
 
         expect(response.headers.get(FORWARDED_TENANT_HEADER)).toBeNull();
       });
 
-      it('answers not found in production', async () => {
-        useProductionDataset(true);
+      it.each([false, true])(
+        'answers not found for any other host with production %s',
+        async (isProduction) => {
+          useProductionDataset(isProduction);
 
-        const response = await visit(BLOG_PATH, { host: MOCK_UNKNOWN_HOST });
+          const response = await visit(BLOG_PATH, { host: MOCK_UNKNOWN_HOST });
 
-        expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
-        expect(response.headers.get(REWRITE_HEADER)).toBeNull();
-      });
+          expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
+          expect(response.headers.get(REWRITE_HEADER)).toBeNull();
+        },
+      );
 
       it('does not log the unmatched host', async () => {
         await visit(BLOG_PATH, { host: MOCK_UNKNOWN_HOST });
