@@ -147,7 +147,75 @@
         "metaTitle": "Projet d’exemple deux — une autre étude de cas",
         "metaDescription": "Une deuxième étude de cas d’exemple créée avec votre site. Remplacez-la par votre travail, ou supprimez-la."
       }
-    ]
+    ],
+    "growth": {
+      "highlights": {
+        "heading": "Ma façon de travailler",
+        "imageAlt": "Illustration d'exemple à remplacer par une image de votre travail",
+        "rows": [
+          {
+            "heading": "Partir du brief",
+            "body": [
+              "Chaque projet commence par savoir à qui il s'adresse et à quoi ressemble la réussite. Remplacez ce texte par votre propre point de départ."
+            ]
+          },
+          {
+            "heading": "Montrer le résultat",
+            "body": [
+              "Associez chaque point à une image du travail terminé. Remplacez l'image d'exemple par une capture ou une photo à vous."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Ils m'ont fait confiance",
+        "logoNames": [
+          "Client d'exemple un",
+          "Client d'exemple deux",
+          "Client d'exemple trois",
+          "Client d'exemple quatre"
+        ]
+      },
+      "timeline": {
+        "heading": "Parcours",
+        "items": [
+          {
+            "marker": "2018",
+            "heading": "Lancement à mon compte",
+            "body": "Remplacez chaque étape par un moment de votre propre carrière."
+          },
+          {
+            "marker": "2021",
+            "heading": "Premier client régulier",
+            "body": "Dites ce qui a changé et ce que vous avez appris."
+          },
+          {
+            "marker": "Aujourd'hui",
+            "heading": "Ouvert aux projets",
+            "body": "Terminez par votre situation actuelle et ce que vous recherchez."
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Ce qu'en disent mes clients",
+        "quotes": [
+          {
+            "name": "Client d'exemple",
+            "role": "Fondatrice, Studio d'exemple",
+            "quote": [
+              "Remplacez ce texte par la citation d'une personne avec qui vous avez travaillé. Une phrase ou deux sur le résultat suffisent."
+            ]
+          },
+          {
+            "name": "Autre client d'exemple",
+            "role": "Responsable marketing, Société d'exemple",
+            "quote": [
+              "Ajoutez un second témoignage, idéalement sur un autre type de projet."
+            ]
+          }
+        ]
+      }
+    }
   },
   "personal": {
     "hero": {
@@ -190,6 +258,45 @@
     "writing": {
       "linkLabel": "Écrits",
       "listHeading": "Tous les articles"
+    },
+    "growth": {
+      "timeline": {
+        "heading": "Mon parcours",
+        "items": [
+          {
+            "marker": "2016",
+            "heading": "Fin de mes études",
+            "body": "Remplacez chaque étape par un moment de votre propre histoire."
+          },
+          {
+            "marker": "2019",
+            "heading": "Trouver ma voie",
+            "body": "Dites ce qui vous a mené au métier que vous exercez."
+          },
+          {
+            "marker": "Aujourd'hui",
+            "heading": "Où j'en suis",
+            "body": "Terminez par ce sur quoi vous travaillez et la suite."
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "Ce que je propose",
+        "features": [
+          {
+            "heading": "Écriture",
+            "supportingText": "Remplacez ce texte par l'un de vos points forts."
+          },
+          {
+            "heading": "Idées",
+            "supportingText": "Ajoutez un deuxième point fort, en une phrase."
+          },
+          {
+            "heading": "Collaboration",
+            "supportingText": "Terminez par votre façon de travailler avec les autres."
+          }
+        ]
+      }
     }
   },
   "docs": {
@@ -343,6 +450,88 @@
       ],
       "metaTitle": "Contact — comment nous joindre et quand nous répondons",
       "metaDescription": "Une page de contact d'exemple créée avec votre site. Ajoutez votre e-mail, votre téléphone et vos horaires."
+    },
+    "growth": {
+      "featureList": {
+        "heading": "Nos services",
+        "features": [
+          {
+            "heading": "Conseil",
+            "supportingText": "Remplacez ce texte par l'un de vos principaux services, en une phrase."
+          },
+          {
+            "heading": "Réalisation",
+            "supportingText": "Ajoutez un deuxième service et à qui il s'adresse."
+          },
+          {
+            "heading": "Accompagnement",
+            "supportingText": "Terminez par la façon dont vous suivez vos clients une fois le travail livré."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "En chiffres",
+        "footnote": "Chiffres d'exemple. Remplacez-les par les vôtres.",
+        "stats": [
+          {
+            "value": "10+",
+            "label": "Années d'activité"
+          },
+          {
+            "value": "250",
+            "label": "Projets livrés"
+          },
+          {
+            "value": "98 %",
+            "label": "Clients fidèles"
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Ils nous font confiance",
+        "logoNames": [
+          "Client d'exemple un",
+          "Client d'exemple deux",
+          "Client d'exemple trois",
+          "Client d'exemple quatre"
+        ]
+      },
+      "team": {
+        "heading": "L'équipe",
+        "members": [
+          {
+            "name": "Membre d'exemple",
+            "role": "Fondateur"
+          },
+          {
+            "name": "Autre membre",
+            "role": "Cheffe de projet"
+          },
+          {
+            "name": "Troisième membre",
+            "role": "Service client"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Ce qu'en disent nos clients",
+        "quotes": [
+          {
+            "name": "Client d'exemple",
+            "role": "Directrice, Société d'exemple",
+            "quote": [
+              "Remplacez ce texte par la citation d'un client satisfait. Une phrase ou deux sur le résultat suffisent."
+            ]
+          },
+          {
+            "name": "Autre client d'exemple",
+            "role": "Gérant, Boutique d'exemple",
+            "quote": [
+              "Ajoutez un second témoignage, idéalement d'un autre type de client."
+            ]
+          }
+        ]
+      }
     }
   },
   "product": {

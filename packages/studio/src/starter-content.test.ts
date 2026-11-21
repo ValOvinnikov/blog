@@ -1,9 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { validateDocument, type ValidationClient } from '@sanity/validation';
-import { buildStarterDocuments } from '@shinefold/config';
+import { buildGrowthLayer, buildStarterDocuments } from '@shinefold/config';
 import {
   LOCALE_ISO_CODES,
   SITE_TYPE,
+  STARTER_PLACEHOLDER_IMAGE,
   type TLocaleIsoCode,
 } from '@shinefold/config/constants';
 import { siteSettingsSchema } from '@shinefold/studio/schema-types/documents/settings/site-settings/site-settings';
@@ -30,6 +31,11 @@ const MOCK_REVISION = faker.string.alphanumeric(12);
 const MOCK_PROJECT_ID = faker.string.alphanumeric(8);
 const MOCK_DATASET = faker.lorem.word();
 const MOCK_TITLE = faker.lorem.words(2);
+
+const MOCK_PLACEHOLDER_IMAGES = {
+  [STARTER_PLACEHOLDER_IMAGE.LOGO]: `image-${faker.string.hexadecimal({ length: 40, prefix: '' })}-240x80-svg`,
+  [STARTER_PLACEHOLDER_IMAGE.ILLUSTRATION]: `image-${faker.string.hexadecimal({ length: 40, prefix: '' })}-1200x900-svg`,
+};
 
 const STARTER_SITE_TYPES = [
   SITE_TYPE.BLOG,
@@ -107,6 +113,37 @@ const buildDocuments = (
     publishedAt: MOCK_PUBLISHED_AT,
   });
 
+const withGrowthLayer = (
+  siteType: (typeof STARTER_SITE_TYPES)[number],
+  locale: TLocaleIsoCode,
+) => {
+  const layer = buildGrowthLayer({
+    siteType,
+    locale,
+    placeholderImages: MOCK_PLACEHOLDER_IMAGES,
+  });
+  if (isNull(layer)) return [];
+
+  const growthSlots = layer.homeSlots.map(({ slot }) => slot);
+  const starterDocuments = buildDocuments(siteType, locale).map((document) =>
+    document._type === 'template_home'
+      ? { ...document, modules: [...(document.modules ?? []), ...growthSlots] }
+      : document,
+  );
+  const dataset = [...starterDocuments, ...layer.documents];
+  const homeTemplate = starterDocuments.find(
+    ({ _type }) => _type === 'template_home',
+  )!;
+
+  return [homeTemplate, ...layer.documents].map((document) => ({
+    siteType,
+    _type: document._type,
+    _id: document._id,
+    document,
+    dataset,
+  }));
+};
+
 describe(buildStarterDocuments, () => {
   describe.each(Object.values(LOCALE_ISO_CODES))(
     'on a Studio whose default language is %s',
@@ -133,7 +170,8 @@ describe(buildStarterDocuments, () => {
           schema,
           client: createDatasetClient(dataset),
           getDocumentExists: async ({ id }) =>
-            dataset.some(({ _id }) => _id === id),
+            dataset.some(({ _id }) => _id === id) ||
+            Object.values(MOCK_PLACEHOLDER_IMAGES).includes(id),
         });
 
         return markers;
@@ -150,6 +188,9 @@ describe(buildStarterDocuments, () => {
           dataset,
         }));
       });
+      const growthCases = STARTER_SITE_TYPES.flatMap((siteType) =>
+        withGrowthLayer(siteType, defaultLocale),
+      );
 
       it.each(starterCases)(
         '$siteType $_type $_id passes Studio validation',
@@ -160,6 +201,24 @@ describe(buildStarterDocuments, () => {
 
       it.each(starterCases)(
         '$siteType $_type $_id seeds every array item as a member its field declares',
+        ({ document }) => {
+          const documentType = schema.get(document._type)!;
+
+          expect(
+            undeclaredArrayItems(documentType, document, document._id),
+          ).toEqual([]);
+        },
+      );
+
+      it.each(growthCases)(
+        '$siteType Growth $_type $_id passes Studio validation',
+        async ({ document, dataset }) => {
+          expect(await validateStarterDocument(document, dataset)).toEqual([]);
+        },
+      );
+
+      it.each(growthCases)(
+        '$siteType Growth $_type $_id seeds every array item as a member its field declares',
         ({ document }) => {
           const documentType = schema.get(document._type)!;
 

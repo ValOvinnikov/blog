@@ -36,6 +36,7 @@ import type {
   Template_topicIndex,
 } from '@shinefold/config/sanity/generated/types';
 
+import type { TGrowthDocumentUnion } from './growth-document';
 import type {
   TStarterDocument,
   TStarterTemplate,
@@ -54,17 +55,12 @@ export type TStarterPage<
 > = TStarterDocument<TPage, 'title' | 'headingBlock' | 'template' | 'seo'>;
 
 export type TStarterModule<
-  TModule extends
-    | Module_heroBlog
-    | Module_heroProfile
-    | Module_heroStatement
-    | Module_content
-    | Module_sectionPages
-    | Module_postLatest
-    | Module_postList
-    | Module_taxonomyList
-    | Module_faq
-    | Module_cta,
+  TModule extends {
+    _id: string;
+    _type: `module_${string}`;
+    title?: string;
+    brandVariant?: string;
+  },
 > = TStarterDocument<TModule, 'title' | 'brandVariant'>;
 
 export type TStarterPost = TStarterDocument<
@@ -116,4 +112,5 @@ export type TStarterDocumentUnion =
   | TStarterModule<Module_content>
   | TStarterModule<Module_sectionPages>
   | TStarterModule<Module_faq>
-  | TStarterDocument<Block_faq, 'title' | 'question' | 'answer'>;
+  | TStarterDocument<Block_faq, 'title' | 'question' | 'answer'>
+  | TGrowthDocumentUnion;

@@ -147,7 +147,75 @@
         "metaTitle": "Beispielprojekt zwei — noch eine Fallstudie zum Ersetzen",
         "metaDescription": "Eine zweite Beispiel-Fallstudie, die mit deiner Website erstellt wurde. Ersetze oder lösche sie."
       }
-    ]
+    ],
+    "growth": {
+      "highlights": {
+        "heading": "So arbeite ich",
+        "imageAlt": "Platzhalterillustration, die du durch ein Bild deiner Arbeit ersetzt",
+        "rows": [
+          {
+            "heading": "Mit dem Briefing beginnen",
+            "body": [
+              "Jedes Projekt beginnt mit der Frage, für wen es ist und wie Erfolg aussieht. Ersetze diesen Text durch deinen eigenen Einstieg."
+            ]
+          },
+          {
+            "heading": "Das Ergebnis zeigen",
+            "body": [
+              "Stelle jedem Punkt ein Bild der fertigen Arbeit zur Seite. Ersetze den Platzhalter durch einen eigenen Screenshot oder ein Foto."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Kunden, mit denen ich gearbeitet habe",
+        "logoNames": [
+          "Beispielkunde eins",
+          "Beispielkunde zwei",
+          "Beispielkunde drei",
+          "Beispielkunde vier"
+        ]
+      },
+      "timeline": {
+        "heading": "Werdegang",
+        "items": [
+          {
+            "marker": "2018",
+            "heading": "Selbstständig gemacht",
+            "body": "Ersetze jeden Meilenstein durch einen Schritt deiner eigenen Laufbahn."
+          },
+          {
+            "marker": "2021",
+            "heading": "Erster Stammkunde",
+            "body": "Erzähle, was sich verändert hat und was du gelernt hast."
+          },
+          {
+            "marker": "Heute",
+            "heading": "Offen für neue Projekte",
+            "body": "Schließe damit, wo du heute stehst und was du suchst."
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Was Kunden sagen",
+        "quotes": [
+          {
+            "name": "Beispielkunde",
+            "role": "Gründerin, Beispielstudio",
+            "quote": [
+              "Ersetze diesen Text durch ein Zitat von jemandem, mit dem du gearbeitet hast. Ein oder zwei Sätze zum Ergebnis lesen sich am besten."
+            ]
+          },
+          {
+            "name": "Weiterer Beispielkunde",
+            "role": "Marketingleiter, Beispielfirma",
+            "quote": [
+              "Füge eine zweite Stimme hinzu, am besten zu einer anderen Art von Projekt."
+            ]
+          }
+        ]
+      }
+    }
   },
   "personal": {
     "hero": {
@@ -190,6 +258,45 @@
     "writing": {
       "linkLabel": "Texte",
       "listHeading": "Alle Beiträge"
+    },
+    "growth": {
+      "timeline": {
+        "heading": "Mein bisheriger Weg",
+        "items": [
+          {
+            "marker": "2016",
+            "heading": "Studium abgeschlossen",
+            "body": "Ersetze jeden Meilenstein durch einen Schritt deiner eigenen Geschichte."
+          },
+          {
+            "marker": "2019",
+            "heading": "Mein Fach gefunden",
+            "body": "Erzähle, was dich zu deiner heutigen Arbeit geführt hat."
+          },
+          {
+            "marker": "Heute",
+            "heading": "Wo ich jetzt stehe",
+            "body": "Schließe damit, woran du arbeitest und was als Nächstes kommt."
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "Wobei ich helfen kann",
+        "features": [
+          {
+            "heading": "Schreiben",
+            "supportingText": "Ersetze diesen Text durch etwas, das du gut kannst."
+          },
+          {
+            "heading": "Ideen",
+            "supportingText": "Füge in einem Satz eine zweite Stärke hinzu."
+          },
+          {
+            "heading": "Zusammenarbeit",
+            "supportingText": "Schließe damit, wie du gern mit anderen arbeitest."
+          }
+        ]
+      }
     }
   },
   "docs": {
@@ -343,6 +450,88 @@
       ],
       "metaTitle": "Kontakt — so erreichen Sie uns und wann wir antworten",
       "metaDescription": "Eine Beispielseite für den Kontakt, mit Ihrer Website erstellt. Fügen Sie E-Mail, Telefon und Öffnungszeiten hinzu."
+    },
+    "growth": {
+      "featureList": {
+        "heading": "Unser Angebot",
+        "features": [
+          {
+            "heading": "Beratung",
+            "supportingText": "Ersetze diesen Text in einem Satz durch eine deiner wichtigsten Leistungen."
+          },
+          {
+            "heading": "Umsetzung",
+            "supportingText": "Füge eine zweite Leistung hinzu und für wen sie gedacht ist."
+          },
+          {
+            "heading": "Betreuung",
+            "supportingText": "Schließe damit, wie du Kunden nach Projektende begleitest."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "In Zahlen",
+        "footnote": "Beispielzahlen. Ersetze sie durch deine eigenen.",
+        "stats": [
+          {
+            "value": "10+",
+            "label": "Jahre am Markt"
+          },
+          {
+            "value": "250",
+            "label": "Abgeschlossene Projekte"
+          },
+          {
+            "value": "98 %",
+            "label": "Wiederkehrende Kunden"
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Uns vertrauen",
+        "logoNames": [
+          "Beispielkunde eins",
+          "Beispielkunde zwei",
+          "Beispielkunde drei",
+          "Beispielkunde vier"
+        ]
+      },
+      "team": {
+        "heading": "Unser Team",
+        "members": [
+          {
+            "name": "Beispielmitglied",
+            "role": "Gründer"
+          },
+          {
+            "name": "Weiteres Teammitglied",
+            "role": "Projektleitung"
+          },
+          {
+            "name": "Drittes Teammitglied",
+            "role": "Kundenservice"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Was unsere Kunden sagen",
+        "quotes": [
+          {
+            "name": "Beispielkunde",
+            "role": "Geschäftsführerin, Beispielfirma",
+            "quote": [
+              "Ersetze diesen Text durch ein Zitat eines zufriedenen Kunden. Ein oder zwei Sätze zum Ergebnis lesen sich am besten."
+            ]
+          },
+          {
+            "name": "Weiterer Beispielkunde",
+            "role": "Inhaber, Beispielladen",
+            "quote": [
+              "Füge eine zweite Stimme hinzu, am besten von einer anderen Art Kunde."
+            ]
+          }
+        ]
+      }
     }
   },
   "product": {
