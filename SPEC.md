@@ -1394,7 +1394,8 @@ screens with a way back. The list loads 25 leads through `@shinefold/db`'s
 Server Action as its end scrolls near; there is no offset paging. Each lead
 carries a `readAt`, shared by the site's members: opening an unread lead marks
 it read and Mark unread clears it, both through a Server Action scoped to the
-session's tenant, and the sidebar shows the site's unread count beside Leads.
+session's tenant. The sidebar shows no unread count beside Leads: the shared
+layout reads it once per navigation, so it would go stale on every other page.
 The pane shows the stored path at once and then asks `apps/web` for the source
 page's current title: a `POST /api/internal/pages/{documentId}` carrying the
 tenant id and the lead's locale, signed with `@shinefold/utils`'s

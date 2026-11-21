@@ -247,7 +247,6 @@
     },
     "blockedSignups": "Inscriptions bloquées",
     "dataRequests": "Demandes de données",
-    "badgeUnreadLeads": "{count, plural, one {# nouveau} other {# nouveaux}}",
     "collapsedStatusTooltip": "{label} · {status}",
     "supportSectionLabel": "Assistance",
     "help": "Aide"
@@ -1916,9 +1915,10 @@
     "downgradedDescription": "Le formulaire de contact est inclus dans les formules Starter et Growth : plus aucun nouveau message n'arrive. Les messages déjà reçus sont conservés ici et vous pouvez toujours en supprimer."
   },
   "leadsInbox": {
-    "listLabel": "Messages",
     "empty": "Aucun message pour l'instant. Quand quelqu'un utilisera votre formulaire de contact, son message apparaîtra ici.",
     "unread": "Non lu",
+    "unreadGroup": "Non lus · {count}",
+    "earlierGroup": "Plus anciens",
     "yesterday": "Hier",
     "loadingMore": "Chargement d'autres messages…",
     "loadMoreFailed": "Impossible de charger d'autres messages. Réessayer",
@@ -1929,6 +1929,7 @@
     "email": "E-mail",
     "received": "Reçu",
     "page": "Page",
+    "messageHeading": "Message",
     "homePage": "Page d'accueil",
     "readStateFailed": "Impossible de mettre à jour le message. Réessayez."
   },

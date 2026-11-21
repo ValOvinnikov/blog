@@ -235,8 +235,8 @@ save still settles as the form's generic server error.
   soon" rows Subscribers NEWSLETTER and Team `GROWTH` only. There is no
   Comments entry.
   Their "Coming soon" pill is `neutral` with no dot, at the row's right edge,
-  in the sidebar and the phone Menu alike; Leads' unread count is a `brand`
-  pill with no dot.
+  in the sidebar and the phone Menu alike. Leads carries no pill: its unread
+  count would go stale while the owner moves between pages.
   The operator's tenant view (`EVERY_PLAN_PAGE`) always shows every page.
 - UI copy is next-intl, five message files (`en`, `de`, `es`, `fr`, `nl`). It
   is fixed platform copy and never [Voice](./voice.md).
@@ -505,12 +505,14 @@ save still settles as the form's generic server error.
   style tiles, preset picker cards, the preset grid) are `selected-tint`
   with a 1.5px `selected-line` border and a 1px `selected-edge` hairline
   (`SELECTED_CHOICE_CLASSES`), and a yellow tick (`SELECTED_TICK_CLASSES`).
-  Rows (preset rows, the selected lead, the current top-bar menu row) are
+  Rows (preset rows, the current top-bar menu row) are
   `selected-tint` with a 3px `selected-line` bar and a 1px `selected-edge`
   (`SELECTED_ROW_CLASSES`). The open accordion row is not selected: its
   title row takes `surface-head` with no frame, and the 3px bar
   (`SELECTED_STRIPE_CLASSES`) runs down the item, title and open panel; a
-  folded row hovers to `hover-tint`. A switch that is on has a
+  folded row hovers to `hover-tint`. The selected lead takes the same
+  open-row treatment on its own row — `surface-head`, the bar on its left
+  edge, no frame — and an unselected lead row hovers to `hover-tint`. A switch that is on has a
   `selected-tint` track with a `selected-edge` ring and a `switch-thumb-on`
   thumb (#12141a / #ffc233). Only small marks keep the solid `selected`
   fill with an `on-selected` tick: a checked checkbox, a tile's tick and the
@@ -543,7 +545,7 @@ save still settles as the form's generic server error.
   takes the tint and a `brand-ink` dashed border. A select keeps the
   field rule (a `brand-ink` border, no tint). Table, list, list-accordion,
   tenant picker, menu and sidebar rows keep their grey hover (a folded
-  row-accordion row takes `hover-tint`), and a
+  row-accordion row and an unselected lead row take `hover-tint`), and a
   selected, pressed, checked, current or open control does not change on
   hover. Disabled and `aria-disabled` controls take no hover.
 - Focus is one gapped ring on every control, built by
@@ -569,8 +571,10 @@ save still settles as the form's generic server error.
   that a clipping parent would cut off is drawn inset
   (`insetFocusRingClasses`, an inset shadow that stacks with a drop shadow):
   the data table's scroll region and its sort buttons, which fill their head
-  cell; lead rows and the current top-bar menu row (on `selected-tint` when
-  selected, the bar and edge drawn above the ring); row-accordion triggers
+  cell; the current top-bar menu row (on `selected-tint` when selected, the
+  bar and edge drawn above the ring); lead rows (on `surface`, or
+  `surface-head` when selected, the bar drawn over the row's left border,
+  clear of the ring); row-accordion triggers
   (on `surface`, or `surface-head` when open, the item's bar drawn above
   the ring); the current phone jump chip (on `selected-tint`);
   menu, select, tenant switcher and top-bar menu

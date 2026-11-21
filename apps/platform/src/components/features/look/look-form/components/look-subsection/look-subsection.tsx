@@ -1,4 +1,4 @@
-import { LookSubheading } from '@platform/components/features/look/look-form/components/look-subheading';
+import { Subheading } from '@platform/components/shared/subheading';
 import type { IWithChildren } from '@shinefold/config/react';
 import { useId } from 'react';
 
@@ -17,7 +17,7 @@ export const LookSubsection = ({ heading, children }: TLookSubsectionProps) => {
       aria-labelledby={headingId}
       className={lookSubsectionVariants()}
     >
-      <LookSubheading id={headingId}>{heading}</LookSubheading>
+      <Subheading id={headingId}>{heading}</Subheading>
       {children}
     </div>
   );
