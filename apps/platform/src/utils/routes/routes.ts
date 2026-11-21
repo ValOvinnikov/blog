@@ -1,3 +1,4 @@
+import { SUBSCRIBERS_SEARCH_PARAM } from '@platform/constants/subscribers';
 import { DRAFT_PREVIEW_SEGMENT } from '@platform/utils/draft-preview-routes/draft-preview-routes';
 import {
   ARCHIVED_PARAM_ON,
@@ -14,10 +15,6 @@ export const STUDIO_SEGMENT = 'studio';
 
 export const SIGN_IN_PATH = '/sign-in';
 
-/**
- * Single source of truth for apps/platform's own URL construction — never build
- * these paths inline elsewhere.
- */
 export const adminRoutes = {
   home: () => '/',
   signIn: (callbackUrl = '/') =>
@@ -79,6 +76,9 @@ export const adminRoutes = {
   dashboardLanguages: () => '/dashboard/languages',
   dashboardEmail: () => '/dashboard/email',
   dashboardLeads: () => '/dashboard/leads',
+  dashboardSubscribers: () => '/dashboard/subscribers',
+  dashboardSubscribersMovedUp: (ceiling: number) =>
+    `${adminRoutes.dashboardSubscribers()}?${new URLSearchParams({ [SUBSCRIBERS_SEARCH_PARAM.MOVED_UP]: String(ceiling) })}`,
   dashboardUpgrade: () => '/dashboard/upgrade',
   dashboardTeam: () => '/dashboard/team',
   dashboardBilling: () => '/dashboard/billing',

@@ -4,18 +4,31 @@ import {
   type TBillingGrace,
 } from '@platform/constants/billing';
 import type { TSubscribedPlan } from '@platform/server/billing/plan-from-price-keys';
-import type { TMaybeUndefined } from '@shinefold/config';
-import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
-import { TENANT_STATUS, type TTenantStatus } from '@shinefold/db/constants';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import {
+  TENANT_PLAN,
+  type TBillingInterval,
+  type TTenantPlan,
+} from '@shinefold/config/constants';
+import {
+  TENANT_STATUS,
+  type TBillingCurrency,
+  type TTenantStatus,
+} from '@shinefold/db/constants';
 
-export type TSubscriptionTenantState = TSubscribedPlan & {
+export type TSubscribedBilling = TSubscribedPlan & {
+  billingInterval: TMaybeNull<TBillingInterval>;
+  billingCurrency: TMaybeNull<TBillingCurrency>;
+};
+
+export type TSubscriptionTenantState = TSubscribedBilling & {
   status: TTenantStatus;
   grace: TBillingGrace;
 };
 
 export const tenantStateFromSubscription = (
   subscriptionStatus: string,
-  subscribed: TSubscribedPlan,
+  subscribed: TSubscribedBilling,
   currentPlan: TTenantPlan,
 ): TMaybeUndefined<TSubscriptionTenantState> => {
   switch (subscriptionStatus) {
@@ -37,6 +50,8 @@ export const tenantStateFromSubscription = (
       return {
         plan: TENANT_PLAN.FREE,
         subscriberBandCeiling: null,
+        billingInterval: null,
+        billingCurrency: null,
         status: TENANT_STATUS.ACTIVE,
         grace:
           currentPlan === TENANT_PLAN.FREE

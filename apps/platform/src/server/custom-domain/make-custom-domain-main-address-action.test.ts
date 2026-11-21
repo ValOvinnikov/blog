@@ -8,6 +8,7 @@ import { requireTenantMembership } from '@platform/server/auth/require-tenant-me
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
+  mockGrowthOwnerContext,
   mockOwnerContext,
   mockTenantDomainRows,
 } from '@platform/testing/custom-domain/fixtures';
@@ -73,19 +74,20 @@ const asTenant = (overrides: Partial<TTenant>) =>
 describe(makeCustomDomainMainAddressAction, () => {
   beforeEach(() => {
     mockedEnv.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
-    vi.mocked(requireTenantMembership)
-      .mockReset()
-      .mockResolvedValue(mockOwnerContext({ plan: TENANT_PLAN.GROWTH }));
-    vi.mocked(tenantDomains.listTenantDomains)
-      .mockReset()
-      .mockResolvedValue(mockTenantDomainRows());
-    vi.mocked(getProjectDomain).mockReset().mockResolvedValue({
+    vi.mocked(requireTenantMembership).mockResolvedValue(
+      mockGrowthOwnerContext(),
+    );
+    vi.mocked(tenantDomains.listTenantDomains).mockResolvedValue(
+      mockTenantDomainRows(),
+    );
+    vi.mocked(getProjectDomain).mockResolvedValue({
       status: DOMAIN_VERIFICATION_STATUS.VERIFIED,
       dnsRecords: [],
     });
-    vi.mocked(tenants.setTenantPrimaryDomain)
-      .mockReset()
-      .mockResolvedValue({ ok: true, data: mockTenant() });
+    vi.mocked(tenants.setTenantPrimaryDomain).mockResolvedValue({
+      ok: true,
+      data: mockTenant(),
+    });
   });
 
   it.each([

@@ -1,5 +1,6 @@
 import { SignInAppStatusBadge } from '@platform/components/features/sign-in-apps/sign-in-app-status-badge';
 import { SignInAppTitle } from '@platform/components/features/sign-in-apps/sign-in-app-title';
+import { useProviderName } from '@platform/utils/use-provider-name/use-provider-name';
 import type { TOAuthProvider } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 
@@ -8,8 +9,7 @@ export const useSignInAppCardHeader = (
   hasOwnApp: boolean,
 ) => {
   const t = useTranslations('signInAppsPage');
-  const tProvider = useTranslations('signInAppsPage.providerName');
-  const providerName = tProvider(provider);
+  const providerName = useProviderName()(provider);
 
   return {
     providerName,

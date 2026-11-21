@@ -1,7 +1,9 @@
+import { getStripeClient } from '@platform/server/billing/stripe-client';
 import {
   MOCK_PAYMENT_CLIENT_SECRET,
   MOCK_PAYMENT_INTENT_ID,
   MOCK_STRIPE_INVOICE_ID,
+  mockStripeInvoice,
 } from '@platform/testing/billing/fixtures';
 import {
   MOCK_PERIOD_END,
@@ -9,6 +11,10 @@ import {
   mockPrice,
 } from '@platform/testing/billing/plan-subscription';
 import { type TStripeCall } from '@platform/testing/billing/stripe-call';
+import {
+  mockStripeSubscription,
+  type TMockStripeSubscription,
+} from '@platform/testing/billing/stripe-subscription';
 import type Stripe from 'stripe';
 
 export const mockStripePlanChangeClient = (
@@ -32,6 +38,7 @@ export const mockStripePlanChangeClient = (
     releaseSchedule: vi.fn<TStripeCall>(async () => ({})),
     retrieveSchedule: vi.fn<TStripeCall>(async () => ({})),
     retrievePaymentIntent: vi.fn<TStripeCall>(async () => ({})),
+    createInvoicePreview: vi.fn<TStripeCall>(async () => mockStripeInvoice()),
   };
   const stripe = {
     subscriptions: {
@@ -40,6 +47,7 @@ export const mockStripePlanChangeClient = (
     },
     prices: { list: calls.listPrices },
     paymentIntents: { retrieve: calls.retrievePaymentIntent },
+    invoices: { createPreview: calls.createInvoicePreview },
     subscriptionSchedules: {
       create: calls.createSchedule,
       update: calls.updateSchedule,
@@ -69,4 +77,12 @@ export const mockStripePlanChangeClient = (
   };
 
   return { stripe, holdForPayment, ...calls };
+};
+
+export const mockStripeClientWithSubscription = (
+  overrides: TMockStripeSubscription = {},
+) => {
+  const client = mockStripePlanChangeClient(mockStripeSubscription(overrides));
+  vi.mocked(getStripeClient).mockReturnValue(client.stripe);
+  return client;
 };

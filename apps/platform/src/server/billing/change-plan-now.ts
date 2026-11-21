@@ -24,6 +24,7 @@ import type { TSubscriptionPlan } from './load-subscription-plan';
 import { releaseSchedule } from './release-schedule';
 import type { TTargetPrices } from './schedule-change-at-renewal';
 import { stripeIdOf } from './stripe-id';
+import { subscriptionItemsFor } from './subscription-items';
 
 type TPaymentConfirmation = { clientSecret: string };
 
@@ -35,23 +36,17 @@ export type TChangeNowResult =
 
 const updateItems = (
   stripe: Stripe,
-  { id, planItemId, bandItem }: TSubscriptionPlan,
+  subscription: TSubscriptionPlan,
   prices: TTargetPrices,
-) => {
-  const bandItems = bandItem
-    ? [
-        prices.band
-          ? { id: bandItem.id, price: prices.band }
-          : { id: bandItem.id, deleted: true },
-      ]
-    : [];
-  return stripe.subscriptions.update(id, {
-    items: [{ id: planItemId, price: prices.plan }, ...bandItems],
+  prorationDate: TMaybeUndefined<number>,
+) =>
+  stripe.subscriptions.update(subscription.id, {
+    items: subscriptionItemsFor(subscription, prices),
+    ...(prorationDate && { proration_date: prorationDate }),
     proration_behavior: STRIPE_PRORATION_BEHAVIOR.ALWAYS_INVOICE,
     payment_behavior: STRIPE_PAYMENT_BEHAVIOR.PENDING_IF_INCOMPLETE,
     expand: STRIPE_PENDING_PAYMENT_EXPAND,
   });
-};
 
 const releaseAfterChange = (
   stripe: Stripe,
@@ -111,11 +106,13 @@ export const changePlanNow = async (
   subscription: TSubscriptionPlan,
   prices: TTargetPrices,
   tenantId: string,
+  prorationDate?: number,
 ): Promise<TChangeNowResult> => {
   const { pending_update, latest_invoice, schedule } = await updateItems(
     stripe,
     subscription,
     prices,
+    prorationDate,
   );
   if (pending_update) {
     const invoice =

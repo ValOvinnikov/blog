@@ -374,8 +374,8 @@ except the Gate 0 `board-keeper` dispatch and the board write after
   constants live: `.claude/agents/config.md`.
 - **Read an action result through its outcome guards.** `@shinefold/config`'s
   `isOutcomeSuccess(result)`, `isOutcomeInvalid(result)`,
-  `isOutcomeServerError(result)`, `isOutcomeRefused(result)` and
-  `isOutcomeUnavailable(result)` take the whole result and narrow it — never
+  `isOutcomeServerError(result)`, `isOutcomeRefused(result)`,
+  `isOutcomeUnavailable(result)` and `isOutcomeRateLimited(result)` take the whole result and narrow it — never
   `result.outcome === ACTION_OUTCOME.<X>`. A guard for another outcome is
   added by the change that gives that check its second use, never ahead of
   it. Files still comparing raw outcomes, and what is left to add:

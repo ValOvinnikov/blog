@@ -1,12 +1,16 @@
 import type { TSignInAppView } from '@platform/server/sign-in-apps/load-sign-in-apps';
 import { MOCK_TENANT_URL } from '@platform/testing/tenants/fixtures';
-import { OAUTH_PROVIDER } from '@shinefold/config/constants';
+import {
+  OAUTH_PROVIDER,
+  type TOAuthProvider,
+} from '@shinefold/config/constants';
 import type { TTenantOAuthClient } from '@shinefold/db/queries/tenant-oauth-credentials';
 
 export const MOCK_CLIENT_ID = '1234567890-abcdefghij.apps.example.com';
 export const MOCK_MASKED_CLIENT_ID = '123456••••••••';
 export const MOCK_REPLACEMENT_CLIENT_ID = 'replacement-client-id';
 export const MOCK_CLIENT_SECRET = 'mock-client-secret';
+export const MOCK_UNKNOWN_PROVIDER = 'gitlab' as TOAuthProvider;
 export const MOCK_GOOGLE_CALLBACK_URL = `${MOCK_TENANT_URL}/api/auth/callback/google`;
 
 export const mockSignInAppsDb = () => ({

@@ -21,6 +21,7 @@ export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
       requireTenantMembership(id),
     ]);
 
+  const { brand } = toTenantEmailBrand(siteConfig);
   const liveLocales = queries.tenants.selectLiveLocalesWithin(
     tenant,
     tenant.entitlements,
@@ -46,7 +47,7 @@ export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
       tenant={{ id, locale, archivedAt }}
       initialDraft={initialDraft}
       liveLocales={liveLocales}
-      brand={toTenantEmailBrand(siteConfig)}
+      brand={brand}
       brandName={siteConfig?.brandName ?? name}
       savedAt={emailConfig?.updatedAt}
     />

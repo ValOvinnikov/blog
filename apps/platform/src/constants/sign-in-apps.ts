@@ -53,6 +53,16 @@ export const SIGN_IN_APPS_MODE = {
 
 export type TSignInAppsMode = TValueOf<typeof SIGN_IN_APPS_MODE>;
 
+export const SIGN_IN_APPS_CALLBACK_WARNING_MODES: readonly TSignInAppsMode[] = [
+  SIGN_IN_APPS_MODE.EDIT,
+  SIGN_IN_APPS_MODE.READ_ONLY,
+];
+
+export const SIGN_IN_APPS_READ_ONLY_CARD_MODES: readonly TSignInAppsMode[] = [
+  SIGN_IN_APPS_MODE.READ_ONLY,
+  SIGN_IN_APPS_MODE.OPERATOR,
+];
+
 export const OAUTH_PROVIDER_ICON = {
   [OAUTH_PROVIDER.GOOGLE]: ICONS.GOOGLE,
   [OAUTH_PROVIDER.GITHUB]: ICONS.GITHUB,
