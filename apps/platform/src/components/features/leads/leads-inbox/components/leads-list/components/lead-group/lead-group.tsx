@@ -1,8 +1,9 @@
+import type { TLeadSelection } from '@platform/components/features/leads/leads-inbox/use-lead-selection';
 import type { TLeadsLoading } from '@platform/components/features/leads/leads-inbox/use-leads-pages';
 import { Card } from '@platform/components/shared/card';
+import { SectionLabel } from '@platform/components/shared/section-label';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
-import type { TMaybeUndefined } from '@shinefold/config';
-import { type Ref, useId } from 'react';
+import { useId } from 'react';
 
 import { LeadRow } from './components/lead-row';
 import { LoadMoreFooter } from './components/load-more-footer';
@@ -11,28 +12,23 @@ import { leadGroupVariants } from './lead-group-variants';
 export type TLeadGroupProps = {
   title: string;
   leads: TInboxLead[];
-  selectedId: TMaybeUndefined<string>;
-  rowRef: (leadId: string) => Ref<HTMLButtonElement>;
-  onOpen: (lead: TInboxLead) => void;
+  selection: TLeadSelection;
   loading?: TLeadsLoading;
 };
 
 export const LeadGroup = ({
   title,
   leads,
-  selectedId,
-  rowRef,
-  onOpen,
+  selection,
   loading,
 }: TLeadGroupProps) => {
   const labelId = useId();
-  const { root, label, list } = leadGroupVariants();
+  const { selectedId, rowRef, open } = selection;
+  const { root, list } = leadGroupVariants();
 
   return (
     <div className={root()}>
-      <p id={labelId} className={label()}>
-        {title}
-      </p>
+      <SectionLabel id={labelId}>{title}</SectionLabel>
       <Card>
         <ul className={list()} aria-labelledby={labelId}>
           {leads.map((lead) => (
@@ -41,7 +37,7 @@ export const LeadGroup = ({
                 ref={rowRef(lead.id)}
                 lead={lead}
                 isSelected={lead.id === selectedId}
-                onOpen={onOpen}
+                onOpen={open}
               />
             </li>
           ))}

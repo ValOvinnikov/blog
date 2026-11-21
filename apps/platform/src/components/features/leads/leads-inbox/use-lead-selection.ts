@@ -57,10 +57,7 @@ export const useLeadSelection = ({
   ) => {
     updateLead(id, { isRead });
     const result = await settleAction(setLeadReadAction(tenantId, id, isRead));
-    if (isOutcomeSuccess(result)) {
-      router.refresh();
-      return;
-    }
+    if (isOutcomeSuccess(result)) return;
     updateLead(id, { isRead: wasRead });
     toast.error({ message: t('readStateFailed') });
   };
@@ -89,13 +86,13 @@ export const useLeadSelection = ({
   };
 
   return {
-    selectedId,
+    selection: { selectedId, rowRef, open },
     paneHeadingRef,
     listRef,
-    rowRef,
-    open,
     markUnread,
     close,
     handleDeleted,
   };
 };
+
+export type TLeadSelection = ReturnType<typeof useLeadSelection>['selection'];

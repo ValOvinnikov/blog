@@ -1,11 +1,10 @@
+import type { TLeadSelection } from '@platform/components/features/leads/leads-inbox/use-lead-selection';
 import type { TLeadsLoading } from '@platform/components/features/leads/leads-inbox/use-leads-pages';
 import { Card } from '@platform/components/shared/card';
 import { Text } from '@platform/components/shared/text';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
-import type { TMaybeUndefined } from '@shinefold/config';
 import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
-import type { Ref } from 'react';
 
 import { LeadGroup } from './components/lead-group';
 import { leadsListVariants } from './leads-list-variants';
@@ -14,18 +13,14 @@ import { useLoadMoreSentinel } from './use-load-more-sentinel';
 export type TLeadsListProps = {
   unreadLeads: TInboxLead[];
   earlierLeads: TInboxLead[];
-  selectedId: TMaybeUndefined<string>;
-  rowRef: (leadId: string) => Ref<HTMLButtonElement>;
-  onOpen: (lead: TInboxLead) => void;
+  selection: TLeadSelection;
   loading: TLeadsLoading;
 };
 
 export const LeadsList = ({
   unreadLeads,
   earlierLeads,
-  selectedId,
-  rowRef,
-  onOpen,
+  selection,
   loading,
 }: TLeadsListProps) => {
   const t = useTranslations('leadsInbox');
@@ -49,8 +44,6 @@ export const LeadsList = ({
     );
   }
 
-  const groupProps = { selectedId, rowRef, onOpen };
-
   return (
     <>
       <div className={groups()}>
@@ -59,7 +52,7 @@ export const LeadsList = ({
             title={t('unreadGroup', { count: unreadLeads.length })}
             leads={unreadLeads}
             loading={hasEarlier ? undefined : loading}
-            {...groupProps}
+            selection={selection}
           />
         )}
         {hasEarlier && (
@@ -67,7 +60,7 @@ export const LeadsList = ({
             title={t('earlierGroup')}
             leads={earlierLeads}
             loading={loading}
-            {...groupProps}
+            selection={selection}
           />
         )}
       </div>

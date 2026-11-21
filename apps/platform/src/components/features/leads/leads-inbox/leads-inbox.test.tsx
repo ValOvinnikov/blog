@@ -87,7 +87,6 @@ const getEarlierGroup = () =>
 
 describe(`<${LeadsInbox.name}/>`, () => {
   let user: UserEvent;
-  let refresh: ReturnType<typeof mockRouterRefresh>;
 
   const deleteLead = async (name: string) => {
     const row = getRow(name);
@@ -104,7 +103,7 @@ describe(`<${LeadsInbox.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    refresh = mockRouterRefresh();
+    mockRouterRefresh();
     vi.mocked(setLeadReadAction).mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
@@ -152,8 +151,7 @@ describe(`<${LeadsInbox.name}/>`, () => {
 
         const error = await screen.findByText(leadsInbox.readStateFailed);
         expect(error).toBeVisible();
-        expect(row).toHaveTextContent(leadsInbox.unread);
-        expect(refresh).not.toHaveBeenCalled();
+        expect(getRow(MOCK_LEAD_NAME)).toHaveTextContent(leadsInbox.unread);
       },
     );
 
@@ -183,10 +181,6 @@ describe(`<${LeadsInbox.name}/>`, () => {
           expect.stringContaining(MOCK_LEAD_NAME),
         );
         expect(earlierRow).not.toHaveTextContent(leadsInbox.unread);
-      });
-
-      it('refreshes the sidebar count', async () => {
-        await waitFor(() => expect(refresh).toHaveBeenCalledTimes(1));
       });
 
       it('shows the message in the reading pane under its own heading', () => {

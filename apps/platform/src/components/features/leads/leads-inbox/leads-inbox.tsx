@@ -19,11 +19,9 @@ export const LeadsInbox = ({ initialPage }: TLeadsInboxProps) => {
   const unreadLeads = leads.filter(({ isRead }) => !isRead);
   const earlierLeads = leads.filter(({ isRead }) => isRead);
   const {
-    selectedId,
+    selection,
     paneHeadingRef,
     listRef,
-    rowRef,
-    open,
     markUnread,
     close,
     handleDeleted,
@@ -32,7 +30,7 @@ export const LeadsInbox = ({ initialPage }: TLeadsInboxProps) => {
     updateLead,
     removeLead,
   });
-  const selectedLead = leads.find(({ id }) => id === selectedId);
+  const selectedLead = leads.find(({ id }) => id === selection.selectedId);
   const { root, listColumn, paneColumn } = leadsInboxVariants({
     hasSelection: !isUndefined(selectedLead),
   });
@@ -48,9 +46,7 @@ export const LeadsInbox = ({ initialPage }: TLeadsInboxProps) => {
         <LeadsList
           unreadLeads={unreadLeads}
           earlierLeads={earlierLeads}
-          selectedId={selectedId}
-          rowRef={rowRef}
-          onOpen={open}
+          selection={selection}
           loading={loading}
         />
       </div>
