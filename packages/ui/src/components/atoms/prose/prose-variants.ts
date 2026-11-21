@@ -1,19 +1,6 @@
-import { SIZE } from '@shinefold/config';
-import { tv } from '@shinefold/ui/lib/styling';
-import type { VariantProps } from 'tailwind-variants';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const proseVariants = tv({
-  base: ['font-read text-text', 'leading-[1.7]', '[&>:where(p+p)]:mt-4'],
-  variants: {
-    size: {
-      [SIZE.SM]: 'text-sm',
-      [SIZE.MD]: 'text-prose',
-      [SIZE.LG]: 'text-lg',
-    },
-  },
-  defaultVariants: {
-    size: SIZE.MD,
-  },
+  base: [TYPOGRAPHY[TEXT_ROLE.BODY], '[&>:where(p+p)]:mt-4'],
 });
-
-export type TProseVariants = VariantProps<typeof proseVariants>;

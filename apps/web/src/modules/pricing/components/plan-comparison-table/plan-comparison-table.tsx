@@ -1,4 +1,8 @@
-import { ICONS, PLAN_COMPARISON_ANCHOR_ID } from '@shinefold/config/constants';
+import {
+  ICONS,
+  PLAN_COMPARISON_ANCHOR_ID,
+  TEXT_ROLE,
+} from '@shinefold/config/constants';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { Table } from '@shinefold/ui/components/molecules/table';
@@ -41,7 +45,7 @@ export const PlanComparisonTable = () => {
     <div className={s.root()}>
       <Heading
         level={3}
-        visual="copy"
+        visual={TEXT_ROLE.TABLE_TITLE}
         id={PLAN_COMPARISON_ANCHOR_ID}
         className={s.heading()}
       >
