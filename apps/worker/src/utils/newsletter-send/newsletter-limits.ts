@@ -17,6 +17,17 @@ export function sentAfterThisPost({
   return sentThisMonth + activeCount;
 }
 
+export function allowanceResetDate(now: Date): Date {
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+}
+
+export function allowanceLeft({
+  allowance,
+  sentThisMonth,
+}: TNewsletterLimits): number {
+  return Math.max(0, allowance - sentThisMonth);
+}
+
 export function newsletterSkipReason(
   limits: TNewsletterLimits,
 ): TMaybeUndefined<TNewsletterSkipReason> {

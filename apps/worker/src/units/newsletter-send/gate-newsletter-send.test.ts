@@ -2,7 +2,10 @@ import { NEWSLETTER_SKIP_REASON } from '@shinefold/config/constants';
 import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@shinefold/db/constants';
 import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config';
 import { getNewsletterLimits } from '@shinefold/db/queries/email-usage';
-import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends';
+import {
+  markNewsletterPostSkipped,
+  recordNewsletterPostSendStart,
+} from '@shinefold/db/queries/newsletter-post-sends';
 import { getTenantById } from '@shinefold/db/queries/tenants';
 import { isEmailAccountConfigured } from '@shinefold/email';
 import {
@@ -11,6 +14,8 @@ import {
   NEWSLETTER_SEND_PACE,
 } from '@worker/constants/newsletter-send';
 import {
+  MOCK_CLAIMED_AT,
+  MOCK_NEWSLETTER_POST,
   MOCK_UNSUBSCRIBE_KEY,
   mockNewsletterLimits,
 } from '@worker/testing/newsletter-send/fixtures';
@@ -34,9 +39,18 @@ vi.mock('@worker/utils/newsletter-send/reputation-pace');
 
 const MOCK_TENANT = mockTenant();
 const SKIPPED = { gate: NEWSLETTER_SEND_GATE.SKIPPED };
+const MOCK_POST_DETAILS = {
+  postTitle: MOCK_NEWSLETTER_POST.title,
+  postPublishedAt: new Date(MOCK_NEWSLETTER_POST.publishedAt),
+};
 
 function runGate() {
-  return gateNewsletterSend(MOCK_TENANT_ID, MOCK_POST_ID);
+  return gateNewsletterSend({
+    tenantId: MOCK_TENANT_ID,
+    postId: MOCK_POST_ID,
+    claimedAt: MOCK_CLAIMED_AT,
+    post: MOCK_NEWSLETTER_POST,
+  });
 }
 
 describe(gateNewsletterSend, () => {
@@ -63,6 +77,20 @@ describe(gateNewsletterSend, () => {
     });
     expect(markNewsletterPostSkipped).not.toHaveBeenCalled();
     expect(sendOwnerNewsletterNotice).not.toHaveBeenCalled();
+  });
+
+  it('records the send’s start with the post and how many subscribers it goes to', async () => {
+    await runGate();
+
+    expect(recordNewsletterPostSendStart).toHaveBeenCalledExactlyOnceWith(
+      MOCK_TENANT_ID,
+      MOCK_POST_ID,
+      new Date(MOCK_CLAIMED_AT),
+      {
+        ...MOCK_POST_DETAILS,
+        recipientCount: mockNewsletterLimits().activeCount,
+      },
+    );
   });
 
   it.each([
@@ -98,6 +126,7 @@ describe(gateNewsletterSend, () => {
       MOCK_TENANT_ID,
       MOCK_POST_ID,
       NEWSLETTER_SKIP_REASON.SITE_PAUSED,
+      MOCK_POST_DETAILS,
     );
     expect(readReputationPace).not.toHaveBeenCalled();
   });
@@ -112,15 +141,25 @@ describe(gateNewsletterSend, () => {
       MOCK_TENANT_ID,
       MOCK_POST_ID,
       NEWSLETTER_SKIP_REASON.REPUTATION_STOP,
+      MOCK_POST_DETAILS,
     );
+    expect(recordNewsletterPostSendStart).not.toHaveBeenCalled();
   });
 
   it.each([
-    [NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND, { activeCount: 1_001 }],
-    [NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE, { sentThisMonth: 5_950 }],
+    [
+      NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND,
+      { activeCount: 1_001 },
+      { emailsNeeded: 1_001, allowanceLeft: 6_000 },
+    ],
+    [
+      NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE,
+      { sentThisMonth: 5_950 },
+      { emailsNeeded: 100, allowanceLeft: 50 },
+    ],
   ])(
-    'skips the post %s and tells the owner sending is paused',
-    async (reason, overrides) => {
+    'skips the post %s with what it needed, and tells the owner which post it was',
+    async (reason, overrides, need) => {
       const limits = mockNewsletterLimits(overrides);
       vi.mocked(getNewsletterLimits).mockResolvedValue(limits);
 
@@ -129,13 +168,15 @@ describe(gateNewsletterSend, () => {
         MOCK_TENANT_ID,
         MOCK_POST_ID,
         reason,
+        { ...MOCK_POST_DETAILS, ...need },
       );
       expect(sendOwnerNewsletterNotice).toHaveBeenCalledExactlyOnceWith(
         MOCK_TENANT,
         NEWSLETTER_LIMIT_NOTICE_KIND.SENDING_PAUSED,
         limits,
-        reason,
+        { skipReason: reason, postTitle: MOCK_NEWSLETTER_POST.title },
       );
+      expect(recordNewsletterPostSendStart).not.toHaveBeenCalled();
     },
   );
 

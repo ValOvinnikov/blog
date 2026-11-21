@@ -107,15 +107,6 @@ describe(sendNewsletterPost, () => {
     });
   });
 
-  it('counts each page’s sends in its own step', async () => {
-    await runSend();
-
-    expect(recordNewsletterSends).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      MOCK_SUBSCRIBER_IDS.length,
-    );
-  });
-
   it('ends at once when another run already holds this claim', async () => {
     hook = fakeRunHook(true);
 
@@ -125,10 +116,11 @@ describe(sendNewsletterPost, () => {
     expect(hook.dispose).toHaveBeenCalled();
   });
 
-  it('ends without releasing anything when the claim is no longer this run’s', async () => {
-    vi.mocked(checkNewsletterPost).mockResolvedValue({
-      state: NEWSLETTER_POST_STATE.UNCLAIMED,
-    });
+  it.each([
+    ['the claim is no longer this run’s', NEWSLETTER_POST_STATE.UNCLAIMED],
+    ['the check recorded the claim as skipped', NEWSLETTER_POST_STATE.SKIPPED],
+  ] as const)('ends without releasing anything when %s', async (_, state) => {
+    vi.mocked(checkNewsletterPost).mockResolvedValue({ state });
 
     await runSend();
 
@@ -222,5 +214,32 @@ describe(sendNewsletterPost, () => {
     expect(releaseNewsletterSendClaim).not.toHaveBeenCalled();
     expect(completeNewsletterSend).not.toHaveBeenCalled();
     expect(hook.dispose).toHaveBeenCalled();
+  });
+
+  describe('a one-page send', () => {
+    beforeEach(async () => {
+      await runSend();
+    });
+
+    it('counts each page’s sends in its own step', async () => {
+      expect(recordNewsletterSends).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_SUBSCRIBER_IDS.length,
+      );
+    });
+
+    it('hands the gate and each page the post the check read, under this run’s claim', async () => {
+      const claim = {
+        tenantId: MOCK_TENANT_ID,
+        postId: MOCK_POST_ID,
+        claimedAt: MOCK_CLAIMED_AT,
+        post: MOCK_NEWSLETTER_POST,
+      };
+      expect(gateNewsletterSend).toHaveBeenCalledExactlyOnceWith(claim);
+      expect(sendNewsletterPage).toHaveBeenCalledExactlyOnceWith({
+        ...claim,
+        afterId: undefined,
+      });
+    });
   });
 });

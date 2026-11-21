@@ -1,15 +1,21 @@
 import { NEWSLETTER_SKIP_REASON } from '@shinefold/config/constants';
 import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config';
-import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends';
+import {
+  addNewsletterPostSendProgress,
+  getNewsletterSendingOffCause,
+  markNewsletterPostSkipped,
+} from '@shinefold/db/queries/newsletter-post-sends';
 import { listActiveSubscribers } from '@shinefold/db/queries/subscribers';
 import { getTenantById } from '@shinefold/db/queries/tenants';
 import { SendEmailError, sendEmail } from '@shinefold/email';
+import { okResult } from '@shinefold/utils';
 import {
   NEWSLETTER_SEND_LOG,
   NEWSLETTER_SEND_PACE,
   NEWSLETTER_SEND_PAGE_SIZE,
 } from '@worker/constants/newsletter-send';
 import {
+  MOCK_CLAIMED_AT,
   MOCK_NEWSLETTER_POST,
   MOCK_SUBSCRIBER_EMAILS,
   MOCK_SUBSCRIBER_IDS,
@@ -19,7 +25,6 @@ import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import { MOCK_TENANT_ID, mockTenant } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 import { buildPostSend } from '@worker/utils/newsletter-send/build-post-send';
-import { isSiteSendingPosts } from '@worker/utils/newsletter-send/is-site-sending-posts';
 import {
   loadNewsletterSendContext,
   type TNewsletterSendContext,
@@ -40,7 +45,6 @@ vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@shinefold/email/transport/send-email');
 vi.mock('@worker/utils/newsletter-send/build-post-send');
 vi.mock('@worker/utils/newsletter-send/newsletter-send-context');
-vi.mock('@worker/utils/newsletter-send/is-site-sending-posts');
 vi.mock('@worker/utils/newsletter-send/reputation-pace');
 
 const MOCK_CONTEXT = {} as TNewsletterSendContext;
@@ -52,6 +56,7 @@ const [FIRST, SECOND] = MOCK_SUBSCRIBERS;
 const MOCK_INPUT: TNewsletterPageInput = {
   tenantId: MOCK_TENANT_ID,
   postId: MOCK_POST_ID,
+  claimedAt: MOCK_CLAIMED_AT,
   post: MOCK_NEWSLETTER_POST,
   afterId: undefined,
 };
@@ -70,7 +75,9 @@ describe(sendNewsletterPage, () => {
   beforeEach(() => {
     vi.mocked(getTenantById).mockResolvedValue(mockTenant());
     vi.mocked(getNewsletterPausedAt).mockResolvedValue(undefined);
-    vi.mocked(isSiteSendingPosts).mockResolvedValue(true);
+    vi.mocked(getNewsletterSendingOffCause).mockResolvedValue(
+      okResult(undefined),
+    );
     vi.mocked(readReputationPace).mockResolvedValue(
       NEWSLETTER_SEND_PACE.NORMAL,
     );
@@ -195,17 +202,8 @@ describe(sendNewsletterPage, () => {
     expect(result.pace).toBe(NEWSLETTER_SEND_PACE.STOPPED);
   });
 
-  it.each([
-    [
-      'an operator pauses the site',
-      () => vi.mocked(getNewsletterPausedAt).mockResolvedValue(new Date()),
-    ],
-    [
-      'the site stops sending posts',
-      () => vi.mocked(isSiteSendingPosts).mockResolvedValue(false),
-    ],
-  ])('sends nothing more once %s mid-run', async (_, arrange) => {
-    arrange();
+  it('sends nothing more once an operator pauses the site mid-run', async () => {
+    vi.mocked(getNewsletterPausedAt).mockResolvedValue(new Date());
 
     const result = await sendNewsletterPage(MOCK_INPUT);
 
@@ -218,11 +216,51 @@ describe(sendNewsletterPage, () => {
     expect(result.pace).toBe(NEWSLETTER_SEND_PACE.STOPPED);
   });
 
-  it('does not alert the operator mid-run', async () => {
-    await sendNewsletterPage(MOCK_INPUT);
+  it.each([
+    [NEWSLETTER_SKIP_REASON.NOT_IN_PLAN, NEWSLETTER_SKIP_REASON.NOT_IN_PLAN],
+    [
+      NEWSLETTER_SKIP_REASON.SITE_INACTIVE,
+      NEWSLETTER_SKIP_REASON.SITE_INACTIVE,
+    ],
+    [NEWSLETTER_SKIP_REASON.NEWSLETTER_OFF, NEWSLETTER_SKIP_REASON.SITE_PAUSED],
+    [NEWSLETTER_SKIP_REASON.SENDING_OFF, NEWSLETTER_SKIP_REASON.SITE_PAUSED],
+  ])(
+    'stops mid-run once sending turns off (%s), recording %s',
+    async (cause, stored) => {
+      vi.mocked(getNewsletterSendingOffCause).mockResolvedValue(
+        okResult(cause),
+      );
 
-    expect(readReputationPace).toHaveBeenCalledWith(expect.anything(), {
-      isOperatorAlerted: false,
+      const result = await sendNewsletterPage(MOCK_INPUT);
+
+      expect(sendEmail).not.toHaveBeenCalled();
+      expect(markNewsletterPostSkipped).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_POST_ID,
+        stored,
+      );
+      expect(result.pace).toBe(NEWSLETTER_SEND_PACE.STOPPED);
+    },
+  );
+
+  describe('a page that sends', () => {
+    beforeEach(async () => {
+      await sendNewsletterPage(MOCK_INPUT);
+    });
+
+    it('adds the page’s subscribers to the send’s progress', async () => {
+      expect(addNewsletterPostSendProgress).toHaveBeenCalledExactlyOnceWith(
+        MOCK_TENANT_ID,
+        MOCK_POST_ID,
+        new Date(MOCK_CLAIMED_AT),
+        MOCK_SUBSCRIBERS.length,
+      );
+    });
+
+    it('does not alert the operator mid-run', async () => {
+      expect(readReputationPace).toHaveBeenCalledWith(expect.anything(), {
+        isOperatorAlerted: false,
+      });
     });
   });
 });

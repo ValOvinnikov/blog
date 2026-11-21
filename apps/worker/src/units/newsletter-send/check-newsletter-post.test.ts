@@ -1,22 +1,18 @@
-import { CAPABILITY, TENANT_PLAN } from '@shinefold/config/constants';
 import {
-  TENANT_STATUS,
-  NEWSLETTER_POST_SEND_OUTCOME,
-} from '@shinefold/db/constants';
-import { getEmailNewPosts } from '@shinefold/db/queries/email-config';
-import { getNewsletterPostSend } from '@shinefold/db/queries/newsletter-post-sends';
+  ERROR_CODE,
+  NEWSLETTER_SKIP_REASON,
+} from '@shinefold/config/constants';
+import { NEWSLETTER_POST_SEND_OUTCOME } from '@shinefold/db/constants';
 import {
-  getSettingsFeatures,
-  type TSettingsFeaturesResult,
-} from '@shinefold/db/queries/settings-features';
-import { listResolvableEntitlementGrants } from '@shinefold/db/queries/tenant-entitlement-grants/list-resolvable-entitlement-grants';
-import {
-  getTenantById,
-  getTenantSanityCredentials,
-} from '@shinefold/db/queries/tenants';
+  getNewsletterPostSend,
+  getNewsletterSendingOffCause,
+  markNewsletterPostSkipped,
+  releaseNewsletterPostSend,
+  setNewsletterPostSendSchedule,
+} from '@shinefold/db/queries/newsletter-post-sends';
+import { getTenantSanityCredentials } from '@shinefold/db/queries/tenants';
 import { mockNewsletterPostSend } from '@shinefold/db/testing/newsletter-post-sends/fixtures';
-import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
-import type { TResolvableGrant } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
+import { errorResult, okResult } from '@shinefold/utils/result';
 import { NEWSLETTER_POST_STATE } from '@worker/constants/newsletter-send';
 import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
 import { MOCK_ONE_HOUR_MS } from '@worker/testing/clock/frozen-clock';
@@ -28,55 +24,48 @@ import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import {
   MOCK_SANITY_CREDENTIALS,
   MOCK_TENANT_ID,
-  mockTenant,
 } from '@worker/testing/tenant/fixtures';
 import { readNewsletterPost } from '@worker/utils/newsletter-send/read-newsletter-post';
 
 import { checkNewsletterPost } from './check-newsletter-post';
 
-vi.mock('@shinefold/db/queries/email-config');
 vi.mock('@shinefold/db/queries/newsletter-post-sends');
-vi.mock('@shinefold/db/queries/settings-features');
-vi.mock(
-  '@shinefold/db/queries/tenant-entitlement-grants/list-resolvable-entitlement-grants',
-);
 vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/newsletter-send/read-newsletter-post');
 
 const MOCK_NOW = new Date('2031-05-15T12:00:00Z');
+const MOCK_PUBLISH_DATE = new Date(MOCK_NOW.getTime() + MOCK_ONE_HOUR_MS);
+const MOCK_CLAIMED_AT_DATE = new Date(MOCK_CLAIMED_AT);
 const CANCELLED = { state: NEWSLETTER_POST_STATE.CANCELLED };
-
-function arrangeClosedNewsletterGrant(closed: Partial<TResolvableGrant>) {
-  vi.mocked(getTenantById).mockResolvedValue(
-    mockTenant({ plan: TENANT_PLAN.FREE }),
-  );
-  vi.mocked(listResolvableEntitlementGrants).mockResolvedValue([
-    mockEntitlementGrant({ key: CAPABILITY.NEWSLETTER, ...closed }),
-  ]);
-}
 
 function runCheck() {
   return checkNewsletterPost(MOCK_TENANT_ID, MOCK_POST_ID, MOCK_CLAIMED_AT);
 }
 
+function arrangeClaim(overrides: Parameters<typeof mockNewsletterPostSend>[0]) {
+  vi.mocked(getNewsletterPostSend).mockResolvedValue(
+    mockNewsletterPostSend({ claimedAt: MOCK_CLAIMED_AT_DATE, ...overrides }),
+  );
+}
+
+function arrangePublishedAt(publishedAt: Date) {
+  vi.mocked(readNewsletterPost).mockResolvedValue({
+    ...MOCK_NEWSLETTER_POST,
+    publishedAt: publishedAt.toISOString(),
+  });
+}
+
 describe(checkNewsletterPost, () => {
   beforeEach(() => {
     vi.useFakeTimers({ now: MOCK_NOW, toFake: ['Date'] });
-    vi.mocked(getTenantById).mockResolvedValue(
-      mockTenant({ plan: TENANT_PLAN.GROWTH }),
+    vi.mocked(getNewsletterSendingOffCause).mockResolvedValue(
+      okResult(undefined),
     );
-    vi.mocked(getSettingsFeatures).mockResolvedValue({
-      newsletterEnabled: true,
-    } as TSettingsFeaturesResult);
-    vi.mocked(listResolvableEntitlementGrants).mockResolvedValue([]);
-    vi.mocked(getEmailNewPosts).mockResolvedValue(true);
     vi.mocked(getTenantSanityCredentials).mockResolvedValue(
       MOCK_SANITY_CREDENTIALS,
     );
     vi.mocked(readNewsletterPost).mockResolvedValue(MOCK_NEWSLETTER_POST);
-    vi.mocked(getNewsletterPostSend).mockResolvedValue(
-      mockNewsletterPostSend({ claimedAt: new Date(MOCK_CLAIMED_AT) }),
-    );
+    arrangeClaim({});
   });
 
   afterEach(() => {
@@ -92,29 +81,55 @@ describe(checkNewsletterPost, () => {
       MOCK_SANITY_CREDENTIALS,
       MOCK_POST_ID,
     );
+    expect(setNewsletterPostSendSchedule).not.toHaveBeenCalled();
   });
 
-  it('waits until a post dated in the future is due', async () => {
-    vi.mocked(readNewsletterPost).mockResolvedValue({
-      ...MOCK_NEWSLETTER_POST,
-      publishedAt: new Date(
-        MOCK_NOW.getTime() + MOCK_ONE_HOUR_MS,
-      ).toISOString(),
+  describe('for a post dated in the future', () => {
+    beforeEach(() => {
+      arrangePublishedAt(MOCK_PUBLISH_DATE);
     });
 
-    await expect(runCheck()).resolves.toEqual({
-      state: NEWSLETTER_POST_STATE.SCHEDULED,
-      waitMs: MOCK_ONE_HOUR_MS,
+    it('waits until a post dated in the future is due, recording its date on the claim', async () => {
+      await expect(runCheck()).resolves.toEqual({
+        state: NEWSLETTER_POST_STATE.SCHEDULED,
+        waitMs: MOCK_ONE_HOUR_MS,
+      });
+      expect(setNewsletterPostSendSchedule).toHaveBeenCalledExactlyOnceWith(
+        MOCK_TENANT_ID,
+        MOCK_POST_ID,
+        MOCK_CLAIMED_AT_DATE,
+        MOCK_PUBLISH_DATE,
+      );
+    });
+
+    it('leaves the claim’s date alone while the post’s date is unchanged', async () => {
+      arrangeClaim({ scheduledFor: MOCK_PUBLISH_DATE });
+
+      await runCheck();
+
+      expect(setNewsletterPostSendSchedule).not.toHaveBeenCalled();
+    });
+
+    it('follows the post’s date when the editor moves it', async () => {
+      const movedTo = new Date(MOCK_PUBLISH_DATE.getTime() + MOCK_ONE_HOUR_MS);
+      arrangePublishedAt(movedTo);
+      arrangeClaim({ scheduledFor: MOCK_PUBLISH_DATE });
+
+      await runCheck();
+
+      expect(setNewsletterPostSendSchedule).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_POST_ID,
+        MOCK_CLAIMED_AT_DATE,
+        movedTo,
+      );
     });
   });
 
   it('checks a far-future post again within a day', async () => {
-    vi.mocked(readNewsletterPost).mockResolvedValue({
-      ...MOCK_NEWSLETTER_POST,
-      publishedAt: new Date(
-        MOCK_NOW.getTime() + 3 * SCHEDULED_POST_RECHECK_MS,
-      ).toISOString(),
-    });
+    arrangePublishedAt(
+      new Date(MOCK_NOW.getTime() + 3 * SCHEDULED_POST_RECHECK_MS),
+    );
 
     await expect(runCheck()).resolves.toEqual({
       state: NEWSLETTER_POST_STATE.SCHEDULED,
@@ -122,17 +137,17 @@ describe(checkNewsletterPost, () => {
     });
   });
 
-  it('sends for a plan without the newsletter when it is granted', async () => {
-    vi.mocked(getTenantById).mockResolvedValue(
-      mockTenant({ plan: TENANT_PLAN.FREE }),
-    );
-    vi.mocked(listResolvableEntitlementGrants).mockResolvedValue([
-      mockEntitlementGrant({ key: CAPABILITY.NEWSLETTER }),
-    ]);
+  it('sends a post started by hand even though its own switch is off', async () => {
+    const switchedOff = {
+      ...MOCK_NEWSLETTER_POST,
+      isSendToSubscribersOn: false,
+    };
+    vi.mocked(readNewsletterPost).mockResolvedValue(switchedOff);
+    arrangeClaim({ handStartedAt: MOCK_CLAIMED_AT_DATE });
 
     await expect(runCheck()).resolves.toEqual({
       state: NEWSLETTER_POST_STATE.READY,
-      post: MOCK_NEWSLETTER_POST,
+      post: switchedOff,
     });
   });
 
@@ -145,49 +160,53 @@ describe(checkNewsletterPost, () => {
     await expect(runCheck()).resolves.toEqual(CANCELLED);
   });
 
+  it('cancels a hand send whose post was unpublished', async () => {
+    vi.mocked(readNewsletterPost).mockResolvedValue(undefined);
+    arrangeClaim({ handStartedAt: MOCK_CLAIMED_AT_DATE });
+
+    await expect(runCheck()).resolves.toEqual(CANCELLED);
+  });
+
   it.each([
-    [
-      'a plan without the newsletter',
-      () =>
-        vi
-          .mocked(getTenantById)
-          .mockResolvedValue(mockTenant({ plan: TENANT_PLAN.FREE })),
-    ],
-    [
-      'a suspended site',
-      () =>
-        vi.mocked(getTenantById).mockResolvedValue(
-          mockTenant({
-            plan: TENANT_PLAN.GROWTH,
-            status: TENANT_STATUS.SUSPENDED,
-          }),
-        ),
-    ],
-    [
-      'an expired newsletter grant on a plan without it',
-      () => arrangeClosedNewsletterGrant({ expiresAt: new Date(0) }),
-    ],
-    [
-      'a revoked newsletter grant on a plan without it',
-      () => arrangeClosedNewsletterGrant({ revokedAt: new Date(0) }),
-    ],
-    [
-      'the Newsletter switch off',
-      () => vi.mocked(getSettingsFeatures).mockResolvedValue(undefined),
-    ],
-    [
-      '"email new posts" off',
-      () => vi.mocked(getEmailNewPosts).mockResolvedValue(false),
-    ],
-    [
-      'an unknown site',
-      () => vi.mocked(getTenantById).mockResolvedValue(undefined),
-    ],
-  ])('cancels the send for %s without reading the post', async (_, arrange) => {
-    arrange();
+    NEWSLETTER_SKIP_REASON.NEWSLETTER_OFF,
+    NEWSLETTER_SKIP_REASON.SENDING_OFF,
+  ])('cancels the send without reading the post when %s', async (cause) => {
+    vi.mocked(getNewsletterSendingOffCause).mockResolvedValue(okResult(cause));
 
     await expect(runCheck()).resolves.toEqual(CANCELLED);
     expect(readNewsletterPost).not.toHaveBeenCalled();
+    expect(markNewsletterPostSkipped).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    NEWSLETTER_SKIP_REASON.NOT_IN_PLAN,
+    NEWSLETTER_SKIP_REASON.SITE_INACTIVE,
+  ])(
+    'keeps the claim as skipped for %s, so a move back never emails it',
+    async (cause) => {
+      vi.mocked(getNewsletterSendingOffCause).mockResolvedValue(
+        okResult(cause),
+      );
+
+      await expect(runCheck()).resolves.toEqual({
+        state: NEWSLETTER_POST_STATE.SKIPPED,
+      });
+      expect(markNewsletterPostSkipped).toHaveBeenCalledExactlyOnceWith(
+        MOCK_TENANT_ID,
+        MOCK_POST_ID,
+        cause,
+      );
+      expect(releaseNewsletterPostSend).not.toHaveBeenCalled();
+      expect(readNewsletterPost).not.toHaveBeenCalled();
+    },
+  );
+
+  it('cancels the send for an unknown site', async () => {
+    vi.mocked(getNewsletterSendingOffCause).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
+
+    await expect(runCheck()).resolves.toEqual(CANCELLED);
   });
 
   it.each([
@@ -195,13 +214,13 @@ describe(checkNewsletterPost, () => {
     [
       'a newer claim',
       mockNewsletterPostSend({
-        claimedAt: new Date(Date.parse(MOCK_CLAIMED_AT) + MOCK_ONE_HOUR_MS),
+        claimedAt: new Date(MOCK_CLAIMED_AT_DATE.getTime() + MOCK_ONE_HOUR_MS),
       }),
     ],
     [
       'a claim that already has an outcome',
       mockNewsletterPostSend({
-        claimedAt: new Date(MOCK_CLAIMED_AT),
+        claimedAt: MOCK_CLAIMED_AT_DATE,
         outcome: NEWSLETTER_POST_SEND_OUTCOME.SKIPPED,
       }),
     ],
@@ -211,6 +230,7 @@ describe(checkNewsletterPost, () => {
     await expect(runCheck()).resolves.toEqual({
       state: NEWSLETTER_POST_STATE.UNCLAIMED,
     });
+    expect(getNewsletterSendingOffCause).not.toHaveBeenCalled();
     expect(readNewsletterPost).not.toHaveBeenCalled();
   });
 });
