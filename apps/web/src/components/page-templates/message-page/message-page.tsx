@@ -1,3 +1,4 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Text } from '@shinefold/ui/components/atoms/text';
 import { tv } from '@shinefold/ui/lib/styling';
@@ -29,7 +30,9 @@ export const MessagePage = ({
     <Heading level={1} visual="page">
       {title}
     </Heading>
-    <Text className={s.copy()}>{message}</Text>
+    <Text textRole={TEXT_ROLE.MESSAGE} className={s.copy()}>
+      {message}
+    </Text>
     {children}
   </main>
 );

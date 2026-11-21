@@ -139,7 +139,7 @@ src/components/molecules/media-card/
   - **`visual` carries the typography.** A title rendered through `Heading`
     keeps in its own `tv()` only what `Heading` can't express — interaction
     state (`hover:`, `transition-colors`). Font family, size, leading and
-    tracking come from `visual` (`card` for card titles); repeating them in
+    tracking come from `visual` (`TEXT_ROLE.CARD_TITLE` for card titles); repeating them in
     both places is how the two drift. `visual` and `Text`'s `textRole` read
     the text-role registry, `TYPOGRAPHY` in `lib/styling/typography.ts`,
     keyed by `TEXT_ROLE` from `@shinefold/config`: it is the one place a

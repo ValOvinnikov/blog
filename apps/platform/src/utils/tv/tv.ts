@@ -5,7 +5,6 @@ import { INSET_SHADOW_TOKENS, SHADOW_TOKENS } from './shadow-tokens';
 
 // Keep these lists, `SHADOW_TOKENS` and `INSET_SHADOW_TOKENS` in sync with the custom tokens in `theme.css` and `platform-theme.css`, or `tailwind-merge` misclassifies or drops them.
 const FONT_SIZE_TOKENS = [
-  'display',
   'hero',
   'title-xl',
   'title-2xl',

@@ -4786,6 +4786,14 @@
         "file": "packages/config/src/constants/text-role.ts"
       }
     ],
+    "TABLE_TITLE": [
+      {
+        "ref": "TEXT_ROLE.TABLE_TITLE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
     "INTRO": [
       {
         "ref": "TEXT_ROLE.INTRO",
@@ -4797,6 +4805,14 @@
     "BODY": [
       {
         "ref": "TEXT_ROLE.BODY",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "MESSAGE": [
+      {
+        "ref": "TEXT_ROLE.MESSAGE",
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/text-role.ts"

@@ -32,7 +32,6 @@ export const tv = createTV({
         'font-size': [
           {
             text: [
-              'display',
               'wordmark',
               'hero',
               'title-2xl',

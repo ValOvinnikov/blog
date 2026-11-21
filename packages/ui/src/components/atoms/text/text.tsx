@@ -12,7 +12,7 @@ import {
 } from '@shinefold/config';
 import type { CSSProperties, ReactNode } from 'react';
 
-import { textVariants, type TTextVariants } from './text-variants';
+import { textVariants } from './text-variants';
 
 type TTextElement =
   | typeof P_AS_CONST
@@ -27,29 +27,21 @@ export type TTextProps = IWithClassName &
   IWithDataTestId & {
     as?: TTextElement;
     textRole?: TTextRole;
-    variant?: TTextVariants['variant'];
     style?: CSSProperties;
     children?: ReactNode;
   };
 
-const DEFAULT_VARIANT: NonNullable<TTextVariants['variant']> = 'lead';
-
-/** Renders any text role, or a legacy variant, in a non-heading element. */
+/** Renders any text role in a non-heading element. */
 export const Text = ({
   as: Tag = P_AS_CONST,
   textRole,
-  variant,
   className,
   dataTestId,
   style,
   children,
 }: TTextProps) => (
   <Tag
-    className={textVariants({
-      textRole,
-      variant: textRole ? undefined : (variant ?? DEFAULT_VARIANT),
-      class: className,
-    })}
+    className={textVariants({ textRole, class: className })}
     data-testid={dataTestId}
     style={style}
   >

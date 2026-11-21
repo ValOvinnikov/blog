@@ -1,4 +1,4 @@
-import { SIZE } from '@shinefold/config';
+import { TEXT_ROLE } from '@shinefold/config';
 import { HEADING_LEVELS } from '@shinefold/ui/lib/react';
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -14,10 +14,6 @@ const meta: Meta<typeof Heading> = {
     visual: {
       control: 'select',
       options: objectKeys(headingVariants.variants.visual),
-    },
-    size: {
-      control: 'select',
-      options: objectKeys(headingVariants.variants.size),
     },
     level: {
       control: 'select',
@@ -45,70 +41,32 @@ export const H4: TStory = {
   args: { level: 4, children: 'Heading Level 4' },
 };
 
-export const WithSizeOverride: TStory = {
-  args: { level: 2, size: SIZE.XS, children: 'H2 with xs size override' },
+export const HeroTitle: TStory = {
+  args: { level: 1, visual: TEXT_ROLE.HERO_TITLE, children: 'Hero Title' },
 };
 
-export const VisualHero: TStory = {
-  args: { level: 1, visual: 'hero', children: 'Hero Heading' },
+export const PostTitle: TStory = {
+  args: { level: 1, visual: TEXT_ROLE.POST_TITLE, children: 'Post Title' },
 };
 
-export const VisualPost: TStory = {
-  args: { level: 1, visual: 'post', children: 'Post Title Heading' },
+export const DialogTitle: TStory = {
+  args: { level: 2, visual: TEXT_ROLE.DIALOG_TITLE, children: 'Dialog Title' },
 };
 
-export const VisualCard: TStory = {
-  args: { level: 2, visual: 'card', children: 'Card Title Heading' },
-};
-
-export const VisualPage: TStory = {
-  args: { level: 1, visual: 'page', children: 'Page Title Heading' },
-};
-
-export const VisualSection: TStory = {
-  args: { level: 2, visual: 'section', children: 'Section Heading' },
-};
-
-export const VisualProseH2: TStory = {
-  args: { level: 2, visual: 'prose-h2', children: 'Prose H2 Heading' },
-};
-
-export const VisualProseH3: TStory = {
-  args: { level: 3, visual: 'prose-h3', children: 'Prose H3 Heading' },
-};
-
-export const VisualProseH4: TStory = {
-  args: { level: 4, visual: 'prose-h4', children: 'Prose H4 Heading' },
-};
-
-export const VisualPreview: TStory = {
-  args: { level: 3, visual: 'preview', children: 'Sample Preview Heading' },
-};
-
-export const VisualCopy: TStory = {
-  args: { level: 3, visual: 'copy', children: 'Copy-sized Heading' },
-};
-
-/**
- * The `post` visual (the page's real title, e.g. `PostPage`'s h1) must
- * always read as the largest heading on the page. `prose-h2`/`prose-h3`/
- * `prose-h4` are sized for subheadings *within* the body copy — this story
- * puts them side by side so the size relationship stays visually checkable.
- */
 export const InArticleHierarchy: TStory = {
   render: () => (
     <div className="flex max-w-prose flex-col gap-4">
-      <Heading level={1} visual="post">
-        The Post Title (h1, visual=&quot;post&quot;)
+      <Heading level={1} visual={TEXT_ROLE.POST_TITLE}>
+        The Post Title
       </Heading>
-      <Heading level={2} visual="prose-h2">
-        A Body Subsection (h2, visual=&quot;prose-h2&quot;)
+      <Heading level={2} visual={TEXT_ROLE.PROSE_H2}>
+        A Body Subsection
       </Heading>
-      <Heading level={3} visual="prose-h3">
-        A Nested Subsection (h3, visual=&quot;prose-h3&quot;)
+      <Heading level={3} visual={TEXT_ROLE.PROSE_H3}>
+        A Nested Subsection
       </Heading>
-      <Heading level={4} visual="prose-h4">
-        A Deeper Subsection (h4, visual=&quot;prose-h4&quot;)
+      <Heading level={4} visual={TEXT_ROLE.PROSE_H4}>
+        A Deeper Subsection
       </Heading>
     </div>
   ),
