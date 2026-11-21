@@ -5,6 +5,7 @@ import {
   sendNewsletterPostTest,
 } from '@platform/server/newsletter-post-send/send-newsletter-post-test';
 import {
+  isSameOriginJsonRequest,
   readJsonBody,
   studioForbiddenResponse,
   studioProjectSchema,
@@ -42,6 +43,8 @@ const refused = (
 ): NextResponse => respond({ outcome: ACTION_OUTCOME.REFUSED, reason });
 
 export async function POST(request: Request): Promise<NextResponse> {
+  if (!isSameOriginJsonRequest(request)) return studioForbiddenResponse();
+
   const body = await readJsonBody(request);
   const project = studioProjectSchema.safeParse(body);
   const caller = project.success

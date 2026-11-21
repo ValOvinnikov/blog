@@ -9184,6 +9184,46 @@
         "file": "apps/web/src/constants/request.ts"
       }
     ],
+    "origin": [
+      {
+        "ref": "REQUEST_HEADER.ORIGIN",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "sec-fetch-site": [
+      {
+        "ref": "REQUEST_HEADER.SEC_FETCH_SITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "content-type": [
+      {
+        "ref": "REQUEST_HEADER.CONTENT_TYPE",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "same-origin": [
+      {
+        "ref": "FETCH_SITE.SAME_ORIGIN",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "application/json": [
+      {
+        "ref": "MEDIA_TYPE.JSON",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
     "/api/sample-content/remove": [
       {
         "ref": "SAMPLE_CONTENT_PATH.REMOVE",

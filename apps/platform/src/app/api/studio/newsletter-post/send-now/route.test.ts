@@ -1,5 +1,6 @@
 import { resolveStudioCaller } from '@platform/server/auth/resolve-studio-caller';
 import { startNewsletterPostSendNow } from '@platform/server/newsletter-post-send/start-newsletter-post-send-now';
+import { itRefusesCrossSiteStudioRequests } from '@platform/testing/newsletter-post-send/cross-site-refusal';
 import {
   MOCK_STUDIO_CALLER,
   MOCK_STUDIO_PROJECT_ID,
@@ -80,4 +81,11 @@ describe(POST, () => {
       reason: NEWSLETTER_SEND_NOW_REFUSAL.SEND_FAILED,
     });
   });
+
+  itRefusesCrossSiteStudioRequests(
+    POST,
+    PATH,
+    MOCK_BODY,
+    vi.mocked(startNewsletterPostSendNow),
+  );
 });

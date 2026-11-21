@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { resolveStudioCaller } from '@platform/server/auth/resolve-studio-caller';
 import { sendNewsletterPostTest } from '@platform/server/newsletter-post-send/send-newsletter-post-test';
+import { itRefusesCrossSiteStudioRequests } from '@platform/testing/newsletter-post-send/cross-site-refusal';
 import {
   MOCK_STUDIO_CALLER,
   MOCK_STUDIO_PROJECT_ID,
@@ -106,4 +107,11 @@ describe(POST, () => {
       reason: NEWSLETTER_TEST_SEND_REFUSAL.SEND_FAILED,
     });
   });
+
+  itRefusesCrossSiteStudioRequests(
+    POST,
+    PATH,
+    MOCK_BODY,
+    vi.mocked(sendNewsletterPostTest),
+  );
 });
