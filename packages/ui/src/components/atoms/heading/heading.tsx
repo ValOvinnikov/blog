@@ -2,7 +2,6 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   TEXT_ROLE,
-  type TTextRole,
 } from '@shinefold/config';
 import { headingTags, type THeadingLevel } from '@shinefold/ui/lib/react';
 import type { CSSProperties, ReactNode } from 'react';
@@ -18,14 +17,17 @@ export type THeadingProps = IWithClassName &
     children?: ReactNode;
   };
 
-const LEVEL_TITLE_ROLE: Record<THeadingLevel, TTextRole> = {
+const LEVEL_TITLE_ROLE: Record<
+  THeadingLevel,
+  NonNullable<THeadingVariants['visual']>
+> = {
   1: TEXT_ROLE.PAGE_TITLE,
   2: TEXT_ROLE.SECTION_TITLE,
   3: TEXT_ROLE.CARD_TITLE,
   4: TEXT_ROLE.ITEM_TITLE,
 };
 
-/** `level` sets the page outline and `visual` the look, so a deep heading can still read as subordinate to the page's title. */
+/** A title in the page's document outline. */
 export const Heading = ({
   level,
   visual = LEVEL_TITLE_ROLE[level],

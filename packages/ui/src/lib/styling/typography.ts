@@ -16,8 +16,10 @@ export const TYPOGRAPHY: Record<TTextRole, string> = {
   [TEXT_ROLE.PROSE_H2]: `${TITLE} text-prose-h2`,
   [TEXT_ROLE.PROSE_H3]: `${TITLE} text-prose-h3`,
   [TEXT_ROLE.PROSE_H4]: `${TITLE} text-prose-h4`,
+  [TEXT_ROLE.TABLE_TITLE]: `${TITLE} text-copy`,
   [TEXT_ROLE.INTRO]: 'font-read text-prose text-text-muted',
   [TEXT_ROLE.BODY]: 'font-read text-prose leading-[1.7] text-text',
+  [TEXT_ROLE.MESSAGE]: 'font-read text-lead leading-[1.72] text-text',
   [TEXT_ROLE.CARD_BODY]: 'font-read text-lead text-text-muted',
   [TEXT_ROLE.META]: `${SUBTLE_MONO} text-meta`,
   [TEXT_ROLE.EYEBROW]:

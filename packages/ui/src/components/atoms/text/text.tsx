@@ -31,7 +31,7 @@ export type TTextProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** Renders any non-heading text role, body text when none is named. */
+/** Renders any text role in a non-heading element. */
 export const Text = ({
   as: Tag = P_AS_CONST,
   textRole,

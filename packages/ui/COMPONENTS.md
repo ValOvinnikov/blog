@@ -55,9 +55,9 @@ Variants: hasHref: (boolean)
 
 ### Heading — `components/atoms/heading/heading.tsx`
 
-`level` sets the page outline and `visual` the look, so a deep heading can still read as subordinate to the page's title.
+A title in the page's document outline.
 Props: level: THeadingLevel · visual?: THeadingVariants['visual'] · id?: string · style?: CSSProperties · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: visual: hero|post|page|section|card|prose-h2|prose-h3|prose-h4
+Variants: visual: TEXT_ROLE.HERO_TITLE|TEXT_ROLE.POST_TITLE|TEXT_ROLE.PAGE_TITLE|TEXT_ROLE.SECTION_TITLE|TEXT_ROLE.CARD_TITLE|TEXT_ROLE.ITEM_TITLE|TEXT_ROLE.DIALOG_TITLE|TEXT_ROLE.PROSE_H2|TEXT_ROLE.PROSE_H3|TEXT_ROLE.PROSE_H4|TEXT_ROLE.TABLE_TITLE|hero|post|page|section|card|prose-h2|prose-h3|prose-h4
 
 ### Icon — `components/atoms/icon/icon.tsx`
 
@@ -127,9 +127,9 @@ Variants: variant: default|accent · interactive: (boolean)
 
 ### Text — `components/atoms/text/text.tsx`
 
-Renders any non-heading text role, body text when none is named.
+Renders any text role in a non-heading element.
 Props: as?: TTextElement · textRole?: TTextRole · style?: CSSProperties · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: textRole: TEXT_ROLE.HERO_TITLE|TEXT_ROLE.POST_TITLE|TEXT_ROLE.PAGE_TITLE|TEXT_ROLE.SECTION_TITLE|TEXT_ROLE.CARD_TITLE|TEXT_ROLE.ITEM_TITLE|TEXT_ROLE.DIALOG_TITLE|TEXT_ROLE.PROSE_H2|TEXT_ROLE.PROSE_H3|TEXT_ROLE.PROSE_H4|TEXT_ROLE.INTRO|TEXT_ROLE.BODY|TEXT_ROLE.CARD_BODY|TEXT_ROLE.META|TEXT_ROLE.EYEBROW|TEXT_ROLE.LABEL|TEXT_ROLE.FOOTNOTE|TEXT_ROLE.CAPTION|TEXT_ROLE.QUOTE|TEXT_ROLE.ATTRIBUTION|TEXT_ROLE.FIGURE|TEXT_ROLE.FIGURE_LABEL
+Variants: textRole: TEXT_ROLE.HERO_TITLE|TEXT_ROLE.POST_TITLE|TEXT_ROLE.PAGE_TITLE|TEXT_ROLE.SECTION_TITLE|TEXT_ROLE.CARD_TITLE|TEXT_ROLE.ITEM_TITLE|TEXT_ROLE.DIALOG_TITLE|TEXT_ROLE.PROSE_H2|TEXT_ROLE.PROSE_H3|TEXT_ROLE.PROSE_H4|TEXT_ROLE.TABLE_TITLE|TEXT_ROLE.INTRO|TEXT_ROLE.BODY|TEXT_ROLE.MESSAGE|TEXT_ROLE.CARD_BODY|TEXT_ROLE.META|TEXT_ROLE.EYEBROW|TEXT_ROLE.LABEL|TEXT_ROLE.FOOTNOTE|TEXT_ROLE.CAPTION|TEXT_ROLE.QUOTE|TEXT_ROLE.ATTRIBUTION|TEXT_ROLE.FIGURE|TEXT_ROLE.FIGURE_LABEL
 
 ### TextInput — `components/atoms/text-input/text-input.tsx`
 
