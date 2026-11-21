@@ -17,6 +17,7 @@ import {
   MOCK_CLIENT_ID,
   MOCK_CLIENT_SECRET,
   MOCK_REPLACEMENT_CLIENT_ID,
+  MOCK_UNKNOWN_PROVIDER,
   mockOAuthClient,
 } from '@platform/testing/sign-in-apps/fixtures';
 import {
@@ -206,6 +207,21 @@ describe(saveSignInAppAction, () => {
       tenantOAuthCredentials.saveTenantOAuthCredentials,
     ).not.toHaveBeenCalled();
     expect(recordAuditEvent).not.toHaveBeenCalled();
+  });
+
+  it('reports invalid input for an unknown provider and saves nothing', async () => {
+    const result = await saveSignInAppAction(MOCK_TENANT_ID, {
+      ...NEW_APP_INPUT,
+      provider: MOCK_UNKNOWN_PROVIDER,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
+    expect(
+      tenantOAuthCredentials.saveTenantOAuthCredentials,
+    ).not.toHaveBeenCalled();
   });
 
   it.each([

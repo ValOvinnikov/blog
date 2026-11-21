@@ -4,6 +4,7 @@ import {
 } from '@platform/constants/sign-in-apps';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { mockOwnerContext } from '@platform/testing/custom-domain/fixtures';
+import { MOCK_UNKNOWN_PROVIDER } from '@platform/testing/sign-in-apps/fixtures';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_CUSTOM_DOMAIN,
@@ -71,6 +72,15 @@ describe(confirmSignInCallbackAction, () => {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SIGN_IN_APP_REFUSAL.ARCHIVED,
     });
+    expect(
+      tenantOAuthCredentials.confirmTenantOAuthCallbackDomain,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('reports a server error for an unknown provider and records nothing', async () => {
+    expect(
+      await confirmSignInCallbackAction(MOCK_TENANT_ID, MOCK_UNKNOWN_PROVIDER),
+    ).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(
       tenantOAuthCredentials.confirmTenantOAuthCallbackDomain,
     ).not.toHaveBeenCalled();

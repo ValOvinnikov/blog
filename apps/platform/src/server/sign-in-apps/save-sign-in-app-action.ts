@@ -15,13 +15,15 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  isOutcomeInvalid,
+  isOutcomeSuccess,
   type TActionResult,
 } from '@shinefold/config';
 import { hasLength } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { readSavedSignInApps } from './read-saved-sign-in-apps';
-import { requireSignInAppOwner } from './require-sign-in-app-owner';
+import { resolveWritableSignInApp } from './resolve-writable-sign-in-app';
 import {
   signInAppInputSchema,
   type TSignInAppInput,
@@ -41,21 +43,20 @@ export const saveSignInAppAction = async (
   tenantId: string,
   input: TSignInAppInput,
 ): Promise<TSaveSignInAppResult> => {
-  const { tenant } = await requireSignInAppOwner(tenantId);
-
-  const parsed = signInAppInputSchema.safeParse(input);
-  if (!parsed.success) {
+  const resolved = await resolveWritableSignInApp(
+    tenantId,
+    signInAppInputSchema,
+    input,
+  );
+  if (isOutcomeInvalid(resolved)) {
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
-  const { provider, clientId, clientSecret } = parsed.data;
-  const { id, entitlements, primaryDomain, isArchived } = tenant;
+  if (!isOutcomeSuccess(resolved)) return resolved;
+  const {
+    tenant: { id, entitlements, primaryDomain },
+    input: { provider, clientId, clientSecret },
+  } = resolved;
 
-  if (isArchived) {
-    return {
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: SIGN_IN_APP_REFUSAL.ARCHIVED,
-    };
-  }
   if (!entitlements.hasOwnOAuthApps) {
     return {
       outcome: ACTION_OUTCOME.REFUSED,
