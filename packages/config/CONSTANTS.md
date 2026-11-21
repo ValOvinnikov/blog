@@ -746,6 +746,9 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/request` — `apps/platform/src/constants/request.ts`
 
 - **REQUEST_LOG**: `UNHANDLED_ERROR`=`"request.unhandled_error"`
+- **REQUEST_HEADER**: `ORIGIN`=`"origin"`, `SEC_FETCH_SITE`=`"sec-fetch-site"`, `CONTENT_TYPE`=`"content-type"`
+- **FETCH_SITE**: `SAME_ORIGIN`=`"same-origin"`, `SAME_SITE`=`"same-site"`
+- **MEDIA_TYPE**: `JSON`=`"application/json"`, `TEXT`=`"text/plain"`
 
 ### `@platform/constants/sample-content` — `apps/platform/src/constants/sample-content.ts`
 

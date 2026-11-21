@@ -2,6 +2,7 @@ import { STUDIO_NEWSLETTER_LOG } from '@platform/constants/studio-newsletter';
 import { resolveStudioCaller } from '@platform/server/auth/resolve-studio-caller';
 import { startNewsletterPostSendNow } from '@platform/server/newsletter-post-send/start-newsletter-post-send-now';
 import {
+  isSameOriginJsonRequest,
   malformedStudioRequestResponse,
   newsletterPostSendNowBodySchema,
   readJsonBody,
@@ -36,6 +37,8 @@ const REFUSAL_HTTP_STATUS = {
 } satisfies Record<TNewsletterSendNowRefusal, number>;
 
 export async function POST(request: Request): Promise<NextResponse> {
+  if (!isSameOriginJsonRequest(request)) return studioForbiddenResponse();
+
   const parsed = newsletterPostSendNowBodySchema.safeParse(
     await readJsonBody(request),
   );
