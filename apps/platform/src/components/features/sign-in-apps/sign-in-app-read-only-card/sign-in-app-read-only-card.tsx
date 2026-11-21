@@ -4,6 +4,7 @@ import { SignInAppStatusBadge } from '@platform/components/features/sign-in-apps
 import { SignInAppTitle } from '@platform/components/features/sign-in-apps/sign-in-app-title';
 import { Card } from '@platform/components/shared/card';
 import type { TSignInAppView } from '@platform/server/sign-in-apps/load-sign-in-apps';
+import { useProviderName } from '@platform/utils/use-provider-name/use-provider-name';
 import { useTranslations } from 'next-intl';
 
 import { ReadOnlyCredentialBox } from './components/read-only-credential-box/read-only-credential-box';
@@ -21,7 +22,7 @@ export const SignInAppReadOnlyCard = ({
   isOperator,
 }: TSignInAppReadOnlyCardProps) => {
   const t = useTranslations('signInAppsPage');
-  const tProvider = useTranslations('signInAppsPage.providerName');
+  const toProviderName = useProviderName();
   const {
     provider,
     hasOwnApp,
@@ -31,7 +32,7 @@ export const SignInAppReadOnlyCard = ({
   } = app;
   const { body, fields } = signInAppReadOnlyCardVariants();
   const describe = (key: 'ownDescription' | 'sharedDescription') =>
-    t(key, { provider: tProvider(provider) });
+    t(key, { provider: toProviderName(provider) });
 
   return (
     <Card>

@@ -6,6 +6,7 @@ import { SignInAppStatusBadge } from '@platform/components/features/sign-in-apps
 import { SignInAppTitle } from '@platform/components/features/sign-in-apps/sign-in-app-title';
 import { Card } from '@platform/components/shared/card';
 import type { TSignInAppView } from '@platform/server/sign-in-apps/load-sign-in-apps';
+import { useProviderName } from '@platform/utils/use-provider-name/use-provider-name';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 
@@ -27,12 +28,13 @@ export const SignInAppCard = ({
   domain,
 }: TSignInAppCardProps) => {
   const t = useTranslations('signInAppsPage');
+  const toProviderName = useProviderName();
   const form = useSignInAppForm(tenantId, app);
   const { provider, saved, savedMessage, clearApp } = form;
   const [isCallbackConfirmed, setIsCallbackConfirmed] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const copyRef = useRef<HTMLButtonElement>(null);
-  const providerName = t(`providerName.${provider}`);
+  const providerName = toProviderName(provider);
   const hasCallbackWarning =
     app.hasCallbackWarning &&
     saved.hasOwnApp &&

@@ -4,13 +4,14 @@ import { useSignInAppGuard } from '@platform/components/features/sign-in-apps/si
 import type { TSignInAppView } from '@platform/server/sign-in-apps/load-sign-in-apps';
 import { saveSignInAppAction } from '@platform/server/sign-in-apps/save-sign-in-app-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import { useProviderName } from '@platform/utils/use-provider-name/use-provider-name';
+import { useSignInAppFailureText } from '@platform/utils/use-sign-in-app-failure-text/use-sign-in-app-failure-text';
 import {
   isOutcomeInvalid,
-  isOutcomeRefused,
   isOutcomeSuccess,
   type TMaybeUndefined,
 } from '@shinefold/config';
-import { hasLength } from '@shinefold/utils/primitives';
+import { hasLength, objectKeys } from '@shinefold/utils/primitives';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
@@ -22,21 +23,25 @@ import {
 
 export const useSignInAppForm = (tenantId: string, app: TSignInAppView) => {
   const t = useTranslations('signInAppsPage');
+  const toProviderName = useProviderName();
+  const failureText = useSignInAppFailureText();
   const router = useRouter();
   const { provider } = app;
   const [saveError, setSaveError] = useState<TMaybeUndefined<string>>();
   const [savedMessage, setSavedMessage] = useState('');
   const [isPending, startTransition] = useTransition();
-  const fields = useSignInAppFields(app, () => {
+
+  const clearFeedback = () => {
     setSaveError(undefined);
     setSavedMessage('');
-  });
+  };
+
+  const fields = useSignInAppFields(app, clearFeedback);
   const { saved, values, isDirty, showErrors, reset } = fields;
   const { clientId, clientSecret, isSecretEditable } = values;
 
   const submit = async (): Promise<boolean> => {
-    setSaveError(undefined);
-    setSavedMessage('');
+    clearFeedback();
     const missing: TSignInAppField[] = [
       ...(clientId.trim() ? [] : (['clientId'] as const)),
       ...(isSecretEditable && !clientSecret.trim()
@@ -58,22 +63,18 @@ export const useSignInAppForm = (tenantId: string, app: TSignInAppView) => {
     if (isOutcomeSuccess(result)) {
       reset({ hasOwnApp: true, clientId: clientId.trim() });
       setSaveError(undefined);
-      setSavedMessage(t('saved', { provider: t(`providerName.${provider}`) }));
+      setSavedMessage(t('saved', { provider: toProviderName(provider) }));
       router.refresh();
       return true;
     }
     const invalidFields = isOutcomeInvalid(result)
-      ? (Object.keys(result.fieldErrors) as TSignInAppField[])
+      ? objectKeys(result.fieldErrors)
       : [];
     if (hasLength(invalidFields)) {
       showErrors(invalidFields);
       return false;
     }
-    setSaveError(
-      isOutcomeRefused(result)
-        ? t(`refusal.${result.reason}`)
-        : t('saveFailed'),
-    );
+    setSaveError(failureText(result, t('saveFailed')));
     return false;
   };
 
@@ -90,8 +91,7 @@ export const useSignInAppForm = (tenantId: string, app: TSignInAppView) => {
 
   const clearApp = () => {
     reset({ hasOwnApp: false, clientId: '' });
-    setSaveError(undefined);
-    setSavedMessage('');
+    clearFeedback();
     router.refresh();
   };
 

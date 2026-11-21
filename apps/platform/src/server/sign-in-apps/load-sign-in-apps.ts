@@ -2,6 +2,7 @@ import 'server-only';
 
 import {
   OAUTH_PROVIDERS,
+  SIGN_IN_APPS_CALLBACK_WARNING_MODES,
   SIGN_IN_APPS_MODE,
   type TSignInAppsMode,
 } from '@platform/constants/sign-in-apps';
@@ -9,6 +10,7 @@ import { maskClientId } from '@platform/utils/mask-client-id/mask-client-id';
 import { oauthCallbackUrl } from '@platform/utils/oauth-callback-url/oauth-callback-url';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import type { TOAuthProvider } from '@shinefold/config/constants';
+import { isOneOf } from '@shinefold/utils/primitives';
 
 import { readSavedSignInApps } from './read-saved-sign-in-apps';
 
@@ -40,8 +42,7 @@ export const loadSignInApps = async (
   const isEntitled = entitlements.hasOwnOAuthApps;
   const savedApps = await readSavedSignInApps(id);
   const isWarnable =
-    !isArchived &&
-    (mode === SIGN_IN_APPS_MODE.EDIT || mode === SIGN_IN_APPS_MODE.READ_ONLY);
+    !isArchived && isOneOf(SIGN_IN_APPS_CALLBACK_WARNING_MODES, mode);
 
   return OAUTH_PROVIDERS.map((provider) => {
     const client = savedApps.get(provider);
