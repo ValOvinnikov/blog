@@ -185,14 +185,10 @@
   --text-4xl: clamp(2.375rem, 1.851rem + 2.62vw, 3.375rem);
   --text-4xl--line-height: 1.08;
 
-  --text-display: clamp(2.625rem, 1.825rem + 3.6vw, 4.625rem);
-  --text-display--line-height: 1.05;
-  --text-display--letter-spacing: -0.02em;
-
   /* cqi, not vw: it scales with the nearest container, so a footer drawn in a narrow frame gets a narrow wordmark. */
   --text-wordmark: clamp(2.625rem, 1.825rem + 3.6cqi, 4.625rem);
-  --text-wordmark--line-height: var(--text-display--line-height);
-  --text-wordmark--letter-spacing: var(--text-display--letter-spacing);
+  --text-wordmark--line-height: 1.05;
+  --text-wordmark--letter-spacing: -0.02em;
 
   --text-title-2xl: clamp(1.75rem, 1.4rem + 1.4vw, 2.25rem);
   --text-title-2xl--line-height: 1.2;

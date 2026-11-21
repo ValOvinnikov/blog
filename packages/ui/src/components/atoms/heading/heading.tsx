@@ -1,7 +1,8 @@
 import {
   type IWithClassName,
   type IWithDataTestId,
-  SIZE,
+  TEXT_ROLE,
+  type TTextRole,
 } from '@shinefold/config';
 import { headingTags, type THeadingLevel } from '@shinefold/ui/lib/react';
 import type { CSSProperties, ReactNode } from 'react';
@@ -12,26 +13,22 @@ export type THeadingProps = IWithClassName &
   IWithDataTestId & {
     level: THeadingLevel;
     visual?: THeadingVariants['visual'];
-    size?: THeadingVariants['size'];
     id?: string;
     style?: CSSProperties;
     children?: ReactNode;
   };
 
-type TSize = NonNullable<THeadingVariants['size']>;
-
-const defaultSizes: Record<THeadingLevel, TSize> = {
-  1: SIZE.XXL,
-  2: SIZE.XL,
-  3: SIZE.LG,
-  4: SIZE.MD,
+const LEVEL_TITLE_ROLE: Record<THeadingLevel, TTextRole> = {
+  1: TEXT_ROLE.PAGE_TITLE,
+  2: TEXT_ROLE.SECTION_TITLE,
+  3: TEXT_ROLE.CARD_TITLE,
+  4: TEXT_ROLE.ITEM_TITLE,
 };
 
-/** Semantic heading — `level` picks the rendered `h1`–`h4` tag for the page outline, independently of `visual`, which drives the rendered size instead (e.g. a deep Portable Text heading can still read as subordinate to the page's title). */
+/** `level` sets the page outline and `visual` the look, so a deep heading can still read as subordinate to the page's title. */
 export const Heading = ({
   level,
-  visual,
-  size,
+  visual = LEVEL_TITLE_ROLE[level],
   className,
   dataTestId,
   id,
@@ -43,11 +40,7 @@ export const Heading = ({
     <Tag
       id={id}
       style={style}
-      className={headingVariants({
-        visual,
-        size: visual ? undefined : (size ?? defaultSizes[level]),
-        class: className,
-      })}
+      className={headingVariants({ visual, class: className })}
       data-testid={dataTestId}
     >
       {children}

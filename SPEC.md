@@ -3021,6 +3021,14 @@ component's own variants. A consumer restyling internals through `className`,
 or through a `[&>child]:` selector, means a variant is missing; add the
 variant.
 
+**Typography is chosen by role, never by size.** `Text`, `Heading` and
+`Prose` take their font, size, weight, leading, tracking and colour from one
+text role in `TYPOGRAPHY` (`packages/ui/src/lib/styling/typography.ts`), keyed
+by `TEXT_ROLE`: `Text`'s `textRole` (`BODY` when none is named), `Heading`'s
+`visual` (the title its level implies when none is named) and `Prose`'s fixed
+`BODY`. None of them takes a size or variant scale beside it, so a new look is
+a registry entry, never a class list in a component.
+
 **Radius is chosen by role, never by step.** A component rounds through the
 token for what it is, so the Look's `radiusScale` and card style reach it
 without the component knowing either:
