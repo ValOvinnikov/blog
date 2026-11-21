@@ -13368,6 +13368,14 @@
         "file": "apps/worker/src/constants/newsletter-send.ts"
       }
     ],
+    "newsletter_send.move_up_price_failed": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.MOVE_UP_PRICE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
     "newsletter_send.alert_no_recipients": [
       {
         "ref": "NEWSLETTER_SEND_LOG.ALERT_NO_RECIPIENTS",
@@ -13510,6 +13518,22 @@
         "scope": "app:worker",
         "from": "@worker/constants/owner-access",
         "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_email.send_failed": [
+      {
+        "ref": "OWNER_EMAIL_LOG.SEND_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-email",
+        "file": "apps/worker/src/constants/owner-email.ts"
+      }
+    ],
+    "owner_email.release_failed": [
+      {
+        "ref": "OWNER_EMAIL_LOG.RELEASE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-email",
+        "file": "apps/worker/src/constants/owner-email.ts"
       }
     ],
     "BAND_NEAR": [

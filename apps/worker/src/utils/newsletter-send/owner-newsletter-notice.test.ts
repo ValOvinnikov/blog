@@ -9,20 +9,15 @@ import {
   BILLING_CURRENCY,
   NEWSLETTER_LIMIT_NOTICE_KIND,
   STRIPE_PRICE_LOOKUP_KEY,
-  type TBillingCurrency,
-  type TStripePriceLookupKey,
 } from '@shinefold/db/constants';
 import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
 import {
   markNewsletterLimitNoticeSent,
   releaseNewsletterLimitNotice,
 } from '@shinefold/db/queries/newsletter-post-sends';
-import {
-  listStripePrices,
-  type TStripePrice,
-} from '@shinefold/db/queries/stripe-catalogue';
+import { listStripePrices } from '@shinefold/db/queries/stripe-catalogue';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import { MOCK_STRIPE_PRODUCT_ID } from '@shinefold/db/testing/stripe-catalogue/fixtures';
+import { mockStripePrice } from '@shinefold/db/testing/stripe-catalogue/fixtures';
 import { sendEmail } from '@shinefold/email';
 import { NEWSLETTER_SEND_LOG } from '@worker/constants/newsletter-send';
 import { OWNER_SUBSCRIBERS_PATH } from '@worker/constants/owner-email';
@@ -60,24 +55,32 @@ const MOCK_BAND_PAUSE = {
 const MOCK_MONTHLY_EXTRA = '20.00';
 const MOCK_YEARLY_EXTRA = '200.00';
 
-function mockBandPrice(
-  lookupKey: TStripePriceLookupKey,
-  unitAmount: number,
-  currency: TBillingCurrency = BILLING_CURRENCY.EUR,
-): TStripePrice {
-  return {
-    lookupKey,
-    currency,
-    unitAmount,
-    stripeProductId: MOCK_STRIPE_PRODUCT_ID,
-  };
-}
-
 const MOCK_BAND_PRICES = [
-  mockBandPrice(STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500, 1_500),
-  mockBandPrice(STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_5000, 3_500),
-  mockBandPrice(STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500_YEARLY, 15_000),
-  mockBandPrice(STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_5000_YEARLY, 35_000),
+  mockStripePrice({
+    lookupKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_25000,
+    currency: BILLING_CURRENCY.EUR,
+    unitAmount: 9_900,
+  }),
+  mockStripePrice({
+    lookupKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500,
+    currency: BILLING_CURRENCY.EUR,
+    unitAmount: 1_500,
+  }),
+  mockStripePrice({
+    lookupKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_5000,
+    currency: BILLING_CURRENCY.EUR,
+    unitAmount: 3_500,
+  }),
+  mockStripePrice({
+    lookupKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500_YEARLY,
+    currency: BILLING_CURRENCY.EUR,
+    unitAmount: 15_000,
+  }),
+  mockStripePrice({
+    lookupKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_5000_YEARLY,
+    currency: BILLING_CURRENCY.EUR,
+    unitAmount: 35_000,
+  }),
 ];
 
 function mockGrowthTenant(overrides: Partial<TTenant> = {}): TTenant {
@@ -163,6 +166,23 @@ describe(sendOwnerNewsletterNotice, () => {
     );
 
     expect(sentEmail()?.text).not.toContain(MOCK_MONTHLY_EXTRA);
+  });
+
+  it('still sends the email, without a move-up, when the prices cannot be read', async () => {
+    vi.mocked(listStripePrices).mockRejectedValue(new Error(MOCK_RESEND_DOWN));
+
+    await sendOwnerNewsletterNotice(
+      mockGrowthTenant(),
+      SUBSCRIBER_BAND_NEAR,
+      MOCK_LIMITS,
+    );
+
+    expect(sentEmail()?.text).not.toContain(MOCK_MONTHLY_EXTRA);
+    expect(logger.error).toHaveBeenCalledWith(
+      NEWSLETTER_SEND_LOG.MOVE_UP_PRICE_FAILED,
+      { tenantId: MOCK_TENANT_ID, error: MOCK_RESEND_DOWN },
+    );
+    expect(releaseNewsletterLimitNotice).not.toHaveBeenCalled();
   });
 
   it('names the skipped post in the paused email and shows only the limit it hit', async () => {

@@ -3,11 +3,14 @@
 import { BILLING_LOG } from '@platform/constants/billing';
 import type { TPlanChangeRefusal } from '@platform/constants/plan-change';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import type { TStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { planTotalFor } from '@platform/utils/move-up-offer/move-up-offer';
-import { isOutcomeRefused, type TMaybeUndefined } from '@shinefold/config';
+import {
+  type TStripeAmount,
+  isOutcomeRefused,
+  type TMaybeUndefined,
+} from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
 

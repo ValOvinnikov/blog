@@ -1215,7 +1215,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@worker/constants/newsletter-send` — `apps/worker/src/constants/newsletter-send.ts`
 
-- **NEWSLETTER_SEND_LOG**: `START_FAILED`=`"newsletter_send.start_failed"`, `NO_TENANT_MAIL_KEY`=`"newsletter_send.no_tenant_mail_key"`, `NO_UNSUBSCRIBE_KEY`=`"newsletter_send.no_unsubscribe_key"`, `NO_PLATFORM_URL`=`"newsletter_send.no_platform_url"`, `SUBSCRIBERS_UNREADABLE`=`"newsletter_send.subscribers_unreadable"`, `PAGE_UNREADABLE`=`"newsletter_send.page_unreadable"`, `SEND_FAILED`=`"newsletter_send.send_failed"`, `OWNER_EMAIL_FAILED`=`"newsletter_send.owner_email_failed"`, `OWNER_EMAIL_MISSING`=`"newsletter_send.owner_email_missing"`, `ALERT_NO_RECIPIENTS`=`"newsletter_send.alert_no_recipients"`, `ALERT_FAILED`=`"newsletter_send.alert_failed"`, `RUN_FAILED`=`"newsletter_send.run_failed"`
+- **NEWSLETTER_SEND_LOG**: `START_FAILED`=`"newsletter_send.start_failed"`, `NO_TENANT_MAIL_KEY`=`"newsletter_send.no_tenant_mail_key"`, `NO_UNSUBSCRIBE_KEY`=`"newsletter_send.no_unsubscribe_key"`, `NO_PLATFORM_URL`=`"newsletter_send.no_platform_url"`, `SUBSCRIBERS_UNREADABLE`=`"newsletter_send.subscribers_unreadable"`, `PAGE_UNREADABLE`=`"newsletter_send.page_unreadable"`, `SEND_FAILED`=`"newsletter_send.send_failed"`, `OWNER_EMAIL_FAILED`=`"newsletter_send.owner_email_failed"`, `OWNER_EMAIL_MISSING`=`"newsletter_send.owner_email_missing"`, `MOVE_UP_PRICE_FAILED`=`"newsletter_send.move_up_price_failed"`, `ALERT_NO_RECIPIENTS`=`"newsletter_send.alert_no_recipients"`, `ALERT_FAILED`=`"newsletter_send.alert_failed"`, `RUN_FAILED`=`"newsletter_send.run_failed"`
 - **NEWSLETTER_POST_STATE**: `READY`, `SCHEDULED`, `CANCELLED`, `SKIPPED`, `UNCLAIMED`
 - **NEWSLETTER_SEND_PACE**: `NORMAL`, `SLOW`, `STOPPED`
 - **NEWSLETTER_SUBSCRIBER_SEND**: `SENT`, `UNREADABLE`, `REJECTED`
@@ -1227,6 +1227,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@worker/constants/owner-email` — `apps/worker/src/constants/owner-email.ts`
 
+- **OWNER_EMAIL_LOG**: `SEND_FAILED`=`"owner_email.send_failed"`, `RELEASE_FAILED`=`"owner_email.release_failed"`
 - **OWNER_NEWSLETTER_EMAIL**: `BAND_NEAR`, `EMAILS_NEAR`, `BAND_PAUSED`, `EMAILS_PAUSED`
 
 ### `@worker/constants/provisioning` — `apps/worker/src/constants/provisioning.ts`

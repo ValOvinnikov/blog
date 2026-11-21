@@ -10,7 +10,10 @@ import { insertTestEmailConfig } from '@shinefold/db/testing/email-config/fixtur
 import { useFrozenClock } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { mockSettingsFeaturesToggles } from '@shinefold/db/testing/settings-features/fixtures';
-import { insertTestEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/fixtures';
+import {
+  insertTestEntitlementGrant,
+  MOCK_GRANT_PAST,
+} from '@shinefold/db/testing/tenant-entitlement-grants/fixtures';
 import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
 import {
   patchTestTenant,
@@ -90,15 +93,35 @@ describe(getNewsletterSendingOffCause, () => {
       });
     });
 
-    it('counts a Newsletter grant on a plan without it as in the plan', async () => {
-      await patchTestTenant(db(), tenantId, { plan: TENANT_PLAN.STARTER });
-      await insertTestEntitlementGrant(db(), tenantId, {
-        key: CAPABILITY.NEWSLETTER,
+    describe('on a plan without Newsletter', () => {
+      beforeEach(async () => {
+        await patchTestTenant(db(), tenantId, { plan: TENANT_PLAN.STARTER });
       });
 
-      expect(await getNewsletterSendingOffCause(tenantId)).toEqual({
-        ok: true,
-        data: undefined,
+      it('counts an open Newsletter grant as in the plan', async () => {
+        await insertTestEntitlementGrant(db(), tenantId, {
+          key: CAPABILITY.NEWSLETTER,
+        });
+
+        expect(await getNewsletterSendingOffCause(tenantId)).toEqual({
+          ok: true,
+          data: undefined,
+        });
+      });
+
+      it.each([
+        ['an expired', { expiresAt: MOCK_GRANT_PAST }],
+        ['a revoked', { revokedAt: MOCK_GRANT_PAST }],
+      ])('does not count %s Newsletter grant', async (_, closed) => {
+        await insertTestEntitlementGrant(db(), tenantId, {
+          key: CAPABILITY.NEWSLETTER,
+          ...closed,
+        });
+
+        expect(await getNewsletterSendingOffCause(tenantId)).toEqual({
+          ok: true,
+          data: NEWSLETTER_SKIP_REASON.NOT_IN_PLAN,
+        });
       });
     });
 

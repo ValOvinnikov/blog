@@ -3,10 +3,13 @@ import { DetailList } from '@platform/components/shared/detail-list';
 import { Spinner } from '@platform/components/shared/spinner';
 import { Text } from '@platform/components/shared/text';
 import type { TMoveUpQuoteResult } from '@platform/server/billing/get-move-up-quote-action';
-import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import type { TMoveUpOffer } from '@platform/utils/move-up-offer/move-up-offer';
 import { richDate } from '@platform/utils/rich-date/rich-date';
-import { ALERT_TYPE, type TMaybeUndefined } from '@shinefold/config';
+import {
+  formatStripeAmount,
+  ALERT_TYPE,
+  type TMaybeUndefined,
+} from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 
 export type TMoveUpBandQuoteProps = {

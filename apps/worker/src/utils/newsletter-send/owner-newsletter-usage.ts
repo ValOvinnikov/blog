@@ -10,7 +10,7 @@ import type { TOwnerNewsletterEmailCopy } from '@worker/utils/owner-email/owner-
 
 type TUsageMeter = Omit<TOwnerUsageRow, 'level' | 'hasBar'>;
 
-export type TOwnerNewsletterUsageInput = {
+type TOwnerNewsletterUsageInput = {
   copy: TOwnerNewsletterEmailCopy;
   format: (value: number) => string;
   limits: TNewsletterLimits;

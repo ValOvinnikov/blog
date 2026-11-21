@@ -1,8 +1,11 @@
 import 'server-only';
 
 import { STRIPE_PRORATION_BEHAVIOR } from '@platform/constants/billing';
-import type { TStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
-import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import {
+  type TStripeAmount,
+  type TMaybeNull,
+  type TMaybeUndefined,
+} from '@shinefold/config';
 import { isString } from '@shinefold/utils/primitives';
 import type Stripe from 'stripe';
 

@@ -1,7 +1,5 @@
-import {
-  LOCALE_ISO_CODES,
-  type TLocaleIsoCode,
-} from '@shinefold/config/constants';
+import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import type { TByLocale } from '@shinefold/config/types';
 import type { TOwnerNewsletterEmailCopy } from '@worker/utils/owner-email/owner-newsletter-copy-input';
 
 import { OWNER_NEWSLETTER_EMAIL_COPY_DE } from './de';
@@ -16,4 +14,4 @@ export const OWNER_NEWSLETTER_EMAIL_COPY = {
   [LOCALE_ISO_CODES.FR]: OWNER_NEWSLETTER_EMAIL_COPY_FR,
   [LOCALE_ISO_CODES.DE]: OWNER_NEWSLETTER_EMAIL_COPY_DE,
   [LOCALE_ISO_CODES.ES]: OWNER_NEWSLETTER_EMAIL_COPY_ES,
-} satisfies Record<TLocaleIsoCode, TOwnerNewsletterEmailCopy>;
+} satisfies TByLocale<TOwnerNewsletterEmailCopy>;

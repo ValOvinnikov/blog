@@ -6,8 +6,10 @@ export const OWNER_DASHBOARD_PATH = '/dashboard';
 export const OWNER_SUBSCRIBERS_PATH = '/dashboard/subscribers';
 export const OWNER_STUDIO_PATH = '/dashboard/studio';
 export const DEFAULT_OWNER_EMAIL_FROM_ADDRESS = `${PLATFORM_EMAIL_BRAND_NAME} <onboarding@resend.dev>`;
-export const OWNER_EMAIL_SEND_FAILED_EVENT = 'owner_email.send_failed';
-export const OWNER_EMAIL_RELEASE_FAILED_EVENT = 'owner_email.release_failed';
+export const OWNER_EMAIL_LOG = {
+  SEND_FAILED: 'owner_email.send_failed',
+  RELEASE_FAILED: 'owner_email.release_failed',
+} as const;
 
 export const OWNER_NEWSLETTER_EMAIL = {
   BAND_NEAR: 'BAND_NEAR',

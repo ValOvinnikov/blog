@@ -46,6 +46,7 @@ async function runNewsletterSend(
   let { pace } = gate;
   let afterId: TMaybeUndefined<string>;
   let unreadableCount = 0;
+  let reachedCount = 0;
   for (;;) {
     if (pace === NEWSLETTER_SEND_PACE.SLOW && afterId) {
       await sleep(NEWSLETTER_SLOW_PAUSE_MS);
@@ -56,13 +57,14 @@ async function runNewsletterSend(
       claimedAt,
       post,
       afterId,
+      reachedBefore: reachedCount,
     });
     await recordNewsletterSends(tenantId, page.sentCount);
     if (page.pace === NEWSLETTER_SEND_PACE.STOPPED) return;
 
     unreadableCount += page.unreadableCount;
     if (page.isLastPage) break;
-    ({ pace, lastId: afterId } = page);
+    ({ pace, lastId: afterId, reachedCount } = page);
   }
   await completeNewsletterSend(tenantId, postId, unreadableCount);
 }

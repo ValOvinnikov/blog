@@ -15,3 +15,7 @@ export function utcDayDaysBefore(at: Date, days: number): string {
 export function utcMonthStartDay(at: Date): string {
   return utcDay(new Date(Date.UTC(at.getUTCFullYear(), at.getUTCMonth(), 1)));
 }
+
+export function utcNextMonthStart(at: Date): Date {
+  return new Date(Date.UTC(at.getUTCFullYear(), at.getUTCMonth() + 1, 1));
+}

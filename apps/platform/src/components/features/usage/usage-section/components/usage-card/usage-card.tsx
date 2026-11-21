@@ -8,8 +8,8 @@ import {
 import { env } from '@platform/utils/env/env';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { toPricingPageUrl } from '@platform/utils/pricing-page-url/pricing-page-url';
-import { usageResetDate } from '@platform/utils/usage-reset-date/usage-reset-date';
 import { TENANT_PLAN } from '@shinefold/config';
+import { utcNextMonthStart } from '@shinefold/utils/date';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
 import { UsageRow } from './components/usage-row/usage-row';
@@ -38,7 +38,7 @@ export const UsageCard = async ({
     getFormatter(),
   ]);
   const resetsOn = format.dateTime(
-    usageResetDate(new Date()),
+    utcNextMonthStart(new Date()),
     RESET_DATE_FORMAT,
   );
   const plansUrl =

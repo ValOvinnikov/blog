@@ -4,7 +4,6 @@ import { mockNewsletterLimits } from '@worker/testing/newsletter-send/fixtures';
 
 import {
   allowanceLeft,
-  allowanceResetDate,
   nearLimitNotices,
   newsletterSkipReason,
   sentAfterThisPost,
@@ -71,13 +70,5 @@ describe(allowanceLeft, () => {
         mockNewsletterLimits({ allowance: 6_000, sentThisMonth: 6_100 }),
       ),
     ).toBe(0);
-  });
-});
-
-describe(allowanceResetDate, () => {
-  it('resets on the first of the next UTC month, across a year end', () => {
-    expect(allowanceResetDate(new Date('2031-12-31T23:30:00Z'))).toEqual(
-      new Date('2032-01-01T00:00:00Z'),
-    );
   });
 });

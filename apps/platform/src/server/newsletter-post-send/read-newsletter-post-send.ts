@@ -5,7 +5,6 @@ import {
   toSendNowEligibility,
 } from '@platform/utils/newsletter-send-now-eligibility/newsletter-send-now-eligibility';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
-import { usageResetDate } from '@platform/utils/usage-reset-date/usage-reset-date';
 import {
   NEWSLETTER_SKIP_REASON,
   type TMaybeUndefined,
@@ -16,6 +15,7 @@ import { queries } from '@shinefold/db';
 import { EMAIL_REPUTATION_LEVEL } from '@shinefold/db/constants';
 import type { INewsletterPostSend } from '@shinefold/db/queries/newsletter-post-sends';
 import { emailReputationLevel } from '@shinefold/db/utils/email-reputation-level/email-reputation-level';
+import { utcNextMonthStart } from '@shinefold/utils/date';
 
 export type TNewsletterPostSendRequest = {
   postId: string;
@@ -85,7 +85,7 @@ export const readNewsletterPostSend = async (
         sendingOffCause,
         isSendingStopped: await isSendingStopped(tenantId),
         limits,
-        resetsAt: usageResetDate(new Date()),
+        resetsAt: utcNextMonthStart(new Date()),
       })
     : { isOffered: false };
 

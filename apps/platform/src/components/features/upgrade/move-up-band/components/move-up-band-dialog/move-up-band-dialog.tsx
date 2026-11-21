@@ -5,8 +5,8 @@ import { PlanChangeStatus } from '@platform/components/features/upgrade/plan-cha
 import { AlertDialogShell } from '@platform/components/shared/alert-dialog-shell';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
-import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import type { TMoveUpOffer } from '@platform/utils/move-up-offer/move-up-offer';
+import { formatStripeAmount } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 
 export type TMoveUpBandDialogProps = {

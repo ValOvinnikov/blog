@@ -1,3 +1,4 @@
+import { formatStripeAmount } from '@shinefold/config';
 import {
   LOCALE_BCP47_TAGS,
   NEWSLETTER_SKIP_REASON,
@@ -17,15 +18,13 @@ import {
   PLATFORM_EMAIL_BRAND_NAME,
   type TOwnerEmail,
 } from '@shinefold/email';
+import { utcNextMonthStart } from '@shinefold/utils/date';
 import {
   OWNER_NEWSLETTER_EMAIL,
   type TOwnerNewsletterEmail,
 } from '@worker/constants/owner-email';
 import { formatInactivityDate } from '@worker/utils/inactivity-sweep/inactivity-dates';
-import {
-  allowanceResetDate,
-  sentAfterThisPost,
-} from '@worker/utils/newsletter-send/newsletter-limits';
+import { sentAfterThisPost } from '@worker/utils/newsletter-send/newsletter-limits';
 import type { TNewsletterMoveUpOffer } from '@worker/utils/newsletter-send/newsletter-move-up-offer';
 import { ownerNewsletterUsage } from '@worker/utils/newsletter-send/owner-newsletter-usage';
 import type { TOwnerNewsletterEmailCopy } from '@worker/utils/owner-email/owner-newsletter-copy-input';
@@ -36,15 +35,13 @@ export type TOwnerNewsletterPause = {
   postTitle: string;
 };
 
-export type TOwnerNewsletterNoticeInput = {
+type TOwnerNewsletterNoticeInput = {
   kind: TNewsletterLimitNoticeKind;
   limits: TNewsletterLimits;
   pause: TMaybeUndefined<TOwnerNewsletterPause>;
   moveUp: TMaybeUndefined<TNewsletterMoveUpOffer>;
   subscribersUrl: string;
 };
-
-const DECIMAL_BASE = 10;
 
 function ownerNewsletterEmailFor(
   kind: TNewsletterLimitNoticeKind,
@@ -67,13 +64,8 @@ function formatExtraPrice(
   locale: TLocaleIsoCode,
   { interval, currency, extraMinorUnits }: TNewsletterMoveUpOffer,
 ): string {
-  const formatter = new Intl.NumberFormat(LOCALE_BCP47_TAGS[locale], {
-    style: 'currency',
-    currency: currency.toUpperCase(),
-  });
-  const { maximumFractionDigits = 0 } = formatter.resolvedOptions();
   return copy.extraPrice[interval](
-    formatter.format(extraMinorUnits / DECIMAL_BASE ** maximumFractionDigits),
+    formatStripeAmount({ minorUnits: extraMinorUnits, currency }, locale),
   );
 }
 
@@ -91,7 +83,7 @@ export function buildOwnerNewsletterNotice(
     bandCeiling: format(bandCeiling),
     allowance: format(allowance),
     sent: format(sentAfterThisPost(limits)),
-    resetDate: formatInactivityDate(allowanceResetDate(new Date()), locale),
+    resetDate: formatInactivityDate(utcNextMonthStart(new Date()), locale),
     postTitle: pause?.postTitle ?? '',
     moveUp: moveUp && {
       ceiling: format(moveUp.ceiling),

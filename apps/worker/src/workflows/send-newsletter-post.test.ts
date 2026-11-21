@@ -70,12 +70,17 @@ describe(sendNewsletterPost, () => {
       vi.mocked(sendNewsletterPage).mockResolvedValueOnce(MOCK_FIRST_PAGE);
     });
 
-    it('pages on from where the last page ended, then records the post as sent', async () => {
+    it('pages on from the last page’s place and total, then marks the post sent', async () => {
       await runSend();
 
       expect(
         vi.mocked(sendNewsletterPage).mock.calls.map(([page]) => page.afterId),
       ).toEqual([undefined, MOCK_FIRST_ID]);
+      expect(
+        vi
+          .mocked(sendNewsletterPage)
+          .mock.calls.map(([page]) => page.reachedBefore),
+      ).toEqual([0, MOCK_FIRST_PAGE.reachedCount]);
       expect(completeNewsletterSend).toHaveBeenCalled();
       expect(sleep).not.toHaveBeenCalled();
       expect(hook.dispose).toHaveBeenCalled();
@@ -239,6 +244,7 @@ describe(sendNewsletterPost, () => {
       expect(sendNewsletterPage).toHaveBeenCalledExactlyOnceWith({
         ...claim,
         afterId: undefined,
+        reachedBefore: 0,
       });
     });
   });

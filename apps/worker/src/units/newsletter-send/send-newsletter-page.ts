@@ -3,7 +3,7 @@ import { setTimeout as wait } from 'node:timers/promises';
 import { NEWSLETTER_SKIP_REASON } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
-  addNewsletterPostSendProgress,
+  setNewsletterPostSendProgress,
   markNewsletterPostSkipped,
 } from '@shinefold/db/queries/newsletter-post-sends';
 import { listActiveSubscribers } from '@shinefold/db/queries/subscribers';
@@ -32,12 +32,14 @@ export type TNewsletterPageInput = {
   claimedAt: string;
   post: TNewsletterPost;
   afterId: TMaybeUndefined<string>;
+  reachedBefore: number;
 };
 
 export type TNewsletterPageResult = {
   pace: TNewsletterSendPace;
   lastId: TMaybeUndefined<string>;
   isLastPage: boolean;
+  reachedCount: number;
   sentCount: number;
   unreadableCount: number;
 };
@@ -47,11 +49,12 @@ export async function sendNewsletterPage(
 ): Promise<TNewsletterPageResult> {
   'use step';
 
-  const { tenantId, postId, claimedAt, afterId } = input;
+  const { tenantId, postId, claimedAt, afterId, reachedBefore } = input;
   const stopped = {
     pace: NEWSLETTER_SEND_PACE.STOPPED,
     lastId: afterId,
     isLastPage: true,
+    reachedCount: reachedBefore,
     sentCount: 0,
     unreadableCount: 0,
   };
@@ -79,17 +82,19 @@ export async function sendNewsletterPage(
     if (index > 0) await wait(NEWSLETTER_SEND_INTERVAL_MS);
     sends.push(await sendToSubscriber(input, context, subscriber));
   }
-  await addNewsletterPostSendProgress(
+  const reachedCount = reachedBefore + subscribers.length;
+  await setNewsletterPostSendProgress(
     tenantId,
     postId,
     new Date(claimedAt),
-    subscribers.length,
+    reachedCount,
   );
 
   return {
     pace,
     lastId: subscribers.at(-1)?.id ?? afterId,
     isLastPage: subscribers.length < NEWSLETTER_SEND_PAGE_SIZE,
+    reachedCount,
     sentCount: countOf(sends, NEWSLETTER_SUBSCRIBER_SEND.SENT),
     unreadableCount: countOf(sends, NEWSLETTER_SUBSCRIBER_SEND.UNREADABLE),
   };

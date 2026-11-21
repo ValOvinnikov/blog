@@ -1,15 +1,13 @@
 import { faker } from '@faker-js/faker';
 import { PRICE_PERIOD } from '@shinefold/config';
 import { BILLING_CURRENCY } from '@shinefold/db/constants';
+import { mockStripePrice } from '@shinefold/db/testing/stripe-catalogue/fixtures';
 import {
   mockPricingPrice,
   mockPricingTier,
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
-import {
-  mockStripePrice,
-  mockLinkedPricingTier,
-} from '@web/testing/modules/pricing/live-price-fixtures';
+import { mockLinkedPricingTier } from '@web/testing/modules/pricing/live-price-fixtures';
 
 import { toPricingPanels } from './to-pricing-panels';
 

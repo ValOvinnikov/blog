@@ -55,6 +55,8 @@ new upstream here means auditing every consumer's `paths` and vitest alias.
   helpers (`TValueOf`).
 - `client/objects.ts` — shared object interfaces (`ISanityImage`, `ILink`,
   `IBodyImageBlock`).
+- `money/` — `formatStripeAmount`, a Stripe minor-unit amount in a locale's
+  currency format, read by the platform and the worker.
 - `portable-text/` — the resolved Portable Text block type, built on
   `@portabletext/types`.
 - `action-outcome/` — the `isOutcome*` guards that read and narrow an
