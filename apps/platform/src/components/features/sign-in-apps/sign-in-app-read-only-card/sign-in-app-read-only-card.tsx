@@ -1,10 +1,8 @@
 import { SignInAppCallbackField } from '@platform/components/features/sign-in-apps/sign-in-app-callback-field';
 import { SignInAppCallbackWarning } from '@platform/components/features/sign-in-apps/sign-in-app-callback-warning';
-import { SignInAppStatusBadge } from '@platform/components/features/sign-in-apps/sign-in-app-status-badge';
-import { SignInAppTitle } from '@platform/components/features/sign-in-apps/sign-in-app-title';
 import { Card } from '@platform/components/shared/card';
 import type { TSignInAppView } from '@platform/server/sign-in-apps/load-sign-in-apps';
-import { useProviderName } from '@platform/utils/use-provider-name/use-provider-name';
+import { useSignInAppCardHeader } from '@platform/utils/use-sign-in-app-card-header/use-sign-in-app-card-header';
 import { useTranslations } from 'next-intl';
 
 import { ReadOnlyCredentialBox } from './components/read-only-credential-box/read-only-credential-box';
@@ -22,7 +20,6 @@ export const SignInAppReadOnlyCard = ({
   isOperator,
 }: TSignInAppReadOnlyCardProps) => {
   const t = useTranslations('signInAppsPage');
-  const toProviderName = useProviderName();
   const {
     provider,
     hasOwnApp,
@@ -31,18 +28,11 @@ export const SignInAppReadOnlyCard = ({
     hasCallbackWarning,
   } = app;
   const { body, fields } = signInAppReadOnlyCardVariants();
-  const describe = (key: 'ownDescription' | 'sharedDescription') =>
-    t(key, { provider: toProviderName(provider) });
+  const { header } = useSignInAppCardHeader(provider, hasOwnApp);
 
   return (
     <Card>
-      <Card.Header
-        title={<SignInAppTitle provider={provider} />}
-        supportingText={describe(
-          hasOwnApp ? 'ownDescription' : 'sharedDescription',
-        )}
-        actions={<SignInAppStatusBadge hasOwnApp={hasOwnApp} />}
-      />
+      <Card.Header {...header} />
       <Card.Body>
         <div className={body()}>
           {hasCallbackWarning && (
