@@ -32,7 +32,6 @@ export const ALWAYS_AVAILABLE_KEYS = [
   'domain',
   'signIn',
 ];
-export const MOCK_UNREAD_LEADS_COUNT = 3;
 
 export const translated = (keys: string[]) =>
   keys.map((key) => tNavSections(key));

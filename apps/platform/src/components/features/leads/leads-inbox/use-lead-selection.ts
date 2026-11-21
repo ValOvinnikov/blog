@@ -57,10 +57,7 @@ export const useLeadSelection = ({
   ) => {
     updateLead(id, { isRead });
     const result = await settleAction(setLeadReadAction(tenantId, id, isRead));
-    if (isOutcomeSuccess(result)) {
-      router.refresh();
-      return;
-    }
+    if (isOutcomeSuccess(result)) return;
     updateLead(id, { isRead: wasRead });
     toast.error({ message: t('readStateFailed') });
   };
@@ -71,8 +68,9 @@ export const useLeadSelection = ({
   };
 
   const markUnread = (lead: TInboxLead) => {
-    close();
+    // Before `close()`: its flushSync must move the row to Unread first, or focus lands on the unmounted one.
     void setReadState(lead, false);
+    close();
   };
 
   const handleDeleted = (id: string) => {
@@ -88,13 +86,13 @@ export const useLeadSelection = ({
   };
 
   return {
-    selectedId,
+    selection: { selectedId, rowRef, open },
     paneHeadingRef,
     listRef,
-    rowRef,
-    open,
     markUnread,
     close,
     handleDeleted,
   };
 };
+
+export type TLeadSelection = ReturnType<typeof useLeadSelection>['selection'];

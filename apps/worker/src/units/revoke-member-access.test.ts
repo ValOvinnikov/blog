@@ -16,6 +16,7 @@ import {
   mockMemberAclEntry,
   mockSanityMember,
 } from '@worker/testing/member-access/fixtures';
+import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
   MOCK_OWNER_EMAIL,
   MOCK_OWNER_PROJECT_USER_ID,
@@ -113,6 +114,44 @@ describe(revokeMemberAccess, () => {
     });
 
     expect(listSanityProjectInvites).not.toHaveBeenCalled();
+    expect(revokeSanityProjectRole).toHaveBeenCalledWith(
+      expect.objectContaining({ projectUserId: MOCK_MEMBER_PROJECT_USER_ID }),
+    );
+  });
+
+  it('deletes the recorded invite by its id when handed no address', async () => {
+    await revokeMemberAccess(MOCK_TENANT_ID, {
+      sanityInviteId: MOCK_MEMBER_INVITE_ID,
+    });
+
+    expect(listSanityProjectInvites).not.toHaveBeenCalled();
+    expect(vi.mocked(deleteSanityProjectInvite).mock.calls).toEqual([
+      [{ ...MOCK_TENANT_PROJECT_CALL, inviteId: MOCK_MEMBER_INVITE_ID }],
+    ]);
+  });
+
+  it('also deletes the recorded invite sent to another address', async () => {
+    await revokeMemberAccess(MOCK_TENANT_ID, {
+      email: MOCK_MEMBER_EMAIL,
+      sanityInviteId: MOCK_MEMBER_INVITE_ID,
+    });
+
+    expect(vi.mocked(deleteSanityProjectInvite).mock.calls).toEqual([
+      [{ ...MOCK_TENANT_PROJECT_CALL, inviteId: MOCK_MEMBER_INVITE_ID }],
+    ]);
+  });
+
+  it('still revokes their roles when the invite delete fails', async () => {
+    vi.mocked(deleteSanityProjectInvite).mockRejectedValue(
+      new Error(MOCK_SANITY_OUTAGE),
+    );
+
+    await expect(
+      revokeMemberAccess(MOCK_TENANT_ID, {
+        sanityUserId: MOCK_MEMBER_SANITY_USER_ID,
+        sanityInviteId: MOCK_MEMBER_INVITE_ID,
+      }),
+    ).rejects.toThrow(MOCK_SANITY_OUTAGE);
     expect(revokeSanityProjectRole).toHaveBeenCalledWith(
       expect.objectContaining({ projectUserId: MOCK_MEMBER_PROJECT_USER_ID }),
     );

@@ -120,7 +120,7 @@ Report with exactly this structure:
 - **Green but a required check absent (step 3):**
   `19/19 checks passed, but <names> never ran — not a clean run.`
 - **Any failure (step 4)**, per failing check: its name; the run URL (from
-  `gh run view`, or `https://github.com/ValOvinnikov/blog/actions/runs/<run-id>`);
+  `gh run view`, or `https://github.com/ValOvinnikov/sf-mono/actions/runs/<run-id>`);
   the raw `--log-failed` excerpt, handed back as data.
 
 No root-cause analysis, suggested fix or severity opinion — name what failed

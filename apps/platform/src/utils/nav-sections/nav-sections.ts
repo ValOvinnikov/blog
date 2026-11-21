@@ -60,7 +60,6 @@ export const tenantNavSections = (
   t: TLooseTranslator,
   tenantId: string,
   tenantName: string,
-  unreadLeadsCount = 0,
 ): TSidebarNavSection[] => {
   const platform = {
     label: t('badgePlatform'),
@@ -96,7 +95,7 @@ export const tenantNavSections = (
     },
     {
       label: t('configurationSectionLabel'),
-      items: configurationNavItems(t, hrefs, EVERY_PLAN_PAGE, unreadLeadsCount),
+      items: configurationNavItems(t, hrefs, EVERY_PLAN_PAGE),
     },
     {
       label: t('accountSectionLabel'),

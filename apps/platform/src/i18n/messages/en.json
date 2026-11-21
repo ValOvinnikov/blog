@@ -247,7 +247,6 @@
     },
     "blockedSignups": "Blocked sign-ups",
     "dataRequests": "Data requests",
-    "badgeUnreadLeads": "{count} new",
     "collapsedStatusTooltip": "{label} · {status}",
     "supportSectionLabel": "Support",
     "help": "Help"
@@ -1916,9 +1915,10 @@
     "downgradedDescription": "The contact form comes with the Starter and Growth plans, so new messages no longer arrive. The messages you already received are kept here, and you can still delete any of them."
   },
   "leadsInbox": {
-    "listLabel": "Messages",
     "empty": "No messages yet. When someone uses your contact form, their message will appear here.",
     "unread": "Unread",
+    "unreadGroup": "Unread · {count}",
+    "earlierGroup": "Earlier",
     "yesterday": "Yesterday",
     "loadingMore": "Loading more messages…",
     "loadMoreFailed": "Couldn't load more messages. Try again",
@@ -1929,6 +1929,7 @@
     "email": "Email",
     "received": "Received",
     "page": "Page",
+    "messageHeading": "Message",
     "homePage": "Home page",
     "readStateFailed": "Couldn't update the message. Try again."
   },

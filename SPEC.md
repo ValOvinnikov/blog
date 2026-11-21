@@ -1394,7 +1394,8 @@ screens with a way back. The list loads 25 leads through `@shinefold/db`'s
 Server Action as its end scrolls near; there is no offset paging. Each lead
 carries a `readAt`, shared by the site's members: opening an unread lead marks
 it read and Mark unread clears it, both through a Server Action scoped to the
-session's tenant, and the sidebar shows the site's unread count beside Leads.
+session's tenant. The sidebar shows no unread count beside Leads: the shared
+layout reads it once per navigation, so it would go stale on every other page.
 The pane shows the stored path at once and then asks `apps/web` for the source
 page's current title: a `POST /api/internal/pages/{documentId}` carrying the
 tenant id and the lead's locale, signed with `@shinefold/utils`'s
@@ -2648,7 +2649,7 @@ Full checklist:
 
 ## 12. Delivery process
 
-Work is tracked on the GitHub project board ("Blog Build"). Every issue follows
+Work is tracked on the GitHub project board ("sf Board"). Every issue follows
 the gate sequence (in full in the `open-pull-request` skill — the operational source of truth):
 
 1. Board → In Progress → branch from `main` → work + quality gates.

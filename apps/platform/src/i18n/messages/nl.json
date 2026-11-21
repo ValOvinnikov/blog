@@ -247,7 +247,6 @@
     },
     "blockedSignups": "Geblokkeerde aanmeldingen",
     "dataRequests": "Gegevensverzoeken",
-    "badgeUnreadLeads": "{count} nieuw",
     "collapsedStatusTooltip": "{label} · {status}",
     "supportSectionLabel": "Ondersteuning",
     "help": "Help"
@@ -1916,9 +1915,10 @@
     "downgradedDescription": "Het contactformulier hoort bij het Starter- en Growth-abonnement, dus er komen geen nieuwe berichten meer binnen. De berichten die je al hebt ontvangen blijven hier bewaard en je kunt ze nog steeds verwijderen."
   },
   "leadsInbox": {
-    "listLabel": "Berichten",
     "empty": "Nog geen berichten. Zodra iemand je contactformulier gebruikt, verschijnt het bericht hier.",
     "unread": "Ongelezen",
+    "unreadGroup": "Ongelezen · {count}",
+    "earlierGroup": "Eerder",
     "yesterday": "Gisteren",
     "loadingMore": "Meer berichten laden…",
     "loadMoreFailed": "Kon geen berichten meer laden. Opnieuw proberen",
@@ -1929,6 +1929,7 @@
     "email": "E-mail",
     "received": "Ontvangen",
     "page": "Pagina",
+    "messageHeading": "Bericht",
     "homePage": "Startpagina",
     "readStateFailed": "Kon het bericht niet bijwerken. Probeer het opnieuw."
   },

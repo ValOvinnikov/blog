@@ -5,7 +5,6 @@ import {
   CONFIGURATION_KEYS,
   itemKeyed,
   labelsOf,
-  MOCK_UNREAD_LEADS_COUNT,
   tNavSections as t,
   translated,
 } from '@platform/testing/layout/nav-sections';
@@ -170,21 +169,6 @@ describe(tenantNavSections, () => {
     expect(provisioning?.badge?.label).toBe(t('badgePlatform'));
     expect(dangerZone?.href).toBe(adminRoutes.tenantDanger(MOCK_TENANT_ID));
     expect(dangerZone?.badge?.label).toBe(t('badgePlatform'));
-  });
-
-  it('shows the unread lead count on the Leads entry', () => {
-    const [, , unreadConfiguration] = tenantNavSections(
-      t,
-      MOCK_TENANT_ID,
-      MOCK_TENANT_NAME,
-      MOCK_UNREAD_LEADS_COUNT,
-    );
-
-    const leads = itemKeyed(unreadConfiguration!, 'leads');
-
-    expect(leads?.badge?.label).toBe(
-      t('badgeUnreadLeads', { count: MOCK_UNREAD_LEADS_COUNT }),
-    );
   });
 });
 
