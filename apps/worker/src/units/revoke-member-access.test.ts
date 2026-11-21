@@ -118,6 +118,17 @@ describe(revokeMemberAccess, () => {
     );
   });
 
+  it('deletes the recorded invite by its id when handed no address', async () => {
+    await revokeMemberAccess(MOCK_TENANT_ID, {
+      sanityInviteId: MOCK_MEMBER_INVITE_ID,
+    });
+
+    expect(listSanityProjectInvites).not.toHaveBeenCalled();
+    expect(vi.mocked(deleteSanityProjectInvite).mock.calls).toEqual([
+      [{ ...MOCK_TENANT_PROJECT_CALL, inviteId: MOCK_MEMBER_INVITE_ID }],
+    ]);
+  });
+
   it('never revokes the owner, even when handed their Sanity user id', async () => {
     await revokeMemberAccess(MOCK_TENANT_ID, {
       email: MOCK_RENAMED_MEMBER_EMAIL,
