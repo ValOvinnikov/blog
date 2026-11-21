@@ -52,7 +52,7 @@ this repo has **no PR preview deploys for web** by design (Vercel's native Git
 auto-deploy is disabled — `apps/web/vercel.json`,
 `git.deploymentEnabled: false`, #445/#446; see `SPEC.md` §13). No per-PR
 preview/smoke-URL mechanism is currently tracked:
-[#275](https://github.com/ValOvinnikov/blog/issues/275), the issue this
+[#275](https://github.com/ValOvinnikov/sf-mono/issues/275), the issue this
 originally waited on, closed (via #822) without delivering one — it only
 added the still-guarded-and-inert `SMOKE_URL` Playwright job. That first
 Lighthouse run against `development` (#826) found real budget failures and

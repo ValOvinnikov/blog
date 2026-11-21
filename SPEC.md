@@ -2648,7 +2648,7 @@ Full checklist:
 
 ## 12. Delivery process
 
-Work is tracked on the GitHub project board ("Blog Build"). Every issue follows
+Work is tracked on the GitHub project board ("sf Board"). Every issue follows
 the gate sequence (in full in the `open-pull-request` skill — the operational source of truth):
 
 1. Board → In Progress → branch from `main` → work + quality gates.

@@ -9,7 +9,7 @@
 > brand: command not found
 ```
 
-[![CI](https://github.com/ValOvinnikov/blog/actions/workflows/ci.yml/badge.svg)](https://github.com/ValOvinnikov/blog/actions/workflows/ci.yml)
+[![CI](https://github.com/ValOvinnikov/sf-mono/actions/workflows/ci.yml/badge.svg)](https://github.com/ValOvinnikov/sf-mono/actions/workflows/ci.yml)
 
 Shinefold is a CMS-driven publishing platform built as a **Turborepo + pnpm
 monorepo** with strict separation of concerns: a headless Sanity Studio for
