@@ -1,5 +1,9 @@
+import { MEDIA_TYPE, REQUEST_HEADER } from '@platform/constants/request';
 import type { TStudioCaller } from '@platform/server/auth/resolve-studio-caller';
-import { MOCK_PLATFORM_ORIGIN } from '@platform/testing/auth/fixtures';
+import {
+  MOCK_OFF_ORIGIN_URL,
+  MOCK_PLATFORM_ORIGIN,
+} from '@platform/testing/auth/fixtures';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import { mockTenant } from '@platform/testing/tenants/fixtures';
 import { HTTP_METHOD } from '@shinefold/config';
@@ -24,8 +28,23 @@ export const MOCK_STUDIO_CALLER: TStudioCaller = {
   email: studioFaker.internet.email(),
 };
 
-export const studioJsonRequest = (path: string, body: unknown): Request =>
+export const MOCK_STUDIO_REQUEST_HEADERS: Record<string, string> = {
+  [REQUEST_HEADER.ORIGIN]: MOCK_PLATFORM_ORIGIN,
+  [REQUEST_HEADER.CONTENT_TYPE]: MEDIA_TYPE.JSON,
+};
+
+export const MOCK_CROSS_ORIGIN_STUDIO_REQUEST_HEADERS = {
+  ...MOCK_STUDIO_REQUEST_HEADERS,
+  [REQUEST_HEADER.ORIGIN]: new URL(MOCK_OFF_ORIGIN_URL).origin,
+};
+
+export const studioJsonRequest = (
+  path: string,
+  body: unknown,
+  headers = MOCK_STUDIO_REQUEST_HEADERS,
+): Request =>
   new Request(`${MOCK_PLATFORM_ORIGIN}${path}`, {
     method: HTTP_METHOD.POST,
+    headers,
     body: JSON.stringify(body),
   });
