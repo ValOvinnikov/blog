@@ -24,7 +24,12 @@ export const PLAN_CHANGE_REFUSAL = {
   UNCHANGED: 'UNCHANGED',
   CARD_DECLINED: 'CARD_DECLINED',
   PAYMENT_NOT_CONFIRMED: 'PAYMENT_NOT_CONFIRMED',
+  NO_NEXT_BAND: 'NO_NEXT_BAND',
+  PENDING_CHANGE: 'PENDING_CHANGE',
+  QUOTE_EXPIRED: 'QUOTE_EXPIRED',
 } as const;
+
+export type TPlanChangeRefusalCode = TValueOf<typeof PLAN_CHANGE_REFUSAL>;
 
 export const PLAN_CHANGE_PAYMENT_REFUSALS = [
   PLAN_CHANGE_REFUSAL.CARD_DECLINED,
@@ -39,4 +44,4 @@ export type TPlanChangeGate =
 export type TPlanChangeRefusal =
   | typeof UPGRADE_STATE.NOT_OWNER
   | typeof UPGRADE_STATE.UNAVAILABLE
-  | TValueOf<typeof PLAN_CHANGE_REFUSAL>;
+  | TPlanChangeRefusalCode;

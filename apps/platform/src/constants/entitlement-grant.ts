@@ -55,4 +55,7 @@ export const ENTITLEMENT_GRANT_LOG = {
   GRANT_AUDIT_FAILED: 'entitlement_grants.grant_audit_failed',
   REVOKE_FAILED: 'entitlement_grants.revoke_failed',
   REVOKE_AUDIT_FAILED: 'entitlement_grants.revoke_audit_failed',
+  EMAIL_UNCONFIGURED: 'entitlement_grants.email_unconfigured',
+  EMAIL_OWNER_MISSING: 'entitlement_grants.email_owner_missing',
+  EMAIL_FAILED: 'entitlement_grants.email_failed',
 } as const;

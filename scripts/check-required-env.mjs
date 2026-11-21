@@ -74,6 +74,7 @@ export const ENV_FILES = [
   'apps/platform/src/utils/env/env.ts',
   'apps/platform/src/utils/stripe-env/stripe-env.ts',
   'apps/platform/src/utils/web-secrets-env/web-secrets-env.ts',
+  'apps/platform/src/utils/worker-secrets-env/worker-secrets-env.ts',
   'apps/platform/src/utils/support-env/support-env.ts',
   'apps/worker/src/utils/env/env.ts',
   'packages/service/src/utils/env/env.ts',

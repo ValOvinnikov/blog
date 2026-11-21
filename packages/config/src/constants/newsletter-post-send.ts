@@ -52,7 +52,7 @@ export type TNewsletterSendStatusRefusal = TValueOf<
   typeof NEWSLETTER_SEND_STATUS_REFUSAL
 >;
 
-type TSendNowEligibility =
+export type TNewsletterSendNowEligibility =
   | { isOffered: false }
   | { isOffered: true; disabledBy?: undefined; emailsLeft: number }
   | {
@@ -74,7 +74,7 @@ type TSendNowEligibility =
       resetsAt: string;
     };
 
-type TPostSendState =
+export type TNewsletterPostSendState =
   | { status: typeof NEWSLETTER_SEND_STATUS.NONE }
   | { status: typeof NEWSLETTER_SEND_STATUS.SCHEDULED; scheduledFor: string }
   | {
@@ -101,10 +101,10 @@ type TPostSendState =
     };
 
 export type TNewsletterPostSendStatusResponse =
-  | ({ outcome: typeof ACTION_OUTCOME.SUCCESS } & TPostSendState & {
+  | ({ outcome: typeof ACTION_OUTCOME.SUCCESS } & TNewsletterPostSendState & {
         confirmedCount: number;
         sendingOffCause: TMaybeUndefined<TNewsletterSendingOffCause>;
-        sendNow: TSendNowEligibility;
+        sendNow: TNewsletterSendNowEligibility;
       })
   | {
       outcome: typeof ACTION_OUTCOME.REFUSED;

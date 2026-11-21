@@ -1,5 +1,5 @@
 import { MILLISECONDS_PER_SECOND } from '@platform/constants/billing';
-import { toStripeTime } from '@platform/testing/billing/stripe-time';
+import { toStripeTime } from '@platform/server/billing/stripe-time';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import type Stripe from 'stripe';
 
