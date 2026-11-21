@@ -8,7 +8,6 @@ import {
   tenantNavSections,
 } from '@platform/utils/nav-sections/nav-sections';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { queries } from '@shinefold/db';
 import { getTranslations } from 'next-intl/server';
 
 type TProps = {
@@ -23,11 +22,9 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
   const [
     { isSidebarInitiallyCollapsed, tNavSections, userName, userEmail },
     t,
-    unreadLeadsCount,
   ] = await Promise.all([
     loadPlatformShellChrome(),
     getTranslations('tenantLayout'),
-    queries.leads.countUnreadLeadsForTenant(tenant.id),
   ]);
 
   return (
@@ -35,12 +32,7 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sections={[
         ...operatorNavSections(tNavSections, admin.role),
-        ...tenantNavSections(
-          tNavSections,
-          tenant.id,
-          tenant.name,
-          unreadLeadsCount,
-        ),
+        ...tenantNavSections(tNavSections, tenant.id, tenant.name),
         helpNavSection(tNavSections, adminRoutes.tenantHelp(tenant.id)),
       ]}
       crumb={<TenantBreadcrumb tenantId={tenant.id} tenantName={tenant.name} />}

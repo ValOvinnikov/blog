@@ -1,5 +1,6 @@
 import type { TLookRowsGroup } from '@platform/components/features/look/look-form/use-look-open-rows';
 import { Accordion } from '@platform/components/shared/accordion';
+import { SectionLabel } from '@platform/components/shared/section-label';
 import { ACCORDION_VARIANT } from '@platform/constants/accordion';
 import type { TLookGroup } from '@platform/constants/look-group';
 import type { TLookRow } from '@platform/constants/look-row';
@@ -22,7 +23,7 @@ export const LookGroup = ({
   children,
 }: TLookGroupProps) => {
   const labelId = useId();
-  const { root, label, list } = lookGroupVariants();
+  const { root, list } = lookGroupVariants();
 
   return (
     <section
@@ -30,9 +31,7 @@ export const LookGroup = ({
       aria-labelledby={labelId}
       className={root()}
     >
-      <p id={labelId} className={label()}>
-        {title}
-      </p>
+      <SectionLabel id={labelId}>{title}</SectionLabel>
       <Accordion<TLookRow>
         multiple={true}
         variant={ACCORDION_VARIANT.ROW}

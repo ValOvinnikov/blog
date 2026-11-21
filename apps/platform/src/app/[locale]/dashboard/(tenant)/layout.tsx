@@ -15,7 +15,6 @@ import { helpNavSection } from '@platform/utils/help-nav-section/help-nav-sectio
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { toTenantSwitcherItems } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
-import { queries } from '@shinefold/db';
 import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { Suspense } from 'react';
 
@@ -26,13 +25,11 @@ type TProps = {
 export default async function DashboardTenantLayout({ children }: TProps) {
   const { tenant, membership, viewer, tenants } =
     await resolveDashboardTenant();
-  const [{ admin: sessionAdmin }, chrome, access, unreadLeadsCount] =
-    await Promise.all([
-      listSessionTenants(),
-      loadPlatformShellChrome(),
-      resolveTenantPageAccess(tenant, viewer),
-      queries.leads.countUnreadLeadsForTenant(tenant.id),
-    ]);
+  const [{ admin: sessionAdmin }, chrome, access] = await Promise.all([
+    listSessionTenants(),
+    loadPlatformShellChrome(),
+    resolveTenantPageAccess(tenant, viewer),
+  ]);
   const { isSidebarInitiallyCollapsed, tNavSections, userName, userEmail } =
     chrome;
   const studioAccess = ownerStudioAccessFor(tenant, viewer);
@@ -43,12 +40,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
     <PlatformShell
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sections={[
-        ...dashboardNavSections(
-          tNavSections,
-          access,
-          studioAccess,
-          unreadLeadsCount,
-        ),
+        ...dashboardNavSections(tNavSections, access, studioAccess),
         helpNavSection(tNavSections, adminRoutes.dashboardHelp()),
       ]}
       switcher={

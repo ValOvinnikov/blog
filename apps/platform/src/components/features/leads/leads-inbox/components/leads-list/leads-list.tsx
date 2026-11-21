@@ -1,44 +1,40 @@
+import type { TLeadSelection } from '@platform/components/features/leads/leads-inbox/use-lead-selection';
 import type { TLeadsLoading } from '@platform/components/features/leads/leads-inbox/use-leads-pages';
-import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
-import { Spinner } from '@platform/components/shared/spinner';
 import { Text } from '@platform/components/shared/text';
-import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
-import { SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
-import type { Ref } from 'react';
 
-import { LeadRow } from './components/lead-row';
+import { LeadGroup } from './components/lead-group';
 import { leadsListVariants } from './leads-list-variants';
 import { useLoadMoreSentinel } from './use-load-more-sentinel';
 
 export type TLeadsListProps = {
-  leads: TInboxLead[];
-  selectedId: TMaybeUndefined<string>;
-  rowRef: (leadId: string) => Ref<HTMLButtonElement>;
-  onOpen: (lead: TInboxLead) => void;
+  unreadLeads: TInboxLead[];
+  earlierLeads: TInboxLead[];
+  selection: TLeadSelection;
   loading: TLeadsLoading;
 };
 
 export const LeadsList = ({
-  leads,
-  selectedId,
-  rowRef,
-  onOpen,
+  unreadLeads,
+  earlierLeads,
+  selection,
   loading,
 }: TLeadsListProps) => {
   const t = useTranslations('leadsInbox');
   const { hasMore, isLoading, hasLoadFailed, loadMore } = loading;
   const sentinelRef = useLoadMoreSentinel({
     isEnabled: hasMore && !isLoading && !hasLoadFailed,
-    loadedCount: leads.length,
+    loadedCount: unreadLeads.length + earlierLeads.length,
     onReach: loadMore,
   });
-  const { list, sentinel, footer } = leadsListVariants();
+  const { groups, sentinel } = leadsListVariants();
+  const hasUnread = hasArrayGotItems(unreadLeads);
+  const hasEarlier = hasArrayGotItems(earlierLeads);
 
-  if (!hasArrayGotItems(leads)) {
+  if (!hasUnread && !hasEarlier) {
     return (
       <Card>
         <Card.Body>
@@ -49,35 +45,26 @@ export const LeadsList = ({
   }
 
   return (
-    <Card>
-      <ul className={list()} aria-label={t('listLabel')}>
-        {leads.map((lead) => (
-          <li key={lead.id}>
-            <LeadRow
-              ref={rowRef(lead.id)}
-              lead={lead}
-              isSelected={lead.id === selectedId}
-              onOpen={onOpen}
-            />
-          </li>
-        ))}
-      </ul>
+    <>
+      <div className={groups()}>
+        {hasUnread && (
+          <LeadGroup
+            title={t('unreadGroup', { count: unreadLeads.length })}
+            leads={unreadLeads}
+            loading={hasEarlier ? undefined : loading}
+            selection={selection}
+          />
+        )}
+        {hasEarlier && (
+          <LeadGroup
+            title={t('earlierGroup')}
+            leads={earlierLeads}
+            loading={loading}
+            selection={selection}
+          />
+        )}
+      </div>
       <div ref={sentinelRef} className={sentinel()} aria-hidden="true" />
-      {(isLoading || hasLoadFailed) && (
-        <div className={footer()}>
-          {isLoading ? (
-            <Spinner label={t('loadingMore')} hasLabel={true} />
-          ) : (
-            <Button
-              size={SIZE.SM}
-              variant={BUTTON_VARIANT.SECONDARY}
-              onClick={loadMore}
-            >
-              {t('loadMoreFailed')}
-            </Button>
-          )}
-        </div>
-      )}
-    </Card>
+    </>
   );
 };

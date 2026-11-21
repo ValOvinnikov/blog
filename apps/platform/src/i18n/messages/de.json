@@ -247,7 +247,6 @@
     },
     "blockedSignups": "Gesperrte Registrierungen",
     "dataRequests": "Datenanfragen",
-    "badgeUnreadLeads": "{count} neu",
     "collapsedStatusTooltip": "{label} · {status}",
     "supportSectionLabel": "Support",
     "help": "Hilfe"
@@ -1916,9 +1915,10 @@
     "downgradedDescription": "Das Kontaktformular gehört zu den Tarifen Starter und Growth, daher kommen keine neuen Nachrichten mehr an. Bereits eingegangene Nachrichten bleiben hier erhalten, und Sie können jede davon weiterhin löschen."
   },
   "leadsInbox": {
-    "listLabel": "Nachrichten",
     "empty": "Noch keine Nachrichten. Sobald jemand Ihr Kontaktformular nutzt, erscheint die Nachricht hier.",
     "unread": "Ungelesen",
+    "unreadGroup": "Ungelesen · {count}",
+    "earlierGroup": "Früher",
     "yesterday": "Gestern",
     "loadingMore": "Weitere Nachrichten werden geladen…",
     "loadMoreFailed": "Weitere Nachrichten konnten nicht geladen werden. Erneut versuchen",
@@ -1929,6 +1929,7 @@
     "email": "E-Mail",
     "received": "Empfangen",
     "page": "Seite",
+    "messageHeading": "Nachricht",
     "homePage": "Startseite",
     "readStateFailed": "Die Nachricht konnte nicht aktualisiert werden. Versuchen Sie es erneut."
   },
