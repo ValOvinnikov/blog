@@ -8,7 +8,9 @@ export type TStarterDocument<
 > = Omit<TDocument, TSanitySystemField> &
   Required<Pick<TDocument, TRequiredField>>;
 
-type TStarterModuleSlot<TTemplate extends { modules?: readonly unknown[] }> = {
+export type TStarterModuleSlot<
+  TTemplate extends { modules?: readonly unknown[] },
+> = {
   _key: string;
   _ref: string;
   _type: TModuleKind<TTemplate>;

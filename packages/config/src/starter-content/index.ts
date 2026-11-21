@@ -1,3 +1,9 @@
+export { buildGrowthLayer } from './growth-layer';
+export type {
+  TGrowthHomeSlot,
+  TGrowthLayer,
+  TStarterPlaceholderImageIds,
+} from './growth-layer-shape';
 export {
   buildStarterCookieStatement,
   buildStarterDocuments,

@@ -327,6 +327,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SORT_DIRECTION**: `ASCENDING`=`"ascending"`, `DESCENDING`=`"descending"`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/starter-document.ts`
+
+- **STARTER_PLACEHOLDER_IMAGE**: `LOGO`, `ILLUSTRATION`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/studio-access.ts`
 
 - **STUDIO_ACCESS**: `INVITE_SENT`, `ACTIVATING`, `READY`, `STALLED`

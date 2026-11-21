@@ -4482,6 +4482,22 @@
         "file": "packages/config/src/constants/sort.ts"
       }
     ],
+    "LOGO": [
+      {
+        "ref": "STARTER_PLACEHOLDER_IMAGE.LOGO",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/starter-document.ts"
+      }
+    ],
+    "ILLUSTRATION": [
+      {
+        "ref": "STARTER_PLACEHOLDER_IMAGE.ILLUSTRATION",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/starter-document.ts"
+      }
+    ],
     "INVITE_SENT": [
       {
         "ref": "STUDIO_ACCESS.INVITE_SENT",

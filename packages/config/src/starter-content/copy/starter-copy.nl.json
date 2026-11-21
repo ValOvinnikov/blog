@@ -147,7 +147,75 @@
         "metaTitle": "Voorbeeldproject twee — nog een case om te vervangen",
         "metaDescription": "Een tweede voorbeeldcase, aangemaakt met je site. Vervang hem door je eigen werk, of verwijder hem."
       }
-    ]
+    ],
+    "growth": {
+      "highlights": {
+        "heading": "Hoe ik werk",
+        "imageAlt": "Voorbeeldillustratie om te vervangen door een beeld van je werk",
+        "rows": [
+          {
+            "heading": "Begin bij de opdracht",
+            "body": [
+              "Elk project begint met voor wie het is en wat succes betekent. Vervang dit door hoe jij begint."
+            ]
+          },
+          {
+            "heading": "Laat het resultaat zien",
+            "body": [
+              "Zet bij elk punt een beeld van het eindresultaat. Vervang de voorbeeldafbeelding door een eigen screenshot of foto."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Klanten met wie ik werkte",
+        "logoNames": [
+          "Voorbeeldklant één",
+          "Voorbeeldklant twee",
+          "Voorbeeldklant drie",
+          "Voorbeeldklant vier"
+        ]
+      },
+      "timeline": {
+        "heading": "Ervaring",
+        "items": [
+          {
+            "marker": "2018",
+            "heading": "Voor mezelf begonnen",
+            "body": "Vervang elke mijlpaal door een stap in je eigen loopbaan."
+          },
+          {
+            "marker": "2021",
+            "heading": "Eerste vaste klant",
+            "body": "Vertel wat er veranderde en wat je leerde."
+          },
+          {
+            "marker": "Nu",
+            "heading": "Open voor nieuwe projecten",
+            "body": "Sluit af met waar je nu staat en wat je zoekt."
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Wat klanten zeggen",
+        "quotes": [
+          {
+            "name": "Voorbeeldklant",
+            "role": "Oprichter, Voorbeeldstudio",
+            "quote": [
+              "Vervang dit door een citaat van iemand met wie je hebt gewerkt. Een zin of twee over het resultaat leest het best."
+            ]
+          },
+          {
+            "name": "Nog een voorbeeldklant",
+            "role": "Hoofd marketing, Voorbeeldbedrijf",
+            "quote": [
+              "Voeg een tweede stem toe, liefst over een ander soort project."
+            ]
+          }
+        ]
+      }
+    }
   },
   "personal": {
     "hero": {
@@ -190,6 +258,45 @@
     "writing": {
       "linkLabel": "Teksten",
       "listHeading": "Alle berichten"
+    },
+    "growth": {
+      "timeline": {
+        "heading": "Mijn weg tot nu toe",
+        "items": [
+          {
+            "marker": "2016",
+            "heading": "Studie afgerond",
+            "body": "Vervang elke mijlpaal door een stap in je eigen verhaal."
+          },
+          {
+            "marker": "2019",
+            "heading": "Mijn vak gevonden",
+            "body": "Vertel wat je aantrok tot het werk dat je nu doet."
+          },
+          {
+            "marker": "Nu",
+            "heading": "Waar ik nu sta",
+            "body": "Sluit af met waar je aan werkt en wat er komt."
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "Waarmee ik kan helpen",
+        "features": [
+          {
+            "heading": "Schrijven",
+            "supportingText": "Vervang dit door iets waar je goed in bent."
+          },
+          {
+            "heading": "Ideeën",
+            "supportingText": "Voeg in één zin een tweede sterk punt toe."
+          },
+          {
+            "heading": "Samenwerken",
+            "supportingText": "Sluit af met hoe je graag met anderen werkt."
+          }
+        ]
+      }
     }
   },
   "docs": {
@@ -343,6 +450,88 @@
       ],
       "metaTitle": "Contact — zo bereik je ons en wanneer we antwoorden",
       "metaDescription": "Een voorbeeldpagina voor contact, aangemaakt met je site. Voeg je e-mailadres, telefoonnummer en openingstijden toe."
+    },
+    "growth": {
+      "featureList": {
+        "heading": "Wat we bieden",
+        "features": [
+          {
+            "heading": "Advies",
+            "supportingText": "Vervang dit in één zin door een van je belangrijkste diensten."
+          },
+          {
+            "heading": "Uitvoering",
+            "supportingText": "Voeg een tweede dienst toe en voor wie die is."
+          },
+          {
+            "heading": "Ondersteuning",
+            "supportingText": "Sluit af met hoe je klanten helpt als het werk klaar is."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "In cijfers",
+        "footnote": "Voorbeeldcijfers. Vervang ze door je eigen cijfers.",
+        "stats": [
+          {
+            "value": "10+",
+            "label": "Jaar actief"
+          },
+          {
+            "value": "250",
+            "label": "Projecten opgeleverd"
+          },
+          {
+            "value": "98%",
+            "label": "Klanten die terugkomen"
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Vertrouwd door",
+        "logoNames": [
+          "Voorbeeldklant één",
+          "Voorbeeldklant twee",
+          "Voorbeeldklant drie",
+          "Voorbeeldklant vier"
+        ]
+      },
+      "team": {
+        "heading": "Maak kennis met het team",
+        "members": [
+          {
+            "name": "Voorbeeldteamlid",
+            "role": "Oprichter"
+          },
+          {
+            "name": "Nog een teamlid",
+            "role": "Projectleider"
+          },
+          {
+            "name": "Een derde teamlid",
+            "role": "Klantenservice"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Wat onze klanten zeggen",
+        "quotes": [
+          {
+            "name": "Voorbeeldklant",
+            "role": "Directeur, Voorbeeldbedrijf",
+            "quote": [
+              "Vervang dit door een citaat van een tevreden klant. Een zin of twee over het resultaat leest het best."
+            ]
+          },
+          {
+            "name": "Nog een voorbeeldklant",
+            "role": "Eigenaar, Voorbeeldwinkel",
+            "quote": [
+              "Voeg een tweede stem toe, liefst van een ander soort klant."
+            ]
+          }
+        ]
+      }
     }
   },
   "product": {

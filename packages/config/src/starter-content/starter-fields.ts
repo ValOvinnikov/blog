@@ -69,7 +69,8 @@ export function moduleHeadingBlock(
 function localizedBlocks<
   TValueType extends
     | 'internationalizedArrayArticleTextValue'
-    | 'internationalizedArrayListedTextValue',
+    | 'internationalizedArrayListedTextValue'
+    | 'internationalizedArrayParagraphTextValue',
   TBlock,
 >(valueType: TValueType, locale: TLocaleIsoCode, value: TBlock[]) {
   return [{ _key: locale, _type: valueType, language: locale, value }];
@@ -94,6 +95,14 @@ export function localizedListedText(
     'internationalizedArrayListedTextValue',
     locale,
     paragraphs(texts),
+  );
+}
+
+export function localizedParagraphText(locale: TLocaleIsoCode, text: string) {
+  return localizedBlocks(
+    'internationalizedArrayParagraphTextValue',
+    locale,
+    paragraphs([text]),
   );
 }
 

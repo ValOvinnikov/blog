@@ -4,6 +4,7 @@ status: partial
 layers: [config, worker, db, studio, platform-app]
 code:
   - packages/config/src/starter-content/**
+  - packages/config/src/constants/starter-document.ts
   - apps/worker/src/units/apply-site-template.ts
   - apps/worker/src/units/remove-sample-content.ts
   - apps/worker/src/app/api/sample-content/remove/route.ts
@@ -52,7 +53,19 @@ No route of its own. The seeded documents are what the public site renders and w
 - **Create-if-missing, everywhere.** Sanity documents use `createIfNotExists`; `site_config` uses an insert that does nothing when a row exists. A re-run never overwrites an owner's content or look.
 - **Seeding runs once per dataset.** The seed step skips a dataset that already has a `settings_site`, so changing a tenant's type later adds nothing; "change type" is future work.
 - **Every seeded document is schema-valid.** No placeholder images: no Blog or Blank field needs one, and the hero renders without media.
-- **No Growth layer yet.** Every built type seeds the same documents on every plan; Growth layers (Portfolio's, Personal's, Business's and Product's), their placeholder images and applying them on upgrade are #5714.
+- **Growth layers are built but not yet applied.** Every type still seeds the same documents on every plan; uploading the placeholder images, applying a layer at provisioning and on upgrade, and Product's layer are the rest of #5714.
+
+## Growth layer
+
+`@shinefold/config`'s `buildGrowthLayer({ siteType, locale, placeholderImages })` returns the Growth sections a type adds to its Free site, or `null` for a type with none (Blog, Docs, Product and Blank today).
+
+- **What it returns** — `documents`, the module documents and the items they reference (feature cards, testimonials, team members), each typed against the generated Sanity types; and `homeSlots`, one `{ slot, after }` per section for the home template's `modules`, where `after` is the id of the slot it follows: a Free module, or the Growth slot before it.
+- **Placeholder images** — `placeholderImages` maps each `STARTER_PLACEHOLDER_IMAGE` (`LOGO`, `ILLUSTRATION`) to a Sanity image asset id. A logo-wall logo and a feature-highlights row need an uploaded image to be schema-valid; every other section uses an icon or initials.
+- **Portfolio** — after the introduction: feature highlights (two rows on the illustration placeholder), a logo wall (four logos on the logo placeholder), a timeline and two testimonials.
+- **Personal** — after the introduction: a timeline and three feature cards with icons.
+- **Business** — after the introduction: three feature cards with icons, a band of sample figures, a logo wall, three team members (initials until the owner adds photos) and two testimonials.
+- **Ids** — `starter.<type>.<section>`, with each section's items under it (`starter.business.teamMember1`), so removing sample content treats them like the Free samples.
+- **Copy** — each type's `growth` entry in the per-locale catalogue.
 
 ## Removing samples
 
@@ -72,8 +85,8 @@ The owner's overview (`/dashboard`) shows a **Sample content** card to the site'
 
 ## Tests
 
-- `packages/studio/src/starter-content.test.ts` — every Blog, Portfolio, Personal, Docs, Business, Product and Blank document passes Studio validation in every default language.
-- `packages/config/src/starter-content/starter-content.test.ts` — ids are stable and unique, every reference resolves, values carry the requested locale, SEO stays within its bounds.
+- `packages/studio/src/starter-content.test.ts` — every Blog, Portfolio, Personal, Docs, Business, Product and Blank document, and every Growth layer document with its home slots, passes Studio validation in every default language.
+- `packages/config/src/starter-content/starter-content.test.ts` — ids are stable and unique, every reference resolves, values carry the requested locale, SEO stays within its bounds; Growth layers add only new ids, place each section in the Free home and use the placeholder image of their kind.
 - `packages/config/src/starter-content/copy/starter-copy.test.ts` — every locale matches the `en` catalogue's shape.
 - `apps/worker/src/units/remove-sample-content.test.ts`, `apps/worker/src/utils/sample-content/plan-sample-content-removal.test.ts` — what is removed, unlinked and kept, and why; `apps/worker/src/utils/sample-content/kept-samples.test.ts` — how each kept sample is named.
 - `apps/worker/src/app/api/sample-content/remove/route.test.ts` — the signature, tenant, provisioning and status refusals, the result body and a failed removal.

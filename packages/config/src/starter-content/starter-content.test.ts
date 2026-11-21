@@ -11,9 +11,11 @@ import {
   SEO_OG_TITLE_MAX_LENGTH,
   SITE_TYPE,
 } from '@shinefold/config/constants';
+import { MOCK_PLACEHOLDER_IMAGES } from '@shinefold/config/testing/placeholder-images';
 import { SITE_MESSAGES_BY_LOCALE } from '@shinefold/config/voice';
 
 import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
+import { buildGrowthLayer } from './growth-layer';
 import {
   buildStarterCookieStatement,
   buildStarterDocuments,
@@ -40,6 +42,11 @@ const STARTER_SITE_TYPES = [
 const LOCALES = Object.values(LOCALE_ISO_CODES);
 const COOKIE_STATEMENT_TYPE = 'page_cookieStatement';
 const BUSINESS_COPY = STARTER_COPY_BY_LOCALE.EN.business;
+const GROWTH_SITE_TYPES = [
+  SITE_TYPE.PORTFOLIO,
+  SITE_TYPE.PERSONAL,
+  SITE_TYPE.BUSINESS,
+] as const;
 
 const build = (
   siteType: (typeof STARTER_SITE_TYPES)[number] = SITE_TYPE.BLANK,
@@ -102,9 +109,14 @@ function referencedIds(documents: TStarterDocumentUnion[]): string[] {
   return ids;
 }
 
-const everyCombination = STARTER_SITE_TYPES.flatMap((siteType) =>
-  LOCALES.map((locale) => [siteType, locale] as const),
-);
+const inEveryLocale = <TSiteType extends (typeof STARTER_SITE_TYPES)[number]>(
+  siteTypes: readonly TSiteType[],
+) =>
+  siteTypes.flatMap((siteType) =>
+    LOCALES.map((locale) => [siteType, locale] as const),
+  );
+
+const everyCombination = inEveryLocale(STARTER_SITE_TYPES);
 
 describe(buildStarterDocuments, () => {
   it('builds the Blank site from the base documents only', () => {
@@ -534,5 +546,171 @@ describe(toStarterSiteType, () => {
 
   it('starts a tenant with no site type from the Blank site', () => {
     expect(toStarterSiteType(null)).toBe(SITE_TYPE.BLANK);
+  });
+});
+
+describe(buildGrowthLayer, () => {
+  const growthCombination = inEveryLocale(GROWTH_SITE_TYPES);
+
+  const layerOf = (
+    siteType: (typeof STARTER_SITE_TYPES)[number],
+    locale: (typeof LOCALES)[number] = LOCALE_ISO_CODES.EN,
+  ) =>
+    buildGrowthLayer({
+      siteType,
+      locale,
+      placeholderImages: MOCK_PLACEHOLDER_IMAGES,
+    });
+
+  const requireLayer = (
+    ...args: Parameters<typeof layerOf>
+  ): NonNullable<ReturnType<typeof layerOf>> => {
+    const layer = layerOf(...args);
+    if (!layer) throw new Error(`no Growth layer for ${args[0]}`);
+    return layer;
+  };
+
+  const homeModuleIds = (documents: TStarterDocumentUnion[]) =>
+    (findByType(documents, 'template_home').modules ?? []).map(
+      ({ _ref }) => _ref,
+    );
+
+  it.each([SITE_TYPE.BLOG, SITE_TYPE.DOCS, SITE_TYPE.PRODUCT, SITE_TYPE.BLANK])(
+    'builds no layer for %s',
+    (siteType) => {
+      expect(layerOf(siteType)).toBeNull();
+    },
+  );
+
+  it.each(growthCombination)(
+    '%s in %s adds only ids the Free site does not seed',
+    (siteType, locale) => {
+      const starterIds = build(siteType, locale).map(({ _id }) => _id);
+      const layerIds = requireLayer(siteType, locale).documents.map(
+        ({ _id }) => _id,
+      );
+
+      expect(new Set(layerIds).size).toBe(layerIds.length);
+      expect(layerIds.filter((id) => starterIds.includes(id))).toEqual([]);
+    },
+  );
+
+  it.each(growthCombination)(
+    '%s in %s builds references that resolve to the site or a placeholder image',
+    (siteType, locale) => {
+      const { documents } = requireLayer(siteType, locale);
+      const knownIds = [...build(siteType, locale), ...documents].map(
+        ({ _id }) => _id,
+      );
+      const placeholderIds: string[] = Object.values(MOCK_PLACEHOLDER_IMAGES);
+
+      const dangling = referencedIds(documents).filter(
+        (id) => !knownIds.includes(id) && !placeholderIds.includes(id),
+      );
+
+      expect(dangling).toEqual([]);
+    },
+  );
+
+  it.each(growthCombination)(
+    '%s in %s writes every localised value in that locale',
+    (siteType, locale) => {
+      const languages = new Set<unknown>();
+      JSON.stringify(requireLayer(siteType, locale).documents, (key, value) => {
+        if (key === 'language') languages.add(value);
+        return value;
+      });
+
+      expect([...languages]).toEqual([locale]);
+    },
+  );
+
+  it.each(GROWTH_SITE_TYPES)(
+    'the %s home slots each reference a layer document of their type',
+    (siteType) => {
+      const { documents, homeSlots } = requireLayer(siteType);
+
+      const mismatched = homeSlots.flatMap(({ slot: { _ref, _type } }) =>
+        byId(documents, _ref)?._type === _type ? [] : [_ref],
+      );
+
+      expect(mismatched).toEqual([]);
+    },
+  );
+
+  it.each([
+    [
+      SITE_TYPE.PORTFOLIO,
+      [
+        'module_content',
+        'module_featureHighlights',
+        'module_logoWall',
+        'module_timeline',
+        'module_testimonial',
+        'module_cta',
+      ],
+    ],
+    [
+      SITE_TYPE.PERSONAL,
+      [
+        'module_content',
+        'module_timeline',
+        'module_featureList',
+        'module_faq',
+        'module_cta',
+      ],
+    ],
+    [
+      SITE_TYPE.BUSINESS,
+      [
+        'module_content',
+        'module_featureList',
+        'module_stats',
+        'module_logoWall',
+        'module_team',
+        'module_testimonial',
+        'module_faq',
+        'module_cta',
+      ],
+    ],
+  ] as const)(
+    'places the %s Growth sections in the Free home',
+    (siteType, expected) => {
+      const starter = build(siteType);
+      const { documents, homeSlots } = requireLayer(siteType);
+      const home = homeSlots.reduce((ids, { slot, after }) => {
+        const index = ids.indexOf(after);
+        return [...ids.slice(0, index + 1), slot._ref, ...ids.slice(index + 1)];
+      }, homeModuleIds(starter));
+
+      expect(
+        home.map((id) => byId([...starter, ...documents], id)?._type),
+      ).toEqual(expected);
+    },
+  );
+
+  it.each([SITE_TYPE.PORTFOLIO, SITE_TYPE.BUSINESS] as const)(
+    'gives the %s logo wall the logo placeholder',
+    (siteType) => {
+      const logoWall = findByType(
+        requireLayer(siteType).documents,
+        'module_logoWall',
+      );
+
+      expect(
+        new Set(logoWall.logos?.map(({ image }) => image?.asset?._ref)),
+      ).toEqual(new Set([MOCK_PLACEHOLDER_IMAGES.LOGO]));
+    },
+  );
+
+  it('gives the Portfolio highlights the illustration placeholder', () => {
+    const highlights = findByType(
+      requireLayer(SITE_TYPE.PORTFOLIO).documents,
+      'module_featureHighlights',
+    );
+
+    expect(
+      new Set(highlights.highlights?.map(({ image }) => image?.asset?._ref)),
+    ).toEqual(new Set([MOCK_PLACEHOLDER_IMAGES.ILLUSTRATION]));
   });
 });
