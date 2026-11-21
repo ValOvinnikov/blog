@@ -49,9 +49,12 @@ vi.mock('@shinefold/db', async () => ({
 const MOCK_TENANT = mockServableTenant();
 const MOCK_NON_TENANT_SHAPED_SEGMENT = '.well-known';
 
+beforeEach(() => {
+  vi.resetAllMocks();
+});
+
 describe(resolveRequestTenant, () => {
   beforeEach(() => {
-    vi.resetAllMocks();
     headersMock.mockResolvedValue(new Headers({ host: MOCK_TENANT_HOST }));
   });
 
@@ -107,7 +110,6 @@ describe(resolveRequestTenant, () => {
 
 describe(getRequestTenantId, () => {
   beforeEach(() => {
-    vi.resetAllMocks();
     headersMock.mockResolvedValue(new Headers());
   });
 
@@ -155,7 +157,6 @@ describe(getRequestTenantId, () => {
 
 describe('request-scoped memoization', () => {
   beforeEach(() => {
-    vi.resetAllMocks();
     headersMock.mockResolvedValue(
       new Headers({
         host: MOCK_TENANT_HOST,
@@ -224,10 +225,6 @@ describe('request-scoped memoization', () => {
 });
 
 describe(isRequestHostPlatformFallback, () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-  });
-
   it.each([
     { host: MOCK_LOCAL_HOST, expected: true },
     { host: MOCK_TENANT_HOST, expected: false },

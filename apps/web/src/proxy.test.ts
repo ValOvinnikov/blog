@@ -6,6 +6,7 @@ import {
   routes,
   SITE_MESSAGES_BY_LOCALE,
   type TLocaleIsoCode,
+  type TMaybeNull,
 } from '@shinefold/config';
 import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
 import { SUSPENSION_REASON, TENANT_STATUS } from '@shinefold/db/constants';
@@ -201,7 +202,7 @@ const visit = (
     headers = {},
     method = HTTP_METHOD.GET,
   }: {
-    host?: string | null;
+    host?: TMaybeNull<string>;
     headers?: Record<string, string>;
     method?: string;
   } = {},

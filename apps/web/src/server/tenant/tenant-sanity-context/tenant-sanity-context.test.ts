@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { TENANT_STATUS } from '@shinefold/db/constants';
 import type { TTenantSanityWriteCredentials } from '@shinefold/db/queries/tenants/get-tenant-sanity-write-credentials/get-tenant-sanity-write-credentials';
@@ -43,7 +44,7 @@ const MOCK_PLATFORM_SANITY_CONTEXT = {
 
 const MOCK_TENANT = mockServableTenant();
 
-const UNCREDENTIALED_TENANT_CASES: [string, TTenant | undefined][] = [
+const UNCREDENTIALED_TENANT_CASES: [string, TMaybeUndefined<TTenant>][] = [
   ['no tenant resolves', undefined],
   ['the matched tenant has no credentials set', MOCK_TENANT],
 ];

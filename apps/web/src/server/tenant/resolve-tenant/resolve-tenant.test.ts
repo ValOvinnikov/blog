@@ -156,12 +156,12 @@ describe(resolveTenant, () => {
       vi.mocked(isProductionEnvironment).mockReturnValue(true);
     });
 
-    it('never falls back to the sole tenant', async () => {
+    it('never falls back to the sole tenant, even on localhost', async () => {
       vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
         undefined,
       );
 
-      await expect(resolveTenant(MOCK_UNKNOWN_HOST)).resolves.toBeUndefined();
+      await expect(resolveTenant(MOCK_LOCAL_HOST)).resolves.toBeUndefined();
       expect(queries.tenants.listTenants).not.toHaveBeenCalled();
     });
 

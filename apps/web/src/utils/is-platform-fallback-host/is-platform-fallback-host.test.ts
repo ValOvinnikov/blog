@@ -1,6 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { setMockEnv } from '@web/testing/server/infra/set-mock-env';
-import { MOCK_LOCAL_HOST } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_LOCAL_HOST,
+  MOCK_LOCAL_HOSTNAME,
+} from '@web/testing/shared/tenant/fixtures';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 
 import { isPlatformFallbackHost } from './is-platform-fallback-host';
@@ -11,7 +14,6 @@ vi.mock('@web/utils/env/env');
 vi.mock('@web/utils/is-production-environment');
 
 const MOCK_SITE_HOST = faker.internet.domainName();
-const LOCALHOST = 'localhost';
 const MOCK_UNKNOWN_HOST = `${faker.lorem.slug()}.${MOCK_SITE_HOST}`;
 
 beforeEach(() => {
@@ -21,7 +23,7 @@ beforeEach(() => {
 
 describe(isPlatformFallbackHost, () => {
   describe('outside production', () => {
-    it.each([LOCALHOST, MOCK_LOCAL_HOST, MOCK_SITE_HOST, null])(
+    it.each([MOCK_LOCAL_HOSTNAME, MOCK_LOCAL_HOST, MOCK_SITE_HOST, null])(
       'allows %j',
       (host) => {
         expect(isPlatformFallbackHost(host)).toBe(true);
@@ -39,7 +41,7 @@ describe(isPlatformFallbackHost, () => {
     });
   });
 
-  it.each([LOCALHOST, MOCK_SITE_HOST, null])(
+  it.each([MOCK_LOCAL_HOSTNAME, MOCK_SITE_HOST, null])(
     'refuses %j in production',
     (host) => {
       vi.mocked(isProductionEnvironment).mockReturnValue(true);

@@ -1,10 +1,12 @@
 import { HTTP_STATUS } from '@shinefold/config/constants';
 import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { SINGLE_LANGUAGE_ROUTING } from '@web/i18n/routing';
-import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import {
+  isRequestHostPlatformFallback,
+  resolveRequestTenant,
+} from '@web/server/tenant/request-tenant/request-tenant';
 import { selectTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { getTenantTranslationMap } from '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map';
-import { isPlatformFallbackHost } from '@web/utils/is-platform-fallback-host';
 import { rememberLanguage } from '@web/utils/language-cookie';
 import { parseSwitchLanguageRequest } from '@web/utils/parse-switch-language-request';
 import { privateRedirect } from '@web/utils/private-redirect';
@@ -24,7 +26,7 @@ const EMPTY_TRANSLATION_MAP = {
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const tenant = await resolveRequestTenant();
-  if (!tenant && !isPlatformFallbackHost(request.headers.get('host'))) {
+  if (!tenant && !(await isRequestHostPlatformFallback())) {
     return new NextResponse(null, { status: HTTP_STATUS.NOT_FOUND });
   }
 
