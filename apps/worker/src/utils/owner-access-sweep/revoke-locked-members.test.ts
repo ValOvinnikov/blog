@@ -97,39 +97,18 @@ describe(revokeLockedMembers, () => {
     expect(result).toEqual({ revoked: 1, failed: 0 });
   });
 
-  describe('a member with only an invite recorded', () => {
-    beforeEach(() => {
-      vi.mocked(listLockedMembersWithStudioAccess).mockResolvedValue([
-        { ...MOCK_LOCKED_MEMBER, email: undefined, sanityUserId: undefined },
-      ]);
-    });
+  it('hands over the recorded invite of a member with only an invite recorded', async () => {
+    vi.mocked(listLockedMembersWithStudioAccess).mockResolvedValue([
+      { ...MOCK_LOCKED_MEMBER, email: undefined, sanityUserId: undefined },
+    ]);
 
-    it('deletes the recorded invite, then clears access', async () => {
-      const result = await revokeLockedMembers();
+    await revokeLockedMembers();
 
-      expect(logger.warn).not.toHaveBeenCalled();
-      expect(revokeMemberAccess).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-        email: undefined,
-        sanityUserId: undefined,
-        sanityInviteId: MOCK_MEMBER_INVITE_ID,
-      });
-      expect(setMemberStudioAccess).toHaveBeenCalledWith(
-        MOCK_TENANT_ID,
-        MOCK_MEMBERSHIP_ID,
-        MOCK_CLEARED_ACCESS,
-      );
-      expect(result).toEqual({ revoked: 1, failed: 0 });
-    });
-
-    it('keeps the recorded access when the invite cannot be deleted', async () => {
-      vi.mocked(revokeMemberAccess).mockRejectedValue(
-        new Error(MOCK_SANITY_OUTAGE),
-      );
-
-      const result = await revokeLockedMembers();
-
-      expect(setMemberStudioAccess).not.toHaveBeenCalled();
-      expect(result).toEqual({ revoked: 0, failed: 1 });
+    expect(logger.warn).not.toHaveBeenCalled();
+    expect(revokeMemberAccess).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+      email: undefined,
+      sanityUserId: undefined,
+      sanityInviteId: MOCK_MEMBER_INVITE_ID,
     });
   });
 

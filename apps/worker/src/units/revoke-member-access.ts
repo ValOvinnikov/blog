@@ -43,8 +43,11 @@ async function listRemovedInvites(
   project: TStudioProject,
   { email, sanityInviteId }: TRemovedMember,
 ): Promise<TSanityInvite[]> {
-  if (email) return listPendingInvites(project, email);
-  return sanityInviteId ? [{ id: sanityInviteId }] : [];
+  const pending = email ? await listPendingInvites(project, email) : [];
+  if (!sanityInviteId || pending.some(({ id }) => id === sanityInviteId)) {
+    return pending;
+  }
+  return [...pending, { id: sanityInviteId }];
 }
 
 export async function revokeMemberAccess(
@@ -67,9 +70,12 @@ export async function revokeMemberAccess(
     listSanityProjectUsers({ token, projectId }),
   ]);
 
-  await deleteInvites(project, invites);
-  await revokeProjectRoles(
-    project,
-    users.filter((user) => isRemovedUser(removed, ownerSanityUserId, user)),
-  );
+  try {
+    await deleteInvites(project, invites);
+  } finally {
+    await revokeProjectRoles(
+      project,
+      users.filter((user) => isRemovedUser(removed, ownerSanityUserId, user)),
+    );
+  }
 }
