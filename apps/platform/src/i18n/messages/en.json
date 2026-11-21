@@ -1251,10 +1251,11 @@
     "sendTest": "Send test to me",
     "sendingTest": "Sending…",
     "testSent": "Test sent to {email}.",
-    "testRateLimited": "You've sent several tests recently — try again in a few minutes.",
+    "testRateLimited": "You've sent the most tests for now. Try again at {time}.",
     "testInvalid": "Fill in the subject and message before sending a test.",
     "testFailed": "Couldn't send the test — try again.",
     "testSubject": "[Test] {subject}",
+    "postTestBanner": "Test email — only you got this. Your subscribers get it when the post is first published.",
     "unsavedLogoNote": "A logo you haven't saved yet isn't included in the test."
   },
   "emailSettingsForm": {
@@ -2269,6 +2270,23 @@
       "kept": "Nothing is deleted. Your content and settings are kept, and they come back if you move to a paid plan again."
     }
   },
+  "ownerEntitlementEmail": {
+    "actionLabel": "Open your dashboard",
+    "granted": {
+      "subject": "Granted on {siteName}: {item}",
+      "previewText": "You can now use {item} on {siteName}. Nothing is charged.",
+      "granted": "{siteName} has been granted the following outside its plan: {item}.",
+      "untilRevoked": "The grant lasts until it is revoked.",
+      "expires": "The grant lasts until {date}.",
+      "free": "Nothing is charged."
+    },
+    "revoked": {
+      "subject": "Grant revoked on {siteName}: {item}",
+      "previewText": "Nothing is deleted.",
+      "revoked": "The grant of {item} on {siteName} has been revoked.",
+      "kept": "Nothing is deleted. What you set up with it is kept, and comes back if it is granted again or your plan includes it."
+    }
+  },
   "ownerReceiptEmail": {
     "subject": "Your payment receipt for {siteName}",
     "previewText": "We received {amount} for {siteName}.",
@@ -2398,7 +2416,29 @@
     "planEnds": "Your plan ends on <time>{date}</time>, so it can't change. To keep it, undo the cancellation from Billing.",
     "UNCHANGED": "Your site is already on this plan.",
     "CARD_DECLINED": "Your card was declined, so nothing changed. Update it in Billing and try again.",
-    "PAYMENT_NOT_CONFIRMED": "Your bank's confirmation wasn't completed, so your plan hasn't changed. Try again when you're ready."
+    "PAYMENT_NOT_CONFIRMED": "Your bank's confirmation wasn't completed, so your plan hasn't changed. Try again when you're ready.",
+    "NO_NEXT_BAND": "Your site can't move up to that band now. Reload the page to see your current band.",
+    "PENDING_CHANGE": "Your site has a plan change waiting for renewal. Keep your current plan from Upgrade first, then move up.",
+    "QUOTE_EXPIRED": "This price was shown a while ago. Close this and open it again for today's price."
+  },
+  "moveUpBand": {
+    "trigger": "Move to {ceiling, number} subscribers — {price} a {interval, select, YEARLY {year} other {month}} more",
+    "title": "Move to {ceiling, number} subscribers?",
+    "lead": "Your new limits apply as soon as the payment goes through.",
+    "loading": "Loading the price…",
+    "quoteFailed": "The price couldn't be loaded. Close this and try again in a moment.",
+    "newLimitsTerm": "New limits",
+    "newLimits": "{ceiling, number} subscribers · {allowance, number} emails a month",
+    "chargedTodayTerm": "Charged today",
+    "chargedTodayNote": "The difference for the rest of this billing period, to <time>{date}</time>.",
+    "renewalTerm": "From {date}",
+    "renewalTotal": "{total} a {interval, select, YEARLY {year} other {month}}",
+    "cardTerm": "Card",
+    "card": "{brand, select, visa {Visa} mastercard {Mastercard} amex {American Express} discover {Discover} other {Card}} ending {last4}",
+    "moveDownNote": "Moving down a band happens at renewal, with no refund.",
+    "cancel": "Cancel",
+    "pay": "Pay {amount} and move up",
+    "paying": "Paying…"
   },
   "helpView": {
     "title": "Help",

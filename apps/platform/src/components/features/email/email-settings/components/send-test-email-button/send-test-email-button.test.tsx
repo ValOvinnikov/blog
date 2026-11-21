@@ -25,6 +25,7 @@ vi.mock('@platform/server/email/send-test-email-action');
 const { testSent, testInvalid, testRateLimited, testFailed } = en.emailPreview;
 const MOCK_SUBJECT = faker.lorem.sentence();
 const MOCK_SENDER_NAME = faker.company.name();
+const TIME_PLACEHOLDER = '{time}';
 
 const setup = customRenderInSettingsForm(SendTestEmailButton, {
   tenantId: MOCK_TENANT_ID,
@@ -76,10 +77,6 @@ describe(`<${SendTestEmailButton.name}/>`, () => {
         message: testInvalid,
       },
       {
-        result: { outcome: ACTION_OUTCOME.RATE_LIMITED },
-        message: testRateLimited,
-      },
-      {
         result: { outcome: ACTION_OUTCOME.SERVER_ERROR },
         message: testFailed,
       },
@@ -95,6 +92,22 @@ describe(`<${SendTestEmailButton.name}/>`, () => {
         expect(failure).toBeVisible();
       },
     );
+
+    it('says when to try again once the sender hits the test limit', async () => {
+      const [limitCopy = ''] = testRateLimited.split(TIME_PLACEHOLDER);
+      vi.mocked(sendTestEmailAction).mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.RATE_LIMITED,
+        retryAt: new Date().toISOString(),
+      });
+
+      await user.click(sendButton);
+
+      const refusal = await screen.findByText((text) =>
+        text.startsWith(limitCopy),
+      );
+
+      expect(refusal).not.toHaveTextContent(TIME_PLACEHOLDER);
+    });
   });
 
   it('offers no test send for an archived tenant', () => {

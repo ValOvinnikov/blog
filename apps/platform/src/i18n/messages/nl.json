@@ -1251,10 +1251,11 @@
     "sendTest": "Test naar mij sturen",
     "sendingTest": "Versturen…",
     "testSent": "Test verstuurd naar {email}.",
-    "testRateLimited": "Je hebt net meerdere tests verstuurd — probeer het over een paar minuten opnieuw.",
+    "testRateLimited": "Je hebt voorlopig het maximum aantal tests verstuurd. Probeer het opnieuw om {time}.",
     "testInvalid": "Vul het onderwerp en bericht in voordat je een test verstuurt.",
     "testFailed": "De test kon niet worden verstuurd — probeer het opnieuw.",
     "testSubject": "[Test] {subject}",
+    "postTestBanner": "Testmail — alleen jij hebt deze gekregen. Je abonnees krijgen hem wanneer het bericht voor het eerst wordt gepubliceerd.",
     "unsavedLogoNote": "Een logo dat je nog niet hebt opgeslagen, zit niet in de test."
   },
   "emailSettingsForm": {
@@ -2269,6 +2270,23 @@
       "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard en komen terug als je weer overstapt naar een betaald plan."
     }
   },
+  "ownerEntitlementEmail": {
+    "actionLabel": "Open je dashboard",
+    "granted": {
+      "subject": "Toegekend op {siteName}: {item}",
+      "previewText": "Je kunt {item} nu gebruiken op {siteName}. Er wordt niets in rekening gebracht.",
+      "granted": "Aan {siteName} is buiten het plan het volgende toegekend: {item}.",
+      "untilRevoked": "De toekenning geldt tot ze wordt ingetrokken.",
+      "expires": "De toekenning geldt tot {date}.",
+      "free": "Er wordt niets in rekening gebracht."
+    },
+    "revoked": {
+      "subject": "Toekenning ingetrokken op {siteName}: {item}",
+      "previewText": "Er wordt niets verwijderd.",
+      "revoked": "De toekenning van {item} op {siteName} is ingetrokken.",
+      "kept": "Er wordt niets verwijderd. Wat je ermee hebt ingesteld blijft bewaard en komt terug als het opnieuw wordt toegekend of je plan het bevat."
+    }
+  },
   "ownerReceiptEmail": {
     "subject": "Je betalingsbewijs voor {siteName}",
     "previewText": "We hebben {amount} ontvangen voor {siteName}.",
@@ -2398,7 +2416,29 @@
     "planEnds": "Je abonnement eindigt op <time>{date}</time>, dus het kan niet meer wijzigen. Wil je het houden, maak de opzegging dan ongedaan via Facturering.",
     "UNCHANGED": "Je site zit al op dit abonnement.",
     "CARD_DECLINED": "Je kaart is geweigerd, dus er is niets gewijzigd. Werk hem bij in Facturering en probeer het opnieuw.",
-    "PAYMENT_NOT_CONFIRMED": "De bevestiging bij je bank is niet afgerond, dus je abonnement is niet gewijzigd. Probeer het opnieuw wanneer je zover bent."
+    "PAYMENT_NOT_CONFIRMED": "De bevestiging bij je bank is niet afgerond, dus je abonnement is niet gewijzigd. Probeer het opnieuw wanneer je zover bent.",
+    "NO_NEXT_BAND": "Je site kan nu niet naar die schijf. Laad de pagina opnieuw om je huidige schijf te zien.",
+    "PENDING_CHANGE": "Voor je site staat een abonnementswijziging gepland bij verlenging. Houd eerst je huidige abonnement via Upgraden en stap daarna een schijf hoger.",
+    "QUOTE_EXPIRED": "Deze prijs werd een tijd geleden getoond. Sluit dit venster en open het opnieuw voor de prijs van vandaag."
+  },
+  "moveUpBand": {
+    "trigger": "Naar {ceiling, number} abonnees — {price} meer per {interval, select, YEARLY {jaar} other {maand}}",
+    "title": "Naar {ceiling, number} abonnees?",
+    "lead": "Je nieuwe limieten gelden zodra de betaling rond is.",
+    "loading": "Prijs laden…",
+    "quoteFailed": "De prijs kon niet worden geladen. Sluit dit venster en probeer het zo opnieuw.",
+    "newLimitsTerm": "Nieuwe limieten",
+    "newLimits": "{ceiling, number} abonnees · {allowance, number} e-mails per maand",
+    "chargedTodayTerm": "Vandaag in rekening gebracht",
+    "chargedTodayNote": "Het verschil voor de rest van deze factuurperiode, tot <time>{date}</time>.",
+    "renewalTerm": "Vanaf {date}",
+    "renewalTotal": "{total} per {interval, select, YEARLY {jaar} other {maand}}",
+    "cardTerm": "Kaart",
+    "card": "{brand, select, visa {Visa} mastercard {Mastercard} amex {American Express} discover {Discover} other {Kaart}} eindigend op {last4}",
+    "moveDownNote": "Naar een lagere schijf gaan gebeurt bij verlenging, zonder terugbetaling.",
+    "cancel": "Annuleren",
+    "pay": "{amount} betalen en overstappen",
+    "paying": "Betalen…"
   },
   "helpView": {
     "title": "Help",

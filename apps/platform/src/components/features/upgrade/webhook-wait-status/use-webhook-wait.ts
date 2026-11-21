@@ -11,6 +11,7 @@ export const useWebhookWait = <TValue>(
   initialValue: TValue,
   poll: (tenantId: string) => Promise<TMaybeUndefined<TValue>>,
   isAwaiting: (value: TValue) => boolean,
+  onSettled?: () => void,
 ) => {
   const router = useRouter();
   const [hasFailed, setHasFailed] = useState(false);
@@ -23,7 +24,9 @@ export const useWebhookWait = <TValue>(
       maxTicks: UPGRADE_POLL.MAX_TICKS,
       isActive: isAwaiting,
       onResult: (next) => {
-        if (!isAwaiting(next)) router.refresh();
+        if (isAwaiting(next)) return;
+        if (onSettled) onSettled();
+        else router.refresh();
       },
       onError: () => setHasFailed(true),
     },

@@ -1,11 +1,11 @@
 import 'server-only';
 
 import { TENANT_LOG } from '@platform/constants/tenant';
+import { dashboardUrl } from '@platform/utils/dashboard-url/dashboard-url';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { toPricingPageUrl } from '@platform/utils/pricing-page-url/pricing-page-url';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import { EMAIL_ACCOUNT, type TTenantPlan } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import {
@@ -52,10 +52,7 @@ const sendPlanChangeEmail = async (
     paragraphs: [t(`${toPlan}.changed`, values), t(`${toPlan}.kept`)],
     action: {
       label: t('actionLabel'),
-      url: new URL(
-        adminRoutes.dashboardSelectTenantHref(tenantId),
-        baseUrl,
-      ).toString(),
+      url: dashboardUrl(tenantId, baseUrl),
     },
     secondaryLink: plansUrl
       ? { label: t('plansLinkLabel'), url: plansUrl }

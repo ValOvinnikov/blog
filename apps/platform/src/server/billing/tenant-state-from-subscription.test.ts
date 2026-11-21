@@ -6,15 +6,19 @@ import {
   MOCK_BAND_CEILING,
   MOCK_INCOMPLETE_SUBSCRIPTION_STATUS,
 } from '@platform/testing/billing/fixtures';
-import { TENANT_PLAN } from '@shinefold/config/constants';
-import { TENANT_STATUS } from '@shinefold/db/constants';
+import { BILLING_INTERVAL, TENANT_PLAN } from '@shinefold/config/constants';
+import { BILLING_CURRENCY, TENANT_STATUS } from '@shinefold/db/constants';
 
-import type { TSubscribedPlan } from './plan-from-price-keys';
-import { tenantStateFromSubscription } from './tenant-state-from-subscription';
+import {
+  tenantStateFromSubscription,
+  type TSubscribedBilling,
+} from './tenant-state-from-subscription';
 
-const MOCK_SUBSCRIBED: TSubscribedPlan = {
+const MOCK_SUBSCRIBED: TSubscribedBilling = {
   plan: TENANT_PLAN.GROWTH,
   subscriberBandCeiling: MOCK_BAND_CEILING,
+  billingInterval: BILLING_INTERVAL.YEARLY,
+  billingCurrency: BILLING_CURRENCY.EUR,
 };
 
 describe(tenantStateFromSubscription, () => {
@@ -52,7 +56,7 @@ describe(tenantStateFromSubscription, () => {
     STRIPE_SUBSCRIPTION_STATUS.CANCELED,
     STRIPE_SUBSCRIPTION_STATUS.UNPAID,
   ])('a %s subscription', (status) => {
-    it('moves a paid site to Free and starts the grace', () => {
+    it('moves a paid site to Free, unsets its period and currency, starts grace', () => {
       expect(
         tenantStateFromSubscription(
           status,
@@ -62,6 +66,8 @@ describe(tenantStateFromSubscription, () => {
       ).toEqual({
         plan: TENANT_PLAN.FREE,
         subscriberBandCeiling: null,
+        billingInterval: null,
+        billingCurrency: null,
         status: TENANT_STATUS.ACTIVE,
         grace: BILLING_GRACE.START,
       });

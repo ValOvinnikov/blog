@@ -1251,10 +1251,11 @@
     "sendTest": "Enviarme una prueba",
     "sendingTest": "Enviando…",
     "testSent": "Prueba enviada a {email}.",
-    "testRateLimited": "Ha enviado varias pruebas recientemente. Vuelva a intentarlo en unos minutos.",
+    "testRateLimited": "Ha enviado el máximo de pruebas por ahora. Vuelva a intentarlo a las {time}.",
     "testInvalid": "Complete el asunto y el mensaje antes de enviar una prueba.",
     "testFailed": "No se pudo enviar la prueba. Vuelva a intentarlo.",
     "testSubject": "[Prueba] {subject}",
+    "postTestBanner": "Correo de prueba: solo usted lo ha recibido. Sus suscriptores lo recibirán cuando la entrada se publique por primera vez.",
     "unsavedLogoNote": "Un logotipo que aún no ha guardado no se incluye en la prueba."
   },
   "emailSettingsForm": {
@@ -2269,6 +2270,23 @@
       "kept": "No se borra nada. Tu contenido y tus ajustes se conservan y vuelven si cambias de nuevo a un plan de pago."
     }
   },
+  "ownerEntitlementEmail": {
+    "actionLabel": "Abrir tu panel",
+    "granted": {
+      "subject": "Concedido en {siteName}: {item}",
+      "previewText": "Ya puedes usar {item} en {siteName}. No se cobra nada.",
+      "granted": "Se ha concedido a {siteName}, fuera de su plan: {item}.",
+      "untilRevoked": "La concesión dura hasta que se revoque.",
+      "expires": "La concesión dura hasta el {date}.",
+      "free": "No se cobra nada."
+    },
+    "revoked": {
+      "subject": "Concesión revocada en {siteName}: {item}",
+      "previewText": "No se borra nada.",
+      "revoked": "Se ha revocado la concesión de {item} en {siteName}.",
+      "kept": "No se borra nada. Lo que configuraste con ello se conserva y vuelve si se concede de nuevo o si tu plan lo incluye."
+    }
+  },
   "ownerReceiptEmail": {
     "subject": "Tu recibo de pago de {siteName}",
     "previewText": "Hemos recibido {amount} por {siteName}.",
@@ -2398,7 +2416,29 @@
     "planEnds": "Tu plan termina el <time>{date}</time>, así que no puede cambiar. Para conservarlo, anula la cancelación desde Facturación.",
     "UNCHANGED": "Tu sitio ya está en este plan.",
     "CARD_DECLINED": "Tu tarjeta ha sido rechazada, así que no ha cambiado nada. Actualízala en Facturación e inténtalo de nuevo.",
-    "PAYMENT_NOT_CONFIRMED": "La confirmación con tu banco no se completó, así que tu plan no ha cambiado. Inténtalo de nuevo cuando quieras."
+    "PAYMENT_NOT_CONFIRMED": "La confirmación con tu banco no se completó, así que tu plan no ha cambiado. Inténtalo de nuevo cuando quieras.",
+    "NO_NEXT_BAND": "Tu sitio no puede pasar a ese tramo ahora. Recarga la página para ver tu tramo actual.",
+    "PENDING_CHANGE": "Tu sitio tiene un cambio de plan pendiente para la renovación. Mantén primero tu plan actual desde Mejorar y luego sube de tramo.",
+    "QUOTE_EXPIRED": "Este precio se mostró hace un rato. Cierra esto y vuelve a abrirlo para ver el precio de hoy."
+  },
+  "moveUpBand": {
+    "trigger": "Pasar a {ceiling, number} suscriptores — {price} más al {interval, select, YEARLY {año} other {mes}}",
+    "title": "¿Pasar a {ceiling, number} suscriptores?",
+    "lead": "Tus nuevos límites se aplican en cuanto se complete el pago.",
+    "loading": "Cargando el precio…",
+    "quoteFailed": "No se pudo cargar el precio. Cierra esto e inténtalo de nuevo en un momento.",
+    "newLimitsTerm": "Nuevos límites",
+    "newLimits": "{ceiling, number} suscriptores · {allowance, number} correos al mes",
+    "chargedTodayTerm": "Cobrado hoy",
+    "chargedTodayNote": "La diferencia por el resto de este periodo de facturación, hasta el <time>{date}</time>.",
+    "renewalTerm": "Desde el {date}",
+    "renewalTotal": "{total} al {interval, select, YEARLY {año} other {mes}}",
+    "cardTerm": "Tarjeta",
+    "card": "{brand, select, visa {Visa} mastercard {Mastercard} amex {American Express} discover {Discover} other {Tarjeta}} terminada en {last4}",
+    "moveDownNote": "Bajar de tramo se aplica en la renovación, sin reembolso.",
+    "cancel": "Cancelar",
+    "pay": "Pagar {amount} y subir",
+    "paying": "Pagando…"
   },
   "helpView": {
     "title": "Ayuda",

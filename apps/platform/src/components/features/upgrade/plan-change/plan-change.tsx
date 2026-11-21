@@ -1,5 +1,6 @@
 'use client';
 
+import { PlanChangeStatus } from '@platform/components/features/upgrade/plan-change-status';
 import { PlanChoices } from '@platform/components/features/upgrade/plan-choices';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
@@ -15,7 +16,6 @@ import { ALERT_TYPE, type TMaybeUndefined } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 
-import { PlanChangeStatus } from './components/plan-change-status/plan-change-status';
 import { PlanChangeSummary } from './components/plan-change-summary/plan-change-summary';
 import { planChangeVariants } from './plan-change-variants';
 import { usePlanChange } from './use-plan-change';
@@ -25,7 +25,7 @@ export type TPlanChangeProps = {
   current: TPlanChoice;
   renewsAt: Date;
   pending: TMaybeUndefined<TPendingPlanChange>;
-  publishableKey?: string;
+  publishableKey: TMaybeUndefined<string>;
 };
 
 export const PlanChange = ({

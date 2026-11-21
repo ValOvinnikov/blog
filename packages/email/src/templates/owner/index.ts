@@ -28,6 +28,10 @@ export {
   type TOwnerPlanChangeEmailInput,
 } from './owner-plan-change/owner-plan-change';
 export {
+  buildOwnerEntitlementEmail,
+  type TOwnerEntitlementEmailInput,
+} from './owner-entitlement/owner-entitlement';
+export {
   buildOwnerSuspensionEmail,
   type TOwnerSuspensionEmailInput,
 } from './owner-suspension/owner-suspension';

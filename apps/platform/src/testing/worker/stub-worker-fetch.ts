@@ -1,4 +1,7 @@
-import { mockedEnv } from '@platform/testing/env/mocked-env';
+import {
+  mockedEnv,
+  mockedWorkerSecretsEnv,
+} from '@platform/testing/env/mocked-env';
 import {
   MOCK_WORKER_SECRET,
   MOCK_WORKER_URL,
@@ -16,5 +19,5 @@ export const stubWorkerFetch = (fetchMock: TWorkerFetchMock): void => {
   );
   vi.stubGlobal('fetch', fetchMock);
   mockedEnv.WORKER_ENQUEUE_URL = MOCK_WORKER_URL;
-  mockedEnv.WORKER_ENQUEUE_SECRET = MOCK_WORKER_SECRET;
+  mockedWorkerSecretsEnv.WORKER_ENQUEUE_SECRET = MOCK_WORKER_SECRET;
 };
