@@ -13,7 +13,7 @@ import {
   mockGrantAccess,
 } from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
-import { LOCALE_ISO_CODES } from '@shinefold/config';
+import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@shinefold/config';
 import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import userEvent from '@testing-library/user-event';
@@ -68,4 +68,11 @@ export const prepareBrandImageForm = () => {
   vi.mocked(uploadBrandAssetAction).mockReset();
   stubStagedImageUrl();
   return userEvent.setup();
+};
+
+export const setupLookFormWithFailingUpload = () => {
+  vi.mocked(uploadBrandAssetAction).mockResolvedValue({
+    outcome: ACTION_OUTCOME.SERVER_ERROR,
+  });
+  setupLookForm();
 };
