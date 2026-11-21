@@ -11,12 +11,17 @@ import {
 } from '@web/testing/server/tenant/fixtures';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
 import {
+  MOCK_LOCAL_HOST,
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_HOST,
   MOCK_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
 
-import { getRequestTenantId, resolveRequestTenant } from './request-tenant';
+import {
+  getRequestTenantId,
+  isRequestHostPlatformFallback,
+  resolveRequestTenant,
+} from './request-tenant';
 
 faker.seed(2288);
 
@@ -215,5 +220,20 @@ describe('request-scoped memoization', () => {
     await getHostTenantSanityWriteContext();
 
     expect(queries.tenantDomains.getTenantByDomain).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe(isRequestHostPlatformFallback, () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it.each([
+    { host: MOCK_LOCAL_HOST, expected: true },
+    { host: MOCK_TENANT_HOST, expected: false },
+  ])('is $expected for a request to $host', async ({ host, expected }) => {
+    headersMock.mockResolvedValueOnce(new Headers({ host }));
+
+    await expect(isRequestHostPlatformFallback()).resolves.toBe(expected);
   });
 });

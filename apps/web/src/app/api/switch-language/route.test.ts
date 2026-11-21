@@ -15,16 +15,17 @@ faker.seed(6009);
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const { isPlatformFallbackAllowedMock, getTenantTranslationMapMock } =
-  vi.hoisted(() => ({
-    isPlatformFallbackAllowedMock: vi.fn(),
+const { isPlatformFallbackHostMock, getTenantTranslationMapMock } = vi.hoisted(
+  () => ({
+    isPlatformFallbackHostMock: vi.fn(),
     getTenantTranslationMapMock: vi.fn(),
-  }));
+  }),
+);
 
 vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales');
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
-vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
-  isPlatformFallbackAllowed: isPlatformFallbackAllowedMock,
+vi.mock('@web/utils/is-platform-fallback-host', () => ({
+  isPlatformFallbackHost: isPlatformFallbackHostMock,
 }));
 vi.mock(
   '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map',
@@ -74,8 +75,8 @@ const serveTenant = (liveLocales: TLocaleIsoCode[]) => {
 
 describe(GET, () => {
   beforeEach(() => {
-    isPlatformFallbackAllowedMock.mockReset();
-    isPlatformFallbackAllowedMock.mockReturnValue(false);
+    isPlatformFallbackHostMock.mockReset();
+    isPlatformFallbackHostMock.mockReturnValue(false);
     getTenantTranslationMapMock.mockReset();
     getTenantTranslationMapMock.mockResolvedValue(translationMap);
     serveTenant([EN, NL, FR]);

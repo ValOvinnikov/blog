@@ -5,8 +5,10 @@ import {
   getPlatformSanityContext,
   type TTenantSanityContext,
 } from '@shinefold/service';
-import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
-import { isPlatformFallbackAllowed } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import {
+  isRequestHostPlatformFallback,
+  resolveRequestTenant,
+} from '@web/server/tenant/request-tenant/request-tenant';
 import { isTenantActive } from '@web/server/tenant/write-gate/write-gate';
 import { cache } from 'react';
 
@@ -25,7 +27,7 @@ export const getHostTenantSanityContext = cache(
       return { isResolvable: true, tenant };
     }
 
-    if (!isPlatformFallbackAllowed()) {
+    if (!(await isRequestHostPlatformFallback())) {
       return { isResolvable: false };
     }
     return { isResolvable: true, tenant: getPlatformSanityContext() };
@@ -55,7 +57,7 @@ export const getHostTenantSanityWriteContext = cache(
     const resolvedTenant = await resolveRequestTenant();
 
     if (!resolvedTenant) {
-      if (!isPlatformFallbackAllowed()) {
+      if (!(await isRequestHostPlatformFallback())) {
         return { isResolvable: false };
       }
       return {

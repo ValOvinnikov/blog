@@ -25,7 +25,7 @@ import {
   type TTenantRouting,
 } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { getDecodedFirstPathSegment } from '@web/utils/get-decoded-first-path-segment';
-import { isProductionEnvironment } from '@web/utils/is-production-environment';
+import { isPlatformFallbackHost } from '@web/utils/is-platform-fallback-host';
 import { logger } from '@web/utils/logger/logger';
 import { siteUnavailableStatus } from '@web/utils/site-unavailable-response';
 import { NextResponse, type NextRequest } from 'next/server';
@@ -74,7 +74,7 @@ const routeRequest = async (request: NextRequest): Promise<NextResponse> => {
 
   const tenantId = tenantRouting?.tenantId;
 
-  if (!tenantId && isProductionEnvironment()) {
+  if (!tenantId && !isPlatformFallbackHost(host)) {
     return new NextResponse(null, { status: HTTP_STATUS.NOT_FOUND });
   }
 

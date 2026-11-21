@@ -7,6 +7,7 @@ import {
   resolveTenant,
   resolveTenantById,
 } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import { isPlatformFallbackHost } from '@web/utils/is-platform-fallback-host';
 import { isValidTenantId } from '@web/utils/is-tenant-shaped-path-segment';
 import { headers } from 'next/headers';
 import { cache } from 'react';
@@ -37,4 +38,8 @@ export const getRequestTenantId = cache(
     }
     return headerTenantId;
   },
+);
+
+export const isRequestHostPlatformFallback = cache(async (): Promise<boolean> =>
+  isPlatformFallbackHost((await headers()).get('host')),
 );
