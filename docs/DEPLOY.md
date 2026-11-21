@@ -737,7 +737,7 @@ Vercel env vars on that app's project, not entries on a GitHub Environment. See 
       tenant but its provisioning run never starts.
 
 - [ ] Env var `TENANT_PROVISIONING_GITHUB_REPO` = `<owner>/<repo>` (e.g.
-      `ValOvinnikov/blog`), paired with its own
+      `ValOvinnikov/sf-mono`), paired with its own
       `TENANT_PROVISIONING_GITHUB_TOKEN` — there's no `GITHUB_REPOSITORY`-style
       var to infer the repo from outside Actions.
 

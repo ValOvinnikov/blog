@@ -271,7 +271,7 @@ XModuleView` block that the rule already forbade and no review had
     `seo-and-metadata` skill as a checklist (`generateMetadata` completeness,
     JSON-LD validity, sitemap/robots/RSS coherence) and reports a verdict in
     the same `APPROVE` / blocking / non-blocking / not-checked format.
-  - `board-keeper` — creates new issues and reconciles the Blog Build
+  - `board-keeper` — creates new issues and reconciles the sf Board
     project board against repo reality (open PR → issue in Code Review,
     in-flight branch → In Progress, merged PR → issue Done, a completed
     parent issue whose sub-issues all trace to merged PRs → Done, every

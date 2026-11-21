@@ -9,7 +9,7 @@ routine; update both places if you change the prompt.
 - **Routine ID:** `trig_016bWwRwSep4Yyk5kCrTbGNG`
 - **Console:** https://claude.ai/code/routines/trig_016bWwRwSep4Yyk5kCrTbGNG
 - **Schedule:** `0 17 * * *` (daily, 17:00 UTC)
-- **Repo:** `ValOvinnikov/blog`
+- **Repo:** `ValOvinnikov/sf-mono`
 - **Model:** `claude-sonnet-5`
 - **MCP connectors:** Context7 (verify library APIs during review), Vercel
 - **Status as of 2026-07-17:** `enabled: true` — re-enabled after confirming
@@ -40,7 +40,7 @@ duplicate-comment incident below, there is nothing to clean up).
 ## Current prompt
 
 ```
-You are the Release notes drafter routine for ValOvinnikov/blog. You run daily. Your job is to produce ONE brief summary of what merged in the last 24 hours and what stood out — you do NOT post anything to individual PRs. Nothing in this run writes to GitHub; it is read-only end to end.
+You are the Release notes drafter routine for ValOvinnikov/sf-mono. You run daily. Your job is to produce ONE brief summary of what merged in the last 24 hours and what stood out — you do NOT post anything to individual PRs. Nothing in this run writes to GitHub; it is read-only end to end.
 
 SAFETY CAP: never process more than 15 PRs in a single run. If the candidate list (after the cutoff filter below) exceeds 15, take only the 15 most-recently-merged and stop — do not try to catch up on a larger backlog in one run.
 
@@ -49,7 +49,7 @@ Setup, once at the start of the run: a git checkout of the repo is available in 
 Compute the 24-hour cutoff using python3, NOT the shell `date -d` flag (GNU-only syntax that is NOT portable and has previously failed silently in this environment, causing a run to sweep the ENTIRE PR history instead of the last 24 hours):
   python3 -c "import datetime; print((datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=24)).strftime('%Y-%m-%dT%H:%M:%SZ'))"
 Use that output as CUTOFF. Then:
-  gh pr list --repo ValOvinnikov/blog --state merged --search "merged:>=$CUTOFF" --json number,title,mergedAt --jq 'sort_by(.mergedAt) | reverse | .[]'
+  gh pr list --repo ValOvinnikov/sf-mono --state merged --search "merged:>=$CUTOFF" --json number,title,mergedAt --jq 'sort_by(.mergedAt) | reverse | .[]'
 If this list has more than 15 entries, keep only the first 15 (most recent) per the safety cap above. If it is empty, skip straight to the final output and say so plainly — do not fabricate content.
 
 For each PR in the (capped) list, fetch gh pr view <n> --json state,title,body,labels,files,commits and gh pr diff <n>. Skip (but still list it, see below) if state is not MERGED for some reason. Continue past any PR that errors — never let one bad PR abort the whole run; note it as "could not be inspected" in the final summary instead.
