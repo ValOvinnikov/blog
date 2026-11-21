@@ -9,6 +9,7 @@ import {
   mockGrowthOwnerContext,
   mockOwnerContext,
 } from '@platform/testing/custom-domain/fixtures';
+import { MOCK_UNKNOWN_PROVIDER } from '@platform/testing/sign-in-apps/fixtures';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
@@ -87,6 +88,15 @@ describe(removeSignInAppAction, () => {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SIGN_IN_APP_REFUSAL.ARCHIVED,
     });
+    expect(
+      tenantOAuthCredentials.clearTenantOAuthCredentials,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('reports a server error for an unknown provider and deletes nothing', async () => {
+    expect(
+      await removeSignInAppAction(MOCK_TENANT_ID, MOCK_UNKNOWN_PROVIDER),
+    ).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(
       tenantOAuthCredentials.clearTenantOAuthCredentials,
     ).not.toHaveBeenCalled();
