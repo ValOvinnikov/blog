@@ -2,11 +2,9 @@
 
 import { SignInAppCallbackField } from '@platform/components/features/sign-in-apps/sign-in-app-callback-field';
 import { SignInAppCallbackWarning } from '@platform/components/features/sign-in-apps/sign-in-app-callback-warning';
-import { SignInAppStatusBadge } from '@platform/components/features/sign-in-apps/sign-in-app-status-badge';
-import { SignInAppTitle } from '@platform/components/features/sign-in-apps/sign-in-app-title';
 import { Card } from '@platform/components/shared/card';
 import type { TSignInAppView } from '@platform/server/sign-in-apps/load-sign-in-apps';
-import { useTranslations } from 'next-intl';
+import { useSignInAppCardHeader } from '@platform/utils/use-sign-in-app-card-header/use-sign-in-app-card-header';
 import { useRef, useState } from 'react';
 
 import { ClientIdField } from './components/client-id-field/client-id-field';
@@ -26,13 +24,15 @@ export const SignInAppCard = ({
   app,
   domain,
 }: TSignInAppCardProps) => {
-  const t = useTranslations('signInAppsPage');
   const form = useSignInAppForm(tenantId, app);
   const { provider, saved, savedMessage, clearApp } = form;
   const [isCallbackConfirmed, setIsCallbackConfirmed] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const copyRef = useRef<HTMLButtonElement>(null);
-  const providerName = t(`providerName.${provider}`);
+  const { providerName, header } = useSignInAppCardHeader(
+    provider,
+    saved.hasOwnApp,
+  );
   const hasCallbackWarning =
     app.hasCallbackWarning &&
     saved.hasOwnApp &&
@@ -52,16 +52,7 @@ export const SignInAppCard = ({
 
   return (
     <Card>
-      <Card.Header
-        title={<SignInAppTitle provider={provider} />}
-        titleRef={titleRef}
-        titleTabIndex={-1}
-        supportingText={t(
-          saved.hasOwnApp ? 'ownDescription' : 'sharedDescription',
-          { provider: providerName },
-        )}
-        actions={<SignInAppStatusBadge hasOwnApp={saved.hasOwnApp} />}
-      />
+      <Card.Header {...header} titleRef={titleRef} titleTabIndex={-1} />
       <Card.Body>
         <div className={body()}>
           {hasCallbackWarning && (
