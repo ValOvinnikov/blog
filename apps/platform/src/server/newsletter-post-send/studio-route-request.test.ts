@@ -5,7 +5,7 @@ import {
 } from '@platform/constants/request';
 import { MOCK_PLATFORM_ORIGIN } from '@platform/testing/auth/fixtures';
 import {
-  MOCK_CROSS_SITE_STUDIO_REQUEST_HEADERS,
+  MOCK_CROSS_ORIGIN_STUDIO_REQUEST_HEADERS,
   MOCK_STUDIO_REQUEST_HEADERS,
   studioJsonRequest,
 } from '@platform/testing/newsletter-post-send/fixtures';
@@ -14,7 +14,7 @@ import { routes } from '@shinefold/config';
 import { isSameOriginJsonRequest } from './studio-route-request';
 
 const PATH = routes.newsletterPostSendNow();
-const HEADERS_WITHOUT_ORIGIN = {
+const MOCK_HEADERS_WITHOUT_ORIGIN = {
   [REQUEST_HEADER.CONTENT_TYPE]: MEDIA_TYPE.JSON,
 };
 
@@ -30,7 +30,7 @@ describe(isSameOriginJsonRequest, () => {
         [REQUEST_HEADER.CONTENT_TYPE]: `${MEDIA_TYPE.JSON}; charset=utf-8`,
       },
       'JSON with no Origin but a same-origin fetch site': {
-        ...HEADERS_WITHOUT_ORIGIN,
+        ...MOCK_HEADERS_WITHOUT_ORIGIN,
         [REQUEST_HEADER.SEC_FETCH_SITE]: FETCH_SITE.SAME_ORIGIN,
       },
     }),
@@ -40,15 +40,19 @@ describe(isSameOriginJsonRequest, () => {
 
   it.each(
     Object.entries<Record<string, string>>({
-      ...MOCK_CROSS_SITE_STUDIO_REQUEST_HEADERS,
+      'another origin': MOCK_CROSS_ORIGIN_STUDIO_REQUEST_HEADERS,
+      'the platform with a non-JSON body': {
+        ...MOCK_STUDIO_REQUEST_HEADERS,
+        [REQUEST_HEADER.CONTENT_TYPE]: MEDIA_TYPE.TEXT,
+      },
       'the platform with no Content-Type': {
         [REQUEST_HEADER.ORIGIN]: MOCK_PLATFORM_ORIGIN,
       },
       'a same-site page with no Origin': {
-        ...HEADERS_WITHOUT_ORIGIN,
-        [REQUEST_HEADER.SEC_FETCH_SITE]: 'same-site',
+        ...MOCK_HEADERS_WITHOUT_ORIGIN,
+        [REQUEST_HEADER.SEC_FETCH_SITE]: FETCH_SITE.SAME_SITE,
       },
-      'nowhere it names': HEADERS_WITHOUT_ORIGIN,
+      'nowhere it names': MOCK_HEADERS_WITHOUT_ORIGIN,
     }),
   )('refuses a request from %s', (_case, headers) => {
     expect(isAccepted(headers)).toBe(false);

@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { resolveStudioCaller } from '@platform/server/auth/resolve-studio-caller';
 import { sendNewsletterPostTest } from '@platform/server/newsletter-post-send/send-newsletter-post-test';
-import { itRefusesCrossSiteStudioRequests } from '@platform/testing/newsletter-post-send/cross-site-refusal';
 import {
+  MOCK_CROSS_ORIGIN_STUDIO_REQUEST_HEADERS,
   MOCK_STUDIO_CALLER,
   MOCK_STUDIO_PROJECT_ID,
   studioJsonRequest,
@@ -108,10 +108,17 @@ describe(POST, () => {
     });
   });
 
-  itRefusesCrossSiteStudioRequests(
-    POST,
-    PATH,
-    MOCK_BODY,
-    vi.mocked(sendNewsletterPostTest),
-  );
+  it('answers FORBIDDEN, before resolving the caller, to a request from another origin', async () => {
+    const response = await POST(
+      studioJsonRequest(
+        PATH,
+        MOCK_BODY,
+        MOCK_CROSS_ORIGIN_STUDIO_REQUEST_HEADERS,
+      ),
+    );
+
+    expect(response.status).toBe(HTTP_STATUS.FORBIDDEN);
+    expect(resolveStudioCaller).not.toHaveBeenCalled();
+    expect(sendNewsletterPostTest).not.toHaveBeenCalled();
+  });
 });

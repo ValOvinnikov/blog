@@ -10,8 +10,10 @@ export const REQUEST_HEADER = {
 
 export const FETCH_SITE = {
   SAME_ORIGIN: 'same-origin',
+  SAME_SITE: 'same-site',
 } as const;
 
 export const MEDIA_TYPE = {
   JSON: 'application/json',
+  TEXT: 'text/plain',
 } as const;

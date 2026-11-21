@@ -33,15 +33,9 @@ export const MOCK_STUDIO_REQUEST_HEADERS: Record<string, string> = {
   [REQUEST_HEADER.CONTENT_TYPE]: MEDIA_TYPE.JSON,
 };
 
-export const MOCK_CROSS_SITE_STUDIO_REQUEST_HEADERS = {
-  'another origin': {
-    ...MOCK_STUDIO_REQUEST_HEADERS,
-    [REQUEST_HEADER.ORIGIN]: new URL(MOCK_OFF_ORIGIN_URL).origin,
-  },
-  'the platform with a non-JSON body': {
-    ...MOCK_STUDIO_REQUEST_HEADERS,
-    [REQUEST_HEADER.CONTENT_TYPE]: 'text/plain',
-  },
+export const MOCK_CROSS_ORIGIN_STUDIO_REQUEST_HEADERS = {
+  ...MOCK_STUDIO_REQUEST_HEADERS,
+  [REQUEST_HEADER.ORIGIN]: new URL(MOCK_OFF_ORIGIN_URL).origin,
 };
 
 export const studioJsonRequest = (

@@ -9216,9 +9216,25 @@
         "file": "apps/platform/src/constants/request.ts"
       }
     ],
+    "same-site": [
+      {
+        "ref": "FETCH_SITE.SAME_SITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
     "application/json": [
       {
         "ref": "MEDIA_TYPE.JSON",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "text/plain": [
+      {
+        "ref": "MEDIA_TYPE.TEXT",
         "scope": "app:platform",
         "from": "@platform/constants/request",
         "file": "apps/platform/src/constants/request.ts"
