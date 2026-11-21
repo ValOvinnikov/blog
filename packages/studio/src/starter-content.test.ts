@@ -4,9 +4,9 @@ import { buildGrowthLayer, buildStarterDocuments } from '@shinefold/config';
 import {
   LOCALE_ISO_CODES,
   SITE_TYPE,
-  STARTER_PLACEHOLDER_IMAGE,
   type TLocaleIsoCode,
 } from '@shinefold/config/constants';
+import { MOCK_PLACEHOLDER_IMAGES } from '@shinefold/config/testing/placeholder-images';
 import { siteSettingsSchema } from '@shinefold/studio/schema-types/documents/settings/site-settings/site-settings';
 import { mockGroqFetch } from '@shinefold/studio/testing/mock-groq-fetch';
 import { isNull } from '@shinefold/utils/primitives';
@@ -32,10 +32,8 @@ const MOCK_PROJECT_ID = faker.string.alphanumeric(8);
 const MOCK_DATASET = faker.lorem.word();
 const MOCK_TITLE = faker.lorem.words(2);
 
-const MOCK_PLACEHOLDER_IMAGES = {
-  [STARTER_PLACEHOLDER_IMAGE.LOGO]: `image-${faker.string.hexadecimal({ length: 40, prefix: '' })}-240x80-svg`,
-  [STARTER_PLACEHOLDER_IMAGE.ILLUSTRATION]: `image-${faker.string.hexadecimal({ length: 40, prefix: '' })}-1200x900-svg`,
-};
+const FREE_LAYER = 'Free';
+const GROWTH_LAYER = 'Growth';
 
 const STARTER_SITE_TYPES = [
   SITE_TYPE.BLOG,
@@ -137,6 +135,7 @@ const withGrowthLayer = (
 
   return [homeTemplate, ...layer.documents].map((document) => ({
     siteType,
+    layer: GROWTH_LAYER,
     _type: document._type,
     _id: document._id,
     document,
@@ -182,43 +181,29 @@ describe(buildStarterDocuments, () => {
 
         return dataset.map((document) => ({
           siteType,
+          layer: FREE_LAYER,
           _type: document._type,
           _id: document._id,
           document,
           dataset,
         }));
       });
-      const growthCases = STARTER_SITE_TYPES.flatMap((siteType) =>
-        withGrowthLayer(siteType, defaultLocale),
-      );
+      const cases = [
+        ...starterCases,
+        ...STARTER_SITE_TYPES.flatMap((siteType) =>
+          withGrowthLayer(siteType, defaultLocale),
+        ),
+      ];
 
-      it.each(starterCases)(
-        '$siteType $_type $_id passes Studio validation',
+      it.each(cases)(
+        '$siteType $layer $_type $_id passes Studio validation',
         async ({ document, dataset }) => {
           expect(await validateStarterDocument(document, dataset)).toEqual([]);
         },
       );
 
-      it.each(starterCases)(
-        '$siteType $_type $_id seeds every array item as a member its field declares',
-        ({ document }) => {
-          const documentType = schema.get(document._type)!;
-
-          expect(
-            undeclaredArrayItems(documentType, document, document._id),
-          ).toEqual([]);
-        },
-      );
-
-      it.each(growthCases)(
-        '$siteType Growth $_type $_id passes Studio validation',
-        async ({ document, dataset }) => {
-          expect(await validateStarterDocument(document, dataset)).toEqual([]);
-        },
-      );
-
-      it.each(growthCases)(
-        '$siteType Growth $_type $_id seeds every array item as a member its field declares',
+      it.each(cases)(
+        '$siteType $layer $_type $_id seeds every array item as a member its field declares',
         ({ document }) => {
           const documentType = schema.get(document._type)!;
 

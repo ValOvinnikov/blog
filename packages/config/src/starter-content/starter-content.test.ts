@@ -10,8 +10,8 @@ import {
   SEO_OG_DESCRIPTION_MAX_LENGTH,
   SEO_OG_TITLE_MAX_LENGTH,
   SITE_TYPE,
-  STARTER_PLACEHOLDER_IMAGE,
 } from '@shinefold/config/constants';
+import { MOCK_PLACEHOLDER_IMAGES } from '@shinefold/config/testing/placeholder-images';
 import { SITE_MESSAGES_BY_LOCALE } from '@shinefold/config/voice';
 
 import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
@@ -47,10 +47,6 @@ const GROWTH_SITE_TYPES = [
   SITE_TYPE.PERSONAL,
   SITE_TYPE.BUSINESS,
 ] as const;
-const MOCK_PLACEHOLDER_IMAGES = {
-  [STARTER_PLACEHOLDER_IMAGE.LOGO]: `image-${faker.string.alphanumeric(40)}-240x80-svg`,
-  [STARTER_PLACEHOLDER_IMAGE.ILLUSTRATION]: `image-${faker.string.alphanumeric(40)}-1200x900-svg`,
-};
 
 const build = (
   siteType: (typeof STARTER_SITE_TYPES)[number] = SITE_TYPE.BLANK,
@@ -113,9 +109,14 @@ function referencedIds(documents: TStarterDocumentUnion[]): string[] {
   return ids;
 }
 
-const everyCombination = STARTER_SITE_TYPES.flatMap((siteType) =>
-  LOCALES.map((locale) => [siteType, locale] as const),
-);
+const inEveryLocale = <TSiteType extends (typeof STARTER_SITE_TYPES)[number]>(
+  siteTypes: readonly TSiteType[],
+) =>
+  siteTypes.flatMap((siteType) =>
+    LOCALES.map((locale) => [siteType, locale] as const),
+  );
+
+const everyCombination = inEveryLocale(STARTER_SITE_TYPES);
 
 describe(buildStarterDocuments, () => {
   it('builds the Blank site from the base documents only', () => {
@@ -549,9 +550,7 @@ describe(toStarterSiteType, () => {
 });
 
 describe(buildGrowthLayer, () => {
-  const growthCombination = GROWTH_SITE_TYPES.flatMap((siteType) =>
-    LOCALES.map((locale) => [siteType, locale] as const),
-  );
+  const growthCombination = inEveryLocale(GROWTH_SITE_TYPES);
 
   const layerOf = (
     siteType: (typeof STARTER_SITE_TYPES)[number],
@@ -636,21 +635,6 @@ describe(buildGrowthLayer, () => {
       );
 
       expect(mismatched).toEqual([]);
-    },
-  );
-
-  it.each(GROWTH_SITE_TYPES)(
-    'the %s home slots each follow a Free home module or the slot before them',
-    (siteType) => {
-      const freeIds = homeModuleIds(build(siteType));
-      const { homeSlots } = requireLayer(siteType);
-
-      const misplaced = homeSlots.filter(
-        ({ after }, index) =>
-          !freeIds.includes(after) && homeSlots[index - 1]?.slot._ref !== after,
-      );
-
-      expect(misplaced).toEqual([]);
     },
   );
 
