@@ -2,7 +2,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const leadsListVariants = tv({
   slots: {
-    list: ['flex flex-col'],
+    groups: ['flex flex-col gap-[18px]'],
     sentinel: ['h-px'],
     footer: [
       'flex justify-center',

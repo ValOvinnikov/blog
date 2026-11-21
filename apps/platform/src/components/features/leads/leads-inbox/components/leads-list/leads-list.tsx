@@ -10,12 +10,13 @@ import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import type { Ref } from 'react';
 
-import { LeadRow } from './components/lead-row';
+import { LeadGroup } from './components/lead-group';
 import { leadsListVariants } from './leads-list-variants';
 import { useLoadMoreSentinel } from './use-load-more-sentinel';
 
 export type TLeadsListProps = {
-  leads: TInboxLead[];
+  unreadLeads: TInboxLead[];
+  earlierLeads: TInboxLead[];
   selectedId: TMaybeUndefined<string>;
   rowRef: (leadId: string) => Ref<HTMLButtonElement>;
   onOpen: (lead: TInboxLead) => void;
@@ -23,7 +24,8 @@ export type TLeadsListProps = {
 };
 
 export const LeadsList = ({
-  leads,
+  unreadLeads,
+  earlierLeads,
   selectedId,
   rowRef,
   onOpen,
@@ -33,12 +35,13 @@ export const LeadsList = ({
   const { hasMore, isLoading, hasLoadFailed, loadMore } = loading;
   const sentinelRef = useLoadMoreSentinel({
     isEnabled: hasMore && !isLoading && !hasLoadFailed,
-    loadedCount: leads.length,
+    loadedCount: unreadLeads.length + earlierLeads.length,
     onReach: loadMore,
   });
-  const { list, sentinel, footer } = leadsListVariants();
+  const { groups, sentinel, footer } = leadsListVariants();
+  const hasEarlier = hasArrayGotItems(earlierLeads);
 
-  if (!hasArrayGotItems(leads)) {
+  if (!hasArrayGotItems(unreadLeads) && !hasEarlier) {
     return (
       <Card>
         <Card.Body>
@@ -48,36 +51,45 @@ export const LeadsList = ({
     );
   }
 
-  return (
-    <Card>
-      <ul className={list()} aria-label={t('listLabel')}>
-        {leads.map((lead) => (
-          <li key={lead.id}>
-            <LeadRow
-              ref={rowRef(lead.id)}
-              lead={lead}
-              isSelected={lead.id === selectedId}
-              onOpen={onOpen}
-            />
-          </li>
-        ))}
-      </ul>
-      <div ref={sentinelRef} className={sentinel()} aria-hidden="true" />
-      {(isLoading || hasLoadFailed) && (
-        <div className={footer()}>
-          {isLoading ? (
-            <Spinner label={t('loadingMore')} hasLabel={true} />
-          ) : (
-            <Button
-              size={SIZE.SM}
-              variant={BUTTON_VARIANT.SECONDARY}
-              onClick={loadMore}
-            >
-              {t('loadMoreFailed')}
-            </Button>
-          )}
-        </div>
+  const loadFooter = (isLoading || hasLoadFailed) && (
+    <div className={footer()}>
+      {isLoading ? (
+        <Spinner label={t('loadingMore')} hasLabel={true} />
+      ) : (
+        <Button
+          size={SIZE.SM}
+          variant={BUTTON_VARIANT.SECONDARY}
+          onClick={loadMore}
+        >
+          {t('loadMoreFailed')}
+        </Button>
       )}
-    </Card>
+    </div>
+  );
+
+  const groupProps = { selectedId, rowRef, onOpen };
+
+  return (
+    <>
+      <div className={groups()}>
+        {hasArrayGotItems(unreadLeads) && (
+          <LeadGroup
+            title={t('unreadGroup', { count: unreadLeads.length })}
+            leads={unreadLeads}
+            footer={hasEarlier ? undefined : loadFooter}
+            {...groupProps}
+          />
+        )}
+        {hasEarlier && (
+          <LeadGroup
+            title={t('earlierGroup')}
+            leads={earlierLeads}
+            footer={loadFooter}
+            {...groupProps}
+          />
+        )}
+      </div>
+      <div ref={sentinelRef} className={sentinel()} aria-hidden="true" />
+    </>
   );
 };

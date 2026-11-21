@@ -23,21 +23,12 @@ export const configurationNavItems = (
   t: TLooseTranslator,
   hrefs: TTenantNavHrefs,
   access: TPlanPageAccess,
-  unreadLeadsCount: number,
 ): TSidebarNavItem[] => {
   const comingSoon = {
     label: t('badgeComingSoon'),
     tone: BADGE_TONE.NEUTRAL,
     hasDot: false,
   } as const;
-  const unreadLeads =
-    unreadLeadsCount > 0
-      ? ({
-          label: t('badgeUnreadLeads', { count: unreadLeadsCount }),
-          tone: BADGE_TONE.BRAND,
-          hasDot: false,
-        } as const)
-      : undefined;
   const ifAccessible = (page: TPlanPage, item: TSidebarNavItem) =>
     access[page] ? [item] : [];
 
@@ -50,7 +41,6 @@ export const configurationNavItems = (
           label: t('leads'),
           icon: ICONS.SEND,
           href: hrefs.leads,
-          badge: unreadLeads,
         })
       : []),
     ...ifAccessible('languages', {

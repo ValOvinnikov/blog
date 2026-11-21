@@ -71,8 +71,9 @@ export const useLeadSelection = ({
   };
 
   const markUnread = (lead: TInboxLead) => {
-    close();
+    // Before `close()`: its flushSync must move the row to Unread first, or focus lands on the unmounted one.
     void setReadState(lead, false);
+    close();
   };
 
   const handleDeleted = (id: string) => {

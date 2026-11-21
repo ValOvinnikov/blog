@@ -19,7 +19,6 @@ export const dashboardNavSections = (
   t: TLooseTranslator,
   access: TPlanPageAccess,
   studioAccess?: TStudioAccess,
-  unreadLeadsCount = 0,
 ): TSidebarNavSection[] => {
   const hrefs: TTenantNavHrefs = {
     look: adminRoutes.dashboardLook(),
@@ -63,7 +62,7 @@ export const dashboardNavSections = (
     },
     {
       label: t('configurationSectionLabel'),
-      items: configurationNavItems(t, hrefs, access, unreadLeadsCount),
+      items: configurationNavItems(t, hrefs, access),
     },
     ...(hasLength(accountItems)
       ? [{ label: t('accountSectionLabel'), items: accountItems }]

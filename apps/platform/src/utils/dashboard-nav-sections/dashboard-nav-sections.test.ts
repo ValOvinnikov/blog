@@ -3,7 +3,6 @@ import {
   CONFIGURATION_KEYS,
   itemKeyed,
   labelsOf,
-  MOCK_UNREAD_LEADS_COUNT,
   NO_PLAN_PAGE,
   tNavSections as t,
   translated,
@@ -94,21 +93,6 @@ describe(dashboardNavSections, () => {
     const item = itemKeyed(configurationOfDashboard(), key);
 
     expect(item?.href).toBe(href);
-  });
-
-  it('badges Leads with the unread count when there are unread leads', () => {
-    const [, , configuration] = dashboardNavSections(
-      t,
-      EVERY_PLAN_PAGE,
-      undefined,
-      MOCK_UNREAD_LEADS_COUNT,
-    );
-
-    const leads = itemKeyed(configuration!, 'leads');
-
-    expect(leads?.badge?.label).toBe(
-      t('badgeUnreadLeads', { count: MOCK_UNREAD_LEADS_COUNT }),
-    );
   });
 
   it('never includes the platform-only entries or a tenant label', () => {

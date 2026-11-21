@@ -34,14 +34,12 @@ const {
   listTenantsMock,
   getAdminByUserIdMock,
   countLeadsForTenantMock,
-  countUnreadLeadsForTenantMock,
   cookiesMock,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
   listTenantsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   countLeadsForTenantMock: vi.fn(),
-  countUnreadLeadsForTenantMock: vi.fn(),
   cookiesMock: vi.fn(),
 }));
 
@@ -64,7 +62,6 @@ vi.mock('@shinefold/db', async () => ({
     admins: { getAdminByUserId: getAdminByUserIdMock },
     leads: {
       countLeadsForTenant: countLeadsForTenantMock,
-      countUnreadLeadsForTenant: countUnreadLeadsForTenantMock,
     },
   },
 }));
@@ -84,7 +81,6 @@ const MOCK_GROWTH_MEMBERSHIP = mockMembership({
   tenantId: MOCK_OTHER_TENANT_ID,
 });
 const MOCK_DASHBOARD_CONTENT = faker.lorem.sentence();
-const MOCK_UNREAD_LEADS_COUNT = faker.number.int({ min: 2, max: 9 });
 
 const switcherNamed = (domain: string) => (name: string) =>
   name.includes(domain);
@@ -101,7 +97,6 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
     listTenantsMock.mockResolvedValue([MOCK_FREE_TENANT]);
     countLeadsForTenantMock.mockResolvedValue(0);
-    countUnreadLeadsForTenantMock.mockResolvedValue(0);
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       { membership: MOCK_FREE_MEMBERSHIP, tenant: MOCK_FREE_TENANT },
       { membership: MOCK_GROWTH_MEMBERSHIP, tenant: MOCK_GROWTH_TENANT },
@@ -131,30 +126,11 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
       expect(switcher).toBeVisible();
     });
 
-    it('offers Leads on a plan with the contact form', () => {
+    it('offers Leads with no unread-count badge on a plan with the contact form', () => {
       const leadsLink = screen.getByRole('link', { name: navSections.leads });
 
       expect(leadsLink).toHaveAttribute('href', adminRoutes.dashboardLeads());
     });
-  });
-
-  it("shows the site's unread lead count beside Leads", async () => {
-    countUnreadLeadsForTenantMock.mockResolvedValueOnce(
-      MOCK_UNREAD_LEADS_COUNT,
-    );
-
-    await setup();
-
-    const leadsLink = screen.getByRole('link', {
-      name: new RegExp(navSections.leads),
-    });
-
-    expect(leadsLink).toHaveTextContent(
-      t('navSections.badgeUnreadLeads', { count: MOCK_UNREAD_LEADS_COUNT }),
-    );
-    expect(countUnreadLeadsForTenantMock).toHaveBeenCalledWith(
-      MOCK_OTHER_TENANT_ID,
-    );
   });
 
   describe('with one membership', () => {

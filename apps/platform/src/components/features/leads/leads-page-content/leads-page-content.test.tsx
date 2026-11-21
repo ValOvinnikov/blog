@@ -5,6 +5,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockLead } from '@platform/testing/leads/fixtures';
 import {
   MOCK_TENANT_ID,
@@ -33,6 +34,7 @@ vi.mock('@platform/server/leads/get-lead-page-title-action');
 vi.mock('@platform/server/leads/set-lead-read-action');
 
 const { leadsInbox, leadsView } = messages;
+const tInbox = makeEnTranslator('leadsInbox');
 
 const MOCK_NEWEST_LEAD = mockLead({
   id: faker.string.uuid(),
@@ -42,6 +44,7 @@ const MOCK_OLDEST_LEAD = mockLead({
   id: faker.string.uuid(),
   name: faker.person.fullName(),
 });
+const MOCK_LEADS = [MOCK_NEWEST_LEAD, MOCK_OLDEST_LEAD];
 
 const setup = customRenderAsync(LeadsPageContent, {
   tenant: mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
@@ -87,13 +90,15 @@ describe(`<${LeadsPageContent.name}/>`, () => {
 
   it('lists the leads newest first, as returned', async () => {
     listLeadsByCursorMock.mockResolvedValueOnce({
-      leads: [MOCK_NEWEST_LEAD, MOCK_OLDEST_LEAD],
+      leads: MOCK_LEADS,
       nextCursor: undefined,
     });
 
     await setup();
 
-    const list = screen.getByRole('list', { name: leadsInbox.listLabel });
+    const list = screen.getByRole('list', {
+      name: tInbox('unreadGroup', { count: MOCK_LEADS.length }),
+    });
     const [newest, oldest] = within(list).getAllByRole('listitem');
 
     expect(newest).toHaveTextContent(MOCK_NEWEST_LEAD.name);

@@ -3,6 +3,7 @@ import { Button } from '@platform/components/shared/button';
 import { buttonVariants } from '@platform/components/shared/button/button-variants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
+import { Subheading } from '@platform/components/shared/subheading';
 import { Text } from '@platform/components/shared/text';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
@@ -93,6 +94,7 @@ export const LeadReadingPane = ({
               <LeadPageSource lead={lead} />
             </DetailList.Row>
           </DetailList>
+          <Subheading>{t('messageHeading')}</Subheading>
           <Text className={styles.message()}>{message}</Text>
         </Card.Body>
       </Card>

@@ -1,6 +1,6 @@
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { insetFocusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
-import { SELECTED_ROW_CLASSES } from '@platform/utils/selected-choice-classes/selected-choice-classes';
+import { SELECTED_STRIPE_CLASSES } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const leadRowVariants = tv({
@@ -8,7 +8,7 @@ export const leadRowVariants = tv({
     row: [
       'flex w-full min-w-0 min-h-11 flex-col gap-1 text-left',
       'border-b border-l-[3px] border-b-platform-line-2 border-l-transparent px-[15px] py-3',
-      'cursor-pointer hover:bg-platform-surface-2',
+      'cursor-pointer',
     ],
     top: ['flex min-w-0 items-center gap-2'],
     dot: ['size-2 flex-none rounded-full bg-platform-brand'],
@@ -25,13 +25,18 @@ export const leadRowVariants = tv({
     isSelected: {
       true: {
         row: [
-          ...SELECTED_ROW_CLASSES,
-          'hover:bg-platform-selected-tint',
-          'before:-left-platform-bar after:-left-platform-bar',
-          insetFocusRingClasses(FOCUS_RING_GROUND.SELECTED_TINT),
+          'relative bg-platform-surface-head hover:bg-platform-surface-head',
+          SELECTED_STRIPE_CLASSES,
+          'before:-left-platform-bar',
+          insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE_HEAD),
         ],
       },
-      false: { row: [insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE)] },
+      false: {
+        row: [
+          'hover:bg-platform-hover-tint',
+          insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE),
+        ],
+      },
     },
   },
 });
