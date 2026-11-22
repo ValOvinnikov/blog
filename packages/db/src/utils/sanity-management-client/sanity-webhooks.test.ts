@@ -184,8 +184,10 @@ describe(updateSanityWebhookSecret, () => {
 describe(updateSanityWebhookUrl, () => {
   const MOCK_URL_INPUT = { ...MOCK_UPDATE_INPUT, url: MOCK_OTHER_URL };
 
+  const MOCK_MOVED_HOOK = { ...MOCK_HOOK, url: MOCK_OTHER_URL };
+
   it('PATCHes only the URL of the named hook', async () => {
-    fetchMock.mockResolvedValue(jsonResponse(MOCK_HOOK));
+    fetchMock.mockResolvedValue(jsonResponse(MOCK_MOVED_HOOK));
 
     await updateSanityWebhookUrl(MOCK_URL_INPUT);
 
@@ -197,6 +199,14 @@ describe(updateSanityWebhookUrl, () => {
 
   it('throws naming the hook when the response is not the moved hook', async () => {
     fetchMock.mockResolvedValue(jsonResponse([]));
+
+    await expect(updateSanityWebhookUrl(MOCK_URL_INPUT)).rejects.toThrow(
+      MOCK_SANITY_WEBHOOK_ID,
+    );
+  });
+
+  it('throws naming the hook when the answered hook keeps its old URL', async () => {
+    fetchMock.mockResolvedValue(jsonResponse(MOCK_HOOK));
 
     await expect(updateSanityWebhookUrl(MOCK_URL_INPUT)).rejects.toThrow(
       MOCK_SANITY_WEBHOOK_ID,

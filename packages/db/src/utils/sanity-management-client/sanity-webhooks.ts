@@ -83,7 +83,7 @@ async function patchSanityWebhook(
     | { secret: string }
     | { url: string }
     | { rule: typeof REVALIDATE_WEBHOOK_RULE },
-): Promise<void> {
+): Promise<Partial<TSanityWebhook>> {
   const { token, projectId, webhookId } = input;
   const updated = await sanityWebhooksRequest<Partial<TSanityWebhook>>(
     projectId,
@@ -97,6 +97,8 @@ async function patchSanityWebhook(
       `Sanity Webhooks API: updating webhook "${webhookId}" of project "${projectId}" returned no matching hook.`,
     );
   }
+
+  return updated;
 }
 
 export async function updateSanityWebhookSecret(input: {
@@ -114,7 +116,13 @@ export async function updateSanityWebhookUrl(input: {
   webhookId: string;
   url: string;
 }): Promise<void> {
-  await patchSanityWebhook(input, { url: input.url });
+  const updated = await patchSanityWebhook(input, { url: input.url });
+
+  if (updated.url !== input.url) {
+    throw new Error(
+      `Sanity Webhooks API: moving webhook "${input.webhookId}" of project "${input.projectId}" left it off ${input.url}.`,
+    );
+  }
 }
 
 export async function updateSanityWebhookProjection(input: {
