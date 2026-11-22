@@ -3,7 +3,10 @@ import {
   type TMoveUpBandProps,
 } from '@platform/components/features/upgrade/move-up-band';
 import { AlertLarge } from '@platform/components/shared/alert';
-import type { TRegisteredIconName } from '@platform/components/shared/icon';
+import {
+  STATUS_ICON,
+  type TRegisteredIconName,
+} from '@platform/components/shared/icon';
 import {
   SUBSCRIBERS_NOTICE,
   type TSubscribersNotice,
@@ -29,10 +32,8 @@ const NOTICE_TYPE = {
 } satisfies Record<TSubscribersNotice, TAlertType>;
 
 const NOTICE_ICON = {
+  ...STATUS_ICON,
   [ALERT_TYPE.ERROR]: ICONS.PAUSE,
-  [ALERT_TYPE.WARNING]: ICONS.WARNING,
-  [ALERT_TYPE.SUCCESS]: ICONS.CHECK,
-  [ALERT_TYPE.INFO]: ICONS.INFO,
 } satisfies Record<TAlertType, TRegisteredIconName>;
 
 export type TSubscribersNoticeProps = {

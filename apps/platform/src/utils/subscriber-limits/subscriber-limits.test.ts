@@ -4,6 +4,10 @@ import {
 } from '@platform/constants/subscribers';
 import { MOCK_NEWSLETTER_LIMITS } from '@platform/testing/newsletter-post-send/fixtures';
 import {
+  MOCK_BAND_NEAR_COUNT,
+  MOCK_BAND_OVER_COUNT,
+  MOCK_EMAILS_NEAR_SENT,
+  MOCK_EMAILS_OUT_SENT,
   MOCK_SENT_THIS_MONTH,
   MOCK_SUBSCRIBER_COUNT,
   MOCK_SUBSCRIBERS_ALLOWANCE,
@@ -15,10 +19,16 @@ import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import { toSubscriberLimits } from './subscriber-limits';
 
 const UNDER_LIMITS = MOCK_SUBSCRIBERS_LIMITS;
-const BAND_NEAR_LIMITS = { ...UNDER_LIMITS, activeCount: 850 };
-const BAND_OVER_LIMITS = { ...UNDER_LIMITS, activeCount: 1_040 };
-const EMAILS_NEAR_LIMITS = { ...UNDER_LIMITS, sentThisMonth: 5_000 };
-const EMAILS_OUT_LIMITS = { ...UNDER_LIMITS, sentThisMonth: 5_800 };
+const BAND_NEAR_LIMITS = { ...UNDER_LIMITS, activeCount: MOCK_BAND_NEAR_COUNT };
+const BAND_OVER_LIMITS = { ...UNDER_LIMITS, activeCount: MOCK_BAND_OVER_COUNT };
+const EMAILS_NEAR_LIMITS = {
+  ...UNDER_LIMITS,
+  sentThisMonth: MOCK_EMAILS_NEAR_SENT,
+};
+const EMAILS_OUT_LIMITS = {
+  ...UNDER_LIMITS,
+  sentThisMonth: MOCK_EMAILS_OUT_SENT,
+};
 
 const limitsFor = (
   limits: TNewsletterLimits,
@@ -64,19 +74,19 @@ describe(toSubscriberLimits, () => {
     ],
     [
       'over the band before out of emails',
-      { ...EMAILS_OUT_LIMITS, activeCount: 1_040 },
+      { ...EMAILS_OUT_LIMITS, activeCount: MOCK_BAND_OVER_COUNT },
       {},
       SUBSCRIBERS_NOTICE.BAND_PAUSED,
     ],
     [
       'out of emails before a near band',
-      { ...EMAILS_OUT_LIMITS, activeCount: 850 },
+      { ...EMAILS_OUT_LIMITS, activeCount: MOCK_BAND_NEAR_COUNT },
       {},
       SUBSCRIBERS_NOTICE.EMAILS_PAUSED,
     ],
     [
       'a near band before near emails',
-      { ...EMAILS_NEAR_LIMITS, activeCount: 850 },
+      { ...EMAILS_NEAR_LIMITS, activeCount: MOCK_BAND_NEAR_COUNT },
       {},
       SUBSCRIBERS_NOTICE.BAND_NEAR,
     ],
@@ -87,24 +97,26 @@ describe(toSubscriberLimits, () => {
       { hasMovedUp: true },
       SUBSCRIBERS_NOTICE.MOVED_UP,
     ],
+    [
+      'a near notice before a move up',
+      BAND_NEAR_LIMITS,
+      { hasMovedUp: true },
+      SUBSCRIBERS_NOTICE.BAND_NEAR,
+    ],
   ] as const)('shows %s', (_, limits, overrides, notice) => {
     expect(limitsFor(limits, overrides).notice).toBe(notice);
-  });
-
-  it('keeps a move up behind a near notice', () => {
-    const { notice } = limitsFor(BAND_NEAR_LIMITS, { hasMovedUp: true });
-
-    expect(notice).toBe(SUBSCRIBERS_NOTICE.BAND_NEAR);
   });
 
   it('marks only the band card paused when the band notice shows', () => {
     const { band, emails } = limitsFor({
       ...EMAILS_OUT_LIMITS,
-      activeCount: 1_040,
+      activeCount: MOCK_BAND_OVER_COUNT,
     });
 
     expect(band.state).toBe(SUBSCRIBER_LIMIT_STATE.PAUSED);
-    expect(band.over).toBe(40);
+    expect(band.over).toBe(
+      MOCK_BAND_OVER_COUNT - MOCK_SUBSCRIBERS_BAND_CEILING,
+    );
     expect(emails.state).toBe(SUBSCRIBER_LIMIT_STATE.NEAR);
   });
 
@@ -112,7 +124,7 @@ describe(toSubscriberLimits, () => {
     const { emails } = limitsFor(EMAILS_OUT_LIMITS);
 
     expect(emails.state).toBe(SUBSCRIBER_LIMIT_STATE.PAUSED);
-    expect(emails.left).toBe(200);
+    expect(emails.left).toBe(MOCK_SUBSCRIBERS_ALLOWANCE - MOCK_EMAILS_OUT_SENT);
   });
 
   it('keeps both cards unpaused under an operator pause', () => {

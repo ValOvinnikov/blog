@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { SUBSCRIBERS_NOTICE } from '@platform/constants/subscribers';
 import messages from '@platform/i18n/messages/en.json';
 import { loadSubscribersPage } from '@platform/server/subscribers/load-subscribers-page';
+import { ARIA_VALUENOW } from '@platform/testing/aria';
 import { MOCK_MOVE_UP_OFFER } from '@platform/testing/billing/move-up';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -15,6 +16,8 @@ import {
   MOCK_SUBSCRIBER_EMAIL,
   MOCK_SUBSCRIBERS_NEXT_BAND,
   mockSubscribersPageData,
+  MOCK_BAND_NEAR_COUNT,
+  MOCK_BAND_OVER_COUNT,
 } from '@platform/testing/subscribers/fixtures';
 import {
   mockReadyTenant,
@@ -60,8 +63,6 @@ const { markup } = createTranslator({
 const BOLD_CHUNK = /<b>(.*)<\/b>/;
 const tMoveUp = makeEnTranslator('moveUpBand');
 const tPagination = makeEnTranslator('pagination');
-const NEAR_COUNT = 850;
-const OVER_COUNT = 1_040;
 const MOCK_POST_TITLE = faker.lorem.words(3);
 const MOVE_UP_LABEL = tMoveUp('trigger', {
   ceiling: MOCK_MOVE_UP_OFFER.ceiling,
@@ -90,6 +91,8 @@ const loadWith = (...args: Parameters<typeof mockSubscribersPageData>) => {
 };
 
 const BAND_NEAR_NOTE = t('notices.bandNear.note');
+const BAND_METER = { name: t('band.meter') };
+const EMAILS_METER = { name: t('emails.meter') };
 
 describe(`<${SubscribersPageContent.name}/>`, () => {
   describe('within its limits', () => {
@@ -113,10 +116,8 @@ describe(`<${SubscribersPageContent.name}/>`, () => {
     });
 
     it('shows both limits as named meters with their details', () => {
-      const bandMeter = screen.getByRole('meter', { name: t('band.meter') });
-      const emailsMeter = screen.getByRole('meter', {
-        name: t('emails.meter'),
-      });
+      const bandMeter = screen.getByRole('meter', BAND_METER);
+      const emailsMeter = screen.getByRole('meter', EMAILS_METER);
       const bandDetail = screen.getAllByText(
         t('band.detail', { ceiling: MOCK_SUBSCRIBERS_BAND_CEILING }),
       );
@@ -143,7 +144,10 @@ describe(`<${SubscribersPageContent.name}/>`, () => {
 
   describe('close to its band with a price for the next one', () => {
     beforeEach(() => {
-      loadWith({ offer: MOCK_MOVE_UP_OFFER }, { activeCount: NEAR_COUNT });
+      loadWith(
+        { offer: MOCK_MOVE_UP_OFFER },
+        { activeCount: MOCK_BAND_NEAR_COUNT },
+      );
     });
 
     it('offers the owner the next band', async () => {
@@ -173,7 +177,7 @@ describe(`<${SubscribersPageContent.name}/>`, () => {
   });
 
   it('says the site is on the largest band and offers no move', async () => {
-    loadWith({ nextBand: undefined }, { activeCount: NEAR_COUNT });
+    loadWith({ nextBand: undefined }, { activeCount: MOCK_BAND_NEAR_COUNT });
     await setup();
 
     const note = screen.getByText(t('notices.largestBand'));
@@ -195,7 +199,7 @@ describe(`<${SubscribersPageContent.name}/>`, () => {
           skippedAt: faker.date.recent(),
         },
       },
-      { activeCount: OVER_COUNT },
+      { activeCount: MOCK_BAND_OVER_COUNT },
     );
     await setup();
 
@@ -206,12 +210,12 @@ describe(`<${SubscribersPageContent.name}/>`, () => {
   });
 
   it('drops the post sentence when no post was skipped', async () => {
-    loadWith({}, { activeCount: OVER_COUNT });
+    loadWith({}, { activeCount: MOCK_BAND_OVER_COUNT });
     await setup();
 
     const descriptions = screen.getAllByText(
       t('notices.bandPaused.descriptionNoPost', {
-        count: OVER_COUNT,
+        count: MOCK_BAND_OVER_COUNT,
         ceiling: MOCK_SUBSCRIBERS_BAND_CEILING,
       }),
     );
@@ -259,10 +263,7 @@ describe(`<${SubscribersPageContent.name}/>`, () => {
 
   describe('with no subscribers', () => {
     beforeEach(async () => {
-      loadWith(
-        { list: { rows: [], total: 0 } },
-        { activeCount: 0, sentThisMonth: 0 },
-      );
+      loadWith({ list: { rows: [], total: 0 } }, { activeCount: 0 });
       await setup();
     });
 
@@ -280,6 +281,14 @@ describe(`<${SubscribersPageContent.name}/>`, () => {
 
       expect(link).toHaveAttribute('href', adminRoutes.dashboardStudioPages());
       expect(setting).not.toBeInTheDocument();
+    });
+
+    it("shows both cards at 0, even after this month's sends", () => {
+      const emailsMeter = screen.getByRole('meter', EMAILS_METER);
+      const bandMeter = screen.getByRole('meter', BAND_METER);
+
+      expect(emailsMeter).toHaveAttribute(ARIA_VALUENOW, '0');
+      expect(bandMeter).toHaveAttribute(ARIA_VALUENOW, '0');
     });
 
     it('leaves both limit cards without notes', () => {

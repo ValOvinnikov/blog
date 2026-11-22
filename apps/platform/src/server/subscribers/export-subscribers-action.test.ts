@@ -5,6 +5,12 @@ import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockMembershipContext } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
+  MOCK_CONFIRMED_AT,
+  MOCK_EXPORTED_AT,
+  MOCK_EXPORTED_DAY,
+  MOCK_SUBSCRIBER_EMAIL,
+} from '@platform/testing/subscribers/fixtures';
+import {
   mockReadyTenant,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
@@ -38,18 +44,15 @@ vi.mock('@shinefold/db', async () => ({
   },
 }));
 
-const MOCK_EMAIL = faker.internet.email();
-const MOCK_CONFIRMED_AT = new Date('2026-11-03T09:15:00.000Z');
-const MOCK_NOW = new Date('2026-11-22T12:00:00.000Z');
 const MOCK_CUSTOM_DOMAIN = faker.internet.domainName();
 
 describe(exportSubscribersAction, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(MOCK_NOW);
+    vi.setSystemTime(MOCK_EXPORTED_AT);
     mockedEnv.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
     listSubscribersForExportMock.mockResolvedValue([
-      { email: MOCK_EMAIL, confirmedAt: MOCK_CONFIRMED_AT },
+      { email: MOCK_SUBSCRIBER_EMAIL, confirmedAt: MOCK_CONFIRMED_AT },
     ]);
     listTenantDomainsMock.mockResolvedValue([
       { domain: MOCK_CUSTOM_DOMAIN },
@@ -67,9 +70,9 @@ describe(exportSubscribersAction, () => {
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
       data: {
-        fileName: `subscribers-${MOCK_TENANT_SLUG}-2026-11-22.csv`,
+        fileName: `subscribers-${MOCK_TENANT_SLUG}-${MOCK_EXPORTED_DAY}.csv`,
         csv: expect.stringContaining(
-          `${MOCK_EMAIL},${MOCK_CONFIRMED_AT.toISOString()}`,
+          `${MOCK_SUBSCRIBER_EMAIL},${MOCK_CONFIRMED_AT.toISOString()}`,
         ),
       },
     });
@@ -95,7 +98,7 @@ describe(exportSubscribersAction, () => {
     expect(result).toEqual(
       expect.objectContaining({
         data: expect.objectContaining({
-          fileName: `subscribers-${label}-2026-11-22.csv`,
+          fileName: `subscribers-${label}-${MOCK_EXPORTED_DAY}.csv`,
         }),
       }),
     );

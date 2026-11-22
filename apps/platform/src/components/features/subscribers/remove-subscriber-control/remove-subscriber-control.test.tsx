@@ -4,8 +4,8 @@ import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
+  MOCK_SUBSCRIBER,
   MOCK_SUBSCRIBER_EMAIL,
-  mockConfirmedSubscriber,
 } from '@platform/testing/subscribers/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { ACTION_OUTCOME } from '@shinefold/config';
@@ -18,9 +18,6 @@ vi.mock('@platform/server/subscribers/remove-subscriber-action', () => ({
 }));
 
 const t = makeEnTranslator('subscribersPage.remove');
-const MOCK_SUBSCRIBER = mockConfirmedSubscriber({
-  email: MOCK_SUBSCRIBER_EMAIL,
-});
 const CONFIRM_BUTTON = { name: t('confirm') };
 
 const setup = customRender(RemoveSubscriberControl, {

@@ -94,7 +94,7 @@ export const SubscriberLimitCards = ({
         />
         <LimitCard
           copy={emailsCopy}
-          used={emails.sent}
+          used={isEmpty ? 0 : emails.sent}
           limit={emails.allowance}
           state={emails.state}
         />

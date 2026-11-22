@@ -1,10 +1,11 @@
+import { defaultAlertRole } from '@platform/components/shared/alert/alert-role';
 import { alertVariants } from '@platform/components/shared/alert/alert-variants';
 import { Heading } from '@platform/components/shared/heading';
 import {
   Icon,
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
-import { ALERT_TYPE, type TAlertType } from '@shinefold/config';
+import type { TAlertType } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
 export type TAlertLargeProps = {
@@ -35,10 +36,7 @@ export const AlertLarge = ({
   } = alertVariants({ type, isLarge: true, hasTitle: Boolean(title) });
 
   return (
-    <div
-      role={type === ALERT_TYPE.ERROR ? 'alert' : 'status'}
-      className={root()}
-    >
+    <div role={defaultAlertRole(type)} className={root()}>
       <Icon name={icon} className={iconSlot()} />
       <div className={text()}>
         {title && (

@@ -2,11 +2,11 @@ import { RemoveSubscriberControl } from '@platform/components/features/subscribe
 import { SubscribersPhoneList } from '@platform/components/features/subscribers/subscribers-phone-list';
 import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import { Pagination } from '@platform/components/shared/pagination';
-import { SUBSCRIBERS_PAGE_SIZE } from '@platform/constants/subscribers';
 import type { TSubscribersPageData } from '@platform/server/subscribers/load-subscribers-page';
-import { formatDate } from '@platform/utils/format-date/format-date';
+import { DAY_MONTH_YEAR_SHORT_UTC } from '@platform/utils/date-format-options/date-format-options';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { useLocale, useTranslations } from 'next-intl';
+import { toSubscribersRange } from '@platform/utils/subscribers-range/subscribers-range';
+import { useFormatter, useTranslations } from 'next-intl';
 import { useId } from 'react';
 
 import { subscribersListVariants } from './subscribers-list-variants';
@@ -20,12 +20,11 @@ export type TSubscribersListProps = {
 
 export const SubscribersList = ({ tenantId, data }: TSubscribersListProps) => {
   const t = useTranslations('subscribersPage.list');
-  const locale = useLocale();
+  const format = useFormatter();
   const titleId = useId();
   const { list, page, totalPages } = data;
-  const { rows, total } = list;
-  const from = (page - 1) * SUBSCRIBERS_PAGE_SIZE + 1;
-  const range = { from, to: from + rows.length - 1, count: total };
+  const { rows } = list;
+  const range = toSubscribersRange(data);
   const { wide, narrow, visuallyHidden, email, unavailable, date } =
     subscribersListVariants();
 
@@ -61,7 +60,10 @@ export const SubscribersList = ({ tenantId, data }: TSubscribersListProps) => {
                   className={date()}
                   dateTime={subscriber.confirmedAt.toISOString()}
                 >
-                  {formatDate(subscriber.confirmedAt, locale)}
+                  {format.dateTime(
+                    subscriber.confirmedAt,
+                    DAY_MONTH_YEAR_SHORT_UTC,
+                  )}
                 </time>
               </DataTableShell.Cell>
               <DataTableShell.Cell>
@@ -88,12 +90,7 @@ export const SubscribersList = ({ tenantId, data }: TSubscribersListProps) => {
         </DataTableShell>
       </div>
       <div className={narrow()}>
-        <SubscribersPhoneList
-          tenantId={tenantId}
-          rows={rows}
-          range={range}
-          pagination={{ page, totalPages }}
-        />
+        <SubscribersPhoneList tenantId={tenantId} data={data} />
       </div>
     </>
   );

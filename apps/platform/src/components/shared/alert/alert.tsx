@@ -1,7 +1,7 @@
 import { Icon, STATUS_ICON } from '@platform/components/shared/icon';
-import { ALERT_TYPE } from '@shinefold/config';
 import type { ReactNode } from 'react';
 
+import { defaultAlertRole, type TAlertRole } from './alert-role';
 import { alertVariants, type TAlertVariants } from './alert-variants';
 
 type TAlertType = NonNullable<TAlertVariants['type']>;
@@ -11,7 +11,7 @@ export type TAlertProps = {
   title?: string;
   description?: ReactNode;
   action?: ReactNode;
-  role?: 'status' | 'alert' | 'note';
+  role?: TAlertRole;
   id?: string;
   className?: string;
 };
@@ -21,7 +21,7 @@ export const Alert = ({
   title,
   description,
   action,
-  role = type === ALERT_TYPE.ERROR ? 'alert' : 'status',
+  role = defaultAlertRole(type),
   id,
   className,
 }: TAlertProps) => {

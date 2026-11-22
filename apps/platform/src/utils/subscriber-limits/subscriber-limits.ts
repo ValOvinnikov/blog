@@ -8,12 +8,10 @@ import { USAGE_NEAR_PERCENT } from '@platform/constants/usage';
 import {
   isOutOfMonthlyEmails,
   isOverSubscriberBand,
-  monthlyEmailsLeft,
 } from '@platform/utils/newsletter-pause-state/newsletter-pause-state';
+import { toUsageSummary } from '@platform/utils/usage-summary/usage-summary';
 import type { TMaybeUndefined } from '@shinefold/config';
 import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
-
-const FULL_PERCENT = 100;
 
 export type TSubscriberLimitsInput = {
   limits: TNewsletterLimits;
@@ -45,9 +43,6 @@ export type TSubscriberLimits = {
   band: TBandLimit;
   emails: TEmailsLimit;
 };
-
-const percentOf = (used: number, limit: number): number =>
-  limit > 0 ? Math.floor((used * FULL_PERCENT) / limit) : FULL_PERCENT;
 
 const shownState = (
   percent: number,
@@ -81,8 +76,13 @@ export const toSubscriberLimits = (
 ): TSubscriberLimits => {
   const { limits } = input;
   const { activeCount, bandCeiling, sentThisMonth, allowance } = limits;
-  const bandPercent = percentOf(activeCount, bandCeiling);
-  const emailsPercent = percentOf(sentThisMonth, allowance);
+  const bandUsage = toUsageSummary({
+    used: activeCount,
+    allowance: bandCeiling,
+  });
+  const emailsUsage = toUsageSummary({ used: sentThisMonth, allowance });
+  const bandPercent = bandUsage.percent;
+  const emailsPercent = emailsUsage.percent;
   const notice = pickNotice(
     input,
     isOverSubscriberBand(limits),
@@ -90,7 +90,7 @@ export const toSubscriberLimits = (
     bandPercent,
     emailsPercent,
   );
-  const emailsLeft = monthlyEmailsLeft(limits);
+  const emailsLeft = emailsUsage.left;
 
   return {
     notice,
@@ -98,8 +98,8 @@ export const toSubscriberLimits = (
       state: shownState(bandPercent, notice === SUBSCRIBERS_NOTICE.BAND_PAUSED),
       count: activeCount,
       ceiling: bandCeiling,
-      percent: Math.min(bandPercent, FULL_PERCENT),
-      left: Math.max(bandCeiling - activeCount, 0),
+      percent: bandPercent,
+      left: bandUsage.left,
       over: Math.max(activeCount - bandCeiling, 0),
     },
     emails: {
@@ -109,7 +109,7 @@ export const toSubscriberLimits = (
       ),
       sent: sentThisMonth,
       allowance,
-      percent: Math.min(emailsPercent, FULL_PERCENT),
+      percent: emailsPercent,
       left: emailsLeft,
       postNeeds: activeCount,
       postsLeft: activeCount > 0 ? Math.floor(emailsLeft / activeCount) : 0,
