@@ -8,19 +8,15 @@ import {
   SITE_TYPE,
   STARTER_PLACEHOLDER_IMAGE,
 } from '@shinefold/config/constants';
-import { SVG_CONTENT_TYPE } from '@worker/constants/growth-layer';
+import { SVG_CONTENT_TYPE } from '@worker/constants/media-type';
 import { createMockFaker } from '@worker/testing/mock-faker';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
   MOCK_REVISION,
   mockKeyedReference,
 } from '@worker/testing/sample-content/fixtures';
-import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
-import { createTenantWriteClient } from '@worker/utils/tenant-content/tenant-write-client';
 
 import { applyGrowthLayer } from './apply-growth-layer';
-
-vi.mock('@worker/utils/tenant-content/tenant-write-client');
 
 const mockFaker = createMockFaker(5715);
 
@@ -37,6 +33,11 @@ const createIfNotExists = vi.fn();
 const patch = vi.fn();
 const commit = vi.fn();
 const transaction = vi.fn(() => ({ createIfNotExists, patch, commit }));
+const MOCK_CLIENT = {
+  assets: { upload },
+  fetch,
+  transaction,
+} as unknown as Parameters<ReturnType<typeof applyGrowthLayer>>[0];
 
 const MOCK_PORTFOLIO_LAYER = buildGrowthLayer({
   siteType: SITE_TYPE.PORTFOLIO,
@@ -47,11 +48,9 @@ const MOCK_GROWTH_SLOTS =
   MOCK_PORTFOLIO_LAYER?.homeSlots.map(({ slot }) => slot) ?? [];
 
 function applyFor(siteType: TStarterSiteType = SITE_TYPE.PORTFOLIO) {
-  return applyGrowthLayer({
-    tenantId: MOCK_TENANT_ID,
-    siteType,
-    locale: LOCALE_ISO_CODES.EN,
-  });
+  return applyGrowthLayer({ siteType, locale: LOCALE_ISO_CODES.EN })(
+    MOCK_CLIENT,
+  );
 }
 
 describe(applyGrowthLayer, () => {
@@ -68,11 +67,6 @@ describe(applyGrowthLayer, () => {
       modules: MOCK_FREE_MODULES,
     });
     commit.mockResolvedValue({});
-    vi.mocked(createTenantWriteClient).mockResolvedValue({
-      assets: { upload },
-      fetch,
-      transaction,
-    } as unknown as Awaited<ReturnType<typeof createTenantWriteClient>>);
   });
 
   describe('on a fresh Portfolio home template', () => {

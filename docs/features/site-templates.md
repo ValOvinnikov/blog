@@ -70,11 +70,12 @@ No route of its own. The seeded documents are what the public site renders and w
 
 ### Applying a layer
 
-`applySiteTemplate` runs the worker's `applyGrowthLayer` step after seeding, in the same `SEED_CONTENT` step, when the tenant's plan includes the `GROWTH` module pack (`PLAN_ENTITLEMENTS`).
+`applySiteTemplate` hands `seedTenantContent` the worker's `applyGrowthLayer` step when the tenant's resolved entitlements (`getTenantEntitlements`, grants included) hold the `GROWTH` module pack — the check is `isGrowthLayerEntitled`. Seeding runs it in the same `SEED_CONTENT` step with its own `editor` token, after persisting that token on a fresh dataset, and straight after its `settings_site` check on one already seeded — so a reactivated tenant whose write token was cleared still gets it. A failure keeps the persisted token, and the unit's retry runs the layer again on an already-seeded dataset.
 
 - **Placeholder images** — it uploads the logo and illustration SVGs to the tenant's dataset on every Growth tenant, and passes their asset ids to `buildGrowthLayer`. Sanity keys an asset by its content hash, so a re-run reuses the assets already there.
 - **Documents** — each layer document is created with `createIfNotExists`, so an owner's edits survive a re-run.
 - **Home slots** — each slot missing from the published `template_home`'s `modules` (by `_key` or by reference) is placed after the slot it follows, or last when the owner removed that one; the owner's own order and modules stay as they are. The patch carries the template's revision, so an edit published mid-run fails the commit and the unit's retry re-reads it. A missing home template gets the documents and no slots.
+- **Cost** — two asset uploads, one fetch and one transaction per Growth provisioning.
 - **Known edges** — a pending draft of `template_home` is not patched, so publishing it drops the new slots; a type with no layer (Blog, Docs, Blank) still receives the two placeholder assets.
 
 ## Removing samples

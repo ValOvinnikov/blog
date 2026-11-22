@@ -1,10 +1,5 @@
 import { STARTER_TEMPLATE_VERSION } from '@shinefold/config';
-import {
-  ERROR_CODE,
-  PRESET_ID,
-  SITE_TYPE,
-  TENANT_PLAN,
-} from '@shinefold/config/constants';
+import { ERROR_CODE, PRESET_ID, SITE_TYPE } from '@shinefold/config/constants';
 import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
@@ -18,9 +13,11 @@ import {
 import { errorResult } from '@shinefold/utils/result';
 import { applyGrowthLayer } from '@worker/steps/apply-growth-layer';
 import { seedTenantContent } from '@worker/steps/seed-content';
+import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import { mockTenant, MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
+import { isGrowthLayerEntitled } from '@worker/utils/growth-layer/growth-layer-entitlement';
 import { FatalError } from 'workflow';
 
 import { applySiteTemplate } from './apply-site-template';
@@ -29,6 +26,7 @@ vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('@worker/steps/seed-content');
 vi.mock('@worker/steps/apply-growth-layer');
+vi.mock('@worker/utils/growth-layer/growth-layer-entitlement');
 vi.mock('@shinefold/db/queries/site-config');
 vi.mock('workflow');
 
@@ -41,6 +39,7 @@ function reportedStatuses(): string[] {
 describe(applySiteTemplate, () => {
   beforeEach(() => {
     atStepAttempt(1);
+    vi.mocked(isGrowthLayerEntitled).mockResolvedValue(false);
     vi.mocked(getTenantById).mockResolvedValue(mockTenant());
     vi.mocked(updateProvisioningStep).mockResolvedValue(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
@@ -91,59 +90,46 @@ describe(applySiteTemplate, () => {
     },
   );
 
-  it('applies the Growth layer after seeding for a Growth tenant', async () => {
-    vi.mocked(getTenantById).mockResolvedValue(
-      mockTenant({ plan: TENANT_PLAN.GROWTH, siteType: SITE_TYPE.PORTFOLIO }),
-    );
+  it('hands seeding the Growth layer when the tenant is entitled to it', async () => {
+    const tenant = mockTenant({ siteType: SITE_TYPE.PORTFOLIO });
+    const afterSeed = vi.fn();
+    vi.mocked(getTenantById).mockResolvedValue(tenant);
+    vi.mocked(isGrowthLayerEntitled).mockResolvedValue(true);
+    vi.mocked(applyGrowthLayer).mockReturnValue(afterSeed);
 
     await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
+    expect(isGrowthLayerEntitled).toHaveBeenCalledWith(tenant);
     expect(applyGrowthLayer).toHaveBeenCalledWith({
-      tenantId: MOCK_TENANT_ID,
       siteType: SITE_TYPE.PORTFOLIO,
-      locale: mockTenant().locale,
+      locale: tenant.locale,
     });
-    expect(
-      vi.mocked(seedTenantContent).mock.invocationCallOrder[0],
-    ).toBeLessThan(
-      vi.mocked(applyGrowthLayer).mock.invocationCallOrder[0] ?? 0,
-    );
+    expect(vi.mocked(seedTenantContent).mock.calls[0]?.[4]).toBe(afterSeed);
   });
 
-  it.each([TENANT_PLAN.FREE, TENANT_PLAN.STARTER])(
-    'applies no Growth layer on the %s plan',
-    async (plan) => {
-      vi.mocked(getTenantById).mockResolvedValue(mockTenant({ plan }));
+  it('hands seeding no Growth layer when the tenant is not entitled to it', async () => {
+    await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
-      await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
+    expect(applyGrowthLayer).not.toHaveBeenCalled();
+    expect(vi.mocked(seedTenantContent).mock.calls[0]?.[4]).toBeUndefined();
+  });
 
-      expect(applyGrowthLayer).not.toHaveBeenCalled();
+  it.each([
+    ['seeding', () => vi.mocked(seedTenantContent)],
+    ['the entitlement lookup', () => vi.mocked(isGrowthLayerEntitled)],
+  ])(
+    'records no preset or template version when %s fails',
+    async (_step, failing) => {
+      failing().mockRejectedValue(new Error(MOCK_SANITY_OUTAGE));
+
+      await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT).catch(
+        () => undefined,
+      );
+
+      expect(insertSiteConfigIfMissing).not.toHaveBeenCalled();
+      expect(setTenantSiteTemplateVersion).not.toHaveBeenCalled();
     },
   );
-
-  it('records no preset or template version when the Growth layer fails', async () => {
-    vi.mocked(getTenantById).mockResolvedValue(
-      mockTenant({ plan: TENANT_PLAN.GROWTH }),
-    );
-    vi.mocked(applyGrowthLayer).mockRejectedValue(new Error('layer failed'));
-
-    await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT).catch(
-      () => undefined,
-    );
-
-    expect(setTenantSiteTemplateVersion).not.toHaveBeenCalled();
-  });
-
-  it('records no preset or template version when seeding fails', async () => {
-    vi.mocked(seedTenantContent).mockRejectedValue(new Error('seed failed'));
-
-    await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT).catch(
-      () => undefined,
-    );
-
-    expect(insertSiteConfigIfMissing).not.toHaveBeenCalled();
-    expect(setTenantSiteTemplateVersion).not.toHaveBeenCalled();
-  });
 
   it('throws a fatal error without seeding for a missing tenant', async () => {
     vi.mocked(getTenantById).mockResolvedValue(undefined);

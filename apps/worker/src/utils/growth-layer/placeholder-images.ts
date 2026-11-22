@@ -3,7 +3,7 @@ import {
   STARTER_PLACEHOLDER_IMAGE,
   type TStarterPlaceholderImage,
 } from '@shinefold/config/constants';
-import { SVG_CONTENT_TYPE } from '@worker/constants/growth-layer';
+import { SVG_CONTENT_TYPE } from '@worker/constants/media-type';
 import type { createClientWithTimeout } from '@worker/utils/step-deps/step-deps';
 
 type TSanityClient = ReturnType<typeof createClientWithTimeout>;

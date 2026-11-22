@@ -1,9 +1,8 @@
 import type { TGrowthHomeSlot } from '@shinefold/config';
 import type { TMaybeNull } from '@shinefold/config/types';
 
-export type THomeModuleSlot = { _key: string; _ref?: string };
+export type THomeModuleSlot = TGrowthHomeSlot['slot'];
 
-// A slot whose anchor the owner removed goes last rather than being dropped.
 export function withGrowthHomeSlots(
   modules: readonly THomeModuleSlot[],
   homeSlots: readonly TGrowthHomeSlot[],

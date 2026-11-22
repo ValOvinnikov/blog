@@ -1,22 +1,26 @@
 import { createMockFaker } from '@worker/testing/mock-faker';
-import { mockKeyedReference } from '@worker/testing/sample-content/fixtures';
 
-import { withGrowthHomeSlots } from './growth-home-modules';
+import {
+  type THomeModuleSlot,
+  withGrowthHomeSlots,
+} from './growth-home-modules';
 
 const mockFaker = createMockFaker(5714);
 
-const MOCK_INTRO_ID = mockFaker.string.uuid();
-const MOCK_FIRST_ID = mockFaker.string.uuid();
-const MOCK_HERO = mockKeyedReference(mockFaker.string.uuid());
-const MOCK_INTRO = mockKeyedReference(MOCK_INTRO_ID);
-const MOCK_CTA = mockKeyedReference(mockFaker.string.uuid());
+function mockModuleSlot(id = mockFaker.string.uuid()): THomeModuleSlot {
+  return { _key: id, _ref: id, _type: 'module_timeline' };
+}
+
+const MOCK_HERO = mockModuleSlot();
+const MOCK_INTRO = mockModuleSlot();
+const MOCK_CTA = mockModuleSlot();
 const MOCK_FREE_MODULES = [MOCK_HERO, MOCK_INTRO, MOCK_CTA];
-const MOCK_FIRST_SLOT = mockKeyedReference(MOCK_FIRST_ID);
-const MOCK_SECOND_SLOT = mockKeyedReference(mockFaker.string.uuid());
+const MOCK_FIRST_SLOT = mockModuleSlot();
+const MOCK_SECOND_SLOT = mockModuleSlot();
 const MOCK_HOME_SLOTS = [
-  { slot: MOCK_FIRST_SLOT, after: MOCK_INTRO_ID },
-  { slot: MOCK_SECOND_SLOT, after: MOCK_FIRST_ID },
-] as Parameters<typeof withGrowthHomeSlots>[1];
+  { slot: MOCK_FIRST_SLOT, after: MOCK_INTRO._ref },
+  { slot: MOCK_SECOND_SLOT, after: MOCK_FIRST_SLOT._ref },
+];
 
 describe(withGrowthHomeSlots, () => {
   it('places each slot after the one it follows, in order', () => {

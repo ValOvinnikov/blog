@@ -3,16 +3,13 @@ import {
   STARTER_TEMPLATE_VERSION,
   toStarterSiteType,
 } from '@shinefold/config';
-import { MODULE_PACK } from '@shinefold/config/constants';
-import {
-  PLAN_ENTITLEMENTS,
-  TENANT_PROVISIONING_STEP,
-} from '@shinefold/db/constants';
+import { TENANT_PROVISIONING_STEP } from '@shinefold/db/constants';
 import { insertSiteConfigIfMissing } from '@shinefold/db/queries/site-config';
 import { setTenantSiteTemplateVersion } from '@shinefold/db/queries/tenants';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { applyGrowthLayer } from '@worker/steps/apply-growth-layer';
 import { seedTenantContent } from '@worker/steps/seed-content';
+import { isGrowthLayerEntitled } from '@worker/utils/growth-layer/growth-layer-entitlement';
 import { getProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import { seedContentDeps } from '@worker/utils/step-deps/step-deps';
 
@@ -38,12 +35,16 @@ export async function applySiteTemplate(
     ctx,
     step: TENANT_PROVISIONING_STEP.SEED_CONTENT,
     run: async () => {
-      await seedTenantContent(tenant, siteType, productName, seedContentDeps);
-      if (
-        PLAN_ENTITLEMENTS[tenant.plan].modulePacks.includes(MODULE_PACK.GROWTH)
-      ) {
-        await applyGrowthLayer({ tenantId, siteType, locale: tenant.locale });
-      }
+      const afterSeed = (await isGrowthLayerEntitled(tenant))
+        ? applyGrowthLayer({ siteType, locale: tenant.locale })
+        : undefined;
+      await seedTenantContent(
+        tenant,
+        siteType,
+        productName,
+        seedContentDeps,
+        afterSeed,
+      );
       await insertSiteConfigIfMissing(
         tenantId,
         STARTER_PRESET_BY_SITE_TYPE[siteType],
