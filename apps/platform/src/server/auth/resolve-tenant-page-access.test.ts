@@ -70,6 +70,28 @@ describe(resolveTenantPageAccess, () => {
     expect(leads).toBe(false);
   });
 
+  it.each([
+    [TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.OWNER, true],
+    [TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.EDITOR, false],
+    [TENANT_PLAN.STARTER, MEMBERSHIP_ROLE.OWNER, false],
+  ] as const)(
+    'gives Subscribers on %s to an %s: %s',
+    async (plan, role, isOpen) => {
+      const { subscribers } = await resolveFor(plan, role);
+
+      expect(subscribers).toBe(isOpen);
+    },
+  );
+
+  it('opens Subscribers to an operator on Growth', async () => {
+    const { subscribers } = await resolveTenantPageAccess(
+      mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
+      mockOperatorViewer(ADMIN_ROLE.MODERATOR),
+    );
+
+    expect(subscribers).toBe(true);
+  });
+
   it('opens Leads to an operator on a plan with the contact form', async () => {
     const { leads } = await resolveTenantPageAccess(
       mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),

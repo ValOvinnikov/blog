@@ -31,7 +31,8 @@
     "upgrade": "Changer d'offre",
     "help": "Aide",
     "draftPreview": "Aperçu du brouillon",
-    "team": "Équipe"
+    "team": "Équipe",
+    "subscribers": "Abonnés"
   },
   "signInPage": {
     "heading": "Connexion",
@@ -234,7 +235,6 @@
     "team": "Équipe",
     "provisioning": "Provisionnement",
     "dangerZone": "Zone de danger",
-    "badgeComingSoon": "Bientôt",
     "badgePlatform": "plateforme",
     "features": "Fonctionnalités",
     "leads": "Messages reçus",
@@ -2441,6 +2441,104 @@
     "pay": "Payer {amount} et passer au palier supérieur",
     "paying": "Paiement…"
   },
+  "subscribersPage": {
+    "title": "Abonnés",
+    "lead": "{count, plural, one {# abonné confirmé reçoit chaque nouvel article par e-mail.} other {# abonnés confirmés reçoivent chaque nouvel article par e-mail.}}",
+    "leadEmpty": "Aucun abonné confirmé pour l'instant.",
+    "export": "Exporter en CSV",
+    "exporting": "Export en cours…",
+    "exportFailed": "L'export n'a pas pu être créé. Réessayez.",
+    "limitsHeading": "Limites",
+    "limitValue": "<count>{used, number}</count> sur {limit, number}",
+    "band": {
+      "name": "Palier d'abonnés",
+      "meter": "Abonnés dans le palier",
+      "detail": "Jusqu'à {ceiling, number}",
+      "narrowUnder": "Encore {left, number} avant le palier de {next, number}.",
+      "notes": {
+        "UNDER": "Encore {left, number} avant d'avoir besoin du palier de {next, number}.",
+        "UNDER_LARGEST": "Encore {left, number} avant la limite du plus grand palier.",
+        "NEAR": "{percent} % utilisés — il en reste {left, number}",
+        "PAUSED": "Envoi en pause — {over, number} au-dessus"
+      }
+    },
+    "emails": {
+      "name": "E-mails ce mois-ci",
+      "meter": "E-mails envoyés ce mois-ci",
+      "detail": "Réinitialisation le {date}",
+      "narrowDetail": "Réinit. le {date}",
+      "notes": {
+        "UNDER": "De quoi envoyer {posts, plural, one {# article de plus} other {# articles de plus}} à votre liste actuelle.",
+        "NEAR": "{percent} % utilisés — il en reste {left, number}",
+        "PAUSED": "Envoi en pause — le prochain article en demande {count, number}"
+      }
+    },
+    "sending": {
+      "label": "Envoyer les nouveaux articles par e-mail aux abonnés",
+      "description": "Désactivez cette option si vous envoyez votre newsletter avec un autre outil. Les lecteurs peuvent toujours s'abonner.",
+      "on": "Activé",
+      "off": "Désactivé",
+      "offNote": "Tant que cette option est désactivée, les articles ne sont pas envoyés par e-mail. Une fois réactivée, vous pourrez envoyer un article publié entre-temps avec Envoyer les e-mails dans le Studio. Exportez la liste pour l'utiliser dans votre propre outil.",
+      "saveFailed": "Le réglage n'a pas pu être enregistré. Réessayez."
+    },
+    "list": {
+      "title": "Abonnés confirmés",
+      "order": "Les plus récents d'abord",
+      "columnEmail": "E-mail",
+      "columnConfirmed": "Confirmé",
+      "columnActions": "Actions",
+      "showing": "{from, number}–{to, number} sur {count, number}",
+      "showingShort": "{from, number}–{to, number} sur {count, number}",
+      "confirmedOn": "Confirmé le {date}",
+      "emailUnavailable": "E-mail indisponible"
+    },
+    "remove": {
+      "trigger": "Supprimer {email}",
+      "triggerUnknown": "Supprimer cet abonné",
+      "title": "Supprimer cet abonné ?",
+      "description": "Cette personne ne recevra plus vos articles, dès maintenant. Elle peut se réabonner depuis votre site.",
+      "confirm": "Supprimer",
+      "confirming": "Suppression…",
+      "failed": "L'abonné n'a pas pu être supprimé. Réessayez.",
+      "alreadyRemoved": "Cet abonné a déjà été supprimé."
+    },
+    "empty": {
+      "title": "Vos premiers abonnés apparaîtront ici",
+      "description": "Les lecteurs s'inscrivent via le formulaire de votre site et apparaissent ici dès qu'ils confirment par e-mail. Chaque nouvel article leur est ensuite envoyé par e-mail.",
+      "action": "Ajouter un formulaire d'inscription à une page"
+    },
+    "notices": {
+      "largestBand": "Vous êtes sur le plus grand palier.",
+      "operatorPause": {
+        "title": "Les e-mails d'articles sont en pause pour ce site",
+        "description": "Shinefold a mis en pause l'envoi des articles par e-mail le {date}. Contactez le support pour le reprendre.",
+        "descriptionUndated": "Shinefold a mis en pause l'envoi des articles par e-mail pour ce site. Contactez le support pour le reprendre."
+      },
+      "bandPaused": {
+        "title": "Les nouveaux articles ne sont pas envoyés par e-mail",
+        "description": "Vous avez {count, number} abonnés et votre palier est de {ceiling, number}. « {title} » ({date}) a été publié mais pas envoyé par e-mail. Une fois revenu dans votre palier, envoyez-le avec Envoyer les e-mails sur l'article dans le Studio. Les articles sont toujours publiés et les lecteurs peuvent toujours s'abonner.",
+        "descriptionNoPost": "Vous avez {count, number} abonnés et votre palier est de {ceiling, number}. Les articles sont toujours publiés et les lecteurs peuvent toujours s'abonner.",
+        "note": "Ou supprimez des abonnés jusqu'à revenir à {ceiling, number}."
+      },
+      "emailsPaused": {
+        "title": "Les nouveaux articles ne sont pas envoyés par e-mail avant le {date}",
+        "description": "« {title} » demandait {needed, number} e-mails et il en restait {left, number} ce mois-ci, il n'a donc pas été envoyé — un article part en entier ou pas du tout. L'envoi reprend le {resetsOn} ; dès que le quota le permet, envoyez-le avec Envoyer les e-mails sur l'article dans le Studio.",
+        "descriptionNoPost": "Votre prochain article demande {count, number} e-mails, et un article part en entier ou pas du tout. L'envoi reprend le {resetsOn}.",
+        "note": "{allowance, number} e-mails par mois, dès maintenant. Ou attendez le {date}."
+      },
+      "bandNear": {
+        "title": "Vous approchez de votre palier d'abonnés",
+        "description": "{count, number} abonnés sur {ceiling, number}. À {ceiling, number}, les nouveaux articles ne sont plus envoyés par e-mail tant que vous ne passez pas au palier supérieur ou que la liste ne diminue pas. Les articles sont toujours publiés et les lecteurs peuvent toujours s'abonner.",
+        "note": "Ou ne faites rien — vous n'êtes jamais facturé sans ce clic."
+      },
+      "emailsNear": {
+        "title": "Vous avez utilisé la plupart des e-mails de ce mois",
+        "description": "{sent, number} envoyés sur {allowance, number}. Un article ne part que s'il passe en entier — le prochain en demande {count, number} et il en reste {left, number}, donc {fit, plural, =0 {plus aucun ne passe} =1 {encore un passe} =2 {encore deux passent} =3 {encore trois passent} =4 {encore quatre passent} =5 {encore cinq passent} =6 {encore six passent} =7 {encore sept passent} =8 {encore huit passent} =9 {encore neuf passent} other {encore # passent}}. Le quota est réinitialisé le {date}.",
+        "note": "{allowance, number} e-mails par mois. Ou ne faites rien."
+      },
+      "movedUp": "<lead>Vous êtes sur le palier de {ceiling, number}.</lead> Jusqu'à {ceiling, number} abonnés et {allowance, number} e-mails par mois, dès maintenant. Votre prochain article sera envoyé par e-mail."
+    }
+  },
   "helpView": {
     "title": "Aide",
     "description": "Envoyez un message à notre équipe d'assistance. Nous y joignons votre site, votre offre et ce compte, pour que vous n'ayez pas à le faire.",
@@ -2596,7 +2694,8 @@
     },
     "links": {
       "SEATS": "Équipe",
-      "LANGUAGES": "Langues"
+      "LANGUAGES": "Langues",
+      "EMAILS": "Abonnés"
     },
     "value": "<count>{used, number}</count> sur {allowance, number}",
     "failed": "Impossible de charger ce total. Rechargez la page pour réessayer.",
@@ -2624,7 +2723,8 @@
         "UNDER": "Votre langue par défaut n'est pas comptée.",
         "NEAR": "{left, plural, one {Il reste # langue.} other {Il reste # langues.}}",
         "FULL": "Toutes sont utilisées. Retirez-en une pour en ajouter une autre."
-      }
+      },
+      "paused": "Envoi en pause — le prochain article en demande {count, number}. Réinitialisation le {date}."
     }
   },
   "revokeGrantControl": {

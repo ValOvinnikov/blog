@@ -31,7 +31,8 @@
     "upgrade": "Upgraden",
     "help": "Help",
     "draftPreview": "Conceptvoorbeeld",
-    "team": "Team"
+    "team": "Team",
+    "subscribers": "Abonnees"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -234,7 +235,6 @@
     "team": "Team",
     "provisioning": "Inrichting",
     "dangerZone": "Gevarenzone",
-    "badgeComingSoon": "Binnenkort",
     "badgePlatform": "platform",
     "features": "Functies",
     "leads": "Berichten",
@@ -2441,6 +2441,104 @@
     "pay": "{amount} betalen en overstappen",
     "paying": "Betalen…"
   },
+  "subscribersPage": {
+    "title": "Abonnees",
+    "lead": "{count, plural, one {# bevestigde abonnee krijgt elk nieuw bericht per e-mail.} other {# bevestigde abonnees krijgen elk nieuw bericht per e-mail.}}",
+    "leadEmpty": "Nog geen bevestigde abonnees.",
+    "export": "CSV exporteren",
+    "exporting": "Bezig met exporteren…",
+    "exportFailed": "De export kon niet worden gemaakt. Probeer het opnieuw.",
+    "limitsHeading": "Limieten",
+    "limitValue": "<count>{used, number}</count> van {limit, number}",
+    "band": {
+      "name": "Abonneeschijf",
+      "meter": "Abonnees in de schijf",
+      "detail": "Tot {ceiling, number}",
+      "narrowUnder": "Nog {left, number} tot de schijf van {next, number}.",
+      "notes": {
+        "UNDER": "Nog {left, number} voordat u de schijf van {next, number} nodig hebt.",
+        "UNDER_LARGEST": "Nog {left, number} tot de limiet van de grootste schijf.",
+        "NEAR": "{percent}% gebruikt — nog {left, number} over",
+        "PAUSED": "Verzenden gepauzeerd — {over, number} te veel"
+      }
+    },
+    "emails": {
+      "name": "E-mails deze maand",
+      "meter": "Deze maand verzonden e-mails",
+      "detail": "Wordt op {date} gereset",
+      "narrowDetail": "Reset op {date}",
+      "notes": {
+        "UNDER": "Genoeg voor {posts, plural, one {nog # bericht} other {nog # berichten}} aan uw huidige lijst.",
+        "NEAR": "{percent}% gebruikt — nog {left, number} over",
+        "PAUSED": "Verzenden gepauzeerd — volgend bericht heeft er {count, number} nodig"
+      }
+    },
+    "sending": {
+      "label": "Nieuwe berichten mailen naar abonnees",
+      "description": "Zet dit uit als u uw nieuwsbrief met een andere tool verstuurt. Lezers kunnen zich nog steeds aanmelden.",
+      "on": "Aan",
+      "off": "Uit",
+      "offNote": "Zolang dit uit staat, worden berichten niet gemaild. Zodra het weer aan staat, kunt u een bericht dat intussen is gepubliceerd versturen met E-mails versturen in de Studio. Exporteer de lijst om die in uw eigen tool te gebruiken.",
+      "saveFailed": "De instelling kon niet worden opgeslagen. Probeer het opnieuw."
+    },
+    "list": {
+      "title": "Bevestigde abonnees",
+      "order": "Nieuwste eerst",
+      "columnEmail": "E-mail",
+      "columnConfirmed": "Bevestigd",
+      "columnActions": "Acties",
+      "showing": "{from, number}–{to, number} van {count, number} weergegeven",
+      "showingShort": "{from, number}–{to, number} van {count, number}",
+      "confirmedOn": "Bevestigd op {date}",
+      "emailUnavailable": "E-mailadres niet beschikbaar"
+    },
+    "remove": {
+      "trigger": "{email} verwijderen",
+      "triggerUnknown": "Deze abonnee verwijderen",
+      "title": "Deze abonnee verwijderen?",
+      "description": "Deze persoon krijgt uw berichten meteen niet meer. Aanmelden kan opnieuw via uw site.",
+      "confirm": "Verwijderen",
+      "confirming": "Bezig met verwijderen…",
+      "failed": "De abonnee kon niet worden verwijderd. Probeer het opnieuw.",
+      "alreadyRemoved": "Deze abonnee is al verwijderd."
+    },
+    "empty": {
+      "title": "Uw eerste abonnees verschijnen hier",
+      "description": "Lezers melden zich aan via het formulier op uw site en verschijnen hier zodra ze per e-mail bevestigen. Elk nieuw bericht wordt hun daarna gemaild.",
+      "action": "Een aanmeldformulier aan een pagina toevoegen"
+    },
+    "notices": {
+      "largestBand": "U zit in de grootste schijf.",
+      "operatorPause": {
+        "title": "Berichtmails zijn gepauzeerd voor deze site",
+        "description": "Shinefold heeft het mailen van berichten op {date} gepauzeerd. Neem contact op met support om het te hervatten.",
+        "descriptionUndated": "Shinefold heeft het mailen van berichten voor deze site gepauzeerd. Neem contact op met support om het te hervatten."
+      },
+      "bandPaused": {
+        "title": "Nieuwe berichten worden niet gemaild",
+        "description": "U hebt {count, number} abonnees en uw schijf is {ceiling, number}. ‘{title}’ ({date}) is gepubliceerd maar niet gemaild. Zodra u weer binnen uw schijf zit, verstuurt u het met E-mails versturen bij het bericht in de Studio. Berichten worden nog steeds gepubliceerd en lezers kunnen zich nog steeds aanmelden.",
+        "descriptionNoPost": "U hebt {count, number} abonnees en uw schijf is {ceiling, number}. Berichten worden nog steeds gepubliceerd en lezers kunnen zich nog steeds aanmelden.",
+        "note": "Of verwijder abonnees tot u op {ceiling, number} zit."
+      },
+      "emailsPaused": {
+        "title": "Nieuwe berichten worden tot {date} niet gemaild",
+        "description": "‘{title}’ had {needed, number} e-mails nodig en er waren deze maand nog {left, number} over, dus het is niet gemaild — berichten gaan in hun geheel of helemaal niet. Verzenden begint weer op {resetsOn}; zodra het tegoed het dekt, verstuurt u het met E-mails versturen bij het bericht in de Studio.",
+        "descriptionNoPost": "Uw volgende bericht heeft {count, number} e-mails nodig, en berichten gaan in hun geheel of helemaal niet. Verzenden begint weer op {resetsOn}.",
+        "note": "{allowance, number} e-mails per maand, vanaf nu. Of wacht tot {date}."
+      },
+      "bandNear": {
+        "title": "U zit dicht bij uw abonneeschijf",
+        "description": "{count, number} van {ceiling, number} abonnees. Bij {ceiling, number} worden nieuwe berichten niet meer gemaild tot u een schijf hoger gaat of de lijst kleiner wordt. Berichten worden nog steeds gepubliceerd en lezers kunnen zich nog steeds aanmelden.",
+        "note": "Of doe niets — zonder deze klik wordt er nooit iets in rekening gebracht."
+      },
+      "emailsNear": {
+        "title": "U hebt de meeste e-mails van deze maand gebruikt",
+        "description": "{sent, number} van {allowance, number} verzonden. Een bericht gaat alleen uit als het in zijn geheel past — uw volgende heeft er {count, number} nodig en er zijn nog {left, number} over, dus {fit, plural, =0 {past er geen meer} =1 {past er nog één} =2 {passen er nog twee} =3 {passen er nog drie} =4 {passen er nog vier} =5 {passen er nog vijf} =6 {passen er nog zes} =7 {passen er nog zeven} =8 {passen er nog acht} =9 {passen er nog negen} other {passen er nog #}}. Het tegoed wordt op {date} gereset.",
+        "note": "{allowance, number} e-mails per maand. Of doe niets."
+      },
+      "movedUp": "<lead>U zit nu in de schijf van {ceiling, number}.</lead> Tot {ceiling, number} abonnees en {allowance, number} e-mails per maand, vanaf nu. Uw volgende bericht wordt gemaild."
+    }
+  },
   "helpView": {
     "title": "Help",
     "description": "Stuur een bericht naar ons supportteam. We sturen je site, je abonnement en dit account automatisch mee.",
@@ -2596,7 +2694,8 @@
     },
     "links": {
       "SEATS": "Team",
-      "LANGUAGES": "Talen"
+      "LANGUAGES": "Talen",
+      "EMAILS": "Abonnees"
     },
     "value": "<count>{used, number}</count> van {allowance, number}",
     "failed": "Dit aantal kon niet worden geladen. Laad de pagina opnieuw om het nog eens te proberen.",
@@ -2624,7 +2723,8 @@
         "UNDER": "Uw standaardtaal telt niet mee.",
         "NEAR": "{left, plural, one {Nog # taal over.} other {Nog # talen over.}}",
         "FULL": "Alle in gebruik. Verwijder er een om een andere toe te voegen."
-      }
+      },
+      "paused": "Verzenden gepauzeerd — het volgende bericht heeft er {count, number} nodig. Wordt op {date} gereset."
     }
   },
   "revokeGrantControl": {

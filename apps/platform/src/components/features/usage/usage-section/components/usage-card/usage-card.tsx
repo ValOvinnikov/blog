@@ -5,6 +5,7 @@ import {
   loadUsageMeters,
   type TUsageLinks,
 } from '@platform/server/usage/load-usage-meters';
+import { DAY_MONTH_LONG_UTC } from '@platform/utils/date-format-options/date-format-options';
 import { env } from '@platform/utils/env/env';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { toPricingPageUrl } from '@platform/utils/pricing-page-url/pricing-page-url';
@@ -14,12 +15,6 @@ import { getFormatter, getTranslations } from 'next-intl/server';
 
 import { UsageRow } from './components/usage-row/usage-row';
 import { usageCardVariants } from './usage-card-variants';
-
-const RESET_DATE_FORMAT = {
-  day: 'numeric',
-  month: 'long',
-  timeZone: 'UTC',
-} as const;
 
 export type TUsageCardProps = {
   tenant: TPlatformTenant;
@@ -39,7 +34,7 @@ export const UsageCard = async ({
   ]);
   const resetsOn = format.dateTime(
     utcNextMonthStart(new Date()),
-    RESET_DATE_FORMAT,
+    DAY_MONTH_LONG_UTC,
   );
   const plansUrl =
     hasPlansFooter && tenant.plan !== TENANT_PLAN.GROWTH

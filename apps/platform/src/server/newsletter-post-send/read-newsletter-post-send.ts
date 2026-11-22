@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { readNewsletterStop } from '@platform/server/newsletter-pause/read-newsletter-stop';
 import {
   isHandSendableClaim,
   toSendNowEligibility,
@@ -12,9 +13,7 @@ import {
   type TNewsletterSendNowEligibility,
 } from '@shinefold/config';
 import { queries } from '@shinefold/db';
-import { EMAIL_REPUTATION_LEVEL } from '@shinefold/db/constants';
 import type { INewsletterPostSend } from '@shinefold/db/queries/newsletter-post-sends';
-import { emailReputationLevel } from '@shinefold/db/utils/email-reputation-level/email-reputation-level';
 import { utcNextMonthStart } from '@shinefold/utils/date';
 
 export type TNewsletterPostSendRequest = {
@@ -41,17 +40,6 @@ const readSendingOffCause = async (
     );
   }
   return result.data;
-};
-
-const isSendingStopped = async (tenantId: string): Promise<boolean> => {
-  const [pausedAt, reputation] = await Promise.all([
-    queries.emailConfig.getNewsletterPausedAt(tenantId),
-    queries.emailUsage.getEmailReputation(tenantId),
-  ]);
-  return (
-    Boolean(pausedAt) ||
-    emailReputationLevel(reputation) === EMAIL_REPUTATION_LEVEL.STOP
-  );
 };
 
 /** The status route's read, which the send-now route re-runs so both judge a post by the same rules. */
@@ -83,7 +71,7 @@ export const readNewsletterPostSend = async (
   const sendNow: TNewsletterSendNowEligibility = isCandidate
     ? toSendNowEligibility({
         sendingOffCause,
-        isSendingStopped: await isSendingStopped(tenantId),
+        isSendingStopped: (await readNewsletterStop(tenantId)).isStopped,
         limits,
         resetsAt: utcNextMonthStart(new Date()),
       })

@@ -31,6 +31,12 @@ code:
   - apps/worker/src/utils/newsletter-send/**
   - apps/worker/src/utils/owner-email/owner-newsletter-*/**
   - apps/worker/src/utils/owner-email/owner-newsletter-*.ts
+  - apps/platform/src/app/[locale]/dashboard/(tenant)/subscribers/**
+  - apps/platform/src/components/features/subscribers/**
+  - apps/platform/src/server/subscribers/**
+  - apps/platform/src/utils/subscriber-limits/**
+  - apps/platform/src/utils/subscribers-csv/**
+  - apps/platform/src/utils/newsletter-pause-state/**
 epics: [4083, 2801]
 ---
 
@@ -50,7 +56,14 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - `/[locale]/newsletter/unsubscribe` — the confirm button, in the site's layout, theme and the link's language; it `POST`s to the unsubscribe path with no token in either URL, so the token never reaches analytics, history or a `Referer`. ISR like the result pages, `noindex`.
 - `/[locale]/newsletter/[result]` — the confirm or unsubscribe outcome (`NEWSLETTER_RESULT`: confirmed, unsubscribed, or an invalid, failed or unavailable link) in the site's layout, theme and the link's language, with a link home; `noindex`.
 - `/[locale]/account` — the Newsletter section (see [reader-account](./reader-account.md)).
-- **Platform** — the Features toggle, the Email page's `NEWSLETTER_CONFIRMATION` template, and a "Coming soon" Subscribers sidebar entry with no page.
+- **Platform** — the Features toggle, the Email page's `NEWSLETTER_CONFIRMATION` template, and the Subscribers page below.
+- **Platform, `/dashboard/subscribers`** — for a site whose plan (with grants) includes Newsletter, opened by its owner or an operator; an editor, and a Free or Starter site, get neither the page nor its sidebar entry. The operator tree (`/tenants/[tenantId]`) has no Subscribers entry: operators reach the page from the dashboard. It shows:
+  - the confirmed count and Export CSV (`exportSubscribersAction`: every confirmed subscriber as `email,confirmed_at`, UTC ISO times, newest first, named `subscribers-{first label of the platform address, else the main address}-{UTC day}.csv`; disabled with no subscribers);
+  - at most one notice, in this order: the operator pause (`newsletter_paused_at` set, or the reputation at `STOP`), over the band, out of this month's emails, near the band, near the emails (80%), then "After moving up" when the `MOVED_UP` search param names the band the site is now on. A paused notice names the newest post skipped for its reason since the last sent post (`getLatestSkippedNewsletterPost`), or drops that sentence. The move-up button (`MoveUpBand`) shows for the owner only, and only with a catalogue price for the site's stored interval and currency; on the 25,000 band the note reads "You're on the largest band.";
+  - the subscriber-band and emails-this-month cards, each a meter with a note that is muted below 80%, warning from 80% and error-toned only while its own paused notice shows ("paused" uses the worker gate's rules: over the band is more subscribers than the ceiling, out of emails is more subscribers than the emails left);
+  - the "Email new posts to subscribers" switch (`setEmailNewPostsAction`, saved on change, reverted with an error on failure) and the paged list, 25 a page newest first, each row with a confirm-first remove (`removeSubscriberAction`, `unsubscribeById`). Below `md` the list is a `<ul>` whose footer hides Previous on page 1.
+  - With no subscribers: no switch and no list, but a card linking to the Studio's page list.
+- **Platform, Overview** — the Usage card's emails row links to the Subscribers page and, while the next post would not fit this month, reads "Sending paused".
 - **Platform, operator** — a paused site's tenant overview (`/tenants/[tenantId]`) shows every admin a "Newsletter paused" card with the date it was paused; an unpaused site shows none. Only a super admin gets its "Clear pause" confirm, which calls `clearNewsletterPauseAction` (`apps/platform/src/server/newsletter-pause/`, behind `requireSuperAdmin`). The clear write decides: when it clears nothing the action refuses `NOT_PAUSED` and a toast says the pause was already cleared; otherwise it records `NEWSLETTER_PAUSE_CLEARED` against the tenant with the cleared `pausedAt`. Either way the dialog closes, focus moves to the page heading and the page refreshes.
 
 ## Data
@@ -87,7 +100,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 ## Configuration
 
 - **Editor (Studio)** — whether a post is sent to subscribers; the module's content, variant, trust cues, alignment and layout, and where it is placed.
-- **Owner or operator (platform)** — the `NEWSLETTER` toggle, `GROWTH` only and locked off as Coming soon; the confirmation email's subject, body, logo, sender name, reply-to and postal footer on the Email page (see [email](./email.md)).
+- **Owner or operator (platform)** — the `NEWSLETTER` toggle, `GROWTH` only and locked off as Coming soon; the "Email new posts to subscribers" setting, removing subscribers and exporting the list on the Subscribers page (moving up a band is the owner's alone); the confirmation email's subject, body, logo, sender name, reply-to and postal footer on the Email page (see [email](./email.md)).
 - **Voice** — the confirm and unsubscribe result-page and confirmation-page copy is fixed (`newsletterConfirm.*`, `newsletterUnsubscribe.*`), as is the form copy, including the rate-limit message (`newsletterForm.errorRateLimited`).
 
 ## Constraints and invariants
@@ -124,11 +137,14 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - `apps/web/src/server/revalidate/start-newsletter-post-send/start-newsletter-post-send.ts`, `apps/web/src/server/revalidate/enqueue-newsletter-post-send/enqueue-newsletter-post-send.ts`
 - `packages/db/src/queries/subscribers/`, `packages/db/src/queries/newsletter-post-sends/`, `packages/db/src/queries/test-email-send-counters/`, `packages/db/src/utils/newsletter-sending-off-cause/`
 - `packages/email/src/templates/tenant/newsletter-confirmation/newsletter-confirmation.ts`
+- `apps/platform/src/app/[locale]/dashboard/(tenant)/subscribers/page.tsx`, `apps/platform/src/components/features/subscribers/subscribers-page-content/subscribers-page-content.tsx`, `apps/platform/src/server/subscribers/load-subscribers-page.ts` (notice precedence in `apps/platform/src/utils/subscriber-limits/subscriber-limits.ts`)
+- `apps/platform/src/server/subscribers/{remove-subscriber,export-subscribers,set-email-new-posts}-action.ts`, all behind `requireSubscribersManager`
 
 ## Tests and stories
 
 - `packages/service/src/features/modules/newsletter/adaptor/*.test.ts`, `packages/db/src/queries/subscribers/**/*.test.ts`, `newsletter-confirmation.test.ts`.
 - `apps/web/src/modules/newsletter/*.test.tsx`, `apps/web/src/server/newsletter/**/*.test.ts`, `apps/web/src/app/api/newsletter/**/route.test.ts`, `newsletter-result-page.test.tsx` and its story, `newsletter-unsubscribe-page.test.tsx`, the `MessagePage` story, the form, gate and control tests.
+- Platform: `apps/platform/src/components/features/subscribers/**/*.test.tsx`, `apps/platform/src/server/subscribers/*.test.ts`, `subscriber-limits.test.ts`, `subscribers-csv.test.ts`.
 - Stories: `newsletter-module-view.stories.tsx`, `newsletter-form.stories.tsx` (web); `newsletter-signup*.stories.tsx` (ui).
 
 ## Related

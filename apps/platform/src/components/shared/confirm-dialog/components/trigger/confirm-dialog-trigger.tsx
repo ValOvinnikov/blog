@@ -2,16 +2,21 @@ import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { Button } from '@platform/components/shared/button';
 import type { TButtonVariants } from '@platform/components/shared/button/button-variants';
 import { useConfirmDialogContext } from '@platform/components/shared/confirm-dialog/confirm-dialog-context';
+import {
+  Icon,
+  type TRegisteredIconName,
+} from '@platform/components/shared/icon';
 import { Text } from '@platform/components/shared/text';
 import { useId, type ReactNode } from 'react';
 
 export type TConfirmDialogTriggerProps = {
-  children: ReactNode;
+  children?: ReactNode;
   variant?: TButtonVariants['variant'];
   disabledReason?: string;
   size?: TButtonVariants['size'];
   focusGround?: TButtonVariants['focusGround'];
   ariaLabel?: string;
+  icon?: TRegisteredIconName;
 };
 
 export const ConfirmDialogTrigger = ({
@@ -21,6 +26,7 @@ export const ConfirmDialogTrigger = ({
   size,
   focusGround,
   ariaLabel,
+  icon,
 }: TConfirmDialogTriggerProps) => {
   const { tone } = useConfirmDialogContext();
   const disabledReasonId = useId();
@@ -36,12 +42,13 @@ export const ConfirmDialogTrigger = ({
             size={size}
             focusGround={focusGround}
             aria-label={ariaLabel}
+            title={icon ? ariaLabel : undefined}
             isAriaDisabled={isDisabled}
             aria-describedby={isDisabled ? disabledReasonId : undefined}
           />
         }
       >
-        {children}
+        {icon ? <Icon name={icon} /> : children}
       </AlertDialog.Trigger>
       {isDisabled && (
         <Text id={disabledReasonId} variant="meta">

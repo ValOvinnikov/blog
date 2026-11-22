@@ -30,6 +30,7 @@ export const dashboardNavSections = (
     signIn: adminRoutes.dashboardSignIn(),
     email: adminRoutes.dashboardEmail(),
     studio: adminRoutes.dashboardStudio(),
+    subscribers: adminRoutes.dashboardSubscribers(),
   };
 
   const accountItems: TSidebarNavItem[] = [

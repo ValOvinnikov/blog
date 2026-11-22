@@ -37,6 +37,7 @@ const MOCK_TAKEAWAYS_USED = 12;
 const MOCK_EMAILS_SENT = 4180;
 const MOCK_EMAIL_ALLOWANCE = 15000;
 const MOCK_SEATS_USED = 2;
+const MOCK_SUBSCRIBER_COUNT = 900;
 const MOCK_READ_ERROR = mockQueryError();
 const LINKS = {
   languages: adminRoutes.languages(MOCK_TENANT_ID),
@@ -74,6 +75,7 @@ describe(loadUsageMeters.name, () => {
           used: MOCK_TAKEAWAYS_USED,
           allowance: PLAN_ENTITLEMENTS[TENANT_PLAN.FREE].takeawaysPerMonth,
         },
+        pausedPostNeeds: undefined,
         isMonthly: true,
         href: undefined,
         grant: undefined,
@@ -110,6 +112,41 @@ describe(loadUsageMeters.name, () => {
         href: LINKS.languages,
       }),
     ]);
+  });
+
+  it('links the emails row to the Subscribers page when the view passes it', async () => {
+    const subscribers = adminRoutes.dashboardSubscribers();
+
+    const meters = await loadUsageMeters(growthTenant, {
+      ...LINKS,
+      subscribers,
+    });
+
+    expect(meters).toContainEqual(
+      expect.objectContaining({
+        meter: USAGE_METER.EMAILS,
+        href: subscribers,
+        pausedPostNeeds: undefined,
+      }),
+    );
+  });
+
+  it("marks the emails row paused when the next post doesn't fit this month", async () => {
+    vi.mocked(queries.emailUsage.getNewsletterLimits).mockResolvedValue({
+      activeCount: MOCK_SUBSCRIBER_COUNT,
+      bandCeiling: SUBSCRIBER_BAND_CEILINGS[0],
+      allowance: MOCK_EMAIL_ALLOWANCE,
+      sentThisMonth: MOCK_EMAIL_ALLOWANCE - MOCK_SUBSCRIBER_COUNT + 1,
+    });
+
+    const meters = await loadUsageMeters(growthTenant, LINKS);
+
+    expect(meters).toContainEqual(
+      expect.objectContaining({
+        meter: USAGE_METER.EMAILS,
+        pausedPostNeeds: MOCK_SUBSCRIBER_COUNT,
+      }),
+    );
   });
 
   it('shows the emails and languages rows a grant adds, with the grant', async () => {

@@ -187,6 +187,32 @@ describe(`<${UsageCard.name}/>`, () => {
     expect(badge).toBeVisible();
   });
 
+  it('links the emails row to the Subscribers page and shows it paused for the month', async () => {
+    const subscribersHref = adminRoutes.dashboardSubscribers();
+    vi.mocked(loadUsageMeters).mockResolvedValue([
+      mockUsageMeterRow({
+        meter: USAGE_METER.EMAILS,
+        href: subscribersHref,
+        pausedPostNeeds: MOCK_USAGE_ALLOWANCE,
+      }),
+    ]);
+
+    await setup();
+
+    const link = screen.getByRole('link', {
+      name: t(`links.${USAGE_METER.EMAILS}`),
+    });
+    const note = screen.getByText(
+      t('notes.paused', {
+        count: MOCK_USAGE_ALLOWANCE,
+        date: MOCK_USAGE_RESETS_ON,
+      }),
+    );
+
+    expect(link).toHaveAttribute('href', subscribersHref);
+    expect(note).toBeVisible();
+  });
+
   it('links the seats row to the Team page when the view passes it', async () => {
     vi.mocked(loadUsageMeters).mockResolvedValue([
       mockUsageMeterRow({

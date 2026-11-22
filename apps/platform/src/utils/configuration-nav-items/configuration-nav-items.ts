@@ -1,5 +1,4 @@
 import type { TSidebarNavItem } from '@platform/components/features/layout/sidebar';
-import { BADGE_TONE } from '@platform/constants/badge-tone';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import type {
   TPlanPage,
@@ -17,6 +16,7 @@ export type TTenantNavHrefs = {
   signIn: string;
   email: string;
   studio: string;
+  subscribers?: string;
 };
 
 export const configurationNavItems = (
@@ -24,11 +24,6 @@ export const configurationNavItems = (
   hrefs: TTenantNavHrefs,
   access: TPlanPageAccess,
 ): TSidebarNavItem[] => {
-  const comingSoon = {
-    label: t('badgeComingSoon'),
-    tone: BADGE_TONE.NEUTRAL,
-    hasDot: false,
-  } as const;
   const ifAccessible = (page: TPlanPage, item: TSidebarNavItem) =>
     access[page] ? [item] : [];
 
@@ -55,10 +50,12 @@ export const configurationNavItems = (
       icon: ICONS.MAIL,
       href: hrefs.email,
     }),
-    ...ifAccessible('subscribers', {
-      label: t('subscribers'),
-      icon: ICONS.MENU_ROWS,
-      badge: comingSoon,
-    }),
+    ...(hrefs.subscribers
+      ? ifAccessible('subscribers', {
+          label: t('subscribers'),
+          icon: ICONS.MENU_ROWS,
+          href: hrefs.subscribers,
+        })
+      : []),
   ];
 };

@@ -690,6 +690,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **MENU_RADIO_GROUP_SIZE**: `DESKTOP`, `TOUCH`
 
+### `@platform/constants/meter` — `apps/platform/src/constants/meter.ts`
+
+- **METER_TONE**: `BRAND`, `WARN`, `BAD`
+
 ### `@platform/constants/newsletter-pause` — `apps/platform/src/constants/newsletter-pause.ts`
 
 - **NEWSLETTER_PAUSE_REFUSAL**: `NOT_PAUSED`
@@ -851,6 +855,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/subscribers` — `apps/platform/src/constants/subscribers.ts`
 
 - **SUBSCRIBERS_SEARCH_PARAM**: `MOVED_UP`
+- **SUBSCRIBER_LIMIT_STATE**: `UNDER`, `NEAR`, `PAUSED`
+- **SUBSCRIBERS_NOTICE**: `OPERATOR_PAUSE`, `BAND_PAUSED`, `EMAILS_PAUSED`, `BAND_NEAR`, `EMAILS_NEAR`, `MOVED_UP`
+- **SUBSCRIBERS_REFUSAL**: `NOT_FOUND`
+- **SUBSCRIBERS_LOG**: `REMOVE_FAILED`=`"subscribers.remove_failed"`, `EXPORT_FAILED`=`"subscribers.export_failed"`, `SENDING_SAVE_FAILED`=`"subscribers.sending_save_failed"`
 
 ### `@platform/constants/subscription-lifecycle` — `apps/platform/src/constants/subscription-lifecycle.ts`
 

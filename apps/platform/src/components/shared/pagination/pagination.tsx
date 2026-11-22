@@ -15,6 +15,8 @@ export type TPaginationProps = {
   page: number;
   totalPages: number;
   focusGround?: TButtonVariants['focusGround'];
+  hasStatus?: boolean;
+  isUnavailableStepHidden?: boolean;
 } & TPaginationTarget;
 
 export const Pagination = ({
@@ -23,6 +25,8 @@ export const Pagination = ({
   pageHref,
   onPageChange,
   focusGround,
+  hasStatus = true,
+  isUnavailableStepHidden = false,
 }: TPaginationProps) => {
   const t = useTranslations('pagination');
   const { root } = paginationVariants();
@@ -31,6 +35,8 @@ export const Pagination = ({
 
   const renderStep = (target: number, label: string) => {
     const isAvailable = target >= 1 && target <= totalPages;
+
+    if (!isAvailable && isUnavailableStepHidden) return null;
 
     if (isAvailable && pageHref) {
       return (
@@ -73,7 +79,9 @@ export const Pagination = ({
       aria-label={t('ariaLabel')}
     >
       {renderStep(page - 1, t('previous'))}
-      <Text variant="meta">{t('status', { page, totalPages })}</Text>
+      {hasStatus && (
+        <Text variant="meta">{t('status', { page, totalPages })}</Text>
+      )}
       {renderStep(page + 1, t('next'))}
     </Root>
   );

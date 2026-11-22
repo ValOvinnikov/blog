@@ -41,6 +41,10 @@ export default async function DashboardOverviewPage() {
         links: {
           languages: adminRoutes.dashboardLanguages(),
           team: viewer.canManage ? adminRoutes.dashboardTeam() : undefined,
+          subscribers:
+            viewer.canManage && tenant.pageAccess.subscribers
+              ? adminRoutes.dashboardSubscribers()
+              : undefined,
         },
         hasPlansFooter: viewer.isOwner,
       }}
