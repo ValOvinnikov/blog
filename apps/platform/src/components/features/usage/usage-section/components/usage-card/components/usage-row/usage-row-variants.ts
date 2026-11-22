@@ -30,6 +30,9 @@ export const usageRowVariants = tv({
       true: {},
       false: {},
     },
+    isPaused: {
+      true: { count: ['text-platform-bad'] },
+    },
   },
   compoundVariants: [
     {

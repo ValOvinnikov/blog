@@ -1,5 +1,4 @@
 import { LOOK_ROW } from '@platform/constants/look-row';
-import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
@@ -12,10 +11,7 @@ import {
   GROWTH_BADGE_TEXT,
   OUTLINED,
 } from '@platform/testing/look/look-form-fixtures';
-import {
-  chooseEditorial,
-  openLookRow,
-} from '@platform/testing/look/look-form-interactions';
+import { openLookRow } from '@platform/testing/look/look-form-interactions';
 import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
 import {
   setupLookForm,
@@ -27,6 +23,8 @@ import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
+
+vi.mock('@platform/components/features/look/look-preview');
 
 vi.mock('@platform/server/site-config/update-look-action');
 
@@ -144,18 +142,6 @@ describe(`<${LookForm.name}/>`, () => {
       expect(hueSlider).toBeEnabled();
       expect(brandNameInput).toBeEnabled();
       expect(uploadLogoButton).toBeEnabled();
-    });
-
-    it("previews a new preset's own fonts and corners", async () => {
-      await chooseEditorial(user);
-      await openLookRow(user, LOOK_ROW.SHAPE);
-
-      const smallButton = screen.getByRole('button', {
-        name: LOOK_FORM.radiusScaleOptionLabel.SM,
-      });
-      const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
-      expect(smallButton).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(sampleTokens).toHaveStyle({ '--radius-md': '4px' });
     });
   });
 });

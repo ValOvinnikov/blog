@@ -1,10 +1,9 @@
 import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
 import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
 import {
-  COMING_SOON_KEYS,
-  CONFIGURATION_KEYS,
   itemKeyed,
   labelsOf,
+  OPERATOR_CONFIGURATION_KEYS,
   tNavSections as t,
   translated,
 } from '@platform/testing/layout/nav-sections';
@@ -118,8 +117,10 @@ describe(tenantNavSections, () => {
     expect(rest).toEqual([]);
   });
 
-  it('lists every Configuration destination, Look through Subscribers', () => {
-    expect(labelsOf(configuration)).toEqual(translated(CONFIGURATION_KEYS));
+  it('lists every Configuration destination, Look through Email', () => {
+    expect(labelsOf(configuration)).toEqual(
+      translated(OPERATOR_CONFIGURATION_KEYS),
+    );
   });
 
   it.each([
@@ -137,17 +138,10 @@ describe(tenantNavSections, () => {
     expect(item?.href).toBe(href);
   });
 
-  it('marks only Subscribers as unlinked coming soon, with no dot', () => {
+  it('badges no Configuration destination as coming soon', () => {
     const badged = configuration.items.filter((item) => item.badge);
 
-    expect(badged.map((item) => item.label)).toEqual(
-      translated(COMING_SOON_KEYS),
-    );
-    for (const item of badged) {
-      expect(item.badge?.label).toBe(t('badgeComingSoon'));
-      expect(item.badge?.hasDot).toBe(false);
-      expect(item.href).toBeUndefined();
-    }
+    expect(badged).toEqual([]);
   });
 
   it('puts only Team in the Account section, linked to the tenant', () => {

@@ -31,7 +31,8 @@
     "upgrade": "Upgrade",
     "help": "Hilfe",
     "draftPreview": "Entwurfsvorschau",
-    "team": "Team"
+    "team": "Team",
+    "subscribers": "Abonnenten"
   },
   "signInPage": {
     "heading": "Anmelden",
@@ -234,7 +235,6 @@
     "team": "Team",
     "provisioning": "Bereitstellung",
     "dangerZone": "Gefahrenzone",
-    "badgeComingSoon": "Demnächst",
     "badgePlatform": "Plattform",
     "features": "Funktionen",
     "leads": "Anfragen",
@@ -2441,6 +2441,104 @@
     "pay": "{amount} zahlen und wechseln",
     "paying": "Zahlung läuft…"
   },
+  "subscribersPage": {
+    "title": "Abonnenten",
+    "lead": "{count, plural, one {# bestätigter Abonnent erhält jeden neuen Beitrag per E-Mail.} other {# bestätigte Abonnenten erhalten jeden neuen Beitrag per E-Mail.}}",
+    "leadEmpty": "Noch keine bestätigten Abonnenten.",
+    "export": "Als CSV exportieren",
+    "exporting": "Wird exportiert …",
+    "exportFailed": "Der Export konnte nicht erstellt werden. Versuchen Sie es erneut.",
+    "limitsHeading": "Limits",
+    "limitValue": "<count>{used, number}</count> von {limit, number}",
+    "band": {
+      "name": "Abonnentenstufe",
+      "meter": "Abonnenten in der Stufe",
+      "detail": "Bis {ceiling, number}",
+      "narrowUnder": "Noch {left, number} bis zur Stufe {next, number}.",
+      "notes": {
+        "UNDER": "Noch {left, number}, bevor Sie die Stufe {next, number} brauchen.",
+        "UNDER_LARGEST": "Noch {left, number} bis zum Limit der größten Stufe.",
+        "NEAR": "{percent} % genutzt — noch {left, number}",
+        "PAUSED": "Versand pausiert — {over, number} darüber"
+      }
+    },
+    "emails": {
+      "name": "E-Mails diesen Monat",
+      "meter": "Diesen Monat gesendete E-Mails",
+      "detail": "Wird am {date} zurückgesetzt",
+      "narrowDetail": "Reset am {date}",
+      "notes": {
+        "UNDER": "Reicht für {posts, plural, one {# weiteren Beitrag} other {# weitere Beiträge}} an Ihre aktuelle Liste.",
+        "NEAR": "{percent} % genutzt — noch {left, number}",
+        "PAUSED": "Versand pausiert — der nächste Beitrag braucht {count, number}"
+      }
+    },
+    "sending": {
+      "label": "Neue Beiträge per E-Mail an Abonnenten senden",
+      "description": "Schalten Sie dies aus, wenn Sie Ihren Newsletter mit einem anderen Tool versenden. Leser können sich weiterhin anmelden.",
+      "on": "An",
+      "off": "Aus",
+      "offNote": "Solange dies aus ist, werden Beiträge nicht gemailt. Sobald es wieder an ist, können Sie einen in der Zwischenzeit veröffentlichten Beitrag im Studio mit „E-Mails senden“ verschicken. Exportieren Sie die Liste, um sie in Ihrem eigenen Tool zu nutzen.",
+      "saveFailed": "Die Einstellung konnte nicht gespeichert werden. Versuchen Sie es erneut."
+    },
+    "list": {
+      "title": "Bestätigte Abonnenten",
+      "order": "Neueste zuerst",
+      "columnEmail": "E-Mail",
+      "columnConfirmed": "Bestätigt",
+      "columnActions": "Aktionen",
+      "showing": "{from, number}–{to, number} von {count, number} angezeigt",
+      "showingShort": "{from, number}–{to, number} von {count, number}",
+      "confirmedOn": "Bestätigt am {date}",
+      "emailUnavailable": "E-Mail-Adresse nicht verfügbar"
+    },
+    "remove": {
+      "trigger": "{email} entfernen",
+      "triggerUnknown": "Diesen Abonnenten entfernen",
+      "title": "Diesen Abonnenten entfernen?",
+      "description": "Die Person erhält Ihre Beiträge ab sofort nicht mehr. Sie kann sich auf Ihrer Website erneut anmelden.",
+      "confirm": "Entfernen",
+      "confirming": "Wird entfernt …",
+      "failed": "Der Abonnent konnte nicht entfernt werden. Versuchen Sie es erneut.",
+      "alreadyRemoved": "Dieser Abonnent wurde bereits entfernt."
+    },
+    "empty": {
+      "title": "Hier erscheinen Ihre ersten Abonnenten",
+      "description": "Leser melden sich über das Anmeldeformular auf Ihrer Website an und erscheinen hier, sobald sie per E-Mail bestätigt haben. Jeder neue Beitrag wird ihnen dann gemailt.",
+      "action": "Anmeldeformular zu einer Seite hinzufügen"
+    },
+    "notices": {
+      "largestBand": "Sie sind in der größten Stufe.",
+      "operatorPause": {
+        "title": "Beitrags-E-Mails sind für diese Website pausiert",
+        "description": "Shinefold hat den E-Mail-Versand von Beiträgen am {date} pausiert. Wenden Sie sich an den Support, um ihn fortzusetzen.",
+        "descriptionUndated": "Shinefold hat den E-Mail-Versand von Beiträgen für diese Website pausiert. Wenden Sie sich an den Support, um ihn fortzusetzen."
+      },
+      "bandPaused": {
+        "title": "Neue Beiträge werden nicht gemailt",
+        "description": "Sie haben {count, number} Abonnenten, und Ihre Stufe ist {ceiling, number}. „{title}“ ({date}) wurde veröffentlicht, aber nicht gemailt. Sobald Sie wieder innerhalb Ihrer Stufe sind, senden Sie ihn im Studio mit „E-Mails senden“ am Beitrag. Beiträge werden weiterhin veröffentlicht, und Leser können sich weiterhin anmelden.",
+        "descriptionNoPost": "Sie haben {count, number} Abonnenten, und Ihre Stufe ist {ceiling, number}. Beiträge werden weiterhin veröffentlicht, und Leser können sich weiterhin anmelden.",
+        "note": "Oder entfernen Sie Abonnenten, bis Sie bei {ceiling, number} sind."
+      },
+      "emailsPaused": {
+        "title": "Neue Beiträge werden bis zum {date} nicht gemailt",
+        "description": "„{title}“ brauchte {needed, number} E-Mails, und diesen Monat waren nur noch {left, number} übrig, daher wurde er nicht gemailt — Beiträge werden ganz oder gar nicht gesendet. Der Versand beginnt am {resetsOn} wieder; sobald das Kontingent reicht, senden Sie ihn im Studio mit „E-Mails senden“ am Beitrag.",
+        "descriptionNoPost": "Ihr nächster Beitrag braucht {count, number} E-Mails, und Beiträge werden ganz oder gar nicht gesendet. Der Versand beginnt am {resetsOn} wieder.",
+        "note": "{allowance, number} E-Mails pro Monat, ab sofort. Oder warten Sie bis zum {date}."
+      },
+      "bandNear": {
+        "title": "Sie sind nah an Ihrer Abonnentenstufe",
+        "description": "{count, number} von {ceiling, number} Abonnenten. Bei {ceiling, number} werden neue Beiträge nicht mehr gemailt, bis Sie aufsteigen oder die Liste kleiner wird. Beiträge werden weiterhin veröffentlicht, und Leser können sich weiterhin anmelden.",
+        "note": "Oder tun Sie nichts — ohne diesen Klick wird Ihnen nie etwas berechnet."
+      },
+      "emailsNear": {
+        "title": "Sie haben die meisten E-Mails dieses Monats genutzt",
+        "description": "{sent, number} von {allowance, number} gesendet. Ein Beitrag geht nur raus, wenn er ganz passt — Ihr nächster braucht {count, number} und es sind noch {left, number} übrig, also {fit, plural, =0 {passt keiner mehr} =1 {passt noch einer} =2 {passen noch zwei} =3 {passen noch drei} =4 {passen noch vier} =5 {passen noch fünf} =6 {passen noch sechs} =7 {passen noch sieben} =8 {passen noch acht} =9 {passen noch neun} other {passen noch #}}. Das Kontingent wird am {date} zurückgesetzt.",
+        "note": "{allowance, number} E-Mails pro Monat. Oder tun Sie nichts."
+      },
+      "movedUp": "<lead>Sie sind jetzt in der Stufe {ceiling, number}.</lead> Bis zu {ceiling, number} Abonnenten und {allowance, number} E-Mails pro Monat, ab sofort. Ihr nächster Beitrag wird gemailt."
+    }
+  },
   "helpView": {
     "title": "Hilfe",
     "description": "Schreib unserem Support-Team. Wir schicken deine Website, deinen Tarif und dieses Konto automatisch mit.",
@@ -2596,7 +2694,8 @@
     },
     "links": {
       "SEATS": "Team",
-      "LANGUAGES": "Sprachen"
+      "LANGUAGES": "Sprachen",
+      "EMAILS": "Abonnenten"
     },
     "value": "<count>{used, number}</count> von {allowance, number}",
     "failed": "Dieser Wert konnte nicht geladen werden. Laden Sie die Seite neu, um es erneut zu versuchen.",
@@ -2624,7 +2723,8 @@
         "UNDER": "Ihre Standardsprache wird nicht mitgezählt.",
         "NEAR": "{left, plural, one {Noch # Sprache frei.} other {Noch # Sprachen frei.}}",
         "FULL": "Alle belegt. Entfernen Sie eine, um eine weitere hinzuzufügen."
-      }
+      },
+      "paused": "Versand pausiert — der nächste Beitrag braucht {count, number}. Wird am {date} zurückgesetzt."
     }
   },
   "revokeGrantControl": {

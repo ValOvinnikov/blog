@@ -43,6 +43,11 @@ export const dataTableShellVariants = tv({
       'border-t border-platform-line-2 px-platform-cell-inset py-4',
       'text-center text-platform-13-5 text-platform-muted',
     ],
+    footer: [
+      'flex flex-wrap items-center justify-between gap-2',
+      'border-t border-platform-line-2 px-platform-cell-inset py-3',
+      'text-platform-13 text-platform-muted',
+    ],
   },
   variants: {
     isAscending: {

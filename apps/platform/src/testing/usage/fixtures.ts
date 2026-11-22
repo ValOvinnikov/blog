@@ -13,6 +13,7 @@ export const mockUsageMeterRow = (
 ): TUsageMeterRow => ({
   meter: USAGE_METER.TAKEAWAYS,
   reading: { used: MOCK_USAGE_USED, allowance: MOCK_USAGE_ALLOWANCE },
+  pausedPostNeeds: undefined,
   isMonthly: true,
   href: undefined,
   grant: undefined,

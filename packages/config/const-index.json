@@ -1388,6 +1388,12 @@
         "file": "packages/config/src/constants/email-usage-level.ts"
       },
       {
+        "ref": "SUBSCRIBER_LIMIT_STATE.NEAR",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
+      },
+      {
         "ref": "USAGE_LEVEL.NEAR",
         "scope": "app:platform",
         "from": "@platform/constants/usage",
@@ -3494,6 +3500,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
+      },
+      {
+        "ref": "METER_TONE.WARN",
+        "scope": "app:platform",
+        "from": "@platform/constants/meter",
+        "file": "apps/platform/src/constants/meter.ts"
       }
     ],
     "SLOW": [
@@ -4324,6 +4336,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/settings",
         "file": "apps/platform/src/constants/settings.ts"
+      },
+      {
+        "ref": "SUBSCRIBERS_REFUSAL.NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
       },
       {
         "ref": "TENANT_REFUSAL.NOT_FOUND",
@@ -8460,6 +8478,12 @@
         "file": "apps/platform/src/constants/look-row.ts"
       },
       {
+        "ref": "METER_TONE.BRAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/meter",
+        "file": "apps/platform/src/constants/meter.ts"
+      },
+      {
         "ref": "SPINNER_TONE.BRAND",
         "scope": "app:platform",
         "from": "@platform/constants/spinner",
@@ -8588,6 +8612,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/menu-radio-group",
         "file": "apps/platform/src/constants/menu-radio-group.ts"
+      }
+    ],
+    "BAD": [
+      {
+        "ref": "METER_TONE.BAD",
+        "scope": "app:platform",
+        "from": "@platform/constants/meter",
+        "file": "apps/platform/src/constants/meter.ts"
       }
     ],
     "NOT_PAUSED": [
@@ -10046,6 +10078,122 @@
         "scope": "app:platform",
         "from": "@platform/constants/subscribers",
         "file": "apps/platform/src/constants/subscribers.ts"
+      },
+      {
+        "ref": "SUBSCRIBERS_NOTICE.MOVED_UP",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
+      }
+    ],
+    "UNDER": [
+      {
+        "ref": "SUBSCRIBER_LIMIT_STATE.UNDER",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
+      },
+      {
+        "ref": "USAGE_LEVEL.UNDER",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
+    "PAUSED": [
+      {
+        "ref": "SUBSCRIBER_LIMIT_STATE.PAUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
+      }
+    ],
+    "OPERATOR_PAUSE": [
+      {
+        "ref": "SUBSCRIBERS_NOTICE.OPERATOR_PAUSE",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
+      }
+    ],
+    "BAND_PAUSED": [
+      {
+        "ref": "SUBSCRIBERS_NOTICE.BAND_PAUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
+      },
+      {
+        "ref": "OWNER_NEWSLETTER_EMAIL.BAND_PAUSED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-email",
+        "file": "apps/worker/src/constants/owner-email.ts"
+      }
+    ],
+    "EMAILS_PAUSED": [
+      {
+        "ref": "SUBSCRIBERS_NOTICE.EMAILS_PAUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
+      },
+      {
+        "ref": "OWNER_NEWSLETTER_EMAIL.EMAILS_PAUSED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-email",
+        "file": "apps/worker/src/constants/owner-email.ts"
+      }
+    ],
+    "BAND_NEAR": [
+      {
+        "ref": "SUBSCRIBERS_NOTICE.BAND_NEAR",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
+      },
+      {
+        "ref": "OWNER_NEWSLETTER_EMAIL.BAND_NEAR",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-email",
+        "file": "apps/worker/src/constants/owner-email.ts"
+      }
+    ],
+    "EMAILS_NEAR": [
+      {
+        "ref": "SUBSCRIBERS_NOTICE.EMAILS_NEAR",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
+      },
+      {
+        "ref": "OWNER_NEWSLETTER_EMAIL.EMAILS_NEAR",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-email",
+        "file": "apps/worker/src/constants/owner-email.ts"
+      }
+    ],
+    "subscribers.remove_failed": [
+      {
+        "ref": "SUBSCRIBERS_LOG.REMOVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
+      }
+    ],
+    "subscribers.export_failed": [
+      {
+        "ref": "SUBSCRIBERS_LOG.EXPORT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
+      }
+    ],
+    "subscribers.sending_save_failed": [
+      {
+        "ref": "SUBSCRIBERS_LOG.SENDING_SAVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
       }
     ],
     "billing.subscription_collection_failed": [
@@ -10950,14 +11098,6 @@
         "scope": "app:web",
         "from": "@web/constants/pricing",
         "file": "apps/web/src/constants/pricing.ts"
-      }
-    ],
-    "UNDER": [
-      {
-        "ref": "USAGE_LEVEL.UNDER",
-        "scope": "app:platform",
-        "from": "@platform/constants/usage",
-        "file": "apps/platform/src/constants/usage.ts"
       }
     ],
     "usage.meter_read_failed": [
@@ -13563,38 +13703,6 @@
     "owner_email.release_failed": [
       {
         "ref": "OWNER_EMAIL_LOG.RELEASE_FAILED",
-        "scope": "app:worker",
-        "from": "@worker/constants/owner-email",
-        "file": "apps/worker/src/constants/owner-email.ts"
-      }
-    ],
-    "BAND_NEAR": [
-      {
-        "ref": "OWNER_NEWSLETTER_EMAIL.BAND_NEAR",
-        "scope": "app:worker",
-        "from": "@worker/constants/owner-email",
-        "file": "apps/worker/src/constants/owner-email.ts"
-      }
-    ],
-    "EMAILS_NEAR": [
-      {
-        "ref": "OWNER_NEWSLETTER_EMAIL.EMAILS_NEAR",
-        "scope": "app:worker",
-        "from": "@worker/constants/owner-email",
-        "file": "apps/worker/src/constants/owner-email.ts"
-      }
-    ],
-    "BAND_PAUSED": [
-      {
-        "ref": "OWNER_NEWSLETTER_EMAIL.BAND_PAUSED",
-        "scope": "app:worker",
-        "from": "@worker/constants/owner-email",
-        "file": "apps/worker/src/constants/owner-email.ts"
-      }
-    ],
-    "EMAILS_PAUSED": [
-      {
-        "ref": "OWNER_NEWSLETTER_EMAIL.EMAILS_PAUSED",
         "scope": "app:worker",
         "from": "@worker/constants/owner-email",
         "file": "apps/worker/src/constants/owner-email.ts"

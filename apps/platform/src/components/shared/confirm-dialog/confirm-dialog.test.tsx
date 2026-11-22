@@ -4,7 +4,7 @@ import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
-import { SIZE } from '@shinefold/config';
+import { ICONS, SIZE } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
 import { act } from '@testing-library/react';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -89,6 +89,21 @@ const UntypedConfirmDialogHarness = (
   </ConfirmDialog>
 );
 
+const IconTriggerHarness = (props: Pick<THarnessProps, 'onConfirm'>) => (
+  <ConfirmDialog {...props}>
+    <ConfirmDialog.Trigger
+      ariaLabel={MOCK_UNTYPED_TRIGGER_LABEL}
+      icon={ICONS.X}
+    />
+    <ConfirmDialog.Content
+      title={MOCK_TITLE}
+      description={MOCK_DESCRIPTION}
+      confirmButtonLabel={MOCK_CONFIRM_LABEL}
+      confirmingButtonLabel={MOCK_CONFIRMING_LABEL}
+    />
+  </ConfirmDialog>
+);
+
 const InShellMainHarness = (props: THarnessProps) => (
   <main id={SHELL_MAIN_ID} tabIndex={-1}>
     <ConfirmDialogHarness {...props} />
@@ -108,6 +123,10 @@ const setup = customRender(ConfirmDialogHarness, {
 const setupInShellMain = customRender(InShellMainHarness, {
   onConfirm: onConfirmMock,
   returnFocusId: MOCK_MISSING_RETURN_FOCUS_ID,
+});
+
+const setupIconTrigger = customRender(IconTriggerHarness, {
+  onConfirm: onConfirmMock,
 });
 
 const setupUntyped = customRender(UntypedConfirmDialogHarness, {
@@ -359,6 +378,16 @@ describe(`<${ConfirmDialog.name}/>`, () => {
       const dialog = screen.queryByRole('alertdialog');
       expect(dialog).not.toBeInTheDocument();
     });
+  });
+
+  it('names an icon-only trigger and gives it the same tooltip', () => {
+    setupIconTrigger();
+
+    const trigger = screen.getByRole('button', {
+      name: MOCK_UNTYPED_TRIGGER_LABEL,
+    });
+
+    expect(trigger).toHaveAttribute('title', MOCK_UNTYPED_TRIGGER_LABEL);
   });
 
   it('renders the trigger enabled with no reason when none is given', () => {

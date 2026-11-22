@@ -31,7 +31,8 @@
     "upgrade": "Mejorar plan",
     "help": "Ayuda",
     "draftPreview": "Vista previa del borrador",
-    "team": "Equipo"
+    "team": "Equipo",
+    "subscribers": "Suscriptores"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -234,7 +235,6 @@
     "team": "Equipo",
     "provisioning": "Aprovisionamiento",
     "dangerZone": "Zona de peligro",
-    "badgeComingSoon": "Próximamente",
     "badgePlatform": "plataforma",
     "features": "Funciones",
     "leads": "Contactos",
@@ -2441,6 +2441,104 @@
     "pay": "Pagar {amount} y subir",
     "paying": "Pagando…"
   },
+  "subscribersPage": {
+    "title": "Suscriptores",
+    "lead": "{count, plural, one {# suscriptor confirmado recibe cada nueva entrada por correo.} other {# suscriptores confirmados reciben cada nueva entrada por correo.}}",
+    "leadEmpty": "Aún no hay suscriptores confirmados.",
+    "export": "Exportar CSV",
+    "exporting": "Exportando…",
+    "exportFailed": "No se ha podido crear la exportación. Inténtelo de nuevo.",
+    "limitsHeading": "Límites",
+    "limitValue": "<count>{used, number}</count> de {limit, number}",
+    "band": {
+      "name": "Tramo de suscriptores",
+      "meter": "Suscriptores en el tramo",
+      "detail": "Hasta {ceiling, number}",
+      "narrowUnder": "{left, number} más antes del tramo de {next, number}.",
+      "notes": {
+        "UNDER": "{left, number} más antes de necesitar el tramo de {next, number}.",
+        "UNDER_LARGEST": "{left, number} más antes de llegar al límite del tramo más grande.",
+        "NEAR": "{percent} % usado — quedan {left, number}",
+        "PAUSED": "Envío en pausa — {over, number} por encima"
+      }
+    },
+    "emails": {
+      "name": "Correos este mes",
+      "meter": "Correos enviados este mes",
+      "detail": "Se reinicia el {date}",
+      "narrowDetail": "Se reinicia el {date}",
+      "notes": {
+        "UNDER": "Suficiente para {posts, plural, one {# entrada más} other {# entradas más}} a su lista actual.",
+        "NEAR": "{percent} % usado — quedan {left, number}",
+        "PAUSED": "Envío en pausa — la próxima entrada necesita {count, number}"
+      }
+    },
+    "sending": {
+      "label": "Enviar las nuevas entradas por correo a los suscriptores",
+      "description": "Desactívelo si envía su boletín con otra herramienta. Los lectores pueden seguir suscribiéndose.",
+      "on": "Activado",
+      "off": "Desactivado",
+      "offNote": "Mientras esté desactivado, las entradas no se envían por correo. Cuando vuelva a activarlo, podrá enviar una entrada publicada entretanto con Enviar correos en el Studio. Exporte la lista para usarla en su propia herramienta.",
+      "saveFailed": "No se ha podido guardar el ajuste. Inténtelo de nuevo."
+    },
+    "list": {
+      "title": "Suscriptores confirmados",
+      "order": "Más recientes primero",
+      "columnEmail": "Correo",
+      "columnConfirmed": "Confirmado",
+      "columnActions": "Acciones",
+      "showing": "Mostrando {from, number}–{to, number} de {count, number}",
+      "showingShort": "{from, number}–{to, number} de {count, number}",
+      "confirmedOn": "Confirmado el {date}",
+      "emailUnavailable": "Correo no disponible"
+    },
+    "remove": {
+      "trigger": "Eliminar {email}",
+      "triggerUnknown": "Eliminar este suscriptor",
+      "title": "¿Eliminar este suscriptor?",
+      "description": "Dejará de recibir sus entradas de inmediato. Puede volver a suscribirse desde su sitio.",
+      "confirm": "Eliminar",
+      "confirming": "Eliminando…",
+      "failed": "No se ha podido eliminar el suscriptor. Inténtelo de nuevo.",
+      "alreadyRemoved": "Este suscriptor ya se había eliminado."
+    },
+    "empty": {
+      "title": "Aquí aparecerán sus primeros suscriptores",
+      "description": "Los lectores se suscriben desde el formulario de su sitio y aparecen aquí cuando confirman por correo. Después, cada nueva entrada se les envía por correo.",
+      "action": "Añadir un formulario de suscripción a una página"
+    },
+    "notices": {
+      "largestBand": "Está en el tramo más grande.",
+      "operatorPause": {
+        "title": "Los correos de entradas están en pausa en este sitio",
+        "description": "Shinefold pausó el envío de entradas por correo el {date}. Contacte con soporte para reanudarlo.",
+        "descriptionUndated": "Shinefold pausó el envío de entradas por correo en este sitio. Contacte con soporte para reanudarlo."
+      },
+      "bandPaused": {
+        "title": "Las nuevas entradas no se están enviando por correo",
+        "description": "Tiene {count, number} suscriptores y su tramo es de {ceiling, number}. «{title}» ({date}) se publicó pero no se envió por correo. Cuando vuelva a estar dentro de su tramo, envíela con Enviar correos en la entrada en el Studio. Las entradas se siguen publicando y los lectores pueden seguir suscribiéndose.",
+        "descriptionNoPost": "Tiene {count, number} suscriptores y su tramo es de {ceiling, number}. Las entradas se siguen publicando y los lectores pueden seguir suscribiéndose.",
+        "note": "O elimine suscriptores hasta llegar a {ceiling, number}."
+      },
+      "emailsPaused": {
+        "title": "Las nuevas entradas no se enviarán por correo hasta el {date}",
+        "description": "«{title}» necesitaba {needed, number} correos y quedaban {left, number} este mes, así que no se envió — las entradas se envían completas o no se envían. El envío se reanuda el {resetsOn}; cuando el cupo lo cubra, envíela con Enviar correos en la entrada en el Studio.",
+        "descriptionNoPost": "Su próxima entrada necesita {count, number} correos, y las entradas se envían completas o no se envían. El envío se reanuda el {resetsOn}.",
+        "note": "{allowance, number} correos al mes, desde ahora. O espere al {date}."
+      },
+      "bandNear": {
+        "title": "Está cerca de su tramo de suscriptores",
+        "description": "{count, number} de {ceiling, number} suscriptores. Al llegar a {ceiling, number}, las nuevas entradas dejan de enviarse por correo hasta que suba de tramo o la lista se reduzca. Las entradas se siguen publicando y los lectores pueden seguir suscribiéndose.",
+        "note": "O no haga nada — nunca se le cobra sin este clic."
+      },
+      "emailsNear": {
+        "title": "Ha usado la mayoría de los correos de este mes",
+        "description": "{sent, number} de {allowance, number} enviados. Una entrada solo sale si cabe completa — la próxima necesita {count, number} y quedan {left, number}, así que {fit, plural, =0 {no cabe ninguna más} =1 {cabe una más} =2 {caben dos más} =3 {caben tres más} =4 {caben cuatro más} =5 {caben cinco más} =6 {caben seis más} =7 {caben siete más} =8 {caben ocho más} =9 {caben nueve más} other {caben # más}}. El cupo se reinicia el {date}.",
+        "note": "{allowance, number} correos al mes. O no haga nada."
+      },
+      "movedUp": "<lead>Ya está en el tramo de {ceiling, number}.</lead> Hasta {ceiling, number} suscriptores y {allowance, number} correos al mes, desde ahora. Su próxima entrada se enviará por correo."
+    }
+  },
   "helpView": {
     "title": "Ayuda",
     "description": "Envía un mensaje a nuestro equipo de soporte. Incluimos tu sitio, tu plan y esta cuenta, para que no tengas que hacerlo tú.",
@@ -2596,7 +2694,8 @@
     },
     "links": {
       "SEATS": "Equipo",
-      "LANGUAGES": "Idiomas"
+      "LANGUAGES": "Idiomas",
+      "EMAILS": "Suscriptores"
     },
     "value": "<count>{used, number}</count> de {allowance, number}",
     "failed": "No se pudo cargar este recuento. Recargue la página para intentarlo de nuevo.",
@@ -2624,7 +2723,8 @@
         "UNDER": "Su idioma predeterminado no cuenta.",
         "NEAR": "{left, plural, one {Queda # idioma.} other {Quedan # idiomas.}}",
         "FULL": "Todos en uso. Quite uno para añadir otro."
-      }
+      },
+      "paused": "Envío en pausa — la próxima entrada necesita {count, number}. Se reinicia el {date}."
     }
   },
   "revokeGrantControl": {

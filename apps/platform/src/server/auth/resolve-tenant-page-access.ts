@@ -10,7 +10,9 @@ export const resolveTenantPageAccess = async (
   { isOwner, canManage, isSuperAdmin }: TPlatformViewer,
 ): Promise<TPlanPageAccess> => {
   const access = { ...pageAccess, billing: isOwner || isSuperAdmin };
-  if (!canManage) return { ...access, leads: false, team: false };
+  if (!canManage) {
+    return { ...access, leads: false, subscribers: false, team: false };
+  }
   if (access.leads) return access;
 
   return { ...access, leads: await hasStoredLeads(id) };

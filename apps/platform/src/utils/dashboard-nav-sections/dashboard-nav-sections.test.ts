@@ -89,6 +89,7 @@ describe(dashboardNavSections, () => {
     ['domain', adminRoutes.dashboardDomain()],
     ['signIn', adminRoutes.dashboardSignIn()],
     ['email', adminRoutes.dashboardEmail()],
+    ['subscribers', adminRoutes.dashboardSubscribers()],
   ])('links Configuration %s to its dashboard page', (key, href) => {
     const item = itemKeyed(configurationOfDashboard(), key);
 

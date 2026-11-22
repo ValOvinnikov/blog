@@ -32,6 +32,7 @@ const MOCK_TITLE = faker.lorem.words(2);
 const MOCK_COUNT = faker.lorem.words(2);
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_NOTE = faker.lorem.sentence();
+const MOCK_FOOTER = faker.lorem.sentence();
 const MOCK_ACTIONS_LABEL = faker.lorem.word();
 const MOCK_STATUS_LABEL = faker.lorem.words(2);
 const MOCK_ID_LABEL = faker.lorem.words(3);
@@ -233,6 +234,7 @@ describe(`<${DataTableShell.name}/>`, () => {
               <button type="button">{MOCK_TOOLBAR_LABEL}</button>
             </DataTableShell.Toolbar>
             <DataTableShell.Note>{MOCK_NOTE}</DataTableShell.Note>
+            <DataTableShell.Footer>{MOCK_FOOTER}</DataTableShell.Footer>
           </>
         ),
       });
@@ -251,6 +253,7 @@ describe(`<${DataTableShell.name}/>`, () => {
       ['count', MOCK_COUNT],
       ['supporting line', MOCK_SUPPORTING_TEXT],
       ['note', MOCK_NOTE],
+      ['footer row', MOCK_FOOTER],
     ])('shows the %s', (_part, text) => {
       const shown = screen.getByText(text);
 

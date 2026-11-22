@@ -31,7 +31,8 @@
     "upgrade": "Upgrade",
     "help": "Help",
     "draftPreview": "Draft preview",
-    "team": "Team"
+    "team": "Team",
+    "subscribers": "Subscribers"
   },
   "signInPage": {
     "heading": "Sign in",
@@ -234,7 +235,6 @@
     "team": "Team",
     "provisioning": "Provisioning",
     "dangerZone": "Danger zone",
-    "badgeComingSoon": "Coming soon",
     "badgePlatform": "platform",
     "features": "Features",
     "leads": "Leads",
@@ -2441,6 +2441,104 @@
     "pay": "Pay {amount} and move up",
     "paying": "Paying…"
   },
+  "subscribersPage": {
+    "title": "Subscribers",
+    "lead": "{count, plural, one {# confirmed subscriber gets each new post by email.} other {# confirmed subscribers get each new post by email.}}",
+    "leadEmpty": "No confirmed subscribers yet.",
+    "export": "Export CSV",
+    "exporting": "Exporting…",
+    "exportFailed": "The export couldn't be made. Try again.",
+    "limitsHeading": "Limits",
+    "limitValue": "<count>{used, number}</count> of {limit, number}",
+    "band": {
+      "name": "Subscriber band",
+      "meter": "Subscribers in band",
+      "detail": "Up to {ceiling, number}",
+      "narrowUnder": "{left, number} more before the {next, number} band.",
+      "notes": {
+        "UNDER": "{left, number} more before you need the {next, number} band.",
+        "UNDER_LARGEST": "{left, number} more before you reach the largest band's limit.",
+        "NEAR": "{percent}% used — {left, number} left",
+        "PAUSED": "Sending paused — {over, number} over"
+      }
+    },
+    "emails": {
+      "name": "Emails this month",
+      "meter": "Emails sent this month",
+      "detail": "Resets on {date}",
+      "narrowDetail": "Resets {date}",
+      "notes": {
+        "UNDER": "Enough for {posts, plural, one {# more post} other {# more posts}} to your current list.",
+        "NEAR": "{percent}% used — {left, number} left",
+        "PAUSED": "Sending paused — next post needs {count, number}"
+      }
+    },
+    "sending": {
+      "label": "Email new posts to subscribers",
+      "description": "Turn this off if you send your newsletter from another tool. Readers can still subscribe.",
+      "on": "On",
+      "off": "Off",
+      "offNote": "Posts aren't emailed while this is off. Once it's back on, you can send a post published meanwhile with Send emails in the Studio. Export the list to use it in your own tool.",
+      "saveFailed": "The setting couldn't be saved. Try again."
+    },
+    "list": {
+      "title": "Confirmed subscribers",
+      "order": "Newest first",
+      "columnEmail": "Email",
+      "columnConfirmed": "Confirmed",
+      "columnActions": "Actions",
+      "showing": "Showing {from, number}–{to, number} of {count, number}",
+      "showingShort": "{from, number}–{to, number} of {count, number}",
+      "confirmedOn": "Confirmed {date}",
+      "emailUnavailable": "Email unavailable"
+    },
+    "remove": {
+      "trigger": "Remove {email}",
+      "triggerUnknown": "Remove this subscriber",
+      "title": "Remove this subscriber?",
+      "description": "They stop getting your posts at once. They can subscribe again from your site.",
+      "confirm": "Remove",
+      "confirming": "Removing…",
+      "failed": "The subscriber couldn't be removed. Try again.",
+      "alreadyRemoved": "This subscriber was already removed."
+    },
+    "empty": {
+      "title": "Your first subscribers will show up here",
+      "description": "Readers join from the sign-up form on your site and appear once they confirm by email. Each new post is then emailed to them.",
+      "action": "Add a sign-up form to a page"
+    },
+    "notices": {
+      "largestBand": "You're on the largest band.",
+      "operatorPause": {
+        "title": "Post emails are paused for this site",
+        "description": "Shinefold paused emailing posts on {date}. Contact support to resume.",
+        "descriptionUndated": "Shinefold paused emailing posts for this site. Contact support to resume."
+      },
+      "bandPaused": {
+        "title": "New posts aren't being emailed",
+        "description": "You have {count, number} subscribers and your band is {ceiling, number}. “{title}” ({date}) was published but not emailed. Once you're within your band, send it with Send emails on the post in the Studio. Posts still publish and readers can still subscribe.",
+        "descriptionNoPost": "You have {count, number} subscribers and your band is {ceiling, number}. Posts still publish and readers can still subscribe.",
+        "note": "Or remove subscribers until you're at {ceiling, number}."
+      },
+      "emailsPaused": {
+        "title": "New posts aren't being emailed until {date}",
+        "description": "“{title}” needed {needed, number} emails and {left, number} were left this month, so it wasn't emailed — posts are sent whole or not at all. Sending starts again on {resetsOn}; once the allowance covers it, send it with Send emails on the post in the Studio.",
+        "descriptionNoPost": "Your next post needs {count, number} emails, and posts are sent whole or not at all. Sending starts again on {resetsOn}.",
+        "note": "{allowance, number} emails a month, from now. Or wait for {date}."
+      },
+      "bandNear": {
+        "title": "You're close to your subscriber band",
+        "description": "{count, number} of {ceiling, number} subscribers. At {ceiling, number}, new posts stop being emailed until you move up or the list shrinks. Posts still publish and readers can still subscribe.",
+        "note": "Or do nothing — you're never charged without this click."
+      },
+      "emailsNear": {
+        "title": "You've used most of this month's emails",
+        "description": "{sent, number} of {allowance, number} sent. A post goes out only if it fits whole — your next one needs {count, number} and {left, number} are left, so {fit, plural, =0 {no more fit} =1 {one more fits} =2 {two more fit} =3 {three more fit} =4 {four more fit} =5 {five more fit} =6 {six more fit} =7 {seven more fit} =8 {eight more fit} =9 {nine more fit} other {# more fit}}. The allowance resets on {date}.",
+        "note": "{allowance, number} emails a month. Or do nothing."
+      },
+      "movedUp": "<lead>You're on the {ceiling, number} band.</lead> Up to {ceiling, number} subscribers and {allowance, number} emails a month, starting now. Your next post will be emailed."
+    }
+  },
   "helpView": {
     "title": "Help",
     "description": "Send a message to our support team. We include your site, plan and this account with it, so you don't need to.",
@@ -2596,7 +2694,8 @@
     },
     "links": {
       "SEATS": "Team",
-      "LANGUAGES": "Languages"
+      "LANGUAGES": "Languages",
+      "EMAILS": "Subscribers"
     },
     "value": "<count>{used, number}</count> of {allowance, number}",
     "failed": "Couldn't load this count. Reload the page to try again.",
@@ -2624,7 +2723,8 @@
         "UNDER": "Your default language isn't counted.",
         "NEAR": "{left, plural, one {# language left.} other {# languages left.}}",
         "FULL": "All in use. Remove one to add another."
-      }
+      },
+      "paused": "Sending paused — next post needs {count, number}. Resets on {date}."
     }
   },
   "revokeGrantControl": {

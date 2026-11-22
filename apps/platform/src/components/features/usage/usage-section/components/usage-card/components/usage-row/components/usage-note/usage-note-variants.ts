@@ -17,6 +17,9 @@ export const usageNoteVariants = tv({
       true: {},
       false: {},
     },
+    isPaused: {
+      true: { root: ['font-semibold text-platform-bad'] },
+    },
   },
   compoundVariants: [
     {

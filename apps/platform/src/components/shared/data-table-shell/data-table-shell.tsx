@@ -11,6 +11,7 @@ import { hasLength } from '@shinefold/utils/primitives';
 import type { ElementType, ReactElement, ReactNode } from 'react';
 
 import { DataTableShellCell } from './components/cell/data-table-shell-cell';
+import { DataTableShellFooter } from './components/footer/data-table-shell-footer';
 import {
   DataTableShellHeadCell,
   type TDataTableShellColumnSort,
@@ -29,6 +30,7 @@ const DataTableShellSlots = {
   Title: DataTableShellTitle,
   Toolbar: DataTableShellToolbar,
   Note: DataTableShellNote,
+  Footer: DataTableShellFooter,
 } satisfies Record<string, ElementType>;
 
 const DataTableShellParts = {
@@ -127,6 +129,7 @@ const DataTableShellRoot = <TItem,>({
           <p className={empty()}>{emptyMessage}</p>
         )}
         {slots.Note}
+        {slots.Footer}
       </>
     </Card>
   );

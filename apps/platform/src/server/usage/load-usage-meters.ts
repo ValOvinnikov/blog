@@ -6,7 +6,6 @@ import {
   type TUsageMeter,
 } from '@platform/constants/usage';
 import type { TGrantProvenance } from '@platform/utils/granted-entitlements/granted-entitlements';
-import { toAdditionalLanguages } from '@platform/utils/locale-limit/locale-limit';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
@@ -14,9 +13,17 @@ import type { TUsageReading } from '@platform/utils/usage-summary/usage-summary'
 import { CAPABILITY, type TMaybeUndefined } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 
+import {
+  countedMeter,
+  readEmailsMeter,
+  readLanguagesMeter,
+  type TUsageMeterRead,
+} from './usage-meter-read';
+
 export type TUsageMeterRow = {
   meter: TUsageMeter;
   reading: TMaybeUndefined<TUsageReading>;
+  pausedPostNeeds: TMaybeUndefined<number>;
   isMonthly: boolean;
   href: TMaybeUndefined<string>;
   grant: TMaybeUndefined<TGrantProvenance>;
@@ -25,10 +32,11 @@ export type TUsageMeterRow = {
 export type TUsageLinks = {
   languages: string;
   team?: string;
+  subscribers?: string;
 };
 
-type TUsageMeterSource = Omit<TUsageMeterRow, 'reading'> & {
-  read: () => Promise<TUsageReading>;
+type TUsageMeterSource = Omit<TUsageMeterRow, 'reading' | 'pausedPostNeeds'> & {
+  read: () => Promise<TUsageMeterRead>;
 };
 
 const readMeter = async (
@@ -36,14 +44,14 @@ const readMeter = async (
   { read, ...row }: TUsageMeterSource,
 ): Promise<TUsageMeterRow> => {
   try {
-    return { ...row, reading: await read() };
+    return { ...row, ...(await read()) };
   } catch (error) {
     logger.error(USAGE_LOG.METER_READ_FAILED, {
       tenantId,
       meter: row.meter,
       ...toLoggableError(error),
     });
-    return { ...row, reading: undefined };
+    return { ...row, reading: undefined, pausedPostNeeds: undefined };
   }
 };
 
@@ -60,26 +68,20 @@ const meterSources = (
       isMonthly: true,
       href: undefined,
       grant: undefined,
-      read: async () => ({
-        used: await queries.takeawayGenerations.countTakeawayGenerationsThisMonth(
-          id,
+      read: () =>
+        countedMeter(
+          queries.takeawayGenerations.countTakeawayGenerationsThisMonth(id),
+          takeawaysPerMonth,
         ),
-        allowance: takeawaysPerMonth,
-      }),
     },
     ...(capabilities.includes(CAPABILITY.NEWSLETTER)
       ? [
           {
             meter: USAGE_METER.EMAILS,
             isMonthly: true,
-            href: undefined,
+            href: links.subscribers,
             grant: grantedEntitlements.capabilities[CAPABILITY.NEWSLETTER],
-            read: async () => {
-              const { sentThisMonth, allowance } =
-                await queries.emailUsage.getNewsletterLimits(tenant);
-
-              return { used: sentThisMonth, allowance };
-            },
+            read: () => readEmailsMeter(tenant),
           },
         ]
       : []),
@@ -90,10 +92,11 @@ const meterSources = (
             isMonthly: false,
             href: links.team,
             grant: undefined,
-            read: async () => ({
-              used: await queries.membershipInvites.countSeatsInUse(id),
-              allowance: seats,
-            }),
+            read: () =>
+              countedMeter(
+                queries.membershipInvites.countSeatsInUse(id),
+                seats,
+              ),
           },
         ]
       : []),
@@ -104,15 +107,7 @@ const meterSources = (
             isMonthly: false,
             href: links.languages,
             grant: grantedEntitlements.localeLimit,
-            read: async () => {
-              const [, ...liveAdditionalLocales] =
-                queries.tenants.selectLiveLocalesWithin(tenant, entitlements);
-
-              return {
-                used: liveAdditionalLocales.length,
-                allowance: toAdditionalLanguages(localeLimit),
-              };
-            },
+            read: () => readLanguagesMeter(tenant),
           },
         ]
       : []),

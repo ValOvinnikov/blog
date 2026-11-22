@@ -10,6 +10,7 @@ export const alertVariants = tv({
     title: ['block text-platform-13-5 font-semibold'],
     description: [],
     action: ['flex flex-wrap items-center gap-2'],
+    actionNote: [],
   },
   variants: {
     type: {
@@ -46,6 +47,25 @@ export const alertVariants = tv({
         description: [
           'text-platform-13 leading-platform-19 text-platform-text',
         ],
+      },
+    },
+    isLarge: {
+      true: {
+        root: [
+          'flex-nowrap items-start gap-2.5 p-4 md:gap-4 md:p-5',
+          'shadow-none',
+        ],
+        icon: ['mt-0.5 size-5 md:size-5.5'],
+        text: ['flex min-w-0 flex-1 flex-col gap-1'],
+        title: ['m-0 text-platform-15 font-semibold md:text-platform-16'],
+        description: ['text-platform-14 leading-normal text-platform-text'],
+        action: ['mt-3 gap-x-4 gap-y-3', 'max-md:[&>*:first-child]:w-full'],
+        actionNote: ['hidden text-platform-13 text-platform-muted md:block'],
+      },
+    },
+    hasTitle: {
+      false: {
+        root: ['items-center px-5 py-4 md:gap-3.5 md:px-5 md:py-4'],
       },
     },
   },

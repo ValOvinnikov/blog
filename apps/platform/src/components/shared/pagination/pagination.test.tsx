@@ -2,7 +2,7 @@ import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { findServerEventHandlers } from '@platform/testing/server-event-handlers';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Pagination } from './pagination';
 
@@ -66,25 +66,37 @@ describe(`<${Pagination.name}/>`, () => {
     expect(button).toBeDisabled();
   });
 
+  it('leaves out the current position when the caller shows its own', () => {
+    setup({ hasStatus: false });
+
+    const position = screen.queryByText(
+      t('status', { page: 2, totalPages: 3 }),
+    );
+
+    expect(position).not.toBeInTheDocument();
+  });
+
+  it.each([
+    [PREVIOUS, 1],
+    [NEXT, 3],
+  ])('hides %s on page %i when asked to', (name, page) => {
+    setup({ page, isUnavailableStepHidden: true });
+
+    const button = screen.queryByRole('button', { name });
+
+    expect(button).not.toBeInTheDocument();
+  });
+
   describe('with a page handler instead of links', () => {
     const onPageChange = vi.fn();
+    let user: UserEvent;
 
     beforeEach(() => {
+      user = userEvent.setup();
       onPageChange.mockReset();
     });
 
-    it('asks for the neighbouring page', async () => {
-      const user = userEvent.setup();
-      setup({ pageHref: undefined, onPageChange });
-
-      const nextButton = screen.getByRole('button', { name: NEXT });
-      await user.click(nextButton);
-
-      expect(onPageChange).toHaveBeenCalledWith(3);
-    });
-
     it('keeps the boundary step focusable but inert', async () => {
-      const user = userEvent.setup();
       setup({ page: 1, pageHref: undefined, onPageChange });
 
       const previous = screen.getByRole('button', { name: PREVIOUS });
@@ -94,14 +106,25 @@ describe(`<${Pagination.name}/>`, () => {
       expect(onPageChange).not.toHaveBeenCalled();
     });
 
-    it('is a named group, not a navigation landmark', () => {
-      setup({ pageHref: undefined, onPageChange });
+    describe('between the first and last page', () => {
+      beforeEach(() => {
+        setup({ pageHref: undefined, onPageChange });
+      });
 
-      const group = screen.getByRole('group', { name: PAGINATION });
-      const navigation = screen.queryByRole('navigation');
+      it('asks for the neighbouring page', async () => {
+        const nextButton = screen.getByRole('button', { name: NEXT });
+        await user.click(nextButton);
 
-      expect(group).toBeVisible();
-      expect(navigation).not.toBeInTheDocument();
+        expect(onPageChange).toHaveBeenCalledWith(3);
+      });
+
+      it('is a named group, not a navigation landmark', () => {
+        const group = screen.getByRole('group', { name: PAGINATION });
+        const navigation = screen.queryByRole('navigation');
+
+        expect(group).toBeVisible();
+        expect(navigation).not.toBeInTheDocument();
+      });
     });
   });
 

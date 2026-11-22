@@ -7,7 +7,7 @@ const FORMULA_TRIGGER = /^[=+\-@\t\r]/;
 const NEEDS_QUOTES = /[",\r\n]/;
 const ROW_SEPARATOR = '\r\n';
 // Without a byte-order mark Excel reads the file as ANSI and garbles non-ASCII text.
-const UTF8_BOM = '﻿';
+export const UTF8_BOM = '﻿';
 
 function toCsvCell(value: TCsvCell): string {
   if (isNull(value) || isUndefined(value)) return '';

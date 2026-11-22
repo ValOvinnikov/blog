@@ -13,6 +13,9 @@ import {
  */
 export const STUDIO_SEGMENT = 'studio';
 
+const STUDIO_STRUCTURE_TOOL = 'structure';
+const STUDIO_PAGES_PANE = 'pages';
+
 export const SIGN_IN_PATH = '/sign-in';
 
 export const adminRoutes = {
@@ -76,13 +79,16 @@ export const adminRoutes = {
   dashboardLanguages: () => '/dashboard/languages',
   dashboardEmail: () => '/dashboard/email',
   dashboardLeads: () => '/dashboard/leads',
-  dashboardSubscribers: () => '/dashboard/subscribers',
+  dashboardSubscribers: (page = 1) =>
+    page > 1 ? `/dashboard/subscribers?page=${page}` : '/dashboard/subscribers',
   dashboardSubscribersMovedUp: (ceiling: number) =>
     `${adminRoutes.dashboardSubscribers()}?${new URLSearchParams({ [SUBSCRIBERS_SEARCH_PARAM.MOVED_UP]: String(ceiling) })}`,
   dashboardUpgrade: () => '/dashboard/upgrade',
   dashboardTeam: () => '/dashboard/team',
   dashboardBilling: () => '/dashboard/billing',
   dashboardStudio: () => `/dashboard/${STUDIO_SEGMENT}`,
+  dashboardStudioPages: () =>
+    `${adminRoutes.dashboardStudio()}/${STUDIO_STRUCTURE_TOOL}/${STUDIO_PAGES_PANE}`,
   dashboardDraftPreviews: () => `/dashboard/${DRAFT_PREVIEW_SEGMENT}`,
   dashboardDraftPreview: (documentId: string) =>
     `${adminRoutes.dashboardDraftPreviews()}/${encodeURIComponent(documentId)}`,

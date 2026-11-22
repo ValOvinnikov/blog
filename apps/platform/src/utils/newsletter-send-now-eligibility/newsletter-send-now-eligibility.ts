@@ -1,4 +1,9 @@
 import {
+  isOutOfMonthlyEmails,
+  isOverSubscriberBand,
+  monthlyEmailsLeft,
+} from '@platform/utils/newsletter-pause-state/newsletter-pause-state';
+import {
   NEWSLETTER_HAND_SENDABLE_SKIP_REASONS,
   NEWSLETTER_SEND_NOW_REFUSAL,
   NEWSLETTER_SKIP_REASON,
@@ -43,8 +48,8 @@ export const toSendNowEligibility = ({
     return { isOffered: true, disabledBy: sendingOffCause };
   }
 
-  const { activeCount, bandCeiling, allowance, sentThisMonth } = limits;
-  if (activeCount > bandCeiling) {
+  const { activeCount, bandCeiling } = limits;
+  if (isOverSubscriberBand(limits)) {
     return {
       isOffered: true,
       disabledBy: NEWSLETTER_SEND_NOW_REFUSAL.OVER_BAND,
@@ -52,8 +57,8 @@ export const toSendNowEligibility = ({
     };
   }
 
-  const emailsLeft = Math.max(0, allowance - sentThisMonth);
-  if (activeCount > emailsLeft) {
+  const emailsLeft = monthlyEmailsLeft(limits);
+  if (isOutOfMonthlyEmails(limits)) {
     return {
       isOffered: true,
       disabledBy: NEWSLETTER_SEND_NOW_REFUSAL.OVER_MONTH,
