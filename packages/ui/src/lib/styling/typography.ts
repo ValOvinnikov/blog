@@ -27,7 +27,7 @@ export const TYPOGRAPHY: Record<TTextRole, string> = {
   [TEXT_ROLE.LABEL]:
     'font-mono text-label font-medium uppercase tracking-label',
   [TEXT_ROLE.FOOTNOTE]: 'font-read text-caption text-text-subtle',
-  [TEXT_ROLE.CAPTION]: SUBTLE_MONO,
+  [TEXT_ROLE.CAPTION]: `${SUBTLE_MONO} text-label`,
   [TEXT_ROLE.QUOTE]: 'font-read italic text-prose text-text',
   [TEXT_ROLE.ATTRIBUTION]: 'font-medium text-text',
   [TEXT_ROLE.FIGURE]:
