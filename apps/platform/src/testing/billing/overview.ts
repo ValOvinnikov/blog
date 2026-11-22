@@ -5,7 +5,7 @@ import {
   MOCK_STRIPE_CUSTOMER_ID,
   MOCK_STRIPE_SUBSCRIPTION_ID,
 } from '@platform/testing/billing/fixtures';
-import type { TStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
+import type { TStripeAmount } from '@shinefold/config';
 import type { TTenantBilling } from '@shinefold/db/queries/tenants/tenant-billing';
 import { MOCK_EMPTY_TENANT_BILLING } from '@shinefold/db/testing/tenants/billing';
 

@@ -1,16 +1,23 @@
-import { INTERACTIVE_ITEM_CARD, tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import {
+  CARD_CONTAINER,
+  INTERACTIVE_ITEM_CARD,
+  tv,
+  TYPOGRAPHY,
+} from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const taxonomyCardVariants = tv({
   slots: {
     root: [
-      '@container/card relative isolate flex h-full flex-col gap-2',
+      CARD_CONTAINER,
+      'relative isolate flex h-full flex-col gap-2',
       'item-card surface-card',
       'px-card-x py-card-y',
     ],
     accessibleName: ['sr-only'],
-    description: ['text-lead', 'text-muted line-clamp-2'],
-    count: ['font-mono text-meta', 'text-subtle'],
+    description: [TYPOGRAPHY[TEXT_ROLE.CARD_BODY], 'line-clamp-2'],
+    count: [TYPOGRAPHY[TEXT_ROLE.META]],
   },
   variants: {
     isInteractive: {

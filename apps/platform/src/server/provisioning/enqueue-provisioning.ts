@@ -1,39 +1,74 @@
+import { PROVISION_PATH } from '@platform/constants/provisioning';
 import { WORKER_LOG } from '@platform/constants/worker';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { workerSecretsEnv } from '@platform/utils/worker-secrets-env/worker-secrets-env';
 import { HTTP_METHOD, type TMaybeNull } from '@shinefold/config';
 import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
 import { buildEnqueueHeaders } from '@shinefold/utils/enqueue-signature';
 
-const PROVISION_PATH = '/api/provision';
 // Twice the platform's other outbound calls: the worker admits the row and starts the run before it answers.
 const ENQUEUE_TIMEOUT_MS = 10_000;
 
 type TWorkerRequestBody = {
   tenantId: string;
   formerOwnerEmail?: string;
+  membershipId?: string;
+  memberEmail?: string;
+  sanityUserId?: string;
   domain?: string;
   locales?: TLocaleIsoCode[];
+  postId?: string;
+  claimedAt?: string;
 };
 
-/** Never throws: a missing worker URL or secret, or a network failure, is logged and returns `null`; any response returns its status. */
-export const enqueueWorkerRequest = async (
+type TWorkerRequestOptions = {
+  timeoutMs?: number;
+  readsBody?: boolean;
+  secretName?: keyof typeof workerSecretsEnv;
+};
+
+export type TWorkerResponse =
+  | { status: number; body?: unknown }
+  | {
+      status: null;
+      failureEvent: TValueOf<typeof WORKER_LOG>;
+      failure: Record<string, unknown>;
+    };
+
+// A gateway or protection page answers HTML, which keeps its status but carries no body to read.
+const readJsonBody = (response: Response): Promise<unknown> =>
+  response.json().catch(() => undefined);
+
+export const isWorkerRequestFailure = (
+  response: TWorkerResponse,
+): response is Extract<TWorkerResponse, { status: null }> =>
+  'failureEvent' in response;
+
+/** Never throws and never logs: a missing worker URL or secret, or a network failure, comes back as the failure to log. */
+export const sendWorkerRequest = async (
   path: string,
   body: TWorkerRequestBody,
-): Promise<TMaybeNull<number>> => {
-  const { tenantId } = body;
+  {
+    timeoutMs = ENQUEUE_TIMEOUT_MS,
+    readsBody = false,
+    secretName = 'WORKER_ENQUEUE_SECRET',
+  }: TWorkerRequestOptions = {},
+): Promise<TWorkerResponse> => {
   const workerUrl = env.WORKER_ENQUEUE_URL;
-  const secret = env.WORKER_ENQUEUE_SECRET;
+  const secret = workerSecretsEnv[secretName];
 
   if (!workerUrl || !secret) {
-    logger.error(WORKER_LOG.ENQUEUE_SKIPPED, {
-      tenantId,
-      path,
-      hasWorkerUrl: Boolean(workerUrl),
-      hasSecret: Boolean(secret),
-    });
-    return null;
+    return {
+      status: null,
+      failureEvent: WORKER_LOG.ENQUEUE_SKIPPED,
+      failure: {
+        hasWorkerUrl: Boolean(workerUrl),
+        hasSecret: Boolean(secret),
+      },
+    };
   }
 
   const url = new URL(path, workerUrl);
@@ -47,17 +82,33 @@ export const enqueueWorkerRequest = async (
         ...buildEnqueueHeaders({ secret, path: url.pathname, rawBody }),
       },
       body: rawBody,
-      signal: AbortSignal.timeout(ENQUEUE_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
-    return response.status;
+    const { status } = response;
+    return readsBody
+      ? { status, body: await readJsonBody(response) }
+      : { status };
   } catch (error) {
-    logger.error(WORKER_LOG.ENQUEUE_ERROR, {
-      tenantId,
-      path,
-      ...toLoggableError(error),
-    });
-    return null;
+    return {
+      status: null,
+      failureEvent: WORKER_LOG.ENQUEUE_ERROR,
+      failure: toLoggableError(error),
+    };
   }
+};
+
+/** Never throws: a missing worker URL or secret, or a network failure, is logged and returns `null`; any response returns its status. */
+export const enqueueWorkerRequest = async (
+  path: string,
+  body: TWorkerRequestBody,
+): Promise<TMaybeNull<number>> => {
+  const response = await sendWorkerRequest(path, body);
+
+  if (isWorkerRequestFailure(response)) {
+    const { failureEvent, failure } = response;
+    logger.error(failureEvent, { tenantId: body.tenantId, path, ...failure });
+  }
+  return response.status;
 };
 
 export const enqueueProvisioning = (

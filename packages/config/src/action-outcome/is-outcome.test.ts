@@ -1,12 +1,12 @@
-import type { TOutcome } from '@shinefold/config/types';
-
 import {
   ACTION_OUTCOME,
   type TActionOutcome,
 } from '@shinefold/config/constants';
+import type { TOutcome } from '@shinefold/config/types';
 
 import {
   isOutcomeInvalid,
+  isOutcomeRateLimited,
   isOutcomeRefused,
   isOutcomeServerError,
   isOutcomeSuccess,
@@ -36,6 +36,7 @@ describe.each([
   [isOutcomeServerError, ACTION_OUTCOME.SERVER_ERROR],
   [isOutcomeRefused, ACTION_OUTCOME.REFUSED],
   [isOutcomeUnavailable, ACTION_OUTCOME.UNAVAILABLE],
+  [isOutcomeRateLimited, ACTION_OUTCOME.RATE_LIMITED],
 ])('%o', (isGivenOutcome, outcome) => {
   it(`accepts a ${outcome} result`, () => {
     expect(isGivenOutcome(resultOf(outcome))).toBe(true);

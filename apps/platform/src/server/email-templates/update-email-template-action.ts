@@ -6,7 +6,7 @@ import {
   type TSettingsRefusal,
 } from '@platform/constants/settings';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import {
   emailTemplateCopyInputSchema,
   emailTemplateTypeSchema,
@@ -63,8 +63,12 @@ export const updateEmailTemplateAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const { tenant } = await requireTenantMembership(tenantId);
-  if (!queries.tenants.selectLiveLocales(tenant).includes(parsedLocale.data)) {
+  const { tenant } = await requireTenantManager(tenantId);
+  if (
+    !queries.tenants
+      .selectLiveLocalesWithin(tenant, tenant.entitlements)
+      .includes(parsedLocale.data)
+  ) {
     return {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SETTINGS_REFUSAL.LOCALE_NOT_LIVE,

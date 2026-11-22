@@ -1,4 +1,8 @@
-import { PAID_SUBSCRIBER_BAND_CEILINGS } from '@shinefold/db/constants';
+import { BILLING_INTERVAL } from '@shinefold/config/constants';
+import {
+  BILLING_CURRENCY,
+  PAID_SUBSCRIBER_BAND_CEILINGS,
+} from '@shinefold/db/constants';
 import type { TStripeIds } from '@shinefold/db/queries/tenants/get-tenant-id-by-stripe-ids';
 import type { TTenantBilling } from '@shinefold/db/queries/tenants/tenant-billing';
 import type { TTenant } from '@shinefold/db/schema/tenants';
@@ -12,6 +16,8 @@ export const MOCK_NO_BILLING = {
   stripeSubscriptionId: null,
   stripePromotionCode: null,
   subscriberBandCeiling: null,
+  billingInterval: null,
+  billingCurrency: null,
   trialEndsAt: null,
   downgradeGraceStartedAt: null,
   graceStartedEmailSentAt: null,
@@ -25,6 +31,8 @@ export const MOCK_EMPTY_TENANT_BILLING: TTenantBilling = {
   stripeSubscriptionId: undefined,
   stripePromotionCode: undefined,
   subscriberBandCeiling: undefined,
+  billingInterval: undefined,
+  billingCurrency: undefined,
   trialEndsAt: undefined,
   downgradeGraceStartedAt: undefined,
   graceStartedEmailSentAt: undefined,
@@ -52,6 +60,12 @@ export function mockTenantBilling(
     stripePromotionCode: billingFaker.string.alphanumeric(8).toUpperCase(),
     subscriberBandCeiling: billingFaker.helpers.arrayElement(
       PAID_SUBSCRIBER_BAND_CEILINGS,
+    ),
+    billingInterval: billingFaker.helpers.arrayElement(
+      Object.values(BILLING_INTERVAL),
+    ),
+    billingCurrency: billingFaker.helpers.arrayElement(
+      Object.values(BILLING_CURRENCY),
     ),
     trialEndsAt: billingFaker.date.past({ refDate: graceStartedAt }),
     downgradeGraceStartedAt: graceStartedAt,

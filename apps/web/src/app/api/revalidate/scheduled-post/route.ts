@@ -50,6 +50,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     slug: undefined,
     previousSlug: undefined,
     operation: SANITY_WEBHOOK_OPERATION.UPDATE,
+    redirect: {},
     tenantId,
     tenant,
   });

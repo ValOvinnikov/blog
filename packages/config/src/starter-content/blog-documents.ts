@@ -1,22 +1,18 @@
-import type { Blog_topic } from '@shinefold/config/sanity/generated/types';
-
 import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import type { Blog_topic } from '@shinefold/config/sanity/generated/types';
 
 import { buildBaseDocuments } from './base-documents';
 import { buildBlogIndexPages } from './blog-index-pages';
 import { buildBlogModules } from './blog-modules';
 import { buildBlogPages } from './blog-pages';
 import type { TStarterCopy } from './copy/starter-copy';
-import type {
-  TStarterDocument,
-  TStarterDocumentUnion,
-  TStarterPost,
-} from './starter-document';
+import type { TStarterDocumentUnion, TStarterPost } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
+import type { TStarterDocument } from './starter-document-shape';
 import {
-  keyedReference,
   localizedString,
   localizedText,
+  moduleSlot,
   pageHeadingBlock,
   paragraphs,
   reference,
@@ -50,11 +46,13 @@ export function buildBlogDocuments({
       ),
       homeLayout: {
         hero: reference(ids.BLOG_HERO),
-        modules: [ids.BLOG_LATEST_POSTS, ids.BLOG_TOPIC_LIST, ids.BLOG_CTA].map(
-          keyedReference,
-        ),
+        modules: [
+          moduleSlot(ids.BLOG_LATEST_POSTS, 'module_postLatest'),
+          moduleSlot(ids.BLOG_TOPIC_LIST, 'module_taxonomyList'),
+          moduleSlot(ids.BLOG_CTA, 'module_cta'),
+        ],
       },
-      postIndexModules: [keyedReference(ids.BLOG_POST_LIST)],
+      postIndexModules: [moduleSlot(ids.BLOG_POST_LIST, 'module_postList')],
     }),
     ...buildBlogModules(locale, copy),
     ...buildBlogIndexPages(locale, copy),

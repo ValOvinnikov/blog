@@ -1,4 +1,3 @@
-import { type TENANT_PLAN } from '@shinefold/config/constants';
 import {
   type INACTIVITY_STAGE,
   type TGraceEmail,
@@ -10,7 +9,7 @@ type TOwnerEmailCopyInput = {
   ownerEmail: string;
 };
 
-export type TOwnerEmailText = {
+type TOwnerEmailText = {
   subject: string;
   previewText: string;
   paragraphs: string[];
@@ -59,11 +58,8 @@ type TDomainLockInput = {
   date: string;
 };
 
-export type TDowngradedPlan =
-  typeof TENANT_PLAN.STARTER | typeof TENANT_PLAN.GROWTH;
-
 export type TOwnerGraceEmailCopy = {
-  stopped: Record<TDowngradedPlan, string>;
+  planComparisonLabel: string;
   upgradeAnyTime: string;
   keepAsTheyAre: (date: string) => string;
   memberLock: (input: TMemberLockInput) => string;

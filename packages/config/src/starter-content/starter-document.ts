@@ -36,13 +36,11 @@ import type {
   Template_topicIndex,
 } from '@shinefold/config/sanity/generated/types';
 
-type TSanitySystemField = '_createdAt' | '_updatedAt' | '_rev';
-
-export type TStarterDocument<
-  TDocument extends { _id: string; _type: string },
-  TRequiredField extends keyof TDocument,
-> = Omit<TDocument, TSanitySystemField> &
-  Required<Pick<TDocument, TRequiredField>>;
+import type { TGrowthDocumentUnion } from './growth-document';
+import type {
+  TStarterDocument,
+  TStarterTemplate,
+} from './starter-document-shape';
 
 export type TStarterPage<
   TPage extends
@@ -57,17 +55,12 @@ export type TStarterPage<
 > = TStarterDocument<TPage, 'title' | 'headingBlock' | 'template' | 'seo'>;
 
 export type TStarterModule<
-  TModule extends
-    | Module_heroBlog
-    | Module_heroProfile
-    | Module_heroStatement
-    | Module_content
-    | Module_sectionPages
-    | Module_postLatest
-    | Module_postList
-    | Module_taxonomyList
-    | Module_faq
-    | Module_cta,
+  TModule extends {
+    _id: string;
+    _type: `module_${string}`;
+    title?: string;
+    brandVariant?: string;
+  },
 > = TStarterDocument<TModule, 'title' | 'brandVariant'>;
 
 export type TStarterPost = TStarterDocument<
@@ -85,25 +78,25 @@ export type TStarterDocumentUnion =
   | TStarterDocument<Settings_navigation, 'title'>
   | TStarterDocument<Settings_footer, 'title'>
   | TStarterDocument<Settings_site, 'title'>
-  | TStarterDocument<Template_home, 'title'>
+  | TStarterTemplate<Template_home>
   | TStarterPage<Page_home>
-  | TStarterDocument<Template_postIndex, 'title'>
+  | TStarterTemplate<Template_postIndex>
   | TStarterPage<Page_postIndex>
   | TStarterDocument<
       Page_cookieStatement,
       'title' | 'headingBlock' | 'content' | 'seo'
     >
-  | TStarterDocument<Template_privacyIndex, 'title'>
+  | TStarterTemplate<Template_privacyIndex>
   | TStarterPage<Page_privacyIndex>
-  | TStarterDocument<Template_legalIndex, 'title'>
+  | TStarterTemplate<Template_legalIndex>
   | TStarterPage<Page_legalIndex>
-  | TStarterDocument<Template_landing, 'title'>
+  | TStarterTemplate<Template_landing>
   | TStarterPage<Page_landing>
-  | TStarterDocument<Template_topicIndex, 'title'>
+  | TStarterTemplate<Template_topicIndex>
   | TStarterPage<Page_topicIndex>
-  | TStarterDocument<Template_tagIndex, 'title'>
+  | TStarterTemplate<Template_tagIndex>
   | TStarterPage<Page_tagIndex>
-  | TStarterDocument<Template_topic, 'title'>
+  | TStarterTemplate<Template_topic>
   | TStarterPage<Page_topic>
   | TStarterDocument<Person, 'name'>
   | TStarterPost
@@ -119,4 +112,5 @@ export type TStarterDocumentUnion =
   | TStarterModule<Module_content>
   | TStarterModule<Module_sectionPages>
   | TStarterModule<Module_faq>
-  | TStarterDocument<Block_faq, 'title' | 'question' | 'answer'>;
+  | TStarterDocument<Block_faq, 'title' | 'question' | 'answer'>
+  | TGrowthDocumentUnion;

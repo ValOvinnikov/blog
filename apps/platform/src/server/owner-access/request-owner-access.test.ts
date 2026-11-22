@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { OWNER_ACCESS_LOG } from '@platform/constants/owner-access';
+import { TEAM_ACCESS_LOG } from '@platform/constants/team-access';
 import { WORKER_LOG } from '@platform/constants/worker';
 import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
@@ -9,7 +10,11 @@ import {
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
-import { env } from '@platform/utils/env/env';
+import { MOCK_WORKER_URL } from '@platform/testing/worker/fixtures';
+import {
+  stubWorkerFetch,
+  type TWorkerFetchMock,
+} from '@platform/testing/worker/stub-worker-fetch';
 import { logger } from '@platform/utils/logger/logger';
 import {
   ACTION_OUTCOME,
@@ -31,6 +36,7 @@ import { resendOwnerInviteAction } from './resend-owner-invite-action';
 vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/utils/env/env');
+vi.mock('@platform/utils/worker-secrets-env/worker-secrets-env');
 
 vi.mock('@shinefold/db', async () => {
   const { mockDbConstants } =
@@ -49,35 +55,21 @@ faker.seed(6105);
 
 const MOCK_USER_ID = faker.string.uuid();
 const MOCK_WORKER_PATH = `/${faker.lorem.slug()}`;
-const MOCK_WORKER_URL = `https://${faker.internet.domainName()}`;
-const MOCK_SECRET = faker.string.alphanumeric(32);
+const MOCK_MEMBERSHIP_ID = faker.string.uuid();
 
-const envMock: Partial<Record<keyof typeof env, string>> = env;
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 const getMembership = vi.mocked(queries.memberships.getMembership);
 const getAdminByUserId = vi.mocked(queries.admins.getAdminByUserId);
-const fetchMock = vi.fn<(url: URL, init?: RequestInit) => Promise<Response>>();
+const fetchMock: TWorkerFetchMock = vi.fn();
 
 const requestedUrls = (): string[] =>
   fetchMock.mock.calls.map(([url]) => url.href);
 
 beforeEach(() => {
   authMock.mockResolvedValue({ user: { id: MOCK_USER_ID } });
-  getAdminByUserId.mockReset();
   getAdminByUserId.mockResolvedValue(undefined);
-  getMembership.mockReset();
   getMembership.mockResolvedValue(mockMembership({ userId: MOCK_USER_ID }));
-  fetchMock.mockReset();
-  fetchMock.mockResolvedValue(
-    new Response(null, { status: HTTP_STATUS.ACCEPTED }),
-  );
-  vi.stubGlobal('fetch', fetchMock);
-  envMock.WORKER_ENQUEUE_URL = MOCK_WORKER_URL;
-  envMock.WORKER_ENQUEUE_SECRET = MOCK_SECRET;
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
+  stubWorkerFetch(fetchMock);
 });
 
 describe(requestOwnerAccess, () => {
@@ -166,17 +158,43 @@ describe(enqueueOwnerAccessRequest, () => {
   });
 
   it('carries the former owner email to the worker when given one', async () => {
-    await enqueueOwnerAccessRequest(
-      MOCK_WORKER_PATH,
-      MOCK_TENANT_ID,
-      MOCK_OWNER_EMAIL,
-    );
+    await enqueueOwnerAccessRequest(MOCK_WORKER_PATH, MOCK_TENANT_ID, {
+      formerOwnerEmail: MOCK_OWNER_EMAIL,
+    });
 
     const [, init] = fetchMock.mock.calls[0] ?? [];
     expect(JSON.parse(String(init?.body))).toEqual({
       tenantId: MOCK_TENANT_ID,
       formerOwnerEmail: MOCK_OWNER_EMAIL,
     });
+  });
+
+  it('carries the membership to the worker and logs a failure as the member request', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: HTTP_STATUS.CONFLICT }),
+    );
+
+    const result = await enqueueOwnerAccessRequest(
+      MOCK_WORKER_PATH,
+      MOCK_TENANT_ID,
+      { membershipId: MOCK_MEMBERSHIP_ID },
+    );
+
+    const [, init] = fetchMock.mock.calls[0] ?? [];
+    expect(JSON.parse(String(init?.body))).toEqual({
+      tenantId: MOCK_TENANT_ID,
+      membershipId: MOCK_MEMBERSHIP_ID,
+    });
+    expect(logger.error).toHaveBeenCalledExactlyOnceWith(
+      TEAM_ACCESS_LOG.ACCESS_REQUEST_FAILED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        path: MOCK_WORKER_PATH,
+        responseStatus: HTTP_STATUS.CONFLICT,
+        membershipId: MOCK_MEMBERSHIP_ID,
+      },
+    );
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
   });
 });
 

@@ -23,7 +23,7 @@ import {
   type TDeviceFrameHandle,
 } from './use-device-frame-handle';
 
-type TUseDeviceFrameOptions = {
+export type TUseDeviceFrameOptions = {
   device: TPreviewDevice;
   fit: TDeviceFrameFit;
   onScaleChange?(scale: number): void;

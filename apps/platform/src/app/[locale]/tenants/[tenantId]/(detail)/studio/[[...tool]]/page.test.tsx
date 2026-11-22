@@ -6,6 +6,7 @@ import {
   MOCK_OTHER_TENANT_NAME,
   MOCK_SANITY_PROJECT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import {
   MOCK_FREE_STUDIO_ENTITLEMENTS,
   mockStudioReadyTenant,
@@ -36,10 +37,11 @@ vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     admins: { getAdminByUserId: getAdminByUserIdMock },
     tenants: {
       getTenantById: getTenantByIdMock,
-      selectLiveLocales: vi.fn(() => []),
+      selectLiveLocalesWithin: vi.fn(() => []),
     },
   },
 }));
@@ -74,7 +76,7 @@ describe(`<${TenantStudioPage.name}/>`, () => {
     expect(studioMountMock).not.toHaveBeenCalled();
   });
 
-  it("mounts Studio for the routed tenant under that tenant's Studio path", async () => {
+  it("mounts the routed tenant's Studio with its Studio and preview paths", async () => {
     await setup();
 
     const studioMount = screen.getByTestId(STUDIO_MOUNT_TEST_ID);
@@ -85,6 +87,7 @@ describe(`<${TenantStudioPage.name}/>`, () => {
         projectId: MOCK_SANITY_PROJECT_ID,
         dataset: tenant.sanityDataset,
         basePath: adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID),
+        previewBasePath: adminRoutes.tenantDraftPreviews(MOCK_OTHER_TENANT_ID),
         title: MOCK_OTHER_TENANT_NAME,
         enabledCapabilities: [],
         entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,

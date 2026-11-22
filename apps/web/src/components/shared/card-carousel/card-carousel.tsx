@@ -1,10 +1,6 @@
 'use client';
 
-import type {
-  IWithClassName,
-  IWithDataTestId,
-  TBrandVariant,
-} from '@shinefold/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import type { ICarouselProps } from '@shinefold/ui/components/organisms/carousel';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
 import {
@@ -16,7 +12,6 @@ export interface ICardCarouselProps extends IWithClassName, IWithDataTestId {
   items: IMediaCardData[];
   hasImages?: boolean;
   title: string;
-  tone?: TBrandVariant;
   contentAlignment?: ICarouselProps<IMediaCardData>['contentAlignment'];
 }
 
@@ -24,7 +19,6 @@ export const CardCarousel = ({
   items,
   hasImages,
   title,
-  tone,
   contentAlignment,
   className,
   dataTestId,
@@ -36,7 +30,6 @@ export const CardCarousel = ({
     )}
     getItemKey={({ item }) => item.id}
     title={title}
-    tone={tone}
     contentAlignment={contentAlignment}
     className={className}
     dataTestId={dataTestId}

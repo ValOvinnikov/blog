@@ -8,6 +8,10 @@ import {
   renderElement,
   screen,
 } from '@web/testing/custom-render';
+import {
+  MOCK_UNRECOGNIZED_ACTION_ERROR,
+  mockUnrecognizedActionError,
+} from '@web/testing/shared/out-of-date/mock-unrecognized-action';
 
 import { NewsletterForm } from './newsletter-form';
 
@@ -73,15 +77,6 @@ describe(`<${NewsletterForm.name}/>`, () => {
       expect(subscribeButton).toBeVisible();
     });
 
-    it('rejects a malformed email without calling the server action', async () => {
-      await typeAndSubmit(user, MOCK_MALFORMED_EMAIL);
-
-      const alert = await screen.findByRole('alert');
-
-      expect(alert).toHaveTextContent(INVALID_EMAIL_MESSAGE);
-      expect(subscribeToNewsletterActionMock).not.toHaveBeenCalled();
-    });
-
     it('reads Subscribing… on a busy button while the server action is in flight', async () => {
       let resolveAction!: (result: TSubscribeResult) => void;
       subscribeToNewsletterActionMock.mockImplementationOnce(
@@ -142,35 +137,60 @@ describe(`<${NewsletterForm.name}/>`, () => {
       },
     );
 
-    it('clears the error once the reader edits the email', async () => {
-      await typeAndSubmit(user, MOCK_MALFORMED_EMAIL);
-      await screen.findByRole('alert');
-      const emailField = screen.getByRole('textbox', {
-        name: EMAIL_FIELD_NAME,
-      });
+    it('returns to idle with the email kept and no error when the action is unrecognised', async () => {
+      mockUnrecognizedActionError();
+      subscribeToNewsletterActionMock.mockRejectedValueOnce(
+        MOCK_UNRECOGNIZED_ACTION_ERROR,
+      );
+      await typeAndSubmit(user, MOCK_EMAIL);
 
-      await user.type(emailField, MOCK_EXTRA_CHARACTER);
-
-      const alert = screen.queryByRole('alert');
-      expect(alert).not.toBeInTheDocument();
-    });
-
-    it('shows the error again when an invalid email is submitted twice', async () => {
-      await typeAndSubmit(user, MOCK_MALFORMED_EMAIL);
-      await screen.findByRole('alert');
-      const emailField = screen.getByRole('textbox', {
-        name: EMAIL_FIELD_NAME,
-      });
-      const subscribeButton = screen.getByRole('button', {
+      const subscribeButton = await screen.findByRole('button', {
         name: SUBSCRIBE_BUTTON_NAME,
       });
 
-      await user.clear(emailField);
-      await user.type(emailField, MOCK_MALFORMED_EMAIL);
-      await user.click(subscribeButton);
+      const emailField = screen.getByRole('textbox', {
+        name: EMAIL_FIELD_NAME,
+      });
+      const alert = screen.queryByRole('alert');
+      expect(subscribeButton).toBeEnabled();
+      expect(emailField).toHaveValue(MOCK_EMAIL);
+      expect(alert).not.toBeInTheDocument();
+    });
 
-      const alert = await screen.findByRole('alert');
-      expect(alert).toHaveTextContent(INVALID_EMAIL_MESSAGE);
+    describe('after a malformed email is submitted', () => {
+      let alert: HTMLElement;
+      let emailField: HTMLElement;
+
+      beforeEach(async () => {
+        await typeAndSubmit(user, MOCK_MALFORMED_EMAIL);
+        alert = await screen.findByRole('alert');
+        emailField = screen.getByRole('textbox', { name: EMAIL_FIELD_NAME });
+      });
+
+      it('rejects it without calling the server action', () => {
+        expect(alert).toHaveTextContent(INVALID_EMAIL_MESSAGE);
+        expect(subscribeToNewsletterActionMock).not.toHaveBeenCalled();
+      });
+
+      it('clears the error once the reader edits the email', async () => {
+        await user.type(emailField, MOCK_EXTRA_CHARACTER);
+
+        const clearedAlert = screen.queryByRole('alert');
+        expect(clearedAlert).not.toBeInTheDocument();
+      });
+
+      it('shows the error again when an invalid email is submitted twice', async () => {
+        const subscribeButton = screen.getByRole('button', {
+          name: SUBSCRIBE_BUTTON_NAME,
+        });
+
+        await user.clear(emailField);
+        await user.type(emailField, MOCK_MALFORMED_EMAIL);
+        await user.click(subscribeButton);
+
+        const repeatedAlert = await screen.findByRole('alert');
+        expect(repeatedAlert).toHaveTextContent(INVALID_EMAIL_MESSAGE);
+      });
     });
   });
 

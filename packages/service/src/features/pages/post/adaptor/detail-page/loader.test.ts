@@ -3,10 +3,11 @@ import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
 import {
   IMAGE_LAYOUT,
   PORTABLE_TEXT_BLOCK_TYPE,
+  SANITY_PERSPECTIVE,
 } from '@shinefold/config/constants';
 import {
   MOCK_SKIM_MODEL,
-  MOCK_SKIM_TAKEAWAYS,
+  MOCK_SKIM_SUMMARY,
 } from '@shinefold/service/testing/editorial/fixtures';
 import {
   MOCK_TAG_ID,
@@ -31,6 +32,7 @@ import {
   MOCK_POST_SLUG,
   mockRawBodyImageBlock,
   mockRawHeadingBlock,
+  mockRawParagraphTextBlock,
   mockRawSeo,
   mockSanityImageView,
 } from '@shinefold/service/testing/shared/fixtures';
@@ -53,7 +55,6 @@ const MOCK_AUTHOR_ROLE = faker.person.jobTitle();
 const MOCK_RELATED_MODULE_ID = faker.string.uuid();
 const MOCK_META_TITLE = faker.lorem.words(4);
 const MOCK_META_DESCRIPTION = faker.lorem.sentence();
-const MOCK_ASIDE_KEY = faker.string.uuid();
 const MOCK_REF_DATE = '2026-06-01T00:00:00Z';
 const MOCK_PUBLISHED_AT = faker.date
   .past({ refDate: MOCK_REF_DATE })
@@ -169,51 +170,42 @@ describe(getPost, () => {
     expect(result.readingTimeMinutes).toBe(3);
   });
 
-  it('maps takeaways with 3 or more entries', async () => {
-    const postTakeaways = {
-      takeaways: MOCK_SKIM_TAKEAWAYS,
+  it('maps a summary with text to Portable Text', async () => {
+    const result = await loadPost({
+      postTakeaways: {
+        summary: MOCK_SKIM_SUMMARY,
+        generatedAt: MOCK_GENERATED_AT,
+        model: MOCK_SKIM_MODEL,
+      },
+    });
+
+    expect(result.postTakeaways).toEqual({
+      summary: MOCK_SKIM_SUMMARY.map((block) => ({
+        ...block,
+        markDefs: undefined,
+      })),
       generatedAt: MOCK_GENERATED_AT,
       model: MOCK_SKIM_MODEL,
-    };
-
-    const result = await loadPost({ postTakeaways });
-
-    expect(result.postTakeaways).toEqual(postTakeaways);
+    });
   });
 
   it.each([
-    ['absent takeaways', null],
+    ['an absent summary', null],
+    ['an empty summary', { summary: [], generatedAt: null, model: null }],
     [
-      'fewer than 3 takeaways',
+      'a summary whose blocks have no text',
       {
-        takeaways: MOCK_SKIM_TAKEAWAYS.slice(0, 2),
+        summary: [mockRawParagraphTextBlock({ text: ' ' })],
         generatedAt: null,
         model: null,
       },
     ],
   ])('leaves postTakeaways undefined for %s', async (_, postTakeaways) => {
-    const result = await loadPost({ postTakeaways });
+    const result = await loadPost({
+      postTakeaways: postTakeaways as TRawPostDetail['postTakeaways'],
+    });
 
     expect(result.postTakeaways).toBeUndefined();
-  });
-
-  it.each([
-    [
-      'when the body contains an aside block',
-      [
-        {
-          _type: PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
-          _key: MOCK_ASIDE_KEY,
-          body: null,
-        },
-      ],
-      true,
-    ],
-    ['when the body has no aside blocks', [], false],
-  ])('reports hasAsides %s', async (_, body, expected) => {
-    const result = await loadPost({ body: body as TRawPostDetail['body'] });
-
-    expect(result.hasAsides).toBe(expected);
   });
 
   it('resolves a bodyImage block in the body to an image view', async () => {
@@ -231,24 +223,42 @@ describe(getPost, () => {
     ]);
   });
 
-  it('queries the slug for the tenant and scopes its tags to it', async () => {
-    mockRun.mockResolvedValueOnce(mockRawPostDetail());
+  describe('the query it runs', () => {
+    beforeEach(() => {
+      mockRun.mockResolvedValueOnce(mockRawPostDetail());
+    });
 
-    await getPost(MOCK_POST_SLUG, tenant);
+    it('queries the slug for the tenant and scopes its tags to it', async () => {
+      await getPost(MOCK_POST_SLUG, tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(postPageQuery, {
-      parameters: { slug: MOCK_POST_SLUG },
-      tenant,
-      next: {
-        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
-        tags: [
-          MOCK_PAGE_POST_CACHE_TAG,
-          MOCK_AUTHOR_CACHE_TAG,
-          MOCK_TOPIC_CACHE_TAG,
-          MOCK_TAG_CACHE_TAG,
-          ...MOCK_LINK_TARGET_CACHE_TAGS,
-        ],
-      },
+      expect(mockRun).toHaveBeenCalledWith(postPageQuery, {
+        parameters: { slug: MOCK_POST_SLUG, isDraftPreview: false },
+        tenant,
+        next: {
+          revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+          tags: [
+            MOCK_PAGE_POST_CACHE_TAG,
+            MOCK_AUTHOR_CACHE_TAG,
+            MOCK_TOPIC_CACHE_TAG,
+            MOCK_TAG_CACHE_TAG,
+            ...MOCK_LINK_TARGET_CACHE_TAGS,
+          ],
+        },
+      });
+    });
+
+    it('reads every publish date when the tenant reads drafts', async () => {
+      await getPost(
+        MOCK_POST_SLUG,
+        mockTenant({ perspective: SANITY_PERSPECTIVE.DRAFTS }),
+      );
+
+      expect(mockRun).toHaveBeenCalledWith(
+        postPageQuery,
+        expect.objectContaining({
+          parameters: { slug: MOCK_POST_SLUG, isDraftPreview: true },
+        }),
+      );
     });
   });
 });

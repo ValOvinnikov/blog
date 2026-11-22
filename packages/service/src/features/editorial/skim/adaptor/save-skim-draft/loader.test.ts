@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { getWriteClient } from '@shinefold/service/sanity/write-client/write-client';
 import {
   MOCK_SKIM_MODEL,
-  MOCK_SKIM_TAKEAWAYS,
+  MOCK_SKIM_SUMMARY,
   mockSkimDraftInput,
 } from '@shinefold/service/testing/editorial/fixtures';
 import { MOCK_POST_ID } from '@shinefold/service/testing/shared/fixtures';
@@ -91,7 +91,7 @@ describe(saveSkimDraft, () => {
             set: {
               postTakeaways: {
                 _type: 'postTakeaways',
-                takeaways: MOCK_SKIM_TAKEAWAYS,
+                summary: MOCK_SKIM_SUMMARY,
                 generatedAt: MOCK_NOW,
                 model: MOCK_SKIM_MODEL,
               },

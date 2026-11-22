@@ -1,3 +1,7 @@
+import {
+  PORTABLE_TEXT_BLOCK_TYPE,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 import type {
   ArticleText,
   Page_legalIndex,
@@ -7,29 +11,22 @@ import type {
 } from '@shinefold/config/sanity/generated/types';
 
 import {
-  PORTABLE_TEXT_BLOCK_TYPE,
-  type TLocaleIsoCode,
-} from '@shinefold/config/constants';
-
-import {
   buildCookieStatementDocument,
   cookieStatementDocumentId,
 } from './cookie-statement-document';
 import type { TStarterCopy } from './copy/starter-copy';
-import type {
-  TStarterDocument,
-  TStarterDocumentUnion,
-  TStarterPage,
-} from './starter-document';
+import type { TStarterDocumentUnion, TStarterPage } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
+import type { TStarterTemplate } from './starter-document-shape';
 import {
-  keyedReference,
+  moduleSlot,
   pageHeadingBlock,
   paragraphs,
   reference,
   seo,
 } from './starter-fields';
 import { internalLink } from './starter-links';
+import { INTRODUCTION_MODULE_TITLE } from './starter-module-titles';
 import { buildContentModule } from './starter-modules';
 
 const COOKIE_STATEMENT_LINK_MARK_KEY = 'cookieStatementLink';
@@ -72,7 +69,7 @@ export function buildLegalPages(
       _id: STARTER_DOCUMENT_IDS.PRIVACY_INDEX_TEMPLATE,
       _type: 'template_privacyIndex',
       title: 'Privacy Index Template',
-    } satisfies TStarterDocument<Template_privacyIndex, 'title'>,
+    } satisfies TStarterTemplate<Template_privacyIndex>,
     {
       _id: STARTER_DOCUMENT_IDS.PRIVACY_INDEX,
       _type: 'page_privacyIndex',
@@ -93,7 +90,7 @@ export function buildLegalPages(
     ),
     buildContentModule({
       id: STARTER_DOCUMENT_IDS.LEGAL_INDEX_INTRO,
-      title: 'Introduction',
+      title: INTRODUCTION_MODULE_TITLE,
       locale,
       body: legalIndexIntro(legalIndex.intro, cookieStatement.title),
     }),
@@ -101,8 +98,10 @@ export function buildLegalPages(
       _id: STARTER_DOCUMENT_IDS.LEGAL_INDEX_TEMPLATE,
       _type: 'template_legalIndex',
       title: 'Legal Index Template',
-      modules: [keyedReference(STARTER_DOCUMENT_IDS.LEGAL_INDEX_INTRO)],
-    } satisfies TStarterDocument<Template_legalIndex, 'title'>,
+      modules: [
+        moduleSlot(STARTER_DOCUMENT_IDS.LEGAL_INDEX_INTRO, 'module_content'),
+      ],
+    } satisfies TStarterTemplate<Template_legalIndex>,
     {
       _id: STARTER_DOCUMENT_IDS.LEGAL_INDEX,
       _type: 'page_legalIndex',

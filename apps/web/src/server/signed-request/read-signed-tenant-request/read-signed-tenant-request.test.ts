@@ -1,10 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
-import {
-  buildEnqueueHeaders,
-  ENQUEUE_MAX_AGE_MS,
-} from '@shinefold/utils/enqueue-signature';
-import { isUndefined } from '@shinefold/utils/primitives';
+import { ENQUEUE_MAX_AGE_MS } from '@shinefold/utils/enqueue-signature';
+import { mockSignedRequest } from '@web/testing/server/signed-request/fixtures';
 import { mockTenantSanityCredentials } from '@web/testing/server/tenant/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
@@ -48,19 +45,13 @@ const bodySchema = z.object({ tenantId: z.uuid() });
 const signedRequest = (
   rawBody: string,
   options: { secret?: string; now?: number; path?: string } = {},
-): Request => {
-  const { secret = MOCK_SECRET, now, path = MOCK_PATH } = options;
-  return new Request(MOCK_URL, {
-    method: HTTP_METHOD.POST,
-    headers: buildEnqueueHeaders({
-      secret,
-      path,
-      rawBody,
-      ...(isUndefined(now) ? {} : { now }),
-    }),
-    body: rawBody,
+): Request =>
+  mockSignedRequest({
+    url: MOCK_URL,
+    secret: MOCK_SECRET,
+    rawBody,
+    ...options,
   });
-};
 
 const readStatus = async (
   request: Request,

@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./theme.css": "./theme.css",
+    "./skins-storybook.css": "./skins-storybook.css",
     "./preset": "./preset.ts"
   },
   "scripts": {

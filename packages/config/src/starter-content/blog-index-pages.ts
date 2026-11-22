@@ -1,3 +1,9 @@
+import {
+  BRAND_VARIANT,
+  TAXONOMY_KIND,
+  type TLocaleIsoCode,
+  type TTaxonomyKind,
+} from '@shinefold/config/constants';
 import type {
   Module_taxonomyList,
   Page_tagIndex,
@@ -6,21 +12,14 @@ import type {
   Template_topicIndex,
 } from '@shinefold/config/sanity/generated/types';
 
-import {
-  BRAND_VARIANT,
-  TAXONOMY_KIND,
-  type TLocaleIsoCode,
-  type TTaxonomyKind,
-} from '@shinefold/config/constants';
-
 import type { TStarterCopy } from './copy/starter-copy';
 import type {
-  TStarterDocument,
   TStarterDocumentUnion,
   TStarterModule,
   TStarterPage,
 } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
+import type { TStarterTemplate } from './starter-document-shape';
 import {
   moduleHeadingBlock,
   pageHeadingBlock,
@@ -84,7 +83,7 @@ export function buildBlogIndexPages(
       _id: ids.BLOG_TOPIC_INDEX_TEMPLATE,
       _type: 'template_topicIndex',
       title: 'Topic Index Template',
-    } satisfies TStarterDocument<Template_topicIndex, 'title'>,
+    } satisfies TStarterTemplate<Template_topicIndex>,
     singleton({
       _type: 'page_topicIndex',
       ...indexPage(
@@ -104,7 +103,7 @@ export function buildBlogIndexPages(
       _id: ids.BLOG_TAG_INDEX_TEMPLATE,
       _type: 'template_tagIndex',
       title: 'Tag Index Template',
-    } satisfies TStarterDocument<Template_tagIndex, 'title'>,
+    } satisfies TStarterTemplate<Template_tagIndex>,
     singleton({
       _type: 'page_tagIndex',
       ...indexPage(

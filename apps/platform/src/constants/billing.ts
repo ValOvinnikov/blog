@@ -8,6 +8,7 @@ export const BILLING_LOG = {
   TENANT_CONFLICT: 'billing.tenant_conflict',
   TENANT_NOT_WRITABLE: 'billing.tenant_not_writable',
   PRICE_UNKNOWN: 'billing.price_unknown',
+  CURRENCY_UNKNOWN: 'billing.currency_unknown',
   SUBSCRIPTION_SUPERSEDED: 'billing.subscription_superseded',
   RECEIPT_UNCONFIGURED: 'billing.receipt_unconfigured',
   RECEIPT_OWNER_MISSING: 'billing.receipt_owner_missing',
@@ -25,6 +26,8 @@ export const BILLING_LOG = {
   PLAN_CHANGE_PRICE_MISSING: 'billing.plan_change_price_missing',
   PLAN_CHANGE_LOAD_FAILED: 'billing.plan_change_load_failed',
   PLAN_CHANGE_RELEASE_FAILED: 'billing.plan_change_release_failed',
+  PLAN_CHANGE_PAYMENT_UNKNOWN: 'billing.plan_change_payment_unknown',
+  MOVE_UP_QUOTE_FAILED: 'billing.move_up_quote_failed',
   CATALOGUE_SYNCED: 'billing.catalogue_synced',
   CATALOGUE_SYNC_FAILED: 'billing.catalogue_sync_failed',
   CATALOGUE_SYNC_MODE_INVALID: 'billing.catalogue_sync_mode_invalid',
@@ -102,18 +105,14 @@ export const BILLING_GRACE = {
 
 export const MILLISECONDS_PER_SECOND = 1000;
 
+// Long enough to read the dialog, short enough that the charge stays the one it showed.
+export const MOVE_UP_QUOTE_MAX_AGE_SECONDS = 30 * 60;
+
 export const STRIPE_SIGNATURE_HEADER = 'stripe-signature';
 
 export const STRIPE_TENANT_METADATA_KEY = 'tenantId';
 
 export type TBillingGrace = TValueOf<typeof BILLING_GRACE>;
-
-export const BILLING_INTERVAL = {
-  MONTHLY: 'MONTHLY',
-  YEARLY: 'YEARLY',
-} as const;
-
-export type TBillingInterval = TValueOf<typeof BILLING_INTERVAL>;
 
 export const UPGRADE_STATE = {
   AVAILABLE: 'AVAILABLE',

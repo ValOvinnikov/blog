@@ -1,3 +1,4 @@
+import { contentColumnClasses } from '@platform/utils/content-column-classes/content-column-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const shellFrameVariants = tv({
@@ -12,7 +13,7 @@ export const shellFrameVariants = tv({
       'w-full max-w-[1180px] px-4 md:px-platform-content',
       '*:my-4 md:*:mt-platform-content',
     ],
-    content: ['flex-1'],
+    content: ['flex-1 outline-none'],
   },
   variants: {
     // Never cap or clip `root` (the document must scroll to keep `Sidebar` reachable); full-bleed pins `main` to the viewport instead.
@@ -22,7 +23,7 @@ export const shellFrameVariants = tv({
         content: ['min-h-0 overflow-hidden'],
       },
       false: {
-        content: ['w-full max-w-[1180px] p-4 md:p-platform-content'],
+        content: [contentColumnClasses()],
       },
     },
   },

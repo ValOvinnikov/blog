@@ -1,66 +1,27 @@
 'use client';
 
-import { useWebhookWait } from '@platform/components/features/upgrade/webhook-wait-status';
-import {
-  PLAN_CHANGE_TIMING,
-  type TPlanChangeRefusal,
-  type TPlanChoice,
-} from '@platform/constants/plan-change';
-import { useRouter } from '@platform/i18n/navigation';
+import type { TPlanChoice } from '@platform/constants/plan-change';
 import { changePlanAction } from '@platform/server/billing/change-plan-action';
 import { getTenantPlanAction } from '@platform/server/billing/get-tenant-plan-action';
-import {
-  isOutcomeRefused,
-  isOutcomeSuccess,
-  type TMaybeUndefined,
-} from '@shinefold/config';
+import { usePaidChange } from '@platform/utils/use-paid-change/use-paid-change';
+import type { TMaybeUndefined } from '@shinefold/config';
 import type { TTenantPlan } from '@shinefold/config/constants';
-import { useState, useTransition } from 'react';
 
-export const usePlanChange = (tenantId: string, currentPlan: TTenantPlan) => {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [refusal, setRefusal] = useState<TMaybeUndefined<TPlanChangeRefusal>>();
-  const [hasFailed, setHasFailed] = useState(false);
-  const [awaitedPlan, setAwaitedPlan] =
-    useState<TMaybeUndefined<TTenantPlan>>();
-  const isAwaiting = (plan: TTenantPlan) =>
-    Boolean(awaitedPlan) && plan !== awaitedPlan;
-  const { value, isSlow, checkAgain } = useWebhookWait(
+export const usePlanChange = (
+  tenantId: string,
+  currentPlan: TTenantPlan,
+  publishableKey: TMaybeUndefined<string>,
+) => {
+  const { submit, ...change } = usePaidChange({
     tenantId,
-    currentPlan,
-    getTenantPlanAction,
-    isAwaiting,
-  );
-
-  const submit = (choice: TPlanChoice) => {
-    setRefusal(undefined);
-    setHasFailed(false);
-    startTransition(async () => {
-      const result = await changePlanAction(tenantId, choice);
-      if (isOutcomeRefused(result)) setRefusal(result.reason);
-      else if (!isOutcomeSuccess(result)) setHasFailed(true);
-      else if (
-        result.timing === PLAN_CHANGE_TIMING.NOW &&
-        choice.plan !== currentPlan
-      ) {
-        setAwaitedPlan(choice.plan);
-      } else router.refresh();
-    });
-  };
+    current: currentPlan,
+    poll: getTenantPlanAction,
+    publishableKey,
+  });
 
   return {
-    submit,
-    isPending,
-    refusal,
-    hasFailed,
-    isConfirming: isAwaiting(value),
-    isSlow,
-    checkAgain,
+    ...change,
+    submit: (choice: TPlanChoice) =>
+      submit(() => changePlanAction(tenantId, choice), choice.plan),
   };
 };
-
-export type TPlanChangeProgress = Omit<
-  ReturnType<typeof usePlanChange>,
-  'submit' | 'isPending'
->;

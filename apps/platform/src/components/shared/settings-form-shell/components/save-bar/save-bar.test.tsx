@@ -5,6 +5,7 @@ import {
   screen,
 } from '@platform/testing/custom-render';
 import {
+  DISCARD,
   GO_TO_THE_FIRST_ONE,
   ONE_FIELD_NEEDS_ATTENTION,
   SAVE_CHANGES,
@@ -18,7 +19,6 @@ import { SaveBar, type TSaveBarProps } from './save-bar';
 faker.seed(5995);
 
 const THREE_UNSAVED_CHANGES = '3 unsaved changes';
-const DISCARD = 'Discard';
 const NOT_SAVED = 'Not saved';
 const SAVE_SHORTCUT = '⌘S / Ctrl+S';
 const MOCK_FIELD_LABEL = faker.lorem.word();
@@ -30,16 +30,23 @@ const MOCK_OTHER_CARD_NAME = faker.lorem.words(2);
 const IN_PREFIX = /^in /;
 const MOCK_SAVE_ERROR = faker.lorem.sentence();
 
-const baseProps: TSaveBarProps = {
-  changeCount: 3,
+const BASE_SUMMARY: TSaveBarProps['summary'] = {
   breakdown: '',
   invalidControls: { ids: [] },
+};
+
+const baseProps: TSaveBarProps = {
+  changeCount: 3,
+  summary: BASE_SUMMARY,
   isPending: false,
   onSave: vi.fn(),
   onDiscard: vi.fn(),
 };
 
 const setup = customRender(SaveBar, baseProps);
+
+const setupWithSummary = (summary: Partial<TSaveBarProps['summary']>) =>
+  setup({ summary: { ...BASE_SUMMARY, ...summary } });
 
 const BarWithHiddenField = () => {
   const [isRevealed, setIsRevealed] = useState(false);
@@ -49,13 +56,24 @@ const BarWithHiddenField = () => {
       {isRevealed && <input id={MOCK_FIELD_ID} aria-label={MOCK_FIELD_LABEL} />}
       <SaveBar
         {...baseProps}
-        invalidControls={{
-          ids: [MOCK_FIELD_ID],
-          revealFirst: () => setIsRevealed(true),
+        summary={{
+          ...BASE_SUMMARY,
+          invalidControls: {
+            ids: [MOCK_FIELD_ID],
+            revealFirst: () => setIsRevealed(true),
+          },
         }}
       />
     </>
   );
+};
+
+const expectSaveAndDiscardEnabled = () => {
+  const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+  const discardButton = screen.getByRole('button', { name: DISCARD });
+
+  expect(saveButton).toBeEnabled();
+  expect(discardButton).toBeEnabled();
 };
 
 describe(`<${SaveBar.name}/>`, () => {
@@ -74,7 +92,7 @@ describe(`<${SaveBar.name}/>`, () => {
   });
 
   it('shows the per-language breakdown beside the count', () => {
-    setup({ breakdown: MOCK_BREAKDOWN });
+    setupWithSummary({ breakdown: MOCK_BREAKDOWN });
 
     const changeCount = screen.getByText(THREE_UNSAVED_CHANGES);
     const breakdown = screen.getByText(MOCK_BREAKDOWN);
@@ -91,31 +109,34 @@ describe(`<${SaveBar.name}/>`, () => {
       </>
     );
 
+    const scrollIntoView = () => vi.mocked(Element.prototype.scrollIntoView);
+
+    beforeEach(() => {
+      vi.spyOn(Element.prototype, 'scrollIntoView');
+    });
+
     it('scrolls the focused control clear of the bar', async () => {
-      const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
       const { rerender } = renderWithIntl(<BarAfterField changeCount={0} />);
       const field = screen.getByRole('textbox', { name: MOCK_FIELD_LABEL });
       await user.click(field);
 
       rerender(<BarAfterField changeCount={1} />);
 
-      expect(scrollIntoView).toHaveBeenCalledTimes(1);
-      expect(scrollIntoView.mock.contexts[0]).toBe(field);
+      expect(scrollIntoView()).toHaveBeenCalledTimes(1);
+      expect(scrollIntoView().mock.contexts[0]).toBe(field);
     });
 
     it('scrolls nothing when no control has focus', () => {
-      const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
-
       setup();
 
-      expect(scrollIntoView).not.toHaveBeenCalled();
+      expect(scrollIntoView()).not.toHaveBeenCalled();
     });
   });
 
   describe('where the changes are', () => {
     it('names the one card holding the changes as a link that calls its handler', async () => {
       const onSelect = vi.fn();
-      setup({ unsavedCards: [{ name: MOCK_CARD_NAME, onSelect }] });
+      setupWithSummary({ unsavedCards: [{ name: MOCK_CARD_NAME, onSelect }] });
 
       const region = screen.getByRole('region', { name: UNSAVED_CHANGES });
       const cardLink = screen.getByRole('button', { name: MOCK_CARD_NAME });
@@ -128,7 +149,7 @@ describe(`<${SaveBar.name}/>`, () => {
     });
 
     it('counts the cards without naming them when there are several', () => {
-      setup({
+      setupWithSummary({
         unsavedCards: [
           { name: MOCK_CARD_NAME, onSelect: vi.fn() },
           { name: MOCK_OTHER_CARD_NAME, onSelect: vi.fn() },
@@ -151,7 +172,7 @@ describe(`<${SaveBar.name}/>`, () => {
     });
 
     it('shows no location while fields need attention', () => {
-      setup({
+      setupWithSummary({
         invalidControls: { ids: [MOCK_FIELD_ID] },
         unsavedCards: [{ name: MOCK_CARD_NAME, onSelect: vi.fn() }],
       });
@@ -184,7 +205,7 @@ describe(`<${SaveBar.name}/>`, () => {
 
   describe('after a save with field errors', () => {
     beforeEach(() => {
-      setup({
+      setupWithSummary({
         invalidControls: { ids: [MOCK_FIELD_ID, MOCK_SECOND_FIELD_ID] },
       });
     });
@@ -214,17 +235,13 @@ describe(`<${SaveBar.name}/>`, () => {
     });
 
     it('keeps Save and Discard available', () => {
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-      const discardButton = screen.getByRole('button', { name: DISCARD });
-
-      expect(saveButton).toBeEnabled();
-      expect(discardButton).toBeEnabled();
+      expectSaveAndDiscardEnabled();
     });
   });
 
   describe('after a failed save', () => {
     beforeEach(() => {
-      setup({ saveError: MOCK_SAVE_ERROR });
+      setupWithSummary({ saveError: MOCK_SAVE_ERROR });
     });
 
     it('announces the failure in place of the change count and shortcut', () => {
@@ -238,16 +255,12 @@ describe(`<${SaveBar.name}/>`, () => {
     });
 
     it('keeps Save and Discard available to try again', () => {
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-      const discardButton = screen.getByRole('button', { name: DISCARD });
-
-      expect(saveButton).toBeEnabled();
-      expect(discardButton).toBeEnabled();
+      expectSaveAndDiscardEnabled();
     });
   });
 
   it('counts the fields that need attention ahead of a failed save', () => {
-    setup({
+    setupWithSummary({
       saveError: MOCK_SAVE_ERROR,
       invalidControls: { ids: [MOCK_FIELD_ID] },
     });

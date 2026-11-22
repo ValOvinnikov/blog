@@ -5,6 +5,7 @@ import { mockMembershipWithTenant } from '@platform/testing/memberships/membersh
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockUnsavedSettingsFeaturesAndPreset } from '@platform/testing/settings-features/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@shinefold/config';
 import { redirect } from 'next/navigation';
@@ -25,6 +26,7 @@ vi.mock('@platform/server/auth/auth');
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     memberships: {
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },
@@ -32,6 +34,7 @@ vi.mock('@shinefold/db', async () => ({
     settingsFeatures: {
       getSettingsFeaturesAndPreset: getSettingsFeaturesAndPresetMock,
     },
+    tenantAnalytics: { getStoredTenantAnalytics: vi.fn() },
   },
 }));
 

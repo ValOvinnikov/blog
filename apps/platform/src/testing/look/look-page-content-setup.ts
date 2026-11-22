@@ -11,8 +11,8 @@ export const setupLookPageContent = customRenderAsync(LookPageContent, {
 
 export const arrangeLookPageQueries = (queries: {
   getSiteConfig: ReturnType<typeof vi.fn>;
-  selectLiveLocales: ReturnType<typeof vi.fn>;
+  selectLiveLocalesWithin: ReturnType<typeof vi.fn>;
 }) => {
   queries.getSiteConfig.mockResolvedValue(undefined);
-  queries.selectLiveLocales.mockReturnValue([LOCALE_ISO_CODES.EN]);
+  queries.selectLiveLocalesWithin.mockReturnValue([LOCALE_ISO_CODES.EN]);
 };

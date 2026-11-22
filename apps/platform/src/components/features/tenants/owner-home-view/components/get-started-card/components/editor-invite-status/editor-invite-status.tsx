@@ -1,12 +1,12 @@
 import { OwnerAccessActions } from '@platform/components/shared/owner-access-actions';
 import { StatusBadge } from '@platform/components/shared/status-badge';
-import type { TPendingOwnerStudioAccess } from '@platform/constants/owner-studio-access';
 import { ownerStudioAccessTone } from '@platform/utils/status-tone/status-tone';
+import type { TPendingStudioAccess } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 
 export type TEditorInviteStatusProps = {
   tenantId: string;
-  studioAccess: TPendingOwnerStudioAccess;
+  studioAccess: TPendingStudioAccess;
 };
 
 export const EditorInviteStatus = ({

@@ -16,6 +16,8 @@ const GITHUB_TIMEOUT_MS = 5000;
 
 export type TGitHubResult<T> = TResult<T, TGitHubFailure>;
 
+export type TGitHubRevalidate = number | false;
+
 const isRateLimited = (response: Response): boolean =>
   response.status === HTTP_STATUS.TOO_MANY_REQUESTS ||
   (response.status === HTTP_STATUS.FORBIDDEN &&
@@ -25,7 +27,7 @@ const isRateLimited = (response: Response): boolean =>
 /** Never throws; a rate limit is logged at warn and a missing resource not at all. */
 export const fetchGitHub = async (
   path: string,
-  accept = 'application/vnd.github+json',
+  revalidate: TGitHubRevalidate = 0,
 ): Promise<TGitHubResult<Response>> => {
   const credentials = readGitHubCredentials();
 
@@ -42,10 +44,11 @@ export const fetchGitHub = async (
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          Accept: accept,
+          Accept: 'application/vnd.github+json',
           'X-GitHub-Api-Version': '2022-11-28',
         },
         signal: AbortSignal.timeout(GITHUB_TIMEOUT_MS),
+        next: { revalidate },
       },
     );
 
@@ -73,8 +76,9 @@ export const fetchGitHub = async (
 export const fetchGitHubJson = async <T>(
   path: string,
   parse: (body: unknown) => T,
+  revalidate?: TGitHubRevalidate,
 ): Promise<TGitHubResult<T>> => {
-  const result = await fetchGitHub(path);
+  const result = await fetchGitHub(path, revalidate);
   if (!result.ok) return result;
 
   try {

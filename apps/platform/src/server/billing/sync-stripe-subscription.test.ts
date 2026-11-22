@@ -2,6 +2,7 @@ import {
   BILLING_LOG,
   STRIPE_SUBSCRIPTION_STATUS,
 } from '@platform/constants/billing';
+import { MOCK_UNSUPPORTED_CURRENCY } from '@platform/testing/billing/catalogue';
 import {
   MOCK_BAND_CEILING,
   MOCK_INCOMPLETE_SUBSCRIPTION_STATUS,
@@ -11,16 +12,22 @@ import {
   MOCK_STRIPE_PROMOTION_CODE,
   MOCK_STRIPE_SUBSCRIPTION_ID,
 } from '@platform/testing/billing/fixtures';
+import {
+  MOCK_CANCEL_AT,
+  MOCK_SCHEDULE_ID,
+} from '@platform/testing/billing/plan-subscription';
 import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import {
+  BILLING_INTERVAL,
   ERROR_CODE,
   TENANT_PLAN,
   type TTenantPlan,
 } from '@shinefold/config/constants';
 import {
+  BILLING_CURRENCY,
   STRIPE_PRICE_LOOKUP_KEY,
   TENANT_PLAN_WRITE_OUTCOME,
   TENANT_STATUS,
@@ -37,12 +44,14 @@ const {
   setTenantPlanMock,
   setTenantBillingMock,
   retrieveSubscriptionMock,
+  releaseScheduleMock,
 } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
   getTenantBillingMock: vi.fn(),
   setTenantPlanMock: vi.fn(),
   setTenantBillingMock: vi.fn(),
   retrieveSubscriptionMock: vi.fn(),
+  releaseScheduleMock: vi.fn(),
 }));
 
 vi.mock('@shinefold/db', async () => ({
@@ -61,6 +70,7 @@ vi.mock('./resolve-stripe-tenant', () => ({ resolveStripeTenant: vi.fn() }));
 
 const MOCK_STRIPE = {
   subscriptions: { retrieve: retrieveSubscriptionMock },
+  subscriptionSchedules: { release: releaseScheduleMock },
 } as unknown as Stripe;
 
 const sync = () =>
@@ -110,12 +120,14 @@ describe(syncStripeSubscription, () => {
       );
     });
 
-    it('stores the Stripe ids, the promotion code and the band, ending any grace', () => {
+    it('stores the ids, promotion code, band, period and currency, ending grace', () => {
       expect(writtenBilling()).toEqual({
         stripeCustomerId: MOCK_STRIPE_CUSTOMER_ID,
         stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
         stripePromotionCode: MOCK_STRIPE_PROMOTION_CODE,
         subscriberBandCeiling: MOCK_BAND_CEILING,
+        billingInterval: BILLING_INTERVAL.MONTHLY,
+        billingCurrency: BILLING_CURRENCY.USD,
         downgradeGraceStartedAt: null,
         graceStartedEmailSentAt: null,
         graceHalfwayEmailSentAt: null,
@@ -154,7 +166,34 @@ describe(syncStripeSubscription, () => {
     );
   });
 
-  it('moves a cancelled paid site to Free and starts the grace', async () => {
+  it("stores a yearly subscription's period", async () => {
+    retrieveSubscriptionMock.mockResolvedValue(
+      mockStripeSubscription({
+        lookupKeys: [STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY],
+      }),
+    );
+
+    await sync();
+
+    expect(writtenBilling()?.billingInterval).toBe(BILLING_INTERVAL.YEARLY);
+  });
+
+  it('stores no currency, and logs it, for a currency outside the catalogue', async () => {
+    retrieveSubscriptionMock.mockResolvedValue(
+      mockStripeSubscription({ currency: MOCK_UNSUPPORTED_CURRENCY }),
+    );
+
+    await sync();
+
+    expect(writtenBilling()?.billingCurrency).toBeNull();
+    expect(logger.error).toHaveBeenCalledWith(BILLING_LOG.CURRENCY_UNKNOWN, {
+      tenantId: MOCK_TENANT_ID,
+      subscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
+      currency: MOCK_UNSUPPORTED_CURRENCY,
+    });
+  });
+
+  it('moves a cancelled paid site to Free, unsets period and currency, starts grace', async () => {
     getTenantByIdMock.mockResolvedValue(
       mockTenant({ plan: TENANT_PLAN.GROWTH }),
     );
@@ -170,8 +209,14 @@ describe(syncStripeSubscription, () => {
     });
     expect(writtenBilling()).toMatchObject({
       subscriberBandCeiling: null,
+      billingInterval: null,
+      billingCurrency: null,
       downgradeGraceStartedAt: expect.any(Date),
     });
+    expect(logger.error).not.toHaveBeenCalledWith(
+      BILLING_LOG.CURRENCY_UNKNOWN,
+      expect.anything(),
+    );
   });
 
   it('starts no grace for a cancelled subscription on a site already on Free', async () => {
@@ -216,6 +261,32 @@ describe(syncStripeSubscription, () => {
       expect(writtenBilling()?.stripeSubscriptionId).toBe(
         MOCK_STRIPE_SUBSCRIPTION_ID,
       );
+    });
+  });
+
+  describe('a subscription with a planned change', () => {
+    it('releases the planned change once the Portal cancels the subscription', async () => {
+      retrieveSubscriptionMock.mockResolvedValue(
+        mockStripeSubscription({
+          cancelAt: MOCK_CANCEL_AT,
+          schedule: MOCK_SCHEDULE_ID,
+        }),
+      );
+
+      await sync();
+
+      expect(releaseScheduleMock).toHaveBeenCalledWith(MOCK_SCHEDULE_ID);
+      expect(setTenantPlanMock).toHaveBeenCalled();
+    });
+
+    it('keeps the planned change while the subscription renews', async () => {
+      retrieveSubscriptionMock.mockResolvedValue(
+        mockStripeSubscription({ schedule: MOCK_SCHEDULE_ID }),
+      );
+
+      await sync();
+
+      expect(releaseScheduleMock).not.toHaveBeenCalled();
     });
   });
 

@@ -20,43 +20,17 @@ export const settingsFormShellVariants = tv({
         root: ['gap-4 max-md:-mt-0.5 md:gap-5'],
       },
     },
-    hasPhoneSaveFooter: {
-      true: {},
-      false: {},
-    },
     isSaveBarShown: {
-      true: {},
-      false: {},
-    },
-    isArchived: {
-      true: {},
-      false: {},
-    },
-  },
-  compoundVariants: [
-    {
-      hasPhoneSaveFooter: false,
-      isSaveBarShown: true,
-      class: {
+      true: {
         root: [
           'max-md:[html:has(&)]:scroll-pb-[max(var(--spacing-platform-dock-room),var(--platform-save-bar-height,0px)+var(--spacing-platform-dock-clearance))]',
         ],
       },
+      false: {},
     },
-    {
-      hasPhoneSaveFooter: true,
-      isArchived: false,
-      class: {
-        root: [
-          'max-md:[html:has(&)]:scroll-pb-[calc(var(--platform-save-bar-height,var(--spacing-platform-phone-footer-max))+var(--spacing-platform-dock-clearance))]',
-        ],
-      },
-    },
-  ],
+  },
   defaultVariants: {
     isWide: false,
-    isArchived: false,
-    hasPhoneSaveFooter: false,
     isSaveBarShown: false,
   },
 });

@@ -2,7 +2,7 @@
 
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { stampSavedAt } from '@platform/server/site-config/stamp-saved-at';
 import {
@@ -26,7 +26,7 @@ import {
 } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { SITE_CONFIG_SAVED_AT } from '@shinefold/db/constants';
-import { pickEntitledLook } from '@shinefold/db/utils/effective-look/effective-look';
+import { pickLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
@@ -43,7 +43,7 @@ export const updateLookAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
   const { preset, brandName, ...rest } = parsed.data;
 
   try {
@@ -53,7 +53,7 @@ export const updateLookAction = async (
     const refused = listRefusedLookFields(
       { ...parsed.data, logoHue: parsed.data.logoHue ?? undefined },
       stored,
-      tenant.plan,
+      tenant.entitlements,
     );
     if (hasArrayGotItems(refused)) {
       return toNotInPlanRefusal(tenant.plan, refused);
@@ -61,9 +61,9 @@ export const updateLookAction = async (
 
     const look = {
       preset,
-      ...pickEntitledLook(
+      ...pickLookWithin(
         { ...rest, brandName: blankToNull(brandName) },
-        tenant.plan,
+        tenant.entitlements,
       ),
     };
     await queries.siteConfig.upsertSiteConfig(tenant.id, look);

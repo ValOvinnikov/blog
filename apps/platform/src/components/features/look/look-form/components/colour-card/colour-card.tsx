@@ -70,8 +70,7 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
         label={t('logoHueLabel')}
         hint={t('logoHueDescription')}
         isGroup={true}
-        labelId={logoHueLock.labelId}
-        growthBadgeId={logoHueLock.growthBadgeId}
+        lock={logoHueLock}
       >
         <LogoHueField
           accentHue={accentHue}

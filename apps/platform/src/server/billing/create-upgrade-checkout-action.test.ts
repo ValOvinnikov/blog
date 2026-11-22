@@ -1,5 +1,4 @@
 import {
-  BILLING_INTERVAL,
   BILLING_LOG,
   STRIPE_CHECKOUT_SESSION_ID_TEMPLATE,
   STRIPE_SUBSCRIPTION_STATUS,
@@ -28,7 +27,7 @@ import { MOCK_TRIAL_ENDS_AT } from '@platform/testing/tenants/mock-tenant';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { ACTION_OUTCOME } from '@shinefold/config';
-import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_PLAN, BILLING_INTERVAL } from '@shinefold/config/constants';
 import {
   STRIPE_PRICE_LOOKUP_KEY,
   TENANT_STATUS,

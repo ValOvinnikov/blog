@@ -55,15 +55,11 @@
     "paginationAriaLabel": "Blogpagina's"
   },
   "blogPostPage": {
-    "depthToggle": {
-      "ariaLabel": "Leesdiepte",
-      "skim": "30s",
-      "read": "Lezen",
-      "deep": "Diepgaand"
-    },
-    "skimPanel": {
-      "label": "Samenvatting in 30 seconden",
-      "readFullArticle": "Lees het volledige artikel"
+    "postSummary": {
+      "button": "Samenvatting",
+      "title": "Kernpunten",
+      "readTime": "30 sec leestijd",
+      "readFullArticle": "Lees het volledige artikel · {count} min"
     },
     "asideKind": {
       "WHY_NOT": "Waarom niet X",
@@ -138,6 +134,7 @@
     "emailInvalid": "Voer een geldig e-mailadres in.",
     "sendLimited": "Er zijn te veel inloglinks aangevraagd voor dit adres. Probeer het over een uur opnieuw.",
     "oauthError": "Inloggen mislukt. Probeer het opnieuw.",
+    "oauthAccountNotLinked": "Google of GitHub heeft dit e-mailadres niet geverifieerd. Verifieer het daar en probeer het opnieuw, of log in met een inloglink per e-mail.",
     "accountMenuAriaLabel": "Accountmenu",
     "signOut": "Uitloggen",
     "loadingAccountStatus": "Accountstatus laden",
@@ -151,12 +148,16 @@
     "dismissLabel": "Melding sluiten",
     "mergeCountSuffix": " ×{count}"
   },
+  "outOfDateNotice": {
+    "message": "Deze pagina is verouderd. Herlaad de pagina om verder te gaan.",
+    "reloadLabel": "Herladen"
+  },
   "bookmarkButton": {
     "save": "Bewaren",
     "saved": "Bewaard",
     "saveAriaLabel": "Bericht bewaren",
     "removeAriaLabel": "Bladwijzer verwijderen",
-    "error": "Dat kon niet worden bewaard. Probeer het opnieuw.",
+    "errorSave": "Dat kon niet worden bewaard. Probeer het opnieuw.",
     "errorUnavailable": "Bladwijzers opslaan is op deze site momenteel niet beschikbaar.",
     "toastSavedMessage": "Bewaard in bladwijzers",
     "toastRemovedMessage": "Verwijderd uit bladwijzers",
@@ -273,6 +274,8 @@
       "unlinkToastSuccessMessage": "Account ontkoppeld.",
       "unlinkError": "Ontkoppelen is mislukt. Probeer het opnieuw.",
       "unlinkLastMethodError": "Dit is uw enige overgebleven inlogmethode — koppel eerst een andere voordat u deze ontkoppelt.",
+      "linkNotLinkedError": "Dat account kon niet worden gekoppeld. Google of GitHub heeft het e-mailadres niet geverifieerd, of het logt hier al in bij een ander account.",
+      "linkError": "Dat account kon niet worden gekoppeld. Probeer het opnieuw.",
       "displayNameLabel": "Weergavenaam",
       "displayNameDescription": "Vervangt uw gebruikersnaam van de provider overal waar uw reacties verschijnen.",
       "displayNameAriaLabel": "Weergavenaam",
@@ -310,12 +313,40 @@
     "promo": {
       "once": "op je eerste betaling",
       "repeating": "gedurende {months, plural, one {# maand} other {# maanden}}"
+    },
+    "compare": {
+      "heading": "Abonnementen vergelijken",
+      "feature": "Functie",
+      "included": "Inbegrepen",
+      "notIncluded": "Niet inbegrepen",
+      "all": "Alle",
+      "share": "{count} van {total}",
+      "plans": {
+        "FREE": "Free",
+        "STARTER": "Starter",
+        "GROWTH": "Growth"
+      },
+      "rows": {
+        "LANGUAGES": "Talen",
+        "SEATS": "Teamleden",
+        "CUSTOM_DOMAIN": "Je eigen domein",
+        "NO_POWERED_BY_MARK": "Geen ‘Powered by’-vermelding",
+        "LOOK_SETTINGS": "Look-instellingen",
+        "SECTION_TYPES": "Soorten paginasecties",
+        "OWN_ANALYTICS": "Je eigen analysetool",
+        "OWN_SIGN_IN_APPS": "Je eigen inlogapps",
+        "CONTACT_FORM": "Contactformulier",
+        "READER_ACCOUNTS": "Lezersaccounts en bladwijzers",
+        "NEWSLETTER_SUBSCRIBERS": "Inbegrepen nieuwsbriefabonnees",
+        "TAKEAWAYS_PER_MONTH": "AI-kernpunten per maand"
+      }
     }
   },
   "consent": {
     "banner": {
       "heading": "Cookies op deze site",
       "message": "We gebruiken alleen cookies die nodig zijn om deze site te laten werken, tenzij je externe media toestaat. Je kunt je keuze op elk moment wijzigen via Cookie-instellingen in de footer.",
+      "messageWithAnalytics": "We gebruiken alleen cookies die nodig zijn om deze site te laten werken, tenzij je analyse of externe media toestaat. Je kunt je keuze op elk moment wijzigen via Cookie-instellingen in de footer.",
       "acceptLabel": "Alles accepteren",
       "rejectLabel": "Alles weigeren",
       "settingsLabel": "Instellingen",
@@ -332,6 +363,10 @@
         "label": "Noodzakelijk",
         "description": "Nodig om de site te laten werken. Altijd ingeschakeld."
       },
+      "analytics": {
+        "label": "Analyse",
+        "description": "Meet bezoeken aan deze site met tools die hun eigen cookies plaatsen, zoals Google Analytics."
+      },
       "externalMedia": {
         "label": "Externe media",
         "description": "Inhoud van externe aanbieders, zoals video's en kaarten, die mogelijk hun eigen cookies plaatsen."
@@ -346,6 +381,7 @@
   "cookieList": {
     "ariaLabel": "Cookies en browseropslag",
     "intro": "Alles hieronder wordt door deze site zelf geplaatst en is strikt noodzakelijk.",
+    "introWithGoogleAnalytics": "Alles hieronder wordt door deze site geplaatst. De Google Analytics-cookies worden alleen geplaatst als je analyse toestaat; al het andere is strikt noodzakelijk.",
     "columns": {
       "name": "Naam",
       "purpose": "Doel",
@@ -358,10 +394,6 @@
       },
       "LANGUAGE": {
         "purpose": "Onthoudt de taal die je voor deze site hebt gekozen.",
-        "duration": "1 jaar"
-      },
-      "CURRENCY": {
-        "purpose": "Onthoudt in welke valuta prijzen worden getoond, op basis van het land van waaruit je de site bezoekt.",
         "duration": "1 jaar"
       },
       "SESSION": {
@@ -396,16 +428,21 @@
         "purpose": "Bewaart de link uit je afmeldmail terwijl je bevestigt.",
         "duration": "1 uur"
       },
-      "READING_DEPTH": {
-        "purpose": "Onthoudt hoeveel je van elk bericht wilt lezen. Opgeslagen in de lokale opslag van je browser.",
-        "duration": "Tot je je browsergegevens wist"
-      },
       "THEME": {
         "purpose": "Onthoudt of je het lichte of donkere thema hebt gekozen. Opgeslagen in de lokale opslag van je browser.",
         "duration": "Tot je je browsergegevens wist"
+      },
+      "GOOGLE_ANALYTICS": {
+        "purpose": "Onderscheidt bezoeken uit verschillende browsers, zodat Google Analytics bezoekers kan tellen.",
+        "duration": "2 jaar"
+      },
+      "GOOGLE_ANALYTICS_VISIT": {
+        "purpose": "Houdt je huidige bezoek bij voor Google Analytics.",
+        "duration": "2 jaar"
       }
     },
-    "analyticsNote": "Als deze site bezoeken en paginasnelheid meet, gebruikt ze Vercel Web Analytics en Speed Insights. Die plaatsen geen cookies en laden ongeacht je cookiekeuze."
+    "analyticsNote": "Als deze site bezoeken en paginasnelheid meet, gebruikt ze Vercel Web Analytics en Speed Insights. Die plaatsen geen cookies en laden ongeacht je cookiekeuze.",
+    "plausibleNote": "Deze site meet bezoeken ook met Plausible, dat geen cookies plaatst."
   },
   "table": {
     "regionLabel": "Tabel"

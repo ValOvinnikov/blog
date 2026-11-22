@@ -40,7 +40,6 @@ export const NewsletterModuleView = ({
           id={titleId}
           level={2}
           align={contentAlignment}
-          variant="section"
         />
         <NewsletterForm
           variant={variant}

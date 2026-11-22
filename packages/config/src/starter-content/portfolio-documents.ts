@@ -4,8 +4,9 @@ import { buildBaseDocuments } from './base-documents';
 import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
-import { keyedReference, paragraphs, reference } from './starter-fields';
+import { moduleSlot, paragraphs, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
+import { INTRODUCTION_MODULE_TITLE } from './starter-module-titles';
 import {
   buildAuthor,
   buildCalloutCta,
@@ -34,7 +35,10 @@ export function buildPortfolioDocuments({
       navigationItems: [navigationLink(ids.PORTFOLIO_WORK_LINK)],
       homeLayout: {
         hero: reference(ids.PORTFOLIO_HERO),
-        modules: [ids.PORTFOLIO_INTRO, ids.PORTFOLIO_CTA].map(keyedReference),
+        modules: [
+          moduleSlot(ids.PORTFOLIO_INTRO, 'module_content'),
+          moduleSlot(ids.PORTFOLIO_CTA, 'module_cta'),
+        ],
       },
     }),
     buildAuthor(ids.PORTFOLIO_AUTHOR, siteName),
@@ -48,7 +52,7 @@ export function buildPortfolioDocuments({
     }),
     buildContentModule({
       id: ids.PORTFOLIO_INTRO,
-      title: 'Introduction',
+      title: INTRODUCTION_MODULE_TITLE,
       locale,
       body: paragraphs(intro.body),
     }),

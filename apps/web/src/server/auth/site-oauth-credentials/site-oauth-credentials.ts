@@ -2,11 +2,10 @@ import 'server-only';
 
 import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import { queries } from '@shinefold/db';
-import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import type { TTenantOAuthCredentialsByProvider } from '@shinefold/db/queries/tenant-oauth-credentials/get-tenant-oauth-credentials/get-tenant-oauth-credentials';
 import { AUTH_ACTION } from '@web/constants/session';
 import { SIGN_IN_LOG } from '@web/constants/sign-in';
-import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
+import { getEffectiveEntitlements } from '@web/server/site-config/get-effective-entitlements/get-effective-entitlements';
 import { resolveTenant } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { logger } from '@web/utils/logger/logger';
 import { headers } from 'next/headers';
@@ -20,8 +19,8 @@ const loadEntitledCredentials = async (
 ): Promise<TTenantOAuthCredentialsByProvider> => {
   if (!tenantId) return SHARED_APPS;
 
-  const plan = await getEffectivePlan(tenantId);
-  if (!PLAN_ENTITLEMENTS[plan].hasOwnOAuthApps) return SHARED_APPS;
+  const { hasOwnOAuthApps } = await getEffectiveEntitlements(tenantId);
+  if (!hasOwnOAuthApps) return SHARED_APPS;
 
   return queries.tenantOAuthCredentials.getTenantOAuthCredentials(tenantId);
 };

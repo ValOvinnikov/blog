@@ -58,24 +58,17 @@
   sticky rail spans both grid rows so it descends to sit beside the footer
   instead of stopping at the end of the body (#996, superseding #987's
   full-width-footer approach).
-- **Choose-your-depth reading (#957, additive-only — no migration):** every
-  post renders at three reader-selectable depths — `SKIM` (a 3–7 item
-  takeaways panel with a "read the full article" affordance), `READ` (the
-  article exactly as written, the default), `DEEP` (the `READ` body plus its
-  authored `aside` blocks expanded in place, kind-labelled "Why not X" /
-  "Digression" / "Context") — via a `SegmentedControl` near the title. All
-  three depths ship in the same static HTML; switching is a pure CSS
-  show/hide keyed off a `data-depth` attribute (`DepthProvider`, a client
-  context wrapping the reading area, mirrors the theme toggle's no-flash
-  pre-hydration script + `localStorage` persistence, key `reading-depth`).
-  ISR, canonical URL, and SEO are unaffected — crawlers see the standard
-  `READ` article; no duplicate-content risk. Graceful degradation: no
-  approved `skim` → no `30s` option; no `aside` blocks (`hasAsides`) → no
-  `Deep` option; a post with neither renders the control hidden entirely
-  (today's default post shape, unchanged). A publish-time pipeline
-  (`POST /api/generate-skim`, secret-verified — see
-  [`rendering-caching-i18n.md`](./rendering-caching-i18n.md)) drafts the `skim`
-  field for human approval; publishing the post **is** the approval step.
+- **Post summary:** a post with a summary gets a **Summary** disclosure
+  button after Save and Share in the author row's action group. It opens a
+  card under the author row, in the title's column, that renders the summary's
+  rich text (paragraphs, lists, bold and italic) and ends with "Read the full article · N min", which closes the card and
+  moves focus to the article body. The card ships in the server HTML, hidden
+  and closed on every load, so nothing is stored and nothing flashes; ISR,
+  canonical URL and SEO are unaffected. Authored `aside` blocks always render
+  inline. A publish-time pipeline (`POST /api/generate-skim`,
+  secret-verified — see
+  [`rendering-caching-i18n.md`](./rendering-caching-i18n.md)) drafts the
+  summary for human approval; publishing the post **is** the approval step.
 - The "Related reading" section is separated from the article by a
   `max-w-page`-width top rule (`--border-emphasis`), not a background
   fill — the page canvas itself (including the hero) is `--bg-subtle`

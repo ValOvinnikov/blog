@@ -42,13 +42,6 @@ const collectTaxonomyListRefLocations = (
     : moduleLocations;
 };
 
-/**
- * Rejects an index page whose referenced taxonomy list — the deprecated
- * `taxonomyList` field or any `modules[]` entry of `moduleTypeName` — is
- * authored for the other taxonomy kind. Reports on each offending location
- * rather than the document as a whole, so the error lands on the Modules
- * field entry (or the legacy field) that actually mismatches.
- */
 export const validateTaxonomyListReferencesMatchKind =
   (kind: TTaxonomyKind, moduleTypeName: string, mismatchError: string) =>
   async (

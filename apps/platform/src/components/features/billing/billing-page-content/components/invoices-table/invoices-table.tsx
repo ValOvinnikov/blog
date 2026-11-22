@@ -4,9 +4,8 @@ import { StatusBadge } from '@platform/components/shared/status-badge';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TBillingInvoice } from '@platform/server/billing/fetch-stripe-billing';
 import { formatDate } from '@platform/utils/format-date/format-date';
-import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import { invoiceStatusTone } from '@platform/utils/invoice-status-tone/invoice-status-tone';
-import { SIZE } from '@shinefold/config';
+import { formatStripeAmount, SIZE } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { invoicesTableVariants } from './invoices-table-variants';

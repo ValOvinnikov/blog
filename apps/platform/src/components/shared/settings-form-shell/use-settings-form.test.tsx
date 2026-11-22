@@ -14,10 +14,8 @@ import {
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import type { Mock } from 'vitest';
 
-import {
-  useSettingsForm,
-  type TUseSettingsFormArgs,
-} from './use-settings-form';
+import type { TUseSettingsFormArgs } from './settings-form-types';
+import { useSettingsForm } from './use-settings-form';
 
 type TValues = { name: string };
 type TResult = { outcome: TActionOutcome };
@@ -213,7 +211,7 @@ describe(useSettingsForm, () => {
       expect(result.current.values).toEqual(MOCK_SAVED_VALUES);
     });
 
-    it('refreshes the page once so it takes the current plan', async () => {
+    it('refreshes the page once so it takes the current entitlements', async () => {
       expect(refresh).toHaveBeenCalledTimes(1);
     });
 
@@ -221,6 +219,18 @@ describe(useSettingsForm, () => {
       act(() => result.current.form.discard());
 
       expect(result.current.form.planRefusal).toBeUndefined();
+    });
+
+    it('names the limit the refusal sends with the page message it was given', async () => {
+      ({ result } = renderSettingsForm({
+        onSubmit: async () => toNotInPlanRefusal(TENANT_PLAN.FREE, ['name'], 3),
+        planRefusalMessageKey: 'languagesNotInPlan',
+      }));
+      await editAndSave(result);
+
+      expect(result.current.form.planRefusal).toBe(
+        `Your site is on the Free plan, which allows 3 languages, so ${MOCK_FIELD_LABEL} wasn't added.`,
+      );
     });
   });
 });

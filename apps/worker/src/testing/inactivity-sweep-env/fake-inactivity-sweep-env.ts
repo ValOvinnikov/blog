@@ -1,3 +1,5 @@
+import { pricingPageUrl } from '@shinefold/config';
+import { MOCK_MARKETING_TENANT_DOMAIN } from '@shinefold/db/testing/tenant-domains/fixtures';
 import { MOCK_SITE_CONFIG_REVALIDATE_SECRET } from '@worker/testing/deprovision-env/fake-deprovision-env';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import { MOCK_TENANT_ROOT_DOMAIN } from '@worker/testing/tenant/fixtures';
@@ -10,5 +12,7 @@ export function mockInactivitySweepEnv(): TInactivitySweepEnv {
     webAppBaseUrl,
     siteConfigRevalidateSecret: MOCK_SITE_CONFIG_REVALIDATE_SECRET,
     tenantRootDomain: MOCK_TENANT_ROOT_DOMAIN,
+    marketingHost: MOCK_MARKETING_TENANT_DOMAIN,
+    pricingPageUrl: pricingPageUrl(`https://${MOCK_MARKETING_TENANT_DOMAIN}`),
   };
 }

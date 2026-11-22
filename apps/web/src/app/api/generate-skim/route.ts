@@ -1,13 +1,8 @@
-import {
-  getPlatformSanityWriteContext,
-  service,
-  type TTenantSanityContext,
-} from '@shinefold/service';
+import { HTTP_STATUS, type TMaybeUndefined } from '@shinefold/config';
 import { isSecretMatch } from '@shinefold/utils';
-import {
-  generateTakeaways,
-  SKIM_GENERATION_MODEL,
-} from '@web/server/skim/generate-takeaways/generate-takeaways';
+import { GENERATE_SKIM_LOG } from '@web/constants/generate-skim';
+import { generatePostSkim } from '@web/server/skim/generate-post-skim/generate-post-skim';
+import { skimResponse } from '@web/server/skim/skim-response/skim-response';
 import {
   getHostTenantSanityContext,
   getHostTenantSanityWriteContext,
@@ -17,149 +12,69 @@ import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-// The Sanity write client (via `service.editorial.skim.v1.saveSkimDraft`)
-// needs the Node.js runtime, same reason as `/api/revalidate`.
+// The Sanity write client needs the Node.js runtime.
 export const runtime = 'nodejs';
 
 const requestBodySchema = z.object({ _id: z.string().min(1) });
+
+const UNRESOLVED_TENANT_MESSAGE = 'Failed to resolve the requesting tenant.';
+
+const parsePostId = async (
+  request: Request,
+): Promise<TMaybeUndefined<string>> => {
+  try {
+    const parsedBody = requestBodySchema.safeParse(await request.json());
+    return parsedBody.success ? parsedBody.data._id : undefined;
+  } catch {
+    return undefined;
+  }
+};
 
 export async function POST(request: Request): Promise<NextResponse> {
   const { SANITY_GENERATE_SECRET: secret, ANTHROPIC_API_KEY: apiKey } = env;
 
   if (!secret || !apiKey) {
-    logger.error('generate_skim.config_missing');
-    return NextResponse.json(
-      { message: 'Skim generation is not configured.' },
-      { status: 503 },
+    logger.error(GENERATE_SKIM_LOG.CONFIG_MISSING);
+    return skimResponse(
+      'Skim generation is not configured.',
+      HTTP_STATUS.SERVICE_UNAVAILABLE,
     );
   }
 
   const providedSecret = new URL(request.url).searchParams.get('secret');
   if (!isSecretMatch(providedSecret, secret)) {
-    return NextResponse.json({ message: 'Invalid secret.' }, { status: 401 });
+    return skimResponse('Invalid secret.', HTTP_STATUS.UNAUTHORIZED);
   }
 
-  let rawBody: unknown;
-  try {
-    rawBody = await request.json();
-  } catch {
-    return NextResponse.json(
-      { message: 'Malformed request body.' },
-      { status: 400 },
-    );
+  const postId = await parsePostId(request);
+  if (!postId) {
+    return skimResponse('Malformed request body.', HTTP_STATUS.BAD_REQUEST);
   }
-
-  const parsedBody = requestBodySchema.safeParse(rawBody);
-  if (!parsedBody.success) {
-    return NextResponse.json(
-      { message: 'Malformed request body.' },
-      { status: 400 },
-    );
-  }
-  const { _id: postId } = parsedBody.data;
 
   const hostTenant = await getHostTenantSanityContext();
   if (!hostTenant.isResolvable) {
-    logger.error('generate_skim.host_unresolvable', { postId });
-    return NextResponse.json(
-      { message: 'Failed to resolve the requesting tenant.' },
-      { status: 404 },
-    );
+    logger.error(GENERATE_SKIM_LOG.HOST_UNRESOLVABLE, { postId });
+    return skimResponse(UNRESOLVED_TENANT_MESSAGE, HTTP_STATUS.NOT_FOUND);
   }
 
-  const writeTenant = await getHostTenantSanityWriteContext();
-  if (!writeTenant.isResolvable) {
-    logger.error('generate_skim.write_tenant_unresolvable', { postId });
-    return NextResponse.json(
-      { message: 'Failed to resolve the requesting tenant.' },
-      { status: 404 },
-    );
-  }
-  if (writeTenant.tenantId && !writeTenant.tenant) {
-    logger.error('generate_skim.tenant_write_credentials_missing', {
-      postId,
-      tenantId: writeTenant.tenantId,
-    });
-    return NextResponse.json(
-      {
-        message:
-          'The requesting tenant has no usable Sanity write credentials.',
-      },
-      { status: 503 },
-    );
-  }
-  if (writeTenant.tenantId && !writeTenant.isActive) {
-    logger.warn('generate_skim.tenant_not_active', {
-      postId,
-      tenantId: writeTenant.tenantId,
-    });
-    return NextResponse.json(
-      { message: 'The requesting tenant is not permitted to write.' },
-      { status: 403 },
-    );
+  const writeContext = await getHostTenantSanityWriteContext();
+  if (!writeContext.isResolvable) {
+    logger.error(GENERATE_SKIM_LOG.WRITE_TENANT_UNRESOLVABLE, { postId });
+    return skimResponse(UNRESOLVED_TENANT_MESSAGE, HTTP_STATUS.NOT_FOUND);
   }
 
-  const bodyResult = await service.editorial.skim.v1.getPublishedPostBody(
+  const result = await generatePostSkim({
     postId,
-    hostTenant.tenant,
-  );
-  if (!bodyResult.ok) {
-    logger.error('generate_skim.post_body_fetch_failed', {
-      postId,
-      error: bodyResult.error,
-    });
-    return NextResponse.json(
-      { message: 'Failed to read the published post.' },
-      { status: 500 },
-    );
-  }
-
-  let takeaways: string[];
-  try {
-    takeaways = await generateTakeaways(bodyResult.data, apiKey);
-  } catch (error) {
-    logger.error('generate_skim.generation_failed', { postId, error });
-    return NextResponse.json(
-      { message: 'Failed to generate takeaways.' },
-      { status: 422 },
-    );
-  }
-
-  let resolvedWriteTenant: TTenantSanityContext;
-  try {
-    resolvedWriteTenant = writeTenant.tenant ?? getPlatformSanityWriteContext();
-  } catch (error) {
-    logger.error('generate_skim.write_client_unconfigured', {
-      postId,
-      error,
-    });
-    return NextResponse.json(
-      { message: 'Failed to save the skim draft.' },
-      { status: 503 },
-    );
-  }
-
-  const saveResult = await service.editorial.skim.v1.saveSkimDraft(
-    {
-      postId,
-      takeaways,
-      model: SKIM_GENERATION_MODEL,
-    },
-    resolvedWriteTenant,
-  );
-  if (!saveResult.ok) {
-    logger.error('generate_skim.draft_save_failed', {
-      postId,
-      error: saveResult.error,
-    });
-    return NextResponse.json(
-      { message: 'Failed to save the skim draft.' },
-      { status: 500 },
-    );
+    apiKey,
+    readTenant: hostTenant.tenant,
+    writeContext,
+  });
+  if (!result.isGenerated) {
+    return skimResponse(result.message, result.status);
   }
 
   return NextResponse.json(
-    { ok: true, count: takeaways.length },
-    { status: 200 },
+    { ok: true, count: result.count },
+    { status: HTTP_STATUS.OK },
   );
 }

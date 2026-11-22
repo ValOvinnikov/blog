@@ -40,7 +40,6 @@ export const ContactFormModuleView = ({
         id={titleId}
         level={2}
         align={contentAlignment}
-        variant="section"
       />
       <div className={s.column()}>
         <ContactForm

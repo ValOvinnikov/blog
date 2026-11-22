@@ -1,9 +1,9 @@
-import { BILLING_INTERVAL } from '@platform/constants/billing';
 import {
   PLAN_CHANGE_TIMING,
   type TPlanChoice,
 } from '@platform/constants/plan-change';
 import type { TMaybeUndefined } from '@shinefold/config';
+import { BILLING_INTERVAL } from '@shinefold/config/constants';
 import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 
 // Key order is the rank; a shorter period waits for renewal even when the plan moves up.

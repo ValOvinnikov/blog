@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { BRAND_VARIANT } from '@shinefold/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { MOCK_TEAM_MEMBER_INITIALS } from '@web/testing/modules/team/fixtures';
@@ -27,7 +26,6 @@ const MOCK_NEW_TAB_LINK = {
 const setup = customRender(TestimonialCard, {
   item: MOCK_ITEM,
   align: 'left',
-  tone: BRAND_VARIANT.PRIMARY,
 });
 
 describe(`<${TestimonialCard.name}/>`, () => {

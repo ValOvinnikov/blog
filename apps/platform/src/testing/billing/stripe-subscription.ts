@@ -4,6 +4,7 @@ import {
 } from '@platform/constants/billing';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
 import {
+  MOCK_STRIPE_CURRENCY,
   MOCK_STRIPE_CUSTOMER_ID,
   MOCK_STRIPE_SUBSCRIPTION_ID,
 } from '@platform/testing/billing/fixtures';
@@ -12,6 +13,7 @@ import {
   MOCK_BAND_QUANTITY,
   MOCK_PERIOD_END,
   MOCK_PLAN_ITEM_ID,
+  MOCK_SCHEDULE_ID,
   mockPrice,
 } from '@platform/testing/billing/plan-subscription';
 import { STRIPE_PRICE_LOOKUP_KEY } from '@shinefold/db/constants';
@@ -33,7 +35,9 @@ export type TMockStripeSubscription = {
   tenantId?: string;
   promotionCode?: string;
   cancelAtPeriodEnd?: boolean;
+  cancelAt?: number;
   schedule?: Stripe.SubscriptionSchedule | string | null;
+  currency?: string;
 };
 
 export const mockStripeSubscription = ({
@@ -42,13 +46,17 @@ export const mockStripeSubscription = ({
   tenantId,
   promotionCode,
   cancelAtPeriodEnd = false,
+  cancelAt,
   schedule = null,
+  currency = MOCK_STRIPE_CURRENCY,
 }: TMockStripeSubscription = {}): Stripe.Subscription =>
   ({
     id: MOCK_STRIPE_SUBSCRIPTION_ID,
+    currency,
     customer: MOCK_STRIPE_CUSTOMER_ID,
     status,
     cancel_at_period_end: cancelAtPeriodEnd,
+    cancel_at: cancelAt ?? null,
     schedule,
     metadata: tenantId ? { [STRIPE_TENANT_METADATA_KEY]: tenantId } : {},
     discounts: promotionCode
@@ -60,9 +68,23 @@ export const mockStripeSubscription = ({
 export const mockStripeEvent = (
   type: string = STRIPE_EVENT_TYPE.SUBSCRIPTION_UPDATED,
   object: object = mockStripeSubscription(),
+  previousAttributes?: object,
 ): Stripe.Event =>
   ({
     id: MOCK_STRIPE_EVENT_ID,
     type,
-    data: { object },
+    data: { object, previous_attributes: previousAttributes },
   }) as unknown as Stripe.Event;
+
+export const mockPendingUpdateClearedEvent = (
+  { schedule = MOCK_SCHEDULE_ID }: Pick<TMockStripeSubscription, 'schedule'>,
+  { isApplied }: { isApplied: boolean },
+): Stripe.Event =>
+  mockStripeEvent(
+    STRIPE_EVENT_TYPE.SUBSCRIPTION_UPDATED,
+    mockStripeSubscription({ schedule }),
+    {
+      pending_update: { expires_at: MOCK_PERIOD_END },
+      ...(isApplied && { items: { data: [] } }),
+    },
+  );

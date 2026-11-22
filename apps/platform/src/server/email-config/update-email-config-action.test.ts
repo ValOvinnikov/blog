@@ -175,34 +175,33 @@ describe(updateEmailConfigAction, () => {
     expect(upsertEmailConfig).not.toHaveBeenCalled();
   });
 
-  it.each([
-    [
-      'a plan without the contact form',
-      TENANT_PLAN.FREE,
-      MEMBERSHIP_ROLE.OWNER,
-    ],
-    ['an editor', TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.EDITOR],
-  ])(
-    'leaves the stored contact recipient untouched for %s',
-    async (_caller, plan, role) => {
-      mockMemberOnPlan(plan, role);
-      mockedAuth.mockResolvedValueOnce(MOCK_OPERATOR_SESSION);
+  it('leaves the stored contact recipient untouched on a plan without the contact form', async () => {
+    mockMemberOnPlan(TENANT_PLAN.FREE, MEMBERSHIP_ROLE.OWNER);
+    mockedAuth.mockResolvedValueOnce(MOCK_OPERATOR_SESSION);
 
-      await updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT);
+    await updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT);
 
-      expect(upsertEmailConfig).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-        ...NON_RECIPIENT_INPUT,
-        contactRecipient: undefined,
-      });
-      expect(insertAuditEvent).toHaveBeenCalledWith({
-        actorId: MOCK_OPERATOR_ID,
-        action: AUDIT_ACTION.SETTINGS_UPDATED,
-        targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-        targetId: MOCK_TENANT_ID,
-        details: { fields: Object.keys(NON_RECIPIENT_INPUT) },
-      });
-    },
-  );
+    expect(upsertEmailConfig).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+      ...NON_RECIPIENT_INPUT,
+      contactRecipient: undefined,
+    });
+    expect(insertAuditEvent).toHaveBeenCalledWith({
+      actorId: MOCK_OPERATOR_ID,
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+      targetId: MOCK_TENANT_ID,
+      details: { fields: Object.keys(NON_RECIPIENT_INPUT) },
+    });
+  });
+
+  it('refuses an editor and writes nothing', async () => {
+    mockMemberOnPlan(TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.EDITOR);
+
+    await expect(
+      updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    expect(upsertEmailConfig).not.toHaveBeenCalled();
+  });
 
   it('reports failure and records no audit event when the write fails', async () => {
     vi.mocked(upsertEmailConfig).mockRejectedValue(MOCK_DB_ERROR);

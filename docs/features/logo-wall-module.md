@@ -72,5 +72,5 @@ An editor shows a row of partner or client logos as social proof. Each logo sits
 ## Related
 
 - #5047 — epic: plans and entitlements. Proposes the logo wall as a Growth module that stops rendering on a Free site (#5051 is its manual test).
-- #5016 — epic: one-entry skins. The carousel's `tone` prop goes when band surfaces render their skin.
+- #5016 — epic: one-entry skins. #5023 retires `Carousel`'s `tone` prop, which the view no longer passes.
 - #4987 — epic: accessible text and colour on the public site, including every module story in each brand variant.

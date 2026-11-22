@@ -72,13 +72,11 @@ export const TestimonialModuleView = ({
         id={titleId}
         level={2}
         align={contentAlignment}
-        variant="section"
       />
       {isSpotlight && spotlightItem ? (
         <TestimonialCard
           item={spotlightItem}
           align="center"
-          tone={brandVariant}
           isSpotlight={true}
           dataTestId={`${dataTestId}-spotlight`}
         />
@@ -86,7 +84,6 @@ export const TestimonialModuleView = ({
         <TestimonialCarousel
           items={testimonials}
           align={cardAlign}
-          tone={brandVariant}
           contentAlignment={carouselAlign}
           title={headingBlock.heading}
         />
@@ -105,7 +102,6 @@ export const TestimonialModuleView = ({
                 isLoneFromLg: index === lastIndex && isLoneFromLg,
               })}
               align={cardAlign}
-              tone={brandVariant}
             />
           ))}
         </CardGrid>

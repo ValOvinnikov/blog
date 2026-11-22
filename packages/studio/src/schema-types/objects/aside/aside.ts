@@ -1,9 +1,10 @@
-import { ASIDE_KIND } from '@shinefold/config/constants';
-import { paragraphTextSchema } from '@shinefold/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import {
-  toPlainText,
-  type TPlainTextBlock,
-} from '@shinefold/studio/schema-types/portable-text/to-plain-text/to-plain-text';
+  ASIDE_KIND,
+  PORTABLE_TEXT_BLOCK_TYPE,
+} from '@shinefold/config/constants';
+import { paragraphTextSchema } from '@shinefold/studio/schema-types/portable-text/paragraph-text/paragraph-text';
+import { toPlainText } from '@shinefold/studio/schema-types/portable-text/to-plain-text/to-plain-text';
+import type { TTextBlock } from '@shinefold/utils/portable-text';
 import { toTitleCase } from '@shinefold/utils/primitives';
 import { MessageSquareText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -17,7 +18,7 @@ const excerpt = (text: string, wordCount = 12) => {
 };
 
 export const asideSchema = defineType({
-  name: 'aside',
+  name: PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
   title: 'Aside',
   type: 'object',
   description:
@@ -49,7 +50,7 @@ export const asideSchema = defineType({
   ],
   preview: {
     select: { kind: 'kind', body: 'body' },
-    prepare({ kind, body }: { kind?: string; body?: TPlainTextBlock[] }) {
+    prepare({ kind, body }: { kind?: string; body?: TTextBlock[] }) {
       return {
         title: kind ? toTitleCase(kind) : 'Unknown',
         subtitle: body ? excerpt(toPlainText(body)) : '',

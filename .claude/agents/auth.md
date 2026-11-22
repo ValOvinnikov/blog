@@ -55,6 +55,9 @@ test); a folder of two or fewer stays flat, and the third module splits all.
   `@shinefold/email` only.** Third-party: `next-auth`/`@auth/*`, `next` (for
   `next/headers` in sign-in events), `@t3-oss/env-core` with `zod`, and
   `server-only`. Only `apps/web` and `apps/platform` import this package.
+  `@auth/core` is pinned to the exact version `next-auth` depends on; bump the
+  two together, since a second copy fails `instanceof AuthError` and turns
+  the unverified-email refusal into `AccessDenied`.
 - **Export the `buildAuthConfig()` builder — never a `NextAuth()` instance or
   a config built at import.** Each app calls `NextAuth(() => …)` itself, so
   its `auth`/`handlers` bind to its own runtime and `getDb()` waits for the

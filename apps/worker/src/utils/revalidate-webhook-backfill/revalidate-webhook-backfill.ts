@@ -7,8 +7,9 @@ import {
   REVALIDATE_WEBHOOK_CHANGE,
 } from '@worker/constants/revalidate-webhook';
 import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
+import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
-import { getProvisionEnv } from '@worker/utils/provision-env/provision-env';
+import { requireValues } from '@worker/utils/require-values/require-values';
 
 type TRevalidateWebhookLogEvent = TValueOf<typeof REVALIDATE_WEBHOOK_LOG>;
 
@@ -27,7 +28,7 @@ export async function runRevalidateWebhookStepForEach(
   tenants: TTenant[],
   tenantFailedEvent: TRevalidateWebhookLogEvent,
 ): Promise<TRevalidateWebhookBackfillSummary> {
-  const env = getProvisionEnv();
+  const { WEB_APP_URL } = requireValues({ WEB_APP_URL: env.WEB_APP_URL });
   const summary: TRevalidateWebhookBackfillSummary = {
     updated: [],
     unchanged: [],
@@ -37,7 +38,9 @@ export async function runRevalidateWebhookStepForEach(
   for (const tenant of tenants) {
     const { id: tenantId } = tenant;
     try {
-      const change = await createTenantRevalidateWebhook(tenant, env);
+      const change = await createTenantRevalidateWebhook(tenant, {
+        webAppBaseUrl: WEB_APP_URL,
+      });
       const bucket =
         change === REVALIDATE_WEBHOOK_CHANGE.UPDATED
           ? summary.updated

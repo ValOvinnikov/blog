@@ -1,7 +1,5 @@
-import { OnboardingView } from '@platform/components/features/onboarding/onboarding-view/onboarding-view';
 import {
   ONBOARDING_STEP,
-  ONBOARDING_TIER_QUERY,
   type TOnboardingStep,
 } from '@platform/constants/onboarding';
 import messages from '@platform/i18n/messages/en.json';
@@ -11,16 +9,13 @@ import {
   ARIA_VALUENOW,
   ARIA_VALUETEXT,
 } from '@platform/testing/aria';
-import { MOCK_SIGN_IN_EMAIL } from '@platform/testing/auth/fixtures';
-import { customRender, screen } from '@platform/testing/custom-render';
+import { screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
-import { stubChangingMediaQueries } from '@platform/testing/match-media';
 import {
   MOCK_TENANT_NAME,
   MOCK_TENANT_ROOT_DOMAIN,
   MOCK_TENANT_SLUG,
 } from '@platform/testing/tenants/fixtures';
-import { toLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
 import {
   LOCALE_ISO_CODES,
   PRESET_ID,
@@ -28,6 +23,8 @@ import {
   SITE_TYPE,
 } from '@shinefold/config';
 import type { UserEvent } from '@testing-library/user-event';
+
+export * from './render-onboarding-view';
 
 export const createSiteMock = vi.mocked(createSiteAction);
 export const MOCK_SITE_ADDRESS = `${MOCK_TENANT_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
@@ -98,13 +95,6 @@ export const MOCK_CREATE_SITE_INPUT = {
   ...MOCK_EDITORIAL_LOOK,
   hasAcceptedTerms: true,
 };
-
-export const setup = customRender(OnboardingView, {
-  rootDomain: MOCK_TENANT_ROOT_DOMAIN,
-  legalPageUrls: toLegalPageUrls(MOCK_TENANT_ROOT_DOMAIN),
-  initialLocale: LOCALE_ISO_CODES.EN,
-  accountEmail: MOCK_SIGN_IN_EMAIL,
-});
 
 export const stepHeading = (name: string) =>
   screen.getByRole('heading', { level: 1, name });
@@ -193,18 +183,4 @@ export const createAfterChangingSiteType = async (
 ) => {
   await changeSiteTypeFromReview(user, name);
   await acceptAndCreate(user);
-};
-
-export const FULL_TIER = [
-  ONBOARDING_TIER_QUERY.RAIL,
-  ONBOARDING_TIER_QUERY.FULL,
-];
-export const RAIL_TIER = [ONBOARDING_TIER_QUERY.RAIL];
-export const FULL_TIER_TITLE = 'from 1360px';
-export const RAIL_TIER_TITLE = 'from 768px';
-
-export const renderInTier = (matchingQueries: readonly string[]) => {
-  const resizeTo = stubChangingMediaQueries(matchingQueries);
-  setup();
-  return resizeTo;
 };

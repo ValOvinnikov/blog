@@ -63,8 +63,10 @@ default to zero".
   `@shinefold/studio`. Needing one is a signal to stop and report.
 - **Nothing imports `apps/worker`.** The platform reaches it only through
   its signed endpoints — `POST /api/provision`, `POST /api/deprovision`,
-  `POST /api/owner-access/*`, `POST /api/custom-domain/*` and
-  `POST /api/newsletter/post-send` and `POST /api/scheduled-post-purge`
+  `POST /api/owner-access/*`, `POST /api/member-access/*`,
+  `POST /api/custom-domain/*`, `POST /api/cookie-statement/seed`,
+  `POST /api/sample-content/remove`, `POST /api/newsletter/post-send`,
+  `POST /api/scheduled-post-purge` and `POST /api/scheduled-post-skim`
   — every one authenticated by the shared enqueue secret. The other routes
   are Vercel Cron's `GET /api/inactivity-sweep` and
   `GET /api/owner-access-sweep`, authenticated by `CRON_SECRET`.
@@ -81,7 +83,9 @@ default to zero".
   returning a result: `ensureInfrastructure` (project, dataset, CORS, tokens,
   webhook; the custom domain only when one exists), `inviteOwner`,
   `applySiteTemplate(siteType, plan, locale)`, `verifyTenant`,
-  `ensureOwnerAccess`. A unit never reaches into another's state.
+  `ensureOwnerAccess`. `removeSampleContent` is not part of provisioning
+  and not a step: `POST /api/sample-content/remove` runs it in the request
+  (`docs/features/site-templates.md`). A unit never reaches into another's state.
 - **Deprovisioning** (`deprovisionTenant`) runs `runDeprovisioningStep` once
   per `DEPROVISIONING_STEP`, in the CLI's order, reusing `@shinefold/db`'s shared
   pieces (`purgeTenantReaderData`, `deleteVercelProjectDomain`,
@@ -106,15 +110,19 @@ default to zero".
   so a run that sleeps for days keeps running old code after every fix. Bound
   a polling run to minutes and let a scheduled sweep, which always runs the
   current deployment, start the next one.
-  The one exception is the newsletter post send (`sendNewsletterPost`), which
-  sleeps until a post's publish date, possibly months away: it keeps the code
-  of the deploy that started it, re-checks the post and the site at least
-  daily, and holds a hook named for its claim so only one run sends a post.
+  The exceptions are the runs that sleep until a post's publish date,
+  possibly months away — the newsletter post send (`sendNewsletterPost`) and
+  the scheduled-post purge and summary runs (`runAtScheduledPostDate`):
+  each keeps the code of the deploy that started it, re-checks the post at
+  least daily, and holds a hook named for its post so only one run acts.
 - **Owner Studio access polls in short runs** — at most 30 one-minute checks
   with `sleep()` between them, never a busy loop, ending early at a grant,
   STALLED or a failed check. The hourly owner-access sweep makes one check
   for every tenant whose owner is not yet administrator, and replaces a run
   older than 45 minutes, which can only be one left on an earlier deploy.
+  A member's Studio access (`ensureMemberAccess`) runs the same poll per
+  membership on the same shared helpers (`src/utils/studio-access/`,
+  `src/utils/access-run/`), and the same sweep covers members.
 - **Secrets.** `SANITY_MANAGEMENT_TOKEN`, `TENANT_TOKEN_ENCRYPTION_KEY`, the
   registry `DATABASE_URL`, `SANITY_REVALIDATE_SECRET` and `VERCEL_TOKEN` live
   on this app alone, plus the enqueue secret it shares with the platform.

@@ -15,6 +15,9 @@ import {
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+const MEMBERSHIP_PITCH =
+  'Members keep the archive open and ad-free, and get early access to new pieces.';
+
 const SPLIT_COPY = {
   eyebrow: 'Pro plan',
   content: (
@@ -40,7 +43,7 @@ const meta = {
   argTypes: {
     tone: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.tone),
+      options: Object.values(BRAND_VARIANT),
     },
     contentPosition: {
       control: 'select',
@@ -75,8 +78,7 @@ export const ImageLeft: TStory = {
     heading: 'Support independent writing',
     children: mockCtaSlots({
       eyebrow: 'Membership',
-      supportingText:
-        'Members keep the archive open and ad-free, and get early access to new pieces.',
+      supportingText: MEMBERSHIP_PITCH,
       actions: MOCK_CTA_PRIMARY_AND_INLINE_LINK,
       image: mockCtaImage('split-image-left'),
     }),
@@ -91,7 +93,7 @@ export const ByCardStyle: TStory = {
   render: (args) => (
     <CardStyles>
       {(cardStyle) =>
-        objectKeys(ctaModuleVariants.variants.tone).map((tone) => (
+        Object.values(BRAND_VARIANT).map((tone) => (
           <CtaModule.Split
             key={tone}
             {...args}
@@ -101,5 +103,26 @@ export const ByCardStyle: TStory = {
         ))
       }
     </CardStyles>
+  ),
+};
+
+export const SupportingTextAndFootnoteByTone: TStory = {
+  render: (args) => (
+    <div className="flex flex-col gap-6">
+      {Object.values(BRAND_VARIANT).map((tone) => (
+        <CtaModule.Split
+          key={tone}
+          {...args}
+          tone={tone}
+          headingId={`cta-module-heading-${tone}`}
+        >
+          {mockCtaSlots({
+            ...SPLIT_COPY,
+            content: undefined,
+            supportingText: MEMBERSHIP_PITCH,
+          })}
+        </CtaModule.Split>
+      ))}
+    </div>
   ),
 };

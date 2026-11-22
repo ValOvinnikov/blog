@@ -28,13 +28,16 @@
     "signUpTitle": "Konto erstellen",
     "onboarding": "Website erstellen",
     "billing": "Abrechnung · Admin",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "help": "Hilfe",
+    "draftPreview": "Entwurfsvorschau",
+    "team": "Team"
   },
   "signInPage": {
     "heading": "Anmelden",
     "description": "Verwenden Sie das Konto, mit dem Sie sich registriert haben oder eingeladen wurden.",
-    "accountNotLinkedTitle": "Diese E-Mail-Adresse meldet sich bereits anders an",
-    "accountNotLinkedDescription": "Ihre E-Mail-Adresse wird bereits mit einer anderen Anmeldemethode verwendet. Melden Sie sich so an wie beim letzten Mal.",
+    "accountNotLinkedTitle": "Wir konnten diese E-Mail-Adresse nicht bestätigen",
+    "accountNotLinkedDescription": "Google oder GitHub hat diese E-Mail-Adresse nicht verifiziert. Verifizieren Sie sie dort und versuchen Sie es erneut, oder melden Sie sich mit einem Anmeldelink per E-Mail an.",
     "signInFailedTitle": "Anmeldung fehlgeschlagen",
     "signInFailedDescription": "Bei der Anmeldung ist etwas schiefgelaufen. Versuchen Sie es erneut oder wählen Sie eine andere Anmeldemethode.",
     "signUpPrompt": "Neu hier? <link>Konto erstellen</link>"
@@ -188,6 +191,7 @@
   },
   "account": {
     "signOut": "Abmelden",
+    "signingOut": "Wird abgemeldet…",
     "signedInAs": "Angemeldet als {email}",
     "menuLabel": "Konto",
     "triggerCollapsedLabel": "Konto: {name}, {email}",
@@ -243,8 +247,9 @@
     },
     "blockedSignups": "Gesperrte Registrierungen",
     "dataRequests": "Datenanfragen",
-    "badgeUnreadLeads": "{count} neu",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Support",
+    "help": "Hilfe"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -389,7 +394,33 @@
     "siteSetupNotStartedContactDescription": "Wir konnten die Einrichtung Ihrer Website nicht starten. Bitten Sie Ihren Plattform-Kontakt, sie zu starten.",
     "siteSetupStart": "Einrichtung starten",
     "siteSetupStarting": "Wird gestartet…",
-    "trialUpgrade": "Tarif wählen"
+    "trialUpgrade": "Tarif wählen",
+    "sampleContent": {
+      "title": "Beispielinhalte",
+      "supportingText": "Ihre Website wurde mit Beispielseiten, -abschnitten und -links angelegt. Entfernen Sie die, die Sie nicht geändert haben.",
+      "trigger": "Beispielinhalte entfernen",
+      "notWritable": "Beispielinhalte können nicht entfernt werden, solange Ihre Website gesperrt oder archiviert ist.",
+      "dialogTitle": "Beispielinhalte entfernen?",
+      "dialogDescription": "Beispiele, die Sie nicht bearbeitet haben, werden von Ihrer Website gelöscht. Beispiele, die Sie bearbeitet haben oder die Ihre anderen Inhalte verwenden, bleiben erhalten. Das lässt sich nicht rückgängig machen.",
+      "keep": "Beispiele behalten",
+      "confirm": "Beispiele entfernen",
+      "confirming": "Beispiele werden entfernt…",
+      "failed": "Die Beispiele konnten nicht entfernt werden. Versuchen Sie es erneut.",
+      "done": "{count, plural, =0 {Es mussten keine Beispiele entfernt werden.} one {# Beispiel entfernt.} other {# Beispiele entfernt.}}",
+      "nothingKept": "Es wurden keine Beispiele behalten.",
+      "keptEditedTitle": "Behalten, weil Sie sie bearbeitet haben",
+      "keptReferencedTitle": "Behalten, weil andere Inhalte sie verwenden",
+      "kind": {
+        "section": "Abschnitt",
+        "page": "Seite",
+        "post": "Beitrag",
+        "template": "Seitenvorlage",
+        "link": "Navigationslink",
+        "author": "Autor",
+        "topic": "Thema",
+        "other": "Beispiel"
+      }
+    }
   },
   "getStartedCard": {
     "title": "Erste Schritte",
@@ -507,7 +538,12 @@
       "OAUTH_APP_SAVED": "Anmelde-App gespeichert",
       "OAUTH_APP_REPLACED": "Anmelde-App ersetzt",
       "OAUTH_APP_REMOVED": "Anmelde-App entfernt",
-      "NEWSLETTER_PAUSE_CLEARED": "Newsletter-Pause aufgehoben"
+      "NEWSLETTER_PAUSE_CLEARED": "Newsletter-Pause aufgehoben",
+      "MEMBER_INVITED": "Teammitglied eingeladen",
+      "MEMBER_REMOVED": "Teammitglied entfernt",
+      "MEMBER_INVITE_CANCELLED": "Team-Einladung storniert",
+      "ENTITLEMENT_GRANTED": "Funktion freigeschaltet",
+      "ENTITLEMENT_REVOKED": "Funktionsfreischaltung widerrufen"
     },
     "detail": {
       "field": {
@@ -527,8 +563,13 @@
       "SUSPENSION_REASON": "Grund: {category}",
       "SUSPENSION_REFERENCE": "Referenz: {reference}",
       "PLAN": "Tarif: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Tarif: {from} → {to}",
       "SIGN_IN_PROVIDER": "Anmeldeanbieter: {provider, select, google {Google} github {GitHub} other {{provider}}}",
-      "CLIENT_SECRET_REPLACED": "Client-Geheimnis ersetzt"
+      "CLIENT_SECRET_REPLACED": "Client-Geheimnis ersetzt",
+      "GRANT_ITEM": "Element: {item}",
+      "GRANT_EXPIRY": "Bis {date}",
+      "GRANT_UNTIL_REVOKED": "Bis zum Widerruf",
+      "GRANT_NOTE": "Notiz: {note}"
     }
   },
   "tenantDomainPage": {
@@ -724,8 +765,8 @@
     "viewTabsAriaLabel": "Look-Ansicht",
     "jumpIndexAriaLabel": "Look-Abschnitte",
     "growthAddsColour": "Ein eigener Logo-Farbton",
-    "growthAddsType": "Überschrift- und Fließtextschriften",
-    "growthAddsShape": "Ecken und Abstände",
+    "growthAddsType": "Schriften, Stärke und Schreibweise der Überschriften",
+    "growthAddsShape": "Ecken, Abstände, Bildproportionen und Trennlinien",
     "growthAddsCards": "Kartenstil",
     "growthAddsButtons": "Ladezustand und Spinner",
     "growthAddsHeader": "Layout, Untermenüs, Leiste, Header-Schaltflächen und Kontosteuerung",
@@ -776,6 +817,34 @@
       "DEFAULT": "Komfortabel",
       "COMPACT": "Kompakt"
     },
+    "headingWeightLabel": "Überschriftenstärke",
+    "headingWeightDescription": "Wie kräftig jede Überschrift auf deiner Website wirkt.",
+    "headingWeightOptionLabel": {
+      "REGULAR": "Normal",
+      "MEDIUM": "Mittel",
+      "SEMIBOLD": "Halbfett",
+      "BOLD": "Fett"
+    },
+    "headingCaseLabel": "Schreibweise der Überschriften",
+    "headingCaseDescription": "Ändert Seiten- und Abschnittstitel. Kartentitel und Überschriften in Beiträgen bleiben, wie du sie geschrieben hast, damit längere Texte gut lesbar bleiben.",
+    "headingCaseOptionLabel": {
+      "AS_WRITTEN": "Wie geschrieben",
+      "UPPERCASE": "Großbuchstaben"
+    },
+    "imageProportionLabel": "Bildproportionen",
+    "imageProportionDescription": "Ändert Bilder mit der Form Breit und Bilder ohne Formauswahl. Quadratische und runde Bilder behalten ihre Form.",
+    "imageProportionOptionLabel": {
+      "AS_DESIGNED": "Wie gestaltet",
+      "WIDE": "Breit",
+      "CLASSIC": "Klassisch",
+      "SQUARE": "Quadrat"
+    },
+    "dividerWidthLabel": "Abschnittstrenner",
+    "dividerWidthDescription": "Wie dick die Linie zwischen Abschnitten ist, die einen Trenner zeigen.",
+    "dividerWidthOptionLabel": {
+      "HAIRLINE": "Haarlinie",
+      "BOLD": "Kräftig"
+    },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Akzentleiste",
       "OUTLINED": "Umrandet",
@@ -820,7 +889,7 @@
     "languageSwitcherSingleLanguage": "Fügen Sie unter Sprachen eine weitere Sprache hinzu, um einen Stil zu wählen.",
     "languageSwitcherFreeDescription": "Ihr Tarif veröffentlicht eine Sprache. Mit einem Upgrade können Sie Sprachen hinzufügen und einen Stil für die Sprachauswahl wählen.",
     "lockLineGrowthFields": "Mit Growth markierte Felder behalten den Wert der Vorlage {preset}.",
-    "lockLineTypeFonts": "In diesem Tarif behält Schrift die Schriften der Vorlage {preset}. Eine andere Vorlage ändert sie.",
+    "lockLineTypeFonts": "In diesem Tarif behält Schrift die Schriften und den Überschriftenstil der Vorlage {preset}. Eine andere Vorlage ändert sie.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globus",
@@ -940,10 +1009,11 @@
     },
     "footerBackgroundLabel": "Hintergrund",
     "footerBackgroundDescription": "Die Farbe der Fußzeile. Jede folgt dem hellen oder dunklen Design der Leser.",
-    "footerBackgroundOptionLabel": {
+    "skinLabel": {
       "PRIMARY": "Schlicht",
       "SECONDARY": "Schattiert",
-      "BRAND_PRIMARY": "Markenton"
+      "BRAND_PRIMARY": "Markenton",
+      "INK": "Tinte"
     },
     "footerSurfaceLabel": "Fläche",
     "footerSurfaceDescription": "Ob die Fußzeile die ganze Breite einnimmt oder als Karte erscheint.",
@@ -1059,7 +1129,14 @@
     "footerFinePrintAriaLabel": "Rechtliches",
     "footerPrivacy": "Datenschutzerklärung",
     "footerPoweredByLabel": "Bereitgestellt von",
-    "footerCookieSettings": "Cookie-Einstellungen"
+    "footerCookieSettings": "Cookie-Einstellungen",
+    "bandHeading": "Aus dem Hafenamt",
+    "bandText": "Gezeitentafeln, Liegeplatzhinweise und das Wetter der Woche an einem Ort.",
+    "bandLink": "Alle Hinweise ansehen",
+    "bandCardTitle": "Hinweis zu Winterliegeplätzen",
+    "bandCardExcerpt": "Die Liegeplätze am Nordkai rücken ab November nach innen.",
+    "bannerHeading": "Springflut an diesem Wochenende",
+    "bannerText": "Das höchste Wasser des Jahres erreicht den Nordkai am Samstagmorgen."
   },
   "lookFollow": {
     "followToggle": "Der Karte folgen, die du bearbeitest",
@@ -1173,10 +1250,11 @@
     "sendTest": "Test an mich senden",
     "sendingTest": "Wird gesendet…",
     "testSent": "Test an {email} gesendet.",
-    "testRateLimited": "Sie haben gerade mehrere Tests gesendet — bitte in ein paar Minuten erneut versuchen.",
+    "testRateLimited": "Sie haben vorerst die maximale Anzahl an Tests gesendet. Versuchen Sie es um {time} erneut.",
     "testInvalid": "Füllen Sie Betreff und Nachricht aus, bevor Sie einen Test senden.",
     "testFailed": "Der Test konnte nicht gesendet werden — bitte erneut versuchen.",
     "testSubject": "[Test] {subject}",
+    "postTestBanner": "Test-E-Mail — nur Sie haben sie erhalten. Ihre Abonnenten erhalten sie, wenn der Beitrag zum ersten Mal veröffentlicht wird.",
     "unsavedLogoNote": "Ein noch nicht gespeichertes Logo ist im Test nicht enthalten."
   },
   "emailSettingsForm": {
@@ -1510,7 +1588,7 @@
       "STALLED": "Ihre Studio-Einladung wurde nicht angenommen"
     },
     "description": {
-      "INVITE_SENT": "Studio basiert auf Sanity, daher brauchen Sie zum Bearbeiten ein kostenloses Sanity-Konto. Wir haben Ihnen eine Einladung von Sanity geschickt: Nehmen Sie sie an – Studio öffnet sich hier, sobald Ihr Zugang bestätigt ist.",
+      "INVITE_SENT": "Studio basiert auf Sanity, daher brauchen Sie zum Bearbeiten ein kostenloses Sanity-Konto. Wir haben Ihnen eine Studio-Einladung geschickt: Nehmen Sie sie an – Studio öffnet sich hier, sobald Ihr Zugang bestätigt ist.",
       "ACTIVATING": "Sie haben die Einladung angenommen. Wir geben Ihrem Konto Bearbeitungsrechte; das dauert meist eine Minute.",
       "STALLED": "Die Einladung wurde vor mehr als drei Tagen gesendet und nicht angenommen, daher prüfen wir nicht mehr. Senden Sie eine neue oder prüfen Sie jetzt, falls Sie sie gerade angenommen haben."
     },
@@ -1520,7 +1598,11 @@
     "resending": "Wird gesendet…",
     "checkStarted": "Ihr Zugang wird jetzt geprüft. Laden Sie die Seite in einer Minute neu, um das Ergebnis zu sehen.",
     "inviteResent": "Eine neue Einladung ist auf dem Weg in Ihr Postfach.",
-    "requestFailed": "Der Einrichtungsdienst war nicht erreichbar – versuchen Sie es erneut."
+    "requestFailed": "Der Einrichtungsdienst war nicht erreichbar – versuchen Sie es erneut.",
+    "checkStartedFor": "Der Studio-Zugang von {email} wird jetzt geprüft. Aktualisieren Sie in einer Minute, um das Ergebnis zu sehen.",
+    "inviteResentTo": "Eine neue Studio-Einladung ist an {email} unterwegs.",
+    "checkNowAriaLabel": "Jetzt prüfen für {email}",
+    "resendInviteAriaLabel": "Einladung erneut senden an {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Mandantendetails",
@@ -1551,9 +1633,11 @@
       "provisioningStarted": "Die Bereitstellung dieses Mandanten hat bereits begonnen; seine Details können nicht mehr bearbeitet werden.",
       "ownerAlreadyJoined": "Der Inhaber dieses Mandanten hat sich bereits angemeldet, daher kann seine E-Mail-Adresse hier nicht mehr korrigiert werden — dies würde stattdessen die Inhaberschaft übertragen.",
       "ownerHasFreeTenant": "Dieser Inhaber hat bereits eine kostenlose Website. Archivieren Sie sie oder belassen Sie diese Website in ihrem aktuellen Tarif.",
+      "planFollowsSubscription": "Diese Website hat ein aktives Abonnement, daher folgt ihr Tarif Stripe. Ändern Sie ihn auf der Abrechnungsseite des Inhabers oder im Stripe-Dashboard.",
       "saveFailed": "Die Mandantendaten konnten nicht gespeichert werden — bitte erneut versuchen."
     },
-    "fieldLockedReasonCustomMainDomain": "Gesperrt — die Hauptadresse ist die eigene Domain. Wechsle zum Bearbeiten auf der Domain-Seite zurück zur Subdomain."
+    "fieldLockedReasonCustomMainDomain": "Gesperrt — die Hauptadresse ist die eigene Domain. Wechsle zum Bearbeiten auf der Domain-Seite zurück zur Subdomain.",
+    "fieldLockedReasonSubscribed": "Gesperrt — diese Website hat ein aktives Abonnement, daher folgt ihr Tarif Stripe. Ändern Sie ihn auf der Abrechnungsseite des Inhabers oder im Stripe-Dashboard."
   },
   "tenantFieldErrors": {
     "nameRequired": "Geben Sie einen Mandantennamen ein.",
@@ -1671,6 +1755,8 @@
     "suspendFailed": "Der Mandant konnte nicht gesperrt werden — bitte erneut versuchen.",
     "liftSuspensionFailed": "Der Mandant konnte nicht reaktiviert werden — bitte erneut versuchen.",
     "ownerEmailUnknown": "Für den Inhaber dieses Mandanten ist noch keine E-Mail-Adresse hinterlegt, daher kann sie nicht gesperrt werden.",
+    "subscriptionCancelFailed": "Das Stripe-Abo der Website konnte nicht gekündigt werden, deshalb wurde sie nicht archiviert. Versuche es erneut oder kündige es zuerst in Stripe.",
+    "subscriptionLive": "Stripe rechnet diese Website noch ab. Kündige ihr Abo, bevor du sie löschst.",
     "invalidInput": "Prüfen Sie die Angaben und versuchen Sie es erneut."
   },
   "featuresSettings": {
@@ -1679,6 +1765,8 @@
     "alertSuccess": "Funktionen gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "planLockedBadge": "{plan, select, FREE {Free-Tarif} STARTER {Starter-Tarif} other {Growth-Tarif}}",
+    "consentBannerRequiredNote": "Für Google Analytics nötig, das Besucher um Zustimmung bittet.",
+    "consentBannerRequiredError": "Google Analytics ist eingerichtet, daher muss das Cookie-Einwilligungsbanner aktiv bleiben. Entfernen Sie zuerst die Mess-ID oder wechseln Sie zu Plausible.",
     "comingSoonBadge": "Demnächst",
     "switchOn": "An",
     "switchOff": "Aus",
@@ -1700,9 +1788,32 @@
       "RATINGS": "Leser können Beiträge bewerten.",
       "BOOKMARKS": "Leser können Beiträge für später merken.",
       "NEWSLETTER": "Das Newsletter-Anmeldeformular auf der Website anzeigen.",
-      "ANALYTICS": "Analyse-Tracking auf der Website aktivieren.",
+      "ANALYTICS": "Verbinde dein eigenes Google Analytics oder Plausible. Lass die ID leer, um kein Analysetool zu laden.",
       "CONSENT_BANNER": "Besuchern ein Cookie-Einwilligungsbanner anzeigen, bevor nicht notwendige Cookies oder Skripte geladen werden.",
       "CONTACT_FORM": "Das Kontaktformular auf der Website anzeigen."
+    },
+    "analyticsProviderLabel": "Analysetool",
+    "analyticsProviderOption": {
+      "GOOGLE_ANALYTICS": "Google Analytics",
+      "PLAUSIBLE": "Plausible"
+    },
+    "analyticsIdDraftLabel": "Analyse-ID",
+    "analyticsIdEmpty": "Keine",
+    "analyticsIdLabel": {
+      "GOOGLE_ANALYTICS": "Mess-ID",
+      "PLAUSIBLE": "Website-Domain"
+    },
+    "analyticsIdHint": {
+      "GOOGLE_ANALYTICS": "Du findest sie in Google Analytics unter Verwaltung, Datenstreams.",
+      "PLAUSIBLE": "Die Domain, unter der deine Website in Plausible eingetragen ist."
+    },
+    "analyticsIdPlaceholder": {
+      "GOOGLE_ANALYTICS": "G-A1B2C3D4E5",
+      "PLAUSIBLE": "example.com"
+    },
+    "analyticsIdInvalid": {
+      "GOOGLE_ANALYTICS": "Gib eine Mess-ID ein: G- gefolgt von Großbuchstaben und Ziffern, zum Beispiel G-A1B2C3D4E5.",
+      "PLAUSIBLE": "Gib nur eine Domain ein, ohne https:// oder Pfad, zum Beispiel example.com."
     }
   },
   "languagePicker": {
@@ -1739,11 +1850,13 @@
     "allowance": "{used} von {allowed} zusätzlichen Sprachen Ihres Tarifs in Verwendung.",
     "noticeTitle": "Tarifgrenze",
     "upgradeNotice": "Ihr Tarif veröffentlicht nur die Standardsprache. Führen Sie ein Upgrade durch, um weitere Sprachen hinzuzufügen.",
+    "atLimitNotice": "Ihr Tarif veröffentlicht {allowed, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}, und alle sind in Verwendung.",
     "downgradeNotice": "Ihr Tarif veröffentlicht {allowed, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}, gespeichert sind jedoch {stored}. Die ersten {allowed} bleiben live; die anderen bleiben erhalten, und nichts wird gelöscht.",
     "keptBadge": "Erhalten, in Ihrem Tarif nicht live",
     "planLockedBadge": "Nicht in Ihrem Tarif",
     "atLimitLockedReason": "Schalten Sie eine aus, um diese einzuschalten",
-    "overLimitLockedReason": "Führen Sie ein Tarif-Upgrade durch, um dies zu ändern"
+    "overLimitLockedReason": "Führen Sie ein Tarif-Upgrade durch, um dies zu ändern",
+    "allowanceGranted": "{used} von {allowed} zusätzlichen Sprachen in Verwendung."
   },
   "saveBar": {
     "regionLabel": "Ungespeicherte Änderungen",
@@ -1755,6 +1868,7 @@
     "goToFirstField": "Zum ersten Feld",
     "notSaved": "Nicht gespeichert",
     "notInPlan": "Ihre Website nutzt den Tarif {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {aktuellen}}, der {items} nicht enthält. Es wurde nichts gespeichert.",
+    "languagesNotInPlan": "Ihre Website nutzt den Tarif {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {aktuellen}}, der {limit, plural, one {# Sprache} other {# Sprachen}} erlaubt. {count, plural, one {{items} wurde nicht hinzugefügt} other {{items} wurden nicht hinzugefügt}}.",
     "shortcut": "⌘S / Strg+S",
     "discard": "Verwerfen",
     "save": "Änderungen speichern",
@@ -1801,9 +1915,10 @@
     "downgradedDescription": "Das Kontaktformular gehört zu den Tarifen Starter und Growth, daher kommen keine neuen Nachrichten mehr an. Bereits eingegangene Nachrichten bleiben hier erhalten, und Sie können jede davon weiterhin löschen."
   },
   "leadsInbox": {
-    "listLabel": "Nachrichten",
     "empty": "Noch keine Nachrichten. Sobald jemand Ihr Kontaktformular nutzt, erscheint die Nachricht hier.",
     "unread": "Ungelesen",
+    "unreadGroup": "Ungelesen · {count}",
+    "earlierGroup": "Früher",
     "yesterday": "Gestern",
     "loadingMore": "Weitere Nachrichten werden geladen…",
     "loadMoreFailed": "Weitere Nachrichten konnten nicht geladen werden. Erneut versuchen",
@@ -1814,6 +1929,7 @@
     "email": "E-Mail",
     "received": "Empfangen",
     "page": "Seite",
+    "messageHeading": "Nachricht",
     "homePage": "Startseite",
     "readStateFailed": "Die Nachricht konnte nicht aktualisiert werden. Versuchen Sie es erneut."
   },
@@ -2135,26 +2251,41 @@
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Dashboard öffnen",
+    "plansLinkLabel": "Sieh dir an, was jeder Tarif enthält",
     "GROWTH": {
       "subject": "Deine Website ist jetzt im Growth-Tarif",
       "previewText": "{siteName} kann jetzt alle Growth-Optionen nutzen.",
       "changed": "{siteName} ist jetzt im Growth-Tarif.",
-      "options": "Die Growth-Optionen sind jetzt auf deiner Website verfügbar: mehr Sprachen, alle Einstellungen für das Erscheinungsbild, zusätzliche Seitenmodule und Funktionen wie das Kontaktformular, Lesezeichen und Statistiken.",
-      "kept": "Wenn du Growth schon einmal genutzt hast, sind deine früheren Einstellungen wieder so da, wie du sie hinterlassen hast."
+      "kept": "Es wird nichts gelöscht. Wenn du Growth schon einmal genutzt hast, sind deine früheren Einstellungen wieder so da, wie du sie hinterlassen hast."
     },
     "STARTER": {
       "subject": "Deine Website ist jetzt im Starter-Tarif",
       "previewText": "{siteName} kann jetzt die Starter-Optionen nutzen.",
       "changed": "{siteName} ist jetzt im Starter-Tarif.",
-      "options": "Mit Starter kann deine Website ihre eigene Domain und das Kontaktformular nutzen, und der Footer zeigt keinen „Bereitgestellt von“-Hinweis. Weitere Sprachen, alle Einstellungen für das Erscheinungsbild und die übrigen Seitenmodule gehören zu Growth.",
       "kept": "Es wird nichts gelöscht. Deine Inhalte und Einstellungen bleiben erhalten, und alles aus Growth ist wieder so da, wie du es hinterlassen hast, wenn du zu Growth wechselst."
     },
     "FREE": {
       "subject": "Deine Website ist jetzt im Free-Tarif",
       "previewText": "Die Optionen der kostenpflichtigen Tarife sind auf {siteName} ausgeschaltet.",
       "changed": "{siteName} ist jetzt im Free-Tarif.",
-      "options": "Die Optionen der kostenpflichtigen Tarife sind auf deiner Website ausgeschaltet: zusätzliche Sprachen, die Growth-Einstellungen für das Erscheinungsbild, kostenpflichtige Seitenmodule und Funktionen wie das Kontaktformular, Lesezeichen und Statistiken.",
       "kept": "Es wird nichts gelöscht. Deine Inhalte und Einstellungen bleiben erhalten und kommen zurück, wenn du wieder zu einem kostenpflichtigen Tarif wechselst."
+    }
+  },
+  "ownerEntitlementEmail": {
+    "actionLabel": "Dashboard öffnen",
+    "granted": {
+      "subject": "Freigeschaltet auf {siteName}: {item}",
+      "previewText": "Du kannst {item} jetzt auf {siteName} nutzen. Es entstehen keine Kosten.",
+      "granted": "Für {siteName} wurde außerhalb des Tarifs Folgendes freigeschaltet: {item}.",
+      "untilRevoked": "Die Freischaltung gilt, bis sie widerrufen wird.",
+      "expires": "Die Freischaltung gilt bis zum {date}.",
+      "free": "Es entstehen keine Kosten."
+    },
+    "revoked": {
+      "subject": "Freischaltung widerrufen auf {siteName}: {item}",
+      "previewText": "Es wird nichts gelöscht.",
+      "revoked": "Die Freischaltung von {item} für {siteName} wurde widerrufen.",
+      "kept": "Es wird nichts gelöscht. Was du damit eingerichtet hast, bleibt erhalten und ist wieder da, wenn es erneut freigeschaltet wird oder dein Tarif es enthält."
     }
   },
   "ownerReceiptEmail": {
@@ -2218,6 +2349,7 @@
     "nextPaymentLabel": "Nächste Zahlung",
     "nextPayment": "{amount} am <time>{date}</time>",
     "noNextPayment": "Keine geplant",
+    "planEnds": "Ihr Tarif endet am <time>{date}</time>.",
     "noPayments": "Für Ihre Website gibt es noch keine Zahlungen.",
     "invoicesTitle": "Rechnungen",
     "invoicesEmpty": "Noch keine Rechnungen.",
@@ -2267,6 +2399,7 @@
     "currentPlan": "Deine Website nutzt {plan}, {interval, select, YEARLY {jährlich} other {monatlich}} bezahlt.",
     "pendingChange": "Deine Website wechselt am <time>{date}</time> zu {plan}, {interval, select, YEARLY {jährlich} other {monatlich}} bezahlt.",
     "changeNow": "Die Änderung gilt ab heute. Du zahlst jetzt die Differenz für den Rest des laufenden Zeitraums.",
+    "changeNowNewPeriod": "Die Änderung gilt ab heute, und ein neuer {interval, select, YEARLY {jährlicher} other {monatlicher}} Zeitraum beginnt damit. Du zahlst jetzt für den neuen Zeitraum, abzüglich der ungenutzten Zeit deines aktuellen.",
     "changeAtRenewal": "Die Änderung gilt ab dem <time>{date}</time>, wenn der laufende Zeitraum endet. Bis dahin ändert sich nichts.",
     "keepCurrentDescription": "Deine Website bleibt bei {plan}, und die für den <time>{date}</time> geplante Änderung wird storniert.",
     "changeUnchanged": "Das ist dein aktueller Tarif. Wähle einen anderen Tarif oder Abrechnungszeitraum, um ihn zu ändern.",
@@ -2281,7 +2414,344 @@
     "billingLink": "Abrechnung",
     "NOT_SUBSCRIBED": "Deine Website hat noch keinen bezahlten Tarif, der geändert werden kann. Wähle einen an der Kasse.",
     "NOT_ACTIVE": "Dein Abonnement braucht deine Aufmerksamkeit, bevor sich der Tarif ändern kann. Öffne die Abrechnung, um das zu klären.",
+    "planEnds": "Dein Tarif endet am <time>{date}</time> und kann sich deshalb nicht mehr ändern. Um ihn zu behalten, nimm die Kündigung in der Abrechnung zurück.",
     "UNCHANGED": "Deine Website nutzt diesen Tarif bereits.",
-    "CARD_DECLINED": "Deine Karte wurde abgelehnt, daher hat sich nichts geändert. Aktualisiere sie in der Abrechnung und versuch es erneut."
+    "CARD_DECLINED": "Deine Karte wurde abgelehnt, daher hat sich nichts geändert. Aktualisiere sie in der Abrechnung und versuch es erneut.",
+    "PAYMENT_NOT_CONFIRMED": "Die Bestätigung bei deiner Bank wurde nicht abgeschlossen, daher hat sich dein Tarif nicht geändert. Versuch es erneut, wenn du so weit bist.",
+    "NO_NEXT_BAND": "Deine Website kann gerade nicht in diese Stufe wechseln. Lade die Seite neu, um deine aktuelle Stufe zu sehen.",
+    "PENDING_CHANGE": "Für deine Website ist ein Tarifwechsel zur Verlängerung geplant. Behalte zuerst unter Upgrade deinen aktuellen Tarif und wechsle dann eine Stufe höher.",
+    "QUOTE_EXPIRED": "Dieser Preis wurde vor einer Weile angezeigt. Schließe das Fenster und öffne es erneut für den heutigen Preis."
+  },
+  "moveUpBand": {
+    "trigger": "Auf {ceiling, number} Abonnenten wechseln — {price} mehr pro {interval, select, YEARLY {Jahr} other {Monat}}",
+    "title": "Auf {ceiling, number} Abonnenten wechseln?",
+    "lead": "Deine neuen Limits gelten, sobald die Zahlung durch ist.",
+    "loading": "Preis wird geladen…",
+    "quoteFailed": "Der Preis konnte nicht geladen werden. Schließe das Fenster und versuche es gleich noch einmal.",
+    "newLimitsTerm": "Neue Limits",
+    "newLimits": "{ceiling, number} Abonnenten · {allowance, number} E-Mails pro Monat",
+    "chargedTodayTerm": "Heute fällig",
+    "chargedTodayNote": "Die Differenz für den Rest dieses Abrechnungszeitraums, bis <time>{date}</time>.",
+    "renewalTerm": "Ab {date}",
+    "renewalTotal": "{total} pro {interval, select, YEARLY {Jahr} other {Monat}}",
+    "cardTerm": "Karte",
+    "card": "{brand, select, visa {Visa} mastercard {Mastercard} amex {American Express} discover {Discover} other {Karte}} mit Endung {last4}",
+    "moveDownNote": "Ein Wechsel in eine niedrigere Stufe erfolgt zur Verlängerung, ohne Erstattung.",
+    "cancel": "Abbrechen",
+    "pay": "{amount} zahlen und wechseln",
+    "paying": "Zahlung läuft…"
+  },
+  "helpView": {
+    "title": "Hilfe",
+    "description": "Schreib unserem Support-Team. Wir schicken deine Website, deinen Tarif und dieses Konto automatisch mit.",
+    "helpCentre": "Hilfe-Center",
+    "unavailableTitle": "Das Hilfe-Formular ist nicht verfügbar",
+    "unavailableDescription": "Nachrichten können gerade nicht von hier gesendet werden. Bitte versuch es später noch einmal."
+  },
+  "helpForm": {
+    "title": "Support kontaktieren",
+    "responseTime": "Wir antworten in der Regel innerhalb von zwei Werktagen.",
+    "subjectLabel": "Betreff",
+    "messageLabel": "Nachricht",
+    "messageHint": "Beschreib, was du tun wolltest und was stattdessen passiert ist.",
+    "required": "Bitte ausfüllen.",
+    "tooLong": "Bitte weniger als {limit} Zeichen.",
+    "send": "Nachricht senden",
+    "sending": "Wird gesendet…",
+    "sent": "Nachricht gesendet. Wir haben dir eine Kopie gemailt.",
+    "rateLimited": "Du hast in kurzer Zeit mehrere Nachrichten gesendet. Bitte versuch es später noch einmal.",
+    "unavailable": "Das Hilfe-Formular ist gerade nicht verfügbar. Bitte versuch es später noch einmal.",
+    "sendFailed": "Deine Nachricht konnte nicht gesendet werden – versuch es noch einmal."
+  },
+  "draftPreview": {
+    "title": "Entwurfsvorschau",
+    "draftNotice": "Das ist der zuletzt gespeicherte Entwurf, nicht die veröffentlichte Seite. Nur Mitglieder dieser Website können diese Vorschau öffnen.",
+    "siteLabel": "Website",
+    "pathLabel": "Seite",
+    "frameRegionLabel": "Entwurfsvorschau",
+    "frameTitle": "Entwurf dieser Seite auf deiner Website",
+    "toolbarAriaLabel": "Vorschauoptionen",
+    "reload": "Neu laden",
+    "reloading": "Wird neu geladen …",
+    "openPublished": "Veröffentlichte Seite öffnen",
+    "refusedTitle": "Dieser Entwurf kann nicht angezeigt werden",
+    "refusalNotFound": "Diese Seite hat keine Adresse auf deiner Website. Nur Beiträge und Landingpages haben eine Vorschau, und bei einer Landingpage müssen alle übergeordneten Seiten gesetzt sein.",
+    "refusalLanguageOff": "Diese Seite ist in einer Sprache, die deine Website nicht anbietet. Schalte diese Sprache ein, um die Vorschau zu sehen.",
+    "refusalSuspended": "Diese Website ist gesperrt, daher gibt es keine Vorschau ihrer Entwürfe.",
+    "refusalArchived": "Diese Website ist archiviert, daher gibt es keine Vorschau ihrer Entwürfe.",
+    "refusalUnavailable": "Die Plattform konnte diese Vorschau nicht vorbereiten. Das Problem wurde für das Plattform-Team protokolliert."
+  },
+  "grantEntitlement": {
+    "trigger": "Diesem Mandanten gewähren",
+    "triggerAriaLabel": "Diesem Mandanten gewähren: {item}",
+    "title": "{item} für {tenant} gewähren",
+    "description": "{tenant} erhält {item} außerhalb des Tarifs {plan}. Der Inhaber sieht die Funktion freigeschaltet und kann sie einschalten. Es entstehen keine Kosten.",
+    "granted": "{item} gewährt.",
+    "failed": "{item} konnte nicht gewährt werden – bitte erneut versuchen."
+  },
+  "grantDialog": {
+    "confirmButton": "Gewähren",
+    "confirmingButton": "Wird gewährt…"
+  },
+  "grantExpiryFields": {
+    "expiresLabel": "Läuft ab",
+    "expiresHint": "Die Gewährung endet danach von selbst.",
+    "expiry": {
+      "NEVER": "Nie – bis zum Widerruf",
+      "DAYS_30": "30 Tage",
+      "DAYS_90": "90 Tage",
+      "YEAR_1": "1 Jahr"
+    },
+    "noteLabel": "Notiz",
+    "noteHint": "Optional. Warum sie gewährt wird – sichtbar auf der Karte „Gewährungen“ und im Aktivitätsprotokoll."
+  },
+  "grantModulePack": {
+    "trigger": "Modulpaket gewähren",
+    "title": "Modulpaket für {tenant} gewähren",
+    "description": "Seine Redakteure erhalten die Module des Pakets in Studio, außerhalb des Tarifs {plan}. Es entstehen keine Kosten.",
+    "packLabel": "Modulpaket",
+    "packPlaceholder": "Modulpaket wählen",
+    "packIncluded": "{pack} (im Tarif enthalten)",
+    "packGranted": "{pack} (bereits gewährt)"
+  },
+  "grantLanguages": {
+    "trigger": "Weitere Sprachen gewähren",
+    "title": "Weitere Sprachen für {tenant} gewähren",
+    "description": "Der Tarif {plan} veröffentlicht nur die Standardsprache. Wählen Sie, wie viele weitere Sprachen {tenant} veröffentlichen darf. Es entstehen keine Kosten.",
+    "descriptionWithAllowance": "Der Tarif {plan} veröffentlicht {n, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}. Wählen Sie, wie viele weitere Sprachen {tenant} veröffentlichen darf. Es entstehen keine Kosten.",
+    "countLabel": "Zusätzliche Sprachen",
+    "countHint": "Erlaubt der Tarif später mehr, gilt die höhere Zahl."
+  },
+  "grantItemNames": {
+    "languages": "{count, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}",
+    "additionalLanguages": "Zusätzliche Sprachen",
+    "modulePack": {
+      "CORE": "Core-Module",
+      "STARTER": "Starter-Module",
+      "GROWTH": "Growth-Module"
+    },
+    "lookField": {
+      "preset": "Vorlage",
+      "accentHue": "Akzentfarbton",
+      "logoHue": "Logo-Farbton",
+      "headingFont": "Überschriftenschrift",
+      "bodyFont": "Fließtextschrift",
+      "radiusScale": "Eckenradius",
+      "density": "Dichte",
+      "languageSwitcherStyle": "Stil der Sprachauswahl",
+      "cardStyle": "Kartenstil",
+      "headerControlStyle": "Header-Schaltflächen",
+      "headerControlShape": "Form der Header-Schaltflächen",
+      "accountButtonStyle": "Konto-Schaltfläche",
+      "accountPanelStyle": "Konto-Bereich",
+      "accountPhonePlacement": "Position des Kontos auf Telefonen",
+      "busyButtonStyle": "Stil bei Beschäftigung",
+      "spinnerStyle": "Spinner-Stil",
+      "buttonShape": "Form der Schaltflächen",
+      "headerLayout": "Header-Layout",
+      "headerSubmenuStyle": "Header-Untermenüs",
+      "headerBarStyle": "Header-Leiste",
+      "navLinkStyle": "Navigationslinks",
+      "headingWeight": "Überschriftenstärke",
+      "headingCase": "Schreibweise der Überschriften",
+      "imageProportion": "Bildproportionen",
+      "dividerWidth": "Abschnittstrenner",
+      "footerLayout": "Fußzeilen-Layout",
+      "footerBackground": "Fußzeilen-Hintergrund",
+      "footerSurface": "Fußzeilen-Fläche",
+      "cookieSettingsButton": "Schaltfläche für Cookie-Einstellungen",
+      "brandName": "Markenname",
+      "logoAssetUrl": "Logo-Bild",
+      "faviconAssetUrl": "Favicon-Bild"
+    }
+  },
+  "grantedBadge": {
+    "label": "Gewährt",
+    "labelUntil": "Gewährt bis {date}"
+  },
+  "grantsCard": {
+    "title": "Gewährungen",
+    "supportingText": "Was dieser Mandant außerhalb seines Tarifs hat.",
+    "empty": "Keine Gewährungen – alles, was dieser Mandant hat, stammt aus seinem Tarif.",
+    "kind": {
+      "CAPABILITY": "Funktion",
+      "LOOK_FIELD": "Look",
+      "MODULE_PACK": "Modulpaket",
+      "LOCALE_LIMIT": "Sprachen"
+    },
+    "expired": "Abgelaufen",
+    "included": "Im Tarif enthalten",
+    "metaUntilRevoked": "{who} · {date} · Bis zum Widerruf",
+    "metaExpires": "{who} · {date} · Läuft ab am {expiry}",
+    "metaExpired": "{who} · {date} · Abgelaufen am {expiry}"
+  },
+  "usageCard": {
+    "title": "Nutzung",
+    "description": "Was Ihr Tarif enthält und wie viel davon genutzt ist.",
+    "labels": {
+      "TAKEAWAYS": "KI-Kernaussagen diesen Monat",
+      "EMAILS": "Diesen Monat gesendete E-Mails",
+      "SEATS": "Team-Plätze",
+      "LANGUAGES": "Zusätzliche Sprachen"
+    },
+    "links": {
+      "SEATS": "Team",
+      "LANGUAGES": "Sprachen"
+    },
+    "value": "<count>{used, number}</count> von {allowance, number}",
+    "failed": "Dieser Wert konnte nicht geladen werden. Laden Sie die Seite neu, um es erneut zu versuchen.",
+    "footer": {
+      "limits": "Ihr Tarif legt diese Grenzen fest.",
+      "plansLink": "Sehen Sie sich an, was jeder Tarif enthält"
+    },
+    "notes": {
+      "TAKEAWAYS": {
+        "UNDER": "Wird am {date} zurückgesetzt",
+        "NEAR": "{percent} % genutzt — noch {left, number}<separator>·</separator><reset>Wird am {date} zurückgesetzt</reset>",
+        "FULL": "Alles genutzt. Neue Beiträge erhalten bis zum {date} keine Kernaussagen."
+      },
+      "EMAILS": {
+        "UNDER": "Wird am {date} zurückgesetzt",
+        "NEAR": "{percent} % genutzt — noch {left, number}<separator>·</separator><reset>Wird am {date} zurückgesetzt</reset>",
+        "FULL": "Alles genutzt. Neue Beiträge werden bis zum {date} nicht per E-Mail versendet."
+      },
+      "SEATS": {
+        "UNDER": "Zählt Inhaber, Mitglieder und offene Einladungen.",
+        "NEAR": "{left, plural, one {Noch # Platz frei.} other {Noch # Plätze frei.}}",
+        "FULL": "Alle Plätze belegt. Entfernen Sie jemanden, um eine weitere Person einzuladen."
+      },
+      "LANGUAGES": {
+        "UNDER": "Ihre Standardsprache wird nicht mitgezählt.",
+        "NEAR": "{left, plural, one {Noch # Sprache frei.} other {Noch # Sprachen frei.}}",
+        "FULL": "Alle belegt. Entfernen Sie eine, um eine weitere hinzuzufügen."
+      }
+    }
+  },
+  "revokeGrantControl": {
+    "revoke": {
+      "trigger": "Widerrufen",
+      "triggerAriaLabel": "{item} widerrufen",
+      "title": "{item} für {tenant} widerrufen",
+      "description": "{item} ist ab dem nächsten Seitenaufruf wieder gesperrt. Was der Mandant eingerichtet hat, bleibt erhalten – wird {item} erneut gewährt, ist alles wieder da.",
+      "confirmButton": "Widerrufen",
+      "confirmingButton": "Wird widerrufen…",
+      "failed": "Die Gewährung konnte nicht widerrufen werden – bitte erneut versuchen.",
+      "done": "{item} widerrufen."
+    },
+    "remove": {
+      "trigger": "Entfernen",
+      "triggerAriaLabel": "Gewährung {item} entfernen",
+      "title": "{item} für {tenant} entfernen",
+      "description": "Diese Gewährung ist abgelaufen, {item} ist also bereits gesperrt. Beim Entfernen verschwindet sie aus der Liste und kann erneut gewährt werden.",
+      "confirmButton": "Entfernen",
+      "confirmingButton": "Wird entfernt…",
+      "failed": "Die Gewährung konnte nicht entfernt werden – bitte erneut versuchen.",
+      "done": "{item} entfernt."
+    }
+  },
+  "entitlementGrantErrors": {
+    "notFound": "Diesen Mandanten gibt es nicht mehr.",
+    "archived": "Dieser Mandant ist archiviert, seine Gewährungen lassen sich nicht ändern.",
+    "comingSoon": "Diese Funktion ist noch nicht verfügbar und kann nicht gewährt werden.",
+    "alreadyGranted": "Das ist bereits gewährt.",
+    "expiryShortened": "Die aktuelle Sprachgewährung läuft länger. Wähle ein späteres Ablaufdatum oder widerrufe diese Gewährung zuerst.",
+    "includedInPlan": "Das ist bereits im Tarif des Mandanten enthalten.",
+    "grantNotOpen": "Diese Gewährung wurde bereits entfernt oder ist abgelaufen."
+  },
+  "teamPage": {
+    "title": "Team",
+    "description": "Die Personen, die die Inhalte dieser Website gemeinsam mit Ihnen in Studio schreiben und veröffentlichen.",
+    "seatsUsed": "{used} von {seats, plural, one {# Platz} other {# Plätzen}} belegt",
+    "inviteEditor": "Redakteur einladen",
+    "seatLimitTitle": "Alle Plätze sind belegt",
+    "seatLimitBody": "{plan} umfasst {seats, plural, one {# Platz} other {# Plätze}}. Entfernen Sie ein Mitglied oder ziehen Sie eine Einladung zurück, um jemand anderen einzuladen.",
+    "thisMember": "dieses Mitglied",
+    "columnPerson": "Person",
+    "columnRole": "Rolle",
+    "columnStudioAccess": "Studio-Zugang",
+    "columnActions": "Aktionen",
+    "members": {
+      "title": "Mitglieder",
+      "count": "{count, plural, one {# Person} other {# Personen}}",
+      "empty": "Dieser Website ist noch niemand beigetreten.",
+      "you": "(Sie)",
+      "noEmail": "Keine E-Mail-Adresse hinterlegt",
+      "joined": "Beigetreten am <time>{date}</time>",
+      "joinedToday": "<time>Heute</time> beigetreten",
+      "joinedWithRole": "Beigetreten am <time>{date}</time> · {role}",
+      "joinedTodayWithRole": "<time>Heute</time> beigetreten · {role}",
+      "noEditorsNoFreeSeats": "Noch keine Redakteure. Jeder freie Platz ist durch eine offene Einladung belegt.",
+      "noEditors": "Noch keine Redakteure. Laden Sie bis zu {free, plural, one {# Person} other {# Personen}} ein, die mit Ihnen in Studio schreiben und veröffentlichen."
+    },
+    "invites": {
+      "title": "Offene Einladungen",
+      "supportingText": "Jede belegt einen Platz, bis die Person beitritt oder Sie die Einladung zurückziehen.",
+      "count": "{count, plural, one {# Einladung} other {# Einladungen}}",
+      "invited": "Eingeladen am <time>{date}</time> · noch nicht beigetreten",
+      "invitedToday": "<time>Heute</time> eingeladen · noch nicht beigetreten",
+      "invitedWithRole": "Eingeladen am <time>{date}</time> · noch nicht beigetreten · {role}",
+      "invitedTodayWithRole": "<time>Heute</time> eingeladen · noch nicht beigetreten · {role}",
+      "studioAccess": "Beginnt mit dem Beitritt"
+    },
+    "studioAccess": {
+      "badge": {
+        "READY": "Bereit",
+        "INVITE_SENT": "Einladung gesendet",
+        "ACTIVATING": "Wird eingerichtet…",
+        "STALLED": "Erfordert Aufmerksamkeit",
+        "LOCKED": "Gesperrt"
+      },
+      "hint": {
+        "INVITE_SENT": "Wartet darauf, dass die Studio-Einladung angenommen wird",
+        "ACTIVATING": "Angenommen – Bearbeitungsrechte dauern meist eine Minute",
+        "STALLED": "Seit 3 Tagen nicht angenommen, daher prüfen wir nicht mehr",
+        "LOCKED": "Über den Plätzen Ihres Tarifs"
+      },
+      "noAccess": "Kein Studio-Zugang"
+    },
+    "inviteDialog": {
+      "title": "Redakteur einladen",
+      "notice": "Ein Redakteur kann alle Inhalte der Website in Studio bearbeiten, veröffentlichen und löschen. Aussehen, Einstellungen und Abrechnung kann er nicht ändern.",
+      "emailLabel": "E-Mail-Adresse",
+      "emailHint": "Wir senden der Person einen Link zum Beitreten. Die Einladung belegt einen Platz, bis sie beitritt.",
+      "emailPlaceholder": "name@example.com",
+      "cancel": "Abbrechen",
+      "send": "Einladung senden",
+      "sending": "Wird gesendet…",
+      "sent": "Einladung an {email} gesendet.",
+      "failed": "Die Einladung konnte nicht gesendet werden – versuchen Sie es erneut.",
+      "fieldError": {
+        "EMAIL_INVALID": "Geben Sie eine E-Mail-Adresse ein, z. B. name@example.com.",
+        "ALREADY_MEMBER": "{email} gehört bereits zum Team.",
+        "ALREADY_INVITED": "{email} hat bereits eine offene Einladung.",
+        "SEAT_LIMIT": "Alle Plätze im Tarif {plan} sind belegt."
+      }
+    },
+    "remove": {
+      "trigger": "Entfernen",
+      "triggerAriaLabel": "Entfernen: {email}",
+      "title": "{email} entfernen?",
+      "description": "Der Zugang zur Verwaltung dieser Website und zu Studio endet sofort, und der Platz wird frei. Die geschriebenen Inhalte bleiben auf der Website.",
+      "keep": "Mitglied behalten",
+      "confirm": "Mitglied entfernen",
+      "confirming": "Wird entfernt…",
+      "done": "{email} wurde entfernt. Der Studio-Zugang wird entzogen.",
+      "gone": "{email} gehört nicht mehr zum Team.",
+      "failed": "{email} konnte nicht entfernt werden – versuchen Sie es erneut.",
+      "self": "Sie können sich nicht selbst aus dem Team entfernen.",
+      "lastOwner": "Eine Website behält immer einen Inhaber, daher kann {email} nicht entfernt werden."
+    },
+    "cancelInvite": {
+      "trigger": "Einladung zurückziehen",
+      "triggerAriaLabel": "Einladung zurückziehen für {email}",
+      "title": "Einladung an {email} zurückziehen?",
+      "description": "Der Link in der E-Mail funktioniert dann nicht mehr, und der Platz wird frei. Sie können die Person später erneut einladen.",
+      "keep": "Einladung behalten",
+      "confirm": "Einladung zurückziehen",
+      "confirming": "Wird zurückgezogen…",
+      "done": "Die Einladung an {email} wurde zurückgezogen.",
+      "gone": "Diese Einladung ist nicht mehr offen.",
+      "failed": "Die Einladung konnte nicht zurückgezogen werden – versuchen Sie es erneut."
+    }
   }
 }

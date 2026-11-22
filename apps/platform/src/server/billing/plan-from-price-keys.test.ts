@@ -1,13 +1,7 @@
-import { BILLING_INTERVAL } from '@platform/constants/billing';
-import { MOCK_BAND_CEILING } from '@platform/testing/billing/fixtures';
-import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_PLAN, BILLING_INTERVAL } from '@shinefold/config/constants';
 import { STRIPE_PRICE_LOOKUP_KEY } from '@shinefold/db/constants';
 
-import {
-  bandKeyFor,
-  planFromPriceKeys,
-  pricesFromKeys,
-} from './plan-from-price-keys';
+import { planFromPriceKeys, pricesFromKeys } from './plan-from-price-keys';
 
 describe(planFromPriceKeys, () => {
   it.each([
@@ -80,24 +74,5 @@ describe(pricesFromKeys, () => {
       interval,
       subscriberBandCeiling: null,
     });
-  });
-});
-
-describe(bandKeyFor, () => {
-  it('names the band Price for the period on a plan with bands', () => {
-    expect(
-      bandKeyFor(
-        TENANT_PLAN.GROWTH,
-        BILLING_INTERVAL.YEARLY,
-        MOCK_BAND_CEILING,
-      ),
-    ).toBe(STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500_YEARLY);
-  });
-
-  it.each([
-    ['a plan without bands', TENANT_PLAN.STARTER, MOCK_BAND_CEILING],
-    ['the included band', TENANT_PLAN.GROWTH, null],
-  ])('names none for %s', (_case, plan, ceiling) => {
-    expect(bandKeyFor(plan, BILLING_INTERVAL.MONTHLY, ceiling)).toBeUndefined();
   });
 });

@@ -1,45 +1,37 @@
 import {
-  CAPABILITY,
   SANITY_WEBHOOK_OPERATION,
+  STARTER_DOCUMENT_ID_PREFIX,
 } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import { queries } from '@shinefold/db';
-import type { TTenant } from '@shinefold/db/schema/tenants';
-import {
-  REVALIDATE_LOG,
-  STARTER_DOCUMENT_ID_PREFIX,
-} from '@web/constants/revalidate';
+import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { enqueueNewsletterPostSend } from '@web/server/revalidate/enqueue-newsletter-post-send/enqueue-newsletter-post-send';
 import type { TPostWebhookEvent } from '@web/server/revalidate/post-webhook-event/post-webhook-event';
-import { isCapabilityEnabledForTenant } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
-import { isTenantActive } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
 
-const isSiteSendingPosts = async (tenant: TTenant): Promise<boolean> => {
-  if (!isTenantActive(tenant)) return false;
-
-  const [isNewsletterOn, isEmailNewPostsOn] = await Promise.all([
-    isCapabilityEnabledForTenant(tenant.id, CAPABILITY.NEWSLETTER),
-    queries.emailConfig.getEmailNewPosts(tenant.id),
-  ]);
-  return isNewsletterOn && isEmailNewPostsOn;
-};
-
-/** Resolves the claim's time only when the site sends posts: a site not sending still keeps the claim, so a later republish emails nothing. */
+/** Resolves the claim's time only when the site sends posts: a site not sending records why on the claim and keeps it, so a later republish emails nothing. */
 const claimFirstPublish = async (
   tenantId: string,
   postId: string,
 ): Promise<TMaybeUndefined<Date>> => {
-  const tenant = await queries.tenants.getTenantById(tenantId);
-  if (!tenant) return undefined;
+  const offCause =
+    await queries.newsletterPostSends.getNewsletterSendingOffCause(tenantId);
+  if (!offCause.ok) return undefined;
 
-  const isSending = await isSiteSendingPosts(tenant);
   const claim = await queries.newsletterPostSends.claimNewsletterPostSend(
     tenantId,
     postId,
   );
-  return isSending ? claim?.claimedAt : undefined;
+  if (!claim) return undefined;
+  if (!offCause.data) return claim.claimedAt;
+
+  await queries.newsletterPostSends.markNewsletterPostSkipped(
+    tenantId,
+    postId,
+    offCause.data,
+  );
+  return undefined;
 };
 
 const releaseClaim = async (

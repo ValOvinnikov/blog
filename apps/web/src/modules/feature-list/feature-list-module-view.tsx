@@ -65,7 +65,6 @@ export const FeatureListModuleView = ({
         id={titleId}
         level={2}
         align={contentAlignment}
-        variant="section"
       />
       {displayMode === DISPLAY_MODE.CAROUSEL ? (
         <FeatureListCarousel
@@ -74,7 +73,6 @@ export const FeatureListModuleView = ({
           align={cardAlign}
           imageSizes={CAROUSEL_IMAGE_SIZES}
           title={headingBlock.heading}
-          tone={brandVariant}
           contentAlignment={contentAlignment}
           hasAnyImage={hasAnyImage}
         />

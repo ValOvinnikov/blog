@@ -1,5 +1,4 @@
 import {
-  BILLING_INTERVAL,
   BILLING_LOG,
   STRIPE_PRORATION_BEHAVIOR,
   STRIPE_RECURRING_INTERVAL,
@@ -9,7 +8,21 @@ import {
   PLAN_CHANGE_TIMING,
   type TPlanChoice,
 } from '@platform/constants/plan-change';
-import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures';
+import {
+  STRIPE_PAYMENT_BEHAVIOR,
+  STRIPE_PAYMENT_GOING_THROUGH,
+  STRIPE_PAYMENT_INTENT_STATUS,
+  STRIPE_PENDING_PAYMENT_EXPAND,
+} from '@platform/constants/stripe-payment';
+import {
+  STRIPE_BILLING_CYCLE_ANCHOR,
+  STRIPE_SCHEDULE_END_BEHAVIOR,
+} from '@platform/constants/stripe-schedule';
+import {
+  MOCK_PAYMENT_CLIENT_SECRET,
+  MOCK_PAYMENT_INTENT_ID,
+  MOCK_STRIPE_SUBSCRIPTION_ID,
+} from '@platform/testing/billing/fixtures';
 import {
   MOCK_GROWTH_MONTHLY_CHOICE,
   MOCK_STARTER_MONTHLY_CHOICE,
@@ -33,6 +46,7 @@ import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { TMaybeNull } from '@shinefold/config';
+import { BILLING_INTERVAL } from '@shinefold/config/constants';
 import { STRIPE_PRICE_LOOKUP_KEY } from '@shinefold/db/constants';
 import Stripe from 'stripe';
 
@@ -42,16 +56,14 @@ import { loadSubscriptionPlan } from './load-subscription-plan';
 const STARTER_MONTHLY = STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY;
 const GROWTH_MONTHLY = STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY;
 const GROWTH_BAND = STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500;
-const MOCK_CARD_ERROR = new Stripe.errors.StripeCardError({
-  message: 'declined',
-});
 const MOCK_INVALID_REQUEST = new Stripe.errors.StripeInvalidRequestError({
   message: 'invalid',
 });
 const MOCK_OTHER_SCHEDULE_ID = `${MOCK_SCHEDULE_ID}_other`;
 const IMMEDIATE_UPDATE = {
   proration_behavior: STRIPE_PRORATION_BEHAVIOR.ALWAYS_INVOICE,
-  payment_behavior: 'error_if_incomplete',
+  payment_behavior: STRIPE_PAYMENT_BEHAVIOR.PENDING_IF_INCOMPLETE,
+  expand: STRIPE_PENDING_PAYMENT_EXPAND,
 };
 
 type TPlanChangeClient = ReturnType<typeof mockStripePlanChangeClient>;
@@ -152,7 +164,7 @@ describe(changeSubscriptionPlan, () => {
       from_subscription: MOCK_STRIPE_SUBSCRIPTION_ID,
     });
     expect(updateSchedule).toHaveBeenCalledExactlyOnceWith(MOCK_SCHEDULE_ID, {
-      end_behavior: 'release',
+      end_behavior: STRIPE_SCHEDULE_END_BEHAVIOR.RELEASE,
       proration_behavior: STRIPE_PRORATION_BEHAVIOR.NONE,
       phases: [
         {
@@ -171,12 +183,42 @@ describe(changeSubscriptionPlan, () => {
             interval: STRIPE_RECURRING_INTERVAL.MONTHLY,
             interval_count: 1,
           },
+          billing_cycle_anchor: STRIPE_BILLING_CYCLE_ANCHOR.PHASE_START,
           proration_behavior: STRIPE_PRORATION_BEHAVIOR.NONE,
           discounts: [],
           automatic_tax: { enabled: true },
         },
       ],
     });
+  });
+
+  it('bills a move down to a longer period from the day its phase starts', async () => {
+    const { updateSchedule } = await change(
+      { lookupKeys: [GROWTH_MONTHLY] },
+      { ...MOCK_STARTER_MONTHLY_CHOICE, interval: BILLING_INTERVAL.YEARLY },
+    );
+
+    expect(updateSchedule).toHaveBeenCalledExactlyOnceWith(
+      MOCK_SCHEDULE_ID,
+      expect.objectContaining({
+        phases: [
+          expect.anything(),
+          expect.objectContaining({
+            items: [
+              {
+                price: priceIdFor(STRIPE_PRICE_LOOKUP_KEY.STARTER_YEARLY),
+                quantity: 1,
+              },
+            ],
+            duration: {
+              interval: STRIPE_RECURRING_INTERVAL.YEARLY,
+              interval_count: 1,
+            },
+            billing_cycle_anchor: STRIPE_BILLING_CYCLE_ANCHOR.PHASE_START,
+          }),
+        ],
+      }),
+    );
   });
 
   it('moves yearly to monthly at renewal', async () => {
@@ -187,6 +229,81 @@ describe(changeSubscriptionPlan, () => {
 
     expect(result).toBe(PLAN_CHANGE_TIMING.AT_RENEWAL);
     expect(updateSubscription).not.toHaveBeenCalled();
+  });
+
+  describe('when the payment for a move up does not go through at once', () => {
+    const moveUpHeldFor = (status: Stripe.PaymentIntent.Status) =>
+      change(
+        { lookupKeys: [STARTER_MONTHLY] },
+        MOCK_GROWTH_MONTHLY_CHOICE,
+        (client) => client.holdForPayment(status),
+      );
+
+    it("hands back the payment's client secret when the bank asks for a step", async () => {
+      const { result, retrievePaymentIntent } = await moveUpHeldFor(
+        STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_ACTION,
+      );
+
+      expect(result).toEqual({ clientSecret: MOCK_PAYMENT_CLIENT_SECRET });
+      expect(retrievePaymentIntent).toHaveBeenCalledExactlyOnceWith(
+        MOCK_PAYMENT_INTENT_ID,
+      );
+    });
+
+    it('says the card was declined when the payment needs another card', async () => {
+      const { result } = await moveUpHeldFor(
+        STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_PAYMENT_METHOD,
+      );
+
+      expect(result).toBe(PLAN_CHANGE_REFUSAL.CARD_DECLINED);
+    });
+
+    it.each(STRIPE_PAYMENT_GOING_THROUGH)(
+      'reports the move up as made when the payment is %s',
+      async (status) => {
+        const { result } = await moveUpHeldFor(status);
+
+        expect(result).toBe(PLAN_CHANGE_TIMING.NOW);
+      },
+    );
+
+    it('logs a bank step it cannot hand to the card', async () => {
+      const { result } = await change(
+        { lookupKeys: [STARTER_MONTHLY] },
+        MOCK_GROWTH_MONTHLY_CHOICE,
+        (client) =>
+          client.holdForPayment(STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_ACTION, {
+            hasConfirmationSecret: false,
+          }),
+      );
+
+      expect(result).toBeUndefined();
+      expect(vi.mocked(logger).error).toHaveBeenCalledExactlyOnceWith(
+        BILLING_LOG.PLAN_CHANGE_PAYMENT_UNKNOWN,
+        expect.objectContaining({
+          status: STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_ACTION,
+        }),
+      );
+    });
+
+    it('logs a held change with no payment to read', async () => {
+      const { result } = await change(
+        { lookupKeys: [STARTER_MONTHLY] },
+        MOCK_GROWTH_MONTHLY_CHOICE,
+        ({ updateSubscription }) =>
+          updateSubscription.mockResolvedValue({
+            ...mockStripeSubscription({ lookupKeys: [STARTER_MONTHLY] }),
+            pending_update: { expires_at: MOCK_PERIOD_END },
+            latest_invoice: null,
+          }),
+      );
+
+      expect(result).toBeUndefined();
+      expect(vi.mocked(logger).error).toHaveBeenCalledExactlyOnceWith(
+        BILLING_LOG.PLAN_CHANGE_PAYMENT_UNKNOWN,
+        expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
+      );
+    });
   });
 
   describe('with a move down already planned', () => {
@@ -205,25 +322,17 @@ describe(changeSubscriptionPlan, () => {
       expect(updateSubscription).toHaveBeenCalledBefore(releaseSchedule);
     });
 
-    it('keeps the planned move when the card is declined', async () => {
-      const client = mockStripePlanChangeClient(
-        mockStripeSubscription(PLANNED),
-      );
-      client.updateSubscription.mockRejectedValue(MOCK_CARD_ERROR);
-      const subscription = await loadSubscriptionPlan(
-        client.stripe,
-        MOCK_STRIPE_SUBSCRIPTION_ID,
-      );
-
-      const decline = changeSubscriptionPlan(
-        client.stripe,
-        subscription!,
+    it.each([
+      STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_ACTION,
+      STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_PAYMENT_METHOD,
+    ])('keeps the planned move while the payment is %s', async (status) => {
+      const { releaseSchedule } = await change(
+        PLANNED,
         MOCK_GROWTH_MONTHLY_CHOICE,
-        MOCK_TENANT_ID,
+        (client) => client.holdForPayment(status),
       );
 
-      await expect(decline).rejects.toBe(MOCK_CARD_ERROR);
-      expect(client.releaseSchedule).not.toHaveBeenCalled();
+      expect(releaseSchedule).not.toHaveBeenCalled();
     });
 
     it('retries a failed release once without logging', async () => {

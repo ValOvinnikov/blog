@@ -1,5 +1,5 @@
 import { STRIPE_INVOICE_STATUS } from '@platform/constants/billing';
-import { toStripeTime } from '@platform/testing/billing/stripe-time';
+import { toStripeTime } from '@platform/server/billing/stripe-time';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { TENANT_PLAN } from '@shinefold/config/constants';
@@ -30,6 +30,8 @@ export const MOCK_STRIPE_PUBLISHABLE_KEY = `pk_test_${billingFaker.string.alphan
 export const MOCK_STRIPE_PRICE_ID = `price_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_STRIPE_PROMOTION_CODE_ID = `promo_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_CHECKOUT_CLIENT_SECRET = `cs_test_${billingFaker.string.alphanumeric(32)}`;
+export const MOCK_PAYMENT_INTENT_ID = `pi_${billingFaker.string.alphanumeric(24)}`;
+export const MOCK_PAYMENT_CLIENT_SECRET = `${MOCK_PAYMENT_INTENT_ID}_secret_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_CHECKOUT_SESSION_ID = `cs_test_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_CHECKOUT_RETURN_URL = billingFaker.internet.url();
 export const MOCK_INVOICE_PDF_URL = billingFaker.internet.url();
@@ -39,6 +41,9 @@ export const PLAN_CHANGE_SECTION_TEST_ID = 'plan-change-section';
 export const MOCK_UNHANDLED_EVENT_TYPE = 'customer.created';
 export const MOCK_INCOMPLETE_SUBSCRIPTION_STATUS = 'incomplete';
 export const MOCK_BAND_CEILING: TPaidSubscriberBandCeiling = 2_500;
+export const MOCK_HIGHER_BAND_CEILING: TPaidSubscriberBandCeiling = 5_000;
+export const MOCK_SECOND_LARGEST_BAND_CEILING: TPaidSubscriberBandCeiling = 10_000;
+export const MOCK_LARGEST_BAND_CEILING: TPaidSubscriberBandCeiling = 25_000;
 export const MOCK_STRIPE_CLIENT = {} as Stripe;
 export const MOCK_GROWTH_UPGRADE = {
   tenantId: MOCK_TENANT_ID,

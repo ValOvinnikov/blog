@@ -7,8 +7,11 @@ import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
-import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
+import { CAPABILITY, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { queries } from '@shinefold/db';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import { redirect } from 'next/navigation';
 
 import { requireTenantById } from './require-tenant-by-id';
@@ -21,7 +24,10 @@ vi.mock('@shinefold/db', async () => {
 
   return {
     ...(await mockDbConstants()),
-    queries: { tenants: { getTenantById: vi.fn() } },
+    queries: {
+      ...noEntitlementGrantQueries(),
+      tenants: { getTenantById: vi.fn() },
+    },
   };
 });
 
@@ -107,6 +113,7 @@ describe(requireTenantById, () => {
         tenant: resolvedTenant,
         admin: mockAdmin(),
         viewer: mockViewer({ admin: mockAdmin() }),
+        canGrantEntitlements: false,
       });
       expect(getTenantById).toHaveBeenCalledWith(MOCK_TENANT_ID, {
         includeArchived: true,
@@ -114,4 +121,36 @@ describe(requireTenantById, () => {
       expect(redirect).not.toHaveBeenCalled();
     },
   );
+
+  it.each([
+    { role: ADMIN_ROLE.SUPERADMIN, canGrant: true },
+    { role: ADMIN_ROLE.ADMIN, canGrant: false },
+    { role: ADMIN_ROLE.MODERATOR, canGrant: false },
+  ])(
+    'lets a $role admin grant entitlements: $canGrant',
+    async ({ role, canGrant }) => {
+      getTenantById.mockResolvedValue(tenant);
+      vi.mocked(requireAdmin).mockResolvedValueOnce(mockAdmin({ role }));
+
+      const { canGrantEntitlements } = await requireTenantById(MOCK_TENANT_ID);
+
+      expect(canGrantEntitlements).toBe(canGrant);
+    },
+  );
+
+  it("opens what the tenant's open grants unlock", async () => {
+    getTenantById.mockResolvedValue(tenant);
+    vi.mocked(
+      queries.tenantEntitlementGrants.listResolvableEntitlementGrants,
+    ).mockResolvedValueOnce([
+      mockEntitlementGrant({ key: CAPABILITY.CONTACT_FORM }),
+    ]);
+
+    const { tenant: resolved } = await requireTenantById(MOCK_TENANT_ID);
+
+    expect(
+      queries.tenantEntitlementGrants.listResolvableEntitlementGrants,
+    ).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(resolved.pageAccess.leads).toBe(true);
+  });
 });

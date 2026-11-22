@@ -5,10 +5,13 @@ import {
   type TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
 import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 
 const { lookForm: LOOK_FORM } = messages;
 const tLogoHue = makeEnTranslator('logoHueField');
 const tSaveBar = makeEnTranslator('saveBar');
+const tLookForm = makeEnTranslator('lookForm');
 
 export const ACCENT_HUE = LOOK_FORM.accentHueLabel;
 export const DEFAULT_ACCENT_HUE = defaultLookFormValues().accentHue;
@@ -31,6 +34,12 @@ export const GROWTH = messages.growthBadge.label;
 export const GROWTH_BADGE_TEXT = `${GROWTH} ${messages.growthBadge.planNote}`;
 export const EDITORIAL = messages.presetPicker.editorial;
 export const CONSOLE = messages.presetPicker.console;
+export const GROWTH_FIELDS_LINE = tLookForm('lockLineGrowthFields', {
+  preset: CONSOLE,
+});
+export const RADIUS_SCALE = LOOK_FORM.radiusScaleLabel;
+export const DENSITY = LOOK_FORM.densityLabel;
+export const FREE_LOOK_FIELDS = PLAN_ENTITLEMENTS[TENANT_PLAN.FREE].lookFields;
 export const DISCARD = tSaveBar('discard');
 export const EDIT_TAB = messages.viewTabs.editTab;
 export const PREVIEW_TAB = messages.viewTabs.previewTab;
@@ -55,6 +64,10 @@ export const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
     headerSubmenuStyle: defaults.headerSubmenuStyle,
     headerBarStyle: defaults.headerBarStyle,
     navLinkStyle: defaults.navLinkStyle,
+    headingWeight: defaults.headingWeight,
+    headingCase: defaults.headingCase,
+    imageProportion: defaults.imageProportion,
+    dividerWidth: defaults.dividerWidth,
     accountButtonStyle: defaults.accountButtonStyle,
     accountPanelStyle: defaults.accountPanelStyle,
     accountPhonePlacement: defaults.accountPhonePlacement,

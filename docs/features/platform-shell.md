@@ -72,10 +72,12 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   reload or shared link keeps them; `listTenants`' own default order stays by
   name, which the dashboard tenant picker relies on.
 - **Operator tenant view**: `/tenants/{id}` and its Look, Voice, Features,
-  Languages, Domain, Email, Studio, Provisioning and Danger zone pages. The
-  sidebar shows the Platform section plus the tenant's own sections.
+  Languages, Domain, Email, Studio, Provisioning, Danger zone and Help pages.
+  The sidebar shows the Platform section plus the tenant's own sections, ending
+  with Support.
 - **Owner dashboard**: `/dashboard` and its Look, Voice, Features,
-  Languages, Domain, Email and Studio pages. `/dashboard/select-tenant` is a
+  Languages, Domain, Email, Studio and Help pages. The sidebar ends with a
+  Support section holding Help on every plan (see [support](./support.md)). `/dashboard/select-tenant` is a
   picker for a user with several workspaces: rows sorted by name, each with
   its domain and "role · plan" (role hidden for a SUPERADMIN's virtual
   membership), archived workspaces in their own read-only group, and a
@@ -87,20 +89,33 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   setup card (while setup is incomplete or failed), the Get started card (the
   real owner only, once setup is READY, until all four first-run steps are
   done; `platform-sign-in-and-onboarding.md` → "First run"), the Your site band, the
-  Domain and Owner pair, then Make it yours. Your site is a full-width card
+  Usage card (not for an archived tenant), the Domain and Owner pair, then Make
+  it yours. Your site is a full-width card
   whose header holds only the title; under it one row of four label-over-value
   cells (Name, Public domain, Plan, Language) in 3:3:2:2 widths, and below
   `md` two columns (Name and Public domain a full row each, Plan and Language
   sharing one). A footer strip carries the read-only hint. Domain and Owner sit
   in two equal columns from `md` and stack below; from `md` to below `lg`
   their detail lists stack label over value, following the window width.
+- **Usage card** sits on the owner Overview after Your site and on the
+  operator's `/tenants/{id}` Overview after Grants, before Findings, for every
+  role that opens the Overview, and not for an archived tenant. Its rows form a
+  band: one column below `md`, two from `md`, an odd last row spanning both,
+  separated by `line-2` borders. Rows and states:
+  [plans-and-entitlements](./plans-and-entitlements.md) → "Platform, Usage card".
 - `GET /api/dashboard/select-tenant?tenantId=` sets the active-workspace
-  cookie and redirects to `/dashboard`.
+  cookie and redirects to `/dashboard`. The Workspace switcher reaches it with
+  a plain link, so choosing a site loads its dashboard as a new document; a
+  client navigation would keep the previous site's dashboard layout.
 - Every other path 404s through a catch-all. `not-found.tsx` renders
   `DeadEndView` with a home link from `resolveHomeHref` (sign-in, `/tenants`
   for an admin, `/dashboard` otherwise); `error.tsx` offers only Retry.
 
 Below `md` the sidebar is hidden and `TopbarNavMenu` carries the same sections.
+Their links prefetch only once hovered, touched or focused
+(`IntentPrefetchLink`), so a page view never renders every nav route's
+layouts in the background, and a pointed-at route still shows its skeleton at
+once.
 The content column and the notices above it start at the sidebar's right
 edge, never centred: at most 1180px wide, with 26px padding from `md` and
 16px below, and any spare width on the right. The column adds no gap of its
@@ -122,7 +137,7 @@ Discard is disabled and the bar is `aria-busy`. A save that fails with no
 field errors — a server error, offline, or a plan refusal — shows the page's
 failure message in the bar's left side in place of the dot, count and hint, as
 one `role="alert"`, and the changes stay unsaved; invalid fields keep that slot
-until they are cleared. A retry withdraws it while it is in flight, so a second failure announces again, and the next edit or a successful save clears it. The bar grows past 64px to fit a long message, and while it shows, the page's bottom room and scroll padding follow its measured height (`--platform-save-bar-height` on `<html>`), with the 64px dock and 85px phone footer as scroll-padding fallbacks. When the
+until they are cleared. A retry withdraws it while it is in flight, so a second failure announces again, and the next edit or a successful save clears it. The bar grows past 64px to fit a long message, and while it shows, the page's bottom room and scroll padding follow its measured height (`--platform-save-bar-height` on `<html>`), with the 64px dock as the scroll-padding fallback. When the
 failure leaves nothing unsaved (a plan refusal that restored every refused
 value), the message is an error toast instead, which stays until it is
 dismissed or the next save starts; the toast viewport sits above the bar's
@@ -132,7 +147,9 @@ the side gutter, 26px from `md` and 16px below — plus the visible bar's
 measured height, so the gap above the bar matches the sides and no extra room
 is left while no bar shows (archived included). From `md` the document's
 `scroll-padding-bottom` is the bar's 64px
-plus 16px so a focused field never sits under the bar, and when the bar
+plus 16px so a focused field never sits under the bar; below `md`, while the
+bar shows, it is the larger of the 120px dock room and the bar's measured
+height plus 16. When the bar
 first appears the focused control is scrolled into view (`block: 'nearest'`),
 since the bar's new room grows the page without scrolling it. The 64 and 16 are the
 `--spacing-platform-dock` / `-clearance` tokens, kept equal to
@@ -148,25 +165,10 @@ narrow for both. What the user entered stays. Saving again withdraws it while
 the request is in flight, so a second failure announces again, and a
 successful save clears it.
 
-Voice opts into its own phone footer below `md` (`layout.hasPhoneSaveFooter`)
-in place of that bar; from `md` it docks like every other page. The footer is
-fixed to the viewport bottom, full width, flat with a top border, and stays
-mounted when clean (never for an archived tenant). It is a region named by its
-own status text — "N unsaved changes" with a dot, "All changes saved" with
-Save disabled, "N fields need attention" on a first row above "Go to the
-first one", or a failed save's message (an alert, while changes remain) — and has Save changes but no Discard and no shortcut hint. While
-saving it is `aria-busy` and Save reads "Saving…" and keeps focus; it renders
-outside Voice's `inert` content. Below `md` Voice's bottom room is the
-16px gutter plus the footer's measured height, and its `scroll-padding-bottom`
-is that height plus 16 (85px plus 16 before it is measured,
-`--spacing-platform-phone-footer-max`, the two-row error footer); an archived
-Voice page shows no footer, so it ends at the 16px gutter.
-
-A successful save pressed from Save changes — in the docked bar or Voice's
-phone footer — returns focus, without scrolling, to the control that had it
-before Save was pressed, so the bar unmounting or the footer's Save disabling
-never drops a keyboard user's place. If that control has left the page, focus
-moves to the page's `h1` instead. A save from ⌘S / Ctrl+S never moves focus,
+A successful save pressed from Save changes in the save bar returns focus,
+without scrolling, to the control that had it before Save was pressed, so the
+bar unmounting never drops a keyboard user's place. If that control has left
+the page, focus moves to the page's `h1` instead. A save from ⌘S / Ctrl+S never moves focus,
 and a failed or refused save leaves it where it is (a refused save reveals and
 focuses the first invalid field).
 
@@ -233,8 +235,8 @@ save still settles as the form's generic server error.
   soon" rows Subscribers NEWSLETTER and Team `GROWTH` only. There is no
   Comments entry.
   Their "Coming soon" pill is `neutral` with no dot, at the row's right edge,
-  in the sidebar and the phone Menu alike; Leads' unread count is a `brand`
-  pill with no dot.
+  in the sidebar and the phone Menu alike. Leads carries no pill: its unread
+  count would go stale while the owner moves between pages.
   The operator's tenant view (`EVERY_PLAN_PAGE`) always shows every page.
 - UI copy is next-intl, five message files (`en`, `de`, `es`, `fr`, `nl`). It
   is fixed platform copy and never [Voice](./voice.md).
@@ -343,7 +345,8 @@ save still settles as the form's generic server error.
   to the trigger's. It heads with the name, the email and the role line
   ("{role} · {scope}"), none focusable, then — in the expanded and the rail
   menu — a Theme section, then the Sign out item, which takes focus on open
-  from the sidebar.
+  from the sidebar. Choosing Sign out keeps the menu open: the item turns into
+  a small spinner and "Signing out…", `aria-disabled`, until the redirect.
   The Theme section is the shared `MenuRadioGroup`
   (`components/shared/menu-radio-group/`) at its desktop size: a "Theme"
   group of Light (sun), Dark (moon) and System (monitor) `menuitemradio`
@@ -396,9 +399,7 @@ save still settles as the form's generic server error.
   focused field takes a `brand-ink` border (near-black in Light, yellow in
   Dark), kept over an invalid field's `bad-line` border, and a 3px
   `focus-ring` glow (`shadow-platform-focus-glow`).
-  The phone save footer's disabled or busy Save is the neutral
-  `pill-neutral` ground with `muted` text and a `control-line-locked`
-  border. A link
+  A link
   is `brand-ink` (or `brand-strong`) with a 2px `highlight` underline 3px
   below it. The sidebar's current row is `side-raised` with a
   `selected-line` bar and `brand-ink` text.
@@ -439,9 +440,10 @@ save still settles as the form's generic server error.
   border, `rounded-platform` on every corner, 4px padding, `text` colour and
   `shadow-platform-lg`. Its `positioner` slot puts every shell popup — the
   phone Menu, the full-path menu, the account menu, the Workspace dropdown,
-  `Select` and More presets — on one layer, `z-30`: above the sticky
-  `ViewTabs` (`z-21`) and `LookJumpIndex` (`z-20`), below dialogs (`z-40`)
-  and toasts and tooltips (`z-50`). The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
+  `Select` and More presets — on one layer, `z-45`: above the sticky
+  `ViewTabs` (`z-21`), `LookJumpIndex` (`z-20`) and dialogs (`z-40`), so a
+  `Select` inside a dialog (the Suspend dialog's category) opens over it, and
+  below toasts and tooltips (`z-50`). The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
   288px wide. It is anchored to the Menu button's left edge and the top bar's
   full height (`use-bar-anchor.ts`), so it opens 5px below the bar and grows
   with its content until it stops 12px above the viewport's bottom (Base UI's
@@ -489,26 +491,35 @@ save still settles as the form's generic server error.
 - Selected is one rule per family, from `utils/selected-choice-classes/`.
   `selected` and `selected-line` are #ffc233 in every theme, `on-selected`
   is #12141a / #0f1115, `selected-tint` is #ffe08a / #4a3b10, and
-  `selected-edge` is #12141a in Light and transparent in Dark, because
-  yellow on white is 1.61:1, below 3:1, while in Dark yellow passes alone.
+  `selected-edge` is #12141a in Light and #ffc233 in Dark, because neither
+  tint reaches 3:1 on its ground (the light tint on white is 1.29:1, the dark
+  tint on the card about 1.6:1), so the edge carries a picked control's 3:1.
   Compact controls (segmented options at every width, preview toolbar
   toggles, the Follow solo, rich-text toolbar toggles,
   segmented view tabs, the language picker and other segmented radio
   tracks, appearance menu radio items, Voice section chips, preset chips
-  and the phone jump index) are solid `selected` with an `on-selected`
-  label and a `selected-edge` border or inset ring
-  (`SELECTED_COMPACT_CHOICE_CLASSES` for the bordered chips). Tiles (card
+  and the phone jump index) fill with `selected-tint` and a `text` label
+  with a `selected-edge` border or inset ring
+  (`SELECTED_COMPACT_FILL_CLASSES`, `SELECTED_COMPACT_CHOICE_CLASSES` for
+  the bordered chips). Tiles (card
   style tiles, preset picker cards, the preset grid) are `selected-tint`
   with a 1.5px `selected-line` border and a 1px `selected-edge` hairline
   (`SELECTED_CHOICE_CLASSES`), and a yellow tick (`SELECTED_TICK_CLASSES`).
-  Rows (preset rows, the selected lead, the open accordion row, the
-  current top-bar menu row) are `selected-tint` with a 3px `selected-line`
-  bar and a 1px `selected-edge` (`SELECTED_ROW_CLASSES`). A switch that is
-  on has a `selected` track with a `selected-edge` ring and an
-  `switch-thumb-on` thumb (#12141a / #0f1115); a checked checkbox and the
-  chosen preset's dot are `selected` with an `on-selected` tick. Underline
-  tabs and the desktop jump index mark the current entry with a
-  `selected-line` underline and a bold `text` label. An open popup trigger
+  Rows (preset rows, the current top-bar menu row) are
+  `selected-tint` with a 3px `selected-line` bar and a 1px `selected-edge`
+  (`SELECTED_ROW_CLASSES`). The open accordion row is not selected: its
+  title row takes `surface-head` with no frame, and the 3px bar
+  (`SELECTED_STRIPE_CLASSES`) runs down the item, title and open panel; a
+  folded row hovers to `hover-tint`. The selected lead takes the same
+  open-row treatment on its own row — `surface-head`, the bar on its left
+  edge, no frame — and an unselected lead row hovers to `hover-tint`. A switch that is on has a
+  `selected-tint` track with a `selected-edge` ring and a `switch-thumb-on`
+  thumb (#12141a / #ffc233). Only small marks keep the solid `selected`
+  fill with an `on-selected` tick: a checked checkbox, a tile's tick and the
+  chosen preset's dot (`SELECTED_MARK_FILL_CLASSES`). Underline tabs and
+  the desktop jump index mark the current entry with a `selected-line`
+  underline (a straight 2px bar inside the jump link's padding) and a bold
+  `text` label. An open popup trigger
   other than a select has a `brand-ink` border on the `hover-tint` ground.
   The preview toolbar's groups and the Follow solo rest on `theme-track`.
   Three yellow marks stay below 3:1 in Light, and a bold near-black label
@@ -532,14 +543,15 @@ save still settles as the form's generic server error.
   that is off darkens its track to `control-line-hover`; a text link's
   `highlight` stroke thickens from 2px to 3px; the asset upload drop area
   takes the tint and a `brand-ink` dashed border. A select keeps the
-  field rule (a `brand-ink` border, no tint). Table, list, accordion,
-  tenant picker, menu and sidebar rows keep their grey hover, and a
+  field rule (a `brand-ink` border, no tint). Table, list, list-accordion,
+  tenant picker, menu and sidebar rows keep their grey hover (a folded
+  row-accordion row and an unselected lead row take `hover-tint`), and a
   selected, pressed, checked, current or open control does not change on
   hover. Disabled and `aria-disabled` controls take no hover.
 - Focus is one gapped ring on every control, built by
   `utils/focus-ring-classes/focus-ring-classes.ts` for a named
   `FOCUS_RING_GROUND` (side, bg, surface, surface-2, surface-head, popover,
-  popover-hover, on-selected, hover-tint, theme-track, selected-tint): a 2px gap in that ground, then a
+  popover-hover, hover-tint, theme-track, selected-tint): a 2px gap in that ground, then a
   2px `focus-ring` (#ffc233 in both themes), then in Light a 1px `focus-edge`
   (#12141a) around it; Dark has no edge. The ground reaches the
   `shadow-platform-focus-ring` token through `--platform-focus-ground`, which
@@ -553,18 +565,22 @@ save still settles as the form's generic server error.
   their border turns `brand-ink` inside a 3px `focus-ring` glow
   (`FIELD_FOCUS_CLASSES`, `EDITABLE_SHELL_FOCUS_CLASSES`,
   `utils/field-surface-classes/`), kept when the field is invalid. The ring sits on `surface` for checkboxes, select
-  triggers, closed accordion triggers (an open one takes it on `surface-2`), underline view tabs, preset cards, the
+  triggers, closed list-accordion triggers (an open one takes it on `surface-2`), underline view tabs, preset cards, the
   hue slider's thumb (focused or dragged) and the rich-text toolbar buttons;
   segmented options take it on `bg`, and segmented view tabs on `theme-track`. A ring
   that a clipping parent would cut off is drawn inset
   (`insetFocusRingClasses`, an inset shadow that stacks with a drop shadow):
   the data table's scroll region and its sort buttons, which fill their head
-  cell; lead rows, the open accordion row and the current top-bar menu row
-  (on `selected-tint` when selected, the bar and edge drawn above the ring);
+  cell; the current top-bar menu row (on `selected-tint` when selected, the
+  bar and edge drawn above the ring); lead rows (on `surface`, or
+  `surface-head` when selected, the bar drawn over the row's left border,
+  clear of the ring); row-accordion triggers
+  (on `surface`, or `surface-head` when open, the item's bar drawn above
+  the ring); the current phone jump chip (on `selected-tint`);
   menu, select, tenant switcher and top-bar menu
   items on keyboard focus only (on `popover-hover`); the appearance menu
-  radio items on keyboard focus only (on `hover-tint`, or `on-selected` for
-  the checked radio, so the yellow ring shows against its yellow fill); the Look preset sheet's rows (on `selected-tint` when
+  radio items on keyboard focus only (on `hover-tint`, or `selected-tint`
+  for the checked radio); the Look preset sheet's rows (on `selected-tint` when
   selected, the 3px bar a pseudo-element
   above the ring); and the full-screen preview stage (on `theme-track`). An
   inset ring's ground is the row's own fill. The more-presets grid's

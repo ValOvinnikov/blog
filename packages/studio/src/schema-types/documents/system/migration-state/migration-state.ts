@@ -1,17 +1,11 @@
 import { Database } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
-/**
- * Declares the shape of the migration tooling's own operational ledger
- * (`scripts/migrate-lib.mjs` / `scripts/migrate.mjs`, `_id: 'migrationState'`)
- * so `sanity documents validate` recognizes the type — it is not authorable
- * content. `sanity.config.ts`'s `document.actions`/`newDocumentOptions`
- * resolvers keep it out of Studio editing and the "+ create" menu; omnisearch
- * visibility is off separately, hiding it from global ⌘K search too.
- */
+const MIGRATION_STATE_TITLE = 'Migration State';
+
 export const migrationStateSchema = defineType({
   name: 'migrationState',
-  title: 'Migration State',
+  title: MIGRATION_STATE_TITLE,
   type: 'document',
   description:
     'Internal record of which content migrations have already run — not edited by hand.',
@@ -36,6 +30,9 @@ export const migrationStateSchema = defineType({
     }),
   ],
   preview: {
-    prepare: () => ({ title: 'Migration State', subtitle: 'System ledger' }),
+    prepare: () => ({
+      title: MIGRATION_STATE_TITLE,
+      subtitle: 'System ledger',
+    }),
   },
 });

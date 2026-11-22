@@ -117,6 +117,7 @@ const {
   listTenantsByIdsMock,
   getTenantByDomainMock,
   getSiteConfigMock,
+  listResolvableEntitlementGrantsMock,
   getEmailConfigMock,
   getEmailTemplateMock,
   sendEmailMock,
@@ -125,11 +126,13 @@ const {
   onSendRefusedMock,
   onSendCountFailedMock,
   recordEmailSendMock,
+  recordPlatformEmailSendMock,
 } = vi.hoisted(() => ({
   findPendingInviteByEmailMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
+  listResolvableEntitlementGrantsMock: vi.fn(),
   getEmailConfigMock: vi.fn(),
   getEmailTemplateMock: vi.fn(),
   sendEmailMock: vi.fn<(input: TSendEmailInput) => Promise<void>>(),
@@ -138,6 +141,7 @@ const {
   onSendRefusedMock: vi.fn(),
   onSendCountFailedMock: vi.fn(),
   recordEmailSendMock: vi.fn(),
+  recordPlatformEmailSendMock: vi.fn(),
 }));
 
 vi.mock(
@@ -165,9 +169,15 @@ vi.mock('@shinefold/db', async () => ({
     },
     tenantDomains: { getTenantByDomain: getTenantByDomainMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
+    tenantEntitlementGrants: {
+      listResolvableEntitlementGrants: listResolvableEntitlementGrantsMock,
+    },
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },
-    emailUsage: { recordEmailSend: recordEmailSendMock },
+    emailUsage: {
+      recordEmailSend: recordEmailSendMock,
+      recordPlatformEmailSend: recordPlatformEmailSendMock,
+    },
   },
 }));
 
@@ -223,10 +233,12 @@ describe(buildMagicLinkProvider, () => {
     vi.stubEnv('MAGIC_LINK_FROM_ADDRESS', MOCK_FROM_ADDRESS);
     findPendingInviteByEmailMock.mockResolvedValue([]);
     getTenantByDomainMock.mockResolvedValue(undefined);
+    listResolvableEntitlementGrantsMock.mockResolvedValue([]);
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockResolvedValue(mockEmailTemplate());
     sendEmailMock.mockResolvedValue(undefined);
     recordEmailSendMock.mockResolvedValue(undefined);
+    recordPlatformEmailSendMock.mockResolvedValue(undefined);
     findMagicLinkSendRefusalMock.mockResolvedValue(undefined);
     withMinimumDurationMock.mockImplementation(
       (_minimumMs: number, task: () => Promise<unknown>) => task(),
@@ -291,6 +303,7 @@ describe(buildMagicLinkProvider, () => {
 
     it('counts no send', () => {
       expect(recordEmailSendMock).not.toHaveBeenCalled();
+      expect(recordPlatformEmailSendMock).not.toHaveBeenCalled();
     });
 
     it('delivers the sign-in link from the configured address', () => {
@@ -365,6 +378,44 @@ describe(buildMagicLinkProvider, () => {
       const { subject, html } = sentEmail();
       expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
       expect(html).not.toContain(MOCK_TENANT_NAME);
+    });
+  });
+
+  describe('when the platform sends a link', () => {
+    it.each([
+      ['sign-in', () => {}, EMAIL_TYPE.SIGN_IN],
+      ['invite', () => withPendingInvite(), EMAIL_TYPE.INVITE],
+    ])(
+      'counts a platform %s in the platform bucket',
+      async (_, arrange, emailType) => {
+        arrange();
+
+        await sendVerificationRequestFor(buildPlatformProvider(), {
+          identifier: MOCK_ADMIN_EMAIL,
+          url: PLATFORM_CALLBACK_URL,
+        });
+
+        expect(recordPlatformEmailSendMock).toHaveBeenCalledExactlyOnceWith(
+          emailType,
+        );
+        expect(recordEmailSendMock).not.toHaveBeenCalled();
+      },
+    );
+
+    it('delivers the link and hands its failed count to the handler', async () => {
+      const countError = new Error(MOCK_DB_ERROR_MESSAGE);
+      recordPlatformEmailSendMock.mockRejectedValue(countError);
+
+      await expect(
+        sendVerificationRequestFor(buildPlatformProvider(), {
+          url: PLATFORM_CALLBACK_URL,
+        }),
+      ).resolves.toBeUndefined();
+      expect(sendEmailMock).toHaveBeenCalledOnce();
+      expect(onSendCountFailedMock).toHaveBeenCalledExactlyOnceWith({
+        emailType: EMAIL_TYPE.SIGN_IN,
+        error: countError,
+      });
     });
   });
 
@@ -501,12 +552,14 @@ describe(buildMagicLinkProvider, () => {
       },
     );
 
-    it('neither tags nor counts a platform sign-in', async () => {
+    it("keeps a platform sign-in on a site's host out of the site's count", async () => {
       await sendVerificationRequestFor(buildPlatformProvider(), {
         url: PLATFORM_CALLBACK_URL,
       });
 
-      expect(sentEmail().tags).toBeUndefined();
+      expect(recordPlatformEmailSendMock).toHaveBeenCalledExactlyOnceWith(
+        EMAIL_TYPE.SIGN_IN,
+      );
       expect(recordEmailSendMock).not.toHaveBeenCalled();
     });
 

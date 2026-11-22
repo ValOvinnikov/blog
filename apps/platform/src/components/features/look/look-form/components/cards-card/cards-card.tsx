@@ -53,8 +53,7 @@ export const CardsCard = ({ summary }: TCardsCardProps) => {
         label={label}
         hint={t('cardStyleDescription')}
         isGroup={true}
-        labelId={lock.labelId}
-        growthBadgeId={lock.growthBadgeId}
+        lock={lock}
       >
         <SegmentedRadioGroup<TCardStyle>
           aria={{

@@ -52,7 +52,7 @@ The same "Actions" building block — `ctaButtons`, rendered by `ActionGroup` �
 - `bandTone` equal to `brandVariant` raises a non-blocking warning ("the card will blend into the section"); it is not checked on Banner.
 - At most two actions; each variant at most once; a `PRIMARY` action, when present, comes first. `ctaButtonsField` defaults to `min = 0`, so no actions is a valid module.
 - Footnote at most 120 characters in each language.
-- Two tones, two jobs: `Section` paints `bandTone` as the full-bleed band, and `CtaModule` paints `brandVariant` (its `tone`) on the card. On Banner the view forces the band to `PRIMARY` with `BANNER_SECTION_LAYOUT` (no spacing, no dividers); the authored `spacingTop`/`spacingBottom` set the Banner's own height instead, and `tone` picks its fill and scrim (brand scrim on Brand tint, neutral otherwise).
+- Two tones, two jobs: `Section` paints `bandTone` as the full-bleed band, and `CtaModule` paints `brandVariant` (its `tone`) on the card. On Banner the view forces the band to `PRIMARY` with `BANNER_SECTION_LAYOUT` (no spacing, no dividers); the authored `spacingTop`/`spacingBottom` set the Banner's own height instead, and `tone` names the skin it renders (`data-skin`), whose ground fills it and whose `--scrim-*` roles colour its scrim (brand scrim on Brand tint, neutral otherwise). The Split and Callout card render `data-skin` too, so everything inside reads the card's skin.
 - Content position and content alignment are separate axes: position moves the copy block (grid column on Split, place over the image on Banner, held to the page column while the band spans the window, nothing on Callout); alignment aligns text and actions inside it on every shape. The UI defaults position to Left, alignment to Left except on Split, and Split's mobile media order to Last.
 - Action rendering (`ActionGroup`): `INLINE` renders as a text link; otherwise `PRIMARY` is a filled button and `SECONDARY` a ghost button. Over a Banner, non-primary actions reverse for the dark photo.
 - The heading is always an `h2` with `visual="section"`, and its id labels the `Section` landmark.
@@ -84,5 +84,5 @@ The same "Actions" building block — `ctaButtons`, rendered by `ActionGroup` �
 
 ## Related
 
-- #5016 — one-entry skins: #5019 (the Background fields list the skin registry), #5021 (`CtaModule` card and Banner render `data-skin`; tone-keyed `bg-*`/`surface-*` pairs go), #5022 (`Section` renders its skin; `isOnDark` leaves `ActionGroup`).
+- #5016 — one-entry skins: #5019 (the Background fields list the skin registry), #5021 (`CtaModule` card and Banner render `data-skin`; tone-keyed `bg-*`/`surface-*` pairs go).
 - #5028 — text roles: #5033 (CTA supporting text becomes INTRO, footnote becomes FOOTNOTE).

@@ -14,6 +14,7 @@ code:
   - apps/platform/src/constants/onboarding.ts
   - apps/platform/src/server/auth/set-signup-terms-cookie*
   - apps/platform/src/utils/legal-page-urls/**
+  - apps/platform/src/server/legal-pages/**
   - apps/platform/src/instrumentation-client.ts
   - apps/platform/src/components/features/sign-in/**
   - apps/platform/src/server/auth/send-sign-in-link-action*
@@ -63,7 +64,10 @@ site as a 14-day Growth trial, with no card.
   so a crafted `callbackUrl` falls back to `/`. Auth.js's own
   `/api/auth/signin` redirects here.
 - Auth.js sends a sign-in failure back to `/sign-in?error=…`.
-  `OAuthAccountNotLinked` (the email already signs in with another provider)
+  Google and GitHub join an existing account with the same email when the
+  provider has verified it ([reader-auth](./reader-auth.md)), so an owner or
+  editor who first signed in by email link gets back in with either.
+  `OAuthAccountNotLinked` (only a provider email that is not verified)
   gets its own message; any other error a general one.
 - `/signup?promo=<code>` (the marketing pricing page's tier actions) keeps
   the code for the visitor's first Checkout in the `platform-signup-promo`
@@ -84,9 +88,21 @@ site as a 14-day Growth trial, with no card.
 - `/signup`: the same card, titled "Create an account", with the same
   provider buttons and email field (`SignInOptions` with `isSignUp`), then the
   note "By continuing, you agree to the Terms of Service and the Privacy
-  Policy", linked at `https://<TENANT_ROOT_DOMAIN>/terms` and `/privacy`
-  (`routes.terms()` and `routes.privacy()` in `@shinefold/config`; the marketing
-  site serves them), or named as plain text without a root domain. No
+  Policy", each opening in a new tab so the form keeps its state.
+  `toLegalPageUrls` builds the marketing site's by-kind redirect,
+  `<MARKETING_SITE_URL>/api/legal-page/TERMS` and `/PRIVACY_POLICY`
+  (`routes.legalPageByKind()` in `@shinefold/config`), and
+  `resolveLegalPageUrls` fetches each with `redirect: 'manual'` on the server
+  and links the page its `Location` names (`/legal/terms`), so no `/api/…`
+  address shows in the browser. The resolved address is cached for 10 minutes
+  per platform instance, so a slug change in the marketing Studio reaches the
+  links within that window. A failed lookup (network error, non-redirect
+  answer, missing `Location`, or one off the marketing site's origin) is not
+  cached and keeps the `/api/legal-page/…` link, which still redirects. With
+  `MARKETING_SITE_URL` unset they fall back to the `TENANT_ROOT_DOMAIN` apex,
+  `https://<TENANT_ROOT_DOMAIN>/api/legal-page/…`; with neither set they are
+  named as plain text. Onboarding's review-step terms checkbox links the same
+  two URLs. No
   checkbox and no separate step: choosing a provider or sending a link runs
   `setSignupTermsCookie` first, which checks Vercel BotID at its free Basic
   level and sets the `SIGNUP_TERMS_COOKIE_NAME` cookie to `TERMS_VERSION` for
@@ -130,7 +146,9 @@ site as a 14-day Growth trial, with no card.
   when too long — on the toolbar row when the section is wide enough and on
   its own line otherwise. The frame (an image named "Sample page at {width}
   px") draws the desktop bar's three dots without a host, and lays Look's
-  sample (`LookSample`) out at the device width, scaled to the stage's width
+  sample (`LookSample`, so it also shows the band per registry skin and the
+  Banner sample, as intended — the owner sees the chosen hue on every
+  background) out at the device width, scaled to the stage's width
   (less its border, bezel and bar) and, in the Full tier, its inner height
   too (no 608px cap), so the whole frame stays inside the stage. The sample
   wears the typed name ("Your site" while empty) with no logo, the chosen
@@ -400,7 +418,8 @@ site as a 14-day Growth trial, with no card.
 - Env: `AUTH_SECRET`, `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`,
   `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `RESEND_PLATFORM_API_KEY`,
   `MAGIC_LINK_FROM_ADDRESS`, `KV_REST_API_URL`/`KV_REST_API_TOKEN` (the
-  Create site gate's counts), `OPERATOR_ALERT_FROM_ADDRESS`.
+  Create site gate's counts), `OPERATOR_ALERT_FROM_ADDRESS`,
+  `MARKETING_SITE_URL` and `TENANT_ROOT_DOMAIN` (the legal links).
 
 ## Entry points
 
@@ -427,6 +446,7 @@ site as a 14-day Growth trial, with no card.
   `sign-in-with-provider-action.test.ts`, `sign-in/page.test.tsx`,
   `sign-in-error/page.test.tsx`, `signup/page.test.tsx`,
   `set-signup-terms-cookie.test.ts`, `legal-page-urls.test.ts`,
+  `resolve-legal-page-urls.test.ts`,
   `create-site-action.test.ts`, `check-site-address-action.test.ts`,
   `require-onboarding-user.test.ts`, the `onboarding-view*.test.tsx` files,
   `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,

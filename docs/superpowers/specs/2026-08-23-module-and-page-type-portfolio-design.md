@@ -144,7 +144,7 @@ end rather than renumbering):
   reusable `block_testimonial` documents; designed below.
 - `module_logoWall` — client / tech logos.
 - `module_stats` — metric figures ("40% faster", "3M users").
-- `module_faq` — **built** ([#2786](https://github.com/ValOvinnikov/blog/issues/2786));
+- `module_faq` — **built** ([#2786](https://github.com/ValOvinnikov/sf-mono/issues/2786));
   `SPEC.md` §6 describes what shipped. The disclosure is `Accordion` in
   `@shinefold/ui` on Base UI and carries no `'use client'`, so a Server Component
   renders it directly — superseding this catalogue's earlier "lives in a `web`
@@ -840,7 +840,7 @@ Banner is legible the same way; `pnpm type-check && pnpm lint && pnpm test
 
 ## `module_heroProfile` — the person hero
 
-Retired 2026-09-18. **[#2776](https://github.com/ValOvinnikov/blog/issues/2776) is the design of record for this hero**, and `SPEC.md` describes what shipped.
+Retired 2026-09-18. **[#2776](https://github.com/ValOvinnikov/sf-mono/issues/2776) is the design of record for this hero**, and `SPEC.md` describes what shipped.
 
 The section that stood here specified a `PROFILE_IMAGE_SOURCE` mode field, a `heroFields({ … })` tail helper, an exhaustive `HERO_MAP`, and delivery as one config + studio + service + web PR. Every one of those was superseded while the work shipped: the photo resolves by precedence, `heroFields()` was deleted in #3275, page maps became per-page and `Partial` in #3331, and the work shipped as six PRs. Keeping a staler second copy of the design here is exactly what kept misleading the work.
 
@@ -913,7 +913,7 @@ does:
 | Field              | Type                                                            | Notes                                                                                   |
 | ------------------ | --------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `title`            | `titleField()`                                                  | Editor-facing name, never rendered                                                      |
-| `brandVariant`     | `brandVariantField({ list: FULL_BRAND_VARIANT_LIST })`          |                                                                                         |
+| `brandVariant`     | `brandVariantField()`                                           |                                                                                         |
 | `headingBlock`     | `headingBlockField()`                                           | Required heading, optional supporting text                                              |
 | `features`         | array of references → `block_feature`, `unique()`, 2–8          | Authored order is display order                                                         |
 | `ctaButtons`       | `ctaButtonsField()`                                             | 0–2 actions under the grid — "See all services", "Get in touch"                         |
@@ -1594,7 +1594,7 @@ for index-page slots:
 
 ```ts
 type TTaxonomyListModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: Extract<TBrandVariant, 'PRIMARY' | 'SECONDARY'>;
   headingBlock: THeadingBlock;
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
@@ -1797,7 +1797,7 @@ One query, the `module_heroBlog` shape:
 
 ```ts
 type TPostFeaturedModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: Extract<TBrandVariant, 'PRIMARY' | 'SECONDARY'>;
   headingBlock: THeadingBlock;
   posts: TPostCard[];
   layout: TMaybeUndefined<TLayout>;

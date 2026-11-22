@@ -6,8 +6,8 @@ import {
 } from '@platform/constants/billing';
 import { env } from '@platform/utils/env/env';
 import { formatDate } from '@platform/utils/format-date/format-date';
-import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import { logger } from '@platform/utils/logger/logger';
+import { formatStripeAmount } from '@shinefold/config';
 import { EMAIL_ACCOUNT, type TTenantPlan } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import {

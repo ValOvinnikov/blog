@@ -1,30 +1,20 @@
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import {
+  buildShapePreviewTokens,
+  type TShapePreviewValues,
+} from '@platform/utils/shape-preview-tokens/shape-preview-tokens';
+import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
-  BUTTON_SHAPE_DECLARATIONS,
-  CARD_STYLE_DECLARATIONS,
-  DENSITY_DECLARATIONS,
-  DERIVED_RADIUS_DECLARATIONS,
+  BRAND_PALETTE,
   formatOklchRamp,
-  HEADER_CONTROL_SHAPE_DECLARATIONS,
-  HEADER_CONTROL_STYLE_DECLARATIONS,
   HUE_MAX,
   HUE_MIN,
+  IMAGE_SCRIM_RAMP,
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
-  NAV_LINK_STYLE_DECLARATIONS,
-  RADIUS_DECLARATIONS,
-  type TButtonShape,
-  type TCardStyle,
-  type TDensity,
   type TFontChoice,
-  type THeaderControlShape,
-  type THeaderControlStyle,
   type TMaybeUndefined,
-  type TNavLinkStyle,
-  type TRadiusScale,
-  type TThemeDeclarations,
 } from '@shinefold/config';
 import type { CSSProperties } from 'react';
 
@@ -38,37 +28,6 @@ export const buildLogoPreviewTokens = (hue: number, isDark: boolean) => {
   return formatOklchRamp(isDark ? LOGO_RAMP_DARK : LOGO_RAMP_LIGHT, hue);
 };
 
-type TShapePreviewValues = {
-  radiusScale: TRadiusScale;
-  density: TDensity;
-  cardStyle: TCardStyle;
-  headerControlStyle: THeaderControlStyle;
-  headerControlShape: THeaderControlShape;
-  buttonShape: TButtonShape;
-  navLinkStyle: TNavLinkStyle;
-};
-
-const buildShapePreviewTokens = ({
-  radiusScale,
-  density,
-  cardStyle,
-  headerControlStyle,
-  headerControlShape,
-  buttonShape,
-  navLinkStyle,
-}: TShapePreviewValues): TThemeDeclarations => {
-  return {
-    ...RADIUS_DECLARATIONS[radiusScale],
-    ...DENSITY_DECLARATIONS[density],
-    ...CARD_STYLE_DECLARATIONS[cardStyle],
-    ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
-    ...HEADER_CONTROL_SHAPE_DECLARATIONS[headerControlShape],
-    ...BUTTON_SHAPE_DECLARATIONS[buttonShape],
-    ...NAV_LINK_STYLE_DECLARATIONS[navLinkStyle],
-    ...DERIVED_RADIUS_DECLARATIONS,
-  };
-};
-
 export type TThemePreviewValues = TShapePreviewValues & {
   accentHue: number;
   logoHue: TMaybeUndefined<number>;
@@ -79,6 +38,8 @@ export const buildThemePreviewStyle = (
   isDark: boolean,
 ): CSSProperties =>
   ({
+    ...formatOklchRamp(BRAND_PALETTE, accentHue),
+    ...formatOklchRamp(IMAGE_SCRIM_RAMP, accentHue),
     ...buildAccentPreviewTokens(accentHue, isDark),
     ...buildLogoPreviewTokens(logoHue ?? accentHue, isDark),
     ...buildShapePreviewTokens(shape),

@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './skins.css';
 
 /*
  * @shinefold/tailwind-config — shared Tailwind v4 theme entry.
@@ -23,8 +24,6 @@
  * (`site-preview/`) needs this file's tokens to render
  * those components correctly.
  */
-
-@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
   /* Semantic colour utilities: bg-primary, text-text-muted, border-border, ... */
@@ -55,9 +54,9 @@
   --color-header-control-fill: var(--header-control-fill); /* @role header control resting fill */
   --color-text: var(--text); /* @role primary ink */
   --color-text-muted: var(--text-muted); /* @role secondary body text */
-  --color-text-subtle: var(--text-muted); /* @role metadata / low emphasis */
+  --color-text-subtle: var(--text-subtle); /* @role metadata / low emphasis */
   --color-muted: var(--text-muted); /* @role secondary body text (alias) */
-  --color-subtle: var(--text-muted); /* @role metadata (alias) */
+  --color-subtle: var(--text-subtle); /* @role metadata (alias) */
   --color-brand-primary: var(--brand-primary); /* @role links / interactive */
   --color-brand-primary-hover: var(
     --brand-primary-hover
@@ -65,8 +64,6 @@
   --color-brand-primary-muted: var(
     --brand-primary-muted
   ); /* @role tint / selection */
-  /* prettier-ignore */
-  --color-tint: var(--tint, var(--brand-primary-muted)); /* @role brand tint of the surface in scope */
   /* prettier-ignore */
   --color-item-hover: color-mix(in oklch, var(--tint, var(--brand-primary-muted)), var(--item-nested-fill, var(--brand-primary-wash)) var(--item-hover-mix, 0%)); /* @role hovered or focused item card */
   /* prettier-ignore */
@@ -188,14 +185,10 @@
   --text-4xl: clamp(2.375rem, 1.851rem + 2.62vw, 3.375rem);
   --text-4xl--line-height: 1.08;
 
-  --text-display: clamp(2.625rem, 1.825rem + 3.6vw, 4.625rem);
-  --text-display--line-height: 1.05;
-  --text-display--letter-spacing: -0.02em;
-
   /* cqi, not vw: it scales with the nearest container, so a footer drawn in a narrow frame gets a narrow wordmark. */
   --text-wordmark: clamp(2.625rem, 1.825rem + 3.6cqi, 4.625rem);
-  --text-wordmark--line-height: var(--text-display--line-height);
-  --text-wordmark--letter-spacing: var(--text-display--letter-spacing);
+  --text-wordmark--line-height: 1.05;
+  --text-wordmark--letter-spacing: -0.02em;
 
   --text-title-2xl: clamp(1.75rem, 1.4rem + 1.4vw, 2.25rem);
   --text-title-2xl--line-height: 1.2;
@@ -289,19 +282,17 @@
      --primary-subtle — both clear the WCAG 1.4.11 3:1 non-text minimum
      (--border-strong itself only reaches 1.69:1 / 2.14:1 there). */
   --border-emphasis: oklch(0.62 0.006 250);
-  /* Ambient surface context: descendants read these for ring-offset/divider
-     colour instead of a hardcoded --primary/--border, so a `surface-secondary`/
-     `surface-brand-primary` ancestor (below) changes them for everything
-     inside it, with no per-component prop. */
   --ambient: var(--primary);
   --backdrop: var(--primary);
+  --ambient-raised: var(--primary-subtle);
   --divider: var(--border);
   /* 3:1 (WCAG 1.4.11) against --surface and against --secondary or
      --brand-primary-muted at every accent hue, where --border-emphasis falls short. */
   --field-boundary-tinted: oklch(0.58 0.006 250);
-  --field-boundary: var(--border-emphasis);
+  --field-boundary: oklch(0.62 0.006 250);
   --text: oklch(0.2 0.01 250);
   --text-muted: oklch(0.46 0.01 250);
+  --text-subtle: var(--text-muted);
   --brand-primary: oklch(0.45 0.17 250);
   --brand-primary-hover: oklch(0.39 0.17 250);
   --brand-primary-muted: oklch(0.95 0.03 250);
@@ -340,7 +331,7 @@
   --shadow-card:
     0 1px 2px oklch(0.2 0.02 250 / 0.05), 0 14px 34px oklch(0.2 0.04 250 / 0.07);
   --shadow-float:
-    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    0 10px 15px -3px oklch(0 0 0 / 0.1), 0 4px 6px -4px oklch(0 0 0 / 0.1);
 
   /* A scrim darkens the photo under it in either mode, so these stay out of .dark. */
   --on-image: oklch(1 0 0);
@@ -351,11 +342,14 @@
   --scrim-neutral-strong: oklch(0.18 0.01 250 / 0.9);
   --scrim-neutral-mid: oklch(0.26 0.015 250 / 0.68);
   --scrim-neutral-weak: oklch(0.32 0.02 250 / 0.4);
+  --scrim-strong: var(--scrim-neutral-strong);
+  --scrim-mid: var(--scrim-neutral-mid);
+  --scrim-weak: var(--scrim-neutral-weak);
 
   --item-radius: var(--radius-md);
   --item-border-width: 0px;
   --item-accent-width: 2px;
-  --item-accent-color: var(--brand-primary);
+  --item-accent-brand-share: 100%;
   --item-shadow: none;
   --item-fill-mix: 0%;
   --item-clear-mix: 0%;
@@ -389,9 +383,10 @@
     0.55 0.01 250
   ); /* see :root comment — verified dark ratio 3.73:1 vs --primary-subtle */
   --field-boundary-tinted: oklch(0.59 0.01 250);
-  --field-boundary: var(--border-emphasis);
+  --field-boundary: oklch(0.58 0.006 250);
   --text: oklch(0.95 0.004 250);
   --text-muted: oklch(0.72 0.008 250);
+  --text-subtle: var(--text-muted);
   --brand-primary: oklch(0.7 0.16 250);
   --brand-primary-hover: oklch(0.76 0.16 250);
   --brand-primary-muted: oklch(0.3 0.06 250);
@@ -575,33 +570,31 @@
   max-width: var(--container-copy);
 }
 
-/* Ambient-surface overrides: apply to an element that changes its own
-   background, so descendants' ring-offset-ambient/border-divider utilities
-   resolve against that background instead of the page default. */
-@utility surface-secondary {
-  --ambient: var(--secondary);
-  --backdrop: var(--secondary);
-  --divider: var(--border-strong);
-  --field-boundary: var(--field-boundary-tinted);
-  --item-fill: var(--brand-primary-muted);
-  --item-nested-fill: var(--brand-primary-wash);
+/* A skin scope starts its own tint fills, so a band around it never leaks in; :where() lets a skin that publishes its own win. */
+:where([data-skin]) {
+  --tint: initial;
+  --media-fill: initial;
+  --item-fill: initial;
+  --item-nested-fill: initial;
 }
 
-/* 10% lifts --tint off the band by ~1.13:1 light / ~1.16:1 dark while
-   brand-primary-hover text on it holds ≥5.86:1 / ≥5.11:1 across hues. */
-@utility surface-brand-primary {
-  --ambient: var(--brand-primary-muted);
-  --backdrop: var(--brand-primary-muted);
-  --divider: var(--border-strong);
-  --field-boundary: var(--field-boundary-tinted);
-  --tint: color-mix(
-    in oklch,
-    var(--brand-primary-muted),
-    var(--brand-primary) 10%
-  );
-  --media-fill: var(--tint);
-  --item-fill: var(--brand-primary-wash);
-  --item-nested-fill: var(--surface);
+/* Unlayered, and one class more specific than the skin scopes, so they re-point roles on the element that sets data-skin. */
+[data-skin].skin-raised,
+.dark [data-skin].skin-raised {
+  --ambient: var(--ambient-raised);
+  --backdrop: var(--ambient-raised);
+}
+
+[data-skin].skin-on-image,
+.dark [data-skin].skin-on-image {
+  --text: var(--on-image);
+  --text-muted: var(--on-image-muted);
+  --text-subtle: var(--on-image-muted);
+  --border: var(--on-image-muted);
+  --border-strong: var(--on-image-muted);
+  --divider: var(--on-image-muted);
+  --brand-primary: var(--on-image);
+  --brand-primary-hover: var(--on-image-muted);
 }
 
 @utility surface-tint {
@@ -685,7 +678,12 @@
     top: var(--radius-item);
     bottom: var(--radius-item);
     left: calc(-1 * var(--item-border-width));
-    border-left: var(--item-accent-width) solid var(--item-accent-color);
+    border-left: var(--item-accent-width) solid
+      color-mix(
+        in oklch,
+        var(--brand-primary) var(--item-accent-brand-share),
+        var(--border)
+      );
     pointer-events: none;
   }
 }

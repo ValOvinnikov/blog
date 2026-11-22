@@ -1,11 +1,14 @@
 import { Button } from '@shinefold/ui/components/atoms/button';
 import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
 import { PricingCard } from '@shinefold/ui/components/molecules/pricing-card';
+import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { PricingCardGrid } from './pricing-card-grid';
 import { pricingCardGridVariants } from './pricing-card-grid-variants';
+
+const COMMUNITY_SUPPORT = 'Community support';
 
 const MONTHLY = {
   period: 'per month',
@@ -28,7 +31,7 @@ const renderTiers = ({ period, starter, pro, studio }: typeof MONTHLY) => [
     </PricingCard.Description>
     <PricingCard.Price amount={starter} period={period} />
     <PricingCard.Features
-      items={['Unlimited posts', 'Custom domain', 'Community support']}
+      items={['Unlimited posts', 'Custom domain', COMMUNITY_SUPPORT]}
     />
     <PricingCard.Actions>
       <LinkButton href="/signup?plan=starter">Get started</LinkButton>
@@ -80,7 +83,7 @@ const freeTier = (
   <PricingCard key="free">
     <PricingCard.Name>Free</PricingCard.Name>
     <PricingCard.Price amount="$0" />
-    <PricingCard.Features items={['One blog', 'Community support']} />
+    <PricingCard.Features items={['One blog', COMMUNITY_SUPPORT]} />
     <PricingCard.Actions>
       <LinkButton href="/signup?plan=free">Start free</LinkButton>
     </PricingCard.Actions>
@@ -156,4 +159,17 @@ export const FourTiersTablet: TStory = {
 export const SingleTier: TStory = {
   name: 'Single tier',
   args: { columns: 1, children: renderTiers(MONTHLY).slice(0, 1) },
+};
+
+export const OnEveryBrandVariant: TStory = {
+  name: 'On every brand variant',
+  render: (args) => (
+    <EveryBrandBand>
+      {() => (
+        <div className="w-4xl max-w-full">
+          <PricingCardGrid {...args} />
+        </div>
+      )}
+    </EveryBrandBand>
+  ),
 };

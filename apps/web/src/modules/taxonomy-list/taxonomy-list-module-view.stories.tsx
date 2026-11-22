@@ -15,10 +15,6 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    },
     headingLevel: {
       control: 'select',
       options: HEADING_LEVELS,
@@ -29,10 +25,9 @@ const meta = {
     },
   },
   args: {
-    brandVariant: BRAND_VARIANT.PRIMARY,
+    section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     headingBlock: mockHeadingBlock({ heading: 'Browse by topic' }),
     items: MOCK_TOPICS_LIST_ITEMS,
-    layout: undefined,
     contentAlignment: undefined,
     titleId: 'topic-list-title',
     dataTestId: 'taxonomy-list-module-topic-list-1',
@@ -67,7 +62,7 @@ export const WithoutLatestPosts: TStory = {
 };
 
 export const Secondary: TStory = {
-  args: { brandVariant: BRAND_VARIANT.SECONDARY },
+  args: { section: { brandVariant: BRAND_VARIANT.SECONDARY } },
 };
 
 export const CenterAligned: TStory = {

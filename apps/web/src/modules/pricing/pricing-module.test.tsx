@@ -1,6 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { PRICE_PERIOD, SITE_MESSAGES } from '@shinefold/config';
-import { MOCK_DOLLAR_AMOUNT } from '@shinefold/db/testing/stripe-catalogue/fixtures';
+import {
+  mockStripePrice,
+  MOCK_DOLLAR_AMOUNT,
+} from '@shinefold/db/testing/stripe-catalogue/fixtures';
 import { errorResult, okResult } from '@shinefold/utils';
 import { PRICING_LOG } from '@web/constants/pricing';
 import { getPlanPrices } from '@web/server/pricing/get-plan-prices/get-plan-prices';
@@ -13,7 +16,6 @@ import {
   mockPricingTier,
 } from '@web/testing/modules/pricing/fixtures';
 import {
-  mockStripePrice,
   formatMockUnitAmount,
   mockLinkedPricingTier,
 } from '@web/testing/modules/pricing/live-price-fixtures';
@@ -90,6 +92,18 @@ describe(`<${PricingModule.name}/>`, () => {
       );
 
       expect(period).toBeVisible();
+    });
+
+    it('reads no plan prices when no tier links a platform plan', () => {
+      expect(vi.mocked(getPlanPrices)).not.toHaveBeenCalled();
+    });
+
+    it('shows no plan comparison when no tier links a platform plan', () => {
+      const table = screen.queryByRole('region', {
+        name: SITE_MESSAGES.pricingModule.compare.heading,
+      });
+
+      expect(table).not.toBeInTheDocument();
     });
   });
 
@@ -182,25 +196,31 @@ describe(`<${PricingModule.name}/>`, () => {
     expect(period).toBeVisible();
   });
 
-  it('reads no plan prices when no tier links a platform plan', async () => {
-    await setup();
-
-    expect(vi.mocked(getPlanPrices)).not.toHaveBeenCalled();
-  });
-
   describe('with a tier linked to a platform plan', () => {
     beforeEach(() => {
       getPricingModuleMock.mockResolvedValue(okResult(MOCK_LINKED_MODULE));
     });
 
-    it("shows the tier's live price from the catalogue", async () => {
-      await setup();
+    describe('with the plan prices read', () => {
+      beforeEach(async () => {
+        await setup();
+      });
 
-      const price = screen.getByText(
-        formatMockUnitAmount(MOCK_DOLLAR_AMOUNT, mockStripePrice().currency),
-      );
+      it("shows the tier's live price from the catalogue", () => {
+        const price = screen.getByText(
+          formatMockUnitAmount(MOCK_DOLLAR_AMOUNT, mockStripePrice().currency),
+        );
 
-      expect(price).toBeVisible();
+        expect(price).toBeVisible();
+      });
+
+      it('shows the plan comparison under the cards', () => {
+        const table = screen.getByRole('region', {
+          name: SITE_MESSAGES.pricingModule.compare.heading,
+        });
+
+        expect(table).toBeVisible();
+      });
     });
 
     it('logs and still renders the tier when the plan prices fail', async () => {
@@ -208,7 +228,9 @@ describe(`<${PricingModule.name}/>`, () => {
 
       await setup();
 
-      const tierName = screen.getByText(mockPricingTier().name);
+      const tierName = screen.getByRole('heading', {
+        name: mockPricingTier().name,
+      });
 
       expect(tierName).toBeVisible();
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(

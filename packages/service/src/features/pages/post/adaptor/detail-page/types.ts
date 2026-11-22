@@ -1,4 +1,8 @@
-import type { TMaybeUndefined, TPagePostType } from '@shinefold/config';
+import type {
+  TMaybeUndefined,
+  TPagePostType,
+  TPortableTextBlock,
+} from '@shinefold/config';
 import type { TPageTranslation } from '@shinefold/service/shared/localization/page-translations/to-page-translations';
 import type { TModule } from '@shinefold/service/shared/transformers/module/to-module';
 import type { TPersonProfile } from '@shinefold/service/shared/transformers/person/to-person-profile';
@@ -11,7 +15,7 @@ import type { TTopic } from '@shinefold/service/shared/transformers/topic/to-top
 export type TPostDetailAuthor = TPersonProfile;
 
 export type TPostTakeaways = {
-  takeaways: string[];
+  summary: TPortableTextBlock[];
   generatedAt: TMaybeUndefined<string>;
   model: TMaybeUndefined<string>;
 };
@@ -19,7 +23,6 @@ export type TPostTakeaways = {
 export type TPostDetail = Omit<TPostCard, 'author' | 'topic'> & {
   body: TPortableTextBody;
   postTakeaways: TMaybeUndefined<TPostTakeaways>;
-  hasAsides: boolean;
   seo: TSeoResolved;
   author: TPostDetailAuthor;
   topic: TTopic;

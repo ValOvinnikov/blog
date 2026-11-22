@@ -108,7 +108,8 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   tag's with its pagination) is purged in every live language of the
   publishing tenant. A body without it (a project still on the old
   projection) purges as before. A renamed landing page is covered: its
-  path change writes a `redirect`, whose publish runs the whole-site purge.
+  path change writes a `redirect`, whose publish purges the tenant's pages
+  and the redirect's addresses.
 
   Every other `_type` (including the `posts`-tagged
   `person`/`blog_topic`/`blog_tag`, whose edit can affect every
@@ -121,12 +122,20 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   from the webhook's projected `slug` through `pageHref`. A
   large tenant costs roughly one `revalidatePath` per listed page and
   pagination page, plus one next page per topic and tag and about sixteen
-  per live language. Three cases skip the derivation because no list holds
-  their stale paths: a `delete` (which includes an unpublish) of any type but
-  a post — the projected slug is a landing page's last segment only, and a
-  deleted topic's or tag's pagination is gone from the lists — a `redirect`,
-  whose old path is unknown, and a `module_postList` change, whose page-size
-  change can drop many pages. Those, and any undeliverable derivation — an
+  per live language. A `delete` (which includes an unpublish), a `redirect`
+  and a `module_postList` change purge that same set. A `redirect` adds its
+  `source` and `previousSource` (`previousSource ?? source` on a delete) in
+  its body's `language`, plus `previousSource ?? source` in its
+  `previousLanguage` when that differs (`build-redirect-paths`). Where no list holds the
+  stale addresses, `is-landing-route-purged` adds
+  `revalidatePath('/[tenant]/[locale]/[...slug]', 'page')`: a prefix redirect
+  (unless both `isPrefix` and `previousIsPrefix` are `false`, so a webhook
+  that predates either field counts) and a deleted landing page, whose projected slug is its last
+  segment only. That pattern refreshes every tenant's landing pages, never
+  their post, blog, topic or tag pages. Two gaps stay until the 24-hour
+  backstop: a `module_postList` page-size change can leave index, topic and
+  tag pages past the new last page cached, and so can a deleted topic's or
+  tag's pagination pages. Any undeliverable derivation — an
   unresolved tenant, a thrown Sanity-credentials or
   live-locales lookup, or a failed page-list lookup — falls back to the
   whole-site `revalidatePath('/', 'layout')` purge, always logged
@@ -215,11 +224,12 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   `ANTHROPIC_API_KEY`/`SANITY_GENERATE_SECRET` → 503; a missing/wrong
   `secret` → 401. On success it reads the published post body
   (`service.editorial.skim.v1.getPublishedPostBody`), asks Claude
-  (`claude-haiku-4-5`) for 3–7 zod-validated takeaways (a malformed response
-  → 422, draft untouched), then patches them onto the post's **draft**
+  (`claude-haiku-5-5`) for a zod-validated summary of 1–8 blocks (a malformed
+  response or one over 100 words → 422, draft untouched), then writes it as
+  Portable Text onto the post's **draft**
   (`service.editorial.skim.v1.saveSkimDraft` — never the published document).
-  Idempotent: re-running always overwrites only the draft's `skim` field. No
-  AI call ever happens on the reader path.
+  Idempotent: re-running always overwrites only the draft's
+  `postTakeaways`. No AI call ever happens on the reader path.
 - **Sanity CDN is deliberately bypassed** (`useCdn: false` in the service
   client): Next's tagged data cache is the sole caching layer. Reading through
   the CDN lets a just-purged tag refetch a still-stale CDN response and

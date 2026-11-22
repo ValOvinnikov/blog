@@ -1,69 +1,69 @@
 import { faker } from '@faker-js/faker';
 import { CUSTOM_DOMAIN_PATH } from '@platform/constants/custom-domain';
+import { PROVISION_PATH } from '@platform/constants/provisioning';
 import { WORKER_LOG } from '@platform/constants/worker';
+import {
+  mockedEnv,
+  mockedWorkerSecretsEnv,
+} from '@platform/testing/env/mocked-env';
 import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
-import { env } from '@platform/utils/env/env';
+import {
+  MOCK_WORKER_SECRET,
+  MOCK_WORKER_URL,
+} from '@platform/testing/worker/fixtures';
+import { readSentSignedRequest } from '@platform/testing/worker/sent-signed-request';
+import {
+  stubWorkerFetch,
+  type TWorkerFetchMock,
+} from '@platform/testing/worker/stub-worker-fetch';
 import { logger } from '@platform/utils/logger/logger';
 import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config';
-import {
-  ENQUEUE_SIGNATURE_HEADER,
-  ENQUEUE_TIMESTAMP_HEADER,
-  isValidEnqueueSignature,
-} from '@shinefold/utils/enqueue-signature';
 
 import {
   enqueueProvisioning,
   enqueueWorkerRequest,
+  sendWorkerRequest,
 } from './enqueue-provisioning';
 
 vi.mock('@platform/utils/env/env');
+vi.mock('@platform/utils/worker-secrets-env/worker-secrets-env');
 
 faker.seed(5997);
 
-const envMock: Partial<Record<keyof typeof env, string>> = env;
 const loggerErrorMock = vi.mocked(logger.error);
-const fetchMock = vi.fn();
+const fetchMock: TWorkerFetchMock = vi.fn();
 
-const MOCK_WORKER_URL = `https://${faker.internet.domainName()}`;
-const MOCK_SECRET = faker.string.alphanumeric(32);
 const MOCK_NETWORK_ERROR_MESSAGE = faker.lorem.words(2);
-const PROVISION_PATH = '/api/provision';
 
 describe(enqueueProvisioning, () => {
   beforeEach(() => {
-    fetchMock.mockReset();
-    fetchMock.mockResolvedValue(
-      new Response(null, { status: HTTP_STATUS.ACCEPTED }),
-    );
-    vi.stubGlobal('fetch', fetchMock);
-    envMock.WORKER_ENQUEUE_URL = MOCK_WORKER_URL;
-    envMock.WORKER_ENQUEUE_SECRET = MOCK_SECRET;
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
+    stubWorkerFetch(fetchMock);
   });
 
   it.each([
     {
       missing: 'worker URL',
-      key: 'WORKER_ENQUEUE_URL',
+      unset: () => {
+        mockedEnv.WORKER_ENQUEUE_URL = undefined;
+      },
       hasWorkerUrl: false,
       hasSecret: true,
     },
     {
       missing: 'enqueue secret',
-      key: 'WORKER_ENQUEUE_SECRET',
+      unset: () => {
+        mockedWorkerSecretsEnv.WORKER_ENQUEUE_SECRET = undefined;
+      },
       hasWorkerUrl: true,
       hasSecret: false,
     },
   ] as const)(
     'skips the request, logs and returns null without a $missing',
-    async ({ key, hasWorkerUrl, hasSecret }) => {
-      envMock[key] = undefined;
+    async ({ unset, hasWorkerUrl, hasSecret }) => {
+      unset();
 
       const status = await enqueueProvisioning(MOCK_TENANT_ID);
 
@@ -81,23 +81,13 @@ describe(enqueueProvisioning, () => {
   it('POSTs the tenant id to the provision route, signed so the worker accepts it', async () => {
     await enqueueProvisioning(MOCK_TENANT_ID);
 
-    const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
-    const headers = init.headers as Record<string, string>;
+    const { url, method, body, isSignedWith } =
+      readSentSignedRequest(fetchMock);
 
     expect(url.toString()).toBe(`${MOCK_WORKER_URL}${PROVISION_PATH}`);
-    expect(init.method).toBe(HTTP_METHOD.POST);
-    expect(JSON.parse(init.body as string)).toEqual({
-      tenantId: MOCK_TENANT_ID,
-    });
-    expect(
-      isValidEnqueueSignature({
-        secret: MOCK_SECRET,
-        timestamp: headers[ENQUEUE_TIMESTAMP_HEADER] ?? null,
-        signature: headers[ENQUEUE_SIGNATURE_HEADER] ?? null,
-        path: PROVISION_PATH,
-        rawBody: init.body as string,
-      }),
-    ).toBe(true);
+    expect(method).toBe(HTTP_METHOD.POST);
+    expect(body).toEqual({ tenantId: MOCK_TENANT_ID });
+    expect(isSignedWith(MOCK_WORKER_SECRET, PROVISION_PATH)).toBe(true);
   });
 
   it('includes the domain in the signed body when one is given', async () => {
@@ -106,22 +96,15 @@ describe(enqueueProvisioning, () => {
       domain: MOCK_CUSTOM_DOMAIN,
     });
 
-    const [, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
-    const headers = init.headers as Record<string, string>;
+    const { body, isSignedWith } = readSentSignedRequest(fetchMock);
 
-    expect(JSON.parse(init.body as string)).toEqual({
+    expect(body).toEqual({
       tenantId: MOCK_TENANT_ID,
       domain: MOCK_CUSTOM_DOMAIN,
     });
-    expect(
-      isValidEnqueueSignature({
-        secret: MOCK_SECRET,
-        timestamp: headers[ENQUEUE_TIMESTAMP_HEADER] ?? null,
-        signature: headers[ENQUEUE_SIGNATURE_HEADER] ?? null,
-        path: CUSTOM_DOMAIN_PATH.CONNECT,
-        rawBody: init.body as string,
-      }),
-    ).toBe(true);
+    expect(isSignedWith(MOCK_WORKER_SECRET, CUSTOM_DOMAIN_PATH.CONNECT)).toBe(
+      true,
+    );
   });
 
   it.each([
@@ -149,5 +132,55 @@ describe(enqueueProvisioning, () => {
       errorName: error.name,
     });
     expect(status).toBeNull();
+  });
+});
+
+describe(sendWorkerRequest, () => {
+  const MOCK_WORKER_BODY = { removed: [MOCK_TENANT_ID] };
+  const MOCK_TIMEOUT_MS = 60_000;
+  const MOCK_GATEWAY_PAGE = '<html>Bad gateway</html>';
+
+  const send = (options?: Parameters<typeof sendWorkerRequest>[2]) =>
+    sendWorkerRequest(PROVISION_PATH, { tenantId: MOCK_TENANT_ID }, options);
+
+  beforeEach(() => {
+    stubWorkerFetch(fetchMock);
+    fetchMock.mockResolvedValue(Response.json(MOCK_WORKER_BODY));
+  });
+
+  it('times the request out after the given limit', async () => {
+    const timeoutSpy = vi.spyOn(AbortSignal, 'timeout');
+
+    await send({ timeoutMs: MOCK_TIMEOUT_MS });
+
+    expect(timeoutSpy).toHaveBeenCalledExactlyOnceWith(MOCK_TIMEOUT_MS);
+  });
+
+  it('returns the status alone unless asked for the body', async () => {
+    const response = await send();
+
+    expect(response).toEqual({ status: HTTP_STATUS.OK });
+  });
+
+  it('returns the JSON body with its status when asked for it', async () => {
+    const response = await send({ readsBody: true });
+
+    expect(response).toEqual({
+      status: HTTP_STATUS.OK,
+      body: MOCK_WORKER_BODY,
+    });
+  });
+
+  it('keeps the status of an answer that is not JSON', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(MOCK_GATEWAY_PAGE, { status: HTTP_STATUS.BAD_GATEWAY }),
+    );
+
+    const response = await send({ readsBody: true });
+
+    expect(response).toEqual({
+      status: HTTP_STATUS.BAD_GATEWAY,
+      body: undefined,
+    });
   });
 });

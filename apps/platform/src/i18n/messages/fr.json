@@ -28,13 +28,16 @@
     "signUpTitle": "Créer un compte",
     "onboarding": "Créer votre site",
     "billing": "Facturation · Administration",
-    "upgrade": "Changer d'offre"
+    "upgrade": "Changer d'offre",
+    "help": "Aide",
+    "draftPreview": "Aperçu du brouillon",
+    "team": "Équipe"
   },
   "signInPage": {
     "heading": "Connexion",
     "description": "Utilisez le compte avec lequel vous vous êtes inscrit ou avez été invité.",
-    "accountNotLinkedTitle": "Cette adresse se connecte déjà autrement",
-    "accountNotLinkedDescription": "Votre adresse e-mail est déjà utilisée avec une autre méthode de connexion. Connectez-vous comme la dernière fois.",
+    "accountNotLinkedTitle": "Nous n'avons pas pu confirmer cette adresse",
+    "accountNotLinkedDescription": "Google ou GitHub n'a pas vérifié cette adresse e-mail. Vérifiez-la auprès d'eux et réessayez, ou connectez-vous avec un lien par e-mail.",
     "signInFailedTitle": "Nous n'avons pas pu vous connecter",
     "signInFailedDescription": "Un problème est survenu lors de la connexion. Réessayez ou choisissez une autre méthode de connexion.",
     "signUpPrompt": "Nouveau ? <link>Créer un compte</link>"
@@ -188,6 +191,7 @@
   },
   "account": {
     "signOut": "Se déconnecter",
+    "signingOut": "Déconnexion…",
     "signedInAs": "Connecté en tant que {email}",
     "menuLabel": "Compte",
     "triggerCollapsedLabel": "Compte : {name}, {email}",
@@ -243,8 +247,9 @@
     },
     "blockedSignups": "Inscriptions bloquées",
     "dataRequests": "Demandes de données",
-    "badgeUnreadLeads": "{count, plural, one {# nouveau} other {# nouveaux}}",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Assistance",
+    "help": "Aide"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -389,7 +394,33 @@
     "siteSetupNotStartedContactDescription": "Nous n'avons pas pu lancer la configuration de votre site. Demandez à votre contact plateforme de la lancer.",
     "siteSetupStart": "Lancer la configuration",
     "siteSetupStarting": "Lancement…",
-    "trialUpgrade": "Choisir une offre"
+    "trialUpgrade": "Choisir une offre",
+    "sampleContent": {
+      "title": "Contenu d’exemple",
+      "supportingText": "Votre site a démarré avec des pages, des sections et des liens d’exemple. Supprimez ceux que vous n’avez pas modifiés.",
+      "trigger": "Supprimer le contenu d’exemple",
+      "notWritable": "Le contenu d’exemple ne peut pas être supprimé tant que votre site est suspendu ou archivé.",
+      "dialogTitle": "Supprimer le contenu d’exemple ?",
+      "dialogDescription": "Les exemples que vous n’avez pas modifiés sont supprimés de votre site. Ceux que vous avez modifiés, ou que votre autre contenu utilise, sont conservés. Cette action est irréversible.",
+      "keep": "Conserver les exemples",
+      "confirm": "Supprimer les exemples",
+      "confirming": "Suppression des exemples…",
+      "failed": "Les exemples n’ont pas pu être supprimés. Réessayez.",
+      "done": "{count, plural, =0 {Aucun exemple à supprimer.} one {# exemple supprimé.} other {# exemples supprimés.}}",
+      "nothingKept": "Aucun exemple n’a été conservé.",
+      "keptEditedTitle": "Conservés, car vous les avez modifiés",
+      "keptReferencedTitle": "Conservés, car un autre contenu les utilise",
+      "kind": {
+        "section": "Section",
+        "page": "Page",
+        "post": "Article",
+        "template": "Modèle de page",
+        "link": "Lien de navigation",
+        "author": "Auteur",
+        "topic": "Thème",
+        "other": "Exemple"
+      }
+    }
   },
   "getStartedCard": {
     "title": "Premiers pas",
@@ -507,7 +538,12 @@
       "OAUTH_APP_SAVED": "Application de connexion enregistrée",
       "OAUTH_APP_REPLACED": "Application de connexion remplacée",
       "OAUTH_APP_REMOVED": "Application de connexion supprimée",
-      "NEWSLETTER_PAUSE_CLEARED": "Pause de la newsletter levée"
+      "NEWSLETTER_PAUSE_CLEARED": "Pause de la newsletter levée",
+      "MEMBER_INVITED": "Membre de l’équipe invité",
+      "MEMBER_REMOVED": "Membre de l’équipe retiré",
+      "MEMBER_INVITE_CANCELLED": "Invitation à l’équipe annulée",
+      "ENTITLEMENT_GRANTED": "Fonctionnalité accordée",
+      "ENTITLEMENT_REVOKED": "Fonctionnalité accordée révoquée"
     },
     "detail": {
       "field": {
@@ -527,8 +563,13 @@
       "SUSPENSION_REASON": "Motif : {category}",
       "SUSPENSION_REFERENCE": "Référence : {reference}",
       "PLAN": "Formule : {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Formule : {from} → {to}",
       "SIGN_IN_PROVIDER": "Fournisseur de connexion : {provider, select, google {Google} github {GitHub} other {{provider}}}",
-      "CLIENT_SECRET_REPLACED": "Secret client remplacé"
+      "CLIENT_SECRET_REPLACED": "Secret client remplacé",
+      "GRANT_ITEM": "Élément : {item}",
+      "GRANT_EXPIRY": "Jusqu'au {date}",
+      "GRANT_UNTIL_REVOKED": "Jusqu'à révocation",
+      "GRANT_NOTE": "Note : {note}"
     }
   },
   "tenantDomainPage": {
@@ -724,8 +765,8 @@
     "viewTabsAriaLabel": "Vue Look",
     "jumpIndexAriaLabel": "Sections de Look",
     "growthAddsColour": "Une teinte de logo à part",
-    "growthAddsType": "Polices des titres et du texte",
-    "growthAddsShape": "Coins et espacement",
+    "growthAddsType": "Polices, graisse et casse des titres",
+    "growthAddsShape": "Coins, espacement, proportions des images et séparateurs",
     "growthAddsCards": "Style de carte",
     "growthAddsButtons": "État de chargement et indicateur de progression",
     "growthAddsHeader": "Mise en page, sous-menus, barre, boutons d'en-tête et commandes du compte",
@@ -776,6 +817,34 @@
       "DEFAULT": "Confortable",
       "COMPACT": "Compacte"
     },
+    "headingWeightLabel": "Graisse des titres",
+    "headingWeightDescription": "L'épaisseur de chaque titre de votre site.",
+    "headingWeightOptionLabel": {
+      "REGULAR": "Normale",
+      "MEDIUM": "Moyenne",
+      "SEMIBOLD": "Demi-gras",
+      "BOLD": "Gras"
+    },
+    "headingCaseLabel": "Casse des titres",
+    "headingCaseDescription": "Change les titres des pages et des sections. Les titres des cartes et des articles gardent la casse saisie, pour que les textes longs restent lisibles.",
+    "headingCaseOptionLabel": {
+      "AS_WRITTEN": "Telle quelle",
+      "UPPERCASE": "Majuscules"
+    },
+    "imageProportionLabel": "Proportions des images",
+    "imageProportionDescription": "Change les images réglées sur Large et celles sans choix de forme. Les images carrées et rondes gardent leur forme.",
+    "imageProportionOptionLabel": {
+      "AS_DESIGNED": "Par défaut",
+      "WIDE": "Large",
+      "CLASSIC": "Classique",
+      "SQUARE": "Carré"
+    },
+    "dividerWidthLabel": "Séparateurs de section",
+    "dividerWidthDescription": "L'épaisseur du trait entre les sections qui affichent un séparateur.",
+    "dividerWidthOptionLabel": {
+      "HAIRLINE": "Fin",
+      "BOLD": "Épais"
+    },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Barre d'accent",
       "OUTLINED": "À contour",
@@ -820,7 +889,7 @@
     "languageSwitcherSingleLanguage": "Ajoutez une autre langue dans Langues pour choisir un style.",
     "languageSwitcherFreeDescription": "Votre formule publie une seule langue. Passez à une formule supérieure pour ajouter des langues et choisir un style de sélecteur.",
     "lockLineGrowthFields": "Les champs marqués Growth gardent la valeur du préréglage {preset}.",
-    "lockLineTypeFonts": "Avec cette formule, Typographie garde les polices du préréglage {preset}. Choisir un autre préréglage les change.",
+    "lockLineTypeFonts": "Avec cette formule, Typographie garde les polices et le style des titres du préréglage {preset}. Choisir un autre préréglage les change.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globe",
@@ -940,10 +1009,11 @@
     },
     "footerBackgroundLabel": "Arrière-plan",
     "footerBackgroundDescription": "La couleur du pied de page. Chacune suit le thème clair ou sombre du lecteur.",
-    "footerBackgroundOptionLabel": {
+    "skinLabel": {
       "PRIMARY": "Uni",
       "SECONDARY": "Ombré",
-      "BRAND_PRIMARY": "Teinte de marque"
+      "BRAND_PRIMARY": "Teinte de marque",
+      "INK": "Encre"
     },
     "footerSurfaceLabel": "Surface",
     "footerSurfaceDescription": "Si le pied de page occupe toute la largeur ou s’affiche comme une carte.",
@@ -1059,7 +1129,14 @@
     "footerFinePrintAriaLabel": "Mentions légales",
     "footerPrivacy": "Politique de confidentialité",
     "footerPoweredByLabel": "Propulsé par",
-    "footerCookieSettings": "Paramètres des cookies"
+    "footerCookieSettings": "Paramètres des cookies",
+    "bandHeading": "Depuis la capitainerie",
+    "bandText": "Tables des marées, avis de mouillage et météo de la semaine, réunis au même endroit.",
+    "bandLink": "Voir tous les avis",
+    "bandCardTitle": "Avis de mouillage d’hiver",
+    "bandCardExcerpt": "Les mouillages du quai nord se déplacent vers l’intérieur à partir de novembre.",
+    "bannerHeading": "Grandes marées ce week-end",
+    "bannerText": "La plus haute mer de l’année atteint le quai nord samedi matin."
   },
   "lookFollow": {
     "followToggle": "Suivre la carte que vous modifiez",
@@ -1173,10 +1250,11 @@
     "sendTest": "M'envoyer un test",
     "sendingTest": "Envoi…",
     "testSent": "Test envoyé à {email}.",
-    "testRateLimited": "Vous avez envoyé plusieurs tests récemment — réessayez dans quelques minutes.",
+    "testRateLimited": "Vous avez envoyé le nombre maximal de tests pour le moment. Réessayez à {time}.",
     "testInvalid": "Renseignez l'objet et le message avant d'envoyer un test.",
     "testFailed": "Impossible d'envoyer le test — veuillez réessayer.",
     "testSubject": "[Test] {subject}",
+    "postTestBanner": "E-mail de test — vous seul l'avez reçu. Vos abonnés le recevront à la première publication de l'article.",
     "unsavedLogoNote": "Un logo non encore enregistré n'est pas inclus dans le test."
   },
   "emailSettingsForm": {
@@ -1510,7 +1588,7 @@
       "STALLED": "Votre invitation à Studio n'a pas été acceptée"
     },
     "description": {
-      "INVITE_SENT": "Studio fonctionne avec Sanity : il vous faut donc un compte Sanity gratuit pour modifier le contenu. Nous vous avons envoyé une invitation de Sanity. Acceptez-la : Studio s'ouvrira ici dès que votre accès sera confirmé.",
+      "INVITE_SENT": "Studio fonctionne avec Sanity : il vous faut donc un compte Sanity gratuit pour modifier le contenu. Nous vous avons envoyé une invitation à Studio. Acceptez-la : Studio s'ouvrira ici dès que votre accès sera confirmé.",
       "ACTIVATING": "Vous avez accepté l'invitation. Nous donnons à votre compte les droits de modification, ce qui prend généralement une minute.",
       "STALLED": "L'invitation a été envoyée il y a plus de trois jours et n'a pas été acceptée, nous avons donc arrêté de vérifier. Renvoyez-en une nouvelle ou vérifiez maintenant si vous venez de l'accepter."
     },
@@ -1520,7 +1598,11 @@
     "resending": "Envoi…",
     "checkStarted": "Nous vérifions votre accès. Actualisez la page dans une minute pour voir le résultat.",
     "inviteResent": "Une nouvelle invitation arrive dans votre boîte de réception.",
-    "requestFailed": "Le service de configuration est injoignable. Réessayez."
+    "requestFailed": "Le service de configuration est injoignable. Réessayez.",
+    "checkStartedFor": "Vérification de l'accès à Studio de {email} en cours. Actualisez dans une minute pour voir le résultat.",
+    "inviteResentTo": "Une nouvelle invitation à Studio est en route vers {email}.",
+    "checkNowAriaLabel": "Vérifier maintenant pour {email}",
+    "resendInviteAriaLabel": "Renvoyer l'invitation à {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Détails du locataire",
@@ -1551,9 +1633,11 @@
       "provisioningStarted": "Le provisionnement de ce locataire a déjà commencé ; ses détails ne peuvent plus être modifiés.",
       "ownerAlreadyJoined": "Le propriétaire de ce locataire s'est déjà connecté : son e-mail ne peut plus être corrigé ici — cela transférerait la propriété.",
       "ownerHasFreeTenant": "Ce propriétaire a déjà un site gratuit. Archivez-le ou laissez ce site sur son offre actuelle.",
+      "planFollowsSubscription": "Ce site a un abonnement actif, son offre suit donc Stripe. Modifiez-la depuis la page Facturation du propriétaire ou dans le tableau de bord Stripe.",
       "saveFailed": "Impossible d'enregistrer les informations du locataire — veuillez réessayer."
     },
-    "fieldLockedReasonCustomMainDomain": "Verrouillé — l'adresse principale est le domaine propre du site. Pour la modifier, revenez au sous-domaine depuis la page Domaine."
+    "fieldLockedReasonCustomMainDomain": "Verrouillé — l'adresse principale est le domaine propre du site. Pour la modifier, revenez au sous-domaine depuis la page Domaine.",
+    "fieldLockedReasonSubscribed": "Verrouillé — ce site a un abonnement actif, son offre suit donc Stripe. Modifiez-la depuis la page Facturation du propriétaire ou dans le tableau de bord Stripe."
   },
   "tenantFieldErrors": {
     "nameRequired": "Saisissez un nom de locataire.",
@@ -1671,6 +1755,8 @@
     "suspendFailed": "Impossible de suspendre le locataire — réessayez.",
     "liftSuspensionFailed": "Impossible de réactiver le locataire — réessayez.",
     "ownerEmailUnknown": "Le propriétaire de ce locataire n’a pas encore d’adresse e-mail enregistrée : elle ne peut donc pas être bloquée.",
+    "subscriptionCancelFailed": "L'abonnement Stripe du site n'a pas pu être résilié, il n'a donc pas été archivé. Réessayez, ou résiliez-le d'abord dans Stripe.",
+    "subscriptionLive": "Stripe facture encore ce site. Résiliez son abonnement avant de le supprimer.",
     "invalidInput": "Vérifiez les informations et réessayez."
   },
   "featuresSettings": {
@@ -1679,6 +1765,8 @@
     "alertSuccess": "Fonctionnalités enregistrées.",
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
     "planLockedBadge": "{plan, select, FREE {Formule Free} STARTER {Formule Starter} other {Formule Growth}}",
+    "consentBannerRequiredNote": "Requis pour Google Analytics, qui demande le consentement des visiteurs.",
+    "consentBannerRequiredError": "Google Analytics est configuré, la bannière de consentement doit donc rester active. Effacez d’abord l’ID de mesure ou passez à Plausible.",
     "comingSoonBadge": "Bientôt",
     "switchOn": "Activé",
     "switchOff": "Désactivé",
@@ -1700,9 +1788,32 @@
       "RATINGS": "Permettre aux lecteurs de noter les articles.",
       "BOOKMARKS": "Permettre aux lecteurs d'enregistrer des articles pour plus tard.",
       "NEWSLETTER": "Afficher le formulaire d'inscription à la newsletter sur le site.",
-      "ANALYTICS": "Activer le suivi statistique sur le site.",
+      "ANALYTICS": "Connectez votre propre Google Analytics ou Plausible. Laissez l’ID vide pour ne charger aucun outil d’analyse.",
       "CONSENT_BANNER": "Afficher aux visiteurs une bannière de consentement aux cookies avant le chargement des cookies ou scripts non essentiels.",
       "CONTACT_FORM": "Afficher le formulaire de contact sur le site."
+    },
+    "analyticsProviderLabel": "Outil d’analyse",
+    "analyticsProviderOption": {
+      "GOOGLE_ANALYTICS": "Google Analytics",
+      "PLAUSIBLE": "Plausible"
+    },
+    "analyticsIdDraftLabel": "ID d’analyse",
+    "analyticsIdEmpty": "Aucun",
+    "analyticsIdLabel": {
+      "GOOGLE_ANALYTICS": "ID de mesure",
+      "PLAUSIBLE": "Domaine du site"
+    },
+    "analyticsIdHint": {
+      "GOOGLE_ANALYTICS": "Vous le trouverez dans Google Analytics sous Administration, Flux de données.",
+      "PLAUSIBLE": "Le domaine sous lequel votre site est enregistré dans Plausible."
+    },
+    "analyticsIdPlaceholder": {
+      "GOOGLE_ANALYTICS": "G-A1B2C3D4E5",
+      "PLAUSIBLE": "example.com"
+    },
+    "analyticsIdInvalid": {
+      "GOOGLE_ANALYTICS": "Saisissez un ID de mesure : G- suivi de majuscules et de chiffres, par exemple G-A1B2C3D4E5.",
+      "PLAUSIBLE": "Saisissez un domaine seul, sans https:// ni chemin, par exemple example.com."
     }
   },
   "languagePicker": {
@@ -1739,11 +1850,13 @@
     "allowance": "{used} sur {allowed} langues supplémentaires utilisées avec votre formule.",
     "noticeTitle": "Limite de la formule",
     "upgradeNotice": "Votre formule ne publie que la langue par défaut. Passez à une formule supérieure pour ajouter d'autres langues.",
+    "atLimitNotice": "Votre formule publie {allowed, plural, one {# langue supplémentaire} other {# langues supplémentaires}}, et toutes sont utilisées.",
     "downgradeNotice": "Votre formule publie {allowed, plural, one {# langue supplémentaire} other {# langues supplémentaires}}, mais {stored} sont enregistrées. Les {allowed} premières restent en ligne ; les autres sont conservées et rien n'est supprimé.",
     "keptBadge": "Conservée, non publiée avec votre formule",
     "planLockedBadge": "Non incluse dans votre formule",
     "atLimitLockedReason": "Désactivez-en une pour activer celle-ci",
-    "overLimitLockedReason": "Passez à une formule supérieure pour modifier ceci"
+    "overLimitLockedReason": "Passez à une formule supérieure pour modifier ceci",
+    "allowanceGranted": "{used} sur {allowed} langues supplémentaires utilisées."
   },
   "saveBar": {
     "regionLabel": "Modifications non enregistrées",
@@ -1755,6 +1868,7 @@
     "goToFirstField": "Aller au premier",
     "notSaved": "Non enregistré",
     "notInPlan": "Votre site est sur la formule {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actuelle}}, qui n'inclut pas {items} : rien n'a été enregistré.",
+    "languagesNotInPlan": "Votre site est sur la formule {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actuelle}}, qui permet {limit, plural, one {# langue} other {# langues}} : {count, plural, one {{items} n'a pas été ajouté} other {{items} n'ont pas été ajoutés}}.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Annuler les modifications",
     "save": "Enregistrer les modifications",
@@ -1801,9 +1915,10 @@
     "downgradedDescription": "Le formulaire de contact est inclus dans les formules Starter et Growth : plus aucun nouveau message n'arrive. Les messages déjà reçus sont conservés ici et vous pouvez toujours en supprimer."
   },
   "leadsInbox": {
-    "listLabel": "Messages",
     "empty": "Aucun message pour l'instant. Quand quelqu'un utilisera votre formulaire de contact, son message apparaîtra ici.",
     "unread": "Non lu",
+    "unreadGroup": "Non lus · {count}",
+    "earlierGroup": "Plus anciens",
     "yesterday": "Hier",
     "loadingMore": "Chargement d'autres messages…",
     "loadMoreFailed": "Impossible de charger d'autres messages. Réessayer",
@@ -1814,6 +1929,7 @@
     "email": "E-mail",
     "received": "Reçu",
     "page": "Page",
+    "messageHeading": "Message",
     "homePage": "Page d'accueil",
     "readStateFailed": "Impossible de mettre à jour le message. Réessayez."
   },
@@ -2135,26 +2251,41 @@
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Ouvrir votre tableau de bord",
+    "plansLinkLabel": "Voir ce que comprend chaque offre",
     "GROWTH": {
       "subject": "Votre site est passé à l’offre Growth",
       "previewText": "{siteName} peut désormais utiliser toutes les options Growth.",
       "changed": "{siteName} est désormais sur l’offre Growth.",
-      "options": "Les options Growth sont maintenant disponibles sur votre site : plus de langues, tous les réglages d’Apparence, des modules de page supplémentaires et des fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
-      "kept": "Si vous avez déjà utilisé Growth, vos choix précédents sont de retour, tels que vous les aviez laissés."
+      "kept": "Rien n’est supprimé. Si vous avez déjà utilisé Growth, vos choix précédents sont de retour, tels que vous les aviez laissés."
     },
     "STARTER": {
       "subject": "Votre site est passé à l’offre Starter",
       "previewText": "{siteName} peut désormais utiliser les options Starter.",
       "changed": "{siteName} est désormais sur l’offre Starter.",
-      "options": "Avec Starter, votre site peut utiliser son propre domaine et le formulaire de contact, et son pied de page n’affiche pas la mention « Propulsé par ». Les langues supplémentaires, tous les réglages d’Apparence et les autres modules de page sont inclus dans Growth.",
       "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés, et ce qui vient de Growth revient tel que vous l’aviez laissé si vous passez à Growth."
     },
     "FREE": {
       "subject": "Votre site est passé à l’offre Free",
       "previewText": "Les options des offres payantes sont désactivées sur {siteName}.",
       "changed": "{siteName} est désormais sur l’offre Free.",
-      "options": "Les options des offres payantes sont désactivées sur votre site : langues supplémentaires, réglages d’Apparence Growth, modules de page payants et fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
       "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés et reviendront si vous repassez à une offre payante."
+    }
+  },
+  "ownerEntitlementEmail": {
+    "actionLabel": "Ouvrir votre tableau de bord",
+    "granted": {
+      "subject": "Accordé sur {siteName} : {item}",
+      "previewText": "Vous pouvez désormais utiliser {item} sur {siteName}. Rien n’est facturé.",
+      "granted": "Un accès a été accordé à {siteName}, en dehors de son offre : {item}.",
+      "untilRevoked": "Cet accès dure jusqu’à sa révocation.",
+      "expires": "Cet accès dure jusqu’au {date}.",
+      "free": "Rien n’est facturé."
+    },
+    "revoked": {
+      "subject": "Accès révoqué sur {siteName} : {item}",
+      "previewText": "Rien n’est supprimé.",
+      "revoked": "L’accès à {item} sur {siteName} a été révoqué.",
+      "kept": "Rien n’est supprimé. Ce que vous avez configuré avec est conservé et revient s’il est accordé à nouveau ou si votre offre l’inclut."
     }
   },
   "ownerReceiptEmail": {
@@ -2218,6 +2349,7 @@
     "nextPaymentLabel": "Prochain paiement",
     "nextPayment": "{amount} le <time>{date}</time>",
     "noNextPayment": "Aucun prévu",
+    "planEnds": "Votre formule prend fin le <time>{date}</time>.",
     "noPayments": "Votre site n'a encore aucun paiement.",
     "invoicesTitle": "Factures",
     "invoicesEmpty": "Aucune facture pour l'instant.",
@@ -2267,6 +2399,7 @@
     "currentPlan": "Votre site est sur {plan}, payé {interval, select, YEARLY {à l'année} other {au mois}}.",
     "pendingChange": "Votre site passe à {plan}, payé {interval, select, YEARLY {à l'année} other {au mois}}, le <time>{date}</time>.",
     "changeNow": "Le changement commence aujourd'hui. Vous payez maintenant la différence pour le reste de la période en cours.",
+    "changeNowNewPeriod": "Le changement commence aujourd'hui, avec une nouvelle période {interval, select, YEARLY {annuelle} other {mensuelle}}. Vous payez maintenant la nouvelle période, moins le temps non utilisé de la période en cours.",
     "changeAtRenewal": "Le changement commence le <time>{date}</time>, à la fin de la période en cours. Rien ne change d'ici là.",
     "keepCurrentDescription": "Votre site reste sur {plan}, et le changement prévu le <time>{date}</time> est annulé.",
     "changeUnchanged": "C'est votre formule actuelle. Choisissez une autre formule ou période de facturation pour la changer.",
@@ -2281,7 +2414,344 @@
     "billingLink": "Facturation",
     "NOT_SUBSCRIBED": "Votre site n'a pas encore de formule payante à changer. Choisissez-en une au paiement.",
     "NOT_ACTIVE": "Votre abonnement demande votre attention avant de pouvoir changer de formule. Ouvrez Facturation pour le régler.",
+    "planEnds": "Votre formule prend fin le <time>{date}</time> et ne peut donc plus changer. Pour la garder, annulez la résiliation depuis Facturation.",
     "UNCHANGED": "Votre site est déjà sur cette formule.",
-    "CARD_DECLINED": "Votre carte a été refusée, donc rien n'a changé. Mettez-la à jour dans Facturation et réessayez."
+    "CARD_DECLINED": "Votre carte a été refusée, donc rien n'a changé. Mettez-la à jour dans Facturation et réessayez.",
+    "PAYMENT_NOT_CONFIRMED": "La confirmation auprès de votre banque n'a pas abouti, donc votre formule n'a pas changé. Réessayez quand vous êtes prêt.",
+    "NO_NEXT_BAND": "Votre site ne peut pas passer à ce palier pour le moment. Rechargez la page pour voir votre palier actuel.",
+    "PENDING_CHANGE": "Un changement d'offre est prévu au renouvellement de votre site. Conservez d'abord votre offre actuelle depuis Mise à niveau, puis passez au palier supérieur.",
+    "QUOTE_EXPIRED": "Ce prix a été affiché il y a un moment. Fermez cette fenêtre et rouvrez-la pour voir le prix du jour."
+  },
+  "moveUpBand": {
+    "trigger": "Passer à {ceiling, number} abonnés — {price} de plus par {interval, select, YEARLY {an} other {mois}}",
+    "title": "Passer à {ceiling, number} abonnés ?",
+    "lead": "Vos nouvelles limites s'appliquent dès que le paiement est accepté.",
+    "loading": "Chargement du prix…",
+    "quoteFailed": "Le prix n'a pas pu être chargé. Fermez cette fenêtre et réessayez dans un instant.",
+    "newLimitsTerm": "Nouvelles limites",
+    "newLimits": "{ceiling, number} abonnés · {allowance, number} e-mails par mois",
+    "chargedTodayTerm": "Débité aujourd'hui",
+    "chargedTodayNote": "La différence pour le reste de cette période de facturation, jusqu'au <time>{date}</time>.",
+    "renewalTerm": "À partir du {date}",
+    "renewalTotal": "{total} par {interval, select, YEARLY {an} other {mois}}",
+    "cardTerm": "Carte",
+    "card": "{brand, select, visa {Visa} mastercard {Mastercard} amex {American Express} discover {Discover} other {Carte}} se terminant par {last4}",
+    "moveDownNote": "Le passage à un palier inférieur se fait au renouvellement, sans remboursement.",
+    "cancel": "Annuler",
+    "pay": "Payer {amount} et passer au palier supérieur",
+    "paying": "Paiement…"
+  },
+  "helpView": {
+    "title": "Aide",
+    "description": "Envoyez un message à notre équipe d'assistance. Nous y joignons votre site, votre offre et ce compte, pour que vous n'ayez pas à le faire.",
+    "helpCentre": "Centre d'aide",
+    "unavailableTitle": "Le formulaire d'aide n'est pas disponible",
+    "unavailableDescription": "Impossible d'envoyer des messages d'ici pour le moment. Réessayez plus tard."
+  },
+  "helpForm": {
+    "title": "Contacter l'assistance",
+    "responseTime": "Nous répondons généralement sous deux jours ouvrés.",
+    "subjectLabel": "Objet",
+    "messageLabel": "Message",
+    "messageHint": "Dites ce que vous essayiez de faire et ce qui s'est passé à la place.",
+    "required": "Remplissez ce champ.",
+    "tooLong": "Restez sous {limit} caractères.",
+    "send": "Envoyer le message",
+    "sending": "Envoi…",
+    "sent": "Message envoyé. Nous vous en avons envoyé une copie par e-mail.",
+    "rateLimited": "Vous avez envoyé plusieurs messages en peu de temps. Réessayez plus tard.",
+    "unavailable": "Le formulaire d'aide n'est pas disponible pour le moment. Réessayez plus tard.",
+    "sendFailed": "Impossible d'envoyer votre message — réessayez."
+  },
+  "draftPreview": {
+    "title": "Aperçu du brouillon",
+    "draftNotice": "Il s'agit du dernier brouillon enregistré, pas de la page publiée. Seuls les membres de ce site peuvent ouvrir cet aperçu.",
+    "siteLabel": "Site",
+    "pathLabel": "Page",
+    "frameRegionLabel": "Aperçu du brouillon",
+    "frameTitle": "Brouillon de cette page sur votre site",
+    "toolbarAriaLabel": "Options d'aperçu",
+    "reload": "Recharger",
+    "reloading": "Rechargement…",
+    "openPublished": "Ouvrir la page publiée",
+    "refusedTitle": "Impossible d'afficher l'aperçu de ce brouillon",
+    "refusalNotFound": "Cette page n'a pas d'adresse sur votre site. Seuls les articles et les pages d'atterrissage ont un aperçu, et une page d'atterrissage doit avoir toutes ses pages parentes.",
+    "refusalLanguageOff": "Cette page est dans une langue que votre site ne propose pas. Activez cette langue pour l'afficher en aperçu.",
+    "refusalSuspended": "Ce site est suspendu : l'aperçu de ses brouillons est impossible.",
+    "refusalArchived": "Ce site est archivé : l'aperçu de ses brouillons est impossible.",
+    "refusalUnavailable": "La plateforme n'a pas pu préparer cet aperçu. Le problème a été consigné pour l'équipe de la plateforme."
+  },
+  "grantEntitlement": {
+    "trigger": "Accorder à ce locataire",
+    "triggerAriaLabel": "Accorder à ce locataire : {item}",
+    "title": "Accorder {item} à {tenant}",
+    "description": "{tenant} obtient {item} en dehors de sa formule {plan}. Son propriétaire le voit déverrouillé et peut l'activer. Rien n'est facturé.",
+    "granted": "{item} accordé.",
+    "failed": "Impossible d'accorder {item} — réessayez."
+  },
+  "grantDialog": {
+    "confirmButton": "Accorder",
+    "confirmingButton": "Attribution…"
+  },
+  "grantExpiryFields": {
+    "expiresLabel": "Expire",
+    "expiresHint": "L'attribution prend fin d'elle-même après ce délai.",
+    "expiry": {
+      "NEVER": "Jamais — jusqu'à révocation",
+      "DAYS_30": "30 jours",
+      "DAYS_90": "90 jours",
+      "YEAR_1": "1 an"
+    },
+    "noteLabel": "Note",
+    "noteHint": "Facultatif. Pourquoi c'est accordé — affiché sur la carte Attributions et dans le journal d'activité."
+  },
+  "grantModulePack": {
+    "trigger": "Accorder un pack de modules",
+    "title": "Accorder un pack de modules à {tenant}",
+    "description": "Ses éditeurs obtiennent les modules du pack dans Studio, en dehors de la formule {plan}. Rien n'est facturé.",
+    "packLabel": "Pack de modules",
+    "packPlaceholder": "Choisissez un pack de modules",
+    "packIncluded": "{pack} (inclus dans la formule)",
+    "packGranted": "{pack} (déjà accordé)"
+  },
+  "grantLanguages": {
+    "trigger": "Accorder plus de langues",
+    "title": "Accorder plus de langues à {tenant}",
+    "description": "La formule {plan} ne publie que la langue par défaut. Choisissez combien de langues de plus {tenant} peut publier. Rien n'est facturé.",
+    "descriptionWithAllowance": "La formule {plan} publie {n, plural, one {# langue supplémentaire} other {# langues supplémentaires}}. Choisissez combien de langues de plus {tenant} peut publier. Rien n'est facturé.",
+    "countLabel": "Langues supplémentaires",
+    "countHint": "Si la formule en autorise plus plus tard, le nombre le plus élevé s'applique."
+  },
+  "grantItemNames": {
+    "languages": "{count, plural, one {# langue supplémentaire} other {# langues supplémentaires}}",
+    "additionalLanguages": "Langues supplémentaires",
+    "modulePack": {
+      "CORE": "Modules Core",
+      "STARTER": "Modules Starter",
+      "GROWTH": "Modules Growth"
+    },
+    "lookField": {
+      "preset": "Préréglage",
+      "accentHue": "Teinte d'accent",
+      "logoHue": "Teinte du logo",
+      "headingFont": "Police des titres",
+      "bodyFont": "Police du texte",
+      "radiusScale": "Échelle d'arrondi",
+      "density": "Densité",
+      "languageSwitcherStyle": "Style du sélecteur de langue",
+      "cardStyle": "Style de carte",
+      "headerControlStyle": "Boutons d'en-tête",
+      "headerControlShape": "Forme des boutons d'en-tête",
+      "accountButtonStyle": "Bouton du compte",
+      "accountPanelStyle": "Panneau du compte",
+      "accountPhonePlacement": "Position du compte sur téléphone",
+      "busyButtonStyle": "Style du bouton occupé",
+      "spinnerStyle": "Style de l'indicateur de chargement",
+      "buttonShape": "Forme des boutons",
+      "headerLayout": "Disposition de l'en-tête",
+      "headerSubmenuStyle": "Sous-menus de l'en-tête",
+      "headerBarStyle": "Barre de l'en-tête",
+      "navLinkStyle": "Liens de navigation",
+      "headingWeight": "Graisse des titres",
+      "headingCase": "Casse des titres",
+      "imageProportion": "Proportions des images",
+      "dividerWidth": "Séparateurs de section",
+      "footerLayout": "Disposition du pied de page",
+      "footerBackground": "Arrière-plan du pied de page",
+      "footerSurface": "Surface du pied de page",
+      "cookieSettingsButton": "Bouton des paramètres des cookies",
+      "brandName": "Nom de la marque",
+      "logoAssetUrl": "Image du logo",
+      "faviconAssetUrl": "Image du favicon"
+    }
+  },
+  "grantedBadge": {
+    "label": "Accordé",
+    "labelUntil": "Accordé jusqu'au {date}"
+  },
+  "grantsCard": {
+    "title": "Attributions",
+    "supportingText": "Ce que ce locataire a en dehors de sa formule.",
+    "empty": "Aucune attribution — tout ce que ce locataire a provient de sa formule.",
+    "kind": {
+      "CAPABILITY": "Fonctionnalité",
+      "LOOK_FIELD": "Apparence",
+      "MODULE_PACK": "Pack de modules",
+      "LOCALE_LIMIT": "Langues"
+    },
+    "expired": "Expirée",
+    "included": "Incluse dans la formule",
+    "metaUntilRevoked": "{who} · {date} · Jusqu'à révocation",
+    "metaExpires": "{who} · {date} · Expire le {expiry}",
+    "metaExpired": "{who} · {date} · Expirée le {expiry}"
+  },
+  "usageCard": {
+    "title": "Utilisation",
+    "description": "Ce que comprend votre offre et ce qui est utilisé.",
+    "labels": {
+      "TAKEAWAYS": "Points clés IA ce mois-ci",
+      "EMAILS": "E-mails envoyés ce mois-ci",
+      "SEATS": "Places de l'équipe",
+      "LANGUAGES": "Langues supplémentaires"
+    },
+    "links": {
+      "SEATS": "Équipe",
+      "LANGUAGES": "Langues"
+    },
+    "value": "<count>{used, number}</count> sur {allowance, number}",
+    "failed": "Impossible de charger ce total. Rechargez la page pour réessayer.",
+    "footer": {
+      "limits": "Votre offre fixe ces limites.",
+      "plansLink": "Voir ce que comprend chaque offre"
+    },
+    "notes": {
+      "TAKEAWAYS": {
+        "UNDER": "Réinitialisation le {date}",
+        "NEAR": "{percent} % utilisés — il en reste {left, number}<separator>·</separator><reset>Réinitialisation le {date}</reset>",
+        "FULL": "Tout est utilisé. Les nouveaux articles n'auront pas de points clés avant le {date}."
+      },
+      "EMAILS": {
+        "UNDER": "Réinitialisation le {date}",
+        "NEAR": "{percent} % utilisés — il en reste {left, number}<separator>·</separator><reset>Réinitialisation le {date}</reset>",
+        "FULL": "Tout est utilisé. Les nouveaux articles ne seront pas envoyés par e-mail avant le {date}."
+      },
+      "SEATS": {
+        "UNDER": "Compte le propriétaire, les membres et les invitations en attente.",
+        "NEAR": "{left, plural, one {Il reste # place.} other {Il reste # places.}}",
+        "FULL": "Toutes les places sont prises. Retirez quelqu'un pour en inviter un autre."
+      },
+      "LANGUAGES": {
+        "UNDER": "Votre langue par défaut n'est pas comptée.",
+        "NEAR": "{left, plural, one {Il reste # langue.} other {Il reste # langues.}}",
+        "FULL": "Toutes sont utilisées. Retirez-en une pour en ajouter une autre."
+      }
+    }
+  },
+  "revokeGrantControl": {
+    "revoke": {
+      "trigger": "Révoquer",
+      "triggerAriaLabel": "Révoquer {item}",
+      "title": "Révoquer {item} pour {tenant}",
+      "description": "{item} se verrouille de nouveau dès le prochain chargement de page. Ce que le locataire a configuré est conservé : l'accorder de nouveau le rétablit.",
+      "confirmButton": "Révoquer",
+      "confirmingButton": "Révocation…",
+      "failed": "Impossible de révoquer l'attribution — réessayez.",
+      "done": "{item} révoqué."
+    },
+    "remove": {
+      "trigger": "Retirer",
+      "triggerAriaLabel": "Retirer l'attribution de {item}",
+      "title": "Retirer {item} pour {tenant}",
+      "description": "Cette attribution a expiré, donc {item} est déjà verrouillé. La retirer la supprime de la liste et permet de l'accorder de nouveau.",
+      "confirmButton": "Retirer",
+      "confirmingButton": "Retrait…",
+      "failed": "Impossible de retirer l'attribution — réessayez.",
+      "done": "{item} retiré."
+    }
+  },
+  "entitlementGrantErrors": {
+    "notFound": "Ce locataire n'existe plus.",
+    "archived": "Ce locataire est archivé, ses attributions ne peuvent donc pas changer.",
+    "comingSoon": "Cette fonctionnalité n'est pas encore disponible, elle ne peut donc pas être accordée.",
+    "alreadyGranted": "C'est déjà accordé.",
+    "expiryShortened": "L'attribution de langues actuelle dure plus longtemps. Choisissez une expiration plus tardive, ou révoquez d'abord cette attribution.",
+    "includedInPlan": "C'est déjà inclus dans le forfait du locataire.",
+    "grantNotOpen": "Cette attribution a déjà été retirée ou a expiré."
+  },
+  "teamPage": {
+    "title": "Équipe",
+    "description": "Les personnes qui rédigent et publient le contenu de ce site avec vous dans Studio.",
+    "seatsUsed": "{used} {seats, plural, one {place utilisée sur #} other {places utilisées sur #}}",
+    "inviteEditor": "Inviter un éditeur",
+    "seatLimitTitle": "Toutes les places sont prises",
+    "seatLimitBody": "{plan} comprend {seats, plural, one {# place} other {# places}}. Retirez un membre ou annulez une invitation pour inviter quelqu'un d'autre.",
+    "thisMember": "ce membre",
+    "columnPerson": "Personne",
+    "columnRole": "Rôle",
+    "columnStudioAccess": "Accès à Studio",
+    "columnActions": "Actions",
+    "members": {
+      "title": "Membres",
+      "count": "{count, plural, one {# personne} other {# personnes}}",
+      "empty": "Personne n'a encore rejoint ce site.",
+      "you": "(vous)",
+      "noEmail": "Aucune adresse e-mail enregistrée",
+      "joined": "A rejoint le <time>{date}</time>",
+      "joinedToday": "A rejoint <time>aujourd'hui</time>",
+      "joinedWithRole": "A rejoint le <time>{date}</time> · {role}",
+      "joinedTodayWithRole": "A rejoint <time>aujourd'hui</time> · {role}",
+      "noEditorsNoFreeSeats": "Aucun éditeur pour l'instant. Chaque place libre est réservée par une invitation en attente.",
+      "noEditors": "Aucun éditeur pour l'instant. Invitez jusqu'à {free, plural, one {# personne} other {# personnes}} à rédiger et publier avec vous dans Studio."
+    },
+    "invites": {
+      "title": "Invitations en attente",
+      "supportingText": "Chacune occupe une place jusqu'à ce que la personne rejoigne le site ou que vous l'annuliez.",
+      "count": "{count, plural, one {# invitation} other {# invitations}}",
+      "invited": "Invité le <time>{date}</time> · n'a pas encore rejoint",
+      "invitedToday": "Invité <time>aujourd'hui</time> · n'a pas encore rejoint",
+      "invitedWithRole": "Invité le <time>{date}</time> · n'a pas encore rejoint · {role}",
+      "invitedTodayWithRole": "Invité <time>aujourd'hui</time> · n'a pas encore rejoint · {role}",
+      "studioAccess": "Commence dès qu'il rejoint le site"
+    },
+    "studioAccess": {
+      "badge": {
+        "READY": "Prêt",
+        "INVITE_SENT": "Invitation envoyée",
+        "ACTIVATING": "Configuration…",
+        "STALLED": "Nécessite votre attention",
+        "LOCKED": "Verrouillé"
+      },
+      "hint": {
+        "INVITE_SENT": "En attente de l'acceptation de l'invitation à Studio",
+        "ACTIVATING": "Acceptée : les droits de modification prennent en général une minute",
+        "STALLED": "Non acceptée en 3 jours, nous avons donc arrêté de vérifier",
+        "LOCKED": "Au-delà des places de votre formule"
+      },
+      "noAccess": "Pas d'accès à Studio"
+    },
+    "inviteDialog": {
+      "title": "Inviter un éditeur",
+      "notice": "Un éditeur peut modifier, publier et supprimer tout le contenu du site dans Studio. Il ne peut pas changer son apparence, ses réglages ni sa facturation.",
+      "emailLabel": "Adresse e-mail",
+      "emailHint": "Nous lui enverrons un lien pour rejoindre le site. L'invitation occupe une place jusqu'à ce qu'il le rejoigne.",
+      "emailPlaceholder": "nom@exemple.com",
+      "cancel": "Annuler",
+      "send": "Envoyer l'invitation",
+      "sending": "Envoi…",
+      "sent": "Invitation envoyée à {email}.",
+      "failed": "Impossible d'envoyer l'invitation. Réessayez.",
+      "fieldError": {
+        "EMAIL_INVALID": "Saisissez une adresse e-mail, par exemple nom@exemple.com.",
+        "ALREADY_MEMBER": "{email} fait déjà partie de l'équipe.",
+        "ALREADY_INVITED": "{email} a déjà une invitation en attente.",
+        "SEAT_LIMIT": "Toutes les places de la formule {plan} sont prises."
+      }
+    },
+    "remove": {
+      "trigger": "Retirer",
+      "triggerAriaLabel": "Retirer {email}",
+      "title": "Retirer {email} ?",
+      "description": "Cette personne perd immédiatement l'accès à l'administration de ce site et à Studio, et sa place se libère. Le contenu qu'elle a rédigé reste sur le site.",
+      "keep": "Garder le membre",
+      "confirm": "Retirer le membre",
+      "confirming": "Retrait…",
+      "done": "{email} a été retiré. Son accès à Studio est en cours de révocation.",
+      "gone": "{email} ne fait plus partie de l'équipe.",
+      "failed": "Impossible de retirer {email}. Réessayez.",
+      "self": "Vous ne pouvez pas vous retirer vous-même de l'équipe.",
+      "lastOwner": "Un site garde toujours un propriétaire : {email} ne peut donc pas être retiré."
+    },
+    "cancelInvite": {
+      "trigger": "Annuler l'invitation",
+      "triggerAriaLabel": "Annuler l'invitation à {email}",
+      "title": "Annuler l'invitation envoyée à {email} ?",
+      "description": "Le lien de l'e-mail cesse de fonctionner et la place se libère. Vous pourrez l'inviter de nouveau plus tard.",
+      "keep": "Garder l'invitation",
+      "confirm": "Annuler l'invitation",
+      "confirming": "Annulation…",
+      "done": "L'invitation envoyée à {email} a été annulée.",
+      "gone": "Cette invitation n'est plus en attente.",
+      "failed": "Impossible d'annuler l'invitation. Réessayez."
+    }
   }
 }

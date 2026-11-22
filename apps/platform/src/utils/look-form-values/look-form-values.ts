@@ -11,8 +11,13 @@ import { isUndefined } from '@shinefold/utils/primitives';
 export const CARD_FIELDS = {
   [LOOK_CARD.PRESET]: ['preset'],
   [LOOK_ROW.COLOUR]: ['accentHue', 'logoHue'],
-  [LOOK_ROW.TYPE]: ['headingFont', 'bodyFont'],
-  [LOOK_ROW.SHAPE]: ['radiusScale', 'density'],
+  [LOOK_ROW.TYPE]: ['headingFont', 'bodyFont', 'headingWeight', 'headingCase'],
+  [LOOK_ROW.SHAPE]: [
+    'radiusScale',
+    'density',
+    'imageProportion',
+    'dividerWidth',
+  ],
   [LOOK_ROW.CARDS]: ['cardStyle'],
   [LOOK_ROW.HEADER]: [
     'headerLayout',

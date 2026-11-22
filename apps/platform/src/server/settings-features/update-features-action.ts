@@ -1,9 +1,14 @@
 'use server';
 
 import type { TSettingsRefusal } from '@platform/constants/settings';
-import { SETTINGS_FEATURES_LOG } from '@platform/constants/settings-features';
+import {
+  FEATURES_FIELD_ERROR,
+  SETTINGS_FEATURES_LOG,
+  type TFeaturesFieldErrorReason,
+} from '@platform/constants/settings-features';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
+import { requiresConsentBanner } from '@platform/server/settings-features/requires-consent-banner';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -24,7 +29,7 @@ import {
   AUDIT_TARGET_TYPE,
   type TActionResult,
 } from '@shinefold/config';
-import { PLAN_REGISTRY, queries } from '@shinefold/db';
+import { queries } from '@shinefold/db';
 import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
@@ -45,18 +50,12 @@ export type TUpdateFeaturesResult =
   | TActionResult<
       typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
       keyof TUpdateFeaturesInput,
-      never,
+      TFeaturesFieldErrorReason,
       TSettingsRefusal
     >
   | TNotInPlanRefusal;
 
-/**
- * A "Coming soon" capability is always written off. Switching on a toggle
- * outside `PLAN_REGISTRY[tenant.plan]` that is stored off rejects the whole
- * save; otherwise an out-of-plan toggle keeps its stored value, so a
- * downgrade loses nothing. A toggle whose parent is off can be switched
- * off but not on, so switching the parent back on restores what was kept.
- */
+/** Writes "Coming soon" capabilities off, keeps out-of-plan toggles at their stored value but refuses switching one on, lets a toggle under an off parent be switched off but never on, and refuses the consent banner off while a Google Analytics id is stored. */
 export const updateFeaturesAction = async (
   tenantId: string,
   input: TUpdateFeaturesInput,
@@ -66,13 +65,31 @@ export const updateFeaturesAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
   const values = withComingSoonOff(parsed.data);
 
-  const entitled = PLAN_REGISTRY[tenant.plan];
+  const entitled = tenant.entitlements.capabilities;
 
   try {
     const { values: stored } = await getSettingsFeaturesOrDefaults(tenant.id);
+
+    if (
+      !values.consentBannerEnabled &&
+      (await requiresConsentBanner(
+        tenant.id,
+        tenant.entitlements.hasOwnAnalytics,
+      ))
+    ) {
+      return {
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: {
+          consentBannerEnabled: {
+            reason: FEATURES_FIELD_ERROR.CONSENT_BANNER_REQUIRED,
+          },
+        },
+      };
+    }
+
     const outOfPlan = listSwitchedOnOutOfPlan(values, stored, entitled);
 
     if (hasArrayGotItems(outOfPlan)) {

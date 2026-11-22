@@ -1,13 +1,16 @@
 import {
+  NEWSLETTER_SKIP_REASON,
+  type TNewsletterSkipReason,
+} from '@shinefold/config/constants';
+import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
   NEWSLETTER_POST_SEND_OUTCOME,
-  NEWSLETTER_SKIP_REASON,
   type TNewsletterLimitNoticeKind,
   type TNewsletterPostSendOutcome,
-  type TNewsletterSkipReason,
 } from '@shinefold/db/constants';
 import {
   date,
+  integer,
   pgTable,
   primaryKey,
   text,
@@ -37,6 +40,15 @@ export const newsletterPostSends = pgTable(
         ...TNewsletterSkipReason[],
       ],
     }),
+    postTitle: text('post_title'),
+    postPublishedAt: timestamp('post_published_at', { mode: 'date' }),
+    recipientCount: integer('recipient_count'),
+    sentCount: integer('sent_count').notNull().default(0),
+    emailsNeeded: integer('emails_needed'),
+    allowanceLeft: integer('allowance_left'),
+    scheduledFor: timestamp('scheduled_for', { mode: 'date' }),
+    settledAt: timestamp('settled_at', { mode: 'date' }),
+    handStartedAt: timestamp('hand_started_at', { mode: 'date' }),
   },
   (row) => [primaryKey({ columns: [row.tenantId, row.postId] })],
 );

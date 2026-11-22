@@ -13,7 +13,10 @@ export type TVoicePageContentProps = {
 
 export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
   const config = await queries.siteConfig.getSiteConfig(tenant.id);
-  const liveLocales = queries.tenants.selectLiveLocales(tenant);
+  const liveLocales = queries.tenants.selectLiveLocalesWithin(
+    tenant,
+    tenant.entitlements,
+  );
   const {
     accentHue,
     logoHue,
@@ -26,6 +29,10 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
     headerControlShape,
     buttonShape,
     navLinkStyle,
+    headingWeight,
+    headingCase,
+    imageProportion,
+    dividerWidth,
   } = lookFormValuesOrDefaults(config);
   const listSamplesByLocale = Object.fromEntries(
     await Promise.all(
@@ -58,6 +65,10 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
           headerControlShape,
           buttonShape,
           navLinkStyle,
+          headingWeight,
+          headingCase,
+          imageProportion,
+          dividerWidth,
         }}
         savedAt={config?.updatedAt}
         archivedAt={tenant.archivedAt}

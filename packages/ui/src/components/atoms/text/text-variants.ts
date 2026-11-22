@@ -1,22 +1,11 @@
-import { tv } from '@shinefold/ui/lib/styling';
-import type { VariantProps } from 'tailwind-variants';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const textVariants = tv({
-  base: ['font-read'],
   variants: {
-    variant: {
-      lead: ['text-lead leading-[1.72]', 'text-text'],
-      muted: ['text-lead leading-[1.72]', 'text-muted'],
-      hero: ['text-base leading-[1.6]', 'text-muted'],
-      card: ['text-lead leading-[1.55]', 'text-muted'],
-      supporting: ['text-lead', 'text-text-muted'],
-      statement: ['text-lg font-medium', 'text-text'],
-      meta: ['text-meta', 'text-subtle'],
-      emphasis: ['text-lead leading-[1.55] font-semibold', 'text-text'],
-      footnote: ['text-caption', 'text-subtle'],
-    },
+    textRole: TYPOGRAPHY,
   },
-  defaultVariants: { variant: 'lead' },
+  defaultVariants: {
+    textRole: TEXT_ROLE.BODY,
+  },
 });
-
-export type TTextVariants = VariantProps<typeof textVariants>;

@@ -1,5 +1,4 @@
 import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
-import { FONT_OPTIONS } from '@platform/config/fonts';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { isUndefined } from '@shinefold/utils/primitives';
@@ -9,11 +8,13 @@ import { useAccountDraftFields } from './use-account-draft-fields';
 import { useButtonsDraftFields } from './use-buttons-draft-fields';
 import { useFooterDraftFields } from './use-footer-draft-fields';
 import { useHeaderDraftFields } from './use-header-draft-fields';
+import { useStyleDraftFields } from './use-style-draft-fields';
 
 export const useLookDraftFields = () => {
   const t = useTranslations('lookForm');
   const tPreset = useTranslations('presetPicker');
   const tHue = useTranslations('logoHueField');
+  const styleDraftFields = useStyleDraftFields();
   const headerDraftFields = useHeaderDraftFields();
   const accountDraftFields = useAccountDraftFields();
   const buttonsDraftFields = useButtonsDraftFields();
@@ -42,35 +43,7 @@ export const useLookDraftFields = () => {
           ? tHue('followsAccent')
           : tHue('hueValue', { hue: logoHue }),
     },
-    {
-      id: 'headingFont',
-      label: t('headingFontLabel'),
-      display: ({ headingFont }: TLookFormValues) =>
-        FONT_OPTIONS[headingFont].label,
-    },
-    {
-      id: 'bodyFont',
-      label: t('bodyFontLabel'),
-      display: ({ bodyFont }: TLookFormValues) => FONT_OPTIONS[bodyFont].label,
-    },
-    {
-      id: 'radiusScale',
-      label: t('radiusScaleLabel'),
-      display: ({ radiusScale }: TLookFormValues) =>
-        t(`radiusScaleOptionLabel.${radiusScale}`),
-    },
-    {
-      id: 'density',
-      label: t('densityLabel'),
-      display: ({ density }: TLookFormValues) =>
-        t(`densityOptionLabel.${density}`),
-    },
-    {
-      id: 'cardStyle',
-      label: t('cardStyleLabel'),
-      display: ({ cardStyle }: TLookFormValues) =>
-        t(`cardStyleOptionLabel.${cardStyle}`),
-    },
+    ...styleDraftFields,
     ...headerDraftFields,
     ...accountDraftFields,
     ...buttonsDraftFields,

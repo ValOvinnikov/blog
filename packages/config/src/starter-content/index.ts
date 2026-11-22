@@ -1,3 +1,9 @@
+export { buildGrowthLayer } from './growth-layer';
+export type {
+  TGrowthHomeSlot,
+  TGrowthLayer,
+  TStarterPlaceholderImageIds,
+} from './growth-layer-shape';
 export {
   buildStarterCookieStatement,
   buildStarterDocuments,
@@ -6,7 +12,6 @@ export {
   toStarterSiteType,
   type TStarterSiteType,
 } from './starter-content';
-export type {
-  TStarterDocument,
-  TStarterDocumentUnion,
-} from './starter-document';
+export { STARTER_DOCUMENT_IDS } from './starter-document-ids';
+export type { TStarterDocumentUnion } from './starter-document';
+export type { TStarterDocument } from './starter-document-shape';

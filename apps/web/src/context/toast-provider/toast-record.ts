@@ -34,3 +34,16 @@ export const toPayloadFields = (
   action,
   durationMs: durationMs ?? TOAST_DEFAULT_LIFE_MS[type],
 });
+
+type TToastPromiseMessage<T> = IToastPayload | ((value: T) => IToastPayload);
+
+export interface IToastPromiseMessages<T> {
+  loading: Pick<IToastPayload, 'title' | 'message'>;
+  success: TToastPromiseMessage<T>;
+  error: TToastPromiseMessage<unknown>;
+}
+
+export const resolvePayload = <T>(
+  message: TToastPromiseMessage<T>,
+  value: T,
+): IToastPayload => (typeof message === 'function' ? message(value) : message);

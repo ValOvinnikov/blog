@@ -16,6 +16,8 @@ const RELEASE_AT = '2026-04-02T10:00:00.000Z';
 
 export const MOCK_RELEASE_LAST_TAG = 'v1.4.0';
 
+export const MOCK_RELEASE_VERSION = 'v1.5.0';
+
 export const mockComparedCommit = (
   overrides: Partial<TComparedCommit> = {},
 ): TComparedCommit => ({

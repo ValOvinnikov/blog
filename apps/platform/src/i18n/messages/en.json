@@ -28,13 +28,16 @@
     "signUpTitle": "Create an account",
     "onboarding": "Create your site",
     "billing": "Billing · Admin",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "help": "Help",
+    "draftPreview": "Draft preview",
+    "team": "Team"
   },
   "signInPage": {
     "heading": "Sign in",
     "description": "Use the account you signed up or were invited with.",
-    "accountNotLinkedTitle": "This email already signs in another way",
-    "accountNotLinkedDescription": "Your email address is already used with a different sign-in method. Sign in the way you did before.",
+    "accountNotLinkedTitle": "We couldn't confirm this email",
+    "accountNotLinkedDescription": "Google or GitHub hasn't verified this email address. Verify it with them and try again, or sign in with an email link.",
     "signInFailedTitle": "We couldn't sign you in",
     "signInFailedDescription": "Something went wrong while signing you in. Try again, or choose another way to sign in.",
     "signUpPrompt": "New here? <link>Create an account</link>"
@@ -188,6 +191,7 @@
   },
   "account": {
     "signOut": "Sign out",
+    "signingOut": "Signing out…",
     "signedInAs": "Signed in as {email}",
     "menuLabel": "Account",
     "triggerCollapsedLabel": "Account: {name}, {email}",
@@ -243,8 +247,9 @@
     },
     "blockedSignups": "Blocked sign-ups",
     "dataRequests": "Data requests",
-    "badgeUnreadLeads": "{count} new",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Support",
+    "help": "Help"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -389,7 +394,33 @@
     "siteSetupNotStartedContactDescription": "We couldn't start setting up your site. Ask your platform contact to start it.",
     "siteSetupStart": "Start setup",
     "siteSetupStarting": "Starting…",
-    "trialUpgrade": "Choose a plan"
+    "trialUpgrade": "Choose a plan",
+    "sampleContent": {
+      "title": "Sample content",
+      "supportingText": "Your site started with sample pages, sections and links. Remove the ones you haven't changed.",
+      "trigger": "Remove sample content",
+      "notWritable": "Sample content can't be removed while your site is suspended or archived.",
+      "dialogTitle": "Remove sample content?",
+      "dialogDescription": "Samples you haven't edited are deleted from your site. Samples you've edited, or that your other content uses, are kept. This can't be undone.",
+      "keep": "Keep samples",
+      "confirm": "Remove samples",
+      "confirming": "Removing samples…",
+      "failed": "The samples couldn't be removed. Try again.",
+      "done": "{count, plural, =0 {No samples needed removing.} one {# sample removed.} other {# samples removed.}}",
+      "nothingKept": "No samples were kept.",
+      "keptEditedTitle": "Kept because you edited them",
+      "keptReferencedTitle": "Kept because other content uses them",
+      "kind": {
+        "section": "Section",
+        "page": "Page",
+        "post": "Post",
+        "template": "Page template",
+        "link": "Navigation link",
+        "author": "Author",
+        "topic": "Topic",
+        "other": "Sample"
+      }
+    }
   },
   "getStartedCard": {
     "title": "Get started",
@@ -507,7 +538,12 @@
       "OAUTH_APP_SAVED": "Sign-in app saved",
       "OAUTH_APP_REPLACED": "Sign-in app replaced",
       "OAUTH_APP_REMOVED": "Sign-in app removed",
-      "NEWSLETTER_PAUSE_CLEARED": "Newsletter pause cleared"
+      "NEWSLETTER_PAUSE_CLEARED": "Newsletter pause cleared",
+      "MEMBER_INVITED": "Team member invited",
+      "MEMBER_REMOVED": "Team member removed",
+      "MEMBER_INVITE_CANCELLED": "Team invite cancelled",
+      "ENTITLEMENT_GRANTED": "Feature granted",
+      "ENTITLEMENT_REVOKED": "Feature grant revoked"
     },
     "detail": {
       "field": {
@@ -527,8 +563,13 @@
       "SUSPENSION_REASON": "Reason: {category}",
       "SUSPENSION_REFERENCE": "Reference: {reference}",
       "PLAN": "Plan: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Plan: {from} → {to}",
       "SIGN_IN_PROVIDER": "Sign-in provider: {provider, select, google {Google} github {GitHub} other {{provider}}}",
-      "CLIENT_SECRET_REPLACED": "Client secret replaced"
+      "CLIENT_SECRET_REPLACED": "Client secret replaced",
+      "GRANT_ITEM": "Item: {item}",
+      "GRANT_EXPIRY": "Until {date}",
+      "GRANT_UNTIL_REVOKED": "Until revoked",
+      "GRANT_NOTE": "Note: {note}"
     }
   },
   "tenantDomainPage": {
@@ -724,8 +765,8 @@
     "viewTabsAriaLabel": "Look view",
     "jumpIndexAriaLabel": "Look sections",
     "growthAddsColour": "A logo hue of its own",
-    "growthAddsType": "Heading and body fonts",
-    "growthAddsShape": "Corners and spacing",
+    "growthAddsType": "Fonts, heading weight and case",
+    "growthAddsShape": "Corners, spacing, image proportions and dividers",
     "growthAddsCards": "Card style",
     "growthAddsButtons": "Busy state and spinner",
     "growthAddsHeader": "Layout, sub-menus, bar, header buttons and account controls",
@@ -776,6 +817,34 @@
       "DEFAULT": "Comfortable",
       "COMPACT": "Compact"
     },
+    "headingWeightLabel": "Heading weight",
+    "headingWeightDescription": "How heavy every heading on your site looks.",
+    "headingWeightOptionLabel": {
+      "REGULAR": "Regular",
+      "MEDIUM": "Medium",
+      "SEMIBOLD": "Semibold",
+      "BOLD": "Bold"
+    },
+    "headingCaseLabel": "Heading case",
+    "headingCaseDescription": "Changes page and section titles. Card titles and headings in posts keep the case you wrote, so longer text stays easy to read.",
+    "headingCaseOptionLabel": {
+      "AS_WRITTEN": "As written",
+      "UPPERCASE": "Uppercase"
+    },
+    "imageProportionLabel": "Image proportions",
+    "imageProportionDescription": "Changes images set to Wide and images with no shape choice. Square and round images keep their shape.",
+    "imageProportionOptionLabel": {
+      "AS_DESIGNED": "As designed",
+      "WIDE": "Wide",
+      "CLASSIC": "Classic",
+      "SQUARE": "Square"
+    },
+    "dividerWidthLabel": "Section dividers",
+    "dividerWidthDescription": "How thick the line is between sections that show a divider.",
+    "dividerWidthOptionLabel": {
+      "HAIRLINE": "Hairline",
+      "BOLD": "Bold"
+    },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Accent bar",
       "OUTLINED": "Outlined",
@@ -820,7 +889,7 @@
     "languageSwitcherSingleLanguage": "Add another language in Languages settings to choose a style.",
     "languageSwitcherFreeDescription": "Your plan publishes one language. Upgrade to add languages and choose a switcher style.",
     "lockLineGrowthFields": "Fields marked Growth keep the {preset} preset's value.",
-    "lockLineTypeFonts": "On this plan, Type keeps the {preset} preset's fonts. Picking another preset changes them.",
+    "lockLineTypeFonts": "On this plan, Type keeps the {preset} preset's fonts and heading style. Picking another preset changes them.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globe",
@@ -940,10 +1009,11 @@
     },
     "footerBackgroundLabel": "Background",
     "footerBackgroundDescription": "The footer's colour. Each follows the reader's light or dark theme.",
-    "footerBackgroundOptionLabel": {
+    "skinLabel": {
       "PRIMARY": "Plain",
       "SECONDARY": "Shaded",
-      "BRAND_PRIMARY": "Brand tint"
+      "BRAND_PRIMARY": "Brand tint",
+      "INK": "Ink"
     },
     "footerSurfaceLabel": "Surface",
     "footerSurfaceDescription": "Whether the footer spans the page or sits as a card.",
@@ -1059,7 +1129,14 @@
     "footerFinePrintAriaLabel": "Legal",
     "footerPrivacy": "Privacy policy",
     "footerPoweredByLabel": "Powered by",
-    "footerCookieSettings": "Cookie settings"
+    "footerCookieSettings": "Cookie settings",
+    "bandHeading": "From the harbour office",
+    "bandText": "Tide tables, berth notices and the week's weather, gathered in one place.",
+    "bandLink": "See all notices",
+    "bandCardTitle": "Winter berth notice",
+    "bandCardExcerpt": "Moorings on the north quay move inward from November.",
+    "bannerHeading": "Spring tides this weekend",
+    "bannerText": "The highest water of the year reaches the north quay on Saturday morning."
   },
   "lookFollow": {
     "followToggle": "Follow the card you are editing",
@@ -1173,10 +1250,11 @@
     "sendTest": "Send test to me",
     "sendingTest": "Sending…",
     "testSent": "Test sent to {email}.",
-    "testRateLimited": "You've sent several tests recently — try again in a few minutes.",
+    "testRateLimited": "You've sent the most tests for now. Try again at {time}.",
     "testInvalid": "Fill in the subject and message before sending a test.",
     "testFailed": "Couldn't send the test — try again.",
     "testSubject": "[Test] {subject}",
+    "postTestBanner": "Test email — only you got this. Your subscribers get it when the post is first published.",
     "unsavedLogoNote": "A logo you haven't saved yet isn't included in the test."
   },
   "emailSettingsForm": {
@@ -1510,7 +1588,7 @@
       "STALLED": "Your Studio invite hasn't been accepted"
     },
     "description": {
-      "INVITE_SENT": "Studio runs on Sanity, so you need a free Sanity account to edit. We've emailed you an invite from Sanity: accept it, and Studio opens here once your access is confirmed.",
+      "INVITE_SENT": "Studio runs on Sanity, so you need a free Sanity account to edit. We've emailed you a Studio invite: accept it, and Studio opens here once your access is confirmed.",
       "ACTIVATING": "You've accepted the invite. We're giving your account editing rights, which usually takes a minute.",
       "STALLED": "The invite was sent more than three days ago and hasn't been accepted, so we've stopped checking. Resend it for a fresh one, or check now if you've just accepted it."
     },
@@ -1520,7 +1598,11 @@
     "resending": "Sending…",
     "checkStarted": "Checking your access now. Refresh in a minute to see the result.",
     "inviteResent": "A new invite is on its way to your inbox.",
-    "requestFailed": "Couldn't reach the setup service — try again."
+    "requestFailed": "Couldn't reach the setup service — try again.",
+    "checkStartedFor": "Checking {email}'s Studio access now. Refresh in a minute to see the result.",
+    "inviteResentTo": "A new Studio invite is on its way to {email}.",
+    "checkNowAriaLabel": "Check now for {email}",
+    "resendInviteAriaLabel": "Resend invite to {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Tenant details",
@@ -1551,9 +1633,11 @@
       "provisioningStarted": "This tenant's provisioning has already started; its details can no longer be edited.",
       "ownerAlreadyJoined": "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
       "ownerHasFreeTenant": "This owner already has a Free site. Archive it or keep this site on its current plan.",
+      "planFollowsSubscription": "This site has a live subscription, so its plan follows Stripe. Change it on the owner's Billing page or in the Stripe dashboard.",
       "saveFailed": "Couldn't save tenant details — try again."
     },
-    "fieldLockedReasonCustomMainDomain": "Locked — the main address is your own domain. Switch back to the subdomain on the Domain page to edit."
+    "fieldLockedReasonCustomMainDomain": "Locked — the main address is your own domain. Switch back to the subdomain on the Domain page to edit.",
+    "fieldLockedReasonSubscribed": "Locked — this site has a live subscription, so its plan follows Stripe. Change it on the owner's Billing page or in the Stripe dashboard."
   },
   "tenantFieldErrors": {
     "nameRequired": "Enter a tenant name.",
@@ -1671,6 +1755,8 @@
     "suspendFailed": "Couldn't suspend the tenant — try again.",
     "liftSuspensionFailed": "Couldn't reactivate the tenant — try again.",
     "ownerEmailUnknown": "This tenant's owner has no email address on record yet, so it can't be blocked.",
+    "subscriptionCancelFailed": "The site's Stripe subscription couldn't be cancelled, so it wasn't archived. Try again, or cancel it in Stripe first.",
+    "subscriptionLive": "Stripe still bills this site. Cancel its subscription before deleting it.",
     "invalidInput": "Check the details and try again."
   },
   "featuresSettings": {
@@ -1679,6 +1765,8 @@
     "alertSuccess": "Features saved.",
     "alertError": "Couldn't save — try again.",
     "planLockedBadge": "{plan, select, FREE {Free plan} STARTER {Starter plan} other {Growth plan}}",
+    "consentBannerRequiredNote": "Needed for Google Analytics, which asks visitors for consent.",
+    "consentBannerRequiredError": "Google Analytics is set up, so the consent banner has to stay on. Clear the Measurement ID or switch to Plausible first.",
     "comingSoonBadge": "Coming soon",
     "switchOn": "On",
     "switchOff": "Off",
@@ -1700,9 +1788,32 @@
       "RATINGS": "Let readers rate posts.",
       "BOOKMARKS": "Let readers save posts to read later.",
       "NEWSLETTER": "Show the newsletter signup form on the site.",
-      "ANALYTICS": "Enable on-site analytics tracking.",
+      "ANALYTICS": "Connect your own Google Analytics or Plausible. Leave the ID empty to load no analytics tool.",
       "CONSENT_BANNER": "Show visitors a cookie-consent banner before non-essential cookies or scripts load.",
       "CONTACT_FORM": "Show the contact form on the site."
+    },
+    "analyticsProviderLabel": "Analytics tool",
+    "analyticsProviderOption": {
+      "GOOGLE_ANALYTICS": "Google Analytics",
+      "PLAUSIBLE": "Plausible"
+    },
+    "analyticsIdDraftLabel": "Analytics ID",
+    "analyticsIdEmpty": "None",
+    "analyticsIdLabel": {
+      "GOOGLE_ANALYTICS": "Measurement ID",
+      "PLAUSIBLE": "Site domain"
+    },
+    "analyticsIdHint": {
+      "GOOGLE_ANALYTICS": "Find it in Google Analytics under Admin, Data streams.",
+      "PLAUSIBLE": "The domain your site is registered under in Plausible."
+    },
+    "analyticsIdPlaceholder": {
+      "GOOGLE_ANALYTICS": "G-A1B2C3D4E5",
+      "PLAUSIBLE": "example.com"
+    },
+    "analyticsIdInvalid": {
+      "GOOGLE_ANALYTICS": "Enter a measurement ID: G- followed by capital letters and numbers, like G-A1B2C3D4E5.",
+      "PLAUSIBLE": "Enter a domain on its own, without https:// or a path, like example.com."
     }
   },
   "languagePicker": {
@@ -1739,11 +1850,13 @@
     "allowance": "{used} of {allowed} additional languages in use on your plan.",
     "noticeTitle": "Plan limit",
     "upgradeNotice": "Your plan publishes the default language only. Upgrade to add more languages.",
+    "atLimitNotice": "Your plan publishes {allowed, plural, one {# additional language} other {# additional languages}}, and all are in use.",
     "downgradeNotice": "Your plan publishes {allowed, plural, one {# additional language} other {# additional languages}}, but {stored} are saved. The first {allowed} stay live; the others are kept and nothing is deleted.",
     "keptBadge": "Kept, not live on your plan",
     "planLockedBadge": "Not on your plan",
     "atLimitLockedReason": "Turn one off to switch this on",
-    "overLimitLockedReason": "Upgrade your plan to change this"
+    "overLimitLockedReason": "Upgrade your plan to change this",
+    "allowanceGranted": "{used} of {allowed} additional languages in use."
   },
   "saveBar": {
     "regionLabel": "Unsaved changes",
@@ -1755,6 +1868,7 @@
     "goToFirstField": "Go to the first one",
     "notSaved": "Not saved",
     "notInPlan": "Your site is on the {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {current}} plan, which doesn't include {items}, so nothing was saved.",
+    "languagesNotInPlan": "Your site is on the {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {current}} plan, which allows {limit, plural, one {# language} other {# languages}}, so {count, plural, one {{items} wasn't added} other {{items} weren't added}}.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Discard",
     "save": "Save changes",
@@ -1801,9 +1915,10 @@
     "downgradedDescription": "The contact form comes with the Starter and Growth plans, so new messages no longer arrive. The messages you already received are kept here, and you can still delete any of them."
   },
   "leadsInbox": {
-    "listLabel": "Messages",
     "empty": "No messages yet. When someone uses your contact form, their message will appear here.",
     "unread": "Unread",
+    "unreadGroup": "Unread · {count}",
+    "earlierGroup": "Earlier",
     "yesterday": "Yesterday",
     "loadingMore": "Loading more messages…",
     "loadMoreFailed": "Couldn't load more messages. Try again",
@@ -1814,6 +1929,7 @@
     "email": "Email",
     "received": "Received",
     "page": "Page",
+    "messageHeading": "Message",
     "homePage": "Home page",
     "readStateFailed": "Couldn't update the message. Try again."
   },
@@ -2135,26 +2251,41 @@
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Open your dashboard",
+    "plansLinkLabel": "See what each plan includes",
     "GROWTH": {
       "subject": "Your site is now on the Growth plan",
       "previewText": "{siteName} can now use every Growth option.",
       "changed": "{siteName} is now on the Growth plan.",
-      "options": "Growth options are now available on your site: more languages, every Look setting, extra page modules, and features such as the contact form, bookmarks and analytics.",
-      "kept": "If you used Growth before, your earlier choices are back as you left them."
+      "kept": "Nothing is deleted. If you used Growth before, your earlier choices are back as you left them."
     },
     "STARTER": {
       "subject": "Your site is now on the Starter plan",
       "previewText": "{siteName} can now use the Starter options.",
       "changed": "{siteName} is now on the Starter plan.",
-      "options": "On Starter your site can use its own domain and the contact form, and its footer has no “Powered by” mark. More languages, every Look setting and the other page modules come with Growth.",
       "kept": "Nothing is deleted. Your content and settings are kept, and anything from Growth is back as you left it if you move to Growth."
     },
     "FREE": {
       "subject": "Your site is now on the Free plan",
       "previewText": "Paid-plan options are switched off on {siteName}.",
       "changed": "{siteName} is now on the Free plan.",
-      "options": "Paid-plan options are switched off on your site: extra languages, the Growth Look settings, paid page modules, and features such as the contact form, bookmarks and analytics.",
       "kept": "Nothing is deleted. Your content and settings are kept, and they come back if you move to a paid plan again."
+    }
+  },
+  "ownerEntitlementEmail": {
+    "actionLabel": "Open your dashboard",
+    "granted": {
+      "subject": "Granted on {siteName}: {item}",
+      "previewText": "You can now use {item} on {siteName}. Nothing is charged.",
+      "granted": "{siteName} has been granted the following outside its plan: {item}.",
+      "untilRevoked": "The grant lasts until it is revoked.",
+      "expires": "The grant lasts until {date}.",
+      "free": "Nothing is charged."
+    },
+    "revoked": {
+      "subject": "Grant revoked on {siteName}: {item}",
+      "previewText": "Nothing is deleted.",
+      "revoked": "The grant of {item} on {siteName} has been revoked.",
+      "kept": "Nothing is deleted. What you set up with it is kept, and comes back if it is granted again or your plan includes it."
     }
   },
   "ownerReceiptEmail": {
@@ -2218,6 +2349,7 @@
     "nextPaymentLabel": "Next payment",
     "nextPayment": "{amount} on <time>{date}</time>",
     "noNextPayment": "None scheduled",
+    "planEnds": "Your plan ends on <time>{date}</time>.",
     "noPayments": "Your site has no payments yet.",
     "invoicesTitle": "Invoices",
     "invoicesEmpty": "No invoices yet.",
@@ -2267,6 +2399,7 @@
     "currentPlan": "Your site is on {plan}, paid {interval, select, YEARLY {yearly} other {monthly}}.",
     "pendingChange": "Your site moves to {plan}, paid {interval, select, YEARLY {yearly} other {monthly}}, on <time>{date}</time>.",
     "changeNow": "The change starts today. You pay the difference for the rest of the current period now.",
+    "changeNowNewPeriod": "The change starts today, and a new {interval, select, YEARLY {yearly} other {monthly}} period starts with it. You pay for the new period now, less the unused time on your current one.",
     "changeAtRenewal": "The change starts on <time>{date}</time>, when the current period ends. Nothing changes until then.",
     "keepCurrentDescription": "Your site stays on {plan}, and the change planned for <time>{date}</time> is cancelled.",
     "changeUnchanged": "This is your current plan. Choose another plan or billing period to change it.",
@@ -2281,7 +2414,344 @@
     "billingLink": "Billing",
     "NOT_SUBSCRIBED": "Your site has no paid plan to change yet. Choose one at checkout.",
     "NOT_ACTIVE": "Your subscription needs attention before its plan can change. Open Billing to settle it.",
+    "planEnds": "Your plan ends on <time>{date}</time>, so it can't change. To keep it, undo the cancellation from Billing.",
     "UNCHANGED": "Your site is already on this plan.",
-    "CARD_DECLINED": "Your card was declined, so nothing changed. Update it in Billing and try again."
+    "CARD_DECLINED": "Your card was declined, so nothing changed. Update it in Billing and try again.",
+    "PAYMENT_NOT_CONFIRMED": "Your bank's confirmation wasn't completed, so your plan hasn't changed. Try again when you're ready.",
+    "NO_NEXT_BAND": "Your site can't move up to that band now. Reload the page to see your current band.",
+    "PENDING_CHANGE": "Your site has a plan change waiting for renewal. Keep your current plan from Upgrade first, then move up.",
+    "QUOTE_EXPIRED": "This price was shown a while ago. Close this and open it again for today's price."
+  },
+  "moveUpBand": {
+    "trigger": "Move to {ceiling, number} subscribers — {price} a {interval, select, YEARLY {year} other {month}} more",
+    "title": "Move to {ceiling, number} subscribers?",
+    "lead": "Your new limits apply as soon as the payment goes through.",
+    "loading": "Loading the price…",
+    "quoteFailed": "The price couldn't be loaded. Close this and try again in a moment.",
+    "newLimitsTerm": "New limits",
+    "newLimits": "{ceiling, number} subscribers · {allowance, number} emails a month",
+    "chargedTodayTerm": "Charged today",
+    "chargedTodayNote": "The difference for the rest of this billing period, to <time>{date}</time>.",
+    "renewalTerm": "From {date}",
+    "renewalTotal": "{total} a {interval, select, YEARLY {year} other {month}}",
+    "cardTerm": "Card",
+    "card": "{brand, select, visa {Visa} mastercard {Mastercard} amex {American Express} discover {Discover} other {Card}} ending {last4}",
+    "moveDownNote": "Moving down a band happens at renewal, with no refund.",
+    "cancel": "Cancel",
+    "pay": "Pay {amount} and move up",
+    "paying": "Paying…"
+  },
+  "helpView": {
+    "title": "Help",
+    "description": "Send a message to our support team. We include your site, plan and this account with it, so you don't need to.",
+    "helpCentre": "Help centre",
+    "unavailableTitle": "The Help form is unavailable",
+    "unavailableDescription": "Messages can't be sent from here right now. Please try again later."
+  },
+  "helpForm": {
+    "title": "Contact support",
+    "responseTime": "We usually reply within two working days.",
+    "subjectLabel": "Subject",
+    "messageLabel": "Message",
+    "messageHint": "Say what you were trying to do and what happened instead.",
+    "required": "Fill this in.",
+    "tooLong": "Keep this under {limit} characters.",
+    "send": "Send message",
+    "sending": "Sending…",
+    "sent": "Message sent. We've emailed you a copy.",
+    "rateLimited": "You've sent several messages in a short time. Please try again later.",
+    "unavailable": "The Help form is unavailable right now. Please try again later.",
+    "sendFailed": "Couldn't send your message — try again."
+  },
+  "draftPreview": {
+    "title": "Draft preview",
+    "draftNotice": "This is the latest saved draft, not the published page. Only members of this site can open this preview.",
+    "siteLabel": "Site",
+    "pathLabel": "Page",
+    "frameRegionLabel": "Draft preview",
+    "frameTitle": "Draft of this page on your site",
+    "toolbarAriaLabel": "Preview options",
+    "reload": "Reload",
+    "reloading": "Reloading…",
+    "openPublished": "Open published page",
+    "refusedTitle": "This draft can't be previewed",
+    "refusalNotFound": "This page has no address on your site. Only posts and landing pages can be previewed, and a landing page needs every parent page set.",
+    "refusalLanguageOff": "This page is in a language your site doesn't serve. Switch this language on to preview it.",
+    "refusalSuspended": "This site is suspended, so its drafts can't be previewed.",
+    "refusalArchived": "This site is archived, so its drafts can't be previewed.",
+    "refusalUnavailable": "The platform couldn't prepare this preview. The problem has been logged for the platform team."
+  },
+  "grantEntitlement": {
+    "trigger": "Grant to this tenant",
+    "triggerAriaLabel": "Grant to this tenant: {item}",
+    "title": "Grant {item} to {tenant}",
+    "description": "{tenant} gets {item} outside its {plan} plan. Its owner sees it unlocked and can switch it on. Nothing is charged.",
+    "granted": "{item} granted.",
+    "failed": "Couldn't grant {item} — try again."
+  },
+  "grantDialog": {
+    "confirmButton": "Grant",
+    "confirmingButton": "Granting…"
+  },
+  "grantExpiryFields": {
+    "expiresLabel": "Expires",
+    "expiresHint": "The grant ends on its own after this.",
+    "expiry": {
+      "NEVER": "Never — until revoked",
+      "DAYS_30": "30 days",
+      "DAYS_90": "90 days",
+      "YEAR_1": "1 year"
+    },
+    "noteLabel": "Note",
+    "noteHint": "Optional. Why it's granted — shown on the Grants card and in the activity log."
+  },
+  "grantModulePack": {
+    "trigger": "Grant a module pack",
+    "title": "Grant a module pack to {tenant}",
+    "description": "Its editors get the pack's modules in Studio, outside the {plan} plan. Nothing is charged.",
+    "packLabel": "Module pack",
+    "packPlaceholder": "Choose a module pack",
+    "packIncluded": "{pack} (in the plan)",
+    "packGranted": "{pack} (already granted)"
+  },
+  "grantLanguages": {
+    "trigger": "Grant more languages",
+    "title": "Grant more languages to {tenant}",
+    "description": "The {plan} plan publishes the default language only. Choose how many more {tenant} may publish. Nothing is charged.",
+    "descriptionWithAllowance": "The {plan} plan publishes {n, plural, one {# additional language} other {# additional languages}}. Choose how many more {tenant} may publish. Nothing is charged.",
+    "countLabel": "Additional languages",
+    "countHint": "If the plan later allows more, the higher number applies."
+  },
+  "grantItemNames": {
+    "languages": "{count, plural, one {# additional language} other {# additional languages}}",
+    "additionalLanguages": "Additional languages",
+    "modulePack": {
+      "CORE": "Core modules",
+      "STARTER": "Starter modules",
+      "GROWTH": "Growth modules"
+    },
+    "lookField": {
+      "preset": "Preset",
+      "accentHue": "Accent hue",
+      "logoHue": "Logo hue",
+      "headingFont": "Heading font",
+      "bodyFont": "Body font",
+      "radiusScale": "Radius scale",
+      "density": "Density",
+      "languageSwitcherStyle": "Language switcher style",
+      "cardStyle": "Card style",
+      "headerControlStyle": "Header buttons",
+      "headerControlShape": "Header buttons shape",
+      "accountButtonStyle": "Account button",
+      "accountPanelStyle": "Account panel",
+      "accountPhonePlacement": "Account position on phones",
+      "busyButtonStyle": "Busy button style",
+      "spinnerStyle": "Spinner style",
+      "buttonShape": "Button shape",
+      "headerLayout": "Header layout",
+      "headerSubmenuStyle": "Header sub-menus",
+      "headerBarStyle": "Header bar",
+      "navLinkStyle": "Navigation links",
+      "headingWeight": "Heading weight",
+      "headingCase": "Heading case",
+      "imageProportion": "Image proportions",
+      "dividerWidth": "Section dividers",
+      "footerLayout": "Footer layout",
+      "footerBackground": "Footer background",
+      "footerSurface": "Footer surface",
+      "cookieSettingsButton": "Cookie settings button",
+      "brandName": "Brand name",
+      "logoAssetUrl": "Logo image",
+      "faviconAssetUrl": "Favicon image"
+    }
+  },
+  "grantedBadge": {
+    "label": "Granted",
+    "labelUntil": "Granted until {date}"
+  },
+  "grantsCard": {
+    "title": "Grants",
+    "supportingText": "What this tenant has outside its plan.",
+    "empty": "No grants — everything this tenant has comes from its plan.",
+    "kind": {
+      "CAPABILITY": "Feature",
+      "LOOK_FIELD": "Look",
+      "MODULE_PACK": "Module pack",
+      "LOCALE_LIMIT": "Languages"
+    },
+    "expired": "Expired",
+    "included": "Included in the plan",
+    "metaUntilRevoked": "{who} · {date} · Until revoked",
+    "metaExpires": "{who} · {date} · Expires {expiry}",
+    "metaExpired": "{who} · {date} · Expired {expiry}"
+  },
+  "usageCard": {
+    "title": "Usage",
+    "description": "What your plan includes and how much is used.",
+    "labels": {
+      "TAKEAWAYS": "AI takeaways this month",
+      "EMAILS": "Emails sent this month",
+      "SEATS": "Team seats",
+      "LANGUAGES": "Additional languages"
+    },
+    "links": {
+      "SEATS": "Team",
+      "LANGUAGES": "Languages"
+    },
+    "value": "<count>{used, number}</count> of {allowance, number}",
+    "failed": "Couldn't load this count. Reload the page to try again.",
+    "footer": {
+      "limits": "Your plan sets these limits.",
+      "plansLink": "See what each plan includes"
+    },
+    "notes": {
+      "TAKEAWAYS": {
+        "UNDER": "Resets on {date}",
+        "NEAR": "{percent}% used — {left, number} left<separator>·</separator><reset>Resets on {date}</reset>",
+        "FULL": "All used. New posts get no takeaways until {date}."
+      },
+      "EMAILS": {
+        "UNDER": "Resets on {date}",
+        "NEAR": "{percent}% used — {left, number} left<separator>·</separator><reset>Resets on {date}</reset>",
+        "FULL": "All used. New posts aren't emailed until {date}."
+      },
+      "SEATS": {
+        "UNDER": "Counts the owner, members and pending invites.",
+        "NEAR": "{left, plural, one {# seat left.} other {# seats left.}}",
+        "FULL": "All seats in use. Remove someone to invite another."
+      },
+      "LANGUAGES": {
+        "UNDER": "Your default language isn't counted.",
+        "NEAR": "{left, plural, one {# language left.} other {# languages left.}}",
+        "FULL": "All in use. Remove one to add another."
+      }
+    }
+  },
+  "revokeGrantControl": {
+    "revoke": {
+      "trigger": "Revoke",
+      "triggerAriaLabel": "Revoke {item}",
+      "title": "Revoke {item} for {tenant}",
+      "description": "{item} locks again from the next page load. What the tenant set up is kept, so granting it again restores it.",
+      "confirmButton": "Revoke",
+      "confirmingButton": "Revoking…",
+      "failed": "Couldn't revoke the grant — try again.",
+      "done": "{item} revoked."
+    },
+    "remove": {
+      "trigger": "Remove",
+      "triggerAriaLabel": "Remove grant {item}",
+      "title": "Remove {item} for {tenant}",
+      "description": "This grant has ended, so {item} is already locked. Removing it clears it from the list, so it can be granted again.",
+      "confirmButton": "Remove",
+      "confirmingButton": "Removing…",
+      "failed": "Couldn't remove the grant — try again.",
+      "done": "{item} removed."
+    }
+  },
+  "entitlementGrantErrors": {
+    "notFound": "This tenant no longer exists.",
+    "archived": "This tenant is archived, so its grants can't change.",
+    "comingSoon": "This feature isn't available yet, so it can't be granted.",
+    "alreadyGranted": "This is already granted.",
+    "expiryShortened": "The current language grant runs longer. Pick a later expiry, or revoke that grant first.",
+    "includedInPlan": "This is already included in the tenant's plan.",
+    "grantNotOpen": "This grant was already removed or has ended."
+  },
+  "teamPage": {
+    "title": "Team",
+    "description": "The people who write and publish this site's content with you in Studio.",
+    "seatsUsed": "{used} of {seats, plural, one {# seat} other {# seats}} used",
+    "inviteEditor": "Invite editor",
+    "seatLimitTitle": "Every seat is in use",
+    "seatLimitBody": "{plan} includes {seats, plural, one {# seat} other {# seats}}. Remove a member or cancel an invite to invite someone else.",
+    "thisMember": "this member",
+    "columnPerson": "Person",
+    "columnRole": "Role",
+    "columnStudioAccess": "Studio access",
+    "columnActions": "Actions",
+    "members": {
+      "title": "Members",
+      "count": "{count, plural, one {# person} other {# people}}",
+      "empty": "No one has joined this site yet.",
+      "you": "(you)",
+      "noEmail": "No email on file",
+      "joined": "Joined <time>{date}</time>",
+      "joinedToday": "Joined <time>today</time>",
+      "joinedWithRole": "Joined <time>{date}</time> · {role}",
+      "joinedTodayWithRole": "Joined <time>today</time> · {role}",
+      "noEditorsNoFreeSeats": "No editors yet. Every free seat is held by a pending invite.",
+      "noEditors": "No editors yet. Invite up to {free, plural, one {# person} other {# people}} to write and publish in Studio with you."
+    },
+    "invites": {
+      "title": "Pending invites",
+      "supportingText": "Each takes a seat until they join or you cancel it.",
+      "count": "{count, plural, one {# invite} other {# invites}}",
+      "invited": "Invited <time>{date}</time> · hasn't joined yet",
+      "invitedToday": "Invited <time>today</time> · hasn't joined yet",
+      "invitedWithRole": "Invited <time>{date}</time> · hasn't joined yet · {role}",
+      "invitedTodayWithRole": "Invited <time>today</time> · hasn't joined yet · {role}",
+      "studioAccess": "Starts once they join"
+    },
+    "studioAccess": {
+      "badge": {
+        "READY": "Ready",
+        "INVITE_SENT": "Invite sent",
+        "ACTIVATING": "Setting up…",
+        "STALLED": "Needs attention",
+        "LOCKED": "Locked"
+      },
+      "hint": {
+        "INVITE_SENT": "Waiting for them to accept the Studio invite",
+        "ACTIVATING": "Accepted — editing rights usually take a minute",
+        "STALLED": "Not accepted in 3 days, so we stopped checking",
+        "LOCKED": "Over your plan's seats"
+      },
+      "noAccess": "No Studio access"
+    },
+    "inviteDialog": {
+      "title": "Invite an editor",
+      "notice": "An editor can edit, publish and delete all of the site's content in Studio. They can't change its look, settings or billing.",
+      "emailLabel": "Email address",
+      "emailHint": "We'll email them a link to join. The invite takes a seat until they join.",
+      "emailPlaceholder": "name@example.com",
+      "cancel": "Cancel",
+      "send": "Send invite",
+      "sending": "Sending…",
+      "sent": "Invite sent to {email}.",
+      "failed": "Couldn't send the invite — try again.",
+      "fieldError": {
+        "EMAIL_INVALID": "Enter an email address, like name@example.com.",
+        "ALREADY_MEMBER": "{email} is already on the team.",
+        "ALREADY_INVITED": "{email} already has an invite waiting.",
+        "SEAT_LIMIT": "Every seat on {plan} is in use."
+      }
+    },
+    "remove": {
+      "trigger": "Remove",
+      "triggerAriaLabel": "Remove {email}",
+      "title": "Remove {email}?",
+      "description": "They lose access to this site's admin and to Studio straight away, and their seat is freed. The content they wrote stays on the site.",
+      "keep": "Keep member",
+      "confirm": "Remove member",
+      "confirming": "Removing…",
+      "done": "{email} was removed. Their Studio access is being revoked.",
+      "gone": "{email} is no longer on the team.",
+      "failed": "Couldn't remove {email} — try again.",
+      "self": "You can't remove yourself from the team.",
+      "lastOwner": "A site always keeps one owner, so {email} can't be removed."
+    },
+    "cancelInvite": {
+      "trigger": "Cancel invite",
+      "triggerAriaLabel": "Cancel invite to {email}",
+      "title": "Cancel the invite to {email}?",
+      "description": "The link in their email stops working and the seat is freed. You can invite them again later.",
+      "keep": "Keep invite",
+      "confirm": "Cancel invite",
+      "confirming": "Cancelling…",
+      "done": "The invite to {email} was cancelled.",
+      "gone": "That invite is no longer pending.",
+      "failed": "Couldn't cancel the invite — try again."
+    }
   }
 }

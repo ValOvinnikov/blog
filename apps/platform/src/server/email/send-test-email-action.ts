@@ -2,10 +2,10 @@
 
 import { EMAIL_TEST_LOG } from '@platform/constants/email-test';
 import { auth } from '@platform/server/auth/auth';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
 import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
-import { takeTestEmailSend } from '@platform/server/email/test-email-rate-limit';
+import { takeTestEmailSend } from '@platform/server/email/take-test-email-send';
 import {
   emailSenderInputSchema,
   emailTemplateCopyInputSchema,
@@ -38,11 +38,12 @@ export type TSendTestEmailInput = z.input<typeof sendTestEmailInputSchema>;
 export type TSendTestEmailResult =
   | Exclude<
       TActionResult<
-        typeof ACTION_OUTCOME.RATE_LIMITED | typeof ACTION_OUTCOME.SERVER_ERROR,
+        typeof ACTION_OUTCOME.SERVER_ERROR,
         keyof TSendTestEmailInput
       >,
       TOutcome<typeof ACTION_OUTCOME.SUCCESS>
     >
+  | { outcome: typeof ACTION_OUTCOME.RATE_LIMITED; retryAt: string }
   | { outcome: typeof ACTION_OUTCOME.SUCCESS; to: string };
 
 const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
@@ -60,22 +61,26 @@ export const sendTestEmailAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
   const session = await auth();
   const userId = session?.user?.id;
   const to = session?.user?.email;
   if (!userId || !to) return SERVER_ERROR;
-
-  if (!takeTestEmailSend(userId)) {
-    return toOutcome(ACTION_OUTCOME.RATE_LIMITED);
-  }
 
   const { templateType, sender } = parsed.data;
   const subject = parsed.data.copy.subject;
   const body = parsed.data.copy.body as TEmailTemplateBlock[];
 
   try {
-    const [brand, emailConfig, template, t] = await Promise.all([
+    const refusal = await takeTestEmailSend(userId);
+    if (refusal) {
+      return {
+        outcome: ACTION_OUTCOME.RATE_LIMITED,
+        retryAt: refusal.retryAt.toISOString(),
+      };
+    }
+
+    const [{ brand }, emailConfig, template, t] = await Promise.all([
       loadTenantEmailBrand(tenant.id),
       queries.emailConfig.getEmailConfig(tenant.id),
       queries.emailTemplates.getEmailTemplate(tenant.id, templateType),

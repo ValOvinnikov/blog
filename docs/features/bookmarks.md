@@ -20,7 +20,7 @@ epics: [5047, 2799]
 
 ## What it does
 
-A reader saves a post for later with a toggle in the post header and finds every saved post on `/bookmarks`, newest first. A bookmark is private: there is no public count and nobody else sees it. Saving and removing give a toast with Undo; a failed save offers Retry.
+A reader saves a post for later with a toggle in the post header and finds every saved post on `/bookmarks`, newest first. A bookmark is private: there is no public count and nobody else sees it. Saving and removing give a toast with Undo; a failed save offers Retry. A save from a page whose build is gone rolls back and shows the out-of-date notice instead (see [toasts](./toasts.md)).
 
 ## Surfaces and routes
 

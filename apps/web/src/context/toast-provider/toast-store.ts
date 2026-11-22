@@ -6,30 +6,22 @@ import {
 import { isString, isUndefined } from '@shinefold/utils/primitives';
 
 import {
+  resolvePayload,
   toPayloadFields,
   type IToastPayload,
+  type IToastPromiseMessages,
   type IToastRecord,
 } from './toast-record';
 
 /** Visible-slot cap — a 5th toast evicts the oldest non-error toast. */
 const TOAST_QUEUE_CAP = 4;
 
-/** Grace period before a pending `toast.promise` shows a `loading` toast. */
 const TOAST_PROMISE_GRACE_MS = 400;
 
-/** Counter-merge window for identical success/info toasts. */
 const TOAST_MERGE_WINDOW_MS = 1000;
 
 /** Exit-animation fallback before a `leaving` toast is actually removed. */
 const TOAST_EXIT_ANIMATION_MS = 360;
-
-type TToastPromiseMessage<T> = IToastPayload | ((value: T) => IToastPayload);
-
-export interface IToastPromiseMessages<T> {
-  loading: Pick<IToastPayload, 'title' | 'message'>;
-  success: TToastPromiseMessage<T>;
-  error: TToastPromiseMessage<unknown>;
-}
 
 export interface IToastQueueState {
   visible: IToastRecord[];
@@ -46,11 +38,6 @@ const EMPTY_STATE: IToastQueueState = { visible: [], pending: [] };
 
 let idCounter = 0;
 const generateId = () => `toast-${Date.now()}-${idCounter++}`;
-
-const resolvePayload = <T>(
-  message: TToastPromiseMessage<T>,
-  value: T,
-): IToastPayload => (typeof message === 'function' ? message(value) : message);
 
 const isMergeableType = (type: TToastType) =>
   type === TOAST_TYPE.SUCCESS || type === TOAST_TYPE.INFO;
@@ -343,6 +330,12 @@ export const createToastStore = () => {
       graceTimers.delete(graceTimeoutId);
       clearTimeout(graceTimeoutId);
 
+      if (payload.coalesceKey && findByCoalesceKey(payload.coalesceKey)) {
+        dismiss(id);
+        show(type, payload);
+        return;
+      }
+
       if (!shown) {
         enqueue(buildRecord(type, payload, Date.now()));
         return;
@@ -355,6 +348,7 @@ export const createToastStore = () => {
       patchRecord(id, (r) => ({
         ...r,
         ...fields,
+        coalesceKey: payload.coalesceKey,
         isLoading: false,
         paused: false,
         createdAt: Date.now(),

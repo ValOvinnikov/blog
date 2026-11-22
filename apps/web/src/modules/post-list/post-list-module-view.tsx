@@ -1,4 +1,6 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import type { TPostListModule } from '@shinefold/service';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
 import { Pagination } from '@shinefold/ui/components/organisms/pagination';
 import { hasLength } from '@shinefold/utils/primitives';
@@ -65,11 +67,10 @@ export const PostListModuleView = ({
         id={titleId}
         level={2}
         align={contentAlignment}
-        variant="section"
       />
       {children ? <div className={v.leadIn()}>{children}</div> : null}
       {isEmpty ? (
-        <p className={v.emptyMessage()}>{emptyMessage}</p>
+        <Text textRole={TEXT_ROLE.CARD_BODY}>{emptyMessage}</Text>
       ) : (
         <CardGrid columns={toCardGridColumns(grid.columns)}>
           {items.map((item) => (

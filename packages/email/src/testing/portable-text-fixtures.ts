@@ -2,6 +2,29 @@ import type { TPortableTextNode } from '@shinefold/email/portable-text';
 
 const LINK_KEY = 'linked-link';
 
+let keySeq = 0;
+function nextKey(prefix: string): string {
+  return `${prefix}-${String(keySeq++)}`;
+}
+
+export function mockPortableTextSpan(
+  text: string,
+  marks: string[] = [],
+): TPortableTextNode {
+  return { _type: 'span', _key: nextKey('span'), text, marks };
+}
+
+export function mockPortableTextBlock<TBlock = TPortableTextNode>(
+  overrides: Record<string, unknown> = {},
+): TBlock {
+  return {
+    _type: 'block',
+    _key: nextKey('block'),
+    style: 'normal',
+    ...overrides,
+  } as TBlock;
+}
+
 export function mockPortableTextBody(text: string): TPortableTextNode[] {
   return [
     {

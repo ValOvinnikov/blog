@@ -1,16 +1,16 @@
+import {
+  COOKIE_STATEMENT_SLUG,
+  NEWSLETTER_RESULT_SLUGS,
+  PLAN_COMPARISON_ANCHOR_ID,
+  type TLegalPageKind,
+  type TLocaleIsoCode,
+  type TNewsletterResult,
+} from '@shinefold/config/constants';
 import type {
   TMaybeNull,
   TMaybeUndefined,
   TNullable,
 } from '@shinefold/config/types';
-
-import {
-  COOKIE_STATEMENT_SLUG,
-  NEWSLETTER_RESULT_SLUGS,
-  type TLegalPageKind,
-  type TLocaleIsoCode,
-  type TNewsletterResult,
-} from '@shinefold/config/constants';
 
 const toNewsletterLinkQuery = (token: string, locale?: TLocaleIsoCode) => {
   const tokenQuery = `token=${encodeURIComponent(token)}`;
@@ -31,6 +31,7 @@ export const routes = {
   account: () => '/account',
   /** A Route Handler, not a page, so it's outside `[locale]`. */
   accountExport: () => '/api/account/export',
+  signInError: () => '/api/sign-in-error',
   newsletterConfirm: (token: string, locale?: TLocaleIsoCode) =>
     `/api/newsletter/confirm?${toNewsletterLinkQuery(token, locale)}`,
   newsletterUnsubscribe: (token: string, locale?: TLocaleIsoCode) =>
@@ -42,6 +43,9 @@ export const routes = {
   newsletterUnsubscribeConfirmation: () => '/newsletter/unsubscribe',
   newsletterResult: (result: TNewsletterResult) =>
     `/newsletter/${NEWSLETTER_RESULT_SLUGS[result]}`,
+  newsletterPostSendStatus: () => '/api/studio/newsletter-post/status',
+  newsletterPostTestSend: () => '/api/studio/newsletter-post/test-send',
+  newsletterPostSendNow: () => '/api/studio/newsletter-post/send-now',
   landingPage: (slug: string) => `/${slug}`,
   privacyDocument: (slug: string) => `/privacy/${slug}`,
   legalDocument: (slug: string) => `/legal/${slug}`,
@@ -53,7 +57,11 @@ export const routes = {
     `/api/switch-language?${new URLSearchParams({ to, from }).toString()}`,
   rssFeed: () => '/rss.xml',
   tagRssFeed: (slug: string) => `${routes.tag(slug)}/rss.xml`,
+  pricingComparison: () => `/pricing#${PLAN_COMPARISON_ANCHOR_ID}`,
 } as const;
+
+export const pricingPageUrl = (marketingSiteUrl: string) =>
+  new URL(routes.pricingComparison(), marketingSiteUrl).href;
 
 const PAGE_HREF_BUILDERS = {
   page_home: () => routes.home(),

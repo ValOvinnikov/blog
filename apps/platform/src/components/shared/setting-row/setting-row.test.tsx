@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { LockedReason } from '@platform/components/shared/locked-reason';
 import { Switch } from '@platform/components/shared/switch';
 import { ICON_TEST_ID } from '@platform/constants/icon';
 import { ARIA_HIDDEN } from '@platform/testing/aria';
@@ -15,6 +16,7 @@ faker.seed(5995);
 const MOCK_LABEL = faker.lorem.words(2);
 const MOCK_DESCRIPTION = faker.lorem.sentence();
 const MOCK_LOCKED_REASON = faker.lorem.sentence();
+const MOCK_ERROR = faker.lorem.sentence();
 const MOCK_CONTROL_LABEL = faker.lorem.word();
 const MOCK_ARCHIVED_NOTICE_ID = faker.string.alpha(8);
 const MOCK_ARCHIVED_NOTICE = faker.lorem.sentence();
@@ -43,36 +45,30 @@ describe(`<${SettingRow.name}/>`, () => {
     expect(control).toBeVisible();
   });
 
-  it('shows the locked reason when locked', () => {
-    setup({ isLocked: true, lockedReason: MOCK_LOCKED_REASON });
+  it('shows the error it is given', () => {
+    setup({ error: MOCK_ERROR });
 
-    const lockedReason = screen.getByText(MOCK_LOCKED_REASON);
+    const error = screen.getByText(MOCK_ERROR);
 
-    expect(lockedReason).toBeVisible();
+    expect(error).toBeVisible();
   });
 
-  it('shows a decorative lock icon beside the locked reason', () => {
-    setup({ isLocked: true, lockedReason: MOCK_LOCKED_REASON });
+  describe('with a locked reason as its status', () => {
+    beforeEach(() => {
+      setup({ status: <LockedReason>{MOCK_LOCKED_REASON}</LockedReason> });
+    });
 
-    const lockIcon = screen.getByTestId(ICON_TEST_ID);
+    it('shows the status it is given', () => {
+      const lockedReason = screen.getByText(MOCK_LOCKED_REASON);
 
-    expect(lockIcon).toHaveAttribute(ARIA_HIDDEN, 'true');
-  });
+      expect(lockedReason).toBeVisible();
+    });
 
-  it('omits the locked reason when not locked, even if one is passed', () => {
-    setup({ lockedReason: MOCK_LOCKED_REASON });
+    it('shows a decorative lock icon beside the locked reason', () => {
+      const lockIcon = screen.getByTestId(ICON_TEST_ID);
 
-    const lockedReason = screen.queryByText(MOCK_LOCKED_REASON);
-
-    expect(lockedReason).not.toBeInTheDocument();
-  });
-
-  it('omits the reason row when locked but no reason is given', () => {
-    setup({ isLocked: true });
-
-    const lockIcon = screen.queryByTestId(ICON_TEST_ID);
-
-    expect(lockIcon).not.toBeInTheDocument();
+      expect(lockIcon).toHaveAttribute(ARIA_HIDDEN, 'true');
+    });
   });
 
   it('adds its description and locked reason to the switch description', () => {
@@ -82,8 +78,7 @@ describe(`<${SettingRow.name}/>`, () => {
         <SettingRow
           label={MOCK_LABEL}
           description={MOCK_DESCRIPTION}
-          isLocked={true}
-          lockedReason={MOCK_LOCKED_REASON}
+          status={<LockedReason>{MOCK_LOCKED_REASON}</LockedReason>}
         >
           <Switch
             aria={{

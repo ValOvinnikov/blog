@@ -8,20 +8,15 @@ import {
   PLAN_CHANGE_TIMING,
   type TPlanChoice,
 } from '@platform/constants/plan-change';
+import { STRIPE_PAYMENT_INTENT_STATUS } from '@platform/constants/stripe-payment';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures';
+import { MOCK_PAYMENT_CLIENT_SECRET } from '@platform/testing/billing/fixtures';
+import { mockPayingSiteContext } from '@platform/testing/billing/paying-site';
 import { MOCK_GROWTH_MONTHLY_CHOICE } from '@platform/testing/billing/plan-choices';
-import { mockStripePlanChangeClient } from '@platform/testing/billing/stripe-plan-change-client';
-import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
+import { mockStripeClientWithSubscription } from '@platform/testing/billing/stripe-plan-change-client';
 import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
-import {
-  mockMembership,
-  mockMembershipContext,
-} from '@platform/testing/memberships/fixtures';
-import {
-  MOCK_TENANT_ID,
-  mockReadyTenant,
-} from '@platform/testing/tenants/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { ACTION_OUTCOME, HTTP_STATUS } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
@@ -32,44 +27,26 @@ import {
 import Stripe from 'stripe';
 
 import { changePlanAction } from './change-plan-action';
-import { getStripeClient } from './stripe-client';
 
 vi.mock('@platform/server/auth/require-tenant-membership');
 
 vi.mock('./stripe-client');
 
-const MOCK_PAYING_SITE = {
-  plan: TENANT_PLAN.STARTER,
-  stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
-};
-
-const siteFor = (
-  tenant: Parameters<typeof mockReadyTenant>[0] = MOCK_PAYING_SITE,
-  membership = mockMembership(),
-) =>
-  mockMembershipContext(
-    mockReadyTenant({ id: MOCK_TENANT_ID, ...tenant }),
-    membership,
-  );
-
 const withSubscription = (
-  overrides: Partial<Parameters<typeof mockStripeSubscription>[0]> = {},
-) => {
-  const client = mockStripePlanChangeClient(
-    mockStripeSubscription({
-      lookupKeys: [STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY],
-      ...overrides,
-    }),
-  );
-  vi.mocked(getStripeClient).mockReturnValue(client.stripe);
-  return client;
-};
+  overrides: Parameters<typeof mockStripeClientWithSubscription>[0] = {},
+) =>
+  mockStripeClientWithSubscription({
+    lookupKeys: [STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY],
+    ...overrides,
+  });
 
 describe(changePlanAction, () => {
   let client: ReturnType<typeof withSubscription>;
 
   beforeEach(() => {
-    vi.mocked(requireTenantMembership).mockResolvedValue(siteFor());
+    vi.mocked(requireTenantMembership).mockResolvedValue(
+      mockPayingSiteContext(),
+    );
     client = withSubscription();
   });
 
@@ -87,10 +64,15 @@ describe(changePlanAction, () => {
   });
 
   it.each([
-    ['a Free site', {}, mockMembership(), PLAN_CHANGE_REFUSAL.NOT_SUBSCRIBED],
+    [
+      'a Free site',
+      { plan: TENANT_PLAN.FREE, stripeSubscriptionId: null },
+      mockMembership(),
+      PLAN_CHANGE_REFUSAL.NOT_SUBSCRIBED,
+    ],
     [
       'a member who is not the owner',
-      MOCK_PAYING_SITE,
+      {},
       mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
       UPGRADE_STATE.NOT_OWNER,
     ],
@@ -98,7 +80,7 @@ describe(changePlanAction, () => {
     'refuses %s without calling Stripe',
     async (_case, tenant, membership, reason) => {
       vi.mocked(requireTenantMembership).mockResolvedValueOnce(
-        siteFor(tenant, membership),
+        mockPayingSiteContext(tenant, membership),
       );
       const result = await changePlanAction(
         MOCK_TENANT_ID,
@@ -137,6 +119,36 @@ describe(changePlanAction, () => {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {},
     });
+  });
+
+  it("hands back the payment's client secret when the bank asks for a step", async () => {
+    client.holdForPayment(STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_ACTION);
+
+    const result = await changePlanAction(
+      MOCK_TENANT_ID,
+      MOCK_GROWTH_MONTHLY_CHOICE,
+    );
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      timing: PLAN_CHANGE_TIMING.NOW,
+      clientSecret: MOCK_PAYMENT_CLIENT_SECRET,
+    });
+  });
+
+  it('says the card was declined when the payment needs another card', async () => {
+    client.holdForPayment(STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_PAYMENT_METHOD);
+
+    const result = await changePlanAction(
+      MOCK_TENANT_ID,
+      MOCK_GROWTH_MONTHLY_CHOICE,
+    );
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: PLAN_CHANGE_REFUSAL.CARD_DECLINED,
+    });
+    expect(vi.mocked(logger).error).not.toHaveBeenCalled();
   });
 
   it.each([

@@ -42,7 +42,7 @@ A section of the questions a visitor asks before getting in touch, each a disclo
 
 - **Editors** write FAQ Items under Blocks → FAQs and assemble them in FAQ modules. Question and answer are per language.
 - **Look** reaches the module through tokens (fonts, band spacing, accent, card style, radius, density); Voice does not reach FAQ copy.
-- **Section overrides:** on Growth, the module's card style, corners and density overrides win over the Look for its own band, restyling its accordion rows through `Section`'s scoped tokens; accordions in rich text and in other sections keep the Look. Below Growth the overrides have no effect: the plan gate (`gateSectionStyleOverrides`) drops each one `isLookFieldEntitled` does not grant ([plans-and-entitlements](./plans-and-entitlements.md)). With none set, the section renders unchanged.
+- **Section overrides:** on Growth, the module's card style, corners and density overrides win over the Look for its own band, restyling its accordion rows through `Section`'s scoped tokens; accordions in rich text and in other sections keep the Look. Below Growth the overrides have no effect: the plan gate (`gateSectionStyleOverrides`) drops each one `isLookFieldWithin` does not grant ([plans-and-entitlements](./plans-and-entitlements.md)). With none set, the section renders unchanged.
 - **Plans:** the module itself is not gated.
 
 ## Constraints and invariants
@@ -82,4 +82,4 @@ A section of the questions a visitor asks before getting in touch, each a disclo
 
 - #4987 — accessible text and colour: #5011 (answers space their paragraphs and lists).
 - #5028 — text roles: #5032 (the question takes ITEM_TITLE), #5034 (the answer takes the card-body role).
-- #5016 — one-entry skins: the Background field lists the skin registry (#5019) and `Section` renders its skin (#5022).
+- #5016 — one-entry skins: the Background field lists the skin registry (#5019).

@@ -3,9 +3,10 @@ import {
   type TLocaleIsoCode,
   type TMaybeNull,
 } from '@shinefold/config';
-import { queries } from '@shinefold/db';
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { routing } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import { selectTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { logger } from '@web/utils/logger/logger';
 
 export type TNewsletterLinkLocale = {
@@ -27,14 +28,14 @@ export const resolveNewsletterLinkLocale = async (
     if (!tenant) return FALLBACK_LINK_LOCALE;
 
     const { locale: defaultLocale } = tenant;
-    const liveLocales = queries.tenants.selectLiveLocales(tenant);
+    const liveLocales = await selectTenantLiveLocales(tenant);
     const locale =
       lang && isLocaleIsoCode(lang) && liveLocales.includes(lang)
         ? lang
         : defaultLocale;
     return { locale, defaultLocale };
   } catch (error) {
-    logger.warn('newsletter.link_locale_tenant_lookup_failed', { error });
+    logger.warn(NEWSLETTER_LOG.LINK_LOCALE_TENANT_LOOKUP_FAILED, { error });
     return FALLBACK_LINK_LOCALE;
   }
 };

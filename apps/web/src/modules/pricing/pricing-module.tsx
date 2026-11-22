@@ -16,11 +16,14 @@ export interface IPricingModuleProps {
   id: string;
 }
 
+const hasLinkedTier = (tiers: TPricingTier[]): boolean =>
+  tiers.some((tier) => tier.platformPlan);
+
 const getLinkedPlanPrices = async (
   id: string,
   tiers: TPricingTier[],
 ): Promise<TStripePrice[]> => {
-  if (!tiers.some((tier) => tier.platformPlan)) return [];
+  if (!hasLinkedTier(tiers)) return [];
   const result = await getPlanPrices();
   if (result.ok) return result.data;
   logger.error(PRICING_LOG.PLAN_PRICES_FETCH_FAILED, {
@@ -89,6 +92,7 @@ export const PricingModule = async ({ id }: IPricingModuleProps) => {
       ctaButtons={ctaButtons}
       contentAlignment={contentAlignment}
       panels={panels}
+      hasPlanComparison={hasLinkedTier(tiers)}
       titleId={`pricing-${id}`}
       dataTestId={`pricing-module-${id}`}
     />

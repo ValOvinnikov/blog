@@ -116,6 +116,12 @@ from `useSettingsFormState()`:
   the Tab order as `aria-disabled`; `isDisabled` is for a state with nothing
   to explain (→ `react-component-practices` § Accessible by construction).
   A `Button` blocked for a reason takes `isAriaDisabled`.
+- A locked choice control (segmented control, tile group, select) greys its
+  text as well as its ground: the picked option or closed value in
+  `text-platform-muted`, the rest and a select's chevron in
+  `text-platform-faint`. Only `lock.isLocked` greys; an archived site passes
+  `isDisabled` and keeps the disabled fade, so a caller never folds archived
+  into `isLocked`.
 - `lockReason` is `undefined` or the translated reason the switch can't be
   used, set for every cause other than saving or archiving (not on the plan, the
   plan's limit reached, another setting off), each with its own key: no row is
@@ -166,8 +172,12 @@ from `useSettingsFormState()`:
   `block text-platform-12 text-platform-muted`.
 - A translated label on every column (`sr-only` for actions), `<time dateTime>`
   for dates, `emptyMessage` for the empty list. `ariaLabel`, the page's title,
-  names the scroll region. A mode the shell lacks (a card title) goes into the
-  shell, kept in the empty state, never a hand-built `<table>`.
+  names the scroll region. A card title with its count
+  (`DataTableShell.Title`), a filter strip (`DataTableShell.Toolbar`) and a
+  note under the rows (`DataTableShell.Note`) are the shell's own opt-in
+  parts, kept in the empty state; a column's `width` (px or %) fixes the
+  table's columns and narrows the gap between them to 16px. A mode the shell still lacks goes into it, never a
+  hand-built `<table>`.
 
 ### Editing a shared primitive
 
@@ -211,9 +221,11 @@ from `useSettingsFormState()`:
   `RailIntro` is the page's only `<h1>`. Choices are visible light-surface
   link rows in one `Card`, none pre-selected. Dead-end pages (404, error,
   sign-in error) use `DeadEndView` on `CenteredCardFrame`.
-- The Studio route is full-bleed in every state, and is the only route that
-  is: neither `ShellFrame` nor `StudioMountView` adds padding around the
-  mounted Studio or its archived and not-provisioned states.
+- The Studio route is full-bleed only while the Studio is mounted: neither
+  `ShellFrame` nor `StudioMountView` adds padding around it. Every state that
+  shows a page instead — the owner's pending access (`OwnerStudioAccessView`)
+  and `StudioMountView`'s archived and not-provisioned states — takes the
+  content column's padding itself (`@platform/utils/content-column-classes`).
 
 ## Cards
 
@@ -309,18 +321,28 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
   track, menu triggers. `border-platform-line` (1.24:1) is decorative structure
   only: card borders, dividers, the dashed upload box.
 - **Selected is one rule per family**, from
-  `@platform/utils/selected-choice-classes/selected-choice-classes`. A
-  compact control (segment, toolbar toggle, solo, chip, menu radio, view
-  tab) is solid `bg-platform-selected text-platform-on-selected` with a
-  `selected-edge` border or inset ring (`SELECTED_COMPACT_CHOICE_CLASSES`
-  for a bordered chip); a tile takes `SELECTED_CHOICE_CLASSES` and a tick
-  `SELECTED_TICK_CLASSES`; a row takes `SELECTED_ROW_CLASSES`. Yellow on
-  white is 1.61:1, so in Light every yellow mark carries its 3:1 on a
-  near-black part: the `selected-edge` (transparent in Dark, where yellow
-  passes alone), a tile's hairline, a switch's thumb. Three yellow marks
-  stay below 3:1 in Light, and a bold near-black label carries their state:
-  the sidebar's current-row bar (with its raised plate), and the underline
-  under the current underline tab and desktop jump index entry.
+  `@platform/utils/selected-choice-classes/selected-choice-classes`. Every
+  picked control (segment, toolbar toggle, solo, chip, menu radio, view tab,
+  switch track, current phone jump chip) fills with `bg-platform-selected-tint
+text-platform-text` and a `selected-edge` border or inset ring
+  (`SELECTED_COMPACT_FILL_CLASSES`, `SELECTED_COMPACT_CHOICE_CLASSES` for a
+  bordered chip); a tile takes `SELECTED_CHOICE_CLASSES`; a selected row takes
+  `SELECTED_ROW_CLASSES` (the tint, a full-height `selected-line` stripe and
+  a 1px `selected-edge` frame). Only small marks keep the strong
+  `bg-platform-selected`: a tick (`SELECTED_TICK_CLASSES`), a radio dot
+  (`SELECTED_MARK_FILL_CLASSES`) and a checked checkbox, whose own
+  `data-[checked]:` classes use the same tokens. An open accordion row is not
+  selected: its title row takes the card header's `surface-head`, with no
+  frame, and the item carries the stripe (`SELECTED_STRIPE_CLASSES`) down the
+  title and the open panel. Neither tint reaches 3:1 on its ground, so every
+  picked control carries its 3:1 on the `selected-edge`: near-black in Light
+  (the light tint on white is 1.29:1) and amber `#ffc233` in Dark (the dark tint on
+  the card is about 1.6:1). A tile adds its hairline, and a switch its thumb
+  (yellow in Dark, so it shows on the dark tint). Three yellow marks stay below 3:1 in Light, and a
+  bold near-black label carries their state: the sidebar's current-row bar
+  (with its raised plate), and the 2px underline under the current
+  underline tab and desktop jump index entry (on the jump index, a straight
+  bar inside the link's padding).
   Every selected item also announces itself as pressed, checked, selected
   or current.
 - **Hover is one rule per kind of control.** A primary button darkens to
@@ -330,9 +352,10 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
   `hover:bg-platform-hover-tint` at every width, never `lg:`-only. Only a
   secondary button, an unchecked checkbox and the upload drop area also
   turn their border `brand-ink`. A field or select changes only its border.
-  Hover and selected never share a fill: the selected lead, preset and
-  current top-bar menu rows and the open accordion row fill with
-  `selected-tint`, a step stronger than the hover tint. Rows
+  Hover and selected never share a fill: picked controls and the selected
+  lead, preset and current top-bar menu rows fill with `selected-tint`, a
+  step stronger than the hover tint. A folded accordion row hovers to
+  `hover-tint`; an open one keeps its `surface-head` ground. Other rows
   (tables, lists, menus, the sidebar) keep their grey hover. Gate the hover so a selected, pressed, checked, current, open,
   disabled or locked control does not change (`not-data-[pressed]:`,
   `not-aria-disabled:`, or the `isSelected: false` variant). A caller that
@@ -533,7 +556,7 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
   - A page under a gated layout takes the tenant from the layout's cached
     resolver.
   - Never query again for a row you already have. Derive from it, for example
-    `queries.tenants.selectLiveLocales(tenant)`.
+    `queries.tenants.selectLiveLocalesWithin(tenant, tenant.entitlements)`.
   - Next does not dedupe a `fetch` that passes `signal`, which includes every
     call using `AbortSignal.timeout`. Make one external request serve everything
     a page needs from it.
@@ -593,11 +616,21 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
   `role="tabpanel"` below `lg` only. A page whose tabbed layout follows its
   content width instead passes `useViewTabs({ isTabbed })`, and the tabs and
   roles follow that. Voice keeps its per-card preview toggle.
-- A dialog keeps a 16px gutter (`w-[calc(100%-2rem)] max-w-md`), which
-  `AlertDialogShell` owns for `ConfirmDialog` and `LeavePageDialog`.
+- A dialog sits at the bottom of the screen, 16px from the sides and bottom,
+  its footer buttons full width and stacked with the primary or danger one on
+  top; from `md` up it is centred at `max-w-md`. `AlertDialogShell` owns this
+  for `ConfirmDialog` and `LeavePageDialog`, and the shared `Dialog` shares its
+  classes.
 - Tables scroll sideways inside their card, and fact lists stack the term above
-  the value below `md`. `DataTableShell` and `DetailList` own both; never
-  add them per page.
+  the value below `md`. A table may opt into stacked rows instead
+  (`DataTableShell`'s `isStacked`: head row hidden, each cell named by its
+  column for screen readers, empty cells not rendered). A stacked table
+  passes each `Cell` its `column` key and keeps a conditional cell at the
+  `Cell` level (`{x && <Cell>}`), since a cell holding a component that
+  renders `null` is not empty; a cell whose value moves elsewhere in the
+  stacked row takes `isHiddenWhenStacked`); one that sorts from its head row
+  never does.
+  `DataTableShell` and `DetailList` own all of this; never add it per page.
 - A Desktop/Mobile preview toggle is offered only where it changes what renders;
   an email's Desktop preview is a real 600px frame.
 - Check in a browser at the manual-test matrix's 390, 820 and 1280px
@@ -705,7 +738,7 @@ of them:
 | `isArchived` + `archivedNoticeId` passed to every card under `SettingsFormShell`                                 | `useSettingsFormState()` in each card                                                                                             |
 | `const a = await x(); const b = await y();` where `y` doesn't use `a`                                            | `const [a, b] = await Promise.all([x(), y()])`                                                                                    |
 | `auth()` called directly, or a tenant query repeated in a layout or page                                         | The `cache()`-wrapped resolver: `getSession`, `requireAdmin`, `requireTenantById`, `resolveDashboardTenant`, `listSessionTenants` |
-| `queries.tenants.getX(tenant.id)` when `tenant` is already in hand                                               | Derive it from the row, e.g. `queries.tenants.selectLiveLocales(tenant)`                                                          |
+| `queries.tenants.getX(tenant.id)` when `tenant` is already in hand                                               | Derive it from the row, e.g. `queries.tenants.selectLiveLocalesWithin(tenant, tenant.entitlements)`                               |
 | Awaiting a slow external call (the Vercel API) in a page's top-level `Promise.all`                               | An async section inside `<Suspense>`, fallback `Skeleton`                                                                         |
 | Loading data that only a closed Disclosure, Menu or inactive tab shows                                           | A Server Action called on first open with a `Spinner`, or a route segment per tab                                                 |
 | `tenant={row}` or `hrefFor={() => …}` passed to a `'use client'` component                                       | A server-side projection of only the fields it renders, with hrefs computed on the server                                         |

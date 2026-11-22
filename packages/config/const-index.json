@@ -174,6 +174,12 @@
         "file": "apps/platform/src/constants/billing.ts"
       },
       {
+        "ref": "DRAFT_PREVIEW_REFUSAL.UNAVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      },
+      {
         "ref": "SITE_ADDRESS_STATUS.UNAVAILABLE",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -292,6 +298,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/analytics-provider.ts"
+      },
+      {
+        "ref": "COOKIE_ID.GOOGLE_ANALYTICS",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
     "PLAUSIBLE": [
@@ -375,6 +387,14 @@
     "PERSONAL_DATA": [
       {
         "ref": "AUDIT_TARGET_TYPE.PERSONAL_DATA",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "TEAM_MEMBER": [
+      {
+        "ref": "AUDIT_TARGET_TYPE.TEAM_MEMBER",
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
@@ -602,6 +622,46 @@
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
+    "MEMBER_INVITED": [
+      {
+        "ref": "AUDIT_ACTION.MEMBER_INVITED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "MEMBER_REMOVED": [
+      {
+        "ref": "AUDIT_ACTION.MEMBER_REMOVED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "MEMBER_INVITE_CANCELLED": [
+      {
+        "ref": "AUDIT_ACTION.MEMBER_INVITE_CANCELLED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "ENTITLEMENT_GRANTED": [
+      {
+        "ref": "AUDIT_ACTION.ENTITLEMENT_GRANTED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "ENTITLEMENT_REVOKED": [
+      {
+        "ref": "AUDIT_ACTION.ENTITLEMENT_REVOKED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
     "SITE": [
       {
         "ref": "AUTH_APP.SITE",
@@ -636,6 +696,22 @@
         "file": "packages/config/src/constants/email-account.ts"
       }
     ],
+    "MONTHLY": [
+      {
+        "ref": "BILLING_INTERVAL.MONTHLY",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/billing-interval.ts"
+      }
+    ],
+    "YEARLY": [
+      {
+        "ref": "BILLING_INTERVAL.YEARLY",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/billing-interval.ts"
+      }
+    ],
     "DOT": [
       {
         "ref": "BRAND_TAGLINE_SEPARATORS.DOT",
@@ -658,6 +734,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/brand-tagline.ts"
+      },
+      {
+        "ref": "SUMMARY_BLOCK_STYLE.BULLET",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
       }
     ],
     "SLASH": [
@@ -674,6 +756,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/busy-button.ts"
+      },
+      {
+        "ref": "TEXT_ROLE.LABEL",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
       }
     ],
     "KEPT": [
@@ -770,6 +858,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.READER_ACCOUNTS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
       }
     ],
     "COMMENTS": [
@@ -810,6 +904,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
+      },
+      {
+        "ref": "CONSENT_CATEGORY.ANALYTICS",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/consent-category.ts"
       }
     ],
     "CONSENT_BANNER": [
@@ -826,6 +926,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/capability.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.CONTACT_FORM",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
       }
     ],
     "WIDE": [
@@ -1238,12 +1344,62 @@
         "file": "packages/config/src/constants/email-type.ts"
       }
     ],
+    "INVITE": [
+      {
+        "ref": "EMAIL_TYPE.INVITE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/email-type.ts"
+      },
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
     "NEWSLETTER_ISSUE": [
       {
         "ref": "EMAIL_TYPE.NEWSLETTER_ISSUE",
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/email-type.ts"
+      }
+    ],
+    "NORMAL": [
+      {
+        "ref": "EMAIL_USAGE_LEVEL.NORMAL",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/email-usage-level.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SEND_PACE.NORMAL",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "NEAR": [
+      {
+        "ref": "EMAIL_USAGE_LEVEL.NEAR",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/email-usage-level.ts"
+      },
+      {
+        "ref": "USAGE_LEVEL.NEAR",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
+    "OVER": [
+      {
+        "ref": "EMAIL_USAGE_LEVEL.OVER",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/email-usage-level.ts"
       }
     ],
     "YOUTUBE": [
@@ -1381,6 +1537,22 @@
     "DB_DOMAIN_CLAIM_EXISTS": [
       {
         "ref": "ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
+    "DB_ENTITLEMENT_ALREADY_GRANTED": [
+      {
+        "ref": "ERROR_CODE.DB_ENTITLEMENT_ALREADY_GRANTED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
+    "DB_ENTITLEMENT_EXPIRY_SHORTENED": [
+      {
+        "ref": "ERROR_CODE.DB_ENTITLEMENT_EXPIRY_SHORTENED",
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/error.ts"
@@ -1546,6 +1718,18 @@
         "scope": "app:platform",
         "from": "@platform/constants/button",
         "file": "apps/platform/src/constants/button.ts"
+      },
+      {
+        "ref": "SAMPLE_KIND.LINK",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
+      },
+      {
+        "ref": "PROVIDER_LINK_ACTION.LINK",
+        "scope": "app:web",
+        "from": "@web/constants/provider-link",
+        "file": "apps/web/src/constants/provider-link.ts"
       }
     ],
     "COOKIE_SETTINGS": [
@@ -1870,6 +2054,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-methods.ts"
+      },
+      {
+        "ref": "SAMPLE_KIND.POST",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       }
     ],
     "PUT": [
@@ -2128,6 +2318,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "COOKIE_PROVIDER.GOOGLE",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
     "BOOKMARK": [
@@ -2260,6 +2456,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "TEXT_ROLE.QUOTE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
       }
     ],
     "GLOBE": [
@@ -2726,12 +2928,26 @@
         "file": "packages/config/src/constants/layout.ts"
       }
     ],
+    "INK": [
+      {
+        "ref": "BRAND_VARIANT.INK",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/layout.ts"
+      }
+    ],
     "NONE": [
       {
         "ref": "SPACING_SCALE.NONE",
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SEND_STATUS.NONE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
       },
       {
         "ref": "RADIUS_SCALE.NONE",
@@ -2876,6 +3092,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/module.ts"
+      },
+      {
+        "ref": "USAGE_LEVEL.FULL",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
       }
     ],
     "LEFT": [
@@ -2968,6 +3190,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-suspension.ts"
+      },
+      {
+        "ref": "SAMPLE_KIND.OTHER",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       }
     ],
     "INTERNAL": [
@@ -3124,6 +3352,136 @@
         "file": "apps/platform/src/constants/view-tabs.ts"
       }
     ],
+    "SCHEDULED": [
+      {
+        "ref": "NEWSLETTER_SEND_STATUS.SCHEDULED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      },
+      {
+        "ref": "NEWSLETTER_POST_STATE.SCHEDULED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      },
+      {
+        "ref": "SCHEDULED_POST_STATE.SCHEDULED",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post",
+        "file": "apps/worker/src/constants/scheduled-post.ts"
+      }
+    ],
+    "SENDING": [
+      {
+        "ref": "NEWSLETTER_SEND_STATUS.SENDING",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "SENT": [
+      {
+        "ref": "NEWSLETTER_SEND_STATUS.SENT",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      },
+      {
+        "ref": "NEWSLETTER_POST_SEND_OUTCOME.SENT",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SUBSCRIBER_SEND.SENT",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "SKIPPED": [
+      {
+        "ref": "NEWSLETTER_SEND_STATUS.SKIPPED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      },
+      {
+        "ref": "NEWSLETTER_POST_SEND_OUTCOME.SKIPPED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      },
+      {
+        "ref": "NEWSLETTER_POST_STATE.SKIPPED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SEND_GATE.SKIPPED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "NOT_ELIGIBLE": [
+      {
+        "ref": "NEWSLETTER_SEND_NOW_REFUSAL.NOT_ELIGIBLE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "OVER_BAND": [
+      {
+        "ref": "NEWSLETTER_SEND_NOW_REFUSAL.OVER_BAND",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "OVER_MONTH": [
+      {
+        "ref": "NEWSLETTER_SEND_NOW_REFUSAL.OVER_MONTH",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "ALREADY_SENT": [
+      {
+        "ref": "NEWSLETTER_SEND_NOW_REFUSAL.ALREADY_SENT",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "SEND_FAILED": [
+      {
+        "ref": "NEWSLETTER_SEND_NOW_REFUSAL.SEND_FAILED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "FORBIDDEN": [
+      {
+        "ref": "NEWSLETTER_SEND_NOW_REFUSAL.FORBIDDEN",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
+    "INVALID_FIELDS": [
+      {
+        "ref": "NEWSLETTER_TEST_SEND_REFUSAL.INVALID_FIELDS",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-post-send.ts"
+      }
+    ],
     "WARN": [
       {
         "ref": "NEWSLETTER_REPUTATION_ALERT_LEVEL.WARN",
@@ -3226,6 +3584,76 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/newsletter-result.ts"
+      }
+    ],
+    "OVER_SUBSCRIBER_BAND": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      }
+    ],
+    "OVER_MONTHLY_ALLOWANCE": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      }
+    ],
+    "REPUTATION_STOP": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.REPUTATION_STOP",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      }
+    ],
+    "SITE_PAUSED": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.SITE_PAUSED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      }
+    ],
+    "NOT_IN_PLAN": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.NOT_IN_PLAN",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      },
+      {
+        "ref": "SETTINGS_REFUSAL.NOT_IN_PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings",
+        "file": "apps/platform/src/constants/settings.ts"
+      }
+    ],
+    "SITE_INACTIVE": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.SITE_INACTIVE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      }
+    ],
+    "NEWSLETTER_OFF": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.NEWSLETTER_OFF",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
+      }
+    ],
+    "SENDING_OFF": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.SENDING_OFF",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/newsletter-skip-reason.ts"
       }
     ],
     "DYNAMIC_SERVER_USAGE": [
@@ -3336,6 +3764,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/portable-text-block-type.ts"
+      },
+      {
+        "ref": "ARIA_ROLE.TABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
       }
     ],
     "CONSOLE": [
@@ -3604,6 +4038,14 @@
         "file": "packages/config/src/constants/sanity-perspective.ts"
       }
     ],
+    "raw": [
+      {
+        "ref": "SANITY_PERSPECTIVE.RAW",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/sanity-perspective.ts"
+      }
+    ],
     "ALREADY_GONE": [
       {
         "ref": "SANITY_PROJECT_DELETE_OUTCOME.ALREADY_GONE",
@@ -3656,6 +4098,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "DRAFT_PREVIEW_REFUSAL.ARCHIVED",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
       },
       {
         "ref": "TENANT_REFUSAL.ARCHIVED",
@@ -3780,6 +4228,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
+      },
+      {
+        "ref": "TEAM_COLUMN.ACCESS",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
       }
     ],
     "WEBHOOKS": [
@@ -3846,6 +4300,18 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
+      },
+      {
+        "ref": "MEMBERSHIP_REMOVAL_OUTCOME.NOT_FOUND",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
+      },
+      {
+        "ref": "DRAFT_PREVIEW_REFUSAL.NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
       },
       {
         "ref": "LEAD_REFUSAL.NOT_FOUND",
@@ -3984,6 +4450,22 @@
         "file": "apps/platform/src/constants/icon.ts"
       }
     ],
+    "MATCH": [
+      {
+        "ref": "SKIN_MODE.MATCH",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/skin.ts"
+      }
+    ],
+    "INVERSE": [
+      {
+        "ref": "SKIN_MODE.INVERSE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/skin.ts"
+      }
+    ],
     "ascending": [
       {
         "ref": "SORT_DIRECTION.ASCENDING",
@@ -3998,6 +4480,72 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/sort.ts"
+      }
+    ],
+    "LOGO": [
+      {
+        "ref": "STARTER_PLACEHOLDER_IMAGE.LOGO",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/starter-document.ts"
+      }
+    ],
+    "ILLUSTRATION": [
+      {
+        "ref": "STARTER_PLACEHOLDER_IMAGE.ILLUSTRATION",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/starter-document.ts"
+      }
+    ],
+    "INVITE_SENT": [
+      {
+        "ref": "STUDIO_ACCESS.INVITE_SENT",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/studio-access.ts"
+      }
+    ],
+    "ACTIVATING": [
+      {
+        "ref": "STUDIO_ACCESS.ACTIVATING",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/studio-access.ts"
+      }
+    ],
+    "READY": [
+      {
+        "ref": "STUDIO_ACCESS.READY",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/studio-access.ts"
+      },
+      {
+        "ref": "TENANT_PROVISIONING_STATUS.READY",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "NEWSLETTER_POST_STATE.READY",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "STALLED": [
+      {
+        "ref": "STUDIO_ACCESS.STALLED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/studio-access.ts"
+      },
+      {
+        "ref": "ELEVATE_TENANT_OWNER_OUTCOME.STALLED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
     "ALREADY_PENDING": [
@@ -4040,6 +4588,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "AVATAR_VARIANT.PENDING",
+        "scope": "app:platform",
+        "from": "@platform/constants/avatar",
+        "file": "apps/platform/src/constants/avatar.ts"
       },
       {
         "ref": "DOMAIN_VERIFICATION_STATUS.PENDING",
@@ -4174,6 +4728,182 @@
         "file": "packages/config/src/constants/tenant-write-refusal.ts"
       }
     ],
+    "HERO_TITLE": [
+      {
+        "ref": "TEXT_ROLE.HERO_TITLE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "POST_TITLE": [
+      {
+        "ref": "TEXT_ROLE.POST_TITLE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "PAGE_TITLE": [
+      {
+        "ref": "TEXT_ROLE.PAGE_TITLE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "SECTION_TITLE": [
+      {
+        "ref": "TEXT_ROLE.SECTION_TITLE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "CARD_TITLE": [
+      {
+        "ref": "TEXT_ROLE.CARD_TITLE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "ITEM_TITLE": [
+      {
+        "ref": "TEXT_ROLE.ITEM_TITLE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "DIALOG_TITLE": [
+      {
+        "ref": "TEXT_ROLE.DIALOG_TITLE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "PROSE_H2": [
+      {
+        "ref": "TEXT_ROLE.PROSE_H2",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "PROSE_H3": [
+      {
+        "ref": "TEXT_ROLE.PROSE_H3",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "PROSE_H4": [
+      {
+        "ref": "TEXT_ROLE.PROSE_H4",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "TABLE_TITLE": [
+      {
+        "ref": "TEXT_ROLE.TABLE_TITLE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "INTRO": [
+      {
+        "ref": "TEXT_ROLE.INTRO",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "BODY": [
+      {
+        "ref": "TEXT_ROLE.BODY",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "MESSAGE": [
+      {
+        "ref": "TEXT_ROLE.MESSAGE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "CARD_BODY": [
+      {
+        "ref": "TEXT_ROLE.CARD_BODY",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "META": [
+      {
+        "ref": "TEXT_ROLE.META",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "EYEBROW": [
+      {
+        "ref": "TEXT_ROLE.EYEBROW",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "FOOTNOTE": [
+      {
+        "ref": "TEXT_ROLE.FOOTNOTE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "CAPTION": [
+      {
+        "ref": "TEXT_ROLE.CAPTION",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "ATTRIBUTION": [
+      {
+        "ref": "TEXT_ROLE.ATTRIBUTION",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "FIGURE": [
+      {
+        "ref": "TEXT_ROLE.FIGURE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
+    "FIGURE_LABEL": [
+      {
+        "ref": "TEXT_ROLE.FIGURE_LABEL",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/text-role.ts"
+      }
+    ],
     "NUMBERED": [
       {
         "ref": "TIMELINE_MARKER_STYLE.NUMBERED",
@@ -4216,6 +4946,22 @@
         "scope": "app:platform",
         "from": "@platform/constants/device-frame",
         "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "UNLINKED": [
+      {
+        "ref": "UNLINK_PROVIDER_OUTCOME.UNLINKED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/unlink-provider-outcome.ts"
+      }
+    ],
+    "LAST_METHOD": [
+      {
+        "ref": "UNLINK_PROVIDER_OUTCOME.LAST_METHOD",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/unlink-provider-outcome.ts"
       }
     ],
     "SUPERADMIN": [
@@ -4454,6 +5200,18 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/billing.ts"
+      },
+      {
+        "ref": "SAMPLE_CONTENT_REFUSAL.NOT_WRITABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
+      },
+      {
+        "ref": "ENQUEUE_ERROR.NOT_WRITABLE",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
       }
     ],
     "ADDRESS": [
@@ -4534,6 +5292,38 @@
         "file": "packages/db/src/constants/email-usage.ts"
       }
     ],
+    "CAPABILITY": [
+      {
+        "ref": "ENTITLEMENT_KIND.CAPABILITY",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
+      }
+    ],
+    "MODULE_PACK": [
+      {
+        "ref": "ENTITLEMENT_KIND.MODULE_PACK",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
+      }
+    ],
+    "LOOK_FIELD": [
+      {
+        "ref": "ENTITLEMENT_KIND.LOOK_FIELD",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
+      }
+    ],
+    "LOCALE_LIMIT": [
+      {
+        "ref": "ENTITLEMENT_KIND.LOCALE_LIMIT",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
+      }
+    ],
     "OWNER": [
       {
         "ref": "MEMBERSHIP_ROLE.OWNER",
@@ -4580,64 +5370,28 @@
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
-    "SENT": [
+    "REMOVED": [
       {
-        "ref": "NEWSLETTER_POST_SEND_OUTCOME.SENT",
+        "ref": "MEMBERSHIP_REMOVAL_OUTCOME.REMOVED",
         "scope": "db",
         "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/newsletter.ts"
-      },
-      {
-        "ref": "NEWSLETTER_SUBSCRIBER_SEND.SENT",
-        "scope": "app:worker",
-        "from": "@worker/constants/newsletter-send",
-        "file": "apps/worker/src/constants/newsletter-send.ts"
+        "file": "packages/db/src/constants/membership.ts"
       }
     ],
-    "SKIPPED": [
+    "LAST_OWNER": [
       {
-        "ref": "NEWSLETTER_POST_SEND_OUTCOME.SKIPPED",
+        "ref": "MEMBERSHIP_REMOVAL_OUTCOME.LAST_OWNER",
         "scope": "db",
         "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/newsletter.ts"
-      },
-      {
-        "ref": "NEWSLETTER_SEND_GATE.SKIPPED",
-        "scope": "app:worker",
-        "from": "@worker/constants/newsletter-send",
-        "file": "apps/worker/src/constants/newsletter-send.ts"
+        "file": "packages/db/src/constants/membership.ts"
       }
     ],
-    "OVER_SUBSCRIBER_BAND": [
+    "SELF": [
       {
-        "ref": "NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND",
+        "ref": "MEMBERSHIP_REMOVAL_OUTCOME.SELF",
         "scope": "db",
         "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/newsletter.ts"
-      }
-    ],
-    "OVER_MONTHLY_ALLOWANCE": [
-      {
-        "ref": "NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/newsletter.ts"
-      }
-    ],
-    "REPUTATION_STOP": [
-      {
-        "ref": "NEWSLETTER_SKIP_REASON.REPUTATION_STOP",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/newsletter.ts"
-      }
-    ],
-    "SITE_PAUSED": [
-      {
-        "ref": "NEWSLETTER_SKIP_REASON.SITE_PAUSED",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/newsletter.ts"
+        "file": "packages/db/src/constants/membership.ts"
       }
     ],
     "SUBSCRIBER_BAND_NEAR": [
@@ -4722,6 +5476,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "GRANT_STATUS.ACTIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
       },
       {
         "ref": "STEP_INDICATOR_STATE.ACTIVE",
@@ -4892,26 +5652,6 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
-      }
-    ],
-    "READY": [
-      {
-        "ref": "TENANT_PROVISIONING_STATUS.READY",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/tenant-provisioning.ts"
-      },
-      {
-        "ref": "OWNER_STUDIO_ACCESS.READY",
-        "scope": "app:platform",
-        "from": "@platform/constants/owner-studio-access",
-        "file": "apps/platform/src/constants/owner-studio-access.ts"
-      },
-      {
-        "ref": "NEWSLETTER_POST_STATE.READY",
-        "scope": "app:worker",
-        "from": "@worker/constants/newsletter-send",
-        "file": "apps/worker/src/constants/newsletter-send.ts"
       }
     ],
     "FAILED": [
@@ -5150,20 +5890,6 @@
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
-    "STALLED": [
-      {
-        "ref": "ELEVATE_TENANT_OWNER_OUTCOME.STALLED",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/tenant-provisioning.ts"
-      },
-      {
-        "ref": "OWNER_STUDIO_ACCESS.STALLED",
-        "scope": "app:platform",
-        "from": "@platform/constants/owner-studio-access",
-        "file": "apps/platform/src/constants/owner-studio-access.ts"
-      }
-    ],
     "AMBIGUOUS_MEMBERSHIP": [
       {
         "ref": "ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP",
@@ -5202,6 +5928,12 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "DRAFT_PREVIEW_REFUSAL.SUSPENDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
       }
     ],
     "TRIAL": [
@@ -5430,6 +6162,14 @@
         "file": "apps/platform/src/constants/activity.ts"
       }
     ],
+    "PLAN_CHANGED": [
+      {
+        "ref": "ACTIVITY_DETAIL.PLAN_CHANGED",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
     "SIGN_IN_PROVIDER": [
       {
         "ref": "ACTIVITY_DETAIL.SIGN_IN_PROVIDER",
@@ -5444,6 +6184,70 @@
         "scope": "app:platform",
         "from": "@platform/constants/activity",
         "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "GRANT_ITEM": [
+      {
+        "ref": "ACTIVITY_DETAIL.GRANT_ITEM",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "GRANT_EXPIRY": [
+      {
+        "ref": "ACTIVITY_DETAIL.GRANT_EXPIRY",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "GRANT_UNTIL_REVOKED": [
+      {
+        "ref": "ACTIVITY_DETAIL.GRANT_UNTIL_REVOKED",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "GRANT_NOTE": [
+      {
+        "ref": "ACTIVITY_DETAIL.GRANT_NOTE",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "region": [
+      {
+        "ref": "ARIA_ROLE.REGION",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
+      }
+    ],
+    "rowgroup": [
+      {
+        "ref": "ARIA_ROLE.ROWGROUP",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
+      }
+    ],
+    "row": [
+      {
+        "ref": "ARIA_ROLE.ROW",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
+      }
+    ],
+    "cell": [
+      {
+        "ref": "ARIA_ROLE.CELL",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-role",
+        "file": "apps/platform/src/constants/aria-role.ts"
       }
     ],
     "FRAMED": [
@@ -5481,6 +6285,14 @@
     "SWITCHER": [
       {
         "ref": "AVATAR_VARIANT.SWITCHER",
+        "scope": "app:platform",
+        "from": "@platform/constants/avatar",
+        "file": "apps/platform/src/constants/avatar.ts"
+      }
+    ],
+    "MEMBER": [
+      {
+        "ref": "AVATAR_VARIANT.MEMBER",
         "scope": "app:platform",
         "from": "@platform/constants/avatar",
         "file": "apps/platform/src/constants/avatar.ts"
@@ -5591,6 +6403,14 @@
     "billing.price_unknown": [
       {
         "ref": "BILLING_LOG.PRICE_UNKNOWN",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.currency_unknown": [
+      {
+        "ref": "BILLING_LOG.CURRENCY_UNKNOWN",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
@@ -5727,6 +6547,22 @@
     "billing.plan_change_release_failed": [
       {
         "ref": "BILLING_LOG.PLAN_CHANGE_RELEASE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.plan_change_payment_unknown": [
+      {
+        "ref": "BILLING_LOG.PLAN_CHANGE_PAYMENT_UNKNOWN",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.move_up_quote_failed": [
+      {
+        "ref": "BILLING_LOG.MOVE_UP_QUOTE_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
@@ -5896,6 +6732,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "STRIPE_PAUSE_BEHAVIOR.VOID",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscription-lifecycle",
+        "file": "apps/platform/src/constants/subscription-lifecycle.ts"
       }
     ],
     "invoice_upcoming_none": [
@@ -5966,22 +6808,6 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
-    "MONTHLY": [
-      {
-        "ref": "BILLING_INTERVAL.MONTHLY",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      }
-    ],
-    "YEARLY": [
-      {
-        "ref": "BILLING_INTERVAL.YEARLY",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      }
-    ],
     "AVAILABLE": [
       {
         "ref": "UPGRADE_STATE.AVAILABLE",
@@ -6008,6 +6834,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_LOCK_KIND.SUBSCRIBED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
     "NOT_OWNER": [
@@ -6320,6 +7152,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.CUSTOM_DOMAIN",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
       }
     ],
     "SUBDOMAIN": [
@@ -6494,14 +7332,6 @@
         "file": "apps/platform/src/constants/data-request.ts"
       }
     ],
-    "INVITE": [
-      {
-        "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
-      }
-    ],
     "STUDIO_REINVITE": [
       {
         "ref": "DATA_REQUEST_MATCH_KIND.STUDIO_REINVITE",
@@ -6610,6 +7440,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/device-frame",
         "file": "apps/platform/src/constants/device-frame.ts"
+      },
+      {
+        "ref": "SAMPLE_KIND.PAGE",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       }
     ],
     "STAGE": [
@@ -6768,6 +7604,46 @@
         "file": "apps/platform/src/constants/domain.ts"
       }
     ],
+    "LANGUAGE_OFF": [
+      {
+        "ref": "DRAFT_PREVIEW_REFUSAL.LANGUAGE_OFF",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
+    "draft_preview.secret_missing": [
+      {
+        "ref": "DRAFT_PREVIEW_LOG.SECRET_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
+    "draft_preview.path_skipped": [
+      {
+        "ref": "DRAFT_PREVIEW_LOG.PATH_SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
+    "draft_preview.path_failed": [
+      {
+        "ref": "DRAFT_PREVIEW_LOG.PATH_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
+    "draft_preview.path_error": [
+      {
+        "ref": "DRAFT_PREVIEW_LOG.PATH_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/draft-preview",
+        "file": "apps/platform/src/constants/draft-preview.ts"
+      }
+    ],
     "email_config.update_audit_failed": [
       {
         "ref": "EMAIL_CONFIG_LOG.UPDATE_AUDIT_FAILED",
@@ -6798,6 +7674,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/email-logo",
         "file": "apps/platform/src/constants/email-logo.ts"
+      },
+      {
+        "ref": "SAMPLE_KIND.TEMPLATE",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       }
     ],
     "email_logo.clear_audit_failed": [
@@ -6880,6 +7762,164 @@
         "file": "apps/platform/src/constants/email-test.ts"
       }
     ],
+    "email_usage.send_count_failed": [
+      {
+        "ref": "EMAIL_USAGE_LOG.SEND_COUNT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-usage",
+        "file": "apps/platform/src/constants/email-usage.ts"
+      },
+      {
+        "ref": "EMAIL_USAGE_LOG.SEND_COUNT_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "NEVER": [
+      {
+        "ref": "ENTITLEMENT_GRANT_EXPIRY.NEVER",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "DAYS_30": [
+      {
+        "ref": "ENTITLEMENT_GRANT_EXPIRY.DAYS_30",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "DAYS_90": [
+      {
+        "ref": "ENTITLEMENT_GRANT_EXPIRY.DAYS_90",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "YEAR_1": [
+      {
+        "ref": "ENTITLEMENT_GRANT_EXPIRY.YEAR_1",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "COMING_SOON": [
+      {
+        "ref": "ENTITLEMENT_GRANT_REFUSAL.COMING_SOON",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "ALREADY_GRANTED": [
+      {
+        "ref": "ENTITLEMENT_GRANT_REFUSAL.ALREADY_GRANTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "EXPIRY_SHORTENED": [
+      {
+        "ref": "ENTITLEMENT_GRANT_REFUSAL.EXPIRY_SHORTENED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "INCLUDED_IN_PLAN": [
+      {
+        "ref": "ENTITLEMENT_GRANT_REFUSAL.INCLUDED_IN_PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "GRANT_NOT_OPEN": [
+      {
+        "ref": "ENTITLEMENT_GRANT_REFUSAL.GRANT_NOT_OPEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "EXPIRED": [
+      {
+        "ref": "GRANT_STATUS.EXPIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "INCLUDED": [
+      {
+        "ref": "GRANT_STATUS.INCLUDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.grant_failed": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.GRANT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.grant_audit_failed": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.GRANT_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.revoke_failed": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.REVOKE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.revoke_audit_failed": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.REVOKE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.email_unconfigured": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.EMAIL_UNCONFIGURED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.email_owner_missing": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.EMAIL_OWNER_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
+    "entitlement_grants.email_failed": [
+      {
+        "ref": "ENTITLEMENT_GRANT_LOG.EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/entitlement-grant",
+        "file": "apps/platform/src/constants/entitlement-grant.ts"
+      }
+    ],
     "WIZARD": [
       {
         "ref": "FIELD_APPEARANCE.WIZARD",
@@ -6945,14 +7985,6 @@
     "POPOVER_HOVER": [
       {
         "ref": "FOCUS_RING_GROUND.POPOVER_HOVER",
-        "scope": "app:platform",
-        "from": "@platform/constants/focus-ring",
-        "file": "apps/platform/src/constants/focus-ring.ts"
-      }
-    ],
-    "ON_SELECTED": [
-      {
-        "ref": "FOCUS_RING_GROUND.ON_SELECTED",
         "scope": "app:platform",
         "from": "@platform/constants/focus-ring",
         "file": "apps/platform/src/constants/focus-ring.ts"
@@ -7702,22 +8734,6 @@
         "file": "apps/platform/src/constants/owner-access.ts"
       }
     ],
-    "INVITE_SENT": [
-      {
-        "ref": "OWNER_STUDIO_ACCESS.INVITE_SENT",
-        "scope": "app:platform",
-        "from": "@platform/constants/owner-studio-access",
-        "file": "apps/platform/src/constants/owner-studio-access.ts"
-      }
-    ],
-    "ACTIVATING": [
-      {
-        "ref": "OWNER_STUDIO_ACCESS.ACTIVATING",
-        "scope": "app:platform",
-        "from": "@platform/constants/owner-studio-access",
-        "file": "apps/platform/src/constants/owner-studio-access.ts"
-      }
-    ],
     "NOW": [
       {
         "ref": "PLAN_CHANGE_TIMING.NOW",
@@ -7767,6 +8783,38 @@
     "CARD_DECLINED": [
       {
         "ref": "PLAN_CHANGE_REFUSAL.CARD_DECLINED",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
+    "PAYMENT_NOT_CONFIRMED": [
+      {
+        "ref": "PLAN_CHANGE_REFUSAL.PAYMENT_NOT_CONFIRMED",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
+    "NO_NEXT_BAND": [
+      {
+        "ref": "PLAN_CHANGE_REFUSAL.NO_NEXT_BAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
+    "PENDING_CHANGE": [
+      {
+        "ref": "PLAN_CHANGE_REFUSAL.PENDING_CHANGE",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
+    "QUOTE_EXPIRED": [
+      {
+        "ref": "PLAN_CHANGE_REFUSAL.QUOTE_EXPIRED",
         "scope": "app:platform",
         "from": "@platform/constants/plan-change",
         "file": "apps/platform/src/constants/plan-change.ts"
@@ -7826,6 +8874,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/preview",
         "file": "apps/platform/src/constants/preview.ts"
+      },
+      {
+        "ref": "SAMPLE_KIND.SECTION",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
       }
     ],
     "PHONE_TAB": [
@@ -7926,8 +8980,8 @@
       {
         "ref": "SCHEDULED_POST_STATE.DUE",
         "scope": "app:worker",
-        "from": "@worker/constants/scheduled-post-purge",
-        "file": "apps/worker/src/constants/scheduled-post-purge.ts"
+        "from": "@worker/constants/scheduled-post",
+        "file": "apps/worker/src/constants/scheduled-post.ts"
       }
     ],
     "development": [
@@ -8168,6 +9222,108 @@
         "file": "apps/web/src/constants/request.ts"
       }
     ],
+    "origin": [
+      {
+        "ref": "REQUEST_HEADER.ORIGIN",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "sec-fetch-site": [
+      {
+        "ref": "REQUEST_HEADER.SEC_FETCH_SITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "content-type": [
+      {
+        "ref": "REQUEST_HEADER.CONTENT_TYPE",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "same-origin": [
+      {
+        "ref": "FETCH_SITE.SAME_ORIGIN",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "same-site": [
+      {
+        "ref": "FETCH_SITE.SAME_SITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "application/json": [
+      {
+        "ref": "MEDIA_TYPE.JSON",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "text/plain": [
+      {
+        "ref": "MEDIA_TYPE.TEXT",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "/api/sample-content/remove": [
+      {
+        "ref": "SAMPLE_CONTENT_PATH.REMOVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
+      }
+    ],
+    "sample_content.removal_failed": [
+      {
+        "ref": "SAMPLE_CONTENT_LOG.REMOVAL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
+      },
+      {
+        "ref": "SAMPLE_CONTENT_LOG.REMOVAL_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/sample-content",
+        "file": "apps/worker/src/constants/sample-content.ts"
+      }
+    ],
+    "sample_content.removal_response_invalid": [
+      {
+        "ref": "SAMPLE_CONTENT_LOG.REMOVAL_RESPONSE_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
+      }
+    ],
+    "AUTHOR": [
+      {
+        "ref": "SAMPLE_KIND.AUTHOR",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
+      }
+    ],
+    "TOPIC": [
+      {
+        "ref": "SAMPLE_KIND.TOPIC",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-content",
+        "file": "apps/platform/src/constants/sample-content.ts"
+      }
+    ],
     "header": [
       {
         "ref": "SAMPLE_PART.HEADER",
@@ -8304,12 +9460,36 @@
         "file": "apps/platform/src/constants/settings-features.ts"
       }
     ],
-    "NOT_IN_PLAN": [
+    "settings_features.analytics_update_audit_failed": [
       {
-        "ref": "SETTINGS_REFUSAL.NOT_IN_PLAN",
+        "ref": "SETTINGS_FEATURES_LOG.ANALYTICS_UPDATE_AUDIT_FAILED",
         "scope": "app:platform",
-        "from": "@platform/constants/settings",
-        "file": "apps/platform/src/constants/settings.ts"
+        "from": "@platform/constants/settings-features",
+        "file": "apps/platform/src/constants/settings-features.ts"
+      }
+    ],
+    "settings_features.analytics_update_failed": [
+      {
+        "ref": "SETTINGS_FEATURES_LOG.ANALYTICS_UPDATE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-features",
+        "file": "apps/platform/src/constants/settings-features.ts"
+      }
+    ],
+    "ID_INVALID": [
+      {
+        "ref": "ANALYTICS_FIELD_ERROR.ID_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-features",
+        "file": "apps/platform/src/constants/settings-features.ts"
+      }
+    ],
+    "CONSENT_BANNER_REQUIRED": [
+      {
+        "ref": "FEATURES_FIELD_ERROR.CONSENT_BANNER_REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-features",
+        "file": "apps/platform/src/constants/settings-features.ts"
       }
     ],
     "LOCALE_NOT_LIVE": [
@@ -8326,6 +9506,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/sign-in-apps",
         "file": "apps/platform/src/constants/sign-in-apps.ts"
+      },
+      {
+        "ref": "SUPPORT_FIELD_ERROR.REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "NO_SAVED_APP": [
@@ -8750,6 +9936,342 @@
         "file": "apps/platform/src/constants/stripe-key-mode.ts"
       }
     ],
+    "pending_if_incomplete": [
+      {
+        "ref": "STRIPE_PAYMENT_BEHAVIOR.PENDING_IF_INCOMPLETE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "requires_action": [
+      {
+        "ref": "STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_ACTION",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "requires_payment_method": [
+      {
+        "ref": "STRIPE_PAYMENT_INTENT_STATUS.REQUIRES_PAYMENT_METHOD",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "processing": [
+      {
+        "ref": "STRIPE_PAYMENT_INTENT_STATUS.PROCESSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "succeeded": [
+      {
+        "ref": "STRIPE_PAYMENT_INTENT_STATUS.SUCCEEDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "card_error": [
+      {
+        "ref": "STRIPE_JS_ERROR_TYPE.CARD_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "payment_intent_authentication_failure": [
+      {
+        "ref": "STRIPE_JS_ERROR_CODE.AUTHENTICATION_FAILURE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "phase_start": [
+      {
+        "ref": "STRIPE_BILLING_CYCLE_ANCHOR.PHASE_START",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-schedule",
+        "file": "apps/platform/src/constants/stripe-schedule.ts"
+      }
+    ],
+    "release": [
+      {
+        "ref": "STRIPE_SCHEDULE_END_BEHAVIOR.RELEASE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-schedule",
+        "file": "apps/platform/src/constants/stripe-schedule.ts"
+      }
+    ],
+    "studio_newsletter.status_failed": [
+      {
+        "ref": "STUDIO_NEWSLETTER_LOG.STATUS_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/studio-newsletter",
+        "file": "apps/platform/src/constants/studio-newsletter.ts"
+      }
+    ],
+    "studio_newsletter.test_send_failed": [
+      {
+        "ref": "STUDIO_NEWSLETTER_LOG.TEST_SEND_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/studio-newsletter",
+        "file": "apps/platform/src/constants/studio-newsletter.ts"
+      }
+    ],
+    "studio_newsletter.send_now_failed": [
+      {
+        "ref": "STUDIO_NEWSLETTER_LOG.SEND_NOW_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/studio-newsletter",
+        "file": "apps/platform/src/constants/studio-newsletter.ts"
+      }
+    ],
+    "studio_newsletter.send_now_enqueue_refused": [
+      {
+        "ref": "STUDIO_NEWSLETTER_LOG.SEND_NOW_ENQUEUE_REFUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/studio-newsletter",
+        "file": "apps/platform/src/constants/studio-newsletter.ts"
+      }
+    ],
+    "MOVED_UP": [
+      {
+        "ref": "SUBSCRIBERS_SEARCH_PARAM.MOVED_UP",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscribers",
+        "file": "apps/platform/src/constants/subscribers.ts"
+      }
+    ],
+    "billing.subscription_collection_failed": [
+      {
+        "ref": "SUBSCRIPTION_LIFECYCLE_LOG.COLLECTION_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscription-lifecycle",
+        "file": "apps/platform/src/constants/subscription-lifecycle.ts"
+      }
+    ],
+    "billing.subscription_cancel_failed": [
+      {
+        "ref": "SUBSCRIPTION_LIFECYCLE_LOG.CANCEL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscription-lifecycle",
+        "file": "apps/platform/src/constants/subscription-lifecycle.ts"
+      }
+    ],
+    "billing.live_subscription_check_failed": [
+      {
+        "ref": "SUBSCRIPTION_LIFECYCLE_LOG.LIVE_CHECK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/subscription-lifecycle",
+        "file": "apps/platform/src/constants/subscription-lifecycle.ts"
+      }
+    ],
+    "TOO_LONG": [
+      {
+        "ref": "SUPPORT_FIELD_ERROR.TOO_LONG",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
+      }
+    ],
+    "support.address_missing": [
+      {
+        "ref": "SUPPORT_LOG.ADDRESS_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
+      }
+    ],
+    "support.send_failed": [
+      {
+        "ref": "SUPPORT_LOG.SEND_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
+      }
+    ],
+    "support.copy_failed": [
+      {
+        "ref": "SUPPORT_LOG.COPY_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
+      }
+    ],
+    "ALREADY_MEMBER": [
+      {
+        "ref": "TEAM_INVITE_FIELD_ERROR.ALREADY_MEMBER",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "ALREADY_INVITED": [
+      {
+        "ref": "TEAM_INVITE_FIELD_ERROR.ALREADY_INVITED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "OWNER_INVITE": [
+      {
+        "ref": "TEAM_REFUSAL.OWNER_INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "/api/member-access/check": [
+      {
+        "ref": "MEMBER_ACCESS_PATH.CHECK",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "/api/member-access/resend": [
+      {
+        "ref": "MEMBER_ACCESS_PATH.RESEND",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "/api/member-access/revoke": [
+      {
+        "ref": "MEMBER_ACCESS_PATH.REVOKE",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.invite_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.INVITE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.invite_email_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.INVITE_EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.invite_audit_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.INVITE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.remove_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.REMOVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.remove_audit_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.REMOVE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.revoke_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.REVOKE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.revoke_skipped_no_email": [
+      {
+        "ref": "TEAM_ACCESS_LOG.REVOKE_SKIPPED_NO_EMAIL",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.cancel_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.CANCEL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.cancel_audit_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.CANCEL_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "team_access.access_request_failed": [
+      {
+        "ref": "TEAM_ACCESS_LOG.ACCESS_REQUEST_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "LOCKED": [
+      {
+        "ref": "TEAM_ROW_ACCESS.LOCKED",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "NO_ACCESS": [
+      {
+        "ref": "TEAM_ROW_ACCESS.NO_ACCESS",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "PERSON": [
+      {
+        "ref": "TEAM_COLUMN.PERSON",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "ROLE": [
+      {
+        "ref": "TEAM_COLUMN.ROLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "ACTIONS": [
+      {
+        "ref": "TEAM_COLUMN.ACTIONS",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
     "CONFIRM_REQUIRED": [
       {
         "ref": "TENANT_FIELD_ERROR.CONFIRM_REQUIRED",
@@ -8914,6 +10436,14 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
+    "PLAN_FOLLOWS_SUBSCRIPTION": [
+      {
+        "ref": "TENANT_REFUSAL.PLAN_FOLLOWS_SUBSCRIPTION",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "OWNER_INVITE_UNCONFIRMED": [
       {
         "ref": "TENANT_REFUSAL.OWNER_INVITE_UNCONFIRMED",
@@ -8933,6 +10463,22 @@
     "STUDIO_NOT_PROVISIONED": [
       {
         "ref": "TENANT_REFUSAL.STUDIO_NOT_PROVISIONED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "SUBSCRIPTION_CANCEL_FAILED": [
+      {
+        "ref": "TENANT_REFUSAL.SUBSCRIPTION_CANCEL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "SUBSCRIPTION_LIVE": [
+      {
+        "ref": "TENANT_REFUSAL.SUBSCRIPTION_LIVE",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"
@@ -9362,6 +10908,66 @@
         "file": "apps/platform/src/constants/upload.ts"
       }
     ],
+    "TAKEAWAYS": [
+      {
+        "ref": "USAGE_METER.TAKEAWAYS",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
+    "EMAILS": [
+      {
+        "ref": "USAGE_METER.EMAILS",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
+    "SEATS": [
+      {
+        "ref": "USAGE_METER.SEATS",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.SEATS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "LANGUAGES": [
+      {
+        "ref": "USAGE_METER.LANGUAGES",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      },
+      {
+        "ref": "PLAN_COMPARISON_ROW.LANGUAGES",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "UNDER": [
+      {
+        "ref": "USAGE_LEVEL.UNDER",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
+    "usage.meter_read_failed": [
+      {
+        "ref": "USAGE_LOG.METER_READ_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/usage",
+        "file": "apps/platform/src/constants/usage.ts"
+      }
+    ],
     "SEGMENTED": [
       {
         "ref": "VIEW_TABS_VARIANT.SEGMENTED",
@@ -9424,6 +11030,22 @@
         "scope": "app:web",
         "from": "@web/constants/account-control",
         "file": "apps/web/src/constants/account-control.ts"
+      }
+    ],
+    "account.provider_unlink_failed": [
+      {
+        "ref": "ACCOUNT_LOG.PROVIDER_UNLINK_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/account",
+        "file": "apps/web/src/constants/account.ts"
+      }
+    ],
+    "account.display_name_update_failed": [
+      {
+        "ref": "ACCOUNT_LOG.DISPLAY_NAME_UPDATE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/account",
+        "file": "apps/web/src/constants/account.ts"
       }
     ],
     "bookmark_button.status_fetch_failed": [
@@ -9522,6 +11144,14 @@
         "file": "apps/web/src/constants/contact-form.ts"
       }
     ],
+    "FIRST_PARTY": [
+      {
+        "ref": "COOKIE_PROVIDER.FIRST_PARTY",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
     "CONSENT": [
       {
         "ref": "COOKIE_ID.CONSENT",
@@ -9533,14 +11163,6 @@
     "LANGUAGE": [
       {
         "ref": "COOKIE_ID.LANGUAGE",
-        "scope": "app:web",
-        "from": "@web/constants/cookie-list",
-        "file": "apps/web/src/constants/cookie-list.ts"
-      }
-    ],
-    "CURRENCY": [
-      {
-        "ref": "COOKIE_ID.CURRENCY",
         "scope": "app:web",
         "from": "@web/constants/cookie-list",
         "file": "apps/web/src/constants/cookie-list.ts"
@@ -9602,17 +11224,17 @@
         "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
-    "READING_DEPTH": [
+    "THEME": [
       {
-        "ref": "COOKIE_ID.READING_DEPTH",
+        "ref": "COOKIE_ID.THEME",
         "scope": "app:web",
         "from": "@web/constants/cookie-list",
         "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
-    "THEME": [
+    "GOOGLE_ANALYTICS_VISIT": [
       {
-        "ref": "COOKIE_ID.THEME",
+        "ref": "COOKIE_ID.GOOGLE_ANALYTICS_VISIT",
         "scope": "app:web",
         "from": "@web/constants/cookie-list",
         "file": "apps/web/src/constants/cookie-list.ts"
@@ -9962,6 +11584,14 @@
         "file": "apps/web/src/constants/email-usage.ts"
       }
     ],
+    "email_usage.webhook_event_untagged": [
+      {
+        "ref": "EMAIL_USAGE_LOG.WEBHOOK_EVENT_UNTAGGED",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
     "email_usage.webhook_site_unknown": [
       {
         "ref": "EMAIL_USAGE_LOG.WEBHOOK_SITE_UNKNOWN",
@@ -9986,20 +11616,28 @@
         "file": "apps/web/src/constants/email-usage.ts"
       }
     ],
-    "email_usage.send_count_failed": [
-      {
-        "ref": "EMAIL_USAGE_LOG.SEND_COUNT_FAILED",
-        "scope": "app:web",
-        "from": "@web/constants/email-usage",
-        "file": "apps/web/src/constants/email-usage.ts"
-      }
-    ],
     "embed_module.fetch_failed": [
       {
         "ref": "EMBED_LOG.MODULE_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/embed",
         "file": "apps/web/src/constants/embed.ts"
+      }
+    ],
+    "global_error_boundary.render_failed": [
+      {
+        "ref": "ERROR_BOUNDARY_LOG.GLOBAL_RENDER_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/error-boundary",
+        "file": "apps/web/src/constants/error-boundary.ts"
+      }
+    ],
+    "locale_error_boundary.render_failed": [
+      {
+        "ref": "ERROR_BOUNDARY_LOG.LOCALE_RENDER_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/error-boundary",
+        "file": "apps/web/src/constants/error-boundary.ts"
       }
     ],
     "faq_module.fetch_failed": [
@@ -10040,6 +11678,214 @@
         "scope": "app:web",
         "from": "@web/constants/footer",
         "file": "apps/web/src/constants/footer.ts"
+      }
+    ],
+    "generate_skim.config_missing": [
+      {
+        "ref": "GENERATE_SKIM_LOG.CONFIG_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.host_unresolvable": [
+      {
+        "ref": "GENERATE_SKIM_LOG.HOST_UNRESOLVABLE",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.write_tenant_unresolvable": [
+      {
+        "ref": "GENERATE_SKIM_LOG.WRITE_TENANT_UNRESOLVABLE",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.tenant_write_credentials_missing": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TENANT_WRITE_CREDENTIALS_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.tenant_not_active": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TENANT_NOT_ACTIVE",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.allowance_used": [
+      {
+        "ref": "GENERATE_SKIM_LOG.ALLOWANCE_USED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.claim_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.CLAIM_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.claim_release_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.CLAIM_RELEASE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.post_body_fetch_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.POST_BODY_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.generation_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GENERATION_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.summary_over_word_limit": [
+      {
+        "ref": "GENERATE_SKIM_LOG.SUMMARY_OVER_WORD_LIMIT",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.summary_empty": [
+      {
+        "ref": "GENERATE_SKIM_LOG.SUMMARY_EMPTY",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.write_client_unconfigured": [
+      {
+        "ref": "GENERATE_SKIM_LOG.WRITE_CLIENT_UNCONFIGURED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.draft_save_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.DRAFT_SAVE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.published_at_lookup_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.PUBLISHED_AT_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.publish_start_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.PUBLISH_START_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.go_live_enqueue_skipped": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GO_LIVE_ENQUEUE_SKIPPED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.go_live_enqueue_refused": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GO_LIVE_ENQUEUE_REFUSED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.go_live_enqueue_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GO_LIVE_ENQUEUE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.go_live_secret_missing": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GO_LIVE_SECRET_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.go_live_tenant_lookup_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.GO_LIVE_TENANT_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.summary_lookup_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.SUMMARY_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.tenant_not_servable": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TENANT_NOT_SERVABLE",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "generate_skim.tenant_resolve_failed": [
+      {
+        "ref": "GENERATE_SKIM_LOG.TENANT_RESOLVE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "PARAGRAPH": [
+      {
+        "ref": "SUMMARY_BLOCK_STYLE.PARAGRAPH",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
+      }
+    ],
+    "NUMBER": [
+      {
+        "ref": "SUMMARY_BLOCK_STYLE.NUMBER",
+        "scope": "app:web",
+        "from": "@web/constants/generate-skim",
+        "file": "apps/web/src/constants/generate-skim.ts"
       }
     ],
     "header_style.site_config_fetch_failed": [
@@ -10160,6 +12006,46 @@
         "scope": "app:web",
         "from": "@web/constants/internal-pages",
         "file": "apps/web/src/constants/internal-pages.ts"
+      }
+    ],
+    "website": [
+      {
+        "ref": "OG_TYPE.WEBSITE",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
+    "article": [
+      {
+        "ref": "OG_TYPE.ARTICLE",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
+    "summary": [
+      {
+        "ref": "TWITTER_CARD.SUMMARY",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
+    "summary_large_image": [
+      {
+        "ref": "TWITTER_CARD.SUMMARY_LARGE_IMAGE",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
+      }
+    ],
+    "application/rss+xml": [
+      {
+        "ref": "ALTERNATE_TYPE.RSS",
+        "scope": "app:web",
+        "from": "@web/constants/metadata",
+        "file": "apps/web/src/constants/metadata.ts"
       }
     ],
     "module_renderer.unknown_module_type": [
@@ -10306,6 +12192,14 @@
         "file": "apps/web/src/constants/newsletter.ts"
       }
     ],
+    "newsletter.link_locale_tenant_lookup_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.LINK_LOCALE_TENANT_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
     "post_featured_module.fetch_failed": [
       {
         "ref": "POST_FEATURED_LOG.MODULE_FETCH_FAILED",
@@ -10325,6 +12219,14 @@
     "post_index_breadcrumbs.fetch_failed": [
       {
         "ref": "POST_INDEX_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post-index",
+        "file": "apps/web/src/constants/post-index.ts"
+      }
+    ],
+    "post_index_metadata.fetch_failed": [
+      {
+        "ref": "POST_INDEX_LOG.METADATA_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/post-index",
         "file": "apps/web/src/constants/post-index.ts"
@@ -10360,6 +12262,22 @@
         "scope": "app:web",
         "from": "@web/constants/post-related",
         "file": "apps/web/src/constants/post-related.ts"
+      }
+    ],
+    "post_article.fetch_failed": [
+      {
+        "ref": "POST_LOG.ARTICLE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post",
+        "file": "apps/web/src/constants/post.ts"
+      }
+    ],
+    "blog_post_page.fetch_failed": [
+      {
+        "ref": "POST_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post",
+        "file": "apps/web/src/constants/post.ts"
       }
     ],
     "pricing_module.fetch_failed": [
@@ -10402,6 +12320,78 @@
         "file": "apps/web/src/constants/pricing.ts"
       }
     ],
+    "pricing_module.visitor_currency_fetch_failed": [
+      {
+        "ref": "PRICING_LOG.VISITOR_CURRENCY_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "NO_POWERED_BY_MARK": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.NO_POWERED_BY_MARK",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "LOOK_SETTINGS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.LOOK_SETTINGS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "SECTION_TYPES": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.SECTION_TYPES",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "OWN_ANALYTICS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.OWN_ANALYTICS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "OWN_SIGN_IN_APPS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.OWN_SIGN_IN_APPS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "NEWSLETTER_SUBSCRIBERS": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.NEWSLETTER_SUBSCRIBERS",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "TAKEAWAYS_PER_MONTH": [
+      {
+        "ref": "PLAN_COMPARISON_ROW.TAKEAWAYS_PER_MONTH",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "UNLINK": [
+      {
+        "ref": "PROVIDER_LINK_ACTION.UNLINK",
+        "scope": "app:web",
+        "from": "@web/constants/provider-link",
+        "file": "apps/web/src/constants/provider-link.ts"
+      }
+    ],
     "proxy.tenant_lookup_failed": [
       {
         "ref": "PROXY_LOG.TENANT_LOOKUP_FAILED",
@@ -10413,6 +12403,14 @@
     "request_context.not_found_tenant_load_failed": [
       {
         "ref": "REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/request-context",
+        "file": "apps/web/src/constants/request-context.ts"
+      }
+    ],
+    "request_context.not_found_live_locales_failed": [
+      {
+        "ref": "REQUEST_CONTEXT_LOG.NOT_FOUND_LIVE_LOCALES_FAILED",
         "scope": "app:web",
         "from": "@web/constants/request-context",
         "file": "apps/web/src/constants/request-context.ts"
@@ -10762,9 +12760,41 @@
         "file": "apps/web/src/constants/session.ts"
       }
     ],
+    "settings_features.plan_fetch_failed": [
+      {
+        "ref": "SETTINGS_FEATURES_LOG.PLAN_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/settings-features",
+        "file": "apps/web/src/constants/settings-features.ts"
+      }
+    ],
+    "settings_features.effective_fetch_failed": [
+      {
+        "ref": "SETTINGS_FEATURES_LOG.EFFECTIVE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/settings-features",
+        "file": "apps/web/src/constants/settings-features.ts"
+      }
+    ],
     "auth.site_oauth_credentials_failed": [
       {
         "ref": "SIGN_IN_LOG.SITE_CREDENTIALS_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/sign-in",
+        "file": "apps/web/src/constants/sign-in.ts"
+      }
+    ],
+    "OAuthAccountNotLinked": [
+      {
+        "ref": "AUTH_ERROR_TYPE.OAUTH_ACCOUNT_NOT_LINKED",
+        "scope": "app:web",
+        "from": "@web/constants/sign-in",
+        "file": "apps/web/src/constants/sign-in.ts"
+      }
+    ],
+    "error": [
+      {
+        "ref": "AUTH_QUERY_PARAM.ERROR",
         "scope": "app:web",
         "from": "@web/constants/sign-in",
         "file": "apps/web/src/constants/sign-in.ts"
@@ -10789,6 +12819,14 @@
     "site_config.plan_fetch_failed": [
       {
         "ref": "SITE_CONFIG_LOG.PLAN_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-config",
+        "file": "apps/web/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.analytics_fetch_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.ANALYTICS_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/site-config",
         "file": "apps/web/src/constants/site-config.ts"
@@ -10930,6 +12968,14 @@
         "file": "apps/web/src/constants/tag.ts"
       }
     ],
+    "tag_metadata.fetch_failed": [
+      {
+        "ref": "TAG_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tag",
+        "file": "apps/web/src/constants/tag.ts"
+      }
+    ],
     "taxonomy_list_module.fetch_failed": [
       {
         "ref": "TAXONOMY_LIST_LOG.MODULE_FETCH_FAILED",
@@ -10954,6 +13000,14 @@
         "file": "apps/web/src/constants/tenant-email-identity.ts"
       }
     ],
+    "tenant_entitlements.grants_fetch_failed": [
+      {
+        "ref": "TENANT_ENTITLEMENTS_LOG.GRANTS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tenant-entitlements",
+        "file": "apps/web/src/constants/tenant-entitlements.ts"
+      }
+    ],
     "tenant_write.unresolved": [
       {
         "ref": "TENANT_WRITE_LOG.UNRESOLVED",
@@ -10976,6 +13030,14 @@
         "scope": "app:web",
         "from": "@web/constants/theme-tokens",
         "file": "apps/web/src/constants/theme-tokens.ts"
+      }
+    ],
+    "timeline_module.fetch_failed": [
+      {
+        "ref": "TIMELINE_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/timeline",
+        "file": "apps/web/src/constants/timeline.ts"
       }
     ],
     "topic_index_page.fetch_failed": [
@@ -11005,6 +13067,14 @@
     "topic_breadcrumbs.fetch_failed": [
       {
         "ref": "TOPIC_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic",
+        "file": "apps/web/src/constants/topic.ts"
+      }
+    ],
+    "topic_metadata.fetch_failed": [
+      {
+        "ref": "TOPIC_LOG.METADATA_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/topic",
         "file": "apps/web/src/constants/topic.ts"
@@ -11202,6 +13272,62 @@
         "file": "apps/worker/src/constants/inactivity-sweep.ts"
       }
     ],
+    "member_access.check_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.CHECK_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.check_now_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.CHECK_NOW_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.resend_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.RESEND_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.revoke_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.REVOKE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.invite_delete_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.INVITE_DELETE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.sweep_member_failed": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.SWEEP_MEMBER_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
+    "member_access.locked_invite_delete_skipped": [
+      {
+        "ref": "MEMBER_ACCESS_LOG.LOCKED_INVITE_DELETE_SKIPPED",
+        "scope": "app:worker",
+        "from": "@worker/constants/member-access",
+        "file": "apps/worker/src/constants/member-access.ts"
+      }
+    ],
     "newsletter_send.start_failed": [
       {
         "ref": "NEWSLETTER_SEND_LOG.START_FAILED",
@@ -11274,6 +13400,14 @@
         "file": "apps/worker/src/constants/newsletter-send.ts"
       }
     ],
+    "newsletter_send.move_up_price_failed": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.MOVE_UP_PRICE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
     "newsletter_send.alert_no_recipients": [
       {
         "ref": "NEWSLETTER_SEND_LOG.ALERT_NO_RECIPIENTS",
@@ -11298,20 +13432,6 @@
         "file": "apps/worker/src/constants/newsletter-send.ts"
       }
     ],
-    "SCHEDULED": [
-      {
-        "ref": "NEWSLETTER_POST_STATE.SCHEDULED",
-        "scope": "app:worker",
-        "from": "@worker/constants/newsletter-send",
-        "file": "apps/worker/src/constants/newsletter-send.ts"
-      },
-      {
-        "ref": "SCHEDULED_POST_STATE.SCHEDULED",
-        "scope": "app:worker",
-        "from": "@worker/constants/scheduled-post-purge",
-        "file": "apps/worker/src/constants/scheduled-post-purge.ts"
-      }
-    ],
     "CANCELLED": [
       {
         "ref": "NEWSLETTER_POST_STATE.CANCELLED",
@@ -11323,14 +13443,6 @@
     "UNCLAIMED": [
       {
         "ref": "NEWSLETTER_POST_STATE.UNCLAIMED",
-        "scope": "app:worker",
-        "from": "@worker/constants/newsletter-send",
-        "file": "apps/worker/src/constants/newsletter-send.ts"
-      }
-    ],
-    "NORMAL": [
-      {
-        "ref": "NEWSLETTER_SEND_PACE.NORMAL",
         "scope": "app:worker",
         "from": "@worker/constants/newsletter-send",
         "file": "apps/worker/src/constants/newsletter-send.ts"
@@ -11363,6 +13475,22 @@
     "owner_access.check_failed": [
       {
         "ref": "OWNER_ACCESS_LOG.CHECK_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.check_now_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.CHECK_NOW_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.resend_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.RESEND_FAILED",
         "scope": "app:worker",
         "from": "@worker/constants/owner-access",
         "file": "apps/worker/src/constants/owner-access.ts"
@@ -11422,6 +13550,54 @@
         "scope": "app:worker",
         "from": "@worker/constants/owner-access",
         "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_email.send_failed": [
+      {
+        "ref": "OWNER_EMAIL_LOG.SEND_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-email",
+        "file": "apps/worker/src/constants/owner-email.ts"
+      }
+    ],
+    "owner_email.release_failed": [
+      {
+        "ref": "OWNER_EMAIL_LOG.RELEASE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-email",
+        "file": "apps/worker/src/constants/owner-email.ts"
+      }
+    ],
+    "BAND_NEAR": [
+      {
+        "ref": "OWNER_NEWSLETTER_EMAIL.BAND_NEAR",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-email",
+        "file": "apps/worker/src/constants/owner-email.ts"
+      }
+    ],
+    "EMAILS_NEAR": [
+      {
+        "ref": "OWNER_NEWSLETTER_EMAIL.EMAILS_NEAR",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-email",
+        "file": "apps/worker/src/constants/owner-email.ts"
+      }
+    ],
+    "BAND_PAUSED": [
+      {
+        "ref": "OWNER_NEWSLETTER_EMAIL.BAND_PAUSED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-email",
+        "file": "apps/worker/src/constants/owner-email.ts"
+      }
+    ],
+    "EMAILS_PAUSED": [
+      {
+        "ref": "OWNER_NEWSLETTER_EMAIL.EMAILS_PAUSED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-email",
+        "file": "apps/worker/src/constants/owner-email.ts"
       }
     ],
     "PENDING_SUBSCRIBERS": [
@@ -11560,12 +13736,36 @@
         "file": "apps/worker/src/constants/scheduled-post-purge.ts"
       }
     ],
+    "scheduled_post_skim.start_failed": [
+      {
+        "ref": "SCHEDULED_POST_SKIM_LOG.START_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post-skim",
+        "file": "apps/worker/src/constants/scheduled-post-skim.ts"
+      }
+    ],
+    "scheduled_post_skim.run_failed": [
+      {
+        "ref": "SCHEDULED_POST_SKIM_LOG.RUN_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post-skim",
+        "file": "apps/worker/src/constants/scheduled-post-skim.ts"
+      }
+    ],
     "STALE": [
       {
         "ref": "SCHEDULED_POST_STATE.STALE",
         "scope": "app:worker",
-        "from": "@worker/constants/scheduled-post-purge",
-        "file": "apps/worker/src/constants/scheduled-post-purge.ts"
+        "from": "@worker/constants/scheduled-post",
+        "file": "apps/worker/src/constants/scheduled-post.ts"
+      }
+    ],
+    "REDATED": [
+      {
+        "ref": "SCHEDULED_POST_STATE.REDATED",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post",
+        "file": "apps/worker/src/constants/scheduled-post.ts"
       }
     ],
     "pending": [
@@ -11672,6 +13872,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/dns",
         "file": "apps/platform/src/constants/dns.ts"
+      },
+      {
+        "ref": "SUPPORT_LIMIT.MESSAGES_PER_WINDOW",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "6": [
@@ -11772,6 +13978,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/device-frame",
         "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "150": [
+      {
+        "ref": "SUPPORT_LIMIT.SUBJECT_MAX_LENGTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "200": [
@@ -11908,6 +14122,14 @@
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
+    "422": [
+      {
+        "ref": "HTTP_STATUS.UNPROCESSABLE_ENTITY",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
     "425": [
       {
         "ref": "HTTP_STATUS.TOO_EARLY",
@@ -11938,6 +14160,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
+      },
+      {
+        "ref": "SUPPORT_LIMIT.ORIGIN_PATH_MAX_LENGTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "502": [
@@ -11986,6 +14214,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "5000": [
+      {
+        "ref": "SUPPORT_LIMIT.MESSAGE_MAX_LENGTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/support",
+        "file": "apps/platform/src/constants/support.ts"
       }
     ],
     "10000": [

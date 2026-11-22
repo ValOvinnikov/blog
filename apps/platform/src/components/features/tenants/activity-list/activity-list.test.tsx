@@ -6,11 +6,15 @@ import {
   MOCK_AUDIT_EVENT_AT,
 } from '@platform/testing/audit-events/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { formatDate } from '@platform/utils/format-date/format-date';
 import {
   AUDIT_ACTION,
   GITHUB_AUDIT_ACTOR_ID_PREFIX,
+  LOCALE_ISO_CODES,
   WORKER_AUDIT_ACTOR_ID,
 } from '@shinefold/config';
+import { CAPABILITY, TENANT_PLAN } from '@shinefold/config/constants';
+import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
 
 import { ActivityList } from './activity-list';
 
@@ -22,6 +26,8 @@ const FIVE_MINUTES_MS = 5 * 60 * 1000;
 const MOCK_NOW = new Date(MOCK_AUDIT_EVENT_AT.getTime() + FIVE_MINUTES_MS);
 const MOCK_FROM_DOMAIN = faker.internet.domainName();
 const MOCK_TO_DOMAIN = faker.internet.domainName();
+const MOCK_GRANT_EXPIRES_AT = faker.date.future();
+const MOCK_GRANT_NOTE = faker.lorem.sentence();
 
 const setup = customRender(ActivityList, {
   events: [
@@ -148,6 +154,92 @@ describe(`<${ActivityList.name}/>`, () => {
     );
 
     expect(mainAddress).toBeVisible();
+  });
+
+  it('shows an operator plan change from one plan to the other', () => {
+    setup({
+      events: [
+        mockAuditEvent({
+          action: AUDIT_ACTION.SETTINGS_UPDATED,
+          details: {
+            planChanged: { from: TENANT_PLAN.GROWTH, to: TENANT_PLAN.STARTER },
+          },
+        }),
+      ],
+    });
+
+    const planChange = screen.getByText('Plan: Growth → Starter');
+
+    expect(planChange).toBeVisible();
+  });
+
+  it('names the item, expiry and note of a feature grant', () => {
+    setup({
+      events: [
+        mockAuditEvent({
+          action: AUDIT_ACTION.ENTITLEMENT_GRANTED,
+          details: {
+            kind: ENTITLEMENT_KIND.CAPABILITY,
+            key: CAPABILITY.NEWSLETTER,
+            value: null,
+            expiresAt: MOCK_GRANT_EXPIRES_AT.toISOString(),
+            note: MOCK_GRANT_NOTE,
+          },
+        }),
+      ],
+    });
+
+    const item = screen.getByText('Item: Newsletter');
+    const expiry = screen.getByText(
+      `Until ${formatDate(MOCK_GRANT_EXPIRES_AT, LOCALE_ISO_CODES.EN)}`,
+    );
+    const note = screen.getByText(`Note: ${MOCK_GRANT_NOTE}`);
+
+    expect(item).toBeVisible();
+    expect(expiry).toBeVisible();
+    expect(note).toBeVisible();
+  });
+
+  it('names the language count of a languages grant lasting until revoked', () => {
+    setup({
+      events: [
+        mockAuditEvent({
+          action: AUDIT_ACTION.ENTITLEMENT_GRANTED,
+          details: {
+            kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+            key: ENTITLEMENT_KIND.LOCALE_LIMIT,
+            value: 3,
+            expiresAt: null,
+            note: null,
+          },
+        }),
+      ],
+    });
+
+    const item = screen.getByText('Item: 2 additional languages');
+    const expiry = screen.getByText('Until revoked');
+
+    expect(item).toBeVisible();
+    expect(expiry).toBeVisible();
+  });
+
+  it('names a language raise closing the earlier grant without a count', () => {
+    setup({
+      events: [
+        mockAuditEvent({
+          action: AUDIT_ACTION.ENTITLEMENT_REVOKED,
+          details: {
+            kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+            key: ENTITLEMENT_KIND.LOCALE_LIMIT,
+            replacedBy: faker.string.uuid(),
+          },
+        }),
+      ],
+    });
+
+    const item = screen.getByText('Item: Additional languages');
+
+    expect(item).toBeVisible();
   });
 
   it('shows no raw detail keys it does not know', () => {

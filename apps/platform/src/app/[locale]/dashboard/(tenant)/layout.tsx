@@ -5,16 +5,16 @@ import { TenantSwitcher } from '@platform/components/features/layout/tenant-swit
 import { OwnerSuspensionBanner } from '@platform/components/features/tenants/owner-suspension-banner';
 import { UPGRADE_STATE } from '@platform/constants/billing';
 import { ShellStudioAccessProvider } from '@platform/context/shell-studio-access-provider';
-import { TenantPlanProvider } from '@platform/context/tenant-plan-provider';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
 import { resolveTenantPageAccess } from '@platform/server/auth/resolve-tenant-page-access';
 import { upgradeStateFor } from '@platform/server/billing/upgrade-state-for';
 import { loadPlatformShellChrome } from '@platform/server/layout/load-platform-shell-chrome';
 import { dashboardNavSections } from '@platform/utils/dashboard-nav-sections/dashboard-nav-sections';
+import { helpNavSection } from '@platform/utils/help-nav-section/help-nav-section';
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { toTenantSwitcherItems } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
-import { queries } from '@shinefold/db';
 import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { Suspense } from 'react';
 
@@ -25,13 +25,11 @@ type TProps = {
 export default async function DashboardTenantLayout({ children }: TProps) {
   const { tenant, membership, viewer, tenants } =
     await resolveDashboardTenant();
-  const [{ admin: sessionAdmin }, chrome, access, unreadLeadsCount] =
-    await Promise.all([
-      listSessionTenants(),
-      loadPlatformShellChrome(),
-      resolveTenantPageAccess(tenant, viewer),
-      queries.leads.countUnreadLeadsForTenant(tenant.id),
-    ]);
+  const [{ admin: sessionAdmin }, chrome, access] = await Promise.all([
+    listSessionTenants(),
+    loadPlatformShellChrome(),
+    resolveTenantPageAccess(tenant, viewer),
+  ]);
   const { isSidebarInitiallyCollapsed, tNavSections, userName, userEmail } =
     chrome;
   const studioAccess = ownerStudioAccessFor(tenant, viewer);
@@ -41,12 +39,10 @@ export default async function DashboardTenantLayout({ children }: TProps) {
   return (
     <PlatformShell
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
-      sections={dashboardNavSections(
-        tNavSections,
-        access,
-        studioAccess,
-        unreadLeadsCount,
-      )}
+      sections={[
+        ...dashboardNavSections(tNavSections, access, studioAccess),
+        helpNavSection(tNavSections, adminRoutes.dashboardHelp()),
+      ]}
       switcher={
         hasArrayGotMultipleItems(tenants) ? (
           <TenantSwitcher
@@ -80,7 +76,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
       }}
     >
       <ShellStudioAccessProvider studioAccess={studioAccess}>
-        <TenantPlanProvider plan={tenant.plan}>{children}</TenantPlanProvider>
+        {children}
       </ShellStudioAccessProvider>
     </PlatformShell>
   );

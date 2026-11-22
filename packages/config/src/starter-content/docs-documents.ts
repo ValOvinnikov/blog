@@ -1,26 +1,19 @@
-import type { Module_heroStatement } from '@shinefold/config/sanity/generated/types';
-
-import {
-  BRAND_VARIANT,
-  HERO_VARIANT,
-  type TLocaleIsoCode,
-} from '@shinefold/config/constants';
+import type { TLocaleIsoCode } from '@shinefold/config/constants';
 
 import { buildBaseDocuments } from './base-documents';
 import type { TStarterCopy } from './copy/starter-copy';
-import type { TStarterDocumentUnion, TStarterModule } from './starter-document';
+import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import { buildFaqModule } from './starter-faq';
+import { moduleSlot, paragraphs, reference } from './starter-fields';
+import { internalLink, navigationLink } from './starter-links';
 import {
-  keyedReference,
-  localizedString,
-  moduleHeadingBlock,
-  paragraphs,
-  reference,
-} from './starter-fields';
-import { ctaButton, internalLink, navigationLink } from './starter-links';
+  INTRODUCTION_MODULE_TITLE,
+  QUESTIONS_MODULE_TITLE,
+} from './starter-module-titles';
 import { buildContentModule } from './starter-modules';
 import { buildSectionPages } from './starter-section-pages';
+import { buildStatementHero } from './starter-statement-hero';
 
 const ids = STARTER_DOCUMENT_IDS;
 
@@ -40,30 +33,30 @@ export function buildDocsDocuments({
       navigationItems: [navigationLink(ids.DOCS_GUIDES_LINK)],
       homeLayout: {
         hero: reference(ids.DOCS_HERO),
-        modules: [ids.DOCS_INTRO, ids.DOCS_FAQ].map(keyedReference),
+        modules: [
+          moduleSlot(ids.DOCS_INTRO, 'module_content'),
+          moduleSlot(ids.DOCS_FAQ, 'module_faq'),
+        ],
       },
     }),
-    {
-      _id: ids.DOCS_HERO,
-      _type: 'module_heroStatement',
-      title: 'Statement Hero',
-      brandVariant: BRAND_VARIANT.PRIMARY,
-      variant: HERO_VARIANT.STACKED,
-      headingBlock: moduleHeadingBlock(
-        locale,
-        hero.heading,
-        hero.supportingText,
-      ),
-      eyebrow: localizedString(locale, hero.eyebrow),
-      ctaButtons: [ctaButton(ids.DOCS_GUIDES_LINK)],
-    } satisfies TStarterModule<Module_heroStatement>,
+    buildStatementHero({
+      id: ids.DOCS_HERO,
+      locale,
+      hero,
+      linkId: ids.DOCS_GUIDES_LINK,
+    }),
     buildContentModule({
       id: ids.DOCS_INTRO,
-      title: 'Introduction',
+      title: INTRODUCTION_MODULE_TITLE,
       locale,
       body: paragraphs(intro.body),
     }),
-    ...buildFaqModule({ id: ids.DOCS_FAQ, title: 'Questions', locale, faq }),
+    ...buildFaqModule({
+      id: ids.DOCS_FAQ,
+      title: QUESTIONS_MODULE_TITLE,
+      locale,
+      faq,
+    }),
     internalLink(ids.DOCS_GUIDES_LINK, guides.title, locale, ids.DOCS_GUIDES),
     ...buildSectionPages({
       locale,

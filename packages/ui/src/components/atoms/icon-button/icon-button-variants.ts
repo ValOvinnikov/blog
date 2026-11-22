@@ -1,4 +1,3 @@
-import { BRAND_VARIANT } from '@shinefold/config';
 import {
   FOCUS_RING,
   HEADER_CONTROL,
@@ -43,24 +42,6 @@ export const iconButtonVariants = tv({
       ],
       circle: ['size-11', HEADER_CONTROL],
     },
-    tone: {
-      [BRAND_VARIANT.PRIMARY]: [],
-      [BRAND_VARIANT.SECONDARY]: [],
-      [BRAND_VARIANT.BRAND_PRIMARY]: [],
-    },
-  },
-  compoundVariants: [
-    {
-      variant: 'control',
-      tone: BRAND_VARIANT.BRAND_PRIMARY,
-      class: [
-        'hover:border-brand-primary-solid hover:bg-brand-primary-solid hover:text-brand-primary-contrast',
-        'focus-visible:bg-brand-primary-solid focus-visible:text-brand-primary-contrast',
-      ],
-    },
-  ],
-  defaultVariants: {
-    tone: BRAND_VARIANT.PRIMARY,
   },
 });
 

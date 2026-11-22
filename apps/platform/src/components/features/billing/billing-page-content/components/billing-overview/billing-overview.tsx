@@ -54,7 +54,10 @@ export const BillingOverview = async ({
     );
   }
 
-  const { nextPayment, invoices } = overview;
+  const {
+    renewal: { nextPayment, endsAt },
+    invoices,
+  } = overview;
 
   return (
     <>
@@ -64,6 +67,7 @@ export const BillingOverview = async ({
         hasPayments={true}
         isSubscribed={isSubscribed}
         nextPayment={nextPayment}
+        endsAt={endsAt}
       />
       <InvoicesTable invoices={invoices} />
     </>

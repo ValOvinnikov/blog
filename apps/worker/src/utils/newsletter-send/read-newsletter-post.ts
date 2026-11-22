@@ -1,4 +1,4 @@
-import type { Page_post } from '@shinefold/config';
+import type { Page_post, TPostSummary } from '@shinefold/config';
 import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
 import type { TTenantSanityCredentials } from '@shinefold/db/queries/tenants';
 import { createPublishedTenantClient } from '@worker/utils/tenant-content/published-tenant-client';
@@ -21,7 +21,7 @@ export type TNewsletterPost = {
   publishedAt: string;
   isSendToSubscribersOn: boolean;
   coverImageUrl: TMaybeUndefined<string>;
-  takeaways: string[];
+  summary: TPostSummary;
 };
 
 const NEWSLETTER_POST_QUERY = `*[_type == "page_post" && _id == $postId][0]{
@@ -43,7 +43,7 @@ function toNewsletterPost(
     publishedAt,
     isSendToSubscribersOn: raw.sendToSubscribers === true,
     coverImageUrl: raw.coverImageUrl,
-    takeaways: postTakeaways?.takeaways ?? [],
+    summary: postTakeaways?.summary ?? [],
   };
 }
 

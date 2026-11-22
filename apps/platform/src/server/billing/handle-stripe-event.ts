@@ -4,6 +4,7 @@ import { BILLING_LOG } from '@platform/constants/billing';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
 import { handleCatalogueEvent } from '@platform/server/billing/catalogue/handle-catalogue-event';
 import { revalidatePlatformSite } from '@platform/server/billing/catalogue/revalidate-platform-site';
+import { releaseAppliedUpdateSchedule } from '@platform/server/billing/release-applied-update-schedule';
 import { sendPaymentReceipt } from '@platform/server/billing/send-payment-receipt';
 import { subscriptionIdFromEvent } from '@platform/server/billing/subscription-id-from-event';
 import { syncStripeSubscription } from '@platform/server/billing/sync-stripe-subscription';
@@ -46,6 +47,7 @@ export const handleStripeEvent = async (
   if (!subscriptionId) return;
 
   const synced = await syncStripeSubscription(stripe, subscriptionId);
+  await releaseAppliedUpdateSchedule(stripe, event);
   if (synced && synced.fromPlan !== synced.toPlan) {
     const { tenantId, fromPlan, toPlan } = synced;
     after(() => revalidateSiteConfig(tenantId));

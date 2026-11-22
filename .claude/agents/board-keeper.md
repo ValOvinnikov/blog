@@ -3,7 +3,7 @@ name: board-keeper
 description: >-
   Creates new issues (given a fully-specified title/body/labels, and an
   optional parent) and places them on the board correctly, and reconciles
-  the Blog Build project board (project #2) against repo reality — every
+  the sf Board project board (project #2) against repo reality — every
   open PR's issue sits in Code Review, in-flight branches sit In Progress,
   merged-PR issues are closed/Done, a completed parent issue whose
   sub-issues all trace to merged PRs is Done, a parent still Todo moves to
@@ -287,7 +287,7 @@ issue has no board item, resolve it directly:
 
 ```
 gh api graphql -f query='query {
-  repository(owner: "ValOvinnikov", name: "blog") {
+  repository(owner: "ValOvinnikov", name: "sf-mono") {
     issue(number: <n>) {
       projectItems(first: 10, includeArchived: true) {
         nodes {
@@ -317,7 +317,7 @@ Skip this step for any other trigger.
    item on project 2:
 
    ```
-   gh project item-add 2 --owner ValOvinnikov --url https://github.com/ValOvinnikov/blog/issues/<n>
+   gh project item-add 2 --owner ValOvinnikov --url https://github.com/ValOvinnikov/sf-mono/issues/<n>
    ```
 
    Confirm it landed with the `projectItems` query, not the Step 1 listing.
@@ -494,7 +494,7 @@ Two triggers:
    Find these with one bulk query, not one call per issue:
 
 ```
-gh api graphql -f query='{ repository(owner:"ValOvinnikov", name:"blog") {
+gh api graphql -f query='{ repository(owner:"ValOvinnikov", name:"sf-mono") {
   issues(states: OPEN, first: 100) { nodes {
     number state subIssuesSummary { total completed }
   } pageInfo { hasNextPage endCursor } } } }'

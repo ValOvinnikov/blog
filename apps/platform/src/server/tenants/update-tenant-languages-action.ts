@@ -6,7 +6,7 @@ import {
 } from '@platform/constants/settings';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { enqueueCookieStatementSeed } from '@platform/server/cookie-statement/enqueue-cookie-statement-seed';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -52,7 +52,7 @@ export const updateTenantLanguagesAction = async (
   const parsed = updateTenantLanguagesInputSchema.safeParse(additionalLocales);
   if (!parsed.success) return INVALID_LANGUAGES;
 
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
 
   try {
     const result = await queries.tenants.setTenantAdditionalLocales(
@@ -78,6 +78,7 @@ export const updateTenantLanguagesAction = async (
             parsed.data.filter(
               (locale) => !tenant.additionalLocales.includes(locale),
             ),
+            tenant.entitlements.localeLimit,
           )
         : INVALID_LANGUAGES;
     }

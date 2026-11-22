@@ -1,6 +1,5 @@
-import type { ArticleText } from '@shinefold/config/sanity/generated/types';
-
 import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import type { ArticleText } from '@shinefold/config/sanity/generated/types';
 
 export function seo(metaTitle: string, metaDescription: string) {
   return {
@@ -21,6 +20,13 @@ export function reference(id: string) {
 
 export function keyedReference(id: string) {
   return { _key: id, ...reference(id) };
+}
+
+export function moduleSlot<TModuleType extends string>(
+  id: string,
+  moduleType: TModuleType,
+) {
+  return { _key: id, _type: moduleType, _ref: id };
 }
 
 function localized<
@@ -63,7 +69,8 @@ export function moduleHeadingBlock(
 function localizedBlocks<
   TValueType extends
     | 'internationalizedArrayArticleTextValue'
-    | 'internationalizedArrayListedTextValue',
+    | 'internationalizedArrayListedTextValue'
+    | 'internationalizedArrayParagraphTextValue',
   TBlock,
 >(valueType: TValueType, locale: TLocaleIsoCode, value: TBlock[]) {
   return [{ _key: locale, _type: valueType, language: locale, value }];
@@ -88,6 +95,14 @@ export function localizedListedText(
     'internationalizedArrayListedTextValue',
     locale,
     paragraphs(texts),
+  );
+}
+
+export function localizedParagraphText(locale: TLocaleIsoCode, text: string) {
+  return localizedBlocks(
+    'internationalizedArrayParagraphTextValue',
+    locale,
+    paragraphs([text]),
   );
 }
 

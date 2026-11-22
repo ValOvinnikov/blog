@@ -40,6 +40,8 @@ export const MOCK_POST_RELATED_STUB_TEST_ID = 'stub-post-related';
 
 export const MOCK_CHILDREN_STUB_TEST_ID = 'stub-children';
 
+export const MOCK_BREADCRUMBS_STUB_TEST_ID = 'stub-breadcrumbs';
+
 export const mockModule = <T extends TModule['type']>(
   type: T,
   overrides: Partial<TModule<T>> = {},

@@ -100,6 +100,15 @@ export const Danger: TStory = {
   },
 };
 
+export const DefaultDark: TStory = {
+  globals: { theme: 'dark' },
+};
+
+export const DangerDark: TStory = {
+  ...Danger,
+  globals: { theme: 'dark' },
+};
+
 export const PrivacySection: TStory = {
   render: () => (
     <Panel>

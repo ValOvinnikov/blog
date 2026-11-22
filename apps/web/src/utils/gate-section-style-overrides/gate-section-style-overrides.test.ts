@@ -1,4 +1,7 @@
 import { TENANT_PLAN } from '@shinefold/config/constants';
+import { ENTITLEMENT_KIND, LOOK_FIELD } from '@shinefold/db/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
+import { mockTenantEntitlements } from '@web/testing/server/settings-features/fixtures';
 import {
   MOCK_NO_SECTION_STYLE_OVERRIDES,
   MOCK_SECTION_STYLE_OVERRIDES,
@@ -10,7 +13,7 @@ describe(gateSectionStyleOverrides, () => {
   it('keeps every override on Growth', () => {
     const gated = gateSectionStyleOverrides(
       MOCK_SECTION_STYLE_OVERRIDES,
-      TENANT_PLAN.GROWTH,
+      mockTenantEntitlements(TENANT_PLAN.GROWTH),
     );
 
     expect(gated).toEqual(MOCK_SECTION_STYLE_OVERRIDES);
@@ -21,10 +24,27 @@ describe(gateSectionStyleOverrides, () => {
     (plan) => {
       const gated = gateSectionStyleOverrides(
         MOCK_SECTION_STYLE_OVERRIDES,
-        plan,
+        mockTenantEntitlements(plan),
       );
 
       expect(gated).toEqual(MOCK_NO_SECTION_STYLE_OVERRIDES);
     },
   );
+
+  it('keeps only the override whose Look field is granted', () => {
+    const gated = gateSectionStyleOverrides(
+      MOCK_SECTION_STYLE_OVERRIDES,
+      mockTenantEntitlements(TENANT_PLAN.FREE, [
+        mockEntitlementGrant({
+          kind: ENTITLEMENT_KIND.LOOK_FIELD,
+          key: LOOK_FIELD.CARD_STYLE,
+        }),
+      ]),
+    );
+
+    expect(gated).toEqual({
+      ...MOCK_NO_SECTION_STYLE_OVERRIDES,
+      cardStyle: MOCK_SECTION_STYLE_OVERRIDES.cardStyle,
+    });
+  });
 });

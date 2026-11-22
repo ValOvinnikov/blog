@@ -1,11 +1,15 @@
 import 'server-only';
 
 import { readRenamedCookie } from '@platform/server/renamed-cookie/read-renamed-cookie';
+import { loadPlatformTenant } from '@platform/server/tenants/load-platform-tenant';
 import {
   ACTIVE_TENANT_COOKIE,
   LEGACY_ACTIVE_TENANT_COOKIE,
 } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
-import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import type {
+  TPlatformTenant,
+  TPlatformTenantSummary,
+} from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TMembership } from '@shinefold/db/schema/memberships';
 import { notFound, redirect } from 'next/navigation';
@@ -18,7 +22,7 @@ export type TDashboardTenantContext = {
   tenant: TPlatformTenant;
   membership: TMembership;
   viewer: TPlatformViewer;
-  tenants: TPlatformTenant[];
+  tenants: TPlatformTenantSummary[];
 };
 
 // `cache()`-wrapped because a layout cannot pass its tenant to its page.
@@ -36,7 +40,7 @@ export const resolveDashboardTenant = cache(
       }
 
       return {
-        tenant,
+        tenant: await loadPlatformTenant(tenant),
         membership,
         viewer: toPlatformViewer({ membership, admin }),
         tenants,
@@ -58,7 +62,7 @@ export const resolveDashboardTenant = cache(
     }
 
     return {
-      tenant: activeTenant,
+      tenant: await loadPlatformTenant(activeTenant),
       membership: activeMembership,
       viewer: toPlatformViewer({ membership: activeMembership, admin }),
       tenants,

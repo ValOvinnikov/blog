@@ -29,33 +29,42 @@ async function runNewsletterSend(
     await sleep(check.waitMs);
     check = await checkNewsletterPost(tenantId, postId, claimedAt);
   }
-  if (check.state === NEWSLETTER_POST_STATE.UNCLAIMED) return;
   if (check.state === NEWSLETTER_POST_STATE.CANCELLED) {
     await releaseNewsletterSendClaim(tenantId, postId, claimedAt);
     return;
   }
-  const gate = await gateNewsletterSend(tenantId, postId);
+  if (check.state !== NEWSLETTER_POST_STATE.READY) return;
+
+  const { post } = check;
+  const gate = await gateNewsletterSend({ tenantId, postId, claimedAt, post });
   if (gate.gate === NEWSLETTER_SEND_GATE.NOT_CONFIGURED) {
     await releaseNewsletterSendClaim(tenantId, postId, claimedAt);
     return;
   }
   if (gate.gate === NEWSLETTER_SEND_GATE.SKIPPED) return;
 
-  const { post } = check;
   let { pace } = gate;
   let afterId: TMaybeUndefined<string>;
   let unreadableCount = 0;
+  let reachedCount = 0;
   for (;;) {
     if (pace === NEWSLETTER_SEND_PACE.SLOW && afterId) {
       await sleep(NEWSLETTER_SLOW_PAUSE_MS);
     }
-    const page = await sendNewsletterPage({ tenantId, postId, post, afterId });
+    const page = await sendNewsletterPage({
+      tenantId,
+      postId,
+      claimedAt,
+      post,
+      afterId,
+      reachedBefore: reachedCount,
+    });
     await recordNewsletterSends(tenantId, page.sentCount);
     if (page.pace === NEWSLETTER_SEND_PACE.STOPPED) return;
 
     unreadableCount += page.unreadableCount;
     if (page.isLastPage) break;
-    ({ pace, lastId: afterId } = page);
+    ({ pace, lastId: afterId, reachedCount } = page);
   }
   await completeNewsletterSend(tenantId, postId, unreadableCount);
 }

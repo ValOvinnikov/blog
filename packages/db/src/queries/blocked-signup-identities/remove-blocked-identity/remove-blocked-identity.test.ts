@@ -3,11 +3,11 @@ import { ERROR_CODE } from '@shinefold/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
 import { addBlockedIdentity } from '@shinefold/db/queries/blocked-signup-identities/add-blocked-identity';
 import * as schema from '@shinefold/db/schema';
+import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
 import {
   MOCK_BLOCK_REASON,
   MOCK_BLOCKED_DOMAIN,
 } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
-import { insertTestAdmin } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
 import { removeBlockedIdentity } from './remove-blocked-identity';

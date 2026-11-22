@@ -1,6 +1,5 @@
 import {
   pageHref,
-  SANITY_WEBHOOK_OPERATION,
   type TMaybeNull,
   type TMaybeUndefined,
 } from '@shinefold/config';
@@ -9,20 +8,18 @@ import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import {
   DOCUMENT_NOT_FOUND_REASON,
   type FETCH_FAILED_REASON,
-  PATH_UNDERIVABLE_REASON,
 } from '@web/constants/revalidate';
+import { buildRedirectPaths } from '@web/server/revalidate/build-redirect-paths/build-redirect-paths';
 import { derivePostPublishPaths } from '@web/server/revalidate/derive-post-publish-paths/derive-post-publish-paths';
 import { deriveTenantSitePaths } from '@web/server/revalidate/derive-tenant-site-paths/derive-tenant-site-paths';
+import type { IRevalidateWebhookRedirect } from '@web/server/revalidate/is-revalidate-webhook-body/is-revalidate-webhook-body';
 import type { TRenamedDocument } from '@web/utils/build-renamed-document-hrefs';
 
 export const POST_TYPE = 'page_post';
 
-// A redirect's old path and a page-size change's dropped pages are not in any list.
-const UNDERIVABLE_TYPES = new Set(['redirect', 'module_postList']);
-
 export type TDeriveRevalidatePathsResult = TResult<
   string[],
-  typeof FETCH_FAILED_REASON | typeof PATH_UNDERIVABLE_REASON
+  typeof FETCH_FAILED_REASON
 >;
 
 export type TDeriveRevalidatePathsInput = {
@@ -31,13 +28,10 @@ export type TDeriveRevalidatePathsInput = {
   slug: TMaybeUndefined<string>;
   previousSlug: TMaybeUndefined<string>;
   operation: TMaybeNull<string>;
+  redirect: IRevalidateWebhookRedirect;
   tenantId: string;
   tenant: TTenantSanityContext;
 };
-
-const isUnderivable = (type: string, operation: TMaybeNull<string>) =>
-  UNDERIVABLE_TYPES.has(type) ||
-  (type !== POST_TYPE && operation === SANITY_WEBHOOK_OPERATION.DELETE);
 
 const toRenamedDocument = ({
   type,
@@ -51,15 +45,13 @@ const toRenamedDocument = ({
 export const deriveRevalidatePaths = async (
   input: TDeriveRevalidatePathsInput,
 ): Promise<TDeriveRevalidatePathsResult> => {
-  const { type, id, slug, operation, tenantId, tenant } = input;
-  if (isUnderivable(type, operation)) {
-    return errorResult(PATH_UNDERIVABLE_REASON);
-  }
+  const { type, id, slug, operation, redirect, tenantId, tenant } = input;
   const renamedDocument = toRenamedDocument(input);
   const tenantSite = {
     tenantId,
     tenant,
     documentHref: pageHref(type, slug),
+    localizedDocumentPaths: buildRedirectPaths(operation, redirect),
     renamedDocument,
   };
   if (type !== POST_TYPE) {

@@ -9,6 +9,7 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@shinefold/db/constants';
@@ -34,6 +35,7 @@ vi.mock('@platform/server/leads/delete-lead-action');
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     memberships: {
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },

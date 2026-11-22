@@ -1,32 +1,52 @@
 import { FeaturesSettings } from '@platform/components/features/capabilities/features-settings';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
+import {
+  toAnalyticsDraft,
+  withConsentBannerForGoogleAnalytics,
+} from '@platform/utils/analytics-draft/analytics-draft';
+import { toGrantTarget } from '@platform/utils/grant-target/grant-target';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import {
   clampToEntitlement,
   withComingSoonOff,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
-import { PLAN_REGISTRY } from '@shinefold/db/constants';
+import { queries } from '@shinefold/db';
 
 export type TFeaturesPageContentProps = {
   tenant: TPlatformTenant;
+  canGrantEntitlements?: boolean;
 };
 
 export const FeaturesPageContent = async ({
   tenant,
+  canGrantEntitlements = false,
 }: TFeaturesPageContentProps) => {
-  const entitledCapabilities = PLAN_REGISTRY[tenant.plan];
-  const { values, savedAt } = await getSettingsFeaturesOrDefaults(tenant.id);
-  const initialValues = withComingSoonOff(
-    clampToEntitlement(values, entitledCapabilities),
-  );
+  const { id, entitlements, grantedEntitlements, archivedAt } = tenant;
+  const entitledCapabilities = entitlements.capabilities;
+  const [{ values, savedAt }, storedAnalytics] = await Promise.all([
+    getSettingsFeaturesOrDefaults(id),
+    queries.tenantAnalytics.getStoredTenantAnalytics(id),
+  ]);
+  const storedValues = {
+    ...withComingSoonOff(clampToEntitlement(values, entitledCapabilities)),
+    ...toAnalyticsDraft(storedAnalytics),
+  };
+  const initialValues = entitlements.hasOwnAnalytics
+    ? withConsentBannerForGoogleAnalytics(storedValues)
+    : storedValues;
 
   return (
     <FeaturesSettings
-      tenantId={tenant.id}
+      tenantId={id}
       entitledCapabilities={entitledCapabilities}
+      grants={{
+        target: toGrantTarget(tenant, canGrantEntitlements),
+        granted: grantedEntitlements.capabilities,
+      }}
+      hasOwnAnalytics={entitlements.hasOwnAnalytics}
       initialValues={initialValues}
       savedAt={savedAt}
-      archivedAt={tenant.archivedAt}
+      archivedAt={archivedAt}
     />
   );
 };

@@ -1,4 +1,7 @@
-import { IMAGE_LAYOUT } from '@shinefold/config/constants';
+import {
+  IMAGE_LAYOUT,
+  PORTABLE_TEXT_BLOCK_TYPE,
+} from '@shinefold/config/constants';
 import {
   imageAltField,
   imageHotspotOptions,
@@ -6,15 +9,8 @@ import {
 import { toTitleCase } from '@shinefold/utils/primitives';
 import { defineField, defineType } from 'sanity';
 
-/**
- * Image type used only inside `articleTextSchema`'s body array. Composes the
- * same `alt` field as `imageWithAltSchema` (shared, not duplicated — see
- * `helpers/image-alt-field`) plus a `layout` choice that is meaningful for
- * body content but not for hero/avatar/brand/OG/site-settings images, which
- * stay on `imageWithAltSchema` unmodified.
- */
 export const bodyImageSchema = defineType({
-  name: 'bodyImage',
+  name: PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE,
   title: 'Body Image',
   type: 'image',
   description:

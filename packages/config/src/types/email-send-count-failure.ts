@@ -1,7 +1,11 @@
 import type { TEmailType } from '@shinefold/config/constants';
 
-export interface IEmailSendCountFailure {
-  siteId: string;
+/** A send counted against `siteId`, or against the platform bucket when it has none. */
+export interface IEmailSendCount {
+  siteId?: string;
   emailType: TEmailType;
+}
+
+export interface IEmailSendCountFailure extends IEmailSendCount {
   error: unknown;
 }

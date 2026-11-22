@@ -6,6 +6,7 @@ import {
 } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { hasLiveStripeSubscription } from '@platform/server/billing/has-live-stripe-subscription';
 import {
   MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
@@ -16,6 +17,7 @@ import {
   MOCK_TENANT_NAME,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { logger } from '@platform/utils/logger/logger';
 import {
   ACTION_OUTCOME,
@@ -36,9 +38,14 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@shinefold/db', () => ({
   queries: {
+    ...noEntitlementGrantQueries(),
     tenants: { getTenantById: vi.fn(), deleteTenant: vi.fn() },
     auditEvents: { insertAuditEvent: vi.fn() },
   },
+}));
+
+vi.mock('@platform/server/billing/has-live-stripe-subscription', () => ({
+  hasLiveStripeSubscription: vi.fn(),
 }));
 
 faker.seed(5997);
@@ -68,6 +75,33 @@ describe(deleteTenantAction, () => {
       sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT,
     });
     insertAuditEventMock.mockReset();
+    vi.mocked(hasLiveStripeSubscription).mockReset().mockResolvedValue(false);
+  });
+
+  it('refuses, deleting and auditing nothing, while Stripe still bills the site', async () => {
+    vi.mocked(hasLiveStripeSubscription).mockResolvedValueOnce(true);
+
+    const result = await deleteTenantAction(MOCK_TENANT_ID, {
+      confirm: MOCK_TENANT_NAME,
+    });
+
+    expect(result).toStrictEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.SUBSCRIPTION_LIVE,
+    });
+    expect(deleteTenantMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('returns a server error without deleting when Stripe cannot be asked', async () => {
+    vi.mocked(hasLiveStripeSubscription).mockResolvedValueOnce(undefined);
+
+    const result = await deleteTenantAction(MOCK_TENANT_ID, {
+      confirm: MOCK_TENANT_NAME,
+    });
+
+    expect(result).toStrictEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
   it('stops before any tenant work when the super-admin gate rejects', async () => {

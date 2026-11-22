@@ -1,3 +1,4 @@
+import { GITHUB_PINNED_READ_REVALIDATE } from '@platform/constants/github';
 import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
 import { okResult } from '@shinefold/utils';
 import { z } from 'zod';
@@ -51,6 +52,7 @@ const fetchComparePage = (
   fetchGitHubJson(
     `/compare/${encodeURIComponent(base)}...${encodeURIComponent(head)}?per_page=${PER_PAGE}&page=${page}`,
     (body) => compareSchema.parse(body),
+    GITHUB_PINNED_READ_REVALIDATE,
   );
 
 const FILE_PAGES = Array.from(

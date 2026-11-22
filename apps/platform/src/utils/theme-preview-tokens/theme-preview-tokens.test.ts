@@ -4,17 +4,27 @@ import { defaultLookFormValues } from '@platform/utils/default-look-values/defau
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
+  BRAND_PALETTE,
   BUTTON_SHAPE,
   BUTTON_SHAPE_DECLARATIONS,
   CARD_STYLE,
   DENSITY,
+  DIVIDER_WIDTH,
+  DIVIDER_WIDTH_DECLARATIONS,
   formatOklchRamp,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
+  HEADING_CASE,
+  HEADING_CASE_DECLARATIONS,
+  HEADING_WEIGHT,
+  HEADING_WEIGHT_DECLARATIONS,
   HUE_MAX,
   HUE_MIN,
+  IMAGE_SCRIM_RAMP,
+  IMAGE_PROPORTION,
+  IMAGE_PROPORTION_DECLARATIONS,
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
   NAV_LINK_STYLE,
@@ -44,6 +54,10 @@ const MOCK_PREVIEW_VALUES: TThemePreviewValues = {
   headerControlShape: HEADER_CONTROL_SHAPE.ROUND,
   buttonShape: BUTTON_SHAPE.ROUNDED,
   navLinkStyle: NAV_LINK_STYLE.PLAIN,
+  headingWeight: HEADING_WEIGHT.MEDIUM,
+  headingCase: HEADING_CASE.AS_WRITTEN,
+  imageProportion: IMAGE_PROPORTION.AS_DESIGNED,
+  dividerWidth: DIVIDER_WIDTH.HAIRLINE,
   accentHue: MOCK_ACCENT_HUE,
   logoHue: undefined,
 };
@@ -109,6 +123,26 @@ describe(buildThemePreviewStyle, () => {
       values: { navLinkStyle: value },
       declarations: NAV_LINK_STYLE_DECLARATIONS[value],
     })),
+    ...Object.values(HEADING_WEIGHT).map((value) => ({
+      label: `${value} heading weight`,
+      values: { headingWeight: value },
+      declarations: HEADING_WEIGHT_DECLARATIONS[value],
+    })),
+    ...Object.values(HEADING_CASE).map((value) => ({
+      label: `${value} heading case`,
+      values: { headingCase: value },
+      declarations: HEADING_CASE_DECLARATIONS[value],
+    })),
+    ...Object.values(IMAGE_PROPORTION).map((value) => ({
+      label: `${value} image proportion`,
+      values: { imageProportion: value },
+      declarations: IMAGE_PROPORTION_DECLARATIONS[value],
+    })),
+    ...Object.values(DIVIDER_WIDTH).map((value) => ({
+      label: `${value} divider width`,
+      values: { dividerWidth: value },
+      declarations: DIVIDER_WIDTH_DECLARATIONS[value],
+    })),
   ])(
     'carries the $label tokens onto the preview',
     ({ values, declarations }) => {
@@ -121,10 +155,14 @@ describe(buildThemePreviewStyle, () => {
     },
   );
 
-  it('colours the logo ramp from the accent hue when no logo hue is set', () => {
+  it('colours the brand palette, scrim and a logo with no hue at the accent hue', () => {
     const style = buildThemePreviewStyle(MOCK_PREVIEW_VALUES, false);
 
-    expect(style).toMatchObject(buildLogoPreviewTokens(MOCK_ACCENT_HUE, false));
+    expect(style).toMatchObject({
+      ...formatOklchRamp(BRAND_PALETTE, MOCK_ACCENT_HUE),
+      ...formatOklchRamp(IMAGE_SCRIM_RAMP, MOCK_ACCENT_HUE),
+      ...buildLogoPreviewTokens(MOCK_ACCENT_HUE, false),
+    });
   });
 
   it('switches every ramp to its dark values in dark mode', () => {

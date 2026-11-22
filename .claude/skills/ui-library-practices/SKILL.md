@@ -139,8 +139,13 @@ src/components/molecules/media-card/
   - **`visual` carries the typography.** A title rendered through `Heading`
     keeps in its own `tv()` only what `Heading` can't express — interaction
     state (`hover:`, `transition-colors`). Font family, size, leading and
-    tracking come from `visual` (`card` for card titles); repeating them in
-    both places is how the two drift.
+    tracking come from `visual` (`TEXT_ROLE.CARD_TITLE` for card titles); repeating them in
+    both places is how the two drift. `visual` and `Text`'s `textRole` read
+    the text-role registry, `TYPOGRAPHY` in `lib/styling/typography.ts`,
+    keyed by `TEXT_ROLE` from `@shinefold/config`: it is the one place a
+    role's font, size, weight, leading, tracking and colour are chosen, so a
+    new look is a registry entry, never a class list in a component's
+    `tv()`.
 
 - **Also:** semantic elements first (`button`, `nav`, `article`, `time`);
   images require `alt`; interactive atoms show a `focus-visible` style (the
@@ -215,9 +220,9 @@ ceiling, its exemptions and the drop → group → slot → hook → context lad
   `apps/web` and passed in (`web-component-practices`).
   ```tsx
   // ✅ PostMeta knows nothing about share state
-  export type TPostMetaProps = … & { share?: ReactNode };
+  export type TPostMetaProps = … & { actions?: ReactNode };
   // ❌ a state bag tunnelled through a component that reads none of it
-  export type TPostMetaProps = … & { share?: { url: string; isCopied: boolean; onCopy: () => void; … } };
+  export type TPostMetaProps = … & { actions?: { url: string; isCopied: boolean; onCopy: () => void; … } };
   ```
 - **Shape data props to the view-model you're fed.** Name a data prop's
   fields after the `@shinefold/service` view-model passed to it, so

@@ -1,11 +1,11 @@
 import * as schema from '@shinefold/db/schema';
 import {
   insertTestSubscriber,
-  insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { readTestSubscriber } from '@shinefold/db/testing/subscribers/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { releaseConfirmationSend } from './release-confirmation-send';
 
@@ -15,19 +15,13 @@ const MOCK_CLAIMED_AT = new Date('2026-10-15T10:00:00.000Z');
 const MOCK_NEWER_CLAIMED_AT = new Date('2026-10-15T10:20:00.000Z');
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
-  await db().delete(schema.tenants);
 });
 
 describe(releaseConfirmationSend, () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
   async function readSentAt(id: string) {
     const { confirmationSentAt } = await readTestSubscriber(db(), id);
     return confirmationSentAt;
@@ -36,7 +30,7 @@ describe(releaseConfirmationSend, () => {
   it('clears the send time it claimed', async () => {
     const { id } = await insertTestSubscriber(
       db(),
-      tenantId,
+      tenant().id,
       MOCK_SUBSCRIBER_EMAIL,
       { confirmationSentAt: MOCK_CLAIMED_AT },
     );
@@ -49,7 +43,7 @@ describe(releaseConfirmationSend, () => {
   it('leaves a newer claim in place', async () => {
     const { id } = await insertTestSubscriber(
       db(),
-      tenantId,
+      tenant().id,
       MOCK_SUBSCRIBER_EMAIL,
       { confirmationSentAt: MOCK_NEWER_CLAIMED_AT },
     );

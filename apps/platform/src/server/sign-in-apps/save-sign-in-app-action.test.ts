@@ -8,7 +8,7 @@ import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { mockOwnerContext } from '@platform/testing/custom-domain/fixtures';
+import { mockGrowthOwnerContext } from '@platform/testing/custom-domain/fixtures';
 import {
   mockMembership,
   mockMembershipContext,
@@ -17,6 +17,7 @@ import {
   MOCK_CLIENT_ID,
   MOCK_CLIENT_SECRET,
   MOCK_REPLACEMENT_CLIENT_ID,
+  MOCK_UNKNOWN_PROVIDER,
   mockOAuthClient,
 } from '@platform/testing/sign-in-apps/fixtures';
 import {
@@ -59,24 +60,22 @@ const NEW_APP_INPUT = {
 const asTenant = (overrides: Partial<TTenant>) =>
   vi
     .mocked(requireTenantMembership)
-    .mockResolvedValueOnce(
-      mockOwnerContext({ plan: TENANT_PLAN.GROWTH, ...overrides }),
-    );
+    .mockResolvedValueOnce(mockGrowthOwnerContext(overrides));
 
 describe(saveSignInAppAction, () => {
   beforeEach(() => {
-    vi.mocked(requireTenantMembership)
-      .mockReset()
-      .mockResolvedValue(mockOwnerContext({ plan: TENANT_PLAN.GROWTH }));
-    vi.mocked(tenantOAuthCredentials.listTenantOAuthClients)
-      .mockReset()
-      .mockResolvedValue([]);
-    vi.mocked(tenantOAuthCredentials.saveTenantOAuthCredentials)
-      .mockReset()
-      .mockResolvedValue(undefined);
-    vi.mocked(tenantOAuthCredentials.updateTenantOAuthClient)
-      .mockReset()
-      .mockResolvedValue(true);
+    vi.mocked(requireTenantMembership).mockResolvedValue(
+      mockGrowthOwnerContext(),
+    );
+    vi.mocked(tenantOAuthCredentials.listTenantOAuthClients).mockResolvedValue(
+      [],
+    );
+    vi.mocked(
+      tenantOAuthCredentials.saveTenantOAuthCredentials,
+    ).mockResolvedValue(undefined);
+    vi.mocked(tenantOAuthCredentials.updateTenantOAuthClient).mockResolvedValue(
+      true,
+    );
   });
 
   it.each([
@@ -94,7 +93,7 @@ describe(saveSignInAppAction, () => {
           .mocked(requireTenantMembership)
           .mockResolvedValueOnce(
             mockMembershipContext(
-              mockOwnerContext({ plan: TENANT_PLAN.GROWTH }).tenant,
+              mockGrowthOwnerContext().tenant,
               mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
             ),
           ),
@@ -106,7 +105,7 @@ describe(saveSignInAppAction, () => {
           .mocked(requireTenantMembership)
           .mockResolvedValueOnce(
             mockMembershipContext(
-              mockOwnerContext({ plan: TENANT_PLAN.GROWTH }).tenant,
+              mockGrowthOwnerContext().tenant,
               buildVirtualAdminMembership(mockAdmin().userId, MOCK_TENANT_ID),
             ),
           ),
@@ -206,6 +205,21 @@ describe(saveSignInAppAction, () => {
       tenantOAuthCredentials.saveTenantOAuthCredentials,
     ).not.toHaveBeenCalled();
     expect(recordAuditEvent).not.toHaveBeenCalled();
+  });
+
+  it('reports invalid input for an unknown provider and saves nothing', async () => {
+    const result = await saveSignInAppAction(MOCK_TENANT_ID, {
+      ...NEW_APP_INPUT,
+      provider: MOCK_UNKNOWN_PROVIDER,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
+    expect(
+      tenantOAuthCredentials.saveTenantOAuthCredentials,
+    ).not.toHaveBeenCalled();
   });
 
   it.each([

@@ -1,6 +1,7 @@
 'use client';
 
 import type { TOnboardingPreviewOptions } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-onboarding-preview-options';
+import type { TOnboardingTier } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-onboarding-tier';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
 import { SampleCookieButton } from '@platform/components/features/site-preview/sample-cookie-button';
 import { DeviceFrame } from '@platform/components/shared/device-frame';
@@ -34,8 +35,7 @@ export type TOnboardingPreviewProps = {
   locale: TLocaleIsoCode;
   preset: TPresetId;
   accentHue: number;
-  isPhone: boolean;
-  isFull: boolean;
+  tier: Pick<TOnboardingTier, 'isPhone' | 'isFull'>;
   options: TOnboardingPreviewOptions;
 };
 
@@ -45,8 +45,7 @@ export const OnboardingPreview = ({
   locale,
   preset,
   accentHue,
-  isPhone,
-  isFull,
+  tier: { isPhone, isFull },
   options: { device, setDevice, mode, setMode, isDark },
 }: TOnboardingPreviewProps) => {
   const t = useTranslations('onboardingForm');
@@ -100,8 +99,8 @@ export const OnboardingPreview = ({
             mode: DEVICE_FRAME_FIT.STAGE,
             availableHeight: isFull ? stageSize?.height : undefined,
           }}
-          isDark={isDark}
-          onScaleChange={setScale}
+          chrome={{ isDark }}
+          listeners={{ onScaleChange: setScale }}
         >
           <LookSample
             brand={{
@@ -113,8 +112,14 @@ export const OnboardingPreview = ({
             header={toSampleHeaderStyle(look)}
             footer={footer}
             busy={toSampleBusyStyle(look)}
-            hasReaderAccounts={false}
-            shouldAlwaysShowLanguageSwitcher={true}
+            headerState={{
+              reader: {
+                hasAccounts: false,
+                hasBookmarks: false,
+                isSignedIn: false,
+              },
+              shouldAlwaysShowLanguageSwitcher: true,
+            }}
           />
           {footer.hasCookieSettingsButton && (
             <DeviceFrame.Overlay>

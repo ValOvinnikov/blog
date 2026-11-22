@@ -1,9 +1,14 @@
 import { faker } from '@faker-js/faker';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { TENANT_STATUS } from '@shinefold/db/constants';
+import type { TTenantSanityWriteCredentials } from '@shinefold/db/queries/tenants/get-tenant-sanity-write-credentials/get-tenant-sanity-write-credentials';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { getPlatformSanityContext } from '@shinefold/service';
-import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import {
+  isRequestHostPlatformFallback,
+  resolveRequestTenant,
+} from '@web/server/tenant/request-tenant/request-tenant';
 import {
   mockServableTenant,
   mockTenantSanityCredentials,
@@ -11,7 +16,6 @@ import {
 } from '@web/testing/server/tenant/fixtures';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
-import { isProductionEnvironment } from '@web/utils/is-production-environment';
 
 import {
   getHostTenantSanityContext,
@@ -21,7 +25,6 @@ import {
 faker.seed(9154);
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
-vi.mock('@web/utils/is-production-environment');
 vi.mock('@shinefold/db', async () => ({
   ...(await import('@shinefold/db/constants')),
   queries: {
@@ -41,7 +44,7 @@ const MOCK_PLATFORM_SANITY_CONTEXT = {
 
 const MOCK_TENANT = mockServableTenant();
 
-const UNCREDENTIALED_TENANT_CASES: [string, TTenant | undefined][] = [
+const UNCREDENTIALED_TENANT_CASES: [string, TMaybeUndefined<TTenant>][] = [
   ['no tenant resolves', undefined],
   ['the matched tenant has no credentials set', MOCK_TENANT],
 ];
@@ -71,7 +74,7 @@ describe(getHostTenantSanityContext, () => {
   });
 
   it.each(UNCREDENTIALED_TENANT_CASES)(
-    'falls back to the platform Sanity context outside production when %s',
+    'falls back to the platform Sanity context on a platform fallback host when %s',
     async (_, tenant) => {
       vi.mocked(resolveRequestTenant).mockResolvedValueOnce(tenant);
 
@@ -82,9 +85,9 @@ describe(getHostTenantSanityContext, () => {
     },
   );
 
-  describe('in production', () => {
+  describe('on a host the platform fallback does not serve', () => {
     beforeEach(() => {
-      vi.mocked(isProductionEnvironment).mockReturnValue(true);
+      vi.mocked(isRequestHostPlatformFallback).mockResolvedValue(false);
     });
 
     it.each(UNCREDENTIALED_TENANT_CASES)(
@@ -102,8 +105,13 @@ describe(getHostTenantSanityContext, () => {
 });
 
 describe(getHostTenantSanityWriteContext, () => {
+  let credentials: TTenantSanityWriteCredentials;
+
+  beforeEach(() => {
+    credentials = mockTenantSanityWriteCredentials();
+  });
+
   it('resolves the tenant Sanity write credentials for a resolved tenant', async () => {
-    const credentials = mockTenantSanityWriteCredentials();
     vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReturnValue(
       credentials,
     );
@@ -117,7 +125,6 @@ describe(getHostTenantSanityWriteContext, () => {
   });
 
   it('reports a suspended resolved tenant as not active', async () => {
-    const credentials = mockTenantSanityWriteCredentials();
     vi.mocked(resolveRequestTenant).mockResolvedValueOnce(
       mockServableTenant({ status: TENANT_STATUS.SUSPENDED }),
     );
@@ -133,8 +140,8 @@ describe(getHostTenantSanityWriteContext, () => {
     });
   });
 
-  it('is unresolvable in production when no tenant resolves', async () => {
-    vi.mocked(isProductionEnvironment).mockReturnValue(true);
+  it('is unresolvable on a host the platform fallback does not serve', async () => {
+    vi.mocked(isRequestHostPlatformFallback).mockResolvedValue(false);
     vi.mocked(resolveRequestTenant).mockResolvedValueOnce(undefined);
 
     await expect(getHostTenantSanityWriteContext()).resolves.toEqual({
@@ -145,7 +152,7 @@ describe(getHostTenantSanityWriteContext, () => {
     ).not.toHaveBeenCalled();
   });
 
-  it('resolves without a tenant outside production when no tenant resolves', async () => {
+  it('resolves without a tenant on a platform fallback host when no tenant resolves', async () => {
     vi.mocked(resolveRequestTenant).mockResolvedValueOnce(undefined);
 
     await expect(getHostTenantSanityWriteContext()).resolves.toEqual({

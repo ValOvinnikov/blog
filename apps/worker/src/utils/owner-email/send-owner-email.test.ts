@@ -7,8 +7,7 @@ import {
 import { sendEmail } from '@shinefold/email';
 import {
   DEFAULT_OWNER_EMAIL_FROM_ADDRESS,
-  OWNER_EMAIL_RELEASE_FAILED_EVENT,
-  OWNER_EMAIL_SEND_FAILED_EVENT,
+  OWNER_EMAIL_LOG,
 } from '@worker/constants/owner-email';
 import { freezeClock, MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import {
@@ -119,7 +118,7 @@ describe(sendOwnerEmailOnce, () => {
       await expect(
         sendOwnerEmailOnce(makeTarget(), TENANT_OWNER_EMAIL.INVITE_HEADS_UP),
       ).resolves.toBeUndefined();
-      expect(logger.error).toHaveBeenCalledWith(OWNER_EMAIL_SEND_FAILED_EVENT, {
+      expect(logger.error).toHaveBeenCalledWith(OWNER_EMAIL_LOG.SEND_FAILED, {
         tenantId: MOCK_TENANT_ID,
         email: TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
         error: MOCK_RESEND_DOWN,
@@ -148,7 +147,7 @@ describe(sendOwnerEmailOnce, () => {
         sendOwnerEmailOnce(makeTarget(), TENANT_OWNER_EMAIL.INVITE_HEADS_UP),
       ).resolves.toBeUndefined();
       expect(logger.error).toHaveBeenCalledWith(
-        OWNER_EMAIL_RELEASE_FAILED_EVENT,
+        OWNER_EMAIL_LOG.RELEASE_FAILED,
         {
           tenantId: MOCK_TENANT_ID,
           email: TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
@@ -166,7 +165,7 @@ describe(sendOwnerEmailOnce, () => {
     ).resolves.toBeUndefined();
     expect(sendEmail).not.toHaveBeenCalled();
     expect(releaseTenantOwnerEmail).not.toHaveBeenCalled();
-    expect(logger.error).toHaveBeenCalledWith(OWNER_EMAIL_SEND_FAILED_EVENT, {
+    expect(logger.error).toHaveBeenCalledWith(OWNER_EMAIL_LOG.SEND_FAILED, {
       tenantId: MOCK_TENANT_ID,
       email: TENANT_OWNER_EMAIL.SITE_READY,
       error: MOCK_DB_DOWN,

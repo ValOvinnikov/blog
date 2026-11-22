@@ -38,7 +38,7 @@ export function buildPostSend(
   { tenantId, postId, subscriberId, email }: TPostSendTarget,
 ): TSendEmailInput {
   const { siteUrl, locale, from, replyTo, unsubscribeKey, ...brand } = context;
-  const { title, excerpt, slug, coverImageUrl, takeaways } = post;
+  const { title, excerpt, slug, coverImageUrl, summary } = post;
   const unsubscribeToken = signNewsletterUnsubscribeToken(
     subscriberId,
     unsubscribeKey,
@@ -51,7 +51,7 @@ export function buildPostSend(
     postUrl: `${siteUrl}${routes.post(slug)}`,
     unsubscribeUrl: `${siteUrl}${routes.newsletterUnsubscribe(unsubscribeToken, locale)}`,
     coverImageUrl,
-    takeaways,
+    summary,
     ...brand,
   });
 

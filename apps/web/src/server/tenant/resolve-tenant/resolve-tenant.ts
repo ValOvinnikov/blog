@@ -12,6 +12,8 @@ import {
 } from '@shinefold/db';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { reviveCachedTenant } from '@web/server/tenant/revive-cached-tenant/revive-cached-tenant';
+import { selectProxyTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
+import { isPlatformFallbackHost } from '@web/utils/is-platform-fallback-host';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { TENANT_BY_HOST_CACHE_TAG } from '@web/utils/tenant-cache-tags';
 import { unstable_cache } from 'next/cache';
@@ -25,9 +27,6 @@ export type TTenantRouting = {
 };
 
 type TResolvedHost = { tenant: TTenant; isOwnHost: boolean };
-
-export const isPlatformFallbackAllowed = (): boolean =>
-  !isProductionEnvironment();
 
 /** Only production requires READY: local/dev rows predate `provisioningStatus`. */
 export const isTenantServable = (tenant: TTenant): boolean => {
@@ -62,7 +61,7 @@ const resolveServableHost = async (
     return isTenantServable(tenant) ? { tenant, isOwnHost: true } : undefined;
   }
 
-  if (!isPlatformFallbackAllowed()) return undefined;
+  if (!isPlatformFallbackHost(host)) return undefined;
 
   const soleTenant = await resolveSoleTenant();
   return soleTenant && { tenant: soleTenant, isOwnHost: false };
@@ -134,7 +133,7 @@ export const resolveTenantRouting = async (
     tenant,
     tenantId: tenant.id,
     defaultLocale: tenant.locale,
-    liveLocales: queries.tenants.selectLiveLocales(tenant),
+    liveLocales: await selectProxyTenantLiveLocales(tenant),
     isSecondaryHost: isOwnHost && host !== tenant.primaryDomain,
   };
 };

@@ -1,5 +1,9 @@
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
 import { TenantPageHeader } from '@platform/components/features/tenants/tenant-page-header';
+import {
+  type TUsageSectionProps,
+  UsageSection,
+} from '@platform/components/features/usage/usage-section';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { DetailCardSkeleton } from '@platform/components/shared/detail-card-skeleton';
 import {
@@ -8,6 +12,7 @@ import {
 } from '@platform/constants/domain';
 import type { TGetStarted } from '@platform/server/onboarding/get-started-for';
 import type { TSiteSetup } from '@platform/server/provisioning/site-setup-for';
+import type { TSampleContent } from '@platform/server/sample-content/sample-content-for';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TMaybeUndefined } from '@shinefold/config';
@@ -17,28 +22,35 @@ import { Suspense } from 'react';
 
 import { GetStartedCard } from './components/get-started-card/get-started-card';
 import { MakeItYoursCard } from './components/make-it-yours-card/make-it-yours-card';
+import { SampleContentCard } from './components/sample-content-card/sample-content-card';
 import { SiteSetupCard } from './components/site-setup-card/site-setup-card';
 import { StreamedDomainCard } from './components/streamed-domain-card/streamed-domain-card';
 import { TrialNotice } from './components/trial-notice/trial-notice';
 import { YourSiteCard } from './components/your-site-card/your-site-card';
 import { ownerHomeViewVariants } from './owner-home-view-variants';
 
+type TOwnerFirstRun = {
+  siteSetup?: TSiteSetup;
+  getStarted?: TGetStarted;
+  sampleContent?: TSampleContent;
+};
+
 export type TOwnerHomeViewProps = {
   tenant: TPlatformTenant;
   domainVerificationStatus: Promise<TDomainVerificationStatus>;
   owner: TMaybeUndefined<TTenantOwnerMembership>;
-  siteSetup?: TSiteSetup;
-  getStarted?: TGetStarted;
+  firstRun?: TOwnerFirstRun;
   canUpgrade?: boolean;
+  usage: Omit<TUsageSectionProps, 'tenant'>;
 };
 
 export const OwnerHomeView = ({
   tenant,
   domainVerificationStatus,
   owner,
-  siteSetup,
-  getStarted,
+  firstRun: { siteSetup, getStarted, sampleContent } = {},
   canUpgrade = false,
+  usage,
 }: TOwnerHomeViewProps) => {
   const tOwnerHome = useTranslations('ownerHomePage');
   const { archivedAt, trial } = tenant;
@@ -62,6 +74,8 @@ export const OwnerHomeView = ({
 
       <YourSiteCard tenant={tenant} />
 
+      {!archivedAt && <UsageSection tenant={tenant} {...usage} />}
+
       <div className={pair()}>
         <Suspense
           fallback={
@@ -82,6 +96,8 @@ export const OwnerHomeView = ({
       </div>
 
       <MakeItYoursCard />
+
+      {sampleContent && <SampleContentCard sampleContent={sampleContent} />}
     </div>
   );
 };

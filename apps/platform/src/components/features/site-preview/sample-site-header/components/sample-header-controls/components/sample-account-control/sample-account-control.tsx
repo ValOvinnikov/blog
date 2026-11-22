@@ -1,3 +1,5 @@
+import type { TSampleReader } from '@platform/components/features/site-preview/sample-site-header/sample-reader';
+import { SAMPLE_LINK_HREF } from '@platform/constants/sample-link';
 import type { IAccountControl, TAccountButtonStyle } from '@shinefold/config';
 import { AccountPanel } from '@shinefold/ui/components/molecules/account-panel';
 import { AccountTrigger } from '@shinefold/ui/components/molecules/account-trigger';
@@ -7,18 +9,16 @@ import { useId } from 'react';
 
 import { sampleAccountControlVariants } from './sample-account-control-variants';
 
-const SAMPLE_LINK_HREF = '#';
-
 export type TSampleAccountControlProps = {
   account: IAccountControl;
   appearance: TAccountButtonStyle;
-  isSignedIn: boolean;
+  reader: Pick<TSampleReader, 'hasBookmarks' | 'isSignedIn'>;
 };
 
 export const SampleAccountControl = ({
   account: { panelStyle },
   appearance,
-  isSignedIn,
+  reader: { hasBookmarks, isSignedIn },
 }: TSampleAccountControlProps) => {
   const t = useTranslations('lookPreview');
   const panelId = useId();
@@ -47,11 +47,13 @@ export const SampleAccountControl = ({
             ariaLabel: t('accountMenuAriaLabel'),
           }}
           links={{
-            bookmarks: {
-              href: SAMPLE_LINK_HREF,
-              label: t('myBookmarks'),
-              description: t('myBookmarksDescription'),
-            },
+            ...(hasBookmarks && {
+              bookmarks: {
+                href: SAMPLE_LINK_HREF,
+                label: t('myBookmarks'),
+                description: t('myBookmarksDescription'),
+              },
+            }),
             settings: {
               href: SAMPLE_LINK_HREF,
               label: t('accountSettings'),

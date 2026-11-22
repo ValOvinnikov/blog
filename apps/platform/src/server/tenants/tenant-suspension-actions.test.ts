@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { TENANT_LOG, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { setSubscriptionCollectionPaused } from '@platform/server/billing/tenant-subscription-lifecycle';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { notifyOwnerOfSuspension } from '@platform/server/tenants/notify-owner-of-suspension';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
@@ -18,6 +19,7 @@ import {
   mockTenantSuspension,
 } from '@platform/testing/tenant-suspensions/fixtures';
 import { mockTenant } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { logger } from '@platform/utils/logger/logger';
 import {
   ACTION_OUTCOME,
@@ -68,9 +70,7 @@ const {
   reopenTenantSuspensionMock: vi.fn(),
 }));
 
-vi.mock('next/server', () => ({
-  after: (task: () => unknown) => task(),
-}));
+vi.mock('next/server');
 
 vi.mock('@platform/server/tenants/notify-owner-of-suspension', () => ({
   notifyOwnerOfSuspension: vi.fn(),
@@ -89,11 +89,16 @@ vi.mock('@platform/server/audit/record-audit-event', () => ({
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
+vi.mock('@platform/server/billing/tenant-subscription-lifecycle', () => ({
+  setSubscriptionCollectionPaused: vi.fn(),
+}));
+
 vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     tenants: {
       getTenantById: getTenantByIdMock,
       setTenantSuspension: setTenantSuspensionMock,
@@ -174,6 +179,18 @@ describe('tenant suspension actions', () => {
     discardTenantSuspensionMock.mockReset().mockResolvedValue(undefined);
     reopenTenantSuspensionMock.mockReset().mockResolvedValue(undefined);
     notifyOwnerOfSuspensionMock.mockReset();
+    vi.mocked(setSubscriptionCollectionPaused).mockReset();
+  });
+
+  it('resumes the billing of a site whose suspension is lifted', async () => {
+    getTenantByIdMock.mockResolvedValue(SUSPENDED_TENANT);
+
+    await liftTenantSuspensionAction(SUSPENDED_TENANT.id);
+
+    expect(setSubscriptionCollectionPaused).toHaveBeenCalledWith(
+      SUSPENDED_TENANT,
+      false,
+    );
   });
 
   it('requires a super-admin session before reading the tenant', async () => {
@@ -188,9 +205,13 @@ describe('tenant suspension actions', () => {
     expect(setTenantSuspensionMock).not.toHaveBeenCalled();
   });
 
-  it('suspends the tenant, purges its cached site and records the operator action', async () => {
+  it('suspends the tenant, pauses its billing, purges its site and audits it', async () => {
     const result = await suspend();
 
+    expect(setSubscriptionCollectionPaused).toHaveBeenCalledWith(
+      ACTIVE_TENANT,
+      true,
+    );
     expect(setTenantSuspensionMock).toHaveBeenCalledWith(
       ACTIVE_TENANT.id,
       TENANT_STATUS.SUSPENDED,
@@ -392,13 +413,14 @@ describe('tenant suspension actions', () => {
     expect(recordAuditEventMock).not.toHaveBeenCalled();
   });
 
-  it('returns a server error without an audit event when the write throws', async () => {
+  it('returns a server error, auditing and pausing nothing, when the write throws', async () => {
     setTenantSuspensionMock.mockRejectedValue(MOCK_DB_ERROR);
 
     const result = await suspend();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(recordAuditEventMock).not.toHaveBeenCalled();
+    expect(setSubscriptionCollectionPaused).not.toHaveBeenCalled();
   });
 
   describe('when the operator also blocks the owner email', () => {

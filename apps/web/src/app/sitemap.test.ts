@@ -5,19 +5,20 @@ import {
   routes,
   type TLocaleIsoCode,
 } from '@shinefold/config';
-import { queries } from '@shinefold/db';
 import { service, type TTranslationMap } from '@shinefold/service';
 import type * as TService from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
 import { routing } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import { selectTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import {
   MOCK_TENANT_BASE_URL,
   MOCK_TENANT_SANITY_CONTEXT,
   mockTenant,
 } from '@web/testing/shared/tenant/fixtures';
+import type { MetadataRoute } from 'next';
 
 import sitemap from './sitemap';
 
@@ -127,9 +128,7 @@ vi.mock(
   }),
 );
 
-vi.mock('@shinefold/db', () => ({
-  queries: { tenants: { selectLiveLocales: vi.fn() } },
-}));
+vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales');
 
 vi.mock('@shinefold/service', async (importOriginal) => ({
   service: {
@@ -155,7 +154,7 @@ vi.mock('@shinefold/service', async (importOriginal) => ({
   },
 }));
 
-const selectLiveLocales = vi.mocked(queries.tenants.selectLiveLocales);
+const selectLiveLocales = vi.mocked(selectTenantLiveLocales);
 const getPostParams = vi.mocked(service.pages.post.v1.getPostParams);
 const getTopicParams = vi.mocked(service.pages.topic.v1.getTopicParams);
 const getTopicPaginationParams = vi.mocked(
@@ -223,7 +222,7 @@ describe(sitemap, () => {
       isResolvable: true,
       tenant: MOCK_TENANT_SANITY_CONTEXT,
     });
-    selectLiveLocales.mockReturnValue([EN]);
+    selectLiveLocales.mockResolvedValue([EN]);
     getPostParams.mockResolvedValue(okResult([]));
     getTopicParams.mockResolvedValue(okResult([]));
     getTopicPaginationParams.mockResolvedValue(okResult([]));
@@ -267,7 +266,7 @@ describe(sitemap, () => {
     const MOCK_LIVE_LOCALES = [EN, NL];
 
     beforeEach(() => {
-      selectLiveLocales.mockReturnValue(MOCK_LIVE_LOCALES);
+      selectLiveLocales.mockResolvedValue(MOCK_LIVE_LOCALES);
     });
 
     it.each([
@@ -351,7 +350,7 @@ describe(sitemap, () => {
     );
 
     beforeEach(() => {
-      selectLiveLocales.mockReturnValue([EN, NL]);
+      selectLiveLocales.mockResolvedValue([EN, NL]);
       getPageSlugs.mockResolvedValue(
         okResult([
           { slug: MOCK_LANDING_SLUG, language: EN },
@@ -391,30 +390,34 @@ describe(sitemap, () => {
         );
       });
 
-      it('lists every live translation and the default-language x-default', async () => {
-        const entries = await sitemap();
+      describe('with every language live', () => {
+        let entries: MetadataRoute.Sitemap;
 
-        expect(entries).toContainEqual({
-          url: LANDING_URL,
-          alternates: { languages: landingAlternates },
+        beforeEach(async () => {
+          entries = await sitemap();
         });
-        expect(entries).toContainEqual({
-          url: NL_LANDING_URL,
-          alternates: { languages: landingAlternates },
+
+        it('lists every live translation and the default-language x-default', () => {
+          expect(entries).toContainEqual({
+            url: LANDING_URL,
+            alternates: { languages: landingAlternates },
+          });
+          expect(entries).toContainEqual({
+            url: NL_LANDING_URL,
+            alternates: { languages: landingAlternates },
+          });
         });
-      });
 
-      it('keeps an untranslated page as its own language alternate', async () => {
-        const entries = await sitemap();
-
-        expect(entries).toContainEqual({
-          url: UNTRANSLATED_URL,
-          alternates: { languages: toOwnAlternate(EN, UNTRANSLATED_URL) },
+        it('keeps an untranslated page as its own language alternate', () => {
+          expect(entries).toContainEqual({
+            url: UNTRANSLATED_URL,
+            alternates: { languages: toOwnAlternate(EN, UNTRANSLATED_URL) },
+          });
         });
       });
 
       it('keeps a single-language tenant page as its own language alternate', async () => {
-        selectLiveLocales.mockReturnValue([EN]);
+        selectLiveLocales.mockResolvedValue([EN]);
         getPageSlugs.mockResolvedValue(
           okResult([{ slug: MOCK_LANDING_SLUG, language: EN }]),
         );
@@ -457,7 +460,7 @@ describe(sitemap, () => {
     );
 
     beforeEach(() => {
-      selectLiveLocales.mockReturnValue([EN, NL]);
+      selectLiveLocales.mockResolvedValue([EN, NL]);
     });
 
     it('lists each live Home with every live Home as an alternate', async () => {
@@ -606,7 +609,7 @@ describe(sitemap, () => {
 
   describe('Topics, Tags and posts', () => {
     beforeEach(() => {
-      selectLiveLocales.mockReturnValue([EN, NL]);
+      selectLiveLocales.mockResolvedValue([EN, NL]);
     });
 
     it('lists each Topic and Tag under its own language prefix with live translations', async () => {

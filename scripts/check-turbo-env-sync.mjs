@@ -33,6 +33,10 @@ const PLATFORM_STRIPE_ENV_FILE = join(
   repoRoot,
   'apps/platform/src/utils/stripe-env/stripe-env.ts',
 );
+const PLATFORM_SUPPORT_ENV_FILE = join(
+  repoRoot,
+  'apps/platform/src/utils/support-env/support-env.ts',
+);
 const WORKER_ENV_FILE = join(repoRoot, 'apps/worker/src/utils/env/env.ts');
 const SERVICE_ENV_FILE = join(
   repoRoot,
@@ -102,9 +106,10 @@ export const extractEnvKeys = (sf) => {
 export const RUNTIME_ONLY_EXCLUDED_VARS = new Set([
   // apps/worker: read only in its route handler bodies (WORKER_ENQUEUE_SECRET)
   // and in provision-env.ts, called from workflow steps. apps/platform reads
-  // WORKER_ENQUEUE_SECRET only inside the enqueue its Server Actions call.
-  // WORKER_NEWSLETTER_ENQUEUE_SECRET is read only by the worker's newsletter
-  // send route and by apps/web's /api/revalidate route.
+  // both worker secrets only inside the enqueue its Server Actions and the
+  // Studio's send-now route call. WORKER_NEWSLETTER_ENQUEUE_SECRET is read
+  // otherwise only by the worker's newsletter send route and by apps/web's
+  // /api/revalidate route.
   // apps/web reads INTERNAL_PAGES_SECRET only in its /api/internal/pages route;
   // apps/platform only inside the Server Action that asks that route for a title.
   'INTERNAL_PAGES_SECRET',
@@ -127,6 +132,7 @@ export const APPS = [
     files: [
       PLATFORM_ENV_FILE,
       PLATFORM_STRIPE_ENV_FILE,
+      PLATFORM_SUPPORT_ENV_FILE,
       DB_ENV_FILE,
       AUTH_ENV_FILE,
     ],

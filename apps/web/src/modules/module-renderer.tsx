@@ -1,6 +1,9 @@
 import type { TTaxonomyKind } from '@shinefold/config';
 import type { TModule } from '@shinefold/service';
-import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
+import {
+  MODULE_RENDERER_LOG,
+  MODULE_SLOT_TEST_ID,
+} from '@web/constants/module-renderer';
 import { ModuleGate } from '@web/modules/module-gate/module-gate';
 import { isModuleEntitled } from '@web/server/settings-features/is-module-entitled/is-module-entitled';
 import { logger } from '@web/utils/logger/logger';
@@ -60,7 +63,9 @@ export const renderModules = ({
   return (
     <>
       {slot && !slotHostId ? (
-        <div className={moduleSlotVariants()}>{slot.node}</div>
+        <div className={moduleSlotVariants()} data-testid={MODULE_SLOT_TEST_ID}>
+          {slot.node}
+        </div>
       ) : null}
       {modules.map((module) => {
         const Component = map[module.type];

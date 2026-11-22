@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2016
-# Moves one issue's Blog Build board item to a target Status, forward-only.
+# Moves one issue's sf Board item to a target Status, forward-only.
 # Usage: sync-board-status.sh <issue-number> <"In Progress"|"Code Review">
 #
 # Requires GH_TOKEN in the environment, a classic PAT scoped repo + project
@@ -19,8 +19,8 @@ TARGET_STATUS_NAME="$2"
 # table, the documented source of truth (itself already duplicated once, into
 # open-pull-request/SKILL.md) — check that table first if any ID here ever
 # needs to change.
-OWNER="ValOvinnikov"
-REPO="blog"
+OWNER="${GITHUB_REPOSITORY%%/*}"
+REPO="${GITHUB_REPOSITORY#*/}"
 PROJECT_ID="PVT_kwHOAIMQW84BcK3T"
 STATUS_FIELD_ID="PVTSSF_lAHOAIMQW84BcK3TzhW1nPs"
 

@@ -1,0 +1,42 @@
+import type { TValueOf } from '@shinefold/config/utils';
+
+// One deadline over every attempt and retry wait, leaving the body read and save inside the scheduled route's 80s maxDuration; a cut-off call keeps its allowance claim.
+export const SKIM_GENERATION_DEADLINE_MS = 60_000;
+
+export const GENERATE_SKIM_LOG = {
+  CONFIG_MISSING: 'generate_skim.config_missing',
+  HOST_UNRESOLVABLE: 'generate_skim.host_unresolvable',
+  WRITE_TENANT_UNRESOLVABLE: 'generate_skim.write_tenant_unresolvable',
+  TENANT_WRITE_CREDENTIALS_MISSING:
+    'generate_skim.tenant_write_credentials_missing',
+  TENANT_NOT_ACTIVE: 'generate_skim.tenant_not_active',
+  ALLOWANCE_USED: 'generate_skim.allowance_used',
+  CLAIM_FAILED: 'generate_skim.claim_failed',
+  CLAIM_RELEASE_FAILED: 'generate_skim.claim_release_failed',
+  POST_BODY_FETCH_FAILED: 'generate_skim.post_body_fetch_failed',
+  GENERATION_FAILED: 'generate_skim.generation_failed',
+  SUMMARY_OVER_WORD_LIMIT: 'generate_skim.summary_over_word_limit',
+  SUMMARY_EMPTY: 'generate_skim.summary_empty',
+  WRITE_CLIENT_UNCONFIGURED: 'generate_skim.write_client_unconfigured',
+  DRAFT_SAVE_FAILED: 'generate_skim.draft_save_failed',
+  PUBLISHED_AT_LOOKUP_FAILED: 'generate_skim.published_at_lookup_failed',
+  PUBLISH_START_FAILED: 'generate_skim.publish_start_failed',
+  GO_LIVE_ENQUEUE_SKIPPED: 'generate_skim.go_live_enqueue_skipped',
+  GO_LIVE_ENQUEUE_REFUSED: 'generate_skim.go_live_enqueue_refused',
+  GO_LIVE_ENQUEUE_FAILED: 'generate_skim.go_live_enqueue_failed',
+  GO_LIVE_SECRET_MISSING: 'generate_skim.go_live_secret_missing',
+  GO_LIVE_TENANT_LOOKUP_FAILED: 'generate_skim.go_live_tenant_lookup_failed',
+  SUMMARY_LOOKUP_FAILED: 'generate_skim.summary_lookup_failed',
+  TENANT_NOT_SERVABLE: 'generate_skim.tenant_not_servable',
+  TENANT_RESOLVE_FAILED: 'generate_skim.tenant_resolve_failed',
+} as const;
+
+export const SKIM_GO_LIVE_PATH = '/api/scheduled-post-skim';
+
+export const SUMMARY_BLOCK_STYLE = {
+  PARAGRAPH: 'PARAGRAPH',
+  BULLET: 'BULLET',
+  NUMBER: 'NUMBER',
+} as const;
+
+export type TSummaryBlockStyle = TValueOf<typeof SUMMARY_BLOCK_STYLE>;

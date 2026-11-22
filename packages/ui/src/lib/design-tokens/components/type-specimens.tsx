@@ -2,15 +2,17 @@ import type { CSSProperties } from 'react';
 
 import type { TToken } from '../parse-theme-tokens';
 
+import { SpecimenList } from './specimen-list';
+import { SpecimenRow } from './specimen-row';
+import { SPECIMEN_SAMPLE } from './specimen-sample';
+
 export type TTypeSpecimensProps = {
   tokens: TToken[];
   isFontOnly?: boolean;
 };
 
-const SAMPLE = 'The quick brown fox jumps over the lazy dog';
-
 export const TypeSpecimens = ({ tokens, isFontOnly }: TTypeSpecimensProps) => (
-  <div className="divide-y divide-border">
+  <SpecimenList>
     {tokens.map((token) => {
       const style: CSSProperties = isFontOnly
         ? { fontFamily: token.value }
@@ -20,13 +22,10 @@ export const TypeSpecimens = ({ tokens, isFontOnly }: TTypeSpecimensProps) => (
         : `text-${token.name}`;
 
       return (
-        <div key={token.cssVar} className="py-5 first:pt-0">
-          <p className="mb-2 font-mono text-label text-text-subtle uppercase">
-            {descriptor}
-          </p>
-          <p style={style}>{SAMPLE}</p>
-        </div>
+        <SpecimenRow key={token.cssVar} label={descriptor}>
+          <p style={style}>{SPECIMEN_SAMPLE}</p>
+        </SpecimenRow>
       );
     })}
-  </div>
+  </SpecimenList>
 );

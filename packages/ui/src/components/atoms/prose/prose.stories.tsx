@@ -1,21 +1,12 @@
 import { faker } from '@faker-js/faker';
-import { SIZE } from '@shinefold/config';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Prose } from './prose';
-import { proseVariants } from './prose-variants';
 
 const meta: Meta<typeof Prose> = {
   title: 'Atoms/Prose',
   component: Prose,
   tags: ['autodocs'],
-  argTypes: {
-    size: {
-      control: 'select',
-      options: objectKeys(proseVariants.variants.size),
-    },
-  },
   args: {
     children: (
       <>
@@ -29,12 +20,4 @@ export default meta;
 
 type TStory = StoryObj<typeof Prose>;
 
-export const Medium: TStory = {};
-
-export const Small: TStory = {
-  args: { size: SIZE.SM },
-};
-
-export const Large: TStory = {
-  args: { size: SIZE.LG },
-};
+export const Default: TStory = {};

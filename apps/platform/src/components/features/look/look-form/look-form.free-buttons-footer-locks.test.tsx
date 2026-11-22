@@ -11,7 +11,7 @@ import {
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
 import {
   setupLookForm,
-  withLookTenant,
+  withLookPlan,
 } from '@platform/testing/look/look-form-setup';
 import { expectStyleGroupLockedAtDefault } from '@platform/testing/look/look-free-locks';
 import { TENANT_PLAN } from '@shinefold/config/constants';
@@ -38,7 +38,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   describe('on Free', () => {
     beforeEach(() => {
-      setupLookForm(withLookTenant({ plan: TENANT_PLAN.FREE }));
+      setupLookForm(withLookPlan(TENANT_PLAN.FREE));
     });
 
     it.each([
@@ -63,8 +63,8 @@ describe(`<${LookForm.name}/>`, () => {
       {
         row: LOOK_ROW.FOOTER,
         group: LOOK_FORM.footerBackgroundLabel,
-        current: LOOK_FORM.footerBackgroundOptionLabel.BRAND_PRIMARY,
-        other: LOOK_FORM.footerBackgroundOptionLabel.SECONDARY,
+        current: LOOK_FORM.skinLabel.BRAND_PRIMARY,
+        other: LOOK_FORM.skinLabel.SECONDARY,
       },
       {
         row: LOOK_ROW.FOOTER,

@@ -1,21 +1,25 @@
-import type { TTenantEmailBrand } from '@shinefold/config';
-import {
-  renderEmailAction,
-  type TEmailAction,
-} from '@shinefold/email/html/email-action/email-action';
-import {
-  FONT_STACK,
-  SHELL_CONTENT_WIDTH_PX,
-} from '@shinefold/email/html/email-metrics/email-metrics';
-import { escapeHtml } from '@shinefold/email/html/escape-html/escape-html';
-import { sanitizeImageUrl } from '@shinefold/email/html/sanitize-image-url/sanitize-image-url';
-import { buildTenantShell } from '@shinefold/email/html/tenant-shell/tenant-shell';
+import type { TPostSummary, TTenantEmailBrand } from '@shinefold/config';
+import type { TFontChoice } from '@shinefold/config/constants';
+import { renderEmailDocument } from '@shinefold/email/html/email-document/email-document';
 import { buildPlainTextBody } from '@shinefold/email/plain-text/plain-text-body';
+import {
+  postCardAsPlainText,
+  renderPostCard,
+} from '@shinefold/email/templates/tenant/post-email-card/post-email-card';
+import {
+  POST_CONTENT_CLASS,
+  POST_PAGE_CLASS,
+  POST_PAGE_PADDING_X_PX,
+  renderPostEmailCss,
+  renderPostFooter,
+  renderSiteName,
+  renderTestBanner,
+  resolvePostEmailFonts,
+} from '@shinefold/email/templates/tenant/post-email-frame/post-email-frame';
 import {
   buildListUnsubscribeHeaders,
   buildUnsubscribeAction,
 } from '@shinefold/email/templates/tenant/unsubscribe/unsubscribe';
-import { hasLength } from '@shinefold/utils/primitives';
 
 export type TPostEmailInput = {
   subject: string;
@@ -25,10 +29,15 @@ export type TPostEmailInput = {
   unsubscribeUrl: string;
   brand: TTenantEmailBrand;
   brandName: string;
+  darkBrand?: TTenantEmailBrand;
+  headingFont?: TFontChoice;
+  bodyFont?: TFontChoice;
   coverImageUrl?: string;
-  takeaways?: string[];
+  summary?: TPostSummary;
   logoImageUrl?: string;
   footerPostalAddress?: string;
+  isTest?: boolean;
+  testBannerText?: string;
 };
 
 export type TPostEmailContent = {
@@ -38,28 +47,7 @@ export type TPostEmailContent = {
   headers: Record<string, string>;
 };
 
-function renderCoverImage(coverImageUrl?: string): string {
-  const safeUrl = coverImageUrl ? sanitizeImageUrl(coverImageUrl) : null;
-  if (!safeUrl) return '';
-
-  // Outlook ignores max-width on images, so the width attribute holds the content column.
-  return `<img src="${escapeHtml(safeUrl)}" width="${SHELL_CONTENT_WIDTH_PX}" alt="" style="display:block;width:100%;max-width:${SHELL_CONTENT_WIDTH_PX}px;height:auto;margin:0 0 24px;border:0;border-radius:6px;" />`;
-}
-
-function renderTakeaways(
-  takeaways: string[],
-  brand: TTenantEmailBrand,
-): string {
-  if (!hasLength(takeaways)) return '';
-
-  const items = takeaways
-    .map(
-      (takeaway) => `<li style="margin:0 0 8px;">${escapeHtml(takeaway)}</li>`,
-    )
-    .join('');
-
-  return `<ul style="margin:0 0 16px;padding:16px 16px 8px 32px;background-color:${brand.surface2};border-left:3px solid ${brand.border};">${items}</ul>`;
-}
+const PAGE_BLOCK_GAP_PX = 16;
 
 export function buildPostEmail({
   subject,
@@ -69,51 +57,52 @@ export function buildPostEmail({
   unsubscribeUrl,
   brand,
   brandName,
+  darkBrand,
+  headingFont,
+  bodyFont,
   coverImageUrl,
-  takeaways = [],
+  summary = [],
   logoImageUrl,
   footerPostalAddress,
+  isTest,
+  testBannerText,
 }: TPostEmailInput): TPostEmailContent {
-  const readAction: TEmailAction = {
-    label: 'Read the post',
-    url: postUrl,
-    variant: 'button',
-  };
+  const bannerText = isTest ? testBannerText : undefined;
+  const fonts = resolvePostEmailFonts(headingFont, bodyFont);
+  const card = { title, excerpt, summary, postUrl, coverImageUrl };
   const unsubscribeAction = buildUnsubscribeAction(unsubscribeUrl);
-  const footerLine = `You are receiving this because you subscribed to ${brandName}.`;
+  const footerLine = `You're getting this because you subscribed to ${brandName}.`;
 
-  const bodyHtml = [
-    renderCoverImage(coverImageUrl),
-    `<h1 style="margin:0 0 16px;font-family:${FONT_STACK};font-size:24px;line-height:1.3;color:${brand.text};">${escapeHtml(title)}</h1>`,
-    renderTakeaways(takeaways, brand),
-    `<p style="margin:0;">${escapeHtml(excerpt)}</p>`,
-  ].join('');
-
-  const actionHtml = [
-    renderEmailAction(readAction, brand),
-    `<p style="margin:24px 0 0;text-align:center;font-family:${FONT_STACK};font-size:12px;color:${brand.textMuted};">${escapeHtml(footerLine)}</p>`,
-    renderEmailAction(unsubscribeAction, brand),
-  ].join('');
-
-  const textParagraphs = [
-    title,
-    ...takeaways.map((takeaway) => `- ${takeaway}`),
-    excerpt,
-  ];
+  const html = renderEmailDocument({
+    title: subject,
+    previewText: excerpt,
+    css: renderPostEmailCss(darkBrand),
+    pageColor: brand.surface2,
+    pageClassName: POST_PAGE_CLASS,
+    textColor: brand.text,
+    fontStack: fonts.body,
+    contentPadding: `32px ${POST_PAGE_PADDING_X_PX}px`,
+    contentClassName: POST_CONTENT_CLASS,
+    blockGapPx: PAGE_BLOCK_GAP_PX,
+    blocks: [
+      bannerText ? renderTestBanner(bannerText) : '',
+      renderSiteName(brandName, brand, fonts, logoImageUrl),
+      renderPostCard(card, brand, fonts),
+      renderPostFooter(
+        footerLine,
+        unsubscribeAction,
+        brand,
+        footerPostalAddress,
+      ),
+    ],
+  });
 
   return {
     subject,
-    html: buildTenantShell({
-      brand,
-      brandName,
-      previewText: excerpt,
-      bodyHtml,
-      actionHtml,
-      logoImageUrl,
-      footerPostalAddress,
-    }),
+    html,
     text: [
-      buildPlainTextBody(textParagraphs, readAction),
+      ...(bannerText ? [bannerText] : []),
+      postCardAsPlainText(card),
       buildPlainTextBody([footerLine], unsubscribeAction),
     ].join('\n\n'),
     headers: buildListUnsubscribeHeaders(unsubscribeUrl),

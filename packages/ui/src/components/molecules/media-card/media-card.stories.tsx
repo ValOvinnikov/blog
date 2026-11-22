@@ -16,6 +16,7 @@ import {
   FilledAndPlainOnEachBand,
   InCardStyle,
 } from '@shinefold/ui/testing/card-styles';
+import { inNarrowColumn, threeAcross } from '@shinefold/ui/testing/card-widths';
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -201,13 +202,7 @@ export const LongTitle: TStory = {
 };
 
 export const NarrowColumn: TStory = {
-  decorators: [
-    (Story) => (
-      <div className="w-[187px]">
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [inNarrowColumn],
   args: {
     excerpt: twoLineExcerpt,
     tags: undefined,
@@ -216,15 +211,7 @@ export const NarrowColumn: TStory = {
 };
 
 export const ThreeAcross: TStory = {
-  decorators: [
-    (Story) => (
-      <div className="grid max-w-6xl grid-cols-3 gap-6">
-        <Story />
-        <Story />
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [threeAcross],
   args: {
     excerpt: twoLineExcerpt,
     tags: undefined,

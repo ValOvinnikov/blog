@@ -17,6 +17,7 @@ import {
   type TMaybeUndefined,
 } from '@shinefold/config';
 
+import type { TSampleReader } from './sample-reader';
 import { sampleSiteHeaderVariants } from './sample-site-header-variants';
 
 type TSampleBrand = {
@@ -28,11 +29,9 @@ export type TSampleSiteHeaderProps = {
   brand: TSampleBrand;
   liveLocales: readonly TLocaleIsoCode[];
   header: TSampleHeaderStyle;
-  hasReaderAccounts: boolean;
-  isSignedIn: boolean;
+  reader: TSampleReader;
   isDark: boolean;
   isSubmenuOpen: boolean;
-  isEdgeToEdge?: boolean;
   shouldAlwaysShowLanguageSwitcher?: boolean;
 };
 
@@ -40,18 +39,15 @@ export const SampleSiteHeader = ({
   brand: { name, logoSrc },
   liveLocales,
   header,
-  hasReaderAccounts,
-  isSignedIn,
+  reader,
   isDark,
   isSubmenuOpen,
-  isEdgeToEdge = false,
   shouldAlwaysShowLanguageSwitcher = false,
 }: TSampleSiteHeaderProps) => {
   const { layout, submenuStyle, barStyle, account } = header;
   const { root, full, bar, group, links, controls } = sampleSiteHeaderVariants({
     barStyle,
     layout,
-    isEdgeToEdge,
     isWidePanelOpen:
       isSubmenuOpen && submenuStyle === HEADER_SUBMENU_STYLE.WIDE_PANEL,
   });
@@ -67,11 +63,7 @@ export const SampleSiteHeader = ({
       }}
     >
       <div className={full()} data-testid={SAMPLE_HEADER_FULL_TEST_ID}>
-        <SampleHeaderBrand
-          name={name}
-          logoSrc={logoSrc}
-          isLarge={isEdgeToEdge}
-        />
+        <SampleHeaderBrand name={name} logoSrc={logoSrc} />
         <div className={group()}>
           {layout !== HEADER_LAYOUT.MENU_BUTTON && (
             <SampleHeaderLinks
@@ -83,8 +75,7 @@ export const SampleSiteHeader = ({
           <SampleHeaderControls
             liveLocales={liveLocales}
             header={header}
-            hasReaderAccounts={hasReaderAccounts}
-            isSignedIn={isSignedIn}
+            reader={reader}
             isDark={isDark}
             shouldAlwaysShowLanguageSwitcher={shouldAlwaysShowLanguageSwitcher}
             className={controls()}
@@ -94,9 +85,7 @@ export const SampleSiteHeader = ({
       <SampleHeaderBar
         brand={{ name, logoSrc }}
         account={account}
-        hasReaderAccounts={hasReaderAccounts}
-        isSignedIn={isSignedIn}
-        isBrandLarge={isEdgeToEdge}
+        reader={reader}
         className={bar()}
       />
     </header>

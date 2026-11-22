@@ -1,9 +1,10 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const quoteBlockVariants = tv({
   base: [
     'my-4 py-0.5 pl-4',
     'border-l-2 border-brand-primary',
-    'font-read text-prose text-muted italic',
+    TYPOGRAPHY[TEXT_ROLE.QUOTE],
   ],
 });

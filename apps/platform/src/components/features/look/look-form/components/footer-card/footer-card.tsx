@@ -46,7 +46,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
   );
   const backgroundOptions = Object.values(BRAND_VARIANT).map((background) => ({
     value: background,
-    label: t(`footerBackgroundOptionLabel.${background}`),
+    label: t(`skinLabel.${background}`),
     glyph: (
       <FooterBackgroundGlyph background={background} accentHue={accentHue} />
     ),
@@ -69,8 +69,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
         label={t('footerLayoutLabel')}
         hint={t('footerLayoutDescription')}
         isGroup={true}
-        labelId={layoutLock.labelId}
-        growthBadgeId={layoutLock.growthBadgeId}
+        lock={layoutLock}
       >
         <SegmentedControl<TFooterLayout>
           aria={layoutLock.aria}
@@ -86,8 +85,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
         label={t('footerBackgroundLabel')}
         hint={t('footerBackgroundDescription')}
         isGroup={true}
-        labelId={backgroundLock.labelId}
-        growthBadgeId={backgroundLock.growthBadgeId}
+        lock={backgroundLock}
       >
         <SegmentedControl<TBrandVariant>
           aria={backgroundLock.aria}
@@ -103,8 +101,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
         label={t('footerSurfaceLabel')}
         hint={t('footerSurfaceDescription')}
         isGroup={true}
-        labelId={surfaceLock.labelId}
-        growthBadgeId={surfaceLock.growthBadgeId}
+        lock={surfaceLock}
       >
         <SegmentedControl<TFooterSurface>
           aria={surfaceLock.aria}

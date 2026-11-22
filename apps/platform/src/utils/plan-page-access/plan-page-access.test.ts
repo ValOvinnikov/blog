@@ -1,58 +1,28 @@
 import { CAPABILITY, type TCapability } from '@shinefold/config';
-import { TENANT_PLAN } from '@shinefold/config/constants';
-import type * as DbConstants from '@shinefold/db/constants';
 
-import { planPageAccess, type TPlanPage } from './plan-page-access';
+import { entitlementPageAccess, type TPlanPage } from './plan-page-access';
 
-const { registry } = vi.hoisted(() => ({
-  registry: {} as Record<string, TCapability[]>,
-}));
+const SINGLE = 1;
+const SEVERAL = 3;
 
-const { entitlements } = vi.hoisted(() => ({
-  entitlements: {} as Record<string, { seats: number }>,
-}));
-
-vi.mock('@shinefold/db/constants', async (importOriginal) => ({
-  ...(await importOriginal<typeof DbConstants>()),
-  PLAN_REGISTRY: registry,
-  PLAN_ENTITLEMENTS: entitlements,
-}));
-
-const withFreeCapabilities = (capabilities: TCapability[]) => {
-  registry[TENANT_PLAN.FREE] = capabilities;
-};
+const entitledTo = ({
+  capabilities = [],
+  localeLimit = SINGLE,
+  seats = SINGLE,
+}: {
+  capabilities?: TCapability[];
+  localeLimit?: number;
+  seats?: number;
+}) => entitlementPageAccess({ capabilities, localeLimit, seats });
 
 const CAPABILITY_GATED_PAGES: { page: TPlanPage; capability: TCapability }[] = [
   { page: 'leads', capability: CAPABILITY.CONTACT_FORM },
   { page: 'subscribers', capability: CAPABILITY.NEWSLETTER },
 ];
 
-describe(planPageAccess, () => {
-  beforeEach(() => {
-    entitlements[TENANT_PLAN.FREE] = { seats: 1 };
-    entitlements[TENANT_PLAN.STARTER] = { seats: 1 };
-    entitlements[TENANT_PLAN.GROWTH] = { seats: 3 };
-    registry[TENANT_PLAN.FREE] = [
-      CAPABILITY.RATINGS,
-      CAPABILITY.CONSENT_BANNER,
-    ];
-    registry[TENANT_PLAN.STARTER] = [
-      CAPABILITY.CONSENT_BANNER,
-      CAPABILITY.CONTACT_FORM,
-    ];
-    registry[TENANT_PLAN.GROWTH] = [
-      CAPABILITY.COMMENTS,
-      CAPABILITY.RATINGS,
-      CAPABILITY.BOOKMARKS,
-      CAPABILITY.NEWSLETTER,
-      CAPABILITY.ANALYTICS,
-      CAPABILITY.CONSENT_BANNER,
-      CAPABILITY.CONTACT_FORM,
-    ];
-  });
-
-  it('gives a FREE tenant with no email capability none of the gated pages', () => {
-    const access = planPageAccess(TENANT_PLAN.FREE);
+describe(entitlementPageAccess, () => {
+  it('opens only Billing with one language, one seat and no email', () => {
+    const access = entitledTo({ capabilities: [CAPABILITY.RATINGS] });
 
     expect(access).toEqual({
       languages: false,
@@ -64,49 +34,19 @@ describe(planPageAccess, () => {
     });
   });
 
-  it('gives a STARTER tenant the email and leads pages, without languages or team', () => {
-    const access = planPageAccess(TENANT_PLAN.STARTER);
-
-    expect(access).toEqual({
-      languages: false,
-      email: true,
-      leads: true,
-      subscribers: false,
-      team: false,
-      billing: true,
-    });
-  });
-
-  it('gives a GROWTH tenant every gated page', () => {
-    const access = planPageAccess(TENANT_PLAN.GROWTH);
-
-    expect(access).toEqual({
-      languages: true,
-      email: true,
-      leads: true,
-      subscribers: true,
-      team: true,
-      billing: true,
-    });
-  });
-
   it.each(CAPABILITY_GATED_PAGES)(
-    'opens $page when the plan holds $capability',
+    'opens $page with $capability',
     ({ page, capability }) => {
-      withFreeCapabilities([capability]);
-
-      const access = planPageAccess(TENANT_PLAN.FREE);
+      const access = entitledTo({ capabilities: [capability] });
 
       expect(access[page]).toBe(true);
     },
   );
 
   it.each(CAPABILITY_GATED_PAGES)(
-    'keeps $page closed without $capability',
+    'keeps $page closed without it',
     ({ page }) => {
-      withFreeCapabilities([CAPABILITY.RATINGS]);
-
-      const access = planPageAccess(TENANT_PLAN.FREE);
+      const access = entitledTo({ capabilities: [CAPABILITY.RATINGS] });
 
       expect(access[page]).toBe(false);
     },
@@ -117,30 +57,26 @@ describe(planPageAccess, () => {
     CAPABILITY.COMMENTS,
     CAPABILITY.NEWSLETTER,
     CAPABILITY.CONTACT_FORM,
-  ])('opens Email when the plan holds %s', (capability) => {
-    withFreeCapabilities([capability]);
-
-    const { email } = planPageAccess(TENANT_PLAN.FREE);
+  ])('opens Email with %s', (capability) => {
+    const { email } = entitledTo({ capabilities: [capability] });
 
     expect(email).toBe(true);
   });
 
-  it('keeps Languages and Team closed on FREE whatever its capabilities', () => {
-    withFreeCapabilities([CAPABILITY.COMMENTS, CAPABILITY.NEWSLETTER]);
+  it.each([
+    [SEVERAL, true],
+    [SINGLE, false],
+  ])('opens Languages with a limit of %i: %s', (localeLimit, isOpen) => {
+    const { languages } = entitledTo({ localeLimit });
 
-    const { languages, team } = planPageAccess(TENANT_PLAN.FREE);
-
-    expect(languages).toBe(false);
-    expect(team).toBe(false);
+    expect(languages).toBe(isOpen);
   });
 
   it.each([
-    [2, true],
-    [1, false],
-  ])('opens Team on a plan with %i seats: %s', (seats, isOpen) => {
-    entitlements[TENANT_PLAN.FREE] = { seats };
-
-    const { team } = planPageAccess(TENANT_PLAN.FREE);
+    [SEVERAL, true],
+    [SINGLE, false],
+  ])('opens Team with %i seats: %s', (seats, isOpen) => {
+    const { team } = entitledTo({ seats });
 
     expect(team).toBe(isOpen);
   });

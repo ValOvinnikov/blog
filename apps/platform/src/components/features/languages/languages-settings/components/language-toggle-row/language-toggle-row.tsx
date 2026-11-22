@@ -1,3 +1,4 @@
+import { LockedReason } from '@platform/components/shared/locked-reason';
 import { SettingRow } from '@platform/components/shared/setting-row';
 import { Switch } from '@platform/components/shared/switch';
 import type { TControlAria } from '@shinefold/config';
@@ -28,8 +29,7 @@ export const LanguageToggleRow = ({
     <SettingRow
       label={aria.label}
       description={description}
-      isLocked={isLocked}
-      lockedReason={lockedReason}
+      status={lockedReason && <LockedReason>{lockedReason}</LockedReason>}
     >
       <Switch
         aria={aria}

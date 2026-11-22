@@ -23,9 +23,8 @@ export const CONFIGURATION_KEYS = [
   'signIn',
   'email',
   'subscribers',
-  'team',
 ];
-export const COMING_SOON_KEYS = ['subscribers', 'team'];
+export const COMING_SOON_KEYS = ['subscribers'];
 export const ALWAYS_AVAILABLE_KEYS = [
   'look',
   'voice',
@@ -33,7 +32,6 @@ export const ALWAYS_AVAILABLE_KEYS = [
   'domain',
   'signIn',
 ];
-export const MOCK_UNREAD_LEADS_COUNT = 3;
 
 export const translated = (keys: string[]) =>
   keys.map((key) => tNavSections(key));

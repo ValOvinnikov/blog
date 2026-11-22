@@ -5,11 +5,13 @@ import { BusyStyleProvider } from '@web/context/busy-style-provider';
 import { ConsentPreferencesProvider } from '@web/context/consent-preferences-provider';
 import { HeaderOverlayProvider } from '@web/context/header-overlay-provider';
 import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-provider';
+import { SiteAnalyticsProvider } from '@web/context/site-analytics-provider';
 import { ToastProvider } from '@web/context/toast-provider';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { getBusyStyle } from '@web/server/site-config/get-busy-style/get-busy-style';
+import { getSiteAnalytics } from '@web/server/site-config/get-site-analytics/get-site-analytics';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 import { SessionProvider } from 'next-auth/react';
@@ -18,6 +20,7 @@ import { getNow, getTimeZone } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
 import { ConsentBannerSlot } from './components/consent-banner-slot/consent-banner-slot';
+import { OutOfDatePageNotice } from './components/out-of-date-page-notice/out-of-date-page-notice';
 
 export interface ISiteProvidersProps {
   children: ReactNode;
@@ -27,12 +30,14 @@ export const SiteProviders = async ({ children }: ISiteProvidersProps) => {
   const { tenantId, locale, sanityContext } = await getRequestContext();
   const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const baseMessages = SITE_MESSAGES_BY_LOCALE[locale];
-  const [now, timeZone, isConsentBannerEnabled, busyStyle] = await Promise.all([
-    getNow(),
-    getTimeZone(),
-    isCapabilityEnabled(CAPABILITY.CONSENT_BANNER),
-    getBusyStyle(tenant),
-  ]);
+  const [now, timeZone, isConsentBannerEnabled, busyStyle, analytics] =
+    await Promise.all([
+      getNow(),
+      getTimeZone(),
+      isCapabilityEnabled(CAPABILITY.CONSENT_BANNER),
+      getBusyStyle(tenant),
+      getSiteAnalytics(tenant),
+    ]);
   const { messages, rich } = await resolveTenantMessages(
     baseMessages,
     locale,
@@ -51,12 +56,15 @@ export const SiteProviders = async ({ children }: ISiteProvidersProps) => {
         <SessionProvider>
           <BusyStyleProvider value={busyStyle}>
             <ToastProvider>
+              <OutOfDatePageNotice />
               <VoiceRichProvider values={rich}>
-                <ConsentPreferencesProvider>
-                  <HeaderOverlayProvider>{children}</HeaderOverlayProvider>
-                  <ConsentBannerSlot isEnabled={isConsentBannerEnabled} />
-                  <ConsentPreferencesDialog />
-                </ConsentPreferencesProvider>
+                <SiteAnalyticsProvider value={analytics}>
+                  <ConsentPreferencesProvider>
+                    <HeaderOverlayProvider>{children}</HeaderOverlayProvider>
+                    <ConsentBannerSlot isEnabled={isConsentBannerEnabled} />
+                    <ConsentPreferencesDialog />
+                  </ConsentPreferencesProvider>
+                </SiteAnalyticsProvider>
               </VoiceRichProvider>
             </ToastProvider>
           </BusyStyleProvider>

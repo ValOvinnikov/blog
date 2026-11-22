@@ -40,6 +40,7 @@ export * from './record-tenant-content-migration-failure';
 export * from './release-tenant-owner-email';
 export * from './restore-downgrade-grace';
 export * from './set-tenant-additional-locales';
+export * from './set-cancelled-tenant-free';
 export * from './set-tenant-billing';
 export * from './set-tenant-owner-access';
 export * from './set-tenant-plan';

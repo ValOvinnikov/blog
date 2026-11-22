@@ -28,13 +28,16 @@
     "signUpTitle": "Crear una cuenta",
     "onboarding": "Crear tu sitio",
     "billing": "Facturación · Administración",
-    "upgrade": "Mejorar plan"
+    "upgrade": "Mejorar plan",
+    "help": "Ayuda",
+    "draftPreview": "Vista previa del borrador",
+    "team": "Equipo"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
     "description": "Usa la cuenta con la que te registraste o te invitaron.",
-    "accountNotLinkedTitle": "Este correo ya inicia sesión de otra forma",
-    "accountNotLinkedDescription": "Tu correo electrónico ya se usa con otro método de inicio de sesión. Inicia sesión como lo hiciste la última vez.",
+    "accountNotLinkedTitle": "No hemos podido confirmar este correo",
+    "accountNotLinkedDescription": "Google o GitHub no ha verificado esta dirección de correo. Verifícala con ellos y vuelve a intentarlo, o inicia sesión con un enlace por correo.",
     "signInFailedTitle": "No hemos podido iniciar tu sesión",
     "signInFailedDescription": "Algo ha fallado al iniciar sesión. Inténtalo de nuevo o elige otra forma de iniciar sesión.",
     "signUpPrompt": "¿Eres nuevo? <link>Crea una cuenta</link>"
@@ -188,6 +191,7 @@
   },
   "account": {
     "signOut": "Cerrar sesión",
+    "signingOut": "Cerrando sesión…",
     "signedInAs": "Sesión iniciada como {email}",
     "menuLabel": "Cuenta",
     "triggerCollapsedLabel": "Cuenta: {name}, {email}",
@@ -243,8 +247,9 @@
     },
     "blockedSignups": "Registros bloqueados",
     "dataRequests": "Solicitudes de datos",
-    "badgeUnreadLeads": "{count, plural, one {# nuevo} other {# nuevos}}",
-    "collapsedStatusTooltip": "{label} · {status}"
+    "collapsedStatusTooltip": "{label} · {status}",
+    "supportSectionLabel": "Soporte",
+    "help": "Ayuda"
   },
   "navItemContent": {
     "statusSeparator": ","
@@ -389,7 +394,33 @@
     "siteSetupNotStartedContactDescription": "No pudimos empezar a configurar tu sitio. Pide a tu contacto de la plataforma que la inicie.",
     "siteSetupStart": "Iniciar configuración",
     "siteSetupStarting": "Iniciando…",
-    "trialUpgrade": "Elegir un plan"
+    "trialUpgrade": "Elegir un plan",
+    "sampleContent": {
+      "title": "Contenido de ejemplo",
+      "supportingText": "Tu sitio empezó con páginas, secciones y enlaces de ejemplo. Quita los que no hayas cambiado.",
+      "trigger": "Quitar el contenido de ejemplo",
+      "notWritable": "No se puede quitar el contenido de ejemplo mientras tu sitio esté suspendido o archivado.",
+      "dialogTitle": "¿Quitar el contenido de ejemplo?",
+      "dialogDescription": "Los ejemplos que no hayas editado se eliminan de tu sitio. Se conservan los que hayas editado o los que use tu otro contenido. Esta acción no se puede deshacer.",
+      "keep": "Conservar los ejemplos",
+      "confirm": "Quitar los ejemplos",
+      "confirming": "Quitando los ejemplos…",
+      "failed": "No se pudieron quitar los ejemplos. Inténtalo de nuevo.",
+      "done": "{count, plural, =0 {No había ejemplos que quitar.} one {Se quitó # ejemplo.} other {Se quitaron # ejemplos.}}",
+      "nothingKept": "No se conservó ningún ejemplo.",
+      "keptEditedTitle": "Conservados porque los editaste",
+      "keptReferencedTitle": "Conservados porque otro contenido los usa",
+      "kind": {
+        "section": "Sección",
+        "page": "Página",
+        "post": "Entrada",
+        "template": "Plantilla de página",
+        "link": "Enlace de navegación",
+        "author": "Autor",
+        "topic": "Tema",
+        "other": "Ejemplo"
+      }
+    }
   },
   "getStartedCard": {
     "title": "Primeros pasos",
@@ -507,7 +538,12 @@
       "OAUTH_APP_SAVED": "App de inicio de sesión guardada",
       "OAUTH_APP_REPLACED": "App de inicio de sesión sustituida",
       "OAUTH_APP_REMOVED": "App de inicio de sesión eliminada",
-      "NEWSLETTER_PAUSE_CLEARED": "Pausa del boletín retirada"
+      "NEWSLETTER_PAUSE_CLEARED": "Pausa del boletín retirada",
+      "MEMBER_INVITED": "Miembro del equipo invitado",
+      "MEMBER_REMOVED": "Miembro del equipo eliminado",
+      "MEMBER_INVITE_CANCELLED": "Invitación al equipo cancelada",
+      "ENTITLEMENT_GRANTED": "Función concedida",
+      "ENTITLEMENT_REVOKED": "Concesión de función revocada"
     },
     "detail": {
       "field": {
@@ -527,8 +563,13 @@
       "SUSPENSION_REASON": "Motivo: {category}",
       "SUSPENSION_REFERENCE": "Referencia: {reference}",
       "PLAN": "Plan: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
+      "PLAN_CHANGED": "Plan: {from} → {to}",
       "SIGN_IN_PROVIDER": "Proveedor de inicio de sesión: {provider, select, google {Google} github {GitHub} other {{provider}}}",
-      "CLIENT_SECRET_REPLACED": "Secreto de cliente sustituido"
+      "CLIENT_SECRET_REPLACED": "Secreto de cliente sustituido",
+      "GRANT_ITEM": "Elemento: {item}",
+      "GRANT_EXPIRY": "Hasta el {date}",
+      "GRANT_UNTIL_REVOKED": "Hasta que se revoque",
+      "GRANT_NOTE": "Nota: {note}"
     }
   },
   "tenantDomainPage": {
@@ -724,8 +765,8 @@
     "viewTabsAriaLabel": "Vista de Look",
     "jumpIndexAriaLabel": "Secciones de Look",
     "growthAddsColour": "Un tono de logotipo propio",
-    "growthAddsType": "Fuentes de títulos y de texto",
-    "growthAddsShape": "Esquinas y espaciado",
+    "growthAddsType": "Fuentes, grosor y mayúsculas de los títulos",
+    "growthAddsShape": "Esquinas, espaciado, proporciones de imagen y separadores",
     "growthAddsCards": "Estilo de tarjeta",
     "growthAddsButtons": "Estado de carga e indicador de progreso",
     "growthAddsHeader": "Diseño, submenús, barra, botones de la cabecera y controles de cuenta",
@@ -776,6 +817,34 @@
       "DEFAULT": "Cómoda",
       "COMPACT": "Compacta"
     },
+    "headingWeightLabel": "Grosor de los títulos",
+    "headingWeightDescription": "Lo marcado que se ve cada título de tu sitio.",
+    "headingWeightOptionLabel": {
+      "REGULAR": "Normal",
+      "MEDIUM": "Medio",
+      "SEMIBOLD": "Seminegrita",
+      "BOLD": "Negrita"
+    },
+    "headingCaseLabel": "Mayúsculas en títulos",
+    "headingCaseDescription": "Cambia los títulos de páginas y secciones. Los títulos de tarjetas y de entradas mantienen cómo los escribiste, para que los textos largos se lean bien.",
+    "headingCaseOptionLabel": {
+      "AS_WRITTEN": "Como se escribió",
+      "UPPERCASE": "Mayúsculas"
+    },
+    "imageProportionLabel": "Proporciones de imagen",
+    "imageProportionDescription": "Cambia las imágenes con forma Ancha y las que no tienen forma elegida. Las imágenes cuadradas y redondas mantienen su forma.",
+    "imageProportionOptionLabel": {
+      "AS_DESIGNED": "Según diseño",
+      "WIDE": "Ancha",
+      "CLASSIC": "Clásica",
+      "SQUARE": "Cuadrada"
+    },
+    "dividerWidthLabel": "Separadores de sección",
+    "dividerWidthDescription": "El grosor de la línea entre secciones que muestran un separador.",
+    "dividerWidthOptionLabel": {
+      "HAIRLINE": "Fino",
+      "BOLD": "Grueso"
+    },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Barra de acento",
       "OUTLINED": "Con contorno",
@@ -820,7 +889,7 @@
     "languageSwitcherSingleLanguage": "Añade otro idioma en Idiomas para elegir un estilo.",
     "languageSwitcherFreeDescription": "Tu plan publica un idioma. Mejora el plan para añadir idiomas y elegir un estilo de selector.",
     "lockLineGrowthFields": "Los campos marcados con Growth mantienen el valor del ajuste predefinido {preset}.",
-    "lockLineTypeFonts": "Con este plan, Tipografía mantiene las fuentes del ajuste predefinido {preset}. Elegir otro ajuste predefinido las cambia.",
+    "lockLineTypeFonts": "Con este plan, Tipografía mantiene las fuentes y el estilo de títulos del ajuste predefinido {preset}. Elegir otro ajuste predefinido los cambia.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Código",
       "MENU_GLOBE": "Globo",
@@ -940,10 +1009,11 @@
     },
     "footerBackgroundLabel": "Fondo",
     "footerBackgroundDescription": "El color del pie de página. Cada uno sigue el tema claro u oscuro del lector.",
-    "footerBackgroundOptionLabel": {
+    "skinLabel": {
       "PRIMARY": "Liso",
       "SECONDARY": "Sombreado",
-      "BRAND_PRIMARY": "Tono de marca"
+      "BRAND_PRIMARY": "Tono de marca",
+      "INK": "Tinta"
     },
     "footerSurfaceLabel": "Superficie",
     "footerSurfaceDescription": "Si el pie de página ocupa todo el ancho o aparece como una tarjeta.",
@@ -1059,7 +1129,14 @@
     "footerFinePrintAriaLabel": "Legal",
     "footerPrivacy": "Política de privacidad",
     "footerPoweredByLabel": "Con la tecnología de",
-    "footerCookieSettings": "Configuración de cookies"
+    "footerCookieSettings": "Configuración de cookies",
+    "bandHeading": "Desde la capitanía",
+    "bandText": "Tablas de mareas, avisos de amarre y el tiempo de la semana, reunidos en un solo lugar.",
+    "bandLink": "Ver todos los avisos",
+    "bandCardTitle": "Aviso de amarres de invierno",
+    "bandCardExcerpt": "Los amarres del muelle norte se desplazan hacia dentro a partir de noviembre.",
+    "bannerHeading": "Mareas vivas este fin de semana",
+    "bannerText": "La marea más alta del año llega al muelle norte el sábado por la mañana."
   },
   "lookFollow": {
     "followToggle": "Seguir la tarjeta que estás editando",
@@ -1173,10 +1250,11 @@
     "sendTest": "Enviarme una prueba",
     "sendingTest": "Enviando…",
     "testSent": "Prueba enviada a {email}.",
-    "testRateLimited": "Ha enviado varias pruebas recientemente. Vuelva a intentarlo en unos minutos.",
+    "testRateLimited": "Ha enviado el máximo de pruebas por ahora. Vuelva a intentarlo a las {time}.",
     "testInvalid": "Complete el asunto y el mensaje antes de enviar una prueba.",
     "testFailed": "No se pudo enviar la prueba. Vuelva a intentarlo.",
     "testSubject": "[Prueba] {subject}",
+    "postTestBanner": "Correo de prueba: solo usted lo ha recibido. Sus suscriptores lo recibirán cuando la entrada se publique por primera vez.",
     "unsavedLogoNote": "Un logotipo que aún no ha guardado no se incluye en la prueba."
   },
   "emailSettingsForm": {
@@ -1510,7 +1588,7 @@
       "STALLED": "Tu invitación a Studio no se ha aceptado"
     },
     "description": {
-      "INVITE_SENT": "Studio funciona con Sanity, así que necesitas una cuenta gratuita de Sanity para editar. Te hemos enviado una invitación de Sanity: acéptala y Studio se abrirá aquí en cuanto se confirme tu acceso.",
+      "INVITE_SENT": "Studio funciona con Sanity, así que necesitas una cuenta gratuita de Sanity para editar. Te hemos enviado una invitación a Studio: acéptala y Studio se abrirá aquí en cuanto se confirme tu acceso.",
       "ACTIVATING": "Has aceptado la invitación. Estamos dando a tu cuenta permisos de edición; suele tardar un minuto.",
       "STALLED": "La invitación se envió hace más de tres días y no se ha aceptado, así que hemos dejado de comprobarla. Reenvíala para recibir una nueva o compruébalo ahora si acabas de aceptarla."
     },
@@ -1520,7 +1598,11 @@
     "resending": "Enviando…",
     "checkStarted": "Estamos comprobando tu acceso. Recarga la página en un minuto para ver el resultado.",
     "inviteResent": "Una nueva invitación va de camino a tu bandeja de entrada.",
-    "requestFailed": "No se pudo contactar con el servicio de configuración. Inténtalo de nuevo."
+    "requestFailed": "No se pudo contactar con el servicio de configuración. Inténtalo de nuevo.",
+    "checkStartedFor": "Comprobando ahora el acceso a Studio de {email}. Actualiza en un minuto para ver el resultado.",
+    "inviteResentTo": "Una nueva invitación a Studio va de camino a {email}.",
+    "checkNowAriaLabel": "Comprobar ahora para {email}",
+    "resendInviteAriaLabel": "Reenviar invitación a {email}"
   },
   "tenantDetailsPanel": {
     "heading": "Detalles del cliente",
@@ -1551,9 +1633,11 @@
       "provisioningStarted": "El aprovisionamiento de este cliente ya ha comenzado; sus detalles ya no se pueden editar.",
       "ownerAlreadyJoined": "El propietario de este cliente ya ha iniciado sesión, por lo que su correo ya no se puede corregir aquí: eso transferiría la propiedad.",
       "ownerHasFreeTenant": "Este propietario ya tiene un sitio gratuito. Archívelo o mantenga este sitio en su plan actual.",
+      "planFollowsSubscription": "Este sitio tiene una suscripción activa, así que su plan sigue a Stripe. Cámbielo en la página de Facturación del propietario o en el panel de Stripe.",
       "saveFailed": "No se pudieron guardar los datos del cliente. Vuelva a intentarlo."
     },
-    "fieldLockedReasonCustomMainDomain": "Bloqueado — la dirección principal es su propio dominio. Para editarla, vuelve al subdominio en la página Dominio."
+    "fieldLockedReasonCustomMainDomain": "Bloqueado — la dirección principal es su propio dominio. Para editarla, vuelve al subdominio en la página Dominio.",
+    "fieldLockedReasonSubscribed": "Bloqueado — este sitio tiene una suscripción activa, así que su plan sigue a Stripe. Cámbielo en la página de Facturación del propietario o en el panel de Stripe."
   },
   "tenantFieldErrors": {
     "nameRequired": "Introduzca un nombre de cliente.",
@@ -1671,6 +1755,8 @@
     "suspendFailed": "No se pudo suspender el cliente — inténtalo de nuevo.",
     "liftSuspensionFailed": "No se pudo reactivar el cliente — inténtalo de nuevo.",
     "ownerEmailUnknown": "El propietario de este cliente aún no tiene un correo electrónico registrado, así que no se puede bloquear.",
+    "subscriptionCancelFailed": "No se pudo cancelar la suscripción de Stripe del sitio, así que no se ha archivado. Inténtalo de nuevo o cancélala primero en Stripe.",
+    "subscriptionLive": "Stripe todavía cobra este sitio. Cancela su suscripción antes de eliminarlo.",
     "invalidInput": "Revise los datos e inténtelo de nuevo."
   },
   "featuresSettings": {
@@ -1679,6 +1765,8 @@
     "alertSuccess": "Funciones guardadas.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
     "planLockedBadge": "{plan, select, FREE {Plan Free} STARTER {Plan Starter} other {Plan Growth}}",
+    "consentBannerRequiredNote": "Necesario para Google Analytics, que pide el consentimiento de los visitantes.",
+    "consentBannerRequiredError": "Google Analytics está configurado, así que el banner de consentimiento debe seguir activo. Borre primero el ID de medición o cambie a Plausible.",
     "comingSoonBadge": "Próximamente",
     "switchOn": "Activado",
     "switchOff": "Desactivado",
@@ -1700,9 +1788,32 @@
       "RATINGS": "Permite a los lectores valorar los artículos.",
       "BOOKMARKS": "Permite a los lectores guardar artículos para leerlos más tarde.",
       "NEWSLETTER": "Muestra el formulario de suscripción al boletín en el sitio.",
-      "ANALYTICS": "Activa el seguimiento analítico en el sitio.",
+      "ANALYTICS": "Conecta tu propio Google Analytics o Plausible. Deja el ID vacío para no cargar ninguna herramienta de analítica.",
       "CONSENT_BANNER": "Muestra a los visitantes un banner de consentimiento de cookies antes de cargar cookies o scripts no esenciales.",
       "CONTACT_FORM": "Muestra el formulario de contacto en el sitio."
+    },
+    "analyticsProviderLabel": "Herramienta de analítica",
+    "analyticsProviderOption": {
+      "GOOGLE_ANALYTICS": "Google Analytics",
+      "PLAUSIBLE": "Plausible"
+    },
+    "analyticsIdDraftLabel": "ID de analítica",
+    "analyticsIdEmpty": "Ninguno",
+    "analyticsIdLabel": {
+      "GOOGLE_ANALYTICS": "ID de medición",
+      "PLAUSIBLE": "Dominio del sitio"
+    },
+    "analyticsIdHint": {
+      "GOOGLE_ANALYTICS": "Lo encontrarás en Google Analytics, en Administrar, Flujos de datos.",
+      "PLAUSIBLE": "El dominio con el que tu sitio está registrado en Plausible."
+    },
+    "analyticsIdPlaceholder": {
+      "GOOGLE_ANALYTICS": "G-A1B2C3D4E5",
+      "PLAUSIBLE": "example.com"
+    },
+    "analyticsIdInvalid": {
+      "GOOGLE_ANALYTICS": "Introduce un ID de medición: G- seguido de mayúsculas y números, por ejemplo G-A1B2C3D4E5.",
+      "PLAUSIBLE": "Introduce solo un dominio, sin https:// ni ruta, por ejemplo example.com."
     }
   },
   "languagePicker": {
@@ -1739,11 +1850,13 @@
     "allowance": "{used} de {allowed} idiomas adicionales en uso en su plan.",
     "noticeTitle": "Límite del plan",
     "upgradeNotice": "Su plan solo publica el idioma predeterminado. Mejore su plan para añadir más idiomas.",
+    "atLimitNotice": "Su plan publica {allowed, plural, one {# idioma adicional} other {# idiomas adicionales}} y todos están en uso.",
     "downgradeNotice": "Su plan publica {allowed, plural, one {# idioma adicional} other {# idiomas adicionales}}, pero hay {stored} guardados. Los primeros {allowed} siguen publicados; los demás se conservan y no se elimina nada.",
     "keptBadge": "Conservado, no publicado en su plan",
     "planLockedBadge": "No incluido en su plan",
     "atLimitLockedReason": "Desactive uno para activar este",
-    "overLimitLockedReason": "Mejore su plan para cambiar esto"
+    "overLimitLockedReason": "Mejore su plan para cambiar esto",
+    "allowanceGranted": "{used} de {allowed} idiomas adicionales en uso."
   },
   "saveBar": {
     "regionLabel": "Cambios sin guardar",
@@ -1755,6 +1868,7 @@
     "goToFirstField": "Ir al primero",
     "notSaved": "No guardado",
     "notInPlan": "Su sitio está en el plan {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actual}}, que no incluye {items}, así que no se ha guardado nada.",
+    "languagesNotInPlan": "Su sitio está en el plan {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actual}}, que permite {limit, plural, one {# idioma} other {# idiomas}}, así que {count, plural, one {no se ha añadido {items}} other {no se han añadido {items}}}.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Descartar",
     "save": "Guardar cambios",
@@ -1801,9 +1915,10 @@
     "downgradedDescription": "El formulario de contacto viene con los planes Starter y Growth, por lo que ya no llegan mensajes nuevos. Los mensajes ya recibidos se conservan aquí y puede seguir eliminando cualquiera de ellos."
   },
   "leadsInbox": {
-    "listLabel": "Mensajes",
     "empty": "Todavía no hay mensajes. Cuando alguien use su formulario de contacto, su mensaje aparecerá aquí.",
     "unread": "No leído",
+    "unreadGroup": "No leídos · {count}",
+    "earlierGroup": "Anteriores",
     "yesterday": "Ayer",
     "loadingMore": "Cargando más mensajes…",
     "loadMoreFailed": "No se pudieron cargar más mensajes. Reintentar",
@@ -1814,6 +1929,7 @@
     "email": "Correo electrónico",
     "received": "Recibido",
     "page": "Página",
+    "messageHeading": "Mensaje",
     "homePage": "Página de inicio",
     "readStateFailed": "No se pudo actualizar el mensaje. Inténtalo de nuevo."
   },
@@ -2135,26 +2251,41 @@
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Abrir tu panel",
+    "plansLinkLabel": "Mira qué incluye cada plan",
     "GROWTH": {
       "subject": "Tu sitio ya está en el plan Growth",
       "previewText": "{siteName} ya puede usar todas las opciones de Growth.",
       "changed": "{siteName} ya está en el plan Growth.",
-      "options": "Las opciones de Growth ya están disponibles en tu sitio: más idiomas, todos los ajustes de Aspecto, módulos de página adicionales y funciones como el formulario de contacto, los marcadores y las estadísticas.",
-      "kept": "Si ya usaste Growth antes, tus opciones anteriores vuelven tal como las dejaste."
+      "kept": "No se borra nada. Si ya usaste Growth antes, tus opciones anteriores vuelven tal como las dejaste."
     },
     "STARTER": {
       "subject": "Tu sitio ya está en el plan Starter",
       "previewText": "{siteName} ya puede usar las opciones de Starter.",
       "changed": "{siteName} ya está en el plan Starter.",
-      "options": "Con Starter tu sitio puede usar su propio dominio y el formulario de contacto, y su pie de página no muestra «Con la tecnología de». Más idiomas, todos los ajustes de Aspecto y los demás módulos de página vienen con Growth.",
       "kept": "No se borra nada. Tu contenido y tus ajustes se conservan, y lo de Growth vuelve tal como lo dejaste si cambias a Growth."
     },
     "FREE": {
       "subject": "Tu sitio ya está en el plan Free",
       "previewText": "Las opciones de los planes de pago están desactivadas en {siteName}.",
       "changed": "{siteName} ya está en el plan Free.",
-      "options": "Las opciones de los planes de pago están desactivadas en tu sitio: idiomas adicionales, los ajustes de Aspecto de Growth, los módulos de página de pago y funciones como el formulario de contacto, los marcadores y las estadísticas.",
       "kept": "No se borra nada. Tu contenido y tus ajustes se conservan y vuelven si cambias de nuevo a un plan de pago."
+    }
+  },
+  "ownerEntitlementEmail": {
+    "actionLabel": "Abrir tu panel",
+    "granted": {
+      "subject": "Concedido en {siteName}: {item}",
+      "previewText": "Ya puedes usar {item} en {siteName}. No se cobra nada.",
+      "granted": "Se ha concedido a {siteName}, fuera de su plan: {item}.",
+      "untilRevoked": "La concesión dura hasta que se revoque.",
+      "expires": "La concesión dura hasta el {date}.",
+      "free": "No se cobra nada."
+    },
+    "revoked": {
+      "subject": "Concesión revocada en {siteName}: {item}",
+      "previewText": "No se borra nada.",
+      "revoked": "Se ha revocado la concesión de {item} en {siteName}.",
+      "kept": "No se borra nada. Lo que configuraste con ello se conserva y vuelve si se concede de nuevo o si tu plan lo incluye."
     }
   },
   "ownerReceiptEmail": {
@@ -2218,6 +2349,7 @@
     "nextPaymentLabel": "Próximo pago",
     "nextPayment": "{amount} el <time>{date}</time>",
     "noNextPayment": "Ninguno programado",
+    "planEnds": "Tu plan termina el <time>{date}</time>.",
     "noPayments": "Tu sitio aún no tiene pagos.",
     "invoicesTitle": "Facturas",
     "invoicesEmpty": "Aún no hay facturas.",
@@ -2267,6 +2399,7 @@
     "currentPlan": "Tu sitio está en {plan}, con pago {interval, select, YEARLY {anual} other {mensual}}.",
     "pendingChange": "Tu sitio pasa a {plan}, con pago {interval, select, YEARLY {anual} other {mensual}}, el <time>{date}</time>.",
     "changeNow": "El cambio empieza hoy. Pagas ahora la diferencia por el resto del periodo actual.",
+    "changeNowNewPeriod": "El cambio empieza hoy y con él empieza un nuevo periodo {interval, select, YEARLY {anual} other {mensual}}. Pagas ahora el nuevo periodo, menos el tiempo sin usar del actual.",
     "changeAtRenewal": "El cambio empieza el <time>{date}</time>, cuando termina el periodo actual. Hasta entonces no cambia nada.",
     "keepCurrentDescription": "Tu sitio se queda en {plan} y se cancela el cambio previsto para el <time>{date}</time>.",
     "changeUnchanged": "Este es tu plan actual. Elige otro plan u otro periodo de facturación para cambiarlo.",
@@ -2281,7 +2414,344 @@
     "billingLink": "Facturación",
     "NOT_SUBSCRIBED": "Tu sitio aún no tiene un plan de pago que cambiar. Elige uno en el pago.",
     "NOT_ACTIVE": "Tu suscripción necesita atención antes de poder cambiar de plan. Abre Facturación para resolverlo.",
+    "planEnds": "Tu plan termina el <time>{date}</time>, así que no puede cambiar. Para conservarlo, anula la cancelación desde Facturación.",
     "UNCHANGED": "Tu sitio ya está en este plan.",
-    "CARD_DECLINED": "Tu tarjeta ha sido rechazada, así que no ha cambiado nada. Actualízala en Facturación e inténtalo de nuevo."
+    "CARD_DECLINED": "Tu tarjeta ha sido rechazada, así que no ha cambiado nada. Actualízala en Facturación e inténtalo de nuevo.",
+    "PAYMENT_NOT_CONFIRMED": "La confirmación con tu banco no se completó, así que tu plan no ha cambiado. Inténtalo de nuevo cuando quieras.",
+    "NO_NEXT_BAND": "Tu sitio no puede pasar a ese tramo ahora. Recarga la página para ver tu tramo actual.",
+    "PENDING_CHANGE": "Tu sitio tiene un cambio de plan pendiente para la renovación. Mantén primero tu plan actual desde Mejorar y luego sube de tramo.",
+    "QUOTE_EXPIRED": "Este precio se mostró hace un rato. Cierra esto y vuelve a abrirlo para ver el precio de hoy."
+  },
+  "moveUpBand": {
+    "trigger": "Pasar a {ceiling, number} suscriptores — {price} más al {interval, select, YEARLY {año} other {mes}}",
+    "title": "¿Pasar a {ceiling, number} suscriptores?",
+    "lead": "Tus nuevos límites se aplican en cuanto se complete el pago.",
+    "loading": "Cargando el precio…",
+    "quoteFailed": "No se pudo cargar el precio. Cierra esto e inténtalo de nuevo en un momento.",
+    "newLimitsTerm": "Nuevos límites",
+    "newLimits": "{ceiling, number} suscriptores · {allowance, number} correos al mes",
+    "chargedTodayTerm": "Cobrado hoy",
+    "chargedTodayNote": "La diferencia por el resto de este periodo de facturación, hasta el <time>{date}</time>.",
+    "renewalTerm": "Desde el {date}",
+    "renewalTotal": "{total} al {interval, select, YEARLY {año} other {mes}}",
+    "cardTerm": "Tarjeta",
+    "card": "{brand, select, visa {Visa} mastercard {Mastercard} amex {American Express} discover {Discover} other {Tarjeta}} terminada en {last4}",
+    "moveDownNote": "Bajar de tramo se aplica en la renovación, sin reembolso.",
+    "cancel": "Cancelar",
+    "pay": "Pagar {amount} y subir",
+    "paying": "Pagando…"
+  },
+  "helpView": {
+    "title": "Ayuda",
+    "description": "Envía un mensaje a nuestro equipo de soporte. Incluimos tu sitio, tu plan y esta cuenta, para que no tengas que hacerlo tú.",
+    "helpCentre": "Centro de ayuda",
+    "unavailableTitle": "El formulario de ayuda no está disponible",
+    "unavailableDescription": "Ahora mismo no se pueden enviar mensajes desde aquí. Vuelve a intentarlo más tarde."
+  },
+  "helpForm": {
+    "title": "Contactar con soporte",
+    "responseTime": "Solemos responder en un plazo de dos días laborables.",
+    "subjectLabel": "Asunto",
+    "messageLabel": "Mensaje",
+    "messageHint": "Cuenta qué intentabas hacer y qué pasó en su lugar.",
+    "required": "Rellena este campo.",
+    "tooLong": "Usa menos de {limit} caracteres.",
+    "send": "Enviar mensaje",
+    "sending": "Enviando…",
+    "sent": "Mensaje enviado. Te hemos enviado una copia por correo.",
+    "rateLimited": "Has enviado varios mensajes en poco tiempo. Vuelve a intentarlo más tarde.",
+    "unavailable": "El formulario de ayuda no está disponible ahora mismo. Vuelve a intentarlo más tarde.",
+    "sendFailed": "No se pudo enviar tu mensaje. Inténtalo de nuevo."
+  },
+  "draftPreview": {
+    "title": "Vista previa del borrador",
+    "draftNotice": "Este es el último borrador guardado, no la página publicada. Solo los miembros de este sitio pueden abrir esta vista previa.",
+    "siteLabel": "Sitio",
+    "pathLabel": "Página",
+    "frameRegionLabel": "Vista previa del borrador",
+    "frameTitle": "Borrador de esta página en tu sitio",
+    "toolbarAriaLabel": "Opciones de vista previa",
+    "reload": "Recargar",
+    "reloading": "Recargando…",
+    "openPublished": "Abrir la página publicada",
+    "refusedTitle": "No se puede previsualizar este borrador",
+    "refusalNotFound": "Esta página no tiene dirección en tu sitio. Solo se pueden previsualizar entradas y páginas de destino, y una página de destino necesita todas sus páginas superiores.",
+    "refusalLanguageOff": "Esta página está en un idioma que tu sitio no ofrece. Activa este idioma para previsualizarla.",
+    "refusalSuspended": "Este sitio está suspendido, así que sus borradores no se pueden previsualizar.",
+    "refusalArchived": "Este sitio está archivado, así que sus borradores no se pueden previsualizar.",
+    "refusalUnavailable": "La plataforma no pudo preparar esta vista previa. El problema se ha registrado para el equipo de la plataforma."
+  },
+  "grantEntitlement": {
+    "trigger": "Conceder a este cliente",
+    "triggerAriaLabel": "Conceder a este cliente: {item}",
+    "title": "Conceder {item} a {tenant}",
+    "description": "{tenant} obtiene {item} fuera de su plan {plan}. Su propietario lo ve desbloqueado y puede activarlo. No se cobra nada.",
+    "granted": "{item} concedido.",
+    "failed": "No se pudo conceder {item}. Inténtalo de nuevo."
+  },
+  "grantDialog": {
+    "confirmButton": "Conceder",
+    "confirmingButton": "Concediendo…"
+  },
+  "grantExpiryFields": {
+    "expiresLabel": "Caduca",
+    "expiresHint": "La concesión termina sola pasado este plazo.",
+    "expiry": {
+      "NEVER": "Nunca: hasta que se revoque",
+      "DAYS_30": "30 días",
+      "DAYS_90": "90 días",
+      "YEAR_1": "1 año"
+    },
+    "noteLabel": "Nota",
+    "noteHint": "Opcional. Por qué se concede: se muestra en la tarjeta Concesiones y en el registro de actividad."
+  },
+  "grantModulePack": {
+    "trigger": "Conceder un paquete de módulos",
+    "title": "Conceder un paquete de módulos a {tenant}",
+    "description": "Sus editores obtienen los módulos del paquete en Studio, fuera del plan {plan}. No se cobra nada.",
+    "packLabel": "Paquete de módulos",
+    "packPlaceholder": "Elige un paquete de módulos",
+    "packIncluded": "{pack} (incluido en el plan)",
+    "packGranted": "{pack} (ya concedido)"
+  },
+  "grantLanguages": {
+    "trigger": "Conceder más idiomas",
+    "title": "Conceder más idiomas a {tenant}",
+    "description": "El plan {plan} solo publica el idioma predeterminado. Elige cuántos idiomas más puede publicar {tenant}. No se cobra nada.",
+    "descriptionWithAllowance": "El plan {plan} publica {n, plural, one {# idioma adicional} other {# idiomas adicionales}}. Elige cuántos idiomas más puede publicar {tenant}. No se cobra nada.",
+    "countLabel": "Idiomas adicionales",
+    "countHint": "Si el plan permite más después, se aplica el número mayor."
+  },
+  "grantItemNames": {
+    "languages": "{count, plural, one {# idioma adicional} other {# idiomas adicionales}}",
+    "additionalLanguages": "Idiomas adicionales",
+    "modulePack": {
+      "CORE": "Módulos Core",
+      "STARTER": "Módulos Starter",
+      "GROWTH": "Módulos Growth"
+    },
+    "lookField": {
+      "preset": "Ajuste predefinido",
+      "accentHue": "Tono de acento",
+      "logoHue": "Tono del logotipo",
+      "headingFont": "Fuente de títulos",
+      "bodyFont": "Fuente del texto",
+      "radiusScale": "Escala de radio",
+      "density": "Densidad",
+      "languageSwitcherStyle": "Estilo del selector de idioma",
+      "cardStyle": "Estilo de tarjeta",
+      "headerControlStyle": "Botones de la cabecera",
+      "headerControlShape": "Forma de los botones de la cabecera",
+      "accountButtonStyle": "Botón de la cuenta",
+      "accountPanelStyle": "Panel de la cuenta",
+      "accountPhonePlacement": "Posición de la cuenta en teléfonos",
+      "busyButtonStyle": "Estilo del botón ocupado",
+      "spinnerStyle": "Estilo del indicador de carga",
+      "buttonShape": "Forma de los botones",
+      "headerLayout": "Diseño de la cabecera",
+      "headerSubmenuStyle": "Submenús de la cabecera",
+      "headerBarStyle": "Barra de la cabecera",
+      "navLinkStyle": "Enlaces de navegación",
+      "headingWeight": "Grosor de los títulos",
+      "headingCase": "Mayúsculas en títulos",
+      "imageProportion": "Proporciones de imagen",
+      "dividerWidth": "Separadores de sección",
+      "footerLayout": "Diseño del pie de página",
+      "footerBackground": "Fondo del pie de página",
+      "footerSurface": "Superficie del pie de página",
+      "cookieSettingsButton": "Botón de configuración de cookies",
+      "brandName": "Nombre de la marca",
+      "logoAssetUrl": "Imagen del logotipo",
+      "faviconAssetUrl": "Imagen del favicon"
+    }
+  },
+  "grantedBadge": {
+    "label": "Concedido",
+    "labelUntil": "Concedido hasta el {date}"
+  },
+  "grantsCard": {
+    "title": "Concesiones",
+    "supportingText": "Lo que este cliente tiene fuera de su plan.",
+    "empty": "No hay concesiones: todo lo que tiene este cliente procede de su plan.",
+    "kind": {
+      "CAPABILITY": "Función",
+      "LOOK_FIELD": "Aspecto",
+      "MODULE_PACK": "Paquete de módulos",
+      "LOCALE_LIMIT": "Idiomas"
+    },
+    "expired": "Caducada",
+    "included": "Incluida en el plan",
+    "metaUntilRevoked": "{who} · {date} · Hasta que se revoque",
+    "metaExpires": "{who} · {date} · Caduca el {expiry}",
+    "metaExpired": "{who} · {date} · Caducó el {expiry}"
+  },
+  "usageCard": {
+    "title": "Uso",
+    "description": "Lo que incluye su plan y cuánto se ha usado.",
+    "labels": {
+      "TAKEAWAYS": "Resúmenes con IA este mes",
+      "EMAILS": "Correos enviados este mes",
+      "SEATS": "Plazas del equipo",
+      "LANGUAGES": "Idiomas adicionales"
+    },
+    "links": {
+      "SEATS": "Equipo",
+      "LANGUAGES": "Idiomas"
+    },
+    "value": "<count>{used, number}</count> de {allowance, number}",
+    "failed": "No se pudo cargar este recuento. Recargue la página para intentarlo de nuevo.",
+    "footer": {
+      "limits": "Su plan fija estos límites.",
+      "plansLink": "Consulte lo que incluye cada plan"
+    },
+    "notes": {
+      "TAKEAWAYS": {
+        "UNDER": "Se reinicia el {date}",
+        "NEAR": "{percent} % usado — quedan {left, number}<separator>·</separator><reset>Se reinicia el {date}</reset>",
+        "FULL": "Todo usado. Las nuevas entradas no tendrán resúmenes hasta el {date}."
+      },
+      "EMAILS": {
+        "UNDER": "Se reinicia el {date}",
+        "NEAR": "{percent} % usado — quedan {left, number}<separator>·</separator><reset>Se reinicia el {date}</reset>",
+        "FULL": "Todo usado. Las nuevas entradas no se enviarán por correo hasta el {date}."
+      },
+      "SEATS": {
+        "UNDER": "Cuenta al propietario, los miembros y las invitaciones pendientes.",
+        "NEAR": "{left, plural, one {Queda # plaza.} other {Quedan # plazas.}}",
+        "FULL": "Todas las plazas ocupadas. Quite a alguien para invitar a otra persona."
+      },
+      "LANGUAGES": {
+        "UNDER": "Su idioma predeterminado no cuenta.",
+        "NEAR": "{left, plural, one {Queda # idioma.} other {Quedan # idiomas.}}",
+        "FULL": "Todos en uso. Quite uno para añadir otro."
+      }
+    }
+  },
+  "revokeGrantControl": {
+    "revoke": {
+      "trigger": "Revocar",
+      "triggerAriaLabel": "Revocar {item}",
+      "title": "Revocar {item} a {tenant}",
+      "description": "{item} se vuelve a bloquear desde la próxima carga de página. Lo que el cliente configuró se conserva, así que concederlo de nuevo lo restaura.",
+      "confirmButton": "Revocar",
+      "confirmingButton": "Revocando…",
+      "failed": "No se pudo revocar la concesión. Inténtalo de nuevo.",
+      "done": "{item} revocado."
+    },
+    "remove": {
+      "trigger": "Quitar",
+      "triggerAriaLabel": "Quitar la concesión de {item}",
+      "title": "Quitar {item} de {tenant}",
+      "description": "Esta concesión ha caducado, así que {item} ya está bloqueado. Al quitarla desaparece de la lista y se podrá conceder de nuevo.",
+      "confirmButton": "Quitar",
+      "confirmingButton": "Quitando…",
+      "failed": "No se pudo quitar la concesión. Inténtalo de nuevo.",
+      "done": "{item} quitado."
+    }
+  },
+  "entitlementGrantErrors": {
+    "notFound": "Este cliente ya no existe.",
+    "archived": "Este cliente está archivado, así que sus concesiones no se pueden cambiar.",
+    "comingSoon": "Esta función aún no está disponible, así que no se puede conceder.",
+    "alreadyGranted": "Esto ya está concedido.",
+    "expiryShortened": "La concesión de idiomas actual dura más. Elige una caducidad posterior o revoca primero esa concesión.",
+    "includedInPlan": "Esto ya está incluido en el plan del cliente.",
+    "grantNotOpen": "Esta concesión ya se quitó o ha caducado."
+  },
+  "teamPage": {
+    "title": "Equipo",
+    "description": "Las personas que escriben y publican el contenido de este sitio contigo en Studio.",
+    "seatsUsed": "{used} de {seats, plural, one {# plaza usada} other {# plazas usadas}}",
+    "inviteEditor": "Invitar editor",
+    "seatLimitTitle": "Todas las plazas están ocupadas",
+    "seatLimitBody": "{plan} incluye {seats, plural, one {# plaza} other {# plazas}}. Quita a un miembro o cancela una invitación para invitar a otra persona.",
+    "thisMember": "este miembro",
+    "columnPerson": "Persona",
+    "columnRole": "Rol",
+    "columnStudioAccess": "Acceso a Studio",
+    "columnActions": "Acciones",
+    "members": {
+      "title": "Miembros",
+      "count": "{count, plural, one {# persona} other {# personas}}",
+      "empty": "Nadie se ha unido a este sitio todavía.",
+      "you": "(tú)",
+      "noEmail": "Sin correo registrado",
+      "joined": "Se unió el <time>{date}</time>",
+      "joinedToday": "Se unió <time>hoy</time>",
+      "joinedWithRole": "Se unió el <time>{date}</time> · {role}",
+      "joinedTodayWithRole": "Se unió <time>hoy</time> · {role}",
+      "noEditorsNoFreeSeats": "Todavía no hay editores. Cada plaza libre está reservada por una invitación pendiente.",
+      "noEditors": "Todavía no hay editores. Invita hasta a {free, plural, one {# persona} other {# personas}} a escribir y publicar en Studio contigo."
+    },
+    "invites": {
+      "title": "Invitaciones pendientes",
+      "supportingText": "Cada una ocupa una plaza hasta que la persona se una o la canceles.",
+      "count": "{count, plural, one {# invitación} other {# invitaciones}}",
+      "invited": "Invitado el <time>{date}</time> · aún no se ha unido",
+      "invitedToday": "Invitado <time>hoy</time> · aún no se ha unido",
+      "invitedWithRole": "Invitado el <time>{date}</time> · aún no se ha unido · {role}",
+      "invitedTodayWithRole": "Invitado <time>hoy</time> · aún no se ha unido · {role}",
+      "studioAccess": "Empieza cuando se una"
+    },
+    "studioAccess": {
+      "badge": {
+        "READY": "Listo",
+        "INVITE_SENT": "Invitación enviada",
+        "ACTIVATING": "Configurando…",
+        "STALLED": "Requiere atención",
+        "LOCKED": "Bloqueado"
+      },
+      "hint": {
+        "INVITE_SENT": "Esperando a que acepte la invitación a Studio",
+        "ACTIVATING": "Aceptada: los permisos de edición suelen tardar un minuto",
+        "STALLED": "No se aceptó en 3 días, así que dejamos de comprobarlo",
+        "LOCKED": "Supera las plazas de tu plan"
+      },
+      "noAccess": "Sin acceso a Studio"
+    },
+    "inviteDialog": {
+      "title": "Invitar a un editor",
+      "notice": "Un editor puede editar, publicar y eliminar todo el contenido del sitio en Studio. No puede cambiar su aspecto, ajustes ni facturación.",
+      "emailLabel": "Correo electrónico",
+      "emailHint": "Le enviaremos un enlace para unirse. La invitación ocupa una plaza hasta que se una.",
+      "emailPlaceholder": "nombre@ejemplo.com",
+      "cancel": "Cancelar",
+      "send": "Enviar invitación",
+      "sending": "Enviando…",
+      "sent": "Invitación enviada a {email}.",
+      "failed": "No se pudo enviar la invitación. Inténtalo de nuevo.",
+      "fieldError": {
+        "EMAIL_INVALID": "Escribe un correo electrónico, como nombre@ejemplo.com.",
+        "ALREADY_MEMBER": "{email} ya forma parte del equipo.",
+        "ALREADY_INVITED": "{email} ya tiene una invitación pendiente.",
+        "SEAT_LIMIT": "Todas las plazas de {plan} están ocupadas."
+      }
+    },
+    "remove": {
+      "trigger": "Quitar",
+      "triggerAriaLabel": "Quitar a {email}",
+      "title": "¿Quitar a {email}?",
+      "description": "Pierde el acceso a la administración de este sitio y a Studio de inmediato, y su plaza queda libre. El contenido que escribió se queda en el sitio.",
+      "keep": "Mantener miembro",
+      "confirm": "Quitar miembro",
+      "confirming": "Quitando…",
+      "done": "Se quitó a {email}. Se está revocando su acceso a Studio.",
+      "gone": "{email} ya no forma parte del equipo.",
+      "failed": "No se pudo quitar a {email}. Inténtalo de nuevo.",
+      "self": "No puedes quitarte a ti mismo del equipo.",
+      "lastOwner": "Un sitio siempre conserva un propietario, así que no se puede quitar a {email}."
+    },
+    "cancelInvite": {
+      "trigger": "Cancelar invitación",
+      "triggerAriaLabel": "Cancelar invitación a {email}",
+      "title": "¿Cancelar la invitación a {email}?",
+      "description": "El enlace de su correo deja de funcionar y la plaza queda libre. Puedes volver a invitarle más adelante.",
+      "keep": "Mantener invitación",
+      "confirm": "Cancelar invitación",
+      "confirming": "Cancelando…",
+      "done": "Se canceló la invitación a {email}.",
+      "gone": "Esa invitación ya no está pendiente.",
+      "failed": "No se pudo cancelar la invitación. Inténtalo de nuevo."
+    }
   }
 }

@@ -1,33 +1,17 @@
 'use server';
 
-import { type TENANT_REFUSAL, TENANT_LOG } from '@platform/constants/tenant';
+import type { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { SUSPENSION_DESCRIPTION_MAX_LENGTH } from '@platform/constants/tenant-suspension';
-import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import type { TTenantLifecycleResult } from '@platform/server/provisioning/tenant-lifecycle-result';
 import { signupBlockReasonSchema } from '@platform/server/signup-block/signup-block-reason-schema';
+import { completeSuspensionChange } from '@platform/server/tenants/complete-suspension-change';
 import { liftTenantSuspension } from '@platform/server/tenants/lift-tenant-suspension';
-import { notifyOwnerOfSuspension } from '@platform/server/tenants/notify-owner-of-suspension';
 import { resolveSuspendableTenant } from '@platform/server/tenants/resolve-suspendable-tenant';
 import type { TSuspensionCase } from '@platform/server/tenants/tenant-suspension-case';
 import { applyTenantSuspension } from '@platform/server/tenants/tenant-suspension-writes';
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  isOutcomeSuccess,
-  type TAuditAction,
-  type TMaybeUndefined,
-} from '@shinefold/config';
-import {
-  SUSPENSION_CATEGORY,
-  TENANT_STATUS,
-  type TSuspensionStatus,
-} from '@shinefold/db';
-import type { TTenantSuspension } from '@shinefold/db/schema/tenant-suspensions';
-import type { TTenant } from '@shinefold/db/schema/tenants';
-import { toOutcome } from '@shinefold/utils/to-outcome';
-import { after } from 'next/server';
+import { ACTION_OUTCOME, isOutcomeSuccess } from '@shinefold/config';
+import { SUSPENSION_CATEGORY, TENANT_STATUS } from '@shinefold/db';
 import { z } from 'zod';
 
 export type TTenantSuspensionResult = TTenantLifecycleResult<
@@ -48,37 +32,6 @@ const suspensionCaseSchema = z.object({
 });
 
 const ownerEmailBlockSchema = z.object({ reason: signupBlockReasonSchema });
-
-const SUSPENSION_AUDIT_ACTION = {
-  [TENANT_STATUS.SUSPENDED]: AUDIT_ACTION.SUSPENSION_APPLIED,
-  [TENANT_STATUS.ACTIVE]: AUDIT_ACTION.SUSPENSION_LIFTED,
-} as const satisfies Record<TSuspensionStatus, TAuditAction>;
-
-const completeSuspensionChange = async (
-  tenant: TTenant,
-  status: TSuspensionStatus,
-  suspension: TMaybeUndefined<TTenantSuspension>,
-): Promise<TTenantSuspensionResult> => {
-  await recordAuditEvent({
-    logEvent: TENANT_LOG.SUSPENSION_AUDIT_FAILED,
-    action: SUSPENSION_AUDIT_ACTION[status],
-    targetType: AUDIT_TARGET_TYPE.TENANT,
-    targetId: tenant.id,
-    details: {
-      name: tenant.name,
-      ...(suspension && {
-        reference: suspension.reference,
-        category: suspension.category,
-      }),
-    },
-  });
-
-  if (suspension) {
-    after(() => notifyOwnerOfSuspension(tenant, suspension, status));
-  }
-
-  return toOutcome(ACTION_OUTCOME.SUCCESS);
-};
 
 export const suspendTenantAction = async (
   tenantId: string,

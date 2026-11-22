@@ -1,4 +1,7 @@
 import { faker } from '@faker-js/faker';
+import type { TPostSummary } from '@shinefold/config';
+import { EMAIL_FONT_STACK, FONT_CHOICE } from '@shinefold/config/constants';
+import { POST_BOX_CLASS } from '@shinefold/email/templates/tenant/post-email-frame/post-email-frame';
 import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@shinefold/email/templates/tenant/unsubscribe/unsubscribe';
 import {
   MOCK_ESCAPED_UNSAFE_MARKUP,
@@ -9,7 +12,14 @@ import {
   MOCK_UNSUBSCRIBE_URL,
   MOCK_URL,
 } from '@shinefold/email/testing/email-fixtures';
-import { MOCK_TENANT_EMAIL_BRAND } from '@shinefold/email/testing/tenant-email-brand';
+import {
+  mockPortableTextBlock,
+  mockPortableTextSpan,
+} from '@shinefold/email/testing/portable-text-fixtures';
+import {
+  MOCK_TENANT_EMAIL_BRAND,
+  MOCK_TENANT_EMAIL_DARK_BRAND,
+} from '@shinefold/email/testing/tenant-email-brand';
 
 import { buildPostEmail, type TPostEmailInput } from './post-email';
 
@@ -17,7 +27,24 @@ faker.seed(7159);
 
 const MOCK_POST_URL = `${MOCK_URL}/en/blog/${faker.lorem.slug()}`;
 const MOCK_COVER_IMAGE_URL = `https://cdn.example.com/${faker.string.alphanumeric(8)}.jpg`;
-const MOCK_TAKEAWAYS = [faker.lorem.sentence(), faker.lorem.sentence()];
+const MOCK_SUMMARY_PARAGRAPH = faker.lorem.sentence();
+const MOCK_SUMMARY_ITEMS = [faker.lorem.sentence(), faker.lorem.sentence()];
+
+type TSummaryBlock = TPostSummary[number];
+
+const MOCK_SUMMARY: TPostSummary = [
+  mockPortableTextBlock<TSummaryBlock>({
+    children: [mockPortableTextSpan(MOCK_SUMMARY_PARAGRAPH)],
+  }),
+  ...MOCK_SUMMARY_ITEMS.map((item) =>
+    mockPortableTextBlock<TSummaryBlock>({
+      children: [mockPortableTextSpan(item)],
+      listItem: 'number',
+      level: 1,
+    }),
+  ),
+];
+const MOCK_TEST_BANNER_TEXT = faker.lorem.sentence();
 
 const MOCK_INPUT: TPostEmailInput = {
   subject: faker.lorem.sentence(),
@@ -41,9 +68,19 @@ describe(buildPostEmail, () => {
       expect(email.subject).toBe(MOCK_INPUT.subject);
     });
 
-    it('renders the title and excerpt', () => {
-      expect(email.html).toContain(MOCK_INPUT.title);
+    it('renders the site name, title and excerpt', () => {
+      expect(email.html).toContain(MOCK_TENANT_NAME);
+      expect(email.html).toContain(`${MOCK_INPUT.title}</h1>`);
       expect(email.html).toContain(MOCK_INPUT.excerpt);
+    });
+
+    it('names the site in the subscriber footer', () => {
+      expect(email.text).toContain(MOCK_TENANT_NAME);
+    });
+
+    it('renders no dark palette and no test banner', () => {
+      expect(email.html).not.toContain(MOCK_TENANT_EMAIL_DARK_BRAND.surface);
+      expect(email.html).not.toContain(MOCK_TEST_BANNER_TEXT);
     });
 
     it('links the post and the escaped unsubscribe url', () => {
@@ -51,8 +88,9 @@ describe(buildPostEmail, () => {
       expect(email.html).toContain(`href="${MOCK_ESCAPED_UNSUBSCRIBE_URL}"`);
     });
 
-    it('renders no cover image and no takeaway list', () => {
+    it('renders no cover image and no summary box', () => {
       expect(email.html).not.toContain('<img');
+      expect(email.html).not.toContain(`class="${POST_BOX_CLASS}"`);
       expect(email.html).not.toContain('<li');
     });
 
@@ -76,7 +114,7 @@ describe(buildPostEmail, () => {
       coverImageUrl: MOCK_COVER_IMAGE_URL,
     });
 
-    expect(html).toContain(`<img src="${MOCK_COVER_IMAGE_URL}"`);
+    expect(html).toContain(`src="${MOCK_COVER_IMAGE_URL}"`);
   });
 
   it('drops a cover image whose url is unsafe', () => {
@@ -88,26 +126,111 @@ describe(buildPostEmail, () => {
     expect(html).not.toContain(MOCK_JAVASCRIPT_URL);
   });
 
-  it('renders each given takeaway in the html and the plain text', () => {
-    const { html, text } = buildPostEmail({
-      ...MOCK_INPUT,
-      takeaways: MOCK_TAKEAWAYS,
+  describe('with a summary', () => {
+    let email: ReturnType<typeof buildPostEmail>;
+
+    beforeEach(() => {
+      email = buildPostEmail({ ...MOCK_INPUT, summary: MOCK_SUMMARY });
     });
 
-    for (const takeaway of MOCK_TAKEAWAYS) {
-      expect(html).toContain(takeaway);
-      expect(text).toContain(`- ${takeaway}`);
-    }
+    it('renders a paragraph as a paragraph and list items in one ordered list', () => {
+      expect(email.html).toContain(`>${MOCK_SUMMARY_PARAGRAPH}</p>`);
+      expect(email.html.match(/<ol/g)).toHaveLength(1);
+      for (const item of MOCK_SUMMARY_ITEMS) {
+        expect(email.html).toContain(`>${item}</li>`);
+      }
+    });
+
+    it('numbers the list items in the plain text', () => {
+      expect(email.text).toContain(MOCK_SUMMARY_PARAGRAPH);
+      expect(email.text).toContain(
+        MOCK_SUMMARY_ITEMS.map(
+          (item, index) => `${String(index + 1)}. ${item}`,
+        ).join('\n'),
+      );
+    });
+  });
+
+  it('renders no summary box for a summary with no text', () => {
+    const { html } = buildPostEmail({
+      ...MOCK_INPUT,
+      summary: [
+        mockPortableTextBlock<TSummaryBlock>({
+          children: [mockPortableTextSpan(' ')],
+        }),
+      ],
+    });
+
+    expect(html).not.toContain(`class="${POST_BOX_CLASS}"`);
   });
 
   it.each<[string, Partial<TPostEmailInput>]>([
     ['title', { title: MOCK_UNSAFE_MARKUP }],
     ['excerpt', { excerpt: MOCK_UNSAFE_MARKUP }],
-    ['takeaway', { takeaways: [MOCK_UNSAFE_MARKUP] }],
+    [
+      'summary',
+      {
+        summary: [
+          mockPortableTextBlock<TSummaryBlock>({
+            children: [mockPortableTextSpan(MOCK_UNSAFE_MARKUP)],
+          }),
+        ],
+      },
+    ],
   ])('shows markup in the %s as text', (_field, override) => {
     const { html } = buildPostEmail({ ...MOCK_INPUT, ...override });
 
     expect(html).not.toContain(MOCK_UNSAFE_MARKUP);
     expect(html).toContain(MOCK_ESCAPED_UNSAFE_MARKUP);
+  });
+
+  it('shows the test banner first on a test email', () => {
+    const { html, text } = buildPostEmail({
+      ...MOCK_INPUT,
+      isTest: true,
+      testBannerText: MOCK_TEST_BANNER_TEXT,
+    });
+
+    expect(html.indexOf(MOCK_TEST_BANNER_TEXT)).toBeLessThan(
+      html.indexOf(MOCK_TENANT_NAME, html.indexOf('<body')),
+    );
+    expect(text.startsWith(MOCK_TEST_BANNER_TEXT)).toBe(true);
+  });
+
+  it('never shows the test banner on a subscriber email', () => {
+    const { html, text } = buildPostEmail({
+      ...MOCK_INPUT,
+      isTest: false,
+      testBannerText: MOCK_TEST_BANNER_TEXT,
+    });
+
+    expect(html).not.toContain(MOCK_TEST_BANNER_TEXT);
+    expect(text).not.toContain(MOCK_TEST_BANNER_TEXT);
+  });
+
+  it('switches to the given dark palette in a dark-mode client', () => {
+    const { html } = buildPostEmail({
+      ...MOCK_INPUT,
+      darkBrand: MOCK_TENANT_EMAIL_DARK_BRAND,
+    });
+
+    for (const color of [
+      MOCK_TENANT_EMAIL_DARK_BRAND.surface,
+      MOCK_TENANT_EMAIL_DARK_BRAND.text,
+      MOCK_TENANT_EMAIL_DARK_BRAND.brandPrimarySolid,
+    ]) {
+      expect(html).toContain(color);
+    }
+  });
+
+  it('sets headings and body text in the given fonts', () => {
+    const { html } = buildPostEmail({
+      ...MOCK_INPUT,
+      headingFont: FONT_CHOICE.FRAUNCES,
+      bodyFont: FONT_CHOICE.INTER,
+    });
+
+    expect(html).toContain(EMAIL_FONT_STACK[FONT_CHOICE.FRAUNCES]);
+    expect(html).toContain(EMAIL_FONT_STACK[FONT_CHOICE.INTER]);
   });
 });

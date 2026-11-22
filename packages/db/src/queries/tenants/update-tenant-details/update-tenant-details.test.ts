@@ -9,7 +9,6 @@ import {
   TENANT_STATUS,
   type TTenantProvisioningStatus,
 } from '@shinefold/db/constants';
-import { inviteEmailColumns } from '@shinefold/db/queries/membership-invites/invite-email-columns';
 import { lockMembershipsOverSeats } from '@shinefold/db/queries/memberships/lock-memberships-over-seats';
 import {
   getUnsentStudioReinviteEmail,
@@ -34,9 +33,11 @@ import {
   insertTestTenant,
   insertTestUser,
 } from '@shinefold/db/testing/fixtures';
+import { mockMembershipInvite } from '@shinefold/db/testing/membership-invites/fixtures';
 import {
   countLockedMemberships,
   insertTeam,
+  mockMembership,
 } from '@shinefold/db/testing/memberships/fixtures';
 import {
   decryptTestPersonalValue,
@@ -44,6 +45,7 @@ import {
 } from '@shinefold/db/testing/personal-data';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { MOCK_SANITY_PROJECT_ID } from '@shinefold/db/testing/sanity-management-client/fixtures';
+import { insertTestTenantDomain } from '@shinefold/db/testing/tenant-domains/fixtures';
 import {
   MOCK_IDLE_PROVISIONING_STEPS,
   MOCK_MISSING_TENANT_ID,
@@ -148,19 +150,13 @@ async function insertTenantWithDomain(overrides?: {
     provisioningSteps: overrides?.provisioningSteps,
   });
 
-  await db().insert(tenantDomains).values({ tenantId: tenant.id, domain });
+  await insertTestTenantDomain(db(), tenant.id, domain);
 
   return tenant.id;
 }
 
 async function insertOwnerInvite(tenantId: string, email: string) {
-  await db()
-    .insert(membershipInvites)
-    .values({
-      tenantId,
-      ...inviteEmailColumns(email),
-      role: MEMBERSHIP_ROLE.OWNER,
-    });
+  await mockMembershipInvite(db(), tenantId, { email });
 }
 
 async function insertOwnerMember(
@@ -169,9 +165,11 @@ async function insertOwnerMember(
 ): Promise<string> {
   const { id: userId } = await insertTestUser(db(), user);
 
-  await db()
-    .insert(memberships)
-    .values({ tenantId, userId, role: MEMBERSHIP_ROLE.OWNER });
+  await mockMembership(db(), {
+    tenantId,
+    userId,
+    role: MEMBERSHIP_ROLE.OWNER,
+  });
 
   return userId;
 }
@@ -402,13 +400,10 @@ describe(updateTenantDetails, () => {
       });
 
       it('returns owner-email-taken when the new email matches another invite', async () => {
-        await db()
-          .insert(membershipInvites)
-          .values({
-            tenantId,
-            ...inviteEmailColumns(MOCK_MEMBER_EMAIL),
-            role: MEMBERSHIP_ROLE.EDITOR,
-          });
+        await mockMembershipInvite(db(), tenantId, {
+          email: MOCK_MEMBER_EMAIL,
+          role: MEMBERSHIP_ROLE.EDITOR,
+        });
 
         const result = await updateTenantDetails(tenantId, {
           ...MOCK_VALID_INPUT,
@@ -515,9 +510,7 @@ describe(updateTenantDetails, () => {
     });
 
     it('returns domain-taken when renaming onto its own secondary domain', async () => {
-      await db()
-        .insert(tenantDomains)
-        .values({ tenantId, domain: MOCK_ALT_DOMAIN });
+      await insertTestTenantDomain(db(), tenantId, MOCK_ALT_DOMAIN);
 
       const result = await updateTenantDetails(tenantId, {
         ...MOCK_VALID_INPUT,
@@ -713,6 +706,43 @@ describe(updateTenantDetails, () => {
         expect(unwrapUpdated(saved).selfServeOwnerEmailIndex).toBe(
           MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
         );
+      },
+    );
+
+    it('ends the trial when an operator moves a trial site to Free', async () => {
+      await patchTestTenant(db(), tenantId, {
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.TRIAL,
+      });
+
+      const saved = await updateTenantDetails(tenantId, MOCK_ORIGINAL_DETAILS);
+
+      expect(unwrapUpdated(saved)).toMatchObject({
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ACTIVE,
+      });
+    });
+
+    it.each([
+      [TENANT_STATUS.TRIAL, TENANT_PLAN.STARTER],
+      [TENANT_STATUS.ACTIVE, TENANT_PLAN.FREE],
+      [TENANT_STATUS.PAST_DUE, TENANT_PLAN.FREE],
+      [TENANT_STATUS.SUSPENDED, TENANT_PLAN.FREE],
+      [TENANT_STATUS.ACTIVE, TENANT_PLAN.STARTER],
+    ])(
+      'keeps the status of a %s site an operator moves to %s',
+      async (status, plan) => {
+        await patchTestTenant(db(), tenantId, {
+          plan: TENANT_PLAN.GROWTH,
+          status,
+        });
+
+        const saved = await updateTenantDetails(tenantId, {
+          ...MOCK_ORIGINAL_DETAILS,
+          plan,
+        });
+
+        expect(unwrapUpdated(saved).status).toBe(status);
       },
     );
 
@@ -927,6 +957,26 @@ describe(updateTenantDetails, () => {
       await expect(saveGrowthOnNewDomain()).rejects.toThrow();
 
       await expect(countLockedMemberships(db())).resolves.toBe(0);
+    });
+
+    it('keeps a trial site on its trial when its move to Free fails', async () => {
+      await patchTestTenant(db(), tenantId, {
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.TRIAL,
+      });
+
+      await expect(
+        updateTenantDetails(tenantId, {
+          ...MOCK_VALID_INPUT,
+          primaryDomain: MOCK_NEW_DOMAIN,
+        }),
+      ).rejects.toThrow();
+
+      const [row] = await db()
+        .select({ status: tenants.status })
+        .from(tenants)
+        .where(eq(tenants.id, tenantId));
+      expect(row?.status).toBe(TENANT_STATUS.TRIAL);
     });
 
     it('locks again the members the save unlocked', async () => {

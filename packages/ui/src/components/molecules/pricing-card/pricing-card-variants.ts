@@ -1,4 +1,4 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { CARD_CONTAINER, tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const pricingCardVariants = tv({
@@ -11,8 +11,8 @@ export const pricingCardVariants = tv({
       'px-card-x py-card-y',
     ],
     highlight: ['row-start-1 h-4'],
-    // The title's size container sits here because on the card its containment would stop the card subgridding.
-    name: ['row-start-2 @container/card'],
+    // Containment on the root would stop the subgrid, so the title measures this content box and steps up at a card 2×card-x wider.
+    name: ['row-start-2', CARD_CONTAINER],
     description: ['row-start-3 mt-2'],
     price: ['row-start-4 mt-4'],
     extras: ['row-start-5 mt-1 flex flex-col gap-1'],
@@ -25,7 +25,7 @@ export const pricingCardVariants = tv({
       true: {
         root: [
           'border-brand-primary',
-          '[--item-border-width:1px] [--item-accent-color:var(--brand-primary)] [--item-shadow:var(--shadow-card)]',
+          '[--item-border-width:1px] [--item-accent-brand-share:100%] [--item-shadow:var(--shadow-card)]',
         ],
       },
       false: {},

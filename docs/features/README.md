@@ -26,6 +26,7 @@ on the public site or the platform yet).
 | [Audit events and findings](audit-and-findings.md)                    | partial | db, platform, config                      | An append-only log of who did what to a tenant, and open/resolved conditions an operator should act on.                                                          |
 | [Operator alerts](operator-alerts.md)                                 | built   | platform, email, db, config               | Emails SUPERADMINs when a background job finds a tenant needing a human, such as stuck Sanity access.                                                            |
 | [Data requests](data-requests.md)                                     | built   | db, platform, config                      | A SUPERADMIN finds, exports and erases what is still stored about a person, by email address.                                                                    |
+| [Support](support.md)                                                 | built   | platform, email, config                   | A member's Help form emails support with the site, plan, account and page attached.                                                                              |
 | [Cross-tenant migrations](cross-tenant-migrations.md)                 | built   | studio, db                                | Runs content migrations for the one shared schema against every tenant's Sanity project.                                                                         |
 | [Platform releases](platform-releases.md)                             | partial | config, utils                             | A SUPERADMIN sees the release candidate, runs the contrast check and cuts a production release.                                                                  |
 
@@ -60,8 +61,8 @@ on the public site or the platform yet).
 | [Posts](posts.md)                           | built   | studio, service, ui, web, db     | An article written in the Studio and rendered at `/blog/{slug}` with byline, reading time, share and bookmark. |
 | [Rich text](rich-text.md)                   | built   | config, studio, service, ui, web | Portable Text authored in the Studio and rendered by one shared renderer, in three allowed shapes.             |
 | [Topics and tags](topics-and-tags.md)       | built   | studio, service, web             | Each post has one topic and up to six tags, each with an archive page, plus index pages for both.              |
-| [Reading experience](reading-experience.md) | built   | config, utils, service, ui, web  | A post offers three depths — 30s takeaways, Read and Deep — from a control above the article.                  |
-| [Skim pipeline](skim-pipeline.md)           | partial | studio, service, web, db         | On publish, Claude drafts 3–7 takeaways onto the post's draft for an editor to review.                         |
+| [Reading experience](reading-experience.md) | built   | config, utils, service, ui, web  | A post shows its full article, with a Summary button opening its summary in a card under the author row.       |
+| [Skim pipeline](skim-pipeline.md)           | partial | studio, service, web, db         | On publish, Claude drafts a summary of at most 100 words onto the post's draft for an editor to review.        |
 
 ## Modules
 

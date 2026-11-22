@@ -7,6 +7,8 @@ code:
   - packages/studio/src/studio-mount.test.tsx
   - packages/studio/src/studio-config.ts
   - packages/studio/src/studio-config.test.ts
+  - packages/studio/src/document-actions/document-options/**
+  - packages/studio/src/document-actions/preview-action/**
   - packages/studio/src/index.ts
   - packages/studio/sanity.config.ts
   - packages/studio/sanity-env.ts
@@ -15,6 +17,9 @@ code:
   - apps/platform/src/utils/content-security-policy/**
   - apps/platform/src/utils/studio-entered-cookie/**
   - apps/platform/src/server/studio-entry/**
+  - apps/platform/src/components/features/draft-preview/**
+  - apps/platform/src/app/**/preview/**
+  - apps/platform/src/server/draft-preview/**
 epics: [4840, 4956, 4959, 4035, 1036]
 ---
 
@@ -29,6 +34,8 @@ their site's content there and operators can open any tenant's. The Studio is
 configured per tenant: its languages follow the tenant's live locales, and
 module types whose capability is off for the tenant carry a warning.
 
+Seeded starter content is badged: `SampleBadge` (`packages/studio/src/document-badges/`, wired in `buildDocumentOptions`) shows **Sample** on every document whose id starts with `STARTER_DOCUMENT_ID_PREFIX`, the starter content [Tenant provisioning](tenant-provisioning.md) seeds. It reads the published id, so a starter document's draft is badged too.
+
 ## Surfaces and routes
 
 - `/dashboard/studio/**`: the owner's Studio for the active workspace.
@@ -38,7 +45,10 @@ module types whose capability is off for the tenant carry a warning.
   below `basePath`, including structure paths whose ids contain dots. The
   platform proxy skips only root-level dotted paths, so those still resolve.
 - The `studio` segment switches the shell to full-bleed: the content column is
-  pinned to the viewport and the Studio fills it (`ShellFrame`).
+  pinned to the viewport and the Studio fills it (`ShellFrame`). While the
+  Studio is not mounted — the owner's access is pending, or the tenant is
+  archived or not provisioned — the page's title and notice keep the padding
+  of every other dashboard page.
 - The sidebar shows a Studio item under "Content" in both trees. Under
   `/dashboard`, while the owner's access is not READY, the item carries one
   muted line under its label, inside the link: a 12px icon and text —
@@ -56,6 +66,8 @@ module types whose capability is off for the tenant carry a warning.
   item's one tooltip, to the right of the row, replacing the rail's name
   tooltip. The line follows the current state without a reload (see
   [platform-shell](./platform-shell.md)). Operators never see it.
+- `/dashboard/preview/{documentId}` and `/tenants/{id}/preview/{documentId}`:
+  the draft preview of one post or landing page (see "Draft preview" below).
 - Outside the platform, `pnpm --filter @shinefold/studio dev` runs the same config
   standalone through the Sanity CLI (`sanity.config.ts`, title "Blog").
 
@@ -65,7 +77,7 @@ module types whose capability is off for the tenant carry a warning.
   `sanityReadTokenEncrypted` decide whether the Studio can mount at all;
   `deprovisionedAt` decides whether it is replaced by the archived notice.
   `locale`, `additionalLocales` and `plan` give the live locales
-  (`selectLiveLocales`).
+  (`selectLiveLocalesWithin`, with the tenant's resolved entitlements).
 - Neon `tenants` owner-access columns (`ownerInviteSentAt`,
   `ownerInviteAcceptedAt`, `ownerSanityUserId`, `ownerSanityRole`,
   `ownerLoginProvider`) and the `OWNER_ELEVATION` step's outcome give the
@@ -76,6 +88,11 @@ module types whose capability is off for the tenant carry a warning.
   STALLED once the worker reports a stall, INVITE_SENT otherwise. With no
   recognisable owner-elevation outcome, STALLED falls back to the invite's
   age against `OWNER_ACCESS_STALL_AFTER_MS`, the worker's own threshold.
+- Neon `memberships` Studio access columns (`sanityInviteSentAt`,
+  `sanityInviteAcceptedAt`, `sanityUserId`) give an EDITOR's access state
+  the same way, by the shared `studioAccessOf`. The worker grants an editor
+  `administrator`, as it does the owner, and revokes it when they are
+  removed ([tenant provisioning](./tenant-provisioning.md)).
 - Neon `settings_features`: the saved capability toggles, clamped to the plan's
   entitlement (`getEnabledCapabilities`), become `enabledCapabilities`.
 - Content lives in the tenant's own Sanity project and dataset; the Studio
@@ -194,6 +211,58 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   actions and no "new document" entry, and wraps the landing page's publish
   action with landing redirects ([landing-tree](./landing-tree.md)).
 
+## Draft preview
+
+- A preview page frames the tenant's own site showing a document's latest
+  saved draft. It sits behind the same gate as the Studio route
+  (`resolveDashboardTenant`, any member; `requireTenantById`, any admin), so a
+  signed-out visitor, a non-member and a member removed since their last load
+  get no frame and no token.
+- On every load the page asks `apps/web`'s
+  `POST /api/internal/pages/{documentId}/path` (signed under
+  `INTERNAL_PAGES_SECRET`, through `postToInternalPagesRoute`, which the
+  Leads page's title lookup shares) for the draft's public path, then signs
+  `{ tenantId, path, expiresAt }` with `@shinefold/utils/preview-token` under
+  `PREVIEW_LINK_SECRET`, valid for five minutes. The frame's address is the
+  tenant's main address (`siteUrl`, a custom domain when that is the primary
+  one) plus the path exactly as returned, plus `?preview=<token>`; it is
+  always built on the server. The browser keeps nothing that grants access
+  later.
+- The chrome: the page title, a notice that this is the latest saved draft,
+  the site's address and the page's path, then a toolbar with the Look page's
+  device widths (`PREVIEW_DEVICE`), Reload, and a link to the published page
+  in a new tab. Reload refreshes the route, which signs a new token and so
+  reloads the frame with the latest saved draft.
+- The frame sits in the shared `DeviceFrame` (`DEVICE_FRAME_FIT.PAGE`, as on
+  the Look page), so the site renders at the true device width scaled to fit.
+  It passes `isInteractive`, which drops `DeviceFrame`'s `inert` so the framed
+  draft scrolls and clicks; every other `DeviceFrame` stays inert.
+- Refusals replace the frame with a message that says why: a document with no
+  public path (404), a draft in a language the site does not serve (409, "switch
+  this language on"), a suspended or archived tenant, and a preview the
+  platform cannot prepare. Only the last is logged (`DRAFT_PREVIEW_LOG`): a
+  missing `PREVIEW_LINK_SECRET`, `WEB_APP_URL` or `INTERNAL_PAGES_SECRET`, or
+  a failed path request.
+- Framing: `next.config.ts` gives only the two preview routes a static CSP
+  whose `frame-src` is `https:` (`buildContentSecurityPolicy`'s
+  `canFrameAnySecureSite`); every other platform page keeps its Stripe-only
+  `frame-src`, and every page keeps `frame-ancestors 'none'`. The site itself
+  allows framing only for a valid token, by the platform's origin
+  ([rendering-and-caching](./rendering-and-caching.md)).
+- The Studio opens it: given `previewBasePath` (a plain string `StudioMount`
+  takes, like `basePath`), posts and landing pages carry a "Preview" document
+  action, after the others, that opens `{previewBasePath}/{documentId}` in a
+  new tab — disabled until the document has been saved. `StudioMountView`
+  passes `adminRoutes.dashboardDraftPreviews()` for the owner's Studio and
+  `adminRoutes.tenantDraftPreviews(id)` for the operator's. Other document
+  types, and a Studio opened without a preview base path (the Sanity CLI
+  Studio), show no Preview action.
+- The preview CSP comes from `next.config` `headers()`, so it applies only to a
+  full page load: a client-side navigation into a preview route keeps the
+  Stripe-only `frame-src` and the frame is blocked. Anything that opens the
+  preview (the Studio's preview action included) uses a full navigation, never
+  `Link` or `router.push`.
+
 ## Dependencies
 
 - `@shinefold/studio` (schema, structure, plugins: structure, vision, code input,
@@ -205,6 +274,8 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   [tenant-provisioning](./tenant-provisioning.md),
   [module-system](./module-system.md), [languages](./languages.md).
 - Env: none in the platform for the mount (ids come from the tenant row). The
+  draft preview reads `PREVIEW_LINK_SECRET`, `WEB_APP_URL` and
+  `INTERNAL_PAGES_SECRET`. The
   standalone CLI Studio reads `SANITY_STUDIO_PROJECT_ID` and
   `SANITY_STUDIO_DATASET`.
 
@@ -212,15 +283,20 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
 
 - `packages/studio/src/studio-mount.tsx`
 - `packages/studio/src/studio-config.ts`
+- `packages/studio/src/document-actions/document-options/document-options.ts`
+- `packages/studio/src/document-actions/preview-action/preview-action.ts`
 - `apps/platform/src/components/features/studio/studio-mount-view/studio-mount-view.tsx`
 - `apps/platform/src/components/features/studio/dashboard-studio-view/dashboard-studio-view.tsx`
 - `apps/platform/src/components/features/studio/owner-studio-access-view/owner-studio-access-view.tsx`
 - `apps/platform/src/utils/owner-studio-access/owner-studio-access.ts`
+- `packages/db/src/utils/studio-access/studio-access.ts`
 - `apps/platform/src/server/owner-access/{check-owner-access,resend-owner-invite}-action.ts`
 - `apps/platform/src/app/[locale]/dashboard/(tenant)/studio/[[...tool]]/page.tsx`
 - `apps/platform/src/app/[locale]/tenants/[tenantId]/(detail)/studio/[[...tool]]/page.tsx`
 - `apps/platform/src/server/settings-features/get-enabled-capabilities.ts`
 - `apps/platform/src/utils/content-security-policy/content-security-policy.ts`
+- `apps/platform/src/server/draft-preview/resolve-draft-preview.ts`
+- `apps/platform/src/components/features/draft-preview/draft-preview-page-content/draft-preview-page-content.tsx`
 
 ## Tests and stories
 
@@ -232,6 +308,8 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   Studio page test, `utils/owner-studio-access/owner-studio-access.test.ts`
   and `server/owner-access/request-owner-access.test.ts`.
 - `apps/platform/src/utils/content-security-policy/content-security-policy.test.ts`.
+- Draft preview: `server/draft-preview/*.test.ts` and
+  `components/features/draft-preview/**/*.test.tsx`.
 - Capability and plan warnings: `packages/studio/src/schema-types/inputs/requirement-warning-input/**/*.test.ts(x)`.
 - Login provider: `packages/studio/src/auth/login-provider-auth.test.ts`.
 - No Storybook in either workspace.
@@ -247,3 +325,4 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   READY.
 - #4035 localize the Studio interface for editors.
 - #1036 draft preview with Sanity Presentation.
+- #7168 a team member gets Studio access through the owner's flow.

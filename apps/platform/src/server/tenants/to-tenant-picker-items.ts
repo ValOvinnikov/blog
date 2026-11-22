@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
-import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import type { TPlatformTenantSummary } from '@platform/utils/platform-tenant/platform-tenant';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 import type { TTenantPlan } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
@@ -14,7 +14,7 @@ export type TTenantPickerItem = TTenantSwitcherItem & {
 };
 
 export const toTenantPickerItems = (
-  tenants: TPlatformTenant[],
+  tenants: TPlatformTenantSummary[],
   memberships: TMembership[],
 ): TTenantPickerItem[] => {
   const roleByTenantId = new Map(

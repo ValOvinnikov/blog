@@ -36,7 +36,7 @@ const { studioMountMock, getEnabledCapabilitiesMock, selectLiveLocalesMock } =
 
 vi.mock('@shinefold/db', () => ({
   queries: {
-    tenants: { selectLiveLocales: selectLiveLocalesMock },
+    tenants: { selectLiveLocalesWithin: selectLiveLocalesMock },
   },
 }));
 
@@ -66,6 +66,7 @@ const MOCK_TENANT = mockProvisionedTenant();
 const setup = customRenderAsync(StudioMountView, {
   tenant: MOCK_TENANT,
   basePath: adminRoutes.dashboardStudio(),
+  previewBasePath: adminRoutes.dashboardDraftPreviews(),
 });
 
 describe(`<${StudioMountView.name}/>`, () => {
@@ -197,7 +198,10 @@ describe(`<${StudioMountView.name}/>`, () => {
 
     await setup({ tenant });
 
-    expect(selectLiveLocalesMock).toHaveBeenCalledWith(tenant);
+    expect(selectLiveLocalesMock).toHaveBeenCalledWith(
+      tenant,
+      tenant.entitlements,
+    );
     expect(studioMountMock).toHaveBeenCalledWith(
       expect.objectContaining({
         projectId: tenant.sanityProjectId,

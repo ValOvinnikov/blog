@@ -1,15 +1,11 @@
+import { BRAND_VARIANT } from '@shinefold/config/constants';
 import type {
   Block_faq,
   Module_faq,
 } from '@shinefold/config/sanity/generated/types';
 
-import { BRAND_VARIANT } from '@shinefold/config/constants';
-
-import type {
-  TStarterDocument,
-  TStarterDocumentUnion,
-  TStarterModule,
-} from './starter-document';
+import type { TStarterDocumentUnion, TStarterModule } from './starter-document';
+import type { TStarterDocument } from './starter-document-shape';
 import {
   keyedReference,
   localizedListedText,

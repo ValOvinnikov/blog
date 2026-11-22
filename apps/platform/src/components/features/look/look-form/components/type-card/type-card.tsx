@@ -1,5 +1,7 @@
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { toLookLabelOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
@@ -7,6 +9,7 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { FontPicker } from '@platform/components/shared/font-picker';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
+import { HEADING_CASE, HEADING_WEIGHT } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TTypeCardProps = {
@@ -28,6 +31,12 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
 
   const headingFontLabel = t('headingFontLabel');
   const bodyFontLabel = t('bodyFontLabel');
+  const headingWeightOptions = toLookLabelOptions(HEADING_WEIGHT, (weight) =>
+    t(`headingWeightOptionLabel.${weight}`),
+  );
+  const headingCaseOptions = toLookLabelOptions(HEADING_CASE, (headingCase) =>
+    t(`headingCaseOptionLabel.${headingCase}`),
+  );
 
   return (
     <LookCard
@@ -40,8 +49,7 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
       <LookField
         field="headingFont"
         label={headingFontLabel}
-        labelId={headingFontLock.labelId}
-        growthBadgeId={headingFontLock.growthBadgeId}
+        lock={headingFontLock}
       >
         <FontPicker
           aria={headingFontLock.aria}
@@ -53,12 +61,7 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
         <PresetValueButton field="headingFont" fieldLabel={headingFontLabel} />
       </LookField>
 
-      <LookField
-        field="bodyFont"
-        label={bodyFontLabel}
-        labelId={bodyFontLock.labelId}
-        growthBadgeId={bodyFontLock.growthBadgeId}
-      >
+      <LookField field="bodyFont" label={bodyFontLabel} lock={bodyFontLock}>
         <FontPicker
           aria={bodyFontLock.aria}
           value={bodyFont}
@@ -68,6 +71,20 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
         />
         <PresetValueButton field="bodyFont" fieldLabel={bodyFontLabel} />
       </LookField>
+
+      <LookPresetChoiceField
+        field="headingWeight"
+        label={t('headingWeightLabel')}
+        hint={t('headingWeightDescription')}
+        options={headingWeightOptions}
+      />
+
+      <LookPresetChoiceField
+        field="headingCase"
+        label={t('headingCaseLabel')}
+        hint={t('headingCaseDescription')}
+        options={headingCaseOptions}
+      />
     </LookCard>
   );
 };

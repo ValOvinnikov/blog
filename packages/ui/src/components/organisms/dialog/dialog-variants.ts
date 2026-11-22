@@ -17,7 +17,6 @@ export const dialogVariants = tv({
       'data-ending-style:scale-95 data-ending-style:opacity-0',
     ],
     header: ['flex items-start justify-between gap-4'],
-    heading: ['text-text'],
     close: ['shrink-0'],
   },
 });

@@ -3,10 +3,9 @@ import {
   MODULE_PACK,
   type TModulePack,
 } from '@shinefold/config';
-import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
+import { getTenantEntitlements } from '@web/server/settings-features/get-tenant-entitlements/get-tenant-entitlements';
 import { logger } from '@web/utils/logger/logger';
 import { cache } from 'react';
 
@@ -14,17 +13,16 @@ const CORE_MODULE_PACKS: readonly TModulePack[] = [MODULE_PACK.CORE];
 
 const getEntitledModulePacks = cache(
   async (tenantId: string): Promise<readonly TModulePack[]> => {
-    const planResult = await getTenantPlan(tenantId);
+    const entitlementsResult = await getTenantEntitlements(tenantId);
 
-    if (!planResult.ok) {
+    if (!entitlementsResult.ok) {
       logger.error(MODULE_RENDERER_LOG.PLAN_FETCH_FAILED, {
-        error: planResult.error,
+        error: entitlementsResult.error,
       });
       return CORE_MODULE_PACKS;
     }
 
-    const { data: plan } = planResult;
-    return plan ? PLAN_ENTITLEMENTS[plan].modulePacks : CORE_MODULE_PACKS;
+    return entitlementsResult.data?.modulePacks ?? CORE_MODULE_PACKS;
   },
 );
 

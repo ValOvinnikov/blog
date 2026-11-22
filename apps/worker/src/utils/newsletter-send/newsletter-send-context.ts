@@ -1,8 +1,9 @@
 import {
   resolveTenantEmailBrand,
+  resolveTenantEmailDarkBrand,
   type TTenantEmailBrand,
 } from '@shinefold/config';
-import type { TLocaleIsoCode } from '@shinefold/config/constants';
+import type { TFontChoice, TLocaleIsoCode } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import { getEmailConfig } from '@shinefold/db/queries/email-config';
 import { getSiteConfig } from '@shinefold/db/queries/site-config';
@@ -19,6 +20,9 @@ export type TNewsletterSendContext = {
   from: string;
   replyTo: TMaybeUndefined<string>;
   brand: TTenantEmailBrand;
+  darkBrand: TTenantEmailBrand;
+  headingFont: TFontChoice;
+  bodyFont: TFontChoice;
   brandName: string;
   logoImageUrl: TMaybeUndefined<string>;
   footerPostalAddress: TMaybeUndefined<string>;
@@ -42,7 +46,8 @@ export async function loadNewsletterSendContext(
     throw new FatalError(`Tenant "${tenantId}" has no site config.`);
   }
   const { name, locale } = tenant;
-  const { preset, accentHue, logoHue } = siteConfig;
+  const { preset, accentHue, logoHue, headingFont, bodyFont } = siteConfig;
+  const brandInput = { preset, accentHue, logoHue };
   const replyToAddress = emailConfig?.replyToAddress;
 
   return {
@@ -56,7 +61,10 @@ export async function loadNewsletterSendContext(
       replyToAddress && isValidEmailAddress(replyToAddress)
         ? replyToAddress
         : undefined,
-    brand: resolveTenantEmailBrand({ preset, accentHue, logoHue }),
+    brand: resolveTenantEmailBrand(brandInput),
+    darkBrand: resolveTenantEmailDarkBrand(brandInput),
+    headingFont,
+    bodyFont,
     brandName: name,
     logoImageUrl: emailConfig?.logoAssetUrl,
     footerPostalAddress: emailConfig?.footerPostalAddress,

@@ -1,5 +1,5 @@
 import { MILLISECONDS_PER_SECOND } from '@platform/constants/billing';
-import { toStripeTime } from '@platform/testing/billing/stripe-time';
+import { toStripeTime } from '@platform/server/billing/stripe-time';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import type Stripe from 'stripe';
 
@@ -14,6 +14,8 @@ export const MOCK_PERIOD_END = toStripeTime(planChangeFaker.date.soon());
 export const MOCK_RENEWS_AT = new Date(
   MOCK_PERIOD_END * MILLISECONDS_PER_SECOND,
 );
+export const MOCK_CANCEL_AT = toStripeTime(planChangeFaker.date.soon());
+export const MOCK_ENDS_AT = new Date(MOCK_CANCEL_AT * MILLISECONDS_PER_SECOND);
 
 export const priceIdFor = (lookupKey: string) => `price_${lookupKey}`;
 

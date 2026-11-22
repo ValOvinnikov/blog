@@ -16,15 +16,17 @@ export type TTenantByIdContext = {
   tenant: TPlatformTenant;
   admin: TAdmin;
   viewer: TPlatformViewer;
+  canGrantEntitlements: boolean;
 };
 
 /** Gates `/tenants/{id}/*` for any admin, archived tenants included, so only an unknown id 404s. */
 export const requireTenantById = cache(
   async (tenantId: string): Promise<TTenantByIdContext> => {
     // Settled, not `Promise.all`: the gate's redirect or 404 must beat a malformed id's read error.
-    const [adminResult, tenantResult] = await Promise.allSettled([
+    const [adminResult, tenantResult, grantsResult] = await Promise.allSettled([
       requireAdmin(),
       queries.tenants.getTenantById(tenantId, { includeArchived: true }),
+      queries.tenantEntitlementGrants.listResolvableEntitlementGrants(tenantId),
     ]);
 
     if (adminResult.status === 'rejected') {
@@ -41,12 +43,18 @@ export const requireTenantById = cache(
       notFound();
     }
 
+    if (grantsResult.status === 'rejected') {
+      throw grantsResult.reason;
+    }
+
     const admin = adminResult.value;
+    const viewer = toPlatformViewer({ admin });
 
     return {
-      tenant: toPlatformTenant(tenant),
+      tenant: toPlatformTenant(tenant, grantsResult.value),
       admin,
-      viewer: toPlatformViewer({ admin }),
+      viewer,
+      canGrantEntitlements: viewer.isSuperAdmin,
     };
   },
 );

@@ -147,7 +147,75 @@
         "metaTitle": "Voorbeeldproject twee — nog een case om te vervangen",
         "metaDescription": "Een tweede voorbeeldcase, aangemaakt met je site. Vervang hem door je eigen werk, of verwijder hem."
       }
-    ]
+    ],
+    "growth": {
+      "highlights": {
+        "heading": "Hoe ik werk",
+        "imageAlt": "Voorbeeldillustratie om te vervangen door een beeld van je werk",
+        "rows": [
+          {
+            "heading": "Begin bij de opdracht",
+            "body": [
+              "Elk project begint met voor wie het is en wat succes betekent. Vervang dit door hoe jij begint."
+            ]
+          },
+          {
+            "heading": "Laat het resultaat zien",
+            "body": [
+              "Zet bij elk punt een beeld van het eindresultaat. Vervang de voorbeeldafbeelding door een eigen screenshot of foto."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Klanten met wie ik werkte",
+        "logoNames": [
+          "Voorbeeldklant één",
+          "Voorbeeldklant twee",
+          "Voorbeeldklant drie",
+          "Voorbeeldklant vier"
+        ]
+      },
+      "timeline": {
+        "heading": "Ervaring",
+        "items": [
+          {
+            "marker": "2018",
+            "heading": "Voor mezelf begonnen",
+            "body": "Vervang elke mijlpaal door een stap in je eigen loopbaan."
+          },
+          {
+            "marker": "2021",
+            "heading": "Eerste vaste klant",
+            "body": "Vertel wat er veranderde en wat je leerde."
+          },
+          {
+            "marker": "Nu",
+            "heading": "Open voor nieuwe projecten",
+            "body": "Sluit af met waar je nu staat en wat je zoekt."
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Wat klanten zeggen",
+        "quotes": [
+          {
+            "name": "Voorbeeldklant",
+            "role": "Oprichter, Voorbeeldstudio",
+            "quote": [
+              "Vervang dit door een citaat van iemand met wie je hebt gewerkt. Een zin of twee over het resultaat leest het best."
+            ]
+          },
+          {
+            "name": "Nog een voorbeeldklant",
+            "role": "Hoofd marketing, Voorbeeldbedrijf",
+            "quote": [
+              "Voeg een tweede stem toe, liefst over een ander soort project."
+            ]
+          }
+        ]
+      }
+    }
   },
   "personal": {
     "hero": {
@@ -190,6 +258,45 @@
     "writing": {
       "linkLabel": "Teksten",
       "listHeading": "Alle berichten"
+    },
+    "growth": {
+      "timeline": {
+        "heading": "Mijn weg tot nu toe",
+        "items": [
+          {
+            "marker": "2016",
+            "heading": "Studie afgerond",
+            "body": "Vervang elke mijlpaal door een stap in je eigen verhaal."
+          },
+          {
+            "marker": "2019",
+            "heading": "Mijn vak gevonden",
+            "body": "Vertel wat je aantrok tot het werk dat je nu doet."
+          },
+          {
+            "marker": "Nu",
+            "heading": "Waar ik nu sta",
+            "body": "Sluit af met waar je aan werkt en wat er komt."
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "Waarmee ik kan helpen",
+        "features": [
+          {
+            "heading": "Schrijven",
+            "supportingText": "Vervang dit door iets waar je goed in bent."
+          },
+          {
+            "heading": "Ideeën",
+            "supportingText": "Voeg in één zin een tweede sterk punt toe."
+          },
+          {
+            "heading": "Samenwerken",
+            "supportingText": "Sluit af met hoe je graag met anderen werkt."
+          }
+        ]
+      }
     }
   },
   "docs": {
@@ -271,5 +378,320 @@
         "metaDescription": "Een voorbeeldhandleiding gemaakt met je site. Gebruik haar voor veelvoorkomende problemen, hun oorzaak en de oplossing."
       }
     ]
+  },
+  "business": {
+    "hero": {
+      "eyebrow": "Welkom",
+      "heading": "Heldere, betrouwbare hulp voor je bedrijf",
+      "supportingText": "Zeg in één zin wat je doet en voor wie."
+    },
+    "intro": {
+      "body": [
+        "We helpen onze klanten het werk goed, op tijd en zonder verrassingen gedaan te krijgen.",
+        "Vervang deze tekst door een kort overzicht van je bedrijf: wat je aanbiedt, voor wie en wat je anders maakt."
+      ]
+    },
+    "faq": {
+      "heading": "Veelgestelde vragen",
+      "questions": [
+        {
+          "question": "Wat bieden jullie aan?",
+          "answer": [
+            "Vat je belangrijkste diensten samen in een zin of twee, en verwijs naar de pagina Diensten voor de details."
+          ]
+        },
+        {
+          "question": "Wat kost het?",
+          "answer": [
+            "Leg uit hoe je je werk prijst, of nodig bezoekers uit om contact op te nemen voor een offerte."
+          ]
+        },
+        {
+          "question": "Hoe beginnen we?",
+          "answer": [
+            "Beschrijf de eerste stap, zoals een kort gesprek of een schriftelijke briefing, en wat daarna gebeurt."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Laten we praten",
+      "supportingText": "Vertel ons wat je nodig hebt en we nemen contact met je op."
+    },
+    "services": {
+      "title": "Diensten",
+      "slug": "diensten",
+      "summary": "Wat we aanbieden en hoe we werken.",
+      "body": [
+        "Beschrijf elke dienst in een korte alinea: wat erbij hoort en voor wie hij is.",
+        "Voeg prijzen, pakketten of voorbeelden van eerder werk toe zodra je die hebt."
+      ],
+      "metaTitle": "Diensten — wat we aanbieden en hoe we werken",
+      "metaDescription": "Een voorbeeldpagina met diensten, aangemaakt met je site. Vervang hem door wat je bedrijf aanbiedt."
+    },
+    "about": {
+      "title": "Over ons",
+      "slug": "over-ons",
+      "summary": "Wie we zijn en waar we voor staan.",
+      "body": [
+        "Vertel bezoekers hoe het bedrijf begon, wie erachter zit en wat je belangrijk vindt.",
+        "Een paar regels is genoeg. Voeg foto's van het team toe zodra je die hebt."
+      ],
+      "metaTitle": "Over ons — wie we zijn en waar we voor staan",
+      "metaDescription": "Een voorbeeldpagina over je bedrijf, aangemaakt met je site. Vertel bezoekers wie erachter zit."
+    },
+    "contact": {
+      "title": "Contact",
+      "slug": "contact",
+      "summary": "Zo bereik je ons.",
+      "body": [
+        "Geef bezoekers de beste manier om je te bereiken: een e-mailadres, een telefoonnummer of allebei.",
+        "Voeg je openingstijden en je locatie toe, en zeg hoe snel je meestal antwoordt."
+      ],
+      "metaTitle": "Contact — zo bereik je ons en wanneer we antwoorden",
+      "metaDescription": "Een voorbeeldpagina voor contact, aangemaakt met je site. Voeg je e-mailadres, telefoonnummer en openingstijden toe."
+    },
+    "growth": {
+      "featureList": {
+        "heading": "Wat we bieden",
+        "features": [
+          {
+            "heading": "Advies",
+            "supportingText": "Vervang dit in één zin door een van je belangrijkste diensten."
+          },
+          {
+            "heading": "Uitvoering",
+            "supportingText": "Voeg een tweede dienst toe en voor wie die is."
+          },
+          {
+            "heading": "Ondersteuning",
+            "supportingText": "Sluit af met hoe je klanten helpt als het werk klaar is."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "In cijfers",
+        "footnote": "Voorbeeldcijfers. Vervang ze door je eigen cijfers.",
+        "stats": [
+          {
+            "value": "10+",
+            "label": "Jaar actief"
+          },
+          {
+            "value": "250",
+            "label": "Projecten opgeleverd"
+          },
+          {
+            "value": "98%",
+            "label": "Klanten die terugkomen"
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Vertrouwd door",
+        "logoNames": [
+          "Voorbeeldklant één",
+          "Voorbeeldklant twee",
+          "Voorbeeldklant drie",
+          "Voorbeeldklant vier"
+        ]
+      },
+      "team": {
+        "heading": "Maak kennis met het team",
+        "members": [
+          {
+            "name": "Voorbeeldteamlid",
+            "role": "Oprichter"
+          },
+          {
+            "name": "Nog een teamlid",
+            "role": "Projectleider"
+          },
+          {
+            "name": "Een derde teamlid",
+            "role": "Klantenservice"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Wat onze klanten zeggen",
+        "quotes": [
+          {
+            "name": "Voorbeeldklant",
+            "role": "Directeur, Voorbeeldbedrijf",
+            "quote": [
+              "Vervang dit door een citaat van een tevreden klant. Een zin of twee over het resultaat leest het best."
+            ]
+          },
+          {
+            "name": "Nog een voorbeeldklant",
+            "role": "Eigenaar, Voorbeeldwinkel",
+            "quote": [
+              "Voeg een tweede stem toe, liefst van een ander soort klant."
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "product": {
+    "hero": {
+      "eyebrow": "Maak kennis met",
+      "heading": "De eenvoudigste manier om je werk gedaan te krijgen",
+      "supportingText": "Zeg in één zin wat je product doet en voor wie het is."
+    },
+    "intro": {
+      "body": [
+        "Welkom. Dit is de thuisbasis van je product: wat het doet, wie het helpt en waarom het de moeite waard is.",
+        "Vervang deze tekst door een kort overzicht van het probleem dat je product oplost en hoe het dat doet."
+      ]
+    },
+    "faq": {
+      "heading": "Veelgestelde vragen",
+      "questions": [
+        {
+          "question": "Wat doet het product?",
+          "answer": [
+            "Vat in een zin of twee samen wat je product vooral doet, in de woorden van je klanten."
+          ]
+        },
+        {
+          "question": "Wat kost het?",
+          "answer": [
+            "Leg je abonnementen en prijzen uit, of vertel of er een gratis proefperiode of gratis versie is."
+          ]
+        },
+        {
+          "question": "Hoe begin ik?",
+          "answer": [
+            "Beschrijf de eerste stap, zoals aanmelden of een demo plannen, en wat er daarna gebeurt."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Bekijk wat er nieuw is",
+      "supportingText": "Elke release, verbetering en oplossing op één plek."
+    },
+    "changelog": {
+      "linkLabel": "Wijzigingen",
+      "listHeading": "Alle releases"
+    },
+    "growth": {
+      "highlights": {
+        "heading": "Zo werkt het",
+        "imageAlt": "Voorbeeldillustratie om te vervangen door een screenshot van je product",
+        "rows": [
+          {
+            "heading": "In een paar minuten ingesteld",
+            "body": [
+              "Beschrijf het eerste wat een nieuwe klant met je product doet. Vervang de voorbeeldafbeelding door een screenshot van die stap."
+            ]
+          },
+          {
+            "heading": "Meteen resultaat zien",
+            "body": [
+              "Laat zien wat er verandert zodra je product in gebruik is. Een screenshot van het resultaat werkt beter dan een lijst met functies."
+            ]
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "Alles wat je nodig hebt",
+        "features": [
+          {
+            "heading": "Snel",
+            "supportingText": "Vervang dit door de functie die klanten als eerste opvalt, in één zin."
+          },
+          {
+            "heading": "Flexibel",
+            "supportingText": "Voeg een tweede functie toe en het probleem dat die oplost."
+          },
+          {
+            "heading": "Veilig",
+            "supportingText": "Sluit af met hoe je de gegevens van je klanten beschermt."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "In cijfers",
+        "footnote": "Voorbeeldcijfers. Vervang ze door je eigen cijfers.",
+        "stats": [
+          {
+            "value": "10k+",
+            "label": "Actieve gebruikers"
+          },
+          {
+            "value": "99,9%",
+            "label": "Beschikbaarheid"
+          },
+          {
+            "value": "4,8/5",
+            "label": "Gemiddelde beoordeling"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Wat onze klanten zeggen",
+        "quotes": [
+          {
+            "name": "Voorbeeldklant",
+            "role": "Productmanager, Voorbeeldbedrijf",
+            "quote": [
+              "Vervang dit door een citaat van een tevreden klant. Een zin of twee over wat er veranderde leest het best."
+            ]
+          },
+          {
+            "name": "Nog een voorbeeldklant",
+            "role": "Oprichter, Voorbeeldstudio",
+            "quote": [
+              "Voeg een tweede stem toe, het liefst van een ander soort klant."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Gebruikt door teams bij",
+        "logoNames": [
+          "Voorbeeldklant één",
+          "Voorbeeldklant twee",
+          "Voorbeeldklant drie",
+          "Voorbeeldklant vier"
+        ]
+      },
+      "pricing": {
+        "heading": "Eenvoudige prijzen",
+        "footnote": "Voorbeeldabonnementen en -prijzen. Vervang ze door je eigen.",
+        "free": {
+          "name": "Gratis",
+          "description": "Om het product zelf uit te proberen.",
+          "priceLabel": "Gratis",
+          "features": [
+            "Vervang dit door wat het gratis abonnement bevat",
+            "Voeg een limiet toe, zoals één project"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "Voor zelfstandigen en kleine teams die het elke dag gebruiken.",
+          "highlightLabel": "Meest gekozen",
+          "features": [
+            "Alles uit Gratis",
+            "Vervang dit door wat Pro toevoegt",
+            "Voeg een tweede Pro-functie toe"
+          ]
+        },
+        "team": {
+          "name": "Team",
+          "description": "Voor grotere teams met eigen wensen.",
+          "priceLabel": "Neem contact op",
+          "features": [
+            "Alles uit Pro",
+            "Vervang dit door wat Team toevoegt",
+            "Voeg toe hoe je grotere klanten ondersteunt"
+          ]
+        }
+      }
+    }
   }
 }

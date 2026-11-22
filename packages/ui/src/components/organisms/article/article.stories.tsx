@@ -1,5 +1,8 @@
 import { faker } from '@faker-js/faker';
+import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
+import { PostMetaActions } from '@shinefold/ui/testing/post-meta-actions';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { ComponentProps } from 'react';
 
 import { Article } from './article';
 
@@ -15,32 +18,66 @@ const bodyParagraphs = faker.lorem
   .split('\n\n')
   .map((paragraph) => <p key={paragraph}>{paragraph}</p>);
 
+const ENGINEERING_TOPIC = {
+  label: 'Engineering',
+  href: '/topics/engineering',
+};
+
+const fullMeta = {
+  author: {
+    name: faker.person.fullName(),
+    imageUrl: faker.image.avatarGitHub(),
+  },
+  publishedAt,
+  formattedDate,
+  readingTime: `${faker.number.int({ min: 3, max: 15 })} min read`,
+};
+
+const plainMeta = {
+  author: { name: faker.person.fullName() },
+  publishedAt,
+  formattedDate,
+};
+
+const summaryCard = (
+  <div className="rounded-md border border-divider p-4">
+    {faker.lorem.paragraph()}
+  </div>
+);
+
+const coverImage = (
+  <img
+    src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=675&fit=crop"
+    alt="Code editor showing component code"
+  />
+);
+
+const articleArgs = (
+  header: Omit<ComponentProps<typeof Article.Header>, 'title'>,
+  footer?: ComponentProps<typeof Article.Footer>,
+) => ({
+  children: (
+    <>
+      <Article.Header
+        title={faker.lorem.sentence({ min: 4, max: 8 })}
+        {...header}
+      />
+      <Article.Body>{bodyParagraphs}</Article.Body>
+      {footer && <Article.Footer {...footer} />}
+    </>
+  ),
+});
+
 const meta = {
   title: 'Organisms/Article',
   component: Article,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
-  args: {
-    children: (
-      <>
-        <Article.Header
-          title={faker.lorem.sentence({ min: 4, max: 8 })}
-          topic={{ label: 'Engineering', href: '/topics/engineering' }}
-          lead={faker.lorem.paragraph()}
-          meta={{
-            author: {
-              name: faker.person.fullName(),
-              imageUrl: faker.image.avatarGitHub(),
-            },
-            publishedAt,
-            formattedDate,
-            readingTime: `${faker.number.int({ min: 3, max: 15 })} min read`,
-          }}
-        />
-        <Article.Body>{bodyParagraphs}</Article.Body>
-      </>
-    ),
-  },
+  args: articleArgs({
+    topic: ENGINEERING_TOPIC,
+    lead: faker.lorem.paragraph(),
+    meta: fullMeta,
+  }),
 } satisfies Meta<typeof Article>;
 
 export default meta;
@@ -49,178 +86,71 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const WithCoverMedia: TStory = {
-  args: {
-    children: (
-      <>
-        <Article.Header
-          title={faker.lorem.sentence({ min: 4, max: 8 })}
-          topic={{ label: 'Engineering', href: '/topics/engineering' }}
-          lead={faker.lorem.paragraph()}
-          meta={{
-            author: {
-              name: faker.person.fullName(),
-              imageUrl: faker.image.avatarGitHub(),
-            },
-            publishedAt,
-            formattedDate,
-            readingTime: `${faker.number.int({ min: 3, max: 15 })} min read`,
-          }}
-          coverMedia={
-            <img
-              src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=675&fit=crop"
-              alt="Code editor showing component code"
-            />
-          }
-        />
-        <Article.Body>{bodyParagraphs}</Article.Body>
-      </>
-    ),
-  },
+  args: articleArgs({
+    topic: ENGINEERING_TOPIC,
+    lead: faker.lorem.paragraph(),
+    meta: fullMeta,
+    coverMedia: coverImage,
+  }),
 };
 
 export const WithUnlinkedTopic: TStory = {
-  args: {
-    children: (
-      <>
-        <Article.Header
-          title={faker.lorem.sentence({ min: 4, max: 8 })}
-          topic={{ label: 'Engineering' }}
-          lead={faker.lorem.paragraph()}
-          meta={{
-            author: { name: faker.person.fullName() },
-            publishedAt,
-            formattedDate,
-          }}
-        />
-        <Article.Body>{bodyParagraphs}</Article.Body>
-      </>
-    ),
-  },
+  args: articleArgs({
+    topic: { label: ENGINEERING_TOPIC.label },
+    lead: faker.lorem.paragraph(),
+    meta: plainMeta,
+  }),
 };
 
 export const WithoutTopic: TStory = {
-  args: {
-    children: (
-      <>
-        <Article.Header
-          title={faker.lorem.sentence({ min: 4, max: 8 })}
-          lead={faker.lorem.paragraph()}
-          meta={{
-            author: { name: faker.person.fullName() },
-            publishedAt,
-            formattedDate,
-          }}
-        />
-        <Article.Body>{bodyParagraphs}</Article.Body>
-      </>
-    ),
-  },
+  args: articleArgs({ lead: faker.lorem.paragraph(), meta: plainMeta }),
 };
 
 export const WithoutLead: TStory = {
-  args: {
-    children: (
-      <>
-        <Article.Header
-          title={faker.lorem.sentence({ min: 4, max: 8 })}
-          meta={{
-            author: { name: faker.person.fullName() },
-            publishedAt,
-            formattedDate,
-          }}
-        />
-        <Article.Body>{bodyParagraphs}</Article.Body>
-      </>
-    ),
-  },
+  args: articleArgs({ meta: plainMeta }),
 };
 
 export const WithoutMeta: TStory = {
-  args: {
-    children: (
-      <>
-        <Article.Header
-          title={faker.lorem.sentence({ min: 4, max: 8 })}
-          lead={faker.lorem.paragraph()}
-        />
-        <Article.Body>{bodyParagraphs}</Article.Body>
-      </>
-    ),
-  },
+  args: articleArgs({ lead: faker.lorem.paragraph() }),
 };
 
 export const WithFooterTags: TStory = {
-  args: {
-    children: (
-      <>
-        <Article.Header
-          title={faker.lorem.sentence({ min: 4, max: 8 })}
-          lead={faker.lorem.paragraph()}
-          meta={{
-            author: { name: faker.person.fullName() },
-            publishedAt,
-            formattedDate,
-          }}
-        />
-        <Article.Body>{bodyParagraphs}</Article.Body>
-        <Article.Footer
-          tags={faker.helpers
-            .multiple(() => faker.lorem.word(), { count: 4 })
-            .map((label) => ({ label, href: `/tag/${label}` }))}
-        />
-      </>
-    ),
-  },
+  args: articleArgs(
+    { lead: faker.lorem.paragraph(), meta: plainMeta },
+    {
+      tags: faker.helpers
+        .multiple(() => faker.lorem.word(), { count: 4 })
+        .map((label) => ({ label, href: `/tag/${label}` })),
+    },
+  ),
 };
 
-export const WithShareSlot: TStory = {
-  args: {
-    children: (
-      <>
-        <Article.Header
-          title={faker.lorem.sentence({ min: 4, max: 8 })}
-          lead={faker.lorem.paragraph()}
-          meta={{
-            author: { name: faker.person.fullName() },
-            publishedAt,
-            formattedDate,
-            share: <button type="button">Share</button>,
-          }}
-        />
-        <Article.Body>{bodyParagraphs}</Article.Body>
-      </>
-    ),
-  },
+export const WithMetaActions: TStory = {
+  args: articleArgs({
+    lead: faker.lorem.paragraph(),
+    meta: { ...fullMeta, actions: <PostMetaActions /> },
+  }),
 };
 
-const OnSecondaryBackground = () => (
-  <div className="bg-secondary surface-secondary" style={{ padding: '1.5rem' }}>
-    <Article>
-      <Article.Header
-        title={faker.lorem.sentence({ min: 4, max: 8 })}
-        topic={{ label: 'Engineering', href: '/topics/engineering' }}
-        lead={faker.lorem.paragraph()}
-        meta={{
-          author: {
-            name: faker.person.fullName(),
-            imageUrl: faker.image.avatarGitHub(),
-          },
-          publishedAt,
-          formattedDate,
-          readingTime: `${faker.number.int({ min: 3, max: 15 })} min read`,
-        }}
-      />
-      <Article.Body>{bodyParagraphs}</Article.Body>
-      <Article.Footer
-        tags={faker.helpers
-          .multiple(() => faker.lorem.word(), { count: 4 })
-          .map((label) => ({ label, href: `/tag/${label}` }))}
-      />
-    </Article>
-  </div>
-);
+export const WithBelowMeta: TStory = {
+  args: articleArgs({
+    topic: ENGINEERING_TOPIC,
+    lead: faker.lorem.paragraph(),
+    meta: { ...fullMeta, actions: <PostMetaActions /> },
+    belowMeta: summaryCard,
+    coverMedia: coverImage,
+  }),
+};
 
-export const OnSecondaryBackgroundStory: TStory = {
-  name: 'On a Secondary background',
-  render: OnSecondaryBackground,
+// The meta actions take their own row below the real `sm:` breakpoint, so
+// the phone state only shows with the viewport pinned.
+export const WithBelowMetaOnPhone: TStory = {
+  ...WithBelowMeta,
+  globals: { viewport: 'phone' },
+};
+
+export const HeaderOnEveryBrandBand: TStory = {
+  render: (args) => (
+    <EveryBrandBand>{() => <Article {...args} />}</EveryBrandBand>
+  ),
 };

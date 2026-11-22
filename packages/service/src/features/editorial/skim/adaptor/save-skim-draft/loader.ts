@@ -5,9 +5,9 @@ import { toDraftId, toPublishedId } from '@shinefold/utils/sanity-document-id';
 
 import type { TSaveSkimDraftInput } from './types';
 
-/** Writes only to the draft, so generated takeaways need a Studio publish before readers see them. */
+/** Writes only to the draft, so a generated summary needs a Studio publish before readers see it. */
 export async function saveSkimDraft(
-  { postId, takeaways, model }: TSaveSkimDraftInput,
+  { postId, summary, model }: TSaveSkimDraftInput,
   tenant: TTenantSanityContext,
 ): Promise<void> {
   const client = getWriteClient(tenant);
@@ -23,7 +23,7 @@ export async function saveSkimDraft(
 
   const postTakeaways: PostTakeaways = {
     _type: 'postTakeaways',
-    takeaways,
+    summary,
     generatedAt: new Date().toISOString(),
     model,
   };

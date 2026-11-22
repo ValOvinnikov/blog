@@ -1,10 +1,8 @@
-import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import {
   ALWAYS_AVAILABLE_KEYS,
   CONFIGURATION_KEYS,
   itemKeyed,
   labelsOf,
-  MOCK_UNREAD_LEADS_COUNT,
   NO_PLAN_PAGE,
   tNavSections as t,
   translated,
@@ -14,6 +12,7 @@ import {
   type TPlanPageAccess,
 } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { STUDIO_ACCESS } from '@shinefold/config/constants';
 
 import { dashboardNavSections } from './dashboard-nav-sections';
 
@@ -25,11 +24,11 @@ describe(dashboardNavSections, () => {
     const [, content] = dashboardNavSections(
       t,
       EVERY_PLAN_PAGE,
-      OWNER_STUDIO_ACCESS.STALLED,
+      STUDIO_ACCESS.STALLED,
     );
 
     expect(content!.items[0]?.status?.text).toBe(
-      t(`studioAccessLine.${OWNER_STUDIO_ACCESS.STALLED}`),
+      t(`studioAccessLine.${STUDIO_ACCESS.STALLED}`),
     );
   });
 
@@ -64,7 +63,7 @@ describe(dashboardNavSections, () => {
     );
   });
 
-  it.each(['languages', 'email', 'leads', 'subscribers', 'team'] as const)(
+  it.each(['languages', 'email', 'leads', 'subscribers'] as const)(
     'shows %s only when the plan can use it',
     (page) => {
       const withPage = configurationOfDashboard({
@@ -96,21 +95,6 @@ describe(dashboardNavSections, () => {
     expect(item?.href).toBe(href);
   });
 
-  it('badges Leads with the unread count when there are unread leads', () => {
-    const [, , configuration] = dashboardNavSections(
-      t,
-      EVERY_PLAN_PAGE,
-      undefined,
-      MOCK_UNREAD_LEADS_COUNT,
-    );
-
-    const leads = itemKeyed(configuration!, 'leads');
-
-    expect(leads?.badge?.label).toBe(
-      t('badgeUnreadLeads', { count: MOCK_UNREAD_LEADS_COUNT }),
-    );
-  });
-
   it('never includes the platform-only entries or a tenant label', () => {
     const sections = dashboardNavSections(t, EVERY_PLAN_PAGE);
     const labels = [
@@ -126,17 +110,36 @@ describe(dashboardNavSections, () => {
     ).toEqual([]);
   });
 
-  it('ends with an Account section linking Billing when the member can see it', () => {
+  it('ends with an Account section linking Team, then Billing', () => {
     const account = dashboardNavSections(t, EVERY_PLAN_PAGE).at(-1)!;
-    const [billing, ...rest] = account.items;
+    const [team, billing, ...rest] = account.items;
 
     expect(account.label).toBe(t('accountSectionLabel'));
-    expect(billing?.label).toBe(t('billing'));
+    expect(team?.href).toBe(adminRoutes.dashboardTeam());
     expect(billing?.href).toBe(adminRoutes.dashboardBilling());
     expect(rest).toEqual([]);
   });
 
-  it('has no Account section for a member who cannot see Billing', () => {
+  it('keeps Team out of Configuration', () => {
+    expect(labelsOf(configurationOfDashboard())).not.toContain(t('team'));
+  });
+
+  it.each([
+    ['team', { team: false }, [t('billing')]],
+    ['billing', { billing: false }, [t('team')]],
+  ] as const)(
+    'leaves %s out of Account when the member cannot open it',
+    (_page, hidden, labels) => {
+      const account = dashboardNavSections(t, {
+        ...EVERY_PLAN_PAGE,
+        ...hidden,
+      }).at(-1)!;
+
+      expect(labelsOf(account)).toEqual(labels);
+    },
+  );
+
+  it('has no Account section for a member who can open neither Team nor Billing', () => {
     const labels = dashboardNavSections(t, NO_PLAN_PAGE).map(
       (section) => section.label,
     );

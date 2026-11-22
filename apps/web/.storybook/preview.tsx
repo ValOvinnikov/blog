@@ -1,4 +1,4 @@
-import '../index.css';
+import './preview.css';
 
 import type { Decorator, Preview } from '@storybook/nextjs-vite';
 import { AppProviders } from '@web/testing/providers';
@@ -9,12 +9,6 @@ import {
   withSiteTheme,
 } from './with-site-theme';
 
-// `AppProviders` supplies the same `NextIntlClientProvider` +
-// `SanityImageBaseUrlProvider` stack `[tenant]/[locale]/layout.tsx` provides
-// in the real app — every story rendering a real `SmartLink` (next-intl's
-// `Link`, reading locale/messages off context) or a `SanityImage` throws
-// without it. Shared with `@web/testing/custom-render` rather than
-// redeclared here, so the two entry points can't drift.
 const withProviders: Decorator = (storyFn) => (
   <AppProviders>{storyFn()}</AppProviders>
 );

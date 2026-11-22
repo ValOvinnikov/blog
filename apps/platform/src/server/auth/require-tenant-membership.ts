@@ -23,7 +23,10 @@ export const requireTenantMembership = async (
   tenantId: string,
 ): Promise<TTenantMembershipContext> => {
   const userId = await requireSessionUserId();
-  const tenant = await queries.tenants.getTenantById(tenantId);
+  const [tenant, grants] = await Promise.all([
+    queries.tenants.getTenantById(tenantId),
+    queries.tenantEntitlementGrants.listResolvableEntitlementGrants(tenantId),
+  ]);
 
   if (!tenant) {
     notFound();
@@ -40,7 +43,7 @@ export const requireTenantMembership = async (
   }
 
   return {
-    tenant: toPlatformTenant(tenant),
+    tenant: toPlatformTenant(tenant, grants),
     membership,
     viewer: toPlatformViewer({ membership, admin }),
   };

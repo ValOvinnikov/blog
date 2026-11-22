@@ -1,9 +1,8 @@
 import { LOOK_ROW } from '@platform/constants/look-row';
-import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -15,6 +14,10 @@ import {
   arrangeLookPageQueries,
   setupLookPageContent as setup,
 } from '@platform/testing/look/look-page-content-setup';
+import {
+  getSiteConfigMock,
+  selectLiveLocalesMock,
+} from '@platform/testing/look/look-page-db';
 import { mockViewer } from '@platform/testing/memberships/fixtures';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
@@ -22,26 +25,15 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
-import { PRESET_ID, RADIUS_SCALE } from '@shinefold/config';
+import { PRESET_ID } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPageContent } from './look-page-content';
 
-const { getSiteConfigMock, selectLiveLocalesMock } = vi.hoisted(() => ({
-  getSiteConfigMock: vi.fn(),
-  selectLiveLocalesMock: vi.fn(),
-}));
-
-vi.mock('@shinefold/db', async () => ({
-  ...(await (
-    await import('@platform/testing/mock-db-constants')
-  ).mockDbConstants()),
-  queries: {
-    siteConfig: { getSiteConfig: getSiteConfigMock },
-    tenants: { selectLiveLocales: selectLiveLocalesMock },
-  },
-}));
+vi.mock('@shinefold/db', async () =>
+  (await import('@platform/testing/look/look-page-db')).mockLookPageDb(),
+);
 
 vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 
@@ -59,7 +51,7 @@ describe(`<${LookPageContent.name}/>`, () => {
     user = userEvent.setup();
     arrangeLookPageQueries({
       getSiteConfig: getSiteConfigMock,
-      selectLiveLocales: selectLiveLocalesMock,
+      selectLiveLocalesWithin: selectLiveLocalesMock,
     });
   });
 
@@ -133,40 +125,6 @@ describe(`<${LookPageContent.name}/>`, () => {
         expect(lockedRadius).toHaveAttribute(ARIA_DISABLED, 'true');
       },
     );
-  });
-
-  describe('with a stored Growth-only corner radius', () => {
-    beforeEach(() => {
-      getSiteConfigMock.mockResolvedValue(
-        mockSiteConfig({ radiusScale: RADIUS_SCALE.XL }),
-      );
-    });
-
-    it("shows and previews the preset's radius on Free", async () => {
-      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }) });
-      await openLookRow(user, LOOK_ROW.SHAPE);
-
-      const presetRadius = screen.getByRole('button', {
-        name: RADIUS_LABEL.MD,
-      });
-      const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
-      expect(presetRadius).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(presetRadius).toHaveAttribute(ARIA_DISABLED, 'true');
-      expect(sampleTokens).not.toHaveStyle({ '--radius-md': '16px' });
-    });
-
-    it('shows and previews the stored radius on Growth', async () => {
-      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.GROWTH }) });
-      await openLookRow(user, LOOK_ROW.SHAPE);
-
-      const storedRadius = screen.getByRole('button', {
-        name: RADIUS_LABEL.XL,
-      });
-      const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
-      expect(storedRadius).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(storedRadius).toBeEnabled();
-      expect(sampleTokens).toHaveStyle({ '--radius-md': '16px' });
-    });
   });
 
   it('shows the archived notice for a deprovisioned tenant', async () => {

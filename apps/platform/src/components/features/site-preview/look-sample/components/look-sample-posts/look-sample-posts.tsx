@@ -1,6 +1,7 @@
-import { LookSamplePostImage } from '@platform/components/features/site-preview/look-sample/components/look-sample-posts/components/look-sample-post-image/look-sample-post-image';
+import { LookSampleImage } from '@platform/components/features/site-preview/look-sample/components/look-sample-image/look-sample-image';
 import { LookSampleSection } from '@platform/components/features/site-preview/look-sample/components/look-sample-section/look-sample-section';
 import { SamplePart } from '@platform/components/features/site-preview/sample-part';
+import { SAMPLE_LINK_HREF } from '@platform/constants/sample-link';
 import { SAMPLE_PART } from '@platform/constants/sample-part';
 import { MediaCard } from '@shinefold/ui/components/molecules/media-card';
 import { useTranslations } from 'next-intl';
@@ -19,9 +20,13 @@ export const LookSamplePosts = () => {
     <LookSampleSection heading={t('latestPostsHeading')}>
       <div className={cards()}>
         <SamplePart part={SAMPLE_PART.POST_CARD}>
-          <MediaCard isInteractive={true} excerpt={t('firstCardExcerpt')}>
+          <MediaCard
+            isLead={true}
+            isInteractive={true}
+            excerpt={t('firstCardExcerpt')}
+          >
             <MediaCard.Media>
-              <LookSamplePostImage />
+              <LookSampleImage part={SAMPLE_PART.POST_IMAGE} />
             </MediaCard.Media>
             <MediaCard.Meta
               dateValue={FIRST_POST_DATE}
@@ -29,14 +34,16 @@ export const LookSamplePosts = () => {
               readingTime={readingTime}
             />
             <MediaCard.Title level={3}>
-              <MediaCard.Link href="#">{t('firstCardTitle')}</MediaCard.Link>
+              <MediaCard.Link href={SAMPLE_LINK_HREF}>
+                {t('firstCardTitle')}
+              </MediaCard.Link>
             </MediaCard.Title>
           </MediaCard>
         </SamplePart>
         <SamplePart part={SAMPLE_PART.POST_CARD}>
           <MediaCard isInteractive={false} excerpt={t('secondCardExcerpt')}>
             <MediaCard.Media>
-              <LookSamplePostImage />
+              <LookSampleImage part={SAMPLE_PART.POST_IMAGE} />
             </MediaCard.Media>
             <MediaCard.Meta
               dateValue={SECOND_POST_DATE}

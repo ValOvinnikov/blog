@@ -3,7 +3,6 @@ import {
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
-  type TBrandVariant,
 } from '@shinefold/config';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { QUOTE_CARD_CAPTION_TEST_ID } from '@shinefold/ui/constants/quote-card';
@@ -34,17 +33,15 @@ export type TQuoteCardProps = IWithClassName &
     align?: TQuoteCardVariants['align'];
     isSpotlight?: boolean;
     isInteractive?: TQuoteCardVariants['isInteractive'];
-    tone: TBrandVariant;
     children?: TCompoundChildren<typeof QuoteCardParts>;
   };
 
-/** A testimonial quote rendered as a figure; composes a caller-supplied `QuoteCard.Quote`, `QuoteCard.Avatar`, and `QuoteCard.Name` for the quoted person. */
+/** A testimonial: what someone said about the site, and who said it. */
 const QuoteCardRoot = ({
   role,
   align,
   isSpotlight = false,
   isInteractive,
-  tone,
   children,
   className,
   dataTestId,
@@ -69,7 +66,7 @@ const QuoteCardRoot = ({
       >
         {slots.Avatar}
         <div className={s.person()}>
-          {slots.Name && cloneElement(slots.Name, { isSpotlight, tone })}
+          {slots.Name}
           {role && <span className={s.role()}>{role}</span>}
         </div>
       </figcaption>

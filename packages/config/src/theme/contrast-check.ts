@@ -13,6 +13,7 @@ import {
 
 import {
   CONTRAST_PAIRS,
+  type TContrastPair,
   type TContrastPairId,
   type TThemeToken,
 } from './contrast-pairs';
@@ -20,6 +21,7 @@ import { findVaryingAxes, styleContextsFor } from './contrast-style-axes';
 import {
   isTransparentToken,
   measureContrast,
+  type TContrastScope,
   tokenFollowsAccentHue,
 } from './contrast-tokens';
 
@@ -46,16 +48,19 @@ const formatHueRanges = (hues: readonly number[]): string =>
     .map(([from, to]) => (from === to ? `${from}` : `${from}-${to}`))
     .join(', ');
 
-export const findContrastFailures = (): TContrastFailure[] =>
-  Object.entries(CONTRAST_PAIRS).flatMap(([id, pair]) => {
+export const findPairFailures = (
+  pairs: Record<string, TContrastPair>,
+  scopes: readonly TContrastScope[],
+): TContrastFailure[] =>
+  Object.entries(pairs).flatMap(([id, pair]) => {
     const { foreground, surfaces, role, followsAccentHue } = pair;
     const tokens = [foreground, ...surfaces];
     const varyingAxes = findVaryingAxes(tokens);
 
-    return Object.values(COLOR_SCHEME).flatMap((scheme) =>
+    return scopes.flatMap(({ scheme, ramp }) =>
       styleContextsFor(varyingAxes).flatMap((styles) => {
         if (isTransparentToken(foreground, styles)) return [];
-        const context = { scheme, ...styles };
+        const context = { scheme, ramp, ...styles };
         const resolvedFollowsHue = tokens.some((token) =>
           tokenFollowsAccentHue(token, context),
         );
@@ -67,7 +72,12 @@ export const findContrastFailures = (): TContrastFailure[] =>
         );
 
         return surfaces.flatMap((surface) => {
-          const failingHues = (followsAccentHue ? ALL_HUES : [0]).filter(
+          const isHueDependent =
+            followsAccentHue &&
+            [foreground, surface].some((token) =>
+              tokenFollowsAccentHue(token, context),
+            );
+          const failingHues = (isHueDependent ? ALL_HUES : [0]).filter(
             (hue) =>
               measureContrast(foreground, surface, { ...context, hue }) <
               CONTRAST_ROLE_MIN[role],
@@ -79,9 +89,15 @@ export const findContrastFailures = (): TContrastFailure[] =>
             surface,
             scheme,
             ...varyingStyles,
-            hues: formatHueRanges(followsAccentHue ? failingHues : ALL_HUES),
+            hues: formatHueRanges(isHueDependent ? failingHues : ALL_HUES),
           };
         });
       }),
     );
   });
+
+export const findContrastFailures = (): TContrastFailure[] =>
+  findPairFailures(
+    CONTRAST_PAIRS,
+    Object.values(COLOR_SCHEME).map((scheme) => ({ scheme })),
+  );

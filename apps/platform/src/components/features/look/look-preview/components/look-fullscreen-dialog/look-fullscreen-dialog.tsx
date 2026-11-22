@@ -124,10 +124,9 @@ export const LookFullscreenDialog = ({
             <DeviceFrame
               ref={frameRef}
               device={device}
-              host={host}
+              chrome={{ host, isDark }}
               fit={FULLSCREEN_FIT}
-              isDark={isDark}
-              onScaleChange={setScale}
+              listeners={{ onScaleChange: setScale }}
             >
               {children}
             </DeviceFrame>

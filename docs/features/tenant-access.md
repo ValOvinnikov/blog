@@ -11,6 +11,7 @@ code:
   - packages/db/src/queries/memberships/**
   - packages/db/src/queries/membership-invites/**
   - packages/db/src/queries/admins/**
+  - packages/db/src/utils/studio-access/**
   - packages/db/scripts/seed-admin.ts
   - packages/auth/src/events/**
   - packages/auth/src/providers/magic-link/find-pending-invite-tenants/**
@@ -30,6 +31,13 @@ code:
   - apps/platform/src/server/create-site-gate/admit-create-site.ts
   - apps/platform/src/app/**/blocked-signups/*.tsx
   - apps/platform/src/components/features/blocked-signups/**
+  - apps/platform/src/server/team/**
+  - apps/platform/src/app/**/team/*.tsx
+  - apps/platform/src/components/features/team/**
+  - apps/platform/src/utils/team-view-model/**
+  - apps/platform/src/utils/use-team-row-action/**
+  - apps/platform/src/utils/use-team-table-columns/**
+  - apps/platform/src/constants/team-access.ts
 epics: [4840, 4979, 5649]
 ---
 
@@ -58,11 +66,31 @@ The platform decides who may run which tenant. Platform operators hold an `admin
   - `grantedVia`: BREAK_GLASS or PROMOTION;
   - `grantedBy` and `grantedAt`.
     It has no `tenantId`.
-- **`memberships`:** unique on `(userId, tenantId)`. `role` is OWNER, EDITOR or READER.
+- **`memberships`:** unique on `(userId, tenantId)`. `role` is OWNER, EDITOR or READER. Each membership also carries its own Studio access record, mirroring the owner's on `tenants`: the Sanity invite id, when that invite was sent and accepted, the Sanity user id and the login provider. The worker reads and writes it through `getMemberStudioAccess` and `setMemberStudioAccess`, both scoped to the tenant; clearing it is `setMemberStudioAccess` with every field `null`. `getMemberStudioIdentity` reads one membership's decrypted email and Sanity user id, locked or not, so a removed member's access can be revoked after the row is gone. `getMemberStudioAccess` does not find a locked membership; `setMemberStudioAccess` still records against one, so the record matches what Sanity did when a seat downgrade locks the member mid-run. `setMemberStudioAccess` is last-write-wins, and returns `DB_NOT_FOUND` once the membership has been removed.
 - **`membership_invites`:** the address is stored only encrypted, with a keyed index that drops `+tag`s so a data request reaches every variant, and `email_exact_index`, which keeps them. Unique on `(tenantId, email_exact_index)`, with `role` and `consumedAt`; an invite written before that column existed has none and is not covered by the rule. At sign-in, `findPendingInviteByEmail` looks invites up by the `+tag`-blind index and keeps only the ones whose decrypted email is the exact requested address, ignoring case. Changing a pending owner's email is refused when another invite on the tenant holds the new address's exact index.
+- **Team reads and writes.**
+  - `listTenantMembers` returns only that tenant's members, owners first, each with the decrypted email, role, whether they have signed in, when they joined, when they were locked (absent when unlocked) and their Studio access state. The state is derived the way the owner's is (Invite sent, Activating, Ready, Stalled after `OWNER_ACCESS_STALL_AFTER_MS`), by the shared `studioAccessOf`, and is absent until a Studio invite has been sent.
+  - `listPendingMembershipInvites` returns only that tenant's unconsumed invites, with the decrypted email, role and invite date.
+  - `removeMembership` refuses to remove the acting user (`SELF`) and the tenant's last owner (`LAST_OWNER`), and changes nothing when it refuses. A removal also deletes that person's consumed invite on the tenant in the same statement, so the same address can be invited again. An id that is not a UUID, such as an operator's virtual membership, is not found; `cancelMembershipInvite` returns false for one. Concurrent removals of two different owners are not serialised: each sees the other still present.
+  - `cancelMembershipInvite` deletes one pending invite of that tenant. It never cancels a pending OWNER invite, which is the site's only owner until it is accepted and moves with the owner email instead.
+  - `listMembersPendingStudioAccess` returns each unlocked EDITOR, on a writable tenant whose provisioning is READY, whose Studio access is not yet READY, for the hourly owner-access sweep. The owner is left to the owner flow, which keeps its state on `tenants`.
+  - `listLockedMembersWithStudioAccess` returns each locked membership, on a writable tenant whose provisioning is READY, with any Studio access recorded, with its tenant, email, Sanity user id and recorded Sanity invite id. The worker's hourly owner-access sweep revokes each one ([tenant provisioning](./tenant-provisioning.md)), so a member locked by a downgrade or at sign-in loses Sanity administrator and any pending Studio invite within the hour.
+  - Changing a role has no query yet.
+- **Team actions** (`apps/platform/src/server/team/`). Invite, remove and cancel are gated by `requireTenantManager` (the tenant's OWNER or any operator); Check now and Resend invite by `requireTenantOwnerOrAdmin` with SUPERADMIN only.
+  - **Invite** trims and lower-cases the address and refuses a malformed one, a current member's (the owner's included) and, through `createMembershipInvite` with role EDITOR, an accepted invite's, a pending invite's or one past the seat limit — each as its own field error naming the address, with no email sent. On `CREATED` it sends the Auth.js magic link through `sendOwnerInviteEmail`, which reports whether the email went out; when it did not, the failure is logged once as `team_access.invite_email_failed` and the invite is cancelled, so the next try creates and sends a fresh one.
+  - **Remove** reads the member's role, email and Sanity user id, then calls `removeMembership`; `SELF`, `LAST_OWNER` and not found come back as refusals and change nothing. Removing an EDITOR then asks the worker's `POST /api/member-access/revoke` to revoke their Studio access after the response: up to three attempts, 1s then 3s apart, stopping early on a 4xx the worker will never accept, and logging `team_access.revoke_failed` once at the end with the last status or transport failure, while the removal stands. A READER has no Studio access and an OWNER no member-level record, so neither is revoked; an editor with no readable address cannot be revoked by address, so the removal logs `team_access.revoke_skipped_no_email` instead.
+  - **Cancel** refuses a pending OWNER invite and answers not found for an invite no longer pending.
+  - **Check now and Resend invite** for a member reach `/api/member-access/check` and `/resend` through `enqueueOwnerAccessRequest` with the membership id; any membership that is not an unlocked EDITOR 404s, like a denied gate. A refused member request logs `team_access.access_request_failed`.
+  - Invite, remove and cancel record `MEMBER_INVITED`, `MEMBER_REMOVED` and `MEMBER_INVITE_CANCELLED` against `TEAM_MEMBER` (the invite or membership id), with only the role in the details, never an address.
+- **Team page** (`/dashboard/team` for the owner, `/tenants/{id}/team` for an operator). The owner reaches it on a plan with more than one seat; an editor or reader never sees it in the sidebar and gets a 404, and so does an owner on Free or Starter. `resolveTenantPageAccess` closes `team` to anyone who cannot manage the tenant. Operators reach it on every plan, from an Account section after Configuration; the owner's sidebar lists it in Account, before Billing.
+  - The header reads "{used} of {seats} seats used": `used` counts every membership (locked ones included) and every pending invite (a pending OWNER invite included), as the seat limit does, and is shown capped at the plan's seats. Once full, Invite editor is held and a warning under the header says why.
+  - Members lists owners first, then members by when they joined. The owner's row reads its Studio state from the tenant's owner access flow (`tenantOwnerStudioAccess`), whoever is viewing; a member's from its own record, and "Setting up…" until the worker's first invite. A locked member reads Locked, a reader "No Studio access". Check now and Resend invite show to the owner and a SUPERADMIN only, on rows with an address and a pending state, and their toasts name the address. Your own row and the last owner's offer no Remove, and an operator sees no "(you)".
+  - With no editor, a note gives the free seats; an operator on a tenant whose owner hasn't joined sees "No one has joined this site yet." Pending invites lists every invite but a pending OWNER one, oldest first.
+  - Invite, Remove and Cancel invite run the Team actions below. Removing a member or cancelling an invite that is already gone closes the confirmation, says so and refreshes; any other refusal or failure shows inside the dialog. Below `md` both tables stack, the role moving onto the person's second line.
 - **Personal data reads.** `getTenantOwnerMembership` returns the OWNER's user email and whether they have signed in, else the pending OWNER invite's email. The SUPERADMIN alert recipients and the blocklist's "added by" are user emails too. Every one of these reads the encrypted column and decrypts it. Create site finds an existing owner with `findUserByEmail`, the same exact-address index lookup sign-in uses.
 - **Cascades:** `admins` and `memberships` cascade on user delete. Memberships and invites cascade on tenant delete. An invite has no user until it is consumed.
 - **`blocked_signup_identities`:** unique on `(kind, value)`. An ADDRESS entry stores only the keyed personal-data index (`PERSONAL_DATA_INDEX_KEY`) of the normalised address (lower-cased, `+tag` dropped), never the address. A DOMAIN entry stores the lower-cased domain. Each entry records `reason`, `createdByAdminId` and `createdAt`. Adds and removes are audited as `SIGNUP_BLOCK_ADDED` / `SIGNUP_BLOCK_REMOVED` against `BLOCKED_SIGNUP_IDENTITY`; re-adding an entry already on the list keeps its reason and author and records no second `SIGNUP_BLOCK_ADDED`. An address entry's audit row carries its kind and reason, never the address or hash. "Added by" on the list page is the email of the admin in `createdByAdminId`, read in the same query as the entries, and "Unknown" once that admin is gone.
+- **Audit.** Inviting, removing and cancelling are recorded as `MEMBER_INVITED`, `MEMBER_REMOVED` and `MEMBER_INVITE_CANCELLED` against `TEAM_MEMBER`. An email address is never written to these events' details.
 - **Caching:** none. Every gate reads Neon per request, and `cache()` deduplicates the reads within one request.
 
 ## Configuration
@@ -81,19 +109,19 @@ The platform decides who may run which tenant. Platform operators hold an `admin
   - `requireTenantById` guards `/tenants/{id}`.
   - `listSessionTenants` and `resolveDashboardTenant` guard `/dashboard`.
 - **Server Actions call a gate themselves.**
-  - Tenant-scoped actions (Look, Voice, Features, Languages, Email, brand assets) call `requireTenantMembership`. That gate excludes archived tenants.
+  - Every tenant-scoped settings save (Look, Voice, Features and its analytics id, Languages, Email settings, templates, logo and test send, brand assets) calls `requireTenantManager`: the tenant's own OWNER or an operator. An editor keeps the Studio and cannot save any of them. Reads and the custom-domain status poll still call `requireTenantMembership`. Both gates exclude archived tenants.
   - Creating a tenant and editing its details need `requireAdmin`.
   - Deprovision, reactivate, delete, the deprovisioning status poll and the blocklist add and remove actions need `requireSuperAdmin`.
   - The provisioning status poll needs the tenant's own OWNER or any admin; retry, Check now and Resend invite need the tenant's own OWNER or a SUPERADMIN (`requireTenantOwnerOrAdmin`).
 - **Roles differ in three places only.**
   - Admin roles gate identically, except that SUPERADMIN alone passes `requireSuperAdmin` and alone sees every tenant under `/dashboard`.
   - Only SUPERADMINs receive operator alerts.
-  - Membership roles never gate anything: only OWNER is ever written, and nothing reads EDITOR or READER.
+  - Membership roles gate the settings saves: OWNER passes `requireTenantManager`, EDITOR and READER do not.
 - **Admins get a virtual OWNER membership.** Any `admins` row passes `requireTenantMembership` on any tenant through a virtual membership. Its id starts with `admin-virtual:`, so it can never pass as a foreign key. Call `isVirtualAdminMembership` before showing `membership.role`; the role chip shows the admin role instead.
 - **Invite consumption is atomic.** The claim stamps `consumedAt` only if it is still null. A failed membership insert resets it, and an existing membership is returned as-is.
 - **Invites are consumed best-effort, in the platform only.** `@shinefold/auth`'s `events.signIn` consumes invites on sign-in to the platform; signing in as a reader on a site leaves them pending. A failure is swallowed and retried on the next platform sign-in.
 - **The blocklist is checked live.** Create site refuses a blocked address or domain with its neutral reply, even for a user who already holds a session, and enqueues nothing ([platform sign-in and onboarding](./platform-sign-in-and-onboarding.md)). Removing an entry restores sign-up at once. Blocking while suspending saves the block, then suspends. `neon-http` has no transactions, so a refused or failed suspension removes the block again, but only one this request created; an older entry stays. A failed removal is logged, and the operator still sees the suspension fail. `SIGNUP_BLOCK_ADDED` is recorded only once the suspension is saved. A failed block, or an owner with no email on record, leaves the tenant unsuspended.
-- **Platform access is not Studio access.** Studio rights come from the tenant's Sanity project ACL. The owner is invited as `viewer` and raised to `administrator` by owner elevation ([embedded studio](./embedded-studio.md)). The worker sends that invite and removes the `viewer` role with the tenant's own Sanity management token, so both survive rotation of the organisation token. Granting `administrator`, and removing it from a former owner, stay on the organisation token, because Sanity refuses a project-scoped token any change to an `administrator` role: after a rotation, the owner of a tenant created before it is promoted by hand in Sanity Manage. Owner discovery — listing the organisation's users while the owner is not yet a project member, the usual case before their first Studio sign-in — uses the organisation token. A replacement organisation token keeps that lookup working only if it can read the organisation's members ([tenant provisioning](./tenant-provisioning.md)).
+- **Platform access is not Studio access.** Studio rights come from the tenant's Sanity project ACL. The owner is invited as `viewer` and raised to `administrator` by owner elevation ([embedded studio](./embedded-studio.md)). The worker sends that invite and removes the `viewer` role with the tenant's own Sanity management token, so both survive rotation of the organisation token. Granting `administrator`, and removing it from a former owner, stay on the organisation token, because Sanity refuses a project-scoped token any change to an `administrator` role: after a rotation, the owner of a tenant created before it is promoted by hand in Sanity Manage. Owner discovery — listing the organisation's users while the owner is not yet a project member, the usual case before their first Studio sign-in — uses the organisation token. A replacement organisation token keeps that lookup working only if it can read the organisation's members ([tenant provisioning](./tenant-provisioning.md)). An EDITOR gets the same access through the same flow, per membership: invited as `viewer`, raised to `administrator` (Sanity's Free plan has no editor role), and recorded on their membership; removing them deletes their pending invite and revokes every role they hold, through the worker's `POST /api/member-access/revoke`, which takes the removed address because the row is already gone ([tenant provisioning](./tenant-provisioning.md)).
 - **Site sign-in is separate.** A public site's readers sign in through the same `users` table, but `memberships` never gate anything in `apps/web` ([reader auth](./reader-auth.md)).
 
 ## Dependencies
@@ -124,8 +152,9 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 - `apps/platform/src/app/api/dashboard/select-tenant/route.test.ts`.
 - The `dashboard/select-tenant` page test and `tenant-switcher.test.tsx`.
 - `packages/auth/src/events/consume-pending-invites-on-sign-in.test.ts`.
+- `apps/platform/src/server/team/*.test.ts`, `team-view-model.test.ts`, the `components/features/team/` tests and the dashboard Team page test, with builders in `apps/platform/src/testing/team/fixtures.ts`.
 - `apps/platform/src/server/signup-block/*.test.ts`, `admit-create-site.test.ts`, the `blocked-signups` layout and page tests, `blocked-signups-view.test.tsx` and `tenant-suspension-control.test.tsx`.
-- `packages/db/src/queries/{memberships,membership-invites,admins}/**` tests (PGlite).
+- `packages/db/src/queries/{memberships,membership-invites,admins}/**` tests (PGlite), and `packages/db/src/utils/studio-access/studio-access.test.ts`.
 - No Storybook.
 
 ## Related
@@ -134,6 +163,9 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 - 4960: shared `/sign-in`, `/signup`, `/onboarding` and self-serve tenant creation.
 - 4955: owner Studio access through invite tracking, acceptance polling and grant.
 - 4959: owner provisioning status and Studio access states.
+- 7608: the Team page's invite, remove, cancel, check and resend actions.
+- 7168: a team member gets Studio access through the owner's flow and loses it on removal.
+- 7169: the Team page.
 - 4979: web and platform stay separate (sessions, language).
 - 4982: the platform refuses sessions it did not issue.
 - 4983: public sites never act on platform invites.

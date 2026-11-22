@@ -4,14 +4,11 @@ import {
   GET_STARTED_STEP,
   type TGetStartedStep,
 } from '@platform/constants/get-started';
-import {
-  OWNER_STUDIO_ACCESS,
-  type TOwnerStudioAccess,
-} from '@platform/constants/owner-studio-access';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import type { TMaybeUndefined } from '@shinefold/config';
+import { STUDIO_ACCESS, type TStudioAccess } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
 import { isUndefined } from '@shinefold/utils/primitives';
@@ -21,7 +18,7 @@ export type TGetStarted = {
   siteAddress: string;
   siteUrl: string;
   doneSteps: Record<TGetStartedStep, boolean>;
-  studioAccess: TOwnerStudioAccess;
+  studioAccess: TStudioAccess;
 };
 
 const isFirstRunViewer = (
@@ -60,6 +57,6 @@ export const getStartedFor = async (
     siteAddress: tenant.primaryDomain,
     siteUrl: tenant.siteUrl,
     doneSteps,
-    studioAccess: studioAccess ?? OWNER_STUDIO_ACCESS.READY,
+    studioAccess: studioAccess ?? STUDIO_ACCESS.READY,
   };
 };

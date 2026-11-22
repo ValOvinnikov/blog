@@ -6,6 +6,10 @@ import {
   arrangeLookPageQueries,
   setupLookPageContent as setup,
 } from '@platform/testing/look/look-page-content-setup';
+import {
+  getSiteConfigMock,
+  selectLiveLocalesMock,
+} from '@platform/testing/look/look-page-db';
 import { mockReadyTenant } from '@platform/testing/tenants/fixtures';
 import { CAPABILITY } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
@@ -13,20 +17,9 @@ import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 
 import { LookPageContent } from './look-page-content';
 
-const { getSiteConfigMock, selectLiveLocalesMock } = vi.hoisted(() => ({
-  getSiteConfigMock: vi.fn(),
-  selectLiveLocalesMock: vi.fn(),
-}));
-
-vi.mock('@shinefold/db', async () => ({
-  ...(await (
-    await import('@platform/testing/mock-db-constants')
-  ).mockDbConstants()),
-  queries: {
-    siteConfig: { getSiteConfig: getSiteConfigMock },
-    tenants: { selectLiveLocales: selectLiveLocalesMock },
-  },
-}));
+vi.mock('@shinefold/db', async () =>
+  (await import('@platform/testing/look/look-page-db')).mockLookPageDb(),
+);
 
 vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 
@@ -37,7 +30,7 @@ describe(`<${LookPageContent.name}/> preview`, () => {
   beforeEach(() => {
     arrangeLookPageQueries({
       getSiteConfig: getSiteConfigMock,
-      selectLiveLocales: selectLiveLocalesMock,
+      selectLiveLocalesWithin: selectLiveLocalesMock,
     });
   });
 

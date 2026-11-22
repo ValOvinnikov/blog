@@ -1,28 +1,20 @@
-import { SANITY_PROJECT_ROLE } from '@shinefold/config';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import {
-  assignSanityProjectUserRole,
-  listSanityOrganizationUsers,
-  listSanityProjectUsers,
-  type TSanityUser,
-} from '@shinefold/db/utils/sanity-management-client/sanity-project-users';
-import { normalizeEmail } from '@shinefold/utils/normalize-email-identity';
+import type { TSanityUser } from '@shinefold/db/utils/sanity-management-client/sanity-project-users';
 import { loadTenant } from '@worker/units/run-reported-step';
+import { getProvisionEnv } from '@worker/utils/provision-env/provision-env';
+import { findStudioUser } from '@worker/utils/studio-access/find-studio-user';
 import {
-  getProvisionEnv,
-  type TProvisionEnv,
-} from '@worker/utils/provision-env/provision-env';
+  isSameEmail,
+  type TStudioProject,
+} from '@worker/utils/studio-access/studio-project';
 import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 import { FatalError } from 'workflow';
 
-export type TOwnerAccessTarget = {
+export type TOwnerAccessTarget = TStudioProject & {
   tenant: TTenant;
-  projectId: string;
   ownerEmail: string;
-  token: string;
-  env: TProvisionEnv;
 };
 
 export async function loadOwnerAccessTarget(
@@ -46,34 +38,11 @@ export function hasOwnerEmail(
   target: TOwnerAccessTarget,
   email: TMaybeUndefined<string>,
 ): boolean {
-  return !!email && normalizeEmail(email) === normalizeEmail(target.ownerEmail);
+  return isSameEmail(target.ownerEmail, email);
 }
 
-export async function findOwner(
+export function findOwner(
   target: TOwnerAccessTarget,
 ): Promise<TMaybeUndefined<TSanityUser>> {
-  const { env, projectId, token } = target;
-
-  const projectUsers = await listSanityProjectUsers({ token, projectId });
-  const member = projectUsers.find(({ profile }) =>
-    hasOwnerEmail(target, profile.email),
-  );
-  if (member) return member;
-
-  const organizationUsers = await listSanityOrganizationUsers({
-    token: env.sanityManagementToken,
-    organizationId: env.sanityOrganizationId,
-  });
-  const organizationUser = organizationUsers.find(({ profile }) =>
-    hasOwnerEmail(target, profile.email),
-  );
-  if (!organizationUser) return undefined;
-
-  await assignSanityProjectUserRole({
-    token,
-    projectId,
-    sanityUserId: organizationUser.sanityUserId,
-    role: SANITY_PROJECT_ROLE.VIEWER,
-  });
-  return organizationUser;
+  return findStudioUser(target, target.ownerEmail);
 }

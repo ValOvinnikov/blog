@@ -7,6 +7,7 @@ import { useId, type ReactNode } from 'react';
 
 export type TConfirmDialogTriggerProps = {
   children: ReactNode;
+  variant?: TButtonVariants['variant'];
   disabledReason?: string;
   size?: TButtonVariants['size'];
   focusGround?: TButtonVariants['focusGround'];
@@ -15,6 +16,7 @@ export type TConfirmDialogTriggerProps = {
 
 export const ConfirmDialogTrigger = ({
   children,
+  variant,
   disabledReason,
   size,
   focusGround,
@@ -30,7 +32,7 @@ export const ConfirmDialogTrigger = ({
         render={
           <Button
             type="button"
-            variant={tone}
+            variant={variant ?? tone}
             size={size}
             focusGround={focusGround}
             aria-label={ariaLabel}

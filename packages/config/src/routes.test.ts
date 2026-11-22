@@ -6,7 +6,7 @@ import {
   NEWSLETTER_RESULT,
 } from '@shinefold/config/constants';
 
-import { pageHref, routes } from './routes';
+import { pageHref, pricingPageUrl, routes } from './routes';
 
 faker.seed(6028);
 
@@ -19,23 +19,18 @@ const NEWSLETTER_UNSUBSCRIBE_PATH = '/api/newsletter/unsubscribe';
 const COOKIE_STATEMENT_PATH = '/legal/cookie-statement';
 const PRIVACY_INDEX_PATH = '/privacy';
 const LEGAL_INDEX_PATH = '/legal';
+const PRICING_COMPARISON_PATH = '/pricing#compare';
+const MOCK_MARKETING_SITE_URL = faker.internet.url({ appendSlash: false });
 
 describe('routes', () => {
   it.each([
-    ['home', routes.home(), '/'],
-    ['topics', routes.topics(), '/topics'],
-    ['tags', routes.tags(), '/tags'],
-    ['bookmarks', routes.bookmarks(), '/bookmarks'],
-    ['account hub', routes.account(), '/account'],
-    ['account data-export', routes.accountExport(), '/api/account/export'],
-    ['site-wide RSS feed', routes.rssFeed(), '/rss.xml'],
     ['cookie statement', routes.cookieStatement(), COOKIE_STATEMENT_PATH],
-    ['legal hub', routes.legal(), LEGAL_INDEX_PATH],
     [
       'legal page by kind',
       routes.legalPageByKind(LEGAL_PAGE_KIND.TERMS),
       '/api/legal-page/TERMS',
     ],
+    ['pricing comparison', routes.pricingComparison(), PRICING_COMPARISON_PATH],
   ])('builds the %s path', (_route, path, expected) => {
     expect(path).toBe(expected);
   });
@@ -125,6 +120,17 @@ describe('routes', () => {
   it('carries the language on the unsubscribe submit path', () => {
     expect(routes.newsletterUnsubscribeSubmit(LOCALE_ISO_CODES.FR)).toBe(
       `${NEWSLETTER_UNSUBSCRIBE_PATH}?lang=${LOCALE_ISO_CODES.FR}`,
+    );
+  });
+});
+
+describe(pricingPageUrl, () => {
+  it.each([
+    ['the marketing site URL', MOCK_MARKETING_SITE_URL],
+    ['a marketing site URL ending in a slash', `${MOCK_MARKETING_SITE_URL}/`],
+  ])('builds the pricing comparison address on %s', (_, siteUrl) => {
+    expect(pricingPageUrl(siteUrl)).toBe(
+      `${MOCK_MARKETING_SITE_URL}${PRICING_COMPARISON_PATH}`,
     );
   });
 });

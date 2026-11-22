@@ -4,27 +4,24 @@ import {
   type TDeprovisioningStep,
   type TTenantProvisioningStepStatus,
 } from '@shinefold/db/constants';
-import { listTenantHosts } from '@shinefold/db/queries/tenant-domains/list-tenant-hosts';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import { isPlatformTenant } from '@shinefold/db/utils/is-platform-tenant/is-platform-tenant';
 import { sanitizeLogMessage } from '@shinefold/insight';
 import { isUndefined } from '@shinefold/utils/primitives';
 
-import {
-  parseDryRun,
-  parseFlagValue,
-  readRequiredTenantId,
-} from '../lib/cli-flags';
+import { parseDryRun, readRequiredTenantId } from '../lib/cli-flags';
 import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 import { workflowRunUrl } from '../lib/workflow-run-url/workflow-run-url';
 
+import { assertNotPlatformTenant } from './lib/assert-not-platform-tenant';
 import { loadDeprovisionEnv, type TDeprovisionEnv } from './lib/env';
 import { getTenantRow } from './lib/get-tenant-row';
+import { parseConfirm } from './lib/parse-confirm';
 import {
   reportDeprovisioningRunFinish,
   reportDeprovisioningRunStart,
 } from './lib/report-deprovisioning-run';
 import { reportDeprovisioningStepStatus } from './lib/report-deprovisioning-step-status';
+import { TOOL } from './lib/tool';
 import { archiveTenantSanityProject } from './steps/archive-sanity-project';
 import { archiveTenantRow } from './steps/archive-tenant';
 import { clearTenantArtifacts } from './steps/clear-artifacts';
@@ -32,19 +29,6 @@ import { invalidateTenantCache } from './steps/invalidate-tenant-cache';
 import { purgeTenantReaderData } from './steps/purge-reader-data';
 import { removeTenantDomain } from './steps/remove-domain';
 import { revokeTenantSanityTokens } from './steps/revoke-sanity-tokens';
-
-const TOOL = 'deprovision-tenant';
-const CONFIRM_FLAG = '--confirm=';
-
-function parseConfirm(argv: string[]): string {
-  const value = parseFlagValue(argv, CONFIRM_FLAG) ?? process.env['CONFIRM'];
-  if (!value) {
-    throw new Error(
-      `${TOOL}: missing required ${CONFIRM_FLAG}<tenant-name> (or CONFIRM env var).`,
-    );
-  }
-  return value;
-}
 
 type TStep = {
   key: TDeprovisioningStep;
@@ -105,7 +89,7 @@ async function recordStepStatus(
     });
   } catch (reportError) {
     console.error(
-      `deprovision-tenant: failed to record step "${step}" status "${status}" for tenant "${tenantId}": ${sanitizeLogMessage(reportError)}`,
+      `${TOOL}: failed to record step "${step}" status "${status}" for tenant "${tenantId}": ${sanitizeLogMessage(reportError)}`,
     );
   }
 }
@@ -127,7 +111,7 @@ async function recordRunStart(
     });
   } catch (error) {
     console.error(
-      `deprovision-tenant: failed to record run start for tenant "${tenant.id}": ${sanitizeLogMessage(error)}`,
+      `${TOOL}: failed to record run start for tenant "${tenant.id}": ${sanitizeLogMessage(error)}`,
     );
   }
 }
@@ -137,7 +121,7 @@ async function recordRunFinish(tenantId: string): Promise<void> {
     await reportDeprovisioningRunFinish(tenantId);
   } catch (error) {
     console.error(
-      `deprovision-tenant: failed to record run finish for tenant "${tenantId}": ${sanitizeLogMessage(error)}`,
+      `${TOOL}: failed to record run finish for tenant "${tenantId}": ${sanitizeLogMessage(error)}`,
     );
   }
 }
@@ -151,7 +135,7 @@ export async function runSteps(
   }
 
   for (const step of STEPS) {
-    console.warn(`deprovision-tenant: running step "${step.name}"...`);
+    console.warn(`${TOOL}: running step "${step.name}"...`);
 
     if (env.dryRun === false) {
       await recordStepStatus(
@@ -163,7 +147,7 @@ export async function runSteps(
 
     try {
       await step.run(tenant, env);
-      console.warn(`deprovision-tenant: step "${step.name}" done.`);
+      console.warn(`${TOOL}: step "${step.name}" done.`);
 
       if (env.dryRun === false) {
         await recordStepStatus(
@@ -174,9 +158,7 @@ export async function runSteps(
       }
     } catch (error) {
       const message = sanitizeLogMessage(error);
-      console.error(
-        `deprovision-tenant: step "${step.name}" failed: ${message}`,
-      );
+      console.error(`${TOOL}: step "${step.name}" failed: ${message}`);
 
       if (env.dryRun === false) {
         await recordStepStatus(
@@ -206,29 +188,24 @@ export async function runDeprovisioning(
   confirm: string,
   env: TDeprovisionEnv,
 ): Promise<TRunDeprovisioningResult> {
-  const hosts = await listTenantHosts(tenant);
-  if (isPlatformTenant(hosts, env.tenantRootDomain)) {
-    throw new Error(
-      `deprovision-tenant: tenant "${tenant.id}" ("${tenant.name}") holds the platform root domain "${env.tenantRootDomain}" — the platform tenant is never deprovisioned, aborting before any destructive action.`,
-    );
-  }
+  await assertNotPlatformTenant(tenant, env);
 
   if (tenant.deprovisionedAt) {
     console.warn(
-      `deprovision-tenant: tenant "${tenant.id}" is already deprovisioned (at ${tenant.deprovisionedAt.toISOString()}) — nothing to do.`,
+      `${TOOL}: tenant "${tenant.id}" is already deprovisioned (at ${tenant.deprovisionedAt.toISOString()}) — nothing to do.`,
     );
     return { ok: true, skipped: true };
   }
 
   if (confirm !== tenant.name) {
     throw new Error(
-      `deprovision-tenant: --confirm="${confirm}" does not match tenant name "${tenant.name}" — aborting before any destructive action.`,
+      `${TOOL}: --confirm="${confirm}" does not match tenant name "${tenant.name}" — aborting before any destructive action.`,
     );
   }
 
   if (env.dryRun) {
     console.warn(
-      `deprovision-tenant: DRY RUN for tenant "${tenant.id}" ("${tenant.name}") — no changes will be made.`,
+      `${TOOL}: DRY RUN for tenant "${tenant.id}" ("${tenant.name}") — no changes will be made.`,
     );
   }
 

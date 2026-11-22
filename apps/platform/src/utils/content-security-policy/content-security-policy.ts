@@ -1,9 +1,15 @@
 type TBuildContentSecurityPolicyOptions = {
   isDev: boolean;
+  canFrameAnySecureSite?: boolean;
 };
+
+// `hooks.stripe.com` is Stripe's 3D Secure and redirect-method step.
+const STRIPE_FRAME_SOURCES =
+  'https://js.stripe.com https://*.js.stripe.com https://checkout.stripe.com https://hooks.stripe.com';
 
 export const buildContentSecurityPolicy = ({
   isDev,
+  canFrameAnySecureSite = false,
 }: TBuildContentSecurityPolicyOptions): string => {
   // Next's per-render inline RSC payload cannot be hashed or nonced ahead of time; 'unsafe-eval' is Turbopack/HMR in dev.
   const scriptSrc = `script-src 'self' 'unsafe-inline' https://js.stripe.com https://*.js.stripe.com${isDev ? " 'unsafe-eval'" : ''}`;
@@ -19,8 +25,7 @@ export const buildContentSecurityPolicy = ({
     "font-src 'self' https://design-system-static.sanity.io",
     // Wildcard on purpose: Studio calls a browser-redacted sanity.io host that could not be listed; `sanity-cdn.com` is its version check.
     "connect-src 'self' https://*.sanity.io https://sanity-cdn.com https://api.stripe.com https://checkout.stripe.com",
-    // `hooks.stripe.com` is Stripe's 3D Secure and redirect-method step.
-    'frame-src https://js.stripe.com https://*.js.stripe.com https://checkout.stripe.com https://hooks.stripe.com',
+    `frame-src ${canFrameAnySecureSite ? 'https:' : STRIPE_FRAME_SOURCES}`,
     "frame-ancestors 'none'",
     "base-uri 'self'",
     // Some browsers apply `form-action` to the sign-in form's 302 to the OAuth provider, not only to its same-origin action.

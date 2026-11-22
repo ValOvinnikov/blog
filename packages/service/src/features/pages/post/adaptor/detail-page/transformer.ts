@@ -1,17 +1,16 @@
-import {
-  PORTABLE_TEXT_BLOCK_TYPE,
-  type TMaybeUndefined,
-} from '@shinefold/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { toPageTranslations } from '@shinefold/service/shared/localization/page-translations/to-page-translations';
 import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
 import { toSanityImage } from '@shinefold/service/shared/transformers/image/to-sanity-image';
 import { toModule } from '@shinefold/service/shared/transformers/module/to-module';
 import { toPersonProfile } from '@shinefold/service/shared/transformers/person/to-person-profile';
 import { toPortableTextBody } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-body';
+import { toPortableText } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import { resolveSeo } from '@shinefold/service/shared/transformers/seo/resolve-seo';
 import { toTag } from '@shinefold/service/shared/transformers/tag/to-tag';
 import { toTopic } from '@shinefold/service/shared/transformers/topic/to-topic';
 import { toReadingTimeMinutes } from '@shinefold/utils';
+import { hasBlockText } from '@shinefold/utils/portable-text';
 import type { InferResultType } from 'groqd';
 
 import type { postPageQuery } from './query';
@@ -19,15 +18,14 @@ import type { TPostDetail, TPostTakeaways } from './types';
 
 export type TRawPostDetail = NonNullable<InferResultType<typeof postPageQuery>>;
 
-// Mirrors the schema's own `min(3)` takeaways rule — fewer than 3 takeaways
-// is treated the same as none at all, never a partial list.
 function toPostTakeaways(
   raw: TRawPostDetail['postTakeaways'],
 ): TMaybeUndefined<TPostTakeaways> {
-  if (!raw?.takeaways || raw.takeaways.length < 3) return undefined;
+  const summary = raw?.summary ?? [];
+  if (!raw || !hasBlockText(summary)) return undefined;
 
   return {
-    takeaways: raw.takeaways,
+    summary: summary.map(toPortableText),
     generatedAt: raw.generatedAt ?? undefined,
     model: raw.model ?? undefined,
   };
@@ -48,9 +46,6 @@ export function toPostDetail(raw: TRawPostDetail): TPostDetail {
     featured: raw.featured ?? false,
     body: toPortableTextBody(raw.body),
     postTakeaways: toPostTakeaways(raw.postTakeaways),
-    hasAsides: raw.body.some(
-      (block) => block._type === PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
-    ),
     seo: resolveSeo(raw.seo),
     author: toPersonProfile(raw.author),
     topic: toTopic(raw.topic),

@@ -1,8 +1,15 @@
 import { faker } from '@faker-js/faker';
-import { FORM_STATUS, CONTENT_ALIGNMENT, ICONS, SIZE } from '@shinefold/config';
+import {
+  BRAND_VARIANT,
+  FORM_STATUS,
+  CONTENT_ALIGNMENT,
+  ICONS,
+  SIZE,
+} from '@shinefold/config';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { NewsletterSignup } from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@shinefold/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
 import {
   BUSY_STYLES,
   SPINNER_VARIANTS,
@@ -172,7 +179,7 @@ export const WideContainer: TStory = {
 export const BrandPrimaryBand: TStory = {
   decorators: [
     (Story) => (
-      <div className="surface-brand-primary bg-brand-primary-muted p-8">
+      <div className="bg-ambient p-8" data-skin={BRAND_VARIANT.BRAND_PRIMARY}>
         <Story />
       </div>
     ),
@@ -182,5 +189,12 @@ export const BrandPrimaryBand: TStory = {
 
 export const DarkTheme: TStory = {
   globals: { theme: 'dark' },
+  args: { trustCues },
+};
+
+export const OnEveryBrandBand: TStory = {
+  render: (args) => (
+    <EveryBrandBand>{() => <NewsletterSignup.Full {...args} />}</EveryBrandBand>
+  ),
   args: { trustCues },
 };

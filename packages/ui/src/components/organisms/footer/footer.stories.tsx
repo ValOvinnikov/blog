@@ -113,7 +113,7 @@ const meta = {
     },
     tone: {
       control: 'select',
-      options: objectKeys(footerVariants.variants.tone),
+      options: Object.values(BRAND_VARIANT),
     },
   },
 } satisfies Meta<typeof Footer>;

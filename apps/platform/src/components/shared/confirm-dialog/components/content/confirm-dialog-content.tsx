@@ -7,6 +7,7 @@ import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { ALERT_TYPE } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -15,6 +16,7 @@ export type TConfirmDialogContentProps = {
   description: ReactNode;
   confirmButtonLabel: ReactNode;
   confirmingButtonLabel: string;
+  keepButtonLabel?: ReactNode;
   isConfirmDisabled?: boolean;
   children?: ReactNode;
 };
@@ -24,10 +26,12 @@ export const ConfirmDialogContent = ({
   description,
   confirmButtonLabel,
   confirmingButtonLabel,
+  keepButtonLabel,
   isConfirmDisabled = false,
   children,
 }: TConfirmDialogContentProps) => {
   const t = useTranslations('confirmDialog');
+  const keepLabel = keepButtonLabel ?? t('cancelButton');
   const {
     expectedValue,
     tone,
@@ -36,18 +40,26 @@ export const ConfirmDialogContent = ({
     error,
     isPending,
     confirm,
+    finalFocus,
   } = useConfirmDialogContext();
 
   return (
     <AlertDialogShell
       title={title}
       description={description}
+      finalFocus={finalFocus}
       actions={
         <>
           <AlertDialog.Close
-            render={<Button type="button" variant={BUTTON_VARIANT.GHOST} />}
+            render={
+              <Button
+                type="button"
+                variant={BUTTON_VARIANT.SECONDARY}
+                isDisabled={isPending}
+              />
+            }
           >
-            {t('cancelButton')}
+            {keepLabel}
           </AlertDialog.Close>
           <Button
             type="button"
@@ -55,7 +67,7 @@ export const ConfirmDialogContent = ({
             onClick={confirm}
             isDisabled={
               isConfirmDisabled ||
-              (expectedValue !== undefined && confirmValue !== expectedValue)
+              (!isUndefined(expectedValue) && confirmValue !== expectedValue)
             }
             isPending={isPending}
             pendingLabel={confirmingButtonLabel}
@@ -67,7 +79,7 @@ export const ConfirmDialogContent = ({
     >
       {error && <Alert type={ALERT_TYPE.ERROR} title={error} />}
 
-      {expectedValue !== undefined && (
+      {!isUndefined(expectedValue) && (
         <FormField
           label={t('confirmLabel', { name: expectedValue })}
           hint={t('confirmHint')}

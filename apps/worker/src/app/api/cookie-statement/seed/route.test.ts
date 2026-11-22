@@ -3,6 +3,7 @@ import {
   HTTP_STATUS,
   LOCALE_ISO_CODES,
 } from '@shinefold/config/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 import { getTenantById } from '@shinefold/db/queries/tenants';
 import { COOKIE_STATEMENT_LOG } from '@worker/constants/cookie-statement';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
@@ -69,6 +70,19 @@ describe('POST /api/cookie-statement/seed', () => {
       MOCK_TENANT_ID,
       MOCK_LOCALES,
     ]);
+  });
+
+  it('starts the seed run for a suspended tenant', async () => {
+    vi.mocked(getTenantById).mockResolvedValue(
+      mockProvisionedTenant({
+        status: TENANT_STATUS.SUSPENDED,
+        sanityWriteTokenEncrypted: MOCK_ENCRYPTED_TOKEN,
+      }),
+    );
+
+    const response = await POST(seedRequest());
+
+    expect(response.status).toBe(HTTP_STATUS.ACCEPTED);
   });
 
   it('refuses an unsigned request', async () => {

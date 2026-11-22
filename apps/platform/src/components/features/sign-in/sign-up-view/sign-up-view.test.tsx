@@ -7,8 +7,7 @@ import {
   MOCK_SIGN_IN_EMAIL,
 } from '@platform/testing/auth/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
-import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
-import { toLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
+import { MOCK_LEGAL_PAGE_URLS } from '@platform/testing/legal-page-urls';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { OAUTH_PROVIDER_IDS } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
 import { ACTION_OUTCOME } from '@shinefold/config';
@@ -25,7 +24,6 @@ vi.mock('@platform/server/auth/send-sign-in-link-action', () => ({
 }));
 
 const [GITHUB_PROVIDER_ID] = OAUTH_PROVIDER_IDS;
-const MOCK_LEGAL_PAGE_URLS = toLegalPageUrls(MOCK_TENANT_ROOT_DOMAIN);
 const EMAIL_FIELD = { name: 'Email address' };
 
 const setup = customRender(SignUpView, {

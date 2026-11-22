@@ -11,7 +11,6 @@ import { prependTenantSegment } from '@web/server/proxy/prepend-tenant-segment/p
 import { redirectSwitchedOffLocale } from '@web/server/proxy/redirect-switched-off-locale/redirect-switched-off-locale';
 import { redirectToMainAddress } from '@web/server/proxy/redirect-to-main-address/redirect-to-main-address';
 import { redirectToPreferredTranslation } from '@web/server/proxy/redirect-to-preferred-translation/redirect-to-preferred-translation';
-import { rememberVisitorCurrency } from '@web/server/proxy/remember-visitor-currency/remember-visitor-currency';
 import { setRoutingRequestHeaders } from '@web/server/proxy/set-routing-request-headers/set-routing-request-headers';
 import {
   TENANT_ID_HEADER,
@@ -26,7 +25,7 @@ import {
   type TTenantRouting,
 } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { getDecodedFirstPathSegment } from '@web/utils/get-decoded-first-path-segment';
-import { isProductionEnvironment } from '@web/utils/is-production-environment';
+import { isPlatformFallbackHost } from '@web/utils/is-platform-fallback-host';
 import { logger } from '@web/utils/logger/logger';
 import { siteUnavailableStatus } from '@web/utils/site-unavailable-response';
 import { NextResponse, type NextRequest } from 'next/server';
@@ -75,7 +74,7 @@ const routeRequest = async (request: NextRequest): Promise<NextResponse> => {
 
   const tenantId = tenantRouting?.tenantId;
 
-  if (!tenantId && isProductionEnvironment()) {
+  if (!tenantId && !isPlatformFallbackHost(host)) {
     return new NextResponse(null, { status: HTTP_STATUS.NOT_FOUND });
   }
 
@@ -101,11 +100,8 @@ const routeRequest = async (request: NextRequest): Promise<NextResponse> => {
     return translationRedirect;
   }
 
-  const intlResponse = getIntlMiddleware(defaultLocale, liveLocales)(request);
-  rememberVisitorCurrency(request, intlResponse);
-
   return prependTenantSegment(
-    intlResponse,
+    getIntlMiddleware(defaultLocale, liveLocales)(request),
     tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
     request,
     Boolean(previewToken),
@@ -123,14 +119,14 @@ export const config = {
   // The UUID is BotID's fixed path prefix, which the tenant-shaped guard would otherwise 404.
   // A dotted final segment skips the proxy unless it is a feed, or the `.rsc` suffix Next matches RSC requests with.
   // The middle entries reach the proxy only so an operator-suspended site can answer them with 503; newsletter unsubscribe, sign-in and account export stay reachable.
-  // The last two send every request carrying a preview token or the draft marker here, so none escapes the framing headers `next.config` leaves to the proxy and no outside request reaches a draft route; Next requires literals, not the constants.
+  // The last two send every request carrying a preview token, a `~` or a `%` here, so none escapes the framing headers `next.config` leaves to the proxy and no encoding of the draft marker reaches a draft route; Next requires literals, not the constants.
   matcher: [
     '/((?!api|_next|_vercel|icon|\\.well-known|149e9513-01fa-4fb0-aad4-566afd725d1b|(?:.*/)?(?!rss\\.xml$|[^/]*\\.rsc$)[^/]*\\.[^/]*$).*)',
     '/sitemap.xml',
     '/api/newsletter/confirm',
     '/api/switch-language',
     '/api/generate-skim',
-    '/(.*(?:~|%7[Ee])preview.*)',
+    '/(.*[~%].*)',
     { source: '/:path*', has: [{ type: 'query', key: 'preview' }] },
   ],
 };

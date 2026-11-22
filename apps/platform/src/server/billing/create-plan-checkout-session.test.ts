@@ -1,5 +1,4 @@
 import {
-  BILLING_INTERVAL,
   BILLING_LOG,
   STRIPE_TENANT_METADATA_KEY,
 } from '@platform/constants/billing';
@@ -14,7 +13,7 @@ import {
 import { mockStripeCheckoutClient } from '@platform/testing/billing/stripe-checkout-client';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
-import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_PLAN, BILLING_INTERVAL } from '@shinefold/config/constants';
 import { STRIPE_PRICE_LOOKUP_KEY } from '@shinefold/db/constants';
 
 import {

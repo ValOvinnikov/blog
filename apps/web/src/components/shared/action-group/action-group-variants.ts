@@ -3,32 +3,20 @@ import { tv } from '@shinefold/ui/lib/styling';
 export const actionGroupVariants = tv({
   base: ['sm:min-w-32'],
   variants: {
-    isOnDark: {
-      true: ['text-on-image'],
-    },
-    isInline: {
-      true: ['sm:min-w-0'],
-      false: ['w-full sm:w-auto'],
+    variant: {
+      primary: [],
+      ghost: [
+        'in-[.skin-on-image]:border-on-image/55',
+        'in-[.skin-on-image]:hover:border-on-image in-[.skin-on-image]:hover:bg-on-image/15 in-[.skin-on-image]:hover:text-on-image',
+      ],
+      link: [
+        'sm:min-w-0 border-x-0',
+        'in-[.skin-on-image]:hover:text-on-image',
+      ],
     },
   },
   compoundVariants: [
-    {
-      isOnDark: false,
-      isInline: true,
-      class: ['border-x-0'],
-    },
-    {
-      isOnDark: true,
-      isInline: false,
-      class: [
-        'border-on-image/55 hover:border-on-image hover:bg-on-image/15 hover:text-on-image',
-      ],
-    },
-    {
-      isOnDark: true,
-      isInline: true,
-      class: ['hover:text-on-image'],
-    },
+    { variant: ['primary', 'ghost'], class: ['w-full sm:w-auto'] },
   ],
 });
 

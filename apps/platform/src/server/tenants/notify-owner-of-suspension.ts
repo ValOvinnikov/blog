@@ -1,10 +1,10 @@
 import 'server-only';
 
 import { TENANT_LOG } from '@platform/constants/tenant';
+import { dashboardUrl } from '@platform/utils/dashboard-url/dashboard-url';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import { queries, TENANT_STATUS, type TSuspensionStatus } from '@shinefold/db';
 import type { TTenantSuspension } from '@shinefold/db/schema/tenant-suspensions';
@@ -53,10 +53,7 @@ const sendSuspensionEmail = async (
   const values = { siteName, reference };
   const action = {
     label: t('actionLabel'),
-    url: new URL(
-      adminRoutes.dashboardSelectTenantHref(tenantId),
-      baseUrl,
-    ).toString(),
+    url: dashboardUrl(tenantId, baseUrl),
   };
 
   const message =

@@ -6,6 +6,10 @@ import {
   MOCK_TAB_SPLIT_JAVASCRIPT_URL,
   MOCK_URL,
 } from '@shinefold/email/testing/email-fixtures';
+import {
+  mockPortableTextBlock,
+  mockPortableTextSpan,
+} from '@shinefold/email/testing/portable-text-fixtures';
 
 import { serializePortableText } from './serialize-portable-text';
 import type { TPortableTextNode } from './types';
@@ -14,19 +18,9 @@ const LINK_KEY = 'link-1';
 const LINK_TEXT = 'Click';
 const ANCHOR_OPEN = '<a ';
 
-function mockSpan(text: string, marks?: string[]): TPortableTextNode {
-  return { _type: 'span', text, marks };
-}
-
-function mockBlock(
-  overrides: Partial<TPortableTextNode> & { children?: TPortableTextNode[] },
-): TPortableTextNode {
-  return { _type: 'block', style: 'normal', ...overrides };
-}
-
 function mockLinkBlock(href: string): TPortableTextNode {
-  return mockBlock({
-    children: [mockSpan(LINK_TEXT, [LINK_KEY])],
+  return mockPortableTextBlock({
+    children: [mockPortableTextSpan(LINK_TEXT, [LINK_KEY])],
     markDefs: [{ _key: LINK_KEY, _type: 'link', href }],
   });
 }
@@ -41,7 +35,9 @@ describe(serializePortableText, () => {
 
   it('renders a normal-style block as a paragraph', () => {
     const html = serializePortableText([
-      mockBlock({ children: [mockSpan('Hello there.')] }),
+      mockPortableTextBlock({
+        children: [mockPortableTextSpan('Hello there.')],
+      }),
     ]);
 
     expect(html).toBe('<p style="margin:0 0 16px;">Hello there.</p>');
@@ -51,7 +47,10 @@ describe(serializePortableText, () => {
     'renders an %s block as that heading',
     (style) => {
       const html = serializePortableText([
-        mockBlock({ style, children: [mockSpan('Section')] }),
+        mockPortableTextBlock({
+          style,
+          children: [mockPortableTextSpan('Section')],
+        }),
       ]);
 
       expect(html).toContain(`<${style} `);
@@ -61,8 +60,11 @@ describe(serializePortableText, () => {
 
   it('renders strong and em marks', () => {
     const html = serializePortableText([
-      mockBlock({
-        children: [mockSpan('bold', ['strong']), mockSpan('italic', ['em'])],
+      mockPortableTextBlock({
+        children: [
+          mockPortableTextSpan('bold', ['strong']),
+          mockPortableTextSpan('italic', ['em']),
+        ],
       }),
     ]);
 
@@ -72,8 +74,14 @@ describe(serializePortableText, () => {
 
   it('groups consecutive bullet list items into one list', () => {
     const html = serializePortableText([
-      mockBlock({ listItem: 'bullet', children: [mockSpan('One')] }),
-      mockBlock({ listItem: 'bullet', children: [mockSpan('Two')] }),
+      mockPortableTextBlock({
+        listItem: 'bullet',
+        children: [mockPortableTextSpan('One')],
+      }),
+      mockPortableTextBlock({
+        listItem: 'bullet',
+        children: [mockPortableTextSpan('Two')],
+      }),
     ]);
 
     expect(html.match(/<ul/g)).toHaveLength(1);
@@ -83,8 +91,14 @@ describe(serializePortableText, () => {
 
   it('starts a new list when the list type changes', () => {
     const html = serializePortableText([
-      mockBlock({ listItem: 'bullet', children: [mockSpan('One')] }),
-      mockBlock({ listItem: 'number', children: [mockSpan('Two')] }),
+      mockPortableTextBlock({
+        listItem: 'bullet',
+        children: [mockPortableTextSpan('One')],
+      }),
+      mockPortableTextBlock({
+        listItem: 'number',
+        children: [mockPortableTextSpan('Two')],
+      }),
     ]);
 
     expect(html.match(/<ul/g)).toHaveLength(1);
@@ -93,8 +107,13 @@ describe(serializePortableText, () => {
 
   it('closes an open list when a non-list block follows', () => {
     const html = serializePortableText([
-      mockBlock({ listItem: 'bullet', children: [mockSpan('One')] }),
-      mockBlock({ children: [mockSpan('After the list.')] }),
+      mockPortableTextBlock({
+        listItem: 'bullet',
+        children: [mockPortableTextSpan('One')],
+      }),
+      mockPortableTextBlock({
+        children: [mockPortableTextSpan('After the list.')],
+      }),
     ]);
 
     expect(html.indexOf('</ul>')).toBeLessThan(html.indexOf('<p'));
@@ -102,7 +121,9 @@ describe(serializePortableText, () => {
 
   it('escapes every interpolated text node', () => {
     const html = serializePortableText([
-      mockBlock({ children: [mockSpan(MOCK_SCRIPT_MARKUP)] }),
+      mockPortableTextBlock({
+        children: [mockPortableTextSpan(MOCK_SCRIPT_MARKUP)],
+      }),
     ]);
 
     expect(html).not.toContain(MOCK_SCRIPT_MARKUP);
@@ -168,7 +189,9 @@ describe(serializePortableText, () => {
     };
 
     const html = serializePortableText([
-      mockBlock({ children: [mockSpan('Kept paragraph.')] }),
+      mockPortableTextBlock({
+        children: [mockPortableTextSpan('Kept paragraph.')],
+      }),
       unsupported,
     ]);
 
@@ -177,7 +200,10 @@ describe(serializePortableText, () => {
 
   it('drops a block style outside the supported set', () => {
     const html = serializePortableText([
-      mockBlock({ style: 'blockquote', children: [mockSpan('A quote.')] }),
+      mockPortableTextBlock({
+        style: 'blockquote',
+        children: [mockPortableTextSpan('A quote.')],
+      }),
     ]);
 
     expect(html).toBe('');

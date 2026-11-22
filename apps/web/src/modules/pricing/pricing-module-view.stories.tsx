@@ -4,7 +4,10 @@ import {
   PRICE_PERIOD,
 } from '@shinefold/config';
 import { BILLING_CURRENCY } from '@shinefold/db/constants';
-import { MOCK_EURO_AMOUNT } from '@shinefold/db/testing/stripe-catalogue/fixtures';
+import {
+  mockStripePrice,
+  MOCK_EURO_AMOUNT,
+} from '@shinefold/db/testing/stripe-catalogue/fixtures';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import {
@@ -12,10 +15,7 @@ import {
   mockPricingTier,
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
-import {
-  mockStripePrice,
-  mockLinkedPricingTier,
-} from '@web/testing/modules/pricing/live-price-fixtures';
+import { mockLinkedPricingTier } from '@web/testing/modules/pricing/live-price-fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
@@ -111,6 +111,7 @@ const meta = {
     footnote: undefined,
     ctaButtons: [],
     contentAlignment: undefined,
+    hasPlanComparison: false,
     titleId: 'pricing-title',
     dataTestId: 'pricing-module-pricing-1',
   },
@@ -204,6 +205,7 @@ export const ThreeTiersPhone: TStory = {
 
 export const LinkedPlanLivePrice: TStory = {
   args: {
+    hasPlanComparison: true,
     panels: panelsFor([
       tiers[0]!,
       mockLinkedPricingTier(PRICE_PERIOD.MONTH, {
@@ -215,4 +217,9 @@ export const LinkedPlanLivePrice: TStory = {
       }),
     ]),
   },
+};
+
+export const LinkedPlanComparisonPhone: TStory = {
+  ...LinkedPlanLivePrice,
+  globals: { viewport: 'mobile' },
 };

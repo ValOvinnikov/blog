@@ -1,5 +1,10 @@
-import type { TContentAlignment, THeadingBlock } from '@shinefold/config';
+import {
+  TEXT_ROLE,
+  type TContentAlignment,
+  type THeadingBlock,
+} from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
+import { Text } from '@shinefold/ui/components/atoms/text';
 import type { THeadingLevel } from '@shinefold/ui/lib/react';
 
 import { moduleHeadingVariants } from './module-heading-variants';
@@ -9,7 +14,6 @@ export interface IModuleHeadingProps {
   id: string;
   level: THeadingLevel;
   align?: TContentAlignment;
-  variant?: 'label' | 'section';
 }
 
 export const ModuleHeading = ({
@@ -17,22 +21,25 @@ export const ModuleHeading = ({
   id,
   level,
   align,
-  variant = 'label',
 }: IModuleHeadingProps) => {
   const { heading, supportingText } = headingBlock;
-  const s = moduleHeadingVariants({ variant, align });
+  const s = moduleHeadingVariants({ align });
 
   return (
     <div className={s.wrapper()}>
       <Heading
         level={level}
         id={id}
-        visual={variant === 'section' ? 'section' : undefined}
-        className={s.label()}
+        visual={TEXT_ROLE.SECTION_TITLE}
+        className={s.heading()}
       >
         {heading}
       </Heading>
-      {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
+      {supportingText && (
+        <Text textRole={TEXT_ROLE.INTRO} className={s.supportingText()}>
+          {supportingText}
+        </Text>
+      )}
     </div>
   );
 };

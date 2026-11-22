@@ -7,3 +7,5 @@ export const useOnboardingTier = () => {
 
   return { isPhone: !isRailUp, isRail: isRailUp && !isFull, isFull };
 };
+
+export type TOnboardingTier = ReturnType<typeof useOnboardingTier>;

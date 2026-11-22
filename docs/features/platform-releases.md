@@ -123,8 +123,9 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   with an `overrideReason` field error (`REASON_REQUIRED`) when an override is
   required and the reason is blank; and `SERVER_ERROR` when the dispatch
   fails, which the dialog reports as nothing started. Otherwise it dispatches
-  `release.yml` on `main` with inputs `version` and `override` (`"true"` or
-  `"false"`) and records `RELEASE_STARTED` (details: `headSha`,
+  `release.yml` on `main` with inputs `version`, `sha` (the candidate's
+  `headSha`, so the run ships exactly the commit the operator reviewed) and
+  `override` (`"true"` or `"false"`) and records `RELEASE_STARTED` (details: `headSha`,
   `isOverride`), plus `RELEASE_OVERRIDE` (details: `headSha`,
   `contrastStatus`, `reason`) when overridden, both on the `RELEASE` target
   with the version as `targetId`. The events attest the dispatch request, not
@@ -232,6 +233,15 @@ values are stored as plain `text`, so none of them needs a db migration:
   timeout, and a failed page fails the read with a reason code. A tag list
   still full at the page cap is reported as `tagListIncomplete`, never as a
   different latest tag.
+- A comparison and a file's contents at a SHA are fixed by their inputs and
+  cached with no expiry (`GITHUB_PINNED_READ_REVALIDATE`). The tag list,
+  `main`'s head, workflow-run reads and every dispatch stay uncached: Next
+  serves an expired entry before refreshing it, so a window on a moving ref
+  would bound nothing, and the release card's 10-second poll sees live
+  state. Only a 200 is cached, so a failure is retried on the next read, and
+  a response over Next's 2 MB cache limit is simply re-fetched.
+- The candidate comparison is deduped per render (`React.cache`), so the
+  contrast-due banner and the releases page share one result.
 - At the 300-file limit the file list is truncated (`isFileListTruncated` on
   the candidate): it counts as touching every set, so a rendering change is
   never missed, and the migration counts are minimums.

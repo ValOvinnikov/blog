@@ -1,32 +1,29 @@
 import {
-  CONTENT_ALIGNMENT,
-  HERO_VARIANT,
-  MEDIA_ORDER,
   type IWithClassName,
   type IWithDataTestId,
   type TBrandVariant,
   type TContentAlignment,
   type THeroVariant,
+  type TLayout,
   type TMediaOrder,
-  type TSpacingScale,
 } from '@shinefold/config';
 import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
-import { Heading } from '@shinefold/ui/components/atoms/heading';
-import { Text } from '@shinefold/ui/components/atoms/text';
+import { HERO_TEST_ID } from '@shinefold/ui/constants/hero';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@shinefold/ui/lib/react';
-import { bannerVariants } from '@shinefold/ui/lib/styling';
 import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { HeroAvatar } from './components/avatar/hero-avatar';
 import { HeroBody } from './components/body/hero-body';
 import { HeroCta } from './components/cta/hero-cta';
+import { HeroHeadline } from './components/headline/hero-headline';
 import { HeroMedia } from './components/media/hero-media';
+import { HeroMediaArea } from './components/media-area/hero-media-area';
 import { HeroSocial } from './components/social/hero-social';
-import { heroVariants } from './hero-variants';
+import { resolveHeroStyles } from './hero-styles';
 
 const HeroParts = {
   Avatar: HeroAvatar,
@@ -36,6 +33,12 @@ const HeroParts = {
   Social: HeroSocial,
 } satisfies Record<string, ElementType>;
 
+export type THeroLayout = Pick<TLayout, 'spacingTop' | 'spacingBottom'> & {
+  contentPosition?: TContentAlignment;
+  contentAlignment?: TContentAlignment;
+  mediaOrder?: TMediaOrder;
+};
+
 export type THeroProps = IWithClassName &
   IWithDataTestId & {
     title: string;
@@ -43,101 +46,59 @@ export type THeroProps = IWithClassName &
     eyebrow?: string;
     excerpt?: string;
     variant?: THeroVariant;
-    contentPosition?: TContentAlignment;
-    contentAlignment?: TContentAlignment;
-    mediaOrder?: TMediaOrder;
+    layout?: THeroLayout;
     tone: TBrandVariant;
-    spacingTop?: TSpacingScale;
-    spacingBottom?: TSpacingScale;
     children?: TCompoundChildren<typeof HeroParts>;
   };
 
-/** The page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Avatar`, `Hero.Body`, `Hero.Cta`, `Hero.Media`, and `Hero.Social` slots. */
 const HeroRoot = ({
   title,
   titleId,
   eyebrow,
   excerpt,
   variant,
-  contentPosition,
-  contentAlignment,
-  mediaOrder,
+  layout,
   tone,
-  spacingTop,
-  spacingBottom,
   children,
   className,
   dataTestId,
 }: THeroProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeroParts);
-  const hasMedia = Boolean(slots.Media);
-  const resolvedVariant = variant ?? HERO_VARIANT.SPLIT;
-  const isSplit = resolvedVariant === HERO_VARIANT.SPLIT;
-  const isBanner = resolvedVariant === HERO_VARIANT.BANNER;
-
-  const resolvedPosition = contentPosition ?? CONTENT_ALIGNMENT.LEFT;
-  const resolvedAlignment = isSplit
-    ? contentAlignment
-    : (contentAlignment ?? CONTENT_ALIGNMENT.LEFT);
-  const resolvedMediaOrder = isBanner
-    ? undefined
-    : (mediaOrder ?? MEDIA_ORDER.LAST);
-
-  const s = heroVariants({
-    variant: resolvedVariant,
-    hasMedia,
-    position: resolvedPosition,
-    alignment: resolvedAlignment,
-    mediaOrder: resolvedMediaOrder,
+  const heroStyles = resolveHeroStyles({
+    variant,
+    hasMedia: Boolean(slots.Media),
+    layout,
   });
-  const banner = isBanner
-    ? bannerVariants({
-        tone,
-        hasMedia,
-        position: resolvedPosition,
-        spacingTop,
-        spacingBottom,
-      })
-    : undefined;
+  const {
+    isBanner,
+    alignment: resolvedAlignment,
+    styles: s,
+    banner,
+  } = heroStyles;
 
   return (
     <div
       className={s.root({ class: [banner?.root(), className] })}
+      data-skin={isBanner ? tone : undefined}
       data-testid={dataTestId}
     >
       <div className={s.grid()}>
         <div
           className={s.copy({ class: banner?.copy() })}
-          data-testid="hero-copy"
+          data-testid={HERO_TEST_ID.COPY}
         >
           {slots.Avatar &&
             cloneElement(slots.Avatar, {
               contentAlignment: resolvedAlignment,
             })}
-          {eyebrow && (
-            <Eyebrow className={s.eyebrow({ class: banner?.title() })}>
-              {eyebrow}
-            </Eyebrow>
-          )}
+          {eyebrow && <Eyebrow className={banner?.title()}>{eyebrow}</Eyebrow>}
           <div className={s.group({ class: banner?.block() })}>
-            <div className={s.title()}>
-              <Heading
-                id={titleId}
-                level={1}
-                visual="hero"
-                className={s.heading({ class: banner?.title() })}
-              >
-                {title}
-              </Heading>
-            </div>
-            {excerpt && (
-              <Text
-                variant="hero"
-                className={s.excerpt({ class: banner?.text() })}
-              >
-                {excerpt}
-              </Text>
-            )}
+            <HeroHeadline
+              title={title}
+              titleId={titleId}
+              excerpt={excerpt}
+              heroStyles={heroStyles}
+            />
             {slots.Body &&
               cloneElement(slots.Body, {
                 contentAlignment: resolvedAlignment,
@@ -158,27 +119,7 @@ const HeroRoot = ({
             })}
         </div>
         {slots.Media && (
-          <div
-            className={s.media({ class: banner?.media() })}
-            data-testid="hero-media"
-          >
-            {cloneElement(
-              slots.Media,
-              isBanner
-                ? { isFramed: false }
-                : {
-                    variant: resolvedVariant,
-                    contentAlignment: resolvedAlignment,
-                  },
-            )}
-          </div>
-        )}
-        {banner && hasMedia && (
-          <div
-            className={banner.overlay()}
-            aria-hidden="true"
-            data-testid="hero-overlay"
-          />
+          <HeroMediaArea media={slots.Media} heroStyles={heroStyles} />
         )}
       </div>
 
@@ -189,5 +130,6 @@ const HeroRoot = ({
   );
 };
 
+/** The page-top band every hero kind renders, where a page states what it is. */
 export const Hero: TCompoundComponent<typeof HeroRoot, typeof HeroParts> =
   Object.assign(HeroRoot, HeroParts);

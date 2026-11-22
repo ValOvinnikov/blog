@@ -92,14 +92,6 @@ describe(scopeAdapterToApp, () => {
       expect(created?.sessionToken).toBe(MOCK_SESSION_TOKEN);
     });
 
-    it('looks a session up by the hash of the cookie token', async () => {
-      await scoped.getSessionAndUser?.(MOCK_SESSION_TOKEN);
-
-      expect(adapter.getSessionAndUser).toHaveBeenCalledWith(
-        SESSION_TOKEN_HASH,
-      );
-    });
-
     it('extends a session by the hash of the cookie token', async () => {
       await scoped.updateSession?.({
         sessionToken: MOCK_SESSION_TOKEN,
@@ -112,10 +104,26 @@ describe(scopeAdapterToApp, () => {
       });
     });
 
-    it('returns the user of a session the app issued', async () => {
-      const found = await scoped.getSessionAndUser?.(MOCK_SESSION_TOKEN);
+    describe('finding a session the app issued', () => {
+      let found: Awaited<ReturnType<NonNullable<Adapter['getSessionAndUser']>>>;
 
-      expect(found?.user).toEqual(MOCK_USER);
+      beforeEach(async () => {
+        found = (await scoped.getSessionAndUser?.(MOCK_SESSION_TOKEN)) ?? null;
+      });
+
+      it('looks it up by the hash of the cookie token', () => {
+        expect(adapter.getSessionAndUser).toHaveBeenCalledWith(
+          SESSION_TOKEN_HASH,
+        );
+      });
+
+      it('hands its raw token back for the session cookie', () => {
+        expect(found?.session.sessionToken).toBe(MOCK_SESSION_TOKEN);
+      });
+
+      it('returns its user', () => {
+        expect(found?.user).toEqual(MOCK_USER);
+      });
     });
 
     it('deletes a session the app issued by its token hash', async () => {

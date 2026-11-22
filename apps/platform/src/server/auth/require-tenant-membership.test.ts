@@ -11,9 +11,15 @@ import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
-import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@shinefold/config';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
+import {
+  CAPABILITY,
+  NEXT_NAVIGATION_ERROR,
+  type TMaybeNull,
+} from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@shinefold/db/constants';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -28,6 +34,7 @@ vi.mock('@shinefold/db', async () => {
   return {
     ...(await mockDbConstants()),
     queries: {
+      ...noEntitlementGrantQueries(),
       tenants: { getTenantById: vi.fn() },
       memberships: { getMembership: vi.fn() },
       admins: { getAdminByUserId: vi.fn() },
@@ -116,5 +123,25 @@ describe(requireTenantMembership, () => {
 
     expect(result).toEqual(mockMembershipContext(tenant, membership));
     expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it("opens what the tenant's open grants unlock", async () => {
+    getMembership.mockResolvedValue(
+      mockMembership({ userId: MOCK_USER_ID, tenantId: MOCK_TENANT_ID }),
+    );
+    vi.mocked(
+      queries.tenantEntitlementGrants.listResolvableEntitlementGrants,
+    ).mockResolvedValueOnce([
+      mockEntitlementGrant({ key: CAPABILITY.CONTACT_FORM }),
+    ]);
+
+    const { tenant: resolved } = await requireTenantMembership(MOCK_TENANT_ID);
+
+    expect(
+      queries.tenantEntitlementGrants.listResolvableEntitlementGrants,
+    ).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(resolved.entitlements.capabilities).toContain(
+      CAPABILITY.CONTACT_FORM,
+    );
   });
 });

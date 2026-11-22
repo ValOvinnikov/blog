@@ -1,23 +1,34 @@
-import { BILLING_INTERVAL, UPGRADE_POLL } from '@platform/constants/billing';
+import { UPGRADE_POLL } from '@platform/constants/billing';
 import {
   PLAN_CHANGE_REFUSAL,
   PLAN_CHANGE_TIMING,
 } from '@platform/constants/plan-change';
+import { STRIPE_JS_ERROR_TYPE } from '@platform/constants/stripe-payment';
 import messages from '@platform/i18n/messages/en.json';
 import { changePlanAction } from '@platform/server/billing/change-plan-action';
 import { getTenantPlanAction } from '@platform/server/billing/get-tenant-plan-action';
+import {
+  MOCK_PAYMENT_CLIENT_SECRET,
+  MOCK_STRIPE_PUBLISHABLE_KEY,
+} from '@platform/testing/billing/fixtures';
 import {
   MOCK_GROWTH_MONTHLY_CHOICE,
   MOCK_STARTER_MONTHLY_CHOICE,
 } from '@platform/testing/billing/plan-choices';
 import { MOCK_RENEWS_AT } from '@platform/testing/billing/plan-subscription';
+import {
+  MOCK_BANK_STEP_CANCELLED,
+  mockStripeNextAction,
+} from '@platform/testing/billing/stripe-js';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import { mockLocaleRouter } from '@platform/testing/mock-locale-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { ACTION_OUTCOME } from '@shinefold/config';
-import { TENANT_PLAN } from '@shinefold/config/constants';
+import { TENANT_PLAN, BILLING_INTERVAL } from '@shinefold/config/constants';
+import { loadStripe } from '@stripe/stripe-js';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 
@@ -29,6 +40,8 @@ vi.mock('@platform/server/billing/change-plan-action');
 
 vi.mock('@platform/server/billing/get-tenant-plan-action');
 
+vi.mock('@stripe/stripe-js');
+
 const { upgradePage, planNames } = messages;
 const t = makeEnTranslator('upgradePage');
 
@@ -37,6 +50,7 @@ const setup = customRender(PlanChange, {
   current: MOCK_STARTER_MONTHLY_CHOICE,
   renewsAt: MOCK_RENEWS_AT,
   pending: undefined,
+  publishableKey: MOCK_STRIPE_PUBLISHABLE_KEY,
 });
 
 const submitButton = () =>
@@ -95,6 +109,15 @@ describe(`<${PlanChange.name}/>`, () => {
       expect(submit).toBeEnabled();
     });
 
+    it('says a move to yearly starts a new yearly period today', async () => {
+      await choose(user, upgradePage.YEARLY);
+      const summary = screen.getByText(
+        t('changeNowNewPeriod', { interval: BILLING_INTERVAL.YEARLY }),
+      );
+
+      expect(summary).toBeVisible();
+    });
+
     it('moves up now and waits for the webhook before refreshing', async () => {
       vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
 
@@ -135,6 +158,77 @@ describe(`<${PlanChange.name}/>`, () => {
 
       expect(refusal).toBeVisible();
       expect(refresh).not.toHaveBeenCalled();
+    });
+
+    describe('when the bank asks to confirm the payment', () => {
+      let handleNextAction: Mock;
+
+      beforeEach(() => {
+        handleNextAction = mockStripeNextAction();
+        vi.mocked(changePlanAction).mockResolvedValueOnce({
+          outcome: ACTION_OUTCOME.SUCCESS,
+          timing: PLAN_CHANGE_TIMING.NOW,
+          clientSecret: MOCK_PAYMENT_CLIENT_SECRET,
+        });
+      });
+
+      it("shows the bank's step, then waits for the new plan", async () => {
+        await choose(user, planNames.GROWTH);
+        await user.click(submitButton());
+        const confirming = await screen.findByText(
+          upgradePage.changeConfirmingTitle,
+        );
+
+        expect(loadStripe).toHaveBeenCalledWith(MOCK_STRIPE_PUBLISHABLE_KEY);
+        expect(handleNextAction).toHaveBeenCalledExactlyOnceWith({
+          clientSecret: MOCK_PAYMENT_CLIENT_SECRET,
+        });
+        expect(confirming).toBeVisible();
+      });
+
+      it('says nothing changed when the bank step is cancelled', async () => {
+        handleNextAction.mockResolvedValue(MOCK_BANK_STEP_CANCELLED);
+
+        await choose(user, planNames.GROWTH);
+        await user.click(submitButton());
+        const notice = await screen.findByText(
+          upgradePage.PAYMENT_NOT_CONFIRMED,
+        );
+
+        expect(notice).toBeVisible();
+        expect(refresh).not.toHaveBeenCalled();
+      });
+
+      it('says the card was declined after the bank step', async () => {
+        handleNextAction.mockResolvedValue({
+          error: { type: STRIPE_JS_ERROR_TYPE.CARD_ERROR },
+        });
+
+        await choose(user, planNames.GROWTH);
+        await user.click(submitButton());
+        const alert = await screen.findByRole('alert');
+
+        expect(alert).toHaveTextContent(upgradePage.CARD_DECLINED);
+      });
+
+      it.each([
+        [
+          'Stripe.js cannot load',
+          () => vi.mocked(loadStripe).mockRejectedValue(MOCK_NETWORK_ERROR),
+        ],
+        [
+          "the bank's step cannot be reached",
+          () => handleNextAction.mockRejectedValue(MOCK_NETWORK_ERROR),
+        ],
+      ])('says nothing changed when %s', async (_case, arrange) => {
+        arrange();
+
+        await choose(user, planNames.GROWTH);
+        await user.click(submitButton());
+        const alert = await screen.findByRole('alert');
+
+        expect(alert).toHaveTextContent(upgradePage.PAYMENT_NOT_CONFIRMED);
+      });
     });
 
     it('says the change failed on a server error', async () => {

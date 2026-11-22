@@ -147,7 +147,75 @@
         "metaTitle": "Projet d’exemple deux — une autre étude de cas",
         "metaDescription": "Une deuxième étude de cas d’exemple créée avec votre site. Remplacez-la par votre travail, ou supprimez-la."
       }
-    ]
+    ],
+    "growth": {
+      "highlights": {
+        "heading": "Ma façon de travailler",
+        "imageAlt": "Illustration d'exemple à remplacer par une image de votre travail",
+        "rows": [
+          {
+            "heading": "Partir du brief",
+            "body": [
+              "Chaque projet commence par savoir à qui il s'adresse et à quoi ressemble la réussite. Remplacez ce texte par votre propre point de départ."
+            ]
+          },
+          {
+            "heading": "Montrer le résultat",
+            "body": [
+              "Associez chaque point à une image du travail terminé. Remplacez l'image d'exemple par une capture ou une photo à vous."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Ils m'ont fait confiance",
+        "logoNames": [
+          "Client d'exemple un",
+          "Client d'exemple deux",
+          "Client d'exemple trois",
+          "Client d'exemple quatre"
+        ]
+      },
+      "timeline": {
+        "heading": "Parcours",
+        "items": [
+          {
+            "marker": "2018",
+            "heading": "Lancement à mon compte",
+            "body": "Remplacez chaque étape par un moment de votre propre carrière."
+          },
+          {
+            "marker": "2021",
+            "heading": "Premier client régulier",
+            "body": "Dites ce qui a changé et ce que vous avez appris."
+          },
+          {
+            "marker": "Aujourd'hui",
+            "heading": "Ouvert aux projets",
+            "body": "Terminez par votre situation actuelle et ce que vous recherchez."
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Ce qu'en disent mes clients",
+        "quotes": [
+          {
+            "name": "Client d'exemple",
+            "role": "Fondatrice, Studio d'exemple",
+            "quote": [
+              "Remplacez ce texte par la citation d'une personne avec qui vous avez travaillé. Une phrase ou deux sur le résultat suffisent."
+            ]
+          },
+          {
+            "name": "Autre client d'exemple",
+            "role": "Responsable marketing, Société d'exemple",
+            "quote": [
+              "Ajoutez un second témoignage, idéalement sur un autre type de projet."
+            ]
+          }
+        ]
+      }
+    }
   },
   "personal": {
     "hero": {
@@ -190,6 +258,45 @@
     "writing": {
       "linkLabel": "Écrits",
       "listHeading": "Tous les articles"
+    },
+    "growth": {
+      "timeline": {
+        "heading": "Mon parcours",
+        "items": [
+          {
+            "marker": "2016",
+            "heading": "Fin de mes études",
+            "body": "Remplacez chaque étape par un moment de votre propre histoire."
+          },
+          {
+            "marker": "2019",
+            "heading": "Trouver ma voie",
+            "body": "Dites ce qui vous a mené au métier que vous exercez."
+          },
+          {
+            "marker": "Aujourd'hui",
+            "heading": "Où j'en suis",
+            "body": "Terminez par ce sur quoi vous travaillez et la suite."
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "Ce que je propose",
+        "features": [
+          {
+            "heading": "Écriture",
+            "supportingText": "Remplacez ce texte par l'un de vos points forts."
+          },
+          {
+            "heading": "Idées",
+            "supportingText": "Ajoutez un deuxième point fort, en une phrase."
+          },
+          {
+            "heading": "Collaboration",
+            "supportingText": "Terminez par votre façon de travailler avec les autres."
+          }
+        ]
+      }
     }
   },
   "docs": {
@@ -271,5 +378,320 @@
         "metaDescription": "Un guide d'exemple créé avec votre site. Utilisez-le pour les problèmes courants, leurs causes et leurs solutions."
       }
     ]
+  },
+  "business": {
+    "hero": {
+      "eyebrow": "Bienvenue",
+      "heading": "Une aide claire et fiable pour votre entreprise",
+      "supportingText": "Dites en une phrase ce que vous faites et pour qui."
+    },
+    "intro": {
+      "body": [
+        "Nous aidons nos clients à mener leur travail à bien, dans les délais et sans surprise.",
+        "Remplacez ce texte par une courte présentation de votre entreprise : ce que vous proposez, à qui et ce qui vous distingue."
+      ]
+    },
+    "faq": {
+      "heading": "Questions fréquentes",
+      "questions": [
+        {
+          "question": "Que proposez-vous ?",
+          "answer": [
+            "Résumez vos principaux services en une ou deux phrases, et renvoyez à la page Services pour les détails."
+          ]
+        },
+        {
+          "question": "Combien cela coûte-t-il ?",
+          "answer": [
+            "Expliquez comment vous fixez vos tarifs, ou invitez les visiteurs à vous contacter pour un devis."
+          ]
+        },
+        {
+          "question": "Comment commencer ?",
+          "answer": [
+            "Décrivez la première étape, comme un court appel ou un cahier des charges, et ce qui suit."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Parlons-en",
+      "supportingText": "Dites-nous ce dont vous avez besoin et nous vous répondrons."
+    },
+    "services": {
+      "title": "Services",
+      "slug": "services",
+      "summary": "Ce que nous proposons et comment nous travaillons.",
+      "body": [
+        "Décrivez chaque service en un court paragraphe : ce qu'il comprend et à qui il s'adresse.",
+        "Ajoutez des tarifs, des formules ou des exemples de réalisations dès que vous en avez."
+      ],
+      "metaTitle": "Services — nos prestations et notre façon de travailler",
+      "metaDescription": "Une page de services d'exemple créée avec votre site. Remplacez-la par ce que propose votre entreprise."
+    },
+    "about": {
+      "title": "À propos",
+      "slug": "a-propos",
+      "summary": "Qui nous sommes et ce qui nous anime.",
+      "body": [
+        "Racontez aux visiteurs comment l'entreprise est née, qui la porte et ce qui compte pour vous.",
+        "Quelques lignes suffisent. Ajoutez des photos de l'équipe dès que vous en avez."
+      ],
+      "metaTitle": "À propos — qui nous sommes et ce qui nous anime",
+      "metaDescription": "Une page à propos d'exemple créée avec votre site. Présentez aux visiteurs les personnes derrière l'entreprise."
+    },
+    "contact": {
+      "title": "Contact",
+      "slug": "contact",
+      "summary": "Comment nous joindre.",
+      "body": [
+        "Indiquez aux visiteurs le meilleur moyen de vous joindre : une adresse e-mail, un numéro de téléphone ou les deux.",
+        "Ajoutez vos horaires et votre adresse, et précisez sous quel délai vous répondez en général."
+      ],
+      "metaTitle": "Contact — comment nous joindre et quand nous répondons",
+      "metaDescription": "Une page de contact d'exemple créée avec votre site. Ajoutez votre e-mail, votre téléphone et vos horaires."
+    },
+    "growth": {
+      "featureList": {
+        "heading": "Nos services",
+        "features": [
+          {
+            "heading": "Conseil",
+            "supportingText": "Remplacez ce texte par l'un de vos principaux services, en une phrase."
+          },
+          {
+            "heading": "Réalisation",
+            "supportingText": "Ajoutez un deuxième service et à qui il s'adresse."
+          },
+          {
+            "heading": "Accompagnement",
+            "supportingText": "Terminez par la façon dont vous suivez vos clients une fois le travail livré."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "En chiffres",
+        "footnote": "Chiffres d'exemple. Remplacez-les par les vôtres.",
+        "stats": [
+          {
+            "value": "10+",
+            "label": "Années d'activité"
+          },
+          {
+            "value": "250",
+            "label": "Projets livrés"
+          },
+          {
+            "value": "98 %",
+            "label": "Clients fidèles"
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Ils nous font confiance",
+        "logoNames": [
+          "Client d'exemple un",
+          "Client d'exemple deux",
+          "Client d'exemple trois",
+          "Client d'exemple quatre"
+        ]
+      },
+      "team": {
+        "heading": "L'équipe",
+        "members": [
+          {
+            "name": "Membre d'exemple",
+            "role": "Fondateur"
+          },
+          {
+            "name": "Autre membre",
+            "role": "Cheffe de projet"
+          },
+          {
+            "name": "Troisième membre",
+            "role": "Service client"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Ce qu'en disent nos clients",
+        "quotes": [
+          {
+            "name": "Client d'exemple",
+            "role": "Directrice, Société d'exemple",
+            "quote": [
+              "Remplacez ce texte par la citation d'un client satisfait. Une phrase ou deux sur le résultat suffisent."
+            ]
+          },
+          {
+            "name": "Autre client d'exemple",
+            "role": "Gérant, Boutique d'exemple",
+            "quote": [
+              "Ajoutez un second témoignage, idéalement d'un autre type de client."
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "product": {
+    "hero": {
+      "eyebrow": "Découvrez",
+      "heading": "La façon la plus simple d'avancer dans votre travail",
+      "supportingText": "Dites en une phrase ce que fait votre produit et à qui il s'adresse."
+    },
+    "intro": {
+      "body": [
+        "Bienvenue. Voici la page de votre produit : ce qu'il fait, à qui il sert et pourquoi il vaut la peine d'être essayé.",
+        "Remplacez ce texte par un bref aperçu du problème que résout votre produit et de la façon dont il le résout."
+      ]
+    },
+    "faq": {
+      "heading": "Questions fréquentes",
+      "questions": [
+        {
+          "question": "Que fait le produit ?",
+          "answer": [
+            "Résumez en une ou deux phrases la tâche principale de votre produit, avec les mots de vos clients."
+          ]
+        },
+        {
+          "question": "Combien ça coûte ?",
+          "answer": [
+            "Expliquez vos formules et vos tarifs, ou indiquez s'il existe un essai ou une offre gratuits."
+          ]
+        },
+        {
+          "question": "Comment commencer ?",
+          "answer": [
+            "Décrivez la première étape, comme l'inscription ou la réservation d'une démo, et ce qui se passe ensuite."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Découvrez les nouveautés",
+      "supportingText": "Chaque version, amélioration et correction, au même endroit."
+    },
+    "changelog": {
+      "linkLabel": "Nouveautés",
+      "listHeading": "Toutes les versions"
+    },
+    "growth": {
+      "highlights": {
+        "heading": "Comment ça marche",
+        "imageAlt": "Illustration d'exemple à remplacer par une capture de votre produit",
+        "rows": [
+          {
+            "heading": "Prêt en quelques minutes",
+            "body": [
+              "Décrivez la première chose qu'un nouveau client fait avec votre produit. Remplacez l'image d'exemple par une capture de cette étape."
+            ]
+          },
+          {
+            "heading": "Des résultats immédiats",
+            "body": [
+              "Montrez ce qui change une fois votre produit adopté. Une capture du résultat parle plus qu'une liste de fonctionnalités."
+            ]
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "Tout ce qu'il vous faut",
+        "features": [
+          {
+            "heading": "Rapide",
+            "supportingText": "Remplacez ce texte par la fonctionnalité que vos clients remarquent en premier, en une phrase."
+          },
+          {
+            "heading": "Flexible",
+            "supportingText": "Ajoutez une deuxième fonctionnalité et le problème qu'elle résout."
+          },
+          {
+            "heading": "Sécurisé",
+            "supportingText": "Terminez par la façon dont vous protégez les données de vos clients."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "En chiffres",
+        "footnote": "Chiffres d'exemple. Remplacez-les par les vôtres.",
+        "stats": [
+          {
+            "value": "10k+",
+            "label": "Utilisateurs actifs"
+          },
+          {
+            "value": "99,9 %",
+            "label": "Disponibilité"
+          },
+          {
+            "value": "4,8/5",
+            "label": "Note moyenne"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Ce qu'en disent nos clients",
+        "quotes": [
+          {
+            "name": "Client d'exemple",
+            "role": "Responsable produit, Société d'exemple",
+            "quote": [
+              "Remplacez ce texte par la citation d'un client satisfait. Une phrase ou deux sur ce qui a changé suffisent."
+            ]
+          },
+          {
+            "name": "Autre client d'exemple",
+            "role": "Fondatrice, Studio d'exemple",
+            "quote": [
+              "Ajoutez une deuxième voix, de préférence celle d'un autre type de client."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Utilisé par les équipes de",
+        "logoNames": [
+          "Client d'exemple un",
+          "Client d'exemple deux",
+          "Client d'exemple trois",
+          "Client d'exemple quatre"
+        ]
+      },
+      "pricing": {
+        "heading": "Des tarifs simples",
+        "footnote": "Offres et prix d'exemple. Remplacez-les par les vôtres.",
+        "free": {
+          "name": "Gratuit",
+          "description": "Pour essayer le produit par vous-même.",
+          "priceLabel": "Gratuit",
+          "features": [
+            "Remplacez ce texte par ce que comprend l'offre gratuite",
+            "Ajoutez une limite, comme un seul projet"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "Pour les indépendants et les petites équipes qui l'utilisent chaque jour.",
+          "highlightLabel": "Le plus choisi",
+          "features": [
+            "Tout ce qu'inclut Gratuit",
+            "Remplacez ce texte par ce qu'ajoute Pro",
+            "Ajoutez une deuxième fonctionnalité Pro"
+          ]
+        },
+        "team": {
+          "name": "Équipe",
+          "description": "Pour les équipes plus grandes aux besoins spécifiques.",
+          "priceLabel": "Contactez-nous",
+          "features": [
+            "Tout ce qu'inclut Pro",
+            "Remplacez ce texte par ce qu'ajoute Équipe",
+            "Ajoutez comment vous accompagnez les grands comptes"
+          ]
+        }
+      }
+    }
   }
 }

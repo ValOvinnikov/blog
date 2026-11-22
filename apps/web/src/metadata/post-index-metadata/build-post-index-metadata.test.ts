@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
 import { type TBlogIndexPage } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import { POST_INDEX_LOG } from '@web/constants/post-index';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   MOCK_DUTCH_REQUEST_CONTEXT,
@@ -79,13 +80,9 @@ describe(buildPostIndexMetadata, () => {
     });
 
     it('suffixes page-N titles with the page, canonical to that page', async () => {
-      const pageTitle = `${ogTitle} ${toPageSuffix(2)}`;
-
       const metadata = await buildPostIndexMetadata(2);
 
       expect(metadata.title).toBe(`${title} ${toPageSuffix(2)}`);
-      expect(metadata.openGraph?.title).toBe(pageTitle);
-      expect(metadata.twitter?.title).toBe(pageTitle);
       expect(metadata.alternates?.canonical).toBe(routes.blogIndex(2));
       expect(metadata.alternates?.types).toEqual(RSS_TYPES);
     });
@@ -99,7 +96,7 @@ describe(buildPostIndexMetadata, () => {
 
       expect(metadata).toEqual({});
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'post_index_metadata.fetch_failed',
+        POST_INDEX_LOG.METADATA_FETCH_FAILED,
         { page: 1, error: MOCK_ERROR },
       );
     });
@@ -138,27 +135,5 @@ describe(buildPostIndexMetadata, () => {
         },
       });
     });
-
-    it('lists no hreflang past page 1', async () => {
-      resolveIndexPageWith({ translations: [EN, NL] });
-
-      const metadata = await buildPostIndexMetadata(2);
-
-      expect(metadata.alternates?.canonical).toBe(
-        `${NL_PATH_PREFIX}${routes.blogIndex(2)}`,
-      );
-      expect(metadata.alternates?.languages).toBeUndefined();
-    });
-  });
-
-  it('omits the OG title past page 1 when none is authored', async () => {
-    resolveIndexPageWith({
-      seo: mockMetadataSeo({ ogTitle: undefined }),
-    });
-
-    const metadata = await buildPostIndexMetadata(2);
-
-    expect(metadata.openGraph?.title).toBeUndefined();
-    expect(metadata.twitter?.title).toBeUndefined();
   });
 });

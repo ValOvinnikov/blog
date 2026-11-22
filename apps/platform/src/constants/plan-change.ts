@@ -1,8 +1,8 @@
-import type {
-  TBillingInterval,
-  UPGRADE_STATE,
-} from '@platform/constants/billing';
-import type { TSellableTenantPlan } from '@shinefold/config/constants';
+import type { UPGRADE_STATE } from '@platform/constants/billing';
+import {
+  type TBillingInterval,
+  type TSellableTenantPlan,
+} from '@shinefold/config/constants';
 import type { TValueOf } from '@shinefold/config/utils';
 
 export type TPlanChoice = {
@@ -23,7 +23,18 @@ export const PLAN_CHANGE_REFUSAL = {
   NOT_ACTIVE: 'NOT_ACTIVE',
   UNCHANGED: 'UNCHANGED',
   CARD_DECLINED: 'CARD_DECLINED',
+  PAYMENT_NOT_CONFIRMED: 'PAYMENT_NOT_CONFIRMED',
+  NO_NEXT_BAND: 'NO_NEXT_BAND',
+  PENDING_CHANGE: 'PENDING_CHANGE',
+  QUOTE_EXPIRED: 'QUOTE_EXPIRED',
 } as const;
+
+export type TPlanChangeRefusalCode = TValueOf<typeof PLAN_CHANGE_REFUSAL>;
+
+export const PLAN_CHANGE_PAYMENT_REFUSALS = [
+  PLAN_CHANGE_REFUSAL.CARD_DECLINED,
+  PLAN_CHANGE_REFUSAL.PAYMENT_NOT_CONFIRMED,
+] as const;
 
 export type TPlanChangeGate =
   | typeof UPGRADE_STATE.NOT_OWNER
@@ -33,4 +44,4 @@ export type TPlanChangeGate =
 export type TPlanChangeRefusal =
   | typeof UPGRADE_STATE.NOT_OWNER
   | typeof UPGRADE_STATE.UNAVAILABLE
-  | TValueOf<typeof PLAN_CHANGE_REFUSAL>;
+  | TPlanChangeRefusalCode;

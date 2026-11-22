@@ -12,8 +12,7 @@ import type { TTenant } from '@shinefold/db/schema/tenants';
 import { sendEmail } from '@shinefold/email';
 import { sanitizeLogMessage } from '@shinefold/insight';
 import {
-  OWNER_EMAIL_RELEASE_FAILED_EVENT,
-  OWNER_EMAIL_SEND_FAILED_EVENT,
+  OWNER_EMAIL_LOG,
   OWNER_INVITE_NUDGE_AFTER_MS,
 } from '@worker/constants/owner-email';
 import { logger } from '@worker/utils/logger/logger';
@@ -38,7 +37,7 @@ export async function sendOwnerEmailOnce(
       ...buildOwnerEmailMessage(target, email),
     });
   } catch (error) {
-    logger.error(OWNER_EMAIL_SEND_FAILED_EVENT, {
+    logger.error(OWNER_EMAIL_LOG.SEND_FAILED, {
       tenantId: tenant.id,
       email,
       error: sanitizeLogMessage(error),
@@ -55,7 +54,7 @@ async function releaseClaim(
   try {
     await releaseTenantOwnerEmail(tenantId, email, claimedAt);
   } catch (error) {
-    logger.error(OWNER_EMAIL_RELEASE_FAILED_EVENT, {
+    logger.error(OWNER_EMAIL_LOG.RELEASE_FAILED, {
       tenantId,
       email,
       error: sanitizeLogMessage(error),

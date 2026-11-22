@@ -5,7 +5,6 @@ import { INSET_SHADOW_TOKENS, SHADOW_TOKENS } from './shadow-tokens';
 
 // Keep these lists, `SHADOW_TOKENS` and `INSET_SHADOW_TOKENS` in sync with the custom tokens in `theme.css` and `platform-theme.css`, or `tailwind-merge` misclassifies or drops them.
 const FONT_SIZE_TOKENS = [
-  'display',
   'hero',
   'title-xl',
   'title-2xl',
@@ -68,8 +67,10 @@ const SPACING_TOKENS = [
   'site-y',
   'card-x',
   'card-y',
-  ...platformTokens('card'),
+  ...platformTokens('card', 'cell-inset'),
 ];
+
+const BORDER_WIDTH_TOKENS = platformTokens('strong');
 
 const RADIUS_TOKENS = [
   'platform',
@@ -101,6 +102,7 @@ export const tv = createTV({
         'font-weight': [{ font: FONT_WEIGHT_TOKENS }],
         leading: [{ leading: LEADING_TOKENS }],
         tracking: [{ tracking: TRACKING_TOKENS }],
+        'border-w': [{ border: BORDER_WIDTH_TOKENS }],
         rounded: [{ rounded: RADIUS_TOKENS }],
         'rounded-t': [{ 'rounded-t': RADIUS_TOKENS }],
         'rounded-b': [{ 'rounded-b': RADIUS_TOKENS }],

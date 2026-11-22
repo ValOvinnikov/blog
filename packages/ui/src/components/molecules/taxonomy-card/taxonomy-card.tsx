@@ -2,6 +2,7 @@ import {
   A_AS_CONST,
   type IWithClassName,
   type IWithDataTestId,
+  TEXT_ROLE,
 } from '@shinefold/config';
 import type { TAnchorElementType } from '@shinefold/config/react';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
@@ -31,7 +32,6 @@ export type TTaxonomyCardProps = IWithClassName &
     postCountLabel: string;
     href: string;
     headingLevel: THeadingLevel;
-    accessibleNameSeparator?: string;
     linkAs?: TAnchorElementType;
     isInteractive?: TTaxonomyCardVariants['isInteractive'];
     children?: TCompoundChildren<typeof TaxonomyCardParts>;
@@ -44,7 +44,6 @@ const TaxonomyCardRoot = ({
   postCountLabel,
   href,
   headingLevel,
-  accessibleNameSeparator = ', ',
   linkAs,
   isInteractive,
   children,
@@ -62,7 +61,7 @@ const TaxonomyCardRoot = ({
 
   return (
     <article className={s.root({ class: className })} data-testid={dataTestId}>
-      <Heading level={headingLevel} visual="card">
+      <Heading level={headingLevel} visual={TEXT_ROLE.CARD_TITLE}>
         <TextLink
           href={href}
           as={LinkComponent}
@@ -72,7 +71,7 @@ const TaxonomyCardRoot = ({
           <span aria-hidden="true">{title}</span>
           <span className={s.accessibleName()}>
             {title}
-            {accessibleNameSeparator}
+            {', '}
             {postCountLabel}
           </span>
         </TextLink>

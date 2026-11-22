@@ -35,7 +35,7 @@ graph is acyclic
 - `@shinefold/db` is the only package importing the Neon/Drizzle SDKs — Postgres
   data: Auth.js users and sessions, tenants and their domains, memberships and
   invites, admins, site config, feature toggles, owner analytics ids, email
-  config and templates, subscribers, bookmarks, contact-form leads, magic-link send counters, email
+  config and templates, subscribers, bookmarks, contact-form leads, magic-link send counters, AI takeaway generation counts, email
   send and delivery-outcome counts, newsletter post-send claims, Stripe
   billing state, handled Stripe webhook event ids and the Stripe price and promotion-code catalogue, audit events and findings (comments are planned; no table exists yet). It never imports React or `@shinefold/service`
   (siblings, not dependents — `.claude/agents/db.md`), and is **imported only
@@ -374,8 +374,8 @@ except the Gate 0 `board-keeper` dispatch and the board write after
   constants live: `.claude/agents/config.md`.
 - **Read an action result through its outcome guards.** `@shinefold/config`'s
   `isOutcomeSuccess(result)`, `isOutcomeInvalid(result)`,
-  `isOutcomeServerError(result)`, `isOutcomeRefused(result)` and
-  `isOutcomeUnavailable(result)` take the whole result and narrow it — never
+  `isOutcomeServerError(result)`, `isOutcomeRefused(result)`,
+  `isOutcomeUnavailable(result)` and `isOutcomeRateLimited(result)` take the whole result and narrow it — never
   `result.outcome === ACTION_OUTCOME.<X>`. A guard for another outcome is
   added by the change that gives that check its second use, never ahead of
   it. Files still comparing raw outcomes, and what is left to add:

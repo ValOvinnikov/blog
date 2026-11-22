@@ -4,18 +4,10 @@ export const BRAND_VARIANT = {
   PRIMARY: 'PRIMARY',
   SECONDARY: 'SECONDARY',
   BRAND_PRIMARY: 'BRAND_PRIMARY',
+  INK: 'INK',
 } as const;
 
 export type TBrandVariant = TValueOf<typeof BRAND_VARIANT>;
-
-export type TBrandVariantOf<TKeys extends keyof typeof BRAND_VARIANT> =
-  (typeof BRAND_VARIANT)[TKeys];
-
-export const FULL_BRAND_VARIANT_LIST = [
-  BRAND_VARIANT.BRAND_PRIMARY,
-  BRAND_VARIANT.PRIMARY,
-  BRAND_VARIANT.SECONDARY,
-] as const satisfies readonly TBrandVariant[];
 
 export const SPACING_SCALE = {
   NONE: 'NONE',

@@ -9,10 +9,12 @@ export const isCarouselMode: ConditionalPropertyCallback = ({ parent }) =>
   (parent as TMaybeUndefined<{ displayMode?: string }>)?.displayMode ===
   DISPLAY_MODE.CAROUSEL;
 
-export const displayModeField = (options?: {
+export type TDisplayModeFieldOptions = {
   description?: string;
   validation?: StringDefinition['validation'];
-}) =>
+};
+
+export const displayModeField = (options?: TDisplayModeFieldOptions) =>
   tileField({
     name: 'displayMode',
     title: 'Display Mode',

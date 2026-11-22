@@ -1,16 +1,15 @@
+import {
+  PORTABLE_TEXT_BLOCK_TYPE,
+  type TLocaleIsoCode,
+} from '@shinefold/config/constants';
 import type {
   ArticleText,
   Page_cookieStatement,
 } from '@shinefold/config/sanity/generated/types';
 
-import {
-  PORTABLE_TEXT_BLOCK_TYPE,
-  type TLocaleIsoCode,
-} from '@shinefold/config/constants';
-
 import type { TStarterCopy } from './copy/starter-copy';
-import type { TStarterDocument } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
+import type { TStarterDocument } from './starter-document-shape';
 import { pageHeadingBlock, paragraphs, seo } from './starter-fields';
 
 const COOKIE_PREFERENCES_MARK_KEY = 'cookiePreferences';

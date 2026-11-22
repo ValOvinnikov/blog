@@ -17,9 +17,10 @@ import {
 import {
   setupArchived,
   setupLookForm,
-  withLookTenant,
+  withLookPlan,
 } from '@platform/testing/look/look-form-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -44,7 +45,7 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
 
   it('offers no Reset to preset on Free, even with an accent hue off the preset', () => {
     setupLookForm({
-      ...withLookTenant({ plan: TENANT_PLAN.FREE }),
+      ...withLookPlan(TENANT_PLAN.FREE),
       initialValues: {
         ...defaultLookFormValues(),
         accentHue: MOCK_SAVED_ACCENT_HUE,
@@ -63,7 +64,7 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
     { site: 'a Growth site', setup: () => setupLookForm() },
     {
       site: 'an archived Free site',
-      setup: () => setupArchived(withLookTenant({ plan: TENANT_PLAN.FREE })),
+      setup: () => setupArchived(withLookPlan(TENANT_PLAN.FREE)),
     },
   ])('shows no Growth badge on $site', ({ setup }) => {
     setup();
@@ -75,7 +76,7 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
 
   describe('on Free', () => {
     beforeEach(() => {
-      setupLookForm(withLookTenant({ plan: TENANT_PLAN.FREE }));
+      setupLookForm(withLookPlan(TENANT_PLAN.FREE));
     });
 
     it.each([
@@ -107,7 +108,7 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
       });
 
       expect(growthRowBadge(LOOK_ROW.TYPE)).not.toBeInTheDocument();
-      expect(fieldBadges).toHaveLength(2);
+      expect(fieldBadges).toHaveLength(CARD_FIELDS[LOOK_ROW.TYPE].length);
     });
 
     it('never shows the old Growth plan lock wording', () => {

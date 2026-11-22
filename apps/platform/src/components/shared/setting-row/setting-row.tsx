@@ -1,5 +1,4 @@
 import { Field } from '@base-ui/react/field';
-import { LockedReason } from '@platform/components/shared/locked-reason';
 import { textVariants } from '@platform/components/shared/text/text-variants';
 import type { ReactNode } from 'react';
 
@@ -9,8 +8,8 @@ export type TSettingRowProps = {
   label: string;
   description?: string;
   isNested?: boolean;
-  isLocked?: boolean;
-  lockedReason?: string;
+  status?: ReactNode;
+  error?: string;
   children: ReactNode;
   className?: string;
 };
@@ -19,8 +18,8 @@ export const SettingRow = ({
   label,
   description,
   isNested = false,
-  isLocked = false,
-  lockedReason,
+  status,
+  error,
   children,
   className,
 }: TSettingRowProps) => {
@@ -30,10 +29,11 @@ export const SettingRow = ({
     label: labelSlot,
     description: descriptionSlot,
     control,
+    error: errorSlot,
   } = settingRowVariants({ isNested });
 
   return (
-    <Field.Root className={root({ class: className })}>
+    <Field.Root className={root({ class: className })} invalid={Boolean(error)}>
       <div className={content()}>
         <span className={labelSlot()}>{label}</span>
         {description && (
@@ -46,8 +46,11 @@ export const SettingRow = ({
             {description}
           </Field.Description>
         )}
-        {isLocked && lockedReason && (
-          <LockedReason>{lockedReason}</LockedReason>
+        {status}
+        {error && (
+          <Field.Error match={true} className={errorSlot()}>
+            {error}
+          </Field.Error>
         )}
       </div>
       <div className={control()}>{children}</div>

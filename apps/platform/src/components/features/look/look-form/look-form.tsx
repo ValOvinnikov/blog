@@ -20,7 +20,6 @@ import {
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
 import type { TLocaleIsoCode } from '@shinefold/config';
 import { LOOK_FIELD } from '@shinefold/db/constants';
-import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   hasArrayGotMultipleItems,
   isUndefined,
@@ -28,23 +27,19 @@ import {
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 
+import type { TLookFormFeatures } from './look-form-features';
+import type { TLookFormTenant } from './look-form-tenant';
 import { lookFormVariants } from './look-form-variants';
 import { useLookFormState } from './use-look-form-state';
 import { useLookOpenRows } from './use-look-open-rows';
 import { useLookUnsavedCards } from './use-look-unsaved-cards';
-
-export type TLookFormTenant = Pick<TTenant, 'id' | 'name' | 'plan'> & {
-  siteHost: string;
-  archivedAt?: Date;
-};
 
 export type TLookFormProps = {
   tenant: TLookFormTenant;
   initialValues: TLookFormValues;
   isOperator: boolean;
   liveLocales: readonly TLocaleIsoCode[];
-  hasReaderAccounts: boolean;
-  hasCookieBanner: boolean;
+  features: TLookFormFeatures;
   savedAt?: Date;
 };
 
@@ -59,11 +54,11 @@ export const LookForm = ({
   initialValues,
   isOperator,
   liveLocales,
-  hasReaderAccounts,
-  hasCookieBanner,
+  features,
   savedAt,
 }: TLookFormProps) => {
-  const { id: tenantId, name: tenantName, siteHost, plan, archivedAt } = tenant;
+  const { siteHost } = tenant;
+  const { hasCookieBanner } = features;
   const layoutRef = useRef<HTMLDivElement>(null);
   const layoutWidth = useElementSize(layoutRef)?.width;
   const { view, hasTabPanels, tabsProps, panelProps } = useViewTabs({
@@ -76,12 +71,9 @@ export const LookForm = ({
   const { groupProps, revealRow, revealCard, engageCardAt, jumpIndex } =
     useLookOpenRows();
   const { lookForm, isPending, form, errorTitle } = useLookFormState({
-    tenantId,
-    tenantName,
+    tenant,
     initialValues,
-    plan,
     savedAt,
-    archivedAt,
     revealInvalidField: (row) => {
       tabsProps.onChange('edit');
       revealRow(row);
@@ -141,8 +133,7 @@ export const LookForm = ({
             >
               <LookPreview
                 liveLocales={liveLocales}
-                hasReaderAccounts={hasReaderAccounts}
-                hasCookieBanner={hasCookieBanner}
+                features={features}
                 siteHost={siteHost}
                 followTarget={toLookFollowTarget(
                   jumpIndex.openRows,

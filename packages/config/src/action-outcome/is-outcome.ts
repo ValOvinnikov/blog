@@ -1,9 +1,8 @@
-import type { TOutcome } from '@shinefold/config/types';
-
 import {
   ACTION_OUTCOME,
   type TActionOutcome,
 } from '@shinefold/config/constants';
+import type { TOutcome } from '@shinefold/config/types';
 
 type TCanBe<
   TResult extends TOutcome<string>,
@@ -23,3 +22,4 @@ export const isOutcomeInvalid = isOutcome(ACTION_OUTCOME.INVALID);
 export const isOutcomeServerError = isOutcome(ACTION_OUTCOME.SERVER_ERROR);
 export const isOutcomeRefused = isOutcome(ACTION_OUTCOME.REFUSED);
 export const isOutcomeUnavailable = isOutcome(ACTION_OUTCOME.UNAVAILABLE);
+export const isOutcomeRateLimited = isOutcome(ACTION_OUTCOME.RATE_LIMITED);

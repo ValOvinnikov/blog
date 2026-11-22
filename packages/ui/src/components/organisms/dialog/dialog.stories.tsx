@@ -43,6 +43,10 @@ type TStory = StoryObj<typeof meta>;
 
 export const Open: TStory = {};
 
+export const OpenDark: TStory = {
+  globals: { theme: 'dark' },
+};
+
 export const Closed: TStory = {
   args: { isOpen: false },
 };
@@ -59,13 +63,9 @@ export const LongContent: TStory = {
   },
 };
 
+// Storybook cannot emulate `prefers-reduced-motion`, so this override reproduces the component's `motion-reduce:` utilities.
 const ReducedMotionDemo = (args: TDialogProps) => (
   <>
-    {/*
-      Storybook has no built-in way to emulate the OS-level
-      `prefers-reduced-motion: reduce` media query, so this scoped override
-      reproduces the component's own `motion-reduce:` utilities.
-    */}
     <style>{`
       [data-testid="dialog-reduced-motion"],
       [data-testid="dialog-backdrop"] {

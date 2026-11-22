@@ -61,7 +61,7 @@ Editors write formatted text in Sanity's Portable Text editor, and the public si
 ## Configuration
 
 - Editors choose the content inside the shapes; which shape a field uses is fixed in the schema.
-- Not plan-gated. Look reaches it through tokens: prose sizes, link and quote colours, the aside and code-block surfaces (`--code-*` properties in `apps/web/index.css`, light and dark). See ./look.md and ./design-tokens-and-surfaces.md.
+- Not plan-gated. Look reaches it through tokens: prose sizes, link and quote colours, the aside and code-block surfaces (`--code-*` properties in `apps/web/index.css`, a light and dark pair that follows the band's `color-scheme`). See ./look.md and ./design-tokens-and-surfaces.md.
 - Aside labels in the post body are fixed catalog copy (`blogPostPage.asideKind.*`), not Voice.
 
 ## Constraints and invariants
@@ -77,7 +77,7 @@ Editors write formatted text in Sanity's Portable Text editor, and the public si
 - Below `lg` the `Prose` container takes the text measure (`proseMeasureCapSlot`) and centres, so its `ch` resolves at the prose text size and headings, paragraphs, tables and expandable sections share one width and left edge. From `lg` each block is capped to the measure instead, left-aligned in its column.
 - `bodyImage` renders `ImageWithCaption` around `SanityImage` (1200px wide, lazy) and renders nothing without an asset. Floats apply from `lg` only, at 12rem; `FULL_BLEED` is wrapped in `data-full-bleed` so `proseMeasureCapSlot` leaves it uncapped.
 - `code` renders `CodeBlock`, which wraps `react-syntax-highlighter` (Prism) with line numbers, highlighted lines and `text` as the default language. It lives in `apps/web` because `@shinefold/ui` takes no third-party highlighter. The Studio code input does not offer a filename, so the filename caption only shows for data that carries one. The scrolling `<pre>` is a keyboard-focusable region named by the fixed `codeBlock.regionLabel` message, with an inset focus ring so the figure's `overflow-hidden` cannot clip it.
-- `aside` renders `DeepAside` with a nested renderer that has no aside type, so asides never nest. Inside a post it shows only at the Deep depth; elsewhere it always shows. Only the post article passes kind labels (`createPostBodyOverride`); other surfaces label an aside with its raw kind value.
+- `aside` renders `@shinefold/ui`'s `Aside` inline, with a nested renderer that has no aside type, so asides never nest. Only the post article passes kind labels (`createPostBodyOverride`); other surfaces label an aside with its raw kind value.
 - `PortableText` merges caller overrides over `baseComponents`; there is one renderer, and modules never define their own.
 - Reading time counts only top-level text blocks (./reading-experience.md); the skim prompt reads only text blocks too (./skim-pipeline.md).
 

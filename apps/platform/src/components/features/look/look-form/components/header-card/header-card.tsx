@@ -71,8 +71,7 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
         field="headerLayout"
         label={t('headerLayoutLabel')}
         hint={t('headerLayoutDescription')}
-        labelId={layoutLock.labelId}
-        growthBadgeId={layoutLock.growthBadgeId}
+        lock={layoutLock}
       >
         <OptionSelect
           appearance={SELECT_APPEARANCE.COMPACT}
@@ -92,8 +91,7 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
           label={t('headerSubmenuStyleLabel')}
           hint={t('headerSubmenuStyleDescription')}
           isGroup={true}
-          labelId={submenuStyleLock.labelId}
-          growthBadgeId={submenuStyleLock.growthBadgeId}
+          lock={submenuStyleLock}
         >
           <SegmentedControl<THeaderSubmenuStyle>
             aria={submenuStyleLock.aria}
@@ -113,8 +111,7 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
         label={t('headerBarStyleLabel')}
         hint={t('headerBarStyleDescription')}
         isGroup={true}
-        labelId={barStyleLock.labelId}
-        growthBadgeId={barStyleLock.growthBadgeId}
+        lock={barStyleLock}
       >
         <SegmentedControl<THeaderBarStyle>
           aria={barStyleLock.aria}

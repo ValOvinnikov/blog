@@ -13,13 +13,15 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  isOutcomeInvalid,
+  isOutcomeSuccess,
   type TActionResult,
 } from '@shinefold/config';
 import type { TOAuthProvider } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
-import { requireSignInAppOwner } from './require-sign-in-app-owner';
+import { resolveWritableSignInApp } from './resolve-writable-sign-in-app';
 import { signInAppProviderSchema } from './sign-in-app-input';
 
 export type TRemoveSignInAppResult = TActionResult<
@@ -33,24 +35,23 @@ export const removeSignInAppAction = async (
   tenantId: string,
   provider: TOAuthProvider,
 ): Promise<TRemoveSignInAppResult> => {
-  const { tenant } = await requireSignInAppOwner(tenantId);
-
-  const parsed = signInAppProviderSchema.safeParse(provider);
-  if (!parsed.success) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
-  const { id, isArchived } = tenant;
-
-  if (isArchived) {
-    return {
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: SIGN_IN_APP_REFUSAL.ARCHIVED,
-    };
-  }
+  const resolved = await resolveWritableSignInApp(
+    tenantId,
+    signInAppProviderSchema,
+    provider,
+  );
+  if (isOutcomeInvalid(resolved)) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+  if (!isOutcomeSuccess(resolved)) return resolved;
+  const {
+    tenant: { id },
+    input: parsedProvider,
+  } = resolved;
 
   try {
     if (
       !(await queries.tenantOAuthCredentials.clearTenantOAuthCredentials(
         id,
-        parsed.data,
+        parsedProvider,
       ))
     ) {
       return {
@@ -65,13 +66,13 @@ export const removeSignInAppAction = async (
       action: AUDIT_ACTION.OAUTH_APP_REMOVED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: id,
-      details: { provider: parsed.data },
+      details: { provider: parsedProvider },
     });
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
     logger.error(SIGN_IN_APP_LOG.REMOVE_FAILED, {
       tenantId: id,
-      provider: parsed.data,
+      provider: parsedProvider,
       ...toLoggableError(error),
     });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);

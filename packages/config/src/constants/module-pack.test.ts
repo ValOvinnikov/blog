@@ -1,5 +1,12 @@
-import { isModuleTypeEntitled, MODULE_PACK } from './module-pack';
+import { CAPABILITY } from './capability';
+import {
+  getModuleCapability,
+  isModuleTypeEntitled,
+  MODULE_PACK,
+} from './module-pack';
 
+const CASE_TITLE = '$behaviour';
+const MOCK_UNKNOWN_TYPE = 'module_unknown';
 const CORE_ONLY = [MODULE_PACK.CORE];
 const EVERY_PACK = [MODULE_PACK.CORE, MODULE_PACK.GROWTH];
 
@@ -31,11 +38,33 @@ describe(isModuleTypeEntitled, () => {
     },
     {
       behaviour: 'never entitles an unknown type',
-      type: 'module_unknown',
+      type: MOCK_UNKNOWN_TYPE,
       packs: EVERY_PACK,
       expected: false,
     },
-  ])('$behaviour', ({ type, packs, expected }) => {
+  ])(CASE_TITLE, ({ type, packs, expected }) => {
     expect(isModuleTypeEntitled(type, packs)).toBe(expected);
+  });
+});
+
+describe(getModuleCapability, () => {
+  it.each([
+    {
+      behaviour: 'names the capability a gated module needs',
+      type: 'module_newsletter',
+      expected: CAPABILITY.NEWSLETTER,
+    },
+    {
+      behaviour: 'names no capability for an ungated module',
+      type: 'module_cta',
+      expected: undefined,
+    },
+    {
+      behaviour: 'names no capability for an unknown type',
+      type: MOCK_UNKNOWN_TYPE,
+      expected: undefined,
+    },
+  ])(CASE_TITLE, ({ type, expected }) => {
+    expect(getModuleCapability(type)).toBe(expected);
   });
 });

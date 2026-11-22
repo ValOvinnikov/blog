@@ -1,5 +1,6 @@
 import {
   CAPABILITY,
+  CAPABILITY_PARENT,
   isComingSoonCapability,
   type TCapability,
   type TMaybeUndefined,
@@ -34,12 +35,11 @@ const CAPABILITY_FIELDS: Record<TCapability, keyof TSettingsFeaturesValues> = {
   [CAPABILITY.CONTACT_FORM]: 'contactFormEnabled',
 };
 
-const PARENT_FIELDS: Partial<
-  Record<TCapability, keyof TSettingsFeaturesValues>
-> = {
-  [CAPABILITY.COMMENTS]: 'readerAccountsEnabled',
-  [CAPABILITY.RATINGS]: 'readerAccountsEnabled',
-  [CAPABILITY.BOOKMARKS]: 'readerAccountsEnabled',
+const parentFieldOf = (
+  capability: TCapability,
+): TMaybeUndefined<keyof TSettingsFeaturesValues> => {
+  const parent = CAPABILITY_PARENT[capability];
+  return parent && CAPABILITY_FIELDS[parent];
 };
 
 export const CAPABILITY_TOGGLES: TCapabilityToggle[] = Object.values(
@@ -48,7 +48,7 @@ export const CAPABILITY_TOGGLES: TCapabilityToggle[] = Object.values(
   capability,
   field: CAPABILITY_FIELDS[capability],
   isComingSoon: isComingSoonCapability(capability),
-  parentField: PARENT_FIELDS[capability],
+  parentField: parentFieldOf(capability),
 }));
 
 const HIDDEN_CAPABILITIES: TCapability[] = [
@@ -72,7 +72,7 @@ export const featureDefaultsToValues = (
 
 export const clampToEntitlement = (
   values: TSettingsFeaturesValues,
-  entitledCapabilities: TCapability[],
+  entitledCapabilities: readonly TCapability[],
 ): TSettingsFeaturesValues => {
   const clamped = { ...values };
   for (const { capability, field } of CAPABILITY_TOGGLES) {
@@ -86,7 +86,7 @@ export const clampToEntitlement = (
 export const keepStoredOutOfPlan = (
   values: TSettingsFeaturesValues,
   stored: TSettingsFeaturesValues,
-  entitledCapabilities: TCapability[],
+  entitledCapabilities: readonly TCapability[],
 ): TSettingsFeaturesValues => {
   const kept = { ...values };
   for (const { capability, field } of CAPABILITY_TOGGLES) {
@@ -100,7 +100,7 @@ export const keepStoredOutOfPlan = (
 export const listSwitchedOnOutOfPlan = (
   values: TSettingsFeaturesValues,
   stored: TSettingsFeaturesValues,
-  entitledCapabilities: TCapability[],
+  entitledCapabilities: readonly TCapability[],
 ): (keyof TSettingsFeaturesValues)[] =>
   CAPABILITY_TOGGLES.filter(
     ({ capability, field }) =>
@@ -120,3 +120,10 @@ export const withComingSoonOff = (
   }
   return clamped;
 };
+
+export const countToggleChanges = (
+  values: TSettingsFeaturesValues,
+  savedValues: TSettingsFeaturesValues,
+): number =>
+  CAPABILITY_TOGGLES.filter(({ field }) => values[field] !== savedValues[field])
+    .length;

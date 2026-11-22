@@ -1,10 +1,6 @@
 'use client';
 
-import type {
-  IWithClassName,
-  IWithDataTestId,
-  TBrandVariant,
-} from '@shinefold/config';
+import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
 import {
   Carousel,
   type ICarouselProps,
@@ -18,7 +14,6 @@ export interface ILabelledCarouselProps<T>
   renderItem: (args: { item: T; index: number }) => ReactNode;
   getItemKey?: (args: { item: T; index: number }) => Key;
   title: string;
-  tone?: TBrandVariant;
   slideSize?: ICarouselProps<T>['slideSize'];
   contentAlignment?: ICarouselProps<T>['contentAlignment'];
 }
@@ -32,7 +27,6 @@ export const LabelledCarousel = <T,>({
   renderItem,
   getItemKey,
   title,
-  tone,
   slideSize,
   contentAlignment,
   className,
@@ -48,7 +42,6 @@ export const LabelledCarousel = <T,>({
       ariaLabel={t('regionLabel', { title })}
       previousLabel={t('previousAriaLabel')}
       nextLabel={t('nextAriaLabel')}
-      tone={tone}
       slideSize={slideSize}
       contentAlignment={contentAlignment}
       className={className}

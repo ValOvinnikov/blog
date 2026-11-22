@@ -147,7 +147,75 @@
         "metaTitle": "Sample project two — another case study to replace",
         "metaDescription": "A second sample case study created with your site. Replace it with your own work, or delete it."
       }
-    ]
+    ],
+    "growth": {
+      "highlights": {
+        "heading": "How I work",
+        "imageAlt": "Placeholder illustration to replace with an image of your work",
+        "rows": [
+          {
+            "heading": "Start with the brief",
+            "body": [
+              "Every project begins with who it is for and what success looks like. Replace this with how you start yours."
+            ]
+          },
+          {
+            "heading": "Show the result",
+            "body": [
+              "Pair each point with an image of the finished work. Swap the placeholder for a screenshot or photo of your own."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Clients I've worked with",
+        "logoNames": [
+          "Sample client one",
+          "Sample client two",
+          "Sample client three",
+          "Sample client four"
+        ]
+      },
+      "timeline": {
+        "heading": "Experience",
+        "items": [
+          {
+            "marker": "2018",
+            "heading": "Started out on my own",
+            "body": "Replace each milestone with a step in your own career."
+          },
+          {
+            "marker": "2021",
+            "heading": "First long-term client",
+            "body": "Say what changed and what you learned."
+          },
+          {
+            "marker": "Today",
+            "heading": "Taking on new projects",
+            "body": "Finish with where you are now and what you are looking for."
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "What clients say",
+        "quotes": [
+          {
+            "name": "Sample client",
+            "role": "Founder, Sample Studio",
+            "quote": [
+              "Replace this with a quote from someone you have worked with. A sentence or two about the result reads best."
+            ]
+          },
+          {
+            "name": "Another sample client",
+            "role": "Head of Marketing, Sample Company",
+            "quote": [
+              "Add a second voice, ideally about a different kind of project."
+            ]
+          }
+        ]
+      }
+    }
   },
   "personal": {
     "hero": {
@@ -190,6 +258,45 @@
     "writing": {
       "linkLabel": "Writing",
       "listHeading": "All posts"
+    },
+    "growth": {
+      "timeline": {
+        "heading": "My path so far",
+        "items": [
+          {
+            "marker": "2016",
+            "heading": "Finished my studies",
+            "body": "Replace each milestone with a step in your own story."
+          },
+          {
+            "marker": "2019",
+            "heading": "Found my field",
+            "body": "Say what drew you to the work you do now."
+          },
+          {
+            "marker": "Today",
+            "heading": "Where I am now",
+            "body": "Finish with what you are working on and what comes next."
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "What I can help with",
+        "features": [
+          {
+            "heading": "Writing",
+            "supportingText": "Replace this with something you are good at."
+          },
+          {
+            "heading": "Ideas",
+            "supportingText": "Add a second strength, in a sentence."
+          },
+          {
+            "heading": "Collaboration",
+            "supportingText": "Finish with how you like to work with others."
+          }
+        ]
+      }
     }
   },
   "docs": {
@@ -271,5 +378,320 @@
         "metaDescription": "A sample guide created with your site. Use it for common problems, their causes and their fixes."
       }
     ]
+  },
+  "business": {
+    "hero": {
+      "eyebrow": "Welcome",
+      "heading": "Clear, reliable help for your business",
+      "supportingText": "Say in a sentence what you do and who you do it for."
+    },
+    "intro": {
+      "body": [
+        "We help our clients get the work done well, on time and without surprises.",
+        "Replace this text with a short overview of your business: what you offer, who it is for and what makes you different."
+      ]
+    },
+    "faq": {
+      "heading": "Frequently asked questions",
+      "questions": [
+        {
+          "question": "What do you offer?",
+          "answer": [
+            "Sum up your main services in a sentence or two, and link to the Services page for the details."
+          ]
+        },
+        {
+          "question": "How much does it cost?",
+          "answer": [
+            "Explain how you price your work, or invite visitors to get in touch for a quote."
+          ]
+        },
+        {
+          "question": "How do we get started?",
+          "answer": [
+            "Describe the first step, such as a short call or a written brief, and what happens after it."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Let's talk",
+      "supportingText": "Tell us what you need and we'll get back to you."
+    },
+    "services": {
+      "title": "Services",
+      "slug": "services",
+      "summary": "What we offer and how we work.",
+      "body": [
+        "Describe each service in a short paragraph: what it includes and who it is for.",
+        "Add prices, packages or examples of past work once you have them."
+      ],
+      "metaTitle": "Services — what we offer and how we work with you",
+      "metaDescription": "A sample services page created with your site. Replace it with what your business offers."
+    },
+    "about": {
+      "title": "About",
+      "slug": "about",
+      "summary": "Who we are and what we stand for.",
+      "body": [
+        "Tell visitors how the business started, who is behind it and what you care about.",
+        "A few lines are enough. Add photos of the team once you have them."
+      ],
+      "metaTitle": "About — who we are and what we stand for",
+      "metaDescription": "A sample about page created with your site. Tell visitors who is behind the business."
+    },
+    "contact": {
+      "title": "Contact",
+      "slug": "contact",
+      "summary": "How to reach us.",
+      "body": [
+        "Give visitors the best way to reach you: an email address, a phone number or both.",
+        "Add your opening hours and where you are based, and say how quickly you usually reply."
+      ],
+      "metaTitle": "Contact — how to reach us and when we reply",
+      "metaDescription": "A sample contact page created with your site. Add your email address, phone number and opening hours."
+    },
+    "growth": {
+      "featureList": {
+        "heading": "What we offer",
+        "features": [
+          {
+            "heading": "Advice",
+            "supportingText": "Replace this with one of your main services, in a sentence."
+          },
+          {
+            "heading": "Delivery",
+            "supportingText": "Add a second service and who it is for."
+          },
+          {
+            "heading": "Support",
+            "supportingText": "Finish with how you look after clients once the work is done."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "In numbers",
+        "footnote": "Sample figures. Replace them with your own.",
+        "stats": [
+          {
+            "value": "10+",
+            "label": "Years in business"
+          },
+          {
+            "value": "250",
+            "label": "Projects delivered"
+          },
+          {
+            "value": "98%",
+            "label": "Clients who return"
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Trusted by",
+        "logoNames": [
+          "Sample client one",
+          "Sample client two",
+          "Sample client three",
+          "Sample client four"
+        ]
+      },
+      "team": {
+        "heading": "Meet the team",
+        "members": [
+          {
+            "name": "Sample team member",
+            "role": "Founder"
+          },
+          {
+            "name": "Another team member",
+            "role": "Project lead"
+          },
+          {
+            "name": "A third team member",
+            "role": "Client support"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "What our clients say",
+        "quotes": [
+          {
+            "name": "Sample client",
+            "role": "Director, Sample Company",
+            "quote": [
+              "Replace this with a quote from a happy client. A sentence or two about the result reads best."
+            ]
+          },
+          {
+            "name": "Another sample client",
+            "role": "Owner, Sample Shop",
+            "quote": [
+              "Add a second voice, ideally from a different kind of client."
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "product": {
+    "hero": {
+      "eyebrow": "Introducing",
+      "heading": "The simplest way to get your work done",
+      "supportingText": "Say in a sentence what your product does and who it is for."
+    },
+    "intro": {
+      "body": [
+        "Welcome. This is the home of your product: what it does, who it helps and why it is worth trying.",
+        "Replace this text with a short overview of the problem your product solves and how it solves it."
+      ]
+    },
+    "faq": {
+      "heading": "Frequently asked questions",
+      "questions": [
+        {
+          "question": "What does the product do?",
+          "answer": [
+            "Sum up the main job your product does in a sentence or two, in the words your customers use."
+          ]
+        },
+        {
+          "question": "How much does it cost?",
+          "answer": [
+            "Explain your plans and prices, or say whether there is a free trial or a free tier."
+          ]
+        },
+        {
+          "question": "How do I get started?",
+          "answer": [
+            "Describe the first step, such as signing up or booking a demo, and what happens after it."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "See what's new",
+      "supportingText": "Every release, improvement and fix, in one place."
+    },
+    "changelog": {
+      "linkLabel": "Changelog",
+      "listHeading": "All releases"
+    },
+    "growth": {
+      "highlights": {
+        "heading": "How it works",
+        "imageAlt": "Placeholder illustration to replace with a screenshot of your product",
+        "rows": [
+          {
+            "heading": "Set it up in minutes",
+            "body": [
+              "Describe the first thing a new customer does with your product. Swap the placeholder for a screenshot of that step."
+            ]
+          },
+          {
+            "heading": "See the result straight away",
+            "body": [
+              "Show what changes once your product is in use. A screenshot of the outcome works better than a list of features."
+            ]
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "Everything you need",
+        "features": [
+          {
+            "heading": "Fast",
+            "supportingText": "Replace this with the feature customers notice first, in a sentence."
+          },
+          {
+            "heading": "Flexible",
+            "supportingText": "Add a second feature and the problem it solves."
+          },
+          {
+            "heading": "Secure",
+            "supportingText": "Finish with how you keep your customers' data safe."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "In numbers",
+        "footnote": "Sample figures. Replace them with your own.",
+        "stats": [
+          {
+            "value": "10k+",
+            "label": "Active users"
+          },
+          {
+            "value": "99.9%",
+            "label": "Uptime"
+          },
+          {
+            "value": "4.8/5",
+            "label": "Average rating"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "What our customers say",
+        "quotes": [
+          {
+            "name": "Sample customer",
+            "role": "Product lead, Sample Company",
+            "quote": [
+              "Replace this with a quote from a happy customer. A sentence or two about what changed reads best."
+            ]
+          },
+          {
+            "name": "Another sample customer",
+            "role": "Founder, Sample Studio",
+            "quote": [
+              "Add a second voice, ideally from a different kind of customer."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Used by teams at",
+        "logoNames": [
+          "Sample customer one",
+          "Sample customer two",
+          "Sample customer three",
+          "Sample customer four"
+        ]
+      },
+      "pricing": {
+        "heading": "Simple pricing",
+        "footnote": "Sample plans and prices. Replace them with your own.",
+        "free": {
+          "name": "Free",
+          "description": "For trying the product on your own.",
+          "priceLabel": "Free",
+          "features": [
+            "Replace this with what the free plan includes",
+            "Add a limit, such as one project"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "For individuals and small teams who use it every day.",
+          "highlightLabel": "Most popular",
+          "features": [
+            "Everything in Free",
+            "Replace this with what Pro adds",
+            "Add a second Pro feature"
+          ]
+        },
+        "team": {
+          "name": "Team",
+          "description": "For larger teams with their own needs.",
+          "priceLabel": "Contact us",
+          "features": [
+            "Everything in Pro",
+            "Replace this with what Team adds",
+            "Add how you support larger customers"
+          ]
+        }
+      }
+    }
   }
 }

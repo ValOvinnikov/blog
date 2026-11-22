@@ -164,28 +164,9 @@ vi.mock('next/font/local', () => ({
   }),
 }));
 
-// next-intl's `Link` reads `usePathname`/`useRouter` off `next/navigation`
-// even when a test never navigates.
-vi.mock('next/navigation', async () => {
-  const { NEXT_NAVIGATION_ERROR } = await import('@shinefold/config/constants');
-  return {
-    notFound: vi.fn(() => {
-      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-    }),
-    redirect: vi.fn(() => {
-      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-    }),
-    permanentRedirect: vi.fn(() => {
-      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-    }),
-    usePathname: vi.fn(() => '/'),
-    useRouter: vi.fn(() => ({
-      push: vi.fn(),
-      replace: vi.fn(),
-      prefetch: vi.fn(),
-      back: vi.fn(),
-      forward: vi.fn(),
-      refresh: vi.fn(),
-    })),
-  };
-});
+// next-intl's `Link` reads `usePathname`/`useRouter` off `next/navigation` even when a test never navigates.
+vi.mock('next/navigation', async () =>
+  (
+    await import('@web/testing/shared/router/next-navigation-mock')
+  ).createNextNavigationMock(),
+);

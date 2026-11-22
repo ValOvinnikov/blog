@@ -77,6 +77,6 @@ An editor shows quotes from clients or readers as social proof. Quotes are reusa
 
 - #5028 — epic: text roles. #5036 gives quotes one shared style.
 - #5047 — epic: plans and entitlements. Proposes Testimonials as a Growth module.
-- #5016 — epic: one-entry skins. The card's and carousel's `tone` props go when band surfaces render their skin.
+- #5016 — epic: one-entry skins. #5023 retires `QuoteCard`'s and `Carousel`'s `tone` props, which the view no longer passes.
 - #4987 — epic: accessible text and colour on the public site.
 - #4456 — the content-alignment help text names the carousel on this module.

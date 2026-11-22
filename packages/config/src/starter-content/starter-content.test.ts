@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { SITE_MESSAGES_BY_LOCALE } from '@shinefold/config/voice';
 
 import {
   LOCALE_ISO_CODES,
@@ -12,8 +11,11 @@ import {
   SEO_OG_TITLE_MAX_LENGTH,
   SITE_TYPE,
 } from '@shinefold/config/constants';
+import { MOCK_PLACEHOLDER_IMAGES } from '@shinefold/config/testing/placeholder-images';
+import { SITE_MESSAGES_BY_LOCALE } from '@shinefold/config/voice';
 
 import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
+import { buildGrowthLayer } from './growth-layer';
 import {
   buildStarterCookieStatement,
   buildStarterDocuments,
@@ -33,10 +35,19 @@ const STARTER_SITE_TYPES = [
   SITE_TYPE.PORTFOLIO,
   SITE_TYPE.PERSONAL,
   SITE_TYPE.DOCS,
+  SITE_TYPE.BUSINESS,
+  SITE_TYPE.PRODUCT,
   SITE_TYPE.BLANK,
 ] as const;
 const LOCALES = Object.values(LOCALE_ISO_CODES);
 const COOKIE_STATEMENT_TYPE = 'page_cookieStatement';
+const BUSINESS_COPY = STARTER_COPY_BY_LOCALE.EN.business;
+const GROWTH_SITE_TYPES = [
+  SITE_TYPE.PORTFOLIO,
+  SITE_TYPE.PERSONAL,
+  SITE_TYPE.BUSINESS,
+  SITE_TYPE.PRODUCT,
+] as const;
 
 const build = (
   siteType: (typeof STARTER_SITE_TYPES)[number] = SITE_TYPE.BLANK,
@@ -62,6 +73,34 @@ function findByType<TType extends TStarterType>(
   return document;
 }
 
+const byId = (documents: TStarterDocumentUnion[], id?: string) =>
+  documents.find(({ _id }) => _id === id);
+
+const pageBehind = (documents: TStarterDocumentUnion[], linkId?: string) => {
+  const link = byId(documents, linkId);
+  return link && 'internalReference' in link
+    ? byId(documents, link.internalReference?._ref)
+    : undefined;
+};
+
+const slugOf = (document?: TStarterDocumentUnion) =>
+  document && 'slug' in document ? document.slug?.current : undefined;
+
+function homeThenHeroTarget(documents: TStarterDocumentUnion[]) {
+  const { hero, modules = [] } = findByType(documents, 'template_home');
+  const heroDocument = byId(documents, hero?._ref);
+  const heroTarget =
+    heroDocument && 'ctaButtons' in heroDocument
+      ? pageBehind(documents, heroDocument.ctaButtons?.[0]?.link?._ref)
+      : undefined;
+
+  return [
+    heroDocument,
+    ...modules.map(({ _ref }) => byId(documents, _ref)),
+    heroTarget,
+  ].map((document) => ({ _type: document?._type }));
+}
+
 function referencedIds(documents: TStarterDocumentUnion[]): string[] {
   const ids: string[] = [];
   JSON.stringify(documents, (key, value: unknown) => {
@@ -71,9 +110,14 @@ function referencedIds(documents: TStarterDocumentUnion[]): string[] {
   return ids;
 }
 
-const everyCombination = STARTER_SITE_TYPES.flatMap((siteType) =>
-  LOCALES.map((locale) => [siteType, locale] as const),
-);
+const inEveryLocale = <TSiteType extends (typeof STARTER_SITE_TYPES)[number]>(
+  siteTypes: readonly TSiteType[],
+) =>
+  siteTypes.flatMap((siteType) =>
+    LOCALES.map((locale) => [siteType, locale] as const),
+  );
+
+const everyCombination = inEveryLocale(STARTER_SITE_TYPES);
 
 describe(buildStarterDocuments, () => {
   it('builds the Blank site from the base documents only', () => {
@@ -210,22 +254,19 @@ describe(buildStarterDocuments, () => {
     '%s in %s seeds a legal hub whose modules link the cookie statement',
     (siteType, locale) => {
       const documents = build(siteType, locale);
-      const byId = (id?: string) => documents.find(({ _id }) => _id === id);
       const { template } = findByType(documents, 'page_legalIndex');
-      const legalTemplate = byId(template._ref);
+      const legalTemplate = byId(documents, template._ref);
       const linkedIds = referencedIds(
         legalTemplate && 'modules' in legalTemplate
           ? (legalTemplate.modules ?? []).flatMap(({ _ref }) => {
-              const module = byId(_ref);
+              const module = byId(documents, _ref);
               return module ? [module] : [];
             })
           : [],
       );
       const linkTargets = linkedIds.flatMap((id) => {
-        const link = byId(id);
-        return link && 'internalReference' in link
-          ? [byId(link.internalReference?._ref)?._type]
-          : [];
+        const page = pageBehind(documents, id);
+        return page ? [page._type] : [];
       });
 
       expect(linkTargets).toEqual([COOKIE_STATEMENT_TYPE]);
@@ -242,6 +283,23 @@ describe(buildStarterDocuments, () => {
     expect(missing).toEqual([]);
   });
 
+  it.each(STARTER_SITE_TYPES)(
+    'the %s site types every module slot as the module it references',
+    (siteType) => {
+      const documents = build(siteType);
+
+      const mismatched = documents.flatMap((document) =>
+        'modules' in document
+          ? (document.modules ?? []).flatMap(({ _type, _ref }) =>
+              byId(documents, _ref)?._type === _type ? [] : [_ref],
+            )
+          : [],
+      );
+
+      expect(mismatched).toEqual([]);
+    },
+  );
+
   it('the Blank home template has no hero and no modules', () => {
     const { hero, modules } = findByType(build(), 'template_home');
 
@@ -253,18 +311,17 @@ describe(buildStarterDocuments, () => {
 
   it('opens the Blog home with a hero pinning a post, then posts, topics and a CTA', () => {
     const documents = build(SITE_TYPE.BLOG);
-    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
     const { hero, modules = [] } = findByType(documents, 'template_home');
-    const heroDocument = byId(hero?._ref);
+    const heroDocument = byId(documents, hero?._ref);
     const pinned =
       heroDocument && 'post' in heroDocument
-        ? byId(heroDocument.post?._ref)
+        ? byId(documents, heroDocument.post?._ref)
         : undefined;
 
     const sequence = [
       heroDocument,
       pinned,
-      ...modules.map(({ _ref }) => byId(_ref)),
+      ...modules.map(({ _ref }) => byId(documents, _ref)),
     ].map((document) => ({ _type: document?._type }));
 
     expect(sequence).toEqual([
@@ -286,19 +343,13 @@ describe(buildStarterDocuments, () => {
 
   it('opens the Personal home with a profile hero, then an introduction, questions and a CTA to the post index', () => {
     const documents = build(SITE_TYPE.PERSONAL);
-    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
     const { hero, modules = [] } = findByType(documents, 'template_home');
     const cta = findByType(documents, 'module_cta');
-    const ctaLink = byId(cta.ctaButtons?.[0]?.link?._ref);
-    const ctaTarget =
-      ctaLink && 'internalReference' in ctaLink
-        ? byId(ctaLink.internalReference?._ref)
-        : undefined;
 
     const sequence = [
-      byId(hero?._ref),
-      ...modules.map(({ _ref }) => byId(_ref)),
-      ctaTarget,
+      byId(documents, hero?._ref),
+      ...modules.map(({ _ref }) => byId(documents, _ref)),
+      pageBehind(documents, cta.ctaButtons?.[0]?.link?._ref),
     ].map((document) => ({ _type: document?._type }));
 
     expect(sequence).toEqual([
@@ -311,24 +362,7 @@ describe(buildStarterDocuments, () => {
   });
 
   it('opens the Docs home with a statement hero linking to the guides, then an introduction and questions', () => {
-    const documents = build(SITE_TYPE.DOCS);
-    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
-    const { hero, modules = [] } = findByType(documents, 'template_home');
-    const heroDocument = byId(hero?._ref);
-    const heroLink =
-      heroDocument && 'ctaButtons' in heroDocument
-        ? byId(heroDocument.ctaButtons?.[0]?.link?._ref)
-        : undefined;
-    const heroTarget =
-      heroLink && 'internalReference' in heroLink
-        ? byId(heroLink.internalReference?._ref)
-        : undefined;
-
-    const sequence = [
-      heroDocument,
-      ...modules.map(({ _ref }) => byId(_ref)),
-      heroTarget,
-    ].map((document) => ({ _type: document?._type }));
+    const sequence = homeThenHeroTarget(build(SITE_TYPE.DOCS));
 
     expect(sequence).toEqual([
       { _type: 'module_heroStatement' },
@@ -352,6 +386,95 @@ describe(buildStarterDocuments, () => {
     );
 
     expect(parents).toEqual([section?._id, section?._id, section?._id]);
+  });
+
+  describe('the Business site', () => {
+    let documents: TStarterDocumentUnion[];
+
+    beforeEach(() => {
+      documents = build(SITE_TYPE.BUSINESS);
+    });
+
+    it('opens the home on a services hero and closes on a contact CTA', () => {
+      const { hero, modules = [] } = findByType(documents, 'template_home');
+      const sections = [hero?._ref, ...modules.map(({ _ref }) => _ref)].map(
+        (id) => byId(documents, id),
+      );
+
+      const sequence = sections.map((document) => ({
+        _type: document?._type,
+        actionTarget:
+          document && 'ctaButtons' in document
+            ? slugOf(
+                pageBehind(documents, document.ctaButtons?.[0]?.link?._ref),
+              )
+            : undefined,
+      }));
+
+      expect(sequence).toEqual([
+        {
+          _type: 'module_heroStatement',
+          actionTarget: BUSINESS_COPY.services.slug,
+        },
+        { _type: 'module_content', actionTarget: undefined },
+        { _type: 'module_faq', actionTarget: undefined },
+        { _type: 'module_cta', actionTarget: BUSINESS_COPY.contact.slug },
+      ]);
+    });
+
+    it('links the navigation to three top-level pages', () => {
+      const { items = [] } = findByType(documents, 'settings_navigation');
+
+      const targets = items.map((item) => {
+        const page = pageBehind(
+          documents,
+          'link' in item ? item.link?._ref : undefined,
+        );
+        return { slug: slugOf(page), hasParent: !!page && 'parent' in page };
+      });
+
+      expect(targets).toEqual([
+        { slug: BUSINESS_COPY.services.slug, hasParent: false },
+        { slug: BUSINESS_COPY.about.slug, hasParent: false },
+        { slug: BUSINESS_COPY.contact.slug, hasParent: false },
+      ]);
+    });
+  });
+
+  describe('the Product site', () => {
+    let documents: TStarterDocumentUnion[];
+
+    beforeEach(() => {
+      documents = build(SITE_TYPE.PRODUCT);
+    });
+
+    it('opens the home on a changelog hero and closes on a changelog CTA', () => {
+      const cta = findByType(documents, 'module_cta');
+
+      const sequence = [
+        ...homeThenHeroTarget(documents),
+        {
+          _type: pageBehind(documents, cta.ctaButtons?.[0]?.link?._ref)?._type,
+        },
+      ];
+
+      expect(sequence).toEqual([
+        { _type: 'module_heroStatement' },
+        { _type: 'module_content' },
+        { _type: 'module_faq' },
+        { _type: 'module_cta' },
+        { _type: 'page_postIndex' },
+        { _type: 'page_postIndex' },
+      ]);
+    });
+
+    it('lists the changelog on the post index template', () => {
+      const { modules = [] } = findByType(documents, 'template_postIndex');
+
+      const listed = modules.map(({ _ref }) => byId(documents, _ref)?._type);
+
+      expect(listed).toEqual(['module_postList']);
+    });
   });
 
   it('the NL home page takes its copy from the Dutch catalogue', () => {
@@ -422,10 +545,191 @@ describe(toStarterSiteType, () => {
     expect(toStarterSiteType(SITE_TYPE.BLOG)).toBe(SITE_TYPE.BLOG);
   });
 
-  it.each([null, SITE_TYPE.BUSINESS])(
-    'starts %s from the Blank site',
+  it('starts a tenant with no site type from the Blank site', () => {
+    expect(toStarterSiteType(null)).toBe(SITE_TYPE.BLANK);
+  });
+});
+
+describe(buildGrowthLayer, () => {
+  const growthCombination = inEveryLocale(GROWTH_SITE_TYPES);
+
+  const layerOf = (
+    siteType: (typeof STARTER_SITE_TYPES)[number],
+    locale: (typeof LOCALES)[number] = LOCALE_ISO_CODES.EN,
+  ) =>
+    buildGrowthLayer({
+      siteType,
+      locale,
+      placeholderImages: MOCK_PLACEHOLDER_IMAGES,
+    });
+
+  const requireLayer = (
+    ...args: Parameters<typeof layerOf>
+  ): NonNullable<ReturnType<typeof layerOf>> => {
+    const layer = layerOf(...args);
+    if (!layer) throw new Error(`no Growth layer for ${args[0]}`);
+    return layer;
+  };
+
+  const homeModuleIds = (documents: TStarterDocumentUnion[]) =>
+    (findByType(documents, 'template_home').modules ?? []).map(
+      ({ _ref }) => _ref,
+    );
+
+  it.each([SITE_TYPE.BLOG, SITE_TYPE.DOCS, SITE_TYPE.BLANK])(
+    'builds no layer for %s',
     (siteType) => {
-      expect(toStarterSiteType(siteType)).toBe(SITE_TYPE.BLANK);
+      expect(layerOf(siteType)).toBeNull();
+    },
+  );
+
+  it.each(growthCombination)(
+    '%s in %s adds only ids the Free site does not seed',
+    (siteType, locale) => {
+      const starterIds = build(siteType, locale).map(({ _id }) => _id);
+      const layerIds = requireLayer(siteType, locale).documents.map(
+        ({ _id }) => _id,
+      );
+
+      expect(new Set(layerIds).size).toBe(layerIds.length);
+      expect(layerIds.filter((id) => starterIds.includes(id))).toEqual([]);
+    },
+  );
+
+  it.each(growthCombination)(
+    '%s in %s builds references that resolve to the site or a placeholder image',
+    (siteType, locale) => {
+      const { documents } = requireLayer(siteType, locale);
+      const knownIds = [...build(siteType, locale), ...documents].map(
+        ({ _id }) => _id,
+      );
+      const placeholderIds: string[] = Object.values(MOCK_PLACEHOLDER_IMAGES);
+
+      const dangling = referencedIds(documents).filter(
+        (id) => !knownIds.includes(id) && !placeholderIds.includes(id),
+      );
+
+      expect(dangling).toEqual([]);
+    },
+  );
+
+  it.each(growthCombination)(
+    '%s in %s writes every localised value in that locale',
+    (siteType, locale) => {
+      const languages = new Set<unknown>();
+      JSON.stringify(requireLayer(siteType, locale).documents, (key, value) => {
+        if (key === 'language') languages.add(value);
+        return value;
+      });
+
+      expect([...languages]).toEqual([locale]);
+    },
+  );
+
+  it.each(GROWTH_SITE_TYPES)(
+    'the %s home slots each reference a layer document of their type',
+    (siteType) => {
+      const { documents, homeSlots } = requireLayer(siteType);
+
+      const mismatched = homeSlots.flatMap(({ slot: { _ref, _type } }) =>
+        byId(documents, _ref)?._type === _type ? [] : [_ref],
+      );
+
+      expect(mismatched).toEqual([]);
+    },
+  );
+
+  it.each([
+    [
+      SITE_TYPE.PORTFOLIO,
+      [
+        'module_content',
+        'module_featureHighlights',
+        'module_logoWall',
+        'module_timeline',
+        'module_testimonial',
+        'module_cta',
+      ],
+    ],
+    [
+      SITE_TYPE.PERSONAL,
+      [
+        'module_content',
+        'module_timeline',
+        'module_featureList',
+        'module_faq',
+        'module_cta',
+      ],
+    ],
+    [
+      SITE_TYPE.BUSINESS,
+      [
+        'module_content',
+        'module_featureList',
+        'module_stats',
+        'module_logoWall',
+        'module_team',
+        'module_testimonial',
+        'module_faq',
+        'module_cta',
+      ],
+    ],
+    [
+      SITE_TYPE.PRODUCT,
+      [
+        'module_content',
+        'module_featureHighlights',
+        'module_featureList',
+        'module_stats',
+        'module_testimonial',
+        'module_logoWall',
+        'module_pricing',
+        'module_faq',
+        'module_cta',
+      ],
+    ],
+  ] as const)(
+    'places the %s Growth sections in the Free home',
+    (siteType, expected) => {
+      const starter = build(siteType);
+      const { documents, homeSlots } = requireLayer(siteType);
+      const home = homeSlots.reduce((ids, { slot, after }) => {
+        const index = ids.indexOf(after);
+        return [...ids.slice(0, index + 1), slot._ref, ...ids.slice(index + 1)];
+      }, homeModuleIds(starter));
+
+      expect(
+        home.map((id) => byId([...starter, ...documents], id)?._type),
+      ).toEqual(expected);
+    },
+  );
+
+  it.each([
+    SITE_TYPE.PORTFOLIO,
+    SITE_TYPE.BUSINESS,
+    SITE_TYPE.PRODUCT,
+  ] as const)('gives the %s logo wall the logo placeholder', (siteType) => {
+    const logoWall = findByType(
+      requireLayer(siteType).documents,
+      'module_logoWall',
+    );
+
+    expect(
+      new Set(logoWall.logos?.map(({ image }) => image?.asset?._ref)),
+    ).toEqual(new Set([MOCK_PLACEHOLDER_IMAGES.LOGO]));
+  });
+
+  it.each([SITE_TYPE.PORTFOLIO, SITE_TYPE.PRODUCT] as const)(
+    'gives the %s highlights the illustration placeholder',
+    (siteType) => {
+      const highlights = findByType(
+        requireLayer(siteType).documents,
+        'module_featureHighlights',
+      );
+
+      expect(
+        new Set(highlights.highlights?.map(({ image }) => image?.asset?._ref)),
+      ).toEqual(new Set([MOCK_PLACEHOLDER_IMAGES.ILLUSTRATION]));
     },
   );
 });

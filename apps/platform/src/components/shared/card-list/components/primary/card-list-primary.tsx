@@ -1,7 +1,8 @@
 import { cardListVariants } from '@platform/components/shared/card-list/card-list-variants';
+import type { ReactNode } from 'react';
 
 export type TCardListPrimaryProps = {
-  children: string;
+  children: ReactNode;
 };
 
 export const CardListPrimary = ({ children }: TCardListPrimaryProps) => {

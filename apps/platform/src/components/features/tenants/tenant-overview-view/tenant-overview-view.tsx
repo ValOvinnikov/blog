@@ -1,3 +1,4 @@
+import { GrantsCard } from '@platform/components/features/entitlement-grants/grants-card';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
 import { LiveDomainCard } from '@platform/components/features/tenants/live-domain-card';
@@ -8,17 +9,21 @@ import { RecentActivityCard } from '@platform/components/features/tenants/recent
 import { TenantOverviewFocusProvider } from '@platform/components/features/tenants/tenant-overview-focus-provider';
 import { TenantOverviewHeader } from '@platform/components/features/tenants/tenant-overview-header';
 import { TenantSuspensionControl } from '@platform/components/features/tenants/tenant-suspension-control';
+import { UsageSection } from '@platform/components/features/usage/usage-section';
 import { DetailCardSkeleton } from '@platform/components/shared/detail-card-skeleton';
 import { DOMAIN_CARD_ROW_COUNT } from '@platform/constants/domain';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
+import { hasStoredSubscription } from '@platform/server/billing/upgrade-state-for';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { loadOperatorSuspension } from '@platform/server/tenants/load-operator-suspension';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { env } from '@platform/utils/env/env';
+import { toGrantTarget } from '@platform/utils/grant-target/grant-target';
 import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { toGrantRows } from '@platform/utils/to-grant-rows/to-grant-rows';
 import { AUDIT_TARGET_TYPE, FINDING_STATUS } from '@shinefold/config';
 import { queries, TENANT_STATUS } from '@shinefold/db';
 import { isNull, isUndefined } from '@shinefold/utils/primitives';
@@ -48,18 +53,23 @@ export const TenantOverviewView = async ({
   } = tenant;
   const clientTenant = toClientTenant(tenant);
   const domainVerificationStatus = getDomainVerificationStatus(primaryDomain);
-  const [owner, auditEvents, findings, suspension, newsletterPausedAt] =
-    await Promise.all([
-      queries.memberships.getTenantOwnerMembership(id),
-      queries.auditEvents.listAuditEventsForTarget(
-        AUDIT_TARGET_TYPE.TENANT,
-        id,
-        { limit: 5 },
-      ),
-      queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
-      loadOperatorSuspension(tenant),
-      queries.emailConfig.getNewsletterPausedAt(id),
-    ]);
+  const [
+    owner,
+    auditEvents,
+    findings,
+    suspension,
+    newsletterPausedAt,
+    listedGrants,
+  ] = await Promise.all([
+    queries.memberships.getTenantOwnerMembership(id),
+    queries.auditEvents.listAuditEventsForTarget(AUDIT_TARGET_TYPE.TENANT, id, {
+      limit: 5,
+    }),
+    queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
+    loadOperatorSuspension(tenant),
+    queries.emailConfig.getNewsletterPausedAt(id),
+    queries.tenantEntitlementGrants.listEntitlementGrants(id),
+  ]);
   const canChangeSuspension =
     viewer.isSuperAdmin && !isArchived && status !== TENANT_STATUS.ARCHIVED;
   const isSuspensionControlShown =
@@ -76,14 +86,32 @@ export const TenantOverviewView = async ({
         <TenantProvisioningSection
           tenant={clientTenant}
           owner={owner}
-          isPrimaryCustom={isCustomDomain(
-            primaryDomain,
-            env.TENANT_ROOT_DOMAIN,
-          )}
+          lockFlags={{
+            isPrimaryCustom: isCustomDomain(
+              primaryDomain,
+              env.TENANT_ROOT_DOMAIN,
+            ),
+            isSubscribed: hasStoredSubscription(tenant),
+          }}
           isStudioReinviteUnsent={
             !isNull(unsentReinviteFormerOwnerEmailEncrypted)
           }
         />
+
+        <GrantsCard
+          grants={toGrantRows(listedGrants, plan, new Date())}
+          target={toGrantTarget(tenant, viewer.isSuperAdmin)}
+        />
+
+        {!isArchived && (
+          <UsageSection
+            tenant={tenant}
+            links={{
+              languages: adminRoutes.languages(id),
+              team: adminRoutes.tenantTeam(id),
+            }}
+          />
+        )}
 
         <FindingsCard tenantId={id} findings={findings} />
 

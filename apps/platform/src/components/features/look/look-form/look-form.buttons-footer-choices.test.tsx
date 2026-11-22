@@ -1,12 +1,12 @@
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { screen, within } from '@platform/testing/custom-render';
+import { screen } from '@platform/testing/custom-render';
 import { FOOTER_LAYOUT_LABEL } from '@platform/testing/look/look-form-fixtures';
 import {
   chooseSegment,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
-import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
+import { saveChosenStyle } from '@platform/testing/look/look-form-save';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import {
   BRAND_VARIANT,
@@ -65,7 +65,7 @@ describe(`<${LookForm.name}/>`, () => {
       {
         row: LOOK_ROW.FOOTER,
         group: LOOK_FORM.footerBackgroundLabel,
-        option: LOOK_FORM.footerBackgroundOptionLabel.SECONDARY,
+        option: LOOK_FORM.skinLabel.SECONDARY,
         saved: { footerBackground: BRAND_VARIANT.SECONDARY },
       },
       {
@@ -86,18 +86,8 @@ describe(`<${LookForm.name}/>`, () => {
         option: LOOK_FORM.languageSwitcherOptionLabel.CODES,
         saved: { languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES },
       },
-    ])(
-      'saves the chosen $group style',
-      async ({ row, group, option, saved }) => {
-        await openLookRow(user, row);
-        const [styleGroup] = screen.getAllByRole('group', { name: group });
-        const optionButton = within(styleGroup!).getByRole('button', {
-          name: option,
-        });
-        await user.click(optionButton);
-
-        await saveAndExpectLook(user, saved);
-      },
+    ])('saves the chosen $group style', (style) =>
+      saveChosenStyle(user, style),
     );
 
     it('marks a changed field as unsaved beside its label until it is changed back', async () => {

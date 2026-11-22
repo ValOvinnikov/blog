@@ -1,5 +1,11 @@
 import { faker } from '@faker-js/faker';
-import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
+import type { TSampleReader } from '@platform/components/features/site-preview/sample-site-header';
+import {
+  LOOK_SAMPLE_BAND_LABEL_TEST_ID,
+  LOOK_SAMPLE_BAND_TEST_ID,
+  LOOK_SAMPLE_BANNER_TEST_ID,
+  LOOK_SAMPLE_TOKENS_TEST_ID,
+} from '@platform/constants/look-sample';
 import {
   SAMPLE_BUSY_BUTTON_TEST_ID,
   SAMPLE_BUSY_STYLE_ATTRIBUTE,
@@ -49,37 +55,51 @@ import {
   HEADER_SUBMENU_STYLE,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
+  SKIN_REGISTRY,
   SPINNER_STYLE,
   type IBusyStyle,
 } from '@shinefold/config';
+import { objectKeys } from '@shinefold/utils/primitives';
 import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 import type { CSSProperties } from 'react';
 
-import { LookSample, type TLookSampleProps } from './look-sample';
+import {
+  LookSample,
+  type TLookSampleHeaderState,
+  type TLookSampleProps,
+} from './look-sample';
 
 faker.seed(5994);
 
-const SUBSCRIBE = 'Subscribe';
-const SIGN_IN = 'Sign in';
-const MENU = 'Menu';
-const POSTS = 'Posts';
 const ENGLISH = 'English';
 const FRANCAIS = 'Français';
 const LANGUAGE_ENGLISH = 'Language: English';
-const CHARTING_THE_NEXT_SEASON = 'Charting the next season';
 const ENGLISH_CODE = LOCALE_ISO_CODES.EN.toUpperCase();
 const FRENCH_CODE = LOCALE_ISO_CODES.FR.toUpperCase();
 const MOCK_DARK_ACCENT = 'oklch(0.7 0.16 28)';
 const MOCK_LOGO_URL = faker.image.url();
 const CURRENT_LANGUAGE_TEST_ID = 'sample-language-code-current';
-const TOPICS = 'Topics';
-const ALL_TOPICS = 'All topics';
 const HARBOUR_NOTES = 'harbour notes';
 const HARBOUR_NOTES_INITIAL = 'H';
+const SKIN_ATTRIBUTE = 'data-skin';
+const SKINS = objectKeys(SKIN_REGISTRY);
+const SUBSCRIBE_BUTTONS_OUTSIDE_BANDS = 3;
 
 const {
   accountHeading: ACCOUNT,
+  subscribeButton: SUBSCRIBE,
+  signIn: SIGN_IN,
+  menuButton: MENU,
+  navPosts: POSTS,
+  navAbout: ABOUT,
+  navTopics: TOPICS,
+  submenuLead: ALL_TOPICS,
+  themeToggleDark: SWITCH_TO_DARK,
+  themeToggleLight: SWITCH_TO_LIGHT,
+  firstCardTitle: FIRST_CARD_TITLE,
+  secondCardTitle: CHARTING_THE_NEXT_SEASON,
   accountMenuAriaLabel: ACCOUNT_MENU,
+  myBookmarks: MY_BOOKMARKS,
   myBookmarksDescription: BOOKMARKS_DESCRIPTION,
   signOut: SIGN_OUT,
   footerArchive: ARCHIVE,
@@ -101,7 +121,14 @@ const {
   quoteRole: QUOTE_ROLE,
   ctaHeading: CTA_HEADING,
   ctaText: CTA_TEXT,
+  bandHeading: BAND_HEADING,
+  bandLink: BAND_LINK,
+  bandCardTitle: BAND_CARD_TITLE,
+  bannerHeading: BANNER_HEADING,
+  bannerText: BANNER_TEXT,
 } = messages.lookPreview;
+
+const { skinLabel: SKIN_LABEL } = messages.lookForm;
 
 const MOCK_BUSY: IBusyStyle = {
   busyStyle: BUSY_BUTTON_STYLE.LABEL,
@@ -123,10 +150,24 @@ const LOOK_SAMPLE_PROPS: TLookSampleProps = {
   header: MOCK_SAMPLE_HEADER_STYLE,
   footer: MOCK_FOOTER,
   busy: MOCK_BUSY,
-  hasReaderAccounts: true,
+  headerState: {
+    reader: { hasAccounts: true, hasBookmarks: true, isSignedIn: false },
+  },
 };
 
 const setup = customRender(LookSample, LOOK_SAMPLE_PROPS);
+
+const withHeaderState = (
+  headerState: Partial<TLookSampleHeaderState>,
+): TLookSampleHeaderState => ({
+  ...LOOK_SAMPLE_PROPS.headerState,
+  ...headerState,
+});
+
+const withReader = (reader: Partial<TSampleReader>): TLookSampleHeaderState =>
+  withHeaderState({
+    reader: { ...LOOK_SAMPLE_PROPS.headerState.reader, ...reader },
+  });
 
 const withinFullHeader = () => {
   const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
@@ -162,14 +203,16 @@ describe(`<${LookSample.name}/>`, () => {
       setup();
     });
 
-    it('shows the tenant name and three Subscribe buttons', () => {
+    it('shows the tenant name and a Subscribe button in the page and in every band', () => {
       const tenantNames = screen.getAllByText(MOCK_TENANT_NAME);
       const subscribeButtons = screen.getAllByRole('button', {
         name: SUBSCRIBE,
       });
 
       expect(tenantNames.length).toBeGreaterThan(0);
-      expect(subscribeButtons).toHaveLength(3);
+      expect(subscribeButtons).toHaveLength(
+        SUBSCRIBE_BUTTONS_OUTSIDE_BANDS + SKINS.length,
+      );
     });
 
     it('keeps the sample out of the tab order and the page outline', () => {
@@ -192,7 +235,7 @@ describe(`<${LookSample.name}/>`, () => {
         screen.getByRole('region', { name: LATEST_POSTS }),
       );
       const linkedCard = latestPosts.getByRole('link', {
-        name: 'Notes from the harbour',
+        name: FIRST_CARD_TITLE,
       });
       const staticCardHeading = latestPosts.getByRole('heading', {
         level: 3,
@@ -223,6 +266,12 @@ describe(`<${LookSample.name}/>`, () => {
       readTimes.forEach((readTime) => {
         expect(latestPosts).toContainElement(readTime);
       });
+    });
+
+    it('shows one section divider for the divider weight to draw on', () => {
+      const divider = screen.getByRole('separator');
+
+      expect(divider).toBeInTheDocument();
     });
 
     it('asks two questions under Questions, answering the first', () => {
@@ -265,6 +314,45 @@ describe(`<${LookSample.name}/>`, () => {
       expect(ctaText).toBeVisible();
     });
 
+    it('shows a band per registry skin, each with a heading, link and card', () => {
+      const bands = screen.getAllByTestId(LOOK_SAMPLE_BAND_TEST_ID);
+      const bandSkins = bands.map((band) => band.getAttribute(SKIN_ATTRIBUTE));
+
+      const bandLabels = bands.map(
+        (band) =>
+          within(band).getByTestId(LOOK_SAMPLE_BAND_LABEL_TEST_ID).textContent,
+      );
+
+      expect(bandSkins).toEqual(SKINS);
+      expect(bandLabels).toEqual(SKINS.map((skin) => SKIN_LABEL[skin]));
+
+      bands.forEach((element) => {
+        const band = within(element);
+
+        expect(
+          band.getByRole('heading', { level: 2, name: BAND_HEADING }),
+        ).toBeVisible();
+        expect(band.getByRole('link', { name: BAND_LINK })).toBeVisible();
+        expect(band.getByRole('link', { name: BAND_CARD_TITLE })).toBeVisible();
+      });
+    });
+
+    it('sets the banner on the Brand tint skin with its heading and text', () => {
+      const banner = screen.getByTestId(LOOK_SAMPLE_BANNER_TEST_ID);
+      const bannerHeading = within(banner).getByRole('heading', {
+        level: 2,
+        name: BANNER_HEADING,
+      });
+      const bannerText = within(banner).getByText(BANNER_TEXT);
+
+      expect(banner).toHaveAttribute(
+        SKIN_ATTRIBUTE,
+        BRAND_VARIANT.BRAND_PRIMARY,
+      );
+      expect(bannerHeading).toBeVisible();
+      expect(bannerText).toBeVisible();
+    });
+
     it('marks the header and the footer as sample parts', () => {
       const header = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
       const footerPart = screen.getByTestId(SAMPLE_FOOTER_PART_TEST_ID);
@@ -281,7 +369,7 @@ describe(`<${LookSample.name}/>`, () => {
     it('opens with a header carrying the brand and two nav links', () => {
       const header = screen.getByRole('banner');
       const postsLink = screen.getByRole('link', { name: POSTS });
-      const aboutLink = screen.getByRole('link', { name: 'About' });
+      const aboutLink = screen.getByRole('link', { name: ABOUT });
 
       expect(header).toHaveTextContent(MOCK_TENANT_NAME);
       expect(postsLink).toBeVisible();
@@ -290,7 +378,7 @@ describe(`<${LookSample.name}/>`, () => {
 
     it('shows the theme toggle and a Sign in pill when the site has reader accounts', () => {
       const themeToggle = screen.getByRole('button', {
-        name: 'Switch to dark theme',
+        name: SWITCH_TO_DARK,
       });
       const signInButton = withinFullHeader().getByRole('button', {
         name: SIGN_IN,
@@ -378,7 +466,7 @@ describe(`<${LookSample.name}/>`, () => {
     setup({ theme: { ...MOCK_SITE_PREVIEW_THEME, isDark: true } });
 
     const themeToggle = screen.getByRole('button', {
-      name: 'Switch to light theme',
+      name: SWITCH_TO_LIGHT,
     });
 
     expect(themeToggle).toBeVisible();
@@ -386,7 +474,7 @@ describe(`<${LookSample.name}/>`, () => {
 
   describe('without reader accounts', () => {
     beforeEach(() => {
-      setup({ hasReaderAccounts: false });
+      setup({ headerState: withReader({ hasAccounts: false }) });
     });
 
     it('shows no Sign in', () => {
@@ -427,7 +515,7 @@ describe(`<${LookSample.name}/>`, () => {
     });
 
     it('opens the account menu from the Account button while signed in', () => {
-      setup({ isSignedIn: true });
+      setup({ headerState: withReader({ isSignedIn: true }) });
       const accountButton = withinFullHeader().getByRole('button', {
         name: ACCOUNT,
       });
@@ -446,13 +534,35 @@ describe(`<${LookSample.name}/>`, () => {
     ])(
       'describes the account links only in the hub panel ($panelStyle)',
       ({ panelStyle, hasDescriptions }) => {
-        setupWithAccount({ panelStyle }, { isSignedIn: true });
+        setupWithAccount(
+          { panelStyle },
+          { headerState: withReader({ isSignedIn: true }) },
+        );
 
         const description = withinFullHeader().queryByText(
           BOOKMARKS_DESCRIPTION,
         );
 
         expect(Boolean(description)).toBe(hasDescriptions);
+      },
+    );
+
+    it.each([
+      { hasBookmarks: true, isListed: true },
+      { hasBookmarks: false, isListed: false },
+    ])(
+      'lists My bookmarks in the account menu only with Bookmarks on ($hasBookmarks)',
+      ({ hasBookmarks, isListed }) => {
+        setup({
+          headerState: withReader({ isSignedIn: true, hasBookmarks }),
+        });
+
+        const accountMenu = withinFullHeader().getByRole('menu', {
+          name: ACCOUNT_MENU,
+        });
+        const bookmarks = within(accountMenu).queryByText(MY_BOOKMARKS);
+
+        expect(Boolean(bookmarks)).toBe(isListed);
       },
     );
 
@@ -511,7 +621,7 @@ describe(`<${LookSample.name}/>`, () => {
   it('keeps the switcher with one live language when told to', () => {
     setup({
       liveLocales: [LOCALE_ISO_CODES.EN],
-      shouldAlwaysShowLanguageSwitcher: true,
+      headerState: withHeaderState({ shouldAlwaysShowLanguageSwitcher: true }),
     });
 
     const current = screen.getByTestId(CURRENT_LANGUAGE_TEST_ID);
@@ -669,7 +779,12 @@ describe(`<${LookSample.name}/>`, () => {
     it.each(Object.values(HEADER_LAYOUT))(
       'shows the same bar with the %s layout',
       (layout) => {
-        setupWithHeader({ layout }, { isSubmenuOpen: true });
+        setupWithHeader(
+          { layout },
+          {
+            headerState: withHeaderState({ isSubmenuOpen: true }),
+          },
+        );
         const menuButton = withinBar().getByRole('button', { name: MENU });
         const postsLink = withinBar().queryByRole('link', { name: POSTS });
         const submenu = withinBar().queryByTestId(SAMPLE_SUBMENU_TEST_ID);
@@ -711,7 +826,12 @@ describe(`<${LookSample.name}/>`, () => {
     it.each(Object.values(HEADER_SUBMENU_STYLE))(
       'draws the %s sub-menu open under the Topics link when asked',
       (submenuStyle) => {
-        setupWithHeader({ submenuStyle }, { isSubmenuOpen: true });
+        setupWithHeader(
+          { submenuStyle },
+          {
+            headerState: withHeaderState({ isSubmenuOpen: true }),
+          },
+        );
 
         const submenu = screen.getByTestId(SAMPLE_SUBMENU_TEST_ID);
         const topicsTrigger = screen.getByText(TOPICS);

@@ -1,11 +1,19 @@
-import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import {
-  NEWSLETTER_LIMIT_NOTICE_KIND,
+  EMAIL_ACCOUNT,
   NEWSLETTER_SKIP_REASON,
   type TNewsletterSkipReason,
-} from '@shinefold/db/constants';
+} from '@shinefold/config/constants';
+import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@shinefold/db/constants';
 import { getNewsletterPausedAt } from '@shinefold/db/queries/email-config';
-import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends';
+import {
+  getNewsletterLimits,
+  type TNewsletterLimits,
+} from '@shinefold/db/queries/email-usage';
+import {
+  markNewsletterPostSkipped,
+  recordNewsletterPostSendStart,
+  type TNewsletterPostSkipDetails,
+} from '@shinefold/db/queries/newsletter-post-sends';
 import { isEmailAccountConfigured } from '@shinefold/email';
 import {
   NEWSLETTER_SEND_GATE,
@@ -18,11 +26,12 @@ import { loadTenant } from '@worker/units/run-reported-step';
 import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
 import {
+  allowanceLeft,
   nearLimitNotices,
   newsletterSkipReason,
 } from '@worker/utils/newsletter-send/newsletter-limits';
 import { sendOwnerNewsletterNotice } from '@worker/utils/newsletter-send/owner-newsletter-notice';
-import { readNewsletterLimits } from '@worker/utils/newsletter-send/read-newsletter-limits';
+import type { TNewsletterPost } from '@worker/utils/newsletter-send/read-newsletter-post';
 import { readReputationPace } from '@worker/utils/newsletter-send/reputation-pace';
 
 export type TNewsletterSendGateResult =
@@ -30,21 +39,36 @@ export type TNewsletterSendGateResult =
   | { gate: typeof NEWSLETTER_SEND_GATE.SKIPPED }
   | { gate: typeof NEWSLETTER_SEND_GATE.NOT_CONFIGURED };
 
+export type TNewsletterSendGateInput = {
+  tenantId: string;
+  postId: string;
+  claimedAt: string;
+  post: TNewsletterPost;
+};
+
 async function skip(
-  tenantId: string,
-  postId: string,
+  { tenantId, postId, post }: TNewsletterSendGateInput,
   reason: TNewsletterSkipReason,
+  limits?: TNewsletterLimits,
 ): Promise<TNewsletterSendGateResult> {
-  await markNewsletterPostSkipped(tenantId, postId, reason);
+  const details: TNewsletterPostSkipDetails = {
+    postTitle: post.title,
+    postPublishedAt: new Date(post.publishedAt),
+    ...(limits && {
+      emailsNeeded: limits.activeCount,
+      allowanceLeft: allowanceLeft(limits),
+    }),
+  };
+  await markNewsletterPostSkipped(tenantId, postId, reason, details);
   return { gate: NEWSLETTER_SEND_GATE.SKIPPED };
 }
 
 export async function gateNewsletterSend(
-  tenantId: string,
-  postId: string,
+  input: TNewsletterSendGateInput,
 ): Promise<TNewsletterSendGateResult> {
   'use step';
 
+  const { tenantId, postId, claimedAt, post } = input;
   if (!isEmailAccountConfigured(EMAIL_ACCOUNT.TENANT)) {
     logger.error(NEWSLETTER_SEND_LOG.NO_TENANT_MAIL_KEY, { tenantId, postId });
     return { gate: NEWSLETTER_SEND_GATE.NOT_CONFIGURED };
@@ -56,26 +80,31 @@ export async function gateNewsletterSend(
 
   const tenant = await loadTenant(tenantId);
   if (await getNewsletterPausedAt(tenantId)) {
-    return skip(tenantId, postId, NEWSLETTER_SKIP_REASON.SITE_PAUSED);
+    return skip(input, NEWSLETTER_SKIP_REASON.SITE_PAUSED);
   }
 
   const pace = await readReputationPace(tenant, { isOperatorAlerted: true });
   if (pace === NEWSLETTER_SEND_PACE.STOPPED) {
-    return skip(tenantId, postId, NEWSLETTER_SKIP_REASON.REPUTATION_STOP);
+    return skip(input, NEWSLETTER_SKIP_REASON.REPUTATION_STOP);
   }
 
-  const limits = await readNewsletterLimits(tenant);
+  const limits = await getNewsletterLimits(tenant);
   const skipReason = newsletterSkipReason(limits);
   if (skipReason) {
     await sendOwnerNewsletterNotice(
       tenant,
       NEWSLETTER_LIMIT_NOTICE_KIND.SENDING_PAUSED,
       limits,
-      skipReason,
+      { skipReason, postTitle: post.title },
     );
-    return skip(tenantId, postId, skipReason);
+    return skip(input, skipReason, limits);
   }
 
+  await recordNewsletterPostSendStart(tenantId, postId, new Date(claimedAt), {
+    postTitle: post.title,
+    postPublishedAt: new Date(post.publishedAt),
+    recipientCount: limits.activeCount,
+  });
   for (const kind of nearLimitNotices(limits)) {
     await sendOwnerNewsletterNotice(tenant, kind, limits);
   }

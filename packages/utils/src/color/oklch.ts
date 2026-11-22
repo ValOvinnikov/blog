@@ -2,10 +2,13 @@ import {
   clampRgb,
   converter,
   formatHex,
+  interpolate,
   type Rgb,
   toGamut,
   wcagContrast,
 } from 'culori';
+
+import { isUndefined } from '@shinefold/utils/primitives';
 
 export function oklchToHex(l: number, c: number, h: number): string {
   return formatHex({ mode: 'oklch', l, c, h });
@@ -16,6 +19,25 @@ export function hexToOklch(hex: string): TOklchColor {
   if (!color) throw new Error(`Not a hex colour: ${hex}`);
 
   return { l: color.l, c: color.c, h: color.h ?? 0 };
+}
+
+/** CSS `color-mix(in oklch, base, toward share)`, hue taking the shorter arc. */
+export function mixOklch(
+  base: TOklchColor,
+  toward: TOklchColor,
+  share: number,
+): TOklchColor {
+  const { l, c, h, alpha } = interpolate(
+    [
+      { mode: 'oklch', ...base },
+      { mode: 'oklch', ...toward },
+    ],
+    'oklch',
+  )(share);
+
+  const hue = ((h ?? 0) % 360) + 360;
+
+  return { l, c, h: hue % 360, ...(isUndefined(alpha) ? {} : { alpha }) };
 }
 
 /** WCAG 2 AA contrast-ratio floor for normal text. */
@@ -67,12 +89,7 @@ function compositeLayers(layers: readonly TOklchColor[], toSrgb: TToSrgb): Rgb {
   );
 }
 
-/**
- * Contrast as a browser could paint it: browsers differ in how they bring an
- * out-of-gamut OKLCH colour into sRGB, so this is the worse of CSS Color 4
- * gamut mapping and per-channel clipping. `backgroundLayers` stack bottom
- * first, over black.
- */
+/** Contrast as a browser could paint it, the worse of CSS Color 4 gamut mapping and per-channel clipping, over `backgroundLayers` stacked bottom first on black. */
 export function renderedContrastRatio(
   foreground: TOklchColor,
   backgroundLayers: readonly TOklchColor[],

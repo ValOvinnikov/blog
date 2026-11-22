@@ -1,9 +1,9 @@
-import { queries } from '@shinefold/db';
 import { service } from '@shinefold/service';
 import { SITEMAP_LOG } from '@web/constants/sitemap';
 import { routing } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import { selectTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { getTenantPageListResults } from '@web/server/tenant/tenant-page-lists/tenant-page-lists';
 import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
@@ -27,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const tenantRow = await resolveRequestTenant();
   const defaultLocale = tenantRow?.locale ?? routing.defaultLocale;
   const liveLocales = tenantRow
-    ? queries.tenants.selectLiveLocales(tenantRow)
+    ? await selectTenantLiveLocales(tenantRow)
     : [routing.defaultLocale];
 
   const [pageLists, translationMapResult] = await Promise.all([

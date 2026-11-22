@@ -1,80 +1,30 @@
 import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
-import type { TMaybeUndefined } from '@shinefold/config/types';
-import {
-  NEWSLETTER_LIMIT_NOTICE_KIND,
-  NEWSLETTER_SKIP_REASON,
-  type TNewsletterLimitNoticeKind,
-  type TNewsletterSkipReason,
-} from '@shinefold/db/constants';
+import type { TNewsletterLimitNoticeKind } from '@shinefold/db/constants';
+import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import { getTenantOwnerEmail } from '@shinefold/db/queries/memberships';
 import {
   markNewsletterLimitNoticeSent,
   releaseNewsletterLimitNotice,
 } from '@shinefold/db/queries/newsletter-post-sends';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import {
-  buildOwnerNewsletterLimitNearEmail,
-  buildOwnerNewsletterPausedEmail,
-  PLATFORM_EMAIL_BRAND_NAME,
-  sendEmail,
-} from '@shinefold/email';
+import { sendEmail } from '@shinefold/email';
 import { sanitizeLogMessage } from '@shinefold/insight';
-import {
-  NEWSLETTER_LIMIT_NEAR_RATIO,
-  NEWSLETTER_SEND_LOG,
-} from '@worker/constants/newsletter-send';
-import { OWNER_DASHBOARD_PATH } from '@worker/constants/owner-email';
+import { NEWSLETTER_SEND_LOG } from '@worker/constants/newsletter-send';
+import { OWNER_SUBSCRIBERS_PATH } from '@worker/constants/owner-email';
 import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
+import { readNewsletterMoveUpOffer } from '@worker/utils/newsletter-send/newsletter-move-up-offer';
 import {
-  sentAfterThisPost,
-  type TNewsletterLimits,
-} from '@worker/utils/newsletter-send/newsletter-limits';
-import { OWNER_DASHBOARD_ACTION_LABEL } from '@worker/utils/owner-email/owner-dashboard-action-label';
+  buildOwnerNewsletterNotice,
+  type TOwnerNewsletterPause,
+} from '@worker/utils/newsletter-send/owner-newsletter-message';
 import { ownerEmailFromAddress } from '@worker/utils/owner-email/owner-email-context';
-import { OWNER_NEWSLETTER_LIMIT_COPY } from '@worker/utils/owner-email/owner-newsletter-limit-copy';
-import { OWNER_NEWSLETTER_PAUSED_COPY } from '@worker/utils/owner-email/owner-newsletter-paused-copy';
-
-function buildNoticeMessage(
-  { name: siteName, locale }: TTenant,
-  kind: TNewsletterLimitNoticeKind,
-  limits: TNewsletterLimits,
-  skipReason: TMaybeUndefined<TNewsletterSkipReason>,
-  dashboardUrl: string,
-) {
-  const intlLocale = locale.toLowerCase();
-  const { format } = new Intl.NumberFormat(intlLocale);
-  const { activeCount, bandCeiling, allowance } = limits;
-  const text = {
-    ...OWNER_NEWSLETTER_LIMIT_COPY[locale],
-    ...OWNER_NEWSLETTER_PAUSED_COPY[locale],
-  }[kind]({
-    siteName,
-    activeCount: format(activeCount),
-    bandCeiling: format(bandCeiling),
-    allowance: format(allowance),
-    sentAfterThisPost: format(sentAfterThisPost(limits)),
-    nearPercent: new Intl.NumberFormat(intlLocale, { style: 'percent' }).format(
-      NEWSLETTER_LIMIT_NEAR_RATIO,
-    ),
-    isOverBand: skipReason === NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND,
-  });
-  const input = {
-    brandName: PLATFORM_EMAIL_BRAND_NAME,
-    ...text,
-    action: { label: OWNER_DASHBOARD_ACTION_LABEL[locale], url: dashboardUrl },
-  };
-
-  return kind === NEWSLETTER_LIMIT_NOTICE_KIND.SENDING_PAUSED
-    ? buildOwnerNewsletterPausedEmail(input)
-    : buildOwnerNewsletterLimitNearEmail(input);
-}
 
 export async function sendOwnerNewsletterNotice(
   tenant: TTenant,
   kind: TNewsletterLimitNoticeKind,
   limits: TNewsletterLimits,
-  skipReason?: TNewsletterSkipReason,
+  pause?: TOwnerNewsletterPause,
 ): Promise<void> {
   const { id: tenantId } = tenant;
   const platformUrl = env.PLATFORM_APP_BASE_URL;
@@ -91,17 +41,18 @@ export async function sendOwnerNewsletterNotice(
   if (!(await markNewsletterLimitNoticeSent(tenantId, kind))) return;
 
   try {
+    const moveUp = await readNewsletterMoveUpOffer(tenant);
     await sendEmail({
       account: EMAIL_ACCOUNT.PLATFORM,
       to: ownerEmail,
       from: ownerEmailFromAddress(),
-      ...buildNoticeMessage(
-        tenant,
+      ...buildOwnerNewsletterNotice(tenant, {
         kind,
         limits,
-        skipReason,
-        new URL(OWNER_DASHBOARD_PATH, platformUrl).toString(),
-      ),
+        pause,
+        moveUp,
+        subscribersUrl: new URL(OWNER_SUBSCRIBERS_PATH, platformUrl).toString(),
+      }),
     });
   } catch (error) {
     logger.error(NEWSLETTER_SEND_LOG.OWNER_EMAIL_FAILED, {

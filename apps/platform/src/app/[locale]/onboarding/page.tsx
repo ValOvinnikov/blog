@@ -1,6 +1,7 @@
 import { OnboardingView } from '@platform/components/features/onboarding/onboarding-view';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import { getSessionEmail } from '@platform/server/auth/get-session-email';
+import { resolveLegalPageUrls } from '@platform/server/legal-pages/resolve-legal-page-urls';
 import { requireOnboardingUser } from '@platform/server/onboarding/require-onboarding-user';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { env } from '@platform/utils/env/env';
@@ -16,10 +17,16 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function OnboardingPage() {
-  const [, locale, accountEmail] = await Promise.all([
+  const [, locale, accountEmail, legalPageUrls] = await Promise.all([
     requireOnboardingUser(),
     getLocale(),
     getSessionEmail(),
+    resolveLegalPageUrls(
+      toLegalPageUrls({
+        marketingSiteUrl: env.MARKETING_SITE_URL,
+        rootDomain: env.TENANT_ROOT_DOMAIN,
+      }),
+    ),
   ]);
 
   return (
@@ -28,7 +35,7 @@ export default async function OnboardingPage() {
     >
       <OnboardingView
         rootDomain={env.TENANT_ROOT_DOMAIN}
-        legalPageUrls={toLegalPageUrls(env.TENANT_ROOT_DOMAIN)}
+        legalPageUrls={legalPageUrls}
         initialLocale={isLocaleIsoCode(locale) ? locale : LOCALE_ISO_CODES.EN}
         accountEmail={accountEmail}
       />

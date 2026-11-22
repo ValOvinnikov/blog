@@ -1,3 +1,4 @@
+export const PROVISION_PATH = '/api/provision';
 export const DEPROVISION_PATH = '/api/deprovision';
 
 export const PROVISIONING_LOG = {

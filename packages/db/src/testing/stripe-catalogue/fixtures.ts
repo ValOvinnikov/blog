@@ -3,6 +3,7 @@ import {
   STRIPE_COUPON_DURATION,
   STRIPE_PRICE_LOOKUP_KEY,
 } from '@shinefold/db/constants';
+import type { TStripePrice } from '@shinefold/db/queries/stripe-catalogue/list-stripe-prices';
 import type { TSaveStripePriceInput } from '@shinefold/db/queries/stripe-catalogue/save-stripe-price';
 import type { TSaveStripePromotionCodeInput } from '@shinefold/db/queries/stripe-catalogue/save-stripe-promotion-code';
 import { createMockFaker } from '@shinefold/db/testing/mock-faker';
@@ -63,6 +64,18 @@ export function mockSaveStripePromotionCodeInput(
     durationInMonths: undefined,
     appliesToProductIds: undefined,
     expiresAt: undefined,
+    ...overrides,
+  };
+}
+
+export function mockStripePrice(
+  overrides: Partial<TStripePrice> = {},
+): TStripePrice {
+  return {
+    lookupKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY,
+    currency: BILLING_CURRENCY.USD,
+    unitAmount: MOCK_DOLLAR_AMOUNT,
+    stripeProductId: MOCK_STRIPE_PRODUCT_ID,
     ...overrides,
   };
 }

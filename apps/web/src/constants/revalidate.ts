@@ -36,18 +36,20 @@ export const REVALIDATE_LOG = {
 
 export const WHOLE_SITE_PURGE_ARGS = ['/', 'layout'] as const;
 
+// Purges every tenant's landing pages: a tenant-scoped pattern matches nothing.
+export const LANDING_ROUTE_PURGE_ARGS = [
+  '/[tenant]/[locale]/[...slug]',
+  'page',
+] as const;
+
 export const TENANT_LOOKUP_FAILED_MESSAGE = 'Tenant lookup failed.';
 
 export const DOCUMENT_NOT_FOUND_REASON = 'document_not_found';
 
 export const FETCH_FAILED_REASON = 'fetch_failed';
 
-export const PATH_UNDERIVABLE_REASON = 'path_underivable';
-
 export const TENANT_UNRESOLVED_REASON = 'tenant_unresolved';
 
 export const REVALIDATE_SIGNATURE_MAX_AGE_MS = 5 * 60 * 1000;
 
 export const SIGNATURE_REFUSED_REASON = 'signature_refused';
-
-export const STARTER_DOCUMENT_ID_PREFIX = 'starter.';

@@ -2,7 +2,6 @@ import { SUBSCRIBER_STATUS } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import {
   insertTestSubscriber,
-  insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
@@ -10,6 +9,8 @@ import {
   MOCK_CONFIRMATION_NOW,
   readTestSubscriber,
 } from '@shinefold/db/testing/subscribers/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
+import { isNull } from '@shinefold/utils/primitives';
 
 import { claimConfirmationSend } from './claim-confirmation-send';
 
@@ -18,6 +19,7 @@ vi.mock('@shinefold/db/client');
 const COOLDOWN_MS = 15 * 60_000;
 
 const db = useQueryTestDb();
+const tenant = useTestTenant(db);
 
 beforeEach(() => {
   vi.useFakeTimers({ now: MOCK_CONFIRMATION_NOW, toFake: ['Date'] });
@@ -26,23 +28,16 @@ beforeEach(() => {
 afterEach(async () => {
   vi.useRealTimers();
   await db().delete(schema.subscribers);
-  await db().delete(schema.tenants);
 });
 
 describe(claimConfirmationSend, () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
   describe('with a pending subscriber', () => {
     let subscriber: schema.TSubscriber;
 
     beforeEach(async () => {
       subscriber = await insertTestSubscriber(
         db(),
-        tenantId,
+        tenant().id,
         MOCK_SUBSCRIBER_EMAIL,
       );
     });
@@ -94,7 +89,7 @@ describe(claimConfirmationSend, () => {
         claimConfirmationSend(subscriber.id, COOLDOWN_MS),
       ]);
 
-      const claims = results.filter((result) => result !== null);
+      const claims = results.filter((result) => !isNull(result));
       expect(claims).toHaveLength(1);
     });
   });
@@ -102,7 +97,7 @@ describe(claimConfirmationSend, () => {
   it('never claims an active subscriber', async () => {
     const { id } = await insertTestSubscriber(
       db(),
-      tenantId,
+      tenant().id,
       MOCK_SUBSCRIBER_EMAIL,
       {
         status: SUBSCRIBER_STATUS.ACTIVE,

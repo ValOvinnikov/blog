@@ -68,12 +68,19 @@ describe(`<${SignInAppCard.name}/>`, () => {
   });
 
   describe('on the shared app', () => {
+    let save: HTMLElement;
+
+    const typeCredentials = async () => {
+      await user.type(clientIdInput(), MOCK_CLIENT_ID);
+      await user.type(secretInput(), MOCK_CLIENT_SECRET);
+    };
+
     beforeEach(() => {
       setup();
+      save = button(SAVE_NAME);
     });
 
     it('shows Save and no Remove', () => {
-      const save = button(SAVE_NAME);
       const remove = queryButton(page.remove);
 
       expect(save).toBeVisible();
@@ -81,8 +88,6 @@ describe(`<${SignInAppCard.name}/>`, () => {
     });
 
     it('marks each empty field invalid, links its error and saves nothing', async () => {
-      const save = button(SAVE_NAME);
-
       await user.click(save);
 
       const clientId = clientIdInput();
@@ -112,11 +117,7 @@ describe(`<${SignInAppCard.name}/>`, () => {
     });
 
     it('saves both fields, then shows the own app with the secret set', async () => {
-      const clientId = clientIdInput();
-      const secret = secretInput();
-      const save = button(SAVE_NAME);
-      await user.type(clientId, MOCK_CLIENT_ID);
-      await user.type(secret, MOCK_CLIENT_SECRET);
+      await typeCredentials();
 
       await user.click(save);
 
@@ -140,29 +141,21 @@ describe(`<${SignInAppCard.name}/>`, () => {
       vi.mocked(saveSignInAppAction).mockResolvedValue({
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
-      const clientId = clientIdInput();
-      const secret = secretInput();
-      const save = button(SAVE_NAME);
-      await user.type(clientId, MOCK_CLIENT_ID);
-      await user.type(secret, MOCK_CLIENT_SECRET);
+      await typeCredentials();
 
       await user.click(save);
 
       const failure = await screen.findByText(page.saveFailed);
       expect(failure).toBeVisible();
-      expect(clientId).toHaveValue(MOCK_CLIENT_ID);
-      expect(secret).toHaveValue(MOCK_CLIENT_SECRET);
+      expect(clientIdInput()).toHaveValue(MOCK_CLIENT_ID);
+      expect(secretInput()).toHaveValue(MOCK_CLIENT_SECRET);
     });
 
     it('clears the failure once a retried save succeeds', async () => {
       vi.mocked(saveSignInAppAction).mockResolvedValueOnce({
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
-      const clientId = clientIdInput();
-      const secret = secretInput();
-      const save = button(SAVE_NAME);
-      await user.type(clientId, MOCK_CLIENT_ID);
-      await user.type(secret, MOCK_CLIENT_SECRET);
+      await typeCredentials();
       await user.click(save);
       await screen.findByText(page.saveFailed);
 
@@ -184,12 +177,14 @@ describe(`<${SignInAppCard.name}/>`, () => {
   });
 
   describe('on the owner’s app', () => {
+    let remove: HTMLElement;
+
     beforeEach(() => {
       setup({ app: OWN_APP });
+      remove = button(page.remove);
     });
 
     it('shows Remove and no Save until a field changes', () => {
-      const remove = button(page.remove);
       const save = queryButton(SAVE_NAME);
 
       expect(remove).toBeVisible();
@@ -231,7 +226,6 @@ describe(`<${SignInAppCard.name}/>`, () => {
     });
 
     it('returns to the shared app after Remove is confirmed', async () => {
-      const remove = button(page.remove);
       await user.click(remove);
       const confirm = await screen.findByRole('button', {
         name: page.removeDialog.confirm,

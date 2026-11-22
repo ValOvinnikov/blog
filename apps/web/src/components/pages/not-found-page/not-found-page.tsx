@@ -1,4 +1,4 @@
-import { ICONS, type TVoicePortableText } from '@shinefold/config';
+import { ICONS, TEXT_ROLE, type TVoicePortableText } from '@shinefold/config';
 import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
@@ -22,10 +22,10 @@ export const NotFoundPage = ({ supportingText }: INotFoundPageProps) => {
   return (
     <main className={s.root()}>
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <Heading level={1} visual="hero">
+      <Heading level={1} visual={TEXT_ROLE.HERO_TITLE}>
         {t('heading')}
       </Heading>
-      <Text className={s.copy()}>
+      <Text textRole={TEXT_ROLE.INTRO} className={s.copy()}>
         <VoiceRichText value={supportingText} />
       </Text>
       <SmartLink href="/" className={s.link()}>

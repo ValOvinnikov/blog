@@ -55,15 +55,11 @@
     "paginationAriaLabel": "Blog pages"
   },
   "blogPostPage": {
-    "depthToggle": {
-      "ariaLabel": "Reading depth",
-      "skim": "30s",
-      "read": "Read",
-      "deep": "Deep"
-    },
-    "skimPanel": {
-      "label": "30-second summary",
-      "readFullArticle": "Read the full article"
+    "postSummary": {
+      "button": "Summary",
+      "title": "Key takeaways",
+      "readTime": "30 sec read",
+      "readFullArticle": "Read the full article · {count} min"
     },
     "asideKind": {
       "WHY_NOT": "Why not X",
@@ -138,6 +134,7 @@
     "emailInvalid": "Enter a valid email address.",
     "sendLimited": "Too many sign-in links were requested for this address. Try again in an hour.",
     "oauthError": "Sign-in failed. Please try again.",
+    "oauthAccountNotLinked": "Google or GitHub hasn't verified this email address. Verify it with them and try again, or sign in with an email link.",
     "accountMenuAriaLabel": "Account menu",
     "signOut": "Sign out",
     "loadingAccountStatus": "Loading account status",
@@ -151,12 +148,16 @@
     "dismissLabel": "Dismiss notification",
     "mergeCountSuffix": " ×{count}"
   },
+  "outOfDateNotice": {
+    "message": "This page is out of date. Reload to continue.",
+    "reloadLabel": "Reload"
+  },
   "bookmarkButton": {
     "save": "Save",
     "saved": "Saved",
     "saveAriaLabel": "Save post",
     "removeAriaLabel": "Remove bookmark",
-    "error": "Couldn't save that. Try again.",
+    "errorSave": "Couldn't save that. Try again.",
     "errorUnavailable": "Bookmarking isn't available on this site right now.",
     "toastSavedMessage": "Saved to bookmarks",
     "toastRemovedMessage": "Removed from bookmarks",
@@ -273,6 +274,8 @@
       "unlinkToastSuccessMessage": "Account unlinked.",
       "unlinkError": "Couldn't unlink. Try again.",
       "unlinkLastMethodError": "That's your only remaining sign-in method — link another before unlinking this one.",
+      "linkNotLinkedError": "That account couldn't be linked. Google or GitHub hasn't verified its email address, or it already signs in to another account here.",
+      "linkError": "Couldn't link that account. Try again.",
       "displayNameLabel": "Display name",
       "displayNameDescription": "Overrides your provider handle wherever your comments appear.",
       "displayNameAriaLabel": "Display name",
@@ -310,12 +313,40 @@
     "promo": {
       "once": "on your first payment",
       "repeating": "for {months, plural, one {# month} other {# months}}"
+    },
+    "compare": {
+      "heading": "Compare plans",
+      "feature": "Feature",
+      "included": "Included",
+      "notIncluded": "Not included",
+      "all": "All",
+      "share": "{count} of {total}",
+      "plans": {
+        "FREE": "Free",
+        "STARTER": "Starter",
+        "GROWTH": "Growth"
+      },
+      "rows": {
+        "LANGUAGES": "Languages",
+        "SEATS": "Team members",
+        "CUSTOM_DOMAIN": "Your own domain",
+        "NO_POWERED_BY_MARK": "No “Powered by” mark",
+        "LOOK_SETTINGS": "Look settings",
+        "SECTION_TYPES": "Page section types",
+        "OWN_ANALYTICS": "Your own analytics tool",
+        "OWN_SIGN_IN_APPS": "Your own sign-in apps",
+        "CONTACT_FORM": "Contact form",
+        "READER_ACCOUNTS": "Reader accounts and bookmarks",
+        "NEWSLETTER_SUBSCRIBERS": "Newsletter subscribers included",
+        "TAKEAWAYS_PER_MONTH": "AI takeaways a month"
+      }
     }
   },
   "consent": {
     "banner": {
       "heading": "Cookies on this site",
       "message": "We use cookies only for what is necessary to run this site, unless you allow external media. You can change your choice at any time via Cookie settings in the footer.",
+      "messageWithAnalytics": "We use cookies only for what is necessary to run this site, unless you allow analytics or external media. You can change your choice at any time via Cookie settings in the footer.",
       "acceptLabel": "Accept all",
       "rejectLabel": "Reject all",
       "settingsLabel": "Settings",
@@ -332,6 +363,10 @@
         "label": "Necessary",
         "description": "Needed for the site to work. Always on."
       },
+      "analytics": {
+        "label": "Analytics",
+        "description": "Measures visits to this site with tools that set their own cookies, such as Google Analytics."
+      },
       "externalMedia": {
         "label": "External media",
         "description": "Content from third-party providers, such as videos and maps, which may set their own cookies."
@@ -346,6 +381,7 @@
   "cookieList": {
     "ariaLabel": "Cookies and browser storage",
     "intro": "Everything below is set by this site and is strictly necessary.",
+    "introWithGoogleAnalytics": "Everything below is set by this site. The Google Analytics cookies are set only if you allow analytics; everything else is strictly necessary.",
     "columns": {
       "name": "Name",
       "purpose": "Purpose",
@@ -358,10 +394,6 @@
       },
       "LANGUAGE": {
         "purpose": "Remembers the language you chose for this site.",
-        "duration": "1 year"
-      },
-      "CURRENCY": {
-        "purpose": "Remembers which currency to show prices in, based on the country you visit from.",
         "duration": "1 year"
       },
       "SESSION": {
@@ -396,16 +428,21 @@
         "purpose": "Keeps the link from your unsubscribe email while you confirm.",
         "duration": "1 hour"
       },
-      "READING_DEPTH": {
-        "purpose": "Remembers how much of each post you chose to read. Kept in your browser’s local storage.",
-        "duration": "Until you clear your browser data"
-      },
       "THEME": {
         "purpose": "Remembers whether you chose the light or dark theme. Kept in your browser’s local storage.",
         "duration": "Until you clear your browser data"
+      },
+      "GOOGLE_ANALYTICS": {
+        "purpose": "Tells visits from different browsers apart, so Google Analytics can count visitors.",
+        "duration": "2 years"
+      },
+      "GOOGLE_ANALYTICS_VISIT": {
+        "purpose": "Keeps track of your current visit for Google Analytics.",
+        "duration": "2 years"
       }
     },
-    "analyticsNote": "Where this site measures visits and page speed, it uses Vercel Web Analytics and Speed Insights. They set no cookies and load regardless of your cookie choice."
+    "analyticsNote": "Where this site measures visits and page speed, it uses Vercel Web Analytics and Speed Insights. They set no cookies and load regardless of your cookie choice.",
+    "plausibleNote": "This site also measures visits with Plausible, which sets no cookies."
   },
   "table": {
     "regionLabel": "Table"

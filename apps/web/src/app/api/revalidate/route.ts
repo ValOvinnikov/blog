@@ -14,6 +14,7 @@ import { resolveWebhookTenant } from '@web/server/revalidate/resolve-webhook-ten
 import { schedulePostPurge } from '@web/server/revalidate/schedule-post-purge/schedule-post-purge';
 import { stampFirstPostPublished } from '@web/server/revalidate/stamp-first-post-published/stamp-first-post-published';
 import { startNewsletterPostSend } from '@web/server/revalidate/start-newsletter-post-send/start-newsletter-post-send';
+import { startSkimGeneration } from '@web/server/revalidate/start-skim-generation/start-skim-generation';
 import { verifyRevalidateSignature } from '@web/server/revalidate/verify-revalidate-signature/verify-revalidate-signature';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
@@ -85,7 +86,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const { _type: type, _id: id, slug, previousSlug } = parsedBody;
+  const { _type: type, _id: id, slug, previousSlug, ...redirect } = parsedBody;
   const tenantId = verified.data;
 
   const tenantRefusal = await resolveWebhookTenant(tenantId, tenantProjectId);
@@ -115,6 +116,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     slug: slug ?? undefined,
     previousSlug: previousSlug ?? undefined,
     operation,
+    redirect,
     tenantId,
     tenant: tenantSanity,
   });
@@ -123,6 +125,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   await stampFirstPostPublished(postEvent);
   await startNewsletterPostSend(postEvent);
   await schedulePostPurge({ ...postEvent, tenant: tenantSanity });
+  startSkimGeneration({ ...postEvent, tenant: tenantSanity });
 
   return NextResponse.json(
     { revalidated, pathPurged, type, id, bookmarksRemoved },

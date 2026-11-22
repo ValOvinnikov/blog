@@ -55,15 +55,11 @@
     "paginationAriaLabel": "Páginas del blog"
   },
   "blogPostPage": {
-    "depthToggle": {
-      "ariaLabel": "Profundidad de lectura",
-      "skim": "30 s",
-      "read": "Leer",
-      "deep": "A fondo"
-    },
-    "skimPanel": {
-      "label": "Resumen en 30 segundos",
-      "readFullArticle": "Leer el artículo completo"
+    "postSummary": {
+      "button": "Resumen",
+      "title": "Puntos clave",
+      "readTime": "30 s de lectura",
+      "readFullArticle": "Leer el artículo completo · {count} min"
     },
     "asideKind": {
       "WHY_NOT": "Por qué no X",
@@ -138,6 +134,7 @@
     "emailInvalid": "Introduzca un correo electrónico válido.",
     "sendLimited": "Se han solicitado demasiados enlaces de inicio de sesión para esta dirección. Vuelva a intentarlo dentro de una hora.",
     "oauthError": "No se pudo iniciar sesión. Vuelva a intentarlo.",
+    "oauthAccountNotLinked": "Google o GitHub no ha verificado esta dirección de correo. Verifíquela con ellos y vuelva a intentarlo, o inicie sesión con un enlace por correo.",
     "accountMenuAriaLabel": "Menú de la cuenta",
     "signOut": "Cerrar sesión",
     "loadingAccountStatus": "Cargando el estado de la cuenta",
@@ -151,12 +148,16 @@
     "dismissLabel": "Cerrar notificación",
     "mergeCountSuffix": " ×{count}"
   },
+  "outOfDateNotice": {
+    "message": "Esta página está desactualizada. Vuelva a cargarla para continuar.",
+    "reloadLabel": "Recargar"
+  },
   "bookmarkButton": {
     "save": "Guardar",
     "saved": "Guardado",
     "saveAriaLabel": "Guardar artículo",
     "removeAriaLabel": "Quitar de guardados",
-    "error": "No se pudo guardar. Vuelva a intentarlo.",
+    "errorSave": "No se pudo guardar. Vuelva a intentarlo.",
     "errorUnavailable": "Los marcadores no están disponibles en este sitio en este momento.",
     "toastSavedMessage": "Añadido a guardados",
     "toastRemovedMessage": "Quitado de guardados",
@@ -273,6 +274,8 @@
       "unlinkToastSuccessMessage": "Cuenta desvinculada.",
       "unlinkError": "No se pudo desvincular. Vuelva a intentarlo.",
       "unlinkLastMethodError": "Es su único método de inicio de sesión disponible — vincule otro antes de desvincular este.",
+      "linkNotLinkedError": "No se pudo vincular esa cuenta. Google o GitHub no ha verificado su dirección de correo, o ya inicia sesión en otra cuenta aquí.",
+      "linkError": "No se pudo vincular esa cuenta. Vuelva a intentarlo.",
       "displayNameLabel": "Nombre visible",
       "displayNameDescription": "Sustituye su nombre de usuario del proveedor en todos los lugares donde aparecen sus comentarios.",
       "displayNameAriaLabel": "Nombre visible",
@@ -310,12 +313,40 @@
     "promo": {
       "once": "en tu primer pago",
       "repeating": "durante {months, plural, one {# mes} other {# meses}}"
+    },
+    "compare": {
+      "heading": "Compara los planes",
+      "feature": "Función",
+      "included": "Incluido",
+      "notIncluded": "No incluido",
+      "all": "Todos",
+      "share": "{count} de {total}",
+      "plans": {
+        "FREE": "Free",
+        "STARTER": "Starter",
+        "GROWTH": "Growth"
+      },
+      "rows": {
+        "LANGUAGES": "Idiomas",
+        "SEATS": "Miembros del equipo",
+        "CUSTOM_DOMAIN": "Tu propio dominio",
+        "NO_POWERED_BY_MARK": "Sin la marca «Powered by»",
+        "LOOK_SETTINGS": "Ajustes de Look",
+        "SECTION_TYPES": "Tipos de sección de página",
+        "OWN_ANALYTICS": "Tu propia herramienta de analítica",
+        "OWN_SIGN_IN_APPS": "Tus propias apps de inicio de sesión",
+        "CONTACT_FORM": "Formulario de contacto",
+        "READER_ACCOUNTS": "Cuentas de lectores y marcadores",
+        "NEWSLETTER_SUBSCRIBERS": "Suscriptores del boletín incluidos",
+        "TAKEAWAYS_PER_MONTH": "Resúmenes con IA al mes"
+      }
     }
   },
   "consent": {
     "banner": {
       "heading": "Cookies en este sitio",
       "message": "Solo usamos las cookies necesarias para que este sitio funcione, a menos que permitas los medios externos. Puedes cambiar tu elección en cualquier momento desde Configuración de cookies en el pie de página.",
+      "messageWithAnalytics": "Solo usamos las cookies necesarias para que este sitio funcione, a menos que permitas la analítica o los medios externos. Puedes cambiar tu elección en cualquier momento desde Configuración de cookies en el pie de página.",
       "acceptLabel": "Aceptar todo",
       "rejectLabel": "Rechazar todo",
       "settingsLabel": "Configuración",
@@ -332,6 +363,10 @@
         "label": "Necesarias",
         "description": "Necesarias para que el sitio funcione. Siempre activas."
       },
+      "analytics": {
+        "label": "Analítica",
+        "description": "Mide las visitas a este sitio con herramientas que establecen sus propias cookies, como Google Analytics."
+      },
       "externalMedia": {
         "label": "Medios externos",
         "description": "Contenido de proveedores externos, como vídeos y mapas, que pueden establecer sus propias cookies."
@@ -346,6 +381,7 @@
   "cookieList": {
     "ariaLabel": "Cookies y almacenamiento del navegador",
     "intro": "Todo lo que aparece a continuación lo establece este sitio y es estrictamente necesario.",
+    "introWithGoogleAnalytics": "Todo lo que aparece a continuación lo establece este sitio. Las cookies de Google Analytics solo se establecen si permites la analítica; todo lo demás es estrictamente necesario.",
     "columns": {
       "name": "Nombre",
       "purpose": "Finalidad",
@@ -358,10 +394,6 @@
       },
       "LANGUAGE": {
         "purpose": "Recuerda el idioma que elegiste para este sitio.",
-        "duration": "1 año"
-      },
-      "CURRENCY": {
-        "purpose": "Recuerda en qué moneda mostrar los precios, según el país desde el que visitas el sitio.",
         "duration": "1 año"
       },
       "SESSION": {
@@ -396,16 +428,21 @@
         "purpose": "Guarda el enlace de tu correo de baja mientras confirmas.",
         "duration": "1 hora"
       },
-      "READING_DEPTH": {
-        "purpose": "Recuerda cuánto de cada artículo elegiste leer. Se guarda en el almacenamiento local de tu navegador.",
-        "duration": "Hasta que borres los datos de tu navegador"
-      },
       "THEME": {
         "purpose": "Recuerda si elegiste el tema claro u oscuro. Se guarda en el almacenamiento local de tu navegador.",
         "duration": "Hasta que borres los datos de tu navegador"
+      },
+      "GOOGLE_ANALYTICS": {
+        "purpose": "Distingue las visitas de distintos navegadores para que Google Analytics pueda contar visitantes.",
+        "duration": "2 años"
+      },
+      "GOOGLE_ANALYTICS_VISIT": {
+        "purpose": "Sigue tu visita actual para Google Analytics.",
+        "duration": "2 años"
       }
     },
-    "analyticsNote": "Cuando este sitio mide las visitas y la velocidad de las páginas, usa Vercel Web Analytics y Speed Insights. No instalan cookies y se cargan sea cual sea tu elección sobre cookies."
+    "analyticsNote": "Cuando este sitio mide las visitas y la velocidad de las páginas, usa Vercel Web Analytics y Speed Insights. No instalan cookies y se cargan sea cual sea tu elección sobre cookies.",
+    "plausibleNote": "Este sitio también mide las visitas con Plausible, que no instala cookies."
   },
   "table": {
     "regionLabel": "Tabla"

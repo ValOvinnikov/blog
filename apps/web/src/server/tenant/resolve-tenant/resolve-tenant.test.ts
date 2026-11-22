@@ -6,8 +6,10 @@ import {
   TENANT_STATUS,
 } from '@shinefold/db/constants';
 import type { TTenant } from '@shinefold/db/schema/tenants';
+import { selectProxyTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { mockServableTenant } from '@web/testing/server/tenant/fixtures';
 import {
+  MOCK_LOCAL_HOST,
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_HOST,
   MOCK_TENANT_ID,
@@ -25,6 +27,7 @@ import {
 faker.seed(7301);
 
 vi.mock('@web/utils/is-production-environment');
+vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales');
 vi.mock(
   'next/cache',
   () => import('@web/testing/server/next-cache/passthrough-next-cache'),
@@ -36,7 +39,6 @@ vi.mock('@shinefold/db', async () => ({
     tenants: {
       listTenants: vi.fn(),
       getTenantById: vi.fn(),
-      selectLiveLocales: vi.fn(),
     },
   },
 }));
@@ -114,33 +116,39 @@ describe(resolveTenant, () => {
       },
     );
 
-    it('falls back to the sole tenant when the host matches no tenant', async () => {
-      vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
-        undefined,
-      );
-
-      await expect(resolveTenant(MOCK_UNKNOWN_HOST)).resolves.toEqual(
-        MOCK_TENANT,
-      );
-    });
-
-    it.each([
-      ['no tenant exists', []],
-      [
-        'several tenants exist',
-        [MOCK_TENANT, mockServableTenant({ id: MOCK_OTHER_TENANT_ID })],
-      ],
-    ])(
-      'resolves undefined when the host matches nothing and %s',
-      async (_, tenants: TTenant[]) => {
+    describe('when the host matches no tenant', () => {
+      beforeEach(() => {
         vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
           undefined,
         );
-        vi.mocked(queries.tenants.listTenants).mockResolvedValue(tenants);
+      });
 
+      it('falls back to the sole tenant on localhost', async () => {
+        await expect(resolveTenant(MOCK_LOCAL_HOST)).resolves.toEqual(
+          MOCK_TENANT,
+        );
+      });
+
+      it('never falls back to the sole tenant for any other host', async () => {
         await expect(resolveTenant(MOCK_UNKNOWN_HOST)).resolves.toBeUndefined();
-      },
-    );
+        expect(queries.tenants.listTenants).not.toHaveBeenCalled();
+      });
+
+      it.each([
+        ['no tenant exists', []],
+        [
+          'several tenants exist',
+          [MOCK_TENANT, mockServableTenant({ id: MOCK_OTHER_TENANT_ID })],
+        ],
+      ])(
+        'resolves undefined on localhost when %s',
+        async (_, tenants: TTenant[]) => {
+          vi.mocked(queries.tenants.listTenants).mockResolvedValue(tenants);
+
+          await expect(resolveTenant(MOCK_LOCAL_HOST)).resolves.toBeUndefined();
+        },
+      );
+    });
   });
 
   describe('in production', () => {
@@ -148,12 +156,12 @@ describe(resolveTenant, () => {
       vi.mocked(isProductionEnvironment).mockReturnValue(true);
     });
 
-    it('never falls back to the sole tenant', async () => {
+    it('never falls back to the sole tenant, even on localhost', async () => {
       vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
         undefined,
       );
 
-      await expect(resolveTenant(MOCK_UNKNOWN_HOST)).resolves.toBeUndefined();
+      await expect(resolveTenant(MOCK_LOCAL_HOST)).resolves.toBeUndefined();
       expect(queries.tenants.listTenants).not.toHaveBeenCalled();
     });
 
@@ -300,7 +308,7 @@ describe(resolveTenantRouting, () => {
     });
 
     it('resolves the routing for the tenant owning the host', async () => {
-      vi.mocked(queries.tenants.selectLiveLocales).mockReturnValue(
+      vi.mocked(selectProxyTenantLiveLocales).mockResolvedValue(
         MOCK_LIVE_LOCALES,
       );
 
@@ -311,9 +319,7 @@ describe(resolveTenantRouting, () => {
         liveLocales: MOCK_LIVE_LOCALES,
         isSecondaryHost: false,
       });
-      expect(queries.tenants.selectLiveLocales).toHaveBeenCalledWith(
-        MOCK_TENANT,
-      );
+      expect(selectProxyTenantLiveLocales).toHaveBeenCalledWith(MOCK_TENANT);
     });
 
     it('marks a host that is not its main address as secondary', async () => {
@@ -334,7 +340,7 @@ describe(resolveTenantRouting, () => {
       vi.mocked(queries.tenants.listTenants).mockResolvedValue([MOCK_TENANT]);
 
       await expect(
-        resolveTenantRouting(MOCK_UNKNOWN_HOST),
+        resolveTenantRouting(MOCK_LOCAL_HOST),
       ).resolves.toMatchObject({
         tenantId: MOCK_TENANT_ID,
         isSecondaryHost: false,
@@ -347,7 +353,7 @@ describe(resolveTenantRouting, () => {
       await expect(
         resolveTenantRouting(MOCK_UNKNOWN_HOST),
       ).resolves.toBeUndefined();
-      expect(queries.tenants.selectLiveLocales).not.toHaveBeenCalled();
+      expect(selectProxyTenantLiveLocales).not.toHaveBeenCalled();
     });
   });
 });

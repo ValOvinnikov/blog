@@ -1,7 +1,7 @@
+import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import { NEWSLETTER_SEND_PACE } from '@worker/constants/newsletter-send';
 import { createMockFaker } from '@worker/testing/mock-faker';
 import type { TNewsletterPageResult } from '@worker/units/newsletter-send/send-newsletter-page';
-import type { TNewsletterLimits } from '@worker/utils/newsletter-send/newsletter-limits';
 import type { TNewsletterPost } from '@worker/utils/newsletter-send/read-newsletter-post';
 
 const mockFaker = createMockFaker(7162);
@@ -25,7 +25,21 @@ export const MOCK_NEWSLETTER_POST: TNewsletterPost = {
   publishedAt: mockFaker.date.past().toISOString(),
   isSendToSubscribersOn: true,
   coverImageUrl: mockFaker.image.url(),
-  takeaways: [mockFaker.lorem.sentence()],
+  summary: [
+    {
+      _type: 'block',
+      _key: mockFaker.string.alphanumeric(8),
+      style: 'normal',
+      children: [
+        {
+          _type: 'span',
+          _key: mockFaker.string.alphanumeric(8),
+          text: mockFaker.lorem.sentence(),
+          marks: [],
+        },
+      ],
+    },
+  ],
 };
 
 export function mockNewsletterLimits(
@@ -47,6 +61,7 @@ export function mockNewsletterPage(
     pace: NEWSLETTER_SEND_PACE.NORMAL,
     lastId: MOCK_SUBSCRIBER_IDS.at(-1),
     isLastPage: true,
+    reachedCount: MOCK_SUBSCRIBER_IDS.length,
     sentCount: MOCK_SUBSCRIBER_IDS.length,
     unreadableCount: 0,
     ...overrides,

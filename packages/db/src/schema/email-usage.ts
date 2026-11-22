@@ -17,6 +17,7 @@ import { tenants } from './tenants';
 
 const DAY_COLUMN = 'day';
 const COUNT_COLUMN = 'count';
+const EMAIL_TYPE_COLUMN = 'email_type';
 
 export const emailSendCounts = pgTable(
   'email_send_counts',
@@ -25,7 +26,7 @@ export const emailSendCounts = pgTable(
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
     day: date(DAY_COLUMN, { mode: 'string' }).notNull(),
-    emailType: text('email_type', {
+    emailType: text(EMAIL_TYPE_COLUMN, {
       enum: Object.values(EMAIL_TYPE) as [TEmailType, ...TEmailType[]],
     }).notNull(),
     count: integer(COUNT_COLUMN).notNull().default(0),
@@ -34,6 +35,21 @@ export const emailSendCounts = pgTable(
 );
 
 export type TEmailSendCount = typeof emailSendCounts.$inferSelect;
+
+export const platformEmailSendCounts = pgTable(
+  'platform_email_send_counts',
+  {
+    day: date(DAY_COLUMN, { mode: 'string' }).notNull(),
+    emailType: text(EMAIL_TYPE_COLUMN, {
+      enum: Object.values(EMAIL_TYPE) as [TEmailType, ...TEmailType[]],
+    }).notNull(),
+    count: integer(COUNT_COLUMN).notNull().default(0),
+  },
+  (row) => [primaryKey({ columns: [row.day, row.emailType] })],
+);
+
+export type TPlatformEmailSendCount =
+  typeof platformEmailSendCounts.$inferSelect;
 
 export const emailDeliveryOutcomeCounts = pgTable(
   'email_delivery_outcome_counts',

@@ -117,6 +117,18 @@ describe(buildTenantSitePaths, () => {
     );
   });
 
+  it('adds a changed document’s addresses in their own language only', () => {
+    const paths = buildTenantSitePaths({
+      tenantId: MOCK_TENANT_ID,
+      locales: [EN, NL],
+      lists: mockTenantPageLists(),
+      localizedDocumentPaths: [{ language: NL, path: MOCK_DOCUMENT_HREF }],
+    });
+
+    expect(paths).toContain(`${NL_ROOT}${MOCK_DOCUMENT_HREF}`);
+    expect(paths).not.toContain(`${EN_ROOT}${MOCK_DOCUMENT_HREF}`);
+  });
+
   it('adds a renamed document’s old address in every locale', () => {
     const previousSlug = faker.lorem.slug();
 

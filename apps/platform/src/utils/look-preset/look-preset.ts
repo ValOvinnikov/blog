@@ -11,6 +11,10 @@ export type TPresetSeededField =
   | 'headerControlStyle'
   | 'headerControlShape'
   | 'navLinkStyle'
+  | 'headingWeight'
+  | 'headingCase'
+  | 'imageProportion'
+  | 'dividerWidth'
   | 'spinnerStyle'
   | 'buttonShape';
 
@@ -23,6 +27,10 @@ const presetSeededValues = (preset: TPresetId): TPresetSeededValues => {
     headerControlStyle,
     headerControlShape,
     navLinkStyle,
+    headingWeight,
+    headingCase,
+    imageProportion,
+    dividerWidth,
     spinnerStyle,
     buttonShape,
   } = PRESET_REGISTRY[preset];
@@ -37,6 +45,10 @@ const presetSeededValues = (preset: TPresetId): TPresetSeededValues => {
     headerControlStyle,
     headerControlShape,
     navLinkStyle,
+    headingWeight,
+    headingCase,
+    imageProportion,
+    dividerWidth,
     spinnerStyle,
     buttonShape,
   };
@@ -81,6 +93,10 @@ export const switchPreset = (
     headerControlStyle: keepCustomised('headerControlStyle'),
     headerControlShape: keepCustomised('headerControlShape'),
     navLinkStyle: keepCustomised('navLinkStyle'),
+    headingWeight: keepCustomised('headingWeight'),
+    headingCase: keepCustomised('headingCase'),
+    imageProportion: keepCustomised('imageProportion'),
+    dividerWidth: keepCustomised('dividerWidth'),
     spinnerStyle: keepCustomised('spinnerStyle'),
     buttonShape: keepCustomised('buttonShape'),
   };

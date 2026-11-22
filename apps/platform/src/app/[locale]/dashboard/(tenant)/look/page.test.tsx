@@ -4,6 +4,7 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockMembershipWithTenant } from '@platform/testing/memberships/membership-with-tenant';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import {
   LOCALE_ISO_CODES,
@@ -29,11 +30,12 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     memberships: {
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },
     tenants: {
-      selectLiveLocales: vi.fn(() => [LOCALE_ISO_CODES.EN]),
+      selectLiveLocalesWithin: vi.fn(() => [LOCALE_ISO_CODES.EN]),
     },
     admins: { getAdminByUserId: vi.fn() },
     siteConfig: { getSiteConfig: getSiteConfigMock },

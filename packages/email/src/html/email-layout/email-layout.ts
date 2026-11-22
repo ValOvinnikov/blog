@@ -1,3 +1,4 @@
+import { renderPreheader } from '@shinefold/email/html/email-document/email-document';
 import {
   renderEmailHeader,
   type TEmailHeaderLogo,
@@ -47,10 +48,6 @@ export function renderEmailShell({
   footerPostalAddress,
 }: TRenderEmailShellInput): string {
   const lockedHtml = `${structuralHtml ?? ''}${actionHtml ?? ''}`;
-  // Inbox preview text has no HTML tag; clients show the first visible text, so it hides in a zero-height div.
-  const preheader = previewText
-    ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(previewText)}</div>`
-    : '';
 
   return [
     '<!doctype html>',
@@ -61,7 +58,7 @@ export function renderEmailShell({
     `<title>${escapeHtml(title)}</title>`,
     '</head>',
     `<body style="margin:0;padding:0;background-color:${palette.surface2};font-family:${FONT_STACK};">`,
-    preheader,
+    renderPreheader(previewText),
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${palette.surface2};">`,
     '<tr><td align="center" style="padding:32px 16px;">',
     `<table role="presentation" width="${SHELL_WIDTH_PX}" cellpadding="0" cellspacing="0" style="max-width:${SHELL_WIDTH_PX}px;width:100%;background-color:${palette.surface};border:1px solid ${palette.border};border-radius:8px;">`,

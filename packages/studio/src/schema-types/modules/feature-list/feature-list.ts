@@ -3,23 +3,12 @@ import {
   CONTENT_ALIGNMENT,
 } from '@shinefold/config/constants';
 import { featureBlockSchema } from '@shinefold/studio/schema-types/documents/blocks/feature/feature';
-import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment-fields/alignment-fields';
-import {
-  appearanceFieldGroups,
-  appearanceFields,
-  appearanceFieldsets,
-} from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
-import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { cardModuleAppearance } from '@shinefold/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { cardAlignmentField } from '@shinefold/studio/schema-types/fields/card-alignment-field/card-alignment-field';
 import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
-import {
-  displayModeField,
-  isCarouselMode,
-} from '@shinefold/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { imageShapeField } from '@shinefold/studio/schema-types/fields/image-shape-field/image-shape-field';
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { wideLayoutField } from '@shinefold/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@shinefold/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { isString, toTitleCase } from '@shinefold/utils/primitives';
 import { Grid2x2 } from 'lucide-react';
@@ -32,9 +21,7 @@ export const featureListSchema = defineType({
   description:
     'A grid of feature cards, each with its own heading, text, and icon or image — used to summarize a set of capabilities or offerings.',
   icon: Grid2x2,
-  fieldsets: appearanceFieldsets,
-  groups: appearanceFieldGroups,
-  fields: appearanceFields({
+  ...cardModuleAppearance({
     content: [
       titleField(),
       moduleHeadingBlockField(),
@@ -63,8 +50,7 @@ export const featureListSchema = defineType({
       }),
       ctaButtonsField(),
     ],
-    appearance: [
-      brandVariantField(),
+    beforeDisplayMode: [
       imageShapeField({
         values: [
           CARD_IMAGE_SHAPE.WIDE,
@@ -75,20 +61,19 @@ export const featureListSchema = defineType({
         initialValue: CARD_IMAGE_SHAPE.WIDE,
         subject: 'card image',
       }),
-      displayModeField({
-        description:
-          'Grid lays the cards out in rows. Carousel puts them in a single row the reader can swipe or step through.',
-      }),
-      ...alignmentFields([], {
-        title: 'Heading Alignment',
-        allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-        hasActions: true,
-        alignsCarousel: true,
-      }),
+    ],
+    displayMode: {
+      description:
+        'Grid lays the cards out in rows. Carousel puts them in a single row the reader can swipe or step through.',
+    },
+    headingAlignment: {
+      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+      hasActions: true,
+      alignsCarousel: true,
+    },
+    afterHeadingAlignment: [
       cardAlignmentField({ initialValue: CONTENT_ALIGNMENT.LEFT }),
     ],
-    layout: wideLayoutField,
-    columnsHidden: isCarouselMode,
   }),
   preview: {
     select: {

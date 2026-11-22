@@ -20,7 +20,6 @@ export const segmentedRadioGroupVariants = tv({
     optionLabel: [],
     optionDescription: [
       'block text-platform-12 leading-4 font-normal text-platform-muted md:leading-3.75',
-      'in-data-[checked]:text-platform-on-selected',
     ],
     glyph: ['flex shrink-0'],
     check: [],
@@ -42,7 +41,7 @@ export const segmentedRadioGroupVariants = tv({
         option: [
           'flex min-h-11 min-w-30 shrink-0 cursor-pointer flex-col items-start justify-center',
           'rounded-platform-control px-3 py-1.5 text-left md:min-h-0',
-          'data-[checked]:bg-platform-selected data-[checked]:text-platform-on-selected',
+          'data-[checked]:bg-platform-selected-tint data-[checked]:text-platform-text',
           'data-[checked]:inset-ring data-[checked]:inset-ring-platform-selected-edge',
           focusRingClasses(FOCUS_RING_GROUND.THEME_TRACK),
         ],
@@ -69,6 +68,10 @@ export const segmentedRadioGroupVariants = tv({
       true: {},
       false: {},
     },
+    isInactive: {
+      true: {},
+      false: {},
+    },
     isLocked: {
       true: {},
       false: {},
@@ -80,24 +83,24 @@ export const segmentedRadioGroupVariants = tv({
   compoundVariants: [
     {
       layout: SEGMENTED_RADIO_LAYOUT.TRACK,
-      isLocked: false,
+      isInactive: false,
       isSelected: false,
       class: { option: ['hover:bg-platform-hover-tint'] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: false,
+      isInactive: false,
       class: { option: ['cursor-pointer'], check: [SELECTED_TICK_CLASSES] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: false,
+      isInactive: false,
       isSelected: true,
       class: { option: [...SELECTED_CHOICE_CLASSES, 'font-semibold'] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: false,
+      isInactive: false,
       isSelected: false,
       class: {
         option: [
@@ -108,7 +111,7 @@ export const segmentedRadioGroupVariants = tv({
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: true,
+      isInactive: true,
       class: {
         option: [...UNSELECTED_CHOICE_CLASSES, 'cursor-not-allowed'],
         glyph: ['opacity-(--platform-locked-fade)'],
@@ -117,13 +120,13 @@ export const segmentedRadioGroupVariants = tv({
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: true,
+      isInactive: true,
       isSelected: true,
       class: { option: ['border-platform-control-line'] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
-      isLocked: true,
+      isInactive: true,
       isSelected: false,
       class: {
         option: [
@@ -131,10 +134,23 @@ export const segmentedRadioGroupVariants = tv({
         ],
       },
     },
+    {
+      layout: SEGMENTED_RADIO_LAYOUT.TILES,
+      isLocked: true,
+      isSelected: true,
+      class: { option: ['text-platform-muted'] },
+    },
+    {
+      layout: SEGMENTED_RADIO_LAYOUT.TILES,
+      isLocked: true,
+      isSelected: false,
+      class: { option: ['text-platform-faint'] },
+    },
   ],
   defaultVariants: {
     layout: SEGMENTED_RADIO_LAYOUT.TRACK,
     isSelected: false,
+    isInactive: false,
     isLocked: false,
   },
 });

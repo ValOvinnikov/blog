@@ -8,6 +8,7 @@ import {
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { AVATAR_VARIANT } from '@platform/constants/avatar';
+import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { formatDate } from '@platform/utils/format-date/format-date';
@@ -71,7 +72,6 @@ export const TenantsTable = ({
           : t('empty')
       }
       ariaLabel={tView('title')}
-      toolbar={toolbar}
       columns={[
         ...Object.values(TENANT_SORT_COLUMN).map((column) => ({
           key: column,
@@ -98,7 +98,7 @@ export const TenantsTable = ({
             </div>
           </DataTableShell.Cell>
           <DataTableShell.Cell>
-            <StatusBadge tone="plan" hasDot={false}>
+            <StatusBadge tone={BADGE_TONE.PLAN} hasDot={false}>
               {tPlan(tenant.plan)}
             </StatusBadge>
           </DataTableShell.Cell>
@@ -125,6 +125,8 @@ export const TenantsTable = ({
           </DataTableShell.Cell>
         </DataTableShell.Row>
       )}
-    />
+    >
+      <DataTableShell.Toolbar>{toolbar}</DataTableShell.Toolbar>
+    </DataTableShell>
   );
 };

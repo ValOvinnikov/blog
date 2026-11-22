@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { CTA_VARIANT } from '@shinefold/config';
+import { BRAND_VARIANT, CTA_VARIANT } from '@shinefold/config';
 import { CtaModule } from '@shinefold/ui/components/organisms/cta-module';
 import { ctaModuleVariants } from '@shinefold/ui/components/organisms/cta-module/cta-module-variants';
 import { customRender, screen } from '@shinefold/ui/testing/custom-render';
@@ -23,6 +23,7 @@ const MOCK_ACTION_LABEL = faker.lorem.word();
 const MOCK_ACTION_PATH = `/${faker.lorem.slug(1)}`;
 
 const setup = customRender(CtaModuleLayout, {
+  tone: BRAND_VARIANT.PRIMARY,
   styles: ctaModuleVariants({ variant: CTA_VARIANT.CALLOUT }),
   heading: MOCK_CTA_HEADING,
 });

@@ -1,6 +1,5 @@
 import { CARD_STYLE, type TCardStyle } from '@shinefold/config/constants';
 
-import { BORDER_COLOR } from './border-tokens';
 import { RADIUS_MD } from './radius-tokens';
 import type { TThemeDeclarations } from './theme-declarations';
 
@@ -8,7 +7,7 @@ const NO_WIDTH = '0px';
 const HAIRLINE = '1px';
 const NONE = 'none';
 const NONE_OF = '0%';
-const ALL_OF = '100%';
+export const ALL_OF = '100%';
 const STACK_GAP = '0.75rem';
 
 const FRAMED_BASE = {
@@ -19,6 +18,7 @@ const FRAMED_BASE = {
   '--item-card-hover-mix': NONE_OF,
   '--item-card-hover-edge': 'transparent',
   '--item-divider-width': NO_WIDTH,
+  '--item-accent-brand-share': NONE_OF,
   '--item-stack-gap': STACK_GAP,
   '--item-stack-radius': RADIUS_MD,
 } as const satisfies TThemeDeclarations;
@@ -26,13 +26,11 @@ const FRAMED_BASE = {
 const OUTLINE = {
   '--item-border-width': HAIRLINE,
   '--item-accent-width': HAIRLINE,
-  '--item-accent-color': BORDER_COLOR,
 } as const satisfies TThemeDeclarations;
 
 const NO_OUTLINE = {
   '--item-border-width': NO_WIDTH,
   '--item-accent-width': NO_WIDTH,
-  '--item-accent-color': BORDER_COLOR,
 } as const satisfies TThemeDeclarations;
 
 export const CARD_STYLE_DECLARATIONS: Record<TCardStyle, TThemeDeclarations> = {
@@ -40,7 +38,7 @@ export const CARD_STYLE_DECLARATIONS: Record<TCardStyle, TThemeDeclarations> = {
     ...FRAMED_BASE,
     '--item-border-width': NO_WIDTH,
     '--item-accent-width': '2px',
-    '--item-accent-color': 'var(--brand-primary)',
+    '--item-accent-brand-share': ALL_OF,
   },
   [CARD_STYLE.OUTLINED]: { ...FRAMED_BASE, ...OUTLINE },
   [CARD_STYLE.FILLED]: {

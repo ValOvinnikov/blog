@@ -22,10 +22,6 @@ const meta = {
       control: 'select',
       options: Object.values(CONTENT_ALIGNMENT),
     },
-    variant: {
-      control: 'select',
-      options: ['label', 'section'],
-    },
   },
   args: {
     headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
@@ -38,8 +34,6 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-const WHY_CHOOSE_US_HEADING = 'Why choose us';
-
 const longHeadingBlock = mockHeadingBlock({
   heading: 'Everything you need to plan, write and ship a great post',
   supportingText:
@@ -51,13 +45,6 @@ export const Default: TStory = {};
 export const NoSupportingText: TStory = {
   args: {
     headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
-  },
-};
-
-export const SectionVariantNoSupportingText: TStory = {
-  args: {
-    variant: 'section',
-    headingBlock: mockHeadingBlock({ heading: WHY_CHOOSE_US_HEADING }),
   },
 };
 
@@ -88,15 +75,5 @@ export const RightAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.RIGHT,
     headingBlock: longHeadingBlock,
-  },
-};
-
-export const SectionVariant: TStory = {
-  args: {
-    variant: 'section',
-    headingBlock: mockHeadingBlock({
-      heading: WHY_CHOOSE_US_HEADING,
-      supportingText: MOCK_LATEST_POSTS_SUPPORTING_TEXT,
-    }),
   },
 };

@@ -1,3 +1,4 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import type { IWithChildren } from '@shinefold/config/react';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { useId } from 'react';
@@ -13,16 +14,11 @@ export const LookSampleSection = ({
   children,
 }: TLookSampleSectionProps) => {
   const headingId = useId();
-  const { root, heading: headingClass } = lookSampleSectionVariants();
+  const { root } = lookSampleSectionVariants();
 
   return (
     <section aria-labelledby={headingId} className={root()}>
-      <Heading
-        level={2}
-        visual="preview"
-        id={headingId}
-        className={headingClass()}
-      >
+      <Heading level={2} visual={TEXT_ROLE.SECTION_TITLE} id={headingId}>
         {heading}
       </Heading>
       {children}

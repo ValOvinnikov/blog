@@ -55,15 +55,11 @@
     "paginationAriaLabel": "Pages du blog"
   },
   "blogPostPage": {
-    "depthToggle": {
-      "ariaLabel": "Niveau de lecture",
-      "skim": "30 s",
-      "read": "Lire",
-      "deep": "Approfondi"
-    },
-    "skimPanel": {
-      "label": "Résumé en 30 secondes",
-      "readFullArticle": "Lire l'article complet"
+    "postSummary": {
+      "button": "Résumé",
+      "title": "L'essentiel",
+      "readTime": "30 s de lecture",
+      "readFullArticle": "Lire l'article complet · {count} min"
     },
     "asideKind": {
       "WHY_NOT": "Pourquoi pas X",
@@ -138,6 +134,7 @@
     "emailInvalid": "Saisissez une adresse e-mail valide.",
     "sendLimited": "Trop de liens de connexion ont été demandés pour cette adresse. Réessayez dans une heure.",
     "oauthError": "La connexion a échoué. Veuillez réessayer.",
+    "oauthAccountNotLinked": "Google ou GitHub n'a pas vérifié cette adresse e-mail. Vérifiez-la auprès d'eux et réessayez, ou connectez-vous avec un lien par e-mail.",
     "accountMenuAriaLabel": "Menu du compte",
     "signOut": "Se déconnecter",
     "loadingAccountStatus": "Chargement de l'état du compte",
@@ -151,12 +148,16 @@
     "dismissLabel": "Fermer la notification",
     "mergeCountSuffix": " ×{count}"
   },
+  "outOfDateNotice": {
+    "message": "Cette page n'est plus à jour. Veuillez la recharger pour continuer.",
+    "reloadLabel": "Recharger"
+  },
   "bookmarkButton": {
     "save": "Enregistrer",
     "saved": "Enregistré",
     "saveAriaLabel": "Enregistrer l'article",
     "removeAriaLabel": "Retirer des favoris",
-    "error": "L'enregistrement a échoué. Veuillez réessayer.",
+    "errorSave": "L'enregistrement a échoué. Veuillez réessayer.",
     "errorUnavailable": "Les favoris ne sont pas disponibles sur ce site pour le moment.",
     "toastSavedMessage": "Ajouté aux favoris",
     "toastRemovedMessage": "Retiré des favoris",
@@ -273,6 +274,8 @@
       "unlinkToastSuccessMessage": "Compte dissocié.",
       "unlinkError": "La dissociation a échoué. Veuillez réessayer.",
       "unlinkLastMethodError": "C'est votre seule méthode de connexion restante — associez-en une autre avant de dissocier celle-ci.",
+      "linkNotLinkedError": "Ce compte n'a pas pu être associé. Google ou GitHub n'a pas vérifié son adresse e-mail, ou il sert déjà à se connecter à un autre compte ici.",
+      "linkError": "Impossible d'associer ce compte. Veuillez réessayer.",
       "displayNameLabel": "Nom affiché",
       "displayNameDescription": "Remplace votre identifiant de fournisseur partout où vos commentaires apparaissent.",
       "displayNameAriaLabel": "Nom affiché",
@@ -310,12 +313,40 @@
     "promo": {
       "once": "sur votre premier paiement",
       "repeating": "pendant {months, plural, one {# mois} other {# mois}}"
+    },
+    "compare": {
+      "heading": "Comparer les offres",
+      "feature": "Fonctionnalité",
+      "included": "Inclus",
+      "notIncluded": "Non inclus",
+      "all": "Tous",
+      "share": "{count} sur {total}",
+      "plans": {
+        "FREE": "Free",
+        "STARTER": "Starter",
+        "GROWTH": "Growth"
+      },
+      "rows": {
+        "LANGUAGES": "Langues",
+        "SEATS": "Membres de l’équipe",
+        "CUSTOM_DOMAIN": "Votre propre domaine",
+        "NO_POWERED_BY_MARK": "Sans la mention « Powered by »",
+        "LOOK_SETTINGS": "Réglages Look",
+        "SECTION_TYPES": "Types de sections de page",
+        "OWN_ANALYTICS": "Votre propre outil d’analyse",
+        "OWN_SIGN_IN_APPS": "Vos propres applis de connexion",
+        "CONTACT_FORM": "Formulaire de contact",
+        "READER_ACCOUNTS": "Comptes lecteurs et favoris",
+        "NEWSLETTER_SUBSCRIBERS": "Abonnés à la newsletter inclus",
+        "TAKEAWAYS_PER_MONTH": "Points clés IA par mois"
+      }
     }
   },
   "consent": {
     "banner": {
       "heading": "Cookies sur ce site",
       "message": "Nous n'utilisons que les cookies nécessaires au fonctionnement de ce site, sauf si vous autorisez les médias externes. Vous pouvez modifier votre choix à tout moment via Paramètres des cookies dans le pied de page.",
+      "messageWithAnalytics": "Nous n'utilisons que les cookies nécessaires au fonctionnement de ce site, sauf si vous autorisez la mesure d'audience ou les médias externes. Vous pouvez modifier votre choix à tout moment via Paramètres des cookies dans le pied de page.",
       "acceptLabel": "Tout accepter",
       "rejectLabel": "Tout refuser",
       "settingsLabel": "Paramètres",
@@ -332,6 +363,10 @@
         "label": "Nécessaires",
         "description": "Indispensables au fonctionnement du site. Toujours actifs."
       },
+      "analytics": {
+        "label": "Mesure d'audience",
+        "description": "Mesure les visites sur ce site avec des outils qui déposent leurs propres cookies, comme Google Analytics."
+      },
       "externalMedia": {
         "label": "Médias externes",
         "description": "Contenus de fournisseurs tiers, tels que des vidéos et des cartes, qui peuvent déposer leurs propres cookies."
@@ -346,6 +381,7 @@
   "cookieList": {
     "ariaLabel": "Cookies et stockage du navigateur",
     "intro": "Tout ce qui suit est défini par ce site et est strictement nécessaire.",
+    "introWithGoogleAnalytics": "Tout ce qui suit est défini par ce site. Les cookies Google Analytics ne sont déposés que si vous autorisez la mesure d'audience ; tout le reste est strictement nécessaire.",
     "columns": {
       "name": "Nom",
       "purpose": "Finalité",
@@ -358,10 +394,6 @@
       },
       "LANGUAGE": {
         "purpose": "Mémorise la langue que vous avez choisie pour ce site.",
-        "duration": "1 an"
-      },
-      "CURRENCY": {
-        "purpose": "Mémorise la devise dans laquelle afficher les prix, selon le pays depuis lequel vous visitez le site.",
         "duration": "1 an"
       },
       "SESSION": {
@@ -396,16 +428,21 @@
         "purpose": "Conserve le lien de votre e-mail de désabonnement le temps de confirmer.",
         "duration": "1 heure"
       },
-      "READING_DEPTH": {
-        "purpose": "Mémorise la part de chaque article que vous avez choisi de lire. Conservé dans le stockage local de votre navigateur.",
-        "duration": "Jusqu’à ce que vous effaciez les données de votre navigateur"
-      },
       "THEME": {
         "purpose": "Mémorise si vous avez choisi le thème clair ou sombre. Conservé dans le stockage local de votre navigateur.",
         "duration": "Jusqu’à ce que vous effaciez les données de votre navigateur"
+      },
+      "GOOGLE_ANALYTICS": {
+        "purpose": "Distingue les visites de différents navigateurs, pour que Google Analytics puisse compter les visiteurs.",
+        "duration": "2 ans"
+      },
+      "GOOGLE_ANALYTICS_VISIT": {
+        "purpose": "Suit votre visite en cours pour Google Analytics.",
+        "duration": "2 ans"
       }
     },
-    "analyticsNote": "Lorsque ce site mesure les visites et la vitesse des pages, il utilise Vercel Web Analytics et Speed Insights. Ils ne déposent aucun cookie et se chargent quel que soit votre choix en matière de cookies."
+    "analyticsNote": "Lorsque ce site mesure les visites et la vitesse des pages, il utilise Vercel Web Analytics et Speed Insights. Ils ne déposent aucun cookie et se chargent quel que soit votre choix en matière de cookies.",
+    "plausibleNote": "Ce site mesure également les visites avec Plausible, qui ne dépose aucun cookie."
   },
   "table": {
     "regionLabel": "Tableau"

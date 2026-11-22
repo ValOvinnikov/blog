@@ -1,12 +1,13 @@
 import { COLOR_SCHEME, type TColorScheme } from '@shinefold/config/constants';
 
-import { ACCENT_RAMP_DARK, ACCENT_RAMP_LIGHT } from './accent-ramps';
 import {
+  ACCENT_RAMP_DARK,
+  ACCENT_RAMP_LIGHT,
   IMAGE_SCRIM_RAMP,
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
-  type TOklchRamp,
-} from './theme-declarations';
+} from './accent-ramps';
+import type { TOklchRamp } from './theme-declarations';
 import {
   CODE_SYNTAX_RAMP_DARK,
   CODE_SYNTAX_RAMP_LIGHT,

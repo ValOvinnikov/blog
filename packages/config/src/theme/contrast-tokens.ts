@@ -1,5 +1,5 @@
-import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
+  mixOklch,
   renderedContrastRatio,
   type TOklchColor,
 } from '@shinefold/utils/color';
@@ -11,10 +11,17 @@ import type {
   THeaderControlStyle,
   TNavLinkStyle,
 } from '@shinefold/config/constants';
+import type { TMaybeUndefined } from '@shinefold/config/types';
 
-import { CARD_STYLE_DECLARATIONS } from './card-style-declarations';
+import { ALL_OF, CARD_STYLE_DECLARATIONS } from './card-style-declarations';
 import type { TThemeToken } from './contrast-pairs';
 import { SCHEME_RAMPS } from './contrast-scheme-ramps';
+import {
+  BRAND_PRIMARY,
+  ITEM_ACCENT_BRAND_SHARE,
+  MIXED_SURFACES,
+  TOKEN_ALIASES,
+} from './contrast-surfaces';
 import { NAV_LINK_STYLE_DECLARATIONS } from './nav-link-declarations';
 import {
   HEADER_CONTROL_STYLE_DECLARATIONS,
@@ -27,20 +34,15 @@ export type TContrastStyles = {
   navLinkStyle: TNavLinkStyle;
 };
 
-export type TContrastContext = TContrastStyles & {
+export type TContrastScope = {
   scheme: TColorScheme;
-  hue: number;
+  ramp?: TOklchRamp;
 };
 
-const BRAND_PRIMARY: TThemeToken = '--brand-primary';
-
-const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
-  '--ring': BRAND_PRIMARY,
-  '--info': BRAND_PRIMARY,
-  '--code-fg': '--text',
-  '--code-comment': '--text-muted',
-  '--field-boundary': '--border-emphasis',
-};
+export type TContrastContext = TContrastStyles &
+  TContrastScope & {
+    hue: number;
+  };
 
 const TRANSPARENT = 'transparent';
 
@@ -67,25 +69,40 @@ const resolveStop = (
   token: TThemeToken,
   context: Omit<TContrastContext, 'hue'>,
 ): TOklchRamp[TThemeToken] => {
-  const { scheme } = context;
+  const { scheme, ramp = SCHEME_RAMPS[scheme] } = context;
   const styleValue = styleValueOf(token, context);
   if (styleValue === TRANSPARENT) {
     return resolveStop(TRANSPARENT_SURFACE, context);
   }
+  if (token === ITEM_ACCENT_BRAND_SHARE) {
+    return resolveStop(
+      styleValue === ALL_OF ? BRAND_PRIMARY : '--border',
+      context,
+    );
+  }
+  const ownStop = ramp[token];
+  if (ownStop) return ownStop;
+
   const alias =
     TOKEN_ALIASES[token] ??
     (styleValue?.match(/^var\((--[\w-]+)\)$/)?.[1] as TThemeToken);
   if (alias) return resolveStop(alias, context);
 
-  const stop = SCHEME_RAMPS[scheme][token];
-  if (!stop) throw new Error(`No ${scheme} value registered for ${token}`);
-  return stop;
+  throw new Error(`No ${scheme} value registered for ${token}`);
 };
 
 const resolveColor = (
   token: TThemeToken,
   context: TContrastContext,
 ): TOklchColor => {
+  const mix = MIXED_SURFACES[token];
+  if (mix) {
+    return mixOklch(
+      resolveColor(mix.base, context),
+      resolveColor(mix.toward, context),
+      mix.share,
+    );
+  }
   const { h, ...stop } = resolveStop(token, context);
   return { ...stop, h: h ?? context.hue };
 };
@@ -105,4 +122,12 @@ export const measureContrast = (
 export const tokenFollowsAccentHue = (
   token: TThemeToken,
   context: Omit<TContrastContext, 'hue'>,
-): boolean => isUndefined(resolveStop(token, context).h);
+): boolean => {
+  const mix = MIXED_SURFACES[token];
+  if (mix) {
+    return [mix.base, mix.toward].some((part) =>
+      tokenFollowsAccentHue(part, context),
+    );
+  }
+  return isUndefined(resolveStop(token, context).h);
+};

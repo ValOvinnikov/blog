@@ -2,17 +2,16 @@ import { buildAppCookies } from '@shinefold/auth/sessions/app-cookies';
 import { CONSENT_CATEGORY, type TConsentCategory } from '@shinefold/config';
 import { AUTH_APP } from '@shinefold/config/constants';
 import type { TValueOf } from '@shinefold/config/utils';
-import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
 import { THEME_STORAGE_KEY } from '@web/config/theme-script';
 import { CONSENT_COOKIE_NAME } from '@web/utils/consent-cookie';
-import { CURRENCY_COOKIE_NAME } from '@web/utils/currency-cookie';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
 import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscribed-cookie-name';
 import { NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME } from '@web/utils/newsletter-unsubscribe-token-cookie-name';
 import { SIGNED_IN_HINT_COOKIE_NAME } from '@web/utils/signed-in-hint-cookie';
 
-const COOKIE_PROVIDER = {
+export const COOKIE_PROVIDER = {
   FIRST_PARTY: 'FIRST_PARTY',
+  GOOGLE: 'GOOGLE',
 } as const;
 
 type TCookieProvider = TValueOf<typeof COOKIE_PROVIDER>;
@@ -20,7 +19,6 @@ type TCookieProvider = TValueOf<typeof COOKIE_PROVIDER>;
 export const COOKIE_ID = {
   CONSENT: 'CONSENT',
   LANGUAGE: 'LANGUAGE',
-  CURRENCY: 'CURRENCY',
   SESSION: 'SESSION',
   CSRF: 'CSRF',
   SIGN_IN_RETURN: 'SIGN_IN_RETURN',
@@ -29,8 +27,9 @@ export const COOKIE_ID = {
   SIGNED_IN_HINT: 'SIGNED_IN_HINT',
   NEWSLETTER_SUBSCRIBED: 'NEWSLETTER_SUBSCRIBED',
   NEWSLETTER_UNSUBSCRIBE_TOKEN: 'NEWSLETTER_UNSUBSCRIBE_TOKEN',
-  READING_DEPTH: 'READING_DEPTH',
   THEME: 'THEME',
+  GOOGLE_ANALYTICS: 'GOOGLE_ANALYTICS',
+  GOOGLE_ANALYTICS_VISIT: 'GOOGLE_ANALYTICS_VISIT',
 } as const;
 
 type TCookieId = TValueOf<typeof COOKIE_ID>;
@@ -54,11 +53,10 @@ const necessaryFirstPartyEntry = (
   category: CONSENT_CATEGORY.NECESSARY,
 });
 
-/** Every cookie and browser-storage key the public site sets, under its production name; each id needs a purpose and duration under `cookieList.cookies` in the site catalog. */
+/** Every cookie and browser-storage key the public site sets whatever its analytics tool, under its production name; each id needs a purpose and duration under `cookieList.cookies` in the site catalog. */
 export const COOKIE_LIST: readonly ICookieListEntry[] = [
   necessaryFirstPartyEntry(COOKIE_ID.CONSENT, CONSENT_COOKIE_NAME),
   necessaryFirstPartyEntry(COOKIE_ID.LANGUAGE, LANGUAGE_COOKIE_NAME),
-  necessaryFirstPartyEntry(COOKIE_ID.CURRENCY, CURRENCY_COOKIE_NAME),
   necessaryFirstPartyEntry(
     COOKIE_ID.SESSION,
     SIGN_IN_COOKIES.sessionToken.name,
@@ -85,6 +83,5 @@ export const COOKIE_LIST: readonly ICookieListEntry[] = [
     COOKIE_ID.NEWSLETTER_UNSUBSCRIBE_TOKEN,
     NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME,
   ),
-  necessaryFirstPartyEntry(COOKIE_ID.READING_DEPTH, DEPTH_STORAGE_KEY),
   necessaryFirstPartyEntry(COOKIE_ID.THEME, THEME_STORAGE_KEY),
 ];

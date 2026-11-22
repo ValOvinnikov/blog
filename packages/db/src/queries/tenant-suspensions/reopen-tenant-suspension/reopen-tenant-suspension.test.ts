@@ -1,31 +1,24 @@
 import * as schema from '@shinefold/db/schema';
-import {
-  insertTestAdmin,
-  insertTestTenant,
-} from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
-import { insertTestTenantSuspension } from '@shinefold/db/testing/tenant-suspensions/fixtures';
+import {
+  insertTestTenantSuspension,
+  useSuspensionAdmin,
+} from '@shinefold/db/testing/tenant-suspensions/fixtures';
+import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
 import { reopenTenantSuspension } from './reopen-tenant-suspension';
 
 vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
-
-afterEach(async () => {
-  await db().delete(schema.tenantSuspensions);
-  await db().delete(schema.tenants);
-  await db().delete(schema.admins);
-  await db().delete(schema.users);
-});
+const tenant = useTestTenant(db);
+const liftedBy = useSuspensionAdmin(db);
 
 describe(reopenTenantSuspension, () => {
   it('clears who lifted the case and when', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-    const { id: liftedBy } = await insertTestAdmin(db());
-    const { id } = await insertTestTenantSuspension(db(), tenantId, {
+    const { id } = await insertTestTenantSuspension(db(), tenant().id, {
       liftedAt: new Date(),
-      liftedBy,
+      liftedBy: liftedBy(),
     });
 
     await reopenTenantSuspension(id);

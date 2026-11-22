@@ -23,6 +23,7 @@ const MOCK_FOOTER_TAGS = [MOCK_TAG, MOCK_OTHER_TAG];
 const MOCK_POST_BODY = faker.lorem.sentence();
 const MOCK_COVER_ALT = faker.lorem.words(3);
 const MOCK_COVER_SRC = faker.image.url();
+const MOCK_BELOW_META_TEXT = faker.lorem.sentence();
 
 const meta = {
   author: { name: MOCK_PERSON_NAME },
@@ -103,6 +104,31 @@ describe(`<${Article.name}/>`, () => {
     it('keeps the post title as the only h1 when a topic eyebrow is present', () => {
       const titleHeadings = screen.getAllByRole('heading', { level: 1 });
       expect(titleHeadings).toHaveLength(1);
+    });
+  });
+
+  describe('with content below the meta', () => {
+    beforeEach(() => {
+      renderArticle({
+        belowMeta: <p>{MOCK_BELOW_META_TEXT}</p>,
+        coverMedia: <img src={MOCK_COVER_SRC} alt={MOCK_COVER_ALT} />,
+      });
+    });
+
+    it('renders it after the meta row', () => {
+      const date = screen.getByText(MOCK_FORMATTED_DATE);
+      const belowMeta = screen.getByText(MOCK_BELOW_META_TEXT);
+      expect(date.compareDocumentPosition(belowMeta)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    });
+
+    it('renders it before the cover media', () => {
+      const belowMeta = screen.getByText(MOCK_BELOW_META_TEXT);
+      const coverImage = screen.getByAltText(MOCK_COVER_ALT);
+      expect(belowMeta.compareDocumentPosition(coverImage)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
     });
   });
 

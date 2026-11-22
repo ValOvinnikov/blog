@@ -1,3 +1,4 @@
+import { SELLABLE_TENANT_PLANS } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   INACTIVITY_STAGE,
@@ -7,6 +8,7 @@ import {
   TENANT_STATUS,
   type TInactivityStage,
 } from '@shinefold/db/constants';
+import { isNotDeprovisioned } from '@shinefold/db/queries/tenants/not-deprovisioned';
 import { tenants } from '@shinefold/db/schema/tenants';
 import { daysBefore } from '@shinefold/db/utils/day-offset/day-offset';
 import {
@@ -16,11 +18,18 @@ import {
   isNotNull,
   isNull,
   lte,
+  notInArray,
+  or,
   sql,
   type SQL,
 } from 'drizzle-orm';
 
 const isWritable = inArray(tenants.status, WRITABLE_TENANT_STATUSES);
+
+const hasNoLiveSubscription = or(
+  isNull(tenants.stripeSubscriptionId),
+  notInArray(tenants.plan, [...SELLABLE_TENANT_PLANS]),
+);
 
 const isSuspendedForInactivity = and(
   eq(tenants.status, TENANT_STATUS.SUSPENDED),
@@ -61,7 +70,8 @@ export function inactivityStageDue(
   const cutoff = daysBefore(now, INACTIVITY_STAGE_DAY[stage]);
 
   return and(
-    isNull(tenants.deprovisionedAt),
+    isNotDeprovisioned,
+    hasNoLiveSubscription,
     lte(tenants.lastActivityAt, cutoff),
     stageCondition[stage],
   );

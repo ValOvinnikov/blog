@@ -41,7 +41,7 @@ The site footer closes every page with a brand column (the Look logo, an about l
 - **Public site, legal pages:** `/privacy` and `/legal` (hubs), `/privacy/[slug]` and `/legal/[slug]` (documents), `/legal/cookie-statement` (the cookie statement), and `/api/legal-page/[kind]`, which redirects to the published document of that kind in the tenant's default language. All five page routes are in the sitemap and follow the language switch.
 - **Studio:** Privacy Index Page and Legal Index Page (one per language, with their templates), Privacy Page and Legal Page (`page_privacyDocument`, `page_legalDocument`) and Cookie Statement (`page_cookieStatement`).
 - **Studio, footer:** Settings → Footer, the `settings_footer` singleton — Social Links, Groups, About, Address, Copyright name, Fine Print, Show language switcher, Show RSS feed. The copyright line shows Copyright name, or the brand name when it is blank; the Big wordmark always shows the brand name. The brand name is set on Look's Brand card, or is the tenant name when that is blank (./look.md).
-- **Platform:** Look › Footer sets Footer layout (Columns default · Centred · Compact · Big wordmark), Background (Plain · Shaded · Brand tint default) and Surface (Full width default · Card), all Growth-only, plus the Cookie settings button (./consent-and-analytics.md). Look also picks the switcher style and the theme tokens.
+- **Platform:** Look › Footer sets Footer layout (Columns default · Centred · Compact · Big wordmark), Background (Plain · Shaded · Brand tint default · Ink) and Surface (Full width default · Card), all Growth-only, plus the Cookie settings button (./consent-and-analytics.md). Look also picks the switcher style and the theme tokens.
 
 ## Data
 
@@ -53,7 +53,7 @@ The site footer closes every page with a brand column (the Look logo, an about l
 - **Cache:** the query is tagged `footer`, `link` and every page type, tenant-scoped; the publish webhook maps `settings_footer` → `footer` and `link` → `link`.
 - **Look:** `site_config.footer_layout`, `footer_background`, `footer_surface` and `cookie_settings_button`, read by `getFooterStyle` through `getSiteConfig`, so a plan without the field gets the preset's value. A failed read logs `footer.site_config_fetch_failed` and falls back to the preset (Columns, Brand tint, Full width, Cookie settings as the footer link).
 - **Copyright:** `© {year} {copyright name or brand name}`, the year computed at render time; the format is fixed in `@shinefold/ui`'s `Footer.Copyright` and no editor or owner can reword it.
-- **Powered-by mark:** `getPoweredByMark(tenant)` returns the link from `MARKETING_SITE_URL` when the tenant's plan carries `PLAN_ENTITLEMENTS[plan].hasPoweredByMark` (`FREE` yes, `STARTER` and `GROWTH` no), reading the plan through `getEffectivePlan`, as the Look does. When the plan cannot be read, Free's rules apply. Its label is the fixed catalog key `siteFooter.poweredByLabel`, translated in every site language.
+- **Powered-by mark:** `getPoweredByMark(tenant)` returns the link from `MARKETING_SITE_URL` when the tenant's plan carries `PLAN_ENTITLEMENTS[plan].hasPoweredByMark` (`FREE` yes, `STARTER` and `GROWTH` no), reading it through `getEffectiveEntitlements`, as the Look does, so a granted plan feature counts. When the entitlements cannot be read, Free's apply. Its label is the fixed catalog key `siteFooter.poweredByLabel`, translated in every site language.
 - **Hubs:** `page_privacyIndex` and `page_legalIndex`, index pages (heading block plus their template's hero and modules), one per language, read by `service.pages.sectionIndex`.
 - **Documents:** `page_privacyDocument` and `page_legalDocument` share one schema (`sectionDocumentSchema`): `language`, `title` (internal to the Studio, never shown on the site), the page heading block (`headingBlock`, `contentAlignment`), `slug`, `kind` and `content` (`articleText`; each document is one language), plus `seo`. Kinds come from `LEGAL_PAGE_KIND`: `PRIVACY_POLICY` and `OTHER` under privacy (`PRIVACY_DOCUMENT_KINDS`), `TERMS`, `IMPRINT` and `OTHER` under legal (`LEGAL_DOCUMENT_KINDS`).
 - **Cookie statement:** `page_cookieStatement` with `language`, `title`, the heading block, `content` and `seo`; its kind is always `COOKIE_STATEMENT`. Its fixed id comes from `cookieStatementDocumentId(locale)`.
@@ -107,7 +107,7 @@ The site footer closes every page with a brand column (the Look logo, an about l
 - `apps/web/src/utils/resolve-cookie-settings-controls/resolve-cookie-settings-controls.ts`
 - `apps/web/src/server/site-config/get-footer-style/get-footer-style.ts`
 - `apps/web/src/server/site-config/get-powered-by-mark/get-powered-by-mark.ts`
-- `apps/web/src/server/site-config/get-effective-plan/get-effective-plan.ts`
+- `apps/web/src/server/site-config/get-effective-entitlements/get-effective-entitlements.ts`
 - `apps/web/src/components/shared/social-links/social-link.tsx`
 - `packages/ui/src/components/organisms/footer/footer.tsx`
 - `packages/studio/src/schema-types/documents/pages/section-document/section-document.ts`, `cookie-statement/cookie-statement.ts`, `privacy-index/privacy-index.ts`, `legal-index/legal-index.ts`
@@ -121,7 +121,7 @@ The site footer closes every page with a brand column (the Look logo, an about l
 
 - `packages/studio/src/schema-types/validation/validate-array-type-at-most-once/validate-array-type-at-most-once.test.ts`
 - `packages/service/src/features/global/footer/adaptor/loader.test.ts`, `query.test.ts`, `packages/service/src/shared/transformers/social-profile/to-social-profiles.test.ts`
-- `apps/web/src/components/shared/site-footer/site-footer.test.tsx`, `apps/web/src/server/site-config/get-footer-style/get-footer-style.test.ts`, `get-powered-by-mark/get-powered-by-mark.test.ts`, `get-effective-plan/get-effective-plan.test.ts`, `social-links/social-links.test.tsx`, `social-links/social-link.test.tsx`
+- `apps/web/src/components/shared/site-footer/site-footer.test.tsx`, `apps/web/src/server/site-config/get-footer-style/get-footer-style.test.ts`, `get-powered-by-mark/get-powered-by-mark.test.ts`, `get-effective-entitlements/get-effective-entitlements.test.ts`, `social-links/social-links.test.tsx`, `social-links/social-link.test.tsx`
 - `packages/ui/src/components/organisms/footer/footer.test.tsx`
 - `apps/web/src/components/page-templates/document-article/document-article.test.tsx`, `section-document-page.test.tsx`, `cookie-statement-page.test.tsx`, `apps/web/src/app/api/legal-page/[kind]/route.test.ts` and the route tests under `app/[tenant]/[locale]/privacy` and `legal`.
 - `packages/service/src/features/pages/section-document/**/*.test.ts`, `cookie-statement/**/*.test.ts`, `section-index/**/*.test.ts`.

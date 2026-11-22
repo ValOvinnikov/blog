@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { onDarkDecorators } from '@web/testing/shared/on-dark/decorators';
+import { onImageDecorators } from '@web/testing/shared/on-image/decorators';
 import {
   MOCK_GITHUB_PROFILE,
   MOCK_LINKEDIN_PROFILE,
@@ -21,7 +21,6 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
-export const OnDark: TStory = {
-  args: { isOnDark: true },
-  decorators: onDarkDecorators,
+export const OnImage: TStory = {
+  decorators: onImageDecorators,
 };

@@ -6,9 +6,9 @@ import {
 } from '@platform/constants/billing';
 import {
   listBillingInvoices,
-  previewNextPayment,
+  previewRenewal,
   type TBillingInvoice,
-  type TBillingNextPayment,
+  type TBillingRenewal,
 } from '@platform/server/billing/fetch-stripe-billing';
 import { getStripeClient } from '@platform/server/billing/stripe-client';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -22,27 +22,32 @@ export type TBillingOverview =
   | { state: typeof BILLING_OVERVIEW_STATE.UNAVAILABLE }
   | {
       state: typeof BILLING_OVERVIEW_STATE.LOADED;
-      nextPayment: TMaybeUndefined<TBillingNextPayment>;
+      renewal: TBillingRenewal;
       invoices: TBillingInvoice[];
     };
 
 const UNAVAILABLE = { state: BILLING_OVERVIEW_STATE.UNAVAILABLE } as const;
 
-const previewOrNone = async (
+const NO_RENEWAL: TBillingRenewal = {
+  nextPayment: undefined,
+  endsAt: undefined,
+};
+
+const renewalOrNone = async (
   stripe: Stripe,
   tenantId: string,
   customer: string,
   subscription: TMaybeUndefined<string>,
-): Promise<TMaybeUndefined<TBillingNextPayment>> => {
-  if (!subscription) return undefined;
+): Promise<TBillingRenewal> => {
+  if (!subscription) return NO_RENEWAL;
   try {
-    return await previewNextPayment(stripe, customer, subscription);
+    return await previewRenewal(stripe, customer, subscription);
   } catch (error) {
     logger.error(BILLING_LOG.NEXT_PAYMENT_FAILED, {
       tenantId,
       ...toLoggableError(error),
     });
-    return undefined;
+    return NO_RENEWAL;
   }
 };
 
@@ -61,11 +66,11 @@ export const loadBillingOverview = async (
 
   const subscription = billing.stripeSubscriptionId;
   try {
-    const [invoices, nextPayment] = await Promise.all([
+    const [invoices, renewal] = await Promise.all([
       listBillingInvoices(stripe, customer),
-      previewOrNone(stripe, tenantId, customer, subscription),
+      renewalOrNone(stripe, tenantId, customer, subscription),
     ]);
-    return { state: BILLING_OVERVIEW_STATE.LOADED, nextPayment, invoices };
+    return { state: BILLING_OVERVIEW_STATE.LOADED, renewal, invoices };
   } catch (error) {
     logger.error(BILLING_LOG.OVERVIEW_FAILED, {
       tenantId,

@@ -10,19 +10,15 @@ import {
   MOCK_TENANT_NAME,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 
 import TenantDetailLayout from './layout';
 
 faker.seed(6302);
 
-const {
-  getAdminByUserIdMock,
-  getTenantByIdMock,
-  countUnreadLeadsForTenantMock,
-} = vi.hoisted(() => ({
+const { getAdminByUserIdMock, getTenantByIdMock } = vi.hoisted(() => ({
   getAdminByUserIdMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
-  countUnreadLeadsForTenantMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/auth');
@@ -35,9 +31,9 @@ vi.mock('next/headers', () => ({
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    ...noEntitlementGrantQueries(),
     admins: { getAdminByUserId: getAdminByUserIdMock },
     tenants: { getTenantById: getTenantByIdMock },
-    leads: { countUnreadLeadsForTenant: countUnreadLeadsForTenantMock },
   },
 }));
 
@@ -45,7 +41,6 @@ const { navSections } = messages;
 const t = makeEnTranslator('navSections');
 
 const MOCK_TENANT_CONTENT = faker.lorem.sentence();
-const MOCK_UNREAD_LEADS_COUNT = faker.number.int({ min: 2, max: 9 });
 
 const setup = customRenderAsync(TenantDetailLayout, {
   params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
@@ -56,7 +51,6 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
   beforeEach(() => {
     getAdminByUserIdMock.mockResolvedValue(mockAdmin());
     getTenantByIdMock.mockResolvedValue(mockReadyTenant());
-    countUnreadLeadsForTenantMock.mockResolvedValue(0);
   });
 
   describe('for a platform operator', () => {
@@ -82,27 +76,16 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
       expect(tenantSection).toBeVisible();
     });
 
+    it('shows Leads in the sidebar with no unread-count badge', () => {
+      const leadsLink = screen.getByRole('link', { name: navSections.leads });
+
+      expect(leadsLink).toBeVisible();
+    });
+
     it('renders no tenant switcher in the sidebar', () => {
       const tenantDomain = screen.queryByText(MOCK_TENANT_DOMAIN);
 
       expect(tenantDomain).not.toBeInTheDocument();
     });
-  });
-
-  it("shows the tenant's unread lead count beside Leads", async () => {
-    countUnreadLeadsForTenantMock.mockResolvedValueOnce(
-      MOCK_UNREAD_LEADS_COUNT,
-    );
-
-    await setup();
-
-    const leadsLink = screen.getByRole('link', {
-      name: new RegExp(navSections.leads),
-    });
-
-    expect(leadsLink).toHaveTextContent(
-      t('badgeUnreadLeads', { count: MOCK_UNREAD_LEADS_COUNT }),
-    );
-    expect(countUnreadLeadsForTenantMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 });

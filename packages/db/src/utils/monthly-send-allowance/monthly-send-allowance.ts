@@ -1,23 +1,12 @@
 import type { TTenantPlan } from '@shinefold/config/constants';
 import {
   PLAN_MONTHLY_SENDS_PER_SUBSCRIBER,
-  SUBSCRIBER_BAND_CEILINGS,
+  type TSubscriberBandCeiling,
 } from '@shinefold/db/constants';
-
-function subscriberBandCeiling(activeSubscriberCount: number): number {
-  return (
-    SUBSCRIBER_BAND_CEILINGS.find(
-      (ceiling) => activeSubscriberCount <= ceiling,
-    ) ?? activeSubscriberCount
-  );
-}
 
 export function monthlySendAllowance(
   plan: TTenantPlan,
-  activeSubscriberCount: number,
+  bandCeiling: TSubscriberBandCeiling,
 ): number {
-  return (
-    PLAN_MONTHLY_SENDS_PER_SUBSCRIBER[plan] *
-    subscriberBandCeiling(activeSubscriberCount)
-  );
+  return PLAN_MONTHLY_SENDS_PER_SUBSCRIBER[plan] * bandCeiling;
 }

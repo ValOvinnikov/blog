@@ -1,8 +1,11 @@
 import { VoiceKeyFrame } from '@platform/components/features/site-preview/voice-key-frame';
 import { VoiceRichText } from '@platform/components/features/site-preview/voice-rich-text';
-import type { TVoiceFieldId, TVoicePortableText } from '@shinefold/config';
+import {
+  TEXT_ROLE,
+  type TVoiceFieldId,
+  type TVoicePortableText,
+} from '@shinefold/config';
 import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
-import { headingVariants } from '@shinefold/ui/components/atoms/heading/heading-variants';
 import { Text } from '@shinefold/ui/components/atoms/text';
 
 import { specimenListVariants } from './specimen-list-variants';
@@ -32,9 +35,9 @@ export const SpecimenList = ({
   return (
     <div className={s.root()}>
       <Eyebrow>{eyebrow}</Eyebrow>
-      <p className={headingVariants({ visual: 'section' })}>{heading}</p>
-      <Text variant="meta">{count}</Text>
-      <p className={s.emptyMessage()}>
+      <Text textRole={TEXT_ROLE.SECTION_TITLE}>{heading}</Text>
+      <Text textRole={TEXT_ROLE.META}>{count}</Text>
+      <Text textRole={TEXT_ROLE.CARD_BODY}>
         <VoiceKeyFrame
           fieldId={fieldId}
           isFocused={fieldId === focusedFieldId}
@@ -42,7 +45,7 @@ export const SpecimenList = ({
         >
           <VoiceRichText value={value} params={{ name: heading }} />
         </VoiceKeyFrame>
-      </p>
+      </Text>
     </div>
   );
 };

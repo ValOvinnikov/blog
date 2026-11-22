@@ -39,8 +39,12 @@ export async function POST(request: Request): Promise<NextResponse> {
     return respondEmpty(HTTP_STATUS.OK);
   }
 
-  const { outcome, siteTag } = event;
-  if (isUndefined(siteTag)) return respondEmpty(HTTP_STATUS.OK);
+  const { outcome, siteTag, isUncountedMail } = event;
+  if (isUncountedMail) return respondEmpty(HTTP_STATUS.OK);
+  if (isUndefined(siteTag)) {
+    logger.warn(EMAIL_USAGE_LOG.WEBHOOK_EVENT_UNTAGGED, { eventId, outcome });
+    return respondEmpty(HTTP_STATUS.OK);
+  }
 
   const siteId = toSiteId(siteTag);
   if (isUndefined(siteId)) {

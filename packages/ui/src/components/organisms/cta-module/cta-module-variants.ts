@@ -1,14 +1,9 @@
-import {
-  BRAND_VARIANT,
-  CONTENT_ALIGNMENT,
-  CTA_VARIANT,
-  MEDIA_ORDER,
-} from '@shinefold/config';
+import { CONTENT_ALIGNMENT, CTA_VARIANT, MEDIA_ORDER } from '@shinefold/config';
 import { type bannerVariants, tv } from '@shinefold/ui/lib/styling';
 
 const CARD = [
   'mx-auto w-full max-w-4xl',
-  'item-card',
+  'item-card bg-ambient',
   'px-[calc(var(--spacing-card-x)*1.5)] sm:px-[calc(var(--spacing-card-x)*2)]',
   'py-[calc(var(--spacing-card-y)*16/7)] sm:py-[calc(var(--spacing-card-y)*20/7)]',
 ];
@@ -28,7 +23,7 @@ export const ctaModuleVariants = tv({
     ],
     media: ['[&>*]:block [&>*]:h-full [&>*]:w-full [&>*]:object-cover'],
     actions: ['mt-5 flex flex-wrap items-center gap-3'],
-    footnote: ['mt-3.5 max-w-measure font-mono text-caption text-subtle'],
+    footnote: ['mt-3.5 max-w-measure'],
   },
   variants: {
     variant: {
@@ -46,11 +41,6 @@ export const ctaModuleVariants = tv({
         root: CARD,
         media: ['order-first mx-auto mb-6 w-full max-w-[420px]'],
       },
-    },
-    tone: {
-      [BRAND_VARIANT.PRIMARY]: {},
-      [BRAND_VARIANT.SECONDARY]: {},
-      [BRAND_VARIANT.BRAND_PRIMARY]: {},
     },
     position: {
       [CONTENT_ALIGNMENT.LEFT]: {},
@@ -81,21 +71,6 @@ export const ctaModuleVariants = tv({
     },
   },
   compoundVariants: [
-    {
-      variant: [CTA_VARIANT.SPLIT, CTA_VARIANT.CALLOUT],
-      tone: BRAND_VARIANT.PRIMARY,
-      class: { root: ['bg-primary'] },
-    },
-    {
-      variant: [CTA_VARIANT.SPLIT, CTA_VARIANT.CALLOUT],
-      tone: BRAND_VARIANT.SECONDARY,
-      class: { root: ['bg-secondary', 'surface-secondary'] },
-    },
-    {
-      variant: [CTA_VARIANT.SPLIT, CTA_VARIANT.CALLOUT],
-      tone: BRAND_VARIANT.BRAND_PRIMARY,
-      class: { root: ['bg-brand-primary-muted', 'surface-brand-primary'] },
-    },
     {
       variant: CTA_VARIANT.SPLIT,
       position: CONTENT_ALIGNMENT.RIGHT,

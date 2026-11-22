@@ -31,6 +31,8 @@ export const selectVariants = tv({
       'flex min-h-11 cursor-pointer items-center gap-2 rounded-platform-control px-2 py-2',
       'outline-none',
       'data-[selected]:bg-platform-popover-hover data-[highlighted]:bg-platform-popover-hover',
+      ...DISABLED_AFFORDANCE_CLASSES,
+      'data-[disabled]:text-platform-muted',
       insetFocusRingClasses(FOCUS_RING_GROUND.POPOVER_HOVER),
     ],
     indicator: ['w-4 shrink-0 text-platform-brand-ink'],
@@ -55,8 +57,9 @@ export const selectVariants = tv({
     isLocked: {
       true: {
         trigger: [
-          'cursor-not-allowed border-platform-control-line-locked bg-platform-bg',
+          'cursor-not-allowed border-platform-control-line-locked bg-platform-bg text-platform-muted',
         ],
+        icon: ['text-platform-faint'],
       },
       false: {
         trigger: [

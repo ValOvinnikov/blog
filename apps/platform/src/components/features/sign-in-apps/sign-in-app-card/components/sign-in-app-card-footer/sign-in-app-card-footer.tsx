@@ -7,7 +7,9 @@ import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { removeSignInAppAction } from '@platform/server/sign-in-apps/remove-sign-in-app-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
-import { isOutcomeRefused, isOutcomeSuccess } from '@shinefold/config';
+import { useProviderName } from '@platform/utils/use-provider-name/use-provider-name';
+import { useSignInAppFailureText } from '@platform/utils/use-sign-in-app-failure-text/use-sign-in-app-failure-text';
+import { isOutcomeSuccess } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
 import { useTranslations } from 'next-intl';
 
@@ -25,9 +27,11 @@ export const SignInAppCardFooter = ({
   onRemoved,
 }: TSignInAppCardFooterProps) => {
   const t = useTranslations('signInAppsPage');
+  const toProviderName = useProviderName();
+  const failureText = useSignInAppFailureText();
   const { provider, saved, hasSave, isPending, saveError, savedMessage, save } =
     form;
-  const providerName = t(`providerName.${provider}`);
+  const providerName = toProviderName(provider);
   const { status, saveButton } = signInAppCardFooterVariants();
 
   const remove = async () => {
@@ -35,11 +39,7 @@ export const SignInAppCardFooter = ({
       removeSignInAppAction(tenantId, provider),
     );
     if (isOutcomeSuccess(result)) return okResult();
-    return errorResult(
-      isOutcomeRefused(result)
-        ? t(`refusal.${result.reason}`)
-        : t('removeDialog.failed'),
-    );
+    return errorResult(failureText(result, t('removeDialog.failed')));
   };
 
   return (

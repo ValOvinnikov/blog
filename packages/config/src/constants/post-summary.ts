@@ -1,0 +1,2 @@
+export const POST_SUMMARY_MAX_WORDS = 100;
+export const POST_SUMMARY_MAX_BLOCKS = 8;

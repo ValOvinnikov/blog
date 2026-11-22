@@ -2,19 +2,21 @@
 
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
-import {
-  OWNER_STUDIO_ACCESS,
-  type TPendingOwnerStudioAccess,
-} from '@platform/constants/owner-studio-access';
 import { useToast } from '@platform/context/toast-provider';
 import { checkOwnerAccessAction } from '@platform/server/owner-access/check-owner-access-action';
 import type { TOwnerAccessRequestResult } from '@platform/server/owner-access/request-owner-access';
 import { resendOwnerInviteAction } from '@platform/server/owner-access/resend-owner-invite-action';
+import { checkMemberAccessAction } from '@platform/server/team/check-member-access-action';
+import { resendMemberInviteAction } from '@platform/server/team/resend-member-invite-action';
 import {
   settleAction,
   type TUnreachedAction,
 } from '@platform/utils/settle-action/settle-action';
 import { isOutcomeSuccess, SIZE } from '@shinefold/config';
+import {
+  STUDIO_ACCESS,
+  type TPendingStudioAccess,
+} from '@shinefold/config/constants';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
@@ -25,12 +27,16 @@ const ACTION_BUTTON_DEFAULTS = { size: SIZE.SM } as const;
 
 export type TOwnerAccessActionsProps = {
   tenantId: string;
-  studioAccess: TPendingOwnerStudioAccess;
+  studioAccess: TPendingStudioAccess;
+  membershipId?: string;
+  email?: string;
 };
 
 export const OwnerAccessActions = ({
   tenantId,
   studioAccess,
+  membershipId,
+  email,
 }: TOwnerAccessActionsProps) => {
   const t = useTranslations('ownerStudioAccess');
   const toast = useToast();
@@ -38,26 +44,32 @@ export const OwnerAccessActions = ({
   const [isChecking, startCheck] = useTransition();
   const [isResending, startResend] = useTransition();
 
-  const isInviteSent = studioAccess === OWNER_STUDIO_ACCESS.INVITE_SENT;
-  const isStalled = studioAccess === OWNER_STUDIO_ACCESS.STALLED;
+  const isInviteSent = studioAccess === STUDIO_ACCESS.INVITE_SENT;
+  const isStalled = studioAccess === STUDIO_ACCESS.STALLED;
+
+  const named = email ? { email } : undefined;
 
   const settle = (
     result: TOwnerAccessRequestResult | TUnreachedAction,
-    successKey: string,
+    successMessage: string,
   ) => {
     if (!isOutcomeSuccess(result)) {
       toast.error({ message: t('requestFailed') });
       return;
     }
-    toast.success({ message: t(successKey) });
+    toast.success({ message: successMessage });
     router.refresh();
   };
 
   const handleCheck = () => {
     startCheck(async () => {
       settle(
-        await settleAction(checkOwnerAccessAction(tenantId)),
-        'checkStarted',
+        await settleAction(
+          membershipId
+            ? checkMemberAccessAction(tenantId, membershipId)
+            : checkOwnerAccessAction(tenantId),
+        ),
+        named ? t('checkStartedFor', named) : t('checkStarted'),
       );
     });
   };
@@ -65,8 +77,12 @@ export const OwnerAccessActions = ({
   const handleResend = () => {
     startResend(async () => {
       settle(
-        await settleAction(resendOwnerInviteAction(tenantId)),
-        'inviteResent',
+        await settleAction(
+          membershipId
+            ? resendMemberInviteAction(tenantId, membershipId)
+            : resendOwnerInviteAction(tenantId),
+        ),
+        named ? t('inviteResentTo', named) : t('inviteResent'),
       );
     });
   };
@@ -78,6 +94,7 @@ export const OwnerAccessActions = ({
       isDisabled={isResending}
       isPending={isChecking}
       pendingLabel={t('checking')}
+      aria-label={named && t('checkNowAriaLabel', named)}
       onClick={handleCheck}
     >
       {t('checkNow')}
@@ -91,6 +108,7 @@ export const OwnerAccessActions = ({
       isDisabled={isChecking}
       isPending={isResending}
       pendingLabel={t('resending')}
+      aria-label={named && t('resendInviteAriaLabel', named)}
       onClick={handleResend}
     >
       {t('resendInvite')}

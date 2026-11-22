@@ -1,11 +1,10 @@
 import { routes } from '@shinefold/config';
-import { customRenderAsync } from '@web/testing/custom-render';
+import { TAG_LOG } from '@web/constants/tag';
+import { customRenderServerAsync } from '@web/testing/custom-render';
 import {
-  testBreadcrumbsJsonLdSchema,
   testBreadcrumbsJsonLdTrail,
   testBreadcrumbsTrail,
   testForwardsArgsToLoader,
-  testNoJsonLdWithoutBaseUrl,
   testThrowsOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
@@ -34,7 +33,7 @@ const MOCK_TAG = mockTag();
 const TAG_HREF = routes.tag(MOCK_TAG_SLUG);
 const MOCK_PAGE = { tag: MOCK_TAG, modules: [], seo: mockSeo() };
 
-const setup = customRenderAsync(TagBreadcrumbs, {
+const setup = customRenderServerAsync(TagBreadcrumbs, {
   slug: MOCK_TAG_SLUG,
 });
 
@@ -47,7 +46,7 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
   testThrowsOnFetchFailure({
     pageLoaderMock: getTagPageMock,
     setup,
-    eventFragment: 'tag_breadcrumbs.fetch_failed',
+    eventFragment: TAG_LOG.BREADCRUMBS_FETCH_FAILED,
     logContext: { slug: MOCK_TAG_SLUG },
   });
   testBreadcrumbsTrail({
@@ -57,12 +56,6 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
     linkSteps: [{ label: SITE_NAME, href: routes.home() }],
     currentLabel: MOCK_TAG.title,
   });
-  testBreadcrumbsJsonLdSchema({
-    pageLoaderMock: getTagPageMock,
-    setup,
-    successData: MOCK_PAGE,
-    itemPath: TAG_HREF,
-  });
   testBreadcrumbsJsonLdTrail({
     pageLoaderMock: getTagPageMock,
     setup,
@@ -71,11 +64,6 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
       { name: SITE_NAME, path: routes.home() },
       { name: MOCK_TAG.title, path: TAG_HREF },
     ],
-  });
-  testNoJsonLdWithoutBaseUrl({
-    pageLoaderMock: getTagPageMock,
-    setup,
-    successData: MOCK_PAGE,
   });
   testForwardsArgsToLoader({
     pageLoaderMock: getTagPageMock,

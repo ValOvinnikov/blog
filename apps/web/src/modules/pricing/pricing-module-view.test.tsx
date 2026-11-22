@@ -54,6 +54,7 @@ const setup = customRender(PricingModuleView, {
   footnote: undefined,
   ctaButtons: [],
   contentAlignment: undefined,
+  hasPlanComparison: false,
   titleId: MOCK_TITLE_ID,
   dataTestId: MOCK_DATA_TEST_ID,
 });

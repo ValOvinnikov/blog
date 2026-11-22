@@ -1,8 +1,8 @@
 'use client';
 
 import { Dialog } from '@base-ui/react/dialog';
+import type { TLookFormFeatures } from '@platform/components/features/look/look-form/look-form-features';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
-import { LookSample } from '@platform/components/features/site-preview/look-sample';
 import { SampleCookieButton } from '@platform/components/features/site-preview/sample-cookie-button';
 import { DeviceFrame } from '@platform/components/shared/device-frame';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
@@ -10,9 +10,7 @@ import { DEVICE_FRAME_FIT } from '@platform/constants/device-frame';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
 import { PREVIEW_HEADING_LAYOUT } from '@platform/constants/preview';
 import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
-import { toSampleBusyStyle } from '@platform/utils/sample-busy-style/sample-busy-style';
 import { toSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
-import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
 import type { TLocaleIsoCode } from '@shinefold/config';
@@ -21,6 +19,7 @@ import { useRef, useState } from 'react';
 
 import { LookFollowMark } from './components/look-follow-mark';
 import { LookFullscreenDialog } from './components/look-fullscreen-dialog';
+import { LookPreviewSample } from './components/look-preview-sample/look-preview-sample';
 import { LookPreviewSolos } from './components/look-preview-solos';
 import { LookPreviewStatus } from './components/look-preview-status';
 import { useFrameAvailableHeight } from './use-frame-available-height';
@@ -29,8 +28,7 @@ import { useLookPreviewToolbar } from './use-look-preview-toolbar';
 
 export type TLookPreviewProps = {
   liveLocales: readonly TLocaleIsoCode[];
-  hasReaderAccounts: boolean;
-  hasCookieBanner: boolean;
+  features: TLookFormFeatures;
   siteHost: string;
   followTarget: TLookFollowTarget;
   isShown: boolean;
@@ -39,15 +37,13 @@ export type TLookPreviewProps = {
 
 export const LookPreview = ({
   liveLocales,
-  hasReaderAccounts,
-  hasCookieBanner,
+  features: { hasReaderAccounts, hasBookmarks, hasCookieBanner },
   siteHost,
   followTarget,
   isShown,
   isScrollingWithPage,
 }: TLookPreviewProps) => {
-  const { shownBrandName, values, isSubmenuPreviewOpen, previewDevice } =
-    useLookForm();
+  const { values, previewDevice } = useLookForm();
   const tPreview = useTranslations('previewModeControl');
   const { toolbarProps, isDark, isSignedIn } =
     useLookPreviewToolbar(hasReaderAccounts);
@@ -65,6 +61,7 @@ export const LookPreview = ({
     scale,
     isShown,
   });
+  const { onHandScroll } = follow;
   const theme = buildSitePreviewTheme(values, isDark);
   const footer = toSampleFooterStyle(values, hasCookieBanner);
 
@@ -77,16 +74,11 @@ export const LookPreview = ({
   );
   const sample = (
     <>
-      <LookSample
-        brand={{ name: shownBrandName, logoSrc: values.logo.url }}
+      <LookPreviewSample
         theme={theme}
-        liveLocales={liveLocales}
-        header={toSampleHeaderStyle(values)}
         footer={footer}
-        busy={toSampleBusyStyle(values)}
-        hasReaderAccounts={hasReaderAccounts}
-        isSignedIn={isSignedIn}
-        isSubmenuOpen={isSubmenuPreviewOpen}
+        liveLocales={liveLocales}
+        reader={{ hasAccounts: hasReaderAccounts, hasBookmarks, isSignedIn }}
       />
       {footer.hasCookieSettingsButton && (
         <DeviceFrame.Overlay>
@@ -126,11 +118,9 @@ export const LookPreview = ({
           <DeviceFrame
             ref={frameRef}
             device={previewDevice}
-            host={siteHost}
+            chrome={{ host: siteHost, isDark }}
             fit={{ mode: DEVICE_FRAME_FIT.PAGE, availableHeight }}
-            isDark={isDark}
-            onScaleChange={setScale}
-            onHandScroll={follow.onHandScroll}
+            listeners={{ onScaleChange: setScale, onHandScroll }}
           >
             {sample}
             {follow.isFollowing && follow.outline && (

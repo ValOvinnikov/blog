@@ -25,7 +25,6 @@ interface IActionGroupAction {
 
 export interface IActionGroupProps {
   actions: readonly IActionGroupAction[];
-  isOnDark?: boolean;
 }
 
 const toButtonVariant = (
@@ -36,12 +35,7 @@ const toButtonVariant = (
   return variant === CTA_ACTION_VARIANT.PRIMARY ? 'primary' : 'ghost';
 };
 
-const toIsReversedOnDark = (
-  isOnDark: TMaybeUndefined<boolean>,
-  variant: TActionButtonVariant,
-): boolean => Boolean(isOnDark) && variant !== 'primary';
-
-export const ActionGroup = ({ actions, isOnDark }: IActionGroupProps) => (
+export const ActionGroup = ({ actions }: IActionGroupProps) => (
   <>
     {actions.map((action, index) => {
       const variant = toButtonVariant(action.variant, action.appearance);
@@ -53,10 +47,7 @@ export const ActionGroup = ({ actions, isOnDark }: IActionGroupProps) => (
           href={action.link.href}
           target={action.link.target}
           variant={variant}
-          className={actionGroupVariants({
-            isOnDark: toIsReversedOnDark(isOnDark, variant),
-            isInline: variant === 'link',
-          })}
+          className={actionGroupVariants({ variant })}
         >
           {action.link.label}
           {action.hiddenLabelSuffix && (

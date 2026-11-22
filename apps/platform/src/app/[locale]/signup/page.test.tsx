@@ -14,6 +14,8 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/utils/env/env');
 
+vi.mock('@platform/server/legal-pages/resolve-legal-page-urls');
+
 vi.mock(
   '@shinefold/auth/utils/oauth-providers/oauth-providers',
   async (importActual) => {

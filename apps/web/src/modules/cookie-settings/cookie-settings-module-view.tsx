@@ -30,12 +30,7 @@ export const CookieSettingsModuleView = ({
       dataTestId={`cookie-settings-module-${id}`}
     >
       <div className={s.wrapper()}>
-        <ModuleHeading
-          headingBlock={headingBlock}
-          id={titleId}
-          level={2}
-          variant="section"
-        />
+        <ModuleHeading headingBlock={headingBlock} id={titleId} level={2} />
         <CookieSettingsForm />
       </div>
     </Section>

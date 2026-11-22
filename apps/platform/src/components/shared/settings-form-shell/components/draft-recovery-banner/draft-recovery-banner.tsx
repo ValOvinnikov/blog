@@ -4,12 +4,9 @@ import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Disclosure } from '@platform/components/shared/disclosure';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { formatLocalMoment } from '@platform/utils/format-local-moment/format-local-moment';
 import type { TDraftDifference } from '@platform/utils/settings-draft-offer/settings-draft-offer';
-import {
-  ALERT_TYPE,
-  LOCALE_BCP47_TAGS,
-  type TLocaleIsoCode,
-} from '@shinefold/config';
+import { ALERT_TYPE, LOCALE_BCP47_TAGS } from '@shinefold/config';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -23,17 +20,6 @@ export type TDraftRecoveryBannerProps = {
   differences: TDraftDifference[];
   onRestore: () => void;
   onDiscard: () => void;
-};
-
-const isSameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
-
-const formatMoment = (date: Date, now: Date, locale: TLocaleIsoCode) => {
-  const tag = LOCALE_BCP47_TAGS[locale];
-  const isToday = isSameDay(date, now);
-  const text = isToday
-    ? date.toLocaleTimeString(tag, { hour: 'numeric', minute: '2-digit' })
-    : date.toLocaleString(tag, { dateStyle: 'medium', timeStyle: 'short' });
-  return { isToday, text };
 };
 
 export const DraftRecoveryBanner = ({
@@ -50,7 +36,7 @@ export const DraftRecoveryBanner = ({
   const differenceCount = differences.length;
   const hasDifferences = differenceCount > 0;
   const { description } = draftRecoveryBannerVariants();
-  const taken = formatMoment(takenAt, now, locale);
+  const taken = formatLocalMoment(takenAt, now, locale);
 
   const heading = (() => {
     if (!hasDifferences) {
@@ -65,7 +51,7 @@ export const DraftRecoveryBanner = ({
     }
     return t('differencesTitle', {
       takenAt: taken.text,
-      savedAt: formatMoment(savedAt, now, locale).text,
+      savedAt: formatLocalMoment(savedAt, now, locale).text,
     });
   })();
 

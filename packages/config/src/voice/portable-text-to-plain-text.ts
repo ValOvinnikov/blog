@@ -1,16 +1,7 @@
-type TPlainTextBlocks = ReadonlyArray<{
-  children?: ReadonlyArray<{ text?: string | null }> | null;
-}>;
+import { toBlockText, type TTextBlock } from '@shinefold/utils/portable-text';
 
 export function portableTextToPlainText(
-  value: TPlainTextBlocks | null | undefined,
+  value: ReadonlyArray<TTextBlock> | null | undefined,
 ): string {
-  if (!value || value.length === 0) return '';
-
-  return value
-    .map((block) =>
-      (block.children ?? []).map((span) => span.text ?? '').join(''),
-    )
-    .join(' ')
-    .trim();
+  return (value ?? []).map(toBlockText).join(' ').trim();
 }

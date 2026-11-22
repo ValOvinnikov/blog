@@ -1,8 +1,4 @@
-import {
-  BRAND_VARIANT,
-  CONTAINER_WIDTH,
-  SPACING_SCALE,
-} from '@shinefold/config';
+import { CONTAINER_WIDTH, SPACING_SCALE } from '@shinefold/config';
 import {
   BAND_SPACING_BOTTOM,
   BAND_SPACING_TOP,
@@ -11,17 +7,10 @@ import {
 
 export const sectionVariants = tv({
   slots: {
-    root: ['flex flex-col'],
+    root: ['flex flex-col bg-ambient'],
     inner: ['mx-auto w-full flex flex-col px-gutter'],
   },
   variants: {
-    brandVariant: {
-      [BRAND_VARIANT.PRIMARY]: { root: ['bg-primary'] },
-      [BRAND_VARIANT.SECONDARY]: { root: ['bg-secondary surface-secondary'] },
-      [BRAND_VARIANT.BRAND_PRIMARY]: {
-        root: ['bg-brand-primary-muted surface-brand-primary'],
-      },
-    },
     spacingTop: {
       [SPACING_SCALE.NONE]: { root: [BAND_SPACING_TOP[SPACING_SCALE.NONE]] },
       [SPACING_SCALE.SM]: { root: [BAND_SPACING_TOP[SPACING_SCALE.SM]] },

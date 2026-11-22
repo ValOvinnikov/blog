@@ -1,25 +1,30 @@
-import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import {
+  TEXT_ROLE,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@shinefold/config';
 import {
   Heading,
   type THeadingProps,
 } from '@shinefold/ui/components/atoms/heading';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 
 import {
   settingRowVariants,
   type TSettingRowVariants,
 } from './setting-row-variants';
 
-export type TSettingRowProps = IWithClassName &
-  IWithDataTestId & {
-    label: ReactNode;
-    labelLevel?: THeadingProps['level'];
-    description?: ReactNode;
-    tone?: TSettingRowVariants['tone'];
-    children?: ReactNode;
-  };
+export type TSettingRowProps = PropsWithChildren<
+  IWithClassName &
+    IWithDataTestId & {
+      label: ReactNode;
+      labelLevel?: THeadingProps['level'];
+      description?: ReactNode;
+      tone?: TSettingRowVariants['tone'];
+    }
+>;
 
-/** A label + description + control-slot row shared by every `/account` section (privacy & data, email preferences, connected accounts). */
+/** One labelled setting in a settings list, with an optional description and a slot for its controls. */
 export const SettingRow = ({
   label,
   labelLevel = 3,
@@ -40,7 +45,11 @@ export const SettingRow = ({
   return (
     <div data-testid={dataTestId} className={root({ class: className })}>
       <div className={content()}>
-        <Heading level={labelLevel} className={title()}>
+        <Heading
+          level={labelLevel}
+          visual={TEXT_ROLE.CARD_TITLE}
+          className={title()}
+        >
           {label}
         </Heading>
         {description && <p className={descriptionSlot()}>{description}</p>}

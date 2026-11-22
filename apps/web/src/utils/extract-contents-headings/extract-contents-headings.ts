@@ -1,5 +1,6 @@
 import type { TPortableTextBlock } from '@shinefold/config';
 import type { TPortableTextBody } from '@shinefold/service';
+import { toBlockText } from '@shinefold/utils/portable-text';
 import { hasLength } from '@shinefold/utils/primitives';
 
 export const MIN_H2_HEADINGS_FOR_RAIL = 3;
@@ -17,12 +18,6 @@ const isHeadingBlock = (
 ): node is TPortableTextBlock & { style: 'h2' | 'h3' } =>
   node._type === 'block' && (node.style === 'h2' || node.style === 'h3');
 
-const blockText = (block: TPortableTextBlock): string =>
-  (block.children ?? [])
-    .map((child) => child.text ?? '')
-    .join('')
-    .trim();
-
 /** Returns an empty outline when the body has too few H2s to earn a contents rail. */
 export const extractContentsHeadings = (
   body: TPortableTextBody | undefined,
@@ -34,7 +29,7 @@ export const extractContentsHeadings = (
     .map((block) => ({
       key: block._key,
       level: (block.style === 'h2' ? 2 : 3) as TContentsHeadingLevel,
-      text: blockText(block),
+      text: toBlockText(block).trim(),
     }))
     .filter((heading) => hasLength(heading.text));
 

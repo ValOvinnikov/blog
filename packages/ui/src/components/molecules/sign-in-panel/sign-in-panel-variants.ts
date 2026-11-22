@@ -1,9 +1,10 @@
-import { POPOVER_SURFACE, tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { POPOVER_SURFACE, tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const signInPanelVariants = tv({
   slots: {
     root: [POPOVER_SURFACE, 'gap-2'],
-    title: ['font-display text-copy font-semibold text-text'],
+    title: [TYPOGRAPHY[TEXT_ROLE.CARD_TITLE]],
     providers: ['mt-1 flex flex-col gap-2'],
     or: [
       'my-1.5 flex items-center gap-2.5',

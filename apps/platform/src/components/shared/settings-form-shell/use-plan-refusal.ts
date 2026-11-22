@@ -1,6 +1,5 @@
 'use client';
 
-import { useTenantPlan } from '@platform/context/tenant-plan-provider';
 import {
   isNotInPlanRefusal,
   type TNotInPlanRefusal,
@@ -12,17 +11,20 @@ import type {
   TMaybeUndefined,
   TOutcome,
 } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useRouter } from 'next/navigation';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState, type Dispatch, type SetStateAction } from 'react';
 
+import type { TPlanRefusalMessageKey } from './settings-form-types';
+
 export const usePlanRefusal = <TValues>(
   fields: TSettingsDraftField<TValues>[],
+  messageKey: TPlanRefusalMessageKey = 'notInPlan',
 ) => {
   const t = useTranslations('saveBar');
   const format = useFormatter();
   const router = useRouter();
-  const renderedPlan = useTenantPlan();
   const [refusal, setRefusal] = useState<TMaybeUndefined<TNotInPlanRefusal>>();
 
   const submit = async <TResult extends TOutcome<TActionOutcome>>(
@@ -37,7 +39,7 @@ export const usePlanRefusal = <TValues>(
         restoreRefusedItems(current, savedValues, result.items),
       );
       setRefusal(result);
-      if (result.values.plan !== renderedPlan) router.refresh();
+      router.refresh();
     }
     return result;
   };
@@ -45,12 +47,18 @@ export const usePlanRefusal = <TValues>(
   const labelOf = (item: string) =>
     fields.find(({ id }) => id === item)?.label ?? item;
 
-  const message =
-    refusal &&
-    t('notInPlan', {
-      plan: refusal.values.plan,
-      items: format.list(refusal.items.map(labelOf)),
+  const toMessage = ({
+    values: { plan, localeLimit },
+    items,
+  }: TNotInPlanRefusal) =>
+    t(messageKey, {
+      plan,
+      ...(!isUndefined(localeLimit) && { limit: localeLimit }),
+      count: items.length,
+      items: format.list(items.map(labelOf)),
     });
+
+  const message = refusal && toMessage(refusal);
 
   return { submit, clear: () => setRefusal(undefined), message };
 };

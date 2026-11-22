@@ -1,8 +1,9 @@
-import type { TMaybeNull } from '@shinefold/config/types';
 import { isNull } from '@shinefold/utils/primitives';
 
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
 import type { TValueOf } from '@shinefold/config/utils';
 
+import { CAPABILITY, type TCapability } from './capability';
 import type { TModuleType } from './module';
 
 export const MODULE_PACK = {
@@ -45,6 +46,23 @@ const isModuleType = (type: string): type is TModuleType =>
 
 export const getModulePack = (type: string): TMaybeNull<TModulePack> =>
   isModuleType(type) ? MODULE_PACK_BY_TYPE[type] : null;
+
+export const CAPABILITY_BY_MODULE_TYPE = {
+  module_newsletter: CAPABILITY.NEWSLETTER,
+  module_contactForm: CAPABILITY.CONTACT_FORM,
+} as const satisfies Partial<Record<TModuleType, TCapability>>;
+
+const isCapabilityGatedModuleType = (
+  type: string,
+): type is keyof typeof CAPABILITY_BY_MODULE_TYPE =>
+  Object.hasOwn(CAPABILITY_BY_MODULE_TYPE, type);
+
+export const getModuleCapability = (
+  type: string,
+): TMaybeUndefined<TCapability> =>
+  isCapabilityGatedModuleType(type)
+    ? CAPABILITY_BY_MODULE_TYPE[type]
+    : undefined;
 
 export const isModuleTypeEntitled = (
   type: string,

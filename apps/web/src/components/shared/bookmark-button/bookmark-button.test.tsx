@@ -1,8 +1,9 @@
 import { faker } from '@faker-js/faker';
-import { ACTION_OUTCOME } from '@shinefold/config';
+import { ACTION_OUTCOME, SITE_MESSAGES } from '@shinefold/config';
 import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import type { TValueOf } from '@shinefold/config/utils';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { OutOfDatePageNotice } from '@web/components/features/layout/site-providers/components/out-of-date-page-notice/out-of-date-page-notice';
 import { AuthMenu } from '@web/components/shared/site-header/components/auth-menu/auth-menu';
 import { BOOKMARK_LOG } from '@web/constants/bookmark';
 import { SESSION_STATUS } from '@web/constants/session';
@@ -16,6 +17,10 @@ import { renderElement, screen, waitFor } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import { ARIA_PRESSED } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import {
+  MOCK_UNRECOGNIZED_ACTION_ERROR,
+  mockUnrecognizedActionError,
+} from '@web/testing/shared/out-of-date/mock-unrecognized-action';
 import { logger } from '@web/utils/logger/logger';
 import { reportClientError } from '@web/utils/report-client-error';
 import { type SessionContextValue, useSession } from 'next-auth/react';
@@ -47,6 +52,7 @@ const REVERTED_MESSAGE = 'Reverted';
 const SAVE_FAILED_MESSAGE = "Couldn't save that. Try again.";
 const UNAVAILABLE_MESSAGE =
   "Bookmarking isn't available on this site right now.";
+const OUT_OF_DATE_MESSAGE = SITE_MESSAGES.outOfDateNotice.message;
 
 const mockSessionStatus = (status: TValueOf<typeof SESSION_STATUS>) => {
   vi.mocked(useSession).mockReturnValue({
@@ -59,6 +65,7 @@ const mockSessionStatus = (status: TValueOf<typeof SESSION_STATUS>) => {
 const setup = () =>
   renderElement(
     <ToastProvider>
+      <OutOfDatePageNotice />
       <AuthMenu
         oauthProviderIds={[OAUTH_PROVIDER.GITHUB]}
         accountControl={MOCK_ACCOUNT_CONTROL}
@@ -172,6 +179,22 @@ describe(`<${BookmarkButton.name}/>`, () => {
       );
     });
 
+    it('shows the out-of-date notice, unlogged, for an unrecognised status action', async () => {
+      mockUnrecognizedActionError();
+      vi.mocked(getBookmarkStatus).mockRejectedValue(
+        MOCK_UNRECOGNIZED_ACTION_ERROR,
+      );
+      setup();
+
+      const notice = await screen.findByText(OUT_OF_DATE_MESSAGE);
+
+      const saveButton = screen.getByRole('button', { name: SAVE_POST });
+      expect(notice).toBeVisible();
+      expect(saveButton).toHaveAttribute(ARIA_PRESSED, 'false');
+      expect(reportClientError).not.toHaveBeenCalled();
+      expect(logger.error).not.toHaveBeenCalled();
+    });
+
     describe('with an unsaved post', () => {
       let saveButton: HTMLElement;
 
@@ -222,6 +245,44 @@ describe(`<${BookmarkButton.name}/>`, () => {
         expect(failure).toBeVisible();
         expect(retryButton).toBeVisible();
         expect(saveButton).toHaveAttribute(ARIA_PRESSED, 'false');
+      });
+
+      describe('when the page is out of date', () => {
+        beforeEach(() => {
+          mockUnrecognizedActionError();
+        });
+
+        it('rolls back the save and tells the reader', async () => {
+          vi.mocked(setBookmarkStatus).mockRejectedValueOnce(
+            MOCK_UNRECOGNIZED_ACTION_ERROR,
+          );
+
+          await user.click(saveButton);
+
+          const notice = await screen.findByText(OUT_OF_DATE_MESSAGE);
+          const failure = screen.queryByText(SAVE_FAILED_MESSAGE);
+          expect(notice).toBeVisible();
+          expect(failure).not.toBeInTheDocument();
+          expect(saveButton).toHaveAttribute(ARIA_PRESSED, 'false');
+        });
+
+        it('keeps the save when Undo is unrecognised and tells the reader', async () => {
+          mockWriteOutcomes(ACTION_OUTCOME.SUCCESS);
+          vi.mocked(setBookmarkStatus).mockRejectedValueOnce(
+            MOCK_UNRECOGNIZED_ACTION_ERROR,
+          );
+          await user.click(saveButton);
+          const undoButton = await screen.findByRole('button', { name: UNDO });
+
+          await user.click(undoButton);
+
+          const notice = await screen.findByText(OUT_OF_DATE_MESSAGE);
+          const savedButton = screen.getByRole('button', {
+            name: REMOVE_BOOKMARK,
+          });
+          expect(notice).toBeVisible();
+          expect(savedButton).toHaveAttribute(ARIA_PRESSED, 'true');
+        });
       });
 
       it('saves the post when Retry succeeds', async () => {
