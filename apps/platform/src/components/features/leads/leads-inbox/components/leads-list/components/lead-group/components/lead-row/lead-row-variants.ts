@@ -7,7 +7,7 @@ export const leadRowVariants = tv({
   slots: {
     row: [
       'flex w-full min-w-0 min-h-11 flex-col gap-1 text-left',
-      'border-b border-l-[3px] border-b-platform-line-2 border-l-transparent px-[15px] py-3',
+      'border-b border-b-platform-line-2 py-3 pr-[15px] pl-[18px]',
       'cursor-pointer',
     ],
     top: ['flex min-w-0 items-center gap-2'],
@@ -27,7 +27,6 @@ export const leadRowVariants = tv({
         row: [
           'relative bg-platform-surface-head hover:bg-platform-surface-head',
           SELECTED_STRIPE_CLASSES,
-          'before:-left-platform-bar',
           insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE_HEAD),
         ],
       },
