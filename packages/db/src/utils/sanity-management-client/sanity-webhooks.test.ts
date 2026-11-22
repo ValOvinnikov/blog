@@ -26,6 +26,7 @@ import {
   REVALIDATE_WEBHOOK_PROJECTION,
   updateSanityWebhookProjection,
   updateSanityWebhookSecret,
+  updateSanityWebhookUrl,
 } from './sanity-webhooks';
 
 faker.seed(2760);
@@ -176,6 +177,49 @@ describe(updateSanityWebhookSecret, () => {
 
     await expect(updateSanityWebhookSecret(MOCK_SECRET_INPUT)).rejects.toThrow(
       MOCK_SANITY_WEBHOOK_ID,
+    );
+  });
+});
+
+describe(updateSanityWebhookUrl, () => {
+  const MOCK_URL_INPUT = { ...MOCK_UPDATE_INPUT, url: MOCK_OTHER_URL };
+
+  const MOCK_MOVED_HOOK = { ...MOCK_HOOK, url: MOCK_OTHER_URL };
+
+  it('PATCHes only the URL of the named hook', async () => {
+    fetchMock.mockResolvedValue(jsonResponse(MOCK_MOVED_HOOK));
+
+    await updateSanityWebhookUrl(MOCK_URL_INPUT);
+
+    const { url, body, method } = firstFetchCall(fetchMock);
+    expect(url).toBe(MOCK_SANITY_EXPECTED_URL.webhook);
+    expect(method).toBe(HTTP_METHOD.PATCH);
+    expect(body).toEqual({ url: MOCK_OTHER_URL });
+  });
+
+  it('throws naming the hook when the response is not the moved hook', async () => {
+    fetchMock.mockResolvedValue(jsonResponse([]));
+
+    await expect(updateSanityWebhookUrl(MOCK_URL_INPUT)).rejects.toThrow(
+      MOCK_SANITY_WEBHOOK_ID,
+    );
+  });
+
+  it('throws naming the hook when the answered hook keeps its old URL', async () => {
+    fetchMock.mockResolvedValue(jsonResponse(MOCK_HOOK));
+
+    await expect(updateSanityWebhookUrl(MOCK_URL_INPUT)).rejects.toThrow(
+      MOCK_SANITY_WEBHOOK_ID,
+    );
+  });
+
+  it('throws with the response status and body when Sanity refuses the move', async () => {
+    fetchMock.mockResolvedValue(
+      textResponse(MOCK_SANITY_ERROR_BODY, HTTP_STATUS.BAD_REQUEST),
+    );
+
+    await expect(updateSanityWebhookUrl(MOCK_URL_INPUT)).rejects.toThrow(
+      new RegExp(`${HTTP_STATUS.BAD_REQUEST}.*${MOCK_SANITY_ERROR_BODY}`),
     );
   });
 });
