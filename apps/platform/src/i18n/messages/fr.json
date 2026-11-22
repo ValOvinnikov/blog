@@ -292,7 +292,8 @@
       "PAST_DUE": "Paiement en retard"
     },
     "manage": "Gérer",
-    "manageAriaLabel": "Gérer {tenantName}"
+    "manageAriaLabel": "Gérer {tenantName}",
+    "matchedDomain": "Correspond à {domain}"
   },
   "tenantsSearch": {
     "label": "Rechercher des locataires",

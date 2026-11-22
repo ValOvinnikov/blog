@@ -62,6 +62,8 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   tenants table opens newest first; each column header sorts it and a second
   click reverses, and a search field narrows it by name or any of the
   tenant's domains, so a site on a custom domain is still found by its slug.
+  A tenant found only through an extra domain shows that domain under its main
+  one, labelled as the match; a name or main-domain match shows nothing extra.
   The search applies 300ms after typing pauses, or at once on Enter, ignores
   surrounding spaces, keeps focus in the field while results update, and has
   its own clear button in place of the browser's native one. Each applied

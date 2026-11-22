@@ -5,7 +5,7 @@ import {
   MOCK_BLOCKED_DOMAIN,
   mockBlockedSignupEntry,
 } from '@platform/testing/blocked-signups/fixtures';
-import { customRender, screen } from '@platform/testing/custom-render';
+import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
@@ -106,6 +106,6 @@ describe(`<${RemoveBlockedIdentityControl.name}/>`, () => {
 
     await user.click(confirm);
 
-    expect(refresh).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(refresh).toHaveBeenCalledTimes(1));
   });
 });

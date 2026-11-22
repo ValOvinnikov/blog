@@ -3,6 +3,7 @@ import { mockLocaleRouterPush } from '@platform/testing/mock-locale-router';
 import {
   mockReadyClientTenant,
   mockTenantsListQuery,
+  MOCK_CUSTOM_DOMAIN,
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_ID,
   MOCK_OTHER_TENANT_NAME,
@@ -45,6 +46,8 @@ const ARIA_SORT = 'aria-sort';
 const TENANT_COLUMN = 'Tenant';
 const CREATED_COLUMN = 'Created';
 const PLAN_COLUMN = 'Plan';
+const MATCHED_HINT = `Matched on ${MOCK_CUSTOM_DOMAIN}`;
+const MATCHED_LABEL = /^Matched on /;
 
 describe(`<${TenantsTable.name}/>`, () => {
   it("shows each tenant's name, domain, plan and status", () => {
@@ -137,6 +140,22 @@ describe(`<${TenantsTable.name}/>`, () => {
         MOCK_TENANT_CREATED_AT.toISOString(),
       );
     });
+  });
+
+  it('labels only the row a search matched through an extra address', () => {
+    setup({
+      tenants: [
+        { ...mockReadyClientTenant(), matchedDomain: MOCK_CUSTOM_DOMAIN },
+        otherTenant(),
+      ],
+      listQuery: mockTenantsListQuery({ search: MOCK_CUSTOM_DOMAIN }),
+    });
+
+    const [, matchedRow] = screen.getAllByRole('row');
+    const labels = screen.getAllByText(MATCHED_LABEL);
+
+    expect(matchedRow).toHaveTextContent(MATCHED_HINT);
+    expect(labels).toHaveLength(1);
   });
 
   it('shows an empty state when there are no tenants', () => {

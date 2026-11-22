@@ -292,7 +292,8 @@
       "PAST_DUE": "Zahlung überfällig"
     },
     "manage": "Verwalten",
-    "manageAriaLabel": "{tenantName} verwalten"
+    "manageAriaLabel": "{tenantName} verwalten",
+    "matchedDomain": "Gefunden über {domain}"
   },
   "tenantsSearch": {
     "label": "Mandanten suchen",

@@ -22,6 +22,7 @@ import {
   type TTenantSortColumn,
 } from '@shinefold/config';
 import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
+import type { TListedTenant } from '@shinefold/db/queries/tenants/list-tenants';
 import { useLocale, useTranslations } from 'next-intl';
 import { useOptimistic, type ReactNode } from 'react';
 
@@ -34,8 +35,11 @@ const COLUMN_LABEL_KEYS = {
   [TENANT_SORT_COLUMN.CREATED]: 'columnCreated',
 } as const satisfies Record<TTenantSortColumn, string>;
 
+export type TTenantsTableTenant = TClientTenant &
+  Pick<TListedTenant, 'matchedDomain'>;
+
 export type TTenantsTableProps = {
-  tenants: TClientTenant[];
+  tenants: TTenantsTableTenant[];
   listQuery: TTenantsListQuery;
   toolbar: ReactNode;
 };
@@ -94,6 +98,11 @@ export const TenantsTable = ({
               <div>
                 <div className={name()}>{tenant.name}</div>
                 <div className={domain()}>{tenant.primaryDomain}</div>
+                {tenant.matchedDomain && (
+                  <div className={domain()}>
+                    {t('matchedDomain', { domain: tenant.matchedDomain })}
+                  </div>
+                )}
               </div>
             </div>
           </DataTableShell.Cell>

@@ -292,7 +292,8 @@
       "PAST_DUE": "Past due"
     },
     "manage": "Manage",
-    "manageAriaLabel": "Manage {tenantName}"
+    "manageAriaLabel": "Manage {tenantName}",
+    "matchedDomain": "Matched on {domain}"
   },
   "tenantsSearch": {
     "label": "Search tenants",

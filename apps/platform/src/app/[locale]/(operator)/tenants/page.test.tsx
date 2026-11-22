@@ -3,6 +3,7 @@ import messages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
+  MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_NAME,
   MOCK_TENANT_SLUG,
   mockTenant,
@@ -48,6 +49,18 @@ describe(`<${TenantsPage.name}/>`, () => {
     const tenantName = screen.getByText(MOCK_TENANT_NAME);
 
     expect(tenantName).toBeVisible();
+  });
+
+  it('shows the extra address a search matched', async () => {
+    listTenantsMock.mockResolvedValueOnce([
+      { ...mockTenant(), matchedDomain: MOCK_CUSTOM_DOMAIN },
+    ]);
+
+    await setup({ searchParams: Promise.resolve({ q: MOCK_CUSTOM_DOMAIN }) });
+
+    const hint = screen.getByText(MOCK_CUSTOM_DOMAIN, { exact: false });
+
+    expect(hint).toBeVisible();
   });
 
   it.each([

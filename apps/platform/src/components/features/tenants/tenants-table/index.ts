@@ -1,1 +1,1 @@
-export { TenantsTable } from './tenants-table';
+export { TenantsTable, type TTenantsTableTenant } from './tenants-table';
