@@ -138,7 +138,6 @@ describe(withComingSoonOff, () => {
       ...ALL_ON,
       commentsEnabled: false,
       ratingsEnabled: false,
-      newsletterEnabled: false,
     });
   });
 

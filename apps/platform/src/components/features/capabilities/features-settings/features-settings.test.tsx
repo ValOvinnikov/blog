@@ -48,6 +48,7 @@ import {
   TENANT_PLAN,
   type TTenantPlan,
 } from '@shinefold/config/constants';
+import { PLAN_REGISTRY } from '@shinefold/db/constants';
 import {
   MOCK_GOOGLE_ANALYTICS,
   MOCK_PLAUSIBLE_ANALYTICS,
@@ -106,6 +107,7 @@ const READER_ACCOUNTS_LABEL = toggleLabel[CAPABILITY.READER_ACCOUNTS];
 const BOOKMARKS_LABEL = toggleLabel[CAPABILITY.BOOKMARKS];
 const CONSENT_BANNER_LABEL = toggleLabel[CAPABILITY.CONSENT_BANNER];
 const CONTACT_FORM_LABEL = toggleLabel[CAPABILITY.CONTACT_FORM];
+const NEWSLETTER_LABEL = toggleLabel[CAPABILITY.NEWSLETTER];
 const { saveBar, grantedBadge } = messages;
 const tGrant = makeEnTranslator('grantEntitlement');
 const tGrantedBadge = makeEnTranslator('grantedBadge');
@@ -168,13 +170,34 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(bookmarksSwitch).toBeChecked();
       expect(consentSwitch).not.toBeChecked();
       expect(contactFormSwitch).toBeChecked();
-      expect(switches).toHaveLength(4);
+      expect(switches).toHaveLength(5);
     });
 
-    it('badges only Newsletter "Coming soon"', () => {
-      const badges = screen.getAllByText(comingSoonBadge);
+    it('badges no row "Coming soon"', () => {
+      const badge = screen.queryByText(comingSoonBadge);
 
-      expect(badges).toHaveLength(1);
+      expect(badge).not.toBeInTheDocument();
+    });
+
+    describe('after switching Newsletter on', () => {
+      let newsletterSwitch: HTMLElement;
+
+      beforeEach(async () => {
+        newsletterSwitch = screen.getByRole('switch', {
+          name: NEWSLETTER_LABEL,
+        });
+        await user.click(newsletterSwitch);
+      });
+
+      it('shows it switched on', () => {
+        expect(newsletterSwitch).toBeChecked();
+      });
+
+      it('switches it off again', async () => {
+        await user.click(newsletterSwitch);
+
+        expect(newsletterSwitch).not.toBeChecked();
+      });
     });
 
     it('nests the Capabilities heading directly under the page heading', () => {
@@ -303,6 +326,21 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     },
   );
 
+  it.each([TENANT_PLAN.FREE, TENANT_PLAN.STARTER])(
+    'locks Newsletter on %s',
+    async (plan) => {
+      setup({ entitledCapabilities: PLAN_REGISTRY[plan] });
+      const newsletterSwitch = screen.getByRole('switch', {
+        name: NEWSLETTER_LABEL,
+      });
+
+      await user.click(newsletterSwitch);
+
+      expect(newsletterSwitch).toHaveAttribute(ARIA_DISABLED, String(true));
+      expect(newsletterSwitch).not.toBeChecked();
+    },
+  );
+
   describe('with only some capabilities entitled', () => {
     let bookmarksSwitch: HTMLElement;
     let consentSwitch: HTMLElement;
@@ -317,15 +355,6 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       contactFormSwitch = screen.getByRole('switch', {
         name: CONTACT_FORM_LABEL,
       });
-    });
-
-    it('shows Newsletter as "Coming soon" with no toggle, whatever the plan', () => {
-      const label = toggleLabel[CAPABILITY.NEWSLETTER];
-      const row = screen.getByText(label);
-      const toggle = screen.queryByRole('switch', { name: label });
-
-      expect(row).toBeVisible();
-      expect(toggle).not.toBeInTheDocument();
     });
 
     it('shows an out-of-plan toggle locked, never hidden', () => {
@@ -567,18 +596,13 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         await waitFor(() => expect(readerAccountsSwitch).toHaveFocus());
       });
 
-      it('offers no grant action on an entitled or coming-soon row', () => {
+      it('offers no grant action on an entitled row', () => {
         const contactFormGrant = screen.queryByRole(
           'button',
           grantTrigger(CONTACT_FORM_LABEL),
         );
-        const newsletterGrant = screen.queryByRole(
-          'button',
-          grantTrigger(toggleLabel[CAPABILITY.NEWSLETTER]),
-        );
 
         expect(contactFormGrant).not.toBeInTheDocument();
-        expect(newsletterGrant).not.toBeInTheDocument();
       });
     });
 
