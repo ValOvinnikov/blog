@@ -485,7 +485,7 @@ not fully functional until they are set:
 | `VERCEL_PROJECT_ID_WEB`            | the shared `apps/web` project id that check runs against                            |
 | `VERCEL_TEAM_ID`                   | only when the Vercel account is team-owned                                          |
 
-> `NEWSLETTER_FROM_ADDRESS` is `apps/web`-only — do **not** set it here.
+> `NEWSLETTER_FROM_ADDRESS` is read by the web and worker projects only — do **not** set it here.
 
 > Every key above is **Production scope only**, same as the web projects — see
 > the Preview-scope note under the web keys above.
@@ -889,15 +889,18 @@ acknowledges those events and records nothing.
 
 Each kind of mail goes through its own key: `RESEND_PLATFORM_API_KEY` on the
 platform and worker projects (sign-in, invites, operator alerts, owner emails)
-and `RESEND_TENANT_API_KEY` on the web projects (reader sign-in, newsletter,
-contact-form leads, posts). On dev both hold the one dev account's key; in
-production each holds its own account's key. Every sender address must be on a
-domain verified in the account that sends it: on the platform and worker
-projects, `MAGIC_LINK_FROM_ADDRESS`, `OPERATOR_ALERT_FROM_ADDRESS` and
-`OWNER_EMAIL_FROM_ADDRESS` in the platform account; on the web projects,
-`MAGIC_LINK_FROM_ADDRESS` and `NEWSLETTER_FROM_ADDRESS` in the tenant-mail
-account. Both keys are also GitHub Environment secrets on `development` and
-`production`, which the required-env CI check verifies.
+and `RESEND_TENANT_API_KEY` on the web and worker projects (reader sign-in,
+newsletter confirmations, contact-form leads on web; post emails on the
+worker). On dev both hold the one dev account's key; in production each holds
+its own account's key. Every sender address must be on a domain verified in
+the account that sends it. In the platform account: `MAGIC_LINK_FROM_ADDRESS`
+on the platform projects, and `OPERATOR_ALERT_FROM_ADDRESS` and
+`OWNER_EMAIL_FROM_ADDRESS` on the platform and worker projects. In the
+tenant-mail account: `MAGIC_LINK_FROM_ADDRESS` on the web projects, and
+`NEWSLETTER_FROM_ADDRESS` on the web and worker projects. Unset on the worker,
+post emails go out from Resend's shared test sender, which delivers only to
+the Resend account owner. Both keys are also GitHub Environment secrets on
+`development` and `production`, which the required-env CI check verifies.
 
 ### 6. Sanity — CORS origins · API → CORS origins
 
