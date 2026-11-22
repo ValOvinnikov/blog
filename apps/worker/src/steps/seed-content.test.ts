@@ -30,7 +30,11 @@ import {
 import { buildAppliedMigrationLedger } from '@worker/utils/migration-ledger/migration-ledger';
 import type { Mock } from 'vitest';
 
-import { seedTenantContent, type TSeedContentDeps } from './seed-content';
+import {
+  seedTenantContent,
+  type TAfterSeed,
+  type TSeedContentDeps,
+} from './seed-content';
 
 faker.seed(7007);
 
@@ -41,6 +45,7 @@ const MOCK_WRITE_TOKEN = faker.string.alphanumeric(32);
 const MOCK_ROBOT_ID = faker.string.uuid();
 const MOCK_EXISTING_SETTINGS_SITE_ID = faker.string.uuid();
 const SITE_SETTINGS_QUERY = '*[_type == "settings_site"][0]._id';
+const MOCK_GRANT_ERROR = new Error(MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE);
 const MOCK_REVOKED_TOKEN = {
   token: MOCK_TENANT_MANAGEMENT_TOKEN,
   projectId: MOCK_SANITY_PROJECT_ID,
@@ -103,6 +108,7 @@ describe(seedTenantContent, () => {
       tenant?: TTenant;
       siteType?: TStarterSiteType;
       deps?: Partial<TSeedContentDeps>;
+      afterSeed?: TAfterSeed;
     } = {},
   ) {
     const { siteType = SITE_TYPE.BLANK, deps } = options;
@@ -117,6 +123,7 @@ describe(seedTenantContent, () => {
         sleep,
         ...deps,
       },
+      options.afterSeed,
     );
   }
 
@@ -162,16 +169,6 @@ describe(seedTenantContent, () => {
     ]);
   });
 
-  it('records every Studio migration as applied in the seed transaction', async () => {
-    await seed();
-
-    const [ledger] = createIfNotExists.mock.lastCall ?? [];
-    expect(ledger.applied.map(({ id }: { id: string }) => id)).toEqual(
-      STUDIO_MIGRATION_IDS,
-    );
-    expect(commit).toHaveBeenCalledTimes(1);
-  });
-
   it('skips seeding when the dataset already has settings_site', async () => {
     const existingSiteClient = createClientStub(
       { createIfNotExists, commit },
@@ -198,60 +195,64 @@ describe(seedTenantContent, () => {
     );
   });
 
-  it('mints an editor token for the tenant project', async () => {
-    await seed();
-
-    expect(mintWriteToken).toHaveBeenCalledWith({
-      token: MOCK_TENANT_MANAGEMENT_TOKEN,
-      projectId: MOCK_SANITY_PROJECT_ID,
-      label: buildSanityTokenLabels(MOCK_PROVISION_ENV.productName).write,
-      role: SANITY_ROBOT_ROLE.EDITOR,
+  describe('on a fresh dataset', () => {
+    beforeEach(async () => {
+      await seed();
     });
-  });
 
-  it('seeds through a client authenticated with the minted token', async () => {
-    await seed();
+    it('records every Studio migration as applied in the seed transaction', () => {
+      const [ledger] = createIfNotExists.mock.lastCall ?? [];
+      expect(ledger.applied.map(({ id }: { id: string }) => id)).toEqual(
+        STUDIO_MIGRATION_IDS,
+      );
+      expect(commit).toHaveBeenCalledTimes(1);
+    });
 
-    const [clientOptions] = vi.mocked(createClient).mock.lastCall ?? [];
-    expect(clientOptions?.projectId).toBe(MOCK_SANITY_PROJECT_ID);
-    expect(clientOptions?.dataset).toBe(MOCK_SANITY_DATASET);
-    expect(clientOptions?.token).toBe(MOCK_WRITE_TOKEN);
-    expect(clientOptions?.useCdn).toBe(false);
-  });
+    it('mints an editor token for the tenant project', () => {
+      expect(mintWriteToken).toHaveBeenCalledWith({
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
+        projectId: MOCK_SANITY_PROJECT_ID,
+        label: buildSanityTokenLabels(MOCK_PROVISION_ENV.productName).write,
+        role: SANITY_ROBOT_ROLE.EDITOR,
+      });
+    });
 
-  it('commits every starter document and the ledger in one transaction, uploading no assets', async () => {
-    await seed();
+    it('seeds through a client authenticated with the minted token', () => {
+      const [clientOptions] = vi.mocked(createClient).mock.lastCall ?? [];
+      expect(clientOptions?.projectId).toBe(MOCK_SANITY_PROJECT_ID);
+      expect(clientOptions?.dataset).toBe(MOCK_SANITY_DATASET);
+      expect(clientOptions?.token).toBe(MOCK_WRITE_TOKEN);
+      expect(clientOptions?.useCdn).toBe(false);
+    });
 
-    expect(assetsUpload).not.toHaveBeenCalled();
-    expect(createIfNotExists).toHaveBeenCalledTimes(
-      starterDocumentsFor(SITE_TYPE.BLANK, tenant).length + 1,
-    );
-    expect(commit).toHaveBeenCalledTimes(1);
-    expect(sleep).not.toHaveBeenCalled();
-  });
+    it('commits every document and the ledger in one transaction, no assets', () => {
+      expect(assetsUpload).not.toHaveBeenCalled();
+      expect(createIfNotExists).toHaveBeenCalledTimes(
+        starterDocumentsFor(SITE_TYPE.BLANK, tenant).length + 1,
+      );
+      expect(commit).toHaveBeenCalledTimes(1);
+      expect(sleep).not.toHaveBeenCalled();
+    });
 
-  it('persists the token and seededAt together', async () => {
-    await seed();
+    it('persists the token and seededAt together', () => {
+      expect(setTenantSanityWriteTokenAndSeededAt).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_WRITE_TOKEN,
+        MOCK_NOW,
+      );
+      expect(revokeWriteToken).not.toHaveBeenCalled();
+    });
 
-    expect(setTenantSanityWriteTokenAndSeededAt).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      MOCK_WRITE_TOKEN,
-      MOCK_NOW,
-    );
-    expect(revokeWriteToken).not.toHaveBeenCalled();
-  });
+    it('commits no defaultOgImage on the site settings', () => {
+      const committedDocuments = createIfNotExists.mock.calls.map(
+        ([document]) => document as Record<string, unknown>,
+      );
+      const site = committedDocuments.find(
+        (document) => document._type === 'settings_site',
+      );
 
-  it('commits no defaultOgImage on the site settings', async () => {
-    await seed();
-
-    const committedDocuments = createIfNotExists.mock.calls.map(
-      ([document]) => document as Record<string, unknown>,
-    );
-    const site = committedDocuments.find(
-      (document) => document._type === 'settings_site',
-    );
-
-    expect(site).not.toHaveProperty('defaultOgImage');
+      expect(site).not.toHaveProperty('defaultOgImage');
+    });
   });
 
   it('still revokes the transient token when seeding fails', async () => {
@@ -274,8 +275,9 @@ describe(seedTenantContent, () => {
   });
 
   it('retries a grant-propagation failure once and succeeds', async () => {
-    const grantError = new Error(MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE);
-    commit.mockRejectedValueOnce(grantError).mockResolvedValueOnce(undefined);
+    commit
+      .mockRejectedValueOnce(MOCK_GRANT_ERROR)
+      .mockResolvedValueOnce(undefined);
 
     await seed();
 
@@ -290,10 +292,9 @@ describe(seedTenantContent, () => {
   });
 
   it('revokes the token and persists nothing once grant retries run out', async () => {
-    const grantError = new Error(MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE);
-    commit.mockRejectedValue(grantError);
+    commit.mockRejectedValue(MOCK_GRANT_ERROR);
 
-    await expect(seed()).rejects.toThrow(grantError);
+    await expect(seed()).rejects.toThrow(MOCK_GRANT_ERROR);
 
     expect(commit.mock.calls.length).toBeGreaterThan(1);
     expect(revokeWriteToken).toHaveBeenCalledWith(MOCK_REVOKED_TOKEN);
@@ -310,5 +311,48 @@ describe(seedTenantContent, () => {
     expect(sleep).not.toHaveBeenCalled();
     expect(revokeWriteToken).toHaveBeenCalledWith(MOCK_REVOKED_TOKEN);
     expect(setTenantSanityWriteTokenAndSeededAt).not.toHaveBeenCalled();
+  });
+
+  describe('with an after-seed step', () => {
+    let afterSeed: Mock<TAfterSeed>;
+
+    beforeEach(() => {
+      afterSeed = vi.fn().mockResolvedValue(undefined);
+    });
+
+    it('runs it on the seeding client once the token is persisted', async () => {
+      await seed({ afterSeed });
+
+      expect(afterSeed).toHaveBeenCalledWith(
+        vi.mocked(createClient).mock.results[0]?.value,
+      );
+      expect(
+        vi.mocked(setTenantSanityWriteTokenAndSeededAt).mock
+          .invocationCallOrder[0],
+      ).toBeLessThan(afterSeed.mock.invocationCallOrder[0] ?? 0);
+    });
+
+    it('runs it on an already-seeded dataset, then revokes the transient token', async () => {
+      const existingSiteClient = createClientStub(
+        { createIfNotExists, commit },
+        { fetchResult: MOCK_EXISTING_SETTINGS_SITE_ID },
+      );
+
+      await seed({
+        afterSeed,
+        deps: { createClient: existingSiteClient.createClient },
+      });
+
+      expect(afterSeed).toHaveBeenCalledOnce();
+      expect(revokeWriteToken).toHaveBeenCalledWith(MOCK_REVOKED_TOKEN);
+    });
+
+    it('keeps the persisted token when it fails', async () => {
+      afterSeed.mockRejectedValue(new Error(MOCK_SANITY_OUTAGE));
+
+      await expect(seed({ afterSeed })).rejects.toThrow(MOCK_SANITY_OUTAGE);
+
+      expect(revokeWriteToken).not.toHaveBeenCalled();
+    });
   });
 });

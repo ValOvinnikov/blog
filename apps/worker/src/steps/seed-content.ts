@@ -36,6 +36,10 @@ const defaultDeps: TSeedContentDeps = {
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 };
 
+export type TAfterSeed = (
+  client: ReturnType<typeof createClient>,
+) => Promise<void>;
+
 const SITE_SETTINGS_EXISTS_QUERY = '*[_type == "settings_site"][0]._id';
 
 // Idempotent on the dataset's own `settings_site`, never `tenants.seededAt`, so an emptied dataset is re-seeded.
@@ -44,6 +48,7 @@ export async function seedTenantContent(
   siteType: TStarterSiteType,
   productName: string,
   deps: TSeedContentDeps = defaultDeps,
+  afterSeed?: TAfterSeed,
 ): Promise<void> {
   if (!tenant.sanityProjectId || !tenant.sanityDataset) {
     throw new Error(
@@ -77,7 +82,10 @@ export async function seedTenantContent(
       retryOptions,
     );
 
-    if (alreadySeeded) return;
+    if (alreadySeeded) {
+      await afterSeed?.(client);
+      return;
+    }
 
     const now = new Date().toISOString();
     const documents = buildStarterDocuments({
@@ -103,6 +111,7 @@ export async function seedTenantContent(
       new Date(),
     );
     persisted = true;
+    await afterSeed?.(client);
   } finally {
     if (!persisted) {
       await deps.revokeWriteToken({
