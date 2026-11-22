@@ -79,7 +79,10 @@ export async function createSanityWebhook(input: {
 
 async function patchSanityWebhook(
   input: { token: string; projectId: string; webhookId: string },
-  patch: { secret: string } | { rule: typeof REVALIDATE_WEBHOOK_RULE },
+  patch:
+    | { secret: string }
+    | { url: string }
+    | { rule: typeof REVALIDATE_WEBHOOK_RULE },
 ): Promise<void> {
   const { token, projectId, webhookId } = input;
   const updated = await sanityWebhooksRequest<Partial<TSanityWebhook>>(
@@ -103,6 +106,15 @@ export async function updateSanityWebhookSecret(input: {
   secret: string;
 }): Promise<void> {
   await patchSanityWebhook(input, { secret: input.secret });
+}
+
+export async function updateSanityWebhookUrl(input: {
+  token: string;
+  projectId: string;
+  webhookId: string;
+  url: string;
+}): Promise<void> {
+  await patchSanityWebhook(input, { url: input.url });
 }
 
 export async function updateSanityWebhookProjection(input: {
