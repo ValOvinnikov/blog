@@ -90,7 +90,10 @@ describe(sendNewsletterPostTest, () => {
     const result = await sendNewsletterPostTest(MOCK_STUDIO_CALLER, MOCK_POST);
 
     const [[email] = []] = vi.mocked(sendEmail).mock.calls;
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      recipient: MOCK_STUDIO_CALLER.email,
+    });
     expect(email?.account).toBe(EMAIL_ACCOUNT.PLATFORM);
     expect(email?.to).toBe(MOCK_STUDIO_CALLER.email);
     expect(email?.from).toBe(`"${MOCK_SENDER_NAME}" <${MOCK_ALERT_ADDRESS}>`);

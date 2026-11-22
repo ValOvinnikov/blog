@@ -1,4 +1,3 @@
-import { MEDIA_TYPE, REQUEST_HEADER } from '@platform/constants/request';
 import type { TStudioCaller } from '@platform/server/auth/resolve-studio-caller';
 import {
   MOCK_OFF_ORIGIN_URL,
@@ -6,7 +5,7 @@ import {
 } from '@platform/testing/auth/fixtures';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import { mockTenant } from '@platform/testing/tenants/fixtures';
-import { HTTP_METHOD } from '@shinefold/config';
+import { HTTP_METHOD, MEDIA_TYPE, REQUEST_HEADER } from '@shinefold/config';
 import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
 
 export const MOCK_NEWSLETTER_LIMITS = {

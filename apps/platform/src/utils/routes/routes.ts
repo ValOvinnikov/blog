@@ -5,6 +5,7 @@ import {
   DEFAULT_TENANTS_SORT,
   type TTenantsListQuery,
 } from '@platform/utils/tenants-list-query/tenants-list-query';
+import { routes } from '@shinefold/config';
 
 /**
  * The final path segment both Studio routes share — also matched against
@@ -75,12 +76,11 @@ export const adminRoutes = {
   dashboardSignIn: () => '/dashboard/sign-in',
   dashboardLook: () => '/dashboard/look',
   dashboardVoice: () => '/dashboard/voice',
-  dashboardFeatures: () => '/dashboard/features',
+  dashboardFeatures: routes.dashboardFeatures,
   dashboardLanguages: () => '/dashboard/languages',
   dashboardEmail: () => '/dashboard/email',
   dashboardLeads: () => '/dashboard/leads',
-  dashboardSubscribers: (page = 1) =>
-    page > 1 ? `/dashboard/subscribers?page=${page}` : '/dashboard/subscribers',
+  dashboardSubscribers: routes.dashboardSubscribers,
   dashboardSubscribersMovedUp: (ceiling: number) =>
     `${adminRoutes.dashboardSubscribers()}?${new URLSearchParams({ [SUBSCRIBERS_SEARCH_PARAM.MOVED_UP]: String(ceiling) })}`,
   dashboardUpgrade: () => '/dashboard/upgrade',

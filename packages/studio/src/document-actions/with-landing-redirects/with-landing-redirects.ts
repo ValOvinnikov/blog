@@ -1,8 +1,8 @@
 import { useToast } from '@sanity/ui/toast';
+import { SANITY_PERSPECTIVE } from '@shinefold/config/constants';
 import { applyLandingRedirects } from '@shinefold/studio/document-actions/apply-landing-redirects/apply-landing-redirects';
+import { STUDIO_API_VERSION } from '@shinefold/studio/studio-api-version';
 import { type DocumentActionComponent, useClient } from 'sanity';
-
-const REDIRECTS_API_VERSION = '2025-02-19';
 
 const wrapped = new WeakMap<DocumentActionComponent, DocumentActionComponent>();
 
@@ -14,7 +14,7 @@ export const withLandingRedirects = (
 
   const LandingPublishAction: DocumentActionComponent = (props) => {
     const description = publish(props);
-    const client = useClient({ apiVersion: REDIRECTS_API_VERSION });
+    const client = useClient({ apiVersion: STUDIO_API_VERSION });
     const toast = useToast();
     const { draft } = props;
 
@@ -25,7 +25,7 @@ export const withLandingRedirects = (
       onHandle: async () => {
         try {
           await applyLandingRedirects(
-            client.withConfig({ perspective: 'published' }),
+            client.withConfig({ perspective: SANITY_PERSPECTIVE.PUBLISHED }),
             draft,
           );
         } catch {

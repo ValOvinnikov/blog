@@ -46,6 +46,9 @@ export const routes = {
   newsletterPostSendStatus: () => '/api/studio/newsletter-post/status',
   newsletterPostTestSend: () => '/api/studio/newsletter-post/test-send',
   newsletterPostSendNow: () => '/api/studio/newsletter-post/send-now',
+  dashboardFeatures: () => '/dashboard/features',
+  dashboardSubscribers: (page = 1) =>
+    page > 1 ? `/dashboard/subscribers?page=${page}` : '/dashboard/subscribers',
   landingPage: (slug: string) => `/${slug}`,
   privacyDocument: (slug: string) => `/privacy/${slug}`,
   legalDocument: (slug: string) => `/legal/${slug}`,

@@ -39,7 +39,7 @@ export default mergeConfig(
       environment: 'node',
       // Off so files share a worker's already-imported `sanity`; the setup file, the preset's reset/restore/unstub flags undo the module, global and spy state a file leaves behind.
       isolate: false,
-      setupFiles: [RESET_FILE_STATE_SETUP],
+      setupFiles: [RESET_FILE_STATE_SETUP, './src/testing/rtl-cleanup.ts'],
       projects: [
         {
           extends: true,

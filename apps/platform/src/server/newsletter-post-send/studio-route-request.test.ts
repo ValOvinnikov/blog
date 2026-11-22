@@ -1,15 +1,11 @@
-import {
-  FETCH_SITE,
-  MEDIA_TYPE,
-  REQUEST_HEADER,
-} from '@platform/constants/request';
+import { FETCH_SITE } from '@platform/constants/request';
 import { MOCK_PLATFORM_ORIGIN } from '@platform/testing/auth/fixtures';
 import {
   MOCK_CROSS_ORIGIN_STUDIO_REQUEST_HEADERS,
   MOCK_STUDIO_REQUEST_HEADERS,
   studioJsonRequest,
 } from '@platform/testing/newsletter-post-send/fixtures';
-import { routes } from '@shinefold/config';
+import { MEDIA_TYPE, REQUEST_HEADER, routes } from '@shinefold/config';
 
 import { isSameOriginJsonRequest } from './studio-route-request';
 

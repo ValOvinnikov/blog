@@ -2038,6 +2038,46 @@
         "file": "packages/config/src/constants/heading-style.ts"
       }
     ],
+    "origin": [
+      {
+        "ref": "REQUEST_HEADER.ORIGIN",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/http-headers.ts"
+      }
+    ],
+    "sec-fetch-site": [
+      {
+        "ref": "REQUEST_HEADER.SEC_FETCH_SITE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/http-headers.ts"
+      }
+    ],
+    "content-type": [
+      {
+        "ref": "REQUEST_HEADER.CONTENT_TYPE",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/http-headers.ts"
+      }
+    ],
+    "application/json": [
+      {
+        "ref": "MEDIA_TYPE.JSON",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/http-headers.ts"
+      }
+    ],
+    "text/plain": [
+      {
+        "ref": "MEDIA_TYPE.TEXT",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/http-headers.ts"
+      }
+    ],
     "GET": [
       {
         "ref": "HTTP_METHOD.GET",
@@ -9254,30 +9294,6 @@
         "file": "apps/web/src/constants/request.ts"
       }
     ],
-    "origin": [
-      {
-        "ref": "REQUEST_HEADER.ORIGIN",
-        "scope": "app:platform",
-        "from": "@platform/constants/request",
-        "file": "apps/platform/src/constants/request.ts"
-      }
-    ],
-    "sec-fetch-site": [
-      {
-        "ref": "REQUEST_HEADER.SEC_FETCH_SITE",
-        "scope": "app:platform",
-        "from": "@platform/constants/request",
-        "file": "apps/platform/src/constants/request.ts"
-      }
-    ],
-    "content-type": [
-      {
-        "ref": "REQUEST_HEADER.CONTENT_TYPE",
-        "scope": "app:platform",
-        "from": "@platform/constants/request",
-        "file": "apps/platform/src/constants/request.ts"
-      }
-    ],
     "same-origin": [
       {
         "ref": "FETCH_SITE.SAME_ORIGIN",
@@ -9289,22 +9305,6 @@
     "same-site": [
       {
         "ref": "FETCH_SITE.SAME_SITE",
-        "scope": "app:platform",
-        "from": "@platform/constants/request",
-        "file": "apps/platform/src/constants/request.ts"
-      }
-    ],
-    "application/json": [
-      {
-        "ref": "MEDIA_TYPE.JSON",
-        "scope": "app:platform",
-        "from": "@platform/constants/request",
-        "file": "apps/platform/src/constants/request.ts"
-      }
-    ],
-    "text/plain": [
-      {
-        "ref": "MEDIA_TYPE.TEXT",
         "scope": "app:platform",
         "from": "@platform/constants/request",
         "file": "apps/platform/src/constants/request.ts"

@@ -7,6 +7,7 @@ import { languageField } from '@shinefold/studio/schema-types/fields/language-fi
 import { modulesField } from '@shinefold/studio/schema-types/fields/modules-field/modules-field';
 import { slugField } from '@shinefold/studio/schema-types/fields/slug-field/slug-field';
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
+import { SendToSubscribersField } from '@shinefold/studio/schema-types/inputs/send-to-subscribers-field/send-to-subscribers-field';
 import { createSlugUrlPreviewInput } from '@shinefold/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
 import { postLatestSchema } from '@shinefold/studio/schema-types/modules/post-latest/post-latest';
 import { postRelatedSchema } from '@shinefold/studio/schema-types/modules/post-related/post-related';
@@ -101,11 +102,12 @@ export const postPageSchema = defineType({
     }),
     defineField({
       name: 'sendToSubscribers',
-      title: 'Send to Subscribers',
+      title: 'Send to subscribers',
       type: 'boolean',
       description:
-        'Emails this post to newsletter subscribers once, when it is first published. Editing and republishing it never sends it again.',
+        "Emails this post to your confirmed subscribers when it's first published. Later edits never send it again.",
       initialValue: true,
+      components: { field: SendToSubscribersField },
     }),
     defineField({
       name: 'postTakeaways',
