@@ -1977,8 +1977,7 @@ a crafted request. `comments` and `ratings` are also on `HIDDEN_CAPABILITIES`
 and have no row at all — a paid-plan row either works or is absent. A
 plan-locked toggle keeps its lock, badged with the cheapest plan that holds it.
 Shipping one of these features means dropping its flag and, for `comments`,
-taking it off `HIDDEN_CAPABILITIES`; a flagged capability with a row shows it
-read-only with a "Coming soon" badge and no switch.
+taking it off `HIDDEN_CAPABILITIES`.
 
 **Plan-aware navigation.** `apps/platform`'s `planPageAccess(plan)` derives
 which plan-gated pages a tenant can use: Languages when `PLAN_LOCALE_LIMIT`
