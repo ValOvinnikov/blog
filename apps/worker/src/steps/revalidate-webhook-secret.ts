@@ -4,10 +4,8 @@ import {
   getTenantRevalidateWebhookSecret,
   setTenantRevalidateWebhookSecret,
 } from '@shinefold/db/queries/tenants';
-import {
-  type TListedSanityWebhook,
-  updateSanityWebhookSecret,
-} from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
+import { updateSanityWebhookSecret } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
+import type { TListedSanityWebhook } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks-list';
 import { HEX_ENCODING } from '@shinefold/utils/hash';
 
 const WEBHOOK_SECRET_BYTES = 32;
