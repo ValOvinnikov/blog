@@ -12,8 +12,13 @@ import {
 import { hasLength } from '@shinefold/utils/primitives';
 import {
   REVALIDATE_WEBHOOK_CHANGE,
+  REVALIDATE_WEBHOOK_NAME,
   type TRevalidateWebhookChange,
 } from '@worker/constants/revalidate-webhook';
+import {
+  targetingUrl,
+  webhooksAtUrl,
+} from '@worker/steps/revalidate-webhook-move';
 import {
   rotateWebhookSecret,
   storedOrNewSecret,
@@ -21,8 +26,6 @@ import {
 } from '@worker/steps/revalidate-webhook-secret';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
-
-const WEBHOOK_NAME = 'web-revalidate (provisioned)';
 
 export function revalidateWebhookUrl(webAppBaseUrl: string): string {
   return new URL('/api/revalidate', webAppBaseUrl).href;
@@ -32,8 +35,7 @@ async function webhooksTargeting(
   target: TTenantWebhookTarget,
 ): Promise<TListedSanityWebhook[]> {
   const { token, projectId, url } = target;
-  const webhooks = await listSanityWebhooks({ token, projectId });
-  return webhooks.filter((webhook) => webhook.url === url);
+  return targetingUrl(await listSanityWebhooks({ token, projectId }), url);
 }
 
 async function createWebhook(target: TTenantWebhookTarget): Promise<void> {
@@ -42,7 +44,7 @@ async function createWebhook(target: TTenantWebhookTarget): Promise<void> {
     token,
     projectId,
     dataset,
-    name: WEBHOOK_NAME,
+    name: REVALIDATE_WEBHOOK_NAME,
     url,
     secret: await storedOrNewSecret(target),
   });
@@ -69,7 +71,7 @@ async function updateStaleProjections(
 }
 
 // Decides from the project's live hooks, never from `webhookCreatedAt`: a
-// hook at an old `WEB_APP_URL`, or one deleted in Sanity, must be replaced.
+// hook at an old `WEB_APP_URL` must be moved, and one deleted in Sanity replaced.
 export async function createTenantRevalidateWebhook(
   tenant: TTenant,
   { webAppBaseUrl }: Pick<TProvisionEnv, 'webAppBaseUrl'>,
@@ -95,7 +97,7 @@ export async function createTenantRevalidateWebhook(
     url: revalidateWebhookUrl(webAppBaseUrl),
   };
 
-  const existing = await webhooksTargeting(target);
+  const { webhooks: existing, isMoved } = await webhooksAtUrl(target);
   const isMissing = !hasLength(existing);
   const isUnrotated = !isMissing && !revalidateWebhookSecretEncrypted;
 
@@ -111,7 +113,7 @@ export async function createTenantRevalidateWebhook(
     await setTenantWebhookCreatedAt(tenantId, new Date());
   }
 
-  return isMissing || isUnrotated || hasUpdatedProjection
+  return isMissing || isMoved || isUnrotated || hasUpdatedProjection
     ? REVALIDATE_WEBHOOK_CHANGE.UPDATED
     : REVALIDATE_WEBHOOK_CHANGE.UNCHANGED;
 }

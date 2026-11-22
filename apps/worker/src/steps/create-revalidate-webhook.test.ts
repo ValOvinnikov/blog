@@ -10,6 +10,7 @@ import {
   createSanityWebhook,
   updateSanityWebhookProjection,
   updateSanityWebhookSecret,
+  updateSanityWebhookUrl,
 } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
 import {
   listSanityWebhooks,
@@ -33,6 +34,7 @@ import {
 } from '@worker/testing/tenant/fixtures';
 import {
   MOCK_CURRENT_WEBHOOK,
+  MOCK_OLD_URL_WEBHOOK,
   MOCK_OTHER_WEBHOOK,
   MOCK_STALE_PROJECTION_WEBHOOK,
   MOCK_WEBHOOK_ID,
@@ -262,6 +264,81 @@ describe(createTenantRevalidateWebhook, () => {
         MOCK_NOW,
       );
     });
+  });
+
+  describe('when the provisioned hook targets an old URL', () => {
+    beforeEach(() => {
+      vi.mocked(listSanityWebhooks).mockResolvedValue([
+        MOCK_OTHER_WEBHOOK,
+        MOCK_OLD_URL_WEBHOOK,
+      ]);
+    });
+
+    it('moves that hook to the current URL and creates none', async () => {
+      const change = await createTenantRevalidateWebhook(
+        baseTenant({
+          revalidateWebhookSecretEncrypted: MOCK_ENCRYPTED_WEBHOOK_SECRET,
+          webhookCreatedAt: MOCK_NOW,
+        }),
+        MOCK_PROVISION_ENV,
+      );
+
+      expect(updateSanityWebhookUrl).toHaveBeenCalledExactlyOnceWith({
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
+        projectId: MOCK_SANITY_PROJECT_ID,
+        webhookId: MOCK_WEBHOOK_ID,
+        url: MOCK_REVALIDATE_WEBHOOK_URL,
+      });
+      expect(change).toBe(REVALIDATE_WEBHOOK_CHANGE.UPDATED);
+      expect(createSanityWebhook).not.toHaveBeenCalled();
+      expect(updateSanityWebhookSecret).not.toHaveBeenCalled();
+      expect(updateSanityWebhookProjection).not.toHaveBeenCalled();
+      expect(setTenantWebhookCreatedAt).not.toHaveBeenCalled();
+    });
+
+    it('rotates a missing secret onto the moved hook', async () => {
+      await createTenantRevalidateWebhook(
+        baseTenant({ webhookCreatedAt: MOCK_NOW }),
+        MOCK_PROVISION_ENV,
+      );
+
+      expect(updateSanityWebhookSecret).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ webhookId: MOCK_WEBHOOK_ID }),
+      );
+      expect(createSanityWebhook).not.toHaveBeenCalled();
+    });
+
+    it('stores nothing when moving the hook fails', async () => {
+      vi.mocked(updateSanityWebhookUrl).mockRejectedValue(
+        new Error(MOCK_SANITY_OUTAGE),
+      );
+
+      await expect(
+        createTenantRevalidateWebhook(baseTenant(), MOCK_PROVISION_ENV),
+      ).rejects.toThrow(MOCK_SANITY_OUTAGE);
+      expect(createSanityWebhook).not.toHaveBeenCalled();
+      expect(setTenantRevalidateWebhookSecret).not.toHaveBeenCalled();
+      expect(setTenantWebhookCreatedAt).not.toHaveBeenCalled();
+    });
+  });
+
+  it('leaves a provisioned hook at an old URL alone while one targets the current URL', async () => {
+    vi.mocked(listSanityWebhooks).mockResolvedValue([
+      MOCK_OLD_URL_WEBHOOK,
+      MOCK_CURRENT_WEBHOOK,
+    ]);
+
+    const change = await createTenantRevalidateWebhook(
+      baseTenant({
+        revalidateWebhookSecretEncrypted: MOCK_ENCRYPTED_WEBHOOK_SECRET,
+        webhookCreatedAt: MOCK_NOW,
+      }),
+      MOCK_PROVISION_ENV,
+    );
+
+    expect(change).toBe(REVALIDATE_WEBHOOK_CHANGE.UNCHANGED);
+    expect(updateSanityWebhookUrl).not.toHaveBeenCalled();
+    expect(createSanityWebhook).not.toHaveBeenCalled();
   });
 
   describe('when the hook carries an old projection', () => {

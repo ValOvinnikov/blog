@@ -1,5 +1,7 @@
 import type { TValueOf } from '@shinefold/config/utils';
 
+export const REVALIDATE_WEBHOOK_NAME = 'web-revalidate (provisioned)';
+
 export const REVALIDATE_WEBHOOK_LOG = {
   ROTATION_TENANT_FAILED: 'webhook_secret_rotation.tenant_failed',
   ROTATION_FINISHED: 'webhook_secret_rotation.finished',
