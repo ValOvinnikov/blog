@@ -4,6 +4,8 @@ import {
 } from '@shinefold/config/constants';
 import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 import { linkToDefaultTranslation } from '@shinefold/studio/schema-types/inputs/translation-link-input/link-to-default-translation';
+import { STUDIO_API_VERSION } from '@shinefold/studio/studio-api-version';
+import { hasLength, isString } from '@shinefold/utils/primitives';
 import { useEffect, useRef } from 'react';
 import {
   getPublishedId,
@@ -12,8 +14,6 @@ import {
   useEditState,
   useFormValue,
 } from 'sanity';
-
-const TRANSLATION_LINK_API_VERSION = '2025-02-19';
 
 export type TTranslationLinkOptions = {
   schemaTypes: readonly string[];
@@ -28,7 +28,7 @@ const DefaultTranslationLink = ({
   defaultLocale: TLocaleIsoCode;
 }) => {
   const documentId = getPublishedId(String(useFormValue(['_id']) ?? ''));
-  const client = useClient({ apiVersion: TRANSLATION_LINK_API_VERSION });
+  const client = useClient({ apiVersion: STUDIO_API_VERSION });
   const { draft, published, ready } = useEditState(documentId, schemaType);
   const document = draft ?? published;
   const language = document?.[LANGUAGE_FIELD];
@@ -36,7 +36,7 @@ const DefaultTranslationLink = ({
 
   useEffect(() => {
     if (!documentId || !ready || !document || hasLinked.current) return;
-    if (typeof language !== 'string' || !isLocaleIsoCode(language)) return;
+    if (!isString(language) || !isLocaleIsoCode(language)) return;
 
     hasLinked.current = true;
     linkToDefaultTranslation(client, {
@@ -65,7 +65,7 @@ export const createTranslationLinkInput = ({
   defaultLocale,
 }: TTranslationLinkOptions) =>
   function TranslationLinkInput(props: InputProps) {
-    if (props.path.length > 0 || !schemaTypes.includes(props.schemaType.name)) {
+    if (hasLength(props.path) || !schemaTypes.includes(props.schemaType.name)) {
       return props.renderDefault(props);
     }
 

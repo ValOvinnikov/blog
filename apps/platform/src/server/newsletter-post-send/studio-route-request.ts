@@ -1,14 +1,12 @@
 import 'server-only';
 
-import {
-  FETCH_SITE,
-  MEDIA_TYPE,
-  REQUEST_HEADER,
-} from '@platform/constants/request';
+import { FETCH_SITE } from '@platform/constants/request';
 import {
   ACTION_OUTCOME,
   HTTP_STATUS,
+  MEDIA_TYPE,
   NEWSLETTER_SEND_NOW_REFUSAL,
+  REQUEST_HEADER,
 } from '@shinefold/config';
 import { isNull } from '@shinefold/utils/primitives';
 import { NextResponse } from 'next/server';

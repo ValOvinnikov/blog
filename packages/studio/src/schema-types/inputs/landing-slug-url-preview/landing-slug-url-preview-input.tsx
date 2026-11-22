@@ -1,3 +1,4 @@
+import { SANITY_PERSPECTIVE } from '@shinefold/config/constants';
 import { SlugUrlPreview } from '@shinefold/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
 import {
   buildNestedRoutePrefix,
@@ -8,6 +9,7 @@ import {
   LANDING_PARENT_CHAIN_QUERY,
   type TLandingParentChainNode,
 } from '@shinefold/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
+import { STUDIO_API_VERSION } from '@shinefold/studio/studio-api-version';
 import { useEffect, useState } from 'react';
 import {
   type Reference,
@@ -16,10 +18,8 @@ import {
   useFormValue,
 } from 'sanity';
 
-const PARENT_CHAIN_API_VERSION = '2025-02-19';
-
 const useAncestorSlugs = (parentId: string | undefined) => {
-  const client = useClient({ apiVersion: PARENT_CHAIN_API_VERSION });
+  const client = useClient({ apiVersion: STUDIO_API_VERSION });
   const [fetched, setFetched] = useState<{
     parentId: string;
     slugs: (string | null | undefined)[];
@@ -30,7 +30,7 @@ const useAncestorSlugs = (parentId: string | undefined) => {
 
     let isCurrent = true;
     client
-      .withConfig({ perspective: 'drafts' })
+      .withConfig({ perspective: SANITY_PERSPECTIVE.DRAFTS })
       .fetch<TLandingParentChainNode | null>(LANDING_PARENT_CHAIN_QUERY, {
         parentId,
       })

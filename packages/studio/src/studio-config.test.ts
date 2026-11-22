@@ -8,6 +8,8 @@ import {
   type TLocaleIsoCode,
   type TSanityDocumentAction,
 } from '@shinefold/config/constants';
+import { PREVIEW_ACTION_NAME } from '@shinefold/studio/document-actions/preview-action/preview-action';
+import { SendTestAction } from '@shinefold/studio/document-actions/send-test-action/send-test-action';
 import { PAGE_COOKIE_STATEMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
 import { PAGE_HOME_TYPE } from '@shinefold/studio/schema-types/documents/pages/home/home-type';
 import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
@@ -179,8 +181,7 @@ describe(buildStudioConfig, () => {
         (schemaType) => {
           const resolved = actions([publish], schemaType);
 
-          expect(resolved).toHaveLength(2);
-          expect(resolved.at(-1)?.action).toBeUndefined();
+          expect(resolved.at(-1)?.displayName).toBe(PREVIEW_ACTION_NAME);
         },
       );
 
@@ -190,7 +191,10 @@ describe(buildStudioConfig, () => {
     });
 
     it('adds no preview action without a preview base path', () => {
-      expect(actions([publish], PAGE_POST_TYPE)).toEqual([publish]);
+      expect(actions([publish], PAGE_POST_TYPE)).toEqual([
+        publish,
+        SendTestAction,
+      ]);
     });
   });
 

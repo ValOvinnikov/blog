@@ -3,6 +3,7 @@ import {
   SANITY_DOCUMENT_ACTION,
 } from '@shinefold/config/constants';
 import { createPreviewAction } from '@shinefold/studio/document-actions/preview-action/preview-action';
+import { SendTestAction } from '@shinefold/studio/document-actions/send-test-action/send-test-action';
 import { withLandingRedirects } from '@shinefold/studio/document-actions/with-landing-redirects/with-landing-redirects';
 import { SampleBadge } from '@shinefold/studio/document-badges/sample-badge/sample-badge';
 import { PAGE_COOKIE_STATEMENT_TYPE } from '@shinefold/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
@@ -38,6 +39,17 @@ const withLandingPublish = (prev: DocumentActionComponent[]) =>
       : action,
   );
 
+// Sanity renders the first action as the primary button, so the test send goes second to lead the menu.
+const withSendTestAction = ([primary, ...rest]: DocumentActionComponent[]) =>
+  primary ? [primary, SendTestAction, ...rest] : [SendTestAction];
+
+const ACTIONS_BY_TYPE: Readonly<
+  Record<string, (prev: DocumentActionComponent[]) => DocumentActionComponent[]>
+> = {
+  [PAGE_LANDING_TYPE]: withLandingPublish,
+  [PAGE_POST_TYPE]: withSendTestAction,
+};
+
 export const buildDocumentOptions = (previewBasePath?: string) => {
   const previewAction = previewBasePath
     ? createPreviewAction(previewBasePath)
@@ -54,8 +66,7 @@ export const buildDocumentOptions = (previewBasePath?: string) => {
         );
       }
 
-      const actions =
-        schemaType === PAGE_LANDING_TYPE ? withLandingPublish(prev) : prev;
+      const actions = ACTIONS_BY_TYPE[schemaType]?.(prev) ?? prev;
 
       return previewAction && PREVIEWABLE_DOCUMENT_TYPES.includes(schemaType)
         ? [...actions, previewAction]

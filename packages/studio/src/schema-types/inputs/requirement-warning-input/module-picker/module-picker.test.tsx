@@ -12,6 +12,7 @@ import { ctaSchema } from '@shinefold/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@shinefold/studio/schema-types/modules/faq/faq';
 import { pricingSchema } from '@shinefold/studio/schema-types/modules/pricing/pricing';
 import { EVERY_MODULE_PACK } from '@shinefold/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
+import { stubMatchMedia } from '@shinefold/studio/testing/stub-match-media';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { ComponentProps } from 'react';
 import type { SchemaType } from 'sanity';
@@ -112,16 +113,7 @@ const expectMenuItems = (titles: string[]) => {
 
 describe(`<${ModulePicker.name}/>`, () => {
   beforeEach(() => {
-    vi.stubGlobal('matchMedia', (query: string): MediaQueryList => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener() {},
-      removeListener() {},
-      addEventListener() {},
-      removeEventListener() {},
-      dispatchEvent: () => false,
-    }));
+    stubMatchMedia();
   });
 
   describe('when opened', () => {
@@ -165,33 +157,32 @@ describe(`<${ModulePicker.name}/>`, () => {
       expect(onItemAppend).not.toHaveBeenCalled();
     });
 
-    it("shows only a kind's modules on its tab", () => {
-      const kindTab = screen.getByRole('tab', { name: MOCK_GROUP_TITLE });
+    describe("on a kind's tab", () => {
+      beforeEach(() => {
+        const kindTab = screen.getByRole('tab', { name: MOCK_GROUP_TITLE });
+        fireEvent.click(kindTab);
+      });
 
-      fireEvent.click(kindTab);
+      it("shows only that kind's modules", () => {
+        expectMenuItems([FAQ_TITLE]);
+      });
 
-      expectMenuItems([FAQ_TITLE]);
-    });
+      it('searches within the selected tab', () => {
+        const search = screen.getByPlaceholderText(SEARCH_KEY);
 
-    it('searches within the selected tab', () => {
-      const kindTab = screen.getByRole('tab', { name: MOCK_GROUP_TITLE });
-      const search = screen.getByPlaceholderText(SEARCH_KEY);
+        fireEvent.change(search, { target: { value: CTA_TITLE } });
+        const noResults = screen.getByText(NO_RESULTS_KEY);
 
-      fireEvent.click(kindTab);
-      fireEvent.change(search, { target: { value: CTA_TITLE } });
-      const noResults = screen.getByText(NO_RESULTS_KEY);
+        expect(noResults).toBeTruthy();
+      });
 
-      expect(noResults).toBeTruthy();
-    });
+      it('returns to every module on the all tab', () => {
+        const allTab = screen.getByRole('tab', { name: ALL_ITEMS_KEY });
 
-    it('returns to every module on the all tab', () => {
-      const kindTab = screen.getByRole('tab', { name: MOCK_GROUP_TITLE });
-      const allTab = screen.getByRole('tab', { name: ALL_ITEMS_KEY });
+        fireEvent.click(allTab);
 
-      fireEvent.click(kindTab);
-      fireEvent.click(allTab);
-
-      expectMenuItems(TITLES);
+        expectMenuItems(TITLES);
+      });
     });
   });
 

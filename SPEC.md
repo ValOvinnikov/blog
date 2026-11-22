@@ -311,6 +311,33 @@ Full diagram, the service/view-model contract (`AsyncResult`, `TMaybeUndefined`,
 no faked defaults), the module-registry mechanism, and the editorial write path:
 [`docs/context/data-flow.md`](./docs/context/data-flow.md).
 
+### Newsletter post sends
+
+A post's first publish emails it to the site's confirmed subscribers once.
+Sanity's publish webhook reaches `apps/web`, which takes the post's
+`newsletter_post_sends` claim in `@shinefold/db` — or records it `SKIPPED` with
+the site's off cause (`NOT_IN_PLAN`, `SITE_INACTIVE`, `NEWSLETTER_OFF`,
+`SENDING_OFF`) — and enqueues `apps/worker`'s send run, which gates on the band,
+the month's emails, the operator pause and the reputation level, then sends and
+settles the claim `SENT` or `SKIPPED`.
+
+The Studio shows and acts on that claim through `apps/platform`, because it
+can import neither `@shinefold/db` nor the platform. The Studio is mounted on the
+platform's origin, so it calls three same-origin routes with the session
+cookie: `GET /api/studio/newsletter-post/status` (the claim's state, the
+confirmed count, the site's off cause and whether Send emails is offered),
+`POST /api/studio/newsletter-post/test-send` (the saved post's fields, emailed
+to the caller alone) and `POST /api/studio/newsletter-post/send-now` (a hand
+send of a post that was never emailed). Each call carries the Studio's Sanity
+project id, which only selects the tenant; the caller's membership of it is
+the access check, and the Studio adds none of its own. The contract has one
+home in `@shinefold/config`, the one package both sides import: the route paths
+(`routes.newsletterPost*`), the state kinds (`NEWSLETTER_SEND_STATUS`), the skip
+reasons and off causes, the refusal codes, the response types and the post
+email's fields (`NEWSLETTER_POST_EMAIL_PROJECTION`, `toNewsletterPostEmail`,
+shared with the worker so a test reads the post the way a send does). Behaviour:
+[`docs/features/newsletter.md`](./docs/features/newsletter.md).
+
 ## 6. Content model
 
 Source of truth: `packages/studio/src/schema-types/` — documents (`post`, `author`,

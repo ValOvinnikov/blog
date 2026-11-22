@@ -1,6 +1,8 @@
 import { Eye } from 'lucide-react';
 import type { DocumentActionComponent } from 'sanity';
 
+export const PREVIEW_ACTION_NAME = 'PreviewAction';
+
 // A full navigation: the preview route's frame policy is a response header a client-side route change never receives.
 export const createPreviewAction = (
   previewBasePath: string,
@@ -22,7 +24,7 @@ export const createPreviewAction = (
     },
   });
 
-  PreviewAction.displayName = 'PreviewAction';
+  PreviewAction.displayName = PREVIEW_ACTION_NAME;
 
   return PreviewAction;
 };

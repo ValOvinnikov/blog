@@ -4,6 +4,7 @@ export * from './client/objects';
 export * from './constants';
 export * from './embed';
 export * from './money';
+export * from './newsletter-post';
 export * from './portable-text';
 export * from './routes';
 export * from './sanity/generated/types';

@@ -111,24 +111,7 @@ export type TNewsletterPostSendStatusResponse =
       reason: TNewsletterSendStatusRefusal;
     };
 
-export type TNewsletterTestSendResult =
-  | { outcome: typeof ACTION_OUTCOME.SUCCESS }
-  | {
-      outcome: typeof ACTION_OUTCOME.REFUSED;
-      reason: Exclude<
-        TNewsletterTestSendRefusal,
-        typeof NEWSLETTER_TEST_SEND_REFUSAL.RATE_LIMITED
-      >;
-    }
-  | {
-      outcome: typeof ACTION_OUTCOME.REFUSED;
-      reason: typeof NEWSLETTER_TEST_SEND_REFUSAL.RATE_LIMITED;
-      retryAt: string;
-    };
-
-export type TNewsletterSendNowResult =
-  | { outcome: typeof ACTION_OUTCOME.SUCCESS }
-  | {
-      outcome: typeof ACTION_OUTCOME.REFUSED;
-      reason: TNewsletterSendNowRefusal;
-    };
+export type TNewsletterPostSendStatus = Extract<
+  TNewsletterPostSendStatusResponse,
+  { outcome: typeof ACTION_OUTCOME.SUCCESS }
+>;
