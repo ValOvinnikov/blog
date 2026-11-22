@@ -4,6 +4,7 @@ import type {
   Module_featureHighlights,
   Module_featureList,
   Module_logoWall,
+  Module_pricing,
   Module_stats,
   Module_team,
   Module_testimonial,
@@ -18,6 +19,7 @@ export type TGrowthDocumentUnion =
   | TStarterModule<Module_featureList>
   | TStarterModule<Module_featureHighlights>
   | TStarterModule<Module_logoWall>
+  | TStarterModule<Module_pricing>
   | TStarterModule<Module_stats>
   | TStarterModule<Module_testimonial>
   | TStarterModule<Module_team>

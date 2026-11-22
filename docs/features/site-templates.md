@@ -53,17 +53,18 @@ No route of its own. The seeded documents are what the public site renders and w
 - **Create-if-missing, everywhere.** Sanity documents use `createIfNotExists`; `site_config` uses an insert that does nothing when a row exists. A re-run never overwrites an owner's content or look.
 - **Seeding runs once per dataset.** The seed step skips a dataset that already has a `settings_site`, so changing a tenant's type later adds nothing; "change type" is future work.
 - **Every seeded document is schema-valid.** No placeholder images: no Blog or Blank field needs one, and the hero renders without media.
-- **Growth layers are built but not yet applied.** Every type still seeds the same documents on every plan; uploading the placeholder images, applying a layer at provisioning and on upgrade, and Product's layer are the rest of #5714.
+- **Growth layers are built but not yet applied.** Every type still seeds the same documents on every plan; uploading the placeholder images and applying a layer at provisioning and on upgrade are the rest of #5714.
 
 ## Growth layer
 
-`@shinefold/config`'s `buildGrowthLayer({ siteType, locale, placeholderImages })` returns the Growth sections a type adds to its Free site, or `null` for a type with none (Blog, Docs, Product and Blank today).
+`@shinefold/config`'s `buildGrowthLayer({ siteType, locale, placeholderImages })` returns the Growth sections a type adds to its Free site, or `null` for a type with none (Blog, Docs and Blank today).
 
 - **What it returns** — `documents`, the module documents and the items they reference (feature cards, testimonials, team members), each typed against the generated Sanity types; and `homeSlots`, one `{ slot, after }` per section for the home template's `modules`, where `after` is the id of the slot it follows: a Free module, or the Growth slot before it.
 - **Placeholder images** — `placeholderImages` maps each `STARTER_PLACEHOLDER_IMAGE` (`LOGO`, `ILLUSTRATION`) to a Sanity image asset id. A logo-wall logo and a feature-highlights row need an uploaded image to be schema-valid; every other section uses an icon or initials.
 - **Portfolio** — after the introduction: feature highlights (two rows on the illustration placeholder), a logo wall (four logos on the logo placeholder), a timeline and two testimonials.
 - **Personal** — after the introduction: a timeline and three feature cards with icons.
 - **Business** — after the introduction: three feature cards with icons, a band of sample figures, a logo wall, three team members (initials until the owner adds photos) and two testimonials.
+- **Product** — after the introduction: feature highlights (two rows on the illustration placeholder), three feature cards with icons, a band of sample figures, two testimonials, a logo wall and a pricing table of three tiers — a free tier, a recommended tier with sample monthly and yearly prices, and a contact-us tier — in the site's currency.
 - **Ids** — `starter.<type>.<section>`, with each section's items under it (`starter.business.teamMember1`), so removing sample content treats them like the Free samples.
 - **Copy** — each type's `growth` entry in the per-locale catalogue.
 

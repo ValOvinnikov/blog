@@ -46,6 +46,7 @@ const GROWTH_SITE_TYPES = [
   SITE_TYPE.PORTFOLIO,
   SITE_TYPE.PERSONAL,
   SITE_TYPE.BUSINESS,
+  SITE_TYPE.PRODUCT,
 ] as const;
 
 const build = (
@@ -575,7 +576,7 @@ describe(buildGrowthLayer, () => {
       ({ _ref }) => _ref,
     );
 
-  it.each([SITE_TYPE.BLOG, SITE_TYPE.DOCS, SITE_TYPE.PRODUCT, SITE_TYPE.BLANK])(
+  it.each([SITE_TYPE.BLOG, SITE_TYPE.DOCS, SITE_TYPE.BLANK])(
     'builds no layer for %s',
     (siteType) => {
       expect(layerOf(siteType)).toBeNull();
@@ -673,6 +674,20 @@ describe(buildGrowthLayer, () => {
         'module_cta',
       ],
     ],
+    [
+      SITE_TYPE.PRODUCT,
+      [
+        'module_content',
+        'module_featureHighlights',
+        'module_featureList',
+        'module_stats',
+        'module_testimonial',
+        'module_logoWall',
+        'module_pricing',
+        'module_faq',
+        'module_cta',
+      ],
+    ],
   ] as const)(
     'places the %s Growth sections in the Free home',
     (siteType, expected) => {
@@ -689,28 +704,32 @@ describe(buildGrowthLayer, () => {
     },
   );
 
-  it.each([SITE_TYPE.PORTFOLIO, SITE_TYPE.BUSINESS] as const)(
-    'gives the %s logo wall the logo placeholder',
-    (siteType) => {
-      const logoWall = findByType(
-        requireLayer(siteType).documents,
-        'module_logoWall',
-      );
-
-      expect(
-        new Set(logoWall.logos?.map(({ image }) => image?.asset?._ref)),
-      ).toEqual(new Set([MOCK_PLACEHOLDER_IMAGES.LOGO]));
-    },
-  );
-
-  it('gives the Portfolio highlights the illustration placeholder', () => {
-    const highlights = findByType(
-      requireLayer(SITE_TYPE.PORTFOLIO).documents,
-      'module_featureHighlights',
+  it.each([
+    SITE_TYPE.PORTFOLIO,
+    SITE_TYPE.BUSINESS,
+    SITE_TYPE.PRODUCT,
+  ] as const)('gives the %s logo wall the logo placeholder', (siteType) => {
+    const logoWall = findByType(
+      requireLayer(siteType).documents,
+      'module_logoWall',
     );
 
     expect(
-      new Set(highlights.highlights?.map(({ image }) => image?.asset?._ref)),
-    ).toEqual(new Set([MOCK_PLACEHOLDER_IMAGES.ILLUSTRATION]));
+      new Set(logoWall.logos?.map(({ image }) => image?.asset?._ref)),
+    ).toEqual(new Set([MOCK_PLACEHOLDER_IMAGES.LOGO]));
   });
+
+  it.each([SITE_TYPE.PORTFOLIO, SITE_TYPE.PRODUCT] as const)(
+    'gives the %s highlights the illustration placeholder',
+    (siteType) => {
+      const highlights = findByType(
+        requireLayer(siteType).documents,
+        'module_featureHighlights',
+      );
+
+      expect(
+        new Set(highlights.highlights?.map(({ image }) => image?.asset?._ref)),
+      ).toEqual(new Set([MOCK_PLACEHOLDER_IMAGES.ILLUSTRATION]));
+    },
+  );
 });

@@ -576,6 +576,122 @@
     "changelog": {
       "linkLabel": "Nouveautés",
       "listHeading": "Toutes les versions"
+    },
+    "growth": {
+      "highlights": {
+        "heading": "Comment ça marche",
+        "imageAlt": "Illustration d'exemple à remplacer par une capture de votre produit",
+        "rows": [
+          {
+            "heading": "Prêt en quelques minutes",
+            "body": [
+              "Décrivez la première chose qu'un nouveau client fait avec votre produit. Remplacez l'image d'exemple par une capture de cette étape."
+            ]
+          },
+          {
+            "heading": "Des résultats immédiats",
+            "body": [
+              "Montrez ce qui change une fois votre produit adopté. Une capture du résultat parle plus qu'une liste de fonctionnalités."
+            ]
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "Tout ce qu'il vous faut",
+        "features": [
+          {
+            "heading": "Rapide",
+            "supportingText": "Remplacez ce texte par la fonctionnalité que vos clients remarquent en premier, en une phrase."
+          },
+          {
+            "heading": "Flexible",
+            "supportingText": "Ajoutez une deuxième fonctionnalité et le problème qu'elle résout."
+          },
+          {
+            "heading": "Sécurisé",
+            "supportingText": "Terminez par la façon dont vous protégez les données de vos clients."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "En chiffres",
+        "footnote": "Chiffres d'exemple. Remplacez-les par les vôtres.",
+        "stats": [
+          {
+            "value": "10k+",
+            "label": "Utilisateurs actifs"
+          },
+          {
+            "value": "99,9 %",
+            "label": "Disponibilité"
+          },
+          {
+            "value": "4,8/5",
+            "label": "Note moyenne"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Ce qu'en disent nos clients",
+        "quotes": [
+          {
+            "name": "Client d'exemple",
+            "role": "Responsable produit, Société d'exemple",
+            "quote": [
+              "Remplacez ce texte par la citation d'un client satisfait. Une phrase ou deux sur ce qui a changé suffisent."
+            ]
+          },
+          {
+            "name": "Autre client d'exemple",
+            "role": "Fondatrice, Studio d'exemple",
+            "quote": [
+              "Ajoutez une deuxième voix, de préférence celle d'un autre type de client."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Utilisé par les équipes de",
+        "logoNames": [
+          "Client d'exemple un",
+          "Client d'exemple deux",
+          "Client d'exemple trois",
+          "Client d'exemple quatre"
+        ]
+      },
+      "pricing": {
+        "heading": "Des tarifs simples",
+        "footnote": "Offres et prix d'exemple. Remplacez-les par les vôtres.",
+        "free": {
+          "name": "Gratuit",
+          "description": "Pour essayer le produit par vous-même.",
+          "priceLabel": "Gratuit",
+          "features": [
+            "Remplacez ce texte par ce que comprend l'offre gratuite",
+            "Ajoutez une limite, comme un seul projet"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "Pour les indépendants et les petites équipes qui l'utilisent chaque jour.",
+          "highlightLabel": "Le plus choisi",
+          "features": [
+            "Tout ce qu'inclut Gratuit",
+            "Remplacez ce texte par ce qu'ajoute Pro",
+            "Ajoutez une deuxième fonctionnalité Pro"
+          ]
+        },
+        "team": {
+          "name": "Équipe",
+          "description": "Pour les équipes plus grandes aux besoins spécifiques.",
+          "priceLabel": "Contactez-nous",
+          "features": [
+            "Tout ce qu'inclut Pro",
+            "Remplacez ce texte par ce qu'ajoute Équipe",
+            "Ajoutez comment vous accompagnez les grands comptes"
+          ]
+        }
+      }
     }
   }
 }

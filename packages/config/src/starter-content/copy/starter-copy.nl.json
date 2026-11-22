@@ -576,6 +576,122 @@
     "changelog": {
       "linkLabel": "Wijzigingen",
       "listHeading": "Alle releases"
+    },
+    "growth": {
+      "highlights": {
+        "heading": "Zo werkt het",
+        "imageAlt": "Voorbeeldillustratie om te vervangen door een screenshot van je product",
+        "rows": [
+          {
+            "heading": "In een paar minuten ingesteld",
+            "body": [
+              "Beschrijf het eerste wat een nieuwe klant met je product doet. Vervang de voorbeeldafbeelding door een screenshot van die stap."
+            ]
+          },
+          {
+            "heading": "Meteen resultaat zien",
+            "body": [
+              "Laat zien wat er verandert zodra je product in gebruik is. Een screenshot van het resultaat werkt beter dan een lijst met functies."
+            ]
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "Alles wat je nodig hebt",
+        "features": [
+          {
+            "heading": "Snel",
+            "supportingText": "Vervang dit door de functie die klanten als eerste opvalt, in één zin."
+          },
+          {
+            "heading": "Flexibel",
+            "supportingText": "Voeg een tweede functie toe en het probleem dat die oplost."
+          },
+          {
+            "heading": "Veilig",
+            "supportingText": "Sluit af met hoe je de gegevens van je klanten beschermt."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "In cijfers",
+        "footnote": "Voorbeeldcijfers. Vervang ze door je eigen cijfers.",
+        "stats": [
+          {
+            "value": "10k+",
+            "label": "Actieve gebruikers"
+          },
+          {
+            "value": "99,9%",
+            "label": "Beschikbaarheid"
+          },
+          {
+            "value": "4,8/5",
+            "label": "Gemiddelde beoordeling"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Wat onze klanten zeggen",
+        "quotes": [
+          {
+            "name": "Voorbeeldklant",
+            "role": "Productmanager, Voorbeeldbedrijf",
+            "quote": [
+              "Vervang dit door een citaat van een tevreden klant. Een zin of twee over wat er veranderde leest het best."
+            ]
+          },
+          {
+            "name": "Nog een voorbeeldklant",
+            "role": "Oprichter, Voorbeeldstudio",
+            "quote": [
+              "Voeg een tweede stem toe, het liefst van een ander soort klant."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Gebruikt door teams bij",
+        "logoNames": [
+          "Voorbeeldklant één",
+          "Voorbeeldklant twee",
+          "Voorbeeldklant drie",
+          "Voorbeeldklant vier"
+        ]
+      },
+      "pricing": {
+        "heading": "Eenvoudige prijzen",
+        "footnote": "Voorbeeldabonnementen en -prijzen. Vervang ze door je eigen.",
+        "free": {
+          "name": "Gratis",
+          "description": "Om het product zelf uit te proberen.",
+          "priceLabel": "Gratis",
+          "features": [
+            "Vervang dit door wat het gratis abonnement bevat",
+            "Voeg een limiet toe, zoals één project"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "Voor zelfstandigen en kleine teams die het elke dag gebruiken.",
+          "highlightLabel": "Meest gekozen",
+          "features": [
+            "Alles uit Gratis",
+            "Vervang dit door wat Pro toevoegt",
+            "Voeg een tweede Pro-functie toe"
+          ]
+        },
+        "team": {
+          "name": "Team",
+          "description": "Voor grotere teams met eigen wensen.",
+          "priceLabel": "Neem contact op",
+          "features": [
+            "Alles uit Pro",
+            "Vervang dit door wat Team toevoegt",
+            "Voeg toe hoe je grotere klanten ondersteunt"
+          ]
+        }
+      }
     }
   }
 }
