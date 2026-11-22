@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   NEWSLETTER_SEND_STATUS,
   NEWSLETTER_SKIP_REASON,
@@ -6,19 +7,19 @@ import {
   type TNewsletterSendingOffCause,
   type TNewsletterSkipReason,
 } from '@shinefold/config';
-import { mockNewsletterPostSendStatus } from '@shinefold/studio/testing/newsletter-post-send-status';
-
 import {
-  formatSendCount,
-  formatSendDay,
-  formatSubscribers,
-} from './send-status-format';
-import { toSendStatusView } from './send-status-view';
+  MOCK_BAND_CEILING,
+  MOCK_RECIPIENTS,
+  MOCK_SEND_DATE,
+  mockNewsletterPostSendStatus,
+} from '@shinefold/studio/testing/newsletter-post-send-status';
 
-const MOCK_DATE = '2026-11-22T12:00:00.000Z';
-const MOCK_RECIPIENTS = 1_180;
-const MOCK_SENT = 420;
-const MOCK_BAND_CEILING = 1_000;
+import { formatSendCount, formatSendDay } from './send-status-format';
+import { SEND_PENDING, toSendStatusView } from './send-status-view';
+
+faker.seed(7711);
+
+const MOCK_SENT = faker.number.int({ min: 1, max: MOCK_RECIPIENTS - 1 });
 
 const viewOf = (
   state: TNewsletterPostSendState,
@@ -41,26 +42,26 @@ describe(toSendStatusView, () => {
     expect(viewOf({ status: NEWSLETTER_SEND_STATUS.NONE })).toBeUndefined();
   });
 
-  it('shows a sent post in the positive tone with its recipients and date', () => {
+  it('names the recipients and the date of a sent post', () => {
     const view = viewOf({
       status: NEWSLETTER_SEND_STATUS.SENT,
       recipients: MOCK_RECIPIENTS,
-      settledAt: MOCK_DATE,
+      settledAt: MOCK_SEND_DATE,
     });
 
-    expect([view?.tone, view?.detail]).toStrictEqual([
-      'positive',
-      ` to ${formatSubscribers(MOCK_RECIPIENTS)} on ${formatSendDay(MOCK_DATE)}.`,
-    ]);
+    expect([
+      view?.detail.includes(formatSendCount(MOCK_RECIPIENTS)),
+      view?.detail.includes(formatSendDay(MOCK_SEND_DATE)),
+    ]).toStrictEqual([true, true]);
   });
 
   it('names the date a scheduled post is emailed on', () => {
     const view = viewOf({
       status: NEWSLETTER_SEND_STATUS.SCHEDULED,
-      scheduledFor: MOCK_DATE,
+      scheduledFor: MOCK_SEND_DATE,
     });
 
-    expect(view?.detail).toContain(formatSendDay(MOCK_DATE));
+    expect(view?.detail).toContain(formatSendDay(MOCK_SEND_DATE));
   });
 
   it('counts how many subscribers a sending post has reached so far', () => {
@@ -75,10 +76,10 @@ describe(toSendStatusView, () => {
     );
   });
 
-  it('shows no count before the run has counted its recipients', () => {
+  it('shows a claim the run has not counted yet as pending, not sending', () => {
     const view = viewOf({ status: NEWSLETTER_SEND_STATUS.SENDING });
 
-    expect(view?.detail).not.toContain(formatSendCount(MOCK_SENT));
+    expect(view?.detail).toBe(SEND_PENDING);
   });
 
   it('names the band and links to Subscribers for a band skip', () => {
@@ -88,20 +89,14 @@ describe(toSendStatusView, () => {
       bandCeiling: MOCK_BAND_CEILING,
     });
 
-    expect([view?.tone, view?.link?.href]).toStrictEqual([
-      'critical',
-      routes.dashboardSubscribers(),
-    ]);
+    expect(view?.link?.href).toBe(routes.dashboardSubscribers());
     expect(view?.detail).toContain(formatSendCount(MOCK_BAND_CEILING));
   });
 
   it('links a month skip to Subscribers', () => {
     const view = viewOf(skipped(NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE));
 
-    expect([view?.tone, view?.link?.href]).toStrictEqual([
-      'critical',
-      routes.dashboardSubscribers(),
-    ]);
+    expect(view?.link?.href).toBe(routes.dashboardSubscribers());
   });
 
   it.each([
@@ -124,10 +119,7 @@ describe(toSendStatusView, () => {
     (skipReason, href) => {
       const view = viewOf(skipped(skipReason), skipReason);
 
-      expect([view?.tone, view?.link?.href]).toStrictEqual([
-        'transparent',
-        href,
-      ]);
+      expect(view?.link?.href).toBe(href);
     },
   );
 

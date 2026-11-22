@@ -18,12 +18,7 @@ import {
 import { STUDIO_API_VERSION } from '@shinefold/studio/studio-api-version';
 import { Send } from 'lucide-react';
 import { useState } from 'react';
-import {
-  type DocumentActionComponent,
-  useClient,
-  useCurrentUser,
-  useProjectId,
-} from 'sanity';
+import { type DocumentActionComponent, useClient, useProjectId } from 'sanity';
 
 type TRawPostTest = TRawNewsletterPostEmail & { language?: TLocaleIsoCode };
 
@@ -45,12 +40,11 @@ export const SendTestAction: DocumentActionComponent = ({
 }) => {
   const client = useClient({ apiVersion: STUDIO_API_VERSION });
   const projectId = useProjectId();
-  const currentUser = useCurrentUser();
   const toast = useToast();
   const [isSending, setIsSending] = useState(false);
   const savedId = (draft ?? published)?._id;
 
-  const sendTest = async (id: string, email: string) => {
+  const sendTest = async (id: string) => {
     setIsSending(true);
     try {
       const raw = await client
@@ -59,7 +53,7 @@ export const SendTestAction: DocumentActionComponent = ({
       const test = toPostTest(raw, projectId);
       toast.push(
         test
-          ? toSendTestToast(await sendNewsletterPostTest(test), email)
+          ? toSendTestToast(await sendNewsletterPostTest(test))
           : SEND_TEST_FAILED_TOAST,
       );
     } catch {
@@ -73,9 +67,9 @@ export const SendTestAction: DocumentActionComponent = ({
     label: 'Send me a test',
     title: 'Emails this post to you only',
     icon: Send,
-    disabled: !savedId || !currentUser || isSending,
+    disabled: !savedId || isSending,
     onHandle: () => {
-      if (savedId && currentUser) void sendTest(savedId, currentUser.email);
+      if (savedId) void sendTest(savedId);
     },
   };
 };

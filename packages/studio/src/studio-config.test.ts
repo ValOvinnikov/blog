@@ -156,6 +156,22 @@ describe(buildStudioConfig, () => {
       expect(topicPublish).toBe(publish);
     });
 
+    it('leads a post’s menu with the test send, after the primary action', () => {
+      const duplicate = mockAction(SANITY_DOCUMENT_ACTION.DUPLICATE);
+      const remove = mockAction(SANITY_DOCUMENT_ACTION.DELETE);
+
+      expect(actions([publish, duplicate, remove], PAGE_POST_TYPE)).toEqual([
+        publish,
+        SendTestAction,
+        duplicate,
+        remove,
+      ]);
+    });
+
+    it('offers the test send on posts only', () => {
+      expect(actions([publish], PAGE_TOPIC_TYPE)).toEqual([publish]);
+    });
+
     it('offers no delete, duplicate or unpublish action on the cookie statement', () => {
       const prev = Object.values(SANITY_DOCUMENT_ACTION).map(mockAction);
 

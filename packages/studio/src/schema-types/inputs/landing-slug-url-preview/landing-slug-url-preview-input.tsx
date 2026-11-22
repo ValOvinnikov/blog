@@ -1,4 +1,9 @@
 import { SANITY_PERSPECTIVE } from '@shinefold/config/constants';
+import type {
+  TMaybeNull,
+  TMaybeUndefined,
+  TNullable,
+} from '@shinefold/config/types';
 import { SlugUrlPreview } from '@shinefold/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
 import {
   buildNestedRoutePrefix,
@@ -18,11 +23,11 @@ import {
   useFormValue,
 } from 'sanity';
 
-const useAncestorSlugs = (parentId: string | undefined) => {
+const useAncestorSlugs = (parentId: TMaybeUndefined<string>) => {
   const client = useClient({ apiVersion: STUDIO_API_VERSION });
   const [fetched, setFetched] = useState<{
     parentId: string;
-    slugs: (string | null | undefined)[];
+    slugs: TNullable<string>[];
   }>();
 
   useEffect(() => {
@@ -31,7 +36,7 @@ const useAncestorSlugs = (parentId: string | undefined) => {
     let isCurrent = true;
     client
       .withConfig({ perspective: SANITY_PERSPECTIVE.DRAFTS })
-      .fetch<TLandingParentChainNode | null>(LANDING_PARENT_CHAIN_QUERY, {
+      .fetch<TMaybeNull<TLandingParentChainNode>>(LANDING_PARENT_CHAIN_QUERY, {
         parentId,
       })
       .then((chain) => {
@@ -52,7 +57,7 @@ const useAncestorSlugs = (parentId: string | undefined) => {
 };
 
 export const LandingSlugUrlPreviewInput = (props: SlugInputProps) => {
-  const parent = useFormValue(['parent']) as Reference | undefined;
+  const parent = useFormValue(['parent']) as TMaybeUndefined<Reference>;
   const ancestorSlugs = useAncestorSlugs(parent?._ref);
 
   return (

@@ -14,7 +14,7 @@ import {
   type TNewsletterSendNowResult,
   type TNewsletterTestSendResult,
 } from '@shinefold/config';
-import type { TMaybeUndefined } from '@shinefold/config/types';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
 
 export type TNewsletterPostRef = {
   projectId: string;
@@ -45,7 +45,7 @@ const requestJson = async <T>(
 ): Promise<TMaybeUndefined<T>> => {
   try {
     const response = await fetch(path, init);
-    return ((await response.json()) as T | null) ?? undefined;
+    return ((await response.json()) as TMaybeNull<T>) ?? undefined;
   } catch {
     return undefined;
   }

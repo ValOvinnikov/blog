@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   ACTION_OUTCOME,
   NEWSLETTER_SEND_STATUS,
@@ -5,8 +6,17 @@ import {
   type TNewsletterPostSendStatus,
 } from '@shinefold/config';
 
-export const MOCK_CONFIRMED_COUNT = 1_240;
-export const MOCK_EMAILS_LEFT = 14_600;
+faker.seed(7711);
+
+const mockCount = () => faker.number.int({ min: 1_000, max: 9_999 });
+
+export const MOCK_CONFIRMED_COUNT = mockCount();
+export const MOCK_EMAILS_LEFT = mockCount();
+export const MOCK_RECIPIENTS = mockCount();
+export const MOCK_BAND_CEILING = mockCount();
+export const MOCK_SEND_DATE = faker.date
+  .between({ from: '2026-01-01', to: '2026-12-31' })
+  .toISOString();
 
 type TStatusExtras = Partial<
   Pick<

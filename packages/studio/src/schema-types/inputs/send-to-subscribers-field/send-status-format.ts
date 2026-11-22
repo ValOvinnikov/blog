@@ -7,11 +7,20 @@ export const formatSendCount = (count: number): string =>
 export const formatSubscribers = (count: number): string =>
   `${formatSendCount(count)} ${count === 1 ? 'subscriber' : 'subscribers'}`;
 
+const DAY_FORMAT = {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+} as const satisfies Intl.DateTimeFormatOptions;
+
 export const formatSendDay = (iso: string): string =>
+  new Date(iso).toLocaleDateString(STUDIO_DATE_LOCALE, DAY_FORMAT);
+
+// The month's emails reset at midnight UTC on the 1st, which is still the last day of the month west of UTC.
+export const formatSendUtcDay = (iso: string): string =>
   new Date(iso).toLocaleDateString(STUDIO_DATE_LOCALE, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
+    ...DAY_FORMAT,
+    timeZone: 'UTC',
   });
 
 export const formatSendTime = (iso: string): string =>

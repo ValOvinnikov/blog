@@ -118,5 +118,5 @@ export const sendNewsletterPostTest = async (
     html,
     text,
   });
-  return { outcome: ACTION_OUTCOME.SUCCESS };
+  return { outcome: ACTION_OUTCOME.SUCCESS, recipient: email };
 };

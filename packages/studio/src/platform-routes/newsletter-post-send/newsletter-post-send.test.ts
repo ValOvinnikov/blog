@@ -5,6 +5,7 @@ import {
   NEWSLETTER_SEND_STATUS_REFUSAL,
   routes,
 } from '@shinefold/config';
+import { MOCK_FETCH_ERROR } from '@shinefold/studio/testing/mock-fetch-error';
 import { mockNewsletterPostSendStatus } from '@shinefold/studio/testing/newsletter-post-send-status';
 
 import {
@@ -20,7 +21,7 @@ const MOCK_POST = {
   isPublished: true,
 };
 const MOCK_STATUS = mockNewsletterPostSendStatus();
-const SEND_FAILED = {
+const MOCK_SEND_FAILED = {
   outcome: ACTION_OUTCOME.REFUSED,
   reason: NEWSLETTER_SEND_NOW_REFUSAL.SEND_FAILED,
 };
@@ -68,8 +69,10 @@ describe(readNewsletterPostSendStatus, () => {
 
 describe(sendNewsletterPostNow, () => {
   it('reports a failed send when the platform cannot be reached', async () => {
-    fetchMock.mockRejectedValueOnce(new TypeError());
+    fetchMock.mockRejectedValueOnce(MOCK_FETCH_ERROR);
 
-    expect(await sendNewsletterPostNow(MOCK_POST)).toStrictEqual(SEND_FAILED);
+    expect(await sendNewsletterPostNow(MOCK_POST)).toStrictEqual(
+      MOCK_SEND_FAILED,
+    );
   });
 });

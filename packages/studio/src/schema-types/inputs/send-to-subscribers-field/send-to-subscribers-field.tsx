@@ -24,10 +24,8 @@ const PostSendField = ({ postId, ...props }: TPostSendFieldProps) => {
   const projectId = useProjectId();
   const { published } = useEditState(postId, PAGE_POST_TYPE);
   const post = { projectId, postId, isPublished: Boolean(published) };
-  const { isLoading, status, refresh } = useNewsletterPostSendStatus(
-    post,
-    published?._rev,
-  );
+  const { isLoading, isAwaitingClaim, status, refresh } =
+    useNewsletterPostSendStatus(post, published?._rev);
   const { title, inputId, path, level, validation, inputProps } = props;
 
   if (!status) {
@@ -42,7 +40,7 @@ const PostSendField = ({ postId, ...props }: TPostSendFieldProps) => {
   if (isSendFieldHidden(status)) return null;
 
   const { confirmedCount, sendNow } = status;
-  const sendEmails = sendNow.isOffered && (
+  const sendEmails = sendNow.isOffered && !isAwaitingClaim && (
     <SendEmailsButton
       post={post}
       confirmedCount={confirmedCount}

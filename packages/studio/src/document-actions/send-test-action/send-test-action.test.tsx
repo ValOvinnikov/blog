@@ -13,7 +13,7 @@ import {
 } from '@shinefold/config';
 import type { IWithChildren } from '@shinefold/config/react';
 import { stubMatchMedia } from '@shinefold/studio/testing/stub-match-media';
-import { act, cleanup, renderHook, screen } from '@testing-library/react';
+import { act, renderHook, screen } from '@testing-library/react';
 import type {
   DocumentActionDescription,
   DocumentActionProps,
@@ -29,7 +29,6 @@ vi.mock('sanity', async (importOriginal) => ({
   ...(await importOriginal<typeof import('sanity')>()),
   useClient: () => ({ withConfig: () => ({ fetch: fetchSavedPost }) }),
   useProjectId: () => MOCK_PROJECT_ID,
-  useCurrentUser: () => ({ email: MOCK_EMAIL }),
 }));
 
 faker.seed(7711);
@@ -42,8 +41,9 @@ const MOCK_SLUG = faker.lorem.slug();
 const MOCK_DRAFT = {
   _id: `drafts.${MOCK_POST_ID}`,
 } as SanityDocument;
-const TEST_SENT: TNewsletterTestSendResult = {
+const MOCK_TEST_SENT: TNewsletterTestSendResult = {
   outcome: ACTION_OUTCOME.SUCCESS,
+  recipient: MOCK_EMAIL,
 };
 
 const MOCK_SAVED_POST = {
@@ -52,7 +52,9 @@ const MOCK_SAVED_POST = {
   language: LOCALE_ISO_CODES.EN,
 };
 
-const fetchMock = vi.fn<typeof fetch>(async () => Response.json(TEST_SENT));
+const fetchMock = vi.fn<typeof fetch>(async () =>
+  Response.json(MOCK_TEST_SENT),
+);
 
 const Providers = ({ children }: IWithChildren) => (
   <ThemeProvider theme={buildTheme()}>
@@ -77,10 +79,6 @@ const sendTest = async (draft: SanityDocument) => {
   });
 };
 
-afterEach(() => {
-  cleanup();
-});
-
 describe(SendTestAction, () => {
   beforeEach(() => {
     stubMatchMedia();
@@ -93,12 +91,12 @@ describe(SendTestAction, () => {
     expect(action.current.disabled).toBe(true);
   });
 
-  it('sends the saved fields to the test route and names the address', async () => {
+  it('sends the saved fields to the test route and names the recipient', async () => {
     fetchSavedPost.mockResolvedValueOnce(MOCK_SAVED_POST);
     await sendTest(MOCK_DRAFT);
 
     const toast = await screen.findByText(
-      String(toSendTestToast(TEST_SENT, MOCK_EMAIL).title),
+      String(toSendTestToast(MOCK_TEST_SENT).title),
     );
     const [[path, init]] = fetchMock.mock.calls as [[string, RequestInit]];
 

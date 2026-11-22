@@ -5,7 +5,7 @@ import {
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import {
   formatSendCount,
-  formatSendDay,
+  formatSendUtcDay,
   formatSubscribers,
 } from '@shinefold/studio/schema-types/inputs/send-to-subscribers-field/send-status-format';
 
@@ -15,6 +15,8 @@ type TOfferedSendNow = Extract<
 >;
 
 export const SEND_EMAILS_LABEL = 'Send emails';
+
+export const CANCEL_LABEL = 'Cancel';
 
 export const SEND_NOW_REFUSED_TOAST = "This post can't be sent right now.";
 
@@ -31,7 +33,7 @@ export const sendNowDisabledReason = (
     case NEWSLETTER_SEND_NOW_REFUSAL.OVER_BAND:
       return `Your site is over its ${formatSendCount(eligibility.bandCeiling)}-subscriber band.`;
     case NEWSLETTER_SEND_NOW_REFUSAL.OVER_MONTH:
-      return `This needs ${formatSendCount(eligibility.emailsNeeded)} emails and ${formatSendCount(eligibility.emailsLeft)} are left until ${formatSendDay(eligibility.resetsAt)}.`;
+      return `This needs ${formatSendCount(eligibility.emailsNeeded)} emails and ${formatSendCount(eligibility.emailsLeft)} are left until ${formatSendUtcDay(eligibility.resetsAt)}.`;
   }
 };
 

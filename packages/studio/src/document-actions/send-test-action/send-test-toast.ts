@@ -13,12 +13,11 @@ export const SEND_TEST_FAILED_TOAST: ToastParams = {
 
 export const toSendTestToast = (
   result: TNewsletterTestSendResult,
-  email: string,
 ): ToastParams => {
   if (isOutcomeSuccess(result)) {
     return {
       status: 'success',
-      title: `Test sent to ${email} — only you got it.`,
+      title: `Test sent to ${result.recipient} — only you got it.`,
     };
   }
   if (result.reason === NEWSLETTER_TEST_SEND_REFUSAL.RATE_LIMITED) {

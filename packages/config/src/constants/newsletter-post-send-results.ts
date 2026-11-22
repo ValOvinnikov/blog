@@ -6,7 +6,7 @@ import {
 } from './newsletter-post-send';
 
 export type TNewsletterTestSendResult =
-  | { outcome: typeof ACTION_OUTCOME.SUCCESS }
+  | { outcome: typeof ACTION_OUTCOME.SUCCESS; recipient: string }
   | {
       outcome: typeof ACTION_OUTCOME.REFUSED;
       reason: Exclude<

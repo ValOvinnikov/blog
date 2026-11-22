@@ -1,18 +1,20 @@
+import { faker } from '@faker-js/faker';
 import { NEWSLETTER_SEND_NOW_REFUSAL } from '@shinefold/config';
-import { MOCK_EMAILS_LEFT } from '@shinefold/studio/testing/newsletter-post-send-status';
+import {
+  MOCK_BAND_CEILING,
+  MOCK_EMAILS_LEFT,
+} from '@shinefold/studio/testing/newsletter-post-send-status';
 
 import { sendNowDisabledReason } from './send-now-copy';
-import { formatSendCount, formatSendDay } from './send-status-format';
+import { formatSendCount } from './send-status-format';
 
-const MOCK_BAND_CEILING = 2_500;
-const MOCK_EMAILS_NEEDED = 3_100;
+faker.seed(7711);
+
+const MOCK_EMAILS_NEEDED =
+  MOCK_EMAILS_LEFT + faker.number.int({ min: 1, max: 999 });
 const MOCK_RESETS_AT = '2026-12-01T00:00:00.000Z';
 
 describe(sendNowDisabledReason, () => {
-  beforeEach(() => {
-    vi.stubEnv('TZ', 'UTC');
-  });
-
   it('gives no reason once the post can be sent', () => {
     expect(
       sendNowDisabledReason({ isOffered: true, emailsLeft: MOCK_EMAILS_LEFT }),
@@ -38,7 +40,8 @@ describe(sendNowDisabledReason, () => {
     expect(reason).toContain(formatSendCount(MOCK_BAND_CEILING));
   });
 
-  it('names the emails needed, the emails left and the reset date', () => {
+  it('names the emails needed, the emails left and the UTC reset day', () => {
+    vi.stubEnv('TZ', 'America/Los_Angeles');
     const reason = sendNowDisabledReason({
       isOffered: true,
       disabledBy: NEWSLETTER_SEND_NOW_REFUSAL.OVER_MONTH,
@@ -50,7 +53,7 @@ describe(sendNowDisabledReason, () => {
     expect([
       reason?.includes(formatSendCount(MOCK_EMAILS_NEEDED)),
       reason?.includes(formatSendCount(MOCK_EMAILS_LEFT)),
-      reason?.includes(formatSendDay(MOCK_RESETS_AT)),
+      reason?.includes('1 Dec 2026'),
     ]).toStrictEqual([true, true, true]);
   });
 });

@@ -1,4 +1,5 @@
 import { SANITY_PERSPECTIVE } from '@shinefold/config/constants';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config/types';
 import { PAGE_LANDING_TYPE } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
 import { isInsideSection } from '@shinefold/studio/schema-types/inputs/landing-section-navigation-field/is-inside-section';
 import {
@@ -6,7 +7,7 @@ import {
   type TLandingParentChainNode,
 } from '@shinefold/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
 import { STUDIO_API_VERSION } from '@shinefold/studio/studio-api-version';
-import { hasLength } from '@shinefold/utils/primitives';
+import { hasLength, isString } from '@shinefold/utils/primitives';
 import { useEffect, useState } from 'react';
 import {
   type BooleanFieldProps,
@@ -20,7 +21,7 @@ const HAS_CHILDREN_QUERY = `count(*[_type == $type && parent._ref == $id]) > 0`;
 
 const useDraftsQuery = <T,>(
   query: string,
-  params: Record<string, string> | undefined,
+  params: TMaybeUndefined<Record<string, string>>,
 ) => {
   const client = useClient({ apiVersion: STUDIO_API_VERSION });
   const key = params ? JSON.stringify(params) : undefined;
@@ -52,10 +53,10 @@ const renderWhen = (isApplicable: boolean, props: BooleanFieldProps) =>
     : null;
 
 export const SectionNavigationField = (props: BooleanFieldProps) => {
-  const documentId = useFormValue(['_id']) as string | undefined;
+  const documentId = useFormValue(['_id']);
   const hasChildren = useDraftsQuery<boolean>(
     HAS_CHILDREN_QUERY,
-    documentId
+    isString(documentId)
       ? { id: getPublishedId(documentId), type: PAGE_LANDING_TYPE }
       : undefined,
   );
@@ -64,8 +65,8 @@ export const SectionNavigationField = (props: BooleanFieldProps) => {
 };
 
 export const ShowSectionNavigationField = (props: BooleanFieldProps) => {
-  const parent = useFormValue(['parent']) as Reference | undefined;
-  const parentChain = useDraftsQuery<TLandingParentChainNode | null>(
+  const parent = useFormValue(['parent']) as TMaybeUndefined<Reference>;
+  const parentChain = useDraftsQuery<TMaybeNull<TLandingParentChainNode>>(
     LANDING_PARENT_CHAIN_QUERY,
     parent?._ref ? { parentId: parent._ref } : undefined,
   );

@@ -13,6 +13,9 @@ import { toSkippedView } from '@shinefold/studio/schema-types/inputs/send-to-sub
 import { isUndefined } from '@shinefold/utils/primitives';
 import { Check, Clock } from 'lucide-react';
 
+// A claim the run has not yet counted may still be scheduled or skipped, so it never reads as sending.
+export const SEND_PENDING = 'Checking whether this post will be emailed…';
+
 /** What replaces the switch once the post has a claim; `undefined` keeps the switch. */
 export const toSendStatusView = (
   status: TNewsletterPostSendStatus,
@@ -39,7 +42,7 @@ export const toSendStatusView = (
       return {
         tone: 'transparent',
         detail: isUndefined(recipients)
-          ? 'Sending…'
+          ? SEND_PENDING
           : `Sending… ${formatSendCount(sent ?? 0)} of ${formatSendCount(recipients)} so far.`,
       };
     }

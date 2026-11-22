@@ -45,6 +45,7 @@ describe(POST, () => {
     vi.mocked(resolveStudioCaller).mockResolvedValue(MOCK_STUDIO_CALLER);
     vi.mocked(sendNewsletterPostTest).mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
+      recipient: MOCK_STUDIO_CALLER.email,
     });
   });
 

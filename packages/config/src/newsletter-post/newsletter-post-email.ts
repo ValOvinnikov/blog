@@ -16,7 +16,6 @@ export type TNewsletterPostEmail = {
   summary: TPostSummary;
 };
 
-/** The post fields the subscriber email and its test share; `undefined` when the post has no title or slug to send. */
 export const toNewsletterPostEmail = ({
   headingBlock,
   title,

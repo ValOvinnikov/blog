@@ -10,7 +10,7 @@ import {
 import { formatSendCount } from './send-status-format';
 import { isSendFieldHidden, toSendSwitchView } from './send-switch-view';
 
-const NOT_IN_PLAN_SKIP = {
+const MOCK_NOT_IN_PLAN_SKIP = {
   status: NEWSLETTER_SEND_STATUS.SKIPPED,
   skipReason: NEWSLETTER_SKIP_REASON.NOT_IN_PLAN,
 } as const;
@@ -25,7 +25,7 @@ describe(isSendFieldHidden, () => {
   });
 
   it('keeps a post published without Newsletter hidden after an upgrade', () => {
-    const status = mockNewsletterPostSendStatus(NOT_IN_PLAN_SKIP);
+    const status = mockNewsletterPostSendStatus(MOCK_NOT_IN_PLAN_SKIP);
 
     expect(isSendFieldHidden(status)).toBe(true);
   });

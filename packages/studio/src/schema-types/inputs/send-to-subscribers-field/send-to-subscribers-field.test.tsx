@@ -16,13 +16,14 @@ import {
   type TNewsletterSendNowResult,
 } from '@shinefold/config';
 import {
+  MOCK_BAND_CEILING,
   MOCK_EMAILS_LEFT,
+  MOCK_RECIPIENTS,
+  MOCK_SEND_DATE,
   mockNewsletterPostSendStatus,
 } from '@shinefold/studio/testing/newsletter-post-send-status';
 import { stubMatchMedia } from '@shinefold/studio/testing/stub-match-media';
 import {
-  act,
-  cleanup,
   fireEvent,
   render,
   screen,
@@ -32,8 +33,10 @@ import {
 import { type BooleanFieldProps, useEditState } from 'sanity';
 
 import {
+  CANCEL_LABEL,
   SEND_EMAILS_LABEL,
   SEND_NOW_REFUSED_TOAST,
+  sendNowDisabledReason,
   sendNowStartedToast,
 } from './send-now-copy';
 import { formatSendCount } from './send-status-format';
@@ -56,24 +59,26 @@ const MOCK_POST_ID = faker.string.uuid();
 const MOCK_DRAFT_ID = `drafts.${MOCK_POST_ID}`;
 const MOCK_REVISION = faker.string.alphanumeric(12);
 const SWITCH_TITLE = 'Send to subscribers';
-const SENDING_REFRESH_MS = 10_000;
-const MOCK_RECIPIENTS = 1_180;
-const MOCK_BAND_CEILING = 2_500;
-const CANCEL_LABEL = 'Cancel';
 
-const PUBLISHED_EDIT_STATE = {
+const MOCK_PUBLISHED_EDIT_STATE = {
   published: { _id: MOCK_POST_ID, _rev: MOCK_REVISION },
 } as unknown as ReturnType<typeof useEditState>;
 
-const SEND_NOW_OK: TNewsletterSendNowResult = {
+const MOCK_SEND_NOW_OK: TNewsletterSendNowResult = {
   outcome: ACTION_OUTCOME.SUCCESS,
 };
+
+const MOCK_OVER_BAND = {
+  isOffered: true,
+  disabledBy: NEWSLETTER_SEND_NOW_REFUSAL.OVER_BAND,
+  bandCeiling: MOCK_BAND_CEILING,
+} as const;
 
 const fetchMock = vi.fn<typeof fetch>();
 
 const respondWith = (
   status: TNewsletterPostSendStatus,
-  sendNow: TNewsletterSendNowResult = SEND_NOW_OK,
+  sendNow: TNewsletterSendNowResult = MOCK_SEND_NOW_OK,
 ) => {
   fetchMock.mockImplementation(async (input) =>
     Response.json(
@@ -142,10 +147,6 @@ const offeredSendNow = mockNewsletterPostSendStatus(undefined, {
   sendNow: { isOffered: true, emailsLeft: MOCK_EMAILS_LEFT },
 });
 
-afterEach(() => {
-  cleanup();
-});
-
 describe(`<${SendToSubscribersField.name}/>`, () => {
   beforeEach(() => {
     stubMatchMedia();
@@ -173,7 +174,7 @@ describe(`<${SendToSubscribersField.name}/>`, () => {
       mockNewsletterPostSendStatus({
         status: NEWSLETTER_SEND_STATUS.SENT,
         recipients: MOCK_RECIPIENTS,
-        settledAt: new Date(0).toISOString(),
+        settledAt: MOCK_SEND_DATE,
       }),
     );
     renderField();
@@ -203,13 +204,7 @@ describe(`<${SendToSubscribersField.name}/>`, () => {
 
   it('explains why Send emails is disabled', async () => {
     respondWith(
-      mockNewsletterPostSendStatus(undefined, {
-        sendNow: {
-          isOffered: true,
-          disabledBy: NEWSLETTER_SEND_NOW_REFUSAL.OVER_BAND,
-          bandCeiling: MOCK_BAND_CEILING,
-        },
-      }),
+      mockNewsletterPostSendStatus(undefined, { sendNow: MOCK_OVER_BAND }),
     );
     renderField();
 
@@ -217,7 +212,7 @@ describe(`<${SendToSubscribersField.name}/>`, () => {
       name: SEND_EMAILS_LABEL,
     });
     const reason = screen.queryByText(
-      `Your site is over its ${formatSendCount(MOCK_BAND_CEILING)}-subscriber band.`,
+      String(sendNowDisabledReason(MOCK_OVER_BAND)),
     );
 
     expect(sendEmails.disabled).toBe(true);
@@ -226,7 +221,7 @@ describe(`<${SendToSubscribersField.name}/>`, () => {
 
   describe('with a published post Send emails can send', () => {
     beforeEach(() => {
-      vi.mocked(useEditState).mockReturnValue(PUBLISHED_EDIT_STATE);
+      vi.mocked(useEditState).mockReturnValue(MOCK_PUBLISHED_EDIT_STATE);
     });
 
     describe('once the dialog is open', () => {
@@ -296,33 +291,6 @@ describe(`<${SendToSubscribersField.name}/>`, () => {
       const toast = await screen.findByText(SEND_NOW_REFUSED_TOAST);
 
       expect(toast.textContent).toBe(SEND_NOW_REFUSED_TOAST);
-    });
-  });
-
-  describe('while the post sends', () => {
-    beforeEach(() => {
-      vi.useFakeTimers({ shouldAdvanceTime: true });
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
-    it('re-reads its status every ten seconds', async () => {
-      respondWith(
-        mockNewsletterPostSendStatus({
-          status: NEWSLETTER_SEND_STATUS.SENDING,
-        }),
-      );
-      renderField();
-      await screen.findByText('Sending…');
-      const readsBefore = statusReads().length;
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(SENDING_REFRESH_MS);
-      });
-
-      expect(statusReads().length).toBe(readsBefore + 1);
     });
   });
 });

@@ -1,5 +1,6 @@
 import { Box, Button, Dialog, Flex, Text } from '@sanity/ui';
 import {
+  CANCEL_LABEL,
   SEND_EMAILS_LABEL,
   sendNowConfirmCopy,
 } from '@shinefold/studio/schema-types/inputs/send-to-subscribers-field/send-now-copy';
@@ -40,7 +41,7 @@ export const SendEmailsDialog = ({
           <Button
             ref={cancelRef}
             mode="ghost"
-            text="Cancel"
+            text={CANCEL_LABEL}
             disabled={isSending}
             onClick={onCancel}
           />
