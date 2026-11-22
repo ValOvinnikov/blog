@@ -65,6 +65,7 @@ default to zero".
   its signed endpoints — `POST /api/provision`, `POST /api/deprovision`,
   `POST /api/owner-access/*`, `POST /api/member-access/*`,
   `POST /api/custom-domain/*`, `POST /api/cookie-statement/seed`,
+  `POST /api/growth-layer/apply`,
   `POST /api/sample-content/remove`, `POST /api/newsletter/post-send`,
   `POST /api/scheduled-post-purge` and `POST /api/scheduled-post-skim`
   — every one authenticated by the shared enqueue secret. The other routes

@@ -53,7 +53,7 @@ No route of its own. The seeded documents are what the public site renders and w
 - **Create-if-missing, everywhere.** Sanity documents use `createIfNotExists`; `site_config` uses an insert that does nothing when a row exists. A re-run never overwrites an owner's content or look.
 - **Seeding runs once per dataset.** The seed step skips a dataset that already has a `settings_site`, so changing a tenant's type later adds nothing; "change type" is future work.
 - **Every seeded document is schema-valid.** The Free layouts need no image: no Blog or Blank field needs one, and the hero renders without media. A Growth layer's images are the placeholder SVGs the worker uploads.
-- **Growth layers apply at provisioning; upgrades are still to come.** A plan change to Growth does not reach the worker yet (#5714).
+- **Growth layers apply at provisioning and on upgrade.** The worker's `POST /api/growth-layer/apply` runs the same layer on an already-provisioned site; the platform's plan change does not call it yet (#5714).
 
 ## Growth layer
 
@@ -72,8 +72,9 @@ No route of its own. The seeded documents are what the public site renders and w
 
 `applySiteTemplate` hands `seedTenantContent` the worker's `applyGrowthLayer` step when the tenant's resolved entitlements (`getTenantEntitlements`, grants included) hold the `GROWTH` module pack — the check is `isGrowthLayerEntitled`. Seeding runs it in the same `SEED_CONTENT` step with its own `editor` token, after persisting that token on a fresh dataset, and straight after its `settings_site` check on one already seeded — so a reactivated tenant whose write token was cleared still gets it. A failure keeps the persisted token, and the unit's retry runs the layer again on an already-seeded dataset.
 
-- **Applied once per dataset** — the same transaction appends a `growth-layer` entry to the `migrationState` ledger's `applied` list (the migration runner ignores ids it has no migration for), and a run that finds the entry writes and uploads nothing. A section the owner deleted, or cleared with **Remove sample content**, therefore stays gone on a re-run. A dataset without a ledger (seeded before the ledger existed) gets no entry and the layer again on each run; the upgrade path decides whether a plan change clears the entry.
+- **Applied once per dataset** — the same transaction appends a `growth-layer` entry to the `migrationState` ledger's `applied` list (the migration runner ignores ids it has no migration for), and a run that finds the entry writes and uploads nothing. A section the owner deleted, or cleared with **Remove sample content**, therefore stays gone on a re-run. A dataset without a ledger (seeded before the ledger existed) gets no entry and the layer again on each run. A plan change never clears the entry, so a site that leaves Growth and returns keeps whatever the owner did with its sections.
 
+- **On upgrade** — a signed `POST /api/growth-layer/apply` (`{ tenantId }`) starts the durable `applyGrowthLayerOnUpgrade` run, whose one step, `ensureGrowthLayerApplied`, re-checks `isGrowthLayerEntitled` (a tenant no longer entitled gets nothing written) and runs `applyGrowthLayer` on the tenant's write client. It answers 202 with `{ runId }`, 404 for an unknown tenant and 409 `NOT_PROVISIONED` without a write token; a failure retries `PROVISIONING_UNIT_MAX_RETRIES` times and is logged as `growth_layer.apply_failed` once they are spent.
 - **Placeholder images** — on a run that applies the layer, it uploads the logo and illustration SVGs to the tenant's dataset on every Growth tenant, and passes their asset ids to `buildGrowthLayer`. Sanity keys an asset by its content hash, so a re-run reuses the assets already there.
 - **Documents** — each layer document is created with `createIfNotExists`, so an owner's edits survive a re-run.
 - **Home slots** — each slot missing from the published `template_home`'s `modules` (by `_key` or by reference) is placed after the slot it follows, or last when the owner removed that one; the owner's own order and modules stay as they are. The patch carries the template's revision, so an edit published mid-run fails the commit and the unit's retry re-reads it. A missing home template gets the documents and no slots.
@@ -105,6 +106,7 @@ The owner's overview (`/dashboard`) shows a **Sample content** card to the site'
 - `apps/worker/src/app/api/sample-content/remove/route.test.ts` — the signature, tenant, provisioning and status refusals, the result body and a failed removal.
 - `apps/platform/src/server/sample-content/remove-sample-content-action.test.ts`, `sample-content-for.test.ts` and the `sample-content-card` test — who is offered removal, the status refusal, the result by kind, and the failures.
 - `apps/worker/src/steps/apply-growth-layer.test.ts`, `apps/worker/src/utils/growth-layer/growth-home-modules.test.ts` — the placeholder upload, the created documents and where each slot lands.
+- `apps/worker/src/units/ensure-growth-layer-applied.test.ts`, `apps/worker/src/app/api/growth-layer/apply/route.test.ts` — the upgrade run applies the layer only while entitled, and the route's signature and refusals.
 - `apps/worker/src/units/apply-site-template.test.ts`, `apps/worker/src/steps/seed-content.test.ts`, `apps/worker/src/utils/migration-ledger/migration-ledger.test.ts`.
 
 ## Related epics
