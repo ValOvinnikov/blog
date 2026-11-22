@@ -1,5 +1,4 @@
 import { HTTP_METHOD, SANITY_WEBHOOK_OPERATION } from '@shinefold/config';
-import type { TMaybeNull } from '@shinefold/config/types';
 import { SANITY_API_PATH } from '@shinefold/db/utils/sanity-management-client/sanity-api-paths';
 import { sanityWebhooksRequest } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks-request';
 
@@ -17,29 +16,6 @@ const REVALIDATE_WEBHOOK_RULE = {
 };
 
 export type TSanityWebhook = { id: string; url: string };
-
-export type TListedSanityWebhook = TSanityWebhook & {
-  projection: TMaybeNull<string>;
-};
-
-type TSanityWebhookResponse = TSanityWebhook & {
-  rule?: { projection?: TMaybeNull<string> };
-};
-
-export async function listSanityWebhooks(input: {
-  token: string;
-  projectId: string;
-}): Promise<TListedSanityWebhook[]> {
-  const webhooks = await sanityWebhooksRequest<TSanityWebhookResponse[]>(
-    input.projectId,
-    input.token,
-  );
-  return webhooks.map(({ id, url, rule }) => ({
-    id,
-    url,
-    projection: rule?.projection ?? null,
-  }));
-}
 
 export async function createSanityWebhook(input: {
   token: string;

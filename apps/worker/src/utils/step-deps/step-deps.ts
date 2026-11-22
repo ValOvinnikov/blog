@@ -7,7 +7,7 @@ import {
   createSanityRobotToken,
   deleteSanityRobotToken,
 } from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
-import { listSanityWebhooks } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
+import { listSanityWebhooks } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks-list';
 import { type TSeedContentDeps } from '@worker/steps/seed-content';
 import { type TVerifyTenantSeededContentDeps } from '@worker/steps/verify-seeded-content';
 import { listVercelProjectDomains } from '@worker/utils/vercel-client/vercel-client';

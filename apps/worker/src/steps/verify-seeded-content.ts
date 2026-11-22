@@ -2,10 +2,8 @@ import { createClient } from '@sanity/client';
 import type { TMaybeNull } from '@shinefold/config';
 import { getTenantSanityCredentials } from '@shinefold/db/queries/tenants';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import {
-  listSanityWebhooks,
-  type TSanityWebhook,
-} from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
+import type { TSanityWebhook } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
+import { listSanityWebhooks } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks-list';
 import { hasLength } from '@shinefold/utils/primitives';
 import { SANITY_API_VERSION } from '@worker/constants/sanity-api';
 import { errorMessage } from '@worker/utils/error-message/error-message';

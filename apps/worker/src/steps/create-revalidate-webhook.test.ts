@@ -8,11 +8,13 @@ import {
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   createSanityWebhook,
-  listSanityWebhooks,
-  type TListedSanityWebhook,
   updateSanityWebhookProjection,
   updateSanityWebhookSecret,
 } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
+import {
+  listSanityWebhooks,
+  type TListedSanityWebhook,
+} from '@shinefold/db/utils/sanity-management-client/sanity-webhooks-list';
 import { REVALIDATE_WEBHOOK_CHANGE } from '@worker/constants/revalidate-webhook';
 import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
@@ -45,6 +47,7 @@ faker.seed(7003);
 
 vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@shinefold/db/utils/sanity-management-client/sanity-webhooks');
+vi.mock('@shinefold/db/utils/sanity-management-client/sanity-webhooks-list');
 vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 const MOCK_STORED_TENANT_SECRET = faker.string.alphanumeric(32);

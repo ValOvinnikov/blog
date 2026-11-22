@@ -2,11 +2,13 @@ import { setTenantWebhookCreatedAt } from '@shinefold/db/queries/tenants';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   createSanityWebhook,
-  listSanityWebhooks,
   REVALIDATE_WEBHOOK_PROJECTION,
-  type TListedSanityWebhook,
   updateSanityWebhookProjection,
 } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
+import {
+  listSanityWebhooks,
+  type TListedSanityWebhook,
+} from '@shinefold/db/utils/sanity-management-client/sanity-webhooks-list';
 import { hasLength } from '@shinefold/utils/primitives';
 import {
   REVALIDATE_WEBHOOK_CHANGE,
