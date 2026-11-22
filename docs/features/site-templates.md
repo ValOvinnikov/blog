@@ -52,8 +52,8 @@ No route of its own. The seeded documents are what the public site renders and w
 
 - **Create-if-missing, everywhere.** Sanity documents use `createIfNotExists`; `site_config` uses an insert that does nothing when a row exists. A re-run never overwrites an owner's content or look.
 - **Seeding runs once per dataset.** The seed step skips a dataset that already has a `settings_site`, so changing a tenant's type later adds nothing; "change type" is future work.
-- **Every seeded document is schema-valid.** No placeholder images: no Blog or Blank field needs one, and the hero renders without media.
-- **Growth layers are built but not yet applied.** Every type still seeds the same documents on every plan; uploading the placeholder images and applying a layer at provisioning and on upgrade are the rest of #5714.
+- **Every seeded document is schema-valid.** The Free layouts need no image: no Blog or Blank field needs one, and the hero renders without media. A Growth layer's images are the placeholder SVGs the worker uploads.
+- **Growth layers apply at provisioning; upgrades are still to come.** A plan change to Growth does not reach the worker yet (#5714).
 
 ## Growth layer
 
@@ -67,6 +67,15 @@ No route of its own. The seeded documents are what the public site renders and w
 - **Product** — after the introduction: feature highlights (two rows on the illustration placeholder), three feature cards with icons, a band of sample figures, two testimonials, a logo wall and a pricing table of three tiers — a free tier, a recommended tier with sample monthly and yearly prices, and a contact-us tier — in the site's currency.
 - **Ids** — `starter.<type>.<section>`, with each section's items under it (`starter.business.teamMember1`), so removing sample content treats them like the Free samples.
 - **Copy** — each type's `growth` entry in the per-locale catalogue.
+
+### Applying a layer
+
+`applySiteTemplate` runs the worker's `applyGrowthLayer` step after seeding, in the same `SEED_CONTENT` step, when the tenant's plan includes the `GROWTH` module pack (`PLAN_ENTITLEMENTS`).
+
+- **Placeholder images** — it uploads the logo and illustration SVGs to the tenant's dataset on every Growth tenant, and passes their asset ids to `buildGrowthLayer`. Sanity keys an asset by its content hash, so a re-run reuses the assets already there.
+- **Documents** — each layer document is created with `createIfNotExists`, so an owner's edits survive a re-run.
+- **Home slots** — each slot missing from the published `template_home`'s `modules` (by `_key` or by reference) is placed after the slot it follows, or last when the owner removed that one; the owner's own order and modules stay as they are. The patch carries the template's revision, so an edit published mid-run fails the commit and the unit's retry re-reads it. A missing home template gets the documents and no slots.
+- **Known edges** — a pending draft of `template_home` is not patched, so publishing it drops the new slots; a type with no layer (Blog, Docs, Blank) still receives the two placeholder assets.
 
 ## Removing samples
 
@@ -92,6 +101,7 @@ The owner's overview (`/dashboard`) shows a **Sample content** card to the site'
 - `apps/worker/src/units/remove-sample-content.test.ts`, `apps/worker/src/utils/sample-content/plan-sample-content-removal.test.ts` — what is removed, unlinked and kept, and why; `apps/worker/src/utils/sample-content/kept-samples.test.ts` — how each kept sample is named.
 - `apps/worker/src/app/api/sample-content/remove/route.test.ts` — the signature, tenant, provisioning and status refusals, the result body and a failed removal.
 - `apps/platform/src/server/sample-content/remove-sample-content-action.test.ts`, `sample-content-for.test.ts` and the `sample-content-card` test — who is offered removal, the status refusal, the result by kind, and the failures.
+- `apps/worker/src/steps/apply-growth-layer.test.ts`, `apps/worker/src/utils/growth-layer/growth-home-modules.test.ts` — the placeholder upload, the created documents and where each slot lands.
 - `apps/worker/src/units/apply-site-template.test.ts`, `apps/worker/src/steps/seed-content.test.ts`, `apps/worker/src/utils/migration-ledger/migration-ledger.test.ts`.
 
 ## Related epics

@@ -1,0 +1,138 @@
+import {
+  buildGrowthLayer,
+  STARTER_DOCUMENT_IDS,
+  type TStarterSiteType,
+} from '@shinefold/config';
+import {
+  LOCALE_ISO_CODES,
+  SITE_TYPE,
+  STARTER_PLACEHOLDER_IMAGE,
+} from '@shinefold/config/constants';
+import { SVG_CONTENT_TYPE } from '@worker/constants/growth-layer';
+import { createMockFaker } from '@worker/testing/mock-faker';
+import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
+import {
+  MOCK_REVISION,
+  mockKeyedReference,
+} from '@worker/testing/sample-content/fixtures';
+import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { createTenantWriteClient } from '@worker/utils/tenant-content/tenant-write-client';
+
+import { applyGrowthLayer } from './apply-growth-layer';
+
+vi.mock('@worker/utils/tenant-content/tenant-write-client');
+
+const mockFaker = createMockFaker(5715);
+
+const ids = STARTER_DOCUMENT_IDS;
+const MOCK_PLACEHOLDER_IMAGES = {
+  [STARTER_PLACEHOLDER_IMAGE.LOGO]: `image-${mockFaker.string.hexadecimal({ length: 40 })}-320x120-svg`,
+  [STARTER_PLACEHOLDER_IMAGE.ILLUSTRATION]: `image-${mockFaker.string.hexadecimal({ length: 40 })}-1200x800-svg`,
+};
+const MOCK_FREE_MODULES = [mockKeyedReference(ids.PORTFOLIO_INTRO)];
+
+const upload = vi.fn();
+const fetch = vi.fn();
+const createIfNotExists = vi.fn();
+const patch = vi.fn();
+const commit = vi.fn();
+const transaction = vi.fn(() => ({ createIfNotExists, patch, commit }));
+
+const MOCK_PORTFOLIO_LAYER = buildGrowthLayer({
+  siteType: SITE_TYPE.PORTFOLIO,
+  locale: LOCALE_ISO_CODES.EN,
+  placeholderImages: MOCK_PLACEHOLDER_IMAGES,
+});
+const MOCK_GROWTH_SLOTS =
+  MOCK_PORTFOLIO_LAYER?.homeSlots.map(({ slot }) => slot) ?? [];
+
+function applyFor(siteType: TStarterSiteType = SITE_TYPE.PORTFOLIO) {
+  return applyGrowthLayer({
+    tenantId: MOCK_TENANT_ID,
+    siteType,
+    locale: LOCALE_ISO_CODES.EN,
+  });
+}
+
+describe(applyGrowthLayer, () => {
+  beforeEach(() => {
+    upload.mockImplementation((_type: string, _body: Buffer, { filename }) =>
+      Promise.resolve({
+        _id: filename.includes('logo')
+          ? MOCK_PLACEHOLDER_IMAGES.LOGO
+          : MOCK_PLACEHOLDER_IMAGES.ILLUSTRATION,
+      }),
+    );
+    fetch.mockResolvedValue({
+      _rev: MOCK_REVISION,
+      modules: MOCK_FREE_MODULES,
+    });
+    commit.mockResolvedValue({});
+    vi.mocked(createTenantWriteClient).mockResolvedValue({
+      assets: { upload },
+      fetch,
+      transaction,
+    } as unknown as Awaited<ReturnType<typeof createTenantWriteClient>>);
+  });
+
+  describe('on a fresh Portfolio home template', () => {
+    beforeEach(async () => {
+      await applyFor();
+    });
+
+    it('uploads both placeholder images as SVG', () => {
+      expect(upload).toHaveBeenCalledTimes(2);
+      for (const [, body, options] of upload.mock.calls) {
+        expect(body).toBeInstanceOf(Buffer);
+        expect(options).toMatchObject({ contentType: SVG_CONTENT_TYPE });
+      }
+    });
+
+    it('creates every layer document on the uploaded images', () => {
+      expect(
+        createIfNotExists.mock.calls.map(([document]) => document),
+      ).toEqual(MOCK_PORTFOLIO_LAYER?.documents);
+    });
+
+    it('adds the layer’s slots to the home template under its revision', () => {
+      expect(patch).toHaveBeenCalledWith(ids.HOME_TEMPLATE, {
+        ifRevisionID: MOCK_REVISION,
+        set: { modules: [...MOCK_FREE_MODULES, ...MOCK_GROWTH_SLOTS] },
+      });
+      expect(commit).toHaveBeenCalledOnce();
+    });
+  });
+
+  it('leaves a home template that already holds every slot untouched', async () => {
+    fetch.mockResolvedValue({
+      _rev: MOCK_REVISION,
+      modules: [...MOCK_FREE_MODULES, ...MOCK_GROWTH_SLOTS],
+    });
+
+    await applyFor();
+
+    expect(patch).not.toHaveBeenCalled();
+    expect(commit).toHaveBeenCalledOnce();
+  });
+
+  it('still creates the documents when the home template is gone', async () => {
+    fetch.mockResolvedValue(null);
+
+    await applyFor();
+
+    expect(createIfNotExists).toHaveBeenCalled();
+    expect(patch).not.toHaveBeenCalled();
+  });
+
+  it('writes nothing for a site type without a Growth layer', async () => {
+    await applyFor(SITE_TYPE.BLOG);
+
+    expect(transaction).not.toHaveBeenCalled();
+  });
+
+  it('rejects when the commit fails', async () => {
+    commit.mockRejectedValue(MOCK_SANITY_OUTAGE);
+
+    await expect(applyFor()).rejects.toBe(MOCK_SANITY_OUTAGE);
+  });
+});
