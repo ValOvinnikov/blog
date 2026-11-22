@@ -9,12 +9,18 @@ import {
   STARTER_PLACEHOLDER_IMAGE,
 } from '@shinefold/config/constants';
 import { SVG_CONTENT_TYPE } from '@worker/constants/media-type';
+import { freezeClock, MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import { createMockFaker } from '@worker/testing/mock-faker';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
   MOCK_REVISION,
   mockKeyedReference,
 } from '@worker/testing/sample-content/fixtures';
+import {
+  buildLedgerEntry,
+  GROWTH_LAYER_LEDGER_ENTRY_ID,
+  MIGRATION_LEDGER_ID,
+} from '@worker/utils/migration-ledger/migration-ledger';
 
 import { applyGrowthLayer } from './apply-growth-layer';
 
@@ -47,6 +53,19 @@ const MOCK_PORTFOLIO_LAYER = buildGrowthLayer({
 const MOCK_GROWTH_SLOTS =
   MOCK_PORTFOLIO_LAYER?.homeSlots.map(({ slot }) => slot) ?? [];
 
+const MOCK_FRESH_HOME_TEMPLATE = {
+  _rev: MOCK_REVISION,
+  modules: MOCK_FREE_MODULES,
+};
+const MOCK_OPEN_LEDGER = { isLayerApplied: false };
+
+function mockLayerState({
+  homeTemplate = MOCK_FRESH_HOME_TEMPLATE as unknown,
+  ledger = MOCK_OPEN_LEDGER as unknown,
+} = {}) {
+  fetch.mockResolvedValue({ homeTemplate, ledger });
+}
+
 function applyFor(siteType: TStarterSiteType = SITE_TYPE.PORTFOLIO) {
   return applyGrowthLayer({ siteType, locale: LOCALE_ISO_CODES.EN })(
     MOCK_CLIENT,
@@ -55,6 +74,8 @@ function applyFor(siteType: TStarterSiteType = SITE_TYPE.PORTFOLIO) {
 
 describe(applyGrowthLayer, () => {
   beforeEach(() => {
+    freezeClock();
+    mockLayerState();
     upload.mockImplementation((_type: string, _body: Buffer, { filename }) =>
       Promise.resolve({
         _id: filename.includes('logo')
@@ -62,11 +83,11 @@ describe(applyGrowthLayer, () => {
           : MOCK_PLACEHOLDER_IMAGES.ILLUSTRATION,
       }),
     );
-    fetch.mockResolvedValue({
-      _rev: MOCK_REVISION,
-      modules: MOCK_FREE_MODULES,
-    });
     commit.mockResolvedValue({});
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('on a fresh Portfolio home template', () => {
@@ -95,27 +116,71 @@ describe(applyGrowthLayer, () => {
       });
       expect(commit).toHaveBeenCalledOnce();
     });
+
+    it('records the layer in the migration ledger in the same transaction', () => {
+      expect(patch).toHaveBeenCalledWith(MIGRATION_LEDGER_ID, {
+        setIfMissing: { applied: [] },
+        insert: {
+          after: 'applied[-1]',
+          items: [
+            buildLedgerEntry(
+              GROWTH_LAYER_LEDGER_ENTRY_ID,
+              MOCK_NOW.toISOString(),
+            ),
+          ],
+        },
+      });
+    });
+  });
+
+  it('writes and uploads nothing once the ledger records the layer', async () => {
+    mockLayerState({ ledger: { isLayerApplied: true } });
+
+    await applyFor();
+
+    expect(upload).not.toHaveBeenCalled();
+    expect(transaction).not.toHaveBeenCalled();
+  });
+
+  it('records nothing when the dataset has no migration ledger', async () => {
+    mockLayerState({ ledger: null });
+
+    await applyFor();
+
+    expect(patch).not.toHaveBeenCalledWith(
+      MIGRATION_LEDGER_ID,
+      expect.anything(),
+    );
+    expect(createIfNotExists).toHaveBeenCalled();
   });
 
   it('leaves a home template that already holds every slot untouched', async () => {
-    fetch.mockResolvedValue({
-      _rev: MOCK_REVISION,
-      modules: [...MOCK_FREE_MODULES, ...MOCK_GROWTH_SLOTS],
+    mockLayerState({
+      homeTemplate: {
+        _rev: MOCK_REVISION,
+        modules: [...MOCK_FREE_MODULES, ...MOCK_GROWTH_SLOTS],
+      },
     });
 
     await applyFor();
 
-    expect(patch).not.toHaveBeenCalled();
+    expect(patch).not.toHaveBeenCalledWith(
+      ids.HOME_TEMPLATE,
+      expect.anything(),
+    );
     expect(commit).toHaveBeenCalledOnce();
   });
 
   it('still creates the documents when the home template is gone', async () => {
-    fetch.mockResolvedValue(null);
+    mockLayerState({ homeTemplate: null });
 
     await applyFor();
 
     expect(createIfNotExists).toHaveBeenCalled();
-    expect(patch).not.toHaveBeenCalled();
+    expect(patch).not.toHaveBeenCalledWith(
+      ids.HOME_TEMPLATE,
+      expect.anything(),
+    );
   });
 
   it('writes nothing for a site type without a Growth layer', async () => {

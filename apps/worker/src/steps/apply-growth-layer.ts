@@ -13,11 +13,22 @@ import {
   withGrowthHomeSlots,
 } from '@worker/utils/growth-layer/growth-home-modules';
 import { uploadPlaceholderImages } from '@worker/utils/growth-layer/placeholder-images';
+import {
+  buildLedgerEntry,
+  GROWTH_LAYER_LEDGER_ENTRY_ID,
+  MIGRATION_LEDGER_ID,
+} from '@worker/utils/migration-ledger/migration-ledger';
 
-const HOME_TEMPLATE_MODULES_QUERY = '*[_id == $id][0]{ _rev, modules }';
+const GROWTH_LAYER_STATE_QUERY = `{
+  "homeTemplate": *[_id == $homeTemplateId][0]{ _rev, modules },
+  "ledger": *[_id == $ledgerId][0]{ "isLayerApplied": $entryId in applied[].id }
+}`;
 
-type THomeTemplateModules = Pick<Template_home, '_rev'> & {
-  modules?: THomeModuleSlot[];
+type TGrowthLayerState = {
+  homeTemplate: TMaybeNull<
+    Pick<Template_home, '_rev'> & { modules?: THomeModuleSlot[] }
+  >;
+  ledger: TMaybeNull<{ isLayerApplied: boolean }>;
 };
 
 export function applyGrowthLayer({
@@ -28,30 +39,45 @@ export function applyGrowthLayer({
   locale: TLocaleIsoCode;
 }): TAfterSeed {
   return async (client) => {
+    const homeTemplateId = STARTER_DOCUMENT_IDS.HOME_TEMPLATE;
+    const { homeTemplate, ledger } = await client.fetch<TGrowthLayerState>(
+      GROWTH_LAYER_STATE_QUERY,
+      {
+        homeTemplateId,
+        ledgerId: MIGRATION_LEDGER_ID,
+        entryId: GROWTH_LAYER_LEDGER_ENTRY_ID,
+      },
+    );
+    if (ledger?.isLayerApplied) return;
+
     const placeholderImages = await uploadPlaceholderImages(client);
     const layer = buildGrowthLayer({ siteType, locale, placeholderImages });
     if (!layer) return;
-
-    const homeTemplateId = STARTER_DOCUMENT_IDS.HOME_TEMPLATE;
-    const homeTemplate = await client.fetch<TMaybeNull<THomeTemplateModules>>(
-      HOME_TEMPLATE_MODULES_QUERY,
-      { id: homeTemplateId },
-    );
 
     const transaction = client.transaction();
     for (const document of layer.documents) {
       transaction.createIfNotExists<TStarterDocumentUnion>(document);
     }
 
-    if (homeTemplate) {
-      const { _rev, modules = [] } = homeTemplate;
-      const nextModules = withGrowthHomeSlots(modules, layer.homeSlots);
-      if (nextModules) {
-        transaction.patch(homeTemplateId, {
-          ifRevisionID: _rev,
-          set: { modules: nextModules },
-        });
-      }
+    const nextModules =
+      homeTemplate &&
+      withGrowthHomeSlots(homeTemplate.modules ?? [], layer.homeSlots);
+    if (homeTemplate && nextModules) {
+      transaction.patch(homeTemplateId, {
+        ifRevisionID: homeTemplate._rev,
+        set: { modules: nextModules },
+      });
+    }
+
+    if (ledger) {
+      const entry = buildLedgerEntry(
+        GROWTH_LAYER_LEDGER_ENTRY_ID,
+        new Date().toISOString(),
+      );
+      transaction.patch(MIGRATION_LEDGER_ID, {
+        setIfMissing: { applied: [] },
+        insert: { after: 'applied[-1]', items: [entry] },
+      });
     }
 
     await transaction.commit();

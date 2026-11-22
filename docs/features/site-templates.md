@@ -46,7 +46,7 @@ No route of its own. The seeded documents are what the public site renders and w
 - **`site_config`** — the type's preset (Blog, Portfolio and Personal `EDITORIAL`, Docs, Business, Product and Blank `CONSOLE`) with that preset's theme tokens, card style and header control style, inserted only when the tenant has no row.
 - **`settings_features`** — provisioning writes no row, so features follow the tenant's current preset defaults ([Plans and entitlements](plans-and-entitlements.md)).
 - **Currency** — Site Settings seeds `DEFAULT_SITE_CURRENCY` (USD); choosing it at signup is #5681.
-- **Migration ledger** — the seed transaction also creates the dataset's `migrationState` ledger, listing every id in `@shinefold/config`'s generated `STUDIO_MIGRATION_IDS` as applied, so the next cross-tenant run replays none of them on content that is already at the current schema.
+- **Migration ledger** — the seed transaction also creates the dataset's `migrationState` ledger, listing every id in `@shinefold/config`'s generated `STUDIO_MIGRATION_IDS` as applied, so the next cross-tenant run replays none of them on content that is already at the current schema. It also records the Growth layer once applied ([Applying a layer](#applying-a-layer)).
 
 ## Constraints and invariants
 
@@ -72,10 +72,12 @@ No route of its own. The seeded documents are what the public site renders and w
 
 `applySiteTemplate` hands `seedTenantContent` the worker's `applyGrowthLayer` step when the tenant's resolved entitlements (`getTenantEntitlements`, grants included) hold the `GROWTH` module pack — the check is `isGrowthLayerEntitled`. Seeding runs it in the same `SEED_CONTENT` step with its own `editor` token, after persisting that token on a fresh dataset, and straight after its `settings_site` check on one already seeded — so a reactivated tenant whose write token was cleared still gets it. A failure keeps the persisted token, and the unit's retry runs the layer again on an already-seeded dataset.
 
-- **Placeholder images** — it uploads the logo and illustration SVGs to the tenant's dataset on every Growth tenant, and passes their asset ids to `buildGrowthLayer`. Sanity keys an asset by its content hash, so a re-run reuses the assets already there.
+- **Applied once per dataset** — the same transaction appends a `growth-layer` entry to the `migrationState` ledger's `applied` list (the migration runner ignores ids it has no migration for), and a run that finds the entry writes and uploads nothing. A section the owner deleted, or cleared with **Remove sample content**, therefore stays gone on a re-run. A dataset without a ledger (seeded before the ledger existed) gets no entry and the layer again on each run; the upgrade path decides whether a plan change clears the entry.
+
+- **Placeholder images** — on a run that applies the layer, it uploads the logo and illustration SVGs to the tenant's dataset on every Growth tenant, and passes their asset ids to `buildGrowthLayer`. Sanity keys an asset by its content hash, so a re-run reuses the assets already there.
 - **Documents** — each layer document is created with `createIfNotExists`, so an owner's edits survive a re-run.
 - **Home slots** — each slot missing from the published `template_home`'s `modules` (by `_key` or by reference) is placed after the slot it follows, or last when the owner removed that one; the owner's own order and modules stay as they are. The patch carries the template's revision, so an edit published mid-run fails the commit and the unit's retry re-reads it. A missing home template gets the documents and no slots.
-- **Cost** — two asset uploads, one fetch and one transaction per Growth provisioning.
+- **Cost** — one fetch per Growth provisioning, plus two asset uploads and one transaction when the layer is applied.
 - **Known edges** — a pending draft of `template_home` is not patched, so publishing it drops the new slots; a type with no layer (Blog, Docs, Blank) still receives the two placeholder assets.
 
 ## Removing samples
