@@ -68,6 +68,8 @@
       "PORTFOLIO": "Portfolio",
       "PERSONAL": "Personnel / CV",
       "DOCS": "Documentation",
+      "BUSINESS": "Entreprise",
+      "PRODUCT": "Produit",
       "BLANK": "Vierge"
     },
     "nameLabel": "Nom du site",
