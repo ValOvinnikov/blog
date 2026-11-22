@@ -3,6 +3,7 @@ import { mockLocaleRouterPush } from '@platform/testing/mock-locale-router';
 import {
   mockReadyClientTenant,
   mockTenantsListQuery,
+  MOCK_CUSTOM_DOMAIN,
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_ID,
   MOCK_OTHER_TENANT_NAME,
@@ -45,6 +46,7 @@ const ARIA_SORT = 'aria-sort';
 const TENANT_COLUMN = 'Tenant';
 const CREATED_COLUMN = 'Created';
 const PLAN_COLUMN = 'Plan';
+const MATCHED_HINT = `Matched on ${MOCK_CUSTOM_DOMAIN}`;
 
 describe(`<${TenantsTable.name}/>`, () => {
   it("shows each tenant's name, domain, plan and status", () => {
@@ -137,6 +139,35 @@ describe(`<${TenantsTable.name}/>`, () => {
         MOCK_TENANT_CREATED_AT.toISOString(),
       );
     });
+  });
+
+  it('announces the address a search matched with its tenant row', () => {
+    setup({
+      tenants: [
+        { ...mockReadyClientTenant(), matchedDomain: MOCK_CUSTOM_DOMAIN },
+        otherTenant(),
+      ],
+      listQuery: mockTenantsListQuery({ search: MOCK_CUSTOM_DOMAIN }),
+    });
+
+    const matchedRow = screen.getByRole('row', {
+      name: new RegExp(`^${MOCK_TENANT_NAME}.*${MATCHED_HINT}`),
+    });
+    const hints = screen.getAllByText(MATCHED_HINT);
+
+    expect(matchedRow).toBeVisible();
+    expect(hints).toHaveLength(1);
+  });
+
+  it('shows no matched address on a row matched by its name or main address', () => {
+    setup({
+      tenants: [mockReadyClientTenant()],
+      listQuery: mockTenantsListQuery({ search: MOCK_TENANT_NAME }),
+    });
+
+    const hint = screen.queryByText(MOCK_CUSTOM_DOMAIN, { exact: false });
+
+    expect(hint).not.toBeInTheDocument();
   });
 
   it('shows an empty state when there are no tenants', () => {

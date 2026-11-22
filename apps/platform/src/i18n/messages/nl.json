@@ -290,7 +290,8 @@
       "PAST_DUE": "Betaling achterstallig"
     },
     "manage": "Beheren",
-    "manageAriaLabel": "{tenantName} beheren"
+    "manageAriaLabel": "{tenantName} beheren",
+    "matchedDomain": "Gevonden via {domain}"
   },
   "tenantsSearch": {
     "label": "Tenants zoeken",

@@ -290,7 +290,8 @@
       "PAST_DUE": "Pago vencido"
     },
     "manage": "Gestionar",
-    "manageAriaLabel": "Gestionar {tenantName}"
+    "manageAriaLabel": "Gestionar {tenantName}",
+    "matchedDomain": "Coincide con {domain}"
   },
   "tenantsSearch": {
     "label": "Buscar clientes",

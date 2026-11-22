@@ -31,9 +31,10 @@ export default async function TenantsPage({ searchParams }: TProps) {
 
   return (
     <TenantsView
-      tenants={tenants.map((tenant) =>
-        toClientTenant(toPlatformTenantSummary(tenant)),
-      )}
+      tenants={tenants.map((tenant) => ({
+        ...toClientTenant(toPlatformTenantSummary(tenant)),
+        matchedDomain: tenant.matchedDomain,
+      }))}
       listQuery={listQuery}
       isEmailAlertingConfigured={isEmailAccountConfigured(
         EMAIL_ACCOUNT.PLATFORM,
