@@ -22,6 +22,7 @@ import { moduleSlot } from './starter-fields';
 import {
   FEATURES_MODULE_TITLE,
   LOGO_WALL_MODULE_TITLE,
+  STATS_MODULE_TITLE,
   TESTIMONIALS_MODULE_TITLE,
 } from './starter-module-titles';
 
@@ -50,7 +51,7 @@ export function buildBusinessGrowthLayer({
       }),
       buildStatsModule({
         id: ids.BUSINESS_STATS,
-        title: 'Stats',
+        title: STATS_MODULE_TITLE,
         locale,
         stats,
       }),

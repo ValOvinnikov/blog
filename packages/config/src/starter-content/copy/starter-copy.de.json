@@ -576,6 +576,122 @@
     "changelog": {
       "linkLabel": "Änderungen",
       "listHeading": "Alle Releases"
+    },
+    "growth": {
+      "highlights": {
+        "heading": "So funktioniert es",
+        "imageAlt": "Platzhalterillustration, die du durch einen Screenshot deines Produkts ersetzt",
+        "rows": [
+          {
+            "heading": "In Minuten eingerichtet",
+            "body": [
+              "Beschreibe, was ein neuer Kunde als Erstes mit deinem Produkt tut. Ersetze den Platzhalter durch einen Screenshot dieses Schritts."
+            ]
+          },
+          {
+            "heading": "Sofort Ergebnisse sehen",
+            "body": [
+              "Zeige, was sich ändert, sobald dein Produkt im Einsatz ist. Ein Screenshot des Ergebnisses wirkt stärker als eine Funktionsliste."
+            ]
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "Alles, was du brauchst",
+        "features": [
+          {
+            "heading": "Schnell",
+            "supportingText": "Ersetze dies durch die Funktion, die Kunden zuerst bemerken, in einem Satz."
+          },
+          {
+            "heading": "Flexibel",
+            "supportingText": "Füge eine zweite Funktion hinzu und das Problem, das sie löst."
+          },
+          {
+            "heading": "Sicher",
+            "supportingText": "Schließe damit ab, wie du die Daten deiner Kunden schützt."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "In Zahlen",
+        "footnote": "Beispielzahlen. Ersetze sie durch deine eigenen.",
+        "stats": [
+          {
+            "value": "10k+",
+            "label": "Aktive Nutzer"
+          },
+          {
+            "value": "99,9 %",
+            "label": "Verfügbarkeit"
+          },
+          {
+            "value": "4,8/5",
+            "label": "Durchschnittliche Bewertung"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "Das sagen unsere Kunden",
+        "quotes": [
+          {
+            "name": "Beispielkunde",
+            "role": "Produktleiterin, Beispielfirma",
+            "quote": [
+              "Ersetze diesen Text durch ein Zitat eines zufriedenen Kunden. Ein oder zwei Sätze dazu, was sich verändert hat, lesen sich am besten."
+            ]
+          },
+          {
+            "name": "Weiterer Beispielkunde",
+            "role": "Gründer, Beispielstudio",
+            "quote": [
+              "Füge eine zweite Stimme hinzu, am besten von einer anderen Art Kunde."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Im Einsatz bei Teams von",
+        "logoNames": [
+          "Beispielkunde eins",
+          "Beispielkunde zwei",
+          "Beispielkunde drei",
+          "Beispielkunde vier"
+        ]
+      },
+      "pricing": {
+        "heading": "Einfache Preise",
+        "footnote": "Beispieltarife und -preise. Ersetze sie durch deine eigenen.",
+        "free": {
+          "name": "Kostenlos",
+          "description": "Zum Ausprobieren auf eigene Faust.",
+          "priceLabel": "Kostenlos",
+          "features": [
+            "Ersetze dies durch das, was der kostenlose Tarif enthält",
+            "Füge ein Limit hinzu, etwa ein Projekt"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "Für Einzelne und kleine Teams, die es täglich nutzen.",
+          "highlightLabel": "Am beliebtesten",
+          "features": [
+            "Alles aus Kostenlos",
+            "Ersetze dies durch das, was Pro ergänzt",
+            "Füge eine zweite Pro-Funktion hinzu"
+          ]
+        },
+        "team": {
+          "name": "Team",
+          "description": "Für größere Teams mit eigenen Anforderungen.",
+          "priceLabel": "Kontakt aufnehmen",
+          "features": [
+            "Alles aus Pro",
+            "Ersetze dies durch das, was Team ergänzt",
+            "Füge hinzu, wie du größere Kunden betreust"
+          ]
+        }
+      }
     }
   }
 }

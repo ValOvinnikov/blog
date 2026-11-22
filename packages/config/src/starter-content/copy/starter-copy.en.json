@@ -576,6 +576,122 @@
     "changelog": {
       "linkLabel": "Changelog",
       "listHeading": "All releases"
+    },
+    "growth": {
+      "highlights": {
+        "heading": "How it works",
+        "imageAlt": "Placeholder illustration to replace with a screenshot of your product",
+        "rows": [
+          {
+            "heading": "Set it up in minutes",
+            "body": [
+              "Describe the first thing a new customer does with your product. Swap the placeholder for a screenshot of that step."
+            ]
+          },
+          {
+            "heading": "See the result straight away",
+            "body": [
+              "Show what changes once your product is in use. A screenshot of the outcome works better than a list of features."
+            ]
+          }
+        ]
+      },
+      "featureList": {
+        "heading": "Everything you need",
+        "features": [
+          {
+            "heading": "Fast",
+            "supportingText": "Replace this with the feature customers notice first, in a sentence."
+          },
+          {
+            "heading": "Flexible",
+            "supportingText": "Add a second feature and the problem it solves."
+          },
+          {
+            "heading": "Secure",
+            "supportingText": "Finish with how you keep your customers' data safe."
+          }
+        ]
+      },
+      "stats": {
+        "heading": "In numbers",
+        "footnote": "Sample figures. Replace them with your own.",
+        "stats": [
+          {
+            "value": "10k+",
+            "label": "Active users"
+          },
+          {
+            "value": "99.9%",
+            "label": "Uptime"
+          },
+          {
+            "value": "4.8/5",
+            "label": "Average rating"
+          }
+        ]
+      },
+      "testimonial": {
+        "heading": "What our customers say",
+        "quotes": [
+          {
+            "name": "Sample customer",
+            "role": "Product lead, Sample Company",
+            "quote": [
+              "Replace this with a quote from a happy customer. A sentence or two about what changed reads best."
+            ]
+          },
+          {
+            "name": "Another sample customer",
+            "role": "Founder, Sample Studio",
+            "quote": [
+              "Add a second voice, ideally from a different kind of customer."
+            ]
+          }
+        ]
+      },
+      "logoWall": {
+        "heading": "Used by teams at",
+        "logoNames": [
+          "Sample customer one",
+          "Sample customer two",
+          "Sample customer three",
+          "Sample customer four"
+        ]
+      },
+      "pricing": {
+        "heading": "Simple pricing",
+        "footnote": "Sample plans and prices. Replace them with your own.",
+        "free": {
+          "name": "Free",
+          "description": "For trying the product on your own.",
+          "priceLabel": "Free",
+          "features": [
+            "Replace this with what the free plan includes",
+            "Add a limit, such as one project"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "For individuals and small teams who use it every day.",
+          "highlightLabel": "Most popular",
+          "features": [
+            "Everything in Free",
+            "Replace this with what Pro adds",
+            "Add a second Pro feature"
+          ]
+        },
+        "team": {
+          "name": "Team",
+          "description": "For larger teams with their own needs.",
+          "priceLabel": "Contact us",
+          "features": [
+            "Everything in Pro",
+            "Replace this with what Team adds",
+            "Add how you support larger customers"
+          ]
+        }
+      }
     }
   }
 }

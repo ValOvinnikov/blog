@@ -9,6 +9,7 @@ import type {
 } from './growth-layer-shape';
 import { buildPersonalGrowthLayer } from './personal-growth';
 import { buildPortfolioGrowthLayer } from './portfolio-growth';
+import { buildProductGrowthLayer } from './product-growth';
 import type { TStarterSiteType } from './starter-content';
 
 type TGrowthInput = {
@@ -29,6 +30,12 @@ const BUILD_GROWTH_BY_SITE_TYPE: Partial<
     buildPersonalGrowthLayer({ locale, copy: STARTER_COPY_BY_LOCALE[locale] }),
   [SITE_TYPE.BUSINESS]: ({ locale, placeholderImages }) =>
     buildBusinessGrowthLayer({
+      locale,
+      copy: STARTER_COPY_BY_LOCALE[locale],
+      placeholderImages,
+    }),
+  [SITE_TYPE.PRODUCT]: ({ locale, placeholderImages }) =>
+    buildProductGrowthLayer({
       locale,
       copy: STARTER_COPY_BY_LOCALE[locale],
       placeholderImages,
