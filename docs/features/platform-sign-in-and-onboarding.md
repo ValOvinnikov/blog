@@ -193,8 +193,8 @@ site as a 14-day Growth trial, with no card.
   the `FIELD_APPEARANCE.WIZARD` option on `FormField` (`control.appearance`),
   `OptionSelect` and `FormSiteAddressInput`; every other platform form keeps the
   hint above its control. The steps:
-  1. **Site** — the site type (Blog, Portfolio, Personal / résumé, Docs or
-     Blank) and the site name.
+  1. **Site** — the site type (Blog, Portfolio, Personal / résumé, Docs,
+     Business, Product or Blank) and the site name.
   2. **Address** — the Site address (only the subdomain, with
      `.<TENANT_ROOT_DOMAIN>` shown beside it, checked live by
      `checkSiteAddressAction` as the user types) and the starting language,
@@ -208,8 +208,8 @@ site as a 14-day Growth trial, with no card.
      Continue (on its own line above the buttons in the phone action bar).
   3. **Look** — the preset and accent colour. Each site type starts on its
      own preset and that preset's accent (`STARTER_PRESET_BY_SITE_TYPE`:
-     Editorial for Blog, Portfolio and Personal / résumé; Console for Docs and
-     Blank), and changing the site type moves the preview with it until the
+     Editorial for Blog, Portfolio and Personal / résumé; Console for Docs,
+     Business, Product and Blank), and changing the site type moves the preview with it until the
      owner picks a preset or moves the accent here; from then on their choice
      stays whatever the site type.
   4. **Review** — every choice in a ruled row (`DetailList` with

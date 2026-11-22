@@ -178,10 +178,21 @@ describe(createSiteAction, () => {
     expect(checkTenantSlugMock).not.toHaveBeenCalled();
   });
 
-  it('refuses a site type the free plan does not offer', async () => {
+  it.each([SITE_TYPE.BUSINESS, SITE_TYPE.PRODUCT])(
+    'creates a %s site with that site type',
+    async (siteType) => {
+      await expectRedirectToDashboard({ ...MOCK_INPUT, siteType });
+
+      expect(createSelfServeTenantMock).toHaveBeenCalledWith(
+        expect.objectContaining({ siteType }),
+      );
+    },
+  );
+
+  it('refuses a site type signup does not offer', async () => {
     const result = await createSiteAction({
       ...MOCK_INPUT,
-      siteType: SITE_TYPE.BUSINESS as TCreateSiteInput['siteType'],
+      siteType: faker.lorem.word() as TCreateSiteInput['siteType'],
     });
 
     expect(result).toEqual({

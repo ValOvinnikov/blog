@@ -68,6 +68,8 @@
       "PORTFOLIO": "Portfolio",
       "PERSONAL": "Persoonlijk / cv",
       "DOCS": "Documentatie",
+      "BUSINESS": "Bedrijf",
+      "PRODUCT": "Product",
       "BLANK": "Leeg"
     },
     "nameLabel": "Naam van de site",

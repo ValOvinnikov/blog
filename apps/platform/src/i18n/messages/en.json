@@ -68,6 +68,8 @@
       "PORTFOLIO": "Portfolio",
       "PERSONAL": "Personal / résumé",
       "DOCS": "Docs",
+      "BUSINESS": "Business",
+      "PRODUCT": "Product",
       "BLANK": "Blank"
     },
     "nameLabel": "Site name",

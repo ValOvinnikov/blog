@@ -68,6 +68,8 @@
       "PORTFOLIO": "Portafolio",
       "PERSONAL": "Personal / currículum",
       "DOCS": "Documentación",
+      "BUSINESS": "Empresa",
+      "PRODUCT": "Producto",
       "BLANK": "En blanco"
     },
     "nameLabel": "Nombre del sitio",
