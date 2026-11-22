@@ -43,14 +43,22 @@ describe(enqueueGrowthLayerOnUpgrade, () => {
     expect(enqueueWorkerRequestMock).not.toHaveBeenCalled();
   });
 
-  it('logs a request the worker rejects', async () => {
+  it('stays silent when the worker has no provisioned site to apply it to yet', async () => {
     enqueueWorkerRequestMock.mockResolvedValueOnce(HTTP_STATUS.CONFLICT);
+
+    await enqueueGrowthLayerOnUpgrade(MOCK_TENANT_ID, STARTER, GROWTH);
+
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it('logs a request the worker rejects', async () => {
+    enqueueWorkerRequestMock.mockResolvedValueOnce(HTTP_STATUS.BAD_REQUEST);
 
     await enqueueGrowthLayerOnUpgrade(MOCK_TENANT_ID, STARTER, GROWTH);
 
     expect(logger.error).toHaveBeenCalledWith(
       GROWTH_LAYER_LOG.APPLY_ENQUEUE_REJECTED,
-      { tenantId: MOCK_TENANT_ID, responseStatus: HTTP_STATUS.CONFLICT },
+      { tenantId: MOCK_TENANT_ID, responseStatus: HTTP_STATUS.BAD_REQUEST },
     );
   });
 

@@ -24,7 +24,13 @@ export const enqueueGrowthLayerOnUpgrade = async (
   const status = await enqueueWorkerRequest(GROWTH_LAYER_PATH.APPLY, {
     tenantId,
   });
-  if (isNull(status) || status === HTTP_STATUS.ACCEPTED) return;
+  if (
+    isNull(status) ||
+    status === HTTP_STATUS.ACCEPTED ||
+    status === HTTP_STATUS.CONFLICT
+  ) {
+    return;
+  }
 
   logger.error(GROWTH_LAYER_LOG.APPLY_ENQUEUE_REJECTED, {
     tenantId,
