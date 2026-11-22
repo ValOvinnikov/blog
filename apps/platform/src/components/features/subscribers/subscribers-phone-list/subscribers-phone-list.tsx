@@ -8,7 +8,7 @@ import { useFormatter, useTranslations } from 'next-intl';
 
 import { subscribersPhoneListVariants } from './subscribers-phone-list-variants';
 
-export type TSubscribersRange = {
+type TSubscribersRange = {
   from: number;
   to: number;
   count: number;

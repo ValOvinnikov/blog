@@ -33,8 +33,6 @@ export const SUBSCRIBERS_REFUSAL = {
   NOT_FOUND: 'NOT_FOUND',
 } as const;
 
-export type TSubscribersRefusal = TValueOf<typeof SUBSCRIBERS_REFUSAL>;
-
 export const SUBSCRIBERS_LOG = {
   REMOVE_FAILED: 'subscribers.remove_failed',
   EXPORT_FAILED: 'subscribers.export_failed',

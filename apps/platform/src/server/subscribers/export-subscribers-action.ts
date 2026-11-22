@@ -15,7 +15,7 @@ import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { requireSubscribersManager } from './require-subscribers-manager';
 
-export type TSubscribersExport = {
+type TSubscribersExport = {
   fileName: string;
   csv: string;
 };

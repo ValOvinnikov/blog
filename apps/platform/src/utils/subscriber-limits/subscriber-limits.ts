@@ -21,7 +21,7 @@ export type TSubscriberLimitsInput = {
   hasMovedUp: boolean;
 };
 
-export type TBandLimit = {
+type TBandLimit = {
   state: TSubscriberLimitState;
   count: number;
   ceiling: number;
@@ -30,7 +30,7 @@ export type TBandLimit = {
   over: number;
 };
 
-export type TEmailsLimit = {
+type TEmailsLimit = {
   state: TSubscriberLimitState;
   sent: number;
   allowance: number;

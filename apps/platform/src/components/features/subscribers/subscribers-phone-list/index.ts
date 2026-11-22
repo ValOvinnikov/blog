@@ -1,4 +1,1 @@
-export {
-  SubscribersPhoneList,
-  type TSubscribersRange,
-} from './subscribers-phone-list';
+export { SubscribersPhoneList } from './subscribers-phone-list';
