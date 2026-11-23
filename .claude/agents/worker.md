@@ -49,9 +49,9 @@ default to zero".
    `package.json`, no range). Check every API you call (`"use workflow"`,
    `"use step"`, retries, `sleep()`) with `use-context7` against that
    version, or against the installed package's own types when context7 is
-   unreachable. Dependabot ignores `workflow` and `@workflow/*`, since 5.7.0
-   hung every run; an upgrade is a deliberate change, tested on worker-dev
-   before it merges.
+   unreachable. The worker's runtime packages (`workflow`, `@workflow/*`,
+   `@vercel/functions`, `next`, `@sanity/client`, `ws`) are exact pins, and an
+   upgrade is tested on worker-dev before it merges.
 5. Verify that any `db` or `config` change your work depends on has actually
    landed before coding against it.
 
