@@ -988,10 +988,15 @@ env vars are set.
 #### 8b. Vercel env vars — per project
 
 Set the three vars on **`web-prod` and `platform-prod`**, Production target
-only, so preview deployments send nothing. `web-dev` and `platform-dev` get them
-only for the rehearsal in 8e. **`worker-dev`** gets them too, Production target,
-because the worker has no production deployment yet; `worker-prod` gets them
-when it is stood up.
+only, so preview deployments send nothing. **No development project keeps
+them:** the alert rules match `service` without an environment, so a
+development error would page as a production one. `web-dev` and
+`platform-dev` get them only for the rehearsal in 8e, and at launch the vars
+come off `web-dev`, `platform-dev` and `worker-dev`, each redeployed.
+
+- [ ] **`worker-prod`** — once a deploy job ships it, set the three vars there,
+      Production target, and redeploy. Until then the worker sends nothing to
+      Loki.
 
 | Variable        | Value                            | Vercel type               |
 | --------------- | -------------------------------- | ------------------------- |
@@ -1061,8 +1066,8 @@ filterable:
    malformed body is rejected with a 400 and logs nothing); on platform, any
    unhandled request error, which `onRequestError` logs as
    `request.unhandled_error`. Confirm both lines arrive with their `service`
-   label. Unset the vars afterwards, or keep them if Loki's free-tier volume
-   allows.
+   label. Then unset the vars on both and redeploy them — development never
+   keeps them (8b).
 3. **Uptime checks on the development hosts**, including one deliberately
    failing path (a 404), confirming both the alert and the resolve. Delete the
    failing check afterwards — it counts against the free tier's executions —
