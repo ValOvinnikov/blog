@@ -637,6 +637,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **GITHUB_RUN_CONCLUSION**: `SUCCESS`=`"success"`, `FAILURE`=`"failure"`, `SKIPPED`=`"skipped"`
 - **GITHUB_LOG**: `NOT_CONFIGURED`=`"github.not_configured"`, `RATE_LIMITED`=`"github.rate_limited"`, `REQUEST_ERROR`=`"github.request_error"`, `REQUEST_FAILED`=`"github.request_failed"`, `TAG_LIST_INCOMPLETE`=`"github.tag_list_incomplete"`, `UNEXPECTED_RESPONSE`=`"github.unexpected_response"`
 
+### `@platform/constants/growth-layer` — `apps/platform/src/constants/growth-layer.ts`
+
+- **GROWTH_LAYER_PATH**: `APPLY`=`"/api/growth-layer/apply"`
+- **GROWTH_LAYER_LOG**: `APPLY_ENQUEUE_REJECTED`=`"growth_layer.apply_enqueue_rejected"`
+
 ### `@platform/constants/hue-slider` — `apps/platform/src/constants/hue-slider.ts`
 
 - **HUE_SLIDER_TRACK**: `PALETTE`, `RAINBOW`

@@ -16,7 +16,6 @@ export type TCapability = TValueOf<typeof CAPABILITY>;
 export const COMING_SOON_CAPABILITIES = [
   CAPABILITY.COMMENTS,
   CAPABILITY.RATINGS,
-  CAPABILITY.NEWSLETTER,
 ] as const satisfies readonly TCapability[];
 
 export const CAPABILITY_PARENT: Partial<Record<TCapability, TCapability>> = {

@@ -94,6 +94,8 @@ vi.mock('@platform/server/tenants/notify-owner-of-plan-change', () => ({
   notifyOwnerOfPlanChange: vi.fn(),
 }));
 
+vi.mock('@platform/server/growth-layer/enqueue-growth-layer-on-upgrade');
+
 vi.mock('next/cache');
 
 vi.mock('next/server');

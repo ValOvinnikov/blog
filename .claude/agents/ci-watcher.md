@@ -96,7 +96,7 @@ so never guess which PR one maps to.
 4. **Any check fails, required or not** — "not required to merge" is not
    "safe to ignore". For each failing check:
    - Confirm its name with `mcp__github__pull_request_read`
-     (`method: get_check_runs`, `owner: ValOvinnikov`, `repo: blog`,
+     (`method: get_check_runs`, `owner: ValOvinnikov`, `repo: sf-mono`,
      `pullNumber: <n>`).
    - Pull the failing job's log, with `<branch>` taken from step 1's
      `headRefName`, never assumed:

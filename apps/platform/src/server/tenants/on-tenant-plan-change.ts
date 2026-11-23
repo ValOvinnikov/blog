@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { enqueueGrowthLayerOnUpgrade } from '@platform/server/growth-layer/enqueue-growth-layer-on-upgrade';
 import { notifyOwnerOfPlanChange } from '@platform/server/tenants/notify-owner-of-plan-change';
 import type { TTenantPlan } from '@shinefold/config/constants';
 
@@ -9,5 +10,8 @@ export const onTenantPlanChange = async (
   fromPlan: TTenantPlan,
   toPlan: TTenantPlan,
 ): Promise<void> => {
-  await notifyOwnerOfPlanChange(tenantId, fromPlan, toPlan);
+  await Promise.all([
+    notifyOwnerOfPlanChange(tenantId, fromPlan, toPlan),
+    enqueueGrowthLayerOnUpgrade(tenantId, fromPlan, toPlan),
+  ]);
 };

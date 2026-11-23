@@ -156,7 +156,7 @@ describe(grantEntitlementAction, () => {
 
   it('refuses a coming-soon capability without writing', async () => {
     const result = await grant({
-      item: { kind: ENTITLEMENT_KIND.CAPABILITY, key: CAPABILITY.NEWSLETTER },
+      item: { kind: ENTITLEMENT_KIND.CAPABILITY, key: CAPABILITY.COMMENTS },
     });
 
     expect(result).toEqual({
