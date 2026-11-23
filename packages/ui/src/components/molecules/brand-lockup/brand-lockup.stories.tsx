@@ -1,9 +1,10 @@
 import { MOCK_SITE_NAME } from '@shinefold/ui/testing/fixtures';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { BrandLockup } from './brand-lockup';
+import { BrandLockup, type TBrandLockupProps } from './brand-lockup';
 
 const MOCK_WIDE_SRC = 'https://placehold.co/320x64';
+const MOCK_WIDE_DARK_SRC = 'https://placehold.co/320x64/111111/ffffff';
 const MOCK_TAGLINE = 'v1.0.0 · build/local';
 
 const meta = {
@@ -37,14 +38,33 @@ export const WithWideImageSourceAndTagline: TStory = {
   },
 };
 
+const withDarkLogoArgs = {
+  src: MOCK_WIDE_SRC,
+  darkSrc: MOCK_WIDE_DARK_SRC,
+} satisfies Partial<TBrandLockupProps>;
+
+export const WithDarkLogo: TStory = {
+  name: 'With a dark-mode logo — light mode shows the main logo',
+  args: withDarkLogoArgs,
+};
+
+export const WithDarkLogoInDarkMode: TStory = {
+  name: 'With a dark-mode logo — dark mode swaps to it',
+  args: withDarkLogoArgs,
+  globals: { theme: 'dark' },
+};
+
+export const WithoutDarkLogoInDarkMode: TStory = {
+  name: 'Without a dark-mode logo — dark mode keeps the main logo',
+  args: { src: MOCK_WIDE_SRC },
+  globals: { theme: 'dark' },
+};
+
 // Narrow-viewport exception (`ui-storybook` skill) — same as `PrimaryNavigation`'s mobile stories.
 export const NarrowViewport: TStory = {
   globals: { viewport: 'phone' },
 };
 
-// Below `md` the tagline is hidden, so the mark must render with the same
-// sizing as the no-tagline case — regression coverage for the mobile
-// stacked-sizing bug.
 export const NarrowViewportWithWideImageSourceAndTagline: TStory = {
   globals: { viewport: 'phone' },
   args: {
