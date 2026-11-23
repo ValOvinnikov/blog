@@ -1,8 +1,9 @@
 import 'server-only';
 
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
-import { consumePendingInvitesOnSignIn } from '@shinefold/auth/events/consume-pending-invites-on-sign-in';
-import { recordSignupTermsOnSignIn } from '@shinefold/auth/events/record-signup-terms-on-sign-in';
+import { consumeAdminInviteOnSignIn } from '@shinefold/auth/events/consume-admin-invite-on-sign-in/consume-admin-invite-on-sign-in';
+import { consumePendingInvitesOnSignIn } from '@shinefold/auth/events/consume-pending-invites-on-sign-in/consume-pending-invites-on-sign-in';
+import { recordSignupTermsOnSignIn } from '@shinefold/auth/events/record-signup-terms-on-sign-in/record-signup-terms-on-sign-in';
 import { buildMagicLinkProvider } from '@shinefold/auth/providers/magic-link/magic-link-provider/magic-link-provider';
 import { GITHUB_USERINFO_WITH_EMAIL_VERIFIED } from '@shinefold/auth/providers/oauth/github-userinfo';
 import { requireVerifiedProviderEmail } from '@shinefold/auth/providers/oauth/require-verified-provider-email';
@@ -103,6 +104,7 @@ export function buildAuthConfig(
         signIn: async ({ user, isNewUser }) => {
           await Promise.all([
             consumePendingInvitesOnSignIn({ user }),
+            consumeAdminInviteOnSignIn({ user }),
             recordSignupTermsOnSignIn({ user, isNewUser }),
           ]);
         },
