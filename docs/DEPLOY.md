@@ -235,9 +235,7 @@ claims a production host:
       self-serve signup ships (epic #4840).
 
 A host under the wildcard renders its tenant once `tenant_domains` holds that
-exact host; production answers any other host with a 404. Development does the
-same once #5724 is deployed; until then an unknown dev subdomain falls back to
-the platform tenant.
+exact host, and every other host answers 404 (checked on dev 2026-11-23).
 
 #### Vercel env vars
 
