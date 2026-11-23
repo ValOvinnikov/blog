@@ -13,11 +13,14 @@ import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { ADMIN_ROLE } from '@shinefold/db/constants';
 
+import { resolveIsDeprovisionUnderway } from './resolve-is-deprovision-underway';
 import { retryProvisioningStepAction } from './retry-provisioning-step-action';
 
 vi.mock('@platform/server/auth/require-tenant-owner-or-admin');
 
 vi.mock('@platform/server/provisioning/start-provisioning');
+
+vi.mock('@platform/server/provisioning/resolve-is-deprovision-underway');
 
 vi.mock('@shinefold/db', () => ({
   queries: {
@@ -111,6 +114,21 @@ describe(retryProvisioningStepAction, () => {
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.ARCHIVED,
+    });
+  });
+
+  it('refuses without starting provisioning while a deprovision is pending or running', async () => {
+    vi.mocked(resolveIsDeprovisionUnderway).mockResolvedValueOnce(true);
+
+    const result = await retryProvisioningStepAction(MOCK_TENANT_ID);
+
+    expect(resolveIsDeprovisionUnderway).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MOCK_TENANT_ID }),
+    );
+    expect(startProvisioningMock).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.DEPROVISION_UNDERWAY,
     });
   });
 });

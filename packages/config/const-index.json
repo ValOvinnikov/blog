@@ -10682,6 +10682,14 @@
         "file": "apps/worker/src/constants/provisioning.ts"
       }
     ],
+    "DEPROVISION_UNDERWAY": [
+      {
+        "ref": "TENANT_REFUSAL.DEPROVISION_UNDERWAY",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "NOT_SUSPENDED": [
       {
         "ref": "TENANT_REFUSAL.NOT_SUSPENDED",

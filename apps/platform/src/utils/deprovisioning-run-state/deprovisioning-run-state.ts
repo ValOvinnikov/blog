@@ -66,3 +66,10 @@ export const currentDeprovisionRequestedAt = (
   }
   return deprovisionRequestedAt.toISOString();
 };
+
+export const isDeprovisionUnderway = (
+  deprovisionRequestedAt: TMaybeUndefined<string>,
+  run: TMaybeUndefined<TDeprovisioningRun>,
+): boolean =>
+  isRetryPending(deprovisionRequestedAt, run) ||
+  Boolean(run && !run.finishedAt);

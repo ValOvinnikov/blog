@@ -8,6 +8,7 @@ import { TENANT_PROVISIONING_STEP_STATUS } from '@shinefold/db/constants';
 import {
   currentDeprovisionRequestedAt,
   deprovisioningOverallStatus,
+  isDeprovisionUnderway,
   isRetryPending,
 } from './deprovisioning-run-state';
 
@@ -90,5 +91,25 @@ describe(currentDeprovisionRequestedAt, () => {
         startedAt: MOCK_RUN_PLUS_2_MIN_AT,
       }),
     ).toBeUndefined();
+  });
+});
+
+describe(isDeprovisionUnderway, () => {
+  it('is not underway without a request or a run', () => {
+    expect(isDeprovisionUnderway(undefined, undefined)).toBe(false);
+  });
+
+  it('is underway while a request waits for its run', () => {
+    expect(isDeprovisionUnderway(MOCK_RUN_PLUS_2_MIN_AT, finishedRun)).toBe(
+      true,
+    );
+  });
+
+  it('is underway while a run is unfinished', () => {
+    expect(isDeprovisionUnderway(undefined, unfinishedRun)).toBe(true);
+  });
+
+  it('is not underway once the requested run finished', () => {
+    expect(isDeprovisionUnderway(MOCK_RUN_STARTED_AT, finishedRun)).toBe(false);
   });
 });

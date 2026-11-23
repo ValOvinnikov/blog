@@ -36,6 +36,7 @@ import type { Session } from 'next-auth';
 
 import { deprovisionTenantAction } from './deprovision-tenant-action';
 import { enqueueWorkerRequest } from './enqueue-provisioning';
+import { resolveIsDeprovisionUnderway } from './resolve-is-deprovision-underway';
 
 vi.mock('@platform/server/auth/require-super-admin');
 
@@ -52,6 +53,8 @@ vi.mock('@shinefold/db', () => ({
 }));
 
 vi.mock('@platform/server/provisioning/enqueue-provisioning');
+
+vi.mock('@platform/server/provisioning/resolve-is-deprovision-underway');
 
 vi.mock('@platform/server/billing/tenant-subscription-lifecycle', () => ({
   cancelLiveSubscription: vi.fn(),
@@ -140,6 +143,25 @@ describe(deprovisionTenantAction, () => {
       reason: TENANT_REFUSAL.ALREADY_DEPROVISIONED,
     });
     expect(enqueueMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses while a deprovision is underway, cancelling and enqueuing nothing', async () => {
+    vi.mocked(resolveIsDeprovisionUnderway).mockResolvedValueOnce(true);
+
+    const result = await deprovisionTenantAction(MOCK_TENANT_ID, {
+      confirm: MOCK_TENANT_NAME,
+    });
+
+    expect(result).toStrictEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.DEPROVISION_UNDERWAY,
+    });
+    expect(resolveIsDeprovisionUnderway).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MOCK_TENANT_ID }),
+    );
+    expect(cancelLiveSubscription).not.toHaveBeenCalled();
+    expect(enqueueMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('refuses the platform tenant without enqueuing or auditing, and logs it', async () => {

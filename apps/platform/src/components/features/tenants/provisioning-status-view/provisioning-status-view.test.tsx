@@ -278,9 +278,11 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
   });
 
   describe('with a failed step', () => {
-    it('offers one Retry in the Run card and none among the steps', () => {
+    beforeEach(() => {
       setup({ tenant: MOCK_FAILED_TENANT });
+    });
 
+    it('offers one Retry in the Run card and none among the steps', () => {
       const retryButtons = screen.getAllByRole('button', {
         name: RETRY_PROVISIONING,
       });
@@ -294,8 +296,6 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     it('keeps the raw error text out of the steps list', () => {
-      setup({ tenant: MOCK_FAILED_TENANT });
-
       const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
       const rawError = within(stepsCard).queryByText(MOCK_DOMAINS_FAILURE);
 
@@ -303,8 +303,6 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     it('dispatches the workflow for this tenant when Retry is clicked', async () => {
-      setup({ tenant: MOCK_FAILED_TENANT });
-
       const retryButton = screen.getByRole('button', {
         name: RETRY_PROVISIONING,
       });
@@ -493,6 +491,15 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         },
         message: "This tenant is archived; provisioning can't be started.",
       },
+      {
+        cause: 'a deprovision pending or running',
+        result: {
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: TENANT_REFUSAL.DEPROVISION_UNDERWAY,
+        },
+        message:
+          "This tenant is being deprovisioned; provisioning can't be started.",
+      },
     ] as const)('explains $cause', async ({ result, message }) => {
       await startResolvingWith(result);
 
@@ -554,12 +561,14 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         tenant: MOCK_ARCHIVED_FAILED_TENANT,
       },
     ])('$action', ({ action, tenant }) => {
+      let button: HTMLElement;
+
       beforeEach(() => {
         setup({ tenant });
+        button = screen.getByRole('button', { name: action });
       });
 
       it('is disabled and never dispatches on click', async () => {
-        const button = screen.getByRole('button', { name: action });
         expect(button).toBeDisabled();
 
         await user.click(button);
@@ -568,8 +577,6 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       });
 
       it('is described by the archived notice', () => {
-        const button = screen.getByRole('button', { name: action });
-
         expect(button).toHaveAccessibleDescription(ARCHIVED_NOTICE_DESCRIPTION);
       });
     });
