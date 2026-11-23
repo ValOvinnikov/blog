@@ -545,6 +545,9 @@
       "MEMBER_INVITED": "Teamlid uitgenodigd",
       "MEMBER_REMOVED": "Teamlid verwijderd",
       "MEMBER_INVITE_CANCELLED": "Teamuitnodiging geannuleerd",
+      "ADMIN_INVITED": "Platformbeheerder uitgenodigd",
+      "ADMIN_INVITE_CANCELLED": "Uitnodiging platformbeheerder geannuleerd",
+      "ADMIN_REMOVED": "Platformbeheerder verwijderd",
       "ENTITLEMENT_GRANTED": "Functie toegekend",
       "ENTITLEMENT_REVOKED": "Functietoekenning ingetrokken"
     },

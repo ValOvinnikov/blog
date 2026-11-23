@@ -545,6 +545,9 @@
       "MEMBER_INVITED": "Teammitglied eingeladen",
       "MEMBER_REMOVED": "Teammitglied entfernt",
       "MEMBER_INVITE_CANCELLED": "Team-Einladung storniert",
+      "ADMIN_INVITED": "Plattform-Admin eingeladen",
+      "ADMIN_INVITE_CANCELLED": "Plattform-Admin-Einladung storniert",
+      "ADMIN_REMOVED": "Plattform-Admin entfernt",
       "ENTITLEMENT_GRANTED": "Funktion freigeschaltet",
       "ENTITLEMENT_REVOKED": "Funktionsfreischaltung widerrufen"
     },

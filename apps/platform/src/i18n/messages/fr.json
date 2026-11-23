@@ -545,6 +545,9 @@
       "MEMBER_INVITED": "Membre de l’équipe invité",
       "MEMBER_REMOVED": "Membre de l’équipe retiré",
       "MEMBER_INVITE_CANCELLED": "Invitation à l’équipe annulée",
+      "ADMIN_INVITED": "Administrateur de la plateforme invité",
+      "ADMIN_INVITE_CANCELLED": "Invitation d’administrateur de la plateforme annulée",
+      "ADMIN_REMOVED": "Administrateur de la plateforme retiré",
       "ENTITLEMENT_GRANTED": "Fonctionnalité accordée",
       "ENTITLEMENT_REVOKED": "Fonctionnalité accordée révoquée"
     },

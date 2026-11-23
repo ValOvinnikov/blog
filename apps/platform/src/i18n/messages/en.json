@@ -545,6 +545,9 @@
       "MEMBER_INVITED": "Team member invited",
       "MEMBER_REMOVED": "Team member removed",
       "MEMBER_INVITE_CANCELLED": "Team invite cancelled",
+      "ADMIN_INVITED": "Platform admin invited",
+      "ADMIN_INVITE_CANCELLED": "Platform admin invite cancelled",
+      "ADMIN_REMOVED": "Platform admin removed",
       "ENTITLEMENT_GRANTED": "Feature granted",
       "ENTITLEMENT_REVOKED": "Feature grant revoked"
     },
