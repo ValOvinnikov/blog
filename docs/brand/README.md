@@ -53,6 +53,7 @@ dark grounds it can be text, a line or a control.
 | "Powered by" in a Free site's footer        | "Powered by" and the one-colour full logo                               |
 | Browser tab                                 | Small logo as the icon; the title reads "Page · Shinefold"              |
 | Marketing site                              | Full logo in the header, small logo as the icon                         |
+| Stripe Checkout, Customer Portal, invoices  | Full logo on its own near-black plate; small logo as the icon           |
 | A tenant site that has uploaded no logo     | The site's own initial in a tile, never a Shinefold logo                |
 
 ## Email images
@@ -63,6 +64,19 @@ in [`email/`](email/): `shinefold-logo-light-v1-2x.png`,
 `shinefold-logo-dark-v1-2x.png`, `shinefold-mark-v1-2x.png` and `shinefold-logo-dark-v2-2x.png` (opaque, near-black ground baked in; the one platform emails use). A changed
 file is uploaded under a new version number, never over the old one, because
 sent emails keep loading the old address.
+
+## Stripe images
+
+Stripe's Branding settings take one logo for every surface: Checkout and the
+Customer Portal draw it on the brand colour, invoice PDFs on white. The files
+uploaded there are kept in [`stripe/`](stripe/):
+
+- `shinefold-stripe-logo-plate-304h.png`: the dark-ground full logo on a
+  rounded Ink plate, so it reads on both grounds.
+- `shinefold-stripe-icon-512.png`: the small logo at 512 × 512.
+
+The brand colour is Ink (`#12141A`), so the plate blends into Checkout's band.
+The accent colour is Yellow (`#FFC233`).
 
 ## Rules
 
