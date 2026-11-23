@@ -52,6 +52,7 @@ export const MOCK_GROWTH_UPGRADE = {
 };
 
 export const MOCK_AMOUNT_PAID = 2900;
+export const MOCK_AMOUNT_PAID_TEXT = '$29.00';
 export const MOCK_STRIPE_CURRENCY = 'usd';
 
 export const mockStripeInvoice = (

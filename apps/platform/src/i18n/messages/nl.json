@@ -2315,6 +2315,17 @@
     "planLabel": "Abonnement",
     "actionLabel": "Je factuur bekijken"
   },
+  "ownerPaymentFailedEmail": {
+    "subject": "Je betaling voor {siteName} is mislukt",
+    "previewText": "We konden {amount} voor {siteName} niet afschrijven.",
+    "failed": "We konden je betaling voor {siteName} niet afschrijven.",
+    "updatePaymentMethod": "Werk je betaalmethode bij op de pagina Facturering om je abonnement te behouden.",
+    "amountLabel": "Verschuldigd bedrag",
+    "planLabel": "Abonnement",
+    "nextRetryLabel": "Volgende poging",
+    "planEnding": "We proberen het niet opnieuw, dus je abonnement stopt als je je betaalmethode niet bijwerkt.",
+    "actionLabel": "Betaalmethode bijwerken"
+  },
   "suspensionCategory": {
     "ABUSE": "Misbruik",
     "ILLEGAL_CONTENT": "Illegale inhoud",

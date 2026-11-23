@@ -1,4 +1,7 @@
-import { BILLING_GRACE, type TBillingGrace } from '@platform/constants/billing';
+import {
+  BILLING_GRACE,
+  type TBillingGrace,
+} from '@platform/constants/billing-grace';
 import type { TSetTenantBillingInput } from '@shinefold/db/queries/tenants/set-tenant-billing/set-tenant-billing';
 import type { TTenantBilling } from '@shinefold/db/queries/tenants/tenant-billing';
 

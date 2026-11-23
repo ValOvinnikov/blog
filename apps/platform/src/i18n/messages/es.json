@@ -2315,6 +2315,17 @@
     "planLabel": "Plan",
     "actionLabel": "Ver tu factura"
   },
+  "ownerPaymentFailedEmail": {
+    "subject": "El pago de {siteName} no se ha podido realizar",
+    "previewText": "No hemos podido cobrar {amount} por {siteName}.",
+    "failed": "No hemos podido cobrar tu pago por {siteName}.",
+    "updatePaymentMethod": "Actualiza tu método de pago en la página de Facturación para conservar tu plan.",
+    "amountLabel": "Importe pendiente",
+    "planLabel": "Plan",
+    "nextRetryLabel": "Próximo intento",
+    "planEnding": "No volveremos a intentarlo, así que tu plan terminará si no actualizas tu método de pago.",
+    "actionLabel": "Actualizar método de pago"
+  },
   "suspensionCategory": {
     "ABUSE": "Abuso",
     "ILLEGAL_CONTENT": "Contenido ilegal",

@@ -2315,6 +2315,17 @@
     "planLabel": "Tarif",
     "actionLabel": "Rechnung ansehen"
   },
+  "ownerPaymentFailedEmail": {
+    "subject": "Ihre Zahlung für {siteName} ist fehlgeschlagen",
+    "previewText": "Wir konnten {amount} für {siteName} nicht einziehen.",
+    "failed": "Wir konnten Ihre Zahlung für {siteName} nicht einziehen.",
+    "updatePaymentMethod": "Aktualisieren Sie Ihre Zahlungsmethode auf der Abrechnungsseite, um Ihren Tarif zu behalten.",
+    "amountLabel": "Fälliger Betrag",
+    "planLabel": "Tarif",
+    "nextRetryLabel": "Nächster Versuch",
+    "planEnding": "Wir versuchen es nicht erneut. Ihr Tarif endet, wenn Sie Ihre Zahlungsmethode nicht aktualisieren.",
+    "actionLabel": "Zahlungsmethode aktualisieren"
+  },
   "suspensionCategory": {
     "ABUSE": "Missbrauch",
     "ILLEGAL_CONTENT": "Rechtswidrige Inhalte",

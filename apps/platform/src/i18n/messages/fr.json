@@ -2315,6 +2315,17 @@
     "planLabel": "Formule",
     "actionLabel": "Voir votre facture"
   },
+  "ownerPaymentFailedEmail": {
+    "subject": "Le paiement pour {siteName} a échoué",
+    "previewText": "Nous n'avons pas pu prélever {amount} pour {siteName}.",
+    "failed": "Nous n'avons pas pu prélever votre paiement pour {siteName}.",
+    "updatePaymentMethod": "Mettez à jour votre moyen de paiement sur la page Facturation pour conserver votre formule.",
+    "amountLabel": "Montant dû",
+    "planLabel": "Formule",
+    "nextRetryLabel": "Prochaine tentative",
+    "planEnding": "Nous ne réessaierons pas : votre formule prendra fin si vous ne mettez pas à jour votre moyen de paiement.",
+    "actionLabel": "Mettre à jour le moyen de paiement"
+  },
   "suspensionCategory": {
     "ABUSE": "Abus",
     "ILLEGAL_CONTENT": "Contenu illicite",

@@ -1,15 +1,11 @@
 import 'server-only';
 
-import {
-  BILLING_LOG,
-  MILLISECONDS_PER_SECOND,
-} from '@platform/constants/billing';
-import { env } from '@platform/utils/env/env';
+import { BILLING_LOG } from '@platform/constants/billing';
+import { loadBillingEmailOwner } from '@platform/server/billing/load-billing-email-owner';
+import { fromStripeTime } from '@platform/server/billing/stripe-time';
 import { formatDate } from '@platform/utils/format-date/format-date';
-import { logger } from '@platform/utils/logger/logger';
 import { formatStripeAmount } from '@shinefold/config';
 import { EMAIL_ACCOUNT, type TTenantPlan } from '@shinefold/config/constants';
-import { queries } from '@shinefold/db';
 import {
   buildOwnerReceiptEmail,
   PLATFORM_EMAIL_BRAND_NAME,
@@ -24,22 +20,13 @@ export const sendPaymentReceipt = async (
   tenantId: string,
   plan: TTenantPlan,
 ): Promise<void> => {
-  const from = env.OWNER_EMAIL_FROM_ADDRESS;
-  if (!from) {
-    logger.warn(BILLING_LOG.RECEIPT_UNCONFIGURED, { tenantId });
-    return;
-  }
+  const owner = await loadBillingEmailOwner(tenantId, {
+    unconfigured: BILLING_LOG.RECEIPT_UNCONFIGURED,
+    ownerMissing: BILLING_LOG.RECEIPT_OWNER_MISSING,
+  });
+  if (!owner) return;
 
-  const [tenant, ownerEmail, invoice] = await Promise.all([
-    queries.tenants.getTenantById(tenantId),
-    queries.memberships.getTenantOwnerEmail(tenantId),
-    stripe.invoices.retrieve(invoiceId),
-  ]);
-  if (!tenant || !ownerEmail) {
-    logger.warn(BILLING_LOG.RECEIPT_OWNER_MISSING, { tenantId });
-    return;
-  }
-
+  const invoice = await stripe.invoices.retrieve(invoiceId);
   const { amount_paid, currency, invoice_pdf, hosted_invoice_url } = invoice;
   if (amount_paid === 0) return;
   const invoiceUrl = invoice_pdf ?? hosted_invoice_url;
@@ -47,7 +34,11 @@ export const sendPaymentReceipt = async (
     throw new Error(`sendPaymentReceipt: invoice "${invoiceId}" has no link.`);
   }
 
-  const { locale, name: siteName } = tenant;
+  const {
+    from,
+    ownerEmail,
+    tenant: { locale, name: siteName },
+  } = owner;
   const [t, tPlan] = await Promise.all([
     getTranslations({ locale, namespace: 'ownerReceiptEmail' }),
     getTranslations({ locale, namespace: 'planNames' }),
@@ -72,7 +63,7 @@ export const sendPaymentReceipt = async (
         { label: t('amountLabel'), value: amount },
         {
           label: t('dateLabel'),
-          value: formatDate(new Date(paidAt * MILLISECONDS_PER_SECOND), locale),
+          value: formatDate(fromStripeTime(paidAt), locale),
         },
         { label: t('planLabel'), value: tPlan(plan) },
       ],

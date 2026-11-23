@@ -29,6 +29,7 @@ import type Stripe from 'stripe';
 import { handleCatalogueEvent } from './catalogue/handle-catalogue-event';
 import { revalidatePlatformSite } from './catalogue/revalidate-platform-site';
 import { handleStripeEvent } from './handle-stripe-event';
+import { sendPaymentFailedNotice } from './send-payment-failed-notice';
 import { sendPaymentReceipt } from './send-payment-receipt';
 import { syncStripeSubscription } from './sync-stripe-subscription';
 
@@ -54,6 +55,9 @@ vi.mock('./sync-stripe-subscription', () => ({
   syncStripeSubscription: vi.fn(),
 }));
 vi.mock('./send-payment-receipt', () => ({ sendPaymentReceipt: vi.fn() }));
+vi.mock('./send-payment-failed-notice', () => ({
+  sendPaymentFailedNotice: vi.fn(),
+}));
 vi.mock('./catalogue/handle-catalogue-event', () => ({
   handleCatalogueEvent: vi.fn(),
 }));
@@ -67,6 +71,14 @@ vi.mock('@platform/server/site-config/revalidate-site-config');
 
 const invoicePaidEvent = () =>
   mockStripeEvent(STRIPE_EVENT_TYPE.INVOICE_PAID, mockStripeInvoice());
+
+const MOCK_RETRY_ATTEMPT_COUNT = 2;
+
+const paymentFailedEvent = (attemptCount = 1) =>
+  mockStripeEvent(
+    STRIPE_EVENT_TYPE.INVOICE_PAYMENT_FAILED,
+    mockStripeInvoice({ attempt_count: attemptCount }),
+  );
 
 const handle = async (event: Stripe.Event) => {
   await handleStripeEvent(MOCK_STRIPE_CLIENT, event);
@@ -215,5 +227,57 @@ describe(handleStripeEvent, () => {
       BILLING_LOG.RECEIPT_FAILED,
       expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
     );
+  });
+
+  describe('a failed renewal payment', () => {
+    it('emails the owner once on the first attempt', async () => {
+      const event = paymentFailedEvent();
+
+      await handle(event);
+
+      expect(sendPaymentFailedNotice).toHaveBeenCalledExactlyOnceWith(
+        event.data.object,
+        MOCK_TENANT_ID,
+        TENANT_PLAN.GROWTH,
+      );
+      expect(sendPaymentReceipt).not.toHaveBeenCalled();
+    });
+
+    it('sends nothing for a later retry of the same invoice', async () => {
+      await handle(paymentFailedEvent(MOCK_RETRY_ATTEMPT_COUNT));
+
+      expect(sendPaymentFailedNotice).not.toHaveBeenCalled();
+    });
+
+    it('sends nothing for an event already recorded', async () => {
+      recordStripeEventMock.mockResolvedValue(
+        STRIPE_EVENT_RECORD_OUTCOME.ALREADY_HANDLED,
+      );
+
+      await handle(paymentFailedEvent());
+
+      expect(sendPaymentFailedNotice).not.toHaveBeenCalled();
+    });
+
+    it('sends nothing when no tenant was written, as for an archived or suspended site', async () => {
+      vi.mocked(syncStripeSubscription).mockResolvedValue(undefined);
+
+      await handle(paymentFailedEvent());
+
+      expect(sendPaymentFailedNotice).not.toHaveBeenCalled();
+    });
+
+    it('logs a failed send without failing the webhook', async () => {
+      vi.mocked(sendPaymentFailedNotice).mockRejectedValue(new Error());
+
+      await expect(handle(paymentFailedEvent())).resolves.toBeUndefined();
+      expect(logger.error).toHaveBeenCalledWith(
+        BILLING_LOG.PAYMENT_FAILED_EMAIL_FAILED,
+        expect.objectContaining({
+          tenantId: MOCK_TENANT_ID,
+          eventId: MOCK_STRIPE_EVENT_ID,
+        }),
+      );
+    });
   });
 });
