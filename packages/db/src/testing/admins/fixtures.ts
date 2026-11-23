@@ -38,6 +38,13 @@ export async function insertTestAdmin(
   return insertTestAdminForUser(db, userId, overrides);
 }
 
+export function useAdminRowCleanup(db: () => TTestDb): void {
+  afterEach(async () => {
+    await db().delete(schema.admins);
+    await db().delete(schema.users);
+  });
+}
+
 export function useTestAdmin(db: () => TTestDb): () => string {
   let adminId: string;
 
@@ -45,10 +52,7 @@ export function useTestAdmin(db: () => TTestDb): () => string {
     ({ id: adminId } = await insertTestAdmin(db()));
   });
 
-  afterEach(async () => {
-    await db().delete(schema.admins);
-    await db().delete(schema.users);
-  });
+  useAdminRowCleanup(db);
 
   return () => adminId;
 }

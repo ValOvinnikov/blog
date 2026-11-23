@@ -1,4 +1,5 @@
 export * as account from './account';
+export * as adminInvites from './admin-invites';
 export * as admins from './admins';
 export * as auditEvents from './audit-events';
 export * as blockedSignupIdentities from './blocked-signup-identities';

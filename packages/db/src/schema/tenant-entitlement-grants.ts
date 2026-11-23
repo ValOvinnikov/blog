@@ -13,6 +13,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { admins } from './admins';
+import { EXPIRES_AT_COLUMN } from './columns';
 import { tenants } from './tenants';
 
 export const TENANT_ENTITLEMENT_GRANTS_OPEN_UNIQUE_NAME =
@@ -33,7 +34,7 @@ export const tenantEntitlementGrants = pgTable(
       onDelete: 'set null',
     }),
     grantedAt: timestamp('granted_at', { mode: 'date' }).notNull().defaultNow(),
-    expiresAt: timestamp('expires_at', { mode: 'date' }),
+    expiresAt: timestamp(EXPIRES_AT_COLUMN, { mode: 'date' }),
     revokedAt: timestamp('revoked_at', { mode: 'date' }),
     revokedBy: uuid('revoked_by').references(() => admins.id, {
       onDelete: 'set null',

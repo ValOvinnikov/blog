@@ -239,6 +239,13 @@
       "when": 1795427232671,
       "tag": "0033_fancy_selene",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1795445242016,
+      "tag": "0034_melodic_valkyrie",
+      "breakpoints": true
     }
   ]
 }

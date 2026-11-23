@@ -1,3 +1,4 @@
+export * from './admin-invites';
 export * from './admins';
 export * from './audit-events';
 export * from './auth';

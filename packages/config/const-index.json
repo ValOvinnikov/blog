@@ -1384,6 +1384,12 @@
         "file": "packages/config/src/constants/email-type.ts"
       },
       {
+        "ref": "GRANTED_VIA.INVITE",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/admin.ts"
+      },
+      {
         "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
         "scope": "app:platform",
         "from": "@platform/constants/data-request",
@@ -4374,6 +4380,12 @@
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
+        "ref": "ADMIN_REMOVAL_OUTCOME.NOT_FOUND",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/admin.ts"
+      },
+      {
         "ref": "STRIPE_TENANT_LOOKUP_OUTCOME.NOT_FOUND",
         "scope": "db",
         "from": "@shinefold/db/constants",
@@ -5094,6 +5106,44 @@
         "file": "packages/db/src/constants/admin.ts"
       }
     ],
+    "INVITED": [
+      {
+        "ref": "ADMIN_INVITE_OUTCOME.INVITED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/admin.ts"
+      }
+    ],
+    "ALREADY_ADMIN": [
+      {
+        "ref": "ADMIN_INVITE_OUTCOME.ALREADY_ADMIN",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/admin.ts"
+      }
+    ],
+    "REMOVED": [
+      {
+        "ref": "ADMIN_REMOVAL_OUTCOME.REMOVED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/admin.ts"
+      },
+      {
+        "ref": "MEMBERSHIP_REMOVAL_OUTCOME.REMOVED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
+      }
+    ],
+    "LAST_SUPERADMIN": [
+      {
+        "ref": "ADMIN_REMOVAL_OUTCOME.LAST_SUPERADMIN",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/admin.ts"
+      }
+    ],
     "USD": [
       {
         "ref": "BILLING_CURRENCY.USD",
@@ -5455,14 +5505,6 @@
     "SEAT_LIMIT": [
       {
         "ref": "MEMBERSHIP_INVITE_OUTCOME.SEAT_LIMIT",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/membership.ts"
-      }
-    ],
-    "REMOVED": [
-      {
-        "ref": "MEMBERSHIP_REMOVAL_OUTCOME.REMOVED",
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/membership.ts"
