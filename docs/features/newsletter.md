@@ -44,7 +44,7 @@ epics: [4083, 2801]
 
 ## What it does
 
-An editor places a Newsletter Signup module on a page; a reader enters an email address, gets a confirmation email and becomes an active subscriber by clicking its link (double opt-in). The confirmation email carries a one-click unsubscribe link, and a signed-in reader can unsubscribe or resend the confirmation from `/account`. A post's first publish emails it to the site's confirmed subscribers through the worker's send run (below). The platform shows the Newsletter capability as "Coming soon" and locked off, and every Features save writes it off, so the module renders only on a `GROWTH` site whose stored toggle is already on.
+An editor places a Newsletter Signup module on a page; a reader enters an email address, gets a confirmation email and becomes an active subscriber by clicking its link (double opt-in). The confirmation email carries a one-click unsubscribe link, and a signed-in reader can unsubscribe or resend the confirmation from `/account`. A post's first publish emails it to the site's confirmed subscribers through the worker's send run (below). An owner turns the Newsletter capability on and off on the platform's Features page; it is `GROWTH` only, so on `FREE` and `STARTER` its switch is locked unless a grant opens it.
 
 ## Surfaces and routes
 
@@ -106,7 +106,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 ## Configuration
 
 - **Editor (Studio)** — whether a post is sent to subscribers; the module's content, variant, trust cues, alignment and layout, and where it is placed.
-- **Owner or operator (platform)** — the `NEWSLETTER` toggle, `GROWTH` only and locked off as Coming soon; the "Email new posts to subscribers" setting, removing subscribers and exporting the list on the Subscribers page (moving up a band is the owner's alone); the confirmation email's subject, body, logo, sender name, reply-to and postal footer on the Email page (see [email](./email.md)).
+- **Owner or operator (platform)** — the `NEWSLETTER` toggle, `GROWTH` only; the "Email new posts to subscribers" setting, removing subscribers and exporting the list on the Subscribers page (moving up a band is the owner's alone); the confirmation email's subject, body, logo, sender name, reply-to and postal footer on the Email page (see [email](./email.md)).
 - **Voice** — the confirm and unsubscribe result-page and confirmation-page copy is fixed (`newsletterConfirm.*`, `newsletterUnsubscribe.*`), as is the form copy, including the rate-limit message (`newsletterForm.errorRateLimited`).
 
 ## Constraints and invariants
@@ -159,6 +159,6 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 
 ## Related
 
-- #4083 — epic: newsletter sending (subscriber list, issue authoring, per-tenant limits and reputation gate); ends the "Coming soon".
+- #4083 — epic: newsletter sending (subscriber list, issue authoring, per-tenant limits and reputation gate).
 - #2801 — live subscriber count in newsletter and hero copy.
 - #5033 — newsletter eyebrow, intro and footnote share one style with Hero, CTA and article header.

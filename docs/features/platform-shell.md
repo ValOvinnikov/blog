@@ -233,12 +233,10 @@ save still settles as the form's generic server error.
   navigates.
 - On `/dashboard`, the plan decides which items appear (`planPageAccess`, see
   [plans-and-entitlements](./plans-and-entitlements.md)): Languages needs more
-  than one plan locale, Email a mail-sending capability, and the inert "Coming
-  soon" rows Subscribers NEWSLETTER and Team `GROWTH` only. There is no
-  Comments entry.
-  Their "Coming soon" pill is `neutral` with no dot, at the row's right edge,
-  in the sidebar and the phone Menu alike. Leads carries no pill: its unread
-  count would go stale while the owner moves between pages.
+  than one plan locale, Email a mail-sending capability, Leads the contact
+  form, Subscribers `NEWSLETTER` and Team more than one seat. There is no
+  Comments entry. Leads carries no unread-count pill: the count would go stale
+  while the owner moves between pages.
   The operator's tenant view (`EVERY_PLAN_PAGE`) always shows every page.
 - UI copy is next-intl, five message files (`en`, `de`, `es`, `fr`, `nl`). It
   is fixed platform copy and never [Voice](./voice.md).

@@ -168,13 +168,13 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(bookmarksSwitch).toBeChecked();
       expect(consentSwitch).not.toBeChecked();
       expect(contactFormSwitch).toBeChecked();
-      expect(switches).toHaveLength(4);
+      expect(switches).toHaveLength(5);
     });
 
-    it('badges only Newsletter "Coming soon"', () => {
-      const badges = screen.getAllByText(comingSoonBadge);
+    it('badges no row "Coming soon"', () => {
+      const badge = screen.queryByText(comingSoonBadge);
 
-      expect(badges).toHaveLength(1);
+      expect(badge).not.toBeInTheDocument();
     });
 
     it('nests the Capabilities heading directly under the page heading', () => {
@@ -319,15 +319,6 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       });
     });
 
-    it('shows Newsletter as "Coming soon" with no toggle, whatever the plan', () => {
-      const label = toggleLabel[CAPABILITY.NEWSLETTER];
-      const row = screen.getByText(label);
-      const toggle = screen.queryByRole('switch', { name: label });
-
-      expect(row).toBeVisible();
-      expect(toggle).not.toBeInTheDocument();
-    });
-
     it('shows an out-of-plan toggle locked, never hidden', () => {
       expect(consentSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(contactFormSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
@@ -374,7 +365,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       name: saveBar.saving,
     });
 
-    expect(savingButton).toHaveAttribute('aria-disabled', 'true');
+    expect(savingButton).toHaveAttribute(ARIA_DISABLED, 'true');
 
     resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
 
@@ -567,18 +558,13 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         await waitFor(() => expect(readerAccountsSwitch).toHaveFocus());
       });
 
-      it('offers no grant action on an entitled or coming-soon row', () => {
+      it('offers no grant action on an entitled row', () => {
         const contactFormGrant = screen.queryByRole(
           'button',
           grantTrigger(CONTACT_FORM_LABEL),
         );
-        const newsletterGrant = screen.queryByRole(
-          'button',
-          grantTrigger(toggleLabel[CAPABILITY.NEWSLETTER]),
-        );
 
         expect(contactFormGrant).not.toBeInTheDocument();
-        expect(newsletterGrant).not.toBeInTheDocument();
       });
     });
 
