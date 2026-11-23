@@ -112,37 +112,38 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
         await vi.waitFor(() => expect(refreshMock).toHaveBeenCalled());
       });
 
-      it('shows the error message inline and never refreshes when the action fails', async () => {
-        deprovisionTenantActionMock.mockResolvedValue({
-          outcome: ACTION_OUTCOME.INVALID,
-          fieldErrors: {
-            confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH },
+      it.each([
+        {
+          failure: 'a name mismatch',
+          result: {
+            outcome: ACTION_OUTCOME.INVALID,
+            fieldErrors: {
+              confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH },
+            },
           },
-        });
-        await typeTenantNameAndConfirm(user, dialog);
+          message: "Doesn't match the tenant's name.",
+        },
+        {
+          failure: 'a deprovision already underway',
+          result: {
+            outcome: ACTION_OUTCOME.REFUSED,
+            reason: TENANT_REFUSAL.DEPROVISION_UNDERWAY,
+          },
+          message:
+            'Deprovisioning is already requested or running for this tenant.',
+        },
+      ])(
+        'shows $failure inline and never refreshes',
+        async ({ result, message }) => {
+          deprovisionTenantActionMock.mockResolvedValue(result);
+          await typeTenantNameAndConfirm(user, dialog);
 
-        const mismatchError = await screen.findByText(
-          "Doesn't match the tenant's name.",
-        );
+          const error = await screen.findByText(message);
 
-        expect(mismatchError).toBeVisible();
-        expect(refreshMock).not.toHaveBeenCalled();
-      });
-
-      it('explains a refusal while a deprovision is already pending or running', async () => {
-        deprovisionTenantActionMock.mockResolvedValue({
-          outcome: ACTION_OUTCOME.REFUSED,
-          reason: TENANT_REFUSAL.DEPROVISION_UNDERWAY,
-        });
-        await typeTenantNameAndConfirm(user, dialog);
-
-        const refusal = await screen.findByText(
-          'Deprovisioning is already requested or running for this tenant.',
-        );
-
-        expect(refusal).toBeVisible();
-        expect(refreshMock).not.toHaveBeenCalled();
-      });
+          expect(error).toBeVisible();
+          expect(refreshMock).not.toHaveBeenCalled();
+        },
+      );
     });
 
     it('offers an enabled trigger with no hint when no run is in progress', () => {

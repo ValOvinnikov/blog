@@ -95,21 +95,32 @@ describe(currentDeprovisionRequestedAt, () => {
 });
 
 describe(isDeprovisionUnderway, () => {
-  it('is not underway without a request or a run', () => {
-    expect(isDeprovisionUnderway(undefined, undefined)).toBe(false);
-  });
-
-  it('is underway while a request waits for its run', () => {
-    expect(isDeprovisionUnderway(MOCK_RUN_PLUS_2_MIN_AT, finishedRun)).toBe(
-      true,
-    );
-  });
-
-  it('is underway while a run is unfinished', () => {
-    expect(isDeprovisionUnderway(undefined, unfinishedRun)).toBe(true);
-  });
-
-  it('is not underway once the requested run finished', () => {
-    expect(isDeprovisionUnderway(MOCK_RUN_STARTED_AT, finishedRun)).toBe(false);
+  it.each([
+    {
+      state: 'no request or run',
+      requestedAt: undefined,
+      run: undefined,
+      isUnderway: false,
+    },
+    {
+      state: 'a request waiting for its run',
+      requestedAt: MOCK_RUN_PLUS_2_MIN_AT,
+      run: finishedRun,
+      isUnderway: true,
+    },
+    {
+      state: 'an unfinished run',
+      requestedAt: undefined,
+      run: unfinishedRun,
+      isUnderway: true,
+    },
+    {
+      state: 'a run finished after its request',
+      requestedAt: MOCK_RUN_STARTED_AT,
+      run: finishedRun,
+      isUnderway: false,
+    },
+  ])('is $isUnderway for $state', ({ requestedAt, run, isUnderway }) => {
+    expect(isDeprovisionUnderway(requestedAt, run)).toBe(isUnderway);
   });
 });

@@ -1,28 +1,19 @@
 import 'server-only';
 
-import {
-  currentDeprovisionRequestedAt,
-  isDeprovisionUnderway,
-} from '@platform/utils/deprovisioning-run-state/deprovisioning-run-state';
-import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
-import { queries } from '@shinefold/db';
+import { isDeprovisionUnderway } from '@platform/utils/deprovisioning-run-state/deprovisioning-run-state';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
-export const resolveIsDeprovisionUnderway = async ({
-  id,
-  provisioningSteps,
-  deprovisioningSteps,
-}: Pick<
-  TPlatformTenant,
+import { resolveCurrentDeprovisionRequestedAt } from './resolve-current-deprovision-requested-at';
+
+export type TDeprovisionStateTenant = Pick<
+  TTenant,
   'id' | 'provisioningSteps' | 'deprovisioningSteps'
->): Promise<boolean> => {
-  const deprovisionRequestedAt =
-    await queries.auditEvents.getLatestDeprovisionRequestedAt(id);
+>;
 
-  return isDeprovisionUnderway(
-    currentDeprovisionRequestedAt(
-      deprovisionRequestedAt,
-      provisioningSteps?.run,
-    ),
-    deprovisioningSteps?.run,
+export const resolveIsDeprovisionUnderway = async (
+  tenant: TDeprovisionStateTenant,
+): Promise<boolean> =>
+  isDeprovisionUnderway(
+    await resolveCurrentDeprovisionRequestedAt(tenant),
+    tenant.deprovisioningSteps?.run,
   );
-};

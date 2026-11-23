@@ -1,10 +1,5 @@
-import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import type { TDeprovisionStateTenant } from '@platform/server/provisioning/resolve-is-deprovision-underway';
 
 export const resolveIsDeprovisionUnderway = vi.fn<
-  (
-    tenant: Pick<
-      TPlatformTenant,
-      'id' | 'provisioningSteps' | 'deprovisioningSteps'
-    >,
-  ) => Promise<boolean>
+  (tenant: TDeprovisionStateTenant) => Promise<boolean>
 >(async () => false);
