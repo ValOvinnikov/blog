@@ -71,7 +71,7 @@
     "@shinefold/prettier-config": "workspace:*",
     "eslint": "catalog:",
     "husky": "^9.1.7",
-    "jscpd": "4.3.0",
+    "jscpd": "5.4.3",
     "knip": "6.47.0",
     "lint-staged": "^17.6.1",
     "prettier": "catalog:",
