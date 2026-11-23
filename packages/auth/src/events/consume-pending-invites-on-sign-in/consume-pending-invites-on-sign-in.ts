@@ -1,9 +1,5 @@
+import type { TSignInEventUser } from '@shinefold/auth/events/sign-in-event-user/sign-in-event-user';
 import { queries } from '@shinefold/db';
-
-export type TSignInEventUser = {
-  id?: string;
-  email?: string | null;
-};
 
 export async function consumePendingInvitesOnSignIn({
   user,

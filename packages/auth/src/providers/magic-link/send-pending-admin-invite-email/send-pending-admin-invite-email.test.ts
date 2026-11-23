@@ -6,6 +6,7 @@ import {
   MOCK_INVITER_NAME,
   mockPendingAdminInvite,
 } from '@shinefold/auth/testing/magic-link-fixtures';
+import { sentEmailOf } from '@shinefold/auth/testing/sent-email';
 import { MOCK_EMAIL } from '@shinefold/auth/testing/session-fixtures';
 import { EMAIL_ACCOUNT, EMAIL_TYPE } from '@shinefold/config/constants';
 import { ADMIN_ROLE } from '@shinefold/db/constants';
@@ -14,7 +15,7 @@ import {
   type TSendEmailInput,
 } from '@shinefold/email';
 
-import { sendPendingAdminInviteEmail } from './send-admin-invite-magic-link-email';
+import { sendPendingAdminInviteEmail } from './send-pending-admin-invite-email';
 
 const MOCK_URL = faker.internet.url();
 
@@ -50,13 +51,6 @@ const send = () =>
     onSendCountFailed: onSendCountFailedMock,
   });
 
-function sentEmail(): TSendEmailInput {
-  const email = sendEmailMock.mock.calls[0]?.[0];
-  if (!email) throw new Error('sendEmail was not called');
-
-  return email;
-}
-
 describe(sendPendingAdminInviteEmail, () => {
   describe('with a pending admin invite', () => {
     let isSent: boolean;
@@ -67,7 +61,7 @@ describe(sendPendingAdminInviteEmail, () => {
     });
 
     it('sends the admin-invite email from the platform account and reports it sent', () => {
-      const { account, to, from, html } = sentEmail();
+      const { account, to, from, html } = sentEmailOf(sendEmailMock);
       expect(isSent).toBe(true);
       expect(findPendingAdminInviteMock).toHaveBeenCalledWith(MOCK_EMAIL);
       expect([account, to, from]).toEqual([
@@ -79,7 +73,7 @@ describe(sendPendingAdminInviteEmail, () => {
     });
 
     it('names the inviter and shows the role as a readable label', () => {
-      const { subject, text } = sentEmail();
+      const { subject, text } = sentEmailOf(sendEmailMock);
       expect(subject).toContain(MOCK_INVITER_NAME);
       expect(text).toContain('Super admin');
       expect(text).not.toContain(ADMIN_ROLE.SUPERADMIN);
@@ -104,7 +98,7 @@ describe(sendPendingAdminInviteEmail, () => {
 
       await send();
 
-      expect(sentEmail().subject).toContain(MOCK_INVITER_EMAIL);
+      expect(sentEmailOf(sendEmailMock).subject).toContain(MOCK_INVITER_EMAIL);
     },
   );
 
@@ -115,7 +109,7 @@ describe(sendPendingAdminInviteEmail, () => {
 
     await send();
 
-    expect(sentEmail().subject).toMatch(
+    expect(sentEmailOf(sendEmailMock).subject).toMatch(
       new RegExp(`^${PLATFORM_EMAIL_BRAND_NAME} `),
     );
   });

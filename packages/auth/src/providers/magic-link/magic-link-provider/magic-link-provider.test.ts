@@ -23,6 +23,7 @@ import {
   mockPendingInvite,
   mockTenant,
 } from '@shinefold/auth/testing/magic-link-fixtures';
+import { sentEmailOf } from '@shinefold/auth/testing/sent-email';
 import { resolveTenantEmailBrand } from '@shinefold/config';
 import {
   AUTH_APP,
@@ -208,15 +209,6 @@ function sendVerificationRequestFor(
   });
 }
 
-function sentEmail(): TSendEmailInput {
-  const email = sendEmailMock.mock.calls[0]?.[0];
-  if (!email) {
-    throw new Error('sendEmail was not called');
-  }
-
-  return email;
-}
-
 const MAGIC_LINK_HANDLERS = {
   onSendRefused: onSendRefusedMock,
   onSendCountFailed: onSendCountFailedMock,
@@ -312,13 +304,15 @@ describe(buildMagicLinkProvider, () => {
     });
 
     it('delivers the sign-in link from the configured address', () => {
-      const { html, ...envelope } = sentEmail();
+      const { html, ...envelope } = sentEmailOf(sendEmailMock);
       expect(envelope).toEqual(SITE_ENVELOPE);
       expect(html).toContain(SITE_LINK_HREF);
     });
 
     it("never sends a site's sign-in email in the platform layout", () => {
-      expect(sentEmail().html).not.toContain(PLATFORM_EMAIL_BRAND_NAME);
+      expect(sentEmailOf(sendEmailMock).html).not.toContain(
+        PLATFORM_EMAIL_BRAND_NAME,
+      );
     });
   });
 
@@ -363,7 +357,7 @@ describe(buildMagicLinkProvider, () => {
         identifier: MOCK_INVITED_EMAIL,
       });
 
-      const { to, from, subject, html } = sentEmail();
+      const { to, from, subject, html } = sentEmailOf(sendEmailMock);
       expect(findPendingInviteByEmailMock).toHaveBeenCalledWith(
         MOCK_INVITED_EMAIL,
       );
@@ -380,7 +374,7 @@ describe(buildMagicLinkProvider, () => {
         identifier: MOCK_INVITED_EMAIL,
       });
 
-      const { subject, html } = sentEmail();
+      const { subject, html } = sentEmailOf(sendEmailMock);
       expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
       expect(html).not.toContain(MOCK_TENANT_NAME);
     });
@@ -399,7 +393,9 @@ describe(buildMagicLinkProvider, () => {
       });
 
       expect(sendEmailMock).toHaveBeenCalledOnce();
-      expect(sentEmail().subject).not.toBe(TENANT_INVITE_DEFAULTS.subject);
+      expect(sentEmailOf(sendEmailMock).subject).not.toBe(
+        TENANT_INVITE_DEFAULTS.subject,
+      );
       expect(findPendingInviteByEmailMock).not.toHaveBeenCalled();
     });
 
@@ -457,7 +453,7 @@ describe(buildMagicLinkProvider, () => {
 
     await sendVerificationRequestFor(buildPlatformProvider());
 
-    const { html, ...envelope } = sentEmail();
+    const { html, ...envelope } = sentEmailOf(sendEmailMock);
     expect(envelope).toEqual(PLATFORM_ENVELOPE);
     expect(html).toContain(SITE_LINK_HREF);
   });
@@ -475,7 +471,7 @@ describe(buildMagicLinkProvider, () => {
         url: PLATFORM_CALLBACK_URL,
       });
 
-      const { subject, html } = sentEmail();
+      const { subject, html } = sentEmailOf(sendEmailMock);
       expect(subject).toBe(expectedSubject);
       expect(html).toContain(PLATFORM_LAYOUT_MARK);
     },
@@ -497,7 +493,7 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      const { html, ...envelope } = sentEmail();
+      const { html, ...envelope } = sentEmailOf(sendEmailMock);
       expect(envelope).toEqual(SITE_ENVELOPE);
       expect(html).not.toContain(COPYRIGHT_MARK);
     },
@@ -511,7 +507,7 @@ describe(buildMagicLinkProvider, () => {
       url: PLATFORM_CALLBACK_URL,
     });
 
-    expect(sentEmail().subject).toBe(
+    expect(sentEmailOf(sendEmailMock).subject).toBe(
       defaultCopyIn(LOCALE_ISO_CODES.ES, EMAIL_TEMPLATE_TYPE.TENANT_INVITE)
         .subject,
     );
@@ -526,7 +522,7 @@ describe(buildMagicLinkProvider, () => {
       ),
     });
 
-    expect(sentEmail().subject).toBe(
+    expect(sentEmailOf(sendEmailMock).subject).toBe(
       defaultCopyIn(LOCALE_ISO_CODES.EN, EMAIL_TEMPLATE_TYPE.MAGIC_LINK)
         .subject,
     );
@@ -579,7 +575,7 @@ describe(buildMagicLinkProvider, () => {
       async (_, account, buildProvider, url) => {
         await sendVerificationRequestFor(buildProvider(), { url });
 
-        expect(sentEmail().account).toBe(account);
+        expect(sentEmailOf(sendEmailMock).account).toBe(account);
       },
     );
 
@@ -600,7 +596,9 @@ describe(buildMagicLinkProvider, () => {
       });
 
       it('tags the send with the site and counts one sign-in for it', () => {
-        expect(sentEmail().tags).toEqual([buildSiteEmailTag(MOCK_TENANT_ID)]);
+        expect(sentEmailOf(sendEmailMock).tags).toEqual([
+          buildSiteEmailTag(MOCK_TENANT_ID),
+        ]);
         expect(recordEmailSendMock).toHaveBeenCalledExactlyOnceWith(
           MOCK_TENANT_ID,
           EMAIL_TYPE.SIGN_IN,
@@ -609,7 +607,7 @@ describe(buildMagicLinkProvider, () => {
 
       it("brands the sign-in email with the resolved tenant's hue", () => {
         const { logo1 } = resolveTenantEmailBrand(MOCK_SITE_CONFIG);
-        expect(sentEmail().html).toContain(logo1);
+        expect(sentEmailOf(sendEmailMock).html).toContain(logo1);
       });
     });
 
@@ -623,7 +621,7 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      const { from, replyTo } = sentEmail();
+      const { from, replyTo } = sentEmailOf(sendEmailMock);
       expect(from).toBe(`"${MOCK_SENDER_NAME}" <${MOCK_FROM_EMAIL}>`);
       expect(replyTo).toBe(MOCK_REPLY_TO);
     });
@@ -641,7 +639,7 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      const { html } = sentEmail();
+      const { html } = sentEmailOf(sendEmailMock);
       expect(html).toContain(`src="${MOCK_TEMPLATE_LOGO_URL}"`);
       expect(html).toContain(escapeHtml(MOCK_POSTAL_ADDRESS));
     });
@@ -669,7 +667,7 @@ describe(buildMagicLinkProvider, () => {
 
         await sendVerificationRequestFor(provider);
 
-        const { from, replyTo } = sentEmail();
+        const { from, replyTo } = sentEmailOf(sendEmailMock);
         expect(from).toBe(`"${MOCK_TENANT_NAME}" <${MOCK_FROM_EMAIL}>`);
         expect(replyTo).toBeUndefined();
       },
@@ -682,7 +680,7 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      expect(sentEmail().from).toBe(
+      expect(sentEmailOf(sendEmailMock).from).toBe(
         `"${MOCK_COMMA_NAME}" <${MOCK_FROM_EMAIL}>`,
       );
     });
@@ -695,7 +693,7 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      const { from, subject } = sentEmail();
+      const { from, subject } = sentEmailOf(sendEmailMock);
       expect(from).toBe(`"${MOCK_SENDER_NAME}" <${MOCK_FROM_EMAIL}>`);
       expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
     });
@@ -710,7 +708,7 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      const { subject, html } = sentEmail();
+      const { subject, html } = sentEmailOf(sendEmailMock);
       expect(subject).toBe(MOCK_SUBJECT);
       expect(html).toContain(MOCK_AUTHORED_BODY_TEXT);
     });
@@ -732,7 +730,7 @@ describe(buildMagicLinkProvider, () => {
 
       await sendVerificationRequestFor(provider);
 
-      expect(sentEmail().html).toContain(SITE_LINK_HREF);
+      expect(sentEmailOf(sendEmailMock).html).toContain(SITE_LINK_HREF);
     });
 
     it.each([

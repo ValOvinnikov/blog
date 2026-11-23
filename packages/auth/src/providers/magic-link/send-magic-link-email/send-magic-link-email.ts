@@ -3,7 +3,7 @@ import { recordMagicLinkSendSafely } from '@shinefold/auth/providers/magic-link/
 import { resolveMagicLinkEmailSettings } from '@shinefold/auth/providers/magic-link/resolve-magic-link-email-settings/resolve-magic-link-email-settings';
 import { resolveRecipientLocale } from '@shinefold/auth/providers/magic-link/resolve-recipient-locale/resolve-recipient-locale';
 import { resolveTenantEmailIdentity } from '@shinefold/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
-import { sendPendingAdminInviteEmail } from '@shinefold/auth/providers/magic-link/send-admin-invite-magic-link-email/send-admin-invite-magic-link-email';
+import { sendPendingAdminInviteEmail } from '@shinefold/auth/providers/magic-link/send-pending-admin-invite-email/send-pending-admin-invite-email';
 import {
   AUTH_APP,
   EMAIL_ACCOUNT,
