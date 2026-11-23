@@ -14,12 +14,12 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@sanity/image-url": "^2.1.1",
+    "@sanity/image-url": "^2.2.0",
     "@shinefold/config": "workspace:*",
     "@shinefold/utils": "workspace:*",
     "@t3-oss/env-core": "^0.13.11",
     "groqd": "^1.7.1",
-    "next-sanity": "^13.3.4",
+    "next-sanity": "^13.5.1",
     "server-only": "^0.0.1",
     "zod": "catalog:"
   },
@@ -31,7 +31,7 @@
     "@shinefold/vitest-config": "workspace:*",
     "@types/node": "^26",
     "eslint": "catalog:",
-    "groq-js": "^2.0.0",
+    "groq-js": "^2.0.3",
     "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

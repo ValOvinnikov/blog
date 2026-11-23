@@ -21,7 +21,7 @@
     "@shinefold/tailwind-config": "workspace:*",
     "@shinefold/utils": "workspace:*",
     "embla-carousel-react": "^8.6.0",
-    "tailwind-merge": "^3.7.0",
+    "tailwind-merge": "^3.7.1",
     "tailwind-variants": "^3.3.1"
   },
   "peerDependencies": {
@@ -40,10 +40,10 @@
     "@storybook/addon-docs": "^10.6.8",
     "@storybook/addon-themes": "^10.6.8",
     "@storybook/react-vite": "^10.6.8",
-    "@tailwindcss/vite": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.5",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.3.3",
-    "@testing-library/user-event": "^14.6.8",
+    "@testing-library/user-event": "^14.6.13",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "catalog:",
@@ -52,7 +52,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "storybook": "catalog:",
-    "tailwindcss": "^4.3.3",
+    "tailwindcss": "^4.3.5",
     "typescript": "catalog:",
     "vite-plugin-svgr": "catalog:",
     "vitest": "catalog:"

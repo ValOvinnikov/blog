@@ -47,8 +47,12 @@ const STARTER_SITE_TYPES = [
 
 type TStarterDocument = ReturnType<typeof buildStarterDocuments>[number];
 
+const MOCK_PLACEHOLDER_ASSETS = Object.values(MOCK_PLACEHOLDER_IMAGES).map(
+  (_id) => ({ _id, _type: 'sanity.imageAsset' }),
+);
+
 const createDatasetClient = (
-  documents: TStarterDocument[],
+  documents: (TStarterDocument | (typeof MOCK_PLACEHOLDER_ASSETS)[number])[],
 ): ValidationClient => {
   const client = {
     fetch: mockGroqFetch(documents),
@@ -164,13 +168,13 @@ describe(buildStarterDocuments, () => {
         document: TStarterDocument,
         dataset: TStarterDocument[],
       ) => {
+        const datasetWithAssets = [...dataset, ...MOCK_PLACEHOLDER_ASSETS];
         const { markers } = await validateDocument({
           document: toSanityDocument(document),
           schema,
-          client: createDatasetClient(dataset),
+          client: createDatasetClient(datasetWithAssets),
           getDocumentExists: async ({ id }) =>
-            dataset.some(({ _id }) => _id === id) ||
-            Object.values(MOCK_PLACEHOLDER_IMAGES).includes(id),
+            datasetWithAssets.some(({ _id }) => _id === id),
         });
 
         return markers;

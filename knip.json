@@ -75,17 +75,7 @@
         "!src/vitest-setup.ts!",
         "!e2e/**!",
         "!contrast/**!"
-      ],
-      // Referenced only as a Turbopack loader string (next.config.ts
-      // `turbopack.rules['*.svg'].loaders: ['@svgr/webpack']`) — knip's
-      // import graph can't see a bare string naming a package. Strict pnpm
-      // (no hoisting) still requires it as a real apps/web devDependency so
-      // Turbopack can resolve it.
-      //
-      // @shinefold/db dropped from this list (#1107): the Auth.js config
-      // (`src/server/auth/auth.ts`) is now the first real
-      // `import ... from '@shinefold/db'` in apps/web.
-      "ignoreDependencies": ["@svgr/webpack"]
+      ]
     },
     ".": {
       "project": ["**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!", "!scripts/**!"]
@@ -104,13 +94,7 @@
         "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,css}!",
         "!src/testing/**!",
         "!src/vitest-setup.ts!"
-      ],
-      // Referenced only as a Turbopack loader string (next.config.ts
-      // `turbopack.rules['*.svg'].loaders: ['@svgr/webpack']`) — knip's
-      // import graph can't see a bare string naming a package. Strict pnpm
-      // (no hoisting) still requires it as a real apps/platform devDependency so
-      // Turbopack can resolve it.
-      "ignoreDependencies": ["@svgr/webpack"]
+      ]
     }
   }
 }
