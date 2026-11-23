@@ -6484,6 +6484,36 @@
         "file": "apps/platform/src/constants/badge-tone.ts"
       }
     ],
+    "START": [
+      {
+        "ref": "BILLING_GRACE.START",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing-grace",
+        "file": "apps/platform/src/constants/billing-grace.ts"
+      }
+    ],
+    "END": [
+      {
+        "ref": "BILLING_GRACE.END",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing-grace",
+        "file": "apps/platform/src/constants/billing-grace.ts"
+      },
+      {
+        "ref": "DEVICE_FRAME_SCROLL_TARGET.END",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "KEEP": [
+      {
+        "ref": "BILLING_GRACE.KEEP",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing-grace",
+        "file": "apps/platform/src/constants/billing-grace.ts"
+      }
+    ],
     "billing.webhook_secret_missing": [
       {
         "ref": "BILLING_LOG.WEBHOOK_SECRET_MISSING",
@@ -6575,6 +6605,30 @@
     "billing.receipt_failed": [
       {
         "ref": "BILLING_LOG.RECEIPT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.payment_failed_email_unconfigured": [
+      {
+        "ref": "BILLING_LOG.PAYMENT_FAILED_EMAIL_UNCONFIGURED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.payment_failed_email_owner_missing": [
+      {
+        "ref": "BILLING_LOG.PAYMENT_FAILED_EMAIL_OWNER_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.payment_failed_email_failed": [
+      {
+        "ref": "BILLING_LOG.PAYMENT_FAILED_EMAIL_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
@@ -6905,36 +6959,6 @@
     "LOADED": [
       {
         "ref": "BILLING_OVERVIEW_STATE.LOADED",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      }
-    ],
-    "START": [
-      {
-        "ref": "BILLING_GRACE.START",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      }
-    ],
-    "END": [
-      {
-        "ref": "BILLING_GRACE.END",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      },
-      {
-        "ref": "DEVICE_FRAME_SCROLL_TARGET.END",
-        "scope": "app:platform",
-        "from": "@platform/constants/device-frame",
-        "file": "apps/platform/src/constants/device-frame.ts"
-      }
-    ],
-    "KEEP": [
-      {
-        "ref": "BILLING_GRACE.KEEP",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
@@ -10109,6 +10133,22 @@
     "payment_intent_authentication_failure": [
       {
         "ref": "STRIPE_JS_ERROR_CODE.AUTHENTICATION_FAILURE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "subscription_cycle": [
+      {
+        "ref": "STRIPE_BILLING_REASON.SUBSCRIPTION_CYCLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "subscription_update": [
+      {
+        "ref": "STRIPE_BILLING_REASON.SUBSCRIPTION_UPDATE",
         "scope": "app:platform",
         "from": "@platform/constants/stripe-payment",
         "file": "apps/platform/src/constants/stripe-payment.ts"

@@ -1,5 +1,6 @@
 import { BILLING_LOG } from '@platform/constants/billing';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
+import { STRIPE_BILLING_REASON } from '@platform/constants/stripe-payment';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { onTenantPlanChange } from '@platform/server/tenants/on-tenant-plan-change';
 import {
@@ -21,6 +22,7 @@ import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { TENANT_PLAN } from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
 import { STRIPE_EVENT_RECORD_OUTCOME } from '@shinefold/db/constants';
 import { MOCK_STRIPE_EVENT_ID } from '@shinefold/db/testing/tenants/billing';
 import { after } from 'next/server';
@@ -29,6 +31,7 @@ import type Stripe from 'stripe';
 import { handleCatalogueEvent } from './catalogue/handle-catalogue-event';
 import { revalidatePlatformSite } from './catalogue/revalidate-platform-site';
 import { handleStripeEvent } from './handle-stripe-event';
+import { sendPaymentFailedNotice } from './send-payment-failed-notice';
 import { sendPaymentReceipt } from './send-payment-receipt';
 import { syncStripeSubscription } from './sync-stripe-subscription';
 
@@ -54,6 +57,9 @@ vi.mock('./sync-stripe-subscription', () => ({
   syncStripeSubscription: vi.fn(),
 }));
 vi.mock('./send-payment-receipt', () => ({ sendPaymentReceipt: vi.fn() }));
+vi.mock('./send-payment-failed-notice', () => ({
+  sendPaymentFailedNotice: vi.fn(),
+}));
 vi.mock('./catalogue/handle-catalogue-event', () => ({
   handleCatalogueEvent: vi.fn(),
 }));
@@ -67,6 +73,23 @@ vi.mock('@platform/server/site-config/revalidate-site-config');
 
 const invoicePaidEvent = () =>
   mockStripeEvent(STRIPE_EVENT_TYPE.INVOICE_PAID, mockStripeInvoice());
+
+const MOCK_RETRY_ATTEMPT_COUNT = 2;
+
+const paymentFailedEvent = ({
+  attemptCount = 1,
+  billingReason = STRIPE_BILLING_REASON.SUBSCRIPTION_CYCLE,
+}: {
+  attemptCount?: number;
+  billingReason?: TValueOf<typeof STRIPE_BILLING_REASON>;
+} = {}) =>
+  mockStripeEvent(
+    STRIPE_EVENT_TYPE.INVOICE_PAYMENT_FAILED,
+    mockStripeInvoice({
+      attempt_count: attemptCount,
+      billing_reason: billingReason,
+    }),
+  );
 
 const handle = async (event: Stripe.Event) => {
   await handleStripeEvent(MOCK_STRIPE_CLIENT, event);
@@ -215,5 +238,51 @@ describe(handleStripeEvent, () => {
       BILLING_LOG.RECEIPT_FAILED,
       expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
     );
+  });
+
+  describe('a failed renewal payment', () => {
+    it('emails the owner once on the first attempt', async () => {
+      const event = paymentFailedEvent();
+
+      await handle(event);
+
+      expect(sendPaymentFailedNotice).toHaveBeenCalledExactlyOnceWith(
+        event.data.object,
+        MOCK_TENANT_ID,
+        TENANT_PLAN.GROWTH,
+      );
+      expect(sendPaymentReceipt).not.toHaveBeenCalled();
+    });
+
+    it('sends nothing for a later retry of the same invoice', async () => {
+      await handle(
+        paymentFailedEvent({ attemptCount: MOCK_RETRY_ATTEMPT_COUNT }),
+      );
+
+      expect(sendPaymentFailedNotice).not.toHaveBeenCalled();
+    });
+
+    it('sends nothing for a failed plan-change invoice', async () => {
+      await handle(
+        paymentFailedEvent({
+          billingReason: STRIPE_BILLING_REASON.SUBSCRIPTION_UPDATE,
+        }),
+      );
+
+      expect(sendPaymentFailedNotice).not.toHaveBeenCalled();
+    });
+
+    it('logs a failed send without failing the webhook', async () => {
+      vi.mocked(sendPaymentFailedNotice).mockRejectedValue(new Error());
+
+      await expect(handle(paymentFailedEvent())).resolves.toBeUndefined();
+      expect(logger.error).toHaveBeenCalledWith(
+        BILLING_LOG.PAYMENT_FAILED_EMAIL_FAILED,
+        expect.objectContaining({
+          tenantId: MOCK_TENANT_ID,
+          eventId: MOCK_STRIPE_EVENT_ID,
+        }),
+      );
+    });
   });
 });

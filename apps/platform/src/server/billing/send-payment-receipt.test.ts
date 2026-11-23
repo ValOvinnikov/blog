@@ -2,6 +2,7 @@ import { BILLING_LOG } from '@platform/constants/billing';
 import enMessages from '@platform/i18n/messages/en.json';
 import nlMessages from '@platform/i18n/messages/nl.json';
 import {
+  MOCK_AMOUNT_PAID_TEXT,
   MOCK_INVOICE_PDF_URL,
   MOCK_STRIPE_INVOICE_ID,
   mockStripeInvoice,
@@ -79,7 +80,7 @@ describe(sendPaymentReceipt, () => {
     it('carries the amount, the plan and a link to the invoice PDF', () => {
       const text = sentEmail()?.text;
 
-      expect(text).toContain('$29.00');
+      expect(text).toContain(MOCK_AMOUNT_PAID_TEXT);
       expect(text).toContain(enMessages.planNames.GROWTH);
       expect(text).toContain(MOCK_INVOICE_PDF_URL);
       expect(text).toContain(MOCK_TENANT_NAME);

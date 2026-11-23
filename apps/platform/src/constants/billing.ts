@@ -13,6 +13,11 @@ export const BILLING_LOG = {
   RECEIPT_UNCONFIGURED: 'billing.receipt_unconfigured',
   RECEIPT_OWNER_MISSING: 'billing.receipt_owner_missing',
   RECEIPT_FAILED: 'billing.receipt_failed',
+  PAYMENT_FAILED_EMAIL_UNCONFIGURED:
+    'billing.payment_failed_email_unconfigured',
+  PAYMENT_FAILED_EMAIL_OWNER_MISSING:
+    'billing.payment_failed_email_owner_missing',
+  PAYMENT_FAILED_EMAIL_FAILED: 'billing.payment_failed_email_failed',
   CHECKOUT_UNCONFIGURED: 'billing.checkout_unconfigured',
   CHECKOUT_PRICE_MISSING: 'billing.checkout_price_missing',
   CHECKOUT_FAILED: 'billing.checkout_failed',
@@ -97,12 +102,6 @@ export const BILLING_INVOICE_LIMIT = 100;
 
 export const PLAN_CARD_ROW_COUNT = 2;
 
-export const BILLING_GRACE = {
-  START: 'START',
-  END: 'END',
-  KEEP: 'KEEP',
-} as const;
-
 export const MILLISECONDS_PER_SECOND = 1000;
 
 // Long enough to read the dialog, short enough that the charge stays the one it showed.
@@ -111,8 +110,6 @@ export const MOVE_UP_QUOTE_MAX_AGE_SECONDS = 30 * 60;
 export const STRIPE_SIGNATURE_HEADER = 'stripe-signature';
 
 export const STRIPE_TENANT_METADATA_KEY = 'tenantId';
-
-export type TBillingGrace = TValueOf<typeof BILLING_GRACE>;
 
 export const UPGRADE_STATE = {
   AVAILABLE: 'AVAILABLE',

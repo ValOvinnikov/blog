@@ -1,13 +1,13 @@
 import 'server-only';
 
 import { TENANT_LOG } from '@platform/constants/tenant';
+import { loadOwnerEmailRecipient } from '@platform/server/owner-email/load-owner-email-recipient';
 import { dashboardUrl } from '@platform/utils/dashboard-url/dashboard-url';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { toPricingPageUrl } from '@platform/utils/pricing-page-url/pricing-page-url';
 import { EMAIL_ACCOUNT, type TTenantPlan } from '@shinefold/config/constants';
-import { queries } from '@shinefold/db';
 import {
   buildOwnerPlanChangeEmail,
   PLATFORM_EMAIL_BRAND_NAME,
@@ -20,30 +20,31 @@ const sendPlanChangeEmail = async (
   toPlan: TTenantPlan,
 ): Promise<void> => {
   const {
-    OWNER_EMAIL_FROM_ADDRESS: from,
     PLATFORM_APP_BASE_URL: baseUrl,
     MARKETING_SITE_URL: marketingSiteUrl,
     TENANT_ROOT_DOMAIN: rootDomain,
   } = env;
-  if (!from || !baseUrl) {
+  if (!baseUrl) {
     logger.warn(TENANT_LOG.PLAN_CHANGE_EMAIL_UNCONFIGURED, { tenantId });
     return;
   }
 
-  const [tenant, ownerEmail] = await Promise.all([
-    queries.tenants.getTenantById(tenantId),
-    queries.memberships.getTenantOwnerEmail(tenantId),
-  ]);
-  if (!tenant || !ownerEmail) {
-    logger.warn(TENANT_LOG.PLAN_CHANGE_EMAIL_OWNER_MISSING, { tenantId });
-    return;
-  }
+  const recipient = await loadOwnerEmailRecipient(tenantId, {
+    unconfigured: TENANT_LOG.PLAN_CHANGE_EMAIL_UNCONFIGURED,
+    ownerMissing: TENANT_LOG.PLAN_CHANGE_EMAIL_OWNER_MISSING,
+  });
+  if (!recipient) return;
 
+  const {
+    from,
+    ownerEmail,
+    tenant: { locale, name: siteName },
+  } = recipient;
   const t = await getTranslations({
-    locale: tenant.locale,
+    locale,
     namespace: 'ownerPlanChangeEmail',
   });
-  const values = { siteName: tenant.name };
+  const values = { siteName };
   const plansUrl = toPricingPageUrl({ marketingSiteUrl, rootDomain });
   const message = buildOwnerPlanChangeEmail({
     brandName: PLATFORM_EMAIL_BRAND_NAME,

@@ -1,4 +1,4 @@
-import { BILLING_GRACE } from '@platform/constants/billing';
+import { BILLING_GRACE } from '@platform/constants/billing-grace';
 import { createMockFaker } from '@platform/testing/mock-faker';
 
 import { graceBillingFields } from './grace-billing-fields';

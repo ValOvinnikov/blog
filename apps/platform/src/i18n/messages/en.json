@@ -2315,6 +2315,17 @@
     "planLabel": "Plan",
     "actionLabel": "View your invoice"
   },
+  "ownerPaymentFailedEmail": {
+    "subject": "Your payment for {siteName} failed",
+    "previewText": "We could not take {amount} for {siteName}.",
+    "failed": "We could not take your payment for {siteName}.",
+    "updatePaymentMethod": "Update your payment method on the Billing page to keep your plan.",
+    "amountLabel": "Amount due",
+    "planLabel": "Plan",
+    "nextRetryLabel": "Next attempt",
+    "planEnding": "We will not try again, so your plan ends unless you update your payment method.",
+    "actionLabel": "Update payment method"
+  },
   "suspensionCategory": {
     "ABUSE": "Abuse",
     "ILLEGAL_CONTENT": "Illegal content",

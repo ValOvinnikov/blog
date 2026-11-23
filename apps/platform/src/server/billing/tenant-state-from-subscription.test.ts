@@ -1,7 +1,5 @@
-import {
-  BILLING_GRACE,
-  STRIPE_SUBSCRIPTION_STATUS,
-} from '@platform/constants/billing';
+import { STRIPE_SUBSCRIPTION_STATUS } from '@platform/constants/billing';
+import { BILLING_GRACE } from '@platform/constants/billing-grace';
 import {
   MOCK_BAND_CEILING,
   MOCK_INCOMPLETE_SUBSCRIPTION_STATUS,

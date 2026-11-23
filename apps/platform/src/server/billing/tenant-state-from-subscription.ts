@@ -1,8 +1,8 @@
+import { STRIPE_SUBSCRIPTION_STATUS } from '@platform/constants/billing';
 import {
   BILLING_GRACE,
-  STRIPE_SUBSCRIPTION_STATUS,
   type TBillingGrace,
-} from '@platform/constants/billing';
+} from '@platform/constants/billing-grace';
 import type { TSubscribedPlan } from '@platform/server/billing/plan-from-price-keys';
 import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import {
