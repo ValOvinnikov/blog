@@ -97,10 +97,10 @@ test); a folder of two or fewer stays flat, and the third module splits all.
   `onSendCountFailed` handler, because this package never logs and the
   app does.
 - **Sign-in events** — `events.signIn` (`consumePendingInvitesOnSignIn`,
-  `recordSignupTermsOnSignIn`),
+  `consumeAdminInviteOnSignIn`, `recordSignupTermsOnSignIn`),
   registered for `PLATFORM` only; a site sign-in never acts on platform
-  invites, and the magic-link provider picks the invite template only for
-  `PLATFORM` too. Auth.js wraps each event in its own try/catch and only logs an
+  invites, and the magic-link provider picks an invite template only for
+  `PLATFORM` too — the admin-invite email over the team-invite one. Auth.js wraps each event in its own try/catch and only logs an
   `EventError`, so a failure never reaches the user and the work is lost
   until the next sign-in: keep handlers best-effort and idempotent.
 

@@ -1,9 +1,5 @@
+import type { TSignInEventUser } from '@shinefold/auth/events/sign-in-event-user/sign-in-event-user';
 import { queries } from '@shinefold/db';
-
-export type TSignInEventUser = {
-  id?: string;
-  email?: string | null;
-};
 
 export async function consumePendingInvitesOnSignIn({
   user,
@@ -23,10 +19,6 @@ export async function consumePendingInvitesOnSignIn({
       ),
     );
   } catch {
-    // Best-effort: this is invoked as Auth.js's `events.signIn` handler,
-    // which has no surrounding try/catch of its own, so an uncaught throw
-    // here would fail sign-in for every user, not just invited ones. A
-    // missed consumption simply retries on the user's next sign-in — never
-    // console.* here, this package never logs (see CLAUDE.md).
+    // Best-effort like every sign-in event: a missed invite is consumed on the next sign-in.
   }
 }
