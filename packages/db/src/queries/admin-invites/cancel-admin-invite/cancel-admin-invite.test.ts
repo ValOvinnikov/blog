@@ -16,6 +16,7 @@ vi.mock('@shinefold/db/client');
 faker.seed(7866);
 
 const MOCK_UNKNOWN_INVITE_ID = faker.string.uuid();
+const MOCK_NON_UUID_INVITE_ID = faker.lorem.word();
 
 const db = useQueryTestDb();
 
@@ -33,13 +34,10 @@ describe(cancelAdminInvite, () => {
     expect(rows).toHaveLength(0);
   });
 
-  it('reports false for an invite that does not exist', async () => {
-    await expect(cancelAdminInvite(MOCK_UNKNOWN_INVITE_ID)).resolves.toBe(
-      false,
-    );
-  });
-
-  it('reports false for an id that is not a uuid', async () => {
-    await expect(cancelAdminInvite(faker.lorem.word())).resolves.toBe(false);
+  it.each([
+    ['an invite that does not exist', MOCK_UNKNOWN_INVITE_ID],
+    ['an id that is not a uuid', MOCK_NON_UUID_INVITE_ID],
+  ])('reports false for %s', async (_case, inviteId) => {
+    await expect(cancelAdminInvite(inviteId)).resolves.toBe(false);
   });
 });

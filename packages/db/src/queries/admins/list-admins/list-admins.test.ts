@@ -1,7 +1,9 @@
 import { ADMIN_ROLE, GRANTED_VIA } from '@shinefold/db/constants';
 import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
-import * as schema from '@shinefold/db/schema';
-import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
+import {
+  insertTestAdmin,
+  useAdminRowCleanup,
+} from '@shinefold/db/testing/admins/fixtures';
 import {
   MOCK_USER_EMAIL,
   MOCK_USER_NAME,
@@ -14,10 +16,7 @@ vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 
-afterEach(async () => {
-  await db().delete(schema.admins);
-  await db().delete(schema.users);
-});
+useAdminRowCleanup(db);
 
 describe(listAdmins, () => {
   it('lists each admin with the decrypted name and email of their account', async () => {

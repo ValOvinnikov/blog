@@ -1,6 +1,7 @@
 import { timestamp } from 'drizzle-orm/pg-core';
 
 export const CREATED_AT_COLUMN = 'created_at';
+export const EXPIRES_AT_COLUMN = 'expires_at';
 const UPDATED_AT_COLUMN = 'updated_at';
 export const EMAIL_ENCRYPTED_COLUMN = 'email_encrypted';
 export const EMAIL_INDEX_COLUMN = 'email_index';

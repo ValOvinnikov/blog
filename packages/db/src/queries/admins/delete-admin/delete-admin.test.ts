@@ -4,6 +4,7 @@ import * as schema from '@shinefold/db/schema';
 import {
   insertTestAdmin,
   MOCK_SUPERADMIN_GRANT,
+  useAdminRowCleanup,
 } from '@shinefold/db/testing/admins/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
@@ -17,10 +18,7 @@ const MOCK_UNKNOWN_ADMIN_ID = faker.string.uuid();
 
 const db = useQueryTestDb();
 
-afterEach(async () => {
-  await db().delete(schema.admins);
-  await db().delete(schema.users);
-});
+useAdminRowCleanup(db);
 
 describe(deleteAdmin, () => {
   let superadminId: string;

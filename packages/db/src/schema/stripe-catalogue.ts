@@ -14,6 +14,8 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
+import { EXPIRES_AT_COLUMN } from './columns';
+
 export const stripePrices = pgTable(
   'stripe_prices',
   {
@@ -46,7 +48,7 @@ export const stripePromotionCodes = pgTable(
     duration: text('duration').$type<TStripeCouponDuration>().notNull(),
     durationInMonths: integer('duration_in_months'),
     appliesToProductIds: text('applies_to_product_ids').array(),
-    expiresAt: timestamp('expires_at', { mode: 'date' }),
+    expiresAt: timestamp(EXPIRES_AT_COLUMN, { mode: 'date' }),
     updatedAt: timestamp('updated_at', { mode: 'date' }).notNull(),
   },
   (promotionCode) => [

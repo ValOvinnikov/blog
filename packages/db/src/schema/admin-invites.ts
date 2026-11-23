@@ -7,6 +7,7 @@ import {
   EMAIL_ENCRYPTED_COLUMN,
   EMAIL_EXACT_INDEX_COLUMN,
   EMAIL_INDEX_COLUMN,
+  EXPIRES_AT_COLUMN,
 } from './columns';
 
 export const adminInvites = pgTable(
@@ -23,7 +24,7 @@ export const adminInvites = pgTable(
     createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
       .notNull()
       .defaultNow(),
-    expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
+    expiresAt: timestamp(EXPIRES_AT_COLUMN, { mode: 'date' }).notNull(),
   },
   (invite) => [index('admin_invites_email_index_idx').on(invite.emailIndex)],
 );
