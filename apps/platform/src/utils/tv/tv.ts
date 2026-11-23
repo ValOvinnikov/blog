@@ -1,4 +1,4 @@
-import { createTV } from 'tailwind-variants';
+import { createTV } from 'tailwind-variants/config';
 
 import { platformTokens } from './platform-tokens';
 import { INSET_SHADOW_TOKENS, SHADOW_TOKENS } from './shadow-tokens';

@@ -1042,9 +1042,6 @@ importers:
       embla-carousel-react:
         specifier: ^8.6.0
         version: 8.6.0(react@19.3.1)
-      tailwind-merge:
-        specifier: ^3.7.0
-        version: 3.7.0
       tailwind-variants:
         specifier: ^4.0.2
         version: 4.0.2
@@ -1118,9 +1115,6 @@ importers:
       storybook:
         specifier: 'catalog:'
         version: 10.6.6(@types/react@19.3.0)(prettier@3.9.10)(react@19.3.1)
-      tailwindcss:
-        specifier: ^4.3.3
-        version: 4.3.3
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -10963,9 +10957,6 @@ packages:
   system-architecture@1.0.0:
     resolution: {integrity: sha512-0OJWD12D7XX3KUg1DYkMaTTjSTo2k/mhIYI3HlBlceXSMcJhW/1qO735fPKS5prcyjvn57Ub151vvASYXpQrEw==}
     engines: {node: '>=18'}
-
-  tailwind-merge@3.7.0:
-    resolution: {integrity: sha512-XPPUyAc+cvspz3lHTcR/QgPfW2A0lv/xQNIjX3HGhLR+Nq2lHaLq5MtTesHn8GUr3W3DguT2KT5x3NVgRtYwmA==}
 
   tailwind-variants@4.0.2:
     resolution: {integrity: sha512-sZvOFkfe5LlYG/crRX5IvP3oUHmJPu+7WmrLQFvF0kCRq51C+lurlzFMm/jURG/5keT7VOJ/it0N3jkzYux85w==}
@@ -24255,8 +24246,6 @@ snapshots:
   symbol-tree@3.2.4: {}
 
   system-architecture@1.0.0: {}
-
-  tailwind-merge@3.7.0: {}
 
   tailwind-variants@4.0.2: {}
 

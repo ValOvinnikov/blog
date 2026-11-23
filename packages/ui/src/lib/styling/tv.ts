@@ -1,4 +1,4 @@
-import { createTV } from 'tailwind-variants';
+import { createTV } from 'tailwind-variants/config';
 
 const SPACING_TOKENS = [
   'gutter',

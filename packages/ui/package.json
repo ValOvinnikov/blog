@@ -21,7 +21,6 @@
     "@shinefold/tailwind-config": "workspace:*",
     "@shinefold/utils": "workspace:*",
     "embla-carousel-react": "^8.6.0",
-    "tailwind-merge": "^3.7.0",
     "tailwind-variants": "^4.0.2"
   },
   "peerDependencies": {
@@ -52,7 +51,6 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "storybook": "catalog:",
-    "tailwindcss": "^4.3.3",
     "typescript": "catalog:",
     "vite-plugin-svgr": "catalog:",
     "vitest": "catalog:"
