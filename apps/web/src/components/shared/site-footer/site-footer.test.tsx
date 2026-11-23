@@ -15,7 +15,7 @@ import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 import { FOOTER_LOG } from '@web/constants/footer';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
-import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
+import { getBrandLogos } from '@web/server/site-config/get-brand-logos/get-brand-logos';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getFooterStyle } from '@web/server/site-config/get-footer-style/get-footer-style';
 import { getPoweredByMark } from '@web/server/site-config/get-powered-by-mark/get-powered-by-mark';
@@ -58,7 +58,7 @@ vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 vi.mock('@web/server/site-config/get-footer-style/get-footer-style');
 
-vi.mock('@web/server/site-config/get-brand-logo-url/get-brand-logo-url');
+vi.mock('@web/server/site-config/get-brand-logos/get-brand-logos');
 
 vi.mock('@web/server/site-config/get-powered-by-mark/get-powered-by-mark');
 
@@ -84,7 +84,10 @@ const POWERED_BY_NAME = `${SITE_MESSAGES.siteFooter.poweredByLabel} ${SHINEFOLD_
 const [MOCK_ABOUT, MOCK_ADDRESS, MOCK_GROUP_HEADING] =
   faker.helpers.uniqueArray(faker.lorem.word, 3);
 const MOCK_COPYRIGHT_NAME = faker.company.name();
-const MOCK_LOGO_URL = faker.image.url();
+const [MOCK_LOGO_URL, MOCK_DARK_LOGO_URL] = faker.helpers.uniqueArray(
+  faker.image.url,
+  2,
+);
 const MOCK_NEW_TAB_LINK: ILink = {
   ...MOCK_ABOUT_LINK,
   href: faker.internet.url(),
@@ -110,7 +113,7 @@ const COOKIE_SETTINGS_ITEM = { kind: FOOTER_FINE_PRINT_KIND.COOKIE_SETTINGS };
 
 const getRequestContextMock = vi.mocked(getRequestContext);
 const getFooterStyleMock = vi.mocked(getFooterStyle);
-const getBrandLogoUrlMock = vi.mocked(getBrandLogoUrl);
+const getBrandLogosMock = vi.mocked(getBrandLogos);
 const isCapabilityEnabledMock = vi.mocked(isCapabilityEnabled);
 const getPoweredByMarkMock = vi.mocked(getPoweredByMark);
 
@@ -312,13 +315,19 @@ describe(`<${SiteFooter.name}/>`, () => {
       expect(wordmark).toBeInTheDocument();
     });
 
-    it('shows the logo when the site has one', async () => {
-      getBrandLogoUrlMock.mockResolvedValueOnce(MOCK_LOGO_URL);
+    it('shows the logo and its dark-mode version when the site has both', async () => {
+      getBrandLogosMock.mockResolvedValueOnce({
+        logoUrl: MOCK_LOGO_URL,
+        darkLogoUrl: MOCK_DARK_LOGO_URL,
+      });
 
       await setupWithFooter({});
 
-      const logo = screen.getByRole('presentation');
-      expect(logo).toHaveAttribute('src', MOCK_LOGO_URL);
+      const logos = screen.getAllByRole('presentation');
+      expect(logos.map((logo) => logo.getAttribute('src'))).toEqual([
+        MOCK_LOGO_URL,
+        MOCK_DARK_LOGO_URL,
+      ]);
     });
 
     it('lists each group under its heading inside the footer links landmark', async () => {

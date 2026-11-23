@@ -11,7 +11,7 @@ import { FOOTER_LOG } from '@web/constants/footer';
 import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
-import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
+import { getBrandLogos } from '@web/server/site-config/get-brand-logos/get-brand-logos';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getFooterStyle } from '@web/server/site-config/get-footer-style/get-footer-style';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
@@ -42,7 +42,7 @@ export const SiteFooter = async () => {
     t,
     switcherStyle,
     footerStyle,
-    brandLogoUrl,
+    { logoUrl, darkLogoUrl },
     isConsentBannerEnabled,
     poweredByHref,
   ] = await Promise.all([
@@ -52,7 +52,7 @@ export const SiteFooter = async () => {
     getTranslations('siteFooter'),
     getLanguageSwitcherStyle(tenant),
     getFooterStyle(tenant),
-    getBrandLogoUrl(tenant),
+    getBrandLogos(tenant),
     isCapabilityEnabled(CAPABILITY.CONSENT_BANNER),
     getPoweredByMark(tenant),
   ]);
@@ -86,8 +86,12 @@ export const SiteFooter = async () => {
         dataTestId="site-footer"
       >
         <Footer.Logo>
-          {brandLogoUrl && (
-            <BrandLockupLink logoUrl={brandLogoUrl} siteName={brandName} />
+          {logoUrl && (
+            <BrandLockupLink
+              logoUrl={logoUrl}
+              darkLogoUrl={darkLogoUrl}
+              siteName={brandName}
+            />
           )}
         </Footer.Logo>
         <Footer.About>{footer?.about}</Footer.About>

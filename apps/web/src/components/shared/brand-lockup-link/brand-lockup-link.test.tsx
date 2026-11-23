@@ -7,7 +7,10 @@ import { BrandLockupLink } from './brand-lockup-link';
 
 faker.seed(5301);
 
-const MOCK_LOGO_URL = faker.image.url();
+const [MOCK_LOGO_URL, MOCK_DARK_LOGO_URL] = faker.helpers.uniqueArray(
+  faker.image.url,
+  2,
+);
 const MOCK_TAGLINE = faker.lorem.words(3);
 const MOCK_SITE_NAME = faker.company.name();
 const MOCK_SITE_INITIAL = toInitial(MOCK_SITE_NAME)!;
@@ -56,6 +59,36 @@ describe(`<${BrandLockupLink.name}/>`, () => {
     });
     const initial = screen.getByText(MOCK_SITE_INITIAL);
     expect(initial).toBeInTheDocument();
+  });
+
+  it('shows the dark-mode logo alongside the main logo', () => {
+    setup({ darkLogoUrl: MOCK_DARK_LOGO_URL });
+
+    const logos = screen.getAllByRole('presentation');
+
+    expect(logos.map((logo) => logo.getAttribute('src'))).toEqual([
+      MOCK_LOGO_URL,
+      MOCK_DARK_LOGO_URL,
+    ]);
+  });
+
+  it('keeps the main logo for dark mode when the dark-mode logo fails to load', async () => {
+    vi.spyOn(HTMLImageElement.prototype, 'decode').mockImplementation(function (
+      this: HTMLImageElement,
+    ) {
+      return this.getAttribute('src') === MOCK_DARK_LOGO_URL
+        ? Promise.reject(new Error(faker.lorem.sentence()))
+        : Promise.resolve();
+    });
+
+    setup({ darkLogoUrl: MOCK_DARK_LOGO_URL });
+
+    await waitFor(() => {
+      const logos = screen.getAllByRole('presentation');
+      expect(logos).toHaveLength(1);
+    });
+    const logo = screen.getByRole('presentation');
+    expect(logo).toHaveAttribute('src', MOCK_LOGO_URL);
   });
 
   it('shows the tagline when set', () => {

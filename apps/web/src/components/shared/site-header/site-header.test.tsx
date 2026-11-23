@@ -17,7 +17,7 @@ import {
   isReaderAccountFeatureEnabled,
 } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
-import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
+import { getBrandLogos } from '@web/server/site-config/get-brand-logos/get-brand-logos';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
@@ -66,12 +66,7 @@ vi.mock(
 
 vi.mock('@web/server/site-config/get-account-control/get-account-control');
 
-vi.mock(
-  '@web/server/site-config/get-brand-logo-url/get-brand-logo-url',
-  () => ({
-    getBrandLogoUrl: vi.fn(),
-  }),
-);
+vi.mock('@web/server/site-config/get-brand-logos/get-brand-logos');
 
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
@@ -103,12 +98,15 @@ const isReaderAccountEnabledMock = vi.mocked(isReaderAccountEnabled);
 const isReaderAccountFeatureEnabledMock = vi.mocked(
   isReaderAccountFeatureEnabled,
 );
-const getBrandLogoUrlMock = vi.mocked(getBrandLogoUrl);
+const getBrandLogosMock = vi.mocked(getBrandLogos);
 const getAccountControlMock = vi.mocked(getAccountControl);
 
 faker.seed(5);
 
-const MOCK_LOOK_LOGO_URL = faker.internet.url();
+const [MOCK_LOOK_LOGO_URL, MOCK_DARK_LOGO_URL] = faker.helpers.uniqueArray(
+  faker.internet.url,
+  2,
+);
 const MOCK_HEADER_TAGLINE = faker.lorem.words(3);
 const MOCK_READER = {
   name: faker.person.fullName(),
@@ -118,6 +116,7 @@ const MOCK_READER = {
 const setup = customRenderAsync(SiteHeader, {});
 
 const TOGGLE_NAVIGATION_MENU = 'Toggle navigation menu';
+const DISCLOSURE_SUMMARY_SELECTOR = 'details > summary';
 const LANGUAGE_ENGLISH = 'Language: English';
 const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
 const MOBILE_PANEL_TEST_ID = 'primary-navigation-mobile-panel';
@@ -165,7 +164,9 @@ describe(`<${SiteHeader.name}/>`, () => {
 
   const getDrawerAccountRow = (name: string) => {
     const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
-    return within(drawerActions).getByText(name, { selector: 'summary' });
+    return within(drawerActions).getByText(name, {
+      selector: DISCLOSURE_SUMMARY_SELECTOR,
+    });
   };
 
   const getBarSignInButtons = () => {
@@ -176,7 +177,6 @@ describe(`<${SiteHeader.name}/>`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     getNavigationMock.mockResolvedValue(okResult({ items: [] }));
-    getBrandLogoUrlMock.mockResolvedValue(undefined);
     isReaderAccountEnabledMock.mockResolvedValue(true);
     isReaderAccountFeatureEnabledMock.mockResolvedValue(true);
     getEnabledOAuthProviderIdsMock.mockReturnValue([
@@ -190,16 +190,22 @@ describe(`<${SiteHeader.name}/>`, () => {
   });
 
   describe('the brand logo', () => {
-    it("shows the tenant's Look logo", async () => {
-      getBrandLogoUrlMock.mockResolvedValue(MOCK_LOOK_LOGO_URL);
+    it("shows the tenant's Look logo and its dark-mode version", async () => {
+      getBrandLogosMock.mockResolvedValueOnce({
+        logoUrl: MOCK_LOOK_LOGO_URL,
+        darkLogoUrl: MOCK_DARK_LOGO_URL,
+      });
 
       await setup();
 
       const homeLink = screen.getByRole('link', { name: HOME_LINK_NAME });
-      const logo = within(homeLink).getByRole('presentation');
+      const logos = within(homeLink).getAllByRole('presentation');
 
-      expect(logo).toHaveAttribute('src', MOCK_LOOK_LOGO_URL);
-      expect(getBrandLogoUrlMock).toHaveBeenCalledWith(
+      expect(logos.map((logo) => logo.getAttribute('src'))).toEqual([
+        MOCK_LOOK_LOGO_URL,
+        MOCK_DARK_LOGO_URL,
+      ]);
+      expect(getBrandLogosMock).toHaveBeenCalledWith(
         MOCK_REQUEST_CONTEXT.tenantId,
       );
     });
@@ -369,7 +375,7 @@ describe(`<${SiteHeader.name}/>`, () => {
       const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
       return {
         subMenuRow: within(mobilePanel).getByText(MOCK_TOPICS_GROUP.label, {
-          selector: 'summary',
+          selector: DISCLOSURE_SUMMARY_SELECTOR,
         }),
         blogLink: within(mobilePanel).getByRole('link', {
           name: MOCK_BLOG_LINK.label,
