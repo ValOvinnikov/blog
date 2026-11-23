@@ -54,6 +54,8 @@ export {
   type TOwnerEntitlementEmailInput,
   buildOwnerReceiptEmail,
   type TOwnerReceiptEmailInput,
+  buildOwnerPaymentFailedEmail,
+  type TOwnerPaymentFailedEmailInput,
   buildOwnerSuspensionEmail,
   type TOwnerSuspensionEmailInput,
   buildOwnerSuspensionLiftedEmail,
