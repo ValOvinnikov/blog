@@ -383,7 +383,9 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@shinefold/db/constants` — `packages/db/src/constants/admin.ts`
 
 - **ADMIN_ROLE**: `SUPERADMIN`, `ADMIN`, `MODERATOR`
-- **GRANTED_VIA**: `BREAK_GLASS`, `PROMOTION`
+- **GRANTED_VIA**: `BREAK_GLASS`, `PROMOTION`, `INVITE`
+- **ADMIN_INVITE_OUTCOME**: `INVITED`, `ALREADY_ADMIN`
+- **ADMIN_REMOVAL_OUTCOME**: `REMOVED`, `NOT_FOUND`, `LAST_SUPERADMIN`
 
 ### `@shinefold/db/constants` — `packages/db/src/constants/billing.ts`
 
