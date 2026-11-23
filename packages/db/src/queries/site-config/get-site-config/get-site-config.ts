@@ -15,6 +15,7 @@ export type TSiteConfigResult = Omit<
   | 'logoHue'
   | 'brandName'
   | 'logoAssetUrl'
+  | 'logoDarkAssetUrl'
   | 'faviconAssetUrl'
   | 'lookSavedAt'
   | 'voiceSavedAt'
@@ -22,6 +23,7 @@ export type TSiteConfigResult = Omit<
   logoHue: TMaybeUndefined<number>;
   brandName: TMaybeUndefined<string>;
   logoAssetUrl: TMaybeUndefined<string>;
+  logoDarkAssetUrl: TMaybeUndefined<string>;
   faviconAssetUrl: TMaybeUndefined<string>;
   lookSavedAt: TMaybeUndefined<Date>;
   voiceSavedAt: TMaybeUndefined<Date>;
@@ -38,6 +40,7 @@ export function toSiteConfigResult(
     logoHue: row.logoHue ?? undefined,
     brandName: row.brandName ?? undefined,
     logoAssetUrl: row.logoAssetUrl ?? undefined,
+    logoDarkAssetUrl: row.logoDarkAssetUrl ?? undefined,
     faviconAssetUrl: row.faviconAssetUrl ?? undefined,
     lookSavedAt: row.lookSavedAt ?? undefined,
     voiceSavedAt: row.voiceSavedAt ?? undefined,

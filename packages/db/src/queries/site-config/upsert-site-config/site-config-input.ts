@@ -81,6 +81,7 @@ export const updateSiteConfigInputSchema = z.object({
     .nullable()
     .optional(),
   logoAssetUrl: z.string().trim().url().nullable().optional(),
+  logoDarkAssetUrl: z.string().trim().url().nullable().optional(),
   faviconAssetUrl: z.string().trim().url().nullable().optional(),
 });
 
