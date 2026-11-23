@@ -315,16 +315,7 @@ describe(`<${SiteFooter.name}/>`, () => {
       expect(wordmark).toBeInTheDocument();
     });
 
-    it('shows the logo when the site has one', async () => {
-      getBrandLogosMock.mockResolvedValueOnce({ logoUrl: MOCK_LOGO_URL });
-
-      await setupWithFooter({});
-
-      const logo = screen.getByRole('presentation');
-      expect(logo).toHaveAttribute('src', MOCK_LOGO_URL);
-    });
-
-    it('shows the dark-mode logo alongside the main logo when the site has both', async () => {
+    it('shows the logo and its dark-mode version when the site has both', async () => {
       getBrandLogosMock.mockResolvedValueOnce({
         logoUrl: MOCK_LOGO_URL,
         darkLogoUrl: MOCK_DARK_LOGO_URL,

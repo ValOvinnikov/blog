@@ -190,21 +190,7 @@ describe(`<${SiteHeader.name}/>`, () => {
   });
 
   describe('the brand logo', () => {
-    it("shows the tenant's Look logo", async () => {
-      getBrandLogosMock.mockResolvedValueOnce({ logoUrl: MOCK_LOOK_LOGO_URL });
-
-      await setup();
-
-      const homeLink = screen.getByRole('link', { name: HOME_LINK_NAME });
-      const logo = within(homeLink).getByRole('presentation');
-
-      expect(logo).toHaveAttribute('src', MOCK_LOOK_LOGO_URL);
-      expect(getBrandLogosMock).toHaveBeenCalledWith(
-        MOCK_REQUEST_CONTEXT.tenantId,
-      );
-    });
-
-    it("shows the tenant's dark-mode logo alongside the Look logo", async () => {
+    it("shows the tenant's Look logo and its dark-mode version", async () => {
       getBrandLogosMock.mockResolvedValueOnce({
         logoUrl: MOCK_LOOK_LOGO_URL,
         darkLogoUrl: MOCK_DARK_LOGO_URL,
@@ -219,6 +205,9 @@ describe(`<${SiteHeader.name}/>`, () => {
         MOCK_LOOK_LOGO_URL,
         MOCK_DARK_LOGO_URL,
       ]);
+      expect(getBrandLogosMock).toHaveBeenCalledWith(
+        MOCK_REQUEST_CONTEXT.tenantId,
+      );
     });
 
     it("shows the site's initial tile without a Look logo", async () => {

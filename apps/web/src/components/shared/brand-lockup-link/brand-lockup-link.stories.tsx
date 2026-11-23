@@ -22,3 +22,10 @@ export const Default: TStory = {};
 export const NoTagline: TStory = {
   args: { tagline: undefined },
 };
+
+export const WithDarkLogo: TStory = {
+  args: {
+    logoUrl: 'https://placehold.co/320x64',
+    darkLogoUrl: 'https://placehold.co/320x64/111111/ffffff',
+  },
+};
