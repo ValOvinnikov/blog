@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import {
   MOCK_FAVICON_URL,
+  MOCK_LOGO_DARK_URL,
   MOCK_LOGO_URL,
   mockSiteConfig,
 } from '@platform/testing/site-config/fixtures';
@@ -20,6 +21,7 @@ const MOCK_SITE_CONFIG = mockSiteConfig({
   logoHue: faker.number.int({ min: HUE_MIN, max: HUE_MAX }),
   brandName: MOCK_BRAND_NAME,
   logoAssetUrl: MOCK_LOGO_URL,
+  logoDarkAssetUrl: MOCK_LOGO_DARK_URL,
   faviconAssetUrl: MOCK_FAVICON_URL,
 });
 
@@ -59,6 +61,7 @@ describe(toLookFormValues, () => {
       cookieSettingsButton: MOCK_SITE_CONFIG.cookieSettingsButton,
       brandName: MOCK_BRAND_NAME,
       logo: { url: MOCK_LOGO_URL },
+      logoDark: { url: MOCK_LOGO_DARK_URL },
       favicon: { url: MOCK_FAVICON_URL },
     });
   });

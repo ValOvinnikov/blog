@@ -3,6 +3,7 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
 import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, waitFor } from '@platform/testing/custom-render';
+import { pickLogo } from '@platform/testing/look/brand-image-interactions';
 import {
   ACCENT_HUE,
   NUDGED_ACCENT_HUE,
@@ -13,7 +14,6 @@ import {
   lookRowTrigger,
   nudgeAccentHue,
   openLookRow,
-  pickLogo,
 } from '@platform/testing/look/look-form-interactions';
 import {
   prepareBrandImageForm,

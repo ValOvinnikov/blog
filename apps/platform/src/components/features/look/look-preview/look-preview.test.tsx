@@ -24,7 +24,14 @@ import {
   renderPreview,
   setPreviewDevice,
 } from '@platform/testing/look/look-preview-render';
-import { MOCK_TENANT_DOMAIN } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_LOGO_DARK_URL,
+  MOCK_LOGO_URL,
+} from '@platform/testing/site-config/fixtures';
+import {
+  MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
 import {
   CARD_STYLE,
   COOKIE_SETTINGS_BUTTON,
@@ -174,6 +181,50 @@ describe(`<${LookPreview.name}/>`, () => {
     expect(sampleTokens).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.7 0.16 28)',
     });
+  });
+
+  describe('brand logo', () => {
+    const sampleLogos = () =>
+      screen.getAllByRole('img', { name: MOCK_TENANT_NAME });
+
+    it.each([
+      {
+        scheme: 'light',
+        isDark: false,
+        logoDark: MOCK_LOGO_DARK_URL,
+        shown: MOCK_LOGO_URL,
+      },
+      {
+        scheme: 'dark',
+        isDark: true,
+        logoDark: MOCK_LOGO_DARK_URL,
+        shown: MOCK_LOGO_DARK_URL,
+      },
+      {
+        scheme: 'dark, with no dark-mode logo,',
+        isDark: true,
+        logoDark: undefined,
+        shown: MOCK_LOGO_URL,
+      },
+    ])(
+      'shows $shown in the $scheme preview',
+      async ({ isDark, logoDark, shown }) => {
+        renderPreview({
+          values: { logo: { url: MOCK_LOGO_URL }, logoDark: { url: logoDark } },
+        });
+
+        if (isDark) {
+          const darkButton = screen.getByRole('button', {
+            name: PREVIEW_DARK_LABEL,
+          });
+          await user.click(darkButton);
+        }
+
+        sampleLogos().forEach((logo) => {
+          expect(logo).toHaveAttribute('src', shown);
+        });
+      },
+    );
   });
 
   describe('cookie settings', () => {

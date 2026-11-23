@@ -64,6 +64,7 @@ export type TLookFormValues = {
   languageSwitcherStyle: TLanguageSwitcherStyle;
   brandName: string;
   logo: TStagedImage;
+  logoDark: TStagedImage;
   favicon: TStagedImage;
 };
 
@@ -79,5 +80,6 @@ export const defaultLookFormValues = (): TLookFormValues => ({
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
   brandName: '',
   logo: { url: undefined },
+  logoDark: { url: undefined },
   favicon: { url: undefined },
 });

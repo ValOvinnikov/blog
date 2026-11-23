@@ -5,6 +5,10 @@ import { screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
+  pickAndSaveLogo,
+  pickLogo,
+} from '@platform/testing/look/brand-image-interactions';
+import {
   BRAND_IMAGES_HINT,
   EDIT_TAB,
   hueValue,
@@ -14,8 +18,6 @@ import {
 import {
   nudgeAccentHue,
   openLookRow,
-  pickAndSaveLogo,
-  pickLogo,
 } from '@platform/testing/look/look-form-interactions';
 import {
   prepareBrandImageForm,

@@ -1,5 +1,8 @@
 import { faker } from '@faker-js/faker';
+import { FREE_LOOK_FIELDS } from '@platform/testing/look/look-form-fixtures';
 import {
+  MOCK_FAVICON_URL,
+  MOCK_LOGO_DARK_URL,
   MOCK_LOGO_URL,
   MOCK_STAGED_LOGO_BLOB_URL,
 } from '@platform/testing/site-config/fixtures';
@@ -10,6 +13,7 @@ import {
   countChanges,
   isFieldChanged,
   listLostStagedFiles,
+  restoreLookDraft,
 } from './look-form-values';
 
 faker.seed(1);
@@ -19,29 +23,30 @@ const MOCK_LOGO_FILE = new File([faker.lorem.word()], faker.system.fileName(), {
 });
 const MOCK_STAGED_FAVICON_URL = faker.internet.url();
 
+const DEFAULT_VALUES = defaultLookFormValues();
+const WITH_LOGO = { ...DEFAULT_VALUES, logo: { url: MOCK_LOGO_URL } };
+
 describe(isFieldChanged, () => {
   it('treats an equal plain field as unchanged', () => {
-    const a = defaultLookFormValues();
-
-    expect(isFieldChanged('accentHue', a, { ...a })).toBe(false);
+    expect(
+      isFieldChanged('accentHue', DEFAULT_VALUES, { ...DEFAULT_VALUES }),
+    ).toBe(false);
   });
 
   it('treats a different plain field as changed', () => {
-    const a = defaultLookFormValues();
-    const b = { ...a, accentHue: a.accentHue + 1 };
+    const b = { ...DEFAULT_VALUES, accentHue: DEFAULT_VALUES.accentHue + 1 };
 
-    expect(isFieldChanged('accentHue', a, b)).toBe(true);
+    expect(isFieldChanged('accentHue', DEFAULT_VALUES, b)).toBe(true);
   });
 
   it('treats a brand image with the same url and file as unchanged', () => {
-    const a = { ...defaultLookFormValues(), logo: { url: MOCK_LOGO_URL } };
-    const b = { ...a, logo: { url: MOCK_LOGO_URL } };
+    const b = { ...WITH_LOGO, logo: { url: MOCK_LOGO_URL } };
 
-    expect(isFieldChanged('logo', a, b)).toBe(false);
+    expect(isFieldChanged('logo', WITH_LOGO, b)).toBe(false);
   });
 
   it('treats a newly staged file as a change', () => {
-    const a = { ...defaultLookFormValues(), logo: { url: MOCK_LOGO_URL } };
+    const a = WITH_LOGO;
     const b = { ...a, logo: { url: MOCK_LOGO_URL, file: MOCK_LOGO_FILE } };
 
     expect(isFieldChanged('logo', a, b)).toBe(true);
@@ -50,13 +55,11 @@ describe(isFieldChanged, () => {
 
 describe(countChanges, () => {
   it('counts nothing between equal values', () => {
-    const a = defaultLookFormValues();
-
-    expect(countChanges(a, defaultLookFormValues())).toBe(0);
+    expect(countChanges(DEFAULT_VALUES, defaultLookFormValues())).toBe(0);
   });
 
   it('counts each changed field once, brand images included', () => {
-    const a = defaultLookFormValues();
+    const a = DEFAULT_VALUES;
     const b = {
       ...a,
       accentHue: a.accentHue + 1,
@@ -81,5 +84,31 @@ describe(listLostStagedFiles, () => {
 
   it('lists nothing when no file was staged', () => {
     expect(listLostStagedFiles(defaultLookFormValues())).toEqual([]);
+  });
+});
+
+describe(restoreLookDraft, () => {
+  const current = {
+    ...WITH_LOGO,
+    logoDark: { url: MOCK_LOGO_DARK_URL },
+    favicon: { url: MOCK_FAVICON_URL },
+  };
+  const draft = {
+    ...DEFAULT_VALUES,
+    logo: { url: MOCK_STAGED_LOGO_BLOB_URL },
+    logoDark: { url: MOCK_STAGED_LOGO_BLOB_URL },
+    favicon: { url: MOCK_STAGED_FAVICON_URL },
+  };
+
+  it("keeps the form's current brand images over the draft's", () => {
+    const restored = restoreLookDraft(draft, current, {
+      lookFields: FREE_LOOK_FIELDS,
+    });
+
+    expect(restored).toMatchObject({
+      logo: { url: MOCK_LOGO_URL },
+      logoDark: { url: MOCK_LOGO_DARK_URL },
+      favicon: { url: MOCK_FAVICON_URL },
+    });
   });
 });

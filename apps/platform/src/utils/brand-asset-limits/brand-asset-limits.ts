@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const brandAssetKindSchema = z.enum(['logo', 'favicon']);
+export const brandAssetKindSchema = z.enum(['logo', 'logoDark', 'favicon']);
 export type TBrandAssetKind = z.infer<typeof brandAssetKindSchema>;
 
 export const ACCEPTED_IMAGE_MIME_TYPES = [
@@ -12,13 +12,16 @@ export const ACCEPTED_IMAGE_MIME_TYPES = [
 type TAcceptedImageMimeType = (typeof ACCEPTED_IMAGE_MIME_TYPES)[number];
 
 const MB = 1024 * 1024;
+const LOGO_MAX_UPLOAD_BYTES = 4 * MB;
+const LOGO_DIMENSION_BOUNDS_PX = { min: 32, max: 4000 };
 
 // Logos are visual branding rendered at whatever size a template wants;
 // favicons are the browser-tab icon Vercel Blob serves byte-for-byte with no
 // resize step, so its cap stays far tighter than "a few MB" — both are
 // generously above the "tens-of-KB" size either asset actually needs.
 export const MAX_UPLOAD_BYTES: Record<TBrandAssetKind, number> = {
-  logo: 4 * MB,
+  logo: LOGO_MAX_UPLOAD_BYTES,
+  logoDark: LOGO_MAX_UPLOAD_BYTES,
   favicon: 1 * MB,
 };
 
@@ -28,7 +31,8 @@ export const DIMENSION_BOUNDS_PX: Record<
   TBrandAssetKind,
   { min: number; max: number }
 > = {
-  logo: { min: 32, max: 4000 },
+  logo: LOGO_DIMENSION_BOUNDS_PX,
+  logoDark: LOGO_DIMENSION_BOUNDS_PX,
   favicon: { min: 16, max: 512 },
 };
 

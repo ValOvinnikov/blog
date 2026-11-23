@@ -112,14 +112,33 @@ describe(uploadBrandAssetAction, () => {
     delMock.mockReset();
   });
 
-  it('re-resolves the tenant from the session before touching Blob or the db', async () => {
-    await uploadBrandAssetAction(
-      MOCK_TENANT_ID,
-      brandAssetKindSchema.enum.logo,
-      mockImageFormData(),
-    );
+  describe('after a logo upload', () => {
+    beforeEach(async () => {
+      await uploadBrandAssetAction(
+        MOCK_TENANT_ID,
+        brandAssetKindSchema.enum.logo,
+        mockImageFormData(),
+      );
+    });
 
-    expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    it('re-resolves the tenant from the session before touching Blob or the db', () => {
+      expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    });
+
+    it('records one SETTINGS_UPDATED audit event naming the asset and operation', () => {
+      expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
+      expect(insertAuditEventMock).toHaveBeenCalledWith({
+        actorId: MOCK_OPERATOR_ID,
+        action: AUDIT_ACTION.SETTINGS_UPDATED,
+        targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+        targetId: MOCK_TENANT_ID,
+        details: {
+          asset: brandAssetKindSchema.enum.logo,
+          operation: 'upload',
+          url: MOCK_UPLOADED_URL,
+        },
+      });
+    });
   });
 
   it('rejects when no file is present in the form data', async () => {
@@ -184,16 +203,16 @@ describe(uploadBrandAssetAction, () => {
     );
   });
 
-  it('saves the preset and the new logo URL', async () => {
-    await uploadBrandAssetAction(
-      MOCK_TENANT_ID,
-      brandAssetKindSchema.enum.logo,
-      mockImageFormData(),
-    );
+  it.each([
+    { kind: brandAssetKindSchema.enum.logo, column: 'logoAssetUrl' },
+    { kind: brandAssetKindSchema.enum.logoDark, column: 'logoDarkAssetUrl' },
+    { kind: brandAssetKindSchema.enum.favicon, column: 'faviconAssetUrl' },
+  ])('saves the preset and the new $kind URL', async ({ kind, column }) => {
+    await uploadBrandAssetAction(MOCK_TENANT_ID, kind, mockImageFormData());
 
     expect(upsertSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       preset: MOCK_THEME_FIELDS.preset,
-      logoAssetUrl: MOCK_UPLOADED_URL,
+      [column]: MOCK_UPLOADED_URL,
     });
   });
 
@@ -205,27 +224,6 @@ describe(uploadBrandAssetAction, () => {
     );
 
     expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
-  });
-
-  it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
-    await uploadBrandAssetAction(
-      MOCK_TENANT_ID,
-      brandAssetKindSchema.enum.logo,
-      mockImageFormData(),
-    );
-
-    expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
-    expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: MOCK_OPERATOR_ID,
-      action: AUDIT_ACTION.SETTINGS_UPDATED,
-      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: MOCK_TENANT_ID,
-      details: {
-        asset: brandAssetKindSchema.enum.logo,
-        operation: 'upload',
-        url: MOCK_UPLOADED_URL,
-      },
-    });
   });
 
   it('deletes the previous asset after a replace without blocking the result', async () => {

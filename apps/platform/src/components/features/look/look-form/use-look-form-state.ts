@@ -9,14 +9,15 @@ import {
   countChanges,
   isBrandAssetKind,
   listLostStagedFiles,
+  restoreLookDraft,
 } from '@platform/utils/look-form-values/look-form-values';
-import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
 import { buildLookFormContext } from './build-look-form-context';
 import type { TLookFormTenant } from './look-form-tenant';
 import { canSaveLook, lookInvalidControls } from './look-save-checks';
+import { useBrandAssetFieldIds } from './use-brand-asset-field-ids';
 import { useLookDraftFields } from './use-look-draft-fields';
 import { useLookSave } from './use-look-save';
 import { useLookSaveErrors } from './use-look-save-errors';
@@ -44,7 +45,7 @@ export const useLookFormState = ({
   } = tenant;
   const accentHueFieldId = useId();
   const brandNameFieldId = useId();
-  const brandAssetFieldIds = { logo: useId(), favicon: useId() };
+  const brandAssetFieldIds = useBrandAssetFieldIds();
   const toast = useToast();
   const t = useTranslations('lookForm');
   const draftFields = useLookDraftFields();
@@ -88,11 +89,9 @@ export const useLookFormState = ({
       fields: draftFields,
       onRestore: (draftValues) => {
         setRepickKinds(listLostStagedFiles(draftValues));
-        setValues((prev) => ({
-          ...toEffectiveLookWithin(draftValues, { lookFields }),
-          logo: prev.logo,
-          favicon: prev.favicon,
-        }));
+        setValues((prev) =>
+          restoreLookDraft(draftValues, prev, { lookFields }),
+        );
       },
     },
   });

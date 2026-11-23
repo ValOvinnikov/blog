@@ -1,3 +1,4 @@
+import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
   isLookFieldWithin,
@@ -5,7 +6,7 @@ import {
 } from '@shinefold/db/utils/effective-look/effective-look';
 import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 
-export type TLookChoices = Omit<TLookFormValues, 'logo' | 'favicon'>;
+export type TLookChoices = Omit<TLookFormValues, TBrandAssetKind>;
 
 /** A locked field is a change only when it differs from both the stored value and the preset value shown in its place. */
 export const listRefusedLookFields = (

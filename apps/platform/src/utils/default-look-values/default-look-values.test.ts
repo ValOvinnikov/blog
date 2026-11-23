@@ -67,6 +67,7 @@ describe(defaultLookFormValues, () => {
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       brandName: '',
       logo: { url: undefined },
+      logoDark: { url: undefined },
       favicon: { url: undefined },
     });
   });

@@ -796,6 +796,8 @@
     "brandNameTooLong": "Usa {max} caracteres como máximo.",
     "brandNameUnset": "Nombre de la cuenta",
     "logoFieldLabel": "Logotipo",
+    "logoDarkFieldLabel": "Logotipo para el modo oscuro",
+    "logoDarkFieldHint": "Se muestra cuando el lector usa el modo oscuro. Sin él, se usa el logotipo principal.",
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logotipo: PNG, JPEG, WebP o SVG. Favicon: una imagen cuadrada.",
     "optionalTag": "opcional",
@@ -1041,6 +1043,8 @@
     "summaryLogoHue": "Tono del logotipo {hue}",
     "summaryLogoUploaded": "Logotipo subido",
     "summaryNoLogo": "Sin logotipo",
+    "summaryLogoDarkUploaded": "Logotipo para el modo oscuro subido",
+    "summaryNoLogoDark": "Sin logotipo para el modo oscuro",
     "summaryFaviconUploaded": "Favicon subido",
     "summaryNoFavicon": "Sin favicon",
     "cookieSettingsButtonSummary": {
@@ -1172,6 +1176,11 @@
       "upload": "Subir logotipo",
       "replace": "Sustituir logotipo"
     },
+    "logoDark": {
+      "currentAlt": "Logotipo actual para el modo oscuro",
+      "upload": "Subir logotipo para el modo oscuro",
+      "replace": "Sustituir logotipo para el modo oscuro"
+    },
     "favicon": {
       "currentAlt": "Favicon actual",
       "upload": "Subir favicon",
@@ -1202,12 +1211,15 @@
     "emailLogoSvg": "No se admiten logotipos SVG: Gmail, Outlook y Yahoo no muestran SVG en el correo, así que llegaría como una imagen ausente.",
     "emailLogoWebp": "No se admiten logotipos WebP: demasiados clientes de correo no muestran WebP de forma fiable.",
     "emailLogoTypeUnsupported": "Elija una imagen PNG, JPEG o GIF.",
-    "uploadFailed": "No se pudo subir {kind, select, favicon {el favicon} other {el logotipo}}. Vuelva a intentarlo.",
-    "removeFailed": "No se pudo quitar {kind, select, favicon {el favicon} other {el logotipo}}. Vuelva a intentarlo."
+    "uploadFailed": "No se pudo subir {kind, select, favicon {el favicon} logoDark {el logotipo para el modo oscuro} other {el logotipo}}. Vuelva a intentarlo.",
+    "removeFailed": "No se pudo quitar {kind, select, favicon {el favicon} logoDark {el logotipo para el modo oscuro} other {el logotipo}}. Vuelva a intentarlo."
   },
   "brandAssetField": {
     "logo": {
       "pickAgain": "El borrador recuperado tenía un logotipo nuevo que no se pudo conservar: vuelva a elegirlo."
+    },
+    "logoDark": {
+      "pickAgain": "El borrador recuperado tenía un logotipo nuevo para el modo oscuro que no se pudo conservar: vuelva a elegirlo."
     },
     "favicon": {
       "pickAgain": "El borrador recuperado tenía un favicon nuevo que no se pudo conservar: vuelva a elegirlo."
@@ -2663,6 +2675,7 @@
       "cookieSettingsButton": "Botón de configuración de cookies",
       "brandName": "Nombre de la marca",
       "logoAssetUrl": "Imagen del logotipo",
+      "logoDarkAssetUrl": "Imagen del logotipo para el modo oscuro",
       "faviconAssetUrl": "Imagen del favicon"
     }
   },

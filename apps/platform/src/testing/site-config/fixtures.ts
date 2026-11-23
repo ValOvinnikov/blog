@@ -33,6 +33,8 @@ import type { TSiteConfigResult } from '@shinefold/db/queries/site-config';
 
 export const MOCK_LOGO_URL =
   'https://example.blob.vercel-storage.com/brand-logo.png';
+export const MOCK_LOGO_DARK_URL =
+  'https://example.blob.vercel-storage.com/brand-logo-dark.png';
 export const MOCK_FAVICON_URL =
   'https://example.blob.vercel-storage.com/favicon.png';
 export const CURRENT_LOGO = 'Current logo';
@@ -101,6 +103,7 @@ export const mockSiteConfigThemeAndAssets = (
 ): TSiteConfigThemeAndAssets => ({
   ...MOCK_THEME_FIELDS,
   logoAssetUrl: undefined,
+  logoDarkAssetUrl: undefined,
   faviconAssetUrl: undefined,
   ...overrides,
 });
