@@ -44,6 +44,10 @@ export {
   type TOwnerReceiptEmailInput,
 } from './owner-receipt/owner-receipt';
 export {
+  buildOwnerPaymentFailedEmail,
+  type TOwnerPaymentFailedEmailInput,
+} from './owner-payment-failed/owner-payment-failed';
+export {
   buildOwnerNewsletterPausedEmail,
   type TOwnerNewsletterPausedEmailInput,
 } from './owner-newsletter-paused/owner-newsletter-paused';
