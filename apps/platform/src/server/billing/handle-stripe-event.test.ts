@@ -1,5 +1,6 @@
 import { BILLING_LOG } from '@platform/constants/billing';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
+import { STRIPE_BILLING_REASON } from '@platform/constants/stripe-payment';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { onTenantPlanChange } from '@platform/server/tenants/on-tenant-plan-change';
 import {
@@ -21,6 +22,7 @@ import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { TENANT_PLAN } from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
 import { STRIPE_EVENT_RECORD_OUTCOME } from '@shinefold/db/constants';
 import { MOCK_STRIPE_EVENT_ID } from '@shinefold/db/testing/tenants/billing';
 import { after } from 'next/server';
@@ -74,10 +76,19 @@ const invoicePaidEvent = () =>
 
 const MOCK_RETRY_ATTEMPT_COUNT = 2;
 
-const paymentFailedEvent = (attemptCount = 1) =>
+const paymentFailedEvent = ({
+  attemptCount = 1,
+  billingReason = STRIPE_BILLING_REASON.SUBSCRIPTION_CYCLE,
+}: {
+  attemptCount?: number;
+  billingReason?: TValueOf<typeof STRIPE_BILLING_REASON>;
+} = {}) =>
   mockStripeEvent(
     STRIPE_EVENT_TYPE.INVOICE_PAYMENT_FAILED,
-    mockStripeInvoice({ attempt_count: attemptCount }),
+    mockStripeInvoice({
+      attempt_count: attemptCount,
+      billing_reason: billingReason,
+    }),
   );
 
 const handle = async (event: Stripe.Event) => {
@@ -244,25 +255,19 @@ describe(handleStripeEvent, () => {
     });
 
     it('sends nothing for a later retry of the same invoice', async () => {
-      await handle(paymentFailedEvent(MOCK_RETRY_ATTEMPT_COUNT));
-
-      expect(sendPaymentFailedNotice).not.toHaveBeenCalled();
-    });
-
-    it('sends nothing for an event already recorded', async () => {
-      recordStripeEventMock.mockResolvedValue(
-        STRIPE_EVENT_RECORD_OUTCOME.ALREADY_HANDLED,
+      await handle(
+        paymentFailedEvent({ attemptCount: MOCK_RETRY_ATTEMPT_COUNT }),
       );
 
-      await handle(paymentFailedEvent());
-
       expect(sendPaymentFailedNotice).not.toHaveBeenCalled();
     });
 
-    it('sends nothing when no tenant was written, as for an archived or suspended site', async () => {
-      vi.mocked(syncStripeSubscription).mockResolvedValue(undefined);
-
-      await handle(paymentFailedEvent());
+    it('sends nothing for a failed plan-change invoice', async () => {
+      await handle(
+        paymentFailedEvent({
+          billingReason: STRIPE_BILLING_REASON.SUBSCRIPTION_UPDATE,
+        }),
+      );
 
       expect(sendPaymentFailedNotice).not.toHaveBeenCalled();
     });

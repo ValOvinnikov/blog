@@ -10096,6 +10096,22 @@
         "file": "apps/platform/src/constants/stripe-payment.ts"
       }
     ],
+    "subscription_cycle": [
+      {
+        "ref": "STRIPE_BILLING_REASON.SUBSCRIPTION_CYCLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "subscription_update": [
+      {
+        "ref": "STRIPE_BILLING_REASON.SUBSCRIPTION_UPDATE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
     "phase_start": [
       {
         "ref": "STRIPE_BILLING_CYCLE_ANCHOR.PHASE_START",

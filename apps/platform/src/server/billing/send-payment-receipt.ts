@@ -1,8 +1,8 @@
 import 'server-only';
 
 import { BILLING_LOG } from '@platform/constants/billing';
-import { loadBillingEmailOwner } from '@platform/server/billing/load-billing-email-owner';
 import { fromStripeTime } from '@platform/server/billing/stripe-time';
+import { loadOwnerEmailRecipient } from '@platform/server/owner-email/load-owner-email-recipient';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { formatStripeAmount } from '@shinefold/config';
 import { EMAIL_ACCOUNT, type TTenantPlan } from '@shinefold/config/constants';
@@ -20,7 +20,7 @@ export const sendPaymentReceipt = async (
   tenantId: string,
   plan: TTenantPlan,
 ): Promise<void> => {
-  const owner = await loadBillingEmailOwner(tenantId, {
+  const owner = await loadOwnerEmailRecipient(tenantId, {
     unconfigured: BILLING_LOG.RECEIPT_UNCONFIGURED,
     ownerMissing: BILLING_LOG.RECEIPT_OWNER_MISSING,
   });

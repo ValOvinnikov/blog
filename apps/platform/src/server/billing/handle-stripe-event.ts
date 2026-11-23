@@ -2,6 +2,7 @@ import 'server-only';
 
 import { BILLING_LOG } from '@platform/constants/billing';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
+import { STRIPE_BILLING_REASON } from '@platform/constants/stripe-payment';
 import { handleCatalogueEvent } from '@platform/server/billing/catalogue/handle-catalogue-event';
 import { revalidatePlatformSite } from '@platform/server/billing/catalogue/revalidate-platform-site';
 import { releaseAppliedUpdateSchedule } from '@platform/server/billing/release-applied-update-schedule';
@@ -41,7 +42,9 @@ const ownerInvoiceEmailFor = (
   }
   if (
     event.type === STRIPE_EVENT_TYPE.INVOICE_PAYMENT_FAILED &&
-    event.data.object.attempt_count === 1
+    event.data.object.attempt_count === 1 &&
+    event.data.object.billing_reason ===
+      STRIPE_BILLING_REASON.SUBSCRIPTION_CYCLE
   ) {
     const invoice = event.data.object;
     return {

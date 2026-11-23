@@ -1,8 +1,8 @@
 import 'server-only';
 
 import { BILLING_LOG } from '@platform/constants/billing';
-import { loadBillingEmailOwner } from '@platform/server/billing/load-billing-email-owner';
 import { fromStripeTime } from '@platform/server/billing/stripe-time';
+import { loadOwnerEmailRecipient } from '@platform/server/owner-email/load-owner-email-recipient';
 import { env } from '@platform/utils/env/env';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { logger } from '@platform/utils/logger/logger';
@@ -17,11 +17,6 @@ import {
 import { getTranslations } from 'next-intl/server';
 import type Stripe from 'stripe';
 
-const SKIP_LOG = {
-  unconfigured: BILLING_LOG.PAYMENT_FAILED_EMAIL_UNCONFIGURED,
-  ownerMissing: BILLING_LOG.PAYMENT_FAILED_EMAIL_OWNER_MISSING,
-};
-
 export const sendPaymentFailedNotice = async (
   invoice: Stripe.Invoice,
   tenantId: string,
@@ -29,11 +24,14 @@ export const sendPaymentFailedNotice = async (
 ): Promise<void> => {
   const baseUrl = env.PLATFORM_APP_BASE_URL;
   if (!baseUrl) {
-    logger.warn(SKIP_LOG.unconfigured, { tenantId });
+    logger.warn(BILLING_LOG.PAYMENT_FAILED_EMAIL_UNCONFIGURED, { tenantId });
     return;
   }
 
-  const owner = await loadBillingEmailOwner(tenantId, SKIP_LOG);
+  const owner = await loadOwnerEmailRecipient(tenantId, {
+    unconfigured: BILLING_LOG.PAYMENT_FAILED_EMAIL_UNCONFIGURED,
+    ownerMissing: BILLING_LOG.PAYMENT_FAILED_EMAIL_OWNER_MISSING,
+  });
   if (!owner) return;
 
   const {
