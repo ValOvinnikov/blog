@@ -25,6 +25,9 @@ apps/cms/schema.json
 # Turborepo
 .turbo/
 
+# SWC
+.swc/
+
 # Build / type info
 *.tsbuildinfo
 *.tsbuildinfo.*
