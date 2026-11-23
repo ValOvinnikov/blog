@@ -11,6 +11,7 @@ faker.seed(123);
 
 const MOCK_TAGLINE = faker.hacker.phrase();
 const MOCK_SRC = faker.image.url();
+const MOCK_DARK_SRC = faker.image.url();
 
 const setup = customRender(BrandLockup, {});
 
@@ -21,6 +22,27 @@ describe(`<${BrandLockup.name}/>`, () => {
     const mark = screen.getByRole('presentation');
 
     expect(mark).toHaveAttribute('src', MOCK_SRC);
+  });
+
+  it('renders the dark-mode logo beside the main logo when both are given', () => {
+    setup({ src: MOCK_SRC, darkSrc: MOCK_DARK_SRC });
+
+    const marks = screen.getAllByRole('presentation');
+
+    expect(marks.map((mark) => mark.getAttribute('src'))).toEqual([
+      MOCK_SRC,
+      MOCK_DARK_SRC,
+    ]);
+  });
+
+  it('falls back to the initial tile when only a dark-mode logo is given', () => {
+    setup({ siteName: MOCK_SITE_NAME, darkSrc: MOCK_DARK_SRC });
+
+    const image = screen.queryByRole('presentation');
+    const initial = screen.getByText(MOCK_SITE_INITIAL);
+
+    expect(image).not.toBeInTheDocument();
+    expect(initial).toBeInTheDocument();
   });
 
   it('passes the site name to the mark', () => {

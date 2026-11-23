@@ -182,7 +182,7 @@ Props: kind: TAsideKind · label: string · children: ReactNode _(extends IWithC
 ### BrandLockup — `components/molecules/brand-lockup/brand-lockup.tsx`
 
 The brand mark plus an optional monospace tagline, stacked with the mark above.
-Props: src?: string · siteName?: string · size?: TBrandMarkProps['size'] · tagline?: string _(extends IWithClassName, IWithDataTestId)_
+Props: src?: string · darkSrc?: string · siteName?: string · size?: TBrandMarkProps['size'] · tagline?: string _(extends IWithClassName, IWithDataTestId)_
 
 ### Breadcrumbs — `components/molecules/breadcrumbs/breadcrumbs.tsx`
 
