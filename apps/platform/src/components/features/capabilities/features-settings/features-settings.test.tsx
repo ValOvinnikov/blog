@@ -1,7 +1,3 @@
-import {
-  ANALYTICS_FIELD_ERROR,
-  FEATURES_FIELD_ERROR,
-} from '@platform/constants/settings-features';
 import messages from '@platform/i18n/messages/en.json';
 import { grantEntitlementAction } from '@platform/server/entitlement-grants/grant-entitlement-action';
 import { updateAnalyticsAction } from '@platform/server/settings-features/update-analytics-action';
@@ -9,16 +5,10 @@ import {
   updateFeaturesAction,
   type TUpdateFeaturesResult,
 } from '@platform/server/settings-features/update-features-action';
-import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
-import {
-  customRender,
-  screen,
-  waitFor,
-  within,
-} from '@platform/testing/custom-render';
+import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
-import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   ALL_CHANGES_SAVED,
   ARCHIVED_NOTICE_DESCRIPTION,
@@ -27,9 +17,16 @@ import {
   ONE_UNSAVED_CHANGE,
 } from '@platform/testing/render-in-settings-form';
 import {
-  mockFeaturesFormValues,
-  mockSettingsFeaturesValues,
-} from '@platform/testing/settings-features/fixtures';
+  ALL_ENTITLED,
+  CONSENT_BANNER_LABEL,
+  CONTACT_FORM_LABEL,
+  MOCK_INITIAL_FEATURES,
+  planLockedBadge,
+  prepareFeaturesSettings,
+  saveFeaturesSettings,
+  setupFeaturesSettings as setup,
+} from '@platform/testing/settings-features/features-settings-setup';
+import { mockFeaturesFormValues } from '@platform/testing/settings-features/fixtures';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_CREATED_AT,
@@ -43,16 +40,8 @@ import {
   CAPABILITY,
   LOCALE_ISO_CODES,
 } from '@shinefold/config';
-import {
-  ANALYTICS_PROVIDER,
-  TENANT_PLAN,
-  type TTenantPlan,
-} from '@shinefold/config/constants';
-import {
-  MOCK_GOOGLE_ANALYTICS,
-  MOCK_PLAUSIBLE_ANALYTICS,
-} from '@shinefold/db/testing/tenant-analytics/fixtures';
-import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { TENANT_PLAN } from '@shinefold/config/constants';
+import type { UserEvent } from '@testing-library/user-event';
 
 import { FeaturesSettings } from './features-settings';
 
@@ -69,22 +58,12 @@ vi.mock('@platform/server/settings-features/update-analytics-action', () => ({
 const updateFeaturesActionMock = vi.mocked(updateFeaturesAction);
 const updateAnalyticsActionMock = vi.mocked(updateAnalyticsAction);
 
-const ALL_ENTITLED = Object.values(CAPABILITY);
 const MOCK_PARTIAL_ENTITLEMENT = [
   CAPABILITY.READER_ACCOUNTS,
   CAPABILITY.COMMENTS,
   CAPABILITY.RATINGS,
   CAPABILITY.BOOKMARKS,
 ];
-
-const MOCK_INITIAL_FEATURES = mockSettingsFeaturesValues({
-  readerAccountsEnabled: true,
-  commentsEnabled: true,
-  ratingsEnabled: true,
-  bookmarksEnabled: true,
-  contactFormEnabled: true,
-});
-const MOCK_INITIAL_VALUES = mockFeaturesFormValues(MOCK_INITIAL_FEATURES);
 
 const {
   heading,
@@ -95,22 +74,13 @@ const {
   readerAccountNote,
   toggleLabel,
   toggleDescription,
-  analyticsProviderOption,
-  analyticsIdLabel,
-  analyticsIdInvalid,
-  consentBannerRequiredNote,
-  consentBannerRequiredError,
 } = messages.featuresSettings;
 
 const READER_ACCOUNTS_LABEL = toggleLabel[CAPABILITY.READER_ACCOUNTS];
 const BOOKMARKS_LABEL = toggleLabel[CAPABILITY.BOOKMARKS];
-const CONSENT_BANNER_LABEL = toggleLabel[CAPABILITY.CONSENT_BANNER];
-const CONTACT_FORM_LABEL = toggleLabel[CAPABILITY.CONTACT_FORM];
 const { saveBar, grantedBadge } = messages;
 const tGrant = makeEnTranslator('grantEntitlement');
 const tGrantedBadge = makeEnTranslator('grantedBadge');
-const planLockedBadge = (plan: TTenantPlan) =>
-  makeEnTranslator('featuresSettings')('planLockedBadge', { plan });
 const RESTORE_ONE_CHANGE = makeEnTranslator('draftRecovery')('restore', {
   count: 1,
 });
@@ -120,31 +90,15 @@ const toggleContactFormAndSave = async (user: UserEvent) => {
     name: CONTACT_FORM_LABEL,
   });
   await user.click(contactFormSwitch);
-  const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-  await user.click(saveButton);
+  await saveFeaturesSettings(user);
 };
-
-const setup = customRender(FeaturesSettings, {
-  tenantId: MOCK_TENANT_ID,
-  entitledCapabilities: ALL_ENTITLED,
-  grants: mockGrantAccess(),
-  hasOwnAnalytics: true,
-  initialValues: MOCK_INITIAL_VALUES,
-});
 
 describe(`<${FeaturesSettings.name}/>`, () => {
   let user: UserEvent;
-  let refresh: ReturnType<typeof mockRouterRefresh>;
+  let refresh: ReturnType<typeof prepareFeaturesSettings>['refresh'];
 
   beforeEach(() => {
-    user = userEvent.setup();
-    refresh = mockRouterRefresh();
-    updateFeaturesActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
-    updateAnalyticsActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
+    ({ user, refresh } = prepareFeaturesSettings());
   });
 
   describe('with every capability entitled', () => {
@@ -682,286 +636,5 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
     expect(restoredSwitch).not.toBeChecked();
     expect(unsavedRegion).toHaveTextContent(ONE_UNSAVED_CHANGE);
-  });
-
-  describe('the Analytics row', () => {
-    const GOOGLE_ANALYTICS_OPTION =
-      analyticsProviderOption[ANALYTICS_PROVIDER.GOOGLE_ANALYTICS];
-    const PLAUSIBLE_OPTION =
-      analyticsProviderOption[ANALYTICS_PROVIDER.PLAUSIBLE];
-    const MEASUREMENT_ID_LABEL =
-      analyticsIdLabel[ANALYTICS_PROVIDER.GOOGLE_ANALYTICS];
-    const SITE_DOMAIN_LABEL = analyticsIdLabel[ANALYTICS_PROVIDER.PLAUSIBLE];
-    const MOCK_SAVED_ANALYTICS_VALUES = mockFeaturesFormValues({
-      ...MOCK_INITIAL_FEATURES,
-      consentBannerEnabled: true,
-      analyticsProvider: MOCK_GOOGLE_ANALYTICS.provider,
-      analyticsId: MOCK_GOOGLE_ANALYTICS.analyticsId,
-    });
-
-    const saveChanges = async () => {
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-      await user.click(saveButton);
-    };
-
-    describe('with no id saved', () => {
-      beforeEach(() => {
-        setup();
-      });
-
-      it('saves a new Google Analytics id without re-saving the toggles', async () => {
-        const idField = screen.getByRole('textbox', {
-          name: MEASUREMENT_ID_LABEL,
-        });
-
-        await user.type(idField, MOCK_GOOGLE_ANALYTICS.analyticsId);
-        await saveChanges();
-        const toast = await screen.findByText(alertSuccess);
-
-        expect(updateAnalyticsActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-          analyticsProvider: MOCK_GOOGLE_ANALYTICS.provider,
-          analyticsId: MOCK_GOOGLE_ANALYTICS.analyticsId,
-        });
-        expect(updateFeaturesActionMock).not.toHaveBeenCalled();
-        expect(toast).toBeVisible();
-      });
-
-      it('asks for a site domain once Plausible is picked, and saves it', async () => {
-        const plausibleOption = screen.getByRole('button', {
-          name: PLAUSIBLE_OPTION,
-        });
-
-        await user.click(plausibleOption);
-        const domainField = screen.getByRole('textbox', {
-          name: SITE_DOMAIN_LABEL,
-        });
-        await user.type(domainField, MOCK_PLAUSIBLE_ANALYTICS.analyticsId);
-        await saveChanges();
-
-        expect(updateAnalyticsActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-          analyticsProvider: MOCK_PLAUSIBLE_ANALYTICS.provider,
-          analyticsId: MOCK_PLAUSIBLE_ANALYTICS.analyticsId,
-        });
-      });
-    });
-
-    it('keeps a saved id saved when the toggles then fail', async () => {
-      updateFeaturesActionMock.mockResolvedValueOnce({
-        outcome: ACTION_OUTCOME.SERVER_ERROR,
-      });
-      setup();
-      const idField = screen.getByRole('textbox', {
-        name: MEASUREMENT_ID_LABEL,
-      });
-      const contactFormSwitch = screen.getByRole('switch', {
-        name: CONTACT_FORM_LABEL,
-      });
-
-      await user.type(idField, MOCK_GOOGLE_ANALYTICS.analyticsId);
-      await user.click(contactFormSwitch);
-      await saveChanges();
-      await screen.findByRole('alert');
-      const discardButton = screen.getByRole('button', {
-        name: saveBar.discard,
-      });
-      await user.click(discardButton);
-
-      expect(idField).toHaveValue(MOCK_GOOGLE_ANALYTICS.analyticsId);
-      expect(contactFormSwitch).toBeChecked();
-    });
-
-    it('saves a cleared id', async () => {
-      setup({ initialValues: MOCK_SAVED_ANALYTICS_VALUES });
-      const idField = screen.getByRole('textbox', {
-        name: MEASUREMENT_ID_LABEL,
-      });
-
-      await user.clear(idField);
-      await saveChanges();
-
-      expect(updateAnalyticsActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-        analyticsProvider: MOCK_GOOGLE_ANALYTICS.provider,
-        analyticsId: '',
-      });
-    });
-
-    describe('when the id is refused as malformed', () => {
-      let idField: HTMLElement;
-
-      beforeEach(async () => {
-        updateAnalyticsActionMock.mockResolvedValueOnce({
-          outcome: ACTION_OUTCOME.INVALID,
-          fieldErrors: {
-            analyticsId: { reason: ANALYTICS_FIELD_ERROR.ID_INVALID },
-          },
-        });
-        setup();
-        idField = screen.getByRole('textbox', { name: MEASUREMENT_ID_LABEL });
-
-        await user.type(idField, MOCK_PLAUSIBLE_ANALYTICS.analyticsId);
-        await saveChanges();
-        await waitFor(() => {
-          expect(idField).toBeEnabled();
-        });
-      });
-
-      it("describes the field with what the provider's id looks like", async () => {
-        await waitFor(() => {
-          expect(idField).toHaveAccessibleDescription(
-            expect.stringContaining(
-              analyticsIdInvalid[ANALYTICS_PROVIDER.GOOGLE_ANALYTICS],
-            ),
-          );
-        });
-      });
-
-      it('saves none of the toggles', () => {
-        expect(updateFeaturesActionMock).not.toHaveBeenCalled();
-      });
-
-      it('withdraws the message on the next keystroke', async () => {
-        await user.type(idField, MOCK_GOOGLE_ANALYTICS.analyticsId);
-        const message = screen.queryByText(
-          analyticsIdInvalid[ANALYTICS_PROVIDER.GOOGLE_ANALYTICS],
-        );
-
-        expect(message).not.toBeInTheDocument();
-      });
-    });
-
-    describe('with a Google Analytics id saved', () => {
-      let consentSwitch: HTMLElement;
-
-      beforeEach(() => {
-        setup({ initialValues: MOCK_SAVED_ANALYTICS_VALUES });
-        consentSwitch = screen.getByRole('switch', {
-          name: CONSENT_BANNER_LABEL,
-        });
-      });
-
-      it('locks the consent banner on, with the reason', () => {
-        const note = screen.getByText(consentBannerRequiredNote);
-
-        expect(consentSwitch).toBeChecked();
-        expect(consentSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(note).toBeVisible();
-      });
-
-      it('unlocks the consent banner once Plausible is picked', async () => {
-        const plausibleOption = screen.getByRole('button', {
-          name: PLAUSIBLE_OPTION,
-        });
-
-        await user.click(plausibleOption);
-        const note = screen.queryByText(consentBannerRequiredNote);
-
-        expect(consentSwitch).not.toHaveAttribute(ARIA_DISABLED);
-        expect(note).not.toBeInTheDocument();
-      });
-
-      it('lets the consent banner be switched off once the id is cleared', async () => {
-        const idField = screen.getByRole('textbox', {
-          name: MEASUREMENT_ID_LABEL,
-        });
-
-        await user.clear(idField);
-        await user.click(consentSwitch);
-
-        expect(consentSwitch).not.toBeChecked();
-      });
-    });
-
-    it('switches the consent banner on for a typed Google Analytics id', async () => {
-      setup();
-      const idField = screen.getByRole('textbox', {
-        name: MEASUREMENT_ID_LABEL,
-      });
-      const consentSwitch = screen.getByRole('switch', {
-        name: CONSENT_BANNER_LABEL,
-      });
-
-      await user.type(idField, MOCK_GOOGLE_ANALYTICS.analyticsId);
-      await saveChanges();
-      await screen.findByText(alertSuccess);
-
-      expect(consentSwitch).toBeChecked();
-      expect(updateFeaturesActionMock).not.toHaveBeenCalled();
-    });
-
-    it('explains a refused consent banner switch-off', async () => {
-      updateFeaturesActionMock.mockResolvedValueOnce({
-        outcome: ACTION_OUTCOME.INVALID,
-        fieldErrors: {
-          consentBannerEnabled: {
-            reason: FEATURES_FIELD_ERROR.CONSENT_BANNER_REQUIRED,
-          },
-        },
-      });
-      setup({
-        initialValues: mockFeaturesFormValues({
-          ...MOCK_INITIAL_FEATURES,
-          consentBannerEnabled: true,
-        }),
-      });
-      const consentSwitch = screen.getByRole('switch', {
-        name: CONSENT_BANNER_LABEL,
-      });
-
-      await user.click(consentSwitch);
-      await saveChanges();
-      const message = await screen.findByText(consentBannerRequiredError);
-
-      expect(message).toBeVisible();
-    });
-
-    describe('on a plan without its own analytics', () => {
-      let plausibleOption: HTMLElement;
-
-      beforeEach(() => {
-        setup({
-          hasOwnAnalytics: false,
-          initialValues: MOCK_SAVED_ANALYTICS_VALUES,
-        });
-        plausibleOption = screen.getByRole('button', {
-          name: PLAUSIBLE_OPTION,
-        });
-      });
-
-      it('leaves the consent banner unlocked', () => {
-        const consentSwitch = screen.getByRole('switch', {
-          name: CONSENT_BANNER_LABEL,
-        });
-        const note = screen.queryByText(consentBannerRequiredNote);
-
-        expect(consentSwitch).not.toHaveAttribute(ARIA_DISABLED);
-        expect(note).not.toBeInTheDocument();
-      });
-
-      it('shows the kept id read-only', () => {
-        const idField = screen.getByRole('textbox', {
-          name: MEASUREMENT_ID_LABEL,
-        });
-
-        expect(idField).toHaveValue(MOCK_GOOGLE_ANALYTICS.analyticsId);
-        expect(idField).toHaveAttribute('readonly');
-      });
-
-      it('locks the provider choice and badges the cheapest plan with it', () => {
-        const badge = screen.getByText(planLockedBadge(TENANT_PLAN.STARTER));
-
-        expect(plausibleOption).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(badge).toBeVisible();
-      });
-
-      it('keeps the provider when a locked option is pressed', async () => {
-        await user.click(plausibleOption);
-
-        const googleOption = screen.getByRole('button', {
-          name: GOOGLE_ANALYTICS_OPTION,
-        });
-
-        expect(googleOption).toHaveAttribute(ARIA_PRESSED, 'true');
-      });
-    });
   });
 });
