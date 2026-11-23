@@ -6,7 +6,11 @@ import {
   PRESET_ID,
   TENANT_PLAN,
 } from '@shinefold/config/constants';
-import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@shinefold/db/constants';
+import {
+  ADMIN_ROLE,
+  EMAIL_TEMPLATE_DEFAULT_COPY,
+} from '@shinefold/db/constants';
+import type { TPendingAdminInviteWithInviter } from '@shinefold/db/queries/admin-invites/find-pending-admin-invite';
 import type { TEmailConfigResult } from '@shinefold/db/queries/email-config/get-email-config/get-email-config';
 import type { TEmailTemplateResult } from '@shinefold/db/queries/email-templates/get-email-template/get-email-template';
 import type { TTenant } from '@shinefold/db/schema/tenants';
@@ -16,6 +20,8 @@ export const MOCK_OTHER_TENANT_ID = faker.string.uuid();
 export const MOCK_TENANT_NAME = faker.lorem.words(2);
 export const MOCK_INVITE_ID = faker.string.uuid();
 export const MOCK_OTHER_INVITE_ID = faker.string.uuid();
+export const MOCK_INVITER_NAME = faker.person.fullName();
+export const MOCK_INVITER_EMAIL = faker.internet.exampleEmail();
 export const MOCK_DB_ERROR_MESSAGE = faker.lorem.sentence();
 export const MOCK_TOKEN = faker.string.alphanumeric(32);
 export const MOCK_READER_EMAIL = faker.internet.exampleEmail();
@@ -56,6 +62,15 @@ export const mockPendingInvite = (
 ) => ({
   id: MOCK_INVITE_ID,
   tenantId: MOCK_TENANT_ID,
+  ...overrides,
+});
+
+export const mockPendingAdminInvite = (
+  overrides: Partial<TPendingAdminInviteWithInviter> = {},
+): TPendingAdminInviteWithInviter => ({
+  role: ADMIN_ROLE.SUPERADMIN,
+  inviterName: MOCK_INVITER_NAME,
+  inviterEmail: MOCK_INVITER_EMAIL,
   ...overrides,
 });
 

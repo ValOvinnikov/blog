@@ -19,6 +19,7 @@ import {
   MOCK_TOKEN,
   mockEmailConfig,
   mockEmailTemplate,
+  mockPendingAdminInvite,
   mockPendingInvite,
   mockTenant,
 } from '@shinefold/auth/testing/magic-link-fixtures';
@@ -113,6 +114,7 @@ const defaultCopyIn = (locale: TLocaleIsoCode, templateType: string) =>
   ];
 
 const {
+  findPendingAdminInviteMock,
   findPendingInviteByEmailMock,
   listTenantsByIdsMock,
   getTenantByDomainMock,
@@ -128,6 +130,7 @@ const {
   recordEmailSendMock,
   recordPlatformEmailSendMock,
 } = vi.hoisted(() => ({
+  findPendingAdminInviteMock: vi.fn(),
   findPendingInviteByEmailMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
@@ -158,6 +161,7 @@ vi.mock(
 
 vi.mock('@shinefold/db', async () => ({
   queries: {
+    adminInvites: { findPendingAdminInvite: findPendingAdminInviteMock },
     membershipInvites: {
       findPendingInviteByEmail: findPendingInviteByEmailMock,
     },
@@ -231,6 +235,7 @@ describe(buildMagicLinkProvider, () => {
 
   beforeEach(() => {
     vi.stubEnv('MAGIC_LINK_FROM_ADDRESS', MOCK_FROM_ADDRESS);
+    findPendingAdminInviteMock.mockResolvedValue(undefined);
     findPendingInviteByEmailMock.mockResolvedValue([]);
     getTenantByDomainMock.mockResolvedValue(undefined);
     listResolvableEntitlementGrantsMock.mockResolvedValue([]);
@@ -378,6 +383,32 @@ describe(buildMagicLinkProvider, () => {
       const { subject, html } = sentEmail();
       expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
       expect(html).not.toContain(MOCK_TENANT_NAME);
+    });
+  });
+
+  describe('with a pending admin invite', () => {
+    beforeEach(() => {
+      findPendingAdminInviteMock.mockResolvedValue(mockPendingAdminInvite());
+      withPendingInvite();
+    });
+
+    it('sends only the admin-invite email from the platform', async () => {
+      await sendVerificationRequestFor(buildPlatformProvider(), {
+        identifier: MOCK_INVITED_EMAIL,
+        url: PLATFORM_CALLBACK_URL,
+      });
+
+      expect(sendEmailMock).toHaveBeenCalledOnce();
+      expect(sentEmail().subject).not.toBe(TENANT_INVITE_DEFAULTS.subject);
+      expect(findPendingInviteByEmailMock).not.toHaveBeenCalled();
+    });
+
+    it("never looks it up for a site's sign-in", async () => {
+      await sendVerificationRequestFor(provider, {
+        identifier: MOCK_INVITED_EMAIL,
+      });
+
+      expect(findPendingAdminInviteMock).not.toHaveBeenCalled();
     });
   });
 

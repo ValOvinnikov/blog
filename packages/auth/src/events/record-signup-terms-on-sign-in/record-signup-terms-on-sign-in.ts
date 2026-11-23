@@ -1,4 +1,4 @@
-import type { TSignInEventUser } from '@shinefold/auth/events/consume-pending-invites-on-sign-in';
+import type { TSignInEventUser } from '@shinefold/auth/events/consume-pending-invites-on-sign-in/consume-pending-invites-on-sign-in';
 import {
   SIGNUP_TERMS_COOKIE_NAME,
   TERMS_VERSION,

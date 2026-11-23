@@ -7,6 +7,7 @@ import {
   SIGNUP_TERMS_COOKIE_NAME,
   TERMS_VERSION,
 } from '@shinefold/config/constants';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 import { recordSignupTermsOnSignIn } from './record-signup-terms-on-sign-in';
 
@@ -27,7 +28,7 @@ const MOCK_OLDER_TERMS_VERSION = '2020-01-01';
 const withSignupCookie = (value?: string) => {
   cookiesMock.mockResolvedValue({
     get: (name: string) =>
-      name === SIGNUP_TERMS_COOKIE_NAME && value !== undefined
+      name === SIGNUP_TERMS_COOKIE_NAME && !isUndefined(value)
         ? { name, value }
         : undefined,
   });

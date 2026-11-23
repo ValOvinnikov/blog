@@ -34,19 +34,36 @@ vi.mock('@auth/drizzle-adapter', () => ({
   DrizzleAdapter: vi.fn(() => drizzleAdapterStub),
 }));
 
-const { consumePendingInvitesOnSignInMock, recordSignupTermsOnSignInMock } =
-  vi.hoisted(() => ({
-    consumePendingInvitesOnSignInMock: vi.fn(),
-    recordSignupTermsOnSignInMock: vi.fn(),
-  }));
-
-vi.mock('@shinefold/auth/events/consume-pending-invites-on-sign-in', () => ({
-  consumePendingInvitesOnSignIn: consumePendingInvitesOnSignInMock,
+const {
+  consumePendingInvitesOnSignInMock,
+  consumeAdminInviteOnSignInMock,
+  recordSignupTermsOnSignInMock,
+} = vi.hoisted(() => ({
+  consumePendingInvitesOnSignInMock: vi.fn(),
+  consumeAdminInviteOnSignInMock: vi.fn(),
+  recordSignupTermsOnSignInMock: vi.fn(),
 }));
 
-vi.mock('@shinefold/auth/events/record-signup-terms-on-sign-in', () => ({
-  recordSignupTermsOnSignIn: recordSignupTermsOnSignInMock,
-}));
+vi.mock(
+  '@shinefold/auth/events/consume-pending-invites-on-sign-in/consume-pending-invites-on-sign-in',
+  () => ({
+    consumePendingInvitesOnSignIn: consumePendingInvitesOnSignInMock,
+  }),
+);
+
+vi.mock(
+  '@shinefold/auth/events/consume-admin-invite-on-sign-in/consume-admin-invite-on-sign-in',
+  () => ({
+    consumeAdminInviteOnSignIn: consumeAdminInviteOnSignInMock,
+  }),
+);
+
+vi.mock(
+  '@shinefold/auth/events/record-signup-terms-on-sign-in/record-signup-terms-on-sign-in',
+  () => ({
+    recordSignupTermsOnSignIn: recordSignupTermsOnSignInMock,
+  }),
+);
 
 const MOCK_SIGNED_IN_USER = { id: MOCK_USER_ID, email: MOCK_EMAIL };
 const MAGIC_LINK_HANDLERS = { onSendRefused: vi.fn() };
@@ -270,6 +287,7 @@ describe(buildAuthConfig, () => {
       });
 
       expect(consumePendingInvitesOnSignInMock).not.toHaveBeenCalled();
+      expect(consumeAdminInviteOnSignInMock).not.toHaveBeenCalled();
       expect(recordSignupTermsOnSignInMock).not.toHaveBeenCalled();
     });
   });
@@ -281,13 +299,16 @@ describe(buildAuthConfig, () => {
       config = buildAuthConfig(AUTH_APP.PLATFORM, MAGIC_LINK_HANDLERS);
     });
 
-    it('consumes pending invites and records signup terms on sign-in', async () => {
+    it('consumes team and admin invites and records signup terms on sign-in', async () => {
       await config.events?.signIn?.({
         user: MOCK_SIGNED_IN_USER,
         isNewUser: true,
       });
 
       expect(consumePendingInvitesOnSignInMock).toHaveBeenCalledWith({
+        user: MOCK_SIGNED_IN_USER,
+      });
+      expect(consumeAdminInviteOnSignInMock).toHaveBeenCalledWith({
         user: MOCK_SIGNED_IN_USER,
       });
       expect(recordSignupTermsOnSignInMock).toHaveBeenCalledWith({

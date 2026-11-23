@@ -1,11 +1,9 @@
-import {
-  findPendingInviteTenants,
-  type TPendingInviteTenant,
-} from '@shinefold/auth/providers/magic-link/find-pending-invite-tenants/find-pending-invite-tenants';
+import { findPendingInviteTenantsOrNone } from '@shinefold/auth/providers/magic-link/find-pending-invite-tenants/find-pending-invite-tenants';
 import { recordMagicLinkSendSafely } from '@shinefold/auth/providers/magic-link/record-magic-link-send-safely/record-magic-link-send-safely';
 import { resolveMagicLinkEmailSettings } from '@shinefold/auth/providers/magic-link/resolve-magic-link-email-settings/resolve-magic-link-email-settings';
 import { resolveRecipientLocale } from '@shinefold/auth/providers/magic-link/resolve-recipient-locale/resolve-recipient-locale';
 import { resolveTenantEmailIdentity } from '@shinefold/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
+import { sendPendingAdminInviteEmail } from '@shinefold/auth/providers/magic-link/send-admin-invite-magic-link-email/send-admin-invite-magic-link-email';
 import {
   AUTH_APP,
   EMAIL_ACCOUNT,
@@ -39,8 +37,20 @@ export async function sendMagicLinkEmail({
   url,
   onSendCountFailed,
 }: TMagicLinkEmailRequest): Promise<void> {
-  const { host } = new URL(url);
   const isSentByPlatform = app === AUTH_APP.PLATFORM;
+  if (
+    isSentByPlatform &&
+    (await sendPendingAdminInviteEmail({
+      from,
+      identifier,
+      url,
+      onSendCountFailed,
+    }))
+  ) {
+    return;
+  }
+
+  const { host } = new URL(url);
   const inviteTenants = isSentByPlatform
     ? await findPendingInviteTenantsOrNone(identifier)
     : [];
@@ -107,16 +117,5 @@ export async function sendMagicLinkEmail({
       },
       onSendCountFailed,
     );
-  }
-}
-
-async function findPendingInviteTenantsOrNone(
-  identifier: string,
-): Promise<TPendingInviteTenant[]> {
-  try {
-    return await findPendingInviteTenants(identifier);
-  } catch {
-    // A failed lookup must not block delivery: it degrades to the generic copy.
-    return [];
   }
 }
