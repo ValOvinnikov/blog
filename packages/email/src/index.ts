@@ -67,6 +67,10 @@ export {
   type TOwnerUsageRow,
 } from './templates/owner';
 export {
+  buildAdminInviteEmail,
+  type TAdminInviteEmailInput,
+} from './templates/platform';
+export {
   buildMagicLinkEmail,
   type TMagicLinkEmailInput,
   type TMagicLinkEmailContent,
