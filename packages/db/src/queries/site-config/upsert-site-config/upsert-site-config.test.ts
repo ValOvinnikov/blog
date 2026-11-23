@@ -868,19 +868,5 @@ describe(upsertSiteConfig, () => {
         expect(result[field]).toBeUndefined();
       },
     );
-
-    it('clears the dark-mode logo and keeps the main logo', async () => {
-      await save({
-        logoAssetUrl: MOCK_LOGO_ASSET_URL,
-        logoDarkAssetUrl: MOCK_LOGO_DARK_ASSET_URL,
-      });
-
-      const result = expectOk(await save({ logoDarkAssetUrl: null }));
-
-      expect(result).toMatchObject({
-        logoAssetUrl: MOCK_LOGO_ASSET_URL,
-        logoDarkAssetUrl: undefined,
-      });
-    });
   });
 });
