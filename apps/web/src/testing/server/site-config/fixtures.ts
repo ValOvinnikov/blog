@@ -71,6 +71,7 @@ export const mockSiteConfig = (
   footerSurface: FOOTER_SURFACE.FULL_WIDTH,
   cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN,
   logoAssetUrl: undefined,
+  logoDarkAssetUrl: undefined,
   faviconAssetUrl: undefined,
   voiceOverridesByLocale: {},
   voiceOverrides: {},

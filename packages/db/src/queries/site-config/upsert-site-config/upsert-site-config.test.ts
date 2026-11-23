@@ -104,6 +104,7 @@ const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_TOPIC_EMPTY_TEXT = faker.lorem.sentence();
 const MOCK_UNKNOWN_PLACEHOLDER_TEXT = `${faker.lorem.words(2)} {${MOCK_UNKNOWN_VALUE}}`;
 const MOCK_LOGO_ASSET_URL = faker.internet.url();
+const MOCK_LOGO_DARK_ASSET_URL = faker.internet.url();
 const MOCK_FAVICON_ASSET_URL = faker.internet.url();
 const MOCK_LINK_HREF = faker.internet.url();
 const MOCK_MULTILINE_TEXT = `${faker.lorem.word()}\n${faker.lorem.word()}`;
@@ -322,6 +323,7 @@ const OPTIONAL_COLUMNS = [
   { field: 'logoHue', value: MOCK_LOGO_HUE },
   { field: 'brandName', value: MOCK_BRAND_NAME },
   { field: 'logoAssetUrl', value: MOCK_LOGO_ASSET_URL },
+  { field: 'logoDarkAssetUrl', value: MOCK_LOGO_DARK_ASSET_URL },
   { field: 'faviconAssetUrl', value: MOCK_FAVICON_ASSET_URL },
 ] as const;
 
@@ -403,6 +405,7 @@ describe(upsertSiteConfig, () => {
       logoHue: undefined,
       brandName: undefined,
       logoAssetUrl: undefined,
+      logoDarkAssetUrl: undefined,
       faviconAssetUrl: undefined,
       lookSavedAt: undefined,
       voiceSavedAt: undefined,
@@ -865,5 +868,19 @@ describe(upsertSiteConfig, () => {
         expect(result[field]).toBeUndefined();
       },
     );
+
+    it('clears the dark-mode logo and keeps the main logo', async () => {
+      await save({
+        logoAssetUrl: MOCK_LOGO_ASSET_URL,
+        logoDarkAssetUrl: MOCK_LOGO_DARK_ASSET_URL,
+      });
+
+      const result = expectOk(await save({ logoDarkAssetUrl: null }));
+
+      expect(result).toMatchObject({
+        logoAssetUrl: MOCK_LOGO_ASSET_URL,
+        logoDarkAssetUrl: undefined,
+      });
+    });
   });
 });

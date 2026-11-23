@@ -43,6 +43,7 @@ faker.seed(5052);
 const MOCK_LOGO_HUE = MOCK_ACCENT_HUE - 1;
 const MOCK_BRAND_NAME = faker.company.name();
 const MOCK_LOGO_ASSET_URL = faker.internet.url();
+const MOCK_LOGO_DARK_ASSET_URL = faker.internet.url();
 const MOCK_FAVICON_ASSET_URL = faker.internet.url();
 
 const STORED_LOOK: TLook = {
@@ -77,6 +78,7 @@ const STORED_LOOK: TLook = {
   cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
   brandName: MOCK_BRAND_NAME,
   logoAssetUrl: MOCK_LOGO_ASSET_URL,
+  logoDarkAssetUrl: MOCK_LOGO_DARK_ASSET_URL,
   faviconAssetUrl: MOCK_FAVICON_ASSET_URL,
 };
 
@@ -125,6 +127,7 @@ describe(toEffectiveLookWithin, () => {
       cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
       brandName: MOCK_BRAND_NAME,
       logoAssetUrl: MOCK_LOGO_ASSET_URL,
+      logoDarkAssetUrl: MOCK_LOGO_DARK_ASSET_URL,
       faviconAssetUrl: MOCK_FAVICON_ASSET_URL,
     });
   });

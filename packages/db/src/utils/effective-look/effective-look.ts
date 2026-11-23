@@ -18,6 +18,7 @@ function presetLook(preset: TPresetId): TLook {
     languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
     brandName: undefined,
     logoAssetUrl: undefined,
+    logoDarkAssetUrl: undefined,
     faviconAssetUrl: undefined,
   };
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "site_config" ADD COLUMN "logo_dark_asset_url" text;

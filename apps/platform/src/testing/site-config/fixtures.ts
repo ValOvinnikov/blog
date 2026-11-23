@@ -85,6 +85,7 @@ export const mockSiteConfig = (
   cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN,
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
   logoAssetUrl: undefined,
+  logoDarkAssetUrl: undefined,
   faviconAssetUrl: undefined,
   voiceOverridesByLocale: {},
   voiceOverrides: {},

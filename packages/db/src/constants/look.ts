@@ -34,6 +34,7 @@ export const LOOK_FIELD = {
   COOKIE_SETTINGS_BUTTON: 'cookieSettingsButton',
   BRAND_NAME: 'brandName',
   LOGO_ASSET_URL: 'logoAssetUrl',
+  LOGO_DARK_ASSET_URL: 'logoDarkAssetUrl',
   FAVICON_ASSET_URL: 'faviconAssetUrl',
 } as const satisfies Record<string, keyof TSiteConfig>;
 
