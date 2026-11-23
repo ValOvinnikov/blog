@@ -20,7 +20,7 @@
     "@shinefold/config": "workspace:*",
     "@shinefold/utils": "workspace:*",
     "@t3-oss/env-core": "^0.13.11",
-    "resend": "^6.33.0",
+    "resend": "^6.39.0",
     "server-only": "^0.0.1",
     "zod": "catalog:"
   },

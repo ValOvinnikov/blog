@@ -8232,6 +8232,22 @@
         "file": "apps/platform/src/constants/github.ts"
       }
     ],
+    "/api/growth-layer/apply": [
+      {
+        "ref": "GROWTH_LAYER_PATH.APPLY",
+        "scope": "app:platform",
+        "from": "@platform/constants/growth-layer",
+        "file": "apps/platform/src/constants/growth-layer.ts"
+      }
+    ],
+    "growth_layer.apply_enqueue_rejected": [
+      {
+        "ref": "GROWTH_LAYER_LOG.APPLY_ENQUEUE_REJECTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/growth-layer",
+        "file": "apps/platform/src/constants/growth-layer.ts"
+      }
+    ],
     "RAINBOW": [
       {
         "ref": "HUE_SLIDER_TRACK.RAINBOW",

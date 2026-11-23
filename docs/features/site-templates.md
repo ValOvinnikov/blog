@@ -53,7 +53,7 @@ No route of its own. The seeded documents are what the public site renders and w
 - **Create-if-missing, everywhere.** Sanity documents use `createIfNotExists`; `site_config` uses an insert that does nothing when a row exists. A re-run never overwrites an owner's content or look.
 - **Seeding runs once per dataset.** The seed step skips a dataset that already has a `settings_site`, so changing a tenant's type later adds nothing; "change type" is future work.
 - **Every seeded document is schema-valid.** The Free layouts need no image: no Blog or Blank field needs one, and the hero renders without media. A Growth layer's images are the placeholder SVGs the worker uploads.
-- **Growth layers apply at provisioning and on upgrade.** The worker's `POST /api/growth-layer/apply` runs the same layer on an already-provisioned site; the platform's plan change does not call it yet (#5714).
+- **Growth layers apply at provisioning and on upgrade.** The worker's `POST /api/growth-layer/apply` runs the same layer on an already-provisioned site, and every plan change that reaches the `GROWTH` module pack calls it ([plans and entitlements](./plans-and-entitlements.md)).
 
 ## Growth layer
 

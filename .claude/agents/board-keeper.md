@@ -384,7 +384,7 @@ Step 5 report.
    Progress → confirm, nothing to write. Further along (Code Review, Done —
    a mis-triggered re-run) → leave it; that would be a backward move.
 3. Check for a parent: `mcp__github__issue_read` (`method: get_parent`,
-   `owner: ValOvinnikov`, `repo: blog`, `issue_number: <n>`), or
+   `owner: ValOvinnikov`, `repo: sf-mono`, `issue_number: <n>`), or
    `gh issue view <n> --json parent` when the MCP server is unavailable.
    None → done. Never skip this check because one path failed.
 4. Resolve the parent's item ID the same way. Todo or blank → promote to In
