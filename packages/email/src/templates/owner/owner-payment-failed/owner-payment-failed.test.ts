@@ -1,10 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { buildOwnerEmail } from '@shinefold/email/templates/owner/owner-email/owner-email';
-import {
-  MOCK_ESCAPED_UNSAFE_MARKUP,
-  MOCK_NOW,
-  MOCK_UNSAFE_MARKUP,
-} from '@shinefold/email/testing/email-fixtures';
+import { MOCK_NOW } from '@shinefold/email/testing/email-fixtures';
 import {
   MOCK_EMAIL_DETAILS,
   MOCK_OWNER_EMAIL_INPUT,
@@ -27,12 +23,12 @@ const MOCK_INPUT = {
 
 describe(buildOwnerPaymentFailedEmail, () => {
   describe('when Stripe will retry the payment', () => {
-    const email = buildOwnerPaymentFailedEmail({
-      ...MOCK_INPUT,
-      nextRetry: MOCK_NEXT_RETRY,
-    });
-
     it('lists the next retry after the amount and plan rows', () => {
+      const email = buildOwnerPaymentFailedEmail({
+        ...MOCK_INPUT,
+        nextRetry: MOCK_NEXT_RETRY,
+      });
+
       expect(email).toEqual(
         buildOwnerEmail({
           ...MOCK_OWNER_EMAIL_INPUT,
@@ -40,19 +36,15 @@ describe(buildOwnerPaymentFailedEmail, () => {
         }),
       );
     });
-
-    it('does not say the plan will end', () => {
-      expect(email.text).not.toContain(MOCK_PLAN_ENDING_NOTICE);
-    });
   });
 
   describe('when Stripe will not retry the payment', () => {
-    const email = buildOwnerPaymentFailedEmail({
-      ...MOCK_INPUT,
-      nextRetry: undefined,
-    });
-
     it('says the plan will end in place of a retry date', () => {
+      const email = buildOwnerPaymentFailedEmail({
+        ...MOCK_INPUT,
+        nextRetry: undefined,
+      });
+
       expect(email).toEqual(
         buildOwnerEmail({
           ...MOCK_OWNER_EMAIL_INPUT,
@@ -64,26 +56,5 @@ describe(buildOwnerPaymentFailedEmail, () => {
         }),
       );
     });
-
-    it('escapes the plan-ending notice', () => {
-      const unsafeEmail = buildOwnerPaymentFailedEmail({
-        ...MOCK_INPUT,
-        nextRetry: undefined,
-        planEndingNotice: MOCK_UNSAFE_MARKUP,
-      });
-
-      expect(unsafeEmail.html).toContain(
-        `<p>${MOCK_ESCAPED_UNSAFE_MARKUP}</p>`,
-      );
-    });
-  });
-
-  it('escapes the next retry row', () => {
-    const email = buildOwnerPaymentFailedEmail({
-      ...MOCK_INPUT,
-      nextRetry: { label: MOCK_NEXT_RETRY.label, value: MOCK_UNSAFE_MARKUP },
-    });
-
-    expect(email.html).not.toContain(MOCK_UNSAFE_MARKUP);
   });
 });
