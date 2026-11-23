@@ -2,10 +2,9 @@ import { TenantDangerPageContent } from '@platform/components/features/tenants/t
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
+import { resolveCurrentDeprovisionRequestedAt } from '@platform/server/provisioning/resolve-current-deprovision-requested-at';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
-import { currentDeprovisionRequestedAt } from '@platform/utils/deprovisioning-run-state/deprovisioning-run-state';
-import { queries } from '@shinefold/db';
 import type { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,17 +23,14 @@ export default async function TenantDangerPage({ params }: TProps) {
 
   // Queried unconditionally: a request newer than any existing run, even a FAILED one, is how a retry restarts.
   const [deprovisionRequestedAt, isPlatformTenant] = await Promise.all([
-    queries.auditEvents.getLatestDeprovisionRequestedAt(tenantId),
+    resolveCurrentDeprovisionRequestedAt(tenant),
     !tenant.isArchived && resolveIsPlatformTenant(tenant),
   ]);
 
   return (
     <TenantDangerPageContent
       tenant={toClientTenant(tenant)}
-      deprovisionRequestedAt={currentDeprovisionRequestedAt(
-        deprovisionRequestedAt,
-        tenant.provisioningSteps?.run,
-      )}
+      deprovisionRequestedAt={deprovisionRequestedAt}
       isPlatformTenant={isPlatformTenant}
     />
   );

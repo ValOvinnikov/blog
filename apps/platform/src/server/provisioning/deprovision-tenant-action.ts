@@ -30,6 +30,7 @@ import {
   confirmTenantInputSchema,
   resolveConfirmedTenant,
 } from './resolve-confirmed-tenant';
+import { resolveIsDeprovisionUnderway } from './resolve-is-deprovision-underway';
 import type { TTenantLifecycleResult } from './tenant-lifecycle-result';
 
 export type TDeprovisionTenantInput = z.input<typeof confirmTenantInputSchema>;
@@ -37,6 +38,7 @@ export type TDeprovisionTenantInput = z.input<typeof confirmTenantInputSchema>;
 export type TDeprovisionTenantResult = TTenantLifecycleResult<
   | typeof TENANT_REFUSAL.NOT_FOUND
   | typeof TENANT_REFUSAL.ALREADY_DEPROVISIONED
+  | typeof TENANT_REFUSAL.DEPROVISION_UNDERWAY
   | typeof TENANT_REFUSAL.PLATFORM_TENANT
   | typeof TENANT_REFUSAL.SUBSCRIPTION_CANCEL_FAILED
 >;
@@ -64,6 +66,13 @@ export const deprovisionTenantAction = async (
     return resolved;
   }
   const { tenant } = resolved;
+
+  if (await resolveIsDeprovisionUnderway(tenant)) {
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.DEPROVISION_UNDERWAY,
+    };
+  }
 
   if (await resolveIsPlatformTenant(tenant)) {
     logger.warn(TENANT_LOG.PLATFORM_TENANT_REFUSED, {

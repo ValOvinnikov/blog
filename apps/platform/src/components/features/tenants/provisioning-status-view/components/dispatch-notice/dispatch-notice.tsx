@@ -13,6 +13,10 @@ const NOTICE_MESSAGES = {
     type: ALERT_TYPE.ERROR,
     titleKey: 'startErrorArchived',
   },
+  [TENANT_REFUSAL.DEPROVISION_UNDERWAY]: {
+    type: ALERT_TYPE.ERROR,
+    titleKey: 'startErrorDeprovisionUnderway',
+  },
   [TENANT_REFUSAL.ALREADY_IN_PROGRESS]: {
     type: ALERT_TYPE.INFO,
     titleKey: 'startNoticeAlreadyInProgress',

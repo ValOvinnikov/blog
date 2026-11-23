@@ -1,4 +1,4 @@
-import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
+import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -66,79 +66,96 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
     mockRouterRefresh(refreshMock);
   });
 
-  it('titles the card "Deprovision this tenant"', () => {
-    setup();
-
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: 'Deprovision this tenant',
-    });
-
-    expect(heading).toBeVisible();
-  });
-
-  it('does not duplicate a "Danger zone" heading inside the card', () => {
-    setup();
-
-    const dangerZoneText = screen.queryByText('Danger zone');
-
-    expect(dangerZoneText).not.toBeInTheDocument();
-  });
-
-  it('opens a confirm dialog requiring the tenant name, disabled until it matches', async () => {
-    setup();
-
-    const dialog = await openDialog(user);
-    const confirmButton = within(dialog).getByRole('button', {
-      name: DEPROVISION,
-    });
-
-    expect(dialog).toBeVisible();
-    expect(confirmButton).toBeDisabled();
-  });
-
-  it('calls the action with the typed name, then refreshes', async () => {
-    setup();
-    const dialog = await openDialog(user);
-
-    await typeTenantNameAndConfirm(user, dialog);
-
-    expect(deprovisionTenantActionMock).toHaveBeenCalledWith(
-      MOCK_CLIENT_TENANT.id,
-      { confirm: MOCK_TENANT_NAME },
-    );
-    await vi.waitFor(() => expect(refreshMock).toHaveBeenCalled());
-  });
-
-  it('shows the error message inline and never refreshes when the action fails', async () => {
-    deprovisionTenantActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH } },
-    });
-    setup();
-    const dialog = await openDialog(user);
-
-    await typeTenantNameAndConfirm(user, dialog);
-
-    const mismatchError = await screen.findByText(
-      "Doesn't match the tenant's name.",
-    );
-
-    expect(mismatchError).toBeVisible();
-    expect(refreshMock).not.toHaveBeenCalled();
-  });
-
-  describe('with a run in progress', () => {
-    it('offers an enabled trigger with no hint when no run is in progress', () => {
+  describe('with no run in progress', () => {
+    beforeEach(() => {
       setup();
+    });
 
+    it('titles the card "Deprovision this tenant"', () => {
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: 'Deprovision this tenant',
+      });
+
+      expect(heading).toBeVisible();
+    });
+
+    it('does not duplicate a "Danger zone" heading inside the card', () => {
+      const dangerZoneText = screen.queryByText('Danger zone');
+
+      expect(dangerZoneText).not.toBeInTheDocument();
+    });
+
+    describe('with the confirm dialog open', () => {
+      let dialog: HTMLElement;
+
+      beforeEach(async () => {
+        dialog = await openDialog(user);
+      });
+
+      it('opens a confirm dialog requiring the tenant name, disabled until it matches', async () => {
+        const confirmButton = within(dialog).getByRole('button', {
+          name: DEPROVISION,
+        });
+
+        expect(dialog).toBeVisible();
+        expect(confirmButton).toBeDisabled();
+      });
+
+      it('calls the action with the typed name, then refreshes', async () => {
+        await typeTenantNameAndConfirm(user, dialog);
+
+        expect(deprovisionTenantActionMock).toHaveBeenCalledWith(
+          MOCK_CLIENT_TENANT.id,
+          { confirm: MOCK_TENANT_NAME },
+        );
+        await vi.waitFor(() => expect(refreshMock).toHaveBeenCalled());
+      });
+
+      it.each([
+        {
+          failure: 'a name mismatch',
+          result: {
+            outcome: ACTION_OUTCOME.INVALID,
+            fieldErrors: {
+              confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH },
+            },
+          },
+          message: "Doesn't match the tenant's name.",
+        },
+        {
+          failure: 'a deprovision already underway',
+          result: {
+            outcome: ACTION_OUTCOME.REFUSED,
+            reason: TENANT_REFUSAL.DEPROVISION_UNDERWAY,
+          },
+          message:
+            'Deprovisioning is already requested or running for this tenant.',
+        },
+      ])(
+        'shows $failure inline and never refreshes',
+        async ({ result, message }) => {
+          deprovisionTenantActionMock.mockResolvedValue(result);
+          await typeTenantNameAndConfirm(user, dialog);
+
+          const error = await screen.findByText(message);
+
+          expect(error).toBeVisible();
+          expect(refreshMock).not.toHaveBeenCalled();
+        },
+      );
+    });
+
+    it('offers an enabled trigger with no hint when no run is in progress', () => {
       const trigger = screen.getByRole('button', { name: DEPROVISION });
       const hint = screen.queryByText(RUN_IN_PROGRESS_HINT);
 
       expect(trigger).toBeEnabled();
       expect(hint).not.toBeInTheDocument();
     });
+  });
 
+  describe('with a run in progress', () => {
     it('blocks the trigger and explains why while a run is in progress', () => {
       setup({ isDeprovisioningInProgress: true });
 
