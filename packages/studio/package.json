@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "catalog:",
-    "@sanity/cli": "^7.7.1",
+    "@sanity/cli": "^8.33.0",
     "@sanity/client": "^8.17.0",
     "@sanity/validation": "^6.24.0",
     "@shinefold/eslint-config": "workspace:*",
