@@ -3,7 +3,10 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStepStatus,
 } from '@shinefold/db/constants';
-import type { TDeprovisioningRun } from '@shinefold/db/schema/tenants';
+import type {
+  TDeprovisioningRun,
+  TProvisioningRun,
+} from '@shinefold/db/schema/tenants';
 
 const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
   TENANT_PROVISIONING_STEP_STATUS.RUNNING,
@@ -44,4 +47,22 @@ export const isRetryPending = (
   return (
     new Date(deprovisionRequestedAt).getTime() > new Date(finishedAt).getTime()
   );
+};
+
+// Reactivation clears the deprovisioning run, so only a provisioning run started since the request shows it was superseded.
+export const currentDeprovisionRequestedAt = (
+  deprovisionRequestedAt: TMaybeUndefined<Date>,
+  provisioningRun: TMaybeUndefined<TProvisioningRun>,
+): TMaybeUndefined<string> => {
+  if (!deprovisionRequestedAt) {
+    return undefined;
+  }
+  if (
+    provisioningRun &&
+    new Date(provisioningRun.startedAt).getTime() >
+      deprovisionRequestedAt.getTime()
+  ) {
+    return undefined;
+  }
+  return deprovisionRequestedAt.toISOString();
 };

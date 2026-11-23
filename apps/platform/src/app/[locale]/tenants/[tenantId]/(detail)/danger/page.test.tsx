@@ -10,6 +10,7 @@ import {
   MOCK_RUN_STARTED_AT,
   MOCK_TENANT_ID,
   mockIdleDeprovisioningSteps,
+  mockIdleProvisioningSteps,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
@@ -122,19 +123,46 @@ describe(`<${TenantDangerPage.name}/>`, () => {
     expect(getLatestDeprovisionRequestedAtMock).not.toHaveBeenCalled();
   });
 
-  it('shows the starting state for a pending deprovision request', async () => {
-    getLatestDeprovisionRequestedAtMock.mockResolvedValueOnce(
-      new Date(MOCK_RUN_STARTED_AT),
-    );
+  describe('with a deprovision request on record', () => {
+    beforeEach(() => {
+      getLatestDeprovisionRequestedAtMock.mockResolvedValueOnce(
+        new Date(MOCK_RUN_STARTED_AT),
+      );
+    });
 
-    await setup();
+    it('shows the starting state while the request is pending', async () => {
+      await setup();
 
-    const startingBadge = screen.getByText(runStatus.startingBadge);
+      const startingBadge = screen.getByText(runStatus.startingBadge);
 
-    expect(getLatestDeprovisionRequestedAtMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-    );
-    expect(startingBadge).toBeVisible();
+      expect(getLatestDeprovisionRequestedAtMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+      );
+      expect(startingBadge).toBeVisible();
+    });
+
+    it('ignores the request once a later reactivation superseded it', async () => {
+      requireTenantByIdMock.mockResolvedValueOnce({
+        tenant: mockTenant({
+          provisioningSteps: {
+            ...mockIdleProvisioningSteps(),
+            run: { startedAt: MOCK_RUN_PLUS_2_MIN_AT },
+          },
+        }),
+      });
+
+      await setup();
+
+      const deprovisionButton = screen.getByRole('button', {
+        name: deprovisionTenantControl.triggerButton,
+      });
+      const progressHeading = screen.queryByRole('heading', {
+        name: DEPROVISIONING_PROGRESS,
+      });
+
+      expect(deprovisionButton).toBeEnabled();
+      expect(progressHeading).not.toBeInTheDocument();
+    });
   });
 
   it('offers no Deprovision control for the platform tenant, and says why', async () => {

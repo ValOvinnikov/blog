@@ -6,6 +6,7 @@ import {
 import { TENANT_PROVISIONING_STEP_STATUS } from '@shinefold/db/constants';
 
 import {
+  currentDeprovisionRequestedAt,
   deprovisioningOverallStatus,
   isRetryPending,
 } from './deprovisioning-run-state';
@@ -59,5 +60,35 @@ describe(isRetryPending, () => {
 
   it('is not pending for a request older than the last finished run', () => {
     expect(isRetryPending(MOCK_RUN_STARTED_AT, finishedRun)).toBe(false);
+  });
+});
+
+describe(currentDeprovisionRequestedAt, () => {
+  const requestedAt = new Date(MOCK_RUN_PLUS_1_MIN_AT);
+
+  it('is undefined without a request', () => {
+    expect(currentDeprovisionRequestedAt(undefined, undefined)).toBeUndefined();
+  });
+
+  it('keeps a request with no provisioning run on record', () => {
+    expect(currentDeprovisionRequestedAt(requestedAt, undefined)).toBe(
+      MOCK_RUN_PLUS_1_MIN_AT,
+    );
+  });
+
+  it('keeps a request made after the latest provisioning run started', () => {
+    expect(
+      currentDeprovisionRequestedAt(requestedAt, {
+        startedAt: MOCK_RUN_STARTED_AT,
+      }),
+    ).toBe(MOCK_RUN_PLUS_1_MIN_AT);
+  });
+
+  it('drops a request that a later provisioning run superseded', () => {
+    expect(
+      currentDeprovisionRequestedAt(requestedAt, {
+        startedAt: MOCK_RUN_PLUS_2_MIN_AT,
+      }),
+    ).toBeUndefined();
   });
 });
