@@ -180,8 +180,8 @@ importers:
         specifier: ^23.2.0
         version: 23.2.0(@types/node@26.6.6)
       tailwind-variants:
-        specifier: ^3.3.1
-        version: 3.3.1(tailwind-merge@3.7.1)(tailwindcss@4.3.5)
+        specifier: ^4.0.2
+        version: 4.0.2
       tldts:
         specifier: ^7.5.5
         version: 7.5.5
@@ -1042,12 +1042,9 @@ importers:
       embla-carousel-react:
         specifier: ^8.6.0
         version: 8.6.0(react@19.3.1)
-      tailwind-merge:
-        specifier: ^3.7.1
-        version: 3.7.1
       tailwind-variants:
-        specifier: ^3.3.1
-        version: 3.3.1(tailwind-merge@3.7.1)(tailwindcss@4.3.5)
+        specifier: ^4.0.2
+        version: 4.0.2
     devDependencies:
       '@faker-js/faker':
         specifier: 'catalog:'
@@ -1118,9 +1115,6 @@ importers:
       storybook:
         specifier: 'catalog:'
         version: 10.6.8(@types/react@19.3.0)(prettier@3.10.1)(react@19.3.1)
-      tailwindcss:
-        specifier: ^4.3.5
-        version: 4.3.5
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -11647,20 +11641,9 @@ packages:
     resolution: {integrity: sha512-0OJWD12D7XX3KUg1DYkMaTTjSTo2k/mhIYI3HlBlceXSMcJhW/1qO735fPKS5prcyjvn57Ub151vvASYXpQrEw==}
     engines: {node: '>=18'}
 
-  tailwind-merge@3.7.1:
-    resolution: {integrity: sha512-v7y4BV4FUlO8exj/4M5UXKeoowDiuugVUg3tkMNIyOUCOHy5xp8+5aWQeXCtZ2491sUV1YPsVeM9EveZ6/xuZQ==}
-
-  tailwind-variants@3.3.1:
-    resolution: {integrity: sha512-4pAvwUtM4HKBiRZftncAbpn6V9Hhwoa5Fl7O2u5zbp7Z5Cvu+/o/6+176WY3WCEES209543quG8zFIcXCsc5Jw==}
+  tailwind-variants@4.0.2:
+    resolution: {integrity: sha512-sZvOFkfe5LlYG/crRX5IvP3oUHmJPu+7WmrLQFvF0kCRq51C+lurlzFMm/jURG/5keT7VOJ/it0N3jkzYux85w==}
     engines: {node: '>=16.9.x', pnpm: '>=7.x'}
-    peerDependencies:
-      tailwind-merge: '>=3.0.0'
-      tailwindcss: '*'
-    peerDependenciesMeta:
-      tailwind-merge:
-        optional: true
-      tailwindcss:
-        optional: true
 
   tailwindcss@4.3.5:
     resolution: {integrity: sha512-FcQk9BuffmEHJP2G0XmB2SplU1aLTI7j07Kunk+U74Ny+XiWOtzXz9aujFZ/avntw1e2cOv/3PkgzflQ7gX2vQ==}
@@ -27308,12 +27291,7 @@ snapshots:
   system-architecture@1.0.0:
     optional: true
 
-  tailwind-merge@3.7.1: {}
-
-  tailwind-variants@3.3.1(tailwind-merge@3.7.1)(tailwindcss@4.3.5):
-    optionalDependencies:
-      tailwind-merge: 3.7.1
-      tailwindcss: 4.3.5
+  tailwind-variants@4.0.2: {}
 
   tailwindcss@4.3.5: {}
 

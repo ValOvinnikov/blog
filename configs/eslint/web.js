@@ -28,12 +28,18 @@ const sanityRestrictedGroup = {
     'apps/web must not talk to Sanity directly — fetch through @shinefold/service.',
 };
 
-const configuredTvPath = {
-  name: 'tailwind-variants',
+const CONFIGURED_TV_MESSAGE =
+  "Import tv from '@shinefold/ui/lib/styling' — the unconfigured tailwind-merge drops the repo's custom size and spacing tokens.";
+
+const configuredTvPaths = [
+  'tailwind-variants',
+  'tailwind-variants/config',
+  'tailwind-variants/lite',
+].map((name) => ({
+  name,
   importNames: ['tv', 'createTV'],
-  message:
-    "Import tv from '@shinefold/ui/lib/styling' — the unconfigured tailwind-merge drops the repo's custom size and spacing tokens.",
-};
+  message: CONFIGURED_TV_MESSAGE,
+}));
 
 const webTestingRestrictedGroup = {
   group: ['@web/testing', '@web/testing/*', '**/testing/**'],
@@ -66,7 +72,7 @@ export default [
       'no-restricted-imports': [
         'error',
         {
-          paths: [noVitestGlobalsImportPath, configuredTvPath],
+          paths: [noVitestGlobalsImportPath, ...configuredTvPaths],
           patterns: [sanityRestrictedGroup, webTestingRestrictedGroup],
         },
       ],
@@ -81,7 +87,7 @@ export default [
       'no-restricted-imports': [
         'error',
         {
-          paths: [noVitestGlobalsImportPath, configuredTvPath],
+          paths: [noVitestGlobalsImportPath, ...configuredTvPaths],
           patterns: [sanityRestrictedGroup],
         },
       ],
