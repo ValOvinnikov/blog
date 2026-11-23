@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@shinefold/config';
 import { z } from 'zod';
 
 export const brandAssetKindSchema = z.enum(['logo', 'logoDark', 'favicon']);
@@ -15,10 +16,7 @@ const MB = 1024 * 1024;
 const LOGO_MAX_UPLOAD_BYTES = 4 * MB;
 const LOGO_DIMENSION_BOUNDS_PX = { min: 32, max: 4000 };
 
-// Logos are visual branding rendered at whatever size a template wants;
-// favicons are the browser-tab icon Vercel Blob serves byte-for-byte with no
-// resize step, so its cap stays far tighter than "a few MB" — both are
-// generously above the "tens-of-KB" size either asset actually needs.
+// Blob serves the favicon byte-for-byte with no resize step, so its cap is far tighter than a logo's.
 export const MAX_UPLOAD_BYTES: Record<TBrandAssetKind, number> = {
   logo: LOGO_MAX_UPLOAD_BYTES,
   logoDark: LOGO_MAX_UPLOAD_BYTES,
@@ -52,7 +50,7 @@ export type TBrandAssetQuickCheckError =
 export const quickClientImageCheck = (
   file: File,
   kind: TBrandAssetKind,
-): TBrandAssetQuickCheckError | undefined => {
+): TMaybeUndefined<TBrandAssetQuickCheckError> => {
   if (
     !ACCEPTED_IMAGE_MIME_TYPES.includes(file.type as TAcceptedImageMimeType)
   ) {

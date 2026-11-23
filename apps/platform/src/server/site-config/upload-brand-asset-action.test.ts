@@ -25,6 +25,7 @@ import {
   NEXT_NAVIGATION_ERROR,
   type TMaybeNull,
 } from '@shinefold/config';
+import { LOOK_FIELD } from '@shinefold/db/constants';
 import { errorResult, okResult } from '@shinefold/utils';
 import type { Session } from 'next-auth';
 
@@ -204,9 +205,18 @@ describe(uploadBrandAssetAction, () => {
   });
 
   it.each([
-    { kind: brandAssetKindSchema.enum.logo, column: 'logoAssetUrl' },
-    { kind: brandAssetKindSchema.enum.logoDark, column: 'logoDarkAssetUrl' },
-    { kind: brandAssetKindSchema.enum.favicon, column: 'faviconAssetUrl' },
+    {
+      kind: brandAssetKindSchema.enum.logo,
+      column: LOOK_FIELD.LOGO_ASSET_URL,
+    },
+    {
+      kind: brandAssetKindSchema.enum.logoDark,
+      column: LOOK_FIELD.LOGO_DARK_ASSET_URL,
+    },
+    {
+      kind: brandAssetKindSchema.enum.favicon,
+      column: LOOK_FIELD.FAVICON_ASSET_URL,
+    },
   ])('saves the preset and the new $kind URL', async ({ kind, column }) => {
     await uploadBrandAssetAction(MOCK_TENANT_ID, kind, mockImageFormData());
 

@@ -24,7 +24,7 @@ const MOCK_LOGO_FILE = new File([faker.lorem.word()], faker.system.fileName(), {
 const MOCK_STAGED_FAVICON_URL = faker.internet.url();
 
 const DEFAULT_VALUES = defaultLookFormValues();
-const WITH_LOGO = { ...DEFAULT_VALUES, logo: { url: MOCK_LOGO_URL } };
+const MOCK_WITH_LOGO = { ...DEFAULT_VALUES, logo: { url: MOCK_LOGO_URL } };
 
 describe(isFieldChanged, () => {
   it('treats an equal plain field as unchanged', () => {
@@ -40,16 +40,18 @@ describe(isFieldChanged, () => {
   });
 
   it('treats a brand image with the same url and file as unchanged', () => {
-    const b = { ...WITH_LOGO, logo: { url: MOCK_LOGO_URL } };
+    const b = { ...MOCK_WITH_LOGO, logo: { url: MOCK_LOGO_URL } };
 
-    expect(isFieldChanged('logo', WITH_LOGO, b)).toBe(false);
+    expect(isFieldChanged('logo', MOCK_WITH_LOGO, b)).toBe(false);
   });
 
   it('treats a newly staged file as a change', () => {
-    const a = WITH_LOGO;
-    const b = { ...a, logo: { url: MOCK_LOGO_URL, file: MOCK_LOGO_FILE } };
+    const b = {
+      ...MOCK_WITH_LOGO,
+      logo: { url: MOCK_LOGO_URL, file: MOCK_LOGO_FILE },
+    };
 
-    expect(isFieldChanged('logo', a, b)).toBe(true);
+    expect(isFieldChanged('logo', MOCK_WITH_LOGO, b)).toBe(true);
   });
 });
 
@@ -59,15 +61,14 @@ describe(countChanges, () => {
   });
 
   it('counts each changed field once, brand images included', () => {
-    const a = DEFAULT_VALUES;
     const b = {
-      ...a,
-      accentHue: a.accentHue + 1,
+      ...DEFAULT_VALUES,
+      accentHue: DEFAULT_VALUES.accentHue + 1,
       radiusScale: RADIUS_SCALE.XL,
       favicon: { url: MOCK_STAGED_FAVICON_URL, file: MOCK_LOGO_FILE },
     };
 
-    expect(countChanges(a, b)).toBe(3);
+    expect(countChanges(DEFAULT_VALUES, b)).toBe(3);
   });
 });
 
@@ -89,7 +90,7 @@ describe(listLostStagedFiles, () => {
 
 describe(restoreLookDraft, () => {
   const current = {
-    ...WITH_LOGO,
+    ...MOCK_WITH_LOGO,
     logoDark: { url: MOCK_LOGO_DARK_URL },
     favicon: { url: MOCK_FAVICON_URL },
   };

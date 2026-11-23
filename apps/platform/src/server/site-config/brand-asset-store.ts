@@ -7,11 +7,12 @@ import {
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import { queries } from '@shinefold/db';
+import { LOOK_FIELD } from '@shinefold/db/constants';
 
 const ASSET_COLUMN = {
-  logo: 'logoAssetUrl',
-  logoDark: 'logoDarkAssetUrl',
-  favicon: 'faviconAssetUrl',
+  logo: LOOK_FIELD.LOGO_ASSET_URL,
+  logoDark: LOOK_FIELD.LOGO_DARK_ASSET_URL,
+  favicon: LOOK_FIELD.FAVICON_ASSET_URL,
 } as const satisfies Record<TBrandAssetKind, keyof TSiteConfigThemeAndAssets>;
 
 export const getBrandAssetUrl = async (

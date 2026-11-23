@@ -37,6 +37,7 @@ import {
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
   RADIUS_SCALE,
+  type TMaybeUndefined,
 } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -187,38 +188,31 @@ describe(`<${LookPreview.name}/>`, () => {
     const sampleLogos = () =>
       screen.getAllByRole('img', { name: MOCK_TENANT_NAME });
 
+    const renderWithLogos = (logoDark: TMaybeUndefined<string>) =>
+      renderPreview({
+        values: { logo: { url: MOCK_LOGO_URL }, logoDark: { url: logoDark } },
+      });
+
+    it('shows the main logo in the light preview', () => {
+      renderWithLogos(MOCK_LOGO_DARK_URL);
+
+      sampleLogos().forEach((logo) => {
+        expect(logo).toHaveAttribute('src', MOCK_LOGO_URL);
+      });
+    });
+
     it.each([
-      {
-        scheme: 'light',
-        isDark: false,
-        logoDark: MOCK_LOGO_DARK_URL,
-        shown: MOCK_LOGO_URL,
-      },
-      {
-        scheme: 'dark',
-        isDark: true,
-        logoDark: MOCK_LOGO_DARK_URL,
-        shown: MOCK_LOGO_DARK_URL,
-      },
-      {
-        scheme: 'dark, with no dark-mode logo,',
-        isDark: true,
-        logoDark: undefined,
-        shown: MOCK_LOGO_URL,
-      },
+      { logoDark: MOCK_LOGO_DARK_URL, shown: MOCK_LOGO_DARK_URL },
+      { logoDark: undefined, shown: MOCK_LOGO_URL },
     ])(
-      'shows $shown in the $scheme preview',
-      async ({ isDark, logoDark, shown }) => {
-        renderPreview({
-          values: { logo: { url: MOCK_LOGO_URL }, logoDark: { url: logoDark } },
+      'shows $shown in the dark preview with dark-mode logo $logoDark',
+      async ({ logoDark, shown }) => {
+        renderWithLogos(logoDark);
+        const darkButton = screen.getByRole('button', {
+          name: PREVIEW_DARK_LABEL,
         });
 
-        if (isDark) {
-          const darkButton = screen.getByRole('button', {
-            name: PREVIEW_DARK_LABEL,
-          });
-          await user.click(darkButton);
-        }
+        await user.click(darkButton);
 
         sampleLogos().forEach((logo) => {
           expect(logo).toHaveAttribute('src', shown);

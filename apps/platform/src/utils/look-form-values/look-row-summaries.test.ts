@@ -88,28 +88,26 @@ describe(buildLookRowSummaries, () => {
     expect(summaries[LOOK_ROW.COLOUR]).toBe('Hue 192 · Logo hue 40');
   });
 
-  it('reads a missing logo and an uploaded favicon', () => {
-    const values = {
-      ...seedValues(),
-      logo: { url: undefined },
-      favicon: { url: MOCK_FAVICON_URL },
-    };
+  it.each([
+    {
+      images: 'a missing logo and an uploaded favicon',
+      overrides: {
+        logo: { url: undefined },
+        favicon: { url: MOCK_FAVICON_URL },
+      },
+      summary: 'No logo · No dark-mode logo · Favicon uploaded',
+    },
+    {
+      images: 'an uploaded dark-mode logo',
+      overrides: { logoDark: { url: MOCK_LOGO_DARK_URL } },
+      summary: 'Logo uploaded · Dark-mode logo uploaded · No favicon',
+    },
+  ])('reads $images', ({ overrides, summary }) => {
+    const values = { ...seedValues(), ...overrides };
 
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
-    expect(summaries[LOOK_ROW.BRAND]).toBe(
-      'No logo · No dark-mode logo · Favicon uploaded',
-    );
-  });
-
-  it('reads an uploaded dark-mode logo', () => {
-    const values = { ...seedValues(), logoDark: { url: MOCK_LOGO_DARK_URL } };
-
-    const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
-
-    expect(summaries[LOOK_ROW.BRAND]).toBe(
-      'Logo uploaded · Dark-mode logo uploaded · No favicon',
-    );
+    expect(summaries[LOOK_ROW.BRAND]).toBe(summary);
   });
 
   it('still names the spinner while busy buttons draw a progress edge', () => {
