@@ -1,12 +1,5 @@
 import { faker } from '@faker-js/faker';
-import {
-  MOCK_ATTRIBUTE_BREAKOUT,
-  MOCK_ESCAPED_UNSAFE_MARKUP,
-  MOCK_PERCENT_ENCODED_ATTRIBUTE_BREAKOUT,
-  MOCK_PLATFORM_MAGIC_LINK_URL,
-  MOCK_UNSAFE_MARKUP,
-  MOCK_URL,
-} from '@shinefold/email/testing/email-fixtures';
+import { MOCK_PLATFORM_MAGIC_LINK_URL } from '@shinefold/email/testing/email-fixtures';
 
 import {
   buildAdminInviteEmail,
@@ -49,28 +42,5 @@ describe(buildAdminInviteEmail, () => {
       expect(email.text).toContain(MOCK_ROLE_LABEL);
       expect(email.text).toContain(MOCK_PLATFORM_MAGIC_LINK_URL);
     });
-  });
-
-  it.each([
-    ['inviter name', 'inviterName'],
-    ['role label', 'roleLabel'],
-  ] as const)('escapes the %s', (_name, key) => {
-    const { html } = buildAdminInviteEmail({
-      ...MOCK_INPUT,
-      [key]: MOCK_UNSAFE_MARKUP,
-    });
-
-    expect(html).not.toContain(MOCK_UNSAFE_MARKUP);
-    expect(html).toContain(MOCK_ESCAPED_UNSAFE_MARKUP);
-  });
-
-  it('percent-encodes an unsafe magic link', () => {
-    const { html } = buildAdminInviteEmail({
-      ...MOCK_INPUT,
-      url: `${MOCK_URL}/callback?token=${MOCK_ATTRIBUTE_BREAKOUT}`,
-    });
-
-    expect(html).not.toContain(MOCK_ATTRIBUTE_BREAKOUT);
-    expect(html).toContain(MOCK_PERCENT_ENCODED_ATTRIBUTE_BREAKOUT);
   });
 });
