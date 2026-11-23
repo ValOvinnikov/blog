@@ -13356,6 +13356,22 @@
         "file": "apps/worker/src/constants/enqueue-error.ts"
       }
     ],
+    "growth_layer.apply_start_failed": [
+      {
+        "ref": "GROWTH_LAYER_LOG.APPLY_START_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/growth-layer",
+        "file": "apps/worker/src/constants/growth-layer.ts"
+      }
+    ],
+    "growth_layer.apply_failed": [
+      {
+        "ref": "GROWTH_LAYER_LOG.APPLY_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/growth-layer",
+        "file": "apps/worker/src/constants/growth-layer.ts"
+      }
+    ],
     "inactivity_sweep.not_configured": [
       {
         "ref": "INACTIVITY_SWEEP_LOG.NOT_CONFIGURED",
