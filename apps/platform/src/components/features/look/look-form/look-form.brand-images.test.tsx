@@ -1,12 +1,17 @@
 import { LOOK_FIELD_LABEL_TEST_ID } from '@platform/constants/look-form';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
-import { screen } from '@platform/testing/custom-render';
+import { screen, within } from '@platform/testing/custom-render';
+import {
+  pickLogo,
+  pickLogoDark,
+} from '@platform/testing/look/brand-image-interactions';
 import { savedLookValues } from '@platform/testing/look/look-form-fixtures';
 import {
   clickSave,
-  pickLogo,
+  openLookRow,
 } from '@platform/testing/look/look-form-interactions';
 import {
   prepareBrandImageForm,
@@ -23,6 +28,7 @@ import {
   MOCK_UPLOADED_LOGO_URL,
 } from '@platform/testing/site-config/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { brandAssetKindSchema } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -105,6 +111,39 @@ describe(`<${LookForm.name}/>`, () => {
         expect(logo).toHaveAttribute(
           'src',
           optimizedImageSrc(MOCK_UPLOADED_LOGO_URL),
+        );
+      });
+    });
+
+    describe('the dark-mode logo', () => {
+      beforeEach(() => {
+        setupLookForm();
+      });
+
+      it('offers an optional dark-mode logo with its hint', async () => {
+        await openLookRow(user, LOOK_ROW.BRAND);
+
+        const logoDarkGroup = screen.getByRole('group', {
+          name: `${LOOK_FORM.logoDarkFieldLabel} ${LOOK_FORM.optionalTag}`,
+          description: LOOK_FORM.logoDarkFieldHint,
+        });
+        const uploadButton = within(logoDarkGroup).getByRole('button', {
+          name: messages.assetUploadField.logoDark.upload,
+        });
+
+        expect(uploadButton).toBeVisible();
+      });
+
+      it('uploads a staged dark-mode logo on Save', async () => {
+        await pickLogoDark(user);
+        await clickSave(user);
+
+        await screen.findByText(ALL_CHANGES_SAVED);
+
+        expect(uploadBrandAssetAction).toHaveBeenCalledExactlyOnceWith(
+          MOCK_TENANT_ID,
+          brandAssetKindSchema.enum.logoDark,
+          expect.any(FormData),
         );
       });
     });

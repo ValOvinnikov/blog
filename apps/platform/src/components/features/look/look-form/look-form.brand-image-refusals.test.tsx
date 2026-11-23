@@ -5,15 +5,15 @@ import { uploadBrandAssetAction } from '@platform/server/site-config/upload-bran
 import { screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
-  BRAND_IMAGES_HINT,
-  UPLOAD_FAVICON,
-} from '@platform/testing/look/look-form-fixtures';
-import {
-  clickSave,
   findLogoPickerWithError,
   pickAndSaveLogo,
   stageAssetRemoval,
-} from '@platform/testing/look/look-form-interactions';
+} from '@platform/testing/look/brand-image-interactions';
+import {
+  BRAND_IMAGES_HINT,
+  UPLOAD_FAVICON,
+} from '@platform/testing/look/look-form-fixtures';
+import { clickSave } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { MOCK_LOGO_URL } from '@platform/testing/site-config/fixtures';
 import { stubStagedImageUrl } from '@platform/testing/staged-image';

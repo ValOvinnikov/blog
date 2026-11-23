@@ -799,6 +799,8 @@
     "brandNameTooLong": "Gebruik maximaal {max} tekens.",
     "brandNameUnset": "Accountnaam",
     "logoFieldLabel": "Logo",
+    "logoDarkFieldLabel": "Logo voor donkere modus",
+    "logoDarkFieldHint": "Wordt getoond als een lezer de donkere modus gebruikt. Zonder dit logo wordt het hoofdlogo gebruikt.",
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logo: PNG, JPEG, WebP of SVG. Favicon: een vierkante afbeelding.",
     "optionalTag": "optioneel",
@@ -1044,6 +1046,8 @@
     "summaryLogoHue": "Logotint {hue}",
     "summaryLogoUploaded": "Logo geüpload",
     "summaryNoLogo": "Geen logo",
+    "summaryLogoDarkUploaded": "Logo voor donkere modus geüpload",
+    "summaryNoLogoDark": "Geen logo voor donkere modus",
     "summaryFaviconUploaded": "Favicon geüpload",
     "summaryNoFavicon": "Geen favicon",
     "cookieSettingsButtonSummary": {
@@ -1175,6 +1179,11 @@
       "upload": "Logo uploaden",
       "replace": "Logo vervangen"
     },
+    "logoDark": {
+      "currentAlt": "Huidig logo voor donkere modus",
+      "upload": "Logo voor donkere modus uploaden",
+      "replace": "Logo voor donkere modus vervangen"
+    },
     "favicon": {
       "currentAlt": "Huidige favicon",
       "upload": "Favicon uploaden",
@@ -1205,12 +1214,15 @@
     "emailLogoSvg": "SVG-logo's worden niet ondersteund — Gmail, Outlook en Yahoo tonen geen SVG in e-mail, dus het logo zou als ontbrekende afbeelding aankomen.",
     "emailLogoWebp": "WebP-logo's worden niet ondersteund — te veel e-mailprogramma's tonen WebP niet betrouwbaar.",
     "emailLogoTypeUnsupported": "Kies een PNG-, JPEG- of GIF-afbeelding.",
-    "uploadFailed": "{kind, select, favicon {Het favicon} other {Het logo}} kon niet worden geüpload — probeer het opnieuw.",
-    "removeFailed": "{kind, select, favicon {Het favicon} other {Het logo}} kon niet worden verwijderd — probeer het opnieuw."
+    "uploadFailed": "{kind, select, favicon {Het favicon} logoDark {Het logo voor donkere modus} other {Het logo}} kon niet worden geüpload — probeer het opnieuw.",
+    "removeFailed": "{kind, select, favicon {Het favicon} logoDark {Het logo voor donkere modus} other {Het logo}} kon niet worden verwijderd — probeer het opnieuw."
   },
   "brandAssetField": {
     "logo": {
       "pickAgain": "Uw herstelde concept bevatte een nieuw logo dat niet bewaard kon worden — kies het opnieuw."
+    },
+    "logoDark": {
+      "pickAgain": "Uw herstelde concept bevatte een nieuw logo voor donkere modus dat niet bewaard kon worden — kies het opnieuw."
     },
     "favicon": {
       "pickAgain": "Uw herstelde concept bevatte een nieuwe favicon die niet bewaard kon worden — kies deze opnieuw."
@@ -2666,6 +2678,7 @@
       "cookieSettingsButton": "Knop voor cookie-instellingen",
       "brandName": "Merknaam",
       "logoAssetUrl": "Logoafbeelding",
+      "logoDarkAssetUrl": "Logoafbeelding voor donkere modus",
       "faviconAssetUrl": "Faviconafbeelding"
     }
   },

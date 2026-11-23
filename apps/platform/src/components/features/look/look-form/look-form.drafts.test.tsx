@@ -1,6 +1,7 @@
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
+import { pickLogo } from '@platform/testing/look/brand-image-interactions';
 import {
   DEFAULT_ACCENT_HUE,
   EDITORIAL,
@@ -11,7 +12,6 @@ import {
 import {
   chooseEditorial,
   openLookRow,
-  pickLogo,
 } from '@platform/testing/look/look-form-interactions';
 import {
   setupLookForm,

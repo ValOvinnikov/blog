@@ -23,10 +23,12 @@ export const LookPreviewSample = ({
   reader,
 }: TLookPreviewSampleProps) => {
   const { shownBrandName, values, isSubmenuPreviewOpen } = useLookForm();
+  const { logo, logoDark } = values;
+  const logoSrc = theme.isDark ? (logoDark.url ?? logo.url) : logo.url;
 
   return (
     <LookSample
-      brand={{ name: shownBrandName, logoSrc: values.logo.url }}
+      brand={{ name: shownBrandName, logoSrc }}
       theme={theme}
       liveLocales={liveLocales}
       header={toSampleHeaderStyle(values)}

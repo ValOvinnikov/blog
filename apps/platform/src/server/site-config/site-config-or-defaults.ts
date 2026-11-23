@@ -18,6 +18,7 @@ export type TSiteConfigThemeAndAssets = {
   radiusScale: TRadiusScale;
   density: TDensity;
   logoAssetUrl: TMaybeUndefined<string>;
+  logoDarkAssetUrl: TMaybeUndefined<string>;
   faviconAssetUrl: TMaybeUndefined<string>;
 };
 
@@ -32,6 +33,7 @@ export const getSiteConfigOrDefaults = async (
     radiusScale,
     density,
     logo,
+    logoDark,
     favicon,
   } = lookFormValuesOrDefaults(
     await queries.siteConfig.getSiteConfig(tenantId),
@@ -45,6 +47,7 @@ export const getSiteConfigOrDefaults = async (
     radiusScale,
     density,
     logoAssetUrl: logo.url,
+    logoDarkAssetUrl: logoDark.url,
     faviconAssetUrl: favicon.url,
   };
 };

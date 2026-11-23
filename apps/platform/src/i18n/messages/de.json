@@ -799,6 +799,8 @@
     "brandNameTooLong": "Verwenden Sie höchstens {max} Zeichen.",
     "brandNameUnset": "Kontoname",
     "logoFieldLabel": "Logo",
+    "logoDarkFieldLabel": "Logo für den Dunkelmodus",
+    "logoDarkFieldHint": "Wird angezeigt, wenn Leser den Dunkelmodus nutzen. Ohne dieses Logo wird das Hauptlogo verwendet.",
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logo: PNG, JPEG, WebP oder SVG. Favicon: ein quadratisches Bild.",
     "optionalTag": "optional",
@@ -1044,6 +1046,8 @@
     "summaryLogoHue": "Logo-Farbton {hue}",
     "summaryLogoUploaded": "Logo hochgeladen",
     "summaryNoLogo": "Kein Logo",
+    "summaryLogoDarkUploaded": "Logo für den Dunkelmodus hochgeladen",
+    "summaryNoLogoDark": "Kein Logo für den Dunkelmodus",
     "summaryFaviconUploaded": "Favicon hochgeladen",
     "summaryNoFavicon": "Kein Favicon",
     "cookieSettingsButtonSummary": {
@@ -1175,6 +1179,11 @@
       "upload": "Logo hochladen",
       "replace": "Logo ersetzen"
     },
+    "logoDark": {
+      "currentAlt": "Aktuelles Logo für den Dunkelmodus",
+      "upload": "Logo für den Dunkelmodus hochladen",
+      "replace": "Logo für den Dunkelmodus ersetzen"
+    },
     "favicon": {
       "currentAlt": "Aktuelles Favicon",
       "upload": "Favicon hochladen",
@@ -1205,12 +1214,15 @@
     "emailLogoSvg": "SVG-Logos werden nicht unterstützt — Gmail, Outlook und Yahoo stellen SVG in E-Mails nicht dar, sodass das Logo als fehlendes Bild ankäme.",
     "emailLogoWebp": "WebP-Logos werden nicht unterstützt — zu viele E-Mail-Programme stellen WebP nicht zuverlässig dar.",
     "emailLogoTypeUnsupported": "Wählen Sie ein PNG-, JPEG- oder GIF-Bild.",
-    "uploadFailed": "{kind, select, favicon {Das Favicon} other {Das Logo}} konnte nicht hochgeladen werden — bitte erneut versuchen.",
-    "removeFailed": "{kind, select, favicon {Das Favicon} other {Das Logo}} konnte nicht entfernt werden — bitte erneut versuchen."
+    "uploadFailed": "{kind, select, favicon {Das Favicon} logoDark {Das Logo für den Dunkelmodus} other {Das Logo}} konnte nicht hochgeladen werden — bitte erneut versuchen.",
+    "removeFailed": "{kind, select, favicon {Das Favicon} logoDark {Das Logo für den Dunkelmodus} other {Das Logo}} konnte nicht entfernt werden — bitte erneut versuchen."
   },
   "brandAssetField": {
     "logo": {
       "pickAgain": "Ihr wiederhergestellter Entwurf enthielt ein neues Logo, das nicht erhalten blieb — bitte wählen Sie es erneut aus."
+    },
+    "logoDark": {
+      "pickAgain": "Ihr wiederhergestellter Entwurf enthielt ein neues Logo für den Dunkelmodus, das nicht erhalten blieb — bitte wählen Sie es erneut aus."
     },
     "favicon": {
       "pickAgain": "Ihr wiederhergestellter Entwurf enthielt ein neues Favicon, das nicht erhalten blieb — bitte wählen Sie es erneut aus."
@@ -2666,6 +2678,7 @@
       "cookieSettingsButton": "Schaltfläche für Cookie-Einstellungen",
       "brandName": "Markenname",
       "logoAssetUrl": "Logo-Bild",
+      "logoDarkAssetUrl": "Logo-Bild für den Dunkelmodus",
       "faviconAssetUrl": "Favicon-Bild"
     }
   },

@@ -5,6 +5,11 @@ import type { TUploadResult } from '@platform/server/uploads/upload-error';
 import { screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
+  pickAndSaveLogo,
+  pickLogo,
+  stageAssetRemoval,
+} from '@platform/testing/look/brand-image-interactions';
+import {
   DISCARD,
   hueValue,
   NUDGED_ACCENT_HUE,
@@ -12,9 +17,6 @@ import {
 import {
   clickSave,
   nudgeAccentHue,
-  pickAndSaveLogo,
-  pickLogo,
-  stageAssetRemoval,
 } from '@platform/testing/look/look-form-interactions';
 import {
   prepareBrandImageForm,

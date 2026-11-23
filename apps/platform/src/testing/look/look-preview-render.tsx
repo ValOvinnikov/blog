@@ -61,7 +61,11 @@ export const lookPreview = ({
     brandNameFieldId: 'brand-name',
     shownBrandName: MOCK_TENANT_NAME,
     repickKinds: [],
-    brandAssetFieldIds: { logo: 'logo', favicon: 'favicon' },
+    brandAssetFieldIds: {
+      logo: 'logo',
+      logoDark: 'logoDark',
+      favicon: 'favicon',
+    },
     brandImageError: undefined,
     changePreset: vi.fn(),
     isPresetValue: () => true,

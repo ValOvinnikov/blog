@@ -40,6 +40,7 @@ export const toLookFormValues = (
     languageSwitcherStyle: siteConfig.languageSwitcherStyle,
     brandName: siteConfig.brandName ?? '',
     logo: { url: siteConfig.logoAssetUrl },
+    logoDark: { url: siteConfig.logoDarkAssetUrl },
     favicon: { url: siteConfig.faviconAssetUrl },
   };
 };

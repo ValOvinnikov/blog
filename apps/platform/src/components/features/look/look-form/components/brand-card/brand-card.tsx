@@ -23,7 +23,7 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const {
     tenantName,
-    values: { brandName, logo, favicon },
+    values: { brandName, logo, logoDark, favicon },
     updateField,
     brandNameFieldId,
     isBrandNameTooLong,
@@ -83,6 +83,18 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
           {...fieldProps('logo')}
           image={logo}
           onStage={(image) => updateField('logo', image)}
+        />
+      </LookField>
+      <LookField
+        field="logoDark"
+        label={t('logoDarkFieldLabel')}
+        hint={t('logoDarkFieldHint')}
+        isGroup={true}
+      >
+        <BrandAssetField
+          {...fieldProps('logoDark')}
+          image={logoDark}
+          onStage={(image) => updateField('logoDark', image)}
         />
       </LookField>
       <LookField field="favicon" label={t('faviconFieldLabel')} isGroup={true}>

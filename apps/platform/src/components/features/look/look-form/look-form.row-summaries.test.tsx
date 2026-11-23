@@ -2,6 +2,7 @@ import { ACCENT_SWATCH_TEST_ID } from '@platform/constants/accent-swatch';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { screen, within } from '@platform/testing/custom-render';
+import { pickLogo } from '@platform/testing/look/brand-image-interactions';
 import {
   DEFAULT_ACCENT_HUE,
   NUDGED_ACCENT_HUE,
@@ -10,7 +11,6 @@ import {
   lookRowTrigger,
   nudgeAccentHue,
   openLookRow,
-  pickLogo,
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { stubStagedImageUrl } from '@platform/testing/staged-image';
@@ -81,14 +81,14 @@ describe(`<${LookForm.name}/>`, () => {
 
     it('reads a staged logo as uploaded before saving', async () => {
       expect(lookRowTrigger(LOOK_ROW.BRAND)).toHaveTextContent(
-        'No logo · No favicon',
+        'No logo · No dark-mode logo · No favicon',
       );
 
       await pickLogo(user);
       await user.click(lookRowTrigger(LOOK_ROW.BRAND));
 
       expect(lookRowTrigger(LOOK_ROW.BRAND)).toHaveTextContent(
-        'Logo uploaded · No favicon',
+        'Logo uploaded · No dark-mode logo · No favicon',
       );
     });
   });

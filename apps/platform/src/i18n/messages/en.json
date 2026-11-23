@@ -799,6 +799,8 @@
     "brandNameTooLong": "Use {max} characters or fewer.",
     "brandNameUnset": "Account name",
     "logoFieldLabel": "Logo",
+    "logoDarkFieldLabel": "Logo for dark mode",
+    "logoDarkFieldHint": "Shown when a reader uses dark mode. Without it, the main logo is used.",
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logo: PNG, JPEG, WebP or SVG. Favicon: a square image.",
     "optionalTag": "optional",
@@ -1044,6 +1046,8 @@
     "summaryLogoHue": "Logo hue {hue}",
     "summaryLogoUploaded": "Logo uploaded",
     "summaryNoLogo": "No logo",
+    "summaryLogoDarkUploaded": "Dark-mode logo uploaded",
+    "summaryNoLogoDark": "No dark-mode logo",
     "summaryFaviconUploaded": "Favicon uploaded",
     "summaryNoFavicon": "No favicon",
     "cookieSettingsButtonSummary": {
@@ -1175,6 +1179,11 @@
       "upload": "Upload logo",
       "replace": "Replace logo"
     },
+    "logoDark": {
+      "currentAlt": "Current logo for dark mode",
+      "upload": "Upload logo for dark mode",
+      "replace": "Replace logo for dark mode"
+    },
     "favicon": {
       "currentAlt": "Current favicon",
       "upload": "Upload favicon",
@@ -1205,12 +1214,15 @@
     "emailLogoSvg": "SVG logos are not supported — Gmail, Outlook and Yahoo do not render SVG in email, so this would ship as a missing image.",
     "emailLogoWebp": "WebP logos are not supported — too many email clients don't render WebP reliably.",
     "emailLogoTypeUnsupported": "Choose a PNG, JPEG, or GIF image.",
-    "uploadFailed": "Couldn't upload the {kind, select, favicon {favicon} other {logo}} — try again.",
-    "removeFailed": "Couldn't remove the {kind, select, favicon {favicon} other {logo}} — try again."
+    "uploadFailed": "Couldn't upload the {kind, select, favicon {favicon} logoDark {logo for dark mode} other {logo}} — try again.",
+    "removeFailed": "Couldn't remove the {kind, select, favicon {favicon} logoDark {logo for dark mode} other {logo}} — try again."
   },
   "brandAssetField": {
     "logo": {
       "pickAgain": "Your recovered draft had a new logo that couldn't be kept — pick it again."
+    },
+    "logoDark": {
+      "pickAgain": "Your recovered draft had a new logo for dark mode that couldn't be kept — pick it again."
     },
     "favicon": {
       "pickAgain": "Your recovered draft had a new favicon that couldn't be kept — pick it again."
@@ -2666,6 +2678,7 @@
       "cookieSettingsButton": "Cookie settings button",
       "brandName": "Brand name",
       "logoAssetUrl": "Logo image",
+      "logoDarkAssetUrl": "Dark-mode logo image",
       "faviconAssetUrl": "Favicon image"
     }
   },

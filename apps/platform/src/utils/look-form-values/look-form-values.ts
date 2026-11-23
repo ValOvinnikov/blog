@@ -6,6 +6,8 @@ import {
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { isSameStagedImage } from '@platform/utils/staged-image/staged-image';
+import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
+import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 import { isUndefined } from '@shinefold/utils/primitives';
 
 export const CARD_FIELDS = {
@@ -37,7 +39,7 @@ export const CARD_FIELDS = {
     'footerSurface',
     'cookieSettingsButton',
   ],
-  [LOOK_ROW.BRAND]: ['brandName', 'logo', 'favicon'],
+  [LOOK_ROW.BRAND]: ['brandName', 'logo', 'logoDark', 'favicon'],
   [LOOK_ROW.LANGUAGE_SWITCHER]: ['languageSwitcherStyle'],
 } as const satisfies Record<TLookCard, readonly (keyof TLookFormValues)[]>;
 
@@ -47,6 +49,17 @@ export const isBrandAssetKind = (
   key: keyof TLookFormValues,
 ): key is TBrandAssetKind =>
   (BRAND_ASSET_KINDS as readonly string[]).includes(key);
+
+export const restoreLookDraft = (
+  draftValues: TLookFormValues,
+  { logo, logoDark, favicon }: TLookFormValues,
+  entitlements: Pick<TTenantEntitlements, 'lookFields'>,
+): TLookFormValues => ({
+  ...toEffectiveLookWithin(draftValues, entitlements),
+  logo,
+  logoDark,
+  favicon,
+});
 
 export const isFieldChanged = (
   key: keyof TLookFormValues,

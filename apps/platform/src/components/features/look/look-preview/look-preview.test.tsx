@@ -24,12 +24,20 @@ import {
   renderPreview,
   setPreviewDevice,
 } from '@platform/testing/look/look-preview-render';
-import { MOCK_TENANT_DOMAIN } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_LOGO_DARK_URL,
+  MOCK_LOGO_URL,
+} from '@platform/testing/site-config/fixtures';
+import {
+  MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
 import {
   CARD_STYLE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
   RADIUS_SCALE,
+  type TMaybeUndefined,
 } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -174,6 +182,43 @@ describe(`<${LookPreview.name}/>`, () => {
     expect(sampleTokens).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.7 0.16 28)',
     });
+  });
+
+  describe('brand logo', () => {
+    const sampleLogos = () =>
+      screen.getAllByRole('img', { name: MOCK_TENANT_NAME });
+
+    const renderWithLogos = (logoDark: TMaybeUndefined<string>) =>
+      renderPreview({
+        values: { logo: { url: MOCK_LOGO_URL }, logoDark: { url: logoDark } },
+      });
+
+    it('shows the main logo in the light preview', () => {
+      renderWithLogos(MOCK_LOGO_DARK_URL);
+
+      sampleLogos().forEach((logo) => {
+        expect(logo).toHaveAttribute('src', MOCK_LOGO_URL);
+      });
+    });
+
+    it.each([
+      { logoDark: MOCK_LOGO_DARK_URL, shown: MOCK_LOGO_DARK_URL },
+      { logoDark: undefined, shown: MOCK_LOGO_URL },
+    ])(
+      'shows $shown in the dark preview with dark-mode logo $logoDark',
+      async ({ logoDark, shown }) => {
+        renderWithLogos(logoDark);
+        const darkButton = screen.getByRole('button', {
+          name: PREVIEW_DARK_LABEL,
+        });
+
+        await user.click(darkButton);
+
+        sampleLogos().forEach((logo) => {
+          expect(logo).toHaveAttribute('src', shown);
+        });
+      },
+    );
   });
 
   describe('cookie settings', () => {

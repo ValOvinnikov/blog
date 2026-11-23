@@ -799,6 +799,8 @@
     "brandNameTooLong": "Utilisez {max} caractères au maximum.",
     "brandNameUnset": "Nom du compte",
     "logoFieldLabel": "Logo",
+    "logoDarkFieldLabel": "Logo pour le mode sombre",
+    "logoDarkFieldHint": "Affiché quand le lecteur utilise le mode sombre. Sans lui, le logo principal est utilisé.",
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logo : PNG, JPEG, WebP ou SVG. Favicon : une image carrée.",
     "optionalTag": "facultatif",
@@ -1044,6 +1046,8 @@
     "summaryLogoHue": "Teinte du logo {hue}",
     "summaryLogoUploaded": "Logo importé",
     "summaryNoLogo": "Aucun logo",
+    "summaryLogoDarkUploaded": "Logo pour le mode sombre importé",
+    "summaryNoLogoDark": "Aucun logo pour le mode sombre",
     "summaryFaviconUploaded": "Favicon importé",
     "summaryNoFavicon": "Aucun favicon",
     "cookieSettingsButtonSummary": {
@@ -1175,6 +1179,11 @@
       "upload": "Importer le logo",
       "replace": "Remplacer le logo"
     },
+    "logoDark": {
+      "currentAlt": "Logo actuel pour le mode sombre",
+      "upload": "Importer le logo pour le mode sombre",
+      "replace": "Remplacer le logo pour le mode sombre"
+    },
     "favicon": {
       "currentAlt": "Favicon actuel",
       "upload": "Importer le favicon",
@@ -1205,12 +1214,15 @@
     "emailLogoSvg": "Les logos SVG ne sont pas pris en charge — Gmail, Outlook et Yahoo n'affichent pas le SVG dans les e-mails, le logo apparaîtrait donc comme une image manquante.",
     "emailLogoWebp": "Les logos WebP ne sont pas pris en charge — trop de clients de messagerie n'affichent pas le WebP de manière fiable.",
     "emailLogoTypeUnsupported": "Choisissez une image PNG, JPEG ou GIF.",
-    "uploadFailed": "Impossible d'importer {kind, select, favicon {le favicon} other {le logo}} — veuillez réessayer.",
-    "removeFailed": "Impossible de supprimer {kind, select, favicon {le favicon} other {le logo}} — veuillez réessayer."
+    "uploadFailed": "Impossible d'importer {kind, select, favicon {le favicon} logoDark {le logo pour le mode sombre} other {le logo}} — veuillez réessayer.",
+    "removeFailed": "Impossible de supprimer {kind, select, favicon {le favicon} logoDark {le logo pour le mode sombre} other {le logo}} — veuillez réessayer."
   },
   "brandAssetField": {
     "logo": {
       "pickAgain": "Votre brouillon restauré contenait un nouveau logo qui n'a pas pu être conservé — choisissez-le à nouveau."
+    },
+    "logoDark": {
+      "pickAgain": "Votre brouillon restauré contenait un nouveau logo pour le mode sombre qui n'a pas pu être conservé — choisissez-le à nouveau."
     },
     "favicon": {
       "pickAgain": "Votre brouillon restauré contenait un nouveau favicon qui n'a pas pu être conservé — choisissez-le à nouveau."
@@ -2666,6 +2678,7 @@
       "cookieSettingsButton": "Bouton des paramètres des cookies",
       "brandName": "Nom de la marque",
       "logoAssetUrl": "Image du logo",
+      "logoDarkAssetUrl": "Image du logo pour le mode sombre",
       "faviconAssetUrl": "Image du favicon"
     }
   },

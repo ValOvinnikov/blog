@@ -2,6 +2,7 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   MOCK_FAVICON_URL,
+  MOCK_LOGO_DARK_URL,
   MOCK_LOGO_URL,
 } from '@platform/testing/site-config/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
@@ -39,6 +40,7 @@ const seedValues = () => ({
   accentHue: SEED_ACCENT_HUE,
   logoHue: undefined,
   logo: { url: MOCK_LOGO_URL },
+  logoDark: { url: undefined },
   favicon: { url: undefined },
   headingFont: FONT_CHOICE.FRAUNCES,
   bodyFont: FONT_CHOICE.INTER,
@@ -65,7 +67,7 @@ describe(buildLookRowSummaries, () => {
   it('summarises every row of the seeded look in its drawn order', () => {
     expect(buildLookRowSummaries(seedValues(), t, MULTIPLE_LANGUAGES)).toEqual({
       [LOOK_ROW.COLOUR]: 'Hue 192 · logo follows accent',
-      [LOOK_ROW.BRAND]: 'Logo uploaded · No favicon',
+      [LOOK_ROW.BRAND]: 'Logo uploaded · No dark-mode logo · No favicon',
       [LOOK_ROW.TYPE]: 'Fraunces · Inter',
       [LOOK_ROW.SHAPE]: 'Medium · Comfortable',
       [LOOK_ROW.CARDS]: 'Accent bar',
@@ -86,16 +88,26 @@ describe(buildLookRowSummaries, () => {
     expect(summaries[LOOK_ROW.COLOUR]).toBe('Hue 192 · Logo hue 40');
   });
 
-  it('reads a missing logo and an uploaded favicon', () => {
-    const values = {
-      ...seedValues(),
-      logo: { url: undefined },
-      favicon: { url: MOCK_FAVICON_URL },
-    };
+  it.each([
+    {
+      images: 'a missing logo and an uploaded favicon',
+      overrides: {
+        logo: { url: undefined },
+        favicon: { url: MOCK_FAVICON_URL },
+      },
+      summary: 'No logo · No dark-mode logo · Favicon uploaded',
+    },
+    {
+      images: 'an uploaded dark-mode logo',
+      overrides: { logoDark: { url: MOCK_LOGO_DARK_URL } },
+      summary: 'Logo uploaded · Dark-mode logo uploaded · No favicon',
+    },
+  ])('reads $images', ({ overrides, summary }) => {
+    const values = { ...seedValues(), ...overrides };
 
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
-    expect(summaries[LOOK_ROW.BRAND]).toBe('No logo · Favicon uploaded');
+    expect(summaries[LOOK_ROW.BRAND]).toBe(summary);
   });
 
   it('still names the spinner while busy buttons draw a progress edge', () => {

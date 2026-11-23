@@ -10,6 +10,7 @@ import {
 import { MOCK_BLOB_TOKEN } from '@platform/testing/blob/fixtures';
 import {
   MOCK_FAVICON_URL,
+  MOCK_LOGO_DARK_URL,
   MOCK_LOGO_URL,
   MOCK_THEME_FIELDS,
   mockSiteConfigThemeAndAssets,
@@ -93,6 +94,12 @@ describe(clearBrandAssetAction, () => {
       blobUrl: MOCK_LOGO_URL,
     },
     {
+      kind: brandAssetKindSchema.enum.logoDark,
+      stored: { logoDarkAssetUrl: MOCK_LOGO_DARK_URL },
+      cleared: { logoDarkAssetUrl: null },
+      blobUrl: MOCK_LOGO_DARK_URL,
+    },
+    {
       kind: brandAssetKindSchema.enum.favicon,
       stored: { faviconAssetUrl: MOCK_FAVICON_URL },
       cleared: { faviconAssetUrl: null },
@@ -128,26 +135,6 @@ describe(clearBrandAssetAction, () => {
     expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
-  it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
-    vi.mocked(getSiteConfigOrDefaults).mockResolvedValue(
-      mockSiteConfigThemeAndAssets({ faviconAssetUrl: MOCK_FAVICON_URL }),
-    );
-
-    await clearBrandAssetAction(
-      MOCK_TENANT_ID,
-      brandAssetKindSchema.enum.favicon,
-    );
-
-    expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
-    expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: MOCK_OPERATOR_ID,
-      action: AUDIT_ACTION.SETTINGS_UPDATED,
-      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: MOCK_TENANT_ID,
-      details: { asset: brandAssetKindSchema.enum.favicon, operation: 'clear' },
-    });
-  });
-
   it('is a no-op success when the field is already empty', async () => {
     const result = await clearBrandAssetAction(
       MOCK_TENANT_ID,
@@ -161,20 +148,44 @@ describe(clearBrandAssetAction, () => {
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
   });
 
-  it('reports failure with no audit event or site refresh when the write fails', async () => {
-    vi.mocked(getSiteConfigOrDefaults).mockResolvedValue(
-      mockSiteConfigThemeAndAssets({ faviconAssetUrl: MOCK_FAVICON_URL }),
-    );
-    upsertSiteConfigMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
+  describe('with a stored favicon', () => {
+    beforeEach(() => {
+      vi.mocked(getSiteConfigOrDefaults).mockResolvedValue(
+        mockSiteConfigThemeAndAssets({ faviconAssetUrl: MOCK_FAVICON_URL }),
+      );
+    });
 
-    const result = await clearBrandAssetAction(
-      MOCK_TENANT_ID,
-      brandAssetKindSchema.enum.favicon,
-    );
+    it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
+      await clearBrandAssetAction(
+        MOCK_TENANT_ID,
+        brandAssetKindSchema.enum.favicon,
+      );
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
-    expect(revalidateSiteConfig).not.toHaveBeenCalled();
+      expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
+      expect(insertAuditEventMock).toHaveBeenCalledWith({
+        actorId: MOCK_OPERATOR_ID,
+        action: AUDIT_ACTION.SETTINGS_UPDATED,
+        targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+        targetId: MOCK_TENANT_ID,
+        details: {
+          asset: brandAssetKindSchema.enum.favicon,
+          operation: 'clear',
+        },
+      });
+    });
+
+    it('reports failure with no audit event or site refresh when the write fails', async () => {
+      upsertSiteConfigMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
+
+      const result = await clearBrandAssetAction(
+        MOCK_TENANT_ID,
+        brandAssetKindSchema.enum.favicon,
+      );
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(insertAuditEventMock).not.toHaveBeenCalled();
+      expect(revalidateSiteConfig).not.toHaveBeenCalled();
+    });
   });
 
   it.each([

@@ -66,6 +66,11 @@ export const useLookDraftFields = () => {
       display: ({ logo }: TLookFormValues) => displayBrandImage(logo),
     },
     {
+      id: 'logoDark',
+      label: t('logoDarkFieldLabel'),
+      display: ({ logoDark }: TLookFormValues) => displayBrandImage(logoDark),
+    },
+    {
       id: 'favicon',
       label: t('faviconFieldLabel'),
       display: ({ favicon }: TLookFormValues) => displayBrandImage(favicon),
