@@ -36,6 +36,10 @@ updates:
       # SVG sanitiser: every later release pulls in an ESM-only dependency that
       # Vercel's runtime refuses to require(). Never bump it.
       - dependency-name: 'jsdom-commonjs'
+      # workflow 5.7.0 hung every apps/worker run on dev (#7882); hold it at
+      # 5.2.2 until a 5.x upgrade is tested on worker-dev.
+      - dependency-name: 'workflow'
+      - dependency-name: '@workflow/*'
     open-pull-requests-limit: 5
     labels: ['tooling']
 
