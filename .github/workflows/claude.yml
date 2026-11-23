@@ -61,7 +61,7 @@ jobs:
 
       - name: Run Claude Code
         id: claude
-        uses: anthropics/claude-code-action@f3b070c88125d33dbae5653df5f143101d4ea9dc # v1.0.276
+        uses: anthropics/claude-code-action@c84e279f859e2591391e95bd309286eb111c345f # v1.0.284
         # `.mcp.json` authenticates the github MCP server with
         # `Bearer ${GITHUB_PAT}`. Secrets are never auto-exposed as env vars, so
         # without this the header expands to a bare "Bearer " and the server
