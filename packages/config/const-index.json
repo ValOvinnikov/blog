@@ -400,6 +400,14 @@
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
+    "PLATFORM_ADMIN": [
+      {
+        "ref": "AUDIT_TARGET_TYPE.PLATFORM_ADMIN",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
     "CREATED": [
       {
         "ref": "AUDIT_ACTION.CREATED",
@@ -641,6 +649,30 @@
     "MEMBER_INVITE_CANCELLED": [
       {
         "ref": "AUDIT_ACTION.MEMBER_INVITE_CANCELLED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "ADMIN_INVITED": [
+      {
+        "ref": "AUDIT_ACTION.ADMIN_INVITED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "ADMIN_INVITE_CANCELLED": [
+      {
+        "ref": "AUDIT_ACTION.ADMIN_INVITE_CANCELLED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "ADMIN_REMOVED": [
+      {
+        "ref": "AUDIT_ACTION.ADMIN_REMOVED",
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/audit.ts"
