@@ -15,7 +15,7 @@ import {
   isReaderAccountFeatureEnabled,
 } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
-import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
+import { getBrandLogos } from '@web/server/site-config/get-brand-logos/get-brand-logos';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
@@ -40,7 +40,7 @@ export const SiteHeader = async () => {
     hasReaderAccounts,
     hasBookmarks,
     switcherStyle,
-    brandLogoUrl,
+    { logoUrl, darkLogoUrl },
     brandName,
     accountControl,
     headerStyle,
@@ -50,7 +50,7 @@ export const SiteHeader = async () => {
     isReaderAccountEnabled(),
     isReaderAccountFeatureEnabled(CAPABILITY.BOOKMARKS),
     getLanguageSwitcherStyle(siteConfigTenant),
-    getBrandLogoUrl(siteConfigTenant),
+    getBrandLogos(siteConfigTenant),
     getBrandName({ tenantId, tenantName }),
     getAccountControl(siteConfigTenant),
     getHeaderStyle(siteConfigTenant),
@@ -77,7 +77,8 @@ export const SiteHeader = async () => {
       <Header layout={layout} barStyle={barStyle}>
         <Header.Brand>
           <BrandLockupLink
-            logoUrl={brandLogoUrl}
+            logoUrl={logoUrl}
+            darkLogoUrl={darkLogoUrl}
             siteName={brandName}
             tagline={tagline}
           />

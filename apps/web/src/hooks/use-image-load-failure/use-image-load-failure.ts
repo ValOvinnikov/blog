@@ -1,17 +1,20 @@
 'use client';
 
-import type { TMaybeUndefined } from '@shinefold/config';
-import { useEffect, useRef, useState } from 'react';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
+import { type RefObject, useEffect, useState } from 'react';
 
 // `decode()` settles even when the image failed before hydration, which a React `onError` would miss.
-export const useImageLoadFailure = <T extends HTMLElement>(
+export const useImageLoadFailure = (
+  containerRef: RefObject<TMaybeNull<HTMLElement>>,
   src: TMaybeUndefined<string>,
 ) => {
-  const containerRef = useRef<T>(null);
   const [failedSrc, setFailedSrc] = useState<TMaybeUndefined<string>>();
 
   useEffect(() => {
-    const image = containerRef.current?.querySelector('img');
+    const image = Array.from(
+      containerRef.current?.querySelectorAll('img') ?? [],
+    ).find((candidate) => candidate.getAttribute('src') === src);
     if (!src || !image) {
       return;
     }
@@ -25,7 +28,7 @@ export const useImageLoadFailure = <T extends HTMLElement>(
     return () => {
       isCurrent = false;
     };
-  }, [src]);
+  }, [containerRef, src]);
 
-  return { containerRef, hasFailed: src !== undefined && failedSrc === src };
+  return !isUndefined(src) && failedSrc === src;
 };

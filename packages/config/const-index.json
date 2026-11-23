@@ -13004,6 +13004,14 @@
         "file": "apps/web/src/constants/site-config.ts"
       }
     ],
+    "brand_logo.site_config_fetch_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.BRAND_LOGO_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-config",
+        "file": "apps/web/src/constants/site-config.ts"
+      }
+    ],
     "site_config.plan_fetch_failed": [
       {
         "ref": "SITE_CONFIG_LOG.PLAN_FETCH_FAILED",
