@@ -45,6 +45,7 @@ An editor walks a reader through a process or a history: a step-by-step how-it-w
 - A timeline holds 2–8 items. A Horizontal timeline holds at most five (`validateTimelineHorizontalItemCap` errors); the web view also renders any timeline with more than five items vertically, whatever its stored orientation.
 - A Labelled timeline needs a marker on every item (`validateTimelineMarkerRequired`); markers stay under 16 characters, headings under 80. A body over 300 characters is a warning.
 - Numbered markers are the item's 1-based position, computed in the web view; Labelled markers are the item's text. Numbered markers are `aria-hidden` (the `<ol>` already numbers the items); labelled ones are read. An item with no marker renders no pill.
+- Markers never wrap. On Vertical, every item shares one marker column sized to the widest marker, so a range such as "2019 – 2021" stays inside its pill and the connector runs through every marker's centre; on Horizontal the connector runs behind each marker to the next.
 - A Horizontal timeline gives each item an equal share of the width and falls back to a stacked column once a share is narrower than 9rem (container query), so it never overflows.
 - Item alignment: on Horizontal the marker centres over its text; on Vertical the list centres as a block.
 - The list is an `<ol role="list">`; each heading and body is passed into `Timeline` compound slots (`Timeline.Item`, `.Marker`, `.Heading`, `.Body`).

@@ -24,6 +24,24 @@ const labelledItems = Array.from({ length: 3 }, () => ({
   body: faker.lorem.sentence(),
 }));
 
+const rangeLabelledItems = [
+  {
+    marker: '2016',
+    heading: faker.company.catchPhrase(),
+    body: faker.lorem.sentence(),
+  },
+  {
+    marker: '2019 – 2021',
+    heading: faker.company.catchPhrase(),
+    body: faker.lorem.sentence(),
+  },
+  {
+    marker: 'Q3 2024',
+    heading: faker.company.catchPhrase(),
+    body: faker.lorem.sentence(),
+  },
+];
+
 const fourItems = Array.from({ length: 4 }, () => ({
   heading: faker.company.catchPhrase(),
   body: faker.lorem.sentence(),
@@ -116,6 +134,26 @@ export const LabelledVertical: TStory = {
     markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
     children: renderTimelineItems(labelledItems, {
       markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
+    }),
+  },
+};
+
+export const LabelledVerticalLongMarker: TStory = {
+  args: {
+    markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
+    children: renderTimelineItems(rangeLabelledItems, {
+      markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
+    }),
+  },
+};
+
+export const LabelledHorizontalLongMarker: TStory = {
+  args: {
+    orientation: TIMELINE_ORIENTATION.HORIZONTAL,
+    markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
+    children: renderTimelineItems(rangeLabelledItems, {
+      markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
+      orientation: TIMELINE_ORIENTATION.HORIZONTAL,
     }),
   },
 };

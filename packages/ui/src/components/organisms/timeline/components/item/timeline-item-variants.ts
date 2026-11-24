@@ -4,9 +4,9 @@ import { tv } from '@shinefold/ui/lib/styling';
 export const timelineItemVariants = tv({
   slots: {
     root: [
-      'relative grid grid-cols-[var(--timeline-marker-track)_1fr] items-start gap-4',
+      'relative col-span-full grid grid-cols-subgrid items-start gap-4',
       'pb-8 last:pb-0',
-      'before:absolute before:top-8 before:bottom-0 before:left-[calc(var(--timeline-marker-track)/2)] before:w-px before:bg-divider before:content-[""]',
+      'before:absolute before:col-[1/2] before:inset-x-0 before:top-8 before:bottom-0 before:mx-auto before:w-px before:bg-divider before:content-[""]',
       'last:before:hidden',
     ],
     marker: ['relative row-span-full self-start justify-self-center'],
@@ -19,7 +19,7 @@ export const timelineItemVariants = tv({
       [TIMELINE_ORIENTATION.HORIZONTAL]: {
         root: [
           '@min-[9rem]/timeline:min-w-0 @min-[9rem]/timeline:flex-1 @min-[9rem]/timeline:grid-cols-1 @min-[9rem]/timeline:pb-0',
-          '@min-[9rem]/timeline:before:top-4 @min-[9rem]/timeline:before:bottom-auto @min-[9rem]/timeline:before:h-px @min-[9rem]/timeline:before:w-auto',
+          '@min-[9rem]/timeline:before:top-4 @min-[9rem]/timeline:before:bottom-auto @min-[9rem]/timeline:before:mx-0 @min-[9rem]/timeline:before:h-px @min-[9rem]/timeline:before:w-auto',
         ],
         marker: ['@min-[9rem]/timeline:row-span-1'],
         content: ['@min-[9rem]/timeline:col-start-1'],
@@ -35,9 +35,7 @@ export const timelineItemVariants = tv({
       orientation: TIMELINE_ORIENTATION.HORIZONTAL,
       itemAlignment: CONTENT_ALIGNMENT.LEFT,
       class: {
-        root: [
-          '@min-[9rem]/timeline:before:-right-[calc(var(--timeline-gap)+var(--timeline-marker-track)/2)]',
-        ],
+        root: ['@min-[9rem]/timeline:before:-right-(--timeline-gap)'],
         marker: ['@min-[9rem]/timeline:justify-self-start'],
         content: ['@min-[9rem]/timeline:text-left'],
       },

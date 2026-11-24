@@ -6,6 +6,7 @@ import {
   SIZE,
   type TBrandVariant,
 } from '@shinefold/config';
+import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import {
   BRAND_BAND_LABELS,
@@ -331,6 +332,29 @@ export const SquareMedia: TStory = {
       </>
     ),
   },
+};
+
+export const SquareMediaInitials: TStory = {
+  args: {
+    excerpt: undefined,
+    tags: undefined,
+    children: (
+      <>
+        <MediaCard.Media shape="square">
+          <Avatar
+            alt={personName}
+            name={personName}
+            shape="square"
+            className="size-full"
+          />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <a href={personHref}>{personName}</a>
+        </MediaCard.Title>
+      </>
+    ),
+  },
+  decorators: [inNarrowColumn],
 };
 
 export const CircleMedia: TStory = {
