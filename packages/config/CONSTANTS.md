@@ -1253,7 +1253,8 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@worker/constants/owner-access` — `apps/worker/src/constants/owner-access.ts`
 
-- **OWNER_ACCESS_LOG**: `CHECK_FAILED`=`"owner_access.check_failed"`, `CHECK_NOW_FAILED`=`"owner_access.check_now_failed"`, `RESEND_FAILED`=`"owner_access.resend_failed"`, `REPORT_FAILED`=`"owner_access.report_failed"`, `ACTIVITY_TOUCH_FAILED`=`"owner_access.activity_touch_failed"`, `INVITE_DELETE_FAILED`=`"owner_access.invite_delete_failed"`, `FINDING_OPEN_FAILED`=`"owner_access.finding_open_failed"`, `SWEEP_NOT_CONFIGURED`=`"owner_access.sweep_not_configured"`, `SWEEP_FAILED`=`"owner_access.sweep_failed"`, `SWEEP_TENANT_FAILED`=`"owner_access.sweep_tenant_failed"`
+- **OWNER_ACCESS_LOG**: `CHECK_FAILED`=`"owner_access.check_failed"`, `CHECK_NOW_FAILED`=`"owner_access.check_now_failed"`, `RESEND_FAILED`=`"owner_access.resend_failed"`, `REPORT_FAILED`=`"owner_access.report_failed"`, `ACTIVITY_TOUCH_FAILED`=`"owner_access.activity_touch_failed"`, `INVITE_DELETE_FAILED`=`"owner_access.invite_delete_failed"`, `FINDING_OPEN_FAILED`=`"owner_access.finding_open_failed"`, `SWEEP_NOT_CONFIGURED`=`"owner_access.sweep_not_configured"`, `SWEEP_FAILED`=`"owner_access.sweep_failed"`, `SWEEP_TENANT_FAILED`=`"owner_access.sweep_tenant_failed"`, `SWEEP_STARTED`=`"owner_access.sweep_started"`, `SWEEP_STEP_DONE`=`"owner_access.sweep_step_done"`, `SWEEP_FINISHED`=`"owner_access.sweep_finished"`
+- **OWNER_ACCESS_SWEEP_STEP**: `LIST_TENANTS`, `WAKE_OWNER`, `LIST_MEMBERS`, `WAKE_MEMBER`, `REVOKE_LOCKED_MEMBERS`
 
 ### `@worker/constants/owner-email` — `apps/worker/src/constants/owner-email.ts`
 
