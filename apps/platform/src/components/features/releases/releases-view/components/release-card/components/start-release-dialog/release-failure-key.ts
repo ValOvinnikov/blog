@@ -4,9 +4,11 @@ import { ACTION_OUTCOME, type TOutcome } from '@shinefold/config';
 
 const REFUSAL_KEYS = {
   [RELEASE_REFUSAL.RELEASE_RUNNING]: 'alreadyRunning',
+  [RELEASE_REFUSAL.RELEASE_STALE]: 'releaseStale',
   [RELEASE_REFUSAL.RELEASES_PAUSED]: 'releasesPaused',
 } satisfies Record<
   | typeof RELEASE_REFUSAL.RELEASE_RUNNING
+  | typeof RELEASE_REFUSAL.RELEASE_STALE
   | typeof RELEASE_REFUSAL.RELEASES_PAUSED,
   string
 >;

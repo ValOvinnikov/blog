@@ -2112,6 +2112,7 @@
       "REASON_REQUIRED": "Geef aan waarom je releast zonder geslaagde contrastcontrole."
     },
     "alreadyRunning": "Er loopt al een release.",
+    "releaseStale": "main is gewijzigd sinds deze pagina is geladen, dus er is niets gestart. Laad opnieuw om de nieuwe kandidaat te bekijken.",
     "releasesPaused": "Productiereleases zijn gepauzeerd.",
     "githubUnavailable": "GitHub was niet bereikbaar, dus er is niets gestart. Probeer het zo opnieuw.",
     "invalid": "Controleer de versie en de reden en probeer het opnieuw.",

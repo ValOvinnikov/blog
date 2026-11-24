@@ -33,6 +33,7 @@ type TReleaseFieldErrors = TFieldErrors<
 >;
 
 export type TStartReleaseDialogProps = {
+  headSha: string;
   lastTag: string;
   migrations: TReleaseMigrationSummary;
   isOverrideRequired: boolean;
@@ -41,6 +42,7 @@ export type TStartReleaseDialogProps = {
 };
 
 export const StartReleaseDialog = ({
+  headSha,
   lastTag,
   migrations,
   isOverrideRequired,
@@ -63,6 +65,7 @@ export const StartReleaseDialog = ({
     const result = await settleAction(
       startReleaseAction({
         version,
+        headSha,
         overrideReason: isOverrideRequired ? overrideReason : undefined,
       }),
     );

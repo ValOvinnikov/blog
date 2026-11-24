@@ -28,6 +28,7 @@ import { resolveContrastStatus } from './resolve-contrast-status';
 
 const startReleaseInputSchema = z.object({
   version: z.string().trim().max(64),
+  headSha: z.string(),
   overrideReason: z
     .string()
     .trim()
@@ -44,6 +45,7 @@ export type TStartReleaseResult = TActionResult<
   'version' | 'overrideReason',
   TReleaseFieldError,
   | typeof RELEASE_REFUSAL.RELEASE_RUNNING
+  | typeof RELEASE_REFUSAL.RELEASE_STALE
   | typeof RELEASE_REFUSAL.RELEASES_PAUSED
 >;
 
@@ -62,7 +64,7 @@ export const startReleaseAction = async (
   if (!parsed.success) {
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
-  const { version, overrideReason } = parsed.data;
+  const { version, headSha, overrideReason } = parsed.data;
 
   const [comparison, releaseRun] = await Promise.all([
     getCandidateComparison(),
@@ -78,7 +80,14 @@ export const startReleaseAction = async (
     };
   }
 
-  const { headSha, lastTag, changes } = comparison.data;
+  const { headSha: candidateSha, lastTag, changes } = comparison.data;
+  if (candidateSha !== headSha) {
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: RELEASE_REFUSAL.RELEASE_STALE,
+    };
+  }
+
   const versionError = releaseVersionError(version, lastTag);
   if (versionError) {
     return {

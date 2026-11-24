@@ -2112,6 +2112,7 @@
       "REASON_REQUIRED": "Begründe, warum du ohne bestandene Kontrastprüfung releast."
     },
     "alreadyRunning": "Es läuft bereits ein Release.",
+    "releaseStale": "main hat sich seit dem Laden dieser Seite geändert, daher wurde nichts gestartet. Lade die Seite neu, um den neuen Kandidaten zu prüfen.",
     "releasesPaused": "Produktions-Releases sind pausiert.",
     "githubUnavailable": "GitHub war nicht erreichbar, daher wurde nichts gestartet. Versuche es gleich noch einmal.",
     "invalid": "Prüfe Version und Begründung und versuche es erneut.",

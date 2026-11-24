@@ -91,6 +91,7 @@ export const ReleasesView = ({
         </>
       )}
       <ReleaseCard
+        headSha={headSha}
         lastTag={lastTag}
         hasChanges={totalCommits > 0}
         migrations={migrations}

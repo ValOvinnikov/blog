@@ -2112,6 +2112,7 @@
       "REASON_REQUIRED": "Indiquez pourquoi vous publiez sans contrôle de contraste réussi."
     },
     "alreadyRunning": "Une version est déjà en cours.",
+    "releaseStale": "main a changé depuis le chargement de cette page, rien n’a donc été lancé. Rechargez pour examiner le nouveau candidat.",
     "releasesPaused": "Les mises en production sont en pause.",
     "githubUnavailable": "GitHub est injoignable, rien n’a donc été lancé. Réessayez dans un instant.",
     "invalid": "Vérifiez la version et le motif, puis réessayez.",
