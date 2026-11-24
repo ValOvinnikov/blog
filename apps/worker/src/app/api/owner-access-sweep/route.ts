@@ -2,7 +2,7 @@ import { HTTP_STATUS } from '@shinefold/config/constants';
 import { sanitizeLogMessage } from '@shinefold/insight';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
-import { hasCronSecret } from '@worker/utils/cron-secret/cron-secret';
+import { hasBearerSecret } from '@worker/utils/bearer-secret/bearer-secret';
 import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
 import { runOwnerAccessSweep } from '@worker/utils/owner-access-sweep/run-owner-access-sweep';
@@ -20,7 +20,7 @@ export async function GET(request: Request): Promise<Response> {
       ENQUEUE_ERROR.SERVER_ERROR,
     );
   }
-  if (!hasCronSecret(request, secret)) {
+  if (!hasBearerSecret(request, secret)) {
     return respondError(HTTP_STATUS.UNAUTHORIZED, ENQUEUE_ERROR.UNAUTHORIZED);
   }
 

@@ -13510,6 +13510,46 @@
         "file": "apps/worker/src/constants/access-run.ts"
       }
     ],
+    "canary.not_configured": [
+      {
+        "ref": "CANARY_LOG.NOT_CONFIGURED",
+        "scope": "app:worker",
+        "from": "@worker/constants/canary",
+        "file": "apps/worker/src/constants/canary.ts"
+      }
+    ],
+    "canary.failed": [
+      {
+        "ref": "CANARY_LOG.FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/canary",
+        "file": "apps/worker/src/constants/canary.ts"
+      }
+    ],
+    "START_FAILED": [
+      {
+        "ref": "CANARY_FAILURE.START_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/canary",
+        "file": "apps/worker/src/constants/canary.ts"
+      }
+    ],
+    "RUN_FAILED": [
+      {
+        "ref": "CANARY_FAILURE.RUN_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/canary",
+        "file": "apps/worker/src/constants/canary.ts"
+      }
+    ],
+    "TIMED_OUT": [
+      {
+        "ref": "CANARY_FAILURE.TIMED_OUT",
+        "scope": "app:worker",
+        "from": "@worker/constants/canary",
+        "file": "apps/worker/src/constants/canary.ts"
+      }
+    ],
     "cookie_statement.seed_start_failed": [
       {
         "ref": "COOKIE_STATEMENT_LOG.SEED_START_FAILED",
