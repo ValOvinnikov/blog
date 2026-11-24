@@ -106,8 +106,6 @@ export const SKIN_REGISTRY = {
   }),
 } as const satisfies Record<TBrandVariant, TSkin>;
 
-export type TSkinName = keyof typeof SKIN_REGISTRY;
-
 export const STORYBOOK_SKINS = {
   STORYBOOK_INVERSE: defineSkin('Inverse (Storybook)', {
     ground: {

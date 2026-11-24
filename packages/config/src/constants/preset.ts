@@ -1,4 +1,3 @@
-import type { TSkinName } from '@shinefold/config/theme';
 import type { TValueOf } from '@shinefold/config/utils';
 
 import type {
@@ -96,8 +95,8 @@ export type TPresetBundle = {
   headerLayout: THeaderLayout;
   headerSubmenuStyle: THeaderSubmenuStyle;
   headerBarStyle: THeaderBarStyle;
-  headerBackground: TSkinName;
-  breadcrumbBackground: TSkinName;
+  headerBackground: TBrandVariant;
+  breadcrumbBackground: TBrandVariant;
   navLinkStyle: TNavLinkStyle;
   headingWeight: THeadingWeight;
   headingCase: THeadingCase;
