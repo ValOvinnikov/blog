@@ -2,7 +2,10 @@ import { ONBOARDING_STEP } from '@platform/constants/onboarding';
 import { SIGN_UP_REFUSAL } from '@platform/constants/sign-up';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { screen } from '@platform/testing/custom-render';
-import { reachReview } from '@platform/testing/onboarding/address-step';
+import {
+  ADDRESS_CHECK_TIMEOUT,
+  reachReview,
+} from '@platform/testing/onboarding/address-step';
 import {
   acceptAndCreate,
   ADDRESS_TAKEN,
@@ -57,7 +60,7 @@ describe(`<${OnboardingView.name}/>`, () => {
       });
       await acceptAndCreate(user);
 
-      await screen.findAllByText(ADDRESS_TAKEN);
+      await screen.findAllByText(ADDRESS_TAKEN, {}, ADDRESS_CHECK_TIMEOUT);
       const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
       const heading = stepHeading(STEPS.ADDRESS);
 
