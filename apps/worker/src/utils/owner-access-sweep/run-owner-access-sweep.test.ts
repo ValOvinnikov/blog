@@ -5,6 +5,7 @@ import { MEMBER_ACCESS_LOG } from '@worker/constants/member-access';
 import {
   OWNER_ACCESS_LOG,
   OWNER_ACCESS_SWEEP_CHECKS,
+  OWNER_ACCESS_SWEEP_STEP,
 } from '@worker/constants/owner-access';
 import { MOCK_MEMBERSHIP_ID } from '@worker/testing/member-access/fixtures';
 import { MOCK_QUEUE_DOWN } from '@worker/testing/outage/fixtures';
@@ -132,6 +133,23 @@ describe(runOwnerAccessSweep, () => {
       revoked: 2,
       failed: 1,
     });
+  });
+
+  it('logs the tenant before waking its owner access', async () => {
+    vi.mocked(listTenantsPendingOwnerElevation).mockResolvedValue([
+      mockProvisionedTenant(),
+    ]);
+    vi.mocked(wakeOwnerAccess).mockImplementation(() => {
+      expect(logger.info).toHaveBeenCalledWith(
+        OWNER_ACCESS_LOG.SWEEP_STEP_STARTED,
+        { step: OWNER_ACCESS_SWEEP_STEP.WAKE_OWNER, tenantId: MOCK_TENANT_ID },
+      );
+      return Promise.resolve();
+    });
+
+    await runOwnerAccessSweep();
+
+    expect(wakeOwnerAccess).toHaveBeenCalledOnce();
   });
 
   it('logs when the sweep starts and finishes with its result', async () => {

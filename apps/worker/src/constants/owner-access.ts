@@ -21,6 +21,7 @@ export const OWNER_ACCESS_LOG = {
   SWEEP_FAILED: 'owner_access.sweep_failed',
   SWEEP_TENANT_FAILED: 'owner_access.sweep_tenant_failed',
   SWEEP_STARTED: 'owner_access.sweep_started',
+  SWEEP_STEP_STARTED: 'owner_access.sweep_step_started',
   SWEEP_STEP_DONE: 'owner_access.sweep_step_done',
   SWEEP_FINISHED: 'owner_access.sweep_finished',
 } as const;
