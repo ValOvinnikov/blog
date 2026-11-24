@@ -468,8 +468,8 @@ file` are all denied alike) — an earlier version only handled the
     pushing; an ls-remote error still checks the name. `.husky/pre-push`
     applies the same check to the refs a push actually sends, counting a ref
     as new when its remote sha is all zeros, which covers pushes the hook
-    cannot parse. Without an issue number in the name, `board-auto-sync.yml`
-    cannot move the ticket.
+    cannot parse. Without an issue number in the name, `board-keeper` cannot
+    find the ticket.
   - `session-start-cloud.sh` — `SessionStart` hook that runs only when
     `CLAUDE_CODE_REMOTE=true`: it runs `pnpm install --frozen-lockfile` when
     `node_modules` is absent and prints the rename command when the current

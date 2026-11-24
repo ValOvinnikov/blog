@@ -6,12 +6,14 @@ import { MEMBER_ACCESS_LOG } from '@worker/constants/member-access';
 import {
   OWNER_ACCESS_LOG,
   OWNER_ACCESS_SWEEP_CHECKS,
+  OWNER_ACCESS_SWEEP_STEP,
 } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
 import { wakeMemberAccess } from '@worker/utils/member-access-run/member-access-run';
 import { wakeOwnerAccess } from '@worker/utils/owner-access-run/owner-access-run';
 
 import { revokeLockedMembers } from './revoke-locked-members';
+import { runSweepStep } from './run-sweep-step';
 
 export type TOwnerAccessSweepResult = {
   checked: number;
@@ -20,7 +22,14 @@ export type TOwnerAccessSweepResult = {
 };
 
 export async function runOwnerAccessSweep(): Promise<TOwnerAccessSweepResult> {
-  const tenants = await listTenantsPendingOwnerElevation();
+  const sweepStartedAt = Date.now();
+  logger.info(OWNER_ACCESS_LOG.SWEEP_STARTED);
+  const tenants = await runSweepStep(
+    OWNER_ACCESS_SWEEP_STEP.LIST_TENANTS,
+    {},
+    listTenantsPendingOwnerElevation,
+    (listed) => ({ pending: listed.length }),
+  );
   const pending = tenants.filter(
     ({ ownerSanityRole }) =>
       ownerSanityRole !== SANITY_PROJECT_ROLE.ADMINISTRATOR,
@@ -29,7 +38,9 @@ export async function runOwnerAccessSweep(): Promise<TOwnerAccessSweepResult> {
   const result: TOwnerAccessSweepResult = { checked: 0, revoked: 0, failed: 0 };
   for (const { id: tenantId } of pending) {
     try {
-      await wakeOwnerAccess(tenantId, OWNER_ACCESS_SWEEP_CHECKS);
+      await runSweepStep(OWNER_ACCESS_SWEEP_STEP.WAKE_OWNER, { tenantId }, () =>
+        wakeOwnerAccess(tenantId, OWNER_ACCESS_SWEEP_CHECKS),
+      );
       result.checked++;
     } catch (error) {
       result.failed++;
@@ -40,12 +51,20 @@ export async function runOwnerAccessSweep(): Promise<TOwnerAccessSweepResult> {
     }
   }
 
-  for (const {
-    tenantId,
-    membershipId,
-  } of await listMembersPendingStudioAccess()) {
+  const members = await runSweepStep(
+    OWNER_ACCESS_SWEEP_STEP.LIST_MEMBERS,
+    {},
+    listMembersPendingStudioAccess,
+    (listed) => ({ pending: listed.length }),
+  );
+  for (const { tenantId, membershipId } of members) {
     try {
-      await wakeMemberAccess(tenantId, membershipId, OWNER_ACCESS_SWEEP_CHECKS);
+      await runSweepStep(
+        OWNER_ACCESS_SWEEP_STEP.WAKE_MEMBER,
+        { tenantId, membershipId },
+        () =>
+          wakeMemberAccess(tenantId, membershipId, OWNER_ACCESS_SWEEP_CHECKS),
+      );
       result.checked++;
     } catch (error) {
       result.failed++;
@@ -57,8 +76,17 @@ export async function runOwnerAccessSweep(): Promise<TOwnerAccessSweepResult> {
     }
   }
 
-  const { revoked, failed } = await revokeLockedMembers();
+  const { revoked, failed } = await runSweepStep(
+    OWNER_ACCESS_SWEEP_STEP.REVOKE_LOCKED_MEMBERS,
+    {},
+    revokeLockedMembers,
+    (outcome) => outcome,
+  );
   result.revoked = revoked;
   result.failed += failed;
+  logger.info(OWNER_ACCESS_LOG.SWEEP_FINISHED, {
+    ...result,
+    durationMs: Date.now() - sweepStartedAt,
+  });
   return result;
 }

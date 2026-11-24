@@ -1219,6 +1219,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## app:worker
 
+### `@worker/constants/access-run` — `apps/worker/src/constants/access-run.ts`
+
+- **ACCESS_RUN_LOG**: `WORKFLOW_CALL_STARTED`=`"access_run.workflow_call_started"`, `WORKFLOW_CALL_DONE`=`"access_run.workflow_call_done"`
+- **ACCESS_RUN_CALL**: `GET_HOOK_BY_TOKEN`, `RUN_STATUS`, `RUN_CREATED_AT`, `RUN_CANCEL`, `RESUME_HOOK`, `START_RUN`
+
 ### `@worker/constants/cookie-statement` — `apps/worker/src/constants/cookie-statement.ts`
 
 - **COOKIE_STATEMENT_LOG**: `SEED_START_FAILED`=`"cookie_statement.seed_start_failed"`, `SEED_FAILED`=`"cookie_statement.seed_failed"`
@@ -1258,7 +1263,8 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@worker/constants/owner-access` — `apps/worker/src/constants/owner-access.ts`
 
-- **OWNER_ACCESS_LOG**: `CHECK_FAILED`=`"owner_access.check_failed"`, `CHECK_NOW_FAILED`=`"owner_access.check_now_failed"`, `RESEND_FAILED`=`"owner_access.resend_failed"`, `REPORT_FAILED`=`"owner_access.report_failed"`, `ACTIVITY_TOUCH_FAILED`=`"owner_access.activity_touch_failed"`, `INVITE_DELETE_FAILED`=`"owner_access.invite_delete_failed"`, `FINDING_OPEN_FAILED`=`"owner_access.finding_open_failed"`, `SWEEP_NOT_CONFIGURED`=`"owner_access.sweep_not_configured"`, `SWEEP_FAILED`=`"owner_access.sweep_failed"`, `SWEEP_TENANT_FAILED`=`"owner_access.sweep_tenant_failed"`
+- **OWNER_ACCESS_LOG**: `CHECK_FAILED`=`"owner_access.check_failed"`, `CHECK_NOW_FAILED`=`"owner_access.check_now_failed"`, `RESEND_FAILED`=`"owner_access.resend_failed"`, `REPORT_FAILED`=`"owner_access.report_failed"`, `ACTIVITY_TOUCH_FAILED`=`"owner_access.activity_touch_failed"`, `INVITE_DELETE_FAILED`=`"owner_access.invite_delete_failed"`, `FINDING_OPEN_FAILED`=`"owner_access.finding_open_failed"`, `SWEEP_NOT_CONFIGURED`=`"owner_access.sweep_not_configured"`, `SWEEP_FAILED`=`"owner_access.sweep_failed"`, `SWEEP_TENANT_FAILED`=`"owner_access.sweep_tenant_failed"`, `SWEEP_STARTED`=`"owner_access.sweep_started"`, `SWEEP_STEP_STARTED`=`"owner_access.sweep_step_started"`, `SWEEP_STEP_DONE`=`"owner_access.sweep_step_done"`, `SWEEP_FINISHED`=`"owner_access.sweep_finished"`
+- **OWNER_ACCESS_SWEEP_STEP**: `LIST_TENANTS`, `WAKE_OWNER`, `LIST_MEMBERS`, `WAKE_MEMBER`, `REVOKE_LOCKED_MEMBERS`
 
 ### `@worker/constants/owner-email` — `apps/worker/src/constants/owner-email.ts`
 

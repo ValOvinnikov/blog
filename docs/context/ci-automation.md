@@ -3,7 +3,7 @@
 > Part of the docs split described in [`docs/README.md`](../README.md).
 
 All automation lives in `.github/workflows/` (shared pnpm/Node setup in
-`.github/actions/setup`; Dependabot bumps npm + GitHub Actions weekly).
+`.github/actions/setup`).
 `.github/actions/setup` takes an optional `install-filter` input (default
 empty, meaning an unscoped `pnpm install --frozen-lockfile` across every
 workspace). When set, its value is split on whitespace into one `--filter=`
@@ -55,7 +55,7 @@ composite action is for.
 `timeout-minutes: 15`, because it pays a fixed dependency-setup cost on top of
 its own work; jobs whose work genuinely takes longer (the deploy,
 dataset and content-migration jobs) keep their larger budgets. A job that
-installs nothing — Workflow security, Dependency scan, Board auto-sync,
+installs nothing — Workflow security, Dependency scan,
 and the `changes` path-filter jobs — gets `timeout-minutes: 5`. Every job
 carries an explicit budget except those that call a reusable workflow, where
 GitHub does not permit the key. Before this policy the budgets ranged from 5 to
@@ -101,8 +101,6 @@ re-stage.
 | **Sync Revalidate Webhooks** (`sync-revalidate-webhooks.yml`)       | manual `workflow_dispatch` only                                                                                                                                    | Runs `apps/worker`'s revalidate-webhook step for every live tenant (`script: sync`, `pnpm --filter worker sync-revalidate-webhooks`) or rotates a per-tenant secret onto every tenant without one (`script: rotate-secrets`, `rotate-webhook-secrets`), against the GitHub Environment the `environment` input names (`development`/`production`). The run log carries the `{ updated, unchanged, failed }` summary and the job fails if any tenant failed. Reads only the tenant registry connection string, `TENANT_TOKEN_ENCRYPTION_KEY` and `vars.WEB_APP_URL`, which must equal that environment's web URL exactly. One concurrency group covers both scripts, so two dispatches queue rather than overlap.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | **Document Validation** (`document-validation.yml`)                 | manual `workflow_dispatch` + `workflow_call` — no schedule                                                                                                         | Runs `sanity documents validate --yes` (read-only) against the console reference project's dataset — every existing document checked against the current Studio schema. Same repo-level `SANITY_STUDIO_PROJECT_ID`/`SANITY_STUDIO_DATASET` Variables and `SANITY_API_READ_TOKEN` secret as `ci.yml`'s Migrations dry-run step, but unlike that step it never no-ops: a missing token fails the run with an error naming `SANITY_API_READ_TOKEN`, so a green run always means documents were validated. `workflow_call` is the hook the platform Releases page uses to run it before a release; the secret is `required: true`, so a caller must pass `SANITY_API_READ_TOKEN` (or `secrets: inherit`) and grant `contents: read` + `issues: write`. On failure a second job opens one tracking issue titled "Document validation is failing" (`bug`, `prio:next` — filed unlabelled if either label is missing; its text names the missing secret when that was the cause), or comments the run link on it while it stays open. Advisory by nature — see "Document validation moved off the per-PR run" below — and deliberately absent from the branch ruleset's required checks. Tenant datasets are the separate Validate Tenant Documents workflow below.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | **Migrate Tenant Content** (`migrate-tenant-content.yml`)           | **push parked** (`push: branches: [main]` commented out until launch, #6461; #6152 restores it) — manual `workflow_dispatch` + `workflow_call` only                | Applies pending Sanity **content** migrations to every writable-status (ACTIVE, TRIAL or PAST_DUE), non-deprovisioned tenant's own Sanity project. Logic lives in `packages/db/scripts/migrate-tenant-content/`, not the workflow YAML. Each tenant's `migrate.mjs deploy --yes` runs with `SANITY_STUDIO_PROJECT_ID`/`SANITY_STUDIO_DATASET`/`SANITY_AUTH_TOKEN` overridden to that tenant's own decrypted **write** token (`getTenantSanityWriteCredentials`), so blast radius stays one tenant per credential. **Empty-ledger tenants are backfilled, never replayed** (`isTenantMigrationLedgerEmpty` → `--backfill`), because they were seeded at the then-current schema. The per-dataset `migrationState` ledger makes every run idempotent, so a retried release skips a tenant whose migrations are already applied. One tenant's failure never aborts the sweep, but any failure fails the job. **A production run exports each tenant dataset just before migrating it** (`TENANT_EXPORT_DIR`; a failed export counts as that tenant's failure and it is not migrated) and, even when a tenant failed, bundles the exports into one tarball stored through `.github/actions/encrypted-backup` as `release/<label>/attempt-<run_attempt>/tenant-exports.tar.gz.age` (`release/run-<run>/attempt-<run_attempt>/` when no `label` is passed). Its `check-only` mode runs before the fan-out, so an unset `BACKUP_AGE_RECIPIENT` or `BACKUP_R2_*` value fails the job before any tenant is migrated. This interim export is replaced by the daily tenant backups (#5095). A dev push exports nothing. `workflow_dispatch` and `workflow_call` take an optional `tenantId` (blank migrates every tenant) and `environment`; `workflow_call` also takes `ref`, the commit whose migrations run, and `label`, which `release.yml` sets to the version. `release.yml` is the production caller; there is no tag trigger. The `Detect changes` job cancels only an older push's detection, never a release's. The push trigger is parked because there are no content migrations before launch, so a dev push run did nothing, yet it failed whenever a merge added a `tenants` column the paused dev deploy had not yet applied.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-
-| **Board Auto-Sync** (`board-auto-sync.yml`) | `create` (branch) + `pull_request` (opened, reopened) | Turns cloud-session branch/PR evidence into board status writes, closing the gap in `CLAUDE.md`'s cloud-session protocol where status otherwise waits on a local session dispatching `board-keeper`. A pushed branch matching `<type>/<n>-<slug>`, the legacy `issue/<n>-*` form, or the GitHub Actions `@claude` cloud shape `claude/issue-<n>-<timestamp>` moves issue `#n` to **In Progress**; an opened/reopened PR whose body carries `Closes #n`/`Fixes #n`/`Resolves #n` (falling back to the branch name) moves it to **Code Review**; either move also takes the issue's parent from Todo to **In Progress**, the way `board-keeper` promotes a parent when any sub-issue starts — all forward-only, mirroring `board-keeper.md` Step 4's safe-transition list, and both re-verified with an independent read after the write (the same Projects v2 silent-write-failure mode `board-keeper.md` documents). Shared logic lives in `.github/scripts/sync-board-status.sh`. Uses the `GH_PAT` secret (see the Claude Code row above) since the default `GITHUB_TOKEN` cannot write Projects v2; the workflow fails loudly, before any API call, if that secret is absent. Gated to the owner as `github.actor`, or `claude[bot]` as the branch's creator (`github.event.sender.login`) or the PR's author (`github.event.pull_request.user.login`) — zizmor rejects a `github.actor` bot check as spoofable — same posture as `claude.yml` (which only runs `claude[bot]` for the owner, so the `@claude` runner's own branches and PRs count) — without it, a PR body's `Closes #n` is attacker-controllable input any contributor to this repo could use to move an arbitrary issue on the board. Its ungated `branch-name` job fails any opened/reopened PR, drafts included, whose head ref is off the pattern in `scripts/branch-name.mjs` (`<type>/<n>-<slug>`, plus `main`, `dependabot/…` and the `@claude` Action's `claude/issue-<n>-<YYYYMMDD>-<HHMM>`) — the CI end of the check `.husky/pre-push` and `pre-bash-branch-name-guard.sh` apply locally. |
 
 **Required status checks on `main`:** `CI` and `Workflow security`, and no
 other. Every job in `ci.yml` reaches the merge gate through `CI`.
@@ -176,6 +174,16 @@ Script helper tests step. A skipped job reads as success to `CI`, which fails
 only on a `failure` or `cancelled` need. `Changes` is in `CI`'s `needs`, so a failure there fails
 the gate.
 
+**Branch-name check.** On a pull request, `Changes` runs
+`node scripts/branch-name.mjs --check` on the head ref, so a PR whose head branch
+is off the pattern (`<type>/<n>-<slug>`, plus `main`, `dependabot/…` and the
+`@claude` Action's `claude/issue-<n>-<YYYYMMDD>-<HHMM>`) fails `Changes` and
+so `CI`. The full gate has no pull request and skips the step.
+
+**Board status.** Local sessions set it through `board-keeper`. When a cloud
+session opens a PR, the project's built-in "linked pull request" workflow
+moves the issue to Code Review. No Actions job writes the board.
+
 **Affected-only runs.** Verify's Type-check, Lint and Build steps and the Test job run
 `turbo run <task> --affected` with `TURBO_SCM_BASE` set to the PR's base SHA,
 so a PR that changes one package runs that package and its dependents (a
@@ -186,7 +194,9 @@ nothing). Three things keep that from running too little:
   affected when any of them changes, so a root config, setup-action, `.nvmrc`
   or lockfile change runs every task. They also bust every task's cache — the
   price of one rule instead of per-task `inputs` that each had to remember
-  which preset they read.
+  which preset they read. `configs/**` excludes `configs/**/.turbo/**`: the
+  glob matches ignored files too, so turbo's own task logs would otherwise
+  change every hash depending on which tasks ran earlier in the job.
 - `full` from `Changes` drops `--affected` for the same paths independently,
   so a root change runs the whole repo even if turbo's own detection misses
   it, and a run with no PR base does the same.
@@ -209,8 +219,7 @@ The step names are the job names they replaced, in this order:
   copied, modified or renamed (`git diff --name-only --diff-filter=ACMR`
   against the base, merge-base). Prettier skips what `.prettierignore` names
   even when passed explicitly, so a file the PR did not touch never fails it.
-  It catches edits that bypassed lint-staged, such as GitHub web edits and
-  Dependabot.
+  It catches edits that bypassed lint-staged, such as GitHub web edits.
 - **Type-check**, **Lint** — turbo, affected-only (above). In `apps/web`
   and `apps/platform`, `type-check` runs `next typegen` before `tsc`, so it checks against Next's
   generated route types (`.next/types/`) on a clean checkout, and catches
@@ -360,6 +369,15 @@ literal `2` rather than a percentage also resolves the same on every machine
 and runner size. Note the flag sits on `turbo run` directly: pnpm forwards
 `pnpm test -- --concurrency=2` verbatim, so the `--` would hand the flag to
 vitest, not turbo.
+
+**Both test steps print what went into each Turbo hash.** CI's Test job and
+Deploy Development's Test step set `TURBO_RUN_SUMMARY`, and the step after
+each, "Turbo test hash inputs" (`scripts/print-turbo-hash-inputs.sh`), prints
+one `global` line, one `global-files` line and one `task` line per task,
+including the `^build` tasks tests depend on. When the deploy misses the cache
+for tests CI just ran, compare the two runs' lines: the first field that
+differs — `hashOfExternalDependencies`, the files digest, a task's
+`inputsDigest`, `dependencies` or `environmentVariables` — is the cause.
 
 **Every test file has a time budget, enforced in CI only.** The shared
 vitest preset (`configs/vitest/preset.ts`) adds a JSON reporter beside the
@@ -612,19 +630,14 @@ tail once any PR is marked ready: `ci-watcher` reports them, and a red one is
 diagnosed from the run log rather than reproduced (`open-pull-request` Gate
 5a).
 
-## Dependabot groups
+## Dependency updates are manual
 
-`.github/dependabot.yml` bumps npm and GitHub Actions weekly, each capped at
-five open pull requests. npm minor and patch bumps arrive as one
-`minor-and-patch` pull request per run, except that `eslint`, `storybook` and
-`vitest` keep their own groups, which carry majors too. Actions minor and
-patch bumps arrive as one `github-actions` pull request. Every other major
-bump, in either ecosystem, arrives on its own.
-
-A dependency joins the first group whose patterns match, so the catch-all
-stays last. One catch-all also means one bad bump holds up the rest of the
-group: when its pull request goes red, find the offender, add a temporary
-`ignore` for it, and let the next run regroup the others.
+No bot opens version-bump pull requests: each one bills a full CI run, and
+an unattended bump of a worker runtime package once took worker-dev down.
+Dependencies are upgraded by hand, as a ticket, when wanted. Dependabot
+alerts stay on to flag vulnerable versions; security-update pull requests are
+off. `scripts/branch-name.mjs` still accepts `dependabot/…` branches, so a
+re-enabled security update is not refused.
 
 ## The Vercel CLI pin tracks the pinned Node version
 
@@ -837,7 +850,7 @@ any other change still builds. Allowlist mode needs no such carve-out:
 
 Affected mode also inherits `turbo.json`'s `globalDependencies`: a change to
 `configs/**`, the setup action, `.nvmrc`, the lockfile or `turbo.json` marks
-`@shinefold/ui` affected and builds `ui-library`, a Dependabot lockfile bump
+`@shinefold/ui` affected and builds `ui-library`, a lockfile-only bump
 included.
 
 `scripts/vercel-ignore-affected.test.sh` pins all of this (see the Hooks row

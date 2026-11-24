@@ -20,4 +20,15 @@ export const OWNER_ACCESS_LOG = {
   SWEEP_NOT_CONFIGURED: 'owner_access.sweep_not_configured',
   SWEEP_FAILED: 'owner_access.sweep_failed',
   SWEEP_TENANT_FAILED: 'owner_access.sweep_tenant_failed',
+  SWEEP_STARTED: 'owner_access.sweep_started',
+  SWEEP_STEP_STARTED: 'owner_access.sweep_step_started',
+  SWEEP_STEP_DONE: 'owner_access.sweep_step_done',
+  SWEEP_FINISHED: 'owner_access.sweep_finished',
+} as const;
+export const OWNER_ACCESS_SWEEP_STEP = {
+  LIST_TENANTS: 'LIST_TENANTS',
+  WAKE_OWNER: 'WAKE_OWNER',
+  LIST_MEMBERS: 'LIST_MEMBERS',
+  WAKE_MEMBER: 'WAKE_MEMBER',
+  REVOKE_LOCKED_MEMBERS: 'REVOKE_LOCKED_MEMBERS',
 } as const;
