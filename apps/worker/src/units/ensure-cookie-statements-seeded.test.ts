@@ -5,6 +5,7 @@ import { getTenantSanityWriteCredentials } from '@shinefold/db/queries/tenants';
 import { COOKIE_STATEMENT_LOG } from '@worker/constants/cookie-statement';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
+import { mockSanityClient } from '@worker/testing/sanity-client/mock-sanity-client';
 import {
   MOCK_SANITY_DATASET,
   MOCK_SANITY_PROJECT_ID,
@@ -23,8 +24,7 @@ vi.mock('workflow');
 const MOCK_WRITE_TOKEN = 'sk-write';
 const MOCK_LOCALES = [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.DE];
 
-const createIfNotExists = vi.fn();
-const commit = vi.fn();
+const { client, createIfNotExists, commit } = mockSanityClient();
 
 describe(ensureCookieStatementsSeeded, () => {
   beforeEach(() => {
@@ -38,9 +38,7 @@ describe(ensureCookieStatementsSeeded, () => {
       provisioningStatus: null,
     });
     commit.mockResolvedValue({});
-    vi.mocked(createClientWithTimeout).mockReturnValue({
-      transaction: () => ({ createIfNotExists, commit }),
-    } as never);
+    vi.mocked(createClientWithTimeout).mockReturnValue(client);
   });
 
   it('creates the starter cookie statement for each locale in one commit, only where missing', async () => {

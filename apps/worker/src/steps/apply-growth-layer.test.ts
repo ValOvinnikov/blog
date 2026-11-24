@@ -16,6 +16,7 @@ import {
   MOCK_REVISION,
   mockKeyedReference,
 } from '@worker/testing/sample-content/fixtures';
+import { mockSanityClient } from '@worker/testing/sanity-client/mock-sanity-client';
 import {
   buildLedgerEntry,
   GROWTH_LAYER_LEDGER_ENTRY_ID,
@@ -33,17 +34,15 @@ const MOCK_PLACEHOLDER_IMAGES = {
 };
 const MOCK_FREE_MODULES = [mockKeyedReference(ids.PORTFOLIO_INTRO)];
 
-const upload = vi.fn();
-const fetch = vi.fn();
-const createIfNotExists = vi.fn();
-const patch = vi.fn();
-const commit = vi.fn();
-const transaction = vi.fn(() => ({ createIfNotExists, patch, commit }));
-const MOCK_CLIENT = {
-  assets: { upload },
+const {
+  client: MOCK_CLIENT,
+  upload,
   fetch,
   transaction,
-} as unknown as Parameters<ReturnType<typeof applyGrowthLayer>>[0];
+  createIfNotExists,
+  patch,
+  commit,
+} = mockSanityClient();
 
 const MOCK_PORTFOLIO_LAYER = buildGrowthLayer({
   siteType: SITE_TYPE.PORTFOLIO,
