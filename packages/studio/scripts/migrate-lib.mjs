@@ -83,7 +83,7 @@ export const computePending = (folderIds, appliedIds) => {
 /** Build a `migrationState.applied[]` entry for a successfully-applied migration. */
 export const buildLedgerEntry = (id, { runAt, sha }) => ({ id, runAt, sha });
 
-/** Must stay in step with `.github/workflows/ci.yml`'s Migrations job, which applies the same `index.ts` test. */
+/** Must stay in step with `.github/workflows/ci.yml`'s Dry-run migrations step, which applies the same `index.ts` test. */
 export const listMigrationIds = (migrationsDir) =>
   readdirSync(migrationsDir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
