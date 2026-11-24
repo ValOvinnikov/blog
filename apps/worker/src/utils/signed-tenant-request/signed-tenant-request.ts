@@ -81,7 +81,7 @@ export async function readSignedTenantRequest(
   return signed.ok ? okResult(signed.data.tenantId) : signed;
 }
 
-type TWriteRefusalOptions = { requiresWritableStatus?: boolean };
+export type TWriteRefusalOptions = { requiresWritableStatus?: boolean };
 
 async function refuseTenantWithout(
   tenantId: string,
