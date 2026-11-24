@@ -41,9 +41,10 @@ regressions); lowering it loosens the budget. There's no separate schema
 migration or regeneration step — the file is read directly by the workflow
 on the next run.
 
-## Activation status — active, targets production (#826)
+## Activation status — manual dispatch only, targets production (#826)
 
-This job is **active**: the repo Variable `LIGHTHOUSE_URLS` (Settings →
+This job runs **only on manual dispatch** (`workflow_dispatch`); no PR or push
+to `main` triggers it. The repo Variable `LIGHTHOUSE_URLS` (Settings →
 Secrets and variables → Actions → Variables) is set to two **production**
 URLs — `https://{your-hosting}/` and one live post page.
 
@@ -63,9 +64,10 @@ category's crawlability audit — and separately carries cold-start /
 unwarmed-ISR performance noise unrelated to any PR's actual changes.
 
 **Production is the correct stable target** — it's the only environment where
-the budgets measure real, indexable behavior. The accepted trade-off: this job
-checks production's current health on every PR, not the PR's own diff, until a
-true per-PR preview target exists (none is currently tracked). It stays
+the budgets measure real, indexable behavior. The accepted trade-off: a run
+checks production's current health, not any PR's diff, so nothing triggers it
+automatically — dispatch it when production's budgets are the question, until
+a true per-PR preview target exists (none is currently tracked). It stays
 advisory (non-required, per #399) for exactly that reason.
 
 If `LIGHTHOUSE_URLS` is ever cleared, the Lighthouse step no-ops green (see
