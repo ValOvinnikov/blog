@@ -2120,7 +2120,12 @@ under `PERSONAL_DATA_INDEX_KEY`. An account is the exception: `users` are
 indexed by `accountEmailIndex`, the same HMAC over `normalizeEmail` (`+tag`
 kept), because `name+tag@domain` may be a different mailbox and must never
 sign in as `name@domain`. Both keys are backed up outside the database:
-losing the encryption key loses the data.
+losing the encryption key loses the data. Beside them,
+`NEWSLETTER_UNSUBSCRIBE_KEY` signs each subscriber's unsubscribe link
+(`<subscriberId>~<signature>`) through the same `keyedHmac`, so the link is
+verified rather than stored; changing it breaks every link already sent, and
+an unsubscribe request arriving while it is unset logs
+`newsletter.unsubscribe_key_missing` and shows the invalid-link page.
 No table stores a readable email address, name or lead message: the encrypted
 and index forms are the only copy, so every write and read of them throws
 while a key is unset. `users.email` and `users.name` stay as columns only
