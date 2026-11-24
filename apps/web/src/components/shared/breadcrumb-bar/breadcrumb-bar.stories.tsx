@@ -14,13 +14,16 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
+const HOME_ITEM = { label: 'Home', href: '/' };
+const ENGINEERING_ITEM = { label: 'Engineering', href: '/topics/engineering' };
+
 export const Default: TStory = {
   args: {
     children: (
       <Breadcrumbs
         items={[
-          { label: 'Home', href: '/' },
-          { label: 'Engineering', href: '/topics/engineering' },
+          HOME_ITEM,
+          ENGINEERING_ITEM,
           {
             label: 'How we ship reviews faster',
             href: '/blog/how-we-ship-reviews-faster',
@@ -33,15 +36,11 @@ export const Default: TStory = {
   },
 };
 
-/**
- * A single-item trail — the "current page" formatting still applies even
- * when it's also the first (Home) item.
- */
 export const SingleItem: TStory = {
   args: {
     children: (
       <Breadcrumbs
-        items={[{ label: 'Home', href: '/' }]}
+        items={[HOME_ITEM]}
         ariaLabel="Breadcrumb"
         linkAs={SmartLink}
       />
@@ -49,18 +48,13 @@ export const SingleItem: TStory = {
   },
 };
 
-/**
- * A long final segment demonstrates the trail's own truncation — earlier
- * items never shrink, only the current (last) item's text clips with an
- * ellipsis when the full trail doesn't fit on one line.
- */
 export const LongCurrentPage: TStory = {
   args: {
     children: (
       <Breadcrumbs
         items={[
-          { label: 'Home', href: '/' },
-          { label: 'Engineering', href: '/topics/engineering' },
+          HOME_ITEM,
+          ENGINEERING_ITEM,
           {
             label:
               'A very long post title that keeps going well past a comfortable line length for the current breadcrumb segment',
@@ -79,10 +73,7 @@ export const AbovePageHeading: TStory = {
     isAbovePageHeading: true,
     children: (
       <Breadcrumbs
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Modules', href: '/modules' },
-        ]}
+        items={[HOME_ITEM, { label: 'Modules', href: '/modules' }]}
         ariaLabel="Breadcrumb"
         linkAs={SmartLink}
       />
