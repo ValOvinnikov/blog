@@ -2112,6 +2112,7 @@
       "REASON_REQUIRED": "Indica por qué publicas sin una comprobación de contraste superada."
     },
     "alreadyRunning": "Ya hay una versión en curso.",
+    "releaseStale": "main ha cambiado desde que se cargó esta página, así que no se ha iniciado nada. Recarga para revisar el nuevo candidato.",
     "releasesPaused": "Las versiones en producción están en pausa.",
     "githubUnavailable": "No se pudo contactar con GitHub, así que no se ha iniciado nada. Inténtalo de nuevo en un momento.",
     "invalid": "Revisa la versión y el motivo e inténtalo de nuevo.",

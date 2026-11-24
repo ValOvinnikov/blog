@@ -2,19 +2,21 @@ import { RELEASE_REFUSAL } from '@platform/constants/release';
 import type { TStartReleaseResult } from '@platform/server/releases/start-release-action';
 import { ACTION_OUTCOME, type TOutcome } from '@shinefold/config';
 
-const REFUSAL_KEYS = {
-  [RELEASE_REFUSAL.RELEASE_RUNNING]: 'alreadyRunning',
-  [RELEASE_REFUSAL.RELEASES_PAUSED]: 'releasesPaused',
-} satisfies Record<
-  | typeof RELEASE_REFUSAL.RELEASE_RUNNING
-  | typeof RELEASE_REFUSAL.RELEASES_PAUSED,
-  string
->;
-
 type TReleaseFailure = Exclude<
   TStartReleaseResult,
   TOutcome<typeof ACTION_OUTCOME.SUCCESS>
 >;
+
+type TReleaseRefusalReason = Extract<
+  TReleaseFailure,
+  { outcome: typeof ACTION_OUTCOME.REFUSED }
+>['reason'];
+
+const REFUSAL_KEYS = {
+  [RELEASE_REFUSAL.RELEASE_RUNNING]: 'alreadyRunning',
+  [RELEASE_REFUSAL.RELEASE_STALE]: 'releaseStale',
+  [RELEASE_REFUSAL.RELEASES_PAUSED]: 'releasesPaused',
+} satisfies Record<TReleaseRefusalReason, string>;
 
 export const releaseFailureKey = (result: TReleaseFailure) => {
   switch (result.outcome) {

@@ -6,6 +6,7 @@ import { ARIA_DISABLED } from '@platform/testing/aria';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
+  MOCK_HEAD_SHA,
   MOCK_LAST_TAG,
   mockReleaseCandidate,
   mockReleaseRun,
@@ -45,6 +46,7 @@ vi.mock('@platform/server/releases/get-release-run-action', () => ({
 const MOCK_VERSION = `v${faker.system.semver()}`;
 
 const setup = customRender(ReleaseCard, {
+  headSha: MOCK_HEAD_SHA,
   lastTag: MOCK_LAST_TAG,
   hasChanges: true,
   migrations: mockReleaseCandidate().migrations,
@@ -84,16 +86,39 @@ describe(`<${ReleaseCard.name}/>`, () => {
     expect(emptyState).toBeVisible();
   });
 
-  it('shows the latest run with a link to it', () => {
-    setup({ releaseRun: okResult(mockReleaseRun()) });
+  describe('with a finished run', () => {
+    beforeEach(() => {
+      setup({ releaseRun: okResult(mockReleaseRun()) });
+    });
 
-    const status = screen.getByText('Succeeded');
-    const runTitle = screen.getByText(mockReleaseRun().title);
-    const runLink = screen.getByRole('link', { name: /View the run/ });
+    it('shows the latest run with a link to it', () => {
+      const status = screen.getByText('Succeeded');
+      const runTitle = screen.getByText(mockReleaseRun().title);
+      const runLink = screen.getByRole('link', { name: /View the run/ });
 
-    expect(status).toBeVisible();
-    expect(runTitle).toBeVisible();
-    expect(runLink).toHaveAttribute('href', MOCK_RELEASE_RUN_URL);
+      expect(status).toBeVisible();
+      expect(runTitle).toBeVisible();
+      expect(runLink).toHaveAttribute('href', MOCK_RELEASE_RUN_URL);
+    });
+
+    it('shows the release as dispatched as soon as it starts', async () => {
+      const openButton = screen.getByRole('button', { name: 'Release' });
+      await user.click(openButton);
+      const versionInput = await screen.findByRole('textbox', {
+        name: 'Version',
+      });
+      await user.type(versionInput, MOCK_VERSION);
+      const startButton = screen.getByRole('button', { name: 'Start release' });
+      await user.click(startButton);
+
+      const dispatchedStatus = await screen.findByText('Dispatched');
+      const startedToast = await screen.findByText('Release started.');
+      const releaseButton = screen.getByRole('button', { name: 'Release' });
+
+      expect(dispatchedStatus).toBeVisible();
+      expect(startedToast).toBeVisible();
+      expect(releaseButton).toHaveAttribute(ARIA_DISABLED, 'true');
+    });
   });
 
   it('points to the tenant retry when a tenant migration failed', () => {
@@ -160,27 +185,6 @@ describe(`<${ReleaseCard.name}/>`, () => {
     const unavailableNotice = screen.getByText('Release status is unavailable');
 
     expect(unavailableNotice).toBeVisible();
-  });
-
-  it('shows the release as dispatched as soon as it starts', async () => {
-    setup({ releaseRun: okResult(mockReleaseRun()) });
-
-    const openButton = screen.getByRole('button', { name: 'Release' });
-    await user.click(openButton);
-    const versionInput = await screen.findByRole('textbox', {
-      name: 'Version',
-    });
-    await user.type(versionInput, MOCK_VERSION);
-    const startButton = screen.getByRole('button', { name: 'Start release' });
-    await user.click(startButton);
-
-    const dispatchedStatus = await screen.findByText('Dispatched');
-    const startedToast = await screen.findByText('Release started.');
-    const releaseButton = screen.getByRole('button', { name: 'Release' });
-
-    expect(dispatchedStatus).toBeVisible();
-    expect(startedToast).toBeVisible();
-    expect(releaseButton).toHaveAttribute(ARIA_DISABLED, 'true');
   });
 
   it('follows a running release to its result and refreshes the page', async () => {

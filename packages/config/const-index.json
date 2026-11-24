@@ -9282,6 +9282,14 @@
         "file": "apps/platform/src/constants/release.ts"
       }
     ],
+    "RELEASE_STALE": [
+      {
+        "ref": "RELEASE_REFUSAL.RELEASE_STALE",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
     "RELEASES_PAUSED": [
       {
         "ref": "RELEASE_REFUSAL.RELEASES_PAUSED",

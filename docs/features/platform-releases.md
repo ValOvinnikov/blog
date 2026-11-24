@@ -113,18 +113,22 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   (`server/releases/start-release-action.ts`): `requireSuperAdmin`, answers
   `REFUSED` with `RELEASES_PAUSED` while `IS_PRODUCTION_RELEASE_ENABLED` is
   `false`, before reading, dispatching or recording anything, validates
-  `{ version, overrideReason? }` with Zod (reason at most
-  `RELEASE_OVERRIDE_REASON_MAX_LENGTH`, trimmed), then re-reads the candidate
-  and the newest release run. It answers `UNAVAILABLE` when GitHub or the db
-  cannot be read; `REFUSED` with `RELEASE_RUNNING` while the newest run is
-  dispatched or running; `INVALID` with a `version` field error
+  `{ version, headSha, overrideReason? }` with Zod (reason at most
+  `RELEASE_OVERRIDE_REASON_MAX_LENGTH`, trimmed; `headSha` is the candidate
+  the page rendered), then re-reads the candidate and the newest release run.
+  It answers `UNAVAILABLE` when GitHub or the db cannot be read; `REFUSED`
+  with `RELEASE_RUNNING` while the newest run is dispatched or running;
+  `REFUSED` with `RELEASE_STALE` when `main`'s HEAD no longer equals the
+  submitted `headSha`, which the dialog reports as nothing started and asks
+  the operator to reload; `INVALID` with a `version` field error
   (`VERSION_MALFORMED` or `VERSION_NOT_GREATER`, both carrying `lastTag`) for a
   version that is not `vX.Y.Z` or not greater than the last tag; `INVALID`
   with an `overrideReason` field error (`REASON_REQUIRED`) when an override is
   required and the reason is blank; and `SERVER_ERROR` when the dispatch
   fails, which the dialog reports as nothing started. Otherwise it dispatches
-  `release.yml` on `main` with inputs `version`, `sha` (the candidate's
-  `headSha`, so the run ships exactly the commit the operator reviewed) and
+  `release.yml` for the commit shown, with inputs `version`, `sha` (the
+  submitted `headSha`, so the run ships exactly the commit the operator
+  reviewed) and
   `override` (`"true"` or `"false"`) and records `RELEASE_STARTED` (details: `headSha`,
   `isOverride`), plus `RELEASE_OVERRIDE` (details: `headSha`,
   `contrastStatus`, `reason`) when overridden, both on the `RELEASE` target

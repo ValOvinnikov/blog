@@ -2112,6 +2112,7 @@
       "REASON_REQUIRED": "Say why you are releasing without a passing contrast check."
     },
     "alreadyRunning": "A release is already running.",
+    "releaseStale": "main has moved since this page loaded, so nothing was started. Reload to review the new candidate.",
     "releasesPaused": "Production releases are paused.",
     "githubUnavailable": "GitHub could not be reached, so nothing was started. Try again in a moment.",
     "invalid": "Check the version and the reason, then try again.",
