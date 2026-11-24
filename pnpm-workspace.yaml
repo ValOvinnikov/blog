@@ -22,7 +22,7 @@ overrides:
   smol-toml@<1.6.1: '>=1.6.1'
   uuid@<11.1.1: '>=11.1.1'
   nanoid@>=5.0.0 <5.1.16: ^5.1.16
-  undici: '>=6.28.0'
+  undici@<6.28.0: ^6.28.0
   fast-uri: '>=3.1.5'
   '@codemirror/state': '6.7.6'
   '@codemirror/view': '6.43.13'
