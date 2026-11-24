@@ -8,13 +8,6 @@ const meta = {
   title: 'Modules/CookieSettingsModule',
   component: CookieSettingsModuleView,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
-  argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: Object.values(BRAND_VARIANT),
-    },
-  },
   args: {
     id: 'cookie-settings-1',
     brandVariant: BRAND_VARIANT.PRIMARY,

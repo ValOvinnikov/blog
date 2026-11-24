@@ -1,5 +1,6 @@
 import './preview.css';
 
+import { BRAND_VARIANT } from '@shinefold/config';
 import type { Decorator, Preview } from '@storybook/nextjs-vite';
 import { AppProviders } from '@web/testing/providers';
 
@@ -15,6 +16,9 @@ const withProviders: Decorator = (storyFn) => (
 
 const preview: Preview = {
   decorators: [withProviders, withSiteTheme],
+  argTypes: {
+    brandVariant: { control: 'select', options: Object.values(BRAND_VARIANT) },
+  },
   globalTypes: SITE_THEME_GLOBAL_TYPES,
   initialGlobals: SITE_THEME_INITIAL_GLOBALS,
   parameters: {
