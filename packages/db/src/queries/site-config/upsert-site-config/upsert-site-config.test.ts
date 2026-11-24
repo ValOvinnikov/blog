@@ -131,6 +131,8 @@ const STYLE_FIELDS = [
   { field: 'headerLayout', value: HEADER_LAYOUT.CENTRED_BRAND },
   { field: 'headerSubmenuStyle', value: HEADER_SUBMENU_STYLE.WIDE_PANEL },
   { field: 'headerBarStyle', value: HEADER_BAR_STYLE.FLOATING },
+  { field: 'headerBackground', value: BRAND_VARIANT.INK },
+  { field: 'breadcrumbBackground', value: BRAND_VARIANT.BRAND_PRIMARY },
   { field: 'footerLayout', value: FOOTER_LAYOUT.CENTRED },
   { field: 'footerBackground', value: BRAND_VARIANT.PRIMARY },
   { field: 'footerSurface', value: FOOTER_SURFACE.CARD },
@@ -277,6 +279,20 @@ const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
     {
       headerBarStyle:
         MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headerBarStyle'],
+    },
+  ],
+  [
+    'an unknown header background',
+    {
+      headerBackground:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headerBackground'],
+    },
+  ],
+  [
+    'an unknown breadcrumb background',
+    {
+      breadcrumbBackground:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['breadcrumbBackground'],
     },
   ],
   [

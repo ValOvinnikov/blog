@@ -1,4 +1,5 @@
 import {
+  BRAND_VARIANT,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
@@ -8,6 +9,8 @@ import {
 } from '@shinefold/config/constants';
 
 import {
+  breadcrumbBackgroundEnum,
+  headerBackgroundEnum,
   headerBarStyleEnum,
   headerControlShapeEnum,
   headerControlStyleEnum,
@@ -32,6 +35,12 @@ export const siteConfigHeaderColumns = {
   headerBarStyle: headerBarStyleEnum('header_bar_style')
     .notNull()
     .default(HEADER_BAR_STYLE.FULL_WIDTH),
+  headerBackground: headerBackgroundEnum('header_background')
+    .notNull()
+    .default(BRAND_VARIANT.PRIMARY),
+  breadcrumbBackground: breadcrumbBackgroundEnum('breadcrumb_background')
+    .notNull()
+    .default(BRAND_VARIANT.PRIMARY),
   navLinkStyle: navLinkStyleEnum('nav_link_style')
     .notNull()
     .default(NAV_LINK_STYLE.PLAIN),

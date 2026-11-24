@@ -88,6 +88,13 @@ export const headerSubmenuStyleEnum = pgEnum(
 
 export const headerBarStyleEnum = pgEnum('header_bar_style', HEADER_BAR_STYLE);
 
+export const headerBackgroundEnum = pgEnum('header_background', BRAND_VARIANT);
+
+export const breadcrumbBackgroundEnum = pgEnum(
+  'breadcrumb_background',
+  BRAND_VARIANT,
+);
+
 export const footerLayoutEnum = pgEnum('footer_layout', FOOTER_LAYOUT);
 
 export const footerBackgroundEnum = pgEnum('footer_background', BRAND_VARIANT);

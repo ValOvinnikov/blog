@@ -64,6 +64,8 @@ export const updateSiteConfigInputSchema = z.object({
   headerLayout: z.enum(HEADER_LAYOUT).optional(),
   headerSubmenuStyle: z.enum(HEADER_SUBMENU_STYLE).optional(),
   headerBarStyle: z.enum(HEADER_BAR_STYLE).optional(),
+  headerBackground: z.enum(BRAND_VARIANT).optional(),
+  breadcrumbBackground: z.enum(BRAND_VARIANT).optional(),
   navLinkStyle: z.enum(NAV_LINK_STYLE).optional(),
   headingWeight: z.enum(HEADING_WEIGHT).optional(),
   headingCase: z.enum(HEADING_CASE).optional(),

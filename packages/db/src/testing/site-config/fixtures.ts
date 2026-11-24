@@ -60,6 +60,8 @@ export const DEFAULT_CONTROL_STYLES = {
   headerLayout: HEADER_LAYOUT.CLASSIC,
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
   headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
+  headerBackground: BRAND_VARIANT.PRIMARY,
+  breadcrumbBackground: BRAND_VARIANT.PRIMARY,
   headerControlShape: HEADER_CONTROL_SHAPE.ROUND,
   navLinkStyle: NAV_LINK_STYLE.PLAIN,
   headingWeight: HEADING_WEIGHT.MEDIUM,
