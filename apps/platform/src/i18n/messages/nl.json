@@ -2328,12 +2328,12 @@
     "subject": "Je betaling voor {siteName} is mislukt",
     "previewText": "We konden {amount} voor {siteName} niet afschrijven.",
     "failed": "We konden je betaling voor {siteName} niet afschrijven.",
-    "updatePaymentMethod": "Werk je betaalmethode bij op de pagina Facturering om je abonnement te behouden.",
+    "payInvoice": "Betaal de openstaande factuur op de betaalpagina om je abonnement te behouden. Daar kun je een andere kaart gebruiken of de betaling bij je bank bevestigen.",
     "amountLabel": "Verschuldigd bedrag",
     "planLabel": "Abonnement",
     "nextRetryLabel": "Volgende poging",
-    "planEnding": "We proberen het niet opnieuw, dus je abonnement stopt als je je betaalmethode niet bijwerkt.",
-    "actionLabel": "Betaalmethode bijwerken"
+    "planEnding": "We proberen het niet opnieuw, dus je abonnement stopt als je de factuur niet betaalt.",
+    "actionLabel": "Factuur betalen"
   },
   "suspensionCategory": {
     "ABUSE": "Misbruik",
@@ -2367,6 +2367,8 @@
     "pastDueTitle": "Je laatste betaling is mislukt",
     "pastDueDescription": "Werk je betaalmethode bij om {plan} te behouden.",
     "pastDueAction": "Betaalmethode bijwerken",
+    "pastDueActionPending": "Openen…",
+    "pastDueActionFailed": "De betaalpagina kon niet worden geopend. Probeer het zo opnieuw.",
     "graceTitle": "Je site staat nu op {plan}",
     "graceMembers": "Op <time>{date}</time> {count, plural, one {verliest # teamlid} other {verliezen # teamleden}} de toegang tot het beheer van deze site.",
     "graceDomain": "Op <time>{date}</time> is {customDomain} niet langer het hoofdadres en wordt het doorgestuurd naar {subdomain}.",

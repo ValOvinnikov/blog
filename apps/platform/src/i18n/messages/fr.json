@@ -2328,12 +2328,12 @@
     "subject": "Le paiement pour {siteName} a échoué",
     "previewText": "Nous n'avons pas pu prélever {amount} pour {siteName}.",
     "failed": "Nous n'avons pas pu prélever votre paiement pour {siteName}.",
-    "updatePaymentMethod": "Mettez à jour votre moyen de paiement sur la page Facturation pour conserver votre formule.",
+    "payInvoice": "Réglez la facture en attente sur sa page de paiement pour conserver votre formule. Vous pouvez y utiliser une autre carte ou confirmer le paiement auprès de votre banque.",
     "amountLabel": "Montant dû",
     "planLabel": "Formule",
     "nextRetryLabel": "Prochaine tentative",
-    "planEnding": "Nous ne réessaierons pas : votre formule prendra fin si vous ne mettez pas à jour votre moyen de paiement.",
-    "actionLabel": "Mettre à jour le moyen de paiement"
+    "planEnding": "Nous ne réessaierons pas : votre formule prendra fin si vous ne réglez pas la facture.",
+    "actionLabel": "Régler la facture"
   },
   "suspensionCategory": {
     "ABUSE": "Abus",
@@ -2367,6 +2367,8 @@
     "pastDueTitle": "Votre dernier paiement a échoué",
     "pastDueDescription": "Mettez à jour votre moyen de paiement pour conserver {plan}.",
     "pastDueAction": "Mettre à jour le moyen de paiement",
+    "pastDueActionPending": "Ouverture…",
+    "pastDueActionFailed": "La page de paiement n'a pas pu s'ouvrir. Réessayez dans un instant.",
     "graceTitle": "Votre site est désormais sur {plan}",
     "graceMembers": "Le <time>{date}</time>, {count, plural, one {# membre de l’équipe perdra} other {# membres de l’équipe perdront}} l’accès à l’administration de ce site.",
     "graceDomain": "Le <time>{date}</time>, {customDomain} ne sera plus l’adresse principale et redirigera vers {subdomain}.",

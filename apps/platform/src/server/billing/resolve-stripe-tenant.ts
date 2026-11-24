@@ -5,12 +5,10 @@ import {
   STRIPE_TENANT_METADATA_KEY,
 } from '@platform/constants/billing';
 import { logger } from '@platform/utils/logger/logger';
+import { tenantIdSchema } from '@platform/utils/tenant-id-schema/tenant-id-schema';
 import type { TMaybeUndefined } from '@shinefold/config';
 import { queries, STRIPE_TENANT_LOOKUP_OUTCOME } from '@shinefold/db';
 import type Stripe from 'stripe';
-import { z } from 'zod';
-
-const tenantIdSchema = z.uuid();
 
 export const resolveStripeTenant = async (
   subscription: Stripe.Subscription,

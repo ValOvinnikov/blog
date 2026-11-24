@@ -2328,12 +2328,12 @@
     "subject": "Ihre Zahlung für {siteName} ist fehlgeschlagen",
     "previewText": "Wir konnten {amount} für {siteName} nicht einziehen.",
     "failed": "Wir konnten Ihre Zahlung für {siteName} nicht einziehen.",
-    "updatePaymentMethod": "Aktualisieren Sie Ihre Zahlungsmethode auf der Abrechnungsseite, um Ihren Tarif zu behalten.",
+    "payInvoice": "Bezahlen Sie die offene Rechnung auf ihrer Zahlungsseite, um Ihren Tarif zu behalten. Dort können Sie eine andere Karte verwenden oder die Zahlung bei Ihrer Bank bestätigen.",
     "amountLabel": "Fälliger Betrag",
     "planLabel": "Tarif",
     "nextRetryLabel": "Nächster Versuch",
-    "planEnding": "Wir versuchen es nicht erneut. Ihr Tarif endet, wenn Sie Ihre Zahlungsmethode nicht aktualisieren.",
-    "actionLabel": "Zahlungsmethode aktualisieren"
+    "planEnding": "Wir versuchen es nicht erneut. Ihr Tarif endet, wenn Sie die Rechnung nicht bezahlen.",
+    "actionLabel": "Rechnung bezahlen"
   },
   "suspensionCategory": {
     "ABUSE": "Missbrauch",
@@ -2367,6 +2367,8 @@
     "pastDueTitle": "Deine letzte Zahlung ist fehlgeschlagen",
     "pastDueDescription": "Aktualisiere deine Zahlungsmethode, um {plan} zu behalten.",
     "pastDueAction": "Zahlungsmethode aktualisieren",
+    "pastDueActionPending": "Wird geöffnet…",
+    "pastDueActionFailed": "Die Zahlungsseite konnte nicht geöffnet werden. Versuche es gleich noch einmal.",
     "graceTitle": "Deine Website ist jetzt auf {plan}",
     "graceMembers": "Am <time>{date}</time> {count, plural, one {verliert # Teammitglied} other {verlieren # Teammitglieder}} den Zugang zur Verwaltung dieser Website.",
     "graceDomain": "Am <time>{date}</time> ist {customDomain} nicht mehr die Hauptadresse und leitet auf {subdomain} weiter.",

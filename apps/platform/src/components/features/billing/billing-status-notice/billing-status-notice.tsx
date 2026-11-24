@@ -27,10 +27,10 @@ export const BillingStatusNotice = async ({
   canOpenBilling,
   canUpgrade,
 }: TBillingStatusNoticeProps) => {
-  const { plan, status, isArchived, downgradeGraceStartedAt } = tenant;
+  const { id, plan, status, isArchived, downgradeGraceStartedAt } = tenant;
 
   if (status === TENANT_STATUS.PAST_DUE) {
-    return canOpenBilling ? <PastDueNotice plan={plan} /> : null;
+    return canOpenBilling ? <PastDueNotice tenantId={id} plan={plan} /> : null;
   }
   if (isArchived || !downgradeGraceStartedAt) return null;
 

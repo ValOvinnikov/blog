@@ -4,6 +4,7 @@ import nlMessages from '@platform/i18n/messages/nl.json';
 import { toStripeTime } from '@platform/server/billing/stripe-time';
 import {
   MOCK_AMOUNT_PAID_TEXT,
+  MOCK_HOSTED_INVOICE_URL,
   mockStripeInvoice,
 } from '@platform/testing/billing/fixtures';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
@@ -59,7 +60,10 @@ describe(sendPaymentFailedNotice, () => {
 
     beforeEach(async () => {
       await sendNotice(
-        mockStripeInvoice({ next_payment_attempt: MOCK_NEXT_PAYMENT_ATTEMPT }),
+        mockStripeInvoice({
+          next_payment_attempt: MOCK_NEXT_PAYMENT_ATTEMPT,
+          hosted_invoice_url: MOCK_HOSTED_INVOICE_URL,
+        }),
       );
       text = sentText();
     });
@@ -78,11 +82,9 @@ describe(sendPaymentFailedNotice, () => {
       expect(text).toContain(MOCK_TENANT_NAME);
     });
 
-    it('links to the Billing page', () => {
-      expect(text).toContain(
-        new URL(adminRoutes.dashboardBilling(), MOCK_PLATFORM_APP_BASE_URL)
-          .href,
-      );
+    it("links to the invoice's payment page", () => {
+      expect(text).toContain(MOCK_HOSTED_INVOICE_URL);
+      expect(text).not.toContain(adminRoutes.dashboardBilling());
     });
 
     it('gives the next attempt and no plan-ending notice', () => {
@@ -91,11 +93,25 @@ describe(sendPaymentFailedNotice, () => {
     });
   });
 
-  it('says the plan ends when Stripe will not retry', async () => {
-    await sendNotice();
+  describe('an invoice Stripe will not retry, with no payment page', () => {
+    let text: TMaybeUndefined<string>;
 
-    expect(sentText()).toContain(copy.planEnding);
-    expect(sentText()).not.toContain(copy.nextRetryLabel);
+    beforeEach(async () => {
+      await sendNotice();
+      text = sentText();
+    });
+
+    it('says the plan ends', () => {
+      expect(text).toContain(copy.planEnding);
+      expect(text).not.toContain(copy.nextRetryLabel);
+    });
+
+    it('links to the Billing page', () => {
+      expect(text).toContain(
+        new URL(adminRoutes.dashboardBilling(), MOCK_PLATFORM_APP_BASE_URL)
+          .href,
+      );
+    });
   });
 
   it("writes in the site's default language", async () => {

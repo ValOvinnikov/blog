@@ -21,6 +21,7 @@ import { TENANT_STATUS } from '@shinefold/db/constants';
 import { BillingStatusNotice } from './billing-status-notice';
 
 vi.mock('@platform/utils/env/env');
+vi.mock('@platform/server/billing/pay-open-invoice-action');
 
 const { countMembershipsOverSeatsMock, listTenantHostsMock } = vi.hoisted(
   () => ({
@@ -175,20 +176,23 @@ describe(`<${BillingStatusNotice.name}/>`, () => {
     expect(countMembershipsOverSeatsMock).not.toHaveBeenCalled();
   });
 
-  it('asks the owner of a past-due site to update the payment method, with no date', async () => {
+  it('asks the owner of a past-due site to pay, with no date and no link to Billing', async () => {
     await setup({ tenant: PAST_DUE });
 
-    const notice = screen.getByRole('status');
-    const billingLink = within(notice).getByRole('link', {
-      name: billingStatusNotice.pastDueAction,
-    });
-    const date = within(notice).queryByRole('time');
-
-    expect(notice).toHaveTextContent(billingStatusNotice.pastDueTitle);
-    expect(notice).toHaveTextContent(
+    const title = screen.getByText(billingStatusNotice.pastDueTitle);
+    const description = screen.getByText(
       t('pastDueDescription', { plan: 'Growth' }),
     );
-    expect(billingLink).toHaveAttribute('href', adminRoutes.dashboardBilling());
+    const payButton = screen.getByRole('button', {
+      name: billingStatusNotice.pastDueAction,
+    });
+    const billingLink = screen.queryByRole('link');
+    const date = screen.queryByRole('time');
+
+    expect(title).toBeVisible();
+    expect(description).toBeVisible();
+    expect(payButton).toBeVisible();
+    expect(billingLink).not.toBeInTheDocument();
     expect(date).not.toBeInTheDocument();
     expect(countMembershipsOverSeatsMock).not.toHaveBeenCalled();
   });
