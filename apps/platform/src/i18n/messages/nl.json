@@ -100,6 +100,7 @@
       "siteAddressInvalid": "Gebruik alleen kleine letters, cijfers en koppeltekens, maximaal 63 tekens, zonder koppelteken aan het begin of eind.",
       "siteAddressReserved": "Dit adres is gereserveerd. Kies een ander.",
       "siteAddressTaken": "Dit adres is al in gebruik. Kies een ander.",
+      "accentHueInaccessible": "Met deze tint blijft lopende tekst op de getinte vlakken niet leesbaar, dus de site zou hem vervangen. Kies een andere tint.",
       "termsNotAccepted": "Accepteer de Servicevoorwaarden en het Privacybeleid om door te gaan."
     },
     "steps": {

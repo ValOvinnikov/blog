@@ -1,6 +1,9 @@
 'use server';
 
-import { ONBOARDING_LOG } from '@platform/constants/onboarding';
+import {
+  ONBOARDING_FIELD_ERROR,
+  ONBOARDING_LOG,
+} from '@platform/constants/onboarding';
 import {
   SIGN_UP_FIELD_ERROR,
   SIGN_UP_REFUSAL,
@@ -46,6 +49,7 @@ export const createSiteAction = async (
       >(parsed.error.issues, {
         name: TENANT_FIELD_ERROR.NAME_REQUIRED,
         slug: TENANT_FIELD_ERROR.SLUG_INVALID,
+        accentHue: ONBOARDING_FIELD_ERROR.ACCENT_HUE_INACCESSIBLE,
         hasAcceptedTerms: SIGN_UP_FIELD_ERROR.TERMS_NOT_ACCEPTED,
       }),
     };

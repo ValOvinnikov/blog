@@ -43,7 +43,7 @@ describe(`<${OnboardingView.name}/> layout`, () => {
     vi.restoreAllMocks();
   });
 
-  it('places the preview after the footer, outside main, from 1104px', () => {
+  it(`places the preview after the footer, outside main, ${FULL_TIER_TITLE}`, () => {
     renderInTier(FULL_TIER);
 
     const { main, nameField, preview, continueButton } = shellParts();
@@ -58,7 +58,7 @@ describe(`<${OnboardingView.name}/> layout`, () => {
     );
   });
 
-  it('places the preview inside main between the fields and the footer from 768px', () => {
+  it(`places the preview in main above the footer ${RAIL_TIER_TITLE}`, () => {
     renderInTier(RAIL_TIER);
 
     const { main, nameField, preview, continueButton } = shellParts();

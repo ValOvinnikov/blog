@@ -11,6 +11,7 @@ faker.seed(5995);
 const MOCK_LABEL = faker.lorem.words(2);
 const MOCK_HINT = faker.lorem.sentence();
 const MOCK_ERROR = faker.lorem.sentence();
+const MOCK_SUFFIX = `.${MOCK_TENANT_ROOT_DOMAIN}`;
 const MOCK_STATUS = faker.lorem.words(3);
 const MOCK_COPY = { label: MOCK_LABEL, hint: MOCK_HINT };
 
@@ -34,14 +35,14 @@ describe(`<${FormSiteAddressInput.name}/>`, () => {
     const siteAddress = screen.getByRole('textbox', { name: MOCK_LABEL });
 
     expect(siteAddress).toHaveAccessibleDescription(
-      `.${MOCK_TENANT_ROOT_DOMAIN} ${MOCK_HINT}`,
+      `${MOCK_SUFFIX} ${MOCK_HINT}`,
     );
   });
 
   it('shows no suffix when no root domain is set', () => {
     setup({ rootDomain: undefined });
 
-    const suffix = screen.queryByText(`.${MOCK_TENANT_ROOT_DOMAIN}`);
+    const suffix = screen.queryByText(MOCK_SUFFIX);
     const siteAddress = screen.getByRole('textbox', { name: MOCK_LABEL });
 
     expect(suffix).not.toBeInTheDocument();
@@ -55,18 +56,7 @@ describe(`<${FormSiteAddressInput.name}/>`, () => {
 
     expect(siteAddress).toBeInvalid();
     expect(siteAddress).toHaveAccessibleDescription(
-      `.${MOCK_TENANT_ROOT_DOMAIN} ${MOCK_HINT} ${MOCK_ERROR}`,
-    );
-  });
-
-  it('places the hint after the address row in the wizard appearance', () => {
-    setup({ appearance: FIELD_APPEARANCE.WIZARD });
-
-    const suffix = screen.getByText(`.${MOCK_TENANT_ROOT_DOMAIN}`);
-    const hint = screen.getByText(MOCK_HINT);
-
-    expect(suffix.compareDocumentPosition(hint)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
+      `${MOCK_SUFFIX} ${MOCK_HINT} ${MOCK_ERROR}`,
     );
   });
 
@@ -76,7 +66,7 @@ describe(`<${FormSiteAddressInput.name}/>`, () => {
       status: <span>{MOCK_STATUS}</span>,
     });
 
-    const suffix = screen.getByText(`.${MOCK_TENANT_ROOT_DOMAIN}`);
+    const suffix = screen.getByText(MOCK_SUFFIX);
     const status = screen.getByText(MOCK_STATUS);
     const hint = screen.getByText(MOCK_HINT);
 

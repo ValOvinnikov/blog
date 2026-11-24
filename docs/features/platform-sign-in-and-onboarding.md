@@ -221,8 +221,11 @@ site as a 14-day Growth trial, with no card.
      owner picks a preset or moves the accent here; from then on their choice
      stays whatever the site type. The accent slider uses the Look page's
      palette track, and a hue the accent-hue guard (`isAccentHueAccessible`)
-     refuses shows the Look page's "unreadable" error under it and blocks
-     Continue.
+     refuses shows the Look page's "unreadable" error as the field's error
+     and blocks Continue. A refused hue never reaches Review or Create site:
+     Continue from an earlier step and Create site both return to Look, and
+     `createSiteAction` refuses it as an `accentHue` field error
+     (`ACCENT_HUE_INACCESSIBLE`).
   4. **Review** — every choice in a ruled row (`DetailList` with
      `isBordered`), each with an Edit back to its step: a button styled as a
      text link (`BUTTON_VARIANT.LINK`), since it changes the step rather than

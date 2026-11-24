@@ -3,15 +3,20 @@ import messages from '@platform/i18n/messages/en.json';
 import { ARIA_DISABLED, ARIA_VALUENOW } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
-import { completeAddressStep } from '@platform/testing/onboarding/address-step';
+import {
+  completeAddressStep,
+  reachReview,
+} from '@platform/testing/onboarding/address-step';
 import {
   ACCENT_LABEL,
   acceptAndCreate,
+  clickBack,
   clickContinue,
   completeSiteStep,
   CONSOLE_PRESET,
   createAfterChangingSiteType,
   createSiteMock,
+  editFromReview,
   MOCK_CONSOLE_LOOK,
   MOCK_CONTINUE,
   MOCK_CREATE,
@@ -22,7 +27,6 @@ import {
   stepHeading,
   STEPS,
 } from '@platform/testing/onboarding/onboarding-view';
-import type * as ShinefoldConfig from '@shinefold/config';
 import { isAccentHueAccessible, PRESET_ID } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -34,13 +38,15 @@ vi.mock('@platform/server/auth/sign-out-action');
 
 vi.mock('@platform/server/onboarding/check-site-address-action');
 
-vi.mock('@shinefold/config', async (importOriginal) => ({
-  ...(await importOriginal<typeof ShinefoldConfig>()),
-  isAccentHueAccessible: vi.fn(() => true),
-}));
+vi.mock('@shinefold/config', async () =>
+  (await import('@platform/testing/accent-hue-guard')).mockAccentHueGuard(),
+);
 
 const MOCK_ACCENT_SLIDER = { name: ACCENT_LABEL };
-const { accentHueInaccessible: ACCENT_HUE_INACCESSIBLE } = messages.lookForm;
+const {
+  presetLabel: PRESET_LABEL,
+  fieldErrors: { accentHueInaccessible: ACCENT_HUE_INACCESSIBLE },
+} = messages.onboardingForm;
 
 describe(`<${OnboardingView.name}/>`, () => {
   let user: UserEvent;
@@ -49,6 +55,26 @@ describe(`<${OnboardingView.name}/>`, () => {
     user = userEvent.setup();
     vi.mocked(isAccentHueAccessible).mockReturnValue(true);
     setup();
+  });
+
+  describe('with the look opened from review and its hue refused', () => {
+    beforeEach(async () => {
+      await reachReview(user);
+      await editFromReview(user, PRESET_LABEL);
+      vi.mocked(isAccentHueAccessible).mockReturnValue(false);
+      const slider = screen.getByRole('slider', MOCK_ACCENT_SLIDER);
+      await user.click(slider);
+      await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
+    });
+
+    it('sends Continue from an earlier step back to the look step, not to review', async () => {
+      await clickBack(user);
+      await clickContinue(user);
+
+      const heading = stepHeading(STEPS.LOOK);
+
+      expect(heading).toBeVisible();
+    });
   });
 
   describe('on the address step', () => {

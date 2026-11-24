@@ -68,8 +68,8 @@ export const useOnboardingSteps = ({
     (Boolean(fieldErrors.slug) ||
       addressStatus === SITE_ADDRESS_STATUS.CHECKING ||
       addressStatus === SITE_ADDRESS_STATUS.UNAVAILABLE);
-  const isLookBlocked =
-    step === ONBOARDING_STEP.LOOK && !isAccentHueAccessible(values.accentHue);
+  const isLookRefused = !isAccentHueAccessible(values.accentHue);
+  const isLookBlocked = step === ONBOARDING_STEP.LOOK && isLookRefused;
   const isContinueDisabled = isAddressBlocked || isLookBlocked;
 
   useEffect(() => {
@@ -100,7 +100,11 @@ export const useOnboardingSteps = ({
     const next = isEditingFromReview
       ? ONBOARDING_STEP.REVIEW
       : ONBOARDING_STEPS[stepIndex + 1];
-    if (next) goTo(next);
+    if (next === ONBOARDING_STEP.REVIEW && isLookRefused) {
+      goTo(ONBOARDING_STEP.LOOK);
+    } else if (next) {
+      goTo(next);
+    }
   };
 
   const goBack = () => {
@@ -121,6 +125,7 @@ export const useOnboardingSteps = ({
     isFirstStep: stepIndex === 0,
     isLastStep: stepIndex === ONBOARDING_STEPS.length - 1,
     isContinueDisabled,
+    isLookRefused,
     panelRef,
     editStep,
     goNext,

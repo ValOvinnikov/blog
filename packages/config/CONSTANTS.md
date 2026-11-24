@@ -647,10 +647,6 @@ Every key/value const an agent should reuse before writing a literal. The
 - **GROWTH_LAYER_PATH**: `APPLY`=`"/api/growth-layer/apply"`
 - **GROWTH_LAYER_LOG**: `APPLY_ENQUEUE_REJECTED`=`"growth_layer.apply_enqueue_rejected"`
 
-### `@platform/constants/hue-slider` — `apps/platform/src/constants/hue-slider.ts`
-
-- **HUE_SLIDER_TRACK**: `PALETTE`, `RAINBOW`
-
 ### `@platform/constants/icon` — `apps/platform/src/constants/icon.ts`
 
 - **ICON_SIZE**: `XXXS`, `XXS`, `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`, `XXXL`
@@ -717,6 +713,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/onboarding` — `apps/platform/src/constants/onboarding.ts`
 
 - **SITE_ADDRESS_STATUS**: `IDLE`, `CHECKING`, `AVAILABLE`, `UNAVAILABLE`, `UNVERIFIED`
+- **ONBOARDING_FIELD_ERROR**: `ACCENT_HUE_INACCESSIBLE`
 - **ONBOARDING_STEP**: `SITE`, `ADDRESS`, `LOOK`, `REVIEW`
 - **ONBOARDING_LOG**: `ROOT_DOMAIN_MISSING`=`"onboarding.root_domain_missing"`, `SESSION_EMAIL_MISSING`=`"onboarding.session_email_missing"`, `OWNS_FREE_TENANT_CHECK_FAILED`=`"onboarding.owns_free_tenant_check_failed"`, `TERMS_RECORD_FAILED`=`"onboarding.terms_record_failed"`, `CREATE_FAILED`=`"onboarding.create_failed"`
 - **ONBOARDING_TIER_QUERY**: `RAIL`=`"(width >= 48rem)"`, `FULL`=`"(width >= 69rem)"`

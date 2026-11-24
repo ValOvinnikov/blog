@@ -1,3 +1,4 @@
+import { ONBOARDING_FIELD_ERROR } from '@platform/constants/onboarding';
 import {
   SIGN_UP_FIELD_ERROR,
   SIGN_UP_REFUSAL,
@@ -13,6 +14,7 @@ export const ONBOARDING_FIELD_ERROR_KEYS = {
   [TENANT_FIELD_ERROR.SLUG_INVALID]: 'siteAddressInvalid',
   [TENANT_FIELD_ERROR.SLUG_RESERVED]: 'siteAddressReserved',
   [TENANT_FIELD_ERROR.SLUG_TAKEN]: 'siteAddressTaken',
+  [ONBOARDING_FIELD_ERROR.ACCENT_HUE_INACCESSIBLE]: 'accentHueInaccessible',
   [SIGN_UP_FIELD_ERROR.TERMS_NOT_ACCEPTED]: 'termsNotAccepted',
 } as const satisfies Record<TCreateSiteFieldError, string>;
 

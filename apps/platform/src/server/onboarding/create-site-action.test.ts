@@ -1,5 +1,8 @@
 import { faker } from '@faker-js/faker';
-import { ONBOARDING_LOG } from '@platform/constants/onboarding';
+import {
+  ONBOARDING_FIELD_ERROR,
+  ONBOARDING_LOG,
+} from '@platform/constants/onboarding';
 import {
   SIGN_UP_FIELD_ERROR,
   SIGN_UP_REFUSAL,
@@ -33,6 +36,7 @@ import {
   ERROR_CODE,
   HUE_MAX,
   HUE_MIN,
+  isAccentHueAccessible,
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
   PRESET_ID,
@@ -55,6 +59,10 @@ const {
   createSelfServeTenantMock: vi.fn(),
   recordTermsAcceptanceMock: vi.fn(),
 }));
+
+vi.mock('@shinefold/config', async () =>
+  (await import('@platform/testing/accent-hue-guard')).mockAccentHueGuard(),
+);
 
 vi.mock('@platform/server/auth/auth');
 vi.mock('@platform/utils/env/env');
@@ -118,6 +126,7 @@ const expectRedirectToDashboard = async (input = MOCK_INPUT) => {
 
 describe(createSiteAction, () => {
   beforeEach(() => {
+    vi.mocked(isAccentHueAccessible).mockReturnValue(true);
     Object.assign(env, { TENANT_ROOT_DOMAIN: MOCK_TENANT_ROOT_DOMAIN });
     authMock.mockResolvedValue({
       user: { id: MOCK_SIGN_IN_USER_ID, email: MOCK_SIGN_IN_EMAIL },
@@ -173,6 +182,20 @@ describe(createSiteAction, () => {
       fieldErrors: {
         name: { reason: TENANT_FIELD_ERROR.NAME_REQUIRED },
         hasAcceptedTerms: { reason: SIGN_UP_FIELD_ERROR.TERMS_NOT_ACCEPTED },
+      },
+    });
+    expect(checkTenantSlugMock).not.toHaveBeenCalled();
+  });
+
+  it('reports a refused accent hue on its field without checking the address', async () => {
+    vi.mocked(isAccentHueAccessible).mockReturnValue(false);
+
+    const result = await createSiteAction(MOCK_INPUT);
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        accentHue: { reason: ONBOARDING_FIELD_ERROR.ACCENT_HUE_INACCESSIBLE },
       },
     });
     expect(checkTenantSlugMock).not.toHaveBeenCalled();

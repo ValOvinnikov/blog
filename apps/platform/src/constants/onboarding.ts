@@ -23,6 +23,10 @@ export const SITE_ADDRESS_STATUS = {
 
 export type TSiteAddressStatus = TValueOf<typeof SITE_ADDRESS_STATUS>;
 
+export const ONBOARDING_FIELD_ERROR = {
+  ACCENT_HUE_INACCESSIBLE: 'ACCENT_HUE_INACCESSIBLE',
+} as const;
+
 export const ONBOARDING_STEP = {
   SITE: 'SITE',
   ADDRESS: 'ADDRESS',

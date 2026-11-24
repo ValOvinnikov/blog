@@ -100,6 +100,7 @@
       "siteAddressInvalid": "Usa solo letras minúsculas, números y guiones, hasta 63 caracteres, sin empezar ni terminar con un guion.",
       "siteAddressReserved": "Esta dirección está reservada. Elige otra.",
       "siteAddressTaken": "Esta dirección ya está en uso. Elige otra.",
+      "accentHueInaccessible": "Este tono no mantiene legible el texto sobre sus superficies tintadas, así que el sitio lo sustituiría. Elija otro tono.",
       "termsNotAccepted": "Acepta los Términos del servicio y la Política de privacidad para continuar."
     },
     "steps": {

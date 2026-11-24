@@ -1,4 +1,7 @@
-import { SELF_SERVE_SITE_TYPE } from '@platform/constants/onboarding';
+import {
+  type ONBOARDING_FIELD_ERROR,
+  SELF_SERVE_SITE_TYPE,
+} from '@platform/constants/onboarding';
 import type {
   SIGN_UP_FIELD_ERROR,
   SIGN_UP_REFUSAL,
@@ -11,6 +14,7 @@ import {
   type ACTION_OUTCOME,
   HUE_MAX,
   HUE_MIN,
+  isAccentHueAccessible,
   LOCALE_ISO_CODES,
   PRESET_ID,
   type TActionResult,
@@ -23,7 +27,12 @@ export const createSiteInputSchema = z.object({
   slug: z.string().trim().toLowerCase().min(1),
   locale: z.enum(LOCALE_ISO_CODES),
   preset: z.enum(PRESET_ID),
-  accentHue: z.number().int().min(HUE_MIN).max(HUE_MAX),
+  accentHue: z
+    .number()
+    .int()
+    .min(HUE_MIN)
+    .max(HUE_MAX)
+    .refine(isAccentHueAccessible),
   hasAcceptedTerms: z.literal(true),
 });
 
@@ -37,6 +46,7 @@ export type TCreateSiteFieldError =
   | typeof TENANT_FIELD_ERROR.SLUG_INVALID
   | typeof TENANT_FIELD_ERROR.SLUG_RESERVED
   | typeof TENANT_FIELD_ERROR.SLUG_TAKEN
+  | typeof ONBOARDING_FIELD_ERROR.ACCENT_HUE_INACCESSIBLE
   | typeof SIGN_UP_FIELD_ERROR.TERMS_NOT_ACCEPTED;
 
 export type TCreateSiteRefusal =

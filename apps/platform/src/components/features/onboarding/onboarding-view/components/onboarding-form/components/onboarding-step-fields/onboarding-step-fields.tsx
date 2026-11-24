@@ -59,6 +59,7 @@ export const OnboardingStepFields = ({
       <SiteLookFields
         preset={values.preset}
         accentHue={values.accentHue}
+        accentHueError={fieldErrors.accentHue?.reason}
         onPresetChange={changePreset}
         onAccentHueChange={changeAccentHue}
       />

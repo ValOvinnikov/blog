@@ -100,6 +100,7 @@
       "siteAddressInvalid": "Verwende nur Kleinbuchstaben, Ziffern und Bindestriche, höchstens 63 Zeichen, nicht mit einem Bindestrich am Anfang oder Ende.",
       "siteAddressReserved": "Diese Adresse ist reserviert. Wähle eine andere.",
       "siteAddressTaken": "Diese Adresse ist vergeben. Wähle eine andere.",
+      "accentHueInaccessible": "Mit diesem Farbton bleibt Fließtext auf seinen getönten Flächen nicht lesbar, daher würde die Website ihn ersetzen. Wählen Sie einen anderen Farbton.",
       "termsNotAccepted": "Akzeptiere die Nutzungsbedingungen und die Datenschutzerklärung, um fortzufahren."
     },
     "steps": {

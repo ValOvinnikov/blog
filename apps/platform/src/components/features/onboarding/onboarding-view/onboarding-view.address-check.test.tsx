@@ -1,7 +1,9 @@
 import { ONBOARDING_SCROLL_AREA_TEST_ID } from '@platform/constants/onboarding';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { act, screen } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   ADDRESS_CHECK_TIMEOUT,
   typeAddress,
@@ -93,7 +95,7 @@ describe(`<${OnboardingView.name}/>`, () => {
           const continueButton = screen.getByRole('button', MOCK_CONTINUE);
 
           expect(checking).toBeVisible();
-          expect(continueButton).toHaveAttribute('aria-disabled', 'true');
+          expect(continueButton).toHaveAttribute(ARIA_DISABLED, 'true');
         });
 
         it('shows the status under the address input, apart from the actions', () => {
@@ -117,7 +119,7 @@ describe(`<${OnboardingView.name}/>`, () => {
       });
 
       it('stays on the address step when Enter is pressed during the check', async () => {
-        await user.type(addressField, '{Enter}');
+        await user.type(addressField, USER_EVENT_KEY.ENTER);
 
         const heading = stepHeading(STEPS.ADDRESS);
 

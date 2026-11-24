@@ -100,6 +100,7 @@
       "siteAddressInvalid": "Utilisez uniquement des lettres minuscules, des chiffres et des traits d’union, 63 caractères au maximum, sans trait d’union au début ni à la fin.",
       "siteAddressReserved": "Cette adresse est réservée. Choisissez-en une autre.",
       "siteAddressTaken": "Cette adresse est déjà prise. Choisissez-en une autre.",
+      "accentHueInaccessible": "Cette teinte ne garde pas le texte lisible sur ses surfaces teintées ; le site la remplacerait. Choisissez une autre teinte.",
       "termsNotAccepted": "Acceptez les Conditions d’utilisation et la Politique de confidentialité pour continuer."
     },
     "steps": {

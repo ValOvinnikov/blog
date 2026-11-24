@@ -100,6 +100,7 @@
       "siteAddressInvalid": "Use only lowercase letters, numbers and hyphens, up to 63 characters, not starting or ending with a hyphen.",
       "siteAddressReserved": "This address is reserved. Choose another.",
       "siteAddressTaken": "This address is taken. Choose another.",
+      "accentHueInaccessible": "This hue doesn't keep body text readable on its tinted surfaces, so the site would replace it. Choose another hue.",
       "termsNotAccepted": "Accept the Terms of Service and the Privacy Policy to continue."
     },
     "steps": {
