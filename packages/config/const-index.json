@@ -9402,6 +9402,38 @@
         "file": "apps/platform/src/constants/release.ts"
       }
     ],
+    "releases.dev_deploy_dispatched": [
+      {
+        "ref": "RELEASE_LOG.DEV_DEPLOY_DISPATCHED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.dev_deploy_dispatch_error": [
+      {
+        "ref": "RELEASE_LOG.DEV_DEPLOY_DISPATCH_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.dev_deploy_dispatch_failed": [
+      {
+        "ref": "RELEASE_LOG.DEV_DEPLOY_DISPATCH_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.dev_deploy_dispatch_skipped": [
+      {
+        "ref": "RELEASE_LOG.DEV_DEPLOY_DISPATCH_SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
     "releases.release_audit_failed": [
       {
         "ref": "RELEASE_LOG.RELEASE_AUDIT_FAILED",

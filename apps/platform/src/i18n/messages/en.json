@@ -2044,6 +2044,12 @@
     "githubUnavailable": "GitHub could not be reached. Try again in a moment.",
     "startFailed": "The contrast check could not be started."
   },
+  "deployToDevButton": {
+    "label": "Deploy to dev",
+    "starting": "Starting…",
+    "started": "Development deploy started.",
+    "startFailed": "Nothing was started: the development deploy could not be triggered."
+  },
   "releaseCard": {
     "title": "Release",
     "description": "Cut a production release of the latest commit on main.",

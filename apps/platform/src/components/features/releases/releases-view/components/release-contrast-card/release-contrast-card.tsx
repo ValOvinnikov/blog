@@ -13,9 +13,11 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 import { contrastStatusTone } from '@platform/utils/status-tone/status-tone';
 import { tv } from '@platform/utils/tv/tv';
 import { SIZE, type TMaybeUndefined } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
+import { DeployToDevButton } from '../deploy-to-dev-button/deploy-to-dev-button';
 import { RunContrastCheckButton } from '../run-contrast-check-button/run-contrast-check-button';
 
 const releaseContrastCardVariants = tv({
@@ -34,12 +36,12 @@ export const ReleaseContrastCard = ({
   const [startedFrom, setStartedFrom] =
     useState<TMaybeUndefined<TContrastStatus>>();
 
-  if (startedFrom !== undefined && serverStatus !== startedFrom) {
+  if (!isUndefined(startedFrom) && serverStatus !== startedFrom) {
     setStartedFrom(undefined);
   }
 
   const status =
-    startedFrom !== undefined && serverStatus === startedFrom
+    !isUndefined(startedFrom) && serverStatus === startedFrom
       ? CONTRAST_STATUS.RUNNING
       : serverStatus;
   const t = useTranslations('releaseContrastCard');
@@ -51,10 +53,13 @@ export const ReleaseContrastCard = ({
         title={t('title')}
         supportingText={t('description')}
         actions={
-          <RunContrastCheckButton
-            isRunning={status === CONTRAST_STATUS.RUNNING}
-            onStarted={() => setStartedFrom(serverStatus)}
-          />
+          <>
+            <DeployToDevButton />
+            <RunContrastCheckButton
+              isRunning={status === CONTRAST_STATUS.RUNNING}
+              onStarted={() => setStartedFrom(serverStatus)}
+            />
+          </>
         }
       />
       <Card.Body>

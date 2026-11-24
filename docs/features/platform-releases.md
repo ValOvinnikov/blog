@@ -25,7 +25,7 @@ epics: [5271]
 ## What it does
 
 A SUPERADMIN sees the release candidate on the platform Releases page, runs
-the contrast check from it, cuts a production release by dispatching
+the contrast check from it, deploys `main`'s HEAD to development, cuts a production release by dispatching
 `release.yml`, and runs tenant content migrations on development or retries a
 tenant whose production migration failed; a contrast-due banner on the
 operator pages links there. What
@@ -69,7 +69,8 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   - a warning that the change list is incomplete when `isFileListTruncated`
     is set (GitHub lists at most 300 files);
   - the contrast status badge with a one-line explanation, a link to
-    `/findings` when it is `FAILED`, and the Run contrast check button.
+    `/findings` when it is `FAILED`, and the Deploy to dev and Run contrast
+    check buttons.
   - the Release card: the Release button, its confirmation dialog and the
     state of the newest `release.yml` run (below).
   - When there are no commits since the tag only the summary, the empty
@@ -94,6 +95,14 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   result. Once the server status differs it wins and the local state clears,
   so a later `DUE` or `NONE` never flips back; the next page load shows
   GitHub's status.
+- Server Action `startDevDeployAction`
+  (`server/releases/start-dev-deploy-action.ts`): `requireSuperAdmin`, then
+  dispatches `deploy-development.yml` on `main` through
+  `dispatchGitHubWorkflow`, which deploys `main`'s HEAD to development. It
+  answers `SERVER_ERROR` when the dispatch fails, which the button reports as
+  nothing started, and otherwise logs `releases.dev_deploy_dispatched` with
+  the actor. A dev deploy is not a release, so it records no audit event and
+  shows no run state; the button confirms the start with a toast.
 - The Release card. The button reads Release when contrast is `GREEN` or
   `NONE`, or no rendering path changed since the tag; otherwise it reads
   Release with override, and the dialog asks for a reason the confirm button
@@ -265,7 +274,7 @@ values are stored as plain `text`, so none of them needs a db migration:
 - `parseReleaseVersion` and `isReleaseVersionGreater` (`@shinefold/utils/version`).
 - `getReleaseCandidate` and `isContrastDue`, both built on
   `getCandidateComparison` (`apps/platform/src/server/releases/`).
-- `startContrastCheckAction`, `startReleaseAction`, `getReleaseRun`,
+- `startContrastCheckAction`, `startDevDeployAction`, `startReleaseAction`, `getReleaseRun`,
   `getReleaseRunAction`, `startTenantMigrationsAction` and
   `listFailedMigrationTenants` (`apps/platform/src/server/releases/`).
 - `isReleaseOverrideRequired` and `isReleaseRunActive`
