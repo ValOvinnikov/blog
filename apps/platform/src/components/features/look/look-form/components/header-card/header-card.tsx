@@ -1,4 +1,5 @@
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
+import { LookChoiceField } from '@platform/components/features/look/look-form/components/look-choice-field';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
@@ -13,7 +14,6 @@ import {
   HEADER_BAR_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
-  type THeaderBarStyle,
   type THeaderSubmenuStyle,
 } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
@@ -32,13 +32,12 @@ export type THeaderCardProps = {
 
 export const HeaderCard = ({ summary }: THeaderCardProps) => {
   const {
-    values: { headerLayout, headerSubmenuStyle, headerBarStyle },
+    values: { headerLayout, headerSubmenuStyle },
     updateField,
   } = useLookForm();
   const t = useTranslations('lookForm');
   const layoutLock = useLookFieldLock('headerLayout');
   const submenuStyleLock = useLookFieldLock('headerSubmenuStyle');
-  const barStyleLock = useLookFieldLock('headerBarStyle');
   const { lockLine, hasGrowthBadge } = useLookRowLock(
     CARD_FIELDS[LOOK_ROW.HEADER],
   );
@@ -107,21 +106,12 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
         </LookField>
       </div>
 
-      <LookField
+      <LookChoiceField
         field="headerBarStyle"
         label={t('headerBarStyleLabel')}
         hint={t('headerBarStyleDescription')}
-        isGroup={true}
-        lock={barStyleLock}
-      >
-        <SegmentedControl<THeaderBarStyle>
-          aria={barStyleLock.aria}
-          options={barStyleOptions}
-          value={headerBarStyle}
-          onChange={(style) => updateField('headerBarStyle', style)}
-          lock={barStyleLock}
-        />
-      </LookField>
+        options={barStyleOptions}
+      />
 
       <BackgroundFields />
 

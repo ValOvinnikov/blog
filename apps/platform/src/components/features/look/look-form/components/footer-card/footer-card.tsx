@@ -1,22 +1,14 @@
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
-import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { LookChoiceField } from '@platform/components/features/look/look-form/components/look-choice-field';
 import {
   toLookGlyphOptions,
   toSkinSwatchOptions,
 } from '@platform/components/features/look/look-form/components/look-option-glyph';
-import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
-import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
-import {
-  FOOTER_LAYOUT,
-  FOOTER_SURFACE,
-  type TBrandVariant,
-  type TFooterLayout,
-  type TFooterSurface,
-} from '@shinefold/config';
+import { FOOTER_LAYOUT, FOOTER_SURFACE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { CookieSettingsButtonField } from './components/cookie-settings-button-field/cookie-settings-button-field';
@@ -29,13 +21,9 @@ export type TFooterCardProps = {
 
 export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
   const {
-    values: { footerLayout, footerBackground, footerSurface, accentHue },
-    updateField,
+    values: { accentHue },
   } = useLookForm();
   const t = useTranslations('lookForm');
-  const layoutLock = useLookFieldLock('footerLayout');
-  const backgroundLock = useLookFieldLock('footerBackground');
-  const surfaceLock = useLookFieldLock('footerSurface');
   const { lockLine } = useLookRowLock(CARD_FIELDS[LOOK_ROW.FOOTER]);
 
   const layoutOptions = toLookGlyphOptions(
@@ -59,53 +47,26 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
       description={t('footerDescription')}
       lockLine={lockLine}
     >
-      <LookField
+      <LookChoiceField
         field="footerLayout"
         label={t('footerLayoutLabel')}
         hint={t('footerLayoutDescription')}
-        isGroup={true}
-        lock={layoutLock}
-      >
-        <SegmentedControl<TFooterLayout>
-          aria={layoutLock.aria}
-          options={layoutOptions}
-          value={footerLayout}
-          onChange={(layout) => updateField('footerLayout', layout)}
-          lock={layoutLock}
-        />
-      </LookField>
+        options={layoutOptions}
+      />
 
-      <LookField
+      <LookChoiceField
         field="footerBackground"
         label={t('footerBackgroundLabel')}
         hint={t('footerBackgroundDescription')}
-        isGroup={true}
-        lock={backgroundLock}
-      >
-        <SegmentedControl<TBrandVariant>
-          aria={backgroundLock.aria}
-          options={backgroundOptions}
-          value={footerBackground}
-          onChange={(background) => updateField('footerBackground', background)}
-          lock={backgroundLock}
-        />
-      </LookField>
+        options={backgroundOptions}
+      />
 
-      <LookField
+      <LookChoiceField
         field="footerSurface"
         label={t('footerSurfaceLabel')}
         hint={t('footerSurfaceDescription')}
-        isGroup={true}
-        lock={surfaceLock}
-      >
-        <SegmentedControl<TFooterSurface>
-          aria={surfaceLock.aria}
-          options={surfaceOptions}
-          value={footerSurface}
-          onChange={(surface) => updateField('footerSurface', surface)}
-          lock={surfaceLock}
-        />
-      </LookField>
+        options={surfaceOptions}
+      />
 
       <CookieSettingsButtonField hasCookieBanner={hasCookieBanner} />
       <FooterPoweredByNote />

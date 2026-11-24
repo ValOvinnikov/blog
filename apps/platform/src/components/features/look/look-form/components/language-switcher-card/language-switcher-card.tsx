@@ -1,17 +1,12 @@
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
-import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { LookChoiceField } from '@platform/components/features/look/look-form/components/look-choice-field';
 import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
-import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
-import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { SEGMENTED_LAYOUT } from '@platform/constants/segmented-control';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
-import {
-  LANGUAGE_SWITCHER_STYLE,
-  type TLanguageSwitcherStyle,
-} from '@shinefold/config';
+import { LANGUAGE_SWITCHER_STYLE } from '@shinefold/config';
 import { LOOK_FIELD } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 
@@ -26,13 +21,8 @@ export const LanguageSwitcherCard = ({
   hasMultipleLanguages,
   summary,
 }: TLanguageSwitcherCardProps) => {
-  const {
-    values: { languageSwitcherStyle },
-    updateField,
-    isLocked: isPlanLocked,
-  } = useLookForm();
+  const { isLocked: isPlanLocked } = useLookForm();
   const t = useTranslations('lookForm');
-  const lock = useLookFieldLock(LOOK_FIELD.LANGUAGE_SWITCHER_STYLE);
   const { hasGrowthBadge } = useLookRowLock(
     CARD_FIELDS[LOOK_ROW.LANGUAGE_SWITCHER],
   );
@@ -57,22 +47,13 @@ export const LanguageSwitcherCard = ({
       hasGrowthBadge={hasGrowthBadge}
     >
       {isStylePlanLocked || hasMultipleLanguages ? (
-        <LookField
-          field="languageSwitcherStyle"
+        <LookChoiceField
+          field={LOOK_FIELD.LANGUAGE_SWITCHER_STYLE}
           label={t('languageSwitcherStyleLabel')}
           hint={isStylePlanLocked ? description : undefined}
-          isGroup={true}
-          lock={lock}
-        >
-          <SegmentedControl<TLanguageSwitcherStyle>
-            aria={lock.aria}
-            options={languageSwitcherOptions}
-            value={languageSwitcherStyle}
-            onChange={(style) => updateField('languageSwitcherStyle', style)}
-            lock={lock}
-            layout={SEGMENTED_LAYOUT.WIDE}
-          />
-        </LookField>
+          options={languageSwitcherOptions}
+          layout={SEGMENTED_LAYOUT.WIDE}
+        />
       ) : (
         <p className={languageSwitcherCardVariants()}>
           {t('languageSwitcherSingleLanguage')}

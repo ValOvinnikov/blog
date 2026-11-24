@@ -1,4 +1,5 @@
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
+import { LookChoiceField } from '@platform/components/features/look/look-form/components/look-choice-field';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
@@ -10,7 +11,6 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { SampleSpinner } from '@platform/components/features/site-preview/sample-spinner';
 import { LockedReason } from '@platform/components/shared/locked-reason';
 import { OptionSelect } from '@platform/components/shared/option-select';
-import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { SEGMENTED_LAYOUT } from '@platform/constants/segmented-control';
 import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
@@ -20,7 +20,6 @@ import {
   BUTTON_SHAPE,
   ICONS,
   SPINNER_STYLE,
-  type TBusyButtonStyle,
 } from '@shinefold/config';
 import { toOptions } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
@@ -35,7 +34,6 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
     updateField,
   } = useLookForm();
   const t = useTranslations('lookForm');
-  const busyLock = useLookFieldLock('busyButtonStyle');
   const spinnerLock = useLookFieldLock('spinnerStyle');
   const { lockLine, hasGrowthBadge } = useLookRowLock(
     CARD_FIELDS[LOOK_ROW.BUTTONS],
@@ -80,21 +78,12 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
       />
 
       <LookSubsection heading={t('buttonsWhileWorkingHeading')}>
-        <LookField
+        <LookChoiceField
           field="busyButtonStyle"
           label={t('busyButtonStyleLabel')}
           hint={t('busyButtonStyleDescription')}
-          isGroup={true}
-          lock={busyLock}
-        >
-          <SegmentedControl<TBusyButtonStyle>
-            aria={busyLock.aria}
-            options={busyOptions}
-            value={busyButtonStyle}
-            onChange={(style) => updateField('busyButtonStyle', style)}
-            lock={busyLock}
-          />
-        </LookField>
+          options={busyOptions}
+        />
         <LookField
           field="spinnerStyle"
           label={spinnerStyleLabel}
