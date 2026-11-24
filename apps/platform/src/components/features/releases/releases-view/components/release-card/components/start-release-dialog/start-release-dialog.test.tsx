@@ -3,8 +3,10 @@ import {
   RELEASE_FIELD_ERROR,
   RELEASE_REFUSAL,
 } from '@platform/constants/release';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import {
+  MOCK_HEAD_SHA,
   MOCK_LAST_TAG,
   mockReleaseCandidate,
 } from '@platform/testing/releases/fixtures';
@@ -30,6 +32,7 @@ const MOCK_VERSION = `v${faker.system.semver()}`;
 const MOCK_OVERRIDE_REASON = faker.lorem.sentence();
 
 const setup = customRender(StartReleaseDialog, {
+  headSha: MOCK_HEAD_SHA,
   lastTag: MOCK_LAST_TAG,
   migrations: mockReleaseCandidate().migrations,
   isOverrideRequired: false,
@@ -76,6 +79,7 @@ describe(`<${StartReleaseDialog.name}/>`, () => {
 
       expect(startReleaseActionMock).toHaveBeenCalledWith({
         version: MOCK_VERSION,
+        headSha: MOCK_HEAD_SHA,
         overrideReason: undefined,
       });
       await waitFor(() => expect(onStartedMock).toHaveBeenCalledOnce());
@@ -130,6 +134,14 @@ describe(`<${StartReleaseDialog.name}/>`, () => {
         },
         'A release is already running.',
       ],
+      [
+        'a candidate that moved since the page loaded',
+        {
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: RELEASE_REFUSAL.RELEASE_STALE,
+        },
+        'main has moved since this page loaded, so nothing was started. Reload to review the new candidate.',
+      ],
     ])(
       'keeps the dialog open and explains %s',
       async (_name, result, message) => {
@@ -183,6 +195,7 @@ describe(`<${StartReleaseDialog.name}/>`, () => {
 
     expect(startReleaseActionMock).toHaveBeenCalledWith({
       version: MOCK_VERSION,
+      headSha: MOCK_HEAD_SHA,
       overrideReason: MOCK_OVERRIDE_REASON,
     });
   });
@@ -193,7 +206,7 @@ describe(`<${StartReleaseDialog.name}/>`, () => {
     const releaseButton = screen.getByRole('button', { name: 'Release' });
     const reason = screen.getByText(RELEASE_RUNNING_REASON);
 
-    expect(releaseButton).toHaveAttribute('aria-disabled', 'true');
+    expect(releaseButton).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(reason).toBeVisible();
   });
 });

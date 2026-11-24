@@ -6706,6 +6706,14 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "billing.open_invoice_failed": [
+      {
+        "ref": "BILLING_LOG.OPEN_INVOICE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "billing.plan_change_failed": [
       {
         "ref": "BILLING_LOG.PLAN_CHANGE_FAILED",
@@ -9282,6 +9290,14 @@
         "file": "apps/platform/src/constants/release.ts"
       }
     ],
+    "RELEASE_STALE": [
+      {
+        "ref": "RELEASE_REFUSAL.RELEASE_STALE",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
     "RELEASES_PAUSED": [
       {
         "ref": "RELEASE_REFUSAL.RELEASES_PAUSED",
@@ -9397,6 +9413,38 @@
     "releases.db_read_failed": [
       {
         "ref": "RELEASE_LOG.DB_READ_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.dev_deploy_dispatched": [
+      {
+        "ref": "RELEASE_LOG.DEV_DEPLOY_DISPATCHED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.dev_deploy_dispatch_error": [
+      {
+        "ref": "RELEASE_LOG.DEV_DEPLOY_DISPATCH_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.dev_deploy_dispatch_failed": [
+      {
+        "ref": "RELEASE_LOG.DEV_DEPLOY_DISPATCH_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.dev_deploy_dispatch_skipped": [
+      {
+        "ref": "RELEASE_LOG.DEV_DEPLOY_DISPATCH_SKIPPED",
         "scope": "app:platform",
         "from": "@platform/constants/release",
         "file": "apps/platform/src/constants/release.ts"
@@ -12537,6 +12585,30 @@
     "newsletter.unsubscribe_tenant_unresolved": [
       {
         "ref": "NEWSLETTER_LOG.UNSUBSCRIBE_TENANT_UNRESOLVED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.unsubscribe_key_missing": [
+      {
+        "ref": "NEWSLETTER_LOG.UNSUBSCRIBE_KEY_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.unsubscribe_link_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.UNSUBSCRIBE_LINK_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.unsubscribe_link_tenant_unresolved": [
+      {
+        "ref": "NEWSLETTER_LOG.UNSUBSCRIBE_LINK_TENANT_UNRESOLVED",
         "scope": "app:web",
         "from": "@web/constants/newsletter",
         "file": "apps/web/src/constants/newsletter.ts"

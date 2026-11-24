@@ -35,7 +35,7 @@ export type TContrastFailure = {
   hues: string;
 };
 
-const ALL_HUES = Array.from({ length: HUE_MAX - HUE_MIN }, (_, i) => i);
+export const ALL_HUES = Array.from({ length: HUE_MAX - HUE_MIN }, (_, i) => i);
 
 const formatHueRanges = (hues: readonly number[]): string =>
   hues
@@ -51,6 +51,7 @@ const formatHueRanges = (hues: readonly number[]): string =>
 export const findPairFailures = (
   pairs: Record<string, TContrastPair>,
   scopes: readonly TContrastScope[],
+  hues: readonly number[] = ALL_HUES,
 ): TContrastFailure[] =>
   Object.entries(pairs).flatMap(([id, pair]) => {
     const { foreground, surfaces, role, followsAccentHue } = pair;
@@ -77,10 +78,12 @@ export const findPairFailures = (
             [foreground, surface].some((token) =>
               tokenFollowsAccentHue(token, context),
             );
-          const failingHues = (isHueDependent ? ALL_HUES : [0]).filter(
+          const failingHues = (isHueDependent ? hues : [0]).filter(
             (hue) =>
-              measureContrast(foreground, surface, { ...context, hue }) <
-              CONTRAST_ROLE_MIN[role],
+              !(
+                measureContrast(foreground, surface, { ...context, hue }) >=
+                CONTRAST_ROLE_MIN[role]
+              ),
           );
           if (!hasLength(failingHues)) return [];
 

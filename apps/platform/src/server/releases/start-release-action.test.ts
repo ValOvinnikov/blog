@@ -120,7 +120,7 @@ describe(startReleaseAction, () => {
     );
 
     await expect(
-      startReleaseAction({ version: MOCK_RELEASE_VERSION }),
+      startReleaseAction({ version: MOCK_RELEASE_VERSION, headSha }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(getCandidateComparisonMock).not.toHaveBeenCalled();
@@ -130,7 +130,10 @@ describe(startReleaseAction, () => {
   it('refuses while production releases are paused, touching nothing', async () => {
     releaseSwitch.isEnabled = false;
 
-    const result = await startReleaseAction({ version: MOCK_RELEASE_VERSION });
+    const result = await startReleaseAction({
+      version: MOCK_RELEASE_VERSION,
+      headSha,
+    });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -144,6 +147,7 @@ describe(startReleaseAction, () => {
   it('dispatches the release without an override and records who started it', async () => {
     const result = await startReleaseAction({
       version: ` ${MOCK_RELEASE_VERSION} `,
+      headSha,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -168,7 +172,10 @@ describe(startReleaseAction, () => {
       okResult(CONTRAST_STATUS.GREEN),
     );
 
-    const result = await startReleaseAction({ version: MOCK_RELEASE_VERSION });
+    const result = await startReleaseAction({
+      version: MOCK_RELEASE_VERSION,
+      headSha,
+    });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(dispatchReleaseWorkflowMock).toHaveBeenCalledWith({
@@ -184,7 +191,7 @@ describe(startReleaseAction, () => {
     [MOCK_RELEASE_LAST_TAG, RELEASE_FIELD_ERROR.VERSION_NOT_GREATER],
     ['v1.3.9', RELEASE_FIELD_ERROR.VERSION_NOT_GREATER],
   ])('refuses version %s naming the last tag', async (version, reason) => {
-    const result = await startReleaseAction({ version });
+    const result = await startReleaseAction({ version, headSha });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -202,6 +209,7 @@ describe(startReleaseAction, () => {
 
       const result = await startReleaseAction({
         version: MOCK_RELEASE_VERSION,
+        headSha,
       });
 
       expect(result).toEqual({
@@ -212,12 +220,31 @@ describe(startReleaseAction, () => {
     },
   );
 
+  it('refuses as stale when main has moved, dispatching and recording nothing', async () => {
+    const shownSha = faker.git.commitSha();
+
+    const result = await startReleaseAction({
+      version: MOCK_RELEASE_VERSION,
+      headSha: shownSha,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: RELEASE_REFUSAL.RELEASE_STALE,
+    });
+    expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
   it('is unavailable when the candidate cannot be read', async () => {
     getCandidateComparisonMock.mockResolvedValue(
       errorResult(GITHUB_FAILURE.RATE_LIMITED),
     );
 
-    const result = await startReleaseAction({ version: MOCK_RELEASE_VERSION });
+    const result = await startReleaseAction({
+      version: MOCK_RELEASE_VERSION,
+      headSha,
+    });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
     expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
@@ -228,7 +255,10 @@ describe(startReleaseAction, () => {
       errorResult(RELEASE_FAILURE.DB_ERROR),
     );
 
-    const result = await startReleaseAction({ version: MOCK_RELEASE_VERSION });
+    const result = await startReleaseAction({
+      version: MOCK_RELEASE_VERSION,
+      headSha,
+    });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
     expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
@@ -237,7 +267,10 @@ describe(startReleaseAction, () => {
   it('still succeeds when the audit write is lost', async () => {
     insertAuditEventMock.mockRejectedValue(new Error(faker.lorem.sentence()));
 
-    const result = await startReleaseAction({ version: MOCK_RELEASE_VERSION });
+    const result = await startReleaseAction({
+      version: MOCK_RELEASE_VERSION,
+      headSha,
+    });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
@@ -253,6 +286,7 @@ describe(startReleaseAction, () => {
     it('dispatches an override and stores the reason with the actor', async () => {
       const result = await startReleaseAction({
         version: MOCK_RELEASE_VERSION,
+        headSha,
         overrideReason: MOCK_OVERRIDE_REASON,
       });
 
@@ -280,6 +314,7 @@ describe(startReleaseAction, () => {
       async (overrideReason) => {
         const result = await startReleaseAction({
           version: MOCK_RELEASE_VERSION,
+          headSha,
           overrideReason,
         });
 
@@ -299,6 +334,7 @@ describe(startReleaseAction, () => {
 
       const result = await startReleaseAction({
         version: MOCK_RELEASE_VERSION,
+        headSha,
         overrideReason: MOCK_OVERRIDE_REASON,
       });
 

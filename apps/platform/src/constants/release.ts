@@ -16,6 +16,8 @@ export const RELEASE_WORKFLOW_FILE = 'release.yml';
 
 export const TENANT_MIGRATION_WORKFLOW_FILE = 'migrate-tenant-content.yml';
 
+export const DEV_DEPLOY_WORKFLOW_FILE = 'deploy-development.yml';
+
 export const MIGRATION_ENVIRONMENT = {
   DEVELOPMENT: 'development',
   PRODUCTION: 'production',
@@ -35,6 +37,7 @@ export const RELEASE_OVERRIDE_REASON_MAX_LENGTH = 500;
 export const RELEASE_REFUSAL = {
   CONTRAST_CHECK_RUNNING: 'CONTRAST_CHECK_RUNNING',
   RELEASE_RUNNING: 'RELEASE_RUNNING',
+  RELEASE_STALE: 'RELEASE_STALE',
   RELEASES_PAUSED: 'RELEASES_PAUSED',
   TENANT_REQUIRED: 'TENANT_REQUIRED',
   TENANT_MIGRATION_NOT_FAILED: 'TENANT_MIGRATION_NOT_FAILED',
@@ -69,6 +72,10 @@ export const RELEASE_LOG = {
   CONTRAST_DISPATCH_FAILED: 'releases.contrast_dispatch_failed',
   CONTRAST_DISPATCH_SKIPPED: 'releases.contrast_dispatch_skipped',
   DB_READ_FAILED: 'releases.db_read_failed',
+  DEV_DEPLOY_DISPATCHED: 'releases.dev_deploy_dispatched',
+  DEV_DEPLOY_DISPATCH_ERROR: 'releases.dev_deploy_dispatch_error',
+  DEV_DEPLOY_DISPATCH_FAILED: 'releases.dev_deploy_dispatch_failed',
+  DEV_DEPLOY_DISPATCH_SKIPPED: 'releases.dev_deploy_dispatch_skipped',
   RELEASE_AUDIT_FAILED: 'releases.release_audit_failed',
   RELEASE_DISPATCH_ERROR: 'releases.release_dispatch_error',
   RELEASE_DISPATCH_FAILED: 'releases.release_dispatch_failed',

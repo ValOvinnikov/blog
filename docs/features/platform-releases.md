@@ -25,7 +25,7 @@ epics: [5271]
 ## What it does
 
 A SUPERADMIN sees the release candidate on the platform Releases page, runs
-the contrast check from it, cuts a production release by dispatching
+the contrast check from it, deploys `main`'s HEAD to development, cuts a production release by dispatching
 `release.yml`, and runs tenant content migrations on development or retries a
 tenant whose production migration failed; a contrast-due banner on the
 operator pages links there. What
@@ -69,7 +69,8 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   - a warning that the change list is incomplete when `isFileListTruncated`
     is set (GitHub lists at most 300 files);
   - the contrast status badge with a one-line explanation, a link to
-    `/findings` when it is `FAILED`, and the Run contrast check button.
+    `/findings` when it is `FAILED`, and the Deploy to dev and Run contrast
+    check buttons.
   - the Release card: the Release button, its confirmation dialog and the
     state of the newest `release.yml` run (below).
   - When there are no commits since the tag only the summary, the empty
@@ -94,6 +95,14 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   result. Once the server status differs it wins and the local state clears,
   so a later `DUE` or `NONE` never flips back; the next page load shows
   GitHub's status.
+- Server Action `startDevDeployAction`
+  (`server/releases/start-dev-deploy-action.ts`): `requireSuperAdmin`, then
+  dispatches `deploy-development.yml` on `main` through
+  `dispatchGitHubWorkflow`, which deploys `main`'s HEAD to development. It
+  answers `SERVER_ERROR` when the dispatch fails, which the button reports as
+  nothing started, and otherwise logs `releases.dev_deploy_dispatched` with
+  the actor. A dev deploy is not a release, so it records no audit event and
+  shows no run state; the button confirms the start with a toast.
 - The Release card. The button reads Release when contrast is `GREEN` or
   `NONE`, or no rendering path changed since the tag; otherwise it reads
   Release with override, and the dialog asks for a reason the confirm button
@@ -113,18 +122,22 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   (`server/releases/start-release-action.ts`): `requireSuperAdmin`, answers
   `REFUSED` with `RELEASES_PAUSED` while `IS_PRODUCTION_RELEASE_ENABLED` is
   `false`, before reading, dispatching or recording anything, validates
-  `{ version, overrideReason? }` with Zod (reason at most
-  `RELEASE_OVERRIDE_REASON_MAX_LENGTH`, trimmed), then re-reads the candidate
-  and the newest release run. It answers `UNAVAILABLE` when GitHub or the db
-  cannot be read; `REFUSED` with `RELEASE_RUNNING` while the newest run is
-  dispatched or running; `INVALID` with a `version` field error
+  `{ version, headSha, overrideReason? }` with Zod (reason at most
+  `RELEASE_OVERRIDE_REASON_MAX_LENGTH`, trimmed; `headSha` is the candidate
+  the page rendered), then re-reads the candidate and the newest release run.
+  It answers `UNAVAILABLE` when GitHub or the db cannot be read; `REFUSED`
+  with `RELEASE_RUNNING` while the newest run is dispatched or running;
+  `REFUSED` with `RELEASE_STALE` when `main`'s HEAD no longer equals the
+  submitted `headSha`, which the dialog reports as nothing started and asks
+  the operator to reload; `INVALID` with a `version` field error
   (`VERSION_MALFORMED` or `VERSION_NOT_GREATER`, both carrying `lastTag`) for a
   version that is not `vX.Y.Z` or not greater than the last tag; `INVALID`
   with an `overrideReason` field error (`REASON_REQUIRED`) when an override is
   required and the reason is blank; and `SERVER_ERROR` when the dispatch
   fails, which the dialog reports as nothing started. Otherwise it dispatches
-  `release.yml` on `main` with inputs `version`, `sha` (the candidate's
-  `headSha`, so the run ships exactly the commit the operator reviewed) and
+  `release.yml` for the commit shown, with inputs `version`, `sha` (the
+  submitted `headSha`, so the run ships exactly the commit the operator
+  reviewed) and
   `override` (`"true"` or `"false"`) and records `RELEASE_STARTED` (details: `headSha`,
   `isOverride`), plus `RELEASE_OVERRIDE` (details: `headSha`,
   `contrastStatus`, `reason`) when overridden, both on the `RELEASE` target
@@ -265,7 +278,7 @@ values are stored as plain `text`, so none of them needs a db migration:
 - `parseReleaseVersion` and `isReleaseVersionGreater` (`@shinefold/utils/version`).
 - `getReleaseCandidate` and `isContrastDue`, both built on
   `getCandidateComparison` (`apps/platform/src/server/releases/`).
-- `startContrastCheckAction`, `startReleaseAction`, `getReleaseRun`,
+- `startContrastCheckAction`, `startDevDeployAction`, `startReleaseAction`, `getReleaseRun`,
   `getReleaseRunAction`, `startTenantMigrationsAction` and
   `listFailedMigrationTenants` (`apps/platform/src/server/releases/`).
 - `isReleaseOverrideRequired` and `isReleaseRunActive`

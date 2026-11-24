@@ -1,15 +1,21 @@
 import { Alert } from '@platform/components/shared/alert';
-import { LinkButton } from '@platform/components/shared/link-button';
-import { adminRoutes } from '@platform/utils/routes/routes';
-import { ALERT_TYPE, SIZE } from '@shinefold/config';
+import { ALERT_TYPE } from '@shinefold/config';
 import type { TTenantPlan } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 
+import { PayInvoiceButton } from './components/pay-invoice-button/pay-invoice-button';
+
 export type TPastDueNoticeProps = {
+  tenantId: string;
   plan: TTenantPlan;
+  canPay: boolean;
 };
 
-export const PastDueNotice = ({ plan }: TPastDueNoticeProps) => {
+export const PastDueNotice = ({
+  tenantId,
+  plan,
+  canPay,
+}: TPastDueNoticeProps) => {
   const t = useTranslations('billingStatusNotice');
   const tPlan = useTranslations('planNames');
 
@@ -18,11 +24,7 @@ export const PastDueNotice = ({ plan }: TPastDueNoticeProps) => {
       type={ALERT_TYPE.WARNING}
       title={t('pastDueTitle')}
       description={t('pastDueDescription', { plan: tPlan(plan) })}
-      action={
-        <LinkButton href={adminRoutes.dashboardBilling()} size={SIZE.SM}>
-          {t('pastDueAction')}
-        </LinkButton>
-      }
+      action={canPay ? <PayInvoiceButton tenantId={tenantId} /> : undefined}
     />
   );
 };

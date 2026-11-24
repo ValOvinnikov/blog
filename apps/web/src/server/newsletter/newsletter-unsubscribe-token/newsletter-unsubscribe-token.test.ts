@@ -1,7 +1,10 @@
 import { faker } from '@faker-js/faker';
 import type { TMaybeUndefined } from '@shinefold/config';
 import { KEY_ENCODING } from '@shinefold/utils/encryption';
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
+import { MOCK_SUBSCRIBER_ID } from '@web/testing/server/newsletter/fixtures';
 import { env } from '@web/utils/env/env';
+import { logger } from '@web/utils/logger/logger';
 
 import {
   mintNewsletterUnsubscribeToken,
@@ -12,7 +15,6 @@ vi.mock('@web/utils/env/env');
 
 faker.seed(6010);
 
-const MOCK_SUBSCRIBER_ID = faker.string.uuid();
 const MOCK_KEY = Buffer.from(faker.string.alphanumeric(32)).toString(
   KEY_ENCODING,
 );
@@ -46,9 +48,27 @@ describe(readNewsletterUnsubscribeSubscriberId, () => {
     );
   });
 
-  it('rejects every token without a key', () => {
-    setKey(undefined);
+  describe('without a key', () => {
+    beforeEach(() => {
+      setKey(undefined);
+    });
 
-    expect(readNewsletterUnsubscribeSubscriberId(token)).toBeNull();
+    it('rejects every token', () => {
+      expect(readNewsletterUnsubscribeSubscriberId(token)).toBeNull();
+    });
+
+    it('logs the missing key once per read', () => {
+      readNewsletterUnsubscribeSubscriberId(token);
+
+      expect(logger.error).toHaveBeenCalledExactlyOnceWith(
+        NEWSLETTER_LOG.UNSUBSCRIBE_KEY_MISSING,
+      );
+    });
+  });
+
+  it('logs nothing while the key is set', () => {
+    readNewsletterUnsubscribeSubscriberId(token);
+
+    expect(logger.error).not.toHaveBeenCalled();
   });
 });

@@ -20,6 +20,7 @@ import { StartReleaseDialog } from './components/start-release-dialog/start-rele
 import { useReleaseRun } from './use-release-run';
 
 export type TReleaseCardProps = {
+  headSha: string;
   lastTag: string;
   hasChanges: boolean;
   migrations: TReleaseMigrationSummary;
@@ -28,6 +29,7 @@ export type TReleaseCardProps = {
 };
 
 export const ReleaseCard = ({
+  headSha,
   lastTag,
   hasChanges,
   migrations,
@@ -61,6 +63,7 @@ export const ReleaseCard = ({
         supportingText={t('description')}
         actions={
           <StartReleaseDialog
+            headSha={headSha}
             lastTag={lastTag}
             migrations={migrations}
             isOverrideRequired={isOverrideRequired}

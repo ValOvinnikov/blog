@@ -68,6 +68,8 @@ export const mockReleaseRun = (
 
 export const MOCK_LAST_TAG = mockReleaseCandidate().lastTag;
 
+export const MOCK_HEAD_SHA = mockReleaseCandidate().headSha;
+
 export const MOCK_MIGRATION_FAILED_AT = new Date(RELEASE_AT);
 
 export const mockFailedMigrationTenant = (

@@ -10,7 +10,7 @@ export const timelineVariants = tv({
     root: ['w-full [--timeline-gap:--spacing(6)]'],
     itemShare: ['w-full'],
     list: [
-      'relative flex flex-col gap-x-(--timeline-gap)',
+      'relative grid grid-cols-[minmax(var(--timeline-marker-track),max-content)_1fr] gap-x-4',
       'm-0 list-none p-0',
     ],
   },
@@ -22,7 +22,7 @@ export const timelineVariants = tv({
         itemShare: ['@container/timeline w-[calc(100%/var(--timeline-items))]'],
         list: [
           'w-[calc(100%*var(--timeline-items))]',
-          '@min-[9rem]/timeline:flex-row @min-[9rem]/timeline:items-start',
+          '@min-[9rem]/timeline:flex @min-[9rem]/timeline:items-start @min-[9rem]/timeline:gap-x-(--timeline-gap)',
         ],
       },
     },

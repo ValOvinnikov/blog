@@ -2044,6 +2044,12 @@
     "githubUnavailable": "GitHub could not be reached. Try again in a moment.",
     "startFailed": "The contrast check could not be started."
   },
+  "deployToDevButton": {
+    "label": "Deploy to dev",
+    "starting": "Starting…",
+    "started": "Development deploy started.",
+    "startFailed": "Nothing was started: the development deploy could not be triggered."
+  },
   "releaseCard": {
     "title": "Release",
     "description": "Cut a production release of the latest commit on main.",
@@ -2112,6 +2118,7 @@
       "REASON_REQUIRED": "Say why you are releasing without a passing contrast check."
     },
     "alreadyRunning": "A release is already running.",
+    "releaseStale": "main has moved since this page loaded, so nothing was started. Reload to review the new candidate.",
     "releasesPaused": "Production releases are paused.",
     "githubUnavailable": "GitHub could not be reached, so nothing was started. Try again in a moment.",
     "invalid": "Check the version and the reason, then try again.",
@@ -2328,12 +2335,12 @@
     "subject": "Your payment for {siteName} failed",
     "previewText": "We could not take {amount} for {siteName}.",
     "failed": "We could not take your payment for {siteName}.",
-    "updatePaymentMethod": "Update your payment method on the Billing page to keep your plan.",
+    "payInvoice": "Pay the open invoice on its payment page to keep your plan. You can use another card there or confirm the payment with your bank.",
     "amountLabel": "Amount due",
     "planLabel": "Plan",
     "nextRetryLabel": "Next attempt",
-    "planEnding": "We will not try again, so your plan ends unless you update your payment method.",
-    "actionLabel": "Update payment method"
+    "planEnding": "We will not try again, so your plan ends unless you pay the invoice.",
+    "actionLabel": "Pay invoice"
   },
   "suspensionCategory": {
     "ABUSE": "Abuse",
@@ -2367,6 +2374,8 @@
     "pastDueTitle": "Your last payment failed",
     "pastDueDescription": "Update your payment method to keep {plan}.",
     "pastDueAction": "Update payment method",
+    "pastDueActionPending": "Opening…",
+    "pastDueActionFailed": "The payment page couldn't be opened. Try again in a moment.",
     "graceTitle": "Your site is now on {plan}",
     "graceMembers": "On <time>{date}</time>, {count, plural, one {# team member loses} other {# team members lose}} access to this site's admin.",
     "graceDomain": "On <time>{date}</time>, {customDomain} stops being the main address and redirects to {subdomain}.",

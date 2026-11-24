@@ -2044,6 +2044,12 @@
     "githubUnavailable": "GitHub war nicht erreichbar. Versuche es gleich noch einmal.",
     "startFailed": "Die Kontrastprüfung konnte nicht gestartet werden."
   },
+  "deployToDevButton": {
+    "label": "In Dev bereitstellen",
+    "starting": "Wird gestartet…",
+    "started": "Entwicklungs-Deployment gestartet.",
+    "startFailed": "Nichts wurde gestartet: Das Entwicklungs-Deployment konnte nicht ausgelöst werden."
+  },
   "releaseCard": {
     "title": "Release",
     "description": "Erstelle ein Produktions-Release des neuesten Commits auf main.",
@@ -2112,6 +2118,7 @@
       "REASON_REQUIRED": "Begründe, warum du ohne bestandene Kontrastprüfung releast."
     },
     "alreadyRunning": "Es läuft bereits ein Release.",
+    "releaseStale": "main hat sich seit dem Laden dieser Seite geändert, daher wurde nichts gestartet. Lade die Seite neu, um den neuen Kandidaten zu prüfen.",
     "releasesPaused": "Produktions-Releases sind pausiert.",
     "githubUnavailable": "GitHub war nicht erreichbar, daher wurde nichts gestartet. Versuche es gleich noch einmal.",
     "invalid": "Prüfe Version und Begründung und versuche es erneut.",
@@ -2328,12 +2335,12 @@
     "subject": "Ihre Zahlung für {siteName} ist fehlgeschlagen",
     "previewText": "Wir konnten {amount} für {siteName} nicht einziehen.",
     "failed": "Wir konnten Ihre Zahlung für {siteName} nicht einziehen.",
-    "updatePaymentMethod": "Aktualisieren Sie Ihre Zahlungsmethode auf der Abrechnungsseite, um Ihren Tarif zu behalten.",
+    "payInvoice": "Bezahlen Sie die offene Rechnung auf ihrer Zahlungsseite, um Ihren Tarif zu behalten. Dort können Sie eine andere Karte verwenden oder die Zahlung bei Ihrer Bank bestätigen.",
     "amountLabel": "Fälliger Betrag",
     "planLabel": "Tarif",
     "nextRetryLabel": "Nächster Versuch",
-    "planEnding": "Wir versuchen es nicht erneut. Ihr Tarif endet, wenn Sie Ihre Zahlungsmethode nicht aktualisieren.",
-    "actionLabel": "Zahlungsmethode aktualisieren"
+    "planEnding": "Wir versuchen es nicht erneut. Ihr Tarif endet, wenn Sie die Rechnung nicht bezahlen.",
+    "actionLabel": "Rechnung bezahlen"
   },
   "suspensionCategory": {
     "ABUSE": "Missbrauch",
@@ -2367,6 +2374,8 @@
     "pastDueTitle": "Deine letzte Zahlung ist fehlgeschlagen",
     "pastDueDescription": "Aktualisiere deine Zahlungsmethode, um {plan} zu behalten.",
     "pastDueAction": "Zahlungsmethode aktualisieren",
+    "pastDueActionPending": "Wird geöffnet…",
+    "pastDueActionFailed": "Die Zahlungsseite konnte nicht geöffnet werden. Versuche es gleich noch einmal.",
     "graceTitle": "Deine Website ist jetzt auf {plan}",
     "graceMembers": "Am <time>{date}</time> {count, plural, one {verliert # Teammitglied} other {verlieren # Teammitglieder}} den Zugang zur Verwaltung dieser Website.",
     "graceDomain": "Am <time>{date}</time> ist {customDomain} nicht mehr die Hauptadresse und leitet auf {subdomain} weiter.",

@@ -27,12 +27,7 @@ const meta = {
   title: 'Modules/ContactFormModule',
   component: ContactFormModuleView,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
   argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    },
     contentAlignment: {
       control: 'select',
       options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],

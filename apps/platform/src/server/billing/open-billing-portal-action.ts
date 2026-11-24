@@ -11,6 +11,7 @@ import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { tenantIdSchema } from '@platform/utils/tenant-id-schema/tenant-id-schema';
 import {
   ACTION_OUTCOME,
   type TActionResult,
@@ -19,9 +20,6 @@ import {
 import { queries } from '@shinefold/db';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import { redirect } from 'next/navigation';
-import { z } from 'zod';
-
-const tenantIdSchema = z.uuid();
 
 export type TOpenBillingPortalResult = TActionResult<
   typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,

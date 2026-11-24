@@ -10,7 +10,6 @@ const meta = {
   title: 'Modules/NewsletterModule',
   component: NewsletterModuleView,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
   decorators: [
     (Story) => (
       <SessionProvider session={null}>
@@ -19,10 +18,6 @@ const meta = {
     ),
   ],
   argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    },
     variant: {
       control: 'select',
       options: [NEWSLETTER_VARIANT.FULL, NEWSLETTER_VARIANT.COMPACT],

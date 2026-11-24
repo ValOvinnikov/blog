@@ -2044,6 +2044,12 @@
     "githubUnavailable": "No se pudo conectar con GitHub. Inténtalo de nuevo en un momento.",
     "startFailed": "No se pudo iniciar la comprobación de contraste."
   },
+  "deployToDevButton": {
+    "label": "Desplegar en dev",
+    "starting": "Iniciando…",
+    "started": "Despliegue de desarrollo iniciado.",
+    "startFailed": "No se inició nada: no se pudo lanzar el despliegue de desarrollo."
+  },
   "releaseCard": {
     "title": "Versión",
     "description": "Publica en producción el último commit de main.",
@@ -2112,6 +2118,7 @@
       "REASON_REQUIRED": "Indica por qué publicas sin una comprobación de contraste superada."
     },
     "alreadyRunning": "Ya hay una versión en curso.",
+    "releaseStale": "main ha cambiado desde que se cargó esta página, así que no se ha iniciado nada. Recarga para revisar el nuevo candidato.",
     "releasesPaused": "Las versiones en producción están en pausa.",
     "githubUnavailable": "No se pudo contactar con GitHub, así que no se ha iniciado nada. Inténtalo de nuevo en un momento.",
     "invalid": "Revisa la versión y el motivo e inténtalo de nuevo.",
@@ -2328,12 +2335,12 @@
     "subject": "El pago de {siteName} no se ha podido realizar",
     "previewText": "No hemos podido cobrar {amount} por {siteName}.",
     "failed": "No hemos podido cobrar tu pago por {siteName}.",
-    "updatePaymentMethod": "Actualiza tu método de pago en la página de Facturación para conservar tu plan.",
+    "payInvoice": "Paga la factura pendiente en su página de pago para conservar tu plan. Allí puedes usar otra tarjeta o confirmar el pago con tu banco.",
     "amountLabel": "Importe pendiente",
     "planLabel": "Plan",
     "nextRetryLabel": "Próximo intento",
-    "planEnding": "No volveremos a intentarlo, así que tu plan terminará si no actualizas tu método de pago.",
-    "actionLabel": "Actualizar método de pago"
+    "planEnding": "No volveremos a intentarlo, así que tu plan terminará si no pagas la factura.",
+    "actionLabel": "Pagar factura"
   },
   "suspensionCategory": {
     "ABUSE": "Abuso",
@@ -2367,6 +2374,8 @@
     "pastDueTitle": "Tu último pago no se ha podido cobrar",
     "pastDueDescription": "Actualiza tu método de pago para conservar {plan}.",
     "pastDueAction": "Actualizar método de pago",
+    "pastDueActionPending": "Abriendo…",
+    "pastDueActionFailed": "No se pudo abrir la página de pago. Inténtalo de nuevo en un momento.",
     "graceTitle": "Tu sitio está ahora en {plan}",
     "graceMembers": "El <time>{date}</time>, {count, plural, one {# miembro del equipo perderá} other {# miembros del equipo perderán}} el acceso a la administración de este sitio.",
     "graceDomain": "El <time>{date}</time>, {customDomain} dejará de ser la dirección principal y redirigirá a {subdomain}.",

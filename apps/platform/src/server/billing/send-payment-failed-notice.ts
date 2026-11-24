@@ -39,7 +39,8 @@ export const sendPaymentFailedNotice = async (
     ownerEmail,
     tenant: { locale, name: siteName },
   } = owner;
-  const { amount_due, currency, next_payment_attempt } = invoice;
+  const { amount_due, currency, next_payment_attempt, hosted_invoice_url } =
+    invoice;
   const [t, tPlan] = await Promise.all([
     getTranslations({ locale, namespace: 'ownerPaymentFailedEmail' }),
     getTranslations({ locale, namespace: 'planNames' }),
@@ -58,7 +59,7 @@ export const sendPaymentFailedNotice = async (
       brandName: PLATFORM_EMAIL_BRAND_NAME,
       subject: t('subject', values),
       previewText: t('previewText', values),
-      paragraphs: [t('failed', values), t('updatePaymentMethod')],
+      paragraphs: [t('failed', values), t('payInvoice')],
       details: [
         { label: t('amountLabel'), value: amount },
         { label: t('planLabel'), value: tPlan(plan) },
@@ -72,7 +73,9 @@ export const sendPaymentFailedNotice = async (
       planEndingNotice: t('planEnding'),
       action: {
         label: t('actionLabel'),
-        url: new URL(adminRoutes.dashboardBilling(), baseUrl).toString(),
+        url:
+          hosted_invoice_url ??
+          new URL(adminRoutes.dashboardBilling(), baseUrl).toString(),
       },
     }),
   });

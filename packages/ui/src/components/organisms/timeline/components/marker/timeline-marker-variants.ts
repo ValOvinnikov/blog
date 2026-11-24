@@ -6,7 +6,7 @@ export const timelineMarkerVariants = tv({
   variants: {
     markerStyle: {
       [TIMELINE_MARKER_STYLE.NUMBERED]: ['w-8'],
-      [TIMELINE_MARKER_STYLE.LABELLED]: ['min-w-11 px-2.5'],
+      [TIMELINE_MARKER_STYLE.LABELLED]: ['min-w-11 px-2.5 whitespace-nowrap'],
     },
   },
 });

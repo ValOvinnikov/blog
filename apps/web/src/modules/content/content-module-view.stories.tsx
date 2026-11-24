@@ -8,6 +8,7 @@ import {
   MOCK_FULL_BLEED_IMAGE_DEMO,
   MOCK_RICH_TEXT_DEMO,
 } from '@web/testing/shared/portable-text/fixtures';
+import { MOCK_PARAGRAPH_LIST_PARAGRAPH } from '@web/testing/shared/portable-text/paragraph-list-fixtures';
 
 import { ContentModuleView } from './content-module-view';
 
@@ -15,13 +16,6 @@ const meta = {
   title: 'Modules/ContentModule',
   component: ContentModuleView,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
-  argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    },
-  },
   args: {
     id: 'content-1',
     brandVariant: BRAND_VARIANT.PRIMARY,
@@ -55,6 +49,10 @@ export const WithDividerAndLargeSpacing: TStory = {
       dividerBottom: true,
     },
   },
+};
+
+export const ParagraphsAndList: TStory = {
+  args: { body: MOCK_PARAGRAPH_LIST_PARAGRAPH },
 };
 
 export const FullBleedImage: TStory = {

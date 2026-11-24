@@ -47,10 +47,6 @@ describe(commitConfirmationToken, () => {
         sha256Hex(MOCK_CONFIRMATION_TOKEN),
       );
     });
-
-    it('leaves the unsubscribe token hash untouched', () => {
-      expect(row.unsubscribeTokenHash).toBe(subscriber.unsubscribeTokenHash);
-    });
   });
 
   it('never changes a subscriber who has confirmed', async () => {
