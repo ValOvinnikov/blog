@@ -1224,6 +1224,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **ACCESS_RUN_LOG**: `WORKFLOW_CALL_STARTED`=`"access_run.workflow_call_started"`, `WORKFLOW_CALL_DONE`=`"access_run.workflow_call_done"`
 - **ACCESS_RUN_CALL**: `GET_HOOK_BY_TOKEN`, `RUN_STATUS`, `RUN_CREATED_AT`, `RUN_CANCEL`, `RESUME_HOOK`, `START_RUN`
 
+### `@worker/constants/canary` — `apps/worker/src/constants/canary.ts`
+
+- **CANARY_LOG**: `NOT_CONFIGURED`=`"canary.not_configured"`, `FAILED`=`"canary.failed"`
+- **CANARY_FAILURE**: `START_FAILED`, `RUN_FAILED`, `TIMED_OUT`
+
 ### `@worker/constants/cookie-statement` — `apps/worker/src/constants/cookie-statement.ts`
 
 - **COOKIE_STATEMENT_LOG**: `SEED_START_FAILED`=`"cookie_statement.seed_start_failed"`, `SEED_FAILED`=`"cookie_statement.seed_failed"`

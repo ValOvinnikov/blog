@@ -52,6 +52,8 @@ export const env = createEnv({
     OPERATOR_ALERT_SECRET: z.string().min(1).optional(),
     // @env-optional
     CRON_SECRET: z.string().min(1).optional(),
+    // @env-required: development, production
+    CANARY_SECRET: z.string().min(1).optional(),
     // @env-optional
     OPERATOR_ALERT_FROM_ADDRESS: z.string().min(1).optional(),
     // @env-optional
@@ -96,6 +98,7 @@ export const env = createEnv({
       process.env.WORKER_NEWSLETTER_ENQUEUE_SECRET,
     OPERATOR_ALERT_SECRET: process.env.OPERATOR_ALERT_SECRET,
     CRON_SECRET: process.env.CRON_SECRET,
+    CANARY_SECRET: process.env.CANARY_SECRET,
     OPERATOR_ALERT_FROM_ADDRESS: process.env.OPERATOR_ALERT_FROM_ADDRESS,
     OWNER_EMAIL_FROM_ADDRESS: process.env.OWNER_EMAIL_FROM_ADDRESS,
     NEWSLETTER_FROM_ADDRESS: process.env.NEWSLETTER_FROM_ADDRESS,

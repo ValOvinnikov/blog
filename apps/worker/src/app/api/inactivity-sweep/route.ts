@@ -4,7 +4,7 @@ import { sanitizeLogMessage } from '@shinefold/insight';
 import { DOWNGRADE_GRACE_LOG } from '@worker/constants/downgrade-grace';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
-import { hasCronSecret } from '@worker/utils/cron-secret/cron-secret';
+import { hasBearerSecret } from '@worker/utils/bearer-secret/bearer-secret';
 import { runDowngradeGraceSweep } from '@worker/utils/downgrade-grace/run-downgrade-grace-sweep';
 import { env } from '@worker/utils/env/env';
 import type { TInactivitySweepContext } from '@worker/utils/inactivity-sweep/inactivity-stages';
@@ -39,7 +39,7 @@ export async function GET(request: Request): Promise<Response> {
       ENQUEUE_ERROR.SERVER_ERROR,
     );
   }
-  if (!hasCronSecret(request, secret)) {
+  if (!hasBearerSecret(request, secret)) {
     return respondError(HTTP_STATUS.UNAUTHORIZED, ENQUEUE_ERROR.UNAUTHORIZED);
   }
 
