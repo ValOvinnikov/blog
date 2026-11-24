@@ -13,13 +13,13 @@ import {
   castTo,
   columnDefault,
 } from '@shinefold/db/utils/insert-select-columns/insert-select-columns';
-import { and, eq, sql } from 'drizzle-orm';
-
 import {
   planSeats,
-  releaseInvitePastSeatLimit,
   seatsInUse,
-} from './seat-limit';
+} from '@shinefold/db/utils/seat-limit/seat-limit';
+import { and, eq, sql } from 'drizzle-orm';
+
+import { releaseInvitePastSeatLimit } from './release-invite-past-seat-limit';
 
 export type TCreateMembershipInviteResult =
   | {

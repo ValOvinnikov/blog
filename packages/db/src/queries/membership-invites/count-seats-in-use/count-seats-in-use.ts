@@ -1,6 +1,6 @@
 import { getDb } from '@shinefold/db/client';
-import { seatsInUse } from '@shinefold/db/queries/membership-invites/create-membership-invite/seat-limit';
 import { tenants } from '@shinefold/db/schema/tenants';
+import { seatsInUse } from '@shinefold/db/utils/seat-limit/seat-limit';
 import { eq } from 'drizzle-orm';
 
 export async function countSeatsInUse(tenantId: string): Promise<number> {

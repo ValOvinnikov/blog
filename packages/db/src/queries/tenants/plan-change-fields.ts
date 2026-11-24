@@ -5,12 +5,12 @@ import {
   TENANT_STATUS,
   type TTenantStatus,
 } from '@shinefold/db/constants';
+import { tenantPlanEnum } from '@shinefold/db/schema/tenant-enums';
+import { tenants } from '@shinefold/db/schema/tenants';
 import {
   planSeats,
   seatsInUse,
-} from '@shinefold/db/queries/membership-invites/create-membership-invite/seat-limit';
-import { tenantPlanEnum } from '@shinefold/db/schema/tenant-enums';
-import { tenants } from '@shinefold/db/schema/tenants';
+} from '@shinefold/db/utils/seat-limit/seat-limit';
 import { type SQL, sql } from 'drizzle-orm';
 
 export type TPlanChangeFields = {

@@ -1,3 +1,4 @@
+import type { TTenantPlan } from '@shinefold/config/constants';
 import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import { deleteCustomDomainClaim } from '@shinefold/db/queries/custom-domain-claims';
 import { stopPendingInvitesOverSeats } from '@shinefold/db/queries/membership-invites';
@@ -46,6 +47,7 @@ async function enforcePlan(input: TGraceStepInput): Promise<void> {
 
 async function giveGraceBack(
   { id, downgradeGraceStartedAt, downgradedFromPlan }: TTenant,
+  endedOnPlan: TTenantPlan,
   error: unknown,
 ): Promise<void> {
   const failure = { tenantId: id, error: sanitizeLogMessage(error) };
@@ -53,6 +55,7 @@ async function giveGraceBack(
 
   try {
     const isGivenBack = await restoreDowngradeGrace(id, {
+      plan: endedOnPlan,
       graceStartedAt: downgradeGraceStartedAt,
       downgradedFromPlan,
     });
@@ -85,7 +88,7 @@ export async function endGrace({
     await enforcePlan({ tenant: ended, hosts, ctx });
     return true;
   } catch (error) {
-    await giveGraceBack(tenant, error);
+    await giveGraceBack(tenant, ended.plan, error);
     return false;
   }
 }

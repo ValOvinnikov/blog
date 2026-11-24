@@ -12,7 +12,7 @@ import {
 import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
-import { releaseInvitePastSeatLimit } from './seat-limit';
+import { releaseInvitePastSeatLimit } from './release-invite-past-seat-limit';
 
 vi.mock('@shinefold/db/client');
 

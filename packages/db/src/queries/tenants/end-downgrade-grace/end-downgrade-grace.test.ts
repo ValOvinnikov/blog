@@ -1,8 +1,7 @@
 import { TENANT_PLAN } from '@shinefold/config/constants';
-import { GRACE_EMAIL, TENANT_STATUS } from '@shinefold/db/constants';
+import { GRACE_EMAIL } from '@shinefold/db/constants';
 import { claimGraceEmail } from '@shinefold/db/queries/tenants/claim-grace-email';
 import { listTenantsDueForGraceEnd } from '@shinefold/db/queries/tenants/list-tenants-due-for-grace-end';
-import { setTenantPlan } from '@shinefold/db/queries/tenants/set-tenant-plan';
 import * as schema from '@shinefold/db/schema';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
@@ -85,23 +84,12 @@ describe(endDowngradeGrace, () => {
     expect(ended?.downgradeGraceStartedAt).toBeNull();
   });
 
-  it('leaves a site whose move back up cleared the grace', async () => {
+  it.each([
+    ['a plan change cleared', null],
+    ['restarted since it was read', MOCK_NOW],
+  ])('leaves a grace %s', async (_, storedStart) => {
     const tenant = await insertTestTenant(db(), {
-      downgradeGraceStartedAt: MOCK_GRACE_ENDED_START,
-    });
-    await setTenantPlan(tenant.id, {
-      plan: TENANT_PLAN.GROWTH,
-      status: TENANT_STATUS.ACTIVE,
-    });
-
-    await expect(
-      endDowngradeGrace(tenant.id, MOCK_GRACE_ENDED_START),
-    ).resolves.toBeNull();
-  });
-
-  it('leaves a grace that restarted since it was read', async () => {
-    const tenant = await insertTestTenant(db(), {
-      downgradeGraceStartedAt: MOCK_NOW,
+      downgradeGraceStartedAt: storedStart,
     });
 
     await expect(
