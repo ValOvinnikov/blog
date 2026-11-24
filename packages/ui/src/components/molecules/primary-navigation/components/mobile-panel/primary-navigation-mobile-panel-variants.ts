@@ -8,7 +8,7 @@ export const primaryNavigationMobilePanelVariants = tv({
     panel: [
       'absolute inset-x-0 top-full z-20',
       'flex flex-col items-start gap-1 p-4',
-      'bg-primary border-b border-border shadow-lg',
+      'bg-ambient border-b border-border shadow-lg',
       'lg:hidden',
     ],
     link: PANEL_LINK,

@@ -455,8 +455,8 @@ Slots:
 
 ### Header — `components/organisms/header/header.tsx`
 
-The site header shell; arranges a `Header.Brand` slot and the navigation for wide screens by `layout`, and sits full width or floating by `barStyle`.
-Props: layout?: THeaderVariants['layout'] · barStyle?: THeaderVariants['barStyle'] · children?: TCompoundChildren<typeof HeaderParts> _(extends IWithClassName, IWithDataTestId)_
+The public site's header, where readers find the brand, the main navigation and the site-wide controls.
+Props: layout?: THeaderVariants['layout'] · barStyle?: THeaderVariants['barStyle'] · tone?: TBrandVariant · children?: TCompoundChildren<typeof HeaderParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: layout: HEADER_LAYOUT.CLASSIC|HEADER_LAYOUT.LINKS_BESIDE_BRAND|HEADER_LAYOUT.CENTRED_LINKS|HEADER_LAYOUT.TWO_ROWS|HEADER_LAYOUT.CENTRED_BRAND|HEADER_LAYOUT.MENU_BUTTON · barStyle: HEADER_BAR_STYLE.FULL_WIDTH|HEADER_BAR_STYLE.FLOATING
 
 Slots:

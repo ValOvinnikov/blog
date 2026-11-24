@@ -8,6 +8,7 @@ import {
   type TColorScheme,
 } from '@shinefold/config/constants';
 
+import { INVERSE_LOGO_TILE } from './accent-ramps';
 import { AMBIENT, TOKEN_ALIASES } from './contrast-surfaces';
 import { formatPaletteDeclarations } from './palette-ramps';
 import { effectiveSchemeOf } from './skin-contrast';
@@ -62,21 +63,35 @@ const BRAND_GROUND_FILLS = [
 const groundFillDeclarations = (roles: TSkinRoles): string[] =>
   isBrandStop(roles[AMBIENT]) ? BRAND_GROUND_FILLS : [];
 
+const logoTileDeclarations = (
+  effectiveScheme: TColorScheme,
+  scheme: TColorScheme,
+): string[] =>
+  effectiveScheme === scheme
+    ? []
+    : Object.entries(INVERSE_LOGO_TILE).map(
+        ([token, source]) => `${token}: var(${source})`,
+      );
+
 const scopeBlock = (
   key: string,
   { mode, roles }: TSkin,
   scheme: TColorScheme,
-): string[] =>
-  formatBlock(
+): string[] => {
+  const effectiveScheme = effectiveSchemeOf(mode, scheme);
+
+  return formatBlock(
     scheme === COLOR_SCHEME.DARK
       ? `.dark ${skinSelector(key)}`
       : skinSelector(key),
     [
-      `color-scheme: ${effectiveSchemeOf(mode, scheme).toLowerCase()}`,
+      `color-scheme: ${effectiveScheme.toLowerCase()}`,
       ...roleDeclarations(roles[scheme]),
       ...groundFillDeclarations(roles[scheme]),
+      ...logoTileDeclarations(effectiveScheme, scheme),
     ],
   );
+};
 
 const formatSkinScopes = (skins: TSkins): string[] =>
   Object.entries(skins).flatMap(([key, skin]) =>

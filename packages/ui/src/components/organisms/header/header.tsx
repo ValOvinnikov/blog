@@ -1,4 +1,10 @@
-import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import {
+  HEADER_BAR_STYLE,
+  type IWithClassName,
+  type IWithDataTestId,
+  type TBrandVariant,
+} from '@shinefold/config';
+import { HEADER_TEST_ID } from '@shinefold/ui/constants/header';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
@@ -21,22 +27,34 @@ export type THeaderProps = IWithClassName &
   IWithDataTestId & {
     layout?: THeaderVariants['layout'];
     barStyle?: THeaderVariants['barStyle'];
+    tone?: TBrandVariant;
     children?: TCompoundChildren<typeof HeaderParts>;
   };
 
-/** The site header shell; arranges a `Header.Brand` slot and the navigation for wide screens by `layout`, and sits full width or floating by `barStyle`. */
+/** The public site's header, where readers find the brand, the main navigation and the site-wide controls. */
 const HeaderRoot = ({
   layout,
   barStyle,
+  tone,
   children,
   className,
   dataTestId,
 }: THeaderProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeaderParts);
   const { root, inner, navActionsGroup } = headerVariants({ layout, barStyle });
+  const isFloating = barStyle === HEADER_BAR_STYLE.FLOATING;
+
   return (
-    <header className={root({ class: className })} data-testid={dataTestId}>
-      <div className={inner()}>
+    <header
+      className={root({ class: className })}
+      data-skin={isFloating ? undefined : tone}
+      data-testid={dataTestId}
+    >
+      <div
+        className={inner()}
+        data-skin={isFloating ? tone : undefined}
+        data-testid={isFloating ? HEADER_TEST_ID.CARD : undefined}
+      >
         {slots.Brand}
         {(slots.Nav || slots.Actions) && (
           <div className={navActionsGroup()}>

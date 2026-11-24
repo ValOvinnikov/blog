@@ -327,6 +327,8 @@
   --logo-3: oklch(0.73 0.13 250);
   --logo-tile: oklch(0.52 0.17 250);
   --logo-tile-contrast: oklch(1 0 0);
+  --logo-tile-inverse: oklch(0.8 0.14 250);
+  --logo-tile-inverse-contrast: oklch(0.22 0.06 250);
 
   --shadow-card:
     0 1px 2px oklch(0.2 0.02 250 / 0.05), 0 14px 34px oklch(0.2 0.04 250 / 0.07);
@@ -358,7 +360,11 @@
   --item-divider-width: 0px;
   --item-stack-gap: 0.75rem;
   --item-stack-radius: var(--radius-md);
+}
 
+/* The defaults again in each skin scope, since a var() resolves where it is declared; a site's own values reach a skin scope only where it re-declares them there. */
+:root,
+:where([data-skin]) {
   --header-control-border: var(--border-strong);
   --header-control-fill: var(--surface);
 
