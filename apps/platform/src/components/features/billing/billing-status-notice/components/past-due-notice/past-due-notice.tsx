@@ -8,9 +8,14 @@ import { PayInvoiceButton } from './components/pay-invoice-button/pay-invoice-bu
 export type TPastDueNoticeProps = {
   tenantId: string;
   plan: TTenantPlan;
+  canPay: boolean;
 };
 
-export const PastDueNotice = ({ tenantId, plan }: TPastDueNoticeProps) => {
+export const PastDueNotice = ({
+  tenantId,
+  plan,
+  canPay,
+}: TPastDueNoticeProps) => {
   const t = useTranslations('billingStatusNotice');
   const tPlan = useTranslations('planNames');
 
@@ -19,7 +24,7 @@ export const PastDueNotice = ({ tenantId, plan }: TPastDueNoticeProps) => {
       type={ALERT_TYPE.WARNING}
       title={t('pastDueTitle')}
       description={t('pastDueDescription', { plan: tPlan(plan) })}
-      action={<PayInvoiceButton tenantId={tenantId} />}
+      action={canPay ? <PayInvoiceButton tenantId={tenantId} /> : undefined}
     />
   );
 };

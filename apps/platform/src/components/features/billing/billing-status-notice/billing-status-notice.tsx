@@ -19,18 +19,22 @@ export type TBillingStatusNoticeProps = {
     | 'downgradeGraceStartedAt'
   >;
   canOpenBilling: boolean;
+  isOwner: boolean;
   canUpgrade: boolean;
 };
 
 export const BillingStatusNotice = async ({
   tenant,
   canOpenBilling,
+  isOwner,
   canUpgrade,
 }: TBillingStatusNoticeProps) => {
   const { id, plan, status, isArchived, downgradeGraceStartedAt } = tenant;
 
   if (status === TENANT_STATUS.PAST_DUE) {
-    return canOpenBilling ? <PastDueNotice tenantId={id} plan={plan} /> : null;
+    return canOpenBilling ? (
+      <PastDueNotice tenantId={id} plan={plan} canPay={isOwner} />
+    ) : null;
   }
   if (isArchived || !downgradeGraceStartedAt) return null;
 

@@ -61,6 +61,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
             <BillingStatusNotice
               tenant={tenant}
               canOpenBilling={access.billing}
+              isOwner={viewer.isOwner}
               canUpgrade={
                 upgradeStateFor(tenant, viewer) === UPGRADE_STATE.AVAILABLE
               }

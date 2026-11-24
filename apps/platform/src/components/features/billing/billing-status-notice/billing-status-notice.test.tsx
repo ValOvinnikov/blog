@@ -63,6 +63,7 @@ const PAST_DUE = mockTenant({
 const setup = customRenderAsync(BillingStatusNotice, {
   tenant: IN_GRACE,
   canOpenBilling: true,
+  isOwner: true,
   canUpgrade: true,
 });
 
@@ -197,8 +198,20 @@ describe(`<${BillingStatusNotice.name}/>`, () => {
     expect(countMembershipsOverSeatsMock).not.toHaveBeenCalled();
   });
 
+  it('shows a super admin the past-due notice with no way to pay', async () => {
+    await setup({ tenant: PAST_DUE, isOwner: false });
+
+    const title = screen.getByText(billingStatusNotice.pastDueTitle);
+    const payButton = screen.queryByRole('button', {
+      name: billingStatusNotice.pastDueAction,
+    });
+
+    expect(title).toBeVisible();
+    expect(payButton).not.toBeInTheDocument();
+  });
+
   it('shows a past-due site nothing to a member outside Billing’s audience', async () => {
-    await setup({ tenant: PAST_DUE, canOpenBilling: false });
+    await setup({ tenant: PAST_DUE, canOpenBilling: false, isOwner: false });
 
     const notice = screen.queryByRole('status');
 

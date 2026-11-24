@@ -4,8 +4,7 @@ import {
   BILLING_LOG,
   STRIPE_INVOICE_STATUS,
 } from '@platform/constants/billing';
-import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
-import { requireTenantOwnerOrAdmin } from '@platform/server/auth/require-tenant-owner-or-admin';
+import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { getStripeClient } from '@platform/server/billing/stripe-client';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
@@ -24,7 +23,7 @@ export type TPayOpenInvoiceResult = TActionResult<
   typeof ACTION_OUTCOME.SERVER_ERROR
 >;
 
-const findPaymentUrl = async (
+const resolvePayDestination = async (
   tenantId: string,
   subscription: string,
 ): Promise<TMaybeUndefined<string>> => {
@@ -56,13 +55,13 @@ export const payOpenInvoiceAction = async (
   const parsed = tenantIdSchema.safeParse(tenantId);
   if (!parsed.success) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
-  await requireTenantOwnerOrAdmin(parsed.data, isSuperAdmin);
+  await requireTenantOwner(parsed.data);
   const billing = await queries.tenants.getTenantBilling(parsed.data);
   const subscription = billing?.stripeSubscriptionId;
   if (!subscription) redirect(adminRoutes.dashboardBilling());
 
-  const url = await findPaymentUrl(parsed.data, subscription);
-  if (!url) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+  const destination = await resolvePayDestination(parsed.data, subscription);
+  if (!destination) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
-  redirect(url);
+  redirect(destination);
 };

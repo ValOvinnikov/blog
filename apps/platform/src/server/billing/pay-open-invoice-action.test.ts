@@ -75,19 +75,16 @@ describe(payOpenInvoiceAction, () => {
     expect(redirect).toHaveBeenCalledWith(MOCK_HOSTED_INVOICE_URL);
   });
 
-  it.each([
-    { role: ADMIN_ROLE.SUPERADMIN, permitted: true },
-    { role: ADMIN_ROLE.MODERATOR, permitted: false },
-  ])(
-    'lets the gate admit a $role admin: $permitted',
-    async ({ role, permitted }) => {
+  it.each([ADMIN_ROLE.SUPERADMIN, ADMIN_ROLE.MODERATOR])(
+    'lets the gate admit only the owner, never a %s',
+    async (role) => {
       await pay().catch(() => undefined);
 
       const [tenantId, isAdminPermitted] =
         requireTenantOwnerOrAdminMock.mock.calls[0] ?? [];
 
       expect(tenantId).toBe(MOCK_TENANT_ID);
-      expect(isAdminPermitted?.(mockAdmin({ role }))).toBe(permitted);
+      expect(isAdminPermitted?.(mockAdmin({ role }))).toBe(false);
     },
   );
 
