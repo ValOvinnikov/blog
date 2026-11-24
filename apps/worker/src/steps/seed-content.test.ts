@@ -111,20 +111,20 @@ describe(seedTenantContent, () => {
       afterSeed?: TAfterSeed;
     } = {},
   ) {
-    const { siteType = SITE_TYPE.BLANK, deps } = options;
-    return seedTenantContent(
-      options.tenant ?? tenant,
+    const { siteType = SITE_TYPE.BLANK, deps, afterSeed } = options;
+    return seedTenantContent({
+      tenant: options.tenant ?? tenant,
       siteType,
-      MOCK_PROVISION_ENV.productName,
-      {
+      productName: MOCK_PROVISION_ENV.productName,
+      deps: {
         createClient,
         mintWriteToken,
         revokeWriteToken,
         sleep,
         ...deps,
       },
-      options.afterSeed,
-    );
+      afterSeed,
+    });
   }
 
   beforeEach(() => {

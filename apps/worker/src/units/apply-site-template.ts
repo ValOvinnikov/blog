@@ -38,13 +38,13 @@ export async function applySiteTemplate(
       const afterSeed = (await isGrowthLayerEntitled(tenant))
         ? applyGrowthLayer({ siteType, locale: tenant.locale })
         : undefined;
-      await seedTenantContent(
+      await seedTenantContent({
         tenant,
         siteType,
         productName,
-        seedContentDeps,
+        deps: seedContentDeps,
         afterSeed,
-      );
+      });
       await insertSiteConfigIfMissing(
         tenantId,
         STARTER_PRESET_BY_SITE_TYPE[siteType],
