@@ -11406,6 +11406,14 @@
         "file": "apps/web/src/constants/account.ts"
       }
     ],
+    "bar_backgrounds.site_config_fetch_failed": [
+      {
+        "ref": "BAR_BACKGROUNDS_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/bar-backgrounds",
+        "file": "apps/web/src/constants/bar-backgrounds.ts"
+      }
+    ],
     "bookmark_button.status_fetch_failed": [
       {
         "ref": "BOOKMARK_LOG.BUTTON_STATUS_FETCH_FAILED",

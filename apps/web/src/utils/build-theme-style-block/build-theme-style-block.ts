@@ -68,13 +68,18 @@ export const buildThemeStyleBlock = ({
       ...BUTTON_SHAPE_DECLARATIONS[buttonShape],
       ...DENSITY_DECLARATIONS[density],
       ...CARD_STYLE_DECLARATIONS[cardStyle],
-      ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
       ...HEADER_CONTROL_SHAPE_DECLARATIONS[headerControlShape],
-      ...NAV_LINK_STYLE_DECLARATIONS[navLinkStyle],
       ...HEADING_WEIGHT_DECLARATIONS[headingWeight],
       ...HEADING_CASE_DECLARATIONS[headingCase],
       ...IMAGE_PROPORTION_DECLARATIONS[imageProportion],
       ...DIVIDER_WIDTH_DECLARATIONS[dividerWidth],
+    })}
+}
+:root,
+:where([data-skin]) {
+    ${formatDeclarations({
+      ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
+      ...NAV_LINK_STYLE_DECLARATIONS[navLinkStyle],
     })}
 }
 .dark {

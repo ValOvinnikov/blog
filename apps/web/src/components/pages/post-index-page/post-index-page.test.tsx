@@ -3,6 +3,7 @@ import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@shinefold/config';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
 import { service } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import { POST_INDEX_LOG } from '@web/constants/post-index';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   customRenderServerAsync,
@@ -30,6 +31,8 @@ faker.seed(6008);
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
+
+vi.mock('@web/server/site-config/get-bar-backgrounds/get-bar-backgrounds');
 vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
 vi.mock('@shinefold/service', () => ({
@@ -79,8 +82,11 @@ describe(`<${PostIndexPage.name}/>`, () => {
   });
 
   describe('with the default index page', () => {
+    let main: HTMLElement;
+
     beforeEach(async () => {
       await setup();
+      main = screen.getByRole('main');
     });
 
     it('fetches the index page with the tenant context', () => {
@@ -88,7 +94,6 @@ describe(`<${PostIndexPage.name}/>`, () => {
     });
 
     it('renders the page heading and supporting text inside main', () => {
-      const main = screen.getByRole('main');
       const heading = within(main).getByRole('heading', {
         level: 1,
         name: MOCK_PAGE_HEADING,
@@ -107,7 +112,6 @@ describe(`<${PostIndexPage.name}/>`, () => {
         name: MOCK_TENANT_NAME,
       });
       const currentCrumb = within(breadcrumbs).getByText(MOCK_PAGE_HEADING);
-      const main = screen.getByRole('main');
 
       expect(homeLink).toBeVisible();
       expect(currentCrumb).toBeVisible();
@@ -115,7 +119,6 @@ describe(`<${PostIndexPage.name}/>`, () => {
     });
 
     it('renders the tenant topic chips inside main', () => {
-      const main = screen.getByRole('main');
       const chips = within(main).getByRole('navigation', {
         name: SITE_MESSAGES.topicChipList.ariaLabel,
       });
@@ -136,9 +139,12 @@ describe(`<${PostIndexPage.name}/>`, () => {
 
     await expect(setup()).rejects.toBe(MOCK_ERROR);
 
-    expect(logger.error).toHaveBeenCalledWith('post_index_page.fetch_failed', {
-      error: MOCK_ERROR,
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      POST_INDEX_LOG.PAGE_FETCH_FAILED,
+      {
+        error: MOCK_ERROR,
+      },
+    );
   });
 
   it('redirects to / when this language has no post index page', async () => {

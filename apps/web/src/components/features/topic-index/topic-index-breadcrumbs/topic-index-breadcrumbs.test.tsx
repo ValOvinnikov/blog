@@ -1,7 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { routes } from '@shinefold/config';
 import { okResult } from '@shinefold/utils';
-import { customRenderAsync } from '@web/testing/custom-render';
+import { TOPIC_INDEX_LOG } from '@web/constants/topic-index';
+import { customRenderServerAsync } from '@web/testing/custom-render';
 import {
   testThrowsOnFetchFailure,
   testNotFoundWithoutLog,
@@ -14,6 +15,8 @@ import { TopicIndexBreadcrumbs } from './topic-index-breadcrumbs';
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
+
+vi.mock('@web/server/site-config/get-bar-backgrounds/get-bar-backgrounds');
 
 const { getTopicIndexPageMock } = vi.hoisted(() => ({
   getTopicIndexPageMock: vi.fn(),
@@ -35,7 +38,7 @@ const MOCK_INDEX_PAGE = {
   headingBlock: mockHeadingBlock({ heading: MOCK_INDEX_HEADING }),
 };
 
-const setup = customRenderAsync(TopicIndexBreadcrumbs, {});
+const setup = customRenderServerAsync(TopicIndexBreadcrumbs, {});
 
 describe(`<${TopicIndexBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
@@ -52,6 +55,6 @@ describe(`<${TopicIndexBreadcrumbs.name}/>`, () => {
   testThrowsOnFetchFailure({
     pageLoaderMock: getTopicIndexPageMock,
     setup,
-    eventFragment: 'topic_index_breadcrumbs.fetch_failed',
+    eventFragment: TOPIC_INDEX_LOG.BREADCRUMBS_FETCH_FAILED,
   });
 });

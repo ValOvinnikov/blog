@@ -56,6 +56,10 @@ const config: StorybookConfig = {
         fileURLToPath(
           new URL('./mocks/get-topic-index-page.ts', import.meta.url),
         ),
+      '@web/server/site-config/get-bar-backgrounds/get-bar-backgrounds':
+        fileURLToPath(
+          new URL('./mocks/get-bar-backgrounds.ts', import.meta.url),
+        ),
       '@web/server/tag-index/get-tag-index-page/get-tag-index-page':
         fileURLToPath(
           new URL('./mocks/get-tag-index-page.ts', import.meta.url),
