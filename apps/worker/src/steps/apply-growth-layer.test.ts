@@ -183,11 +183,38 @@ describe(applyGrowthLayer, () => {
     );
   });
 
-  it('writes nothing for a site type without a Growth layer', async () => {
-    await applyFor(SITE_TYPE.BLOG);
+  it.each([SITE_TYPE.BLOG, SITE_TYPE.DOCS, SITE_TYPE.BLANK])(
+    'reads, uploads and writes nothing for %s, which has no Growth layer',
+    async (siteType) => {
+      await applyFor(siteType);
 
-    expect(transaction).not.toHaveBeenCalled();
+      expect(fetch).not.toHaveBeenCalled();
+      expect(upload).not.toHaveBeenCalled();
+      expect(transaction).not.toHaveBeenCalled();
+    },
+  );
+
+  it('applies the Personal layer without uploading a placeholder image', async () => {
+    await applyFor(SITE_TYPE.PERSONAL);
+
+    expect(upload).not.toHaveBeenCalled();
+    expect(createIfNotExists.mock.calls.map(([document]) => document)).toEqual(
+      buildGrowthLayer({
+        siteType: SITE_TYPE.PERSONAL,
+        locale: LOCALE_ISO_CODES.EN,
+        placeholderImages: MOCK_PLACEHOLDER_IMAGES,
+      })?.documents,
+    );
   });
+
+  it.each([SITE_TYPE.BUSINESS, SITE_TYPE.PRODUCT])(
+    'uploads both placeholder images for %s',
+    async (siteType) => {
+      await applyFor(siteType);
+
+      expect(upload).toHaveBeenCalledTimes(2);
+    },
+  );
 
   it('rejects when the commit fails', async () => {
     commit.mockRejectedValue(MOCK_SANITY_OUTAGE);

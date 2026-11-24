@@ -1,5 +1,5 @@
 import {
-  buildGrowthLayer,
+  getGrowthLayerBuilder,
   STARTER_DOCUMENT_IDS,
   type Template_home,
   type TStarterDocumentUnion,
@@ -39,6 +39,9 @@ export function applyGrowthLayer({
   locale: TLocaleIsoCode;
 }): TAfterSeed {
   return async (client) => {
+    const builder = getGrowthLayerBuilder(siteType);
+    if (!builder) return;
+
     const homeTemplateId = STARTER_DOCUMENT_IDS.HOME_TEMPLATE;
     const { homeTemplate, ledger } = await client.fetch<TGrowthLayerState>(
       GROWTH_LAYER_STATE_QUERY,
@@ -50,9 +53,12 @@ export function applyGrowthLayer({
     );
     if (ledger?.isLayerApplied) return;
 
-    const placeholderImages = await uploadPlaceholderImages(client);
-    const layer = buildGrowthLayer({ siteType, locale, placeholderImages });
-    if (!layer) return;
+    const layer = builder.usesPlaceholderImages
+      ? builder.build({
+          locale,
+          placeholderImages: await uploadPlaceholderImages(client),
+        })
+      : builder.build({ locale });
 
     const transaction = client.transaction();
     for (const document of layer.documents) {
