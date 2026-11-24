@@ -1,7 +1,7 @@
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import {
   buildShapePreviewTokens,
-  buildSkinScopePreviewTokens,
+  buildSkinScopeOverrideTokens,
   type TShapePreviewValues,
 } from '@platform/utils/shape-preview-tokens/shape-preview-tokens';
 import {
@@ -54,7 +54,7 @@ export type TSitePreviewThemeValues = TThemePreviewValues & {
 
 export type TSitePreviewTheme = {
   tokenStyle: CSSProperties;
-  skinScopeTokens: TThemeDeclarations;
+  skinScopeTokens: TMaybeUndefined<TThemeDeclarations>;
   isDark: boolean;
   headingFontFamily: string;
   bodyFontFamily: string;
@@ -65,7 +65,7 @@ export const buildSitePreviewTheme = (
   isDark: boolean,
 ): TSitePreviewTheme => ({
   tokenStyle: buildThemePreviewStyle(values, isDark),
-  skinScopeTokens: buildSkinScopePreviewTokens(values),
+  skinScopeTokens: buildSkinScopeOverrideTokens(values),
   isDark,
   headingFontFamily: FONT_OPTIONS[values.headingFont].fontFamily,
   bodyFontFamily: FONT_OPTIONS[values.bodyFont].fontFamily,

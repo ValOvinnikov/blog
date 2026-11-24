@@ -197,10 +197,7 @@ describe(buildSitePreviewTheme, () => {
 
     expect(buildSitePreviewTheme(values, true)).toEqual({
       tokenStyle: buildThemePreviewStyle(values, true),
-      skinScopeTokens: {
-        ...HEADER_CONTROL_STYLE_DECLARATIONS[values.headerControlStyle],
-        ...NAV_LINK_STYLE_DECLARATIONS[values.navLinkStyle],
-      },
+      skinScopeTokens: undefined,
       isDark: true,
       headingFontFamily: FONT_OPTIONS[values.headingFont].fontFamily,
       bodyFontFamily: FONT_OPTIONS[values.bodyFont].fontFamily,

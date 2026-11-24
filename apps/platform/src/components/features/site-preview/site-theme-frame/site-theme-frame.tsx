@@ -45,12 +45,14 @@ export const SiteThemeFrame = ({
       data-testid={testId}
       {...{ [SITE_THEME_FRAME_ATTRIBUTE]: frameId }}
     >
-      <style>
-        {toScopedDeclarationsCss(
-          `[${SITE_THEME_FRAME_ATTRIBUTE}="${frameId}"] [${SKIN_ATTRIBUTE}]`,
-          skinScopeTokens,
-        )}
-      </style>
+      {skinScopeTokens && (
+        <style>
+          {toScopedDeclarationsCss(
+            `[${SITE_THEME_FRAME_ATTRIBUTE}="${frameId}"] [${SKIN_ATTRIBUTE}]`,
+            skinScopeTokens,
+          )}
+        </style>
+      )}
       {children}
     </div>
   );

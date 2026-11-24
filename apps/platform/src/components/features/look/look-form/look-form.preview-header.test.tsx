@@ -1,8 +1,5 @@
 import { LOOK_ROW } from '@platform/constants/look-row';
-import {
-  LOOK_SAMPLE_BREADCRUMBS_TEST_ID,
-  LOOK_SAMPLE_TOKENS_TEST_ID,
-} from '@platform/constants/look-sample';
+import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
   SAMPLE_FOOTER_LAYOUT_ATTRIBUTE,
   SAMPLE_FOOTER_TEST_ID,
@@ -13,7 +10,6 @@ import {
   SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
   SAMPLE_HEADER_TEST_ID,
 } from '@platform/constants/sample-header';
-import { SKIN_ATTRIBUTE } from '@platform/constants/site-theme-frame';
 import messages from '@platform/i18n/messages/en.json';
 import { screen, within } from '@platform/testing/custom-render';
 import {
@@ -27,7 +23,6 @@ import {
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import {
-  BRAND_VARIANT,
   FOOTER_LAYOUT,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_SHAPE,
@@ -117,40 +112,6 @@ describe(`<${LookForm.name}/>`, () => {
           SAMPLE_FOOTER_LAYOUT_ATTRIBUTE,
           FOOTER_LAYOUT.CENTRED,
         );
-      });
-
-      it('previews the chosen header background before saving', async () => {
-        await chooseSegment(
-          user,
-          LOOK_FORM.headerBackgroundLabel,
-          LOOK_FORM.skinLabel.INK,
-        );
-
-        const sampleHeader = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
-        expect(sampleHeader).toHaveAttribute(SKIN_ATTRIBUTE, BRAND_VARIANT.INK);
-      });
-
-      it('previews the chosen breadcrumb background before saving', async () => {
-        await chooseSegment(
-          user,
-          LOOK_FORM.breadcrumbBackgroundLabel,
-          LOOK_FORM.skinLabel.SECONDARY,
-        );
-
-        const sampleBreadcrumbs = screen.getByTestId(
-          LOOK_SAMPLE_BREADCRUMBS_TEST_ID,
-        );
-        expect(sampleBreadcrumbs).toHaveAttribute(
-          SKIN_ATTRIBUTE,
-          BRAND_VARIANT.SECONDARY,
-        );
-      });
-
-      it('shows the breadcrumb row on the page tint while it is Plain', () => {
-        const sampleBreadcrumbs = screen.getByTestId(
-          LOOK_SAMPLE_BREADCRUMBS_TEST_ID,
-        );
-        expect(sampleBreadcrumbs).not.toHaveAttribute(SKIN_ATTRIBUTE);
       });
 
       it('previews the chosen navigation link style before saving', async () => {

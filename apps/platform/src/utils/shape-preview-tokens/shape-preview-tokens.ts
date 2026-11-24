@@ -5,10 +5,12 @@ import {
   DERIVED_RADIUS_DECLARATIONS,
   DIVIDER_WIDTH_DECLARATIONS,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
+  HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
   HEADING_CASE_DECLARATIONS,
   HEADING_WEIGHT_DECLARATIONS,
   IMAGE_PROPORTION_DECLARATIONS,
+  NAV_LINK_STYLE,
   NAV_LINK_STYLE_DECLARATIONS,
   RADIUS_DECLARATIONS,
   type TButtonShape,
@@ -20,6 +22,7 @@ import {
   type THeadingCase,
   type THeadingWeight,
   type TImageProportion,
+  type TMaybeUndefined,
   type TNavLinkStyle,
   type TRadiusScale,
   type TThemeDeclarations,
@@ -39,7 +42,7 @@ export type TShapePreviewValues = {
   dividerWidth: TDividerWidth;
 };
 
-export const buildSkinScopePreviewTokens = ({
+const buildSkinScopePreviewTokens = ({
   headerControlStyle,
   navLinkStyle,
 }: Pick<
@@ -49,6 +52,15 @@ export const buildSkinScopePreviewTokens = ({
   ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
   ...NAV_LINK_STYLE_DECLARATIONS[navLinkStyle],
 });
+
+// theme.css already declares Outlined header buttons and Plain links in every skin scope.
+export const buildSkinScopeOverrideTokens = (
+  values: Pick<TShapePreviewValues, 'headerControlStyle' | 'navLinkStyle'>,
+): TMaybeUndefined<TThemeDeclarations> =>
+  values.headerControlStyle === HEADER_CONTROL_STYLE.OUTLINED &&
+  values.navLinkStyle === NAV_LINK_STYLE.PLAIN
+    ? undefined
+    : buildSkinScopePreviewTokens(values);
 
 export const buildShapePreviewTokens = ({
   radiusScale,
