@@ -78,7 +78,9 @@ describe(applySiteTemplate, () => {
 
       await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
-      expect(vi.mocked(seedTenantContent).mock.calls[0]?.[1]).toBe(seededType);
+      expect(vi.mocked(seedTenantContent).mock.calls[0]?.[0].siteType).toBe(
+        seededType,
+      );
       expect(insertSiteConfigIfMissing).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
         preset,
@@ -104,14 +106,18 @@ describe(applySiteTemplate, () => {
       siteType: SITE_TYPE.PORTFOLIO,
       locale: tenant.locale,
     });
-    expect(vi.mocked(seedTenantContent).mock.calls[0]?.[4]).toBe(afterSeed);
+    expect(vi.mocked(seedTenantContent).mock.calls[0]?.[0].afterSeed).toBe(
+      afterSeed,
+    );
   });
 
   it('hands seeding no Growth layer when the tenant is not entitled to it', async () => {
     await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(applyGrowthLayer).not.toHaveBeenCalled();
-    expect(vi.mocked(seedTenantContent).mock.calls[0]?.[4]).toBeUndefined();
+    expect(
+      vi.mocked(seedTenantContent).mock.calls[0]?.[0].afterSeed,
+    ).toBeUndefined();
   });
 
   it.each([
