@@ -30,7 +30,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "workflow": "5.8.0",
-    "ws": "8.22.0",
+    "ws": "8.23.0",
     "zod": "catalog:"
   },
   "devDependencies": {
