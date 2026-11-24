@@ -12542,6 +12542,14 @@
         "file": "apps/web/src/constants/newsletter.ts"
       }
     ],
+    "newsletter.unsubscribe_key_missing": [
+      {
+        "ref": "NEWSLETTER_LOG.UNSUBSCRIBE_KEY_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
     "newsletter.unsubscribe_link_failed": [
       {
         "ref": "NEWSLETTER_LOG.UNSUBSCRIBE_LINK_FAILED",

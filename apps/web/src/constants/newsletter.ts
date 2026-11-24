@@ -17,6 +17,7 @@ export const NEWSLETTER_LOG = {
   GATE_STATUS_FETCH_FAILED: 'newsletter.gate_status_fetch_failed',
   UNSUBSCRIBE_FAILED: 'newsletter.unsubscribe_failed',
   UNSUBSCRIBE_TENANT_UNRESOLVED: 'newsletter.unsubscribe_tenant_unresolved',
+  UNSUBSCRIBE_KEY_MISSING: 'newsletter.unsubscribe_key_missing',
   UNSUBSCRIBE_LINK_FAILED: 'newsletter.unsubscribe_link_failed',
   UNSUBSCRIBE_LINK_TENANT_UNRESOLVED:
     'newsletter.unsubscribe_link_tenant_unresolved',
