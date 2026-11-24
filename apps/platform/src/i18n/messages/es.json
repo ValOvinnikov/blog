@@ -943,6 +943,10 @@
     },
     "headerBarStyleLabel": "Barra",
     "headerBarStyleDescription": "Si la barra ocupa todo el ancho de la página o flota sobre ella como una tarjeta.",
+    "headerBackgroundLabel": "Fondo",
+    "headerBackgroundDescription": "El color de la cabecera y de los menús y paneles que se abren desde ella. Cada uno sigue el tema claro u oscuro del lector.",
+    "breadcrumbBackgroundLabel": "Fondo de la ruta de navegación",
+    "breadcrumbBackgroundDescription": "El color de la fila de ruta de navegación bajo la cabecera, en entradas, etiquetas, temas y páginas de destino. Cada uno sigue el tema claro u oscuro del lector.",
     "headerBarStyleOptionLabel": {
       "FULL_WIDTH": "Ancho completo",
       "FLOATING": "Flotante"

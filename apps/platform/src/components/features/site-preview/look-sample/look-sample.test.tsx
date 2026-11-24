@@ -40,6 +40,7 @@ import {
 } from '@platform/testing/custom-render';
 import { MOCK_SAMPLE_HEADER_STYLE } from '@platform/testing/sample-header-style';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
+import { SKIN_ATTRIBUTE } from '@platform/testing/skin';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
@@ -81,7 +82,6 @@ const MOCK_LOGO_URL = faker.image.url();
 const CURRENT_LANGUAGE_TEST_ID = 'sample-language-code-current';
 const HARBOUR_NOTES = 'harbour notes';
 const HARBOUR_NOTES_INITIAL = 'H';
-const SKIN_ATTRIBUTE = 'data-skin';
 const SKINS = objectKeys(SKIN_REGISTRY);
 const SUBSCRIBE_BUTTONS_OUTSIDE_BANDS = 3;
 

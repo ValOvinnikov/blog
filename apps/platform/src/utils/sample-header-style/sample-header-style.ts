@@ -2,10 +2,12 @@ import type { TLookFormValues } from '@platform/utils/default-look-values/defaul
 import type {
   IAccountControl,
   IHeaderStyle,
+  TBrandVariant,
   TLanguageSwitcherStyle,
 } from '@shinefold/config';
 
 export type TSampleHeaderStyle = IHeaderStyle & {
+  breadcrumbBackground: TBrandVariant;
   languageSwitcherStyle: TLanguageSwitcherStyle;
   account: IAccountControl;
 };
@@ -14,6 +16,8 @@ export const toSampleHeaderStyle = ({
   headerLayout,
   headerSubmenuStyle,
   headerBarStyle,
+  headerBackground,
+  breadcrumbBackground,
   languageSwitcherStyle,
   accountButtonStyle,
   accountPanelStyle,
@@ -23,6 +27,8 @@ export const toSampleHeaderStyle = ({
   | 'headerLayout'
   | 'headerSubmenuStyle'
   | 'headerBarStyle'
+  | 'headerBackground'
+  | 'breadcrumbBackground'
   | 'languageSwitcherStyle'
   | 'accountButtonStyle'
   | 'accountPanelStyle'
@@ -31,6 +37,8 @@ export const toSampleHeaderStyle = ({
   layout: headerLayout,
   submenuStyle: headerSubmenuStyle,
   barStyle: headerBarStyle,
+  background: headerBackground,
+  breadcrumbBackground,
   languageSwitcherStyle,
   account: {
     buttonStyle: accountButtonStyle,

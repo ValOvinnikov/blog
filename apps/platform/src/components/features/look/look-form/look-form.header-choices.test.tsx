@@ -15,6 +15,7 @@ import {
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { UNSAVED_CHANGES } from '@platform/testing/render-in-settings-form';
 import {
+  BRAND_VARIANT,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
@@ -69,6 +70,18 @@ describe(`<${LookForm.name}/>`, () => {
         group: LOOK_FORM.navLinkStyleLabel,
         option: LOOK_FORM.navLinkStyleOptionLabel.SOFT,
         saved: { navLinkStyle: NAV_LINK_STYLE.SOFT },
+      },
+      {
+        row: LOOK_ROW.HEADER,
+        group: LOOK_FORM.headerBackgroundLabel,
+        option: LOOK_FORM.skinLabel.INK,
+        saved: { headerBackground: BRAND_VARIANT.INK },
+      },
+      {
+        row: LOOK_ROW.HEADER,
+        group: LOOK_FORM.breadcrumbBackgroundLabel,
+        option: LOOK_FORM.skinLabel.BRAND_PRIMARY,
+        saved: { breadcrumbBackground: BRAND_VARIANT.BRAND_PRIMARY },
       },
     ])('saves the chosen $group style', (style) =>
       saveChosenStyle(user, style),

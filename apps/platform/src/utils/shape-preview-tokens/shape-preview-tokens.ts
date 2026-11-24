@@ -39,6 +39,17 @@ export type TShapePreviewValues = {
   dividerWidth: TDividerWidth;
 };
 
+export const buildSkinScopePreviewTokens = ({
+  headerControlStyle,
+  navLinkStyle,
+}: Pick<
+  TShapePreviewValues,
+  'headerControlStyle' | 'navLinkStyle'
+>): TThemeDeclarations => ({
+  ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
+  ...NAV_LINK_STYLE_DECLARATIONS[navLinkStyle],
+});
+
 export const buildShapePreviewTokens = ({
   radiusScale,
   density,
@@ -56,10 +67,9 @@ export const buildShapePreviewTokens = ({
     ...RADIUS_DECLARATIONS[radiusScale],
     ...DENSITY_DECLARATIONS[density],
     ...CARD_STYLE_DECLARATIONS[cardStyle],
-    ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
     ...HEADER_CONTROL_SHAPE_DECLARATIONS[headerControlShape],
     ...BUTTON_SHAPE_DECLARATIONS[buttonShape],
-    ...NAV_LINK_STYLE_DECLARATIONS[navLinkStyle],
+    ...buildSkinScopePreviewTokens({ headerControlStyle, navLinkStyle }),
     ...HEADING_WEIGHT_DECLARATIONS[headingWeight],
     ...HEADING_CASE_DECLARATIONS[headingCase],
     ...IMAGE_PROPORTION_DECLARATIONS[imageProportion],

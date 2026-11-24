@@ -1,6 +1,7 @@
 import { LookSampleActions } from '@platform/components/features/site-preview/look-sample/components/look-sample-actions/look-sample-actions';
 import { LookSampleBand } from '@platform/components/features/site-preview/look-sample/components/look-sample-band/look-sample-band';
 import { LookSampleBanner } from '@platform/components/features/site-preview/look-sample/components/look-sample-banner/look-sample-banner';
+import { LookSampleBreadcrumbs } from '@platform/components/features/site-preview/look-sample/components/look-sample-breadcrumbs/look-sample-breadcrumbs';
 import { LookSampleCta } from '@platform/components/features/site-preview/look-sample/components/look-sample-cta/look-sample-cta';
 import { LookSampleFaq } from '@platform/components/features/site-preview/look-sample/components/look-sample-faq/look-sample-faq';
 import { LookSampleForm } from '@platform/components/features/site-preview/look-sample/components/look-sample-form/look-sample-form';
@@ -79,6 +80,10 @@ export const LookSample = ({
         isDark={theme.isDark}
         isSubmenuOpen={isSubmenuOpen}
         shouldAlwaysShowLanguageSwitcher={shouldAlwaysShowLanguageSwitcher}
+      />
+      <LookSampleBreadcrumbs
+        background={header.breadcrumbBackground}
+        homeLabel={brand.name}
       />
       <div className={main()}>
         <div className={hero()}>

@@ -44,6 +44,8 @@ describe(toLookFormValues, () => {
       headerLayout: MOCK_SITE_CONFIG.headerLayout,
       headerSubmenuStyle: MOCK_SITE_CONFIG.headerSubmenuStyle,
       headerBarStyle: MOCK_SITE_CONFIG.headerBarStyle,
+      headerBackground: MOCK_SITE_CONFIG.headerBackground,
+      breadcrumbBackground: MOCK_SITE_CONFIG.breadcrumbBackground,
       navLinkStyle: MOCK_SITE_CONFIG.navLinkStyle,
       headingWeight: MOCK_SITE_CONFIG.headingWeight,
       headingCase: MOCK_SITE_CONFIG.headingCase,

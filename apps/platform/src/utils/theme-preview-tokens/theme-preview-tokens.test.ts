@@ -179,11 +179,28 @@ describe(buildThemePreviewStyle, () => {
 });
 
 describe(buildSitePreviewTheme, () => {
+  it('re-declares the chosen header buttons and navigation links for skin scopes', () => {
+    const values = {
+      ...defaultLookFormValues(),
+      headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
+      navLinkStyle: NAV_LINK_STYLE.PILL,
+    };
+
+    expect(buildSitePreviewTheme(values, false).skinScopeTokens).toEqual({
+      ...HEADER_CONTROL_STYLE_DECLARATIONS[HEADER_CONTROL_STYLE.SOFT],
+      ...NAV_LINK_STYLE_DECLARATIONS[NAV_LINK_STYLE.PILL],
+    });
+  });
+
   it('resolves both fonts and the dark ramp for the chosen mode', () => {
     const values = defaultLookFormValues();
 
     expect(buildSitePreviewTheme(values, true)).toEqual({
       tokenStyle: buildThemePreviewStyle(values, true),
+      skinScopeTokens: {
+        ...HEADER_CONTROL_STYLE_DECLARATIONS[values.headerControlStyle],
+        ...NAV_LINK_STYLE_DECLARATIONS[values.navLinkStyle],
+      },
       isDark: true,
       headingFontFamily: FONT_OPTIONS[values.headingFont].fontFamily,
       bodyFontFamily: FONT_OPTIONS[values.bodyFont].fontFamily,

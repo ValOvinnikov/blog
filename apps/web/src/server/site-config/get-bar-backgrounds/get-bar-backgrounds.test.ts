@@ -31,21 +31,17 @@ describe(getBarBackgrounds, () => {
     getSiteConfigMock.mockReset();
   });
 
-  it("returns the tenant's saved header and breadcrumb backgrounds", async () => {
+  it("returns the tenant's saved breadcrumb background", async () => {
     getSiteConfigMock.mockResolvedValue(
-      mockSiteConfig({
-        headerBackground: BRAND_VARIANT.INK,
-        breadcrumbBackground: BRAND_VARIANT.SECONDARY,
-      }),
+      mockSiteConfig({ breadcrumbBackground: BRAND_VARIANT.SECONDARY }),
     );
 
     await expect(getBarBackgrounds(MOCK_TENANT_ID)).resolves.toEqual({
-      header: BRAND_VARIANT.INK,
       breadcrumb: BRAND_VARIANT.SECONDARY,
     });
   });
 
-  it('falls back to Plain for both when the tenant has no site config', async () => {
+  it('falls back to Plain when the tenant has no site config', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await expect(getBarBackgrounds(MOCK_TENANT_ID)).resolves.toEqual(
@@ -58,7 +54,7 @@ describe(getBarBackgrounds, () => {
       getSiteConfigMock.mockRejectedValue(MOCK_ERROR);
     });
 
-    it('falls back to Plain for both', async () => {
+    it('falls back to Plain', async () => {
       await expect(getBarBackgrounds(MOCK_TENANT_ID)).resolves.toEqual(
         MOCK_BAR_BACKGROUNDS,
       );

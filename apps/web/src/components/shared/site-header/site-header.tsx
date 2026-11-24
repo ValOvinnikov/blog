@@ -15,7 +15,6 @@ import {
   isReaderAccountFeatureEnabled,
 } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
-import { getBarBackgrounds } from '@web/server/site-config/get-bar-backgrounds/get-bar-backgrounds';
 import { getBrandLogos } from '@web/server/site-config/get-brand-logos/get-brand-logos';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
@@ -45,7 +44,6 @@ export const SiteHeader = async () => {
     brandName,
     accountControl,
     headerStyle,
-    { header: headerBackground },
     siteOAuthCredentials,
   ] = await Promise.all([
     service.global.navigation.v1.getNavigation(sanityContext),
@@ -56,7 +54,6 @@ export const SiteHeader = async () => {
     getBrandName({ tenantId, tenantName }),
     getAccountControl(siteConfigTenant),
     getHeaderStyle(siteConfigTenant),
-    getBarBackgrounds(siteConfigTenant),
     getSiteOAuthCredentials(tenantId),
   ]);
 
@@ -68,7 +65,7 @@ export const SiteHeader = async () => {
 
   const navItems = navResult.ok ? navResult.data.items : [];
   const tagline = navResult.ok ? navResult.data.tagline : undefined;
-  const { layout, submenuStyle, barStyle } = headerStyle;
+  const { layout, submenuStyle, barStyle, background } = headerStyle;
   const hasLanguageSwitcher =
     navResult.ok && navResult.data.showLanguageSwitcher === true;
   const oauthProviderIds = getEnabledOAuthProviderIds(siteOAuthCredentials);
@@ -77,7 +74,7 @@ export const SiteHeader = async () => {
 
   return (
     <StickyHeaderFrame>
-      <Header layout={layout} barStyle={barStyle} tone={headerBackground}>
+      <Header layout={layout} barStyle={barStyle} tone={background}>
         <Header.Brand>
           <BrandLockupLink
             logoUrl={logoUrl}

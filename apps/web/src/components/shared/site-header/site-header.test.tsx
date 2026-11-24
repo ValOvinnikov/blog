@@ -18,7 +18,6 @@ import {
   isReaderAccountFeatureEnabled,
 } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
-import { getBarBackgrounds } from '@web/server/site-config/get-bar-backgrounds/get-bar-backgrounds';
 import { getBrandLogos } from '@web/server/site-config/get-brand-logos/get-brand-logos';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
@@ -26,8 +25,8 @@ import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_SITE_OAUTH_CREDENTIALS } from '@web/testing/server/auth/site-oauth-credentials-fixtures';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
-import { MOCK_BAR_BACKGROUNDS } from '@web/testing/shared/bar-backgrounds/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_HEADER_STYLE } from '@web/testing/shared/header-style/fixtures';
 import {
   KEY_ARROW_DOWN,
   KEY_ARROW_UP,
@@ -76,8 +75,6 @@ vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 vi.mock('@web/server/site-config/get-header-style/get-header-style');
 
-vi.mock('@web/server/site-config/get-bar-backgrounds/get-bar-backgrounds');
-
 vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
 );
@@ -100,7 +97,6 @@ vi.mock('next-auth/react', () => ({
 
 const getRequestContextMock = vi.mocked(getRequestContext);
 const getHeaderStyleMock = vi.mocked(getHeaderStyle);
-const getBarBackgroundsMock = vi.mocked(getBarBackgrounds);
 const isReaderAccountEnabledMock = vi.mocked(isReaderAccountEnabled);
 const isReaderAccountFeatureEnabledMock = vi.mocked(
   isReaderAccountFeatureEnabled,
@@ -234,9 +230,9 @@ describe(`<${SiteHeader.name}/>`, () => {
   });
 
   it("puts the header on the tenant's header background", async () => {
-    getBarBackgroundsMock.mockResolvedValueOnce({
-      ...MOCK_BAR_BACKGROUNDS,
-      header: BRAND_VARIANT.INK,
+    getHeaderStyleMock.mockResolvedValueOnce({
+      ...MOCK_HEADER_STYLE,
+      background: BRAND_VARIANT.INK,
     });
     await setup();
 
@@ -773,14 +769,8 @@ describe(`<${SiteHeader.name}/>`, () => {
       );
     });
 
-    it("reads the tenant's header layout, sub-menu style and bar", () => {
+    it("reads the tenant's header layout, sub-menu style, bar and background", () => {
       expect(getHeaderStyleMock).toHaveBeenCalledWith(
-        MOCK_REQUEST_CONTEXT.tenantId,
-      );
-    });
-
-    it("reads the tenant's header background", () => {
-      expect(getBarBackgroundsMock).toHaveBeenCalledWith(
         MOCK_REQUEST_CONTEXT.tenantId,
       );
     });

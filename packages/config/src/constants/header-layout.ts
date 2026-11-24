@@ -1,5 +1,7 @@
 import type { TValueOf } from '@shinefold/config/utils';
 
+import type { TBrandVariant } from './layout';
+
 export const HEADER_LAYOUT = {
   CLASSIC: 'CLASSIC',
   LINKS_BESIDE_BRAND: 'LINKS_BESIDE_BRAND',
@@ -29,4 +31,5 @@ export interface IHeaderStyle {
   layout: THeaderLayout;
   submenuStyle: THeaderSubmenuStyle;
   barStyle: THeaderBarStyle;
+  background: TBrandVariant;
 }

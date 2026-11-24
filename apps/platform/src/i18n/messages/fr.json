@@ -943,6 +943,10 @@
     },
     "headerBarStyleLabel": "Barre",
     "headerBarStyleDescription": "Si la barre occupe toute la largeur de la page ou flotte au-dessus comme une carte.",
+    "headerBackgroundLabel": "Arrière-plan",
+    "headerBackgroundDescription": "La couleur de l’en-tête et des menus et panneaux qui s’ouvrent depuis celui-ci. Chacune suit le thème clair ou sombre du lecteur.",
+    "breadcrumbBackgroundLabel": "Arrière-plan du fil d’Ariane",
+    "breadcrumbBackgroundDescription": "La couleur du fil d’Ariane sous l’en-tête, sur les articles, les étiquettes, les thèmes et les pages d’accueil. Chacune suit le thème clair ou sombre du lecteur.",
     "headerBarStyleOptionLabel": {
       "FULL_WIDTH": "Pleine largeur",
       "FLOATING": "Flottante"

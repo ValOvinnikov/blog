@@ -25,6 +25,8 @@ export const CARD_FIELDS = {
     'headerLayout',
     'headerSubmenuStyle',
     'headerBarStyle',
+    'headerBackground',
+    'breadcrumbBackground',
     'navLinkStyle',
     'headerControlStyle',
     'headerControlShape',

@@ -943,6 +943,10 @@
     },
     "headerBarStyleLabel": "Balk",
     "headerBarStyleDescription": "Of de balk de hele pagina beslaat of als kaart erboven zweeft.",
+    "headerBackgroundLabel": "Achtergrond",
+    "headerBackgroundDescription": "De kleur van de kop en van de menu’s en panelen die daaruit openen. Elke kleur volgt het lichte of donkere thema van de lezer.",
+    "breadcrumbBackgroundLabel": "Achtergrond kruimelpad",
+    "breadcrumbBackgroundDescription": "De kleur van het kruimelpad onder de kop, op berichten, tags, onderwerpen en landingspagina’s. Elke kleur volgt het lichte of donkere thema van de lezer.",
     "headerBarStyleOptionLabel": {
       "FULL_WIDTH": "Volledige breedte",
       "FLOATING": "Zwevend"
