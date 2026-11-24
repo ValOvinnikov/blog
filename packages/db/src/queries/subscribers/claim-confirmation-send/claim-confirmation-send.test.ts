@@ -50,14 +50,13 @@ describe(claimConfirmationSend, () => {
       expect(row.confirmationSentAt).toEqual(MOCK_CONFIRMATION_NOW);
     });
 
-    it('leaves the stored token hashes untouched', async () => {
-      const { id, confirmationTokenHash, unsubscribeTokenHash } = subscriber;
+    it('leaves the stored confirmation token hash untouched', async () => {
+      const { id, confirmationTokenHash } = subscriber;
 
       await claimConfirmationSend(id, COOLDOWN_MS);
 
       const row = await readTestSubscriber(db(), id);
       expect(row.confirmationTokenHash).toBe(confirmationTokenHash);
-      expect(row.unsubscribeTokenHash).toBe(unsubscribeTokenHash);
     });
 
     it('refuses a second claim inside the cooldown', async () => {

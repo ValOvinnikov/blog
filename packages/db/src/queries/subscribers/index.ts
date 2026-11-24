@@ -3,7 +3,6 @@ export * from './confirm-subscriber';
 export * from './get-subscriber-by-email-index';
 export * from './get-subscription-status';
 export * from './unsubscribe';
-export * from './unsubscribe-by-token';
 export * from './unsubscribe-by-id';
 export * from './resend-confirmation';
 export * from './count-subscribers-for-tenant';
