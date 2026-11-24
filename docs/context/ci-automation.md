@@ -3,7 +3,7 @@
 > Part of the docs split described in [`docs/README.md`](../README.md).
 
 All automation lives in `.github/workflows/` (shared pnpm/Node setup in
-`.github/actions/setup`; Dependabot bumps npm + GitHub Actions weekly).
+`.github/actions/setup`).
 `.github/actions/setup` takes an optional `install-filter` input (default
 empty, meaning an unscoped `pnpm install --frozen-lockfile` across every
 workspace). When set, its value is split on whitespace into one `--filter=`
@@ -217,8 +217,7 @@ The step names are the job names they replaced, in this order:
   copied, modified or renamed (`git diff --name-only --diff-filter=ACMR`
   against the base, merge-base). Prettier skips what `.prettierignore` names
   even when passed explicitly, so a file the PR did not touch never fails it.
-  It catches edits that bypassed lint-staged, such as GitHub web edits and
-  Dependabot.
+  It catches edits that bypassed lint-staged, such as GitHub web edits.
 - **Type-check**, **Lint** — turbo, affected-only (above). In `apps/web`
   and `apps/platform`, `type-check` runs `next typegen` before `tsc`, so it checks against Next's
   generated route types (`.next/types/`) on a clean checkout, and catches
@@ -620,19 +619,14 @@ tail once any PR is marked ready: `ci-watcher` reports them, and a red one is
 diagnosed from the run log rather than reproduced (`open-pull-request` Gate
 5a).
 
-## Dependabot groups
+## Dependency updates are manual
 
-`.github/dependabot.yml` bumps npm and GitHub Actions weekly, each capped at
-five open pull requests. npm minor and patch bumps arrive as one
-`minor-and-patch` pull request per run, except that `eslint`, `storybook` and
-`vitest` keep their own groups, which carry majors too. Actions minor and
-patch bumps arrive as one `github-actions` pull request. Every other major
-bump, in either ecosystem, arrives on its own.
-
-A dependency joins the first group whose patterns match, so the catch-all
-stays last. One catch-all also means one bad bump holds up the rest of the
-group: when its pull request goes red, find the offender, add a temporary
-`ignore` for it, and let the next run regroup the others.
+No bot opens version-bump pull requests: each one bills a full CI run, and
+an unattended bump of a worker runtime package once took worker-dev down.
+Dependencies are upgraded by hand, as a ticket, when wanted. Dependabot
+alerts stay on to flag vulnerable versions; security-update pull requests are
+off. `scripts/branch-name.mjs` still accepts `dependabot/…` branches, so a
+re-enabled security update is not refused.
 
 ## The Vercel CLI pin tracks the pinned Node version
 
@@ -845,7 +839,7 @@ any other change still builds. Allowlist mode needs no such carve-out:
 
 Affected mode also inherits `turbo.json`'s `globalDependencies`: a change to
 `configs/**`, the setup action, `.nvmrc`, the lockfile or `turbo.json` marks
-`@shinefold/ui` affected and builds `ui-library`, a Dependabot lockfile bump
+`@shinefold/ui` affected and builds `ui-library`, a lockfile-only bump
 included.
 
 `scripts/vercel-ignore-affected.test.sh` pins all of this (see the Hooks row
