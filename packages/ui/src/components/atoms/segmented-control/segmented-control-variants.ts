@@ -3,7 +3,8 @@ import { tv } from '@shinefold/ui/lib/styling';
 export const segmentedControlVariants = tv({
   slots: {
     root: [
-      'inline-flex items-center gap-0.5',
+      // The gap matches the focus ring's 4px reach, so a focused option's ring never lands on a selected neighbour's fill.
+      'inline-flex items-center gap-1',
       'rounded-button border border-border bg-surface p-0.5',
     ],
     option: [
