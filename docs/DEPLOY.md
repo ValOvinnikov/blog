@@ -1209,6 +1209,13 @@ gate`, which fails with `No app was promoted`, naming every job that did
    has no production deploy job). The script sends the app's own secret as
    `x-vercel-protection-bypass`.
 
+   **The worker must also run a workflow before it goes live.** With
+   `CANARY_PATH` set, the worker stage job calls `/api/canary` on the staged
+   deployment (bypass header plus `Authorization: Bearer $CANARY_SECRET`,
+   90 s limit). Anything but 200 fails the job, so no app is promoted. Store
+   the worker-dev project's `CANARY_SECRET` on the `development` GitHub
+   Environment too; the job fails and names it when it is missing.
+
 Concurrency is scoped **per job**, not workflow-wide. `changes` / `verify` /
 `deploy-*` each keep `cancel-in-progress: true`, so a newer merge still
 supersedes an in-flight build/deploy — "latest merge wins" still holds. (The

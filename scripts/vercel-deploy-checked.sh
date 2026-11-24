@@ -120,8 +120,25 @@ stage() {
 		fail "Deployment Protection refused the check on ${url}${path} — ${protection_hint}"
 	fi
 
+	if [ -n "${CANARY_PATH:-}" ]; then
+		canary "$url" ${bypass[@]+"${bypass[@]}"}
+	fi
+
 	echo "${app}: ${url}${path} answered HTTP ${status}; staged for promotion."
 	echo "url=${url}" >>"${GITHUB_OUTPUT:-/dev/null}"
+}
+
+# A canary proves the deployment can run work end to end, not just start.
+canary() {
+	local url=$1 status
+	shift
+	: "${CANARY_SECRET:?empty — set the CANARY_SECRET secret on this GitHub Environment}"
+	status=$(curl --silent --show-error --max-time 90 --output /dev/null --write-out '%{http_code}' \
+		"$@" --header "Authorization: Bearer ${CANARY_SECRET}" "${url}${CANARY_PATH}") || status=000
+	if [ "$status" != 200 ]; then
+		fail "The new ${app} deployment (${url}) failed its canary ${CANARY_PATH} with HTTP ${status} — it could not run a workflow to completion."
+	fi
+	echo "${app}: canary ${CANARY_PATH} completed."
 }
 
 case "$mode" in

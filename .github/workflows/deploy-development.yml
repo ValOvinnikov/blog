@@ -534,6 +534,8 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_AUTOMATION_BYPASS_SECRET_WORKER: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET_WORKER }}
+      CANARY_SECRET: ${{ secrets.CANARY_SECRET }}
+      CANARY_PATH: /api/canary
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_WORKER }}
     steps:

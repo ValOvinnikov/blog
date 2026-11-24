@@ -25,6 +25,9 @@ cat >"$stubdir/curl" <<'STUB'
 #!/usr/bin/env bash
 printf 'curl %s\n' "$*" >>"$STUB_LOG"
 [ "$STUB_CURL_EXIT" -eq 0 ] || exit "$STUB_CURL_EXIT"
+case " $* " in
+*"Authorization: Bearer "*) printf "%s" "${STUB_CANARY_STATUS:-200}"; exit "${STUB_CANARY_EXIT:-0}" ;;
+esac
 while [ $# -gt 0 ]; do
 	[ "$1" = --dump-header ] && printf '%b' "$STUB_HEADERS" >"$2"
 	shift
@@ -126,6 +129,33 @@ out=$(PATH="$stubdir:$PATH" VERCEL_TOKEN=t VERCEL_CLI_VERSION=1.0.0 \
 	bash "$script" stage web / 2>&1)
 check "the app's own bypass secret is sent as the protection-bypass header" \
 	'grep -q "x-vercel-protection-bypass: web-s3cret" "$workdir/log" && ! grep -q platform-s3cret "$workdir/log"'
+
+canary_run() {
+	reset
+	out=$(PATH="$stubdir:$PATH" VERCEL_TOKEN=t VERCEL_CLI_VERSION=1.0.0 CANARY_PATH=/api/canary "$@" \
+		STUB_DEPLOY_URL="$deployment_url" STUB_STATUS=200 STUB_HEADERS="HTTP/2 200\r\n\r\n" STUB_CURL_EXIT=0 \
+		bash "$script" stage worker /api/check 2>&1)
+	code=$?
+}
+
+canary_run env CANARY_SECRET=c4nary STUB_CANARY_STATUS=200
+check "a worker whose canary completes is staged" '[ $code -eq 0 ] && staged'
+check "the canary sends the canary secret to the canary path" \
+	'grep -q "Authorization: Bearer c4nary $deployment_url/api/canary" "$STUB_LOG"'
+
+canary_run env CANARY_SECRET=c4nary STUB_CANARY_STATUS=503
+check "a canary that does not complete fails without staging" \
+	'[ $code -ne 0 ] && not_staged && [[ "$out" == *"failed its canary /api/canary with HTTP 503"* ]]'
+
+canary_run env CANARY_SECRET=c4nary STUB_CANARY_EXIT=28
+check "a canary that times out fails without staging" '[ $code -ne 0 ] && not_staged'
+
+canary_run env
+check "a canary without its secret fails and names the secret" \
+	'[ $code -ne 0 ] && not_staged && [[ "$out" == *CANARY_SECRET* ]]'
+
+run 200 "HTTP/2 200\r\n\r\n"
+check "an app without a canary path makes one request" '[ "$(grep -c "^curl" "$STUB_LOG")" -eq 1 ]'
 
 run_promote "$deployment_url"
 check 'promote assigns the domains to the staged deployment' '[ $code -eq 0 ] && promoted'
