@@ -2,11 +2,11 @@ import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import {
-  MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK,
   MOCK_FAQ_HEADING,
   mockFaqQuestion,
 } from '@web/testing/modules/faq/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_PARAGRAPH_LIST_PARAGRAPH } from '@web/testing/shared/portable-text/paragraph-list-fixtures';
 import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { FaqModuleView } from './faq-module-view';
@@ -65,7 +65,7 @@ export const WithRichAnswer: TStory = {
       mockFaqQuestion({
         id: 'faq-1',
         question: 'What does the free trial include?',
-        answer: MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK,
+        answer: MOCK_PARAGRAPH_LIST_PARAGRAPH,
       }),
       ...questions.slice(1),
     ],

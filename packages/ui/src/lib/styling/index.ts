@@ -1,6 +1,7 @@
 export { ALIGN_JUSTIFY } from './align-justify';
 export { BAND_SPACING_BOTTOM, BAND_SPACING_TOP } from './band-spacing';
 export { bannerVariants } from './banner';
+export { BLOCK_RHYTHM, NESTED_BLOCK_RHYTHM } from './block-rhythm';
 export { CARD_GAP, CARD_GUTTER_OFFSET, CARD_GUTTER_START } from './card-gap';
 export { FIELD_CONTROL, FIELD_CONTROL_INVALID } from './field';
 export { FULL_BLEED, MEDIA_MAX_WIDTH } from './full-bleed';

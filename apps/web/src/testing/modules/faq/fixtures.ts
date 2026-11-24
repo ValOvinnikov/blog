@@ -1,10 +1,7 @@
-import { BRAND_VARIANT, PORTABLE_TEXT_BLOCK_TYPE } from '@shinefold/config';
+import { BRAND_VARIANT } from '@shinefold/config';
 import type { TFaqModule, TFaqQuestion } from '@shinefold/service';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import {
-  mockPortableTextBlock,
-  mockPortableTextSpan,
-} from '@web/testing/shared/portable-text/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 export const mockFaqQuestion = (
   overrides: Partial<TFaqQuestion> = {},
@@ -16,42 +13,6 @@ export const mockFaqQuestion = (
   ],
   ...overrides,
 });
-
-export const MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK: TFaqQuestion['answer'] = [
-  mockPortableTextBlock([
-    mockPortableTextSpan('Yes — every plan includes a '),
-    mockPortableTextSpan('14-day free trial', ['strong']),
-    mockPortableTextSpan(', no credit card required.'),
-  ]),
-  mockPortableTextBlock(
-    [mockPortableTextSpan('Full access to every feature')],
-    {
-      listItem: 'bullet',
-    },
-  ),
-  mockPortableTextBlock(
-    [mockPortableTextSpan('Cancel anytime before it ends')],
-    {
-      listItem: 'bullet',
-    },
-  ),
-  mockPortableTextBlock(
-    [
-      mockPortableTextSpan('See our '),
-      mockPortableTextSpan('pricing page', ['link-1']),
-      mockPortableTextSpan(' for full plan details.'),
-    ],
-    {
-      markDefs: [
-        {
-          _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
-          _key: 'link-1',
-          link: { href: '/pricing', target: undefined },
-        },
-      ],
-    },
-  ),
-];
 
 export const MOCK_FAQ_HEADING = 'Frequently asked questions';
 

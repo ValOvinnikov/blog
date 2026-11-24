@@ -51,6 +51,7 @@ A section of the questions a visitor asks before getting in touch, each a disclo
 - An FAQ Item must have a question and an answer in the default language.
 - Each question's `question` and `answer` are projected `.notNull()`: a question missing both its request-language and default-language value fails the module's query, so the module renders nothing and `faq_module.fetch_failed` is logged; the page still renders.
 - The disclosure is `@shinefold/ui`'s `Accordion` on Base UI: every row starts closed, any number may be open, and a closed panel stays in the DOM (`hiddenUntilFound`) so find-in-page still matches answer text. Each row is its own item card (`item-card`), stacked with a gap, so the rows follow the Look's card style, radius and density. Under the Plain card style the rows lose their gap and corners and are separated by straight divider lines above, between and below.
+- An answer's paragraphs and lists are separated by the same 1rem gap `Prose` puts between them (`NESTED_BLOCK_RHYTHM`, `packages/ui/src/lib/styling/block-rhythm.ts`), so an answer reads like the same text in a Content module.
 - The questions sit in a column capped at `max-w-post`; `contentAlignment` aligns the heading, the column and the actions together (Center centres the column).
 - The `FAQPage` JSON-LD covers every FAQ module on the page, deduplicated by `block_faq` id, skipping any question whose question or plain-text answer is empty; with no questions it renders nothing. One page never emits two `FAQPage` blocks.
 
@@ -76,7 +77,7 @@ A section of the questions a visitor asks before getting in touch, each a disclo
 - `packages/ui/src/components/organisms/accordion/accordion.test.tsx`
 - `apps/web/src/modules/faq/faq-module.test.tsx`, `faq-module-view.test.tsx`, `apps/web/src/components/features/faq-page-schema/faq-page-schema.test.tsx`, `apps/web/src/utils/build-faq-page-schema/build-faq-page-schema.test.ts`
 - Stories: `apps/web/src/modules/faq/faq-module-view.stories.tsx`, `packages/ui/src/components/organisms/accordion/accordion.stories.tsx`.
-- Fixtures: `apps/web/src/testing/modules/faq/fixtures.ts`, `packages/service/src/testing/shared/faq-page-dataset.ts`.
+- Fixtures: `apps/web/src/testing/modules/faq/fixtures.ts`, `apps/web/src/testing/shared/portable-text/paragraph-list-fixtures.ts`, `packages/service/src/testing/shared/faq-page-dataset.ts`.
 
 ## Related
 

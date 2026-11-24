@@ -1,4 +1,4 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { NESTED_BLOCK_RHYTHM, tv } from '@shinefold/ui/lib/styling';
 
 export const accordionPanelVariants = tv({
   slots: {
@@ -7,6 +7,6 @@ export const accordionPanelVariants = tv({
       'transition-[height] duration-slow ease-smooth motion-reduce:transition-none',
       'data-starting-style:h-0 data-ending-style:h-0',
     ],
-    content: ['pb-card-y text-base text-text'],
+    content: ['pb-card-y text-base text-text', NESTED_BLOCK_RHYTHM],
   },
 });
