@@ -38,8 +38,8 @@
   --info-muted: var(--brand-primary-muted);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
-  --logo-tile: var(--palette-brand-300);
-  --logo-tile-contrast: var(--palette-brand-1800);
+  --logo-tile: var(--logo-tile-inverse);
+  --logo-tile-contrast: var(--logo-tile-inverse-contrast);
 }
 
 .dark [data-skin='STORYBOOK_INVERSE'] {

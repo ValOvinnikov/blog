@@ -25,24 +25,33 @@ export const ACCENT_RAMP_DARK = {
   '--brand-primary-solid-hover': BRAND_PALETTE['--palette-brand-400'],
 } as const satisfies TOklchRamp;
 
+const LOGO_TILE_DARK = {
+  '--logo-tile': BRAND_PALETTE['--palette-brand-300'],
+  '--logo-tile-contrast': BRAND_PALETTE['--palette-brand-1800'],
+} as const satisfies TOklchRamp;
+
+/** The page-level tokens a skin that flips a light page dark points its logo tile at, so the tile keeps the tenant's logo hue. */
+export const INVERSE_LOGO_TILE = {
+  '--logo-tile': '--logo-tile-inverse',
+  '--logo-tile-contrast': '--logo-tile-inverse-contrast',
+} as const satisfies Record<keyof typeof LOGO_TILE_DARK, `--${string}`>;
+
 export const LOGO_RAMP_LIGHT = {
   '--logo-1': BRAND_PALETTE['--palette-brand-1000'],
   '--logo-2': BRAND_PALETTE['--palette-brand-800'],
   '--logo-3': BRAND_PALETTE['--palette-brand-500'],
   '--logo-tile': BRAND_PALETTE['--palette-brand-1000'],
   '--logo-tile-contrast': ACHROMATIC_PALETTE['--palette-achromatic-100'],
-} as const satisfies TOklchRamp;
-
-export const LOGO_TILE_RAMP_DARK = {
-  '--logo-tile': BRAND_PALETTE['--palette-brand-300'],
-  '--logo-tile-contrast': BRAND_PALETTE['--palette-brand-1800'],
+  [INVERSE_LOGO_TILE['--logo-tile']]: LOGO_TILE_DARK['--logo-tile'],
+  [INVERSE_LOGO_TILE['--logo-tile-contrast']]:
+    LOGO_TILE_DARK['--logo-tile-contrast'],
 } as const satisfies TOklchRamp;
 
 export const LOGO_RAMP_DARK = {
   '--logo-1': BRAND_PALETTE['--palette-brand-900'],
   '--logo-2': BRAND_PALETTE['--palette-brand-700'],
   '--logo-3': BRAND_PALETTE['--palette-brand-300'],
-  ...LOGO_TILE_RAMP_DARK,
+  ...LOGO_TILE_DARK,
 } as const satisfies TOklchRamp;
 
 // A scrim darkens the photo under it in either mode, so this ramp has no dark twin.
