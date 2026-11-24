@@ -76,6 +76,12 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Check the head branch name
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: node scripts/branch-name.mjs --check "$HEAD_REF"
+
       # `studio` is @shinefold/studio's turbo-affected set (itself, its workspace
       # dependencies config and utils, and the lockfile) written out as paths,
       # so this job needs no install. It is wider than `packages/studio/**`
