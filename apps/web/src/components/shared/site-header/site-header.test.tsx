@@ -44,6 +44,7 @@ import {
   stubHidePopover,
   unstubHidePopover,
 } from '@web/testing/shared/popover/stub-hide-popover';
+import { SKIN_ATTRIBUTE } from '@web/testing/shared/skin/constants';
 import {
   MOCK_REQUEST_CONTEXT,
   MOCK_TENANT_NAME,
@@ -241,7 +242,7 @@ describe(`<${SiteHeader.name}/>`, () => {
 
     const banner = screen.getByRole('banner');
 
-    expect(banner).toHaveAttribute('data-skin', BRAND_VARIANT.INK);
+    expect(banner).toHaveAttribute(SKIN_ATTRIBUTE, BRAND_VARIANT.INK);
   });
 
   describe('the header tagline', () => {
@@ -774,6 +775,12 @@ describe(`<${SiteHeader.name}/>`, () => {
 
     it("reads the tenant's header layout, sub-menu style and bar", () => {
       expect(getHeaderStyleMock).toHaveBeenCalledWith(
+        MOCK_REQUEST_CONTEXT.tenantId,
+      );
+    });
+
+    it("reads the tenant's header background", () => {
+      expect(getBarBackgroundsMock).toHaveBeenCalledWith(
         MOCK_REQUEST_CONTEXT.tenantId,
       );
     });
