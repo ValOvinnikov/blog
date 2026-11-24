@@ -1,9 +1,17 @@
 import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import type { TMaybeNull } from '@shinefold/config/types';
-import { TENANT_STATUS, type TTenantStatus } from '@shinefold/db/constants';
+import {
+  PLAN_ENTITLEMENTS,
+  TENANT_STATUS,
+  type TTenantStatus,
+} from '@shinefold/db/constants';
 import { tenantPlanEnum } from '@shinefold/db/schema/tenant-enums';
 import { tenants } from '@shinefold/db/schema/tenants';
-import { or, type SQL, sql } from 'drizzle-orm';
+import {
+  planSeats,
+  seatsInUse,
+} from '@shinefold/db/utils/seat-limit/seat-limit';
+import { type SQL, sql } from 'drizzle-orm';
 
 export type TPlanChangeFields = {
   plan: TTenantPlan;
@@ -15,6 +23,11 @@ export type TPlanChangeFields = {
   downgradedFromPlan: TMaybeNull<SQL>;
 };
 
+type TGraceRule = {
+  keeps: SQL;
+  starts: SQL;
+};
+
 const PAID_SITE_STATUSES: readonly TTenantStatus[] = [
   TENANT_STATUS.ACTIVE,
   TENANT_STATUS.PAST_DUE,
@@ -24,51 +37,65 @@ const planType = sql.raw(tenantPlanEnum.enumName);
 
 export const isOnTrial = sql`${tenants.status} = ${TENANT_STATUS.TRIAL}`;
 
-const isLeavingPaidPlanOrTrial = or(
-  sql`${tenants.plan} <> ${TENANT_PLAN.FREE}::${planType}`,
-  isOnTrial,
-);
+const isInGrace = sql`${tenants.downgradeGraceStartedAt} is not null`;
 
-function startsGrace(column: SQL, value: SQL): SQL {
-  return sql`case when ${isLeavingPaidPlanOrTrial} then ${value} else ${column} end`;
+const FREE_GRACE_RULE: TGraceRule = {
+  keeps: isInGrace,
+  starts: sql`(${tenants.plan} <> ${TENANT_PLAN.FREE}::${planType} or ${isOnTrial})`,
+};
+
+function paidGraceRule(plan: TTenantPlan): TGraceRule {
+  const { seats } = PLAN_ENTITLEMENTS[plan];
+  const isOverSeats = sql`${seatsInUse(tenants.id)} > ${seats}`;
+
+  return {
+    keeps: sql`(${isInGrace} and ${isOverSeats})`,
+    starts: sql`(${planSeats()} > ${seats} and ${isOverSeats})`,
+  };
+}
+
+function graceField(
+  { keeps, starts }: TGraceRule,
+  column: SQL,
+  value: SQL,
+): SQL {
+  return sql`case when ${keeps} then ${column} when ${starts} then ${value} else null end`;
 }
 
 function graceFields(plan: TTenantPlan, now: Date) {
-  if (plan !== TENANT_PLAN.FREE) {
-    return {
-      downgradeGraceStartedAt: null,
-      graceStartedEmailSentAt: null,
-      graceHalfwayEmailSentAt: null,
-      graceEndingEmailSentAt: null,
-      downgradedFromPlan: null,
-    };
-  }
+  const rule =
+    plan === TENANT_PLAN.FREE ? FREE_GRACE_RULE : paidGraceRule(plan);
 
   return {
-    downgradeGraceStartedAt: startsGrace(
+    downgradeGraceStartedAt: graceField(
+      rule,
       sql`${tenants.downgradeGraceStartedAt}`,
       sql`${sql.param(now, tenants.downgradeGraceStartedAt)}::timestamp`,
     ),
-    graceStartedEmailSentAt: startsGrace(
+    graceStartedEmailSentAt: graceField(
+      rule,
       sql`${tenants.graceStartedEmailSentAt}`,
       sql`null`,
     ),
-    graceHalfwayEmailSentAt: startsGrace(
+    graceHalfwayEmailSentAt: graceField(
+      rule,
       sql`${tenants.graceHalfwayEmailSentAt}`,
       sql`null`,
     ),
-    graceEndingEmailSentAt: startsGrace(
+    graceEndingEmailSentAt: graceField(
+      rule,
       sql`${tenants.graceEndingEmailSentAt}`,
       sql`null`,
     ),
-    downgradedFromPlan: startsGrace(
+    downgradedFromPlan: graceField(
+      rule,
       sql`${tenants.downgradedFromPlan}`,
       sql`${tenants.plan}`,
     ),
   };
 }
 
-// Only a move to a paid, running site gives up the Free-or-trial slot; leaving a paid plan or a trial for Free starts the downgrade grace, and a paid plan ends it.
+// A running grace keeps its deadline through any move that still leaves the site over its seats, and on a paid plan ends only once they fit.
 export function planChangeFields(
   plan: TTenantPlan,
   status: TTenantStatus,

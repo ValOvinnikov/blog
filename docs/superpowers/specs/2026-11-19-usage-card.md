@@ -74,7 +74,7 @@ with nothing used still shows, as "0 of {n}".
   limits read (#7736), so the card never disagrees with what is sent. The
   label matches the Subscribers page's meter name.
 - **Seats**: `countSeatsInUse` (#7736), built from the same SQL as
-  `create-membership-invite/seat-limit.ts`, and shown as the Team page shows:
+  `utils/seat-limit/seat-limit.ts`, and shown as the Team page shows:
   every membership (the owner's own included, locked ones included) plus
   every pending invite, a pending OWNER invite included. Nobody is counted
   twice.

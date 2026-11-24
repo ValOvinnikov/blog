@@ -2,16 +2,16 @@ import type { TMaybeUndefined } from '@shinefold/config/types';
 import { getDb } from '@shinefold/db/client';
 import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import {
-  planSeats,
-  unlockedMembershipsCount,
-} from '@shinefold/db/queries/membership-invites/create-membership-invite/seat-limit';
-import {
   createMembership,
   lockMembershipsOverSeats,
 } from '@shinefold/db/queries/memberships';
 import { membershipInvites } from '@shinefold/db/schema/membership-invites';
 import type { TMembership } from '@shinefold/db/schema/memberships';
 import { tenants } from '@shinefold/db/schema/tenants';
+import {
+  planSeats,
+  unlockedMembershipsCount,
+} from '@shinefold/db/utils/seat-limit/seat-limit';
 import { and, eq, isNull, or, sql } from 'drizzle-orm';
 
 function hasSeatFor(invite: typeof membershipInvites) {

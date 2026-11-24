@@ -56,7 +56,7 @@ primitive to match a board:
 ## Data
 
 - **Seats**: `seats` is the plan's `PLAN_ENTITLEMENTS` seats. `used` is counted
-  exactly as `create-membership-invite/seat-limit.ts` counts: every membership,
+  exactly as `utils/seat-limit/seat-limit.ts` counts: every membership,
   locked ones included, plus every pending invite, a pending OWNER invite
   included. "Full" means `used >= seats`. After a downgrade `used` can exceed
   `seats`; the header then shows `seats` of `seats`, as the boards cap it,

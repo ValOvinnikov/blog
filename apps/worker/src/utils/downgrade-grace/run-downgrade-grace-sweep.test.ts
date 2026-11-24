@@ -319,6 +319,7 @@ describe(runDowngradeGraceSweep, () => {
         await sweep();
 
         expect(restoreDowngradeGrace).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+          plan: tenant.plan,
           graceStartedAt: tenant.downgradeGraceStartedAt,
           downgradedFromPlan: tenant.downgradedFromPlan,
         });

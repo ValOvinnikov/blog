@@ -13,14 +13,13 @@ import {
   castTo,
   columnDefault,
 } from '@shinefold/db/utils/insert-select-columns/insert-select-columns';
+import {
+  planSeats,
+  seatsInUse,
+} from '@shinefold/db/utils/seat-limit/seat-limit';
 import { and, eq, sql } from 'drizzle-orm';
 
-import {
-  membershipsCount,
-  pendingInvitesCount,
-  planSeats,
-  releaseInvitePastSeatLimit,
-} from './seat-limit';
+import { releaseInvitePastSeatLimit } from './release-invite-past-seat-limit';
 
 export type TCreateMembershipInviteResult =
   | {
@@ -98,7 +97,7 @@ export async function createMembershipInvite(
         .where(
           and(
             eq(tenants.id, tenantId),
-            sql`${membershipsCount(tenantId)} + ${pendingInvitesCount(tenantId)} < ${planSeats()}`,
+            sql`${seatsInUse(tenantId)} < ${planSeats()}`,
           ),
         ),
     )

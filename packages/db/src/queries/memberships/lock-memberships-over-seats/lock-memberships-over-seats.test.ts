@@ -97,13 +97,35 @@ describe(lockMembershipsOverSeats, () => {
         ).resolves.toBe(0);
       });
     });
+  });
 
-    it('locks nothing once the site has moved to a paid plan', async () => {
+  it.each([
+    ['Free', TENANT_PLAN.FREE],
+    ['Starter', TENANT_PLAN.STARTER],
+  ])(
+    'locks nothing on a %s grace once the site has moved to Growth',
+    async (_, plan) => {
+      await addMember(MEMBERSHIP_ROLE.OWNER, MOCK_NOW);
+      await addMember(MEMBERSHIP_ROLE.EDITOR, MOCK_NOW);
       await patchTestTenant(db(), tenant().id, { plan: TENANT_PLAN.GROWTH });
 
       await expect(
-        lockMembershipsOverSeats(tenant().id, TENANT_PLAN.FREE, MOCK_NOW),
+        lockMembershipsOverSeats(tenant().id, plan, MOCK_NOW),
       ).resolves.toBe(0);
+    },
+  );
+
+  describe('an owner and one editor on Starter', () => {
+    beforeEach(async () => {
+      await patchTestTenant(db(), tenant().id, { plan: TENANT_PLAN.STARTER });
+      await addMember(MEMBERSHIP_ROLE.OWNER, MOCK_NOW);
+      await addMember(MEMBERSHIP_ROLE.EDITOR, MOCK_NOW);
+    });
+
+    it('locks the editor over the seats', async () => {
+      await expect(
+        lockMembershipsOverSeats(tenant().id, TENANT_PLAN.STARTER, MOCK_NOW),
+      ).resolves.toBe(1);
     });
   });
 });

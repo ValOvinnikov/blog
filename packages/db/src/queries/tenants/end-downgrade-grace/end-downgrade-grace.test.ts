@@ -37,6 +37,17 @@ describe(listTenantsDueForGraceEnd, () => {
     expect(listed.map(({ id }) => id)).toEqual([due.id]);
   });
 
+  it('lists a site whose grace runs on a paid plan', async () => {
+    const due = await insertTestTenant(db(), {
+      plan: TENANT_PLAN.STARTER,
+      downgradeGraceStartedAt: MOCK_GRACE_ENDED_START,
+    });
+
+    const listed = await listTenantsDueForGraceEnd(MOCK_NOW);
+
+    expect(listed.map(({ id }) => id)).toEqual([due.id]);
+  });
+
   it('counts sweep days, so a grace started late in the day ends on the fourteenth', async () => {
     const lateStart = await insertTestTenant(db(), {
       downgradeGraceStartedAt: MOCK_LATE_ON_START_DAY,
@@ -61,20 +72,24 @@ describe(endDowngradeGrace, () => {
     expect(ended?.graceEndingEmailSentAt).toBeNull();
   });
 
-  it('leaves a site that moved to a paid plan', async () => {
+  it('ends a grace running on a paid plan', async () => {
     const tenant = await insertTestTenant(db(), {
-      plan: TENANT_PLAN.GROWTH,
+      plan: TENANT_PLAN.STARTER,
       downgradeGraceStartedAt: MOCK_GRACE_ENDED_START,
     });
 
-    await expect(
-      endDowngradeGrace(tenant.id, MOCK_GRACE_ENDED_START),
-    ).resolves.toBeNull();
+    const ended = await endDowngradeGrace(tenant.id, MOCK_GRACE_ENDED_START);
+
+    expect(ended?.plan).toBe(TENANT_PLAN.STARTER);
+    expect(ended?.downgradeGraceStartedAt).toBeNull();
   });
 
-  it('leaves a grace that restarted since it was read', async () => {
+  it.each([
+    ['a plan change cleared', null],
+    ['restarted since it was read', MOCK_NOW],
+  ])('leaves a grace %s', async (_, storedStart) => {
     const tenant = await insertTestTenant(db(), {
-      downgradeGraceStartedAt: MOCK_NOW,
+      downgradeGraceStartedAt: storedStart,
     });
 
     await expect(

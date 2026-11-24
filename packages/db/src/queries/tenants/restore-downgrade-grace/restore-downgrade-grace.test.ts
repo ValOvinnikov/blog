@@ -19,6 +19,7 @@ useFrozenClock();
 
 const MOCK_GRACE_START = daysBeforeNow(14);
 const MOCK_GIVEN_BACK = {
+  plan: TENANT_PLAN.FREE,
   graceStartedAt: MOCK_GRACE_START,
   downgradedFromPlan: TENANT_PLAN.GROWTH,
 };
@@ -40,6 +41,17 @@ describe(restoreDowngradeGrace, () => {
     const due = await listTenantsDueForGraceEnd(daysAfter(MOCK_NOW, 1));
     expect(due.map(({ id }) => id)).toEqual([tenant().id]);
     expect(due[0]?.downgradedFromPlan).toBe(TENANT_PLAN.GROWTH);
+  });
+
+  it('gives back a grace that ended on a paid plan', async () => {
+    await patchTestTenant(db(), tenant().id, { plan: TENANT_PLAN.STARTER });
+
+    await expect(
+      restoreDowngradeGrace(tenant().id, {
+        ...MOCK_GIVEN_BACK,
+        plan: TENANT_PLAN.STARTER,
+      }),
+    ).resolves.toBe(true);
   });
 
   it('leaves a site that paid in between untouched', async () => {
