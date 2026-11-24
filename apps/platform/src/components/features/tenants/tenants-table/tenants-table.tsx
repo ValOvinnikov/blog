@@ -60,7 +60,7 @@ export const TenantsTable = ({
   const locale = useLocale();
   const { navigate } = useTenantsListNavigation(listQuery);
   const [sort, setOptimisticSort] = useOptimistic(listQuery.sort);
-  const { visuallyHidden, tname, name, domain } = tenantsTableVariants();
+  const { tname, name, domain } = tenantsTableVariants();
 
   const sortBy = (column: TTenantSortColumn) => {
     const next = nextSort(sort, column);
@@ -87,7 +87,8 @@ export const TenantsTable = ({
         })),
         {
           key: 'actions',
-          label: <span className={visuallyHidden()}>{t('columnActions')}</span>,
+          label: t('columnActions'),
+          isLabelHidden: true,
         },
       ]}
       renderRow={(tenant) => (

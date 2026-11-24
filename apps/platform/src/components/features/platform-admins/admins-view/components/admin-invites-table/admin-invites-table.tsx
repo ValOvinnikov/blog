@@ -11,7 +11,6 @@ import { useLocale, useTranslations } from 'next-intl';
 
 const adminInvitesTableVariants = tv({
   slots: {
-    visuallyHidden: ['sr-only'],
     actions: ['flex flex-wrap items-center justify-end gap-2'],
   },
 });
@@ -24,7 +23,7 @@ export const AdminInvitesTable = ({ invites }: TAdminInvitesTableProps) => {
   const t = useTranslations('adminInvitesTable');
   const tRole = useTranslations('roleLabel');
   const locale = useLocale();
-  const { visuallyHidden, actions } = adminInvitesTableVariants();
+  const { actions } = adminInvitesTableVariants();
 
   return (
     <DataTableShell
@@ -38,7 +37,8 @@ export const AdminInvitesTable = ({ invites }: TAdminInvitesTableProps) => {
         { key: 'status', label: t('columnStatus') },
         {
           key: 'actions',
-          label: <span className={visuallyHidden()}>{t('columnActions')}</span>,
+          label: t('columnActions'),
+          isLabelHidden: true,
         },
       ]}
       renderRow={({ inviteId, email, role, invitedAt, isExpired }) => (

@@ -1,4 +1,7 @@
-import { MOCK_SESSION_EXPIRES } from '@platform/testing/auth/fixtures';
+import {
+  MOCK_SESSION_EXPIRES,
+  MOCK_VERIFY_REQUEST_URL,
+} from '@platform/testing/auth/fixtures';
 import type { Session } from 'next-auth';
 
 export const auth = vi.fn(async (): Promise<Session | null> => ({
@@ -8,7 +11,7 @@ export const auth = vi.fn(async (): Promise<Session | null> => ({
 
 export const getSession = vi.fn(() => auth());
 
-export const signIn = vi.fn();
+export const signIn = vi.fn(async () => MOCK_VERIFY_REQUEST_URL);
 
 export const signOut = vi.fn();
 

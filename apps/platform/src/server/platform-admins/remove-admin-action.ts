@@ -3,11 +3,16 @@
 import {
   PLATFORM_ADMIN_LOG,
   PLATFORM_ADMIN_REFUSAL,
+  type TPlatformAdminRefusal,
 } from '@platform/constants/platform-admins';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  refusedAction,
+  type TRefusalResult,
+} from '@platform/utils/refused-action/refused-action';
 import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
@@ -18,21 +23,17 @@ import { ADMIN_REMOVAL_OUTCOME } from '@shinefold/db/constants';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { platformAdminTargetIdSchema } from './admin-invite-input';
-import {
-  refusedPlatformAdminAction,
-  type TPlatformAdminRefusalResult,
-} from './platform-admin-refusal';
 
 export const removeAdminAction = async (
   adminId: string,
-): Promise<TPlatformAdminRefusalResult> => {
+): Promise<TRefusalResult<TPlatformAdminRefusal>> => {
   const viewer = await requireSuperAdmin();
 
   if (!platformAdminTargetIdSchema.safeParse(adminId).success) {
-    return refusedPlatformAdminAction(PLATFORM_ADMIN_REFUSAL.NOT_FOUND);
+    return refusedAction(PLATFORM_ADMIN_REFUSAL.NOT_FOUND);
   }
   if (adminId === viewer.id) {
-    return refusedPlatformAdminAction(PLATFORM_ADMIN_REFUSAL.SELF);
+    return refusedAction(PLATFORM_ADMIN_REFUSAL.SELF);
   }
 
   try {
@@ -40,12 +41,12 @@ export const removeAdminAction = async (
       (admin) => admin.adminId === adminId,
     );
     if (!removed) {
-      return refusedPlatformAdminAction(PLATFORM_ADMIN_REFUSAL.NOT_FOUND);
+      return refusedAction(PLATFORM_ADMIN_REFUSAL.NOT_FOUND);
     }
 
     const outcome = await queries.admins.deleteAdmin(adminId);
     if (outcome !== ADMIN_REMOVAL_OUTCOME.REMOVED) {
-      return refusedPlatformAdminAction(outcome);
+      return refusedAction(outcome);
     }
 
     const { role, userId } = removed;

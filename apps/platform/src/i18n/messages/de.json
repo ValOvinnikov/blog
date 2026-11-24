@@ -2923,10 +2923,10 @@
     "you": "(du)"
   },
   "adminInvitesTable": {
-    "title": "Offene Einladungen",
+    "title": "Einladungen",
     "count": "{count, plural, one {# Einladung} other {# Einladungen}}",
     "supportingText": "Eine abgelaufene Einladung gewährt nichts, bis du sie erneut sendest.",
-    "empty": "Keine offenen Einladungen.",
+    "empty": "Keine Einladungen.",
     "columnEmail": "E-Mail",
     "columnRole": "Rolle",
     "columnInvited": "Eingeladen",

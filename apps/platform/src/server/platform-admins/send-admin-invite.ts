@@ -16,7 +16,6 @@ export const sendAdminInviteEmail = (
     logContext: { inviteId },
   });
 
-/** Cancels the invite when its email does not go out, so no invite waits on an email nobody received. */
 export const sendAdminInviteOrCancel = async (
   inviteId: string,
   email: string,

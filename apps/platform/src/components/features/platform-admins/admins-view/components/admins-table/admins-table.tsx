@@ -4,14 +4,7 @@ import { Text } from '@platform/components/shared/text';
 import { ADMINS_HEADING_ID } from '@platform/constants/platform-admins';
 import type { TPlatformAdminRow } from '@platform/server/platform-admins/load-platform-admins';
 import { formatDate } from '@platform/utils/format-date/format-date';
-import { tv } from '@platform/utils/tv/tv';
 import { useLocale, useTranslations } from 'next-intl';
-
-const adminsTableVariants = tv({
-  slots: {
-    visuallyHidden: ['sr-only'],
-  },
-});
 
 export type TAdminsTableProps = {
   admins: TPlatformAdminRow[];
@@ -21,7 +14,6 @@ export const AdminsTable = ({ admins }: TAdminsTableProps) => {
   const t = useTranslations('adminsTable');
   const tRole = useTranslations('roleLabel');
   const locale = useLocale();
-  const { visuallyHidden } = adminsTableVariants();
 
   return (
     <DataTableShell
@@ -35,7 +27,8 @@ export const AdminsTable = ({ admins }: TAdminsTableProps) => {
         { key: 'grantedAt', label: t('columnGranted') },
         {
           key: 'actions',
-          label: <span className={visuallyHidden()}>{t('columnActions')}</span>,
+          label: t('columnActions'),
+          isLabelHidden: true,
         },
       ]}
       renderRow={({ adminId, name, email, role, grantedAt, isYou }) => (

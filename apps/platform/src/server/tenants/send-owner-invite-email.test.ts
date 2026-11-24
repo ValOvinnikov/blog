@@ -4,7 +4,6 @@ import { signIn } from '@platform/server/auth/auth';
 import {
   MOCK_AUTH_ERROR_TYPE,
   MOCK_AUTH_ERROR_URL,
-  MOCK_VERIFY_REQUEST_URL,
 } from '@platform/testing/auth/fixtures';
 import {
   MOCK_POSTGRES_ERROR_CODE,
@@ -31,7 +30,6 @@ const loggerErrorMock = vi.mocked(logger.error);
 describe(sendOwnerInviteEmail, () => {
   beforeEach(() => {
     signInMock.mockReset();
-    signInMock.mockResolvedValue(MOCK_VERIFY_REQUEST_URL);
   });
 
   it("emails the owner a magic link that lands on their site's dashboard", async () => {

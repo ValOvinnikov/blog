@@ -5,6 +5,7 @@ import {
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import {
   MOCK_ADMIN_INVITE_ID,
   MOCK_LISTED_ADMIN_ID,
@@ -101,15 +102,14 @@ describe(removeAdminAction, () => {
   });
 
   it('returns a server error and logs when the removal throws', async () => {
-    const error = new Error(AUDIT_ACTION.ADMIN_REMOVED);
-    deleteAdmin.mockRejectedValueOnce(error);
+    deleteAdmin.mockRejectedValueOnce(MOCK_NETWORK_ERROR);
 
     const result = await removeAdminAction(MOCK_LISTED_ADMIN_ID);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
       PLATFORM_ADMIN_LOG.REMOVE_FAILED,
-      { adminId: MOCK_LISTED_ADMIN_ID, errorName: error.name },
+      { adminId: MOCK_LISTED_ADMIN_ID, errorName: MOCK_NETWORK_ERROR.name },
     );
   });
 });

@@ -6,11 +6,9 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { signIn } from '@platform/server/auth/auth';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import {
-  MOCK_AUTH_ERROR_URL,
-  MOCK_VERIFY_REQUEST_URL,
-} from '@platform/testing/auth/fixtures';
+import { MOCK_AUTH_ERROR_URL } from '@platform/testing/auth/fixtures';
 import { MOCK_NOT_AN_EMAIL } from '@platform/testing/data-requests/fixtures';
+import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import {
   MOCK_ADMIN_INVITE_ID,
   MOCK_INVITED_ADMIN_EMAIL,
@@ -48,7 +46,6 @@ const { adminInvites } = queries;
 const createInvite = vi.mocked(adminInvites.createAdminInvite);
 const cancelInvite = vi.mocked(adminInvites.cancelAdminInvite);
 const signInMock = vi.mocked(signIn);
-const MOCK_SUPER_ADMIN = mockAdmin({ role: ADMIN_ROLE.SUPERADMIN });
 
 const invite = (
   email = MOCK_INVITED_ADMIN_EMAIL,
@@ -57,10 +54,7 @@ const invite = (
   inviteAdminAction({ email, role } as Parameters<typeof inviteAdminAction>[0]);
 
 describe(inviteAdminAction, () => {
-  beforeEach(() => {
-    vi.mocked(requireSuperAdmin).mockResolvedValue(MOCK_SUPER_ADMIN);
-    signInMock.mockResolvedValue(MOCK_VERIFY_REQUEST_URL);
-  });
+  beforeEach(() => {});
 
   it('creates, emails and audits the invite without its address', async () => {
     const result = await invite(
@@ -72,7 +66,7 @@ describe(inviteAdminAction, () => {
     expect(createInvite).toHaveBeenCalledExactlyOnceWith(
       MOCK_INVITED_ADMIN_EMAIL,
       ADMIN_ROLE.SUPERADMIN,
-      MOCK_SUPER_ADMIN.userId,
+      mockAdmin().userId,
     );
     expect(signInMock).toHaveBeenCalledExactlyOnceWith(MAGIC_LINK_PROVIDER_ID, {
       email: MOCK_INVITED_ADMIN_EMAIL,
@@ -153,15 +147,14 @@ describe(inviteAdminAction, () => {
   });
 
   it('returns a server error and logs when the invite cannot be stored', async () => {
-    const error = new Error(MOCK_NOT_AN_EMAIL);
-    createInvite.mockRejectedValueOnce(error);
+    createInvite.mockRejectedValueOnce(MOCK_NETWORK_ERROR);
 
     const result = await invite();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
       PLATFORM_ADMIN_LOG.INVITE_FAILED,
-      { errorName: error.name },
+      { errorName: MOCK_NETWORK_ERROR.name },
     );
   });
 });

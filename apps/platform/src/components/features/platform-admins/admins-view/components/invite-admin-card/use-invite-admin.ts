@@ -6,6 +6,7 @@ import {
   type TInvitableAdminRole,
 } from '@platform/constants/platform-admins';
 import { useToast } from '@platform/context/toast-provider';
+import type { TAdminInviteInput } from '@platform/server/platform-admins/admin-invite-input';
 import { inviteAdminAction } from '@platform/server/platform-admins/invite-admin-action';
 import { inviteEmailSchema } from '@platform/utils/invite-email-schema/invite-email-schema';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
@@ -15,7 +16,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
 type TInviteAdminFieldErrors = TFieldErrors<
-  'email' | 'role',
+  keyof TAdminInviteInput,
   TAdminInviteFieldError
 >;
 

@@ -2923,10 +2923,10 @@
     "you": "(vous)"
   },
   "adminInvitesTable": {
-    "title": "Invitations en attente",
+    "title": "Invitations",
     "count": "{count, plural, one {# invitation} other {# invitations}}",
     "supportingText": "Une invitation expirée n’accorde rien tant que vous ne la renvoyez pas.",
-    "empty": "Aucune invitation en attente.",
+    "empty": "Aucune invitation.",
     "columnEmail": "E-mail",
     "columnRole": "Rôle",
     "columnInvited": "Invité le",

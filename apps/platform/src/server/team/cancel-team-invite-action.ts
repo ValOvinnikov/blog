@@ -1,10 +1,18 @@
 'use server';
 
-import { TEAM_ACCESS_LOG, TEAM_REFUSAL } from '@platform/constants/team-access';
+import {
+  TEAM_ACCESS_LOG,
+  TEAM_REFUSAL,
+  type TTeamRefusal,
+} from '@platform/constants/team-access';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  refusedAction,
+  type TRefusalResult,
+} from '@platform/utils/refused-action/refused-action';
 import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
@@ -15,25 +23,24 @@ import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { teamTargetIdSchema } from './team-input';
-import { refusedTeamAction, type TTeamRefusalResult } from './team-refusal';
 
 export const cancelTeamInviteAction = async (
   tenantId: string,
   inviteId: string,
-): Promise<TTeamRefusalResult> => {
+): Promise<TRefusalResult<TTeamRefusal>> => {
   await requireTenantManager(tenantId);
 
   if (!teamTargetIdSchema.safeParse(inviteId).success) {
-    return refusedTeamAction(TEAM_REFUSAL.NOT_FOUND);
+    return refusedAction(TEAM_REFUSAL.NOT_FOUND);
   }
 
   try {
     const invite = (
       await queries.membershipInvites.listPendingMembershipInvites(tenantId)
     ).find((row) => row.inviteId === inviteId);
-    if (!invite) return refusedTeamAction(TEAM_REFUSAL.NOT_FOUND);
+    if (!invite) return refusedAction(TEAM_REFUSAL.NOT_FOUND);
     if (invite.role === MEMBERSHIP_ROLE.OWNER) {
-      return refusedTeamAction(TEAM_REFUSAL.OWNER_INVITE);
+      return refusedAction(TEAM_REFUSAL.OWNER_INVITE);
     }
 
     if (
@@ -42,7 +49,7 @@ export const cancelTeamInviteAction = async (
         inviteId,
       ))
     ) {
-      return refusedTeamAction(TEAM_REFUSAL.NOT_FOUND);
+      return refusedAction(TEAM_REFUSAL.NOT_FOUND);
     }
 
     await recordAuditEvent({

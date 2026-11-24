@@ -38,6 +38,7 @@ code:
   - apps/platform/src/components/features/team/**
   - apps/platform/src/utils/team-view-model/**
   - apps/platform/src/utils/use-row-action/**
+  - apps/platform/src/utils/refused-action/**
   - apps/platform/src/server/platform-admins/**
   - apps/platform/src/app/**/admins/*.tsx
   - apps/platform/src/components/features/platform-admins/**

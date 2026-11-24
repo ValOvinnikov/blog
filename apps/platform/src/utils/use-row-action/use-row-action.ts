@@ -3,10 +3,9 @@
 import type { TConfirmDialogActionResult } from '@platform/components/shared/confirm-dialog';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { useToast } from '@platform/context/toast-provider';
+import type { TRefusalResult } from '@platform/utils/refused-action/refused-action';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
 import {
-  type ACTION_OUTCOME,
-  type TActionResult,
   type TMaybeUndefined,
   isOutcomeRefused,
   isOutcomeSuccess,
@@ -14,13 +13,6 @@ import {
 import { errorResult, okResult } from '@shinefold/utils';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
-
-type TRowActionResult<TReason extends string> = TActionResult<
-  typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
-  never,
-  never,
-  TReason
->;
 
 type TRowActionMessages<TReason extends string> = {
   done: string;
@@ -40,7 +32,7 @@ export const useRowAction = <TReason extends string>({
   const announce = useRef<TMaybeUndefined<() => void>>(undefined);
 
   const onConfirm = async (
-    request: Promise<TRowActionResult<TReason>>,
+    request: Promise<TRefusalResult<TReason>>,
   ): Promise<TConfirmDialogActionResult> => {
     const result = await settleAction(request);
     if (isOutcomeSuccess(result)) {

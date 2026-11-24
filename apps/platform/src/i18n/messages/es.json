@@ -2923,10 +2923,10 @@
     "you": "(tú)"
   },
   "adminInvitesTable": {
-    "title": "Invitaciones pendientes",
+    "title": "Invitaciones",
     "count": "{count, plural, one {# invitación} other {# invitaciones}}",
     "supportingText": "Una invitación caducada no concede nada hasta que la reenvíes.",
-    "empty": "No hay invitaciones pendientes.",
+    "empty": "No hay invitaciones.",
     "columnEmail": "Correo electrónico",
     "columnRole": "Rol",
     "columnInvited": "Invitado",

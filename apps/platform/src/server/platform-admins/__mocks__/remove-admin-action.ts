@@ -1,6 +1,7 @@
-import type { TPlatformAdminRefusalResult } from '@platform/server/platform-admins/platform-admin-refusal';
+import type { TPlatformAdminRefusal } from '@platform/constants/platform-admins';
+import type { TRefusalResult } from '@platform/utils/refused-action/refused-action';
 import { ACTION_OUTCOME } from '@shinefold/config';
 
 export const removeAdminAction = vi.fn<
-  (id: string) => Promise<TPlatformAdminRefusalResult>
+  (id: string) => Promise<TRefusalResult<TPlatformAdminRefusal>>
 >(async () => ({ outcome: ACTION_OUTCOME.SUCCESS }));

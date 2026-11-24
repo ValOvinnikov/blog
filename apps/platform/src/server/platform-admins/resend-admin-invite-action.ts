@@ -3,10 +3,15 @@
 import {
   PLATFORM_ADMIN_LOG,
   PLATFORM_ADMIN_REFUSAL,
+  type TPlatformAdminRefusal,
 } from '@platform/constants/platform-admins';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  refusedAction,
+  type TRefusalResult,
+} from '@platform/utils/refused-action/refused-action';
 import { ACTION_OUTCOME } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { ADMIN_INVITE_OUTCOME } from '@shinefold/db/constants';
@@ -14,25 +19,21 @@ import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { platformAdminTargetIdSchema } from './admin-invite-input';
 import { findAdminInvite } from './find-admin-invite';
-import {
-  refusedPlatformAdminAction,
-  type TPlatformAdminRefusalResult,
-} from './platform-admin-refusal';
 import { sendAdminInviteEmail } from './send-admin-invite';
 
 export const resendAdminInviteAction = async (
   inviteId: string,
-): Promise<TPlatformAdminRefusalResult> => {
+): Promise<TRefusalResult<TPlatformAdminRefusal>> => {
   const { userId } = await requireSuperAdmin();
 
   if (!platformAdminTargetIdSchema.safeParse(inviteId).success) {
-    return refusedPlatformAdminAction(PLATFORM_ADMIN_REFUSAL.NOT_FOUND);
+    return refusedAction(PLATFORM_ADMIN_REFUSAL.NOT_FOUND);
   }
 
   try {
     const invite = await findAdminInvite(inviteId);
     if (!invite) {
-      return refusedPlatformAdminAction(PLATFORM_ADMIN_REFUSAL.NOT_FOUND);
+      return refusedAction(PLATFORM_ADMIN_REFUSAL.NOT_FOUND);
     }
 
     const { email, role } = invite;
@@ -42,7 +43,7 @@ export const resendAdminInviteAction = async (
       userId,
     );
     if (renewed.outcome === ADMIN_INVITE_OUTCOME.ALREADY_ADMIN) {
-      return refusedPlatformAdminAction(PLATFORM_ADMIN_REFUSAL.ALREADY_ADMIN);
+      return refusedAction(PLATFORM_ADMIN_REFUSAL.ALREADY_ADMIN);
     }
 
     const isSent = await sendAdminInviteEmail(

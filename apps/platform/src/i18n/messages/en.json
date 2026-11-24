@@ -2923,10 +2923,10 @@
     "you": "(you)"
   },
   "adminInvitesTable": {
-    "title": "Pending invites",
+    "title": "Invites",
     "count": "{count, plural, one {# invite} other {# invites}}",
     "supportingText": "An expired invite grants nothing until you resend it.",
-    "empty": "No pending invites.",
+    "empty": "No invites.",
     "columnEmail": "Email",
     "columnRole": "Role",
     "columnInvited": "Invited",

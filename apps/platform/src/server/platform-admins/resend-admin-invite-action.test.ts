@@ -8,7 +8,6 @@ import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
   MOCK_AUTH_ERROR_TYPE,
   MOCK_AUTH_ERROR_URL,
-  MOCK_VERIFY_REQUEST_URL,
 } from '@platform/testing/auth/fixtures';
 import {
   MOCK_ADMIN_INVITE_ID,
@@ -40,13 +39,9 @@ const { adminInvites } = queries;
 const createInvite = vi.mocked(adminInvites.createAdminInvite);
 const cancelInvite = vi.mocked(adminInvites.cancelAdminInvite);
 const signInMock = vi.mocked(signIn);
-const MOCK_SUPER_ADMIN = mockAdmin({ role: ADMIN_ROLE.SUPERADMIN });
 
 describe(resendAdminInviteAction, () => {
-  beforeEach(() => {
-    vi.mocked(requireSuperAdmin).mockResolvedValue(MOCK_SUPER_ADMIN);
-    signInMock.mockResolvedValue(MOCK_VERIFY_REQUEST_URL);
-  });
+  beforeEach(() => {});
 
   it('renews an expired invite with its own role, then emails it again', async () => {
     vi.mocked(adminInvites.listAdminInvites).mockResolvedValueOnce([
@@ -59,7 +54,7 @@ describe(resendAdminInviteAction, () => {
     expect(createInvite).toHaveBeenCalledExactlyOnceWith(
       MOCK_INVITED_ADMIN_EMAIL,
       ADMIN_ROLE.SUPERADMIN,
-      MOCK_SUPER_ADMIN.userId,
+      mockAdmin().userId,
     );
     expect(signInMock).toHaveBeenCalledOnce();
   });

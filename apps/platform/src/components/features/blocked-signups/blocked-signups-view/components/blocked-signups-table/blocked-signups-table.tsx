@@ -9,7 +9,6 @@ import { useLocale, useTranslations } from 'next-intl';
 
 const blockedSignupsTableVariants = tv({
   slots: {
-    visuallyHidden: ['sr-only'],
     value: ['font-mono text-platform-12-5 break-all'],
   },
 });
@@ -22,7 +21,7 @@ export const BlockedSignupsTable = ({ entries }: TBlockedSignupsTableProps) => {
   const t = useTranslations('blockedSignupsTable');
   const tKind = useTranslations('blockedSignupKindLabel');
   const locale = useLocale();
-  const { visuallyHidden, value } = blockedSignupsTableVariants();
+  const { value } = blockedSignupsTableVariants();
 
   return (
     <DataTableShell
@@ -37,7 +36,8 @@ export const BlockedSignupsTable = ({ entries }: TBlockedSignupsTableProps) => {
         { key: 'addedAt', label: t('columnAdded') },
         {
           key: 'actions',
-          label: <span className={visuallyHidden()}>{t('columnActions')}</span>,
+          label: t('columnActions'),
+          isLabelHidden: true,
         },
       ]}
       renderRow={(entry) => (

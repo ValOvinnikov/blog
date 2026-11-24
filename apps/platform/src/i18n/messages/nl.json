@@ -2923,10 +2923,10 @@
     "you": "(jij)"
   },
   "adminInvitesTable": {
-    "title": "Openstaande uitnodigingen",
+    "title": "Uitnodigingen",
     "count": "{count, plural, one {# uitnodiging} other {# uitnodigingen}}",
     "supportingText": "Een verlopen uitnodiging geeft geen toegang totdat je hem opnieuw verstuurt.",
-    "empty": "Geen openstaande uitnodigingen.",
+    "empty": "Geen uitnodigingen.",
     "columnEmail": "E-mail",
     "columnRole": "Rol",
     "columnInvited": "Uitgenodigd",
