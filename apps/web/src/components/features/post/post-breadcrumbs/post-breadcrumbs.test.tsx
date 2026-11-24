@@ -1,7 +1,11 @@
 import { faker } from '@faker-js/faker';
 import { routes, SITE_MESSAGES } from '@shinefold/config';
 import { okResult } from '@shinefold/utils';
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import {
+  customRenderServerAsync,
+  screen,
+  within,
+} from '@web/testing/custom-render';
 import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
 import {
   testBreadcrumbsJsonLdSchema,
@@ -18,6 +22,8 @@ import { PostBreadcrumbs } from './post-breadcrumbs';
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
+
+vi.mock('@web/server/site-config/get-bar-backgrounds/get-bar-backgrounds');
 
 const { getPostPageMock } = vi.hoisted(() => ({
   getPostPageMock: vi.fn(),
@@ -46,7 +52,7 @@ const BREADCRUMB_NAV_NAME = SITE_MESSAGES.breadcrumbs.ariaLabel;
 const POST_TITLE = MOCK_POST.title;
 const TOPIC_TITLE = MOCK_POST.topic.title;
 
-const setup = customRenderAsync(PostBreadcrumbs, {
+const setup = customRenderServerAsync(PostBreadcrumbs, {
   slug: POST_SLUG,
 });
 

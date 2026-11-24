@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { routes } from '@shinefold/config';
-import { customRenderAsync } from '@web/testing/custom-render';
+import { customRenderServerAsync } from '@web/testing/custom-render';
 import {
   mockLandingSectionNavigation,
   MOCK_LANDING_PAGE,
@@ -24,6 +24,8 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
+vi.mock('@web/server/site-config/get-bar-backgrounds/get-bar-backgrounds');
+
 const { getLandingPageMock } = vi.hoisted(() => ({
   getLandingPageMock: vi.fn(),
 }));
@@ -39,7 +41,7 @@ faker.seed(5776);
 const MOCK_LANDING_PATH = faker.lorem.slug();
 const HOME_LINK_STEP = { label: MOCK_TENANT_NAME, href: '/' };
 
-const setup = customRenderAsync(LandingBreadcrumbs, {
+const setup = customRenderServerAsync(LandingBreadcrumbs, {
   path: MOCK_LANDING_PATH,
 });
 

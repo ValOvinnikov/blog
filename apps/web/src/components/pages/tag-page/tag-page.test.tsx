@@ -25,6 +25,8 @@ faker.seed(6008);
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
+
+vi.mock('@web/server/site-config/get-bar-backgrounds/get-bar-backgrounds');
 vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
 vi.mock('@shinefold/service', () => ({

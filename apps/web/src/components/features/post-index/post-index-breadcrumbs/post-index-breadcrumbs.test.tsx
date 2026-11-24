@@ -1,7 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { routes } from '@shinefold/config';
 import { okResult } from '@shinefold/utils';
-import { customRenderAsync } from '@web/testing/custom-render';
+import { POST_INDEX_LOG } from '@web/constants/post-index';
+import { customRenderServerAsync } from '@web/testing/custom-render';
 import {
   testThrowsOnFetchFailure,
   testNotFoundWithoutLog,
@@ -14,6 +15,8 @@ import { PostIndexBreadcrumbs } from './post-index-breadcrumbs';
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
+
+vi.mock('@web/server/site-config/get-bar-backgrounds/get-bar-backgrounds');
 
 const { getPostIndexPageMock } = vi.hoisted(() => ({
   getPostIndexPageMock: vi.fn(),
@@ -35,7 +38,7 @@ const MOCK_INDEX_PAGE = {
   headingBlock: mockHeadingBlock({ heading: MOCK_INDEX_HEADING }),
 };
 
-const setup = customRenderAsync(PostIndexBreadcrumbs, {});
+const setup = customRenderServerAsync(PostIndexBreadcrumbs, {});
 
 describe(`<${PostIndexBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
@@ -52,6 +55,6 @@ describe(`<${PostIndexBreadcrumbs.name}/>`, () => {
   testThrowsOnFetchFailure({
     pageLoaderMock: getPostIndexPageMock,
     setup,
-    eventFragment: 'post_index_breadcrumbs.fetch_failed',
+    eventFragment: POST_INDEX_LOG.BREADCRUMBS_FETCH_FAILED,
   });
 });

@@ -7,11 +7,28 @@ export const breadcrumbBarVariants = tv({
   },
   variants: {
     isAbovePageHeading: {
-      true: { root: ['bg-primary-subtle'] },
-      false: { root: ['bg-primary border-b border-border-strong'] },
+      true: {},
+      false: {},
+    },
+    isPlain: {
+      true: {},
+      false: { root: ['bg-ambient text-text border-b border-divider'] },
     },
   },
+  compoundVariants: [
+    {
+      isPlain: true,
+      isAbovePageHeading: true,
+      class: { root: ['bg-primary-subtle'] },
+    },
+    {
+      isPlain: true,
+      isAbovePageHeading: false,
+      class: { root: ['bg-primary border-b border-border-strong'] },
+    },
+  ],
   defaultVariants: {
     isAbovePageHeading: false,
+    isPlain: true,
   },
 });

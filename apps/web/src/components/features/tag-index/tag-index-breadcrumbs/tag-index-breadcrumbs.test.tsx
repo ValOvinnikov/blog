@@ -1,7 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { routes } from '@shinefold/config';
 import { okResult } from '@shinefold/utils';
-import { customRenderAsync } from '@web/testing/custom-render';
+import { TAG_INDEX_LOG } from '@web/constants/tag-index';
+import { customRenderServerAsync } from '@web/testing/custom-render';
 import {
   testThrowsOnFetchFailure,
   testNotFoundWithoutLog,
@@ -14,6 +15,8 @@ import { TagIndexBreadcrumbs } from './tag-index-breadcrumbs';
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
+
+vi.mock('@web/server/site-config/get-bar-backgrounds/get-bar-backgrounds');
 
 const { getTagIndexPageMock } = vi.hoisted(() => ({
   getTagIndexPageMock: vi.fn(),
@@ -32,7 +35,7 @@ const MOCK_INDEX_PAGE = {
   headingBlock: mockHeadingBlock({ heading: MOCK_INDEX_HEADING }),
 };
 
-const setup = customRenderAsync(TagIndexBreadcrumbs, {});
+const setup = customRenderServerAsync(TagIndexBreadcrumbs, {});
 
 describe(`<${TagIndexBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
@@ -49,6 +52,6 @@ describe(`<${TagIndexBreadcrumbs.name}/>`, () => {
   testThrowsOnFetchFailure({
     pageLoaderMock: getTagIndexPageMock,
     setup,
-    eventFragment: 'tag_index_breadcrumbs.fetch_failed',
+    eventFragment: TAG_INDEX_LOG.BREADCRUMBS_FETCH_FAILED,
   });
 });

@@ -28,6 +28,7 @@ import { buildThemeStyleBlock } from './build-theme-style-block';
 faker.seed(107);
 
 const DARK_SELECTOR = '.dark';
+const SKIN_SCOPE_SELECTOR = ':root,\n:where([data-skin]) {';
 const BRAND_TOKEN = '--brand-primary';
 const BRAND_PALETTE_STOP = '--palette-brand-100';
 const LOGO_TOKEN = '--logo-1';
@@ -331,6 +332,34 @@ describe(buildThemeStyleBlock, () => {
       );
 
       expect(missingDeclarations(root, declarations)).toEqual([]);
+    },
+  );
+
+  it.each([
+    {
+      field: 'headerControlStyle',
+      declarations: HEADER_CONTROL_STYLE_DECLARATIONS,
+    },
+    { field: 'navLinkStyle', declarations: NAV_LINK_STYLE_DECLARATIONS },
+  ] as const)(
+    'writes every $field into each skin scope as well as :root',
+    ({ field, declarations }) => {
+      const missing = Object.entries(declarations).flatMap(
+        ([value, valueDeclarations]) => {
+          const css = buildThemeStyleBlock({
+            ...CONSOLE_TOKENS,
+            [field]: value,
+          });
+          const skinScope = css.slice(
+            css.indexOf(SKIN_SCOPE_SELECTOR),
+            css.indexOf(DARK_SELECTOR),
+          );
+
+          return missingDeclarations(skinScope, valueDeclarations);
+        },
+      );
+
+      expect(missing).toEqual([]);
     },
   );
 

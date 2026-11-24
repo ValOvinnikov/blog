@@ -950,6 +950,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **ACCOUNT_LOG**: `PROVIDER_UNLINK_FAILED`=`"account.provider_unlink_failed"`, `DISPLAY_NAME_UPDATE_FAILED`=`"account.display_name_update_failed"`
 
+### `@web/constants/bar-backgrounds` — `apps/web/src/constants/bar-backgrounds.ts`
+
+- **BAR_BACKGROUNDS_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"bar_backgrounds.site_config_fetch_failed"`
+
 ### `@web/constants/bookmark` — `apps/web/src/constants/bookmark.ts`
 
 - **BOOKMARK_LOG**: `BUTTON_STATUS_FETCH_FAILED`=`"bookmark_button.status_fetch_failed"`, `TENANT_NOT_ACTIVE`=`"bookmark.tenant_not_active"`, `UPDATE_FAILED`=`"bookmark.update_failed"`
