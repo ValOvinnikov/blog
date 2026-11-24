@@ -8,6 +8,7 @@ import {
   MOCK_FULL_BLEED_IMAGE_DEMO,
   MOCK_RICH_TEXT_DEMO,
 } from '@web/testing/shared/portable-text/fixtures';
+import { MOCK_PARAGRAPH_LIST_PARAGRAPH } from '@web/testing/shared/portable-text/paragraph-list-fixtures';
 
 import { ContentModuleView } from './content-module-view';
 
@@ -55,6 +56,10 @@ export const WithDividerAndLargeSpacing: TStory = {
       dividerBottom: true,
     },
   },
+};
+
+export const ParagraphsAndList: TStory = {
+  args: { body: MOCK_PARAGRAPH_LIST_PARAGRAPH },
 };
 
 export const FullBleedImage: TStory = {

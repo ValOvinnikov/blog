@@ -81,10 +81,13 @@ export const EightItems: TStory = {
   },
 };
 
+const RICH_CONTENT_VALUE = 'rich-content';
+
 export const WithRichContent: TStory = {
   args: {
+    defaultValue: [RICH_CONTENT_VALUE],
     children: (
-      <Accordion.Item>
+      <Accordion.Item value={RICH_CONTENT_VALUE}>
         <Accordion.Trigger>{faker.lorem.sentence()}</Accordion.Trigger>
         <Accordion.Panel>
           <p>{faker.lorem.sentence()}</p>
@@ -93,7 +96,10 @@ export const WithRichContent: TStory = {
             <li>{faker.lorem.words(4)}</li>
             <li>{faker.lorem.words(4)}</li>
           </ul>
-          <a href="https://example.com">{faker.lorem.words(3)}</a>
+          <p>
+            {faker.lorem.sentence()}{' '}
+            <a href="https://example.com">{faker.lorem.words(3)}</a>
+          </p>
         </Accordion.Panel>
       </Accordion.Item>
     ),
