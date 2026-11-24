@@ -12,6 +12,7 @@ export async function runSweepStep<T>(
   describeResult: (value: T) => Record<string, number> = () => ({}),
 ): Promise<T> {
   const startedAt = Date.now();
+  logger.info(OWNER_ACCESS_LOG.SWEEP_STEP_STARTED, { step, ...context });
   const value = await run();
   logger.info(OWNER_ACCESS_LOG.SWEEP_STEP_DONE, {
     step,
