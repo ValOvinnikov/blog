@@ -31,7 +31,10 @@ const mockFaker = createMockFaker(7401);
 
 const MOCK_CANARY_URL = `${MOCK_WORKER_ORIGIN}/api/canary`;
 const MOCK_CANARY_SECRET = mockFaker.string.alphanumeric(32);
-const MOCK_RUN_MS = mockFaker.number.int({ min: 1, max: CANARY_TIMEOUT_MS - 1 });
+const MOCK_RUN_MS = mockFaker.number.int({
+  min: 1,
+  max: CANARY_TIMEOUT_MS - 1,
+});
 
 function never(): Promise<never> {
   return new Promise(() => {});
