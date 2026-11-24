@@ -1,5 +1,6 @@
 import { NEWSLETTER_RESULT, SUBSCRIBER_OUTCOME } from '@shinefold/config';
 import { queries } from '@shinefold/db';
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import {
   redirectToNewsletterResult,
   redirectToNewsletterUnsubscribeConfirmation,
@@ -42,19 +43,27 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   try {
+    const subscriberId = readNewsletterUnsubscribeSubscriberId(token);
+    if (!subscriberId) {
+      return redirectToNewsletterResult(
+        request,
+        NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID,
+      );
+    }
+
     const tenant = await resolveRequestTenant();
     if (!tenant) {
-      logger.error('newsletter.unsubscribe_link_tenant_unresolved');
+      logger.error(NEWSLETTER_LOG.UNSUBSCRIBE_LINK_TENANT_UNRESOLVED);
       return redirectToNewsletterResult(
         request,
         NEWSLETTER_RESULT.UNSUBSCRIBE_FAILED,
       );
     }
 
-    const subscriberId = readNewsletterUnsubscribeSubscriberId(token);
-    const result = subscriberId
-      ? await queries.subscribers.unsubscribeById(tenant.id, subscriberId)
-      : await queries.subscribers.unsubscribeByToken(tenant.id, token);
+    const result = await queries.subscribers.unsubscribeById(
+      tenant.id,
+      subscriberId,
+    );
 
     return redirectToNewsletterResult(
       request,
@@ -63,7 +72,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         : NEWSLETTER_RESULT.UNSUBSCRIBED,
     );
   } catch (error) {
-    logger.error('newsletter.unsubscribe_link_failed', { error });
+    logger.error(NEWSLETTER_LOG.UNSUBSCRIBE_LINK_FAILED, { error });
     return redirectToNewsletterResult(
       request,
       NEWSLETTER_RESULT.UNSUBSCRIBE_FAILED,
