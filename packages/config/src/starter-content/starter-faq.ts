@@ -14,7 +14,7 @@ import {
 } from './starter-fields';
 import type { TModuleInput } from './starter-modules';
 
-type TFaqCopy = {
+export type TFaqCopy = {
   heading: string;
   questions: readonly { question: string; answer: readonly string[] }[];
 };
