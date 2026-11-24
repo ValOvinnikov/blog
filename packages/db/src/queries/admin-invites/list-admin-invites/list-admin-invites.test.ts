@@ -9,7 +9,7 @@ import { MOCK_INVITE_EMAIL } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
-import { listPendingAdminInvites } from './list-pending-admin-invites';
+import { listAdminInvites } from './list-admin-invites';
 
 vi.mock('@shinefold/db/client');
 
@@ -17,13 +17,14 @@ const db = useQueryTestDb();
 
 const inviterId = useAdminInviter(db);
 
-describe(listPendingAdminInvites, () => {
-  it('lists an unexpired invite with its decrypted address', async () => {
+describe(listAdminInvites, () => {
+  it('still lists an invite past its expiry, with its decrypted address', async () => {
     const { id } = adminInviteOf(
       await createAdminInvite(MOCK_INVITE_EMAIL, ADMIN_ROLE.ADMIN, inviterId()),
     );
+    vi.setSystemTime(MOCK_ADMIN_INVITE_EXPIRY);
 
-    await expect(listPendingAdminInvites()).resolves.toEqual([
+    await expect(listAdminInvites()).resolves.toEqual([
       {
         inviteId: id,
         email: MOCK_INVITE_EMAIL,
@@ -32,12 +33,5 @@ describe(listPendingAdminInvites, () => {
         expiresAt: MOCK_ADMIN_INVITE_EXPIRY,
       },
     ]);
-  });
-
-  it('leaves out an invite past its expiry', async () => {
-    await createAdminInvite(MOCK_INVITE_EMAIL, ADMIN_ROLE.ADMIN, inviterId());
-    vi.setSystemTime(MOCK_ADMIN_INVITE_EXPIRY);
-
-    await expect(listPendingAdminInvites()).resolves.toEqual([]);
   });
 });
