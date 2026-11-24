@@ -360,12 +360,17 @@ jobs:
         env:
           FULL: ${{ needs.changes.outputs.full }}
           TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
+          TURBO_RUN_SUMMARY: 'true'
         run: |
           if [ "${FULL}" = 'true' ]; then
             pnpm turbo run test --concurrency=2
           else
             pnpm turbo run test --affected --concurrency=2
           fi
+
+      - name: Turbo test hash inputs
+        if: ${{ !cancelled() }}
+        run: bash scripts/print-turbo-hash-inputs.sh
 
       # Reads the JSON timings the Test step's vitest runs wrote; the base
       # ref is what the allowlist may only shrink against.

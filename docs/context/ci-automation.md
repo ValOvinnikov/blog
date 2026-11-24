@@ -368,6 +368,15 @@ and runner size. Note the flag sits on `turbo run` directly: pnpm forwards
 `pnpm test -- --concurrency=2` verbatim, so the `--` would hand the flag to
 vitest, not turbo.
 
+**Both test steps print what went into each Turbo hash.** CI's Test job and
+Deploy Development's Test step set `TURBO_RUN_SUMMARY`, and the step after
+each, "Turbo test hash inputs" (`scripts/print-turbo-hash-inputs.sh`), prints
+one `global` line, one `global-files` line and one `task` line per task,
+including the `^build` tasks tests depend on. When the deploy misses the cache
+for tests CI just ran, compare the two runs' lines: the first field that
+differs — `hashOfExternalDependencies`, the files digest, a task's
+`inputsDigest`, `dependencies` or `environmentVariables` — is the cause.
+
 **Every test file has a time budget, enforced in CI only.** The shared
 vitest preset (`configs/vitest/preset.ts`) adds a JSON reporter beside the
 default one, writing `<workspace>/.vitest/timings.json` (a `test` output in

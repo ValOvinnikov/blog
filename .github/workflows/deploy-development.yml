@@ -306,7 +306,12 @@ jobs:
           run_tests "${pr_url}'s head \`${pr_head}\` has no successful CI run whose Test job ran."
       - name: Test
         if: steps.tested.outputs.passed != 'true'
+        env:
+          TURBO_RUN_SUMMARY: 'true'
         run: pnpm test
+      - name: Turbo test hash inputs
+        if: ${{ !cancelled() && steps.tested.outputs.passed != 'true' }}
+        run: bash scripts/print-turbo-hash-inputs.sh
       - name: Build
         run: pnpm build
         env:
