@@ -36,7 +36,7 @@ One `@shinefold/studio` schema serves many Sanity projects: the platform's own c
   - **`push` to `main`:** runs against the `development` Environment, for all tenants. It runs only when `turbo-ignore` reports that `@shinefold/studio` or `web` is affected.
   - **`workflow_dispatch`:** defaults to `production` and takes an optional `tenantId`.
   - **`workflow_call`:** takes an optional `tenantId` (blank migrates every tenant), `environment` and `ref`. `release.yml` calls it for every tenant.
-- **CI check.** The `Migrations` job in `ci.yml` loads every migration (`sanity migrations list`). When a read token is configured, it also dry-runs them against the console dataset only.
+- **CI check.** The Verify job in `ci.yml` loads every migration in its "Validate migrations load" step (`sanity migrations list`). When a read token is configured, its "Dry-run migrations" step also dry-runs them against the console dataset only.
 
 ## Data
 

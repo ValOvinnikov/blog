@@ -4,8 +4,9 @@
 are complete, per project decision.
 **Date:** 2026-07-10
 **Related:** #241 (migration tooling), the migration helper
-(`apps/cms/scripts/migrate.mjs`), the CI migration guard (`.github/workflows/ci.yml`
-`Migrations` job).
+(`apps/cms/scripts/migrate.mjs`), the CI migration guard (the Verify job's
+"Validate migrations load" and "Dry-run migrations" steps in
+`.github/workflows/ci.yml`).
 
 ## Goal
 

@@ -41,11 +41,13 @@ regressions); lowering it loosens the budget. There's no separate schema
 migration or regeneration step — the file is read directly by the workflow
 on the next run.
 
-## Activation status — active, targets production (#826)
+## Activation status — manual dispatch only, inert until configured (#826)
 
-This job is **active**: the repo Variable `LIGHTHOUSE_URLS` (Settings →
-Secrets and variables → Actions → Variables) is set to two **production**
-URLs — `https://{your-hosting}/` and one live post page.
+This job runs **only on manual dispatch** (`workflow_dispatch`); no PR or push
+to `main` triggers it. The repo Variable `LIGHTHOUSE_URLS` (Settings →
+Secrets and variables → Actions → Variables) is currently unset; it must hold
+two **production** URLs — `https://{your-hosting}/` and one live post page —
+before a dispatch measures anything.
 
 It was first activated (#399), pointed at the `development` deployment, since
 this repo has **no PR preview deploys for web** by design (Vercel's native Git
@@ -63,14 +65,16 @@ category's crawlability audit — and separately carries cold-start /
 unwarmed-ISR performance noise unrelated to any PR's actual changes.
 
 **Production is the correct stable target** — it's the only environment where
-the budgets measure real, indexable behavior. The accepted trade-off: this job
-checks production's current health on every PR, not the PR's own diff, until a
-true per-PR preview target exists (none is currently tracked). It stays
+the budgets measure real, indexable behavior. The accepted trade-off: a run
+checks production's current health, not any PR's diff, so nothing triggers it
+automatically — dispatch it when production's budgets are the question, until
+a true per-PR preview target exists (none is currently tracked). It stays
 advisory (non-required, per #399) for exactly that reason.
 
-If `LIGHTHOUSE_URLS` is ever cleared, the Lighthouse step no-ops green (see
-the guarded-step pattern in `deploy-development.yml`) rather than failing —
-so accidentally unsetting the Variable doesn't red the job, just silences it.
+While `LIGHTHOUSE_URLS` is unset, the Lighthouse step no-ops green (see the
+guarded-step pattern in `deploy-development.yml`) rather than failing — so a
+dispatch before it is configured, or after it is cleared, silences the job
+instead of failing it.
 
 ## `ci.collect.numberOfRuns: 3` — averaging out single-run noise (#846)
 

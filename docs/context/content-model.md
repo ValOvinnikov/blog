@@ -634,8 +634,9 @@ changing a schema does **not** change existing documents.
   applied **without** running them (one-time, per dataset, for migrations that
   predate the ledger). Both need a write token (`SANITY_AUTH_TOKEN` /
   `SANITY_DEPLOY_TOKEN`).
-- CI (`Migrations` job) validates every migration loads and — with a read
-  token — dry-runs each one read-only. It never mutates data.
+- CI's Verify job validates every migration loads (the "Validate migrations
+  load" step) and — with a read token — dry-runs each one read-only (the
+  "Dry-run migrations" step). It never mutates data.
 - `migrate:deploy --yes` is automated as part of the deploy pipeline: dev runs
   it via `deploy-development.yml`'s `migrate` job on merges to `main` that
   touch `studio` or `web` (a platform-only merge skips it, since neither changed;
