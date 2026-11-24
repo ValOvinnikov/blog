@@ -19,14 +19,8 @@ import type {
   TStarterPage,
 } from './starter-document';
 import type { TStarterTemplate } from './starter-document-shape';
-import {
-  moduleSlot,
-  moduleHeadingBlock,
-  pageHeadingBlock,
-  reference,
-  seo,
-  slug,
-} from './starter-fields';
+import { moduleSlot, moduleHeadingBlock, slug } from './starter-fields';
+import { pageFields, starterTemplate } from './starter-pages';
 
 type TSectionCopy = TPageCopy & {
   heading: string;
@@ -58,24 +52,18 @@ export function buildSectionPages({
       headingBlock: moduleHeadingBlock(locale, section.listHeading),
     } satisfies TStarterModule<Module_sectionPages>,
     {
-      _id: ids.template,
-      _type: 'template_landing',
-      title: `${name} Template`,
+      ...starterTemplate(ids.template, 'template_landing', `${name} Template`),
       modules: [moduleSlot(ids.list, 'module_sectionPages')],
     } satisfies TStarterTemplate<Template_landing>,
     {
       _id: ids.page,
       _type: 'page_landing',
-      language: locale,
-      title: section.title,
+      ...pageFields(locale, ids.template, section),
       slug: slug(section.slug),
-      headingBlock: pageHeadingBlock(section.heading, section.supportingText),
-      template: reference(ids.template),
       ...(hasSectionNavigation && {
         sectionNavigation: true,
         sectionNavigationTitle: section.title,
       }),
-      seo: seo(section.metaTitle, section.metaDescription),
     } satisfies TStarterPage<Page_landing>,
     ...pages.flatMap((page, index) =>
       buildContentPage({

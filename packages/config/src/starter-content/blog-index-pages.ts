@@ -20,12 +20,8 @@ import type {
 } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import type { TStarterTemplate } from './starter-document-shape';
-import {
-  moduleHeadingBlock,
-  pageHeadingBlock,
-  reference,
-  seo,
-} from './starter-fields';
+import { moduleHeadingBlock, reference } from './starter-fields';
+import { pageFields, starterTemplate } from './starter-pages';
 
 type TIndexCopy = TStarterCopy['blog']['topicIndex'];
 
@@ -59,12 +55,8 @@ function indexPage(
   listId: string,
 ) {
   return {
-    language: locale,
-    title: copy.title,
-    headingBlock: pageHeadingBlock(copy.heading, copy.supportingText),
-    template: reference(templateId),
+    ...pageFields(locale, templateId, copy),
     taxonomyList: reference(listId),
-    seo: seo(copy.metaTitle, copy.metaDescription),
   };
 }
 
@@ -79,11 +71,11 @@ export function buildBlogIndexPages(
       TAXONOMY_KIND.TOPICS,
       moduleHeadingBlock(locale, topicIndex.listHeading),
     ),
-    {
-      _id: ids.BLOG_TOPIC_INDEX_TEMPLATE,
-      _type: 'template_topicIndex',
-      title: 'Topic Index Template',
-    } satisfies TStarterTemplate<Template_topicIndex>,
+    starterTemplate(
+      ids.BLOG_TOPIC_INDEX_TEMPLATE,
+      'template_topicIndex',
+      'Topic Index Template',
+    ) satisfies TStarterTemplate<Template_topicIndex>,
     singleton({
       _type: 'page_topicIndex',
       ...indexPage(
@@ -99,11 +91,11 @@ export function buildBlogIndexPages(
       TAXONOMY_KIND.TAGS,
       moduleHeadingBlock(locale, tagIndex.listHeading),
     ),
-    {
-      _id: ids.BLOG_TAG_INDEX_TEMPLATE,
-      _type: 'template_tagIndex',
-      title: 'Tag Index Template',
-    } satisfies TStarterTemplate<Template_tagIndex>,
+    starterTemplate(
+      ids.BLOG_TAG_INDEX_TEMPLATE,
+      'template_tagIndex',
+      'Tag Index Template',
+    ) satisfies TStarterTemplate<Template_tagIndex>,
     singleton({
       _type: 'page_tagIndex',
       ...indexPage(

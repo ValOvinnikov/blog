@@ -18,12 +18,8 @@ import type {
   TStarterDocument,
   TStarterTemplate,
 } from './starter-document-shape';
-import {
-  localizedString,
-  pageHeadingBlock,
-  reference,
-  seo,
-} from './starter-fields';
+import { localizedString } from './starter-fields';
+import { pageFields, starterTemplate } from './starter-pages';
 
 // TODO(#5684): seed the tenant's own currency once tenants record one.
 const DEFAULT_SITE_CURRENCY = 'USD';
@@ -82,37 +78,34 @@ export function buildBaseDocuments({
       pricePeriodSuffix: pricePeriodWording(locale),
     } satisfies TStarterDocument<Settings_site, 'title'>,
     {
-      _id: STARTER_DOCUMENT_IDS.HOME_TEMPLATE,
-      _type: 'template_home',
-      title: 'Home Template',
+      ...starterTemplate(
+        STARTER_DOCUMENT_IDS.HOME_TEMPLATE,
+        'template_home',
+        'Home Template',
+      ),
       ...homeLayout,
     } satisfies TStarterTemplate<Template_home>,
     {
       _id: STARTER_DOCUMENT_IDS.HOME,
       _type: 'page_home',
-      language: locale,
-      title: home.title,
-      headingBlock: pageHeadingBlock(home.heading, home.supportingText),
-      template: reference(STARTER_DOCUMENT_IDS.HOME_TEMPLATE),
-      seo: seo(home.metaTitle, home.metaDescription),
+      ...pageFields(locale, STARTER_DOCUMENT_IDS.HOME_TEMPLATE, home),
     } satisfies TStarterPage<Page_home>,
     {
-      _id: STARTER_DOCUMENT_IDS.POST_INDEX_TEMPLATE,
-      _type: 'template_postIndex',
-      title: 'Post Index Template',
+      ...starterTemplate(
+        STARTER_DOCUMENT_IDS.POST_INDEX_TEMPLATE,
+        'template_postIndex',
+        'Post Index Template',
+      ),
       ...(postIndexModules && { modules: postIndexModules }),
     } satisfies TStarterTemplate<Template_postIndex>,
     {
       _id: STARTER_DOCUMENT_IDS.POST_INDEX,
       _type: 'page_postIndex',
-      language: locale,
-      title: postIndex.title,
-      headingBlock: pageHeadingBlock(
-        postIndex.heading,
-        postIndex.supportingText,
+      ...pageFields(
+        locale,
+        STARTER_DOCUMENT_IDS.POST_INDEX_TEMPLATE,
+        postIndex,
       ),
-      template: reference(STARTER_DOCUMENT_IDS.POST_INDEX_TEMPLATE),
-      seo: seo(postIndex.metaTitle, postIndex.metaDescription),
     } satisfies TStarterPage<Page_postIndex>,
     ...buildLegalPages(locale, copy),
   ];
