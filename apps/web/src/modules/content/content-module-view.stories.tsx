@@ -15,13 +15,6 @@ const meta = {
   title: 'Modules/ContentModule',
   component: ContentModuleView,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
-  argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    },
-  },
   args: {
     id: 'content-1',
     brandVariant: BRAND_VARIANT.PRIMARY,
