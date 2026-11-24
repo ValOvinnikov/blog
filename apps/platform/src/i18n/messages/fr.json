@@ -945,6 +945,7 @@
     "headerBarStyleDescription": "Si la barre occupe toute la largeur de la page ou flotte au-dessus comme une carte.",
     "headerBackgroundLabel": "Arrière-plan",
     "headerBackgroundDescription": "La couleur de l’en-tête et des menus et panneaux qui s’ouvrent depuis celui-ci. Chacune suit le thème clair ou sombre du lecteur.",
+    "headerBackgroundDarkLogoNote": "Encre affiche l’en-tête en sombre : votre logo a donc besoin d’une version pour le mode sombre. Ajoutez-la dans Marque.",
     "breadcrumbBackgroundLabel": "Arrière-plan du fil d’Ariane",
     "breadcrumbBackgroundDescription": "La couleur du fil d’Ariane sous l’en-tête, sur les articles, les étiquettes, les thèmes et les pages d’accueil. Chacune suit le thème clair ou sombre du lecteur.",
     "headerBarStyleOptionLabel": {

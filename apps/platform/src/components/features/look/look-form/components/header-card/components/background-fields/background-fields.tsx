@@ -2,13 +2,15 @@ import { LookField } from '@platform/components/features/look/look-form/componen
 import { toSkinSwatchOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
+import { LockedReason } from '@platform/components/shared/locked-reason';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
-import type { TBrandVariant } from '@shinefold/config';
+import { ICONS, type TBrandVariant } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 export const BackgroundFields = () => {
   const {
-    values: { headerBackground, breadcrumbBackground, accentHue },
+    values: { headerBackground, breadcrumbBackground, accentHue, logoDark },
     updateField,
   } = useLookForm();
   const t = useTranslations('lookForm');
@@ -35,6 +37,11 @@ export const BackgroundFields = () => {
           onChange={(background) => updateField('headerBackground', background)}
           lock={headerLock}
         />
+        {isUndefined(logoDark.url) && (
+          <LockedReason icon={ICONS.INFO}>
+            {t('headerBackgroundDarkLogoNote')}
+          </LockedReason>
+        )}
       </LookField>
 
       <LookField

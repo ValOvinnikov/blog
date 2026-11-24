@@ -945,6 +945,7 @@
     "headerBarStyleDescription": "Whether the bar spans the page or floats above it as a card.",
     "headerBackgroundLabel": "Background",
     "headerBackgroundDescription": "The header's colour, and the colour of the menus and panels that open from it. Each follows the reader's light or dark theme.",
+    "headerBackgroundDarkLogoNote": "Ink draws the header dark, so your logo needs a dark-mode version. Add one in Brand.",
     "breadcrumbBackgroundLabel": "Breadcrumb background",
     "breadcrumbBackgroundDescription": "The colour of the breadcrumb row under the header, on posts, tags, topics and landing pages. Each follows the reader's light or dark theme.",
     "headerBarStyleOptionLabel": {
