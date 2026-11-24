@@ -2,7 +2,11 @@
 # Diagnostic only: always exits 0, so it can never fail the job that runs it.
 set -uo pipefail
 
-summary=$(ls -t .turbo/runs/*.json 2>/dev/null | head -n 1)
+summary=''
+for run in .turbo/runs/*.json; do
+  [ -f "$run" ] || continue
+  if [ -z "$summary" ] || [ "$run" -nt "$summary" ]; then summary=$run; fi
+done
 if [ -z "$summary" ]; then
   echo 'turbo-hash-inputs: no run summary in .turbo/runs'
   exit 0
