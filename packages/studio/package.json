@@ -58,7 +58,7 @@
     "@types/react-dom": "^19",
     "eslint": "catalog:",
     "groq-js": "^2.0.3",
-    "jsdom": "^29.1.1",
+    "jsdom": "^31.0.1",
     "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
