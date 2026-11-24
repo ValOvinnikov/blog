@@ -10,7 +10,7 @@ import {
 import { tv } from '@platform/utils/tv/tv';
 import type { TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
-import { useId } from 'react';
+import { useId, type ReactNode } from 'react';
 
 const formSiteAddressInputVariants = tv({
   slots: {
@@ -32,24 +32,28 @@ const formSiteAddressInputVariants = tv({
   },
 });
 
-export type TFormSiteAddressInputProps = {
+type TFormSiteAddressInputCopy = {
   label: string;
   hint: string;
   error?: string;
+};
+
+export type TFormSiteAddressInputProps = {
+  copy: TFormSiteAddressInputCopy;
   value: string;
   onChange: (value: string) => void;
   rootDomain: TMaybeUndefined<string>;
   appearance?: TFieldAppearance;
+  status?: ReactNode;
 };
 
 export const FormSiteAddressInput = ({
-  label,
-  hint,
-  error,
+  copy: { label, hint, error },
   value,
   onChange,
   rootDomain,
   appearance,
+  status,
 }: TFormSiteAddressInputProps) => {
   const t = useTranslations('formSiteAddressInput');
   const suffixId = useId();
@@ -82,6 +86,7 @@ export const FormSiteAddressInput = ({
           </Text>
         )}
       </div>
+      {status}
     </FormField>
   );
 };

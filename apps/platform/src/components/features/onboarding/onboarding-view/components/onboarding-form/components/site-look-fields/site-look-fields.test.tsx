@@ -18,6 +18,7 @@ const MOCK_HUE = 28;
 const setup = customRender(SiteLookFields, {
   preset: PRESET_ID.EDITORIAL,
   accentHue: MOCK_HUE,
+  accentHueError: undefined,
   onPresetChange: vi.fn(),
   onAccentHueChange: vi.fn(),
 });

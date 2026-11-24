@@ -19,7 +19,7 @@ export const FULL_TIER = [
   ONBOARDING_TIER_QUERY.FULL,
 ];
 export const RAIL_TIER = [ONBOARDING_TIER_QUERY.RAIL];
-export const FULL_TIER_TITLE = 'from 1360px';
+export const FULL_TIER_TITLE = 'from 1104px';
 export const RAIL_TIER_TITLE = 'from 768px';
 
 export const renderInTier = (matchingQueries: readonly string[]) => {

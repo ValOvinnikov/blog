@@ -4,7 +4,6 @@ import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
 
 import { onboardingActionsVariants } from './onboarding-actions-variants';
 
@@ -15,7 +14,6 @@ export type TOnboardingActionsProps = {
   isContinueDisabled: boolean;
   onBack: () => void;
   onContinue: () => void;
-  children?: ReactNode;
 };
 
 export const OnboardingActions = ({
@@ -25,10 +23,9 @@ export const OnboardingActions = ({
   isContinueDisabled,
   onBack,
   onContinue,
-  children,
 }: TOnboardingActionsProps) => {
   const t = useTranslations('onboardingForm');
-  const { root, back, primary, status } = onboardingActionsVariants();
+  const { root, back, primary } = onboardingActionsVariants();
 
   return (
     <div className={root()}>
@@ -37,7 +34,6 @@ export const OnboardingActions = ({
           {t('back')}
         </Button>
       )}
-      {children && <div className={status()}>{children}</div>}
       {isLastStep ? (
         <Button
           key="create-site"

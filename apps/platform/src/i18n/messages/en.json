@@ -77,8 +77,8 @@
     "nameHint": "Shown in your site’s header and in browser tabs.",
     "siteAddressLabel": "Site address",
     "siteAddressHint": "Letters, numbers and hyphens. You can connect your own domain on the Starter and Growth plans.",
-    "siteAddressChecking": "Checking the address…",
-    "siteAddressAvailable": "{address} is yours",
+    "siteAddressChecking": "Checking…",
+    "siteAddressAvailable": "Available<detail> — <host>{address}</host></detail>",
     "siteAddressUnverified": "We couldn’t check this address right now. You can continue — we’ll check it again when you create the site.",
     "languageLabel": "Language",
     "languageHint": "The language your site starts in. You can add more later.",
@@ -100,6 +100,7 @@
       "siteAddressInvalid": "Use only lowercase letters, numbers and hyphens, up to 63 characters, not starting or ending with a hyphen.",
       "siteAddressReserved": "This address is reserved. Choose another.",
       "siteAddressTaken": "This address is taken. Choose another.",
+      "accentHueInaccessible": "This hue doesn't keep body text readable on its tinted surfaces, so the site would replace it. Choose another hue.",
       "termsNotAccepted": "Accept the Terms of Service and the Privacy Policy to continue."
     },
     "steps": {

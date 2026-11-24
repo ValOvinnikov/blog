@@ -1,15 +1,12 @@
 'use client';
 
 import { Slider } from '@base-ui/react/slider';
-import {
-  HUE_SLIDER_TRACK,
-  type THueSliderTrack,
-} from '@platform/constants/hue-slider';
+import { accentHueGradient } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { HUE_MAX, HUE_MIN } from '@shinefold/config';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import type { AriaAttributes } from 'react';
 
-import { HUE_SLIDER_TRACK_STYLE } from './hue-slider-tracks';
 import { hueSliderVariants } from './hue-slider-variants';
 
 type THueSliderName = { ariaLabel: string } | { labelledBy: string };
@@ -21,7 +18,6 @@ export type THueSliderProps = {
   onChange: (value: number) => void;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
-  track?: THueSliderTrack;
 };
 
 export const HueSlider = ({
@@ -31,19 +27,16 @@ export const HueSlider = ({
   onChange,
   isDisabled,
   'aria-describedby': ariaDescribedBy,
-  track: trackKind = HUE_SLIDER_TRACK.PALETTE,
 }: THueSliderProps) => {
   const t = useTranslations('logoHueField');
-  const { root, control, track, thumb } = hueSliderVariants({
-    track: trackKind,
-  });
+  const { root, control, track, thumb } = hueSliderVariants();
 
   return (
     <Slider.Root
       value={value}
       onValueChange={(next) => {
         const nextValue = Array.isArray(next) ? next[0] : next;
-        if (nextValue !== undefined) onChange(nextValue);
+        if (!isUndefined(nextValue)) onChange(nextValue);
       }}
       min={HUE_MIN}
       max={HUE_MAX}
@@ -53,7 +46,7 @@ export const HueSlider = ({
       <Slider.Control className={control()}>
         <Slider.Track
           className={track()}
-          style={HUE_SLIDER_TRACK_STYLE[trackKind]}
+          style={{ background: accentHueGradient() }}
         >
           <Slider.Thumb
             id={id}

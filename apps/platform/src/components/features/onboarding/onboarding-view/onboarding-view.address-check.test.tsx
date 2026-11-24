@@ -1,6 +1,9 @@
+import { ONBOARDING_SCROLL_AREA_TEST_ID } from '@platform/constants/onboarding';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { act, screen } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   ADDRESS_CHECK_TIMEOUT,
   typeAddress,
@@ -70,6 +73,7 @@ describe(`<${OnboardingView.name}/>`, () => {
         );
 
         expect(available).toBeVisible();
+        expect(available).toHaveTextContent(MOCK_SITE_ADDRESS);
         expect(checkSiteAddressMock).toHaveBeenLastCalledWith(MOCK_TENANT_SLUG);
       });
 
@@ -80,12 +84,28 @@ describe(`<${OnboardingView.name}/>`, () => {
         expect(preview).not.toHaveTextContent(MOCK_PLACEHOLDER_ADDRESS);
       });
 
-      it('keeps Continue disabled while the address is checked', () => {
-        const checking = screen.getByText(ADDRESS_CHECKING);
-        const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+      describe('while the address is checked', () => {
+        let checking: HTMLElement;
 
-        expect(checking).toBeVisible();
-        expect(continueButton).toHaveAttribute('aria-disabled', 'true');
+        beforeEach(() => {
+          checking = screen.getByText(ADDRESS_CHECKING);
+        });
+
+        it('keeps Continue disabled', () => {
+          const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+
+          expect(checking).toBeVisible();
+          expect(continueButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        });
+
+        it('shows the status under the address input, apart from the actions', () => {
+          const scrollArea = screen.getByTestId(ONBOARDING_SCROLL_AREA_TEST_ID);
+
+          expect(addressField.compareDocumentPosition(checking)).toBe(
+            Node.DOCUMENT_POSITION_FOLLOWING,
+          );
+          expect(scrollArea).toContainElement(checking);
+        });
       });
 
       it('keeps Continue reachable by keyboard while the address is checked', async () => {
@@ -99,7 +119,7 @@ describe(`<${OnboardingView.name}/>`, () => {
       });
 
       it('stays on the address step when Enter is pressed during the check', async () => {
-        await user.type(addressField, '{Enter}');
+        await user.type(addressField, USER_EVENT_KEY.ENTER);
 
         const heading = stepHeading(STEPS.ADDRESS);
 

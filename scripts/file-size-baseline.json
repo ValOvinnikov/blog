@@ -9,7 +9,7 @@
   "apps/platform/src/server/tenants/create-tenant-action.ts": 130,
   "apps/platform/src/server/tenants/update-tenant-details-action.ts": 139,
   "apps/platform/src/testing/data-requests/fixtures.ts": 157,
-  "apps/platform/src/testing/onboarding/onboarding-view.ts": 167,
+  "apps/platform/src/testing/onboarding/onboarding-view.ts": 166,
   "apps/platform/src/utils/device-frame-scale/device-frame-scale.ts": 157,
   "apps/platform/src/utils/email-draft-changes/email-draft-changes.ts": 129,
   "apps/platform/src/utils/voice-draft/voice-draft.ts": 164,

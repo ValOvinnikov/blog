@@ -77,8 +77,8 @@
     "nameHint": "Affiché dans l’en-tête de votre site et dans les onglets du navigateur.",
     "siteAddressLabel": "Adresse du site",
     "siteAddressHint": "Lettres, chiffres et traits d’union. Avec les offres Starter et Growth, vous pouvez connecter votre propre domaine.",
-    "siteAddressChecking": "Vérification de l’adresse…",
-    "siteAddressAvailable": "{address} est à vous",
+    "siteAddressChecking": "Vérification…",
+    "siteAddressAvailable": "Disponible<detail> — <host>{address}</host></detail>",
     "siteAddressUnverified": "Nous n’avons pas pu vérifier cette adresse pour le moment. Vous pouvez continuer : nous la vérifierons à nouveau lors de la création du site.",
     "languageLabel": "Langue",
     "languageHint": "La langue dans laquelle votre site démarre. Vous pourrez en ajouter d’autres plus tard.",
@@ -100,6 +100,7 @@
       "siteAddressInvalid": "Utilisez uniquement des lettres minuscules, des chiffres et des traits d’union, 63 caractères au maximum, sans trait d’union au début ni à la fin.",
       "siteAddressReserved": "Cette adresse est réservée. Choisissez-en une autre.",
       "siteAddressTaken": "Cette adresse est déjà prise. Choisissez-en une autre.",
+      "accentHueInaccessible": "Cette teinte ne garde pas le texte lisible sur ses surfaces teintées ; le site la remplacerait. Choisissez une autre teinte.",
       "termsNotAccepted": "Acceptez les Conditions d’utilisation et la Politique de confidentialité pour continuer."
     },
     "steps": {

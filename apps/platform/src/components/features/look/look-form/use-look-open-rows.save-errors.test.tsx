@@ -21,16 +21,14 @@ import {
 } from '@platform/testing/look/look-form-setup';
 import { GO_TO_THE_FIRST_ONE } from '@platform/testing/render-in-settings-form';
 import { REPLACE_LOGO } from '@platform/testing/site-config/fixtures';
-import type * as BlogConfig from '@shinefold/config';
 import { ACTION_OUTCOME, isAccentHueAccessible } from '@shinefold/config';
 import type { UserEvent } from '@testing-library/user-event';
 
 import { useLookOpenRows } from './use-look-open-rows';
 
-vi.mock('@shinefold/config', async (importOriginal) => ({
-  ...(await importOriginal<typeof BlogConfig>()),
-  isAccentHueAccessible: vi.fn(() => true),
-}));
+vi.mock('@shinefold/config', async () =>
+  (await import('@platform/testing/accent-hue-guard')).mockAccentHueGuard(),
+);
 
 vi.mock('@platform/server/site-config/update-look-action');
 

@@ -63,15 +63,15 @@ export const useOnboardingWizard = (
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (steps.isLastStep) submit(steps.showFirstFieldError);
-    else steps.goNext();
+    if (!steps.isLastStep) steps.goNext();
+    else if (steps.isLookRefused) steps.editStep(ONBOARDING_STEP.LOOK);
+    else submit(steps.showFirstFieldError);
   };
 
   return {
     ...form,
     ...steps,
     addressVerdict,
-    addressError,
     siteAddress,
     previewAddress,
     railSteps,

@@ -35,6 +35,7 @@ const {
   continue: CONTINUE,
   back: BACK,
   siteTypeLabel: SITE_TYPE_LABEL,
+  siteAddressAvailable: ADDRESS_AVAILABLE,
 } = messages.onboardingForm;
 export const {
   nameHint: NAME_HINT,
@@ -67,9 +68,7 @@ export const MOCK_ACCEPTANCE = { name: new RegExp(`^${ACCEPT_TERMS_LEAD}`) };
 export const MOCK_CREATE = { name: CREATE_SITE };
 export const MOCK_CONTINUE = { name: CONTINUE };
 export const MOCK_BACK = { name: BACK };
-export const MOCK_ADDRESS_AVAILABLE = t('siteAddressAvailable', {
-  address: MOCK_SITE_ADDRESS,
-});
+export const MOCK_ADDRESS_AVAILABLE = ADDRESS_AVAILABLE.replace(/<.*/, '');
 export const MOCK_PLACEHOLDER_ADDRESS = `${PLACEHOLDER_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
 export const MOCK_LIVE_PREVIEW = {
   name: messages.previewModeControl.livePreviewHeading,

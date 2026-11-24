@@ -77,8 +77,8 @@
     "nameHint": "Se muestra en la cabecera de tu sitio y en las pestañas del navegador.",
     "siteAddressLabel": "Dirección del sitio",
     "siteAddressHint": "Letras, números y guiones. Con los planes Starter y Growth puedes conectar tu propio dominio.",
-    "siteAddressChecking": "Comprobando la dirección…",
-    "siteAddressAvailable": "{address} es tuya",
+    "siteAddressChecking": "Comprobando…",
+    "siteAddressAvailable": "Disponible<detail> — <host>{address}</host></detail>",
     "siteAddressUnverified": "No hemos podido comprobar esta dirección ahora mismo. Puedes continuar: la volveremos a comprobar cuando crees el sitio.",
     "languageLabel": "Idioma",
     "languageHint": "El idioma con el que empieza tu sitio. Podrás añadir más después.",
@@ -100,6 +100,7 @@
       "siteAddressInvalid": "Usa solo letras minúsculas, números y guiones, hasta 63 caracteres, sin empezar ni terminar con un guion.",
       "siteAddressReserved": "Esta dirección está reservada. Elige otra.",
       "siteAddressTaken": "Esta dirección ya está en uso. Elige otra.",
+      "accentHueInaccessible": "Este tono no mantiene legible el texto sobre sus superficies tintadas, así que el sitio lo sustituiría. Elija otro tono.",
       "termsNotAccepted": "Acepta los Términos del servicio y la Política de privacidad para continuar."
     },
     "steps": {
