@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import type { TMaybeUndefined } from '@shinefold/config';
 import { KEY_ENCODING } from '@shinefold/utils/encryption';
 import { NEWSLETTER_LOG } from '@web/constants/newsletter';
+import { MOCK_SUBSCRIBER_ID } from '@web/testing/server/newsletter/fixtures';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 
@@ -14,7 +15,6 @@ vi.mock('@web/utils/env/env');
 
 faker.seed(6010);
 
-const MOCK_SUBSCRIBER_ID = faker.string.uuid();
 const MOCK_KEY = Buffer.from(faker.string.alphanumeric(32)).toString(
   KEY_ENCODING,
 );

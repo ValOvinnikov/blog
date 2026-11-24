@@ -13,6 +13,8 @@ export const MOCK_CONFIRMATION_TOKEN = mockFaker.string.alphanumeric(16);
 
 export const MOCK_UNSUBSCRIBE_TOKEN = mockFaker.string.alphanumeric(16);
 
+export const MOCK_SUBSCRIBER_ID = mockFaker.string.uuid();
+
 export const MOCK_REPLY_TO = mockFaker.internet.email();
 
 export const MOCK_AUTHORED_SUBJECT = mockFaker.lorem.sentence();

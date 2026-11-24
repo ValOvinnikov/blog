@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import {
   HTTP_METHOD,
   HTTP_STATUS,
@@ -10,6 +9,8 @@ import {
 import { queries, TENANT_STATUS } from '@shinefold/db';
 import type * as DbConstants from '@shinefold/db/constants';
 import { toOutcome } from '@shinefold/utils/to-outcome';
+import { CACHE_CONTROL } from '@web/constants/http';
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { readNewsletterUnsubscribeSubscriberId } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
 import {
@@ -18,7 +19,10 @@ import {
   storeNewsletterUnsubscribeToken,
 } from '@web/server/newsletter/newsletter-unsubscribe-token-cookie/newsletter-unsubscribe-token-cookie';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
-import { MOCK_UNSUBSCRIBE_TOKEN } from '@web/testing/server/newsletter/fixtures';
+import {
+  MOCK_SUBSCRIBER_ID,
+  MOCK_UNSUBSCRIBE_TOKEN,
+} from '@web/testing/server/newsletter/fixtures';
 import { mockNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
@@ -30,12 +34,10 @@ import { logger } from '@web/utils/logger/logger';
 
 import { GET, POST } from './route';
 
-faker.seed(6009);
-
 vi.mock('@shinefold/db', async () => ({
   ...(await vi.importActual<typeof DbConstants>('@shinefold/db/constants')),
   queries: {
-    subscribers: { unsubscribeByToken: vi.fn(), unsubscribeById: vi.fn() },
+    subscribers: { unsubscribeById: vi.fn() },
   },
 }));
 
@@ -60,9 +62,6 @@ vi.mock(
   () => ({ readNewsletterUnsubscribeSubscriberId: vi.fn() }),
 );
 
-const unsubscribeByTokenMock = vi.mocked(
-  queries.subscribers.unsubscribeByToken,
-);
 const unsubscribeByIdMock = vi.mocked(queries.subscribers.unsubscribeById);
 const readNewsletterUnsubscribeSubscriberIdMock = vi.mocked(
   readNewsletterUnsubscribeSubscriberId,
@@ -95,7 +94,7 @@ describe(GET, () => {
 
     expect(response.status).toBe(HTTP_STATUS.SEE_OTHER);
     expect(locationOf(response)).toBe(MOCK_INVALID_LOCATION);
-    expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
+    expect(unsubscribeByIdMock).not.toHaveBeenCalled();
     expect(resolveRequestTenant).not.toHaveBeenCalled();
   });
 
@@ -113,8 +112,10 @@ describe(GET, () => {
     expect(locationOf(response)).toBe(
       `${MOCK_TENANT_BASE_URL}/newsletter/unsubscribe`,
     );
-    expect(response.headers.get('cache-control')).toBe('private, no-store');
-    expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
+    expect(response.headers.get('cache-control')).toBe(
+      CACHE_CONTROL.PRIVATE_NO_STORE,
+    );
+    expect(unsubscribeByIdMock).not.toHaveBeenCalled();
     expect(resolveRequestTenant).not.toHaveBeenCalled();
   });
 
@@ -148,47 +149,39 @@ describe(POST, () => {
       routes.newsletterUnsubscribe(MOCK_UNSUBSCRIBE_TOKEN),
       HTTP_METHOD.POST,
     );
-    unsubscribeByTokenMock.mockResolvedValue(
-      toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
+    readNewsletterUnsubscribeSubscriberIdMock.mockReturnValue(
+      MOCK_SUBSCRIBER_ID,
     );
-    readNewsletterUnsubscribeSubscriberIdMock.mockReturnValue(null);
-  });
-
-  it('unsubscribes by an unsigned token and redirects to the unsubscribed page', async () => {
-    const response = await POST(request);
-
-    expect(response.status).toBe(HTTP_STATUS.SEE_OTHER);
-    expect(locationOf(response)).toBe(MOCK_UNSUBSCRIBED_LOCATION);
-    expect(unsubscribeByTokenMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      MOCK_UNSUBSCRIBE_TOKEN,
+    unsubscribeByIdMock.mockResolvedValue(
+      toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
     );
   });
 
   it('unsubscribes the subscriber a signed token names', async () => {
-    const subscriberId = faker.string.uuid();
-    readNewsletterUnsubscribeSubscriberIdMock.mockReturnValue(subscriberId);
-    unsubscribeByIdMock.mockResolvedValue(
-      toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
-    );
-
     const response = await POST(request);
 
+    expect(response.status).toBe(HTTP_STATUS.SEE_OTHER);
     expect(locationOf(response)).toBe(MOCK_UNSUBSCRIBED_LOCATION);
     expect(readNewsletterUnsubscribeSubscriberIdMock).toHaveBeenCalledWith(
       MOCK_UNSUBSCRIBE_TOKEN,
     );
     expect(unsubscribeByIdMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
-      subscriberId,
+      MOCK_SUBSCRIBER_ID,
     );
-    expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
+  });
+
+  it('sends an unsigned token to the invalid page without unsubscribing anyone', async () => {
+    readNewsletterUnsubscribeSubscriberIdMock.mockReturnValue(null);
+
+    const response = await POST(request);
+
+    expect(locationOf(response)).toBe(MOCK_INVALID_LOCATION);
+    expect(unsubscribeByIdMock).not.toHaveBeenCalled();
+    expect(resolveRequestTenant).not.toHaveBeenCalled();
   });
 
   it('sends a signed token whose subscriber is gone to the invalid page', async () => {
-    readNewsletterUnsubscribeSubscriberIdMock.mockReturnValue(
-      faker.string.uuid(),
-    );
     unsubscribeByIdMock.mockResolvedValue(
       toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND),
     );
@@ -227,8 +220,7 @@ describe(POST, () => {
     const response = await POST(toTokenlessPost());
 
     expect(locationOf(response)).toBe(MOCK_UNSUBSCRIBED_LOCATION);
-    expect(unsubscribeByTokenMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
+    expect(readNewsletterUnsubscribeSubscriberIdMock).toHaveBeenCalledWith(
       MOCK_UNSUBSCRIBE_TOKEN,
     );
     expect(clearNewsletterUnsubscribeToken).toHaveBeenCalled();
@@ -238,16 +230,7 @@ describe(POST, () => {
     const response = await POST(toTokenlessPost());
 
     expect(locationOf(response)).toBe(MOCK_INVALID_LOCATION);
-    expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
-  });
-
-  it('sends an unknown or already-used token to the invalid page', async () => {
-    unsubscribeByTokenMock.mockResolvedValue(
-      toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND),
-    );
-    const response = await POST(request);
-
-    expect(locationOf(response)).toBe(MOCK_INVALID_LOCATION);
+    expect(unsubscribeByIdMock).not.toHaveBeenCalled();
   });
 
   it.each([TENANT_STATUS.SUSPENDED, TENANT_STATUS.ARCHIVED])(
@@ -259,9 +242,9 @@ describe(POST, () => {
       const response = await POST(request);
 
       expect(locationOf(response)).toBe(MOCK_UNSUBSCRIBED_LOCATION);
-      expect(unsubscribeByTokenMock).toHaveBeenCalledWith(
+      expect(unsubscribeByIdMock).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
-        MOCK_UNSUBSCRIBE_TOKEN,
+        MOCK_SUBSCRIBER_ID,
       );
     },
   );
@@ -271,19 +254,19 @@ describe(POST, () => {
     const response = await POST(request);
 
     expect(locationOf(response)).toBe(MOCK_FAILED_LOCATION);
-    expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
+    expect(unsubscribeByIdMock).not.toHaveBeenCalled();
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      'newsletter.unsubscribe_link_tenant_unresolved',
+      NEWSLETTER_LOG.UNSUBSCRIBE_LINK_TENANT_UNRESOLVED,
     );
   });
 
   it('redirects to the failed page and logs when the db query throws', async () => {
-    unsubscribeByTokenMock.mockRejectedValue(MOCK_ERROR);
+    unsubscribeByIdMock.mockRejectedValue(MOCK_ERROR);
     const response = await POST(request);
 
     expect(locationOf(response)).toBe(MOCK_FAILED_LOCATION);
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      'newsletter.unsubscribe_link_failed',
+      NEWSLETTER_LOG.UNSUBSCRIBE_LINK_FAILED,
       { error: MOCK_ERROR },
     );
   });

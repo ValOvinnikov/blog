@@ -18,6 +18,9 @@ export const NEWSLETTER_LOG = {
   UNSUBSCRIBE_FAILED: 'newsletter.unsubscribe_failed',
   UNSUBSCRIBE_TENANT_UNRESOLVED: 'newsletter.unsubscribe_tenant_unresolved',
   UNSUBSCRIBE_KEY_MISSING: 'newsletter.unsubscribe_key_missing',
+  UNSUBSCRIBE_LINK_FAILED: 'newsletter.unsubscribe_link_failed',
+  UNSUBSCRIBE_LINK_TENANT_UNRESOLVED:
+    'newsletter.unsubscribe_link_tenant_unresolved',
   CONFIRMATION_RESEND_FAILED: 'newsletter.confirmation_resend_failed',
   RESEND_CONFIRMATION_TENANT_NOT_ACTIVE:
     'newsletter.resend_confirmation_tenant_not_active',

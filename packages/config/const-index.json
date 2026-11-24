@@ -12550,6 +12550,22 @@
         "file": "apps/web/src/constants/newsletter.ts"
       }
     ],
+    "newsletter.unsubscribe_link_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.UNSUBSCRIBE_LINK_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.unsubscribe_link_tenant_unresolved": [
+      {
+        "ref": "NEWSLETTER_LOG.UNSUBSCRIBE_LINK_TENANT_UNRESOLVED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
     "newsletter.confirmation_resend_failed": [
       {
         "ref": "NEWSLETTER_LOG.CONFIRMATION_RESEND_FAILED",
