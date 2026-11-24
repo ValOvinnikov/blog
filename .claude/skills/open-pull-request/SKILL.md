@@ -75,10 +75,10 @@ Committing is free; stop at Gates 3 and 4 and wait for the user.
    `scripts/branch-name.mjs` holds the one pattern, `<type>/<n>-<slug>` with
    a commitlint type; `main`, `dependabot/…` and the `@claude` Action's
    `claude/issue-<n>-<YYYYMMDD>-<HHMM>` are the only other names allowed.
-   `board-keeper` and `board-auto-sync.yml` read the issue from that shape.
+   `board-keeper` reads the issue from that shape.
    Creating a branch under any other name is refused at push by
    `.claude/hooks/pre-bash-branch-name-guard.sh` and `.husky/pre-push`, and
-   fails `board-auto-sync.yml`'s `branch-name` check on the PR. A branch
+   fails the `Changes` job's branch-name check on the PR. A branch
    already on the remote keeps pushing, so open PRs are unaffected.
 
    **Worktree-delegated work:** when layer subagents run in their own
@@ -126,8 +126,7 @@ gh pr create --draft --base main --head <type>/<n>-<short-slug> \
 
 1. **Dispatch `board-keeper` synchronously with `"after PR #<n>"`** — the
    issue number, not `<pr>` (`board-keeper.md` Step 1c). It confirms the
-   issue reached Code Review — `board-auto-sync.yml` has usually moved it
-   already — writes it if not, and re-verifies. This is the second
+   issue reached Code Review, writes it if not, and re-verifies. This is the second
    synchronous dispatch and also the "after PR" reconciliation of "Board reconciliation" below — don't dispatch it twice.
 2. **Tag the PR with this job's label**, so concurrent background jobs' PRs
    are tellable apart in the PR list. **Skip silently when `$CLAUDE_JOB_DIR`
@@ -404,7 +403,7 @@ Signal status the way the board tooling reads it (`board-keeper.md` Step 3):
   `git branch -m "$(pnpm -s branch:name <n> "<issue title>")"`, which the
   `SessionStart` hook prints when the branch is off the pattern. A pushed
   branch with that name is the In Progress signal. Creating a branch under any
-  other name is refused at push and fails the PR's `branch-name` check; a
+  other name is refused at push and fails the `Changes` job's branch-name check; a
   branch already on the remote keeps pushing.
 - **In review:** open the PR as a draft with the issue reference
   (`Closes #n` on the completing PR only) — an open PR, draft or not, is the
@@ -415,12 +414,10 @@ Signal status the way the board tooling reads it (`board-keeper.md` Step 3):
   the pushed branch without a checkout.
 - **Done:** the merged `Closes #n` PR is the Done signal; nothing extra.
 
-**The board updates itself from that evidence:**
-`.github/workflows/board-auto-sync.yml` moves issue `#n` to In Progress when a
-branch named for it is pushed and to Code Review when its PR opens. A cloud
-session reports the evidence it left and stops — never telling the user the
-board waits on a local `board-keeper` run, which only catches up what the
-workflow can't see (such as a generated branch name).
+**The board catches up from that evidence:** the project's built-in "linked
+pull request" workflow moves issue `#n` to Code Review when a PR linked to it
+opens, and a local `board-keeper` run sets the rest. A cloud session reports
+the evidence it left and stops.
 
 ## Deployment
 

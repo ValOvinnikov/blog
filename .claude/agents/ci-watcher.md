@@ -87,10 +87,8 @@ so never guess which PR one maps to.
      `CI` gathers every other `ci.yml` job, so a red job also turns it red.
 
    A missing name means the suite silently under-triggered. The total varies,
-   roughly 17–22: `pr-opened` and `branch-created` (`board-auto-sync.yml`)
-   appear only on the run from when the PR was opened or reopened
-   (`branch-created` as `skipping`) and drop off after the next push, and
-   `Vercel – *` checks can register after the watch returns. Report the
+   roughly 17–22, since `Vercel – *` checks can register after the watch
+   returns. Report the
    count; judge by names. Then stop.
 
 4. **Any check fails, required or not** — "not required to merge" is not

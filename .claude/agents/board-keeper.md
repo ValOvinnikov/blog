@@ -178,8 +178,7 @@ duplicate — `Done` is for completed work. GitHub's built-in "closed → Done"
 workflow fires on every close, so those closures need a follow-up write from
 `Done` to `Rejected`.
 
-`.github/scripts/sync-board-status.sh` copies all five values; change it in
-the same edit. If a live field or item query ever disagrees with this table,
+If a live field or item query ever disagrees with this table,
 trust the live query and say so loudly in your report — the table needs a
 follow-up edit.
 
