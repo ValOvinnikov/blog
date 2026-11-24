@@ -2044,6 +2044,12 @@
     "githubUnavailable": "GitHub est injoignable. Réessayez dans un instant.",
     "startFailed": "La vérification du contraste n'a pas pu être lancée."
   },
+  "deployToDevButton": {
+    "label": "Déployer en dev",
+    "starting": "Démarrage…",
+    "started": "Déploiement de développement lancé.",
+    "startFailed": "Rien n’a été lancé : le déploiement de développement n’a pas pu être déclenché."
+  },
   "releaseCard": {
     "title": "Version",
     "description": "Publiez en production le dernier commit de main.",

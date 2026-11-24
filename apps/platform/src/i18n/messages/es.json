@@ -2044,6 +2044,12 @@
     "githubUnavailable": "No se pudo conectar con GitHub. Inténtalo de nuevo en un momento.",
     "startFailed": "No se pudo iniciar la comprobación de contraste."
   },
+  "deployToDevButton": {
+    "label": "Desplegar en dev",
+    "starting": "Iniciando…",
+    "started": "Despliegue de desarrollo iniciado.",
+    "startFailed": "No se inició nada: no se pudo lanzar el despliegue de desarrollo."
+  },
   "releaseCard": {
     "title": "Versión",
     "description": "Publica en producción el último commit de main.",

@@ -2044,6 +2044,12 @@
     "githubUnavailable": "GitHub was niet bereikbaar. Probeer het zo opnieuw.",
     "startFailed": "De contrastcontrole kon niet worden gestart."
   },
+  "deployToDevButton": {
+    "label": "Uitrollen naar dev",
+    "starting": "Starten…",
+    "started": "Ontwikkelingsuitrol gestart.",
+    "startFailed": "Er is niets gestart: de ontwikkelingsuitrol kon niet worden geactiveerd."
+  },
   "releaseCard": {
     "title": "Release",
     "description": "Maak een productierelease van de nieuwste commit op main.",

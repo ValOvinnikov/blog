@@ -2044,6 +2044,12 @@
     "githubUnavailable": "GitHub war nicht erreichbar. Versuche es gleich noch einmal.",
     "startFailed": "Die Kontrastprüfung konnte nicht gestartet werden."
   },
+  "deployToDevButton": {
+    "label": "In Dev bereitstellen",
+    "starting": "Wird gestartet…",
+    "started": "Entwicklungs-Deployment gestartet.",
+    "startFailed": "Nichts wurde gestartet: Das Entwicklungs-Deployment konnte nicht ausgelöst werden."
+  },
   "releaseCard": {
     "title": "Release",
     "description": "Erstelle ein Produktions-Release des neuesten Commits auf main.",
