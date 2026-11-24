@@ -17,7 +17,7 @@ export const taxonomyCardVariants = tv({
     ],
     accessibleName: ['sr-only'],
     description: [TYPOGRAPHY[TEXT_ROLE.CARD_BODY], 'line-clamp-2'],
-    count: [TYPOGRAPHY[TEXT_ROLE.META]],
+    count: [TYPOGRAPHY[TEXT_ROLE.META], 'mt-auto'],
   },
   variants: {
     isInteractive: {
