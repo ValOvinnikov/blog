@@ -41,8 +41,6 @@ const cancelInvite = vi.mocked(adminInvites.cancelAdminInvite);
 const signInMock = vi.mocked(signIn);
 
 describe(resendAdminInviteAction, () => {
-  beforeEach(() => {});
-
   it('renews an expired invite with its own role, then emails it again', async () => {
     vi.mocked(adminInvites.listAdminInvites).mockResolvedValueOnce([
       mockAdminInviteEntry({ role: ADMIN_ROLE.SUPERADMIN }),

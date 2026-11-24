@@ -54,8 +54,6 @@ const invite = (
   inviteAdminAction({ email, role } as Parameters<typeof inviteAdminAction>[0]);
 
 describe(inviteAdminAction, () => {
-  beforeEach(() => {});
-
   it('creates, emails and audits the invite without its address', async () => {
     const result = await invite(
       ` ${MOCK_INVITED_ADMIN_EMAIL.toUpperCase()} `,
