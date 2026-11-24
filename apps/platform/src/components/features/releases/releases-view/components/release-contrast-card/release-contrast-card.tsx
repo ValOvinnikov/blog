@@ -1,5 +1,7 @@
 'use client';
 
+import { DeployToDevButton } from '@platform/components/features/releases/releases-view/components/deploy-to-dev-button/deploy-to-dev-button';
+import { RunContrastCheckButton } from '@platform/components/features/releases/releases-view/components/run-contrast-check-button/run-contrast-check-button';
 import { Card } from '@platform/components/shared/card';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -16,9 +18,6 @@ import { SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-
-import { DeployToDevButton } from '../deploy-to-dev-button/deploy-to-dev-button';
-import { RunContrastCheckButton } from '../run-contrast-check-button/run-contrast-check-button';
 
 const releaseContrastCardVariants = tv({
   slots: {

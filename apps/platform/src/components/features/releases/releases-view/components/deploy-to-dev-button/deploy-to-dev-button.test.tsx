@@ -1,4 +1,5 @@
 import { customRender, screen } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
 import { ACTION_OUTCOME } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -13,10 +14,7 @@ vi.mock('@platform/server/releases/start-dev-deploy-action', () => ({
   startDevDeployAction: startDevDeployActionMock,
 }));
 
-const DEPLOY_TO_DEV = { name: 'Deploy to dev' };
-const STARTED = 'Development deploy started.';
-const START_FAILED =
-  'Nothing was started: the development deploy could not be triggered.';
+const t = makeEnTranslator('deployToDevButton');
 
 const setup = customRender(DeployToDevButton, {});
 
@@ -24,7 +22,7 @@ describe(`<${DeployToDevButton.name}/>`, () => {
   let user: UserEvent;
 
   const deploy = async () => {
-    const deployButton = screen.getByRole('button', DEPLOY_TO_DEV);
+    const deployButton = screen.getByRole('button', { name: t('label') });
     await user.click(deployButton);
   };
 
@@ -40,7 +38,7 @@ describe(`<${DeployToDevButton.name}/>`, () => {
 
     await deploy();
 
-    const confirmation = await screen.findByText(STARTED);
+    const confirmation = await screen.findByText(t('started'));
 
     expect(startDevDeployActionMock).toHaveBeenCalledOnce();
     expect(confirmation).toBeVisible();
@@ -54,7 +52,7 @@ describe(`<${DeployToDevButton.name}/>`, () => {
 
     await deploy();
 
-    const failure = await screen.findByText(START_FAILED);
+    const failure = await screen.findByText(t('startFailed'));
 
     expect(failure).toBeVisible();
   });
@@ -65,7 +63,7 @@ describe(`<${DeployToDevButton.name}/>`, () => {
 
     await deploy();
 
-    const failure = await screen.findByText(START_FAILED);
+    const failure = await screen.findByText(t('startFailed'));
 
     expect(failure).toBeVisible();
   });
