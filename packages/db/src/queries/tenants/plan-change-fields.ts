@@ -24,8 +24,8 @@ export type TPlanChangeFields = {
 };
 
 type TGraceRule = {
-  starts: SQL;
   keeps: SQL;
+  starts: SQL;
 };
 
 const PAID_SITE_STATUSES: readonly TTenantStatus[] = [
@@ -37,26 +37,29 @@ const planType = sql.raw(tenantPlanEnum.enumName);
 
 export const isOnTrial = sql`${tenants.status} = ${TENANT_STATUS.TRIAL}`;
 
+const isInGrace = sql`${tenants.downgradeGraceStartedAt} is not null`;
+
 const FREE_GRACE_RULE: TGraceRule = {
+  keeps: isInGrace,
   starts: sql`(${tenants.plan} <> ${TENANT_PLAN.FREE}::${planType} or ${isOnTrial})`,
-  keeps: sql`true`,
 };
 
 function paidGraceRule(plan: TTenantPlan): TGraceRule {
   const { seats } = PLAN_ENTITLEMENTS[plan];
+  const isOverSeats = sql`${seatsInUse(tenants.id)} > ${seats}`;
 
   return {
-    starts: sql`(${planSeats()} > ${seats} and ${seatsInUse(tenants.id)} > ${seats})`,
-    keeps: sql`${tenants.plan} = ${plan}::${planType}`,
+    keeps: sql`(${isInGrace} and ${isOverSeats})`,
+    starts: sql`(${planSeats()} > ${seats} and ${isOverSeats})`,
   };
 }
 
 function graceField(
-  { starts, keeps }: TGraceRule,
+  { keeps, starts }: TGraceRule,
   column: SQL,
   value: SQL,
 ): SQL {
-  return sql`case when ${starts} then ${value} when ${keeps} then ${column} else null end`;
+  return sql`case when ${keeps} then ${column} when ${starts} then ${value} else null end`;
 }
 
 function graceFields(plan: TTenantPlan, now: Date) {
@@ -92,7 +95,7 @@ function graceFields(plan: TTenantPlan, now: Date) {
   };
 }
 
-// The grace starts on leaving a paid plan or a trial for Free, or for a plan with fewer seats than the site uses, and survives only a rewrite of the same plan.
+// A running grace keeps its deadline through any move that still leaves the site over its seats, and on a paid plan ends only once they fit.
 export function planChangeFields(
   plan: TTenantPlan,
   status: TTenantStatus,

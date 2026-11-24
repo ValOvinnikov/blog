@@ -5,7 +5,9 @@ import {
   TENANT_STATUS,
 } from '@shinefold/db/constants';
 import { lockMembershipsOverSeats } from '@shinefold/db/queries/memberships/lock-memberships-over-seats';
+import { endDowngradeGrace } from '@shinefold/db/queries/tenants/end-downgrade-grace';
 import * as schema from '@shinefold/db/schema';
+import { memberships } from '@shinefold/db/schema/memberships';
 import { tenants } from '@shinefold/db/schema/tenants';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
@@ -207,10 +209,32 @@ describe(setTenantPlan, () => {
       ]);
     });
 
-    it('keeps it when written Starter again', async () => {
+    it('keeps it when written Starter again while over the seats', async () => {
       await setTenantPlan(tenantId, MOVE_TO_STARTER);
 
       expect(await readGraceStart(tenantId)).toEqual(startedAt);
+    });
+
+    it('keeps its deadline and the plan it left when it moves to Free', async () => {
+      await setTenantPlan(tenantId, {
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ACTIVE,
+      });
+
+      expect(await readGrace(tenantId)).toEqual({
+        startedAt,
+        fromPlan: TENANT_PLAN.GROWTH,
+      });
+    });
+
+    it('ends it once the site fits its seats', async () => {
+      await db()
+        .delete(memberships)
+        .where(eq(memberships.role, MEMBERSHIP_ROLE.EDITOR));
+
+      await setTenantPlan(tenantId, MOVE_TO_STARTER);
+
+      expect(await readGraceStart(tenantId)).toBeNull();
     });
 
     it('ends it when the site moves back up', async () => {
@@ -223,6 +247,41 @@ describe(setTenantPlan, () => {
         startedAt: null,
         fromPlan: null,
       });
+    });
+  });
+
+  describe('a Free site in its grace paying for Starter while over its seats', () => {
+    const startedAt = daysBeforeNow(14);
+    let tenantId: string;
+
+    beforeEach(async () => {
+      ({ id: tenantId } = await insertTestTenant(db(), {
+        downgradeGraceStartedAt: startedAt,
+        downgradedFromPlan: TENANT_PLAN.GROWTH,
+      }));
+      await insertTeam(db(), tenantId, [
+        MEMBERSHIP_ROLE.OWNER,
+        MEMBERSHIP_ROLE.EDITOR,
+        MEMBERSHIP_ROLE.EDITOR,
+      ]);
+      await setTenantPlan(tenantId, MOVE_TO_STARTER);
+    });
+
+    it('keeps the grace, its deadline and the plan it left', async () => {
+      expect(await readGrace(tenantId)).toEqual({
+        startedAt,
+        fromPlan: TENANT_PLAN.GROWTH,
+      });
+    });
+
+    it("locks on day 14 only the members over Starter's seats", async () => {
+      const ended = await endDowngradeGrace(tenantId, startedAt);
+      if (!ended) throw new Error('the grace did not end');
+
+      await expect(
+        lockMembershipsOverSeats(tenantId, ended.plan, MOCK_NOW),
+      ).resolves.toBe(2);
+      expect(ended.plan).toBe(TENANT_PLAN.STARTER);
     });
   });
 
