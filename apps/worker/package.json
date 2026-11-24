@@ -25,12 +25,12 @@
     "@shinefold/insight": "workspace:*",
     "@shinefold/utils": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.11",
-    "@vercel/functions": "3.10.1",
+    "@vercel/functions": "3.11.3",
     "next": "16.4.5",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "workflow": "5.2.2",
-    "ws": "8.22.0",
+    "workflow": "5.8.0",
+    "ws": "8.23.0",
     "zod": "catalog:"
   },
   "devDependencies": {
