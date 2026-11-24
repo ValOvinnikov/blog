@@ -23,6 +23,8 @@ export const LOOK_FIELD = {
   HEADER_LAYOUT: 'headerLayout',
   HEADER_SUBMENU_STYLE: 'headerSubmenuStyle',
   HEADER_BAR_STYLE: 'headerBarStyle',
+  HEADER_BACKGROUND: 'headerBackground',
+  BREADCRUMB_BACKGROUND: 'breadcrumbBackground',
   NAV_LINK_STYLE: 'navLinkStyle',
   HEADING_WEIGHT: 'headingWeight',
   HEADING_CASE: 'headingCase',

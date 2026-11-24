@@ -61,6 +61,8 @@ export const mockSiteConfig = (
   headerLayout: HEADER_LAYOUT.CLASSIC,
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
   headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
+  headerBackground: BRAND_VARIANT.PRIMARY,
+  breadcrumbBackground: BRAND_VARIANT.PRIMARY,
   navLinkStyle: NAV_LINK_STYLE.PLAIN,
   headingWeight: HEADING_WEIGHT.MEDIUM,
   headingCase: HEADING_CASE.AS_WRITTEN,

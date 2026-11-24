@@ -9,13 +9,7 @@ type TPresetSiteConfig = { preset: TPresetId } & Pick<
   TThemeTokens,
   'accentHue' | 'headingFont' | 'bodyFont' | 'radiusScale' | 'density'
 > &
-  Omit<
-    TPresetBundle,
-    | 'themeTokens'
-    | 'featureDefaults'
-    | 'headerBackground'
-    | 'breadcrumbBackground'
-  >;
+  Omit<TPresetBundle, 'themeTokens' | 'featureDefaults'>;
 
 export function presetSiteConfig(preset: TPresetId): TPresetSiteConfig {
   const {
@@ -32,6 +26,8 @@ export function presetSiteConfig(preset: TPresetId): TPresetSiteConfig {
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
+    headerBackground,
+    breadcrumbBackground,
     navLinkStyle,
     headingWeight,
     headingCase,
@@ -62,6 +58,8 @@ export function presetSiteConfig(preset: TPresetId): TPresetSiteConfig {
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
+    headerBackground,
+    breadcrumbBackground,
     navLinkStyle,
     headingWeight,
     headingCase,
