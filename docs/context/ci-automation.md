@@ -194,7 +194,9 @@ nothing). Three things keep that from running too little:
   affected when any of them changes, so a root config, setup-action, `.nvmrc`
   or lockfile change runs every task. They also bust every task's cache — the
   price of one rule instead of per-task `inputs` that each had to remember
-  which preset they read.
+  which preset they read. `configs/**` excludes `configs/**/.turbo/**`: the
+  glob matches ignored files too, so turbo's own task logs would otherwise
+  change every hash depending on which tasks ran earlier in the job.
 - `full` from `Changes` drops `--affected` for the same paths independently,
   so a root change runs the whole repo even if turbo's own detection misses
   it, and a run with no PR base does the same.
