@@ -11,7 +11,7 @@ import type {
   TCreateSiteFieldError,
   TCreateSiteInput,
 } from '@platform/server/onboarding/create-site-input';
-import type { TMaybeUndefined } from '@shinefold/config';
+import { isAccentHueAccessible, type TMaybeUndefined } from '@shinefold/config';
 import { useEffect, useRef, useState } from 'react';
 
 import type { TOnboardingFieldErrors } from './use-onboarding-form';
@@ -68,6 +68,9 @@ export const useOnboardingSteps = ({
     (Boolean(fieldErrors.slug) ||
       addressStatus === SITE_ADDRESS_STATUS.CHECKING ||
       addressStatus === SITE_ADDRESS_STATUS.UNAVAILABLE);
+  const isLookBlocked =
+    step === ONBOARDING_STEP.LOOK && !isAccentHueAccessible(values.accentHue);
+  const isContinueDisabled = isAddressBlocked || isLookBlocked;
 
   useEffect(() => {
     if (hasNavigatedRef.current) panelRef.current?.focus();
@@ -92,7 +95,7 @@ export const useOnboardingSteps = ({
     }
 
     const hasFieldError = STEP_FIELDS[step].some((field) => fieldErrors[field]);
-    if (hasFieldError || isAddressBlocked) return;
+    if (hasFieldError || isContinueDisabled) return;
 
     const next = isEditingFromReview
       ? ONBOARDING_STEP.REVIEW
@@ -117,7 +120,7 @@ export const useOnboardingSteps = ({
     stepIndex,
     isFirstStep: stepIndex === 0,
     isLastStep: stepIndex === ONBOARDING_STEPS.length - 1,
-    isContinueDisabled: isAddressBlocked,
+    isContinueDisabled,
     panelRef,
     editStep,
     goNext,

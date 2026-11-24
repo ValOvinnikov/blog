@@ -8872,7 +8872,7 @@
         "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
-    "(width >= 85rem)": [
+    "(width >= 69rem)": [
       {
         "ref": "ONBOARDING_TIER_QUERY.FULL",
         "scope": "app:platform",

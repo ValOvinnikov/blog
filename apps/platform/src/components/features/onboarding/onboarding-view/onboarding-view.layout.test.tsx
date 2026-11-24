@@ -43,7 +43,7 @@ describe(`<${OnboardingView.name}/> layout`, () => {
     vi.restoreAllMocks();
   });
 
-  it('places the preview after the footer, outside main, from 1360px', () => {
+  it('places the preview after the footer, outside main, from 1104px', () => {
     renderInTier(FULL_TIER);
 
     const { main, nameField, preview, continueButton } = shellParts();

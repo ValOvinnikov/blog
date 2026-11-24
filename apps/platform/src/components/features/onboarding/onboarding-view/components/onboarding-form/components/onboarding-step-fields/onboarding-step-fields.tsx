@@ -12,7 +12,7 @@ export type TOnboardingStepFieldsProps = Pick<
   | 'step'
   | 'values'
   | 'fieldErrors'
-  | 'addressError'
+  | 'addressVerdict'
   | 'siteAddress'
   | 'changeField'
   | 'changeSiteType'
@@ -28,7 +28,7 @@ export const OnboardingStepFields = ({
   step,
   values,
   fieldErrors,
-  addressError,
+  addressVerdict,
   siteAddress,
   changeField,
   changeSiteType,
@@ -51,7 +51,7 @@ export const OnboardingStepFields = ({
       <AddressStepFields
         values={values}
         rootDomain={rootDomain}
-        addressError={addressError}
+        addressVerdict={addressVerdict}
         onFieldChange={changeField}
       />
     )}

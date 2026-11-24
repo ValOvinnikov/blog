@@ -72,9 +72,11 @@ export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
               />
 
               <FormSiteAddressInput
-                label={t('siteAddressLabel')}
-                hint={t('siteAddressHint')}
-                error={fieldErrorText(fieldErrors.slug)}
+                copy={{
+                  label: t('siteAddressLabel'),
+                  hint: t('siteAddressHint'),
+                  error: fieldErrorText(fieldErrors.slug),
+                }}
                 value={values.slug}
                 onChange={(value) => updateValues({ slug: value })}
                 rootDomain={rootDomain}

@@ -42,7 +42,7 @@ export const ONBOARDING_LOG = {
 
 export const ONBOARDING_TIER_QUERY = {
   RAIL: '(width >= 48rem)',
-  FULL: '(width >= 85rem)',
+  FULL: '(width >= 69rem)',
 } as const;
 
 export const ONBOARDING_PREVIEW = {

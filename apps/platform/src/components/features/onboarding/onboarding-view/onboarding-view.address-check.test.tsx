@@ -1,3 +1,4 @@
+import { ONBOARDING_SCROLL_AREA_TEST_ID } from '@platform/constants/onboarding';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
 import { act, screen } from '@platform/testing/custom-render';
@@ -70,6 +71,7 @@ describe(`<${OnboardingView.name}/>`, () => {
         );
 
         expect(available).toBeVisible();
+        expect(available).toHaveTextContent(MOCK_SITE_ADDRESS);
         expect(checkSiteAddressMock).toHaveBeenLastCalledWith(MOCK_TENANT_SLUG);
       });
 
@@ -80,12 +82,28 @@ describe(`<${OnboardingView.name}/>`, () => {
         expect(preview).not.toHaveTextContent(MOCK_PLACEHOLDER_ADDRESS);
       });
 
-      it('keeps Continue disabled while the address is checked', () => {
-        const checking = screen.getByText(ADDRESS_CHECKING);
-        const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+      describe('while the address is checked', () => {
+        let checking: HTMLElement;
 
-        expect(checking).toBeVisible();
-        expect(continueButton).toHaveAttribute('aria-disabled', 'true');
+        beforeEach(() => {
+          checking = screen.getByText(ADDRESS_CHECKING);
+        });
+
+        it('keeps Continue disabled', () => {
+          const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+
+          expect(checking).toBeVisible();
+          expect(continueButton).toHaveAttribute('aria-disabled', 'true');
+        });
+
+        it('shows the status under the address input, apart from the actions', () => {
+          const scrollArea = screen.getByTestId(ONBOARDING_SCROLL_AREA_TEST_ID);
+
+          expect(addressField.compareDocumentPosition(checking)).toBe(
+            Node.DOCUMENT_POSITION_FOLLOWING,
+          );
+          expect(scrollArea).toContainElement(checking);
+        });
       });
 
       it('keeps Continue reachable by keyboard while the address is checked', async () => {

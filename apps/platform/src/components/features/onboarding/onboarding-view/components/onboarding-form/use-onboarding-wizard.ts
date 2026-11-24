@@ -71,7 +71,6 @@ export const useOnboardingWizard = (
     ...form,
     ...steps,
     addressVerdict,
-    addressError,
     siteAddress,
     previewAddress,
     railSteps,

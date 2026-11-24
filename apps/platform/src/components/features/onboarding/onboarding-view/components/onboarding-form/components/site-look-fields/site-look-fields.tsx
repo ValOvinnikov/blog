@@ -3,9 +3,8 @@
 import { AccentSwatch } from '@platform/components/shared/accent-swatch';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { PresetPicker } from '@platform/components/shared/preset-picker';
-import { HUE_SLIDER_TRACK } from '@platform/constants/hue-slider';
 import { PRESET_PICKER_LAYOUT } from '@platform/constants/preset-picker';
-import type { TPresetId } from '@shinefold/config';
+import { isAccentHueAccessible, type TPresetId } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
@@ -25,9 +24,12 @@ export const SiteLookFields = ({
   onAccentHueChange,
 }: TSiteLookFieldsProps) => {
   const t = useTranslations('onboardingForm');
+  const tLook = useTranslations('lookForm');
   const presetLegendId = useId();
   const presetHintId = useId();
   const accentLabelId = useId();
+  const accentErrorId = useId();
+  const isAccentHueRejected = !isAccentHueAccessible(accentHue);
   const {
     preset: presetGroup,
     legend,
@@ -35,6 +37,7 @@ export const SiteLookFields = ({
     accent,
     label,
     row,
+    error,
   } = siteLookFieldsVariants();
 
   return (
@@ -62,10 +65,15 @@ export const SiteLookFields = ({
             name={{ labelledBy: accentLabelId }}
             value={accentHue}
             onChange={onAccentHueChange}
-            track={HUE_SLIDER_TRACK.RAINBOW}
+            aria-describedby={isAccentHueRejected ? accentErrorId : undefined}
           />
           <AccentSwatch hue={accentHue} />
         </div>
+        {isAccentHueRejected && (
+          <p id={accentErrorId} className={error()}>
+            {tLook('accentHueInaccessible')}
+          </p>
+        )}
       </div>
     </>
   );
