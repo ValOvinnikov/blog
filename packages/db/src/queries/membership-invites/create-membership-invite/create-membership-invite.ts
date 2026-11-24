@@ -16,10 +16,9 @@ import {
 import { and, eq, sql } from 'drizzle-orm';
 
 import {
-  membershipsCount,
-  pendingInvitesCount,
   planSeats,
   releaseInvitePastSeatLimit,
+  seatsInUse,
 } from './seat-limit';
 
 export type TCreateMembershipInviteResult =
@@ -98,7 +97,7 @@ export async function createMembershipInvite(
         .where(
           and(
             eq(tenants.id, tenantId),
-            sql`${membershipsCount(tenantId)} + ${pendingInvitesCount(tenantId)} < ${planSeats()}`,
+            sql`${seatsInUse(tenantId)} < ${planSeats()}`,
           ),
         ),
     )

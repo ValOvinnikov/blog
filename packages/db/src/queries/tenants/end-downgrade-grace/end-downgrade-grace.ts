@@ -1,10 +1,9 @@
-import { TENANT_PLAN } from '@shinefold/config/constants';
 import type { TMaybeNull } from '@shinefold/config/types';
 import { getDb } from '@shinefold/db/client';
 import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
 import { and, eq } from 'drizzle-orm';
 
-// Returns the tenant only to the one caller that ended a grace still running on Free.
+// Returns the tenant only to the one caller that ended a grace no plan change has cleared or restarted since it was read.
 export async function endDowngradeGrace(
   tenantId: string,
   graceStartedAt: Date,
@@ -21,7 +20,6 @@ export async function endDowngradeGrace(
     .where(
       and(
         eq(tenants.id, tenantId),
-        eq(tenants.plan, TENANT_PLAN.FREE),
         eq(tenants.downgradeGraceStartedAt, graceStartedAt),
       ),
     )

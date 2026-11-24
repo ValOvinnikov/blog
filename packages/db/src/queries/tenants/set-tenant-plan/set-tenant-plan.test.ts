@@ -9,6 +9,7 @@ import * as schema from '@shinefold/db/schema';
 import { tenants } from '@shinefold/db/schema/tenants';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@shinefold/db/testing/frozen-clock';
+import { mockMembershipInvite } from '@shinefold/db/testing/membership-invites/fixtures';
 import {
   countLockedMemberships,
   insertTeam,
@@ -30,18 +31,31 @@ const db = useQueryTestDb();
 useFrozenClock();
 
 afterEach(async () => {
+  await db().delete(schema.membershipInvites);
   await db().delete(schema.memberships);
   await db().delete(schema.users);
   await db().delete(schema.tenants);
 });
 
-async function readGraceStart(tenantId: string) {
+async function readGrace(tenantId: string) {
   const [row] = await db()
-    .select({ startedAt: tenants.downgradeGraceStartedAt })
+    .select({
+      startedAt: tenants.downgradeGraceStartedAt,
+      fromPlan: tenants.downgradedFromPlan,
+    })
     .from(tenants)
     .where(eq(tenants.id, tenantId));
-  return row?.startedAt;
+  return row;
 }
+
+async function readGraceStart(tenantId: string) {
+  return (await readGrace(tenantId))?.startedAt;
+}
+
+const MOVE_TO_STARTER = {
+  plan: TENANT_PLAN.STARTER,
+  status: TENANT_STATUS.ACTIVE,
+};
 
 describe(setTenantPlan, () => {
   describe('a site with members locked on Free', () => {
@@ -134,6 +148,81 @@ describe(setTenantPlan, () => {
       });
 
       expect(await readGraceStart(id)).toBeNull();
+    });
+  });
+
+  describe('a Growth site moving to Starter', () => {
+    let tenantId: string;
+
+    beforeEach(async () => {
+      ({ id: tenantId } = await insertTestTenant(db(), {
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.ACTIVE,
+      }));
+      await insertTeam(db(), tenantId, [MEMBERSHIP_ROLE.OWNER]);
+    });
+
+    it('starts the grace and records Growth when its members exceed the seats', async () => {
+      await insertTeam(db(), tenantId, [MEMBERSHIP_ROLE.EDITOR]);
+
+      await setTenantPlan(tenantId, MOVE_TO_STARTER);
+
+      expect(await readGrace(tenantId)).toEqual({
+        startedAt: MOCK_NOW,
+        fromPlan: TENANT_PLAN.GROWTH,
+      });
+    });
+
+    it('counts a pending invite as a seat', async () => {
+      await mockMembershipInvite(db(), tenantId, {
+        role: MEMBERSHIP_ROLE.EDITOR,
+      });
+
+      await setTenantPlan(tenantId, MOVE_TO_STARTER);
+
+      expect(await readGraceStart(tenantId)).toEqual(MOCK_NOW);
+    });
+
+    it('starts no grace when the site fits the seats', async () => {
+      await setTenantPlan(tenantId, MOVE_TO_STARTER);
+
+      expect(await readGraceStart(tenantId)).toBeNull();
+    });
+  });
+
+  describe('a Starter site in its grace', () => {
+    const startedAt = daysBeforeNow(3);
+    let tenantId: string;
+
+    beforeEach(async () => {
+      ({ id: tenantId } = await insertTestTenant(db(), {
+        plan: TENANT_PLAN.STARTER,
+        status: TENANT_STATUS.ACTIVE,
+        downgradeGraceStartedAt: startedAt,
+        downgradedFromPlan: TENANT_PLAN.GROWTH,
+      }));
+      await insertTeam(db(), tenantId, [
+        MEMBERSHIP_ROLE.OWNER,
+        MEMBERSHIP_ROLE.EDITOR,
+      ]);
+    });
+
+    it('keeps it when written Starter again', async () => {
+      await setTenantPlan(tenantId, MOVE_TO_STARTER);
+
+      expect(await readGraceStart(tenantId)).toEqual(startedAt);
+    });
+
+    it('ends it when the site moves back up', async () => {
+      await setTenantPlan(tenantId, {
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.ACTIVE,
+      });
+
+      expect(await readGrace(tenantId)).toEqual({
+        startedAt: null,
+        fromPlan: null,
+      });
     });
   });
 

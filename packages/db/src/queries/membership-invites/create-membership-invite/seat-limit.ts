@@ -15,7 +15,7 @@ export function planSeats(): SQL<number> {
   return sql<number>`case ${tenants.plan} ${sql.join(cases, sql` `)} end`;
 }
 
-export function membershipsCount(tenantId: SQLWrapper | string): SQL<number> {
+function membershipsCount(tenantId: SQLWrapper | string): SQL<number> {
   return sql<number>`(select count(*) from ${memberships} where ${eq(memberships.tenantId, tenantId)})`;
 }
 
@@ -25,9 +25,13 @@ export function unlockedMembershipsCount(
   return sql<number>`(select count(*) from ${memberships} where ${and(eq(memberships.tenantId, tenantId), isNull(memberships.lockedAt))})`;
 }
 
-export function pendingInvitesCount(tenantId: string): SQL<number> {
+function pendingInvitesCount(tenantId: SQLWrapper | string): SQL<number> {
   return sql<number>`(select count(*) from ${membershipInvites}
     where ${and(eq(membershipInvites.tenantId, tenantId), isNull(membershipInvites.consumedAt))})`;
+}
+
+export function seatsInUse(tenantId: SQLWrapper | string): SQL<number> {
+  return sql<number>`(${membershipsCount(tenantId)} + ${pendingInvitesCount(tenantId)})::int`;
 }
 
 // Two concurrent invites can both pass the insert's count, so each re-counts
