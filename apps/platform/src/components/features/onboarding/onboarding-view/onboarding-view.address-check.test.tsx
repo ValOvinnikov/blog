@@ -113,7 +113,7 @@ describe(`<${OnboardingView.name}/>`, () => {
       beforeEach(async () => {
         checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
         addressField = await typeAddress(user);
-        await screen.findAllByText(ADDRESS_TAKEN);
+        await screen.findAllByText(ADDRESS_TAKEN, {}, ADDRESS_CHECK_TIMEOUT);
       });
 
       it('keeps a taken address from continuing', async () => {
@@ -147,13 +147,17 @@ describe(`<${OnboardingView.name}/>`, () => {
       });
 
       it('says when the address could not be checked', async () => {
-        const unverified = await screen.findByText(ADDRESS_UNVERIFIED);
+        const unverified = await screen.findByText(
+          ADDRESS_UNVERIFIED,
+          {},
+          ADDRESS_CHECK_TIMEOUT,
+        );
 
         expect(unverified).toBeVisible();
       });
 
       it('lets the user continue when the address check fails', async () => {
-        await screen.findByText(ADDRESS_UNVERIFIED);
+        await screen.findByText(ADDRESS_UNVERIFIED, {}, ADDRESS_CHECK_TIMEOUT);
         await clickContinue(user);
 
         const heading = stepHeading(STEPS.LOOK);
