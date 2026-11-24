@@ -13,9 +13,7 @@ import type { z } from 'zod';
 
 type TSignedTenantRequestBody = { tenantId: string };
 
-export type TSignedTenantRequestHandler<
-  TBody extends TSignedTenantRequestBody,
-> = {
+type TSignedTenantRequestHandler<TBody extends TSignedTenantRequestBody> = {
   schema: z.ZodType<TBody>;
   failureEvent: string;
   refusal?: TWriteRefusalOptions;

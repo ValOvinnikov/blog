@@ -30,12 +30,15 @@ vi.mock('@shinefold/db/queries/tenants');
 
 const run = vi.fn<(body: { tenantId: string }) => Promise<Response>>();
 
-function handle(
-  request: Request = mockSignedRequest(MOCK_URL, MOCK_BODY, {
+function handle({
+  request = mockSignedRequest(MOCK_URL, MOCK_BODY, {
     secret: MOCK_ENQUEUE_SECRET,
   }),
   requiresWritableStatus = false,
-): Promise<Response> {
+}: {
+  request?: Request;
+  requiresWritableStatus?: boolean;
+} = {}): Promise<Response> {
   return handleSignedTenantRequest(request, {
     schema: tenantRequestBodySchema,
     failureEvent: MOCK_FAILURE_EVENT,
@@ -44,7 +47,7 @@ function handle(
   });
 }
 
-describe('handleSignedTenantRequest', () => {
+describe(handleSignedTenantRequest, () => {
   beforeEach(() => {
     arrangeSignedWritableTenant();
     run.mockResolvedValue(Response.json({}, { status: HTTP_STATUS.ACCEPTED }));
@@ -82,7 +85,7 @@ describe('handleSignedTenantRequest', () => {
       error: ENQUEUE_ERROR.INVALID_BODY,
     },
   ])('refuses $name', async ({ request, status, error }) => {
-    const response = await handle(request());
+    const response = await handle({ request: request() });
 
     expect(response.status).toBe(status);
     await expect(response.json()).resolves.toEqual({ error });
@@ -122,7 +125,7 @@ describe('handleSignedTenantRequest', () => {
         MOCK_SUSPENDED_WRITABLE_TENANT,
       );
 
-      const response = await handle(undefined, requiresWritableStatus);
+      const response = await handle({ requiresWritableStatus });
 
       expect(response.status).toBe(status);
     },
