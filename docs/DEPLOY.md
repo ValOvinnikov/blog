@@ -44,6 +44,15 @@ Architecture rationale lives in `SPEC.md` §13 and
 | Platform deploy           | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
 | CI gate before deploy     | `verify` job on `main`            | Full gate on the `v*` tag          |
 | Revalidation webhook      | dev → dev site                    | prod → prod site                   |
+| Function region           | `lhr1` (London)                   | `lhr1` (London)                    |
+
+> **Function region.** Every app's `vercel.json` pins its functions to
+> `lhr1`, next to Neon (`eu-west-2`). A function in another region pays a
+> transatlantic round trip on every query; in `iad1` that cost 1.2–1.7 s of
+> server time per page (#7931). Upstash KV, which only web and platform use
+> for rate limiting, belongs in `eu-west-2` too. Create a new Neon project,
+> Neon branch or Upstash database in London, or move all three regions
+> together.
 
 > **Project name vs. hostname.** The Vercel _projects_ are named `web-dev`/`web-prod` and `platform-dev`/`platform-prod`; the _hostnames_ they serve are `blog-dev.{your-hosting}` and `platform.dev.{your-hosting}` (and the apex plus `platform.{your-hosting}` in production; the old `admin-dev` host was retired on 2026-10-22). The gap is deliberate and it widened when the projects were renamed off their `blog-` prefix (#2426): the product is no longer a blog, but the hostnames are live DNS records wired into OAuth callback registrations, so renaming them is separate work with its own checklist — not a side effect of tidying project names. Both forms appear in this file on purpose: `vercel link` and the project settings use the project name, while anything you visit in a browser uses the hostname. The two Storybook projects follow the same split — `ui-library` happens to match its `ui-library.{your_hosting}` hostname, while `web-ui-library`'s intended hostname, `web-storybook.{your_hosting}`, is not attached to it yet and does not resolve.
 
