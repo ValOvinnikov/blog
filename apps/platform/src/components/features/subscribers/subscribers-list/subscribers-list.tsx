@@ -25,8 +25,7 @@ export const SubscribersList = ({ tenantId, data }: TSubscribersListProps) => {
   const { list, page, totalPages } = data;
   const { rows } = list;
   const range = toSubscribersRange(data);
-  const { wide, narrow, visuallyHidden, email, unavailable, date } =
-    subscribersListVariants();
+  const { wide, narrow, email, unavailable, date } = subscribersListVariants();
 
   return (
     <>
@@ -40,9 +39,8 @@ export const SubscribersList = ({ tenantId, data }: TSubscribersListProps) => {
             { key: 'confirmed', label: t('columnConfirmed') },
             {
               key: 'actions',
-              label: (
-                <span className={visuallyHidden()}>{t('columnActions')}</span>
-              ),
+              label: t('columnActions'),
+              isLabelHidden: true,
               width: ACTIONS_COLUMN_WIDTH,
             },
           ]}

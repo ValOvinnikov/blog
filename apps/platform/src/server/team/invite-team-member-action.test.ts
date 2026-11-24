@@ -5,10 +5,7 @@ import {
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { signIn } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import {
-  MOCK_AUTH_ERROR_URL,
-  MOCK_VERIFY_REQUEST_URL,
-} from '@platform/testing/auth/fixtures';
+import { MOCK_AUTH_ERROR_URL } from '@platform/testing/auth/fixtures';
 import { MOCK_NOT_AN_EMAIL } from '@platform/testing/data-requests/fixtures';
 import {
   mockEditorMembershipContext,
@@ -73,7 +70,6 @@ describe(inviteTeamMemberAction, () => {
         role: MEMBERSHIP_ROLE.OWNER,
       }),
     ]);
-    signInMock.mockResolvedValue(MOCK_VERIFY_REQUEST_URL);
   });
 
   it('creates and emails one editor invite, audited without the address', async () => {

@@ -5,6 +5,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const dataTableShellVariants = tv({
   slots: {
     card: ['overflow-hidden'],
+    visuallyHidden: ['sr-only'],
     scrollRegion: [
       'overflow-x-auto',
       insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE),

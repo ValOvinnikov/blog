@@ -9,6 +9,7 @@ import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-tr
 import { EVERY_PLAN_PAGE } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { studioNavItem } from '@platform/utils/studio-nav-item/studio-nav-item';
+import { superAdminNavItems } from '@platform/utils/super-admin-nav-items/super-admin-nav-items';
 import { teamNavItem } from '@platform/utils/team-nav-item/team-nav-item';
 import { ICONS, type TMaybeUndefined } from '@shinefold/config';
 import type { TAdminRole } from '@shinefold/db/constants';
@@ -33,25 +34,7 @@ export const operatorNavSections = (
         icon: ICONS.WARNING,
         href: adminRoutes.findings(),
       },
-      ...(isSuperAdmin({ role })
-        ? [
-            {
-              label: t('releases'),
-              icon: ICONS.CHECK_SHEET,
-              href: adminRoutes.releases(),
-            },
-            {
-              label: t('blockedSignups'),
-              icon: ICONS.SHIELD_CHECK,
-              href: adminRoutes.blockedSignups(),
-            },
-            {
-              label: t('dataRequests'),
-              icon: ICONS.LOCK,
-              href: adminRoutes.dataRequests(),
-            },
-          ]
-        : []),
+      ...(isSuperAdmin({ role }) ? superAdminNavItems(t) : []),
     ],
   },
 ];

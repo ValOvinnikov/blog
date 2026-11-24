@@ -44,6 +44,7 @@ type TDataTableShellColumn = {
   label: ReactNode;
   sort?: TDataTableShellColumnSort;
   width?: `${number}px` | `${number}%`;
+  isLabelHidden?: boolean;
 };
 
 type TDataTableShellProps<TItem> = {
@@ -66,14 +67,18 @@ const DataTableShellRoot = <TItem,>({
   children,
 }: TDataTableShellProps<TItem>) => {
   const hasWidths = columns.some(({ width }) => width);
-  const { card, scrollRegion, table, thead, tbody, empty } =
+  const { card, scrollRegion, table, thead, tbody, empty, visuallyHidden } =
     dataTableShellVariants({
       isStacked,
       hasWidths,
     });
+  const headLabel = ({ label, isLabelHidden }: TDataTableShellColumn) =>
+    isLabelHidden ? <span className={visuallyHidden()}>{label}</span> : label;
   const { slots } = mapCompoundSlots(children, DataTableShellSlots);
   const stackedLabels = isStacked
-    ? Object.fromEntries(columns.map(({ key, label }) => [key, label]))
+    ? Object.fromEntries(
+        columns.map((column) => [column.key, headLabel(column)]),
+      )
     : undefined;
   const stackedRole = (role: TValueOf<typeof ARIA_ROLE>) =>
     isStacked ? role : undefined;
@@ -109,11 +114,11 @@ const DataTableShellRoot = <TItem,>({
               )}
               <thead className={thead()} role={stackedRole(ARIA_ROLE.ROWGROUP)}>
                 <tr>
-                  {columns.map(({ key, label, sort }) => (
+                  {columns.map((column) => (
                     <DataTableShellHeadCell
-                      key={key}
-                      label={label}
-                      sort={sort}
+                      key={column.key}
+                      label={headLabel(column)}
+                      sort={column.sort}
                     />
                   ))}
                 </tr>

@@ -1,19 +1,15 @@
 import { itGatesToSuperAdmins } from '@platform/testing/admins/super-admin-layout-gate';
-import { mockDbConstants } from '@platform/testing/mock-db-constants';
 
 import DataRequestsLayout from './layout';
 
-const { getAdminByUserIdMock } = vi.hoisted(() => ({
-  getAdminByUserIdMock: vi.fn(),
-}));
-
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@shinefold/db', async () => ({
-  ...(await mockDbConstants()),
-  queries: { admins: { getAdminByUserId: getAdminByUserIdMock } },
-}));
+vi.mock('@shinefold/db', async () =>
+  (
+    await import('@platform/testing/admins/super-admin-gate-db')
+  ).mockSuperAdminGateDb(),
+);
 
 describe(`<${DataRequestsLayout.name}/>`, () => {
-  itGatesToSuperAdmins(DataRequestsLayout, getAdminByUserIdMock);
+  itGatesToSuperAdmins(DataRequestsLayout);
 });

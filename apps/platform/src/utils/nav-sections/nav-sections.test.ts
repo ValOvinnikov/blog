@@ -22,7 +22,12 @@ import {
   tenantNavSections,
 } from './nav-sections';
 
-const SUPERADMIN_ONLY_KEYS = ['releases', 'blockedSignups', 'dataRequests'];
+const SUPERADMIN_ONLY_KEYS = [
+  'releases',
+  'blockedSignups',
+  'dataRequests',
+  'admins',
+];
 
 describe(operatorNavSections, () => {
   it('lists the Platform pages in order for a SUPERADMIN, with no Add tenant row', () => {
@@ -48,6 +53,7 @@ describe(operatorNavSections, () => {
     ['releases', adminRoutes.releases()],
     ['blockedSignups', adminRoutes.blockedSignups()],
     ['dataRequests', adminRoutes.dataRequests()],
+    ['admins', adminRoutes.admins()],
   ])('links %s to its page for a SUPERADMIN', (key, href) => {
     const [platform] = operatorNavSections(t, ADMIN_ROLE.SUPERADMIN);
 

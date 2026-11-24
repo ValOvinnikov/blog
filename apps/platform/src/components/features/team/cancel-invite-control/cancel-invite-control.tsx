@@ -2,8 +2,9 @@
 
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import type { TTeamRefusal } from '@platform/constants/team-access';
 import { cancelTeamInviteAction } from '@platform/server/team/cancel-team-invite-action';
-import { useTeamRowAction } from '@platform/utils/use-team-row-action/use-team-row-action';
+import { useRowAction } from '@platform/utils/use-row-action/use-row-action';
 import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
@@ -21,7 +22,7 @@ export const CancelInviteControl = ({
   returnFocusId,
 }: TCancelInviteControlProps) => {
   const t = useTranslations('teamPage.cancelInvite');
-  const { onConfirm, onConfirmed } = useTeamRowAction({
+  const { onConfirm, onConfirmed } = useRowAction<TTeamRefusal>({
     done: t('done', { email }),
     gone: t('gone'),
     failed: t('failed'),

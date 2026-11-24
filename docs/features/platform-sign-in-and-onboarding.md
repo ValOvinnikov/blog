@@ -346,7 +346,11 @@ site as a 14-day Growth trial, with no card.
 
 - Operator access is decided by an `admins` row after sign-in, never by a
   separate sign-in. The first admin is granted by hand with
-  `pnpm --filter @shinefold/db db:seed-admin`.
+  `pnpm --filter @shinefold/db db:seed-admin`; later ones are invited from
+  the Admins page. The invite is a magic-link send to the invited address:
+  while it holds an unexpired admin invite, the link goes out as the admin
+  invite email, naming the inviter and the role, and signing in from it
+  turns the invite into an `admins` row.
 - Self-serve starts every site as a Growth trial, one Free or trial site per
   user at a time. Wizard,
   card and email copy is fixed platform copy, not [Voice](./voice.md).

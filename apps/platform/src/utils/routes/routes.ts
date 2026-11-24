@@ -49,6 +49,7 @@ export const adminRoutes = {
   releases: () => '/releases',
   blockedSignups: () => '/blocked-signups',
   dataRequests: () => '/data-requests',
+  admins: () => '/admins',
   tenantOverview: (tenantId: string) => `/tenants/${tenantId}`,
   tenantProvisioning: (tenantId: string) => `/tenants/${tenantId}/provisioning`,
   tenantDanger: (tenantId: string) => `/tenants/${tenantId}/danger`,

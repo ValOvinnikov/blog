@@ -24,6 +24,7 @@
     "leads": "Contactos",
     "releases": "Versiones",
     "blockedSignupsPage": "Registros bloqueados",
+    "adminsPage": "Administradores",
     "dataRequestsPage": "Solicitudes de datos",
     "signUpTitle": "Crear una cuenta",
     "onboarding": "Crear tu sitio",
@@ -248,6 +249,7 @@
       "STALLED": "Requiere atención"
     },
     "blockedSignups": "Registros bloqueados",
+    "admins": "Administradores",
     "dataRequests": "Solicitudes de datos",
     "collapsedStatusTooltip": "{label} · {status}",
     "supportSectionLabel": "Soporte",
@@ -2885,5 +2887,87 @@
       "gone": "Esa invitación ya no está pendiente.",
       "failed": "No se pudo cancelar la invitación. Inténtalo de nuevo."
     }
+  },
+  "adminsView": {
+    "title": "Administradores",
+    "description": "Las personas que gestionan toda la plataforma. Invita a alguien por correo, reenvía o cancela una invitación, o elimina a un administrador."
+  },
+  "inviteAdminCard": {
+    "title": "Invitar a un administrador",
+    "supportingText": "Recibirá un correo con un enlace de inicio de sesión. La invitación dura {days, plural, one {# día} other {# días}}.",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "nombre@example.com",
+    "roleLabel": "Rol",
+    "roleHint": "Un superadministrador también puede gestionar administradores, versiones, registros bloqueados y solicitudes de datos.",
+    "send": "Enviar invitación",
+    "sending": "Enviando…",
+    "sent": "Invitación enviada a {email}.",
+    "sendFailed": "No se pudo enviar el correo de invitación, así que no se guardó ninguna invitación. Inténtalo de nuevo.",
+    "fieldError": {
+      "EMAIL_INVALID": "Introduce una dirección de correo válida.",
+      "ROLE_INVALID": "Elige Administrador o Superadministrador.",
+      "ALREADY_ADMIN": "{email} ya es administrador."
+    }
+  },
+  "adminsTable": {
+    "title": "Administradores",
+    "count": "{count, plural, one {# administrador} other {# administradores}}",
+    "empty": "Aún no hay administradores.",
+    "columnName": "Nombre",
+    "columnEmail": "Correo electrónico",
+    "columnRole": "Rol",
+    "columnGranted": "Concedido",
+    "columnActions": "Acciones",
+    "noName": "Sin nombre",
+    "noEmail": "Sin correo",
+    "you": "(tú)"
+  },
+  "adminInvitesTable": {
+    "title": "Invitaciones",
+    "count": "{count, plural, one {# invitación} other {# invitaciones}}",
+    "supportingText": "Una invitación caducada no concede nada hasta que la reenvíes.",
+    "empty": "No hay invitaciones.",
+    "columnEmail": "Correo electrónico",
+    "columnRole": "Rol",
+    "columnInvited": "Invitado",
+    "columnStatus": "Estado",
+    "columnActions": "Acciones",
+    "statusPending": "Pendiente",
+    "statusExpired": "Caducada"
+  },
+  "removeAdminControl": {
+    "trigger": "Eliminar",
+    "triggerAriaLabel": "Eliminar a {name}",
+    "title": "¿Eliminar a {name} como administrador?",
+    "description": "Pierde el acceso a la plataforma al instante. Puedes volver a invitarle más tarde.",
+    "keep": "Mantener administrador",
+    "confirm": "Eliminar administrador",
+    "confirming": "Eliminando…",
+    "done": "Se eliminó a {name}.",
+    "gone": "{name} ya no es administrador.",
+    "failed": "No se pudo eliminar a {name}; inténtalo de nuevo.",
+    "self": "No puedes eliminarte a ti mismo.",
+    "lastSuperAdmin": "Es el último superadministrador, así que no se puede eliminar."
+  },
+  "cancelAdminInviteControl": {
+    "trigger": "Cancelar",
+    "triggerAriaLabel": "Cancelar la invitación a {email}",
+    "title": "¿Cancelar la invitación a {email}?",
+    "description": "Iniciar sesión con esa dirección ya no concede acceso de administrador. Puedes volver a invitarle más tarde.",
+    "keep": "Mantener invitación",
+    "confirm": "Cancelar invitación",
+    "confirming": "Cancelando…",
+    "done": "Se canceló la invitación a {email}.",
+    "gone": "Esa invitación ya no está pendiente.",
+    "failed": "No se pudo cancelar la invitación; inténtalo de nuevo."
+  },
+  "resendAdminInviteControl": {
+    "trigger": "Reenviar",
+    "triggerAriaLabel": "Reenviar la invitación a {email}",
+    "sending": "Enviando…",
+    "done": "Invitación reenviada a {email}. Ahora dura {days, plural, one {# día} other {# días}} más.",
+    "gone": "Esa invitación ya no está pendiente.",
+    "alreadyAdmin": "{email} ya es administrador.",
+    "failed": "No se pudo enviar la invitación a {email}; inténtalo de nuevo."
   }
 }
