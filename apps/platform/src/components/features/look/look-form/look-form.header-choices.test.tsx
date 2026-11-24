@@ -1,6 +1,6 @@
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { within } from '@platform/testing/custom-render';
+import { screen, within } from '@platform/testing/custom-render';
 import { HEADER_LAYOUT_LABEL } from '@platform/testing/look/look-form-fixtures';
 import {
   chooseOption,
@@ -14,7 +14,10 @@ import {
 } from '@platform/testing/look/look-form-save';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { UNSAVED_CHANGES } from '@platform/testing/render-in-settings-form';
+import { MOCK_LOGO_DARK_URL } from '@platform/testing/site-config/fixtures';
+import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
+  BRAND_VARIANT,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
@@ -70,6 +73,18 @@ describe(`<${LookForm.name}/>`, () => {
         option: LOOK_FORM.navLinkStyleOptionLabel.SOFT,
         saved: { navLinkStyle: NAV_LINK_STYLE.SOFT },
       },
+      {
+        row: LOOK_ROW.HEADER,
+        group: LOOK_FORM.headerBackgroundLabel,
+        option: LOOK_FORM.skinLabel.INK,
+        saved: { headerBackground: BRAND_VARIANT.INK },
+      },
+      {
+        row: LOOK_ROW.HEADER,
+        group: LOOK_FORM.breadcrumbBackgroundLabel,
+        option: LOOK_FORM.skinLabel.BRAND_PRIMARY,
+        saved: { breadcrumbBackground: BRAND_VARIANT.BRAND_PRIMARY },
+      },
     ])('saves the chosen $group style', (style) =>
       saveChosenStyle(user, style),
     );
@@ -106,6 +121,31 @@ describe(`<${LookForm.name}/>`, () => {
       );
       expect(headerDot).toBeInTheDocument();
       expect(shapeDot).not.toBeInTheDocument();
+    });
+  });
+
+  describe('the Background field', () => {
+    it('shows the dark-logo hint under Ink while the site has no dark-mode logo', async () => {
+      setupLookForm();
+      await openLookRow(user, LOOK_ROW.HEADER);
+
+      const note = screen.getByText(LOOK_FORM.headerBackgroundDarkLogoNote);
+
+      expect(note).toBeVisible();
+    });
+
+    it('shows no dark-logo hint once the site has a dark-mode logo', async () => {
+      setupLookForm({
+        initialValues: {
+          ...defaultLookFormValues(),
+          logoDark: { url: MOCK_LOGO_DARK_URL },
+        },
+      });
+      await openLookRow(user, LOOK_ROW.HEADER);
+
+      const note = screen.queryByText(LOOK_FORM.headerBackgroundDarkLogoNote);
+
+      expect(note).not.toBeInTheDocument();
     });
   });
 });

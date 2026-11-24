@@ -24,6 +24,18 @@ export const useHeaderDraftFields = () => {
         t(`headerBarStyleOptionLabel.${headerBarStyle}`),
     },
     {
+      id: 'headerBackground',
+      label: t('headerBackgroundLabel'),
+      display: ({ headerBackground }: TLookFormValues) =>
+        t(`skinLabel.${headerBackground}`),
+    },
+    {
+      id: 'breadcrumbBackground',
+      label: t('breadcrumbBackgroundLabel'),
+      display: ({ breadcrumbBackground }: TLookFormValues) =>
+        t(`skinLabel.${breadcrumbBackground}`),
+    },
+    {
       id: 'navLinkStyle',
       label: t('navLinkStyleLabel'),
       display: ({ navLinkStyle }: TLookFormValues) =>

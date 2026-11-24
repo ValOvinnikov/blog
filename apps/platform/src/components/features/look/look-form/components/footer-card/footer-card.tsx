@@ -1,8 +1,8 @@
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import {
-  FooterBackgroundGlyph,
   toLookGlyphOptions,
+  toSkinSwatchOptions,
 } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
@@ -11,7 +11,6 @@ import { SegmentedControl } from '@platform/components/shared/segmented-control'
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import {
-  BRAND_VARIANT,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
   type TBrandVariant,
@@ -44,13 +43,9 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
     FOOTER_LAYOUT,
     (layout) => t(`footerLayoutOptionLabel.${layout}`),
   );
-  const backgroundOptions = Object.values(BRAND_VARIANT).map((background) => ({
-    value: background,
-    label: t(`skinLabel.${background}`),
-    glyph: (
-      <FooterBackgroundGlyph background={background} accentHue={accentHue} />
-    ),
-  }));
+  const backgroundOptions = toSkinSwatchOptions(accentHue, (skin) =>
+    t(`skinLabel.${skin}`),
+  );
   const surfaceOptions = toLookGlyphOptions(
     'footerSurface',
     FOOTER_SURFACE,

@@ -14,5 +14,6 @@ export const getHeaderStyle = async (
     layout: row?.headerLayout ?? preset.headerLayout,
     submenuStyle: row?.headerSubmenuStyle ?? preset.headerSubmenuStyle,
     barStyle: row?.headerBarStyle ?? preset.headerBarStyle,
+    background: row?.headerBackground ?? preset.headerBackground,
   };
 };

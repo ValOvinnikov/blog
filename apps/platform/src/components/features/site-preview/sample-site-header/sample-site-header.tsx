@@ -44,7 +44,7 @@ export const SampleSiteHeader = ({
   isSubmenuOpen,
   shouldAlwaysShowLanguageSwitcher = false,
 }: TSampleSiteHeaderProps) => {
-  const { layout, submenuStyle, barStyle, account } = header;
+  const { layout, submenuStyle, barStyle, background, account } = header;
   const { root, full, bar, group, links, controls } = sampleSiteHeaderVariants({
     barStyle,
     layout,
@@ -55,6 +55,7 @@ export const SampleSiteHeader = ({
   return (
     <header
       className={root()}
+      data-skin={background}
       data-testid={SAMPLE_HEADER_TEST_ID}
       data-part={SAMPLE_PART.HEADER}
       {...{

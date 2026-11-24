@@ -46,6 +46,8 @@ export type TLookFormValues = {
   headerLayout: THeaderLayout;
   headerSubmenuStyle: THeaderSubmenuStyle;
   headerBarStyle: THeaderBarStyle;
+  headerBackground: TBrandVariant;
+  breadcrumbBackground: TBrandVariant;
   navLinkStyle: TNavLinkStyle;
   headingWeight: THeadingWeight;
   headingCase: THeadingCase;

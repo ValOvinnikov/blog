@@ -1,4 +1,5 @@
 import {
+  BRAND_VARIANT,
   HEADER_BAR_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
@@ -35,12 +36,13 @@ describe(getHeaderStyle, () => {
     getSiteConfigMock.mockReset();
   });
 
-  it("returns the tenant's saved layout, sub-menu style and bar", async () => {
+  it("returns the tenant's saved layout, sub-menu style, bar and background", async () => {
     getSiteConfigMock.mockResolvedValue(
       mockSiteConfig({
         headerLayout: HEADER_LAYOUT.TWO_ROWS,
         headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
         headerBarStyle: HEADER_BAR_STYLE.FLOATING,
+        headerBackground: BRAND_VARIANT.INK,
       }),
     );
 
@@ -48,10 +50,11 @@ describe(getHeaderStyle, () => {
       layout: HEADER_LAYOUT.TWO_ROWS,
       submenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
       barStyle: HEADER_BAR_STYLE.FLOATING,
+      background: BRAND_VARIANT.INK,
     });
   });
 
-  it('falls back to Classic, Dropdown and Full width when the tenant has no site config', async () => {
+  it('falls back to the preset header when the tenant has no site config', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await expect(getHeaderStyle(MOCK_TENANT_ID)).resolves.toEqual(
@@ -64,7 +67,7 @@ describe(getHeaderStyle, () => {
       getSiteConfigMock.mockRejectedValue(MOCK_ERROR);
     });
 
-    it('falls back to Classic, Dropdown and Full width', async () => {
+    it('falls back to the preset header', async () => {
       await expect(getHeaderStyle(MOCK_TENANT_ID)).resolves.toEqual(
         MOCK_HEADER_STYLE,
       );

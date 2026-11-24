@@ -13,13 +13,13 @@ export const sampleSiteHeaderVariants = tv({
   variants: {
     barStyle: {
       [HEADER_BAR_STYLE.FULL_WIDTH]: {
-        root: ['border-b border-border bg-primary'],
+        root: ['border-b border-divider bg-ambient text-text'],
         full: ['min-h-18 px-8'],
         bar: ['px-4 @[40rem]:px-8'],
       },
       [HEADER_BAR_STYLE.FLOATING]: {
         root: [
-          'mx-3 mt-3 rounded-card border border-border bg-primary px-3 py-2.5 shadow-float',
+          'mx-3 mt-3 rounded-card border border-divider bg-ambient px-3 py-2.5 text-text shadow-float',
         ],
         full: ['min-h-14'],
       },

@@ -29,6 +29,7 @@ import {
   SAMPLE_PART,
   SAMPLE_PART_ATTRIBUTE,
 } from '@platform/constants/sample-part';
+import { SKIN_ATTRIBUTE } from '@platform/constants/site-theme-frame';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_CURRENT, ARIA_EXPANDED } from '@platform/testing/aria';
@@ -81,7 +82,6 @@ const MOCK_LOGO_URL = faker.image.url();
 const CURRENT_LANGUAGE_TEST_ID = 'sample-language-code-current';
 const HARBOUR_NOTES = 'harbour notes';
 const HARBOUR_NOTES_INITIAL = 'H';
-const SKIN_ATTRIBUTE = 'data-skin';
 const SKINS = objectKeys(SKIN_REGISTRY);
 const SUBSCRIBE_BUTTONS_OUTSIDE_BANDS = 3;
 

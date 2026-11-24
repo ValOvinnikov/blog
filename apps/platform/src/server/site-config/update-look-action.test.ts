@@ -127,6 +127,8 @@ const VALID_INPUT: TUpdateLookInput = {
   headerLayout: HEADER_LAYOUT.TWO_ROWS,
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
   headerBarStyle: HEADER_BAR_STYLE.FLOATING,
+  headerBackground: BRAND_VARIANT.INK,
+  breadcrumbBackground: BRAND_VARIANT.SECONDARY,
   navLinkStyle: NAV_LINK_STYLE.UNDERLINE,
   headingWeight: HEADING_WEIGHT.BOLD,
   headingCase: HEADING_CASE.UPPERCASE,

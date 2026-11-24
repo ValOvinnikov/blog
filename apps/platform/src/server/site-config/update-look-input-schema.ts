@@ -49,6 +49,8 @@ export const updateLookInputSchema = z.object({
   headerLayout: z.enum(HEADER_LAYOUT),
   headerSubmenuStyle: z.enum(HEADER_SUBMENU_STYLE),
   headerBarStyle: z.enum(HEADER_BAR_STYLE),
+  headerBackground: z.enum(BRAND_VARIANT),
+  breadcrumbBackground: z.enum(BRAND_VARIANT),
   navLinkStyle: z.enum(NAV_LINK_STYLE),
   headingWeight: z.enum(HEADING_WEIGHT),
   headingCase: z.enum(HEADING_CASE),

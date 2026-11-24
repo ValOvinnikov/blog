@@ -17,6 +17,8 @@ export const toUpdateLookInput = (
   headerLayout: values.headerLayout,
   headerSubmenuStyle: values.headerSubmenuStyle,
   headerBarStyle: values.headerBarStyle,
+  headerBackground: values.headerBackground,
+  breadcrumbBackground: values.breadcrumbBackground,
   navLinkStyle: values.navLinkStyle,
   headingWeight: values.headingWeight,
   headingCase: values.headingCase,

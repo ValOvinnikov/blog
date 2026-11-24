@@ -3,7 +3,6 @@ import { BAR_BACKGROUNDS_LOG } from '@web/constants/bar-backgrounds';
 import { getSiteConfigWithPreset } from '@web/server/site-config/get-site-config-with-preset/get-site-config-with-preset';
 
 export type TBarBackgrounds = {
-  header: TBrandVariant;
   breadcrumb: TBrandVariant;
 };
 
@@ -16,7 +15,6 @@ export const getBarBackgrounds = async (
   );
 
   return {
-    header: row?.headerBackground ?? preset.headerBackground,
     breadcrumb: row?.breadcrumbBackground ?? preset.breadcrumbBackground,
   };
 };

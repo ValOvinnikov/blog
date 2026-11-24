@@ -943,6 +943,11 @@
     },
     "headerBarStyleLabel": "Barre",
     "headerBarStyleDescription": "Si la barre occupe toute la largeur de la page ou flotte au-dessus comme une carte.",
+    "headerBackgroundLabel": "Arrière-plan",
+    "headerBackgroundDescription": "La couleur de l’en-tête et des menus et panneaux qui s’ouvrent depuis celui-ci. Chacune suit le thème clair ou sombre du lecteur.",
+    "headerBackgroundDarkLogoNote": "Encre affiche l’en-tête en sombre : votre logo a donc besoin d’une version pour le mode sombre. Ajoutez-la dans Marque.",
+    "breadcrumbBackgroundLabel": "Arrière-plan du fil d’Ariane",
+    "breadcrumbBackgroundDescription": "La couleur du fil d’Ariane sous l’en-tête, sur les articles, les étiquettes, les thèmes et les pages d’accueil. Chacune suit le thème clair ou sombre du lecteur.",
     "headerBarStyleOptionLabel": {
       "FULL_WIDTH": "Pleine largeur",
       "FLOATING": "Flottante"
@@ -2682,6 +2687,8 @@
       "headerLayout": "Disposition de l'en-tête",
       "headerSubmenuStyle": "Sous-menus de l'en-tête",
       "headerBarStyle": "Barre de l'en-tête",
+      "headerBackground": "Arrière-plan de l'en-tête",
+      "breadcrumbBackground": "Arrière-plan du fil d'Ariane",
       "navLinkStyle": "Liens de navigation",
       "headingWeight": "Graisse des titres",
       "headingCase": "Casse des titres",

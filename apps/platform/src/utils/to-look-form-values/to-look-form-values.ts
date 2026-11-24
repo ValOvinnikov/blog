@@ -22,6 +22,8 @@ export const toLookFormValues = (
     headerLayout: siteConfig.headerLayout,
     headerSubmenuStyle: siteConfig.headerSubmenuStyle,
     headerBarStyle: siteConfig.headerBarStyle,
+    headerBackground: siteConfig.headerBackground,
+    breadcrumbBackground: siteConfig.breadcrumbBackground,
     navLinkStyle: siteConfig.navLinkStyle,
     headingWeight: siteConfig.headingWeight,
     headingCase: siteConfig.headingCase,

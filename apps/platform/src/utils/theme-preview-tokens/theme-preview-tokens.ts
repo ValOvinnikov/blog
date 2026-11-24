@@ -1,6 +1,7 @@
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import {
   buildShapePreviewTokens,
+  buildSkinScopeOverrideTokens,
   type TShapePreviewValues,
 } from '@platform/utils/shape-preview-tokens/shape-preview-tokens';
 import {
@@ -15,6 +16,7 @@ import {
   LOGO_RAMP_LIGHT,
   type TFontChoice,
   type TMaybeUndefined,
+  type TThemeDeclarations,
 } from '@shinefold/config';
 import type { CSSProperties } from 'react';
 
@@ -52,6 +54,7 @@ export type TSitePreviewThemeValues = TThemePreviewValues & {
 
 export type TSitePreviewTheme = {
   tokenStyle: CSSProperties;
+  skinScopeTokens: TMaybeUndefined<TThemeDeclarations>;
   isDark: boolean;
   headingFontFamily: string;
   bodyFontFamily: string;
@@ -62,6 +65,7 @@ export const buildSitePreviewTheme = (
   isDark: boolean,
 ): TSitePreviewTheme => ({
   tokenStyle: buildThemePreviewStyle(values, isDark),
+  skinScopeTokens: buildSkinScopeOverrideTokens(values),
   isDark,
   headingFontFamily: FONT_OPTIONS[values.headingFont].fontFamily,
   bodyFontFamily: FONT_OPTIONS[values.bodyFont].fontFamily,

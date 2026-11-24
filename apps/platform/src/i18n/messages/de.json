@@ -943,6 +943,11 @@
     },
     "headerBarStyleLabel": "Leiste",
     "headerBarStyleDescription": "Ob die Leiste die ganze Seite überspannt oder als Karte darüber schwebt.",
+    "headerBackgroundLabel": "Hintergrund",
+    "headerBackgroundDescription": "Die Farbe der Kopfzeile und der Menüs und Bereiche, die sich daraus öffnen. Jede folgt dem hellen oder dunklen Design der Leser.",
+    "headerBackgroundDarkLogoNote": "Tinte stellt die Kopfzeile dunkel dar, daher braucht Ihr Logo eine Version für den dunklen Modus. Fügen Sie sie unter Marke hinzu.",
+    "breadcrumbBackgroundLabel": "Hintergrund der Brotkrumen",
+    "breadcrumbBackgroundDescription": "Die Farbe der Brotkrumenleiste unter der Kopfzeile, auf Beiträgen, Schlagwörtern, Themen und Landingpages. Jede folgt dem hellen oder dunklen Design der Leser.",
     "headerBarStyleOptionLabel": {
       "FULL_WIDTH": "Volle Breite",
       "FLOATING": "Schwebend"
@@ -2682,6 +2687,8 @@
       "headerLayout": "Header-Layout",
       "headerSubmenuStyle": "Header-Untermenüs",
       "headerBarStyle": "Header-Leiste",
+      "headerBackground": "Header-Hintergrund",
+      "breadcrumbBackground": "Hintergrund der Brotkrumen",
       "navLinkStyle": "Navigationslinks",
       "headingWeight": "Überschriftenstärke",
       "headingCase": "Schreibweise der Überschriften",
