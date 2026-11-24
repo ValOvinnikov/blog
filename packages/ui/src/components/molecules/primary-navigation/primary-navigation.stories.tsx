@@ -54,6 +54,16 @@ const closedToggle = {
 
 const openToggle = { ...closedToggle, isOpen: true };
 
+const barAndPanelActions = [
+  <PrimaryNavigation.Actions key="actions">
+    <button type="button">Account</button>
+  </PrimaryNavigation.Actions>,
+  <PrimaryNavigation.PanelActions key="panel-actions">
+    <button type="button">EN</button>
+    <button type="button">Toggle theme</button>
+  </PrimaryNavigation.PanelActions>,
+];
+
 const meta = {
   title: 'Molecules/PrimaryNavigation',
   component: PrimaryNavigation,
@@ -91,14 +101,7 @@ export const WithExternalLink: TStory = {
   },
 };
 
-// The `mobileToggle` collapse is driven by real `lg:` media-query variants
-// (see primary-navigation-variants.ts), not a container query — a wrapping
-// element's width has no effect on which rules match, only the actual
-// canvas/viewport width does. `globals: { viewport: 'phone' }` (the
-// Storybook 10 replacement for the removed `parameters.viewport.
-// defaultViewport`) is the only way to default these stories to a width
-// under `lg` so the collapsed state is what actually renders — an
-// intentional, narrow exception to not overriding viewport per story.
+// The collapse uses `lg:` media queries, so these stories default to the phone viewport to render collapsed.
 export const MobileClosed: TStory = {
   globals: { viewport: 'phone' },
   args: {
@@ -116,15 +119,7 @@ export const MobileOpen: TStory = {
 export const MobileOpenWithPanelActions: TStory = {
   globals: { viewport: 'phone' },
   args: {
-    children: [
-      <PrimaryNavigation.Actions key="actions">
-        <button type="button">Account</button>
-      </PrimaryNavigation.Actions>,
-      <PrimaryNavigation.PanelActions key="panel-actions">
-        <button type="button">EN</button>
-        <button type="button">Toggle theme</button>
-      </PrimaryNavigation.PanelActions>,
-    ],
+    children: barAndPanelActions,
     mobileToggle: openToggle,
   },
 };
@@ -133,13 +128,7 @@ export const MobileOpenWithDrawerActions: TStory = {
   globals: { viewport: 'phone' },
   args: {
     children: [
-      <PrimaryNavigation.Actions key="actions">
-        <button type="button">Account</button>
-      </PrimaryNavigation.Actions>,
-      <PrimaryNavigation.PanelActions key="panel-actions">
-        <button type="button">EN</button>
-        <button type="button">Toggle theme</button>
-      </PrimaryNavigation.PanelActions>,
+      ...barAndPanelActions,
       <PrimaryNavigation.DrawerActions key="drawer-actions">
         <button type="button">Sign in</button>
       </PrimaryNavigation.DrawerActions>,
@@ -150,15 +139,7 @@ export const MobileOpenWithDrawerActions: TStory = {
 
 export const DesktopWithBothActions: TStory = {
   args: {
-    children: [
-      <PrimaryNavigation.Actions key="actions">
-        <button type="button">Account</button>
-      </PrimaryNavigation.Actions>,
-      <PrimaryNavigation.PanelActions key="panel-actions">
-        <button type="button">EN</button>
-        <button type="button">Toggle theme</button>
-      </PrimaryNavigation.PanelActions>,
-    ],
+    children: barAndPanelActions,
     mobileToggle: closedToggle,
   },
 };

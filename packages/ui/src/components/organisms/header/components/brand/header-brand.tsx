@@ -8,7 +8,7 @@ export type THeaderBrandProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** The brand/logo slot in the site `Header`; a styled `<span>` you place the logo or wordmark in. */
+/** Holds the site's logo or wordmark at the leading end of the header. */
 export const HeaderBrand = ({
   className,
   dataTestId,
