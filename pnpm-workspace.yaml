@@ -26,8 +26,6 @@ overrides:
   fast-uri: '>=3.1.5'
   '@codemirror/state': '6.7.6'
   '@codemirror/view': '6.43.13'
-  '@workflow/core>@vercel/functions': '3.10.1'
-  '@workflow/world-vercel>@vercel/functions': '3.10.1'
 
 ignoredOptionalDependencies:
   - nodemailer
@@ -39,3 +37,22 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+
+minimumReleaseAgeExclude:
+  - '@workflow/astro@5.0.15'
+  - '@workflow/builders@5.1.6'
+  - '@workflow/cli@5.3.3'
+  - '@workflow/core@5.8.0'
+  - '@workflow/errors@5.2.0'
+  - '@workflow/nest@5.1.13'
+  - '@workflow/next@5.1.6'
+  - '@workflow/nitro@5.0.15'
+  - '@workflow/nuxt@5.0.15'
+  - '@workflow/rollup@5.0.15'
+  - '@workflow/sveltekit@5.0.15'
+  - '@workflow/vite@5.0.15'
+  - '@workflow/web@5.3.3'
+  - '@workflow/world-local@5.6.0'
+  - '@workflow/world-vercel@5.8.0'
+  - '@workflow/world@5.4.0'
+  - workflow@5.8.0
