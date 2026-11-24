@@ -2686,6 +2686,8 @@
       "headerLayout": "Header layout",
       "headerSubmenuStyle": "Header sub-menus",
       "headerBarStyle": "Header bar",
+      "headerBackground": "Header background",
+      "breadcrumbBackground": "Breadcrumb background",
       "navLinkStyle": "Navigation links",
       "headingWeight": "Heading weight",
       "headingCase": "Heading case",

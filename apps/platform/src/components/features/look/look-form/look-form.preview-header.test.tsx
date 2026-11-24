@@ -13,6 +13,7 @@ import {
   SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
   SAMPLE_HEADER_TEST_ID,
 } from '@platform/constants/sample-header';
+import { SKIN_ATTRIBUTE } from '@platform/constants/site-theme-frame';
 import messages from '@platform/i18n/messages/en.json';
 import { screen, within } from '@platform/testing/custom-render';
 import {
@@ -25,7 +26,6 @@ import {
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
-import { SKIN_ATTRIBUTE } from '@platform/testing/skin';
 import {
   BRAND_VARIANT,
   FOOTER_LAYOUT,

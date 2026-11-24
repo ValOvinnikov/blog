@@ -2686,6 +2686,8 @@
       "headerLayout": "Headerindeling",
       "headerSubmenuStyle": "Submenu’s van de header",
       "headerBarStyle": "Headerbalk",
+      "headerBackground": "Achtergrond van de header",
+      "breadcrumbBackground": "Achtergrond kruimelpad",
       "navLinkStyle": "Navigatielinks",
       "headingWeight": "Dikte van koppen",
       "headingCase": "Hoofdletters in koppen",

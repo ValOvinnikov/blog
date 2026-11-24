@@ -2686,6 +2686,8 @@
       "headerLayout": "Diseño de la cabecera",
       "headerSubmenuStyle": "Submenús de la cabecera",
       "headerBarStyle": "Barra de la cabecera",
+      "headerBackground": "Fondo de la cabecera",
+      "breadcrumbBackground": "Fondo de la ruta de navegación",
       "navLinkStyle": "Enlaces de navegación",
       "headingWeight": "Grosor de los títulos",
       "headingCase": "Mayúsculas en títulos",

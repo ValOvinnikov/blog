@@ -2686,6 +2686,8 @@
       "headerLayout": "Header-Layout",
       "headerSubmenuStyle": "Header-Untermenüs",
       "headerBarStyle": "Header-Leiste",
+      "headerBackground": "Header-Hintergrund",
+      "breadcrumbBackground": "Hintergrund der Brotkrumen",
       "navLinkStyle": "Navigationslinks",
       "headingWeight": "Überschriftenstärke",
       "headingCase": "Schreibweise der Überschriften",

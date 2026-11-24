@@ -2686,6 +2686,8 @@
       "headerLayout": "Disposition de l'en-tête",
       "headerSubmenuStyle": "Sous-menus de l'en-tête",
       "headerBarStyle": "Barre de l'en-tête",
+      "headerBackground": "Arrière-plan de l'en-tête",
+      "breadcrumbBackground": "Arrière-plan du fil d'Ariane",
       "navLinkStyle": "Liens de navigation",
       "headingWeight": "Graisse des titres",
       "headingCase": "Casse des titres",

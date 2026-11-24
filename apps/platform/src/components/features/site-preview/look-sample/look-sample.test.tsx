@@ -29,6 +29,7 @@ import {
   SAMPLE_PART,
   SAMPLE_PART_ATTRIBUTE,
 } from '@platform/constants/sample-part';
+import { SKIN_ATTRIBUTE } from '@platform/constants/site-theme-frame';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_CURRENT, ARIA_EXPANDED } from '@platform/testing/aria';
@@ -40,7 +41,6 @@ import {
 } from '@platform/testing/custom-render';
 import { MOCK_SAMPLE_HEADER_STYLE } from '@platform/testing/sample-header-style';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
-import { SKIN_ATTRIBUTE } from '@platform/testing/skin';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
