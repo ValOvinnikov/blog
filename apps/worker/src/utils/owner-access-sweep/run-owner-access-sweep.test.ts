@@ -29,6 +29,7 @@ vi.mock('./revoke-locked-members');
 
 describe(runOwnerAccessSweep, () => {
   beforeEach(() => {
+    vi.mocked(listTenantsPendingOwnerElevation).mockResolvedValue([]);
     vi.mocked(wakeOwnerAccess).mockResolvedValue(undefined);
     vi.mocked(listMembersPendingStudioAccess).mockResolvedValue([]);
     vi.mocked(revokeLockedMembers).mockResolvedValue({ revoked: 0, failed: 0 });
@@ -124,7 +125,6 @@ describe(runOwnerAccessSweep, () => {
   });
 
   it('revokes locked members and adds their counts to the run', async () => {
-    vi.mocked(listTenantsPendingOwnerElevation).mockResolvedValue([]);
     vi.mocked(revokeLockedMembers).mockResolvedValue({ revoked: 2, failed: 1 });
 
     await expect(runOwnerAccessSweep()).resolves.toEqual({
@@ -132,5 +132,15 @@ describe(runOwnerAccessSweep, () => {
       revoked: 2,
       failed: 1,
     });
+  });
+
+  it('logs when the sweep starts and finishes with its result', async () => {
+    await runOwnerAccessSweep();
+
+    expect(logger.info).toHaveBeenCalledWith(OWNER_ACCESS_LOG.SWEEP_STARTED);
+    expect(logger.info).toHaveBeenCalledWith(
+      OWNER_ACCESS_LOG.SWEEP_FINISHED,
+      expect.objectContaining({ checked: 0, revoked: 0, failed: 0 }),
+    );
   });
 });

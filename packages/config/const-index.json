@@ -13854,6 +13854,70 @@
         "file": "apps/worker/src/constants/owner-access.ts"
       }
     ],
+    "owner_access.sweep_started": [
+      {
+        "ref": "OWNER_ACCESS_LOG.SWEEP_STARTED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.sweep_step_done": [
+      {
+        "ref": "OWNER_ACCESS_LOG.SWEEP_STEP_DONE",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.sweep_finished": [
+      {
+        "ref": "OWNER_ACCESS_LOG.SWEEP_FINISHED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "LIST_TENANTS": [
+      {
+        "ref": "OWNER_ACCESS_SWEEP_STEP.LIST_TENANTS",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "WAKE_OWNER": [
+      {
+        "ref": "OWNER_ACCESS_SWEEP_STEP.WAKE_OWNER",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "LIST_MEMBERS": [
+      {
+        "ref": "OWNER_ACCESS_SWEEP_STEP.LIST_MEMBERS",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "WAKE_MEMBER": [
+      {
+        "ref": "OWNER_ACCESS_SWEEP_STEP.WAKE_MEMBER",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "REVOKE_LOCKED_MEMBERS": [
+      {
+        "ref": "OWNER_ACCESS_SWEEP_STEP.REVOKE_LOCKED_MEMBERS",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
     "owner_email.send_failed": [
       {
         "ref": "OWNER_EMAIL_LOG.SEND_FAILED",
