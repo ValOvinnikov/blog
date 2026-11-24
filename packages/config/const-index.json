@@ -6706,6 +6706,14 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "billing.open_invoice_failed": [
+      {
+        "ref": "BILLING_LOG.OPEN_INVOICE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "billing.plan_change_failed": [
       {
         "ref": "BILLING_LOG.PLAN_CHANGE_FAILED",

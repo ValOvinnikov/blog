@@ -9,6 +9,7 @@ import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { tenantIdSchema } from '@platform/utils/tenant-id-schema/tenant-id-schema';
 import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
@@ -18,9 +19,6 @@ import {
 import { queries } from '@shinefold/db';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
-import { z } from 'zod';
-
-const tenantIdSchema = z.uuid();
 
 export type TClearNewsletterPauseResult = TActionResult<
   typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
