@@ -107,7 +107,7 @@ const stopEquals = (
 ): boolean =>
   a.l === b.l && a.c === b.c && ('h' in a ? a.h : undefined) === b.h;
 
-const paletteStopOf = (
+export const paletteStopOf = (
   token: TThemeToken,
   scheme: TColorScheme,
 ): TPaletteStop => {

@@ -33,12 +33,16 @@ export const LOGO_RAMP_LIGHT = {
   '--logo-tile-contrast': ACHROMATIC_PALETTE['--palette-achromatic-100'],
 } as const satisfies TOklchRamp;
 
+export const LOGO_TILE_RAMP_DARK = {
+  '--logo-tile': BRAND_PALETTE['--palette-brand-300'],
+  '--logo-tile-contrast': BRAND_PALETTE['--palette-brand-1800'],
+} as const satisfies TOklchRamp;
+
 export const LOGO_RAMP_DARK = {
   '--logo-1': BRAND_PALETTE['--palette-brand-900'],
   '--logo-2': BRAND_PALETTE['--palette-brand-700'],
   '--logo-3': BRAND_PALETTE['--palette-brand-300'],
-  '--logo-tile': BRAND_PALETTE['--palette-brand-300'],
-  '--logo-tile-contrast': BRAND_PALETTE['--palette-brand-1800'],
+  ...LOGO_TILE_RAMP_DARK,
 } as const satisfies TOklchRamp;
 
 // A scrim darkens the photo under it in either mode, so this ramp has no dark twin.

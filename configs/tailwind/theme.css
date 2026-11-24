@@ -358,7 +358,11 @@
   --item-divider-width: 0px;
   --item-stack-gap: 0.75rem;
   --item-stack-radius: var(--radius-md);
+}
 
+/* A var() resolves where it is declared, so a skin scope re-declares these to take its own roles; :where() lets the site's look override them. */
+:root,
+:where([data-skin]) {
   --header-control-border: var(--border-strong);
   --header-control-fill: var(--surface);
 

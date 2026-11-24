@@ -1,4 +1,9 @@
-import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import {
+  HEADER_BAR_STYLE,
+  type IWithClassName,
+  type IWithDataTestId,
+  type TBrandVariant,
+} from '@shinefold/config';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
@@ -21,6 +26,7 @@ export type THeaderProps = IWithClassName &
   IWithDataTestId & {
     layout?: THeaderVariants['layout'];
     barStyle?: THeaderVariants['barStyle'];
+    tone?: TBrandVariant;
     children?: TCompoundChildren<typeof HeaderParts>;
   };
 
@@ -28,15 +34,22 @@ export type THeaderProps = IWithClassName &
 const HeaderRoot = ({
   layout,
   barStyle,
+  tone,
   children,
   className,
   dataTestId,
 }: THeaderProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeaderParts);
   const { root, inner, navActionsGroup } = headerVariants({ layout, barStyle });
+  const isFloating = barStyle === HEADER_BAR_STYLE.FLOATING;
+
   return (
-    <header className={root({ class: className })} data-testid={dataTestId}>
-      <div className={inner()}>
+    <header
+      className={root({ class: className })}
+      data-skin={isFloating ? undefined : tone}
+      data-testid={dataTestId}
+    >
+      <div className={inner()} data-skin={isFloating ? tone : undefined}>
         {slots.Brand}
         {(slots.Nav || slots.Actions) && (
           <div className={navActionsGroup()}>

@@ -1,4 +1,4 @@
-import { isOneOf } from '@shinefold/utils/primitives';
+import { isOneOf, objectKeys } from '@shinefold/utils/primitives';
 
 import {
   COLOR_SCHEME,
@@ -8,11 +8,12 @@ import {
   type TColorScheme,
 } from '@shinefold/config/constants';
 
+import { LOGO_TILE_RAMP_DARK } from './accent-ramps';
 import { AMBIENT, TOKEN_ALIASES } from './contrast-surfaces';
 import { formatPaletteDeclarations } from './palette-ramps';
 import { effectiveSchemeOf } from './skin-contrast';
 import { isBrandStop } from './skin-derive';
-import { SKIN_ROLES, type TSkinRoles } from './skin-roles';
+import { paletteStopOf, SKIN_ROLES, type TSkinRoles } from './skin-roles';
 import {
   SKIN_REGISTRY,
   SKINS_WITH_STORYBOOK,
@@ -62,21 +63,36 @@ const BRAND_GROUND_FILLS = [
 const groundFillDeclarations = (roles: TSkinRoles): string[] =>
   isBrandStop(roles[AMBIENT]) ? BRAND_GROUND_FILLS : [];
 
+// Only a scope that flips the page's scheme re-declares the tile: one that matches keeps the tenant's logo hue from :root or .dark.
+const logoTileDeclarations = (
+  effectiveScheme: TColorScheme,
+  scheme: TColorScheme,
+): string[] =>
+  effectiveScheme === scheme
+    ? []
+    : objectKeys(LOGO_TILE_RAMP_DARK).map(
+        (token) => `${token}: var(${paletteStopOf(token, effectiveScheme)})`,
+      );
+
 const scopeBlock = (
   key: string,
   { mode, roles }: TSkin,
   scheme: TColorScheme,
-): string[] =>
-  formatBlock(
+): string[] => {
+  const effectiveScheme = effectiveSchemeOf(mode, scheme);
+
+  return formatBlock(
     scheme === COLOR_SCHEME.DARK
       ? `.dark ${skinSelector(key)}`
       : skinSelector(key),
     [
-      `color-scheme: ${effectiveSchemeOf(mode, scheme).toLowerCase()}`,
+      `color-scheme: ${effectiveScheme.toLowerCase()}`,
       ...roleDeclarations(roles[scheme]),
       ...groundFillDeclarations(roles[scheme]),
+      ...logoTileDeclarations(effectiveScheme, scheme),
     ],
   );
+};
 
 const formatSkinScopes = (skins: TSkins): string[] =>
   Object.entries(skins).flatMap(([key, skin]) =>

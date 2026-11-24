@@ -1,4 +1,5 @@
 import {
+  BRAND_VARIANT,
   HEADER_BAR_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
@@ -76,7 +77,7 @@ const SiteHeader = ({
           isOpen: isMenuOpen,
           onToggle: () => setIsMenuOpen((current) => !current),
           ariaLabel: 'Toggle navigation menu',
-          panelId: 'header-story-menu',
+          panelId: `header-story-menu-${args.tone ?? 'page'}`,
         }}
       >
         <PrimaryNavigation.PanelActions>
@@ -89,6 +90,24 @@ const SiteHeader = ({
     </Header>
   );
 };
+
+const AllTones = (
+  args: THeaderProps & {
+    isMenuOpen?: boolean;
+    submenuStyle?: THeaderSubmenuStyle;
+  },
+) => (
+  <div className="flex flex-col gap-8">
+    {Object.values(BRAND_VARIANT).map((tone) => (
+      <div
+        key={tone}
+        className={args.isMenuOpen ? 'min-h-[30rem]' : 'min-h-40'}
+      >
+        <SiteHeader {...args} tone={tone} />
+      </div>
+    ))}
+  </div>
+);
 
 const withPageContent: Decorator = (Story) => (
   <>
@@ -110,6 +129,10 @@ const meta = {
     barStyle: {
       control: 'select',
       options: objectKeys(headerVariants.variants.barStyle),
+    },
+    tone: {
+      control: 'select',
+      options: Object.values(BRAND_VARIANT),
     },
   },
   args: {
@@ -228,4 +251,44 @@ export const PhoneFloating: TStory = {
     barStyle: HEADER_BAR_STYLE.FLOATING,
   },
   render: (args) => <SiteHeader {...args} />,
+};
+
+export const Skins: TStory = {
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: AllTones,
+};
+
+export const SkinsDark: TStory = {
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: AllTones,
+  globals: { theme: 'dark' },
+};
+
+export const FloatingSkins: TStory = {
+  args: {
+    layout: HEADER_LAYOUT.CLASSIC,
+    barStyle: HEADER_BAR_STYLE.FLOATING,
+  },
+  render: AllTones,
+};
+
+export const FloatingSkinsDark: TStory = {
+  args: {
+    layout: HEADER_LAYOUT.CLASSIC,
+    barStyle: HEADER_BAR_STYLE.FLOATING,
+  },
+  render: AllTones,
+  globals: { theme: 'dark' },
+};
+
+export const PhoneMenuOpenSkins: TStory = {
+  globals: { viewport: 'phone' },
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: (args) => <AllTones {...args} isMenuOpen={true} />,
+};
+
+export const PhoneMenuOpenSkinsDark: TStory = {
+  globals: { viewport: 'phone', theme: 'dark' },
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: (args) => <AllTones {...args} isMenuOpen={true} />,
 };

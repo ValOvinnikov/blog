@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { BRAND_VARIANT, HEADER_BAR_STYLE } from '@shinefold/config';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { renderElement, screen } from '@shinefold/ui/testing/custom-render';
 
@@ -74,6 +75,24 @@ describe(`<${Header.name}/>`, () => {
     const strayContent = screen.getByText(MOCK_STRAY_TEXT);
 
     expect(strayContent).toBeVisible();
+  });
+
+  it('puts the tone on the full-width bar', () => {
+    renderElement(<Header tone={BRAND_VARIANT.INK} />);
+
+    const banner = screen.getByRole('banner');
+
+    expect(banner).toHaveAttribute('data-skin', BRAND_VARIANT.INK);
+  });
+
+  it('leaves the tone off the full-width strip when the bar floats', () => {
+    renderElement(
+      <Header tone={BRAND_VARIANT.INK} barStyle={HEADER_BAR_STYLE.FLOATING} />,
+    );
+
+    const banner = screen.getByRole('banner');
+
+    expect(banner).not.toHaveAttribute('data-skin');
   });
 
   it('renders as a banner landmark', () => {

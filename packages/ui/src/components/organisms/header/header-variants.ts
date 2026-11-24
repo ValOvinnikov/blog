@@ -30,13 +30,13 @@ export const headerVariants = tv({
     },
     barStyle: {
       [HEADER_BAR_STYLE.FULL_WIDTH]: {
-        root: ['bg-primary border-b border-border', HEADER_ANCHOR],
+        root: ['bg-ambient text-text border-b border-divider', HEADER_ANCHOR],
       },
       [HEADER_BAR_STYLE.FLOATING]: {
         root: ['px-3 pt-3'],
         inner: [
           'relative',
-          'rounded-card border border-border bg-primary shadow-float',
+          'rounded-card border border-divider bg-ambient text-text shadow-float',
           'has-[[data-wide-panel]:popover-open]:rounded-b-none',
           HEADER_ANCHOR,
         ],

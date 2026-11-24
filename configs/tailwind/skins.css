@@ -338,6 +338,8 @@
   --info-muted: var(--brand-primary-muted);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
+  --logo-tile: var(--palette-brand-300);
+  --logo-tile-contrast: var(--palette-brand-1800);
 }
 
 .dark [data-skin='INK'] {
