@@ -529,7 +529,7 @@ neither Storybook.
   Storybook build is posted as a `FAIL`. A post that is refused, or a missing
   variable or secret, fails the job.
 - **Matrix.** Every story under `apps/web/src/modules/`, in each brand
-  variant (PRIMARY, SECONDARY, BRAND_PRIMARY), at 1280px and 390px; within
+  variant (every `BRAND_VARIANT` value), at 1280px and 390px; within
   each, the Console and Editorial presets at their default hues and hues 130
   and 190, in light and dark. The brand variant goes through Storybook's
   `updateStoryArgs` channel event, because a story whose `argTypes` narrow
@@ -548,7 +548,9 @@ neither Storybook.
   canvas, and the backdrop is sampled from a screenshot with all text made
   transparent, so text over a photo or scrim is measured against the pixels
   under it. Sanity CDN images are answered with a checked-in bright fixture
-  photo.
+  photo. Focus a story's `play` function leaves behind is released before
+  each measurement, so a live ring never lands in the rest screenshot the
+  forced ring is compared against.
 - **Baseline.** `apps/web/contrast/baseline.json` holds the failures `main`
   carried when the job landed: per story, variant and width, one line per
   element and kind, listing the theme and mode pairs where it fails. A
