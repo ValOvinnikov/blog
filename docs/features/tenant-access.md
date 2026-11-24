@@ -11,6 +11,8 @@ code:
   - packages/db/src/queries/memberships/**
   - packages/db/src/queries/membership-invites/**
   - packages/db/src/queries/admins/**
+  - packages/db/src/queries/admin-invites/**
+  - packages/db/src/schema/admin-invites.ts
   - packages/db/src/utils/studio-access/**
   - packages/db/scripts/seed-admin.ts
   - packages/auth/src/events/**
@@ -35,7 +37,11 @@ code:
   - apps/platform/src/app/**/team/*.tsx
   - apps/platform/src/components/features/team/**
   - apps/platform/src/utils/team-view-model/**
-  - apps/platform/src/utils/use-team-row-action/**
+  - apps/platform/src/utils/use-row-action/**
+  - apps/platform/src/server/platform-admins/**
+  - apps/platform/src/app/**/admins/*.tsx
+  - apps/platform/src/components/features/platform-admins/**
+  - apps/platform/src/constants/platform-admins.ts
   - apps/platform/src/utils/use-team-table-columns/**
   - apps/platform/src/constants/team-access.ts
 epics: [4840, 4979, 5649]
@@ -57,15 +63,17 @@ The platform decides who may run which tenant. Platform operators hold an `admin
     This tree hides the Platform nav, so an owner never sees that the platform has other tenants.
 - **Tenant switching.** `GET /api/dashboard/select-tenant?tenantId=` sets the active-tenant cookie (httpOnly, 30 days) after checking access, and 404s otherwise. The tenant switcher in the shell only appears for users with more than one tenant.
 - **Signup blocklist.** `/blocked-signups` in the `(operator)` group lists every blocked identity: its kind, the domain or the first characters of an address hash, the reason, who added it and when. A SUPERADMIN can add a domain there and remove any entry. The Suspend dialog on a tenant can also block that tenant's owner email, with a reason. The nav entry shows for SUPERADMINs only, and owners never see the list.
+- **Admins page.** `/admins` in the `(operator)` group lists every admin (name, email, role, granted date) and every admin invite (email, role, invited date, Pending or Expired). A SUPERADMIN invites an address as Admin or Super admin there; Moderator is not offered, and an action called with it is refused. Each invite row can be resent, which sends the email again and restarts its 7 days, or cancelled. Every admin row but the viewer's own offers Remove, which takes access away on the next request; removing the last SUPERADMIN is refused. The nav entry shows for SUPERADMINs only.
 - **Home link.** The home link from a dead end goes to `/tenants` for an admin, `/dashboard` for any other signed-in user, and sign-in otherwise.
 
 ## Data
 
 - **`admins`:** one row per user (`userId` is unique). It records:
   - `role`: SUPERADMIN, ADMIN or MODERATOR;
-  - `grantedVia`: BREAK_GLASS or PROMOTION;
+  - `grantedVia`: BREAK_GLASS, PROMOTION or INVITE;
   - `grantedBy` and `grantedAt`.
     It has no `tenantId`.
+- **`admin_invites`:** one invite per exact address (`email_exact_index`), the address stored only encrypted, with `role`, `invitedBy` and `expiresAt`, 7 days after it was created (`ADMIN_INVITE_LIFETIME_DAYS`). Inviting an address again replaces the role and restarts the 7 days; inviting a current admin is refused. `listAdminInvites` returns expired invites too, and an expired invite is never consumed. Signing in from an address with an unexpired invite creates its `admins` row (`grantedVia` INVITE, `grantedBy` the inviter) and removes the invite in one statement; an address that is already an admin just loses the invite.
 - **`memberships`:** unique on `(userId, tenantId)`. `role` is OWNER, EDITOR or READER. Each membership also carries its own Studio access record, mirroring the owner's on `tenants`: the Sanity invite id, when that invite was sent and accepted, the Sanity user id and the login provider. The worker reads and writes it through `getMemberStudioAccess` and `setMemberStudioAccess`, both scoped to the tenant; clearing it is `setMemberStudioAccess` with every field `null`. `getMemberStudioIdentity` reads one membership's decrypted email and Sanity user id, locked or not, so a removed member's access can be revoked after the row is gone. `getMemberStudioAccess` does not find a locked membership; `setMemberStudioAccess` still records against one, so the record matches what Sanity did when a seat downgrade locks the member mid-run. `setMemberStudioAccess` is last-write-wins, and returns `DB_NOT_FOUND` once the membership has been removed.
 - **`membership_invites`:** the address is stored only encrypted, with a keyed index that drops `+tag`s so a data request reaches every variant, and `email_exact_index`, which keeps them. Unique on `(tenantId, email_exact_index)`, with `role` and `consumedAt`; an invite written before that column existed has none and is not covered by the rule. At sign-in, `findPendingInviteByEmail` looks invites up by the `+tag`-blind index and keeps only the ones whose decrypted email is the exact requested address, ignoring case. Changing a pending owner's email is refused when another invite on the tenant holds the new address's exact index.
 - **Team reads and writes.**
@@ -95,7 +103,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 
 ## Configuration
 
-- **Operators** are granted only by the manual `db:seed-admin` CLI. It writes BREAK_GLASS, never changes the role on an existing row, and requires the user to have signed in once first. The platform has no screen for granting operators.
+- **Operators** are granted only by the manual `db:seed-admin` CLI. It writes BREAK_GLASS, never changes the role on an existing row, and requires the user to have signed in once first. Further operators are invited from the Admins page.
 - **Owners** are set when an operator creates the tenant ([tenant provisioning](./tenant-provisioning.md)):
   - a known user gets an OWNER membership;
   - an unknown email gets an OWNER invite and a `TENANT_INVITE` magic-link email, whose link signs the owner in, selects that tenant and lands on `/dashboard`, never the operator's `/tenants/<id>` page, whichever page the operator sent it from.
@@ -111,7 +119,8 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 - **Server Actions call a gate themselves.**
   - Every tenant-scoped settings save (Look, Voice, Features and its analytics id, Languages, Email settings, templates, logo and test send, brand assets) calls `requireTenantManager`: the tenant's own OWNER or an operator. An editor keeps the Studio and cannot save any of them. Reads and the custom-domain status poll still call `requireTenantMembership`. Both gates exclude archived tenants.
   - Creating a tenant and editing its details need `requireAdmin`.
-  - Deprovision, reactivate, delete, the deprovisioning status poll and the blocklist add and remove actions need `requireSuperAdmin`.
+  - Deprovision, reactivate, delete, the deprovisioning status poll, the blocklist add and remove actions and the admin invite, resend, cancel and remove actions need `requireSuperAdmin`.
+  - Inviting, cancelling an invite and removing an admin are audited as `ADMIN_INVITED`, `ADMIN_INVITE_CANCELLED` and `ADMIN_REMOVED` against `PLATFORM_ADMIN`, with the role and never the address; a removal also records the removed user's id. An invite whose email fails to send is cancelled and records nothing.
   - The provisioning status poll needs the tenant's own OWNER or any admin; retry, Check now and Resend invite need the tenant's own OWNER or a SUPERADMIN (`requireTenantOwnerOrAdmin`).
 - **Roles differ in three places only.**
   - Admin roles gate identically, except that SUPERADMIN alone passes `requireSuperAdmin` and alone sees every tenant under `/dashboard`.

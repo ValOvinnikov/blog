@@ -24,6 +24,7 @@
     "leads": "Anfragen",
     "releases": "Releases",
     "blockedSignupsPage": "Gesperrte Registrierungen",
+    "adminsPage": "Admins",
     "dataRequestsPage": "Datenanfragen",
     "signUpTitle": "Konto erstellen",
     "onboarding": "Website erstellen",
@@ -248,6 +249,7 @@
       "STALLED": "Erfordert Aufmerksamkeit"
     },
     "blockedSignups": "Gesperrte Registrierungen",
+    "admins": "Admins",
     "dataRequests": "Datenanfragen",
     "collapsedStatusTooltip": "{label} · {status}",
     "supportSectionLabel": "Support",
@@ -2885,5 +2887,87 @@
       "gone": "Diese Einladung ist nicht mehr offen.",
       "failed": "Die Einladung konnte nicht zurückgezogen werden – versuchen Sie es erneut."
     }
+  },
+  "adminsView": {
+    "title": "Admins",
+    "description": "Die Personen, die die gesamte Plattform betreiben. Lade jemanden per E-Mail ein, sende eine Einladung erneut, ziehe sie zurück oder entferne einen Admin."
+  },
+  "inviteAdminCard": {
+    "title": "Admin einladen",
+    "supportingText": "Die Person erhält eine E-Mail mit einem Anmeldelink. Die Einladung gilt {days, plural, one {# Tag} other {# Tage}}.",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "name@example.com",
+    "roleLabel": "Rolle",
+    "roleHint": "Ein Super-Admin kann zusätzlich Admins, Releases, gesperrte Registrierungen und Datenanfragen verwalten.",
+    "send": "Einladung senden",
+    "sending": "Wird gesendet…",
+    "sent": "Einladung an {email} gesendet.",
+    "sendFailed": "Die Einladungs-E-Mail konnte nicht gesendet werden, daher wurde keine Einladung gespeichert. Versuche es erneut.",
+    "fieldError": {
+      "EMAIL_INVALID": "Gib eine gültige E-Mail-Adresse ein.",
+      "ROLE_INVALID": "Wähle Admin oder Super-Admin.",
+      "ALREADY_ADMIN": "{email} ist bereits Admin."
+    }
+  },
+  "adminsTable": {
+    "title": "Admins",
+    "count": "{count, plural, one {# Admin} other {# Admins}}",
+    "empty": "Noch keine Admins.",
+    "columnName": "Name",
+    "columnEmail": "E-Mail",
+    "columnRole": "Rolle",
+    "columnGranted": "Erteilt",
+    "columnActions": "Aktionen",
+    "noName": "Kein Name",
+    "noEmail": "Keine E-Mail",
+    "you": "(du)"
+  },
+  "adminInvitesTable": {
+    "title": "Offene Einladungen",
+    "count": "{count, plural, one {# Einladung} other {# Einladungen}}",
+    "supportingText": "Eine abgelaufene Einladung gewährt nichts, bis du sie erneut sendest.",
+    "empty": "Keine offenen Einladungen.",
+    "columnEmail": "E-Mail",
+    "columnRole": "Rolle",
+    "columnInvited": "Eingeladen",
+    "columnStatus": "Status",
+    "columnActions": "Aktionen",
+    "statusPending": "Offen",
+    "statusExpired": "Abgelaufen"
+  },
+  "removeAdminControl": {
+    "trigger": "Entfernen",
+    "triggerAriaLabel": "{name} entfernen",
+    "title": "{name} als Admin entfernen?",
+    "description": "Der Plattformzugang endet sofort. Du kannst die Person später erneut einladen.",
+    "keep": "Admin behalten",
+    "confirm": "Admin entfernen",
+    "confirming": "Wird entfernt…",
+    "done": "{name} wurde entfernt.",
+    "gone": "{name} ist kein Admin mehr.",
+    "failed": "{name} konnte nicht entfernt werden – versuche es erneut.",
+    "self": "Du kannst dich nicht selbst entfernen.",
+    "lastSuperAdmin": "Dies ist der letzte Super-Admin und kann daher nicht entfernt werden."
+  },
+  "cancelAdminInviteControl": {
+    "trigger": "Zurückziehen",
+    "triggerAriaLabel": "Einladung an {email} zurückziehen",
+    "title": "Einladung an {email} zurückziehen?",
+    "description": "Eine Anmeldung mit dieser Adresse gewährt dann keinen Admin-Zugang mehr. Du kannst die Person später erneut einladen.",
+    "keep": "Einladung behalten",
+    "confirm": "Einladung zurückziehen",
+    "confirming": "Wird zurückgezogen…",
+    "done": "Die Einladung an {email} wurde zurückgezogen.",
+    "gone": "Diese Einladung ist nicht mehr offen.",
+    "failed": "Die Einladung konnte nicht zurückgezogen werden – versuche es erneut."
+  },
+  "resendAdminInviteControl": {
+    "trigger": "Erneut senden",
+    "triggerAriaLabel": "Einladung an {email} erneut senden",
+    "sending": "Wird gesendet…",
+    "done": "Einladung erneut an {email} gesendet. Sie gilt jetzt weitere {days, plural, one {# Tag} other {# Tage}}.",
+    "gone": "Diese Einladung ist nicht mehr offen.",
+    "alreadyAdmin": "{email} ist bereits Admin.",
+    "failed": "Die Einladung an {email} konnte nicht gesendet werden – versuche es erneut."
   }
 }

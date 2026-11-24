@@ -9006,6 +9006,86 @@
         "file": "apps/platform/src/constants/plan-change.ts"
       }
     ],
+    "ROLE_INVALID": [
+      {
+        "ref": "ADMIN_INVITE_FIELD_ERROR.ROLE_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/platform-admins",
+        "file": "apps/platform/src/constants/platform-admins.ts"
+      }
+    ],
+    "platform_admin.invite_failed": [
+      {
+        "ref": "PLATFORM_ADMIN_LOG.INVITE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/platform-admins",
+        "file": "apps/platform/src/constants/platform-admins.ts"
+      }
+    ],
+    "platform_admin.invite_email_failed": [
+      {
+        "ref": "PLATFORM_ADMIN_LOG.INVITE_EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/platform-admins",
+        "file": "apps/platform/src/constants/platform-admins.ts"
+      }
+    ],
+    "platform_admin.invite_audit_failed": [
+      {
+        "ref": "PLATFORM_ADMIN_LOG.INVITE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/platform-admins",
+        "file": "apps/platform/src/constants/platform-admins.ts"
+      }
+    ],
+    "platform_admin.resend_failed": [
+      {
+        "ref": "PLATFORM_ADMIN_LOG.RESEND_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/platform-admins",
+        "file": "apps/platform/src/constants/platform-admins.ts"
+      }
+    ],
+    "platform_admin.resend_email_failed": [
+      {
+        "ref": "PLATFORM_ADMIN_LOG.RESEND_EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/platform-admins",
+        "file": "apps/platform/src/constants/platform-admins.ts"
+      }
+    ],
+    "platform_admin.cancel_failed": [
+      {
+        "ref": "PLATFORM_ADMIN_LOG.CANCEL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/platform-admins",
+        "file": "apps/platform/src/constants/platform-admins.ts"
+      }
+    ],
+    "platform_admin.cancel_audit_failed": [
+      {
+        "ref": "PLATFORM_ADMIN_LOG.CANCEL_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/platform-admins",
+        "file": "apps/platform/src/constants/platform-admins.ts"
+      }
+    ],
+    "platform_admin.remove_failed": [
+      {
+        "ref": "PLATFORM_ADMIN_LOG.REMOVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/platform-admins",
+        "file": "apps/platform/src/constants/platform-admins.ts"
+      }
+    ],
+    "platform_admin.remove_audit_failed": [
+      {
+        "ref": "PLATFORM_ADMIN_LOG.REMOVE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/platform-admins",
+        "file": "apps/platform/src/constants/platform-admins.ts"
+      }
+    ],
     "ROWS": [
       {
         "ref": "PRESET_LIST_LAYOUT.ROWS",

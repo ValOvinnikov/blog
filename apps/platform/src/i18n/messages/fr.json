@@ -24,6 +24,7 @@
     "leads": "Messages reçus",
     "releases": "Versions",
     "blockedSignupsPage": "Inscriptions bloquées",
+    "adminsPage": "Administrateurs",
     "dataRequestsPage": "Demandes de données",
     "signUpTitle": "Créer un compte",
     "onboarding": "Créer votre site",
@@ -248,6 +249,7 @@
       "STALLED": "Nécessite votre attention"
     },
     "blockedSignups": "Inscriptions bloquées",
+    "admins": "Administrateurs",
     "dataRequests": "Demandes de données",
     "collapsedStatusTooltip": "{label} · {status}",
     "supportSectionLabel": "Assistance",
@@ -2885,5 +2887,87 @@
       "gone": "Cette invitation n'est plus en attente.",
       "failed": "Impossible d'annuler l'invitation. Réessayez."
     }
+  },
+  "adminsView": {
+    "title": "Administrateurs",
+    "description": "Les personnes qui gèrent toute la plateforme. Invitez quelqu’un par e-mail, renvoyez ou annulez une invitation, ou retirez un administrateur."
+  },
+  "inviteAdminCard": {
+    "title": "Inviter un administrateur",
+    "supportingText": "La personne reçoit un e-mail avec un lien de connexion. L’invitation est valable {days, plural, one {# jour} other {# jours}}.",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "nom@example.com",
+    "roleLabel": "Rôle",
+    "roleHint": "Un super administrateur peut aussi gérer les administrateurs, les versions, les inscriptions bloquées et les demandes de données.",
+    "send": "Envoyer l’invitation",
+    "sending": "Envoi…",
+    "sent": "Invitation envoyée à {email}.",
+    "sendFailed": "L’e-mail d’invitation n’a pas pu être envoyé, aucune invitation n’a donc été conservée. Réessayez.",
+    "fieldError": {
+      "EMAIL_INVALID": "Saisissez une adresse e-mail valide.",
+      "ROLE_INVALID": "Choisissez Administrateur ou Super administrateur.",
+      "ALREADY_ADMIN": "{email} est déjà administrateur."
+    }
+  },
+  "adminsTable": {
+    "title": "Administrateurs",
+    "count": "{count, plural, one {# administrateur} other {# administrateurs}}",
+    "empty": "Aucun administrateur pour l’instant.",
+    "columnName": "Nom",
+    "columnEmail": "E-mail",
+    "columnRole": "Rôle",
+    "columnGranted": "Accordé le",
+    "columnActions": "Actions",
+    "noName": "Sans nom",
+    "noEmail": "Sans e-mail",
+    "you": "(vous)"
+  },
+  "adminInvitesTable": {
+    "title": "Invitations en attente",
+    "count": "{count, plural, one {# invitation} other {# invitations}}",
+    "supportingText": "Une invitation expirée n’accorde rien tant que vous ne la renvoyez pas.",
+    "empty": "Aucune invitation en attente.",
+    "columnEmail": "E-mail",
+    "columnRole": "Rôle",
+    "columnInvited": "Invité le",
+    "columnStatus": "Statut",
+    "columnActions": "Actions",
+    "statusPending": "En attente",
+    "statusExpired": "Expirée"
+  },
+  "removeAdminControl": {
+    "trigger": "Retirer",
+    "triggerAriaLabel": "Retirer {name}",
+    "title": "Retirer {name} des administrateurs ?",
+    "description": "La personne perd immédiatement l’accès à la plateforme. Vous pourrez l’inviter à nouveau plus tard.",
+    "keep": "Garder l’administrateur",
+    "confirm": "Retirer l’administrateur",
+    "confirming": "Retrait…",
+    "done": "{name} a été retiré.",
+    "gone": "{name} n’est plus administrateur.",
+    "failed": "Impossible de retirer {name} — réessayez.",
+    "self": "Vous ne pouvez pas vous retirer vous-même.",
+    "lastSuperAdmin": "C’est le dernier super administrateur, il ne peut donc pas être retiré."
+  },
+  "cancelAdminInviteControl": {
+    "trigger": "Annuler",
+    "triggerAriaLabel": "Annuler l’invitation à {email}",
+    "title": "Annuler l’invitation à {email} ?",
+    "description": "Se connecter avec cette adresse n’accorde plus d’accès administrateur. Vous pourrez l’inviter à nouveau plus tard.",
+    "keep": "Garder l’invitation",
+    "confirm": "Annuler l’invitation",
+    "confirming": "Annulation…",
+    "done": "L’invitation à {email} a été annulée.",
+    "gone": "Cette invitation n’est plus en attente.",
+    "failed": "Impossible d’annuler l’invitation — réessayez."
+  },
+  "resendAdminInviteControl": {
+    "trigger": "Renvoyer",
+    "triggerAriaLabel": "Renvoyer l’invitation à {email}",
+    "sending": "Envoi…",
+    "done": "Invitation renvoyée à {email}. Elle est de nouveau valable {days, plural, one {# jour} other {# jours}}.",
+    "gone": "Cette invitation n’est plus en attente.",
+    "alreadyAdmin": "{email} est déjà administrateur.",
+    "failed": "Impossible d’envoyer l’invitation à {email} — réessayez."
   }
 }

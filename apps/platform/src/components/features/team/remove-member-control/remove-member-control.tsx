@@ -5,9 +5,10 @@ import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   TEAM_MEMBERS_HEADING_ID,
   TEAM_REFUSAL,
+  type TTeamRefusal,
 } from '@platform/constants/team-access';
 import { removeTeamMemberAction } from '@platform/server/team/remove-team-member-action';
-import { useTeamRowAction } from '@platform/utils/use-team-row-action/use-team-row-action';
+import { useRowAction } from '@platform/utils/use-row-action/use-row-action';
 import { SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
@@ -25,7 +26,7 @@ export const RemoveMemberControl = ({
   const t = useTranslations('teamPage.remove');
   const tTeam = useTranslations('teamPage');
   const named = { email: email ?? tTeam('thisMember') };
-  const { onConfirm, onConfirmed } = useTeamRowAction({
+  const { onConfirm, onConfirmed } = useRowAction<TTeamRefusal>({
     done: t('done', named),
     gone: t('gone', named),
     failed: t('failed', named),

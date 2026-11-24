@@ -24,6 +24,7 @@
     "leads": "Leads",
     "releases": "Releases",
     "blockedSignupsPage": "Blocked sign-ups",
+    "adminsPage": "Admins",
     "dataRequestsPage": "Data requests",
     "signUpTitle": "Create an account",
     "onboarding": "Create your site",
@@ -248,6 +249,7 @@
       "STALLED": "Needs attention"
     },
     "blockedSignups": "Blocked sign-ups",
+    "admins": "Admins",
     "dataRequests": "Data requests",
     "collapsedStatusTooltip": "{label} · {status}",
     "supportSectionLabel": "Support",
@@ -2885,5 +2887,87 @@
       "gone": "That invite is no longer pending.",
       "failed": "Couldn't cancel the invite — try again."
     }
+  },
+  "adminsView": {
+    "title": "Admins",
+    "description": "The people who run the whole platform. Invite someone by email, resend or cancel an invite, or remove an admin."
+  },
+  "inviteAdminCard": {
+    "title": "Invite an admin",
+    "supportingText": "They get an email with a sign-in link. The invite lasts {days, plural, one {# day} other {# days}}.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "name@example.com",
+    "roleLabel": "Role",
+    "roleHint": "A super admin can also manage admins, releases, blocked sign-ups and data requests.",
+    "send": "Send invite",
+    "sending": "Sending…",
+    "sent": "Invite sent to {email}.",
+    "sendFailed": "The invite email couldn't be sent, so no invite was kept. Try again.",
+    "fieldError": {
+      "EMAIL_INVALID": "Enter a valid email address.",
+      "ROLE_INVALID": "Choose Admin or Super admin.",
+      "ALREADY_ADMIN": "{email} is already an admin."
+    }
+  },
+  "adminsTable": {
+    "title": "Admins",
+    "count": "{count, plural, one {# admin} other {# admins}}",
+    "empty": "No admins yet.",
+    "columnName": "Name",
+    "columnEmail": "Email",
+    "columnRole": "Role",
+    "columnGranted": "Granted",
+    "columnActions": "Actions",
+    "noName": "No name",
+    "noEmail": "No email",
+    "you": "(you)"
+  },
+  "adminInvitesTable": {
+    "title": "Pending invites",
+    "count": "{count, plural, one {# invite} other {# invites}}",
+    "supportingText": "An expired invite grants nothing until you resend it.",
+    "empty": "No pending invites.",
+    "columnEmail": "Email",
+    "columnRole": "Role",
+    "columnInvited": "Invited",
+    "columnStatus": "Status",
+    "columnActions": "Actions",
+    "statusPending": "Pending",
+    "statusExpired": "Expired"
+  },
+  "removeAdminControl": {
+    "trigger": "Remove",
+    "triggerAriaLabel": "Remove {name}",
+    "title": "Remove {name} as an admin?",
+    "description": "They lose platform access straight away. You can invite them again later.",
+    "keep": "Keep admin",
+    "confirm": "Remove admin",
+    "confirming": "Removing…",
+    "done": "{name} was removed.",
+    "gone": "{name} is no longer an admin.",
+    "failed": "Couldn't remove {name} — try again.",
+    "self": "You can't remove yourself.",
+    "lastSuperAdmin": "This is the last super admin, so they can't be removed."
+  },
+  "cancelAdminInviteControl": {
+    "trigger": "Cancel",
+    "triggerAriaLabel": "Cancel invite to {email}",
+    "title": "Cancel the invite to {email}?",
+    "description": "Signing in from that address no longer grants admin access. You can invite them again later.",
+    "keep": "Keep invite",
+    "confirm": "Cancel invite",
+    "confirming": "Cancelling…",
+    "done": "The invite to {email} was cancelled.",
+    "gone": "That invite is no longer pending.",
+    "failed": "Couldn't cancel the invite — try again."
+  },
+  "resendAdminInviteControl": {
+    "trigger": "Resend",
+    "triggerAriaLabel": "Resend invite to {email}",
+    "sending": "Sending…",
+    "done": "Invite sent again to {email}. It now lasts another {days, plural, one {# day} other {# days}}.",
+    "gone": "That invite is no longer pending.",
+    "alreadyAdmin": "{email} is already an admin.",
+    "failed": "Couldn't send the invite to {email} — try again."
   }
 }

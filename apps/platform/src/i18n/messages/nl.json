@@ -24,6 +24,7 @@
     "leads": "Berichten",
     "releases": "Releases",
     "blockedSignupsPage": "Geblokkeerde aanmeldingen",
+    "adminsPage": "Beheerders",
     "dataRequestsPage": "Gegevensverzoeken",
     "signUpTitle": "Account aanmaken",
     "onboarding": "Je site maken",
@@ -248,6 +249,7 @@
       "STALLED": "Vraagt aandacht"
     },
     "blockedSignups": "Geblokkeerde aanmeldingen",
+    "admins": "Beheerders",
     "dataRequests": "Gegevensverzoeken",
     "collapsedStatusTooltip": "{label} · {status}",
     "supportSectionLabel": "Ondersteuning",
@@ -2885,5 +2887,87 @@
       "gone": "Die uitnodiging staat niet meer open.",
       "failed": "De uitnodiging kon niet worden ingetrokken — probeer het opnieuw."
     }
+  },
+  "adminsView": {
+    "title": "Beheerders",
+    "description": "De mensen die het hele platform beheren. Nodig iemand uit per e-mail, verstuur of annuleer een uitnodiging, of verwijder een beheerder."
+  },
+  "inviteAdminCard": {
+    "title": "Beheerder uitnodigen",
+    "supportingText": "Diegene krijgt een e-mail met een inloglink. De uitnodiging is {days, plural, one {# dag} other {# dagen}} geldig.",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "naam@example.com",
+    "roleLabel": "Rol",
+    "roleHint": "Een superbeheerder kan ook beheerders, releases, geblokkeerde aanmeldingen en gegevensverzoeken beheren.",
+    "send": "Uitnodiging versturen",
+    "sending": "Versturen…",
+    "sent": "Uitnodiging verstuurd naar {email}.",
+    "sendFailed": "De uitnodigingsmail kon niet worden verstuurd, dus er is geen uitnodiging bewaard. Probeer het opnieuw.",
+    "fieldError": {
+      "EMAIL_INVALID": "Voer een geldig e-mailadres in.",
+      "ROLE_INVALID": "Kies Beheerder of Superbeheerder.",
+      "ALREADY_ADMIN": "{email} is al beheerder."
+    }
+  },
+  "adminsTable": {
+    "title": "Beheerders",
+    "count": "{count, plural, one {# beheerder} other {# beheerders}}",
+    "empty": "Nog geen beheerders.",
+    "columnName": "Naam",
+    "columnEmail": "E-mail",
+    "columnRole": "Rol",
+    "columnGranted": "Toegekend",
+    "columnActions": "Acties",
+    "noName": "Geen naam",
+    "noEmail": "Geen e-mail",
+    "you": "(jij)"
+  },
+  "adminInvitesTable": {
+    "title": "Openstaande uitnodigingen",
+    "count": "{count, plural, one {# uitnodiging} other {# uitnodigingen}}",
+    "supportingText": "Een verlopen uitnodiging geeft geen toegang totdat je hem opnieuw verstuurt.",
+    "empty": "Geen openstaande uitnodigingen.",
+    "columnEmail": "E-mail",
+    "columnRole": "Rol",
+    "columnInvited": "Uitgenodigd",
+    "columnStatus": "Status",
+    "columnActions": "Acties",
+    "statusPending": "Openstaand",
+    "statusExpired": "Verlopen"
+  },
+  "removeAdminControl": {
+    "trigger": "Verwijderen",
+    "triggerAriaLabel": "{name} verwijderen",
+    "title": "{name} als beheerder verwijderen?",
+    "description": "Diegene verliest direct de toegang tot het platform. Je kunt diegene later opnieuw uitnodigen.",
+    "keep": "Beheerder houden",
+    "confirm": "Beheerder verwijderen",
+    "confirming": "Verwijderen…",
+    "done": "{name} is verwijderd.",
+    "gone": "{name} is geen beheerder meer.",
+    "failed": "{name} kon niet worden verwijderd — probeer het opnieuw.",
+    "self": "Je kunt jezelf niet verwijderen.",
+    "lastSuperAdmin": "Dit is de laatste superbeheerder en kan dus niet worden verwijderd."
+  },
+  "cancelAdminInviteControl": {
+    "trigger": "Annuleren",
+    "triggerAriaLabel": "Uitnodiging aan {email} annuleren",
+    "title": "Uitnodiging aan {email} annuleren?",
+    "description": "Inloggen met dat adres geeft dan geen beheerderstoegang meer. Je kunt diegene later opnieuw uitnodigen.",
+    "keep": "Uitnodiging houden",
+    "confirm": "Uitnodiging annuleren",
+    "confirming": "Annuleren…",
+    "done": "De uitnodiging aan {email} is geannuleerd.",
+    "gone": "Die uitnodiging staat niet meer open.",
+    "failed": "De uitnodiging kon niet worden geannuleerd — probeer het opnieuw."
+  },
+  "resendAdminInviteControl": {
+    "trigger": "Opnieuw versturen",
+    "triggerAriaLabel": "Uitnodiging aan {email} opnieuw versturen",
+    "sending": "Versturen…",
+    "done": "Uitnodiging opnieuw verstuurd naar {email}. Hij is nu weer {days, plural, one {# dag} other {# dagen}} geldig.",
+    "gone": "Die uitnodiging staat niet meer open.",
+    "alreadyAdmin": "{email} is al beheerder.",
+    "failed": "De uitnodiging aan {email} kon niet worden verstuurd — probeer het opnieuw."
   }
 }

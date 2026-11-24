@@ -735,6 +735,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **PLAN_CHANGE_TIMING**: `NOW`, `AT_RENEWAL`, `CANCEL_PENDING`
 - **PLAN_CHANGE_REFUSAL**: `NOT_SUBSCRIBED`, `NOT_ACTIVE`, `UNCHANGED`, `CARD_DECLINED`, `PAYMENT_NOT_CONFIRMED`, `NO_NEXT_BAND`, `PENDING_CHANGE`, `QUOTE_EXPIRED`
 
+### `@platform/constants/platform-admins` — `apps/platform/src/constants/platform-admins.ts`
+
+- **ADMIN_INVITE_FIELD_ERROR**: `ROLE_INVALID`
+- **PLATFORM_ADMIN_LOG**: `INVITE_FAILED`=`"platform_admin.invite_failed"`, `INVITE_EMAIL_FAILED`=`"platform_admin.invite_email_failed"`, `INVITE_AUDIT_FAILED`=`"platform_admin.invite_audit_failed"`, `RESEND_FAILED`=`"platform_admin.resend_failed"`, `RESEND_EMAIL_FAILED`=`"platform_admin.resend_email_failed"`, `CANCEL_FAILED`=`"platform_admin.cancel_failed"`, `CANCEL_AUDIT_FAILED`=`"platform_admin.cancel_audit_failed"`, `REMOVE_FAILED`=`"platform_admin.remove_failed"`, `REMOVE_AUDIT_FAILED`=`"platform_admin.remove_audit_failed"`
+
 ### `@platform/constants/preset-list` — `apps/platform/src/constants/preset-list.ts`
 
 - **PRESET_LIST_LAYOUT**: `GRID`, `ROWS`
