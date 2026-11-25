@@ -18,6 +18,7 @@ export const mockHeroStatementModule = (
   headingBlock: mockHeadingBlock({ heading: MOCK_HERO_STATEMENT_HEADING }),
   sanityImage: undefined,
   ctaButtons: [],
+  footnote: undefined,
   presentation: mockHeroPresentation(),
   layout: undefined,
   ...overrides,
