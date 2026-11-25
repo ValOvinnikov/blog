@@ -341,11 +341,6 @@
     "viewRunLabel": "Voir l'exécution de contraste du commit {sha} (s'ouvre dans un nouvel onglet)",
     "openReleases": "Ouvrir Releases"
   },
-  "contrastDueBanner": {
-    "title": "Vérification du contraste à faire",
-    "description": "Le rendu a changé depuis la dernière vérification du contraste réussie. Lancez-en une avant la prochaine release.",
-    "openReleases": "Ouvrir Releases"
-  },
   "findingsCard": {
     "title": "Constats ouverts",
     "empty": "Aucun constat ouvert pour ce locataire — tout fonctionne correctement.",
