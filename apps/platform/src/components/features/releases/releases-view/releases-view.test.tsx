@@ -1,3 +1,4 @@
+import { RELEASE_FAILURE } from '@platform/constants/release';
 import type { TReleaseCandidate } from '@platform/server/releases/get-release-candidate';
 import type { TReleaseResult } from '@platform/server/releases/release-result';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
@@ -5,7 +6,7 @@ import {
   mockComparedCommit,
   mockReleaseCandidate,
 } from '@platform/testing/releases/fixtures';
-import { okResult } from '@shinefold/utils';
+import { errorResult, okResult } from '@shinefold/utils';
 
 import { ReleasesView, type TReleasesViewProps } from './releases-view';
 
@@ -17,6 +18,8 @@ vi.mock('@platform/server/releases/start-tenant-migrations-action');
 
 const MOCK_COMMIT_SUBJECT = mockComparedCommit().message.split('\n')[0] ?? '';
 const LOADING_LABEL = 'Loading page…';
+const UNAVAILABLE_TITLE = 'Release information is unavailable';
+const RUN_ON_DEVELOPMENT = { name: 'Run on development' };
 
 const setup = customRenderAsync(
   (props: TReleasesViewProps) => <ReleasesView {...props} />,
@@ -47,9 +50,7 @@ describe(`<${ReleasesView.name}/>`, () => {
     });
 
     it('shows the tenant migrations card without waiting for it', () => {
-      const runButton = screen.getByRole('button', {
-        name: 'Run on development',
-      });
+      const runButton = screen.getByRole('button', RUN_ON_DEVELOPMENT);
 
       expect(runButton).toBeVisible();
     });
@@ -62,6 +63,32 @@ describe(`<${ReleasesView.name}/>`, () => {
 
       expect(commit).toBeVisible();
       expect(loading).not.toBeInTheDocument();
+    });
+  });
+
+  describe('when the candidate fails to load', () => {
+    let title: HTMLElement;
+
+    beforeEach(async () => {
+      await setup({
+        resultPromise: Promise.resolve(errorResult(RELEASE_FAILURE.DB_ERROR)),
+      });
+      title = await screen.findByText(UNAVAILABLE_TITLE);
+    });
+
+    it('shows the error notice with a way to retry', () => {
+      const retryButton = screen.getByRole('button', { name: 'Try again' });
+
+      expect(title).toBeVisible();
+      expect(retryButton).toBeVisible();
+    });
+
+    it('shows the tenant migrations card below the error notice', () => {
+      const runButton = screen.getByRole('button', RUN_ON_DEVELOPMENT);
+
+      expect(title.compareDocumentPosition(runButton)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
     });
   });
 });
