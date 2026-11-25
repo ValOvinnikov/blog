@@ -25,9 +25,11 @@ import { listTenantsPage, type TTenantsPageRow } from './list-tenants-page';
 
 vi.mock('@shinefold/db/client');
 
-faker.seed(8076);
+faker.seed(80761);
 
 const MOCK_PAGE_SIZE = 2;
+const MOCK_LOWER_TENANT_ID = '00000000-0000-4000-8000-000000000001';
+const MOCK_HIGHER_TENANT_ID = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
 const MOCK_MIDDLE_NAME = `M ${faker.company.name()}`;
 const MOCK_PAST_THE_END_PAGE = 9;
 
@@ -167,17 +169,16 @@ describe(listTenantsPage, () => {
   });
 
   it('breaks a tie on name by id', async () => {
-    const firstInserted = await insertTestTenant(db(), {
+    const higherIdTenant = await insertTestTenant(db(), {
+      id: MOCK_HIGHER_TENANT_ID,
       name: MOCK_FIRST_NAME,
       primaryDomain: MOCK_FIRST_EXTRA_DOMAIN,
     });
-    const secondInserted = await insertTestTenant(db(), {
+    const lowerIdTenant = await insertTestTenant(db(), {
+      id: MOCK_LOWER_TENANT_ID,
       name: MOCK_FIRST_NAME,
       primaryDomain: MOCK_SECOND_EXTRA_DOMAIN,
     });
-    const isFirstLower = firstInserted.id < secondInserted.id;
-    const lowerIdTenant = isFirstLower ? firstInserted : secondInserted;
-    const higherIdTenant = isFirstLower ? secondInserted : firstInserted;
 
     const firstPage = await listTenantsPage({ page: 1, pageSize: 1 });
     const secondPage = await listTenantsPage({ page: 2, pageSize: 1 });
