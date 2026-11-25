@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { GITHUB_CACHE_KEY, GITHUB_FAILURE } from '@platform/constants/github';
+import { clearMemoryUnstableCache } from '@platform/testing/memory-unstable-cache';
 import { errorResult, okResult } from '@shinefold/utils';
 
 import { cacheGitHubResult } from './cache-github-result';
@@ -22,6 +23,7 @@ describe(cacheGitHubResult, () => {
   let version: number;
 
   beforeEach(() => {
+    clearMemoryUnstableCache();
     version = faker.number.int();
     cached = cacheGitHubResult(read, {
       key: GITHUB_CACHE_KEY.COMPARISON,

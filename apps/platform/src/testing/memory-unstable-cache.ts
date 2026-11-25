@@ -1,5 +1,9 @@
 const store = new Map<string, unknown>();
 
+export const clearMemoryUnstableCache = () => {
+  store.clear();
+};
+
 export const memoryUnstableCache =
   <TArgs extends string[], T>(
     read: (...args: TArgs) => Promise<T>,
