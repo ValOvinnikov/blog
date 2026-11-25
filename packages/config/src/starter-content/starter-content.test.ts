@@ -86,20 +86,38 @@ const pageBehind = (documents: TStarterDocumentUnion[], linkId?: string) => {
 const slugOf = (document?: TStarterDocumentUnion) =>
   document && 'slug' in document ? document.slug?.current : undefined;
 
-function homeThenHeroTarget(documents: TStarterDocumentUnion[]) {
-  const { hero, modules = [] } = findByType(documents, 'template_home');
-  const heroDocument = byId(documents, hero?._ref);
-  const heroTarget =
-    heroDocument && 'ctaButtons' in heroDocument
-      ? pageBehind(documents, heroDocument.ctaButtons?.[0]?.link?._ref)
-      : undefined;
+const sectionTarget = (
+  documents: TStarterDocumentUnion[],
+  section?: TStarterDocumentUnion,
+) => {
+  if (section && 'post' in section) return byId(documents, section.post?._ref);
+  if (section && 'ctaButtons' in section)
+    return pageBehind(documents, section.ctaButtons?.[0]?.link?._ref);
+  return undefined;
+};
 
-  return [
-    heroDocument,
-    ...modules.map(({ _ref }) => byId(documents, _ref)),
-    heroTarget,
-  ].map((document) => ({ _type: document?._type }));
+function homeSections(documents: TStarterDocumentUnion[]) {
+  const { hero, modules = [] } = findByType(documents, 'template_home');
+  return [hero, ...modules].map((slot) => {
+    const section = byId(documents, slot?._ref);
+    return { section, target: sectionTarget(documents, section) };
+  });
 }
+
+const homeOrder = (documents: TStarterDocumentUnion[]) =>
+  homeSections(documents).map(({ section, target }) => ({
+    _type: section?._type,
+    target: target?._type,
+  }));
+
+const parentRefs = (documents: TStarterDocumentUnion[]) =>
+  documents.flatMap((document) =>
+    'parent' in document && document.parent ? [document.parent._ref] : [],
+  );
+
+const imageAssetRefs = (
+  items: { image?: { asset?: { _ref: string } } }[] = [],
+) => new Set(items.map(({ image }) => image?.asset?._ref));
 
 function referencedIds(documents: TStarterDocumentUnion[]): string[] {
   const ids: string[] = [];
@@ -310,65 +328,34 @@ describe(buildStarterDocuments, () => {
   });
 
   it('opens the Blog home with a hero pinning a post, then posts, topics and a CTA', () => {
-    const documents = build(SITE_TYPE.BLOG);
-    const { hero, modules = [] } = findByType(documents, 'template_home');
-    const heroDocument = byId(documents, hero?._ref);
-    const pinned =
-      heroDocument && 'post' in heroDocument
-        ? byId(documents, heroDocument.post?._ref)
-        : undefined;
-
-    const sequence = [
-      heroDocument,
-      pinned,
-      ...modules.map(({ _ref }) => byId(documents, _ref)),
-    ].map((document) => ({ _type: document?._type }));
-
-    expect(sequence).toEqual([
-      { _type: 'module_heroBlog' },
-      { _type: 'page_post' },
-      { _type: 'module_postLatest' },
-      { _type: 'module_taxonomyList' },
-      { _type: 'module_cta' },
+    expect(homeOrder(build(SITE_TYPE.BLOG))).toEqual([
+      { _type: 'module_heroBlog', target: 'page_post' },
+      { _type: 'module_postLatest', target: undefined },
+      { _type: 'module_taxonomyList', target: undefined },
+      { _type: 'module_cta', target: 'page_landing' },
     ]);
   });
 
   it('the Portfolio sample projects are two pages under one parent', () => {
-    const parents = build(SITE_TYPE.PORTFOLIO).flatMap((document) =>
-      'parent' in document && document.parent ? [document.parent._ref] : [],
-    );
+    const parents = parentRefs(build(SITE_TYPE.PORTFOLIO));
 
     expect(parents).toEqual([parents[0], parents[0]]);
   });
 
   it('opens the Personal home with a profile hero, then an introduction, questions and a CTA to the post index', () => {
-    const documents = build(SITE_TYPE.PERSONAL);
-    const { hero, modules = [] } = findByType(documents, 'template_home');
-    const cta = findByType(documents, 'module_cta');
-
-    const sequence = [
-      byId(documents, hero?._ref),
-      ...modules.map(({ _ref }) => byId(documents, _ref)),
-      pageBehind(documents, cta.ctaButtons?.[0]?.link?._ref),
-    ].map((document) => ({ _type: document?._type }));
-
-    expect(sequence).toEqual([
-      { _type: 'module_heroProfile' },
-      { _type: 'module_content' },
-      { _type: 'module_faq' },
-      { _type: 'module_cta' },
-      { _type: 'page_postIndex' },
+    expect(homeOrder(build(SITE_TYPE.PERSONAL))).toEqual([
+      { _type: 'module_heroProfile', target: undefined },
+      { _type: 'module_content', target: undefined },
+      { _type: 'module_faq', target: undefined },
+      { _type: 'module_cta', target: 'page_postIndex' },
     ]);
   });
 
   it('opens the Docs home with a statement hero linking to the guides, then an introduction and questions', () => {
-    const sequence = homeThenHeroTarget(build(SITE_TYPE.DOCS));
-
-    expect(sequence).toEqual([
-      { _type: 'module_heroStatement' },
-      { _type: 'module_content' },
-      { _type: 'module_faq' },
-      { _type: 'page_landing' },
+    expect(homeOrder(build(SITE_TYPE.DOCS))).toEqual([
+      { _type: 'module_heroStatement', target: 'page_landing' },
+      { _type: 'module_content', target: undefined },
+      { _type: 'module_faq', target: undefined },
     ]);
   });
 
@@ -381,11 +368,11 @@ describe(buildStarterDocuments, () => {
         'sectionNavigation' in document && document.sectionNavigation,
     );
 
-    const parents = landings.flatMap((document) =>
-      'parent' in document && document.parent ? [document.parent._ref] : [],
-    );
-
-    expect(parents).toEqual([section?._id, section?._id, section?._id]);
+    expect(parentRefs(landings)).toEqual([
+      section?._id,
+      section?._id,
+      section?._id,
+    ]);
   });
 
   describe('the Business site', () => {
@@ -396,19 +383,9 @@ describe(buildStarterDocuments, () => {
     });
 
     it('opens the home on a services hero and closes on a contact CTA', () => {
-      const { hero, modules = [] } = findByType(documents, 'template_home');
-      const sections = [hero?._ref, ...modules.map(({ _ref }) => _ref)].map(
-        (id) => byId(documents, id),
-      );
-
-      const sequence = sections.map((document) => ({
-        _type: document?._type,
-        actionTarget:
-          document && 'ctaButtons' in document
-            ? slugOf(
-                pageBehind(documents, document.ctaButtons?.[0]?.link?._ref),
-              )
-            : undefined,
+      const sequence = homeSections(documents).map(({ section, target }) => ({
+        _type: section?._type,
+        actionTarget: slugOf(target),
       }));
 
       expect(sequence).toEqual([
@@ -449,22 +426,11 @@ describe(buildStarterDocuments, () => {
     });
 
     it('opens the home on a changelog hero and closes on a changelog CTA', () => {
-      const cta = findByType(documents, 'module_cta');
-
-      const sequence = [
-        ...homeThenHeroTarget(documents),
-        {
-          _type: pageBehind(documents, cta.ctaButtons?.[0]?.link?._ref)?._type,
-        },
-      ];
-
-      expect(sequence).toEqual([
-        { _type: 'module_heroStatement' },
-        { _type: 'module_content' },
-        { _type: 'module_faq' },
-        { _type: 'module_cta' },
-        { _type: 'page_postIndex' },
-        { _type: 'page_postIndex' },
+      expect(homeOrder(documents)).toEqual([
+        { _type: 'module_heroStatement', target: 'page_postIndex' },
+        { _type: 'module_content', target: undefined },
+        { _type: 'module_faq', target: undefined },
+        { _type: 'module_cta', target: 'page_postIndex' },
       ]);
     });
 
@@ -714,9 +680,9 @@ describe(buildGrowthLayer, () => {
       'module_logoWall',
     );
 
-    expect(
-      new Set(logoWall.logos?.map(({ image }) => image?.asset?._ref)),
-    ).toEqual(new Set([MOCK_PLACEHOLDER_IMAGES.LOGO]));
+    expect(imageAssetRefs(logoWall.logos)).toEqual(
+      new Set([MOCK_PLACEHOLDER_IMAGES.LOGO]),
+    );
   });
 
   it.each([SITE_TYPE.PORTFOLIO, SITE_TYPE.PRODUCT] as const)(
@@ -727,9 +693,9 @@ describe(buildGrowthLayer, () => {
         'module_featureHighlights',
       );
 
-      expect(
-        new Set(highlights.highlights?.map(({ image }) => image?.asset?._ref)),
-      ).toEqual(new Set([MOCK_PLACEHOLDER_IMAGES.ILLUSTRATION]));
+      expect(imageAssetRefs(highlights.highlights)).toEqual(
+        new Set([MOCK_PLACEHOLDER_IMAGES.ILLUSTRATION]),
+      );
     },
   );
 });
