@@ -1,4 +1,5 @@
 import { ACCOUNT_IDENTITY_VOICE_FIXED_KEYS } from './voice-fixed-keys-account-identity';
+import { ASIDE_VOICE_FIXED_KEYS } from './voice-fixed-keys-aside';
 import { AUTH_MENU_VOICE_FIXED_KEYS } from './voice-fixed-keys-auth-menu';
 import { CONSENT_VOICE_FIXED_KEYS } from './voice-fixed-keys-consent';
 import { COOKIE_LIST_VOICE_FIXED_KEYS } from './voice-fixed-keys-cookie-list';
@@ -12,6 +13,7 @@ import { TOAST_VOICE_FIXED_KEYS } from './voice-fixed-keys-toast';
  */
 export const VOICE_FIXED_KEYS = [
   ...ACCOUNT_IDENTITY_VOICE_FIXED_KEYS,
+  ...ASIDE_VOICE_FIXED_KEYS,
   ...AUTH_MENU_VOICE_FIXED_KEYS,
   ...CONSENT_VOICE_FIXED_KEYS,
   ...COOKIE_LIST_VOICE_FIXED_KEYS,
@@ -50,10 +52,6 @@ export const VOICE_FIXED_KEYS = [
   'carousel.nextAriaLabel',
   'carousel.regionLabel',
   'codeBlock.regionLabel',
-
-  'blogPostPage.asideKind.WHY_NOT',
-  'blogPostPage.asideKind.DIGRESSION',
-  'blogPostPage.asideKind.CONTEXT',
 
   'bookmarkButton.errorSave',
   'bookmarkButton.errorUnavailable',

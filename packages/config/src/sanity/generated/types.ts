@@ -963,7 +963,7 @@ export type LinkRef = {
 
 export type Aside = {
   _type: 'aside';
-  kind?: 'WHY_NOT' | 'DIGRESSION' | 'CONTEXT';
+  kind?: 'WHY_NOT' | 'DIGRESSION' | 'CONTEXT' | 'TIP' | 'NOTE' | 'WARNING';
   body?: ParagraphText;
 };
 

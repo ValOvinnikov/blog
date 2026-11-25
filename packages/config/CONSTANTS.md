@@ -27,7 +27,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/aside.ts`
 
-- **ASIDE_KIND**: `WHY_NOT`, `DIGRESSION`, `CONTEXT`
+- **ASIDE_KIND**: `WHY_NOT`, `DIGRESSION`, `CONTEXT`, `TIP`, `NOTE`, `WARNING`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/audit.ts`
 

@@ -1,4 +1,4 @@
-import { ASIDE_KIND, routes, type TAsideKind } from '@shinefold/config';
+import { ASIDE_KIND, routes } from '@shinefold/config';
 import {
   type TImageTransformOptions,
   urlForSanityImage,
@@ -9,6 +9,7 @@ import { ContentsRailLayout } from '@web/components/shared/contents-rail-layout'
 import {
   createPostBodyOverride,
   PortableText,
+  type TAsideKindLabels,
 } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -75,7 +76,7 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
     month: 'long',
     day: 'numeric',
   });
-  const asideKindLabels: Record<TAsideKind, string> = {
+  const asideKindLabels: TAsideKindLabels = {
     [ASIDE_KIND.WHY_NOT]: blogPostT('asideKind.WHY_NOT'),
     [ASIDE_KIND.DIGRESSION]: blogPostT('asideKind.DIGRESSION'),
     [ASIDE_KIND.CONTEXT]: blogPostT('asideKind.CONTEXT'),
