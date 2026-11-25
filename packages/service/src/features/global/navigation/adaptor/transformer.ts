@@ -28,6 +28,7 @@ function toNavigationItem(
 export function toNavigation(raw: TRawNavigation): TNavigation {
   return {
     items: (raw.items ?? []).flatMap((item) => toNavigationItem(item) ?? []),
+    headerAction: toLinkDocument(raw.headerAction),
     tagline: toBrandTagline(raw.tagline),
     showLanguageSwitcher: raw.showLanguageSwitcher ?? undefined,
   };

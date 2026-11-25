@@ -23,7 +23,6 @@ import type { TRawFaqModule } from '@shinefold/service/features/modules/faq/adap
 import type { TRawFeatureHighlightsModule } from '@shinefold/service/features/modules/feature-highlights/adaptor/transformer';
 import type { TRawHeroBlogModule } from '@shinefold/service/features/modules/hero-blog/adaptor/transformer';
 import type { TRawHeroProfileModule } from '@shinefold/service/features/modules/hero-profile/adaptor/transformer';
-import type { TRawHeroStatementModule } from '@shinefold/service/features/modules/hero-statement/adaptor/transformer';
 import type { TRawLogoWallModule } from '@shinefold/service/features/modules/logo-wall/adaptor/transformer';
 import type { TRawNewsletterModule } from '@shinefold/service/features/modules/newsletter/adaptor/transformer';
 import type { TRawSectionPagesModule } from '@shinefold/service/features/modules/section-pages/adaptor/module/transformer';
@@ -126,26 +125,6 @@ export function mockRawHeroBlogModule(
     secondaryAction: null,
     variant: HERO_VARIANT.SPLIT,
     brandVariant: BRAND_VARIANT.PRIMARY,
-    contentPositionSplit: null,
-    contentPositionBanner: null,
-    contentAlignment: null,
-    mediaOrderSplit: null,
-    mediaOrderStacked: null,
-    layout: null,
-    ...overrides,
-  };
-}
-
-export function mockRawHeroStatementModule(
-  overrides: Partial<TRawHeroStatementModule> = {},
-): TRawHeroStatementModule {
-  return {
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    variant: HERO_VARIANT.SPLIT,
-    eyebrow: null,
-    headingBlock: mockRawHeadingBlock('Statement heading'),
-    image: null,
-    ctaButtons: null,
     contentPositionSplit: null,
     contentPositionBanner: null,
     contentAlignment: null,

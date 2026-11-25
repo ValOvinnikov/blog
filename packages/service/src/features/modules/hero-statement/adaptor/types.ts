@@ -14,6 +14,7 @@ export type THeroStatementModule = {
   eyebrow: TMaybeUndefined<string>;
   sanityImage: TMaybeUndefined<ISanityImage>;
   ctaButtons: TCtaButton[];
+  footnote: TMaybeUndefined<string>;
   presentation: THeroPresentation;
   layout: TMaybeUndefined<THeroLayout>;
 };

@@ -3,6 +3,8 @@ import { StandaloneNotFoundPage } from '@web/components/pages/standalone-not-fou
 import { DocumentShell } from '@web/components/shared/document-shell';
 import { buildNotFoundMetadata } from '@web/metadata/not-found-metadata';
 import { getNotFoundContext } from '@web/server/request-context/request-context';
+import { getLockedColorScheme } from '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import type { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -11,16 +13,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return buildNotFoundMetadata({ tenant: tenantId, locale });
 }
 
-/**
- * Catches a `notFound()` thrown by `[tenant]/[locale]/layout.tsx` itself,
- * which a same-segment boundary cannot; it sits above that layout, so it owns
- * the document. Must never call `headers()`.
- */
+/** Owns the document for a `notFound()` thrown by `[tenant]/[locale]/layout.tsx` itself, which no same-segment boundary catches, and must never call `headers()`. */
 export default async function TenantNotFound() {
   const { tenantId, locale } = await getNotFoundContext();
+  const lockedColorScheme = await getLockedColorScheme(
+    tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
+  );
 
   return (
-    <DocumentShell lang={LOCALE_BCP47_TAGS[locale]}>
+    <DocumentShell
+      lang={LOCALE_BCP47_TAGS[locale]}
+      lockedColorScheme={lockedColorScheme}
+    >
       {await StandaloneNotFoundPage({ tenant: tenantId, locale })}
     </DocumentShell>
   );

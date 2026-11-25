@@ -27,6 +27,11 @@ export const navigationQuery = q
         }),
       }))
       .nullable(true),
+    headerAction: sub
+      .field('headerAction')
+      .deref()
+      .project(linkDocumentFragment)
+      .nullable(true),
     tagline: sub.field('tagline').project(brandTaglineFragment).nullable(true),
     showLanguageSwitcher: sub.field('showLanguageSwitcher').nullable(true),
   }))

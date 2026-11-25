@@ -1,5 +1,7 @@
+import { MOCK_YELLOW_HEX } from '@shinefold/config/testing/button-colors';
 import {
   hexToOklch,
+  isHexColor,
   oklchToHex,
   renderedContrastRatio,
   WCAG_AA_CONTRAST_MIN,
@@ -31,7 +33,6 @@ vi.mock(import('@shinefold/utils/color'), async (importOriginal) => {
 
 const MOCK_ACCENT_HUE = 65;
 const MOCK_LOGO_HUE = 274;
-const HEX_COLOR = /^#[0-9a-f]{6}$/;
 
 const hexAt = ({ l, c, h }: TOklchStop, hue: number) =>
   oklchToHex(l, c, h ?? hue);
@@ -89,9 +90,7 @@ describe.each(MODES)('the $mode email brand', ({ resolve, ramps }) => {
       preset: PRESET_ID.CONSOLE,
       accentHue: MOCK_ACCENT_HUE,
     });
-    const nonHex = Object.values(brand).filter(
-      (value) => !HEX_COLOR.test(value),
-    );
+    const nonHex = Object.values(brand).filter((value) => !isHexColor(value));
 
     expect({ brand, nonHex }).toEqual({
       brand: expectedBrandHex(ramps, MOCK_ACCENT_HUE),
@@ -109,6 +108,28 @@ describe.each(MODES)('the $mode email brand', ({ resolve, ramps }) => {
     expect(brand).toEqual(
       expectedBrandHex(ramps, MOCK_ACCENT_HUE, MOCK_LOGO_HUE),
     );
+  });
+
+  it('takes the light-ground button colour for its button fill and label', () => {
+    const brand = resolve({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: MOCK_ACCENT_HUE,
+      buttonColor: MOCK_YELLOW_HEX,
+    });
+
+    expect({
+      brand,
+      labelContrast:
+        contrastOf(brand.brandPrimaryContrast, brand.brandPrimarySolid) >=
+        WCAG_AA_CONTRAST_MIN,
+    }).toEqual({
+      brand: {
+        ...expectedBrandHex(ramps, MOCK_ACCENT_HUE),
+        brandPrimarySolid: MOCK_YELLOW_HEX,
+        brandPrimaryContrast: expect.any(String),
+      },
+      labelContrast: true,
+    });
   });
 
   it('falls back to the preset accent hue when the requested one fails AA', () => {

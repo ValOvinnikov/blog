@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
 import { mockRun } from '@shinefold/service/testing/mock-run-query';
-import { mockRawHeroStatementModule } from '@shinefold/service/testing/modules/fixtures';
+import { mockRawHeroStatementModule } from '@shinefold/service/testing/modules/hero-statement/fixtures';
 import {
   MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,

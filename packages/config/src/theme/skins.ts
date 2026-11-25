@@ -23,6 +23,7 @@ import {
 export type TSkin = {
   title: string;
   mode: TSkinMode;
+  ground: Record<TColorScheme, TPaletteStop>;
   readonly roles: Record<TColorScheme, TSkinRoles>;
 };
 
@@ -43,6 +44,7 @@ export const defineSkin = (
   return {
     title,
     mode,
+    ground,
     // Derived on first read: the search measures every accent hue, too slow for module load.
     get roles() {
       roles ??= mapKeysToRecord(COLOR_SCHEMES, (scheme) =>

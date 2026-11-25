@@ -65,6 +65,7 @@ export * from './oauth-provider';
 export * from './operator-alert';
 export * from './path';
 export * from './plan-comparison';
+export * from './platform-plan-interval';
 export * from './portable-text-block-type';
 export * from './post-summary';
 export * from './preset';

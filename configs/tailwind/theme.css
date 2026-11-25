@@ -79,6 +79,10 @@
   --color-brand-primary-solid: var(--brand-primary-solid); /* @role filled surface (button bg) */
   /* prettier-ignore */
   --color-brand-primary-solid-hover: var(--brand-primary-solid-hover); /* @role filled surface hover */
+  --color-button-fill: var(--button-fill); /* @role filled button background */
+  /* prettier-ignore */
+  --color-button-fill-hover: var(--button-fill-hover); /* @role filled button hover */
+  --color-button-label: var(--button-label); /* @role text on button-fill */
 
   --color-success: var(--success); /* @role success text / icon */
   /* prettier-ignore */
@@ -300,6 +304,9 @@
   --brand-primary-contrast: oklch(0.99 0 0);
   --brand-primary-solid: oklch(0.51 0.17 250);
   --brand-primary-solid-hover: oklch(0.45 0.17 250);
+  --button-fill: var(--brand-primary-solid);
+  --button-fill-hover: var(--brand-primary-solid-hover);
+  --button-label: var(--brand-primary-contrast);
   --ring: var(--brand-primary);
   /* --info aliases --brand-primary rather than duplicating it: info conveys
      no success/failure valence, so it deliberately reuses the brand-primary
@@ -406,6 +413,9 @@
      near-black text hits ~7.3:1 (AAA). */
   --brand-primary-solid: oklch(0.7 0.16 250);
   --brand-primary-solid-hover: oklch(0.76 0.16 250);
+  --button-fill: var(--brand-primary-solid);
+  --button-fill-hover: var(--brand-primary-solid-hover);
+  --button-label: var(--brand-primary-contrast);
   --ring: var(--brand-primary);
   /* --info aliases --brand-primary rather than duplicating it: info conveys
      no success/failure valence, so it deliberately reuses the brand-primary

@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { COLOR_SCHEME } from '@shinefold/config';
 import { themeBootstrapScript } from '@web/config/theme-script';
 import { SANITY_IMAGE_CDN_PRECONNECT_TEST_ID } from '@web/constants/document-shell';
 import { renderElement, within } from '@web/testing/custom-render';
@@ -12,6 +13,35 @@ const MOCK_LANGUAGE = faker.location.countryCode().toLowerCase();
 const SANITY_IMAGE_CDN_ORIGIN = 'https://cdn.sanity.io';
 
 describe(`<${DocumentShell.name}/>`, () => {
+  const queryThemeScript = () =>
+    within(document.head).queryByText(themeBootstrapScript, { ignore: false });
+
+  describe.each([
+    [COLOR_SCHEME.DARK, 'dark'],
+    [COLOR_SCHEME.LIGHT, 'light'],
+  ])('locked to %s', (lockedColorScheme, colorScheme) => {
+    beforeEach(() => {
+      renderElement(
+        <DocumentShell
+          lang={MOCK_LANGUAGE}
+          lockedColorScheme={lockedColorScheme}
+        >
+          <div>{MOCK_CONTENT}</div>
+        </DocumentShell>,
+      );
+    });
+
+    it('renders the locked scheme from the server', () => {
+      expect(document.documentElement.style.colorScheme).toBe(colorScheme);
+    });
+
+    it("skips the theme bootstrap script, so the reader's stored choice never applies", () => {
+      expect(queryThemeScript()).not.toBeInTheDocument();
+    });
+  });
+});
+
+describe(`<${DocumentShell.name}/> for a site the reader chooses`, () => {
   beforeEach(() => {
     renderElement(
       <DocumentShell lang={MOCK_LANGUAGE}>

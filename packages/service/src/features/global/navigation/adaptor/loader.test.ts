@@ -141,6 +141,56 @@ describe(getNavigation, () => {
     ]);
   });
 
+  it('maps the header action into a link', async () => {
+    mockRun.mockResolvedValueOnce(
+      mockRawNavigation({
+        headerAction: mockRawExternalLinkDocument({
+          label: MOCK_LINK_LABEL,
+          url: MOCK_LINK_URL,
+        }),
+      }),
+    );
+
+    const result = await getNavigation(MOCK_TENANT);
+
+    expect(result.headerAction).toEqual(
+      mockLinkView({ label: MOCK_LINK_LABEL, href: MOCK_LINK_URL }),
+    );
+  });
+
+  it.each([
+    ['no label', { label: null }],
+    ['no resolvable href', { url: null }],
+  ])('returns no header action when its link has %s', async (_, overrides) => {
+    mockRun.mockResolvedValueOnce(
+      mockRawNavigation({
+        headerAction: mockRawExternalLinkDocument(overrides),
+      }),
+    );
+
+    const result = await getNavigation(MOCK_TENANT);
+
+    expect(result.headerAction).toBeUndefined();
+  });
+
+  it('returns no header action when none is set, keeping the other fields', async () => {
+    mockRun.mockResolvedValueOnce(
+      mockRawNavigation({
+        items: [mockRawLinkRef(MOCK_LINK_LABEL, MOCK_LINK_URL)],
+        showLanguageSwitcher: true,
+      }),
+    );
+
+    const result = await getNavigation(MOCK_TENANT);
+
+    expect(result).toEqual({
+      items: [mockLinkView({ label: MOCK_LINK_LABEL, href: MOCK_LINK_URL })],
+      headerAction: undefined,
+      tagline: undefined,
+      showLanguageSwitcher: true,
+    });
+  });
+
   it('joins the tagline items with their separator', async () => {
     mockRun.mockResolvedValueOnce(
       mockRawNavigation({

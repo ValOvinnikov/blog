@@ -1,5 +1,4 @@
 import type {
-  PricingTier,
   TBrandVariant,
   TContentAlignmentOf,
   THeadingBlock,
@@ -20,7 +19,7 @@ export type TPricingPrice = {
 
 export type TPricingTierPlatformPlan = {
   plan: TSellableTenantPlan;
-  interval: NonNullable<PricingTier['platformPlanInterval']>;
+  periods: TPricePeriod[];
 };
 
 export type TPricingTier = {

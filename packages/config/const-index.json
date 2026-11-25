@@ -3854,6 +3854,14 @@
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
+    "MONTH_AND_YEAR": [
+      {
+        "ref": "PLATFORM_PLAN_INTERVAL.MONTH_AND_YEAR",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/platform-plan-interval.ts"
+      }
+    ],
     "bodyImage": [
       {
         "ref": "PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE",
@@ -13389,6 +13397,14 @@
     "voice_rich.fetch_failed": [
       {
         "ref": "SITE_CONFIG_LOG.VOICE_RICH_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-config",
+        "file": "apps/web/src/constants/site-config.ts"
+      }
+    ],
+    "color_mode.site_config_fetch_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.COLOR_MODE_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/site-config",
         "file": "apps/web/src/constants/site-config.ts"
