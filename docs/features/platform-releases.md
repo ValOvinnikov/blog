@@ -76,8 +76,12 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   - When there are no commits since the tag only the summary, the empty
     message and the Release card show, and the Release button is disabled
     with "Nothing has changed since {lastTag}". A failed read shows an error notice with the reason and a
-    Try again button, never earlier data. Loading is the `(operator)`
-    segment's page skeleton.
+    Try again button, never earlier data; the tenant migrations card still
+    shows below it.
+  - The heading renders first. The candidate section and the tenant
+    migrations card each stream in behind their own Suspense boundary, with a
+    card skeleton until they resolve. Navigation to the page shows the
+    `(operator)` segment's page skeleton.
 - Server Action `startContrastCheckAction`
   (`server/releases/start-contrast-check-action.ts`): `requireSuperAdmin`,
   reads `main`'s HEAD, answers `REFUSED` with reason `CONTRAST_CHECK_RUNNING`
@@ -240,19 +244,26 @@ values are stored as plain `text`, so none of them needs a db migration:
   `notConfigured` (token or repo missing), `noReleaseTag`, `rateLimited`
   (logged at warn), `githubError`, `tagListIncomplete` and `dbError`. A repository with no tag yet
   is not logged.
-- The reader pages GitHub's lists 100 at a time: a comparison's changed files
-  up to GitHub's 300-file limit, the pages holding its newest commits, and
-  every `v*` tag ref up to 10 pages (1000 tags). Every request keeps its
-  timeout, and a failed page fails the read with a reason code. A tag list
-  still full at the page cap is reported as `tagListIncomplete`, never as a
-  different latest tag.
-- A comparison and a file's contents at a SHA are fixed by their inputs and
-  cached with no expiry (`GITHUB_PINNED_READ_REVALIDATE`). The tag list,
-  `main`'s head, workflow-run reads and every dispatch stay uncached: Next
-  serves an expired entry before refreshing it, so a window on a moving ref
-  would bound nothing, and the release card's 10-second poll sees live
-  state. Only a 200 is cached, so a failure is retried on the next read, and
-  a response over Next's 2 MB cache limit is simply re-fetched.
+- The reader pages GitHub's lists 100 at a time: the pages holding a
+  comparison's newest commits, and every `v*` tag ref up to 10 pages (1000
+  tags). A comparison's changed files come from its first page only, where
+  GitHub returns the whole list up to its 300-file limit, so one comparison
+  makes at most three requests: page 1 and the last two commit pages. Every
+  request keeps its timeout, and a failed page fails the read with a reason
+  code. A tag list still full at the page cap is reported as
+  `tagListIncomplete`, never as a different latest tag.
+- A comparison is fixed by its base and head, so its reduced result (the
+  newest commits, the total, the changed filenames and the truncation flag)
+  is cached per pair with no expiry (`cacheGitHubResult`). The raw compare
+  pages are not cached: with full commit objects and file patches they pass
+  Next's 2 MB cache limit, which skips them silently. A failed comparison is
+  never stored, so the next read retries it. A file's contents at a SHA are
+  cached with no expiry as a raw response (`GITHUB_PINNED_READ_REVALIDATE`).
+- The tag list, `main`'s head, workflow-run reads and every dispatch stay
+  uncached: Next serves an expired entry before refreshing it, so a window on
+  a moving ref would bound nothing, and the release card's 10-second poll
+  sees live state. A new commit on `main` changes the head, so the first view
+  after it reads the comparison again.
 - The candidate comparison is deduped per render (`React.cache`), so the
   contrast-due banner and the releases page share one result.
 - At the 300-file limit the file list is truncated (`isFileListTruncated` on
