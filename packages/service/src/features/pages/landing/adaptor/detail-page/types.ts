@@ -14,12 +14,16 @@ export type TLandingSectionPage = {
   isCurrent: boolean;
 };
 
+export type TLandingSectionNavigationPage = TLandingSectionPage & {
+  pages?: TLandingSectionPage[];
+};
+
 export type TLandingBreadcrumb = Omit<TLandingSectionPage, 'isCurrent'>;
 
 export type TLandingSectionNavigation = {
   title: string | null;
   root: TLandingSectionPage;
-  pages: TLandingSectionPage[];
+  pages: TLandingSectionNavigationPage[];
   breadcrumbs: TLandingBreadcrumb[];
   parentSection: TMaybeUndefined<TLandingBreadcrumb>;
 };

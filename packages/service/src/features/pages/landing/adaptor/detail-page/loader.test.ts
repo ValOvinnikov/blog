@@ -167,11 +167,19 @@ describe(getPageDocument, () => {
         sectionNavigation: !isNull(children),
         sectionNavigationTitle: null,
         showPreviousNextLinks: true,
+        showSubPagesInNavigation: false,
         children,
       };
     }
 
     const modulesSection = mockChainNode(sectionRoot, [faq, pricing]);
+    const breadcrumbsToAnswers = [sectionRoot, faq, answers].map(
+      ({ title, path }) => ({ title, path }),
+    );
+
+    function toSectionLink({ title, path }: TSectionPage, isCurrent: boolean) {
+      return { title, path, isCurrent };
+    }
 
     async function navigationFor(
       overrides: Parameters<typeof mockRawLandingPage>[0],
@@ -201,11 +209,7 @@ describe(getPageDocument, () => {
           { title: faq.title, path: MOCK_FAQ_PATH, isCurrent: true },
           { title: pricing.title, path: MOCK_PRICING_PATH, isCurrent: false },
         ],
-        breadcrumbs: [
-          { title: sectionRoot.title, path: MOCK_SECTION_SLUG },
-          { title: faq.title, path: MOCK_FAQ_PATH },
-          { title: answers.title, path: MOCK_ANSWERS_PATH },
-        ],
+        breadcrumbs: breadcrumbsToAnswers,
         parentSection: undefined,
       });
     });
@@ -311,6 +315,91 @@ describe(getPageDocument, () => {
       ]);
     });
 
+    describe('with sub-pages shown', () => {
+      const groupedSection = {
+        ...mockChainNode(sectionRoot, [
+          { ...faq, children: [answers, glossary] },
+          { ...pricing, children: [] },
+        ]),
+        showSubPagesInNavigation: true,
+      };
+
+      it('gives a page two levels down each top-level child with its pages', async () => {
+        const navigation = await navigationFor({
+          sectionChain: [
+            mockChainNode(answers),
+            mockChainNode(faq),
+            groupedSection,
+          ],
+        });
+
+        expect(navigation?.root).toEqual(toSectionLink(sectionRoot, false));
+        expect(navigation?.pages).toEqual([
+          {
+            ...toSectionLink(faq, true),
+            pages: [
+              toSectionLink(answers, true),
+              toSectionLink(glossary, false),
+            ],
+          },
+          toSectionLink(pricing, false),
+        ]);
+        expect(navigation?.breadcrumbs).toEqual(breadcrumbsToAnswers);
+      });
+
+      it('gives a child with no pages of its own none', async () => {
+        const navigation = await navigationFor({
+          sectionChain: [groupedSection],
+        });
+
+        expect(navigation?.pages[1]).not.toHaveProperty('pages');
+      });
+
+      it.each([
+        ['no path', { path: null }],
+        ['no heading', { title: null }],
+      ])('leaves out a sub-page with %s', async (_, broken) => {
+        const navigation = await navigationFor({
+          sectionChain: [
+            {
+              ...groupedSection,
+              children: [
+                { ...faq, children: [{ ...answers, ...broken }, glossary] },
+              ],
+            },
+          ],
+        });
+
+        expect(navigation?.pages[0]?.pages).toEqual([
+          toSectionLink(glossary, false),
+        ]);
+      });
+
+      it("ignores a nested section's own navigation under the top page", async () => {
+        const navigation = await navigationFor({
+          sectionChain: [
+            mockChainNode(answers),
+            mockChainNode(faq, [glossary, answers]),
+            groupedSection,
+          ],
+        });
+
+        expect(navigation?.root.path).toBe(MOCK_SECTION_SLUG);
+        expect(navigation?.parentSection).toBeUndefined();
+      });
+    });
+
+    it('gives no page its sub-pages while the top page has the switch off', async () => {
+      const navigation = await navigationFor({
+        sectionChain: [
+          mockChainNode(faq),
+          mockChainNode(sectionRoot, [{ ...faq, children: [answers] }]),
+        ],
+      });
+
+      expect(navigation?.pages[0]).not.toHaveProperty('pages');
+    });
+
     it.each([
       [
         'the page turns section navigation off',
@@ -339,6 +428,7 @@ describe(getPageDocument, () => {
         sectionNavigation: true,
         sectionNavigationTitle: null,
         showPreviousNextLinks: true,
+        showSubPagesInNavigation: false,
         children: [{ ...faq, children: [answers, glossary] }, pricing],
         ...overrides,
       };
@@ -350,6 +440,7 @@ describe(getPageDocument, () => {
         sectionNavigation: false,
         sectionNavigationTitle: null,
         showPreviousNextLinks: true,
+        showSubPagesInNavigation: false,
         children: null,
       };
     }

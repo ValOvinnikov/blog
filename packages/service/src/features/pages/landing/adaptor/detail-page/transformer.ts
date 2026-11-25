@@ -10,70 +10,17 @@ import { resolveSeo } from '@shinefold/service/shared/transformers/seo/resolve-s
 import type { InferResultType } from 'groqd';
 
 import type { landingPageQuery } from './query';
-import type {
-  TLandingAdjacentPages,
-  TLandingBreadcrumb,
-  TLandingPageDocument,
-  TLandingSectionNavigation,
-  TLandingSectionPage,
-} from './types';
+import {
+  toBreadcrumb,
+  toSectionNavigation,
+  type TRawSectionPage,
+  type TRawSectionTreePage,
+} from './section-navigation';
+import type { TLandingAdjacentPages, TLandingPageDocument } from './types';
 
 export type TRawLandingPage = NonNullable<
   InferResultType<typeof landingPageQuery>
 >;
-
-type TRawSectionRoot = TRawLandingPage['sectionChain'][number];
-
-type TRawSectionPage = Pick<TRawSectionRoot, '_id' | 'title' | 'path'>;
-
-type TRawSectionTreePage = NonNullable<TRawSectionRoot['children']>[number];
-
-function toBreadcrumb({
-  title,
-  path,
-}: TRawSectionPage): TMaybeUndefined<TLandingBreadcrumb> {
-  return title && path ? { title, path } : undefined;
-}
-
-function toSectionPage(
-  raw: TRawSectionPage,
-  isCurrent: boolean,
-): TMaybeUndefined<TLandingSectionPage> {
-  const breadcrumb = toBreadcrumb(raw);
-
-  return breadcrumb && { ...breadcrumb, isCurrent };
-}
-
-function toSectionNavigation({
-  sectionChain,
-  showSectionNavigation,
-}: TRawLandingPage): TMaybeUndefined<TLandingSectionNavigation> {
-  if (showSectionNavigation === false) return undefined;
-
-  const rootIndex = sectionChain.findIndex((page) => page.sectionNavigation);
-  const sectionRoot = sectionChain[rootIndex];
-  const root = sectionRoot && toSectionPage(sectionRoot, rootIndex === 0);
-  if (!sectionRoot || !root) return undefined;
-
-  const parentSection = sectionChain
-    .slice(rootIndex + 1)
-    .find((page) => page.sectionNavigation);
-  const currentBranchIds = new Set(
-    sectionChain.slice(0, rootIndex).map(({ _id }) => _id),
-  );
-
-  return {
-    title: sectionRoot.sectionNavigationTitle?.trim() || null,
-    root,
-    pages: (sectionRoot.children ?? []).flatMap(
-      (child) => toSectionPage(child, currentBranchIds.has(child._id)) ?? [],
-    ),
-    breadcrumbs: [...sectionChain]
-      .reverse()
-      .flatMap((page) => toBreadcrumb(page) ?? []),
-    parentSection: parentSection && toBreadcrumb(parentSection),
-  };
-}
 
 function toReadingOrder(
   page: TRawSectionPage & { children?: TRawSectionTreePage[] | null },

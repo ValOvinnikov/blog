@@ -32,6 +32,7 @@ export function mockRawLandingPage(
         sectionNavigation: false,
         sectionNavigationTitle: null,
         showPreviousNextLinks: true,
+        showSubPagesInNavigation: false,
         children: null,
       },
     ],
