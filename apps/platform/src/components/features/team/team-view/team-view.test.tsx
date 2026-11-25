@@ -3,6 +3,7 @@ import {
   TEAM_SEAT_NOTICE_ID,
 } from '@platform/constants/team-access';
 import { ARIA_DESCRIBEDBY, ARIA_DISABLED } from '@platform/testing/aria';
+import { MOCK_GRACE_ENDS_AT } from '@platform/testing/billing/grace';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
   MOCK_MEMBER_EMAIL,
@@ -42,7 +43,6 @@ const PENDING_INVITES = 'Pending invites';
 const SEAT_LIMIT_TITLE = 'Every seat is in use';
 const MOCK_READER_EMAIL = 'reader@example.com';
 const MOCK_PENDING_EMAIL = 'pending@example.com';
-const MOCK_GRACE_ENDS_AT = new Date(Date.UTC(2026, 9, 15));
 
 const setup = customRender(TeamView, {
   tenantId: MOCK_TENANT_ID,

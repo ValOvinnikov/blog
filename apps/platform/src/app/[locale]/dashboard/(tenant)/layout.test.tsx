@@ -10,6 +10,7 @@ import {
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { MOCK_SEATS_OVER_ONE_SEAT } from '@platform/testing/team/fixtures';
 import {
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_ID,
@@ -83,7 +84,6 @@ const MOCK_FREE_MEMBERSHIP = mockMembership({ tenantId: MOCK_TENANT_ID });
 const MOCK_GROWTH_MEMBERSHIP = mockMembership({
   tenantId: MOCK_OTHER_TENANT_ID,
 });
-const MOCK_SEATS_OVER_FREE = 2;
 const MOCK_DASHBOARD_CONTENT = faker.lorem.sentence();
 
 const switcherNamed = (domain: string) => (name: string) =>
@@ -210,7 +210,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       { membership: MOCK_FREE_MEMBERSHIP, tenant: MOCK_FREE_TENANT },
     ]);
-    countSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_FREE);
+    countSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
 
     await setup();
     const teamLink = screen.getByRole('link', { name: navSections.team });

@@ -1,6 +1,10 @@
 import { TEAM_ROW_ACCESS } from '@platform/constants/team-access';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
+  MOCK_GRACE_ENDS_AT,
+  MOCK_GRACE_STARTED_AT,
+} from '@platform/testing/billing/grace';
+import {
   mockOperatorViewer,
   mockViewer,
 } from '@platform/testing/memberships/fixtures';
@@ -28,8 +32,6 @@ const MOCK_NOW = new Date(2026, 9, 2, 12, 0);
 const MOCK_HOUR_AGO = new Date(MOCK_NOW.getTime() - HOUR_MS);
 const MOCK_YESTERDAY = new Date(MOCK_NOW.getTime() - DAY_MS);
 const MOCK_OWNER = mockTeamOwner();
-const MOCK_GRACE_STARTED_AT = new Date(Date.UTC(2026, 9, 1, 15));
-const MOCK_GRACE_ENDS_AT = new Date(Date.UTC(2026, 9, 15));
 
 const modelFor = (
   overrides: Partial<Parameters<typeof teamViewModel>[0]> = {},

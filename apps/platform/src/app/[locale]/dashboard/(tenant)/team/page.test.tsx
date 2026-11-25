@@ -2,7 +2,10 @@ import messages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { mockTenantMember } from '@platform/testing/team/fixtures';
+import {
+  MOCK_SEATS_OVER_ONE_SEAT,
+  mockTenantMember,
+} from '@platform/testing/team/fixtures';
 import { mockTeamOwner } from '@platform/testing/team/team-view';
 import {
   MOCK_TENANT_ID,
@@ -52,8 +55,6 @@ vi.mock('@shinefold/db', async () => ({
   },
 }));
 
-const MOCK_SEATS_OVER_STARTER = 2;
-
 const signInAs = (role: TMembershipRole, plan: TTenantPlan) =>
   listMembershipsWithTenantsForUserMock.mockResolvedValue([
     {
@@ -100,7 +101,7 @@ describe(`<${DashboardTeamPage.name}/>`, () => {
 
   it('shows the owner of a Starter site over its seats its team, with no Invite editor', async () => {
     signInAs(MEMBERSHIP_ROLE.OWNER, TENANT_PLAN.STARTER);
-    countSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_STARTER);
+    countSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
     listTenantMembersMock.mockResolvedValue([
       mockTeamOwner(),
       mockTenantMember(),

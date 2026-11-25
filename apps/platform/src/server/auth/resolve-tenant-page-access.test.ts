@@ -3,6 +3,7 @@ import {
   mockOperatorViewer,
   mockViewer,
 } from '@platform/testing/memberships/fixtures';
+import { MOCK_SEATS_OVER_ONE_SEAT } from '@platform/testing/team/fixtures';
 import {
   MOCK_TENANT_ID,
   mockReadyTenant,
@@ -25,7 +26,6 @@ vi.mock('@shinefold/db', () => ({
 }));
 
 const MOCK_STORED_LEAD_COUNT = 2;
-const MOCK_SEATS_OVER_STARTER = 3;
 const countLeadsForTenant = vi.mocked(queries.leads.countLeadsForTenant);
 const countSeatsInUse = vi.mocked(queries.membershipInvites.countSeatsInUse);
 
@@ -140,36 +140,24 @@ describe(resolveTenantPageAccess, () => {
     expect(team).toBe(isOpen);
   });
 
-  it('opens Team on Growth without counting seats', async () => {
-    const { team } = await resolveFor(
-      TENANT_PLAN.GROWTH,
-      MEMBERSHIP_ROLE.OWNER,
-    );
+  it.each([
+    ['a Starter owner', TENANT_PLAN.STARTER, MEMBERSHIP_ROLE.OWNER, true],
+    ['a Free owner', TENANT_PLAN.FREE, MEMBERSHIP_ROLE.OWNER, true],
+    ['a Starter editor', TENANT_PLAN.STARTER, MEMBERSHIP_ROLE.EDITOR, false],
+  ])(
+    'opens Team to %s while the site is over its seats: %s',
+    async (_label, plan, role, isOpen) => {
+      countSeatsInUse.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
 
-    expect(team).toBe(true);
-    expect(countSeatsInUse).not.toHaveBeenCalled();
-  });
+      const { team } = await resolveFor(plan, role);
 
-  it.each([TENANT_PLAN.STARTER, TENANT_PLAN.FREE])(
-    'opens Team to an owner on %s while the site is over its seats',
-    async (plan) => {
-      countSeatsInUse.mockResolvedValue(MOCK_SEATS_OVER_STARTER);
-
-      const { team } = await resolveFor(plan, MEMBERSHIP_ROLE.OWNER);
-
-      expect(team).toBe(true);
-      expect(countSeatsInUse).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      expect(team).toBe(isOpen);
     },
   );
 
-  it('keeps Team closed to an editor on Starter over its seats', async () => {
-    countSeatsInUse.mockResolvedValue(MOCK_SEATS_OVER_STARTER);
+  it('counts no seats when the plan already opens Team', async () => {
+    await resolveFor(TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.OWNER);
 
-    const { team } = await resolveFor(
-      TENANT_PLAN.STARTER,
-      MEMBERSHIP_ROLE.EDITOR,
-    );
-
-    expect(team).toBe(false);
+    expect(countSeatsInUse).not.toHaveBeenCalled();
   });
 });
