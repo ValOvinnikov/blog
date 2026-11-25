@@ -1,3 +1,5 @@
+import { SHINEFOLD_LOGO_COLOR } from '@shinefold/utils/shinefold-logo';
+
 import { BUTTON_SHAPE } from './button-shape';
 import { CARD_STYLE } from './card-style';
 import { CONSOLE_BUNDLE } from './console-preset-bundle';
@@ -10,8 +12,6 @@ import {
   type TPresetBundle,
 } from './preset';
 
-export const SHINEFOLD_YELLOW = '#ffc233';
-
 export const SHINEFOLD_BUNDLE: TPresetBundle = {
   ...CONSOLE_BUNDLE,
   themeTokens: {
@@ -23,7 +23,7 @@ export const SHINEFOLD_BUNDLE: TPresetBundle = {
   },
   cardStyle: CARD_STYLE.OUTLINED,
   buttonShape: BUTTON_SHAPE.PILL,
-  buttonColor: SHINEFOLD_YELLOW,
+  buttonColor: SHINEFOLD_LOGO_COLOR.YELLOW,
   footerLayout: FOOTER_LAYOUT.COLUMNS,
   footerBackground: BRAND_VARIANT.INK,
   footerSurface: FOOTER_SURFACE.FULL_WIDTH,

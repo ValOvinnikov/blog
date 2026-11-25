@@ -21,6 +21,8 @@ export const SIDENAV_CURRENT_BAR =
 export const SIDENAV_CURRENT_TEXT =
   '--sidenav-current-text' satisfies TThemeToken;
 
+export const BAND_EDGE = '--band-edge' satisfies TThemeToken;
+
 export const LINK_UNDERLINE_WIDTH = '--link-underline-width';
 export const LINK_UNDERLINE_WIDTH_HOVER = '--link-underline-width-hover';
 export const TIER_HIGHLIGHT_BORDER_WIDTH = '--tier-highlight-border-width';

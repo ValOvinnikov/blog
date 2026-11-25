@@ -9,7 +9,7 @@ import {
 } from '@shinefold/config/constants';
 
 import { findPairFailures, type TContrastFailure } from './contrast-check';
-import { KNOWN_CONTRAST_FAILURES } from './contrast-known-failures';
+import { isKnownFailure } from './contrast-known-failures';
 import { CONTRAST_PAIRS, type TContrastPair } from './contrast-pairs';
 import { SCHEME_RAMPS } from './contrast-scheme-ramps';
 import type { TContrastScope } from './contrast-tokens';
@@ -55,18 +55,6 @@ const failuresIn = (
 ): TContrastFailure[] =>
   findPairFailures(withMeasurableFills(pairs, ramp), [{ scheme, ramp }], [hue]);
 
-const signatureOf = ({
-  pair,
-  surface,
-  scheme,
-  cardStyle,
-  headerControlStyle,
-  navLinkStyle,
-}: TContrastFailure): string =>
-  [pair, surface, scheme, cardStyle, headerControlStyle, navLinkStyle].join();
-
-const KNOWN_SIGNATURES = new Set(KNOWN_CONTRAST_FAILURES.map(signatureOf));
-
 export const findPresetSurfaceFailures = (
   preset: TPresetId,
 ): TPresetSurfaceFailure[] => {
@@ -83,7 +71,7 @@ export const findPresetSurfaceFailures = (
       },
       hue,
     ),
-  ).filter((failure) => !KNOWN_SIGNATURES.has(signatureOf(failure)));
+  ).filter((failure) => !isKnownFailure(failure));
 
   const bandFailures = objectKeys(surfaces.bands).flatMap((band) =>
     COLOR_SCHEMES.flatMap((scheme) => {

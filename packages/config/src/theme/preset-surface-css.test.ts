@@ -6,6 +6,7 @@ import {
 import {
   readCssBlock,
   readCssDeclarations,
+  readDefaultRoleScopes,
   readThemeCss,
 } from '@shinefold/config/testing/theme-css';
 
@@ -29,7 +30,6 @@ import {
   TIMELINE_MARKER_NUMERAL,
 } from './preset-role-tokens';
 import { formatPresetSurfaceBlock } from './preset-surface-css';
-import { formatSkinCss } from './skin-css';
 
 const PRESET_ALIAS_ROLES: TThemeToken[] = [
   HEADING,
@@ -47,29 +47,11 @@ const PRESET_ALIAS_ROLES: TThemeToken[] = [
   SIDENAV_CURRENT_TEXT,
 ];
 
-const MOCK_THEME_CSS = readThemeCss();
-const MOCK_SKIN_CSS = formatSkinCss();
-
-const DEFAULT_SCOPES = [
-  ['the page', MOCK_THEME_CSS, ':root'],
-  ['the dark page', MOCK_THEME_CSS, '.dark'],
-  ...Object.values(BRAND_VARIANT).flatMap((variant) =>
-    Object.values(COLOR_SCHEME).map((scheme) => [
-      `the ${scheme} ${variant} band`,
-      MOCK_SKIN_CSS,
-      skinSchemeSelector(variant, scheme),
-    ]),
-  ),
-];
-
-const blockOf = (css: string, selector: string): string =>
-  css.split(`${selector} {\n`)[1]?.split('\n}')[0] ?? '';
-
 describe('the preset roles with no surfaces of a preset', () => {
-  it.each(DEFAULT_SCOPES)(
+  it.each(readDefaultRoleScopes())(
     'point at the role each replaces on %s',
     (_scope, css, selector) => {
-      const declarations = readCssDeclarations(readCssBlock(css!, selector!));
+      const declarations = readCssDeclarations(readCssBlock(css, selector));
       const mismatched = PRESET_ALIAS_ROLES.filter(
         (role) => declarations[role] !== `var(${TOKEN_ALIASES[role]})`,
       );
@@ -80,7 +62,7 @@ describe('the preset roles with no surfaces of a preset', () => {
 
   it('declares the link underline and tier border widths on the page', () => {
     const declarations = readCssDeclarations(
-      readCssBlock(MOCK_THEME_CSS, ':root'),
+      readCssBlock(readThemeCss(), ':root'),
     );
 
     expect(declarations).toEqual(expect.objectContaining(PRESET_ROLE_LENGTHS));
@@ -96,7 +78,7 @@ describe(formatPresetSurfaceBlock, () => {
   );
 
   it('redraws a band in light mode on a dark page when the preset keeps it light', () => {
-    const block = blockOf(
+    const block = readCssBlock(
       formatPresetSurfaceBlock(PRESET_ID.SHINEFOLD),
       skinSchemeSelector(BRAND_VARIANT.BRAND_PRIMARY, COLOR_SCHEME.DARK),
     );
@@ -106,7 +88,7 @@ describe(formatPresetSurfaceBlock, () => {
   });
 
   it('declares only its own values on a band drawn in the page mode', () => {
-    const block = blockOf(
+    const block = readCssBlock(
       formatPresetSurfaceBlock(PRESET_ID.SHINEFOLD),
       skinSchemeSelector(BRAND_VARIANT.SECONDARY, COLOR_SCHEME.DARK),
     );

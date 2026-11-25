@@ -4,8 +4,9 @@ import {
   type TColorScheme,
 } from '@shinefold/config/constants';
 
-import { PRIMARY } from './contrast-surfaces';
+import { PRIMARY, SECONDARY } from './contrast-surfaces';
 import {
+  BAND_EDGE,
   LINK_UNDERLINE_WIDTH,
   LINK_UNDERLINE_WIDTH_HOVER,
   TIER_HIGHLIGHT_BORDER_WIDTH,
@@ -16,25 +17,39 @@ import type {
   TPresetSurfaces,
 } from './preset-surface-types';
 import {
-  CREAM,
   DARK_GROUND,
   groundOf,
-  INK,
   INK_GROUND,
   LIGHT_GROUND,
-  NAVY,
-  WHITE,
-  YELLOW_GROUND,
 } from './shinefold-grounds';
+import {
+  BLOCK,
+  BLOCK_LINE,
+  CREAM,
+  INK,
+  INK_RAISED,
+  TRANSPARENT,
+  WHITE,
+} from './shinefold-palette';
+import { YELLOW_GROUND } from './shinefold-yellow-ground';
 
 const drawnAs = (
   base: TColorScheme,
   colors: TPresetSurfaceColors,
-): TPresetBandSurface => ({ base, colors });
+  edge = TRANSPARENT,
+): TPresetBandSurface => ({ base, colors: { ...colors, [BAND_EDGE]: edge } });
 
-const LIGHT_PAGE: TPresetSurfaceColors = { ...LIGHT_GROUND, [PRIMARY]: WHITE };
+const LIGHT_PAGE: TPresetSurfaceColors = {
+  ...LIGHT_GROUND,
+  [PRIMARY]: WHITE,
+  [SECONDARY]: CREAM,
+};
 
-const DARK_PAGE: TPresetSurfaceColors = { ...DARK_GROUND, [PRIMARY]: INK };
+const DARK_PAGE: TPresetSurfaceColors = {
+  ...DARK_GROUND,
+  [PRIMARY]: INK,
+  [SECONDARY]: BLOCK,
+};
 
 const LIGHT = COLOR_SCHEME.LIGHT;
 const DARK = COLOR_SCHEME.DARK;
@@ -48,7 +63,7 @@ export const SHINEFOLD_SURFACES: TPresetSurfaces = {
     },
     [BRAND_VARIANT.SECONDARY]: {
       [LIGHT]: drawnAs(LIGHT, { ...LIGHT_GROUND, ...groundOf(CREAM) }),
-      [DARK]: drawnAs(DARK, { ...DARK_GROUND, ...groundOf(NAVY) }),
+      [DARK]: drawnAs(DARK, { ...DARK_GROUND, ...groundOf(BLOCK) }, BLOCK_LINE),
     },
     [BRAND_VARIANT.BRAND_PRIMARY]: {
       [LIGHT]: drawnAs(LIGHT, YELLOW_GROUND),
@@ -56,7 +71,7 @@ export const SHINEFOLD_SURFACES: TPresetSurfaces = {
     },
     [BRAND_VARIANT.INK]: {
       [LIGHT]: drawnAs(DARK, INK_GROUND),
-      [DARK]: drawnAs(DARK, INK_GROUND),
+      [DARK]: drawnAs(DARK, INK_GROUND, INK_RAISED),
     },
   },
   lengths: {

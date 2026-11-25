@@ -1,19 +1,14 @@
-import { SHINEFOLD_YELLOW } from '@shinefold/config/constants';
-
 import {
   AMBIENT,
   AMBIENT_RAISED,
+  BACKDROP,
   BORDER,
-  BORDER_EMPHASIS,
-  BRAND_PRIMARY,
-  BUTTON_FILL,
-  BUTTON_FILL_HOVER,
-  BUTTON_LABEL,
-  FIELD_BOUNDARY,
+  DIVIDER,
+  HEADING_HIGHLIGHT,
   SURFACE,
-  SURFACE_2,
   TEXT,
   TEXT_MUTED,
+  TEXT_SUBTLE,
 } from './contrast-surfaces';
 import {
   ASIDE_BAR,
@@ -33,42 +28,46 @@ import {
   TIMELINE_MARKER_NUMERAL,
 } from './preset-role-tokens';
 import type { TPresetSurfaceColors } from './preset-surface-types';
-
-export const WHITE = '#ffffff';
-export const INK = '#12141a';
-const INK_RAISED = '#2a2d36';
-const SLATE = '#4b5058';
-const HAIRLINE = '#dfe1e6';
-export const CREAM = '#fff6dd';
-const CHIP_CREAM = '#fff3cf';
-const PAPER = '#e8eaef';
-const MIST = '#a9afba';
-export const NAVY = '#0e1726';
-const NAVY_LINE = '#232b3d';
-const TRANSPARENT = 'transparent';
+import {
+  AMBER,
+  BLOCK,
+  BLOCK_LINE,
+  CHIP_CREAM,
+  HAIRLINE,
+  INK,
+  MIST,
+  PAPER,
+  SLATE,
+  TRANSPARENT,
+  WHITE,
+  YELLOW,
+} from './shinefold-palette';
 
 export const groundOf = (color: string): TPresetSurfaceColors => ({
   [AMBIENT]: color,
-  '--backdrop': color,
+  [BACKDROP]: color,
   [AMBIENT_RAISED]: color,
 });
 
-const YELLOW_MARKS: TPresetSurfaceColors = {
-  [FEATURE_ICON_TILE]: SHINEFOLD_YELLOW,
+export const marksOf = (
+  mark: string,
+  onMark: string,
+): TPresetSurfaceColors => ({
+  [FEATURE_ICON_TILE]: YELLOW,
   [FEATURE_ICON_GLYPH]: INK,
-  [TIER_HIGHLIGHT_BORDER]: SHINEFOLD_YELLOW,
-  [TIER_BADGE_FILL]: SHINEFOLD_YELLOW,
-  [TIER_BADGE_LABEL]: INK,
-  [TIMELINE_MARKER_FILL]: SHINEFOLD_YELLOW,
-  [TIMELINE_MARKER_NUMERAL]: INK,
-  [ASIDE_BAR]: SHINEFOLD_YELLOW,
-  [SIDENAV_CURRENT_BAR]: SHINEFOLD_YELLOW,
-};
+  [TIER_HIGHLIGHT_BORDER]: mark,
+  [TIER_BADGE_FILL]: mark,
+  [TIER_BADGE_LABEL]: onMark,
+  [TIMELINE_MARKER_FILL]: mark,
+  [TIMELINE_MARKER_NUMERAL]: onMark,
+  [ASIDE_BAR]: mark,
+  [SIDENAV_CURRENT_BAR]: mark,
+});
 
-const inkOn = (muted: string): TPresetSurfaceColors => ({
+export const inkOn = (muted: string): TPresetSurfaceColors => ({
   [TEXT]: INK,
   [TEXT_MUTED]: muted,
-  '--text-subtle': muted,
+  [TEXT_SUBTLE]: muted,
   [HEADING]: INK,
   [LINK_TEXT]: INK,
   [EYEBROW_TEXT]: INK,
@@ -76,51 +75,31 @@ const inkOn = (muted: string): TPresetSurfaceColors => ({
 });
 
 export const LIGHT_GROUND: TPresetSurfaceColors = {
-  ...YELLOW_MARKS,
+  ...marksOf(YELLOW, INK),
   ...inkOn(SLATE),
   [SURFACE]: WHITE,
   [BORDER]: HAIRLINE,
-  '--divider': HAIRLINE,
-  [LINK_UNDERLINE]: SHINEFOLD_YELLOW,
+  [DIVIDER]: HAIRLINE,
+  [LINK_UNDERLINE]: YELLOW,
   [EYEBROW_CHIP]: CHIP_CREAM,
+  [HEADING_HIGHLIGHT]: AMBER,
 };
 
 export const DARK_GROUND: TPresetSurfaceColors = {
-  ...YELLOW_MARKS,
+  ...marksOf(YELLOW, INK),
   [TEXT]: PAPER,
   [TEXT_MUTED]: MIST,
-  '--text-subtle': MIST,
+  [TEXT_SUBTLE]: MIST,
   [HEADING]: WHITE,
-  [SURFACE]: NAVY,
-  [BORDER]: NAVY_LINE,
-  '--divider': NAVY_LINE,
-  [LINK_TEXT]: SHINEFOLD_YELLOW,
-  [LINK_UNDERLINE]: SHINEFOLD_YELLOW,
-  [EYEBROW_TEXT]: SHINEFOLD_YELLOW,
+  [SURFACE]: BLOCK,
+  [BORDER]: BLOCK_LINE,
+  [DIVIDER]: BLOCK_LINE,
+  [LINK_TEXT]: YELLOW,
+  [LINK_UNDERLINE]: YELLOW,
+  [EYEBROW_TEXT]: YELLOW,
   [EYEBROW_CHIP]: TRANSPARENT,
-  [SIDENAV_CURRENT_TEXT]: SHINEFOLD_YELLOW,
-};
-
-export const YELLOW_GROUND: TPresetSurfaceColors = {
-  ...YELLOW_MARKS,
-  ...groundOf(SHINEFOLD_YELLOW),
-  ...inkOn(SLATE),
-  [SURFACE]: WHITE,
-  [SURFACE_2]: WHITE,
-  [BORDER]: INK,
-  '--divider': INK,
-  [BORDER_EMPHASIS]: SLATE,
-  [FIELD_BOUNDARY]: SLATE,
-  [BRAND_PRIMARY]: INK,
-  '--brand-primary-hover': INK_RAISED,
-  [LINK_UNDERLINE]: INK,
-  [EYEBROW_CHIP]: TRANSPARENT,
-  [TIER_HIGHLIGHT_BORDER]: INK,
-  [ASIDE_BAR]: INK,
-  [SIDENAV_CURRENT_BAR]: INK,
-  [BUTTON_FILL]: INK,
-  [BUTTON_FILL_HOVER]: INK_RAISED,
-  [BUTTON_LABEL]: WHITE,
+  [SIDENAV_CURRENT_TEXT]: YELLOW,
+  [HEADING_HIGHLIGHT]: YELLOW,
 };
 
 export const INK_GROUND: TPresetSurfaceColors = {

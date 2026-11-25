@@ -30,9 +30,15 @@ export const AMBIENT_RAISED = '--ambient-raised' satisfies TThemeToken;
 export const FIELD_BOUNDARY = '--field-boundary' satisfies TThemeToken;
 export const TEXT = '--text' satisfies TThemeToken;
 export const TEXT_MUTED = '--text-muted' satisfies TThemeToken;
+export const TEXT_SUBTLE = '--text-subtle' satisfies TThemeToken;
+export const DIVIDER = '--divider' satisfies TThemeToken;
+export const BACKDROP = '--backdrop' satisfies TThemeToken;
+export const HEADING_HIGHLIGHT = '--heading-highlight' satisfies TThemeToken;
 export const BORDER_EMPHASIS = '--border-emphasis' satisfies TThemeToken;
 export const BRAND_PRIMARY_WASH = '--brand-primary-wash' satisfies TThemeToken;
 export const BRAND_PRIMARY = '--brand-primary' satisfies TThemeToken;
+export const BRAND_PRIMARY_HOVER =
+  '--brand-primary-hover' satisfies TThemeToken;
 export const BRAND_PRIMARY_SOLID =
   '--brand-primary-solid' satisfies TThemeToken;
 export const BRAND_PRIMARY_SOLID_HOVER =
@@ -50,7 +56,7 @@ export const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
   '--ring': BRAND_PRIMARY,
   '--info': BRAND_PRIMARY,
   '--info-muted': BRAND_PRIMARY_MUTED,
-  '--heading-highlight': BRAND_PRIMARY,
+  [HEADING_HIGHLIGHT]: BRAND_PRIMARY,
   '--code-fg': TEXT,
   '--code-comment': TEXT_MUTED,
   [BUTTON_FILL]: BRAND_PRIMARY_SOLID,
