@@ -708,6 +708,12 @@
         "file": "apps/platform/src/constants/data-request.ts"
       },
       {
+        "ref": "NO_ACCESS_REASON.SITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/no-access",
+        "file": "apps/platform/src/constants/no-access.ts"
+      },
+      {
         "ref": "ONBOARDING_STEP.SITE",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -1394,6 +1400,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/data-request",
         "file": "apps/platform/src/constants/data-request.ts"
+      },
+      {
+        "ref": "SELECT_TENANT_FROM.INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/select-tenant",
+        "file": "apps/platform/src/constants/select-tenant.ts"
       }
     ],
     "NEWSLETTER_ISSUE": [
@@ -8794,6 +8806,30 @@
         "file": "apps/platform/src/constants/newsletter-pause.ts"
       }
     ],
+    "SITE_INVITE": [
+      {
+        "ref": "NO_ACCESS_REASON.SITE_INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/no-access",
+        "file": "apps/platform/src/constants/no-access.ts"
+      }
+    ],
+    "ADMIN_INVITE": [
+      {
+        "ref": "NO_ACCESS_REASON.ADMIN_INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/no-access",
+        "file": "apps/platform/src/constants/no-access.ts"
+      }
+    ],
+    "reason": [
+      {
+        "ref": "NO_ACCESS_SEARCH_PARAM.REASON",
+        "scope": "app:platform",
+        "from": "@platform/constants/no-access",
+        "file": "apps/platform/src/constants/no-access.ts"
+      }
+    ],
     "CHECKING": [
       {
         "ref": "SITE_ADDRESS_STATUS.CHECKING",
@@ -9710,6 +9746,22 @@
         "scope": "app:platform",
         "from": "@platform/constants/segmented-control",
         "file": "apps/platform/src/constants/segmented-control.ts"
+      }
+    ],
+    "tenantId": [
+      {
+        "ref": "SELECT_TENANT_SEARCH_PARAM.TENANT_ID",
+        "scope": "app:platform",
+        "from": "@platform/constants/select-tenant",
+        "file": "apps/platform/src/constants/select-tenant.ts"
+      }
+    ],
+    "from": [
+      {
+        "ref": "SELECT_TENANT_SEARCH_PARAM.FROM",
+        "scope": "app:platform",
+        "from": "@platform/constants/select-tenant",
+        "file": "apps/platform/src/constants/select-tenant.ts"
       }
     ],
     "settings_features.plan_entitlement_rejected": [

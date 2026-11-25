@@ -710,6 +710,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **NEWSLETTER_PAUSE_REFUSAL**: `NOT_PAUSED`
 - **NEWSLETTER_PAUSE_LOG**: `CLEAR_AUDIT_FAILED`=`"newsletter_pause.clear_audit_failed"`, `CLEAR_FAILED`=`"newsletter_pause.clear_failed"`
 
+### `@platform/constants/no-access` — `apps/platform/src/constants/no-access.ts`
+
+- **NO_ACCESS_REASON**: `SITE`, `SITE_INVITE`, `ADMIN_INVITE`
+- **NO_ACCESS_SEARCH_PARAM**: `REASON`=`"reason"`
+
 ### `@platform/constants/onboarding` — `apps/platform/src/constants/onboarding.ts`
 
 - **SITE_ADDRESS_STATUS**: `IDLE`, `CHECKING`, `AVAILABLE`, `UNAVAILABLE`, `UNVERIFIED`
@@ -792,6 +797,11 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/select-appearance` — `apps/platform/src/constants/select-appearance.ts`
 
 - **SELECT_APPEARANCE**: `COMPACT`
+
+### `@platform/constants/select-tenant` — `apps/platform/src/constants/select-tenant.ts`
+
+- **SELECT_TENANT_SEARCH_PARAM**: `TENANT_ID`=`"tenantId"`, `FROM`=`"from"`
+- **SELECT_TENANT_FROM**: `INVITE`
 
 ### `@platform/constants/settings-features` — `apps/platform/src/constants/settings-features.ts`
 

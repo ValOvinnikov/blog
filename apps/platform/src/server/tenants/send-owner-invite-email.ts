@@ -9,7 +9,7 @@ export const sendOwnerInviteEmail = (
 ): Promise<boolean> =>
   sendMagicLinkEmail({
     email,
-    redirectTo: adminRoutes.dashboardSelectTenantHref(tenantId),
+    redirectTo: adminRoutes.dashboardSelectTenantFromInviteHref(tenantId),
     failureEvent,
     logContext: { tenantId },
   });

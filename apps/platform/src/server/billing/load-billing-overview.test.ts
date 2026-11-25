@@ -5,6 +5,7 @@ import {
 } from '@platform/constants/billing';
 import {
   listBillingInvoices,
+  NO_RENEWAL,
   previewRenewal,
   type TBillingInvoice,
 } from '@platform/server/billing/fetch-stripe-billing';
@@ -25,10 +26,14 @@ import { MOCK_EMPTY_TENANT_BILLING } from '@shinefold/db/testing/tenants/billing
 import { loadBillingOverview } from './load-billing-overview';
 
 vi.mock('@platform/server/billing/stripe-client');
-vi.mock('@platform/server/billing/fetch-stripe-billing', () => ({
-  listBillingInvoices: vi.fn(),
-  previewRenewal: vi.fn(),
-}));
+vi.mock(
+  '@platform/server/billing/fetch-stripe-billing',
+  async (importOriginal) => ({
+    ...(await importOriginal()),
+    listBillingInvoices: vi.fn(),
+    previewRenewal: vi.fn(),
+  }),
+);
 
 faker.seed(6878);
 
@@ -38,8 +43,7 @@ const MOCK_STRIPE_FAILURE = new Error(faker.lorem.sentence());
 const getStripeClientMock = vi.mocked(getStripeClient);
 const listBillingInvoicesMock = vi.mocked(listBillingInvoices);
 const previewRenewalMock = vi.mocked(previewRenewal);
-const MOCK_RENEWAL = { nextPayment: MOCK_NEXT_PAYMENT, endsAt: undefined };
-const NO_RENEWAL = { nextPayment: undefined, endsAt: undefined };
+const MOCK_RENEWAL = { ...NO_RENEWAL, nextPayment: MOCK_NEXT_PAYMENT };
 
 const loadPaying = () =>
   loadBillingOverview(MOCK_TENANT_ID, MOCK_PAYING_TENANT_BILLING);

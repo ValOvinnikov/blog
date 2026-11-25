@@ -11,8 +11,6 @@ import { useId } from 'react';
 
 import { subscribersListVariants } from './subscribers-list-variants';
 
-const ACTIONS_COLUMN_WIDTH = '64px';
-
 export type TSubscribersListProps = {
   tenantId: string;
   data: Pick<TSubscribersPageData, 'list' | 'page' | 'totalPages'>;
@@ -41,7 +39,6 @@ export const SubscribersList = ({ tenantId, data }: TSubscribersListProps) => {
               key: 'actions',
               label: t('columnActions'),
               isLabelHidden: true,
-              width: ACTIONS_COLUMN_WIDTH,
             },
           ]}
           renderRow={(subscriber) => (

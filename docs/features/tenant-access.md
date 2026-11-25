@@ -23,6 +23,11 @@ code:
   - apps/platform/src/server/auth/list-session-tenants*.ts
   - apps/platform/src/server/auth/resolve-*.ts
   - apps/platform/src/app/api/dashboard/select-tenant/**
+  - apps/platform/src/app/api/admin-invite/**
+  - apps/platform/src/app/[locale]/no-access/**
+  - apps/platform/src/constants/no-access.ts
+  - apps/platform/src/constants/select-tenant.ts
+  - apps/platform/src/utils/sign-in-redirect/**
   - apps/platform/src/app/**/select-tenant/*.tsx
   - apps/platform/src/utils/active-tenant-cookie/**
   - apps/platform/src/components/features/layout/tenant-switcher/**
@@ -62,9 +67,9 @@ The platform decides who may run which tenant. Platform operators hold an `admin
   - with several, it reads the `platform-active-tenant` cookie, and without the cookie it redirects to `/dashboard/select-tenant`;
   - with none, it redirects to `/onboarding`.
     This tree hides the Platform nav, so an owner never sees that the platform has other tenants.
-- **Tenant switching.** `GET /api/dashboard/select-tenant?tenantId=` sets the active-tenant cookie (httpOnly, 30 days) after checking access, and 404s otherwise. The tenant switcher in the shell only appears for users with more than one tenant.
+- **Tenant switching.** `GET /api/dashboard/select-tenant?tenantId=` sets the active-tenant cookie (httpOnly, 30 days) after checking access. Without access — no membership, and not a SUPERADMIN on a tenant that exists — it sets no cookie and redirects to `/no-access`, a plain dead-end page with a way home: "You don't have access to this site. Ask the site owner." An owner or team invite's link adds `from=INVITE` (`dashboardSelectTenantFromInviteHref`), so an invite that was cancelled or could not be consumed reads "This invite can't be used right now. Ask the site owner." instead. Neither mentions seats. The tenant switcher in the shell only appears for users with more than one tenant.
 - **Signup blocklist.** `/blocked-signups` in the `(operator)` group lists every blocked identity: its kind, the domain or the first characters of an address hash, the reason, who added it and when. A SUPERADMIN can add a domain there and remove any entry. The Suspend dialog on a tenant can also block that tenant's owner email, with a reason. The nav entry shows for SUPERADMINs only, and owners never see the list.
-- **Admins page.** `/admins` in the `(operator)` group lists every admin (name, email, role, granted date) and every admin invite (email, role, invited date, Pending or Expired). A SUPERADMIN invites an address as Admin or Super admin there; Moderator is not offered, and an action called with it is refused. Each invite row can be resent, which sends the email again and restarts its 7 days, or cancelled. Every admin row but the viewer's own offers Remove, which takes access away on the next request and deletes every session the removed user holds, signing them out of the platform and any site dashboard; removing the last SUPERADMIN is refused. A failed session delete is logged as `platform_admin.remove_sessions_failed`, and the removal still succeeds. The nav entry shows for SUPERADMINs only.
+- **Admins page.** `/admins` in the `(operator)` group lists every admin (name, email, role, granted date) and every admin invite (email, role, invited date, Pending or Expired). A SUPERADMIN invites an address as Admin or Super admin there; Moderator is not offered, and an action called with it is refused. Each invite row can be resent, which sends the email again and restarts its 7 days, or cancelled. Every admin row but the viewer's own offers Remove, which takes access away on the next request and deletes every session the removed user holds, signing them out of the platform and any site dashboard; removing the last SUPERADMIN is refused. A failed session delete is logged as `platform_admin.remove_sessions_failed`, and the removal still succeeds. The nav entry shows for SUPERADMINs only. The invite email's link lands on `GET /api/admin-invite`, which sends an admin on to `/tenants` and anyone else — a cancelled or expired invite — to `/no-access`: "This invite is no longer valid. Ask the person who invited you." `/tenants` itself still 404s a non-admin.
 - **Home link.** The home link from a dead end goes to `/tenants` for an admin, `/dashboard` for any other signed-in user, and sign-in otherwise.
 
 ## Data
@@ -92,7 +97,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
   - **Check now and Resend invite** for a member reach `/api/member-access/check` and `/resend` through `enqueueOwnerAccessRequest` with the membership id; any membership that is not an unlocked EDITOR 404s, like a denied gate. A refused member request logs `team_access.access_request_failed`.
   - Invite, remove and cancel record `MEMBER_INVITED`, `MEMBER_REMOVED` and `MEMBER_INVITE_CANCELLED` against `TEAM_MEMBER` (the invite or membership id), with only the role in the details, never an address.
 - **Team page** (`/dashboard/team` for the owner, `/tenants/{id}/team` for an operator). The owner reaches it on a plan with more than one seat; an editor or reader never sees it in the sidebar and gets a 404, and so does an owner on Free or Starter. `resolveTenantPageAccess` closes `team` to anyone who cannot manage the tenant. Operators reach it on every plan, from an Account section after Configuration; the owner's sidebar lists it in Account, before Billing.
-  - The header reads "{used} of {seats} seats used": `used` counts every membership (locked ones included) and every pending invite (a pending OWNER invite included), as the seat limit does, and is shown capped at the plan's seats. Once full, Invite editor is held and a warning under the header says why.
+  - The header reads "{used} of {seats} seats used": `used` counts every membership (locked ones included) and every pending invite (a pending OWNER invite included), as the seat limit does, and is shown capped at the plan's seats. Once full, Invite editor is held and an information notice (not a warning) under the header says why.
   - Members lists owners first, then members by when they joined. The owner's row reads its Studio state from the tenant's owner access flow (`tenantOwnerStudioAccess`), whoever is viewing; a member's from its own record, and "Setting up…" until the worker's first invite. A locked member reads Locked, a reader "No Studio access". Check now and Resend invite show to the owner and a SUPERADMIN only, on rows with an address and a pending state, and their toasts name the address. Your own row and the last owner's offer no Remove, and an operator sees no "(you)".
   - With no editor, a note gives the free seats; an operator on a tenant whose owner hasn't joined sees "No one has joined this site yet." Pending invites lists every invite but a pending OWNER one, oldest first.
   - Invite, Remove and Cancel invite run the Team actions below. Removing a member or cancelling an invite that is already gone closes the confirmation, says so and refreshes; any other refusal or failure shows inside the dialog. Below `md` both tables stack, the role moving onto the person's second line.
@@ -159,7 +164,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 ## Tests and stories
 
 - `apps/platform/src/server/auth/*.test.ts`, with `__mocks__/require-tenant-membership.ts`.
-- `apps/platform/src/app/api/dashboard/select-tenant/route.test.ts`.
+- `apps/platform/src/app/api/dashboard/select-tenant/route.test.ts`, `app/api/admin-invite/route.test.ts` and the `no-access` page test.
 - The `dashboard/select-tenant` page test and `tenant-switcher.test.tsx`.
 - `packages/auth/src/events/consume-pending-invites-on-sign-in.test.ts`.
 - `apps/platform/src/server/team/*.test.ts`, `team-view-model.test.ts`, the `components/features/team/` tests and the dashboard Team page test, with builders in `apps/platform/src/testing/team/fixtures.ts`.

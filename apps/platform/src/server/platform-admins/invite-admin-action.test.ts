@@ -69,7 +69,7 @@ describe(inviteAdminAction, () => {
     expect(signInMock).toHaveBeenCalledExactlyOnceWith(MAGIC_LINK_PROVIDER_ID, {
       email: MOCK_INVITED_ADMIN_EMAIL,
       redirect: false,
-      redirectTo: adminRoutes.tenants(),
+      redirectTo: adminRoutes.adminInvite(),
     });
     expect(recordAuditEvent).toHaveBeenCalledExactlyOnceWith({
       logEvent: PLATFORM_ADMIN_LOG.INVITE_AUDIT_FAILED,
