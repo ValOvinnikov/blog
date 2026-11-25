@@ -24,6 +24,11 @@ export type TLandingSectionNavigation = {
   parentSection: TMaybeUndefined<TLandingBreadcrumb>;
 };
 
+export type TLandingAdjacentPages = {
+  previous: TMaybeUndefined<TLandingBreadcrumb>;
+  next: TMaybeUndefined<TLandingBreadcrumb>;
+};
+
 export type TLandingPageDocument = {
   id: string;
   path: string;
@@ -34,4 +39,5 @@ export type TLandingPageDocument = {
   seo: TSeoResolved;
   translations: TPageTranslation[];
   sectionNavigation: TMaybeUndefined<TLandingSectionNavigation>;
+  adjacentPages: TMaybeUndefined<TLandingAdjacentPages>;
 };
