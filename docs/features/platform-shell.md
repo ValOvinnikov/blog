@@ -243,9 +243,11 @@ save still settles as the form's generic server error.
 
 ## Constraints and invariants
 
-- Every gate lives in a layout, so no page can forget it: `(operator)` calls
-  `requireAdmin`, `/tenants/{id}` calls `requireTenantById` (any admin role),
-  `/dashboard` calls `listSessionTenants` and then `resolveDashboardTenant`.
+- Each tree's layout gates it: `(operator)` calls `requireAdmin`,
+  `/tenants/{id}` calls `requireTenantById` (any admin role), `/dashboard`
+  calls `listSessionTenants` and then `resolveDashboardTenant`. Client-side
+  navigation keeps a layout without re-running it, so every page calls its
+  gate again; for `(operator)`, `pages.test.ts` enforces it.
   A layout gate does not cover Route Handlers or Server Actions; each of
   those calls its own gate (see [tenant-access](./tenant-access.md)).
 - A denied entitlement 404s, indistinguishable from a missing route. No
