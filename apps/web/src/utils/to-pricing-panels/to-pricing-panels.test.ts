@@ -1,16 +1,16 @@
 import { faker } from '@faker-js/faker';
 import { PRICE_PERIOD } from '@shinefold/config';
-import {
-  BILLING_CURRENCY,
-  STRIPE_PRICE_LOOKUP_KEY,
-} from '@shinefold/db/constants';
+import { BILLING_CURRENCY } from '@shinefold/db/constants';
 import { mockStripePrice } from '@shinefold/db/testing/stripe-catalogue/fixtures';
 import {
   mockPricingPrice,
   mockPricingTier,
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
-import { mockLinkedPricingTier } from '@web/testing/modules/pricing/live-price-fixtures';
+import {
+  mockLinkedPricingTier,
+  MOCK_YEARLY_PLAN_PRICE,
+} from '@web/testing/modules/pricing/live-price-fixtures';
 
 import { toPricingPanels } from './to-pricing-panels';
 
@@ -26,10 +26,6 @@ const MOCK_COMPARE_AT_AMOUNT = faker.number.int({ min: 700, max: 899 });
 const MOCK_PRICE_LABEL = faker.lorem.words(2);
 
 const formatPounds = (amount: number) => `£${amount}`;
-
-const MOCK_YEARLY_PLAN_PRICE = mockStripePrice({
-  lookupKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY,
-});
 
 const setup = (tiers: Parameters<typeof toPricingPanels>[0]['tiers']) =>
   toPricingPanels({
@@ -264,15 +260,6 @@ describe(toPricingPanels, () => {
       ).toEqual([
         [PRICE_PERIOD.MONTH, periods[PRICE_PERIOD.MONTH]],
         [PRICE_PERIOD.YEAR, periods[PRICE_PERIOD.YEAR]],
-      ]);
-    });
-
-    it('carries a single-interval tier price under every tab', () => {
-      const panels = setup([monthlyAndYearly, yearlyLinkedTier]);
-
-      expect(panels.map(({ cards }) => cards[1]?.livePrice?.period)).toEqual([
-        periods[PRICE_PERIOD.YEAR],
-        periods[PRICE_PERIOD.YEAR],
       ]);
     });
 

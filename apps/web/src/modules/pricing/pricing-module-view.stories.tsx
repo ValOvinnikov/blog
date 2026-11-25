@@ -3,10 +3,7 @@ import {
   CONTENT_ALIGNMENT,
   PRICE_PERIOD,
 } from '@shinefold/config';
-import {
-  BILLING_CURRENCY,
-  STRIPE_PRICE_LOOKUP_KEY,
-} from '@shinefold/db/constants';
+import { BILLING_CURRENCY } from '@shinefold/db/constants';
 import {
   mockStripePrice,
   MOCK_EURO_AMOUNT,
@@ -18,7 +15,10 @@ import {
   mockPricingTier,
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
-import { mockLinkedPricingTier } from '@web/testing/modules/pricing/live-price-fixtures';
+import {
+  mockLinkedPricingTier,
+  MOCK_YEARLY_PLAN_PRICE,
+} from '@web/testing/modules/pricing/live-price-fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
@@ -90,10 +90,7 @@ const panelsFor = (selected: typeof tiers) =>
         currency: BILLING_CURRENCY.EUR,
         unitAmount: MOCK_EURO_AMOUNT,
       }),
-      mockStripePrice({
-        lookupKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY,
-        unitAmount: 49000,
-      }),
+      MOCK_YEARLY_PLAN_PRICE,
     ],
     locale: 'en-GB',
     currency: MOCK_SITE_SETTINGS.currency,

@@ -12,6 +12,7 @@ import type { TStripePrice } from '@shinefold/db/queries/stripe-catalogue/list-s
 import type { TPricingTier } from '@shinefold/service';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { isBillingCurrency } from '@web/utils/is-billing-currency';
+import type { TPricingTabPeriod } from '@web/utils/to-pricing-panels';
 
 interface IPlanPriceAmount {
   unitAmount: number;
@@ -28,7 +29,7 @@ export interface ILivePlanPrice {
 
 export interface IToLivePlanPriceArgs {
   tier: TPricingTier;
-  tab: TMaybeUndefined<TPricePeriod>;
+  tab?: TPricingTabPeriod;
   planPrices: readonly TStripePrice[];
   siteCurrency: string;
   periods: Record<TPricePeriod, string>;

@@ -3,8 +3,10 @@ import { TENANT_PLAN } from '@shinefold/config/constants';
 import {
   BILLING_CURRENCY,
   STRIPE_COUPON_DURATION,
+  STRIPE_PRICE_LOOKUP_KEY,
 } from '@shinefold/db/constants';
 import {
+  mockStripePrice,
   MOCK_DOLLAR_AMOUNT,
   MOCK_EURO_AMOUNT,
   MOCK_PROMOTION_CODE,
@@ -22,6 +24,13 @@ const MINOR_UNITS_PER_MAJOR = 100;
 const PERCENT = 100;
 
 export const MOCK_UNLISTED_CURRENCY = 'JPY';
+
+export const MOCK_YEARLY_PLAN_AMOUNT = 49000;
+
+export const MOCK_YEARLY_PLAN_PRICE = mockStripePrice({
+  lookupKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY,
+  unitAmount: MOCK_YEARLY_PLAN_AMOUNT,
+});
 
 export const formatMockUnitAmount = (
   unitAmount: number,

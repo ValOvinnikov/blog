@@ -267,7 +267,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/platform-plan-interval.ts`
 
-- **PLATFORM_PLAN_INTERVAL**: `MONTH`, `YEAR`, `MONTH_AND_YEAR`
+- **PLATFORM_PLAN_INTERVAL**: `MONTH_AND_YEAR`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/portable-text-block-type.ts`
 
