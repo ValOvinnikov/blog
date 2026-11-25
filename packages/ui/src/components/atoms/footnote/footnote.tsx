@@ -6,15 +6,15 @@ import {
 import { Text } from '@shinefold/ui/components/atoms/text';
 import type { ReactNode } from 'react';
 
-export type TCtaModuleFootnoteProps = IWithClassName &
+export type TFootnoteProps = IWithClassName &
   IWithDataTestId & { children?: ReactNode };
 
-/** The fine-print slot under a `CtaModule`'s actions. */
-export const CtaModuleFootnote = ({
+/** The fine-print line an organism sets under its actions. */
+export const Footnote = ({
   className,
   dataTestId,
   children,
-}: TCtaModuleFootnoteProps) => (
+}: TFootnoteProps) => (
   <Text
     textRole={TEXT_ROLE.FOOTNOTE}
     className={className}

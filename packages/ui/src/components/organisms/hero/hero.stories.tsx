@@ -687,17 +687,24 @@ export const SplitAndStackedOnEveryBrandBand: TStory = {
   ),
 };
 
+const footnote = <Hero.Footnote>{HERO_FOOTNOTE}</Hero.Footnote>;
+
 export const SplitWithFootnote: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,
-    footnote: HERO_FOOTNOTE,
+    children: (
+      <>
+        {bannerWithoutMediaContent}
+        {footnote}
+      </>
+    ),
   },
 };
 
 export const StackedWithFootnoteCenter: TStory = {
   args: {
+    ...SplitWithFootnote.args,
     variant: HERO_VARIANT.STACKED,
-    footnote: HERO_FOOTNOTE,
     layout: {
       contentAlignment: CONTENT_ALIGNMENT.CENTER,
     },
@@ -708,28 +715,30 @@ export const BannerWithFootnoteRight: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
-    footnote: HERO_FOOTNOTE,
     layout: {
       contentPosition: CONTENT_ALIGNMENT.RIGHT,
       contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     },
-    children: bannerContent,
+    children: (
+      <>
+        {bannerContent}
+        {footnote}
+      </>
+    ),
   },
 };
 
 export const BannerWithoutMediaWithFootnote: TStory = {
   args: {
+    ...SplitWithFootnote.args,
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.SECONDARY,
-    footnote: HERO_FOOTNOTE,
-    children: bannerWithoutMediaContent,
   },
 };
 
 export const FootnoteWithoutActions: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
-    footnote: HERO_FOOTNOTE,
-    children: undefined,
+    children: footnote,
   },
 };

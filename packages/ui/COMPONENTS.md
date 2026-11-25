@@ -2,7 +2,7 @@
 
 # @shinefold/ui component index
 
-_69 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_70 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -52,6 +52,11 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Small uppercase label displayed above a heading to provide contextual topic or section context.
 Props: href?: string · linkAs?: TAnchorElementType · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: hasHref: (boolean)
+
+### Footnote — `components/atoms/footnote/footnote.tsx`
+
+The fine-print line an organism sets under its actions.
+Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Heading — `components/atoms/heading/heading.tsx`
 
@@ -424,7 +429,7 @@ Compound component:
 - **CtaModule.Eyebrow** — The label slot above a `CtaModule` heading. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **CtaModule.Text** — The copy slot under a `CtaModule` heading: a plain supporting line, then rich content set as prose. Props: supportingText?: string · children?: ReactNode _(extends IWithClassName)_
 - **CtaModule.Actions** — The row a `CtaModule` lays its buttons and links out in. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **CtaModule.Footnote** — The fine-print slot under a `CtaModule`'s actions. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **CtaModule.Footnote** — The fine-print line an organism sets under its actions. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **CtaModule.Media** — The image slot of a `CtaModule`; framed at 16:9 in a card, unframed behind a banner's copy. Props: isFramed?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Dialog — `components/organisms/dialog/dialog.tsx`
@@ -468,7 +473,7 @@ Slots:
 ### Hero — `components/organisms/hero/hero.tsx`
 
 The page-top band every hero kind renders, where a page states what it is.
-Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · footnote?: string · variant?: THeroVariant · layout?: THeroLayout · tone: TBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
+Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · layout?: THeroLayout · tone: TBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST
 
 Slots:
@@ -477,6 +482,7 @@ Slots:
 - **Hero.Media** — The media slot of a `Hero`; frames its content via `MediaFrame`, at a configurable ratio (16:9 by default). Props: isFramed?: boolean · ratio?: TMediaFrameRatio · variant?: THeroVariant · contentAlignment?: TContentAlignment · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: ratio: video|square|portrait|classic|vertical · variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 - **Hero.Body** — The rich body-copy slot of a `Hero`, rendered after the excerpt and before `Hero.Cta`. Props: contentAlignment?: THeroBodyVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 - **Hero.Cta** — The call-to-action slot of a Hero. Props: contentAlignment?: THeroCtaVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
+- **Hero.Footnote** — The fine-print line an organism sets under its actions. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Hero.Social** — The trailing slot of a `Hero`, rendered after `Hero.Cta`; a styled `<div>` for the caller's own social links, typically a labelled list. Props: contentAlignment?: THeroSocialVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 
 ### NewsletterSignup — `components/organisms/newsletter-signup/newsletter-signup.tsx`

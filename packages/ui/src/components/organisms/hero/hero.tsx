@@ -6,10 +6,9 @@ import {
   type THeroVariant,
   type TLayout,
   type TMediaOrder,
-  TEXT_ROLE,
 } from '@shinefold/config';
 import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
-import { Text } from '@shinefold/ui/components/atoms/text';
+import { Footnote } from '@shinefold/ui/components/atoms/footnote';
 import { HERO_TEST_ID } from '@shinefold/ui/constants/hero';
 import {
   mapCompoundSlots,
@@ -32,6 +31,7 @@ const HeroParts = {
   Media: HeroMedia,
   Body: HeroBody,
   Cta: HeroCta,
+  Footnote,
   Social: HeroSocial,
 } satisfies Record<string, ElementType>;
 
@@ -47,7 +47,6 @@ export type THeroProps = IWithClassName &
     titleId: string;
     eyebrow?: string;
     excerpt?: string;
-    footnote?: string;
     variant?: THeroVariant;
     layout?: THeroLayout;
     tone: TBrandVariant;
@@ -59,7 +58,6 @@ const HeroRoot = ({
   titleId,
   eyebrow,
   excerpt,
-  footnote,
   variant,
   layout,
   tone,
@@ -116,16 +114,16 @@ const HeroRoot = ({
               contentAlignment: resolvedAlignment,
               ...(banner && { className: banner.actions() }),
             })}
-          {footnote && (
-            <Text
-              textRole={TEXT_ROLE.FOOTNOTE}
-              className={s.footnote({
-                class: [banner?.block(), banner?.text()],
-              })}
-            >
-              {footnote}
-            </Text>
-          )}
+          {slots.Footnote &&
+            cloneElement(slots.Footnote, {
+              className: s.footnote({
+                class: [
+                  banner?.block(),
+                  banner?.text(),
+                  slots.Footnote.props.className,
+                ],
+              }),
+            })}
           {slots.Social &&
             cloneElement(slots.Social, {
               contentAlignment: resolvedAlignment,
