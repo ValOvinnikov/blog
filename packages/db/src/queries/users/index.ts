@@ -1,3 +1,4 @@
+export * from './delete-user-sessions';
 export * from './find-user-by-email';
 export * from './get-users-by-email-index';
 export * from './record-terms-acceptance';

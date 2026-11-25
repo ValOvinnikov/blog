@@ -14,6 +14,7 @@ import {
 } from '@shinefold/db/testing/fixtures';
 import { mockMembership } from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { insertTestSession } from '@shinefold/db/testing/sessions/fixtures';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { errorResult, okResult } from '@shinefold/utils';
 import { eq } from 'drizzle-orm';
@@ -24,11 +25,8 @@ vi.mock('@shinefold/db/client');
 
 faker.seed(602201);
 
-const MOCK_REF_DATE = new Date(Date.UTC(2026, 0, 1));
-
 const MOCK_MISSING_USER_ID = faker.string.uuid();
 const MOCK_POST_ID = faker.string.uuid();
-const MOCK_SESSION_EXPIRES = faker.date.future({ refDate: MOCK_REF_DATE });
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);
@@ -45,11 +43,7 @@ afterEach(async () => {
 async function seedUserWithRelatedRows(): Promise<string> {
   const { id } = await insertTestUser(db());
   await insertTestAccount(db(), id, GITHUB_PROVIDER);
-  await db().insert(schema.sessions).values({
-    sessionToken: faker.string.uuid(),
-    userId: id,
-    expires: MOCK_SESSION_EXPIRES,
-  });
+  await insertTestSession(db(), id);
   await db()
     .insert(schema.bookmarks)
     .values({ tenantId: tenant().id, userId: id, postId: MOCK_POST_ID });

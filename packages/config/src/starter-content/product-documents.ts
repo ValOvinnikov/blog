@@ -4,18 +4,10 @@ import { buildBaseDocuments } from './base-documents';
 import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
-import { buildFaqModule } from './starter-faq';
-import { moduleSlot, paragraphs, reference } from './starter-fields';
+import { moduleSlot, reference } from './starter-fields';
+import { buildHomeSections } from './starter-home-sections';
 import { internalLink, navigationLink } from './starter-links';
-import {
-  INTRODUCTION_MODULE_TITLE,
-  QUESTIONS_MODULE_TITLE,
-} from './starter-module-titles';
-import {
-  buildCalloutCta,
-  buildContentModule,
-  buildPostListModule,
-} from './starter-modules';
+import { buildPostListModule } from './starter-modules';
 import { buildStatementHero } from './starter-statement-hero';
 
 const ids = STARTER_DOCUMENT_IDS;
@@ -29,6 +21,18 @@ export function buildProductDocuments({
 }): TStarterDocumentUnion[] {
   const { hero, intro, faq, cta, changelog } = copy.product;
 
+  const homeSections = buildHomeSections({
+    locale,
+    intro: { id: ids.PRODUCT_INTRO, ...intro },
+    faq: { id: ids.PRODUCT_FAQ, ...faq },
+    cta: {
+      id: ids.PRODUCT_CTA,
+      title: 'See the Changelog',
+      linkId: ids.PRODUCT_CHANGELOG_LINK,
+      ...cta,
+    },
+  });
+
   return [
     ...buildBaseDocuments({
       locale,
@@ -36,11 +40,7 @@ export function buildProductDocuments({
       navigationItems: [navigationLink(ids.PRODUCT_CHANGELOG_LINK)],
       homeLayout: {
         hero: reference(ids.PRODUCT_HERO),
-        modules: [
-          moduleSlot(ids.PRODUCT_INTRO, 'module_content'),
-          moduleSlot(ids.PRODUCT_FAQ, 'module_faq'),
-          moduleSlot(ids.PRODUCT_CTA, 'module_cta'),
-        ],
+        modules: homeSections.modules,
       },
       postIndexModules: [
         moduleSlot(ids.PRODUCT_CHANGELOG_LIST, 'module_postList'),
@@ -52,26 +52,7 @@ export function buildProductDocuments({
       hero,
       linkId: ids.PRODUCT_CHANGELOG_LINK,
     }),
-    buildContentModule({
-      id: ids.PRODUCT_INTRO,
-      title: INTRODUCTION_MODULE_TITLE,
-      locale,
-      body: paragraphs(intro.body),
-    }),
-    ...buildFaqModule({
-      id: ids.PRODUCT_FAQ,
-      title: QUESTIONS_MODULE_TITLE,
-      locale,
-      faq,
-    }),
-    buildCalloutCta({
-      id: ids.PRODUCT_CTA,
-      title: 'See the Changelog',
-      locale,
-      heading: cta.heading,
-      supportingText: cta.supportingText,
-      linkId: ids.PRODUCT_CHANGELOG_LINK,
-    }),
+    ...homeSections.documents,
     buildPostListModule({
       id: ids.PRODUCT_CHANGELOG_LIST,
       title: 'Changelog Post List',

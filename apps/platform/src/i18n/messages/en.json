@@ -9,6 +9,7 @@
     "selectTenant": "Choose a workspace",
     "signInTitle": "Sign in",
     "signInError": "Sign-in problem",
+    "noAccess": "No access",
     "addTenant": "Add tenant",
     "tenantOverview": "Tenant overview",
     "tenantActivity": "Tenant activity",
@@ -147,10 +148,24 @@
     "backToSignIn": "Back to sign-in",
     "badge": "Sign-in"
   },
+  "noAccessPage": {
+    "badge": "No access",
+    "SITE": {
+      "heading": "You don't have access to this site",
+      "description": "Ask the site owner."
+    },
+    "SITE_INVITE": {
+      "heading": "This invite can't be used right now",
+      "description": "Ask the site owner."
+    },
+    "ADMIN_INVITE": {
+      "heading": "This invite is no longer valid",
+      "description": "Ask the person who invited you."
+    }
+  },
   "notFoundPage": {
     "heading": "Page not found",
     "description": "This page doesn't exist, or you don't have access to it.",
-    "backLink": "Back to home",
     "badge": "404"
   },
   "errorPage": {
@@ -164,6 +179,7 @@
     "brandName": "Shinefold"
   },
   "deadEndView": {
+    "backHome": "Back to home",
     "errorId": "Error ID: {errorId}"
   },
   "pageSkeleton": {
@@ -2397,6 +2413,9 @@
     "nextPaymentLabel": "Next payment",
     "nextPayment": "{amount} on <time>{date}</time>",
     "noNextPayment": "None scheduled",
+    "amountOverdueLabel": "Amount overdue",
+    "amountOverdueRetry": "{amount}, next try on <time>{date}</time>",
+    "amountOverdueNoRetry": "{amount}, not tried again automatically",
     "planEnds": "Your plan ends on <time>{date}</time>.",
     "noPayments": "Your site has no payments yet.",
     "invoicesTitle": "Invoices",

@@ -3,7 +3,11 @@ import { DetailList } from '@platform/components/shared/detail-list';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
-import type { TBillingNextPayment } from '@platform/server/billing/fetch-stripe-billing';
+import type {
+  TBillingNextPayment,
+  TBillingRenewal,
+} from '@platform/server/billing/fetch-stripe-billing';
+import type { TBillingAmountOwed } from '@platform/server/billing/read-amount-owed';
 import { richDate } from '@platform/utils/rich-date/rich-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
@@ -21,8 +25,7 @@ export type TPlanCardProps = {
   status: TTenantStatus;
   hasPayments: boolean;
   isSubscribed: boolean;
-  nextPayment?: TBillingNextPayment;
-  endsAt?: Date;
+  renewal: TBillingRenewal;
 };
 
 export const PlanCard = ({
@@ -30,9 +33,9 @@ export const PlanCard = ({
   status,
   hasPayments,
   isSubscribed,
-  nextPayment,
-  endsAt,
+  renewal,
 }: TPlanCardProps) => {
+  const { nextPayment, amountOwed, endsAt } = renewal;
   const t = useTranslations('billingPage');
   const tPlan = useTranslations('planNames');
   const tStatus = useTranslations('tenantsTable.status');
@@ -45,6 +48,16 @@ export const PlanCard = ({
           ...richDate(payment.dueAt, locale),
         })
       : t('noNextPayment');
+
+  const amountOwedText = ({ amount, retryAt }: TBillingAmountOwed) => {
+    const formattedAmount = formatStripeAmount(amount, locale);
+    return retryAt
+      ? t.rich('amountOverdueRetry', {
+          amount: formattedAmount,
+          ...richDate(retryAt, locale),
+        })
+      : t('amountOverdueNoRetry', { amount: formattedAmount });
+  };
 
   return (
     <Card>
@@ -60,7 +73,12 @@ export const PlanCard = ({
       <Card.Body>
         <DetailList>
           <DetailList.Row label={t('planLabel')}>{tPlan(plan)}</DetailList.Row>
-          {hasPayments && !endsAt && (
+          {amountOwed && (
+            <DetailList.Row label={t('amountOverdueLabel')}>
+              {amountOwedText(amountOwed)}
+            </DetailList.Row>
+          )}
+          {hasPayments && !endsAt && !amountOwed && (
             <DetailList.Row label={t('nextPaymentLabel')}>
               {nextPaymentText(nextPayment)}
             </DetailList.Row>

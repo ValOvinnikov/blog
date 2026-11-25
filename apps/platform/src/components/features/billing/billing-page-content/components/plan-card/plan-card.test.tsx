@@ -1,5 +1,11 @@
 import messages from '@platform/i18n/messages/en.json';
-import { MOCK_NEXT_PAYMENT } from '@platform/testing/billing/overview';
+import { NO_RENEWAL } from '@platform/server/billing/fetch-stripe-billing';
+import { MOCK_AMOUNT_PAID_TEXT } from '@platform/testing/billing/fixtures';
+import {
+  MOCK_AMOUNT_OWED,
+  MOCK_NEXT_PAYMENT,
+  MOCK_RETRY_AT,
+} from '@platform/testing/billing/overview';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { TENANT_PLAN } from '@shinefold/config/constants';
@@ -9,13 +15,14 @@ import { PlanCard } from './plan-card';
 
 const { billingPage } = messages;
 const MOCK_DATE_TEXT = 'Dec 2, 2026';
+const MOCK_RETRY_DATE_TEXT = 'Nov 28, 2026';
 
 const setup = customRender(PlanCard, {
   plan: TENANT_PLAN.GROWTH,
   status: TENANT_STATUS.PAST_DUE,
   hasPayments: true,
   isSubscribed: true,
-  nextPayment: MOCK_NEXT_PAYMENT,
+  renewal: { ...NO_RENEWAL, nextPayment: MOCK_NEXT_PAYMENT },
 });
 
 describe(`<${PlanCard.name}/>`, () => {
@@ -44,10 +51,12 @@ describe(`<${PlanCard.name}/>`, () => {
     });
 
     it('shows the amount and date of the next payment', () => {
-      const nextPayment = screen.getByText(/^\$29\.00 on/);
+      const nextPayment = screen.getByText(`${MOCK_AMOUNT_PAID_TEXT} on`);
       const dueDate = screen.getByText(MOCK_DATE_TEXT);
 
-      expect(nextPayment).toHaveTextContent(`$29.00 on ${MOCK_DATE_TEXT}`);
+      expect(nextPayment).toHaveTextContent(
+        `${MOCK_AMOUNT_PAID_TEXT} on ${MOCK_DATE_TEXT}`,
+      );
       expect(dueDate).toHaveAttribute(
         'dateTime',
         MOCK_NEXT_PAYMENT.dueAt.toISOString(),
@@ -56,16 +65,50 @@ describe(`<${PlanCard.name}/>`, () => {
   });
 
   it('says no payment is scheduled when there is none', () => {
-    setup({ nextPayment: undefined });
+    setup({ renewal: NO_RENEWAL });
 
     const nextPayment = screen.getByText('None scheduled');
 
     expect(nextPayment).toBeVisible();
   });
 
+  describe('a past-due site', () => {
+    it('shows the amount owed and when it is tried again, not the next payment', () => {
+      setup({ renewal: { ...NO_RENEWAL, amountOwed: MOCK_AMOUNT_OWED } });
+
+      const owed = screen.getByText(`${MOCK_AMOUNT_PAID_TEXT}, next try on`);
+      const retryDate = screen.getByText(MOCK_RETRY_DATE_TEXT);
+      const nextPaymentLabel = screen.queryByText(billingPage.nextPaymentLabel);
+
+      expect(owed).toHaveTextContent(
+        `${MOCK_AMOUNT_PAID_TEXT}, next try on ${MOCK_RETRY_DATE_TEXT}`,
+      );
+      expect(retryDate).toHaveAttribute(
+        'dateTime',
+        MOCK_RETRY_AT.toISOString(),
+      );
+      expect(nextPaymentLabel).not.toBeInTheDocument();
+    });
+
+    it('says the amount is not tried again once Stripe has stopped', () => {
+      setup({
+        renewal: {
+          ...NO_RENEWAL,
+          amountOwed: { ...MOCK_AMOUNT_OWED, retryAt: undefined },
+        },
+      });
+
+      const owed = screen.getByText(
+        `${MOCK_AMOUNT_PAID_TEXT}, not tried again automatically`,
+      );
+
+      expect(owed).toBeVisible();
+    });
+  });
+
   describe('a plan cancelled to end', () => {
     beforeEach(() => {
-      setup({ nextPayment: undefined, endsAt: MOCK_NEXT_PAYMENT.dueAt });
+      setup({ renewal: { ...NO_RENEWAL, endsAt: MOCK_NEXT_PAYMENT.dueAt } });
     });
 
     it('says when the plan ends', () => {
@@ -96,7 +139,7 @@ describe(`<${PlanCard.name}/>`, () => {
       status: TENANT_STATUS.TRIAL,
       hasPayments: false,
       isSubscribed: false,
-      nextPayment: undefined,
+      renewal: NO_RENEWAL,
     });
 
     const noPayments = screen.getByText('Your site has no payments yet.');

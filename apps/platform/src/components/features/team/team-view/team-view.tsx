@@ -53,7 +53,7 @@ export const TeamView = ({ tenantId, plan, team }: TTeamViewProps) => {
         isFull && (
           <Alert
             id={TEAM_SEAT_NOTICE_ID}
-            type={ALERT_TYPE.WARNING}
+            type={ALERT_TYPE.INFO}
             title={t('seatLimitTitle')}
             description={t('seatLimitBody', { plan: tPlan(plan), seats })}
           />

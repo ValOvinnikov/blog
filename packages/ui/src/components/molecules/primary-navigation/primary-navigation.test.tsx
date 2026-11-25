@@ -172,46 +172,50 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
   });
 
   describe('mobile toggle', () => {
-    it('renders the toggle button with its accessible label', () => {
-      setup({ mobileToggle: mobileToggle(false) });
+    describe('while closed', () => {
+      beforeEach(() => {
+        setup({ mobileToggle: mobileToggle(false) });
+      });
 
-      const toggle = screen.getByRole('button', { name: MOCK_TOGGLE_LABEL });
+      it('renders the toggle button with its accessible label', () => {
+        const toggle = screen.getByRole('button', { name: MOCK_TOGGLE_LABEL });
 
-      expect(toggle).toBeVisible();
+        expect(toggle).toBeVisible();
+      });
+
+      it('hides the panel', () => {
+        const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+
+        expect(mobilePanel).not.toBeVisible();
+      });
     });
 
-    it('exposes the open state and links the toggle to its panel', () => {
-      setup({ mobileToggle: mobileToggle(true) });
+    describe('while open', () => {
+      beforeEach(() => {
+        setup({ mobileToggle: mobileToggle(true) });
+      });
 
-      const toggle = screen.getByRole('button', { name: MOCK_TOGGLE_LABEL });
-      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+      it('exposes the open state and links the toggle to its panel', () => {
+        const toggle = screen.getByRole('button', { name: MOCK_TOGGLE_LABEL });
+        const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
 
-      expect(toggle).toHaveAttribute('aria-expanded', 'true');
-      expect(toggle).toHaveAttribute('aria-controls', MOCK_PANEL_ID);
-      expect(mobilePanel).toHaveAttribute('id', MOCK_PANEL_ID);
-    });
+        expect(toggle).toHaveAttribute('aria-expanded', 'true');
+        expect(toggle).toHaveAttribute('aria-controls', MOCK_PANEL_ID);
+        expect(mobilePanel).toHaveAttribute('id', MOCK_PANEL_ID);
+      });
 
-    it('hides the panel while closed', () => {
-      setup({ mobileToggle: mobileToggle(false) });
+      it('shows every link in the panel', () => {
+        const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
 
-      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+        expect(mobilePanel).toBeVisible();
+        for (const link of links) {
+          const panelLink = within(mobilePanel).getByRole('link', {
+            name: link.label,
+          });
 
-      expect(mobilePanel).not.toBeVisible();
-    });
-
-    it('shows every link in the panel while open', () => {
-      setup({ mobileToggle: mobileToggle(true) });
-
-      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
-
-      expect(mobilePanel).toBeVisible();
-      for (const link of links) {
-        const panelLink = within(mobilePanel).getByRole('link', {
-          name: link.label,
-        });
-
-        expect(panelLink).toBeVisible();
-      }
+          expect(panelLink).toBeVisible();
+        }
+      });
     });
 
     it('shows the panel actions as a row in the open panel', () => {

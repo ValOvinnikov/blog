@@ -1,3 +1,11 @@
+import {
+  NO_ACCESS_SEARCH_PARAM,
+  type TNoAccessReason,
+} from '@platform/constants/no-access';
+import {
+  SELECT_TENANT_FROM,
+  SELECT_TENANT_SEARCH_PARAM,
+} from '@platform/constants/select-tenant';
 import { SUBSCRIBERS_SEARCH_PARAM } from '@platform/constants/subscribers';
 import { DRAFT_PREVIEW_SEGMENT } from '@platform/utils/draft-preview-routes/draft-preview-routes';
 import {
@@ -24,6 +32,9 @@ export const adminRoutes = {
   signIn: (callbackUrl = '/') =>
     `${SIGN_IN_PATH}?${new URLSearchParams({ callbackUrl })}`,
   signInError: () => '/sign-in-error',
+  noAccess: (reason: TNoAccessReason) =>
+    `/no-access?${new URLSearchParams({ [NO_ACCESS_SEARCH_PARAM.REASON]: reason })}`,
+  adminInvite: () => '/api/admin-invite',
   signUp: () => '/signup',
   onboarding: () => '/onboarding',
   tenants: ({
@@ -96,7 +107,12 @@ export const adminRoutes = {
   dashboardHelp: () => '/dashboard/help',
   dashboardSelectTenant: () => '/dashboard/select-tenant',
   dashboardSelectTenantHref: (tenantId: string) =>
-    `/api/dashboard/select-tenant?tenantId=${tenantId}`,
+    `/api/dashboard/select-tenant?${new URLSearchParams({ [SELECT_TENANT_SEARCH_PARAM.TENANT_ID]: tenantId })}`,
+  dashboardSelectTenantFromInviteHref: (tenantId: string) =>
+    `/api/dashboard/select-tenant?${new URLSearchParams({
+      [SELECT_TENANT_SEARCH_PARAM.TENANT_ID]: tenantId,
+      [SELECT_TENANT_SEARCH_PARAM.FROM]: SELECT_TENANT_FROM.INVITE,
+    })}`,
 } as const;
 
 export const tenantSiteUrl = (domain: string) => `https://${domain}`;

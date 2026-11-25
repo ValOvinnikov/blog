@@ -23,6 +23,7 @@ import {
   insertTestPersonalDataRows,
 } from '@shinefold/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { insertTestSession } from '@shinefold/db/testing/sessions/fixtures';
 import { readSelfServeIndex } from '@shinefold/db/testing/tenants/self-serve-fixtures';
 import { errorResult, okResult } from '@shinefold/utils';
 
@@ -36,11 +37,6 @@ vi.mock('@shinefold/db/client');
 const db = useQueryTestDb();
 
 faker.seed(6022);
-
-const MOCK_SESSION_TOKEN = faker.string.uuid();
-const MOCK_SESSION_EXPIRES = faker.date.future({
-  refDate: '2026-03-15T10:00:00.000Z',
-});
 
 const WITH_READER_ACCOUNT = { includesReaderAccount: true };
 const WITHOUT_READER_ACCOUNT = { includesReaderAccount: false };
@@ -153,11 +149,7 @@ describe(erasePersonalData, () => {
     });
 
     it('revokes every session of the erased reader account', async () => {
-      await db().insert(schema.sessions).values({
-        sessionToken: MOCK_SESSION_TOKEN,
-        userId: readerId,
-        expires: MOCK_SESSION_EXPIRES,
-      });
+      await insertTestSession(db(), readerId);
 
       await erasePersonalData(MOCK_SUBSCRIBER_EMAIL, WITH_READER_ACCOUNT);
 

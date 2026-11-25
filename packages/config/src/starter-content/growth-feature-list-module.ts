@@ -11,7 +11,7 @@ import type {
 
 import type { TStarterDocumentUnion, TStarterModule } from './starter-document';
 import type { TStarterDocument } from './starter-document-shape';
-import { keyedReference, moduleHeadingBlock } from './starter-fields';
+import { moduleHeadingBlock, moduleItemDocuments } from './starter-fields';
 import type { TModuleInput } from './starter-modules';
 
 type TFeatureListCopy = {
@@ -29,10 +29,13 @@ export function buildFeatureListModule({
   featureList: TFeatureListCopy;
   icons: readonly TFeatureIconName[];
 }): TStarterDocumentUnion[] {
-  const blocks = features.map(
-    (feature, index) =>
+  const { documents, references } = moduleItemDocuments(
+    id,
+    'Feature',
+    features,
+    (feature, itemId, index) =>
       ({
-        _id: `${id}Feature${index + 1}`,
+        _id: itemId,
         _type: 'block_feature',
         title: feature.heading,
         headingBlock: moduleHeadingBlock(
@@ -45,7 +48,7 @@ export function buildFeatureListModule({
   );
 
   return [
-    ...blocks,
+    ...documents,
     {
       _id: id,
       _type: 'module_featureList',
@@ -54,7 +57,7 @@ export function buildFeatureListModule({
       headingBlock: moduleHeadingBlock(locale, heading),
       imageShape: CARD_IMAGE_SHAPE.ICON,
       cardAlignment: CONTENT_ALIGNMENT.LEFT,
-      features: blocks.map(({ _id }) => keyedReference(_id)),
+      features: references,
     } satisfies TStarterModule<Module_featureList>,
   ];
 }

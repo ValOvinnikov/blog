@@ -9,6 +9,7 @@
     "selectTenant": "Choisir un espace de travail",
     "signInTitle": "Connexion",
     "signInError": "Problème de connexion",
+    "noAccess": "Accès refusé",
     "addTenant": "Ajouter un locataire",
     "tenantOverview": "Aperçu du locataire",
     "tenantActivity": "Activité du locataire",
@@ -147,10 +148,24 @@
     "backToSignIn": "Retour à la connexion",
     "badge": "Connexion"
   },
+  "noAccessPage": {
+    "badge": "Accès refusé",
+    "SITE": {
+      "heading": "Vous n'avez pas accès à ce site",
+      "description": "Demandez au propriétaire du site."
+    },
+    "SITE_INVITE": {
+      "heading": "Cette invitation ne peut pas être utilisée pour le moment",
+      "description": "Demandez au propriétaire du site."
+    },
+    "ADMIN_INVITE": {
+      "heading": "Cette invitation n'est plus valide",
+      "description": "Demandez à la personne qui vous a invité."
+    }
+  },
   "notFoundPage": {
     "heading": "Page introuvable",
     "description": "Cette page n'existe pas, ou vous n'y avez pas accès.",
-    "backLink": "Retour à l'accueil",
     "badge": "404"
   },
   "errorPage": {
@@ -164,6 +179,7 @@
     "brandName": "Shinefold"
   },
   "deadEndView": {
+    "backHome": "Retour à l'accueil",
     "errorId": "ID de l’erreur : {errorId}"
   },
   "pageSkeleton": {
@@ -2397,6 +2413,9 @@
     "nextPaymentLabel": "Prochain paiement",
     "nextPayment": "{amount} le <time>{date}</time>",
     "noNextPayment": "Aucun prévu",
+    "amountOverdueLabel": "Montant en retard",
+    "amountOverdueRetry": "{amount}, nouvelle tentative le <time>{date}</time>",
+    "amountOverdueNoRetry": "{amount}, aucune nouvelle tentative automatique",
     "planEnds": "Votre formule prend fin le <time>{date}</time>.",
     "noPayments": "Votre site n'a encore aucun paiement.",
     "invoicesTitle": "Factures",

@@ -19,6 +19,12 @@ import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email
 import { OWNER_GRACE_EMAIL_COPY } from '@worker/utils/owner-email/owner-grace-email-copy/owner-grace-email-copy';
 import { sendOwnerMessage } from '@worker/utils/owner-email/send-owner-message';
 
+import {
+  fewerSeatsGraceBody,
+  isFewerSeatsGrace,
+} from './fewer-seats-grace-email';
+import type { TGraceEmailBody } from './grace-email-body';
+
 export type TGraceEmailInput = {
   tenant: TTenant;
   graceStartedAt: Date;
@@ -44,35 +50,50 @@ function lockParagraphs(
   return [...members, ...domain];
 }
 
-export async function sendOwnerGraceEmail(
+function freePlanGraceBody(
   email: TGraceEmail,
-  { tenant, graceStartedAt, ownerEmail, locks, env }: TGraceEmailInput,
-): Promise<void> {
-  const { id: tenantId, name, locale } = tenant;
+  { name, locale }: TTenant,
+  locks: TGraceLocks,
+  date: string,
+): TGraceEmailBody {
   const copy = OWNER_GRACE_EMAIL_COPY[locale];
-  const date = formatInactivityDate(graceEndDate(graceStartedAt), locale);
   const { paragraphs, ...text } = copy.emails[email]({ siteName: name, date });
   const closing =
     email === GRACE_EMAIL.STARTED && !hasGraceLocks(locks)
       ? copy.upgradeAnyTime
       : copy.keepAsTheyAre(date);
 
+  return {
+    ...text,
+    paragraphs: [...paragraphs, ...lockParagraphs(copy, locks, date), closing],
+    action: {
+      label: OWNER_DASHBOARD_ACTION_LABEL[locale],
+      path: OWNER_DASHBOARD_PATH,
+    },
+  };
+}
+
+export async function sendOwnerGraceEmail(
+  email: TGraceEmail,
+  { tenant, graceStartedAt, ownerEmail, locks, env }: TGraceEmailInput,
+): Promise<void> {
+  const { id: tenantId, locale } = tenant;
+  const date = formatInactivityDate(graceEndDate(graceStartedAt), locale);
+  const { action, ...body } = isFewerSeatsGrace(tenant)
+    ? await fewerSeatsGraceBody(email, tenant, date)
+    : freePlanGraceBody(email, tenant, locks, date);
+
   await sendOwnerMessage({
     to: ownerEmail,
     message: buildOwnerDowngradeGraceEmail({
       brandName: PLATFORM_EMAIL_BRAND_NAME,
-      ...text,
-      paragraphs: [
-        ...paragraphs,
-        ...lockParagraphs(copy, locks, date),
-        closing,
-      ],
+      ...body,
       action: {
-        label: OWNER_DASHBOARD_ACTION_LABEL[locale],
-        url: new URL(OWNER_DASHBOARD_PATH, env.platformAppBaseUrl).toString(),
+        label: action.label,
+        url: new URL(action.path, env.platformAppBaseUrl).toString(),
       },
       secondaryLink: {
-        label: copy.planComparisonLabel,
+        label: OWNER_GRACE_EMAIL_COPY[locale].planComparisonLabel,
         url: env.pricingPageUrl,
       },
     }),

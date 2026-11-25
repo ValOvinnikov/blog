@@ -4,9 +4,7 @@ import {
   type TStarterPlaceholderImage,
 } from '@shinefold/config/constants';
 import { SVG_CONTENT_TYPE } from '@worker/constants/media-type';
-import type { createClientWithTimeout } from '@worker/utils/step-deps/step-deps';
-
-type TSanityClient = ReturnType<typeof createClientWithTimeout>;
+import type { TTenantSanityClient } from '@worker/utils/tenant-sanity-client/tenant-sanity-client';
 
 const PLACEHOLDER_IMAGES: Record<
   TStarterPlaceholderImage,
@@ -23,7 +21,7 @@ const PLACEHOLDER_IMAGES: Record<
 };
 
 async function uploadPlaceholderImage(
-  client: TSanityClient,
+  client: TTenantSanityClient,
   image: TStarterPlaceholderImage,
 ): Promise<string> {
   const { filename, svg } = PLACEHOLDER_IMAGES[image];
@@ -36,7 +34,7 @@ async function uploadPlaceholderImage(
 
 // Sanity keys an asset by its content hash, so a repeat upload returns the asset already in the dataset.
 export async function uploadPlaceholderImages(
-  client: TSanityClient,
+  client: TTenantSanityClient,
 ): Promise<TStarterPlaceholderImageIds> {
   const [logo, illustration] = await Promise.all([
     uploadPlaceholderImage(client, STARTER_PLACEHOLDER_IMAGE.LOGO),

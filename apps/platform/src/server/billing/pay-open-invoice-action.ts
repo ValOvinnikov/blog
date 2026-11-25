@@ -1,10 +1,8 @@
 'use server';
 
-import {
-  BILLING_LOG,
-  STRIPE_INVOICE_STATUS,
-} from '@platform/constants/billing';
+import { BILLING_LOG } from '@platform/constants/billing';
 import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
+import { findOpenInvoice } from '@platform/server/billing/find-open-invoice';
 import { getStripeClient } from '@platform/server/billing/stripe-client';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
@@ -34,12 +32,8 @@ const resolvePayDestination = async (
   }
 
   try {
-    const { data } = await stripe.invoices.list({
-      subscription,
-      status: STRIPE_INVOICE_STATUS.OPEN,
-      limit: 1,
-    });
-    return data[0]?.hosted_invoice_url ?? adminRoutes.dashboardBilling();
+    const invoice = await findOpenInvoice(stripe, subscription);
+    return invoice?.hosted_invoice_url ?? adminRoutes.dashboardBilling();
   } catch (error) {
     logger.error(BILLING_LOG.OPEN_INVOICE_FAILED, {
       tenantId,
