@@ -9,6 +9,7 @@ import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
   DEFAULT_CONTROL_STYLES,
   MOCK_NOT_FOUND_HEADING,
+  UNSET_OPTIONAL_COLUMNS,
   insertTestSiteConfig,
 } from '@shinefold/db/testing/site-config/fixtures';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
@@ -47,13 +48,7 @@ describe(getSiteConfig, () => {
     expect(result).toEqual({
       ...row,
       cardStyle: CARD_STYLE.ACCENT_BAR,
-      logoHue: undefined,
-      brandName: undefined,
-      logoAssetUrl: undefined,
-      logoDarkAssetUrl: undefined,
-      faviconAssetUrl: undefined,
-      lookSavedAt: undefined,
-      voiceSavedAt: undefined,
+      ...UNSET_OPTIONAL_COLUMNS,
       voiceOverrides: {},
     });
   });
@@ -91,13 +86,7 @@ describe(getSiteConfig, () => {
 
     expect(result).toEqual({
       ...row,
-      logoHue: undefined,
-      brandName: undefined,
-      logoAssetUrl: undefined,
-      logoDarkAssetUrl: undefined,
-      faviconAssetUrl: undefined,
-      lookSavedAt: undefined,
-      voiceSavedAt: undefined,
+      ...UNSET_OPTIONAL_COLUMNS,
       voiceOverrides: { notFoundHeading: MOCK_NOT_FOUND_HEADING },
     });
   });
