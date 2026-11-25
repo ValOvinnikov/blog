@@ -2136,6 +2136,14 @@
         "file": "packages/config/src/constants/heading-style.ts"
       }
     ],
+    "HIGHLIGHT": [
+      {
+        "ref": "HEADING_TEXT_MARK.HIGHLIGHT",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/heading-text.ts"
+      }
+    ],
     "origin": [
       {
         "ref": "REQUEST_HEADER.ORIGIN",

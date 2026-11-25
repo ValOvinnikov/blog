@@ -100,6 +100,7 @@
   --ring: var(--brand-primary);
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
+  --heading-highlight: var(--brand-primary);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
 }
@@ -138,6 +139,7 @@
   --ring: var(--brand-primary);
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
+  --heading-highlight: var(--brand-primary);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
 }
@@ -176,6 +178,7 @@
   --ring: var(--brand-primary);
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
+  --heading-highlight: var(--brand-primary);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
 }
@@ -214,6 +217,7 @@
   --ring: var(--brand-primary);
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
+  --heading-highlight: var(--brand-primary);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
 }
@@ -252,6 +256,7 @@
   --ring: var(--brand-primary);
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
+  --heading-highlight: var(--brand-primary);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
   --tint: color-mix(in oklch, var(--backdrop), var(--brand-primary) 10%);
@@ -294,6 +299,7 @@
   --ring: var(--brand-primary);
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
+  --heading-highlight: var(--brand-primary);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
   --tint: color-mix(in oklch, var(--backdrop), var(--brand-primary) 10%);
@@ -336,6 +342,7 @@
   --ring: var(--brand-primary);
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
+  --heading-highlight: var(--brand-primary);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
   --logo-tile: var(--logo-tile-inverse);
@@ -376,6 +383,7 @@
   --ring: var(--brand-primary);
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
+  --heading-highlight: var(--brand-primary);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
 }

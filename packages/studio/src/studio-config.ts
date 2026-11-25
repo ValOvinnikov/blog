@@ -7,6 +7,7 @@ import {
 } from '@shinefold/config/constants';
 import { buildLoginProviderAuth } from '@shinefold/studio/auth/login-provider-auth';
 import { buildDocumentOptions } from '@shinefold/studio/document-actions/document-options/document-options';
+import { LOCALIZED_FIELD_TYPES } from '@shinefold/studio/localized-field-types';
 import { schemaTypes } from '@shinefold/studio/schema-types';
 import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 import { createLanguageSwitcherField } from '@shinefold/studio/schema-types/inputs/language-switcher-field/language-switcher-field';
@@ -21,9 +22,6 @@ import {
   createTranslationLinkInput,
   type TTranslationLinkOptions,
 } from '@shinefold/studio/schema-types/inputs/translation-link-input/translation-link-input';
-import { articleTextSchema } from '@shinefold/studio/schema-types/portable-text/article-text/article-text';
-import { listedTextSchema } from '@shinefold/studio/schema-types/portable-text/listed-text/listed-text';
-import { paragraphTextSchema } from '@shinefold/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import { setDefaultLanguage } from '@shinefold/studio/schema-types/validation/default-language/default-language';
 import {
   EVERY_MODULE_PACK,
@@ -33,7 +31,7 @@ import { setLiveLanguages } from '@shinefold/studio/schema-types/validation/live
 import { setCanLinkPlatformPlans } from '@shinefold/studio/schema-types/validation/platform-plan-links/platform-plan-links';
 import { isSingleLanguage } from '@shinefold/studio/structure/locales/is-single-language';
 import { orderLocales } from '@shinefold/studio/structure/locales/order-locales';
-import { defineConfig, defineField, definePlugin } from 'sanity';
+import { defineConfig, definePlugin } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { internationalizedArray } from 'sanity-plugin-internationalized-array';
 import { media, mediaAssetSource } from 'sanity-plugin-media';
@@ -134,13 +132,7 @@ export const buildStudioConfig = ({
       internationalizedArray({
         languages,
         defaultLanguages: [defaultLocale],
-        fieldTypes: [
-          'string',
-          defineField({ name: 'text', type: 'text', rows: 3 }),
-          listedTextSchema.name,
-          paragraphTextSchema.name,
-          articleTextSchema.name,
-        ],
+        fieldTypes: LOCALIZED_FIELD_TYPES,
       }),
       ...(liveLocales
         ? [

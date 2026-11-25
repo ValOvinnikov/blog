@@ -10,13 +10,10 @@ import type {
 } from '@shinefold/config/sanity/generated/types';
 
 import type { TStarterModule } from './starter-document';
-import {
-  localizedListedText,
-  localizedString,
-  moduleHeadingBlock,
-} from './starter-fields';
+import { localizedString, moduleHeadingBlock } from './starter-fields';
 import { imageAsset, localizedImageWithAlt } from './starter-images';
 import type { TModuleInput } from './starter-modules';
+import { localizedListedText } from './starter-portable-text';
 
 type THighlightsCopy = {
   heading: string;

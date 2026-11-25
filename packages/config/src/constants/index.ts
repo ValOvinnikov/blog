@@ -37,6 +37,7 @@ export * from './header-control-shape';
 export * from './header-control-style';
 export * from './header-layout';
 export * from './heading-style';
+export * from './heading-text';
 export * from './html-tag';
 export * from './http-headers';
 export * from './http-methods';

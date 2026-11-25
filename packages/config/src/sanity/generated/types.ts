@@ -52,7 +52,7 @@ export type Embed = {
 
 export type ModuleHeadingBlock = {
   _type: 'moduleHeadingBlock';
-  heading?: InternationalizedArrayString;
+  heading?: InternationalizedArrayHeadingText;
   supportingText?: InternationalizedArrayText;
 };
 
@@ -579,6 +579,21 @@ export type Module_postList = {
   columns?: 'TWO' | 'THREE' | 'FOUR';
   layout?: WideLayout;
 };
+
+export type HeadingText = Array<{
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: 'span';
+    _key: string;
+  }>;
+  style?: 'normal';
+  listItem?: never;
+  markDefs?: null;
+  level?: number;
+  _type: 'block';
+  _key: string;
+}>;
 
 export type ExpandableSectionText = Array<
   | {
@@ -1330,6 +1345,12 @@ export type Block_feature = {
   link?: LinkReference;
 };
 
+export type InternationalizedArrayHeadingTextValue = {
+  _type: 'internationalizedArrayHeadingTextValue';
+  value?: HeadingText;
+  language?: string;
+};
+
 export type InternationalizedArrayArticleTextValue = {
   _type: 'internationalizedArrayArticleTextValue';
   value?: ArticleText;
@@ -1359,6 +1380,12 @@ export type InternationalizedArrayStringValue = {
   value?: string;
   language?: string;
 };
+
+export type InternationalizedArrayHeadingText = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayHeadingTextValue
+>;
 
 export type TranslationMetadata = {
   _id: string;
@@ -2725,6 +2752,7 @@ export type AllSanitySchemaTypes =
   | Module_postFeatured
   | Module_postLatest
   | Module_postList
+  | HeadingText
   | ExpandableSectionText
   | ListedText
   | ParagraphText
@@ -2769,11 +2797,13 @@ export type AllSanitySchemaTypes =
   | Block_faq
   | Block_testimonial
   | Block_feature
+  | InternationalizedArrayHeadingTextValue
   | InternationalizedArrayArticleTextValue
   | InternationalizedArrayParagraphTextValue
   | InternationalizedArrayListedTextValue
   | InternationalizedArrayTextValue
   | InternationalizedArrayStringValue
+  | InternationalizedArrayHeadingText
   | TranslationMetadata
   | InternationalizedArrayReference
   | Page_homeReference

@@ -2,7 +2,7 @@ import type { TLocaleIsoCode } from '@shinefold/config/constants';
 
 import type { TStarterDocumentUnion } from './starter-document';
 import { buildFaqModule, type TFaqCopy } from './starter-faq';
-import { moduleSlot, paragraphs } from './starter-fields';
+import { moduleSlot } from './starter-fields';
 import {
   INTRODUCTION_MODULE_TITLE,
   QUESTIONS_MODULE_TITLE,
@@ -12,6 +12,7 @@ import {
   buildContentModule,
   type TCalloutCtaInput,
 } from './starter-modules';
+import { paragraphs } from './starter-portable-text';
 
 type TWithId = { id: string };
 

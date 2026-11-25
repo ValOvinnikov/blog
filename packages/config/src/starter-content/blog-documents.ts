@@ -14,13 +14,13 @@ import {
   localizedText,
   moduleSlot,
   pageHeadingBlock,
-  paragraphs,
   reference,
   seo,
   slug,
 } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
 import { buildAuthor } from './starter-modules';
+import { paragraphs } from './starter-portable-text';
 
 const ids = STARTER_DOCUMENT_IDS;
 
