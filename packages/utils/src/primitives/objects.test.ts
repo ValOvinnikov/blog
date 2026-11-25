@@ -1,4 +1,10 @@
-import { mapKeysToRecord, objectKeys, toOptions, toTitleCase } from './objects';
+import {
+  isPlainObject,
+  mapKeysToRecord,
+  objectKeys,
+  toOptions,
+  toTitleCase,
+} from './objects';
 
 describe(objectKeys, () => {
   it("returns the object's keys", () => {
@@ -48,5 +54,15 @@ describe(mapKeysToRecord, () => {
 
   it('returns {} for no keys', () => {
     expect(mapKeysToRecord([], (key) => key)).toEqual({});
+  });
+});
+
+describe(isPlainObject, () => {
+  it('accepts an object', () => {
+    expect(isPlainObject({ a: 1 })).toBe(true);
+  });
+
+  it.each([[null], [[]], ['a'], [1], [undefined]])('rejects %j', (value) => {
+    expect(isPlainObject(value)).toBe(false);
   });
 });

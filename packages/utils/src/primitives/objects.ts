@@ -1,3 +1,5 @@
+import { isNull } from './null';
+
 export const objectKeys = <T extends object>(obj: T): Array<keyof T> =>
   Object.keys(obj) as Array<keyof T>;
 
@@ -19,3 +21,8 @@ export const toOptions = <TValue extends string>(
   toLabel: (value: TValue) => string,
 ): { value: TValue; label: string }[] =>
   Object.values(vocabulary).map((value) => ({ value, label: toLabel(value) }));
+
+export const isPlainObject = (
+  value: unknown,
+): value is Record<string, unknown> =>
+  typeof value === 'object' && !isNull(value) && !Array.isArray(value);

@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { toPublishedId } from '@shinefold/utils/sanity-document-id';
 
 import {
   LOCALE_ISO_CODES,
@@ -173,7 +174,7 @@ describe(buildStarterDocuments, () => {
     (siteType, locale) => {
       const draftIds = build(siteType, locale)
         .map(({ _id }) => _id)
-        .filter((id) => id.startsWith('drafts.'));
+        .filter((id) => id !== toPublishedId(id));
 
       expect(draftIds).toEqual([]);
     },

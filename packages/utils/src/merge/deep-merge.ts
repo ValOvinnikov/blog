@@ -1,15 +1,12 @@
+import { isPlainObject } from '@shinefold/utils/primitives';
+
 export type TDeepPartial<T> = {
   [K in keyof T]?: T[K] extends Record<string, unknown>
     ? TDeepPartial<T[K]>
     : T[K];
 };
 
-/**
- * Merges plain nested objects key-by-key, left to right. An override's
- * absent/`undefined` key leaves `base`'s value in place; a defined leaf
- * value replaces it. No array-merge semantics — every leaf here is a
- * primitive.
- */
+/** An override's `undefined` key keeps `base`'s value, and an array replaces rather than merges. */
 export function deepMergePartial<T extends Record<string, unknown>>(
   base: T,
   ...overrides: Array<TDeepPartial<T> | undefined>
@@ -36,8 +33,4 @@ export function deepMergePartial<T extends Record<string, unknown>>(
   }
 
   return result;
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
