@@ -11,7 +11,7 @@ import { buildBaseDocuments } from './base-documents';
 import { buildBlogDocuments } from './blog-documents';
 import { buildBusinessDocuments } from './business-documents';
 import { buildCookieStatementDocument } from './cookie-statement-document';
-import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
+import { STARTER_COPY_BY_LOCALE, type TStarterCopy } from './copy/starter-copy';
 import { buildDocsDocuments } from './docs-documents';
 import { buildPersonalDocuments } from './personal-documents';
 import { buildPortfolioDocuments } from './portfolio-documents';
@@ -25,46 +25,16 @@ type TStarterInput = {
 };
 
 const BUILD_BY_SITE_TYPE = {
-  [SITE_TYPE.BLOG]: (input: TStarterInput) =>
-    buildBlogDocuments({
-      ...input,
-      copy: STARTER_COPY_BY_LOCALE[input.locale],
-    }),
-  [SITE_TYPE.PORTFOLIO]: ({ siteName, locale }: TStarterInput) =>
-    buildPortfolioDocuments({
-      siteName,
-      locale,
-      copy: STARTER_COPY_BY_LOCALE[locale],
-    }),
-  [SITE_TYPE.PERSONAL]: ({ siteName, locale }: TStarterInput) =>
-    buildPersonalDocuments({
-      siteName,
-      locale,
-      copy: STARTER_COPY_BY_LOCALE[locale],
-    }),
-  [SITE_TYPE.DOCS]: ({ locale }: TStarterInput) =>
-    buildDocsDocuments({
-      locale,
-      copy: STARTER_COPY_BY_LOCALE[locale],
-    }),
-  [SITE_TYPE.BUSINESS]: ({ locale }: TStarterInput) =>
-    buildBusinessDocuments({
-      locale,
-      copy: STARTER_COPY_BY_LOCALE[locale],
-    }),
-  [SITE_TYPE.PRODUCT]: ({ locale }: TStarterInput) =>
-    buildProductDocuments({
-      locale,
-      copy: STARTER_COPY_BY_LOCALE[locale],
-    }),
-  [SITE_TYPE.BLANK]: ({ locale }: TStarterInput) =>
-    buildBaseDocuments({
-      locale,
-      copy: STARTER_COPY_BY_LOCALE[locale],
-    }),
+  [SITE_TYPE.BLOG]: buildBlogDocuments,
+  [SITE_TYPE.PORTFOLIO]: buildPortfolioDocuments,
+  [SITE_TYPE.PERSONAL]: buildPersonalDocuments,
+  [SITE_TYPE.DOCS]: buildDocsDocuments,
+  [SITE_TYPE.BUSINESS]: buildBusinessDocuments,
+  [SITE_TYPE.PRODUCT]: buildProductDocuments,
+  [SITE_TYPE.BLANK]: buildBaseDocuments,
 } satisfies Record<
   TSiteType,
-  (input: TStarterInput) => TStarterDocumentUnion[]
+  (input: TStarterInput & { copy: TStarterCopy }) => TStarterDocumentUnion[]
 >;
 
 export type TStarterSiteType = keyof typeof BUILD_BY_SITE_TYPE;
@@ -92,7 +62,10 @@ export function buildStarterDocuments({
   siteType,
   ...input
 }: TStarterInput & { siteType: TStarterSiteType }): TStarterDocumentUnion[] {
-  return BUILD_BY_SITE_TYPE[siteType](input);
+  return BUILD_BY_SITE_TYPE[siteType]({
+    ...input,
+    copy: STARTER_COPY_BY_LOCALE[input.locale],
+  });
 }
 
 export function buildStarterCookieStatement(locale: TLocaleIsoCode) {
