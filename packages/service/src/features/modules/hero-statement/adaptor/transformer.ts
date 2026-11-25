@@ -21,6 +21,7 @@ export function toHeroStatementModule(
     eyebrow: raw.eyebrow ?? undefined,
     sanityImage: toSanityImage(raw.image),
     ctaButtons: toCtaButtons(raw.ctaButtons),
+    footnote: raw.footnote?.trim() || undefined,
     presentation: toHeroPresentation(raw),
     layout: toLayout(raw.layout),
   };

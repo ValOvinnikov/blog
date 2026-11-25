@@ -27,6 +27,7 @@ export const heroStatementModuleQuery = q
       .project(localizedImageWithAltOptionalFragment)
       .nullable(true),
     ...ctaButtonsFragment,
+    footnote: getLocalizedField(sub, 'footnote'),
     contentPositionSplit: sub.field('contentPositionSplit').nullable(true),
     contentPositionBanner: sub.field('contentPositionBanner').nullable(true),
     ...moduleContentAlignmentFragment,

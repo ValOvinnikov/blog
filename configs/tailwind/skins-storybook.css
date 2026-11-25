@@ -39,6 +39,9 @@
   --heading-highlight: var(--brand-primary);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
+  --button-fill: var(--brand-primary-solid);
+  --button-fill-hover: var(--brand-primary-solid-hover);
+  --button-label: var(--brand-primary-contrast);
   --logo-tile: var(--logo-tile-inverse);
   --logo-tile-contrast: var(--logo-tile-inverse-contrast);
 }
@@ -80,4 +83,7 @@
   --heading-highlight: var(--brand-primary);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
+  --button-fill: var(--brand-primary-solid);
+  --button-fill-hover: var(--brand-primary-solid-hover);
+  --button-label: var(--brand-primary-contrast);
 }

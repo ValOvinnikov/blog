@@ -18,8 +18,15 @@ export const TEXT_MUTED = '--text-muted' satisfies TThemeToken;
 export const BORDER_EMPHASIS = '--border-emphasis' satisfies TThemeToken;
 export const BRAND_PRIMARY_WASH = '--brand-primary-wash' satisfies TThemeToken;
 export const BRAND_PRIMARY = '--brand-primary' satisfies TThemeToken;
+export const BRAND_PRIMARY_SOLID =
+  '--brand-primary-solid' satisfies TThemeToken;
+export const BRAND_PRIMARY_SOLID_HOVER =
+  '--brand-primary-solid-hover' satisfies TThemeToken;
 export const BRAND_PRIMARY_CONTRAST =
   '--brand-primary-contrast' satisfies TThemeToken;
+export const BUTTON_FILL = '--button-fill' satisfies TThemeToken;
+export const BUTTON_FILL_HOVER = '--button-fill-hover' satisfies TThemeToken;
+export const BUTTON_LABEL = '--button-label' satisfies TThemeToken;
 export const ITEM_ACCENT_BRAND_SHARE =
   '--item-accent-brand-share' satisfies TThemeToken;
 
@@ -31,6 +38,9 @@ export const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
   '--heading-highlight': BRAND_PRIMARY,
   '--code-fg': TEXT,
   '--code-comment': TEXT_MUTED,
+  [BUTTON_FILL]: BRAND_PRIMARY_SOLID,
+  [BUTTON_FILL_HOVER]: BRAND_PRIMARY_SOLID_HOVER,
+  [BUTTON_LABEL]: BRAND_PRIMARY_CONTRAST,
 };
 
 export const BANDS = [

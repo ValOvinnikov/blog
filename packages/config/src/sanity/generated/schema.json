@@ -15136,6 +15136,13 @@
         },
         "optional": true
       },
+      "showPreviousNextLinks": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "showSectionNavigation": {
         "type": "objectAttribute",
         "value": {

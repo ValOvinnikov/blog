@@ -12,6 +12,7 @@ export function mockRawHeroStatementModule(
     headingBlock: mockRawModuleHeadingBlock('Statement heading'),
     image: null,
     ctaButtons: null,
+    footnote: null,
     contentPositionSplit: null,
     contentPositionBanner: null,
     contentAlignment: null,

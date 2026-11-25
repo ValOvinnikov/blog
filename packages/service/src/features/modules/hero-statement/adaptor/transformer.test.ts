@@ -27,6 +27,7 @@ faker.seed(8);
 
 const MOCK_STATEMENT_HEADING = faker.lorem.words(3);
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_FOOTNOTE = faker.lorem.sentence();
 
 describe(toHeroStatementModule, () => {
   it('maps the brand variant, variant and heading block', () => {
@@ -90,6 +91,19 @@ describe(toHeroStatementModule, () => {
     const hero = toHeroStatementModule(raw);
 
     expect(hero.ctaButtons).toEqual([mockCtaButtonView()]);
+  });
+
+  it.each([
+    [MOCK_FOOTNOTE, MOCK_FOOTNOTE],
+    [null, undefined],
+    ['', undefined],
+    ['   ', undefined],
+  ])('maps footnote %j to %j', (footnote, expected) => {
+    const raw = mockRawHeroStatementModule({ footnote });
+
+    const hero = toHeroStatementModule(raw);
+
+    expect(hero.footnote).toBe(expected);
   });
 
   it('takes content position and media order from the Split variant', () => {

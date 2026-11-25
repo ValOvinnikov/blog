@@ -23,6 +23,7 @@ const MOCK_EN_COPY = {
   heading: faker.lorem.words(3),
   supportingText: faker.lorem.sentence(),
   alt: faker.lorem.words(2),
+  footnote: faker.lorem.sentence(),
 };
 
 const MOCK_NL_COPY = {
@@ -30,6 +31,7 @@ const MOCK_NL_COPY = {
   heading: faker.lorem.words(3),
   supportingText: faker.lorem.sentence(),
   alt: faker.lorem.words(2),
+  footnote: faker.lorem.sentence(),
 };
 
 const MOCK_HERO_DOCUMENT = {
@@ -54,6 +56,10 @@ const MOCK_HERO_DOCUMENT = {
     [NL]: MOCK_NL_COPY.eyebrow,
   }),
   image: mockLocalizedImage({ [EN]: MOCK_EN_COPY.alt, [NL]: MOCK_NL_COPY.alt }),
+  footnote: mockLocalizedStrings({
+    [EN]: MOCK_EN_COPY.footnote,
+    [NL]: MOCK_NL_COPY.footnote,
+  }),
 };
 
 async function runHero(document: Record<string, unknown>, locale: string) {
@@ -76,7 +82,7 @@ describe('heroStatementModuleQuery', () => {
       MOCK_EN_COPY,
     ],
   ])('%s', async (_, locale, copy) => {
-    const { eyebrow, headingBlock, image } = await runHero(
+    const { eyebrow, headingBlock, image, footnote } = await runHero(
       MOCK_HERO_DOCUMENT,
       locale,
     );
@@ -87,13 +93,15 @@ describe('heroStatementModuleQuery', () => {
       supportingText: copy.supportingText,
     });
     expect(image?.alt).toBe(copy.alt);
+    expect(footnote).toBe(copy.footnote);
   });
 
-  it('leaves the eyebrow and supporting text null when no language has a value', async () => {
-    const { eyebrow, headingBlock } = await runHero(
+  it('leaves optional copy null when no language has a value', async () => {
+    const { eyebrow, headingBlock, footnote } = await runHero(
       {
         ...MOCK_HERO_DOCUMENT,
         eyebrow: undefined,
+        footnote: undefined,
         headingBlock: mockLocalizedHeadingBlock({ [EN]: MOCK_EN_COPY.heading }),
       },
       NL,
@@ -101,6 +109,7 @@ describe('heroStatementModuleQuery', () => {
 
     expect(eyebrow).toBeNull();
     expect(headingBlock.supportingText).toBeNull();
+    expect(footnote).toBeNull();
   });
 
   it('fails when the heading is missing in every language', async () => {

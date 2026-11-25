@@ -2,6 +2,7 @@ import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config/constants';
 import {
   readCssBlock,
   readRepoFile,
+  readThemeCss,
 } from '@shinefold/config/testing/theme-css';
 
 import {
@@ -60,7 +61,7 @@ const formatRamps = (...ramps: TOklchRamp[]): Record<string, string> =>
   Object.assign({}, ...ramps.map((ramp) => formatOklchRamp(ramp, CONSOLE_HUE)));
 
 describe('theme ramps', () => {
-  const themeCss = readRepoFile('configs/tailwind/theme.css');
+  const themeCss = readThemeCss();
   const webCss = readRepoFile('apps/web/index.css');
 
   it('match every OKLCH value theme.css sets in :root', () => {
