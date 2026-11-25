@@ -20,9 +20,9 @@ export const buttonVariants = tv({
   variants: {
     variant: {
       primary:
-        'border-transparent bg-brand-primary-solid text-brand-primary-contrast hover:bg-brand-primary-solid-hover',
+        'border-transparent bg-button-fill text-button-label hover:bg-button-fill-hover',
       ghost:
-        'border-border-strong bg-transparent text-text hover:border-brand-primary hover:text-brand-primary',
+        'border-border-strong bg-transparent text-text hover:border-button-fill hover:bg-button-fill hover:text-button-label',
       // Forced colours paint transparent borders, so the link drops its border there.
       link: 'border-transparent bg-transparent text-brand-primary hover:text-brand-primary-hover forced-colors:border-0',
       danger:

@@ -1,9 +1,3 @@
-import {
-  MOCK_BLACK_HEX,
-  MOCK_PINK_HEX,
-  MOCK_WHITE_HEX,
-  MOCK_YELLOW_HEX,
-} from '@shinefold/config/testing/button-colors';
 import { hexToOklch, renderedContrastRatio } from '@shinefold/utils/color';
 
 import {
@@ -11,6 +5,12 @@ import {
   CONTRAST_ROLE,
   CONTRAST_ROLE_MIN,
 } from '@shinefold/config/constants';
+import {
+  MOCK_BLACK_HEX,
+  MOCK_PINK_HEX,
+  MOCK_WHITE_HEX,
+  MOCK_YELLOW_HEX,
+} from '@shinefold/config/testing/button-colors';
 
 import { deriveButtonColors } from './button-colors';
 

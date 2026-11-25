@@ -1,11 +1,10 @@
+import { BRAND_VARIANT, COLOR_SCHEME } from '@shinefold/config/constants';
 import {
   MOCK_BLACK_HEX,
   MOCK_PINK_HEX,
   MOCK_WHITE_HEX,
   MOCK_YELLOW_HEX,
 } from '@shinefold/config/testing/button-colors';
-
-import { BRAND_VARIANT, COLOR_SCHEME } from '@shinefold/config/constants';
 import {
   readCssBlock,
   readCssDeclarations,
