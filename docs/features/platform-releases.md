@@ -252,9 +252,13 @@ values are stored as plain `text`, so none of them needs a db migration:
   request keeps its timeout, and a failed page fails the read with a reason
   code. A tag list still full at the page cap is reported as
   `tagListIncomplete`, never as a different latest tag.
-- A comparison is fixed by its base and head, so its reduced result (the
+- A comparison between two SHAs never changes, so its reduced result (the
   newest commits, the total, the changed filenames and the truncation flag)
-  is cached per pair with no expiry (`cacheGitHubResult`). The raw compare
+  is cached with no expiry (`cacheGitHubResult`). The candidate compares by
+  tag name but is keyed by the tag ref's SHA as well, so a tag recreated on
+  another commit reads afresh. The key also carries
+  `COMPARISON_CACHE_VERSION`, bumped whenever the stored shape or the page
+  maths changes, because the cache outlives a deploy. The raw compare
   pages are not cached: with full commit objects and file patches they pass
   Next's 2 MB cache limit, which skips them silently. A failed comparison is
   never stored, so the next read retries it. A file's contents at a SHA are
