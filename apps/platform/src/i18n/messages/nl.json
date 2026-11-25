@@ -150,7 +150,6 @@
   },
   "noAccessPage": {
     "badge": "Geen toegang",
-    "backLink": "Terug naar start",
     "SITE": {
       "heading": "Je hebt geen toegang tot deze site",
       "description": "Vraag het aan de eigenaar van de site."
@@ -167,7 +166,6 @@
   "notFoundPage": {
     "heading": "Pagina niet gevonden",
     "description": "Deze pagina bestaat niet, of je hebt er geen toegang toe.",
-    "backLink": "Terug naar start",
     "badge": "404"
   },
   "errorPage": {
@@ -181,6 +179,7 @@
     "brandName": "Shinefold"
   },
   "deadEndView": {
+    "backHome": "Terug naar start",
     "errorId": "Fout-ID: {errorId}"
   },
   "pageSkeleton": {

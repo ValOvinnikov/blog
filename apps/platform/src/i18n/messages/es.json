@@ -150,7 +150,6 @@
   },
   "noAccessPage": {
     "badge": "Sin acceso",
-    "backLink": "Volver al inicio",
     "SITE": {
       "heading": "No tienes acceso a este sitio",
       "description": "Pregunta a la persona propietaria del sitio."
@@ -167,7 +166,6 @@
   "notFoundPage": {
     "heading": "Página no encontrada",
     "description": "Esta página no existe o no tienes acceso a ella.",
-    "backLink": "Volver al inicio",
     "badge": "404"
   },
   "errorPage": {
@@ -181,6 +179,7 @@
     "brandName": "Shinefold"
   },
   "deadEndView": {
+    "backHome": "Volver al inicio",
     "errorId": "ID del error: {errorId}"
   },
   "pageSkeleton": {

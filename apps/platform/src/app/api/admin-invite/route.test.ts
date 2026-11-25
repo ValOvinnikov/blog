@@ -1,16 +1,15 @@
-import { faker } from '@faker-js/faker';
 import { NO_ACCESS_REASON } from '@platform/constants/no-access';
-import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { MOCK_SIGN_IN_USER_ID } from '@platform/testing/auth/fixtures';
+import {
+  MOCK_PLATFORM_ORIGIN,
+  MOCK_SIGN_IN_USER_ID,
+} from '@platform/testing/auth/fixtures';
+import { mockedPartialAuth } from '@platform/testing/auth/mocked-auth';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { HTTP_STATUS, type TMaybeNull } from '@shinefold/config';
-import type { Session } from 'next-auth';
+import { HTTP_STATUS } from '@shinefold/config';
 
 import { GET } from './route';
-
-faker.seed(7934);
 
 const { getAdminByUserIdMock } = vi.hoisted(() => ({
   getAdminByUserIdMock: vi.fn(),
@@ -23,28 +22,27 @@ vi.mock('@shinefold/db', async () => ({
   queries: { admins: { getAdminByUserId: getAdminByUserIdMock } },
 }));
 
-const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
-
-const MOCK_ORIGIN = faker.internet.url();
-
 const getAdminInvite = () =>
-  GET(new Request(new URL(adminRoutes.adminInvite(), MOCK_ORIGIN)));
+  GET(new Request(new URL(adminRoutes.adminInvite(), MOCK_PLATFORM_ORIGIN)));
 
 const locationOf = (response: Response) => response.headers.get('location');
 
 describe(GET, () => {
   beforeEach(() => {
-    authMock.mockResolvedValue({ user: { id: MOCK_SIGN_IN_USER_ID } });
+    mockedPartialAuth.mockResolvedValue({ user: { id: MOCK_SIGN_IN_USER_ID } });
   });
 
   it('sends a signed-out visitor to sign-in, back here afterwards', async () => {
-    authMock.mockResolvedValueOnce(null);
+    mockedPartialAuth.mockResolvedValueOnce(null);
 
     const response = await getAdminInvite();
 
     expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
     expect(locationOf(response)).toBe(
-      new URL(adminRoutes.signIn(adminRoutes.adminInvite()), MOCK_ORIGIN).href,
+      new URL(
+        adminRoutes.signIn(adminRoutes.adminInvite()),
+        MOCK_PLATFORM_ORIGIN,
+      ).href,
     );
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
@@ -56,8 +54,10 @@ describe(GET, () => {
 
     expect(getAdminByUserIdMock).toHaveBeenCalledWith(MOCK_SIGN_IN_USER_ID);
     expect(locationOf(response)).toBe(
-      new URL(adminRoutes.noAccess(NO_ACCESS_REASON.ADMIN_INVITE), MOCK_ORIGIN)
-        .href,
+      new URL(
+        adminRoutes.noAccess(NO_ACCESS_REASON.ADMIN_INVITE),
+        MOCK_PLATFORM_ORIGIN,
+      ).href,
     );
   });
 
@@ -67,7 +67,7 @@ describe(GET, () => {
     const response = await getAdminInvite();
 
     expect(locationOf(response)).toBe(
-      new URL(adminRoutes.tenants(), MOCK_ORIGIN).href,
+      new URL(adminRoutes.tenants(), MOCK_PLATFORM_ORIGIN).href,
     );
   });
 });

@@ -11,9 +11,6 @@ import { useId } from 'react';
 
 import { subscribersListVariants } from './subscribers-list-variants';
 
-// Fits the small icon button, whose hidden busy face (spinner beside the icon) sets its width.
-const ACTIONS_COLUMN_WIDTH = '80px';
-
 export type TSubscribersListProps = {
   tenantId: string;
   data: Pick<TSubscribersPageData, 'list' | 'page' | 'totalPages'>;
@@ -42,7 +39,6 @@ export const SubscribersList = ({ tenantId, data }: TSubscribersListProps) => {
               key: 'actions',
               label: t('columnActions'),
               isLabelHidden: true,
-              width: ACTIONS_COLUMN_WIDTH,
             },
           ]}
           renderRow={(subscriber) => (

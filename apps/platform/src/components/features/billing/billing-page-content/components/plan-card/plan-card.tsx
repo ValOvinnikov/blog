@@ -3,7 +3,10 @@ import { DetailList } from '@platform/components/shared/detail-list';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
-import type { TBillingNextPayment } from '@platform/server/billing/fetch-stripe-billing';
+import type {
+  TBillingNextPayment,
+  TBillingRenewal,
+} from '@platform/server/billing/fetch-stripe-billing';
 import type { TBillingAmountOwed } from '@platform/server/billing/read-amount-owed';
 import { richDate } from '@platform/utils/rich-date/rich-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -22,9 +25,7 @@ export type TPlanCardProps = {
   status: TTenantStatus;
   hasPayments: boolean;
   isSubscribed: boolean;
-  nextPayment?: TBillingNextPayment;
-  amountOwed?: TBillingAmountOwed;
-  endsAt?: Date;
+  renewal: TBillingRenewal;
 };
 
 export const PlanCard = ({
@@ -32,10 +33,9 @@ export const PlanCard = ({
   status,
   hasPayments,
   isSubscribed,
-  nextPayment,
-  amountOwed,
-  endsAt,
+  renewal,
 }: TPlanCardProps) => {
+  const { nextPayment, amountOwed, endsAt } = renewal;
   const t = useTranslations('billingPage');
   const tPlan = useTranslations('planNames');
   const tStatus = useTranslations('tenantsTable.status');

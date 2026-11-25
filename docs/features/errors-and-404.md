@@ -23,6 +23,7 @@ code:
   - apps/platform/src/app/global-error.tsx
   - apps/platform/src/app/[locale]/error.tsx
   - apps/platform/src/app/[locale]/not-found.tsx
+  - apps/platform/src/components/features/layout/home-dead-end/**
   - apps/platform/src/components/features/layout/dead-end-view/**
 epics: []
 ---
@@ -41,7 +42,7 @@ A reader who hits a missing page sees the tenant's own 404 in its theme and lang
 - `[tenant]/[locale]/error.tsx` — `LocaleErrorPage`, below `NextIntlClientProvider`.
 - `global-error.tsx` — `GlobalErrorPage`, replaces the document when the locale layout (the root layout) throws; re-imports the global stylesheet.
 - The proxy answers some requests with a bare status and no page: 404 for a tenant-shaped or undecodable first path segment, 404 for an unknown host in production, 503 when the tenant lookup fails.
-- Platform: `apps/platform/src/app/[locale]/not-found.tsx`, `error.tsx`, and `sign-in-error/page.tsx`, all `DeadEndView`. `error.tsx` offers **Try again** and **Back to home** (`/`, which redirects to the viewer's home) and shows `Error ID: <digest>` when Next provides one.
+- Platform: `apps/platform/src/app/[locale]/not-found.tsx`, `error.tsx`, and `sign-in-error/page.tsx`, all `DeadEndView`. `not-found.tsx` and `no-access/page.tsx` share `HomeDeadEnd`, which adds a **Back to home** link to the viewer's resolved home and the signed-in account. `error.tsx` offers **Try again** and **Back to home** (`/`, which redirects to the viewer's home) and shows `Error ID: <digest>` when Next provides one.
 - Platform: `apps/platform/src/app/global-error.tsx` replaces the document when `[locale]/layout.tsx` throws; it renders the same `DeadEndView` in fixed English under its own minimal `NextIntlClientProvider`, with **Reload** calling Next's `retry`.
 
 ## Data

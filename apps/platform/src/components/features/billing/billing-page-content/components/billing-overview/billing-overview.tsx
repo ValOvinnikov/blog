@@ -2,6 +2,7 @@ import { InvoicesTable } from '@platform/components/features/billing/billing-pag
 import { PlanCard } from '@platform/components/features/billing/billing-page-content/components/plan-card/plan-card';
 import { Alert } from '@platform/components/shared/alert';
 import { BILLING_OVERVIEW_STATE } from '@platform/constants/billing';
+import { NO_RENEWAL } from '@platform/server/billing/fetch-stripe-billing';
 import { loadBillingOverview } from '@platform/server/billing/load-billing-overview';
 import { hasStoredSubscription } from '@platform/server/billing/upgrade-state-for';
 import { ALERT_TYPE, type TMaybeUndefined } from '@shinefold/config';
@@ -50,14 +51,12 @@ export const BillingOverview = async ({
         status={status}
         hasPayments={false}
         isSubscribed={isSubscribed}
+        renewal={NO_RENEWAL}
       />
     );
   }
 
-  const {
-    renewal: { nextPayment, endsAt, amountOwed },
-    invoices,
-  } = overview;
+  const { renewal, invoices } = overview;
 
   return (
     <>
@@ -66,9 +65,7 @@ export const BillingOverview = async ({
         status={status}
         hasPayments={true}
         isSubscribed={isSubscribed}
-        nextPayment={nextPayment}
-        amountOwed={amountOwed}
-        endsAt={endsAt}
+        renewal={renewal}
       />
       <InvoicesTable invoices={invoices} />
     </>

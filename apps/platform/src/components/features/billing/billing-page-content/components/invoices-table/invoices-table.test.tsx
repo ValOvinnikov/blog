@@ -1,6 +1,7 @@
 import { STRIPE_INVOICE_STATUS } from '@platform/constants/billing';
 import type { TBillingInvoice } from '@platform/server/billing/fetch-stripe-billing';
 import {
+  MOCK_AMOUNT_PAID_TEXT,
   MOCK_INVOICE_PDF_URL,
   MOCK_STRIPE_INVOICE_ID,
 } from '@platform/testing/billing/fixtures';
@@ -29,7 +30,7 @@ describe(`<${InvoicesTable.name}/>`, () => {
       const [, row] = screen.getAllByRole('row');
 
       expect(row).toHaveTextContent('Oct 2, 2026');
-      expect(row).toHaveTextContent('$29.00');
+      expect(row).toHaveTextContent(MOCK_AMOUNT_PAID_TEXT);
       expect(row).toHaveTextContent('Paid');
     });
 

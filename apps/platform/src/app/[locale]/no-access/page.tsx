@@ -1,13 +1,9 @@
-import { DeadEndView } from '@platform/components/features/layout/dead-end-view';
-import { LinkButton } from '@platform/components/shared/link-button';
-import { BADGE_TONE } from '@platform/constants/badge-tone';
-import { BUTTON_VARIANT } from '@platform/constants/button';
+import { HomeDeadEnd } from '@platform/components/features/layout/home-dead-end';
 import {
   NO_ACCESS_REASON,
   NO_ACCESS_REASONS,
+  NO_ACCESS_SEARCH_PARAM,
 } from '@platform/constants/no-access';
-import { getSessionEmail } from '@platform/server/auth/get-session-email';
-import { resolveHomeHref } from '@platform/server/auth/resolve-home-href';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { isOneOf } from '@shinefold/utils/primitives';
 import type { Metadata } from 'next';
@@ -18,32 +14,21 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 type TProps = {
-  searchParams: Promise<{ reason?: string }>;
+  searchParams: Promise<{ [NO_ACCESS_SEARCH_PARAM.REASON]?: string }>;
 };
 
 export default async function NoAccessPage({ searchParams }: TProps) {
-  const [{ reason: requestedReason }, t, homeHref, accountEmail] =
-    await Promise.all([
-      searchParams,
-      getTranslations('noAccessPage'),
-      resolveHomeHref(),
-      getSessionEmail(),
-    ]);
+  const [{ [NO_ACCESS_SEARCH_PARAM.REASON]: requestedReason }, t] =
+    await Promise.all([searchParams, getTranslations('noAccessPage')]);
   const reason = isOneOf(NO_ACCESS_REASONS, requestedReason)
     ? requestedReason
     : NO_ACCESS_REASON.SITE;
 
   return (
-    <DeadEndView
-      badge={{ label: t('badge'), tone: BADGE_TONE.BRAND }}
+    <HomeDeadEnd
+      badge={t('badge')}
       title={t(`${reason}.heading`)}
       description={t(`${reason}.description`)}
-      action={
-        <LinkButton href={homeHref} variant={BUTTON_VARIANT.SECONDARY}>
-          {t('backLink')}
-        </LinkButton>
-      }
-      accountEmail={accountEmail}
     />
   );
 }

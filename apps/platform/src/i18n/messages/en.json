@@ -150,7 +150,6 @@
   },
   "noAccessPage": {
     "badge": "No access",
-    "backLink": "Back to home",
     "SITE": {
       "heading": "You don't have access to this site",
       "description": "Ask the site owner."
@@ -167,7 +166,6 @@
   "notFoundPage": {
     "heading": "Page not found",
     "description": "This page doesn't exist, or you don't have access to it.",
-    "backLink": "Back to home",
     "badge": "404"
   },
   "errorPage": {
@@ -181,6 +179,7 @@
     "brandName": "Shinefold"
   },
   "deadEndView": {
+    "backHome": "Back to home",
     "errorId": "Error ID: {errorId}"
   },
   "pageSkeleton": {
@@ -2415,7 +2414,7 @@
     "nextPayment": "{amount} on <time>{date}</time>",
     "noNextPayment": "None scheduled",
     "amountOverdueLabel": "Amount overdue",
-    "amountOverdueRetry": "{amount}, tried again on <time>{date}</time>",
+    "amountOverdueRetry": "{amount}, next try on <time>{date}</time>",
     "amountOverdueNoRetry": "{amount}, not tried again automatically",
     "planEnds": "Your plan ends on <time>{date}</time>.",
     "noPayments": "Your site has no payments yet.",
