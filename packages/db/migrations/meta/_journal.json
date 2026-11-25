@@ -274,6 +274,13 @@
       "when": 1795618257765,
       "tag": "0038_awesome_captain_britain",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1795645831939,
+      "tag": "0039_sleepy_junta",
+      "breakpoints": true
     }
   ]
 }
