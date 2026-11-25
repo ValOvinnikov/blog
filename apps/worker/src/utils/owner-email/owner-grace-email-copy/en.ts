@@ -31,4 +31,34 @@ export const OWNER_GRACE_EMAIL_COPY_EN: TOwnerGraceEmailCopy = {
       ],
     }),
   },
+  fewerSeats: {
+    teamActionLabel: 'Open Team',
+    memberLock: ({ members, date }) =>
+      `On ${date}, these team members will lose access to the site’s admin: ${members}. Their accounts are kept.`,
+    closing: (date) =>
+      `To choose who keeps access, remove members on the Team page before ${date}, or move to a plan with more seats.`,
+    emails: {
+      [GRACE_EMAIL.STARTED]: ({ siteName, date }) => ({
+        subject: `${siteName} has more team members than its plan’s seats`,
+        previewText: `Choose who keeps access before ${date}.`,
+        paragraphs: [
+          `${siteName} has moved to a plan with fewer seats, and its team is now over the limit.`,
+        ],
+      }),
+      [GRACE_EMAIL.HALFWAY]: ({ siteName, date }) => ({
+        subject: `${siteName}: one week until team members over the plan’s seats lose access`,
+        previewText: `Remove members or change plan before ${date}.`,
+        paragraphs: [
+          `${siteName} moved to a plan with fewer seats a week ago, and its team is still over the limit.`,
+        ],
+      }),
+      [GRACE_EMAIL.ENDING]: ({ siteName, date }) => ({
+        subject: `${siteName}: team members over the plan’s seats lose access tomorrow`,
+        previewText: 'Choose who keeps access today.',
+        paragraphs: [
+          `${siteName}’s team is still over its plan’s seats, and the limit applies tomorrow, ${date}.`,
+        ],
+      }),
+    },
+  },
 };

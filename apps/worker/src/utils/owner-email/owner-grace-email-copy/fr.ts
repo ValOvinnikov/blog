@@ -36,4 +36,34 @@ export const OWNER_GRACE_EMAIL_COPY_FR: TOwnerGraceEmailCopy = {
       ],
     }),
   },
+  fewerSeats: {
+    teamActionLabel: 'Ouvrir Équipe',
+    memberLock: ({ members, date }) =>
+      `Le ${date}, ces membres de l’équipe perdront l’accès à l’administration du site : ${members}. Leurs comptes sont conservés.`,
+    closing: (date) =>
+      `Pour choisir qui garde l’accès, retirez des membres sur la page Équipe avant le ${date}, ou passez à une offre avec plus de places.`,
+    emails: {
+      [GRACE_EMAIL.STARTED]: ({ siteName, date }) => ({
+        subject: `${siteName} compte plus de membres que de places dans son offre`,
+        previewText: `Choisissez qui garde l’accès avant le ${date}.`,
+        paragraphs: [
+          `${siteName} est passé à une offre avec moins de places, et son équipe dépasse désormais la limite.`,
+        ],
+      }),
+      [GRACE_EMAIL.HALFWAY]: ({ siteName, date }) => ({
+        subject: `${siteName} : plus qu’une semaine avant que les membres en trop perdent l’accès`,
+        previewText: `Retirez des membres ou changez d’offre avant le ${date}.`,
+        paragraphs: [
+          `${siteName} est passé à une offre avec moins de places il y a une semaine, et son équipe dépasse toujours la limite.`,
+        ],
+      }),
+      [GRACE_EMAIL.ENDING]: ({ siteName, date }) => ({
+        subject: `${siteName} : les membres en trop perdent l’accès demain`,
+        previewText: 'Choisissez aujourd’hui qui garde l’accès.',
+        paragraphs: [
+          `L’équipe de ${siteName} dépasse toujours les places de son offre, et la limite s’applique demain, le ${date}.`,
+        ],
+      }),
+    },
+  },
 };
