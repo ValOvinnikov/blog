@@ -11,7 +11,7 @@ export const sendAdminInviteEmail = (
 ): Promise<boolean> =>
   sendMagicLinkEmail({
     email,
-    redirectTo: adminRoutes.tenants(),
+    redirectTo: adminRoutes.adminInvite(),
     failureEvent,
     logContext: { inviteId },
   });

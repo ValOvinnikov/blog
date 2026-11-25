@@ -38,7 +38,8 @@ describe(sendOwnerInviteEmail, () => {
     expect(signInMock).toHaveBeenCalledWith(MAGIC_LINK_PROVIDER_ID, {
       email: MOCK_OWNER_EMAIL,
       redirect: false,
-      redirectTo: adminRoutes.dashboardSelectTenantHref(MOCK_TENANT_ID),
+      redirectTo:
+        adminRoutes.dashboardSelectTenantFromInviteHref(MOCK_TENANT_ID),
     });
   });
 

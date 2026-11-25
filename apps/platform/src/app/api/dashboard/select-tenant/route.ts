@@ -1,10 +1,14 @@
+import { NO_ACCESS_REASON } from '@platform/constants/no-access';
+import {
+  SELECT_TENANT_FROM,
+  SELECT_TENANT_SEARCH_PARAM,
+} from '@platform/constants/select-tenant';
 import { auth } from '@platform/server/auth/auth';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
-import { toRequestedPath } from '@platform/utils/requested-path/requested-path';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { toServerCookieOptions } from '@platform/utils/server-cookie-options/server-cookie-options';
-import { HTTP_STATUS } from '@shinefold/config/constants';
+import { signInRedirect } from '@platform/utils/sign-in-redirect/sign-in-redirect';
 import { queries } from '@shinefold/db';
 import { hasLength } from '@shinefold/utils/primitives';
 import { NextResponse } from 'next/server';
@@ -17,13 +21,10 @@ export async function GET(request: Request): Promise<NextResponse> {
   const session = await auth();
   const userId = session?.user?.id;
 
-  if (!userId) {
-    return NextResponse.redirect(
-      new URL(adminRoutes.signIn(toRequestedPath(url)), url),
-    );
-  }
+  if (!userId) return signInRedirect(url);
 
-  const tenantId = url.searchParams.get('tenantId');
+  const { searchParams } = url;
+  const tenantId = searchParams.get(SELECT_TENANT_SEARCH_PARAM.TENANT_ID);
 
   if (!tenantId) {
     return NextResponse.redirect(
@@ -38,7 +39,13 @@ export async function GET(request: Request): Promise<NextResponse> {
       hasLength(await queries.tenants.listTenantsByIds([tenantId]));
 
   if (!authorized) {
-    return NextResponse.json(null, { status: HTTP_STATUS.NOT_FOUND });
+    const isFromInvite =
+      searchParams.get(SELECT_TENANT_SEARCH_PARAM.FROM) ===
+      SELECT_TENANT_FROM.INVITE;
+    const reason = isFromInvite
+      ? NO_ACCESS_REASON.SITE_INVITE
+      : NO_ACCESS_REASON.SITE;
+    return NextResponse.redirect(new URL(adminRoutes.noAccess(reason), url));
   }
 
   const response = NextResponse.redirect(new URL(adminRoutes.dashboard(), url));

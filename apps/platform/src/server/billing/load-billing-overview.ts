@@ -6,6 +6,7 @@ import {
 } from '@platform/constants/billing';
 import {
   listBillingInvoices,
+  NO_RENEWAL,
   previewRenewal,
   type TBillingInvoice,
   type TBillingRenewal,
@@ -27,11 +28,6 @@ export type TBillingOverview =
     };
 
 const UNAVAILABLE = { state: BILLING_OVERVIEW_STATE.UNAVAILABLE } as const;
-
-const NO_RENEWAL: TBillingRenewal = {
-  nextPayment: undefined,
-  endsAt: undefined,
-};
 
 const renewalOrNone = async (
   stripe: Stripe,
