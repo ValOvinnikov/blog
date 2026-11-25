@@ -10,6 +10,8 @@ export const MOCK_HERO_STATEMENT_MODULE_ID = mockFaker.string.uuid();
 
 export const MOCK_HERO_STATEMENT_HEADING = mockFaker.company.catchPhrase();
 
+export const MOCK_HERO_STATEMENT_FOOTNOTE = mockFaker.lorem.sentence();
+
 export const mockHeroStatementModule = (
   overrides: Partial<THeroStatementModule> = {},
 ): THeroStatementModule => ({
