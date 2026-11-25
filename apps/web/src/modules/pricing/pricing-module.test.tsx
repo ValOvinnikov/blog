@@ -59,7 +59,7 @@ faker.seed(13);
 const MOCK_PRICING_MODULE_ID = faker.string.uuid();
 const MOCK_MONTH_WORDING = 'a month';
 const MOCK_LINKED_MODULE = mockPricingModule({
-  tiers: [mockLinkedPricingTier(PRICE_PERIOD.MONTH)],
+  tiers: [mockLinkedPricingTier([PRICE_PERIOD.MONTH])],
 });
 
 const setup = customRenderAsync(PricingModule, {

@@ -28,6 +28,7 @@ export interface ILivePlanPrice {
 
 export interface IToLivePlanPriceArgs {
   tier: TPricingTier;
+  tab: TMaybeUndefined<TPricePeriod>;
   planPrices: readonly TStripePrice[];
   siteCurrency: string;
   periods: Record<TPricePeriod, string>;
@@ -46,14 +47,17 @@ const toDefaultCurrency = (
 
 export const toLivePlanPrice = ({
   tier: { platformPlan },
+  tab,
   planPrices,
   siteCurrency,
   periods,
 }: IToLivePlanPriceArgs): TMaybeUndefined<ILivePlanPrice> => {
   if (!platformPlan) return undefined;
-  const { plan, interval } = platformPlan;
+  const { plan, periods: planPeriods } = platformPlan;
+  const period = planPeriods.find((value) => value === tab) ?? planPeriods[0];
+  if (!period) return undefined;
   const { monthly, yearly } = PLAN_PRICE_LOOKUP_KEYS[plan];
-  const lookupKey = interval === PRICE_PERIOD.YEAR ? yearly : monthly;
+  const lookupKey = period === PRICE_PERIOD.YEAR ? yearly : monthly;
   const amounts: TPlanPriceAmounts = Object.fromEntries(
     planPrices
       .filter((price) => price.lookupKey === lookupKey)
@@ -65,6 +69,6 @@ export const toLivePlanPrice = ({
   const defaultCurrency = toDefaultCurrency(amounts, siteCurrency);
 
   return defaultCurrency
-    ? { period: periods[interval], defaultCurrency, amounts }
+    ? { period: periods[period], defaultCurrency, amounts }
     : undefined;
 };

@@ -17,4 +17,4 @@ export const periodsOf = ({
   platformPlan,
   prices,
 }: TPricingTier): TPricePeriod[] =>
-  platformPlan ? [platformPlan.interval] : prices.map(({ period }) => period);
+  platformPlan ? platformPlan.periods : prices.map(({ period }) => period);

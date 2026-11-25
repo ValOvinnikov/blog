@@ -36,7 +36,8 @@ const setup = (
   overrides: Partial<Parameters<typeof toLivePlanPrice>[0]> = {},
 ) =>
   toLivePlanPrice({
-    tier: mockLinkedPricingTier(PRICE_PERIOD.MONTH),
+    tier: mockLinkedPricingTier([PRICE_PERIOD.MONTH]),
+    tab: undefined,
     planPrices: [MOCK_DOLLAR_PRICE, MOCK_EURO_PRICE, MOCK_YEARLY_DOLLAR_PRICE],
     siteCurrency: BILLING_CURRENCY.EUR,
     periods,
@@ -62,12 +63,35 @@ describe(toLivePlanPrice, () => {
   });
 
   it('reads the yearly lookup key for a yearly tier', () => {
-    const livePrice = setup({ tier: mockLinkedPricingTier(PRICE_PERIOD.YEAR) });
+    const livePrice = setup({
+      tier: mockLinkedPricingTier([PRICE_PERIOD.YEAR]),
+    });
 
     expect(livePrice?.period).toBe(periods[PRICE_PERIOD.YEAR]);
     expect(livePrice?.amounts[BILLING_CURRENCY.USD]?.unitAmount).toBe(
       MOCK_EURO_AMOUNT,
     );
+  });
+
+  it.each([PRICE_PERIOD.MONTH, PRICE_PERIOD.YEAR])(
+    'reads the %s price of a tier showing both periods under that tab',
+    (tab) => {
+      const livePrice = setup({
+        tier: mockLinkedPricingTier([PRICE_PERIOD.MONTH, PRICE_PERIOD.YEAR]),
+        tab,
+      });
+
+      expect(livePrice?.period).toBe(periods[tab]);
+    },
+  );
+
+  it('reads the only period of a tier under another tab', () => {
+    const livePrice = setup({
+      tier: mockLinkedPricingTier([PRICE_PERIOD.YEAR]),
+      tab: PRICE_PERIOD.MONTH,
+    });
+
+    expect(livePrice?.period).toBe(periods[PRICE_PERIOD.YEAR]);
   });
 
   it.each([

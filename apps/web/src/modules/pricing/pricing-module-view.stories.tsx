@@ -3,7 +3,10 @@ import {
   CONTENT_ALIGNMENT,
   PRICE_PERIOD,
 } from '@shinefold/config';
-import { BILLING_CURRENCY } from '@shinefold/db/constants';
+import {
+  BILLING_CURRENCY,
+  STRIPE_PRICE_LOOKUP_KEY,
+} from '@shinefold/db/constants';
 import {
   mockStripePrice,
   MOCK_EURO_AMOUNT,
@@ -86,6 +89,10 @@ const panelsFor = (selected: typeof tiers) =>
       mockStripePrice({
         currency: BILLING_CURRENCY.EUR,
         unitAmount: MOCK_EURO_AMOUNT,
+      }),
+      mockStripePrice({
+        lookupKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY,
+        unitAmount: 49000,
       }),
     ],
     locale: 'en-GB',
@@ -208,10 +215,26 @@ export const LinkedPlanLivePrice: TStory = {
     hasPlanComparison: true,
     panels: panelsFor([
       tiers[0]!,
-      mockLinkedPricingTier(PRICE_PERIOD.MONTH, {
+      mockLinkedPricingTier([PRICE_PERIOD.MONTH], {
         id: 'growth',
         name: 'Growth',
         description: 'The platform plan, at its live price.',
+        features,
+        ctaButtons: MOCK_CTA_ACTIONS.slice(0, 1),
+      }),
+    ]),
+  },
+};
+
+export const LinkedPlanBothPeriods: TStory = {
+  args: {
+    hasPlanComparison: true,
+    panels: panelsFor([
+      tiers[0]!,
+      mockLinkedPricingTier([PRICE_PERIOD.MONTH, PRICE_PERIOD.YEAR], {
+        id: 'growth',
+        name: 'Growth',
+        description: 'The platform plan, monthly or yearly.',
         features,
         ctaButtons: MOCK_CTA_ACTIONS.slice(0, 1),
       }),

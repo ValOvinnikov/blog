@@ -4,6 +4,7 @@ import {
   CARD_STYLE,
   CONTENT_ALIGNMENT,
   DENSITY,
+  PLATFORM_PLAN_INTERVAL,
   PRICE_PERIOD,
   RADIUS_SCALE,
   TENANT_PLAN,
@@ -243,12 +244,12 @@ describe(toPricingModule, () => {
     expect(module).toMatchObject(appearance);
   });
 
-  it('returns a linked tier with its plan and interval and no typed prices or label', () => {
+  it('returns a linked tier with its plan and no typed prices or label', () => {
     const raw = mockRawPricingModule({
       tiers: [
         mockRawPricingTier({
           platformPlan: TENANT_PLAN.GROWTH,
-          platformPlanInterval: PRICE_PERIOD.YEAR,
+          platformPlanInterval: PLATFORM_PLAN_INTERVAL.YEAR,
           prices: [mockRawPricingPrice()],
           priceLabel: MOCK_PRICE_LABEL,
         }),
@@ -258,10 +259,32 @@ describe(toPricingModule, () => {
     const [tier] = toPricingModule(raw).tiers;
 
     expect(tier).toMatchObject({
-      platformPlan: { plan: TENANT_PLAN.GROWTH, interval: PRICE_PERIOD.YEAR },
+      platformPlan: { plan: TENANT_PLAN.GROWTH, periods: [PRICE_PERIOD.YEAR] },
       prices: [],
       priceLabel: undefined,
     });
+  });
+
+  it.each([
+    [PLATFORM_PLAN_INTERVAL.MONTH, [PRICE_PERIOD.MONTH]],
+    [PLATFORM_PLAN_INTERVAL.YEAR, [PRICE_PERIOD.YEAR]],
+    [
+      PLATFORM_PLAN_INTERVAL.MONTH_AND_YEAR,
+      [PRICE_PERIOD.MONTH, PRICE_PERIOD.YEAR],
+    ],
+  ])('shows the %s interval as the periods %j', (interval, periods) => {
+    const raw = mockRawPricingModule({
+      tiers: [
+        mockRawPricingTier({
+          platformPlan: TENANT_PLAN.GROWTH,
+          platformPlanInterval: interval,
+        }),
+      ],
+    });
+
+    const [tier] = toPricingModule(raw).tiers;
+
+    expect(tier?.platformPlan?.periods).toEqual(periods);
   });
 
   it.each([

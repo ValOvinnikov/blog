@@ -1,6 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { PRICE_PERIOD } from '@shinefold/config';
-import { BILLING_CURRENCY } from '@shinefold/db/constants';
+import {
+  BILLING_CURRENCY,
+  STRIPE_PRICE_LOOKUP_KEY,
+} from '@shinefold/db/constants';
 import { mockStripePrice } from '@shinefold/db/testing/stripe-catalogue/fixtures';
 import {
   mockPricingPrice,
@@ -24,10 +27,14 @@ const MOCK_PRICE_LABEL = faker.lorem.words(2);
 
 const formatPounds = (amount: number) => `£${amount}`;
 
+const MOCK_YEARLY_PLAN_PRICE = mockStripePrice({
+  lookupKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY,
+});
+
 const setup = (tiers: Parameters<typeof toPricingPanels>[0]['tiers']) =>
   toPricingPanels({
     tiers,
-    planPrices: [mockStripePrice()],
+    planPrices: [mockStripePrice(), MOCK_YEARLY_PLAN_PRICE],
     locale: 'en-GB',
     currency: BILLING_CURRENCY.GBP,
     labels: MOCK_PRICING_LABELS,
@@ -219,10 +226,10 @@ describe(toPricingPanels, () => {
   });
 
   describe('with a tier linked to a platform plan', () => {
-    const yearlyLinkedTier = mockLinkedPricingTier(PRICE_PERIOD.YEAR, {
+    const yearlyLinkedTier = mockLinkedPricingTier([PRICE_PERIOD.YEAR], {
       id: faker.string.uuid(),
     });
-    const monthlyLinkedTier = mockLinkedPricingTier(PRICE_PERIOD.MONTH, {
+    const monthlyLinkedTier = mockLinkedPricingTier([PRICE_PERIOD.MONTH], {
       id: faker.string.uuid(),
     });
 
@@ -242,6 +249,31 @@ describe(toPricingPanels, () => {
       expect(panel?.cards[0]?.livePrice?.period).toBe(
         periods[PRICE_PERIOD.MONTH],
       );
+    });
+
+    it('carries each tab period live price for a tier showing both', () => {
+      const panels = setup([
+        mockLinkedPricingTier([PRICE_PERIOD.MONTH, PRICE_PERIOD.YEAR]),
+      ]);
+
+      expect(
+        panels.map(({ period, cards }) => [
+          period,
+          cards[0]?.livePrice?.period,
+        ]),
+      ).toEqual([
+        [PRICE_PERIOD.MONTH, periods[PRICE_PERIOD.MONTH]],
+        [PRICE_PERIOD.YEAR, periods[PRICE_PERIOD.YEAR]],
+      ]);
+    });
+
+    it('carries a single-interval tier price under every tab', () => {
+      const panels = setup([monthlyAndYearly, yearlyLinkedTier]);
+
+      expect(panels.map(({ cards }) => cards[1]?.livePrice?.period)).toEqual([
+        periods[PRICE_PERIOD.YEAR],
+        periods[PRICE_PERIOD.YEAR],
+      ]);
     });
 
     it('leaves an unlinked tier without a live price', () => {
