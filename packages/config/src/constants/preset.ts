@@ -31,9 +31,16 @@ import type { TThemeTokens } from './theme-tokens';
 export const PRESET_ID = {
   CONSOLE: 'CONSOLE',
   EDITORIAL: 'EDITORIAL',
+  SHINEFOLD: 'SHINEFOLD',
 } as const;
 
 export type TPresetId = TValueOf<typeof PRESET_ID>;
+
+export const GRANTABLE_PRESET_IDS = [
+  PRESET_ID.SHINEFOLD,
+] as const satisfies readonly TPresetId[];
+
+export type TGrantablePresetId = (typeof GRANTABLE_PRESET_IDS)[number];
 
 export const FONT_CHOICE = {
   SPACE_GROTESK: 'SPACE_GROTESK',
