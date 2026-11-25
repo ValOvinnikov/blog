@@ -4,6 +4,7 @@ import {
 } from '@platform/constants/release';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { RUN_ON_DEVELOPMENT } from '@platform/testing/releases/fixtures';
 import {
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
@@ -21,7 +22,6 @@ vi.mock('@platform/server/releases/start-tenant-migrations-action', () => ({
   startTenantMigrationsAction: startTenantMigrationsActionMock,
 }));
 
-const RUN_ON_DEVELOPMENT = { name: 'Run on development' };
 const RETRY_TENANT = { name: `Retry ${MOCK_TENANT_NAME} on production` };
 const STARTED = 'Tenant migrations started.';
 const RETRY_TENANT_PROPS = {
