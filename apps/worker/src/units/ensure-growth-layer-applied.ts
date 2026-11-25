@@ -1,9 +1,7 @@
-import { toStarterSiteType } from '@shinefold/config';
 import { sanitizeLogMessage } from '@shinefold/insight';
 import { GROWTH_LAYER_LOG } from '@worker/constants/growth-layer';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
-import { applyGrowthLayer } from '@worker/steps/apply-growth-layer';
-import { isGrowthLayerEntitled } from '@worker/utils/growth-layer/growth-layer-entitlement';
+import { getEntitledGrowthLayer } from '@worker/steps/entitled-growth-layer';
 import { logger } from '@worker/utils/logger/logger';
 import { createTenantWriteClient } from '@worker/utils/tenant-content/tenant-write-client';
 
@@ -16,13 +14,10 @@ export async function ensureGrowthLayerApplied(
 
   try {
     const tenant = await loadTenant(tenantId);
-    if (!(await isGrowthLayerEntitled(tenant))) return;
+    const growthLayer = await getEntitledGrowthLayer(tenant);
+    if (!growthLayer) return;
 
-    const client = await createTenantWriteClient(tenantId);
-    await applyGrowthLayer({
-      siteType: toStarterSiteType(tenant.siteType),
-      locale: tenant.locale,
-    })(client);
+    await growthLayer(await createTenantWriteClient(tenantId));
   } catch (error) {
     if (isFinalStepAttempt(error)) {
       logger.error(GROWTH_LAYER_LOG.APPLY_FAILED, {

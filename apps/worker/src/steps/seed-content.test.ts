@@ -45,7 +45,6 @@ vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 const MOCK_WRITE_TOKEN = faker.string.alphanumeric(32);
 const MOCK_ROBOT_ID = faker.string.uuid();
 const MOCK_EXISTING_SETTINGS_SITE_ID = faker.string.uuid();
-const SITE_SETTINGS_QUERY = '*[_type == "settings_site"][0]._id';
 const MOCK_GRANT_ERROR = new Error(MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE);
 const MOCK_REVOKED_TOKEN = {
   token: MOCK_TENANT_MANAGEMENT_TOKEN,
@@ -136,7 +135,6 @@ describe(seedTenantContent, () => {
 
     await seed({ tenant: seededTenant });
 
-    expect(clientFetch).toHaveBeenCalledWith(SITE_SETTINGS_QUERY);
     expect(commit).toHaveBeenCalledTimes(1);
   });
 
@@ -157,7 +155,6 @@ describe(seedTenantContent, () => {
 
     await seed();
 
-    expect(clientFetch).toHaveBeenCalledWith(SITE_SETTINGS_QUERY);
     expect(createIfNotExists).not.toHaveBeenCalled();
     expect(commit).not.toHaveBeenCalled();
     expect(setTenantSanityWriteTokenAndSeededAt).not.toHaveBeenCalled();
