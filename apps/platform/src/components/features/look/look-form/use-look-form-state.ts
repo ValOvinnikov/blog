@@ -36,13 +36,7 @@ export const useLookFormState = ({
   savedAt,
   revealInvalidField,
 }: TUseLookFormStateArgs) => {
-  const {
-    id: tenantId,
-    name: tenantName,
-    grants,
-    lookFields,
-    archivedAt,
-  } = tenant;
+  const { id: tenantId, name: tenantName, grants, archivedAt } = tenant;
   const accentHueFieldId = useId();
   const brandNameFieldId = useId();
   const brandAssetFieldIds = useBrandAssetFieldIds();
@@ -89,9 +83,7 @@ export const useLookFormState = ({
       fields: draftFields,
       onRestore: (draftValues) => {
         setRepickKinds(listLostStagedFiles(draftValues));
-        setValues((prev) =>
-          restoreLookDraft(draftValues, prev, { lookFields }),
-        );
+        setValues((prev) => restoreLookDraft(draftValues, prev, tenant));
       },
     },
   });
@@ -116,7 +108,7 @@ export const useLookFormState = ({
     savedValues,
     setValues,
     updateField,
-    lookFields,
+    entitlements: tenant,
     accentHueFieldId,
     brandNameFieldId,
     repickKinds,

@@ -283,7 +283,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/preset.ts`
 
-- **PRESET_ID**: `CONSOLE`, `EDITORIAL`
+- **PRESET_ID**: `CONSOLE`, `EDITORIAL`, `SHINEFOLD`
 - **FONT_CHOICE**: `SPACE_GROTESK`, `NEWSREADER`, `JETBRAINS_MONO`, `FRAUNCES`, `INTER`
 - **RADIUS_SCALE**: `NONE`, `SM`, `MD`, `LG`, `XL`
 - **DENSITY**: `DEFAULT`, `COMPACT`
@@ -423,7 +423,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/db/constants` — `packages/db/src/constants/entitlement.ts`
 
-- **ENTITLEMENT_KIND**: `CAPABILITY`, `MODULE_PACK`, `LOOK_FIELD`, `LOCALE_LIMIT`
+- **ENTITLEMENT_KIND**: `CAPABILITY`, `MODULE_PACK`, `LOOK_FIELD`, `PRESET`, `LOCALE_LIMIT`
 
 ### `@shinefold/db/constants` — `packages/db/src/constants/membership.ts`
 

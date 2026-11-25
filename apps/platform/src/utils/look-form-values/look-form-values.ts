@@ -6,8 +6,10 @@ import {
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { isSameStagedImage } from '@platform/utils/staged-image/staged-image';
-import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
-import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
+import {
+  type TEffectiveLookEntitlements,
+  toEffectiveLookWithin,
+} from '@shinefold/db/utils/effective-look/effective-look';
 import { isUndefined } from '@shinefold/utils/primitives';
 
 export const CARD_FIELDS = {
@@ -55,7 +57,7 @@ export const isBrandAssetKind = (
 export const restoreLookDraft = (
   draftValues: TLookFormValues,
   { logo, logoDark, favicon }: TLookFormValues,
-  entitlements: Pick<TTenantEntitlements, 'lookFields'>,
+  entitlements: TEffectiveLookEntitlements,
 ): TLookFormValues => ({
   ...toEffectiveLookWithin(draftValues, entitlements),
   logo,

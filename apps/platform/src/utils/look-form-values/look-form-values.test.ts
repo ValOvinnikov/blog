@@ -104,6 +104,7 @@ describe(restoreLookDraft, () => {
   it("keeps the form's current brand images over the draft's", () => {
     const restored = restoreLookDraft(draft, current, {
       lookFields: FREE_LOOK_FIELDS,
+      unlockedPresets: [],
     });
 
     expect(restored).toMatchObject({

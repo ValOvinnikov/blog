@@ -18,6 +18,7 @@ export type TLookFormContext = {
   tenantName: string;
   grants: TGrantAccess<TLookField>;
   values: TLookFormValues;
+  presets: readonly TPresetId[];
   updateField: TLookFormFieldSetter;
   isLocked: (field: TLookField) => boolean;
   hasLockedFields: boolean;

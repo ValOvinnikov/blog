@@ -1,6 +1,7 @@
 import {
   CAPABILITY,
   CAPABILITY_PARENT,
+  GRANTABLE_PRESET_IDS,
   MODULE_PACK,
   type TCapability,
   type TTenantPlan,
@@ -86,6 +87,10 @@ export function resolveTenantEntitlements(
     modulePacks: union(
       planEntitlements.modulePacks,
       grantedKeys(active, ENTITLEMENT_KIND.MODULE_PACK, MODULE_PACKS),
+    ),
+    unlockedPresets: union(
+      planEntitlements.unlockedPresets,
+      grantedKeys(active, ENTITLEMENT_KIND.PRESET, GRANTABLE_PRESET_IDS),
     ),
   };
 }

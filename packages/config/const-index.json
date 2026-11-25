@@ -3948,6 +3948,14 @@
         "file": "packages/config/src/constants/preset.ts"
       }
     ],
+    "SHINEFOLD": [
+      {
+        "ref": "PRESET_ID.SHINEFOLD",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
     "SPACE_GROTESK": [
       {
         "ref": "FONT_CHOICE.SPACE_GROTESK",
@@ -5524,6 +5532,20 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/entitlement.ts"
+      }
+    ],
+    "PRESET": [
+      {
+        "ref": "ENTITLEMENT_KIND.PRESET",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/entitlement.ts"
+      },
+      {
+        "ref": "LOOK_CARD.PRESET",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-card",
+        "file": "apps/platform/src/constants/look-card.ts"
       }
     ],
     "LOCALE_LIMIT": [
@@ -8566,14 +8588,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/lead",
         "file": "apps/platform/src/constants/lead.ts"
-      }
-    ],
-    "PRESET": [
-      {
-        "ref": "LOOK_CARD.PRESET",
-        "scope": "app:platform",
-        "from": "@platform/constants/look-card",
-        "file": "apps/platform/src/constants/look-card.ts"
       }
     ],
     "UNEDITED": [

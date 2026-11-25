@@ -21,6 +21,8 @@ export const isCoveredByPlan = (
       return isOneOf(planEntitlements.lookFields, key);
     case ENTITLEMENT_KIND.MODULE_PACK:
       return isOneOf(planEntitlements.modulePacks, key);
+    case ENTITLEMENT_KIND.PRESET:
+      return isOneOf(planEntitlements.unlockedPresets, key);
     case ENTITLEMENT_KIND.LOCALE_LIMIT:
       return !isNull(value) && value <= PLAN_LOCALE_LIMIT[plan];
   }
