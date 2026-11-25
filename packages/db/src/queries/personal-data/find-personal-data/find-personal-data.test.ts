@@ -29,6 +29,7 @@ import {
   taggedMixedCaseAddress,
 } from '@shinefold/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { insertTestSession } from '@shinefold/db/testing/sessions/fixtures';
 import { unwrapOk } from '@shinefold/db/testing/tenants/fixtures';
 import { errorResult, okResult } from '@shinefold/utils';
 
@@ -178,20 +179,14 @@ describe(findPersonalData, () => {
       await db()
         .insert(schema.bookmarks)
         .values({ tenantId, userId, postId: MOCK_BOOKMARKED_POST_ID });
-      await db()
-        .insert(schema.sessions)
-        .values([
-          {
-            sessionToken: MOCK_ACTIVE_SESSION_TOKEN,
-            userId,
-            expires: new Date(MOCK_NOW.getTime() + DAY_MS),
-          },
-          {
-            sessionToken: MOCK_EXPIRED_SESSION_TOKEN,
-            userId,
-            expires: new Date(MOCK_NOW.getTime() - DAY_MS),
-          },
-        ]);
+      await insertTestSession(db(), userId, {
+        sessionToken: MOCK_ACTIVE_SESSION_TOKEN,
+        expires: new Date(MOCK_NOW.getTime() + DAY_MS),
+      });
+      await insertTestSession(db(), userId, {
+        sessionToken: MOCK_EXPIRED_SESSION_TOKEN,
+        expires: new Date(MOCK_NOW.getTime() - DAY_MS),
+      });
     });
 
     afterEach(async () => {
