@@ -1,5 +1,6 @@
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 vi.mock('@platform/server/auth/auth');
@@ -11,13 +12,17 @@ vi.mock('@platform/server/auth/require-super-admin');
 vi.mock('@platform/utils/env/env');
 
 vi.mock('@shinefold/db', async () => ({
-  ...(await import('@platform/testing/mock-db-constants')).mockDbConstants(),
+  ...(await mockDbConstants()),
   queries: {},
 }));
 
 const pages = import.meta.glob<{
   default: (props: Record<string, unknown>) => Promise<unknown>;
 }>('./**/page.tsx');
+
+const gateCallCount = () =>
+  vi.mocked(requireAdmin).mock.calls.length +
+  vi.mocked(requireSuperAdmin).mock.calls.length;
 
 const MOCK_PAGE_PROPS = {
   params: Promise.resolve({}),
@@ -42,6 +47,7 @@ describe('operator pages', () => {
       await expect(Page(MOCK_PAGE_PROPS)).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
       );
+      expect(gateCallCount()).toBeGreaterThan(0);
     },
   );
 });

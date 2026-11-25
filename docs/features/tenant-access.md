@@ -113,8 +113,8 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 
 ## Constraints and invariants
 
-- **Each gate is the layout of its tree**, never a check inside a page, except `/danger`, whose page calls `requireSuperAdmin`.
-  - `requireAdmin` guards `(operator)`, in its layout and again in every page: client-side navigation keeps the layout without re-running it, so a page relying on the layout alone would still load for a removed admin. `pages.test.ts` beside the layout fails for any page that skips its own check.
+- **Each tree's layout gates it, and every `(operator)` page calls its gate again**: client-side navigation keeps a layout without re-running it, so a page relying on the layout alone would still load for a removed admin. `/danger` calls `requireSuperAdmin` on top of its tree's gate.
+  - `requireAdmin` guards `(operator)`; each of its pages calls `requireAdmin` or `requireSuperAdmin` itself, and `pages.test.ts` beside the layout fails for any page that skips its own check.
   - `requireTenantById` guards `/tenants/{id}`.
   - `listSessionTenants` and `resolveDashboardTenant` guard `/dashboard`.
 - **Server Actions call a gate themselves.**

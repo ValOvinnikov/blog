@@ -11,7 +11,7 @@ type TProps = {
   children: React.ReactNode;
 };
 
-// Client-side navigation keeps this layout without re-running it, so every page, Route Handler and Server Action under this segment calls `requireAdmin()` itself.
+// Client-side navigation keeps this layout without re-running it, so every page, Route Handler and Server Action under this segment calls its own gate.
 export default async function OperatorLayout({ children }: TProps) {
   const admin = await requireAdmin();
   const { isSidebarInitiallyCollapsed, tNavSections, userName, userEmail } =
