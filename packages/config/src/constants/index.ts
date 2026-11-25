@@ -13,6 +13,7 @@ export * from './cache';
 export * from './capability';
 export * from './card-image-shape';
 export * from './card-style';
+export * from './color-mode';
 export * from './consent-category';
 export * from './contrast';
 export * from './cta';

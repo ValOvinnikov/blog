@@ -30,6 +30,7 @@ export const LOOK_FIELD = {
   HEADING_CASE: 'headingCase',
   IMAGE_PROPORTION: 'imageProportion',
   DIVIDER_WIDTH: 'dividerWidth',
+  COLOR_MODE: 'colorMode',
   FOOTER_LAYOUT: 'footerLayout',
   FOOTER_BACKGROUND: 'footerBackground',
   FOOTER_SURFACE: 'footerSurface',

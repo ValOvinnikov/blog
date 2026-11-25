@@ -1,4 +1,5 @@
 import {
+  COLOR_MODE,
   DIVIDER_WIDTH,
   HEADING_CASE,
   HEADING_WEIGHT,
@@ -6,6 +7,7 @@ import {
 } from '@shinefold/config/constants';
 
 import {
+  colorModeEnum,
   dividerWidthEnum,
   headingCaseEnum,
   headingWeightEnum,
@@ -25,4 +27,5 @@ export const siteConfigDetailColumns = {
   dividerWidth: dividerWidthEnum('divider_width')
     .notNull()
     .default(DIVIDER_WIDTH.HAIRLINE),
+  colorMode: colorModeEnum('color_mode').notNull().default(COLOR_MODE.READER),
 };

@@ -260,6 +260,13 @@
       "when": 1795548106518,
       "tag": "0036_tired_anthem",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1795612963904,
+      "tag": "0037_typical_tag",
+      "breakpoints": true
     }
   ]
 }

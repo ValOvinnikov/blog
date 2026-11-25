@@ -6,6 +6,7 @@ import {
   BUSY_BUTTON_STYLE,
   BUTTON_SHAPE,
   CARD_STYLE,
+  COLOR_MODE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
   DIVIDER_WIDTH,
@@ -113,3 +114,5 @@ export const headingCaseEnum = pgEnum('heading_case', HEADING_CASE);
 export const imageProportionEnum = pgEnum('image_proportion', IMAGE_PROPORTION);
 
 export const dividerWidthEnum = pgEnum('divider_width', DIVIDER_WIDTH);
+
+export const colorModeEnum = pgEnum('color_mode', COLOR_MODE);

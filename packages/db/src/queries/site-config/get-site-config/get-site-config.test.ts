@@ -1,5 +1,9 @@
 import { faker } from '@faker-js/faker';
-import { CARD_STYLE, LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import {
+  CARD_STYLE,
+  COLOR_MODE,
+  LOCALE_ISO_CODES,
+} from '@shinefold/config/constants';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
@@ -54,12 +58,21 @@ describe(getSiteConfig, () => {
     });
   });
 
-  it('reads the default control styles for a row stored without them', async () => {
-    await insertTestSiteConfig(db(), tenantId);
+  describe('for a row stored with only the required columns', () => {
+    let result: Awaited<ReturnType<typeof getSiteConfig>>;
 
-    const result = await getSiteConfig(tenantId);
+    beforeEach(async () => {
+      await insertTestSiteConfig(db(), tenantId);
+      result = await getSiteConfig(tenantId);
+    });
 
-    expect(result).toMatchObject(DEFAULT_CONTROL_STYLES);
+    it('reads the default control styles', () => {
+      expect(result).toMatchObject(DEFAULT_CONTROL_STYLES);
+    });
+
+    it('reads Reader chooses as the colour mode', () => {
+      expect(result?.colorMode).toBe(COLOR_MODE.READER);
+    });
   });
 
   it("returns every language's overrides and the default language's slice", async () => {

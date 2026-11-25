@@ -1,4 +1,5 @@
 import {
+  COLOR_MODE,
   LANGUAGE_SWITCHER_STYLE,
   type TPresetId,
 } from '@shinefold/config/constants';
@@ -16,6 +17,7 @@ function presetLook(preset: TPresetId): TLook {
     ...presetSiteConfig(preset),
     logoHue: undefined,
     languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
+    colorMode: COLOR_MODE.READER,
     brandName: undefined,
     logoAssetUrl: undefined,
     logoDarkAssetUrl: undefined,

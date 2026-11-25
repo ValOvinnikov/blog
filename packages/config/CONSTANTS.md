@@ -67,6 +67,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **CARD_STYLE**: `ACCENT_BAR`, `OUTLINED`, `FILLED`, `RAISED`, `PLAIN`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/color-mode.ts`
+
+- **COLOR_MODE**: `READER`, `LIGHT`, `DARK`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/consent-category.ts`
 
 - **CONSENT_CATEGORY**: `NECESSARY`, `ANALYTICS`, `EXTERNAL_MEDIA`
