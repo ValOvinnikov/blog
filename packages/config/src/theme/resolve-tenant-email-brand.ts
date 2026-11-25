@@ -1,4 +1,8 @@
-import { PRESET_REGISTRY, type TPresetId } from '@shinefold/config/constants';
+import {
+  COLOR_SCHEME,
+  PRESET_REGISTRY,
+  type TPresetId,
+} from '@shinefold/config/constants';
 
 import { isAccentHueAccessible } from './accent-hue-guard';
 import {
@@ -7,6 +11,7 @@ import {
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
 } from './accent-ramps';
+import { deriveButtonColors } from './button-colors';
 import { oklchStopToHex, type TOklchStop } from './theme-declarations';
 import { NEUTRAL_RAMP_DARK, NEUTRAL_RAMP_LIGHT } from './theme-ramps';
 
@@ -14,6 +19,7 @@ export type TResolveTenantEmailBrandInput = {
   preset: TPresetId;
   accentHue: number;
   logoHue?: number;
+  buttonColor?: string;
 };
 
 export type TTenantEmailBrand = {
@@ -56,7 +62,7 @@ const DARK_EMAIL_RAMPS: TEmailBrandRamps = {
 
 const resolveEmailBrand = (
   { neutral, accent, logo }: TEmailBrandRamps,
-  { preset, accentHue, logoHue }: TResolveTenantEmailBrandInput,
+  { preset, accentHue, logoHue, buttonColor }: TResolveTenantEmailBrandInput,
 ): TTenantEmailBrand => {
   const base = PRESET_REGISTRY[preset].themeTokens;
   const resolvedAccentHue = isAccentHueAccessible(accentHue)
@@ -66,6 +72,9 @@ const resolveEmailBrand = (
   const accentHex = (stop: TOklchStop) =>
     oklchStopToHex(stop, resolvedAccentHue);
   const logoHex = (stop: TOklchStop) => oklchStopToHex(stop, resolvedLogoHue);
+  const button = buttonColor
+    ? deriveButtonColors({ color: buttonColor })[COLOR_SCHEME.LIGHT]
+    : undefined;
 
   return {
     surface: accentHex(neutral['--surface']),
@@ -74,8 +83,10 @@ const resolveEmailBrand = (
     text: accentHex(neutral['--text']),
     textMuted: accentHex(neutral['--text-muted']),
     brandPrimary: accentHex(accent['--brand-primary']),
-    brandPrimarySolid: accentHex(accent['--brand-primary-solid']),
-    brandPrimaryContrast: accentHex(accent['--brand-primary-contrast']),
+    brandPrimarySolid:
+      button?.fill ?? accentHex(accent['--brand-primary-solid']),
+    brandPrimaryContrast:
+      button?.label ?? accentHex(accent['--brand-primary-contrast']),
     logo1: logoHex(logo['--logo-1']),
     logo2: logoHex(logo['--logo-2']),
     logo3: logoHex(logo['--logo-3']),
