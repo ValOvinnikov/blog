@@ -2518,6 +2518,7 @@ export type Module_heroStatement = {
       _key: string;
     } & CtaButton
   >;
+  footnote?: InternationalizedArrayString;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';

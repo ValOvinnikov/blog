@@ -1,4 +1,5 @@
 import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { footnoteField } from '@shinefold/studio/schema-types/fields/footnote-field/footnote-field';
 import { heroBackgroundAndShapeFields } from '@shinefold/studio/schema-types/fields/hero-background-and-shape-fields/hero-background-and-shape-fields';
 import { heroContentPositionFields } from '@shinefold/studio/schema-types/fields/hero-content-position-fields/hero-content-position-fields';
 import { heroImageField } from '@shinefold/studio/schema-types/fields/hero-image-field/hero-image-field';
@@ -34,6 +35,7 @@ export const heroStatementSchema = defineType({
     }),
     heroImageField(),
     ctaButtonsField(),
+    footnoteField(),
     ...heroContentPositionFields(),
     heroMediaOrderSplitField(),
     heroMediaOrderStackedField(),
