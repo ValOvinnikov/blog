@@ -6,6 +6,7 @@ import {
   PAGE_LANDING_TYPE,
   SECTION_NAVIGATION_FIELD,
   SECTION_NAVIGATION_TITLE_FIELD,
+  SHOW_PREVIOUS_NEXT_LINKS_FIELD,
   SHOW_SECTION_NAVIGATION_FIELD,
 } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
 import { landingTemplateSchema } from '@shinefold/studio/schema-types/documents/templates/landing/landing';
@@ -28,9 +29,11 @@ import { validateLandingParent } from '@shinefold/studio/schema-types/validation
 import { validateLandingSlug } from '@shinefold/studio/schema-types/validation/validate-landing-slug/validate-landing-slug';
 import { validateLandingSlugUniqueAmongSiblings } from '@shinefold/studio/schema-types/validation/validate-landing-slug-unique-among-siblings/validate-landing-slug-unique-among-siblings';
 import { validateSettingMatchesDefaultLanguage } from '@shinefold/studio/schema-types/validation/validate-setting-matches-default-language/validate-setting-matches-default-language';
+import { isString } from '@shinefold/utils/primitives';
 import { FileText } from 'lucide-react';
 import type { ComponentType } from 'react';
 import {
+  type ConditionalPropertyCallback,
   defineField,
   defineType,
   type BooleanFieldProps,
@@ -45,12 +48,15 @@ const otherPageInSameLanguage: ReferenceFilterResolver = ({ document }) => {
   return {
     filter: `coalesce(${LANGUAGE_FIELD}, "") == $language && !(_id in [$id, $draftId])`,
     params: {
-      language: typeof language === 'string' ? language : '',
+      language: isString(language) ? language : '',
       id: getPublishedId(document._id),
       draftId: getDraftId(document._id),
     },
   };
 };
+
+const isNotSectionRoot: ConditionalPropertyCallback = ({ document }) =>
+  document?.[SECTION_NAVIGATION_FIELD] !== true;
 
 const sectionNavigationSetting = ({
   name,
@@ -58,12 +64,14 @@ const sectionNavigationSetting = ({
   description,
   initialValue,
   field,
+  hidden,
 }: {
   name: string;
   title: string;
   description: string;
   initialValue: boolean;
-  field: ComponentType<BooleanFieldProps>;
+  field?: ComponentType<BooleanFieldProps>;
+  hidden?: ConditionalPropertyCallback;
 }) =>
   defineField({
     name,
@@ -71,7 +79,8 @@ const sectionNavigationSetting = ({
     type: 'boolean',
     description,
     initialValue,
-    components: { field },
+    hidden,
+    ...(field && { components: { field } }),
     validation: (rule) =>
       rule
         .custom(
@@ -130,7 +139,15 @@ export const landingPageSchema = defineType({
       type: 'string',
       description:
         'The heading above the section sidebar, e.g. Guides. Leave empty to use the site default.',
-      hidden: ({ document }) => document?.[SECTION_NAVIGATION_FIELD] !== true,
+      hidden: isNotSectionRoot,
+    }),
+    sectionNavigationSetting({
+      name: SHOW_PREVIOUS_NEXT_LINKS_FIELD,
+      title: 'Show previous and next links',
+      description:
+        'Shows links to the previous and next page, in sidebar order, under the content of every page in this section.',
+      initialValue: true,
+      hidden: isNotSectionRoot,
     }),
     sectionNavigationSetting({
       name: SHOW_SECTION_NAVIGATION_FIELD,
