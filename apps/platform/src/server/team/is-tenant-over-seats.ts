@@ -5,5 +5,5 @@ import { cache } from 'react';
 
 export const isTenantOverSeats = cache(
   async (tenantId: string, seats: number) =>
-    (await queries.membershipInvites.countSeatsInUse(tenantId)) > seats,
+    (await queries.membershipInvites.countUnlockedSeatsInUse(tenantId)) > seats,
 );

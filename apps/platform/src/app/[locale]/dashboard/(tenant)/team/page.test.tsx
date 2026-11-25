@@ -22,12 +22,12 @@ const {
   listMembershipsWithTenantsForUserMock,
   listTenantMembersMock,
   listPendingMembershipInvitesMock,
-  countSeatsInUseMock,
+  countUnlockedSeatsInUseMock,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
   listTenantMembersMock: vi.fn(),
   listPendingMembershipInvitesMock: vi.fn(),
-  countSeatsInUseMock: vi.fn(),
+  countUnlockedSeatsInUseMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/auth');
@@ -47,7 +47,7 @@ vi.mock('@shinefold/db', async () => ({
     },
     membershipInvites: {
       listPendingMembershipInvites: listPendingMembershipInvitesMock,
-      countSeatsInUse: countSeatsInUseMock,
+      countUnlockedSeatsInUse: countUnlockedSeatsInUseMock,
     },
     admins: { getAdminByUserId: vi.fn(async () => undefined) },
     leads: { countLeadsForTenant: vi.fn(async () => 0) },
@@ -71,7 +71,7 @@ describe(`<${DashboardTeamPage.name}/>`, () => {
       mockTenantMember({ role: MEMBERSHIP_ROLE.OWNER }),
     ]);
     listPendingMembershipInvitesMock.mockResolvedValue([]);
-    countSeatsInUseMock.mockResolvedValue(1);
+    countUnlockedSeatsInUseMock.mockResolvedValue(1);
   });
 
   it("shows the owner their site's team on Growth", async () => {
@@ -101,7 +101,7 @@ describe(`<${DashboardTeamPage.name}/>`, () => {
 
   it('shows the owner of a Starter site over its seats its team, with no Invite editor', async () => {
     signInAs(MEMBERSHIP_ROLE.OWNER, TENANT_PLAN.STARTER);
-    countSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
+    countUnlockedSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
     listTenantMembersMock.mockResolvedValue([
       mockTeamOwner(),
       mockTenantMember(),

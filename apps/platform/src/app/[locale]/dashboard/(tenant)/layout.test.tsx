@@ -35,14 +35,14 @@ const {
   listTenantsMock,
   getAdminByUserIdMock,
   countLeadsForTenantMock,
-  countSeatsInUseMock,
+  countUnlockedSeatsInUseMock,
   cookiesMock,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
   listTenantsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   countLeadsForTenantMock: vi.fn(),
-  countSeatsInUseMock: vi.fn(),
+  countUnlockedSeatsInUseMock: vi.fn(),
   cookiesMock: vi.fn(),
 }));
 
@@ -66,7 +66,7 @@ vi.mock('@shinefold/db', async () => ({
     leads: {
       countLeadsForTenant: countLeadsForTenantMock,
     },
-    membershipInvites: { countSeatsInUse: countSeatsInUseMock },
+    membershipInvites: { countUnlockedSeatsInUse: countUnlockedSeatsInUseMock },
   },
 }));
 
@@ -101,7 +101,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
     listTenantsMock.mockResolvedValue([MOCK_FREE_TENANT]);
     countLeadsForTenantMock.mockResolvedValue(0);
-    countSeatsInUseMock.mockResolvedValue(1);
+    countUnlockedSeatsInUseMock.mockResolvedValue(1);
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       { membership: MOCK_FREE_MEMBERSHIP, tenant: MOCK_FREE_TENANT },
       { membership: MOCK_GROWTH_MEMBERSHIP, tenant: MOCK_GROWTH_TENANT },
@@ -210,7 +210,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       { membership: MOCK_FREE_MEMBERSHIP, tenant: MOCK_FREE_TENANT },
     ]);
-    countSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
+    countUnlockedSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
 
     await setup();
     const teamLink = screen.getByRole('link', { name: navSections.team });
