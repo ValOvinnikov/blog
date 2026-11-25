@@ -14,6 +14,11 @@ import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { ShareLink } from '@shinefold/ui/components/molecules/share-link';
 import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
+import {
+  MOCK_ONE_HIGHLIGHT_PIECES,
+  MOCK_TWO_HIGHLIGHT_PIECES,
+  toHeadingWords,
+} from '@shinefold/ui/testing/heading-pieces';
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -741,4 +746,38 @@ export const FootnoteWithoutActions: TStory = {
     variant: HERO_VARIANT.STACKED,
     children: footnote,
   },
+};
+
+export const TitleWithOneHighlight: TStory = {
+  args: {
+    title: toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES),
+    titlePieces: MOCK_ONE_HIGHLIGHT_PIECES,
+  },
+};
+
+export const TitleWithOneHighlightDark: TStory = {
+  ...TitleWithOneHighlight,
+  globals: { theme: 'dark' },
+};
+
+export const TitleWithTwoHighlights: TStory = {
+  args: {
+    title: toHeadingWords(MOCK_TWO_HIGHLIGHT_PIECES),
+    titlePieces: MOCK_TWO_HIGHLIGHT_PIECES,
+  },
+};
+
+export const TitleWithTwoHighlightsDark: TStory = {
+  ...TitleWithTwoHighlights,
+  globals: { theme: 'dark' },
+};
+
+export const TitleHighlightsOnEveryBrandBand: TStory = {
+  ...SplitAndStackedOnEveryBrandBand,
+  args: TitleWithTwoHighlights.args,
+};
+
+export const TitleHighlightsOnEveryBrandBandDark: TStory = {
+  ...TitleHighlightsOnEveryBrandBand,
+  globals: { theme: 'dark' },
 };
