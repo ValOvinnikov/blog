@@ -18,8 +18,23 @@ export function reference(id: string) {
   return { _type: 'reference', _ref: id } as const;
 }
 
-export function keyedReference(id: string) {
+function keyedReference(id: string) {
   return { _key: id, ...reference(id) };
+}
+
+export function moduleItemDocuments<TItem, TDocument extends { _id: string }>(
+  id: string,
+  idSuffix: string,
+  items: readonly TItem[],
+  toDocument: (item: TItem, itemId: string, index: number) => TDocument,
+) {
+  const documents = items.map((item, index) =>
+    toDocument(item, `${id}${idSuffix}${index + 1}`, index),
+  );
+  return {
+    documents,
+    references: documents.map(({ _id }) => keyedReference(_id)),
+  };
 }
 
 export function moduleSlot<TModuleType extends string>(
