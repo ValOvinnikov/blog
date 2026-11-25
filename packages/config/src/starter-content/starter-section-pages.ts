@@ -63,6 +63,7 @@ export function buildSectionPages({
       ...(hasSectionNavigation && {
         sectionNavigation: true,
         sectionNavigationTitle: section.title,
+        showPreviousNextLinks: true,
       }),
     } satisfies TStarterPage<Page_landing>,
     ...pages.flatMap((page, index) =>
