@@ -3,6 +3,7 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockTenantMember } from '@platform/testing/team/fixtures';
+import { mockTeamOwner } from '@platform/testing/team/team-view';
 import {
   MOCK_TENANT_ID,
   mockReadyTenant,
@@ -18,10 +19,12 @@ const {
   listMembershipsWithTenantsForUserMock,
   listTenantMembersMock,
   listPendingMembershipInvitesMock,
+  countSeatsInUseMock,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
   listTenantMembersMock: vi.fn(),
   listPendingMembershipInvitesMock: vi.fn(),
+  countSeatsInUseMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/auth');
@@ -41,12 +44,15 @@ vi.mock('@shinefold/db', async () => ({
     },
     membershipInvites: {
       listPendingMembershipInvites: listPendingMembershipInvitesMock,
+      countSeatsInUse: countSeatsInUseMock,
     },
     admins: { getAdminByUserId: vi.fn(async () => undefined) },
     leads: { countLeadsForTenant: vi.fn(async () => 0) },
     tenants: { listTenants: vi.fn(async () => []) },
   },
 }));
+
+const MOCK_SEATS_OVER_STARTER = 2;
 
 const signInAs = (role: TMembershipRole, plan: TTenantPlan) =>
   listMembershipsWithTenantsForUserMock.mockResolvedValue([
@@ -64,6 +70,7 @@ describe(`<${DashboardTeamPage.name}/>`, () => {
       mockTenantMember({ role: MEMBERSHIP_ROLE.OWNER }),
     ]);
     listPendingMembershipInvitesMock.mockResolvedValue([]);
+    countSeatsInUseMock.mockResolvedValue(1);
   });
 
   it("shows the owner their site's team on Growth", async () => {
@@ -89,5 +96,26 @@ describe(`<${DashboardTeamPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(listTenantMembersMock).not.toHaveBeenCalled();
+  });
+
+  it('shows the owner of a Starter site over its seats its team, with no Invite editor', async () => {
+    signInAs(MEMBERSHIP_ROLE.OWNER, TENANT_PLAN.STARTER);
+    countSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_STARTER);
+    listTenantMembersMock.mockResolvedValue([
+      mockTeamOwner(),
+      mockTenantMember(),
+    ]);
+
+    await setup();
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: messages.teamPage.title,
+    });
+    const invite = screen.queryByRole('button', {
+      name: messages.teamPage.inviteEditor,
+    });
+
+    expect(heading).toBeVisible();
+    expect(invite).not.toBeInTheDocument();
   });
 });

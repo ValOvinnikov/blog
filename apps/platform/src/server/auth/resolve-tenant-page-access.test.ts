@@ -18,11 +18,16 @@ import {
 import { resolveTenantPageAccess } from './resolve-tenant-page-access';
 
 vi.mock('@shinefold/db', () => ({
-  queries: { leads: { countLeadsForTenant: vi.fn() } },
+  queries: {
+    leads: { countLeadsForTenant: vi.fn() },
+    membershipInvites: { countSeatsInUse: vi.fn() },
+  },
 }));
 
 const MOCK_STORED_LEAD_COUNT = 2;
+const MOCK_SEATS_OVER_STARTER = 3;
 const countLeadsForTenant = vi.mocked(queries.leads.countLeadsForTenant);
+const countSeatsInUse = vi.mocked(queries.membershipInvites.countSeatsInUse);
 
 const resolveFor = (plan: TTenantPlan, role: TMembershipRole) =>
   resolveTenantPageAccess(
@@ -34,6 +39,8 @@ describe(resolveTenantPageAccess, () => {
   beforeEach(() => {
     countLeadsForTenant.mockReset();
     countLeadsForTenant.mockResolvedValue(0);
+    countSeatsInUse.mockReset();
+    countSeatsInUse.mockResolvedValue(1);
   });
 
   it('opens Leads to an owner on a plan with the contact form', async () => {
@@ -131,5 +138,38 @@ describe(resolveTenantPageAccess, () => {
     const { team } = await resolveFor(plan, role);
 
     expect(team).toBe(isOpen);
+  });
+
+  it('opens Team on Growth without counting seats', async () => {
+    const { team } = await resolveFor(
+      TENANT_PLAN.GROWTH,
+      MEMBERSHIP_ROLE.OWNER,
+    );
+
+    expect(team).toBe(true);
+    expect(countSeatsInUse).not.toHaveBeenCalled();
+  });
+
+  it.each([TENANT_PLAN.STARTER, TENANT_PLAN.FREE])(
+    'opens Team to an owner on %s while the site is over its seats',
+    async (plan) => {
+      countSeatsInUse.mockResolvedValue(MOCK_SEATS_OVER_STARTER);
+
+      const { team } = await resolveFor(plan, MEMBERSHIP_ROLE.OWNER);
+
+      expect(team).toBe(true);
+      expect(countSeatsInUse).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    },
+  );
+
+  it('keeps Team closed to an editor on Starter over its seats', async () => {
+    countSeatsInUse.mockResolvedValue(MOCK_SEATS_OVER_STARTER);
+
+    const { team } = await resolveFor(
+      TENANT_PLAN.STARTER,
+      MEMBERSHIP_ROLE.EDITOR,
+    );
+
+    expect(team).toBe(false);
   });
 });

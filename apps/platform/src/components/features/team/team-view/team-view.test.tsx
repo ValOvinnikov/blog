@@ -42,6 +42,7 @@ const PENDING_INVITES = 'Pending invites';
 const SEAT_LIMIT_TITLE = 'Every seat is in use';
 const MOCK_READER_EMAIL = 'reader@example.com';
 const MOCK_PENDING_EMAIL = 'pending@example.com';
+const MOCK_GRACE_ENDS_AT = new Date(Date.UTC(2026, 9, 15));
 
 const setup = customRender(TeamView, {
   tenantId: MOCK_TENANT_ID,
@@ -92,6 +93,63 @@ describe(`<${TeamView.name}/>`, () => {
     expect(notice).toBeVisible();
     expect(invite).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(invite).toHaveAttribute(ARIA_DESCRIBEDBY, TEAM_SEAT_NOTICE_ID);
+  });
+
+  describe('over the seats on Starter', () => {
+    const overSeats = (graceEndsAt?: Date) =>
+      setup({
+        plan: TENANT_PLAN.STARTER,
+        team: mockTeamViewModel({
+          seats: 1,
+          shownUsed: 1,
+          isFull: true,
+          freeSeats: 0,
+          seatsOver: 2,
+          graceEndsAt,
+          members: [mockTeamOwnerRow(), mockTeamMemberRow()],
+          invites: [mockTeamInviteRow()],
+        }),
+      });
+
+    describe('with no grace running', () => {
+      beforeEach(() => {
+        overSeats();
+      });
+
+      it('offers Remove and Cancel invite but no Invite editor', () => {
+        const invite = screen.queryByRole('button', { name: INVITE_EDITOR });
+        const remove = screen.getByRole('button', {
+          name: `Remove ${MOCK_MEMBER_EMAIL}`,
+        });
+        const cancel = screen.getByRole('button', {
+          name: `Cancel invite to ${MOCK_INVITEE_EMAIL}`,
+        });
+
+        expect(invite).not.toBeInTheDocument();
+        expect(remove).toBeVisible();
+        expect(cancel).toBeVisible();
+      });
+
+      it('says how many must go, with no full notice and no deadline', () => {
+        const title = screen.getByText('Remove 2 people to fit Starter');
+        const full = screen.queryByText(SEAT_LIMIT_TITLE);
+        const deadline = screen.queryByText(/loses Studio access/);
+
+        expect(title).toBeVisible();
+        expect(full).not.toBeInTheDocument();
+        expect(deadline).not.toBeInTheDocument();
+      });
+    });
+
+    it('names the grace deadline while a grace runs', () => {
+      overSeats(MOCK_GRACE_ENDS_AT);
+
+      const deadline = screen.getByText(/loses Studio access/);
+      const date = within(deadline).getByText(/2026/);
+
+      expect(deadline).toBeVisible();
+      expect(date.tagName).toBe('TIME');
+    });
   });
 
   it.each([

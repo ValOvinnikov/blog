@@ -28,6 +28,8 @@ const MOCK_NOW = new Date(2026, 9, 2, 12, 0);
 const MOCK_HOUR_AGO = new Date(MOCK_NOW.getTime() - HOUR_MS);
 const MOCK_YESTERDAY = new Date(MOCK_NOW.getTime() - DAY_MS);
 const MOCK_OWNER = mockTeamOwner();
+const MOCK_GRACE_STARTED_AT = new Date(Date.UTC(2026, 9, 1, 15));
+const MOCK_GRACE_ENDS_AT = new Date(Date.UTC(2026, 9, 15));
 
 const modelFor = (
   overrides: Partial<Parameters<typeof teamViewModel>[0]> = {},
@@ -72,6 +74,31 @@ describe(teamViewModel, () => {
       shownUsed: 3,
       isFull: true,
       freeSeats: 0,
+    });
+  });
+
+  it('counts the people over the seats and the grace deadline after a move down', () => {
+    const { seatsOver, graceEndsAt } = modelFor({
+      tenant: mockTenant({
+        plan: TENANT_PLAN.STARTER,
+        downgradeGraceStartedAt: MOCK_GRACE_STARTED_AT,
+      }),
+      members: [MOCK_OWNER, mockTenantMember({ membershipId: 'a' })],
+      invites: [mockPendingInvite()],
+    });
+
+    expect({ seatsOver, graceEndsAt }).toEqual({
+      seatsOver: 2,
+      graceEndsAt: MOCK_GRACE_ENDS_AT,
+    });
+  });
+
+  it('counts no one over the seats and no deadline within the seats', () => {
+    const { seatsOver, graceEndsAt } = modelFor();
+
+    expect({ seatsOver, graceEndsAt }).toEqual({
+      seatsOver: 0,
+      graceEndsAt: undefined,
     });
   });
 
