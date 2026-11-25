@@ -6,7 +6,6 @@ import {
 import { getBranchHeadSha } from '@platform/server/github/get-branch-head-sha';
 import { getLatestReleaseTag } from '@platform/server/github/get-latest-release-tag';
 import { errorResult, okResult } from '@shinefold/utils';
-import { cache } from 'react';
 
 import {
   classifyReleaseChanges,
@@ -20,27 +19,27 @@ type TCandidateComparison = TCommitComparison & {
   changes: TReleaseChanges;
 };
 
-export const getCandidateComparison = cache(
-  async (): Promise<TReleaseResult<TCandidateComparison>> => {
-    const [lastTag, headSha] = await Promise.all([
-      getLatestReleaseTag(),
-      getBranchHeadSha(),
-    ]);
-    if (!lastTag.ok) return toReleaseFailure(lastTag.error);
-    if (!headSha.ok) return toReleaseFailure(headSha.error);
-    if (!lastTag.data) return errorResult(RELEASE_FAILURE.NO_RELEASE_TAG);
+export const getCandidateComparison = async (): Promise<
+  TReleaseResult<TCandidateComparison>
+> => {
+  const [lastTag, headSha] = await Promise.all([
+    getLatestReleaseTag(),
+    getBranchHeadSha(),
+  ]);
+  if (!lastTag.ok) return toReleaseFailure(lastTag.error);
+  if (!headSha.ok) return toReleaseFailure(headSha.error);
+  if (!lastTag.data) return errorResult(RELEASE_FAILURE.NO_RELEASE_TAG);
 
-    const { name: tagName, sha: tagSha } = lastTag.data;
-    const comparison = await compareCommits(tagName, headSha.data, tagSha);
-    if (!comparison.ok) return toReleaseFailure(comparison.error);
+  const { name: tagName, sha: tagSha } = lastTag.data;
+  const comparison = await compareCommits(tagName, headSha.data, tagSha);
+  if (!comparison.ok) return toReleaseFailure(comparison.error);
 
-    const { files, isFileListTruncated } = comparison.data;
+  const { files, isFileListTruncated } = comparison.data;
 
-    return okResult({
-      ...comparison.data,
-      headSha: headSha.data,
-      lastTag: tagName,
-      changes: classifyReleaseChanges(files, isFileListTruncated),
-    });
-  },
-);
+  return okResult({
+    ...comparison.data,
+    headSha: headSha.data,
+    lastTag: tagName,
+    changes: classifyReleaseChanges(files, isFileListTruncated),
+  });
+};

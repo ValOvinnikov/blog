@@ -1,4 +1,5 @@
 import type { THeroStatementModule } from '@shinefold/service';
+import { Hero } from '@shinefold/ui/components/organisms/hero';
 import { HeroModuleShell } from '@web/components/shared/hero-module-shell';
 
 export interface IHeroStatementModuleViewProps {
@@ -17,6 +18,7 @@ export const HeroStatementModuleView = ({
     headingBlock,
     sanityImage,
     ctaButtons,
+    footnote,
     layout,
   } = module;
   const { heading, supportingText } = headingBlock;
@@ -32,6 +34,8 @@ export const HeroStatementModuleView = ({
       dataTestId={`hero-statement-module-${id}`}
       ctaButtons={ctaButtons}
       sanityImage={sanityImage}
-    />
+    >
+      {footnote ? <Hero.Footnote>{footnote}</Hero.Footnote> : undefined}
+    </HeroModuleShell>
   );
 };

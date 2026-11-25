@@ -45,6 +45,7 @@ import {
   MOCK_ACCENT_HUE,
   MOCK_NOT_FOUND_HEADING,
   MOCK_SITE_CONFIG_FIELDS,
+  UNSET_OPTIONAL_COLUMNS,
 } from '@shinefold/db/testing/site-config/fixtures';
 import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
@@ -109,6 +110,8 @@ const MOCK_UNKNOWN_PLACEHOLDER_TEXT = `${faker.lorem.words(2)} {${MOCK_UNKNOWN_V
 const MOCK_LOGO_ASSET_URL = faker.internet.url();
 const MOCK_LOGO_DARK_ASSET_URL = faker.internet.url();
 const MOCK_FAVICON_ASSET_URL = faker.internet.url();
+const MOCK_BUTTON_COLOR = faker.color.rgb();
+const MOCK_BUTTON_COLOR_DARK = faker.color.rgb();
 const MOCK_LINK_HREF = faker.internet.url();
 const MOCK_MULTILINE_TEXT = `${faker.lorem.word()}\n${faker.lorem.word()}`;
 const MOCK_UNSAFE_HREF = 'javascript:alert(1)';
@@ -334,6 +337,14 @@ const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
     },
   ],
   [
+    'a button colour that is not a hex colour',
+    { buttonColor: MOCK_UNKNOWN_VALUE },
+  ],
+  [
+    'a dark-ground button colour that is not a hex colour',
+    { buttonColorDark: MOCK_UNKNOWN_VALUE },
+  ],
+  [
     'an unknown voice override key',
     {
       voiceOverridesByLocale: {
@@ -351,6 +362,8 @@ const OPTIONAL_COLUMNS = [
   { field: 'logoAssetUrl', value: MOCK_LOGO_ASSET_URL },
   { field: 'logoDarkAssetUrl', value: MOCK_LOGO_DARK_ASSET_URL },
   { field: 'faviconAssetUrl', value: MOCK_FAVICON_ASSET_URL },
+  { field: 'buttonColor', value: MOCK_BUTTON_COLOR },
+  { field: 'buttonColorDark', value: MOCK_BUTTON_COLOR_DARK },
 ] as const;
 
 const OVER_CAP_FIELDS = [
@@ -428,13 +441,7 @@ describe(upsertSiteConfig, () => {
     const [row] = await db().select().from(schema.siteConfig);
     expect(result).toEqual({
       ...row,
-      logoHue: undefined,
-      brandName: undefined,
-      logoAssetUrl: undefined,
-      logoDarkAssetUrl: undefined,
-      faviconAssetUrl: undefined,
-      lookSavedAt: undefined,
-      voiceSavedAt: undefined,
+      ...UNSET_OPTIONAL_COLUMNS,
       voiceOverrides: {},
     });
   });
