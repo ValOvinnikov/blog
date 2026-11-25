@@ -9,7 +9,7 @@ export type THeaderNavProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** The primary navigation region of the site `Header`; a labelled `<nav>` wrapping the header links. */
+/** Holds the site's main links as a landmark screen-reader users can jump straight to. */
 export const HeaderNav = ({
   className,
   ariaLabel,

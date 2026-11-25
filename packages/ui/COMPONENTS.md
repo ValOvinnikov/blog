@@ -461,9 +461,9 @@ Variants: layout: HEADER_LAYOUT.CLASSIC|HEADER_LAYOUT.LINKS_BESIDE_BRAND|HEADER_
 
 Slots:
 
-- **Header.Brand** — The brand/logo slot in the site `Header`; a styled `<span>` you place the logo or wordmark in. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Header.Nav** — The primary navigation region of the site `Header`; a labelled `<nav>` wrapping the header links. Props: ariaLabel?: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Header.Actions** — The trailing actions cluster in the site `Header` (e.g. theme toggle, auth controls); a styled `<div>` wrapper. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Header.Brand** — Holds the site's logo or wordmark at the leading end of the header. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Header.Nav** — Holds the site's main links as a landmark screen-reader users can jump straight to. Props: ariaLabel?: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Header.Actions** — Groups the controls at the trailing end of the header, such as the theme toggle and sign-in. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Hero — `components/organisms/hero/hero.tsx`
 

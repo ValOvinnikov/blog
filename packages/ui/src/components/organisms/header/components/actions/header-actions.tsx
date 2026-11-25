@@ -8,7 +8,7 @@ export type THeaderActionsProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** The trailing actions cluster in the site `Header` (e.g. theme toggle, auth controls); a styled `<div>` wrapper. */
+/** Groups the controls at the trailing end of the header, such as the theme toggle and sign-in. */
 export const HeaderActions = ({
   className,
   dataTestId,
