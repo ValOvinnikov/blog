@@ -1,5 +1,8 @@
 import { faker } from '@faker-js/faker';
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
+import {
+  SANITY_CONTENT_REVALIDATE_SECONDS,
+  type TMaybeNull,
+} from '@shinefold/config';
 import { mockRun } from '@shinefold/service/testing/mock-run-query';
 import {
   MOCK_ABOUT_PAGE_TITLE,
@@ -28,8 +31,8 @@ import { mockTenant } from '@shinefold/service/testing/tenant';
 import { isNull } from '@shinefold/utils/primitives';
 
 import { getPageDocument } from './loader';
-import { landingPageQuery } from './query';
-import type { TRawLandingPage } from './transformer';
+import { landingPageQuery, type TRawLandingPage } from './query';
+import type { TRawSectionTreePage } from './section-navigation';
 
 vi.mock('@shinefold/service/sanity/query/query');
 
@@ -49,15 +52,12 @@ const MOCK_PRICING_PATH = `${MOCK_SECTION_SLUG}/${MOCK_PRICING_SLUG}`;
 const MOCK_ANSWERS_PATH = `${MOCK_FAQ_PATH}/${MOCK_ANSWERS_SLUG}`;
 const MOCK_GLOSSARY_PATH = `${MOCK_FAQ_PATH}/${MOCK_GLOSSARY_SLUG}`;
 
-type TSectionPage = {
-  _id: string;
-  title: string | null;
-  path: string | null;
-  children?: TSectionPage[];
-};
-
-function mockSectionPage(id: string, path: string): TSectionPage {
+function mockSectionPage(id: string, path: string): TRawSectionTreePage {
   return { _id: id, title: faker.lorem.words(2), path };
+}
+
+function toLink({ title, path }: TRawSectionTreePage) {
+  return { title, path };
 }
 
 const faq = mockSectionPage(MOCK_FAQ_SLUG, MOCK_FAQ_PATH);
@@ -159,8 +159,8 @@ describe(getPageDocument, () => {
 
   describe('section navigation', () => {
     function mockChainNode(
-      page: TSectionPage,
-      children: TSectionPage[] | null = null,
+      page: TRawSectionTreePage,
+      children: TMaybeNull<TRawSectionTreePage[]> = null,
     ) {
       return {
         ...page,
@@ -173,12 +173,10 @@ describe(getPageDocument, () => {
     }
 
     const modulesSection = mockChainNode(sectionRoot, [faq, pricing]);
-    const breadcrumbsToAnswers = [sectionRoot, faq, answers].map(
-      ({ title, path }) => ({ title, path }),
-    );
+    const breadcrumbsToAnswers = [sectionRoot, faq, answers].map(toLink);
 
-    function toSectionLink({ title, path }: TSectionPage, isCurrent: boolean) {
-      return { title, path, isCurrent };
+    function toSectionLink(page: TRawSectionTreePage, isCurrent: boolean) {
+      return { ...toLink(page), isCurrent };
     }
 
     async function navigationFor(
@@ -434,7 +432,7 @@ describe(getPageDocument, () => {
       };
     }
 
-    function mockAncestor(page: TSectionPage) {
+    function mockAncestor(page: TRawSectionTreePage) {
       return {
         ...page,
         sectionNavigation: false,
@@ -443,10 +441,6 @@ describe(getPageDocument, () => {
         showSubPagesInNavigation: false,
         children: null,
       };
-    }
-
-    function toLink({ title, path }: TSectionPage) {
-      return { title, path };
     }
 
     async function adjacentPagesFor(
@@ -480,6 +474,35 @@ describe(getPageDocument, () => {
       },
     );
 
+    const nestedSection = {
+      ...mockAncestor(faq),
+      sectionNavigation: true,
+      showPreviousNextLinks: false,
+      children: [answers, glossary],
+    };
+
+    it.each([
+      [
+        'the last page of a nested section',
+        [mockAncestor(glossary), nestedSection],
+        answers,
+        pricing,
+      ],
+      ['the root of a nested section', [nestedSection], sectionRoot, answers],
+    ])(
+      "follows the top page's side navigation on %s while it shows sub-pages",
+      async (_, chainBelowTop, previous, next) => {
+        expect(
+          await adjacentPagesFor({
+            sectionChain: [
+              ...chainBelowTop,
+              mockSection({ showSubPagesInNavigation: true }),
+            ],
+          }),
+        ).toEqual({ previous: toLink(previous), next: toLink(next) });
+      },
+    );
+
     it('skips a neighbour that has no path for the next one that has', async () => {
       const adjacentPages = await adjacentPagesFor({
         sectionChain: [
@@ -495,7 +518,7 @@ describe(getPageDocument, () => {
 
     it.each([
       [
-        'the section sectionRoot switches the links off',
+        'the section root switches the links off',
         [mockAncestor(pricing), mockSection({ showPreviousNextLinks: false })],
         null,
       ],

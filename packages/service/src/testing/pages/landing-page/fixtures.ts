@@ -1,5 +1,5 @@
 import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
-import type { TRawLandingPage } from '@shinefold/service/features/pages/landing/adaptor/detail-page/transformer';
+import type { TRawLandingPage } from '@shinefold/service/features/pages/landing/adaptor/detail-page/query';
 import {
   MOCK_ABOUT_PAGE_TITLE,
   mockRawContentRef,

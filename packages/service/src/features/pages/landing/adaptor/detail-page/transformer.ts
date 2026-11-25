@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@shinefold/config';
+import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import { toPageTranslations } from '@shinefold/service/shared/localization/page-translations/to-page-translations';
 import { toHeadingAlignment } from '@shinefold/service/shared/transformers/heading-block/to-heading-alignment';
 import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
@@ -7,10 +7,10 @@ import {
   toModule,
 } from '@shinefold/service/shared/transformers/module/to-module';
 import { resolveSeo } from '@shinefold/service/shared/transformers/seo/resolve-seo';
-import type { InferResultType } from 'groqd';
 
-import type { landingPageQuery } from './query';
+import type { TRawLandingPage } from './query';
 import {
+  findSectionRootIndex,
   toBreadcrumb,
   toSectionNavigation,
   type TRawSectionPage,
@@ -18,12 +18,8 @@ import {
 } from './section-navigation';
 import type { TLandingAdjacentPages, TLandingPageDocument } from './types';
 
-export type TRawLandingPage = NonNullable<
-  InferResultType<typeof landingPageQuery>
->;
-
 function toReadingOrder(
-  page: TRawSectionPage & { children?: TRawSectionTreePage[] | null },
+  page: TRawSectionPage & { children?: TMaybeNull<TRawSectionTreePage[]> },
 ): TRawSectionPage[] {
   return [page, ...(page.children ?? []).flatMap(toReadingOrder)];
 }
@@ -33,7 +29,7 @@ function toAdjacentPages({
   showSectionNavigation,
 }: TRawLandingPage): TMaybeUndefined<TLandingAdjacentPages> {
   const [current] = sectionChain;
-  const sectionRoot = sectionChain.find((page) => page.sectionNavigation);
+  const sectionRoot = sectionChain[findSectionRootIndex(sectionChain)];
   if (
     showSectionNavigation === false ||
     !current ||

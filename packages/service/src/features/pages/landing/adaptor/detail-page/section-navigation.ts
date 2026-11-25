@@ -1,7 +1,7 @@
 import type { TMaybeUndefined } from '@shinefold/config';
 import { hasLength } from '@shinefold/utils/primitives';
 
-import type { TRawLandingPage } from './transformer';
+import type { TRawLandingPage } from './query';
 import type {
   TLandingBreadcrumb,
   TLandingSectionNavigation,
@@ -35,7 +35,7 @@ function toSectionPage(
   return breadcrumb && { ...breadcrumb, isCurrent };
 }
 
-function findSectionRootIndex(sectionChain: TRawSectionChain): number {
+export function findSectionRootIndex(sectionChain: TRawSectionChain): number {
   const topIndex = sectionChain
     .map((page) => page.sectionNavigation && page.showSubPagesInNavigation)
     .lastIndexOf(true);

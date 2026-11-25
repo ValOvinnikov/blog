@@ -1,6 +1,7 @@
 import type {
   THeadingAlignment,
   THeadingBlock,
+  TMaybeNull,
   TMaybeUndefined,
   TPageLandingType,
 } from '@shinefold/config';
@@ -21,7 +22,7 @@ export type TLandingSectionNavigationPage = TLandingSectionPage & {
 export type TLandingBreadcrumb = Omit<TLandingSectionPage, 'isCurrent'>;
 
 export type TLandingSectionNavigation = {
-  title: string | null;
+  title: TMaybeNull<string>;
   root: TLandingSectionPage;
   pages: TLandingSectionNavigationPage[];
   breadcrumbs: TLandingBreadcrumb[];
