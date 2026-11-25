@@ -1,13 +1,14 @@
 import '../../../../index.css';
 
+import { COLOR_SCHEME, type TColorScheme } from '@shinefold/config';
+import type { IWithChildren } from '@shinefold/config/react';
 import { signedInHintBootstrapScript } from '@web/config/signed-in-hint-script';
 import { themeBootstrapScript } from '@web/config/theme-script';
 import { SANITY_IMAGE_CDN_PRECONNECT_TEST_ID } from '@web/constants/document-shell';
-import type { ReactNode } from 'react';
 
-type TDocumentShellProps = {
+type TDocumentShellProps = IWithChildren & {
   lang: string;
-  children: ReactNode;
+  lockedColorScheme?: TColorScheme;
 };
 
 // Fixed public hostname for every Sanity project's asset CDN (not per-tenant).
@@ -15,8 +16,19 @@ type TDocumentShellProps = {
 // preconnect's connection can't serve.
 const SANITY_IMAGE_CDN_ORIGIN = 'https://cdn.sanity.io';
 
-export const DocumentShell = ({ lang, children }: TDocumentShellProps) => (
-  <html lang={lang} suppressHydrationWarning={true}>
+export const DocumentShell = ({
+  lang,
+  lockedColorScheme,
+  children,
+}: TDocumentShellProps) => (
+  <html
+    lang={lang}
+    className={lockedColorScheme === COLOR_SCHEME.DARK ? 'dark' : undefined}
+    style={
+      lockedColorScheme && { colorScheme: lockedColorScheme.toLowerCase() }
+    }
+    suppressHydrationWarning={true}
+  >
     {/* eslint-disable-next-line @next/next/no-head-element -- an App Router document shell, which the pages-router rule can't tell apart from a page */}
     <head>
       <link
@@ -24,7 +36,9 @@ export const DocumentShell = ({ lang, children }: TDocumentShellProps) => (
         href={SANITY_IMAGE_CDN_ORIGIN}
         data-testid={SANITY_IMAGE_CDN_PRECONNECT_TEST_ID}
       />
-      <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+      {!lockedColorScheme && (
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+      )}
       <script
         dangerouslySetInnerHTML={{ __html: signedInHintBootstrapScript }}
       />

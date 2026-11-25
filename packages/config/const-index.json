@@ -13380,6 +13380,14 @@
         "file": "apps/web/src/constants/site-config.ts"
       }
     ],
+    "color_mode.site_config_fetch_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.COLOR_MODE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-config",
+        "file": "apps/web/src/constants/site-config.ts"
+      }
+    ],
     "sitemap.site_url_missing": [
       {
         "ref": "SITEMAP_LOG.SITE_URL_MISSING",
