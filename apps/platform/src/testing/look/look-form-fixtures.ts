@@ -70,6 +70,7 @@ export const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
     headingCase: defaults.headingCase,
     imageProportion: defaults.imageProportion,
     dividerWidth: defaults.dividerWidth,
+    colorMode: defaults.colorMode,
     accountButtonStyle: defaults.accountButtonStyle,
     accountPanelStyle: defaults.accountPanelStyle,
     accountPhonePlacement: defaults.accountPhonePlacement,

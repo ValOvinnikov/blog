@@ -1,3 +1,4 @@
+import { COLOR_MODE, type TColorMode } from '@shinefold/config';
 import type { TValueOf } from '@shinefold/config/utils';
 
 export const PREVIEW_MODE = {
@@ -6,6 +7,14 @@ export const PREVIEW_MODE = {
 } as const;
 
 export type TPreviewMode = TValueOf<typeof PREVIEW_MODE>;
+
+export const PREVIEW_MODES: readonly TPreviewMode[] =
+  Object.values(PREVIEW_MODE);
+
+export const LOCKED_PREVIEW_MODE: Partial<Record<TColorMode, TPreviewMode>> = {
+  [COLOR_MODE.LIGHT]: PREVIEW_MODE.LIGHT,
+  [COLOR_MODE.DARK]: PREVIEW_MODE.DARK,
+};
 
 export const PREVIEW_WIDTH = {
   DESKTOP: 'DESKTOP',

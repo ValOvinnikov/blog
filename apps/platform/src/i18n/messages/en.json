@@ -812,6 +812,13 @@
     "accentHueInaccessible": "This hue doesn't keep body text readable on its tinted surfaces, so the site would replace it. Choose another hue.",
     "logoHueLabel": "Logo hue",
     "logoHueDescription": "Tints your wordmark. Follows the accent hue unless you choose another.",
+    "colorModeLabel": "Colour mode",
+    "colorModeDescription": "Whether readers switch between light and dark, or the site always shows one.",
+    "colorModeOptionLabel": {
+      "READER": "Reader chooses",
+      "LIGHT": "Always light",
+      "DARK": "Always dark"
+    },
     "brandImagesDescription": "Images are used exactly as uploaded — nothing is resized or cropped.",
     "brandNameLabel": "Brand name",
     "brandNameHint": "Your site's name. Leave it blank to use your account name.",
@@ -2723,6 +2730,7 @@
       "headingCase": "Heading case",
       "imageProportion": "Image proportions",
       "dividerWidth": "Section dividers",
+      "colorMode": "Colour mode",
       "footerLayout": "Footer layout",
       "footerBackground": "Footer background",
       "footerSurface": "Footer surface",

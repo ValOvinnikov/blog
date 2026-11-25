@@ -1,7 +1,9 @@
 import { LogoHueField } from '@platform/components/features/look/logo-hue-field';
 import { logoHueFieldVariants } from '@platform/components/features/look/logo-hue-field/logo-hue-field-variants';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
+import { LookChoiceField } from '@platform/components/features/look/look-form/components/look-choice-field';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { toLookLabelOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
@@ -11,7 +13,8 @@ import { HueSlider } from '@platform/components/shared/hue-slider';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
-import { SIZE } from '@shinefold/config';
+import { COLOR_MODE, SIZE } from '@shinefold/config';
+import { LOOK_FIELD } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 
 export type TColourCardProps = {
@@ -33,6 +36,9 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
   const { hueField, hueValue } = logoHueFieldVariants();
 
   const accentHueLabel = t('accentHueLabel');
+  const colorModeOptions = toLookLabelOptions(COLOR_MODE, (mode) =>
+    t(`colorModeOptionLabel.${mode}`),
+  );
 
   return (
     <LookCard
@@ -82,6 +88,13 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
           aria-describedby={logoHueLock.aria.describedBy}
         />
       </LookField>
+
+      <LookChoiceField
+        field={LOOK_FIELD.COLOR_MODE}
+        label={t('colorModeLabel')}
+        hint={t('colorModeDescription')}
+        options={colorModeOptions}
+      />
     </LookCard>
   );
 };

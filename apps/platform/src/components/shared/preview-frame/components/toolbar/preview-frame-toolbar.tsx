@@ -12,6 +12,7 @@ export type TPreviewFrameToolbarProps = PropsWithChildren<{
   device: TPreviewDevice;
   onDeviceChange(device: TPreviewDevice): void;
   mode: TPreviewMode;
+  modes?: readonly TPreviewMode[];
   onModeChange(mode: TPreviewMode): void;
   extraGroups?: TIconToggleGroupProps<string>[];
   isEndOnOwnLine?: boolean;
@@ -21,6 +22,7 @@ export const PreviewFrameToolbar = ({
   device,
   onDeviceChange,
   mode,
+  modes,
   onModeChange,
   extraGroups = [],
   isEndOnOwnLine,
@@ -28,7 +30,7 @@ export const PreviewFrameToolbar = ({
 }: TPreviewFrameToolbarProps) => {
   const t = useTranslations('devicePreview');
   const deviceGroup = usePreviewDeviceGroup(device, onDeviceChange);
-  const modeGroup = usePreviewModeGroup(mode, onModeChange);
+  const modeGroup = usePreviewModeGroup(mode, onModeChange, modes);
 
   return (
     <IconToolbar

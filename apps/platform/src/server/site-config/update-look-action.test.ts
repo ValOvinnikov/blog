@@ -30,6 +30,7 @@ import {
   BRAND_VARIANT,
   BUTTON_SHAPE,
   CARD_STYLE,
+  COLOR_MODE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
   DIVIDER_WIDTH,
@@ -134,6 +135,7 @@ const VALID_INPUT: TUpdateLookInput = {
   headingCase: HEADING_CASE.UPPERCASE,
   imageProportion: IMAGE_PROPORTION.SQUARE,
   dividerWidth: DIVIDER_WIDTH.BOLD,
+  colorMode: COLOR_MODE.DARK,
   accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
   accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
   accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
@@ -319,6 +321,7 @@ describe(updateLookAction, () => {
     [LOOK_FIELD.HEADING_CASE, MOCK_UNSUPPORTED_LOOK_VALUE],
     [LOOK_FIELD.IMAGE_PROPORTION, MOCK_UNSUPPORTED_LOOK_VALUE],
     [LOOK_FIELD.DIVIDER_WIDTH, MOCK_UNSUPPORTED_LOOK_VALUE],
+    [LOOK_FIELD.COLOR_MODE, MOCK_UNSUPPORTED_LOOK_VALUE],
     [LOOK_FIELD.BRAND_NAME, 'x'.repeat(BRAND_NAME_MAX_LENGTH + 1)],
   ])('rejects an invalid %s without writing it', async (field, value) => {
     const result = await updateLookAction(MOCK_TENANT_ID, {

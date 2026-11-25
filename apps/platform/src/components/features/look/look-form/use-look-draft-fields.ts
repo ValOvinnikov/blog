@@ -43,6 +43,12 @@ export const useLookDraftFields = () => {
           ? tHue('followsAccent')
           : tHue('hueValue', { hue: logoHue }),
     },
+    {
+      id: 'colorMode',
+      label: t('colorModeLabel'),
+      display: ({ colorMode }: TLookFormValues) =>
+        t(`colorModeOptionLabel.${colorMode}`),
+    },
     ...styleDraftFields,
     ...headerDraftFields,
     ...accountDraftFields,

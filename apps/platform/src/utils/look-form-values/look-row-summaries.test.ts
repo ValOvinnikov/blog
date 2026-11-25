@@ -66,7 +66,7 @@ const seedValues = () => ({
 describe(buildLookRowSummaries, () => {
   it('summarises every row of the seeded look in its drawn order', () => {
     expect(buildLookRowSummaries(seedValues(), t, MULTIPLE_LANGUAGES)).toEqual({
-      [LOOK_ROW.COLOUR]: 'Hue 192 · logo follows accent',
+      [LOOK_ROW.COLOUR]: 'Hue 192 · logo follows accent · Reader chooses',
       [LOOK_ROW.BRAND]: 'Logo uploaded · No dark-mode logo · No favicon',
       [LOOK_ROW.TYPE]: 'Fraunces · Inter',
       [LOOK_ROW.SHAPE]: 'Medium · Comfortable',
@@ -85,7 +85,9 @@ describe(buildLookRowSummaries, () => {
 
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
-    expect(summaries[LOOK_ROW.COLOUR]).toBe('Hue 192 · Logo hue 40');
+    expect(summaries[LOOK_ROW.COLOUR]).toBe(
+      'Hue 192 · Logo hue 40 · Reader chooses',
+    );
   });
 
   it.each([

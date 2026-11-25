@@ -812,6 +812,13 @@
     "accentHueInaccessible": "Met deze tint blijft lopende tekst op de getinte vlakken niet leesbaar, dus de site zou hem vervangen. Kies een andere tint.",
     "logoHueLabel": "Logotint",
     "logoHueDescription": "Kleurt het woordmerk. Volgt de accenttint, tenzij er een andere is gekozen.",
+    "colorModeLabel": "Kleurmodus",
+    "colorModeDescription": "Of lezers wisselen tussen licht en donker, of de site altijd één modus toont.",
+    "colorModeOptionLabel": {
+      "READER": "Lezer kiest",
+      "LIGHT": "Altijd licht",
+      "DARK": "Altijd donker"
+    },
     "brandImagesDescription": "Afbeeldingen worden gebruikt zoals ze zijn geüpload — er wordt niets verkleind of bijgesneden.",
     "brandNameLabel": "Merknaam",
     "brandNameHint": "De naam van je site. Laat leeg om de accountnaam te gebruiken.",
@@ -2723,6 +2730,7 @@
       "headingCase": "Hoofdletters in koppen",
       "imageProportion": "Beeldverhoudingen",
       "dividerWidth": "Sectiescheidingen",
+      "colorMode": "Kleurmodus",
       "footerLayout": "Indeling van de voettekst",
       "footerBackground": "Achtergrond van de voettekst",
       "footerSurface": "Oppervlak van de voettekst",

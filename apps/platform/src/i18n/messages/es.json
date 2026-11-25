@@ -812,6 +812,13 @@
     "accentHueInaccessible": "Este tono no mantiene legible el texto sobre sus superficies tintadas, así que el sitio lo sustituiría. Elija otro tono.",
     "logoHueLabel": "Tono del logotipo",
     "logoHueDescription": "Tiñe el logotipo de texto. Sigue el tono de acento si no se elige otro.",
+    "colorModeLabel": "Modo de color",
+    "colorModeDescription": "Si los lectores cambian entre claro y oscuro, o el sitio muestra siempre uno.",
+    "colorModeOptionLabel": {
+      "READER": "Elige el lector",
+      "LIGHT": "Siempre claro",
+      "DARK": "Siempre oscuro"
+    },
     "brandImagesDescription": "Las imágenes se usan tal como se suben: no se redimensionan ni se recortan.",
     "brandNameLabel": "Nombre de la marca",
     "brandNameHint": "El nombre de tu sitio. Déjalo en blanco para usar el nombre de la cuenta.",
@@ -2723,6 +2730,7 @@
       "headingCase": "Mayúsculas en títulos",
       "imageProportion": "Proporciones de imagen",
       "dividerWidth": "Separadores de sección",
+      "colorMode": "Modo de color",
       "footerLayout": "Diseño del pie de página",
       "footerBackground": "Fondo del pie de página",
       "footerSurface": "Superficie del pie de página",
