@@ -13,17 +13,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ReleasesPage() {
   await requireSuperAdmin();
 
-  const [result, releaseRun, failedMigrationTenants] = await Promise.all([
-    getReleaseCandidate(),
-    getReleaseRun(),
-    listFailedMigrationTenants(),
-  ]);
-
   return (
     <ReleasesView
-      result={result}
-      releaseRun={releaseRun}
-      failedMigrationTenants={failedMigrationTenants}
+      resultPromise={getReleaseCandidate()}
+      releaseRunPromise={getReleaseRun()}
+      failedTenantsPromise={listFailedMigrationTenants()}
     />
   );
 }

@@ -20,6 +20,12 @@ export const GITHUB_RATE_LIMIT_EXHAUSTED = String(0);
 
 export const GITHUB_PINNED_READ_REVALIDATE = false;
 
+export const GITHUB_CACHE_KEY = {
+  COMPARISON: 'COMPARISON',
+} as const;
+
+export type TGitHubCacheKey = TValueOf<typeof GITHUB_CACHE_KEY>;
+
 export const GITHUB_FILE_STATUS = {
   ADDED: 'added',
   MODIFIED: 'modified',

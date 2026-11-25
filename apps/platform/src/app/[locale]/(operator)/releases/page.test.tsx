@@ -9,6 +9,7 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import {
   MOCK_GITHUB_MAIN_BRANCH_PATH,
   MOCK_GITHUB_RELEASE_TAGS_PATH,
+  mockGitHubTagRef,
 } from '@platform/testing/github/fixtures';
 import {
   mockGitHubCompareResponse,
@@ -42,21 +43,13 @@ vi.mock('@shinefold/db', async () => ({
   },
 }));
 
-vi.mock('@platform/server/releases/start-contrast-check-action', () => ({
-  startContrastCheckAction: vi.fn(),
-}));
+vi.mock('@platform/server/releases/start-contrast-check-action');
 
-vi.mock('@platform/server/releases/start-release-action', () => ({
-  startReleaseAction: vi.fn(),
-}));
+vi.mock('@platform/server/releases/start-release-action');
 
-vi.mock('@platform/server/releases/get-release-run-action', () => ({
-  getReleaseRunAction: vi.fn(),
-}));
+vi.mock('@platform/server/releases/get-release-run-action');
 
-vi.mock('@platform/server/releases/start-tenant-migrations-action', () => ({
-  startTenantMigrationsAction: vi.fn(),
-}));
+vi.mock('@platform/server/releases/start-tenant-migrations-action');
 
 const MOCK_HEAD_SHA = faker.git.commitSha();
 const MOCK_COMMIT_SUBJECT = faker.git.commitMessage();
@@ -69,7 +62,7 @@ describe(`<${ReleasesPage.name}/>`, () => {
 
   beforeEach(() => {
     github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
-      mockGitHubResponse([{ ref: `refs/tags/${MOCK_RELEASE_LAST_TAG}` }]),
+      mockGitHubResponse([mockGitHubTagRef(MOCK_RELEASE_LAST_TAG)]),
     );
     github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
       mockGitHubResponse({ commit: { sha: MOCK_HEAD_SHA } }),

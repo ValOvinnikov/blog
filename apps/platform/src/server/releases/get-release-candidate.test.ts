@@ -17,6 +17,7 @@ import {
   mockChangedFile,
   mockChangedFiles,
   mockGitHubCommit,
+  mockGitHubTagRef,
 } from '@platform/testing/github/fixtures';
 import {
   mockGitHubCompareResponse,
@@ -66,6 +67,7 @@ const MOCK_DOCS_FILE = mockChangedFile('docs/ROADMAP.md');
 describe(getReleaseCandidate, () => {
   const github = useGitHubFetch();
   let headSha: string;
+  let lastGreenSha: string;
 
   const compare = (
     base: string,
@@ -85,8 +87,9 @@ describe(getReleaseCandidate, () => {
 
   beforeEach(() => {
     headSha = faker.git.commitSha();
+    lastGreenSha = faker.git.commitSha();
     github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
-      mockGitHubResponse([{ ref: `refs/tags/${MOCK_RELEASE_LAST_TAG}` }]),
+      mockGitHubResponse([mockGitHubTagRef(MOCK_RELEASE_LAST_TAG)]),
     );
     github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
       mockGitHubResponse({ commit: { sha: headSha } }),
@@ -94,6 +97,7 @@ describe(getReleaseCandidate, () => {
     github.respond(MOCK_GITHUB_CONTRAST_RUNS_PATH, () =>
       mockGitHubResponse({ workflow_runs: [] }),
     );
+    compare(MOCK_RELEASE_LAST_TAG, [MOCK_RENDERING_FILE]);
     getContrastFindingMock.mockReset().mockResolvedValue(undefined);
     getLatestPassingContrastShaMock.mockReset().mockResolvedValue(undefined);
     listActiveTenantsMock.mockReset().mockResolvedValue([]);
@@ -132,27 +136,25 @@ describe(getReleaseCandidate, () => {
     expect(contrastStatus).toBe(CONTRAST_STATUS.NONE);
   });
 
-  it('reports contrast as due when rendering changed since the last green run', async () => {
-    const lastGreenSha = faker.git.commitSha();
-    getLatestPassingContrastShaMock.mockResolvedValue(lastGreenSha);
-    compare(MOCK_RELEASE_LAST_TAG, [MOCK_RENDERING_FILE]);
-    compare(lastGreenSha, [MOCK_RENDERING_FILE]);
+  describe('with a previous green contrast run', () => {
+    beforeEach(() => {
+      getLatestPassingContrastShaMock.mockResolvedValue(lastGreenSha);
+    });
 
-    expect((await candidate()).contrastStatus).toBe(CONTRAST_STATUS.DUE);
-  });
+    it('reports contrast as due when rendering changed since the last green run', async () => {
+      compare(lastGreenSha, [MOCK_RENDERING_FILE]);
 
-  it('reports contrast as not due when nothing rendering changed since a green run', async () => {
-    const lastGreenSha = faker.git.commitSha();
-    getLatestPassingContrastShaMock.mockResolvedValue(lastGreenSha);
-    compare(MOCK_RELEASE_LAST_TAG, [MOCK_RENDERING_FILE]);
-    compare(lastGreenSha, [MOCK_DOCS_FILE]);
+      expect((await candidate()).contrastStatus).toBe(CONTRAST_STATUS.DUE);
+    });
 
-    expect((await candidate()).contrastStatus).toBe(CONTRAST_STATUS.NONE);
+    it('reports contrast as not due when nothing rendering changed since a green run', async () => {
+      compare(lastGreenSha, [MOCK_DOCS_FILE]);
+
+      expect((await candidate()).contrastStatus).toBe(CONTRAST_STATUS.NONE);
+    });
   });
 
   it('reports contrast as due when rendering changed and no run has ever passed', async () => {
-    compare(MOCK_RELEASE_LAST_TAG, [MOCK_RENDERING_FILE]);
-
     expect((await candidate()).contrastStatus).toBe(CONTRAST_STATUS.DUE);
   });
 
@@ -178,7 +180,6 @@ describe(getReleaseCandidate, () => {
   ])(
     'reports a HEAD contrast check that $outcome as $expected',
     async ({ status, hasPassed, expected }) => {
-      compare(MOCK_RELEASE_LAST_TAG, [MOCK_RENDERING_FILE]);
       getContrastFindingMock.mockResolvedValue({ status, hasPassed });
 
       expect((await candidate()).contrastStatus).toBe(expected);
@@ -186,7 +187,6 @@ describe(getReleaseCandidate, () => {
   );
 
   it('reports contrast as running while a contrast run for HEAD is in progress', async () => {
-    compare(MOCK_RELEASE_LAST_TAG, [MOCK_RENDERING_FILE]);
     github.respond(MOCK_GITHUB_CONTRAST_RUNS_PATH, () =>
       mockGitHubResponse({
         workflow_runs: [{ status: GITHUB_RUN_STATUS.IN_PROGRESS }],
@@ -234,8 +234,6 @@ describe(getReleaseCandidate, () => {
   });
 
   it('reports zero migrations when the release adds none', async () => {
-    compare(MOCK_RELEASE_LAST_TAG, [MOCK_RENDERING_FILE]);
-
     expect((await candidate()).migrations).toEqual({
       contentMigrations: 0,
       tenants: 0,
@@ -266,9 +264,9 @@ describe(getReleaseCandidate, () => {
   it('fails with TAG_LIST_INCOMPLETE when the tag list never stops paging', async () => {
     github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
       mockGitHubResponse(
-        Array.from({ length: TAG_PAGE_SIZE }, (_, index) => ({
-          ref: `refs/tags/v1.${index}.0`,
-        })),
+        Array.from({ length: TAG_PAGE_SIZE }, (_, index) =>
+          mockGitHubTagRef(`v1.${index}.0`),
+        ),
       ),
     );
 
@@ -300,7 +298,6 @@ describe(getReleaseCandidate, () => {
   });
 
   it('fails with DB_ERROR when a database read fails', async () => {
-    compare(MOCK_RELEASE_LAST_TAG, [MOCK_RENDERING_FILE]);
     getContrastFindingMock.mockRejectedValue(new Error(faker.lorem.sentence()));
 
     expect(await getReleaseCandidate()).toEqual({

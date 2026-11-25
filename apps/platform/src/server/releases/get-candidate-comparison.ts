@@ -30,7 +30,8 @@ export const getCandidateComparison = cache(
     if (!headSha.ok) return toReleaseFailure(headSha.error);
     if (!lastTag.data) return errorResult(RELEASE_FAILURE.NO_RELEASE_TAG);
 
-    const comparison = await compareCommits(lastTag.data, headSha.data);
+    const { name: tagName, sha: tagSha } = lastTag.data;
+    const comparison = await compareCommits(tagName, headSha.data, tagSha);
     if (!comparison.ok) return toReleaseFailure(comparison.error);
 
     const { files, isFileListTruncated } = comparison.data;
@@ -38,7 +39,7 @@ export const getCandidateComparison = cache(
     return okResult({
       ...comparison.data,
       headSha: headSha.data,
-      lastTag: lastTag.data,
+      lastTag: tagName,
       changes: classifyReleaseChanges(files, isFileListTruncated),
     });
   },

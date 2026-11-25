@@ -653,6 +653,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/github` — `apps/platform/src/constants/github.ts`
 
 - **GITHUB_FAILURE**: `GITHUB_ERROR`
+- **GITHUB_CACHE_KEY**: `COMPARISON`
 - **GITHUB_FILE_STATUS**: `ADDED`=`"added"`, `MODIFIED`=`"modified"`
 - **GITHUB_RUN_STATUS**: `QUEUED`=`"queued"`, `IN_PROGRESS`=`"in_progress"`, `COMPLETED`=`"completed"`
 - **GITHUB_RUN_CONCLUSION**: `SUCCESS`=`"success"`, `FAILURE`=`"failure"`, `SKIPPED`=`"skipped"`

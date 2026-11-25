@@ -103,6 +103,11 @@ afterEach(() => {
 
 vi.mock('@platform/utils/logger/logger');
 
+vi.mock('next/cache', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  unstable_cache: <TFn>(fn: TFn): TFn => fn,
+}));
+
 vi.mock('next/headers', async () => {
   const { cookieStoreWith } = await import('@platform/testing/cookie-store');
 

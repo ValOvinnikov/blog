@@ -17,6 +17,11 @@ export const MOCK_GITHUB_CONTRAST_DISPATCH_PATH = `/actions/workflows/${CONTRAST
 export const MOCK_GITHUB_DEV_DEPLOY_DISPATCH_PATH = `/actions/workflows/${DEV_DEPLOY_WORKFLOW_FILE}/dispatches`;
 export const MOCK_GITHUB_TENANT_MIGRATION_DISPATCH_PATH = `/actions/workflows/${TENANT_MIGRATION_WORKFLOW_FILE}/dispatches`;
 
+export const mockGitHubTagRef = (tag: string) => ({
+  ref: `refs/tags/${tag}`,
+  object: { sha: faker.git.commitSha() },
+});
+
 export const mockGitHubCommit = () => ({
   sha: faker.git.commitSha(),
   commit: {
