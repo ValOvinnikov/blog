@@ -80,3 +80,7 @@ export const mockFailedMigrationTenant = (
   failedAt: MOCK_MIGRATION_FAILED_AT,
   ...overrides,
 });
+
+export const RUN_ON_DEVELOPMENT = { name: 'Run on development' };
+
+export const RELEASE_UNAVAILABLE_TITLE = 'Release information is unavailable';

@@ -5,6 +5,8 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import {
   mockComparedCommit,
   mockReleaseCandidate,
+  RELEASE_UNAVAILABLE_TITLE,
+  RUN_ON_DEVELOPMENT,
 } from '@platform/testing/releases/fixtures';
 import { errorResult, okResult } from '@shinefold/utils';
 
@@ -18,8 +20,6 @@ vi.mock('@platform/server/releases/start-tenant-migrations-action');
 
 const MOCK_COMMIT_SUBJECT = mockComparedCommit().message.split('\n')[0] ?? '';
 const LOADING_LABEL = 'Loading page…';
-const UNAVAILABLE_TITLE = 'Release information is unavailable';
-const RUN_ON_DEVELOPMENT = { name: 'Run on development' };
 
 const setup = customRenderAsync(
   (props: TReleasesViewProps) => <ReleasesView {...props} />,
@@ -73,7 +73,7 @@ describe(`<${ReleasesView.name}/>`, () => {
       await setup({
         resultPromise: Promise.resolve(errorResult(RELEASE_FAILURE.DB_ERROR)),
       });
-      title = await screen.findByText(UNAVAILABLE_TITLE);
+      title = await screen.findByText(RELEASE_UNAVAILABLE_TITLE);
     });
 
     it('shows the error notice with a way to retry', () => {

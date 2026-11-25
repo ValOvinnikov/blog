@@ -1,6 +1,9 @@
 import { RELEASE_FAILURE } from '@platform/constants/release';
 import { customRender, screen } from '@platform/testing/custom-render';
-import { mockFailedMigrationTenant } from '@platform/testing/releases/fixtures';
+import {
+  mockFailedMigrationTenant,
+  RUN_ON_DEVELOPMENT,
+} from '@platform/testing/releases/fixtures';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import { errorResult, okResult } from '@shinefold/utils';
 
@@ -10,7 +13,6 @@ vi.mock('@platform/server/releases/start-tenant-migrations-action', () => ({
   startTenantMigrationsAction: vi.fn(),
 }));
 
-const RUN_ON_DEVELOPMENT = { name: 'Run on development' };
 const RETRY_ON_PRODUCTION = /on production/;
 
 const setup = customRender(TenantMigrationsCard, {
