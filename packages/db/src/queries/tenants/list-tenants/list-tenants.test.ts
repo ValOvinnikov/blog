@@ -4,13 +4,22 @@ import {
   TENANT_SORT_COLUMN,
   TENANT_PLAN,
 } from '@shinefold/config/constants';
-import { TENANT_STATUS } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { insertTestTenantDomain } from '@shinefold/db/testing/tenant-domains/fixtures';
-import { MOCK_DEPROVISIONED_AT } from '@shinefold/db/testing/tenants/fixtures';
+import {
+  insertActiveAndArchivedTenants,
+  MOCK_FIRST_EXTRA_DOMAIN,
+  MOCK_FIRST_NAME,
+  MOCK_LAST_NAME,
+  MOCK_NEWER_CREATED_AT,
+  MOCK_OLDER_CREATED_AT,
+  MOCK_SEARCH_SLUG,
+  MOCK_SEARCH_WORD,
+  MOCK_SECOND_EXTRA_DOMAIN,
+} from '@shinefold/db/testing/tenants/tenant-list-fixtures';
 
 import { listTenants } from './list-tenants';
 
@@ -20,17 +29,7 @@ faker.seed(6020);
 
 const db = useQueryTestDb();
 
-const MOCK_FIRST_NAME = `A ${faker.company.name()}`;
-const MOCK_LAST_NAME = `Z ${faker.company.name()}`;
-const MOCK_NEWER_CREATED_AT = faker.date.recent();
-const MOCK_OLDER_CREATED_AT = faker.date.past({
-  refDate: MOCK_NEWER_CREATED_AT,
-});
-const MOCK_SEARCH_WORD = faker.string.alpha({ length: 8, casing: 'lower' });
-const MOCK_SLUG = faker.string.alpha({ length: 10, casing: 'lower' });
 const MOCK_CUSTOM_PRIMARY_DOMAIN = faker.internet.domainName();
-const MOCK_FIRST_EXTRA_DOMAIN = `a-${MOCK_SLUG}.example.com`;
-const MOCK_SECOND_EXTRA_DOMAIN = `b-${MOCK_SLUG}.example.com`;
 const MOCK_SEARCH_PRIMARY_DOMAIN = `${MOCK_SEARCH_WORD}-site.example.com`;
 
 async function insertTenantDomains(tenantId: string, domains: string[]) {
@@ -49,12 +48,8 @@ describe(listTenants, () => {
     let archivedTenant: TTenant;
 
     beforeEach(async () => {
-      activeTenant = await insertTestTenant(db(), { name: MOCK_FIRST_NAME });
-      archivedTenant = await insertTestTenant(db(), {
-        name: MOCK_LAST_NAME,
-        status: TENANT_STATUS.ARCHIVED,
-        deprovisionedAt: MOCK_DEPROVISIONED_AT,
-      });
+      ({ activeTenant, archivedTenant } =
+        await insertActiveAndArchivedTenants(db()));
     });
 
     it('excludes deprovisioned tenants by default', async () => {
@@ -171,7 +166,7 @@ describe(listTenants, () => {
         MOCK_FIRST_EXTRA_DOMAIN,
       ]);
 
-      const result = await listTenants({ search: MOCK_SLUG });
+      const result = await listTenants({ search: MOCK_SEARCH_SLUG });
 
       expect(result).toEqual([
         { ...customDomainTenant, matchedDomain: MOCK_FIRST_EXTRA_DOMAIN },
