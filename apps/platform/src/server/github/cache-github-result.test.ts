@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { GITHUB_FAILURE } from '@platform/constants/github';
+import { GITHUB_CACHE_KEY, GITHUB_FAILURE } from '@platform/constants/github';
 import { errorResult, okResult } from '@shinefold/utils';
 
 import { cacheGitHubResult } from './cache-github-result';
@@ -19,9 +19,14 @@ describe(cacheGitHubResult, () => {
   let cached: ReturnType<typeof cacheGitHubResult<[string], string>>;
   let id: string;
   let data: string;
+  let version: number;
 
   beforeEach(() => {
-    cached = cacheGitHubResult(read, [faker.lorem.slug()]);
+    version = faker.number.int();
+    cached = cacheGitHubResult(read, {
+      key: GITHUB_CACHE_KEY.COMPARISON,
+      version,
+    });
     id = faker.string.uuid();
     data = faker.lorem.sentence();
   });
@@ -43,6 +48,18 @@ describe(cacheGitHubResult, () => {
     it('reads again for a different argument', async () => {
       await cached(id);
       await cached(faker.string.uuid());
+
+      expect(read).toHaveBeenCalledTimes(2);
+    });
+
+    it('reads again under a different version', async () => {
+      const nextVersion = cacheGitHubResult(read, {
+        key: GITHUB_CACHE_KEY.COMPARISON,
+        version: version + 1,
+      });
+
+      await cached(id);
+      await nextVersion(id);
 
       expect(read).toHaveBeenCalledTimes(2);
     });

@@ -9,6 +9,7 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import {
   MOCK_GITHUB_MAIN_BRANCH_PATH,
   MOCK_GITHUB_RELEASE_TAGS_PATH,
+  mockGitHubTagRef,
 } from '@platform/testing/github/fixtures';
 import {
   mockGitHubCompareResponse,
@@ -61,7 +62,7 @@ describe(`<${ReleasesPage.name}/>`, () => {
 
   beforeEach(() => {
     github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
-      mockGitHubResponse([{ ref: `refs/tags/${MOCK_LAST_RELEASE_TAG}` }]),
+      mockGitHubResponse([mockGitHubTagRef(MOCK_LAST_RELEASE_TAG)]),
     );
     github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
       mockGitHubResponse({ commit: { sha: MOCK_HEAD_SHA } }),

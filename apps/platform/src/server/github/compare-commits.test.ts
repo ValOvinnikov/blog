@@ -91,6 +91,19 @@ describe(compareCommits, () => {
     );
   });
 
+  it('keeps the cache identifier out of every request', async () => {
+    const baseId = faker.git.commitSha();
+    respondCompare([mockGitHubCommit()], []);
+
+    await compareCommits(MOCK_BASE, MOCK_HEAD, baseId);
+
+    const requestedUrls = github.fetchMock.mock.calls.map(([url]) =>
+      String(url),
+    );
+    expect(requestedUrls).not.toHaveLength(0);
+    expect(requestedUrls.some((url) => url.includes(baseId))).toBe(false);
+  });
+
   it.each([
     { total: 10, pages: [1] },
     { total: TWO_PAGES_OF_COMMITS, pages: [1, 2] },
