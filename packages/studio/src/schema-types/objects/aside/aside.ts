@@ -30,7 +30,7 @@ export const asideSchema = defineType({
       title: 'Kind',
       type: 'string',
       description:
-        'What kind of side note this is — drives its label and styling.',
+        'Pick the kind that matches the note: a tip for a helpful shortcut, a note for something worth knowing, a warning for something that can go wrong, why not for an option you chose against, a digression for a related tangent, and context for background the reader may need.',
       options: {
         layout: 'radio',
         list: Object.values(ASIDE_KIND).map((value) => ({

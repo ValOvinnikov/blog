@@ -64,7 +64,10 @@
     "asideKind": {
       "WHY_NOT": "Why not X",
       "DIGRESSION": "Digression",
-      "CONTEXT": "Context"
+      "CONTEXT": "Context",
+      "TIP": "Tip",
+      "NOTE": "Note",
+      "WARNING": "Warning"
     },
     "backToTop": {
       "ariaLabel": "Back to top"

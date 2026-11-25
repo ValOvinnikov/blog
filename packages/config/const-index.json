@@ -216,6 +216,12 @@
         "file": "packages/config/src/constants/alert.ts"
       },
       {
+        "ref": "ASIDE_KIND.WARNING",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/aside.ts"
+      },
+      {
         "ref": "FINDING_SEVERITY.WARNING",
         "scope": "config",
         "from": "@shinefold/config/constants",
@@ -333,6 +339,22 @@
     "CONTEXT": [
       {
         "ref": "ASIDE_KIND.CONTEXT",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/aside.ts"
+      }
+    ],
+    "TIP": [
+      {
+        "ref": "ASIDE_KIND.TIP",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/aside.ts"
+      }
+    ],
+    "NOTE": [
+      {
+        "ref": "ASIDE_KIND.NOTE",
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/aside.ts"
