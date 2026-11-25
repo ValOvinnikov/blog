@@ -7,9 +7,8 @@ import { TENANT_PROVISIONING_STEP } from '@shinefold/db/constants';
 import { insertSiteConfigIfMissing } from '@shinefold/db/queries/site-config';
 import { setTenantSiteTemplateVersion } from '@shinefold/db/queries/tenants';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
-import { applyGrowthLayer } from '@worker/steps/apply-growth-layer';
+import { getEntitledGrowthLayer } from '@worker/steps/entitled-growth-layer';
 import { seedTenantContent } from '@worker/steps/seed-content';
-import { isGrowthLayerEntitled } from '@worker/utils/growth-layer/growth-layer-entitlement';
 import { getProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import { seedContentDeps } from '@worker/utils/step-deps/step-deps';
 
@@ -35,9 +34,7 @@ export async function applySiteTemplate(
     ctx,
     step: TENANT_PROVISIONING_STEP.SEED_CONTENT,
     run: async () => {
-      const afterSeed = (await isGrowthLayerEntitled(tenant))
-        ? applyGrowthLayer({ siteType, locale: tenant.locale })
-        : undefined;
+      const afterSeed = await getEntitledGrowthLayer(tenant);
       await seedTenantContent({
         tenant,
         siteType,

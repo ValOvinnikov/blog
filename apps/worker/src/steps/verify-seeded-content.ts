@@ -25,12 +25,16 @@ const REQUIRED_SINGLETON_TYPES = [
 async function readWithGrantPropagationRetry<T>(
   read: () => Promise<T>,
   retryOptions: TRetryWithBackoffOptions,
-  wrapError: (error: unknown) => Error,
+  tenantId: string,
+  failureLabel: string,
 ): Promise<T> {
   try {
     return await retryWithBackoff(read, retryOptions);
   } catch (error) {
-    throw wrapError(error);
+    throw new Error(
+      `verifyTenantSeededContent: tenant "${tenantId}"'s ${failureLabel}: ${errorMessage(error)}`,
+      { cause: error },
+    );
   }
 }
 
@@ -67,11 +71,8 @@ export async function verifyTenantSeededContent(
         types: REQUIRED_SINGLETON_TYPES,
       }),
     retryOptions,
-    (error) =>
-      new Error(
-        `verifyTenantSeededContent: tenant "${tenant.id}"'s persisted Sanity read token failed against its dataset: ${errorMessage(error)}`,
-        { cause: error },
-      ),
+    tenant.id,
+    'persisted Sanity read token failed against its dataset',
   );
 
   const missingTypes = REQUIRED_SINGLETON_TYPES.filter(
@@ -92,11 +93,8 @@ export async function verifyTenantSeededContent(
         '*[_type == "settings_navigation"][0].items[]{ "resolved": defined(link->_id) }',
       ),
     retryOptions,
-    (error) =>
-      new Error(
-        `verifyTenantSeededContent: tenant "${tenant.id}"'s "settings_navigation" items read failed: ${errorMessage(error)}`,
-        { cause: error },
-      ),
+    tenant.id,
+    '"settings_navigation" items read failed',
   );
 
   const unresolvedNavigationItemCount = (navigationItems ?? []).filter(
@@ -115,11 +113,8 @@ export async function verifyTenantSeededContent(
         '*[_type == "page_home"][0]{ headingBlock, seo }',
       ),
     retryOptions,
-    (error) =>
-      new Error(
-        `verifyTenantSeededContent: tenant "${tenant.id}"'s "page_home" read failed: ${errorMessage(error)}`,
-        { cause: error },
-      ),
+    tenant.id,
+    '"page_home" read failed',
   );
 
   if (!homePage) {
@@ -150,11 +145,8 @@ export async function verifyTenantSeededContent(
         projectId: credentials.projectId,
       }),
     retryOptions,
-    (error) =>
-      new Error(
-        `verifyTenantSeededContent: tenant "${tenant.id}"'s revalidate webhook check against its Sanity project failed: ${errorMessage(error)}`,
-        { cause: error },
-      ),
+    tenant.id,
+    'revalidate webhook check against its Sanity project failed',
   );
 
   const expectedWebhookUrl = revalidateWebhookUrl(env.webAppBaseUrl);
@@ -172,11 +164,8 @@ export async function verifyTenantSeededContent(
         projectId: env.vercelWebProjectId,
       }),
     retryOptions,
-    (error) =>
-      new Error(
-        `verifyTenantSeededContent: tenant "${tenant.id}"'s domain mapping check against the shared Vercel project failed: ${errorMessage(error)}`,
-        { cause: error },
-      ),
+    tenant.id,
+    'domain mapping check against the shared Vercel project failed',
   );
 
   if (!domains.some((domain) => domain.name === tenant.primaryDomain)) {
