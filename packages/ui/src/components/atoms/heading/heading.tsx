@@ -19,9 +19,10 @@ export type THeadingProps = IWithClassName &
     visual?: THeadingVariants['visual'];
     id?: string;
     style?: CSSProperties;
-    pieces?: readonly THeadingPiece[];
-    children?: ReactNode;
-  };
+  } & (
+    | { pieces: readonly THeadingPiece[]; children?: never }
+    | { pieces?: never; children?: ReactNode }
+  );
 
 const LEVEL_TITLE_ROLE: Record<
   THeadingLevel,
@@ -52,7 +53,7 @@ export const Heading = ({
       className={headingVariants({ visual, class: className })}
       data-testid={dataTestId}
     >
-      {pieces?.length
+      {pieces
         ? pieces.map(({ text, isHighlighted }, index) =>
             isHighlighted ? (
               <span key={index} className={headingHighlightVariants()}>

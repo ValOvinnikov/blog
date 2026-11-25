@@ -119,7 +119,7 @@ const meta = {
   },
   args: {
     eyebrow: 'Architecture',
-    title: 'Building a Design System from Scratch',
+    title: { heading: 'Building a Design System from Scratch' },
     excerpt:
       'A deep dive into Atomic Design principles, Tailwind CSS v4, and class-variance-authority — all working together in a portable component library.',
     titleId: 'hero-title',
@@ -151,7 +151,7 @@ export const Full: TStory = {};
 export const Minimal: TStory = {
   args: {
     eyebrow: PROFILE_EYEBROW,
-    title: 'Notes on shipping frontend at scale',
+    title: { heading: 'Notes on shipping frontend at scale' },
     excerpt:
       'Architecture, performance, and design systems — from fintech and retail. Written, not generated.',
     children: undefined,
@@ -452,7 +452,7 @@ export const BannerProfileWithoutMedia: TStory = {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.SECONDARY,
     eyebrow: 'Platform engineering',
-    title: 'Jane Doe',
+    title: { heading: 'Jane Doe' },
     excerpt: 'Staff engineer',
     children: bannerProfileContent(false),
   },
@@ -586,7 +586,7 @@ export const StackedProfileToneBrandPrimary: TStory = {
     variant: HERO_VARIANT.STACKED,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
     eyebrow: PROFILE_EYEBROW,
-    title: 'Jane Doe',
+    title: { heading: 'Jane Doe' },
     excerpt: PROFILE_EXCERPT,
     children: profileContent,
   },
@@ -597,7 +597,7 @@ export const StackedProfileTonePrimary: TStory = {
     variant: HERO_VARIANT.STACKED,
     tone: BRAND_VARIANT.PRIMARY,
     eyebrow: PROFILE_EYEBROW,
-    title: 'Jane Doe',
+    title: { heading: 'Jane Doe' },
     excerpt: PROFILE_EXCERPT,
     children: profileContent,
   },
@@ -608,7 +608,7 @@ export const StackedProfileToneSecondary: TStory = {
     variant: HERO_VARIANT.STACKED,
     tone: BRAND_VARIANT.SECONDARY,
     eyebrow: PROFILE_EYEBROW,
-    title: 'Jane Doe',
+    title: { heading: 'Jane Doe' },
     excerpt: PROFILE_EXCERPT,
     children: profileContent,
   },
@@ -750,8 +750,10 @@ export const FootnoteWithoutActions: TStory = {
 
 export const TitleWithOneHighlight: TStory = {
   args: {
-    title: toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES),
-    titlePieces: MOCK_ONE_HIGHLIGHT_PIECES,
+    title: {
+      heading: toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES),
+      headingPieces: MOCK_ONE_HIGHLIGHT_PIECES,
+    },
   },
 };
 
@@ -762,8 +764,10 @@ export const TitleWithOneHighlightDark: TStory = {
 
 export const TitleWithTwoHighlights: TStory = {
   args: {
-    title: toHeadingWords(MOCK_TWO_HIGHLIGHT_PIECES),
-    titlePieces: MOCK_TWO_HIGHLIGHT_PIECES,
+    title: {
+      heading: toHeadingWords(MOCK_TWO_HIGHLIGHT_PIECES),
+      headingPieces: MOCK_TWO_HIGHLIGHT_PIECES,
+    },
   },
 };
 

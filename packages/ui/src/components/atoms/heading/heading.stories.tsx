@@ -96,7 +96,8 @@ export const OneHighlightOnEveryBrandBandDark: TStory = {
 export const TwoHighlightsOnEveryBrandBand: TStory = {
   ...OneHighlightOnEveryBrandBand,
   args: {
-    ...OneHighlightOnEveryBrandBand.args,
+    level: 2,
+    visual: TEXT_ROLE.SECTION_TITLE,
     pieces: MOCK_TWO_HIGHLIGHT_PIECES,
   },
 };

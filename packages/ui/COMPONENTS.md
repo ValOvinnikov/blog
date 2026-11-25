@@ -61,7 +61,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### Heading — `components/atoms/heading/heading.tsx`
 
 A title in the page's document outline.
-Props: level: THeadingLevel · visual?: THeadingVariants['visual'] · id?: string · style?: CSSProperties · pieces?: readonly THeadingPiece[] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Props: level: THeadingLevel · visual?: THeadingVariants['visual'] · id?: string · style?: CSSProperties _(extends IWithClassName, IWithDataTestId, ( | { pieces: readonly THeadingPiece[]; childre…)_
 Variants: visual: TEXT_ROLE.HERO_TITLE|TEXT_ROLE.POST_TITLE|TEXT_ROLE.PAGE_TITLE|TEXT_ROLE.SECTION_TITLE|TEXT_ROLE.CARD_TITLE|TEXT_ROLE.ITEM_TITLE|TEXT_ROLE.DIALOG_TITLE|TEXT_ROLE.PROSE_H2|TEXT_ROLE.PROSE_H3|TEXT_ROLE.PROSE_H4|TEXT_ROLE.TABLE_TITLE|hero|post|page|section|card|prose-h2|prose-h3|prose-h4
 
 ### Icon — `components/atoms/icon/icon.tsx`
@@ -473,7 +473,7 @@ Slots:
 ### Hero — `components/organisms/hero/hero.tsx`
 
 The page-top band every hero kind renders, where a page states what it is.
-Props: title: string · titlePieces?: readonly THeadingPiece[] · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · layout?: THeroLayout · tone: TBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
+Props: title: THeroTitle · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · layout?: THeroLayout · tone: TBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST
 
 Slots:

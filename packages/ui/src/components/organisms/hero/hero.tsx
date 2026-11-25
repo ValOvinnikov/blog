@@ -3,7 +3,7 @@ import {
   type IWithDataTestId,
   type TBrandVariant,
   type TContentAlignment,
-  type THeadingPiece,
+  type THeadingBlock,
   type THeroVariant,
   type TLayout,
   type TMediaOrder,
@@ -42,10 +42,11 @@ export type THeroLayout = Pick<TLayout, 'spacingTop' | 'spacingBottom'> & {
   mediaOrder?: TMediaOrder;
 };
 
+export type THeroTitle = Pick<THeadingBlock, 'heading' | 'headingPieces'>;
+
 export type THeroProps = IWithClassName &
   IWithDataTestId & {
-    title: string;
-    titlePieces?: readonly THeadingPiece[];
+    title: THeroTitle;
     titleId: string;
     eyebrow?: string;
     excerpt?: string;
@@ -57,7 +58,6 @@ export type THeroProps = IWithClassName &
 
 const HeroRoot = ({
   title,
-  titlePieces,
   titleId,
   eyebrow,
   excerpt,
@@ -100,7 +100,6 @@ const HeroRoot = ({
           <div className={s.group({ class: banner?.block() })}>
             <HeroHeadline
               title={title}
-              titlePieces={titlePieces}
               titleId={titleId}
               excerpt={excerpt}
               heroStyles={heroStyles}

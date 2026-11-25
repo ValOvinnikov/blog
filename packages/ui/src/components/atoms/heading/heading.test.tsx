@@ -59,12 +59,4 @@ describe(`<${Heading.name}/>`, () => {
       });
     },
   );
-
-  it('renders its children when the pieces are empty', () => {
-    setup({ pieces: [] });
-
-    const heading = screen.getByRole('heading', { name: MOCK_TITLE });
-
-    expect(heading).toBeVisible();
-  });
 });
