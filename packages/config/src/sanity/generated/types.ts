@@ -2427,6 +2427,7 @@ export type Page_landing = {
   sectionNavigation?: boolean;
   sectionNavigationTitle?: string;
   showPreviousNextLinks?: boolean;
+  showSubPagesInNavigation?: boolean;
   showSectionNavigation?: boolean;
   seo?: Seo;
 };

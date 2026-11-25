@@ -8,6 +8,7 @@ import {
   SECTION_NAVIGATION_TITLE_FIELD,
   SHOW_PREVIOUS_NEXT_LINKS_FIELD,
   SHOW_SECTION_NAVIGATION_FIELD,
+  SHOW_SUB_PAGES_IN_NAVIGATION_FIELD,
 } from '@shinefold/studio/schema-types/documents/pages/landing/landing-type';
 import { landingTemplateSchema } from '@shinefold/studio/schema-types/documents/templates/landing/landing';
 import {
@@ -147,6 +148,14 @@ export const landingPageSchema = defineType({
       description:
         'Shows links to the previous and next page, in sidebar order, under the content of every page in this section.',
       initialValue: true,
+      hidden: isNotSectionRoot,
+    }),
+    sectionNavigationSetting({
+      name: SHOW_SUB_PAGES_IN_NAVIGATION_FIELD,
+      title: 'Show sub-pages in the side navigation',
+      description:
+        'Adds a second level to the sidebar: each page beneath this one lists its own sub-pages under it.',
+      initialValue: false,
       hidden: isNotSectionRoot,
     }),
     sectionNavigationSetting({
