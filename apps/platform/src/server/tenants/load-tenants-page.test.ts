@@ -27,7 +27,7 @@ vi.mock('@shinefold/db', async () => ({
 const MOCK_ROWS = [mockTenantsPageRow()];
 const MOCK_TOTAL = TENANTS_PAGE_SIZE * 2 + 1;
 const MOCK_TOTAL_PAGES = 3;
-const listQuery = mockTenantsListQuery({
+const MOCK_LIST_QUERY = mockTenantsListQuery({
   shouldShowArchived: true,
   sort: {
     column: TENANT_SORT_COLUMN.NAME,
@@ -46,19 +46,19 @@ describe(loadTenantsPage, () => {
   });
 
   it('reads the asked page of tenants, one page size at a time', async () => {
-    await loadTenantsPage(listQuery);
+    await loadTenantsPage(MOCK_LIST_QUERY);
 
     expect(listTenantsPageMock).toHaveBeenCalledExactlyOnceWith({
-      includeArchived: listQuery.shouldShowArchived,
-      sort: listQuery.sort,
-      search: listQuery.search,
-      page: listQuery.page,
+      includeArchived: MOCK_LIST_QUERY.shouldShowArchived,
+      sort: MOCK_LIST_QUERY.sort,
+      search: MOCK_LIST_QUERY.search,
+      page: MOCK_LIST_QUERY.page,
       pageSize: TENANTS_PAGE_SIZE,
     });
   });
 
   it('returns the rows, the total and the page count', async () => {
-    const data = await loadTenantsPage(listQuery);
+    const data = await loadTenantsPage(MOCK_LIST_QUERY);
 
     expect(data).toEqual({
       rows: MOCK_ROWS,
@@ -68,14 +68,14 @@ describe(loadTenantsPage, () => {
   });
 
   it('sends a page past the end to the last page, keeping the filters', async () => {
-    const pastEnd = { ...listQuery, page: MOCK_TOTAL_PAGES + 1 };
+    const pastEnd = { ...MOCK_LIST_QUERY, page: MOCK_TOTAL_PAGES + 1 };
 
     await expect(loadTenantsPage(pastEnd)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
     expect(redirect).toHaveBeenCalledWith(
-      adminRoutes.tenants({ ...listQuery, page: MOCK_TOTAL_PAGES }),
+      adminRoutes.tenants({ ...MOCK_LIST_QUERY, page: MOCK_TOTAL_PAGES }),
     );
   });
 });

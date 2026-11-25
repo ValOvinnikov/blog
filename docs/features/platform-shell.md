@@ -79,7 +79,7 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   positive whole number shows page 1. A footer under the rows gives the range
   and total ("1–25 of 168 tenants") with Previous, "Page 1 of 7" and Next; a
   list that fits one page shows only the count, and an empty list has no
-  footer. Below `md` the footer stacks, the count above the controls. Below `md` the table
+  footer; on a phone the footer stacks, the count above the controls. Below `md` the table
   uses `DataTableShell`'s stacked layout (`isStacked`): no column headers and
   no sideways scroll, each tenant one block of lines — avatar with the name
   over its domain (and the matched domain, when there is one), then plan,
