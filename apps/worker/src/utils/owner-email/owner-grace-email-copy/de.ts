@@ -36,4 +36,34 @@ export const OWNER_GRACE_EMAIL_COPY_DE: TOwnerGraceEmailCopy = {
       ],
     }),
   },
+  fewerSeats: {
+    teamActionLabel: 'Team öffnen',
+    memberLock: ({ members, date }) =>
+      `Am ${date} verlieren diese Teammitglieder den Zugang zur Verwaltung der Website: ${members}. Die Konten bleiben erhalten.`,
+    closing: (date) =>
+      `Um selbst zu entscheiden, wer den Zugang behält, entfernen Sie vor dem ${date} Mitglieder auf der Seite Team oder wechseln Sie in einen Tarif mit mehr Plätzen.`,
+    emails: {
+      [GRACE_EMAIL.STARTED]: ({ siteName, date }) => ({
+        subject: `${siteName} hat mehr Teammitglieder, als der Tarif Plätze hat`,
+        previewText: `Entscheiden Sie vor dem ${date}, wer den Zugang behält.`,
+        paragraphs: [
+          `${siteName} ist in einen Tarif mit weniger Plätzen gewechselt, und das Team liegt jetzt über der Grenze.`,
+        ],
+      }),
+      [GRACE_EMAIL.HALFWAY]: ({ siteName, date }) => ({
+        subject: `${siteName}: noch eine Woche, bis Teammitglieder über den Plätzen des Tarifs den Zugang verlieren`,
+        previewText: `Entfernen Sie Mitglieder oder wechseln Sie den Tarif vor dem ${date}.`,
+        paragraphs: [
+          `${siteName} ist vor einer Woche in einen Tarif mit weniger Plätzen gewechselt, und das Team liegt noch immer über der Grenze.`,
+        ],
+      }),
+      [GRACE_EMAIL.ENDING]: ({ siteName, date }) => ({
+        subject: `${siteName}: Teammitglieder über den Plätzen des Tarifs verlieren morgen den Zugang`,
+        previewText: 'Entscheiden Sie heute, wer den Zugang behält.',
+        paragraphs: [
+          `Das Team von ${siteName} liegt noch immer über den Plätzen des Tarifs, und ab morgen, dem ${date}, gilt die Grenze.`,
+        ],
+      }),
+    },
+  },
 };

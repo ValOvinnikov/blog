@@ -1,11 +1,7 @@
-import { createClient } from '@sanity/client';
 import type { TMaybeNull } from '@shinefold/config';
-import { getTenantSanityCredentials } from '@shinefold/db/queries/tenants';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import type { TSanityWebhook } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks';
-import { listSanityWebhooks } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks-list';
 import { hasLength } from '@shinefold/utils/primitives';
-import { SANITY_API_VERSION } from '@worker/constants/sanity-api';
 import { errorMessage } from '@worker/utils/error-message/error-message';
 import { grantPropagationRetryOptions } from '@worker/utils/grant-propagation-retry/grant-propagation-retry';
 import { assertHomeMetaTitleLength } from '@worker/utils/home-meta-title-length/home-meta-title-length';
@@ -14,11 +10,9 @@ import {
   retryWithBackoff,
   type TRetryWithBackoffOptions,
 } from '@worker/utils/retry-with-backoff/retry-with-backoff';
+import type { TVerifyTenantSeededContentDeps } from '@worker/utils/step-deps/step-deps';
 import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
-import {
-  listVercelProjectDomains,
-  type TVercelDomain,
-} from '@worker/utils/vercel-client/vercel-client';
+import type { TVercelDomain } from '@worker/utils/vercel-client/vercel-client';
 
 import { revalidateWebhookUrl } from './create-revalidate-webhook';
 
@@ -27,22 +21,6 @@ const REQUIRED_SINGLETON_TYPES = [
   'settings_navigation',
   'settings_footer',
 ] as const;
-
-export type TVerifyTenantSeededContentDeps = {
-  createClient: typeof createClient;
-  getCredentials: typeof getTenantSanityCredentials;
-  listWebhooks: typeof listSanityWebhooks;
-  listDomains: typeof listVercelProjectDomains;
-  sleep: (ms: number) => Promise<void>;
-};
-
-const defaultDeps: TVerifyTenantSeededContentDeps = {
-  createClient,
-  getCredentials: getTenantSanityCredentials,
-  listWebhooks: listSanityWebhooks,
-  listDomains: listVercelProjectDomains,
-  sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
-};
 
 async function readWithGrantPropagationRetry<T>(
   read: () => Promise<T>,
@@ -69,7 +47,7 @@ type TNavigationItemLinkCheck = {
 export async function verifyTenantSeededContent(
   tenant: TTenant,
   env: TProvisionEnv,
-  deps: TVerifyTenantSeededContentDeps = defaultDeps,
+  deps: TVerifyTenantSeededContentDeps,
 ): Promise<void> {
   const credentials = await deps.getCredentials(tenant.id);
 
@@ -79,13 +57,7 @@ export async function verifyTenantSeededContent(
     );
   }
 
-  const client = deps.createClient({
-    projectId: credentials.projectId,
-    dataset: credentials.dataset,
-    token: credentials.token,
-    apiVersion: SANITY_API_VERSION,
-    useCdn: false,
-  });
+  const client = deps.createClient(credentials);
 
   const retryOptions = grantPropagationRetryOptions(deps.sleep);
 

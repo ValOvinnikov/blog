@@ -1,10 +1,15 @@
 import { ERROR_CODE, TENANT_PLAN } from '@shinefold/config/constants';
-import { GRACE_EMAIL, type TGraceEmail } from '@shinefold/db/constants';
+import {
+  GRACE_EMAIL,
+  MEMBERSHIP_ROLE,
+  type TGraceEmail,
+} from '@shinefold/db/constants';
 import { deleteCustomDomainClaim } from '@shinefold/db/queries/custom-domain-claims';
 import { stopPendingInvitesOverSeats } from '@shinefold/db/queries/membership-invites';
 import {
   countMembershipsOverSeats,
   getTenantOwnerEmail,
+  listTenantMembers,
   lockMembershipsOverSeats,
 } from '@shinefold/db/queries/memberships';
 import { listTenantHosts } from '@shinefold/db/queries/tenant-domains/list-tenant-hosts';
@@ -31,8 +36,10 @@ import {
   DOWNGRADE_GRACE_LOG,
   DOWNGRADE_GRACE_STEP,
 } from '@worker/constants/downgrade-grace';
+import { OWNER_TEAM_PATH } from '@worker/constants/owner-email';
 import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import { mockInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
+import { mockTenantMember } from '@worker/testing/memberships/fixtures';
 import { createMockFaker } from '@worker/testing/mock-faker';
 import {
   MOCK_DB_DOWN,
@@ -53,10 +60,13 @@ import { runDowngradeGraceSweep } from './run-downgrade-grace-sweep';
 
 const MOCK_SWEEP_ENV = mockInactivitySweepEnv();
 const MOCK_DAY_0_GRACE_END_DATE = 'November 4, 2026';
+const MOCK_DAY_7_GRACE_END_DATE = 'October 28, 2026';
+const MOCK_DAY_13_GRACE_END_DATE = 'October 22, 2026';
 const MOCK_SITE_NAME = mockTenant().name;
 const MOCK_EXTRA_MEMBERS = 2;
 const MOCK_SECOND_TENANT_ID = createMockFaker(6875).string.uuid();
 const COPY = OWNER_GRACE_EMAIL_COPY.EN;
+const EMAIL_CASE_TITLE = 'the %s email';
 const MOCK_NOTHING_DONE = {
   [DOWNGRADE_GRACE_STEP.TRIAL_END]: 0,
   [DOWNGRADE_GRACE_STEP.GRACE_END]: 0,
@@ -103,6 +113,7 @@ beforeEach(() => {
   vi.mocked(listTenantsDueForGraceEmail).mockResolvedValue([]);
   vi.mocked(listTenantHosts).mockResolvedValue([MOCK_TENANT_DOMAIN]);
   vi.mocked(countMembershipsOverSeats).mockResolvedValue(0);
+  vi.mocked(listTenantMembers).mockResolvedValue([]);
   vi.mocked(getTenantOwnerEmail).mockResolvedValue(MOCK_OWNER_EMAIL);
   vi.mocked(sendEmail).mockResolvedValue();
   vi.mocked(requestTenantCacheInvalidation).mockResolvedValue();
@@ -200,10 +211,10 @@ describe(runDowngradeGraceSweep, () => {
   });
 
   describe.each([
-    [GRACE_EMAIL.HALFWAY, 7, 'October 28, 2026'],
-    [GRACE_EMAIL.ENDING, 13, 'October 22, 2026'],
+    [GRACE_EMAIL.HALFWAY, 7, MOCK_DAY_7_GRACE_END_DATE],
+    [GRACE_EMAIL.ENDING, 13, MOCK_DAY_13_GRACE_END_DATE],
   ] as [TGraceEmail, number, string][])(
-    'the %s email',
+    EMAIL_CASE_TITLE,
     (email, days, graceEndDate) => {
       beforeEach(() => {
         emailDue(email, [inGraceFor(days)]);
@@ -383,6 +394,120 @@ describe(runDowngradeGraceSweep, () => {
           },
         );
       });
+    });
+  });
+
+  describe('a site moved to a paid plan with fewer seats', () => {
+    const owner = mockTenantMember({ role: MEMBERSHIP_ROLE.OWNER });
+    const lockedMember = mockTenantMember({ lockedAt: MOCK_NOW });
+    const overSeats = [mockTenantMember(), mockTenantMember()];
+    const fewerSeatsCopy = COPY.fewerSeats;
+    function inStarterGraceFor(days: number): TTenant {
+      return inGraceFor(days, {
+        plan: TENANT_PLAN.STARTER,
+        primaryDomain: MOCK_CUSTOM_DOMAIN,
+        downgradedFromPlan: TENANT_PLAN.GROWTH,
+      });
+    }
+
+    beforeEach(() => {
+      vi.mocked(countMembershipsOverSeats).mockResolvedValue(overSeats.length);
+      vi.mocked(listTenantMembers).mockResolvedValue([
+        owner,
+        lockedMember,
+        ...overSeats,
+      ]);
+      vi.mocked(listTenantHosts).mockResolvedValue([
+        MOCK_CUSTOM_DOMAIN,
+        MOCK_TENANT_DOMAIN,
+      ]);
+    });
+
+    describe.each([
+      [GRACE_EMAIL.STARTED, 0, MOCK_DAY_0_GRACE_END_DATE],
+      [GRACE_EMAIL.HALFWAY, 7, MOCK_DAY_7_GRACE_END_DATE],
+      [GRACE_EMAIL.ENDING, 13, MOCK_DAY_13_GRACE_END_DATE],
+    ] as [TGraceEmail, number, string][])(
+      EMAIL_CASE_TITLE,
+      (email, days, graceEndDate) => {
+        beforeEach(() => {
+          emailDue(email, [inStarterGraceFor(days)]);
+        });
+
+        describe('while members are over the seats', () => {
+          beforeEach(async () => {
+            await sweep();
+          });
+
+          it('names the unlocked members over the seats and links Team', () => {
+            const [sent] = sentEmails();
+            const { subject } = fewerSeatsCopy.emails[email]({
+              siteName: MOCK_SITE_NAME,
+              date: graceEndDate,
+            });
+            expect(sent?.subject).toBe(subject);
+            expect(sent?.text).toContain(
+              fewerSeatsCopy.memberLock({
+                members: `${overSeats[0]?.email} and ${overSeats[1]?.email}`,
+                date: graceEndDate,
+              }),
+            );
+            expect(sent?.text).not.toContain(lockedMember.email);
+            expect(sent?.html).toContain(
+              new URL(
+                OWNER_TEAM_PATH,
+                MOCK_SWEEP_ENV.platformAppBaseUrl,
+              ).toString(),
+            );
+          });
+
+          it('never says the site is on Free or that its address moves', () => {
+            const text = sentEmails()[0]?.text;
+            expect(text).not.toContain(
+              COPY.emails[email]({
+                siteName: MOCK_SITE_NAME,
+                date: graceEndDate,
+              }).subject,
+            );
+            expect(text).not.toContain(MOCK_CUSTOM_DOMAIN);
+          });
+        });
+
+        it('is neither claimed nor sent once the site is within its seats', async () => {
+          vi.mocked(countMembershipsOverSeats).mockResolvedValue(0);
+
+          await sweep();
+
+          expect(claimGraceEmail).not.toHaveBeenCalled();
+          expect(sendEmail).not.toHaveBeenCalled();
+        });
+      },
+    );
+
+    it('locks over the plan’s seats on day 14 and keeps the custom domain', async () => {
+      const tenant = inStarterGraceFor(14);
+      vi.mocked(listTenantsDueForGraceEnd).mockResolvedValue([tenant]);
+      vi.mocked(endDowngradeGrace).mockResolvedValue({
+        ...tenant,
+        downgradeGraceStartedAt: null,
+        downgradedFromPlan: null,
+      });
+
+      await expect(sweep()).resolves.toEqual({
+        ...MOCK_NOTHING_DONE,
+        [DOWNGRADE_GRACE_STEP.GRACE_END]: 1,
+      });
+      expect(lockMembershipsOverSeats).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        TENANT_PLAN.STARTER,
+        MOCK_NOW,
+      );
+      expect(stopPendingInvitesOverSeats).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        TENANT_PLAN.STARTER,
+      );
+      expect(setTenantPrimaryDomain).not.toHaveBeenCalled();
+      expect(deleteCustomDomainClaim).not.toHaveBeenCalled();
     });
   });
 
