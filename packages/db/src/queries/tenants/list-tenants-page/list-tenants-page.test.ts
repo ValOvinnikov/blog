@@ -4,13 +4,22 @@ import {
   TENANT_PLAN,
   TENANT_SORT_COLUMN,
 } from '@shinefold/config/constants';
-import { TENANT_STATUS } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { insertTestTenantDomain } from '@shinefold/db/testing/tenant-domains/fixtures';
-import { MOCK_DEPROVISIONED_AT } from '@shinefold/db/testing/tenants/fixtures';
+import {
+  insertActiveAndArchivedTenants,
+  MOCK_FIRST_EXTRA_DOMAIN,
+  MOCK_FIRST_NAME,
+  MOCK_LAST_NAME,
+  MOCK_NEWER_CREATED_AT,
+  MOCK_OLDER_CREATED_AT,
+  MOCK_SEARCH_SLUG,
+  MOCK_SEARCH_WORD,
+  MOCK_SECOND_EXTRA_DOMAIN,
+} from '@shinefold/db/testing/tenants/tenant-list-fixtures';
 
 import { listTenantsPage, type TTenantsPageRow } from './list-tenants-page';
 
@@ -19,17 +28,8 @@ vi.mock('@shinefold/db/client');
 faker.seed(8076);
 
 const MOCK_PAGE_SIZE = 2;
-const MOCK_FIRST_NAME = `A ${faker.company.name()}`;
 const MOCK_MIDDLE_NAME = `M ${faker.company.name()}`;
-const MOCK_LAST_NAME = `Z ${faker.company.name()}`;
-const MOCK_NEWER_CREATED_AT = faker.date.recent();
-const MOCK_OLDER_CREATED_AT = faker.date.past({
-  refDate: MOCK_NEWER_CREATED_AT,
-});
-const MOCK_SEARCH_WORD = faker.string.alpha({ length: 8, casing: 'lower' });
 const MOCK_PAST_THE_END_PAGE = 9;
-const MOCK_FIRST_EXTRA_DOMAIN = `a-${MOCK_SEARCH_WORD}.example.com`;
-const MOCK_SECOND_EXTRA_DOMAIN = `b-${MOCK_SEARCH_WORD}.example.com`;
 
 const db = useQueryTestDb();
 
@@ -122,16 +122,6 @@ describe(listTenantsPage, () => {
         toPageRow(middleTenant),
       ]);
     });
-
-    it('counts only the tenants matching the search', async () => {
-      const result = await listTenantsPage({
-        page: 1,
-        pageSize: 1,
-        search: MOCK_FIRST_NAME,
-      });
-
-      expect(result).toEqual({ rows: [toPageRow(firstTenant)], total: 1 });
-    });
   });
 
   describe('with an active and a deprovisioned tenant', () => {
@@ -139,12 +129,8 @@ describe(listTenantsPage, () => {
     let archivedTenant: TTenant;
 
     beforeEach(async () => {
-      activeTenant = await insertTestTenant(db(), { name: MOCK_FIRST_NAME });
-      archivedTenant = await insertTestTenant(db(), {
-        name: MOCK_LAST_NAME,
-        status: TENANT_STATUS.ARCHIVED,
-        deprovisionedAt: MOCK_DEPROVISIONED_AT,
-      });
+      ({ activeTenant, archivedTenant } =
+        await insertActiveAndArchivedTenants(db()));
     });
 
     it('excludes deprovisioned tenants from rows and total by default', async () => {
@@ -168,6 +154,63 @@ describe(listTenantsPage, () => {
         total: 2,
       });
     });
+
+    it('counts deprovisioned tenants on a page past the end when included', async () => {
+      const result = await listTenantsPage({
+        page: MOCK_PAST_THE_END_PAGE,
+        pageSize: MOCK_PAGE_SIZE,
+        includeArchived: true,
+      });
+
+      expect(result).toEqual({ rows: [], total: 2 });
+    });
+  });
+
+  it('breaks a tie on name by id', async () => {
+    const firstInserted = await insertTestTenant(db(), {
+      name: MOCK_FIRST_NAME,
+      primaryDomain: MOCK_FIRST_EXTRA_DOMAIN,
+    });
+    const secondInserted = await insertTestTenant(db(), {
+      name: MOCK_FIRST_NAME,
+      primaryDomain: MOCK_SECOND_EXTRA_DOMAIN,
+    });
+    const isFirstLower = firstInserted.id < secondInserted.id;
+    const lowerIdTenant = isFirstLower ? firstInserted : secondInserted;
+    const higherIdTenant = isFirstLower ? secondInserted : firstInserted;
+
+    const firstPage = await listTenantsPage({ page: 1, pageSize: 1 });
+    const secondPage = await listTenantsPage({ page: 2, pageSize: 1 });
+
+    expect([firstPage.rows, secondPage.rows]).toEqual([
+      [toPageRow(lowerIdTenant)],
+      [toPageRow(higherIdTenant)],
+    ]);
+  });
+
+  it('orders higher plans first when sorted by plan descending', async () => {
+    const freeTenant = await insertTestTenant(db(), {
+      name: MOCK_FIRST_NAME,
+      plan: TENANT_PLAN.FREE,
+    });
+    const growthTenant = await insertTestTenant(db(), {
+      name: MOCK_LAST_NAME,
+      plan: TENANT_PLAN.GROWTH,
+    });
+
+    const result = await listTenantsPage({
+      page: 1,
+      pageSize: MOCK_PAGE_SIZE,
+      sort: {
+        column: TENANT_SORT_COLUMN.PLAN,
+        direction: SORT_DIRECTION.DESCENDING,
+      },
+    });
+
+    expect(result.rows).toEqual([
+      toPageRow(growthTenant),
+      toPageRow(freeTenant),
+    ]);
   });
 
   it('orders newest first when sorted by created date descending', async () => {
@@ -203,6 +246,40 @@ describe(listTenantsPage, () => {
   });
 
   describe('with a search', () => {
+    describe('matching two of three tenants', () => {
+      let firstMatch: TTenant;
+
+      beforeEach(async () => {
+        firstMatch = await insertTestTenant(db(), {
+          name: `${MOCK_FIRST_NAME} ${MOCK_SEARCH_WORD}`,
+        });
+        await insertTestTenant(db(), {
+          name: `${MOCK_LAST_NAME} ${MOCK_SEARCH_WORD}`,
+        });
+        await insertTestTenant(db(), { name: MOCK_MIDDLE_NAME });
+      });
+
+      it('counts every match beyond the rows on the page', async () => {
+        const result = await listTenantsPage({
+          page: 1,
+          pageSize: 1,
+          search: MOCK_SEARCH_WORD,
+        });
+
+        expect(result).toEqual({ rows: [toPageRow(firstMatch)], total: 2 });
+      });
+
+      it('counts every match on a page past the end', async () => {
+        const result = await listTenantsPage({
+          page: MOCK_PAST_THE_END_PAGE,
+          pageSize: 1,
+          search: MOCK_SEARCH_WORD,
+        });
+
+        expect(result).toEqual({ rows: [], total: 2 });
+      });
+    });
+
     it('matches a name without reporting a matched address', async () => {
       const nameTenant = await insertTestTenant(db(), {
         name: `${MOCK_FIRST_NAME} ${MOCK_SEARCH_WORD}`,
@@ -228,7 +305,7 @@ describe(listTenantsPage, () => {
       const result = await listTenantsPage({
         page: 1,
         pageSize: MOCK_PAGE_SIZE,
-        search: MOCK_SEARCH_WORD,
+        search: MOCK_SEARCH_SLUG,
       });
 
       expect(result).toEqual({ rows: [toPageRow(domainTenant)], total: 1 });
@@ -253,7 +330,7 @@ describe(listTenantsPage, () => {
       const result = await listTenantsPage({
         page: 1,
         pageSize: MOCK_PAGE_SIZE,
-        search: MOCK_SEARCH_WORD,
+        search: MOCK_SEARCH_SLUG,
       });
 
       expect(result).toEqual({
