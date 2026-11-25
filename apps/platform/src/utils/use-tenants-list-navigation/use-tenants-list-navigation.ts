@@ -19,7 +19,9 @@ export const useTenantsListNavigation = (listQuery: TTenantsListQuery) => {
 
   const navigateInPlace = (changes: Partial<TTenantsListQuery>) => {
     startTransition(() => {
-      router.replace(adminRoutes.tenants({ ...listQuery, page: 1, ...changes }));
+      router.replace(
+        adminRoutes.tenants({ ...listQuery, page: 1, ...changes }),
+      );
     });
   };
 
