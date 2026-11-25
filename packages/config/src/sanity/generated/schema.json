@@ -5555,6 +5555,10 @@
               {
                 "type": "string",
                 "value": "YEAR"
+              },
+              {
+                "type": "string",
+                "value": "MONTH_AND_YEAR"
               }
             ]
           },

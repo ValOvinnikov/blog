@@ -1,6 +1,7 @@
 import {
-  PRICE_PERIOD,
+  PLATFORM_PLAN_INTERVAL,
   SELLABLE_TENANT_PLANS,
+  type TPlatformPlanInterval,
   type TPricePeriod,
   type TSellableTenantPlan,
 } from '@shinefold/config/constants';
@@ -29,10 +30,11 @@ const DESCRIPTION_MAX_LENGTH = 160;
 const LABEL_MAX_LENGTH = 24;
 const FOOTNOTE_MAX_LENGTH = 120;
 
-const PLATFORM_PLAN_INTERVALS = [
-  PRICE_PERIOD.MONTH,
-  PRICE_PERIOD.YEAR,
-] as const;
+const PLATFORM_PLAN_INTERVAL_TITLE: Record<TPlatformPlanInterval, string> = {
+  [PLATFORM_PLAN_INTERVAL.MONTH]: 'Monthly',
+  [PLATFORM_PLAN_INTERVAL.YEAR]: 'Yearly',
+  [PLATFORM_PLAN_INTERVAL.MONTH_AND_YEAR]: 'Monthly and yearly',
+};
 
 type TPricingTierPricePreviewItem = {
   amount?: number;
@@ -46,7 +48,7 @@ type TPricingTierPreview = {
   name?: unknown;
   prices?: TPricingTierPricePreviewItem[];
   platformPlan?: TSellableTenantPlan;
-  platformPlanInterval?: TPricePeriod;
+  platformPlanInterval?: TPlatformPlanInterval;
   highlightLabel?: unknown;
 };
 
@@ -109,11 +111,12 @@ export const pricingTierSchema = defineType({
       name: 'platformPlanInterval',
       title: 'Billing Interval',
       type: 'string',
-      description: 'Which of the plan’s prices the tier shows.',
+      description:
+        'Which of the plan’s prices the tier shows. Monthly and yearly lets readers switch between them.',
       options: {
         layout: 'radio',
-        list: PLATFORM_PLAN_INTERVALS.map((value) => ({
-          title: PRICING_PERIOD_TITLE[value],
+        list: Object.values(PLATFORM_PLAN_INTERVAL).map((value) => ({
+          title: PLATFORM_PLAN_INTERVAL_TITLE[value],
           value,
         })),
       },
@@ -205,7 +208,8 @@ export const pricingTierSchema = defineType({
       const priceSubtitle = platformPlan
         ? [
             toTitleCase(platformPlan),
-            platformPlanInterval && PRICING_PERIOD_TITLE[platformPlanInterval],
+            platformPlanInterval &&
+              PLATFORM_PLAN_INTERVAL_TITLE[platformPlanInterval],
           ]
             .filter(Boolean)
             .join(' · ')

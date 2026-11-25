@@ -15,7 +15,10 @@ import {
   mockPricingTier,
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
-import { mockLinkedPricingTier } from '@web/testing/modules/pricing/live-price-fixtures';
+import {
+  mockLinkedPricingTier,
+  MOCK_YEARLY_PLAN_PRICE,
+} from '@web/testing/modules/pricing/live-price-fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
@@ -87,6 +90,7 @@ const panelsFor = (selected: typeof tiers) =>
         currency: BILLING_CURRENCY.EUR,
         unitAmount: MOCK_EURO_AMOUNT,
       }),
+      MOCK_YEARLY_PLAN_PRICE,
     ],
     locale: 'en-GB',
     currency: MOCK_SITE_SETTINGS.currency,
@@ -208,10 +212,26 @@ export const LinkedPlanLivePrice: TStory = {
     hasPlanComparison: true,
     panels: panelsFor([
       tiers[0]!,
-      mockLinkedPricingTier(PRICE_PERIOD.MONTH, {
+      mockLinkedPricingTier([PRICE_PERIOD.MONTH], {
         id: 'growth',
         name: 'Growth',
         description: 'The platform plan, at its live price.',
+        features,
+        ctaButtons: MOCK_CTA_ACTIONS.slice(0, 1),
+      }),
+    ]),
+  },
+};
+
+export const LinkedPlanBothPeriods: TStory = {
+  args: {
+    hasPlanComparison: true,
+    panels: panelsFor([
+      tiers[0]!,
+      mockLinkedPricingTier([PRICE_PERIOD.MONTH, PRICE_PERIOD.YEAR], {
+        id: 'growth',
+        name: 'Growth',
+        description: 'The platform plan, monthly or yearly.',
         features,
         ctaButtons: MOCK_CTA_ACTIONS.slice(0, 1),
       }),

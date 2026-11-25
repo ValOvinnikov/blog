@@ -28,6 +28,7 @@ export const MOCK_LANDING_PAGE: TLandingPage = {
   modules: [],
   faqs: [],
   sectionNavigation: undefined,
+  adjacentPages: undefined,
   seo: mockSeo({
     title: 'About Us',
     description: 'Who we are.',

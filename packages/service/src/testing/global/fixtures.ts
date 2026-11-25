@@ -17,6 +17,7 @@ export function mockRawNavigation(
 ): TRawNavigation {
   return {
     items: null,
+    headerAction: null,
     tagline: null,
     showLanguageSwitcher: null,
     ...overrides,

@@ -1,5 +1,5 @@
 import type { SanityDocument } from '@sanity/client';
-import { isNull, isString } from '@shinefold/utils/primitives';
+import { isPlainObject, isString } from '@shinefold/utils/primitives';
 
 type TArrayItem = { field: string; key: string; targetIds: string[] };
 
@@ -8,13 +8,9 @@ export type TDocumentReference = {
   arrayItem?: TArrayItem;
 };
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && !isNull(value);
-}
-
 function collectReferenceIds(value: unknown): string[] {
   if (Array.isArray(value)) return value.flatMap(collectReferenceIds);
-  if (!isRecord(value)) return [];
+  if (!isPlainObject(value)) return [];
 
   const { _ref, ...fields } = value;
 
@@ -30,7 +26,7 @@ function listArrayReferences(
 ): TDocumentReference[] {
   return items.flatMap((item) => {
     const targetIds = collectReferenceIds(item);
-    if (!isRecord(item) || !isString(item._key)) {
+    if (!isPlainObject(item) || !isString(item._key)) {
       return targetIds.map((targetId) => ({ targetId }));
     }
 

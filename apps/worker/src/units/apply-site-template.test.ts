@@ -11,13 +11,12 @@ import {
   updateProvisioningStep,
 } from '@shinefold/db/queries/tenants';
 import { errorResult } from '@shinefold/utils/result';
-import { applyGrowthLayer } from '@worker/steps/apply-growth-layer';
+import { getEntitledGrowthLayer } from '@worker/steps/entitled-growth-layer';
 import { seedTenantContent } from '@worker/steps/seed-content';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import { mockTenant, MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
-import { isGrowthLayerEntitled } from '@worker/utils/growth-layer/growth-layer-entitlement';
 import { FatalError } from 'workflow';
 
 import { applySiteTemplate } from './apply-site-template';
@@ -25,8 +24,7 @@ import { applySiteTemplate } from './apply-site-template';
 vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('@worker/steps/seed-content');
-vi.mock('@worker/steps/apply-growth-layer');
-vi.mock('@worker/utils/growth-layer/growth-layer-entitlement');
+vi.mock('@worker/steps/entitled-growth-layer');
 vi.mock('@shinefold/db/queries/site-config');
 vi.mock('workflow');
 
@@ -39,7 +37,7 @@ function reportedStatuses(): string[] {
 describe(applySiteTemplate, () => {
   beforeEach(() => {
     atStepAttempt(1);
-    vi.mocked(isGrowthLayerEntitled).mockResolvedValue(false);
+    vi.mocked(getEntitledGrowthLayer).mockResolvedValue(undefined);
     vi.mocked(getTenantById).mockResolvedValue(mockTenant());
     vi.mocked(updateProvisioningStep).mockResolvedValue(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
@@ -92,20 +90,15 @@ describe(applySiteTemplate, () => {
     },
   );
 
-  it('hands seeding the Growth layer when the tenant is entitled to it', async () => {
+  it('hands seeding the Growth layer the tenant is entitled to', async () => {
     const tenant = mockTenant({ siteType: SITE_TYPE.PORTFOLIO });
     const afterSeed = vi.fn();
     vi.mocked(getTenantById).mockResolvedValue(tenant);
-    vi.mocked(isGrowthLayerEntitled).mockResolvedValue(true);
-    vi.mocked(applyGrowthLayer).mockReturnValue(afterSeed);
+    vi.mocked(getEntitledGrowthLayer).mockResolvedValue(afterSeed);
 
     await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
-    expect(isGrowthLayerEntitled).toHaveBeenCalledWith(tenant);
-    expect(applyGrowthLayer).toHaveBeenCalledWith({
-      siteType: SITE_TYPE.PORTFOLIO,
-      locale: tenant.locale,
-    });
+    expect(getEntitledGrowthLayer).toHaveBeenCalledWith(tenant);
     expect(vi.mocked(seedTenantContent).mock.calls[0]?.[0].afterSeed).toBe(
       afterSeed,
     );
@@ -114,7 +107,6 @@ describe(applySiteTemplate, () => {
   it('hands seeding no Growth layer when the tenant is not entitled to it', async () => {
     await applySiteTemplate(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
-    expect(applyGrowthLayer).not.toHaveBeenCalled();
     expect(
       vi.mocked(seedTenantContent).mock.calls[0]?.[0].afterSeed,
     ).toBeUndefined();
@@ -122,7 +114,7 @@ describe(applySiteTemplate, () => {
 
   it.each([
     ['seeding', () => vi.mocked(seedTenantContent)],
-    ['the entitlement lookup', () => vi.mocked(isGrowthLayerEntitled)],
+    ['the entitlement lookup', () => vi.mocked(getEntitledGrowthLayer)],
   ])(
     'records no preset or template version when %s fails',
     async (_step, failing) => {

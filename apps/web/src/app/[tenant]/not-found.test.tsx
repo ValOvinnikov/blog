@@ -1,8 +1,13 @@
 import { faker } from '@faker-js/faker';
-import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES } from '@shinefold/config';
+import {
+  COLOR_SCHEME,
+  LOCALE_BCP47_TAGS,
+  LOCALE_ISO_CODES,
+} from '@shinefold/config';
 import { StandaloneNotFoundPage } from '@web/components/pages/standalone-not-found-page';
 import { buildNotFoundMetadata } from '@web/metadata/not-found-metadata';
 import { getNotFoundContext } from '@web/server/request-context/request-context';
+import { getLockedColorScheme } from '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { headers } from 'next/headers';
 
@@ -20,6 +25,10 @@ vi.mock('@web/components/pages/standalone-not-found-page', () => ({
 }));
 
 vi.mock('@web/server/request-context/request-context');
+
+vi.mock(
+  '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme',
+);
 
 vi.mock('next/headers', () => ({ headers: vi.fn() }));
 
@@ -63,6 +72,15 @@ describe(TenantNotFound, () => {
       tenant: MOCK_TENANT_ID,
       locale: LOCALE_ISO_CODES.NL,
     });
+  });
+
+  it("locks the document to the remembered tenant's colour scheme", async () => {
+    vi.mocked(getLockedColorScheme).mockResolvedValueOnce(COLOR_SCHEME.LIGHT);
+
+    const document = await TenantNotFound();
+
+    expect(document.props.lockedColorScheme).toBe(COLOR_SCHEME.LIGHT);
+    expect(getLockedColorScheme).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 });
 

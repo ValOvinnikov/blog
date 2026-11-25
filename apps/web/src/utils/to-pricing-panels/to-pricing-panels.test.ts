@@ -7,7 +7,10 @@ import {
   mockPricingTier,
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
-import { mockLinkedPricingTier } from '@web/testing/modules/pricing/live-price-fixtures';
+import {
+  mockLinkedPricingTier,
+  MOCK_YEARLY_PLAN_PRICE,
+} from '@web/testing/modules/pricing/live-price-fixtures';
 
 import { toPricingPanels } from './to-pricing-panels';
 
@@ -27,7 +30,7 @@ const formatPounds = (amount: number) => `£${amount}`;
 const setup = (tiers: Parameters<typeof toPricingPanels>[0]['tiers']) =>
   toPricingPanels({
     tiers,
-    planPrices: [mockStripePrice()],
+    planPrices: [mockStripePrice(), MOCK_YEARLY_PLAN_PRICE],
     locale: 'en-GB',
     currency: BILLING_CURRENCY.GBP,
     labels: MOCK_PRICING_LABELS,
@@ -219,10 +222,10 @@ describe(toPricingPanels, () => {
   });
 
   describe('with a tier linked to a platform plan', () => {
-    const yearlyLinkedTier = mockLinkedPricingTier(PRICE_PERIOD.YEAR, {
+    const yearlyLinkedTier = mockLinkedPricingTier([PRICE_PERIOD.YEAR], {
       id: faker.string.uuid(),
     });
-    const monthlyLinkedTier = mockLinkedPricingTier(PRICE_PERIOD.MONTH, {
+    const monthlyLinkedTier = mockLinkedPricingTier([PRICE_PERIOD.MONTH], {
       id: faker.string.uuid(),
     });
 
@@ -242,6 +245,22 @@ describe(toPricingPanels, () => {
       expect(panel?.cards[0]?.livePrice?.period).toBe(
         periods[PRICE_PERIOD.MONTH],
       );
+    });
+
+    it('carries each tab period live price for a tier showing both', () => {
+      const panels = setup([
+        mockLinkedPricingTier([PRICE_PERIOD.MONTH, PRICE_PERIOD.YEAR]),
+      ]);
+
+      expect(
+        panels.map(({ period, cards }) => [
+          period,
+          cards[0]?.livePrice?.period,
+        ]),
+      ).toEqual([
+        [PRICE_PERIOD.MONTH, periods[PRICE_PERIOD.MONTH]],
+        [PRICE_PERIOD.YEAR, periods[PRICE_PERIOD.YEAR]],
+      ]);
     });
 
     it('leaves an unlinked tier without a live price', () => {

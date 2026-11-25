@@ -1,4 +1,10 @@
-import type { TMaybeUndefined } from '@shinefold/config';
+import {
+  PLATFORM_PLAN_INTERVAL,
+  PRICE_PERIOD,
+  type TMaybeUndefined,
+  type TPlatformPlanInterval,
+  type TPricePeriod,
+} from '@shinefold/config';
 import { toCtaButtons } from '@shinefold/service/shared/transformers/cta/to-cta-buttons';
 import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
@@ -28,12 +34,27 @@ function toPricingPrices(
 
 type TRawPricingTier = TRawPricingModule['tiers'][number];
 
+const PLATFORM_PLAN_INTERVAL_PERIODS: Record<
+  TPlatformPlanInterval,
+  TPricePeriod[]
+> = {
+  [PLATFORM_PLAN_INTERVAL.MONTH]: [PRICE_PERIOD.MONTH],
+  [PLATFORM_PLAN_INTERVAL.YEAR]: [PRICE_PERIOD.YEAR],
+  [PLATFORM_PLAN_INTERVAL.MONTH_AND_YEAR]: [
+    PRICE_PERIOD.MONTH,
+    PRICE_PERIOD.YEAR,
+  ],
+};
+
 function toPlatformPlan({
   platformPlan,
   platformPlanInterval,
 }: TRawPricingTier): TMaybeUndefined<TPricingTierPlatformPlan> {
   return platformPlan && platformPlanInterval
-    ? { plan: platformPlan, interval: platformPlanInterval }
+    ? {
+        plan: platformPlan,
+        periods: PLATFORM_PLAN_INTERVAL_PERIODS[platformPlanInterval],
+      }
     : undefined;
 }
 

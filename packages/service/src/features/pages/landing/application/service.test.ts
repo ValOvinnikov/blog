@@ -5,7 +5,7 @@ import {
   mockFaqView,
   mockRawFaqModuleQuestions,
 } from '@shinefold/service/testing/modules/fixtures';
-import { mockRawLandingPage } from '@shinefold/service/testing/pages/fixtures';
+import { mockRawLandingPage } from '@shinefold/service/testing/pages/landing-page/fixtures';
 import { MOCK_ABOUT_SLUG } from '@shinefold/service/testing/shared/translated-pages-dataset';
 import { mockTenant } from '@shinefold/service/testing/tenant';
 

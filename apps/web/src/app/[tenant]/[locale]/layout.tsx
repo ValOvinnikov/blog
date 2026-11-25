@@ -14,6 +14,7 @@ import {
   getRequestContext,
 } from '@web/server/request-context/request-context';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
+import { getLockedColorScheme } from '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
@@ -58,12 +59,18 @@ export default async function LocaleLayout({ children, params }: TProps) {
   await enterRequestContext(params, { acceptsDraftPreview: true });
   const { tenantId, locale, isOperatorSuspended } = await getRequestContext();
   const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
-  const themeTokens = await getThemeTokens(tenant);
+  const [themeTokens, lockedColorScheme] = await Promise.all([
+    getThemeTokens(tenant),
+    getLockedColorScheme(tenant),
+  ]);
 
   const s = localeLayoutVariants();
 
   return (
-    <DocumentShell lang={LOCALE_BCP47_TAGS[locale]}>
+    <DocumentShell
+      lang={LOCALE_BCP47_TAGS[locale]}
+      lockedColorScheme={lockedColorScheme}
+    >
       <ThemeScope themeTokens={themeTokens}>
         <SiteProviders>
           <div className={s.root()}>

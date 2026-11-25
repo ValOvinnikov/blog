@@ -19,6 +19,7 @@ import { getBrandLogos } from '@web/server/site-config/get-brand-logos/get-brand
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
+import { getLockedColorScheme } from '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { logger } from '@web/utils/logger/logger';
 
@@ -45,6 +46,7 @@ export const SiteHeader = async () => {
     accountControl,
     headerStyle,
     siteOAuthCredentials,
+    lockedColorScheme,
   ] = await Promise.all([
     service.global.navigation.v1.getNavigation(sanityContext),
     isReaderAccountEnabled(),
@@ -55,6 +57,7 @@ export const SiteHeader = async () => {
     getAccountControl(siteConfigTenant),
     getHeaderStyle(siteConfigTenant),
     getSiteOAuthCredentials(tenantId),
+    getLockedColorScheme(siteConfigTenant),
   ]);
 
   if (!navResult.ok) {
@@ -71,6 +74,7 @@ export const SiteHeader = async () => {
   const oauthProviderIds = getEnabledOAuthProviderIds(siteOAuthCredentials);
   const hasAccountInPhoneMenu =
     accountControl.phonePlacement === ACCOUNT_PHONE_PLACEMENT.MENU;
+  const hasThemeToggle = !lockedColorScheme;
 
   return (
     <StickyHeaderFrame>
@@ -96,7 +100,7 @@ export const SiteHeader = async () => {
                   defaultLocale={defaultLocale ?? routing.defaultLocale}
                   switcherStyle={switcherStyle}
                 />
-                <ThemeToggleButton />
+                {hasThemeToggle && <ThemeToggleButton />}
               </>
             )
           }
@@ -112,7 +116,7 @@ export const SiteHeader = async () => {
           hasReaderAccounts={hasReaderAccounts}
           actions={
             <>
-              {!hasLanguageSwitcher && <ThemeToggleButton />}
+              {!hasLanguageSwitcher && hasThemeToggle && <ThemeToggleButton />}
               <AuthMenu
                 oauthProviderIds={oauthProviderIds}
                 accountControl={accountControl}

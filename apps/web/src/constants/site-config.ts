@@ -5,4 +5,5 @@ export const SITE_CONFIG_LOG = {
   PLAN_FETCH_FAILED: 'site_config.plan_fetch_failed',
   ANALYTICS_FETCH_FAILED: 'site_config.analytics_fetch_failed',
   VOICE_RICH_FETCH_FAILED: 'voice_rich.fetch_failed',
+  COLOR_MODE_FETCH_FAILED: 'color_mode.site_config_fetch_failed',
 } as const;
