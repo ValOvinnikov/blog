@@ -22,7 +22,7 @@ const tagRefsSchema = z.array(
   z.object({ ref: z.string(), object: z.object({ sha: z.string() }) }),
 );
 
-export type TReleaseTag = {
+type TReleaseTag = {
   name: string;
   sha: string;
 };
