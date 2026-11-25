@@ -16,8 +16,6 @@ export type TTenantsPageRequest = TTenantListFilters & {
   pageSize: number;
 };
 
-export type { TTenantsPageRow };
-
 export type TTenantsPage = {
   rows: TTenantsPageRow[];
   total: number;
