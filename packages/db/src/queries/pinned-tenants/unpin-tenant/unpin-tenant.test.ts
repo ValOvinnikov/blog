@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { pinTenant } from '@shinefold/db/queries/pinned-tenants/pin-tenant';
 import * as schema from '@shinefold/db/schema';
 import {
@@ -11,6 +12,10 @@ import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 import { unpinTenant } from './unpin-tenant';
 
 vi.mock('@shinefold/db/client');
+
+faker.seed(80781);
+
+const MOCK_NOT_UUID = faker.string.alpha(12);
 
 const db = useQueryTestDb();
 
@@ -35,6 +40,10 @@ describe(unpinTenant, () => {
 
   it('resolves when the tenant is not pinned', async () => {
     await expect(unpinTenant(adminId, tenant().id)).resolves.toBeUndefined();
+  });
+
+  it('resolves when the tenant id is not a UUID', async () => {
+    await expect(unpinTenant(adminId, MOCK_NOT_UUID)).resolves.toBeUndefined();
   });
 
   it('leaves the same tenant pinned by another admin', async () => {

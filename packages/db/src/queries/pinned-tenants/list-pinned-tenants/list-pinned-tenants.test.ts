@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { pinTenant } from '@shinefold/db/queries/pinned-tenants/pin-tenant';
 import { archiveTenant } from '@shinefold/db/queries/tenants/archive-tenant';
 import { reactivateTenant } from '@shinefold/db/queries/tenants/reactivate-tenant';
@@ -16,6 +17,13 @@ import {
 import { listPinnedTenants } from './list-pinned-tenants';
 
 vi.mock('@shinefold/db/client');
+
+faker.seed(80782);
+
+const MOCK_MIDDLE_NAME = `M ${faker.company.name()}`;
+const MOCK_LOWEST_TENANT_ID = faker.string.uuid().replace(/^./, '0');
+const MOCK_MIDDLE_TENANT_ID = faker.string.uuid().replace(/^./, '8');
+const MOCK_HIGHEST_TENANT_ID = faker.string.uuid().replace(/^./, 'f');
 
 const db = useQueryTestDb();
 
@@ -52,19 +60,30 @@ describe(listPinnedTenants, () => {
   });
 
   it('orders the pinned tenants by name', async () => {
-    const { id: lastId } = await insertTestTenant(db(), {
-      name: MOCK_LAST_NAME,
+    await insertTestTenant(db(), {
+      id: MOCK_LOWEST_TENANT_ID,
+      name: MOCK_MIDDLE_NAME,
     });
-    const { id: firstId } = await insertTestTenant(db(), {
+    await insertTestTenant(db(), {
+      id: MOCK_MIDDLE_TENANT_ID,
       name: MOCK_FIRST_NAME,
     });
-    await pinTenant(adminId, lastId);
-    await pinTenant(adminId, firstId);
+    await insertTestTenant(db(), {
+      id: MOCK_HIGHEST_TENANT_ID,
+      name: MOCK_LAST_NAME,
+    });
+    await pinTenant(adminId, MOCK_HIGHEST_TENANT_ID);
+    await pinTenant(adminId, MOCK_LOWEST_TENANT_ID);
+    await pinTenant(adminId, MOCK_MIDDLE_TENANT_ID);
 
     const rows = await listPinnedTenants(adminId);
 
     const tenantIds = rows.map((row) => row.id);
-    expect(tenantIds).toEqual([firstId, lastId]);
+    expect(tenantIds).toEqual([
+      MOCK_MIDDLE_TENANT_ID,
+      MOCK_LOWEST_TENANT_ID,
+      MOCK_HIGHEST_TENANT_ID,
+    ]);
   });
 
   describe('with a pinned tenant that gets archived', () => {
