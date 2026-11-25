@@ -57,7 +57,7 @@ No route of its own. The seeded documents are what the public site renders and w
 
 ## Growth layer
 
-`@shinefold/config`'s `buildGrowthLayer({ siteType, locale, placeholderImages })` returns the Growth sections a type adds to its Free site, or `null` for a type with none (Blog, Docs and Blank today).
+`@shinefold/config`'s `buildGrowthLayer({ siteType, locale, placeholderImages })` returns the Growth sections a type adds to its Free site, or `null` for a type with none (Blog, Docs and Blank today). `getGrowthLayerBuilder(siteType)` returns that type's builder, or `null`, with `usesPlaceholderImages` saying whether its `build` takes `placeholderImages` — true for Portfolio, Business and Product, false for Personal.
 
 - **What it returns** — `documents`, the module documents and the items they reference (feature cards, testimonials, team members), each typed against the generated Sanity types; and `homeSlots`, one `{ slot, after }` per section for the home template's `modules`, where `after` is the id of the slot it follows: a Free module, or the Growth slot before it.
 - **Placeholder images** — `placeholderImages` maps each `STARTER_PLACEHOLDER_IMAGE` (`LOGO`, `ILLUSTRATION`) to a Sanity image asset id. A logo-wall logo and a feature-highlights row need an uploaded image to be schema-valid; every other section uses an icon or initials.
@@ -75,11 +75,11 @@ No route of its own. The seeded documents are what the public site renders and w
 - **Applied once per dataset** — the same transaction appends a `growth-layer` entry to the `migrationState` ledger's `applied` list (the migration runner ignores ids it has no migration for), and a run that finds the entry writes and uploads nothing. A section the owner deleted, or cleared with **Remove sample content**, therefore stays gone on a re-run. A dataset without a ledger (seeded before the ledger existed) gets no entry and the layer again on each run. A plan change never clears the entry, so a site that leaves Growth and returns keeps whatever the owner did with its sections.
 
 - **On upgrade** — a signed `POST /api/growth-layer/apply` (`{ tenantId }`) starts the durable `applyGrowthLayerOnUpgrade` run, whose one step, `ensureGrowthLayerApplied`, re-checks `isGrowthLayerEntitled` (a tenant no longer entitled gets nothing written) and runs `applyGrowthLayer` on the tenant's write client. It answers 202 with `{ runId }`, 404 for an unknown tenant and 409 `NOT_PROVISIONED` without a write token; a failure retries `PROVISIONING_UNIT_MAX_RETRIES` times and is logged as `growth_layer.apply_failed` once they are spent.
-- **Placeholder images** — on a run that applies the layer, it uploads the logo and illustration SVGs to the tenant's dataset on every Growth tenant, and passes their asset ids to `buildGrowthLayer`. Sanity keys an asset by its content hash, so a re-run reuses the assets already there.
+- **Placeholder images** — on a run that applies the layer to a type whose builder `usesPlaceholderImages`, it uploads the logo and illustration SVGs to the tenant's dataset and passes their asset ids to the builder; a Personal site gets no upload, and a type with no layer returns before reading the dataset. Sanity keys an asset by its content hash, so a re-run reuses the assets already there.
 - **Documents** — each layer document is created with `createIfNotExists`, so an owner's edits survive a re-run.
 - **Home slots** — each slot missing from the published `template_home`'s `modules` (by `_key` or by reference) is placed after the slot it follows, or last when the owner removed that one; the owner's own order and modules stay as they are. The patch carries the template's revision, so an edit published mid-run fails the commit and the unit's retry re-reads it. A missing home template gets the documents and no slots.
-- **Cost** — one fetch per Growth provisioning, plus two asset uploads and one transaction when the layer is applied.
-- **Known edges** — a pending draft of `template_home` is not patched, so publishing it drops the new slots; a type with no layer (Blog, Docs, Blank) still receives the two placeholder assets.
+- **Cost** — one fetch per Growth provisioning of a type with a layer, plus one transaction when the layer is applied and two asset uploads when that layer uses placeholder images.
+- **Known edges** — a pending draft of `template_home` is not patched, so publishing it drops the new slots.
 
 ## Removing samples
 
@@ -105,7 +105,7 @@ The owner's overview (`/dashboard`) shows a **Sample content** card to the site'
 - `apps/worker/src/units/remove-sample-content.test.ts`, `apps/worker/src/utils/sample-content/plan-sample-content-removal.test.ts` — what is removed, unlinked and kept, and why; `apps/worker/src/utils/sample-content/kept-samples.test.ts` — how each kept sample is named.
 - `apps/worker/src/app/api/sample-content/remove/route.test.ts` — the signature, tenant, provisioning and status refusals, the result body and a failed removal.
 - `apps/platform/src/server/sample-content/remove-sample-content-action.test.ts`, `sample-content-for.test.ts` and the `sample-content-card` test — who is offered removal, the status refusal, the result by kind, and the failures.
-- `apps/worker/src/steps/apply-growth-layer.test.ts`, `apps/worker/src/utils/growth-layer/growth-home-modules.test.ts` — the placeholder upload, the created documents and where each slot lands.
+- `apps/worker/src/steps/apply-growth-layer.test.ts`, `apps/worker/src/utils/growth-layer/growth-home-modules.test.ts` — the placeholder upload only for a layer that uses it, the created documents and where each slot lands.
 - `apps/worker/src/units/ensure-growth-layer-applied.test.ts`, `apps/worker/src/app/api/growth-layer/apply/route.test.ts` — the upgrade run applies the layer only while entitled, and the route's signature and refusals.
 - `apps/worker/src/units/apply-site-template.test.ts`, `apps/worker/src/steps/seed-content.test.ts`, `apps/worker/src/utils/migration-ledger/migration-ledger.test.ts`.
 

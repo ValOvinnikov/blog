@@ -1,4 +1,4 @@
-export { buildGrowthLayer } from './growth-layer';
+export { buildGrowthLayer, getGrowthLayerBuilder } from './growth-layer';
 export type {
   TGrowthHomeSlot,
   TGrowthLayer,

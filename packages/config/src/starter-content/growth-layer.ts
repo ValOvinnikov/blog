@@ -17,34 +17,65 @@ type TGrowthInput = {
   placeholderImages: TStarterPlaceholderImageIds;
 };
 
-const BUILD_GROWTH_BY_SITE_TYPE: Partial<
-  Record<TStarterSiteType, (input: TGrowthInput) => TGrowthLayer>
+type TGrowthLayerBuilder =
+  | {
+      usesPlaceholderImages: true;
+      build: (input: TGrowthInput) => TGrowthLayer;
+    }
+  | {
+      usesPlaceholderImages: false;
+      build: (input: Pick<TGrowthInput, 'locale'>) => TGrowthLayer;
+    };
+
+const GROWTH_LAYER_BUILDER_BY_SITE_TYPE: Partial<
+  Record<TStarterSiteType, TGrowthLayerBuilder>
 > = {
-  [SITE_TYPE.PORTFOLIO]: ({ locale, placeholderImages }) =>
-    buildPortfolioGrowthLayer({
-      locale,
-      copy: STARTER_COPY_BY_LOCALE[locale],
-      placeholderImages,
-    }),
-  [SITE_TYPE.PERSONAL]: ({ locale }) =>
-    buildPersonalGrowthLayer({ locale, copy: STARTER_COPY_BY_LOCALE[locale] }),
-  [SITE_TYPE.BUSINESS]: ({ locale, placeholderImages }) =>
-    buildBusinessGrowthLayer({
-      locale,
-      copy: STARTER_COPY_BY_LOCALE[locale],
-      placeholderImages,
-    }),
-  [SITE_TYPE.PRODUCT]: ({ locale, placeholderImages }) =>
-    buildProductGrowthLayer({
-      locale,
-      copy: STARTER_COPY_BY_LOCALE[locale],
-      placeholderImages,
-    }),
+  [SITE_TYPE.PORTFOLIO]: {
+    usesPlaceholderImages: true,
+    build: ({ locale, placeholderImages }) =>
+      buildPortfolioGrowthLayer({
+        locale,
+        copy: STARTER_COPY_BY_LOCALE[locale],
+        placeholderImages,
+      }),
+  },
+  [SITE_TYPE.PERSONAL]: {
+    usesPlaceholderImages: false,
+    build: ({ locale }) =>
+      buildPersonalGrowthLayer({
+        locale,
+        copy: STARTER_COPY_BY_LOCALE[locale],
+      }),
+  },
+  [SITE_TYPE.BUSINESS]: {
+    usesPlaceholderImages: true,
+    build: ({ locale, placeholderImages }) =>
+      buildBusinessGrowthLayer({
+        locale,
+        copy: STARTER_COPY_BY_LOCALE[locale],
+        placeholderImages,
+      }),
+  },
+  [SITE_TYPE.PRODUCT]: {
+    usesPlaceholderImages: true,
+    build: ({ locale, placeholderImages }) =>
+      buildProductGrowthLayer({
+        locale,
+        copy: STARTER_COPY_BY_LOCALE[locale],
+        placeholderImages,
+      }),
+  },
 };
+
+export function getGrowthLayerBuilder(
+  siteType: TStarterSiteType,
+): TMaybeNull<TGrowthLayerBuilder> {
+  return GROWTH_LAYER_BUILDER_BY_SITE_TYPE[siteType] ?? null;
+}
 
 export function buildGrowthLayer({
   siteType,
   ...input
 }: TGrowthInput & { siteType: TStarterSiteType }): TMaybeNull<TGrowthLayer> {
-  return BUILD_GROWTH_BY_SITE_TYPE[siteType]?.(input) ?? null;
+  return getGrowthLayerBuilder(siteType)?.build(input) ?? null;
 }
