@@ -35,6 +35,8 @@ const COLUMN_LABEL_KEYS = {
   [TENANT_SORT_COLUMN.CREATED]: 'columnCreated',
 } as const satisfies Record<TTenantSortColumn, string>;
 
+const ACTIONS_COLUMN = 'actions';
+
 export type TTenantsTableTenant = TClientTenant &
   Pick<TListedTenant, 'matchedDomain'>;
 
@@ -60,7 +62,7 @@ export const TenantsTable = ({
   const locale = useLocale();
   const { navigate } = useTenantsListNavigation(listQuery);
   const [sort, setOptimisticSort] = useOptimistic(listQuery.sort);
-  const { tname, name, domain } = tenantsTableVariants();
+  const { tname, lines, name, domain } = tenantsTableVariants();
 
   const sortBy = (column: TTenantSortColumn) => {
     const next = nextSort(sort, column);
@@ -76,6 +78,7 @@ export const TenantsTable = ({
           : t('empty')
       }
       ariaLabel={tView('title')}
+      isStacked={true}
       columns={[
         ...Object.values(TENANT_SORT_COLUMN).map((column) => ({
           key: column,
@@ -86,17 +89,17 @@ export const TenantsTable = ({
           },
         })),
         {
-          key: 'actions',
+          key: ACTIONS_COLUMN,
           label: t('columnActions'),
           isLabelHidden: true,
         },
       ]}
       renderRow={(tenant) => (
         <DataTableShell.Row key={tenant.id}>
-          <DataTableShell.Cell>
+          <DataTableShell.Cell column={TENANT_SORT_COLUMN.NAME}>
             <div className={tname()}>
               <Avatar name={tenant.name} variant={AVATAR_VARIANT.TABLE} />
-              <div>
+              <div className={lines()}>
                 <div className={name()}>{tenant.name}</div>
                 <div className={domain()}>{tenant.primaryDomain}</div>
                 {tenant.matchedDomain && (
@@ -107,22 +110,22 @@ export const TenantsTable = ({
               </div>
             </div>
           </DataTableShell.Cell>
-          <DataTableShell.Cell>
+          <DataTableShell.Cell column={TENANT_SORT_COLUMN.PLAN}>
             <StatusBadge tone={BADGE_TONE.PLAN} hasDot={false}>
               {tPlan(tenant.plan)}
             </StatusBadge>
           </DataTableShell.Cell>
-          <DataTableShell.Cell>
+          <DataTableShell.Cell column={TENANT_SORT_COLUMN.STATUS}>
             <StatusBadge tone={tenantStatusTone(tenant.status)}>
               {t(`status.${tenant.status}`)}
             </StatusBadge>
           </DataTableShell.Cell>
-          <DataTableShell.Cell>
+          <DataTableShell.Cell column={TENANT_SORT_COLUMN.CREATED}>
             <time dateTime={tenant.createdAt.toISOString()}>
               {formatDate(tenant.createdAt, locale)}
             </time>
           </DataTableShell.Cell>
-          <DataTableShell.Cell>
+          <DataTableShell.Cell column={ACTIONS_COLUMN}>
             <LinkButton
               href={manageHrefFor(tenant)}
               variant={BUTTON_VARIANT.SECONDARY}
