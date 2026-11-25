@@ -1,1 +1,2 @@
-export { TenantsTable, type TTenantsTableTenant } from './tenants-table';
+export { TenantsTable } from './tenants-table';
+export type { TTenantsTableTenant } from './components/row/tenants-table-row';

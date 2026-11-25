@@ -72,6 +72,7 @@ export const mockTenantsListQuery = (
   shouldShowArchived: false,
   sort: DEFAULT_TENANTS_SORT,
   search: '',
+  page: 1,
   ...overrides,
 });
 
