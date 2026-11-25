@@ -269,6 +269,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **OPERATOR_ALERT_KIND**: `OWNER_ELEVATION`, `DOCUMENT_VALIDATION`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/platform-plan-interval.ts`
+
+- **PLATFORM_PLAN_INTERVAL**: `MONTH_AND_YEAR`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/portable-text-block-type.ts`
 
 - **PORTABLE_TEXT_BLOCK_TYPE**: `BODY_IMAGE`=`"bodyImage"`, `ASIDE`=`"aside"`, `LINK_REF`=`"linkRef"`, `COOKIE_PREFERENCES_LINK`=`"cookiePreferencesLink"`, `COOKIE_LIST`=`"cookieList"`, `EXPANDABLE_SECTION`=`"expandableSection"`, `TABLE`=`"table"`

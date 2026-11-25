@@ -79,6 +79,7 @@ export const toPricingPanels = ({
       footnote: tier.footnote,
       livePrice: toLivePlanPrice({
         tier,
+        tab,
         planPrices,
         siteCurrency: currency,
         periods: labels.periods,
