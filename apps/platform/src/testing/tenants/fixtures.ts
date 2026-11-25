@@ -10,7 +10,7 @@ import {
 import type { TTenantOwnerMembership } from '@shinefold/db/queries/memberships';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 
-import { mockReadyTenant, mockTenant } from './mock-tenant';
+import { mockTenant } from './mock-tenant';
 import { MOCK_TENANT_DOMAIN, MOCK_TENANT_NAME } from './tenant-identity';
 
 export * from './entitlement-grants';
@@ -62,10 +62,6 @@ export const MOCK_RUN_PLUS_7_MIN_AT = '2026-08-12T14:25:30.000Z';
 export const mockClientTenant = (
   overrides: Partial<TTenant> = {},
 ): TClientTenant => toClientTenant(mockTenant(overrides));
-
-export const mockReadyClientTenant = (
-  overrides: Partial<TTenant> = {},
-): TClientTenant => toClientTenant(mockReadyTenant(overrides));
 
 export const mockTenantsListQuery = (
   overrides: Partial<TTenantsListQuery> = {},
