@@ -2425,6 +2425,7 @@ export type Page_landing = {
   template?: Template_landingReference;
   sectionNavigation?: boolean;
   sectionNavigationTitle?: string;
+  showPreviousNextLinks?: boolean;
   showSectionNavigation?: boolean;
   seo?: Seo;
 };
