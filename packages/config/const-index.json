@@ -3806,6 +3806,42 @@
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
+    "MONTH": [
+      {
+        "ref": "PLATFORM_PLAN_INTERVAL.MONTH",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/platform-plan-interval.ts"
+      },
+      {
+        "ref": "PRICE_PERIOD.MONTH",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/price-period.ts"
+      }
+    ],
+    "YEAR": [
+      {
+        "ref": "PLATFORM_PLAN_INTERVAL.YEAR",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/platform-plan-interval.ts"
+      },
+      {
+        "ref": "PRICE_PERIOD.YEAR",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/price-period.ts"
+      }
+    ],
+    "MONTH_AND_YEAR": [
+      {
+        "ref": "PLATFORM_PLAN_INTERVAL.MONTH_AND_YEAR",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/platform-plan-interval.ts"
+      }
+    ],
     "bodyImage": [
       {
         "ref": "PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE",
@@ -3990,22 +4026,6 @@
         "scope": "app:web",
         "from": "@web/constants/cookie-list",
         "file": "apps/web/src/constants/cookie-list.ts"
-      }
-    ],
-    "MONTH": [
-      {
-        "ref": "PRICE_PERIOD.MONTH",
-        "scope": "config",
-        "from": "@shinefold/config/constants",
-        "file": "packages/config/src/constants/price-period.ts"
-      }
-    ],
-    "YEAR": [
-      {
-        "ref": "PRICE_PERIOD.YEAR",
-        "scope": "config",
-        "from": "@shinefold/config/constants",
-        "file": "packages/config/src/constants/price-period.ts"
       }
     ],
     "PERMANENT": [
