@@ -7,6 +7,7 @@ import {
   BUSY_BUTTON_STYLE,
   BUTTON_SHAPE,
   CARD_STYLE,
+  COLOR_MODE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
   DIVIDER_WIDTH,
@@ -74,6 +75,7 @@ const STORED_LOOK: TLook = {
   headingCase: HEADING_CASE.UPPERCASE,
   imageProportion: IMAGE_PROPORTION.SQUARE,
   dividerWidth: DIVIDER_WIDTH.BOLD,
+  colorMode: COLOR_MODE.DARK,
   footerLayout: FOOTER_LAYOUT.COMPACT,
   footerBackground: BRAND_VARIANT.SECONDARY,
   footerSurface: FOOTER_SURFACE.CARD,
@@ -86,6 +88,7 @@ const STORED_LOOK: TLook = {
 
 const GROWTH = PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH];
 const FREE = PLAN_ENTITLEMENTS[TENANT_PLAN.FREE];
+const STARTER = PLAN_ENTITLEMENTS[TENANT_PLAN.STARTER];
 const MOCK_ENTITLEMENTS_LABEL = 'a heading-font grant';
 const MOCK_ENTITLEMENTS = {
   lookFields: [LOOK_FIELD.PRESET, LOOK_FIELD.HEADING_FONT],
@@ -125,6 +128,7 @@ describe(toEffectiveLookWithin, () => {
       headingCase: HEADING_CASE.AS_WRITTEN,
       imageProportion: IMAGE_PROPORTION.AS_DESIGNED,
       dividerWidth: DIVIDER_WIDTH.HAIRLINE,
+      colorMode: COLOR_MODE.READER,
       footerLayout: FOOTER_LAYOUT.COLUMNS,
       footerBackground: BRAND_VARIANT.BRAND_PRIMARY,
       footerSurface: FOOTER_SURFACE.FULL_WIDTH,
@@ -135,6 +139,20 @@ describe(toEffectiveLookWithin, () => {
       faviconAssetUrl: MOCK_FAVICON_ASSET_URL,
     });
   });
+
+  it.each([
+    [TENANT_PLAN.FREE, FREE],
+    [TENANT_PLAN.STARTER, STARTER],
+  ] as const)(
+    'renders Reader chooses on %s whatever colour mode is stored',
+    (_, entitlements) => {
+      const { preset, colorMode } = STORED_LOOK;
+
+      expect(
+        toEffectiveLookWithin({ preset, colorMode }, entitlements),
+      ).toEqual({ preset, colorMode: COLOR_MODE.READER });
+    },
+  );
 
   it('leaves keys outside the Look untouched and adds no missing Look keys', () => {
     const { preset, headingFont } = STORED_LOOK;

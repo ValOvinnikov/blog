@@ -1064,23 +1064,27 @@
         "file": "packages/config/src/constants/nav-link-style.ts"
       }
     ],
-    "NECESSARY": [
+    "READER": [
       {
-        "ref": "CONSENT_CATEGORY.NECESSARY",
+        "ref": "COLOR_MODE.READER",
         "scope": "config",
         "from": "@shinefold/config/constants",
-        "file": "packages/config/src/constants/consent-category.ts"
-      }
-    ],
-    "EXTERNAL_MEDIA": [
+        "file": "packages/config/src/constants/color-mode.ts"
+      },
       {
-        "ref": "CONSENT_CATEGORY.EXTERNAL_MEDIA",
-        "scope": "config",
-        "from": "@shinefold/config/constants",
-        "file": "packages/config/src/constants/consent-category.ts"
+        "ref": "MEMBERSHIP_ROLE.READER",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
       }
     ],
     "LIGHT": [
+      {
+        "ref": "COLOR_MODE.LIGHT",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/color-mode.ts"
+      },
       {
         "ref": "COLOR_SCHEME.LIGHT",
         "scope": "config",
@@ -1102,6 +1106,12 @@
     ],
     "DARK": [
       {
+        "ref": "COLOR_MODE.DARK",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/color-mode.ts"
+      },
+      {
         "ref": "COLOR_SCHEME.DARK",
         "scope": "config",
         "from": "@shinefold/config/constants",
@@ -1118,6 +1128,22 @@
         "scope": "app:platform",
         "from": "@platform/constants/theme",
         "file": "apps/platform/src/constants/theme.ts"
+      }
+    ],
+    "NECESSARY": [
+      {
+        "ref": "CONSENT_CATEGORY.NECESSARY",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/consent-category.ts"
+      }
+    ],
+    "EXTERNAL_MEDIA": [
+      {
+        "ref": "CONSENT_CATEGORY.EXTERNAL_MEDIA",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/consent-category.ts"
       }
     ],
     "TEXT": [
@@ -5490,14 +5516,6 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-owner-access.ts"
-      }
-    ],
-    "READER": [
-      {
-        "ref": "MEMBERSHIP_ROLE.READER",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/membership.ts"
       }
     ],
     "ALREADY_CONSUMED": [
