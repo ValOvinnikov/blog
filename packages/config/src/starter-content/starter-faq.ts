@@ -7,10 +7,10 @@ import type {
 import type { TStarterDocumentUnion, TStarterModule } from './starter-document';
 import type { TStarterDocument } from './starter-document-shape';
 import {
-  keyedReference,
   localizedListedText,
   localizedString,
   moduleHeadingBlock,
+  moduleItemDocuments,
 } from './starter-fields';
 import type { TModuleInput } from './starter-modules';
 
@@ -25,10 +25,13 @@ export function buildFaqModule({
   locale,
   faq: { heading, questions },
 }: TModuleInput & { faq: TFaqCopy }): TStarterDocumentUnion[] {
-  const blocks = questions.map(
-    ({ question, answer }, index) =>
+  const { documents, references } = moduleItemDocuments(
+    id,
+    'Question',
+    questions,
+    ({ question, answer }, itemId) =>
       ({
-        _id: `${id}Question${index + 1}`,
+        _id: itemId,
         _type: 'block_faq',
         title: question,
         question: localizedString(locale, question),
@@ -37,14 +40,14 @@ export function buildFaqModule({
   );
 
   return [
-    ...blocks,
+    ...documents,
     {
       _id: id,
       _type: 'module_faq',
       title,
       brandVariant: BRAND_VARIANT.PRIMARY,
       headingBlock: moduleHeadingBlock(locale, heading),
-      questions: blocks.map(({ _id }) => keyedReference(_id)),
+      questions: references,
     } satisfies TStarterModule<Module_faq>,
   ];
 }

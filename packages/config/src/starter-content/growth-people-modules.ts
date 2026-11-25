@@ -13,10 +13,10 @@ import type {
 import type { TStarterDocumentUnion, TStarterModule } from './starter-document';
 import type { TStarterDocument } from './starter-document-shape';
 import {
-  keyedReference,
   localizedListedText,
   localizedString,
   moduleHeadingBlock,
+  moduleItemDocuments,
 } from './starter-fields';
 import type { TModuleInput } from './starter-modules';
 
@@ -36,10 +36,13 @@ export function buildTestimonialModule({
   locale,
   testimonial: { heading, quotes },
 }: TModuleInput & { testimonial: TTestimonialCopy }): TStarterDocumentUnion[] {
-  const blocks = quotes.map(
-    ({ name, role, quote }, index) =>
+  const { documents, references } = moduleItemDocuments(
+    id,
+    'Quote',
+    quotes,
+    ({ name, role, quote }, itemId) =>
       ({
-        _id: `${id}Quote${index + 1}`,
+        _id: itemId,
         _type: 'block_testimonial',
         title: name,
         name,
@@ -52,14 +55,14 @@ export function buildTestimonialModule({
   );
 
   return [
-    ...blocks,
+    ...documents,
     {
       _id: id,
       _type: 'module_testimonial',
       title,
       brandVariant: BRAND_VARIANT.SECONDARY,
       headingBlock: moduleHeadingBlock(locale, heading),
-      testimonials: blocks.map(({ _id }) => keyedReference(_id)),
+      testimonials: references,
     } satisfies TStarterModule<Module_testimonial>,
   ];
 }
@@ -70,10 +73,13 @@ export function buildTeamModule({
   locale,
   team: { heading, members },
 }: TModuleInput & { team: TTeamCopy }): TStarterDocumentUnion[] {
-  const people = members.map(
-    ({ name, role }, index) =>
+  const { documents, references } = moduleItemDocuments(
+    id,
+    'Member',
+    members,
+    ({ name, role }, itemId) =>
       ({
-        _id: `${id}Member${index + 1}`,
+        _id: itemId,
         _type: 'person',
         name,
         role: localizedString(locale, role),
@@ -81,7 +87,7 @@ export function buildTeamModule({
   );
 
   return [
-    ...people,
+    ...documents,
     {
       _id: id,
       _type: 'module_team',
@@ -90,7 +96,7 @@ export function buildTeamModule({
       headingBlock: moduleHeadingBlock(locale, heading),
       imageShape: CARD_IMAGE_SHAPE.CIRCLE,
       cardAlignment: CONTENT_ALIGNMENT.CENTER,
-      members: people.map(({ _id }) => keyedReference(_id)),
+      members: references,
     } satisfies TStarterModule<Module_team>,
   ];
 }
