@@ -107,7 +107,7 @@ describe(`<${RunContrastCheckButton.name}/>`, () => {
       expect(explanation).toBeVisible();
     });
 
-    it('says the check could not start when the request never reaches the server, and starts it on retry', async () => {
+    it('reports an unreached request and starts the check on retry', async () => {
       startContrastCheckActionMock.mockRejectedValueOnce(
         MOCK_UNREACHED_REQUEST,
       );
