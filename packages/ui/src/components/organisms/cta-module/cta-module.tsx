@@ -1,8 +1,9 @@
+import { Footnote } from '@shinefold/ui/components/atoms/footnote';
+
 import { CtaModuleActions } from './components/actions/cta-module-actions';
 import { CtaModuleBanner } from './components/banner/cta-module-banner';
 import { CtaModuleCallout } from './components/callout/cta-module-callout';
 import { CtaModuleEyebrow } from './components/eyebrow/cta-module-eyebrow';
-import { CtaModuleFootnote } from './components/footnote/cta-module-footnote';
 import { CtaModuleMedia } from './components/media/cta-module-media';
 import { CtaModuleSplit } from './components/split/cta-module-split';
 import { CtaModuleText } from './components/text/cta-module-text';
@@ -19,6 +20,6 @@ export const CtaModule = {
   Eyebrow: CtaModuleEyebrow,
   Text: CtaModuleText,
   Actions: CtaModuleActions,
-  Footnote: CtaModuleFootnote,
+  Footnote,
   Media: CtaModuleMedia,
 };

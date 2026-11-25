@@ -8,6 +8,7 @@ import {
   type TMediaOrder,
 } from '@shinefold/config';
 import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
+import { Footnote } from '@shinefold/ui/components/atoms/footnote';
 import { HERO_TEST_ID } from '@shinefold/ui/constants/hero';
 import {
   mapCompoundSlots,
@@ -30,6 +31,7 @@ const HeroParts = {
   Media: HeroMedia,
   Body: HeroBody,
   Cta: HeroCta,
+  Footnote,
   Social: HeroSocial,
 } satisfies Record<string, ElementType>;
 
@@ -111,6 +113,16 @@ const HeroRoot = ({
             cloneElement(slots.Cta, {
               contentAlignment: resolvedAlignment,
               ...(banner && { className: banner.actions() }),
+            })}
+          {slots.Footnote &&
+            cloneElement(slots.Footnote, {
+              className: s.footnote({
+                class: [
+                  banner?.block(),
+                  banner?.text(),
+                  slots.Footnote.props.className,
+                ],
+              }),
             })}
           {slots.Social &&
             cloneElement(slots.Social, {
