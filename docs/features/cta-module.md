@@ -67,7 +67,7 @@ The same "Actions" building block â€” `ctaButtons`, rendered by `ActionGroup` â€
 ## Entry points
 
 - `packages/studio/src/schema-types/modules/cta/cta.ts`
-- `packages/studio/src/schema-types/objects/cta-button/cta-button.ts`, `fields/cta-buttons-field/cta-buttons-field.ts`, `objects/cta-layout/cta-layout.ts`
+- `packages/studio/src/schema-types/objects/cta-button/cta-button.ts`, `fields/cta-buttons-field/cta-buttons-field.ts`, `fields/footnote-field/footnote-field.ts`, `objects/cta-layout/cta-layout.ts`
 - `packages/service/src/features/modules/cta/adaptor/query.ts`, `transformer.ts`, `loader.ts`
 - `packages/service/src/shared/transformers/cta/to-cta-button.ts`
 - `packages/ui/src/components/organisms/cta-module/cta-module.tsx`, `cta-module-variants.ts`

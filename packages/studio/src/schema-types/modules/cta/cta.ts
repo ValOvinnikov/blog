@@ -9,6 +9,7 @@ import { alignmentFields } from '@shinefold/studio/schema-types/fields/alignment
 import { brandVariantField } from '@shinefold/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { contentPositionFields } from '@shinefold/studio/schema-types/fields/content-position-fields/content-position-fields';
 import { ctaButtonsField } from '@shinefold/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { footnoteField } from '@shinefold/studio/schema-types/fields/footnote-field/footnote-field';
 import { localizedListedTextField } from '@shinefold/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
 import { localizedOneLineTextField } from '@shinefold/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { mediaOrderField } from '@shinefold/studio/schema-types/fields/media-order-field/media-order-field';
@@ -19,12 +20,9 @@ import { ctaLayoutField } from '@shinefold/studio/schema-types/objects/cta-layou
 import { localizedImageWithAltSchema } from '@shinefold/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
-import { validateLocalizedMaxLength } from '@shinefold/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { Megaphone } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
-
-const FOOTNOTE_MAX_LENGTH = 120;
 
 type TCtaParent = { variant?: string; brandVariant?: string };
 
@@ -101,18 +99,7 @@ export const ctaSchema = defineType({
       description: 'Optional longer text below the heading.',
     }),
     ctaButtonsField(),
-    localizedOneLineTextField({
-      name: 'footnote',
-      title: 'Footnote',
-      description: 'Small print below the actions.',
-      validation: (rule) =>
-        rule.custom(
-          validateLocalizedMaxLength(
-            FOOTNOTE_MAX_LENGTH,
-            `Keep each footnote to ${FOOTNOTE_MAX_LENGTH} characters or fewer.`,
-          ),
-        ),
-    }),
+    footnoteField(),
     ...alignmentFields([], {
       hasActions: true,
       allow: Object.values(CONTENT_ALIGNMENT),

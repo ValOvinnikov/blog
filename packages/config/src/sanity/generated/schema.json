@@ -15464,6 +15464,14 @@
         },
         "optional": true
       },
+      "footnote": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "internationalizedArrayString"
+        },
+        "optional": true
+      },
       "contentAlignment": {
         "type": "objectAttribute",
         "value": {
