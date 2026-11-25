@@ -28,6 +28,7 @@ export * from './get-tenant-sanity-write-credentials';
 export * from './list-active-tenants';
 export * from './list-tenants';
 export * from './list-tenants-by-ids';
+export * from './list-tenants-page';
 export * from './list-tenants-due-for-grace-email';
 export * from './list-tenants-due-for-grace-end';
 export * from './list-tenants-due-for-inactivity-stage';
