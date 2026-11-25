@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
 import { env } from '@platform/utils/env/env';
+import { MEDIA_TYPE } from '@shinefold/config';
 
 type TGitHubRoute = [pathPrefix: string, response: (path: string) => Response];
 
@@ -8,14 +10,17 @@ const envMock: Partial<Record<keyof typeof env, string>> = env;
 export const mockGitHubResponse = (body: unknown, status = 200): Response =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': MEDIA_TYPE.JSON },
   });
 
+const GITHUB_API_ORIGIN = 'https://api.github.com';
 const GITHUB_DEFAULT_PER_PAGE = 30;
-const GITHUB_COMPARE_FILE_LIMIT = 300;
+
+const isFirstPage = (path: string): boolean =>
+  Number(new URL(path, GITHUB_API_ORIGIN).searchParams.get('page') ?? 1) === 1;
 
 export const mockGitHubPage = <T>(items: T[], path: string): T[] => {
-  const params = new URL(path, 'https://api.github.com').searchParams;
+  const params = new URL(path, GITHUB_API_ORIGIN).searchParams;
   const perPage = Number(params.get('per_page') ?? GITHUB_DEFAULT_PER_PAGE);
   const page = Number(params.get('page') ?? 1);
   return items.slice((page - 1) * perPage, page * perPage);
@@ -29,7 +34,7 @@ export const mockGitHubCompareResponse = (
   mockGitHubResponse({
     total_commits: commits.length,
     commits: mockGitHubPage(commits, path),
-    files: mockGitHubPage(files.slice(0, GITHUB_COMPARE_FILE_LIMIT), path),
+    files: isFirstPage(path) ? files.slice(0, GITHUB_COMPARE_FILE_LIMIT) : [],
   });
 
 /** Needs `vi.mock('@platform/utils/env/env')` in the calling test file. */
@@ -44,7 +49,7 @@ export const useGitHubFetch = () => {
     fetchMock.mockReset();
     fetchMock.mockImplementation(async (url: string) => {
       const path = url.replace(
-        `https://api.github.com/repos/${owner}/${repo}`,
+        `${GITHUB_API_ORIGIN}/repos/${owner}/${repo}`,
         '',
       );
       const route = routes.find(([prefix]) => path.startsWith(prefix));

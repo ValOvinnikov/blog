@@ -1,8 +1,8 @@
-import { GITHUB_PINNED_READ_REVALIDATE } from '@platform/constants/github';
 import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
 import { okResult } from '@shinefold/utils';
 import { z } from 'zod';
 
+import { cacheGitHubResult } from './cache-github-result';
 import { fetchGitHubJson, type TGitHubResult } from './fetch-github';
 
 const PER_PAGE = 100;
@@ -52,13 +52,7 @@ const fetchComparePage = (
   fetchGitHubJson(
     `/compare/${encodeURIComponent(base)}...${encodeURIComponent(head)}?per_page=${PER_PAGE}&page=${page}`,
     (body) => compareSchema.parse(body),
-    GITHUB_PINNED_READ_REVALIDATE,
   );
-
-const FILE_PAGES = Array.from(
-  { length: GITHUB_COMPARE_FILE_LIMIT / PER_PAGE },
-  (_, index) => index + 1,
-);
 
 const toComparedCommit = ({
   sha,
@@ -70,26 +64,24 @@ const toComparedCommit = ({
   authoredAt: author?.date,
 });
 
-/** Holds at most the newest 100 commits, newest first; `totalCommits` counts every one. */
-export const compareCommits = async (
+const readComparison = async (
   base: string,
   head: string,
 ): Promise<TGitHubResult<TCommitComparison>> => {
   const first = await fetchComparePage(base, head, 1);
   if (!first.ok) return first;
 
-  const { total_commits, files: firstFiles } = first.data;
+  const { total_commits, files } = first.data;
   const lastCommitPage = Math.max(1, Math.ceil(total_commits / PER_PAGE));
-  const filePages = firstFiles.length === PER_PAGE ? FILE_PAGES : [1];
-  const laterPages = [
-    ...new Set([...filePages, lastCommitPage - 1, lastCommitPage]),
-  ].filter((page) => page > 1);
+  const newestPages = [lastCommitPage - 1, lastCommitPage];
 
   const fetched = await Promise.all(
-    laterPages.map(async (page) => ({
-      page,
-      result: await fetchComparePage(base, head, page),
-    })),
+    newestPages
+      .filter((page) => page > 1)
+      .map(async (page) => ({
+        page,
+        result: await fetchComparePage(base, head, page),
+      })),
   );
   const pages = new Map([[1, first.data]]);
   for (const { page, result } of fetched) {
@@ -97,8 +89,7 @@ export const compareCommits = async (
     pages.set(page, result.data);
   }
 
-  const files = filePages.flatMap((page) => pages.get(page)?.files ?? []);
-  const newestCommits = [lastCommitPage - 1, lastCommitPage]
+  const newestCommits = newestPages
     .flatMap((page) => pages.get(page)?.commits ?? [])
     .slice(-PER_PAGE)
     .reverse();
@@ -110,3 +101,8 @@ export const compareCommits = async (
     isFileListTruncated: files.length >= GITHUB_COMPARE_FILE_LIMIT,
   });
 };
+
+/** Holds at most the newest 100 commits, newest first; `totalCommits` counts every one. */
+export const compareCommits = cacheGitHubResult(readComparison, [
+  'github-compare',
+]);

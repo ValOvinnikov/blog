@@ -1,26 +1,17 @@
-import { Alert } from '@platform/components/shared/alert';
+import { DetailCardSkeleton } from '@platform/components/shared/detail-card-skeleton';
 import { PageHeader } from '@platform/components/shared/page-header';
-import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
 import type { TReleaseCandidate } from '@platform/server/releases/get-release-candidate';
 import type { TReleaseRun } from '@platform/server/releases/get-release-run';
 import type { TFailedMigrationTenant } from '@platform/server/releases/list-failed-migration-tenants';
 import type { TReleaseResult } from '@platform/server/releases/release-result';
-import { isReleaseOverrideRequired } from '@platform/utils/release-state/release-state';
 import { tv } from '@platform/utils/tv/tv';
-import {
-  ALERT_TYPE,
-  RELEASE_CHANGE,
-  type TMaybeUndefined,
-} from '@shinefold/config';
+import type { TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
+import { Suspense } from 'react';
 
-import { ReleaseAreasCard } from './components/release-areas-card/release-areas-card';
-import { ReleaseCard } from './components/release-card/release-card';
-import { ReleaseCommits } from './components/release-commits/release-commits';
-import { ReleaseContrastCard } from './components/release-contrast-card/release-contrast-card';
-import { ReleaseSummaryCard } from './components/release-summary-card/release-summary-card';
-import { ReleaseUnavailable } from './components/release-unavailable/release-unavailable';
-import { TenantMigrationsCard } from './components/tenant-migrations-card/tenant-migrations-card';
+import { FailedMigrationsLoader } from './components/failed-migrations-loader/failed-migrations-loader';
+import { ReleaseCandidateLoader } from './components/release-candidate-loader/release-candidate-loader';
+import { ReleaseCandidateSkeleton } from './components/release-candidate-skeleton/release-candidate-skeleton';
 
 const releasesViewVariants = tv({
   slots: {
@@ -29,79 +20,31 @@ const releasesViewVariants = tv({
 });
 
 export type TReleasesViewProps = {
-  result: TReleaseResult<TReleaseCandidate>;
-  releaseRun: TReleaseResult<TMaybeUndefined<TReleaseRun>>;
-  failedMigrationTenants: TReleaseResult<TFailedMigrationTenant[]>;
+  resultPromise: Promise<TReleaseResult<TReleaseCandidate>>;
+  releaseRunPromise: Promise<TReleaseResult<TMaybeUndefined<TReleaseRun>>>;
+  failedTenantsPromise: Promise<TReleaseResult<TFailedMigrationTenant[]>>;
 };
 
 export const ReleasesView = ({
-  result,
-  releaseRun,
-  failedMigrationTenants,
+  resultPromise,
+  releaseRunPromise,
+  failedTenantsPromise,
 }: TReleasesViewProps) => {
   const t = useTranslations('releasesView');
   const { root } = releasesViewVariants();
 
-  if (!result.ok) {
-    return (
-      <div className={root()}>
-        <PageHeader title={t('title')} description={t('description')} />
-        <ReleaseUnavailable reason={result.error} />
-      </div>
-    );
-  }
-
-  const {
-    headSha,
-    lastTag,
-    commits,
-    totalCommits,
-    isFileListTruncated,
-    changes,
-    migrations,
-    contrastStatus,
-  } = result.data;
-
   return (
     <div className={root()}>
       <PageHeader title={t('title')} description={t('description')} />
-      <ReleaseSummaryCard
-        lastTag={lastTag}
-        headSha={headSha}
-        totalCommits={totalCommits}
-      />
-      {isFileListTruncated && (
-        <Alert
-          type={ALERT_TYPE.WARNING}
-          title={t('incompleteTitle')}
-          description={t('incompleteDescription', {
-            limit: GITHUB_COMPARE_FILE_LIMIT,
-          })}
+      <Suspense fallback={<ReleaseCandidateSkeleton />}>
+        <ReleaseCandidateLoader
+          resultPromise={resultPromise}
+          releaseRunPromise={releaseRunPromise}
         />
-      )}
-      <ReleaseCommits
-        commits={commits}
-        totalCommits={totalCommits}
-        lastTag={lastTag}
-      />
-      {totalCommits > 0 && (
-        <>
-          <ReleaseAreasCard changes={changes} migrations={migrations} />
-          <ReleaseContrastCard status={contrastStatus} />
-        </>
-      )}
-      <ReleaseCard
-        headSha={headSha}
-        lastTag={lastTag}
-        hasChanges={totalCommits > 0}
-        migrations={migrations}
-        isOverrideRequired={isReleaseOverrideRequired({
-          isRenderingChanged: changes[RELEASE_CHANGE.RENDERING],
-          contrastStatus,
-        })}
-        releaseRun={releaseRun}
-      />
-      <TenantMigrationsCard failedTenants={failedMigrationTenants} />
+      </Suspense>
+      <Suspense fallback={<DetailCardSkeleton rowCount={1} />}>
+        <FailedMigrationsLoader failedTenantsPromise={failedTenantsPromise} />
+      </Suspense>
     </div>
   );
 };

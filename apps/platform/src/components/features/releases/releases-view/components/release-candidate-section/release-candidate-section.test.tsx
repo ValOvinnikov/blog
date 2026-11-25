@@ -11,7 +11,7 @@ import { RELEASE_CHANGE } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
-import { ReleasesView } from './releases-view';
+import { ReleaseCandidateSection } from './release-candidate-section';
 
 const RUN_CONTRAST_CHECK = { name: 'Run contrast check' };
 
@@ -39,13 +39,12 @@ const ALL_CHANGED = {
   [RELEASE_CHANGE.ENV]: true,
 };
 
-const setup = customRender(ReleasesView, {
+const setup = customRender(ReleaseCandidateSection, {
   result: okResult(mockReleaseCandidate()),
   releaseRun: okResult(),
-  failedMigrationTenants: okResult([]),
 });
 
-describe(`<${ReleasesView.name}/>`, () => {
+describe(`<${ReleaseCandidateSection.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {
@@ -57,13 +56,11 @@ describe(`<${ReleasesView.name}/>`, () => {
       result: okResult(mockReleaseCandidate({ changes: RENDERING_CHANGED })),
     });
 
-    const heading = screen.getByRole('heading', { name: 'Releases' });
     const lastTag = screen.getByText(MOCK_LAST_TAG);
     const commit = screen.getByText(MOCK_COMMIT_SUBJECT);
     const touched = screen.getByText('Touched');
     const notTouched = screen.getAllByText('Not touched');
 
-    expect(heading).toBeVisible();
     expect(lastTag).toBeVisible();
     expect(commit).toBeVisible();
     expect(touched).toBeVisible();
