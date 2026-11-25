@@ -81,5 +81,8 @@ export const mockPlatformAdminsDb = async () => ({
       })),
       cancelAdminInvite: vi.fn(async () => true),
     },
+    users: {
+      deleteUserSessions: vi.fn(async () => 1),
+    },
   },
 });

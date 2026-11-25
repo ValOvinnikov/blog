@@ -17,6 +17,8 @@ const { listOpenFindingsMock } = vi.hoisted(() => ({
   listOpenFindingsMock: vi.fn(),
 }));
 
+vi.mock('@platform/server/auth/require-admin');
+
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {

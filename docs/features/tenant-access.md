@@ -64,7 +64,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
     This tree hides the Platform nav, so an owner never sees that the platform has other tenants.
 - **Tenant switching.** `GET /api/dashboard/select-tenant?tenantId=` sets the active-tenant cookie (httpOnly, 30 days) after checking access, and 404s otherwise. The tenant switcher in the shell only appears for users with more than one tenant.
 - **Signup blocklist.** `/blocked-signups` in the `(operator)` group lists every blocked identity: its kind, the domain or the first characters of an address hash, the reason, who added it and when. A SUPERADMIN can add a domain there and remove any entry. The Suspend dialog on a tenant can also block that tenant's owner email, with a reason. The nav entry shows for SUPERADMINs only, and owners never see the list.
-- **Admins page.** `/admins` in the `(operator)` group lists every admin (name, email, role, granted date) and every admin invite (email, role, invited date, Pending or Expired). A SUPERADMIN invites an address as Admin or Super admin there; Moderator is not offered, and an action called with it is refused. Each invite row can be resent, which sends the email again and restarts its 7 days, or cancelled. Every admin row but the viewer's own offers Remove, which takes access away on the next request; removing the last SUPERADMIN is refused. The nav entry shows for SUPERADMINs only.
+- **Admins page.** `/admins` in the `(operator)` group lists every admin (name, email, role, granted date) and every admin invite (email, role, invited date, Pending or Expired). A SUPERADMIN invites an address as Admin or Super admin there; Moderator is not offered, and an action called with it is refused. Each invite row can be resent, which sends the email again and restarts its 7 days, or cancelled. Every admin row but the viewer's own offers Remove, which takes access away on the next request and deletes every session the removed user holds, signing them out of the platform and any site dashboard; removing the last SUPERADMIN is refused. A failed session delete is logged as `platform_admin.remove_sessions_failed`, and the removal still succeeds. The nav entry shows for SUPERADMINs only.
 - **Home link.** The home link from a dead end goes to `/tenants` for an admin, `/dashboard` for any other signed-in user, and sign-in otherwise.
 
 ## Data
@@ -114,7 +114,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 ## Constraints and invariants
 
 - **Each gate is the layout of its tree**, never a check inside a page, except `/danger`, whose page calls `requireSuperAdmin`.
-  - `requireAdmin` guards `(operator)`.
+  - `requireAdmin` guards `(operator)`, in its layout and again in every page: client-side navigation keeps the layout without re-running it, so a page relying on the layout alone would still load for a removed admin. `pages.test.ts` beside the layout fails for any page that skips its own check.
   - `requireTenantById` guards `/tenants/{id}`.
   - `listSessionTenants` and `resolveDashboardTenant` guard `/dashboard`.
 - **Server Actions call a gate themselves.**

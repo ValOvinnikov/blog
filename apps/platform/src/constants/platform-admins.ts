@@ -45,4 +45,5 @@ export const PLATFORM_ADMIN_LOG = {
   CANCEL_AUDIT_FAILED: 'platform_admin.cancel_audit_failed',
   REMOVE_FAILED: 'platform_admin.remove_failed',
   REMOVE_AUDIT_FAILED: 'platform_admin.remove_audit_failed',
+  REMOVE_SESSIONS_FAILED: 'platform_admin.remove_sessions_failed',
 } as const;

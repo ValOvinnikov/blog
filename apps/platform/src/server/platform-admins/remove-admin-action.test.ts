@@ -35,6 +35,7 @@ vi.mock('@shinefold/db', async () =>
 );
 
 const deleteAdmin = vi.mocked(queries.admins.deleteAdmin);
+const deleteUserSessions = vi.mocked(queries.users.deleteUserSessions);
 
 describe(removeAdminAction, () => {
   it('removes the admin and audits it with their role and user', async () => {
@@ -42,6 +43,9 @@ describe(removeAdminAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(deleteAdmin).toHaveBeenCalledExactlyOnceWith(MOCK_LISTED_ADMIN_ID);
+    expect(deleteUserSessions).toHaveBeenCalledExactlyOnceWith(
+      MOCK_LISTED_ADMIN_USER_ID,
+    );
     expect(recordAuditEvent).toHaveBeenCalledExactlyOnceWith({
       logEvent: PLATFORM_ADMIN_LOG.REMOVE_AUDIT_FAILED,
       action: AUDIT_ACTION.ADMIN_REMOVED,
@@ -86,6 +90,20 @@ describe(removeAdminAction, () => {
       reason: PLATFORM_ADMIN_REFUSAL.LAST_SUPERADMIN,
     });
     expect(recordAuditEvent).not.toHaveBeenCalled();
+    expect(deleteUserSessions).not.toHaveBeenCalled();
+  });
+
+  it('still removes and audits the admin when ending their sessions fails, and logs it', async () => {
+    deleteUserSessions.mockRejectedValueOnce(MOCK_NETWORK_ERROR);
+
+    const result = await removeAdminAction(MOCK_LISTED_ADMIN_ID);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(recordAuditEvent).toHaveBeenCalledOnce();
+    expect(logger.error).toHaveBeenCalledExactlyOnceWith(
+      PLATFORM_ADMIN_LOG.REMOVE_SESSIONS_FAILED,
+      { adminId: MOCK_LISTED_ADMIN_ID, errorName: MOCK_NETWORK_ERROR.name },
+    );
   });
 
   it.each([
