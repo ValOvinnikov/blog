@@ -1,3 +1,4 @@
+import { GITHUB_CACHE_KEY } from '@platform/constants/github';
 import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
 import { okResult } from '@shinefold/utils';
 import { z } from 'zod';
@@ -64,9 +65,10 @@ const toComparedCommit = ({
   authoredAt: author?.date,
 });
 
+type TComparisonArgs = [base: string, head: string, baseId: string];
+
 const readComparison = async (
-  base: string,
-  head: string,
+  ...[base, head]: TComparisonArgs
 ): Promise<TGitHubResult<TCommitComparison>> => {
   const first = await fetchComparePage(base, head, 1);
   if (!first.ok) return first;
@@ -102,7 +104,18 @@ const readComparison = async (
   });
 };
 
-/** Holds at most the newest 100 commits, newest first; `totalCommits` counts every one. */
-export const compareCommits = cacheGitHubResult(readComparison, [
-  'github-compare',
-]);
+// Bump when TCommitComparison or the page maths changes: stored entries outlive deployments.
+const COMPARISON_CACHE_VERSION = 1;
+
+const compareCommitsCached = cacheGitHubResult(readComparison, {
+  key: GITHUB_CACHE_KEY.COMPARISON,
+  version: COMPARISON_CACHE_VERSION,
+});
+
+/** `baseId` keys the cache, so a ref that can be repointed passes the SHA it currently names. */
+export const compareCommits = (
+  base: string,
+  head: string,
+  baseId: string = base,
+): Promise<TGitHubResult<TCommitComparison>> =>
+  compareCommitsCached(base, head, baseId);

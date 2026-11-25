@@ -4,6 +4,7 @@ import { CONTRAST_WORKFLOW_FILE } from '@platform/constants/release';
 import {
   MOCK_GITHUB_MAIN_BRANCH_PATH,
   MOCK_GITHUB_RELEASE_TAGS_PATH,
+  mockGitHubTagRef,
 } from '@platform/testing/github/fixtures';
 import {
   mockGitHubCompareResponse,
@@ -24,7 +25,7 @@ export const respondWithDueContrastCheck = (
   const headSha = faker.git.commitSha();
 
   github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
-    mockGitHubResponse([{ ref: `refs/tags/${MOCK_LAST_RELEASE_TAG}` }]),
+    mockGitHubResponse([mockGitHubTagRef(MOCK_LAST_RELEASE_TAG)]),
   );
   github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
     mockGitHubResponse({ commit: { sha: headSha } }),

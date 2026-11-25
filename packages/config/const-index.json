@@ -8280,6 +8280,14 @@
         "file": "apps/platform/src/constants/github.ts"
       }
     ],
+    "COMPARISON": [
+      {
+        "ref": "GITHUB_CACHE_KEY.COMPARISON",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
     "added": [
       {
         "ref": "GITHUB_FILE_STATUS.ADDED",

@@ -4,6 +4,7 @@ import {
   MOCK_GITHUB_MAIN_BRANCH_PATH,
   MOCK_GITHUB_RELEASE_TAGS_PATH,
   mockChangedFile,
+  mockGitHubTagRef,
 } from '@platform/testing/github/fixtures';
 import {
   mockGitHubCompareResponse,
@@ -53,7 +54,7 @@ describe(isContrastDue, () => {
   beforeEach(() => {
     headSha = faker.git.commitSha();
     github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
-      mockGitHubResponse([{ ref: `refs/tags/${MOCK_RELEASE_LAST_TAG}` }]),
+      mockGitHubResponse([mockGitHubTagRef(MOCK_RELEASE_LAST_TAG)]),
     );
     github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
       mockGitHubResponse({ commit: { sha: headSha } }),

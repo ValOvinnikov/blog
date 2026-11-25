@@ -18,28 +18,42 @@ const TAG_PAGE_SIZE = 100;
 
 const MAX_TAG_PAGES = 10;
 
-const tagRefsSchema = z.array(z.object({ ref: z.string() }));
+const tagRefsSchema = z.array(
+  z.object({ ref: z.string(), object: z.object({ sha: z.string() }) }),
+);
+
+export type TReleaseTag = {
+  name: string;
+  sha: string;
+};
 
 /** A list still full at the page cap is `TAG_LIST_INCOMPLETE`, never a read of a different latest tag. */
 export type TLatestReleaseTagResult = TResult<
-  TMaybeUndefined<string>,
+  TMaybeUndefined<TReleaseTag>,
   TGitHubFailure | typeof RELEASE_FAILURE.TAG_LIST_INCOMPLETE
 >;
 
-const listReleaseTagRefs = async (): Promise<
-  TResult<string[], TGitHubFailure | typeof RELEASE_FAILURE.TAG_LIST_INCOMPLETE>
+const listReleaseTags = async (): Promise<
+  TResult<
+    TReleaseTag[],
+    TGitHubFailure | typeof RELEASE_FAILURE.TAG_LIST_INCOMPLETE
+  >
 > => {
-  const refs: string[] = [];
+  const tags: TReleaseTag[] = [];
 
   for (let page = 1; page <= MAX_TAG_PAGES; page += 1) {
     const result = await fetchGitHubJson(
       `/git/matching-refs/tags/v?per_page=${TAG_PAGE_SIZE}&page=${page}`,
-      (body) => tagRefsSchema.parse(body).map(({ ref }) => ref),
+      (body) =>
+        tagRefsSchema.parse(body).map(({ ref, object }) => ({
+          name: ref.slice(TAG_REF_PREFIX.length),
+          sha: object.sha,
+        })),
     );
     if (!result.ok) return result;
 
-    refs.push(...result.data);
-    if (result.data.length < TAG_PAGE_SIZE) return okResult(refs);
+    tags.push(...result.data);
+    if (result.data.length < TAG_PAGE_SIZE) return okResult(tags);
   }
 
   logger.warn(GITHUB_LOG.TAG_LIST_INCOMPLETE, { pageCap: MAX_TAG_PAGES });
@@ -48,15 +62,16 @@ const listReleaseTagRefs = async (): Promise<
 
 export const getLatestReleaseTag =
   async (): Promise<TLatestReleaseTagResult> => {
-    const result = await listReleaseTagRefs();
+    const result = await listReleaseTags();
     if (!result.ok) return result;
 
     const latest = result.data
-      .map((ref) => ref.slice(TAG_REF_PREFIX.length))
-      .filter((tag) => !isNull(parseReleaseVersion(tag)))
-      .reduce<TMaybeUndefined<string>>(
+      .filter(({ name }) => !isNull(parseReleaseVersion(name)))
+      .reduce<TMaybeUndefined<TReleaseTag>>(
         (greatest, tag) =>
-          !greatest || isReleaseVersionGreater(tag, greatest) ? tag : greatest,
+          !greatest || isReleaseVersionGreater(tag.name, greatest.name)
+            ? tag
+            : greatest,
         undefined,
       );
 
