@@ -1,4 +1,5 @@
 import {
+  COLOR_SCHEME,
   DENSITY,
   FONT_CHOICE,
   LOCALE_BCP47_TAGS,
@@ -15,6 +16,7 @@ import {
   getRequestContext,
 } from '@web/server/request-context/request-context';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
+import { getLockedColorScheme } from '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme';
 import { mockRouteParams } from '@web/testing/app/route-params';
 import {
   MOCK_REQUEST_CONTEXT,
@@ -40,6 +42,10 @@ const { getThemeTokensMock, isProductionEnvironmentMock } = vi.hoisted(() => ({
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
+
+vi.mock(
+  '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme',
+);
 
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
@@ -173,6 +179,15 @@ describe(`<${LocaleLayout.name}/>`, () => {
     await renderLayout();
 
     expect(getThemeTokensMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+  });
+
+  it("locks the document to the tenant's colour scheme", async () => {
+    vi.mocked(getLockedColorScheme).mockResolvedValueOnce(COLOR_SCHEME.DARK);
+
+    const document = await renderLayout();
+
+    expect(document.props.lockedColorScheme).toBe(COLOR_SCHEME.DARK);
+    expect(getLockedColorScheme).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('composes providers around header, content and footer, with analytics', async () => {

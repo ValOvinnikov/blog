@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
   ACCOUNT_PHONE_PLACEMENT,
   BRAND_VARIANT,
+  COLOR_SCHEME,
   LOCALE_ISO_CODES,
   SITE_MESSAGES,
 } from '@shinefold/config';
@@ -21,6 +22,7 @@ import { getAccountControl } from '@web/server/site-config/get-account-control/g
 import { getBrandLogos } from '@web/server/site-config/get-brand-logos/get-brand-logos';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
+import { getLockedColorScheme } from '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_SITE_OAUTH_CREDENTIALS } from '@web/testing/server/auth/site-oauth-credentials-fixtures';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
@@ -76,6 +78,10 @@ vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 vi.mock('@web/server/site-config/get-header-style/get-header-style');
 
 vi.mock(
+  '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme',
+);
+
+vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
 );
 
@@ -119,6 +125,7 @@ const MOCK_READER = {
 const setup = customRenderAsync(SiteHeader, {});
 
 const TOGGLE_NAVIGATION_MENU = 'Toggle navigation menu';
+const THEME_TOGGLE_NAME = /Switch to/;
 const DISCLOSURE_SUMMARY_SELECTOR = 'details > summary';
 const LANGUAGE_ENGLISH = 'Language: English';
 const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
@@ -295,7 +302,7 @@ describe(`<${SiteHeader.name}/>`, () => {
         name: LANGUAGE_ENGLISH,
       });
       const switchToButton = within(panelRow).getByRole('button', {
-        name: /Switch to/,
+        name: THEME_TOGGLE_NAME,
       });
       const panelSignInButton = within(panelRow).queryByRole('button', {
         name: SIGN_IN,
@@ -326,6 +333,54 @@ describe(`<${SiteHeader.name}/>`, () => {
       expect(menus).toHaveLength(0);
       expect(signInDialog).toBeVisible();
     });
+  });
+
+  describe.each([COLOR_SCHEME.DARK, COLOR_SCHEME.LIGHT])(
+    'on a site locked to %s',
+    (lockedColorScheme) => {
+      beforeEach(() => {
+        vi.mocked(getLockedColorScheme).mockResolvedValueOnce(
+          lockedColorScheme,
+        );
+      });
+
+      it('offers no theme toggle in the bar', async () => {
+        await setup();
+
+        const toggle = screen.queryByRole('button', {
+          name: THEME_TOGGLE_NAME,
+        });
+
+        expect(toggle).not.toBeInTheDocument();
+      });
+
+      it('offers no theme toggle beside the language pill in the phone menu', async () => {
+        getRequestContextMock.mockResolvedValueOnce({
+          ...MOCK_REQUEST_CONTEXT,
+          liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+        });
+        getNavigationMock.mockResolvedValue(
+          okResult({ items: [], showLanguageSwitcher: true }),
+        );
+        await setup();
+        await openPhoneMenu();
+
+        const panelRow = screen.getByTestId(PANEL_ACTIONS_TEST_ID);
+        const toggle = within(panelRow).queryByRole('button', {
+          name: THEME_TOGGLE_NAME,
+        });
+
+        expect(toggle).not.toBeInTheDocument();
+      });
+    },
+  );
+
+  it('offers the theme toggle in the bar on a site the reader chooses', async () => {
+    await setup();
+
+    const toggle = screen.getByRole('button', { name: THEME_TOGGLE_NAME });
+
+    expect(toggle).toBeVisible();
   });
 
   describe('with the account in the bar on phones', () => {

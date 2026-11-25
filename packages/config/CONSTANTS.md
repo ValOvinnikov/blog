@@ -1178,7 +1178,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/site-config` — `apps/web/src/constants/site-config.ts`
 
-- **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `BRAND_NAME_FETCH_FAILED`=`"brand_name.site_config_fetch_failed"`, `BRAND_LOGO_FETCH_FAILED`=`"brand_logo.site_config_fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `ANALYTICS_FETCH_FAILED`=`"site_config.analytics_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`
+- **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `BRAND_NAME_FETCH_FAILED`=`"brand_name.site_config_fetch_failed"`, `BRAND_LOGO_FETCH_FAILED`=`"brand_logo.site_config_fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `ANALYTICS_FETCH_FAILED`=`"site_config.analytics_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`, `COLOR_MODE_FETCH_FAILED`=`"color_mode.site_config_fetch_failed"`
 
 ### `@web/constants/sitemap` — `apps/web/src/constants/sitemap.ts`
 
