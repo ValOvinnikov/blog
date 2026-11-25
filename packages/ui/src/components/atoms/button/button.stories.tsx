@@ -157,14 +157,18 @@ const ButtonColor = ({ color }: { color: string }) => (
   </div>
 );
 
+const IN_OWN_IFRAME = { docs: { story: { inline: false } } };
+
 export const BrightButtonColor: TStory = {
   name: 'Bright button colour on every band, light and dark',
   render: () => <ButtonColor color={MOCK_YELLOW_HEX} />,
+  parameters: IN_OWN_IFRAME,
 };
 
 export const DeepButtonColor: TStory = {
   name: 'Deep button colour on every band, light and dark',
   render: () => <ButtonColor color={MOCK_BLACK_HEX} />,
+  parameters: IN_OWN_IFRAME,
 };
 
 export const Busy: TStory = {
