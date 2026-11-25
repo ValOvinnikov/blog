@@ -1,4 +1,5 @@
 import {
+  COLOR_MODE,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
@@ -69,6 +70,7 @@ describe(defaultLookFormValues, () => {
       footerSurface,
       cookieSettingsButton,
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
+      colorMode: COLOR_MODE.READER,
       brandName: '',
       logo: { url: undefined },
       logoDark: { url: undefined },

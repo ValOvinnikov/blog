@@ -6,7 +6,7 @@ import {
   mockSiteConfig,
 } from '@platform/testing/site-config/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
-import { HUE_MAX, HUE_MIN } from '@shinefold/config';
+import { COLOR_MODE, HUE_MAX, HUE_MIN } from '@shinefold/config';
 
 import {
   lookFormValuesOrDefaults,
@@ -19,6 +19,7 @@ const MOCK_BRAND_NAME = faker.company.name();
 
 const MOCK_SITE_CONFIG = mockSiteConfig({
   logoHue: faker.number.int({ min: HUE_MIN, max: HUE_MAX }),
+  colorMode: COLOR_MODE.DARK,
   brandName: MOCK_BRAND_NAME,
   logoAssetUrl: MOCK_LOGO_URL,
   logoDarkAssetUrl: MOCK_LOGO_DARK_URL,
@@ -51,6 +52,7 @@ describe(toLookFormValues, () => {
       headingCase: MOCK_SITE_CONFIG.headingCase,
       imageProportion: MOCK_SITE_CONFIG.imageProportion,
       dividerWidth: MOCK_SITE_CONFIG.dividerWidth,
+      colorMode: COLOR_MODE.DARK,
       accountButtonStyle: MOCK_SITE_CONFIG.accountButtonStyle,
       accountPanelStyle: MOCK_SITE_CONFIG.accountPanelStyle,
       accountPhonePlacement: MOCK_SITE_CONFIG.accountPhonePlacement,

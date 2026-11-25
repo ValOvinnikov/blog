@@ -26,7 +26,7 @@ export type TSampleHeaderControlsProps = IWithClassName & {
 
 export const SampleHeaderControls = ({
   liveLocales,
-  header: { layout, languageSwitcherStyle, account },
+  header: { layout, languageSwitcherStyle, account, hasThemeToggle },
   reader,
   isDark,
   shouldAlwaysShowLanguageSwitcher,
@@ -43,13 +43,15 @@ export const SampleHeaderControls = ({
         switcherStyle={languageSwitcherStyle}
         isAlwaysShown={shouldAlwaysShowLanguageSwitcher}
       />
-      <ThemeToggle
-        isDark={isDark}
-        onToggle={() => undefined}
-        lightLabel={t('themeToggleLight')}
-        darkLabel={t('themeToggleDark')}
-        className={themeToggle()}
-      />
+      {hasThemeToggle && (
+        <ThemeToggle
+          isDark={isDark}
+          onToggle={() => undefined}
+          lightLabel={t('themeToggleLight')}
+          darkLabel={t('themeToggleDark')}
+          className={themeToggle()}
+        />
+      )}
       {reader.hasAccounts && (
         <SampleAccountControl
           account={account}

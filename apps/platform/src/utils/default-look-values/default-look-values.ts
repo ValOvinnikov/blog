@@ -1,5 +1,6 @@
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import {
+  COLOR_MODE,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   type TAccountButtonStyle,
@@ -9,6 +10,7 @@ import {
   type TBusyButtonStyle,
   type TButtonShape,
   type TCardStyle,
+  type TColorMode,
   type TCookieSettingsButton,
   type TDensity,
   type TDividerWidth,
@@ -53,6 +55,7 @@ export type TLookFormValues = {
   headingCase: THeadingCase;
   imageProportion: TImageProportion;
   dividerWidth: TDividerWidth;
+  colorMode: TColorMode;
   accountButtonStyle: TAccountButtonStyle;
   accountPanelStyle: TAccountPanelStyle;
   accountPhonePlacement: TAccountPhonePlacement;
@@ -80,6 +83,7 @@ export const defaultLookFormValues = (): TLookFormValues => ({
   ...presetSiteConfig(PRESET_ID.CONSOLE),
   logoHue: undefined,
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
+  colorMode: COLOR_MODE.READER,
   brandName: '',
   logo: { url: undefined },
   logoDark: { url: undefined },

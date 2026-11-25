@@ -15,6 +15,7 @@ export const buildLookRowSummaries = (
   const {
     accentHue,
     logoHue,
+    colorMode,
     logo,
     logoDark,
     favicon,
@@ -45,6 +46,7 @@ export const buildLookRowSummaries = (
       isUndefined(logoHue)
         ? t('summaryLogoFollowsAccent')
         : t('summaryLogoHue', { hue: logoHue }),
+      t(`colorModeOptionLabel.${colorMode}`),
     ]),
     [LOOK_ROW.BRAND]: join([
       t(isUndefined(logo.url) ? 'summaryNoLogo' : 'summaryLogoUploaded'),

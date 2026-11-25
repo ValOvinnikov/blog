@@ -24,6 +24,7 @@ export const toUpdateLookInput = (
   headingCase: values.headingCase,
   imageProportion: values.imageProportion,
   dividerWidth: values.dividerWidth,
+  colorMode: values.colorMode,
   accountButtonStyle: values.accountButtonStyle,
   accountPanelStyle: values.accountPanelStyle,
   accountPhonePlacement: values.accountPhonePlacement,

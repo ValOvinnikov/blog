@@ -22,4 +22,5 @@ export const MOCK_SAMPLE_HEADER_STYLE: TSampleHeaderStyle = {
     panelStyle: ACCOUNT_PANEL_STYLE.CARD,
     phonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
   },
+  hasThemeToggle: true,
 };

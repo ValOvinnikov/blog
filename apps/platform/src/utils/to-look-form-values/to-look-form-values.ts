@@ -29,6 +29,7 @@ export const toLookFormValues = (
     headingCase: siteConfig.headingCase,
     imageProportion: siteConfig.imageProportion,
     dividerWidth: siteConfig.dividerWidth,
+    colorMode: siteConfig.colorMode,
     accountButtonStyle: siteConfig.accountButtonStyle,
     accountPanelStyle: siteConfig.accountPanelStyle,
     accountPhonePlacement: siteConfig.accountPhonePlacement,
