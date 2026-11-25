@@ -9124,6 +9124,14 @@
         "file": "apps/platform/src/constants/platform-admins.ts"
       }
     ],
+    "platform_admin.remove_sessions_failed": [
+      {
+        "ref": "PLATFORM_ADMIN_LOG.REMOVE_SESSIONS_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/platform-admins",
+        "file": "apps/platform/src/constants/platform-admins.ts"
+      }
+    ],
     "ROWS": [
       {
         "ref": "PRESET_LIST_LAYOUT.ROWS",

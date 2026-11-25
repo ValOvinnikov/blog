@@ -1,4 +1,5 @@
 import { TenantsView } from '@platform/components/features/tenants/tenants-view';
+import { requireAdmin } from '@platform/server/auth/require-admin';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { toPlatformTenantSummary } from '@platform/utils/platform-tenant/platform-tenant';
@@ -20,6 +21,8 @@ type TProps = {
 };
 
 export default async function TenantsPage({ searchParams }: TProps) {
+  await requireAdmin();
+
   const listQuery = parseTenantsListQuery(await searchParams);
   const { shouldShowArchived, sort, search } = listQuery;
 

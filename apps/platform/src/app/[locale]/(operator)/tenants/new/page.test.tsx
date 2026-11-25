@@ -1,7 +1,9 @@
-import { customRender, screen } from '@platform/testing/custom-render';
+import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 
 import NewTenantPage from './page';
+
+vi.mock('@platform/server/auth/require-admin');
 
 vi.mock('@platform/utils/env/env');
 
@@ -11,11 +13,11 @@ vi.mock('@platform/server/tenants/create-tenant-action', () => ({
 
 const t = makeEnTranslator('addTenantWizard');
 
-const setup = customRender(NewTenantPage, {});
+const setup = customRenderAsync(NewTenantPage, {});
 
 describe(`<${NewTenantPage.name}/>`, () => {
-  it('opens the add-tenant wizard', () => {
-    setup();
+  it('opens the add-tenant wizard', async () => {
+    await setup();
 
     const pageHeading = screen.getByRole('heading', {
       level: 1,

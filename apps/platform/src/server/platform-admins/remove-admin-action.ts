@@ -24,6 +24,20 @@ import { toOutcome } from '@shinefold/utils/to-outcome';
 
 import { platformAdminTargetIdSchema } from './admin-invite-input';
 
+const endRemovedAdminSessions = async (
+  adminId: string,
+  userId: string,
+): Promise<void> => {
+  try {
+    await queries.users.deleteUserSessions(userId);
+  } catch (error) {
+    logger.error(PLATFORM_ADMIN_LOG.REMOVE_SESSIONS_FAILED, {
+      adminId,
+      ...toLoggableError(error),
+    });
+  }
+};
+
 export const removeAdminAction = async (
   adminId: string,
 ): Promise<TRefusalResult<TPlatformAdminRefusal>> => {
@@ -50,6 +64,7 @@ export const removeAdminAction = async (
     }
 
     const { role, userId } = removed;
+    await endRemovedAdminSessions(adminId, userId);
     await recordAuditEvent({
       logEvent: PLATFORM_ADMIN_LOG.REMOVE_AUDIT_FAILED,
       action: AUDIT_ACTION.ADMIN_REMOVED,

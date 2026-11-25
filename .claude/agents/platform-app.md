@@ -454,7 +454,9 @@ Run once, after all work is complete:
 - `pnpm --filter platform type-check`, `lint` and `test` pass. `build` runs in
   CI (`ci.yml`), not in local verify.
 - No Sanity, Drizzle/Neon or SQL; no edit outside `apps/platform`.
-- Every route under a gated segment is gated; every Server Action validates its
+- Every page under a gated segment calls its gate itself — client-side
+  navigation keeps a layout without re-running it, so a layout gate alone
+  does not protect a page; every Server Action validates its
   input and re-checks authorization.
 - Every new operator-initiated lifecycle mutation records an audit event, or
   the report says why it doesn't.
