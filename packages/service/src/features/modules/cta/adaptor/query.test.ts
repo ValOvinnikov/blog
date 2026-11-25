@@ -12,7 +12,7 @@ import {
   mockLocalizedListedText,
   mockLocalizedStrings,
   mockLocalizedValues,
-  mockParagraphBlocks,
+  mockRawModuleHeadingBlock,
 } from '@shinefold/service/testing/shared/localized';
 
 import { ctaModuleQuery } from './query';
@@ -99,10 +99,9 @@ describe('ctaModuleQuery', () => {
 
     expect(cta).toMatchObject({
       eyebrow: copy.eyebrow,
-      headingBlock: {
-        heading: mockParagraphBlocks(copy.heading),
+      headingBlock: mockRawModuleHeadingBlock(copy.heading, {
         supportingText: copy.supportingText,
-      },
+      }),
       footnote: copy.footnote,
       image: { alt: copy.alt },
       content: [{ children: [{ text: copy.content }] }],
@@ -141,15 +140,18 @@ describe('ctaModuleQuery', () => {
     expect(cta).toMatchObject({ image: { alt: null } });
   });
 
-  it('fails when the heading is missing in both languages', async () => {
-    await expect(
-      runCta(
-        {
-          ...MOCK_CTA_DOCUMENT,
-          headingBlock: { _type: 'moduleHeadingBlock' },
-        },
-        NL,
-      ),
-    ).rejects.toThrow();
+  it.each([
+    ['missing in both languages', { _type: 'moduleHeadingBlock' }],
+    [
+      'still stored as plain strings',
+      {
+        _type: 'moduleHeadingBlock',
+        heading: mockLocalizedStrings({ [EN]: MOCK_EN_COPY.heading }),
+      },
+    ],
+  ])('reads a heading %s as no heading', async (_case, headingBlock) => {
+    const cta = await runCta({ ...MOCK_CTA_DOCUMENT, headingBlock }, NL);
+
+    expect(cta.headingBlock?.heading).toBeNull();
   });
 });

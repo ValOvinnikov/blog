@@ -1,14 +1,6 @@
-import { getDefaultLanguage } from '@shinefold/studio/schema-types/validation/default-language/default-language';
+import type { TMaybeUndefined } from '@shinefold/config/types';
+import { defaultLanguageEntryValue } from '@shinefold/studio/schema-types/validation/default-language-entry-value/default-language-entry-value';
 import { localizedStringValues } from '@shinefold/studio/schema-types/validation/localized-string-values/localized-string-values';
 
-export const defaultLanguageValue = (value: unknown): string | undefined => {
-  const defaultEntries = Array.isArray(value)
-    ? value.filter(
-        (item) =>
-          (item as { language?: unknown } | null)?.language ===
-          getDefaultLanguage(),
-      )
-    : [];
-
-  return localizedStringValues(defaultEntries)[0];
-};
+export const defaultLanguageValue = (value: unknown): TMaybeUndefined<string> =>
+  localizedStringValues([{ value: defaultLanguageEntryValue(value) }])[0];

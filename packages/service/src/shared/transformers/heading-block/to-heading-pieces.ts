@@ -1,12 +1,14 @@
-import type { THeadingPiece } from '@shinefold/config';
+import type { THeadingPiece, TMaybeNull } from '@shinefold/config';
 import { HEADING_TEXT_MARK } from '@shinefold/config/constants';
 import { hasLength } from '@shinefold/utils/primitives';
 
 type THeadingSourceBlock = {
-  children?: ReadonlyArray<{
-    text?: string | null;
-    marks?: readonly string[] | null;
-  }> | null;
+  children?: TMaybeNull<
+    ReadonlyArray<{
+      text?: TMaybeNull<string>;
+      marks?: TMaybeNull<readonly string[]>;
+    }>
+  >;
 };
 
 const BLOCK_SEPARATOR: THeadingPiece = { text: ' ', isHighlighted: false };

@@ -25,7 +25,7 @@ import {
 } from '@shinefold/service/testing/shared/fixtures';
 import {
   mockRawModuleHeadingBlock,
-  mockPlainHeadingPieces,
+  mockModuleHeadingBlockView,
 } from '@shinefold/service/testing/shared/localized';
 
 import { toTaxonomyListModule } from './transformer';
@@ -69,11 +69,12 @@ describe(toTaxonomyListModule, () => {
 
     const module = toTaxonomyListModule(raw);
 
-    expect(module.headingBlock).toEqual({
-      heading: MOCK_TOPIC_INDEX_HEADING,
-      headingPieces: mockPlainHeadingPieces(MOCK_TOPIC_INDEX_HEADING),
-      supportingText: MOCK_SUPPORTING_TEXT,
-    });
+    expect(module.headingBlock).toEqual(
+      mockModuleHeadingBlockView(
+        MOCK_TOPIC_INDEX_HEADING,
+        MOCK_SUPPORTING_TEXT,
+      ),
+    );
   });
 
   it.each([

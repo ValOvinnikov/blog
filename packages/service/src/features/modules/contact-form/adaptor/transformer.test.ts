@@ -7,7 +7,7 @@ import {
 } from '@shinefold/service/testing/shared/fixtures';
 import {
   mockRawModuleHeadingBlock,
-  mockPlainHeadingPieces,
+  mockModuleHeadingBlockView,
 } from '@shinefold/service/testing/shared/localized';
 
 import { toContactFormModule, type TRawContactFormModule } from './transformer';
@@ -44,11 +44,10 @@ describe(toContactFormModule, () => {
 
     expect(module).toEqual({
       brandVariant: BRAND_VARIANT.SECONDARY,
-      headingBlock: {
-        heading: MOCK_HEADING,
-        headingPieces: mockPlainHeadingPieces(MOCK_HEADING),
-        supportingText: MOCK_SUPPORTING_TEXT,
-      },
+      headingBlock: mockModuleHeadingBlockView(
+        MOCK_HEADING,
+        MOCK_SUPPORTING_TEXT,
+      ),
       successMessage: MOCK_SUCCESS_MESSAGE,
       privacyNote: [{ ...privacyNoteBlock, markDefs: undefined }],
       contentAlignment: CONTENT_ALIGNMENT.CENTER,

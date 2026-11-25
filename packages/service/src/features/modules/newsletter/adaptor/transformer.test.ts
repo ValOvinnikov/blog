@@ -8,7 +8,7 @@ import { mockRawNewsletterModule } from '@shinefold/service/testing/modules/fixt
 import { mockRawWideLayout } from '@shinefold/service/testing/shared/fixtures';
 import {
   mockRawModuleHeadingBlock,
-  mockPlainHeadingPieces,
+  mockModuleHeadingBlockView,
 } from '@shinefold/service/testing/shared/localized';
 
 import { toNewsletterModule } from './transformer';
@@ -33,11 +33,9 @@ describe(toNewsletterModule, () => {
 
     const module = toNewsletterModule(raw);
 
-    expect(module.headingBlock).toEqual({
-      heading: MOCK_HEADING,
-      headingPieces: mockPlainHeadingPieces(MOCK_HEADING),
-      supportingText: MOCK_SUPPORTING_TEXT,
-    });
+    expect(module.headingBlock).toEqual(
+      mockModuleHeadingBlockView(MOCK_HEADING, MOCK_SUPPORTING_TEXT),
+    );
   });
 
   it.each([

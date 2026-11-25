@@ -16,4 +16,5 @@ export const headingTextSchema = defineType({
       marks: { decorators: [highlightDecorator], annotations: [] },
     }),
   ],
+  validation: (rule) => rule.max(1).error('Keep the heading to one line.'),
 });

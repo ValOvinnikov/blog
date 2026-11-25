@@ -14,7 +14,7 @@ import {
 } from '@shinefold/service/testing/shared/fixtures';
 import {
   mockRawModuleHeadingBlock,
-  mockPlainHeadingPieces,
+  mockModuleHeadingBlockView,
 } from '@shinefold/service/testing/shared/localized';
 
 import {
@@ -32,11 +32,9 @@ describe(toPostLatestModule, () => {
 
     const module = toPostLatestModule(raw, MOCK_NO_POSTS);
 
-    expect(module.headingBlock).toEqual({
-      heading: MOCK_RECENT_POSTS_HEADING,
-      headingPieces: mockPlainHeadingPieces(MOCK_RECENT_POSTS_HEADING),
-      supportingText: undefined,
-    });
+    expect(module.headingBlock).toEqual(
+      mockModuleHeadingBlockView(MOCK_RECENT_POSTS_HEADING),
+    );
   });
 
   it.each([

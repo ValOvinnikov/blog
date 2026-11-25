@@ -13,7 +13,7 @@ import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
 import { mockRawWideLayout } from '@shinefold/service/testing/shared/fixtures';
 import {
   mockRawModuleHeadingBlock,
-  mockPlainHeadingPieces,
+  mockModuleHeadingBlockView,
 } from '@shinefold/service/testing/shared/localized';
 
 import { toPostFeaturedModule } from './transformer';
@@ -40,11 +40,9 @@ describe(toPostFeaturedModule, () => {
 
     const module = toPostFeaturedModule(raw);
 
-    expect(module.headingBlock).toEqual({
-      heading: MOCK_HEADING,
-      headingPieces: mockPlainHeadingPieces(MOCK_HEADING),
-      supportingText: MOCK_SUPPORTING_TEXT,
-    });
+    expect(module.headingBlock).toEqual(
+      mockModuleHeadingBlockView(MOCK_HEADING, MOCK_SUPPORTING_TEXT),
+    );
   });
 
   it.each([

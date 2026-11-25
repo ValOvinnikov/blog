@@ -18,7 +18,7 @@ import {
 } from '@shinefold/service/testing/shared/fixtures';
 import {
   mockRawModuleHeadingBlock,
-  mockPlainHeadingPieces,
+  mockModuleHeadingBlockView,
 } from '@shinefold/service/testing/shared/localized';
 
 import { toHeroStatementModule } from './transformer';
@@ -41,11 +41,9 @@ describe(toHeroStatementModule, () => {
 
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
     expect(hero.presentation.variant).toBe(HERO_VARIANT.BANNER);
-    expect(hero.headingBlock).toEqual({
-      heading: MOCK_STATEMENT_HEADING,
-      headingPieces: mockPlainHeadingPieces(MOCK_STATEMENT_HEADING),
-      supportingText: undefined,
-    });
+    expect(hero.headingBlock).toEqual(
+      mockModuleHeadingBlockView(MOCK_STATEMENT_HEADING),
+    );
   });
 
   it.each([

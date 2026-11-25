@@ -13,7 +13,7 @@ import {
 } from '@shinefold/service/testing/shared/fixtures';
 import {
   mockRawModuleHeadingBlock,
-  mockPlainHeadingPieces,
+  mockModuleHeadingBlockView,
 } from '@shinefold/service/testing/shared/localized';
 
 import { toPostListModule, type TRawPostListModulePosts } from './transformer';
@@ -29,11 +29,9 @@ describe(toPostListModule, () => {
 
     const module = toPostListModule(raw, MOCK_NO_POSTS, MOCK_PAGINATION);
 
-    expect(module.headingBlock).toEqual({
-      heading: MOCK_RECENT_POSTS_HEADING,
-      headingPieces: mockPlainHeadingPieces(MOCK_RECENT_POSTS_HEADING),
-      supportingText: undefined,
-    });
+    expect(module.headingBlock).toEqual(
+      mockModuleHeadingBlockView(MOCK_RECENT_POSTS_HEADING),
+    );
   });
 
   it.each([

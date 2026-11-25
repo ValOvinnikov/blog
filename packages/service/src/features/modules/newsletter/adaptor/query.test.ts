@@ -13,7 +13,7 @@ import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
   mockLocalizedValues,
-  mockParagraphBlocks,
+  mockRawModuleHeadingBlock,
 } from '@shinefold/service/testing/shared/localized';
 
 import { newsletterModuleQuery } from './query';
@@ -115,10 +115,11 @@ describe('newsletterModuleQuery', () => {
     });
 
     it('picks the heading and supporting text in the visitor language', () => {
-      expect(newsletter.headingBlock).toEqual({
-        heading: mockParagraphBlocks(MOCK_DUTCH_HEADING),
-        supportingText: MOCK_DUTCH_SUPPORTING_TEXT,
-      });
+      expect(newsletter.headingBlock).toEqual(
+        mockRawModuleHeadingBlock(MOCK_DUTCH_HEADING, {
+          supportingText: MOCK_DUTCH_SUPPORTING_TEXT,
+        }),
+      );
     });
 
     it('picks the content in the visitor language', () => {
@@ -141,10 +142,11 @@ describe('newsletterModuleQuery', () => {
     });
 
     it('falls back to the default language for heading and supporting text', () => {
-      expect(newsletter.headingBlock).toEqual({
-        heading: mockParagraphBlocks(MOCK_ENGLISH_HEADING),
-        supportingText: MOCK_ENGLISH_SUPPORTING_TEXT,
-      });
+      expect(newsletter.headingBlock).toEqual(
+        mockRawModuleHeadingBlock(MOCK_ENGLISH_HEADING, {
+          supportingText: MOCK_ENGLISH_SUPPORTING_TEXT,
+        }),
+      );
     });
 
     it('falls back to the default language for the content', () => {
@@ -164,15 +166,15 @@ describe('newsletterModuleQuery', () => {
     expect(read(newsletter)).toBeNull();
   });
 
-  it('fails when the heading is missing in both languages', async () => {
-    await expect(
-      runNewsletter(
-        {
-          ...MOCK_NEWSLETTER_DOCUMENT,
-          headingBlock: { _type: 'moduleHeadingBlock' },
-        },
-        NL,
-      ),
-    ).rejects.toThrow();
+  it('reads a heading missing in both languages as no heading', async () => {
+    const newsletter = await runNewsletter(
+      {
+        ...MOCK_NEWSLETTER_DOCUMENT,
+        headingBlock: { _type: 'moduleHeadingBlock' },
+      },
+      NL,
+    );
+
+    expect(newsletter.headingBlock.heading).toBeNull();
   });
 });

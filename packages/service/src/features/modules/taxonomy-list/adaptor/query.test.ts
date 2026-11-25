@@ -16,6 +16,7 @@ import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedStrings,
   mockParagraphBlocks,
+  mockRawModuleHeadingBlock,
 } from '@shinefold/service/testing/shared/localized';
 import {
   MOCK_DESIGN_EN_POST_ID,
@@ -93,10 +94,7 @@ describe('taxonomyListModuleQuery', () => {
 
     expect(module).toEqual({
       brandVariant: BRAND_VARIANT.PRIMARY,
-      headingBlock: {
-        heading: mockParagraphBlocks(MOCK_ENGLISH_MODULE_HEADING),
-        supportingText: null,
-      },
+      headingBlock: mockRawModuleHeadingBlock(MOCK_ENGLISH_MODULE_HEADING),
       layout: null,
       contentAlignment: null,
       taxonomy: TAXONOMY_KIND.TOPICS,

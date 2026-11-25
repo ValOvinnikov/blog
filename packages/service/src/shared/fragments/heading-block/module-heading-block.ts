@@ -7,6 +7,6 @@ export const moduleHeadingBlockFragment = q
   .parameters<TLocaleQueryParams>()
   .fragmentForType<'moduleHeadingBlock'>()
   .project((sub) => ({
-    heading: getLocalizedPortableTextBlock(sub, 'heading').notNull(),
+    heading: getLocalizedPortableTextBlock(sub, 'heading'),
     supportingText: getLocalizedField(sub, 'supportingText'),
   }));

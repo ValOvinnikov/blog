@@ -1,4 +1,8 @@
-import type { THeadingBlock, TMaybeUndefined } from '@shinefold/config';
+import type {
+  THeadingBlock,
+  TMaybeUndefined,
+  TNullable,
+} from '@shinefold/config';
 import type { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
 import type { InferFragmentType } from 'groqd';
 
@@ -12,14 +16,14 @@ export function toModuleHeadingBlock(
   raw: TRawModuleHeadingBlock,
 ): THeadingBlock;
 export function toModuleHeadingBlock(
-  raw: TRawModuleHeadingBlock | null | undefined,
+  raw: TNullable<TRawModuleHeadingBlock>,
 ): TMaybeUndefined<THeadingBlock>;
 export function toModuleHeadingBlock(
-  raw: TRawModuleHeadingBlock | null | undefined,
+  raw: TNullable<TRawModuleHeadingBlock>,
 ): TMaybeUndefined<THeadingBlock> {
   if (!raw) return undefined;
 
-  const headingPieces = toHeadingPieces(raw.heading);
+  const headingPieces = toHeadingPieces(raw.heading ?? []);
 
   return {
     heading: headingPieces.map(({ text }) => text).join(''),

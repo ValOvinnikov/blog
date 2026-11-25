@@ -23,7 +23,7 @@ import {
 } from '@shinefold/service/testing/shared/fixtures';
 import {
   mockRawModuleHeadingBlock,
-  mockPlainHeadingPieces,
+  mockModuleHeadingBlockView,
 } from '@shinefold/service/testing/shared/localized';
 
 import { toCtaModule } from './transformer';
@@ -47,11 +47,9 @@ describe(toCtaModule, () => {
 
     const cta = toCtaModule(raw);
 
-    expect(cta.headingBlock).toEqual({
-      heading: MOCK_HEADING,
-      headingPieces: mockPlainHeadingPieces(MOCK_HEADING),
-      supportingText: MOCK_SUPPORTING_TEXT,
-    });
+    expect(cta.headingBlock).toEqual(
+      mockModuleHeadingBlockView(MOCK_HEADING, MOCK_SUPPORTING_TEXT),
+    );
   });
 
   it.each([BRAND_VARIANT.SECONDARY, BRAND_VARIANT.BRAND_PRIMARY])(

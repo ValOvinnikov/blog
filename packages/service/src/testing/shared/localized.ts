@@ -50,8 +50,19 @@ export function mockParagraphBlocks(text: string) {
   ];
 }
 
-export function mockPlainHeadingPieces(text: string) {
+function mockPlainHeadingPieces(text: string) {
   return [{ text, isHighlighted: false }];
+}
+
+export function mockModuleHeadingBlockView(
+  heading: string,
+  supportingText?: string,
+) {
+  return {
+    heading,
+    headingPieces: mockPlainHeadingPieces(heading),
+    supportingText,
+  };
 }
 
 export function mockRawModuleHeadingBlock(

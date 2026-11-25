@@ -22,7 +22,7 @@ import {
 } from '@shinefold/service/testing/shared/fixtures';
 import {
   mockRawModuleHeadingBlock,
-  mockPlainHeadingPieces,
+  mockModuleHeadingBlockView,
 } from '@shinefold/service/testing/shared/localized';
 
 import { toHeroProfileModule, type TRawHeroProfileModule } from './transformer';
@@ -62,11 +62,9 @@ describe(toHeroProfileModule, () => {
 
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
     expect(hero.presentation.variant).toBe(HERO_VARIANT.BANNER);
-    expect(hero.headingBlock).toEqual({
-      heading: MOCK_PROFILE_HEADING,
-      headingPieces: mockPlainHeadingPieces(MOCK_PROFILE_HEADING),
-      supportingText: undefined,
-    });
+    expect(hero.headingBlock).toEqual(
+      mockModuleHeadingBlockView(MOCK_PROFILE_HEADING),
+    );
   });
 
   it.each([

@@ -17,6 +17,7 @@ import {
   mockLocalizedParagraphText,
   mockLocalizedStrings,
   mockParagraphBlocks,
+  mockRawModuleHeadingBlock,
 } from '@shinefold/service/testing/shared/localized';
 
 import { timelineModuleQuery } from './query';
@@ -135,10 +136,7 @@ describe('timelineModuleQuery', () => {
 
       expect(timeline).toEqual({
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: mockParagraphBlocks(heading),
-          supportingText: null,
-        },
+        headingBlock: mockRawModuleHeadingBlock(heading),
         markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
         items: [
           {

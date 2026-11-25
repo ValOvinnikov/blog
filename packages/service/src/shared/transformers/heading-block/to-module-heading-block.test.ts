@@ -46,6 +46,12 @@ describe(toModuleHeadingBlock, () => {
     });
   });
 
+  it('returns an empty heading when no language has heading blocks', () => {
+    expect(
+      toModuleHeadingBlock({ heading: null, supportingText: null }),
+    ).toEqual({ heading: '', headingPieces: [], supportingText: undefined });
+  });
+
   it.each([null, undefined])(
     'returns undefined for an absent heading block (%s)',
     (raw) => {
