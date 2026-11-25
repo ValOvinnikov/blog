@@ -1335,7 +1335,7 @@ when there are no prices and no platform plan ("Let's talk"), up to 12 plain
 feature lines, its own `ctaButtons`, a `highlightLabel` and a `footnote`. In
 the marketing tenant's Studio (`StudioMount`'s `canLinkPlatformPlans`) a tier
 can instead carry a `platformPlan` (a `SELLABLE_TENANT_PLANS` value) and a
-required `platformPlanInterval` (`MONTH` or `YEAR`): **a filled `platformPlan`
+required `platformPlanInterval` (`MONTH`, `YEAR` or `MONTH_AND_YEAR`): **a filled `platformPlan`
 is the link**, which hides the typed prices and label, and readers decide on
 it alone, since a linked tier may still store hidden prices or a stale
 interval. The copy limits are errors,
