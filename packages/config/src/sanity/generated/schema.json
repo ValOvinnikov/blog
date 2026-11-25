@@ -14982,6 +14982,13 @@
         },
         "optional": true
       },
+      "showSubPagesInNavigation": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "showSectionNavigation": {
         "type": "objectAttribute",
         "value": {
