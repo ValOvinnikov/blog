@@ -9,9 +9,12 @@ import { mockRawPostListModule } from '@shinefold/service/testing/modules/post-l
 import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_POST_ID,
-  mockRawHeadingBlock,
   mockRawWideLayout,
 } from '@shinefold/service/testing/shared/fixtures';
+import {
+  mockRawModuleHeadingBlock,
+  mockModuleHeadingBlockView,
+} from '@shinefold/service/testing/shared/localized';
 
 import { toPostListModule, type TRawPostListModulePosts } from './transformer';
 
@@ -21,15 +24,14 @@ const MOCK_PAGINATION = { currentPage: 1, totalPages: 1 };
 describe(toPostListModule, () => {
   it('maps the heading block', () => {
     const raw = mockRawPostListModule({
-      headingBlock: mockRawHeadingBlock(MOCK_RECENT_POSTS_HEADING),
+      headingBlock: mockRawModuleHeadingBlock(MOCK_RECENT_POSTS_HEADING),
     });
 
     const module = toPostListModule(raw, MOCK_NO_POSTS, MOCK_PAGINATION);
 
-    expect(module.headingBlock).toEqual({
-      heading: MOCK_RECENT_POSTS_HEADING,
-      supportingText: undefined,
-    });
+    expect(module.headingBlock).toEqual(
+      mockModuleHeadingBlockView(MOCK_RECENT_POSTS_HEADING),
+    );
   });
 
   it.each([

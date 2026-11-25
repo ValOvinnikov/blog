@@ -34,6 +34,7 @@ import { MOCK_ACCENT_HUE } from '@shinefold/db/testing/site-config/fixtures';
 
 import {
   isLookFieldWithin,
+  isPresetWithin,
   pickLookWithin,
   toEffectiveLookWithin,
   type TLook,
@@ -92,7 +93,9 @@ const STARTER = PLAN_ENTITLEMENTS[TENANT_PLAN.STARTER];
 const MOCK_ENTITLEMENTS_LABEL = 'a heading-font grant';
 const MOCK_ENTITLEMENTS = {
   lookFields: [LOOK_FIELD.PRESET, LOOK_FIELD.HEADING_FONT],
+  unlockedPresets: [],
 };
+const SHINEFOLD_LOOK = { ...STORED_LOOK, preset: PRESET_ID.SHINEFOLD };
 
 describe(toEffectiveLookWithin, () => {
   it('returns every stored value on Growth', () => {
@@ -173,6 +176,24 @@ describe(toEffectiveLookWithin, () => {
       ),
     ).toEqual({ preset, headingFont, bodyFont: FONT_CHOICE.INTER });
   });
+
+  it('renders Console for a stored Shinefold preset without its grant', () => {
+    expect(toEffectiveLookWithin(SHINEFOLD_LOOK, FREE)).toEqual(
+      toEffectiveLookWithin(
+        { ...SHINEFOLD_LOOK, preset: PRESET_ID.CONSOLE },
+        FREE,
+      ),
+    );
+  });
+
+  it('keeps a stored Shinefold preset with its grant', () => {
+    expect(
+      toEffectiveLookWithin(SHINEFOLD_LOOK, {
+        ...GROWTH,
+        unlockedPresets: [PRESET_ID.SHINEFOLD],
+      }),
+    ).toEqual(SHINEFOLD_LOOK);
+  });
 });
 
 describe(isLookFieldWithin, () => {
@@ -210,5 +231,25 @@ describe(pickLookWithin, () => {
     expect(
       pickLookWithin({ preset, headingFont, bodyFont }, MOCK_ENTITLEMENTS),
     ).toEqual({ preset, headingFont });
+  });
+});
+
+describe(isPresetWithin, () => {
+  it.each([PRESET_ID.CONSOLE, PRESET_ID.EDITORIAL])(
+    'allows %s with nothing unlocked',
+    (preset) => {
+      expect(isPresetWithin(preset, { unlockedPresets: [] })).toBe(true);
+    },
+  );
+
+  it('allows the Shinefold preset only once unlocked', () => {
+    expect(isPresetWithin(PRESET_ID.SHINEFOLD, { unlockedPresets: [] })).toBe(
+      false,
+    );
+    expect(
+      isPresetWithin(PRESET_ID.SHINEFOLD, {
+        unlockedPresets: [PRESET_ID.SHINEFOLD],
+      }),
+    ).toBe(true);
   });
 });

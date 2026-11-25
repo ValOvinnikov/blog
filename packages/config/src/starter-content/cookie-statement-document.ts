@@ -10,8 +10,9 @@ import type {
 import type { TStarterCopy } from './copy/starter-copy';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import type { TStarterDocument } from './starter-document-shape';
-import { pageHeadingBlock, paragraphs, seo } from './starter-fields';
+import { pageHeadingBlock, seo } from './starter-fields';
 import { linkedParagraph } from './starter-linked-paragraph';
+import { paragraphs } from './starter-portable-text';
 
 const COOKIE_PREFERENCES_MARK_KEY = 'cookiePreferences';
 

@@ -224,6 +224,19 @@ describe(createSiteAction, () => {
     });
   });
 
+  it('refuses the Shinefold preset, which no new site holds a grant for', async () => {
+    const result = await createSiteAction({
+      ...MOCK_INPUT,
+      preset: PRESET_ID.SHINEFOLD,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
+    expect(createSelfServeTenantMock).not.toHaveBeenCalled();
+  });
+
   it('reports a taken address on its field without spending a create slot', async () => {
     checkTenantSlugMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
 

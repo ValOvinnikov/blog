@@ -43,6 +43,7 @@ export const LookPageContent = async ({
             granted: tenant.grantedEntitlements.lookFields,
           },
           lookFields: tenant.entitlements.lookFields,
+          unlockedPresets: tenant.entitlements.unlockedPresets,
           archivedAt: tenant.archivedAt,
         }}
         initialValues={toEffectiveLookWithin(

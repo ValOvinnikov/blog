@@ -1,7 +1,9 @@
+import { HEADING_TEXT_MARK } from '@shinefold/config/constants';
 import { toToolbarIcon } from '@shinefold/studio/schema-types/portable-text/toolbar-icon/toolbar-icon';
 import {
   Bold,
   Code,
+  Highlighter,
   Italic,
   Strikethrough,
   Subscript,
@@ -50,4 +52,10 @@ export const superscriptDecorator: BlockDecoratorDefinition = {
   title: 'Superscript',
   value: 'sup',
   icon: toToolbarIcon(Superscript),
+};
+
+export const highlightDecorator: BlockDecoratorDefinition = {
+  title: 'Highlight',
+  value: HEADING_TEXT_MARK.HIGHLIGHT,
+  icon: toToolbarIcon(Highlighter),
 };

@@ -1,6 +1,7 @@
 import {
   CAPABILITY,
   MODULE_PACK,
+  PRESET_ID,
   TENANT_PLAN,
 } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND, LOOK_FIELD } from '@shinefold/db/constants';
@@ -9,7 +10,10 @@ import {
   MOCK_GRANT_FUTURE,
   MOCK_GRANT_PAST,
 } from '@shinefold/db/testing/tenant-entitlement-grants/fixtures';
-import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
+import {
+  MOCK_SHINEFOLD_PRESET_GRANT,
+  mockEntitlementGrant,
+} from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 
 import {
   resolveTenantEntitlements,
@@ -102,5 +106,20 @@ describe(resolveTenantEntitlements, () => {
         MOCK_NOW,
       ).localeLimit,
     ).toBe(growth.localeLimit);
+  });
+
+  it.each(Object.values(TENANT_PLAN))(
+    'unlocks no preset on %s without a grant',
+    (plan) => {
+      expect(
+        resolveTenantEntitlements(plan, [], MOCK_NOW).unlockedPresets,
+      ).toEqual([]);
+    },
+  );
+
+  it('unlocks a granted preset', () => {
+    expect(resolveFree([MOCK_SHINEFOLD_PRESET_GRANT]).unlockedPresets).toEqual([
+      PRESET_ID.SHINEFOLD,
+    ]);
   });
 });

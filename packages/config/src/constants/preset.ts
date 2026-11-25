@@ -1,3 +1,5 @@
+import { isOneOf } from '@shinefold/utils/primitives';
+
 import type { TValueOf } from '@shinefold/config/utils';
 
 import type {
@@ -31,9 +33,23 @@ import type { TThemeTokens } from './theme-tokens';
 export const PRESET_ID = {
   CONSOLE: 'CONSOLE',
   EDITORIAL: 'EDITORIAL',
+  SHINEFOLD: 'SHINEFOLD',
 } as const;
 
 export type TPresetId = TValueOf<typeof PRESET_ID>;
+
+export const OPEN_PRESET_IDS = [
+  PRESET_ID.CONSOLE,
+  PRESET_ID.EDITORIAL,
+] as const satisfies readonly TPresetId[];
+
+export type TOpenPresetId = (typeof OPEN_PRESET_IDS)[number];
+
+export type TGrantablePresetId = Exclude<TPresetId, TOpenPresetId>;
+
+export const GRANTABLE_PRESET_IDS = Object.values(PRESET_ID).filter(
+  (id): id is TGrantablePresetId => !isOneOf(OPEN_PRESET_IDS, id),
+);
 
 export const FONT_CHOICE = {
   SPACE_GROTESK: 'SPACE_GROTESK',

@@ -4,6 +4,7 @@ import {
   mockRawCookieSettingsModule,
 } from '@shinefold/service/testing/modules/fixtures';
 import { mockRawWideLayout } from '@shinefold/service/testing/shared/fixtures';
+import { mockModuleHeadingBlockView } from '@shinefold/service/testing/shared/localized';
 
 import { toCookieSettingsModule } from './transformer';
 
@@ -20,10 +21,7 @@ describe(toCookieSettingsModule, () => {
 
     expect(module).toEqual({
       brandVariant: BRAND_VARIANT.SECONDARY,
-      headingBlock: {
-        heading: MOCK_COOKIE_SETTINGS_HEADING,
-        supportingText: undefined,
-      },
+      headingBlock: mockModuleHeadingBlockView(MOCK_COOKIE_SETTINGS_HEADING),
       layout: MOCK_LAYOUT,
     });
   });

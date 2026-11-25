@@ -5,6 +5,7 @@ import {
   CONTENT_ALIGNMENT,
   LOCALE_ISO_CODES,
 } from '@shinefold/config/constants';
+import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { MOCK_FEATURE_LIST_MODULE_ID } from '@shinefold/service/testing/modules/feature-list/fixtures';
 import { mockReference } from '@shinefold/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
@@ -12,6 +13,7 @@ import {
   MOCK_IMAGE_ASSET_DOCUMENT,
   mockLocalizedHeadingBlock,
   mockLocalizedImage,
+  mockParagraphBlocks,
 } from '@shinefold/service/testing/shared/localized';
 import { MOCK_AUTHORED_MODULE_APPEARANCE } from '@shinefold/service/testing/shared/module-appearance';
 
@@ -97,7 +99,7 @@ async function runFeatureList(
 
 function featureText(module: Awaited<ReturnType<typeof runFeatureList>>) {
   return module.features?.map(({ headingBlock, image }) => ({
-    heading: headingBlock.heading,
+    heading: toModuleHeadingBlock(headingBlock).heading,
     alt: image?.alt,
   }));
 }
@@ -117,7 +119,9 @@ describe('featureListModuleQuery', () => {
   ])('%s', async (_, locale, copy) => {
     const module = await runFeatureList(locale);
 
-    expect(module.headingBlock.heading).toBe(copy.heading);
+    expect(module.headingBlock.heading).toEqual(
+      mockParagraphBlocks(copy.heading),
+    );
     expect(featureText(module)).toEqual([
       copy.feature,
       MOCK_ENGLISH_ONLY_FEATURE,

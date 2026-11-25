@@ -13,12 +13,12 @@ import type {
 import type { TStarterDocumentUnion, TStarterModule } from './starter-document';
 import type { TStarterDocument } from './starter-document-shape';
 import {
-  localizedListedText,
   localizedString,
   moduleHeadingBlock,
   moduleItemDocuments,
 } from './starter-fields';
 import type { TModuleInput } from './starter-modules';
+import { localizedListedText } from './starter-portable-text';
 
 type TTestimonialCopy = {
   heading: string;

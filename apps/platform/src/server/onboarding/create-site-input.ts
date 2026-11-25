@@ -16,9 +16,11 @@ import {
   HUE_MIN,
   isAccentHueAccessible,
   LOCALE_ISO_CODES,
+  OPEN_PRESET_IDS,
   PRESET_ID,
   type TActionResult,
 } from '@shinefold/config';
+import { isOneOf } from '@shinefold/utils/primitives';
 import { z } from 'zod';
 
 export const createSiteInputSchema = z.object({
@@ -26,7 +28,9 @@ export const createSiteInputSchema = z.object({
   name: z.string().trim().min(1),
   slug: z.string().trim().toLowerCase().min(1),
   locale: z.enum(LOCALE_ISO_CODES),
-  preset: z.enum(PRESET_ID),
+  preset: z
+    .enum(PRESET_ID)
+    .refine((preset) => isOneOf(OPEN_PRESET_IDS, preset)),
   accentHue: z
     .number()
     .int()

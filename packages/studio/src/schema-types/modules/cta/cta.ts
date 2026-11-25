@@ -19,7 +19,7 @@ import { isNotVariant } from '@shinefold/studio/schema-types/fields/variant-fiel
 import { ctaLayoutField } from '@shinefold/studio/schema-types/objects/cta-layout/cta-layout-field';
 import { localizedImageWithAltSchema } from '@shinefold/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
+import { defaultLanguageBlockText } from '@shinefold/studio/schema-types/validation/default-language-block-text/default-language-block-text';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { Megaphone } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -124,7 +124,7 @@ export const ctaSchema = defineType({
     prepare({ title, subtitle }) {
       return {
         title: title ?? 'Unknown',
-        subtitle: defaultLanguageValue(subtitle),
+        subtitle: defaultLanguageBlockText(subtitle),
       };
     },
   },

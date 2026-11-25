@@ -11,9 +11,9 @@ import {
 } from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
-  mockRawHeadingBlock,
   mockValidationError,
 } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getPricingModule } from './loader';
@@ -32,7 +32,9 @@ describe(getPricingModule, () => {
 
   it('resolves the module in a single round trip', async () => {
     mockRun.mockResolvedValueOnce(
-      mockRawPricingModule({ headingBlock: mockRawHeadingBlock(MOCK_HEADING) }),
+      mockRawPricingModule({
+        headingBlock: mockRawModuleHeadingBlock(MOCK_HEADING),
+      }),
     );
 
     const pricing = await getPricingModule(MOCK_PRICING_MODULE_ID, MOCK_TENANT);

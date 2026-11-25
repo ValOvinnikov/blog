@@ -16,7 +16,10 @@ import {
 import { mockRawPostFeaturedModule } from '@shinefold/service/testing/modules/post-featured/fixtures';
 import { mockReference } from '@shinefold/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
-import { mockLocalizedStrings } from '@shinefold/service/testing/shared/localized';
+import {
+  mockLocalizedStrings,
+  mockParagraphBlocks,
+} from '@shinefold/service/testing/shared/localized';
 import {
   MOCK_DESIGN_EN_POST_ID,
   MOCK_DESIGN_NL_POST_ID,
@@ -105,13 +108,17 @@ describe('postFeaturedModuleQuery', () => {
   it('picks the heading in the visitor language', async () => {
     const { headingBlock } = await runPostFeatured(NL);
 
-    expect(headingBlock.heading).toBe(MOCK_DUTCH_MODULE_HEADING);
+    expect(headingBlock.heading).toEqual(
+      mockParagraphBlocks(MOCK_DUTCH_MODULE_HEADING),
+    );
   });
 
   it('falls back to the default language for the heading', async () => {
     const { headingBlock } = await runPostFeatured(FR);
 
-    expect(headingBlock.heading).toBe(MOCK_ENGLISH_MODULE_HEADING);
+    expect(headingBlock.heading).toEqual(
+      mockParagraphBlocks(MOCK_ENGLISH_MODULE_HEADING),
+    );
   });
 
   describe('language scoping', () => {

@@ -11,9 +11,9 @@ import {
 } from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
-  mockRawHeadingBlock,
   mockValidationError,
 } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getTimelineModule } from './loader';
@@ -29,7 +29,7 @@ describe(getTimelineModule, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
       mockRawTimelineModule({
-        headingBlock: mockRawHeadingBlock(MOCK_HEADING),
+        headingBlock: mockRawModuleHeadingBlock(MOCK_HEADING),
       }),
     );
   });

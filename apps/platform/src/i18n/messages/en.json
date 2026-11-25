@@ -772,6 +772,8 @@
     "editorialMiniSecondary": "Dispatches from the coast",
     "morePresets": "More presets",
     "morePresetsAriaLabel": "More presets, {count} more",
+    "shinefold": "Shinefold",
+    "shinefoldDescription": "Yellow and ink, in the Shinefold brand.",
     "presetCount": "{count, plural, one {# preset} other {# presets}}",
     "choosePreset": "Choose a preset",
     "close": "Close"

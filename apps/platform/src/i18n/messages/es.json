@@ -772,6 +772,8 @@
     "editorialMiniSecondary": "Crónicas desde la costa",
     "morePresets": "Más ajustes",
     "morePresetsAriaLabel": "Más ajustes, {count} más",
+    "shinefold": "Shinefold",
+    "shinefoldDescription": "Amarillo y tinta, con la marca Shinefold.",
     "presetCount": "{count, plural, one {# ajuste} other {# ajustes}}",
     "choosePreset": "Elige un ajuste predefinido",
     "close": "Cerrar"

@@ -425,8 +425,9 @@ post index, topic, tag and the taxonomy index pages), additionally carries a
 `headingBlock` field (`heading` and `supportingText`
 only). Two registered types back that one field name: pages use
 `pageHeadingBlock` (plain strings), modules and feature blocks use
-`moduleHeadingBlock` (per-language values, where `heading` is required in
-the default language). Requiredness is enforced at **two levels**, because
+`moduleHeadingBlock` (per-language values, where `heading` is one line of
+`headingText` Portable Text whose only mark is Highlight, required in the
+default language by its plain words). Requiredness is enforced at **two levels**, because
 Sanity never descends into an absent object: each type marks its own nested
 `heading` required, and its field factory (`pageHeadingBlockField()`,
 `moduleHeadingBlockField()`) marks the containing field required so the

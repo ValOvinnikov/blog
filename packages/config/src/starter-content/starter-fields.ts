@@ -1,5 +1,6 @@
 import type { TLocaleIsoCode } from '@shinefold/config/constants';
-import type { ArticleText } from '@shinefold/config/sanity/generated/types';
+
+import { localizedHeadingText } from './starter-portable-text';
 
 export function seo(metaTitle: string, metaDescription: string) {
   return {
@@ -74,60 +75,9 @@ export function moduleHeadingBlock(
 ) {
   return {
     _type: 'moduleHeadingBlock',
-    heading: localizedString(locale, heading),
+    heading: localizedHeadingText(locale, heading),
     ...(supportingText && {
       supportingText: localizedText(locale, supportingText),
     }),
   } as const;
-}
-
-function localizedBlocks<
-  TValueType extends
-    | 'internationalizedArrayArticleTextValue'
-    | 'internationalizedArrayListedTextValue'
-    | 'internationalizedArrayParagraphTextValue',
-  TBlock,
->(valueType: TValueType, locale: TLocaleIsoCode, value: TBlock[]) {
-  return [{ _key: locale, _type: valueType, language: locale, value }];
-}
-
-export function localizedArticleBlocks(
-  locale: TLocaleIsoCode,
-  blocks: ArticleText,
-) {
-  return localizedBlocks(
-    'internationalizedArrayArticleTextValue',
-    locale,
-    blocks,
-  );
-}
-
-export function localizedListedText(
-  locale: TLocaleIsoCode,
-  texts: readonly string[],
-) {
-  return localizedBlocks(
-    'internationalizedArrayListedTextValue',
-    locale,
-    paragraphs(texts),
-  );
-}
-
-export function localizedParagraphText(locale: TLocaleIsoCode, text: string) {
-  return localizedBlocks(
-    'internationalizedArrayParagraphTextValue',
-    locale,
-    paragraphs([text]),
-  );
-}
-
-export function paragraphs(texts: readonly string[]) {
-  return texts.map((text, index) => ({
-    _type: 'block' as const,
-    _key: `paragraph${index}`,
-    markDefs: [],
-    children: [
-      { _type: 'span' as const, _key: `span${index}`, text, marks: [] },
-    ],
-  }));
 }

@@ -43,7 +43,7 @@ Landing pages are the site's free-form pages, and they nest: an editor puts a pa
 
 ## Data
 
-- `page_landing` — the [page-types](./page-types.md) fields plus `parent` (optional reference to another Landing page in the same language), `slug` (one segment), `orderRank`, `sectionNavigation` (boolean, default off), `sectionNavigationTitle` and `showPreviousNextLinks` (boolean, default on; both shown only when section navigation is on), `showSectionNavigation` (boolean, default on) and the `template_landing` reference.
+- `page_landing` — the [page-types](./page-types.md) fields plus `parent` (optional reference to another Landing page in the same language), `slug` (one segment), `orderRank`, `sectionNavigation` (boolean, default off), `sectionNavigationTitle`, `showPreviousNextLinks` (boolean, default on) and `showSubPagesInNavigation` (boolean, default off; all three shown only when section navigation is on), `showSectionNavigation` (boolean, default on) and the `template_landing` reference.
 - `redirect` — `language` (required), `source` and `destination` (site paths), `isPrefix` ("Include Sub-pages"), `status` (`PERMANENT` default, or `TEMPORARY`), an editor-only `description`, and a read-only `isAutomatic`.
 - The path is computed in GROQ (`LANDING_PAGE_PATH_EXPRESSION`) by joining the parent chain's slugs; `PAGE_PATH_EXPRESSION` is the variant used where page types mix (sitemap, translation map). Section navigation is computed from the page's ancestor chain (`LANDING_PAGE_SECTION_CHAIN_EXPRESSION`).
 - **Caching** — the page loader is tagged `page_landing` and `template_landing`; the redirect loader fetches every redirect for the language, tagged `redirect`. Publishing a page or template purges its tags and every page of that tenant, including the page's own path; publishing a redirect, which a changed landing path writes, purges that tenant's pages and the redirect's addresses, and a prefix redirect or a deleted or unpublished page also purges the landing route by pattern, refreshing every tenant's landing pages (see [rendering-and-caching](./rendering-and-caching.md)).
@@ -51,7 +51,7 @@ Landing pages are the site's free-form pages, and they nest: an editor puts a pa
 ## Configuration
 
 - Editors create, nest, reorder and redirect pages in the Studio. Nothing is set in the platform, and the tree is not plan-gated.
-- "Section navigation" is a per-page setting, never a module. Its control appears only on a page that has children; "Show section navigation on this page" appears only on a page inside a section. "Show previous and next links" appears beside the sidebar title on a section's top page. All three warn when they differ from the default-language version.
+- "Section navigation" is a per-page setting, never a module. Its control appears only on a page that has children; "Show section navigation on this page" appears only on a page inside a section. "Show previous and next links" and "Show sub-pages in the side navigation" appear beside the sidebar title on a section's top page. All four warn when they differ from the default-language version.
 - The sidebar heading is `sectionNavigationTitle`, or the fixed catalogue string `sectionNavigation.label` when empty. It is not a [Voice](./voice.md) field.
 
 ## Constraints and invariants
@@ -62,6 +62,7 @@ Landing pages are the site's free-form pages, and they nest: an editor puts a pa
 - A page whose chain is broken (a missing, unpublished or slugless ancestor, or one past the depth bound) has no path and is not routable.
 - Section navigation: the section root is the nearest ancestor-or-self with `sectionNavigation` on, so a nested parent can run its own branch. The sidebar lists the root and its direct children in drag order, marks the current page (or the child whose branch contains it) and links back to the enclosing section. Breadcrumbs follow the parent chain. Labels are each page's public heading, never its internal `title`. `showSectionNavigation: false` hides the sidebar and the section breadcrumb trail on that page only; the breadcrumb bar still shows, as Home → this page.
 - Without section navigation, the breadcrumb is Home → this page.
+- **Previous and next pages.** A page inside a section gets its previous and next page (title and path) in the side navigation's reading order: the section root, then each child in drag order followed by its own descendants, down to the depth bound. The first page has no previous and the last no next. A neighbour with no page in the request language, or no path, is skipped for the next one that has one. Neither is returned when the section root has "Show previous and next links" off (stored as `showPreviousNextLinks`, on when unset), when the page has "Show section navigation on this page" off, when it is outside any section, or when the section has no other page.
 - **Redirects cover Landing paths only.** When a Landing path finds no page, the site looks up redirects for that language: an exact source first, then the longest prefix redirect, carrying the rest of the path. Permanent answers 308, Temporary 307; otherwise the page 404s. A destination that is not a same-origin path is ignored.
 - A published page at the source always wins over a redirect (the Studio warns). A destination with no published page in that language is an error, as are a duplicate source, a redirect chain in either direction, a destination equal to the source, and `/` as a source.
 - On publishing a moved page, the Studio creates an automatic Permanent redirect from the old path (a prefix redirect when the page has descendants), rebases redirects that pointed under the old path, and deletes redirects whose source is now a live page or that would loop. If that write fails, the publish is cancelled with a "Not published" toast.
@@ -78,7 +79,7 @@ Landing pages are the site's free-form pages, and they nest: an editor puts a pa
 - `packages/studio/src/schema-types/documents/redirect/redirect.ts`
 - `packages/studio/src/structure/page-tree/page-tree.ts`
 - `packages/studio/src/document-actions/with-landing-redirects/with-landing-redirects.ts`, `apply-landing-redirects/`, `plan-landing-redirects/`
-- `packages/service/src/features/pages/landing/adaptor/detail-page/` (path match, section navigation) and `adaptor/redirect/`
+- `packages/service/src/features/pages/landing/adaptor/detail-page/` (path match, section navigation, previous and next pages) and `adaptor/redirect/`
 - `packages/service/src/shared/expressions/landing-page/landing-page-path.ts`
 - `apps/web/src/components/pages/landing-page/landing-page.tsx`
 - `apps/web/src/components/features/landing/section-navigation/section-navigation.tsx`

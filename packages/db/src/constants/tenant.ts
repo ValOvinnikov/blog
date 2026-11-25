@@ -3,6 +3,7 @@ import {
   MODULE_PACK,
   TENANT_PLAN,
   type TCapability,
+  type TGrantablePresetId,
   type TModulePack,
   type TTenantPlan,
 } from '@shinefold/config/constants';
@@ -76,6 +77,7 @@ export const SUBSCRIBER_BAND_CEILINGS = [
 export type TPlanEntitlements = {
   lookFields: readonly TLookField[];
   modulePacks: readonly TModulePack[];
+  unlockedPresets: readonly TGrantablePresetId[];
   hasPoweredByMark: boolean;
   hasCustomDomain: boolean;
   hasOwnOAuthApps: boolean;
@@ -98,6 +100,7 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
   [TENANT_PLAN.FREE]: {
     lookFields: BASE_LOOK_FIELDS,
     modulePacks: [MODULE_PACK.CORE],
+    unlockedPresets: [],
     hasPoweredByMark: true,
     hasCustomDomain: false,
     hasOwnOAuthApps: false,
@@ -108,6 +111,7 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
   [TENANT_PLAN.STARTER]: {
     lookFields: BASE_LOOK_FIELDS,
     modulePacks: [MODULE_PACK.CORE, MODULE_PACK.STARTER],
+    unlockedPresets: [],
     hasPoweredByMark: false,
     hasCustomDomain: true,
     hasOwnOAuthApps: false,
@@ -118,6 +122,7 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
   [TENANT_PLAN.GROWTH]: {
     lookFields: LOOK_FIELDS,
     modulePacks: [MODULE_PACK.CORE, MODULE_PACK.STARTER, MODULE_PACK.GROWTH],
+    unlockedPresets: [],
     hasPoweredByMark: false,
     hasCustomDomain: true,
     hasOwnOAuthApps: true,

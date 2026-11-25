@@ -2,7 +2,6 @@ import { faker } from '@faker-js/faker';
 import { LEGAL_PAGE_KIND, LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import type { TRawCookieStatementPage } from '@shinefold/service/features/pages/cookie-statement/adaptor/transformer';
 import type { TRawHomePage } from '@shinefold/service/features/pages/home/adaptor/transformer';
-import type { TRawLandingPage } from '@shinefold/service/features/pages/landing/adaptor/detail-page/transformer';
 import type { TRawPostDetail } from '@shinefold/service/features/pages/post/adaptor/detail-page/transformer';
 import type { TRawBlogPage } from '@shinefold/service/features/pages/post-index/adaptor/index-page/transformer';
 import type { TRawSectionDocumentDetail } from '@shinefold/service/features/pages/section-document/adaptor/detail-page/transformer';
@@ -43,7 +42,6 @@ import {
   mockReference,
 } from '@shinefold/service/testing/shared/fixtures';
 import { mockTranslationLink } from '@shinefold/service/testing/shared/localized';
-import { MOCK_ABOUT_SLUG } from '@shinefold/service/testing/shared/translated-pages-dataset';
 
 export const MOCK_HOME_PAGE_ID = 'home-1';
 export const MOCK_LIST_MODULE_ID = 'list-1';
@@ -354,33 +352,6 @@ export function mockRawTagPage(
     modules: [{ _id: POST_LIST_MODULE_ID, _type: 'module_postList' }],
     seo: mockRawSeo(),
     translations: [{ language: LOCALE_ISO_CODES.EN, slug: MOCK_TAG_SLUG }],
-    ...overrides,
-  };
-}
-
-export function mockRawLandingPage(
-  overrides: Partial<TRawLandingPage> = {},
-): TRawLandingPage {
-  return {
-    _id: MOCK_ABOUT_SLUG,
-    path: MOCK_ABOUT_SLUG,
-    headingBlock: mockRawHeadingBlock(MOCK_ABOUT_PAGE_TITLE),
-    contentAlignment: null,
-    hero: null,
-    modules: [mockRawContentRef(), mockRawCtaRef()],
-    seo: mockRawSeo(),
-    translations: [{ language: LOCALE_ISO_CODES.EN, slug: MOCK_ABOUT_SLUG }],
-    showSectionNavigation: null,
-    sectionChain: [
-      {
-        _id: MOCK_ABOUT_SLUG,
-        title: MOCK_ABOUT_PAGE_TITLE,
-        path: MOCK_ABOUT_SLUG,
-        sectionNavigation: false,
-        sectionNavigationTitle: null,
-        children: null,
-      },
-    ],
     ...overrides,
   };
 }

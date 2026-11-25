@@ -1,0 +1,1 @@
+ALTER TYPE "public"."preset_id" ADD VALUE 'SHINEFOLD';

@@ -16,6 +16,7 @@ import {
 } from '@shinefold/service/testing/modules/fixtures';
 import { mockRawPostRelatedModule } from '@shinefold/service/testing/modules/post-related/fixtures';
 import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { mockParagraphBlocks } from '@shinefold/service/testing/shared/localized';
 
 import { postRelatedModuleQuery } from './query';
 
@@ -104,12 +105,16 @@ describe('postRelatedModuleQuery', () => {
   it('picks the heading in the visitor language', async () => {
     const { headingBlock } = await runPostRelated(NL);
 
-    expect(headingBlock.heading).toBe(MOCK_DUTCH_MODULE_HEADING);
+    expect(headingBlock.heading).toEqual(
+      mockParagraphBlocks(MOCK_DUTCH_MODULE_HEADING),
+    );
   });
 
   it('falls back to the default language for the heading', async () => {
     const { headingBlock } = await runPostRelated(FR);
 
-    expect(headingBlock.heading).toBe(MOCK_ENGLISH_MODULE_HEADING);
+    expect(headingBlock.heading).toEqual(
+      mockParagraphBlocks(MOCK_ENGLISH_MODULE_HEADING),
+    );
   });
 });

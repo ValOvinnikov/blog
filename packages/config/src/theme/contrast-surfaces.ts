@@ -35,6 +35,7 @@ export const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
   '--ring': BRAND_PRIMARY,
   '--info': BRAND_PRIMARY,
   '--info-muted': BRAND_PRIMARY_MUTED,
+  '--heading-highlight': BRAND_PRIMARY,
   '--code-fg': TEXT,
   '--code-comment': TEXT_MUTED,
   [BUTTON_FILL]: BRAND_PRIMARY_SOLID,

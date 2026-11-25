@@ -14,6 +14,7 @@ import {
   MOCK_IMAGE_ASSET_DOCUMENT,
   MOCK_IMAGE_ASSET_DOCUMENT_ID,
   mockLocalizedHeadingBlock,
+  mockParagraphBlocks,
 } from '@shinefold/service/testing/shared/localized';
 
 import { logoWallModuleQuery } from './query';
@@ -105,13 +106,17 @@ describe('logoWallModuleQuery', () => {
   it('picks the heading in the visitor language', async () => {
     const { headingBlock } = await runLogoWall(NL);
 
-    expect(headingBlock.heading).toBe(MOCK_DUTCH_HEADING);
+    expect(headingBlock.heading).toEqual(
+      mockParagraphBlocks(MOCK_DUTCH_HEADING),
+    );
   });
 
   it('falls back to the default language for the heading', async () => {
     const { headingBlock } = await runLogoWall(FR);
 
-    expect(headingBlock.heading).toBe(MOCK_ENGLISH_HEADING);
+    expect(headingBlock.heading).toEqual(
+      mockParagraphBlocks(MOCK_ENGLISH_HEADING),
+    );
   });
 
   it('reads a logo name the same in every language', async () => {

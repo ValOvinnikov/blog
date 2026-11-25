@@ -31,9 +31,7 @@ export type TPostArticleProps = {
 
 const s = postArticleVariants();
 
-// `PostMeta` renders the author avatar at `SIZE.SM` (32px,
-// `avatar-variants.ts`) — 64px covers a 2x DPR display without serving the
-// source asset's full natural resolution.
+// Twice the 32px `SIZE.SM` avatar `PostMeta` renders, for 2x DPR displays.
 const AUTHOR_AVATAR_SIZE_PX = 64;
 const AUTHOR_AVATAR_TRANSFORM: TImageTransformOptions = {
   width: AUTHOR_AVATAR_SIZE_PX,
@@ -76,11 +74,12 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
     month: 'long',
     day: 'numeric',
   });
-  const asideKindLabels: TAsideKindLabels = {
-    [ASIDE_KIND.WHY_NOT]: blogPostT('asideKind.WHY_NOT'),
-    [ASIDE_KIND.DIGRESSION]: blogPostT('asideKind.DIGRESSION'),
-    [ASIDE_KIND.CONTEXT]: blogPostT('asideKind.CONTEXT'),
-  };
+  const asideKindLabels: TAsideKindLabels = Object.fromEntries(
+    Object.values(ASIDE_KIND).map((kind) => [
+      kind,
+      blogPostT(`asideKind.${kind}`),
+    ]),
+  );
   const footerTags = tags.flatMap(({ title: label, slug: tagSlug }) =>
     tagSlug ? [{ label, href: routes.tag(tagSlug) }] : [],
   );
