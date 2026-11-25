@@ -13,7 +13,11 @@ import {
   mockGrantAccess,
 } from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
-import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@shinefold/config';
+import {
+  ACTION_OUTCOME,
+  LOCALE_ISO_CODES,
+  OPEN_PRESET_IDS,
+} from '@shinefold/config';
 import { TENANT_PLAN, type TTenantPlan } from '@shinefold/config/constants';
 import { PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import userEvent from '@testing-library/user-event';
@@ -22,6 +26,7 @@ const MOCK_LOOK_TENANT: TLookFormTenant = {
   id: MOCK_TENANT_ID,
   name: MOCK_TENANT_NAME,
   siteHost: MOCK_TENANT_DOMAIN,
+  presets: OPEN_PRESET_IDS,
   grants: mockGrantAccess(),
   lookFields: PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH].lookFields,
 };

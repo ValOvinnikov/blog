@@ -34,6 +34,7 @@ import { MOCK_ACCENT_HUE } from '@shinefold/db/testing/site-config/fixtures';
 
 import {
   isLookFieldWithin,
+  isPresetWithin,
   pickLookWithin,
   toEffectiveLookWithin,
   type TLook,
@@ -210,5 +211,25 @@ describe(pickLookWithin, () => {
     expect(
       pickLookWithin({ preset, headingFont, bodyFont }, MOCK_ENTITLEMENTS),
     ).toEqual({ preset, headingFont });
+  });
+});
+
+describe(isPresetWithin, () => {
+  it.each([PRESET_ID.CONSOLE, PRESET_ID.EDITORIAL])(
+    'allows %s with nothing unlocked',
+    (preset) => {
+      expect(isPresetWithin(preset, { unlockedPresets: [] })).toBe(true);
+    },
+  );
+
+  it('allows the Shinefold preset only once unlocked', () => {
+    expect(isPresetWithin(PRESET_ID.SHINEFOLD, { unlockedPresets: [] })).toBe(
+      false,
+    );
+    expect(
+      isPresetWithin(PRESET_ID.SHINEFOLD, {
+        unlockedPresets: [PRESET_ID.SHINEFOLD],
+      }),
+    ).toBe(true);
   });
 });

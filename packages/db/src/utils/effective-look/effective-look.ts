@@ -1,12 +1,14 @@
 import {
   COLOR_MODE,
   LANGUAGE_SWITCHER_STYLE,
+  OPEN_PRESET_IDS,
   type TPresetId,
 } from '@shinefold/config/constants';
 import { LOOK_FIELDS, type TLookField } from '@shinefold/db/constants';
 import type { TSiteConfigResult } from '@shinefold/db/queries/site-config/get-site-config';
 import { presetSiteConfig } from '@shinefold/db/utils/preset-site-config/preset-site-config';
 import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
+import { isOneOf } from '@shinefold/utils/primitives';
 
 export type TLook = Pick<TSiteConfigResult, TLookField>;
 
@@ -32,6 +34,13 @@ export function isLookFieldWithin(
   { lookFields }: TLookEntitlements,
 ): boolean {
   return lookFields.includes(field);
+}
+
+export function isPresetWithin(
+  preset: TPresetId,
+  { unlockedPresets }: Pick<TTenantEntitlements, 'unlockedPresets'>,
+): boolean {
+  return isOneOf(OPEN_PRESET_IDS, preset) || isOneOf(unlockedPresets, preset);
 }
 
 /** The Look a site renders: every field outside the entitlements takes its preset's value, whatever is stored. */

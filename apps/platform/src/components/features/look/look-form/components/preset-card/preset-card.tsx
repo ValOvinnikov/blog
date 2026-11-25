@@ -11,7 +11,7 @@ import {
   LOOK_ANCHOR_CLASSES,
   toLookAnchorId,
 } from '@platform/utils/look-anchor/look-anchor';
-import { PRESET_ID, SIZE } from '@shinefold/config';
+import { SIZE, type TPresetId } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
@@ -19,13 +19,17 @@ import { PresetStrip } from './components/preset-strip';
 import { presetCardVariants } from './preset-card-variants';
 import { PRESET_SWATCH } from './preset-swatch';
 
-export const PresetCard = () => {
+type TPresetCardProps = {
+  presets: readonly TPresetId[];
+};
+
+export const PresetCard = ({ presets: presetIds }: TPresetCardProps) => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const { values, changePreset, resetToPreset, canResetToPreset } =
     useLookForm();
   const t = useTranslations('lookForm');
   const tPreset = useTranslations('presetPicker');
-  const presets = Object.values(PRESET_ID).map((id) => {
+  const presets = presetIds.map((id) => {
     const labelKey = PRESET_LABEL_KEY[id];
     return {
       id,

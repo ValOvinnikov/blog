@@ -772,6 +772,8 @@
     "editorialMiniSecondary": "Berichte von der Küste",
     "morePresets": "Weitere Vorlagen",
     "morePresetsAriaLabel": "Weitere Vorlagen, {count} mehr",
+    "shinefold": "Shinefold",
+    "shinefoldDescription": "Gelb und Tinte, im Shinefold-Markenstil.",
     "presetCount": "{count, plural, one {# Vorlage} other {# Vorlagen}}",
     "choosePreset": "Wähle eine Vorlage",
     "close": "Schließen"

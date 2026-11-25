@@ -260,6 +260,21 @@ describe(updateLookAction, () => {
     });
   });
 
+  it('refuses the Shinefold preset for a tenant without its grant, and writes nothing', async () => {
+    const result = await updateLookAction(MOCK_TENANT_ID, {
+      ...VALID_INPUT,
+      preset: PRESET_ID.SHINEFOLD,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
+      values: { plan: TENANT_PLAN.GROWTH },
+      items: [LOOK_FIELD.PRESET],
+    });
+    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
+  });
+
   it('clears the brand name when it is saved blank', async () => {
     await updateLookAction(MOCK_TENANT_ID, { ...VALID_INPUT, brandName: ' ' });
 

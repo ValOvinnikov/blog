@@ -772,6 +772,8 @@
     "editorialMiniSecondary": "Chroniques du littoral",
     "morePresets": "Autres préréglages",
     "morePresetsAriaLabel": "Autres préréglages, {count} de plus",
+    "shinefold": "Shinefold",
+    "shinefoldDescription": "Jaune et encre, aux couleurs de Shinefold.",
     "presetCount": "{count, plural, one {# préréglage} other {# préréglages}}",
     "choosePreset": "Choisir un préréglage",
     "close": "Fermer"
