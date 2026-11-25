@@ -789,7 +789,7 @@
     "sitePartsGroupHeading": "Site parts",
     "viewTabsAriaLabel": "Look view",
     "jumpIndexAriaLabel": "Look sections",
-    "growthAddsColour": "A logo hue of its own",
+    "growthAddsColour": "A logo hue of its own, and a site locked to light or dark",
     "growthAddsType": "Fonts, heading weight and case",
     "growthAddsShape": "Corners, spacing, image proportions and dividers",
     "growthAddsCards": "Card style",
@@ -935,7 +935,7 @@
       "CODES": "Language codes side by side, for a few languages"
     },
     "colourHeading": "Colour",
-    "colourDescription": "Only the hue changes, so text stays readable.",
+    "colourDescription": "Pick the accent hue and whether readers choose light or dark. Text stays readable either way.",
     "typeHeading": "Type",
     "typeDescription": "Each font is shown in its own face.",
     "shapeHeading": "Corners & spacing",

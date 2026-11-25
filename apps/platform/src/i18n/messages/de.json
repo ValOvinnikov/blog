@@ -789,7 +789,7 @@
     "sitePartsGroupHeading": "Website-Bereiche",
     "viewTabsAriaLabel": "Look-Ansicht",
     "jumpIndexAriaLabel": "Look-Abschnitte",
-    "growthAddsColour": "Ein eigener Logo-Farbton",
+    "growthAddsColour": "Ein eigener Logo-Farbton und eine Website, die fest hell oder dunkel bleibt",
     "growthAddsType": "Schriften, Stärke und Schreibweise der Überschriften",
     "growthAddsShape": "Ecken, Abstände, Bildproportionen und Trennlinien",
     "growthAddsCards": "Kartenstil",
@@ -935,7 +935,7 @@
       "CODES": "Sprachcodes nebeneinander, für wenige Sprachen"
     },
     "colourHeading": "Farbe",
-    "colourDescription": "Nur der Farbton ändert sich, damit Text lesbar bleibt.",
+    "colourDescription": "Akzentfarbton wählen und festlegen, ob Leser zwischen hell und dunkel wählen. Text bleibt in beiden Fällen lesbar.",
     "typeHeading": "Schrift",
     "typeDescription": "Jede Schrift wird in ihrem eigenen Schnitt gezeigt.",
     "shapeHeading": "Ecken & Abstände",

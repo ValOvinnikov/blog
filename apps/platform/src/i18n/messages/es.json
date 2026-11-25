@@ -789,7 +789,7 @@
     "sitePartsGroupHeading": "Partes del sitio",
     "viewTabsAriaLabel": "Vista de Look",
     "jumpIndexAriaLabel": "Secciones de Look",
-    "growthAddsColour": "Un tono de logotipo propio",
+    "growthAddsColour": "Un tono de logotipo propio y un sitio fijado en claro u oscuro",
     "growthAddsType": "Fuentes, grosor y mayúsculas de los títulos",
     "growthAddsShape": "Esquinas, espaciado, proporciones de imagen y separadores",
     "growthAddsCards": "Estilo de tarjeta",
@@ -935,7 +935,7 @@
       "CODES": "Códigos de idioma uno al lado del otro, para pocos idiomas"
     },
     "colourHeading": "Color",
-    "colourDescription": "Solo cambia el tono, para que el texto siga siendo legible.",
+    "colourDescription": "Elige el tono de acento y si los lectores eligen entre claro y oscuro. El texto sigue siendo legible en ambos casos.",
     "typeHeading": "Tipografía",
     "typeDescription": "Cada fuente se muestra con su propio estilo.",
     "shapeHeading": "Esquinas y espaciado",

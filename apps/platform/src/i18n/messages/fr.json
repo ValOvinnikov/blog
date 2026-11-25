@@ -789,7 +789,7 @@
     "sitePartsGroupHeading": "Parties du site",
     "viewTabsAriaLabel": "Vue Look",
     "jumpIndexAriaLabel": "Sections de Look",
-    "growthAddsColour": "Une teinte de logo à part",
+    "growthAddsColour": "Une teinte de logo à part, et un site figé en clair ou en sombre",
     "growthAddsType": "Polices, graisse et casse des titres",
     "growthAddsShape": "Coins, espacement, proportions des images et séparateurs",
     "growthAddsCards": "Style de carte",
@@ -935,7 +935,7 @@
       "CODES": "Codes de langue côte à côte, pour quelques langues"
     },
     "colourHeading": "Couleur",
-    "colourDescription": "Seule la teinte change, pour que le texte reste lisible.",
+    "colourDescription": "Choisissez la teinte d'accent et si les lecteurs choisissent entre clair et sombre. Le texte reste lisible dans les deux cas.",
     "typeHeading": "Typographie",
     "typeDescription": "Chaque police s'affiche dans son propre style.",
     "shapeHeading": "Coins et espacement",
