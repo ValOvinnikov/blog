@@ -779,6 +779,10 @@
     "followsAccent": "follows accent",
     "hueValue": "hue {hue}°"
   },
+  "buttonColorField": {
+    "hexLabel": "Hex",
+    "pickerAriaLabel": "Pick a colour"
+  },
   "lookForm": {
     "heading": "Look",
     "subtitle": "Theme this site. The preview shows your changes — nothing is live until you save.",
@@ -1008,7 +1012,7 @@
       "MENU": "In the menu"
     },
     "buttonsHeading": "Buttons",
-    "buttonsDescription": "How buttons are shaped, how they look while they work, and the spinner they show.",
+    "buttonsDescription": "How buttons are shaped and coloured, how they look while they work, and the spinner they show.",
     "buttonsWhileWorkingHeading": "While working",
     "buttonShapeLabel": "Shape",
     "buttonShapeDescription": "Corners of buttons and tags.",
@@ -1017,6 +1021,15 @@
       "ROUNDED": "Rounded",
       "PILL": "Pill"
     },
+    "buttonColorLabel": "Button colour",
+    "buttonColorDescription": "The fill of filled buttons, and of outlined buttons on hover. Labels turn white or black to stay readable.",
+    "buttonColorFollowAccent": "Follows the accent",
+    "buttonColorDarkLabel": "Button colour on dark backgrounds",
+    "buttonColorDarkDescription": "Used on dark bands and in dark mode. Left to follow, it is worked out from the button colour.",
+    "buttonColorDarkFollow": "Follows the button colour",
+    "buttonColorInvalid": "Enter a hex colour, like #1a73e8.",
+    "buttonColorFaint": "Buttons are faint on {grounds}, so readers may miss them there.",
+    "buttonColorFaintGround": "{skin} in {scheme, select, DARK {dark mode} other {light mode}}",
     "busyButtonStyleLabel": "While busy",
     "busyButtonStyleDescription": "What a button shows while it saves or sends. It keeps its place and stays full colour.",
     "busyButtonStyleOptionLabel": {

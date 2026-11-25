@@ -63,8 +63,14 @@ export const updateLookAction = async (
     const stored = lookFormValuesOrDefaults(
       await queries.siteConfig.getSiteConfig(tenant.id),
     );
+    const { logoHue, buttonColor, buttonColorDark } = parsed.data;
     const refused = listRefusedLookFields(
-      { ...parsed.data, logoHue: parsed.data.logoHue ?? undefined },
+      {
+        ...parsed.data,
+        logoHue: logoHue ?? undefined,
+        buttonColor: buttonColor ?? undefined,
+        buttonColorDark: buttonColorDark ?? undefined,
+      },
       stored,
       tenant.entitlements,
     );

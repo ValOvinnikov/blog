@@ -1,4 +1,5 @@
 import {
+  SITE_THEME_BUTTON_STYLE_TEST_ID,
   SITE_THEME_FRAME_ATTRIBUTE,
   SKIN_ATTRIBUTE,
 } from '@platform/constants/site-theme-frame';
@@ -25,6 +26,7 @@ export const SiteThemeFrame = ({
   const {
     tokenStyle,
     skinScopeTokens,
+    buttonStyleBlock,
     isDark,
     headingFontFamily,
     bodyFontFamily,
@@ -51,6 +53,11 @@ export const SiteThemeFrame = ({
             `[${SITE_THEME_FRAME_ATTRIBUTE}="${frameId}"] [${SKIN_ATTRIBUTE}]`,
             skinScopeTokens,
           )}
+        </style>
+      )}
+      {buttonStyleBlock && (
+        <style data-testid={SITE_THEME_BUTTON_STYLE_TEST_ID}>
+          {buttonStyleBlock}
         </style>
       )}
       {children}

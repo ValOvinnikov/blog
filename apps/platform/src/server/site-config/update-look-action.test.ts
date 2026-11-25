@@ -112,6 +112,8 @@ const MOCK_DB_ERROR_MESSAGE = faker.lorem.words(3);
 const MOCK_UNSUPPORTED_LOOK_VALUE = 'HEAVY';
 
 const MOCK_BRAND_NAME = faker.company.name();
+const MOCK_BUTTON_COLOR = faker.color.rgb();
+const MOCK_BUTTON_COLOR_DARK = faker.color.rgb();
 
 const VALID_INPUT: TUpdateLookInput = {
   preset: PRESET_ID.EDITORIAL,
@@ -142,11 +144,20 @@ const VALID_INPUT: TUpdateLookInput = {
   busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
   spinnerStyle: SPINNER_STYLE.DOTS,
   buttonShape: BUTTON_SHAPE.PILL,
+  buttonColor: MOCK_BUTTON_COLOR,
+  buttonColorDark: MOCK_BUTTON_COLOR_DARK,
   footerLayout: FOOTER_LAYOUT.CENTRED,
   footerBackground: BRAND_VARIANT.SECONDARY,
   footerSurface: FOOTER_SURFACE.CARD,
   cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
   brandName: MOCK_BRAND_NAME,
+};
+
+const STORED_LOOK = {
+  ...VALID_INPUT,
+  logoHue: undefined,
+  buttonColor: MOCK_BUTTON_COLOR,
+  buttonColorDark: MOCK_BUTTON_COLOR_DARK,
 };
 
 const { preset, accentHue, cookieSettingsButton, brandName } = VALID_INPUT;
@@ -174,9 +185,7 @@ describe(updateLookAction, () => {
       user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     getSiteConfigMock.mockReset();
-    getSiteConfigMock.mockResolvedValue(
-      mockSiteConfig({ ...VALID_INPUT, logoHue: undefined }),
-    );
+    getSiteConfigMock.mockResolvedValue(mockSiteConfig(STORED_LOOK));
     upsertSiteConfigMock.mockReset();
     stampSiteConfigSavedAtMock.mockReset();
     insertAuditEventMock.mockReset();
@@ -234,6 +243,18 @@ describe(updateLookAction, () => {
       expect(upsertSiteConfigMock).not.toHaveBeenCalled();
     });
 
+    it('refuses a button colour picked on Free, and writes nothing', async () => {
+      const result = await updateLookAction(MOCK_TENANT_ID, {
+        ...VALID_INPUT,
+        buttonColor: faker.color.rgb(),
+      });
+
+      expect(result).toEqual(
+        expect.objectContaining({ items: [LOOK_FIELD.BUTTON_COLOR] }),
+      );
+      expect(upsertSiteConfigMock).not.toHaveBeenCalled();
+    });
+
     it('saves an accent hue change while the Growth-only fields keep their stored values', async () => {
       const result = await updateLookAction(MOCK_TENANT_ID, {
         ...VALID_INPUT,
@@ -249,13 +270,15 @@ describe(updateLookAction, () => {
 
     it('saves when the Growth-only fields hold the preset values the Free page shows', async () => {
       const presetValues = toEffectiveLookWithin(
-        { ...VALID_INPUT, logoHue: undefined, radiusScale: RADIUS_SCALE.LG },
+        { ...STORED_LOOK, radiusScale: RADIUS_SCALE.LG },
         PLAN_ENTITLEMENTS[TENANT_PLAN.FREE],
       );
 
       const result = await updateLookAction(MOCK_TENANT_ID, {
         ...presetValues,
         logoHue: null,
+        buttonColor: null,
+        buttonColorDark: null,
       });
 
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -280,11 +303,7 @@ describe(updateLookAction, () => {
   describe('with the Shinefold preset stored and no grant', () => {
     beforeEach(() => {
       getSiteConfigMock.mockResolvedValue(
-        mockSiteConfig({
-          ...VALID_INPUT,
-          preset: PRESET_ID.SHINEFOLD,
-          logoHue: undefined,
-        }),
+        mockSiteConfig({ ...STORED_LOOK, preset: PRESET_ID.SHINEFOLD }),
       );
     });
 
@@ -308,6 +327,19 @@ describe(updateLookAction, () => {
         expect.objectContaining({ preset: PRESET_ID.EDITORIAL }),
       );
     });
+  });
+
+  it('clears both button colours when they are saved as following the accent', async () => {
+    await updateLookAction(MOCK_TENANT_ID, {
+      ...VALID_INPUT,
+      buttonColor: null,
+      buttonColorDark: null,
+    });
+
+    expect(upsertSiteConfigMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      expect.objectContaining({ buttonColor: null, buttonColorDark: null }),
+    );
   });
 
   it('clears the brand name when it is saved blank', async () => {
@@ -371,6 +403,8 @@ describe(updateLookAction, () => {
     [LOOK_FIELD.DIVIDER_WIDTH, MOCK_UNSUPPORTED_LOOK_VALUE],
     [LOOK_FIELD.COLOR_MODE, MOCK_UNSUPPORTED_LOOK_VALUE],
     [LOOK_FIELD.BRAND_NAME, 'x'.repeat(BRAND_NAME_MAX_LENGTH + 1)],
+    [LOOK_FIELD.BUTTON_COLOR, MOCK_UNSUPPORTED_LOOK_VALUE],
+    [LOOK_FIELD.BUTTON_COLOR_DARK, MOCK_UNSUPPORTED_LOOK_VALUE],
   ])('rejects an invalid %s without writing it', async (field, value) => {
     const result = await updateLookAction(MOCK_TENANT_ID, {
       ...VALID_INPUT,

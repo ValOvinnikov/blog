@@ -24,6 +24,8 @@ import {
 import { toOptions } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
+import { ButtonColorFields } from './components/button-color-fields';
+
 export type TButtonsCardProps = {
   summary: string;
 };
@@ -76,6 +78,7 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
         options={shapeOptions}
         layout={SEGMENTED_LAYOUT.SINGLE_ROW}
       />
+      <ButtonColorFields />
 
       <LookSubsection heading={t('buttonsWhileWorkingHeading')}>
         <LookChoiceField

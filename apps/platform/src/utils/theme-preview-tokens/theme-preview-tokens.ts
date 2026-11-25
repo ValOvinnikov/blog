@@ -1,5 +1,9 @@
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import {
+  toButtonColors,
+  type TButtonColorValues,
+} from '@platform/utils/button-colors/button-colors';
+import {
   buildShapePreviewTokens,
   buildSkinScopeOverrideTokens,
   type TShapePreviewValues,
@@ -8,6 +12,7 @@ import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
   BRAND_PALETTE,
+  formatButtonStyleBlock,
   formatOklchRamp,
   HUE_MAX,
   HUE_MIN,
@@ -47,17 +52,24 @@ export const buildThemePreviewStyle = (
     ...buildShapePreviewTokens(shape),
   }) as CSSProperties;
 
-export type TSitePreviewThemeValues = TThemePreviewValues & {
-  headingFont: TFontChoice;
-  bodyFont: TFontChoice;
-};
+export type TSitePreviewThemeValues = TThemePreviewValues &
+  TButtonColorValues & {
+    headingFont: TFontChoice;
+    bodyFont: TFontChoice;
+  };
 
 export type TSitePreviewTheme = {
   tokenStyle: CSSProperties;
   skinScopeTokens: TMaybeUndefined<TThemeDeclarations>;
+  buttonStyleBlock: TMaybeUndefined<string>;
   isDark: boolean;
   headingFontFamily: string;
   bodyFontFamily: string;
+};
+
+const formatButtonStyle = (values: TButtonColorValues) => {
+  const colors = toButtonColors(values);
+  return colors && formatButtonStyleBlock(colors);
 };
 
 export const buildSitePreviewTheme = (
@@ -66,6 +78,7 @@ export const buildSitePreviewTheme = (
 ): TSitePreviewTheme => ({
   tokenStyle: buildThemePreviewStyle(values, isDark),
   skinScopeTokens: buildSkinScopeOverrideTokens(values),
+  buttonStyleBlock: formatButtonStyle(values),
   isDark,
   headingFontFamily: FONT_OPTIONS[values.headingFont].fontFamily,
   bodyFontFamily: FONT_OPTIONS[values.bodyFont].fontFamily,

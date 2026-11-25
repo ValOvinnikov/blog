@@ -31,9 +31,11 @@ import {
   SPINNER_STYLE,
 } from '@shinefold/config';
 import { BRAND_NAME_MAX_LENGTH } from '@shinefold/db/constants';
+import { isHexColor } from '@shinefold/utils/color';
 import { z } from 'zod';
 
 const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
+const hexColorSchema = z.string().refine(isHexColor);
 
 export const updateLookInputSchema = z.object({
   preset: z.enum(PRESET_ID),
@@ -64,6 +66,8 @@ export const updateLookInputSchema = z.object({
   busyButtonStyle: z.enum(BUSY_BUTTON_STYLE),
   spinnerStyle: z.enum(SPINNER_STYLE),
   buttonShape: z.enum(BUTTON_SHAPE),
+  buttonColor: hexColorSchema.nullable(),
+  buttonColorDark: hexColorSchema.nullable(),
   footerLayout: z.enum(FOOTER_LAYOUT),
   footerBackground: z.enum(BRAND_VARIANT),
   footerSurface: z.enum(FOOTER_SURFACE),
