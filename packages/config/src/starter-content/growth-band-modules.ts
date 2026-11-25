@@ -10,12 +10,9 @@ import type {
 } from '@shinefold/config/sanity/generated/types';
 
 import type { TStarterModule } from './starter-document';
-import {
-  localizedParagraphText,
-  localizedString,
-  moduleHeadingBlock,
-} from './starter-fields';
+import { localizedString, moduleHeadingBlock } from './starter-fields';
 import type { TModuleInput } from './starter-modules';
+import { localizedParagraphText } from './starter-portable-text';
 
 type TTimelineCopy = {
   heading: string;

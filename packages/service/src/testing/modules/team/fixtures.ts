@@ -6,7 +6,7 @@ import {
 } from '@shinefold/config';
 import type { TRawTeamModule } from '@shinefold/service/features/modules/team/adaptor/transformer';
 import { MOCK_PERSON_NAME } from '@shinefold/service/testing/modules/fixtures';
-import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 type TRawTeamMember = TRawTeamModule['members'][number];
@@ -33,7 +33,7 @@ export function mockRawTeamModule(
 ): TRawTeamModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Meet the team'),
+    headingBlock: mockRawModuleHeadingBlock('Meet the team'),
     members: [
       mockRawTeamMember(),
       mockRawTeamMember({ _id: 'person-2', name: 'Alex Chen' }),

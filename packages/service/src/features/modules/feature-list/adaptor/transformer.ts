@@ -1,5 +1,5 @@
 import { toCtaButtons } from '@shinefold/service/shared/transformers/cta/to-cta-buttons';
-import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { toSanityImage } from '@shinefold/service/shared/transformers/image/to-sanity-image';
 import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 import { toLinkDocument } from '@shinefold/service/shared/transformers/link/to-link-document';
@@ -20,7 +20,7 @@ type TRawFeatureListItem = NonNullable<
 function toFeatureListItem(raw: TRawFeatureListItem): TFeatureListItem {
   return {
     id: raw._id,
-    headingBlock: toHeadingBlock(raw.headingBlock),
+    headingBlock: toModuleHeadingBlock(raw.headingBlock),
     sanityImage: toSanityImage(raw.image),
     icon: raw.icon ?? undefined,
     link: toLinkDocument(raw.link),
@@ -41,7 +41,7 @@ export function toFeatureListModule(
 ): TFeatureListModule {
   return {
     brandVariant: raw.brandVariant,
-    headingBlock: toHeadingBlock(raw.headingBlock),
+    headingBlock: toModuleHeadingBlock(raw.headingBlock),
     items: toFeatureListItems(raw.features),
     ctaButtons: toCtaButtons(raw.ctaButtons),
     imageShape: raw.imageShape,

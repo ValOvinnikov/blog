@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { LINK_TYPE } from '@shinefold/config';
 import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
+import type { TRawModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { mockReference } from '@shinefold/service/testing/shared/fixtures';
 
 type TLocalizedText = Partial<Record<string, string>>;
@@ -40,13 +41,39 @@ export function mockLocalizedStrings(values: TLocalizedText) {
 export function mockParagraphBlocks(text: string) {
   return [
     {
-      _type: 'block',
+      _type: 'block' as const,
       _key: text,
-      style: 'normal',
-      children: [{ _type: 'span', _key: 'span', text, marks: [] }],
+      style: 'normal' as const,
+      children: [{ _type: 'span' as const, _key: 'span', text, marks: [] }],
       markDefs: [],
     },
   ];
+}
+
+function mockPlainHeadingPieces(text: string) {
+  return [{ text, isHighlighted: false }];
+}
+
+export function mockModuleHeadingBlockView(
+  heading: string,
+  supportingText?: string,
+) {
+  return {
+    heading,
+    headingPieces: mockPlainHeadingPieces(heading),
+    supportingText,
+  };
+}
+
+export function mockRawModuleHeadingBlock(
+  heading: string,
+  overrides: Partial<Omit<TRawModuleHeadingBlock, 'heading'>> = {},
+): TRawModuleHeadingBlock {
+  return {
+    heading: mockParagraphBlocks(heading),
+    supportingText: null,
+    ...overrides,
+  };
 }
 
 function mockLocalizedParagraphs(type: string, values: TLocalizedText) {
@@ -81,7 +108,10 @@ export function mockLocalizedHeadingBlock(
 ) {
   return {
     _type: 'moduleHeadingBlock',
-    heading: mockLocalizedStrings(heading),
+    heading: mockLocalizedParagraphs(
+      'internationalizedArrayHeadingTextValue',
+      heading,
+    ),
     ...fields,
   };
 }

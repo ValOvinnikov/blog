@@ -18,12 +18,13 @@ import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion, TStarterPage } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import type { TStarterTemplate } from './starter-document-shape';
-import { moduleSlot, paragraphs, reference } from './starter-fields';
+import { moduleSlot, reference } from './starter-fields';
 import { linkedParagraph } from './starter-linked-paragraph';
 import { internalLink } from './starter-links';
 import { INTRODUCTION_MODULE_TITLE } from './starter-module-titles';
 import { buildContentModule } from './starter-modules';
 import { pageFields, starterTemplate } from './starter-pages';
+import { paragraphs } from './starter-portable-text';
 
 const COOKIE_STATEMENT_LINK_MARK_KEY = 'cookieStatementLink';
 

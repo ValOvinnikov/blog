@@ -6,9 +6,10 @@ import type {
 
 import type { TStarterDocumentUnion, TStarterPage } from './starter-document';
 import type { TStarterTemplate } from './starter-document-shape';
-import { moduleSlot, paragraphs, reference, slug } from './starter-fields';
+import { moduleSlot, reference, slug } from './starter-fields';
 import { buildContentModule } from './starter-modules';
 import { pageFields, starterTemplate } from './starter-pages';
+import { paragraphs } from './starter-portable-text';
 
 export type TPageCopy = {
   title: string;

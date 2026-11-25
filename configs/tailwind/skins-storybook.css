@@ -36,6 +36,7 @@
   --ring: var(--brand-primary);
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
+  --heading-highlight: var(--brand-primary);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
   --button-fill: var(--brand-primary-solid);
@@ -79,6 +80,7 @@
   --ring: var(--brand-primary);
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
+  --heading-highlight: var(--brand-primary);
   --code-fg: var(--text);
   --code-comment: var(--text-muted);
   --button-fill: var(--brand-primary-solid);

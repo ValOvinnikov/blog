@@ -9,6 +9,7 @@ import {
   mockLocalizedImage,
   mockLocalizedStrings,
   mockLocalizedValues,
+  mockRawModuleHeadingBlock,
 } from '@shinefold/service/testing/shared/localized';
 
 import { heroStatementModuleQuery } from './query';
@@ -87,10 +88,11 @@ describe('heroStatementModuleQuery', () => {
     );
 
     expect(eyebrow).toBe(copy.eyebrow);
-    expect(headingBlock).toEqual({
-      heading: copy.heading,
-      supportingText: copy.supportingText,
-    });
+    expect(headingBlock).toEqual(
+      mockRawModuleHeadingBlock(copy.heading, {
+        supportingText: copy.supportingText,
+      }),
+    );
     expect(image?.alt).toBe(copy.alt);
     expect(footnote).toBe(copy.footnote);
   });
@@ -111,15 +113,15 @@ describe('heroStatementModuleQuery', () => {
     expect(footnote).toBeNull();
   });
 
-  it('fails when the heading is missing in every language', async () => {
-    await expect(
-      runHero(
-        {
-          ...MOCK_HERO_DOCUMENT,
-          headingBlock: { _type: 'moduleHeadingBlock' },
-        },
-        NL,
-      ),
-    ).rejects.toThrow();
+  it('reads a heading missing in every language as no heading', async () => {
+    const { headingBlock } = await runHero(
+      {
+        ...MOCK_HERO_DOCUMENT,
+        headingBlock: { _type: 'moduleHeadingBlock' },
+      },
+      NL,
+    );
+
+    expect(headingBlock.heading).toBeNull();
   });
 });

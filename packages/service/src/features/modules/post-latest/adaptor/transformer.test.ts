@@ -10,9 +10,12 @@ import { mockRawPostLatestModule } from '@shinefold/service/testing/modules/post
 import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_POST_ID,
-  mockRawHeadingBlock,
   mockRawWideLayout,
 } from '@shinefold/service/testing/shared/fixtures';
+import {
+  mockRawModuleHeadingBlock,
+  mockModuleHeadingBlockView,
+} from '@shinefold/service/testing/shared/localized';
 
 import {
   toPostLatestModule,
@@ -24,15 +27,14 @@ const MOCK_NO_POSTS: TRawPostLatestModulePosts = [];
 describe(toPostLatestModule, () => {
   it('maps the heading block', () => {
     const raw = mockRawPostLatestModule({
-      headingBlock: mockRawHeadingBlock(MOCK_RECENT_POSTS_HEADING),
+      headingBlock: mockRawModuleHeadingBlock(MOCK_RECENT_POSTS_HEADING),
     });
 
     const module = toPostLatestModule(raw, MOCK_NO_POSTS);
 
-    expect(module.headingBlock).toEqual({
-      heading: MOCK_RECENT_POSTS_HEADING,
-      supportingText: undefined,
-    });
+    expect(module.headingBlock).toEqual(
+      mockModuleHeadingBlockView(MOCK_RECENT_POSTS_HEADING),
+    );
   });
 
   it.each([

@@ -1,4 +1,5 @@
 import type {
+  InternationalizedArrayHeadingText,
   InternationalizedArrayListedText,
   InternationalizedArrayParagraphText,
 } from '@shinefold/config';
@@ -18,7 +19,9 @@ import type {
 type TTextBlock = InferFragmentType<typeof textBlockFragment>;
 
 type TLocalizedPortableText =
-  InternationalizedArrayListedText | InternationalizedArrayParagraphText;
+  | InternationalizedArrayHeadingText
+  | InternationalizedArrayListedText
+  | InternationalizedArrayParagraphText;
 
 export function getLocalizedPortableTextBlock<
   TScope,

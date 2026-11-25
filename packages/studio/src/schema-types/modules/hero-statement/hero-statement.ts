@@ -12,7 +12,7 @@ import { titleField } from '@shinefold/studio/schema-types/fields/title-field/ti
 import { heroFieldsets } from '@shinefold/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
 import { heroLayoutField } from '@shinefold/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
+import { defaultLanguageBlockText } from '@shinefold/studio/schema-types/validation/default-language-block-text/default-language-block-text';
 import { Quote } from 'lucide-react';
 import { defineType } from 'sanity';
 
@@ -49,7 +49,7 @@ export const heroStatementSchema = defineType({
     prepare({ title, subtitle }) {
       return {
         title: title ?? 'Unknown',
-        subtitle: defaultLanguageValue(subtitle),
+        subtitle: defaultLanguageBlockText(subtitle),
       };
     },
   },

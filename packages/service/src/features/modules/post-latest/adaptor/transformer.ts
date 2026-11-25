@@ -1,4 +1,4 @@
-import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 import { toModuleAppearance } from '@shinefold/service/shared/transformers/module/to-module-appearance';
 import { toPostCard } from '@shinefold/service/shared/transformers/post/to-post-card';
@@ -21,7 +21,7 @@ export function toPostLatestModule(
 ): TPostLatestModule {
   return {
     brandVariant: raw.brandVariant,
-    headingBlock: toHeadingBlock(raw.headingBlock),
+    headingBlock: toModuleHeadingBlock(raw.headingBlock),
     posts: rawPosts.map((rawPost) => toPostCard(rawPost)),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,

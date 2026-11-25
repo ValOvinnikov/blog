@@ -6,7 +6,7 @@ import {
   type TPricePeriod,
 } from '@shinefold/config';
 import { toCtaButtons } from '@shinefold/service/shared/transformers/cta/to-cta-buttons';
-import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 import { toModuleAppearance } from '@shinefold/service/shared/transformers/module/to-module-appearance';
 import type { InferResultType } from 'groqd';
@@ -82,7 +82,7 @@ function toPricingTiers(raw: TRawPricingModule['tiers']): TPricingTier[] {
 export function toPricingModule(raw: TRawPricingModule): TPricingModule {
   return {
     brandVariant: raw.brandVariant,
-    headingBlock: toHeadingBlock(raw.headingBlock),
+    headingBlock: toModuleHeadingBlock(raw.headingBlock),
     tiers: toPricingTiers(raw.tiers),
     footnote: raw.footnote ?? undefined,
     ctaButtons: toCtaButtons(raw.ctaButtons),

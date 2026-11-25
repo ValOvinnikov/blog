@@ -4,7 +4,7 @@ import {
   MOCK_SECOND_FAQ_QUESTION_ID,
   mockRawFaqQuestionItem,
 } from '@shinefold/service/testing/modules/fixtures';
-import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 export function mockRawFaqModule(
@@ -12,7 +12,7 @@ export function mockRawFaqModule(
 ): TRawFaqModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Frequently asked questions'),
+    headingBlock: mockRawModuleHeadingBlock('Frequently asked questions'),
     questions: [
       mockRawFaqQuestionItem(),
       mockRawFaqQuestionItem({ _id: MOCK_SECOND_FAQ_QUESTION_ID }),

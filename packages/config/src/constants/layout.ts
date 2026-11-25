@@ -48,8 +48,14 @@ export type TContentAlignmentOf<TKeys extends keyof typeof CONTENT_ALIGNMENT> =
 
 export type THeadingAlignment = TContentAlignmentOf<'LEFT' | 'CENTER'>;
 
+export type THeadingPiece = {
+  text: string;
+  isHighlighted: boolean;
+};
+
 export type THeadingBlock = {
   heading: string;
+  headingPieces?: readonly THeadingPiece[];
   supportingText?: string;
 };
 

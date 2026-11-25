@@ -1,4 +1,4 @@
-import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 import type { InferResultType } from 'groqd';
 
@@ -14,7 +14,7 @@ export function toCookieSettingsModule(
 ): TCookieSettingsModule {
   return {
     brandVariant: raw.brandVariant,
-    headingBlock: toHeadingBlock(raw.headingBlock),
+    headingBlock: toModuleHeadingBlock(raw.headingBlock),
     layout: toLayout(raw.layout),
   };
 }

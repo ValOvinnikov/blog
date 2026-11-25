@@ -10,7 +10,7 @@ import { heroFieldsets } from '@shinefold/studio/schema-types/modules/hero-field
 import { heroLayoutField } from '@shinefold/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { localizedImageWithAltSchema } from '@shinefold/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
 import { moduleHeadingBlockField } from '@shinefold/studio/schema-types/objects/module-heading-block/module-heading-block-field';
-import { defaultLanguageValue } from '@shinefold/studio/schema-types/validation/default-language-value/default-language-value';
+import { defaultLanguageBlockText } from '@shinefold/studio/schema-types/validation/default-language-block-text/default-language-block-text';
 import { UserCircle } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -83,7 +83,7 @@ export const heroProfileSchema = defineType({
     prepare({ title, subtitle }) {
       return {
         title: title ?? 'Unknown',
-        subtitle: defaultLanguageValue(subtitle) ?? 'No heading yet',
+        subtitle: defaultLanguageBlockText(subtitle) ?? 'No heading yet',
       };
     },
   },

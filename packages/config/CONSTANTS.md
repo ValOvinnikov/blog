@@ -166,6 +166,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **HEADING_WEIGHT**: `REGULAR`, `MEDIUM`, `SEMIBOLD`, `BOLD`
 - **HEADING_CASE**: `AS_WRITTEN`, `UPPERCASE`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/heading-text.ts`
+
+- **HEADING_TEXT_MARK**: `HIGHLIGHT`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/http-headers.ts`
 
 - **REQUEST_HEADER**: `ORIGIN`=`"origin"`, `SEC_FETCH_SITE`=`"sec-fetch-site"`, `CONTENT_TYPE`=`"content-type"`

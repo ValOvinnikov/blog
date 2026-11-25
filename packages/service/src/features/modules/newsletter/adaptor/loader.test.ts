@@ -11,9 +11,9 @@ import {
 import { mockCacheTag } from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
-  mockRawHeadingBlock,
   mockValidationError,
 } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getNewsletter } from './loader';
@@ -30,7 +30,7 @@ describe(getNewsletter, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
       mockRawNewsletterModule({
-        headingBlock: mockRawHeadingBlock(MOCK_HEADING, {
+        headingBlock: mockRawModuleHeadingBlock(MOCK_HEADING, {
           supportingText: MOCK_SUPPORTING_TEXT,
         }),
         variant: NEWSLETTER_VARIANT.COMPACT,

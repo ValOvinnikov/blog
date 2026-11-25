@@ -8,6 +8,7 @@ import {
   mockLocalizedHeadingBlock,
   mockLocalizedListedText,
   mockLocalizedStrings,
+  mockParagraphBlocks,
 } from '@shinefold/service/testing/shared/localized';
 import { MOCK_AUTHORED_CARD_APPEARANCE } from '@shinefold/service/testing/shared/module-appearance';
 
@@ -145,7 +146,9 @@ describe('faqModuleQuery', () => {
   ])('%s', async (_, locale, copy) => {
     const module = await runFaq(MOCK_FAQ_DATASET, locale);
 
-    expect(module.headingBlock.heading).toBe(copy.heading);
+    expect(module.headingBlock.heading).toEqual(
+      mockParagraphBlocks(copy.heading),
+    );
     expect(questionText(module)).toEqual([
       { question: copy.question, answer: [[copy.answer]] },
       {

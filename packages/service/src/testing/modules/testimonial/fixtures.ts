@@ -8,7 +8,7 @@ import {
   MOCK_PERSON_NAME,
   mockRawContentBlock,
 } from '@shinefold/service/testing/modules/fixtures';
-import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 type TRawTestimonialItem = TRawTestimonialModule['testimonials'][number];
@@ -34,7 +34,7 @@ export function mockRawTestimonialModule(
 ): TRawTestimonialModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('What people say'),
+    headingBlock: mockRawModuleHeadingBlock('What people say'),
     testimonials: [
       mockRawTestimonialItem(),
       mockRawTestimonialItem({ _id: 'block-testimonial-2' }),

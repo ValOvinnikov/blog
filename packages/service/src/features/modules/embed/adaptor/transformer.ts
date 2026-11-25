@@ -1,6 +1,6 @@
 import { parseEmbedUrl, type TMaybeUndefined } from '@shinefold/config';
 import { toCtaButtons } from '@shinefold/service/shared/transformers/cta/to-cta-buttons';
-import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 import type { InferResultType } from 'groqd';
 
@@ -24,7 +24,7 @@ function toEmbed(raw: TRawEmbedModule['embed']): TMaybeUndefined<TEmbed> {
 export function toEmbedModule(raw: TRawEmbedModule): TEmbedModule {
   return {
     brandVariant: raw.brandVariant,
-    headingBlock: toHeadingBlock(raw.headingBlock),
+    headingBlock: toModuleHeadingBlock(raw.headingBlock),
     embed: toEmbed(raw.embed),
     ctaButtons: toCtaButtons(raw.ctaButtons),
     contentAlignment: raw.contentAlignment ?? undefined,

@@ -16,12 +16,12 @@ import type {
 import type { TStarterModule } from './starter-document';
 import type { TStarterDocument } from './starter-document-shape';
 import {
-  localizedArticleBlocks,
   localizedString,
   moduleHeadingBlock,
   reference,
 } from './starter-fields';
 import { ctaButton } from './starter-links';
+import { localizedArticleBlocks } from './starter-portable-text';
 
 export type TModuleInput = {
   id: string;
